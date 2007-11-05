@@ -359,7 +359,7 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 215974172;
+			PBXPerProjectTemplateStateSaveDate = 215976049;
 			PBXPrepackagedSmartGroups_v2 = (
 				{
 					PBXTransientLocationAtTop = bottom;
@@ -2575,7 +2575,7 @@
 				PBXModuleWindowStatusBarHidden = YES;
 				RubberWindowFrame = "1241 -35 750 444 0 0 1680 1028 ";
 			};
-			PBXWorkspaceStateSaveDate = 215974172;
+			PBXWorkspaceStateSaveDate = 215976049;
 		};
 		perUserProjectItems = {
 			8400CC4E09ABB852000C1DA4 = 8400CC4E09ABB852000C1DA4 /* PBXTextBookmark */;
@@ -4873,6 +4873,12 @@
 			84E4CC190C23159B005B7D9A = 84E4CC190C23159B005B7D9A /* PBXTextBookmark */;
 			84E4CC340C231743005B7D9A = 84E4CC340C231743005B7D9A /* PBXTextBookmark */;
 			84E4CC370C231743005B7D9A = 84E4CC370C231743005B7D9A /* PBXTextBookmark */;
+			84E551AF0CDF8D8E009FA927 /* PBXTextBookmark */ = 84E551AF0CDF8D8E009FA927 /* PBXTextBookmark */;
+			84E551B00CDF8D8E009FA927 /* PBXTextBookmark */ = 84E551B00CDF8D8E009FA927 /* PBXTextBookmark */;
+			84E551B20CDF8D96009FA927 /* PBXTextBookmark */ = 84E551B20CDF8D96009FA927 /* PBXTextBookmark */;
+			84E551B30CDF8D96009FA927 /* PBXTextBookmark */ = 84E551B30CDF8D96009FA927 /* PBXTextBookmark */;
+			84E551B40CDF8D96009FA927 /* PBXTextBookmark */ = 84E551B40CDF8D96009FA927 /* PBXTextBookmark */;
+			84E551B50CDF8D96009FA927 /* PBXTextBookmark */ = 84E551B50CDF8D96009FA927 /* PBXTextBookmark */;
 			84E5C38B09C2246200BBF4F7 = 84E5C38B09C2246200BBF4F7 /* PBXTextBookmark */;
 			84E5C3A109C2246200BBF4F7 = 84E5C3A109C2246200BBF4F7 /* PBXTextBookmark */;
 			84E5C3B609C2246200BBF4F7 = 84E5C3B609C2246200BBF4F7 /* PBXTextBookmark */;
@@ -8352,9 +8358,9 @@
 	};
 	841903E20CCE71ED00F21371 /* ORGretina4Model.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {908, 17808}}";
-			sepNavSelRange = "{4479, 0}";
-			sepNavVisRect = "{{0, 956}, {869, 538}}";
+			sepNavIntBoundsRect = "{{0, 0}, {908, 17836}}";
+			sepNavSelRange = "{3533, 0}";
+			sepNavVisRect = "{{0, 712}, {827, 550}}";
 		};
 	};
 	841903F20CCE75F800F21371 /* PBXBookmark */ = {
@@ -8578,7 +8584,7 @@
 		fRef = 841903E20CCE71ED00F21371 /* ORGretina4Model.m */;
 		name = "ORGretina4Model.m: 99";
 		rLen = 0;
-		rLoc = 4499;
+		rLoc = 4505;
 		rType = 0;
 		vrLen = 3039;
 		vrLoc = 76;
@@ -11727,9 +11733,9 @@
 	};
 	842B0623040C2709005F64B1 /* NcdMuxBoxController.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {880, 2156}}";
-			sepNavSelRange = "{792, 0}";
-			sepNavVisRect = "{{0, 0}, {880, 715}}";
+			sepNavIntBoundsRect = "{{0, 0}, {827, 2338}}";
+			sepNavSelRange = "{6202, 0}";
+			sepNavVisRect = "{{0, 0}, {827, 550}}";
 			sepNavWindowFrame = "{{61, 423}, {750, 558}}";
 		};
 	};
@@ -14100,7 +14106,7 @@
 		fRef = 842B0623040C2709005F64B1 /* NcdMuxBoxController.h */;
 		name = "NcdMuxBoxController.h: 29";
 		rLen = 0;
-		rLoc = 1603;
+		rLoc = 1602;
 		rType = 0;
 		vrLen = 1610;
 		vrLoc = 0;
@@ -32106,7 +32112,7 @@
 			CVSToolPath = /usr/bin/ocvs;
 			CVSUseSSH = NO;
 		};
-		scmType = scm.cvs;
+		scmType = scm.subversion;
 	};
 	84D1F3E9054F14EF0074BAF3 /* Code sense */ = {
 		isa = PBXCodeSenseManager;
@@ -35391,6 +35397,64 @@
 		name = server.c;
 		path = /Users/markhowe/cPciTest/server.c;
 		sourceTree = "<absolute>";
+	};
+	84E551AF0CDF8D8E009FA927 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		comments = "warning: excess elements in array initializer";
+		fRef = 841903E20CCE71ED00F21371 /* ORGretina4Model.m */;
+		rLen = 1;
+		rLoc = 71;
+		rType = 1;
+	};
+	84E551B00CDF8D8E009FA927 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 841903E20CCE71ED00F21371 /* ORGretina4Model.m */;
+		name = "ORGretina4Model.m: 73";
+		rLen = 0;
+		rLoc = 3533;
+		rType = 0;
+		vrLen = 1378;
+		vrLoc = 2825;
+	};
+	84E551B20CDF8D96009FA927 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 842B0623040C2709005F64B1 /* NcdMuxBoxController.h */;
+		name = "NcdMuxBoxController.h: 167";
+		rLen = 0;
+		rLoc = 6202;
+		rType = 0;
+		vrLen = 1597;
+		vrLoc = 0;
+	};
+	84E551B30CDF8D96009FA927 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 841903E20CCE71ED00F21371 /* ORGretina4Model.m */;
+		name = "ORGretina4Model.m: 73";
+		rLen = 0;
+		rLoc = 3533;
+		rType = 0;
+		vrLen = 1408;
+		vrLoc = 2824;
+	};
+	84E551B40CDF8D96009FA927 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 842B0623040C2709005F64B1 /* NcdMuxBoxController.h */;
+		name = "NcdMuxBoxController.h: 167";
+		rLen = 0;
+		rLoc = 6202;
+		rType = 0;
+		vrLen = 1597;
+		vrLoc = 0;
+	};
+	84E551B50CDF8D96009FA927 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 841903E20CCE71ED00F21371 /* ORGretina4Model.m */;
+		name = "ORGretina4Model.m: 73";
+		rLen = 0;
+		rLoc = 3533;
+		rType = 0;
+		vrLen = 1408;
+		vrLoc = 2824;
 	};
 	84E583FE04DB1772005F64B1 /* ORPCICamacCommands.h */ = {
 		uiCtxt = {
