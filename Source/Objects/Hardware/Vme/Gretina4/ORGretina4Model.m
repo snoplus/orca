@@ -68,7 +68,9 @@ static unsigned long register_offsets[kNumberOfGretina4Registers] = {
     0x100,  //[12] Raw data sliding length
     0x140, //[13] Raw data window length
     0x400, //[14] DAC
-    0x480, //[15] Slave Front bus status
+		};
+	/*
+	0x480, //[15] Slave Front bus status
     0x484, //[16] Channel Zero time stamp LSB
     0x488, //[17] Channel Zero time stamp MSB
     0x48C, //[18] Slave Front Bus Send Box 18 - 1
@@ -100,7 +102,7 @@ static unsigned long register_offsets[kNumberOfGretina4Registers] = {
 
 
 
-};
+};*/
 
 enum {
     kExternalWindowIndex,
