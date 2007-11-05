@@ -17,9 +17,9 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					243,
+					512,
 					20,
-					48.1626,
+					48,
 					43,
 					43,
 					20,
@@ -34,8 +34,8 @@
 					PBXFileDataSource_Target_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 209402051;
-			PBXWorkspaceStateSaveDate = 209402051;
+			PBXPerProjectTemplateStateSaveDate = 215984399;
+			PBXWorkspaceStateSaveDate = 215984399;
 		};
 		sourceControlManager = 2A7685B50C7B38CD000C942F /* Source Control */;
 		userBuildSettings = {
@@ -68,10 +68,10 @@
 	2A7685B50C7B38CD000C942F /* Source Control */ = {
 		isa = PBXSourceControlManager;
 		fallbackIsa = XCSourceControlManager;
-		isSCMEnabled = 0;
+		isSCMEnabled = 1;
 		scmConfiguration = {
 		};
-		scmType = "";
+		scmType = scm.subversion;
 	};
 	2A7685B60C7B38CD000C942F /* Code sense */ = {
 		isa = PBXCodeSenseManager;

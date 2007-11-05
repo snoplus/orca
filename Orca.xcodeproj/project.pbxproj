@@ -2033,7 +2033,7 @@
 		8434150B08EE0378009B7659 /* ORCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCrateController.h; sourceTree = "<group>"; };
 		8434150C08EE0378009B7659 /* ORCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCrateController.m; sourceTree = "<group>"; };
 		8434A363055B3288002D3102 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8434A364055B3288002D3102 /* Orca.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orca.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8434A364055B3288002D3102 /* Orca.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Orca.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8434A3E4055C223A002D3102 /* ORCommandClient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCommandClient.m; path = "Source/Main Dialogs/CommandCenter/ORCommandClient.m"; sourceTree = SOURCE_ROOT; };
 		8434A3E5055C223A002D3102 /* ORCommandClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCommandClient.h; path = "Source/Main Dialogs/CommandCenter/ORCommandClient.h"; sourceTree = SOURCE_ROOT; };
 		8434F87305B4637600E03AAE /* ORSafeQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSafeQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORSafeQueue.h"; sourceTree = SOURCE_ROOT; };
