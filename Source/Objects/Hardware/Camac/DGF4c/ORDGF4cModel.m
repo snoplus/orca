@@ -1909,7 +1909,7 @@ enum {
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-														object:[NSData dataWithBytes:liveTimeData length:13*sizeof(long)]];
+														object:[NSData dataWithBytes:liveTimeData length:19*sizeof(long)]];
 }
 
 - (void) readMCA:(ORDataPacket*)aDataPacket channel:(short)aChannel
