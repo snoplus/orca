@@ -1,0 +1,32 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = ORAlarmCollection; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                acknowledge = id; 
+                addAddress = id; 
+                addressAction = id; 
+                eMailEnabledAction = id; 
+                removeAddress = id; 
+                severityAction = id; 
+            }; 
+            CLASS = ORAlarmController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                acknowledgeButton = NSButton; 
+                addressField = NSTextField; 
+                addressList = NSTableView; 
+                eMailEnabledButton = NSButton; 
+                helpButton = NSButton; 
+                helpDrawer = NSDrawer; 
+                helpTextView = NSTextView; 
+                removeAddressButton = NSButton; 
+                severityMatrix = NSMatrix; 
+                tableView = NSTableView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

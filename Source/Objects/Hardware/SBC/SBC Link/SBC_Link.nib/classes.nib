@@ -1,0 +1,132 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            CLASS = ORQueueView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                addressAction = id; 
+                connectionAction = id; 
+                doRangeAction = id; 
+                filePathAction = id; 
+                forceReloadAction = id; 
+                initAfterConnectAction = id; 
+                ipNumberAction = id; 
+                killCrateAction = id; 
+                loadModeAction = id; 
+                lockAction = id; 
+                passWordAction = id; 
+                portNumberAction = id; 
+                rangeTextFieldAction = id; 
+                readAction = id; 
+                readWriteTypeMatrixAction = id; 
+                toggleCrateAction = id; 
+                userNameAction = id; 
+                verboseAction = id; 
+                writeAction = id; 
+                writeValueAction = id; 
+            }; 
+            CLASS = "SBC_LinkController"; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressField = NSTextField; 
+                addressStepper = NSStepper; 
+                byteRateReceivedField = NSTextField; 
+                byteRateSentField = NSTextField; 
+                bytesReceivedRateBar = ORValueBar; 
+                bytesSentRateBar = ORValueBar; 
+                connect1Button = NSButton; 
+                connectButton = NSButton; 
+                connectionStatus1Field = NSTextField; 
+                connectionStatusField = NSTextField; 
+                doRangeButton = NSButton; 
+                filePathField = NSTextField; 
+                forceReloadButton = NSButton; 
+                initAfterConnectButton = NSButton; 
+                ipNumberField = NSTextField; 
+                killCrateButton = NSButton; 
+                loadModeMatrix = NSMatrix; 
+                lockButton = NSButton; 
+                passWordField = NSSecureTextField; 
+                portNumberField = NSTextField; 
+                queView = ORQueueView; 
+                rangeStepper = NSStepper; 
+                rangeTextField = NSTextField; 
+                readButton = NSButton; 
+                readWriteTypeMatrix = NSMatrix; 
+                runInfoField = NSTextField; 
+                setFilePathButton = NSButton; 
+                status1Field = NSTextField; 
+                statusField = ORTimedTextField; 
+                tabView = NSTabView; 
+                toggleCrateButton = NSButton; 
+                userNameField = NSTextField; 
+                verboseButton = NSButton; 
+                writeButton = NSButton; 
+                writeValueField = NSTextField; 
+                writeValueStepper = NSStepper; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                filePathAction = id; 
+                forceReloadAction = id; 
+                killCrateAction = id; 
+                loadModeAction = id; 
+                toggleCrateAction = id; 
+                verboseAction = id; 
+            }; 
+            CLASS = "SBC_ManagementView"; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                boxContent = NSView; 
+                connectionStatusField = NSTextField; 
+                filePathField = NSTextField; 
+                forceReloadButton = NSButton; 
+                killCrateButton = NSButton; 
+                loadModeMatrix = NSMatrix; 
+                model = id; 
+                setFilePathButton = NSButton; 
+                statusField = ORTimedTextField; 
+                tabView = NSTabView; 
+                toggleCrateButton = NSButton; 
+                verboseButton = NSButton; 
+                window = NSWindow; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

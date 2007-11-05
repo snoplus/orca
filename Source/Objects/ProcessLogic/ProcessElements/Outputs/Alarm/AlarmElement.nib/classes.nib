@@ -1,0 +1,26 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {helpAction = id; nameAction = id; severityAction = id; }; 
+            CLASS = ORAlarmElementController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {helpField = NSTextField; nameField = NSTextField; severityMatrix = NSMatrix; }; 
+            SUPERCLASS = ORProcessElementController; 
+        }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            CLASS = ORProcessElementController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

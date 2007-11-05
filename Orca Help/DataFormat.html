@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=ISO-8859-1">
+		<meta name="generator" content="Adobe GoLive 6">
+		<title>Welcome to Adobe GoLive 6</title>
+	</head>
+
+	<body bgcolor="#fffad9">
+		<div align="center">
+			<p><font size="+2" face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular">Data File Format</font></p>
+		</div>
+		<p>ORCA data files consist of two main parts:</p>
+		<ul>
+			<li>a header
+			<li>the raw data
+		</ul>
+		<p>Starting with data version 2, the header was changed to XML and the data format was changed. See <a href="#Anchor-Old-49575">Old Format section</a> for  documentation of version 1 header and data formats. </p>
+		<div align="left">
+			<h4>Header</h4>
+			<p>The header is written in xml and contains a description of the configuration of the system as it was at the time the data file was written. It also contains the information needed to decode the data records. A partial example of a particular header is shown below. The easiest way to dig into an ORCA header and learn what's included is to create one and open it in an editor. The header is most easily parsed using the Cocoa objects that created it, but it relatively easy to write one of your own design.</p>
+			<p>Starting with ORCA v6.0, the header is preceeded by two long words:</p>
+			<pre><font face="Courier New, Courier, Monaco, monospace">0000 0000 0000 00xx xxxx xxxx xxxx xxxx&nbsp;</font><font size="-1" face="Courier New, Courier, Monaco, monospace">&nbsp; 1st word of the header</font></pre>
+			<pre><font face="Courier New, Courier, Monaco, monospace">^^^^ ^^^^ ^^^^ ^^-----------------------  </font><font size="-1" face="Courier New, Courier, Monaco, monospace">always set to all zeros</font><font face="Courier New, Courier, Monaco, monospace">. </font></pre>
+			<pre><font face="Courier New, Courier, Monaco, monospace">                 ^^ ^^^^ ^^^^ ^^^^ ^^^^- </font><font size="-1" face="Courier New, Courier, Monaco, monospace">total length n of record (in longs)</font><font face="Courier New, Courier, Monaco, monospace"> 
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx&nbsp;&nbsp;</font><font size="-1" face="Courier New, Courier, Monaco, monospace">2nd word of the record, length of header (bytes)
+
+
+The header proper follows immediately:</font></pre>
+			<address>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</address>
+			<address>&lt;!DOCTYPE plist PUBLIC &quot;-//Apple Computer//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;</address>
+			<address>&lt;plist version=&quot;1.0&quot;&gt;</address>
+			<address>&lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;Document Info&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;ORCAVersion&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;3.0&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;dataVersion&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;2&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;date&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;2004-10-15 14:07:08 -0700&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;documentName&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;/Users/howe/Desktop/test2.ORCA&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &lt;/dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;crate 0&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;Class Name&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;ORVmeCrateModel&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;card 0&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;Class Name&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;OReCPU147Model&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;baseAddress&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;134217728&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;fileName&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;~/Desktop/ORCAReadOut2.0h&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;slot&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;0&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;/dict&gt;</address>
+			<address>...</address>
+			<address>data for other cards omitted</address>
+			<address>...</address>
+			<address>...</address>
+			<address>data for other objects omitted</address>
+			<address>...</address>
+			<address>&lt;/dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;dataDescription&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;ORRunModel&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;Run&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;dataId&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;20185088&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;decoder&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;ORRunDecoderForRun&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;length&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;4&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;variable&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;false/&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;/dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;/dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;ORShaperModel&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;Scaler&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;dataId&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;18612224&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;decoder&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;ORShaperDecoderForScalers&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;length&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;-1&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;variable&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;true/&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;/dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;Shaper&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;dataId&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;-2147483648&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;decoder&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;ORShaperDecoderForShaper&lt;/string&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;length&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;integer&gt;1&lt;/integer&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;key&gt;variable&lt;/key&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;false/&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;/dict&gt;</address>
+			<address>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &lt;/dict&gt;</address>
+			<address>...</address>
+			<address>other data description entries omitted</address>
+			<address>...</address>
+			<address>&lt;/plist&gt;</address>
+			<address>--note that the header is padded out to the nearest long word boundary.</address>
+			<h4>Raw dataFormat</h4>
+			<p>The raw data immediately follows the xml header.</p>
+			<p>With the release of data format version 2 the old format was depreciated. ORCA remains able to decode the old format, but always generates data in the new format. The new format is more self describing and is not limited to 32 different types of data records.</p>
+			<p></p>
+			<p><b>Short form data format (always 32 bits)</b></p>
+			<pre><i>xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+</i>^--------------------------------------- <i>always set</i>
+^^^^ ^^--------------------------------- dataId from the data description
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^-&nbsp;raw data</pre>
+			<pre><b>Long form data format (variable length)
+
+</b><i>xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx&nbsp;&nbsp;1st word of the record</i>
+^--------------------------------------- always clear.
+^^^^ ^^^^ ^^^^ ^^----------------------- dataId from the data description
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;^^ ^^^^ ^^^^ ^^^^ ^^^^- total length n of record (<i>in longs</i>)
+<i>xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx&nbsp;&nbsp;2nd word of the record, 1st word of data</i>
+<i>..
+</i><i>..
+</i><i>xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx&nbsp;&nbsp;nth word of the record</i></pre>
+			<p>If the most significant bit in the first word of a data record is set, then the class ID uses the top 6 bits and the length of the record is always one long word (4 bytes) in length. If the most significant bit is not set, then the class ID uses the top 14 bits and the length of the record in bytes (including this header word) is encoded in the bottom 18 bits. Note that the length is always the number of longs (not bytes) in the record. The raw data immediately follows the header word.</p>
+			<p>Note that the object ID's are dynamically assigned and may vary from configuration to configuration. Objects that can produce data that will fit into one long word will request to be allowed to use just one word, however if there are more than 32 short records assigned then objects will be assigned the long form. External analysis application have to assume that an object that normally puts out the short form could put out the long form and must be prepared to deal with either.</p>
+			<p>Some of the objects that can ship data:</p>
+			<ul>
+				<li><a href="Objects/Control/RunControl/RunControl.html">ORRunModel</a>
+				<li><a href="Objects/Vme/Shaper/shaper.html">ORShaperModel</a>
+				<li><a href="Objects/Vme/Trigger32/Trigger32.html">ORTrigger32Model</a>
+				<li><a href="Objects/SNO-NCD/MuxController/MuxController.html">NcdMuxModel</a>
+				<li><a href="Objects/SNO-NCD/SNO-NCD/SNONCD.html">NcdModel</a>
+				<li><a href="Objects/GPIB/Pulser/Pulser.html">ORHPPulserModel</a>
+				<li><a href="Objects/GPIB/Scope/Scope.html">OR754ScopeModel</a>
+			</ul>
+			<h3><a name="Anchor-Old-49575" id="Anchor-Old-49575"></a>Old Format (versions &lt; 2)</h3>
+			<p>Note that the old data format is depreciated and is no longer written out by ORCA ever. The following information is included for historical reasons. As of ORCA version 3.x, ORCA can still read and decode the old data format, but at some point in the future this capability will probably be removed.</p>
+			<h4><font face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular"><b>Header</b></font></h4>
+		</div>
+		<p>The header is completely ascii and is thus human readable. It consists three parts:</p>
+		<ul>
+			<li>data type word
+			<li>data description section
+			<li>record description section (for data version 1 only!)
+			<li>parameter section
+		</ul>
+		<p>Each of these parts will be discussed below.</p>
+		<p><font face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular"><b>Data Type Word</b></font></p>
+		<p>The orginal ORCA data form had this is set to be &quot;DataStructure_LittleEndian&quot; to give an idication of the how to decode the raw data section. Starting with data version 1 this is set to be &quot;DataStructure version x&quot;, where x is the data version number.</p>
+		<p><a name="Anchor-Data-49575" id="Anchor-Data-49575"></a><font face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular"><b>Data Description Section</b></font></p>
+		<p>This section is started with &quot;BeginDataDescriptionSection&quot; and ended with &quot;EndDataDescriptionSection&quot;. The content is a list of objects that have put data into the file and the size of the data records that those objects produce. A typical entry is:</p>
+		<address><font face="Courier New,Courier,Monaco"><dfn><tt>ORShaperModel Shaper 0x18000000 0 4</tt></dfn></font></address>
+		<address><font face="Courier New,Courier,Monaco"><dfn><tt>^^^^^^^^^^^^^------------------------ data class object name</tt></dfn></font></address>
+		<address><font face="Courier New,Courier,Monaco"><dfn><tt>--------------^^^^^^----------------- data class descrition</tt></dfn></font></address>
+		<address><font face="Courier New,Courier,Monaco"><dfn><tt>---------------------^^^^^^^^^^------ data ID number</tt></dfn></font></address>
+		<address><font face="Courier New,Courier,Monaco"><dfn><tt>--------------------------------^---- variable length (1 == variable, 0 == fixed)</tt></dfn></font></address>
+		<address><font face="Courier New,Courier,Monaco"><dfn><tt>----------------------------------^-- record size in bytes (-1 if variable)</tt></dfn></font></address>
+		<ul>
+			<h4>
+				<li>Data Class Object Name
+			</h4>
+		</ul>
+		<p>The first field is the name of data producing class: 'ORShaperModel'. This is used internally by ORCA in forming the name of a data decoding object. Other applications can use this name combined with the class description and data ID to decide how to decode the record.</p>
+		<ul>
+			<h4>
+				<li>Data Class Description
+			</h4>
+		</ul>
+		<p>The next field, 'Shaper', is a sub-label for the data record. Some objects put out several differant types of data records. Each will have a different data id. One thing to be aware of is that there is no ascii space between the data class object name and the data class description. But the data class object name is a C string, so it is followed by a '\0'.</p>
+		<ul>
+			<h4>
+				<li>Data Id Number format for versions 0 thru 1
+			</h4>
+		</ul>
+		<p>The data id number is the number that is located in the 5 most signification bits of the first word a data record.</p>
+		<p>Note that the object ID's are dynamically assigned and may vary from configuration to configuration.</p>
+		<p>Note that this format of using five bits for the object ID puts a hard limit on the number of data producing objects that can be used in a particular experiment. This may be addressed as needed in future versions.</p>
+		<ul>
+			<h4>
+				<li>Variable Length and Data Size fields.
+			</h4>
+		</ul>
+		<p>The next field can be '0' or '1'. A '0' means that the last field is the size of the raw data record that this object put out in bytes. If the object puts out a variable sized record the last two fields would be '1' followed by '-1'. If the data record is variable the size will be included in the data record itself.</p>
+		<p>Note that the current format of using five bits for the object ID puts a hard limit on the number of data producing objects that can be used in a particular experiment. This may be addressed as needed in future versions.</p>
+		<p><font face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular"><b>Record Description Section</b></font></p>
+		<p>This section was added starting with data version 1 but was depreciated and removed starting with version 2. In version 2, data records are treated the same as the data records that described in the <a href="#Anchor-Data-49575">Data Description Section</a>. Data records are meant to be small information records that are put in the data stream on an ocasional basis.</p>
+		<p>This section is started with &quot;BeginRecordDescriptionSection&quot; and ended with &quot;EndRecordDescriptionSection&quot;. The content is a list of objects that can put records into the file and the size of the records that those objects produce. A typical entry is:</p>
+		<p><font face="Courier New,Courier,Monaco"><dfn><tt>ORShaperModel Scalers 0x00020000 1 -1</tt></dfn></font></p>
+		<p>The first field is the name of data producing class: 'ORShaperModel'. The next field, 'Scalers', is a label for the record. The next field is the record ID, of which only the top 16 bits are used. The next field can be '0' or '1'. A '0' means that the last field is the size of the raw data record that this object puts out in bytes. If the object puts out a variable sized record the last two fields would be '1' followed by '-1'. If the data record is variable the size will be included in the data record itself.</p>
+		<p>Note that the record ID's are dynamically assigned and may vary from configuration to configuration.</p>
+		<p>One thing to be aware of is that there is no ASCII space between the class name and the record label. But the class name is a C string, so it is followed by a '\0'.</p>
+		<p><font face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular"><b>Parameter Section</b></font></p>
+		<p>This section is started with &quot;BeginParameterSection&quot; and ended with &quot;EndParameterSection&quot;. The content is a list of parameter data. A typical entry is:</p>
+		<p><font face="Courier New,Courier,Monaco"><dfn><tt>0x18000000</tt></dfn></font><tt> </tt><font face="Courier New,Courier,Monaco"><dfn><tt>ORShaperModel</tt></dfn></font><tt> Threshold 0 0 8 short 78</tt></p>
+		<p>The first field is the object ID. This is the same ID that is in the data description section, with one exception. If the ID is 0xffffffff, the parameter is from an object that is not in the data description section. The second field is the object class name. The third field is the name of the parameter, followed by three hardware identification numbers. In this example, they encode the crate, card, and channel. The last two fields hold the parameter data type and the parameter value.</p>
+		<div align="left">
+			<h4><font face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular"><b>Raw Data</b></font><font size="+3" face="Arial,Helvetica,Geneva,Swiss,SunSans-Regular"><b> </b></font></h4>
+		</div>
+		<p>The data section begins with the C string &quot;BeginData&quot;. The raw data format is set by each object that puts data into the data stream. In general, the data records are as compact as possible. See the individual objects to get the data formats (i.e. <a href="Objects/Vme/Shaper/shaper.html#Anchor-Data-49575">ORShaperModel</a>)</p>
+		<p>The data section may also contain generic records that are differant from the regular raw data in that any object can place a record in the data stream. Records are meant to be small and only ocasionally inserted into the data. For an example, see the ORShaperModel's <a href="Objects/Vme/Shaper/shaper.html#Anchor-Record-47857">Scaler Record</a> format. No matter what a generic record contains, it is wrapped with a generic record header.</p>
+		<p>Some of the objects that can ship data:</p>
+		<ul>
+			<li><a href="Objects/Control/RunControl/RunControl.html">ORRunModel</a>
+			<li><a href="Objects/Vme/Shaper/shaper.html">ORShaperModel</a>
+			<li><a href="Objects/Vme/Trigger32/Trigger32.html">ORTrigger32Model</a>
+			<li><a href="Objects/SNO-NCD/MuxController/MuxController.html">NcdMuxModel</a>
+			<li><a href="Objects/SNO-NCD/SNO-NCD/SNONCD.html">NcdModel</a>
+			<li><a href="Objects/GPIB/Pulser/Pulser.html">ORHPPulserModel</a>
+			<li><a href="Objects/GPIB/Scope/Scope.html">OR754ScopeModel</a>
+		</ul>
+		<ol></ol>
+		<p></p>
+	</body>
+
+</html>

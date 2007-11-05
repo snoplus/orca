@@ -1,0 +1,65 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                argAction = id; 
+                cancelLoadSaveAction = id; 
+                doCmdAction = id; 
+                listMethodsAction = id; 
+                loadFileAction = id; 
+                loadSaveAction = id; 
+                parseScript = id; 
+                processFileAction = id; 
+                runScript = id; 
+                saveAsFileAction = id; 
+                saveFileAction = id; 
+                setPortAction = id; 
+            }; 
+            CLASS = ORCommandCenterController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                argsMatrix = NSMatrix; 
+                argsView = NSView; 
+                checkButton = NSButton; 
+                classNameField = NSTextField; 
+                clientCountField = NSTextField; 
+                clientListView = NSTableView; 
+                cmdField = NSTextField; 
+                helpDrawer = NSDrawer; 
+                helpView = NSTextView; 
+                lastFileField = NSTextField; 
+                lastFileField1 = NSTextField; 
+                loadSaveButton = NSButton; 
+                loadSaveView = id; 
+                panelView = NSView; 
+                portField = NSTextField; 
+                runButton = NSButton; 
+                scriptView = ORScriptView; 
+                statusField = ORTimedTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                recolorCompleteFile = id; 
+                recolorCompleteFileDeferred = id; 
+                recolorSyntaxTimer = id; 
+                toggleAutoSyntaxColoring = id; 
+                toggleMaintainIndentation = id; 
+            }; 
+            CLASS = ORScriptView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {progress = NSProgressIndicator; status = NSTextField; }; 
+            SUPERCLASS = NSTextView; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

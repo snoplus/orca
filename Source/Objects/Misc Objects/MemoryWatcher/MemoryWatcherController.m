@@ -1,0 +1,168 @@
+//
+//  MemoryWatcherController.m
+//  Orca
+//
+//  Created by Mark Howe on 5/13/05.
+//  Copyright 2005 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+
+#import "MemoryWatcherController.h"
+#import "MemoryWatcher.h"
+#import "ORPlotter1D.h"
+#import "ORAxis.h"
+
+static MemoryWatcherController *sharedInstance = nil;
+
+@implementation MemoryWatcherController
+
++ (id) sharedMemoryWatcherController
+{
+	if(!sharedInstance){
+		sharedInstance = [[MemoryWatcherController alloc] init];
+	}
+    return sharedInstance;
+}
+
+
+- (id) init
+{
+    self = [super initWithWindowNibName:@"MemoryWatcher"];
+    [self setWindowFrameAutosaveName:@"MemoryWatcher"];
+    return self;
+}
+
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [super dealloc];
+}
+
+- (void) awakeFromNib
+{
+	[plotter setDrawWithGradient:YES];
+    [self registerNotificationObservers];
+    [plotter setNeedsDisplay:YES];
+    [self upTimeChanged:nil];
+	[self taskIntervalChanged:nil];
+	
+    [xScale setRngLow:0.0 withHigh:200.];
+    [yScale setRngLow:0.0 withHigh:300.];
+
+	[xScale setRngLimitsLow:0.0 withHigh:4096. withMinRng:50.];
+	[yScale setRngLimitsLow:0.0 withHigh:1000. withMinRng:50.];
+
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+	[notifyCenter addObserver : self
+				selector : @selector(memoryStatsChanged:)
+				name : MemoryWatcherChangedNotification
+				object : watcher];
+
+	[notifyCenter addObserver : self
+				selector : @selector(upTimeChanged:)
+				name : MemoryWatcherUpTimeChanged
+				object : watcher];
+
+	[notifyCenter addObserver : self
+				selector : @selector(taskIntervalChanged:)
+				name : MemoryWatcherTaskIntervalNotification
+				object : watcher];
+
+
+}
+
+- (void)flagsChanged:(NSEvent*)inEvent
+{
+	[[self window] resetCursorRects];
+}
+
+
+- (void) taskIntervalChanged:(NSNotification*)aNote
+{
+    if(aNote == nil || [aNote object] == watcher){
+		NSTimeInterval interval = [watcher taskInterval];
+		NSString* s;
+		if(interval == 1.0) s = @"Max 4096 Samples @ 1 Hz";
+		else s = [NSString stringWithFormat:@"Max 4096 Samples @ 1/%.0f Hz",[watcher taskInterval]];
+		[taskIntervalField setStringValue:s];
+    }
+}
+
+
+- (void) memoryStatsChanged:(NSNotification*)aNote
+{
+    if(aNote == nil || [aNote object] == watcher){
+        [plotter setNeedsDisplay:YES];
+    }
+}
+
+- (void) upTimeChanged:(NSNotification*)aNote
+{
+    if(aNote == nil || [aNote object] == watcher){
+        int days,hr,min,sec;
+        NSTimeInterval elapsedTime = [watcher upTime];
+        days = elapsedTime/(3600*24);
+        hr = (elapsedTime - days*(3600*24))/3600;
+        min =(elapsedTime - days*(3600*24) - hr*3600)/60;
+        sec = elapsedTime - days*(3600*24) - hr*3600 - min*60;
+        [upTimeField setStringValue:[NSString stringWithFormat:@"%d %02d:%02d:%02d",days,hr,min,sec]];
+    }
+}
+
+#pragma mark ***Accessors
+- (void) setMemoryWatcher:(MemoryWatcher*)aWatcher
+{
+    watcher = aWatcher;
+}
+
+
+- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+	if(set < kNumWatchedValues) return [watcher timeRateCount:set];
+	else return 0;
+}
+
+- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+{
+	if(set < kNumWatchedValues) return [watcher timeRate:set value:x];
+	else return 0;
+}
+
+- (int)	numberOfDataSetsInPlot:(id)aPlotter
+{
+    return kNumWatchedValues;
+}
+
+- (BOOL)   	willSupplyColors
+{
+    return YES;
+}
+
+- (NSColor*) colorForDataSet:(int)set
+{
+    switch(set){
+        case 0:  return [NSColor colorWithCalibratedRed:10/255. green:90/255. blue:0 alpha:1];
+        case 1:  return [NSColor redColor];
+        default: return [NSColor blueColor];
+    }
+}
+
+
+@end

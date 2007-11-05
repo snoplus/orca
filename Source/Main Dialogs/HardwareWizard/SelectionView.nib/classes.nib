@@ -1,0 +1,25 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                logicalPopUpButtonAction = id; 
+                objPopUpButtonAction = id; 
+                selectionPopUpButtonAction = id; 
+                selectionTextFieldAction = id; 
+            }; 
+            CLASS = ORHWizSelectionController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                logicalPopUpButton = NSPopUpButton; 
+                objPopUpButton = NSPopUpButton; 
+                selectionPopUpButton = NSPopUpButton; 
+                selectionStepper = NSStepper; 
+                selectionTextField = NSTextField; 
+                subview = NSView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

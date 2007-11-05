@@ -1,0 +1,95 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {connectAction = id; primaryAddressAction = id; secondaryAddressAction = id; }; 
+            CLASS = ORGpibDeviceController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                mConfigured = NSTextField; 
+                mConnectButton = NSButton; 
+                mPrimaryAddress = NSPopUpButton; 
+                mSecondaryAddress = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORLC950Controller; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = OROscBaseController; 
+        }, 
+        {
+            ACTIONS = {
+                autoReset = id; 
+                chnlAcquireAction = id; 
+                chnlCouplingAction0 = id; 
+                chnlCouplingAction1 = id; 
+                chnlCouplingAction2 = id; 
+                chnlCouplingAction3 = id; 
+                chnlPosAction = id; 
+                chnlScaleAction = id; 
+                gpibLockAction = id; 
+                horizPosAction = id; 
+                horizRecordLengthAction = id; 
+                horizScaleAction = id; 
+                horizUnitsAction = id; 
+                setDialogFromOsc = id; 
+                setOscFromDialog = id; 
+                settingsLockAction = id; 
+                triggerCouplingAction = id; 
+                triggerLevelAction = id; 
+                triggerModeAction = id; 
+                triggerPolarityAction = id; 
+                triggerPosAction = id; 
+                triggerSourceAction = id; 
+            }; 
+            CLASS = OROscBaseController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                gpibLockButton = NSButton; 
+                mAutoReset = NSButton; 
+                mChnlAcquire = NSMatrix; 
+                mChnlCoupling0 = NSPopUpButton; 
+                mChnlCoupling1 = NSPopUpButton; 
+                mChnlCoupling2 = NSPopUpButton; 
+                mChnlCoupling3 = NSPopUpButton; 
+                mChnlPos = NSMatrix; 
+                mChnlPosSteppers = NSMatrix; 
+                mChnlScale = NSMatrix; 
+                mChnlScaleSteppers = NSMatrix; 
+                mHorizPos = NSTextField; 
+                mHorizPosStepper = NSStepper; 
+                mHorizScale = NSTextField; 
+                mHorizUnits = NSMatrix; 
+                mModelReflectsHardware = NSTextField; 
+                mRecordLength = NSPopUpButton; 
+                mSetDialogFromOsc = NSButton; 
+                mSetOscFromDialog = NSButton; 
+                mTriggerCoupling = NSPopUpButton; 
+                mTriggerLevel = NSTextField; 
+                mTriggerMode = NSPopUpButton; 
+                mTriggerPolarity = NSMatrix; 
+                mTriggerPos = NSTextField; 
+                mTriggerPosStepper = NSStepper; 
+                mTriggerSource = NSPopUpButton; 
+                settingsLockButton = NSButton; 
+                settingsLockDocField = NSTextField; 
+            }; 
+            SUPERCLASS = ORGpibDeviceController; 
+        }, 
+        {
+            ACTIONS = {doDoubleClick = id; windowIsClosing = id; }; 
+            CLASS = OrcaObject; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {parent = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

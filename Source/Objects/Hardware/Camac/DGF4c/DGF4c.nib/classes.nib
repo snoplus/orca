@@ -1,0 +1,121 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                autoFindTauAction = id; 
+                baselineCutAction = id; 
+                bootDSPAction = id; 
+                calibrateAction = id; 
+                chanCSRAAction = id; 
+                channelAction = id; 
+                decimationAction = id; 
+                dspCodePathAction = id; 
+                energyFilterAction = id; 
+                firmWarePathAction = id; 
+                histogramAction = id; 
+                loadDefaults = id; 
+                loadFirmWareAction = id; 
+                loadParamsToHWAction = id; 
+                loadSetAction = id; 
+                mergeSetAction = id; 
+                offsetAction = id; 
+                oscChanEnableAction = id; 
+                pulseShapeAction = id; 
+                registerAction = id; 
+                runBehaviorAction = id; 
+                runTypeAction = id; 
+                sampleAction = id; 
+                sampleWaveformsAction = id; 
+                saveSetAction = id; 
+                settingLockAction = id; 
+                triggerFilterAction = id; 
+                xwaitAction = id; 
+            }; 
+            CLASS = ORDGF4cController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                autoTauFindButton = NSButton; 
+                baselineCutButton = NSButton; 
+                bootDSPButton = NSButton; 
+                calibrateFieldMatrix = NSMatrix; 
+                calibrateStepperMatrix = NSMatrix; 
+                chanCSRAMatrix = NSMatrix; 
+                channelField = NSTextField; 
+                channelStepper = NSStepper; 
+                decimationPopup = NSPopUpButton; 
+                dspChanTableView = NSTableView; 
+                dspCodePathButton = NSButton; 
+                dspCodePathField = NSTextField; 
+                dspParamTableView = NSTableView; 
+                energyFilterFieldMatrix = NSMatrix; 
+                energyFilterStepperMatrix = NSMatrix; 
+                firmWarePathButton = NSButton; 
+                firmWarePathField = NSTextField; 
+                histogramFieldMatrix = NSMatrix; 
+                histogramStepperMatrix = NSMatrix; 
+                inputCountsMatrix = NSMatrix; 
+                liveTimeMatrix = NSMatrix; 
+                loadDefaultsButton = NSButton; 
+                loadFirmWareButton = NSButton; 
+                loadParamsToHWButton = NSButton; 
+                loadParamsToHWButton2 = NSButton; 
+                loadSetButton = NSButton; 
+                mergeSetButton = NSButton; 
+                ocsChanEnableMatrix = NSMatrix; 
+                offsetButton = NSButton; 
+                plotter = ORPlotter1D; 
+                pulseShapeFieldMatrix = NSMatrix; 
+                pulseShapeStepperMatrix = NSMatrix; 
+                registerFieldMatrix = NSMatrix; 
+                revisionField = NSTextField; 
+                runBehaviorMatrix = NSMatrix; 
+                runTypePopup = NSPopUpButton; 
+                sampleButton = NSButton; 
+                sampleContinousButton = NSButton; 
+                sampleWaveformsButton = NSButton; 
+                samplingWarning = NSTextField; 
+                saveSetButton = NSButton; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                timeMatrix = NSMatrix; 
+                triggerFilterFieldMatrix = NSMatrix; 
+                triggerFilterStepperMatrix = NSMatrix; 
+                xScale = ORAxis; 
+                xwaitField = NSTextField; 
+                xwaitStepper = NSStepper; 
+                yScale = ORAxis; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

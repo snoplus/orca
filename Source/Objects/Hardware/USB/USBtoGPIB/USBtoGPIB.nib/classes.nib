@@ -1,0 +1,119 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                debounceAction = id; 
+                pollTimeAction = id; 
+                queryAction = id; 
+                readClearAction = id; 
+                relayControlAction = id; 
+                sendCommandAction = id; 
+                serialNumberAction = id; 
+                settingLockAction = id; 
+            }; 
+            CLASS = ORADU200Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                commandField = NSTextField; 
+                debouncePopup = NSPopUpButton; 
+                eventCounterMatrix = NSMatrix; 
+                lockButton = NSButton; 
+                pollTimePopup = NSPopUpButton; 
+                portAMatrix = NSMatrix; 
+                queryButton = NSButton; 
+                readClearButton = NSButton; 
+                relayControlMatrix = NSMatrix; 
+                relayStateMatrix = NSMatrix; 
+                sendCommandButton = NSButton; 
+                serialNumberPopup = NSPopUpButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {savePDF = id; }; 
+            CLASS = ORPlotter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mDataSource = id; mXScale = ORScale; mYScale = ORScale; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                addGateAction = id; 
+                analyze = id; 
+                autoScale = id; 
+                averageWindowAction = id; 
+                centerOnPeak = id; 
+                clearActiveCurveGates = id; 
+                clearActiveGate = id; 
+                clearAllGates = id; 
+                copy = id; 
+                differentiateAction = id; 
+                removeGateAction = id; 
+                resetScales = id; 
+                savePDF = id; 
+            }; 
+            CLASS = ORPlotter1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                analysisView = ZFlowLayout; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = ORSelfScaledPlotter; LANGUAGE = ObjC; SUPERCLASS = ORPlotter; }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            ACTIONS = {
+                addressTextFieldAction = id; 
+                commandTextFieldAction = id; 
+                sendAction = id; 
+                serialNumberAction = id; 
+            }; 
+            CLASS = ORUSBtoGPIBController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressTextField = NSTextField; 
+                commandTextField = NSTextField; 
+                serialNumberPopup = NSPopUpButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,79 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OPlotInterface; LANGUAGE = ObjC; SUPERCLASS = NSWindowController; }, 
+        {
+            ACTIONS = {
+                chooseDir = id; 
+                clearRunTypeAction = id; 
+                definitionsFileAction = id; 
+                listVetoAction = id; 
+                newRunAction = id; 
+                quickStartCBAction = id; 
+                remoteControlAction = id; 
+                repeatRunCBAction = id; 
+                runModeAction = id; 
+                runNumberAction = id; 
+                runNumberLockAction = id; 
+                runTypeAction = id; 
+                runTypeLockAction = id; 
+                startRunAction = id; 
+                stopRunAction = id; 
+                timeLimitStepperAction = id; 
+                timeLimitTextAction = id; 
+                timedRunCBAction = id; 
+            }; 
+            CLASS = ORRunController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                clearAllTypesButton = NSButton; 
+                definitionsFileTextField = NSTextField; 
+                elapsedTimeField = NSTextField; 
+                lightBoardView = StopLightView; 
+                listVetosButton = NSButton; 
+                quickStartCB = NSButton; 
+                remoteControlCB = NSButton; 
+                repeatRunCB = NSButton; 
+                restartRunButton = NSButton; 
+                runBar = NSProgressIndicator; 
+                runDefinitionsButton = NSButton; 
+                runModeMatrix = NSMatrix; 
+                runModeNoticeView = NSTabView; 
+                runNumberButton = NSButton; 
+                runNumberDirButton = NSButton; 
+                runNumberDirField = NSTextField; 
+                runNumberDrawer = NSDrawer; 
+                runNumberField = NSTextField; 
+                runNumberLockButton = NSButton; 
+                runNumberStepper = NSStepper; 
+                runNumberText = NSTextField; 
+                runProgress = NSProgressIndicator; 
+                runTypeButton = NSButton; 
+                runTypeDrawer = NSDrawer; 
+                runTypeLockButton = NSButton; 
+                runTypeMatrix = NSMatrix; 
+                startRunButton = NSButton; 
+                statusField = NSTextField; 
+                stopRunButton = NSButton; 
+                timeLimitField = NSTextField; 
+                timeLimitStepper = NSStepper; 
+                timeStartedField = NSTextField; 
+                timeToGoField = NSTextField; 
+                timedRunCB = NSButton; 
+                vetoCountField = NSTextField; 
+                vetoedTextField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORRunFactory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = StopLightView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

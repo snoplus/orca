@@ -1,0 +1,37 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            ACTIONS = {
+                autoReconnectAction = id; 
+                connectAtStartAction = id; 
+                connectButtonAction = id; 
+                lockAction = id; 
+                remoteHostFieldAction = id; 
+                remotePortFieldAction = id; 
+            }; 
+            CLASS = ORListenerController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                autoReconnectButton = NSButton; 
+                byteRecievedField = NSTextField; 
+                connectAtStartButton = NSButton; 
+                connectButton = NSButton; 
+                connectionStatusField = NSTextField; 
+                lockButton = NSButton; 
+                remoteHostField = NSTextField; 
+                remotePortField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

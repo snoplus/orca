@@ -1,0 +1,60 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {scopeSelectionAction = id; }; 
+            CLASS = NcdMuxController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {scopeSelectionMatrix = NSMatrix; }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                allColAction = id; 
+                disableForPulserAction = id; 
+                loadAction = id; 
+                noisyEnvBroadcastEnabledButtonAction = id; 
+                noneColAction = id; 
+                patternAction = id; 
+            }; 
+            CLASS = ORPulserDistribController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                allColButton = NSMatrix; 
+                disableForPulserCB = NSButton; 
+                noisyEnvBroadcastEnabledButton = NSButton; 
+                noneColButton = NSMatrix; 
+                patternMatrix0 = NSMatrix; 
+                patternMatrix1 = NSMatrix; 
+                patternMatrix2 = NSMatrix; 
+                patternMatrix3 = NSMatrix; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {download = id; dump = id; selectFile = id; start = id; stop = id; }; 
+            CLASS = OReCPU147Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                diagButton = NSButton; 
+                diagDrawer = NSDrawer; 
+                dumpCodeButton = NSButton; 
+                dumpUserAreaButton = NSButton; 
+                fileNameField = NSTextField; 
+                hexView = NSTextView; 
+                outputButton = NSButton; 
+                outputDrawer = NSDrawer; 
+                queueView = ORQueueView; 
+                setFileButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

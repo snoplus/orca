@@ -1,0 +1,41 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {reArmAction = id; scopeSelectionAction = id; }; 
+            CLASS = NcdMuxController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                armErrorField = NSTextField; 
+                eventReadErrorField = NSTextField; 
+                scopeSelectionMatrix = NSMatrix; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {download = id; dump = id; selectFile = id; start = id; stop = id; }; 
+            CLASS = OReCPU147Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                diagButton = NSButton; 
+                diagDrawer = NSDrawer; 
+                dumpCodeButton = NSButton; 
+                dumpUserAreaButton = NSButton; 
+                fileNameField = NSTextField; 
+                hexView = NSTextView; 
+                outputButton = NSButton; 
+                outputDrawer = NSDrawer; 
+                queueView = ORQueueView; 
+                setFileButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

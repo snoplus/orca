@@ -1,0 +1,61 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = ORCircularBuffer; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {delegate = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = ORCircularBufferReader; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = ORCircularBuffer; 
+        }, 
+        {
+            ACTIONS = {
+                download = id; 
+                dump = id; 
+                incDebugLevelAction = id; 
+                selectFile = id; 
+                setUpdateIntervalAction = id; 
+                start = id; 
+                stop = id; 
+                updateNowAction = id; 
+                verifyCodeAction = id; 
+            }; 
+            CLASS = OReCPU147Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                debugLevelField = NSTextField; 
+                diagButton = NSButton; 
+                diagDrawer = NSDrawer; 
+                dumpCodeButton = NSButton; 
+                errorButton = NSButton; 
+                errorDrawer = NSDrawer; 
+                errorView = NSTextView; 
+                fileNameField = NSTextField; 
+                hexView = NSTextView; 
+                messageButton = NSButton; 
+                messageDrawer = NSDrawer; 
+                messageView = NSTextView; 
+                outputButton = NSButton; 
+                outputDrawer = NSDrawer; 
+                outputView = NSTextView; 
+                queueView = ORQueueView; 
+                setFileButton = NSButton; 
+                updateButton = NSPopUpButton; 
+                verifyCodeButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {modelStepperAction = id; modelSwitchAction = id; }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; modelStepper = NSStepper; modelSwitchPopUp = NSPopUpButton; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,134 @@
+{
+    IBClasses = (
+        {CLASS = AltMuxThreshold; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = BiStateView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            CLASS = NcdDetector; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {rateColorBar = ORColorBar; view = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            CLASS = ORColorBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {scale = ORScale; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORColorScale; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {scale = ORAxis; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORGenericView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {autoScale = id; resetScales = id; savePDF = id; zoomIn = id; zoomOut = id; }; 
+            CLASS = ORPlotter2D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                curve = id; 
+                mColorScale = ORColorScale; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+                mZScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORScale; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mView = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = ORTimeScale; LANGUAGE = ObjC; SUPERCLASS = ORScale; }, 
+        {
+            ACTIONS = {
+                absMotionAction = id; 
+                cmdPositionAction = id; 
+                conversionAction = id; 
+                dwellTimeAction = id; 
+                enabledMaskAction = id; 
+                fullScaleAction = id; 
+                getPositionAction = id; 
+                goAction = id; 
+                goHomeAction = id; 
+                lockAction = id; 
+                openPortAction = id; 
+                optionsAction = id; 
+                patternAction = id; 
+                patternTypeAction = id; 
+                portListAction = id; 
+                runCmdFileAction = id; 
+                selectCmdFileAction = id; 
+                stopAction = id; 
+            }; 
+            CLASS = ORVXMController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                absMatrix = NSMatrix; 
+                cmdFileField = NSTextField; 
+                cmdFileField1 = NSTextField; 
+                cmdXValueField = NSTextField; 
+                cmdYValueField = NSTextField; 
+                conversionMatrix = NSMatrix; 
+                dwellTimeField = NSTextField; 
+                enabledMaskMatrix = NSMatrix; 
+                fullScaleMatrix = NSMatrix; 
+                getHomeButton = NSButton; 
+                getPositionButton = NSButton; 
+                goButton = NSButton; 
+                goingHomeField = NSTextField; 
+                lockButton = NSButton; 
+                lockDocField = NSTextField; 
+                motorPie1 = SMPieChartView; 
+                motorPie2 = SMPieChartView; 
+                moveLabelField = NSTextField; 
+                openPortButton = NSButton; 
+                optionMatrix = NSMatrix; 
+                patternMatrix = NSMatrix; 
+                patternTypeMatrix = NSMatrix; 
+                portListPopup = NSPopUpButton; 
+                portStateField = NSTextField; 
+                runCmdFileButton = NSButton; 
+                selectCmdFileButton = NSButton; 
+                selectCmdFileButton1 = NSButton; 
+                stopButton = NSButton; 
+                xPositionField = NSTextField; 
+                yPositionField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            ACTIONS = {refreshDisplay = id; }; 
+            CLASS = SMPieChartView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; delegate = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = SourceMask; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

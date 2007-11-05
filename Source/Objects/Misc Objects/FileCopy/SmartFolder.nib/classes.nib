@@ -1,0 +1,42 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                chooseDirButtonAction = id; 
+                copyButtonAction = id; 
+                copyEnabledAction = id; 
+                deleteButtonAction = id; 
+                deleteEnabledAction = id; 
+                lockButtonAction = id; 
+                passWordSecureTextFieldAction = id; 
+                remoteHostTextFieldAction = id; 
+                remotePathTextFieldAction = id; 
+                transferPopupButtonAction = id; 
+                userNameTextFieldAction = id; 
+                verboseButtonAction = id; 
+            }; 
+            CLASS = ORSmartFolder; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                chooseDirButton = NSButton; 
+                copyButton = NSButton; 
+                deleteButton = NSButton; 
+                dirTextField = NSTextField; 
+                enableCopyButton = NSButton; 
+                enableDeleteButton = NSButton; 
+                lockButton = NSButton; 
+                passWordSecureTextField = NSSecureTextField; 
+                remoteHostTextField = NSTextField; 
+                remotePathTextField = NSTextField; 
+                titleField = NSTextField; 
+                transferTypePopupButton = NSPopUpButton; 
+                userNameTextField = NSTextField; 
+                verboseButton = NSButton; 
+                view = NSView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

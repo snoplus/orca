@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBDocumentLocation</key>
+	<string>93 81 390 457 0 0 1680 1028 </string>
+	<key>IBFramework Version</key>
+	<string>437.0</string>
+	<key>IBGroupedObjects</key>
+	<dict>
+		<key>11</key>
+		<array>
+			<string>885</string>
+			<string>880</string>
+			<string>891</string>
+			<string>892</string>
+			<string>888</string>
+		</array>
+		<key>18</key>
+		<array>
+			<string>1047</string>
+			<string>1049</string>
+			<string>1041</string>
+			<string>988</string>
+			<string>995</string>
+			<string>1034</string>
+			<string>994</string>
+			<string>1043</string>
+			<string>1035</string>
+			<string>1068</string>
+			<string>1069</string>
+			<string>993</string>
+			<string>1067</string>
+			<string>1051</string>
+			<string>1045</string>
+			<string>989</string>
+			<string>1002</string>
+			<string>1078</string>
+		</array>
+		<key>3</key>
+		<array>
+			<string>843</string>
+			<string>844</string>
+		</array>
+		<key>7</key>
+		<array>
+			<string>987</string>
+			<string>986</string>
+			<string>981</string>
+			<string>982</string>
+		</array>
+		<key>9</key>
+		<array>
+			<string>895</string>
+			<string>924</string>
+			<string>901</string>
+			<string>903</string>
+			<string>904</string>
+			<string>906</string>
+			<string>920</string>
+			<string>922</string>
+			<string>902</string>
+			<string>905</string>
+			<string>907</string>
+			<string>912</string>
+			<string>913</string>
+			<string>925</string>
+			<string>937</string>
+			<string>897</string>
+			<string>917</string>
+			<string>949</string>
+			<string>914</string>
+			<string>918</string>
+			<string>919</string>
+		</array>
+	</dict>
+	<key>IBLastGroupID</key>
+	<string>23</string>
+	<key>IBOpenObjects</key>
+	<array>
+		<integer>5</integer>
+	</array>
+	<key>IBSystem Version</key>
+	<string>8C46</string>
+</dict>
+</plist>

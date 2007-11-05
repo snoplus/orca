@@ -1,0 +1,69 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                enabledAction = id; 
+                gainAction = id; 
+                includeTimingAction = id; 
+                initAction = id; 
+                offsetAction = id; 
+                readAction = id; 
+                resetLAMAction = id; 
+                settingLockAction = id; 
+                testLAMAction = id; 
+            }; 
+            CLASS = ORAD3511Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                enabledButton = NSButton; 
+                gainPopUp = NSPopUpButton; 
+                includeTimingButton = NSButton; 
+                initButton = NSButton; 
+                offsetPopUp = NSPopUpButton; 
+                readButton = NSButton; 
+                resetLAMButton = NSButton; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                testLAMButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                includeTimingAction = id; 
+                readInputsAction = id; 
+                readInputsAndClearAction = id; 
+                readStatusRegisterAction = id; 
+                settingLockAction = id; 
+                testClearLAM = id; 
+                testLAM = id; 
+            }; 
+            CLASS = ORL4532Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                includeTimingButton = NSButton; 
+                readInputsButton = NSButton; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                statusButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,110 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                addressModifierAction = id; 
+                doTests = id; 
+                ioSpaceAction = id; 
+                read = id; 
+                readWriteTypeMatrixAction = id; 
+                reset = id; 
+                rwAddressStepperAction = id; 
+                rwAddressTextAction = id; 
+                sysReset = id; 
+                write = id; 
+                writeValueStepperAction = id; 
+                writeValueTextAction = id; 
+            }; 
+            CLASS = OR617Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressStepper = NSStepper; 
+                addressValueField = NSTextField; 
+                readWriteAddressModifierPopUp = NSPopUpButton; 
+                readWriteIOSpacePopUp = NSPopUpButton; 
+                readWriteTypeMatrix = NSMatrix; 
+                writeValueField = NSTextField; 
+                writeValueStepper = NSStepper; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                addressModifierAction = id; 
+                doTests = id; 
+                ioSpaceAction = id; 
+                read = id; 
+                readWriteTypeMatrixAction = id; 
+                reset = id; 
+                rwAddressStepperAction = id; 
+                rwAddressTextAction = id; 
+                sysReset = id; 
+                write = id; 
+                writeValueStepperAction = id; 
+                writeValueTextAction = id; 
+            }; 
+            CLASS = OR620Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressStepper = NSStepper; 
+                addressValueField = NSTextField; 
+                readWriteAddressModifierPopUp = NSPopUpButton; 
+                readWriteIOSpacePopUp = NSPopUpButton; 
+                readWriteTypeMatrix = NSMatrix; 
+                writeValueField = NSTextField; 
+                writeValueStepper = NSStepper; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {init = id; resetController = id; test = id; }; 
+            CLASS = ORCC32Controller; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {init = id; printConfig = id; resetController = id; test = id; }; 
+            CLASS = ORPCICamacController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                clearLAMAction = id; 
+                controlRegisterAction = id; 
+                initAction = id; 
+                moduleIDAction = id; 
+                offsetRegisterAction = id; 
+                testLAMAction = id; 
+                triggerAction = id; 
+            }; 
+            CLASS = ORTRS1Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                clearLAMButton = NSButton; 
+                controlRegisterTextField = NSTextField; 
+                initButton = NSButton; 
+                moduleIDButton = NSButton; 
+                offsetRegisterTextField = NSTextField; 
+                testLAMButton = NSButton; 
+                triggerButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

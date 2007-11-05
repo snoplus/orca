@@ -1,0 +1,46 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                changeBoardIndexAction = id; 
+                changeMonitorRead = id; 
+                changeMonitorWrite = id; 
+                changePrimaryAddress = id; 
+                connect = id; 
+                query = id; 
+                read = id; 
+                testLockAction = id; 
+                write = id; 
+            }; 
+            CLASS = ORGpibEnetController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                connectButton = NSButton; 
+                mCommand = NSTextField; 
+                mConfigured = NSTextField; 
+                mGpibBoard = NSPopUpButton; 
+                mIbstaErrors = NSMatrix; 
+                mPrimaryAddress = NSPopUpButton; 
+                mQuery = NSButton; 
+                mRead = NSButton; 
+                mResult = NSTextView; 
+                mSecondaryAddress = NSTextField; 
+                mWrite = NSButton; 
+                mibcntl = NSTextField; 
+                miberr = NSTextField; 
+                mibsta = NSTextField; 
+                monitorView = NSTextView; 
+                testLockButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

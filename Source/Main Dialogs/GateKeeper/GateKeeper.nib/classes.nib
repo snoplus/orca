@@ -1,0 +1,75 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                cardAction = id; 
+                channelAction = id; 
+                crateAction = id; 
+                decoderTargetAction = id; 
+            }; 
+            CLASS = ORGateElementController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                cardField = NSTextField; 
+                channelField = NSTextField; 
+                crateField = NSTextField; 
+                decoderTargetPopup = NSPopUpButton; 
+                model = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                addGateAction = id; 
+                delete = id; 
+                dimensionAction = id; 
+                gateNameAction = id; 
+                ignoreKeyAction = id; 
+                preScaleAction = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+                settingLockAction = id; 
+                twoDSizeAction = id; 
+            }; 
+            CLASS = ORGateKeeper; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addGateButton = NSButton; 
+                dimensionButton = NSMatrix; 
+                dimensionTabView = NSTabView; 
+                gateKeyController = ORGateKeyController; 
+                gateListView = NSTableView; 
+                gateNameField = NSTextField; 
+                gateTabView = NSTabView; 
+                gatedValue1DBox = NSBox; 
+                gatedValueController = ORGatedValueController; 
+                gatedValueControllerY = ORGatedValueController; 
+                ignoreKeyButton = NSButton; 
+                preScaleField = NSTextField; 
+                removeGateButton = NSButton; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                twoDSizeField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {acceptTypeAction = id; highValueAction = id; lowValueAction = id; }; 
+            CLASS = ORGateKeyController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                acceptenceMatrix = NSMatrix; 
+                highValueField = NSTextField; 
+                lowValueField = NSTextField; 
+            }; 
+            SUPERCLASS = ORGateElementController; 
+        }, 
+        {
+            CLASS = ORGatedValueController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = ORGateElementController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

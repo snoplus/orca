@@ -1,0 +1,56 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OR1DHistoController; LANGUAGE = ObjC; SUPERCLASS = ORDataController; }, 
+        {
+            ACTIONS = {
+                clear = id; 
+                clearROI = id; 
+                doAnalysis = id; 
+                hideShowControls = id; 
+                logLin = id; 
+                printDocument = id; 
+            }; 
+            CLASS = ORDataController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                containingView = NSView; 
+                hideShowButton = NSButton; 
+                plotter = ORPlotter1D; 
+                plotterGroupView = NSView; 
+                titleField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {plotNameAction = id; }; 
+            CLASS = ORMultiPlotController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {legendMatrix = NSMatrix; plotNameField = NSTextField; }; 
+            SUPERCLASS = ORDataController; 
+        }, 
+        {
+            CLASS = ORToolbarFactory; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {owner = NSWindow; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = ZFlowLayout; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

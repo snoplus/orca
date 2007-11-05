@@ -1,0 +1,25 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {orderFrontGoToPanel = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {jumpButtonClicked = id; orderFrontGoToPanel = id; }; 
+            CLASS = GoToLine; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dialogueView = id; lineNumberField = NSTextField; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {jumpButtonClicked = id; }; 
+            CLASS = MNLineNumberingRulerView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dialogueView = id; radioButtons = id; textField = id; }; 
+            SUPERCLASS = NSRulerView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,70 @@
+//
+//  ORHistoController.h
+//  Orca
+//
+//  Created by Mark Howe on Sat Nov 23 2002.
+//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+
+
+@interface ORHistoController : OrcaObjectController  {
+    IBOutlet NSSplitView*	splitView;
+    IBOutlet NSOutlineView* outlineView;
+    IBOutlet NSOutlineView* multiPlotView;
+    IBOutlet NSButton* 		chooseDirButton;
+    IBOutlet NSTextField* 	dirTextField;
+    IBOutlet NSTextField* 	fileTextField;
+    IBOutlet NSButton* 		writeFileButton;
+    IBOutlet NSButton* 		clearAllButton;
+    IBOutlet NSButton* 		plotGroupButton;
+    BOOL                    scheduledToUpdate;
+}
+
+#pragma mark ¥¥¥Accessors
+
+#pragma mark ¥¥¥Interface Management
+- (void) registerNotificationObservers;
+- (void) modelChanged:(NSNotification*)aNotification;
+- (void) dirChanged:(NSNotification*)note;
+- (void) fileChanged:(NSNotification*)note;
+- (void) writeFileChanged:(NSNotification*)note;
+- (void) dataChanged:(NSNotification*)aNotification;
+- (void) setButtonStates;
+- (void) doUpdate;
+- (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
+- (void) multiPlotsChanged:(NSNotification*)aNotification;
+- (void) outlineViewSelectionDidChange:(NSNotification *)notification;
+- (void)splitViewDidResizeSubviews:(NSNotification *)aNotification;
+
+#pragma mark ¥¥¥Actions
+- (IBAction) doubleClick:(id)sender;
+- (IBAction) chooseDir:(id)sender;
+- (IBAction) writeFileAction:(id)sender;
+- (IBAction) clearAllAction:(id)sender;
+- (IBAction) removeItemAction:(id)sender;
+- (IBAction) delete:(id)sender;
+- (IBAction) cut:(id)sender;
+- (IBAction) plotGroupAction:(id)sender;
+
+- (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+
+#pragma mark ¥¥¥Data Source Methods
+- (BOOL) outlineView:(NSOutlineView*)ov isItemExpandable:(id)item;
+- (int)  outlineView:(NSOutlineView*)ov numberOfChildrenOfItem:(id)item;
+- (id)   outlineView:(NSOutlineView*)ov child:(int)index ofItem:(id)item;
+- (id)   outlineView:(NSOutlineView*)ov objectValueForTableColumn:(NSTableColumn*)tableColumn byItem:(id)item;
+
+@end

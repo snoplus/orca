@@ -1,0 +1,86 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                baseAddressAction = id; 
+                couplingAction = id; 
+                delayTimeFieldAction = id; 
+                enableMaskAction = id; 
+                fullScalePUAction = id; 
+                get1Waveform = id; 
+                initAction = id; 
+                loadDialogAction = id; 
+                numberSamplesAction = id; 
+                probeAction = id; 
+                readContinouslyAction = id; 
+                report = id; 
+                sampleIntervalAction = id; 
+                settingLockAction = id; 
+                triggerCouplingAction = id; 
+                triggerLevel1FieldAction = id; 
+                triggerLevel2FieldAction = id; 
+                triggerSlopeAction = id; 
+                triggerSourceAction = id; 
+                verticalOffsetAction = id; 
+            }; 
+            CLASS = ORAcqirisDC440Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                baseAddressField = NSTextField; 
+                couplingPU = NSPopUpButton; 
+                delayTimeField = NSTextField; 
+                enableMaskMatrix = NSMatrix; 
+                fullScalePU = NSPopUpButton; 
+                initButton = NSButton; 
+                loadDialogButton = NSButton; 
+                numberSamplesField = NSTextField; 
+                plotter = ORPlotter1D; 
+                probeButton = NSButton; 
+                rate0 = ORValueBar; 
+                readContinouslyButton = NSButton; 
+                readOneButton = NSButton; 
+                reportButton = NSButton; 
+                sampleIntervalField = NSTextField; 
+                sampleRateTextFields = NSMatrix; 
+                settingLockButton = NSButton; 
+                triggerCouplingPU = NSPopUpButton; 
+                triggerLablel1Field = NSTextField; 
+                triggerLablel2Field = NSTextField; 
+                triggerLevel1Field = NSTextField; 
+                triggerLevel2Field = NSTextField; 
+                triggerSlopePU = NSPopUpButton; 
+                triggerSourcePU = NSPopUpButton; 
+                verticalOffsetField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORQueueView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

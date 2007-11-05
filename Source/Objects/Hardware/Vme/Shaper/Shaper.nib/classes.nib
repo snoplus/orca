@@ -1,0 +1,129 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                addGateAction = id; 
+                analyze = id; 
+                autoScale = id; 
+                averageWindowAction = id; 
+                centerOnPeak = id; 
+                clearActiveCurveGates = id; 
+                clearActiveGate = id; 
+                clearAllGates = id; 
+                copy = id; 
+                differentiateAction = id; 
+                removeGateAction = id; 
+                resetScales = id; 
+                savePDF = id; 
+            }; 
+            CLASS = ORPlotter1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                analysisView = ZFlowLayout; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                baseAddressAction = id; 
+                continousAction = id; 
+                displayRawAction = id; 
+                gainAction = id; 
+                initBoard = id; 
+                integrationAction = id; 
+                mulitBoardEnabledAction = id; 
+                onlineAction = id; 
+                probeBoard = id; 
+                readScalers = id; 
+                report = id; 
+                scalerMaskAction = id; 
+                scalersEnabledAction = id; 
+                scanAction = id; 
+                scanDeltaAction = id; 
+                scanNumberAction = id; 
+                scanStartAction = id; 
+                settingLockAction = id; 
+                thresholdAction = id; 
+                thresholdTextAction = id; 
+            }; 
+            CLASS = ORShaperController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressStepper = NSStepper; 
+                addressText = NSTextField; 
+                continousModeCB = NSButton; 
+                displayRawCB = NSButton; 
+                enableMultiBoardCB = NSButton; 
+                enableScalersCB = NSButton; 
+                gainSteppers = NSMatrix; 
+                gainTextFields = NSMatrix; 
+                initButton = NSButton; 
+                integrationStepper = NSStepper; 
+                integrationText = NSTextField; 
+                online1MaskMatrix = NSMatrix; 
+                online2MaskMatrix = NSMatrix; 
+                rate0 = ORValueBar; 
+                rateLogCB = NSButton; 
+                rateTextFields = NSMatrix; 
+                scalerMaskMatrix = NSMatrix; 
+                scanDeltaField = NSTextField; 
+                scanNumberField = NSTextField; 
+                scanStartField = NSTextField; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                slotField = NSTextField; 
+                tabView = NSTabView; 
+                thresholdLabel = NSTextField; 
+                thresholdSteppers = NSMatrix; 
+                thresholdTextFields = NSMatrix; 
+                timeRateLogCB = NSButton; 
+                timeRatePlot = ORPlotter1D; 
+                totalRate = ORValueBar; 
+                totalRateLogCB = NSButton; 
+                totalRateText = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {modelStepperAction = id; modelSwitchAction = id; }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; modelStepper = NSStepper; modelSwitchPopUp = NSPopUpButton; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

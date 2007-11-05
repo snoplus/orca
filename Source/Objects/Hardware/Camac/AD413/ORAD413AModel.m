@@ -1,0 +1,446 @@
+/*
+ *  ORAD413AModel.cpp
+ *  Orca
+ *
+ *  Created by Mark Howe on Sat Nov 16 2002.
+ *  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
+ *
+ */
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+#pragma mark ¥¥¥Imported Files
+#import "ORAD413AModel.h"
+
+#import "ORDataTypeAssigner.h"
+#import "ORDataPacket.h"
+#import "ORCamacControllerCard.h"
+#import "ORCamacCrateModel.h"
+
+NSString* ORAD413AOnlineMaskChangedNotification		= @"ORAD413AOnlineMaskChangedNotification";
+NSString* ORAD413ASettingsLock						= @"ORAD413ASettingsLock";
+NSString* ORAD413ADiscriminatorChangedNotification      = @"ORAD413ADiscriminatorChangedNotification";
+NSString* ORAD413AControlReg1ChangedNotification     = @"ORAD413AControlReg1ChangedNotification";
+NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2ChangedNotification";
+
+@interface ORAD413AModel (private)
+- (void) ship:(ORDataPacket*)aDataPacket adc:(unsigned short)adcValue forChan:(int)i;
+@end
+
+@implementation ORAD413AModel
+
+#pragma mark ¥¥¥Initialization
+- (id) init
+{		
+    self = [super init];
+    
+    //set default:
+    //zero suppresion   = NO
+    //ECL port enable   = NO
+    //Coincidence       = NO
+    //Random Access     = NO
+    //OF suppression    = NO
+    controlReg1 = 0x9300;
+    
+    //all gates disabled
+    controlReg2 = 0x00ff;
+    
+    
+    return self;
+}
+
+- (void) dealloc
+{
+    [discriminators release];
+    [super dealloc];
+}
+
+- (void) setUpImage
+{
+    [self setImage:[NSImage imageNamed:@"AD413ACard"]];
+}
+
+- (void) makeMainController
+{
+    [self linkToController:@"ORAD413AController"];
+}
+
+- (short) numberSlotsUsed
+{
+    return 2;
+}
+
+#pragma mark ¥¥¥Accessors
+- (NSString*) shortName
+{
+	return @"AD413";
+}
+
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+
+- (unsigned char)onlineMask {
+	
+    return onlineMask;
+}
+
+- (void)setOnlineMask:(unsigned char)anOnlineMask {
+    [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
+	
+    onlineMask = anOnlineMask;
+    
+    [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORAD413AOnlineMaskChangedNotification
+							  object:self];
+	
+}
+
+- (BOOL)onlineMaskBit:(int)bit
+{
+	return onlineMask&(1<<bit);
+}
+
+- (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned char aMask = onlineMask;
+	if(aValue)aMask |= (1<<bit);
+	else aMask &= ~(1<<bit);
+	[self setOnlineMask:aMask];
+}
+
+- (NSMutableArray *) discriminators
+{
+    return discriminators; 
+}
+
+- (void) setDiscriminators: (NSMutableArray *) anArray
+{
+    [anArray retain];
+    [discriminators release];    
+    discriminators = anArray;
+}
+
+- (unsigned short) discriminatorForChan:(int)aChan
+{
+    if(discriminators) return [[discriminators objectAtIndex:aChan] intValue];
+    else return 0.0;
+}
+
+- (void) setDiscriminator:(unsigned short)aValue forChan:(int)aChan
+{
+    if(!discriminators){
+        [self setDiscriminators:[NSMutableArray arrayWithObjects:
+            [NSNumber numberWithChar:0],
+            [NSNumber numberWithChar:0],
+            [NSNumber numberWithChar:0],
+            [NSNumber numberWithChar:0],
+            nil]];
+        
+    }
+    [[[self undoManager] prepareWithInvocationTarget:self] setDiscriminator:[self discriminatorForChan:aChan] forChan:aChan];
+    
+    [discriminators replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+    
+    [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORAD413ADiscriminatorChangedNotification
+							  object:self
+							userInfo: [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"]];
+}
+
+- (unsigned short) controlReg1
+{
+    
+    return controlReg1;
+}
+
+- (void) setControlReg1: (unsigned short) aControlReg1
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setControlReg1:controlReg1];
+	
+    controlReg1 = aControlReg1;
+    
+    [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORAD413AControlReg1ChangedNotification
+							  object:self];
+}
+
+
+- (unsigned short) controlReg2
+{
+    
+    return controlReg2;
+}
+
+- (void) setControlReg2: (unsigned short) aControlReg2
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setControlReg2:controlReg2];
+	
+
+    controlReg2 = aControlReg2 & 0x001f;
+    
+    [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORAD413AControlReg2ChangedNotification
+							  object:self];
+}
+
+#pragma mark ¥¥¥Hardware functions
+- (void) readControlReg1
+{
+    unsigned short aValue;
+    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:0 data:&aValue];
+    [self setControlReg1:aValue];
+}
+
+- (void) readControlReg2
+{
+    unsigned short aValue;
+    [[self adapter] camacShortNAF:[self stationNumber]+1 a:1 f:0 data:&aValue];
+    [self setControlReg2:aValue];
+}
+
+- (void) writeControlReg1
+{
+    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:16 data:&controlReg1];
+}
+
+- (void) writeControlReg2
+{
+    [[self adapter] camacShortNAF:[self stationNumber]+1 a:1 f:16 data:&controlReg2];
+}
+
+- (void) clearModule
+{
+    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:9 data:&controlReg2];
+}
+
+- (void) clearLAM
+{
+    [controller camacShortNAF:[self stationNumber]+1 a:0 f:10 data:nil];
+}
+
+- (void) readDiscriminators
+{
+    unsigned short aValue;
+    int i;
+    for(i=0;i<4;i++){
+        [[self adapter] camacShortNAF:[self stationNumber]+1 a:i f:1 data:&aValue];
+        [self setDiscriminator:0x00ff&aValue forChan:i];
+    }
+}
+
+- (void) writeDiscriminators
+{
+    unsigned short aValue;
+    int i;
+    for(i=0;i<4;i++){
+        aValue = [self discriminatorForChan:i];
+        [[self adapter] camacShortNAF:[self stationNumber]+1 a:i f:17 data:&aValue];
+    }
+}
+
+
+#pragma mark ¥¥¥DataTaker
+
+- (void) setDataIds:(id)assigner
+{
+    dataId       = [assigner assignDataIds:kShortForm]; //short form preferred
+}
+
+- (void) syncDataIdsWith:(id)anotherCard
+{
+    [self setDataId:[anotherCard dataId]];
+}
+
+- (void) reset
+{
+	//[self initBoard];    
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"ORAD413ADecoderForAdc",                       @"decoder",
+        [NSNumber numberWithLong:dataId],               @"dataId",
+        [NSNumber numberWithBool:NO],                   @"variable",
+        [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
+        [NSNumber numberWithBool:YES],                  @"canBeGated",
+        nil];
+    [dataDictionary setObject:aDictionary forKey:@"ADC"];
+    return dataDictionary;
+}
+
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	
+    if(![self adapter]){
+		[NSException raise:@"Not Connected" format:@"You must connect to a PCI-CAMAC Controller (i.e. a CC32)."];
+    }
+	
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORAD413AModel"];    
+    
+    //----------------------------------------------------------------------------------------
+    controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
+    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | ((([self stationNumber]+1)& 0x0000001f)<<16); //doesn't change so do it here.
+	cachedStation = [self stationNumber]+1;
+    randomAccessMode    = (controlReg1>>kRandomAccessBit)    & 0x1;
+    zeroSuppressionMode = !((controlReg1>>kZeroSuppressionBit) & 0x1);
+    eclMode				= !((controlReg1>>kECLPortEnableBit) & 0x1);
+	
+    [self clearExceptionCount];
+    
+    int i;
+	onlineChannelCount = 0;
+    for(i=0;i<4;i++){
+        if(onlineMask & (0x1<<i)){
+            onlineList[onlineChannelCount] = i;
+            onlineChannelCount++;
+        }
+    }
+    
+	
+    //if([[userInfo objectForKey:@"doinit"]intValue]){
+    [self clearModule];
+    [self writeControlReg2];
+    [self writeControlReg1];  //LAM enable is rolled into this load
+	[self writeDiscriminators];
+    [self clearLAM];
+    //}
+}
+
+//**************************************************************************************
+// Function:	TakeData
+// Description: Read data from a card
+//**************************************************************************************
+
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    NS_DURING
+        
+        //test the LAM
+        unsigned short dummy;
+        unsigned short adcValue;
+		unsigned short status = [controller camacShortNAF:cachedStation a:0 f:8 data:&dummy];
+
+        if(isQbitSet(status)) { //LAM status comes back in the Q bit
+            
+            if(zeroSuppressionMode){            
+                unsigned short data;
+                [controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+                int numValues = (data>>11) & 0x3;
+                int i;
+                for(i=0;i<numValues;i++){
+                    [controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&data];
+                    int chan = (data>>13)&0x3;
+                    [self ship:aDataPacket adc:data&0x1fff forChan:chan];
+                    //in this mode, the LAM is cleared when the last adc is read.
+                }
+            }
+            else {
+                if(randomAccessMode && !eclMode ){
+                    if(onlineChannelCount){
+                        int i;
+                        for(i=0;i<onlineChannelCount;i++){
+                            //read one adc channnel
+                            [controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
+                            [self ship:aDataPacket adc:adcValue&0x1fff forChan:onlineList[i]];
+                        }
+                    }
+                }
+                else {
+                    int i;
+                    for(i=0;i<4;i++){
+                        [controller camacShortNAF:cachedStation a:i f:2 data:&adcValue];
+                        [self ship:aDataPacket adc:adcValue&0x1fff forChan:i];
+                    }
+                }
+            }
+			
+			[controller camacShortNAF:cachedStation a:0 f:10 data:&dummy];
+            
+        }
+        NS_HANDLER
+			[self incExceptionCount];
+			[localException raise];
+		NS_ENDHANDLER
+}
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+}
+
+
+#pragma mark ¥¥¥Archival
+
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+	
+    [[self undoManager] disableUndoRegistration];
+    
+    [self setOnlineMask:[decoder decodeIntForKey:   @"ORAD413AOnlineMask"]];
+    [self setDiscriminators:[decoder decodeObjectForKey:@"OR413Discriminators"]];
+    [self setControlReg1:[decoder decodeIntForKey:@"OR413AControlReg1"]];
+    [self setControlReg2:[decoder decodeIntForKey:@"OR413AControlReg2"]];
+    
+    [[self undoManager] enableUndoRegistration];
+	
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt:onlineMask    forKey:@"ORAD413AOnlineMask"];
+    [encoder encodeObject:discriminators forKey:@"OR413Discriminators"];
+    [encoder encodeInt:controlReg1 forKey:@"OR413AControlReg1"];
+    [encoder encodeInt:controlReg2 forKey:@"OR413AControlReg2"];
+	
+}
+
+
+- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    [objDictionary setObject:[NSNumber numberWithInt:onlineMask] forKey:@"onlineMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:controlReg1] forKey:@"controlReg1"];
+    [objDictionary setObject:[NSNumber numberWithInt:controlReg1] forKey:@"controlReg2"];
+    return objDictionary;
+}
+
+@end
+
+@implementation ORAD413AModel (private)
+
+- (void) ship:(ORDataPacket*)aDataPacket adc:(unsigned short)adcValue forChan:(int)i
+{
+    if(IsShortForm(dataId)){
+        unsigned long data = dataId | unChangingDataPart | (i&0x3)<<13 | (adcValue & 0x1FFF);
+        [aDataPacket addLongsToFrameBuffer:&data length:1];
+    }
+    else {
+        unsigned long data[2];
+        data[0] =  dataId | 2;
+        data[1] =  unChangingDataPart | (i&0x3)<<13 | (adcValue & 0x1FFF);
+        [aDataPacket addLongsToFrameBuffer:data length:2];
+    }
+}
+
+@end

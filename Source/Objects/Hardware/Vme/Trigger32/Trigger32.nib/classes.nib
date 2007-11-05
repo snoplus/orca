@@ -1,0 +1,156 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                baseAddressAction = id; 
+                boardIDAction = id; 
+                dumpLiveTimeAction = id; 
+                enableLiveTimeAction = id; 
+                enableTimeClockAction = id; 
+                gtIdValueAction = id; 
+                gtSyncClrAction = id; 
+                initAction = id; 
+                latchGtid1Action = id; 
+                latchGtid2Action = id; 
+                latchLiveTimeAction = id; 
+                latchTrigger1ClockAction = id; 
+                latchTrigger2ClockAction = id; 
+                loadGtIdAction = id; 
+                loadLowerClockAction = id; 
+                loadTestRegAction = id; 
+                loadUpperClockAction = id; 
+                prescaleAction = id; 
+                readGtId1Action = id; 
+                readGtId2Action = id; 
+                readLowerTrigger1ClockAction = id; 
+                readLowerTrigger2ClockAction = id; 
+                readSGTIDAction = id; 
+                readStatusAction = id; 
+                readTestRegAction = id; 
+                readTrigger1ClockAction = id; 
+                readTrigger2ClockAction = id; 
+                readUpperTrigger1ClockAction = id; 
+                readUpperTrigger2ClockAction = id; 
+                requestSGTIDAction = id; 
+                resetAlteraAction = id; 
+                resetClockAction = id; 
+                resetErrorCountAction = id; 
+                resetGT1Action = id; 
+                resetGT2Action = id; 
+                resetLiveTimeAction = id; 
+                resetMSAMAction = id; 
+                settingLockAction = id; 
+                shipEvt1ClkAction = id; 
+                shipEvt2ClkAction = id; 
+                softGtAction = id; 
+                specialLockAction = id; 
+                syncClr24Action = id; 
+                syncClrAction = id; 
+                testPollSeqAction = id; 
+                testRegValueAction = id; 
+                timeClockLowerAction = id; 
+                timeClockUpperAction = id; 
+                trigger1GTXorAction = id; 
+                trigger1NameAction = id; 
+                trigger2BusyOutputAction = id; 
+                trigger2EventInputAction = id; 
+                trigger2GTXorAction = id; 
+                trigger2NameAction = id; 
+                useMSAMAction = id; 
+                useNoHardwareAction = id; 
+                useSoftwareGtIdAction = id; 
+            }; 
+            CLASS = ORTrigger32Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressStepper = NSStepper; 
+                addressText = NSTextField; 
+                boardIDButton = NSButton; 
+                dumpLiveTimeButton = NSButton; 
+                enableLiveTimeCB = NSButton; 
+                enableTimeClockCB = NSButton; 
+                getStatusButton1 = NSButton; 
+                getStatusButton2 = NSButton; 
+                gtErrorField = NSTextField; 
+                gtIdValueStepper = NSStepper; 
+                gtIdValueText = NSTextField; 
+                gtSyncClr24Button = NSButton; 
+                gtSyncClrButton = NSButton; 
+                initButton = NSButton; 
+                latchClock1Button = NSButton; 
+                latchClock2Button = NSButton; 
+                latchGTID1Button = NSButton; 
+                latchGTID2Button = NSButton; 
+                latchLiveTimeButton = NSButton; 
+                loadGTIDButton = NSButton; 
+                loadLowerTimerCounterButton = NSButton; 
+                loadTestRegButton = NSButton; 
+                loadUpperTimerCounterButton = NSButton; 
+                pollEventButton = NSButton; 
+                prescaleStepper = NSStepper; 
+                prescaleText = NSTextField; 
+                readGTID1Button = NSButton; 
+                readGTID2Button = NSButton; 
+                readSGTIDButton = NSButton; 
+                readTestRegButton = NSButton; 
+                readTimerCounter1Button = NSButton; 
+                readTimerCounter2Button = NSButton; 
+                requestSGTIDButton = NSButton; 
+                resetAlteraButton = NSButton; 
+                resetClockButton = NSButton; 
+                resetErrorButton = NSButton; 
+                resetGT1Button = NSButton; 
+                resetGT2Button = NSButton; 
+                resetLiveTimeButton = NSButton; 
+                resetMSAMButton = NSButton; 
+                setUpTrigger1Box = NSBox; 
+                setUpTrigger2Box = NSBox; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                shipEvt1ClkCB = NSButton; 
+                shipEvt2ClkCB = NSButton; 
+                slotField = NSTextField; 
+                softGTButton = NSButton; 
+                specialLockButton = NSButton; 
+                specialLockDocField = NSTextField; 
+                syncClrButton = NSButton; 
+                tabView = NSTabView; 
+                testRegStepper = NSStepper; 
+                testRegText = NSTextField; 
+                testingTrigger1Label = NSTextField; 
+                testingTrigger2Label = NSTextField; 
+                timeClockLowerStepper = NSStepper; 
+                timeClockLowerText = NSTextField; 
+                timeClockUpperStepper = NSStepper; 
+                timeClockUpperText = NSTextField; 
+                trigger1GTXorCB = NSButton; 
+                trigger1NameField = NSTextField; 
+                trigger2BusyOutputEnableCB = NSButton; 
+                trigger2GTXorCB = NSButton; 
+                trigger2NameField = NSTextField; 
+                trigger2eventInputEnableCB = NSButton; 
+                useMSAMCB = NSButton; 
+                useNoHardwareCB = NSButton; 
+                useSoftwareGtIdCB = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {modelStepperAction = id; modelSwitchAction = id; }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; modelStepper = NSStepper; modelSwitchPopUp = NSPopUpButton; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,181 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                cCycleAction = id; 
+                cCycleIAction = id; 
+                cmdSelectAction = id; 
+                cmdStationAction = id; 
+                cmdSubAddressAction = id; 
+                cmdWriteValueAction = id; 
+                execute = id; 
+                inhibitOffAction = id; 
+                inhibitOnAction = id; 
+                init = id; 
+                moduleWriteValueAction = id; 
+                readInhibitAction = id; 
+                readLamFFAction = id; 
+                readLamMaskAction = id; 
+                readLamStationsAction = id; 
+                readLedsAction = id; 
+                resetController = id; 
+                resetLamFFAction = id; 
+                setLamMaskAction = id; 
+                settingLockAction = id; 
+                test = id; 
+                zCycleAction = id; 
+                zCycleIAction = id; 
+            }; 
+            CLASS = ORCC32Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                cCycleButton = NSButton; 
+                cICycleButton = NSButton; 
+                cmdAcceptedField = NSTextField; 
+                cmdSelectPopUp = NSPopUpButton; 
+                executeButton = NSButton; 
+                helpField = NSTextField; 
+                inhibitField = NSTextField; 
+                inhibitOffButton = NSButton; 
+                inhibitOnButton = NSButton; 
+                initButton = NSButton; 
+                lookAtMeField = NSTextField; 
+                moduleWriteValueField = NSTextField; 
+                readIhibitButton = NSButton; 
+                readLamFFButton = NSButton; 
+                readLamMaskButton = NSButton; 
+                readLamStationsButton = NSButton; 
+                readLedsButton = NSButton; 
+                resetButton = NSButton; 
+                resetLamFFButton = NSButton; 
+                responseField = NSTextField; 
+                setLamMaskButton = NSButton; 
+                settingLockButton = NSButton; 
+                stationField = NSTextField; 
+                stationStepper = NSStepper; 
+                subaddressField = NSTextField; 
+                subaddressStepper = NSStepper; 
+                testButton = NSButton; 
+                valueField = NSTextField; 
+                writeValueField = NSTextField; 
+                writeValueStepper = NSStepper; 
+                zCycleButton = NSButton; 
+                zICycleButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                LAMMaskValueAction = id; 
+                aValueTextFieldAction = id; 
+                addDataWordToStack = id; 
+                addNAFToStack = id; 
+                bufferSizeAction = id; 
+                clearStack = id; 
+                dataModifierBitsMatrixAction = id; 
+                dataWordTextFieldAction = id; 
+                dggAAction = id; 
+                dggBAction = id; 
+                dggExtAction = id; 
+                executeListAction = id; 
+                fValueTextFieldAction = id; 
+                getStatusAction = id; 
+                internalRegSelectionAction = id; 
+                lamTimeOutAction = id; 
+                nValueTextFieldAction = id; 
+                nafModBitsMatrixAction = id; 
+                numSepEventsAction = id; 
+                readRegAction = id; 
+                readStackAction = id; 
+                registerValueTextFieldAction = id; 
+                saveStackAction = id; 
+                scalerAndDggAction = id; 
+                scalerEnableAction = id; 
+                scalerResetAction = id; 
+                serialNumberAction = id; 
+                timeIntervalActionAction = id; 
+                triggerDelayAction = id; 
+                usbTransferSetupAction = id; 
+                useDataModifierButtonAction = id; 
+                userLEDCodeAction = id; 
+                userLEDInvertLatchAction = id; 
+                userNIMCodeAction = id; 
+                userNIMInvertLatchAction = id; 
+                writeInternalRegistersAction = id; 
+                writeRegAction = id; 
+            }; 
+            CLASS = ORCCUSBController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                aValueTextField = NSTextField; 
+                bufferSizePopup = NSPopUpButton; 
+                customStackTable = NSTableView; 
+                dataModifierBitsMatrix = NSMatrix; 
+                dataWordTextField = NSTextField; 
+                dggADelayCoarseTextField = NSTextField; 
+                dggADelayFineTextField = NSTextField; 
+                dggAGateTextField = NSTextField; 
+                dggAModePopup = NSPopUpButton; 
+                dggBDelayCoarseTextField = NSTextField; 
+                dggBDelayFineTextField = NSTextField; 
+                dggBGateTextField = NSTextField; 
+                dggBModePopup = NSPopUpButton; 
+                fValueTextField = NSTextField; 
+                greenLedSourcePopup = NSPopUpButton; 
+                internalRegSelectionPopup = NSPopUpButton; 
+                lamMaskValueField = NSTextField; 
+                lamTimeOutField = NSTextField; 
+                nValueTextField = NSTextField; 
+                nafModBitsMatrix = NSMatrix; 
+                nim01SourcePopup = NSPopUpButton; 
+                nim02SourcePopup = NSPopUpButton; 
+                nim03SourcePopup = NSPopUpButton; 
+                numBuffersTextField = NSTextField; 
+                numSepEventsField = NSTextField; 
+                numberOfProductTermsTextField = NSTextField; 
+                readRegButton = NSButton; 
+                redLedSourcePopup = NSPopUpButton; 
+                registerValueStepper = NSStepper; 
+                registerValueTextField = NSTextField; 
+                scalerAModePopup = NSPopUpButton; 
+                scalerATextField = NSTextField; 
+                scalerBModePopup = NSPopUpButton; 
+                scalerBTextField = NSTextField; 
+                scalerEnableMatrix = NSMatrix; 
+                scalerResetMatrix = NSMatrix; 
+                serialNumberPopup = NSPopUpButton; 
+                tabView = NSTabView; 
+                timeIntervalField = NSTextField; 
+                timeOutTextField = NSTextField; 
+                triggerDelayField = NSTextField; 
+                useDataModifierButton = NSButton; 
+                userLEDLatchInvertMatrix = NSMatrix; 
+                userNIMLatchInvertMatrix = NSMatrix; 
+                writeInternalRegistersButton = NSButton; 
+                writeRegButton = NSButton; 
+                yellowLedSourcePopup = NSPopUpButton; 
+            }; 
+            SUPERCLASS = ORCC32Controller; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

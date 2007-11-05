@@ -1,0 +1,49 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                autoReconnectAction = id; 
+                connectAction = id; 
+                connectAtStartAction = id; 
+                lockAction = id; 
+                setHostAction = id; 
+                setPortAction = id; 
+            }; 
+            CLASS = ORCARootServiceController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                autoReconnectButton = NSButton; 
+                connectAtStartButton = NSButton; 
+                connectButton = NSButton; 
+                hostField = NSTextField; 
+                lockButton = NSButton; 
+                portField = NSTextField; 
+                statusField = NSTextField; 
+                timeField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                recolorCompleteFile = id; 
+                recolorCompleteFileDeferred = id; 
+                recolorSyntaxTimer = id; 
+                toggleAutoSyntaxColoring = id; 
+                toggleMaintainIndentation = id; 
+            }; 
+            CLASS = ORScriptView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {progress = NSProgressIndicator; status = NSTextField; }; 
+            SUPERCLASS = NSTextView; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

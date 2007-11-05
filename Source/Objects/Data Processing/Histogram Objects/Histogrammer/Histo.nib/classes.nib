@@ -1,0 +1,66 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OPlotInterface; LANGUAGE = ObjC; SUPERCLASS = NSWindowController; }, 
+        {
+            ACTIONS = {
+                chooseDir = id; 
+                clearAllAction = id; 
+                cut = id; 
+                delete = id; 
+                doubleClick = id; 
+                plotGroupAction = id; 
+                removeItemAction = id; 
+                writeFileAction = id; 
+            }; 
+            CLASS = ORHistoController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                chooseDirButton = NSButton; 
+                clearAllButton = NSButton; 
+                dirTextField = NSTextField; 
+                fileTextField = NSTextField; 
+                multiPlotView = NSOutlineView; 
+                outlineView = NSOutlineView; 
+                plotGroupButton = NSButton; 
+                splitView = NSSplitView; 
+                writeFileButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                repeatRunCBAction = id; 
+                timeLimitStepperAction = id; 
+                timeLimitTextAction = id; 
+                timedRunCBAction = id; 
+                toggleRunning = id; 
+            }; 
+            CLASS = ORRunController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                elapsedTimeField = NSTextField; 
+                repeatRunCB = NSButton; 
+                runBar = NSProgressIndicator; 
+                runProgress = NSProgressIndicator; 
+                startStopButton = NSButton; 
+                statusField = NSTextField; 
+                timeLimitField = NSTextField; 
+                timeLimitStepper = NSStepper; 
+                timeStartedField = NSTextField; 
+                timeToGoField = NSTextField; 
+                timedRunCB = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORRunFactory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

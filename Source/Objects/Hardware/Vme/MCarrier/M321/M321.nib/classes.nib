@@ -1,0 +1,72 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                baseAddressStepperAction = id; 
+                baseAddressTextAction = id; 
+                loadUnloadTest = id; 
+                readWriteTest = id; 
+                reset = id; 
+                status = id; 
+            }; 
+            CLASS = ORFifoController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressStepper = NSStepper; 
+                addressText = NSTextField; 
+                blockLoadTestControl = NSButton; 
+                progressView = NSProgressIndicator; 
+                readWriteTestControl = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                read = id; 
+                readMaskBitAction = id; 
+                readMaskDecimalAction = id; 
+                readMaskHexAction = id; 
+                write = id; 
+                writeMaskBitAction = id; 
+                writeMaskDecimalAction = id; 
+                writeMaskHexAction = id; 
+                writeValueBitAction = id; 
+                writeValueDecimalAction = id; 
+                writeValueHexAction = id; 
+            }; 
+            CLASS = ORIP408Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                readBitMatrix = NSMatrix; 
+                readButton = NSButton; 
+                readDecimalField = NSTextField; 
+                readHexField = NSTextField; 
+                readMaskBitMatrix = NSMatrix; 
+                readMaskDecimalField = NSTextField; 
+                readMaskHexField = NSTextField; 
+                writeBitMatrix = NSMatrix; 
+                writeButton = NSButton; 
+                writeDecimalField = NSTextField; 
+                writeHexField = NSTextField; 
+                writeMaskBitMatrix = NSMatrix; 
+                writeMaskDecimalField = NSTextField; 
+                writeMaskHexField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {probeAction = id; statusAction = id; syncAction = id; }; 
+            CLASS = ORM321Controller; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

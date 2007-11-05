@@ -1,0 +1,53 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                disableLAMEnableLatchAction = id; 
+                enableLAMEnableLatchAction = id; 
+                generalResetAction = id; 
+                includeTimingAction = id; 
+                onlineAction = id; 
+                readNoResetAction = id; 
+                readResetAction = id; 
+                resetLAMAction = id; 
+                settingLockAction = id; 
+                suppressZerosAction = id; 
+                testAllChansAction = id; 
+                testLAMAction = id; 
+            }; 
+            CLASS = ORADC2249Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                disableLAMEnableLatchButton = NSButton; 
+                enableLAMEnableLatchButton = NSButton; 
+                generalResetButton = NSButton; 
+                includeTimingButton = NSButton; 
+                onlineMaskMatrix = NSMatrix; 
+                readNoResetButton = NSButton; 
+                readResetButton = NSButton; 
+                resetLAMButton = NSButton; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                suppressZerosButton = NSButton; 
+                testAllChansButton = NSButton; 
+                testLAMButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

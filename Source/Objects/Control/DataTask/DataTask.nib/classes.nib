@@ -1,0 +1,58 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                cut = id; 
+                delete = id; 
+                enableTimer = id; 
+                listLockAction = id; 
+                loadListAction = id; 
+                modeAction = id; 
+                refreshTimeAction = id; 
+                removeAllAction = id; 
+                removeItemAction = id; 
+                saveAsAction = id; 
+                tableClick = id; 
+                tableDoubleClick = id; 
+                timeScaleAction = id; 
+            }; 
+            CLASS = ORDataTaskController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                autoTabView = NSTabView; 
+                cycleRateField = NSTextField; 
+                listLockButton = NSButton; 
+                loadListButton = NSButton; 
+                modeMatrix = NSMatrix; 
+                plotter = ORPlotter1D; 
+                queueBarGraph = ORValueBar; 
+                readoutListView = NSOutlineView; 
+                removeAllButton = NSButton; 
+                removeButton = NSButton; 
+                saveAsButton = NSButton; 
+                tabView = NSTabView; 
+                timeScaleMatrix = NSMatrix; 
+                totalListView = NSOutlineView; 
+                totalListViewDrawer = NSDrawer; 
+                viewListButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {modelStepperAction = id; modelSwitchAction = id; }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; modelStepper = NSStepper; modelSwitchPopUp = NSPopUpButton; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

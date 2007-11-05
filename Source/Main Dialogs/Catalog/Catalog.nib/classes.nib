@@ -1,0 +1,159 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                alarmMaster = id; 
+                goBackAction = id; 
+                openCatalog = id; 
+                openCommandCenter = id; 
+                openHWWizard = id; 
+                openPreferences = id; 
+                openTaskMaster = id; 
+                printDocument = id; 
+                scaleFactorAction = id; 
+                statusLog = id; 
+            }; 
+            CLASS = ORContainerController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                goBackButton = NSButton; 
+                groupView = ORGroupView; 
+                lockDocField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORDataTaskModel; LANGUAGE = ObjC; SUPERCLASS = OrcaObject; }, 
+        {
+            CLASS = ORDetectorView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {delegate = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                captureStateAction = id; 
+                detailsLockAction = id; 
+                detectorLockAction = id; 
+                displayTypeAction = id; 
+                initAction = id; 
+                mapLockAction = id; 
+                primaryAdcClassNameAction = id; 
+                readPrimaryMapFileAction = id; 
+                reportConfigAction = id; 
+                savePrimaryMapFileAction = id; 
+            }; 
+            CLASS = ORExperimentController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                captureDateField = NSTextField; 
+                captureStateButton = NSButton; 
+                cardCheckView = BiStateView; 
+                detailsLockButton = NSButton; 
+                detectorLockButton = NSButton; 
+                detectorView = ORDetectorView; 
+                displayTypeMatrix = NSMatrix; 
+                displayTypeMatrix1 = NSMatrix; 
+                hardwareCheckView = BiStateView; 
+                histogramTitle = NSTextField; 
+                initButton = NSButton; 
+                mapLockButton = NSButton; 
+                primaryAdcClassNamePopup = NSPopUpButton; 
+                primaryColorAxisLogCB = NSButton; 
+                primaryColorScale = ORColorScale; 
+                primaryMapFileTextField = NSTextField; 
+                primaryRateField = NSTextField; 
+                primaryTableView = NSTableView; 
+                primaryValuesView = NSTableView; 
+                rateLogCB = NSButton; 
+                ratePlot = ORPlotter1D; 
+                readPrimaryMapFileButton = NSButton; 
+                reportStateButton = NSButton; 
+                savePrimaryMapFileButton = NSButton; 
+                selectionStringTextView = NSTextView; 
+                tabView = NSTabView; 
+                valueHistogramsPlot = ORPlotter1D; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORFifoModel; LANGUAGE = ObjC; SUPERCLASS = ORVmeCard; }, 
+        {
+            CLASS = ORProcessController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = ORContainerController; 
+        }, 
+        {CLASS = ORVmeCard; LANGUAGE = ObjC; SUPERCLASS = ORVmeHardware; }, 
+        {
+            CLASS = ORVmeHardware; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataBus = id; hardwareBus = id; }; 
+            SUPERCLASS = OrcaObject; 
+        }, 
+        {
+            CLASS = ObjectFactory; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {object = id; }; 
+            SUPERCLASS = NSButton; 
+        }, 
+        {
+            ACTIONS = {doDoubleClick = id; showInterface = id; }; 
+            CLASS = OrcaObject; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {click = id; }; 
+            CLASS = OrcaObjectFactory; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                readSecondaryMapFileAction = id; 
+                saveSecondaryMapFileAction = id; 
+                secondaryAdcClassNameAction = id; 
+            }; 
+            CLASS = nTPCController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                detectorTitle = NSTextField; 
+                readSecondaryMapFileButton = NSButton; 
+                saveSecondaryMapFileButton = NSButton; 
+                secondaryAdcClassNamePopup = NSPopUpButton; 
+                secondaryColorAxisLogCB = NSButton; 
+                secondaryColorScale = ORColorScale; 
+                secondaryMapFileTextField = NSTextField; 
+                secondaryRateField = NSTextField; 
+                secondaryTableView = NSTableView; 
+                secondaryValuesView = NSTableView; 
+            }; 
+            SUPERCLASS = ORExperimentController; 
+        }, 
+        {
+            CLASS = nTPCView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {anodeColorScale = ORColorScale; cathodeColorScale = ORColorScale; }; 
+            SUPERCLASS = ORDetectorView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

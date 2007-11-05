@@ -1,0 +1,54 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {becomeCrateAdapter = id; }; 
+            CLASS = ORBit3Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mainAdapterButton = NSButton; statusText = NSTextField; }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            ACTIONS = {
+                lockAction = id; 
+                reportAction = id; 
+                setActivateAllowAction = id; 
+                setActivateRefuseAction = id; 
+                setPortAction = id; 
+            }; 
+            CLASS = ORDispatcherController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                allowListView = NSTextView; 
+                checkAllowedButton = NSButton; 
+                checkRefusedButton = NSButton; 
+                clientListView = NSTableView; 
+                lockButton = NSButton; 
+                portField = NSTextField; 
+                refuseListView = NSTextView; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {loadUnloadTest = id; readWriteTest = id; reset = id; status = id; }; 
+            CLASS = ORFifoController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressStepper = NSStepper; 
+                progressView = NSProgressIndicator; 
+                readWriteTestControl = id; 
+                testWorker = id; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

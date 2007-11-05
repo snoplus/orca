@@ -1,0 +1,63 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = ORAnalysis1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                averageField = NSTextField; 
+                centroidField = NSTextField; 
+                roiMaxField = NSTextField; 
+                roiMinField = NSTextField; 
+                sigmaField = NSTextField; 
+                totalSumField = NSTextField; 
+                view = NSView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                deleteFitAction = id; 
+                displayGateAction = id; 
+                fftAction = id; 
+                fftOptionAction = id; 
+                fftWindowAction = id; 
+                fitAction = id; 
+                fitOrderAction = id; 
+                fitTypeAction = id; 
+                selectGateAction = id; 
+            }; 
+            CLASS = ORAnalysisPanel1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                activeField = NSTextField; 
+                analysisDrawer = NSDrawer; 
+                analysisView = NSView; 
+                averageField = NSTextField; 
+                centroidField = NSTextField; 
+                curveField = NSTextField; 
+                deleteButton = NSButton; 
+                displayGateButton = NSButton; 
+                fftButton = NSButton; 
+                fftOptionPopup = NSPopUpButton; 
+                fftWindowPopup = NSPopUpButton; 
+                fitButton = NSButton; 
+                fitTypePopup = NSPopUpButton; 
+                gateField = NSTextField; 
+                gateMaxField = NSTextField; 
+                gateMinField = NSTextField; 
+                gatePeakXField = NSTextField; 
+                gatePeakYField = NSTextField; 
+                gatePopup = NSPopUpButton; 
+                gateWidthField = NSTextField; 
+                polyOrderField = NSTextField; 
+                serviceStatusField = NSTextField; 
+                sigmaField = NSTextField; 
+                totalSumField = NSTextField; 
+                view = NSView; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

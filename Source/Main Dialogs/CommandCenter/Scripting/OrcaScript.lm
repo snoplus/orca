@@ -1,0 +1,180 @@
+%{
+#include <stdlib.h>
+#include "OrcaScript.h"
+#include <string.h>
+#include "y.tab.h"
+extern int yyYYINPUT(char* theBuffer,int maxSize);
+#undef YY_INPUT
+#define YY_INPUT(b,r,s) (r = yyYYINPUT(b,s))
+
+void yyerror(char *);
+void comment();
+void singleLineComment();
+void grabString();
+void yyreset_state();
+long num_lines = 1;
+extern NSMutableArray* nodeList;
+extern NSMutableArray* functionList;
+%}
+
+D			[0-9]
+L			[a-zA-Z_$]
+H			[a-fA-F0-9]
+E			[Ee][+-]?{D}+
+
+%%
+
+{D}+{E}?			{
+						strncpy(yylval.cString,yytext,yyleng);
+						yylval.cString[yyleng] = '\0';
+						return CONSTANT;
+					}
+					
+{D}*"."{D}+({E})	{
+						strncpy(yylval.cString,yytext,yyleng);
+						yylval.cString[yyleng] = '\0';
+						return CONSTANT;
+					}
+					
+{D}*"."{D}*({E})?	{
+						strncpy(yylval.cString,yytext,yyleng);
+						yylval.cString[yyleng] = '\0';
+						return CONSTANT;
+					}
+
+0[xX]{H}+			{
+						strncpy(yylval.cString,yytext,yyleng);
+						yylval.cString[yyleng] = '\0';
+						unsigned long n = strtoul(yylval.cString,0,16);
+						sprintf(yylval.cString,"%lu",n);
+						return CONSTANT;
+					}
+
+[-()<>=+*/%!;:\[\],{}~^&|?.]	{ return *yytext; }
+
+"function"		return FUNCTION;
+"\""			{ grabString(); return STRING;}
+"/*"			{ comment(); }
+"//"			{ singleLineComment(); }
+">>="			return RIGHT_ASSIGN;
+"<<="			return LEFT_ASSIGN;
+"+="			return ADD_ASSIGN;
+"-="			return SUB_ASSIGN;
+"*="			return MUL_ASSIGN;
+"/="			return DIV_ASSIGN;
+"|="			return OR_ASSIGN;
+"%="			return MOD_ASSIGN;
+"&="			return AND_ASSIGN;
+"^="			return XOR_ASSIGN;
+"++"			return INC_OP;
+"--"			return DEC_OP;
+">="            return GE_OP;
+"<="            return LE_OP;
+"=="            return EQ_OP;
+"!="            return NE_OP;
+"&&"			return AND_OP;
+"||"			return OR_OP;
+
+"<<"			return LEFT_OP;
+">>"			return RIGHT_OP;
+
+"do"			return DO;
+"while"         return WHILE;
+"for"			return FOR;
+"if"            return IF;
+"switch"        return SWITCH;
+"case"			return CASE;
+"default"		return DEFAULT;
+"else"          return ELSE;
+"print"         return PRINT;
+"find"			return FIND;
+"break"			return BREAK;
+"exit"			return EXIT;
+"continue"		return CONTINUE;
+"return"		return RETURN;
+"sleep"			return SLEEP;
+"waituntil"		return WAITUNTIL;
+"hex"			return HEX;
+"array"			return MAKEARRAY;
+"string"		return MAKESTRING;
+"point"			return MAKEPOINT;
+"rect"			return MAKERECT;
+"postalarm"		return ALARM;
+"clearalarm"	return CLEAR;
+"logfile"		return LOGFILE;
+
+{L}({L}|{D})*   {
+                strncpy(yylval.symKey,yytext,yyleng);
+				yylval.symKey[yyleng] = '\0';
+                return VARIABLE;
+				}
+			
+[ \t]+			;       /* ignore whitespace */
+
+\n				{++num_lines;}
+
+.               yyerror("Unknown character");
+
+%%
+
+
+int yywrap(void) 
+{
+    return 1;
+}
+
+void yyerror(char* s)
+{
+	NSLog(@"<%s> line %d\n",s,num_lines+1);
+	[nodeList release];
+	nodeList = nil;
+	[functionList release];
+	functionList = nil;
+}
+
+void grabString()
+{
+	int i=0;
+	char c;
+	while ((c = input()) != '"'){
+		yylval.cString[i++] = c;
+	}
+	yylval.cString[i] = '\0';
+}
+
+void comment()
+{
+	//just eat comments, carefully counting lines as needed
+	char c, c1;
+loop:
+	while ((c = input()) != '*' && c != 0){
+		if(c=='\n')num_lines++;
+	}
+
+	if ((c1 = input()) != '/' && c != 0){
+		unput(c1);
+		goto loop;
+	}
+}
+
+void singleLineComment()
+{
+	//just eat comments, carefully counting lines as needed
+	char c;
+	while (c = input()){
+		if(c=='\n'){
+			num_lines++;
+			break;
+		}
+	}
+}
+
+void yyreset_state()
+{
+	num_lines = 0;
+	[nodeList release];
+	nodeList = nil;
+	[functionList release];
+	functionList = nil;
+	BEGIN(INITIAL);
+}

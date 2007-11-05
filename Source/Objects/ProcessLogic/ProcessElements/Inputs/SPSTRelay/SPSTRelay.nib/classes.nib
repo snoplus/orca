@@ -1,0 +1,39 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            ACTIONS = {commentFieldAction = id; }; 
+            CLASS = ORProcessElementController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {commentField = NSTextField; }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {channelPUAction = id; hwAccessLockAction = id; interfaceObjPUAction = id; }; 
+            CLASS = ORProcessHwAccessorController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                channelPU = NSPopUpButton; 
+                currentSourceField = NSTextField; 
+                currentSourceStateField = NSTextField; 
+                hwAccessLockButton = NSButton; 
+                interfaceObjPU = NSPopUpButton; 
+            }; 
+            SUPERCLASS = ORProcessElementController; 
+        }, 
+        {
+            CLASS = ORSPSTRelayController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = ORProcessHwAccessorController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

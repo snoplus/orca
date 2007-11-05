@@ -1,0 +1,41 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                connectionAction = id; 
+                databaseNameAction = id; 
+                hostNameAction = id; 
+                passwordAction = id; 
+                sqlLockAction = id; 
+                userNameAction = id; 
+            }; 
+            CLASS = ORSqlController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                connectionButton = NSButton; 
+                dataBaseNameField = NSTextField; 
+                hostNameField = NSTextField; 
+                passwordField = NSTextField; 
+                sqlLockButton = NSButton; 
+                userNameField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

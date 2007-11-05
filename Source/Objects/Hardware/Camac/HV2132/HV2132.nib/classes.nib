@@ -1,0 +1,84 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            CLASS = ORBarGraph; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                channelAction = id; 
+                chooseDir = id; 
+                clearBufferAction = id; 
+                disableL1L2Action = id; 
+                enableL1L2Action = id; 
+                hvValueAction = id; 
+                mainFrameAction = id; 
+                offAction = id; 
+                onAction = id; 
+                readAction = id; 
+                setAction = id; 
+                settingLockAction = id; 
+                statusAction = id; 
+            }; 
+            CLASS = ORHV2132Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                channelPU = NSPopUpButton; 
+                clearBufferButton = NSButton; 
+                dirSelectionButton = NSButton; 
+                disableL1L2Button = NSButton; 
+                enableL1L2Button = NSButton; 
+                hvStateDirField = NSTextField; 
+                hvValueStepper = NSStepper; 
+                hvValueTextField = NSTextField; 
+                mainFramePU = NSPopUpButton; 
+                offButton = NSButton; 
+                onButton = NSButton; 
+                readButton = NSButton; 
+                setButton = NSButton; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                statusButton = NSButton; 
+                warningField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

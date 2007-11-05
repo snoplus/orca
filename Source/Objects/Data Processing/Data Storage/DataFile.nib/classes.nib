@@ -1,0 +1,73 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OPlotInterface; LANGUAGE = ObjC; SUPERCLASS = NSWindowController; }, 
+        {
+            ACTIONS = {lockButtonAction = id; saveConfigurationAction = id; stopSendingAction = id; }; 
+            CLASS = ORDataFileController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                copyConfigField = NSTextField; 
+                copyDataField = NSTextField; 
+                copyDrawer = NSDrawer; 
+                copyStatusField = NSTextField; 
+                deleteConfigField = NSTextField; 
+                deleteDataField = NSTextField; 
+                deleteStatusField = NSTextField; 
+                dirTextField = NSTextField; 
+                fileTextField = NSTextField; 
+                lockButton = NSButton; 
+                queueConfigField = NSTextField; 
+                queueDataField = NSTextField; 
+                queueStatusField = NSTextField; 
+                saveConfigurationCB = NSButton; 
+                sizeTextField = NSTextField; 
+                statusTextField = NSTextField; 
+                stopSendingButton = NSButton; 
+                tabView = NSTabView; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORFolderModel; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = ORHistoController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {outlineView = NSOutlineView; }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                repeatRunCBAction = id; 
+                timeLimitStepperAction = id; 
+                timeLimitTextAction = id; 
+                timedRunCBAction = id; 
+                toggleRunning = id; 
+            }; 
+            CLASS = ORRunController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                elapsedTimeField = NSTextField; 
+                repeatRunCB = NSButton; 
+                runBar = NSProgressIndicator; 
+                runProgress = NSProgressIndicator; 
+                startStopButton = NSButton; 
+                statusField = NSTextField; 
+                timeLimitField = NSTextField; 
+                timeLimitStepper = NSStepper; 
+                timeStartedField = NSTextField; 
+                timeToGoField = NSTextField; 
+                timedRunCB = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORRunFactory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

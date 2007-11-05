@@ -1,0 +1,92 @@
+{
+    IBClasses = (
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                argAction = id; 
+                breakChainAction = id; 
+                cancelLoadSaveAction = id; 
+                listMethodsAction = id; 
+                loadFileAction = id; 
+                loadSaveAction = id; 
+                nameAction = id; 
+                parseScript = id; 
+                runScript = id; 
+                saveAsFileAction = id; 
+                saveFileAction = id; 
+            }; 
+            CLASS = ORScriptTaskController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                argsMatrix = NSMatrix; 
+                argsView = NSView; 
+                breakChainButton = NSButton; 
+                checkButton = NSButton; 
+                classNameField = NSTextField; 
+                helpDrawer = NSDrawer; 
+                helpView = NSTextView; 
+                lastFileField = NSTextField; 
+                lastFileField1 = NSTextField; 
+                loadSaveButton = NSButton; 
+                loadSaveView = id; 
+                nameField = NSTextField; 
+                panelView = NSView; 
+                runButton = NSButton; 
+                runStatusField = NSTextField; 
+                scriptView = ORScriptView; 
+                statusField = ORTimedTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                recolorCompleteFile = id; 
+                recolorCompleteFileDeferred = id; 
+                recolorSyntaxTimer = id; 
+                toggleAutoSyntaxColoring = id; 
+                toggleMaintainIndentation = id; 
+            }; 
+            CLASS = ORScriptView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {progress = NSProgressIndicator; status = NSTextField; }; 
+            SUPERCLASS = NSTextView; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                findNext = id; 
+                findNextAndOrderFindPanelOut = id; 
+                findPrevious = id; 
+                jumpToSelection = id; 
+                orderFrontFindPanel = id; 
+                replace = id; 
+                replaceAll = id; 
+                replaceAndFind = id; 
+                takeFindStringFromSelection = id; 
+            }; 
+            CLASS = TextFinder; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                findNextButton = NSButton; 
+                findTextField = NSTextField; 
+                ignoreCaseButton = NSButton; 
+                replaceAllScopeMatrix = NSMatrix; 
+                replaceTextField = NSTextField; 
+                statusField = NSTextField; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,439 @@
+//
+//  ORHistoController.m
+//  Orca
+//
+//  Created by Mark Howe on Sat Nov 23 2002.
+//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+
+#pragma mark ¥¥¥Imported Files
+#import "ORHistoController.h"
+#import "ORHistoModel.h"
+#import "OR1DHistoController.h"
+#import "ORMultiPlot.h"
+#import "ORDataSet.h"
+
+@implementation ORHistoController
+
+#pragma mark ¥¥¥Initialization
+-(id)init
+{
+    self = [super initWithWindowNibName:@"Histo"];
+    return self;
+}
+
+- (void) awakeFromNib
+{
+    [super awakeFromNib];
+    [outlineView setDoubleAction:@selector(doubleClick:)];
+    [multiPlotView setDoubleAction:@selector(doubleClickMultiPlot:)];
+	[splitView loadLayoutWithName:[NSString stringWithFormat:@"Data Monitor-%d",[model uniqueIdNumber]]];
+    
+    [self updateWindow];
+    [plotGroupButton setEnabled:NO];    
+}
+
+- (void) dealloc
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [super dealloc];
+}
+
+
+#pragma mark ¥¥¥Accessors
+
+- (void) setModel:(id)aModel
+{    
+    [super setModel:aModel];
+    [outlineView setDoubleAction:@selector(doubleClick:)];
+    [multiPlotView setDoubleAction:@selector(doubleClickMultiPlot:)];
+    [[self window] setTitle:[NSString stringWithFormat:@"Data Monitor-%d",[model uniqueIdNumber]]];
+    [outlineView setDataSource:aModel];
+    [self updateWindow];
+}
+
+
+
+#pragma mark ¥¥¥Interface Management
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [super registerNotificationObservers];
+    [notifyCenter addObserver : self
+                     selector : @selector(dirChanged:)
+                         name : ORHistoModelDirChangedNotification
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(fileChanged:)
+                         name : ORHistoModelFileChangedNotification
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(writeFileChanged:)
+                         name : ORHistoModelWriteFileChangedNotification
+                       object : model];
+    
+        
+    [notifyCenter addObserver : self
+                     selector : @selector(dataChanged:)
+                         name : ORDataSetDataChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(multiPlotsChanged:)
+                         name : ORHistoModelMultiPlotsChangedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(multiPlotsChanged:)
+                         name : ORMultiPlotDataSetItemsChangedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(multiPlotsChanged:)
+                         name : ORMultiPlotNameChangedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(outlineViewSelectionDidChange:)
+                         name : NSOutlineViewSelectionDidChangeNotification
+                       object : outlineView];
+
+
+}
+
+- (void) updateWindow
+{
+	[super updateWindow];
+    [self modelChanged:nil];
+    [self dataChanged:nil];
+    [self dirChanged:nil];
+    [self fileChanged:nil];
+    [self writeFileChanged:nil];
+}
+
+
+
+#pragma  mark ¥¥¥Interface Management
+
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+    if([notification object] == outlineView){
+        NSMutableArray *selection = [NSMutableArray arrayWithArray:[outlineView allSelectedItems]];
+    
+        int validCount = 0;
+        int i;
+        for(i=0;i<[selection count];i++){
+            id aDataSet = [selection objectAtIndex:i];
+            if([aDataSet leafNode]){
+                id obj = [aDataSet data];
+                if([obj canJoinMultiPlot]){
+                    validCount++;
+                }
+            }
+        }
+        [plotGroupButton setEnabled:validCount];
+    }
+}
+
+- (void) multiPlotsChanged:(NSNotification*)aNotification
+{
+	[multiPlotView reloadData];
+}
+
+
+- (void) modelChanged:(NSNotification*)aNotification
+{
+    if(!aNotification || [aNotification object] == self){
+        //[outlineView reloadItem:[model dataSet] reloadChildren:YES];
+        [outlineView reloadData];
+        [multiPlotView reloadData];
+    }
+}
+
+- (void) dataChanged:(NSNotification*)aNotification
+{
+    if(!scheduledToUpdate){
+        [self performSelector:@selector(doUpdate) withObject:nil afterDelay:1.0];
+        scheduledToUpdate = YES;
+    }
+}
+
+- (void) doUpdate
+{
+    scheduledToUpdate = NO;
+    [outlineView reloadData];
+    [multiPlotView reloadData];
+    //[outlineView reloadItem:[model dataSet] reloadChildren:YES];
+}
+
+- (void) dirChanged:(NSNotification*)note
+{
+	if([model directoryName]!=nil)[dirTextField setStringValue: [model directoryName]];
+}
+
+
+- (void) fileChanged:(NSNotification*)note
+{
+	if([model fileName]!=nil)[fileTextField setStringValue: [model fileName]];
+}
+
+- (void) writeFileChanged:(NSNotification*)note
+{
+	if([writeFileButton state] != [model writeFile]){
+		[writeFileButton setState: [model writeFile]];
+	}
+	
+	[self setButtonStates];		
+}
+
+- (void) setButtonStates
+{
+    BOOL willWrite = [model writeFile];
+    if(willWrite == NO){
+        [dirTextField setStringValue:@"---"];
+        [fileTextField setStringValue:@"---"];
+    }
+    [chooseDirButton setEnabled:willWrite];
+}
+
+
+- (void)splitViewDidResizeSubviews:(NSNotification *)aNotification
+{
+	[splitView storeLayoutWithName:[NSString stringWithFormat:@"Data Monitor-%d",[model uniqueIdNumber]]];
+}
+
+#pragma  mark ¥¥¥Actions
+
+- (IBAction) plotGroupAction:(id)sender
+{
+    NSMutableArray *selection = [NSMutableArray arrayWithArray:[outlineView allSelectedItems]];
+    //launch the multiplot for the selection array...
+    ORMultiPlot* newMultiPlot = [[ORMultiPlot alloc] init];
+    
+    NSEnumerator* e = [selection objectEnumerator];
+    ORDataSet* aDataSet;
+    int validCount = 0;
+    while(aDataSet = [e nextObject]){
+        if([aDataSet leafNode]){
+            id obj = [aDataSet data];
+            if([obj canJoinMultiPlot]){
+                [newMultiPlot addDataSetName:[[aDataSet data] shortName]];
+                validCount++;
+				if(![newMultiPlot dataSet]){
+					[newMultiPlot setDataSet:[obj dataSet]];
+				}
+            }
+        }
+    }
+    if(validCount){
+        [newMultiPlot setDataSource:[model dataSet]];
+        [newMultiPlot doDoubleClick:nil];
+        [model addMultiPlot:newMultiPlot];
+    }
+    [newMultiPlot release];
+    [multiPlotView reloadData];
+    [outlineView deselectAll:self];
+    [outlineView reloadData];
+
+}
+
+- (IBAction) doubleClickMultiPlot:(id)sender
+{
+    id selectedObj = [multiPlotView itemAtRow:[multiPlotView selectedRow]];
+    [selectedObj doDoubleClick:sender];
+}
+
+- (IBAction) doubleClick:(id)sender
+{
+    id selectedObj = [outlineView itemAtRow:[outlineView selectedRow]];
+    [selectedObj doDoubleClick:sender];
+}
+
+- (IBAction) chooseDir:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:YES];
+    [openPanel setCanChooseFiles:NO];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setCanCreateDirectories:YES];
+    [openPanel setPrompt:@"Choose"];
+    [openPanel beginSheetForDirectory:NSHomeDirectory()
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+    
+}
+
+- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        NSString* directoryName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
+        [model setDirectoryName:directoryName];
+    }
+}
+
+- (IBAction) writeFileAction:(id)sender
+{
+    [model setWriteFile:[sender state]];
+}
+
+- (IBAction) clearAllAction:(id)sender
+{
+    NSBeginAlertSheet(@"Clear Counts",
+                      @"Cancel",
+                      @"Yes/Clear It",
+                      nil,[self window],
+                      self,
+                      @selector(_clearSheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Really Clear them? You will not be able to undo this.");
+}
+
+
+- (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [[model dataSet] clear];
+        [outlineView reloadData];
+        //[outlineView reloadItem:[model dataSet] reloadChildren:YES];
+        //[outlineView setNeedsDisplay:YES];
+    }    
+}
+
+- (IBAction)delete:(id)sender
+{
+    [self removeItemAction:nil];
+}
+
+- (IBAction)cut:(id)sender
+{
+    [self removeItemAction:nil];
+}
+
+- (IBAction) removeItemAction:(id)sender
+{ 
+    if([[self window] firstResponder] == outlineView){
+        NSArray *selection = [outlineView allSelectedItems];
+        NSEnumerator* e = [selection objectEnumerator];
+        id item;
+        while(item = [e nextObject]){
+            [model removeDataSet:item];
+        }
+        [[model dataSet] recountTotal];
+        [outlineView deselectAll:self];
+        [outlineView reloadData];
+    }
+    else {
+        NSArray *selection = [multiPlotView allSelectedItems];
+        NSEnumerator* e = [selection objectEnumerator];
+        id item;
+        while(item = [e nextObject]){
+            if([item isKindOfClass:[ORMultiPlot class]]){
+                [model removeMultiPlot:item];
+            }
+            else {//if([item isKindOfClass:[ORMultiPlotDataItem class]]){
+                [item removeSelf];
+            }
+        }
+        [multiPlotView deselectAll:self];
+        [multiPlotView reloadData];
+    }
+}
+
+- (BOOL) validateMenuItem:(NSMenuItem*)menuItem
+{
+    if ([menuItem action] == @selector(cut:)) {
+        return [outlineView selectedRow] >= 0 || [multiPlotView selectedRow]>=0;
+    }
+    else if ([menuItem action] == @selector(delete:)) {
+        return [outlineView selectedRow] >= 0 || [multiPlotView selectedRow]>=0;
+    }    
+    else if ([menuItem action] == @selector(copy:)) {
+        return NO;
+    }
+    else  return [super validateMenuItem:menuItem];
+}
+
+#pragma  mark ¥¥¥Delegate Responsiblities
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    return NO;
+}
+
+#pragma mark ¥¥¥Data Source Methods
+- (int)outlineView:(NSOutlineView *)ov numberOfChildrenOfItem:(id)item
+{
+    if(ov == outlineView){
+        return  (item == nil) ? [model numberOfChildren]  : [item numberOfChildren];
+    }
+    else {
+        if(!item)return [[model multiPlots] count];
+        else {
+            if([item respondsToSelector:@selector(count)])return [item count];
+            else return 0;
+        }
+    }
+}
+
+- (BOOL)outlineView:(NSOutlineView *)ov isItemExpandable:(id)item
+{
+    if(ov == outlineView){
+        return   (item == nil) ? [model numberOfChildren] != 0 : ([item numberOfChildren] != 0);
+    }
+    else {
+        if(!item)return [[model multiPlots] count]!=0;
+        else {
+            if([item respondsToSelector:@selector(count)])return [item count]!=0;
+            else return NO;
+        }
+    }
+}
+
+- (id)outlineView:(NSOutlineView *)ov child:(int)index ofItem:(id)item
+{
+    id anObj;
+    if(ov == outlineView){
+        if(!item)   anObj = model;
+        else        anObj = [item childAtIndex:index];
+    }
+    else {
+        if(!item)   anObj = [[model multiPlots] objectAtIndex:index];
+        else  anObj = [item objectAtIndex:index];
+    }
+    return anObj;
+}
+
+- (id)outlineView:(NSOutlineView *)ov objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+{
+    if(ov == outlineView){
+        return  ((item == nil) ? [model name] : [item name]);
+    }
+    else {
+        if([tableColumn identifier]){
+            return [item description];
+        }
+        else return nil;
+    }
+}
+
+@end
+

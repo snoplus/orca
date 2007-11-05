@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+		<meta name="generator" content="Adobe GoLive">
+		<title>Untitled Page</title>
+	</head>
+
+	<body bgcolor="#e4ffdf">
+		<div align="center">
+			<h2>Model</h2>
+		</div>
+		<div align="left">
+			<p><font size="-1"><a href="../Programming.html">Programming</a> | <a href="overview.html">Code Overview</a> | <a href="Controller.html">Controller</a></font></p>
+			<p>Here is an example  ORCA model  object with comentary. It is a part of the CAMAC 811 ADC object.</p>
+			<table width="889" border="0" cellspacing="0" cellpadding="0" cool gridx="16" gridy="16" height="3537" showgridx showgridy usegridx usegridy>
+				<tr height="3536">
+					<td content csheight="3473" width="768" height="3536" valign="top" xpos="0">
+						<pre><font size="1">/*
+* ORAD811Model.cpp
+* Orca
+*
+* Created by Mark Howe on Sat Nov 16 2002.
+* Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
+*
+*/
+
+#pragma mark &#x2022;&#x2022;&#x2022;Imported Files
+#import &quot;ORAD811Model.h&quot;
+#import &quot;StatusLog.h&quot;
+#import &quot;ORDataTypeAssigner.h&quot;
+#import &quot;ORParamItem.h&quot;
+#import &quot;ORDataDescriptionItem.h&quot;
+#import &quot;ORHeaderSection.h&quot;
+#import &quot;ORDataPacket.h&quot;
+#import &quot;ORCamacControllerCard.h&quot;
+#import &quot;ORCamacCrateModel.h&quot;
+
+NSString* ORAD811OnlineMaskChangedNotification    = @&quot;ORAD811OnlineMaskChangedNotification&quot;;
+NSString* ORAD811SettingsLock                     = @&quot;ORAD811SettingsLock&quot;;
+NSString* ORAD811SuppressZerosChangedNotification = @&quot;ORAD811SuppressZerosChangedNotification&quot;;
+
+@implementation ORAD811Model
+
+#pragma mark &#x2022;&#x2022;&#x2022;Initialization
+- (id) init
+{
+    self = [super init];
+    return self;
+}
+
+- (void) dealloc
+{
+    [super </font><font size="1" color="black">dealloc</font><font size="1">];
+}
+
+- (void) setUpImage
+{
+    [self setImage:[NSImage imageNamed:@&quot;AD811Card&quot;]]; </font><font size="1" color="#cc0033"> <b>//Defines the object's icon</b></font><font size="1" color="#bf0408">
+</font><font size="1">}
+
+- (void) makeMainController
+{    
+    [self linkToController:@&quot;ORAD811Controller&quot;];      </font><font size="1" color="#cc0033"><b>//This is the object's controller...i.e. the
+                                                       //glue code between the view and the model</b></font><font size="1">
+}
+
+#pragma mark &#x2022;&#x2022;&#x2022;Accessors
+- (unsigned long) dataId 
+{ 
+    return dataId;                                    </font><font size="1" color="#cc0033"><b>//Data ids are used to uniquely identify an object's</b></font><font size="1">
+}                                                     </font><font size="1" color="#cc0033"><b>//data record(s). An object will have one data for </b></font><font size="1">
+- (void) setDataId: (unsigned long) DataId            </font><font size="1" color="#cc0033"><b>//record that it will put into the data stream. 
+</b></font><font size="1">{
+    dataId = DataId;
+}
+
+- (unsigned char)onlineMask {
+
+    return onlineMask;
+}
+
+- (void)setOnlineMask:(unsigned char)anOnlineMask 
+{
+    </font><font size="1" color="#cc0033"><b>//Setters that are 'undoable' have to register with the undo manager
+ </b></font><font size="1">   [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
+
+    onlineMask = anOnlineMask;
+
+    </font><font size="1" color="#cc0033"><b>//Variables that are displayed to the user must post the fact that they have changed.
+    //These notifications are picked by the Controller objects that pass the model data
+    //on to the view.
+ </b></font><font size="1">
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORAD811OnlineMaskChangedNotification object:self];
+
+}
+
+...
+...
+...
+
+#pragma mark &#x2022;&#x2022;&#x2022;DataTaker
+
+- (void) setDataIds:(id)assigner
+{                                                 </font><font size="1" color="#cc0033"><b>//This method is called so data taking objects can</b></font><font size="1">
+    dataId = [assigner assignDataIds:kShortForm]; </font><font size="1" color="#cc0033"><b>//assign their data ids. Objects can request to use 
+</b></font><font size="1">}                                                 </font><font size="1" color="#cc0033"><b>//the 'short' form but may be assigned the 'long' form,
+                                                  //so they must</b></font><font size="1"> </font><font size="1" color="#cc0033"><b>be prepared to deal with either type.
+</b></font><font size="1">- (void) syncDataIdsWith:(id)anotherCard          </font><font size="1" color="#cc0033"><b>//Note that there is only one Data id per object of this</b></font><font size="1">
+{                                                 </font><font size="1" color="#cc0033"><b>//class no matter how many instances there are. Also </b></font><font size="1">
+    [self setDataId:[anotherCard dataId]];        </font><font size="1" color="#cc0033"><b>//note that there would be additional entries in these</b></font><font size="1">
+}                                                 </font><font size="1" color="#cc0033"><b>//methods it this object could produce other data records.</b></font><font size="1">
+
+ 
+
+
+</font><font size="1" color="#cc0033"><b>//All objects that need to put an kind of record must have a 'dataRecordDescription' method. 
+//The resulting info is put in the data header so that the records can be decoded by others.
+</b></font><font size="1">- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @&quot;ORAD811DecoderForAdc&quot;,          @&quot;decoder&quot;,
+        [NSNumber numberWithLong:dataId], @&quot;dataId&quot;,
+        [NSNumber numberWithBool:NO],     @&quot;variable&quot;,
+        [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@&quot;length&quot;,
+        [NSNumber numberWithBool:YES],    @&quot;canBeGated&quot;,
+        nil];
+    [dataDictionary setObject:aDictionary forKey:@&quot;ADC&quot;];
+    return dataDictionary;
+}
+
+</font><font size="1" color="#cc0033"><b>//At the start of run, all data taking objects receive the 'runTaskStarted' message. It is here that
+//hardware initialization and prerun checks are normally done. Also note the the data description
+//is added to the data packet at this time. 
+</b></font><font size="1">- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+
+    if(![self adapter]){
+        [NSException raise:@&quot;Not Connected&quot; format:@&quot;You must connect to a PCI-CAMAC Controller (i.e. a CC32).&quot;];
+    }
+
+//----------------------------------------------------------------------------------------
+// first add our description to the data description
+
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@&quot;ORAD811Model&quot;];
+
+//----------------------------------------------------------------------------------------
+    controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
+    unChangingDataPart = (([self crateNumber]&amp;0x1e)&lt;&lt;21) | (([self stationNumber]&amp; 0x0000001f)&lt;&lt;16); //doesn't change so do it here.
+    cachedStation = [self stationNumber];
+    [self clearExceptionCount];
+
+ 
+    int i;
+    onlineChannelCount = 0;
+    for(i=0;i&lt;8;i++){
+        if(onlineMask &amp; (0x1&lt;&lt;i)){
+            onlineList[onlineChannelCount] = i;
+            onlineChannelCount++;
+        }
+    }
+
+
+    if([[userInfo objectForKey:@&quot;doinit&quot;]intValue]){
+        [self generalReset];
+    }
+    [self enableLAMEnableLatch];
+}
+
+</font><font size="1" color="#cc0033"><b>//The 'takeData' is called continuously during the data taking phase of a run. This happens in the 
+//data taking thread, it is is important to remember that calls made to methods that may also
+//be called from other threads must be thread-safe or chaos will ensue.</b></font><font size="1">
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    NSString* errorLocation;
+    BOOL resetDone;
+    NS_DURING
+
+        //check the LAM
+        unsigned short dummy;
+        unsigned short status = [controller camacShortNAF:cachedStation a:12 f:8 data:&amp;dummy];
+        if(isQbitSet(status)) { //LAM status comes back in the Q bit
+            if(onlineChannelCount){
+                resetDone = NO;
+                int i;
+                for(i=0;i&lt;onlineChannelCount;i++){
+                    //read one adc channnel
+                    unsigned short adcValue;
+                    [controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&amp;adcValue];
+                    if(!(suppressZeros &amp;&amp; adcValue==0)){
+                        if(IsShortForm(dataId)){
+                            unsigned long data = dataId | 
+                                                 unChangingDataPart | 
+                                                 (onlineList[i]&amp;0xf)&lt;&lt;12 | 
+                                                 (adcValue &amp; 0xfff);
+                            [aDataPacket addLongsToFrameBuffer:&amp;data length:1];
+                        }
+                        else {
+                            unsigned long data[2];
+                            data[0] = dataId | 2;
+                            data[1] = unChangingDataPart | (onlineList[i]&amp;0xf)&lt;&lt;12 | (adcValue &amp; 0xfff);
+                            [aDataPacket addLongsToFrameBuffer:data length:2];
+                        }
+                    }
+                    if(i == 7) resetDone = YES;
+                }
+               //read of last channel with this command clears
+               if(!resetDone) [controller camacShortNAF:[self stationNumber] a:7 f:2 data:&amp;dummy];
+           }
+       }
+    NS_HANDLER
+        NSLogError(@&quot;&quot;,@&quot;AD811 Card Error&quot;,errorLocation,nil);
+        [self incExceptionCount];
+        [localException raise];
+    NS_ENDHANDLER
+}
+
+
+</font><font size="1" color="#cc0033"><b>//The 'runTaskStopped' method is called end the run has ended. This object does nothing, but in general 
+//it would be the place to do any hardware shutdown that is required or last minute records inserted into
+//the data stream. There is one other method called 'runCloseOut' that is called after
+//the run has stopped as a oppertunity after all objects have been notified that the run is stopped.</b></font><font size="1"> 
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+}
+
+...
+...
+...
+
+#pragma mark &#x2022;&#x2022;&#x2022;Archival
+
+</font><font size="1" color="#cc0033"><b>//Here is where the object stores its persistant data. The data is stored in the configuration file.
+</b></font><font size="1">- (id)initWithCoder:(NSCoder*)decoder
+{
+    [self = [super initWithCoder:decoder];
+    [[self undoManager] disableUndoRegistration];
+    [self setOnlineMask:[decoder decodeIntForKey:@&quot;OR811OnlineMask&quot;]];
+    [self setSuppressZeros:[decoder decodeIntForKey:@&quot;OR811SuppressZeros&quot;]];
+    [[self undoManager] enableUndoRegistration];
+    return self;
+}
+
+</font><font size="1" color="#cc0033"><b>//Here is where the object read its persistant data back in. 
+</b></font><font size="1">- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeInt:onlineMask forKey:@&quot;OR811OnlineMask&quot;];
+    [encoder encodeInt:suppressZeros forKey:@&quot;OR811SuppressZeros&quot;];
+}
+
+</font><font size="1" color="#cc0033"><b>//This method is called for records that need to be placed into the data header. Usually that means
+//state data that is important for data analysis, i.e. gains, thresholds, etc... </b></font><font size="1">
+- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+{
+    [NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    [objDictionary setObject:[NSNumber numberWithInt:onlineMask] forKey:@&quot;onlineMask&quot;];
+    [objDictionary setObject:[NSNumber numberWithBool:suppressZeros] forKey:@&quot;suppressZeros&quot;];
+    return objDictionary;
+}
+
+@end</font></pre>
+					</td>
+					<td width="120" height="3536"></td>
+					<td width="1" height="3536"><spacer type="block" width="1" height="3536"></td>
+				</tr>
+				<tr height="1" cntrlrow>
+					<td width="768" height="1"><spacer type="block" width="768" height="1"></td>
+					<td width="120" height="1"><spacer type="block" width="120" height="1"></td>
+					<td width="1" height="1"></td>
+				</tr>
+			</table>
+			<p><a href="Controller.html">controller</a></p>
+		</div>
+	</body>
+
+</html>
+
+
+

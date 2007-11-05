@@ -1,0 +1,64 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            ACTIONS = {commentFieldAction = id; }; 
+            CLASS = ORProcessElementController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {commentField = NSTextField; }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                channelPUAction = id; 
+                hwAccessLockAction = id; 
+                interfaceObjPUAction = id; 
+                viewSourceAction = id; 
+            }; 
+            CLASS = ORProcessHwAccessorController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                channelPU = NSPopUpButton; 
+                currentSourceField = NSTextField; 
+                currentSourceStateField = NSTextField; 
+                hwAccessLockButton = NSButton; 
+                interfaceObjPU = NSPopUpButton; 
+                viewSourceButton = NSButton; 
+            }; 
+            SUPERCLASS = ORProcessElementController; 
+        }, 
+        {
+            ACTIONS = {
+                addAddressAction = id; 
+                cut = id; 
+                deadBandAction = id; 
+                delete = id; 
+                directionAction = id; 
+                enableMailAction = id; 
+                limitAction = id; 
+                removeAddressAction = id; 
+            }; 
+            CLASS = ORRangeTimerController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addAddressButton = NSButton; 
+                addressList = NSTableView; 
+                deadBandTextField = NSTextField; 
+                directionPU = NSPopUpButton; 
+                enableMailButton = NSButton; 
+                limitTextField = NSTextField; 
+                removeAddressButton = NSButton; 
+            }; 
+            SUPERCLASS = ORProcessHwAccessorController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

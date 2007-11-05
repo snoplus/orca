@@ -1,0 +1,112 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = NSView; LANGUAGE = ObjC; SUPERCLASS = NSResponder; }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                cardNumberAction = id; 
+                channelNumberAction = id; 
+                crateNumberAction = id; 
+                globalEnabledAction = id; 
+                insertRampItem = id; 
+                panic = id; 
+                paramSelectionAction = id; 
+                rampTargetAction = id; 
+                removeRampItem = id; 
+                selectItem = id; 
+                startStop = id; 
+                targetSelectionAction = id; 
+            }; 
+            CLASS = ORRampItemController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                cardNumberField = NSTextField; 
+                channelNumberField = NSTextField; 
+                crateNumberField = NSTextField; 
+                currentValueField = NSTextField; 
+                globalEnableButton = NSButton; 
+                listLockButton = NSButton; 
+                minusButton = NSButton; 
+                model = id; 
+                plusButton = NSButton; 
+                progressIndicator = NSProgressIndicator; 
+                rampTargetField = NSTextField; 
+                selectorPU = NSPopUpButton; 
+                startStopButton = NSButton; 
+                targetNamePU = NSPopUpButton; 
+                view = NSView; 
+                visibleButton = NSButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                downRampPathAction = id; 
+                downRateTextFieldAction = id; 
+                listLockAction = id; 
+                makeLinear = id; 
+                makeLog = id; 
+                panic = id; 
+                rescaleToMax = id; 
+                rescaleToTarget = id; 
+                startGlobalAction = id; 
+                stopGlobalAction = id; 
+            }; 
+            CLASS = ORRamperController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                downRampPathMatrix = NSMatrix; 
+                downRateTextField = NSTextField; 
+                linearButton = NSButton; 
+                listLockButton = NSButton; 
+                logButton = NSButton; 
+                numberRunningField = NSTextField; 
+                rampItemContentView = ZFlowLayout; 
+                ramperView = NSView; 
+                scaleToMaxButton = NSButton; 
+                scaleToTargetButton = NSButton; 
+                startButton = NSButton; 
+                stopButton = NSButton; 
+                titleField = NSTextField; 
+                xAxis = ORAxis; 
+                yAxis = ORAxis; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORRamperView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; xAxis = id; yAxis = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = ZFlowLayout; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

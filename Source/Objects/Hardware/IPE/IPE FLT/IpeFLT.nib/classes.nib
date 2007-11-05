@@ -1,0 +1,152 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                calibrateAction = id; 
+                coinTimeAction = id; 
+                enableAllTriggersAction = id; 
+                enableNoTriggersAction = id; 
+                gainAction = id; 
+                hitRateAllAction = id; 
+                hitRateEnableAction = id; 
+                hitRateLengthAction = id; 
+                hitRateNoneAction = id; 
+                initBoardButtonAction = id; 
+                integrationTimeAction = id; 
+                interruptMaskAction = id; 
+                modeAction = id; 
+                readThresholdsGains = id; 
+                readoutPagesAction = id; 
+                reportButtonAction = id; 
+                resetAction = id; 
+                settingLockAction = id; 
+                statusAction = id; 
+                testAction = id; 
+                testEnabledAction = id; 
+                testParamAction = id; 
+                thresholdAction = id; 
+                thresholdOffsetAction = id; 
+                triggerEnableAction = id; 
+                versionAction = id; 
+                writeThresholdsGains = id; 
+            }; 
+            CLASS = ORIpeFLTController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                calibrateButton = NSButton; 
+                coinTimeField = NSTextField; 
+                gainTextFields = NSMatrix; 
+                hitRateAllButton = NSButton; 
+                hitRateEnabledCBs = NSMatrix; 
+                hitRateLengthPU = NSPopUpButton; 
+                hitRateNoneButton = NSButton; 
+                initBoardButton = NSButton; 
+                integrationTimeField = NSTextField; 
+                interruptMaskField = NSTextField; 
+                ledOffField = NSTextField; 
+                modeButton = NSPopUpButton; 
+                rate0 = ORValueBar; 
+                rateLogCB = NSButton; 
+                rateTextFields = NSMatrix; 
+                readoutPagesField = NSTextField; 
+                reportButton = NSButton; 
+                resetButton = NSButton; 
+                settingLockButton = NSButton; 
+                statusButton = NSButton; 
+                tabView = NSTabView; 
+                testButton = NSButton; 
+                testEnabledMatrix = NSMatrix; 
+                testParamsMatrix = NSMatrix; 
+                testStatusMatrix = NSMatrix; 
+                thresholdOffsetField = NSTextField; 
+                thresholdTextFields = NSMatrix; 
+                timeRateLogCB = NSButton; 
+                timeRatePlot = ORPlotter1D; 
+                totalHitRateField = NSTextField; 
+                totalRate = ORValueBar; 
+                totalRateLogCB = NSButton; 
+                totalView = NSView; 
+                triggerEnabledCBs = NSMatrix; 
+                triggersAllButton = NSButton; 
+                triggersNoneButton = NSButton; 
+                versionButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                addGateAction = id; 
+                analyze = id; 
+                autoScale = id; 
+                averageWindowAction = id; 
+                centerOnPeak = id; 
+                clearActiveCurveGates = id; 
+                clearActiveGate = id; 
+                clearAllGates = id; 
+                copy = id; 
+                differentiateAction = id; 
+                removeGateAction = id; 
+                resetScales = id; 
+                savePDF = id; 
+            }; 
+            CLASS = ORPlotter1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                analysisView = ZFlowLayout; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

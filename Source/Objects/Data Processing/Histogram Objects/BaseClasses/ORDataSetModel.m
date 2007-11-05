@@ -1,0 +1,254 @@
+//
+//  ORDataSetModel.m
+//  Orca
+//
+//  Created by Mark Howe on Mon Sep 29 2003.
+//  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+
+#import "ORDataSetModel.h"
+#import "ORScale.h"
+#import "ORGate.h"
+
+NSString* ORDataSetModelRemoved                     = @"ORDataSetModelRemoved";
+NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
+
+@implementation ORDataSetModel
+- (id) init
+{
+	self = [super init];
+	dataSetLock = [[NSLock alloc] init];
+	return self;
+}
+
+- (void) dealloc
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+	
+    [[NSNotificationCenter defaultCenter]
+			postNotificationName:ORDataSetModelRemoved
+						  object:self
+						userInfo: nil];
+	
+    
+	
+    [key release];
+    [fullName release];
+    [shortName release];	
+	
+    [super dealloc];
+}
+
+#pragma mark ¥¥¥Accessors
+- (void) setDataSet:(id)aDataSet
+{
+	dataSet = aDataSet;	 //don't retain things like this.
+}
+- (id) dataSet
+{
+	return dataSet;
+}
+
+- (void) setKey:(NSString*)aKey
+{
+	[dataSetLock lock];
+	[key autorelease];
+	key = [aKey copy];
+	[dataSetLock unlock];
+}
+
+- (NSString*)key
+{
+	[dataSetLock lock];
+	NSString* temp = [[key retain] autorelease];
+	[dataSetLock unlock];
+	return temp;
+}
+- (void) setFullName:(NSString*)aString
+{
+	[dataSetLock lock];
+    [fullName autorelease];
+    fullName = [aString copy];
+    if(fullName){
+		
+		//also parse the full name to create a short version the name.
+		NSScanner* 		 scanner  	= [NSScanner scannerWithString:fullName];
+		NSCharacterSet*  numbers 	= [NSCharacterSet decimalDigitCharacterSet];
+		NSCharacterSet*  delimiters = [NSCharacterSet characterSetWithCharactersInString:@"\r\n\t ,"];
+		NSString* 		 scanResult = [NSString string];
+		NSString* comma = @",";
+		NSMutableString* result = [NSMutableString string];
+		[scanner scanUpToCharactersFromSet:[delimiters invertedSet] intoString:nil];//skip any leading whitespace
+		[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];		//read in the leading name i.e.'Shaper'
+		[result appendString:scanResult];
+		[result appendString:comma];
+		
+		[scanner scanUpToCharactersFromSet:[delimiters invertedSet] intoString:nil];//skip any leading whitespace
+		[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];	//skip any non-alphanumerics
+		[result appendString:scanResult];
+	   
+		while(![scanner isAtEnd]) {
+			[result appendString:comma];											//add a ','	
+			[scanner scanUpToCharactersFromSet:numbers intoString:nil];				//skip any non-alphanumerics
+			[scanner scanUpToCharactersFromSet:delimiters intoString:&scanResult];	//skip any non-alphanumerics
+			[result appendString:scanResult];										
+		}
+		[shortName release];
+		shortName = [result copy];
+	}
+	[dataSetLock unlock];
+}
+
+-(NSString*) fullName
+{
+	[dataSetLock lock];
+	NSString* temp = [[fullName retain] autorelease];
+	[dataSetLock unlock];
+	return temp;
+}
+
+-(NSString*) shortName
+{
+	[dataSetLock lock];
+	NSString* temp = [[shortName retain] autorelease];
+	[dataSetLock unlock];
+	return temp;
+}
+
+
+-(unsigned long) totalCounts
+{
+	return totalCounts;
+}
+
+- (void) setTotalCounts:(unsigned long) aNewCount
+{
+    if(aNewCount!=totalCounts){
+        totalCounts = aNewCount;
+        
+        [self postUpdateOnMainThread];
+    }
+}    
+
+
+- (void) incrementTotalCounts
+{
+	++totalCounts;
+	if(!scheduledForUpdate){
+		scheduledForUpdate = YES;
+		[self performSelectorOnMainThread:@selector(scheduleUpdateOnMainThread) withObject:nil waitUntilDone:NO];
+	}
+}
+
+- (void) postUpdateOnMainThread
+{
+	[self performSelectorOnMainThread:@selector(postUpdate) withObject:nil waitUntilDone:NO];
+    
+}
+
+- (void) scheduleUpdateOnMainThread
+{
+	scheduledForUpdate = YES;
+	[self performSelector:@selector(postUpdate) withObject:nil afterDelay:1.0];
+}
+
+- (void) postUpdate
+{
+	[[NSNotificationCenter defaultCenter]
+		postNotificationName:ORDataSetDataChanged
+					  object:self];    
+	scheduledForUpdate = NO;
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //by default there is no data description. subclasses can override
+}
+
+- (void) processResponse:(NSDictionary*)aResponse
+{
+	[dataSet processResponse:aResponse];
+}
+
+
+#pragma mark ¥¥¥Data Source Methods
+- (unsigned)  numberOfChildren
+{
+	return 0;
+}
+
+- (id)   childAtIndex:(int)index
+{
+	return nil;
+}
+
+- (NSString*)   name
+{
+	return [NSString stringWithFormat:@"Error: no concrete class defined"];
+}
+
+
+- (void) runTaskStopped
+{
+    //default is do nothing. subclasses can override
+}
+
+- (void) runTaskBoundary
+{
+    //default is do nothing. subclasses can override
+}
+
+
+#pragma mark ¥¥¥Archival
+static NSString *ORDataSetModelKey              = @"ORDataSetModelKey";
+static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
+
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    [[self undoManager] disableUndoRegistration];
+	dataSetLock = [[NSLock alloc] init];
+    [self setKey:[decoder decodeObjectForKey:ORDataSetModelKey]];
+    [self setFullName:[decoder decodeObjectForKey:ORDataSetModelFullName]];
+	
+    
+    [[self undoManager] enableUndoRegistration];
+    
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeObject:key forKey:ORDataSetModelKey];
+    [encoder encodeObject:fullName forKey:ORDataSetModelFullName];
+	
+}
+
+- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray
+{
+    //default is no data... subclasses can override
+}
+
+- (BOOL) canJoinMultiPlot
+{
+    //default is no... subclasses can override
+    return NO;
+}
+
+
+@end

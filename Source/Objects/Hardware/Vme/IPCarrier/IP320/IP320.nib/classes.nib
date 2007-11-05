@@ -1,0 +1,36 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {CLASS = ORIP320Channel; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                enableAlarmAllAction = id; 
+                enableAlarmNoneAction = id; 
+                enablePollAllAction = id; 
+                enablePollNoneAction = id; 
+                readAll = id; 
+                setPollingAction = id; 
+            }; 
+            CLASS = ORIP320Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                alarmTable1 = NSTableView; 
+                alarmTable2 = NSTableView; 
+                calibrationTable1 = NSTableView; 
+                calibrationTable2 = NSTableView; 
+                pollingButton = NSPopUpButton; 
+                tabView = NSTabView; 
+                valueTable1 = NSTableView; 
+                valueTable2 = NSTableView; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

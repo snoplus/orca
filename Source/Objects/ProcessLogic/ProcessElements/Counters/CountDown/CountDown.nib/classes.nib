@@ -1,0 +1,28 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            ACTIONS = {countDownLockAction = id; countDownTextAction = id; }; 
+            CLASS = ORCountDownController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {countDownLockButton = NSButton; startCountField = NSTextField; }; 
+            SUPERCLASS = ORProcessElementController; 
+        }, 
+        {
+            ACTIONS = {commentFieldAction = id; }; 
+            CLASS = ORProcessElementController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {commentField = NSTextField; }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

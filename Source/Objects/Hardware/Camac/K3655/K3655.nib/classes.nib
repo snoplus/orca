@@ -1,0 +1,73 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            CLASS = ORBarGraph; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                clearLAMAction = id; 
+                clockFreqAction = id; 
+                continousAction = id; 
+                inhibitEnabledAction = id; 
+                initAction = id; 
+                numChansAction = id; 
+                numberToClearAction = id; 
+                numberToSetAction = id; 
+                readSetPointAction = id; 
+                setPointAction = id; 
+                settingLockAction = id; 
+                testLAMAction = id; 
+                useExtClockAction = id; 
+            }; 
+            CLASS = ORK3655Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                clearLAMButton = NSButton; 
+                clockFreqField = NSTextField; 
+                continousButton = NSButton; 
+                inhibitEnabledButton = NSButton; 
+                initButton = NSButton; 
+                numChansField = NSTextField; 
+                numberToClearField = NSTextField; 
+                numberToSetField = NSTextField; 
+                readSetPointButton = NSButton; 
+                setPointMatrix = NSMatrix; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                testLAMButton = NSButton; 
+                useExtClockButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,94 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OR1DHistoController; LANGUAGE = ObjC; SUPERCLASS = ORDataController; }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                autoScale = id; 
+                clear = id; 
+                clearROI = id; 
+                doAnalysis = id; 
+                hideShowControls = id; 
+                logLin = id; 
+                printDocument = id; 
+                toggleRaw = id; 
+            }; 
+            CLASS = ORDataController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                containingView = NSView; 
+                hideShowButton = NSButton; 
+                plotter = id; 
+                plotterGroupView = NSView; 
+                positionField = NSTextField; 
+                rawDataTabView = NSTabView; 
+                rawDataTable = NSTableView; 
+                titleField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                addGateAction = id; 
+                analyze = id; 
+                autoScale = id; 
+                averageWindowAction = id; 
+                centerOnPeak = id; 
+                clearActiveCurveGates = id; 
+                clearActiveGate = id; 
+                clearAllGates = id; 
+                copy = id; 
+                differentiateAction = id; 
+                removeGateAction = id; 
+                resetScales = id; 
+                savePDF = id; 
+            }; 
+            CLASS = ORPlotter1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                analysisView = ZFlowLayout; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORToolbarFactory; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {owner = NSWindow; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = ZFlowLayout; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,65 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                changeBackgroundColor = id; 
+                changeLineColor = id; 
+                changePassWordAction = id; 
+                changeScriptBackgroundColor = id; 
+                changeScriptCommentColor = id; 
+                changeScriptConstantsColor = id; 
+                changeScriptIndentifier1Color = id; 
+                changeScriptIndentifier2Color = id; 
+                changeScriptStringColor = id; 
+                closeChangePassWordPanel = id; 
+                closePassWordPanel = id; 
+                closeSetPassWordPanel = id; 
+                enableBugReportSendAction = id; 
+                lineTypeAction = id; 
+                lockAction = id; 
+                openingDialogAction = id; 
+                openingDocPrefAction = id; 
+            }; 
+            CLASS = ORPreferencesController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                backgroundColorWell = NSColorWell; 
+                bugReportEMailField = NSTextView; 
+                changePassWordPanel = NSPanel; 
+                confirmPassWordField = NSTextField; 
+                confirmSetPassWordField = NSTextField; 
+                lineColorWell = NSColorWell; 
+                lineTypeMatrix = NSMatrix; 
+                lockButton = NSButton; 
+                lockTextField = NSTextField; 
+                newPassWordField = NSTextField; 
+                nextTimeTextField = NSTextField; 
+                oldPassWordField = NSTextField; 
+                openingDialogMatrix = NSMatrix; 
+                openingDocPrefMatrix = NSMatrix; 
+                passWordField = NSTextField; 
+                passWordPanel = NSPanel; 
+                passwordButton = NSButton; 
+                scriptBackgroundColorWell = NSColorWell; 
+                scriptCommentColorWell = NSColorWell; 
+                scriptConstantsColorWell = NSColorWell; 
+                scriptIdentifier1ColorWell = NSColorWell; 
+                scriptIdentifier2ColorWell = NSColorWell; 
+                scriptStringColorWell = NSColorWell; 
+                sendBugReportButton = NSButton; 
+                setPassWordField = NSTextField; 
+                setPassWordPanel = NSPanel; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {changePanes = id; orderFrontPrefsPanel = id; }; 
+            CLASS = UKPrefsPanel; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {tabView = NSTabView; }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,17 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {labelAction = id; maxValueAction = id; minValueAction = id; }; 
+            CLASS = ORAxisPreferences; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                labelField = NSTextField; 
+                maxValueField = NSTextField; 
+                minValueField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

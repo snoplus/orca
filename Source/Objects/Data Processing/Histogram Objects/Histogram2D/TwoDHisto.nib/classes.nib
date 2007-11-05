@@ -1,0 +1,87 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OR1DHistoController; LANGUAGE = ObjC; SUPERCLASS = ORDataController; }, 
+        {
+            ACTIONS = {logLin = id; zoomIn = id; zoomOut = id; }; 
+            CLASS = OR2DHistoController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = ORDataController; 
+        }, 
+        {
+            CLASS = ORColorScale; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {colorAxis = ORAxis; scale = ORAxis; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                clear = id; 
+                clearROI = id; 
+                doAnalysis = id; 
+                hideShowControls = id; 
+                logLin = id; 
+                printDocument = id; 
+            }; 
+            CLASS = ORDataController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                containingView = NSView; 
+                hideShowButton = NSButton; 
+                plotter = id; 
+                plotterGroupView = NSView; 
+                titleField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {autoScale = id; resetScales = id; savePDF = id; zoomIn = id; zoomOut = id; }; 
+            CLASS = ORPlotter2D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                curve = id; 
+                mColorScale = ORColorScale; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+                mZScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORPlotter3D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                mColorScale = ORColorScale; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+                mZScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSOpenGLView; 
+        }, 
+        {
+            CLASS = ORToolbarFactory; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {owner = NSWindow; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = ZFlowLayout; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

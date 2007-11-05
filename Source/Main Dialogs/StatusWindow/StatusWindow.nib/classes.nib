@@ -1,0 +1,56 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {mailContent = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = OApplication; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {print = id; }; 
+            CLASS = ORPrintableOutlineView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSOutlineView; 
+        }, 
+        {
+            ACTIONS = {print = id; }; 
+            CLASS = ORPrintableView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSTextView; 
+        }, 
+        {
+            ACTIONS = {
+                clearAllAction = id; 
+                cut = id; 
+                delete = id; 
+                insertConfigurationName = id; 
+                insertDate = id; 
+                insertRunNumber = id; 
+                loadLogBook = id; 
+                mailContent = id; 
+                newLogBook = id; 
+                removeItemAction = id; 
+                saveAsLogBook = id; 
+                saveLogBook = id; 
+                selectAll = id; 
+            }; 
+            CLASS = ORStatusController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                clearCountsButton = NSButton; 
+                errorField = NSTextField; 
+                errorTextField = NSTextField; 
+                logBookField = NSTextView; 
+                logBookPathField = NSTextField; 
+                outlineView = NSOutlineView; 
+                saveLogBookButton = NSButton; 
+                statusView = NSTextView; 
+                tabView = NSTabView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

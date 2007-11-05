@@ -1,0 +1,85 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {acknowledge = id; }; 
+            CLASS = ORAlarmController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                acknowledgeButton = NSButton; 
+                helpButton = NSButton; 
+                helpDrawer = NSDrawer; 
+                helpTextView = NSTextView; 
+                tableView = NSTableView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            CLASS = ORHWWizObj; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {target = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                addAction = id; 
+                addSelection = id; 
+                clearMarks = id; 
+                clearUndo = id; 
+                doIt = id; 
+                doItWithMark = id; 
+                redo = id; 
+                removeAction = id; 
+                removeSelection = id; 
+                restoreAllAction = id; 
+                selectObject = id; 
+                undo = id; 
+                undoToMark = id; 
+                wizardLockAction = id; 
+            }; 
+            CLASS = ORHWWizardController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                actionColumn = NSTableColumn; 
+                actionTableView = NSTableView; 
+                actionView = NSView; 
+                addActionColumn = NSTableColumn; 
+                addSelectionColumn = NSTableColumn; 
+                advancedButton = NSButton; 
+                advancedDrawer = NSDrawer; 
+                chanTextField = NSTextField; 
+                clearMarksButton = NSButton; 
+                clearUndoButton = NSButton; 
+                containerLabel = NSTextField; 
+                containerTextField = NSTextField; 
+                doItButton = NSButton; 
+                doitButton = NSButton; 
+                fileSelectionTextField = NSTextField; 
+                goToMarkButton = NSButton; 
+                markAnDoitButton = NSButton; 
+                marksPU = NSPopUpButton; 
+                objectLabel = NSTextField; 
+                objectPU = NSPopUpButton; 
+                objectTextField = NSTextField; 
+                redoButton = NSButton; 
+                removeActionColumn = NSTableColumn; 
+                removeSelectionColumn = NSTableColumn; 
+                restoreAllButton = NSButton; 
+                selectionColumn = NSTableColumn; 
+                selectionTableView = NSTableView; 
+                selectionView = NSView; 
+                settingLockDocField = NSTextField; 
+                statusTextField = NSTextField; 
+                undoButton = NSButton; 
+                wizardLockButton = NSButton; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

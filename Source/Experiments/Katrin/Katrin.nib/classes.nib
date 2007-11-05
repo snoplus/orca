@@ -1,0 +1,200 @@
+{
+    IBClasses = (
+        {CLASS = AltMuxThreshold; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = BiStateView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                readSecondaryMapFileAction = id; 
+                saveSecondaryMapFileAction = id; 
+                secondaryAdcClassNameAction = id; 
+            }; 
+            CLASS = KatrinController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                detectorTitle = NSTextField; 
+                readSecondaryMapFileButton = NSButton; 
+                saveSecondaryMapFileButton = NSButton; 
+                secondaryAdcClassNamePopup = NSPopUpButton; 
+                secondaryColorAxisLogCB = NSButton; 
+                secondaryColorScale = ORColorScale; 
+                secondaryMapFileTextField = NSTextField; 
+                secondaryRateField = NSTextField; 
+                secondaryTableView = NSTableView; 
+                secondaryValuesView = NSTableView; 
+            }; 
+            SUPERCLASS = ORExperimentController; 
+        }, 
+        {
+            CLASS = KatrinDetectorView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {focalPlaneColorScale = ORColorScale; vetoColorScale = ORColorScale; }; 
+            SUPERCLASS = ORDetectorView; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            CLASS = NcdDetector; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {rateColorBar = ORColorBar; view = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORBasicOpenGLView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; }; 
+            SUPERCLASS = NSOpenGLView; 
+        }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            CLASS = ORColorBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {colorAxis = ORScale; scale = ORScale; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORColorScale; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {colorAxis = ORAxis; scale = ORAxis; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORDetectorView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {delegate = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                captureStateAction = id; 
+                detailsLockAction = id; 
+                detectorLockAction = id; 
+                displayTypeAction = id; 
+                initAction = id; 
+                mapLockAction = id; 
+                primaryAdcClassNameAction = id; 
+                readPrimaryMapFileAction = id; 
+                reportConfigAction = id; 
+                savePrimaryMapFileAction = id; 
+                startRunAction = id; 
+                stopRunAction = id; 
+            }; 
+            CLASS = ORExperimentController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                captureDateField = NSTextField; 
+                captureStateButton = NSButton; 
+                cardCheckView = BiStateView; 
+                detailsLockButton = NSButton; 
+                detectorLockButton = NSButton; 
+                detectorView = ORDetectorView; 
+                displayTypeMatrix = NSMatrix; 
+                displayTypeMatrix1 = NSMatrix; 
+                elapsedTimeField = NSTextField; 
+                hardwareCheckView = BiStateView; 
+                histogramTitle = NSTextField; 
+                initButton = NSButton; 
+                mapLockButton = NSButton; 
+                primaryAdcClassNamePopup = NSPopUpButton; 
+                primaryColorAxisLogCB = NSButton; 
+                primaryColorScale = ORColorScale; 
+                primaryMapFileTextField = NSTextField; 
+                primaryRateField = NSTextField; 
+                primaryTableView = NSTableView; 
+                primaryValuesView = NSTableView; 
+                rateLogCB = NSButton; 
+                ratePlot = ORPlotter1D; 
+                readPrimaryMapFileButton = NSButton; 
+                reportStateButton = NSButton; 
+                runNumberField = NSTextField; 
+                runStatusField = NSTextField; 
+                savePrimaryMapFileButton = NSButton; 
+                selectionStringTextView = NSTextView; 
+                startRunButton = NSButton; 
+                stopRunButton = NSButton; 
+                tabView = NSTabView; 
+                valueHistogramsPlot = ORPlotter1D; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORGenericView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                addGateAction = id; 
+                analyze = id; 
+                autoScale = id; 
+                averageWindowAction = id; 
+                centerOnPeak = id; 
+                clearActiveCurveGates = id; 
+                clearActiveGate = id; 
+                clearAllGates = id; 
+                copy = id; 
+                differentiateAction = id; 
+                removeGateAction = id; 
+                resetScales = id; 
+                savePDF = id; 
+            }; 
+            CLASS = ORPlotter1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                analysisView = ZFlowLayout; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORScale; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mView = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = ORTimeScale; LANGUAGE = ObjC; SUPERCLASS = ORScale; }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = SourceMask; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

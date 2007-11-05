@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+		<meta name="generator" content="Adobe GoLive">
+		<title>Untitled Page</title>
+	</head>
+
+	<body bgcolor="#e4ffdf">
+		<div align="center">
+			<h2>Controller</h2>
+		</div>
+		<div align="left">
+			<p><font size="-1"><a href="../Programming.html">Programming</a> | <a href="overview.html">Code Overview</a> | <a href="Model.html">Model</a></font></p>
+			<p>Here is an example ORCA controller object with comentary. It is a part of the CAMAC 811 ADC object.</p>
+			<table width="744" border="0" cellspacing="0" cellpadding="0" cool gridx="16" gridy="16" height="2564" showgridx showgridy usegridx usegridy>
+				<tr height="2563">
+					<td content csheight="2563" width="743" height="2563" valign="top" xpos="0">
+						<pre><font size="1">/*
+ *  ORAD811ModelController.cpp
+ *  Orca
+ *
+ *  Created by Mark Howe on Jun 15 2005.
+ *  Copyright (c) 2002 CENPA, University of Washington. for the Regents of the
+ *
+ */
+
+
+#pragma mark &#x2022;&#x2022;&#x2022;Imported Files
+#import &quot;ORAD811Controller.h&quot;
+#import &quot;StatusLog.h&quot;
+#import &quot;ORDefaults.h&quot;
+#import &quot;ORGlobal.h&quot;
+#import &quot;ORCamacExceptions.h&quot;
+#import &quot;ORCamacExceptions.h&quot;
+
+@implementation ORAD811Controller
+
+#pragma mark &#x2022;&#x2022;&#x2022;Initialization
+-(id)init
+{
+    self = [super initWithWindowNibName:@&quot;AD811&quot;]; </font><font size="1" color="#cc0033"><b>//AD811 is the name of the .nib file this controller</b></font><font size="1">
+    return self;                                   </font><font size="1" color="#cc0033"><b>//will load.</b></font><font size="1"> 
+}
+
+#pragma mark &#x2022;&#x2022;&#x2022;Notifications
+
+</font><font size="1" color="#cc0033"><b>//Models post notifications when variables change. Here is where we register for the various
+//Notifications that this controller will handle.
+</b></font><font size="1">
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [super registerNotificationObservers];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(slotChanged:)
+                         name : ORCamacCardSlotChangedNotification
+                       object : model];
+
+   [notifyCenter addObserver : self
+	        selector : @selector(settingsLockChanged:)
+	            name : ORRunStatusChangedNotification
+	          object : nil];
+
+   [notifyCenter addObserver : self
+	          selector : @selector(settingsLockChanged:)
+	              name : ORAD811SettingsLock
+	             object: nil];
+
+   [notifyCenter addObserver : self
+		 selector : @selector(onlineMaskChanged:)
+		     name : ORAD811OnlineMaskChangedNotification
+		   object : model];
+
+ ...
+ ...
+ ...
+ 
+}
+
+#pragma mark &#x2022;&#x2022;&#x2022;Interface Management
+
+</font><font size="1" color="#cc0033"><b>//UpdateWindow is called after the .nib file is loaded and is one of the oppertunities for us to 
+//load our dialog elements for the first time. After this, generally the dialog elements will only
+//be updated when a particular notification is delivered about a variable change. 
+</b></font><font size="1">- (void) updateWindow
+{
+    [super updateWindow];
+    [self slotChanged:nil];
+    [self onlineMaskChanged:nil];
+    [self settingsLockChanged:nil];
+}
+
+
+</font><font size="1" color="#cc0033"><b>//Many of the dialogs have sercutiy locks. This method is called set the initial state of the system 
+//system.
+</b></font><font size="1">- (void) checkGlobalSecurity
+{
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORAD811SettingsLock to:secure];
+    [settingLockButton setEnabled:secure];
+}
+
+
+</font><font size="1" color="#cc0033"><b>//When the lock is clicked, here is the place to enable/disable various controls based on the lock state
+//and/or the run state.
+</b></font><font size="1">- (void) settingsLockChanged:(NSNotification*)aNotification
+{
+
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORAD811SettingsLock];
+    BOOL locked = [gSecurity isLocked:ORAD811SettingsLock];
+
+    [settingLockButton setState: locked];
+    [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
+
+ ...
+ ...
+ ... 
+
+    NSString* s = @&quot;&quot;;
+    if(lockedOrRunningMaintenance){
+        if(runInProgress &amp;&amp; ![gSecurity isLocked:ORAD811SettingsLock])s = @&quot;Not in Maintenance Run.&quot;;
+    }
+    [settingLockDocField setStringValue:s];
+
+}
+
+
+</font><font size="1" color="#cc0033"><b>//Example of how to handle a notification. This particular notification has told us that this object's
+//crate slot has changed. In response the title of the window is changed.</b></font><font size="1">
+- (void) slotChanged:(NSNotification*)aNotification
+{
+	[[self window] setTitle:[NSString stringWithFormat:@&quot;AD811 (Station %d)&quot;,[model stationNumber]]];
+}
+
+- (void) onlineMaskChanged:(NSNotification*)aNotification
+{
+	short i;
+	unsigned char theMask = [model onlineMask];
+	for(i=0;i&lt;8;i++){
+		BOOL bitSet = (theMask&amp;(1&lt;&lt;i))&gt;0;
+		if(bitSet != [[onlineMaskMatrix cellWithTag:i] intValue]){
+			[[onlineMaskMatrix cellWithTag:i] setState:bitSet];
+		}			
+	}
+}
+
+#pragma mark &#x2022;&#x2022;&#x2022;Actions
+</font><font size="1" color="#cc0033"><b>//Button actions are linked to this action methods via Interface Builder. Here are a couple of
+//examples handling button actions</b></font><font size="1">
+- (IBAction) settingLockAction:(id) sender
+{
+    [gSecurity tryToSetLock:ORAD811SettingsLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) onlineAction:(id)sender
+{
+	if([sender intValue] != [model onlineMaskBit:[[sender selectedCell] tag]]){
+		[[self undoManager] setActionName: @&quot;Set Online Mask&quot;];
+		[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+
+- (IBAction) readNoResetAction:(id)sender
+{
+    NS_DURING
+        [model checkCratePower];
+        [model readNoReset];
+    NS_HANDLER
+        [self showError:localException name:@&quot;Read/No Reset&quot; fCode:0];
+    NS_ENDHANDLER
+}
+ ...
+ ...
+ ...
+
+</font><font size="1" color="#cc0033"><b>//Here is the central place where this controller handles exception.</b></font><font size="1">
+- (void) showError:(NSException*)anException name:(NSString*)name fCode:(int)i
+{
+    NSLog(@&quot;Failed Cmd: %@ (F%d)\n&quot;,name,i);
+    if([[anException name] isEqualToString: OExceptionNoCamacCratePower]) {
+        [[model crate]  doNoPowerAlert:anException action:[NSString stringWithFormat:@&quot;%@ (F%d)&quot;,name,i]];
+    }
+    else {
+        NSRunAlertPanel([anException name], @&quot;%@\n%@ (F%d)&quot;, @&quot;OK&quot;, nil, nil,
+                        [anException name],name,i);
+    }
+}
+@end
+
+
+
+</font></pre>
+					</td>
+					<td width="1" height="2563"><spacer type="block" width="1" height="2563"></td>
+				</tr>
+				<tr height="1" cntrlrow>
+					<td width="743" height="1"><spacer type="block" width="743" height="1"></td>
+					<td width="1" height="1"></td>
+				</tr>
+			</table>
+			<p><a href="Model.html">model</a></p>
+		</div>
+	</body>
+
+</html>

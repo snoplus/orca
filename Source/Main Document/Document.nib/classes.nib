@@ -1,0 +1,69 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {openStatusLog = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {openStatusLog = id; }; 
+            CLASS = ORDocument; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSDocument; 
+        }, 
+        {
+            ACTIONS = {
+                alarmMaster = id; 
+                documentLockAction = id; 
+                lockAllAction = id; 
+                openCatalog = id; 
+                openCommandCenter = id; 
+                openHWWizard = id; 
+                openPreferences = id; 
+                openTaskMaster = id; 
+                printDocument = id; 
+                scaleFactorAction = id; 
+                statusLog = id; 
+            }; 
+            CLASS = ORDocumentController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                documentLockButton = NSButton; 
+                groupView = ORGroupView; 
+                lockAllButton = NSButton; 
+                lockStatusTextField = NSTextField; 
+                outlineView = NSOutlineView; 
+                scaleFactorField = NSTextField; 
+                statusTextField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                concludeDragOperation = id; 
+                copy = id; 
+                cut = id; 
+                draggingExited = id; 
+                paste = id; 
+            }; 
+            CLASS = ORGroupView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mouseTask = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORPlacardScrollView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {placard = NSView; }; 
+            SUPERCLASS = NSScrollView; 
+        }, 
+        {
+            CLASS = ORToolbarFactory; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {owner = NSWindow; }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

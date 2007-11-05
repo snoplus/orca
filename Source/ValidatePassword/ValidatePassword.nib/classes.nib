@@ -1,0 +1,14 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = ORPasswordPanel; LANGUAGE = ObjC; SUPERCLASS = NSPanel; }, 
+        {
+            ACTIONS = {closePassWordPanel = id; }; 
+            CLASS = ORValidatePassword; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {modalDelegate = id; passWordField = NSTextField; passWordPanel = NSPanel; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

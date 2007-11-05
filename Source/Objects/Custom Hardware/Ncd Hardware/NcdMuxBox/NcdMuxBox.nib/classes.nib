@@ -1,0 +1,167 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                calibrateAction = id; 
+                calibrationEnableAllAction = id; 
+                calibrationEnableNoneAction = id; 
+                calibrationEnabledAction = id; 
+                calibrationFinalDeltaAction = id; 
+                calibrationLockAction = id; 
+                channelAction = id; 
+                dacValueAction = id; 
+                initThresholdAction = id; 
+                integrationAction = id; 
+                ping = id; 
+                rateUsesLogAction = id; 
+                reArmAction = id; 
+                readAdcAction = id; 
+                readEventRegAction = id; 
+                readThresholdAction = id; 
+                scopeChanAction = id; 
+                settingsLockAction = id; 
+                statusQueryAction = id; 
+                testAction = id; 
+                testLockAction = id; 
+                thresholdDacAction = id; 
+                timeRateUsesLogAction = id; 
+                totalRateUsesLogAction = id; 
+                writeDacAction = id; 
+            }; 
+            CLASS = NcdMuxBoxController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                boxNumberField = NSTextField; 
+                busNumberField = NSTextField; 
+                calibrateButton = NSButton; 
+                calibrationEnabledMatrix = NSMatrix; 
+                calibrationFinalDeltaStepper = NSStepper; 
+                calibrationFinalDeltaTextField = NSTextField; 
+                calibrationLockButton = NSButton; 
+                calibrationLockDocField = NSTextField; 
+                calibrationRateTextMatrix = NSMatrix; 
+                calibrationStateMatrix = NSMatrix; 
+                calibrationThresholdMatrix = NSMatrix; 
+                countTextFields = NSMatrix; 
+                dacValueField = NSTextField; 
+                dacValueStepper = NSStepper; 
+                enableAllButton = NSButton; 
+                enableNoneButton = NSButton; 
+                initThresholdsButton = NSButton; 
+                integrationStepper = NSStepper; 
+                integrationText = NSTextField; 
+                pingButton = NSButton; 
+                rate0 = ORValueBar; 
+                rateLogCB = NSButton; 
+                rateTextFields = NSMatrix; 
+                reArmButton = NSButton; 
+                readAdcButton = NSButton; 
+                readEventRegButton = NSButton; 
+                readThresholdsButton = NSButton; 
+                scopeChanStepper = NSStepper; 
+                scopeChanTextField = NSTextField; 
+                selectChannelPU = NSPopUpButton; 
+                settingLockDocField = NSTextField; 
+                settingsLockButton = NSButton; 
+                statusQueryButton = NSButton; 
+                tabView = NSTabView; 
+                testAdcDacButton = NSButton; 
+                testLockButton = NSButton; 
+                thresholdAdcTextFields = NSMatrix; 
+                thresholdDacSteppers = NSMatrix; 
+                thresholdDacTextFields = NSMatrix; 
+                timeRateLogCB = NSButton; 
+                timeRatePlot = ORPlotter1D; 
+                totalRate = ORValueBar; 
+                totalRateLogCB = NSButton; 
+                totalRateText = NSTextField; 
+                writeDacButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORColorScale; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {colorAxis = ORAxis; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                concludeDragOperation = id; 
+                copy = id; 
+                cut = id; 
+                draggingExited = id; 
+                paste = id; 
+            }; 
+            CLASS = ORGroupView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mouseTask = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                addGateAction = id; 
+                analyze = id; 
+                autoScale = id; 
+                averageWindowAction = id; 
+                centerOnPeak = id; 
+                clearActiveCurveGates = id; 
+                clearActiveGate = id; 
+                clearAllGates = id; 
+                copy = id; 
+                differentiateAction = id; 
+                removeGateAction = id; 
+                resetScales = id; 
+                savePDF = id; 
+            }; 
+            CLASS = ORPlotter1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                analysisView = ZFlowLayout; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = ORTimeAxis; LANGUAGE = ObjC; SUPERCLASS = ORAxis; }, 
+        {
+            CLASS = ORValueBar; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORVmeCrateController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {groupView = ORGroupView; }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORVmeCrateView; LANGUAGE = ObjC; SUPERCLASS = ORGroupView; }, 
+        {
+            ACTIONS = {modelStepperAction = id; modelSwitchAction = id; }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; modelStepper = NSStepper; modelSwitchPopUp = NSPopUpButton; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

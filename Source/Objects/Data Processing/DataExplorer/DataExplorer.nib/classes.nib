@@ -1,0 +1,169 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {CLASS = OPlotInterface; LANGUAGE = ObjC; SUPERCLASS = NSWindowController; }, 
+        {
+            ACTIONS = {
+                catalogAllAction = id; 
+                clearCountsButtonAction = id; 
+                cut = id; 
+                delete = id; 
+                flushButtonAction = id; 
+                parseButtonAction = id; 
+                removeItemAction = id; 
+                scanNextButtonAction = id; 
+                scanPreviousButtonAction = id; 
+                selectFileButtonAction = id; 
+                stopScanButtonAction = id; 
+            }; 
+            CLASS = ORDataExplorerController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                catalogAllButton = NSButton; 
+                clearCountsButton = NSButton; 
+                dataCatalogView = NSOutlineView; 
+                dataView = NSTableView; 
+                detailsView = NSTextView; 
+                fileNameField = NSTextField; 
+                flushButton = NSButton; 
+                headerView = NSOutlineView; 
+                messageTextField = ORTimedTextField; 
+                parseButton = NSButton; 
+                parseProgressBar = NSProgressIndicator; 
+                scanNextButton = NSButton; 
+                scanPreviousButton = NSButton; 
+                selectFileButton = NSButton; 
+                stopScanButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                chooseDir = id; 
+                copyEnableAction = id; 
+                copyStatusEnableAction = id; 
+                deleteAllAction = id; 
+                deleteStatusWhenDoneAction = id; 
+                deleteWhenDoneAction = id; 
+                passWordAction = id; 
+                remoteHostAction = id; 
+                remotePathAction = id; 
+                sendAllAction = id; 
+                transferTypeAction = id; 
+                userNameAction = id; 
+                verboseAction = id; 
+            }; 
+            CLASS = ORDataFileController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                chooseDirButton = NSButton; 
+                copyButton = NSButton; 
+                copyStateField = NSTextField; 
+                copyStatusButton = NSButton; 
+                copyStatusField = NSTextField; 
+                deleteButton = NSButton; 
+                deleteStateField = NSTextField; 
+                deleteStatusButton = NSButton; 
+                deleteStatusField = NSTextField; 
+                dirTextField = NSTextField; 
+                fileTextField = NSTextField; 
+                passWordField = NSSecureTextField; 
+                remoteHostField = NSTextField; 
+                remotePathField = NSTextField; 
+                sizeTextField = NSTextField; 
+                statusTextField = NSTextField; 
+                transferTypeMatrix = NSMatrix; 
+                userNameField = NSTextField; 
+                verboseButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                chooseDir = id; 
+                clearAllAction = id; 
+                cut = id; 
+                delete = id; 
+                doubleClick = id; 
+                removeItemAction = id; 
+                writeFileAction = id; 
+            }; 
+            CLASS = ORHistoController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                chooseDirButton = NSButton; 
+                clearAllButton = NSButton; 
+                dirTextField = NSTextField; 
+                fileTextField = NSTextField; 
+                outlineView = NSOutlineView; 
+                writeFileButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                replayButtonAction = id; 
+                selectButtonAction = id; 
+                startButtonAction = id; 
+                stepButtonAction = id; 
+            }; 
+            CLASS = ORReplayDataController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fileListView = NSTableView; 
+                headerTextDrawer = NSDrawer; 
+                headerTextView = NSTextView; 
+                replayButton = NSButton; 
+                selectButton = NSButton; 
+                startButton = NSButton; 
+                stepButton = NSButton; 
+                viewHeaderButton = NSButton; 
+                viewHeaderFile = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                repeatRunCBAction = id; 
+                timeLimitStepperAction = id; 
+                timeLimitTextAction = id; 
+                timedRunCBAction = id; 
+                toggleRunning = id; 
+            }; 
+            CLASS = ORRunController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                elapsedTimeField = NSTextField; 
+                repeatRunCB = NSButton; 
+                runBar = NSProgressIndicator; 
+                runProgress = NSProgressIndicator; 
+                startStopButton = NSButton; 
+                statusField = NSTextField; 
+                timeLimitField = NSTextField; 
+                timeLimitStepper = NSStepper; 
+                timeStartedField = NSTextField; 
+                timeToGoField = NSTextField; 
+                timedRunCB = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORRunFactory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

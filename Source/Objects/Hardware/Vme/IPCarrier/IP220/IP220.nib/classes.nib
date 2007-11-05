@@ -1,0 +1,33 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                outputValuesAction = id; 
+                read = id; 
+                resetAction = id; 
+                settingLockAction = id; 
+                transferModeAction = id; 
+                write = id; 
+            }; 
+            CLASS = ORIP220Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                outputValuesMatrix = NSMatrix; 
+                readButton = NSButton; 
+                resetButton = NSButton; 
+                settingLockButton = NSButton; 
+                transferModeMatrix = NSMatrix; 
+                writeButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

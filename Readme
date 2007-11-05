@@ -1,0 +1,52 @@
+
+You must install the NI driver before ORCA will build correctly.
+
+You must install any needed drivers before hardware accesses will work. Find what you need in the drivers folder. 
+
+starting with CVS:
+
+ -copying the whole project from another source is OK unless you want to use cvs. Then you must get the Orca folder from the cvs server using cvs.
+ 
+1)put the following in your .tcshrc file:
+
+  setenv CVSROOT :pserver:username@128.95.100.177:/Users/orca/cvs
+  setenv CVS_RSH ssh
+  setenv CVSEDITOR pico
+
+  Note: If you do not have an account use 'anonymous' as the username and the password.
+
+  
+2)copy the cvswrappers file into your home dir and rename to .cvswrappers
+  
+3)re-log in or source the .tcshrc file.
+    
+4)Now cvs should be ready to work. The first time you use the Orca cvs server you must login:
+   
+   ocvs login
+   
+   and enter your password. You shouldn't have to do a login again.
+   
+5)get Orca:
+  
+	cd Dev
+	ocvs checkout Orca
+	
+-double-click on the Orca.xcodeproj file to launch project builder and compile the code.
+	
+
+-Note that the Drivers folder and the OrcaPalette folder are not under cvs at this time. You can copy them from the distribution CD.
+
+Updating
+ 
+ -to do a normal update with no new files you can use the project builder cvs functions.
+ 
+ -to grab new files,or to grab a new version of the project it's a little tricky. do the following 
+
+1)cd Dev/Orca
+2)rename your Orca.xcodeproj file to something else or delete it (rm -rf Orca.xcodeproj)
+3)cd ..
+4)ocvs update -d Orca
+
+
+
+

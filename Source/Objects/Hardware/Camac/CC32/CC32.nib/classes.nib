@@ -1,0 +1,83 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                cCycleAction = id; 
+                cCycleIAction = id; 
+                cmdSelectAction = id; 
+                cmdStationAction = id; 
+                cmdSubAddressAction = id; 
+                cmdWriteValueAction = id; 
+                execute = id; 
+                inhibitOffAction = id; 
+                inhibitOnAction = id; 
+                init = id; 
+                moduleWriteValueAction = id; 
+                readInhibitAction = id; 
+                readLamFFAction = id; 
+                readLamMaskAction = id; 
+                readLamStationsAction = id; 
+                readLedsAction = id; 
+                resetController = id; 
+                resetLamFFAction = id; 
+                setLamMaskAction = id; 
+                settingLockAction = id; 
+                test = id; 
+                zCycleAction = id; 
+                zCycleIAction = id; 
+            }; 
+            CLASS = ORCC32Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                cCycleButton = NSButton; 
+                cICycleButton = NSButton; 
+                cmdAcceptedField = NSTextField; 
+                cmdSelectPopUp = NSPopUpButton; 
+                executeButton = NSButton; 
+                helpField = NSTextField; 
+                inhibitField = NSTextField; 
+                inhibitOffButton = NSButton; 
+                inhibitOnButton = NSButton; 
+                initButton = NSButton; 
+                lookAtMeField = NSTextField; 
+                moduleWriteValueField = NSTextField; 
+                readIhibitButton = NSButton; 
+                readLamFFButton = NSButton; 
+                readLamMaskButton = NSButton; 
+                readLamStationsButton = NSButton; 
+                readLedsButton = NSButton; 
+                resetButton = NSButton; 
+                resetLamFFButton = NSButton; 
+                responseField = NSTextField; 
+                setLamMaskButton = NSButton; 
+                settingLockButton = NSButton; 
+                stationField = NSTextField; 
+                stationStepper = NSStepper; 
+                subaddressField = NSTextField; 
+                subaddressStepper = NSStepper; 
+                testButton = NSButton; 
+                valueField = NSTextField; 
+                writeValueField = NSTextField; 
+                writeValueStepper = NSStepper; 
+                zCycleButton = NSButton; 
+                zICycleButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

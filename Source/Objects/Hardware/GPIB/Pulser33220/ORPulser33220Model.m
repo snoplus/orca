@@ -1,0 +1,679 @@
+//
+//  ORPulser33220Model.m
+//  Orca
+//
+//  Created by Mark Howe on Tue May 13 2003.
+//  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+
+#pragma mark ¥¥¥Imported Files
+#import "ORPulser33220Model.h"
+#import "ORUSBInterface.h"
+#import "NetSocket.h"
+
+NSString* ORPulser33220ModelSerialNumberChanged = @"ORPulser33220ModelSerialNumberChanged";
+NSString* ORPulser33220ModelCanChangeConnectionProtocolChanged = @"ORPulser33220ModelCanChangeConnectionProtocolChanged";
+NSString* ORPulser33220ModelIpConnectedChanged	= @"ORPulser33220ModelIpConnectedChanged";
+NSString* ORPulser33220ModelUsbConnectedChanged = @"ORPulser33220ModelUsbConnectedChanged";
+NSString* ORPulser33220ModelIpAddressChanged	= @"ORPulser33220ModelIpAddressChanged";
+NSString* ORPulser33220ModelConnectionProtocolChanged = @"ORPulser33220ModelConnectionProtocolChanged";
+NSString* ORPulserUSBInConnection				= @"ORPulserUSBInConnection";
+NSString* ORPulserUSBNextConnection				= @"ORPulserUSBNextConnection";
+NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfaceChanged";
+
+@implementation ORPulser33220Model
+
+- (void) makeConnectors
+{
+	[self adjustConnectors:YES];
+}
+
+- (void) makeUSBConnectors
+{
+	if(![[ self connectors ] objectForKey:ORPulserUSBInConnection]){
+		ORConnector* connectorObj1 = [[ ORConnector alloc ] 
+                                initAt: NSMakePoint( 2, 2 )
+                            withGuardian: self];
+		[[ self connectors ] setObject: connectorObj1 forKey: ORPulserUSBInConnection ];
+		[ connectorObj1 setConnectorType: 'USBI' ];
+		[ connectorObj1 addRestrictedConnectionType: 'USBO' ]; //can only connect to gpib outputs
+		[connectorObj1 setOffColor:[NSColor yellowColor]];
+		[ connectorObj1 release ];
+	}
+	
+	if(![[ self connectors ] objectForKey:ORPulserUSBNextConnection]){
+		ORConnector* connectorObj2 = [[ ORConnector alloc ] 
+									initAt: NSMakePoint( [self frame].size.width-kConnectorSize-2, 2 )
+								withGuardian: self];
+		[[ self connectors ] setObject: connectorObj2 forKey: ORPulserUSBNextConnection ];
+		[ connectorObj2 setConnectorType: 'USBO' ];
+		[ connectorObj2 addRestrictedConnectionType: 'USBI' ]; //can only connect to gpib inputs
+		[connectorObj2 setOffColor:[NSColor yellowColor]];
+		[ connectorObj2 release ];
+	}
+}
+
+- (void) makeGPIBConnectors
+{
+	[super makeConnectors];
+}
+
+- (void) adjustConnectors:(BOOL)force
+{
+	if(canChangeConnectionProtocol || force){
+		if(connectionProtocol == kHPPulserUseGPIB) {
+			[self removeConnectorForKey:ORPulserUSBInConnection];
+			[self removeConnectorForKey:ORPulserUSBNextConnection];
+			[self makeGPIBConnectors];
+		}
+		else if(connectionProtocol == kHPPulserUseUSB) {
+			[self removeConnectorForKey:ORGpibConnection];
+			[self removeConnectorForKey:ORGpibConnectionToNextDevice];
+			[self makeUSBConnectors];
+		}
+		else { //kHPPulserUseIP
+			[self removeConnectorForKey:ORPulserUSBInConnection];
+			[self removeConnectorForKey:ORPulserUSBNextConnection];
+			[self removeConnectorForKey:ORGpibConnection];
+			[self removeConnectorForKey:ORGpibConnectionToNextDevice];
+		}
+	}
+}
+
+- (void) makeMainController
+{
+    [self linkToController:@"ORPulser33220Controller"];
+}
+
+- (void) dealloc
+{
+	[noUSBAlarm clearAlarm];
+	[noUSBAlarm release];
+    [serialNumber release];
+	[allWaveFormsInMemory release];
+	[ipAddress release];
+	[socket close];
+	[socket release];
+    [super dealloc];
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+	NS_DURING
+		[self connect];
+		[self connectionChanged];
+	NS_HANDLER
+	NS_ENDHANDLER
+}
+
+- (void) connectionChanged
+{
+	if([self objectConnectedTo:ORPulserUSBInConnection] || [self objectConnectedTo:ORPulserUSBNextConnection] ||
+	   [self objectConnectedTo:ORGpibConnection] || [self objectConnectedTo:ORGpibConnectionToNextDevice]){
+		[self setCanChangeConnectionProtocol:NO];
+	}
+	else {
+		[self setCanChangeConnectionProtocol:YES];
+	}
+}
+
+
+-(void) setUpImage
+{
+    //---------------------------------------------------------------------------------------------------
+    //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
+    //so, we cache the image here so we can draw into it.
+    //---------------------------------------------------------------------------------------------------
+    
+    NSImage* aCachedImage = [NSImage imageNamed:@"Pulser33220Icon"];
+
+    NSSize theIconSize = [aCachedImage size];
+    NSPoint theOffset = NSZeroPoint;
+    NSImage* netConnectIcon;
+    if(connectionProtocol == kHPPulserUseIP){
+        netConnectIcon = [NSImage imageNamed:@"NetConnect"];
+        theIconSize.width += 10;
+    }
+    
+    NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
+    [i lockFocus];
+    if(connectionProtocol == kHPPulserUseIP){
+        [netConnectIcon compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
+        theOffset.x += 10;
+    }
+    [aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
+
+    if(connectionProtocol == kHPPulserUseUSB && !usbInterface){
+        NSBezierPath* path = [NSBezierPath bezierPath];
+        [path moveToPoint:NSMakePoint(20,10)];
+        [path lineToPoint:NSMakePoint(40,30)];
+        [path moveToPoint:NSMakePoint(40,10)];
+        [path lineToPoint:NSMakePoint(20,30)];
+        [path setLineWidth:3];
+        [[NSColor redColor] set];
+        [path stroke];
+    }    
+
+    [i unlockFocus];
+    
+    [self setImage:i];
+    [i release];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object: self];
+    
+}
+
+
+- (id)  dialogLock
+{
+	return @"ORPulser33220Lock";
+}
+
+- (NSString*) title 
+{
+	switch (connectionProtocol){
+		case kHPPulserUseGPIB:	return [NSString stringWithFormat:@"33220 Pulser (GPIB %d)",[self primaryAddress]];
+		case kHPPulserUseUSB:	return [NSString stringWithFormat:@"33220 Pulser (Serial# %@)",[usbInterface serialNumber]];
+		case kHPPulserUseIP:	return [NSString stringWithFormat:@"33220 Pulser (%@)",[self ipAddress]];
+	}
+	return [NSString stringWithFormat:@"33220 Pulser (%d)",[self tag]];
+}
+
+- (unsigned long) vendorID
+{
+	return 0x0957;
+}
+
+- (unsigned long) productID
+{
+	return 0x0407;
+}
+
+- (id) getUSBController
+{
+	id obj = [self objectConnectedTo:ORPulserUSBInConnection];
+	id cont =  [ obj getUSBController ];
+	return cont;
+}
+
+#pragma mark ***Accessors
+
+- (NSString*) serialNumber
+{
+    return serialNumber;
+}
+
+- (void) setSerialNumber:(NSString*)aSerialNumber
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSerialNumber:serialNumber];
+    
+    [serialNumber autorelease];
+    serialNumber = [aSerialNumber copy];    
+
+	if(!serialNumber){
+		[[self getUSBController] releaseInterfaceFor:self];
+	}
+	else [[self getUSBController] claimInterfaceWithSerialNumber:serialNumber for:self];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelSerialNumberChanged object:self];
+}
+
+- (BOOL) canChangeConnectionProtocol
+{
+    return canChangeConnectionProtocol;
+}
+
+- (void) setCanChangeConnectionProtocol:(BOOL)aCanChangeConnectionProtocol
+{
+    
+    canChangeConnectionProtocol = aCanChangeConnectionProtocol;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelCanChangeConnectionProtocolChanged object:self];
+}
+
+- (NetSocket*) socket
+{
+	return socket;
+}
+- (void) setSocket:(NetSocket*)aSocket
+{
+	if(aSocket != socket)[socket close];
+	[aSocket retain];
+	[socket release];
+	socket = aSocket;
+    [socket setDelegate:self];
+}
+
+- (BOOL) ipConnected
+{
+    return ipConnected;
+}
+
+- (void) setIpConnected:(BOOL)aIpConnected
+{
+    ipConnected = aIpConnected;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelIpConnectedChanged object:self];
+}
+
+- (BOOL) usbConnected
+{
+    return usbConnected;
+}
+- (ORUSBInterface*) usbInterface
+{
+	return usbInterface;
+}
+
+- (void) setUsbConnected:(BOOL)aUsbConnected
+{
+    usbConnected = aUsbConnected;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelUsbConnectedChanged object:self];
+}
+
+- (NSString*) ipAddress
+{
+    return ipAddress;
+}
+
+- (void) setIpAddress:(NSString*)aIpAddress
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setIpAddress:ipAddress];
+    
+    [ipAddress autorelease];
+    ipAddress = [aIpAddress copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelIpAddressChanged object:self];
+}
+
+- (int) connectionProtocol
+{
+    return connectionProtocol;
+}
+
+- (void) setConnectionProtocol:(int)aConnectionProtocol
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setConnectionProtocol:connectionProtocol];
+	
+	connectionProtocol = aConnectionProtocol;
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelConnectionProtocolChanged object:self];
+	[self setUpImage];
+}
+
+- (void) sendRemoteCommand
+{
+	[self writeToGPIBDevice:@"SYST:COMM:RLST REM"];
+}
+
+- (void) sendLocalCommand
+{
+	[self writeToGPIBDevice:@"SYST:COMM:RLST LOC"];
+}
+
+- (void) setUsbInterface:(ORUSBInterface*)anInterface
+{
+
+	if(connectionProtocol == kHPPulserUseUSB){
+
+		[self enableEOT:YES];
+		[usbInterface release];
+		usbInterface = anInterface;
+		[usbInterface retain];
+			
+		[usbInterface writeUSB488Command:@"SYST:COMM:RLST REM;*WAI" eom:YES];
+		[usbInterface writeUSB488Command:@"OUTPUT 1;*WAI" eom:YES];
+
+		[[NSNotificationCenter defaultCenter]
+				postNotificationName: ORPulser33220ModelUSBInterfaceChanged
+							  object: self];
+
+
+		[self setUpImage];
+
+		
+
+		if(usbInterface){
+			[noUSBAlarm clearAlarm];
+			[noUSBAlarm release];
+			noUSBAlarm = nil;
+		}
+		else {
+			if(!noUSBAlarm){
+				noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for Pulser"] severity:kHardwareAlarm];
+				[noUSBAlarm setSticky:YES];		
+			}
+			[noUSBAlarm setAcknowledged:NO];
+			[noUSBAlarm postAlarm];
+		}
+}
+}
+
+- (void) interfaceAdded:(NSNotification*)aNote
+{
+	if(connectionProtocol == kHPPulserUseUSB){
+		[[aNote object] claimInterfaceWithSerialNumber:[self serialNumber] for:self];
+	}
+}
+
+- (void) interfaceRemoved:(NSNotification*)aNote
+{
+	if(connectionProtocol == kHPPulserUseUSB){
+		if(usbInterface && serialNumber){
+			[self setUsbInterface:nil];
+		}
+	}
+}
+
+
+
+- (NSString*) usbInterfaceDescription
+{
+	if(usbInterface)return [usbInterface description];
+	else return @"?";
+}
+
+- (void) registerWithUSB:(id)usb
+{
+	[usb registerForUSBNotifications:self];
+}
+
+- (NSString*) hwName
+{
+	if(usbInterface)return [usbInterface deviceName];
+	else return @"?";
+}
+
+- (void) logSystemResponse
+{
+	if(connectionProtocol == kHPPulserUseIP){
+		[self writeToGPIBDevice:@"SYST:ERR?"];
+	}
+	else [super logSystemResponse];
+}
+
+
+- (NSArray*) getLoadedWaveforms
+{
+	if(connectionProtocol == kHPPulserUseIP ){
+		waitForGetWaveformsLoadedDone = YES;
+		[self writeToGPIBDevice:@"Data:CAT?;*WAI;*OPC?"];
+		return allWaveFormsInMemory;
+	}
+	else return [super getLoadedWaveforms];
+}
+
+- (void) emptyVolatileMemory
+{
+	if(connectionProtocol == kHPPulserUseIP){
+		NS_DURING
+			NSEnumerator* e = [allWaveFormsInMemory objectEnumerator];
+			NSString* aName;
+			while(aName = [e nextObject]){
+				if( ![self inBuiltInList:aName]){
+					[self writeToGPIBDevice:[NSString stringWithFormat:@"DATA:DEL %@",aName]];
+				}
+			}
+			
+		NS_HANDLER
+		NS_ENDHANDLER
+
+
+		waitForGetWaveformsLoadedDone = YES;
+		[self writeToGPIBDevice:@"Data:CAT?;*WAI;*OPC?"];
+	}
+	else [super emptyVolatileMemory];
+}
+
+
+- (void) downloadWaveform
+{
+	if(connectionProtocol == kHPPulserUseIP){
+		waitForAsyncDownloadDone = YES;
+	}
+	else waitForAsyncDownloadDone = NO;
+	[super downloadWaveform];
+}
+
+- (void) waveFormWasSent
+{
+	if(!waitForAsyncDownloadDone)[super waveFormWasSent];
+	if(connectionProtocol == kHPPulserUseIP){
+		[self writeToGPIBDevice:@"*OPC?"];
+	}
+	
+}
+
+- (void) downloadFinished:(NSNotification*)aNotification
+{
+	[super downloadFinished:aNotification];
+	[self writeToGPIBDevice:@"Output 1;*WAI"];
+}
+
+- (void) asyncDownloadFinished
+{
+	waitForAsyncDownloadDone = NO;
+	loading = NO;
+	[[NSNotificationCenter defaultCenter]
+			postNotificationName: ORHPPulserWaveformLoadFinishedNotification
+						  object: self];
+	waitForGetWaveformsLoadedDone = YES;
+	[self writeToGPIBDevice:@"Data:CAT?;*WAI;*OPC?"];
+}
+
+- (void) connect
+{
+	switch(connectionProtocol){
+		case kHPPulserUseGPIB: 
+			[super connect];		
+		break;
+		case kHPPulserUseUSB: 
+			[self connectUSB];
+		break;
+		case kHPPulserUseIP: 
+			if(!ipConnected && !socket) [self connectIP]; 
+		break;
+	}	
+}
+
+- (BOOL) isConnected
+{
+	switch(connectionProtocol){
+		case kHPPulserUseGPIB: 
+			return [super isConnected];		
+		break;
+		case kHPPulserUseUSB: 
+			if(!usbConnected && !usbInterface)[self connectUSB];
+			return YES;	
+		break;
+		case kHPPulserUseIP: 
+			if(!ipConnected && !socket) [self connectIP]; 
+			return ipConnected;
+		break;
+	}
+	return NO;
+}
+
+- (void) connectUSB
+{
+}
+
+- (void) connectIP
+{
+	if(!ipConnected){
+		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kHPPulserPort]];	
+	}
+}
+
+#pragma mark ***Delegate Methods
+- (void) netsocketConnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+		[self enableEOT:YES];
+        [self setIpConnected:[socket isConnected]];
+		if(ipConnected){
+			[self writeToGPIBDevice:@"SYST:COMM:RLST REM"];
+			waitForGetWaveformsLoadedDone = YES;
+			[self writeToGPIBDevice:@"Data:CAT?;*WAI;*OPC?"];
+		}
+    }
+}
+
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+{
+    if(inNetSocket == socket){
+		NSString* theString = [[inNetSocket readString:NSASCIIStringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		theString = [[theString componentsSeparatedByString:@"\n"] componentsJoinedByString:@","];
+		theString = [[theString componentsSeparatedByString:@";"] componentsJoinedByString:@","];
+		NSArray* theParts = [theString componentsSeparatedByString:@","];
+		NSEnumerator* e = [theParts objectEnumerator];
+		NSString* aLine;
+		if(!waitForGetWaveformsLoadedDone && !waitForAsyncDownloadDone){
+			NSLog(@"%@\n",theString);
+		}
+		else while(aLine = [e nextObject]){
+			aLine = [aLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+			if([aLine isEqualToString:@"1"]){
+				if(waitForGetWaveformsLoadedDone){
+					waitForGetWaveformsLoadedDone = NO;
+					theString = [[theString componentsSeparatedByString:@"\""] componentsJoinedByString:@""];
+					theString = [theString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+					NSRange junkRange = [theString rangeOfString:@",1"];
+					if(junkRange.location != NSNotFound){
+						theString = [theString substringToIndex:junkRange.location];
+					}
+					[allWaveFormsInMemory release];
+					allWaveFormsInMemory = [[theString componentsSeparatedByString:@","] retain];
+				}
+				else if(waitForAsyncDownloadDone){
+					[self asyncDownloadFinished];
+				}
+			}
+		}
+    }
+}
+
+- (void) netsocketDisconnected:(NetSocket*)inNetSocket
+{
+    if(inNetSocket == socket){
+        [self setIpConnected:[socket isConnected]];
+        [self setIpConnected:NO];
+		[socket autorelease];
+		socket = nil;
+    }
+}
+
+
+#pragma mark ***Archival
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+    [[self undoManager] disableUndoRegistration];
+    [self setSerialNumber:[decoder decodeObjectForKey:@"ORPulser33220ModelSerialNumber"]];
+	[self setIpAddress:[decoder decodeObjectForKey:@"ORPulser33220ModelIpAddress"]];
+    [self setConnectionProtocol:[decoder decodeIntForKey:@"ORPulser33220ModelConnectionProtocol"]];
+    [[self undoManager] enableUndoRegistration];    
+		
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeObject:serialNumber forKey:@"ORPulser33220ModelSerialNumber"];
+    [encoder encodeObject:ipAddress forKey:@"ORPulser33220ModelIpAddress"];
+    [encoder encodeInt:connectionProtocol forKey:@"ORPulser33220ModelConnectionProtocol"];
+}
+
+
+- (void) enableEOT: (BOOL) state
+{
+	if(connectionProtocol == kHPPulserUseGPIB ){
+		[super enableEOT:state];
+	}
+	else {
+		mEOT = state;
+	}
+}
+
+#pragma mark ***Comm methods
+- (long) readFromGPIBDevice: (char*) aData maxLength: (long) aMaxLength
+{
+	switch(connectionProtocol){
+		case kHPPulserUseGPIB: return [super readFromGPIBDevice:aData maxLength:aMaxLength];
+		case kHPPulserUseUSB:  
+			if(usbInterface && [self getUSBController]){
+				return [usbInterface readUSB488:aData length:aMaxLength];;
+			}
+			else {
+				NSString *errorMsg = @"Must establish connection prior to issuing command\n";
+				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+				
+			}
+		break;
+		case kHPPulserUseIP: 
+			//nothing to do... all incoming data is initiated by us and we'll be notified 
+			//when any data arrives in the  netsocket:dataAvailable: method
+		break;
+	}
+	return 0;
+}
+
+- (void) writeToGPIBDevice: (NSString*) aCommand
+{
+	switch(connectionProtocol){
+		case kHPPulserUseGPIB:  [super writeToGPIBDevice:aCommand]; break;
+
+		case kHPPulserUseUSB:
+			if(usbInterface && [self getUSBController]){
+				if(mEOT)aCommand = [aCommand stringByAppendingString:@"\n"];
+				[usbInterface writeUSB488Command:aCommand eom:mEOT];
+			}
+			else {
+				NSString *errorMsg = @"Must establish connection prior to issuing command\n";
+				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+				
+			}
+		break;
+		
+		case kHPPulserUseIP: 
+			if([self isConnected]){
+				if(mEOT)aCommand = [aCommand stringByAppendingString:@"\n"];
+				[self performSelectorOnMainThread:@selector(mainThreadSocketSend:) withObject:aCommand waitUntilDone:YES];
+				
+			}
+			else {
+				NSString *errorMsg = @"Must establish IP connection prior to issuing command.\n";
+				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
+
+			} 			
+		break;
+	}
+}
+
+- (void) mainThreadSocketSend:(NSString*)aCommand
+{
+	[socket writeString:aCommand encoding:NSASCIIStringEncoding];
+}
+
+- (void) makeUSBClaim:(NSString*)aSerialNumber
+{
+	
+}
+
+@end

@@ -1,0 +1,64 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                executeCCycleAction = id; 
+                executeZCycleAction = id; 
+                setInhibitOffAction = id; 
+                setInhibitOnAction = id; 
+                showHideAction = id; 
+            }; 
+            CLASS = ORCamacCrateController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {showHideButton = NSButton; }; 
+            SUPERCLASS = ORCrateController; 
+        }, 
+        {CLASS = ORCamacCrateView; LANGUAGE = ObjC; SUPERCLASS = ORGroupView; }, 
+        {
+            ACTIONS = {showLabelsAction = id; }; 
+            CLASS = ORCrateController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                groupView = ORGroupView; 
+                labelView = ORCrateLabelView; 
+                lockDocField = NSTextField; 
+                powerField = NSTextField; 
+                showLabelsButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = ORCrateLabelView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {crateView = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                concludeDragOperation = id; 
+                copy = id; 
+                cut = id; 
+                draggingExited = id; 
+                paste = id; 
+            }; 
+            CLASS = ORGroupView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mouseTask = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORL8013CrateController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = ORCamacCrateController; 
+        }, 
+        {CLASS = ORL8013CrateView; LANGUAGE = ObjC; SUPERCLASS = ORCamacCrateView; }, 
+        {CLASS = ORVmeCrateView; LANGUAGE = ObjC; SUPERCLASS = ORGroupView; }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

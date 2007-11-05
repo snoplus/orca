@@ -1,0 +1,20 @@
+{
+    IBClasses = (
+        {CLASS = OApplication; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {send = id; }; 
+            CLASS = ORMailCenter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {bodyField = NSTextView; mailForm = NSForm; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {print = id; }; 
+            CLASS = ORPrintableOutlineView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSOutlineView; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

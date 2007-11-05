@@ -1,0 +1,486 @@
+//
+//  ORDocumentController.m
+//  Orca
+//
+//  Created by Mark Howe on Tue Dec 03 2002.
+//  Copyright  © 2002 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+
+
+#pragma mark ¥¥¥Imported Files
+#import "ORDocumentController.h"
+#import "ORStatusController.h"
+#import "ORAlarmController.h"
+#import "ORCatalogController.h"
+#import "ORHWWizardController.h"
+#import "ORPreferencesController.h"
+#import "ORCommandCenterController.h"
+#import "ORGateKeeper.h"
+#import "ORDataTaker.h"
+#import "ORReadOutList.h"
+
+int sortListUpFunc(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
+int sortListDnFunc(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
+
+#define ORDataTakerItem @"ORDataTaker Drag Item"
+
+@implementation ORDocumentController
+
+#pragma mark ¥¥¥Intialization
+
+- (id) init
+{
+
+    if(self = [super initWithWindowNibName:@"Document"]){
+        [self setShouldCloseDocument:YES];
+        [self setWindowFrameAutosaveName:@"Document"];
+
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
+																object:self
+																userInfo:[NSDictionary dictionaryWithObject:@"Preloading Catalog..." forKey:@"Message"]];
+		[self preloadCatalog];
+
+    }
+    return self;
+}
+
+- (void) awakeFromNib
+{
+
+	ascendingSortingImage = [[NSImage imageNamed:@"NSAscendingSortIndicator"] retain];
+    descendingSortingImage = [[NSImage imageNamed:@"NSDescendingSortIndicator"] retain];
+
+    [self registerNotificationObservers];
+    [groupView setGroup:[self group]];
+    [self updateWindow];
+        
+    [outlineView setDoubleAction:@selector(doubleClick:)];
+    [self securityStateChanged:nil];
+    [self scaleFactorChanged:nil];
+}
+
+- (void) dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[ascendingSortingImage release];
+	[descendingSortingImage release];
+    [super dealloc];
+}
+
+- (void) preloadCatalog
+{
+	[[ORCatalogController sharedCatalogController] window];
+}
+
+#pragma mark ¥¥¥Accessors
+
+- (ORGroup *)group
+{
+    return [[self document] group];
+}
+
+- (ORGroupView *)groupView
+{
+    return [[self document] groupView];
+}
+
+- (NSTextField*) statusTextField
+{
+    return statusTextField;
+}
+
+#pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers
+{
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(updateWindow)
+                                                 name : ORGroupObjectsAdded
+                                               object : nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(updateWindow)
+                                                 name : ORGroupObjectsRemoved
+                                               object : nil];
+	
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(updateWindow)
+                                                 name : OROrcaObjectMoved
+                                               object : nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(updateWindow)
+                                                 name : ORConnectionChanged
+                                               object : nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(statusTextChanged:)
+                                                 name : ORStatusTextChangedNotification
+                                               object : nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(updateWindow)
+                                                 name : ORRunModeChangedNotification
+                                               object : nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(updateWindow)
+                                                 name : ORForceRedraw
+                                               object : nil];
+    
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(documentLockChanged:)
+                                                 name : ORDocumentLock
+                                                object: nil];
+    
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(securityStateChanged:)
+                                                 name : ORGlobalSecurityStateChanged
+                                                object: nil];
+    
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(scaleFactorChanged:)
+                                                 name : ORDocumentScaleChangedNotification
+                                                object: nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(remoteScaleFactorChanged:)
+                                                 name : @"ScaleView"
+                                                object: groupView];
+
+    
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(numberLockedPagesChanged:)
+                                                 name : ORSecurityNumberLockPagesChanged
+                                                object: gSecurity];
+    
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(windowOrderChanged:)
+                                                 name : NSWindowDidBecomeKeyNotification
+                                                object: nil];
+    
+}
+
+- (void) updateWindow
+{
+    [groupView setNeedsDisplay:YES];
+    [self statusTextChanged:nil];
+    [self numberLockedPagesChanged:nil];
+    [outlineView reloadData];
+}
+
+- (void) securityStateChanged:(NSNotification*)aNotification
+{
+    BOOL secure = [gSecurity globalSecurityEnabled];
+    [gSecurity setLock:ORDocumentLock to:secure];
+    [documentLockButton setEnabled:secure];
+    [lockAllButton setEnabled:secure && [gSecurity numberItemsUnlocked]];
+}
+
+- (void) documentLockChanged:(NSNotification*)aNotification
+{
+    BOOL locked = [gSecurity isLocked:ORDocumentLock];
+    [documentLockButton setState: locked];
+    
+}
+
+- (void) statusTextChanged:(NSNotification*)aNotification
+{
+    if([[self document] statusText])[[self statusTextField] setStringValue:[[self document] statusText]];		
+}
+
+- (void) scaleFactorChanged:(NSNotification*)aNotification
+{
+	[groupView setScalePercent:[[self document] scaleFactor]];
+	[scaleFactorField setIntValue:[groupView scalePercent]];
+}
+
+- (void) remoteScaleFactorChanged:(NSNotification*)aNotification
+{
+	[[self document] setScaleFactor:[[[aNotification userInfo] objectForKey:@"ScaleFactor"] intValue]];
+	[scaleFactorField setIntValue:[groupView scalePercent]];
+}
+
+- (void) windowOrderChanged:(NSNotification*)aNotification
+{
+    [[self document] windowMovedToFront:[[aNotification object]windowController]];
+}
+
+- (void) numberLockedPagesChanged:(NSNotification*)aNotification
+{
+    if([gSecurity globalSecurityEnabled]){
+        int num = [gSecurity numberItemsUnlocked];
+        if(num == 1)[lockStatusTextField setStringValue:[NSString stringWithFormat:@"%d item unlocked.",num]];
+        else [lockStatusTextField setStringValue:[NSString stringWithFormat:@"%d items unlocked.",num]];
+        [lockAllButton setEnabled:[gSecurity numberItemsUnlocked]];
+    }
+    else {
+        [lockStatusTextField setStringValue:@"Security Disabled"];
+        [lockAllButton setEnabled:NO];
+    }
+}
+
+#pragma mark ¥¥¥Actions
+
+- (IBAction) documentLockAction:(id)sender
+{
+    [gSecurity tryToSetLock:ORDocumentLock to:[sender intValue] forWindow:[self window]];
+}
+
+
+#pragma mark ¥¥¥Toolbar
+
+- (IBAction) statusLog:(NSToolbarItem*)item 
+{
+    [[ORStatusController sharedStatusController] showWindow:self];
+}
+- (IBAction) alarmMaster:(NSToolbarItem*)item 
+{
+    [[ORAlarmController sharedAlarmController] showWindow:self];
+}
+- (IBAction) openCatalog:(NSToolbarItem*)item 
+{
+    [[ORCatalogController sharedCatalogController] showWindow:self];
+}
+
+- (IBAction) openGateKeeper:(NSToolbarItem*)item 
+{
+    ORGateKeeper* aGateKeeper = [ORGateKeeper sharedGateKeeper];
+    [aGateKeeper setGateGroup:[[self document] gateGroup]];
+    [aGateKeeper showWindow:self];
+}
+
+
+- (IBAction) openPreferences:(NSToolbarItem*)item 
+{
+    [[ORPreferencesController sharedPreferencesController] showWindow:self];
+}
+
+- (IBAction) openHWWizard:(NSToolbarItem*)item 
+{
+    [[ORHWWizardController sharedInstance] showWindow:self];
+}
+
+- (IBAction) openCommandCenter:(NSToolbarItem*)item 
+{
+    [[ORCommandCenterController sharedCommandCenterController] showWindow:self];
+}
+
+- (IBAction) openTaskMaster:(NSToolbarItem*)item 
+{
+    [[NSApp  delegate] showTaskMaster:self];
+}
+
+- (IBAction) openORCARootService:(NSToolbarItem*)item 
+{
+    [[NSApp  delegate] showORCARootServiceController:self];
+}
+
+- (IBAction) printDocument:(id)sender
+{
+    NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
+    NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:[[self window]contentView] printInfo:printInfo];
+    [printOp setShowPanels:YES];
+    [printOp runOperation];
+}
+
+- (IBAction) scaleFactorAction:(id)sender
+{
+    [[self document] setScaleFactor:[sender intValue]];
+}
+
+- (IBAction) lockAllAction:(id)sender
+{
+    if([gSecurity globalSecurityEnabled]){
+        [gSecurity lockAll];
+    }
+}
+
+
+- (NSRect)windowWillUseStandardFrame:(NSWindow*)sender defaultFrame:(NSRect)defaultFrame
+{
+    return [groupView normalized] ;
+}
+
+#pragma mark ¥¥¥Data Source
+- (id)   outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+{
+	if(item==nil)return [[self group] objectAtIndex:index];
+	else {
+		if([item isKindOfClass:NSClassFromString(@"ORGroup")]){
+			return [[item orcaObjects] objectAtIndex:index];
+		}
+		else return nil;
+	}
+}
+
+- (BOOL) outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+{
+	if(item==nil)return [[self group] count]>0;
+	else if([item isKindOfClass:NSClassFromString(@"ORGroup")])return [[item orcaObjects] count]>0;
+	else return NO;
+}
+
+- (int)  outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+{
+	if(item==nil)return [[self group] count];
+	else if([item isKindOfClass:NSClassFromString(@"ORGroup")])return [[item orcaObjects] count];
+	else return 0;
+}
+
+- (id)  outlineView:(NSOutlineView *)outlineView  objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+{
+    NSString* columnID =  [tableColumn identifier];
+    return [item valueForKey:columnID];
+}
+
+- (void) outlineView:(NSOutlineView *)outlineView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn byItem:(id)item;
+{
+    [item setValue:anObject forKey:[aTableColumn identifier]];
+}
+
+- (IBAction) doubleClick:(id)sender
+{
+    [[outlineView selectedItem] doDoubleClick:sender];
+}
+
+- (void) outlineView:(NSOutlineView*)tv didClickTableColumn:(NSTableColumn *)tableColumn
+{
+    NSImage *sortOrderImage = [tv indicatorImageInTableColumn:tableColumn];
+    NSString *columnKey = [tableColumn identifier];
+    // If the user clicked the column which already has the sort indicator
+    // then just flip the sort order.
+    
+    if (sortOrderImage || columnKey == [self sortColumn]) {
+        [self setSortIsDescending:![self sortIsDescending]];
+    }
+    else {
+        [self setSortColumn:columnKey];
+    }
+    [self updateTableHeaderToMatchCurrentSort];
+    // now do it - doc calls us back when done
+    [self sort];
+    [outlineView reloadData];
+}
+
+- (void) updateTableHeaderToMatchCurrentSort
+{
+    BOOL isDescending = [self sortIsDescending];
+    NSString *key = [self sortColumn];
+    NSArray *a = [outlineView tableColumns];
+    NSTableColumn *column = [outlineView tableColumnWithIdentifier:key];
+    unsigned i = [a count];
+    
+    while (i-- > 0) [outlineView setIndicatorImage:nil inTableColumn:[a objectAtIndex:i]];
+    
+    if (key) {
+        [outlineView setIndicatorImage:(isDescending ? ascendingSortingImage:descendingSortingImage) inTableColumn:column];
+        
+        [outlineView setHighlightedTableColumn:column];
+    }
+    else {
+        [outlineView setHighlightedTableColumn:nil];
+    }
+}
+
+-(void)setSortColumn:(NSString *)identifier {
+    if (![identifier isEqualToString:_sortColumn]) {
+        [_sortColumn release];
+        _sortColumn = [identifier copyWithZone:[self zone]];
+    }
+}
+
+- (NSString *)sortColumn
+{
+    return _sortColumn;
+}
+
+- (void)setSortIsDescending:(BOOL)whichWay {
+    if (whichWay != _sortIsDescending) {
+        _sortIsDescending = whichWay;
+    }
+}
+
+- (BOOL)sortIsDescending
+{
+    return _sortIsDescending;
+}
+
+- (void)sort
+{
+    if(_sortIsDescending){
+		[[[self group] orcaObjects] sortUsingFunction:sortListDnFunc context: _sortColumn];
+	}
+    else {
+		[[[self group] orcaObjects] sortUsingFunction:sortListUpFunc context: _sortColumn];
+	}
+	NSEnumerator* mainEnummy = [[[self group] orcaObjects] objectEnumerator];
+	OrcaObject* obj;
+	while(obj = [mainEnummy nextObject]){
+		if([obj isKindOfClass:NSClassFromString(@"ORGroup")]){
+			NSMutableArray* theKids = [obj children];
+			if(_sortIsDescending){
+				[theKids sortUsingFunction:sortListDnFunc context: _sortColumn];
+			}
+			else {
+				[theKids sortUsingFunction:sortListUpFunc context: _sortColumn];
+			}
+		}
+	}
+}
+
+- (BOOL)outlineView:(NSOutlineView *)ov writeItems:(NSArray*)writeItems toPasteboard:(NSPasteboard*)pboard
+{
+    draggedNodes = [[NSMutableArray array] retain]; 
+    NSEnumerator* e = [writeItems objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        if(ov == outlineView) {           //wrap objs from the total list into a readoutobj
+            if([obj conformsToProtocol:@protocol(ORDataTaker)]){
+                ORReadOutObject* itemWrapper = [[ORReadOutObject alloc] initWithObject:obj];
+                [draggedNodes addObject:itemWrapper];
+                [itemWrapper release];
+            }
+        }
+    }
+    
+    if([draggedNodes count] == 0){
+        [draggedNodes release];
+        draggedNodes = nil;
+        return NO;
+    }
+    
+    // Provide data for our custom type, and simple NSStrings.
+    [pboard declareTypes:[NSArray arrayWithObjects:ORDataTakerItem, nil] owner:self];
+    
+    // the actual data doesn't matter since We're not really putting anything on the pasteboard. We are
+    //using it to control the process.
+    [pboard setData:[NSData data] forType:ORDataTakerItem]; 
+    return YES;
+    
+}
+
+- (NSArray*)draggedNodes
+{ 
+    return draggedNodes; 
+}
+- (void) dragDone
+{
+    [draggedNodes release];
+    draggedNodes = nil;
+}
+
+@end

@@ -1,0 +1,134 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {connectAction = id; primaryAddressAction = id; secondaryAddressAction = id; }; 
+            CLASS = ORGpibDeviceController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                mConfigured = NSTextField; 
+                mConnectButton = NSButton; 
+                mPrimaryAddress = NSPopUpButton; 
+                mSecondaryAddress = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {
+                clearMemory = id; 
+                downloadWaveformAction = id; 
+                enableRandomAction = id; 
+                loadParamsAction = id; 
+                lockAction = id; 
+                maxTimeAction = id; 
+                minTimeAction = id; 
+                negativePulseAction = id; 
+                readIdAction = id; 
+                resetAction = id; 
+                selectWaveformAction = id; 
+                sendCommandAction = id; 
+                setBurstRateAction = id; 
+                setTotalWidthAction = id; 
+                setVoltageAction = id; 
+                testAction = id; 
+                triggerAction = id; 
+                triggerModeAction = id; 
+            }; 
+            CLASS = ORHPPulserController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                burstRateDisplay = NSTextField; 
+                burstRateField = NSTextField; 
+                burstRateStepper = NSStepper; 
+                clearButton = NSButton; 
+                commandField = NSTextField; 
+                downloadButton = NSButton; 
+                downloadTypeField = NSTextField; 
+                enableRandomButton = NSButton; 
+                loadParamsButton = NSButton; 
+                lockButton = NSButton; 
+                lockDocField = NSTextField; 
+                maxTimeField = NSTextField; 
+                maxTimeStepper = NSStepper; 
+                minTimeField = NSTextField; 
+                minTimeStepper = NSStepper; 
+                negativePulseMatrix = NSMatrix; 
+                plotter = ORPlotter1D; 
+                progress = NSProgressIndicator; 
+                randomCountField = NSTextField; 
+                readIdButton = NSButton; 
+                resetButton = NSButton; 
+                selectionPopUpButton = NSPopUpButton; 
+                sendCommandButton = NSButton; 
+                testButton = NSButton; 
+                totalWidthDisplay = NSTextField; 
+                totalWidthField = NSTextField; 
+                totalWidthStepper = NSStepper; 
+                triggerButton = NSButton; 
+                triggerModeMatrix = NSMatrix; 
+                voltageDisplay = NSTextField; 
+                voltageField = NSTextField; 
+                voltageStepper = NSStepper; 
+                xScale = ORAxis; 
+                yScale = ORAxis; 
+            }; 
+            SUPERCLASS = ORGpibDeviceController; 
+        }, 
+        {
+            ACTIONS = {savePDF = id; }; 
+            CLASS = ORPlotter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mDataSource = id; mXScale = ORScale; mYScale = ORScale; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {
+                addGateAction = id; 
+                analyze = id; 
+                autoScale = id; 
+                averageWindowAction = id; 
+                centerOnPeak = id; 
+                clearActiveCurveGates = id; 
+                clearActiveGate = id; 
+                clearAllGates = id; 
+                copy = id; 
+                differentiateAction = id; 
+                removeGateAction = id; 
+                resetScales = id; 
+                savePDF = id; 
+            }; 
+            CLASS = ORPlotter1D; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                analysisDrawer = NSDrawer; 
+                analysisView = ZFlowLayout; 
+                mDataSource = id; 
+                mXScale = ORAxis; 
+                mYScale = ORAxis; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = ORSelfScaledPlotter; LANGUAGE = ObjC; SUPERCLASS = ORPlotter; }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

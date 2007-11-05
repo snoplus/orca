@@ -1,0 +1,179 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                decDialog = id; 
+                incDialog = id; 
+                mailContent = id; 
+                openStatusLog = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+            }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {jumpButtonClicked = id; orderFrontGoToPanel = id; }; 
+            CLASS = GoToLine; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dialogueView = id; lineNumberField = NSTextField; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = MemoryWatcher; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = MemoryWatcherController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {watcher = MemoryWatcher; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {showAboutBox = id; }; 
+            CLASS = ORAboutBox; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                appNameField = id; 
+                copyrightField = id; 
+                creditsField = id; 
+                versionField = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = ORAlarmCollection; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {controller = ORAlarmController; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {acknowledge = id; }; 
+            CLASS = ORAlarmController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                acknowledgeButton = NSButton; 
+                alarmCollection = ORAlarmCollection; 
+                helpButton = NSButton; 
+                helpDrawer = NSDrawer; 
+                helpTextView = NSTextView; 
+                tableView = NSTableView; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                newDocument = id; 
+                openDocument = id; 
+                performClose = id; 
+                showAlarms = id; 
+                showCatalog = id; 
+                showCommandCenter = id; 
+                showGateKeeper = id; 
+                showHardwareWizard = id; 
+                showMemoryWatcher = id; 
+                showORCARootServiceController = id; 
+                showPreferences = id; 
+                showProcessCenter = id; 
+                showStatusLog = id; 
+                showTaskMaster = id; 
+                showWindowList = id; 
+                terminate = id; 
+            }; 
+            CLASS = ORAppDelegate; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {document = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showStatusWindow = id; }; 
+            CLASS = ORAppHelper; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = ORCatalogController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = ORCommandCenter; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {doCmdAction = id; processFileAction = id; setPortAction = id; }; 
+            CLASS = ORCommandCenterController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                clientListView = NSTableView; 
+                cmdField = NSTextField; 
+                portField = NSTextField; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = ORDocument; LANGUAGE = ObjC; SUPERCLASS = NSDocument; }, 
+        {
+            CLASS = ORHWWizardController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = ORHWWizardModel; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                changeBackgroundColor = id; 
+                changeLineColor = id; 
+                lineTypeAction = id; 
+                openingDocPrefAction = id; 
+            }; 
+            CLASS = ORPreferencesController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                backgroundColorWell = NSColorWell; 
+                lineColorWell = NSColorWell; 
+                lineTypeMatrix = NSMatrix; 
+                nextTimeTextField = NSTextField; 
+                openingDocPrefMatrix = NSMatrix; 
+            }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {saveDocument = id; saveDocumentAs = id; }; 
+            CLASS = ORProcessCenter; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            CLASS = ORStatusController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {statusView = NSTextView; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            CLASS = ORTaskMaster; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {taskContentView = NSView; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                findNext = id; 
+                findNextAndOrderFindPanelOut = id; 
+                findPrevious = id; 
+                jumpToSelection = id; 
+                orderFrontFindPanel = id; 
+                replace = id; 
+                replaceAll = id; 
+                replaceAndFind = id; 
+                takeFindStringFromSelection = id; 
+            }; 
+            CLASS = TextFinder; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                findNextButton = id; 
+                findTextField = id; 
+                ignoreCaseButton = id; 
+                replaceAllScopeMatrix = id; 
+                replaceTextField = id; 
+                statusField = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

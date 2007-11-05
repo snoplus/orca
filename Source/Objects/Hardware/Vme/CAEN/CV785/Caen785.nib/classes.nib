@@ -1,0 +1,64 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            CLASS = ORCaen785Controller; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = ORCaenCardController; 
+        }, 
+        {
+            ACTIONS = {
+                baseAddressAction = id; 
+                basicLockAction = id; 
+                read = id; 
+                readThresholds = id; 
+                selectChannelAction = id; 
+                selectRegisterAction = id; 
+                thresholdChangedAction = id; 
+                thresholdLockAction = id; 
+                write = id; 
+                writeThresholds = id; 
+                writeValueAction = id; 
+            }; 
+            CLASS = ORCaenCardController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addressStepper = NSStepper; 
+                addressTextField = NSTextField; 
+                basicLockButton = NSButton; 
+                basicLockDocField = NSTextField; 
+                basicReadButton = NSButton; 
+                basicWriteButton = NSButton; 
+                channelPopUp = NSPopUpButton; 
+                drTextField = NSTextField; 
+                hrTextField = NSTextField; 
+                regNameField = NSTextField; 
+                registerAddressPopUp = NSPopUpButton; 
+                registerOffsetTextField = NSTextField; 
+                registerReadWriteTextField = NSTextField; 
+                slotField = NSTextField; 
+                srTextField = NSTextField; 
+                stepperA = NSMatrix; 
+                stepperB = NSMatrix; 
+                tabView = NSTabView; 
+                thresholdA = NSMatrix; 
+                thresholdB = NSMatrix; 
+                thresholdLockButton = NSButton; 
+                thresholdLockDocField = NSTextField; 
+                thresholdReadButton = NSButton; 
+                thresholdWriteButton = NSButton; 
+                writeValueStepper = NSStepper; 
+                writeValueTextField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

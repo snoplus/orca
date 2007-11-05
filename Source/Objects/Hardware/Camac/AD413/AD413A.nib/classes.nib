@@ -1,0 +1,55 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                clearModuleAction = id; 
+                controlReg1Action = id; 
+                controlReg2Action = id; 
+                discriminatorAction = id; 
+                onlineAction = id; 
+                readControlReg1Action = id; 
+                readControlReg2Action = id; 
+                readDiscriminatorAction = id; 
+                settingLockAction = id; 
+                writeControlReg1Action = id; 
+                writeControlReg2Action = id; 
+                writeDiscriminatorAction = id; 
+            }; 
+            CLASS = ORAD413AController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                clearModuleButton = NSButton; 
+                controlReg1Matrix = NSMatrix; 
+                controlReg2Matrix = NSMatrix; 
+                discriminatorFieldMatrix = NSMatrix; 
+                discriminatorStepperMatrix = NSMatrix; 
+                onlineMaskMatrix = NSMatrix; 
+                readControlReg1Button = NSButton; 
+                readControlReg2Button = NSButton; 
+                readDiscriminatorButton = NSButton; 
+                settingLockButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                virtualStationField = NSTextField; 
+                writeControlReg1Button = NSButton; 
+                writeControlReg2Button = NSButton; 
+                writeDiscriminatorButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

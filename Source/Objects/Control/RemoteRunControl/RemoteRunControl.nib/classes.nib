@@ -1,0 +1,59 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                autoReconnectAction = id; 
+                connectAction = id; 
+                connectAtStartAction = id; 
+                lockAction = id; 
+                newRunAction = id; 
+                quickStartCBAction = id; 
+                remoteHostAction = id; 
+                remotePortAction = id; 
+                repeatRunCBAction = id; 
+                startRunAction = id; 
+                stopRunAction = id; 
+                timeLimitStepperAction = id; 
+                timeLimitTextAction = id; 
+                timedRunCBAction = id; 
+            }; 
+            CLASS = ORRemoteRunController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                autoReconnectButton = NSButton; 
+                connectAtStartButton = NSButton; 
+                connectButton = NSButton; 
+                connectionStatusField = NSTextField; 
+                elapsedTimeField = NSTextField; 
+                lockButton = NSButton; 
+                quickStartCB = NSButton; 
+                remoteHostField = NSTextField; 
+                remotePortField = NSTextField; 
+                repeatRunCB = NSButton; 
+                restartRunButton = NSButton; 
+                runBar = NSProgressIndicator; 
+                runNumberField = NSTextField; 
+                runProgress = NSProgressIndicator; 
+                startRunButton = NSButton; 
+                statusField = NSTextField; 
+                stopRunButton = NSButton; 
+                timeLimitField = NSTextField; 
+                timeLimitStepper = NSStepper; 
+                timeStartedField = NSTextField; 
+                timeToGoField = NSTextField; 
+                timedRunCB = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORRunFactory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,196 @@
+{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf420
+{\fonttbl\f0\fswiss\fcharset77 Helvetica-BoldOblique;\f1\fswiss\fcharset77 Helvetica;\f2\fswiss\fcharset77 Helvetica-Bold;
+\f3\fswiss\fcharset77 Helvetica-Oblique;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\i\b\fs22 \cf0 \
+
+\f1\i0\b0 Tip: you can cut and paste from this guide. Also note that, for the most part, the syntax is just like 'C'.
+\f0\i\b \
+
+\f1\i0\b0 Tip: you can drag an object from the configuration into the script view to get the id text that is used by the find command.
+\f0\i\b \
+
+\f2\i0 \
+Program Structure\
+
+\f1\b0 function main(args)\
+\{\
+....\
+\}\
+function <name> (args)\
+\{\
+\}\
+Note: There must be a 'main' function. Additional functions are, of course, optional.
+\f2\b \
+\
+Functions
+\f1\b0 \
+function <name> (args)	
+\f3\i //declaration
+\f1\i0 \
+<fuction>(args);			
+\f3\i //calling
+\f1\i0 \
+return <result>;			
+\f3\i //return
+\f1\i0 \
+exit;					//quit script and exit\
+\
+
+\f2\b Special Function Arguments
+\f1\b0 \
+The arguments in the ScriptTask dialog are special hidden arguments. They should not be listed in the argument list of any function, but can be accessed by name (i.e. $1,$2, etc...) in the body of the main function.
+\fs24 \
+
+\fs22 \
+
+\f2\b Loops
+\f1\b0 \
+for(<exp>;<exp>;<exp>) \{\
+	<statements>\
+\}\
+\
+do \{\
+	<statements>\
+\} while(<exp>);\
+\
+while(<exp>)\{\
+	<statements>\
+\}\
+\
+break;		
+\f3\i //exit loop early
+\f1\i0 \
+continue;		
+\f3\i //goto next iteration
+\f1\i0 \
+exit;			//quit script and exit\
+\
+
+\f2\b Logic\
+
+\f1\b0 if(<condition>)\{\
+	<statements>\
+\}\
+if(<condition>)\{\
+	<statements>\
+\}\
+else \{\
+	<statements>\
+\}\
+\
+
+\f2\b Switch Statements\
+
+\f1\b0 switch(<condition>)\{\
+	case <val>: <statements> break;\
+	case <val>: <statements> break;\
+	..\
+	default: <statements> break;\
+\}\
+\
+
+\f2\b Conditional\
+
+\f1\b0 var = <expression>?<stmt>:<stmt>\
+\
+
+\f2\b ORCA Interface\
+
+\f1\b0 obj = find(<className>);			//tag defaults to 1\
+obj = find(<className>,<tag or slot>); 	//crate defauts to 1\
+obj = find(<className>,<crate>,<tag or slot>);\
+obj = find(<className>,<crate>,<carrier slot>,<slot>);\
+obj = find(<className>,<carrier slot>,<slot>); //crate defauts to 1\
+result = [obj <selector>];\
+x = pointx([obj <selectorReturnsPoint>]);\
+\
+
+\f2\b Special ObjC functions\
+
+\f1\b0 point(x,y) 			   
+\f3\i //makes a NSPoint object
+\f1\i0 \
+rect(x,y,w,h) 		   
+\f3\i //makes a NSRect object
+\f1\i0 \
+pointx(<point structure>) 
+\f3\i //returns x value
+\f1\i0 \
+pointy(<point structure>) 
+\f3\i //returns y value
+\f1\i0 \
+rectx(<rect structure>)   
+\f3\i //returns x value
+\f1\i0 \
+recty(<rect structure>)   
+\f3\i //returns y value
+\f1\i0 \
+recth(<rect structure>)   
+\f3\i //returns h value
+\f1\i0 \
+rectw(<rect structure>)  
+\f3\i //returns w value
+\f1\i0 \
+\
+
+\f2\b Output
+\f1\b0 \
+print(<var,var,...>);\
+print <var,var,...>;\
+outputfile (<var,var,...>); //output logged to file\
+outputfile <var,var,...>;   //output logged to file\
+\
+
+\f2\b Special
+\f1\b0 \
+waituntil (<true>)		       //returns true always\
+waituntil (<true>,<timeout>) //returns false if timed-out, true otherwise.\
+sleep(<# seconds>);\
+hex(<var>)		                
+\f3\i //convert to hex string
+\f1\i0 \
+string(<var,var,...>)	      
+\f3\i //produce a string for printing or an argument
+\f1\i0 \
+postalarm(<alarmName>, <alarmSeverity> [,<alarmHelp>]);  //the help string is optional\
+clearalarm(<alarmName>);\
+
+\f2\b \
+Array Declaration
+\f1\b0 \
+array varName[<size>];\
+array varName[<size>] = \{<var>,<var>, ... <var>\};\
+\
+Note: Arrays can not be used just anywhere. i.e. a[i]++ will pass the syntax checker but will cause a run-time exception. Other operators that do not work with arrays include, +=, -=,*=, etc...\
+\
+
+\f2\b Standard Library Functions\
+
+\f1\b0 pow(), sqrt(), ceil(), floor(), round(), cos(), acos()\
+sin(), asin(), tan(), atan(), abs(), exp(), log(), log10()\
+\
+
+\f2\b Operators
+\f1\b0 \
++	-	/	*	%	++	--	+=	-=\
+*=	/=	&=	^=	&= 	!= 	!	&	&&\
+|	||	==	>=	<=	<<	>>	^	<\
+>	\
+\
+
+\f2\b Predefined Constants\
+
+\f1\b0 true, false, TRUE, FALSE\
+yes, no, YES, NO\
+nil, NUL
+\f2\b \
+
+\f1\b0 \
+
+\f2\b Special Notes\
+
+\f1\b0 Arrays and vars are passed by value. \
+}

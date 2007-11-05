@@ -1,0 +1,138 @@
+{
+    IBClasses = (
+        {CLASS = AltMuxThreshold; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = BiStateView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                addTubeAction = id; 
+                allDisabledAction = id; 
+                captureNominalSettingsAction = id; 
+                captureStateAction = id; 
+                colorBarUsesLogAction = id; 
+                cut = id; 
+                delete = id; 
+                detectorLockAction = id; 
+                muxEfficiencyAction = id; 
+                nominalSettingsLockAction = id; 
+                readMapFileAction = id; 
+                reportConfigAction = id; 
+                restoreAllToNominal = id; 
+                restoreEfficiencyAction = id; 
+                restoreMuxesToNominal = id; 
+                restoreShaperGainsToNominal = id; 
+                restoreShaperThresoldsToNominal = id; 
+                restoreShapersToNominal = id; 
+                saveMapFileAction = id; 
+                selectDifferentNominalSettingsFileAction = id; 
+                selectFile = id; 
+                setDisplayOptionAction = id; 
+                setMuxEfficiencyAction = id; 
+                showCrate = id; 
+                showEnetGpib = id; 
+                showHVMaster = id; 
+                showMac = id; 
+                showMux = id; 
+                showPulser = id; 
+                showScopeA = id; 
+                showScopeB = id; 
+                specialLockAction = id; 
+                standAloneAction = id; 
+                tubeMapLockAction = id; 
+            }; 
+            CLASS = NcdController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addTubeButton = NSButton; 
+                allDisabledButton = NSButton; 
+                allToNominalButton = NSButton; 
+                altMuxThresholdsController = NSArrayController; 
+                captureDateField = NSTextField; 
+                captureNominalFileButton = NSButton; 
+                captureStateButton = NSButton; 
+                colorBarLogCB = NSButton; 
+                deleteTubeButton = NSButton; 
+                detectorColorBar = ORColorScale; 
+                detectorLockButton = NSButton; 
+                detectorView = NSView; 
+                displayOptionMatrix = NSMatrix; 
+                hardwareCheckView = BiStateView; 
+                hwTableView = NSTableView; 
+                mapFileField = NSTextField; 
+                muxAddButton = NSButton; 
+                muxCheckView = BiStateView; 
+                muxEfficiencyField = NSTextField; 
+                muxEfficiencyPopup = NSPopUpButton; 
+                muxEnableButton = NSButton; 
+                muxSelectButton = NSButton; 
+                muxThresholdPopup = NSPopUpButton; 
+                muxThresholdView = NSTableView; 
+                muxToNominalButton = NSButton; 
+                nominalFileField = NSTextField; 
+                nominalSettingsLockButton = NSButton; 
+                rateLogCB = NSButton; 
+                ratePlot = ORPlotter1D; 
+                readMapFileButton = NSButton; 
+                reducedEfficiencyDateField = NSTextField; 
+                reportStateButton = NSButton; 
+                restoreEfficiencyButton = NSButton; 
+                saveMapFileButton = NSButton; 
+                selectNominalFileButton = NSButton; 
+                setMuxEfficiencyButton = NSButton; 
+                shaperAllToNominalButton = NSButton; 
+                shaperCheckView = BiStateView; 
+                shaperGainsToNominalButton = NSButton; 
+                shaperThresholdsToNominalButton = NSButton; 
+                specialLockButton = NSButton; 
+                standAloneButton = NSButton; 
+                tabView = NSTabView; 
+                triggerCheckView = BiStateView; 
+                tubeInfoView = NSTextView; 
+                tubeMapLockButton = NSButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = NcdDetector; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {rateColorBar = ORColorBar; view = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                setLogScale = id; 
+                shiftLeft = id; 
+                shiftRight = id; 
+                zoomIn = id; 
+                zoomOut = id; 
+            }; 
+            CLASS = ORAxis; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = ORBit3Factory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
+        {
+            CLASS = ORColorScale; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {colorAxis = ORAxis; scale = ORAxis; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = ORGenericView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {dataSource = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {CLASS = SourceMask; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

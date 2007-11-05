@@ -1,0 +1,78 @@
+{
+    IBClasses = (
+        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                busyEndDelayTextFieldAction = id; 
+                controlRegMatrixAction = id; 
+                controlRegOpModePopupAction = id; 
+                dacValueTextFieldAction = id; 
+                eventTimeoutTextFieldAction = id; 
+                extRenInputSigSelPopupAction = id; 
+                feraClrWidthTextFieldAction = id; 
+                gateTimeOutTextFieldAction = id; 
+                histoBlockSizeTextFieldAction = id; 
+                histogramControlPopupAction = id; 
+                histogramMaskTextFieldAction = id; 
+                ledAssigmentPopupAction = id; 
+                multiHistogramTextFieldAction = id; 
+                outputSelectionPopupAction = id; 
+                pingPongTextFieldAction = id; 
+                readButtonAction = id; 
+                reqDelayTextFieldAction = id; 
+                settingLockAction = id; 
+                testGateWidthTextFieldAction = id; 
+                vsnTextFieldAction = id; 
+                writeButtonAction = id; 
+            }; 
+            CLASS = ORCMC203Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                busyEndDelayTextField = NSTextField; 
+                controlRegMatrix = NSMatrix; 
+                controlRegOpModePopup = NSPopUpButton; 
+                dacValueTextField = NSTextField; 
+                eventTimeoutTextField = NSTextField; 
+                extRenInputSigSelPopup = NSPopUpButton; 
+                feraClrWidthTextField = NSTextField; 
+                gateTimeOutTextField = NSTextField; 
+                histoBlockSizeTextField = NSTextField; 
+                histogramControlPopup = NSPopUpButton; 
+                histogramMaskTextField = NSTextField; 
+                ledAssigmentPopup = NSPopUpButton; 
+                multiHistogramTextField = NSTextField; 
+                pingPongTextField = NSTextField; 
+                qOutputSelectionPopup = NSPopUpButton; 
+                readButton = NSButton; 
+                reqDelayTextField = NSTextField; 
+                rqoOutputSelectionPopup = NSPopUpButton; 
+                sOutputSelectionPopup = NSPopUpButton; 
+                settingLockButton = NSButton; 
+                testGateWidthTextField = NSTextField; 
+                vsnTextField = NSTextField; 
+                writeButton = NSButton; 
+                wsoOutputSelectionPopup = NSPopUpButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
