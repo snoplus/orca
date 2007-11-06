@@ -141,7 +141,7 @@
 	}
 }
 
-- (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
+- (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
 	return [groupView validateMenuItem:menuItem];
 }

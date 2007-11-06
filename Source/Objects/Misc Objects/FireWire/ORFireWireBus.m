@@ -116,11 +116,11 @@
     // Clean up
 	if ( enumerator ) {
         IOObjectRelease( enumerator );
-        enumerator = nil;
+        enumerator = 0;
     }
     if ( masterDevicePort ) {
         mach_port_deallocate( mach_task_self(), masterDevicePort );
-        masterDevicePort = nil;
+        masterDevicePort = 0;
     }
 }
 

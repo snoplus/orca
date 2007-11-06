@@ -925,7 +925,8 @@
     if(returnCode){
        [model setLastStackFilePath:[sheet filename]];
 	   NSString* theContents = [[model customStack] componentsJoinedByString:@"\n"];
-	   [theContents writeToFile:[sheet filename] atomically:YES];
+	   [theContents writeToFile:[sheet filename] atomically:YES encoding:NSASCIIStringEncoding error:nil];
+
     }
 }
 

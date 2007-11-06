@@ -286,7 +286,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscSendTextMessage: (NSString*) aMsg
 {
-    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"MESSAGE '%s'", [ aMsg cString ]]];
+    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"MESSAGE '%s'", [ aMsg cStringUsingEncoding:NSASCIIStringEncoding ]]];
 }
 
 //--------------------------------------------------------------------------------
@@ -655,7 +655,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 		NSArray* waveformValues = [ waveformParams componentsSeparatedByString: @"," ];
 				
 		recordLengthStr = [ waveformValues objectAtIndex: 3 ];		
-		strcpy( &mReturnData[ 0 ], [ recordLengthStr cString ] );
+		strcpy( &mReturnData[ 0 ], [ recordLengthStr cStringUsingEncoding:NSASCIIStringEncoding ] );
 
 		[ self setWaveformLength: [ self convertStringToLong: mReturnData withLength: returnLength ]];;
 	}
@@ -757,23 +757,23 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	switch ( [ self triggerCoupling ] )
 	{
 		case kTriggerAC:
-                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING AC", [ source cString ]]];
+                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING AC", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]];
                 break;
                 
 		case kTriggerDC:
-                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING DC", [ source cString ]]];
+                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING DC", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]];
                 break;
                 
 		case kTriggerHFRej:
-                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING HFREJ", [ source cString ]]];
+                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING HFREJ", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]];
                 break;
                 
 		case kTriggerLFRej:
-                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING LFREJ", [ source cString ]]];
+                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING LFREJ", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]];
                 break;
                                 
 		default:
-                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING AC", [ source cString ]]];
+                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_COUPLING AC", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]];
                 break;	
 	}
 	
@@ -794,7 +794,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	NSString* source = [ self triggerSourceAsString ];
 
 // Get trigger level.
-	returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_LEVEL?", [ source cString ]]
+	returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_LEVEL?", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
 	
@@ -818,7 +818,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	
 // Set the trigger level.
 	[ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_LEVEL %e", 
-	                                                       [ source cString ],
+	                                                       [ source cStringUsingEncoding:NSASCIIStringEncoding ],
 														   [ self triggerLevel ]]];	
 }
 
@@ -953,7 +953,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	NSString* source = [ self triggerSourceAsString ];
 	
 // Get trigger slope.
-	returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_SLOPE?", [ source cString ]]
+	returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_SLOPE?", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
                                     
@@ -987,10 +987,10 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 	
 // Set the trigger polarity
     if ( [ self triggerSlopeIsPos ] ){
-        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_SLOPE POS", [ source cString ]]];
+        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_SLOPE POS", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]];
     }
     else{
-        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_SLOPE NEG", [ source cString ]]];
+        [ self writeToGPIBDevice: [ NSString stringWithFormat: @"%s:TRIG_SLOPE NEG", [ source cStringUsingEncoding:NSASCIIStringEncoding ]]];
     }
 }
 

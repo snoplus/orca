@@ -246,7 +246,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 - (unsigned long) timeMeasured:(int)index
 {
 	if(index>=0 && index<8)return timeMeasured[index];
-	else return nil;
+	else return 0;
 }
 
 - (void) setTemp:(int)index value:(float)aValue;

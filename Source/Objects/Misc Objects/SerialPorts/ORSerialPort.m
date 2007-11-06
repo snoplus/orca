@@ -43,7 +43,7 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 - (id)init:(NSString*) path withName:(NSString*) name
 {
 	[super init];
-	bsdPath = malloc([path cStringLength]);
+	bsdPath = malloc([path length]);
 	strcpy(bsdPath, [path cStringUsingEncoding:NSASCIIStringEncoding]);
 	serviceName = [name retain];
 	optionsDictionary = [[NSMutableDictionary dictionaryWithCapacity:8] retain];

@@ -507,7 +507,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         if ( mMonitorWrite )
         {
             NSMutableDictionary* userInfo = [ NSMutableDictionary dictionary ];
-            [ userInfo setObject: [ NSString stringWithFormat: @"Write - Address: %d Comm: %s\n", aPrimaryAddress, [ aCommand cString ]] 
+            [ userInfo setObject: [ NSString stringWithFormat: @"Write - Address: %d Comm: %s\n", aPrimaryAddress, [ aCommand cStringUsingEncoding:NSASCIIStringEncoding ]] 
                           forKey: ORGpibMonitor ]; 
             
             [[ NSNotificationCenter defaultCenter ]
@@ -519,7 +519,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         //	printf( "Command %s\n", [ aCommand cString ] );
         
         // Write to device.
-        ibwrt( mDeviceUnit[ aPrimaryAddress ], (char *)[ aCommand cString ], [ aCommand length ] );
+        ibwrt( mDeviceUnit[ aPrimaryAddress ], (char *)[ aCommand cStringUsingEncoding:NSASCIIStringEncoding ], [ aCommand length ] );
         if ( ibsta & ERR ) {
             [ mErrorMsg setString:  @"***Error: ibwrt" ];
             [ self GpibError: mErrorMsg ]; 

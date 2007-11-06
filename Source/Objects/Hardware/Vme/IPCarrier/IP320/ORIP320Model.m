@@ -212,7 +212,7 @@ static struct {
 								usingAddSpace:kAccessRemoteIO];
 			
 			//the value needs to be shifted by 3 bits after the read. That's how is comes off the card....
-			if([[chanObjs objectAtIndex:aChannel] setValue:(value>>3) & 0x0fff])changeCount++;
+			if([[chanObjs objectAtIndex:aChannel] setChannelValue:(value>>3) & 0x0fff])changeCount++;
 			
 		NS_HANDLER
 			NSLogError(@"",[NSString stringWithFormat:@"IP320 %d,%@",[self slot],[self identifier]],errorLocation,nil);

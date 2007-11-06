@@ -76,7 +76,7 @@
 #if ORSerialDebug
     NSLog(@"writeString\n");
 #endif
-    return write(fileDescriptor, [string cStringUsingEncoding:NSASCIIStringEncoding], [string cStringLength]);
+    return write(fileDescriptor, [string cStringUsingEncoding:NSASCIIStringEncoding], [string length]);
 }
 
 - (int)checkRead

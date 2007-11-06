@@ -271,8 +271,8 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     [ dateString replaceCharactersInRange: NSMakeRange( 7, 1 ) withString: @"-"];
     
 // Set date and time
-    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"TIME \"%s\"", [ timeString cString ]]];
-    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"DATE \"%s\"", [ dateString cString ]]];    
+    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"TIME \"%s\"", [ timeString cStringUsingEncoding:NSASCIIStringEncoding ]]];
+    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"DATE \"%s\"", [ dateString cStringUsingEncoding:NSASCIIStringEncoding ]]];    
 }
 
 //--------------------------------------------------------------------------------
@@ -307,7 +307,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscSendTextMessage: (NSString*) aMsg
 {
-    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"MESSAGE:SHOW '%s'", [ aMsg cString ]]];
+    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"MESSAGE:SHOW '%s'", [ aMsg cStringUsingEncoding:NSASCIIStringEncoding ]]];
 }
 
 

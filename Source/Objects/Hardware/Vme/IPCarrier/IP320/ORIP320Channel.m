@@ -217,7 +217,7 @@
 	}
 }
 
-- (BOOL) setValue:(int)aValue
+- (BOOL) setChannelValue:(int)aValue
 {    
 	BOOL changed = NO;
 	@synchronized(self){

@@ -55,7 +55,7 @@
 - (int)  gain;
 - (int)  channel;
 - (BOOL) readEnabled;
-- (BOOL) setValue:(int)aValue;
+- (BOOL) setChannelValue:(int)aValue;
 - (void) checkDefaults;
 - (double) maxValue;
 @end

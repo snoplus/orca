@@ -75,7 +75,7 @@
 // Convenience constructor
 + (id)sourceMaskWithTitle:(NSString *)aTitle andValue:(unsigned long)aValue
 {
-    id newSourceMask = [[[self alloc] init] autorelease];
+    SourceMask* newSourceMask = [[[self alloc] init] autorelease];
     [newSourceMask setTitle:aTitle];
     [newSourceMask setValue:aValue];
     

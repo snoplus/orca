@@ -243,7 +243,7 @@ NSString* ORBocTIC3Lock = @"ORBocTIC3Lock";
 - (unsigned long) timeMeasured:(int)index
 {
 	if(index>=0 && index<3)return timeMeasured[index];
-	else return nil;
+	else return 0;
 }
 
 - (void) setPressure:(int)index value:(float)aValue;
