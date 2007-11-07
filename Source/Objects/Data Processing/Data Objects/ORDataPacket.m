@@ -27,7 +27,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORGateGroup.h"
 
-#define kDataVersion 2
+#define kDataVersion 3
 #define kMinSize 4096*2
 #define kMinCapacity 4096
 
