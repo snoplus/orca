@@ -23,30 +23,6 @@
 #import "ORGpibDeviceModel.h"
 #import "ORDataTaker.h"
 
-enum {
-    kSquareWave1,
-    kSingleSinWave1,
-	kSingleSinWave2,
-    kSquareWave2,
-    kDoubleSinWave,
-    kLogCalibrationWaveform,
-	kLogCalibWave2,
-	kLogCalibWave4,
-	kDoubleLogamp,
-	kTripleLogamp,
-	kLogCalibWaveAdjust,
-	kGaussian,
-	kPinDiode,
-    kWaveformFromFile,
-    kNumWaveforms   //must be last
-};
-
-enum {
-    kInternalTrigger,
-    kExternalTrigger,
-    kSoftwareTrigger
-};
-
 // Structure used to describe characteristics of hardware register.
 typedef struct HPPulserCustomWaveformStruct {
 	NSString*       waveformName;
@@ -54,12 +30,10 @@ typedef struct HPPulserCustomWaveformStruct {
 	bool			tryToStore;
 } HPPulserCustomWaveformStruct; 
 
-#define kNumBuiltInTypes        6
 #define kCalibrationWidth 	7.8  //can't set exactly to 8 because of a bug in the HP pulser
 #define kCalibrationVoltage 	750
 #define kCalibrationBurstRate 	3.0 
 
-#define kMaxNumWaveformPoints 16000
 #define kPadSize 100
 
 @class ORDataPacket;
@@ -82,6 +56,38 @@ typedef struct HPPulserCustomWaveformStruct {
 	int				savedTriggerSource;
     BOOL			lockGUI;
     BOOL			negativePulse;
+	
+	enum {
+    kSquareWave1,
+    kSingleSinWave1,
+	kSingleSinWave2,
+    kSquareWave2,
+    kDoubleSinWave,
+    kLogCalibrationWaveform,
+	kLogCalibWave2,
+	kLogCalibWave4,
+	kDoubleLogamp,
+	kTripleLogamp,
+	kLogCalibWaveAdjust,
+	kGaussian,
+	kPinDiode,
+    kWaveformFromFile,
+    kNumWaveforms   //must be last
+    } volatileWaveformConsts;
+	
+	enum {
+	kNumBuiltInTypes = 6
+	} numBuiltInTypes;
+	
+	enum {
+	kMaxNumWaveformPoints = 16000
+	} maxNumWaveformPoints;
+    
+	enum {
+    kInternalTrigger,
+    kExternalTrigger,
+    kSoftwareTrigger 
+    } triggerTypes;
 }
 
 #pragma mark ***Initialization
@@ -146,7 +152,7 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void) writeTriggerSource:(short)value;
 - (void) downloadWaveform;
 - (void) downloadWaveformWorker;
- - (void) copyWaveformWorker;
+- (void) copyWaveformWorker;
 - (void) outputWaveformParams;
 
 #pragma mark •••NonVolatile Memory Management

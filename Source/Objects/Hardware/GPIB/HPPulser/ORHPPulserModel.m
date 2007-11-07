@@ -576,13 +576,13 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
 - (void) writeTriggerSource:(short)value
 {
     switch(value){
-        case 0:
+        case kInternalTrigger:
             [self writeToGPIBDevice:@"TRIG:SOUR IMM"];
             break;
-        case 1:
+        case kExternalTrigger:
             [self writeToGPIBDevice:@"TRIG:SOUR EXT"];
             break;
-        case 2:
+        case kSoftwareTrigger:
             [self writeToGPIBDevice:@"TRIG:SOUR BUS"];
             break;
         default:
