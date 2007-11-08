@@ -33,6 +33,7 @@
 
 void SwapLongBlock(void* p, long n);
 void SwapShortBlock(void* p, long n);
+int writeBuffer(SBC_Packet* aPacket);
 
 
 extern char needToSwap;
