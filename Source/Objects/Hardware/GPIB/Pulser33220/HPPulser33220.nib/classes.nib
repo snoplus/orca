@@ -44,6 +44,7 @@
                 setBurstRateAction = id; 
                 setTotalWidthAction = id; 
                 setVoltageAction = id; 
+                setVoltageOffsetAction = id; 
                 testAction = id; 
                 triggerAction = id; 
                 triggerModeAction = id; 
@@ -82,6 +83,9 @@
                 triggerModeMatrix = NSMatrix; 
                 voltageDisplay = NSTextField; 
                 voltageField = NSTextField; 
+                voltageOffsetDisplay = NSTextField; 
+                voltageOffsetField = NSTextField; 
+                voltageOffsetStepper = NSStepper; 
                 voltageStepper = NSStepper; 
                 xScale = ORAxis; 
                 yScale = ORAxis; 

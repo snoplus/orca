@@ -43,6 +43,8 @@
 NSString* ORHPPulserModelNegativePulseChanged = @"ORHPPulserModelNegativePulseChanged";
 NSString* ORHPPulserModelLockGUIChanged = @"ORHPPulserModelLockGUIChanged";
 NSString* ORHPPulserVoltageChangedNotification		= @"HP Pulser Voltage Changed";
+NSString* ORHPPulserVoltageOffsetChangedNotification		= @"HP Pulser Voltage Offset Changed";
+NSString* ORHPPulserFrequencyChangedNotification		= @"HP Pulser Frequency Changed";
 NSString* ORHPPulserBurstRateChangedNotification	= @"HP Pulser Burst Rate Changed";
 NSString* ORHPPulserTotalWidthChangedNotification       = @"HP Pulser Total Width Changed";
 NSString* ORHPPulserSelectedWaveformChangedNotification = @"HP Pulser Selected Waveform";
@@ -58,6 +60,11 @@ NSString* ORHPPulserMaxTimeChangedNotification		= @"ORHPPulserMaxTimeChangedNoti
 NSString* ORHPPulserRandomCountChangedNotification	= @"ORHPPulserRandomCountChangedNotification";
 
 static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
+    { @"Sinc Wave",         @"SINC",      NO },
+	{ @"Negative Ramp",     @"NEG_RAMP",  NO },
+	{ @"Exponential Rise",  @"EXP_RISE",  NO },
+	{ @"Exponential Fall",  @"EXP_FALL",  NO },
+	{ @"Cardiac Wave",      @"CARDIAC",   NO },
     { @"Square Wave 1",     @"",          NO },
     { @"Single Sin 1",      @"SGLSIN",    YES },
     { @"Single Sin 2",      @"SGLSI2",    YES },
@@ -73,9 +80,6 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     { @"From File",         @"",          NO },
 };
 
-NSString* builtInWaveform[kNumBuiltInTypes] = {
-    @"SINC",@"NEG_RAMP",@"EXP_RISE",@"EXP_FALL",@"CARDIAC",@"VOLATILE"
-};
 
 @interface ORHPPulserModel (private)
 - (void) firePulserRandom;
@@ -101,6 +105,8 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
     [self setVoltage:kLogAmpVoltage];
     [self setBurstRate:kLogAmpBurstRate];
     [self setTotalWidth:kLogAmpPulseWidth];
+	[self setVoltageOffset:0];
+	[self setFrequency:1000.0];
     
     [[self undoManager] enableUndoRegistration];
     
@@ -288,6 +294,22 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
                           object: self ];
 }
 
+- (float) frequency
+{
+    return frequency;	
+}
+
+- (void) setFrequency:(float)newFrequency
+{
+    [[[self undoManager] prepareWithInvocationTarget: self]
+    setFrequency: [self frequency]];
+    frequency = newFrequency;
+    
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName: ORHPPulserFrequencyChangedNotification
+                      object: self];
+}
+
 - (float)	voltage
 {
     return voltage;
@@ -303,6 +325,23 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
         postNotificationName: ORHPPulserVoltageChangedNotification
                       object: self];
 }
+
+- (float)	voltageOffset
+{
+    return voltageOffset;
+}
+
+- (void) setVoltageOffset:(float)newVoltageOffset
+{
+    [[[self undoManager] prepareWithInvocationTarget: self]
+    setVoltageOffset: [self voltageOffset]];
+    voltageOffset = newVoltageOffset;
+    
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName: ORHPPulserVoltageOffsetChangedNotification
+                      object: self];
+}
+
 
 - (float) burstRate
 {
@@ -548,6 +587,20 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
     NSLog(@"HP Pulser Voltage PP set to %dE-3\n",value);
 }
 
+- (void) writeVoltageOffset:(short)value
+{
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"VOLT:OFFS %dE-3",value]];
+	[self logSystemResponse];
+	NSLog(@"HP Pulser Voltage Offset set to %dE-3\n",value);
+}
+
+- (void) writeFrequency:(float)value
+{
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"FREQ %.2f",value]];
+	[self logSystemResponse];
+	NSLog(@"HP Pulser Frequency set to %.2f\n",value);
+}
+
 - (void) writeBurstRate:(float)value
 {
     [self writeBurstCount:kNumBurstPerCycles];
@@ -573,7 +626,7 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
     else NSLog(@"ORHPPulser:writeBurstCount -  value = %d, is out of range",value);
 }
 
-- (void) writeTriggerSource:(short)value
+- (void) writeTriggerSource:(int)value
 {
     switch(value){
         case kInternalTrigger:
@@ -640,6 +693,7 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
 
 - (BOOL) isWaveformInNonVolatileMemory
 {
+	if ([self inBuiltInList:waveformData[selectedWaveform].storageName]) return YES;
     BOOL result = NO;
     NS_DURING
         NSArray* allInMemory = [self getLoadedWaveforms];
@@ -702,7 +756,7 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
 {
     int i;
     for(i=0;i<kNumBuiltInTypes;i++){
-        if([builtInWaveform[i] isEqualToString:aName]){
+        if([waveformData[i].storageName isEqualToString:aName]){
             return YES;
         }
     }
@@ -822,6 +876,12 @@ NSString* builtInWaveform[kNumBuiltInTypes] = {
 			[self logSystemResponse];
             [self writeVoltage:[self voltage]];
 			[self logSystemResponse];
+			[self writeVoltageOffset:[self voltageOffset]];
+			[self logSystemResponse];
+			if (selectedWaveform <= kNumBuiltInTypes) {
+			    [self writeFrequency:[self frequency]];
+			    [self logSystemResponse];
+			}
             [self writeBurstRate:[self burstRate]];
 			[self logSystemResponse];
         }

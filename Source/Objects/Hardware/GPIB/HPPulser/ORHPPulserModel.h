@@ -43,7 +43,11 @@ typedef struct HPPulserCustomWaveformStruct {
 	float           voltage;
 	float           burstRate;
 	float           totalWidth;
+	float           frequency;
+	float           voltageOffset;
 	int             selectedWaveform;
+	int             burstPhase;
+	int             burstNCycles;
 	NSString*       fileName;
 	int             downloadIndex;
 	BOOL            loading;
@@ -58,6 +62,11 @@ typedef struct HPPulserCustomWaveformStruct {
     BOOL			negativePulse;
 	
 	enum {
+	kBuiltInSinc,
+	kBuiltInNegRamp,
+	kBuiltInExpRise,
+	kBuiltInExpFall,
+	kBuiltInCardiac,
     kSquareWave1,
     kSingleSinWave1,
 	kSingleSinWave2,
@@ -73,11 +82,28 @@ typedef struct HPPulserCustomWaveformStruct {
 	kPinDiode,
     kWaveformFromFile,
     kNumWaveforms   //must be last
-    } volatileWaveformConsts;
+    } userWaveformConsts;
 	
 	enum {
-	kNumBuiltInTypes = 6
+	kNumBuiltInTypes = 5
 	} numBuiltInTypes;
+	
+	enum {
+	kVPP,
+	kVRMS,
+	kDBM,
+	kDEF
+	} voltageTypes;
+	
+	enum {
+	kSine,
+	kSquare,
+	kTriangle,
+	kRamp,
+	kNoise,
+	kDC,
+	kUser
+	} builtInFunctions;
 	
 	enum {
 	kMaxNumWaveformPoints = 16000
@@ -114,8 +140,12 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void)  setSelectedWaveform:(int)newSelectedWaveform;
 - (NSMutableData*) waveform;
 - (void)  setWaveform:(NSMutableData* )newWaveform;
+- (float) frequency;
+- (void)  setFrequency:(float)newFrequency;
 - (float) voltage;
-- (void)  setVoltage:(float)aValue;
+- (void)  setVoltage:(float)newVoltage;
+- (float) voltageOffset;
+- (void)  setVoltageOffset:(float)newVoltageOffset;
 - (float) burstRate;
 - (void)  setBurstRate:(float)aValue;
 - (float) totalWidth;
@@ -145,11 +175,13 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void) systemTest;
 - (void) logSystemResponse;
 - (void) writeVoltage:(unsigned short)value;
+- (void) writeVoltageOffset:(short)value;
+- (void) writeFrequency:(float)value;
 - (void) writeBurstRate:(float)rate;
 - (void) writeTotalWidth:(float)width;
 - (void) writeBurstMode:(BOOL)value;
 - (void) writeBurstCount:(int)value;
-- (void) writeTriggerSource:(short)value;
+- (void) writeTriggerSource:(int)value;
 - (void) downloadWaveform;
 - (void) downloadWaveformWorker;
 - (void) copyWaveformWorker;
@@ -193,6 +225,8 @@ typedef struct HPPulserCustomWaveformStruct {
 extern NSString* ORHPPulserModelNegativePulseChanged;
 extern NSString* ORHPPulserModelLockGUIChanged;
 extern NSString* ORHPPulserVoltageChangedNotification;
+extern NSString* ORHPPulserVoltageOffsetChangedNotification;
+extern NSString* ORHPPulserFrequencyChangedNotification;
 extern NSString* ORHPPulserBurstRateChangedNotification;
 extern NSString* ORHPPulserTotalWidthChangedNotification;
 extern NSString* ORHPPulserSelectedWaveformChangedNotification;

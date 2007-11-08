@@ -35,6 +35,8 @@
     IBOutlet NSPopUpButton*     selectionPopUpButton;	
     IBOutlet NSTextField* 	voltageField;
     IBOutlet NSStepper* 	voltageStepper;
+	IBOutlet NSTextField* 	voltageOffsetField;
+    IBOutlet NSStepper* 	voltageOffsetStepper;
     IBOutlet NSTextField* 	burstRateField;
     IBOutlet NSStepper* 	burstRateStepper;
     IBOutlet NSTextField* 	totalWidthField;
@@ -51,6 +53,7 @@
 
 
     IBOutlet NSTextField* 	voltageDisplay;
+    IBOutlet NSTextField* 	voltageOffsetDisplay;	
     IBOutlet NSTextField* 	totalWidthDisplay;
     IBOutlet NSTextField* 	burstRateDisplay;
     IBOutlet NSButton*		loadParamsButton;	
@@ -82,6 +85,7 @@
 - (IBAction) selectWaveformAction:(id)sender; 
 - (IBAction) clearMemory:(id)sender;
 - (IBAction) setVoltageAction:(id)sender;
+- (IBAction) setVoltageOffsetAction:(id)sender;
 - (IBAction) setBurstRateAction:(id)sender;
 - (IBAction) setTotalWidthAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
@@ -108,6 +112,7 @@
 - (void) selectedWaveformChanged:(NSNotification*)aNotification;
 - (void) triggerModeChanged:(NSNotification*)aNotification;
 - (void) voltageChanged:(NSNotification*)aNotification;
+- (void) voltageOffsetChanged:(NSNotification*)aNotification;
 - (void) burstRateChanged:(NSNotification*)aNotification;
 - (void) totalWidthChanged:(NSNotification*)aNotification;
 - (void) loadConstantsChanged:(NSNotification*)aNotification;

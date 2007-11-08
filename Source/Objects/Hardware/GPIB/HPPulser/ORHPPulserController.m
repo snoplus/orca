@@ -59,6 +59,11 @@
                      selector : @selector(voltageChanged:)
                          name : ORHPPulserVoltageChangedNotification
                        object : model];
+					   
+	[notifyCenter addObserver : self
+                     selector : @selector(voltageOffsetChanged:)
+                         name : ORHPPulserVoltageOffsetChangedNotification
+                       object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(burstRateChanged:)
@@ -79,6 +84,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(loadConstantsChanged:)
                          name : ORHPPulserVoltageChangedNotification
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(loadConstantsChanged:)
+                         name : ORHPPulserVoltageOffsetChangedNotification
                        object : model];
     
     [notifyCenter addObserver : self
@@ -173,6 +183,7 @@
     [ super updateWindow ];
     
     [self voltageChanged:nil];
+    [self voltageOffsetChanged:nil];
     [self burstRateChanged:nil];
     [self totalWidthChanged:nil];
     [self selectedWaveformChanged:nil];
@@ -425,6 +436,15 @@
 	
 }
 
+-(IBAction) setVoltageOffsetAction:(id)sender
+{
+    if([sender floatValue] != [model voltageOffset]){
+        [[self undoManager] setActionName: @"Set Voltage Offset"];
+        [model setVoltageOffset:[sender floatValue]];		
+    }
+	
+}
+
 -(IBAction) setBurstRateAction:(id)sender
 {
     if([sender floatValue] != [model burstRate]){
@@ -511,6 +531,12 @@
 	[voltageField setIntValue: [model voltage]];
 }
 
+- (void) voltageOffsetChanged:(NSNotification*)aNotification
+{
+	[self updateStepper:voltageOffsetStepper setting:[model voltageOffset]];
+	[voltageOffsetField setFloatValue: [model voltageOffset]];
+}
+
 - (void) burstRateChanged:(NSNotification*)aNotification
 {
 	[self updateStepper:burstRateStepper setting:[model burstRate]];
@@ -545,11 +571,13 @@
 {
 	if([model selectedWaveform] == kLogCalibrationWaveform){
 		[voltageDisplay setFloatValue:kCalibrationVoltage];
+		[voltageOffsetDisplay setFloatValue:0.0];
 		[totalWidthDisplay setFloatValue:kCalibrationWidth];
 		[burstRateDisplay setFloatValue:kCalibrationBurstRate];
 	}
 	else {
 		[voltageDisplay setFloatValue:[model voltage]];
+		[voltageOffsetDisplay setFloatValue:[model voltageOffset]];
 		[totalWidthDisplay setFloatValue:[model totalWidth]];
 		[burstRateDisplay setFloatValue:[model burstRate]];
 	}
@@ -664,6 +692,8 @@
     [selectionPopUpButton setEnabled:!loading && !locked];
     [voltageField setEnabled:!loading && !locked];
     [voltageStepper setEnabled:!loading && !locked];
+	[voltageOffsetField setEnabled:!loading && !locked];
+    [voltageOffsetStepper setEnabled:!loading && !locked];
     [burstRateField setEnabled:!loading && !locked];
     [burstRateStepper setEnabled:!loading && !locked];
     [totalWidthField setEnabled:!loading && !locked];
