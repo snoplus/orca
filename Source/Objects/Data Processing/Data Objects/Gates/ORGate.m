@@ -228,8 +228,8 @@ NSString* ORGateTwoDChangedNotification = @"ORGateTwoDChangedNotification";
     if(!twoD){
         if([gateKey dataOpensGate:someData]){
             gateOpen = YES;
-            [gatedValue processData:someData intoDataSet:aDataSet];
         }
+		[gatedValue processData:someData intoDataSet:aDataSet];
     }
     else {
         if(!ignoreKey){

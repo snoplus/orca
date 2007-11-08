@@ -1133,6 +1133,15 @@
 		84978B4D0702190100B7887E /* ORDataTypeAssigner.m in Sources */ = {isa = PBXBuildFile; fileRef = 84978B4B0702190100B7887E /* ORDataTypeAssigner.m */; };
 		8498069D09A6584200086E71 /* ORSocketThreadedClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 8498069B09A6584200086E71 /* ORSocketThreadedClient.h */; };
 		8498069E09A6584200086E71 /* ORSocketThreadedClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8498069C09A6584200086E71 /* ORSocketThreadedClient.m */; };
+		84997E850CE37CBA002CFA70 /* ORVme64CrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */; };
+		84997E860CE37CBA002CFA70 /* ORVme64CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */; };
+		84997E870CE37CBA002CFA70 /* ORVme64CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */; };
+		84997E880CE37CBA002CFA70 /* ORVme64CrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7F0CE37CBA002CFA70 /* ORVme64CrateView.h */; };
+		84997E890CE37CBA002CFA70 /* ORVme64CrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997E800CE37CBA002CFA70 /* ORVme64CrateView.m */; };
+		84997E8A0CE37CBA002CFA70 /* ORVmeCrate64Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997E810CE37CBA002CFA70 /* ORVmeCrate64Controller.m */; };
+		84997E8B0CE37CBA002CFA70 /* Vme64Crate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84997E820CE37CBA002CFA70 /* Vme64Crate.gif */; };
+		84997E8C0CE37CBA002CFA70 /* Vme64Crate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84997E830CE37CBA002CFA70 /* Vme64Crate.nib */; };
+		84997E8D0CE37CBA002CFA70 /* Vme64CrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84997E840CE37CBA002CFA70 /* Vme64CrateSmall.gif */; };
 		849B25EC0B2F34F90007484F /* Prespectrometer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849B25E40B2F34F90007484F /* Prespectrometer.nib */; };
 		849B25ED0B2F34FA0007484F /* prespectrometer.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849B25E50B2F34F90007484F /* prespectrometer.tif */; };
 		849B25EE0B2F34FA0007484F /* PrespectrometerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B25E60B2F34F90007484F /* PrespectrometerController.h */; };
@@ -2033,7 +2042,7 @@
 		8434150B08EE0378009B7659 /* ORCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCrateController.h; sourceTree = "<group>"; };
 		8434150C08EE0378009B7659 /* ORCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCrateController.m; sourceTree = "<group>"; };
 		8434A363055B3288002D3102 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8434A364055B3288002D3102 /* Orca.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Orca.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8434A364055B3288002D3102 /* Orca.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orca.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8434A3E4055C223A002D3102 /* ORCommandClient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCommandClient.m; path = "Source/Main Dialogs/CommandCenter/ORCommandClient.m"; sourceTree = SOURCE_ROOT; };
 		8434A3E5055C223A002D3102 /* ORCommandClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCommandClient.h; path = "Source/Main Dialogs/CommandCenter/ORCommandClient.h"; sourceTree = SOURCE_ROOT; };
 		8434F87305B4637600E03AAE /* ORSafeQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSafeQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORSafeQueue.h"; sourceTree = SOURCE_ROOT; };
@@ -2524,6 +2533,15 @@
 		8499148804BB3E05005F64B1 /* ORDispatcherController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDispatcherController.m; sourceTree = "<group>"; };
 		8499148B04BB3E05005F64B1 /* ORDispatcherModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDispatcherModel.h; sourceTree = "<group>"; };
 		8499148C04BB3E05005F64B1 /* ORDispatcherModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDispatcherModel.m; sourceTree = "<group>"; };
+		84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateController.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateController.h; sourceTree = SOURCE_ROOT; };
+		84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateModel.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateModel.h; sourceTree = SOURCE_ROOT; };
+		84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVme64CrateModel.m; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateModel.m; sourceTree = SOURCE_ROOT; };
+		84997E7F0CE37CBA002CFA70 /* ORVme64CrateView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateView.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateView.h; sourceTree = SOURCE_ROOT; };
+		84997E800CE37CBA002CFA70 /* ORVme64CrateView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVme64CrateView.m; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateView.m; sourceTree = SOURCE_ROOT; };
+		84997E810CE37CBA002CFA70 /* ORVmeCrate64Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVmeCrate64Controller.m; path = Source/Objects/Hardware/Vme/VME64Crate/ORVmeCrate64Controller.m; sourceTree = SOURCE_ROOT; };
+		84997E820CE37CBA002CFA70 /* Vme64Crate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Vme64Crate.gif; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64Crate.gif; sourceTree = SOURCE_ROOT; };
+		84997E830CE37CBA002CFA70 /* Vme64Crate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Vme64Crate.nib; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64Crate.nib; sourceTree = SOURCE_ROOT; };
+		84997E840CE37CBA002CFA70 /* Vme64CrateSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Vme64CrateSmall.gif; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64CrateSmall.gif; sourceTree = SOURCE_ROOT; };
 		849B25E40B2F34F90007484F /* Prespectrometer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Prespectrometer.nib; path = Source/Experiments/Prespectrometer/Prespectrometer.nib; sourceTree = SOURCE_ROOT; };
 		849B25E50B2F34F90007484F /* prespectrometer.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = prespectrometer.tif; path = Source/Experiments/Prespectrometer/prespectrometer.tif; sourceTree = SOURCE_ROOT; };
 		849B25E60B2F34F90007484F /* PrespectrometerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrespectrometerController.h; path = Source/Experiments/Prespectrometer/PrespectrometerController.h; sourceTree = SOURCE_ROOT; };
@@ -5413,6 +5431,23 @@
 			path = "Source/Objects/Data Processing/Dispatcher";
 			sourceTree = SOURCE_ROOT;
 		};
+		84997E7B0CE37CBA002CFA70 /* VME64Crate */ = {
+			isa = PBXGroup;
+			children = (
+				84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */,
+				84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */,
+				84997E7F0CE37CBA002CFA70 /* ORVme64CrateView.h */,
+				84997E800CE37CBA002CFA70 /* ORVme64CrateView.m */,
+				84997E810CE37CBA002CFA70 /* ORVmeCrate64Controller.m */,
+				84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */,
+				84997E820CE37CBA002CFA70 /* Vme64Crate.gif */,
+				84997E840CE37CBA002CFA70 /* Vme64CrateSmall.gif */,
+				84997E830CE37CBA002CFA70 /* Vme64Crate.nib */,
+			);
+			name = VME64Crate;
+			path = Source/Objects/Hardware/Vme/VME64Crate;
+			sourceTree = SOURCE_ROOT;
+		};
 		849B25E30B2F34F90007484F /* Prespectrometer */ = {
 			isa = PBXGroup;
 			children = (
@@ -6923,6 +6958,7 @@
 				8402796907397B8700972B07 /* Bit3 Adaptor */,
 				F5B1801F03B297FC015F64B1 /* CAEN */,
 				F51E69BE03AE4776015F64B1 /* Crate */,
+				84997E7B0CE37CBA002CFA70 /* VME64Crate */,
 				F576B07D03B12320015F64B1 /* Shaper */,
 				84B60905043134C6005F64B1 /* eCPU */,
 				843A54CD07BBE7A500534C27 /* 4ChanTrigger */,
@@ -7664,6 +7700,9 @@
 				84CEDD1A0CDA7D9E002CFD3A /* ORGretina4Decoders.h in Headers */,
 				84CEDD1C0CDA7D9E002CFD3A /* ORGretina4Model.h in Headers */,
 				84CEDD1F0CDA7DB7002CFD3A /* VME_HW_Definitions.h in Headers */,
+				84997E850CE37CBA002CFA70 /* ORVme64CrateController.h in Headers */,
+				84997E860CE37CBA002CFA70 /* ORVme64CrateModel.h in Headers */,
+				84997E880CE37CBA002CFA70 /* ORVme64CrateView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8134,6 +8173,9 @@
 				84E09A230CCD1AA400EFBC8F /* inc.tif in Resources */,
 				84CEDD160CDA7D9E002CFD3A /* Gretina4.nib in Resources */,
 				84CEDD170CDA7D9E002CFD3A /* Gretina4Card.gif in Resources */,
+				84997E8B0CE37CBA002CFA70 /* Vme64Crate.gif in Resources */,
+				84997E8C0CE37CBA002CFA70 /* Vme64Crate.nib in Resources */,
+				84997E8D0CE37CBA002CFA70 /* Vme64CrateSmall.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8696,6 +8738,9 @@
 				84CEDD190CDA7D9E002CFD3A /* ORGretina4Controller.m in Sources */,
 				84CEDD1B0CDA7D9E002CFD3A /* ORGretina4Decoders.m in Sources */,
 				84CEDD1D0CDA7D9E002CFD3A /* ORGretina4Model.m in Sources */,
+				84997E870CE37CBA002CFA70 /* ORVme64CrateModel.m in Sources */,
+				84997E890CE37CBA002CFA70 /* ORVme64CrateView.m in Sources */,
+				84997E8A0CE37CBA002CFA70 /* ORVmeCrate64Controller.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
