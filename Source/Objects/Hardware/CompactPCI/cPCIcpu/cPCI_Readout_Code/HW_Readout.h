@@ -30,7 +30,5 @@ void FindHardware(void);
 void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket);
 void doReadBlock(SBC_Packet* aPacket);
-long readAddress(long address);
-void writeAddress(long address,long value);
 
 #endif

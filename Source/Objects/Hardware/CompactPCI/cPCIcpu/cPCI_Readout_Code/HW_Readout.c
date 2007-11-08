@@ -24,9 +24,26 @@
 #include <string.h>
 #include <sys/types.h>
 #include "SBC_Config.h"
+#include "SBC_Readout.h"
 #include "AcqirisDC440.h"
 
 extern char needToSwap;
+
+//--------------------------------------------------------
+//this stuff will be replaced with SBC HW access routines when we figure out how to do it.
+long testBuffer[] = {10,11,12,13,14,15};
+
+long readAddress(long address)
+{
+	if(address<6)return testBuffer[address];
+	else return 0;
+}
+
+void writeAddress(long address,long value)
+{
+	testBuffer[address] = value;
+}
+//--------------------------------------------------------
 
 void processHWCommand(SBC_Packet* aPacket)
 {
@@ -139,21 +156,5 @@ void doReadBlock(SBC_Packet* aPacket)
 	writeBuffer(aPacket);
 	
 }
-
-//--------------------------------------------------------
-//this stuff will be replaced with SBC HW access routines when we figure out how to do it.
-long testBuffer[] = {10,11,12,13,14,15};
-
-long readAddress(long address)
-{
-	if(address<6)return testBuffer[address];
-	else return 0;
-}
-
-void writeAddress(long address,long value)
-{
-	testBuffer[address] = value;
-}
-//--------------------------------------------------------
 
 
