@@ -28,7 +28,6 @@
 
 #define kMaxLengthOfReply		128
 #define kMaxLengthOfShortMessage	64
-#define kNumBurstPerCycles		1
 #define theMin				-1
 #define theMax				1
 
@@ -46,6 +45,8 @@ NSString* ORHPPulserVoltageChangedNotification		= @"HP Pulser Voltage Changed";
 NSString* ORHPPulserVoltageOffsetChangedNotification		= @"HP Pulser Voltage Offset Changed";
 NSString* ORHPPulserFrequencyChangedNotification		= @"HP Pulser Frequency Changed";
 NSString* ORHPPulserBurstRateChangedNotification	= @"HP Pulser Burst Rate Changed";
+NSString* ORHPPulserBurstPhaseChangedNotification	= @"HP Pulser Burst Phase Changed";
+NSString* ORHPPulserBurstCyclesChangedNotification	= @"HP Pulser Burst Cycles Changed";
 NSString* ORHPPulserTotalWidthChangedNotification       = @"HP Pulser Total Width Changed";
 NSString* ORHPPulserSelectedWaveformChangedNotification = @"HP Pulser Selected Waveform";
 NSString* ORHPPulserWaveformLoadStartedNotification     = @"HP Pulser Waveform Load Started";
@@ -105,8 +106,10 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     [self setVoltage:kLogAmpVoltage];
     [self setBurstRate:kLogAmpBurstRate];
     [self setTotalWidth:kLogAmpPulseWidth];
-	[self setVoltageOffset:0];
-	[self setFrequency:1000.0];
+    [self setVoltageOffset:0];
+    [self setFrequency:1000.0];
+    [self setBurstCycles:1];
+    [self setBurstPhase:0];
     
     [[self undoManager] enableUndoRegistration];
     
@@ -292,6 +295,38 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	[[NSNotificationCenter defaultCenter] 
 			postNotificationName:ORHPPulserRandomCountChangedNotification 
                           object: self ];
+}
+
+- (int) burstCycles
+{
+    return burstCycles;	
+}
+
+- (void) setBurstCycles:(int)newCycles
+{
+    [[[self undoManager] prepareWithInvocationTarget: self]
+    setBurstCycles: [self burstCycles]];
+    burstCycles = newCycles;
+    
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName: ORHPPulserBurstCyclesChangedNotification
+                      object: self];
+}
+
+- (int) burstPhase
+{
+    return burstPhase;	
+}
+
+- (void) setBurstPhase:(int)newPhase
+{
+    [[[self undoManager] prepareWithInvocationTarget: self]
+    setBurstPhase: [self burstPhase]];
+    burstPhase = newPhase;
+    
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName: ORHPPulserBurstPhaseChangedNotification
+                      object: self];
 }
 
 - (float) frequency
@@ -596,34 +631,38 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (void) writeFrequency:(float)value
 {
-    [self writeToGPIBDevice:[NSString stringWithFormat:@"FREQ %.2f",value]];
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"FREQ %E",value]];
 	[self logSystemResponse];
-	NSLog(@"HP Pulser Frequency set to %.2f\n",value);
+	NSLog(@"HP Pulser Frequency set to %E\n",value);
 }
 
 - (void) writeBurstRate:(float)value
 {
-    [self writeBurstCount:kNumBurstPerCycles];
-    [self logSystemResponse];
-    [self writeToGPIBDevice:[NSString stringWithFormat:@"BM:INT:RATE %.2f",value]];
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"BM:INT:RATE %f",value]];
     [self logSystemResponse];
     [self writeToGPIBDevice:@"BM:SOUR INT"];
-    [self logSystemResponse];
-    [self writeBurstMode:TRUE];
     [self logSystemResponse];
     NSLog(@"HP Pulser Burst Rate set to %f\n",value);
 }
 
-- (void) writeBurstMode:(BOOL)value
+- (void) writeBurstState:(BOOL)value
 {
     if(value) [self writeToGPIBDevice:@"BM:STAT ON"];
     else [self writeToGPIBDevice:@"BM:STAT OFF"];
 }
 
-- (void) writeBurstCount:(int)value
+- (void) writeBurstCycles:(int)value
 {
-    if(value >= 1 && value <= 50000) [self writeToGPIBDevice:[NSString stringWithFormat:@"BM:NCYC %d",value]];
-    else NSLog(@"ORHPPulser:writeBurstCount -  value = %d, is out of range",value);
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"BM:NCYC %d",value]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Burst Cycles set to %d\n",value);
+}
+
+- (void) writeBurstPhase:(int)value
+{
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"BM:PHAS %d",value]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Burst Phase set to %d\n",value);
 }
 
 - (void) writeTriggerSource:(int)value
@@ -865,29 +904,35 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     if([self isConnected]){
         if(selectedWaveform == kLogCalibrationWaveform){
             [self writeTotalWidth:kCalibrationWidth];
-			[self logSystemResponse];
+            [self logSystemResponse];
             [self writeVoltage:kCalibrationVoltage];
-			[self logSystemResponse];
+            [self logSystemResponse];
             [self writeBurstRate:kCalibrationBurstRate];
-			[self logSystemResponse];
+            [self logSystemResponse];
         }
         else {
             [self writeTotalWidth:[self totalWidth]];
-			[self logSystemResponse];
+            [self logSystemResponse];
             [self writeVoltage:[self voltage]];
-			[self logSystemResponse];
-			[self writeVoltageOffset:[self voltageOffset]];
-			[self logSystemResponse];
-			if (selectedWaveform <= kNumBuiltInTypes) {
-			    [self writeFrequency:[self frequency]];
-			    [self logSystemResponse];
-			}
+            [self logSystemResponse];
+            [self writeVoltageOffset:[self voltageOffset]];
+            [self logSystemResponse];
+            if (selectedWaveform <= kNumBuiltInTypes) {
+                [self writeFrequency:[self frequency]];
+                [self logSystemResponse];
+            }
             [self writeBurstRate:[self burstRate]];
-			[self logSystemResponse];
+            [self logSystemResponse];
         }
         
+        [self writeBurstCycles:[self burstCycles]];
+        [self logSystemResponse];
+        [self writeBurstPhase:[self burstPhase]];
+        [self logSystemResponse];
         [self writeTriggerSource:[self triggerSource]];
-		[self logSystemResponse];
+        [self logSystemResponse];
+        [self writeBurstState:YES];
+        [self logSystemResponse];
         
     }
 }

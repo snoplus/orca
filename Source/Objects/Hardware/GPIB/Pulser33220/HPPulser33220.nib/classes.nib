@@ -41,7 +41,10 @@
                 resetAction = id; 
                 selectWaveformAction = id; 
                 sendCommandAction = id; 
+                setBurstCyclesAction = id; 
+                setBurstPhaseAction = id; 
                 setBurstRateAction = id; 
+                setFrequencyAction = id; 
                 setTotalWidthAction = id; 
                 setVoltageAction = id; 
                 setVoltageOffsetAction = id; 
@@ -52,6 +55,10 @@
             CLASS = ORHPPulserController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                burstCyclesField = NSTextField; 
+                burstCyclesStepper = NSStepper; 
+                burstPhaseField = NSTextField; 
+                burstPhaseStepper = NSStepper; 
                 burstRateDisplay = NSTextField; 
                 burstRateField = NSTextField; 
                 burstRateStepper = NSStepper; 
@@ -60,6 +67,8 @@
                 downloadButton = NSButton; 
                 downloadTypeField = NSTextField; 
                 enableRandomButton = NSButton; 
+                frequencyField = NSTextField; 
+                frequencyStepper = NSStepper; 
                 loadParamsButton = NSButton; 
                 lockButton = NSButton; 
                 lockDocField = NSTextField; 
@@ -83,7 +92,6 @@
                 triggerModeMatrix = NSMatrix; 
                 voltageDisplay = NSTextField; 
                 voltageField = NSTextField; 
-                voltageOffsetDisplay = NSTextField; 
                 voltageOffsetField = NSTextField; 
                 voltageOffsetStepper = NSStepper; 
                 voltageStepper = NSStepper; 

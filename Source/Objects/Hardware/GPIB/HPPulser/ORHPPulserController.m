@@ -53,7 +53,21 @@
                      selector : @selector(triggerModeChanged:)
                          name : ORHPPulserTriggerModeChangedNotification
                        object : model];
+  
+    [notifyCenter addObserver : self
+                     selector : @selector(frequencyChanged:)
+                         name : ORHPPulserFrequencyChangedNotification
+                       object : model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(burstPhaseChanged:)
+                         name : ORHPPulserBurstPhaseChangedNotification
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(burstCyclesChanged:)
+                         name : ORHPPulserBurstCyclesChangedNotification
+                       object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(voltageChanged:)
@@ -81,6 +95,21 @@
                          name : ORHPPulserSelectedWaveformChangedNotification
                        object : model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(loadConstantsChanged:)
+                         name : ORHPPulserFrequencyChangedNotification
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(loadConstantsChanged:)
+                         name : ORHPPulserBurstCyclesChangedNotification
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(loadConstantsChanged:)
+                         name : ORHPPulserBurstPhaseChangedNotification
+                       object : model];
+					   
     [notifyCenter addObserver : self
                      selector : @selector(loadConstantsChanged:)
                          name : ORHPPulserVoltageChangedNotification
@@ -183,18 +212,21 @@
     [ super updateWindow ];
     
     [self voltageChanged:nil];
+    [self frequencyChanged:nil];
     [self voltageOffsetChanged:nil];
     [self burstRateChanged:nil];
+    [self burstPhaseChanged:nil];
+    [self burstCyclesChanged:nil];
     [self totalWidthChanged:nil];
     [self selectedWaveformChanged:nil];
     [self loadConstantsChanged:nil];
     [self lockChanged:nil];
-	[self enableRandomChanged:nil];
-	[self minTimeChanged:nil];
-	[self maxTimeChanged:nil];
-	[self randomCountChanged:nil];
+    [self enableRandomChanged:nil];
+    [self minTimeChanged:nil];
+    [self maxTimeChanged:nil];
+    [self randomCountChanged:nil];
     [self triggerModeChanged:nil];
-	[self negativePulseChanged:nil];
+    [self negativePulseChanged:nil];
 }
 
 - (void) negativePulseChanged:(NSNotification*)aNote
@@ -427,6 +459,15 @@
 	NS_ENDHANDLER
 }
 
+-(IBAction) setFrequencyAction:(id)sender
+{
+    if([sender floatValue] != [model frequency]){
+        [[self undoManager] setActionName: @"Set Frequency"];
+        [model setFrequency:[sender floatValue]];		
+    }
+	
+}
+
 -(IBAction) setVoltageAction:(id)sender
 {
     if([sender intValue] != [model voltage]){
@@ -443,6 +484,22 @@
         [model setVoltageOffset:[sender floatValue]];		
     }
 	
+}
+
+-(IBAction) setBurstPhaseAction:(id)sender
+{
+    if([sender intValue] != [model burstPhase]){
+        [[self undoManager] setActionName: @"Set Burst Phase"];
+        [model setBurstPhase:[sender intValue]];		
+    }
+}
+
+-(IBAction) setBurstCyclesAction:(id)sender
+{
+    if([sender intValue] != [model burstCycles]){
+        [[self undoManager] setActionName: @"Set Burst Cycles"];
+        [model setBurstCycles:[sender intValue]];		
+    }
 }
 
 -(IBAction) setBurstRateAction:(id)sender
@@ -525,6 +582,13 @@
 	[self setButtonStates];
 	//[model writeTriggerSource:[model triggerSource]];
 }
+
+- (void) frequencyChanged:(NSNotification*)aNotification
+{
+	[self updateStepper:frequencyStepper setting:[model frequency]];
+	[frequencyField setFloatValue: [model frequency]];
+}
+
 - (void) voltageChanged:(NSNotification*)aNotification
 {
 	[self updateStepper:voltageStepper setting:[model voltage]];
@@ -535,6 +599,18 @@
 {
 	[self updateStepper:voltageOffsetStepper setting:[model voltageOffset]];
 	[voltageOffsetField setFloatValue: [model voltageOffset]];
+}
+
+- (void) burstCyclesChanged:(NSNotification*)aNotification
+{
+	[self updateStepper:burstCyclesStepper setting:[model burstCycles]];
+	[burstCyclesField setIntValue: [model burstCycles]];
+}
+
+- (void) burstPhaseChanged:(NSNotification*)aNotification
+{
+	[self updateStepper:burstPhaseStepper setting:[model burstPhase]];
+	[burstPhaseField setIntValue: [model burstPhase]];
 }
 
 - (void) burstRateChanged:(NSNotification*)aNotification
@@ -571,13 +647,11 @@
 {
 	if([model selectedWaveform] == kLogCalibrationWaveform){
 		[voltageDisplay setFloatValue:kCalibrationVoltage];
-		[voltageOffsetDisplay setFloatValue:0.0];
 		[totalWidthDisplay setFloatValue:kCalibrationWidth];
 		[burstRateDisplay setFloatValue:kCalibrationBurstRate];
 	}
 	else {
 		[voltageDisplay setFloatValue:[model voltage]];
-		[voltageOffsetDisplay setFloatValue:[model voltageOffset]];
 		[totalWidthDisplay setFloatValue:[model totalWidth]];
 		[burstRateDisplay setFloatValue:[model burstRate]];
 	}
@@ -691,18 +765,24 @@
     [clearButton setEnabled:!loading && !locked];
     [selectionPopUpButton setEnabled:!loading && !locked];
     [voltageField setEnabled:!loading && !locked];
+    [frequencyField setEnabled:!loading && !locked];
     [voltageStepper setEnabled:!loading && !locked];
-	[voltageOffsetField setEnabled:!loading && !locked];
+    [frequencyStepper setEnabled:!loading && !locked];
+    [voltageOffsetField setEnabled:!loading && !locked];
     [voltageOffsetStepper setEnabled:!loading && !locked];
     [burstRateField setEnabled:!loading && !locked];
     [burstRateStepper setEnabled:!loading && !locked];
+    [burstCyclesField setEnabled:!loading && !locked];
+    [burstCyclesStepper setEnabled:!loading && !locked];
+    [burstPhaseField setEnabled:!loading && !locked];
+    [burstPhaseStepper setEnabled:!loading && !locked];
     [totalWidthField setEnabled:!loading && !locked];
     [totalWidthStepper setEnabled:!loading && !locked];
     [triggerModeMatrix setEnabled:!locked && !loading];
     [triggerButton setEnabled:!locked && !loading && triggerModeIsSoftware];
     [loadParamsButton setEnabled:!locked && !loading];
     [sendCommandButton setEnabled:!locked && !loading];
-	[commandField setEnabled:!locked && !loading];
+    [commandField setEnabled:!locked && !loading];
     NSString* s = @"";
 	if([model lockGUI]){
 		s = @"Locked by other object";

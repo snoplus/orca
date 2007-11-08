@@ -325,6 +325,39 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	[self writeToGPIBDevice:@"SYST:COMM:RLST LOC"];
 }
 
+- (void) writeBurstRate:(float)value
+{
+    // We use period instead of rate!
+    float period = 1.0/value;
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"BURS:INT:PER %f",period]];
+    [self logSystemResponse];
+    [self writeToGPIBDevice:@"BURS:MODE TRIG"];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Burst Period set to %f\n",period);
+}
+
+- (void) writeBurstState:(BOOL)value
+{
+    if(value) [self writeToGPIBDevice:@"BURS:STAT ON"];
+    else [self writeToGPIBDevice:@"BURS:STAT OFF"];
+}
+
+- (void) writeBurstCycles:(int)value
+{
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"BURS:NCYC %d",value]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Burst Cycles set to %d\n",value);
+}
+
+- (void) writeBurstPhase:(int)value
+{
+    // The parent model only supports degrees, so this is coded as it is for now.
+    [self writeToGPIBDevice:@"UNIT:ANGL DEG"];
+    [self writeToGPIBDevice:[NSString stringWithFormat:@"BURS:PHAS %d",value]];
+    [self logSystemResponse];
+    NSLog(@"HP Pulser Burst Phase set to %d\n",value);
+}
+
 - (void) setUsbInterface:(ORUSBInterface*)anInterface
 {
 

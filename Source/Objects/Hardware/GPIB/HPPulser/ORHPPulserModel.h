@@ -45,6 +45,7 @@ typedef struct HPPulserCustomWaveformStruct {
 	float           totalWidth;
 	float           frequency;
 	float           voltageOffset;
+	int             burstCycles;
 	int             selectedWaveform;
 	int             burstPhase;
 	int             burstNCycles;
@@ -109,11 +110,11 @@ typedef struct HPPulserCustomWaveformStruct {
 	kMaxNumWaveformPoints = 16000
 	} maxNumWaveformPoints;
     
-	enum {
-    kInternalTrigger,
-    kExternalTrigger,
-    kSoftwareTrigger 
-    } triggerTypes;
+        enum {
+        kInternalTrigger,
+        kExternalTrigger,
+        kSoftwareTrigger 
+        } triggerTypes;
 }
 
 #pragma mark ***Initialization
@@ -148,6 +149,10 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void)  setVoltageOffset:(float)newVoltageOffset;
 - (float) burstRate;
 - (void)  setBurstRate:(float)aValue;
+- (int)   burstPhase;
+- (void)  setBurstPhase:(int)aValue;
+- (int)   burstCycles;
+- (void)  setBurstCycles:(int)aValue;
 - (float) totalWidth;
 - (void)  setTotalWidth:(float)aValue;
 
@@ -178,9 +183,10 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void) writeVoltageOffset:(short)value;
 - (void) writeFrequency:(float)value;
 - (void) writeBurstRate:(float)rate;
+- (void) writeBurstPhase:(int)phase;
+- (void) writeBurstCycles:(int)cycles;
 - (void) writeTotalWidth:(float)width;
-- (void) writeBurstMode:(BOOL)value;
-- (void) writeBurstCount:(int)value;
+- (void) writeBurstState:(BOOL)value;
 - (void) writeTriggerSource:(int)value;
 - (void) downloadWaveform;
 - (void) downloadWaveformWorker;
@@ -228,6 +234,8 @@ extern NSString* ORHPPulserVoltageChangedNotification;
 extern NSString* ORHPPulserVoltageOffsetChangedNotification;
 extern NSString* ORHPPulserFrequencyChangedNotification;
 extern NSString* ORHPPulserBurstRateChangedNotification;
+extern NSString* ORHPPulserBurstPhaseChangedNotification;
+extern NSString* ORHPPulserBurstCyclesChangedNotification;
 extern NSString* ORHPPulserTotalWidthChangedNotification;
 extern NSString* ORHPPulserSelectedWaveformChangedNotification;
 extern NSString* ORHPPulserWaveformLoadStartedNotification;

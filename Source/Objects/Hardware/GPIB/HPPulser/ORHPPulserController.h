@@ -27,7 +27,7 @@
 
 @interface ORHPPulserController : ORGpibDeviceController {
     IBOutlet NSButton* 		readIdButton;	
-	IBOutlet NSMatrix*		negativePulseMatrix;
+    IBOutlet NSMatrix*		negativePulseMatrix;
     IBOutlet NSButton* 		resetButton;	
     IBOutlet NSButton* 		testButton;	
     IBOutlet NSButton* 		clearButton;	
@@ -35,25 +35,30 @@
     IBOutlet NSPopUpButton*     selectionPopUpButton;	
     IBOutlet NSTextField* 	voltageField;
     IBOutlet NSStepper* 	voltageStepper;
-	IBOutlet NSTextField* 	voltageOffsetField;
+    IBOutlet NSTextField* 	voltageOffsetField;
     IBOutlet NSStepper* 	voltageOffsetStepper;
+    IBOutlet NSTextField* 	frequencyField;
+    IBOutlet NSStepper* 	frequencyStepper;
     IBOutlet NSTextField* 	burstRateField;
     IBOutlet NSStepper* 	burstRateStepper;
+    IBOutlet NSTextField* 	burstPhaseField;
+    IBOutlet NSStepper* 	burstPhaseStepper;
+    IBOutlet NSTextField* 	burstCyclesField;
+    IBOutlet NSStepper* 	burstCyclesStepper;
     IBOutlet NSTextField* 	totalWidthField;
     IBOutlet NSStepper* 	totalWidthStepper;
-    IBOutlet NSMatrix*      triggerModeMatrix;
+    IBOutlet NSMatrix*          triggerModeMatrix;
     IBOutlet NSButton* 		triggerButton;	
 
-	IBOutlet NSButton*		enableRandomButton;
-	IBOutlet NSTextField*	minTimeField;
-	IBOutlet NSTextField*	maxTimeField;
-	IBOutlet NSStepper*		minTimeStepper;
-	IBOutlet NSStepper*		maxTimeStepper;
-	IBOutlet NSTextField*	randomCountField;
+    IBOutlet NSButton*		enableRandomButton;
+    IBOutlet NSTextField*	minTimeField;
+    IBOutlet NSTextField*	maxTimeField;
+    IBOutlet NSStepper*		minTimeStepper;
+    IBOutlet NSStepper*		maxTimeStepper;
+    IBOutlet NSTextField*	randomCountField;
 
 
     IBOutlet NSTextField* 	voltageDisplay;
-    IBOutlet NSTextField* 	voltageOffsetDisplay;	
     IBOutlet NSTextField* 	totalWidthDisplay;
     IBOutlet NSTextField* 	burstRateDisplay;
     IBOutlet NSButton*		loadParamsButton;	
@@ -86,7 +91,10 @@
 - (IBAction) clearMemory:(id)sender;
 - (IBAction) setVoltageAction:(id)sender;
 - (IBAction) setVoltageOffsetAction:(id)sender;
+- (IBAction) setFrequencyAction:(id)sender;
 - (IBAction) setBurstRateAction:(id)sender;
+- (IBAction) setBurstCyclesAction:(id)sender;
+- (IBAction) setBurstPhaseAction:(id)sender;
 - (IBAction) setTotalWidthAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) enableRandomAction:(id)sender;
@@ -113,7 +121,10 @@
 - (void) triggerModeChanged:(NSNotification*)aNotification;
 - (void) voltageChanged:(NSNotification*)aNotification;
 - (void) voltageOffsetChanged:(NSNotification*)aNotification;
+- (void) frequencyChanged:(NSNotification*)aNotification;
 - (void) burstRateChanged:(NSNotification*)aNotification;
+- (void) burstCyclesChanged:(NSNotification*)aNotification;
+- (void) burstPhaseChanged:(NSNotification*)aNotification;
 - (void) totalWidthChanged:(NSNotification*)aNotification;
 - (void) loadConstantsChanged:(NSNotification*)aNotification;
 - (void) waveformLoadStarted:(NSNotification*)aNotification;

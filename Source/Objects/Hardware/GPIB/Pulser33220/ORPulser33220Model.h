@@ -85,6 +85,11 @@
 - (void) sendLocalCommand;
 - (void) asyncDownloadFinished;
 
+// Overloading these functions since the command syntax has changed.
+- (void) writeBurstRate:(float)value;
+- (void) writeBurstState:(BOOL)value;
+- (void) writeBurstCycles:(int)value;
+- (void) writeBurstPhase:(int)value;
 
 #pragma mark ***Delegate Methods
 //- (void) netsocketConnected:(NetSocket*)inNetSocket;
