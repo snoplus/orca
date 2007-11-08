@@ -146,6 +146,10 @@ void doWriteBlock(SBC_Packet* aPacket)
 	long addressSpace				= p->addressSpace;
 	long unitSize					= p->unitSize;
 	long numItems					= p->numItems;
+	int memMapHandle;
+	if(addressModifier == 29) memMapHandle = vmeAM29Handle;
+	else					  memMapHandle = vmeAM39Handle;
+	
 	p++; /*point to the data*/
 	short *sptr;
 	long  *lptr;
@@ -166,7 +170,7 @@ void doWriteBlock(SBC_Packet* aPacket)
 	}
 	
 	//printf("writing %lu bytes @ 0x%x\n",numItems*unitSize,(int)startAddress);
-	int result = vme_write(vmeAM29Handle,startAddress,(unsigned char*)p,numItems*unitSize);
+	int result = vme_write(memMapHandle,startAddress,(unsigned char*)p,numItems*unitSize);
 	//printf("write result: %d  (%ld, %ld)\n", result,numItems,unitSize);
 	
 	/* echo the structure back with the error code*/
@@ -204,6 +208,9 @@ void doReadBlock(SBC_Packet* aPacket)
 	long addressSpace				= p->addressSpace;
 	long unitSize					= p->unitSize;
 	long numItems					= p->numItems;
+	int memMapHandle;
+	if(addressModifier == 29)	memMapHandle = vmeAM29Handle;
+	else						memMapHandle = vmeAM39Handle;
 
 	/*OK, got address and # to read, set up the response and go get the data*/
 	aPacket->cmdHeader.destination	= kSBC_Process;
@@ -216,7 +223,7 @@ void doReadBlock(SBC_Packet* aPacket)
 	unsigned char* returnPayload = (unsigned char*)(returnDataPtr+1);
 	//printf("reading %ld bytes @ 0x%x\n",numItems*unitSize,(int)startAddress);
 
-	int result	= vme_read(vmeAM29Handle,startAddress,returnPayload,numItems*unitSize);
+	int result	= vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
 	//printf("read result: %d\n",result);
 
 	returnDataPtr->address			= startAddress;
