@@ -17,6 +17,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -24,6 +25,8 @@
 #include <sys/types.h>
 #include "SBC_Config.h"
 #include "AcqirisDC440.h"
+
+extern char needToSwap;
 
 void processHWCommand(SBC_Packet* aPacket)
 {
