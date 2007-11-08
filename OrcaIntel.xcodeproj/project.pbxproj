@@ -1426,11 +1426,9 @@
 		848E23030C961561002329AE /* AcqirisDC440.h in cPCI_Readout Copy */ = {isa = PBXBuildFile; fileRef = 844242980C95DB7700415C78 /* AcqirisDC440.h */; };
 		848E23040C961561002329AE /* HW_Readout.c in cPCI_Readout Copy */ = {isa = PBXBuildFile; fileRef = 8442429B0C95DB7700415C78 /* HW_Readout.c */; };
 		848E23050C961561002329AE /* HW_Readout.h in cPCI_Readout Copy */ = {isa = PBXBuildFile; fileRef = 8442429C0C95DB7700415C78 /* HW_Readout.h */; };
-		848E23E90C96EBB6002329AE /* CircularBuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 848E23E30C96EBB6002329AE /* CircularBuffer.c */; };
 		848E23EA0C96EBB6002329AE /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E23E40C96EBB6002329AE /* CircularBuffer.h */; };
 		848E23EB0C96EBB6002329AE /* SBC_Cmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E23E50C96EBB6002329AE /* SBC_Cmds.h */; };
 		848E23EC0C96EBB6002329AE /* SBC_Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E23E60C96EBB6002329AE /* SBC_Config.h */; };
-		848E23ED0C96EBB6002329AE /* SBC_Readout.c in Sources */ = {isa = PBXBuildFile; fileRef = 848E23E70C96EBB6002329AE /* SBC_Readout.c */; };
 		848E23EE0C96EBB6002329AE /* SBC_Readout.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E23E80C96EBB6002329AE /* SBC_Readout.h */; };
 		848E23EF0C96EBC5002329AE /* CircularBuffer.c in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 848E23E30C96EBB6002329AE /* CircularBuffer.c */; };
 		848E23F00C96EBC5002329AE /* CircularBuffer.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 848E23E40C96EBB6002329AE /* CircularBuffer.h */; };
@@ -1439,8 +1437,6 @@
 		848E23F30C96EBC5002329AE /* SBC_Readout.c in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 848E23E70C96EBB6002329AE /* SBC_Readout.c */; };
 		848E23F40C96EBC5002329AE /* SBC_Readout.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 848E23E80C96EBB6002329AE /* SBC_Readout.h */; };
 		848E24240C96EE97002329AE /* SBC_Link.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E24220C96EE97002329AE /* SBC_Link.h */; };
-		848E24250C96EE97002329AE /* SBC_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E24230C96EE97002329AE /* SBC_Link.m */; };
-		8493C4E20C984AF200B46CD4 /* HW_Readout.c in Sources */ = {isa = PBXBuildFile; fileRef = 8493C4DE0C984AF200B46CD4 /* HW_Readout.c */; };
 		8493C4E30C984AF200B46CD4 /* HW_Readout.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C4DF0C984AF200B46CD4 /* HW_Readout.h */; };
 		8493C4F00C984C9D00B46CD4 /* SBC_Linking.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C4EF0C984C9D00B46CD4 /* SBC_Linking.h */; };
 		8493C5030C984E0500B46CD4 /* HW_Readout.c in VME_Code Copy  */ = {isa = PBXBuildFile; fileRef = 8493C4DE0C984AF200B46CD4 /* HW_Readout.c */; };
@@ -1449,11 +1445,11 @@
 		8493C57D0C98516900B46CD4 /* makeScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493C5790C98516900B46CD4 /* makeScript */; };
 		8493C57E0C98516900B46CD4 /* loginScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493C57A0C98516900B46CD4 /* loginScript */; };
 		8493C57F0C98516900B46CD4 /* goScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493C57B0C98516900B46CD4 /* goScript */; };
-		8493C5DF0C9854C000B46CD4 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 8493C5DE0C9854C000B46CD4 /* Makefile */; };
 		8493C5E00C9854C800B46CD4 /* Makefile in VME_Code Copy  */ = {isa = PBXBuildFile; fileRef = 8493C5DE0C9854C000B46CD4 /* Makefile */; };
 		8493C7B60C987F1D00B46CD4 /* SBC_LinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C7B40C987F1D00B46CD4 /* SBC_LinkController.h */; };
-		8493C7B70C987F1D00B46CD4 /* SBC_LinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493C7B50C987F1D00B46CD4 /* SBC_LinkController.m */; };
 		8493C9BB0C98BABB00B46CD4 /* SBC_Link.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8493C9BA0C98BABB00B46CD4 /* SBC_Link.nib */; };
+		84997F0B0CE3BFEB002CFA70 /* SBC_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E24230C96EE97002329AE /* SBC_Link.m */; };
+		84997F0C0CE3BFED002CFA70 /* SBC_LinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493C7B50C987F1D00B46CD4 /* SBC_LinkController.m */; };
 		84A042A10C35751A00DCE0EC /* ORAcqirisDC440Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A0429F0C35751900DCE0EC /* ORAcqirisDC440Decoders.h */; };
 		84A042A20C35751A00DCE0EC /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A042A00C35751A00DCE0EC /* ORAcqirisDC440Decoders.m */; };
 		84A042A50C35756A00DCE0EC /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A042A30C35756A00DCE0EC /* ORcPCICardDecoder.h */; };
@@ -2117,11 +2113,11 @@
 		844049D308353D47000D03DB /* MemoryWatcher.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MemoryWatcher.nib; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.nib"; sourceTree = SOURCE_ROOT; };
 		8441B66F03CC9F33005F64B1 /* ORConnector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORConnector.h; sourceTree = "<group>"; };
 		8441B67003CC9F33005F64B1 /* ORConnector.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORConnector.m; sourceTree = "<group>"; };
-		844242970C95DB7700415C78 /* AcqirisDC440.c */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = AcqirisDC440.c; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/AcqirisDC440.c; sourceTree = SOURCE_ROOT; };
-		844242980C95DB7700415C78 /* AcqirisDC440.h */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = AcqirisDC440.h; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/AcqirisDC440.h; sourceTree = SOURCE_ROOT; };
-		844242990C95DB7700415C78 /* AcqirisDC440Cmds.h */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = AcqirisDC440Cmds.h; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/AcqirisDC440Cmds.h; sourceTree = SOURCE_ROOT; };
-		8442429B0C95DB7700415C78 /* HW_Readout.c */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = HW_Readout.c; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/HW_Readout.c; sourceTree = SOURCE_ROOT; };
-		8442429C0C95DB7700415C78 /* HW_Readout.h */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = HW_Readout.h; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/HW_Readout.h; sourceTree = SOURCE_ROOT; };
+		844242970C95DB7700415C78 /* AcqirisDC440.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = AcqirisDC440.c; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/AcqirisDC440.c; sourceTree = SOURCE_ROOT; };
+		844242980C95DB7700415C78 /* AcqirisDC440.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = AcqirisDC440.h; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/AcqirisDC440.h; sourceTree = SOURCE_ROOT; };
+		844242990C95DB7700415C78 /* AcqirisDC440Cmds.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = AcqirisDC440Cmds.h; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/AcqirisDC440Cmds.h; sourceTree = SOURCE_ROOT; };
+		8442429B0C95DB7700415C78 /* HW_Readout.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = HW_Readout.c; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/HW_Readout.c; sourceTree = SOURCE_ROOT; };
+		8442429C0C95DB7700415C78 /* HW_Readout.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = HW_Readout.h; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/HW_Readout.h; sourceTree = SOURCE_ROOT; };
 		844242A70C95DB9F00415C78 /* Makefile */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = Makefile; path = Source/Objects/Hardware/CompactPCI/cPCIcpu/cPCI_Readout_Code/Makefile; sourceTree = SOURCE_ROOT; };
 		844352060B56E9360033B918 /* FindPanel.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = FindPanel.nib; path = "Source/Objects/Misc Objects/Views/TextFinder/FindPanel.nib"; sourceTree = SOURCE_ROOT; };
 		844352070B56E9360033B918 /* TextFinder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TextFinder.h; path = "Source/Objects/Misc Objects/Views/TextFinder/TextFinder.h"; sourceTree = SOURCE_ROOT; };
@@ -2479,12 +2475,12 @@
 		848E21610593A4B900B6708F /* HVNotPollingHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = HVNotPollingHelp.plist; path = Source/Objects/Control/HVControl/HVNotPollingHelp.plist; sourceTree = SOURCE_ROOT; };
 		848E22A00C9612DB002329AE /* ORcPCIControllerCard.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORcPCIControllerCard.m; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCIControllerCard.m"; sourceTree = SOURCE_ROOT; };
 		848E22A10C9612DB002329AE /* ORcPCIControllerCard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCIControllerCard.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCIControllerCard.h"; sourceTree = SOURCE_ROOT; };
-		848E23E30C96EBB6002329AE /* CircularBuffer.c */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = CircularBuffer.c; path = Source/Objects/Hardware/SBC/SBC_Code/CircularBuffer.c; sourceTree = SOURCE_ROOT; };
-		848E23E40C96EBB6002329AE /* CircularBuffer.h */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = CircularBuffer.h; path = Source/Objects/Hardware/SBC/SBC_Code/CircularBuffer.h; sourceTree = SOURCE_ROOT; };
-		848E23E50C96EBB6002329AE /* SBC_Cmds.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SBC_Cmds.h; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Cmds.h; sourceTree = SOURCE_ROOT; };
+		848E23E30C96EBB6002329AE /* CircularBuffer.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = CircularBuffer.c; path = Source/Objects/Hardware/SBC/SBC_Code/CircularBuffer.c; sourceTree = SOURCE_ROOT; };
+		848E23E40C96EBB6002329AE /* CircularBuffer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = CircularBuffer.h; path = Source/Objects/Hardware/SBC/SBC_Code/CircularBuffer.h; sourceTree = SOURCE_ROOT; };
+		848E23E50C96EBB6002329AE /* SBC_Cmds.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = SBC_Cmds.h; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Cmds.h; sourceTree = SOURCE_ROOT; };
 		848E23E60C96EBB6002329AE /* SBC_Config.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SBC_Config.h; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Config.h; sourceTree = SOURCE_ROOT; };
-		848E23E70C96EBB6002329AE /* SBC_Readout.c */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = SBC_Readout.c; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Readout.c; sourceTree = SOURCE_ROOT; };
-		848E23E80C96EBB6002329AE /* SBC_Readout.h */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = SBC_Readout.h; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Readout.h; sourceTree = SOURCE_ROOT; };
+		848E23E70C96EBB6002329AE /* SBC_Readout.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = SBC_Readout.c; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Readout.c; sourceTree = SOURCE_ROOT; };
+		848E23E80C96EBB6002329AE /* SBC_Readout.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = SBC_Readout.h; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Readout.h; sourceTree = SOURCE_ROOT; };
 		848E24220C96EE97002329AE /* SBC_Link.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBC_Link.h; sourceTree = "<group>"; };
 		848E24230C96EE97002329AE /* SBC_Link.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBC_Link.m; sourceTree = "<group>"; };
 		848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMailCenter.h; path = "Source/Main Dialogs/MailCenter/ORMailCenter.h"; sourceTree = SOURCE_ROOT; };
@@ -2507,8 +2503,8 @@
 		8492D7270B7A85090065F3DE /* ORGretinaDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGretinaDecoders.h; path = Source/Objects/Hardware/Vme/Gretina/ORGretinaDecoders.h; sourceTree = SOURCE_ROOT; };
 		8492D7500B7A891C0065F3DE /* Gretina.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Gretina.nib; path = Source/Objects/Hardware/Vme/Gretina/Gretina.nib; sourceTree = SOURCE_ROOT; };
 		8492D7510B7A891C0065F3DE /* GretinaCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = GretinaCard.gif; path = Source/Objects/Hardware/Vme/Gretina/GretinaCard.gif; sourceTree = SOURCE_ROOT; };
-		8493C4DE0C984AF200B46CD4 /* HW_Readout.c */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = HW_Readout.c; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Readout.c; sourceTree = SOURCE_ROOT; };
-		8493C4DF0C984AF200B46CD4 /* HW_Readout.h */ = {isa = PBXFileReference; explicitFileType = text; fileEncoding = 30; name = HW_Readout.h; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Readout.h; sourceTree = SOURCE_ROOT; };
+		8493C4DE0C984AF200B46CD4 /* HW_Readout.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = HW_Readout.c; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Readout.c; sourceTree = SOURCE_ROOT; };
+		8493C4DF0C984AF200B46CD4 /* HW_Readout.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = HW_Readout.h; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Readout.h; sourceTree = SOURCE_ROOT; };
 		8493C4EF0C984C9D00B46CD4 /* SBC_Linking.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SBC_Linking.h; sourceTree = "<group>"; };
 		8493C5780C98516900B46CD4 /* killScript */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; name = killScript; path = "Source/Objects/Hardware/SBC/SBC Link/killScript"; sourceTree = SOURCE_ROOT; };
 		8493C5790C98516900B46CD4 /* makeScript */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; name = makeScript; path = "Source/Objects/Hardware/SBC/SBC Link/makeScript"; sourceTree = SOURCE_ROOT; };
@@ -8704,12 +8700,6 @@
 				8466E5180C833A2800D076AA /* ORBocTIC3Model.m in Sources */,
 				84C2671E0C91B71900EC5CD7 /* ORVmecpuModel.m in Sources */,
 				848E22A20C9612DB002329AE /* ORcPCIControllerCard.m in Sources */,
-				848E23E90C96EBB6002329AE /* CircularBuffer.c in Sources */,
-				848E23ED0C96EBB6002329AE /* SBC_Readout.c in Sources */,
-				848E24250C96EE97002329AE /* SBC_Link.m in Sources */,
-				8493C4E20C984AF200B46CD4 /* HW_Readout.c in Sources */,
-				8493C5DF0C9854C000B46CD4 /* Makefile in Sources */,
-				8493C7B70C987F1D00B46CD4 /* SBC_LinkController.m in Sources */,
 				84D967440CA03DCA000C0C76 /* ORScriptController.m in Sources */,
 				84D967460CA03DCA000C0C76 /* ORScriptModel.m in Sources */,
 				84D9737F0CA1D4E2000C0C76 /* ORIpeCard.m in Sources */,
@@ -8752,6 +8742,8 @@
 				841903E60CCE71ED00F21371 /* ORGretina4Controller.m in Sources */,
 				841903E80CCE71ED00F21371 /* ORGretina4Decoders.m in Sources */,
 				841903EA0CCE71ED00F21371 /* ORGretina4Model.m in Sources */,
+				84997F0B0CE3BFEB002CFA70 /* SBC_Link.m in Sources */,
+				84997F0C0CE3BFED002CFA70 /* SBC_LinkController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
