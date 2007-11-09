@@ -417,12 +417,20 @@
 		
 		//logic
 		case IF:			return [self processIf:p];
-		case kConditional:  return [NodeValue(0) boolValue] ? NodeValue(1) : NodeValue(2);
-
+		case kConditional:  
+			{
+				if([NodeValue(0) isKindOfClass:[NSNumber class]]){
+					return [NodeValue(0) boolValue] ? NodeValue(1) : NodeValue(2);
+				}
+				else return NodeValue(0)  ? NodeValue(1) : NodeValue(2);
+			}
 		case '!':  
 			{
-				if(![NodeValue(0) boolValue])return _one;
-				else return _zero;
+				if([NodeValue(0) isKindOfClass:[NSNumber class]]){
+					if(![NodeValue(0) boolValue])return _one;
+					else return _zero;
+				}
+				else if(!NodeValue(0))return _one;
 			}
 			
 		case AND_OP:

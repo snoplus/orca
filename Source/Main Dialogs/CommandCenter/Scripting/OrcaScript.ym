@@ -39,7 +39,7 @@ extern long num_lines;
 
 %left '+' '-' 
 %left  '%' '*' '/' ','
-%nonassoc UMINUS INVERT
+%nonassoc NOT UMINUS INVERT
 
 %type <nPtr> program  functionCall statement arrayElement make_string  break_statement
 %type <nPtr> hex_str expr statement_list objC findObj selection_statement iteration_statement 
@@ -211,9 +211,9 @@ unary_expr
 		: postfix_expr				{ $$ = $1;}
 		| INC_OP unary_expr			{ $$ = executionNode(kPreInc,$2,nil);}
 		| DEC_OP unary_expr			{ $$ = executionNode(kPreDec,$2,nil);}
-		| '-' expr %prec UMINUS		{ $$ = executionNode(UMINUS, $2,nil); }
-        | '!' expr					{ $$ = executionNode('!', $2,nil); }
-        | '~' expr %prec INVERT		{ $$ = executionNode('~', $2,nil); }
+		| '-' primary_expr %prec UMINUS		{ $$ = executionNode(UMINUS, $2,nil); }
+        | '!' primary_expr %prec NOT		{ $$ = executionNode('!', $2,nil); }
+        | '~' primary_expr %prec INVERT		{ $$ = executionNode('~', $2,nil); }
 		;
 
 multiplicative_expr
