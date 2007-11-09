@@ -457,6 +457,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	NSMutableArray* tempData = [[fileAsDataPacket dataArray] retain];
 	[fileAsDataPacket setDataArray:nil];
 	ORDataPacket* tempPacket = [fileAsDataPacket copy];
+	[tempPacket setNeedToSwap:[fileAsDataPacket needToSwap]];
 	[fileAsDataPacket setDataArray: tempData];
 	[tempData release];
 	
@@ -485,6 +486,8 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 		unsigned long* dPtr = ((unsigned long*)[theData bytes]) + anOffset;
 		if(!dPtr)break;
 		if(dPtr+aLength <=  endPtr){
+		    id aKey = [dataDictionary objectForKey:@"Key"];
+			[tempPacket byteSwapData:dPtr forKey:aKey];
 			[tempPacket addData:[NSData dataWithBytes:dPtr length:aLength*sizeof(long)]];
 			[nextObject processData:tempPacket userInfo:nil];
 			[tempPacket clearData];
@@ -504,6 +507,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     }
     [pool release];
 }
+
 
 #pragma mark ¥¥¥Archival
 static NSString* ORReplayFileList 			= @"ORReplayFileList";

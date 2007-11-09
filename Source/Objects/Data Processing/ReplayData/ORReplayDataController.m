@@ -327,7 +327,7 @@
 
 - (void) fileListChanged:(NSNotification*)note
 {
-	[self loadHeader];
+//	[self loadHeader];
 }
 
 - (void) drawerDidOpen:(NSNotification *)notification

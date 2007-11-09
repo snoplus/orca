@@ -283,7 +283,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 
 - (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset forKey:(id)aKey
 {
-    [fileAsDataPacket byteSwapOneRecordAtOffset:anOffset intoDataSet:dataSet forKey:aKey];
+    [fileAsDataPacket byteSwapOneRecordAtOffset:anOffset forKey:aKey];
 }
 
 - (void) decodeOneRecordAtOffset:(unsigned long)anOffset forKey:(id)aKey

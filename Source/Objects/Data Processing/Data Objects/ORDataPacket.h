@@ -58,6 +58,7 @@
 
 #pragma mark •••Accessors
 - (BOOL) needToSwap;
+- (void) setNeedToSwap:(BOOL)aFlag;
 - (int)  version;
 - (void)  setVersion:(int)aVersion;
 - (void) setRunNumber:(unsigned long)aRunNumber;
@@ -107,7 +108,8 @@
 - (NSString*) dataRecordDescription:(unsigned long)anOffset forKey:(NSNumber*)aKey;
 - (void) addEventDescriptionItem:(NSDictionary*) eventDictionary;
 - (void) decodeOneRecordAtOffset:(unsigned long)offset intoDataSet:(ORDataSet*)aDataSet forKey:(NSNumber*)aKey;
-- (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset intoDataSet:(ORDataSet*)aDataSet forKey:(NSNumber*)aKey;
+- (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset forKey:(NSNumber*)aKey;
+- (void) byteSwapData:(unsigned long*)dPtr forKey:(NSNumber*)aKey;
 - (void) setStopDecodeIntoArray:(BOOL)state;
 
 //one record decoding

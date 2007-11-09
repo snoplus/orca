@@ -523,11 +523,19 @@
     if(anObj)[anObj decodeData:dPtr  fromDataPacket:self intoDataSet:aDataSet];
 }
 
-- (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset intoDataSet:(ORDataSet*)aDataSet forKey:(NSNumber*)aKey
+- (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset forKey:(NSNumber*)aKey
 {
 	if(needToSwap){
 		NSData* theData = [dataArray objectAtIndex:0];
 		unsigned long* dPtr = ((unsigned long*)[theData bytes]) + anOffset;
+		if(!dPtr)return;
+		[[objectLookup objectForKey:aKey] swapData:dPtr];	
+	}
+}
+
+- (void) byteSwapData:(unsigned long*)dPtr forKey:(NSNumber*)aKey
+{
+	if(needToSwap){
 		if(!dPtr)return;
 		[[objectLookup objectForKey:aKey] swapData:dPtr];	
 	}
@@ -661,6 +669,12 @@
 {
     return version;
 }
+
+- (void) setNeedToSwap:(BOOL)aFlag
+{
+	needToSwap = aFlag;
+}
+
 - (BOOL) needToSwap
 {
 	return needToSwap;
