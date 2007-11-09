@@ -45,8 +45,8 @@
     IBOutlet NSStepper* 	burstPhaseStepper;
     IBOutlet NSTextField* 	burstCyclesField;
     IBOutlet NSStepper* 	burstCyclesStepper;
-    IBOutlet NSTextField* 	totalWidthField;
-    IBOutlet NSStepper* 	totalWidthStepper;
+//    IBOutlet NSTextField* 	totalWidthField;
+//    IBOutlet NSStepper* 	totalWidthStepper;
     IBOutlet NSMatrix*          triggerModeMatrix;
     IBOutlet NSButton* 		triggerButton;	
 
@@ -59,7 +59,7 @@
 
 
     IBOutlet NSTextField* 	voltageDisplay;
-    IBOutlet NSTextField* 	totalWidthDisplay;
+//    IBOutlet NSTextField* 	totalWidthDisplay;
     IBOutlet NSTextField* 	burstRateDisplay;
     IBOutlet NSButton*		loadParamsButton;	
 
@@ -95,7 +95,7 @@
 - (IBAction) setBurstRateAction:(id)sender;
 - (IBAction) setBurstCyclesAction:(id)sender;
 - (IBAction) setBurstPhaseAction:(id)sender;
-- (IBAction) setTotalWidthAction:(id)sender;
+//- (IBAction) setTotalWidthAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) enableRandomAction:(id)sender;
 - (IBAction) minTimeAction:(id)sender;
@@ -125,7 +125,7 @@
 - (void) burstRateChanged:(NSNotification*)aNotification;
 - (void) burstCyclesChanged:(NSNotification*)aNotification;
 - (void) burstPhaseChanged:(NSNotification*)aNotification;
-- (void) totalWidthChanged:(NSNotification*)aNotification;
+//- (void) totalWidthChanged:(NSNotification*)aNotification;
 - (void) loadConstantsChanged:(NSNotification*)aNotification;
 - (void) waveformLoadStarted:(NSNotification*)aNotification;
 - (void) waveformLoadProgressing:(NSNotification*)aNotification;

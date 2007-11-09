@@ -84,10 +84,10 @@
                          name : ORHPPulserBurstRateChangedNotification
                        object : model];
     
-    [notifyCenter addObserver : self
+/*    [notifyCenter addObserver : self
                      selector : @selector(totalWidthChanged:)
                          name : ORHPPulserTotalWidthChangedNotification
-                       object : model];
+                       object : model];*/
     
     
     [notifyCenter addObserver : self
@@ -125,10 +125,10 @@
                          name : ORHPPulserBurstRateChangedNotification
                        object : model];
     
-    [notifyCenter addObserver : self
+/*    [notifyCenter addObserver : self
                      selector : @selector(loadConstantsChanged:)
                          name : ORHPPulserTotalWidthChangedNotification
-                       object : model];
+                       object : model];*/
     
     
     [notifyCenter addObserver : self
@@ -217,7 +217,7 @@
     [self burstRateChanged:nil];
     [self burstPhaseChanged:nil];
     [self burstCyclesChanged:nil];
-    [self totalWidthChanged:nil];
+//    [self totalWidthChanged:nil];
     [self selectedWaveformChanged:nil];
     [self loadConstantsChanged:nil];
     [self lockChanged:nil];
@@ -510,13 +510,13 @@
     }
 }
 
--(IBAction) setTotalWidthAction:(id)sender
+/*-(IBAction) setTotalWidthAction:(id)sender
 {
     if([sender floatValue] != [model totalWidth]){
         [[self undoManager] setActionName: @"Set Total Width"];
         [model setTotalWidth:[sender floatValue]];		
     }
-}
+}*/
 
 -(IBAction) selectWaveformAction:(id)sender;
 {
@@ -619,11 +619,11 @@
 	[burstRateField setFloatValue: [model burstRate]];
 }
 
-- (void) totalWidthChanged:(NSNotification*)aNotification
+/*- (void) totalWidthChanged:(NSNotification*)aNotification
 {
 	[self updateStepper:totalWidthStepper setting:[model totalWidth]];
 	[totalWidthField setFloatValue: [model totalWidth]];
-}
+}*/
 
 - (void) selectedWaveformChanged:(NSNotification*)aNotification
 {
@@ -647,12 +647,12 @@
 {
 	if([model selectedWaveform] == kLogCalibrationWaveform){
 		[voltageDisplay setFloatValue:kCalibrationVoltage];
-		[totalWidthDisplay setFloatValue:kCalibrationWidth];
+		//[totalWidthDisplay setFloatValue:kCalibrationWidth];
 		[burstRateDisplay setFloatValue:kCalibrationBurstRate];
 	}
 	else {
 		[voltageDisplay setFloatValue:[model voltage]];
-		[totalWidthDisplay setFloatValue:[model totalWidth]];
+		//[totalWidthDisplay setFloatValue:[model totalWidth]];
 		[burstRateDisplay setFloatValue:[model burstRate]];
 	}
 }
@@ -776,8 +776,8 @@
     [burstCyclesStepper setEnabled:!loading && !locked];
     [burstPhaseField setEnabled:!loading && !locked];
     [burstPhaseStepper setEnabled:!loading && !locked];
-    [totalWidthField setEnabled:!loading && !locked];
-    [totalWidthStepper setEnabled:!loading && !locked];
+//    [totalWidthField setEnabled:!loading && !locked];
+//    [totalWidthStepper setEnabled:!loading && !locked];
     [triggerModeMatrix setEnabled:!locked && !loading];
     [triggerButton setEnabled:!locked && !loading && triggerModeIsSoftware];
     [loadParamsButton setEnabled:!locked && !loading];

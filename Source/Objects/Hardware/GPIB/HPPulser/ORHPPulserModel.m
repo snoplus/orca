@@ -47,7 +47,7 @@ NSString* ORHPPulserFrequencyChangedNotification		= @"HP Pulser Frequency Change
 NSString* ORHPPulserBurstRateChangedNotification	= @"HP Pulser Burst Rate Changed";
 NSString* ORHPPulserBurstPhaseChangedNotification	= @"HP Pulser Burst Phase Changed";
 NSString* ORHPPulserBurstCyclesChangedNotification	= @"HP Pulser Burst Cycles Changed";
-NSString* ORHPPulserTotalWidthChangedNotification       = @"HP Pulser Total Width Changed";
+//NSString* ORHPPulserTotalWidthChangedNotification       = @"HP Pulser Total Width Changed";
 NSString* ORHPPulserSelectedWaveformChangedNotification = @"HP Pulser Selected Waveform";
 NSString* ORHPPulserWaveformLoadStartedNotification     = @"HP Pulser Waveform Load Started";
 NSString* ORHPPulserWaveformLoadProgressingNotification = @"HP Pulser Waveform Load Progressing";
@@ -105,7 +105,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     
     [self setVoltage:kLogAmpVoltage];
     [self setBurstRate:kLogAmpBurstRate];
-    [self setTotalWidth:kLogAmpPulseWidth];
+//    [self setTotalWidth:kLogAmpPulseWidth];
     [self setVoltageOffset:0];
     [self setFrequency:1000.0];
     [self setBurstCycles:1];
@@ -396,18 +396,18 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (float) totalWidth
 {
-    return totalWidth;
+    float theWidth;
+	if (frequency != 0) {
+        theWidth = (float)(([self numPoints] - kPadSize)/(float)[self numPoints]) * 1/frequency;
+    } else {
+        theWidth = 0.;
+    }
+    return theWidth;
 }
 
 - (void) setTotalWidth:(float)newTotalWidth
 {
-    [[[self undoManager] prepareWithInvocationTarget: self]
-        setTotalWidth: [self totalWidth]];
-    totalWidth = newTotalWidth;
-    
-    [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserTotalWidthChangedNotification
-                      object: self];
+    [self setFrequency:[self calculateFreq:newTotalWidth]];
 }
 
 - (int)	triggerSource
@@ -683,7 +683,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     }
 }
 
-
+/*
 - (void) writeTotalWidth:(float)width
 {
     
@@ -707,7 +707,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     }
     else NSLog(@"HP Pulser: Can't set width to zero!\n");
     
-}
+}*/
 
 - (void) logSystemResponse
 {
@@ -903,30 +903,35 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     if([self isConnected]){
         if(selectedWaveform == kLogCalibrationWaveform){
-            [self writeTotalWidth:kCalibrationWidth];
-            [self logSystemResponse];
+            //[self writeTotalWidth:kCalibrationWidth];
+            //[self logSystemResponse];
             [self writeVoltage:kCalibrationVoltage];
             [self logSystemResponse];
+            [self writeBurstCycles:1];
+            [self logSystemResponse];            
             [self writeBurstRate:kCalibrationBurstRate];
             [self logSystemResponse];
+			[self writeFrequency:[self frequency]];
+			[self logSystemResponse];
         }
         else {
-            [self writeTotalWidth:[self totalWidth]];
-            [self logSystemResponse];
+            //[self writeTotalWidth:[self totalWidth]];
+            //[self logSystemResponse];
             [self writeVoltage:[self voltage]];
             [self logSystemResponse];
             [self writeVoltageOffset:[self voltageOffset]];
             [self logSystemResponse];
-            if (selectedWaveform <= kNumBuiltInTypes) {
+            //if (selectedWaveform <= kNumBuiltInTypes) {
                 [self writeFrequency:[self frequency]];
                 [self logSystemResponse];
-            }
+            //}
+            [self writeBurstCycles:[self burstCycles]];
+            [self logSystemResponse];
             [self writeBurstRate:[self burstRate]];
             [self logSystemResponse];
         }
         
-        [self writeBurstCycles:[self burstCycles]];
-        [self logSystemResponse];
+
         [self writeBurstPhase:[self burstPhase]];
         [self logSystemResponse];
         [self writeTriggerSource:[self triggerSource]];
@@ -1107,10 +1112,14 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 }
 
 #pragma mark •••Archival
-static NSString* HPTriggerMode          = @"HPTriggerMode";
+static NSString* HPTriggerMode      = @"HPTriggerMode";
 static NSString* HPVoltage          = @"HPVoltageFloat";
+static NSString* HPVoltageOffset    = @"HPVoltageOffsetFloat";
+static NSString* HPFrequency        = @"HPFrequency";
+static NSString* HPBurstCycles      = @"HPBurstCycles";
 static NSString* HPBurstRate 		= @"HPBurstRate";
-static NSString* HPTotalWidth 		= @"HPTotalWidth";
+static NSString* HPBurstPhase 		= @"HPBurstPhase";
+//static NSString* HPTotalWidth 		= @"HPTotalWidth";
 static NSString* HPSelectedWaveform  = @"HPSelectedWaveform";
 static NSString* ORHPPulserEnableRandom = @"ORHPPulserEnableRandom";
 static NSString* ORHPPulserMinTime = @"ORHPPulserMinTime";
@@ -1138,8 +1147,12 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
     [[self undoManager] disableUndoRegistration];
     [self setTriggerSource: [aDecoder decodeIntForKey: HPTriggerMode]];
     [self setVoltage: [aDecoder decodeFloatForKey: HPVoltage]];
+    [self setVoltageOffset: [aDecoder decodeFloatForKey: HPVoltageOffset]];
+    [self setFrequency: [aDecoder decodeFloatForKey: HPFrequency]];
     [self setBurstRate: [aDecoder decodeFloatForKey: HPBurstRate]];
-    [self setTotalWidth: [aDecoder decodeFloatForKey: HPTotalWidth]];
+    [self setBurstPhase: [aDecoder decodeIntForKey: HPBurstPhase]];
+    [self setBurstCycles: [aDecoder decodeIntForKey: HPBurstCycles]];
+//    [self setTotalWidth: [aDecoder decodeFloatForKey: HPTotalWidth]];
     [self setSelectedWaveform: [aDecoder decodeIntForKey: HPSelectedWaveform]];
 	[self setEnableRandom:[aDecoder decodeBoolForKey:ORHPPulserEnableRandom]];
 	[self setMinTime:[aDecoder decodeFloatForKey:ORHPPulserMinTime]];
@@ -1153,8 +1166,12 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
     [anEncoder encodeBool:negativePulse forKey:@"ORHPPulserModelNegativePulse"];
     [anEncoder encodeInt: [self triggerSource] forKey: HPTriggerMode];
     [anEncoder encodeFloat: [self voltage] forKey: HPVoltage];
+	[anEncoder encodeFloat: [self voltageOffset] forKey: HPVoltageOffset];
     [anEncoder encodeFloat: [self burstRate] forKey: HPBurstRate];
-    [anEncoder encodeFloat: [self totalWidth] forKey: HPTotalWidth];
+    [anEncoder encodeFloat: [self frequency] forKey: HPFrequency];
+    [anEncoder encodeInt: [self burstCycles] forKey: HPBurstCycles];
+    [anEncoder encodeInt: [self burstPhase] forKey: HPBurstPhase];
+//    [anEncoder encodeFloat: [self totalWidth] forKey: HPTotalWidth];
     [anEncoder encodeInt: [self selectedWaveform] forKey: HPSelectedWaveform];
 	[anEncoder encodeBool:enableRandom forKey:ORHPPulserEnableRandom];
 	[anEncoder encodeFloat:minTime forKey:ORHPPulserMinTime];
@@ -1167,8 +1184,12 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
     
     [objDictionary setObject:[NSNumber numberWithInt:triggerSource] forKey:@"triggerMode"];
     [objDictionary setObject:[NSNumber numberWithFloat:voltage] forKey:@"voltage"];
+    [objDictionary setObject:[NSNumber numberWithFloat:voltageOffset] forKey:@"voltageOffset"];
+	[objDictionary setObject:[NSNumber numberWithFloat:frequency] forKey:@"frequency"];
     [objDictionary setObject:[NSNumber numberWithFloat:burstRate] forKey:@"burstRate"];
-    [objDictionary setObject:[NSNumber numberWithFloat:totalWidth] forKey:@"totalWidth"];
+    [objDictionary setObject:[NSNumber numberWithInt:burstCycles] forKey:@"burstCycles"];
+    [objDictionary setObject:[NSNumber numberWithInt:burstPhase] forKey:@"burstPhase"];
+//    [objDictionary setObject:[NSNumber numberWithFloat:totalWidth] forKey:@"totalWidth"];
     [objDictionary setObject:[NSNumber numberWithInt:selectedWaveform] forKey:@"selectedWaveform"];
     [objDictionary setObject:[NSNumber numberWithBool:enableRandom] forKey:@"enableRandom"];
     [objDictionary setObject:[NSNumber numberWithFloat:minTime] forKey:@"minTime"];

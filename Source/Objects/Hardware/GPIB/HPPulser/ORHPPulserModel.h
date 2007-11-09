@@ -42,7 +42,7 @@ typedef struct HPPulserCustomWaveformStruct {
 	NSMutableData*  waveform;
 	float           voltage;
 	float           burstRate;
-	float           totalWidth;
+	//float           totalWidth;
 	float           frequency;
 	float           voltageOffset;
 	int             burstCycles;
@@ -185,7 +185,7 @@ typedef struct HPPulserCustomWaveformStruct {
 - (void) writeBurstRate:(float)rate;
 - (void) writeBurstPhase:(int)phase;
 - (void) writeBurstCycles:(int)cycles;
-- (void) writeTotalWidth:(float)width;
+//- (void) writeTotalWidth:(float)width;
 - (void) writeBurstState:(BOOL)value;
 - (void) writeTriggerSource:(int)value;
 - (void) downloadWaveform;
@@ -236,7 +236,7 @@ extern NSString* ORHPPulserFrequencyChangedNotification;
 extern NSString* ORHPPulserBurstRateChangedNotification;
 extern NSString* ORHPPulserBurstPhaseChangedNotification;
 extern NSString* ORHPPulserBurstCyclesChangedNotification;
-extern NSString* ORHPPulserTotalWidthChangedNotification;
+//extern NSString* ORHPPulserTotalWidthChangedNotification;
 extern NSString* ORHPPulserSelectedWaveformChangedNotification;
 extern NSString* ORHPPulserWaveformLoadStartedNotification;
 extern NSString* ORHPPulserWaveformLoadProgressingNotification;
