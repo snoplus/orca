@@ -208,7 +208,12 @@
                      selector : @selector(processing:)
                          name : ORReplayProcessingStartedNotification
                         object: model];
-	
+
+	[notifyCenter addObserver : self
+                     selector : @selector(tableViewSelectionDidChange:)
+                         name : NSTableViewSelectionDidChangeNotification
+                        object: nil];
+
 }
 
 - (void) updateWindow
@@ -295,10 +300,13 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-    if(![model isReplaying]){
-		[self loadHeader];
+	if([aNotification object] == fileListView){
+		if(![model isReplaying]){
+			[self loadHeader];
+		}
 	}
 }
+
 - (void) loadHeader
 {
     int n = [fileListView numberOfSelectedRows];
@@ -327,7 +335,7 @@
 
 - (void) fileListChanged:(NSNotification*)note
 {
-//	[self loadHeader];
+	[self loadHeader];
 }
 
 - (void) drawerDidOpen:(NSNotification *)notification

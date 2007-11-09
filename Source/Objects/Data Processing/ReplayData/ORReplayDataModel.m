@@ -262,14 +262,14 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
         
         if(fp){
             ORDataPacket* aDataPacket = [[ORDataPacket alloc] init];
-            
-            if([aDataPacket readHeader:fp]){
-                [self setHeader:[ORHeaderItem headerFromObject:[aDataPacket fileHeader] named:@"Root"]];
-            }
-            else {
-                NSLogColor([NSColor redColor],@"Problem reading header for <%@>.\n",aFileName);
-            }
-            
+            if([aDataPacket legalDataFile:fp]){
+				if([aDataPacket readHeader:fp]){
+					[self setHeader:[ORHeaderItem headerFromObject:[aDataPacket fileHeader] named:@"Root"]];
+				}
+				else {
+					NSLogColor([NSColor redColor],@"Problem reading header for <%@>.\n",aFileName);
+				}
+			}
             [aDataPacket release];
         }
         else {
