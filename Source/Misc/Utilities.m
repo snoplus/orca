@@ -124,6 +124,9 @@ NSString* listMethods(Class aClass)
 
 NSString* listMethodWithOptions(Class aClass,BOOL verbose)
 {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+	return @"not yet available in 10.5";
+#else
 	NSMutableString* resultString = [NSMutableString stringWithString:@""];
     struct objc_class *class = aClass;
 	if(!aClass)return @"Class Not Found!\n";
@@ -158,5 +161,5 @@ NSString* listMethodWithOptions(Class aClass,BOOL verbose)
         [resultString appendString: listMethodWithOptions( class->super_class,verbose)];
     }
 	return resultString;
+#endif
 }
-
