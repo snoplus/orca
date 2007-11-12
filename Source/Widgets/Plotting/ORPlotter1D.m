@@ -445,13 +445,29 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	[gradient release];
 	gradient = nil;
     [self setNeedsDisplay:YES];
-    [mYScale setNeedsDisplay:YES];
-    [mXScale setNeedsDisplay:YES];
+    //[mYScale setNeedsDisplay:YES];
+    //[mXScale setNeedsDisplay:YES];
 }
 
 -(NSColor*)backgroundColor
 {
-    return [NSUnarchiver unarchiveObjectWithData:[attributes objectForKey:ORPlotter1DBackgroundColor]];
+	NSData* d = [attributes objectForKey:ORPlotter1DBackgroundColor];
+	if(!d)return [NSColor whiteColor];
+    else return [NSUnarchiver unarchiveObjectWithData:d];
+}
+
+- (void)setGridColor:(NSColor *)aColor
+{
+    [attributes setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:ORPlotter1DGridColor];
+    [self setNeedsDisplay:YES];
+    [mYScale setNeedsDisplay:YES];
+    [mXScale setNeedsDisplay:YES];
+}
+
+-(NSColor*)gridColor{
+	NSData* d = [attributes objectForKey:ORPlotter1DGridColor];
+	if(!d) return [NSColor grayColor];
+    else return [NSUnarchiver unarchiveObjectWithData:d];
 }
 
 -(NSColor*)colorForDataSet:(int) aDataSet
@@ -477,22 +493,67 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	[self setNeedsDisplay:YES];
 }
 
+//wrappers for KVO bindings
+- (void) setDataColor0:(NSColor*)aColor { [self setDataColor:aColor dataSet:0]; }
+- (void) setDataColor1:(NSColor*)aColor { [self setDataColor:aColor dataSet:1]; }
+- (void) setDataColor2:(NSColor*)aColor { [self setDataColor:aColor dataSet:2]; }
+- (void) setDataColor3:(NSColor*)aColor { [self setDataColor:aColor dataSet:3]; }
+- (void) setDataColor4:(NSColor*)aColor { [self setDataColor:aColor dataSet:4]; }
+- (void) setDataColor5:(NSColor*)aColor { [self setDataColor:aColor dataSet:5]; }
+
+- (NSColor*) dataColor0
+{
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:0]];
+	if(!colorData)return [NSColor redColor];
+	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
+}
+
+- (NSColor*) dataColor1
+{
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:1]];
+	if(!colorData)return [NSColor greenColor];
+	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
+}
+
+- (NSColor*) dataColor2
+{
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:2]];
+	if(!colorData)return [NSColor blueColor];
+	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
+}
+
+- (NSColor*) dataColor3
+{
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:3]];
+	if(!colorData)return [NSColor brownColor];
+	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
+}
+- (NSColor*) dataColor4
+{
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:4]];
+	if(!colorData)return [NSColor purpleColor];
+	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
+}
+- (NSColor*) dataColor5
+{
+	NSMutableDictionary* colorDictionary = [attributes objectForKey:ORPlotter1DataColor];
+	NSData* colorData = [colorDictionary objectForKey:[NSNumber numberWithInt:5]];
+	if(!colorData)return [NSColor orangeColor];
+	else return [NSUnarchiver unarchiveObjectWithData:colorData];	
+}
+
+
 - (void)setIgnoreDoNotDrawFlag:(BOOL)aFlag
 {
     ignoreDoNotDrawFlag = aFlag;
 }
 
-- (void)setGridColor:(NSColor *)aColor
-{
-    [attributes setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:ORPlotter1DGridColor];
-    [self setNeedsDisplay:YES];
-    [mYScale setNeedsDisplay:YES];
-    [mXScale setNeedsDisplay:YES];
-}
 
--(NSColor*)gridColor{
-    return [NSUnarchiver unarchiveObjectWithData:[attributes objectForKey:ORPlotter1DGridColor]];
-}
 
 -(void)setFrame:(NSRect)aFrame
 {
@@ -940,11 +1001,10 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     double   x, y;
     NSBezierPath* theGrid;
     NSBezierPath* theDataPath;
-    NSBezierPath* theGatePath;
     
     NSRect bounds = [self bounds];
-
-    [[NSColor whiteColor] set];
+	
+    [[self backgroundColor] set];
     [NSBezierPath fillRect:bounds];
     [[NSColor darkGrayColor] set];
     [NSBezierPath strokeRect:bounds];
@@ -956,7 +1016,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     [theGrid setLineWidth:.75];
     ht = [self frame].size.height;
     
-    for(x=0;x<=width;x = x+width/10.){
+	for(x=0;x<=width;x = x+width/10.){
         [theGrid moveToPoint:NSMakePoint(x,0)];
         [theGrid relativeLineToPoint:NSMakePoint(0,ht)];
     }
@@ -967,33 +1027,31 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
         [theGrid relativeLineToPoint:NSMakePoint(width,0)];
     }
     
-    theDataPath = [NSBezierPath bezierPath];
-    theGatePath = [NSBezierPath bezierPath];
-    [theDataPath moveToPoint:NSMakePoint(0,0)];
-    for (x=0;x<=width;x++) {
-        float y = (x*x)/250.;
-        [theDataPath lineToPoint:NSMakePoint(x,y)];
-        if(x>=width/2 && x<=width/2+20){
-            [theGatePath moveToPoint:NSMakePoint(x,0)];
-            [theGatePath lineToPoint:NSMakePoint(x,y)];
-        }
-    }
-    
-    [[NSColor lightGrayColor] set];
+	int i;
+	for(i=0;i<6;i++){
+		theDataPath = [NSBezierPath bezierPath];
+		[theDataPath moveToPoint:NSMakePoint(0,0)];
+		for (x=0;x<=width;x++) {
+			float y;
+			if(i==0)y = x;
+			else if(i==1)y = (x*x)/250.;
+			else y = pow(x,(double)(i+1))/25000.;
+			[theDataPath lineToPoint:NSMakePoint(x,y)];
+		}
+		[[self colorForDataSet:i] set];
+
+		[theDataPath setLineWidth:.5];
+		[theDataPath stroke];
+	}
+ 
+	[[self gridColor] set];
     [theGrid setLineWidth:.5];
     [theGrid stroke];
     
     
-    [[NSColor lightGrayColor] set];
-    [theGatePath setLineWidth:.5];
-    [theGatePath stroke];
-    
-    [[NSColor greenColor] set];
-    [theDataPath setLineWidth:.5];
-    [theDataPath stroke];
-    
-    
 }
+
+
 - (BOOL) acceptsFirstResponder
 {
     return YES;

@@ -90,6 +90,7 @@ long roundToLong(double x);
 - (void)  setRngLimitsLow:(double)low withHigh:(double) high withMinRng:(double) min_rng;
 - (void) setRngDefaultsLow:(double)aLow withHigh:(double)aHigh;
 - (void) setLog:(BOOL)isLog;
+- (BOOL) log;
 - (BOOL) isLog;
 - (double) padding;
 - (void) setPadding:(double) p;
@@ -144,6 +145,11 @@ long roundToLong(double x);
 - (void) encodeWithCoder:(NSCoder*)coder;
 - (BOOL) dragInProgress;
 - (void)  rangingDonePostChange;				// end drag procedure
+
+- (long) axisMinLimit;
+- (void) setAxisMinLimit:(long)aValue;
+- (long) axisMaxLimit;
+- (void) setAxisMaxLimit:(long)aValue;
 
 - (IBAction) setLogScale:(id)sender;
 - (IBAction) shiftLeft:(id)sender;

@@ -111,10 +111,22 @@
 - (void) setXLabel:(NSString*)xLabel yLabel:(NSString*)yLabel;	
 - (void) doFFT:(id)userInfo;
 - (void) autoScaleXAxis;
+
+//wrappers for KVO bindings
+- (void) setDataColor0:(NSColor*)aColor;
+- (void) setDataColor1:(NSColor*)aColor; 
+- (void) setDataColor2:(NSColor*)aColor; 
+- (void) setDataColor3:(NSColor*)aColor; 
+- (void) setDataColor4:(NSColor*)aColor; 
+- (void) setDataColor5:(NSColor*)aColor; 
+
+- (NSColor*) dataColor0;
+- (NSColor*) dataColor1;
+- (NSColor*) dataColor2;
+- (NSColor*) dataColor3;
+- (NSColor*) dataColor4;
+- (NSColor*) dataColor5;
 @end
-
-
-
 
 @interface NSObject (OR1DPlotDataSource1)
 - (BOOL)   	willSupplyColors;

@@ -67,7 +67,7 @@ NSString* kDefFont = @"Helvetica";
 #define	kMaxArgumentForExp				1000	// maximum argument for exp()
 #define kBigNumber						1e100	// large number for divide by zero result
 
-static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
+static char	symbols[]	= "fpnÂµm\0kMG";		// symbols for exponents
 
 //notifications
 NSString* ORAxisRangeChangedNotification    = @"ORAxis Range Changed";
@@ -258,6 +258,11 @@ enum {
     [viewToScale setNeedsDisplay:YES];;
 }
 
+-(BOOL) log
+{
+    if(isLogCached)return cachedIsLog;
+    return [[attributes objectForKey:ORAxisUseLog] boolValue];
+}
 
 -(BOOL) isLog
 {
@@ -676,6 +681,32 @@ enum {
 	else return theLabel;
 }
 
+- (long) axisMinLimit
+{
+	return (long)[self minLimit];
+}
+
+- (void) setAxisMinLimit:(long)aValue
+{
+	double dv = (double)aValue;
+	[self setMinLimit:dv];
+	//[self setRngLow:dv withHigh:[self maxLimit]]; 
+    [self calcSci];
+ 	[self setNeedsDisplay:YES];
+}
+
+- (long) axisMaxLimit
+{
+	return (long)[self maxLimit];
+}
+- (void) setAxisMaxLimit:(long)aValue
+{
+	double dv = (double)aValue;
+	[self setMaxLimit:dv];
+	//[self setRngLow:[self minLimit] withHigh:dv];   	
+    [self calcSci];
+  	[self setNeedsDisplay:YES];
+}
 
 /* GetMinVal - get scale minimum value */
 - (double) minValue
