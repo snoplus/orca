@@ -40,8 +40,8 @@
 - (int) eval
 {
     if(!alreadyEvaluated){
-        alreadyEvaluated = YES;
         [self setState:![super eval]];
+        alreadyEvaluated = YES;
     }
     [self setEvaluatedState: [self state]];
 	return evaluatedState;
