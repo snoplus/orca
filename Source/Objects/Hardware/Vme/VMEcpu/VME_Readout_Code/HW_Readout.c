@@ -81,7 +81,7 @@ void FindHardware(void)
 
     vmeAM29Handle = vme_openDevice( "lsi1" );
 	vmeAM39Handle = vme_openDevice( "lsi2" );
-    controlHandle  = vme_openDevice( "ctl" );
+    controlHandle = vme_openDevice( "ctl" );
 
 	int result;
 
@@ -99,14 +99,14 @@ void FindHardware(void)
    
 	PCI_IMAGE_DATA idata;
 	idata.pciAddress	= 0x0;			/* default -- let the cpu pick the address */
-	idata.vmeAddress	= 0x0;			/* start a zero and map the ENTIRE short address space */
+	idata.vmeAddress	= 0x0;			/* start at zero and map the ENTIRE short address space */
 	idata.size			= 0x10000;		/* 64K, 16 bit address space */
 	idata.dataWidth		= VME_D16;		/* 16 bit data */
 	idata.addrSpace		= VME_A16;      /* address modifier 0x29 */
 	//idata.addrSpace	= VME_USER1_AM; /* address modifier 0x29 */
 	idata.postedWrites	= 0;
 	idata.type			= LSI_DATA;     /* data AM code */
-	idata.mode			= 1;     /* non-privileged */
+	idata.mode			= 1;			/* non-privileged */
 	idata.vmeCycle		= 0;			/* no BLT's on VME bus */
 	idata.pciBusSpace	= 0;			/* PCI bus memory space */
 	idata.ioremap		= 1;			/* use ioremap */
@@ -114,9 +114,9 @@ void FindHardware(void)
     //printf("Pci image result: %d\n",result);
 
 	idata.pciAddress	= 0x0;			/* default -- let the cpu pick the address */
-	idata.vmeAddress	= 0x0;			/* start a zero and map the ENTIRE short address space */
+	idata.vmeAddress	= 0x0;			/* start at zero and map the ENTIRE short address space */
 	idata.size			= 0x10000;		/* 64K, 16 bit address space */
-	idata.dataWidth		= VME_D32;		/* 32 bit data */
+	idata.dataWidth		= VME_D16;		/* 16 bit data */
 	idata.addrSpace		= VME_A32;      /* address modifier 0x39 */
 	//idata.addrSpace	= VME_USER1_AM; /* address modifier 0x29 */
 	idata.postedWrites	= 0;
@@ -225,7 +225,6 @@ void doReadBlock(SBC_Packet* aPacket)
 	//printf("reading %ld bytes @ 0x%x\n",numItems*unitSize,(int)startAddress);
 
 	int result	= vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
-	//printf("read result: %d\n",result);
 
 	returnDataPtr->address			= startAddress;
 	returnDataPtr->addressModifier	= addressModifier;
@@ -250,7 +249,7 @@ void doReadBlock(SBC_Packet* aPacket)
 		}
 	}
 	else {
-		//printf("error: %d %d : %s\n",(int)result,(int)errno,strerror(errno));
+		sprintf(aPacket->message,"error: %d %d : %s\n",(int)result,(int)errno,strerror(errno));
 		aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
 		returnDataPtr->numItems			= 0;
 		returnDataPtr->errorCode		= result;		
