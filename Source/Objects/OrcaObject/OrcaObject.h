@@ -167,6 +167,12 @@ extern NSString* ORObjArrayPtrPBType;
 - (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
 @end
 
+#pragma mark ¥¥¥Compiler Warning Fixes
+//This following are mostly just to fix compiler warnings in one place by supplying methods that 
+//return default values
+@interface OrcaObject (cardSupport)
+- (short) numberSlotsUsed;
+@end
 
 @interface OrcaObject (scriptingAdditions)
 - (long) longValue;
@@ -175,6 +181,14 @@ extern NSString* ORObjArrayPtrPBType;
 @interface OrcaObject (compilerErrorFix)
 - (NSDictionary*) dataRecordDescription;
 @end
+
+@interface NSObject (OrcaObject_Catagory)
+- (void) makeConnectors;
+- (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)aDataPacket forChannel:(int)aChannel;
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
+- (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+@end
+
 
 extern NSString* OROrcaObjectMoved;
 extern NSString* ORMovedObject;
@@ -186,11 +200,5 @@ extern NSString* ORWarningPosted;
 extern NSString* ORMiscAttributesChanged;
 extern NSString* ORMiscAttributeKey;
 
-@interface NSObject (OrcaObject_Catagory)
-- (void) makeConnectors;
-- (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)aDataPacket forChannel:(int)aChannel;
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
-- (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-@end
 
 

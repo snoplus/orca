@@ -42,6 +42,7 @@
 - (id) serialPort:(int)index;
 
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard;
+- (int) crateNumber;
 
 #pragma mark ¥¥¥Serial Ports
 - (void) scanForSerialPorts;

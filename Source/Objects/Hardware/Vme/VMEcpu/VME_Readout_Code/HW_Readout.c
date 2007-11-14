@@ -80,7 +80,7 @@ void FindHardware(void)
 	/* TBD **** MUST add some error checking here */
 
     vmeAM29Handle = vme_openDevice( "lsi1" );
-    vmeAM39Handle = vme_openDevice( "lsi2" );
+	vmeAM39Handle = vme_openDevice( "lsi2" );
     controlHandle  = vme_openDevice( "ctl" );
 
 	int result;
@@ -148,8 +148,8 @@ void doWriteBlock(SBC_Packet* aPacket)
 	long unitSize					= p->unitSize;
 	long numItems					= p->numItems;
 	int memMapHandle;
-	if(addressModifier == 29) memMapHandle = vmeAM29Handle;
-	else					  memMapHandle = vmeAM39Handle;
+	if(addressModifier == 0x29) memMapHandle = vmeAM29Handle;
+	else					    memMapHandle = vmeAM39Handle;
 	
 	p++; /*point to the data*/
 	short *sptr;
@@ -210,7 +210,7 @@ void doReadBlock(SBC_Packet* aPacket)
 	long unitSize					= p->unitSize;
 	long numItems					= p->numItems;
 	int memMapHandle;
-	if(addressModifier == 29)	memMapHandle = vmeAM29Handle;
+	if(addressModifier == 0x29)	memMapHandle = vmeAM29Handle;
 	else						memMapHandle = vmeAM39Handle;
 
 	/*OK, got address and # to read, set up the response and go get the data*/

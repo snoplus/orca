@@ -779,6 +779,13 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 }
 @end
 
+@implementation OrcaObject (cardSupport)
+- (short) numberSlotsUsed
+{
+	return 0;
+}
+@end
+
 @implementation OrcaObject (scriptingAdditions)
 //this is just to help with the scriting stuff
 - (long) longValue

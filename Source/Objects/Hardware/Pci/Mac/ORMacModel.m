@@ -89,6 +89,11 @@ void registryChanged(
 
 }
 
+- (int) crateNumber
+{
+	return 0;
+}
+
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"Mac"]];
