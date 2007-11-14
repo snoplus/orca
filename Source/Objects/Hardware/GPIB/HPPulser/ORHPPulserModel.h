@@ -63,58 +63,58 @@ typedef struct HPPulserCustomWaveformStruct {
     BOOL			negativePulse;
 	
 	enum {
-	kBuiltInSinc,
-	kBuiltInNegRamp,
-	kBuiltInExpRise,
-	kBuiltInExpFall,
-	kBuiltInCardiac,
-    kSquareWave1,
-    kSingleSinWave1,
-	kSingleSinWave2,
-    kSquareWave2,
-    kDoubleSinWave,
-    kLogCalibrationWaveform,
-	kLogCalibWave2,
-	kLogCalibWave4,
-	kDoubleLogamp,
-	kTripleLogamp,
-	kLogCalibWaveAdjust,
-	kGaussian,
-	kPinDiode,
-    kWaveformFromFile,
-    kNumWaveforms   //must be last
+		kBuiltInSinc,
+		kBuiltInNegRamp,
+		kBuiltInExpRise,
+		kBuiltInExpFall,
+		kBuiltInCardiac,
+		kSquareWave1,
+		kSingleSinWave1,
+		kSingleSinWave2,
+		kSquareWave2,
+		kDoubleSinWave,
+		kLogCalibrationWaveform,
+		kLogCalibWave2,
+		kLogCalibWave4,
+		kDoubleLogamp,
+		kTripleLogamp,
+		kLogCalibWaveAdjust,
+		kGaussian,
+		kPinDiode,
+		kWaveformFromFile,
+		kNumWaveforms   //must be last
     } userWaveformConsts;
 	
 	enum {
-	kNumBuiltInTypes = 5
+		kNumBuiltInTypes = 5
 	} numBuiltInTypes;
 	
 	enum {
-	kVPP,
-	kVRMS,
-	kDBM,
-	kDEF
+		kVPP,
+		kVRMS,
+		kDBM,
+		kDEF
 	} voltageTypes;
 	
 	enum {
-	kSine,
-	kSquare,
-	kTriangle,
-	kRamp,
-	kNoise,
-	kDC,
-	kUser
+		kSine,
+		kSquare,
+		kTriangle,
+		kRamp,
+		kNoise,
+		kDC,
+		kUser
 	} builtInFunctions;
 	
 	enum {
-	kMaxNumWaveformPoints = 16000
+		kMaxNumWaveformPoints = 16000
 	} maxNumWaveformPoints;
     
-        enum {
+	enum {
         kInternalTrigger,
         kExternalTrigger,
         kSoftwareTrigger 
-        } triggerTypes;
+	} triggerTypes;
 }
 
 #pragma mark ***Initialization
