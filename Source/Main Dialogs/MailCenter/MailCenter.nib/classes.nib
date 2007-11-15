@@ -2,6 +2,13 @@
     IBClasses = (
         {CLASS = OApplication; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            ACTIONS = {goHome = id; showHelpCenter = id; }; 
+            CLASS = ORHelpCenter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {webView = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
             ACTIONS = {send = id; }; 
             CLASS = ORMailCenter; 
             LANGUAGE = ObjC; 
