@@ -1226,17 +1226,17 @@ static struct {
     for(i=0;i<kNumGretinaCardParams;i++){
         [objDictionary setObject:[self cardInfo:i] forKey:cardConstants[i].name];
     }  
-	[self addCurrentState:dictionary cArray:enabled forKey:@"Enabled"];
-	[self addCurrentState:dictionary cArray:debug forKey:@"Debug Mode"];
-	[self addCurrentState:dictionary cArray:pileUp forKey:@"Pile Up"];
-	[self addCurrentState:dictionary cArray:polarity forKey:@"Polarity"];
-	[self addCurrentState:dictionary cArray:triggerMode forKey:@"Trigger Mode"];
-	[self addCurrentState:dictionary cArray:ledThreshold forKey:@"LED Threshold"];
-	[self addCurrentState:dictionary cArray:cfdDelay forKey:@"CFD Delay"];
-	[self addCurrentState:dictionary cArray:cfdFraction forKey:@"CFD Fraction"];
-	[self addCurrentState:dictionary cArray:cfdThreshold forKey:@"CFD Threshold"];
-	[self addCurrentState:dictionary cArray:dataDelay forKey:@"Data Delay"];
-	[self addCurrentState:dictionary cArray:dataLength forKey:@"Data Length"];
+	[self addCurrentState:objDictionary cArray:enabled forKey:@"Enabled"];
+	[self addCurrentState:objDictionary cArray:debug forKey:@"Debug Mode"];
+	[self addCurrentState:objDictionary cArray:pileUp forKey:@"Pile Up"];
+	[self addCurrentState:objDictionary cArray:polarity forKey:@"Polarity"];
+	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
+	[self addCurrentState:objDictionary cArray:ledThreshold forKey:@"LED Threshold"];
+	[self addCurrentState:objDictionary cArray:cfdDelay forKey:@"CFD Delay"];
+	[self addCurrentState:objDictionary cArray:cfdFraction forKey:@"CFD Fraction"];
+	[self addCurrentState:objDictionary cArray:cfdThreshold forKey:@"CFD Threshold"];
+	[self addCurrentState:objDictionary cArray:dataDelay forKey:@"Data Delay"];
+	[self addCurrentState:objDictionary cArray:dataLength forKey:@"Data Length"];
 	
 	
     return objDictionary;

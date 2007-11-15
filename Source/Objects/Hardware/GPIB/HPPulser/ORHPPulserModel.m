@@ -769,7 +769,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     NS_DURING
         NSArray* allInMemory = [self getLoadedWaveforms];
         NSEnumerator* e = [allInMemory objectEnumerator];
-        NSString* aName;
+        NSString* aName; 
         while(aName = [e nextObject]){
             if( ![self inBuiltInList:aName] && [self inCustomList:aName]){
                 [self writeToGPIBDevice:[NSString stringWithFormat:@"*RST;*CLS;DATA:DEL %@",aName]];
