@@ -115,6 +115,13 @@
         }, 
         {CLASS = ORHWWizardModel; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
+            ACTIONS = {showHelpCenter = id; }; 
+            CLASS = ORHelpCenter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {webView = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
             ACTIONS = {
                 changeBackgroundColor = id; 
                 changeLineColor = id; 
