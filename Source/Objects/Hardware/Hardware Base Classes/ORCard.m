@@ -157,5 +157,12 @@
     return objDictionary;
 }
 
+- (void) addInfoToArray:(NSMutableArray*)anArray
+{
+	NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+									[NSNumber numberWithInt:[self slot]], @"SlotNumber",
+									[self className],	@"ClassName",nil];
+	[anArray addObject:dictionary];
+}
 
 @end

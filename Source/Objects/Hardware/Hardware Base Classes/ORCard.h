@@ -44,6 +44,7 @@
 
 #pragma mark ¥¥¥Archival
 - (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (void) addInfoToArray:(NSMutableArray*)anArray;
 
 @end
 

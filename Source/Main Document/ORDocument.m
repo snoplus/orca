@@ -275,6 +275,14 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     if([gateGroup count]){
         dictionary = [gateGroup captureCurrentState:dictionary];
     }
+	
+	NSArray* crates = [self collectObjectsOfClass:NSClassFromString(@"ORCrate")];
+	if([crates count]){
+		NSMutableArray* crateArray = [NSMutableArray array];
+		[crates makeObjectsPerformSelector:@selector(addInfoToArray:) withObject:crateArray];
+		[dictionary setObject:crateArray forKey:@"CrateList"];
+	}
+	
     return [group captureCurrentState:dictionary];
 }
 

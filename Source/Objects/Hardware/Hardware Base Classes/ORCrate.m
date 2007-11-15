@@ -341,5 +341,24 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 	[encoder encodeBool:showLabels forKey:@"showLabels"];
 }
 
+- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* dictionaryToUse = [super captureCurrentState:dictionary];
+	NSArray* cards = [self collectObjectsOfClass:NSClassFromString(@"ORCard")];
+	if([cards count]){
+		NSMutableArray* cardArray = [NSMutableArray array];
+		[cards makeObjectsPerformSelector:@selector(addInfoToArray:) withObject:cardArray];
+		[dictionaryToUse setObject:cardArray forKey:@"CardList"];
+	}
+    return dictionaryToUse;
+}
+
+- (void) addInfoToArray:(NSMutableArray*)anArray
+{
+	NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+									[NSNumber numberWithInt:[self crateNumber]], @"CrateNumber",
+									[self className],	@"ClassName",nil];
+	[anArray addObject:dictionary];
+}
 
 @end
