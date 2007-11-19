@@ -218,6 +218,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) setSerialNumber:(NSString*)aSerialNumber
 {
+	if(!aSerialNumber)aSerialNumber = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setSerialNumber:serialNumber];
     
     [serialNumber autorelease];
@@ -292,6 +293,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) setIpAddress:(NSString*)aIpAddress
 {
+	if(!aIpAddress)aIpAddress = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setIpAddress:ipAddress];
     
     [ipAddress autorelease];
@@ -701,6 +703,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) mainThreadSocketSend:(NSString*)aCommand
 {
+	if(!aCommand)aCommand = @"";
 	[socket writeString:aCommand encoding:NSASCIIStringEncoding];
 }
 

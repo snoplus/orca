@@ -45,7 +45,6 @@
                 setBurstPhaseAction = id; 
                 setBurstRateAction = id; 
                 setFrequencyAction = id; 
-                setTotalWidthAction = id; 
                 setVoltageAction = id; 
                 setVoltageOffsetAction = id; 
                 testAction = id; 
@@ -85,9 +84,6 @@
                 selectionPopUpButton = NSPopUpButton; 
                 sendCommandButton = NSButton; 
                 testButton = NSButton; 
-                totalWidthDisplay = NSTextField; 
-                totalWidthField = NSTextField; 
-                totalWidthStepper = NSStepper; 
                 triggerButton = NSButton; 
                 triggerModeMatrix = NSMatrix; 
                 voltageDisplay = NSTextField; 

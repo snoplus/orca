@@ -1,0 +1,27 @@
+{
+    IBClasses = (
+        {CLASS = OApplication; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {goHome = id; showHelpCenter = id; }; 
+            CLASS = ORHelpCenter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {webView = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {send = id; }; 
+            CLASS = ORMailCenter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {bodyField = NSTextView; mailForm = NSForm; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {print = id; }; 
+            CLASS = ORPrintableOutlineView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSOutlineView; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
+    ); 
+    IBVersion = 1; 
+}

@@ -253,8 +253,9 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"crate %d",[self tag]];
+    return [NSString stringWithFormat:@"%@ %d",[self className],[self tag]];
 }
+
 - (BOOL) powerOff
 {
 	return powerOff;
@@ -355,9 +356,20 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 
 - (void) addInfoToArray:(NSMutableArray*)anArray
 {
+	int cardStart = 0;
+	NSEnumerator* e = [[self orcaObjects] objectEnumerator];
+	id anObj;
+	while(anObj = [e nextObject]){
+		if([anObj isKindOfClass:NSClassFromString(@"ORCard")]){
+			cardStart = [anObj tagBase];
+			break;
+		}
+	}
+
 	NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 									[NSNumber numberWithInt:[self crateNumber]], @"CrateNumber",
-									[self className],	@"ClassName",nil];
+									[self className],	@"ClassName",
+									[NSNumber numberWithInt:cardStart],	@"FirstSlot",nil];
 	[anArray addObject:dictionary];
 }
 

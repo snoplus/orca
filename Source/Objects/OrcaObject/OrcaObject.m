@@ -60,7 +60,6 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
     [image release];
     [connectors release];
 	[miscAttributes release];
-    [self sleep];
     [super dealloc];
 }
 
