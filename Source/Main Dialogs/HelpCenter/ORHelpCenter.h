@@ -22,7 +22,7 @@
 	IBOutlet id webView;
 }
 
-- (NSString*) homeURL;
+- (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) showHelpCenter:(id)sender;

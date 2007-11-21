@@ -21,6 +21,7 @@
 #import <WebKit/WebKit.h>
 #import "ORHelpCenter.h"
 
+#define kORCAHelpURL @"http://128.95.100.177/~markhowe"
 
 @implementation ORHelpCenter
 - (id)init
@@ -31,14 +32,12 @@
 
 - (void) awakeFromNib
 {
-	[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self homeURL]]]];
+	[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:kORCAHelpURL]]];
 }
 
-- (NSString*) homeURL
+- (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame
 {
-	//NSString* homeURL =  [NSString stringWithFormat:@"file://localhost%@/OrcaHelp/index.html",[[NSBundle mainBundle] resourcePath]];
-	NSString* homeURL =   @"http://128.95.100.177/~markhowe";
-	return homeURL;
+	NSBeginAlertSheet (@"Load Failed",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Check Internet Connection");
 }
 
 #pragma mark ¥¥¥Actions
@@ -49,6 +48,6 @@
 
 - (IBAction) goHome:(id)sender
 {
-	[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self homeURL]]]];
+	[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:kORCAHelpURL]]];
 }
 @end
