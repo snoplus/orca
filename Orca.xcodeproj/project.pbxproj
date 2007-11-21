@@ -127,7 +127,6 @@
 		8407751E0CEE7CAD0073F5A9 /* ORHelpCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 840775100CEE7CAC0073F5A9 /* ORHelpCenter.h */; };
 		8407751F0CEE7CAD0073F5A9 /* ORHelpCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 840775110CEE7CAC0073F5A9 /* ORHelpCenter.m */; };
 		840775220CEE7CAD0073F5A9 /* SnapBack.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 840775140CEE7CAC0073F5A9 /* SnapBack.tiff */; };
-		8407AF960CEE75C70073F5A9 /* OrcaHelp in Resources */ = {isa = PBXBuildFile; fileRef = 840794170CEE75C40073F5A9 /* OrcaHelp */; };
 		84080D2B0B3C7FBF009D3704 /* ORScriptRunner.h in Headers */ = {isa = PBXBuildFile; fileRef = 84080D240B3C7FBE009D3704 /* ORScriptRunner.h */; };
 		84080D2C0B3C7FBF009D3704 /* ORScriptRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 84080D250B3C7FBE009D3704 /* ORScriptRunner.m */; };
 		84080D2D0B3C7FBF009D3704 /* NodeTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 84080D260B3C7FBE009D3704 /* NodeTree.h */; };
@@ -1744,7 +1743,6 @@
 		840775100CEE7CAC0073F5A9 /* ORHelpCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHelpCenter.h; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.h"; sourceTree = SOURCE_ROOT; };
 		840775110CEE7CAC0073F5A9 /* ORHelpCenter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHelpCenter.m; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.m"; sourceTree = SOURCE_ROOT; };
 		840775140CEE7CAC0073F5A9 /* SnapBack.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = SnapBack.tiff; path = "Source/Main Dialogs/HelpCenter/SnapBack.tiff"; sourceTree = SOURCE_ROOT; };
-		840794170CEE75C40073F5A9 /* OrcaHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = OrcaHelp; sourceTree = SOURCE_ROOT; };
 		84080D240B3C7FBE009D3704 /* ORScriptRunner.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORScriptRunner.h; sourceTree = "<group>"; };
 		84080D250B3C7FBE009D3704 /* ORScriptRunner.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORScriptRunner.m; sourceTree = "<group>"; };
 		84080D260B3C7FBE009D3704 /* NodeTree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NodeTree.h; path = "Source/Main Dialogs/CommandCenter/Scripting/NodeTree.h"; sourceTree = SOURCE_ROOT; };
@@ -3348,7 +3346,6 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				840794170CEE75C40073F5A9 /* OrcaHelp */,
 				84C533280652BA6B00E4731F /* MainMenu.nib */,
 				840B721E0948AE3900B1B135 /* smallLock.tif */,
 				847BC82E05E293E80054841E /* Unlocked.tif */,
@@ -8190,7 +8187,6 @@
 				84997E8B0CE37CBA002CFA70 /* Vme64Crate.gif in Resources */,
 				84997E8C0CE37CBA002CFA70 /* Vme64Crate.nib in Resources */,
 				84997E8D0CE37CBA002CFA70 /* Vme64CrateSmall.gif in Resources */,
-				8407AF960CEE75C70073F5A9 /* OrcaHelp in Resources */,
 				8407751A0CEE7CAD0073F5A9 /* HelpCenter.nib in Resources */,
 				8407751C0CEE7CAD0073F5A9 /* home.gif in Resources */,
 				8407751D0CEE7CAD0073F5A9 /* Linkback Green.tiff in Resources */,
