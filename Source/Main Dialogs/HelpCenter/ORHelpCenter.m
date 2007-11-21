@@ -36,7 +36,8 @@
 
 - (NSString*) homeURL
 {
-	NSString* homeURL =  [NSString stringWithFormat:@"file://localhost%@/OrcaHelp/index.html",[[NSBundle mainBundle] resourcePath]];
+	//NSString* homeURL =  [NSString stringWithFormat:@"file://localhost%@/OrcaHelp/index.html",[[NSBundle mainBundle] resourcePath]];
+	NSString* homeURL =   @"http://128.95.100.177/~markhowe";
 	return homeURL;
 }
 
