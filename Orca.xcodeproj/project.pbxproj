@@ -15,6 +15,9 @@
 		1C50F9F708033CA9008D18EA /* ORADC2249Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C50F9EC08033CA9008D18EA /* ORADC2249Decoders.m */; };
 		1C50F9F808033CA9008D18EA /* ORADC2249Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C50F9ED08033CA9008D18EA /* ORADC2249Model.h */; };
 		1C50F9F908033CA9008D18EA /* ORADC2249Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C50F9EE08033CA9008D18EA /* ORADC2249Model.m */; };
+		2A08E4C20CFB74B30090BF77 /* SBC_Readout.c in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC400C99FA0700B46CD4 /* SBC_Readout.c */; };
+		2A08E4C30CFB74CF0090BF77 /* CircularBuffer.c in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3C0C99FA0700B46CD4 /* CircularBuffer.c */; };
+		2A08E4C40CFB74DF0090BF77 /* CircularBuffer.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3D0C99FA0700B46CD4 /* CircularBuffer.h */; };
 		2A178E3908DB3CD8001D78BC /* ORAugerCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A178E3208DB3CD8001D78BC /* ORAugerCard.h */; };
 		2A178E3A08DB3CD8001D78BC /* ORAugerCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A178E3308DB3CD8001D78BC /* ORAugerCard.m */; };
 		2A178E3D08DB3CD8001D78BC /* ORAugerFLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A178E3608DB3CD8001D78BC /* ORAugerFLTDefs.h */; };
@@ -1606,6 +1609,9 @@
 			dstSubfolderSpec = 7;
 			files = (
 				8493D2AA0C99FC2C00B46CD4 /* SBC_Cmds.h in SBC_Code Copy */,
+				2A08E4C40CFB74DF0090BF77 /* CircularBuffer.h in SBC_Code Copy */,
+				2A08E4C30CFB74CF0090BF77 /* CircularBuffer.c in SBC_Code Copy */,
+				2A08E4C20CFB74B30090BF77 /* SBC_Readout.c in SBC_Code Copy */,
 				8493D2AB0C99FC2C00B46CD4 /* SBC_Config.h in SBC_Code Copy */,
 				8493D2AD0C99FC2C00B46CD4 /* SBC_Readout.h in SBC_Code Copy */,
 			);
@@ -2039,7 +2045,7 @@
 		8434150B08EE0378009B7659 /* ORCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCrateController.h; sourceTree = "<group>"; };
 		8434150C08EE0378009B7659 /* ORCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCrateController.m; sourceTree = "<group>"; };
 		8434A363055B3288002D3102 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8434A364055B3288002D3102 /* Orca.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Orca.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8434A364055B3288002D3102 /* Orca.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Orca.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8434A3E4055C223A002D3102 /* ORCommandClient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCommandClient.m; path = "Source/Main Dialogs/CommandCenter/ORCommandClient.m"; sourceTree = SOURCE_ROOT; };
 		8434A3E5055C223A002D3102 /* ORCommandClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCommandClient.h; path = "Source/Main Dialogs/CommandCenter/ORCommandClient.h"; sourceTree = SOURCE_ROOT; };
 		8434F87305B4637600E03AAE /* ORSafeQueue.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSafeQueue.h; path = "Source/Objects/Misc Objects/DataStructures/ORSafeQueue.h"; sourceTree = SOURCE_ROOT; };
