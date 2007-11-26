@@ -48,7 +48,7 @@
     
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
-        [transform translateXBy:15 yBy:40];
+        [transform translateXBy:15 yBy:30];
         [transform scaleXBy:.62 yBy:.62];
         [transform concat];
         NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
