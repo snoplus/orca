@@ -293,9 +293,10 @@ void sendCBRecord(void)
 int readBuffer(SBC_Packet* aPacket)
 { 
 	long numberBytesinPacket;
-	int bytesRead = read(workingSocket, &numberBytesinPacket, 4);
+	int bytesRead = read(workingSocket, &numberBytesinPacket, sizeof(long));
 	if(bytesRead==0)return 0; //disconnected
 	if(needToSwap)SwapLongBlock(&numberBytesinPacket,1);	
+        aPacket->numBytes = numberBytesinPacket;
 	numberBytesinPacket-= sizeof(long);
 	int returnValue		= numberBytesinPacket;
 	char* p = (char*)&aPacket->cmdHeader;
@@ -309,7 +310,7 @@ int readBuffer(SBC_Packet* aPacket)
 	if(needToSwap){
 		//only swap the size and the header struct
 		//the payload will be swapped by the user routines as needed.
-		SwapLongBlock(aPacket,sizeof(SBC_CommandHeader)/sizeof(long));
+		SwapLongBlock((long*)&(aPacket->cmdHeader),sizeof(SBC_CommandHeader)/sizeof(long));
 	}
 
 	return returnValue;

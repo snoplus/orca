@@ -219,18 +219,15 @@ void doReadBlock(SBC_Packet* aPacket)
 	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct) + numItems*unitSize;
 
 	SBC_VmeReadBlockStruct* returnDataPtr = (SBC_VmeReadBlockStruct*)aPacket->payload;
-	returnDataPtr->address  = startAddress;
-	if(needToSwap)SwapLongBlock(returnDataPtr,sizeof(SBC_VmeReadBlockStruct)/sizeof(long));
 	unsigned char* returnPayload = (unsigned char*)(returnDataPtr+1);
 	//printf("reading %ld bytes @ 0x%x\n",numItems*unitSize,(int)startAddress);
 
-	int result	= vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
-
-	returnDataPtr->address			= startAddress;
-	returnDataPtr->addressModifier	= addressModifier;
-	returnDataPtr->addressSpace		= addressSpace;
-	returnDataPtr->unitSize			= unitSize;
-	returnDataPtr->numItems			= numItems;
+	int result = vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
+	returnDataPtr->address = startAddress;
+	returnDataPtr->addressModifier = addressModifier;
+	returnDataPtr->addressSpace = addressSpace;
+	returnDataPtr->unitSize	= unitSize;
+	returnDataPtr->numItems	= numItems;
 	if(result == (numItems*unitSize)){
 		//printf("no read error\n");
 		returnDataPtr->errorCode		= 0;
@@ -255,6 +252,7 @@ void doReadBlock(SBC_Packet* aPacket)
 		returnDataPtr->errorCode		= result;		
 	}
 
+	if(needToSwap)SwapLongBlock(returnDataPtr,sizeof(SBC_VmeReadBlockStruct)/sizeof(long));
 	writeBuffer(aPacket);
 	
 }
