@@ -20,9 +20,12 @@
 @interface ORHelpCenter : NSWindowController
 {
 	IBOutlet id webView;
+	IBOutlet id defaultPathField;
 }
 
 - (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame;
+- (NSString *) helpFilePath;
+- (void) defaultPathChanged:(NSNotification*) aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) showHelpCenter:(id)sender;

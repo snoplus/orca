@@ -27,17 +27,51 @@
 - (id)init
 {
     self = [super initWithWindowNibName:@"HelpCenter"];
+	[[NSNotificationCenter defaultCenter] addObserver : self
+											 selector : @selector(defaultPathChanged:)
+												 name :	ORHelpFilesPathChanged
+											   object : nil];
     return self;
+}
+
+- (void) dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[super dealloc];
+}
+
+- (NSString *) helpFilePath 
+{
+	NSString* theHelpFilePath;
+	BOOL useCustomLocation = [[[NSUserDefaults standardUserDefaults] objectForKey:ORHelpFilesUseDefault] boolValue];
+	if(useCustomLocation){
+		theHelpFilePath = [[NSUserDefaults standardUserDefaults] objectForKey:ORHelpFilesPath];
+		if(![[theHelpFilePath lastPathComponent] isEqualToString:@"index.html"]){
+			theHelpFilePath = [theHelpFilePath stringByAppendingString:@"/index.html"];
+		}
+	}
+	else {
+		theHelpFilePath = kORCAHelpURL;
+	}
+	return theHelpFilePath;
 }
 
 - (void) awakeFromNib
 {
-	[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:kORCAHelpURL]]];
+	[self defaultPathChanged:nil];
 }
 
 - (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame
 {
 	NSBeginAlertSheet (@"Load Failed",@"OK",nil,nil,[self window],self,nil,nil,nil,@"Check Internet Connection");
+}
+
+- (void) defaultPathChanged:(NSNotification*) aNote
+{
+	[defaultPathField setStringValue:[self helpFilePath]];
+	if([[self helpFilePath] length]){
+		[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self helpFilePath]]]];
+	}
 }
 
 #pragma mark ¥¥¥Actions
@@ -48,6 +82,8 @@
 
 - (IBAction) goHome:(id)sender
 {
-	[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:kORCAHelpURL]]];
+	if([[self helpFilePath] length]){
+		[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self helpFilePath]]]];
+	}
 }
 @end
