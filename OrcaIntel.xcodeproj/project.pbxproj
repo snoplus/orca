@@ -27,7 +27,6 @@
 		841B11AF0CC51FC800E0B678 /* ORL8013CrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 841B11A50CC51FC800E0B678 /* ORL8013CrateView.h */; };
 		841B11B00CC51FC800E0B678 /* ORL8013CrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 841B11A60CC51FC800E0B678 /* ORL8013CrateView.m */; };
 		841B195D0CC6987C00E0B678 /* ORIpeDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 841B195C0CC6987C00E0B678 /* ORIpeDefs.h */; };
-		841EBAAE0CED04DA000232E7 /* OrcaHelp in Resources */ = {isa = PBXBuildFile; fileRef = 841EA4560CED04D3000232E7 /* OrcaHelp */; };
 		841EBE2F0CED05F9000232E7 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841EBD3B0CED05F9000232E7 /* WebKit.framework */; };
 		842E54930C16041E00397CDF /* ORAppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = F51E695503AE4775015F64B1 /* ORAppDelegate.h */; };
 		842E54940C16041E00397CDF /* ORAboutBox.h in Headers */ = {isa = PBXBuildFile; fileRef = F51E695F03AE4775015F64B1 /* ORAboutBox.h */; };
@@ -1449,6 +1448,7 @@
 		8493C5E00C9854C800B46CD4 /* Makefile in VME_Code Copy  */ = {isa = PBXBuildFile; fileRef = 8493C5DE0C9854C000B46CD4 /* Makefile */; };
 		8493C7B60C987F1D00B46CD4 /* SBC_LinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C7B40C987F1D00B46CD4 /* SBC_LinkController.h */; };
 		8493C9BB0C98BABB00B46CD4 /* SBC_Link.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8493C9BA0C98BABB00B46CD4 /* SBC_Link.nib */; };
+		84951D9B0CFB707500B4558E /* Help.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84951D9A0CFB707500B4558E /* Help.tiff */; };
 		84952EAC0CECD27D00787DDB /* HelpCenter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84952EA50CECD27D00787DDB /* HelpCenter.nib */; };
 		84952EAD0CECD27D00787DDB /* ORHelpCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 84952EA60CECD27D00787DDB /* ORHelpCenter.h */; };
 		84952EAE0CECD27D00787DDB /* ORHelpCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 84952EA70CECD27D00787DDB /* ORHelpCenter.m */; };
@@ -1457,7 +1457,6 @@
 		849531F00CECF75700787DDB /* home.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849531EF0CECF75700787DDB /* home.gif */; };
 		84997F0B0CE3BFEB002CFA70 /* SBC_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E24230C96EE97002329AE /* SBC_Link.m */; };
 		84997F0C0CE3BFED002CFA70 /* SBC_LinkController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493C7B50C987F1D00B46CD4 /* SBC_LinkController.m */; };
-		8499DFED0CEA7708002CFA70 /* Orca Help in Resources */ = {isa = PBXBuildFile; fileRef = 8499C7A50CEA7702002CFA70 /* Orca Help */; };
 		84A042A10C35751A00DCE0EC /* ORAcqirisDC440Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A0429F0C35751900DCE0EC /* ORAcqirisDC440Decoders.h */; };
 		84A042A20C35751A00DCE0EC /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A042A00C35751A00DCE0EC /* ORAcqirisDC440Decoders.m */; };
 		84A042A50C35756A00DCE0EC /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A042A30C35756A00DCE0EC /* ORcPCICardDecoder.h */; };
@@ -1572,6 +1571,16 @@
 		84F480A20CB70E3E007EFADA /* ORIpeSLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F480A00CB70E3D007EFADA /* ORIpeSLTDecoder.h */; };
 		84F480A30CB70E3E007EFADA /* ORIpeSLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F480A10CB70E3D007EFADA /* ORIpeSLTDecoder.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		84951F9C0CFC807700B4558E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84951F870CFC804A00B4558E /* Orca.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8434A364055B3288002D3102 /* Orca.app */;
+			remoteInfo = Orca;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		844241C70C95B8BD00415C78 /* SBC_Code Copy */ = {
@@ -1940,7 +1949,6 @@
 		841DAA5707838C990099BBF6 /* ORDGF4cModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDGF4cModel.m; sourceTree = "<group>"; };
 		841DAAC207846CC20099BBF6 /* ORCamacControllerCard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacControllerCard.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacControllerCard.h"; sourceTree = SOURCE_ROOT; };
 		841DAAC307846CC20099BBF6 /* ORCamacControllerCard.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacControllerCard.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacControllerCard.m"; sourceTree = SOURCE_ROOT; };
-		841EA4560CED04D3000232E7 /* OrcaHelp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = OrcaHelp; sourceTree = SOURCE_ROOT; };
 		841EBD3B0CED05F9000232E7 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = ../../../../System/Library/Frameworks/WebKit.framework; sourceTree = SOURCE_ROOT; };
 		84200CA006764C120048DFB4 /* ORSubPlotController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSubPlotController.h; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.h"; sourceTree = SOURCE_ROOT; };
 		84200CA106764C120048DFB4 /* ORSubPlotController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSubPlotController.m; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.m"; sourceTree = SOURCE_ROOT; };
@@ -2525,6 +2533,8 @@
 		8493C9BA0C98BABB00B46CD4 /* SBC_Link.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SBC_Link.nib; path = "Source/Objects/Hardware/SBC/SBC Link/SBC_Link.nib"; sourceTree = SOURCE_ROOT; };
 		84940B3E04E07FA6005F64B1 /* ORRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRate.h; sourceTree = "<group>"; };
 		84940B3F04E07FA6005F64B1 /* ORRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRate.m; sourceTree = "<group>"; };
+		84951D9A0CFB707500B4558E /* Help.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Help.tiff; path = Source/Preferences/Help.tiff; sourceTree = SOURCE_ROOT; };
+		84951F870CFC804A00B4558E /* Orca.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Orca.xcodeproj; path = /Users/markhowe/Dev/Orca/Orca.xcodeproj; sourceTree = "<absolute>"; };
 		84952EA50CECD27D00787DDB /* HelpCenter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HelpCenter.nib; path = "Source/Main Dialogs/HelpCenter/HelpCenter.nib"; sourceTree = SOURCE_ROOT; };
 		84952EA60CECD27D00787DDB /* ORHelpCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHelpCenter.h; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.h"; sourceTree = SOURCE_ROOT; };
 		84952EA70CECD27D00787DDB /* ORHelpCenter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHelpCenter.m; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.m"; sourceTree = SOURCE_ROOT; };
@@ -2544,7 +2554,6 @@
 		8499148804BB3E05005F64B1 /* ORDispatcherController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDispatcherController.m; sourceTree = "<group>"; };
 		8499148B04BB3E05005F64B1 /* ORDispatcherModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDispatcherModel.h; sourceTree = "<group>"; };
 		8499148C04BB3E05005F64B1 /* ORDispatcherModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDispatcherModel.m; sourceTree = "<group>"; };
-		8499C7A50CEA7702002CFA70 /* Orca Help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Orca Help"; sourceTree = SOURCE_ROOT; };
 		849B25E40B2F34F90007484F /* Prespectrometer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Prespectrometer.nib; path = Source/Experiments/Prespectrometer/Prespectrometer.nib; sourceTree = SOURCE_ROOT; };
 		849B25E50B2F34F90007484F /* prespectrometer.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = prespectrometer.tif; path = Source/Experiments/Prespectrometer/prespectrometer.tif; sourceTree = SOURCE_ROOT; };
 		849B25E60B2F34F90007484F /* PrespectrometerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrespectrometerController.h; path = Source/Experiments/Prespectrometer/PrespectrometerController.h; sourceTree = SOURCE_ROOT; };
@@ -3313,8 +3322,6 @@
 		2A37F4B8FDCFA73011CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				841EA4560CED04D3000232E7 /* OrcaHelp */,
-				8499C7A50CEA7702002CFA70 /* Orca Help */,
 				84C533280652BA6B00E4731F /* MainMenu.nib */,
 				840B721E0948AE3900B1B135 /* smallLock.tif */,
 				847BC82E05E293E80054841E /* Unlocked.tif */,
@@ -4532,6 +4539,7 @@
 				84CF3B2305E6B60700C5C320 /* Appearance.tif */,
 				84C859040665624C00FBAF9C /* Bugs.tif */,
 				840B20C50B4D7CE80021220C /* Editing.tif */,
+				84951D9A0CFB707500B4558E /* Help.tiff */,
 				843CDEDC03BE307400C39F5F /* ORPreferences.nib */,
 			);
 			name = Preferences;
@@ -5403,6 +5411,14 @@
 			name = Rates;
 			path = "Source/Objects/Misc Objects/Rates";
 			sourceTree = SOURCE_ROOT;
+		};
+		84951F990CFC807700B4558E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				84951F9D0CFC807700B4558E /* Orca.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
 		};
 		84952EA40CECD27D00787DDB /* HelpCenter */ = {
 			isa = PBXGroup;
@@ -7779,14 +7795,32 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "OrcaIntel" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Orca */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 84951F990CFC807700B4558E /* Products */;
+					ProjectRef = 84951F870CFC804A00B4558E /* Orca.xcodeproj */;
+				},
+			);
+			projectRoot = "";
 			targets = (
 				842E54910C16041E00397CDF /* OrcaIntel */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		84951F9D0CFC807700B4558E /* Orca.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = Orca.app;
+			remoteRef = 84951F9C0CFC807700B4558E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		842E56960C16041E00397CDF /* Resources */ = {
@@ -8219,12 +8253,11 @@
 				841903CD0CCE6E1300F21371 /* Vme64CrateSmall.gif in Resources */,
 				841903E30CCE71ED00F21371 /* Gretina4.nib in Resources */,
 				841903E40CCE71ED00F21371 /* Gretina4Card.gif in Resources */,
-				8499DFED0CEA7708002CFA70 /* Orca Help in Resources */,
 				84952EAC0CECD27D00787DDB /* HelpCenter.nib in Resources */,
 				84952EB10CECD55D00787DDB /* Linkback Green.tiff in Resources */,
 				84952EB30CECD56E00787DDB /* SnapBack.tiff in Resources */,
 				849531F00CECF75700787DDB /* home.gif in Resources */,
-				841EBAAE0CED04DA000232E7 /* OrcaHelp in Resources */,
+				84951D9B0CFB707500B4558E /* Help.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9075,6 +9108,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = i386;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				PREBINDING = NO;
 			};
 			name = Development;

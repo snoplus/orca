@@ -1123,6 +1123,7 @@
 		8493D2AA0C99FC2C00B46CD4 /* SBC_Cmds.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3E0C99FA0700B46CD4 /* SBC_Cmds.h */; };
 		8493D2AB0C99FC2C00B46CD4 /* SBC_Config.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3F0C99FA0700B46CD4 /* SBC_Config.h */; };
 		8493D2AD0C99FC2C00B46CD4 /* SBC_Readout.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC410C99FA0700B46CD4 /* SBC_Readout.h */; };
+		84951F980CFC805C00B4558E /* Help.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84951F970CFC805C00B4558E /* Help.tiff */; };
 		84954B8305C87518004EBD3D /* ORHWWizParam.h in Headers */ = {isa = PBXBuildFile; fileRef = 84954B8105C87518004EBD3D /* ORHWWizParam.h */; };
 		84954B8405C87518004EBD3D /* ORHWWizParam.m in Sources */ = {isa = PBXBuildFile; fileRef = 84954B8205C87518004EBD3D /* ORHWWizParam.m */; };
 		84978A290701F02000B7887E /* ORDataGenDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978A270701F02000B7887E /* ORDataGenDecoders.h */; };
@@ -2523,6 +2524,7 @@
 		8493CC800C99FA4B00B46CD4 /* HW_Readout.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = HW_Readout.h; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Readout.h; sourceTree = SOURCE_ROOT; };
 		84940B3E04E07FA6005F64B1 /* ORRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRate.h; sourceTree = "<group>"; };
 		84940B3F04E07FA6005F64B1 /* ORRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRate.m; sourceTree = "<group>"; };
+		84951F970CFC805C00B4558E /* Help.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Help.tiff; path = Source/Preferences/Help.tiff; sourceTree = SOURCE_ROOT; };
 		84954B8105C87518004EBD3D /* ORHWWizParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizParam.h; sourceTree = "<group>"; };
 		84954B8205C87518004EBD3D /* ORHWWizParam.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizParam.m; sourceTree = "<group>"; };
 		84978A270701F02000B7887E /* ORDataGenDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataGenDecoders.h; sourceTree = "<group>"; };
@@ -4569,6 +4571,7 @@
 				84CF3B2305E6B60700C5C320 /* Appearance.tif */,
 				84C859040665624C00FBAF9C /* Bugs.tif */,
 				840B20C50B4D7CE80021220C /* Editing.tif */,
+				84951F970CFC805C00B4558E /* Help.tiff */,
 				843CDEDC03BE307400C39F5F /* ORPreferences.nib */,
 			);
 			name = Preferences;
@@ -7755,9 +7758,11 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Orca */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				8434A184055B3287002D3102 /* Orca */,
 			);
@@ -8197,6 +8202,7 @@
 				8407751C0CEE7CAD0073F5A9 /* home.gif in Resources */,
 				8407751D0CEE7CAD0073F5A9 /* Linkback Green.tiff in Resources */,
 				840775220CEE7CAD0073F5A9 /* SnapBack.tiff in Resources */,
+				84951F980CFC805C00B4558E /* Help.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
