@@ -68,6 +68,9 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
         [initialUserDefaults setObject:dataForColor([NSColor grayColor])  forKey:ORScriptIdentifier2Color];
         [initialUserDefaults setObject:dataForColor([NSColor orangeColor])  forKey:ORScriptConstantsColor];
         
+		[initialUserDefaults setObject:[NSNumber numberWithBool:YES]  forKey:ORHelpFilesUseDefault];
+		[initialUserDefaults setObject:@"" forKey:ORHelpFilesPath];
+	
         [defaults registerDefaults:initialUserDefaults];
         initialized = YES;
         
