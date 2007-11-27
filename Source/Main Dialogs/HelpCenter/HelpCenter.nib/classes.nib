@@ -45,6 +45,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>defaultPathField</key>
+				<string>id</string>
 				<key>webView</key>
 				<string>id</string>
 			</dict>
