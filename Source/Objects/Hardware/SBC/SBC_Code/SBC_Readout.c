@@ -296,7 +296,7 @@ int readBuffer(SBC_Packet* aPacket)
 	int bytesRead = read(workingSocket, &numberBytesinPacket, sizeof(long));
 	if(bytesRead==0)return 0; //disconnected
 	if(needToSwap)SwapLongBlock(&numberBytesinPacket,1);	
-        aPacket->numBytes = numberBytesinPacket;
+    aPacket->numBytes = numberBytesinPacket;
 	numberBytesinPacket-= sizeof(long);
 	int returnValue		= numberBytesinPacket;
 	char* p = (char*)&aPacket->cmdHeader;

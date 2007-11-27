@@ -29,8 +29,6 @@
 void processBuffer(SBC_Packet* aPacket);
 void processSBCCommand(SBC_Packet* aPacket);
 void doRunCommand(SBC_Packet* aPacket);
-void doWriteBlock(SBC_Packet* aPacket);
-void doReadBlock(SBC_Packet* aPacket);
 void sendResponse(SBC_Packet* aPacket);
 int readBuffer(SBC_Packet* aPacket);
 int writeBuffer(SBC_Packet* aPacket);
