@@ -22,7 +22,7 @@
 
 
 
-#pragma mark ¥¥¥StringDefinitions
+#pragma mark â€¢â€¢â€¢StringDefinitions
 //If you add to the list of defaults, don't forget to set up and register the default values
 //in ORAppDelegate's Initialize method.
 #define  ORBackgroundColor          @"OR Document Background Color"
@@ -51,16 +51,19 @@ enum {
 };
 
 
-#pragma mark ¥¥¥Notification Strings
+#pragma mark â€¢â€¢â€¢Notification Strings
 #define  ORBackgroundColorChangedNotification 	@"ORBackgroundColorChangedNotification"
 #define  ORLineColorChangedNotification         @"ORLineColorChangedNotification"
 #define  ORLineTypeChangedNotification          @"ORLineTypeChangedNotification"
 #define  ORSyntaxColorChangedNotification		@"ORSyntaxColorChangedNotification"
 
-#pragma mark ¥¥¥Other Definiations
+#pragma mark â€¢â€¢â€¢Other Definiations
 #define  ORLastDocumentName                     @"OR Last Document Name"
+#define  ORHelpFilesUseDefault					@"ORHelpFilesUseDefault"
+#define  ORHelpFilesPath						@"ORHelpFilesPath"
+#define  ORHelpFilesPathChanged					@"ORHelpFilesPathChanged"
 
 
-#pragma mark ¥¥¥Helpers
+#pragma mark â€¢â€¢â€¢Helpers
 NSData* dataForColor(NSColor* aColor);
 NSColor* colorForData(NSData* data);
