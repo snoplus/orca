@@ -54,6 +54,9 @@
     IBOutlet NSColorWell* 	scriptIdentifier2ColorWell;
     IBOutlet NSColorWell* 	scriptConstantsColorWell;
 
+    IBOutlet NSMatrix*		helpFileLocationMatrix;
+    IBOutlet NSTextField*	helpFileLocationPathField;
+
 
     BOOL disallowStateChange;
 }
@@ -91,6 +94,10 @@
 
 
 - (void) textDidChange:(NSNotification*)aNote;
+
+
+- (IBAction) helpFileLocationPrefAction:(id)sender;
+- (IBAction) helpFilePathAction:(id)sender;
 
 @end
 

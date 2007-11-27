@@ -56,8 +56,8 @@ static ORPreferencesController* sharedInstance = nil;
     self = [super initWithWindowNibName:@"ORPreferences"];
     if (self) {
         [self setWindowFrameAutosaveName:@"ORPreferences"];
-    }
-    return self;
+    }	
+	return self;
 }
 
 - (void) dealloc
@@ -133,7 +133,14 @@ static ORPreferencesController* sharedInstance = nil;
     [bugReportEMailField setDelegate:self];
     
     [nextTimeTextField setStringValue:@" "];
-    
+
+    tag = [[defaults objectForKey: ORHelpFilesUseDefault] intValue];
+    [helpFileLocationMatrix selectCellWithTag: tag ];
+	[helpFileLocationPathField setStringValue:[defaults objectForKey: ORHelpFilesPath]];
+	[helpFileLocationPathField setEnabled:tag];
+	[helpFileLocationPathField setNeedsDisplay:YES];
+
+
     [self _setPassWordButtonText];
 }
 
@@ -336,6 +343,21 @@ static ORPreferencesController* sharedInstance = nil;
         postNotificationName:ORSyntaxColorChangedNotification
                       object:self
                     userInfo:nil];
+}
+
+- (IBAction) helpFileLocationPrefAction:(id)sender
+{
+    int tag = [[helpFileLocationMatrix selectedCell] tag];
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:tag] forKey:ORHelpFilesUseDefault];    
+	[helpFileLocationPathField setEnabled:tag];
+	[helpFileLocationPathField setNeedsDisplay:YES];
+	[[NSNotificationCenter defaultCenter]postNotificationName:ORHelpFilesPathChanged object:nil];
+}
+
+- (IBAction) helpFilePathAction:(id)sender
+{
+	[[NSUserDefaults standardUserDefaults] setObject:[sender stringValue] forKey:ORHelpFilesPath];    
+	[[NSNotificationCenter defaultCenter]postNotificationName:ORHelpFilesPathChanged object:nil];
 }
 
 @end
