@@ -417,8 +417,8 @@ void SwapShortBlock(void* p, long n)
 	int i;
 	for(i=0;i<n;i++){
 		short x = *sp;
-		*sp =  ((x) << 8) |	
-			   ((x) >> 8) ;
+		*sp =  ((x & 0x00FF) << 8) |	
+			   ((x & 0xFF00) >> 8) ;
 		sp++;
 	}
 }
