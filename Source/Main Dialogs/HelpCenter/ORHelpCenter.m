@@ -46,8 +46,14 @@
 	BOOL useCustomLocation = [[[NSUserDefaults standardUserDefaults] objectForKey:ORHelpFilesUseDefault] boolValue];
 	if(useCustomLocation){
 		theHelpFilePath = [[NSUserDefaults standardUserDefaults] objectForKey:ORHelpFilesPath];
-		if(![[theHelpFilePath lastPathComponent] isEqualToString:@"index.html"]){
-			theHelpFilePath = [theHelpFilePath stringByAppendingString:@"/index.html"];
+		if([theHelpFilePath length]){
+			if(![[theHelpFilePath lastPathComponent] isEqualToString:@"index.html"]){
+				theHelpFilePath = [theHelpFilePath stringByAppendingString:@"/index.html"];
+			}
+		}
+		else {
+			[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:YES] forKey:ORHelpFilesUseDefault];
+			theHelpFilePath = kORCAHelpURL;
 		}
 	}
 	else {
