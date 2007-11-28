@@ -26,7 +26,7 @@
 
 #pragma mark ¥¥¥Initialization
 
-- (id) initt //designated initializer
+- (id) init //designated initializer
 {
 	self = [super init];
 	return self;

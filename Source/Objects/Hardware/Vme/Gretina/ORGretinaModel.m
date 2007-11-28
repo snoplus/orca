@@ -567,7 +567,8 @@ static struct {
 	NSDate* startDate = [NSDate date];
     fifoStateAddress  = [self baseAddress] + register_offsets[kProgrammingDone];
     fifoAddress       = [self baseAddress]*0x100;
-	theController     = [[self crate] controllerCard];
+	//theController     = [[self crate] controllerCard];
+	theController     = [self adapter];
 	unsigned long  dataDump[0xffff];
 	BOOL error		  = NO;
     while(1){
