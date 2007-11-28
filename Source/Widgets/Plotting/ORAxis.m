@@ -67,7 +67,7 @@ NSString* kDefFont = @"Helvetica";
 #define	kMaxArgumentForExp				1000	// maximum argument for exp()
 #define kBigNumber						1e100	// large number for divide by zero result
 
-static char	symbols[]	= "fpnÂµm\0kMG";		// symbols for exponents
+static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 
 //notifications
 NSString* ORAxisRangeChangedNotification    = @"ORAxis Range Changed";
