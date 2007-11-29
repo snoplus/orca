@@ -60,6 +60,11 @@ NSString* OReGunLock = @"OReGunLock";
 	[super dealloc];
 }
 
+- (BOOL) solitaryObject
+{
+    return YES;
+}
+
 - (void) setUpImage
 {
 	[self setImage:[NSImage imageNamed:@"eGun.tif"]];
@@ -148,9 +153,11 @@ NSString* OReGunLock = @"OReGunLock";
 
 - (void) setMoving:(BOOL)aMoving
 {
+	NSLog(@"%d\n",aMoving);
     if(moving!=aMoving){
         moving = aMoving;
 		if(!moving){
+			NSLog(@"resetandNotify called\n");
 			[self performSelector:@selector(resetTrackAndNotify) withObject:nil afterDelay:.3];
 		}
         [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelMovingChanged object:self];
@@ -353,7 +360,7 @@ NSString* OReGunLock = @"OReGunLock";
 		[[self undoManager] enableUndoRegistration];
 	NS_HANDLER
 		[[self undoManager] enableUndoRegistration];
-		[self setMoving:NO];
+		[self updateTrack];
 	NS_ENDHANDLER
 }
 

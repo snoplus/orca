@@ -149,6 +149,7 @@
 	[self movingChanged:nil];
 	[self voltsPerMillimeterChanged:nil];
 	[self noHysteresisChanged:nil];
+	[self proxyChanged:nil];
 }
 
 - (void) noHysteresisChanged:(NSNotification*)aNote
