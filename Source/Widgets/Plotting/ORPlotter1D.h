@@ -36,7 +36,6 @@
     BOOL			shiftKeyIsDown;
     BOOL			doNotDraw;
     BOOL			ignoreDoNotDrawFlag;
-	BOOL			useGradient;
 	CTGradient*		gradient;
 }
 
@@ -45,7 +44,8 @@
 - (void) initCurves;
 - (NSMutableDictionary *)attributes;
 - (void)setAttributes:(NSMutableDictionary *)anAttributes;
-
+- (BOOL) useGradient;
+- (void) setUseGradient:(BOOL)aflag;
 - (void) drawerDidOpen:(NSNotification*)aNote;
 - (void) forcedUpdate:(NSNotification*)aNote;
 - (void) windowResizing:(NSNotification*)aNote;

@@ -128,10 +128,20 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     [mXScale setNeedsDisplay:YES];
 }
 
+- (BOOL) useGradient
+{
+	return [[attributes objectForKey:@"useGradient"] boolValue];
+}
+
+- (void) setUseGradient:(BOOL)aFlag
+{
+    [attributes setObject:[NSNumber numberWithBool:aFlag] forKey:@"useGradient"];	
+	[self setNeedsDisplay:YES];
+}
 
 - (void) setDrawWithGradient:(BOOL)flag
 {
-	useGradient = flag;
+	[self setUseGradient:flag];
 }
 
 - (NSUndoManager*) undoManager
@@ -287,7 +297,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     
     NSRect bounds = [self bounds];
 
-	if(useGradient){
+	if([self useGradient]){
 		if(!gradient){
 			float red,green,blue,alpha;
 			NSColor* color = [self backgroundColor];
