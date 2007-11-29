@@ -47,7 +47,7 @@
 - (void) awakeFromNib
 {
     [xyPlot setVectorMode:YES];
-    [xyPlot setBackgroundImage:[NSImage imageNamed:@"mainFocalPlaneDetector"]];
+    [xyPlot setBackgroundImage:[NSImage imageNamed:@"mainFocalPlanedetector"]];
     [xyPlot setDrawWithGradient:YES];
 	[[xyPlot xScale] setInteger:YES];
 	float r = 47;
