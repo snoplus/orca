@@ -1400,6 +1400,7 @@
 		846B97270CCE52F8004BAD8A /* ORVmeCrate64Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B971F0CCE52F8004BAD8A /* ORVmeCrate64Controller.m */; };
 		846B97280CCE52F8004BAD8A /* Vme64Crate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 846B97200CCE52F8004BAD8A /* Vme64Crate.gif */; };
 		846B97290CCE52F8004BAD8A /* Vme64Crate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846B97210CCE52F8004BAD8A /* Vme64Crate.nib */; };
+		847E6BE10CFF44E000E963C6 /* OReGunModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849520590CFC8E2000B4558E /* OReGunModel.m */; };
 		84818AE70C17198C00047083 /* IP220.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84818AD90C17198A00047083 /* IP220.gif */; };
 		84818AE80C17198E00047083 /* IP220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84818ADA0C17198A00047083 /* IP220.nib */; };
 		84818AEA0C17198F00047083 /* ORIP220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84818ADC0C17198A00047083 /* ORIP220Controller.h */; };
@@ -1449,6 +1450,13 @@
 		8493C7B60C987F1D00B46CD4 /* SBC_LinkController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C7B40C987F1D00B46CD4 /* SBC_LinkController.h */; };
 		8493C9BB0C98BABB00B46CD4 /* SBC_Link.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8493C9BA0C98BABB00B46CD4 /* SBC_Link.nib */; };
 		84951D9B0CFB707500B4558E /* Help.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84951D9A0CFB707500B4558E /* Help.tiff */; };
+		8495205A0CFC8E2000B4558E /* eGun.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849520520CFC8E2000B4558E /* eGun.nib */; };
+		8495205B0CFC8E2000B4558E /* eGun.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849520530CFC8E2000B4558E /* eGun.tif */; };
+		8495205C0CFC8E2000B4558E /* OReGunController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849520540CFC8E2000B4558E /* OReGunController.h */; };
+		8495205D0CFC8E2000B4558E /* OReGunController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849520550CFC8E2000B4558E /* OReGunController.m */; };
+		849520600CFC8E2000B4558E /* OReGunModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849520580CFC8E2000B4558E /* OReGunModel.h */; };
+		8495226C0CFDD01700B4558E /* ORObjectProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 8495226A0CFDD01700B4558E /* ORObjectProxy.h */; };
+		8495226D0CFDD01700B4558E /* ORObjectProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 8495226B0CFDD01700B4558E /* ORObjectProxy.m */; };
 		84952EAC0CECD27D00787DDB /* HelpCenter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84952EA50CECD27D00787DDB /* HelpCenter.nib */; };
 		84952EAD0CECD27D00787DDB /* ORHelpCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 84952EA60CECD27D00787DDB /* ORHelpCenter.h */; };
 		84952EAE0CECD27D00787DDB /* ORHelpCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 84952EA70CECD27D00787DDB /* ORHelpCenter.m */; };
@@ -1461,6 +1469,7 @@
 		84A042A20C35751A00DCE0EC /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A042A00C35751A00DCE0EC /* ORAcqirisDC440Decoders.m */; };
 		84A042A50C35756A00DCE0EC /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A042A30C35756A00DCE0EC /* ORcPCICardDecoder.h */; };
 		84A042A60C35756A00DCE0EC /* ORcPCICardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A042A40C35756A00DCE0EC /* ORcPCICardDecoder.m */; };
+		84B07AD20CFE494C00B8068C /* mainFocalPlaneDetector.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B07AD10CFE494C00B8068C /* mainFocalPlaneDetector.tif */; };
 		84B7A2370C2C5E24003AAB4C /* AcqirisDC440.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7A22D0C2C5E22003AAB4C /* AcqirisDC440.gif */; };
 		84B7A2390C2C5E26003AAB4C /* ORAcqirisDC440Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7A22F0C2C5E22003AAB4C /* ORAcqirisDC440Controller.m */; };
 		84B7A23A0C2C5E26003AAB4C /* ORAcqirisDC440Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B7A2300C2C5E22003AAB4C /* ORAcqirisDC440Model.h */; };
@@ -1577,7 +1586,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 84951F870CFC804A00B4558E /* Orca.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8434A364055B3288002D3102 /* Orca.app */;
+			remoteGlobalIDString = 8434A364055B3288002D3102;
 			remoteInfo = Orca;
 		};
 /* End PBXContainerItemProxy section */
@@ -2535,6 +2544,14 @@
 		84940B3F04E07FA6005F64B1 /* ORRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRate.m; sourceTree = "<group>"; };
 		84951D9A0CFB707500B4558E /* Help.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Help.tiff; path = Source/Preferences/Help.tiff; sourceTree = SOURCE_ROOT; };
 		84951F870CFC804A00B4558E /* Orca.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Orca.xcodeproj; path = /Users/markhowe/Dev/Orca/Orca.xcodeproj; sourceTree = "<absolute>"; };
+		849520520CFC8E2000B4558E /* eGun.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = eGun.nib; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/eGun.nib"; sourceTree = SOURCE_ROOT; };
+		849520530CFC8E2000B4558E /* eGun.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = eGun.tif; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/eGun.tif"; sourceTree = SOURCE_ROOT; };
+		849520540CFC8E2000B4558E /* OReGunController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OReGunController.h; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/OReGunController.h"; sourceTree = SOURCE_ROOT; };
+		849520550CFC8E2000B4558E /* OReGunController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OReGunController.m; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/OReGunController.m"; sourceTree = SOURCE_ROOT; };
+		849520580CFC8E2000B4558E /* OReGunModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OReGunModel.h; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/OReGunModel.h"; sourceTree = SOURCE_ROOT; };
+		849520590CFC8E2000B4558E /* OReGunModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OReGunModel.m; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/OReGunModel.m"; sourceTree = SOURCE_ROOT; };
+		8495226A0CFDD01700B4558E /* ORObjectProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORObjectProxy.h; path = "Source/Objects/Misc Objects/ObjectProxy/ORObjectProxy.h"; sourceTree = SOURCE_ROOT; };
+		8495226B0CFDD01700B4558E /* ORObjectProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORObjectProxy.m; path = "Source/Objects/Misc Objects/ObjectProxy/ORObjectProxy.m"; sourceTree = SOURCE_ROOT; };
 		84952EA50CECD27D00787DDB /* HelpCenter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HelpCenter.nib; path = "Source/Main Dialogs/HelpCenter/HelpCenter.nib"; sourceTree = SOURCE_ROOT; };
 		84952EA60CECD27D00787DDB /* ORHelpCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHelpCenter.h; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.h"; sourceTree = SOURCE_ROOT; };
 		84952EA70CECD27D00787DDB /* ORHelpCenter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHelpCenter.m; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.m"; sourceTree = SOURCE_ROOT; };
@@ -2696,6 +2713,7 @@
 		84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WindowList.nib; path = "Source/Main Dialogs/WindowList/WindowList.nib"; sourceTree = SOURCE_ROOT; };
 		84ADA288040ADF2D005F64B1 /* NcdMux.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdMux.nib; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMux/NcdMux.nib"; sourceTree = SOURCE_ROOT; };
 		84AF39FD093D0AED0015BE54 /* HV4032On.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HV4032On.tif; path = Source/Objects/Control/HV4032/HV4032On.tif; sourceTree = SOURCE_ROOT; };
+		84B07AD10CFE494C00B8068C /* mainFocalPlaneDetector.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = mainFocalPlaneDetector.tif; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/mainFocalPlaneDetector.tif"; sourceTree = SOURCE_ROOT; };
 		84B0CFB808FC60BC00EBE23C /* Container.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Container.nib; path = Source/Objects/Container/Container.nib; sourceTree = SOURCE_ROOT; };
 		84B0CFB908FC60BC00EBE23C /* Container.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Container.tif; path = Source/Objects/Container/Container.tif; sourceTree = SOURCE_ROOT; };
 		84B0CFBA08FC60BC00EBE23C /* ORContainerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORContainerController.m; path = Source/Objects/Container/ORContainerController.m; sourceTree = SOURCE_ROOT; };
@@ -4233,6 +4251,7 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
+				849522690CFDD01700B4558E /* ObjectProxy */,
 				2AAB08F808E36CCE00BB0792 /* Testing */,
 				844048AB08350BEE000D03DB /* MemoryWatcher */,
 				8484811107288C26009EDCE2 /* Dots */,
@@ -5420,6 +5439,31 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		849520510CFC8E2000B4558E /* eGun */ = {
+			isa = PBXGroup;
+			children = (
+				849520520CFC8E2000B4558E /* eGun.nib */,
+				84B07AD10CFE494C00B8068C /* mainFocalPlaneDetector.tif */,
+				849520530CFC8E2000B4558E /* eGun.tif */,
+				849520540CFC8E2000B4558E /* OReGunController.h */,
+				849520550CFC8E2000B4558E /* OReGunController.m */,
+				849520580CFC8E2000B4558E /* OReGunModel.h */,
+				849520590CFC8E2000B4558E /* OReGunModel.m */,
+			);
+			name = eGun;
+			path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun";
+			sourceTree = SOURCE_ROOT;
+		};
+		849522690CFDD01700B4558E /* ObjectProxy */ = {
+			isa = PBXGroup;
+			children = (
+				8495226A0CFDD01700B4558E /* ORObjectProxy.h */,
+				8495226B0CFDD01700B4558E /* ORObjectProxy.m */,
+			);
+			name = ObjectProxy;
+			path = "Source/Objects/Misc Objects/ObjectProxy";
+			sourceTree = SOURCE_ROOT;
+		};
 		84952EA40CECD27D00787DDB /* HelpCenter */ = {
 			isa = PBXGroup;
 			children = (
@@ -6170,6 +6214,7 @@
 		84C4948A0405A0C0005F64B1 /* Custom Hardware */ = {
 			isa = PBXGroup;
 			children = (
+				849520510CFC8E2000B4558E /* eGun */,
 				843CDF55071C9C0A009D7D30 /* RandomPulser */,
 				84C4948C0405A0C0005F64B1 /* Ncd Hardware */,
 			);
@@ -7761,6 +7806,9 @@
 				841903E90CCE71ED00F21371 /* ORGretina4Model.h in Headers */,
 				8457B0C40CDA70E70095F7D9 /* VME_HW_Definitions.h in Headers */,
 				84952EAD0CECD27D00787DDB /* ORHelpCenter.h in Headers */,
+				8495205C0CFC8E2000B4558E /* OReGunController.h in Headers */,
+				849520600CFC8E2000B4558E /* OReGunModel.h in Headers */,
+				8495226C0CFDD01700B4558E /* ORObjectProxy.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8258,6 +8306,9 @@
 				84952EB30CECD56E00787DDB /* SnapBack.tiff in Resources */,
 				849531F00CECF75700787DDB /* home.gif in Resources */,
 				84951D9B0CFB707500B4558E /* Help.tiff in Resources */,
+				8495205A0CFC8E2000B4558E /* eGun.nib in Resources */,
+				8495205B0CFC8E2000B4558E /* eGun.tif in Resources */,
+				84B07AD20CFE494C00B8068C /* mainFocalPlaneDetector.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8818,6 +8869,9 @@
 				84997F0B0CE3BFEB002CFA70 /* SBC_Link.m in Sources */,
 				84997F0C0CE3BFED002CFA70 /* SBC_LinkController.m in Sources */,
 				84952EAE0CECD27D00787DDB /* ORHelpCenter.m in Sources */,
+				8495205D0CFC8E2000B4558E /* OReGunController.m in Sources */,
+				8495226D0CFDD01700B4558E /* ORObjectProxy.m in Sources */,
+				847E6BE10CFF44E000E963C6 /* OReGunModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -19,6 +19,7 @@
 @class ZFlowLayout;
 @class ORCurve2D;
 @class ORColorScale;
+@class CTGradient;
 
 @interface ORPlotter2D : NSView <NSCoding>
 {
@@ -36,6 +37,9 @@
     BOOL			ignoreDoNotDrawFlag;
     
     BOOL            vectorMode;
+	NSImage*		backgroundImage;
+	BOOL			useGradient;
+	CTGradient*		gradient;
 }
 
 - (id)   initWithFrame:(NSRect)aFrame;
@@ -45,13 +49,14 @@
 - (NSMutableDictionary *)attributes;
 - (void)setAttributes:(NSMutableDictionary *)anAttributes;
 - (void)setIgnoreDoNotDrawFlag:(BOOL)aFlag;
+- (void) setDrawWithGradient:(BOOL)flag;
 
 - (void) drawRect:(NSRect) rect;
 - (void) setFrame:(NSRect)aFrame;
 - (BOOL) isOpaque;
 - (id)  dataSource;
 - (void) setDataSource:(id)d; 
-
+- (void) setBackgroundImage:(NSImage*)anImage;
 - (void) setBackgroundColor:(NSColor*)c;
 - (void) setGridColor:(NSColor*)c;
 - (NSColor*) backgroundColor;

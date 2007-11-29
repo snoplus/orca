@@ -186,6 +186,11 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 	}
 }
 
+- (NSString*) processingTitle
+{
+    return [NSString stringWithFormat:@"%d,%d,%@",[self crateNumber],[guardian slot],[self identifier]];
+}
+
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {

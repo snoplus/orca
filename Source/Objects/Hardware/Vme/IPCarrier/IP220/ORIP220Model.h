@@ -26,8 +26,8 @@
 {
 	@private
         NSLock* hwLock;
-		float outputVoltage[16];
-		BOOL  transferMode;
+		float	outputVoltage[16];
+		BOOL	transferMode;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -37,6 +37,7 @@
 - (void) setOutputVoltage:(unsigned short)index withValue:(float)aValue;
 - (void) setTransferMode:(BOOL)flag;
 - (BOOL) transferMode;
+- (NSString*) processingTitle;
 
 #pragma mark ¥¥¥Hardware Access
 - (void) resetBoard;

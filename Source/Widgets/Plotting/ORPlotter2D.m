@@ -16,6 +16,7 @@
 #import "ORCurve2D.h"
 #import "ZFlowLayout.h"
 #import "ORColorScale.h"
+#import "CTGradient.h"
 
 NSString* ORPlotter2DBackgroundColor    = @"ORPlotter2DBackgroundColor";
 NSString* ORPlotter2DGridColor          = @"ORPlotter2DGridColor";
@@ -51,6 +52,8 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [gradient release];
+	[backgroundImage release];
     [curve release];
     [attributes release];
     [super dealloc];
@@ -114,6 +117,11 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 - (void) initCurve
 {
     [self setCurve:[ORCurve2D curve:0]];    
+}
+
+- (void) setDrawWithGradient:(BOOL)flag
+{
+	useGradient = flag;
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
@@ -229,6 +237,13 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     vectorMode = state;
 }
 
+- (void) setBackgroundImage:(NSImage*)anImage
+{
+	[anImage retain];
+	[backgroundImage release];
+	backgroundImage = anImage;
+}
+
 - (void) drawRect:(NSRect) rect
 {
     
@@ -239,10 +254,35 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     
     
     NSRect bounds = [self bounds];
-    [[self backgroundColor] set];
-    [NSBezierPath fillRect:bounds];
-    [[NSColor darkGrayColor] set];
-    [NSBezierPath strokeRect:bounds];
+
+	if(useGradient){
+		if(!gradient){
+			float red,green,blue,alpha;
+			NSColor* color = [self backgroundColor];
+			[color getRed:&red green:&green blue:&blue alpha:&alpha];
+		
+			red *= .75;
+			green *= .75;
+			blue *= .75;
+			//alpha = .75;
+		
+			NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
+		
+			[gradient release];
+			gradient = [[CTGradient gradientWithBeginningColor:color endingColor:endingColor] retain];
+		}
+		[gradient fillRect:bounds angle:270.];
+	}
+	else {
+		[[self backgroundColor] set];
+		[NSBezierPath fillRect:bounds];
+	}
+	[[NSColor darkGrayColor] set];
+	[NSBezierPath strokeRect:bounds];
+
+	if(backgroundImage){
+		[backgroundImage compositeToPoint:NSMakePoint(0,-1) operation:NSCompositeSourceOver];
+	}
     
     
     if(!doNotDraw || ignoreDoNotDrawFlag){
@@ -283,6 +323,8 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 - (void)setBackgroundColor:(NSColor *)aColor
 {
     [attributes setObject:[NSArchiver archivedDataWithRootObject:aColor] forKey:ORPlotter2DBackgroundColor];
+	[gradient release];
+	gradient = nil;
     [self setNeedsDisplay: YES];
 }
 

@@ -1,79 +1,204 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = OPlotInterface; LANGUAGE = ObjC; SUPERCLASS = NSWindowController; }, 
-        {
-            ACTIONS = {
-                chooseDir = id; 
-                clearRunTypeAction = id; 
-                definitionsFileAction = id; 
-                listVetoAction = id; 
-                newRunAction = id; 
-                quickStartCBAction = id; 
-                remoteControlAction = id; 
-                repeatRunCBAction = id; 
-                runModeAction = id; 
-                runNumberAction = id; 
-                runNumberLockAction = id; 
-                runTypeAction = id; 
-                runTypeLockAction = id; 
-                startRunAction = id; 
-                stopRunAction = id; 
-                timeLimitStepperAction = id; 
-                timeLimitTextAction = id; 
-                timedRunCBAction = id; 
-            }; 
-            CLASS = ORRunController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                clearAllTypesButton = NSButton; 
-                definitionsFileTextField = NSTextField; 
-                elapsedTimeField = NSTextField; 
-                lightBoardView = StopLightView; 
-                listVetosButton = NSButton; 
-                quickStartCB = NSButton; 
-                remoteControlCB = NSButton; 
-                repeatRunCB = NSButton; 
-                restartRunButton = NSButton; 
-                runBar = NSProgressIndicator; 
-                runDefinitionsButton = NSButton; 
-                runModeMatrix = NSMatrix; 
-                runModeNoticeView = NSTabView; 
-                runNumberButton = NSButton; 
-                runNumberDirButton = NSButton; 
-                runNumberDirField = NSTextField; 
-                runNumberDrawer = NSDrawer; 
-                runNumberField = NSTextField; 
-                runNumberLockButton = NSButton; 
-                runNumberStepper = NSStepper; 
-                runNumberText = NSTextField; 
-                runProgress = NSProgressIndicator; 
-                runTypeButton = NSButton; 
-                runTypeDrawer = NSDrawer; 
-                runTypeLockButton = NSButton; 
-                runTypeMatrix = NSMatrix; 
-                startRunButton = NSButton; 
-                statusField = NSTextField; 
-                stopRunButton = NSButton; 
-                timeLimitField = NSTextField; 
-                timeLimitStepper = NSStepper; 
-                timeStartedField = NSTextField; 
-                timeToGoField = NSTextField; 
-                timedRunCB = NSButton; 
-                vetoCountField = NSTextField; 
-                vetoedTextField = NSTextField; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {CLASS = ORRunFactory; LANGUAGE = ObjC; SUPERCLASS = OrcaObjectFactory; }, 
-        {
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {model = id; }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {CLASS = OrcaObjectFactory; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {CLASS = StopLightView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>chooseDir</key>
+				<string>id</string>
+				<key>clearRunTypeAction</key>
+				<string>id</string>
+				<key>definitionsFileAction</key>
+				<string>id</string>
+				<key>listVetoAction</key>
+				<string>id</string>
+				<key>newRunAction</key>
+				<string>id</string>
+				<key>quickStartCBAction</key>
+				<string>id</string>
+				<key>remoteControlAction</key>
+				<string>id</string>
+				<key>repeatRunCBAction</key>
+				<string>id</string>
+				<key>runModeAction</key>
+				<string>id</string>
+				<key>runNumberAction</key>
+				<string>id</string>
+				<key>runNumberLockAction</key>
+				<string>id</string>
+				<key>runTypeAction</key>
+				<string>id</string>
+				<key>runTypeLockAction</key>
+				<string>id</string>
+				<key>startRunAction</key>
+				<string>id</string>
+				<key>stopRunAction</key>
+				<string>id</string>
+				<key>timeLimitStepperAction</key>
+				<string>id</string>
+				<key>timeLimitTextAction</key>
+				<string>id</string>
+				<key>timedRunCBAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORRunController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>clearAllTypesButton</key>
+				<string>NSButton</string>
+				<key>definitionsFileTextField</key>
+				<string>NSTextField</string>
+				<key>elapsedTimeField</key>
+				<string>NSTextField</string>
+				<key>lightBoardView</key>
+				<string>StopLightView</string>
+				<key>listVetosButton</key>
+				<string>NSButton</string>
+				<key>quickStartCB</key>
+				<string>NSButton</string>
+				<key>remoteControlCB</key>
+				<string>NSButton</string>
+				<key>repeatRunCB</key>
+				<string>NSButton</string>
+				<key>restartRunButton</key>
+				<string>NSButton</string>
+				<key>runBar</key>
+				<string>NSProgressIndicator</string>
+				<key>runDefinitionsButton</key>
+				<string>NSButton</string>
+				<key>runModeMatrix</key>
+				<string>NSMatrix</string>
+				<key>runModeNoticeView</key>
+				<string>NSTabView</string>
+				<key>runNumberButton</key>
+				<string>NSButton</string>
+				<key>runNumberDirButton</key>
+				<string>NSButton</string>
+				<key>runNumberDirField</key>
+				<string>NSTextField</string>
+				<key>runNumberDrawer</key>
+				<string>NSDrawer</string>
+				<key>runNumberField</key>
+				<string>NSTextField</string>
+				<key>runNumberLockButton</key>
+				<string>NSButton</string>
+				<key>runNumberStepper</key>
+				<string>NSStepper</string>
+				<key>runNumberText</key>
+				<string>NSTextField</string>
+				<key>runProgress</key>
+				<string>NSProgressIndicator</string>
+				<key>runTypeButton</key>
+				<string>NSButton</string>
+				<key>runTypeDrawer</key>
+				<string>NSDrawer</string>
+				<key>runTypeLockButton</key>
+				<string>NSButton</string>
+				<key>runTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>startRunButton</key>
+				<string>NSButton</string>
+				<key>statusField</key>
+				<string>NSTextField</string>
+				<key>stopRunButton</key>
+				<string>NSButton</string>
+				<key>timeLimitField</key>
+				<string>NSTextField</string>
+				<key>timeLimitStepper</key>
+				<string>NSStepper</string>
+				<key>timeStartedField</key>
+				<string>NSTextField</string>
+				<key>timeToGoField</key>
+				<string>NSTextField</string>
+				<key>timedRunCB</key>
+				<string>NSButton</string>
+				<key>vetoCountField</key>
+				<string>NSTextField</string>
+				<key>vetoedTextField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>StopLightView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
