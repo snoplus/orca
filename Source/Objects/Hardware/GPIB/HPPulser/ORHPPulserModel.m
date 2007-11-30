@@ -543,7 +543,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) insertPinDiode:(unsigned short)numPoints amplitude:(float) theAmplitude
 {
     short i;
-	int inverter = negativePulse?-1:1;
+	int inverter = negativePulse?1:-1;
     for(i=0;i<numPoints;i++){
 		float number = -inverter*theAmplitude*expf(-i/((float)numPoints/10.));
         [waveform appendBytes:&number length:sizeof(float)];
