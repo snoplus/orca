@@ -41,6 +41,7 @@
 		unsigned short	chanX;
 		unsigned short	chanY;
 		BOOL			noHysteresis;
+    int viewType;
  }
 
 #pragma mark ***Initialization
@@ -49,6 +50,8 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
+- (int) viewType;
+- (void) setViewType:(int)aViewType;
 - (BOOL) noHysteresis;
 - (void) setNoHysteresis:(BOOL)aNoHysteresis;
 - (float) voltsPerMillimeter;
@@ -84,7 +87,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
-
+extern NSString* OReGunModelViewTypeChanged;
 extern NSString* OReGunModelNoHysteresisChanged;
 extern NSString* OReGunModelVoltsPerMillimeterChanged;
 extern NSString* OReGunModelChanYChanged;

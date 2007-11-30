@@ -24,6 +24,7 @@
 #import "ORObjectProxy.h"
 
 #pragma mark ***External Strings
+NSString* OReGunModelViewTypeChanged = @"OReGunModelViewTypeChanged";
 NSString* OReGunModelNoHysteresisChanged = @"OReGunModelNoHysteresisChanged";
 NSString* OReGunModelVoltsPerMillimeterChanged = @"OReGunModelVoltsPerMillimeterChanged";
 NSString* OReGunModelChanYChanged		= @"OReGunModelChanYChanged";
@@ -86,6 +87,20 @@ NSString* OReGunLock = @"OReGunLock";
 }
 
 #pragma mark ***Accessors
+
+- (int) viewType
+{
+    return viewType;
+}
+
+- (void) setViewType:(int)aViewType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setViewType:viewType];
+    
+    viewType = aViewType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelViewTypeChanged object:self];
+}
 
 - (BOOL) noHysteresis
 {
@@ -241,6 +256,7 @@ NSString* OReGunLock = @"OReGunLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setViewType:[decoder decodeIntForKey:@"OReGunModelViewType"]];
 	[self setNoHysteresis:[decoder decodeBoolForKey:@"OReGunModelNoHysteresis"]];
 	[self setVoltsPerMillimeter:[decoder decodeFloatForKey:@"OReGunModelVoltsPerMillimeter"]];
 	[self setChanY:[decoder decodeIntForKey:@"OReGunModelChanY"]];
@@ -256,6 +272,7 @@ NSString* OReGunLock = @"OReGunLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:viewType forKey:@"OReGunModelViewType"];
     [encoder encodeBool:noHysteresis forKey:@"OReGunModelNoHysteresis"];
     [encoder encodeFloat:voltsPerMillimeter forKey:@"OReGunModelVoltsPerMillimeter"];
     [encoder encodeInt:chanY forKey:@"OReGunModelChanY"];
