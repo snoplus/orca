@@ -47,14 +47,8 @@
 - (void) awakeFromNib
 {
     [xyPlot setVectorMode:YES];
-    [xyPlot setBackgroundImage:[NSImage imageNamed:@"mainFocalPlanedetector"]];
     [xyPlot setDrawWithGradient:YES];
 	[[xyPlot xScale] setInteger:YES];
-	float r = 47;
-	[[xyPlot xScale] setRngDefaultsLow:-r withHigh:r];
-    [[xyPlot xScale] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
-	[[xyPlot yScale] setRngDefaultsLow:-r withHigh:r];
-    [[xyPlot yScale] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
     [xyPlot setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
 	[super awakeFromNib];
 }
@@ -137,6 +131,11 @@
                          name : OReGunModelNoHysteresisChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(viewTypeChanged:)
+                         name : OReGunModelViewTypeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -150,6 +149,28 @@
 	[self voltsPerMillimeterChanged:nil];
 	[self noHysteresisChanged:nil];
 	[self proxyChanged:nil];
+	[self viewTypeChanged:nil];
+}
+
+- (void) viewTypeChanged:(NSNotification*)aNote
+{
+    [viewTypeMatrix selectCellWithTag:[model viewType]];
+
+	float r;
+	if(![model viewType]){
+		[xyPlot setBackgroundImage:[NSImage imageNamed:@"mainFocalPlanedetector"]];
+		r = 47;
+	}
+	else {
+		[xyPlot setBackgroundImage:nil];
+		r = 200;
+	}
+	[[xyPlot xScale] setRngDefaultsLow:-r withHigh:r];
+    [[xyPlot xScale] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
+	[[xyPlot yScale] setRngDefaultsLow:-r withHigh:r];
+    [[xyPlot yScale] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
+	[xyPlot setNeedsDisplay:YES];
+	
 }
 
 - (void) noHysteresisChanged:(NSNotification*)aNote
@@ -198,9 +219,6 @@
 
 - (void) lockChanged:(NSNotification*)aNote
 {
-
-    BOOL runInProgress = [gOrcaGlobals runInProgress];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:OReGunLock];
     BOOL locked = [gSecurity isLocked:OReGunLock];
 
     [lockButton setState: locked];
@@ -210,12 +228,6 @@
     [channelMatrix setEnabled:!locked];
     [absMatrix setEnabled:!locked];
     [goButton setEnabled:!locked];
-
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:OReGunLock])s = @"Not in Maintenance Run.";
-    }
-    [lockDocField setStringValue:s];
 
 }
 
@@ -259,6 +271,11 @@
 }
 
 #pragma mark ***Actions
+
+- (IBAction) viewTypeAction:(id)sender
+{
+    [model setViewType:[[viewTypeMatrix selectedCell] tag]];
+}
 
 - (IBAction) noHysteresisAction:(id)sender
 {

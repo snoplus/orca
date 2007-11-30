@@ -75,6 +75,8 @@
 				<string>id</string>
 				<key>stopAction</key>
 				<string>id</string>
+				<key>viewTypeAction</key>
+				<string>id</string>
 				<key>voltsPerMillimeterTextFieldAction</key>
 				<string>id</string>
 			</dict>
@@ -90,8 +92,6 @@
 				<string>NSForm</string>
 				<key>cmdMatrix</key>
 				<string>NSForm</string>
-				<key>getHomeButton</key>
-				<string>NSButton</string>
 				<key>getPositionButton</key>
 				<string>NSButton</string>
 				<key>goButton</key>
@@ -102,8 +102,6 @@
 				<string>NSPopUpButton</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
-				<key>lockDocField</key>
-				<string>NSTextField</string>
 				<key>moveLabelField</key>
 				<string>NSTextField</string>
 				<key>moveStatusField</key>
@@ -112,6 +110,8 @@
 				<string>NSButton</string>
 				<key>stopButton</key>
 				<string>NSButton</string>
+				<key>viewTypeMatrix</key>
+				<string>NSMatrix</string>
 				<key>voltsPerMillimeterTextField</key>
 				<string>NSTextField</string>
 				<key>xPositionField</key>

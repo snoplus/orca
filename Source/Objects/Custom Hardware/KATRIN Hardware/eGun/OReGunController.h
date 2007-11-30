@@ -24,15 +24,14 @@
 @interface OReGunController : OrcaObjectController
 {
 	IBOutlet NSPopUpButton* interfaceObjPUx;
+	IBOutlet NSMatrix*		viewTypeMatrix;
 	IBOutlet NSButton*		noHysteresisButton;
 	IBOutlet NSTextField*	voltsPerMillimeterTextField;
     IBOutlet NSPopUpButton* interfaceObjPUy;
 	IBOutlet NSForm*		channelMatrix;
 	IBOutlet ORPlotter2D*   xyPlot;
-    IBOutlet NSTextField*   lockDocField;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*      getPositionButton;
-    IBOutlet NSButton*      getHomeButton;
     IBOutlet NSTextField*   xPositionField;
     IBOutlet NSTextField*   yPositionField;
     IBOutlet NSForm*		cmdMatrix;
@@ -53,6 +52,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) noHysteresisChanged:(NSNotification*)aNote;
 - (void) voltsPerMillimeterChanged:(NSNotification*)aNote;
 - (void) chanChanged:(NSNotification*)aNote;
@@ -64,6 +64,7 @@
 - (void) movingChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) viewTypeAction:(id)sender;
 - (IBAction) noHysteresisAction:(id)sender;
 - (IBAction) voltsPerMillimeterTextFieldAction:(id)sender;
 - (IBAction) getPositionAction:(id)sender;
