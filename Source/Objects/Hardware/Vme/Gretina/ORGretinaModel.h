@@ -69,7 +69,6 @@ enum GretinaFIFOStates {
   @private
 	unsigned long   dataId;
 	unsigned long*  dataBuffer;
-	BOOL            inited;
 
 	NSMutableArray* cardInfo;
     short			enabled[kNumGretinaChannels];

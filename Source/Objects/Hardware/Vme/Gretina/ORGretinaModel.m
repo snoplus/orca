@@ -977,9 +977,11 @@ static struct {
         [self writeControlReg:i enabled:NO];
     }
     [self clearFIFO];
-    inited = NO;
     dataBuffer = (unsigned long*)malloc(0xffff * sizeof(long));
     [self startRates];
+	
+	[self initBoard];
+	
     isRunning = YES;
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
@@ -992,64 +994,58 @@ static struct {
 {
     NSString* errorLocation = @"";
     NS_DURING
-        if(inited){
-			unsigned short val;
-			//read the fifo state
-			[theController readWordBlock:&val
-							   atAddress:fifoStateAddress
-							   numToRead:1
-							  withAddMod:0x29
+		unsigned short val;
+		//read the fifo state
+		[theController readWordBlock:&val
+						   atAddress:fifoStateAddress
+						   numToRead:1
+						  withAddMod:0x29
+					   usingAddSpace:0x01];
+		fifoState = val;			
+		if((val & kGretinaFIFOEmpty) != 0){
+			unsigned long numLongs = 0;
+			dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
+			dataBuffer[numLongs++] = location;
+			
+			//read the first longword which should be the packet separator: 0xAAAAAAAA
+			unsigned long theValue;
+			[theController readLongBlock:&theValue 
+							   atAddress:fifoAddress 
+							   numToRead:1 
+							  withAddMod:0x39 
 						   usingAddSpace:0x01];
-			fifoState = val;			
-			if((val & kGretinaFIFOEmpty) != 0){
-				unsigned long numLongs = 0;
-				dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
-				dataBuffer[numLongs++] = location;
+			
+			if(theValue==0xAAAAAAAA){
 				
-				//read the first longword which should be the packet separator: 0xAAAAAAAA
-				unsigned long theValue;
+				//read the first word of actual data so we know how much to read
 				[theController readLongBlock:&theValue 
 								   atAddress:fifoAddress 
 								   numToRead:1 
 								  withAddMod:0x39 
 							   usingAddSpace:0x01];
 				
-				if(theValue==0xAAAAAAAA){
-					
-					//read the first word of actual data so we know how much to read
-					[theController readLongBlock:&theValue 
-									   atAddress:fifoAddress 
-									   numToRead:1 
-									  withAddMod:0x39 
-								   usingAddSpace:0x01];
-					
-					dataBuffer[numLongs++] = theValue;
-					
-					++waveFormCount[theValue & 0x7];  //grab the channel and inc the count
-					
-					unsigned long numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
-					
-					[theController readLong:&dataBuffer[numLongs] 
-								  atAddress:fifoAddress 
-								timesToRead:numLongsLeft 
-								 withAddMod:0x39 
-							  usingAddSpace:0x01];
-							  
-					long totalNumLongs = (numLongs + numLongsLeft);
-					dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
-					[aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
-				}
-				else {
-					//oops... really bad -- the buffer read is out of sequence -- dump it all
-					[self clearFIFO];
-					NSLogError(@"Gretina",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO flushed",nil);
-				}
+				dataBuffer[numLongs++] = theValue;
+				
+				++waveFormCount[theValue & 0x7];  //grab the channel and inc the count
+				
+				unsigned long numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
+				
+				[theController readLong:&dataBuffer[numLongs] 
+							  atAddress:fifoAddress 
+							timesToRead:numLongsLeft 
+							 withAddMod:0x39 
+						  usingAddSpace:0x01];
+						  
+				long totalNumLongs = (numLongs + numLongsLeft);
+				dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
+				[aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
 			}
-        }
-        else {
-            [self initBoard];
-            inited = YES;
-        }
+			else {
+				//oops... really bad -- the buffer read is out of sequence -- dump it all
+				[self clearFIFO];
+				NSLogError(@"Gretina",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO flushed",nil);
+			}
+		} 
         NS_HANDLER
             NSLogError(@"",@"Gretina Card Error",errorLocation,nil);
             [self incExceptionCount];
