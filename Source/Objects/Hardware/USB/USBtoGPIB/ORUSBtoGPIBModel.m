@@ -416,8 +416,19 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 	if(serialNumber){
 		const char* deviceName = [[NSString stringWithFormat:@"/dev/cu.usbserial-%@",serialNumber] cStringUsingEncoding:NSASCIIStringEncoding];
 		fd = open(deviceName,O_RDWR | O_NOCTTY | O_NDELAY);
-		if(fd){
+		if(fd && fd != -1){
 			fcntl(fd, F_SETFL, 0);
+			[noDriverAlarm clearAlarm];
+			[noDriverAlarm release];
+			noDriverAlarm = nil;
+		}
+		else {
+			if(!noDriverAlarm){
+				noDriverAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No Driver (Prologix)"] severity:kHardwareAlarm];
+				[noDriverAlarm setSticky:YES];		
+			}
+			[noDriverAlarm setAcknowledged:NO];
+			[noDriverAlarm postAlarm];
 		}
 	}
 }
