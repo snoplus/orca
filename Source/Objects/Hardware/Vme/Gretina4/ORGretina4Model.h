@@ -37,21 +37,50 @@
 
 #pragma mark ¥¥¥Register Definitions
 enum {
-	kBoardID,					//[0] 
-	kProgrammingDone,			//[1] 
-	kExternalWindow,			//[2] 
-	kPileupWindow,				//[3] 
-	kNoiseWindow,				//[4] 
-	kExtTriggerSlidingLength,	//[5] 
-	kCollectionTime,			//[6] 
-	kIntegrationTime,			//[7]
-	kControlStatus,				//[8]
-	kLEDThreshold,				//[9]
-	kCFDParameters,				//[10]
-	kRawDataSlidingLength,		//[11]
-	kRawDataWindowLength,		//[12]
-	kDebugDataBufferAddress,	//[13]
-	kDebugDataBufferData,		//[14]
+	kBoardID,					//[0] board ID
+    kProgrammingDone,			//[1] Programming done
+    kExternalWindow,			//[2] External Window
+    kPileupWindow,				//[3] Pileup Window
+    kNoiseWindow,				//[4] Noise Window
+    kExtTriggerSlidingLength,	//[5] Extrn trigger sliding length
+    kCollectionTime,			//[6] Collection time
+    kIntegrationTime,			//[7] Integration time
+    kHardwareStatus,			//[8] Hardware Status
+    kControlStatus,				//[9] Control Status
+    kLEDThreshold,				//[10] LED Threshold
+    kCFDParameters,				//[11] CFD Parameters
+    kRawDataSlidingLength,		//[12] Raw data sliding length
+    kRawDataWindowLength,		//[13] Raw data window length
+    kDAC,						//[14] DAC
+	kSlaveFrontBusStatus,		//[15] Slave Front bus status
+    kChanZeroTimeStampLSB,		//[16] Channel Zero time stamp LSB
+    kChanZeroTimeStampMSB,		//[17] Channel Zero time stamp MSB
+    kSlaveFrontBusSendBox18_1,  //[18] Slave Front Bus Send Box 18 - 1
+    kSlaveFrontBusRegister0_10, //[19] Slave Front bus register 0 - 10
+    kMasterLogicStatus,			//[20] Master Logic Status
+    kSlowDataCCLEDTimers,		//[21] SlowData CCLED timers
+    kDeltaT155_DeltaT255,		//[22] DeltaT155_DeltaT255 (3)
+    kSnapShot,					//[23] SnapShot 
+    kXtalID,					//[24] XTAL ID 
+    kHitPatternTimeOut,			//[25] Length of Time to get Hit Pattern 
+    kFrontSideBusRegister,		//[26] Front Side Bus Register
+    kFrontBusRegisters0_10,		//[27] FrontBus Registers 0-10
+	kDebugDataBufferAddress,	//[28] Debug data buffer address
+	kDebugDataBufferData,		//[29] Debug data buffer data
+	kLEDFlagWindow,				//[30] LED flag window
+	kAuxIORead,					//[31] Aux io read
+	kAuxIOWrite,				//[32] Aux io write
+	kAuxIOConfig,				//[33] Aux io config
+	kFBRead,					//[34] FB_Read
+	kFBWrite,					//[35] FB_Write
+	kFBConfig,					//[36] FB_Config
+	kSDRead,					//[37] SD_Read
+	kSDWrite,					//[38] SD_Write
+	kSDCongif,					//[39] SD_Config
+	kADCConfig,					//[40] Adc config
+	kSelfTriggerEnable,			//[41] self trigger enable
+	kSelfTriggerPeriod,			//[42] self trigger period
+	kSelfTriggerCount,			//[43] self trigger count
 	kNumberOfGretina4Registers	//must be last
 };
 

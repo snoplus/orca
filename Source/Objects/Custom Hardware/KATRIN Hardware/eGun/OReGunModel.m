@@ -41,6 +41,8 @@ NSString* OReGunY220ObjectChanged		= @"OReGunY220ObjectChanged";
 
 NSString* OReGunLock = @"OReGunLock";
 
+#define kEGunMoveTime 0.2
+
 @implementation OReGunModel
 - (id) init
 {
@@ -314,14 +316,30 @@ NSString* OReGunLock = @"OReGunLock";
 {
  	[self setMoving:YES];
 	goalPosition = cmdPosition;
-	[self performSelector:@selector(doMove) withObject:nil afterDelay:.1];
+	
+	[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
+	[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
+	[self loadBoard];
+	firstPoint = YES;
+	count=0;
+	
+	if(noHysteresis)[self setMoving:NO];
+	else [self performSelector:@selector(doMove) withObject:nil afterDelay:kEGunMoveTime];
 }
 
 - (void) move:(NSPoint)amount
 {
 	[self setMoving:YES];
 	goalPosition = NSMakePoint([x220Object outputVoltage:chanX]+cmdPosition.x, [y220Object outputVoltage:chanY]+cmdPosition.x);
-	[self performSelector:@selector(doMove) withObject:nil afterDelay:.1];
+
+	[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
+	[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
+	[self loadBoard];
+	firstPoint = YES;
+	count=0;
+
+	if(noHysteresis)[self setMoving:NO];
+	else [self performSelector:@selector(doMove) withObject:nil afterDelay:kEGunMoveTime];
 }
 
 - (void) resetTrackAndNotify
@@ -343,42 +361,51 @@ NSString* OReGunLock = @"OReGunLock";
 {
 	//Note that all values are stored as raw values. Any conversion needed is done only for the display code.
 	[[self undoManager] disableUndoRegistration];
-	NS_DURING
-		if(noHysteresis){
-			[self setMoving:NO];
-			[x220Object setOutputVoltage:chanX withValue:goalPosition.x];		
-			[y220Object setOutputVoltage:chanY withValue:goalPosition.y];		
-			[self updateTrack];
+	
+	count++;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	if(firstPoint){
+		NSPoint newPt		= NSMakePoint(goalPosition.x + 50.*voltsPerMillimeter,goalPosition.y + 50.*voltsPerMillimeter);
+		[x220Object setOutputVoltage:chanX withValue:newPt.x];
+		[y220Object setOutputVoltage:chanY withValue:newPt.y];
+		firstPoint = NO;
+		[self performSelector:@selector(doMove) withObject:nil afterDelay:kEGunMoveTime];
+	}
+	else {
+		NSPoint currentPt	= NSMakePoint([x220Object outputVoltage:chanX],[y220Object outputVoltage:chanY]);
+		NSPoint delta 		= NSMakePoint((goalPosition.x - currentPt.x)*.80,(goalPosition.y - currentPt.y)*.80);
+		NSPoint newPt		= NSMakePoint(goalPosition.x + delta.x,goalPosition.y + delta.y);
+
+		if(count<20){
+			[x220Object setOutputVoltage:chanX withValue:newPt.x];
+			[y220Object setOutputVoltage:chanY withValue:newPt.y];
 		}
 		else {
-			float minErr = .001;
-			[NSObject cancelPreviousPerformRequestsWithTarget:self];
-			NSPoint currentPt	= NSMakePoint([x220Object outputVoltage:chanX],[y220Object outputVoltage:chanY]);
-			NSPoint delta 		= NSMakePoint((goalPosition.x - currentPt.x)/2.,(goalPosition.y - currentPt.y)/2.);
-			NSPoint newPt		= NSMakePoint(goalPosition.x + delta.x,goalPosition.y + delta.y);
-
-			if(fabs(delta.x) >= minErr)[x220Object setOutputVoltage:chanX withValue:newPt.x];
-			else [x220Object setOutputVoltage:chanX withValue:goalPosition.x];
-
-			if(fabs(delta.y) >= minErr)[y220Object setOutputVoltage:chanY withValue:newPt.y];
-			else [y220Object setOutputVoltage:chanY withValue:goalPosition.y];
-			
-			if(fabs(delta.x) >= minErr || fabs(delta.y) >= minErr){
-				[self performSelector:@selector(doMove) withObject:nil afterDelay:.1];
-			}
-			else 	[self setMoving:NO];
-
-			[self updateTrack];
-			[x220Object initBoard];
-			if([x220Object hwObject] != [y220Object hwObject]){
-				[y220Object initBoard];
-			}
+			[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
+			[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
 		}
-		[[self undoManager] enableUndoRegistration];
-	NS_HANDLER
-		[[self undoManager] enableUndoRegistration];
-		[self updateTrack];
-	NS_ENDHANDLER
+
+		if(count<20){
+			[self performSelector:@selector(doMove) withObject:nil afterDelay:kEGunMoveTime];
+		}
+		else 	[self setMoving:NO];
+	}
+
+	[self updateTrack];
+	[self loadBoard];
+	
+	[[self undoManager] enableUndoRegistration];
 }
 
+- (void) loadBoard
+{
+	NS_DURING
+		[x220Object initBoard];
+		if([x220Object hwObject] != [y220Object hwObject]){
+			[y220Object initBoard];
+		}
+	NS_HANDLER
+	NS_ENDHANDLER
+
+}
 @end

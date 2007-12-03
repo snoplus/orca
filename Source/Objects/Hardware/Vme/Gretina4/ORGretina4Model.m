@@ -53,23 +53,21 @@ NSString* ORGretina4ModelDataLenghtChanged		= @"ORGretina4ModelDataLenghtChanged
 #pragma mark ¥¥¥Static Declarations
 //offsets from the base address
 static unsigned long register_offsets[kNumberOfGretina4Registers] = {
-    0x00, //[0] board ID
-    0x04, //[1] Programming done
-    0x08, //[2] External Window
-    0x0C, //[3] Pileup Window
-    0x10, //[4] Noise Window
-    0x14, //[5] Extrn trigger sliding length
-    0x18, //[6] Collection time
-    0x1C, //[7] Integration time
-    0x20, //[8] Hardware Status
-    0x40, //[9] Hardware Status
-    0x80, //[10] LED Threshold
-    0xC0, //[11] CFD Parameters
-    0x100,  //[12] Raw data sliding length
+    0x00,  //[0] board ID
+    0x04,  //[1] Programming done
+    0x08,  //[2] External Window
+    0x0C,  //[3] Pileup Window
+    0x10,  //[4] Noise Window
+    0x14,  //[5] Extrn trigger sliding length
+    0x18,  //[6] Collection time
+    0x1C,  //[7] Integration time
+    0x20,  //[8] Hardware Status
+    0x40,  //[9] Hardware Status
+    0x80,  //[10] LED Threshold
+    0xC0,  //[11] CFD Parameters
+    0x100, //[12] Raw data sliding length
     0x140, //[13] Raw data window length
     0x400, //[14] DAC
-		};
-	/*
 	0x480, //[15] Slave Front bus status
     0x484, //[16] Channel Zero time stamp LSB
     0x488, //[17] Channel Zero time stamp MSB
@@ -99,10 +97,7 @@ static unsigned long register_offsets[kNumberOfGretina4Registers] = {
 	0x860, //[41] self trigger enable
 	0x864, //[42] self trigger period
 	0x868, //[43] self trigger count
-
-
-
-};*/
+};
 
 enum {
     kExternalWindowIndex,
@@ -453,6 +448,10 @@ static struct {
 }  
 
 #pragma mark ¥¥¥Hardware Access
+- (unsigned long) baseAddress
+{
+	return ([self slot]&0x1f)<<19;
+}
 
 - (short) readBoardID
 {

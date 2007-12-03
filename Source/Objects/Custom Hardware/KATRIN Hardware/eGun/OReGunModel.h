@@ -41,7 +41,9 @@
 		unsigned short	chanX;
 		unsigned short	chanY;
 		BOOL			noHysteresis;
-    int viewType;
+		BOOL			firstPoint;
+		int				count;
+		int				viewType;
  }
 
 #pragma mark ***Initialization
@@ -82,6 +84,7 @@
 - (void) moveToPoint:(NSPoint)aPoint;
 - (void) move:(NSPoint)delta;
 - (void) stopMotion;
+- (void) loadBoard;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;

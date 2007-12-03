@@ -1174,21 +1174,18 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[self tellClientToStopRun];
-	@synchronized(self){
-        [self getRunInfoBlock];
-		if(runInfo.amountInBuffer > 0){
-			NSLog(@"%@ %d %d reading out last %d bytes in CB\nm",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
-		}
+	[self getRunInfoBlock];
+	if(runInfo.amountInBuffer > 0){
+		NSLog(@"%@ %d %d reading out last %d bytes in CB\nm",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
 	}
+	
 }
 
 - (BOOL) doneTakingData
 {
 	//the remote client has  been told to stop taking data, but there is probably still
 	//data in the CB. The run will not actually stop until we return YES from this method.
-	@synchronized(self){
-        [self getRunInfoBlock];
-	}
+	[self getRunInfoBlock];
 	return runInfo.amountInBuffer == 0;
 }
 
