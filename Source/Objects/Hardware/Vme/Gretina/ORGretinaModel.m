@@ -984,7 +984,7 @@ static struct {
 	
 	[self initBoard];
 	
-    isRunning = YES;
+    isRunning = YES; 
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
 
