@@ -179,9 +179,19 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	[sbcLink takeData:aDataPacket userInfo:userInfo];
 }
 
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[sbcLink runIsStopping:aDataPacket userInfo:userInfo];
+}
+
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[sbcLink runTaskStopped:aDataPacket userInfo:userInfo];
+}
+
+- (BOOL) doneTakingData
+{
+	return [sbcLink doneTakingData];
 }
 
 - (void) saveReadOutList:(NSFileHandle*)aFile

@@ -1078,6 +1078,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [pool release];
     }
     
+	[client runIsStopping:dataPacket userInfo:nil];
+	
+	BOOL allDone = NO;
+	do {
+        NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
+		[client takeData:dataPacket userInfo:nil];
+		allDone = [client doneTakingData];
+		[pool release];
+	}while(!allDone);
+	
 	NSLog(@"DataTaking Thread Exited\n");
 	dataTakingThreadRunning = NO;
 	[outerpool release];
@@ -1352,5 +1362,22 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
     if(dataPtr[1] & 0x1) return [NSString stringWithFormat:@"%@%s%@%@%@%@",title,ctime((const time_t *)(&dataPtr[3])),runState,init,remote,thirdWord]; 
     else                 return [NSString stringWithFormat:@"%@%s%@%@%@",title,ctime((const time_t *)(&dataPtr[3])),runState,remote,thirdWord];               
 }
+
+@end
+
+@implementation NSObject (SpecialDataTakingFinishUp)
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	//classes can override as needed
+}
+
+- (BOOL) doneTakingData
+{
+	//classes can override as needed. Most classes don't need to override -- the special cases
+	//would be, for example, those taking data from a circular buffer and need to empty it 
+	//before declaring that they 
+	return YES;
+}
+
 
 @end

@@ -98,6 +98,8 @@
 #pragma mark ¥¥¥Run Management
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (BOOL) doneTakingData;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) putDataInQueue:(ORDataPacket*)aDataPacket force:(BOOL)forceAdd;
@@ -117,3 +119,5 @@ extern NSString* ORDataTaskQueueCountChangedNotification;
 extern NSString* ORDataTaskListLock;
 extern NSString* ORDataTaskTimeScalerChangedNotification;
 extern NSString* ORDataTaskCycleRateChangedNotification;
+
+

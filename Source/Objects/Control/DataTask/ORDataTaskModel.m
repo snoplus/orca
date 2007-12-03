@@ -427,6 +427,24 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 	++cycleCount;
 }
 
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    int i;
+    for(i=0;i<cachedNumberDataTakers;i++){
+        [cachedDataTakers[i] runIsStopping:aDataPacket userInfo:userInfo];
+    }
+}
+
+- (BOOL) doneTakingData
+{
+	BOOL allDone = NO;;
+    int i;
+    for(i=0;i<cachedNumberDataTakers;i++){
+        allDone |= [cachedDataTakers[i] doneTakingData];
+    }
+	return allDone;
+}
+
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	
@@ -691,6 +709,6 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 	}
 }
 
-
-
 @end
+
+

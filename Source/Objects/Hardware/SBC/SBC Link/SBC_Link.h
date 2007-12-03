@@ -217,7 +217,9 @@ typedef  enum eSBC_CrateStates{
 
 - (void) update;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (BOOL) doneTakingData;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) load_HW_Config:(SBC_crate_config*)aConfig;
 - (unsigned long) throttle;

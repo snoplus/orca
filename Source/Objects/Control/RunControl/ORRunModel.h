@@ -173,6 +173,10 @@
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
 
+@interface NSObject (SpecialDataTakingFinishUp)
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (BOOL) doneTakingData;
+@end
 
 extern NSString* ORRunTimedRunChangedNotification;
 extern NSString* ORRunRepeatRunChangedNotification;
