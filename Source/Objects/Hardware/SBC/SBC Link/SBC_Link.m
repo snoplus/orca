@@ -1174,6 +1174,13 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[self tellClientToStopRun];
+    throttle = 0;
+    while(1) {
+        /* Waiting for the buffer to empty. */
+        [self getRunInfoBlock];
+        if(runInfo.amountInBuffer == 0) break;
+        [self takeData:aDataPacket userInfo:userInfo];
+    }
 	[self performSelector:@selector(getRunInfoBlock) withObject:self afterDelay:1];
 }
 

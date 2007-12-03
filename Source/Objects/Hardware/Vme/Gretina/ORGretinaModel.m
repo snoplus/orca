@@ -611,7 +611,8 @@ static struct {
 		else break;
 
 		if([[NSDate date] timeIntervalSinceDate:startDate] > 10){
-			error = YES;
+            NSLog(@"That took a long time but seems to have been successful (slot %d)\n",[self slot]);
+			//error = YES;
 			break;
 		}
     }
@@ -968,7 +969,8 @@ static struct {
     
     //cache some stuff
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
-    theController   = [[self crate] controllerCard];
+    //theController   = [[self crate] controllerCard];
+    theController   = [self adapter];
     fifoAddress     = [self baseAddress]*0x100;
     fifoStateAddress= [self baseAddress] + register_offsets[kProgrammingDone];
     
@@ -983,6 +985,7 @@ static struct {
 	[self initBoard];
 	
     isRunning = YES;
+    inited = YES;
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
 
