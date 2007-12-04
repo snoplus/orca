@@ -20,6 +20,7 @@
 #ifndef _H_ACQIRISDC440CMDS_
 #define _H_ACQIRISDC440CMDS_
 #include <sys/types.h>
+#include <stdint.h>
 
 #define kAcqiris_GetSerialNumbers		0x01
 #define kAcqiris_SetConfigVertical		0x02
@@ -50,50 +51,50 @@ Acquiris_AsciiCmdStruct;
 #define kMaxAsciiCmdLength 256
 typedef 
 	struct {
-		long status;
+		int32_t status;
 		char responseBuffer[kMaxAsciiCmdLength];
 	}
 Acquiris_GetCmdStatusStruct;
 
 typedef 
 	struct {
-		long status;
+		int32_t status;
 	}
 Acquiris_SetCmdStatusStruct;
 
 typedef 
 	struct {
-		long status;
+		int32_t status;
 	}
 Acquiris_StatusStruct;
 
 //special struct for requesting data.
 typedef 
 	struct {
-		unsigned long boardID;
-		unsigned long numberSamples;
-		unsigned long dataID;	
-		unsigned long location;
-		unsigned long enableMask;	
+		uint32_t boardID;
+		uint32_t numberSamples;
+		uint32_t dataID;	
+		uint32_t location;
+		uint32_t enableMask;	
 	}
 Acquiris_ReadDataRequest;
 
 //special struct for requesting data.
 typedef 
 	struct {
-		long hitMask;
-		long numWaveformStructsToFollow;
+		int32_t hitMask;
+		int32_t numWaveformStructsToFollow;
 	}
 Acquiris_WaveformResponseStruct;
 
 typedef 
 	struct {
-		long orcaHeader;
-		long location;
-		long timeStampLo;
-		long timeStampHi;
-		long offsetToValidData;
-		long numShorts;
+		int32_t orcaHeader;
+		int32_t location;
+		int32_t timeStampLo;
+		int32_t timeStampHi;
+		int32_t offsetToValidData;
+		int32_t numShorts;
 		//followed by a number of bytes
 	}
 Acquiris_OrcaWaveformStruct;
@@ -101,7 +102,7 @@ Acquiris_OrcaWaveformStruct;
 
 typedef 
 	struct {
-		unsigned long numLongs;		/*number Longs of data to follow*/
+		uint32_t numLongs;		/*number Longs of data to follow*/
 		/*followed by the requested data, number of longs from above*/
 	}
 Acquiris_RecordBlockStruct;

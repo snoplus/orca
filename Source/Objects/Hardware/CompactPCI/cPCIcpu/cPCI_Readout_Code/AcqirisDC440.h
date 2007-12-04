@@ -20,6 +20,7 @@
 
 
 #include <sys/types.h>
+#include <stdint.h>
 #include "AcqirisDC440Cmds.h"
 #include "SBC_Config.h"
 #include "SBC_Cmds.h"
@@ -29,8 +30,8 @@ char FindAcqirisDC440s(void);
 void ReleaseAcqirisDC440s(void);
 void processAcquirisDC440Command(SBC_Packet* aPacket);
 
-long configVerical(unsigned long identifier,long channel, double fullScale, double offset, long coupling, long bandwidth);
+int32_t configVerical(uint32_t identifier,int32_t channel, double fullScale, double offset, int32_t coupling, int32_t bandwidth);
 
-long Start_AqirisDC440(long index,SBC_crate_config* crate_config );
-long Stop_AqirisDC440(long index,SBC_crate_config* crate_config );
-void Readout_DC440(long boardID,long numberSamples,long enableMask,long dataID,long location,char restart,char useCB);
+int32_t Start_AqirisDC440(int32_t index,SBC_crate_config* crate_config );
+int32_t Stop_AqirisDC440(int32_t index,SBC_crate_config* crate_config );
+void Readout_DC440(int32_t boardID,int32_t numberSamples,int32_t enableMask,int32_t dataID,int32_t location,char restart,char useCB);

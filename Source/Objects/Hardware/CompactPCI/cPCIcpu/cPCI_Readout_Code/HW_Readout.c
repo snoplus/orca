@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
+#include <stdint.h>
 #include "SBC_Config.h"
 #include "SBC_Readout.h"
 #include "AcqirisDC440.h"
@@ -31,15 +32,15 @@ extern char needToSwap;
 
 //--------------------------------------------------------
 //this stuff will be replaced with SBC HW access routines when we figure out how to do it.
-long testBuffer[] = {10,11,12,13,14,15};
+int32_t testBuffer[] = {10,11,12,13,14,15};
 
-long readAddress(long address)
+int32_t readAddress(int32_t address)
 {
 	if(address<6)return testBuffer[address];
 	else return 0;
 }
 
-void writeAddress(long address,long value)
+void writeAddress(int32_t address,int32_t value)
 {
 	testBuffer[address] = value;
 }
@@ -48,7 +49,7 @@ void writeAddress(long address,long value)
 void processHWCommand(SBC_Packet* aPacket)
 {
 	/*look at the first word to get the destination*/
-	long destination = aPacket->cmdHeader.destination;
+	int32_t destination = aPacket->cmdHeader.destination;
 	switch(destination){
 		case kAcqirisDC440:	 processAcquirisDC440Command(aPacket); break;
 		default:			 break;
@@ -57,7 +58,7 @@ void processHWCommand(SBC_Packet* aPacket)
 
 void startHWRun (SBC_crate_config* config)
 {	
-	long index = 0;
+	int32_t index = 0;
 	while(1){
 		switch(config->card_info[index].hw_type_id){
 			case kAcqirisDC440: index = Start_AqirisDC440(index, config); break; /*Acqiris DC440 Digitizer*/
@@ -70,7 +71,7 @@ void startHWRun (SBC_crate_config* config)
 void stopHWRun (SBC_crate_config* config)
 {
 
-	long index = 0;
+	int32_t index = 0;
 	while(1){
 		switch(config->card_info[index].hw_type_id){
 			case kAcqirisDC440: index = Stop_AqirisDC440(index, config); break; /*Acqiris DC440 Digitizer*/
@@ -82,7 +83,7 @@ void stopHWRun (SBC_crate_config* config)
 
 void readHW(SBC_crate_config* config)
 {
-	long index = 0;
+	int32_t index = 0;
 	while(1){
 		switch(config->card_info[index].hw_type_id){
 			case kAcqirisDC440:														//Acqiris DC440 Digitizer
@@ -116,12 +117,12 @@ void ReleaseHardware(void)
 void doWriteBlock(SBC_Packet* aPacket)
 {
 	SBC_WriteBlockStruct* p = (SBC_WriteBlockStruct*)aPacket->payload;
-	if(needToSwap)SwapLongBlock(p,sizeof(SBC_WriteBlockStruct)/sizeof(long));
-	long startAddress = p->address;
-	long num = p->numLongs;
+	if(needToSwap)SwapLongBlock(p,sizeof(SBC_WriteBlockStruct)/sizeof(int32_t));
+	int32_t startAddress = p->address;
+	int32_t num = p->numLongs;
 	p++;
-	int i;
-	long* dataToRead = (long*)p;
+	int32_t i;
+	int32_t* dataToRead = (int32_t*)p;
 	if(needToSwap)SwapLongBlock(dataToRead,num);
 	for(i=0;i<num;i++){
 		writeAddress(startAddress+i,dataToRead[i]);
@@ -132,26 +133,26 @@ void doReadBlock(SBC_Packet* aPacket)
 {
 	//what to read?
 	SBC_ReadBlockStruct* p = (SBC_ReadBlockStruct*)aPacket->payload;
-	if(needToSwap)SwapLongBlock(p,sizeof(SBC_ReadBlockStruct)/sizeof(long));
-	int numLongs = p->numLongs;
-	int address  = p->address;
+	if(needToSwap)SwapLongBlock(p,sizeof(SBC_ReadBlockStruct)/sizeof(int32_t));
+	int32_t numLongs = p->numLongs;
+	int32_t address  = p->address;
 
 	//OK, got address and # to read, set up the response and go get the data
 	aPacket->cmdHeader.destination	= kSBC_Process;
 	aPacket->cmdHeader.cmdID		= kSBC_ReadBlock;
-	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct) + numLongs*sizeof(long);
+	aPacket->cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct) + numLongs*sizeof(int32_t);
 	
 	SBC_ReadBlockStruct* optionPtr = (SBC_ReadBlockStruct*)aPacket->payload;
 	optionPtr->numLongs = numLongs;
 	optionPtr->address  = address;
-	if(needToSwap)SwapLongBlock(optionPtr,sizeof(SBC_ReadBlockStruct)/sizeof(long));
+	if(needToSwap)SwapLongBlock(optionPtr,sizeof(SBC_ReadBlockStruct)/sizeof(int32_t));
 	optionPtr++;
 	
-	long* lPtr		= (long*)optionPtr;
-	long* startPtr	= lPtr;
-	int i;
+	int32_t* lPtr		= (int32_t*)optionPtr;
+	int32_t* startPtr	= lPtr;
+	int32_t i;
 	for(i=0;i<numLongs;i++)*lPtr++ = readAddress(address+i);    //read from hardware addresses
-	if(needToSwap)SwapLongBlock(startPtr,numLongs/sizeof(long));
+	if(needToSwap)SwapLongBlock(startPtr,numLongs/sizeof(int32_t));
 
 	writeBuffer(aPacket);
 	

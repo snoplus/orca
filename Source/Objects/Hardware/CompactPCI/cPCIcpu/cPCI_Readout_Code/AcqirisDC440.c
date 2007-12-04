@@ -38,22 +38,22 @@
 
 void StartUp(ViSession dev);
 void Stop(ViSession dev);
-void SwapLongBlock(void* p, long n);
-void SwapShortBlock(void* p, long n);
+void SwapLongBlock(void* p, int32_t n);
+void SwapShortBlock(void* p, int32_t n);
 char Arm(ViSession dev);
 char Acquire(ViSession dev);
-ViInt32 StopAcquisition (ViSession dev,long aStopOption);
+ViInt32 StopAcquisition (ViSession dev,int32_t aStopOption);
 
 
 // ### Global variables ###
-long NumInstruments;			// Number of instruments
+int32_t NumInstruments;			// Number of instruments
 ViSession InstrumentID[10];		// Array of instrument handles
 
 typedef struct digitizerInfo{
 	char name[20];
-	long busNumber;
-	long serialNumber;
-	long instrumentID;
+	int32_t busNumber;
+	int32_t serialNumber;
+	int32_t instrumentID;
 } digitizerInfo;
 digitizerInfo digitizer[10];
 char acqirisInitFlag;
@@ -66,7 +66,7 @@ static SBC_Packet sendPacket;
 #define kStopAcq         0x00000004	// Force stop acq.
 #define kMaxNbrSegments  10
 
-void decodeArgs(char* inputString,char** argv, int numArgs)
+void decodeArgs(char* inputString,char** argv, int32_t numArgs)
 {
 	char **ap;
 	for (ap = argv; (*ap = strsep(&inputString, ",")) != NULL;) {
@@ -74,9 +74,9 @@ void decodeArgs(char* inputString,char** argv, int numArgs)
 	}
 }
 
-void sendGetResponse(SBC_Packet* aPacket, long status, char* aString)
+void sendGetResponse(SBC_Packet* aPacket, int32_t status, char* aString)
 {
-	long aCmd = aPacket->cmdHeader.cmdID;
+	int32_t aCmd = aPacket->cmdHeader.cmdID;
 	aPacket->cmdHeader.destination	= kAcqirisDC440;
 	aPacket->cmdHeader.numberBytesinPayload	= sizeof(Acquiris_GetCmdStatusStruct);
 	aPacket->cmdHeader.cmdID		= aCmd;
@@ -88,9 +88,9 @@ void sendGetResponse(SBC_Packet* aPacket, long status, char* aString)
 	writeBuffer(aPacket);
 }
 
-void sendSetResponse(SBC_Packet* aPacket, long status)
+void sendSetResponse(SBC_Packet* aPacket, int32_t status)
 {
-	long aCmd = aPacket->cmdHeader.cmdID;
+	int32_t aCmd = aPacket->cmdHeader.cmdID;
 	aPacket->cmdHeader.destination	= kAcqirisDC440;
 	aPacket->cmdHeader.cmdID		= aCmd;
 	aPacket->cmdHeader.numberBytesinPayload	= sizeof(Acquiris_SetCmdStatusStruct);
@@ -98,13 +98,13 @@ void sendSetResponse(SBC_Packet* aPacket, long status)
 	
 	Acquiris_SetCmdStatusStruct* p = (Acquiris_SetCmdStatusStruct*)aPacket->payload;	
 	p->status = status;	
-	if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_SetCmdStatusStruct)/sizeof(long));
+	if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_SetCmdStatusStruct)/sizeof(int32_t));
 	writeBuffer(aPacket);
 }
 
-void sendStatus(SBC_Packet* aPacket, long status)
+void sendStatus(SBC_Packet* aPacket, int32_t status)
 {
-	long aCmd = aPacket->cmdHeader.cmdID;
+	int32_t aCmd = aPacket->cmdHeader.cmdID;
 	aPacket->cmdHeader.destination	= kAcqirisDC440;
 	aPacket->cmdHeader.cmdID		= aCmd;
 	aPacket->cmdHeader.numberBytesinPayload = sizeof(Acquiris_StatusStruct);
@@ -112,7 +112,7 @@ void sendStatus(SBC_Packet* aPacket, long status)
 	
 	Acquiris_StatusStruct* p = (Acquiris_StatusStruct*)aPacket->payload;	
 	p->status = status;	
-	if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_StatusStruct)/sizeof(long));
+	if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_StatusStruct)/sizeof(int32_t));
 	writeBuffer(aPacket);
 }
 
@@ -122,9 +122,9 @@ void sendStatus(SBC_Packet* aPacket, long status)
 
 void processAcquirisDC440Command(SBC_Packet* aPacket)
 {
-	long status;
+	int32_t status;
 	char *argv[32];
-	int i;
+	int32_t i;
 	char aString[kMaxAsciiCmdLength];
 	switch(aPacket->cmdHeader.cmdID){		
 		case kAcqiris_GetSerialNumbers:
@@ -184,7 +184,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetMemory:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,1);
-				long numberSamples,nubmerSegments;
+				int32_t numberSamples,nubmerSegments;
 				status = AcqrsD1_getMemory(argl(0),&numberSamples,&nubmerSegments);
 				sprintf(aString,"%ld,%ld",numberSamples,nubmerSegments);
 				sendGetResponse(aPacket,status,aString);
@@ -206,7 +206,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,2);
 				double fullScale,offset;
-				unsigned long coupling,bandwidth;
+				uint32_t coupling,bandwidth;
 				status = AcqrsD1_getVertical(argl(0),argl(1),&fullScale,&offset,&coupling,&bandwidth);
 				sprintf(aString,"%G,%G,%ld,%ld",fullScale,offset,coupling,bandwidth);
 				sendGetResponse(aPacket,status,aString);
@@ -216,7 +216,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetTrigSource:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,2);
-				unsigned long coupling,slope;
+				uint32_t coupling,slope;
 				double level1,level2;
 				status = AcqrsD1_getTrigSource(argl(0),argl(1),&coupling,&slope,&level1,&level2);
 				sprintf(aString,"%ld,%ld,%G,%G",coupling,slope,level1,level2);
@@ -227,7 +227,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetTrigClass:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,1);
-				unsigned long sourcePattern,trigClass,validatepattern,holdType;
+				uint32_t sourcePattern,trigClass,validatepattern,holdType;
 				double holdValue1,holdValue2;
 				status = AcqrsD1_getTrigClass(argl(0),&trigClass,&sourcePattern,&validatepattern,&holdType,&holdValue1,&holdValue2);
 				sprintf(aString,"%ld,%ld",trigClass,sourcePattern);
@@ -239,7 +239,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetNbrChannels:
 			{
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,1);
-				unsigned long numChannels;
+				uint32_t numChannels;
 				status = AcqrsD1_getNbrChannels(argl(0),&numChannels);
 				sprintf(aString,"%ld",numChannels);
 				sendGetResponse(aPacket,status,aString);
@@ -269,7 +269,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 				ViBoolean done = 0;
 				decodeArgs(((Acquiris_AsciiCmdStruct*)aPacket->payload)->argBuffer,argv,1);
 				status = AcqrsD1_acqDone(argl(0), &done);
-				long lDone = done;
+				int32_t lDone = done;
 				sendStatus(aPacket,lDone);
 			}
 		break;
@@ -277,7 +277,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 		case kAcqiris_GetDataRequest:
 			{
 				Acquiris_ReadDataRequest* p = (Acquiris_ReadDataRequest*)aPacket->payload;
-				if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_ReadDataRequest)/sizeof(long));
+				if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_ReadDataRequest)/sizeof(int32_t));
 				Readout_DC440(p->boardID,p->numberSamples,p->enableMask,p->dataID,p->location,1,0); 
 			}
 		break;
@@ -287,7 +287,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 				Acquiris_ReadDataRequest* p = (Acquiris_ReadDataRequest*)aPacket->payload;
 				if(Acquire (p->boardID)){
 					Acquiris_ReadDataRequest* p = (Acquiris_ReadDataRequest*)aPacket->payload;
-					if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_ReadDataRequest)/sizeof(long));
+					if(needToSwap)SwapLongBlock(p,sizeof(Acquiris_ReadDataRequest)/sizeof(int32_t));
 					Readout_DC440(p->boardID,p->numberSamples,p->enableMask,p->dataID,p->location,0,0); 
 					AcqrsD1_stopAcquisition(p->boardID);
 				}
@@ -310,7 +310,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 char Acquire(ViSession dev)
 {
 	ViBoolean done		= 0;
-	long timeoutCounter = 100000;
+	int32_t timeoutCounter = 100000;
 	
 	AcqrsD1_acquire(dev);					// Start the acquisition
 	
@@ -335,7 +335,7 @@ char FindAcqirisDC440s(void)
 // The following call will find the number of digitizers on the computer, regardless of
 // their connection(s) to ASBus.
 	ViStatus status = AcqrsD1_getNbrPhysicalInstruments(&NumInstruments);
-	int i;
+	int32_t i;
 	// Initialize the digitizers and setup a digitizer->ID array for ORCA
 	for (i = 0; i < NumInstruments; i++){
 		char resourceName[20];
@@ -347,7 +347,7 @@ char FindAcqirisDC440s(void)
 			acqirisInitFlag = 1;
 		}
 		char name[20];
-		long serialNumber,busNumber,digitizerNumber;
+		int32_t serialNumber,busNumber,digitizerNumber;
 		AcqrsD1_getInstrumentData(InstrumentID[i],name,&serialNumber,&busNumber,&digitizerNumber);
 		strcpy(digitizer[i].name,name);
 		digitizer[i].busNumber		= busNumber;
@@ -359,7 +359,7 @@ char FindAcqirisDC440s(void)
 
 void ReleaseAcqirisDC440s(void)
 {
-	int i;
+	int32_t i;
 	for (i = 0; i < NumInstruments; i++){
 		Stop(InstrumentID[i]);
 	}
@@ -385,7 +385,7 @@ char Arm(ViSession dev)
     return( bRetVal );
 }
 
-ViInt32 StopAcquisition (ViSession dev,long aStopOption)
+ViInt32 StopAcquisition (ViSession dev,int32_t aStopOption)
 {
     ViStatus    status = 0;
     ViInt32     nbrSegmentsRead = 0;
@@ -440,24 +440,24 @@ void Stop(ViSession dev)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-long Start_AqirisDC440(long index,SBC_crate_config* crate_config )
+int32_t Start_AqirisDC440(int32_t index,SBC_crate_config* crate_config )
 {
 	ViSession dev = crate_config->card_info[index].base_add;
 	StartUp(dev);
 	return crate_config->card_info[index].next_Card_Index;
 }
 
-long Stop_AqirisDC440(long index,SBC_crate_config* crate_config )
+int32_t Stop_AqirisDC440(int32_t index,SBC_crate_config* crate_config )
 {
 	ViSession dev = crate_config->card_info[index].base_add;
 	Stop(dev);
 	return crate_config->card_info[index].next_Card_Index;
 }
 
-void Readout_DC440(long boardID,long numberSamples,long enableMask,long dataID,long location,char restart,char useCB)
+void Readout_DC440(int32_t boardID,int32_t numberSamples,int32_t enableMask,int32_t dataID,int32_t location,char restart,char useCB)
 {
 	// ### Readout the data ###
-	long nbrSegments=1;
+	int32_t nbrSegments=1;
 
 	if(useCB){
 		ViBoolean done = 0;
@@ -468,7 +468,7 @@ void Readout_DC440(long boardID,long numberSamples,long enableMask,long dataID,l
 	AqDataDescriptor                wfDesc;
 	AqSegmentDescriptor             segDesc;
 
-	long extra;
+	int32_t extra;
 	AcqrsD1_getInstrumentInfo(boardID, "TbSegmentPad", &extra);
 	AqReadParameters readParams;
     readParams.dataType         = ReadInt16;			// short
@@ -480,7 +480,7 @@ void Readout_DC440(long boardID,long numberSamples,long enableMask,long dataID,l
     readParams.segmentOffset    = numberSamples + 100;	// Offset between segments.
     readParams.dataArraySize    = ( kSBC_MaxPayloadSize - 
 									sizeof(Acquiris_WaveformResponseStruct) - 
-									sizeof(Acquiris_OrcaWaveformStruct)) / sizeof(short) ;	// User supplied array size.
+									sizeof(Acquiris_OrcaWaveformStruct)) / sizeof(int16_t) ;	// User supplied array size.
     readParams.segDescArraySize = nbrSegments*sizeof(AqSegmentDescriptor);  // Maximum number of segments.	
 	readParams.reserved1 = 0;
 	readParams.reserved2 = 0;
@@ -498,11 +498,11 @@ void Readout_DC440(long boardID,long numberSamples,long enableMask,long dataID,l
 	
 	//get pointer to the Orca part of the payload
 	Acquiris_OrcaWaveformStruct* recordPtr = (Acquiris_OrcaWaveformStruct*)(wPtr+1); //point to recordStart
-	short* dataPtr	 = (short*)(recordPtr+1);										 //point to the start of data
-	long numberShortsInSample;	
-	long numberLongsInSample;
+	int16_t* dataPtr	 = (int16_t*)(recordPtr+1);										 //point to the start of data
+	int32_t numberShortsInSample;	
+	int32_t numberLongsInSample;
 
-	int channel;
+	int32_t channel;
 	for(channel=0;channel<2;channel++){
 	
 		if(enableMask & (1<<channel)){
@@ -518,7 +518,7 @@ void Readout_DC440(long boardID,long numberSamples,long enableMask,long dataID,l
 
 				//update the size of payload
 				sendPacket.cmdHeader.numberBytesinPayload += sizeof(Acquiris_OrcaWaveformStruct);
-				sendPacket.cmdHeader.numberBytesinPayload += numberLongsInSample*sizeof(long);			
+				sendPacket.cmdHeader.numberBytesinPayload += numberLongsInSample*sizeof(int32_t);			
 			}
 			else {
 				numberShortsInSample = 0;
@@ -526,7 +526,7 @@ void Readout_DC440(long boardID,long numberSamples,long enableMask,long dataID,l
 			}
 			
 			//update the Orca record
-			recordPtr->orcaHeader			= dataID   | (numberLongsInSample + (sizeof(Acquiris_OrcaWaveformStruct)/sizeof(long)));
+			recordPtr->orcaHeader			= dataID   | (numberLongsInSample + (sizeof(Acquiris_OrcaWaveformStruct)/sizeof(int32_t)));
 			recordPtr->location				= location | (channel&0xFF)<<8;
 			recordPtr->timeStampLo			= segDesc.timeStampLo;
 			recordPtr->timeStampHi			= segDesc.timeStampHi;
@@ -534,35 +534,35 @@ void Readout_DC440(long boardID,long numberSamples,long enableMask,long dataID,l
 			recordPtr->numShorts			= numberShortsInSample;
 			
 			//advance our pointers
-			recordPtr = (Acquiris_OrcaWaveformStruct*)((long*)(recordPtr+1) + numberLongsInSample); //point to next recordStart
-			dataPtr	  = (short*)(recordPtr+1);														 //point to the start of next data
+			recordPtr = (Acquiris_OrcaWaveformStruct*)((int32_t*)(recordPtr+1) + numberLongsInSample); //point to next recordStart
+			dataPtr	  = (int16_t*)(recordPtr+1);														 //point to the start of next data
 		}
 	}
 	
 	//if using the Circular Buffer, only the Orca part of the payload is put in the CB. The first part holding the
 	//hitMask and numWaveforms is discarded. set up here because we may have to swap
-	long* orcaRecordPartPtr = (long*)(wPtr+1);
-	long numLongs = (sendPacket.cmdHeader.numberBytesinPayload - sizeof(Acquiris_WaveformResponseStruct))/sizeof(long);
+	int32_t* orcaRecordPartPtr = (int32_t*)(wPtr+1);
+	int32_t numLongs = (sendPacket.cmdHeader.numberBytesinPayload - sizeof(Acquiris_WaveformResponseStruct))/sizeof(int32_t);
 
 	if(needToSwap){
-		int numRec = wPtr->numWaveformStructsToFollow;
+		int32_t numRec = wPtr->numWaveformStructsToFollow;
 		recordPtr = (Acquiris_OrcaWaveformStruct*)(wPtr+1); //point to recordStart
-		dataPtr	 = (short*)(recordPtr+1);				    //point to the start of data
+		dataPtr	 = (int16_t*)(recordPtr+1);				    //point to the start of data
 
-		SwapLongBlock(wPtr,sizeof(Acquiris_WaveformResponseStruct)/sizeof(long));
-		int i;
+		SwapLongBlock(wPtr,sizeof(Acquiris_WaveformResponseStruct)/sizeof(int32_t));
+		int32_t i;
 		for(i=0;i<numRec;i++){
-			long recordLen			= (recordPtr->orcaHeader & 0x0003ffff);	//# longs
-			long numShortsInData	= recordPtr->numShorts;
+			int32_t recordLen			= (recordPtr->orcaHeader & 0x0003ffff);	//# longs
+			int32_t numShortsInData	= recordPtr->numShorts;
 			
-			short* dataPtr = (short*)(recordPtr+1);
-			SwapLongBlock(recordPtr,sizeof(Acquiris_OrcaWaveformStruct)/sizeof(long));
+			int16_t* dataPtr = (int16_t*)(recordPtr+1);
+			SwapLongBlock(recordPtr,sizeof(Acquiris_OrcaWaveformStruct)/sizeof(int32_t));
 			SwapShortBlock(dataPtr,numShortsInData);
-			recordPtr = (Acquiris_OrcaWaveformStruct*)((long*)recordPtr + recordLen);
+			recordPtr = (Acquiris_OrcaWaveformStruct*)((int32_t*)recordPtr + recordLen);
 		}
 	}
 	
-	if(useCB) CB_writeDataBlock((long*)orcaRecordPartPtr,numLongs);
+	if(useCB) CB_writeDataBlock((int32_t*)orcaRecordPartPtr,numLongs);
 	else	  writeBuffer(&sendPacket);
 
 	if(restart) AcqrsD1_acquire(boardID);
