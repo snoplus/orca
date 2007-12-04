@@ -673,7 +673,11 @@
 
 - (IBAction) resetCrateBusAction:(id)sender
 {
+    BOOL crateBusButtonEnabled = 
+		[resetCrateBusButton isEnabled];
+	[resetCrateBusButton setEnabled:NO];
     [model reset];
+	[resetCrateBusButton setEnabled:crateBusButtonEnabled];
 }
 
 - (void) rangeTextFieldAction:(id)sender

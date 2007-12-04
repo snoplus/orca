@@ -226,7 +226,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
             withAddMod:0x39
             usingAddSpace:0xFFFF];
     
-    NSLog(@"VmecpuModel (crate: %d, card: %d): Performed SYSRESET .\n", [self crate], [self card]);
+    NSLog(@"VmecpuModel (crate: %d, card: %d): Performed SYSRESET.\n", [self crateNumber], [self slot]);
 }
 
 - (void) load_HW_Config
