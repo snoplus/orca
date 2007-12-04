@@ -116,12 +116,12 @@ static struct {
     short		initialValue;
     float		ratio; //conversion constants
 } cardConstants[kNumGretina4CardParams] = {
-    {@"External Window",	@"",	0x04,	0x7FF,	0x07FF, 1.},
-    {@"Pileup Window",		@"us",	0x06,	0x7FF,	0x0400,	10./(float)0x400},
-    {@"Noise Window",		@"ns",	0x08,	0x07F,	0x0040,	640./(float)0x40},
-    {@"Ext Trigger Length", @"us",	0x0a,	0x7FF,	0x01C2,	4.5/(float)0x1C2},
-    {@"Collection Time",	@"us",	0x0c,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
-    {@"Integration Time",	@"us",	0x0e,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
+    {@"External Window",	@"",	0x08,	0x7FF,	0x07FF, 1.},
+    {@"Pileup Window",		@"us",	0x0C,	0x7FF,	0x0400,	10./(float)0x400},
+    {@"Noise Window",		@"ns",	0x10,	0x07F,	0x0040,	640./(float)0x40},
+    {@"Ext Trigger Length", @"us",	0x14,	0x7FF,	0x01C2,	4.5/(float)0x1C2},
+    {@"Collection Time",	@"us",	0x18,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
+    {@"Integration Time",	@"us",	0x1C,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
 };
 
 
@@ -131,7 +131,7 @@ static struct {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
     [self initParams];
-    [self setAddressModifier:0x29];
+    [self setAddressModifier:0x09];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -455,8 +455,8 @@ static struct {
 
 - (short) readBoardID
 {
-    unsigned short theValue = 0;
-    [[self adapter] readWordBlock:&theValue
+    unsigned long theValue = 0;
+    [[self adapter] readLongBlock:&theValue
                         atAddress:[self baseAddress] + register_offsets[kBoardID]
                         numToRead:1
                        withAddMod:[self addressModifier]
@@ -469,8 +469,8 @@ static struct {
     //write the card level params
     int i;
     for(i=0;i<kNumGretina4CardParams;i++){
-        unsigned short theValue = [[cardInfo objectAtIndex:i] shortValue];
-        [[self adapter] writeWordBlock:&theValue
+        unsigned long theValue = [[cardInfo objectAtIndex:i] longValue];
+        [[self adapter] writeLongBlock:&theValue
                              atAddress:[self baseAddress] + cardConstants[i].regOffset
                             numToWrite:1
                             withAddMod:[self addressModifier]
@@ -489,8 +489,8 @@ static struct {
 
 - (short) readControlReg:(int)channel
 {
-    unsigned short theValue = 0 ;
-    [[self adapter] readWordBlock:&theValue
+    unsigned long theValue = 0 ;
+    [[self adapter] readLongBlock:&theValue
                         atAddress:[self baseAddress] + register_offsets[kControlStatus] + 2*channel
                         numToRead:1
                        withAddMod:[self addressModifier]
@@ -506,8 +506,8 @@ static struct {
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
 	
-    unsigned short theValue = (polarity[chan] << 10) | (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
-    [[self adapter] writeWordBlock:&theValue
+    unsigned long theValue = (polarity[chan] << 10) | (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
+    [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_offsets[kControlStatus] + 2*chan
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -520,7 +520,7 @@ static struct {
 
 - (void) writeLEDThreshold:(int)channel
 {    
-    [[self adapter] writeWordBlock:(unsigned short*)&ledThreshold[channel]
+    [[self adapter] writeLongBlock:(unsigned long*)&ledThreshold[channel]
                          atAddress:[self baseAddress] + register_offsets[kLEDThreshold] + 2*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -530,8 +530,8 @@ static struct {
 
 - (void) writeCFDParameters:(int)channel
 {    
-    unsigned short theValue = (cfdDelay[channel] << 7) | (cfdFraction[channel] << 5) | cfdThreshold[channel];
-    [[self adapter] writeWordBlock:&theValue
+    unsigned long theValue = (cfdDelay[channel] << 7) | (cfdFraction[channel] << 5) | cfdThreshold[channel];
+    [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_offsets[kCFDParameters] + 2*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -541,7 +541,7 @@ static struct {
 
 - (void) writeRawDataSlidingLength:(int)channel
 {    
-    [[self adapter] writeWordBlock:(unsigned short*)&dataDelay[channel]
+    [[self adapter] writeLongBlock:(unsigned long*)&dataDelay[channel]
                          atAddress:[self baseAddress] + register_offsets[kRawDataSlidingLength] + 2*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -551,8 +551,8 @@ static struct {
 
 - (void) writeRawDataWindowLength:(int)channel
 {    
-	unsigned short aValue = dataLength[channel]-1;
-    [[self adapter] writeWordBlock:&aValue
+	unsigned long aValue = dataLength[channel]-1;
+    [[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + register_offsets[kRawDataWindowLength] + 2*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -563,8 +563,8 @@ static struct {
 
 - (unsigned short) readFifoState
 {
-    unsigned short theValue = 0 ;
-    [[self adapter] readWordBlock:&theValue
+    unsigned long theValue = 0 ;
+    [[self adapter] readLongBlock:&theValue
                         atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
                         numToRead:1
                        withAddMod:[self addressModifier]
@@ -608,9 +608,9 @@ static struct {
 	unsigned long  dataDump[0xffff];
 	BOOL error		  = NO;
     while(1){
-		unsigned short val;
+		unsigned long val;
 		//read the fifo state
-		[theController readWordBlock:&val
+		[theController readLongBlock:&val
 						   atAddress:fifoStateAddress
 						   numToRead:1
 						  withAddMod:0x29
@@ -678,7 +678,7 @@ static struct {
 	[[self undoManager] disableUndoRegistration];
   
     NS_DURING
-		unsigned short val;
+		unsigned long val;
 
 		switch(noiseFloorState){
 			case 0: //init
@@ -735,7 +735,7 @@ static struct {
 			
 			case 2:
 				//read the fifo state
-				[[self adapter] readWordBlock:&val
+				[[self adapter] readLongBlock:&val
 									   atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
 									   numToRead:1
 									  withAddMod:0x29
@@ -1029,9 +1029,9 @@ static struct {
     NSString* errorLocation = @"";
     NS_DURING
         if(inited){
-			unsigned short val;
+			unsigned long val;
 			//read the fifo state
-			[theController readWordBlock:&val
+			[theController readLongBlock:&val
 							   atAddress:fifoStateAddress
 							   numToRead:1
 							  withAddMod:0x29

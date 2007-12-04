@@ -88,6 +88,11 @@
     [super registerNotificationObservers];
         
     [notifyCenter addObserver : self
+					 selector : @selector(slotChanged:)
+						 name : ORVmeCardSlotChangedNotification
+					   object : model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(baseAddressChanged:)
                          name : ORVmeIOCardBaseAddressChangedNotification
                        object : model];
