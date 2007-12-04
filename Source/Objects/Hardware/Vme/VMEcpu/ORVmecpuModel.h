@@ -44,6 +44,7 @@
 - (ORReadOutList*)	readOutGroup;
 - (void)			setReadOutGroup:(ORReadOutList*)newReadOutGroup;
 - (NSMutableArray*) children;
+- (void) performSysReset;
 
 #pragma mark ¥¥¥DataTaker
 - (void) load_HW_Config;

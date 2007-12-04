@@ -65,6 +65,7 @@
 	IBOutlet NSStepper*		writeValueStepper;
 	IBOutlet NSButton*		readButton;
 	IBOutlet NSButton*		writeButton;
+	IBOutlet NSButton*		resetCrateBusButton;
 	IBOutlet NSTextField*	rangeTextField;
 	IBOutlet NSStepper* 	rangeStepper;
 	IBOutlet NSButton*		doRangeButton;
@@ -109,6 +110,7 @@
 - (void) readWriteTypeChanged:(NSNotification*)aNote;
 
 
+
 #pragma mark •••Actions
 - (IBAction) lockAction:(id)sender;
 
@@ -130,6 +132,7 @@
 - (IBAction) writeValueAction:(id)sender;
 - (IBAction) writeAction:(id)sender;
 - (IBAction) readAction:(id)sender;
+- (IBAction) resetCrateBusAction:(id)sender;
 
 - (IBAction) rangeTextFieldAction:(id)sender;
 - (IBAction) doRangeAction:(id)sender;

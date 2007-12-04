@@ -302,6 +302,7 @@
 	[writeButton setEnabled:connected];
     [rangeStepper setEnabled:connected];
     [rangeTextField setEnabled:connected && [[model sbcLink] doRange]];
+    [resetCrateBusButton setEnabled:(connected && [model respondsToSelector:@selector(reset)])];
 
 }
 
@@ -343,6 +344,7 @@
 //	if([[model sbcLink] isConnected])	[connectButton setTitle:@"Disconnect"];
 //	else					[connectButton setTitle:@"Connect"];
 }
+
 
 - (void) verboseChanged:(NSNotification*)aNote
 {
@@ -666,6 +668,12 @@
         NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
                         localException,address);
     NS_ENDHANDLER
+}
+
+
+- (IBAction) resetCrateBusAction:(id)sender
+{
+    [model reset];
 }
 
 - (void) rangeTextFieldAction:(id)sender

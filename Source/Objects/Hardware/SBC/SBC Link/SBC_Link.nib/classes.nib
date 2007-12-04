@@ -51,6 +51,7 @@
                 rangeTextFieldAction = id; 
                 readAction = id; 
                 readWriteTypeMatrixAction = id; 
+                resetCrateBusAction = id; 
                 toggleCrateAction = id; 
                 userNameAction = id; 
                 verboseAction = id; 
@@ -85,6 +86,7 @@
                 rangeTextField = NSTextField; 
                 readButton = NSButton; 
                 readWriteTypeMatrix = NSMatrix; 
+                resetCrateBusButton = NSButton; 
                 runInfoField = NSTextField; 
                 setFilePathButton = NSButton; 
                 status1Field = NSTextField; 

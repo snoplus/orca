@@ -769,7 +769,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		timeToStopTakingData= YES;
 		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.05]];
 		totalTime += .105;
-		if(totalTime > 20){
+		if(totalTime > 1000){
 			NSLogColor([NSColor redColor], @"Run Thread Failed to stop.....You should stop and restart ORCA!\n");
 			break;
 		}

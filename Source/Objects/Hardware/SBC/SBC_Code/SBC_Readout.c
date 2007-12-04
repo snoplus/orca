@@ -53,14 +53,14 @@ void sendCBRecord(void);
 
 
 /*----globals----*/
-char                timeToExit;
-SBC_crate_config    crate_config;
+char               timeToExit;
+SBC_crate_config   crate_config;
 SBC_info_struct    run_info;
-time_t                lastTime;
+time_t             lastTime;
 
-pthread_t            readoutThreadId;
-pthread_mutex_t     runInfoMutex;
-int     workingSocket;
+pthread_t readoutThreadId;
+pthread_mutex_t runInfoMutex;
+int  workingSocket;
 char needToSwap;
 /*---------------*/
 
@@ -193,12 +193,22 @@ void processSBCCommand(SBC_Packet* aPacket)
             run_info.statusBits    |= kSBC_ConfigLoadedMask;
         break;
                     
-        case kSBC_StartRun:           doRunCommand(aPacket); break;
-        case kSBC_StopRun:            doRunCommand(aPacket); break;
-                            
-        case kSBC_RunInfoRequest:    sendRunInfo(); break;
-        case kSBC_CBRead:            sendCBRecord(); break;
-        case kSBC_Exit:              timeToExit = 1; break;
+        case kSBC_StartRun:           
+            doRunCommand(aPacket); 
+            break;
+        case kSBC_StopRun:            
+            doRunCommand(aPacket); 
+            break;
+    
+        case kSBC_RunInfoRequest:    
+            sendRunInfo(); 
+            break;
+        case kSBC_CBRead:            
+            sendCBRecord(); 
+            break;
+        case kSBC_Exit:              
+            timeToExit = 1; 
+            break;
     }
 }
 

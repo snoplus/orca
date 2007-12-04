@@ -299,7 +299,14 @@ void doWriteBlock(SBC_Packet* aPacket)
     int32_t numItems        = p->numItems;
     int32_t memMapHandle;
 
-    if(addressModifier == 0x29) {
+    if (addressSpace == 0xFFFF) {
+        memMapHandle = controlHandle;
+        if (unitSize != sizeof(uint32_t) && numItems != 1) {
+            sprintf(aPacket->message,"error: size and number not correct");
+            writeBuffer(aPacket);
+            return;
+        }
+    } else if(addressModifier == 0x29) {
         memMapHandle = vmeAM29Handle;
     } else {
         memMapHandle = openNewDevice("lsi2", p); 
@@ -330,10 +337,9 @@ void doWriteBlock(SBC_Packet* aPacket)
         break;
     }
     
-    //printf("writing %lu bytes @ 0x%x\n",numItems*unitSize,(int)startAddress);
-    int32_t result = 
+    int32_t result = 0;
+    result = 
         vme_write(memMapHandle,startAddress,(uint8_t*)p,numItems*unitSize);
-    //printf("write result: %d  (%ld, %ld)\n", result,numItems,unitSize);
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
@@ -359,7 +365,7 @@ void doWriteBlock(SBC_Packet* aPacket)
     if(needToSwap)SwapLongBlock(lptr,numItems);
 
     writeBuffer(aPacket);    
-    if (memMapHandle != vmeAM29Handle) {
+    if (memMapHandle != vmeAM29Handle && memMapHandle != controlHandle) {
         closeDevice(memMapHandle);
     } 
 }
@@ -378,7 +384,14 @@ void doReadBlock(SBC_Packet* aPacket)
     int32_t numItems        = p->numItems;
     int32_t memMapHandle;
 
-    if(addressModifier == 0x29) {
+    if (addressSpace == 0xFFFF) {
+        memMapHandle = controlHandle;
+        if (unitSize != sizeof(uint32_t) && numItems != 1) {
+            sprintf(aPacket->message,"error: size and number not correct");
+            writeBuffer(aPacket);
+            return;
+         }
+    } else if(addressModifier == 0x29) {
       memMapHandle = vmeAM29Handle;
     } else {
         memMapHandle = openNewDevice("lsi2", (SBC_VmeWriteBlockStruct*)p); 
@@ -401,8 +414,9 @@ void doReadBlock(SBC_Packet* aPacket)
         (SBC_VmeReadBlockStruct*)aPacket->payload;
     uint8_t* returnPayload = (uint8_t*)(returnDataPtr+1);
 
-    int32_t result = 
-      vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
+    int32_t result = 0;
+    result = 
+        vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
     returnDataPtr->address         = oldAddress;
     returnDataPtr->addressModifier = addressModifier;
     returnDataPtr->addressSpace    = addressSpace;
@@ -410,7 +424,7 @@ void doReadBlock(SBC_Packet* aPacket)
     returnDataPtr->numItems        = numItems;
     if(result == (numItems*unitSize)){
         //printf("no read error\n");
-        returnDataPtr->errorCode        = 0;
+        returnDataPtr->errorCode = 0;
         switch(unitSize){
             case 1: /*bytes*/
                 /*no need to swap*/
@@ -437,7 +451,7 @@ void doReadBlock(SBC_Packet* aPacket)
             sizeof(SBC_VmeReadBlockStruct)/sizeof(int32_t));
     }
     writeBuffer(aPacket);
-    if (memMapHandle != vmeAM29Handle) {
+    if (memMapHandle != vmeAM29Handle && memMapHandle != controlHandle) {
         closeDevice(memMapHandle);
     } 
 }

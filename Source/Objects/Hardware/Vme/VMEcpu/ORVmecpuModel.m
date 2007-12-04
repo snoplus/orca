@@ -207,6 +207,24 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (void) reset
 {
+    [self performSysReset];
+}
+
+- (void) performSysReset
+{
+    unsigned long registerRead = 0x0;
+    [self readLong:&registerRead 
+            atAddress:0x404 
+            timesToRead:1
+            withAddMod:0x39
+            usingAddSpace:0xFFFF];
+    registerRead |= 0x404000;
+    
+    [self writeLongBlock:&registerRead
+            atAddress:0x404 
+            numToWrite:1
+            withAddMod:0x39
+            usingAddSpace:0xFFFF];
 }
 
 - (void) load_HW_Config

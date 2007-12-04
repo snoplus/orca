@@ -1115,7 +1115,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	if(isRunning){
 		[self getRunInfoBlock];
 		if(runInfo.readCycles == oldCycleCount){
-			if(++missedHeartBeat == 3){
+			if(++missedHeartBeat == 10){
 				if(!eCpuDeadAlarm){
 					eCpuDeadAlarm = [[ORAlarm alloc] initWithName:@"eCPU appears dead" severity:kHardwareAlarm];
 					[eCpuDeadAlarm setSticky:NO];
