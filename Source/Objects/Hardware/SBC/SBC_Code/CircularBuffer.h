@@ -22,10 +22,11 @@
 
 #include "SBC_Cmds.h"
 #include <sys/types.h>
+#include <stdint.h>
 
 void CB_initialize(size_t length);
 void CB_cleanup(void);
-void CB_writeDataBlock(long* data, long length);
-long CB_nextBlockSize(void);
-long CB_readNextDataBlock(long* buffer,long maxSize);
+void CB_writeDataBlock(int32_t* data, int32_t length);
+int32_t CB_nextBlockSize(void);
+int32_t CB_readNextDataBlock(int32_t* buffer,int32_t maxSize);
 void CB_getBufferInfo(BufferInfo* buffInfo);

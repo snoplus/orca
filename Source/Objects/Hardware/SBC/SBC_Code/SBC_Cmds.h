@@ -1,11 +1,11 @@
 
 /*---------------------------------------------------------------------------
-/	SBC_Cmds.h
+/    SBC_Cmds.h
 /  command protocol for the PCI controller
 /
-/	02/21/06 Mark A. Howe
-/	CENPA, University of Washington. All rights reserved.
-/	ORCA project
+/    02/21/06 Mark A. Howe
+/    CENPA, University of Washington. All rights reserved.
+/    ORCA project
 /  ---------------------------------------------------------------------------
 */
 //-----------------------------------------------------------
@@ -26,113 +26,114 @@
 #define _H_SBCCMDS_
 
 #include <sys/types.h>
+#include <stdint.h>
 #include "SBC_Config.h"
 
 /*destinations*/
-#define kSBC_Process	0x1
-#define kAcqirisDC440	0x2
+#define kSBC_Process           0x1
+#define kAcqirisDC440          0x2
 
 /* SBC commands */
-#define kSBC_Command			0x01
-#define kSBC_ReadBlock			0x02
-#define kSBC_WriteBlock			0x03
-#define kSBC_LoadConfig			0x04
-#define kSBC_RunInfoRequest		0x05
-#define kSBC_DataBlock			0x06
-#define kSBC_AcqirisDC440Cmd	0x07
-#define kSBC_CBBlock			0x08
-#define kSBC_StartRun			0x0a
-#define kSBC_StopRun			0x0b
-#define kSBC_CBRead				0x0c
-#define kSBC_ConnectionStatus	0x0d
-#define kSBC_VmeReadBlock		0x0e
-#define kSBC_VmeWriteBlock		0x0f
+#define kSBC_Command           0x01
+#define kSBC_ReadBlock         0x02
+#define kSBC_WriteBlock        0x03
+#define kSBC_LoadConfig        0x04
+#define kSBC_RunInfoRequest    0x05
+#define kSBC_DataBlock         0x06
+#define kSBC_AcqirisDC440Cmd   0x07
+#define kSBC_CBBlock           0x08
+#define kSBC_StartRun          0x0a
+#define kSBC_StopRun           0x0b
+#define kSBC_CBRead            0x0c
+#define kSBC_ConnectionStatus  0x0d
+#define kSBC_VmeReadBlock      0x0e
+#define kSBC_VmeWriteBlock     0x0f
 
-#define kSBC_Exit				0xFFFFFFFF /*close socket and quit application*/
+#define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
 typedef 
-	struct {
-		unsigned long destination;	/*should be kSBC_Command*/
-		unsigned long cmdID;
-		unsigned long numberBytesinPayload;
-	}
+    struct {
+        uint32_t destination;    /*should be kSBC_Command*/
+        uint32_t cmdID;
+        uint32_t numberBytesinPayload;
+    }
 SBC_CommandHeader;
 
 typedef 
-	struct {
-		SBC_info_struct runInfo;
-	}
+    struct {
+        SBC_info_struct runInfo;
+    }
 SBC_RunInfo;
 
 #define kMaxOptions 10
 typedef 
-	struct {
-		unsigned long option[kMaxOptions];
-	}
+    struct {
+        uint32_t option[kMaxOptions];
+    }
 SBC_CmdOptionStruct;
 
 typedef 
-	struct {
-		unsigned long address;		/*first address*/
-		unsigned long numLongs;		/*number of longs to read*/
-	}
+    struct {
+        uint32_t address;        /*first address*/
+        uint32_t numLongs;        /*number of longs to read*/
+    }
 SBC_ReadBlockStruct;
 
 typedef 
-	struct {
-		unsigned long address;		/*first address*/
-		unsigned long numLongs;		/*number Longs of data to follow*/
-		/*followed by the requested data, number of longs from above*/
-	}
+    struct {
+        uint32_t address;        /*first address*/
+        uint32_t numLongs;        /*number Longs of data to follow*/
+        /*followed by the requested data, number of longs from above*/
+    }
 SBC_WriteBlockStruct;
 
 typedef 
-	struct {
-		unsigned long address;		/*first address*/
-		unsigned long addressModifier;
-		unsigned long addressSpace;
-		unsigned long unitSize;		/*1,2,or 4*/
-		unsigned long errorCode;	/*filled on return*/
-		unsigned long numItems;		/*number of items to read*/
-	}
+    struct {
+        uint32_t address;        /*first address*/
+        uint32_t addressModifier;
+        uint32_t addressSpace;
+        uint32_t unitSize;        /*1,2,or 4*/
+        uint32_t errorCode;    /*filled on return*/
+        uint32_t numItems;        /*number of items to read*/
+    }
 SBC_VmeReadBlockStruct;
 
 typedef 
-	struct {
-		unsigned long address;		/*first address*/
-		unsigned long addressModifier;
-		unsigned long addressSpace;
-		unsigned long unitSize;		/*1,2,or 4*/
-		unsigned long errorCode;	/*filled on return*/
-		unsigned long numItems;		/*number Items of data to follow*/
-		/*followed by the requested data, number of items from above*/
-	}
+    struct {
+        uint32_t address;        /*first address*/
+        uint32_t addressModifier;
+        uint32_t addressSpace;
+        uint32_t unitSize;        /*1,2,or 4*/
+        uint32_t errorCode;    /*filled on return*/
+        uint32_t numItems;        /*number Items of data to follow*/
+        /*followed by the requested data, number of items from above*/
+    }
 SBC_VmeWriteBlockStruct;
 
 
 
-#define kSBC_MaxPayloadSize	1024*200
-#define kSBC_MaxMessageSize	256
+#define kSBC_MaxPayloadSize    1024*200
+#define kSBC_MaxMessageSize    256
 typedef 
-	struct {
-		unsigned long numBytes;				//filled in automatically
-		SBC_CommandHeader cmdHeader;
-		char message[kSBC_MaxMessageSize];
-		char payload[kSBC_MaxPayloadSize];
-	}
+    struct {
+        uint32_t numBytes;                //filled in automatically
+        SBC_CommandHeader cmdHeader;
+        char message[kSBC_MaxMessageSize];
+        char payload[kSBC_MaxPayloadSize];
+    }
 SBC_Packet;
 
 
 //---------------------
 
 typedef
-	struct {
-		 unsigned long readIndex;
-		 unsigned long writeIndex;
-		 unsigned long lostByteCount;
-		 unsigned long amountInBuffer;
-		 unsigned long wrapArounds;
-	}
+    struct {
+         uint32_t readIndex;
+         uint32_t writeIndex;
+         uint32_t lostByteCount;
+         uint32_t amountInBuffer;
+         uint32_t wrapArounds;
+    }
 BufferInfo;
 
 #endif

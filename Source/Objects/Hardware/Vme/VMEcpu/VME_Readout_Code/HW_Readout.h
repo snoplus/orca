@@ -33,6 +33,11 @@ void doReadBlock(SBC_Packet* aPacket);
 void doVmeWriteBlock(SBC_Packet* aPacket);
 void doVmeReadBlock(SBC_Packet* aPacket);
 
+int32_t openNewDevice(char* devName, SBC_VmeWriteBlockStruct* aPacket);
+int32_t openNewDMADevice(SBC_VmeWriteBlockStruct* aPacket, uint32_t length);
+int32_t closeDevice(int32_t deviceHandle);
+int32_t closeDMADevice(int32_t deviceHandle);
+
 int Readout_Shaper(SBC_crate_config* config,int index);
 int Readout_Gretina(SBC_crate_config* config,int index);
 

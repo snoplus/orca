@@ -1066,7 +1066,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		FD_SET(socketfd, &fds);
 
 		struct timeval tv;
-		tv.tv_sec  = 2;
+		tv.tv_sec  = 10;
 		tv.tv_usec = 0;
 
 		// wait until timeout or data received

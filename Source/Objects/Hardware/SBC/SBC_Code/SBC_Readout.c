@@ -1,9 +1,9 @@
 /*---------------------------------------------------------------------------
-/	SBC_Readout.c
+/    SBC_Readout.c
 /
-/	09/09/07 Mark A. Howe
-/	CENPA, University of Washington. All rights reserved.
-/	ORCA project
+/    09/09/07 Mark A. Howe
+/    CENPA, University of Washington. All rights reserved.
+/    ORCA project
 /  ---------------------------------------------------------------------------
 */
 //-----------------------------------------------------------
@@ -53,327 +53,327 @@ void sendCBRecord(void);
 
 
 /*----globals----*/
-char				timeToExit;
-SBC_crate_config	crate_config;
-SBC_info_struct	run_info;
-time_t				lastTime;
+char                timeToExit;
+SBC_crate_config    crate_config;
+SBC_info_struct    run_info;
+time_t                lastTime;
 
-pthread_t			readoutThreadId;
+pthread_t            readoutThreadId;
 pthread_mutex_t     runInfoMutex;
-int	 workingSocket;
+int     workingSocket;
 char needToSwap;
 /*---------------*/
 
-void sigchld_handler(int s)
+void sigchld_handler(int32_t s)
 {
     while(waitpid(-1, NULL, WNOHANG) > 0);
 }
 
-int main(int argc, char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
-    int sockfd;				// listen on sock_fd, new connection on workingSocket
-    struct sockaddr_in my_addr;		// my address information
-    struct sockaddr_in their_addr;	// connector's address information
+    int32_t sockfd;                // listen on sock_fd, new connection on workingSocket
+    struct sockaddr_in my_addr;        // my address information
+    struct sockaddr_in their_addr;    // connector's address information
     socklen_t sin_size;
     struct sigaction sa;
-    int yes=1;
-	timeToExit = 0;
-	
+    int32_t yes=1;
+    timeToExit = 0;
+    
     if (argc != 2) {
         exit(1);
     }
-	
-	int thePort = atoi(argv[1]);
-	while(1){
-		if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
-			exit(1);
-		}
-		
-		if (setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) {
-			exit(1);
-		}
-		
-		my_addr.sin_family = AF_INET;         // host byte order
-		my_addr.sin_port = htons(thePort);     // short, network byte order
-		my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
-		memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
-		
-		if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))== -1) {
-			exit(1);
-		}
-		
-		if (listen(sockfd, BACKLOG) == -1) {
-			exit(1);
-		}
-		
-		sa.sa_handler = sigchld_handler; // reap all dead processes
-		sigemptyset(&sa.sa_mask);
-		sa.sa_flags = SA_RESTART;
-		if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-			exit(1);
-		}
-		FindHardware();
-	
-		sin_size = sizeof(struct sockaddr_in);
-		if ((workingSocket = accept(sockfd, (struct sockaddr *)&their_addr,
-							 &sin_size)) == -1) {
-			exit(1);
-		}
-		
-		//don't need this socket anymore
-		close(sockfd);
-	
-		//the first word sent is a test word to determine endian-ness
-		long testWord;
-		needToSwap = FALSE;
-		int n = read(workingSocket,&testWord, 4);
-		if(n == 0)	return 0 ; //disconnected -- exit
-		if(testWord == 0xBADC0000)needToSwap = TRUE;
-		//end of swap test
+    
+    int32_t thePort = atoi(argv[1]);
+    while(1){
+        if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
+            exit(1);
+        }
+        
+        if (setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(int)) == -1) {
+            exit(1);
+        }
+        
+        my_addr.sin_family = AF_INET;         // host byte order
+        my_addr.sin_port = htons(thePort);     // short, network byte order
+        my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
+        memset(my_addr.sin_zero, '\0', sizeof my_addr.sin_zero);
+        
+        if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))== -1) {
+            exit(1);
+        }
+        
+        if (listen(sockfd, BACKLOG) == -1) {
+            exit(1);
+        }
+        
+        sa.sa_handler = sigchld_handler; // reap all dead processes
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = SA_RESTART;
+        if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+            exit(1);
+        }
+        FindHardware();
+    
+        sin_size = sizeof(struct sockaddr_in);
+        if ((workingSocket = accept(sockfd, (struct sockaddr *)&their_addr,
+                             &sin_size)) == -1) {
+            exit(1);
+        }
+        
+        //don't need this socket anymore
+        close(sockfd);
+    
+        //the first word sent is a test word to determine endian-ness
+        int32_t testWord;
+        needToSwap = FALSE;
+        int32_t n = read(workingSocket,&testWord, 4);
+        if(n == 0)    return 0 ; //disconnected -- exit
+        if(testWord == 0xBADC0000)needToSwap = TRUE;
+        //end of swap test
 
-		//Note that we don't fork, only one connection is allowed.
-		/*-------------------------------*/
-		/*initialize our global variables*/
-		pthread_mutex_init(&runInfoMutex, NULL);
-		pthread_mutex_lock (&runInfoMutex);  //begin critical section
-		run_info.statusBits		&= ~kSBC_ConfigLoadedMask; //clr bit
-		run_info.statusBits		&= ~kSBC_RunningMask;		//clr bit
-		run_info.readCycles		= 0;
-		pthread_mutex_unlock (&runInfoMutex);//end critical section
-		/*-------------------------------*/
-		SBC_Packet aPacket;
-		while(!timeToExit){
-			if(readBuffer(&aPacket) == 0)break;
-			processBuffer(&aPacket);
-		}
-		
-		close(workingSocket);
-		CB_cleanup();
-		pthread_mutex_destroy(&runInfoMutex);
+        //Note that we don't fork, only one connection is allowed.
+        /*-------------------------------*/
+        /*initialize our global variables*/
+        pthread_mutex_init(&runInfoMutex, NULL);
+        pthread_mutex_lock (&runInfoMutex);  //begin critical section
+        run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
+        run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
+        run_info.readCycles        = 0;
+        pthread_mutex_unlock (&runInfoMutex);//end critical section
+        /*-------------------------------*/
+        SBC_Packet aPacket;
+        while(!timeToExit){
+            if(readBuffer(&aPacket) == 0)break;
+            processBuffer(&aPacket);
+        }
+        
+        close(workingSocket);
+        CB_cleanup();
+        pthread_mutex_destroy(&runInfoMutex);
 
-		ReleaseHardware();
-		if(timeToExit)break;    
-	}
-	
-	
+        ReleaseHardware();
+        if(timeToExit)break;    
+    }
+    
+    
     return 0;
 } 
 
 void processBuffer(SBC_Packet* aPacket)
 {
-	/*look at the first word to get the destination*/
-	long destination = aPacket->cmdHeader.destination;
+    /*look at the first word to get the destination*/
+    int32_t destination = aPacket->cmdHeader.destination;
 
-	switch(destination){
-		case kSBC_Process:	 processSBCCommand(aPacket);			 break;
-		default:			 processHWCommand(aPacket); break;
-	}
+    switch(destination){
+        case kSBC_Process:   processSBCCommand(aPacket);             break;
+        default:             processHWCommand(aPacket); break;
+    }
 }
 
 void processSBCCommand(SBC_Packet* aPacket)
 {
-	switch(aPacket->cmdHeader.cmdID){
-		case kSBC_WriteBlock:		
-		case kSBC_VmeWriteBlock:
-			pthread_mutex_lock (&runInfoMutex);							//begin critical section
-			doWriteBlock(aPacket); 
-			pthread_mutex_unlock (&runInfoMutex);						//end critical section
-		break;
-		
-		case kSBC_ReadBlock:
-		case kSBC_VmeReadBlock:		
-			pthread_mutex_lock (&runInfoMutex);							//begin critical section
-			doReadBlock(aPacket);  
-			pthread_mutex_unlock (&runInfoMutex);						//end critical section
-		break;
-			
-		case kSBC_LoadConfig:
-			if(needToSwap)SwapLongBlock(aPacket->payload,sizeof(SBC_crate_config)/sizeof(long));
-			memcpy(&crate_config, aPacket->payload, sizeof(SBC_crate_config));
-			run_info.statusBits	|= kSBC_ConfigLoadedMask;
-		break;
-					
-		case kSBC_StartRun:			doRunCommand(aPacket); break;
-		case kSBC_StopRun:			doRunCommand(aPacket); break;
-							
-		case kSBC_RunInfoRequest:	sendRunInfo(); break;
-		case kSBC_CBRead:			sendCBRecord(); break;
-		case kSBC_Exit:				timeToExit = 1; break;
-	}
+    switch(aPacket->cmdHeader.cmdID){
+        case kSBC_WriteBlock:        
+        case kSBC_VmeWriteBlock:
+            pthread_mutex_lock (&runInfoMutex);                            //begin critical section
+            doWriteBlock(aPacket); 
+            pthread_mutex_unlock (&runInfoMutex);                        //end critical section
+        break;
+        
+        case kSBC_ReadBlock:
+        case kSBC_VmeReadBlock:        
+            pthread_mutex_lock (&runInfoMutex);                            //begin critical section
+            doReadBlock(aPacket);  
+            pthread_mutex_unlock (&runInfoMutex);                        //end critical section
+        break;
+            
+        case kSBC_LoadConfig:
+            if(needToSwap)SwapLongBlock(aPacket->payload,sizeof(SBC_crate_config)/sizeof(int32_t));
+            memcpy(&crate_config, aPacket->payload, sizeof(SBC_crate_config));
+            run_info.statusBits    |= kSBC_ConfigLoadedMask;
+        break;
+                    
+        case kSBC_StartRun:           doRunCommand(aPacket); break;
+        case kSBC_StopRun:            doRunCommand(aPacket); break;
+                            
+        case kSBC_RunInfoRequest:    sendRunInfo(); break;
+        case kSBC_CBRead:            sendCBRecord(); break;
+        case kSBC_Exit:              timeToExit = 1; break;
+    }
 }
 
 void doRunCommand(SBC_Packet* aPacket)
 {
-	//future options will be decoded here, are not any so far so the code is commented out
-	//SBC_CmdOptionStruct* p = (SBC_CmdOptionStruct*)aPacket->payload;
-	//if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(long));
-	// option1 = p->option[0];
-	// option2 = p->option[1];
-	//....
+    //future options will be decoded here, are not any so far so the code is commented out
+    //SBC_CmdOptionStruct* p = (SBC_CmdOptionStruct*)aPacket->payload;
+    //if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
+    // option1 = p->option[0];
+    // option2 = p->option[1];
+    //....
 
-	long result = 0;
-	if(aPacket->cmdHeader.cmdID == kSBC_StartRun)  result = startRun();
-	else if(aPacket->cmdHeader.cmdID == kSBC_StopRun) stopRun();
+    int32_t result = 0;
+    if(aPacket->cmdHeader.cmdID == kSBC_StartRun)  result = startRun();
+    else if(aPacket->cmdHeader.cmdID == kSBC_StopRun) stopRun();
 
-	SBC_CmdOptionStruct* op = (SBC_CmdOptionStruct*)aPacket->payload;
-	op->option[0] = result;
-	if(needToSwap)SwapLongBlock(op,sizeof(SBC_CmdOptionStruct)/sizeof(long));
-	sendResponse(aPacket);
+    SBC_CmdOptionStruct* op = (SBC_CmdOptionStruct*)aPacket->payload;
+    op->option[0] = result;
+//    if(needToSwap)SwapLongBlock(op,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
+    sendResponse(aPacket);
 }
 
 
 void sendResponse(SBC_Packet* aPacket)
 {
-	aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_CmdOptionStruct);
-	
-	SBC_CmdOptionStruct* p = (SBC_CmdOptionStruct*)aPacket->payload;		
-	if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(long));
-	writeBuffer(aPacket);
+    aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_CmdOptionStruct);
+    
+    SBC_CmdOptionStruct* p = (SBC_CmdOptionStruct*)aPacket->payload;        
+    if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
+    writeBuffer(aPacket);
 }
 
 void sendRunInfo(void)
 {
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination	= kSBC_Process;
-	aPacket.cmdHeader.cmdID			= kSBC_RunInfoRequest;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_info_struct);
-	
-	SBC_info_struct* runInfoPtr = (SBC_info_struct*)aPacket.payload;
+    SBC_Packet aPacket;
+    aPacket.cmdHeader.destination    = kSBC_Process;
+    aPacket.cmdHeader.cmdID            = kSBC_RunInfoRequest;
+    aPacket.cmdHeader.numberBytesinPayload    = sizeof(SBC_info_struct);
+    
+    SBC_info_struct* runInfoPtr = (SBC_info_struct*)aPacket.payload;
 
-	pthread_mutex_lock (&runInfoMutex);							//begin critical section
-	memcpy(runInfoPtr, &run_info, sizeof(SBC_info_struct));	//make copy
-	pthread_mutex_unlock (&runInfoMutex);						//end critical section
+    pthread_mutex_lock (&runInfoMutex);                            //begin critical section
+    memcpy(runInfoPtr, &run_info, sizeof(SBC_info_struct));    //make copy
+    pthread_mutex_unlock (&runInfoMutex);                        //end critical section
 
-	BufferInfo cbInfo;
-	CB_getBufferInfo(&cbInfo);
-	runInfoPtr->readIndex      = cbInfo.readIndex;
-	runInfoPtr->writeIndex     = cbInfo.writeIndex;
-	runInfoPtr->lostByteCount  = cbInfo.lostByteCount;
-	runInfoPtr->amountInBuffer = cbInfo.amountInBuffer;
-	runInfoPtr->wrapArounds    = cbInfo.wrapArounds;
-			
-	if(needToSwap)SwapLongBlock(runInfoPtr,sizeof(SBC_info_struct)/sizeof(long));
-	writeBuffer(&aPacket);
+    BufferInfo cbInfo;
+    CB_getBufferInfo(&cbInfo);
+    runInfoPtr->readIndex      = cbInfo.readIndex;
+    runInfoPtr->writeIndex     = cbInfo.writeIndex;
+    runInfoPtr->lostByteCount  = cbInfo.lostByteCount;
+    runInfoPtr->amountInBuffer = cbInfo.amountInBuffer;
+    runInfoPtr->wrapArounds    = cbInfo.wrapArounds;
+            
+    if(needToSwap)SwapLongBlock(runInfoPtr,sizeof(SBC_info_struct)/sizeof(int32_t));
+    writeBuffer(&aPacket);
 }
 
 void sendCBRecord(void)
 {
-	//create an empty packet
-	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination			= kSBC_Process;
-	aPacket.cmdHeader.cmdID					= kSBC_CBBlock;
-	aPacket.message[0] = '\0';
-	aPacket.cmdHeader.numberBytesinPayload	= 0;
+    //create an empty packet
+    SBC_Packet aPacket;
+    aPacket.cmdHeader.destination = kSBC_Process;
+    aPacket.cmdHeader.cmdID       = kSBC_CBBlock;
+    aPacket.message[0] = '\0';
+    aPacket.cmdHeader.numberBytesinPayload    = 0;
 
-	//point to the payload
-	long* dataPtr = (long*)aPacket.payload;	
-	
-	long recordCount = 0;
-	//put data from the circular buffer into the payload until either, 1)the payload is full, or 2)the CB is empty.
-	do {
-		long nextBlockSize = CB_nextBlockSize();
-		if(nextBlockSize == 0)break;
-		if((aPacket.cmdHeader.numberBytesinPayload + nextBlockSize*sizeof(long)) < (kSBC_MaxPayloadSize-32)){
-			long maxToRead		= (kSBC_MaxPayloadSize - aPacket.cmdHeader.numberBytesinPayload)/sizeof(long);
-			if(!CB_readNextDataBlock(dataPtr,maxToRead)) break;
-			aPacket.cmdHeader.numberBytesinPayload	+= nextBlockSize*sizeof(long);
-			dataPtr += nextBlockSize;
-			recordCount++;
-		}
-		else break;
-	} while (1);
-	
-	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	run_info.recordsTransfered		+= recordCount;
-	pthread_mutex_unlock (&runInfoMutex);  //end critical section
+    //point to the payload
+    int32_t* dataPtr = (int32_t*)aPacket.payload;    
+    
+    int32_t recordCount = 0;
+    //put data from the circular buffer into the payload until either, 1)the payload is full, or 2)the CB is empty.
+    do {
+        int32_t nextBlockSize = CB_nextBlockSize();
+        if(nextBlockSize == 0)break;
+        if((aPacket.cmdHeader.numberBytesinPayload + nextBlockSize*sizeof(int32_t)) < (kSBC_MaxPayloadSize-32)){
+            int32_t maxToRead        = (kSBC_MaxPayloadSize - aPacket.cmdHeader.numberBytesinPayload)/sizeof(int32_t);
+            if(!CB_readNextDataBlock(dataPtr,maxToRead)) break;
+            aPacket.cmdHeader.numberBytesinPayload    += nextBlockSize*sizeof(int32_t);
+            dataPtr += nextBlockSize;
+            recordCount++;
+        }
+        else break;
+    } while (1);
+    
+    pthread_mutex_lock (&runInfoMutex);  //begin critical section
+    run_info.recordsTransfered        += recordCount;
+    pthread_mutex_unlock (&runInfoMutex);  //end critical section
 
-	writeBuffer(&aPacket);
+    writeBuffer(&aPacket);
 }
 
-int readBuffer(SBC_Packet* aPacket)
+int32_t readBuffer(SBC_Packet* aPacket)
 { 
-	long numberBytesinPacket;
-	int bytesRead = read(workingSocket, &numberBytesinPacket, sizeof(long));
-	if(bytesRead==0)return 0; //disconnected
-	if(needToSwap)SwapLongBlock(&numberBytesinPacket,1);	
+    int32_t numberBytesinPacket;
+    int32_t bytesRead = read(workingSocket, &numberBytesinPacket, sizeof(int32_t));
+    if(bytesRead==0)return 0; //disconnected
+    if(needToSwap)SwapLongBlock(&numberBytesinPacket,1);    
     aPacket->numBytes = numberBytesinPacket;
-	numberBytesinPacket-= sizeof(long);
-	int returnValue		= numberBytesinPacket;
-	char* p = (char*)&aPacket->cmdHeader;
-	while(numberBytesinPacket){
-		bytesRead = read(workingSocket, p, numberBytesinPacket);
-		if(bytesRead == 0) return 0;	//connection disconnected.
-		p += bytesRead;
-		numberBytesinPacket -= bytesRead;
-	}
-	aPacket->message[0] = '\0';
-	if(needToSwap){
-		//only swap the size and the header struct
-		//the payload will be swapped by the user routines as needed.
-		SwapLongBlock((long*)&(aPacket->cmdHeader),sizeof(SBC_CommandHeader)/sizeof(long));
-	}
+    numberBytesinPacket-= sizeof(int32_t);
+    int32_t returnValue        = numberBytesinPacket;
+    char* p = (char*)&aPacket->cmdHeader;
+    while(numberBytesinPacket){
+        bytesRead = read(workingSocket, p, numberBytesinPacket);
+        if(bytesRead == 0) return 0;    //connection disconnected.
+        p += bytesRead;
+        numberBytesinPacket -= bytesRead;
+    }
+    aPacket->message[0] = '\0';
+    if(needToSwap){
+        //only swap the size and the header struct
+        //the payload will be swapped by the user routines as needed.
+        SwapLongBlock((int32_t*)&(aPacket->cmdHeader),sizeof(SBC_CommandHeader)/sizeof(int32_t));
+    }
 
-	return returnValue;
+    return returnValue;
 }
 
-int writeBuffer(SBC_Packet* aPacket)
+int32_t writeBuffer(SBC_Packet* aPacket)
 { 
-	if(!workingSocket)return 0;
-	aPacket->numBytes =  sizeof(long) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket->cmdHeader.numberBytesinPayload; 
-	int numBytesToSend = aPacket->numBytes; 
-	if(needToSwap)SwapLongBlock(aPacket,sizeof(SBC_CommandHeader)/sizeof(long)+1);
-	char* p = (char*)aPacket;
+    if(!workingSocket)return 0;
+    aPacket->numBytes =  sizeof(int32_t) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket->cmdHeader.numberBytesinPayload; 
+    int32_t numBytesToSend = aPacket->numBytes; 
+    if(needToSwap)SwapLongBlock(aPacket,sizeof(SBC_CommandHeader)/sizeof(int32_t)+1);
+    char* p = (char*)aPacket;
     while (numBytesToSend) {       
-		int bytesWritten = write(workingSocket,p,numBytesToSend);
-		if (bytesWritten > 0) {
-			p += bytesWritten;
-			numBytesToSend -= bytesWritten;
-		}
-		else break;
+        int32_t bytesWritten = write(workingSocket,p,numBytesToSend);
+        if (bytesWritten > 0) {
+            p += bytesWritten;
+            numBytesToSend -= bytesWritten;
+        }
+        else break;
     }
-	return numBytesToSend;
+    return numBytesToSend;
 }
 
 
 char startRun (void)
-{	
-	/*---------------------------------*/
-	/* setup the circular buffer       */
-	/* and init our run Info struct    */
-	/*---------------------------------*/
-	CB_initialize(kCBBufferSize);
-	time(&lastTime); 
-	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	run_info.bufferSize				= kCBBufferSize;
-	run_info.readCycles				= 0;
-	run_info.recordsTransfered		= 0;
-	run_info.wrapArounds			= 0;
-	pthread_mutex_unlock (&runInfoMutex);  //end critical section
-	if(run_info.statusBits | kSBC_ConfigLoadedMask){
+{    
+    /*---------------------------------*/
+    /* setup the circular buffer       */
+    /* and init our run Info struct    */
+    /*---------------------------------*/
+    CB_initialize(kCBBufferSize);
+    time(&lastTime); 
+    pthread_mutex_lock (&runInfoMutex);  //begin critical section
+    run_info.bufferSize                = kCBBufferSize;
+    run_info.readCycles                = 0;
+    run_info.recordsTransfered        = 0;
+    run_info.wrapArounds            = 0;
+    pthread_mutex_unlock (&runInfoMutex);  //end critical section
+    if(run_info.statusBits | kSBC_ConfigLoadedMask){
 
-		startHWRun(&crate_config);
+        startHWRun(&crate_config);
 
-		if( pthread_create(&readoutThreadId,NULL, readoutThread, 0) == 0){
-			return pthread_detach(readoutThreadId)==0;
-		}
-		else return 0;
-		
-	}
-	else return 0;
+        if( pthread_create(&readoutThreadId,NULL, readoutThread, 0) == 0){
+            return pthread_detach(readoutThreadId)==0;
+        }
+        else return 0;
+        
+    }
+    else return 0;
 }
 
 void stopRun()
 {
-	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	run_info.statusBits		&= ~kSBC_RunningMask;		//clr bit
-	run_info.statusBits		&= ~kSBC_ConfigLoadedMask; //clr bit
-	run_info.readCycles		= 0;
-	pthread_mutex_unlock (&runInfoMutex);  //end critical section
+    pthread_mutex_lock (&runInfoMutex);  //begin critical section
+    run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
+    run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
+    run_info.readCycles        = 0;
+    pthread_mutex_unlock (&runInfoMutex);  //end critical section
 
-	stopHWRun(&crate_config);
+    stopHWRun(&crate_config);
 
-	memset(&crate_config,0,sizeof(SBC_crate_config));
-	CB_cleanup();
+    memset(&crate_config,0,sizeof(SBC_crate_config));
+    //CB_cleanup();
 }
 
 /*-------------------------------------------------------------
@@ -382,45 +382,48 @@ void stopRun()
 void* readoutThread (void* p)
 {
 
-	pthread_mutex_lock (&runInfoMutex);			//begin critical section
-	run_info.statusBits |= kSBC_RunningMask;	//set bit
-	pthread_mutex_unlock (&runInfoMutex);		//end critical section
+    size_t cycles = 0;
+    pthread_mutex_lock (&runInfoMutex);            //begin critical section
+    run_info.statusBits |= kSBC_RunningMask;    //set bit
+    pthread_mutex_unlock (&runInfoMutex);        //end critical section
 
-	while(run_info.statusBits & kSBC_RunningMask) {
-		pthread_mutex_lock (&runInfoMutex);  //begin critical section
-		run_info.readCycles++;
+    while(run_info.statusBits & kSBC_RunningMask) {
+        if (cycles % 10000 == 0 ) {
+          pthread_mutex_lock (&runInfoMutex);  //begin critical section
+          run_info.readCycles = cycles;
+          pthread_mutex_unlock (&runInfoMutex);  //end critical section
+        }
         
-		readHW(&crate_config);
-		
-		pthread_mutex_unlock (&runInfoMutex);  //end critical section
-	}
+        readHW(&crate_config);
+        cycles++; 
+    }
 
-	return NULL;
+    return NULL;
 }
 
-void SwapLongBlock(void* p, long n)
+void SwapLongBlock(void* p, int32_t n)
 {
-	long* lp = (long*)p;
-	int i;
-	for(i=0;i<n;i++){
-		long x = *lp;
-		*lp =  (((x) & 0x000000FF) << 24) |	
-				(((x) & 0x0000FF00) <<  8) |	
-				(((x) & 0x00FF0000) >>  8) |	
-				(((x) & 0xFF000000) >> 24);
-		lp++;
-	}
+    int32_t* lp = (int32_t*)p;
+    int32_t i;
+    for(i=0;i<n;i++){
+        int32_t x = *lp;
+        *lp =  (((x) & 0x000000FF) << 24) |    
+               (((x) & 0x0000FF00) <<  8) |    
+               (((x) & 0x00FF0000) >>  8) |    
+               (((x) & 0xFF000000) >> 24);
+        lp++;
+    }
 }
-void SwapShortBlock(void* p, long n)
+void SwapShortBlock(void* p, int32_t n)
 {
-	short* sp = (short*)p;
-	int i;
-	for(i=0;i<n;i++){
-		short x = *sp;
-		*sp =  ((x & 0x00FF) << 8) |	
-			   ((x & 0xFF00) >> 8) ;
-		sp++;
-	}
+    int16_t* sp = (int16_t*)p;
+    int32_t i;
+    for(i=0;i<n;i++){
+        int16_t x = *sp;
+        *sp =  ((x & 0x00FF) << 8) |    
+               ((x & 0xFF00) >> 8) ;
+        sp++;
+    }
 }
 
 

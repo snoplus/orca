@@ -619,7 +619,7 @@ static struct {
 
 	if(error){
 		NSLog(@"unable to clear FIFO on Gretina card (slot %d)\n",[self slot]);
-		[NSException raise:@"Getina card Error" format:@"unable to clear FIFO on Gretina card (slot %d)",[self slot]];
+		[NSException raise:@"Gretina card Error" format:@"unable to clear FIFO on Gretina card (slot %d)",[self slot]];
 	}
 	
 	return count;

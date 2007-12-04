@@ -32,7 +32,7 @@ void doRunCommand(SBC_Packet* aPacket);
 void sendResponse(SBC_Packet* aPacket);
 int readBuffer(SBC_Packet* aPacket);
 int writeBuffer(SBC_Packet* aPacket);
-void SwapLongBlock(void* p, long n);
-void SwapShortBlock(void* p, long n);
+void SwapLongBlock(void* p, int32_t n);
+void SwapShortBlock(void* p, int32_t n);
 
 #endif
