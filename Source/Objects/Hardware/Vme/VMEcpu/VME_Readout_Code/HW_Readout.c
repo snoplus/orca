@@ -425,8 +425,22 @@ void doReadBlock(SBC_Packet* aPacket)
     uint8_t* returnPayload = (uint8_t*)(returnDataPtr+1);
 
     int32_t result = 0;
-    result = 
-        vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
+	
+    if (addressSpace == 0xFF) {
+        /* We have to poll the same address. */
+        uint32_t i = 0;
+        for (i=0;i<numItems;i++) {
+            result = 
+                vme_read(memMapHandle,startAddress,
+                    returnPayload + i*unitSize,unitSize);
+            if (result != unitSize) break;
+        }
+        if (result == unitSize) result = unitSize*numItems; 
+	} else {
+        result = 
+            vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
+    }
+    
     returnDataPtr->address         = oldAddress;
     returnDataPtr->addressModifier = addressModifier;
     returnDataPtr->addressSpace    = addressSpace;
@@ -579,21 +593,21 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
             uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
             
             int32_t totalNumLongs = (numLongs + numLongsLeft);
-            /* 
+             
             while (numLongs != totalNumLongs) {
                 result = vme_read(vmeAM39Handle,0x0,(uint8_t*) (dataBuffer + numLongs),4); 
                 if (result != 4) {
-                    *//* Error, FixME how to report this? *//*
+                    /* Error, FixME how to report this? */
                     return config->card_info[index].next_Card_Index;
                 }
                 numLongs++;
-            }*/
-                          
-            result = vme_read(vmeAM39Handle,0x0,(uint8_t*) (dataBuffer + numLongs),4*numLongsLeft); 
-            if (result != 4*numLongsLeft) {
-                /* something bad happened. */
-                return config->card_info[index].next_Card_Index;
             }
+                          
+            /*result = vme_read(vmeAM39Handle,0x0,(uint8_t*) (dataBuffer + numLongs),4*numLongsLeft); 
+            if (result != 4*numLongsLeft) {
+                *//* something bad happened. */
+                /*return config->card_info[index].next_Card_Index;
+            }*/
             dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
             /* Swap here?! */
             if (needToSwap) SwapLongBlock(dataBuffer, totalNumLongs);

@@ -281,6 +281,10 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	
 }
 
+	/* readLong is for reading a long from a single address 
+	   so that the address never changes, i.e. it does not
+	   auto-increment.  We use a specific address space to
+	   do this: 0xFF. */
 -(void) readLong:(unsigned long *) readAddress
 	   atAddress:(unsigned int) vmeAddress
 	 timesToRead:(unsigned int) numberLongs
@@ -294,7 +298,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 			   atAddress:vmeAddress
 			   numToRead:numberLongs
 			  withAddMod:anAddressModifier
-		   usingAddSpace:anAddressSpace];
+		   usingAddSpace:0xFF];
 }
 
 -(void) readByteBlock:(unsigned char *) readAddress
