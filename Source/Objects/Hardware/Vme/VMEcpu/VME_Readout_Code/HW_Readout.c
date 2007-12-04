@@ -303,6 +303,7 @@ void doWriteBlock(SBC_Packet* aPacket)
         memMapHandle = controlHandle;
         if (unitSize != sizeof(uint32_t) && numItems != 1) {
             sprintf(aPacket->message,"error: size and number not correct");
+            p->errorCode = -1;
             writeBuffer(aPacket);
             return;
         }
@@ -312,6 +313,7 @@ void doWriteBlock(SBC_Packet* aPacket)
         memMapHandle = openNewDevice("lsi2", p); 
         if (memMapHandle < 0) {
             sprintf(aPacket->message,"error: %d %d : %s\n",(int32_t)memMapHandle,(int32_t)errno,strerror(errno));
+            p->errorCode = -1;
             writeBuffer(aPacket);
             return;
         }
@@ -384,10 +386,17 @@ void doReadBlock(SBC_Packet* aPacket)
     int32_t numItems        = p->numItems;
     int32_t memMapHandle;
 
+    if (numItems*unitSize > kSBC_MaxPayloadSize) {
+        sprintf(aPacket->message,"error: requested greater than payload size.");
+        p->errorCode = -1;
+        writeBuffer(aPacket);
+        return;
+    }
     if (addressSpace == 0xFFFF) {
         memMapHandle = controlHandle;
         if (unitSize != sizeof(uint32_t) && numItems != 1) {
             sprintf(aPacket->message,"error: size and number not correct");
+            p->errorCode = -1;
             writeBuffer(aPacket);
             return;
          }
@@ -398,6 +407,7 @@ void doReadBlock(SBC_Packet* aPacket)
         if (memMapHandle < 0) {
             sprintf(aPacket->message,"error: %d %d : %s\n",
                 (int32_t)memMapHandle,(int32_t)errno,strerror(errno));
+            p->errorCode = -1;
             writeBuffer(aPacket);
             return;
         }

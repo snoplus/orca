@@ -569,7 +569,7 @@ static struct {
     fifoAddress       = [self baseAddress]*0x100;
 	//theController     = [[self crate] controllerCard];
 	theController     = [self adapter];
-	unsigned long  dataDump[0xffff];
+	unsigned long  dataDump[kGretinaFIFOAllFull];
 	BOOL error		  = NO;
     while(1){
 		unsigned short val;
@@ -581,13 +581,13 @@ static struct {
 					   usingAddSpace:0x01];
 		if((val & kGretinaFIFOEmpty) != 0){
 			//read the first longword which should be the packet separator: 0xAAAAAAAA
-			unsigned long theValue;
-			[theController readLongBlock:&theValue 
+			//unsigned long theValue;
+			[theController readLongBlock:dataDump 
 							   atAddress:fifoAddress 
-							   numToRead:1 
+							   numToRead:kGretinaFIFOAllFull 
 							  withAddMod:0x39 
 						   usingAddSpace:0x01];
-			
+			/*
 			if(theValue==0xAAAAAAAA){
 				//read the first word of actual data so we know how much to read
 				[theController readLongBlock:&theValue 
@@ -606,7 +606,7 @@ static struct {
 			else {
 				error = YES;
 				break;
-			}
+			}*/
 		}
 		else break;
 
