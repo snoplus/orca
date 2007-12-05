@@ -60,6 +60,7 @@ typedef  enum eSBC_CrateStates{
     NSTimeInterval	updateInterval;
     unsigned long	writeAddress;
     unsigned long	writeValue;
+	unsigned long   addressModifier;
 	SBC_info_struct runInfo;
 	NSDate*			lastQueUpdate;
     BOOL			reloading;
@@ -91,7 +92,7 @@ typedef  enum eSBC_CrateStates{
 - (void) wakeUp; 
 - (void) sleep ;	
 
-#pragma mark â€¢â€¢â€¢Accessors
+#pragma mark ¥¥¥Accessors
 - (int) slot;
 - (NSUndoManager*) undoManager;
 - (void) setDelegate:(ORCard*)anDelegate;
@@ -139,6 +140,8 @@ typedef  enum eSBC_CrateStates{
 - (void) setDoRange:(BOOL)aDoRange;
 - (unsigned int) readWriteType;
 - (void) setReadWriteType:(unsigned int)aValue;
+- (unsigned long) addressModifier;
+- (void) setAddressModifier:(unsigned long)aValue;
 
 
 - (void) calculateRates;
@@ -228,10 +231,10 @@ typedef  enum eSBC_CrateStates{
 - (NSString*) crateName;
 
 
-#pragma mark â€¢â€¢â€¢DataSource
+#pragma mark ¥¥¥DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 
-#pragma mark â€¢â€¢â€¢Archival
+#pragma mark ¥¥¥Archival
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
@@ -265,6 +268,6 @@ extern NSString* SBC_LinkTryingToStartCrateChanged;
 extern NSString* SBC_LinkByteRateChanged;	
 extern NSString* SBC_LinkRangeChanged;
 extern NSString* SBC_LinkDoRangeChanged;
-extern NSString* SBC_LinkRWAddressModifierChanged;
+extern NSString* SBC_LinkAddressModifierChanged;
 extern NSString* SBC_LinkRWTypeChanged;
 

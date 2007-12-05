@@ -70,14 +70,15 @@
 	IBOutlet NSStepper* 	rangeStepper;
 	IBOutlet NSButton*		doRangeButton;
 	IBOutlet NSMatrix*      readWriteTypeMatrix;
+	IBOutlet NSPopUpButton* addressModifierPU;
 }
 
-#pragma mark â€¢â€¢â€¢Initialization
+#pragma mark ¥¥¥Initialization
 
 - (void) dealloc;
 - (void) awakeFromNib;
 
-#pragma mark â€¢â€¢â€¢Notifications
+#pragma mark ¥¥¥Notifications
 
 - (void) registerNotificationObservers;
 - (void) updateWindow;
@@ -108,10 +109,11 @@
 - (void) rangeChanged:(NSNotification*)aNote;
 - (void) doRangeChanged:(NSNotification*)aNote;
 - (void) readWriteTypeChanged:(NSNotification*)aNote;
+- (void) addressModifierChanged:(NSNotification*)aNote;
 
 
 
-#pragma mark â€¢â€¢â€¢Actions
+#pragma mark ¥¥¥Actions
 - (IBAction) lockAction:(id)sender;
 
 - (IBAction) loadModeAction:(id)sender;
@@ -137,8 +139,9 @@
 - (IBAction) rangeTextFieldAction:(id)sender;
 - (IBAction) doRangeAction:(id)sender;
 - (IBAction) readWriteTypeMatrixAction:(id)sender;
+- (IBAction) addressModifierPUAction:(id)sender;
 
-#pragma mark â€¢â€¢â€¢DataSource
+#pragma mark ¥¥¥DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 
 @end

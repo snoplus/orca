@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark â€¢â€¢â€¢Imported Files
+#pragma mark ¥¥¥Imported Files
 
 #import "SBC_Link.h"
 #import "SBC_Linking.h"
@@ -45,7 +45,7 @@
 
 #define kSBCRateIntegrationTime 1.5
 
-#pragma mark â€¢â€¢â€¢External Strings
+#pragma mark ¥¥¥External Strings
 NSString* SBC_LinkLoadModeChanged			= @"SBC_LinkLoadModeChanged";
 NSString* SBC_LinkInitAfterConnectChanged	= @"SBC_LinkInitAfterConnectChanged";
 NSString* SBC_LinkReloadingChanged			= @"SBC_LinkReloadingChanged";
@@ -69,7 +69,7 @@ NSString* SBC_LinkTryingToStartCrateChanged = @"SBC_LinkTryingToStartCrateChange
 NSString* SBC_LinkByteRateChanged			= @"SBC_LinkByteRateChanged";
 NSString* SBC_LinkRangeChanged				= @"SBC_LinkRangeChanged";
 NSString* SBC_LinkDoRangeChanged			= @"SBC_LinkDoRangeChanged";
-NSString* SBC_LinkRWAddressModifierChanged  = @"SBC_LinkRWAddressModifierChanged";
+NSString* SBC_LinkAddressModifierChanged	= @"SBC_LinkAddressModifierChanged";
 NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 
 @interface SBC_Link (private)
@@ -115,7 +115,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
 }
 
-#pragma mark â€¢â€¢â€¢Accessors
+#pragma mark ¥¥¥Accessors
 - (int) slot
 {
 	return [delegate slot];
@@ -473,7 +473,23 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
                           object:self];
 }
 
-#pragma mark â€¢â€¢â€¢Archival
+- (unsigned long) addressModifier
+{
+    return addressModifier;
+}
+
+- (void) setAddressModifier:(unsigned long)aValue
+{
+	if(aValue == 0)aValue = 0x29; //default
+    [[[self undoManager] prepareWithInvocationTarget:self] setAddressModifier:addressModifier];
+    addressModifier = aValue;
+    [[NSNotificationCenter defaultCenter]
+		    postNotificationName:SBC_LinkAddressModifierChanged
+                          object:self];
+}
+
+
+#pragma mark ¥¥¥Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super init];
@@ -493,6 +509,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
     [self setRange:			[decoder decodeIntForKey:	@"Range"]];
     [self setDoRange:		[decoder decodeBoolForKey:	@"DoRange"]];
     [self setReadWriteType: [decoder decodeIntForKey:   @"ReadWriteType"]];	
+    [self setAddressModifier: [decoder decodeIntForKey:   @"addressModifier"]];	
 
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -514,6 +531,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	[encoder encodeBool:verbose			forKey:@"Verbose"];
 	[encoder encodeBool:forceReload		forKey:@"ForceReload"];
     [encoder encodeInt:readWriteType    forKey:@"ReadWriteType"];
+    [encoder encodeInt:addressModifier    forKey:@"addressModifier"];
 }
 
 
@@ -1209,7 +1227,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	}
 }
 
-#pragma mark â€¢â€¢â€¢DataSource
+#pragma mark ¥¥¥DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
 {
 	*aMinValue  = 0;

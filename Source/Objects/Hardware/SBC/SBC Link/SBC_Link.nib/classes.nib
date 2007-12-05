@@ -1,134 +1,279 @@
-{
-    IBClasses = (
-        {
-            ACTIONS = {"" = id; }; 
-            CLASS = FirstResponder; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            CLASS = ORQueueView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {dataSource = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
-        {
-            CLASS = ORValueBar; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {
-                copy = id; 
-                decDialog = id; 
-                incDialog = id; 
-                saveDocument = id; 
-                saveDocumentAs = id; 
-            }; 
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {
-            ACTIONS = {
-                addressAction = id; 
-                connectionAction = id; 
-                doRangeAction = id; 
-                filePathAction = id; 
-                forceReloadAction = id; 
-                initAfterConnectAction = id; 
-                ipNumberAction = id; 
-                killCrateAction = id; 
-                loadModeAction = id; 
-                lockAction = id; 
-                passWordAction = id; 
-                portNumberAction = id; 
-                rangeTextFieldAction = id; 
-                readAction = id; 
-                readWriteTypeMatrixAction = id; 
-                resetCrateBusAction = id; 
-                toggleCrateAction = id; 
-                userNameAction = id; 
-                verboseAction = id; 
-                writeAction = id; 
-                writeValueAction = id; 
-            }; 
-            CLASS = "SBC_LinkController"; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                addressField = NSTextField; 
-                addressStepper = NSStepper; 
-                byteRateReceivedField = NSTextField; 
-                byteRateSentField = NSTextField; 
-                bytesReceivedRateBar = ORValueBar; 
-                bytesSentRateBar = ORValueBar; 
-                connect1Button = NSButton; 
-                connectButton = NSButton; 
-                connectionStatus1Field = NSTextField; 
-                connectionStatusField = NSTextField; 
-                doRangeButton = NSButton; 
-                filePathField = NSTextField; 
-                forceReloadButton = NSButton; 
-                initAfterConnectButton = NSButton; 
-                ipNumberField = NSTextField; 
-                killCrateButton = NSButton; 
-                loadModeMatrix = NSMatrix; 
-                lockButton = NSButton; 
-                passWordField = NSSecureTextField; 
-                portNumberField = NSTextField; 
-                queView = ORQueueView; 
-                rangeStepper = NSStepper; 
-                rangeTextField = NSTextField; 
-                readButton = NSButton; 
-                readWriteTypeMatrix = NSMatrix; 
-                resetCrateBusButton = NSButton; 
-                runInfoField = NSTextField; 
-                setFilePathButton = NSButton; 
-                status1Field = NSTextField; 
-                statusField = ORTimedTextField; 
-                tabView = NSTabView; 
-                toggleCrateButton = NSButton; 
-                userNameField = NSTextField; 
-                verboseButton = NSButton; 
-                writeButton = NSButton; 
-                writeValueField = NSTextField; 
-                writeValueStepper = NSStepper; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {
-                filePathAction = id; 
-                forceReloadAction = id; 
-                killCrateAction = id; 
-                loadModeAction = id; 
-                toggleCrateAction = id; 
-                verboseAction = id; 
-            }; 
-            CLASS = "SBC_ManagementView"; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                boxContent = NSView; 
-                connectionStatusField = NSTextField; 
-                filePathField = NSTextField; 
-                forceReloadButton = NSButton; 
-                killCrateButton = NSButton; 
-                loadModeMatrix = NSMatrix; 
-                model = id; 
-                setFilePathButton = NSButton; 
-                statusField = ORTimedTextField; 
-                tabView = NSTabView; 
-                toggleCrateButton = NSButton; 
-                verboseButton = NSButton; 
-                window = NSWindow; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORValueBar</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>chainedView</key>
+				<string>id</string>
+				<key>dataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key></key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORQueueView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>dataSource</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addressAction</key>
+				<string>id</string>
+				<key>addressModifierPUAction</key>
+				<string>id</string>
+				<key>connectionAction</key>
+				<string>id</string>
+				<key>doRangeAction</key>
+				<string>id</string>
+				<key>filePathAction</key>
+				<string>id</string>
+				<key>forceReloadAction</key>
+				<string>id</string>
+				<key>initAfterConnectAction</key>
+				<string>id</string>
+				<key>ipNumberAction</key>
+				<string>id</string>
+				<key>killCrateAction</key>
+				<string>id</string>
+				<key>loadModeAction</key>
+				<string>id</string>
+				<key>lockAction</key>
+				<string>id</string>
+				<key>passWordAction</key>
+				<string>id</string>
+				<key>portNumberAction</key>
+				<string>id</string>
+				<key>rangeTextFieldAction</key>
+				<string>id</string>
+				<key>readAction</key>
+				<string>id</string>
+				<key>readWriteTypeMatrixAction</key>
+				<string>id</string>
+				<key>resetCrateBusAction</key>
+				<string>id</string>
+				<key>toggleCrateAction</key>
+				<string>id</string>
+				<key>userNameAction</key>
+				<string>id</string>
+				<key>verboseAction</key>
+				<string>id</string>
+				<key>writeAction</key>
+				<string>id</string>
+				<key>writeValueAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>SBC_LinkController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>addressField</key>
+				<string>NSTextField</string>
+				<key>addressModifierPU</key>
+				<string>NSPopUpButton</string>
+				<key>addressStepper</key>
+				<string>NSStepper</string>
+				<key>byteRateReceivedField</key>
+				<string>NSTextField</string>
+				<key>byteRateSentField</key>
+				<string>NSTextField</string>
+				<key>bytesReceivedRateBar</key>
+				<string>ORValueBar</string>
+				<key>bytesSentRateBar</key>
+				<string>ORValueBar</string>
+				<key>connect1Button</key>
+				<string>NSButton</string>
+				<key>connectButton</key>
+				<string>NSButton</string>
+				<key>connectionStatus1Field</key>
+				<string>NSTextField</string>
+				<key>connectionStatusField</key>
+				<string>NSTextField</string>
+				<key>doRangeButton</key>
+				<string>NSButton</string>
+				<key>filePathField</key>
+				<string>NSTextField</string>
+				<key>forceReloadButton</key>
+				<string>NSButton</string>
+				<key>initAfterConnectButton</key>
+				<string>NSButton</string>
+				<key>ipNumberField</key>
+				<string>NSTextField</string>
+				<key>killCrateButton</key>
+				<string>NSButton</string>
+				<key>loadModeMatrix</key>
+				<string>NSMatrix</string>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>passWordField</key>
+				<string>NSSecureTextField</string>
+				<key>portNumberField</key>
+				<string>NSTextField</string>
+				<key>queView</key>
+				<string>ORQueueView</string>
+				<key>rangeStepper</key>
+				<string>NSStepper</string>
+				<key>rangeTextField</key>
+				<string>NSTextField</string>
+				<key>readButton</key>
+				<string>NSButton</string>
+				<key>readWriteTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>resetCrateBusButton</key>
+				<string>NSButton</string>
+				<key>runInfoField</key>
+				<string>NSTextField</string>
+				<key>setFilePathButton</key>
+				<string>NSButton</string>
+				<key>status1Field</key>
+				<string>NSTextField</string>
+				<key>statusField</key>
+				<string>ORTimedTextField</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
+				<key>toggleCrateButton</key>
+				<string>NSButton</string>
+				<key>userNameField</key>
+				<string>NSTextField</string>
+				<key>verboseButton</key>
+				<string>NSButton</string>
+				<key>writeButton</key>
+				<string>NSButton</string>
+				<key>writeValueField</key>
+				<string>NSTextField</string>
+				<key>writeValueStepper</key>
+				<string>NSStepper</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

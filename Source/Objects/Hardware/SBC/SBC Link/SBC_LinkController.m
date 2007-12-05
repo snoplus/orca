@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark â€¢â€¢â€¢Imported Files
+#pragma mark ¥¥¥Imported Files
 
 #import "SBC_LinkController.h"
 #import "SBC_Link.h"
@@ -32,7 +32,7 @@
 
 @implementation SBC_LinkController
 
-#pragma mark â€¢â€¢â€¢Initialization
+#pragma mark ¥¥¥Initialization
 
 - (id) init
 {
@@ -69,7 +69,7 @@
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
-#pragma mark â€¢â€¢â€¢Notifications
+#pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -207,6 +207,12 @@
                      selector : @selector(readWriteTypeChanged:)
                          name : SBC_LinkRWTypeChanged
                        object : [model sbcLink]];
+
+   [notifyCenter addObserver : self
+                     selector : @selector(addressModifierChanged:)
+                         name : SBC_LinkAddressModifierChanged
+                       object : [model sbcLink]];
+
 }
 
 - (void) updateWindow
@@ -234,6 +240,7 @@
 	[self doRangeChanged:nil];
 	[self rangeChanged:nil];
     [self readWriteTypeChanged:nil];
+    [self addressModifierChanged:nil];
 	
 	[self startStatusChanged:nil];
 }
@@ -280,6 +287,10 @@
 	}
 }
 
+- (void) addressModifierChanged:(NSNotification*)aNotification
+{
+	[addressModifierPU selectItemWithTag:[[model sbcLink] addressModifier]];
+}
 
 - (void) startStatusChanged:(NSNotification*)aNote
 {
@@ -431,7 +442,7 @@
 	[writeValueStepper setIntValue:[[model sbcLink] writeValue]];
 }
 
-#pragma mark â€¢â€¢â€¢Actions
+#pragma mark ¥¥¥Actions
 - (IBAction) lockAction:(id)sender
 {
     [gSecurity tryToSetLock:[model sbcLockName] to:[sender intValue] forWindow:[self window]];
@@ -542,7 +553,7 @@
 		if([model isKindOfClass:[ORVmeAdapter class]]){
 			int 			startAddress 	= [[model sbcLink] writeAddress];
 			int				endAddress		= [[model sbcLink] doRange]?startAddress + [[model sbcLink] range]*[addressStepper increment] : startAddress;
-			unsigned short 	addressModifier = 29; //[[model sbcLink] rwAddressModifierValue];
+			unsigned short 	addressModifier = [[model sbcLink] addressModifier];
 			unsigned short 	addressSpace	= 1;  //[[model sbcLink] rwIOSpaceValue];
 			unsigned long  	ldata			= [[model sbcLink] writeValue];
 			
@@ -613,7 +624,7 @@
 		if([model isKindOfClass:[ORVmeAdapter class]]){
 			unsigned long 	startAddress 	= [[model sbcLink] writeAddress];
 			unsigned long	endAddress		= [[model sbcLink] doRange]?startAddress + [[model sbcLink] range]*[addressStepper increment] : startAddress;
-			unsigned short 	addressModifier = 0x29; //[model rwAddressModifierValue];
+			unsigned short 	addressModifier = [[model sbcLink] addressModifier];
 			unsigned short 	addressSpace	= 1;  //[model rwIOSpaceValue];
 			
 			address = startAddress;
@@ -695,6 +706,11 @@
     if ([[model sbcLink] readWriteType] != [sender selectedTag]){
         [[model sbcLink] setReadWriteType:[sender selectedTag]];
     }
+}
+
+- (IBAction) addressModifierPUAction:(id)sender
+{
+	[[model sbcLink] setAddressModifier:[[sender selectedItem] tag]];
 }
 
 @end
