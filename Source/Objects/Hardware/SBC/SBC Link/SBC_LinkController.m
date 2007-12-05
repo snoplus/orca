@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 
 #import "SBC_LinkController.h"
 #import "SBC_Link.h"
@@ -32,7 +32,7 @@
 
 @implementation SBC_LinkController
 
-#pragma mark ¥¥¥Initialization
+#pragma mark â€¢â€¢â€¢Initialization
 
 - (id) init
 {
@@ -60,6 +60,16 @@
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[model cpuName]];
+	if(aModel){
+		if(![aModel showBasicOps]){
+			NSInteger index = [tabView indexOfTabViewItemWithIdentifier:@"BasicOps"];
+			if(index != NSNotFound){
+				NSTabViewItem* anItem = [tabView tabViewItemAtIndex:index];
+				[tabView removeTabViewItem:anItem]; 
+			}
+		}
+	}
+	
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
@@ -69,7 +79,7 @@
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
-#pragma mark ¥¥¥Notifications
+#pragma mark â€¢â€¢â€¢Notifications
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -442,7 +452,7 @@
 	[writeValueStepper setIntValue:[[model sbcLink] writeValue]];
 }
 
-#pragma mark ¥¥¥Actions
+#pragma mark â€¢â€¢â€¢Actions
 - (IBAction) lockAction:(id)sender
 {
     [gSecurity tryToSetLock:[model sbcLockName] to:[sender intValue] forWindow:[self window]];
@@ -722,5 +732,12 @@
         NSString* path = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
         [[model sbcLink] setFilePath:path];
     }
+}
+@end
+
+@implementation OrcaObjectController (SBC_Link)
+- (BOOL) showBasicOps
+{
+	return YES;
 }
 @end

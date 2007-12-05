@@ -73,12 +73,12 @@
 	IBOutlet NSPopUpButton* addressModifierPU;
 }
 
-#pragma mark ¥¥¥Initialization
+#pragma mark â€¢â€¢â€¢Initialization
 
 - (void) dealloc;
 - (void) awakeFromNib;
 
-#pragma mark ¥¥¥Notifications
+#pragma mark â€¢â€¢â€¢Notifications
 
 - (void) registerNotificationObservers;
 - (void) updateWindow;
@@ -113,7 +113,7 @@
 
 
 
-#pragma mark ¥¥¥Actions
+#pragma mark â€¢â€¢â€¢Actions
 - (IBAction) lockAction:(id)sender;
 
 - (IBAction) loadModeAction:(id)sender;
@@ -141,7 +141,9 @@
 - (IBAction) readWriteTypeMatrixAction:(id)sender;
 - (IBAction) addressModifierPUAction:(id)sender;
 
-#pragma mark ¥¥¥DataSource
+#pragma mark â€¢â€¢â€¢DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
-
+@end
+@interface OrcaObjectController (SBC_Link)
+- (BOOL) showBasicOps;
 @end

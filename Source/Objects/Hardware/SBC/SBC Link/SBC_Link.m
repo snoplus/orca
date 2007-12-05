@@ -1108,6 +1108,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 				packetPtr += n;
 				numBytesToGet -= n;
 				bytesReceived += n;
+				missedHeartBeat = 0;
 			}
 			if(n==0){
 				[self setIsConnected:NO];
@@ -1147,7 +1148,6 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		}
 		else {
 			oldCycleCount = runInfo.readCycles;
-			missedHeartBeat = 0;
 		}	
 	}
 

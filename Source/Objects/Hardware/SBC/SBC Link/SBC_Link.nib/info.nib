@@ -4,13 +4,11 @@
 <dict>
 	<key>IBFramework Version</key>
 	<string>629</string>
-	<key>IBLastKnownRelativeProjectPath</key>
-	<string>../../../../../../Orca.xcodeproj</string>
 	<key>IBOldestOS</key>
 	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>1093</integer>
+		<integer>841</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9B18</string>

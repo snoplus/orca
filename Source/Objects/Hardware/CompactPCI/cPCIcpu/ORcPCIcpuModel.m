@@ -54,6 +54,12 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 	[self linkToController:@"SBC_LinkController"];
 }
 
+- (BOOL) showBasicOps
+{
+	return NO;
+}
+
+
 - (void) awakeAfterDocumentLoaded
 {
 	NS_DURING
