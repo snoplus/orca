@@ -44,6 +44,9 @@
 		BOOL			firstPoint;
 		int				count;
 		int				viewType;
+		float			excursion;
+		float			decayRate;
+		float			decayTime;
  }
 
 #pragma mark ***Initialization
@@ -52,6 +55,12 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
+- (float) decayTime;
+- (void) setDecayTime:(float)aDecayTime;
+- (float) decayRate;
+- (void) setDecayRate:(float)aDecayRate;
+- (float) excursion;
+- (void) setExcursion:(float)aExcursion;
 - (int) viewType;
 - (void) setViewType:(int)aViewType;
 - (BOOL) noHysteresis;
@@ -90,6 +99,9 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* OReGunModelDecayTimeChanged;
+extern NSString* OReGunModelDecayRateChanged;
+extern NSString* OReGunModelExcursionChanged;
 extern NSString* OReGunModelViewTypeChanged;
 extern NSString* OReGunModelNoHysteresisChanged;
 extern NSString* OReGunModelVoltsPerMillimeterChanged;

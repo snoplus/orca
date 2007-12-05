@@ -63,6 +63,12 @@
 				<string>id</string>
 				<key>cmdPositionAction</key>
 				<string>id</string>
+				<key>decayRateTextFieldAction</key>
+				<string>id</string>
+				<key>decayTimeTextFieldAction</key>
+				<string>id</string>
+				<key>excursionTextFieldAction</key>
+				<string>id</string>
 				<key>getPositionAction</key>
 				<string>id</string>
 				<key>goAction</key>
@@ -92,6 +98,12 @@
 				<string>NSForm</string>
 				<key>cmdMatrix</key>
 				<string>NSForm</string>
+				<key>decayRateTextField</key>
+				<string>NSTextField</string>
+				<key>decayTimeTextField</key>
+				<string>NSTextField</string>
+				<key>excursionTextField</key>
+				<string>NSTextField</string>
 				<key>getPositionButton</key>
 				<string>NSButton</string>
 				<key>goButton</key>

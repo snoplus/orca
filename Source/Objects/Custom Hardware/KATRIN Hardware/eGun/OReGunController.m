@@ -136,6 +136,21 @@
                          name : OReGunModelViewTypeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(excursionChanged:)
+                         name : OReGunModelExcursionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(decayRateChanged:)
+                         name : OReGunModelDecayRateChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(decayTimeChanged:)
+                         name : OReGunModelDecayTimeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -150,6 +165,24 @@
 	[self noHysteresisChanged:nil];
 	[self proxyChanged:nil];
 	[self viewTypeChanged:nil];
+	[self excursionChanged:nil];
+	[self decayRateChanged:nil];
+	[self decayTimeChanged:nil];
+}
+
+- (void) decayTimeChanged:(NSNotification*)aNote
+{
+	[decayTimeTextField setFloatValue: [model decayTime]];
+}
+
+- (void) decayRateChanged:(NSNotification*)aNote
+{
+	[decayRateTextField setFloatValue: [model decayRate]];
+}
+
+- (void) excursionChanged:(NSNotification*)aNote
+{
+	[excursionTextField setFloatValue: [model excursion]];
 }
 
 - (void) viewTypeChanged:(NSNotification*)aNote
@@ -176,6 +209,9 @@
 - (void) noHysteresisChanged:(NSNotification*)aNote
 {
 	[noHysteresisButton setIntValue: [model noHysteresis]];
+	[decayTimeTextField setEnabled: ![model noHysteresis]];
+	[decayRateTextField setEnabled: ![model noHysteresis]];
+	[excursionTextField setEnabled: ![model noHysteresis]];
 }
 
 - (void) voltsPerMillimeterChanged:(NSNotification*)aNote
@@ -271,6 +307,21 @@
 }
 
 #pragma mark ***Actions
+
+- (void) decayTimeTextFieldAction:(id)sender
+{
+	[model setDecayTime:[sender floatValue]];	
+}
+
+- (void) decayRateTextFieldAction:(id)sender
+{
+	[model setDecayRate:[sender floatValue]];	
+}
+
+- (void) excursionTextFieldAction:(id)sender
+{
+	[model setExcursion:[sender floatValue]];	
+}
 
 - (IBAction) viewTypeAction:(id)sender
 {

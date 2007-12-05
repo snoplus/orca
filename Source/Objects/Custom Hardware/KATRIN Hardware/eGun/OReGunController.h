@@ -24,6 +24,9 @@
 @interface OReGunController : OrcaObjectController
 {
 	IBOutlet NSPopUpButton* interfaceObjPUx;
+	IBOutlet   NSTextField* decayTimeTextField;
+	IBOutlet   NSTextField* decayRateTextField;
+	IBOutlet   NSTextField* excursionTextField;
 	IBOutlet NSMatrix*		viewTypeMatrix;
 	IBOutlet NSButton*		noHysteresisButton;
 	IBOutlet NSTextField*	voltsPerMillimeterTextField;
@@ -52,6 +55,9 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) decayTimeChanged:(NSNotification*)aNote;
+- (void) decayRateChanged:(NSNotification*)aNote;
+- (void) excursionChanged:(NSNotification*)aNote;
 - (void) viewTypeChanged:(NSNotification*)aNote;
 - (void) noHysteresisChanged:(NSNotification*)aNote;
 - (void) voltsPerMillimeterChanged:(NSNotification*)aNote;
@@ -64,6 +70,9 @@
 - (void) movingChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) decayTimeTextFieldAction:(id)sender;
+- (IBAction) decayRateTextFieldAction:(id)sender;
+- (IBAction) excursionTextFieldAction:(id)sender;
 - (IBAction) viewTypeAction:(id)sender;
 - (IBAction) noHysteresisAction:(id)sender;
 - (IBAction) voltsPerMillimeterTextFieldAction:(id)sender;
