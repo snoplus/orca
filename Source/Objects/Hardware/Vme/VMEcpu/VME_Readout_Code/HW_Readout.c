@@ -485,6 +485,13 @@ void doReadBlock(SBC_Packet* aPacket)
     } 
 }
 
+/*************************************************************/
+/*  All HW Readout code for VMEcpu follows here.             */
+/*                                                           */
+/*  Readout_CARD() function returns the index of the next    */
+/*   card to read out                                        */
+/*************************************************************/
+
 void readHW(SBC_crate_config* config)
 {
     int32_t index = 0;
@@ -504,6 +511,10 @@ void readHW(SBC_crate_config* config)
         if(index>=config->total_cards || index<0)break;
     }
 }
+
+/*************************************************************/
+/*             Reads out Shaper cards.                       */
+/*************************************************************/
 
 int32_t Readout_Shaper(SBC_crate_config* config,int32_t index)
 {
@@ -546,6 +557,10 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index)
     return config->card_info[index].next_Card_Index;
 }            
 
+/*************************************************************/
+/*             Reads out Gretina (Mark I) cards.             */
+/*************************************************************/
+
 int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
 {
 
@@ -555,8 +570,9 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
 #define kGretinaFIFOAllFull     0x4000
    
     static SBC_VmeWriteBlockStruct gretinaStruct = 
-        {0x0, 0x3B, 0x1, 0x4, 0x0, 0x0}; 
+        {0x0, 0x39, 0x1, 0x4, 0x0, 0x0}; 
     static int32_t vmeAM39Handle = 0;
+    static uint16_t fifoState;
 
     uint32_t baseAddress = config->card_info[index].base_add;
     uint32_t fifoStateAddress = 
@@ -567,7 +583,6 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
     uint32_t crate       = config->card_info[index].crate;
     uint32_t location    = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
 
-    static uint16_t fifoState;
 
     //read the fifo state
     int32_t result  = vme_read(vmeAM29Handle,fifoStateAddress,(uint8_t*)&fifoState,2); 
@@ -575,6 +590,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
    
     gretinaStruct.address = fifoAddress; 
     vmeAM39Handle = openNewDevice("lsi2", &gretinaStruct); 
+
     if (vmeAM39Handle < 0) {
         return config->card_info[index].next_Card_Index;
     }
@@ -647,3 +663,51 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
     closeDevice(vmeAM39Handle);
     return config->card_info[index].next_Card_Index;
 }            
+
+/*************************************************************/
+/*             Reads out CAEN cards.                         */
+/*************************************************************/
+
+int32_t Readout_CAEN(SBC_crate_config* config,int32_t index)
+{
+  
+    /* The deviceSpecificData is as follows:          */ 
+    /* 0: statusOne register                          */
+    /* 1: statusTwo register                          */
+    /* 2: buffer                                      */
+    /*
+    static SBC_VmeWriteBlockStruct caenStruct = 
+        {0x0, 0x39, 0x1, 0x4, 0x0, 0x0}; 
+    static int32_t vmeAM39Handle = 0;
+    static uint16_t statusOne, statusTwo;
+    
+    uint32_t baseAddress = config->card_info[index].base_add;
+    uint32_t statusOneIndex = 
+        baseAddress + config->card_info[index].deviceSpecificData[0];
+    uint32_t statusTwoIndex = 
+        baseAddress + config->card_info[index].deviceSpecificData[1];
+    uint32_t fifoAddress = 
+        baseAddress + config->card_info[index].deviceSpecificData[2];
+    uint32_t dataId      = config->card_info[index].hw_mask[0];
+    uint32_t slot        = config->card_info[index].slot;
+    uint32_t crate       = config->card_info[index].crate;
+    //uint32_t addMod      = config->card_info[index].add_mod;
+    uint32_t location    = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
+    
+
+    //read the states
+    int32_t result  = vme_read(vmeAM29Handle,fifoAddress,(uint8_t*)&fifoState,2); 
+    if (result != 2) {
+        return config->card_info[index].next_Card_Index;
+    }
+    int32_t dataBuffer[0xffff];
+   
+    caenStruct.address = fifoAddress; 
+    vmeAM39Handle = openNewDevice("lsi2", &caenStruct); 
+
+    if (vmeAM39Handle < 0) {
+        return config->card_info[index].next_Card_Index;
+    }
+    closeDevice(vmeAM39Handle);*/
+    return config->card_info[index].next_Card_Index;
+}

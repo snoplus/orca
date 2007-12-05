@@ -243,7 +243,7 @@ extern NSString* ORGretinaModelCFDDelayChanged;
 extern NSString* ORGretinaModelCFDFractionChanged;
 extern NSString* ORGretinaModelCFDThresholdChanged;
 extern NSString* ORGretinaModelDataDelayChanged;
-extern NSString* ORGretinaModelDataLenghtChanged;
+extern NSString* ORGretinaModelDataLengthChanged;
 
 extern NSString* ORGretinaSettingsLock;
 extern NSString* ORGretinaCardInfoUpdated;

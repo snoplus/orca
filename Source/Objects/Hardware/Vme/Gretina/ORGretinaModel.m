@@ -47,7 +47,7 @@ NSString* ORGretinaModelCFDDelayChanged			= @"ORGretinaModelCFDDelayChanged";
 NSString* ORGretinaModelCFDFractionChanged		= @"ORGretinaModelCFDFractionChanged";
 NSString* ORGretinaModelCFDThresholdChanged		= @"ORGretinaModelCFDThresholdChanged";
 NSString* ORGretinaModelDataDelayChanged		= @"ORGretinaModelDataDelayChanged";
-NSString* ORGretinaModelDataLenghtChanged		= @"ORGretinaModelDataLenghtChanged";
+NSString* ORGretinaModelDataLengthChanged		= @"ORGretinaModelDataLengthChanged";
 
 
 @implementation ORGretinaModel
@@ -373,7 +373,7 @@ static struct {
 	else if(aValue>1024)aValue = 1024;
     [[[self undoManager] prepareWithInvocationTarget:self] setDataLength:chan withValue:dataLength[chan]];
 	dataLength[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaModelDataLenghtChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaModelDataLengthChanged object:self];
 }
 
 - (int) enabled:(short)chan			{ return enabled[chan]; }

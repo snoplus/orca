@@ -163,7 +163,7 @@
                        object : model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(enbledChanged:)
+                     selector : @selector(enabledChanged:)
                          name : ORGretinaModelEnabledChanged
                        object : model];
 
@@ -212,7 +212,7 @@
                        object : model];
     [notifyCenter addObserver : self
                      selector : @selector(dataLengthChanged:)
-                         name : ORGretinaModelDataLenghtChanged
+                         name : ORGretinaModelDataLengthChanged
                        object : model];
 
     [self registerRates];
@@ -245,7 +245,7 @@
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
     [self updateCardInfo:nil];
-	[self enbledChanged:nil];
+	[self enabledChanged:nil];
 	[self debugChanged:nil];
 	[self pileUpChanged:nil];
 	[self polarityChanged:nil];
@@ -271,7 +271,7 @@
 }
 
 #pragma mark ¥¥¥Interface Management
-- (void) enbledChanged:(NSNotification*)aNote
+- (void) enabledChanged:(NSNotification*)aNote
 {
 	short i;
 	for(i=0;i<kNumGretinaChannels;i++){
@@ -582,13 +582,13 @@
 }
 - (IBAction) debugAction:(id)sender
 {
-	if([sender intValue] != [model enabled:[[sender selectedCell] tag]]){
+	if([sender intValue] != [model debug:[[sender selectedCell] tag]]){
 		[model setDebug:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 - (IBAction) pileUpAction:(id)sender
 {
-	if([sender intValue] != [model enabled:[[sender selectedCell] tag]]){
+	if([sender intValue] != [model pileUp:[[sender selectedCell] tag]]){
 		[model setPileUp:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }

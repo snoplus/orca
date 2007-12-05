@@ -31,22 +31,22 @@
 NSString* ORGretina4ModelNoiseFloorIntegrationTimeChanged = @"ORGretina4ModelNoiseFloorIntegrationTimeChanged";
 NSString* ORGretina4ModelNoiseFloorOffsetChanged = @"ORGretina4ModelNoiseFloorOffsetChanged";
 NSString* ORGretina4CardInfoUpdated				= @"ORGretina4CardInfoUpdated";
-NSString* ORGretina4RateGroupChangedNotification	= @"ORGretina4RateGroupChangedNotification";
-NSString* ORGretina4SettingsLock					= @"ORGretina4SettingsLock";
+NSString* ORGretina4RateGroupChangedNotification= @"ORGretina4RateGroupChangedNotification";
+NSString* ORGretina4SettingsLock				= @"ORGretina4SettingsLock";
 NSString* ORGretina4NoiseFloorChanged			= @"ORGretina4NoiseFloorChanged";
 NSString* ORGretina4ModelFIFOCheckChanged		= @"ORGretina4ModelFIFOCheckChanged";
 
 NSString* ORGretina4ModelEnabledChanged			= @"ORGretina4ModelEnabledChanged";
 NSString* ORGretina4ModelDebugChanged			= @"ORGretina4ModelDebugChanged";
 NSString* ORGretina4ModelPileUpChanged			= @"ORGretina4ModelPileUpChanged";
-NSString* ORGretina4ModelPolarityChanged			= @"ORGretina4ModelPolarityChanged";
+NSString* ORGretina4ModelPolarityChanged		= @"ORGretina4ModelPolarityChanged";
 NSString* ORGretina4ModelTriggerModeChanged		= @"ORGretina4ModelTriggerModeChanged";
-NSString* ORGretina4ModelLEDThresholdChanged		= @"ORGretina4ModelLEDThresholdChanged";
-NSString* ORGretina4ModelCFDDelayChanged			= @"ORGretina4ModelCFDDelayChanged";
+NSString* ORGretina4ModelLEDThresholdChanged	= @"ORGretina4ModelLEDThresholdChanged";
+NSString* ORGretina4ModelCFDDelayChanged		= @"ORGretina4ModelCFDDelayChanged";
 NSString* ORGretina4ModelCFDFractionChanged		= @"ORGretina4ModelCFDFractionChanged";
-NSString* ORGretina4ModelCFDThresholdChanged		= @"ORGretina4ModelCFDThresholdChanged";
+NSString* ORGretina4ModelCFDThresholdChanged	= @"ORGretina4ModelCFDThresholdChanged";
 NSString* ORGretina4ModelDataDelayChanged		= @"ORGretina4ModelDataDelayChanged";
-NSString* ORGretina4ModelDataLenghtChanged		= @"ORGretina4ModelDataLenghtChanged";
+NSString* ORGretina4ModelDataLengthChanged		= @"ORGretina4ModelDataLengthChanged";
 
 
 @implementation ORGretina4Model
@@ -406,7 +406,7 @@ static struct {
 	else if(aValue>1024)aValue = 1024;
     [[[self undoManager] prepareWithInvocationTarget:self] setDataLength:chan withValue:dataLength[chan]];
 	dataLength[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelDataLenghtChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelDataLengthChanged object:self];
 }
 
 - (int) enabled:(short)chan			{ return enabled[chan]; }
@@ -513,7 +513,7 @@ static struct {
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     unsigned short readBackValue = [self readControlReg:chan];
-    if((readBackValue & 0x0c1f) != theValue){
+    if((readBackValue & 0xffff) != theValue){
         NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xc1f,theValue & 0xc1f);
     }
 }
@@ -571,10 +571,10 @@ static struct {
                     usingAddSpace:0x01];
     
     
-    if((theValue & kGretina4FIFOAllFull)==0)		return kFull;
-    else if((theValue & kGretina4FIFOHalfFull)==0)	return kHalfFull;
-    else if((theValue & kGretina4FIFOEmpty)==0)		return kEmpty;
-    else if((theValue & kGretina4FIFOAlmostEmpty)==0)	return kAlmostEmpty;
+    if((theValue & kGretina4FIFOAllFull)!=0)		return kFull;
+    else if((theValue & kGretina4FIFOHalfFull)!=0)	return kHalfFull;
+    else if((theValue & kGretina4FIFOAlmostEmpty)!=0)	return kAlmostEmpty;
+    else if((theValue & kGretina4FIFOEmpty)!=0)		return kEmpty;
     else						return kSome;
 }
 
@@ -603,7 +603,7 @@ static struct {
 	int count = 0;
 	NSDate* startDate = [NSDate date];
     fifoStateAddress  = [self baseAddress] + register_offsets[kProgrammingDone];
-    fifoAddress       = [self baseAddress]*0x100;
+    fifoAddress       = [self baseAddress] + 0x1000;
 	theController     = [[self crate] controllerCard];
 	unsigned long  dataDump[0xffff];
 	BOOL error		  = NO;

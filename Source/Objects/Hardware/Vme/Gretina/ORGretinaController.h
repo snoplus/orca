@@ -117,7 +117,7 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
 - (void) setFifoStateLabel;
-- (void) enbledChanged:(NSNotification*)aNote;
+- (void) enabledChanged:(NSNotification*)aNote;
 - (void) debugChanged:(NSNotification*)aNote;
 - (void) pileUpChanged:(NSNotification*)aNote;
 - (void) polarityChanged:(NSNotification*)aNote;

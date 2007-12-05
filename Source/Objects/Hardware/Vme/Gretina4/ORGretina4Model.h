@@ -30,10 +30,10 @@
 #define kNumGretina4Channels		10 
 #define kNumGretina4CardParams		6
 
-#define kGretina4FIFOEmpty			0x800
-#define kGretina4FIFOAlmostEmpty	0x1000
-#define kGretina4FIFOHalfFull		0x2000
-#define kGretina4FIFOAllFull		0x4000
+#define kGretina4FIFOEmpty			0x100000
+#define kGretina4FIFOAlmostEmpty	0x400000
+#define kGretina4FIFOHalfFull		0x800000
+#define kGretina4FIFOAllFull		0x4000000
 
 #pragma mark ¥¥¥Register Definitions
 enum {
@@ -271,7 +271,7 @@ extern NSString* ORGretina4ModelCFDDelayChanged;
 extern NSString* ORGretina4ModelCFDFractionChanged;
 extern NSString* ORGretina4ModelCFDThresholdChanged;
 extern NSString* ORGretina4ModelDataDelayChanged;
-extern NSString* ORGretina4ModelDataLenghtChanged;
+extern NSString* ORGretina4ModelDataLengthChanged;
 
 extern NSString* ORGretina4SettingsLock;
 extern NSString* ORGretina4CardInfoUpdated;
