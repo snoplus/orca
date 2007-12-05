@@ -111,6 +111,8 @@ enum Gretina4FIFOStates {
     short			cfdFraction[kNumGretina4Channels];
     short			dataDelay[kNumGretina4Channels];
     short			dataLength[kNumGretina4Channels];
+    short           cfdEnabled[kNumGretina4Channels];
+    short           poleZeroEnabled[kNumGretina4Channels];
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumGretina4Channels];
@@ -180,7 +182,9 @@ enum Gretina4FIFOStates {
 - (void) setPolarity:(short)chan withValue:(int)aValue;
 - (void) setTriggerMode:(short)chan withValue:(int)aValue; 
 - (void) setPileUp:(short)chan withValue:(short)aValue;		
-- (void) setEnabled:(short)chan withValue:(short)aValue;		
+- (void) setEnabled:(short)chan withValue:(short)aValue;
+- (void) setCFDEnabled:(short)chan withValue:(short)aValue;
+- (void) setPoleZeroEnabled:(short)chan withValue:(short)aValue;		
 - (void) setDebug:(short)chan withValue:(short)aValue;	
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue;
 - (void) setCFDDelay:(short)chan withValue:(int)aValue;	
@@ -189,7 +193,9 @@ enum Gretina4FIFOStates {
 - (void) setDataDelay:(short)chan withValue:(int)aValue;   
 - (void) setDataLength:(short)chan withValue:(int)aValue;  
 
-- (int) enabled:(short)chan;		
+- (int) enabled:(short)chan;
+- (int) poleZeroEnabled:(short)chan;
+- (int) cfdEnabled:(short)chan;		
 - (int) debug:(short)chan;		
 - (int) pileUp:(short)chan;		
 - (int)	polarity:(short)chan;	
@@ -264,6 +270,8 @@ extern NSString* ORGretina4ModelNoiseFloorOffsetChanged;
 extern NSString* ORGretina4ModelEnabledChanged;
 extern NSString* ORGretina4ModelDebugChanged;
 extern NSString* ORGretina4ModelPileUpChanged;
+extern NSString* ORGretina4ModelCFDEnabledChanged;
+extern NSString* ORGretina4ModelPoleZeroEnabledChanged;
 extern NSString* ORGretina4ModelPolarityChanged;
 extern NSString* ORGretina4ModelTriggerModeChanged;
 extern NSString* ORGretina4ModelLEDThresholdChanged;

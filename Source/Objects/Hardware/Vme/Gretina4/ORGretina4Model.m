@@ -37,6 +37,8 @@ NSString* ORGretina4NoiseFloorChanged			= @"ORGretina4NoiseFloorChanged";
 NSString* ORGretina4ModelFIFOCheckChanged		= @"ORGretina4ModelFIFOCheckChanged";
 
 NSString* ORGretina4ModelEnabledChanged			= @"ORGretina4ModelEnabledChanged";
+NSString* ORGretina4ModelCFDEnabledChanged		= @"ORGretina4ModelCFDEnabledChanged";
+NSString* ORGretina4ModelPoleZeroEnabledChanged	= @"ORGretina4ModelPoleZeroEnabledChanged";
 NSString* ORGretina4ModelDebugChanged			= @"ORGretina4ModelDebugChanged";
 NSString* ORGretina4ModelPileUpChanged			= @"ORGretina4ModelPileUpChanged";
 NSString* ORGretina4ModelPolarityChanged		= @"ORGretina4ModelPolarityChanged";
@@ -236,6 +238,8 @@ static struct {
 		enabled[i]			= YES;
 		debug[i]			= NO;
 		pileUp[i]			= NO;
+        cfdEnabled[i]		= NO;
+		poleZeroEnabled[i]	= NO;
 		polarity[i]			= 0x3;
 		triggerMode[i]		= 0x0;
 		ledThreshold[i]		= 0x7FFF;
@@ -321,6 +325,20 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
 	enabled[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelEnabledChanged object:self];
+}
+
+- (void) setCFDEnabled:(short)chan withValue:(short)aValue		
+{ 
+    [[[self undoManager] prepareWithInvocationTarget:self] setCFDEnabled:chan withValue:cfdEnabled[chan]];
+	cfdEnabled[chan] = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelCFDEnabledChanged object:self];
+}
+
+- (void) setPoleZeroEnabled:(short)chan withValue:(short)aValue		
+{ 
+    [[[self undoManager] prepareWithInvocationTarget:self] setPoleZeroEnabled:chan withValue:poleZeroEnabled[chan]];
+	poleZeroEnabled[chan] = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelPoleZeroEnabledChanged object:self];
 }
 
 - (void) setDebug:(short)chan withValue:(short)aValue	
@@ -410,6 +428,8 @@ static struct {
 }
 
 - (int) enabled:(short)chan			{ return enabled[chan]; }
+- (int) cfdEnabled:(short)chan		{ return cfdEnabled[chan]; }
+- (int) poleZeroEnabled:(short)chan	{ return poleZeroEnabled[chan]; }
 - (int) debug:(short)chan			{ return debug[chan]; }
 - (int) pileUp:(short)chan			{ return pileUp[chan];}
 - (int) polarity:(short)chan		{ return polarity[chan];}
@@ -506,14 +526,15 @@ static struct {
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
 	
-    unsigned long theValue = (polarity[chan] << 10) | (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
+    unsigned long theValue = (poleZeroEnabled[chan] << 13) | (cfdEnabled[chan] << 12) | (polarity[chan] << 10) 
+        | (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_offsets[kControlStatus] + 4*chan
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     unsigned short readBackValue = [self readControlReg:chan];
-    if((readBackValue & 0xffff) != theValue){
+    if(readBackValue != (unsigned short) (theValue & 0xFFFF)){
         NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xc1f,theValue & 0xc1f);
     }
 }

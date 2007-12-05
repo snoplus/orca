@@ -172,6 +172,16 @@
                        object : model];
 
     [notifyCenter addObserver : self
+                     selector : @selector(cfdEnabledChanged:)
+                         name : ORGretina4ModelCFDEnabledChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(poleZeroEnabledChanged:)
+                         name : ORGretina4ModelPoleZeroEnabledChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(debugChanged:)
                          name : ORGretina4ModelDebugChanged
                        object : model];
@@ -250,6 +260,8 @@
     [self settingsLockChanged:nil];
     [self updateCardInfo:nil];
 	[self enabledChanged:nil];
+	[self cfdEnabledChanged:nil];
+	[self poleZeroEnabledChanged:nil];
 	[self debugChanged:nil];
 	[self pileUpChanged:nil];
 	[self polarityChanged:nil];
@@ -281,6 +293,22 @@
 	for(i=0;i<kNumGretina4Channels;i++){
 		[[enabledMatrix cellWithTag:i] setState:[model enabled:i]];
 		[[enabled2Matrix cellWithTag:i] setState:[model enabled:i]];
+	}
+}
+
+- (void) cfdEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumGretina4Channels;i++){
+		[[cfdEnabledMatrix cellWithTag:i] setState:[model cfdEnabled:i]];
+	}
+}
+
+- (void) poleZeroEnabledChanged:(NSNotification*)aNote
+{
+	short i;
+	for(i=0;i<kNumGretina4Channels;i++){
+		[[poleZeroEnabledMatrix cellWithTag:i] setState:[model poleZeroEnabled:i]];
 	}
 }
 
@@ -432,6 +460,8 @@
 	[statusButton setEnabled:!lockedOrRunningMaintenance];
 	[probeButton setEnabled:!locked && !runInProgress];
 	[enabledMatrix setEnabled:!lockedOrRunningMaintenance];
+	[cfdEnabledMatrix setEnabled:!lockedOrRunningMaintenance];
+	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance];
 	[debugMatrix setEnabled:!lockedOrRunningMaintenance];
 	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance];
 	[ledThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
@@ -582,6 +612,18 @@
 {
 	if([sender intValue] != [model enabled:[[sender selectedCell] tag]]){
 		[model setEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+- (IBAction) cfdEnabledAction:(id)sender
+{
+	if([sender intValue] != [model cfdEnabled:[[sender selectedCell] tag]]){
+		[model setCFDEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
+	}
+}
+- (IBAction) poleZeroEnabledAction:(id)sender
+{
+	if([sender intValue] != [model poleZeroEnabled:[[sender selectedCell] tag]]){
+		[model setPoleZeroEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 - (IBAction) debugAction:(id)sender
@@ -772,11 +814,13 @@
         int chan;
         for(chan = 0;chan<kNumGretina4Channels;chan++){
             unsigned value = [model readControlReg:chan];
-            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  PileUp: %@ Polarity: 0x%02x TriggerMode: 0x%02x\n",
+            NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"chan: %d Enabled: %@ Debug: %@  PileUp: %@ CFD: %@ Pole-zero: %@ Polarity: 0x%02x TriggerMode: 0x%02x\n",
                       chan, 
                       (value&0x1)?@"[YES]":@"[ NO]",		//enabled
                       ((value>>1)&0x1)?@"[YES]":@"[ NO]",	//debug
                       ((value>>2)&0x1)?@"[YES]":@"[ NO]", //pileup
+                      ((value>>12)&0x1)?@"[YES]":@"[ NO]", //CFD
+                      ((value>>13)&0x1)?@"[YES]":@"[ NO]", //pole-zero
                       (value>>10)&0x3, (value>>3)&0x3);
         }
         unsigned short fifoStatus = [model readFifoState];

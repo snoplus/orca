@@ -30,6 +30,8 @@
     IBOutlet NSTabView* 	tabView;
     //basic ops page
 	IBOutlet NSMatrix*		enabledMatrix;
+	IBOutlet NSMatrix*		cfdEnabledMatrix;
+	IBOutlet NSMatrix*		poleZeroEnabledMatrix;
 	IBOutlet NSMatrix*		debugMatrix;
 	IBOutlet NSMatrix*		pileUpMatrix;
 	IBOutlet NSMatrix*		ledThresholdMatrix;
@@ -122,6 +124,8 @@
 - (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
 - (void) setFifoStateLabel;
 - (void) enabledChanged:(NSNotification*)aNote;
+- (void) cfdEnabledChanged:(NSNotification*)aNote;
+- (void) poleZeroEnabledChanged:(NSNotification*)aNote;
 - (void) debugChanged:(NSNotification*)aNote;
 - (void) pileUpChanged:(NSNotification*)aNote;
 - (void) polarityChanged:(NSNotification*)aNote;
@@ -155,6 +159,8 @@
 - (IBAction) noiseFloorIntegrationAction:(id)sender;
 
 - (IBAction) enabledAction:(id)sender;
+- (IBAction) cfdEnabledAction:(id)sender;
+- (IBAction) poleZeroEnabledAction:(id)sender;
 - (IBAction) debugAction:(id)sender;
 - (IBAction) pileUpAction:(id)sender;
 - (IBAction) polarityAction:(id)sender;
