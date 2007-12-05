@@ -450,7 +450,7 @@ static struct {
 #pragma mark ¥¥¥Hardware Access
 - (unsigned long) baseAddress
 {
-	return ([self slot]&0x1f)<<19;
+	return (([self slot]+1)&0x1f)<<20;
 }
 
 - (short) readBoardID
@@ -491,7 +491,7 @@ static struct {
 {
     unsigned long theValue = 0 ;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kControlStatus] + 2*channel
+                        atAddress:[self baseAddress] + register_offsets[kControlStatus] + 4*channel
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -508,7 +508,7 @@ static struct {
 	
     unsigned long theValue = (polarity[chan] << 10) | (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
     [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_offsets[kControlStatus] + 2*chan
+                         atAddress:[self baseAddress] + register_offsets[kControlStatus] + 4*chan
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -521,7 +521,7 @@ static struct {
 - (void) writeLEDThreshold:(int)channel
 {    
     [[self adapter] writeLongBlock:(unsigned long*)&ledThreshold[channel]
-                         atAddress:[self baseAddress] + register_offsets[kLEDThreshold] + 2*channel
+                         atAddress:[self baseAddress] + register_offsets[kLEDThreshold] + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -532,7 +532,7 @@ static struct {
 {    
     unsigned long theValue = (cfdDelay[channel] << 7) | (cfdFraction[channel] << 5) | cfdThreshold[channel];
     [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_offsets[kCFDParameters] + 2*channel
+                         atAddress:[self baseAddress] + register_offsets[kCFDParameters] + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -542,7 +542,7 @@ static struct {
 - (void) writeRawDataSlidingLength:(int)channel
 {    
     [[self adapter] writeLongBlock:(unsigned long*)&dataDelay[channel]
-                         atAddress:[self baseAddress] + register_offsets[kRawDataSlidingLength] + 2*channel
+                         atAddress:[self baseAddress] + register_offsets[kRawDataSlidingLength] + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -553,7 +553,7 @@ static struct {
 {    
 	unsigned long aValue = dataLength[channel]-1;
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + register_offsets[kRawDataWindowLength] + 2*channel
+                         atAddress:[self baseAddress] + register_offsets[kRawDataWindowLength] + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];

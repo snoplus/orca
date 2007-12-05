@@ -728,9 +728,9 @@
     [self endEditing];
     NS_DURING
         unsigned short theID = [model readBoardID];
-        NSLog(@"Getina BoardID (slot %d): 0x%x\n",[model slot],theID);
-        if(theID == ([model baseAddress]>>5))NSLog(@"Getina BoardID looks correct\n");
-        else NSLogColor([NSColor redColor],@"Getina BoardID doesn't match dip settings\n");
+        NSLog(@"Gretina BoardID (slot %d): 0x%x\n",[model slot],theID);
+        if(theID == ([model baseAddress]>>16))NSLog(@"Gretina BoardID looks correct\n");
+        else NSLogColor([NSColor redColor],@"Gretina BoardID doesn't match dip settings\n");
     NS_HANDLER
         NSLog(@"Probe Gretina4 Board FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
@@ -755,7 +755,7 @@
 {
 	[noiseFloorPanel endEditingFor:nil];		
     NS_DURING
-        NSLog(@"Getina (slot %d) Finding LED Thresholds \n",[model slot]);
+        NSLog(@"Gretina (slot %d) Finding LED Thresholds \n",[model slot]);
 		[model findNoiseFloors];
     NS_HANDLER
         NSLog(@"LED Threshold Finder for Gretina4 Board FAILED.\n");
@@ -768,7 +768,7 @@
 {    
     [self endEditing];
     NS_DURING
-        NSLog(@"Getina BoardID (slot %d): [0x%x] ID = 0x%x\n",[model slot],[model baseAddress],[model readBoardID]);
+        NSLog(@"Gretina BoardID (slot %d): [0x%x] ID = 0x%x\n",[model slot],[model baseAddress],[model readBoardID]);
         int chan;
         for(chan = 0;chan<kNumGretina4Channels;chan++){
             unsigned value = [model readControlReg:chan];

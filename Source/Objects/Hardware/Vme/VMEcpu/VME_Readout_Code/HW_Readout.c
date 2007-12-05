@@ -310,6 +310,9 @@ void doWriteBlock(SBC_Packet* aPacket)
     } else if(addressModifier == 0x29) {
         memMapHandle = vmeAM29Handle;
     } else {
+        /* The address must be byte-aligned */ 
+        startAddress = p->address & 0xFFFF;
+        p->address = p->address & 0xFFFF0000;
         memMapHandle = openNewDevice("lsi2", p); 
         if (memMapHandle < 0) {
             sprintf(aPacket->message,"error: %d %d : %s\n",(int32_t)memMapHandle,(int32_t)errno,strerror(errno));
@@ -317,7 +320,6 @@ void doWriteBlock(SBC_Packet* aPacket)
             writeBuffer(aPacket);
             return;
         }
-        startAddress = 0x0;
     }
     
     p++; /*point to the data*/
@@ -403,6 +405,10 @@ void doReadBlock(SBC_Packet* aPacket)
     } else if(addressModifier == 0x29) {
       memMapHandle = vmeAM29Handle;
     } else {
+        /* The address must be byte-aligned */ 
+        startAddress = p->address & 0xFFFF;
+        p->address = p->address & 0xFFFF0000;
+        
         memMapHandle = openNewDevice("lsi2", (SBC_VmeWriteBlockStruct*)p); 
         if (memMapHandle < 0) {
             sprintf(aPacket->message,"error: %d %d : %s\n",
@@ -411,7 +417,6 @@ void doReadBlock(SBC_Packet* aPacket)
             writeBuffer(aPacket);
             return;
         }
-        startAddress = 0x0;
     }
 
     /*OK, got address and # to read, set up the response and go get the data*/
