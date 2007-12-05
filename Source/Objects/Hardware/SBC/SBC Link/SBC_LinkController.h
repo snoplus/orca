@@ -59,6 +59,7 @@
 	IBOutlet NSTextField*	status1Field;
 
 	//Basic Ops
+	IBOutlet NSTextField*	functionAllowedField;
 	IBOutlet NSTextField*	addressField;
 	IBOutlet NSStepper*		addressStepper;
 	IBOutlet NSTextField*	writeValueField;
@@ -144,6 +145,6 @@
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 @end
-@interface OrcaObjectController (SBC_Link)
+@interface OrcaObject (SBC_Link)
 - (BOOL) showBasicOps;
 @end

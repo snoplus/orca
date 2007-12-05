@@ -59,17 +59,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[model cpuName]];
-	if(aModel){
-		if(![aModel showBasicOps]){
-			NSInteger index = [tabView indexOfTabViewItemWithIdentifier:@"BasicOps"];
-			if(index != NSNotFound){
-				NSTabViewItem* anItem = [tabView tabViewItemAtIndex:index];
-				[tabView removeTabViewItem:anItem]; 
-			}
-		}
-	}
-	
+	[[self window] setTitle:[model cpuName]];	
 }
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
@@ -315,15 +305,23 @@
 	[connectButton setTitle:connected?@"Disconnect":@"Connect"];
 	[connect1Button setTitle:connected?@"Disconnect":@"Connect"];
 	
-	[addressField setEnabled:connected];
-	[addressStepper setEnabled:connected];
-	[writeValueField setEnabled:connected];
-	[writeValueStepper setEnabled:connected];
-	[readButton setEnabled:connected];
-	[writeButton setEnabled:connected];
-    [rangeStepper setEnabled:connected];
-    [rangeTextField setEnabled:connected && [[model sbcLink] doRange]];
-    [resetCrateBusButton setEnabled:(connected && [model respondsToSelector:@selector(reset)])];
+	BOOL functionsExist = 	[model showBasicOps] && connected;
+
+	[addressModifierPU  setEnabled:functionsExist];
+	[readWriteTypeMatrix  setEnabled:functionsExist];
+	[doRangeButton setEnabled:functionsExist];
+	[addressField setEnabled:functionsExist];
+	[addressStepper setEnabled:functionsExist];
+	[writeValueField setEnabled:functionsExist];
+	[writeValueStepper setEnabled:functionsExist];
+	[readButton setEnabled:functionsExist];
+	[writeButton setEnabled:functionsExist];
+    [rangeStepper setEnabled:functionsExist];
+    [rangeTextField setEnabled:functionsExist && [[model sbcLink] doRange]];
+    [resetCrateBusButton setEnabled:functionsExist];
+	
+	if(![model showBasicOps]) [functionAllowedField setStringValue:@"Low-Level Access NOT allowed with this SBC"];
+	else [functionAllowedField setStringValue:@""];
 
 }
 
@@ -735,7 +733,7 @@
 }
 @end
 
-@implementation OrcaObjectController (SBC_Link)
+@implementation OrcaObject (SBC_Link)
 - (BOOL) showBasicOps
 {
 	return YES;

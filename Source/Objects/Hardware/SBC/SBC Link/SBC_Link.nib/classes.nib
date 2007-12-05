@@ -212,6 +212,8 @@
 				<string>NSTextField</string>
 				<key>forceReloadButton</key>
 				<string>NSButton</string>
+				<key>functionAllowedField</key>
+				<string>NSTextField</string>
 				<key>initAfterConnectButton</key>
 				<string>NSButton</string>
 				<key>ipNumberField</key>
