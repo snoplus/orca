@@ -40,13 +40,13 @@
         BOOL            moving;
 		unsigned short	chanX;
 		unsigned short	chanY;
-		BOOL			noHysteresis;
 		BOOL			firstPoint;
-		int				count;
 		int				viewType;
 		float			excursion;
 		float			decayRate;
 		float			decayTime;
+		float			overShoot;
+		int				operationType;
  }
 
 #pragma mark ***Initialization
@@ -55,6 +55,10 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
+- (int) operationType;
+- (void) setOperationType:(int)aOperationType;
+- (float) overShoot;
+- (void) setOverShoot:(float)aOverShoot;
 - (float) decayTime;
 - (void) setDecayTime:(float)aDecayTime;
 - (float) decayRate;
@@ -63,8 +67,6 @@
 - (void) setExcursion:(float)aExcursion;
 - (int) viewType;
 - (void) setViewType:(int)aViewType;
-- (BOOL) noHysteresis;
-- (void) setNoHysteresis:(BOOL)aNoHysteresis;
 - (float) voltsPerMillimeter;
 - (void) setVoltsPerMillimeter:(float)aVoltsPerMillimeter;
 - (unsigned short) chanY;
@@ -90,8 +92,7 @@
 #pragma mark ***eGun Commands
 - (void) getPosition;
 - (void) go;
-- (void) moveToPoint:(NSPoint)aPoint;
-- (void) move:(NSPoint)delta;
+- (void) moveToGoal;
 - (void) stopMotion;
 - (void) loadBoard;
 
@@ -99,11 +100,12 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* OReGunModelOperationTypeChanged;
+extern NSString* OReGunModelOverShootChanged;
 extern NSString* OReGunModelDecayTimeChanged;
 extern NSString* OReGunModelDecayRateChanged;
 extern NSString* OReGunModelExcursionChanged;
 extern NSString* OReGunModelViewTypeChanged;
-extern NSString* OReGunModelNoHysteresisChanged;
 extern NSString* OReGunModelVoltsPerMillimeterChanged;
 extern NSString* OReGunModelChanYChanged;
 extern NSString* OReGunModelChanXChanged;

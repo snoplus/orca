@@ -24,11 +24,12 @@
 #import "ORObjectProxy.h"
 
 #pragma mark ***External Strings
+NSString* OReGunModelOperationTypeChanged = @"OReGunModelOperationTypeChanged";
+NSString* OReGunModelOverShootChanged = @"OReGunModelOverShootChanged";
 NSString* OReGunModelDecayTimeChanged = @"OReGunModelDecayTimeChanged";
 NSString* OReGunModelDecayRateChanged = @"OReGunModelDecayRateChanged";
 NSString* OReGunModelExcursionChanged = @"OReGunModelExcursionChanged";
 NSString* OReGunModelViewTypeChanged = @"OReGunModelViewTypeChanged";
-NSString* OReGunModelNoHysteresisChanged = @"OReGunModelNoHysteresisChanged";
 NSString* OReGunModelVoltsPerMillimeterChanged = @"OReGunModelVoltsPerMillimeterChanged";
 NSString* OReGunModelChanYChanged		= @"OReGunModelChanYChanged";
 NSString* OReGunModelChanXChanged		= @"OReGunModelChanXChanged";
@@ -92,6 +93,34 @@ NSString* OReGunLock = @"OReGunLock";
 
 #pragma mark ***Accessors
 
+- (int) operationType
+{
+    return operationType;
+}
+
+- (void) setOperationType:(int)aOperationType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOperationType:operationType];
+    
+    operationType = aOperationType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelOperationTypeChanged object:self];
+}
+
+- (float) overShoot
+{
+    return overShoot;
+}
+
+- (void) setOverShoot:(float)aOverShoot
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOverShoot:overShoot];
+    
+    overShoot = aOverShoot;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelOverShootChanged object:self];
+}
+
 - (float) decayTime
 {
     return decayTime;
@@ -152,18 +181,6 @@ NSString* OReGunLock = @"OReGunLock";
     viewType = aViewType;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelViewTypeChanged object:self];
-}
-
-- (BOOL) noHysteresis
-{
-    return noHysteresis;
-}
-
-- (void) setNoHysteresis:(BOOL)aNoHysteresis
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNoHysteresis:noHysteresis];
-    noHysteresis = aNoHysteresis;
-    [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelNoHysteresisChanged object:self];
 }
 
 - (float) voltsPerMillimeter
@@ -308,11 +325,12 @@ NSString* OReGunLock = @"OReGunLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setOperationType:[decoder decodeIntForKey:@"OReGunModelOperationType"]];
+	[self setOverShoot:[decoder decodeFloatForKey:@"OReGunModelOverShoot"]];
 	[self setDecayTime:[decoder decodeFloatForKey:@"OReGunModelDecayTime"]];
 	[self setDecayRate:[decoder decodeFloatForKey:@"OReGunModelDecayRate"]];
 	[self setExcursion:[decoder decodeFloatForKey:@"OReGunModelExcursion"]];
 	[self setViewType:[decoder decodeIntForKey:@"OReGunModelViewType"]];
-	[self setNoHysteresis:[decoder decodeBoolForKey:@"OReGunModelNoHysteresis"]];
 	[self setVoltsPerMillimeter:[decoder decodeFloatForKey:@"OReGunModelVoltsPerMillimeter"]];
 	[self setChanY:[decoder decodeIntForKey:@"OReGunModelChanY"]];
 	[self setChanX:[decoder decodeIntForKey:@"OReGunModelChanX"]];
@@ -327,11 +345,12 @@ NSString* OReGunLock = @"OReGunLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:operationType forKey:@"OReGunModelOperationType"];
+    [encoder encodeFloat:overShoot forKey:@"OReGunModelOverShoot"];
     [encoder encodeFloat:decayTime forKey:@"OReGunModelDecayTime"];
     [encoder encodeFloat:decayRate forKey:@"OReGunModelDecayRate"];
     [encoder encodeFloat:excursion forKey:@"OReGunModelExcursion"];
     [encoder encodeInt:viewType forKey:@"OReGunModelViewType"];
-    [encoder encodeBool:noHysteresis forKey:@"OReGunModelNoHysteresis"];
     [encoder encodeFloat:voltsPerMillimeter forKey:@"OReGunModelVoltsPerMillimeter"];
     [encoder encodeInt:chanY forKey:@"OReGunModelChanY"];
     [encoder encodeInt:chanX forKey:@"OReGunModelChanX"];
@@ -363,39 +382,37 @@ NSString* OReGunLock = @"OReGunLock";
 - (void) go
 {
 	[self resetTrack];
-        
-	if(absMotion) [self moveToPoint:NSMakePoint(cmdPosition.x,cmdPosition.y)];
-	else          [self move:NSMakePoint(cmdPosition.x,cmdPosition.y)];
+	if(absMotion) goalPosition = cmdPosition;
+	else goalPosition = NSMakePoint([x220Object outputVoltage:chanX]+cmdPosition.x, [y220Object outputVoltage:chanY]+cmdPosition.x);
+	[self moveToGoal];
 }
 
-- (void) moveToPoint:(NSPoint)aPoint
+- (void) moveToGoal
 {
  	[self setMoving:YES];
-	goalPosition = cmdPosition;
-	
-	[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
-	[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
+	float delay; 
+	if(operationType == 2){
+		//overshoot
+		float os = (1.0 * overShoot/100.);
+		NSPoint currentPt	= NSMakePoint([x220Object outputVoltage:chanX],[y220Object outputVoltage:chanY]);
+		NSPoint delta 		= NSMakePoint(goalPosition.x - currentPt.x,goalPosition.y - currentPt.y);
+		NSPoint newPt		= NSMakePoint(goalPosition.x + delta.x*os,goalPosition.y + delta.y*os);
+		[x220Object setOutputVoltage:chanX withValue:newPt.x];
+		[y220Object setOutputVoltage:chanY withValue:newPt.y];
+		delay = 1;
+	}
+	else {
+		//wiggle
+		[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
+		[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
+		delay = decayTime;
+	}
 	[self loadBoard];
+	[self updateTrack];
 	firstPoint = YES;
-	count=0;
 	
-	if(noHysteresis)[self setMoving:NO];
-	else [self performSelector:@selector(doMove) withObject:nil afterDelay:[self decayTime]];
-}
-
-- (void) move:(NSPoint)amount
-{
-	[self setMoving:YES];
-	goalPosition = NSMakePoint([x220Object outputVoltage:chanX]+cmdPosition.x, [y220Object outputVoltage:chanY]+cmdPosition.x);
-
-	[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
-	[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
-	[self loadBoard];
-	firstPoint = YES;
-	count=0;
-
-	if(noHysteresis)[self setMoving:NO];
-	else [self performSelector:@selector(doMove) withObject:nil afterDelay:[self decayTime]];
+	if(operationType == 0)[self setMoving:NO];
+	else [self performSelector:@selector(doMove) withObject:nil afterDelay:delay];
 }
 
 - (void) resetTrackAndNotify
@@ -418,33 +435,41 @@ NSString* OReGunLock = @"OReGunLock";
 	//Note that all values are stored as raw values. Any conversion needed is done only for the display code.
 	[[self undoManager] disableUndoRegistration];
 	
-	count++;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	if(firstPoint){
-		NSPoint newPt		= NSMakePoint(goalPosition.x + [self excursion]*voltsPerMillimeter,goalPosition.y + [self excursion]*voltsPerMillimeter);
-		[x220Object setOutputVoltage:chanX withValue:newPt.x];
-		[y220Object setOutputVoltage:chanY withValue:newPt.y];
-		firstPoint = NO;
-		[self performSelector:@selector(doMove) withObject:nil afterDelay:[self decayTime]];
-	}
-	else {
-		NSPoint currentPt	= NSMakePoint([x220Object outputVoltage:chanX],[y220Object outputVoltage:chanY]);
-		NSPoint delta 		= NSMakePoint((goalPosition.x - currentPt.x)*[self decayRate]/100.,(goalPosition.y - currentPt.y)*[self decayRate]/100.);
-		NSPoint newPt		= NSMakePoint(goalPosition.x + delta.x,goalPosition.y + delta.y);
-
-		if(fabs(delta.x/voltsPerMillimeter) > .5){
+	if(operationType == 1){
+		//wiggle
+		if(firstPoint){
+			NSPoint newPt		= NSMakePoint(goalPosition.x + [self excursion]*voltsPerMillimeter,goalPosition.y + [self excursion]*voltsPerMillimeter);
 			[x220Object setOutputVoltage:chanX withValue:newPt.x];
 			[y220Object setOutputVoltage:chanY withValue:newPt.y];
+			firstPoint = NO;
 			[self performSelector:@selector(doMove) withObject:nil afterDelay:[self decayTime]];
 		}
 		else {
-			[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
-			[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
-			[self setMoving:NO];		
+			NSPoint currentPt	= NSMakePoint([x220Object outputVoltage:chanX],[y220Object outputVoltage:chanY]);
+			NSPoint delta 		= NSMakePoint((goalPosition.x - currentPt.x)*[self decayRate]/100.,(goalPosition.y - currentPt.y)*[self decayRate]/100.);
+			NSPoint newPt		= NSMakePoint(goalPosition.x + delta.x,goalPosition.y + delta.y);
+
+			if(fabs(delta.x/voltsPerMillimeter) > .5){
+				[x220Object setOutputVoltage:chanX withValue:newPt.x];
+				[y220Object setOutputVoltage:chanY withValue:newPt.y];
+				[self performSelector:@selector(doMove) withObject:nil afterDelay:[self decayTime]];
+			}
+			else {
+				[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
+				[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
+				[self setMoving:NO];		
+			}
+
 		}
-
 	}
-
+	else {
+		//overshoot
+		[x220Object setOutputVoltage:chanX withValue:goalPosition.x];
+		[y220Object setOutputVoltage:chanY withValue:goalPosition.y];
+		[self setMoving:NO];		
+	}
+	
 	[self updateTrack];
 	[self loadBoard];
 	

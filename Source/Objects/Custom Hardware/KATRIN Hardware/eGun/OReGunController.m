@@ -125,12 +125,7 @@
                      selector : @selector(movingChanged:)
                          name : OReGunModelMovingChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(noHysteresisChanged:)
-                         name : OReGunModelNoHysteresisChanged
-						object: model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(viewTypeChanged:)
                          name : OReGunModelViewTypeChanged
@@ -151,6 +146,16 @@
                          name : OReGunModelDecayTimeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(overShootChanged:)
+                         name : OReGunModelOverShootChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(operationTypeChanged:)
+                         name : OReGunModelOperationTypeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -162,12 +167,23 @@
 	[self chanChanged:nil];
 	[self movingChanged:nil];
 	[self voltsPerMillimeterChanged:nil];
-	[self noHysteresisChanged:nil];
 	[self proxyChanged:nil];
 	[self viewTypeChanged:nil];
 	[self excursionChanged:nil];
 	[self decayRateChanged:nil];
 	[self decayTimeChanged:nil];
+	[self overShootChanged:nil];
+	[self operationTypeChanged:nil];
+}
+
+- (void) operationTypeChanged:(NSNotification*)aNote
+{
+    [operationTypeMatrix selectCellWithTag:[model operationType]];
+}
+
+- (void) overShootChanged:(NSNotification*)aNote
+{
+	[overShootTextField setFloatValue: [model overShoot]];
 }
 
 - (void) decayTimeChanged:(NSNotification*)aNote
@@ -191,7 +207,7 @@
 
 	float r;
 	if(![model viewType]){
-		[xyPlot setBackgroundImage:[NSImage imageNamed:@"mainFocalPlanedetector"]];
+		[xyPlot setBackgroundImage:[NSImage imageNamed:@"mainFocalPlaneDetector"]];
 		r = 47;
 	}
 	else {
@@ -204,14 +220,6 @@
     [[xyPlot yScale] setRngLimitsLow:-r withHigh:r withMinRng:2*r];
 	[xyPlot setNeedsDisplay:YES];
 	
-}
-
-- (void) noHysteresisChanged:(NSNotification*)aNote
-{
-	[noHysteresisButton setIntValue: [model noHysteresis]];
-	[decayTimeTextField setEnabled: ![model noHysteresis]];
-	[decayRateTextField setEnabled: ![model noHysteresis]];
-	[excursionTextField setEnabled: ![model noHysteresis]];
 }
 
 - (void) voltsPerMillimeterChanged:(NSNotification*)aNote
@@ -308,6 +316,16 @@
 
 #pragma mark ***Actions
 
+- (void) operationTypeAction:(id)sender
+{
+    [model setOperationType:[[operationTypeMatrix selectedCell] tag]];
+}
+
+- (void) overShootTextFieldAction:(id)sender
+{
+	[model setOverShoot:[sender floatValue]];	
+}
+
 - (void) decayTimeTextFieldAction:(id)sender
 {
 	[model setDecayTime:[sender floatValue]];	
@@ -328,10 +346,6 @@
     [model setViewType:[[viewTypeMatrix selectedCell] tag]];
 }
 
-- (IBAction) noHysteresisAction:(id)sender
-{
-	[model setNoHysteresis:[sender intValue]];	
-}
 
 - (IBAction) voltsPerMillimeterTextFieldAction:(id)sender
 {

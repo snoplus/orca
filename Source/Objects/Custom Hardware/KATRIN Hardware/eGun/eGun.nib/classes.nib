@@ -77,7 +77,9 @@
 				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
-				<key>noHysteresisAction</key>
+				<key>operationTypeAction</key>
+				<string>id</string>
+				<key>overShootTextFieldAction</key>
 				<string>id</string>
 				<key>stopAction</key>
 				<string>id</string>
@@ -118,8 +120,10 @@
 				<string>NSTextField</string>
 				<key>moveStatusField</key>
 				<string>NSTextField</string>
-				<key>noHysteresisButton</key>
-				<string>NSButton</string>
+				<key>operationTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>overShootTextField</key>
+				<string>NSTextField</string>
 				<key>stopButton</key>
 				<string>NSButton</string>
 				<key>viewTypeMatrix</key>
