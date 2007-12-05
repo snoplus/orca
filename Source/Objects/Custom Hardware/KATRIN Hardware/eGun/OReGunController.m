@@ -179,6 +179,13 @@
 - (void) operationTypeChanged:(NSNotification*)aNote
 {
     [operationTypeMatrix selectCellWithTag:[model operationType]];
+
+	int type = [model operationType];
+	[overShootTextField setEnabled:type == 2];
+	[decayTimeTextField setEnabled:type == 1];
+	[decayRateTextField setEnabled:type == 1];
+	[excursionTextField setEnabled:type == 1];
+
 }
 
 - (void) overShootChanged:(NSNotification*)aNote

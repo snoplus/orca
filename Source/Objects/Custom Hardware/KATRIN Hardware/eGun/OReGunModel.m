@@ -114,6 +114,8 @@ NSString* OReGunLock = @"OReGunLock";
 
 - (void) setOverShoot:(float)aOverShoot
 {
+	if(aOverShoot <= 0)aOverShoot = 10;
+	else if(aOverShoot>=200)aOverShoot = 200;
     [[[self undoManager] prepareWithInvocationTarget:self] setOverShoot:overShoot];
     
     overShoot = aOverShoot;
