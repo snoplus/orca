@@ -487,15 +487,18 @@
 	}
 	else {
 		int val = [model fifoState];
-		if((val & kGretina4FIFOAllFull)==0) {
+		if((val & kGretina4FIFOAllFull)!=0) {
 			[fifoState setTextColor:[NSColor redColor]];
 			[fifoState setStringValue:@"Full"];
-		}
-		else {
+		} else if((val & kGretina4FIFOAlmostFull)!=0) {
+			[fifoState setTextColor:[NSColor redColor]];
+			[fifoState setStringValue:@"Almost Full"];
+		} else {
 			[fifoState setTextColor:[NSColor blackColor]];
-			if((val & kGretina4FIFOHalfFull)==0)			[fifoState setStringValue:@"Half Full"];
-			else if((val & kGretina4FIFOEmpty)==0)		[fifoState setStringValue:@"Empty"];
-			else if((val & kGretina4FIFOAlmostEmpty)==0)	[fifoState setStringValue:@"Almost Empty"];
+            if((val & kGretina4FIFOEmpty)!=0)               [fifoState setStringValue:@"Empty"];
+			else if((val & kGretina4FIFOAlmostEmpty)!=0)    [fifoState setStringValue:@"Almost Empty"];
+            else                                            [fifoState setStringValue:@"Half Full"];
+
 		}
 	}
 }
@@ -825,10 +828,10 @@
         }
         unsigned short fifoStatus = [model readFifoState];
         if(fifoStatus == kFull)			    NSLog(@"FIFO = Full\n");
-        else if(fifoStatus == kHalfFull)	NSLog(@"FIFO = Half Full\n");
+        else if(fifoStatus == kAlmostFull)	NSLog(@"FIFO = Almost Full\n");
         else if(fifoStatus == kEmpty)		NSLog(@"FIFO = Empty\n");
         else if(fifoStatus == kAlmostEmpty)	NSLog(@"FIFO = Almost Empty\n");
-        else if(fifoStatus == kSome)		NSLog(@"FIFO = Not Empty\n");
+        else if(fifoStatus == kHalfFull)	NSLog(@"FIFO = Half Full\n");
         
     NS_HANDLER
         NSLog(@"Probe Gretina4 Board FAILED.\n");

@@ -64,7 +64,7 @@ static unsigned long register_offsets[kNumberOfGretina4Registers] = {
     0x18,  //[6] Collection time
     0x1C,  //[7] Integration time
     0x20,  //[8] Hardware Status
-    0x40,  //[9] Hardware Status
+    0x40,  //[9] Control/Status
     0x80,  //[10] LED Threshold
     0xC0,  //[11] CFD Parameters
     0x100, //[12] Raw data sliding length
@@ -115,13 +115,13 @@ static struct {
     NSString*	units;
     unsigned long	regOffset;
     unsigned short	mask; 
-    short		initialValue;
+    unsigned short	initialValue;
     float		ratio; //conversion constants
 } cardConstants[kNumGretina4CardParams] = {
-    {@"External Window",	@"",	0x08,	0x7FF,	0x07FF, 1.},
+    {@"External Window",	@"us",	0x08,	0x7FF,	0x190, 4./(float)0x190},
     {@"Pileup Window",		@"us",	0x0C,	0x7FF,	0x0400,	10./(float)0x400},
     {@"Noise Window",		@"ns",	0x10,	0x07F,	0x0040,	640./(float)0x40},
-    {@"Ext Trigger Length", @"us",	0x14,	0x7FF,	0x01C2,	4.5/(float)0x1C2},
+    {@"Ext Trigger Length", @"us",	0x14,	0x7FF,	0x0190,	4.0/(float)0x190},
     {@"Collection Time",	@"us",	0x18,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
     {@"Integration Time",	@"us",	0x1C,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
 };
@@ -242,12 +242,12 @@ static struct {
 		poleZeroEnabled[i]	= NO;
 		polarity[i]			= 0x3;
 		triggerMode[i]		= 0x0;
-		ledThreshold[i]		= 0x7FFF;
+		ledThreshold[i]		= 0x1FFFF;
 		cfdDelay[i]			= 0x3f;
 		cfdFraction[i]		= 0x0;
 		cfdThreshold[i]		= 0x10;
 		dataDelay[i]		= 0x1C2;
-		dataLength[i]		= 1024;
+		dataLength[i]		= 0x3FF;
 	}
 	
     if(!cardInfo){
@@ -376,7 +376,7 @@ static struct {
 - (void) setLEDThreshold:(short)chan withValue:(int)aValue 
 { 
 	if(aValue<0)aValue=0;
-	else if(aValue>0x7FFF)aValue = 0x7FFF;
+	else if(aValue>0x1FFFF)aValue = 0x1FFFF;
     [[[self undoManager] prepareWithInvocationTarget:self] setLEDThreshold:chan withValue:ledThreshold[chan]];
 	ledThreshold[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelLEDThresholdChanged object:self];
@@ -420,8 +420,8 @@ static struct {
 
 - (void) setDataLength:(short)chan withValue:(int)aValue    
 {
-	if(aValue<1)aValue=1;
-	else if(aValue>1024)aValue = 1024;
+	if(aValue<0x0)aValue=0x0;
+	else if(aValue>0x3FF)aValue = 0x3FF;
     [[[self undoManager] prepareWithInvocationTarget:self] setDataLength:chan withValue:dataLength[chan]];
 	dataLength[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelDataLengthChanged object:self];
@@ -445,7 +445,7 @@ static struct {
 - (float) cfdDelayConverted:(short)chan		{ return cfdDelay[chan]*630./(float)0x3F; }		//convert to ns
 - (float) cfdThresholdConverted:(short)chan	{ return cfdThreshold[chan]*160./(float)0x10; }	//convert to kev
 - (float) dataDelayConverted:(short)chan	{ return dataDelay[chan]*4.5/(float)0x01C2; }	//convert to Âµs
-- (float) dataLengthConverted:(short)chan	{ return dataLength[chan]; }	//convert to ns
+- (float) dataLengthConverted:(short)chan	{ return dataLength[chan]*10.0; }               //convert to ns
 
 - (void) setCFDDelayConverted:(short)chan withValue:(float)aValue
 {
@@ -464,7 +464,7 @@ static struct {
  
 - (void) setDataLengthConverted:(short)chan withValue:(float)aValue
 {
-	[self setDataLength:chan withValue:aValue];		//ns -> raw
+	[self setDataLength:chan withValue:aValue/10.0];		//ns -> raw
 }  
 
 #pragma mark ¥¥¥Hardware Access
@@ -479,13 +479,51 @@ static struct {
     [[self adapter] readLongBlock:&theValue
                         atAddress:[self baseAddress] + register_offsets[kBoardID]
                         numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
+                        withAddMod:[self addressModifier]
+                        usingAddSpace:0x01];
     return theValue & 0xffff;
+}
+
+- (void) initSerDes
+{
+    unsigned long theValue = 0;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_offsets[kHardwareStatus]
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+                        usingAddSpace:0x01];
+                        
+    if ((theValue & 0x7) == 0x7) return;
+    theValue = 0x22;
+    /* First we set to loop back mode so the SD can lock. */
+    [[self adapter] writeLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_offsets[kSDConfig]
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                        usingAddSpace:0x01];
+
+    
+    while(1) {
+        /* Wait for the SD and DCM to lock */
+        [[self adapter] readLongBlock:&theValue
+                            atAddress:[self baseAddress] + register_offsets[kHardwareStatus]
+                            numToRead:1
+                            withAddMod:[self addressModifier]
+                            usingAddSpace:0x01];
+                    
+        if ((theValue & 0x7) == 0x7) break;
+    }
+    theValue = 0x02;
+    [[self adapter] writeLongBlock:&theValue
+                            atAddress:[self baseAddress] + register_offsets[kSDConfig]
+                            numToWrite:1
+                            withAddMod:[self addressModifier]
+                            usingAddSpace:0x01];    
 }
 
 - (void) initBoard
 {
+    [self initSerDes];
     //write the card level params
     int i;
     for(i=0;i<kNumGretina4CardParams;i++){
@@ -534,14 +572,14 @@ static struct {
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
     unsigned long readBackValue = [self readControlReg:chan];
-    if((readBackValue & 0xFC1F) != (theValue & 0xFC1F)){
-        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xFC1F,theValue & 0xFC1F);
+    if((readBackValue & 0xC1F) != (theValue & 0xC1F)){
+        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xC1F,theValue & 0xC1F);
     }
 }
 
 - (void) writeLEDThreshold:(int)channel
 {    
-    [[self adapter] writeLongBlock:(unsigned long*)&ledThreshold[channel]
+    [[self adapter] writeLongBlock:&ledThreshold[channel]
                          atAddress:[self baseAddress] + register_offsets[kLEDThreshold] + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -551,7 +589,7 @@ static struct {
 
 - (void) writeCFDParameters:(int)channel
 {    
-    unsigned long theValue = (cfdDelay[channel] << 7) | (cfdFraction[channel] << 5) | cfdThreshold[channel];
+    unsigned long theValue = ((cfdDelay[channel] & 0x1F) << 7) | ((cfdFraction[channel] & 0x3) << 5) | (cfdThreshold[channel] & 0xF);
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_offsets[kCFDParameters] + 4*channel
                         numToWrite:1
@@ -562,7 +600,8 @@ static struct {
 
 - (void) writeRawDataSlidingLength:(int)channel
 {    
-    [[self adapter] writeLongBlock:(unsigned long*)&dataDelay[channel]
+    unsigned long theValue = (unsigned long)dataDelay[channel];
+    [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_offsets[kRawDataSlidingLength] + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -572,7 +611,7 @@ static struct {
 
 - (void) writeRawDataWindowLength:(int)channel
 {    
-	unsigned long aValue = dataLength[channel]-1;
+	unsigned long aValue = dataLength[channel];
     [[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + register_offsets[kRawDataWindowLength] + 4*channel
                         numToWrite:1
@@ -591,12 +630,11 @@ static struct {
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     
-    
-    if((theValue & kGretina4FIFOAllFull)!=0)		return kFull;
-    else if((theValue & kGretina4FIFOHalfFull)!=0)	return kHalfFull;
+    if((theValue & kGretina4FIFOEmpty)!=0)		return kEmpty;
+    else if((theValue & kGretina4FIFOAllFull)!=0)		return kFull;
+    else if((theValue & kGretina4FIFOAlmostFull)!=0)	return kAlmostFull;
     else if((theValue & kGretina4FIFOAlmostEmpty)!=0)	return kAlmostEmpty;
-    else if((theValue & kGretina4FIFOEmpty)!=0)		return kEmpty;
-    else						return kSome;
+    else						return kHalfFull;
 }
 
 - (unsigned long) readFIFO:(unsigned long)index
@@ -605,7 +643,7 @@ static struct {
     [[self adapter] readLongBlock:&theValue
                         atAddress:[self baseAddress]*0x100 + (4*index)
                         numToRead:1
-                       withAddMod:0x39
+                       withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     return theValue;
 }
@@ -615,7 +653,7 @@ static struct {
     [[self adapter] writeLongBlock:&aValue
                          atAddress:([self baseAddress]*0x100) + (4*index)
                         numToWrite:1
-                        withAddMod:0x39
+                        withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
 
@@ -634,15 +672,15 @@ static struct {
 		[theController readLongBlock:&val
 						   atAddress:fifoStateAddress
 						   numToRead:1
-						  withAddMod:0x29
+						  withAddMod:[self addressModifier]
 					   usingAddSpace:0x01];
-		if((val & kGretina4FIFOEmpty) != 0){
+		if((val & kGretina4FIFOEmpty) == 0){
 			//read the first longword which should be the packet separator: 0xAAAAAAAA
 			unsigned long theValue;
 			[theController readLongBlock:&theValue 
 							   atAddress:fifoAddress 
 							   numToRead:1 
-							  withAddMod:0x39 
+							  withAddMod:[self addressModifier] 
 						   usingAddSpace:0x01];
 			
 			if(theValue==0xAAAAAAAA){
@@ -650,13 +688,13 @@ static struct {
 				[theController readLongBlock:&theValue 
 								   atAddress:fifoAddress 
 								   numToRead:1 
-								  withAddMod:0x39 
+								  withAddMod:[self addressModifier] 
 							   usingAddSpace:0x01];
 																		
 				[theController readLong:dataDump 
 							  atAddress:fifoAddress 
 							timesToRead:((theValue & 0xffff0000)>>16)-1  //number longs left to read
-							 withAddMod:0x39 
+							 withAddMod:[self addressModifier] 
 						  usingAddSpace:0x01];
 				count++;
 			}
@@ -759,10 +797,10 @@ static struct {
 				[[self adapter] readLongBlock:&val
 									   atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
 									   numToRead:1
-									  withAddMod:0x29
+									  withAddMod:[self addressModifier]
 								   usingAddSpace:0x01];
 
-				if((val & kGretina4FIFOEmpty) != 0){
+				if((val & kGretina4FIFOEmpty) == 0){
 					//there's some data in fifo so we're too low with the threshold
 					[self setLEDThreshold:noiseFloorWorkingChannel withValue:0x7fff];
 					[self writeLEDThreshold:noiseFloorWorkingChannel];
@@ -946,7 +984,7 @@ static struct {
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"LED Threshold"];
-    [p setFormat:@"##0" upperLimit:0x7fff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x1ffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setLEDThreshold:withValue:) getMethod:@selector(ledThreshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
@@ -979,7 +1017,7 @@ static struct {
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Data Length"];
-    [p setFormat:@"##0" upperLimit:1024 lowerLimit:1 stepSize:1 units:@"pts"];
+    [p setFormat:@"##0" upperLimit:0x3FF lowerLimit:1 stepSize:1 units:@"ns"];
     [p setSetMethod:@selector(setDataLengthConverted:withValue:) getMethod:@selector(dataLengthConverted:)];
     [a addObject:p];
     
@@ -1055,10 +1093,10 @@ static struct {
 			[theController readLongBlock:&val
 							   atAddress:fifoStateAddress
 							   numToRead:1
-							  withAddMod:0x29
+							  withAddMod:[self addressModifier]
 						   usingAddSpace:0x01];
 			fifoState = val;			
-			if((val & kGretina4FIFOEmpty) != 0){
+			if((val & kGretina4FIFOEmpty) == 0){
 				unsigned long numLongs = 0;
 				dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
 				dataBuffer[numLongs++] = location;
@@ -1068,7 +1106,7 @@ static struct {
 				[theController readLongBlock:&theValue 
 								   atAddress:fifoAddress 
 								   numToRead:1 
-								  withAddMod:0x39 
+								  withAddMod:[self addressModifier] 
 							   usingAddSpace:0x01];
 				
 				if(theValue==0xAAAAAAAA){
@@ -1077,7 +1115,7 @@ static struct {
 					[theController readLongBlock:&theValue 
 									   atAddress:fifoAddress 
 									   numToRead:1 
-									  withAddMod:0x39 
+									  withAddMod:[self addressModifier] 
 								   usingAddSpace:0x01];
 					
 					dataBuffer[numLongs++] = theValue;
@@ -1089,7 +1127,7 @@ static struct {
 					[theController readLong:&dataBuffer[numLongs] 
 								  atAddress:fifoAddress 
 								timesToRead:numLongsLeft 
-								 withAddMod:0x39 
+								 withAddMod:[self addressModifier] 
 							  usingAddSpace:0x01];
 							  
 					long totalNumLongs = (numLongs + numLongsLeft);
@@ -1267,12 +1305,17 @@ static struct {
 	[self addCurrentState:objDictionary cArray:pileUp forKey:@"Pile Up"];
 	[self addCurrentState:objDictionary cArray:polarity forKey:@"Polarity"];
 	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
-	[self addCurrentState:objDictionary cArray:ledThreshold forKey:@"LED Threshold"];
 	[self addCurrentState:objDictionary cArray:cfdDelay forKey:@"CFD Delay"];
 	[self addCurrentState:objDictionary cArray:cfdFraction forKey:@"CFD Fraction"];
 	[self addCurrentState:objDictionary cArray:cfdThreshold forKey:@"CFD Threshold"];
 	[self addCurrentState:objDictionary cArray:dataDelay forKey:@"Data Delay"];
 	[self addCurrentState:objDictionary cArray:dataLength forKey:@"Data Length"];
+    
+    NSMutableArray* ar = [NSMutableArray array];
+	for(i=0;i<kNumGretina4Channels;i++){
+		[ar addObject:[NSNumber numberWithLong:ledThreshold[i]]];
+	}
+    [objDictionary setObject:ar forKey:@"LED Threshold"];
 	
 	
     return objDictionary;

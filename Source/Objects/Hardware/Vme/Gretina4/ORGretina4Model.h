@@ -32,8 +32,8 @@
 
 #define kGretina4FIFOEmpty			0x100000
 #define kGretina4FIFOAlmostEmpty	0x400000
-#define kGretina4FIFOHalfFull		0x800000
-#define kGretina4FIFOAllFull		0x4000000
+#define kGretina4FIFOAlmostFull		0x800000
+#define kGretina4FIFOAllFull		0x1000000
 
 #pragma mark ¥¥¥Register Definitions
 enum {
@@ -76,7 +76,7 @@ enum {
 	kFBConfig,					//[36] FB_Config
 	kSDRead,					//[37] SD_Read
 	kSDWrite,					//[38] SD_Write
-	kSDCongif,					//[39] SD_Config
+	kSDConfig,					//[39] SD_Config
 	kADCConfig,					//[40] Adc config
 	kSelfTriggerEnable,			//[41] self trigger enable
 	kSelfTriggerPeriod,			//[42] self trigger period
@@ -87,9 +87,9 @@ enum {
 enum Gretina4FIFOStates {
 	kEmpty,
 	kAlmostEmpty,	
-	kHalfFull,
+	kAlmostFull,
 	kFull,
-	kSome
+	kHalfFull
 };
 
 @interface ORGretina4Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
@@ -105,12 +105,12 @@ enum Gretina4FIFOStates {
     short			pileUp[kNumGretina4Channels];
     short			polarity[kNumGretina4Channels];
     short			triggerMode[kNumGretina4Channels];
-    short			ledThreshold[kNumGretina4Channels];
+    unsigned long   ledThreshold[kNumGretina4Channels];
     short			cfdDelay[kNumGretina4Channels];
     short			cfdThreshold[kNumGretina4Channels];
     short			cfdFraction[kNumGretina4Channels];
-    short			dataDelay[kNumGretina4Channels];
-    short			dataLength[kNumGretina4Channels];
+    short           dataDelay[kNumGretina4Channels];
+    short           dataLength[kNumGretina4Channels];
     short           cfdEnabled[kNumGretina4Channels];
     short           poleZeroEnabled[kNumGretina4Channels];
 	
@@ -122,15 +122,15 @@ enum Gretina4FIFOStates {
 	ORAlarm*        fifoFullAlarm;
 	int				fifoEmptyCount;
 
-	//cach to speed takedata
+	//cache to speed takedata
 	unsigned long location;
 	id theController;
 	unsigned long fifoAddress;
 	unsigned long fifoStateAddress;
 
 	BOOL oldEnabled[kNumGretina4Channels];
-	unsigned short oldLEDThreshold[kNumGretina4Channels];
-	unsigned short newLEDThreshold[kNumGretina4Channels];
+	unsigned long oldLEDThreshold[kNumGretina4Channels];
+	unsigned long newLEDThreshold[kNumGretina4Channels];
 	BOOL noiseFloorRunning;
 	int noiseFloorState;
 	int noiseFloorWorkingChannel;
@@ -221,6 +221,7 @@ enum Gretina4FIFOStates {
 #pragma mark ¥¥¥Hardware Access
 - (short) readBoardID;
 - (void) initBoard;
+- (void) initSerDes;
 - (unsigned long) readControlReg:(int)channel;
 - (void) writeControlReg:(int)channel enabled:(BOOL)enabled;
 - (void) writeLEDThreshold:(int)channel;
