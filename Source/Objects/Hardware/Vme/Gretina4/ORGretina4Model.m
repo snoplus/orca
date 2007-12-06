@@ -367,7 +367,7 @@ static struct {
 - (void) setTriggerMode:(short)chan withValue:(int)aValue	
 { 
 	if(aValue<0)aValue=0;
-	else if(aValue>0x2)aValue= 0x2;
+	else if(aValue>0x3)aValue= 0x3;
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerMode:chan withValue:triggerMode[chan]];
 	triggerMode[chan] = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelTriggerModeChanged object:self];
@@ -507,7 +507,7 @@ static struct {
     
 }
 
-- (short) readControlReg:(int)channel
+- (unsigned long) readControlReg:(int)channel
 {
     unsigned long theValue = 0 ;
     [[self adapter] readLongBlock:&theValue
@@ -516,7 +516,7 @@ static struct {
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     
-    return theValue & 0xffff;
+    return theValue;
 }
 
 - (void) writeControlReg:(int)chan enabled:(BOOL)forceEnable
@@ -533,9 +533,9 @@ static struct {
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-    unsigned short readBackValue = [self readControlReg:chan];
-    if(readBackValue != (unsigned short) (theValue & 0xFFFF)){
-        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xc1f,theValue & 0xc1f);
+    unsigned long readBackValue = [self readControlReg:chan];
+    if((readBackValue & 0xFC1F) != (theValue & 0xFC1F)){
+        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xFC1F,theValue & 0xFC1F);
     }
 }
 

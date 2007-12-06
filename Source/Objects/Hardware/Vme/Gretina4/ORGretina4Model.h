@@ -221,7 +221,7 @@ enum Gretina4FIFOStates {
 #pragma mark ¥¥¥Hardware Access
 - (short) readBoardID;
 - (void) initBoard;
-- (short) readControlReg:(int)channel;
+- (unsigned long) readControlReg:(int)channel;
 - (void) writeControlReg:(int)channel enabled:(BOOL)enabled;
 - (void) writeLEDThreshold:(int)channel;
 - (void) writeCFDParameters:(int)channel;

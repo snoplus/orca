@@ -46,7 +46,7 @@ static CircularBufferStruct cb;
 // Circular Buffer format
 //     BxxxxxxxBxxxxxx
 //     ^------------------Block count (longs) to follow
-//        ^^^^^^^-----------the data
+//      ^^^^^^^-----------the data
 //                    ^---Write index points to here
 //     ^------------------Read  index points to here
 //--------------------------------------------------------

@@ -27,6 +27,7 @@
                 baseAddressAction = id; 
                 cardInfoAction = id; 
                 cfdDelayAction = id; 
+                cfdEnabledAction = id; 
                 cfdFractionAction = id; 
                 cfdThresholdAction = id; 
                 clearFIFO = id; 
@@ -44,6 +45,7 @@
                 openNoiseFloorPanel = id; 
                 pileUpAction = id; 
                 polarityAction = id; 
+                poleZeroEnabledAction = id; 
                 probeBoard = id; 
                 readStatus = id; 
                 settingLockAction = id; 
@@ -55,6 +57,7 @@
                 addressText = NSTextField; 
                 cardInfoMatrix = NSMatrix; 
                 cfdDelayMatrix = NSMatrix; 
+                cfdEnabledMatrix = NSMatrix; 
                 cfdFractionMatrix = NSMatrix; 
                 cfdThresholdMatrix = NSMatrix; 
                 clearFIFOButton = NSButton; 
@@ -84,6 +87,7 @@
                 polarityPU7 = NSPopUpButton; 
                 polarityPU8 = NSPopUpButton; 
                 polarityPU9 = NSPopUpButton; 
+                poleZeroEnabledMatrix = NSMatrix; 
                 probeButton = NSButton; 
                 rate0 = ORValueBar; 
                 rateLogCB = NSButton; 

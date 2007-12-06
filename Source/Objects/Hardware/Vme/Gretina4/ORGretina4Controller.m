@@ -641,14 +641,14 @@
 
 - (IBAction) polarityAction:(id)sender
 {
-	if([sender intValue] != [model polarity:[sender indexOfSelectedItem]]){
+	if([sender indexOfSelectedItem] != [model polarity:[sender tag]]){
 		[model setPolarity:[sender tag] withValue:[sender indexOfSelectedItem]];
 	}
 }
 
 - (IBAction) triggerModeAction:(id)sender
 {
-	if([sender intValue] != [model triggerMode:[sender indexOfSelectedItem]]){
+	if([sender indexOfSelectedItem] != [model triggerMode:[sender tag]]){
 		[model setTriggerMode:[sender tag] withValue:[sender indexOfSelectedItem]];
 	}
 }
