@@ -24,13 +24,12 @@
 @interface OReGunController : OrcaObjectController
 {
 	IBOutlet NSPopUpButton* interfaceObjPUx;
-	IBOutlet NSMatrix*		operationTypeMatrix;
-	IBOutlet NSTextField*	overShootTextField;
+	IBOutlet   NSTextField* stateStringTextField;
 	IBOutlet NSTextField*	decayTimeTextField;
 	IBOutlet NSTextField*	decayRateTextField;
 	IBOutlet NSTextField*	excursionTextField;
 	IBOutlet NSMatrix*		viewTypeMatrix;
-	IBOutlet NSTextField*	voltsPerMillimeterTextField;
+	IBOutlet NSTextField*	millimetersPerVoltTextField;
     IBOutlet NSPopUpButton* interfaceObjPUy;
 	IBOutlet NSForm*		channelMatrix;
 	IBOutlet ORPlotter2D*   xyPlot;
@@ -44,6 +43,7 @@
     IBOutlet NSButton*      stopButton;
     IBOutlet NSTextField*   moveStatusField;
     IBOutlet NSTextField*   moveLabelField;
+    IBOutlet NSButton*      degaussButton;
 }
 
 #pragma mark ***Initialization
@@ -56,13 +56,12 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
-- (void) operationTypeChanged:(NSNotification*)aNote;
-- (void) overShootChanged:(NSNotification*)aNote;
+- (void) stateStringChanged:(NSNotification*)aNote;
 - (void) decayTimeChanged:(NSNotification*)aNote;
 - (void) decayRateChanged:(NSNotification*)aNote;
 - (void) excursionChanged:(NSNotification*)aNote;
 - (void) viewTypeChanged:(NSNotification*)aNote;
-- (void) voltsPerMillimeterChanged:(NSNotification*)aNote;
+- (void) millimetersPerVoltChanged:(NSNotification*)aNote;
 - (void) chanChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) positionChanged:(NSNotification*)aNote;
@@ -72,13 +71,12 @@
 - (void) movingChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
-- (IBAction) operationTypeAction:(id)sender;
-- (IBAction) overShootTextFieldAction:(id)sender;
+- (IBAction) degaussAction:(id)sender;
 - (IBAction) decayTimeTextFieldAction:(id)sender;
 - (IBAction) decayRateTextFieldAction:(id)sender;
 - (IBAction) excursionTextFieldAction:(id)sender;
 - (IBAction) viewTypeAction:(id)sender;
-- (IBAction) voltsPerMillimeterTextFieldAction:(id)sender;
+- (IBAction) millimetersPerVoltTextFieldAction:(id)sender;
 - (IBAction) getPositionAction:(id)sender;
 - (IBAction) chanMatrixAction:(id)sender;
 - (IBAction) interfaceObjPUAction:(id)sender;

@@ -117,8 +117,8 @@
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(voltsPerMillimeterChanged:)
-                         name : OReGunModelVoltsPerMillimeterChanged
+                     selector : @selector(millimetersPerVoltChanged:)
+                         name : OReGunModelMillimetersPerVoltChanged
 						object: model];
 	
     [notifyCenter addObserver : self
@@ -145,15 +145,9 @@
                      selector : @selector(decayTimeChanged:)
                          name : OReGunModelDecayTimeChanged
 						object: model];
-
     [notifyCenter addObserver : self
-                     selector : @selector(overShootChanged:)
-                         name : OReGunModelOverShootChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(operationTypeChanged:)
-                         name : OReGunModelOperationTypeChanged
+                     selector : @selector(stateStringChanged:)
+                         name : OReGunModelStateStringChanged
 						object: model];
 
 }
@@ -166,32 +160,21 @@
     [self absMotionChanged:nil];
 	[self chanChanged:nil];
 	[self movingChanged:nil];
-	[self voltsPerMillimeterChanged:nil];
+	[self millimetersPerVoltChanged:nil];
 	[self proxyChanged:nil];
 	[self viewTypeChanged:nil];
 	[self excursionChanged:nil];
 	[self decayRateChanged:nil];
 	[self decayTimeChanged:nil];
-	[self overShootChanged:nil];
-	[self operationTypeChanged:nil];
+	[self stateStringChanged:nil];
 }
 
-- (void) operationTypeChanged:(NSNotification*)aNote
+- (void) stateStringChanged:(NSNotification*)aNote
 {
-    [operationTypeMatrix selectCellWithTag:[model operationType]];
-
-	int type = [model operationType];
-	[overShootTextField setEnabled:type == 2];
-	[decayTimeTextField setEnabled:type == 1];
-	[decayRateTextField setEnabled:type == 1];
-	[excursionTextField setEnabled:type == 1];
-
+	if([model stateString])[stateStringTextField setStringValue: [model stateString]];
+	else [stateStringTextField setStringValue: @""];
 }
 
-- (void) overShootChanged:(NSNotification*)aNote
-{
-	[overShootTextField setFloatValue: [model overShoot]];
-}
 
 - (void) decayTimeChanged:(NSNotification*)aNote
 {
@@ -229,9 +212,9 @@
 	
 }
 
-- (void) voltsPerMillimeterChanged:(NSNotification*)aNote
+- (void) millimetersPerVoltChanged:(NSNotification*)aNote
 {
-	[voltsPerMillimeterTextField setFloatValue: [model voltsPerMillimeter]];
+	[millimetersPerVoltTextField setFloatValue: [model millimetersPerVolt]];
 }
 
 - (void) movingChanged:(NSNotification*)aNote
@@ -297,41 +280,32 @@
 
 - (void) cmdPositionChanged:(NSNotification*)aNote
 {
-	float voltsPerMillimeter = [model voltsPerMillimeter];
- 	[[cmdMatrix cellWithTag:0] setFloatValue:[model cmdPosition].x/voltsPerMillimeter];
-	[[cmdMatrix cellWithTag:1] setFloatValue:[model cmdPosition].y/voltsPerMillimeter];
+	float millimetersPerVolt = [model millimetersPerVolt];
+ 	[[cmdMatrix cellWithTag:0] setFloatValue:[model cmdPosition].x*millimetersPerVolt];
+	[[cmdMatrix cellWithTag:1] setFloatValue:[model cmdPosition].y*millimetersPerVolt];
 }
 
 
 - (void) positionChanged:(NSNotification*)aNote
 {
 	[xyPlot setNeedsDisplay:YES];
-	float voltsPerMillimeter = [model voltsPerMillimeter];
-	[xPositionField setFloatValue:[model xyVoltage].x/voltsPerMillimeter];
-	[yPositionField setFloatValue:[model xyVoltage].y/voltsPerMillimeter];
+	float millimetersPerVolt = [model millimetersPerVolt];
+	NSPoint xyVoltage = [model xyVoltage];
+	[xPositionField setFloatValue:(xyVoltage.x + 0.01*xyVoltage.y)*millimetersPerVolt];
+	[yPositionField setFloatValue:(xyVoltage.y + 0.01*xyVoltage.x)*millimetersPerVolt];
 }
 
 - (void) mousePositionReported: (NSNotification*)aNote
 {
     if((GetCurrentKeyModifiers() & shiftKey)){
-		float voltsPerMillimeter = [model voltsPerMillimeter];
-		float x = [[[aNote userInfo] objectForKey:@"x"]floatValue]*voltsPerMillimeter;
-		float y = [[[aNote userInfo] objectForKey:@"y"]floatValue]*voltsPerMillimeter;
+		float millimetersPerVolt = [model millimetersPerVolt];
+		float x = [[[aNote userInfo] objectForKey:@"x"]floatValue]/millimetersPerVolt;
+		float y = [[[aNote userInfo] objectForKey:@"y"]floatValue]/millimetersPerVolt;
         [model setCmdPosition:NSMakePoint(x,y)];
     }
 }
 
 #pragma mark ***Actions
-
-- (void) operationTypeAction:(id)sender
-{
-    [model setOperationType:[[operationTypeMatrix selectedCell] tag]];
-}
-
-- (void) overShootTextFieldAction:(id)sender
-{
-	[model setOverShoot:[sender floatValue]];	
-}
 
 - (void) decayTimeTextFieldAction:(id)sender
 {
@@ -354,9 +328,9 @@
 }
 
 
-- (IBAction) voltsPerMillimeterTextFieldAction:(id)sender
+- (IBAction) millimetersPerVoltTextFieldAction:(id)sender
 {
-	[model setVoltsPerMillimeter:[sender floatValue]];	
+	[model setMillimetersPerVolt:[sender floatValue]];	
 }
 
 - (IBAction) chanMatrixAction:(id)sender
@@ -380,8 +354,8 @@
 
 - (IBAction) cmdPositionAction:(id)sender
 {
-	float voltsPerMillimeter = [model voltsPerMillimeter];
-    [model setCmdPosition:NSMakePoint([[cmdMatrix cellWithTag:0] floatValue]*voltsPerMillimeter,[[cmdMatrix cellWithTag:1] floatValue]*voltsPerMillimeter)];
+	float millimetersPerVolt = [model millimetersPerVolt];
+    [model setCmdPosition:NSMakePoint([[cmdMatrix cellWithTag:0] floatValue]/millimetersPerVolt,[[cmdMatrix cellWithTag:1] floatValue]/millimetersPerVolt)];
 }
 
 - (IBAction) absMotionAction:(id)sender
@@ -412,6 +386,13 @@
 	}
 }
 
+- (IBAction) degaussAction:(id)sender
+{
+	[model degauss];
+}
+
+
+
 #pragma mark ***Plotter delegate methods
 - (unsigned long) plotter:(id)aPlotter numPointsInSet:(int)set
 {
@@ -420,23 +401,24 @@
 
 - (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
 {
-	float voltsPerMillimeter = [model voltsPerMillimeter];
+	float millimetersPerVolt = [model millimetersPerVolt];
     if(index>kNumTrackPoints){
         *xValue = 0;
         *yValue = 0;
         return NO;
     }
     NSPoint track = [model track:index];
-    *xValue = track.x/voltsPerMillimeter;
-    *yValue = track.y/voltsPerMillimeter;
+    *xValue = track.x*millimetersPerVolt;
+    *yValue = track.y*millimetersPerVolt;
     return YES;    
 }
 
 - (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue
 {
-	float voltsPerMillimeter = [model voltsPerMillimeter];
-    *xValue = [model xyVoltage].x/voltsPerMillimeter;
-    *yValue = [model xyVoltage].y/voltsPerMillimeter;
+	float millimetersPerVolt = [model millimetersPerVolt];
+	NSPoint voltage = [model xyVoltage];
+    *xValue = voltage.x*millimetersPerVolt;
+    *yValue = voltage.y*millimetersPerVolt;
     return YES;
 }
 

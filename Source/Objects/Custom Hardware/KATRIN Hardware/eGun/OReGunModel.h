@@ -30,13 +30,14 @@
 		id				y220Object;
         NSPoint         cmdPosition;
         NSPoint         goalPosition;
+        NSPoint         degaussPosition;
         int             pollCount;
         BOOL            absMotion;
         BOOL            goingHome;
         unsigned        currentTrackIndex;
         unsigned        validTrackCount;
         NSPoint         track[kNumTrackPoints];
-		float			voltsPerMillimeter;
+		float			millimetersPerVolt;
         BOOL            moving;
 		unsigned short	chanX;
 		unsigned short	chanY;
@@ -45,8 +46,8 @@
 		float			excursion;
 		float			decayRate;
 		float			decayTime;
-		float			overShoot;
-		int				operationType;
+		int				state;
+    NSString* stateString;
  }
 
 #pragma mark ***Initialization
@@ -55,10 +56,8 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
-- (int) operationType;
-- (void) setOperationType:(int)aOperationType;
-- (float) overShoot;
-- (void) setOverShoot:(float)aOverShoot;
+- (NSString*) stateString;
+- (void) setStateString:(NSString*)aStateString;
 - (float) decayTime;
 - (void) setDecayTime:(float)aDecayTime;
 - (float) decayRate;
@@ -67,8 +66,8 @@
 - (void) setExcursion:(float)aExcursion;
 - (int) viewType;
 - (void) setViewType:(int)aViewType;
-- (float) voltsPerMillimeter;
-- (void) setVoltsPerMillimeter:(float)aVoltsPerMillimeter;
+- (float) millimetersPerVolt;
+- (void) setMillimetersPerVolt:(float)aMillimetersPerVolt;
 - (unsigned short) chanY;
 - (void) setChanY:(unsigned short)aChanY;
 - (unsigned short) chanX;
@@ -92,21 +91,20 @@
 #pragma mark ***eGun Commands
 - (void) getPosition;
 - (void) go;
-- (void) moveToGoal;
 - (void) stopMotion;
 - (void) loadBoard;
+- (void) degauss;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
-extern NSString* OReGunModelOperationTypeChanged;
-extern NSString* OReGunModelOverShootChanged;
+extern NSString* OReGunModelStateStringChanged;
 extern NSString* OReGunModelDecayTimeChanged;
 extern NSString* OReGunModelDecayRateChanged;
 extern NSString* OReGunModelExcursionChanged;
 extern NSString* OReGunModelViewTypeChanged;
-extern NSString* OReGunModelVoltsPerMillimeterChanged;
+extern NSString* OReGunModelMillimetersPerVoltChanged;
 extern NSString* OReGunModelChanYChanged;
 extern NSString* OReGunModelChanXChanged;
 extern NSString* OReGunModelEndEditing;
