@@ -144,7 +144,7 @@ NSString* OReGunLock = @"OReGunLock";
 - (void) setExcursion:(float)aExcursion
 {
 	if(aExcursion<=1)aExcursion=1;
-	else if(aExcursion>95)aExcursion = 95;
+	else if(aExcursion>200)aExcursion = 200;
     [[[self undoManager] prepareWithInvocationTarget:self] setExcursion:excursion];
     
     excursion = aExcursion;
