@@ -35,8 +35,8 @@
     int card  = (*ptr&0x001f0000)>>16;
 
 	ptr++; //first word of the actual card packet
-	int channel		 = *ptr&0x7;
-	int packetLength = (*ptr>>16) - 6;
+	int channel		 = *ptr&0xF;
+	int packetLength = (*ptr>>16) - 7;
 	
 /*	ptr++; //point to led0-15 && 16-31
 	unsigned short led1 = *ptr & 0xffff;
@@ -50,19 +50,19 @@
 	ptr += 2; //point to Energy low word
 	unsigned long energy = *ptr >> 16;
 	ptr++;	  //point to Energy second word
-	energy += (*ptr & 0x0000007f) << 16;
+	energy += (*ptr & 0x000001ff) << 16;
 	
 	// energy is in 2's complement, taking abs value if necessary
-    if((energy >> 22) & 0x1) energy = (~energy + 1) & 0x7fffff;
+    //if((energy >> 22) & 0x1) energy = (~energy + 1) & 0x7fffff;
 
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
 
 
-    [aDataSet histogram:energy>>2 numBins:4096*8 sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
+    [aDataSet histogram:(energy & 0x3FFF) numBins:32768 sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	
-	ptr += 3; //point to the data
+	ptr += 4; //point to the data
 
     NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
 	
@@ -73,8 +73,8 @@
 	int i;
 	int wordCount = 0;
 	for(i=0;i<packetLength;i++){
-		dPtr[wordCount++] =	0x00000fff & *ptr;		
-		dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
+		dPtr[wordCount++] =	0x0000ffff & *ptr;		
+		dPtr[wordCount++] =	(0xffff0000 & *ptr) >> 16;		
 		ptr++;
 	}
     [aDataSet loadWaveform:tmpData 

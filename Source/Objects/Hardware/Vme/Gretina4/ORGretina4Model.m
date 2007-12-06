@@ -1064,7 +1064,7 @@ static struct {
     //cache some stuff
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
     theController   = [[self crate] controllerCard];
-    fifoAddress     = [self baseAddress]*0x100;
+    fifoAddress     = [self baseAddress] + 0x1000;
     fifoStateAddress= [self baseAddress] + register_offsets[kProgrammingDone];
     
     short i;
@@ -1167,10 +1167,10 @@ static struct {
 
 - (void) checkFifoAlarm
 {
-	if(((fifoState & kGretina4FIFOAllFull) == 0) && isRunning){
+	if(((fifoState & kGretina4FIFOAlmostFull) != 0) && isRunning){
 		fifoEmptyCount = 0;
 		if(!fifoFullAlarm){
-			NSString* alarmName = [NSString stringWithFormat:@"FIFO FULL Gretina4 (slot %d)",[self slot]];
+			NSString* alarmName = [NSString stringWithFormat:@"FIFO Almost Full Gretina4 (slot %d)",[self slot]];
 			fifoFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
 			[fifoFullAlarm setSticky:YES];
 			[fifoFullAlarm setHelpString:@"The rate is too high. Adjust the LED Threshold accordingly."];
