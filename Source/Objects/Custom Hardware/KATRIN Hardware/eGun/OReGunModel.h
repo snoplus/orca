@@ -48,6 +48,8 @@
 		float			decayTime;
 		int				state;
     NSString* stateString;
+    float overshoot;
+    float stepTime;
  }
 
 #pragma mark ***Initialization
@@ -56,6 +58,10 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
+- (float) stepTime;
+- (void) setStepTime:(float)aStepTime;
+- (float) overshoot;
+- (void) setOvershoot:(float)aOvershoot;
 - (NSString*) stateString;
 - (void) setStateString:(NSString*)aStateString;
 - (float) decayTime;
@@ -99,6 +105,8 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* OReGunModelStepTimeChanged;
+extern NSString* OReGunModelOvershootChanged;
 extern NSString* OReGunModelStateStringChanged;
 extern NSString* OReGunModelDecayTimeChanged;
 extern NSString* OReGunModelDecayRateChanged;

@@ -24,6 +24,8 @@
 @interface OReGunController : OrcaObjectController
 {
 	IBOutlet NSPopUpButton* interfaceObjPUx;
+	IBOutlet   NSTextField* stepTimeTextField;
+	IBOutlet   NSTextField* overshootTextField;
 	IBOutlet   NSTextField* stateStringTextField;
 	IBOutlet NSTextField*	decayTimeTextField;
 	IBOutlet NSTextField*	decayRateTextField;
@@ -56,6 +58,8 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) stepTimeChanged:(NSNotification*)aNote;
+- (void) overshootChanged:(NSNotification*)aNote;
 - (void) stateStringChanged:(NSNotification*)aNote;
 - (void) decayTimeChanged:(NSNotification*)aNote;
 - (void) decayRateChanged:(NSNotification*)aNote;
@@ -71,6 +75,8 @@
 - (void) movingChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) stepTimeTextFieldAction:(id)sender;
+- (IBAction) overshootTextFieldAction:(id)sender;
 - (IBAction) degaussAction:(id)sender;
 - (IBAction) decayTimeTextFieldAction:(id)sender;
 - (IBAction) decayRateTextFieldAction:(id)sender;
