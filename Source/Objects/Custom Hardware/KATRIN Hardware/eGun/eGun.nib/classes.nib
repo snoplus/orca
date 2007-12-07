@@ -81,6 +81,10 @@
 				<string>id</string>
 				<key>millimetersPerVoltTextFieldAction</key>
 				<string>id</string>
+				<key>overshootTextFieldAction</key>
+				<string>id</string>
+				<key>stepTimeTextFieldAction</key>
+				<string>id</string>
 				<key>stopAction</key>
 				<string>id</string>
 				<key>viewTypeAction</key>
@@ -122,7 +126,11 @@
 				<string>NSTextField</string>
 				<key>moveStatusField</key>
 				<string>NSTextField</string>
+				<key>overshootTextField</key>
+				<string>NSTextField</string>
 				<key>stateStringTextField</key>
+				<string>NSTextField</string>
+				<key>stepTimeTextField</key>
 				<string>NSTextField</string>
 				<key>stopButton</key>
 				<string>NSButton</string>

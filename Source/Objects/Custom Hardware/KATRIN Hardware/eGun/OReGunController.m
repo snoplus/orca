@@ -150,6 +150,16 @@
                          name : OReGunModelStateStringChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(overshootChanged:)
+                         name : OReGunModelOvershootChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(stepTimeChanged:)
+                         name : OReGunModelStepTimeChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -167,6 +177,18 @@
 	[self decayRateChanged:nil];
 	[self decayTimeChanged:nil];
 	[self stateStringChanged:nil];
+	[self overshootChanged:nil];
+	[self stepTimeChanged:nil];
+}
+
+- (void) stepTimeChanged:(NSNotification*)aNote
+{
+	[stepTimeTextField setFloatValue: [model stepTime]];
+}
+
+- (void) overshootChanged:(NSNotification*)aNote
+{
+	[overshootTextField setFloatValue: [model overshoot]];
 }
 
 - (void) stateStringChanged:(NSNotification*)aNote
@@ -306,6 +328,16 @@
 }
 
 #pragma mark ***Actions
+
+- (void) stepTimeTextFieldAction:(id)sender
+{
+	[model setStepTime:[sender floatValue]];	
+}
+
+- (void) overshootTextFieldAction:(id)sender
+{
+	[model setOvershoot:[sender floatValue]];	
+}
 
 - (void) decayTimeTextFieldAction:(id)sender
 {

@@ -24,6 +24,8 @@
 #import "ORObjectProxy.h"
 
 #pragma mark ***External Strings
+NSString* OReGunModelStepTimeChanged = @"OReGunModelStepTimeChanged";
+NSString* OReGunModelOvershootChanged = @"OReGunModelOvershootChanged";
 NSString* OReGunModelStateStringChanged = @"OReGunModelStateStringChanged";
 NSString* OReGunModelDecayTimeChanged = @"OReGunModelDecayTimeChanged";
 NSString* OReGunModelDecayRateChanged = @"OReGunModelDecayRateChanged";
@@ -43,7 +45,6 @@ NSString* OReGunX220ObjectChanged		= @"OReGunX220ObjectChanged";
 NSString* OReGunY220ObjectChanged		= @"OReGunY220ObjectChanged";
 
 NSString* OReGunLock = @"OReGunLock";
-#define eGunStepDelta .2
 
 @implementation OReGunModel
 - (id) init
@@ -91,6 +92,40 @@ NSString* OReGunLock = @"OReGunLock";
 }
 
 #pragma mark ***Accessors
+
+- (float) stepTime
+{
+    return stepTime;
+}
+
+- (void) setStepTime:(float)aStepTime
+{
+	if(aStepTime<.01)aStepTime = .01;
+	else if(aStepTime>2)aStepTime = 2;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setStepTime:stepTime];
+    
+    stepTime = aStepTime;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelStepTimeChanged object:self];
+}
+
+- (float) overshoot
+{
+    return overshoot;
+}
+
+- (void) setOvershoot:(float)aOvershoot
+{
+	if(aOvershoot<0)aOvershoot=0;
+	else if(aOvershoot>300)aOvershoot=300;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setOvershoot:overshoot];
+    
+    overshoot = aOvershoot;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelOvershootChanged object:self];
+}
 
 - (NSString*) stateString
 {
@@ -318,6 +353,8 @@ NSString* OReGunLock = @"OReGunLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setStepTime:[decoder decodeFloatForKey:@"OReGunModelStepTime"]];
+	[self setOvershoot:[decoder decodeFloatForKey:@"OReGunModelOvershoot"]];
 	[self setDecayTime:[decoder decodeFloatForKey:@"OReGunModelDecayTime"]];
 	[self setDecayRate:[decoder decodeFloatForKey:@"OReGunModelDecayRate"]];
 	[self setExcursion:[decoder decodeFloatForKey:@"OReGunModelExcursion"]];
@@ -336,6 +373,8 @@ NSString* OReGunLock = @"OReGunLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeFloat:stepTime forKey:@"OReGunModelStepTime"];
+    [encoder encodeFloat:overshoot forKey:@"OReGunModelOvershoot"];
     [encoder encodeFloat:decayTime forKey:@"OReGunModelDecayTime"];
     [encoder encodeFloat:decayRate forKey:@"OReGunModelDecayRate"];
     [encoder encodeFloat:excursion forKey:@"OReGunModelExcursion"];
@@ -377,15 +416,15 @@ NSString* OReGunLock = @"OReGunLock";
 		goalPosition = NSMakePoint(xyVolts.x+cmdPosition.x, xyVolts.y+cmdPosition.x);
 	}
 	//Start move past to 0,0
-	[self setStateString:@"Moving 40% Past 0,0"];
+	[self setStateString:[NSString stringWithFormat:@"Moving %.0f%% Past 0,0",overshoot]];
 	NSPoint currentPt	= [self xyVoltage];
-	NSPoint delta 		= NSMakePoint((0 - currentPt.x)*.40,(0 - currentPt.y)*.40);
+	NSPoint delta 		= NSMakePoint((0 - currentPt.x)*overshoot/100.,(0 - currentPt.y)*overshoot/100.);
 	NSPoint newPt		= NSMakePoint(0 + delta.x,0 + delta.y);
 
 	[self setXyVoltage:newPt];
 	[self loadBoard];
 	[self updateTrack];
-	[self performSelector:@selector(step1) withObject:nil afterDelay:eGunStepDelta];
+	[self performSelector:@selector(step1) withObject:nil afterDelay:stepTime];
 }
 
 - (void) step1
@@ -396,7 +435,7 @@ NSString* OReGunLock = @"OReGunLock";
 	[self setXyVoltage:NSMakePoint(-100./millimetersPerVolt,-100./millimetersPerVolt)];
 	[self loadBoard];
 	[self updateTrack];
-	[self performSelector:@selector(step2) withObject:nil afterDelay:eGunStepDelta];
+	[self performSelector:@selector(step2) withObject:nil afterDelay:stepTime];
 	
 }
 
@@ -407,7 +446,7 @@ NSString* OReGunLock = @"OReGunLock";
 	[self setXyVoltage:NSMakePoint(100./millimetersPerVolt,100./millimetersPerVolt)];
 	[self loadBoard];
 	[self updateTrack];
-	[self performSelector:@selector(step3) withObject:nil afterDelay:eGunStepDelta];
+	[self performSelector:@selector(step3) withObject:nil afterDelay:stepTime];
 }
 
 
@@ -418,7 +457,7 @@ NSString* OReGunLock = @"OReGunLock";
 	[self setXyVoltage:NSMakePoint(0,0)];
 	[self loadBoard];
 	[self updateTrack];
-	[self performSelector:@selector(step4) withObject:nil afterDelay:eGunStepDelta];
+	[self performSelector:@selector(step4) withObject:nil afterDelay:stepTime];
 }
 
 
@@ -426,7 +465,7 @@ NSString* OReGunLock = @"OReGunLock";
 {
 	[self setStateString:@"Degaussing"];
 	[self degauss];
-	[self performSelector:@selector(step5) withObject:nil afterDelay:eGunStepDelta];
+	[self performSelector:@selector(step5) withObject:nil afterDelay:stepTime];
 }
 
 - (void) step5
@@ -434,14 +473,14 @@ NSString* OReGunLock = @"OReGunLock";
 	//wait for degauss to finish
 	if(moving){
 		[self setStateString:@"Wait for Degauss"];
-		[self performSelector:@selector(step5) withObject:nil afterDelay:eGunStepDelta];
+		[self performSelector:@selector(step5) withObject:nil afterDelay:stepTime];
 	}
 	else {
 		[self setMoving:YES];
 		[self setXyVoltage:goalPosition];
 		[self loadBoard];
 		[self updateTrack];
-		[self performSelector:@selector(step6) withObject:nil afterDelay:eGunStepDelta];
+		[self performSelector:@selector(step6) withObject:nil afterDelay:stepTime];
 	}
 }
 
@@ -450,7 +489,7 @@ NSString* OReGunLock = @"OReGunLock";
 	[self setStateString:@"Degaussing"];
 	//NSPoint currentPosition = [self xyVoltage];
 	[self degauss];
-	[self performSelector:@selector(step7) withObject:nil afterDelay:eGunStepDelta];
+	[self performSelector:@selector(step7) withObject:nil afterDelay:stepTime];
 }
 
 - (void) step7
@@ -458,7 +497,7 @@ NSString* OReGunLock = @"OReGunLock";
 	//wait for degauss to finish
 	if(moving){
 		[self setStateString:@"Wait for Degauss"];
-		[self performSelector:@selector(step7) withObject:nil afterDelay:eGunStepDelta];
+		[self performSelector:@selector(step7) withObject:nil afterDelay:stepTime];
 	}
 	else {
 		[self setMoving:NO];
