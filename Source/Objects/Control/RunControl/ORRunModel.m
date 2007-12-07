@@ -254,7 +254,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 -(BOOL)isRunning
 {
-//    return dataTakingThreadRunning || stillWaitingForOthers;
 	return [self runningState] != eRunStopped;
 }
 
@@ -773,7 +772,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitForRunToStop) object:nil];
 
-	stillWaitingForOthers = YES;
     //wait for runthread to exit
     if(dataTakingThreadRunning){
 		timeToStopTakingData= YES;
@@ -841,8 +839,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	
 	//closeout run will wait until the processing thread is done.
 	[nextObject closeOutRun:dataPacket userInfo:nil];
-
-	stillWaitingForOthers = NO;
 	   
 	if([[ORGlobal sharedInstance] runMode] == kNormalRun){
 		NSLog(@"Run %d stopped.\n",_currentRun);
