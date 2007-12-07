@@ -73,6 +73,7 @@
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
+    IBOutlet NSButton*      resetButton;
     IBOutlet NSButton*      clearFIFOButton;
     IBOutlet NSButton*      probeButton;
     IBOutlet NSButton*      statusButton;
@@ -149,6 +150,7 @@
 - (IBAction) cardInfoAction:(id) sender;
 - (IBAction) probeBoard:(id)sender;
 - (IBAction) readStatus:(id)sender;
+- (IBAction) resetBoard:(id)sender;
 - (IBAction) initBoard:(id)sender;
 - (IBAction) clearFIFO:(id)sender;
 - (IBAction) integrationAction:(id)sender;

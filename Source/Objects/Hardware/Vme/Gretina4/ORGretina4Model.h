@@ -77,7 +77,7 @@ enum {
 	kFBConfig,					//[36] FB_Config
 	kSDRead,					//[37] SD_Read
 	kSDWrite,					//[38] SD_Write
-	kSDConfig,					//[39] SD_Config
+	kSDConfig,					//[39] SD_Config; This has a number of important set/reset bits
 	kADCConfig,					//[40] Adc config
 	kSelfTriggerEnable,			//[41] self trigger enable
 	kSelfTriggerPeriod,			//[42] self trigger period
@@ -221,6 +221,8 @@ enum Gretina4FIFOStates {
 
 #pragma mark ¥¥¥Hardware Access
 - (short) readBoardID;
+- (void) resetBoard;
+- (void) resetDCM;
 - (void) initBoard;
 - (void) initSerDes;
 - (unsigned long) readControlReg:(int)channel;

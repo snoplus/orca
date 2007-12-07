@@ -724,12 +724,16 @@
     [gSecurity tryToSetLock:ORGretina4SettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
+- (IBAction) resetBoard:(id) sender
+{
+    [model resetBoard];
+}
 
 -(IBAction)initBoard:(id)sender
 {
     NS_DURING
         [self endEditing];
-        [model initBoard];		//initialize and load hardward
+        [model initBoard];		//initialize and load hardware
         NSLog(@"Initialized Gretina4 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
     NS_HANDLER

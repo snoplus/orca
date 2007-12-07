@@ -73,8 +73,8 @@
 	int i;
 	int wordCount = 0;
 	for(i=0;i<packetLength;i++){
-		dPtr[wordCount++] =	0x0000ffff & *ptr;		
-		dPtr[wordCount++] =	(0xffff0000 & *ptr) >> 16;		
+		dPtr[wordCount++] =	0x00003fff & *ptr;		
+		dPtr[wordCount++] =	(0x3fff0000 & *ptr) >> 16;		
 		ptr++;
 	}
     [aDataSet loadWaveform:tmpData 

@@ -485,6 +485,42 @@ static struct {
     return theValue & 0xffff;
 }
 
+- (void) resetDCM
+{
+    unsigned long theValue = 0;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_offsets[kSDConfig]
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+                        usingAddSpace:0x01];
+    
+    /* To reset the DCM, assert bit 9 of this register. */
+    theValue |= 0x200;
+    
+    [[self adapter] writeLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_offsets[kSDConfig]
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                        usingAddSpace:0x01];
+    /* OK, that should do it. */
+}
+
+- (void) resetBoard
+{
+    /* First disable all channels. This does not affect the model state,
+       just the board state. */
+    int i;
+    for(i=0;i<kNumGretina4Channels;i++){
+        [self writeControlReg:i enabled:NO];
+    }
+
+    /* Then reset the DCM clock. (This will also reset the serdes.) */
+    [self resetDCM];
+    
+    /* Finally, initialize the serdes. */
+    [self initSerDes];
+}
+
 - (void) initSerDes
 {
     unsigned long theValue = 0;
@@ -590,7 +626,7 @@ static struct {
 
 - (void) writeCFDParameters:(int)channel
 {    
-    unsigned long theValue = ((cfdDelay[channel] & 0x1F) << 7) | ((cfdFraction[channel] & 0x3) << 5) | (cfdThreshold[channel] & 0xF);
+    unsigned long theValue = ((cfdDelay[channel] & 0x3F) << 7) | ((cfdFraction[channel] & 0x3) << 5) | (cfdThreshold[channel]);
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_offsets[kCFDParameters] + 4*channel
                         numToWrite:1
