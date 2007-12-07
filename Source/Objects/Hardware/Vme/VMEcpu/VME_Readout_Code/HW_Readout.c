@@ -605,7 +605,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
      
 
 
-    if ((fifoState & fifoEmptyMask) != 0) {
+    if ((fifoState & fifoEmptyMask) == 0) {
 
         gretinaStruct.address = fifoAddress & 0xFFFF0000; 
         gretinaStruct.addressModifier = fifoAddressMod; 
