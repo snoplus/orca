@@ -52,6 +52,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 @interface ORRunModel (private)
 - (void) startRun1:(NSNumber*)doInit;
+- (void) waitForRunToStop;
+- (void) finishRunStop;
+
 @end
 
 @implementation ORRunModel
@@ -761,20 +764,32 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [heartBeatTimer release];
     heartBeatTimer = nil;
     
-    
+	totalWaitTime = 0;
+	[self waitForRunToStop];
+	
+}
+
+- (void) waitForRunToStop
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitForRunToStop) object:nil];
+
 	stillWaitingForOthers = YES;
     //wait for runthread to exit
-	float totalTime = 0;
-    while(dataTakingThreadRunning){
+    if(dataTakingThreadRunning){
 		timeToStopTakingData= YES;
-		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.05]];
-		totalTime += .105;
-		if(totalTime > 1000){
+		totalWaitTime += .1;
+		if(totalWaitTime > 10){
 			NSLogColor([NSColor redColor], @"Run Thread Failed to stop.....You should stop and restart ORCA!\n");
-			break;
+			[self finishRunStop];
 		}
+		[self performSelector:@selector(waitForRunToStop) withObject:nil afterDelay:.1];
 	}
+	else [self finishRunStop];
 
+}
+
+- (void) finishRunStop
+{
 	[dataTypeAssigner release];
 	dataTypeAssigner = nil;
     

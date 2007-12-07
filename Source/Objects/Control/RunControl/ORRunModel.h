@@ -73,6 +73,8 @@
 		BOOL		timeToStopTakingData;
 		BOOL		dataTakingThreadRunning;
 		BOOL		stillWaitingForOthers;
+		float		totalWaitTime;
+
 }
 
 
