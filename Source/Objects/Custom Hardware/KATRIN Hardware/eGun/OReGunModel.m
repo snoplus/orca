@@ -376,6 +376,20 @@ NSString* OReGunLock = @"OReGunLock";
 		NSPoint xyVolts = [self xyVoltage];
 		goalPosition = NSMakePoint(xyVolts.x+cmdPosition.x, xyVolts.y+cmdPosition.x);
 	}
+	//Start move past to 0,0
+	[self setStateString:@"Moving 40% Past 0,0"];
+	NSPoint currentPt	= [self xyVoltage];
+	NSPoint delta 		= NSMakePoint((0 - currentPt.x)*.40,(0 - currentPt.y)*.40);
+	NSPoint newPt		= NSMakePoint(0 + delta.x,0 + delta.y);
+
+	[self setXyVoltage:newPt];
+	[self loadBoard];
+	[self updateTrack];
+	[self performSelector:@selector(step1) withObject:nil afterDelay:eGunStepDelta];
+}
+
+- (void) step1
+{
 	//Step 1 move to -100,-100
  	[self setMoving:YES];
 	[self setStateString:@"Moving To -100,-100"];
@@ -396,21 +410,8 @@ NSString* OReGunLock = @"OReGunLock";
 	[self performSelector:@selector(step3) withObject:nil afterDelay:eGunStepDelta];
 }
 
+
 - (void) step3
-{
-	//Step 3 move past to 0,0
-	[self setStateString:@"Moving 40% Past 0,0"];
-	NSPoint currentPt	= [self xyVoltage];
-	NSPoint delta 		= NSMakePoint((degaussPosition.x - currentPt.x)*.40,(degaussPosition.y - currentPt.y)*.40);
-	NSPoint newPt		= NSMakePoint(degaussPosition.x + delta.x,degaussPosition.y + delta.y);
-
-	[self setXyVoltage:newPt];
-	[self loadBoard];
-	[self updateTrack];
-	[self performSelector:@selector(step3a) withObject:nil afterDelay:eGunStepDelta];
-}
-
-- (void) step3a
 {
 	//Step 3 move to 0,0
 	[self setStateString:@"Moving To 0,0"];
