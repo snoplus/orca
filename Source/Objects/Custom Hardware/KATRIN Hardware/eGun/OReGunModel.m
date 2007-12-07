@@ -43,6 +43,7 @@ NSString* OReGunX220ObjectChanged		= @"OReGunX220ObjectChanged";
 NSString* OReGunY220ObjectChanged		= @"OReGunY220ObjectChanged";
 
 NSString* OReGunLock = @"OReGunLock";
+#define eGunStepDelta .2
 
 @implementation OReGunModel
 - (id) init
@@ -381,7 +382,7 @@ NSString* OReGunLock = @"OReGunLock";
 	[self setXyVoltage:NSMakePoint(-100./millimetersPerVolt,-100./millimetersPerVolt)];
 	[self loadBoard];
 	[self updateTrack];
-	[self performSelector:@selector(step2) withObject:nil afterDelay:.2];
+	[self performSelector:@selector(step2) withObject:nil afterDelay:eGunStepDelta];
 	
 }
 
@@ -392,24 +393,39 @@ NSString* OReGunLock = @"OReGunLock";
 	[self setXyVoltage:NSMakePoint(100./millimetersPerVolt,100./millimetersPerVolt)];
 	[self loadBoard];
 	[self updateTrack];
-	[self performSelector:@selector(step3) withObject:nil afterDelay:.2];
+	[self performSelector:@selector(step3) withObject:nil afterDelay:eGunStepDelta];
 }
 
 - (void) step3
+{
+	//Step 3 move past to 0,0
+	[self setStateString:@"Moving 40% Past 0,0"];
+	NSPoint currentPt	= [self xyVoltage];
+	NSPoint delta 		= NSMakePoint((degaussPosition.x - currentPt.x)*.40,(degaussPosition.y - currentPt.y)*.40);
+	NSPoint newPt		= NSMakePoint(degaussPosition.x + delta.x,degaussPosition.y + delta.y);
+
+	[self setXyVoltage:newPt];
+	[self loadBoard];
+	[self updateTrack];
+	[self performSelector:@selector(step3a) withObject:nil afterDelay:eGunStepDelta];
+}
+
+- (void) step3a
 {
 	//Step 3 move to 0,0
 	[self setStateString:@"Moving To 0,0"];
 	[self setXyVoltage:NSMakePoint(0,0)];
 	[self loadBoard];
 	[self updateTrack];
-	[self performSelector:@selector(step4) withObject:nil afterDelay:.2];
+	[self performSelector:@selector(step4) withObject:nil afterDelay:eGunStepDelta];
 }
+
 
 - (void) step4
 {
 	[self setStateString:@"Degaussing"];
 	[self degauss];
-	[self performSelector:@selector(step5) withObject:nil afterDelay:.2];
+	[self performSelector:@selector(step5) withObject:nil afterDelay:eGunStepDelta];
 }
 
 - (void) step5
@@ -417,14 +433,14 @@ NSString* OReGunLock = @"OReGunLock";
 	//wait for degauss to finish
 	if(moving){
 		[self setStateString:@"Wait for Degauss"];
-		[self performSelector:@selector(step5) withObject:nil afterDelay:.2];
+		[self performSelector:@selector(step5) withObject:nil afterDelay:eGunStepDelta];
 	}
 	else {
 		[self setMoving:YES];
 		[self setXyVoltage:goalPosition];
 		[self loadBoard];
 		[self updateTrack];
-		[self performSelector:@selector(step6) withObject:nil afterDelay:.2];
+		[self performSelector:@selector(step6) withObject:nil afterDelay:eGunStepDelta];
 	}
 }
 
@@ -433,7 +449,7 @@ NSString* OReGunLock = @"OReGunLock";
 	[self setStateString:@"Degaussing"];
 	//NSPoint currentPosition = [self xyVoltage];
 	[self degauss];
-	[self performSelector:@selector(step7) withObject:nil afterDelay:.2];
+	[self performSelector:@selector(step7) withObject:nil afterDelay:eGunStepDelta];
 }
 
 - (void) step7
@@ -441,7 +457,7 @@ NSString* OReGunLock = @"OReGunLock";
 	//wait for degauss to finish
 	if(moving){
 		[self setStateString:@"Wait for Degauss"];
-		[self performSelector:@selector(step7) withObject:nil afterDelay:.2];
+		[self performSelector:@selector(step7) withObject:nil afterDelay:eGunStepDelta];
 	}
 	else {
 		[self setMoving:NO];
