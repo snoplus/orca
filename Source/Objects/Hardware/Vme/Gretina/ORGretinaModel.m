@@ -579,7 +579,7 @@ static struct {
 						   numToRead:1
 						  withAddMod:0x29
 					   usingAddSpace:0x01];
-		if((val & kGretinaFIFOEmpty) != 0){
+		if((val & kGretinaFIFOEmpty) == 0){
 			//read the first longword which should be the packet separator: 0xAAAAAAAA
 			unsigned long theValue;
 			[theController readLongBlock:&theValue 
@@ -1071,6 +1071,15 @@ static struct {
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
+
+    /* The current hardware specific data is:               *
+     *                                                      *
+     * 0: FIFO state address                                *
+     * 1: FIFO empty state mask                             *
+     * 2: FIFO address                                      *
+     * 3: FIFO address AM                                   *
+     * 4: FIFO size                                         */
+    
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id	= kGretina; //should be unique
 	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
@@ -1078,7 +1087,11 @@ static struct {
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= [self addressModifier];
 	configStruct->card_info[index].base_add		= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0]	= register_offsets[kProgrammingDone];
+	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_offsets[kProgrammingDone];
+    configStruct->card_info[index].deviceSpecificData[1]	= kGretinaFIFOEmpty;
+    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] * 0x100;
+    configStruct->card_info[index].deviceSpecificData[3]	= 0x39;
+    configStruct->card_info[index].deviceSpecificData[4]	= 0x4000;
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

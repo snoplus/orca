@@ -27,6 +27,7 @@
 #import "ORVmeCrateModel.h"
 #import "ORRateGroup.h"
 #import "ORTimer.h"
+#import "VME_HW_Definitions.h"
 
 NSString* ORGretina4ModelNoiseFloorIntegrationTimeChanged = @"ORGretina4ModelNoiseFloorIntegrationTimeChanged";
 NSString* ORGretina4ModelNoiseFloorOffsetChanged = @"ORGretina4ModelNoiseFloorOffsetChanged";
@@ -663,7 +664,7 @@ static struct {
 	NSDate* startDate = [NSDate date];
     fifoStateAddress  = [self baseAddress] + register_offsets[kProgrammingDone];
     fifoAddress       = [self baseAddress] + 0x1000;
-	theController     = [[self crate] controllerCard];
+	theController     = [self adapter];
 	unsigned long  dataDump[0xffff];
 	BOOL error		  = NO;
     while(1){
@@ -712,8 +713,8 @@ static struct {
     }
 
 	if(error){
-		NSLog(@"unable to clear FIFO on Gretina4 card (slot %d)\n",[self slot]);
-		[NSException raise:@"Getina card Error" format:@"unable to clear FIFO on Gretina4 card (slot %d)",[self slot]];
+		NSLog(@"Unable to clear FIFO on Gretina4 card (slot %d)\n",[self slot]);
+		[NSException raise:@"Gretina card Error" format:@"unable to clear FIFO on Gretina4 card (slot %d)",[self slot]];
 	}
 	
 	return count;
@@ -1063,7 +1064,7 @@ static struct {
     
     //cache some stuff
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
-    theController   = [[self crate] controllerCard];
+    theController   = [self adapter];
     fifoAddress     = [self baseAddress] + 0x1000;
     fifoStateAddress= [self baseAddress] + register_offsets[kProgrammingDone];
     
@@ -1226,6 +1227,36 @@ static struct {
     for(i=0;i<kNumGretina4Channels;i++){
         waveFormCount[i]=0;
     }
+}
+
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+
+    /* The current hardware specific data is:               *
+     *                                                      *
+     * 0: FIFO state address                                *
+     * 1: FIFO empty state mask                             *
+     * 2: FIFO address                                      *
+     * 3: FIFO address AM                                   *
+     * 4: FIFO size                                         */
+    
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id	= kGretina; //should be unique
+	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
+	configStruct->card_info[index].slot			= [self slot];
+	configStruct->card_info[index].crate		= [self crateNumber];
+	configStruct->card_info[index].add_mod		= [self addressModifier];
+	configStruct->card_info[index].base_add		= [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_offsets[kProgrammingDone];
+    configStruct->card_info[index].deviceSpecificData[1]	= kGretina4FIFOEmpty;
+    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + 0x1000;
+    configStruct->card_info[index].deviceSpecificData[3]	= 0x09;
+    configStruct->card_info[index].deviceSpecificData[4]	= 0x1FFFF;
+	configStruct->card_info[index].num_Trigger_Indexes		= 0;
+	
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	
+	return index+1;
 }
 
 #pragma mark ¥¥¥Archival

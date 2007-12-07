@@ -255,7 +255,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		usingAddSpace:(unsigned short) anAddressSpace
 {
 	if(![sbcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connectconnecteded."];
+		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readLongBlock:readAddress
 					atAddress:vmeAddress

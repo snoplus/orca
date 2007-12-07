@@ -23,6 +23,7 @@
 #import "ORVmeIOCard.h";
 #import "ORDataTaker.h";
 #import "ORHWWizard.h";
+#import "SBC_Config.h";
 
 @class ORRateGroup;
 @class ORAlarm;
@@ -250,6 +251,7 @@ enum Gretina4FIFOStates {
 - (void) clearWaveFormCounts;
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (void) checkFifoAlarm;
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
 #pragma mark ¥¥¥HW Wizard
 - (int) numberOfChannels;

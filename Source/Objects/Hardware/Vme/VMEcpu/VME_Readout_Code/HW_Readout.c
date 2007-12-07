@@ -564,50 +564,68 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index)
 int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
 {
 
-#define kGretinaFIFOEmpty       0x800
-#define kGretinaFIFOAlmostEmpty 0x1000
-#define kGretinaFIFOHalfFull    0x2000
-#define kGretinaFIFOAllFull     0x4000
-   
     static SBC_VmeWriteBlockStruct gretinaStruct = 
         {0x0, 0x39, 0x1, 0x4, 0x0, 0x0}; 
-    static int32_t vmeAM39Handle = 0;
-    static uint16_t fifoState;
+    static int32_t vmeReadOutHandle = 0;
+    static int32_t vmeFIFOStateReadOutHandle = 0;
+    static uint32_t fifoState;
+    static int32_t dataBuffer[0xffff];
 
-    uint32_t baseAddress = config->card_info[index].base_add;
-    uint32_t fifoStateAddress = 
-        baseAddress + config->card_info[index].deviceSpecificData[0];
-    uint32_t fifoAddress = baseAddress * 0x100;
-    uint32_t dataId      = config->card_info[index].hw_mask[0];
-    uint32_t slot        = config->card_info[index].slot;
-    uint32_t crate       = config->card_info[index].crate;
-    uint32_t location    = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
+    //uint32_t baseAddress      = config->card_info[index].base_add;
+    uint32_t fifoStateAddress = config->card_info[index].deviceSpecificData[0];
+    uint32_t fifoEmptyMask    = config->card_info[index].deviceSpecificData[1];
+    uint32_t fifoAddress      = config->card_info[index].deviceSpecificData[2];
+    uint32_t fifoAddressMod   = config->card_info[index].deviceSpecificData[3];
+    uint32_t sizeOfFIFO       = config->card_info[index].deviceSpecificData[3];
+    uint32_t dataId           = config->card_info[index].hw_mask[0];
+    uint32_t slot             = config->card_info[index].slot;
+    uint32_t crate            = config->card_info[index].crate;
+    uint32_t location         = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
 
 
     //read the fifo state
-    int32_t result  = vme_read(vmeAM29Handle,fifoStateAddress,(uint8_t*)&fifoState,2); 
-    int32_t dataBuffer[0xffff];
-   
-    gretinaStruct.address = fifoAddress; 
-    vmeAM39Handle = openNewDevice("lsi2", &gretinaStruct); 
-
-    if (vmeAM39Handle < 0) {
+    int32_t result;
+    fifoState = 0;
+    gretinaStruct.addressModifier = config->card_info[index].add_mod;
+    if (config->card_info[index].add_mod == 0x29) {
+        result = vme_read(vmeAM29Handle,fifoStateAddress,(uint8_t*)&fifoState,2); 
+    } else {
+        gretinaStruct.address = fifoStateAddress & 0xFFFF0000;
+        vmeFIFOStateReadOutHandle = openNewDevice("lsi3", &gretinaStruct);
+        if (vmeFIFOStateReadOutHandle < 0) {
+            return config->card_info[index].next_Card_Index;
+        }
+        result = vme_read(vmeFIFOStateReadOutHandle, fifoStateAddress & 0xFFFF, 
+            (uint8_t*)&fifoState, 4);
+        closeDevice(vmeFIFOStateReadOutHandle);
+    }
+    if (result <= 0) {
         return config->card_info[index].next_Card_Index;
     }
+     
 
-    if(result == 2 && ((fifoState & kGretinaFIFOEmpty) != 0)){
+
+    if ((fifoState & fifoEmptyMask) != 0) {
+
+        gretinaStruct.address = fifoAddress & 0xFFFF0000; 
+        gretinaStruct.addressModifier = fifoAddressMod; 
+        vmeReadOutHandle = openNewDevice("lsi2", &gretinaStruct); 
+        if (vmeReadOutHandle < 0) {
+            return config->card_info[index].next_Card_Index;
+        }
+
         uint32_t numLongs = 0;
         dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
         dataBuffer[numLongs++] = location;
         
         //read the first int32_tword which should be the packet separator: 0xAAAAAAAA
         uint32_t theValue;
-        result = vme_read(vmeAM39Handle,0x0,(uint8_t*)&theValue,4); 
+        result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,(uint8_t*)&theValue,4); 
         
-        if(result == 4 && (theValue==0xAAAAAAAA)){
+        if (result == 4 && (theValue==0xAAAAAAAA)){
             
             //read the first word of actual data so we know how much to read
-            result = vme_read(vmeAM39Handle,0x0,(uint8_t*)&theValue,4); 
+            result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,(uint8_t*)&theValue,4); 
             
             dataBuffer[numLongs++] = theValue;
                         
@@ -615,20 +633,26 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
             
             int32_t totalNumLongs = (numLongs + numLongsLeft);
              
-            while (numLongs != totalNumLongs) {
-                result = vme_read(vmeAM39Handle,0x0,(uint8_t*) (dataBuffer + numLongs),4); 
-                if (result != 4) {
+            if ((fifoAddressMod & 0x9) == 0x9) {
+                /* No BLT's */
+                while (numLongs != totalNumLongs) {
+                    result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,
+                        (uint8_t*) (dataBuffer + numLongs),4); 
+                    if (result != 4) {
+                        /* Error, FixME how to report this? */
+                        return config->card_info[index].next_Card_Index;
+                    }
+                    numLongs++;
+                }
+            } else {
+                result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,
+                    (uint8_t*) (dataBuffer + numLongs),numLongsLeft*sizeof(uint32_t)); 
+                if (result != numLongsLeft*sizeof(uint32_t)) {
                     /* Error, FixME how to report this? */
                     return config->card_info[index].next_Card_Index;
                 }
-                numLongs++;
             }
                           
-            /*result = vme_read(vmeAM39Handle,0x0,(uint8_t*) (dataBuffer + numLongs),4*numLongsLeft); 
-            if (result != 4*numLongsLeft) {
-                *//* something bad happened. */
-                /*return config->card_info[index].next_Card_Index;
-            }*/
             dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
             /* Swap here?! */
             if (needToSwap) SwapLongBlock(dataBuffer, totalNumLongs);
@@ -636,31 +660,15 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
         }
         else {
             //oops... really bad -- the buffer read is out of sequence -- dump it all
-            while(1){
-                uint16_t val;
-                //read the fifo state
-               int32_t result = vme_read(vmeAM29Handle,fifoStateAddress,(uint8_t*)&val,2); 
-
-                 if (result ==2 && (val & kGretinaFIFOEmpty) != 0) {
-                    //read the first longword which should be the packet separator: 0xAAAAAAAA
-                    uint32_t theValue;
-                      result    = vme_read(vmeAM39Handle,0x0,(uint8_t*)&theValue,4); 
-                     
-                    if (result == 4 && theValue==0xAAAAAAAA) {
-                        //read the first word of actual data so we know how much to read
-                       result    = vme_read(vmeAM39Handle,0x0,(uint8_t*)&val,4); 
-                       if(result != 4)break;
-                       result    = vme_read(vmeAM39Handle,0x0,(uint8_t*)dataBuffer,4*((val & 0xffff0000)>>16)-1);                                                          
-                        if(result != ((val & 0xffff0000)>>16)-1)break;
-                    } else {
-                        break;
-                    }
-                }
-                else break;
-             }
+            uint32_t i = 0;
+            while(i < sizeOfFIFO) {
+                result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,
+                    (uint8_t*) (&theValue),4); 
+                i++;
+            }
         }
+        closeDevice(vmeReadOutHandle);
     }
-    closeDevice(vmeAM39Handle);
     return config->card_info[index].next_Card_Index;
 }            
 
