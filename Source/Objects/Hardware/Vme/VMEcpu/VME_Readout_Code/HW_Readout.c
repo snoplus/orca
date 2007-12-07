@@ -313,7 +313,7 @@ void doWriteBlock(SBC_Packet* aPacket)
         /* The address must be byte-aligned */ 
         startAddress = p->address & 0xFFFF;
         p->address = p->address & 0xFFFF0000;
-        memMapHandle = openNewDevice("lsi2", p); 
+        memMapHandle = openNewDevice("lsi5", p); 
         if (memMapHandle < 0) {
             sprintf(aPacket->message,"error: %d %d : %s\n",(int32_t)memMapHandle,(int32_t)errno,strerror(errno));
             p->errorCode = -1;
@@ -409,7 +409,7 @@ void doReadBlock(SBC_Packet* aPacket)
         startAddress = p->address & 0xFFFF;
         p->address = p->address & 0xFFFF0000;
         
-        memMapHandle = openNewDevice("lsi2", (SBC_VmeWriteBlockStruct*)p); 
+        memMapHandle = openNewDevice("lsi5", (SBC_VmeWriteBlockStruct*)p); 
         if (memMapHandle < 0) {
             sprintf(aPacket->message,"error: %d %d : %s\n",
                 (int32_t)memMapHandle,(int32_t)errno,strerror(errno));

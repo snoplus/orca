@@ -48,6 +48,7 @@
                 poleZeroEnabledAction = id; 
                 probeBoard = id; 
                 readStatus = id; 
+                resetBoard = id; 
                 settingLockAction = id; 
                 triggerModeAction = id; 
             }; 
@@ -92,6 +93,7 @@
                 rate0 = ORValueBar; 
                 rateLogCB = NSButton; 
                 rateTextFields = NSMatrix; 
+                resetButton = NSButton; 
                 settingLockButton = NSButton; 
                 slotField = NSTextField; 
                 startNoiseFloorButton = NSButton; 

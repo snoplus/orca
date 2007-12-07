@@ -982,7 +982,7 @@ static struct {
     dataBuffer = (unsigned long*)malloc(0xffff * sizeof(long));
     [self startRates];
 	
-	[self initBoard];
+    [self initBoard];
 	
     isRunning = YES; 
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
