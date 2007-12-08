@@ -78,6 +78,7 @@
     [self activePlotChanged:nil];
     [self plotNameChanged:nil];
     [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+	[plotter setUseGradient:YES];
 
 }
 
