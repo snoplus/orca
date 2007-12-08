@@ -44,6 +44,8 @@ static unsigned long register_offsets[kNumberOfV265Registers] = {
 };
 
 #pragma mark •••Notification Strings
+NSString* ORCaen265ModelSuppressZerosChanged = @"ORCaen265ModelSuppressZerosChanged";
+NSString* ORCaen265ModelEnabledMaskChanged = @"ORCaen265ModelEnabledMaskChanged";
 NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 
 @implementation ORCaen265Model
@@ -77,12 +79,51 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 
 
 #pragma mark •••Accessors
+
+- (BOOL) suppressZeros
+{
+    return suppressZeros;
+}
+
+- (void) setSuppressZeros:(BOOL)aSuppressZeros
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSuppressZeros:suppressZeros];
+    
+    suppressZeros = aSuppressZeros;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen265ModelSuppressZerosChanged object:self];
+}
+
+- (unsigned short) enabledMask
+{
+    return enabledMask;
+}
+
+- (void) setEnabledMask:(unsigned short)aEnabledMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
+    
+    enabledMask = aEnabledMask;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen265ModelEnabledMaskChanged object:self];
+}
+
 - (unsigned long) dataId { return dataId; }
+
 - (void) setDataId: (unsigned long) DataId
 {
     dataId = DataId;
 }
 
+- (void) setDataIds:(id)assigner
+{
+    dataId = [assigner assignDataIds:kShortForm]; //short form preferred
+}
+
+- (void) syncDataIdsWith:(id)anotherCaen265
+{
+    [self setDataId:[anotherCaen265 dataId]];
+}
 
 #pragma mark •••Hardware Access
 - (void) initBoard
@@ -139,7 +180,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
         @"ORCaen265DecoderForAdc",							@"decoder",
         [NSNumber numberWithLong:dataId],					@"dataId",
         [NSNumber numberWithBool:NO],						@"variable",
-        [NSNumber numberWithLong:IsShortForm(dataId)?1:2],	@"length",
+        [NSNumber numberWithLong:IsShortForm(dataId)?1:3],	@"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"Caen265"];
     
@@ -176,7 +217,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 	statusAddress = [self baseAddress]+register_offsets[kStatusControl];
 	fifoAddress   = [self baseAddress]+register_offsets[kDataRegister];
 	location      =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
-
+	usingShortForm = IsShortForm(dataId);
     [self clearExceptionCount];
 	
 	[self initBoard];
@@ -198,20 +239,31 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 						numToRead:1
 					   withAddMod:0x29
 					usingAddSpace:0x01];
+					
 		if(statusValue & 0x8000){
-			//FIFO is ready  ???do we have to continually poll the status reg for each value, or is the following OK????
-			int i;
-			unsigned long dataBuffer[18];
-			for(i=0;i<16;i++){
-				[controller readWordBlock:(unsigned short*)(&dataBuffer[i+2])
+			unsigned short dataValue;
+			[controller readWordBlock:&dataValue
 								atAddress:fifoAddress
 								numToRead:1
 							   withAddMod:0x29
 							usingAddSpace:0x01];
+			short chan = (dataValue >> 13) & 0x7;
+			if(enabledMask & (1L<<chan)){
+				if(!(suppressZeros && (dataValue & 0xfff)==0)){
+					if(usingShortForm){
+						unsigned long dataWord = dataId | location | (dataValue & 0x7fff);
+						[aDataPacket addLongsToFrameBuffer:&dataWord length:1];
+					}
+					else {
+						//unlikely we have been assigned the long form, but just in case....
+						unsigned long dataBuffer[2];
+						dataBuffer[0] = dataId | 2;
+						dataBuffer[1] = location;
+						dataBuffer[2] = dataValue & 0x7fff;
+						[aDataPacket addLongsToFrameBuffer:dataBuffer length:3];
+					}
+				}
 			}
-			dataBuffer[0] = dataId | 18;
-			dataBuffer[1] = location;
-			[aDataPacket addLongsToFrameBuffer:dataBuffer length:18];
 		}
 		
 	NS_HANDLER
@@ -276,21 +328,14 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 {
     
     NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    [encoder encodeBool:suppressZeros forKey:@"ORCaen265ModelSuppressZeros"];
+    [encoder encodeInt:enabledMask forKey:@"ORCaen265ModelEnabledMask"];
     [objDictionary setObject:thresholds forKey:@"thresholds"];
         
 	return objDictionary;
 }
 */
 
-- (void) setDataIds:(id)assigner
-{
-    dataId       = [assigner assignDataIds:kShortForm]; //short form preferred
-}
-
-- (void) syncDataIdsWith:(id)anotherCaen265
-{
-    [self setDataId:[anotherCaen265 dataId]];
-}
 
 - (BOOL) partOfEvent:(unsigned short)aChannel
 {

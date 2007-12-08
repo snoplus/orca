@@ -31,38 +31,28 @@
 {
     unsigned long length;
     unsigned long* ptr = (unsigned long*)someData;
-     
-	ptr++;
+	if(IsLongForm(*ptr))ptr++;
 	unsigned char crate   = (*ptr&0x01e00000)>>21;
 	unsigned char card   = (*ptr& 0x001f0000)>>16;
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
-	ptr++;
-	int i;
-	for(i=0;i<16;i++){
-		short chan = *ptr >> 13;
-		[aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Caen265", crateKey,cardKey,[self getChannelKey: chan],nil];
-		ptr++;
-	}
+	if(IsLongForm(*ptr))ptr++;
+	short chan = (*ptr >> 13) & 0x7;
+	[aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Caen265", crateKey,cardKey,[self getChannelKey: chan],nil];
     return length; //must return number of bytes processed.
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-
     NSString* title= @"Caen265 ADC Record\n\n";
-    ptr++;
+	if(IsLongForm(*ptr))ptr++;
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-	NSString* data;
-	ptr++;
-	int i;
-	for(i=0;i<16;i++){
-		data   = [data stringByAppendingFormat:@"%d: 0x%x\n",*ptr>>13,*ptr&0x00000fff];
-		ptr++;
-	}
+	if(IsLongForm(*ptr))ptr++;
+    NSString* chan  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr>>13)&0x7];
+	NSString* data  = [NSString stringWithFormat:@"Value = 0x%x\n",*ptr&0x00000fff];
 	    
-    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,data];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,data];               
 }
 
 

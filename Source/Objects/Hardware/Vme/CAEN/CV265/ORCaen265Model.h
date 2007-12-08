@@ -51,11 +51,15 @@ enum {
 		unsigned long dataId;
 		BOOL isRunning;
 		short adcIndex;
+        unsigned short enabledMask;
+		BOOL suppressZeros;
+		
 		//cached values for use while running only
+		BOOL usingShortForm;
 		unsigned long statusAddress;
 		unsigned long fifoAddress;
 		unsigned long location;
-    
+ 
 }
 
 #pragma mark •••Initialization
@@ -65,6 +69,10 @@ enum {
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (BOOL) suppressZeros;
+- (void) setSuppressZeros:(BOOL)aSuppressZeros;
+- (unsigned short) enabledMask;
+- (void) setEnabledMask:(unsigned short)aEnabledMask;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
@@ -98,5 +106,7 @@ enum {
 
 
 #pragma mark •••External String Definitions
+extern NSString* ORCaen265ModelSuppressZerosChanged;
+extern NSString* ORCaen265ModelEnabledMaskChanged;
 extern NSString* ORCaen265SettingsLock;
 

@@ -21,6 +21,10 @@
 @interface ORCaen265Controller : OrcaObjectController {
 
     IBOutlet NSTextField*   slotField;
+	IBOutlet NSButton*		suppressZerosButton;
+	IBOutlet NSButton*		enableAllButton;
+	IBOutlet NSButton*		disableAllButton;
+	IBOutlet NSMatrix*		enabledMaskMatrix;
     IBOutlet NSStepper* 	addressStepper;
     IBOutlet NSTextField* 	addressText;
     IBOutlet NSButton*		initButton;
@@ -32,12 +36,18 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) suppressZerosChanged:(NSNotification*)aNote;
+- (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNotification;
 - (void) slotChanged:(NSNotification*)aNotification;
 - (void) baseAddressChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Actions
+- (IBAction) suppressZerosAction:(id)sender;
+- (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) initBoard:(id)sender;
 - (IBAction) probeBoard:(id)sender;
+- (IBAction) enableAllAction:(id)sender;
+- (IBAction) disableAllAction:(id)sender;
 @end

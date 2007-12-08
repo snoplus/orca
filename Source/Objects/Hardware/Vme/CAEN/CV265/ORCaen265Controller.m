@@ -54,22 +54,46 @@
 						 name : ORVmeIOCardBaseAddressChangedNotification
 					   object : model];
 	
-	
- 	
     [notifyCenter addObserver : self
 					 selector : @selector(settingsLockChanged:)
 						 name : ORCaen265SettingsLock
 						object: nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(enabledMaskChanged:)
+                         name : ORCaen265ModelEnabledMaskChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(suppressZerosChanged:)
+                         name : ORCaen265ModelSuppressZerosChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) suppressZerosChanged:(NSNotification*)aNote
+{
+	[suppressZerosButton setIntValue: [model suppressZeros]];
+}
+
+- (void) enabledMaskChanged:(NSNotification*)aNote
+{
+	int i;
+	for(i=0;i<16;i++){
+		[[enabledMaskMatrix cellWithTag:i] setIntValue:[model enabledMask] & (1<<i)];
+	}
+}
+
 - (void) updateWindow
 {
     [super updateWindow];
     [self baseAddressChanged:nil];
 	[self slotChanged:nil];
 	[self settingsLockChanged:nil];
+	[self enabledMaskChanged:nil];
+	[self suppressZerosChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -91,6 +115,9 @@
     [addressText setEnabled:!locked && !runInProgress];
     
     [initButton setEnabled:!lockedOrRunningMaintenance];
+    [suppressZerosButton setEnabled:!lockedOrRunningMaintenance];
+    [enableAllButton setEnabled:!lockedOrRunningMaintenance];
+    [disableAllButton setEnabled:!lockedOrRunningMaintenance];
 	
 }
 
@@ -106,17 +133,29 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"Caen265 Card (Slot %d)",[model slot]]];
 }
 
-
-
-
 - (void) baseAddressChanged:(NSNotification*)aNotification
 {
 	[self updateStepper:addressStepper setting:[model baseAddress]];
 	[addressText setIntValue: [model baseAddress]];
 }
 
-
 #pragma mark •••Actions
+
+- (void) suppressZerosAction:(id)sender
+{
+	[model setSuppressZeros:[sender intValue]];	
+}
+
+- (void) enabledMaskAction:(id)sender
+{
+	int i;
+	unsigned short aMask = 0;
+	for(i=0;i<16;i++){
+		int state = [[enabledMaskMatrix cellWithTag:i] intValue];
+		if(state)aMask |= (1<<i);
+	}
+	[model setEnabledMask:aMask];	
+}
 
 - (IBAction) settingLockAction:(id) sender
 {
@@ -130,6 +169,17 @@
 		[model setBaseAddress:[sender intValue]];		
 	}
 }
+
+- (IBAction)enableAllAction:(id)sender
+{
+	[model setEnabledMask:0xFFFF];
+}
+
+- (IBAction)disableAllAction:(id)sender
+{
+	[model setEnabledMask:0];
+}
+
 
 -(IBAction)initBoard:(id)sender
 {
@@ -145,7 +195,7 @@
     NS_ENDHANDLER
 }
 
--(IBAction)probeBoard:(id)sender
+-(IBAction) probeBoard:(id)sender
 {
 	[self endEditing];    
 	NS_DURING
@@ -168,8 +218,5 @@
 						localException);
     NS_ENDHANDLER
 }
-
-
-
 
 @end

@@ -20,9 +20,17 @@
 			<dict>
 				<key>baseAddressAction</key>
 				<string>id</string>
+				<key>disableAllAction</key>
+				<string>id</string>
+				<key>enableAllAction</key>
+				<string>id</string>
+				<key>enabledMaskAction</key>
+				<string>id</string>
 				<key>initBoard</key>
 				<string>id</string>
 				<key>probeBoard</key>
+				<string>id</string>
+				<key>suppressZerosAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -35,7 +43,15 @@
 				<string>NSStepper</string>
 				<key>addressText</key>
 				<string>NSTextField</string>
+				<key>disableAllButton</key>
+				<string>NSButton</string>
+				<key>enableAllButton</key>
+				<string>NSButton</string>
+				<key>enabledMaskMatrix</key>
+				<string>NSMatrix</string>
 				<key>initButton</key>
+				<string>NSButton</string>
+				<key>probeButton</key>
 				<string>NSButton</string>
 				<key>settingLockButton</key>
 				<string>NSButton</string>
@@ -43,6 +59,8 @@
 				<string>NSTextField</string>
 				<key>slotField</key>
 				<string>NSTextField</string>
+				<key>suppressZerosButton</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
