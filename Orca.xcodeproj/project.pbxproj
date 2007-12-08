@@ -1555,6 +1555,21 @@
 		84FFCAA90636D5B10069432F /* ORCaen792Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FFCAA30636D5B10069432F /* ORCaen792Controller.m */; };
 		84FFCAAA0636D5B10069432F /* ORCaen792Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FFCAA40636D5B10069432F /* ORCaen792Model.h */; };
 		84FFCAAB0636D5B10069432F /* ORCaen792Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FFCAA50636D5B10069432F /* ORCaen792Model.m */; };
+		9C1363B70D0A78FC006C550D /* NoUSBHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9C1363B00D0A78FC006C550D /* NoUSBHelp.plist */; };
+		9C1363B80D0A78FC006C550D /* NplHV.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C1363B10D0A78FC006C550D /* NplHV.nib */; };
+		9C1363B90D0A78FC006C550D /* NplHVIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C1363B20D0A78FC006C550D /* NplHVIcon.tif */; };
+		9C1363BA0D0A78FC006C550D /* ORNplHVController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C1363B30D0A78FC006C550D /* ORNplHVController.h */; };
+		9C1363BB0D0A78FC006C550D /* ORNplHVController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C1363B40D0A78FC006C550D /* ORNplHVController.m */; };
+		9C1363BC0D0A78FC006C550D /* ORNplHVModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C1363B50D0A78FC006C550D /* ORNplHVModel.h */; };
+		9C1363BD0D0A78FC006C550D /* ORNplHVModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C1363B60D0A78FC006C550D /* ORNplHVModel.m */; };
+		9C1363C70D0A7921006C550D /* Caen265.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C1363BF0D0A7921006C550D /* Caen265.nib */; };
+		9C1363C80D0A7921006C550D /* Caen265Card.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C1363C00D0A7921006C550D /* Caen265Card.tif */; };
+		9C1363C90D0A7921006C550D /* ORCaen265Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C1363C10D0A7921006C550D /* ORCaen265Controller.h */; };
+		9C1363CA0D0A7921006C550D /* ORCaen265Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C1363C20D0A7921006C550D /* ORCaen265Controller.m */; };
+		9C1363CB0D0A7921006C550D /* ORCaen265Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C1363C30D0A7921006C550D /* ORCaen265Decoders.h */; };
+		9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C1363C40D0A7921006C550D /* ORCaen265Decoders.m */; };
+		9C1363CD0D0A7921006C550D /* ORCaen265Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C1363C50D0A7921006C550D /* ORCaen265Model.h */; };
+		9C1363CE0D0A7921006C550D /* ORCaen265Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C1363C60D0A7921006C550D /* ORCaen265Model.m */; };
 		9C38E5580C775F2A00255848 /* ORcPCICardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C38E5560C775F2A00255848 /* ORcPCICardDecoder.m */; };
 		9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */; };
 		9CB167790C5BC9580053CFAD /* xAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167770C5BC9580053CFAD /* xAxisMarker.gif */; };
@@ -3107,6 +3122,21 @@
 		84FFCAA30636D5B10069432F /* ORCaen792Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCaen792Controller.m; sourceTree = "<group>"; };
 		84FFCAA40636D5B10069432F /* ORCaen792Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen792Model.h; sourceTree = "<group>"; };
 		84FFCAA50636D5B10069432F /* ORCaen792Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCaen792Model.m; sourceTree = "<group>"; };
+		9C1363B00D0A78FC006C550D /* NoUSBHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoUSBHelp.plist; path = "Source/Objects/Misc Objects/NplHV/NoUSBHelp.plist"; sourceTree = SOURCE_ROOT; };
+		9C1363B10D0A78FC006C550D /* NplHV.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NplHV.nib; path = "Source/Objects/Misc Objects/NplHV/NplHV.nib"; sourceTree = SOURCE_ROOT; };
+		9C1363B20D0A78FC006C550D /* NplHVIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NplHVIcon.tif; path = "Source/Objects/Misc Objects/NplHV/NplHVIcon.tif"; sourceTree = SOURCE_ROOT; };
+		9C1363B30D0A78FC006C550D /* ORNplHVController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNplHVController.h; path = "Source/Objects/Misc Objects/NplHV/ORNplHVController.h"; sourceTree = SOURCE_ROOT; };
+		9C1363B40D0A78FC006C550D /* ORNplHVController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNplHVController.m; path = "Source/Objects/Misc Objects/NplHV/ORNplHVController.m"; sourceTree = SOURCE_ROOT; };
+		9C1363B50D0A78FC006C550D /* ORNplHVModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNplHVModel.h; path = "Source/Objects/Misc Objects/NplHV/ORNplHVModel.h"; sourceTree = SOURCE_ROOT; };
+		9C1363B60D0A78FC006C550D /* ORNplHVModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNplHVModel.m; path = "Source/Objects/Misc Objects/NplHV/ORNplHVModel.m"; sourceTree = SOURCE_ROOT; };
+		9C1363BF0D0A7921006C550D /* Caen265.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen265.nib; path = Source/Objects/Hardware/Vme/CAEN/CV265/Caen265.nib; sourceTree = SOURCE_ROOT; };
+		9C1363C00D0A7921006C550D /* Caen265Card.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Caen265Card.tif; path = Source/Objects/Hardware/Vme/CAEN/CV265/Caen265Card.tif; sourceTree = SOURCE_ROOT; };
+		9C1363C10D0A7921006C550D /* ORCaen265Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen265Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Controller.h; sourceTree = SOURCE_ROOT; };
+		9C1363C20D0A7921006C550D /* ORCaen265Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen265Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Controller.m; sourceTree = SOURCE_ROOT; };
+		9C1363C30D0A7921006C550D /* ORCaen265Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen265Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Decoders.h; sourceTree = SOURCE_ROOT; };
+		9C1363C40D0A7921006C550D /* ORCaen265Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen265Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Decoders.m; sourceTree = SOURCE_ROOT; };
+		9C1363C50D0A7921006C550D /* ORCaen265Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen265Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Model.h; sourceTree = SOURCE_ROOT; };
+		9C1363C60D0A7921006C550D /* ORCaen265Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen265Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Model.m; sourceTree = SOURCE_ROOT; };
 		9C38E5560C775F2A00255848 /* ORcPCICardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORcPCICardDecoder.m; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.m"; sourceTree = SOURCE_ROOT; };
 		9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICardDecoder.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		9C7E0885051A522B005F64D5 /* MuxScopeMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MuxScopeMap.h; path = Source/Experiments/Ncd/Detector/MuxScopeMap.h; sourceTree = SOURCE_ROOT; };
@@ -4292,6 +4322,7 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
+				9C1363AF0D0A78FC006C550D /* NplHV */,
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
 				2AAB08F808E36CCE00BB0792 /* Testing */,
 				844048AB08350BEE000D03DB /* MemoryWatcher */,
@@ -6777,6 +6808,37 @@
 			path = Source/Objects/Hardware/Vme/CAEN/CV792;
 			sourceTree = SOURCE_ROOT;
 		};
+		9C1363AF0D0A78FC006C550D /* NplHV */ = {
+			isa = PBXGroup;
+			children = (
+				9C1363B00D0A78FC006C550D /* NoUSBHelp.plist */,
+				9C1363B10D0A78FC006C550D /* NplHV.nib */,
+				9C1363B20D0A78FC006C550D /* NplHVIcon.tif */,
+				9C1363B30D0A78FC006C550D /* ORNplHVController.h */,
+				9C1363B40D0A78FC006C550D /* ORNplHVController.m */,
+				9C1363B50D0A78FC006C550D /* ORNplHVModel.h */,
+				9C1363B60D0A78FC006C550D /* ORNplHVModel.m */,
+			);
+			name = NplHV;
+			path = "Source/Objects/Misc Objects/NplHV";
+			sourceTree = SOURCE_ROOT;
+		};
+		9C1363BE0D0A7921006C550D /* CV265 */ = {
+			isa = PBXGroup;
+			children = (
+				9C1363BF0D0A7921006C550D /* Caen265.nib */,
+				9C1363C00D0A7921006C550D /* Caen265Card.tif */,
+				9C1363C10D0A7921006C550D /* ORCaen265Controller.h */,
+				9C1363C20D0A7921006C550D /* ORCaen265Controller.m */,
+				9C1363C30D0A7921006C550D /* ORCaen265Decoders.h */,
+				9C1363C40D0A7921006C550D /* ORCaen265Decoders.m */,
+				9C1363C50D0A7921006C550D /* ORCaen265Model.h */,
+				9C1363C60D0A7921006C550D /* ORCaen265Model.m */,
+			);
+			name = CV265;
+			path = Source/Objects/Hardware/Vme/CAEN/CV265;
+			sourceTree = SOURCE_ROOT;
+		};
 		9C4BA4900C2A35C800FCBC9A /* GradientView */ = {
 			isa = PBXGroup;
 			children = (
@@ -7154,6 +7216,7 @@
 				84FFCA9F0636D5B10069432F /* CV792 */,
 				84DE591F051F7AF9005F64B1 /* CV785 */,
 				F5B1802703B297FD015F64B1 /* CV775 */,
+				9C1363BE0D0A7921006C550D /* CV265 */,
 			);
 			name = CAEN;
 			path = Source/Objects/Hardware/Vme/CAEN;
@@ -7772,6 +7835,11 @@
 				847E6C100CFF4BF400E963C6 /* ORObjectProxy.h in Headers */,
 				847E6C1D0CFF4C3200E963C6 /* OReGunController.h in Headers */,
 				847E6C1F0CFF4C3200E963C6 /* OReGunModel.h in Headers */,
+				9C1363BA0D0A78FC006C550D /* ORNplHVController.h in Headers */,
+				9C1363BC0D0A78FC006C550D /* ORNplHVModel.h in Headers */,
+				9C1363C90D0A7921006C550D /* ORCaen265Controller.h in Headers */,
+				9C1363CB0D0A7921006C550D /* ORCaen265Decoders.h in Headers */,
+				9C1363CD0D0A7921006C550D /* ORCaen265Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8254,6 +8322,11 @@
 				847E6C1A0CFF4C3200E963C6 /* eGun.nib in Resources */,
 				847E6C1B0CFF4C3200E963C6 /* eGun.tif in Resources */,
 				847E6C1C0CFF4C3200E963C6 /* mainFocalPlanedetector.tif in Resources */,
+				9C1363B70D0A78FC006C550D /* NoUSBHelp.plist in Resources */,
+				9C1363B80D0A78FC006C550D /* NplHV.nib in Resources */,
+				9C1363B90D0A78FC006C550D /* NplHVIcon.tif in Resources */,
+				9C1363C70D0A7921006C550D /* Caen265.nib in Resources */,
+				9C1363C80D0A7921006C550D /* Caen265Card.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8816,6 +8889,11 @@
 				847E6C110CFF4BF400E963C6 /* ORObjectProxy.m in Sources */,
 				847E6C1E0CFF4C3200E963C6 /* OReGunController.m in Sources */,
 				847E6C200CFF4C3200E963C6 /* OReGunModel.m in Sources */,
+				9C1363BB0D0A78FC006C550D /* ORNplHVController.m in Sources */,
+				9C1363BD0D0A78FC006C550D /* ORNplHVModel.m in Sources */,
+				9C1363CA0D0A7921006C550D /* ORCaen265Controller.m in Sources */,
+				9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */,
+				9C1363CE0D0A7921006C550D /* ORCaen265Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8948,6 +9026,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Source/App Delegate/OrcaPrecompiledHeader.h";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_PEDANTIC = NO;
