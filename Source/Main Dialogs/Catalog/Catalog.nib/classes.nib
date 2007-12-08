@@ -15,7 +15,7 @@
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>ObjectFactory</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
