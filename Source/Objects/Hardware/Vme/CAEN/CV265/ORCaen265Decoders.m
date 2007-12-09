@@ -36,7 +36,6 @@
 	unsigned char card   = (*ptr& 0x001f0000)>>16;
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
-	if(IsLongForm(*ptr))ptr++;
 	short chan = (*ptr >> 13) & 0x7;
 	[aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Caen265", crateKey,cardKey,[self getChannelKey: chan],nil];
     return length; //must return number of bytes processed.
@@ -48,7 +47,6 @@
 	if(IsLongForm(*ptr))ptr++;
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-	if(IsLongForm(*ptr))ptr++;
     NSString* chan  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr>>13)&0x7];
 	NSString* data  = [NSString stringWithFormat:@"Value = 0x%x\n",*ptr&0x00000fff];
 	    

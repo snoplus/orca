@@ -258,9 +258,8 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 						//unlikely we have been assigned the long form, but just in case....
 						unsigned long dataBuffer[2];
 						dataBuffer[0] = dataId | 2;
-						dataBuffer[1] = location;
-						dataBuffer[2] = dataValue & 0x7fff;
-						[aDataPacket addLongsToFrameBuffer:dataBuffer length:3];
+						dataBuffer[1] = location | dataValue & 0x7fff;
+						[aDataPacket addLongsToFrameBuffer:dataBuffer length:2];
 					}
 				}
 			}
