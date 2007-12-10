@@ -52,6 +52,14 @@
  *
  *
  * History:
+ * - 1.1-8 - Acceleration of Slt memory readout: 
+ *            - The Slt memory access was implementted by single access
+ *              instead of using faster block transfer. 
+ *              After changing to block mode the rates are consisted with Auger!
+ *            - Added selectable display of event loop performance and trigger data.
+ *            - Added parameter for the length of the readout windows (0..100us).
+ *              This is a second parameter to customize the readout speed.
+ *              10.12.07 (ak) 
  * - 1.1-7 - Added endian support for intel macs
  *            - Added conversion between host and network byte order in firewire base class
  *            - Fixed copy of 64bit firewire address to high and low word.
@@ -106,6 +114,6 @@
  
 /** Version of the IPE-DAQ object.
   * The version number is independand fron the Orca version. */ 
-#define ORIPE_VERSION @"1.1-7"
+#define ORIPE_VERSION @"1.1-8"
 
 
