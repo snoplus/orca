@@ -27,7 +27,7 @@
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
 
-#define 	kNumCaen265Channels 		16
+#define 	kNumCaen265Channels 		8
 
 #pragma mark •••Register Definitions
 enum {

@@ -81,7 +81,7 @@
 - (void) enabledMaskChanged:(NSNotification*)aNote
 {
 	int i;
-	for(i=0;i<16;i++){
+	for(i=0;i<kNumCaen265Channels;i++){
 		[[enabledMaskMatrix cellWithTag:i] setIntValue:[model enabledMask] & (1<<i)];
 	}
 }
@@ -149,7 +149,7 @@
 {
 	int i;
 	unsigned short aMask = 0;
-	for(i=0;i<16;i++){
+	for(i=0;i<kNumCaen265Channels;i++){
 		int state = [[enabledMaskMatrix cellWithTag:i] intValue];
 		if(state)aMask |= (1<<i);
 	}

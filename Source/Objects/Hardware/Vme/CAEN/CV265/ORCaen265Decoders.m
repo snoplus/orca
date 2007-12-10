@@ -25,6 +25,29 @@
 #import "ORCaen265Model.h"
 #import "ORDataTypeAssigner.h"
 
+/*
+Short Form:
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+^^^^ ^^--------------------------------- V265 ID (from header)
+--------^-^^^--------------------------- Crate number
+-------------^-^^^^--------------------- Card number
+--------------------^^^----------------- Channel number
+-----------------------^---------------- Range Type (0==12 bit, 1==15bit)
+-------------------------^^^^ ^^^^ ^^^^- adc value
+
+Long Form:
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+^^^^ ^^^^ ^^^^ ^^----------------------- V265 ID (from header)
+-----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length (always 2 longs)
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+--------^-^^^--------------------------- Crate number
+-------------^-^^^^--------------------- Card number
+--------------------^^^----------------- Channel number
+-----------------------^---------------- Range Type (0==12 bit, 1==15bit)
+-------------------------^^^^ ^^^^ ^^^^- adc value
+*/
+
+
 @implementation ORCaen265DecoderForAdc
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
@@ -48,9 +71,10 @@
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
     NSString* chan  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr>>13)&0x7];
+	NSString* type  = [NSString stringWithFormat:@"Range = %@\n",*ptr&0x00001000?@"12 Bit":@"15 Bit"];
 	NSString* data  = [NSString stringWithFormat:@"Value = 0x%x\n",*ptr&0x00000fff];
 	    
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,data];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,chan,type,data];               
 }
 
 
