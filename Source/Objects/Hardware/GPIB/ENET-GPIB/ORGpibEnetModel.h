@@ -28,15 +28,20 @@
 #pragma mark ***Errors
 #define OExceptionGpibError	@"GPIBError"
 
+#import "EduWashingtonNplOrcaNi488PlugIn.h"
+
 #pragma mark ***Class Definition
 @interface ORGpibEnetModel : OrcaObject {
-    short			mBoardIndex;
-    short			mDeviceUnit[ kMaxGpibAddresses ];
-    short			mDeviceSecondaryAddress[ kMaxGpibAddresses ];  
-    NSMutableString* mErrorMsg;  
-    NSRecursiveLock* theHWLock;
-	bool			mMonitorRead;
-	bool			mMonitorWrite;
+    short                       mBoardIndex;
+    short                       mDeviceUnit[ kMaxGpibAddresses ];
+    short                       mDeviceSecondaryAddress[ kMaxGpibAddresses ];  
+    NSMutableString*            mErrorMsg;  
+    NSRecursiveLock*            theHWLock;
+	bool                        mMonitorRead;
+	bool                        mMonitorWrite;
+    ORAlarm*                    noDriverAlarm;
+    ORAlarm*                    noPluginAlarm;
+    EduWashingtonNplOrcaNi488PlugIn*  gpibEnetInstance;
 }
 
 #pragma mark ***Initialization.
@@ -44,8 +49,10 @@
 - (id) 		init;
 - (void) 	dealloc;
 - (void) 	makeConnectors;
+- (NSString*) pluginName;
 
 #pragma mark ***Accessors
+- (BOOL)    isEnabled;
 - (short) 	boardIndex;
 - (void) 	setBoardIndex: (short) anIndex;
 - (int) 	ibsta;

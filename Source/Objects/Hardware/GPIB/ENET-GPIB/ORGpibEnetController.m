@@ -30,12 +30,16 @@
 - (void) awakeFromNib
 {
     [ super awakeFromNib ];
-    [ self populatePullDowns ];
-    [ self setTestButtonsEnabled: false ];
-    [ self changeIbstaStatus: 0 ];
-    [ self changeStatusSummary: 0 error: 0 count: 0 ];
-    [ self testLockChanged: nil ];
-    [ self updateWindow ];
+    if ( ! [ model isEnabled ] ) {
+        [ self disableAll ];
+    } else {
+        [ self populatePullDowns ];
+        [ self setTestButtonsEnabled: false ];
+        [ self changeIbstaStatus: 0 ];
+        [ self changeStatusSummary: 0 error: 0 count: 0 ];
+        [ self testLockChanged: nil ];
+        [ self updateWindow ];
+    }
 }
 
 - (void) registerNotificationObservers
@@ -76,7 +80,7 @@
 
 - (void) testLockChanged: (NSNotification*) aNotification
 {
-    BOOL locked		= [ gSecurity isLocked:ORGpibEnetTestLock ];
+    BOOL locked		= [ gSecurity isLocked:ORGpibEnetTestLock ] || (! [ model isEnabled ]);
     BOOL runInProgress  = [ gOrcaGlobals runInProgress ];
     
     [ testLockButton setState: locked];
@@ -394,8 +398,37 @@
 //--------------------------------------------------------------------------------
 - (void) setTestButtonsEnabled:(BOOL) aValue
 {
+    aValue = (aValue && [ model isEnabled ] );
     [mQuery setEnabled:aValue];
     [mWrite setEnabled:aValue];
     [mRead setEnabled:aValue];            
-}    
+}
+
+//--------------------------------------------------------------------------------
+/*!
+ * \method  disableAll
+ * \brief   disables all of the buttons/fields
+ *			
+ * \note	
+ */
+//--------------------------------------------------------------------------------
+- (void) disableAll
+{
+    [ mGpibBoard setEnabled:NO ];
+    [ mPrimaryAddress setEnabled:NO ];
+    [ mSecondaryAddress setEnabled:NO ];
+    [ mCommand setEnabled:NO ];
+    [ mConfigured setEnabled:NO ];
+    [ mibsta setEnabled:NO ];
+    [ miberr setEnabled:NO ];
+    [ mibcntl setEnabled:NO ];
+    [ mIbstaErrors setEnabled:NO ];
+    [ connectButton setEnabled:NO ];
+    [ mQuery setEnabled:NO ];
+    [ mWrite setEnabled:NO ];
+    [ mRead setEnabled:NO ];
+
+
+}
+    
 @end

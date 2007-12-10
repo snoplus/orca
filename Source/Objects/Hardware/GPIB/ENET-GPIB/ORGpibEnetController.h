@@ -74,6 +74,7 @@
 - (void)    testLockChanged: (NSNotification*) aNotification;
 - (void)    checkGlobalSecurity;
 - (void)	boardIndexChange: (NSNotification*) aNotification;
+- (void)    disableAll;
 
 
 @end

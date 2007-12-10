@@ -19,7 +19,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #pragma mark ***Imported Files
-#include <NI488/ni488.h>
+//#include <NI488/ni488.h>
 #include <stdio.h>
 
 #include "ORGpibEnetModel.h"
@@ -64,6 +64,38 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     
     [ self setBoardIndex: kDefaultGpibPort ];
     
+    NSString* plugInDirectory = [[NSBundle mainBundle] builtInPlugInsPath];
+    /* Now find the GPIB-ENET bundle. */
+    NSBundle* gpibEnetBundle = [NSBundle bundleWithPath:
+                                    [NSString stringWithFormat:@"%@/%@",plugInDirectory,[ self pluginName ]]];
+    
+    Class gpibEnetClass;
+    
+    if (gpibEnetClass = [gpibEnetBundle principalClass]) {
+        gpibEnetInstance = [[gpibEnetClass alloc] init];
+        if ( ! [gpibEnetInstance isLoaded] ) {
+            /* The class failed to load, no NI488 framework exists. */
+            [gpibEnetInstance release];
+            gpibEnetInstance = nil;
+            NSLogColor([NSColor redColor],@"*** Unable To Locate NI488 drivers.  Please install from the NI disk. ***\n");
+            noDriverAlarm = [[ORAlarm alloc] initWithName:@"NI GPIB-ENET drivers not found." severity:0];
+            [noDriverAlarm setSticky:NO];
+            [noDriverAlarm setAcknowledged:NO];
+            [noDriverAlarm postAlarm];
+
+        }
+    } else {
+        /* It's not here, let's make sure the user knows that. */
+        NSLogColor([NSColor redColor],[NSString stringWithFormat:@"*** Unable To Locate %@. Please re-install Orca. ***\n",[ self pluginName ]]);
+        noPluginAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Plugin %@ not Found",[self pluginName]] severity:0];
+        [noPluginAlarm setSticky:NO];
+        [noPluginAlarm setAcknowledged:NO];
+        [noPluginAlarm postAlarm];
+
+        gpibEnetInstance = nil;
+    }
+
+    
 }
 
 //--------------------------------------------------------------------------------
@@ -89,10 +121,21 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 //--------------------------------------------------------------------------------
 - (void) dealloc
 {
+    [noDriverAlarm clearAlarm];
+    [noDriverAlarm release];
+    [noPluginAlarm clearAlarm];
+    [noPluginAlarm release];
+    [gpibEnetInstance release];
     [theHWLock release];
     [ mErrorMsg release ];
     [ super dealloc ];
 }
+
+- (NSString*) pluginName
+{
+    return @"EduWashingtonNplOrcaNi488PlugIn.plugin";
+}
+
 
 //--------------------------------------------------------------------------------
 /*! \method		setUpImage
@@ -138,6 +181,14 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 
 #pragma mark ***Accessors
+- (BOOL) isEnabled
+{
+    if ( gpibEnetInstance != nil ) {
+        return [ gpibEnetInstance isLoaded ];
+    }
+    return NO;
+}
+
 - (short) boardIndex
 {
     return( mBoardIndex );
@@ -167,17 +218,26 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 - (int) ibsta
 {
-    return( ibsta );
+    if ( gpibEnetInstance != nil) {
+        return( [gpibEnetInstance ibsta] );
+    }
+    return 0;
 }
 
 - (int) iberr
 {
-    return( iberr );
+    if ( gpibEnetInstance != nil) {
+        return( [gpibEnetInstance iberr] );
+    }
+    return 0;
 }
 
 - (long) ibcntl
 {
-    return( ibcntl );
+    if ( gpibEnetInstance != nil) {
+        return( [gpibEnetInstance ibcntl] );
+    }
+    return 0;
 }
 
 
@@ -194,19 +254,20 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 - (void) changePrimaryAddress: (short) anOldPrimaryAddress newAddress: (short) aNewPrimaryAddress
 {
     // Make sure that device is initialized and that new address is valid.
-    
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         [ self checkDeviceThrow: anOldPrimaryAddress ];
         [ self checkDeviceThrow: aNewPrimaryAddress checkSetup: false ];
         
-        ibpad( mDeviceUnit[ anOldPrimaryAddress ], aNewPrimaryAddress );
-        if ( ibsta & ERR ) {
+        [ gpibEnetInstance ibpad:mDeviceUnit[ anOldPrimaryAddress ] v:aNewPrimaryAddress ];
+
+        if ( (int) [gpibEnetInstance ibsta] & (unsigned short) [gpibEnetInstance err] ) {
             [ mErrorMsg setString: @"***Error: ibpad" ];
             [ self GpibError: mErrorMsg ];
             
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
-        } 
+        }
         [theHWLock unlock];   //-----end critical section
     NS_HANDLER
         [theHWLock unlock];   //-----end critical section
@@ -224,6 +285,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         short deviceState = 0;
@@ -233,8 +295,8 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         
         // Change device state.
         if ( aState ) deviceState = 1;
-        ibonl( mDeviceUnit[ aPrimaryAddress ], deviceState );
-        if ( ibsta & ERR ) {
+        [gpibEnetInstance ibonl:mDeviceUnit[ aPrimaryAddress ] v:deviceState];
+        if ([gpibEnetInstance ibsta] & [gpibEnetInstance err] ) {
             [ mErrorMsg setString:  @"***Error: ibonl" ];
             [ self GpibError: mErrorMsg ];
             
@@ -259,7 +321,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 - (BOOL) checkAddress: (short) aPrimaryAddress
 {
     BOOL  bRetVal = false;
-    
+    if ( gpibEnetInstance == nil) return bRetVal;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         
@@ -289,14 +351,15 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 //--------------------------------------------------------------------------------
 - (void) deactivateAddress: (short) aPrimaryAddress
 {
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         [ theHWLock lock ];   //-----begin critical section
                               // Make sure that device is initialized.
         [ self checkDeviceThrow: aPrimaryAddress ];
         
         // Deactivate the device
-        ibonl( mDeviceUnit[ aPrimaryAddress ], 0 );
-        if ( ibsta & ERR )
+        [gpibEnetInstance ibonl:mDeviceUnit[ aPrimaryAddress ] v:0 ];
+        if ( [gpibEnetInstance ibsta] & [gpibEnetInstance err] )
         {
             [ mErrorMsg setString: @"***Error: ibonl (deactivate)" ];
             [ self GpibError: mErrorMsg ];
@@ -312,13 +375,14 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 - (void) enableEOT:(short)aPrimaryAddress state: (BOOL) state
 {
+    if ( gpibEnetInstance == nil) return;
     // Make sure that device is initialized.
     NS_DURING
         [ theHWLock lock ];   //-----begin critical section
         [ self checkDeviceThrow: aPrimaryAddress ];
         
-        ibeot( mDeviceUnit[ aPrimaryAddress ], state );
-        if ( ibsta & ERR ){
+        [gpibEnetInstance ibeot:mDeviceUnit[ aPrimaryAddress ] v:state];
+        if ( (int)[gpibEnetInstance ibsta] & (unsigned short)[gpibEnetInstance err] ){
             [ mErrorMsg setString: [NSString stringWithFormat:@"***Error: ibeot (%d)",state] ];
             [ self GpibError: mErrorMsg ];
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
@@ -340,13 +404,14 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         [ self checkDeviceThrow: aPrimaryAddress ];
         
         // Clear device.
-        ibclr( mDeviceUnit[ aPrimaryAddress ] );
-        if ( ibsta & ERR ) {
+        [gpibEnetInstance ibclr:mDeviceUnit[ aPrimaryAddress ]];
+        if ( [gpibEnetInstance ibsta] & [gpibEnetInstance err] ) {
             [ mErrorMsg setString: @"***Error: ibclr" ];
             [ self GpibError: mErrorMsg ];
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
@@ -390,6 +455,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {  
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         // Check device number.
         [theHWLock lock];   //-----begin critical section
@@ -398,15 +464,15 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         mDeviceSecondaryAddress[ aPrimaryAddress ] = aSecondaryAddress;
 	    
         // Perform the initialization.
-        mDeviceUnit[ aPrimaryAddress ] = ibdev( mBoardIndex, 		// (GPIB0, GPIB1, ... )
-                                                aPrimaryAddress, 
-                                                aSecondaryAddress,
-                                                T3s,   			// Timeout setting (Txs = x secs)
-                                                1,			// Assert EOI line at end of write.
-                                                0 );			// EOS termination mode.
+        mDeviceUnit[ aPrimaryAddress ] = [gpibEnetInstance ibdev:mBoardIndex 		// (GPIB0, GPIB1, ... )
+                                                pad:aPrimaryAddress 
+                                                sad:aSecondaryAddress
+                                                tmo:[gpibEnetInstance t3s]   	// Timeout setting (Txs = x secs)
+                                                eot:1			// Assert EOI line at end of write.
+                                                eos:0];			// EOS termination mode.
         
         // Check for an error
-        if ( ibsta & ERR ) {
+        if ( [gpibEnetInstance ibsta] &  [gpibEnetInstance err] ) {
             [ mErrorMsg setString:  @"***Error: ibdev" ];
             [ self GpibError: mErrorMsg ]; 
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
@@ -437,6 +503,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {
+    if ( gpibEnetInstance == nil) return -1;
     long	nReadBytes = -1;
     
     NS_DURING
@@ -448,8 +515,10 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 	    //while([NSDate timeIntervalSinceReferenceDate]-t0 < .01);
         
         // Perform the read.
-        ibrd( mDeviceUnit[ aPrimaryAddress ], aData, aMaxLength );
-        if ( ibsta & ERR ) {
+        [ gpibEnetInstance ibrd:mDeviceUnit[ aPrimaryAddress ] 
+                buf:aData
+                cnt:aMaxLength ];
+        if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibrd" ];
             [ self GpibError: mErrorMsg ]; 
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
@@ -458,7 +527,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         // Successful read.
         else
         {
-            nReadBytes = ibcntl;
+            nReadBytes = [ gpibEnetInstance ibcntl ];
             
             // Allow monitoring of commands.
             if ( mMonitorRead )
@@ -498,6 +567,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 //--------------------------------------------------------------------------------
 - (void) writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand
 {
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         [ theHWLock lock ];   //-----begin critical section
                               // Make sure that device is initialized.
@@ -519,8 +589,10 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         //	printf( "Command %s\n", [ aCommand cString ] );
         
         // Write to device.
-        ibwrt( mDeviceUnit[ aPrimaryAddress ], (char *)[ aCommand cStringUsingEncoding:NSASCIIStringEncoding ], [ aCommand length ] );
-        if ( ibsta & ERR ) {
+        [ gpibEnetInstance ibwrt:mDeviceUnit[ aPrimaryAddress ]
+                buf:(char *)[ aCommand cStringUsingEncoding:NSASCIIStringEncoding ]
+                cnt:[ aCommand length ] ];
+        if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibwrt" ];
             [ self GpibError: mErrorMsg ]; 
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
@@ -547,6 +619,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     //--------------------------------------------------------------------------------
 {
     long retVal = 0;
+    if ( gpibEnetInstance == nil) return -1;
     NS_DURING
         
         [theHWLock lock];   //-----begin critical section
@@ -574,14 +647,15 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         "*/
     //--------------------------------------------------------------------------------
 {
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
                             // Make sure that device is initialized.
         [ self checkDeviceThrow: aPrimaryAddress ];
         
         // Wait for specified events.
-        ibwait( mDeviceUnit[ aPrimaryAddress ], aWaitMask );
-        if ( ibsta & ERR ) {
+        [ gpibEnetInstance ibwait:mDeviceUnit[ aPrimaryAddress ] mask:aWaitMask ];
+        if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibwait" ];
             [ self GpibError: mErrorMsg ]; 
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
@@ -631,6 +705,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 //--------------------------------------------------------------------------------
 - (void) checkDeviceThrow: (short) aPrimaryAddress checkSetup: (BOOL) aState
 {
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         if ( aPrimaryAddress < 0 || aPrimaryAddress > kMaxGpibAddresses ){
@@ -648,8 +723,10 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             else {
                 short		listen;
                 
-                ibln( mDeviceUnit[ aPrimaryAddress ], aPrimaryAddress, 
-                      mDeviceSecondaryAddress[ aPrimaryAddress ], &listen );
+                [ gpibEnetInstance ibln:mDeviceUnit[ aPrimaryAddress ] 
+                        pad:aPrimaryAddress 
+                        sad:mDeviceSecondaryAddress[ aPrimaryAddress ] 
+                        listen:&listen ];
                 
                 // Deviced is not present so throw error.
                 if ( !listen ) {
@@ -689,59 +766,60 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {
+    if ( gpibEnetInstance == nil) return;
     NS_DURING
         // Handle the master error register and extract error.
         [theHWLock unlock];   //-----end critical section
-        [ aMsg appendString: [ NSString stringWithFormat:  @" ibsta = 0x%x < ", ibsta ]];
+        [ aMsg appendString: [ NSString stringWithFormat:  @" ibsta = 0x%x < ", [ gpibEnetInstance ibsta ] ]];
         
         NSMutableString *errorType = [[ NSMutableString alloc ] initWithFormat: @"" ];
         
-        if (ibsta & ERR )  [ errorType appendString: @" ERR " ];
-        if (ibsta & TIMO)  [ errorType appendString: @" TIMO " ];
-        if (ibsta & END )  [ errorType appendString: @" END " ];
-        if (ibsta & SRQI)  [ errorType appendString: @" SRQI " ];
-        if (ibsta & RQS )  [ errorType appendString: @" RQS " ];
-        if (ibsta & CMPL)  [ errorType appendString: @" CMPL " ];
-        if (ibsta & LOK )  [ errorType appendString: @" LOK " ];
-        if (ibsta & REM )  [ errorType appendString: @" REM " ];
-        if (ibsta & CIC )  [ errorType appendString: @" CIC " ];
-        if (ibsta & ATN )  [ errorType appendString: @" ATN " ];
-        if (ibsta & TACS)  [ errorType appendString: @" TACS " ];
-        if (ibsta & LACS)  [ errorType appendString: @" LACS " ];
-        if (ibsta & DTAS)  [ errorType appendString: @" DTAS " ];
-        if (ibsta & DCAS)  [ errorType appendString: @" DCAS " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] )  [ errorType appendString: @" ERR " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance timo ])  [ errorType appendString: @" TIMO " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance end ] )  [ errorType appendString: @" END " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance srqi ])  [ errorType appendString: @" SRQI " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance rqs ] )  [ errorType appendString: @" RQS " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance cmpl ])  [ errorType appendString: @" CMPL " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance lok ] )  [ errorType appendString: @" LOK " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance rem ] )  [ errorType appendString: @" REM " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance cic ] )  [ errorType appendString: @" CIC " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance atn ] )  [ errorType appendString: @" ATN " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance tacs ])  [ errorType appendString: @" TACS " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance lacs ])  [ errorType appendString: @" LACS " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance dtas ])  [ errorType appendString: @" DTAS " ];
+        if ([ gpibEnetInstance ibsta ] & [ gpibEnetInstance dcas ])  [ errorType appendString: @" DCAS " ];
         
         [ aMsg appendString: errorType ];
         [ errorType release ];
         
         // Handle the actual error message.  This message expands on what ibsta found.  Only
         // valid if ibsta & ERR is true.
-        [ aMsg appendString: [ NSString stringWithFormat: @"\niberr = %d", iberr ]];
+        [ aMsg appendString: [ NSString stringWithFormat: @"\niberr = %d", (int) [ gpibEnetInstance iberr ] ]];
         
         NSMutableString *errorMsg = [[ NSMutableString alloc ] initWithFormat: @"" ];
         
-        if (iberr == EDVR) [ errorMsg appendString: @" EDVR <DOS Error>\n" ];
-        if (iberr == ECIC) [ errorMsg appendString: @" ECIC <Not Controller-In-Charge>\n" ];
-        if (iberr == ENOL) [ errorMsg appendString: @" ENOL <No Listener>\n" ];
-        if (iberr == EADR) [ errorMsg appendString: @" EADR <Address error>\n" ];
-        if (iberr == EARG) [ errorMsg appendString: @" EARG <Invalid argument>\n" ];
-        if (iberr == ESAC) [ errorMsg appendString: @" ESAC <Not System Controller>\n" ];
-        if (iberr == EABO) [ errorMsg appendString: @" EABO <Operation aborted>\n" ];
-        if (iberr == ENEB) [ errorMsg appendString: @" ENEB <No GPIB board>\n" ];
-        if (iberr == EOIP) [ errorMsg appendString: @" EOIP <Async I/O in progress>\n" ];
-        if (iberr == ECAP) [ errorMsg appendString: @" ECAP <No capability>\n" ];
-        if (iberr == EFSO) [ errorMsg appendString: @" EFSO <File system error>\n" ];
-        if (iberr == EBUS) [ errorMsg appendString: @" EBUS <Command error>\n" ];
-        if (iberr == ESTB) [ errorMsg appendString: @" ESTB <Status byte lost>\n" ];
-        if (iberr == ESRQ) [ errorMsg appendString: @" ESRQ <SRQ stuck on>\n" ];
-        if (iberr == ETAB) [ errorMsg appendString: @" ETAB <Table Overflow>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance edvr ]) [ errorMsg appendString: @" EDVR <DOS Error>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance ecic ]) [ errorMsg appendString: @" ECIC <Not Controller-In-Charge>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance enol ]) [ errorMsg appendString: @" ENOL <No Listener>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance eadr ]) [ errorMsg appendString: @" EADR <Address error>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance earg ]) [ errorMsg appendString: @" EARG <Invalid argument>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance esac ]) [ errorMsg appendString: @" ESAC <Not System Controller>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance eabo ]) [ errorMsg appendString: @" EABO <Operation aborted>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance eneb ]) [ errorMsg appendString: @" ENEB <No GPIB board>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance eoip ]) [ errorMsg appendString: @" EOIP <Async I/O in progress>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance ecap ]) [ errorMsg appendString: @" ECAP <No capability>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance efso ]) [ errorMsg appendString: @" EFSO <File system error>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance ebus ]) [ errorMsg appendString: @" EBUS <Command error>\n" ];
+        if ((int)[ gpibEnetInstance iberr ] == (unsigned short)[ gpibEnetInstance estb ]) [ errorMsg appendString: @" ESTB <Status byte lost>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance esrq ]) [ errorMsg appendString: @" ESRQ <SRQ stuck on>\n" ];
+        if ([ gpibEnetInstance iberr ] == [ gpibEnetInstance etab ]) [ errorMsg appendString: @" ETAB <Table Overflow>\n" ];
         
         [ aMsg appendString: errorMsg ];
         //	printf( "4th Message: %s\n", [ mErrorMsg cString ] );
         
         [ errorMsg release ];
         
-        [ aMsg appendString: [ NSString stringWithFormat: @"ibcntl = %ld\n", ibcntl ]];
+        [ aMsg appendString: [ NSString stringWithFormat: @"ibcntl = %ld\n", [ gpibEnetInstance ibcntl ]]];
         
         [theHWLock unlock];   //-----end critical section
                               // Call ibonl to take the device and interface offline
