@@ -183,6 +183,17 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 					usingAddSpace:0x01];
 }
 
+- (void) clear
+{
+	unsigned short aValue = 0;
+    [[self adapter] writeWordBlock:&aValue
+						atAddress:[self baseAddress]+register_offsets[kClear]
+						numToWrite:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+}
+
+
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];

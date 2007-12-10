@@ -86,6 +86,7 @@ enum {
 - (unsigned short) 	readBoardVersion;
 - (unsigned short) 	readFixedCode;
 - (void)			trigger;
+- (void)			clear;
 
 #pragma mark •••Data Header
 - (NSDictionary*) dataRecordDescription;
@@ -102,12 +103,9 @@ enum {
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-
 @end
-
 
 #pragma mark •••External String Definitions
 extern NSString* ORCaen265ModelSuppressZerosChanged;
 extern NSString* ORCaen265ModelEnabledMaskChanged;
 extern NSString* ORCaen265SettingsLock;
-

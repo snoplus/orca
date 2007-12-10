@@ -117,7 +117,8 @@
     [suppressZerosButton setEnabled:!lockedOrRunningMaintenance];
     [enableAllButton setEnabled:!lockedOrRunningMaintenance];
     [disableAllButton setEnabled:!lockedOrRunningMaintenance];
-    [triggerButton setEnabled:!locked];
+    [triggerButton setEnabled:!lockedOrRunningMaintenance];
+    [clearButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -231,5 +232,20 @@
     NS_ENDHANDLER
 
 }
+
+- (IBAction) clearAction:(id)sender
+{
+    NS_DURING
+        [model clear];		//force trigger
+		NSLog(@"Clear Caen265 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    NS_HANDLER
+        NSLog(@"Clear of Caen265 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Caen265 Clear", @"OK", nil, nil,
+                        localException);
+    NS_ENDHANDLER
+
+}
+
 
 @end

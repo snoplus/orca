@@ -31,6 +31,7 @@
 	IBOutlet NSButton*		probeButton;
     IBOutlet NSButton*		settingLockButton;
     IBOutlet NSButton*		triggerButton;
+    IBOutlet NSButton*		clearButton;
 }
 
 - (void) registerNotificationObservers;
@@ -51,4 +52,5 @@
 - (IBAction) enableAllAction:(id)sender;
 - (IBAction) disableAllAction:(id)sender;
 - (IBAction) triggerAction:(id)sender;
+- (IBAction) clearAction:(id)sender;
 @end
