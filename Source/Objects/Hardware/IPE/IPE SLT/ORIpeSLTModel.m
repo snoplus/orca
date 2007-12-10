@@ -864,6 +864,8 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 
 - (void) setDisplayTrigger:(BOOL) aState
 {
+	[[[self undoManager] prepareWithInvocationTarget:self] setDisplayTrigger:displayTrigger];
+	
 	displayTrigger = aState;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSLTModelDisplayTriggerChanged object:self];
@@ -877,6 +879,8 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 
 - (void) setDisplayEventLoop:(BOOL) aState
 {
+	[[[self undoManager] prepareWithInvocationTarget:self] setDisplayEventLoop:displayEventLoop];
+	
 	displayEventLoop = aState;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSLTModelDisplayEventLoopChanged object:self];
@@ -890,6 +894,9 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 
 - (void) setPageSize: (unsigned long) aPageSize
 {
+
+	[[[self undoManager] prepareWithInvocationTarget:self] setPageSize:pageSize];
+	
     if (aPageSize < 0) pageSize = 0;
 	else if (aPageSize > 100) pageSize = 100;
 	else pageSize = aPageSize;
