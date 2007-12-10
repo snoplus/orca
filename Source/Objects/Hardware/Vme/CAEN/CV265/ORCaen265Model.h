@@ -22,7 +22,7 @@
 
 #pragma mark •••Imported Files
 
-#import "ORVmeIOCard.h"
+#import "ORCaenCardModel.h"
 #import "ORDataTaker.h"
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
@@ -45,10 +45,9 @@ enum {
 #pragma mark •••Forward Declarations
 @class ORRateGroup;
 
-@interface ORCaen265Model :  ORVmeIOCard <ORDataTaker>
+@interface ORCaen265Model :  ORCaenCardModel <ORDataTaker>
 {
     @private
-		unsigned long dataId;
 		BOOL isRunning;
 		short adcIndex;
         unsigned short enabledMask;
@@ -81,12 +80,11 @@ enum {
 
 
 #pragma mark •••Hardware Access
-- (void) initBoard;
+- (void)			initBoard;
 - (unsigned short) 	readBoardID;
 - (unsigned short) 	readBoardVersion;
 - (unsigned short) 	readFixedCode;
 - (void)			trigger;
-- (void)			clear;
 
 #pragma mark •••Data Header
 - (NSDictionary*) dataRecordDescription;

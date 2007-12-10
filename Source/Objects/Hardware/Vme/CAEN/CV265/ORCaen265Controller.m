@@ -6,7 +6,7 @@
 //  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
+//Washington at the Center for Experimental Nug Physics and 
 //Astrophysics (CENPA) sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
 //The University has certain rights in the program pursuant to 
@@ -118,7 +118,6 @@
     [enableAllButton setEnabled:!lockedOrRunningMaintenance];
     [disableAllButton setEnabled:!lockedOrRunningMaintenance];
     [triggerButton setEnabled:!lockedOrRunningMaintenance];
-    [clearButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -204,8 +203,8 @@
 		if(fixedCode == 0xFAF5){
 			unsigned short boardID		= [model readBoardID];
 			unsigned short boardVersion = [model readBoardVersion];
-			NSLog(@"Board Manufacturer Code: 0x%x\n",boardID>>10);
-			NSLog(@"Board Module Code: 0x%x\n",boardID&0x3ff);
+			NSLog(@"Board Manufacturer Code: 0x%x %@\n",boardID>>10,[model decodeManufacturerCode:boardID>>10]);
+			NSLog(@"Board Module Code: 0x%x %@\n",boardID&0x3ff,[model decodeModuleCode:boardID&0x3ff]);
 			NSLog(@"Board Series Number: 0x%x\n",boardVersion&0xfff);
 			NSLog(@"Board Version: 0x%x (%@)\n",boardVersion>>12,boardVersion>>12 == 0?@"NIM":@"ECL");
 		}
@@ -232,20 +231,5 @@
     NS_ENDHANDLER
 
 }
-
-- (IBAction) clearAction:(id)sender
-{
-    NS_DURING
-        [model clear];		//force trigger
-		NSLog(@"Clear Caen265 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
-        
-    NS_HANDLER
-        NSLog(@"Clear of Caen265 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen265 Clear", @"OK", nil, nil,
-                        localException);
-    NS_ENDHANDLER
-
-}
-
 
 @end

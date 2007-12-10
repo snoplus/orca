@@ -466,6 +466,19 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 {
 }
 
+- (NSString*) decodeManufacturerCode:(short)aCode
+{
+	if(aCode == 0x02)return @"CAEN";
+	else return @"Unknown Manufacturer";
+}
+
+- (NSString*) decodeModuleCode:(short)aCode
+{
+	if(aCode == 0x012)return @"V265";
+	else return @"Unknown module";
+}
+
+
 #pragma mark ***Support Hardware Functions
 //--------------------------------------------------------------------------------
 // Method:	readThreshold

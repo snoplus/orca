@@ -20,8 +20,6 @@
 			<dict>
 				<key>baseAddressAction</key>
 				<string>id</string>
-				<key>clearAction</key>
-				<string>id</string>
 				<key>disableAllAction</key>
 				<string>id</string>
 				<key>enableAllAction</key>
@@ -47,8 +45,6 @@
 				<string>NSStepper</string>
 				<key>addressText</key>
 				<string>NSTextField</string>
-				<key>clearButton</key>
-				<string>NSButton</string>
 				<key>disableAllButton</key>
 				<string>NSButton</string>
 				<key>enableAllButton</key>

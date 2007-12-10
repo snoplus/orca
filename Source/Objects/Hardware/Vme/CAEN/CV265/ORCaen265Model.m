@@ -183,16 +183,6 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 					usingAddSpace:0x01];
 }
 
-- (void) clear
-{
-	unsigned short aValue = 0;
-    [[self adapter] writeWordBlock:&aValue
-						atAddress:[self baseAddress]+register_offsets[kClear]
-						numToWrite:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-}
-
 
 - (NSDictionary*) dataRecordDescription
 {
@@ -277,10 +267,10 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 					}
 					else {
 						//unlikely we have been assigned the long form, but just in case....
-						unsigned long dataBuffer[2];
-						dataBuffer[0] = dataId | 2;
-						dataBuffer[1] = location | dataValue & 0x7fff;
-						[aDataPacket addLongsToFrameBuffer:dataBuffer length:2];
+						unsigned long dataRecord[2];
+						dataRecord[0] = dataId | 2;
+						dataRecord[1] = location | dataValue & 0x7fff;
+						[aDataPacket addLongsToFrameBuffer:dataRecord length:2];
 					}
 				}
 			}

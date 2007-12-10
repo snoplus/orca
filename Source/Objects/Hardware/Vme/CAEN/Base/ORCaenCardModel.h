@@ -112,6 +112,8 @@ typedef struct RegisterNamesStruct {
 - (void)		writeThresholds;
 - (void)		caenInitializeForDataTaking;
 - (void)		logThresholds;
+- (NSString*)       decodeManufacturerCode:(short)aCode;
+- (NSString*)       decodeModuleCode:(short)aCode;
 
 #pragma mark ***Support Hardware Functions
 - (void)		readThreshold: (unsigned short) pChan; 
