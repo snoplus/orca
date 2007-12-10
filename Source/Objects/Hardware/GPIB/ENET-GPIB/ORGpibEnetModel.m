@@ -82,6 +82,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [noDriverAlarm setSticky:NO];
             [noDriverAlarm setAcknowledged:NO];
             [noDriverAlarm postAlarm];
+            [noDriverAlarm setHelpStringFromFile:@"NoNI488DriversHelp"];
 
         }
     } else {
@@ -91,6 +92,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         [noPluginAlarm setSticky:NO];
         [noPluginAlarm setAcknowledged:NO];
         [noPluginAlarm postAlarm];
+        [noPluginAlarm setHelpStringFromFile:@"NoNI488PluginHelp"];
 
         gpibEnetInstance = nil;
     }
@@ -145,7 +147,24 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 //--------------------------------------------------------------------------------
 - (void) setUpImage
 {
-    [ self setImage: [NSImage imageNamed: @"GpibEnetBox" ]];
+    NSImage* aCachedImage = [NSImage imageNamed:@"GpibEnetBox"];
+    NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
+    [i lockFocus];
+    [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
+    
+    if(![self isEnabled]){
+        NSBezierPath* path = [NSBezierPath bezierPath];
+        [path moveToPoint:NSZeroPoint];
+        [path lineToPoint:NSMakePoint([self frame].size.width,[self frame].size.height)];
+        [path moveToPoint:NSMakePoint([self frame].size.width,0)];
+        [path lineToPoint:NSMakePoint(0,[self frame].size.height)];
+        [path setLineWidth:2];
+        [[NSColor redColor] set];
+        [path stroke];
+    }
+    [i unlockFocus];
+    
+    [ self setImage:i];
 }
 
 //--------------------------------------------------------------------------------
@@ -218,7 +237,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 - (int) ibsta
 {
-    if ( gpibEnetInstance != nil) {
+    if ( [ self isEnabled ]) {
         return( [gpibEnetInstance ibsta] );
     }
     return 0;
@@ -226,7 +245,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 - (int) iberr
 {
-    if ( gpibEnetInstance != nil) {
+    if ( [ self isEnabled ]) {
         return( [gpibEnetInstance iberr] );
     }
     return 0;
@@ -234,7 +253,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 - (long) ibcntl
 {
-    if ( gpibEnetInstance != nil) {
+    if ( [ self isEnabled ]) {
         return( [gpibEnetInstance ibcntl] );
     }
     return 0;
@@ -254,7 +273,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 - (void) changePrimaryAddress: (short) anOldPrimaryAddress newAddress: (short) aNewPrimaryAddress
 {
     // Make sure that device is initialized and that new address is valid.
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         [ self checkDeviceThrow: anOldPrimaryAddress ];
@@ -285,7 +304,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         short deviceState = 0;
@@ -321,7 +340,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 - (BOOL) checkAddress: (short) aPrimaryAddress
 {
     BOOL  bRetVal = false;
-    if ( gpibEnetInstance == nil) return bRetVal;
+    if ( ! [ self isEnabled ]) return bRetVal;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         
@@ -351,7 +370,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 //--------------------------------------------------------------------------------
 - (void) deactivateAddress: (short) aPrimaryAddress
 {
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         [ theHWLock lock ];   //-----begin critical section
                               // Make sure that device is initialized.
@@ -375,7 +394,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 - (void) enableEOT:(short)aPrimaryAddress state: (BOOL) state
 {
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     // Make sure that device is initialized.
     NS_DURING
         [ theHWLock lock ];   //-----begin critical section
@@ -404,7 +423,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         [ self checkDeviceThrow: aPrimaryAddress ];
@@ -455,7 +474,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {  
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         // Check device number.
         [theHWLock lock];   //-----begin critical section
@@ -503,7 +522,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {
-    if ( gpibEnetInstance == nil) return -1;
+    if ( ! [ self isEnabled ]) return -1;
     long	nReadBytes = -1;
     
     NS_DURING
@@ -567,7 +586,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 //--------------------------------------------------------------------------------
 - (void) writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand
 {
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         [ theHWLock lock ];   //-----begin critical section
                               // Make sure that device is initialized.
@@ -619,7 +638,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     //--------------------------------------------------------------------------------
 {
     long retVal = 0;
-    if ( gpibEnetInstance == nil) return -1;
+    if ( ! [ self isEnabled ]) return -1;
     NS_DURING
         
         [theHWLock lock];   //-----begin critical section
@@ -647,7 +666,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         "*/
     //--------------------------------------------------------------------------------
 {
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
                             // Make sure that device is initialized.
@@ -705,7 +724,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 //--------------------------------------------------------------------------------
 - (void) checkDeviceThrow: (short) aPrimaryAddress checkSetup: (BOOL) aState
 {
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         [theHWLock lock];   //-----begin critical section
         if ( aPrimaryAddress < 0 || aPrimaryAddress > kMaxGpibAddresses ){
@@ -766,7 +785,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     "*/
     //--------------------------------------------------------------------------------
 {
-    if ( gpibEnetInstance == nil) return;
+    if ( ! [ self isEnabled ]) return;
     NS_DURING
         // Handle the master error register and extract error.
         [theHWLock unlock];   //-----end critical section

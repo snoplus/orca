@@ -1595,6 +1595,8 @@
 		CE252F750D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */ = {isa = PBXBuildFile; fileRef = CE252F680D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		CE252F780D0DB66200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE252F680D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */; };
+		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
+		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -3173,6 +3175,8 @@
 		9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerDefs.h; path = "Source/Objects/Hardware/auger/Auger Base Classes/ORAugerDefs.h"; sourceTree = SOURCE_ROOT; };
 		CE252F680D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/PPC/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = "<group>"; };
 		CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EduWashingtonNplOrcaNi488PlugIn.h; sourceTree = "<group>"; };
+		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
+		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
 		F51E695403AE4775015F64B1 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/App Delegate/main.m"; sourceTree = SOURCE_ROOT; };
 		F51E695503AE4775015F64B1 /* ORAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAppDelegate.h; sourceTree = "<group>"; };
 		F51E695603AE4775015F64B1 /* ORAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAppDelegate.m; sourceTree = "<group>"; };
@@ -6227,6 +6231,8 @@
 				84C4939E04059AEA005F64B1 /* ORGpibEnetModel.h */,
 				84C4939F04059AEA005F64B1 /* ORGpibEnetModel.m */,
 				848627AD08E4B5EB00301049 /* GpibEnetBox.tif */,
+				CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */,
+				CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */,
 				84C493A004059AEA005F64B1 /* ORGpibSetup.nib */,
 			);
 			path = "ENET-GPIB";
@@ -8347,6 +8353,8 @@
 				9C1363C70D0A7921006C550D /* Caen265.nib in Resources */,
 				9C1363C80D0A7921006C550D /* Caen265Card.tif in Resources */,
 				CE252F750D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
+				CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */,
+				CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
