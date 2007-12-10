@@ -1370,7 +1370,6 @@
 		842E59FA0C16041E00397CDF /* ORRamperView.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DAB0C0C108E3C00044320 /* ORRamperView.m */; };
 		842E59FB0C16041E00397CDF /* ORRampItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DAB0E0C108E3C00044320 /* ORRampItem.m */; };
 		842E59FC0C16041E00397CDF /* ORRampItemController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DAB100C108E3C00044320 /* ORRampItemController.m */; };
-		842E59FE0C16041E00397CDF /* NI488.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C493CD04059C4A005F64B1 /* NI488.framework */; };
 		842E59FF0C16041E00397CDF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84AA7A540545B1B2005F64B1 /* Cocoa.framework */; };
 		842E5A000C16041E00397CDF /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */; };
 		842E5A010C16041E00397CDF /* Message.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8429C8F80665661100213F1E /* Message.framework */; };
@@ -2909,7 +2908,6 @@
 		84C493AE04059AEA005F64B1 /* ORTek754DController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORTek754DController.m; sourceTree = "<group>"; };
 		84C493B104059AEA005F64B1 /* ORTek754DModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTek754DModel.h; sourceTree = "<group>"; };
 		84C493B204059AEA005F64B1 /* ORTek754DModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORTek754DModel.m; sourceTree = "<group>"; };
-		84C493CD04059C4A005F64B1 /* NI488.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NI488.framework; path = ../../../../Library/Frameworks/NI488.framework; sourceTree = SOURCE_ROOT; };
 		84C494910405A0C0005F64B1 /* NcdMuxController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdMuxController.h; sourceTree = "<group>"; };
 		84C494920405A0C0005F64B1 /* NcdMuxController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdMuxController.m; sourceTree = "<group>"; };
 		84C494950405A0C0005F64B1 /* NcdMuxModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdMuxModel.h; sourceTree = "<group>"; };
@@ -3261,7 +3259,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				842E59FE0C16041E00397CDF /* NI488.framework in Frameworks */,
 				842E59FF0C16041E00397CDF /* Cocoa.framework in Frameworks */,
 				842E5A000C16041E00397CDF /* Carbon.framework in Frameworks */,
 				842E5A010C16041E00397CDF /* Message.framework in Frameworks */,
@@ -3284,7 +3281,6 @@
 				8429C8F80665661100213F1E /* Message.framework */,
 				84AA7A540545B1B2005F64B1 /* Cocoa.framework */,
 				F539C97C03A7C80D015F64B1 /* IOKit.framework */,
-				84C493CD04059C4A005F64B1 /* NI488.framework */,
 				847599850B5FF26500123411 /* QuartzCore.framework */,
 			);
 			name = "Linked Frameworks";
