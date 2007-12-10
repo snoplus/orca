@@ -309,8 +309,8 @@
 				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
 				PBXFileTableDataSourceColumnWidthsKey = (
 					20,
-					440,
-					161,
+					753,
+					60,
 					20,
 					96,
 					43,
@@ -6045,9 +6045,9 @@
 	};
 	844D92FA0A0A79AA00E83C57 /* ORPulser33220Model.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {970, 1722}}";
-			sepNavSelRange = "{1130, 27}";
-			sepNavVisRange = "{0, 1774}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 1736}}";
+			sepNavSelRange = "{1248, 15}";
+			sepNavVisRange = "{0, 1649}";
 			sepNavVisRect = "{{0, 195}, {587, 771}}";
 			sepNavWindowFrame = "{{38, 125}, {1029, 930}}";
 		};
@@ -6993,8 +6993,9 @@
 	};
 	847946CB07330E5300C5E1FA /* ORPciBit3Model.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1004, 28546}}";
-			sepNavSelRange = "{24696, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {1016, 27678}}";
+			sepNavSelRange = "{47262, 4}";
+			sepNavVisRange = "{45937, 2393}";
 			sepNavVisRect = "{{0, 10311}, {821, 777}}";
 			sepNavWindowFrame = "{{147, 314}, {1075, 855}}";
 		};
@@ -7200,15 +7201,15 @@
 	8479E4400D0A1A7E007E346A /* ORCaen265Controller.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1019, 770}}";
-			sepNavSelRange = "{2166, 0}";
-			sepNavVisRange = "{0, 2080}";
+			sepNavSelRange = "{1181, 0}";
+			sepNavVisRange = "{29, 2133}";
 		};
 	};
 	8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {866, 3304}}";
-			sepNavSelRange = "{6882, 0}";
-			sepNavVisRange = "{3083, 1906}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 3388}}";
+			sepNavSelRange = "{4221, 0}";
+			sepNavVisRange = "{3910, 1245}";
 			sepNavWindowFrame = "{{61, 126}, {925, 1005}}";
 		};
 	};
@@ -7221,24 +7222,24 @@
 	};
 	8479E4430D0A1A7E007E346A /* ORCaen265Decoders.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1019, 924}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 826}}";
 			sepNavSelRange = "{67, 7}";
-			sepNavVisRange = "{0, 2140}";
+			sepNavVisRange = "{210, 2161}";
 		};
 	};
 	8479E4440D0A1A7E007E346A /* ORCaen265Model.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {674, 1596}}";
-			sepNavSelRange = "{3237, 0}";
-			sepNavVisRange = "{0, 1816}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 1624}}";
+			sepNavSelRange = "{1325, 0}";
+			sepNavVisRange = "{607, 1192}";
 			sepNavWindowFrame = "{{38, 92}, {671, 1079}}";
 		};
 	};
 	8479E4450D0A1A7E007E346A /* ORCaen265Model.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {716, 4970}}";
-			sepNavSelRange = "{10210, 0}";
-			sepNavVisRange = "{5022, 2442}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 4844}}";
+			sepNavSelRange = "{6877, 8}";
+			sepNavVisRange = "{6772, 1516}";
 			sepNavWindowFrame = "{{15, 94}, {671, 1079}}";
 		};
 	};
@@ -7557,7 +7558,7 @@
 		fRef = 8479E4400D0A1A7E007E346A /* ORCaen265Controller.h */;
 		name = "ORCaen265Controller.h: 55";
 		rLen = 0;
-		rLoc = 2166;
+		rLoc = 2162;
 		rType = 0;
 		vrLen = 2080;
 		vrLoc = 0;
@@ -7863,9 +7864,9 @@
 		fRef = 8479E4400D0A1A7E007E346A /* ORCaen265Controller.h */;
 		name = "ORCaen265Controller.h: 33";
 		rLen = 0;
-		rLoc = 1140;
+		rLoc = 1136;
 		rType = 0;
-		vrLen = 1374;
+		vrLen = 1259;
 		vrLoc = 907;
 	};
 	8479E4D40D0D9D9C007E346A /* PBXBookmark */ = {
@@ -7877,9 +7878,9 @@
 		fRef = 8479E4400D0A1A7E007E346A /* ORCaen265Controller.h */;
 		name = "ORCaen265Controller.h: 33";
 		rLen = 0;
-		rLoc = 1140;
+		rLoc = 1136;
 		rType = 0;
-		vrLen = 1374;
+		vrLen = 1259;
 		vrLoc = 907;
 	};
 	8479E4D60D0D9D9C007E346A /* PBXBookmark */ = {
@@ -7921,7 +7922,7 @@
 		fRef = 8479E4440D0A1A7E007E346A /* ORCaen265Model.h */;
 		name = "ORCaen265Model.h: 41";
 		rLen = 0;
-		rLoc = 1278;
+		rLoc = 1281;
 		rType = 0;
 		vrLen = 965;
 		vrLoc = 547;
@@ -7931,7 +7932,7 @@
 		fRef = 8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */;
 		name = "ORCaen265Controller.m: 67";
 		rLen = 0;
-		rLoc = 1871;
+		rLoc = 1867;
 		rType = 0;
 		vrLen = 1475;
 		vrLoc = 1409;
@@ -7951,7 +7952,7 @@
 		fRef = 8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */;
 		name = "ORCaen265Controller.m: 157";
 		rLen = 0;
-		rLoc = 4399;
+		rLoc = 4432;
 		rType = 0;
 		vrLen = 1367;
 		vrLoc = 3245;
@@ -7971,7 +7972,7 @@
 		fRef = 8479E4440D0A1A7E007E346A /* ORCaen265Model.h */;
 		name = "ORCaen265Model.h: 40";
 		rLen = 8;
-		rLoc = 1258;
+		rLoc = 1261;
 		rType = 0;
 		vrLen = 1576;
 		vrLoc = 0;
@@ -7981,7 +7982,7 @@
 		fRef = 8479E4450D0A1A7E007E346A /* ORCaen265Model.m */;
 		name = "ORCaen265Model.m: 179";
 		rLen = 0;
-		rLoc = 6476;
+		rLoc = 6477;
 		rType = 0;
 		vrLen = 1564;
 		vrLoc = 3711;
@@ -7991,7 +7992,7 @@
 		fRef = 8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */;
 		name = "ORCaen265Controller.m: 75";
 		rLen = 0;
-		rLoc = 2052;
+		rLoc = 2048;
 		rType = 0;
 		vrLen = 1489;
 		vrLoc = 481;
@@ -8001,7 +8002,7 @@
 		fRef = 8479E4400D0A1A7E007E346A /* ORCaen265Controller.h */;
 		name = "ORCaen265Controller.h: 36";
 		rLen = 0;
-		rLoc = 1345;
+		rLoc = 1341;
 		rType = 0;
 		vrLen = 1718;
 		vrLoc = 0;
@@ -8011,7 +8012,7 @@
 		fRef = 8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */;
 		name = "ORCaen265Controller.m: 64";
 		rLen = 0;
-		rLoc = 1869;
+		rLoc = 1865;
 		rType = 0;
 		vrLen = 1389;
 		vrLoc = 674;
@@ -8035,7 +8036,7 @@
 		fRef = 8479E4400D0A1A7E007E346A /* ORCaen265Controller.h */;
 		name = "ORCaen265Controller.h: 32";
 		rLen = 0;
-		rLoc = 1210;
+		rLoc = 1206;
 		rType = 0;
 		vrLen = 1751;
 		vrLoc = 0;
@@ -8055,7 +8056,7 @@
 		fRef = 8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */;
 		name = "ORCaen265Controller.m: 138";
 		rLen = 5;
-		rLoc = 3812;
+		rLoc = 3845;
 		rType = 0;
 		vrLen = 1878;
 		vrLoc = 3187;
@@ -8065,7 +8066,7 @@
 		fRef = 8479E4450D0A1A7E007E346A /* ORCaen265Model.m */;
 		name = "ORCaen265Model.m: 219";
 		rLen = 0;
-		rLoc = 6052;
+		rLoc = 6053;
 		rType = 0;
 		vrLen = 1503;
 		vrLoc = 5638;
@@ -8077,7 +8078,7 @@
 		rLen = 0;
 		rLoc = 2359;
 		rType = 0;
-		vrLen = 2017;
+		vrLen = 816;
 		vrLoc = 1555;
 	};
 	8479E4EB0D0D9D9C007E346A /* PBXTextBookmark */ = {
@@ -8117,7 +8118,7 @@
 		rLen = 0;
 		rLoc = 1869;
 		rType = 0;
-		vrLen = 2234;
+		vrLen = 2160;
 		vrLoc = 211;
 	};
 	8479E4EF0D0D9D9C007E346A /* PBXTextBookmark */ = {
@@ -8125,7 +8126,7 @@
 		fRef = 8479E4450D0A1A7E007E346A /* ORCaen265Model.m */;
 		name = "ORCaen265Model.m: 195";
 		rLen = 8;
-		rLoc = 5216;
+		rLoc = 5217;
 		rType = 0;
 		vrLen = 2213;
 		vrLoc = 4292;
@@ -8135,7 +8136,7 @@
 		fRef = 8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */;
 		name = "ORCaen265Controller.m: 117";
 		rLen = 0;
-		rLoc = 3356;
+		rLoc = 3369;
 		rType = 0;
 		vrLen = 1809;
 		vrLoc = 3087;
@@ -8145,7 +8146,7 @@
 		fRef = 8479E4440D0A1A7E007E346A /* ORCaen265Model.h */;
 		name = "ORCaen265Model.h: 40";
 		rLen = 8;
-		rLoc = 1258;
+		rLoc = 1261;
 		rType = 0;
 		vrLen = 1658;
 		vrLoc = 0;
@@ -8167,7 +8168,7 @@
 		rLen = 0;
 		rLoc = 1869;
 		rType = 0;
-		vrLen = 2369;
+		vrLen = 2295;
 		vrLoc = 76;
 	};
 	8479E4F40D0D9D9C007E346A /* PBXTextBookmark */ = {
@@ -8255,7 +8256,7 @@
 		fRef = 8479E4400D0A1A7E007E346A /* ORCaen265Controller.h */;
 		name = "ORCaen265Controller.h: 20";
 		rLen = 0;
-		rLoc = 962;
+		rLoc = 958;
 		rType = 0;
 		vrLen = 1701;
 		vrLoc = 0;
@@ -8285,7 +8286,7 @@
 		fRef = 8479E4400D0A1A7E007E346A /* ORCaen265Controller.h */;
 		name = "ORCaen265Controller.h: 55";
 		rLen = 0;
-		rLoc = 2166;
+		rLoc = 2162;
 		rType = 0;
 		vrLen = 2080;
 		vrLoc = 0;
@@ -8364,7 +8365,7 @@
 		fRef = 8479E4450D0A1A7E007E346A /* ORCaen265Model.m */;
 		name = "ORCaen265Model.m: 355";
 		rLen = 0;
-		rLoc = 10210;
+		rLoc = 10211;
 		rType = 0;
 		vrLen = 2495;
 		vrLoc = 4969;
@@ -8374,7 +8375,7 @@
 		fRef = 8479E4440D0A1A7E007E346A /* ORCaen265Model.h */;
 		name = "ORCaen265Model.h: 38";
 		rLen = 13;
-		rLoc = 1229;
+		rLoc = 1232;
 		rType = 0;
 		vrLen = 1799;
 		vrLoc = 0;
@@ -8384,7 +8385,7 @@
 		fRef = 8479E4440D0A1A7E007E346A /* ORCaen265Model.h */;
 		name = "ORCaen265Model.h: 114";
 		rLen = 0;
-		rLoc = 3237;
+		rLoc = 3218;
 		rType = 0;
 		vrLen = 1816;
 		vrLoc = 0;
@@ -8441,7 +8442,7 @@
 		fRef = 8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */;
 		name = "ORCaen265Controller.m: 32";
 		rLen = 0;
-		rLoc = 1145;
+		rLoc = 1141;
 		rType = 0;
 		vrLen = 1749;
 		vrLoc = 1281;
@@ -8451,7 +8452,7 @@
 		fRef = 8479E4410D0A1A7E007E346A /* ORCaen265Controller.m */;
 		name = "ORCaen265Controller.m: 236";
 		rLen = 0;
-		rLoc = 6882;
+		rLoc = 7020;
 		rType = 0;
 		vrLen = 1851;
 		vrLoc = 3138;
@@ -11773,8 +11774,9 @@
 	};
 	84C4939E04059AEA005F64B1 /* ORGpibEnetModel.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {711, 1260}}";
-			sepNavSelRange = "{2193, 14}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 1358}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1696}";
 			sepNavVisRect = "{{0, 563}, {711, 429}}";
 			sepNavWindowFrame = "{{465, 319}, {750, 558}}";
 		};
@@ -11986,8 +11988,9 @@
 	};
 	84CDDA3B047167C7005F64B1 /* ORGpibDeviceModel.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {704, 8442}}";
-			sepNavSelRange = "{20302, 7}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 8204}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{5743, 2013}";
 			sepNavVisRect = "{{0, 7957}, {662, 485}}";
 			sepNavWindowFrame = "{{154, 294}, {750, 558}}";
 		};
@@ -12636,16 +12639,18 @@
 	};
 	84DE590B051F7606005F64B1 /* ORCaenCardModel.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {864, 2156}}";
-			sepNavSelRange = "{1318, 12}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 2394}}";
+			sepNavSelRange = "{3628, 0}";
+			sepNavVisRange = "{1919, 1667}";
 			sepNavVisRect = "{{0, 596}, {864, 334}}";
 			sepNavWindowFrame = "{{337, 171}, {750, 558}}";
 		};
 	};
 	84DE590C051F7606005F64B1 /* ORCaenCardModel.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {968, 11802}}";
-			sepNavSelRange = "{482, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 12222}}";
+			sepNavSelRange = "{16616, 0}";
+			sepNavVisRange = "{15679, 1460}";
 			sepNavVisRect = "{{0, 0}, {930, 448}}";
 			sepNavWindowFrame = "{{41, 305}, {750, 558}}";
 		};
@@ -13845,8 +13850,9 @@
 	};
 	F5B1802B03B297FD015F64B1 /* ORCaen775Model.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {719, 1316}}";
-			sepNavSelRange = "{1326, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 1526}}";
+			sepNavSelRange = "{2000, 15}";
+			sepNavVisRange = "{1393, 934}";
 			sepNavVisRect = "{{0, 0}, {719, 722}}";
 			sepNavWindowFrame = "{{406, 108}, {750, 558}}";
 		};
