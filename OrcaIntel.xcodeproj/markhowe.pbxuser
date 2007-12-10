@@ -2759,6 +2759,7 @@
 			84CE57AF0D0D9DD400F8551E /* PBXBookmark */ = 84CE57AF0D0D9DD400F8551E /* PBXBookmark */;
 			84CE57B00D0D9DD400F8551E /* PBXBookmark */ = 84CE57B00D0D9DD400F8551E /* PBXBookmark */;
 			84CE57B10D0D9DD400F8551E /* PBXTextBookmark */ = 84CE57B10D0D9DD400F8551E /* PBXTextBookmark */;
+			84CE57E10D0D9F4A00F8551E /* PBXTextBookmark */ = 84CE57E10D0D9F4A00F8551E /* PBXTextBookmark */;
 		};
 		sourceControlManager = 84D1F3E8054F14EF0074BAF3 /* Source Control */;
 		userBookmarkGroup = 842A60E106FF7723007536B6 /* PBXBookmarkGroup */;
@@ -8306,6 +8307,11 @@
 		name = markhowe.perspectivev3;
 		path = /Users/markhowe/Dev/Orca/OrcaIntel.xcodeproj/markhowe.perspectivev3;
 		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 22820}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1274}";
+		};
 	};
 	8479E5030D0D9D9C007E346A /* PBXTextBookmark */ = {
 		isa = PBXTextBookmark;
@@ -9006,8 +9012,8 @@
 	};
 	847DFD3E0D08C7EE0021F9CB /* ORNplHVController.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {866, 877}}";
-			sepNavSelRange = "{1680, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {1019, 724}}";
+			sepNavSelRange = "{264, 0}";
 			sepNavVisRange = "{0, 1680}";
 			sepNavWindowFrame = "{{607, 123}, {925, 1005}}";
 		};
@@ -9016,7 +9022,7 @@
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1019, 1610}}";
 			sepNavSelRange = "{3125, 0}";
-			sepNavVisRange = "{2030, 1099}";
+			sepNavVisRange = "{2000, 1129}";
 			sepNavWindowFrame = "{{107, 84}, {925, 1005}}";
 		};
 	};
@@ -12058,6 +12064,16 @@
 		rType = 0;
 		vrLen = 1351;
 		vrLoc = 2967;
+	};
+	84CE57E10D0D9F4A00F8551E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8479E5020D0D9D9C007E346A /* markhowe.perspectivev3 */;
+		name = "markhowe.perspectivev3: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1274;
+		vrLoc = 0;
 	};
 	84CF3B1F05E6B2B800C5C320 /* UKPrefsPanel.h */ = {
 		uiCtxt = {
