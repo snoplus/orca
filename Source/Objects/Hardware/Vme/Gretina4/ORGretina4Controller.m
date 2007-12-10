@@ -726,7 +726,14 @@
 
 - (IBAction) resetBoard:(id) sender
 {
-    [model resetBoard];
+    NS_DURING
+        [model resetBoard];
+        NSLog(@"Reset Gretina4 Board (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+    NS_HANDLER
+        NSLog(@"Reset of Gretina4 Board FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4 Reset", @"OK", nil, nil,
+                        localException);
+    NS_ENDHANDLER
 }
 
 -(IBAction)initBoard:(id)sender
@@ -737,8 +744,8 @@
         NSLog(@"Initialized Gretina4 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
     NS_HANDLER
-        NSLog(@"Reset and Init of Gretina4 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4 Reset and Init", @"OK", nil, nil,
+        NSLog(@"Init of Gretina4 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Gretina4 Init", @"OK", nil, nil,
                         localException);
     NS_ENDHANDLER
 }
