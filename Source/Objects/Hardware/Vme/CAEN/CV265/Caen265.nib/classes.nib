@@ -32,6 +32,8 @@
 				<string>id</string>
 				<key>suppressZerosAction</key>
 				<string>id</string>
+				<key>triggerAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORCaen265Controller</string>
@@ -55,11 +57,11 @@
 				<string>NSButton</string>
 				<key>settingLockButton</key>
 				<string>NSButton</string>
-				<key>settingLockDocField</key>
-				<string>NSTextField</string>
 				<key>slotField</key>
 				<string>NSTextField</string>
 				<key>suppressZerosButton</key>
+				<string>NSButton</string>
+				<key>triggerButton</key>
 				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>

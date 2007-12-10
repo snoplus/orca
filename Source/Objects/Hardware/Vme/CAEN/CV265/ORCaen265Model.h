@@ -85,6 +85,7 @@ enum {
 - (unsigned short) 	readBoardID;
 - (unsigned short) 	readBoardVersion;
 - (unsigned short) 	readFixedCode;
+- (void)			trigger;
 
 #pragma mark •••Data Header
 - (NSDictionary*) dataRecordDescription;

@@ -30,7 +30,7 @@
     IBOutlet NSButton*		initButton;
 	IBOutlet NSButton*		probeButton;
     IBOutlet NSButton*		settingLockButton;
-    IBOutlet NSTextField*   settingLockDocField;
+    IBOutlet NSButton*		triggerButton;
 }
 
 - (void) registerNotificationObservers;
@@ -50,4 +50,5 @@
 - (IBAction) probeBoard:(id)sender;
 - (IBAction) enableAllAction:(id)sender;
 - (IBAction) disableAllAction:(id)sender;
+- (IBAction) triggerAction:(id)sender;
 @end

@@ -105,7 +105,6 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen265SettingsLock];
     BOOL locked = [gSecurity isLocked:ORCaen265SettingsLock];
@@ -118,7 +117,7 @@
     [suppressZerosButton setEnabled:!lockedOrRunningMaintenance];
     [enableAllButton setEnabled:!lockedOrRunningMaintenance];
     [disableAllButton setEnabled:!lockedOrRunningMaintenance];
-	
+    [triggerButton setEnabled:!locked];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -217,6 +216,20 @@
 		NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
 						localException);
     NS_ENDHANDLER
+}
+
+- (IBAction) triggerAction:(id)sender
+{
+    NS_DURING
+        [model trigger];		//force trigger
+		NSLog(@"Triggered Caen265 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    NS_HANDLER
+        NSLog(@"Trigger of Caen265 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Caen265 Trigger", @"OK", nil, nil,
+                        localException);
+    NS_ENDHANDLER
+
 }
 
 @end
