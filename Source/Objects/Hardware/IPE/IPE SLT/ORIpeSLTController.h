@@ -44,6 +44,10 @@
 		IBOutlet NSMatrix*		pageStatusMatrix;
 		IBOutlet NSMatrix*		readAllMatrix;
 		IBOutlet NSButton*		calibrateButton;
+		IBOutlet NSTextField*   pageSizeField;
+		IBOutlet NSStepper*     pageSizeStepper;
+		IBOutlet NSButton*      displayTriggerButton;
+		IBOutlet NSButton*      displayEventLoopButton;
 		
 		//status reg
 		IBOutlet NSMatrix*		statusMatrix;
@@ -107,6 +111,9 @@
 - (void) versionChanged:(NSNotification*)aNote;
 - (void) nHitThresholdChanged:(NSNotification*)aNote;
 - (void) nHitChanged:(NSNotification*)aNote;
+- (void) pageSizeChanged:(NSNotification*)aNote;
+- (void) displayEventLoopChanged:(NSNotification*)aNote;
+- (void) displayTriggerChanged:(NSNotification*)aNote;
 - (void) populatePullDown;
 - (void) updateWindow;
 - (void) settingsLockChanged:(NSNotification*)aNote;
@@ -140,6 +147,9 @@
 - (IBAction) interruptMaskAction:(id)sender;
 - (IBAction) nHitThresholdAction:(id)sender;
 - (IBAction) nHitAction:(id)sender;
+- (IBAction) pageSizeAction:(id)sender;
+- (IBAction) displayTriggerAction:(id)sender;
+- (IBAction) displayEventLoopAction:(id)sender;
 - (IBAction) usePBusSimAction:(id) sender;
 - (IBAction) controlCheckBoxAction:(id) sender;
 - (IBAction) inhibitCheckBoxAction:(id) sender;

@@ -14,6 +14,8 @@
                 controlRegAction = id; 
                 deadTimeAction = id; 
                 definePatternFileAction = id; 
+                displayEventLoopAction = id; 
+                displayTriggerAction = id; 
                 dumpROMAction = id; 
                 dumpTriggerRAM = id; 
                 forceTrigger = id; 
@@ -25,6 +27,7 @@
                 nHitAction = id; 
                 nHitThresholdAction = id; 
                 nextPageDelayAction = id; 
+                pageSizeAction = id; 
                 pollNowAction = id; 
                 pollRateAction = id; 
                 pulseOnceAction = id; 
@@ -55,6 +58,8 @@
                 controlCheckBoxMatrix = NSMatrix; 
                 deadTimeButton = NSButton; 
                 definePatternFileButton = NSButton; 
+                displayEventLoopButton = NSButton; 
+                displayTriggerButton = NSButton; 
                 dumpROMButton = NSButton; 
                 forceTrigger1Button = NSButton; 
                 forceTriggerButton = NSButton; 
@@ -71,6 +76,8 @@
                 nextPageDelayField = NSTextField; 
                 nextPageDelaySlider = NSSlider; 
                 nextPageField = NSTextField; 
+                pageSizeField = NSTextField; 
+                pageSizeStepper = NSStepper; 
                 pageStatusMatrix = NSMatrix; 
                 patternFilePathField = NSTextField; 
                 pollRatePopup = NSPopUpButton; 

@@ -205,6 +205,10 @@ NSString* ORIpeSLTModelPageStatusChanged		= @"ORIpeSLTModelPageStatusChanged";
 NSString* ORIpeSLTModelPollRateChanged			= @"ORIpeSLTModelPollRateChanged";
 NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 
+NSString* ORIpeSLTModelPageSizeChanged			= @"ORIpeSLTModelPageSizeChanged";
+NSString* ORIpeSLTModelDisplayTriggerChanged	= @"ORIpeSLTModelDisplayTrigerChanged";
+NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoopChanged";
+
 @implementation ORIpeSLTModel
 
 - (id) init
@@ -853,6 +857,49 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 }
 
 
+- (BOOL) displayTrigger
+{
+	return displayTrigger;
+}
+
+- (void) setDisplayTrigger:(BOOL) aState
+{
+	displayTrigger = aState;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSLTModelDisplayTriggerChanged object:self];
+	
+}
+
+- (BOOL) displayEventLoop
+{
+	return displayEventLoop;
+}
+
+- (void) setDisplayEventLoop:(BOOL) aState
+{
+	displayEventLoop = aState;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSLTModelDisplayEventLoopChanged object:self];
+	
+}
+
+- (unsigned long) pageSize
+{
+	return pageSize;
+}
+
+- (void) setPageSize: (unsigned long) aPageSize
+{
+    if (aPageSize < 0) pageSize = 0;
+	else if (aPageSize > 100) pageSize = 100;
+	else pageSize = aPageSize;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSLTModelPageSizeChanged object:self];
+	
+}  
+
+
+
 #pragma mark ***HW Access
 - (void) checkPresence
 {
@@ -1320,6 +1367,10 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 	[self setReadOutGroup:			[decoder decodeObjectForKey:@"ReadoutGroup"]];
     [self setPoller:				[decoder decodeObjectForKey:@"poller"]];
 	
+    [self setPageSize:				[decoder decodeIntForKey:@"ORIpeSLTPageSize"]]; // ak, 9.12.07
+    [self setDisplayTrigger:		[decoder decodeBoolForKey:@"ORIpeSLTDisplayTrigger"]];
+    [self setDisplayEventLoop:		[decoder decodeBoolForKey:@"ORIpeSLTDisplayEventLoop"]];
+
 
     if (!poller)[self makePoller:0];
 
@@ -1371,6 +1422,9 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 	[encoder encodeObject:readOutGroup  forKey:@"ReadoutGroup"];
     [encoder encodeObject:poller         forKey:@"poller"];
 	
+    [encoder encodeInt:pageSize         forKey:@"ORIpeSLTPageSize"]; // ak, 9.12.07
+    [encoder encodeBool:displayTrigger   forKey:@"ORIpeSLTDisplayTrigger"];
+    [encoder encodeBool:displayEventLoop forKey:@"ORIpeSLTDisplayEventLoop"];
 
 }
 
@@ -1475,14 +1529,34 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 	actualPageIndex = 0;
 	eventCounter    = 0;
 	first = YES;
+	lastDisplaySec = 0;
+	lastDisplayCounter = 0;
+	lastDisplayRate = 0;
+	
+  	usingPBusSimulation		  = [self pBusSim];
+	lastSimSec = 0;
+	
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	if(!first){
+		struct timeval t0, t1;
+		struct timezone tz;	
+			
 			
 		unsigned long long lPageStatus;
 		lPageStatus = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
+
+		// Siumartion events everey second?!
+		if (usingPBusSimulation){
+		  gettimeofday(&t0, &tz);
+		  if (t0.tv_sec > lastSimSec) {
+		    lPageStatus = 1;
+			lastSimSec = t0.tv_sec;
+		  }	
+		}
+		
 		
 		if(lPageStatus != 0x0){
 			while((lPageStatus & (0x1LL<<actualPageIndex)) == 0){
@@ -1490,6 +1564,8 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 				else actualPageIndex++;
 			}
 			
+			// Set start of readout 
+			gettimeofday(&t0, &tz);
 			
 			eventCounter++;
 			
@@ -1504,59 +1580,40 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 			//			         actualPageIndex+1, iPageStart, timeStampH, (timeStampL >> 11) & 0x3fff);
 			
 			//readout the SLT pixel trigger data
+			int i;
 			unsigned long buffer[2000];
 			unsigned long sltMemoryAddress = (SLTID << 24) | actualPageIndex<<11;
-			[self readBlock:sltMemoryAddress dataBuffer:(unsigned long*)buffer length:20*100 increment:1];
-			unsigned long reorderBuffer[2000];
+			// Split the reading of the memory in blocks according to the maximal block size
+			// supported by the firewire driver	
+			// TODO: Read only the relevant trigger data for smaller page sizes!
+			//       Reading needs to start in this case at start address...		
+			int blockSize = 500;
+			int sltSize = 2000; // Allways read the full trigger memory
+			int nBlocks = sltSize / blockSize;
+			for (i=0;i<nBlocks;i++)
+			  [self read:sltMemoryAddress+i*blockSize data:buffer+i*blockSize size:blockSize*sizeof(unsigned long)];
+			
+			//for(i=0;i<2000;i++) buffer[i]=0; // only Test
+
+            // Check result from block readout - Testing only
+			//unsigned long buffer2[2000];
+            //[self readBlock:sltMemoryAddress dataBuffer:(unsigned long*)buffer2 length:2000 increment:1];
+			//for(i=0;i<2000;i++) if (buffer[i]!=buffer2[i]) {
+			//  NSLog(@"Error reading Slt Memory\n"); 
+			//  break;
+			//}  
+			
 		    // Re-organize trigger data to get it in a continous data stream
+			// There is no automatic address wrapping like in the Flts available...
+			unsigned long reorderBuffer[2000];
 			unsigned long *pMult = reorderBuffer;
 			memcpy( pMult, buffer + iPageStart, (2000 - iPageStart)*sizeof(unsigned long));  
 			memcpy( pMult + 2000 - iPageStart, buffer, iPageStart*sizeof(unsigned long));  
 			
-			//temp-----
-			int i;
-			int k;	
-			
-            // Dislay the matrix of triggered pixel and timing
-			// The xy-Projection is needed to readout only the triggered pixel!!!
+			int nTriggered = 0;
 		    unsigned long xyProj[20];
 			unsigned long tyProj[100];
-			for (i=0;i<20;i++) xyProj[i] = 0;
-			for (k=0;k<100;k++) tyProj[k] = 0;
-	        for (k=0;k<2000;k++){
-				xyProj[k%20] = xyProj[k%20] | (pMult[k] & 0x3fffff);
-            }  
-	        for (k=0;k<2000;k++){
-				if (xyProj[k%20]) {
-					tyProj[k/20] = tyProj[k/20] | (pMult[k] & 0x3fffff);
-				}
-            }
-		
-/*			
-			//--- Display trigger data
-			int j;			
-			NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
-			
-			for(j=0;j<22;j++){
-				NSMutableString* s = [NSMutableString stringWithFormat:@"%2d: ",j];
-			//matrix of triggered pixel
-			for(i=0;i<20;i++){
-				if (((xyProj[i]>>j) & 0x1) == 0x1) [s appendFormat:@"X"];
-				else							   [s appendFormat:@"."];
-			}
-			[s appendFormat:@"  "];
-			
-			// trigger timing
-			for (k=0;k<100;k++){
-				if (((tyProj[k]>>j) & 0x1) == 0x1 )[s appendFormat:@"="];
-			    else							   [s appendFormat:@"."];
-			}
-			NSLogFont(aFont, @"%@\n", s);
-			}
-						
-			NSLogFont(aFont,@"\n");			
-			//---
-*/
+			nTriggered = [self calcProjection:pMult xyProj:xyProj tyProj:tyProj];
 
 			//ship the start of event record
 			unsigned long eventData[5];
@@ -1586,6 +1643,7 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 				[NSNumber numberWithInt:actualPageIndex], @"page",
 				[NSNumber numberWithInt:lStart],		  @"lStart",
 				[NSNumber numberWithInt:eventCounter],	  @"eventCounter",
+				[NSNumber numberWithInt:pageSize],		  @"pageSize",
 				nil];
 			id obj;
 			while(obj = [e nextObject]){			    
@@ -1600,6 +1658,38 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 
 			//free the page
 			[self writeReg:kSLTSetPageFree value:actualPageIndex];
+			
+			// Set end of readout
+			gettimeofday(&t1, &tz);
+
+			// Display event header
+			if (displayEventLoop) {
+				// TODO: Display number of stored pages
+				// TODO: Add control to GUI that controls the update rate
+				// 7.12.07 ak
+				if (t0.tv_sec > lastDisplaySec){
+					NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
+					int nEv = eventCounter - lastDisplayCounter;
+					double rate = 0.1 * nEv / (t0.tv_sec-lastDisplaySec) + 0.9 * lastDisplayRate;
+					
+					unsigned long tRead = (t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec);
+					if (t0.tv_sec%20 == 0) {
+					    NSLogFont(aFont, @"%64s  | %16s\n", "Last event", "Interval summary"); 
+						NSLogFont(aFont, @"%4s %14s %4s %14s %4s %4s %14s  |  %4s %10s\n", 
+								  "No", "Actual time/s", "Page", "Time stamp/s", "Trig", 
+								  "nCh", "tRead/us", "nEv", "Rate");
+					}			  
+					NSLogFont(aFont,   @"%4d %14d %4d %14d %4d %4d %14d  |  %4d %10.2f\n", 
+							  eventCounter, t0.tv_sec, actualPageIndex, timeStampH, 0, 
+							  nTriggered, tRead, nEv, rate);
+					
+					// Keep the last display second		  
+					lastDisplaySec = t0.tv_sec;	
+					lastDisplayCounter = eventCounter;
+					lastDisplayRate = rate;	  
+				}
+			}
+			
 		}
 	}
 	else {
@@ -1626,6 +1716,67 @@ NSString* ORIpeSLTModelReadAllChanged			= @"ORIpeSLTModelReadAllChanged";
 	if(pollingWasRunning) {
 		[poller runWithTarget:self selector:@selector(readAllStatus)];
 	}
+}
+
+
+- (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj
+{ 
+			//temp----
+			int i, j, k;
+			int sltSize = pageSize * 20;	
+	
+				
+            // Dislay the matrix of triggered pixel and timing
+			// The xy-Projection is needed to readout only the triggered pixel!!!
+		    //unsigned long xyProj[20];
+			//unsigned long tyProj[100];
+			for (i=0;i<20;i++) xyProj[i] = 0;
+			for (k=0;k<100;k++) tyProj[k] = 0;
+	        for (k=0;k<sltSize;k++){
+				xyProj[k%20] = xyProj[k%20] | (pMult[k] & 0x3fffff);
+            }  
+	        for (k=0;k<sltSize;k++){
+				if (xyProj[k%20]) {
+					tyProj[k/20] = tyProj[k/20] | (pMult[k] & 0x3fffff);
+				}
+            }
+
+ 			int nTriggered = 0;
+			for (i=0;i<20;i++){
+			  for(j=0;j<22;j++){
+			     if (((xyProj[i]>>j) & 0x1 ) == 0x1) nTriggered++;
+			  }
+			}
+		
+		
+			// Display trigger data
+			if (displayTrigger) {	
+				int i, j, k;
+				NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
+				
+				for(j=0;j<22;j++){
+					NSMutableString* s = [NSMutableString stringWithFormat:@"%2d: ",j];
+					//matrix of triggered pixel
+					for(i=0;i<20;i++){
+						if (((xyProj[i]>>j) & 0x1) == 0x1) [s appendFormat:@"X"];
+						else							   [s appendFormat:@"."];
+					}
+					[s appendFormat:@"  "];
+					
+					// trigger timing
+					for (k=0;k<pageSize;k++){
+						if (((tyProj[k]>>j) & 0x1) == 0x1 )[s appendFormat:@"="];
+						else							   [s appendFormat:@"."];
+					}
+					NSLogFont(aFont, @"%@\n", s);
+				}
+				
+				NSLogFont(aFont,@"\n");	
+			}		
+			
+
+
+	return(nTriggered);
 }
 
 - (void) saveReadOutList:(NSFileHandle*)aFile

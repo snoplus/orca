@@ -127,6 +127,18 @@ enum {
 		ORReadOutList*	readOutGroup;
 		NSArray*		dataTakers;			//cache of data takers.
 		BOOL			first;
+		// ak, 9.12.07
+		BOOL            displayTrigger;    //< Display pixel and timing view of trigger data
+		BOOL            displayEventLoop;  //< Display the event loop parameter
+		unsigned long   lastDisplaySec;
+		unsigned long   lastDisplayCounter;
+		double          lastDisplayRate;
+		
+		
+    	BOOL usingPBusSimulation;
+		unsigned long   lastSimSec;
+		unsigned long   pageSize; //< Length of the ADC data (0..100us)
+		
 }
 
 #pragma mark ¥¥¥Initialization
@@ -181,6 +193,13 @@ enum {
 - (BOOL)	readAll;
 - (void)    setReadAll:(BOOL)aState;
 - (void) loadPatternFile;
+
+- (BOOL) displayTrigger; //< Staus of dispaly of trigger information
+- (void) setDisplayTrigger:(BOOL) aState; 
+- (BOOL) displayEventLoop; //< Status of display of event loop performance information
+- (void) setDisplayEventLoop:(BOOL) aState;
+- (unsigned long) pageSize; //< Length of the ADC data (0..100us)
+- (void) setPageSize: (unsigned long) pageSize;   
  
 //status reg assess
 - (BOOL) inhibit;
@@ -274,6 +293,7 @@ enum {
 - (ORReadOutList*)	readOutGroup;
 - (void)			setReadOutGroup:(ORReadOutList*)newReadOutGroup;
 - (NSMutableArray*) children;
+- (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj;
 
 @end
 
@@ -282,6 +302,9 @@ extern NSString* ORIpeSLTModelInterruptMaskChanged;
 extern NSString* ORIpeSLTModelFpgaVersionChanged;
 extern NSString* ORIpeSLTModelNHitThresholdChanged;
 extern NSString* ORIpeSLTModelNHitChanged;
+extern NSString* ORIpeSLTModelPageSizeChanged;
+extern NSString* ORIpeSLTModelDisplayEventLoopChanged;
+extern NSString* ORIpeSLTModelDisplayTriggerChanged;
 extern NSString* ORIpeSLTPulserDelayChanged;
 extern NSString* ORIpeSLTPulserAmpChanged;
 extern NSString* ORIpeSLTSelectedRegIndexChanged;

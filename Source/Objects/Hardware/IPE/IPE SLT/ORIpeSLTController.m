@@ -143,6 +143,20 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
                      selector : @selector(nHitChanged:)
                          name : ORIpeSLTModelNHitChanged
 						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(pageSize:)
+                         name : ORIpeSLTModelPageSizeChanged
+						object: model];
+						
+    [notifyCenter addObserver : self
+                     selector : @selector(pageSize:)
+                         name : ORIpeSLTModelDisplayEventLoopChanged
+						object: model];
+						
+    [notifyCenter addObserver : self
+                     selector : @selector(pageSize:)
+                         name : ORIpeSLTModelDisplayTriggerChanged
+						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(nHitThresholdChanged:)
@@ -266,6 +280,13 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[nHitStepper setIntValue: [model nHit]];
 }
 
+- (void) pageSizeChanged:(NSNotification*)aNote
+{
+	[pageSizeField setIntValue: [model pageSize]];
+	[pageSizeStepper setIntValue: [model pageSize]];
+}
+
+
 - (void) updateWindow
 {
     [super updateWindow];
@@ -280,6 +301,9 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
     [self selectedRegIndexChanged:nil];
     [self usePBusSimChanged:nil];
 	[self nHitChanged:nil];
+	[self pageSizeChanged:nil];	
+	[self displayEventLoopChanged:nil];	
+	[self displayTriggerChanged:nil];	
 	[self nHitThresholdChanged:nil];
 	[self interruptMaskChanged:nil];
 	[self nextPageDelayChanged:nil];
@@ -337,6 +361,9 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[nHitField setEnabled:nHitSupported && !lockedOrRunningMaintenance];
 	[nHitStepper setEnabled:nHitSupported && !lockedOrRunningMaintenance];
 
+	[pageSizeField setEnabled:!lockedOrRunningMaintenance];
+	[pageSizeStepper setEnabled:!lockedOrRunningMaintenance];
+
 
 	[nextPageDelaySlider setEnabled:!isRunning];
 	
@@ -373,6 +400,17 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	[usePBusSimButton setState:[model pBusSim]];
 }
+
+- (void) displayEventLoopChanged:(NSNotification*) aNote
+{
+	[displayEventLoopButton setState:[model displayEventLoop]];
+}
+
+- (void) displayTriggerChanged:(NSNotification*) aNote
+{
+	[displayTriggerButton setState:[model displayTrigger]];
+}
+
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
 {
@@ -549,6 +587,21 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) nHitAction:(id)sender
 {
 	[model setNHit:[sender intValue]];	
+}
+
+- (IBAction) pageSizeAction:(id)sender
+{
+	[model setPageSize:[sender intValue]];	
+}
+
+- (IBAction) displayTriggerAction:(id)sender
+{
+	[model setDisplayTrigger:[sender intValue]];	
+}
+
+- (IBAction) displayEventLoopAction:(id)sender
+{
+	[model setDisplayEventLoop:[sender intValue]];	
 }
 
 - (IBAction) usePBusSimAction:(id)sender
