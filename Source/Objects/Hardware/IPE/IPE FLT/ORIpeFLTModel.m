@@ -1284,6 +1284,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	id slt = [[self crate] adapter];
 
 	firstTime = YES;
 
@@ -1333,6 +1334,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	fireWireCard			  = [[self crate] adapter];
 	locationWord			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
   	usingPBusSimulation		  = [fireWireCard pBusSim];
+	pageSize                  = [slt pageSize];  //us
 }
 
 
@@ -1340,7 +1342,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 // Function:	
 
 // Description: Read data from a card
-//****************************g**********************************************************
+//***************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
     NS_DURING	
@@ -1349,17 +1351,22 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		int fltPageStart = [[userInfo objectForKey:@"page"] intValue];
 		int lStart		 = [[userInfo objectForKey:@"lStart"] intValue];
 		unsigned long pixelList = [[userInfo objectForKey:@"pixelList"] intValue]; // ak, 5.10.2007
+		unsigned long fltSize = pageSize * 5; // Size in long words
+
 		//int eventCounter = [[userInfo objectForKey:@"eventCounter"] intValue];
 		[self eventMask:pixelList];	
-			
+		
+		//NSLog(@"Pixellist = %08x\n", pixelList);	
+				
 		int aChan;
 		for(aChan=0;aChan<kNumFLTChannels;aChan++){	
 		    if (( (pixelList >> aChan) & 0x1 == 0x1)) {	
-			    //NSLog(@"Reading channel (%d,%d)\n", [self slot], aChan);						
+			    //NSLog(@"Reading channel (%d,%d)\n", [self slot], aChan);
+									
 				locationWord &= 0xffff0000;
 				locationWord |= (aChan&0xff)<<8;
 				
-				unsigned long totalLength = (2 + readoutPages * 500);	// longs
+				unsigned long totalLength = (2 + readoutPages * fltSize);	// longs
 																		//unsigned long totalLength = (2 + 500);	// longs
 				NSMutableData* theWaveFormData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
 				unsigned long header = waveFormId | totalLength;
@@ -1382,16 +1389,16 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 					// Use block read mode.
 					// With every 32bit (long word) two 12bit ADC values are transmitted
 					// documentation says 1000 data words followed by 24 words not used
-					[fireWireCard read:addr data:wPtr size:500*sizeof(long)];	
+					[fireWireCard read:addr data:wPtr size:fltSize*sizeof(long)];	
 					
 					// Remove the flags
 					// TODO: Add a control to enable or disable flags in the data
 					//       Better: Improve the display, define a variable number of
 					//               flags that can be defined and stored with the Orca settings.
-					for (i=0;i<1000;i++)
+					for (i=0;i<2*fltSize;i++)
 						waveFormPtr[i] = waveFormPtr[i] & 0x0fff;					
 					
-					wPtr += 500;				
+					wPtr += fltSize;				
 					addr = (addr + 1024) % 0x10000;
 				}
 								

@@ -104,6 +104,7 @@
 	BOOL usingPBusSimulation;
     BOOL ledOff;
     unsigned long interruptMask;
+	unsigned long pageSize; //< Size of the readout pages - defined in slt dialog
 
 	//-----------------------------------------
 	//place to cache some values so they don't have to be calculated every time thru the run loop.
