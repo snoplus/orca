@@ -27,7 +27,7 @@
 #include "VME_HW_Definitions.h"
 
 #pragma mark •••Definitions
-#define kDefaultAddressModifier			0x29
+#define kDefaultAddressModifier			0x39
 #define kDefaultBaseAddress				0x00008000
 
 #pragma mark •••Static Declarations
@@ -57,6 +57,8 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
     [[self undoManager] disableUndoRegistration];
 		
     [[self undoManager] enableUndoRegistration];
+    
+    [self setAddressModifier:0x39];
 	
     return self;
 }
@@ -248,7 +250,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 		[controller readWordBlock:&statusValue
 						atAddress:statusAddress
 						numToRead:1
-					   withAddMod:0x29
+					   withAddMod:[ self addressModifier]
 					usingAddSpace:0x01];
 					
 		if(statusValue & 0x8000){
@@ -256,7 +258,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 			[controller readWordBlock:&dataValue
 								atAddress:fifoAddress
 								numToRead:1
-							   withAddMod:0x29
+							   withAddMod:[self addressModifier]
 							usingAddSpace:0x01];
 			short chan = (dataValue >> 13) & 0x7;
 			if(enabledMask & (1L<<chan)){
@@ -324,6 +326,8 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
     [[self undoManager] disableUndoRegistration];
 	
     [[self undoManager] enableUndoRegistration];
+    
+    [self setAddressModifier:0x39];
 	
     return self;
 }
