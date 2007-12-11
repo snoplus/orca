@@ -231,6 +231,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 	fifoAddress   = [self baseAddress]+register_offsets[kDataRegister];
 	location      =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
 	usingShortForm = IsShortForm(dataId);
+    //usingShortForm = dataId & 0x80000000;
     [self clearExceptionCount];
 	
 	[self initBoard];

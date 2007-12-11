@@ -54,14 +54,19 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 {
     unsigned long length;
     unsigned long* ptr = (unsigned long*)someData;
-	if(IsLongForm(*ptr))ptr++;
+	if(IsLongForm(*ptr)) {
+        ptr++;
+        length = 2;
+    } else {
+        length = 1;
+    }
 	unsigned char crate   = (*ptr&0x01e00000)>>21;
 	unsigned char card   = (*ptr& 0x001f0000)>>16;
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
 	short chan = (*ptr >> 13) & 0x7;
 	[aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Caen265", crateKey,cardKey,[self getChannelKey: chan],nil];
-    return length; //must return number of bytes processed.
+    return length; //must return number of longs processed.
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr

@@ -28,7 +28,7 @@
 #define kLongFormDataIdMask 0xfffc0000
 #define kLongFormLengthMask (~kLongFormDataIdMask)
 
-#define IsShortForm(x) ((x)&0x80000000)
+#define IsShortForm(x) (((x)&0x80000000) >> 31)
 #define IsLongForm(x) !IsShortForm(x)
 
 #define ExtractDataId(x) (IsShortForm(x) ? ((x)&kShortFormDataIdMask) : ((x)&kLongFormDataIdMask))
