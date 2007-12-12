@@ -997,7 +997,6 @@
 		847E6C110CFF4BF400E963C6 /* ORObjectProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 847E6C0F0CFF4BF400E963C6 /* ORObjectProxy.m */; };
 		847E6C1A0CFF4C3200E963C6 /* eGun.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847E6C130CFF4C3200E963C6 /* eGun.nib */; };
 		847E6C1B0CFF4C3200E963C6 /* eGun.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847E6C140CFF4C3200E963C6 /* eGun.tif */; };
-		847E6C1C0CFF4C3200E963C6 /* mainFocalPlanedetector.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847E6C150CFF4C3200E963C6 /* mainFocalPlanedetector.tif */; };
 		847E6C1D0CFF4C3200E963C6 /* OReGunController.h in Headers */ = {isa = PBXBuildFile; fileRef = 847E6C160CFF4C3200E963C6 /* OReGunController.h */; };
 		847E6C1E0CFF4C3200E963C6 /* OReGunController.m in Sources */ = {isa = PBXBuildFile; fileRef = 847E6C170CFF4C3200E963C6 /* OReGunController.m */; };
 		847E6C1F0CFF4C3200E963C6 /* OReGunModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 847E6C180CFF4C3200E963C6 /* OReGunModel.h */; };
@@ -1554,6 +1553,7 @@
 		84FFCAA90636D5B10069432F /* ORCaen792Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FFCAA30636D5B10069432F /* ORCaen792Controller.m */; };
 		84FFCAAA0636D5B10069432F /* ORCaen792Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FFCAA40636D5B10069432F /* ORCaen792Model.h */; };
 		84FFCAAB0636D5B10069432F /* ORCaen792Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FFCAA50636D5B10069432F /* ORCaen792Model.m */; };
+		9C086CE90D10AB6200524F47 /* mainFocalPlaneDetector.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C086CE80D10AB6200524F47 /* mainFocalPlaneDetector.tif */; };
 		9C1363B80D0A78FC006C550D /* NplHV.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C1363B10D0A78FC006C550D /* NplHV.nib */; };
 		9C1363B90D0A78FC006C550D /* NplHVIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C1363B20D0A78FC006C550D /* NplHVIcon.tif */; };
 		9C1363BA0D0A78FC006C550D /* ORNplHVController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C1363B30D0A78FC006C550D /* ORNplHVController.h */; };
@@ -2432,7 +2432,6 @@
 		847E6C0F0CFF4BF400E963C6 /* ORObjectProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORObjectProxy.m; path = "Source/Objects/Misc Objects/ObjectProxy/ORObjectProxy.m"; sourceTree = SOURCE_ROOT; };
 		847E6C130CFF4C3200E963C6 /* eGun.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = eGun.nib; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/eGun.nib"; sourceTree = SOURCE_ROOT; };
 		847E6C140CFF4C3200E963C6 /* eGun.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = eGun.tif; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/eGun.tif"; sourceTree = SOURCE_ROOT; };
-		847E6C150CFF4C3200E963C6 /* mainFocalPlanedetector.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = mainFocalPlanedetector.tif; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/mainFocalPlanedetector.tif"; sourceTree = SOURCE_ROOT; };
 		847E6C160CFF4C3200E963C6 /* OReGunController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OReGunController.h; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/OReGunController.h"; sourceTree = SOURCE_ROOT; };
 		847E6C170CFF4C3200E963C6 /* OReGunController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OReGunController.m; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/OReGunController.m"; sourceTree = SOURCE_ROOT; };
 		847E6C180CFF4C3200E963C6 /* OReGunModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OReGunModel.h; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/OReGunModel.h"; sourceTree = SOURCE_ROOT; };
@@ -3134,6 +3133,7 @@
 		84FFCAA30636D5B10069432F /* ORCaen792Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCaen792Controller.m; sourceTree = "<group>"; };
 		84FFCAA40636D5B10069432F /* ORCaen792Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen792Model.h; sourceTree = "<group>"; };
 		84FFCAA50636D5B10069432F /* ORCaen792Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCaen792Model.m; sourceTree = "<group>"; };
+		9C086CE80D10AB6200524F47 /* mainFocalPlaneDetector.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = mainFocalPlaneDetector.tif; path = "Source/Objects/Custom Hardware/KATRIN Hardware/eGun/mainFocalPlaneDetector.tif"; sourceTree = SOURCE_ROOT; };
 		9C1363B10D0A78FC006C550D /* NplHV.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NplHV.nib; path = "Source/Objects/Misc Objects/NplHV/NplHV.nib"; sourceTree = SOURCE_ROOT; };
 		9C1363B20D0A78FC006C550D /* NplHVIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NplHVIcon.tif; path = "Source/Objects/Misc Objects/NplHV/NplHVIcon.tif"; sourceTree = SOURCE_ROOT; };
 		9C1363B30D0A78FC006C550D /* ORNplHVController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNplHVController.h; path = "Source/Objects/Misc Objects/NplHV/ORNplHVController.h"; sourceTree = SOURCE_ROOT; };
@@ -5264,7 +5264,7 @@
 			children = (
 				847E6C130CFF4C3200E963C6 /* eGun.nib */,
 				847E6C140CFF4C3200E963C6 /* eGun.tif */,
-				847E6C150CFF4C3200E963C6 /* mainFocalPlanedetector.tif */,
+				9C086CE80D10AB6200524F47 /* mainFocalPlaneDetector.tif */,
 				847E6C160CFF4C3200E963C6 /* OReGunController.h */,
 				847E6C170CFF4C3200E963C6 /* OReGunController.m */,
 				847E6C180CFF4C3200E963C6 /* OReGunModel.h */,
@@ -8347,7 +8347,6 @@
 				84951F980CFC805C00B4558E /* Help.tiff in Resources */,
 				847E6C1A0CFF4C3200E963C6 /* eGun.nib in Resources */,
 				847E6C1B0CFF4C3200E963C6 /* eGun.tif in Resources */,
-				847E6C1C0CFF4C3200E963C6 /* mainFocalPlanedetector.tif in Resources */,
 				9C1363B80D0A78FC006C550D /* NplHV.nib in Resources */,
 				9C1363B90D0A78FC006C550D /* NplHVIcon.tif in Resources */,
 				9C1363C70D0A7921006C550D /* Caen265.nib in Resources */,
@@ -8355,6 +8354,7 @@
 				CE252F750D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
 				CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */,
 				CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */,
+				9C086CE90D10AB6200524F47 /* mainFocalPlaneDetector.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
