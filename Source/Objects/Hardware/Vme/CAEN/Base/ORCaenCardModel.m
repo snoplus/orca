@@ -570,7 +570,6 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     [super encodeWithCoder:anEncoder];
     
     // Save the information from first TAB.
-    [super encodeWithCoder:anEncoder];
     [anEncoder encodeInt:[self selectedRegIndex] forKey:CAENSelectedRegIndex];
     [anEncoder encodeInt:[self selectedChannel] forKey:CAENSelectedChannelIndex];
     [anEncoder encodeInt32:[self writeValue] forKey:CAENWriteValue];
