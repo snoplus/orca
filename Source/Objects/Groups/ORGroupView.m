@@ -26,6 +26,7 @@
 #import "ORReadOutList.h"
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
+#import "CTGradient.h"
 
 @interface ORGroupView (ExperimentViewPrivateMethods)
 - (BOOL) _canTakeValueFromPasteboard:(NSPasteboard *)pb;
@@ -136,17 +137,33 @@
 
 - (void) drawBackground:(NSRect)aRect
 {
-	//don't want a background... subclasses can override
+	NSRect bounds = [self bounds];
+	float red,green,blue,alpha;
+	NSColor* color = [self backgroundColor];
+	[color getRed:&red green:&green blue:&blue alpha:&alpha];
+
+	red *= .75;
+	green *= .75;
+	blue *= .75;
+	//alpha = .75;
+
+	NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
+
+	CTGradient* gradient = [CTGradient gradientWithBeginningColor:color endingColor:endingColor];
+
+	[gradient fillRect:bounds angle:270.];
 }
 
 - (void)drawRect:(NSRect)rect
 {
+	[self drawBackground:rect];
     [self drawContents:rect];
     [mouseTask drawRect:rect];
 }
 
 - (void) drawContents:(NSRect)aRect
 {
+
     [group drawContents:aRect];	
 }
 
