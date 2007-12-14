@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		840710730D12FDA100FD6EFD /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840710710D12FDA100FD6EFD /* NoNI488DriversHelp.plist */; };
+		840710740D12FDA100FD6EFD /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840710720D12FDA100FD6EFD /* NoNI488PluginHelp.plist */; };
 		841903CD0CCE6E1300F21371 /* Vme64CrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 841903CC0CCE6E1300F21371 /* Vme64CrateSmall.gif */; };
 		841903E30CCE71ED00F21371 /* Gretina4.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841903DB0CCE71ED00F21371 /* Gretina4.nib */; };
 		841903E40CCE71ED00F21371 /* Gretina4Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 841903DC0CCE71ED00F21371 /* Gretina4Card.gif */; };
@@ -1454,6 +1456,12 @@
 		8490B2060D0DC68600275B5E /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */ = {isa = PBXBuildFile; fileRef = 8490B2050D0DC68600275B5E /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		8490B2070D0DC68F00275B5E /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8490B2050D0DC68600275B5E /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		8490B20A0D0DC70900275B5E /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */ = {isa = PBXBuildFile; fileRef = 8490B2090D0DC70900275B5E /* EduWashingtonNplOrcaNi488PlugIn.h */; };
+		8490B2190D0DDC1E00275B5E /* C111C.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8490B2130D0DDC1E00275B5E /* C111C.nib */; };
+		8490B21B0D0DDC1E00275B5E /* ORC111CController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8490B2150D0DDC1E00275B5E /* ORC111CController.h */; };
+		8490B21C0D0DDC1E00275B5E /* ORC111CController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8490B2160D0DDC1E00275B5E /* ORC111CController.m */; };
+		8490B21D0D0DDC1E00275B5E /* ORC111CModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8490B2170D0DDC1E00275B5E /* ORC111CModel.h */; };
+		8490B21E0D0DDC1E00275B5E /* ORC111CModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8490B2180D0DDC1E00275B5E /* ORC111CModel.m */; };
+		8490B2200D0DDC3600275B5E /* C111C.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8490B21F0D0DDC3600275B5E /* C111C.tif */; };
 		8493C4E30C984AF200B46CD4 /* HW_Readout.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C4DF0C984AF200B46CD4 /* HW_Readout.h */; };
 		8493C4F00C984C9D00B46CD4 /* SBC_Linking.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C4EF0C984C9D00B46CD4 /* SBC_Linking.h */; };
 		8493C5030C984E0500B46CD4 /* HW_Readout.c in VME_Code Copy  */ = {isa = PBXBuildFile; fileRef = 8493C4DE0C984AF200B46CD4 /* HW_Readout.c */; };
@@ -1763,6 +1771,8 @@
 		840340270427CEEA005F64B1 /* ORDataSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataSet.m; sourceTree = "<group>"; };
 		8403F4A50508F1BE005F64B1 /* ORGenericView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGenericView.h; path = Source/Misc/ORGenericView.h; sourceTree = SOURCE_ROOT; };
 		8403F4A60508F1BE005F64B1 /* ORGenericView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGenericView.m; path = Source/Misc/ORGenericView.m; sourceTree = SOURCE_ROOT; };
+		840710710D12FDA100FD6EFD /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoNI488DriversHelp.plist; path = "Source/Objects/Hardware/GPIB/ENET-GPIB/NoNI488DriversHelp.plist"; sourceTree = SOURCE_ROOT; };
+		840710720D12FDA100FD6EFD /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoNI488PluginHelp.plist; path = "Source/Objects/Hardware/GPIB/ENET-GPIB/NoNI488PluginHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORValidatePassword.h; sourceTree = "<group>"; };
 		84073A4E05E3F3D3003E62AA /* ORValidatePassword.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORValidatePassword.m; sourceTree = "<group>"; };
 		84073A5105E3F455003E62AA /* ValidatePassword.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ValidatePassword.nib; sourceTree = "<group>"; };
@@ -2554,6 +2564,12 @@
 		848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MailCenter.nib; sourceTree = "<group>"; };
 		8490B2050D0DC68600275B5E /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/Intel/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = SOURCE_ROOT; };
 		8490B2090D0DC70900275B5E /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EduWashingtonNplOrcaNi488PlugIn.h; path = "Source/Objects/Hardware/GPIB/ENET-GPIB/EduWashingtonNplOrcaNi488PlugIn.h"; sourceTree = SOURCE_ROOT; };
+		8490B2130D0DDC1E00275B5E /* C111C.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = C111C.nib; path = Source/Objects/Hardware/Camac/C111C/C111C.nib; sourceTree = SOURCE_ROOT; };
+		8490B2150D0DDC1E00275B5E /* ORC111CController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORC111CController.h; path = Source/Objects/Hardware/Camac/C111C/ORC111CController.h; sourceTree = SOURCE_ROOT; };
+		8490B2160D0DDC1E00275B5E /* ORC111CController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORC111CController.m; path = Source/Objects/Hardware/Camac/C111C/ORC111CController.m; sourceTree = SOURCE_ROOT; };
+		8490B2170D0DDC1E00275B5E /* ORC111CModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORC111CModel.h; path = Source/Objects/Hardware/Camac/C111C/ORC111CModel.h; sourceTree = SOURCE_ROOT; };
+		8490B2180D0DDC1E00275B5E /* ORC111CModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORC111CModel.m; path = Source/Objects/Hardware/Camac/C111C/ORC111CModel.m; sourceTree = SOURCE_ROOT; };
+		8490B21F0D0DDC3600275B5E /* C111C.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = C111C.tif; path = Source/Objects/Hardware/Camac/C111C/C111C.tif; sourceTree = SOURCE_ROOT; };
 		8491917D0725B43400F454F1 /* ORToolbarFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORToolbarFactory.m; path = Source/Misc/ORToolbarFactory.m; sourceTree = SOURCE_ROOT; };
 		8491917E0725B43500F454F1 /* ORToolbarFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORToolbarFactory.h; path = Source/Misc/ORToolbarFactory.h; sourceTree = SOURCE_ROOT; };
 		849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = edu.washington.npl.orca.Document.plist; path = "Source/Main Document/edu.washington.npl.orca.Document.plist"; sourceTree = SOURCE_ROOT; };
@@ -4125,6 +4141,9 @@
 			children = (
 				841DA0060780D7CA0099BBF6 /* Camac Base Classes */,
 				841DA5F307820BB70099BBF6 /* Crate */,
+				849C67FC0A2CC06F00511E30 /* CCUSB */,
+				841DA65E078211E70099BBF6 /* CC32 */,
+				8490B2120D0DDC1E00275B5E /* C111C */,
 				841B119C0CC51FC800E0B678 /* L8013 Crate */,
 				84861D270ACD83F300C543D7 /* L4532 */,
 				2A4553DA08BCE9A3004BB15E /* TDC3377 */,
@@ -4133,8 +4152,6 @@
 				8472AD670A82BD8E0069A069 /* BiRa3251 */,
 				842DAEB40A82CA8400C942A2 /* BiRa2351 */,
 				1C50F9E308033CA9008D18EA /* ADC2249 */,
-				849C67FC0A2CC06F00511E30 /* CCUSB */,
-				841DA65E078211E70099BBF6 /* CC32 */,
 				8446CE1607B847B8006CD9C4 /* AD413 */,
 				84D980910795C5AC0074A035 /* AD811 */,
 				849DDE5608F466630052AFC6 /* AD3511 */,
@@ -5448,6 +5465,20 @@
 			name = Plugins;
 			sourceTree = "<group>";
 		};
+		8490B2120D0DDC1E00275B5E /* C111C */ = {
+			isa = PBXGroup;
+			children = (
+				8490B2130D0DDC1E00275B5E /* C111C.nib */,
+				8490B21F0D0DDC3600275B5E /* C111C.tif */,
+				8490B2150D0DDC1E00275B5E /* ORC111CController.h */,
+				8490B2160D0DDC1E00275B5E /* ORC111CController.m */,
+				8490B2170D0DDC1E00275B5E /* ORC111CModel.h */,
+				8490B2180D0DDC1E00275B5E /* ORC111CModel.m */,
+			);
+			name = C111C;
+			path = Source/Objects/Hardware/Camac/C111C;
+			sourceTree = SOURCE_ROOT;
+		};
 		84929E8104439586005F64B1 /* Trigger */ = {
 			isa = PBXGroup;
 			children = (
@@ -6243,6 +6274,8 @@
 			children = (
 				8490B2090D0DC70900275B5E /* EduWashingtonNplOrcaNi488PlugIn.h */,
 				84C4939A04059AEA005F64B1 /* ORGpibEnetController.h */,
+				840710710D12FDA100FD6EFD /* NoNI488DriversHelp.plist */,
+				840710720D12FDA100FD6EFD /* NoNI488PluginHelp.plist */,
 				84C4939B04059AEA005F64B1 /* ORGpibEnetController.m */,
 				84C4939E04059AEA005F64B1 /* ORGpibEnetModel.h */,
 				84C4939F04059AEA005F64B1 /* ORGpibEnetModel.m */,
@@ -7896,6 +7929,8 @@
 				8479E44A0D0A1A7E007E346A /* ORCaen265Decoders.h in Headers */,
 				8479E44C0D0A1A7E007E346A /* ORCaen265Model.h in Headers */,
 				8490B20A0D0DC70900275B5E /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */,
+				8490B21B0D0DDC1E00275B5E /* ORC111CController.h in Headers */,
+				8490B21D0D0DDC1E00275B5E /* ORC111CModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8402,6 +8437,10 @@
 				8479E4460D0A1A7E007E346A /* Caen265.nib in Resources */,
 				8479E44F0D0A1AD6007E346A /* Caen265Card.tif in Resources */,
 				8490B2060D0DC68600275B5E /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
+				8490B2190D0DDC1E00275B5E /* C111C.nib in Resources */,
+				8490B2200D0DDC3600275B5E /* C111C.tif in Resources */,
+				840710730D12FDA100FD6EFD /* NoNI488DriversHelp.plist in Resources */,
+				840710740D12FDA100FD6EFD /* NoNI488PluginHelp.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8970,6 +9009,8 @@
 				8479E4490D0A1A7E007E346A /* ORCaen265Controller.m in Sources */,
 				8479E44B0D0A1A7E007E346A /* ORCaen265Decoders.m in Sources */,
 				8479E44D0D0A1A7E007E346A /* ORCaen265Model.m in Sources */,
+				8490B21C0D0DDC1E00275B5E /* ORC111CController.m in Sources */,
+				8490B21E0D0DDC1E00275B5E /* ORC111CModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
