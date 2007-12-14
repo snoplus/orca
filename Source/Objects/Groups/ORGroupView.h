@@ -44,7 +44,6 @@
 
 #pragma mark ¥¥¥Graphics
 - (void) drawContents:(NSRect)aRect;
-- (void) drawBackground:(NSRect)aRect;
 - (void) backgroundColorChanged:(NSNotification*)note;
 - (void) lineColorChanged:(NSNotification*)note;
 - (void) lineTypeChanged:(NSNotification*)note;
@@ -92,4 +91,10 @@
 #pragma mark ¥¥¥Connection Management
 -(void)doConnectionFrom:(NSPoint)pt1 to:(NSPoint)pt2;
 
+@end
+
+@interface ORScrollView : NSScrollView
+{
+}
+- (void) drawRect:(NSRect)aRect;
 @end

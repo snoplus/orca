@@ -21,7 +21,7 @@
 
 
 #import "ORPlacardScrollView.h"
-
+#import "CTGradient.h"
 
 @implementation ORPlacardScrollView
 
@@ -102,5 +102,27 @@
 	[placard setFrame:placardFrame];
     }
 }
+
+- (void) drawRect:(NSRect)aRect
+{
+	NSRect bounds = [self bounds];
+	float red,green,blue,alpha;
+	NSColor* color = [[self backgroundColor] colorUsingColorSpaceName:NSDeviceRGBColorSpace];
+	[color getRed:&red green:&green blue:&blue alpha:&alpha];
+
+	red *= .75;
+	green *= .75;
+	blue *= .75;
+	//alpha = .75;
+
+	NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
+
+	CTGradient* gradient = [CTGradient gradientWithBeginningColor:color endingColor:endingColor];
+
+	[gradient fillRect:bounds angle:90.];
+
+	[super drawRect:aRect];
+}
+
 
 @end

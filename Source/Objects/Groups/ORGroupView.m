@@ -26,7 +26,6 @@
 #import "ORReadOutList.h"
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
-#import "CTGradient.h"
 
 @interface ORGroupView (ExperimentViewPrivateMethods)
 - (BOOL) _canTakeValueFromPasteboard:(NSPasteboard *)pb;
@@ -98,8 +97,7 @@
                       selector:@selector(imageChanged:)
                           name:OROrcaObjectImageChanged
                         object:nil];
-    
-    
+      
     [self backgroundColorChanged:nil];
     [self setNeedsDisplay:YES];
 }
@@ -135,29 +133,8 @@
 
 #pragma mark ¥¥¥Graphics
 
-- (void) drawBackground:(NSRect)aRect
-{
-	NSRect bounds = [self bounds];
-	float red,green,blue,alpha;
-	NSColor* color = [[self backgroundColor] colorUsingColorSpaceName:NSDeviceRGBColorSpace];
-	[color getRed:&red green:&green blue:&blue alpha:&alpha];
-
-	red *= .75;
-	green *= .75;
-	blue *= .75;
-	//alpha = .75;
-
-	NSColor* endingColor = [NSColor colorWithCalibratedRed:red green:green blue:blue alpha:alpha];
-
-	CTGradient* gradient = [CTGradient gradientWithBeginningColor:color endingColor:endingColor];
-
-	[gradient fillRect:bounds angle:270.];
-
-}
-
 - (void)drawRect:(NSRect)rect
 {
-	[self drawBackground:rect];
     [self drawContents:rect];
     [mouseTask drawRect:rect];
 }
@@ -173,6 +150,7 @@
     return NO;
 }
 
+
 //-------------------------------------------------------------------------------
 // backgroundColorChanged
 // invoded when the preference panel announces a background color change.
@@ -185,8 +163,8 @@
     colorAsData = [defaults objectForKey: ORBackgroundColor];
     [self setBackgroundColor:colorForData(colorAsData)];
     NSScrollView*   sv = [self enclosingScrollView];
-    [sv setDrawsBackground:YES];
-    [sv setBackgroundColor:[self backgroundColor]];
+    [sv setDrawsBackground:NO];
+	[sv setBackgroundColor:[self backgroundColor]];
 }
 
 - (void)lineColorChanged:(NSNotification*)note
@@ -218,41 +196,42 @@
         NSRect          svRect = [[sv contentView]frame];
         
         int x = box.origin.x;//*scaleFactor;
-            int y = box.origin.y;//*scaleFactor;
-                
-                if(x<0 || y<0){
-                    //origins must be 0,0 so we have to do a bit of adjustment here
-                    if(x<0){
-                        box.origin.x = 0;
-                        box.size.width += fabs(x) * scaleFactor;
-                    }
-                    if(y<0){
-                        box.origin.y = 0;
-                        box.size.height += fabs(y) * scaleFactor;
-                    }
-                    NSEnumerator* e = [[group orcaObjects] objectEnumerator];
-                    OrcaObject* obj;
-                    while(obj = [e nextObject]){
-                        NSRect aFrame = [obj frame];
-                        if(x<0)aFrame.origin.x += fabs(x);
-                        if(y<0)aFrame.origin.y += fabs(y);
-                        [obj setFrame:aFrame];
-                    }
-                    
-                    svRect = [[sv contentView]frame];
-                    svRect.size.width *= scaleFactor;
-                    svRect.size.height *= scaleFactor;
-                    
-                    box = [group rectEnclosingObjects:[group orcaObjects]];
-                    box.size.width *= scaleFactor;
-                    box.size.height *= scaleFactor;
-                }
-                
-                box = NSUnionRect(box,svRect);
-                [self setFrame:box];
-                
+		int y = box.origin.y;//*scaleFactor;
+		
+		if(x<0 || y<0){
+			//origins must be 0,0 so we have to do a bit of adjustment here
+			if(x<0){
+				box.origin.x = 0;
+				box.size.width += fabs(x) * scaleFactor;
+			}
+			if(y<0){
+				box.origin.y = 0;
+				box.size.height += fabs(y) * scaleFactor;
+			}
+			NSEnumerator* e = [[group orcaObjects] objectEnumerator];
+			OrcaObject* obj;
+			while(obj = [e nextObject]){
+				NSRect aFrame = [obj frame];
+				if(x<0)aFrame.origin.x += fabs(x);
+				if(y<0)aFrame.origin.y += fabs(y);
+				[obj setFrame:aFrame];
+			}
+			
+			svRect = [[sv contentView]frame];
+			svRect.size.width *= scaleFactor;
+			svRect.size.height *= scaleFactor;
+			
+			box = [group rectEnclosingObjects:[group orcaObjects]];
+			box.size.width *= scaleFactor;
+			box.size.height *= scaleFactor;
+		}
+		
+		box = NSUnionRect(box,svRect);
+		[self setFrame:box];
+		
     }
 }
+
 
 - (void)resizeWithOldSuperviewSize:(NSSize)oldSize
 {
@@ -995,6 +974,6 @@
     }
     return NO;
 }
-
-
 @end
+
+
