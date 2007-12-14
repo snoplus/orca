@@ -137,7 +137,7 @@
 
 - (void) drawBackground:(NSRect)aRect
 {
-	NSRect bounds = [self bounds];
+/*	NSRect bounds = [self bounds];
 	float red,green,blue,alpha;
 	NSColor* color = [self backgroundColor];
 	[color getRed:&red green:&green blue:&blue alpha:&alpha];
@@ -152,11 +152,12 @@
 	CTGradient* gradient = [CTGradient gradientWithBeginningColor:color endingColor:endingColor];
 
 	[gradient fillRect:bounds angle:270.];
+*/
 }
 
 - (void)drawRect:(NSRect)rect
 {
-	[self drawBackground:rect];
+//	[self drawBackground:rect];
     [self drawContents:rect];
     [mouseTask drawRect:rect];
 }
