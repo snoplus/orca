@@ -37,8 +37,8 @@
 @interface ORCamacCard : ORCard
 {
     @protected
-        BOOL 	cmdResponse;
-        BOOL 	cmdAccepted;
+        BOOL 	cmdResponse; //Q
+        BOOL 	cmdAccepted; //X
         BOOL 	inhibit;
         BOOL 	lookAtMe;
 }

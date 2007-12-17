@@ -31,7 +31,6 @@
 
 @interface ORNplHVModel : OrcaObject {
 	NSLock* localLock;
-    int connectionProtocol;
     NSString* ipAddress;
     BOOL isConnected;
 	NetSocket* socket;

@@ -24,6 +24,38 @@
 #import "ORDataSet.h"
 #import "ORDataTypeAssigner.h"
 
+/*
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
+-----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+--------^-^^^--------------------------- Crate number
+-------------^-^^^^--------------------- Card number
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+------------------------------------^^^- Channel number
+^^^^ ^^^^ ^^^^ ^^^^--------------------- Data Length
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+--------------------^^^^ ^^^^ ^^^^ ^^^^- LED1
+^^^^ ^^^^ ^^^^ ^^^^--------------------- LED2
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+--------------------^^^^ ^^^^ ^^^^ ^^^^- LED3
+^^^^ ^^^^ ^^^^ ^^^^--------------------- Energy bit 0-15
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+-------------------------------^^^ ^^^^- Energy bit 16-22
+--------------------^------------------- P
+---------------------^------------------ C
+----------------------^----------------- E
+-----------------------^---------------- Sx
+^^^^ ^^^^ ^^^^ ^^^^--------------------- CFD Timestamp bit0-15
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+--------------------^^^^ ^^^^ ^^^^ ^^^^- CFD Timestamp bit16-31
+^^^^ ^^^^ ^^^^ ^^^^--------------------- CFD Timestamp bit32-47
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+------------------------ ^^^^ ^^^^ ^^^^- Raw data point0
+-----^^^^ ^^^^ ^^^^--------------------- Raw data point1
+Raw data points continue until the Data length is used up....
+*/
+
 @implementation ORGretinaWaveformDecoder
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet

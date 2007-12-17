@@ -96,7 +96,7 @@
 	[model setCmdString:[sender objectValue]];	
 }
 
-- (void) ipAddressTextFieldAction:(id)sender
+- (IBAction) ipAddressTextFieldAction:(id)sender
 {
 	[model setIpAddress:[sender stringValue]];	
 }

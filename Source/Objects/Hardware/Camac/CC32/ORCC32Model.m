@@ -216,7 +216,8 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     unsigned long temp;
     unsigned short status =  [[self controller] camacLongNAF:28 a:1 f:0 data:&temp];
 	*mask = temp & 0xffffff;
-	return status;} 
+	return status;
+} 
 
 - (unsigned short)  readLAMStations:(unsigned long *)stations
 {

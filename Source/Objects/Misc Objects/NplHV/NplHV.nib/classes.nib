@@ -87,8 +87,6 @@
 			<dict>
 				<key>cmdStringTextField</key>
 				<string>NSTextField</string>
-				<key>connectionNoteTextField</key>
-				<string>NSTextField</string>
 				<key>ipAddressTextField</key>
 				<string>NSTextField</string>
 				<key>ipConnectButton</key>
