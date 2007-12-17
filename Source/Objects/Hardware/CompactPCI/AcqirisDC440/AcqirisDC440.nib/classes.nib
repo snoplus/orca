@@ -1,86 +1,291 @@
-{
-    IBClasses = (
-        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            ACTIONS = {
-                baseAddressAction = id; 
-                couplingAction = id; 
-                delayTimeFieldAction = id; 
-                enableMaskAction = id; 
-                fullScalePUAction = id; 
-                get1Waveform = id; 
-                initAction = id; 
-                loadDialogAction = id; 
-                numberSamplesAction = id; 
-                probeAction = id; 
-                readContinouslyAction = id; 
-                report = id; 
-                sampleIntervalAction = id; 
-                settingLockAction = id; 
-                triggerCouplingAction = id; 
-                triggerLevel1FieldAction = id; 
-                triggerLevel2FieldAction = id; 
-                triggerSlopeAction = id; 
-                triggerSourceAction = id; 
-                verticalOffsetAction = id; 
-            }; 
-            CLASS = ORAcqirisDC440Controller; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                baseAddressField = NSTextField; 
-                couplingPU = NSPopUpButton; 
-                delayTimeField = NSTextField; 
-                enableMaskMatrix = NSMatrix; 
-                fullScalePU = NSPopUpButton; 
-                initButton = NSButton; 
-                loadDialogButton = NSButton; 
-                numberSamplesField = NSTextField; 
-                plotter = ORPlotter1D; 
-                probeButton = NSButton; 
-                rate0 = ORValueBar; 
-                readContinouslyButton = NSButton; 
-                readOneButton = NSButton; 
-                reportButton = NSButton; 
-                sampleIntervalField = NSTextField; 
-                sampleRateTextFields = NSMatrix; 
-                settingLockButton = NSButton; 
-                triggerCouplingPU = NSPopUpButton; 
-                triggerLablel1Field = NSTextField; 
-                triggerLablel2Field = NSTextField; 
-                triggerLevel1Field = NSTextField; 
-                triggerLevel2Field = NSTextField; 
-                triggerSlopePU = NSPopUpButton; 
-                triggerSourcePU = NSPopUpButton; 
-                verticalOffsetField = NSTextField; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            CLASS = ORQueueView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {dataSource = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            CLASS = ORValueBar; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
-            CLASS = OrcaController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORValueBar</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>chainedView</key>
+				<string>id</string>
+				<key>dataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>baseAddressAction</key>
+				<string>id</string>
+				<key>couplingAction</key>
+				<string>id</string>
+				<key>delayTimeFieldAction</key>
+				<string>id</string>
+				<key>enableMaskAction</key>
+				<string>id</string>
+				<key>fullScalePUAction</key>
+				<string>id</string>
+				<key>get1Waveform</key>
+				<string>id</string>
+				<key>initAction</key>
+				<string>id</string>
+				<key>loadDialogAction</key>
+				<string>id</string>
+				<key>numberSamplesAction</key>
+				<string>id</string>
+				<key>probeAction</key>
+				<string>id</string>
+				<key>readContinouslyAction</key>
+				<string>id</string>
+				<key>report</key>
+				<string>id</string>
+				<key>sampleIntervalAction</key>
+				<string>id</string>
+				<key>settingLockAction</key>
+				<string>id</string>
+				<key>triggerCouplingAction</key>
+				<string>id</string>
+				<key>triggerLevel1FieldAction</key>
+				<string>id</string>
+				<key>triggerLevel2FieldAction</key>
+				<string>id</string>
+				<key>triggerSlopeAction</key>
+				<string>id</string>
+				<key>triggerSourceAction</key>
+				<string>id</string>
+				<key>verticalOffsetAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAcqirisDC440Controller</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>baseAddressField</key>
+				<string>NSTextField</string>
+				<key>couplingPU</key>
+				<string>NSPopUpButton</string>
+				<key>delayTimeField</key>
+				<string>NSTextField</string>
+				<key>enableMaskMatrix</key>
+				<string>NSMatrix</string>
+				<key>fullScalePU</key>
+				<string>NSPopUpButton</string>
+				<key>initButton</key>
+				<string>NSButton</string>
+				<key>loadDialogButton</key>
+				<string>NSButton</string>
+				<key>numberSamplesField</key>
+				<string>NSTextField</string>
+				<key>plotter</key>
+				<string>ORPlotter1D</string>
+				<key>probeButton</key>
+				<string>NSButton</string>
+				<key>rate0</key>
+				<string>ORValueBar</string>
+				<key>readContinouslyButton</key>
+				<string>NSButton</string>
+				<key>readOneButton</key>
+				<string>NSButton</string>
+				<key>reportButton</key>
+				<string>NSButton</string>
+				<key>sampleIntervalField</key>
+				<string>NSTextField</string>
+				<key>sampleRateTextFields</key>
+				<string>NSMatrix</string>
+				<key>settingLockButton</key>
+				<string>NSButton</string>
+				<key>triggerCouplingPU</key>
+				<string>NSPopUpButton</string>
+				<key>triggerLablel1Field</key>
+				<string>NSTextField</string>
+				<key>triggerLablel2Field</key>
+				<string>NSTextField</string>
+				<key>triggerLevel1Field</key>
+				<string>NSTextField</string>
+				<key>triggerLevel2Field</key>
+				<string>NSTextField</string>
+				<key>triggerSlopePU</key>
+				<string>NSPopUpButton</string>
+				<key>triggerSourcePU</key>
+				<string>NSPopUpButton</string>
+				<key>verticalOffsetField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
