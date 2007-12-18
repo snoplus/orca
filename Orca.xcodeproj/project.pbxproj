@@ -121,6 +121,8 @@
 		84028033073BF49D00972B07 /* ORLAMhosting.h in Headers */ = {isa = PBXBuildFile; fileRef = 84028032073BF49D00972B07 /* ORLAMhosting.h */; };
 		840590EB0CCE5E9C0000DBF3 /* ORLevelMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */; };
 		840590EC0CCE5E9C0000DBF3 /* ORLevelMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */; };
+		84071B690D185E7F00FD6EFD /* ORDataChainObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 84071B670D185E7F00FD6EFD /* ORDataChainObject.h */; };
+		84071B6A0D185E7F00FD6EFD /* ORDataChainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 84071B680D185E7F00FD6EFD /* ORDataChainObject.m */; };
 		84073A4F05E3F3D3003E62AA /* ORValidatePassword.h in Headers */ = {isa = PBXBuildFile; fileRef = 84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */; };
 		84073A5005E3F3D3003E62AA /* ORValidatePassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 84073A4E05E3F3D3003E62AA /* ORValidatePassword.m */; };
 		84073A5205E3F455003E62AA /* ValidatePassword.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84073A5105E3F455003E62AA /* ValidatePassword.nib */; };
@@ -1778,6 +1780,8 @@
 		8403F4A60508F1BE005F64B1 /* ORGenericView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGenericView.m; path = Source/Misc/ORGenericView.m; sourceTree = SOURCE_ROOT; };
 		840590E90CCE5E9C0000DBF3 /* ORLevelMonitor.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLevelMonitor.h; path = "Source/Widgets/Bar Graph/ORLevelMonitor.h"; sourceTree = SOURCE_ROOT; };
 		840590EA0CCE5E9C0000DBF3 /* ORLevelMonitor.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLevelMonitor.m; path = "Source/Widgets/Bar Graph/ORLevelMonitor.m"; sourceTree = SOURCE_ROOT; };
+		84071B670D185E7F00FD6EFD /* ORDataChainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORDataChainObject.h; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.h"; sourceTree = SOURCE_ROOT; };
+		84071B680D185E7F00FD6EFD /* ORDataChainObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDataChainObject.m; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.m"; sourceTree = SOURCE_ROOT; };
 		84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORValidatePassword.h; sourceTree = "<group>"; };
 		84073A4E05E3F3D3003E62AA /* ORValidatePassword.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORValidatePassword.m; sourceTree = "<group>"; };
 		84073A5105E3F455003E62AA /* ValidatePassword.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ValidatePassword.nib; sourceTree = "<group>"; };
@@ -3621,6 +3625,16 @@
 			);
 			name = "Bit3 Adaptor";
 			path = "Source/Objects/Hardware/Vme/Bit3 Adaptor";
+			sourceTree = SOURCE_ROOT;
+		};
+		84071B660D185E7F00FD6EFD /* BaseClasses */ = {
+			isa = PBXGroup;
+			children = (
+				84071B670D185E7F00FD6EFD /* ORDataChainObject.h */,
+				84071B680D185E7F00FD6EFD /* ORDataChainObject.m */,
+			);
+			name = BaseClasses;
+			path = "Source/Objects/Data Processing/BaseClasses";
 			sourceTree = SOURCE_ROOT;
 		};
 		84073A4C05E3F3D3003E62AA /* ValidatePassword */ = {
@@ -5834,6 +5848,7 @@
 		84AD1EE003C2476F005F64B1 /* Data Processing */ = {
 			isa = PBXGroup;
 			children = (
+				84071B660D185E7F00FD6EFD /* BaseClasses */,
 				840DFF0703C37EAA00DCF929 /* Data Flow */,
 				849F4C6A0768DA920087E9A8 /* DataExplorer */,
 				84E427D6054EFFCA0057208F /* ReplayData */,
@@ -7865,6 +7880,7 @@
 				9C1363CB0D0A7921006C550D /* ORCaen265Decoders.h in Headers */,
 				9C1363CD0D0A7921006C550D /* ORCaen265Model.h in Headers */,
 				CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */,
+				84071B690D185E7F00FD6EFD /* ORDataChainObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8922,6 +8938,7 @@
 				9C1363CA0D0A7921006C550D /* ORCaen265Controller.m in Sources */,
 				9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */,
 				9C1363CE0D0A7921006C550D /* ORCaen265Model.m in Sources */,
+				84071B6A0D185E7F00FD6EFD /* ORDataChainObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
