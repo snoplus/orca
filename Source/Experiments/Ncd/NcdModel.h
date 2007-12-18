@@ -159,7 +159,7 @@
 - (void)setSourceMask:(unsigned long)aMask;
 
 - (NSMutableDictionary*) captureState;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)aDictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary;
 - (BOOL) preRunChecks;
 - (void) printProblemSummary;
 

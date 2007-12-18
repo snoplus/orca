@@ -1381,7 +1381,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 - (NSMutableDictionary*) captureState
 {
     NSMutableDictionary* stateDictionary = [NSMutableDictionary dictionary];
-    [[self document] captureCurrentState: stateDictionary];
+    [[self document] addParametersToDictionary: stateDictionary];
     
     [stateDictionary writeToFile:[CapturePListFile stringByExpandingTildeInPath] atomically:YES];
     
@@ -1393,11 +1393,11 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     return stateDictionary;
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)aDictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     
-    [[self detector] captureCurrentState:objDictionary];
+    [[self detector] addParametersToDictionary:objDictionary];
     
     [aDictionary setObject:objDictionary forKey:@"NcdModel"];
     return aDictionary;
@@ -1407,7 +1407,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 //a highly hardcoded config checker. Assumes things like only one crate, ect.
 - (BOOL) preRunChecks
 {
-    NSMutableDictionary* newDictionary  = [[self document] captureCurrentState: [NSMutableDictionary dictionary]];
+    NSMutableDictionary* newDictionary  = [[self document] addParametersToDictionary: [NSMutableDictionary dictionary]];
     NSDictionary* oldDictionary         = [NSDictionary dictionaryWithContentsOfFile:[CapturePListFile stringByExpandingTildeInPath]];
     
     [problemArray release];

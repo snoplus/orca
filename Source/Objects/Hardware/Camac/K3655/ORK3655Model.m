@@ -376,10 +376,10 @@ NSString* ORK3655Chan							= @"ORK3655Chan";
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithBool:inhibitEnabled] forKey:@"InhibitEnabled"];
     [objDictionary setObject:[NSNumber numberWithBool:continous] forKey:@"Continous"];
     [objDictionary setObject:[NSNumber numberWithBool:useExtClock] forKey:@"UseExtClock"];
@@ -464,8 +464,7 @@ NSString* ORK3655Chan							= @"ORK3655Chan";
 }
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"station %d",[self stationNumber]]];
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
 	if([param isEqualToString:@"SetPoint"])return [[cardDictionary objectForKey:@"setPoints"] objectAtIndex:aChannel];
     else if([param isEqualToString:@"InhibitEnabled"]) return [cardDictionary objectForKey:@"inhibitEnabled"];
     else if([param isEqualToString:@"Continous"]) return [cardDictionary objectForKey:@"continous"];

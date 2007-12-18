@@ -62,7 +62,7 @@
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol;
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
 - (void) resetAlreadyVisitedInChainSearch;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (void) changeSelectedObjectsLevel:(BOOL)up;
 
 - (id) findObjectWithFullID:(NSString*)aFullID;

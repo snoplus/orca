@@ -164,7 +164,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) removeDisplayOf:(ORConnector*)aConnector;
 
 - (BOOL) aWake;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 @end
 
 #pragma mark ¥¥¥Compiler Warning Fixes

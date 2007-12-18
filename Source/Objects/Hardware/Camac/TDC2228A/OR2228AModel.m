@@ -376,9 +376,9 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithInt:onlineMask] forKey:@"onlineMask"];
     [objDictionary setObject:[NSNumber numberWithBool:suppressZeros] forKey:@"suppressZeros"];
     [objDictionary setObject:[NSNumber numberWithInt:overFlowCheckTime] forKey:@"overFlowCheckTime"];
@@ -426,8 +426,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 }
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"station %d",[self stationNumber]]];
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
     if([param isEqualToString:@"OnlineMask"]) return [cardDictionary objectForKey:@"onlineMask"];
     else return nil;
 }

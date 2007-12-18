@@ -840,8 +840,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"card %d",[self slot]]];
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
     if([param isEqualToString:@"Threshold"])return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
     else return nil;
 }
@@ -856,9 +855,9 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     int i;
     NSMutableArray* array = [NSMutableArray arrayWithCapacity:kNumChannels];
     for(i=0;i<kNumChannels;i++){

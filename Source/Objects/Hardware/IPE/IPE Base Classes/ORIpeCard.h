@@ -63,7 +63,7 @@ typedef struct IpeRegisterNamesStruct {
 #pragma mark ¥¥¥archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark ¥¥¥HW Access
 - (unsigned long) read:(unsigned long) address;

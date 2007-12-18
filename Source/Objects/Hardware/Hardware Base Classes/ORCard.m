@@ -148,21 +148,69 @@
 }
 
 #pragma mark ¥¥¥Archival
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
-    [objDictionary setObject:[NSNumber numberWithInt:[self slot]] forKey:@"slot"];
+    [objDictionary setObject:[NSNumber numberWithInt:[self slot]] forKey:@"Card"];
     [dictionary setObject:objDictionary forKey:[self identifier]];
     return objDictionary;
 }
 
-- (void) addInfoToArray:(NSMutableArray*)anArray
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray
 {
-	NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									[NSNumber numberWithInt:[self slot]], @"SlotNumber",
-									[self className],	@"ClassName",nil];
+	NSMutableDictionary* stateDictionary = [NSMutableDictionary dictionary];
+	[self addParametersToDictionary:stateDictionary];
+	NSMutableDictionary* dictionary = [NSMutableDictionary dictionary];
+	NSEnumerator* e = [stateDictionary keyEnumerator];
+	id aKey;
+	while(aKey = [e nextObject]){
+		NSDictionary* d = [stateDictionary objectForKey:aKey];
+		[dictionary addEntriesFromDictionary:d];
+	}							
+	
 	[anArray addObject:dictionary];
+}
+
+- (NSDictionary*) findCardDictionaryInHeader:(NSDictionary*)fileHeader
+{
+	NSDictionary* crateDictionary;
+	NSDictionary* cardDictionary;
+	//could be old style
+	crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
+	cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"card %d",[self slot]]];
+	if(!cardDictionary){
+		//nope, new style -- a little harder....
+		NSDictionary* objectInfo = [fileHeader objectForKey:@"ObjectInfo"];
+		NSArray* crates = [objectInfo objectForKey:@"Crates"];
+		//have to match the crate class and crate number
+		int i;
+		for(i=0;i<[crates count];i++){
+			NSDictionary* aCrateDictionary = [crates objectAtIndex:i];
+			int firstSlot = [[aCrateDictionary objectForKey:@"FirstSlot"] intValue];
+			NSString* testClassName = [aCrateDictionary objectForKey:@"ClassName"];
+			if([testClassName isEqualToString:[[self guardian] className]]){
+				int testCrateNumber = [[aCrateDictionary objectForKey:@"CrateNumber"] intValue];
+				if(testCrateNumber == [self crateNumber]){
+					//OK, we found the right crate. Search for the right card dictionary
+					NSArray* cards = [aCrateDictionary objectForKey:@"Cards"];
+					int card;
+					for(card=0;card<[cards count];card++){
+						NSDictionary* aCardDictionary = [cards objectAtIndex:card];
+						NSString* testClassName = [aCardDictionary objectForKey:@"Class Name"];
+						if([testClassName isEqualToString:[self className]]){
+							int testSlot = [[aCardDictionary objectForKey:@"Card"] intValue] + firstSlot;
+							if(testSlot == [self slot]){
+								//yeah, we found it.
+								return aCardDictionary;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return cardDictionary;
 }
 
 @end

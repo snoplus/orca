@@ -551,6 +551,21 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     [encoder encodeBool:[self saveConfiguration] forKey:ORDataSaveConfiguration];
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+	NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+    [objDictionary setObject:[dataFolder addParametersToDictionary:[NSMutableDictionary dictionary]] forKey:@"DataFolder"];
+    [objDictionary setObject:[statusFolder addParametersToDictionary:[NSMutableDictionary dictionary]] forKey:@"StatusFolder"];
+    [objDictionary setObject:[configFolder addParametersToDictionary:[NSMutableDictionary dictionary]] forKey:@"ConfigFolder"];
+    [objDictionary setObject:[NSNumber numberWithInt:saveConfiguration] forKey:@"SaveConfiguration"];
+   
+    [dictionary setObject:objDictionary forKey:@"Data File"];
+    
+    
+    return objDictionary;
+}
+
+
 @end
 
 

@@ -397,7 +397,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 - (NSMutableDictionary*) captureState
 {
     NSMutableDictionary* stateDictionary = [NSMutableDictionary dictionary];
-    [[self document] captureCurrentState: stateDictionary];
+    [[self document] addParametersToDictionary: stateDictionary];
     [stateDictionary writeToFile:[[self capturePListsFile] stringByExpandingTildeInPath] atomically:YES];
     
     [self setHardwareCheck:YES];
@@ -406,7 +406,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     return stateDictionary;
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)aDictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
         
@@ -434,7 +434,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 {
 	[self clearSegmentErrors];
 	
-    NSMutableDictionary* newDictionary  = [[self document] captureCurrentState: [NSMutableDictionary dictionary]];
+    NSMutableDictionary* newDictionary  = [[self document] addParametersToDictionary: [NSMutableDictionary dictionary]];
     NSDictionary* oldDictionary         = [NSDictionary dictionaryWithContentsOfFile:[[self capturePListsFile] stringByExpandingTildeInPath]];
     
     [problemArray release];

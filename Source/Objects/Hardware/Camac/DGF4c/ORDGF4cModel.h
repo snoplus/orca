@@ -206,7 +206,7 @@ union {
 - (long) numOscPoints;
 - (long) oscData:(short)set value:(short)x;
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (NSArray*) valueArrayFor:(SEL)sel;
 
 #pragma mark ¥¥¥Hardware Access

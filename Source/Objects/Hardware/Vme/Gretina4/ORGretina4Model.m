@@ -1079,8 +1079,7 @@ static struct {
 
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"card %d",[self slot]]];
+ 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
     
     id obj = [cardDictionary objectForKey:param];
     if(obj)return obj;
@@ -1357,9 +1356,9 @@ static struct {
 
  }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     short i;
     for(i=0;i<kNumGretina4CardParams;i++){
         [objDictionary setObject:[self cardInfo:i] forKey:cardConstants[i].name];

@@ -79,7 +79,8 @@
 - (char*) 		findNumber: (char*) aString withLength: (long) aLength;
 - (NSString*)   title;
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray;
 
 @end
 

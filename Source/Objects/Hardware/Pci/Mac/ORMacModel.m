@@ -104,6 +104,11 @@ void registryChanged(
     [self linkToController:@"ORMacController"];
 }
 
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"%@ %d",[self className],[self tag]];
+}
+
 -(void)makeConnectors
 {
 	//we  have three permanent connectors. The rest we manage for the pci objects.

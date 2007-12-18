@@ -38,7 +38,7 @@
 - (int)  stationNumber;
 
 #pragma mark ¥¥¥archival
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 @end
 

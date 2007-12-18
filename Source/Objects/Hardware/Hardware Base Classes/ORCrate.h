@@ -70,7 +70,7 @@
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-- (void) addInfoToArray:(NSMutableArray*)anArray;
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray;
 
 
 @end

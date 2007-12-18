@@ -366,9 +366,9 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithInt:gain] forKey:@"gain"];
     [objDictionary setObject:[NSNumber numberWithInt:storageOffset] forKey:@"storageOffset"];
     return objDictionary;

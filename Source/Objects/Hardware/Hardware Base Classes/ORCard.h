@@ -43,8 +43,9 @@
 - (void) disconnected;
 
 #pragma mark ¥¥¥Archival
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
-- (void) addInfoToArray:(NSMutableArray*)anArray;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray;
+- (NSDictionary*) findCardDictionaryInHeader:(NSDictionary*)fileHeader;
 
 @end
 

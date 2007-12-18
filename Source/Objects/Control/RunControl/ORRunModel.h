@@ -21,13 +21,14 @@
 
 
 #import "ORBaseDecoder.h"
+#import "ORDataChainObject.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataPacket;
 @class ORDataSet;
 @class ORDataTypeAssigner;
 
-@interface ORRunModel :  OrcaObject {
+@interface ORRunModel :  ORDataChainObject {
     @private
         unsigned long 	runNumber;
 
@@ -149,7 +150,7 @@
 - (NSDictionary*) dataRecordDescription;
 - (void) takeData;
 - (void) runStarted:(BOOL)doInit;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 - (void) incrementTime:(NSTimer*)aTimer;
 - (void) sendHeartBeat:(NSTimer*)aTimer;

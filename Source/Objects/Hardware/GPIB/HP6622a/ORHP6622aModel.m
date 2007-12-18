@@ -368,9 +368,9 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
     
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     
 	int i;
 	for(i=0;i<kHP6622aNumberSupplies;i++){

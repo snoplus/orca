@@ -264,26 +264,63 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     return [[self group] findObjectWithFullID:aFullID];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) fillInHeaderInfo:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* docDict = [NSMutableDictionary dictionary];
-    
+	//add in the document parameters
+	NSMutableDictionary* docDict = [NSMutableDictionary dictionary];
     [docDict setObject:[self fileName] forKey:@"documentName"];
     [docDict setObject:[[[NSBundle mainBundle] infoDictionary]       objectForKey:@"CFBundleVersion"] forKey:@"OrcaVersion"];
     [docDict setObject:[NSString stringWithFormat:@"%@",[NSDate date]]   forKey:@"date"];
     [dictionary setObject:docDict forKey:@"Document Info"];
-    if([gateGroup count]){
-        dictionary = [gateGroup captureCurrentState:dictionary];
-    }
 	
-	NSArray* crates = [self collectObjectsOfClass:NSClassFromString(@"ORCrate")];
-	if([crates count]){
-		NSMutableArray* crateArray = [NSMutableArray array];
-		[crates makeObjectsPerformSelector:@selector(addInfoToArray:) withObject:crateArray];
-		[dictionary setObject:crateArray forKey:@"CrateList"];
+	//add in any gategroups
+    if([gateGroup count])[gateGroup addParametersToDictionary:dictionary];
+
+	//have our group add parameters
+	//[group addParametersToDictionary:dictionary];
+	
+	//setup and add Objects to object info list
+	NSMutableDictionary* objectInfoDictionary = [NSMutableDictionary dictionary];
+	NSMutableArray* allObjects		= (NSMutableArray*)[self collectObjectsOfClass:NSClassFromString(@"OrcaObject")];
+	NSMutableArray* crates			= [NSMutableArray array];
+	NSMutableArray* dataChain		= [NSMutableArray array];
+	NSMutableArray* gpib			= [NSMutableArray array];
+	NSEnumerator* e					= [allObjects objectEnumerator];
+	id anObj;
+	while(anObj = [e nextObject]){
+		if([anObj isKindOfClass:NSClassFromString(@"ORCrate")]){
+			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
+				[anObj addObjectInfoToArray:crates];
+			}
+		}
+		else if([anObj isKindOfClass:NSClassFromString(@"ORDataChainObject")]){
+			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
+				[anObj addObjectInfoToArray:dataChain];
+			}
+		}
+		else if([anObj isKindOfClass:NSClassFromString(@"ORGpibDeviceModel")]){
+			if([anObj respondsToSelector:@selector(addObjectInfoToArray:)]){
+				[anObj addObjectInfoToArray:gpib];
+			}
+		}
 	}
 	
-    return [group captureCurrentState:dictionary];
+	
+	if([crates count]){
+		[objectInfoDictionary setObject:crates forKey:@"Crates"];
+	}
+	if([dataChain count]){
+		[objectInfoDictionary setObject:dataChain forKey:@"DataChain"];
+	}
+	if([gpib count]){
+		[objectInfoDictionary setObject:gpib forKey:@"Gpib"];
+	}
+	
+	//add the Object Info into the dictionary from our argument list.
+	if([objectInfoDictionary count]){
+		[dictionary setObject:objectInfoDictionary forKey:@"ObjectInfo"];
+	}
+    return dictionary;
 }
 
 #pragma mark ¥¥¥Archival

@@ -18,11 +18,12 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import "ORDataChainObject.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class NetSocket;
 
-@interface ORRemoteRunModel :  OrcaObject {
+@interface ORRemoteRunModel :  ORDataChainObject {
     @private
         unsigned long 	runNumber;
 

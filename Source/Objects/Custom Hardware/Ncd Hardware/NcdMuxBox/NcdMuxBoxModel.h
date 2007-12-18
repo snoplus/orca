@@ -133,7 +133,7 @@
 - (NSArray*) wizardSelections;
 - (NSArray*) wizardParameters;
 - (int) numberOfChannels;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark ¥¥¥Archival
 - (id)      initWithCoder:(NSCoder*)aDecoder;

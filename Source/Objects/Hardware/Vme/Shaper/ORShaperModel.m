@@ -1380,10 +1380,10 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 	
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:thresholds forKey:@"thresholds"];
     [objDictionary setObject:thresholdAdcs forKey:@"thresholdAdcs"];
     [objDictionary setObject:gains forKey:@"gains"];
@@ -1572,9 +1572,8 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"card %d",[self slot]]];
-    if([param isEqualToString:@"Threshold"]){
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
+	if([param isEqualToString:@"Threshold"]){
         int rawValue = [[[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel] intValue];
         return [NSNumber numberWithInt:[self thresholdRawtomV:rawValue]];
     }

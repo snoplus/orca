@@ -118,9 +118,9 @@ static NSString *ORVmeCardAddressModifier 	= @"vme Address Modifier";
 	[encoder encodeInt:[self addressModifier] forKey:ORVmeCardAddressModifier];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithLong:baseAddress] forKey:@"baseAddress"];
     return objDictionary;
 }

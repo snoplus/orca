@@ -188,18 +188,18 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 				memset(&(target_address.sin_zero), '\0', 8);		// zero the rest of the struct 
 
 				if ((socketfd = socket(AF_INET, SOCK_STREAM, 0)) != 0) {
-					int oflag = fcntl(socketfd, F_GETFL);
-					fcntl(socketfd, F_SETFL, oflag | O_NONBLOCK);
+					//int oflag = fcntl(socketfd, F_GETFL);
+					//fcntl(socketfd, F_SETFL, oflag | O_NONBLOCK);
 					//time_t now = time(NULL);
 					int r = connect(socketfd, (struct sockaddr *) &target_address, sizeof(target_address));
 					if (r == -1) {
-							[NSException raise:@"Socket Failed" format:@"Couldn't couldn't get socket for %@ Port %d",ipAddress,kC111CBinaryPort];
+						[NSException raise:@"Socket Failed" format:@"Couldn't couldn't get socket for %@ Port %d",ipAddress,kC111CBinaryPort];
 					}
 					
 					NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],ipAddress,kC111CBinaryPort);
 					[self setIsConnected:YES];
 					[self setTimeConnected:[NSCalendarDate date]];
-					fcntl(socketfd, F_SETFL, oflag);
+					//fcntl(socketfd, F_SETFL, oflag);
 				}
 				else [NSException raise:@"Socket Failed" format:@"Couldn't couldn't get socket for %@ Port %d",ipAddress,kC111CBinaryPort];
 			}
@@ -259,15 +259,22 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 	return 0;
 }
 
+- (unsigned short)  resetContrl
+{   
+	NSLog(@"C111C doesn't support a controller reset function\n");
+    return 1;
+}
 - (unsigned long) setLAMMask:(unsigned long) mask
 {
-	lamMask = mask;
+	NSLog(@"C111C doesn't support a set LAM mask function\n");
     return 1;
 }
 
 - (unsigned short)  readLAMMask:(unsigned long *)mask
 {
-	*mask = lamMask & 0xffffff;
+	NSLog(@"C111C doesn't support a read LAM mask function\n");
+
+	*mask = 0;
 	return 1;
 } 
 
@@ -407,13 +414,11 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 		msgsize += [self adjustFrame:&buffer[msgsize] length:(int) 6];
 		buffer[msgsize++] = kETX;
 
-		NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
 		[self writeBuffer:buffer length:msgsize];
 		
 		//get the response
-		msgsize = [self readBuffer:buffer maxLength:7];
+		msgsize = [self readBuffer:bin_rcv maxLength:7];
 		
-		NSLog(@"%d delta time: %f mS\n",msgsize,1000*([NSDate timeIntervalSinceReferenceDate] - now));
 		
 		if ((bin_rcv[1] != kBin_CSSA_Cmd) || (msgsize != 7)) result =  -1;
 		if(result==1){
@@ -444,15 +449,13 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 		buffer[4] = a;
 		buffer[5] = 0;
 		buffer[6] = 0;
-		buffer[7] = kResponseRequired;
+		buffer[7] = kNOResponseRequired;
 
 		msgsize = 2;
 		msgsize += [self adjustFrame:&buffer[msgsize] length:(int) 6];
 		buffer[msgsize++] = kETX;
 
-		NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
 		[self writeBuffer:buffer length:msgsize];
-		NSLog(@"%d delta time: %f mS\n",msgsize,1000*([NSDate timeIntervalSinceReferenceDate] - now));
 				
 		cmdResponse		= 0;
 		cmdAccepted		= 0;
@@ -484,12 +487,10 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 		msgsize += [self adjustFrame:&buffer[msgsize] length:(int) 8];
 		buffer[msgsize++] = kETX;
 
-		NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
 		[self writeBuffer:buffer length:msgsize];
 		
 		//get the response
-		msgsize = [self readBuffer:buffer maxLength:8];
-		NSLog(@"%d delta time: %f mS\n",msgsize,1000*([NSDate timeIntervalSinceReferenceDate] - now));
+		msgsize = [self readBuffer:bin_rcv maxLength:8];
 			
 		if ((bin_rcv[1] != kBin_CFSA_Cmd) || (msgsize != 8)) result =  -1;
 		if(result==1){		
@@ -562,7 +563,7 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 	FD_SET(socketfd, &rfds);
 
 	struct timeval tv;
-	tv.tv_sec = 1;
+	tv.tv_sec  = 0;
 	tv.tv_usec = 0;
 
 	if (select(socketfd + 1, &rfds, NULL, NULL, &tv) > 0) {
@@ -578,8 +579,8 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 	BOOL etx_found = NO;
 	unsigned char buf;
 
-	if ([self canRead]) {
-		while (!etx_found) {
+	while (!etx_found) {
+		if ([self canRead]) {
 			int rp = recv(socketfd, &buf, 1, 0);
 			if (rp > 0) {
 				if (buf == kSTX) {

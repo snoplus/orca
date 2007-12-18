@@ -110,7 +110,7 @@
 
 #pragma mark ¥¥¥Run Data
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 
 #pragma mark ¥¥¥Ramp

@@ -67,7 +67,7 @@
 - (void) setGatedValueY: (ORGatedValue *) aGatedValue;
 - (void) valueAccepted:(unsigned long)aValue gate:(ORGateElement*)aGateElement dataSet:(ORDataSet*)aDataSet;
 - (void) installGates:(id)obj;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (void) processEvent:(NSData*)someData intoDataSet:(ORDataSet*)aDataSet;
 
 

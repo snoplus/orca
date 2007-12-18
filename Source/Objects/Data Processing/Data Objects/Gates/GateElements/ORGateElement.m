@@ -164,7 +164,7 @@ NSString* ORGateDecoderTargetChangedNotification   = @"ORGateDecoderTargetChange
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     if(decoderTarget){
         [dictionary setObject:decoderTarget forKey:@"decoderTarget"];

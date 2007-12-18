@@ -99,7 +99,7 @@ enum {
 - (void) resolveActualVsSetValueProblem;
 - (BOOL) currentIsHigh:(id)checker pollingTime:(int)pollingTime;
 - (BOOL) checkAdcDacMismatch:(id)checker pollingTime:(int)pollingTime;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 @end
 

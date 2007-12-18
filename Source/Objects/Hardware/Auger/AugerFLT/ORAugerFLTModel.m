@@ -1273,10 +1273,10 @@ static NSString* fltTestName[kNumAugerFLTTests]= {
 	[anEventDictionary setObject:aDictionary forKey:@"AugerFLT"];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:thresholds			forKey:@"thresholds"];
     [objDictionary setObject:gains				forKey:@"gains"];
     [objDictionary setObject:hitRatesEnabled	forKey:@"hitRatesEnabled"];
@@ -1981,8 +1981,7 @@ static NSString* fltTestName[kNumAugerFLTTests]= {
 
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"station %d",[self stationNumber]]];
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
     if([param isEqualToString:@"Threshold"]){
         return  [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
     }

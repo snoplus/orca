@@ -31,6 +31,7 @@
 		IBOutlet NSTextField*	ipAddressTextField;
 		IBOutlet NSButton*		ipConnectButton;
 };
+
 #pragma mark •••Initialization
 -(id)init;
 

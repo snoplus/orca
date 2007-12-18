@@ -147,10 +147,10 @@ NSString* ORGateAcceptTypeChangedNotification= @"ORGateAcceptTypeChangedNotifica
 
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* gateDictionary = [NSMutableDictionary dictionary];
-    gateDictionary = [super captureCurrentState:gateDictionary];
+    gateDictionary = [super addParametersToDictionary:gateDictionary];
     
     [gateDictionary setObject:[NSNumber numberWithLong:lowAcceptValue] forKey:@"lowAcceptValue"];
     [gateDictionary setObject:[NSNumber numberWithLong:highAcceptValue] forKey:@"highAcceptValue"];

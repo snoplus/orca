@@ -200,7 +200,7 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     return [[[NSApp delegate]document] documentCanBeChanged];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* dictionaryToUse = dictionary;
     if([[self identifier] length]){
@@ -209,7 +209,7 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
         [dictionaryToUse setObject:[NSNumber numberWithShort:[self count]] forKey:@"count"]; 
         [dictionaryToUse setObject:NSStringFromClass([self class]) forKey:@"Class Name"]; 
     }
-    [orcaObjects makeObjectsPerformSelector:@selector(captureCurrentState:) withObject:dictionaryToUse];
+    [orcaObjects makeObjectsPerformSelector:@selector(addParametersToDictionary:) withObject:dictionaryToUse];
     return dictionaryToUse;
 }
 

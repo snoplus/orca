@@ -922,7 +922,7 @@ static NSString *NcdMuxTriggerGroup2 = @" NcdMuxTrigger Group 2";
     [encoder encodeObject:[self trigger2Group] forKey:NcdMuxTriggerGroup2];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];

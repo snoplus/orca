@@ -21,6 +21,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORSafeQueue.h"
+#import "ORDataChainObject.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataPacket;
@@ -35,7 +36,7 @@
 
 @class ORAlarm;
 
-@interface ORDataTaskModel : OrcaObject  {
+@interface ORDataTaskModel : ORDataChainObject  {
     ORReadOutList*  readOutList;
     id              nextObject;     //cache for alittle bit more speed.
     NSArray*        dataTakers;     //cache of data takers.

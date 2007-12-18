@@ -454,4 +454,17 @@ static NSString *ORDispatcherRefusedList	 	= @"ORDispatcherRefusedList";
     [encoder encodeObject:refusedList forKey:ORDispatcherRefusedList];
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+	NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+    [objDictionary setObject:[NSNumber numberWithInt:socketPort] forKey:@"PortNumber"];
+    [objDictionary setObject:[NSNumber numberWithInt:checkAllowed] forKey:@"CheckAllowed"];
+    [objDictionary setObject:[NSNumber numberWithInt:checkRefused] forKey:@"CheckRefused"];
+    if([allowedList count])[objDictionary setObject:allowedList forKey:@"AllowedList"];
+    if([refusedList count])[objDictionary setObject:refusedList forKey:@"RefusedList"];
+    [dictionary setObject:objDictionary forKey:@"Listener"];
+    return objDictionary;
+}
+
+
 @end

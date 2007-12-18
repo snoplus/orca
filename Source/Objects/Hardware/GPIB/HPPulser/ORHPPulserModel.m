@@ -1178,9 +1178,9 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 	[anEncoder encodeFloat:maxTime forKey:ORHPPulserMaxTime];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     
     [objDictionary setObject:[NSNumber numberWithInt:triggerSource] forKey:@"triggerMode"];
     [objDictionary setObject:[NSNumber numberWithFloat:voltage] forKey:@"voltage"];

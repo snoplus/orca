@@ -466,7 +466,7 @@ static NSString *ORSupplyVoltageAdcSlope  = @"ORHV4032Supply Volt adc slope";
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class])             forKey:@"Class Name"];

@@ -374,6 +374,19 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	[encoder encodeInt:remotePort forKey:@"ORListenerRemotePort"];
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+	NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+    if(remoteHost)[objDictionary setObject:remoteHost forKey:@"RemoteHost"];
+    [objDictionary setObject:[NSNumber numberWithInt:connectAtStart] forKey:@"ConnectAtStart"];
+    [objDictionary setObject:[NSNumber numberWithInt:autoReconnect] forKey:@"AutoReconnect"];
+    [objDictionary setObject:[NSNumber numberWithInt:remotePort] forKey:@"RemotePort"];
+    [dictionary setObject:objDictionary forKey:@"Listener"];
+    
+    return objDictionary;
+}
+
+
 @end
 
 @implementation ORListenerModel (processThread)
@@ -563,6 +576,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reConnect) object:nil];
     [self connectSocket:YES];
 }
+
 
 @end
 

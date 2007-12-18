@@ -292,7 +292,7 @@ struct {
 
 - (NSString*) identifier
 {
-    return @"JADC-L";
+    return [NSString stringWithFormat:@"JADC-L (Station %d) ",[self slot]];
 }
 
 #pragma mark ¥¥¥Hardware Test functions
@@ -407,6 +407,7 @@ struct {
 	unsigned short aMask = enabledMask;
 	[[self adapter] camacShortNAF:[self stationNumber] a:0 f:17 data:&aMask];
 }
+
 
 #pragma mark ¥¥¥Archival
 

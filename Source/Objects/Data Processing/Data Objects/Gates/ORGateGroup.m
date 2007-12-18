@@ -187,14 +187,14 @@ NSString* ORGateArrayChangedNotification = @"ORGateArrayChangedNotification";
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* gateDictionary = [NSMutableDictionary dictionary];
 
     NSEnumerator* e = [dataGates objectEnumerator];
     ORGate* aGate;
     while(aGate = [e nextObject]){
-        gateDictionary = [aGate captureCurrentState:gateDictionary];
+        gateDictionary = [aGate addParametersToDictionary:gateDictionary];
     }
     
     [dictionary setObject:gateDictionary forKey:@"Gates"];

@@ -915,9 +915,9 @@ static NSString *OReCPUReadOutGroup1		= @"OReCPU ReadOut Group 1";
 	}
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:fileName?fileName:@"" forKey:@"fileName"];
     return objDictionary;
 }

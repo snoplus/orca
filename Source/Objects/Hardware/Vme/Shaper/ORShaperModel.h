@@ -228,7 +228,7 @@ enum {
 - (unsigned short) 	decodeBoardType:(unsigned short) aValue;
 - (unsigned short) 	decodeBoardRev:(unsigned short) aValue;
 - (NSString *)		decodeBoardName:(unsigned short) aValue;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (void) scanForShapers;
 
 #pragma mark ¥¥¥DataTaker

@@ -18,13 +18,14 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+#import "ORDataChainObject.h"
 
 #pragma mark ***Forward Declarations
 @class NetSocket;
 @class ORDataPacket;
 @class ORSafeQueue;
 
-@interface ORListenerModel : OrcaObject
+@interface ORListenerModel : ORDataChainObject
 {
 	unsigned short remotePort;
 	NSString* remoteHost;

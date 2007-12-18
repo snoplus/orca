@@ -613,11 +613,11 @@ static NSString *ORHVPollingState 	= @"ORHVPollingState";
 
 #pragma mark ¥¥¥Run Data
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class])        forKey:@"Class Name"];
-    [supplies makeObjectsPerformSelector:@selector(captureCurrentState:) withObject:objDictionary];
+    [supplies makeObjectsPerformSelector:@selector(addParametersToDictionary:) withObject:objDictionary];
     
     [dictionary setObject:objDictionary forKey:@"High Voltage"];
     

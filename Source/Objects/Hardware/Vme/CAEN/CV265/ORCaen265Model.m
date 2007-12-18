@@ -339,10 +339,10 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 	
 }
 
-/*- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+/*- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [encoder encodeBool:suppressZeros forKey:@"ORCaen265ModelSuppressZeros"];
     [encoder encodeInt:enabledMask forKey:@"ORCaen265ModelEnabledMask"];
     [objDictionary setObject:thresholds forKey:@"thresholds"];

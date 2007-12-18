@@ -714,8 +714,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 }
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"station %d",[self stationNumber]]];
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
     if([param isEqualToString:@"Data Shift"]) return [cardDictionary objectForKey:@"dataShift"];
     else if([param isEqualToString:@"Both Edges"]) return [cardDictionary objectForKey:@"bothEdges"];
     else if([param isEqualToString:@"Fera Mode"]) return [cardDictionary objectForKey:@"feraMode"];
@@ -736,9 +735,9 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     else return nil;
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 
     [objDictionary setObject:[NSNumber numberWithBool:bothEdges] forKey:@"bothEdges"];
     [objDictionary setObject:[NSNumber numberWithBool:feraMode] forKey:@"feraMode"];

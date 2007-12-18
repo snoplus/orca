@@ -1477,9 +1477,9 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
     [self setMultiplicityId:[anotherCard multiplicityId]];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithInt:triggerSource]	forKey:@"triggerSource"];
     [objDictionary setObject:[NSNumber numberWithInt:inhibitSource]	forKey:@"inhibitSource"];	
     [objDictionary setObject:[NSNumber numberWithInt:nHit]			forKey:@"nHit"];	

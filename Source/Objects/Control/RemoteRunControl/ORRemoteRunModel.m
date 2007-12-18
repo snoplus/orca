@@ -486,6 +486,28 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [encoder encodeInt:remotePort forKey:ORRunRemotePort];
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    //get the time(UT!)
+    time_t	theTime;
+    time(&theTime);
+    struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+    time_t ut_time = mktime(theTimeGMTAsStruct);
+    NSTimeInterval refTime = [NSDate timeIntervalSinceReferenceDate];
+    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+    [objDictionary setObject:NSStringFromClass([self class])            forKey:@"Class Name"];
+    [objDictionary setObject:[NSNumber numberWithLong:ut_time]          forKey:@"startTime"];
+    [objDictionary setObject:[NSNumber numberWithFloat:refTime]         forKey:@"refTime"];
+    [objDictionary setObject:[NSNumber numberWithBool:quickStart]       forKey:@"quickStart"];
+    [objDictionary setObject:[NSNumber numberWithLong:[self runNumber]] forKey:@"RunNumber"];
+    
+    [dictionary setObject:objDictionary forKey:@"Run Control"];
+    
+    
+    return objDictionary;
+}
+
+
 -(NSString*)commandID
 {
     return @"RemoteRunControl";

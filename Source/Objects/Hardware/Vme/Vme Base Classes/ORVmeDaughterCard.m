@@ -193,4 +193,11 @@ static NSString *ORIPSlot 			= @"IP Slot";
     NSLog(@"Probe not implemented for %@\n",[self className]);
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    [objDictionary setObject:[self identifier] forKey:@"SlotName"];
+    return objDictionary;
+}
+
 @end

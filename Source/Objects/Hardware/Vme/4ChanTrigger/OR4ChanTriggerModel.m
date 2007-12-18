@@ -371,9 +371,9 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
     
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];    
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];    
     [objDictionary setObject:[NSNumber numberWithInt:shipClockMask] forKey:@"shipClockMask"];
     return objDictionary;
 }

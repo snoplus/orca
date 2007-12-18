@@ -20,13 +20,14 @@
 
 
 #pragma mark ¥¥¥Imported Files
+#import "ORDataChainObject.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataPacket;
 @class ORQueue;
 @class ORSmartFolder;
 
-@interface ORDataFileModel :  OrcaObject
+@interface ORDataFileModel :  ORDataChainObject
 {
     @private
         NSFileHandle*  filePointer;

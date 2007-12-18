@@ -245,13 +245,13 @@ NSString* ORGateTwoDChangedNotification = @"ORGateTwoDChangedNotification";
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     ////Note....twoD part not included.....TBD.......
     
     NSMutableDictionary* gateDictionary = [NSMutableDictionary dictionary];
-    gateDictionary = [gateKey captureCurrentState:gateDictionary];
-    gateDictionary = [gatedValue captureCurrentState:gateDictionary];
+    gateDictionary = [gateKey addParametersToDictionary:gateDictionary];
+    gateDictionary = [gatedValue addParametersToDictionary:gateDictionary];
     
     [dictionary setObject:gateDictionary forKey:gateName];
     

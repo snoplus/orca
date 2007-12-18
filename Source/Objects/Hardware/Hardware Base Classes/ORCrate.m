@@ -342,20 +342,9 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 	[encoder encodeBool:showLabels forKey:@"showLabels"];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray
 {
-    NSMutableDictionary* dictionaryToUse = [super captureCurrentState:dictionary];
-	NSArray* cards = [self collectObjectsOfClass:NSClassFromString(@"ORCard")];
-	if([cards count]){
-		NSMutableArray* cardArray = [NSMutableArray array];
-		[cards makeObjectsPerformSelector:@selector(addInfoToArray:) withObject:cardArray];
-		[dictionaryToUse setObject:cardArray forKey:@"CardList"];
-	}
-    return dictionaryToUse;
-}
-
-- (void) addInfoToArray:(NSMutableArray*)anArray
-{
+	//find the slot number base, i.e. CAMAC starts at 1, VME starts at 0
 	int cardStart = 0;
 	NSEnumerator* e = [[self orcaObjects] objectEnumerator];
 	id anObj;
@@ -366,10 +355,27 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 		}
 	}
 
-	NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									[NSNumber numberWithInt:[self crateNumber]], @"CrateNumber",
-									[self className],	@"ClassName",
-									[NSNumber numberWithInt:cardStart],	@"FirstSlot",nil];
+	NSMutableDictionary* dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+											[NSNumber numberWithInt:[self crateNumber]], @"CrateNumber",
+											[self className],	@"ClassName",
+											[NSNumber numberWithInt:cardStart],	@"FirstSlot",nil];
+
+	NSArray* cards = [self collectObjectsOfClass:NSClassFromString(@"ORCard")];
+	if([cards count]){
+		NSMutableArray* cardArray = [NSMutableArray array];
+		int i;
+		for(i=0;i<[cards count];i++){
+			ORCard* aCard = [cards objectAtIndex:i];
+			if([aCard guardian] == self){
+				[aCard addObjectInfoToArray:cardArray];
+			}
+		}
+		if([cardArray count]){
+			[dictionary setObject:cardArray forKey:@"Cards"];
+		}
+	}
+
+
 	[anArray addObject:dictionary];
 }
 

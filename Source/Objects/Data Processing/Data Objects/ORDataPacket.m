@@ -87,7 +87,7 @@
 
 - (void) makeFileHeader
 {
-    [self setFileHeader:[[[NSApp delegate] document] captureCurrentState:[NSMutableDictionary dictionary]]];
+    [self setFileHeader:[[[NSApp delegate] document] fillInHeaderInfo:[NSMutableDictionary dictionary]]];
     NSMutableDictionary* docDict = [fileHeader objectForKey:@"Document Info"];
     if(!docDict){
         docDict = [NSMutableDictionary dictionary];

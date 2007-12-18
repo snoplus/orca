@@ -20,14 +20,13 @@
 
 
 #pragma mark ¥¥¥Imported Files
+#import "ORDataChainObject.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataPacket;
 @class ORDataSet;
 
-
-
-@interface ORHistoModel :  OrcaObject 
+@interface ORHistoModel :  ORDataChainObject 
 {
     @private
         ORDataSet*   dataSet;

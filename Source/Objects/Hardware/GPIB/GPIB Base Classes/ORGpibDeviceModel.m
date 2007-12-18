@@ -586,8 +586,18 @@ static NSString *ORGpibSecondaryAddress			= @"ORGpib Secondary Address";
     [ anEncoder encodeInt: mSecondaryAddress forKey: ORGpibSecondaryAddress ];
 }
 
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray
+{
+	NSMutableDictionary* dictionary = [NSMutableDictionary dictionary];
+	if([self respondsToSelector:@selector(addParametersToDictionary:)]){
+		[self addParametersToDictionary:dictionary];
+	}
+	if([dictionary count]){
+		[anArray addObject:dictionary];
+	}
+}
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];

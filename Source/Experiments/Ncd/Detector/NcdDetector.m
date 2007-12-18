@@ -344,7 +344,7 @@ static NSString *ORDetectorMapFile	= @"ORDetectorMapFile";
 }
 
 #pragma mark ¥¥¥Run Data
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];

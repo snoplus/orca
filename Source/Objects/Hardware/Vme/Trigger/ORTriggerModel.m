@@ -718,9 +718,9 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
     
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];    
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];    
     [objDictionary setObject:[NSNumber numberWithBool:shipEvt1Clk] forKey:@"shipEvt1Clk"];
     [objDictionary setObject:[NSNumber numberWithBool:shipEvt2Clk] forKey:@"shipEvt2Clk"];
     [objDictionary setObject:[NSNumber numberWithBool:initWithMultiBoardEnabled] forKey:@"initWithMultiBoardEnabled"];

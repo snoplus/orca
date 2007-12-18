@@ -125,6 +125,9 @@
 - (NSString*) lockName;
 - (eFileTransferType) transferType;
 - (void) setTransferType:(eFileTransferType)aNewTransferType;
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+
 #pragma mark ***Actions
 
 - (IBAction) lockButtonAction:(id)sender;

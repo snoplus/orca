@@ -68,7 +68,7 @@
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol;
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
 - (id)       findObjectWithFullID:(NSString*)aFullID;
-- (NSMutableDictionary*)     captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) fillInHeaderInfo:(NSMutableDictionary*)dictionary;
 - (ORGateGroup *) gateGroup;
 - (void) setGateGroup: (ORGateGroup *) aGateGroup;
 - (void) assignUniqueIDNumber:(id)anObject;
@@ -87,6 +87,10 @@
 - (void)    windowMovedToFront:(NSWindowController*)aController;
 - (void)    checkControllers;
 
+@end
+
+@interface NSObject (ORDocument)
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray;
 @end
 
 #pragma mark ¥¥¥External Definitions

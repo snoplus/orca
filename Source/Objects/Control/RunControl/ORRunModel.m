@@ -911,7 +911,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //get the time(UT!)
     time_t	theTime;

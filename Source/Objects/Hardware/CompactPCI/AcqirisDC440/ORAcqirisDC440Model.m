@@ -1021,10 +1021,10 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [encoder encodeObject:[self sampleRateGroup] forKey:@"sampleRateGroup"];
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithInt:numberSamples] forKey:@"numberSamples"];
     [objDictionary setObject:[NSNumber numberWithDouble:delayTime] forKey:@"delayTime"];
     [objDictionary setObject:[NSNumber numberWithDouble:sampleInterval] forKey:@"sampleInterval"];
@@ -1147,8 +1147,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"card %d",[self stationNumber]]];
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
     if([param isEqualToString:@"NumberSamples"])return [[cardDictionary objectForKey:@"numberSamples"] objectAtIndex:aChannel];
     else if([param isEqualToString:@"DelayTime"]) return [cardDictionary objectForKey:@"delayTime"];
     else if([param isEqualToString:@"SampleInterval"]) return [cardDictionary objectForKey:@"sampleInterval"];

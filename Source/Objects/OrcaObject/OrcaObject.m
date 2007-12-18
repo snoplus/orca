@@ -611,7 +611,7 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     else return nil;
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //subclass responsibility
     return nil;
@@ -799,6 +799,8 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     //subclasses will override.
     return nil;
 }
+
+
 - (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 }

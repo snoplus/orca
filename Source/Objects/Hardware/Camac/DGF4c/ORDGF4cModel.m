@@ -2082,9 +2082,9 @@ enum {
 	return theValues;
 }
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithLong:runBehaviorMask] forKey:@"runBehavior"];
     [objDictionary setObject:[self valueArrayFor:@selector(triggerRiseTime:)] forKey:@"triggerRiseTime"];
     [objDictionary setObject:[self valueArrayFor:@selector(triggerFlatTop:)] forKey:@"triggerFlatTop"];
@@ -2443,8 +2443,7 @@ enum {
 
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
-    NSDictionary* crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-    NSDictionary* cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"station %d",[self stationNumber]]];
+	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
     if(     [param isEqualToString:@"Trigger Rise Time"])return [[cardDictionary objectForKey:@"triggerRiseTime"] objectAtIndex:aChannel];
     else if([param isEqualToString:@"Trigger Flat Top"]) return [[cardDictionary objectForKey:@"triggerFlatTop"] objectAtIndex:aChannel];
     else if([param isEqualToString:@"Trigger Threshold"])return [[cardDictionary objectForKey:@"triggerThreshold"] objectAtIndex:aChannel];

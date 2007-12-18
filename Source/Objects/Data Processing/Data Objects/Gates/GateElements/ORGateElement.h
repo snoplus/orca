@@ -75,7 +75,7 @@ typedef  enum {
                    value:(unsigned long)aValue;
 - (void) installGates:(id)obj;
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 #pragma mark ***Achival
 - (void) encodeWithCoder: (NSCoder *)coder;
 - (id)   initWithCoder: (NSCoder *)coder;

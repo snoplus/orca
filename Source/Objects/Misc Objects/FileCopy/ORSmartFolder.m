@@ -827,6 +827,19 @@ static NSString* ORFolderDirectoryName    = @"ORFolderDirectoryName";
     [encoder encodeInt:transferType forKey:@"transferType"];
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+	[dictionary setObject:[NSNumber numberWithInt:copyEnabled] forKey:@"CopyEnabled"];
+    [dictionary setObject:[NSNumber numberWithInt:deleteWhenCopied] forKey:@"DeleteWhenCopied"];
+    if(remoteHost)[dictionary setObject:remoteHost forKey:@"RemoteHost"];
+    if(remotePath)[dictionary setObject:remotePath forKey:@"RemotePath"];
+    if(remoteUserName)[dictionary setObject:remoteUserName forKey:@"RemoteUserName"];
+    [dictionary setObject:[NSNumber numberWithInt:verbose] forKey:@"Verbose"];
+    if(directoryName)[dictionary setObject:directoryName forKey:@"DirectoryName"];
+    [dictionary setObject:[NSNumber numberWithInt:transferType] forKey:@"TransferType"];
+	return dictionary;
+}
+
 
 @end
 

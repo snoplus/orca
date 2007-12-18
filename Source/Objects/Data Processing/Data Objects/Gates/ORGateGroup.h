@@ -71,7 +71,7 @@ typedef struct gateData {
 
 - (void) addProcessFlag:(ORDataPacket*)aDataPacket;
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (void) encodeWithCoder: (NSCoder *)coder; 
 - (id) initWithCoder: (NSCoder *)coder;
 - (BOOL) prepareData:(ORDataSet*)aDataSet

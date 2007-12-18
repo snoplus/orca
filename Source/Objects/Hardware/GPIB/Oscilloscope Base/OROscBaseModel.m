@@ -1201,10 +1201,10 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
 }
 
 
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableArray* array;
-    NSMutableDictionary* objDictionary = [super captureCurrentState:dictionary];
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     int i;
     array = [NSMutableArray arrayWithCapacity:kMaxOscChnls];
     for ( i = 0; i < kMaxOscChnls; i++ ) [array addObject:[NSNumber numberWithBool:[self chnlAcquire: i]]];

@@ -110,7 +110,7 @@
 - (BOOL) getScopeMask:(unsigned char*)aMask forScope:(short)scope eventReg:(unsigned short) aMuxEventRegister;
 - (void) takeScopeData:(ORDataPacket*)aDataPacket onScope:(id)scope userInfo:(id)userInfo;
 - (void) readOutScope:(int)scope usingPacket:(ORDataPacket*)aDataPacket hitDR:(unsigned short)aHitDR userInfo:(id)userInfo;
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 @end
 
 

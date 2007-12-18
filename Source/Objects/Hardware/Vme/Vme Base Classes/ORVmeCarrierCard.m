@@ -159,6 +159,30 @@
 	[[self orcaObjects] makeObjectsPerformSelector:@selector(calcBaseAddress)];
 }
 
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray
+{
+	NSMutableDictionary* stateDictionary = [NSMutableDictionary dictionary];
+	[self addParametersToDictionary:stateDictionary];
+
+	NSMutableDictionary* dictionary = [NSMutableDictionary dictionary];
+	NSEnumerator* e = [stateDictionary keyEnumerator];
+	id aKey;
+	while(aKey = [e nextObject]){
+		NSDictionary* d = [stateDictionary objectForKey:aKey];
+		[dictionary addEntriesFromDictionary:d];
+	}							
+
+	NSArray* daughterCards = [self collectObjectsOfClass:NSClassFromString(@"ORVmeDaughterCard")];
+	if([daughterCards count]){
+		NSMutableArray* cardArray = [NSMutableArray array];
+		[daughterCards makeObjectsPerformSelector:@selector(addObjectInfoToArray:) withObject:cardArray];
+		[dictionary setObject:cardArray forKey:@"DaughterCards"];
+	}
+
+	[anArray addObject:dictionary];
+	
+}
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {

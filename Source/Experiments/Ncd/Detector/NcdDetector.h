@@ -95,7 +95,7 @@
 - (void) handleMouseDownAt:(NSPoint)localPoint inView:(NSView*)detectorView;
 
 #pragma mark ¥¥¥Run Data
-- (NSMutableDictionary*) captureCurrentState:(NSMutableDictionary*)dictionary;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 - (void) replaceMuxThresholdsUsingFile:(NSString*)path;
 - (void) restoreMuxMementos;
 - (void) saveMuxMementos;

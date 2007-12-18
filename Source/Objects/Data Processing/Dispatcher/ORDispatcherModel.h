@@ -20,6 +20,7 @@
 
 
 #pragma mark ¥¥¥Imported Files
+#import "ORDataChainObject.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class NetSocket;
@@ -29,7 +30,7 @@
 #define kORDispatcherPort 44666
 
 
-@interface ORDispatcherModel :  OrcaObject 
+@interface ORDispatcherModel :  ORDataChainObject 
 {
     @private
 	int             socketPort;

@@ -31,7 +31,6 @@
     BOOL isConnected;
     NSCalendarDate*	timeConnected;
 	int				socketfd;
-	unsigned short  lamMask;
 
 }
 
