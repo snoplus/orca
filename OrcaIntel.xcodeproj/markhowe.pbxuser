@@ -24620,9 +24620,9 @@
 	};
 	842B061E040C2709005F64B1 /* NcdMuxBoxModel.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {879, 14154}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1190, 14070}}";
 			sepNavSelRange = "{33487, 12}";
-			sepNavVisRange = "{32337, 1778}";
+			sepNavVisRange = "{33058, 743}";
 			sepNavVisRect = "{{0, 11114}, {931, 803}}";
 			sepNavWindowFrame = "{{15, 465}, {750, 558}}";
 		};
@@ -24850,7 +24850,7 @@
 			sepNavSelRange = "{18259, 0}";
 			sepNavVisRange = "{17574, 1483}";
 			sepNavVisRect = "{{0, 13057}, {850, 500}}";
-			sepNavWindowFrame = "{{721, 92}, {874, 860}}";
+			sepNavWindowFrame = "{{74, 210}, {874, 860}}";
 		};
 	};
 	842F19B903B8F060005F64B1 /* ORRunModel.h */ = {
@@ -25963,7 +25963,7 @@
 	};
 	84516B940523845D005F64B1 /* ORHWWizardController.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1190, 24220}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1190, 24150}}";
 			sepNavSelRange = "{48624, 0}";
 			sepNavVisRange = "{48153, 838}";
 			sepNavVisRect = "{{0, 18933}, {964, 595}}";
@@ -31400,9 +31400,9 @@
 	};
 	84CFB096042A80BE005F64B1 /* ORDataFileModel.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1190, 7630}}";
-			sepNavSelRange = "{20686, 0}";
-			sepNavVisRange = "{19646, 1282}";
+			sepNavIntBoundsRect = "{{0, 0}, {879, 7560}}";
+			sepNavSelRange = "{20261, 0}";
+			sepNavVisRange = "{18630, 2298}";
 			sepNavVisRect = "{{0, 3942}, {987, 810}}";
 			sepNavWindowFrame = "{{235, 293}, {750, 558}}";
 		};
@@ -31658,7 +31658,7 @@
 			sepNavSelRange = "{64048, 12}";
 			sepNavVisRange = "{63124, 1916}";
 			sepNavVisRect = "{{0, 10921}, {680, 587}}";
-			sepNavWindowFrame = "{{245, 108}, {1075, 855}}";
+			sepNavWindowFrame = "{{575, 129}, {1075, 855}}";
 		};
 	};
 	84D975070CA1E36D000C0C76 /* ORAugerCard.h */ = {
@@ -31706,7 +31706,7 @@
 	};
 	84D975240CA1E36D000C0C76 /* ORAugerFLTModel.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {879, 35252}}";
+			sepNavIntBoundsRect = "{{0, 0}, {879, 35196}}";
 			sepNavSelRange = "{62940, 0}";
 			sepNavVisRange = "{61939, 1873}";
 			sepNavVisRect = "{{0, 20272}, {552, 918}}";
@@ -32990,7 +32990,7 @@
 			sepNavSelRange = "{5992, 0}";
 			sepNavVisRange = "{5447, 984}";
 			sepNavVisRect = "{{0, 1987}, {587, 771}}";
-			sepNavWindowFrame = "{{38, 444}, {750, 558}}";
+			sepNavWindowFrame = "{{-119, 116}, {750, 558}}";
 		};
 	};
 	F51E69EC03AE4776015F64B1 /* OrcaObject.m */ = {
@@ -33085,11 +33085,11 @@
 	};
 	F576B08003B12320015F64B1 /* ORShaperModel.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {908, 22386}}";
+			sepNavIntBoundsRect = "{{0, 0}, {908, 22372}}";
 			sepNavSelRange = "{48929, 0}";
 			sepNavVisRange = "{48392, 1448}";
 			sepNavVisRect = "{{0, 19357}, {850, 500}}";
-			sepNavWindowFrame = "{{8, 432}, {967, 579}}";
+			sepNavWindowFrame = "{{28, 585}, {967, 579}}";
 		};
 	};
 	F576B08203B12320015F64B1 /* ORShaperController.m */ = {
