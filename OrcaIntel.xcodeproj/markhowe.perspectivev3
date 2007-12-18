@@ -202,46 +202,6 @@
 			<key>Content</key>
 			<dict>
 				<key>PBXProjectModuleGUID</key>
-				<string>840719F50D18587C00FD6EFD</string>
-				<key>PBXProjectModuleLabel</key>
-				<string>OrcaObject.h</string>
-				<key>PBXSplitModuleInNavigatorKey</key>
-				<dict>
-					<key>Split0</key>
-					<dict>
-						<key>PBXProjectModuleGUID</key>
-						<string>840719F60D18587C00FD6EFD</string>
-						<key>PBXProjectModuleLabel</key>
-						<string>OrcaObject.h</string>
-						<key>_historyCapacity</key>
-						<integer>0</integer>
-						<key>bookmark</key>
-						<string>84071B1A0D185C5600FD6EFD</string>
-						<key>history</key>
-						<array>
-							<string>840719F70D18587C00FD6EFD</string>
-						</array>
-					</dict>
-					<key>SplitCount</key>
-					<string>1</string>
-				</dict>
-				<key>StatusBarVisibility</key>
-				<true/>
-			</dict>
-			<key>Geometry</key>
-			<dict>
-				<key>Frame</key>
-				<string>{{0, 20}, {750, 461}}</string>
-				<key>PBXModuleWindowStatusBarHidden2</key>
-				<false/>
-				<key>RubberWindowFrame</key>
-				<string>-119 172 750 502 0 0 1920 1178 </string>
-			</dict>
-		</dict>
-		<dict>
-			<key>Content</key>
-			<dict>
-				<key>PBXProjectModuleGUID</key>
 				<string>840719F90D18587C00FD6EFD</string>
 				<key>PBXProjectModuleLabel</key>
 				<string>ORCrate.h</string>
@@ -256,7 +216,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B1B0D185C5600FD6EFD</string>
+						<string>84071B500D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840719D90D18561F00FD6EFD</string>
@@ -282,6 +242,46 @@
 			<key>Content</key>
 			<dict>
 				<key>PBXProjectModuleGUID</key>
+				<string>840719F50D18587C00FD6EFD</string>
+				<key>PBXProjectModuleLabel</key>
+				<string>OrcaObject.h</string>
+				<key>PBXSplitModuleInNavigatorKey</key>
+				<dict>
+					<key>Split0</key>
+					<dict>
+						<key>PBXProjectModuleGUID</key>
+						<string>840719F60D18587C00FD6EFD</string>
+						<key>PBXProjectModuleLabel</key>
+						<string>OrcaObject.h</string>
+						<key>_historyCapacity</key>
+						<integer>0</integer>
+						<key>bookmark</key>
+						<string>84071B510D185E4200FD6EFD</string>
+						<key>history</key>
+						<array>
+							<string>840719F70D18587C00FD6EFD</string>
+						</array>
+					</dict>
+					<key>SplitCount</key>
+					<string>1</string>
+				</dict>
+				<key>StatusBarVisibility</key>
+				<true/>
+			</dict>
+			<key>Geometry</key>
+			<dict>
+				<key>Frame</key>
+				<string>{{0, 20}, {750, 461}}</string>
+				<key>PBXModuleWindowStatusBarHidden2</key>
+				<false/>
+				<key>RubberWindowFrame</key>
+				<string>-119 172 750 502 0 0 1920 1178 </string>
+			</dict>
+		</dict>
+		<dict>
+			<key>Content</key>
+			<dict>
+				<key>PBXProjectModuleGUID</key>
 				<string>840719FC0D18587C00FD6EFD</string>
 				<key>PBXProjectModuleLabel</key>
 				<string>ORCard.h</string>
@@ -296,7 +296,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B1C0D185C5600FD6EFD</string>
+						<string>84071B520D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840719FE0D18587C00FD6EFD</string>
@@ -336,7 +336,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B1D0D185C5600FD6EFD</string>
+						<string>84071B530D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>84071A000D18587C00FD6EFD</string>
@@ -376,7 +376,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B1E0D185C5600FD6EFD</string>
+						<string>84071B540D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>84071A040D18587C00FD6EFD</string>
@@ -416,7 +416,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B1F0D185C5600FD6EFD</string>
+						<string>84071B550D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>84071A080D18587C00FD6EFD</string>
@@ -456,7 +456,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B200D185C5600FD6EFD</string>
+						<string>84071B560D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>8407199E0D184B8600FD6EFD</string>
@@ -496,7 +496,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B210D185C5600FD6EFD</string>
+						<string>84071B570D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840719390D18494C00FD6EFD</string>
@@ -536,7 +536,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B220D185C5600FD6EFD</string>
+						<string>84071B580D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840719080D1848CD00FD6EFD</string>
@@ -576,7 +576,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B230D185C5600FD6EFD</string>
+						<string>84071B590D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>8407190A0D1848CD00FD6EFD</string>
@@ -616,7 +616,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B240D185C5600FD6EFD</string>
+						<string>84071B5A0D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840718BB0D18482100FD6EFD</string>
@@ -642,86 +642,6 @@
 			<key>Content</key>
 			<dict>
 				<key>PBXProjectModuleGUID</key>
-				<string>840718970D1846CC00FD6EFD</string>
-				<key>PBXProjectModuleLabel</key>
-				<string>ORDataChainObject.m</string>
-				<key>PBXSplitModuleInNavigatorKey</key>
-				<dict>
-					<key>Split0</key>
-					<dict>
-						<key>PBXProjectModuleGUID</key>
-						<string>840718980D1846CC00FD6EFD</string>
-						<key>PBXProjectModuleLabel</key>
-						<string>ORDataChainObject.m</string>
-						<key>_historyCapacity</key>
-						<integer>0</integer>
-						<key>bookmark</key>
-						<string>84071B250D185C5600FD6EFD</string>
-						<key>history</key>
-						<array>
-							<string>840718990D1846CC00FD6EFD</string>
-						</array>
-					</dict>
-					<key>SplitCount</key>
-					<string>1</string>
-				</dict>
-				<key>StatusBarVisibility</key>
-				<true/>
-			</dict>
-			<key>Geometry</key>
-			<dict>
-				<key>Frame</key>
-				<string>{{0, 20}, {842, 714}}</string>
-				<key>PBXModuleWindowStatusBarHidden2</key>
-				<false/>
-				<key>RubberWindowFrame</key>
-				<string>153 292 842 755 0 0 1920 1178 </string>
-			</dict>
-		</dict>
-		<dict>
-			<key>Content</key>
-			<dict>
-				<key>PBXProjectModuleGUID</key>
-				<string>8407189B0D1846CC00FD6EFD</string>
-				<key>PBXProjectModuleLabel</key>
-				<string>ORDataChainObject.h</string>
-				<key>PBXSplitModuleInNavigatorKey</key>
-				<dict>
-					<key>Split0</key>
-					<dict>
-						<key>PBXProjectModuleGUID</key>
-						<string>8407189C0D1846CC00FD6EFD</string>
-						<key>PBXProjectModuleLabel</key>
-						<string>ORDataChainObject.h</string>
-						<key>_historyCapacity</key>
-						<integer>0</integer>
-						<key>bookmark</key>
-						<string>84071B260D185C5600FD6EFD</string>
-						<key>history</key>
-						<array>
-							<string>8407189D0D1846CC00FD6EFD</string>
-						</array>
-					</dict>
-					<key>SplitCount</key>
-					<string>1</string>
-				</dict>
-				<key>StatusBarVisibility</key>
-				<true/>
-			</dict>
-			<key>Geometry</key>
-			<dict>
-				<key>Frame</key>
-				<string>{{0, 20}, {842, 714}}</string>
-				<key>PBXModuleWindowStatusBarHidden2</key>
-				<false/>
-				<key>RubberWindowFrame</key>
-				<string>130 313 842 755 0 0 1920 1178 </string>
-			</dict>
-		</dict>
-		<dict>
-			<key>Content</key>
-			<dict>
-				<key>PBXProjectModuleGUID</key>
 				<string>840717D20D183C5600FD6EFD</string>
 				<key>PBXProjectModuleLabel</key>
 				<string>ORCrate.m</string>
@@ -736,7 +656,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B270D185C5600FD6EFD</string>
+						<string>84071B5B0D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840718480D18435600FD6EFD</string>
@@ -776,7 +696,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B280D185C5600FD6EFD</string>
+						<string>84071B5C0D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>8407184C0D18435600FD6EFD</string>
@@ -816,7 +736,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B290D185C5600FD6EFD</string>
+						<string>84071B5D0D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840717D00D183C5600FD6EFD</string>
@@ -856,7 +776,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B2A0D185C5600FD6EFD</string>
+						<string>84071B5E0D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840717BA0D183C0100FD6EFD</string>
@@ -896,7 +816,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B2B0D185C5600FD6EFD</string>
+						<string>84071B5F0D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840717BE0D183C0100FD6EFD</string>
@@ -936,7 +856,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B2C0D185C5600FD6EFD</string>
+						<string>84071B600D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>8407176D0D18373E00FD6EFD</string>
@@ -976,7 +896,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B2D0D185C5600FD6EFD</string>
+						<string>84071B610D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840717710D18373E00FD6EFD</string>
@@ -1016,7 +936,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B2E0D185C5600FD6EFD</string>
+						<string>84071B620D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840717750D18373E00FD6EFD</string>
@@ -1056,7 +976,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B2F0D185C5600FD6EFD</string>
+						<string>84071B630D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>8407177D0D18373E00FD6EFD</string>
@@ -1096,7 +1016,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B300D185C5600FD6EFD</string>
+						<string>84071B640D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840717810D18373E00FD6EFD</string>
@@ -1136,7 +1056,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>84071B310D185C5600FD6EFD</string>
+						<string>84071B650D185E4200FD6EFD</string>
 						<key>history</key>
 						<array>
 							<string>840717850D18373E00FD6EFD</string>
@@ -1239,6 +1159,7 @@
 								<string>84516B900523845D005F64B1</string>
 								<string>F51E697803AE4775015F64B1</string>
 								<string>84AD1EE003C2476F005F64B1</string>
+								<string>84071B490D185E3A00FD6EFD</string>
 								<string>F51E698503AE4775015F64B1</string>
 								<string>2A178E9908DB3D91001D78BC</string>
 								<string>84B8B99204DB32A6005F64B1</string>
@@ -1250,16 +1171,31 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>70</integer>
-									<integer>68</integer>
-									<integer>66</integer>
+									<integer>56</integer>
+									<integer>55</integer>
+									<integer>50</integer>
+									<integer>4</integer>
+									<integer>0</integer>
+								</array>
+								<array>
+									<integer>57</integer>
+									<integer>56</integer>
+									<integer>55</integer>
+									<integer>50</integer>
+									<integer>4</integer>
+									<integer>0</integer>
+								</array>
+								<array>
+									<integer>58</integer>
+									<integer>56</integer>
+									<integer>55</integer>
 									<integer>50</integer>
 									<integer>4</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 907}, {289, 980}}</string>
+							<string>{{0, 662}, {289, 980}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -1276,7 +1212,7 @@
 							<real>289</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>570 139 1251 1039 0 0 1920 1178 </string>
+						<string>107 139 1251 1039 0 0 1920 1178 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -1287,8 +1223,6 @@
 					<key>Dock</key>
 					<array>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -1306,7 +1240,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>84071B190D185C5600FD6EFD</string>
+										<string>84071B4F0D185E4200FD6EFD</string>
 										<key>history</key>
 										<array>
 											<string>847DF97A0D072CE80021F9CB</string>
@@ -1461,7 +1395,6 @@
 											<string>8407181A0D18435600FD6EFD</string>
 											<string>8407181C0D18435600FD6EFD</string>
 											<string>8407181D0D18435600FD6EFD</string>
-											<string>840718700D18443000FD6EFD</string>
 											<string>8407188C0D1846CC00FD6EFD</string>
 											<string>8407188D0D1846CC00FD6EFD</string>
 											<string>8407188E0D1846CC00FD6EFD</string>
@@ -1473,7 +1406,6 @@
 											<string>840719B60D184C0300FD6EFD</string>
 											<string>840719B70D184C0300FD6EFD</string>
 											<string>840719B80D184C0300FD6EFD</string>
-											<string>840719B90D184C0300FD6EFD</string>
 											<string>840719DB0D18587C00FD6EFD</string>
 											<string>840719DC0D18587C00FD6EFD</string>
 											<string>840719DE0D18587C00FD6EFD</string>
@@ -1503,7 +1435,7 @@
 											<string>84071A330D1859C400FD6EFD</string>
 											<string>84071A660D1859D600FD6EFD</string>
 											<string>84071AA10D185A5200FD6EFD</string>
-											<string>84071B180D185C5000FD6EFD</string>
+											<string>84071B4E0D185E4200FD6EFD</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -1805,7 +1737,6 @@
 											<string>8407125E0D133C8E00FD6EFD</string>
 											<string>8407196C0D184AA800FD6EFD</string>
 											<string>8407196D0D184AA800FD6EFD</string>
-											<string>840719700D184AA800FD6EFD</string>
 											<string>840719920D184B8600FD6EFD</string>
 											<string>840719930D184B8600FD6EFD</string>
 											<string>840719940D184B8600FD6EFD</string>
@@ -1813,7 +1744,6 @@
 											<string>840719960D184B8600FD6EFD</string>
 											<string>840719970D184B8600FD6EFD</string>
 											<string>840719BB0D184C0300FD6EFD</string>
-											<string>840719BC0D184C0300FD6EFD</string>
 											<string>840719E70D18587C00FD6EFD</string>
 											<string>840719E80D18587C00FD6EFD</string>
 											<string>840719E90D18587C00FD6EFD</string>
@@ -1867,7 +1797,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {940, 770}}</string>
 								<key>RubberWindowFrame</key>
-								<string>570 139 1251 1039 0 0 1920 1178 </string>
+								<string>107 139 1251 1039 0 0 1920 1178 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -1907,8 +1837,6 @@
 									<dict>
 										<key>Frame</key>
 										<string>{{10, 27}, {940, 196}}</string>
-										<key>RubberWindowFrame</key>
-										<string>570 139 1251 1039 0 0 1920 1178 </string>
 									</dict>
 									<key>Module</key>
 									<string>PBXProjectFindModule</string>
@@ -1922,7 +1850,7 @@
 										<dict>
 											<key>PBXCVSModuleTreeModuleColumnWidthsKey</key>
 											<array>
-												<real>324</real>
+												<real>308</real>
 												<real>56</real>
 												<real>63</real>
 												<real>60</real>
@@ -1947,7 +1875,9 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {940, 222}}</string>
+										<string>{{10, 27}, {940, 196}}</string>
+										<key>RubberWindowFrame</key>
+										<string>107 139 1251 1039 0 0 1920 1178 </string>
 									</dict>
 									<key>Module</key>
 									<string>PBXCVSModule</string>
@@ -2197,8 +2127,6 @@
 		<string>840717C00D183C0100FD6EFD</string>
 		<string>8407184A0D18435600FD6EFD</string>
 		<string>840717D20D183C5600FD6EFD</string>
-		<string>8407189B0D1846CC00FD6EFD</string>
-		<string>840718970D1846CC00FD6EFD</string>
 		<string>840718B90D18482100FD6EFD</string>
 		<string>840717670D18373E00FD6EFD</string>
 		<string>840718450D18435600FD6EFD</string>
@@ -2208,12 +2136,12 @@
 		<string>84071A020D18587C00FD6EFD</string>
 		<string>840717870D18373E00FD6EFD</string>
 		<string>840719FC0D18587C00FD6EFD</string>
-		<string>840719F90D18587C00FD6EFD</string>
 		<string>840719F50D18587C00FD6EFD</string>
+		<string>840719F90D18587C00FD6EFD</string>
 		<string>/Users/markhowe/Dev/Orca/OrcaIntel.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>570 139 1251 1039 0 0 1920 1178 </string>
+	<string>107 139 1251 1039 0 0 1920 1178 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>

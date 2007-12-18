@@ -11,6 +11,8 @@
 		840710740D12FDA100FD6EFD /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840710720D12FDA100FD6EFD /* NoNI488PluginHelp.plist */; };
 		840718080D183FED00FD6EFD /* ORDataChainObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 840718060D183FED00FD6EFD /* ORDataChainObject.h */; };
 		840718090D183FED00FD6EFD /* ORDataChainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 840718070D183FED00FD6EFD /* ORDataChainObject.m */; };
+		84071B4C0D185E3A00FD6EFD /* ORDataChainObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 84071B4A0D185E3A00FD6EFD /* ORDataChainObject.h */; };
+		84071B4D0D185E3A00FD6EFD /* ORDataChainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 84071B4B0D185E3A00FD6EFD /* ORDataChainObject.m */; };
 		841903CD0CCE6E1300F21371 /* Vme64CrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 841903CC0CCE6E1300F21371 /* Vme64CrateSmall.gif */; };
 		841903E30CCE71ED00F21371 /* Gretina4.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841903DB0CCE71ED00F21371 /* Gretina4.nib */; };
 		841903E40CCE71ED00F21371 /* Gretina4Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 841903DC0CCE71ED00F21371 /* Gretina4Card.gif */; };
@@ -1777,6 +1779,8 @@
 		840710720D12FDA100FD6EFD /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoNI488PluginHelp.plist; path = "Source/Objects/Hardware/GPIB/ENET-GPIB/NoNI488PluginHelp.plist"; sourceTree = SOURCE_ROOT; };
 		840718060D183FED00FD6EFD /* ORDataChainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataChainObject.h; sourceTree = "<group>"; };
 		840718070D183FED00FD6EFD /* ORDataChainObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataChainObject.m; sourceTree = "<group>"; };
+		84071B4A0D185E3A00FD6EFD /* ORDataChainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORDataChainObject.h; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.h"; sourceTree = SOURCE_ROOT; };
+		84071B4B0D185E3A00FD6EFD /* ORDataChainObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORDataChainObject.m; path = "Source/Objects/Data Processing/BaseClasses/ORDataChainObject.m"; sourceTree = SOURCE_ROOT; };
 		84073A4D05E3F3D3003E62AA /* ORValidatePassword.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORValidatePassword.h; sourceTree = "<group>"; };
 		84073A4E05E3F3D3003E62AA /* ORValidatePassword.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORValidatePassword.m; sourceTree = "<group>"; };
 		84073A5105E3F455003E62AA /* ValidatePassword.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ValidatePassword.nib; sourceTree = "<group>"; };
@@ -3587,6 +3591,16 @@
 			);
 			name = BaseClasses;
 			path = Source/Objects/BaseClasses;
+			sourceTree = SOURCE_ROOT;
+		};
+		84071B490D185E3A00FD6EFD /* BaseClasses */ = {
+			isa = PBXGroup;
+			children = (
+				84071B4A0D185E3A00FD6EFD /* ORDataChainObject.h */,
+				84071B4B0D185E3A00FD6EFD /* ORDataChainObject.m */,
+			);
+			name = BaseClasses;
+			path = "Source/Objects/Data Processing/BaseClasses";
 			sourceTree = SOURCE_ROOT;
 		};
 		84073A4C05E3F3D3003E62AA /* ValidatePassword */ = {
@@ -5854,6 +5868,7 @@
 		84AD1EE003C2476F005F64B1 /* Data Processing */ = {
 			isa = PBXGroup;
 			children = (
+				84071B490D185E3A00FD6EFD /* BaseClasses */,
 				840DFF0703C37EAA00DCF929 /* Data Flow */,
 				849F4C6A0768DA920087E9A8 /* DataExplorer */,
 				84E427D6054EFFCA0057208F /* ReplayData */,
@@ -7947,6 +7962,7 @@
 				8490B21B0D0DDC1E00275B5E /* ORC111CController.h in Headers */,
 				8490B21D0D0DDC1E00275B5E /* ORC111CModel.h in Headers */,
 				840718080D183FED00FD6EFD /* ORDataChainObject.h in Headers */,
+				84071B4C0D185E3A00FD6EFD /* ORDataChainObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9028,6 +9044,7 @@
 				8490B21C0D0DDC1E00275B5E /* ORC111CController.m in Sources */,
 				8490B21E0D0DDC1E00275B5E /* ORC111CModel.m in Sources */,
 				840718090D183FED00FD6EFD /* ORDataChainObject.m in Sources */,
+				84071B4D0D185E3A00FD6EFD /* ORDataChainObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
