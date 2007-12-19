@@ -356,15 +356,16 @@ struct {
 
 - (void) readLimits
 {
-	unsigned short theLowLimit;
-	unsigned short theHighLimit;
+	unsigned short theLowLimit[16];
+	unsigned short theHighLimit[16];
 	NSLog(@"Lower and Upper limits for JADC-L (station %d)\n",[self stationNumber]);
 	int chan;
 	for(chan=0;chan<16;chan++){
-		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:4 data:&theLowLimit]; //read lower limit
-		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:6 data:&theHighLimit]; //read lower limit
-
-		NSLog(@"%2d:%.2f %.2f\n",chan,[self convertRawLimitToVolts:theLowLimit],[self convertRawLimitToVolts:theHighLimit]);
+		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:4 data:&theLowLimit[chan]]; //read lower limit
+		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:6 data:&theHighLimit[chan]]; //read lower limit
+	}
+	for(chan=0;chan<16;chan++){
+		NSLog(@"%2d:%.2f %.2f\n",chan,[self convertRawLimitToVolts:theLowLimit[chan]],[self convertRawLimitToVolts:theHighLimit[chan]]);
 	}
 	
 }

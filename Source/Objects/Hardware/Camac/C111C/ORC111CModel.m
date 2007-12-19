@@ -80,7 +80,7 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 - (void) awakeAfterDocumentLoaded
 {
 	NS_DURING
-		//[self connect];
+		//if(ipAddress) [self connect];
 	NS_HANDLER
 	NS_ENDHANDLER
 }
@@ -575,37 +575,62 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 - (int) readBuffer:(unsigned char*)buffer maxLength:(int)maxLen
 {
 	int pos = 0;
-	BOOL escapeSeq = NO;
-	BOOL etx_found = NO;
-	unsigned char buf;
+	@synchronized(self){
+		BOOL escapeSeq = NO;
+		BOOL etx_found = NO;
+		unsigned char buf;
 
-	while (!etx_found) {
-		if ([self canRead]) {
-			int rp = recv(socketfd, &buf, 1, 0);
-			if (rp > 0) {
-				if (buf == kSTX) {
-					pos = 0;
-					escapeSeq = NO;
-					buffer[pos++] = buf;
+		// set up the file descriptor set
+		fd_set fds;
+		FD_ZERO(&fds);
+		FD_SET(socketfd, &fds);
+
+		struct timeval tv;
+		tv.tv_sec  = 1;
+		tv.tv_usec = 0;
+
+		int  selectionResult = select(socketfd+1, &fds, NULL, NULL, &tv);
+		if(selectionResult > 0){
+			while (!etx_found) {
+				int rp = recv(socketfd, &buf, 1, 0);
+				if(rp==0){
+					[self setIsConnected:NO];
+					[self setTimeConnected:nil];
+					[NSException raise:@"Socket Disconnected" format:@"%@ Port %d Disconnected",ipAddress,kC111CBinaryPort];
 				}
-				else if (pos) {
-					if (buf == 0x10) escapeSeq = YES;
-					else if (buf == kETX) {
-						buffer[pos++] = buf;
-						etx_found = YES;
-					}
-					else {
-						if (pos < maxLen) {
-							if (escapeSeq)	buffer[pos++] = buf - 0x80;
-							else			buffer[pos++] = buf;
-						}
+				int i;
+				for(i=0;i<rp;i++){
+					if (buf == kSTX) {
+						pos = 0;
 						escapeSeq = NO;
+						buffer[pos++] = buf;
+					}
+					else if (pos) {
+						if (buf == 0x10) escapeSeq = YES;
+						else if (buf == kETX) {
+							buffer[pos++] = buf;
+							etx_found = YES;
+						}
+						else {
+							if (pos < maxLen) {
+								if (escapeSeq)	buffer[pos++] = buf - 0x80;
+								else			buffer[pos++] = buf;
+							}
+							escapeSeq = NO;
+						}
 					}
 				}
 			}
-			else return 0;
 		}
 	}
+//	if(pos){
+//		int i;
+//		NSString* s = @"";
+//		for(i=0;i<pos;i++){
+//			s = [s stringByAppendingFormat:@" 0x%x",buffer[i]];
+//		}
+//		NSLog(@"%@\n",s);
+//	}
 	return pos;
 }
 
@@ -652,7 +677,24 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 
 - (int) writeBuffer:(unsigned char*)aBuffer length:(int)len
 {
-	return send(socketfd, (char *)aBuffer, len, 0);	
+	if(!socketfd)	return 0;
+	int numBytesToSend = len;
+	int bytesSent = 0;
+	@synchronized(self){
+		while (numBytesToSend) {       
+			int bytesWritten = write(socketfd,aBuffer,numBytesToSend);
+			if (bytesWritten > 0) {
+				aBuffer += bytesWritten;
+				numBytesToSend -= bytesWritten;
+				bytesSent += bytesWritten;
+			}
+			else if (bytesWritten < 0) {
+				[NSException raise:@"Write Error" format:@"Write Error %@ <%@> port: %d",[self crateName],ipAddress,kC111CBinaryPort];
+			}
+		}
+	}
+
+	return bytesSent;
 }
 
 
