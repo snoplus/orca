@@ -55,7 +55,6 @@
 
         IBOutlet NSButton*		settingLockButton;
 
-
         NSArray* helpStrings;
 };
 #pragma mark ¥¥¥Initialization
@@ -106,5 +105,6 @@
 - (IBAction) cmdWriteValueAction:(id)sender;
 - (IBAction) moduleWriteValueAction:(id)sender;
 - (IBAction) execute:(id)sender;
+
 
 @end

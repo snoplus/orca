@@ -297,6 +297,16 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     return  [[self controller] camacShortNAFBlock:n a:a f:f data:data length:numWords];
 }
 
+- (unsigned short)  camacLongNAFBlock:(unsigned short) n 
+									 a:(unsigned short) a 
+									 f:(unsigned short) f
+								  data:(unsigned long*) data
+                                length:(unsigned long)    numWords
+{
+    return  [[self controller] camacLongNAFBlock:n a:a f:f data:data length:numWords];
+}
+
+
 - (void) delay:(float)delayValue
 {
     [NSThread sleepUntilDate:[[NSDate date] addTimeInterval:delayValue]];

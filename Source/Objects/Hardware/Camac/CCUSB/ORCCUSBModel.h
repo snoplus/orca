@@ -196,6 +196,11 @@
 								  data:(unsigned short*) data
                                 length:(unsigned long)   numWords;
 
+- (unsigned short)  camacLongNAFBlock:(unsigned short) n 
+									 a:(unsigned short) a 
+									 f:(unsigned short) f
+								  data:(unsigned long*) data
+                                length:(unsigned long)    numWords;
 
 - (void) checkStatus:(unsigned short)x station:(unsigned short)n;
 - (int) flush;

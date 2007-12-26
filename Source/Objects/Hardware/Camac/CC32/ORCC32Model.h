@@ -149,6 +149,11 @@ are declared volatile.
 								  data:(unsigned short*) data
                                 length:(unsigned long)   numWords;
 
+- (unsigned short)  camacLongNAFBlock:(unsigned short) n 
+									 a:(unsigned short) a 
+									 f:(unsigned short) f
+								  data:(unsigned long*) data
+                                length:(unsigned long)    numWords;
 
 #pragma mark ¥¥¥DataTaker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

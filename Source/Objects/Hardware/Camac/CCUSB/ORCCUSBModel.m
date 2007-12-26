@@ -751,6 +751,22 @@ enum {
 	return 0;
 }
 
+- (unsigned short)  camacLongNAFBlock:(unsigned short) n 
+									 a:(unsigned short) a 
+									 f:(unsigned short) f
+								  data:(unsigned long*) data
+                                length:(unsigned long)    numWords
+{
+	int i;
+	for(i=0;i<numWords;i++){
+		unsigned long iData = 0;
+		[self sendNAF:n a:a f:f d24:YES data:&iData];
+		*data++ = iData;
+	}
+	return 0;
+}
+
+
 ///usb specific stuff
 /********************************************************************/
 - (int) flush

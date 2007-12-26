@@ -368,9 +368,9 @@
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model setCrateInhibit:YES];
-        NSLog(@"Set CC32 inhibit ON\n");
+        NSLog(@"SET CC32 inhibit\n");
     NS_HANDLER
-        NSLog(@"Set CC32 inhibit ON FAILED\n");
+        NSLog(@"SET CC32 inhibit FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Inhibit On"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Inhibit On", @"OK", nil, nil,
@@ -385,9 +385,9 @@
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model setCrateInhibit:NO];
-        NSLog(@"Set CC32 inhibit OFF\n");
+        NSLog(@"CLEAR CC32 inhibit\n");
     NS_HANDLER
-        NSLog(@"Set CC32 inhibit OFF FAILED\n");
+        NSLog(@"CLEAR CC32 inhibit FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Inhibit Off"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Inhibit Off", @"OK", nil, nil,
@@ -404,7 +404,7 @@
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model readCrateInhibit:&inhibitState];
-        NSLog(@"CC32 inhibit state = 0x%0x\n",inhibitState);
+        NSLog(@"CC32 inhibit state = %@\n",inhibitState?@"SET":@"CLEAR");
     NS_HANDLER
         NSLog(@"Read CC32 inhibit FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Read Inhibit"];
