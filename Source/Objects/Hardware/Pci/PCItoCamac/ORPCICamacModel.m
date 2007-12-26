@@ -628,7 +628,7 @@ static UInt32 *fVPCICamacMem;
             
             // write dataway
             UInt32 wnafOffset = (UInt32)(offsetNAF(n,a,f) / 4);	 // note divide by 4
-            volatile UInt32 *wCC32MemBase = (UInt16 *)&fVPCICamacMem[wnafOffset];
+            volatile UInt32 *wCC32MemBase = (UInt32 *)&fVPCICamacMem[wnafOffset];
             UInt32 *ptrData = data;
             UInt32 ptrOffset;
             
