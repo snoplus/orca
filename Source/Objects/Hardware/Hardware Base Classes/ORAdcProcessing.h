@@ -34,7 +34,7 @@
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
 - (double) minValueForChan:(int)channel;
-- (BOOL) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 
 
 @end
