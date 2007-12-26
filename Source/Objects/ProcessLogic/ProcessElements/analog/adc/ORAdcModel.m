@@ -215,7 +215,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
         if(maxValue-minValue != 0){
             NSPoint theCenter = NSMakePoint((theIconSize.width-10.)/2.+1.,27.);
 			float slope     = -180./(maxValue-minValue);
-			float intercept = 180.;
+			float intercept = 90;
             if(lowLimit>minValue){
                 float lowLimitAngle = slope*lowLimit + intercept;
                 [path appendBezierPathWithArcWithCenter:theCenter radius:30.
@@ -226,7 +226,7 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
                 [path fill];
                 [path removeAllPoints];
             }
-            if(highLimit>0 && highLimit<maxValue){
+            if(highLimit<maxValue){
                  float highLimitAngle = slope*highLimit + intercept;
                 [path appendBezierPathWithArcWithCenter:theCenter radius:30.
                             startAngle:0. endAngle:highLimitAngle];
