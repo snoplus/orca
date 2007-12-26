@@ -179,6 +179,11 @@ enum {
 							   f:(unsigned short) f
 							data:(unsigned long*) data;
 
+- (unsigned short) camacLongNAFBlock:(unsigned short)n 
+									a:(unsigned short)a 
+									f:(unsigned short)f
+								 data:(unsigned long*) data 
+							   length:(unsigned long) numWords;
 
 - (void) delay:(float)delayValue;
 - (void) printConfigurationData;

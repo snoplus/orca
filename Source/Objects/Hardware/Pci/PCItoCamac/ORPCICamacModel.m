@@ -614,6 +614,54 @@ static UInt32 *fVPCICamacMem;
     return  theStatus;
 }
 
+// write block of longs to dataway
+- (unsigned short) camacLongNAFBlock:(unsigned short)n 
+									a:(unsigned short)a 
+									f:(unsigned short)f
+								 data:(unsigned long*) data 
+							   length:(unsigned long) numWords
+{
+    unsigned short theStatus = 0;
+    if(hardwareExists && data!=nil){
+        NS_DURING
+            [theHWLock lock];   //----begin crital section
+            
+            // write dataway
+            UInt32 wnafOffset = (UInt32)(offsetNAF(n,a,f) / 4);	 // note divide by 4
+            volatile UInt32 *wCC32MemBase = (UInt16 *)&fVPCICamacMem[wnafOffset];
+            UInt32 *ptrData = data;
+            UInt32 ptrOffset;
+            
+            //The PCI-CAMAC hardware forces all NAF command writes to set
+            //the F16 bit to a 1 and all NAF command reads to set the F16
+            //bit to 0.  Therefore all F values from F0 through F15 MUST
+            //be used with CAMAC bus read accesses and all F values from
+            //F16 through F31 MUST be used with CAMAC bus write accesses.
+            
+			if(f < 16){
+                for( ptrOffset = 0;ptrOffset < numWords; ptrOffset++ ) {
+                    *ptrData++ = Swap8BitsIn16(*wCC32MemBase);
+                }
+            }
+            else {
+                for(ptrOffset = 0; ptrOffset < numWords; ptrOffset++ ) {
+                    *wCC32MemBase = Swap8BitsIn16(*ptrData);
+                    ptrData++;
+                }
+            }
+			volatile UInt16* statusValue = (UInt16 *)&fVPCICamacMem[0];
+			theStatus = Swap8BitsIn16(*statusValue);
+			[self checkStatusReturn:theStatus station:n];
+			[theHWLock unlock];   //----end crital section
+        NS_HANDLER
+            [theHWLock unlock]; //----end crital section because of exception
+            [localException raise];
+        NS_ENDHANDLER
+    }
+    return theStatus;
+}
+
+
 - (void) checkStatusReturn:(unsigned short)theStatus station:(unsigned short) n
 {
 	if(!isXbitSet(theStatus)){
