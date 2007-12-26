@@ -21,6 +21,7 @@
 //-------------------------------------------------------------
 
 #import "ORC111CModel.h"
+#import "ORCmdHistory.h"
 #include <sys/time.h> 
 #include <sys/wait.h> 
 #include <sys/types.h> 
@@ -33,54 +34,99 @@
 #import <netdb.h>
 #include <time.h> 
 
+#define kTinyDelay 0.0005
 
-NSString* ORC111CSettingsLock			= @"ORC111CSettingsLock";
-NSString* ORC111CConnectionChanged		= @"ORC111CConnectionChanged";
-NSString* ORC111CTimeConnectedChanged	= @"ORC111CTimeConnectedChanged";
-NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
-
-#define kC111CBinaryPort 2001
-
-#define kSTX				0x02
-#define kETX				0x04
-#define kResponseRequired	0x01 //actually ANYTHING other than 0xa0
-#define kNOResponseRequired	0xa0
-#define kBin_CFSA_Cmd		0x20
-#define kBin_CSSA_Cmd		0x21
-#define kBin_CCCZ_Cmd		0x22
-#define kBin_CCCC_Cmd		0x23
-#define kBin_CCCI_Cmd		0x24
-#define kBin_CTCI_Cmd		0x25
-#define kBin_CTLM_Cmd		0x26
-#define kBin_CLWT_Cmd		0x27
-#define kBin_LACK_Cmd		0x28
-#define kBin_CTSTAT_Cmd		0x29
-#define kBin_CLMR_Cmd		0x2A
-#define kBin_CSCAN_Cmd		0x2B
-#define kBin_NIMSetOuts_Cmd 0x30
-
-@interface ORC111CModel (private)
-- (int) readBuffer:(unsigned char*)aBuffer maxLength:(int)len;
-- (int) writeBuffer:(unsigned char*)aBuffer length:(int)len;
-- (int) adjustFrame:(unsigned char*)buff length:(int) length;
-- (BOOL) canWrite;
-- (BOOL) canRead;
-@end
+NSString* ORC111CModelTrackTransactionsChanged = @"ORC111CModelTrackTransactionsChanged";
+NSString* ORC111CModelStationToTestChanged	= @"ORC111CModelStationToTestChanged";
+NSString* ORC111CSettingsLock				= @"ORC111CSettingsLock";
+NSString* ORC111CConnectionChanged			= @"ORC111CConnectionChanged";
+NSString* ORC111CTimeConnectedChanged		= @"ORC111CTimeConnectedChanged";
+NSString* ORC111CIpAddressChanged			= @"ORC111CIpAddressChanged";
 
 @implementation ORC111CModel
 
-// destructor
 -(void) dealloc
 {
+	[cmdHistory release];
     [ipAddress release];
+	[transactionTimer release];
 	[self disconnect];
     [super dealloc];
+}
+
+#pragma mark ***Accessors
+- (ORCmdHistory*) cmdHistory
+{
+	if(!cmdHistory)cmdHistory = [[ORCmdHistory alloc] init];
+	return cmdHistory;
+}
+
+- (BOOL) trackTransactions
+{
+    return trackTransactions;
+}
+
+- (void) setTrackTransactions:(BOOL)aTrackTransactions
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTrackTransactions:trackTransactions];
+    
+    trackTransactions = aTrackTransactions;
+	
+	if(aTrackTransactions){
+		transactionTimer = [[ORTimer alloc] init];
+		[transactionTimer start];
+	}
+	else {
+		[transactionTimer release];
+		transactionTimer = nil;
+	}
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORC111CModelTrackTransactionsChanged object:self];
+}
+
+- (void) histogramTransactions
+{
+	float seconds = [transactionTimer seconds];
+	if(seconds>0){
+		int ts = 1./seconds;
+		transactionsPerSecondHistogram[ts]++;
+	}
+}
+
+- (void) clearTransactions
+{
+	int i;
+	for(i=0;i<kMaxNumberC111CTransactionsPerSecond;i++)transactionsPerSecondHistogram[i] = 0;
+}
+
+- (float) transactionsPerSecondHistogram:(int)index
+{
+	if(index>=kMaxNumberC111CTransactionsPerSecond)index = kMaxNumberC111CTransactionsPerSecond-1;
+	return transactionsPerSecondHistogram[index];
+}
+
+- (char) stationToTest
+{
+    return stationToTest;
+}
+
+- (void) setStationToTest:(char)aStationToTest
+{
+	if(aStationToTest==0)aStationToTest=1;
+	else if(aStationToTest>25)aStationToTest=25;
+	else if(aStationToTest< -1)aStationToTest = -1;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setStationToTest:stationToTest];
+    
+    stationToTest = aStationToTest;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORC111CModelStationToTestChanged object:self];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
 	NS_DURING
-		//if(ipAddress) [self connect];
+		if(ipAddress) [self connect];
 	NS_HANDLER
 	NS_ENDHANDLER
 }
@@ -176,55 +222,28 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 
 - (void) connect
 {
-	if(!socketfd && ([ipAddress length]!=0)){
-		NS_DURING
-			struct sockaddr_in target_address;
-			
-			struct hostent* he=gethostbyname([ipAddress cStringUsingEncoding:NSASCIIStringEncoding]);
-			if(he){
-				target_address.sin_family = AF_INET;
-				target_address.sin_addr	  =	*((struct in_addr *)he->h_addr);
-				target_address.sin_port	  = htons(kC111CBinaryPort);
-				memset(&(target_address.sin_zero), '\0', 8);		// zero the rest of the struct 
-
-				if ((socketfd = socket(AF_INET, SOCK_STREAM, 0)) != 0) {
-					//int oflag = fcntl(socketfd, F_GETFL);
-					//fcntl(socketfd, F_SETFL, oflag | O_NONBLOCK);
-					//time_t now = time(NULL);
-					int r = connect(socketfd, (struct sockaddr *) &target_address, sizeof(target_address));
-					if (r == -1) {
-						[NSException raise:@"Socket Failed" format:@"Couldn't couldn't get socket for %@ Port %d",ipAddress,kC111CBinaryPort];
-					}
-					
-					NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],ipAddress,kC111CBinaryPort);
-					[self setIsConnected:YES];
-					[self setTimeConnected:[NSCalendarDate date]];
-					//fcntl(socketfd, F_SETFL, oflag);
-				}
-				else [NSException raise:@"Socket Failed" format:@"Couldn't couldn't get socket for %@ Port %d",ipAddress,kC111CBinaryPort];
+	if(!isConnected){
+		crate_id = CROPEN((char*)[ipAddress cStringUsingEncoding:NSASCIIStringEncoding]);
+		if (crate_id < 0) { 
+			NSLog(@"Error %d opening connection with CAMAC Controller", crate_id); 
+		}
+		else {
+			int res = CRGET(crate_id, &cr_info);
+			if(res == CRATE_OK){
+				[self setIsConnected: YES];
+				cr_info. tout_ticks = 100000; 
+				CRSET(crate_id, &cr_info);
 			}
-			else [NSException raise:@"HostByName Failed" format:@"Couldn't couldn't get hostname for %@",ipAddress];
-
-		NS_HANDLER
-			if(socketfd){
-				close(socketfd);
-				socketfd = 0;
-				[self setIsConnected: NO];
-				[self setTimeConnected:nil];
-			}
-			[localException raise];
-		NS_ENDHANDLER
+		}
 	}
 }
 
 - (void) disconnect
 {
-	if(socketfd){
-		close(socketfd);
-		socketfd = 0;
+	if(isConnected){
+		CRCLOSE(crate_id);		
 		[self setIsConnected: NO];
-		[self setTimeConnected:nil];
-		NSLog(@"Disconnected from %@ <%@> port: %d\n",[self crateName],ipAddress,kC111CBinaryPort);
+		NSLog(@"Disconnected from %@ <%@>\n",[self crateName],ipAddress);
 	}	
 }
 
@@ -235,28 +254,23 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 
 - (unsigned short)  executeCCycle
 {
+	short res;
 	@synchronized(self){
-		unsigned char data[4] = {	kSTX,
-									kBin_CCCC_Cmd,
-									kResponseRequired,
-									kETX };
-		[self writeBuffer:data length:4];
-		[self readBuffer:data maxLength:3];
+		res = CCCC(crate_id);
 	}
-	return 0;
+	return res;
 }
 
 - (unsigned short)  executeZCycle
 {
+	short res;
 	@synchronized(self){
-		unsigned char data[4] = {	kSTX,
-									kBin_CCCZ_Cmd,
-									kResponseRequired,
-									kETX };
-		[self writeBuffer:data length:4];
-		[self readBuffer:data maxLength:3];
+		res=CCCZ(crate_id);
+		if(res==CRATE_CONNECT_ERROR){
+			[self setIsConnected:NO];
+		}
 	}
-	return 0;
+	return res;	
 }
 
 - (unsigned short)  resetContrl
@@ -278,189 +292,138 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 	return 1;
 } 
 
+- (unsigned short)  readLAMFFStatus:(unsigned short*)value
+{
+	NSLog(@"C111C doesn't support a read LAMFF Status function\n");
+
+	*value = 0;
+	return 1;
+}
+
+- (unsigned short) testLAMForStation:(char)aStation value:(char*)result
+{
+	short res;
+	@synchronized(self){
+		res = CTLM(crate_id,aStation,result);
+		if(res==CRATE_CONNECT_ERROR){
+			[self setIsConnected:NO];
+		}
+	}
+	return res;
+}
+
 - (unsigned short)  resetLAMFF
 {
-	unsigned short result;
+	short res;
 	@synchronized (self) {
-		unsigned char bin_cmd[4];
-		bin_cmd[0] = kSTX;
-		bin_cmd[1] = kBin_LACK_Cmd;
-		bin_cmd[2] = kNOResponseRequired;
-		bin_cmd[3] = kETX;
-
-		result = [self writeBuffer:bin_cmd length:4];
+		res = LACK(crate_id);
+		if(res==CRATE_CONNECT_ERROR){
+			[self setIsConnected:NO];
+		}
 	}
-	return result;
+	return res;
 }
 
 
 - (unsigned short)  readLAMStations:(unsigned long *)stations
 {
-	unsigned short result = 1;
-	@synchronized(self){
-		unsigned char bin_cmd[5];
-		unsigned char bin_rcv[4] = {0, 0, 0, 0};
-		short msgsize;
-
-		bin_cmd[0] = kSTX;
-		bin_cmd[1] = kBin_CTLM_Cmd;
-		bin_cmd[2] = 0xFF;
-		msgsize = 2;
-		msgsize += [self adjustFrame:&bin_cmd[msgsize] length:1];
-		bin_cmd[msgsize++] = kETX;
-
-		[self writeBuffer:bin_cmd length:msgsize];
-
-		msgsize = [self readBuffer:bin_rcv maxLength:7];
-
-		if ((bin_rcv[1] != kBin_CTLM_Cmd) || (msgsize != 4)) result =  -1;
-
-		if(result>0)*stations = bin_rcv[2];
-		else *stations = 0;
+	short res;
+	unsigned int mask;
+	@synchronized (self) {
+		res = CLMR(crate_id,&mask);
+		if(res==CRATE_CONNECT_ERROR){
+			*stations = 0;
+			[self setIsConnected:NO];
+		}
+		else *stations = mask&0x0FFFFFF;
 	}
-	return result;
+	return res;
 }
 
 - (unsigned short)  setCrateInhibit:(BOOL)state
 {   
-	unsigned short result = 1;
+	short res;
  	@synchronized(self){
-		unsigned char bin_cmd[5];
-		short msgsize;
-
-		bin_cmd[0] = kSTX;
-		bin_cmd[1] = kBin_CCCI_Cmd;
-		bin_cmd[2] = state;
-		bin_cmd[3] = kNOResponseRequired;
-		bin_cmd[4] = kETX;
-
-		result = [self writeBuffer:bin_cmd length:msgsize];
+		res = CCCI(crate_id,state);
+		if(res==CRATE_CONNECT_ERROR){
+			[self setIsConnected:NO];
+		}
 	}
-	return result;
+	return res;
 }
 
 - (unsigned short)  readCrateInhibit:(unsigned short*)state
 {   
- 	unsigned short result = 1;
+ 	short res;
+	char inhibitValue;
  	@synchronized(self){
-		unsigned char bin_cmd[3];
-		unsigned char bin_rcv[4] = {0, 0, 0, 0};
-		short msgsize;
-
-		bin_cmd[0] = kSTX;
-		bin_cmd[1] = kBin_CTCI_Cmd;
-		bin_cmd[2] = kETX;
-
-		if ([self writeBuffer:bin_cmd length:msgsize] <= 0) result =  -1;
-		if(result==1){
-			msgsize = [self readBuffer:bin_rcv maxLength:4];
-		
-			if ((bin_rcv[1] != kBin_CTCI_Cmd) || (msgsize != 4)) result =  -1;
-		
-			if(result==1) *state = bin_cmd[2];
-			else *state = 0;
+		res = CTCI(crate_id,&inhibitValue);
+		if(res==CRATE_CONNECT_ERROR){
+			[self setIsConnected:NO];
 		}
+		else *state = inhibitValue;
 	}
-	return result;
+	return res;
 }
 
-
-
-- (unsigned short)  readLAMFFStatus:(unsigned short*)value
-{
-    unsigned char bin_cmd[3];
-    unsigned char bin_rcv[7] = {0, 0, 0, 0, 0, 0, 0};
-	short msgsize;
-
-	unsigned short result = 1;
-	@synchronized(self){
-
-		bin_cmd[0] = kSTX;
-		bin_cmd[1] = kBin_CLMR_Cmd;
-		bin_cmd[2] = kETX;
-
-		[self writeBuffer:bin_cmd length:3];
-
-		msgsize = [self readBuffer:bin_rcv maxLength:7];
-	
-		if ((bin_rcv[1] != kBin_CLMR_Cmd) || (msgsize != 7)) result = -1;
-		
-		if(result == 1) *value = bin_cmd[2] | (bin_cmd[3] << 8) | (bin_cmd[4] << 16) | (bin_cmd[5] << 24);
-		else *value = 0;
-	}
-	return result;
-}
 
 - (unsigned short)  camacShortNAF:(unsigned short) n 
 								a:(unsigned short) a 
 								f:(unsigned short) f
 							 data:(unsigned short*) data
 {
-	unsigned short result = 1;
+	short result;
 	@synchronized(self){
-		unsigned char buffer[15];
-		unsigned char bin_rcv[7] = {0, 0, 0, 0, 0, 0, 0};
-		int msgsize = 0;
-		buffer[0] = kSTX;
-		buffer[1] = kBin_CSSA_Cmd;
-		buffer[2] = f;
-		buffer[3] = n;
-		buffer[4] = a;
-		buffer[5] = (*data & 0xFF);
-		buffer[6] = ((*data >> 8) & 0xFF);
-		buffer[7] = kResponseRequired;
-
-		msgsize = 2;
-		msgsize += [self adjustFrame:&buffer[msgsize] length:(int) 6];
-		buffer[msgsize++] = kETX;
-
-		[self writeBuffer:buffer length:msgsize];
-		
-		//get the response
-		msgsize = [self readBuffer:bin_rcv maxLength:7];
-		
-		
-		if ((bin_rcv[1] != kBin_CSSA_Cmd) || (msgsize != 7)) result =  -1;
-		if(result==1){
-			cmdResponse		= bin_rcv[2];
-			cmdAccepted		= bin_rcv[3];
-			*data			= bin_rcv[4] | (bin_rcv[5] << 8);
+		CRATE_OP cr_op;
+		cr_op.F = f;
+		cr_op.N = n;
+		cr_op.A = a;
+		cr_op.DATA = *data;
+		if(trackTransactions)[transactionTimer reset];
+		result = CSSA(crate_id,&cr_op);
+		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+		if(result==CRATE_OK){
+			if(trackTransactions)[self histogramTransactions];
+			cmdResponse		= cr_op.Q;
+			cmdAccepted		= cr_op.X;
+			*data			= cr_op.DATA;
 		}
-		else {
+		else if(result==CRATE_CONNECT_ERROR){
 			cmdResponse		= 0;
 			cmdAccepted		= 0;
 			*data			= 0;
+			[self setIsConnected:NO];
 		}
 	}
-	return 1;
+	return result;
 }
 
 - (unsigned short)  camacShortNAF:(unsigned short) n 
 								a:(unsigned short) a 
 								f:(unsigned short) f;
 {
+	short result;
 	@synchronized(self){
-		unsigned char buffer[15];
-		int msgsize = 0;
-		buffer[0] = kSTX;
-		buffer[1] = kBin_CSSA_Cmd;
-		buffer[2] = f;
-		buffer[3] = n;
-		buffer[4] = a;
-		buffer[5] = 0;
-		buffer[6] = 0;
-		buffer[7] = kNOResponseRequired;
-
-		msgsize = 2;
-		msgsize += [self adjustFrame:&buffer[msgsize] length:(int) 6];
-		buffer[msgsize++] = kETX;
-
-		[self writeBuffer:buffer length:msgsize];
-				
-		cmdResponse		= 0;
-		cmdAccepted		= 0;
+		CRATE_OP cr_op;
+		cr_op.F = f;
+		cr_op.N = n;
+		cr_op.A = a;
+		cr_op.DATA = 0;
+		if(trackTransactions)[transactionTimer reset];
+		result = CSSA(crate_id,&cr_op);
+		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+		if(trackTransactions)[self histogramTransactions];
+		if(result==CRATE_OK){
+			cmdResponse		= cr_op.Q;
+			cmdAccepted		= cr_op.X;
+		}
+		else if(result==CRATE_CONNECT_ERROR){
+			cmdResponse		= 0;
+			cmdAccepted		= 0;
+			[self setIsConnected:NO];
+		}
 	}
-	return 1;
+	return result;
 }
 
 - (unsigned short)  camacLongNAF:(unsigned short) n 
@@ -468,44 +431,30 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 							   f:(unsigned short) f
 							data:(unsigned long*) data
 {
-	unsigned short result = 1;
+	short result;
 	@synchronized(self){
-		unsigned char buffer[16];
-		unsigned char bin_rcv[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-		int msgsize = 0;
-		buffer[0] = kSTX;
-		buffer[1] = kBin_CFSA_Cmd;
-		buffer[2] = f;
-		buffer[3] = n;
-		buffer[4] = a;
-		buffer[5] = (*data & 0xFF);
-		buffer[6] = ((*data >> 8) & 0xFF);
-		buffer[7] = ((*data >> 16) & 0xFF);
-		buffer[8] = kResponseRequired;
-
-		msgsize = 2;
-		msgsize += [self adjustFrame:&buffer[msgsize] length:(int) 8];
-		buffer[msgsize++] = kETX;
-
-		[self writeBuffer:buffer length:msgsize];
-		
-		//get the response
-		msgsize = [self readBuffer:bin_rcv maxLength:8];
-			
-		if ((bin_rcv[1] != kBin_CFSA_Cmd) || (msgsize != 8)) result =  -1;
-		if(result==1){		
-			cmdResponse		= bin_rcv[2];
-			cmdAccepted		= bin_rcv[3];
-			*data			= bin_rcv[4] | (bin_rcv[5] << 8);
+		CRATE_OP cr_op;
+		cr_op.F = f;
+		cr_op.N = n;
+		cr_op.A = a;
+		cr_op.DATA = *data;
+		if(trackTransactions)[transactionTimer reset];
+		result = CFSA(crate_id,&cr_op);
+		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+		if(trackTransactions)[self histogramTransactions];
+		if(result==CRATE_OK){
+			cmdResponse		= cr_op.Q;
+			cmdAccepted		= cr_op.X;
+			*data			= cr_op.DATA;
 		}
-		else {
+		else if(result==CRATE_CONNECT_ERROR){
 			cmdResponse		= 0;
 			cmdAccepted		= 0;
 			*data			= 0;
+			[self setIsConnected:NO];
 		}
-
 	}
-	return 1;
+	return result;
 }
 
 
@@ -513,18 +462,113 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 									 a:(unsigned short) a 
 									 f:(unsigned short) f
 								  data:(unsigned short*) data
-                                length:(unsigned long)    numWords
+                                length:(unsigned long) numWords
 {
-	//not implemented yet
-	return 0;
+	BLK_TRANSF_INFO blk_info;
+	blk_info.opcode = OP_BLKSA; 
+	blk_info.F = f; 
+	blk_info.N = n; 
+	blk_info.A = a; 
+	blk_info.blksize = 16; //16 bit word size  
+	blk_info.totsize = numWords;  	
+	blk_info.timeout = 0;
+	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(int));
+	short result;
+	if(trackTransactions)[transactionTimer reset];
+	int i;
+	if(f < 16){
+		//CAMAC Read
+		result = BLKTRANSF(crate_id, &blk_info, buffer);
+		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+		if(result==CRATE_OK){
+			unsigned int* dp = buffer;
+			for(i=0;i<numWords;i++)*data++ = *dp++;
+		}
+	}
+	else {
+		//CAMAC write
+		unsigned int* dp = buffer;
+		for(i=0;i<numWords;i++) *dp++ = *data++;
+		result = BLKTRANSF(crate_id, &blk_info, buffer);
+	}
+	if(trackTransactions)[self histogramTransactions];
+	
+	if(result==CRATE_CONNECT_ERROR){
+		[self setIsConnected:NO];
+	}
+	free(buffer);
+  	return result;
 }
 
+- (unsigned short)  camacLongNAFBlock:(unsigned short) n 
+									 a:(unsigned short) a 
+									 f:(unsigned short) f
+								  data:(unsigned long*) data
+                                length:(unsigned long)    numWords
+{
+	BLK_TRANSF_INFO blk_info;
+	blk_info.opcode = OP_BLKSA; 
+	blk_info.F = f; 
+	blk_info.N = n; 
+	blk_info.A = a; 
+	blk_info.blksize = 24; //16 bit word size  
+	blk_info.totsize = numWords;  	
+	blk_info.timeout = 0;
+	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(long));
+	short result;
+	if(trackTransactions)[transactionTimer reset];
+	int i;
+	if(f < 16){
+		//CAMAC Read
+		result = BLKTRANSF(crate_id, &blk_info, buffer);
+		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+		if(result==CRATE_OK){
+			unsigned int* dp = buffer;
+			for(i=0;i<numWords;i++)*data++ = *dp++;
+		}
+	}
+	else {
+		//CAMAC write
+		unsigned int* dp = buffer;
+		for(i=0;i<numWords;i++) *dp++ = *data++;
+		result = BLKTRANSF(crate_id, &blk_info, buffer);
+	}
+	if(trackTransactions)[self histogramTransactions];
+	
+	if(result==CRATE_CONNECT_ERROR){
+		[self setIsConnected:NO];
+	}
+	free(buffer);
+  	return result;
+}
+
+
+- (void) sendCmd:(NSString*)aCmd verbose:(BOOL)verbose
+{
+	int res;
+	char response[32];
+	@synchronized(self){
+		if(![aCmd hasSuffix:@"\r"])aCmd = [aCmd stringByAppendingString:@"\r"];
+		res = CMDSR(crate_id,(char*)[aCmd cStringUsingEncoding:NSASCIIStringEncoding], response, 32);
+		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+		if(res==CRATE_OK){
+			if(verbose){
+				if(response)NSLog(@"C111C Response: %s\n",response);
+				else NSLog(@"C111C Response: <nil>\n");
+			}
+		}
+		else {
+			[self setIsConnected:NO];
+		}
+	}
+}
 
 
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+    [self setStationToTest:[decoder decodeIntForKey:@"ORC111CModelStationToTest"]];
 	[self setIpAddress:[decoder decodeObjectForKey:@"IpAddress"]];
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -533,169 +577,9 @@ NSString* ORC111CIpAddressChanged		= @"ORC111CIpAddressChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:stationToTest forKey:@"ORC111CModelStationToTest"];
     [encoder encodeObject:ipAddress forKey:@"IpAddress"];
 }
 
 @end
 
-@implementation ORC111CModel (private)
-- (BOOL) canWrite
-{
-	fd_set wfds;
-
-	FD_ZERO(&wfds);
-	FD_SET(socketfd, &wfds);
-
-	struct timeval tv;
-	tv.tv_sec = 1;
-	tv.tv_usec = 0;
-
-	if (select(socketfd + 1, NULL, &wfds, NULL, &tv) > 0) {
-		if (FD_ISSET(socketfd, &wfds)) return YES;
-	}
-	return NO;
-}
-
-- (BOOL) canRead
-{
-	fd_set rfds;
-	FD_ZERO(&rfds);
-	FD_SET(socketfd, &rfds);
-
-	struct timeval tv;
-	tv.tv_sec  = 0;
-	tv.tv_usec = 0;
-
-	if (select(socketfd + 1, &rfds, NULL, NULL, &tv) > 0) {
-		if (FD_ISSET(socketfd, &rfds)) return YES;
-	}
-	return NO;
-}
-
-- (int) readBuffer:(unsigned char*)buffer maxLength:(int)maxLen
-{
-	int pos = 0;
-	@synchronized(self){
-		BOOL escapeSeq = NO;
-		BOOL etx_found = NO;
-		unsigned char buf;
-
-		// set up the file descriptor set
-		fd_set fds;
-		FD_ZERO(&fds);
-		FD_SET(socketfd, &fds);
-
-		struct timeval tv;
-		tv.tv_sec  = 1;
-		tv.tv_usec = 0;
-
-		int  selectionResult = select(socketfd+1, &fds, NULL, NULL, &tv);
-		if(selectionResult > 0){
-			while (!etx_found) {
-				int rp = recv(socketfd, &buf, 1, 0);
-				if(rp==0){
-					[self setIsConnected:NO];
-					[self setTimeConnected:nil];
-					[NSException raise:@"Socket Disconnected" format:@"%@ Port %d Disconnected",ipAddress,kC111CBinaryPort];
-				}
-				int i;
-				for(i=0;i<rp;i++){
-					if (buf == kSTX) {
-						pos = 0;
-						escapeSeq = NO;
-						buffer[pos++] = buf;
-					}
-					else if (pos) {
-						if (buf == 0x10) escapeSeq = YES;
-						else if (buf == kETX) {
-							buffer[pos++] = buf;
-							etx_found = YES;
-						}
-						else {
-							if (pos < maxLen) {
-								if (escapeSeq)	buffer[pos++] = buf - 0x80;
-								else			buffer[pos++] = buf;
-							}
-							escapeSeq = NO;
-						}
-					}
-				}
-			}
-		}
-	}
-//	if(pos){
-//		int i;
-//		NSString* s = @"";
-//		for(i=0;i<pos;i++){
-//			s = [s stringByAppendingFormat:@" 0x%x",buffer[i]];
-//		}
-//		NSLog(@"%@\n",s);
-//	}
-	return pos;
-}
-
-
-- (int) adjustFrame:(unsigned char*)buff length:(int) length
-{
-    unsigned char dataFrame[32];
-	BOOL changed = NO;
-	int  pos = 0;
-    
-    int i;
-	for (i = 0; i < length; i++) {
-		if (buff[i] == kSTX) {
-			dataFrame[pos] = 0x10;
-			pos++;
-			dataFrame[pos] = (unsigned char)(0x80 | kSTX);
-			changed = YES;
-		}
-		else if (buff[i] == kETX) {
-			dataFrame[pos] = 0x10;
-			pos++;
-			dataFrame[pos] = (unsigned char)(0x80 | kETX);	    
-			changed = YES;
-		}
-		else if (buff[i] == 0x10) {
-			dataFrame[pos] = 0x10;
-			pos++;
-			dataFrame[pos] = (unsigned char)(0x80 | 0x10);	    
-			changed = YES;
-		}
-		else dataFrame[pos] = buff[i];
-		pos++;
-    }
-
-    if (changed) {
-		for (i = 0; i < pos; i++) {
-			buff[i] = dataFrame[i];
-		}
-    }
-
-    return pos;
-}
-
-
-- (int) writeBuffer:(unsigned char*)aBuffer length:(int)len
-{
-	if(!socketfd)	return 0;
-	int numBytesToSend = len;
-	int bytesSent = 0;
-	@synchronized(self){
-		while (numBytesToSend) {       
-			int bytesWritten = write(socketfd,aBuffer,numBytesToSend);
-			if (bytesWritten > 0) {
-				aBuffer += bytesWritten;
-				numBytesToSend -= bytesWritten;
-				bytesSent += bytesWritten;
-			}
-			else if (bytesWritten < 0) {
-				[NSException raise:@"Write Error" format:@"Write Error %@ <%@> port: %d",[self crateName],ipAddress,kC111CBinaryPort];
-			}
-		}
-	}
-
-	return bytesSent;
-}
-
-
-@end

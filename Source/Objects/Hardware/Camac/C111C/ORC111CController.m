@@ -23,7 +23,9 @@
 
 #pragma mark •••Imported Files
 #import "ORC111CController.h"
+#import "ORPlotter1D.h"
 #import "ORC111CModel.h"
+#import "ORCmdHistory.h"
 
 @implementation ORC111CController
 
@@ -33,6 +35,21 @@
     self = [super initWithWindowNibName:@"C111C"];
     
     return self;
+}
+
+- (void) dealloc
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[super dealloc];
+}
+
+- (void) awakeFromNib
+{
+	[super awakeFromNib];
+	[plotter setUseGradient:YES];
+	if([model trackTransactions]){
+		[self performSelector:@selector(updatePlot) withObject:nil afterDelay:1.0];
+	}
 }
 
 #pragma mark •••Notifications
@@ -52,15 +69,50 @@
                      selector : @selector(isConnectedChanged:)
                          name : ORC111CConnectionChanged
 						object: model];
+						
+    [notifyCenter addObserver : self
+                     selector : @selector(stationToTestChanged:)
+                         name : ORC111CModelStationToTestChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(trackTransactionsChanged:)
+                         name : ORC111CModelTrackTransactionsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(commandChanged:)
+                         name : ORCmdHistoryChangedNotification
+                       object : [model cmdHistory]];
 }
 
 #pragma mark •••Interface Management
+
+- (void) commandChanged:(NSNotification*)aNote
+{
+	NSString* aCommand = [[aNote userInfo] objectForKey:ORCmdHistoryChangedNotification];
+	if(aCommand){
+		[asciiCmdTextField setStringValue:aCommand];
+	}
+}
+
+- (void) trackTransactionsChanged:(NSNotification*)aNote
+{
+	[trackTransactionsCB setIntValue: [model trackTransactions]];
+}
+
+- (void) stationToTestChanged:(NSNotification*)aNote
+{
+	[stationToTestTextField setIntValue: [model stationToTest]];
+}
 
 - (void) updateWindow
 {
     [super updateWindow];
 	[self ipAddressChanged:nil];
 	[self isConnectedChanged:nil];
+	[self stationToTestChanged:nil];
+	[self trackTransactionsChanged:nil];
 }
 
 - (void) setButtonStates
@@ -73,6 +125,10 @@
 
     [ipConnectButton setEnabled:!locked && !runInProgress];
     [ipAddressTextField setEnabled:!locked && !runInProgress];
+    [stationToTestTextField setEnabled:!locked];
+    [asciiCmdTextField setEnabled:!locked && !runInProgress];
+    [sendAsciiCmdButton setEnabled:!locked && !runInProgress];
+
 }
 
 - (void) isConnectedChanged:(NSNotification*)aNote
@@ -86,7 +142,39 @@
 	[ipAddressTextField setStringValue: [model ipAddress]];
 }
 
+- (void) updatePlot
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updatePlot) object:nil];
+	[plotter setNeedsDisplay:YES];
+	if([model trackTransactions]){
+		[self performSelector:@selector(updatePlot) withObject:nil afterDelay:1.0];
+	}
+}
+
 #pragma mark •••Actions
+
+- (IBAction) trackTransactionsAction:(id)sender
+{
+	[model setTrackTransactions:[sender intValue]];	
+	if([model trackTransactions]){
+		[self performSelector:@selector(updatePlot) withObject:nil afterDelay:1.0];
+	}
+}
+
+- (IBAction) testLAMForStationAction:(id)sender
+{
+	char result;
+	if([model testLAMForStation:[model stationToTest] value:&result] == 0){
+		NSLog(@"LAM is %@ on %@\n",result==1?@"SET":@"CLEAR",result==1 ? ([model stationToTest] == -1?@"at least one station":[NSString stringWithFormat:@"on station %d",[model stationToTest]]) : 
+																		 ([model stationToTest] == -1?@"on all stations":[NSString stringWithFormat:@"on station %d",[model stationToTest]]));
+	}	
+}
+
+- (IBAction) stationToTestTextFieldAction:(id)sender
+{
+	[model setStationToTest:[sender intValue]];	
+}
+
 - (IBAction) ipAddressTextFieldAction:(id)sender
 {
 	[model setIpAddress:[sender stringValue]];	
@@ -95,12 +183,54 @@
 - (IBAction) connectAction:(id)sender
 {
 	NS_DURING
+		[self endEditing];
 		if([model isConnected])[model disconnect];
 		else [model connect];
 	NS_HANDLER
 		NSLog(@"%@\n",localException);
 	NS_ENDHANDLER
 }
+
+- (IBAction) sendAsciiCmd:(id)sender
+{
+	[self endEditing];
+	[model sendCmd:[asciiCmdTextField stringValue] verbose:YES];
+	[[model cmdHistory] addCommandToHistory:[asciiCmdTextField stringValue]];
+	[asciiCmdTextField becomeFirstResponder];
+}
+
+- (IBAction) clearTransactions:(id)sender
+{
+	[model clearTransactions];
+	[plotter setNeedsDisplay:YES];
+}
+
+- (BOOL) control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command
+{
+	if ((command == @selector(moveDown:))) {
+		[[model cmdHistory] moveInHistoryDown];
+		return YES;
+	}
+	if ((command == @selector(moveUp:))) {
+		[[model cmdHistory] moveInHistoryUp];	
+		return YES;
+	}
+	return NO;
+}
+
+
+#pragma mark •••Plotter Datasource
+- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+    return kMaxNumberC111CTransactionsPerSecond;
+}
+
+- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+{
+	return [model transactionsPerSecondHistogram:x];
+ 
+}
+
 
 @end
 

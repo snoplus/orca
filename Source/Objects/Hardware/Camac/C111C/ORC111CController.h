@@ -25,24 +25,42 @@
 #pragma mark •••Imported Files
 #import "ORCC32Controller.h"
 
+#pragma mark •••Forward Declarations
+@class ORPlotter1D;
+
 @interface ORC111CController : ORCC32Controller {
 	@private
 		IBOutlet NSTextField*	ipConnectedTextField;
+		IBOutlet NSButton*		trackTransactionsCB;
+		IBOutlet NSTextField*	stationToTestTextField;
 		IBOutlet NSTextField*	ipAddressTextField;
 		IBOutlet NSButton*		ipConnectButton;
+		IBOutlet NSButton*		sendAsciiCmdButton;
+		IBOutlet NSTextField*	asciiCmdTextField;
+		IBOutlet ORPlotter1D*	plotter;
 };
 
 #pragma mark •••Initialization
 -(id)init;
+- (void) updatePlot;
+- (BOOL) control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command;
 
 #pragma mark •••Interface Management
+- (void) trackTransactionsChanged:(NSNotification*)aNote;
+- (void) stationToTestChanged:(NSNotification*)aNote;
 - (void) setButtonStates;
 - (void) registerNotificationObservers;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
+- (void) commandChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) trackTransactionsAction:(id)sender;
+- (IBAction) testLAMForStationAction:(id)sender;
+- (IBAction) stationToTestTextFieldAction:(id)sender;
 - (IBAction) ipAddressTextFieldAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
+- (IBAction) sendAsciiCmd:(id)sender;
+- (IBAction) clearTransactions:(id)sender;
 
 @end

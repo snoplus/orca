@@ -17,6 +17,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -70,9 +78,19 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clearTransactions</key>
+				<string>id</string>
 				<key>connectAction</key>
 				<string>id</string>
 				<key>ipAddressTextFieldAction</key>
+				<string>id</string>
+				<key>sendAsciiCmd</key>
+				<string>id</string>
+				<key>stationToTestTextFieldAction</key>
+				<string>id</string>
+				<key>testLAMForStationAction</key>
+				<string>id</string>
+				<key>trackTransactionsAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -81,15 +99,105 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>asciiCmdTextField</key>
+				<string>NSTextField</string>
 				<key>ipAddressTextField</key>
 				<string>NSTextField</string>
 				<key>ipConnectButton</key>
 				<string>NSButton</string>
 				<key>ipConnectedTextField</key>
 				<string>NSTextField</string>
+				<key>plotter</key>
+				<string>ORPlotter1D</string>
+				<key>sendAsciiCmdButton</key>
+				<string>NSButton</string>
+				<key>stationToTestTextField</key>
+				<string>NSTextField</string>
+				<key>trackTransactionsCB</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>ORCC32Controller</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>

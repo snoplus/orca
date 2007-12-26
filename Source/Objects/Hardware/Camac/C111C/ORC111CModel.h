@@ -22,31 +22,48 @@
 
 #pragma mark •••Imported Files
 #import "ORCC32Model.h"
+#import "crate_lib.h"
 
+@class ORCmdHistory;
+
+#define kMaxNumberC111CTransactionsPerSecond 1024
 
 // class definition
 @interface ORC111CModel : ORCC32Model
 {
-    NSString* ipAddress;
-    BOOL isConnected;
+    NSString*		ipAddress;
+    BOOL			isConnected;
     NSCalendarDate*	timeConnected;
-	int				socketfd;
-
+	int				crate_id;
+	CRATE_INFO		cr_info;
+    short			stationToTest;
+    unsigned long	transactionsPerSecondHistogram[kMaxNumberC111CTransactionsPerSecond];
+    BOOL			trackTransactions;
+	ORTimer*		transactionTimer;
+	ORCmdHistory*   cmdHistory;
 }
 
 #pragma mark •••Initialization
 - (NSString*) settingsLock;
 
 #pragma mark •••Accessors
+- (BOOL) trackTransactions;
+- (void) setTrackTransactions:(BOOL)aTrackTranactions;
+- (char) stationToTest;
+- (void) setStationToTest:(char)aStationToTest;
 - (NSCalendarDate*) timeConnected;
 - (void) setTimeConnected:(NSCalendarDate*)newTimeConnected;
 - (BOOL) isConnected;
 - (void) setIsConnected:(BOOL)aFlag;
 - (NSString*) ipAddress;
 - (void) setIpAddress:(NSString*)aIpAddress;
+- (float) transactionsPerSecondHistogram:(int)index;
+- (void) clearTransactions;
+- (ORCmdHistory*) cmdHistory;
 
 #pragma mark ***Utilities
 - (void) connect;
+- (unsigned short) testLAMForStation:(char)aStation value:(char*)result;
 
 - (unsigned short)  camacShortNAF:(unsigned short) n 
 								a:(unsigned short) a 
@@ -67,9 +84,23 @@
 									 a:(unsigned short) a 
 									 f:(unsigned short) f
 								  data:(unsigned short*) data
-                                length:(unsigned long)   numWords;
+                                length:(unsigned long) numWords;
+
+- (unsigned short)  camacLongNAFBlock:(unsigned short) n 
+									 a:(unsigned short) a 
+									 f:(unsigned short) f
+								  data:(unsigned long*) data
+                                length:(unsigned long) numWords;
+
+- (void) sendCmd:(NSString*)aCmd verbose:(BOOL)verbose;
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
+
+extern NSString* ORC111CModelTrackTransactionsChanged;
+extern NSString* ORC111CModelStationToTestChanged;
 extern NSString* ORC111CSettingsLock;
 extern NSString* ORC111CTimeConnectedChanged;
 extern NSString* ORC111CConnectionChanged;	
