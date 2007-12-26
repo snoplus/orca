@@ -1382,6 +1382,12 @@
 		842E5A050C16041E00397CDF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 847599850B5FF26500123411 /* QuartzCore.framework */; };
 		842E5A130C16045E00397CDF /* libmysqlclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 842E5A0E0C16044000397CDF /* libmysqlclient.a */; };
 		844244840C96058900415C78 /* AcqirisDC440Cmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 844242990C95DB7700415C78 /* AcqirisDC440Cmds.h */; };
+		8446CE730D1C809600F257F0 /* JAMF.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8446CE6D0D1C809600F257F0 /* JAMF.gif */; };
+		8446CE740D1C809600F257F0 /* JAMF.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8446CE6E0D1C809600F257F0 /* JAMF.nib */; };
+		8446CE750D1C809600F257F0 /* ORJAMFController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8446CE6F0D1C809600F257F0 /* ORJAMFController.h */; };
+		8446CE760D1C809600F257F0 /* ORJAMFController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8446CE700D1C809600F257F0 /* ORJAMFController.m */; };
+		8446CE770D1C809600F257F0 /* ORJAMFModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8446CE710D1C809600F257F0 /* ORJAMFModel.h */; };
+		8446CE780D1C809600F257F0 /* ORJAMFModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8446CE720D1C809600F257F0 /* ORJAMFModel.m */; };
 		844DF85D0C6A803700BEB215 /* ORMaskedWaveform.m in Sources */ = {isa = PBXBuildFile; fileRef = 844DF85B0C6A803700BEB215 /* ORMaskedWaveform.m */; };
 		844DF85E0C6A803700BEB215 /* ORMaskedWaveform.h in Headers */ = {isa = PBXBuildFile; fileRef = 844DF85C0C6A803700BEB215 /* ORMaskedWaveform.h */; };
 		8457B0C40CDA70E70095F7D9 /* VME_HW_Definitions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8457B0C30CDA70E70095F7D9 /* VME_HW_Definitions.h */; };
@@ -1495,6 +1501,8 @@
 		84A042A20C35751A00DCE0EC /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A042A00C35751A00DCE0EC /* ORAcqirisDC440Decoders.m */; };
 		84A042A50C35756A00DCE0EC /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A042A30C35756A00DCE0EC /* ORcPCICardDecoder.h */; };
 		84A042A60C35756A00DCE0EC /* ORcPCICardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A042A40C35756A00DCE0EC /* ORcPCICardDecoder.m */; };
+		84AB8A3D0D22FAE600EC39F2 /* ORCmdHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8A3B0D22FAE600EC39F2 /* ORCmdHistory.h */; };
+		84AB8A3E0D22FAE600EC39F2 /* ORCmdHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8A3C0D22FAE600EC39F2 /* ORCmdHistory.m */; };
 		84B07AD20CFE494C00B8068C /* mainFocalPlaneDetector.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B07AD10CFE494C00B8068C /* mainFocalPlaneDetector.tif */; };
 		84B7A2370C2C5E24003AAB4C /* AcqirisDC440.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7A22D0C2C5E22003AAB4C /* AcqirisDC440.gif */; };
 		84B7A2390C2C5E26003AAB4C /* ORAcqirisDC440Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7A22F0C2C5E22003AAB4C /* ORAcqirisDC440Controller.m */; };
@@ -1605,6 +1613,8 @@
 		84EA6C400C73CD7D00083319 /* nTPCView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6C370C73CD7D00083319 /* nTPCView.m */; };
 		84F480A20CB70E3E007EFADA /* ORIpeSLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F480A00CB70E3D007EFADA /* ORIpeSLTDecoder.h */; };
 		84F480A30CB70E3E007EFADA /* ORIpeSLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F480A10CB70E3D007EFADA /* ORIpeSLTDecoder.m */; };
+		84FE8FA20D19918000FAD31D /* crate_lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FE8FA00D19918000FAD31D /* crate_lib.m */; };
+		84FE8FA30D19918000FAD31D /* crate_lib.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FE8FA10D19918000FAD31D /* crate_lib.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2231,6 +2241,12 @@
 		8446CE1C07B847B8006CD9C4 /* ORAD413ADecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAD413ADecoders.m; sourceTree = "<group>"; };
 		8446CE1D07B847B8006CD9C4 /* ORAD413AModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAD413AModel.m; sourceTree = "<group>"; };
 		8446CE1E07B847B8006CD9C4 /* ORAD413AModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAD413AModel.h; sourceTree = "<group>"; };
+		8446CE6D0D1C809600F257F0 /* JAMF.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = JAMF.gif; path = Source/Objects/Hardware/Camac/JAM_F/JAMF.gif; sourceTree = SOURCE_ROOT; };
+		8446CE6E0D1C809600F257F0 /* JAMF.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = JAMF.nib; path = Source/Objects/Hardware/Camac/JAM_F/JAMF.nib; sourceTree = SOURCE_ROOT; };
+		8446CE6F0D1C809600F257F0 /* ORJAMFController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORJAMFController.h; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFController.h; sourceTree = SOURCE_ROOT; };
+		8446CE700D1C809600F257F0 /* ORJAMFController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFController.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFController.m; sourceTree = SOURCE_ROOT; };
+		8446CE710D1C809600F257F0 /* ORJAMFModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORJAMFModel.h; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFModel.h; sourceTree = SOURCE_ROOT; };
+		8446CE720D1C809600F257F0 /* ORJAMFModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFModel.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFModel.m; sourceTree = SOURCE_ROOT; };
 		8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+Extensions.h"; sourceTree = "<group>"; };
 		8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+Extensions.m"; sourceTree = "<group>"; };
 		844BF4980B1B85560047C9BF /* KatrinDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = KatrinDetectorView.h; path = Source/Experiments/Katrin/KatrinDetectorView.h; sourceTree = SOURCE_ROOT; };
@@ -2767,6 +2783,8 @@
 		84AA7A470545B167005F64B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = ../../../../System/Library/Frameworks/Foundation.framework; sourceTree = SOURCE_ROOT; };
 		84AA7A4F0545B17C005F64B1 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../System/Library/Frameworks/AppKit.framework; sourceTree = SOURCE_ROOT; };
 		84AA7A540545B1B2005F64B1 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = SOURCE_ROOT; };
+		84AB8A3B0D22FAE600EC39F2 /* ORCmdHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCmdHistory.h; sourceTree = "<group>"; };
+		84AB8A3C0D22FAE600EC39F2 /* ORCmdHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCmdHistory.m; sourceTree = "<group>"; };
 		84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NcdPulseChannelsTask.h; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.h; sourceTree = SOURCE_ROOT; };
 		84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NcdPulseChannelsTask.m; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.m; sourceTree = SOURCE_ROOT; };
 		84AC6A500A34F9A800A0018E /* NcdPulseChannelsTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdPulseChannelsTask.nib; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.nib; sourceTree = SOURCE_ROOT; };
@@ -3193,6 +3211,8 @@
 		84FE07CF07B403ED00E2CB0E /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "Source/Cocoa Extensions/NSString+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		84FE6584047D9140005F64B1 /* ORHVSupply.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHVSupply.h; path = Source/Objects/Control/HVControl/ORHVSupply.h; sourceTree = SOURCE_ROOT; };
 		84FE6585047D9140005F64B1 /* ORHVSupply.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHVSupply.m; path = Source/Objects/Control/HVControl/ORHVSupply.m; sourceTree = SOURCE_ROOT; };
+		84FE8FA00D19918000FAD31D /* crate_lib.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = crate_lib.m; sourceTree = "<group>"; };
+		84FE8FA10D19918000FAD31D /* crate_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crate_lib.h; path = Source/Objects/Hardware/Camac/C111C/crate_lib.h; sourceTree = SOURCE_ROOT; };
 		84FFCAA00636D5B10069432F /* C792.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = C792.gif; sourceTree = "<group>"; };
 		84FFCAA10636D5B10069432F /* Caen792.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Caen792.nib; sourceTree = "<group>"; };
 		84FFCAA20636D5B10069432F /* ORCaen792Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen792Controller.h; sourceTree = "<group>"; };
@@ -4162,6 +4182,7 @@
 				84861D270ACD83F300C543D7 /* L4532 */,
 				2A4553DA08BCE9A3004BB15E /* TDC3377 */,
 				546D9DA60874BDD60072A274 /* TDC2228A */,
+				8446CE6C0D1C809600F257F0 /* JAM_F */,
 				84A16C4C0A7EB7CE005BC151 /* ADC_L */,
 				8472AD670A82BD8E0069A069 /* BiRa3251 */,
 				842DAEB40A82CA8400C942A2 /* BiRa2351 */,
@@ -4322,6 +4343,7 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
+				84AB8A380D22FABB00EC39F2 /* CmdHistory */,
 				849522690CFDD01700B4558E /* ObjectProxy */,
 				2AAB08F808E36CCE00BB0792 /* Testing */,
 				844048AB08350BEE000D03DB /* MemoryWatcher */,
@@ -4793,6 +4815,20 @@
 			);
 			name = AD413;
 			path = Source/Objects/Hardware/Camac/AD413;
+			sourceTree = SOURCE_ROOT;
+		};
+		8446CE6C0D1C809600F257F0 /* JAM_F */ = {
+			isa = PBXGroup;
+			children = (
+				8446CE6D0D1C809600F257F0 /* JAMF.gif */,
+				8446CE6E0D1C809600F257F0 /* JAMF.nib */,
+				8446CE6F0D1C809600F257F0 /* ORJAMFController.h */,
+				8446CE700D1C809600F257F0 /* ORJAMFController.m */,
+				8446CE710D1C809600F257F0 /* ORJAMFModel.h */,
+				8446CE720D1C809600F257F0 /* ORJAMFModel.m */,
+			);
+			name = JAM_F;
+			path = Source/Objects/Hardware/Camac/JAM_F;
 			sourceTree = SOURCE_ROOT;
 		};
 		844D2B0E0455BFD7005F64B1 /* Generic */ = {
@@ -5482,6 +5518,8 @@
 		8490B2120D0DDC1E00275B5E /* C111C */ = {
 			isa = PBXGroup;
 			children = (
+				84FE8FA00D19918000FAD31D /* crate_lib.m */,
+				84FE8FA10D19918000FAD31D /* crate_lib.h */,
 				8490B2130D0DDC1E00275B5E /* C111C.nib */,
 				8490B21F0D0DDC3600275B5E /* C111C.tif */,
 				8490B2150D0DDC1E00275B5E /* ORC111CController.h */,
@@ -5837,6 +5875,16 @@
 			);
 			name = ADC_L;
 			path = Source/Objects/Hardware/Camac/ADC_L;
+			sourceTree = SOURCE_ROOT;
+		};
+		84AB8A380D22FABB00EC39F2 /* CmdHistory */ = {
+			isa = PBXGroup;
+			children = (
+				84AB8A3B0D22FAE600EC39F2 /* ORCmdHistory.h */,
+				84AB8A3C0D22FAE600EC39F2 /* ORCmdHistory.m */,
+			);
+			name = CmdHistory;
+			path = "Source/Objects/Misc Objects/CmdHistory";
 			sourceTree = SOURCE_ROOT;
 		};
 		84AC6A4D0A34F9A800A0018E /* PulseChannelsTask */ = {
@@ -7947,6 +7995,10 @@
 				8490B21B0D0DDC1E00275B5E /* ORC111CController.h in Headers */,
 				8490B21D0D0DDC1E00275B5E /* ORC111CModel.h in Headers */,
 				84071B4C0D185E3A00FD6EFD /* ORDataChainObject.h in Headers */,
+				84FE8FA30D19918000FAD31D /* crate_lib.h in Headers */,
+				8446CE750D1C809600F257F0 /* ORJAMFController.h in Headers */,
+				8446CE770D1C809600F257F0 /* ORJAMFModel.h in Headers */,
+				84AB8A3D0D22FAE600EC39F2 /* ORCmdHistory.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8457,6 +8509,8 @@
 				8490B2200D0DDC3600275B5E /* C111C.tif in Resources */,
 				840710730D12FDA100FD6EFD /* NoNI488DriversHelp.plist in Resources */,
 				840710740D12FDA100FD6EFD /* NoNI488PluginHelp.plist in Resources */,
+				8446CE730D1C809600F257F0 /* JAMF.gif in Resources */,
+				8446CE740D1C809600F257F0 /* JAMF.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9028,6 +9082,10 @@
 				8490B21C0D0DDC1E00275B5E /* ORC111CController.m in Sources */,
 				8490B21E0D0DDC1E00275B5E /* ORC111CModel.m in Sources */,
 				84071B4D0D185E3A00FD6EFD /* ORDataChainObject.m in Sources */,
+				84FE8FA20D19918000FAD31D /* crate_lib.m in Sources */,
+				8446CE760D1C809600F257F0 /* ORJAMFController.m in Sources */,
+				8446CE780D1C809600F257F0 /* ORJAMFModel.m in Sources */,
+				84AB8A3E0D22FAE600EC39F2 /* ORCmdHistory.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
