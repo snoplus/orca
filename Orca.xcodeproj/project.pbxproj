@@ -1292,6 +1292,22 @@
 		84A9566F077B796F00CAD99D /* ORCurve2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A9566D077B796F00CAD99D /* ORCurve2D.h */; };
 		84A95670077B796F00CAD99D /* ORCurve2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A9566E077B796F00CAD99D /* ORCurve2D.m */; };
 		84A9571F077B887100CAD99D /* Example2D.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9571E077B887100CAD99D /* Example2D.gif */; };
+		84AB8BB60D2314A500EC39F2 /* ORCmdHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BB40D2314A500EC39F2 /* ORCmdHistory.h */; };
+		84AB8BB70D2314A500EC39F2 /* ORCmdHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BB50D2314A500EC39F2 /* ORCmdHistory.m */; };
+		84AB8BC10D2314CD00EC39F2 /* crate_lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BB90D2314CD00EC39F2 /* crate_lib.m */; };
+		84AB8BC20D2314CD00EC39F2 /* crate_lib.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BBA0D2314CD00EC39F2 /* crate_lib.h */; };
+		84AB8BC30D2314CD00EC39F2 /* C111C.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AB8BBB0D2314CD00EC39F2 /* C111C.nib */; };
+		84AB8BC40D2314CD00EC39F2 /* C111C.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AB8BBC0D2314CD00EC39F2 /* C111C.tif */; };
+		84AB8BC50D2314CD00EC39F2 /* ORC111CController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BBD0D2314CD00EC39F2 /* ORC111CController.h */; };
+		84AB8BC60D2314CD00EC39F2 /* ORC111CController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BBE0D2314CD00EC39F2 /* ORC111CController.m */; };
+		84AB8BC70D2314CD00EC39F2 /* ORC111CModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BBF0D2314CD00EC39F2 /* ORC111CModel.h */; };
+		84AB8BC80D2314CD00EC39F2 /* ORC111CModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BC00D2314CD00EC39F2 /* ORC111CModel.m */; };
+		84AB8BD00D2314DD00EC39F2 /* JAMF.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84AB8BCA0D2314DD00EC39F2 /* JAMF.gif */; };
+		84AB8BD10D2314DD00EC39F2 /* JAMF.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AB8BCB0D2314DD00EC39F2 /* JAMF.nib */; };
+		84AB8BD20D2314DD00EC39F2 /* ORJAMFController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BCC0D2314DD00EC39F2 /* ORJAMFController.h */; };
+		84AB8BD30D2314DD00EC39F2 /* ORJAMFController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BCD0D2314DD00EC39F2 /* ORJAMFController.m */; };
+		84AB8BD40D2314DD00EC39F2 /* ORJAMFModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AB8BCE0D2314DD00EC39F2 /* ORJAMFModel.h */; };
+		84AB8BD50D2314DD00EC39F2 /* ORJAMFModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AB8BCF0D2314DD00EC39F2 /* ORJAMFModel.m */; };
 		84AC6A510A34F9A800A0018E /* NcdPulseChannelsTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */; };
 		84AC6A520A34F9A900A0018E /* NcdPulseChannelsTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */; };
 		84AC6A530A34F9A900A0018E /* NcdPulseChannelsTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AC6A500A34F9A800A0018E /* NcdPulseChannelsTask.nib */; };
@@ -2743,6 +2759,22 @@
 		84AA7A470545B167005F64B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = ../../../../System/Library/Frameworks/Foundation.framework; sourceTree = SOURCE_ROOT; };
 		84AA7A4F0545B17C005F64B1 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../System/Library/Frameworks/AppKit.framework; sourceTree = SOURCE_ROOT; };
 		84AA7A540545B1B2005F64B1 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = SOURCE_ROOT; };
+		84AB8BB40D2314A500EC39F2 /* ORCmdHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCmdHistory.h; path = "Source/Objects/Misc Objects/CmdHistory/ORCmdHistory.h"; sourceTree = SOURCE_ROOT; };
+		84AB8BB50D2314A500EC39F2 /* ORCmdHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCmdHistory.m; path = "Source/Objects/Misc Objects/CmdHistory/ORCmdHistory.m"; sourceTree = SOURCE_ROOT; };
+		84AB8BB90D2314CD00EC39F2 /* crate_lib.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = crate_lib.m; path = Source/Objects/Hardware/Camac/C111C/crate_lib.m; sourceTree = SOURCE_ROOT; };
+		84AB8BBA0D2314CD00EC39F2 /* crate_lib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crate_lib.h; path = Source/Objects/Hardware/Camac/C111C/crate_lib.h; sourceTree = SOURCE_ROOT; };
+		84AB8BBB0D2314CD00EC39F2 /* C111C.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = C111C.nib; path = Source/Objects/Hardware/Camac/C111C/C111C.nib; sourceTree = SOURCE_ROOT; };
+		84AB8BBC0D2314CD00EC39F2 /* C111C.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = C111C.tif; path = Source/Objects/Hardware/Camac/C111C/C111C.tif; sourceTree = SOURCE_ROOT; };
+		84AB8BBD0D2314CD00EC39F2 /* ORC111CController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORC111CController.h; path = Source/Objects/Hardware/Camac/C111C/ORC111CController.h; sourceTree = SOURCE_ROOT; };
+		84AB8BBE0D2314CD00EC39F2 /* ORC111CController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORC111CController.m; path = Source/Objects/Hardware/Camac/C111C/ORC111CController.m; sourceTree = SOURCE_ROOT; };
+		84AB8BBF0D2314CD00EC39F2 /* ORC111CModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORC111CModel.h; path = Source/Objects/Hardware/Camac/C111C/ORC111CModel.h; sourceTree = SOURCE_ROOT; };
+		84AB8BC00D2314CD00EC39F2 /* ORC111CModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORC111CModel.m; path = Source/Objects/Hardware/Camac/C111C/ORC111CModel.m; sourceTree = SOURCE_ROOT; };
+		84AB8BCA0D2314DD00EC39F2 /* JAMF.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = JAMF.gif; path = Source/Objects/Hardware/Camac/JAM_F/JAMF.gif; sourceTree = SOURCE_ROOT; };
+		84AB8BCB0D2314DD00EC39F2 /* JAMF.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = JAMF.nib; path = Source/Objects/Hardware/Camac/JAM_F/JAMF.nib; sourceTree = SOURCE_ROOT; };
+		84AB8BCC0D2314DD00EC39F2 /* ORJAMFController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORJAMFController.h; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFController.h; sourceTree = SOURCE_ROOT; };
+		84AB8BCD0D2314DD00EC39F2 /* ORJAMFController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFController.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFController.m; sourceTree = SOURCE_ROOT; };
+		84AB8BCE0D2314DD00EC39F2 /* ORJAMFModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORJAMFModel.h; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFModel.h; sourceTree = SOURCE_ROOT; };
+		84AB8BCF0D2314DD00EC39F2 /* ORJAMFModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFModel.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFModel.m; sourceTree = SOURCE_ROOT; };
 		84AC6A4E0A34F9A800A0018E /* NcdPulseChannelsTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NcdPulseChannelsTask.h; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.h; sourceTree = SOURCE_ROOT; };
 		84AC6A4F0A34F9A800A0018E /* NcdPulseChannelsTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = NcdPulseChannelsTask.m; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.m; sourceTree = SOURCE_ROOT; };
 		84AC6A500A34F9A800A0018E /* NcdPulseChannelsTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdPulseChannelsTask.nib; path = Source/Experiments/Ncd/PulseChannelsTask/NcdPulseChannelsTask.nib; sourceTree = SOURCE_ROOT; };
@@ -4189,11 +4221,13 @@
 				2A4553DA08BCE9A3004BB15E /* TDC3377 */,
 				546D9DA60874BDD60072A274 /* TDC2228A */,
 				84A16C4C0A7EB7CE005BC151 /* ADC_L */,
+				84AB8BC90D2314DD00EC39F2 /* JAM_F */,
 				8472AD670A82BD8E0069A069 /* BiRa3251 */,
 				842DAEB40A82CA8400C942A2 /* BiRa2351 */,
 				1C50F9E308033CA9008D18EA /* ADC2249 */,
 				849C67FC0A2CC06F00511E30 /* CCUSB */,
 				841DA65E078211E70099BBF6 /* CC32 */,
+				84AB8BB80D2314CD00EC39F2 /* C111C */,
 				8446CE1607B847B8006CD9C4 /* AD413 */,
 				84D980910795C5AC0074A035 /* AD811 */,
 				849DDE5608F466630052AFC6 /* AD3511 */,
@@ -4350,6 +4384,7 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
+				84AB8BB30D2314A500EC39F2 /* CmdHistory */,
 				9C1363AF0D0A78FC006C550D /* NplHV */,
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
 				2AAB08F808E36CCE00BB0792 /* Testing */,
@@ -5833,6 +5868,46 @@
 			);
 			path = AcqirisDC440;
 			sourceTree = "<group>";
+		};
+		84AB8BB30D2314A500EC39F2 /* CmdHistory */ = {
+			isa = PBXGroup;
+			children = (
+				84AB8BB40D2314A500EC39F2 /* ORCmdHistory.h */,
+				84AB8BB50D2314A500EC39F2 /* ORCmdHistory.m */,
+			);
+			name = CmdHistory;
+			path = "Source/Objects/Misc Objects/CmdHistory";
+			sourceTree = SOURCE_ROOT;
+		};
+		84AB8BB80D2314CD00EC39F2 /* C111C */ = {
+			isa = PBXGroup;
+			children = (
+				84AB8BB90D2314CD00EC39F2 /* crate_lib.m */,
+				84AB8BBA0D2314CD00EC39F2 /* crate_lib.h */,
+				84AB8BBB0D2314CD00EC39F2 /* C111C.nib */,
+				84AB8BBC0D2314CD00EC39F2 /* C111C.tif */,
+				84AB8BBD0D2314CD00EC39F2 /* ORC111CController.h */,
+				84AB8BBE0D2314CD00EC39F2 /* ORC111CController.m */,
+				84AB8BBF0D2314CD00EC39F2 /* ORC111CModel.h */,
+				84AB8BC00D2314CD00EC39F2 /* ORC111CModel.m */,
+			);
+			name = C111C;
+			path = Source/Objects/Hardware/Camac/C111C;
+			sourceTree = SOURCE_ROOT;
+		};
+		84AB8BC90D2314DD00EC39F2 /* JAM_F */ = {
+			isa = PBXGroup;
+			children = (
+				84AB8BCA0D2314DD00EC39F2 /* JAMF.gif */,
+				84AB8BCB0D2314DD00EC39F2 /* JAMF.nib */,
+				84AB8BCC0D2314DD00EC39F2 /* ORJAMFController.h */,
+				84AB8BCD0D2314DD00EC39F2 /* ORJAMFController.m */,
+				84AB8BCE0D2314DD00EC39F2 /* ORJAMFModel.h */,
+				84AB8BCF0D2314DD00EC39F2 /* ORJAMFModel.m */,
+			);
+			name = JAM_F;
+			path = Source/Objects/Hardware/Camac/JAM_F;
+			sourceTree = SOURCE_ROOT;
 		};
 		84AC6A4D0A34F9A800A0018E /* PulseChannelsTask */ = {
 			isa = PBXGroup;
@@ -7881,6 +7956,12 @@
 				9C1363CD0D0A7921006C550D /* ORCaen265Model.h in Headers */,
 				CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */,
 				84071B690D185E7F00FD6EFD /* ORDataChainObject.h in Headers */,
+				84AB8BB60D2314A500EC39F2 /* ORCmdHistory.h in Headers */,
+				84AB8BC20D2314CD00EC39F2 /* crate_lib.h in Headers */,
+				84AB8BC50D2314CD00EC39F2 /* ORC111CController.h in Headers */,
+				84AB8BC70D2314CD00EC39F2 /* ORC111CModel.h in Headers */,
+				84AB8BD20D2314DD00EC39F2 /* ORJAMFController.h in Headers */,
+				84AB8BD40D2314DD00EC39F2 /* ORJAMFModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8371,6 +8452,10 @@
 				CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */,
 				CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */,
 				9C086CE90D10AB6200524F47 /* mainFocalPlaneDetector.tif in Resources */,
+				84AB8BC30D2314CD00EC39F2 /* C111C.nib in Resources */,
+				84AB8BC40D2314CD00EC39F2 /* C111C.tif in Resources */,
+				84AB8BD00D2314DD00EC39F2 /* JAMF.gif in Resources */,
+				84AB8BD10D2314DD00EC39F2 /* JAMF.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8939,6 +9024,12 @@
 				9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */,
 				9C1363CE0D0A7921006C550D /* ORCaen265Model.m in Sources */,
 				84071B6A0D185E7F00FD6EFD /* ORDataChainObject.m in Sources */,
+				84AB8BB70D2314A500EC39F2 /* ORCmdHistory.m in Sources */,
+				84AB8BC10D2314CD00EC39F2 /* crate_lib.m in Sources */,
+				84AB8BC60D2314CD00EC39F2 /* ORC111CController.m in Sources */,
+				84AB8BC80D2314CD00EC39F2 /* ORC111CModel.m in Sources */,
+				84AB8BD30D2314DD00EC39F2 /* ORJAMFController.m in Sources */,
+				84AB8BD50D2314DD00EC39F2 /* ORJAMFModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
