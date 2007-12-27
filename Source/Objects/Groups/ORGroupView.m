@@ -920,11 +920,11 @@
 {
     NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSDragPboard];
     NSData* data = [pb dataForType:ORGroupDragBoardItem];
+	BOOL result = YES;
     if(data){
         NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
         id objectList = [unarchiver decodeObjectForKey:ORObjArrayPtrPBType];
-        [unarchiver finishDecoding];
-        [unarchiver release];
+		
         
         NSEnumerator* e = [objectList objectEnumerator];
         NSNumber* aPointer;
@@ -953,11 +953,12 @@
                     [newObjects addObject:newObject];
                     [newObject release];
                 }
-                else return NO;
+                else {
+					result = NO;
+					break;
+				}
             }
-            [group addObjects:newObjects];
-            return YES;
-            
+            if(result)[group addObjects:newObjects];            
         }
         else if(op == @"move"){	
             while(aPointer = [e nextObject]){
@@ -967,12 +968,18 @@
                 if([self canAddObject:anObject atPoint:newPoint]){
                     [self moveObject:anObject to:NSMakePoint(aPoint.x + anOffset.x,aPoint.y + anOffset.y)];
                 }
-                else return NO;
-            }
-            return YES;
-        }
+                else {					
+					result = NO;
+					break;
+				}
+			}
+		}
+		
+		[unarchiver finishDecoding];
+		[unarchiver release];
+		
     }
-    return NO;
+    return result;
 }
 @end
 

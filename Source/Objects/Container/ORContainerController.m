@@ -135,11 +135,13 @@
 -(void) groupChanged:(NSNotification*)note
 {
     if(note == nil || [note object] == model || [[note object] guardian] == model){
-        [model setUpImage];
-        [groupView setNeedsDisplay:YES];
+		//the icon needs to be updated, but we may get this notification many times if a group is moving, so 
+		//we'll schedule an update later, cancelling each request until only one is left.
+		[NSObject cancelPreviousPerformRequestsWithTarget:model selector:@selector(setUpImage) object:nil];
+		[model performSelector:@selector(setUpImage) withObject:nil afterDelay:1];
+		[groupView setNeedsDisplay:YES];
     }
 }
-
 
 #pragma mark ¥¥¥Interface Management
 - (void) endEditing

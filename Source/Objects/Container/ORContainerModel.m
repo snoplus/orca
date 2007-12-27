@@ -42,15 +42,15 @@ NSString* ORContainerScaleChangedNotification = @"ORContainerScaleChangedNotific
     
     if([[self orcaObjects] count]){
 		NSImage* imageOfObjects = [self imageOfObjects:[self orcaObjects] withTransparency:1.0];
-		float xScale = [aCachedImage size].width/[imageOfObjects size].width;
-		float yScale = [aCachedImage size].height/[imageOfObjects size].height;
+		float xScale = .75*[aCachedImage size].width/[imageOfObjects size].width;
+		float yScale = .75*[aCachedImage size].height/[imageOfObjects size].height;
 		float scale = MIN(.3,MIN(xScale,yScale));
 		float newWidth = [imageOfObjects size].width*scale;
 		float newHeight = [imageOfObjects size].height*scale;
 		
-		[imageOfObjects setSize:NSMakeSize(newWidth-20,newHeight-20)];
-		[imageOfObjects compositeToPoint:NSMakePoint(10 + [aCachedImage size].width/2-newWidth/2, 5 + [aCachedImage size].height/2-newHeight/2) operation:NSCompositeSourceAtop];
-    }
+		[imageOfObjects setSize:NSMakeSize(newWidth,newHeight)];
+		[imageOfObjects compositeToPoint:NSMakePoint([aCachedImage size].width/2-newWidth/2, [aCachedImage size].height/2-newHeight/2) operation:NSCompositeSourceAtop];
+	}
 	
 	if([self uniqueIdNumber]){
         NSAttributedString* n = [[NSAttributedString alloc] 

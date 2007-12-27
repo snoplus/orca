@@ -426,7 +426,7 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     float minx,miny;
     
     NSEnumerator *enumerator = [someObjects objectEnumerator];
-    NSRect theEnclosingRect  = [self rectEnclosingObjects:[self selectedObjects]];
+    NSRect theEnclosingRect  = [self rectEnclosingObjects:someObjects];
     NSImage* anUnScaledImage = [[NSImage alloc] initWithSize:theEnclosingRect.size];
     
     id anObject;
@@ -438,7 +438,7 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     
     [anUnScaledImage lockFocus];
     while ((anObject = [enumerator nextObject])) {
-        [anObject drawImageAtOffset:NSMakePoint(-minx, -miny) withTransparency:(float)aTransparency];
+       [anObject drawImageAtOffset:NSMakePoint(-minx, -miny) withTransparency:(float)aTransparency];
     }
     [anUnScaledImage unlockFocus];
     
