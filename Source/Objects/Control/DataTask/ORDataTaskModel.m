@@ -93,6 +93,11 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     
 }
 
+- (BOOL) solitaryObject
+{
+    return YES;
+}
+
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"DataTask"]];
