@@ -345,7 +345,8 @@ NSString* ORProcessModelShortNameChangedNotification   = @"ORProcessModelShortNa
 }
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
 {
-    return [aGuardian isMemberOfClass:[self guardianClass]];
+    return [aGuardian isMemberOfClass:NSClassFromString(@"ORGroup")] ||
+		   [aGuardian isMemberOfClass:NSClassFromString(@"ORContainerModel")];
 }
 
 - (void) setUniqueIdNumber :(unsigned long)aNumber
