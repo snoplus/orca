@@ -43,14 +43,14 @@
 {
 	[super awakeFromNib];
 	
-    [[plotter0 yScale] setRngLow:0.0 withHigh:12.];
-	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:12 withMinRng:4];
-    [[plotter1 yScale] setRngLow:0.0 withHigh:12.];
-	[[plotter1 yScale] setRngLimitsLow:0.0 withHigh:12 withMinRng:4];
-    [[plotter2 yScale] setRngLow:0.0 withHigh:12.];
-	[[plotter2 yScale] setRngLimitsLow:0.0 withHigh:12 withMinRng:4];
-    [[plotter3 yScale] setRngLow:0.0 withHigh:12.];
-	[[plotter3 yScale] setRngLimitsLow:0.0 withHigh:12 withMinRng:4];
+    [[plotter0 yScale] setRngLow:-12.0 withHigh:12.];
+	[[plotter0 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
+    [[plotter1 yScale] setRngLow:-12.0 withHigh:12.];
+	[[plotter1 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
+    [[plotter2 yScale] setRngLow:-12.0 withHigh:12.];
+	[[plotter2 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
+    [[plotter3 yScale] setRngLow:-12.0 withHigh:12.];
+	[[plotter3 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
 
 
     [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
@@ -61,6 +61,11 @@
 	[[plotter2 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[plotter3 xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter3 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
+	
+	[plotter0 setUseGradient:YES];
+	[plotter1 setUseGradient:YES];
+	[plotter2 setUseGradient:YES];
+	[plotter3 setUseGradient:YES];
 }
 
 
@@ -521,6 +526,7 @@
 - (IBAction) readAdcsAction:(id)sender
 {
     NS_DURING
+		[self endEditing];
         [model checkCratePower];
         [model readAdcs:YES];
     NS_HANDLER
