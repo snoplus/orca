@@ -268,9 +268,10 @@ struct {
 
 		[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORJADCLModelAdcValueChanged object:self userInfo:userInfo] waitUntilDone:NO];
 
-		if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
-		[timeRates[aChan] addDataToTimeAverage:anAdcValue];
 	}
+	
+	if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
+	[timeRates[aChan] addDataToTimeAverage:anAdcValue];
 }
 
 - (float) adcRange:(unsigned short)aChan
