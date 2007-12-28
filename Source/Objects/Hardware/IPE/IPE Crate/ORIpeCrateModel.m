@@ -72,7 +72,7 @@ static NSString* ORIpeCrateFireWireOut 	= @"ORIpeCrateFireWireOut";
     
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
-        [transform translateXBy:10 yBy:25];
+        [transform translateXBy:10 yBy:28];
         [transform scaleXBy:.5 yBy:.5];
         [transform concat];
         NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
