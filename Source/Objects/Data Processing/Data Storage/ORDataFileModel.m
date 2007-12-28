@@ -26,6 +26,9 @@
 #import "ORSmartFolder.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORDataFileModelFileSegmentChanged = @"ORDataFileModelFileSegmentChanged";
+NSString* ORDataFileModelMaxFileSizeChanged = @"ORDataFileModelMaxFileSizeChanged";
+NSString* ORDataFileModelLimitSizeChanged = @"ORDataFileModelLimitSizeChanged";
 NSString* ORDataFileChangedNotification                 = @"The DataFile File Has Changed";
 NSString* ORDataFileStatusChangedNotification 		= @"The DataFile Status Has Changed";
 NSString* ORDataFileSizeChangedNotification 		= @"The DataFile Size Has Changed";
@@ -171,6 +174,47 @@ static const int currentVersion = 1;           // Current version
 
 #pragma mark ¥¥¥Accessors
 
+- (int) fileSegment
+{
+    return fileSegment;
+}
+
+- (void) setFileSegment:(int)aFileSegment
+{
+    fileSegment = aFileSegment;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelFileSegmentChanged object:self];
+}
+
+- (float) maxFileSize
+{
+    return maxFileSize;
+}
+
+- (void) setMaxFileSize:(float)aMaxFileSize
+{
+	if(aMaxFileSize<10)aMaxFileSize=10;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setMaxFileSize:maxFileSize];
+    
+    maxFileSize = aMaxFileSize;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelMaxFileSizeChanged object:self];
+}
+
+- (BOOL) limitSize
+{
+    return limitSize;
+}
+
+- (void) setLimitSize:(BOOL)aLimitSize
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLimitSize:limitSize];
+    
+    limitSize = aLimitSize;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelLimitSizeChanged object:self];
+}
+
 
 - (ORSmartFolder *)dataFolder 
 {
@@ -213,7 +257,7 @@ static const int currentVersion = 1;           // Current version
     
     [fileName autorelease];
     fileName = [aFileName copy];
-    
+    	
     [[NSNotificationCenter defaultCenter]
 				postNotificationName:ORDataFileChangedNotification
                               object:self];
@@ -291,14 +335,26 @@ static const int currentVersion = 1;           // Current version
             [dataBuffer setLength:0];
             lastTime = [NSDate timeIntervalSinceReferenceDate];
         }
+		
+		if(fileLimitExceeded){
+			NSString* reason = [NSString stringWithFormat:@"File size exceeded %.1f MB",maxFileSize];
+			
+			[[NSNotificationCenter defaultCenter]
+					postNotificationName:ORRequestRunStop
+								  object:self
+								userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+			fileLimitExceeded = NO;
+		}
     }
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     if(!dataBuffer)dataBuffer = [[NSMutableData dataWithCapacity:20*1024] retain];
-    lastTime = [NSDate timeIntervalSinceReferenceDate];
-    
+    lastTime	 = [NSDate timeIntervalSinceReferenceDate];
+    fileSegment = 1;
+	fileLimitExceeded = NO;
+	
     if(processedRunStart) return;
     else {
         processedRunStart = YES;
@@ -454,6 +510,10 @@ static const int currentVersion = 1;           // Current version
 {
     dataFileSize = aNumber;
     
+	if(limitSize && (dataFileSize >= maxFileSize*1000000)){
+		fileLimitExceeded = YES;
+	}
+	
     [[NSNotificationCenter defaultCenter]
 			postNotificationName:ORDataFileSizeChangedNotification
                           object: self];
@@ -498,6 +558,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setMaxFileSize:[decoder decodeFloatForKey:@"ORDataFileModelMaxFileSize"]];
+    [self setLimitSize:[decoder decodeBoolForKey:@"ORDataFileModelLimitSize"]];
     int  version = [decoder decodeIntForKey:ORDataVersion];
     
     //-------------------------------------------------------------------------------
@@ -544,6 +606,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeFloat:maxFileSize forKey:@"ORDataFileModelMaxFileSize"];
+    [encoder encodeBool:limitSize forKey:@"ORDataFileModelLimitSize"];
     [encoder encodeInt:currentVersion forKey:ORDataVersion];
     [encoder encodeObject:dataFolder forKey:ORDataDataFolderName];
     [encoder encodeObject:statusFolder forKey:ORDataStatusFolderName];

@@ -48,9 +48,19 @@
         
         NSMutableData*     dataBuffer;
         NSTimeInterval     lastTime;
+		BOOL		limitSize;
+		float		maxFileSize;
+		int			fileSegment;
+		BOOL		fileLimitExceeded;
 }
 
 #pragma mark ¥¥¥Accessors
+- (int) fileSegment;
+- (void) setFileSegment:(int)aFileSegment;
+- (float) maxFileSize;
+- (void) setMaxFileSize:(float)aMaxFileSize;
+- (BOOL) limitSize;
+- (void) setLimitSize:(BOOL)aLimitSize;
 - (ORSmartFolder *)dataFolder;
 - (void)setDataFolder:(ORSmartFolder *)aDataFolder;
 - (ORSmartFolder *)statusFolder;
@@ -84,11 +94,16 @@
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
-
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
+
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORDataFileModelFileSegmentChanged;
+extern NSString* ORDataFileModelMaxFileSizeChanged;
+extern NSString* ORDataFileModelLimitSizeChanged;
 extern NSString* ORDataFileChangedNotification;
 extern NSString* ORDataFileStatusChangedNotification;
 extern NSString* ORDataFileSizeChangedNotification;

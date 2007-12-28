@@ -69,6 +69,18 @@ enum {
 
 
 #pragma  mark ¥¥¥Actions
+
+- (IBAction) maxFileSizeTextFieldAction:(id)sender
+{
+	[model setMaxFileSize:[sender floatValue]];	
+}
+
+- (IBAction) limitSizeAction:(id)sender
+{
+	[model setLimitSize:[sender intValue]];
+	[self lockChanged:nil];	
+}
+
 - (IBAction) lockButtonAction:(id)sender
 {
     [gSecurity tryToSetLock:ORDataFileLock to:[sender intValue] forWindow:[self window]];
@@ -106,6 +118,17 @@ enum {
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) maxFileSizeChanged:(NSNotification*)aNote
+{
+	[maxFileSizeTextField setFloatValue: [model maxFileSize]];
+}
+
+- (void) limitSizeChanged:(NSNotification*)aNote
+{
+	[limitSizeCB setIntValue: [model limitSize]];
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -115,8 +138,14 @@ enum {
 	
     [notifyCenter addObserver : self
 					 selector : @selector(fileChanged:)
+						 name : ORDataFileModelFileSegmentChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(fileChanged:)
 						 name : ORDataFileChangedNotification
 						object: model];
+
 	
     [notifyCenter addObserver : self
 					 selector : @selector(fileStatusChanged:)
@@ -163,6 +192,21 @@ enum {
                          name : ORDataFileLock
 						object: nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(limitSizeChanged:)
+                         name : ORDataFileModelLimitSizeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(maxFileSizeChanged:)
+                         name : ORDataFileModelMaxFileSizeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lockChanged:)
+                         name : ORRunStatusChangedNotification
+						object: nil];
+
 }
 
 - (void) updateWindow
@@ -176,6 +220,8 @@ enum {
     [self fileStatusChanged:nil];
     [self saveConfigurationChanged:nil];
     [self lockChanged:nil];
+	[self limitSizeChanged:nil];
+	[self maxFileSizeChanged:nil];
 }
 
 
@@ -204,18 +250,18 @@ enum {
 
 - (void) lockChanged:(NSNotification*)aNotification
 {
-    BOOL locked = [gSecurity isLocked: ORDataFileLock];
+    BOOL locked    = [gSecurity isLocked: ORDataFileLock];
+	BOOL isRunning = [gOrcaGlobals runInProgress];
     [lockButton setState: locked];
     [saveConfigurationCB setEnabled: !locked];
+	[maxFileSizeTextField setEnabled: !(locked || isRunning) && [model limitSize]];
+	[limitSizeCB setEnabled: !(locked || isRunning)];
 }
 
 - (void) fileChanged:(NSNotification*)note
 {
 	if([model fileName]!=nil)[fileTextField setStringValue: [model fileName]];
 	[self fileStatusChanged:nil];
-	
-    [self fileStatusChanged:nil];
-	
 }
 
 - (void) copyEnabledChanged:(NSNotification*)note

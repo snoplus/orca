@@ -22,6 +22,8 @@
 @interface ORDataFileController : OrcaObjectController  {
     @private
 	IBOutlet NSTextField* 	dirTextField;
+	IBOutlet NSTextField*	maxFileSizeTextField;
+	IBOutlet NSButton*		limitSizeCB;
 	IBOutlet NSTextField* 	fileTextField;
 	IBOutlet NSTextField* 	statusTextField;
 	IBOutlet NSTextField* 	sizeTextField;
@@ -50,12 +52,16 @@
 #pragma mark ¥¥¥Accessors
 
 #pragma  mark ¥¥¥Actions
+- (IBAction) maxFileSizeTextFieldAction:(id)sender;
+- (IBAction) limitSizeAction:(id)sender;
 - (IBAction) saveConfigurationAction:(id)sender;
 
 - (IBAction) stopSendingAction:(id)sender;
 - (IBAction) lockButtonAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
+- (void) maxFileSizeChanged:(NSNotification*)aNote;
+- (void) limitSizeChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
