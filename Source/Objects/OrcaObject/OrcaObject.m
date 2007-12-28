@@ -411,6 +411,9 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) drawSelf:(NSRect)aRect withTransparency:(float)aTransparency
 {
+	//a workaround for a case where image hasn't been made yet.. don't worry--it will get made below if need be.
+	if(aRect.size.height == 0)aRect.size.height = 1;
+	if(aRect.size.width == 0)aRect.size.width = 1;
 	
     if(NSIntersectsRect(aRect,[self frame])){
 		
