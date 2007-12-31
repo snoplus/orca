@@ -93,6 +93,7 @@
                                 length:(unsigned long) numWords;
 
 - (void) sendCmd:(NSString*)aCmd verbose:(BOOL)verbose;
+- (void) handleIRQ:(short)irq_type data:(unsigned int)irq_data;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 

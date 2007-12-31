@@ -233,6 +233,20 @@ int csock_canread(SOCKET sck)
 	return 0;
 }
 
+int csock_hasBytesToRead(SOCKET sck)
+{
+    int	bytesAvailable = 0;
+    if( sck > 0 ){
+		if( ioctl( sck, FIONREAD, &bytesAvailable ) == -1 ){
+			if( errno == EINVAL) bytesAvailable = -1;
+			else				 bytesAvailable = 0;
+		}
+    }
+	else bytesAvailable = -1;
+    return bytesAvailable;
+}
+
+
 ////////////////////////////////////////////
 //	csock_send
 ////////////////////////////////////////////
@@ -285,7 +299,7 @@ int csock_recv_t(SOCKET sck, void *buffer, int size, int timeout)
 	buf[pos] = '\0';
 
 	while (pos < size) {
-		if (csock_canread(sck)) {
+		if (csock_hasBytesToRead(sck)) {
 			rp = recv(sck, &buf[pos], 1, 0);
 			if (rp < 0) 
 				return -1;
@@ -388,7 +402,7 @@ int csock_recvline_t(SOCKET sck, char *buffer, int size, int timeout)
 	buffer[pos] = '\0';
 	
 	while (pos < size) {
-		if (csock_canread(sck)) {
+		if (csock_hasBytesToRead(sck)) {
 			rp = recv(sck, &buffer[pos], 1, 0);
 			if (rp > 0) {
 				buffer[pos + 1] = '\0';
@@ -645,7 +659,7 @@ void* IRQ_Handler(void *arg)
 #endif
 {
     short crate_id = *((short *)arg);
-    char cmd[256], resp[2], *stops;
+    char cmd[256], resp[2];
 	short irq_type, res;
 	unsigned int irq_data;
     resp[0] = 'A';
@@ -662,24 +676,23 @@ void* IRQ_Handler(void *arg)
 			else {
 				res = csock_recvline_t(crate_info[crate_id].sock_irq, cmd, 255, crate_info[crate_id].tout_ticks);
 			}
-
 			if (res > 0) {
 				if (crate_info[crate_id].irq_callback != NULL) {
 					switch (cmd[0]) {
 						case 'L':
 							irq_type = LAM_INT;
-							irq_data = strtoul(&cmd[2], &stops, 16);
+							irq_data = strtoul(&cmd[2], 0, 16);
 							break;
 						case 'C':
 							irq_type = COMBO_INT;
-							irq_data = strtoul(&cmd[2], &stops, 16);
+							irq_data = strtoul(&cmd[2], 0, 16);
 							break;
 						case 'D':
 							irq_type = DEFAULT_INT;
-							irq_data = strtoul(&cmd[2], &stops, 16);
+							irq_data = strtoul(&cmd[2], 0, 16);
 							break;
 					}
-					crate_info[crate_id].irq_callback((short)crate_id, irq_type, irq_data);
+					crate_info[crate_id].irq_callback((short)crate_id, irq_type, irq_data, crate_info[crate_id].userInfo);
 				}
 				res = csock_send(crate_info[crate_id].sock_irq, resp, 2);
 			}
@@ -850,7 +863,7 @@ short CRTOUT(short crate_id, unsigned int tout)
 ////////////////////////////////////////////
 //	CRIRQ
 ////////////////////////////////////////////
-short CRIRQ(short crate_id, IRQ_CALLBACK irq_callback)
+short CRIRQ(short crate_id, IRQ_CALLBACK irq_callback, unsigned long userInfo)
 {
 	short retcode = CRATE_OK;
 #ifdef WIN32
@@ -865,6 +878,8 @@ short CRIRQ(short crate_id, IRQ_CALLBACK irq_callback)
 	tempId[crate_id] = crate_id;	
 	
 	crate_info[crate_id].irq_callback = irq_callback;
+	crate_info[crate_id].userInfo = userInfo;
+	
 #ifdef WIN32
 	crate_info[crate_id].irq_tid = CreateThread(0, 0, IRQ_Handler, &tempId[crate_id], 0, &pid);
 	if(!crate_info[crate_id].irq_tid) {
@@ -1378,7 +1393,7 @@ short BLKTRANSF(short crate_id, BLK_TRANSF_INFO *blk_info, unsigned int *buffer)
 {
 	int i, j, resp, bytes_per_row, bytes_received, bytes_sent, rows, buf_index;
 	short retcode = CRATE_ERROR;
-	char blk_ascii_buf[4096], *stops;
+	char blk_ascii_buf[4096];
 	unsigned int row_buf[2048], transf_res;
 	PARAMETER lParam[MAX_PAR];
 
@@ -1472,7 +1487,7 @@ short BLKTRANSF(short crate_id, BLK_TRANSF_INFO *blk_info, unsigned int *buffer)
 				else {
 					for (j = 0; j < blk_info->blksize; j++) {
 						if (row_buf[0] > 0) {
-							buffer[(i * blk_info->blksize) + j] = strtoul((char *)&blk_ascii_buf[4 + (j * 7)], &stops, 16) & 0xFFFFFF;
+							buffer[(i * blk_info->blksize) + j] = strtoul((char *)&blk_ascii_buf[4 + (j * 7)], 0, 16) & 0xFFFFFF;
 						}
 					}
 				}
@@ -1486,9 +1501,9 @@ short BLKTRANSF(short crate_id, BLK_TRANSF_INFO *blk_info, unsigned int *buffer)
 					}
 				}
 				else {
-					transf_res = strtoul((char *)&blk_ascii_buf[0], &stops, 10);
+					transf_res = strtoul((char *)&blk_ascii_buf[0], 0, 10);
 					if (transf_res <= 0) {
-						blk_info->totsize = (short) strtoul((char *)&blk_ascii_buf[4], &stops, 16);
+						blk_info->totsize = (short) strtoul((char *)&blk_ascii_buf[4], 0, 16);
 						retcode = (short) transf_res;
 						break;
 					}

@@ -132,7 +132,7 @@ typedef struct {
 //	CRATE_INFO Structure
 ////////////////////////////////////////////
 
-typedef void (*IRQ_CALLBACK) (short, short, unsigned int);
+typedef void (*IRQ_CALLBACK) (short, short, unsigned int, unsigned long);
 
 typedef struct {
 	unsigned char		connected;
@@ -147,6 +147,7 @@ typedef struct {
 
 	IRQ_CALLBACK		irq_callback;
 	HANDLE				irq_tid;
+	unsigned long		userInfo;
 } CRATE_INFO;
 
 ////////////////////////////////////////////
@@ -182,7 +183,7 @@ int csock_close			(SOCKET sck);
 
 int csock_canwrite		(SOCKET sck);
 int csock_canread		(SOCKET sck);
-
+int csock_hasBytesToRead(SOCKET sck);
 int csock_send			(SOCKET sck, void *buffer, int size);
 int csock_sendto		(SOCKET sck, void *buffer, int size, struct sockaddr *dest);
 
@@ -208,7 +209,7 @@ int csock_flush			(SOCKET sck);
 short CROPEN	(char *address);
 short CRCLOSE	(short crate_id);
 
-short CRIRQ		(short crate_id, IRQ_CALLBACK irq_callback);
+short CRIRQ		(short crate_id, IRQ_CALLBACK irq_callback, unsigned long userInfo);
 
 short CRGET		(short crate_id, CRATE_INFO *cr_info);
 short CRSET		(short crate_id, CRATE_INFO *cr_info);

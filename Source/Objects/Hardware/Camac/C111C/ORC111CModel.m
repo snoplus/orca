@@ -43,6 +43,13 @@ NSString* ORC111CConnectionChanged			= @"ORC111CConnectionChanged";
 NSString* ORC111CTimeConnectedChanged		= @"ORC111CTimeConnectedChanged";
 NSString* ORC111CIpAddressChanged			= @"ORC111CIpAddressChanged";
 
+void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned long userInfo)
+{
+	NSLog(@"got irq\n");
+	id obj = (id)userInfo;
+	[obj handleIRQ:irq_type data:irq_data];
+}
+
 @implementation ORC111CModel
 
 -(void) dealloc
@@ -231,8 +238,11 @@ NSString* ORC111CIpAddressChanged			= @"ORC111CIpAddressChanged";
 			int res = CRGET(crate_id, &cr_info);
 			if(res == CRATE_OK){
 				[self setIsConnected: YES];
-				cr_info. tout_ticks = 100000; 
+				cr_info.tout_ticks = 1000000; 
 				CRSET(crate_id, &cr_info);
+				[ORTimer delay:.3];
+				int res = CRIRQ(crate_id,IRQHandler,(unsigned long)(self));
+				NSLog(@"res: %d\n",res);
 			}
 		}
 	}
@@ -542,6 +552,30 @@ NSString* ORC111CIpAddressChanged			= @"ORC111CIpAddressChanged";
   	return result;
 }
 
+- (void) handleIRQ:(short)irq_type data:(unsigned int)irq_data
+{
+	switch (irq_type) { 
+		case LAM_INT: 
+			// Do something when a LAM event occurs 
+			// Write your code here 
+			NSLog(@"got LAM irq\n");
+			LACK(crate_id);
+		break; 
+		
+		case COMBO_INT: 
+			NSLog(@"got combo irq\n");
+			// Do something when a COMBO event occurs 
+			// Write your code here 
+		break; 
+		
+		case DEFAULT_INT:
+			NSLog(@"got default irq\n");
+			// Do something when the ìDEFAULTî button is pressed  
+			// Write your code here 
+		break; 
+	} 
+}
+
 
 - (void) sendCmd:(NSString*)aCmd verbose:(BOOL)verbose
 {
@@ -580,6 +614,7 @@ NSString* ORC111CIpAddressChanged			= @"ORC111CIpAddressChanged";
     [encoder encodeInt:stationToTest forKey:@"ORC111CModelStationToTest"];
     [encoder encodeObject:ipAddress forKey:@"IpAddress"];
 }
+
 
 @end
 
