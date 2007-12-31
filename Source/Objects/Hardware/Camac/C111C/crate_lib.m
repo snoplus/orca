@@ -697,6 +697,7 @@ void* IRQ_Handler(void *arg)
 				res = csock_send(crate_info[crate_id].sock_irq, resp, 2);
 			}
 			else {
+                crate_info[crate_id].irq_tid = 0;
 #ifdef WIN32
 				return 0;
 #else
@@ -713,6 +714,7 @@ void* IRQ_Handler(void *arg)
 		}
 
     }
+    crate_info[crate_id].irq_tid = 0;
 #ifdef WIN32
     return 0;                    
 #else
@@ -809,12 +811,14 @@ short CRCLOSE(short crate_id)
 		crate_info[crate_id].irq_tid = 0;
 		
 		crate_info[crate_id].connected = 0;
+        if(crate_info[crate_id].irq_tid != 0){
 #ifdef WIN32
-		TerminateThread(crate_info[crate_id].irq_tid, 0);
-		CloseHandle(crate_info[crate_id].irq_tid);
+            TerminateThread(crate_info[crate_id].irq_tid, 0);
+            CloseHandle(crate_info[crate_id].irq_tid);
 #else
-		pthread_cancel(crate_info[crate_id].irq_tid);
+            pthread_cancel(crate_info[crate_id].irq_tid);
 #endif
+        }
 	}
 
 	return CRATE_OK;
