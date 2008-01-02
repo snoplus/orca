@@ -249,7 +249,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 			int res = CRGET(crate_id, &cr_info);
 			if(res == CRATE_OK){
 				[self setIsConnected: YES];
-				cr_info.tout_ticks = 1000000; 
+				cr_info.tout_ticks = 1000; 
 				CRSET(crate_id, &cr_info);
 				[ORTimer delay:.3];
 				int res = CRIRQ(crate_id,IRQHandler,(unsigned long)(self));
