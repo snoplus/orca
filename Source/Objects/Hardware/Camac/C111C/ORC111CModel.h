@@ -41,6 +41,10 @@
     BOOL			trackTransactions;
 	ORTimer*		transactionTimer;
 	ORCmdHistory*   cmdHistory;
+	unsigned int   lamMask;
+	NSLock* socketLock;
+	NSLock* irqLock;  
+
 }
 
 #pragma mark •••Initialization

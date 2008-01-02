@@ -233,28 +233,24 @@ int csock_canread(SOCKET sck)
 	return 0;
 }
 
-int csock_hasBytesToRead(SOCKET sck)
-{
-    int	bytesAvailable = 0;
-    if( sck > 0 ){
-		if( ioctl( sck, FIONREAD, &bytesAvailable ) == -1 ){
-			if( errno == EINVAL) bytesAvailable = -1;
-			else				 bytesAvailable = 0;
-		}
-    }
-	else bytesAvailable = -1;
-    return bytesAvailable;
-}
-
 
 ////////////////////////////////////////////
 //	csock_send
 ////////////////////////////////////////////
 int csock_send(SOCKET sck, void *buffer, int size)
 {
-	if (csock_canwrite(sck))
-		return send(sck, (char *)buffer, size, 0);
-	return 0;
+	int ret = 0;
+	int pos = 0;
+	char* p = (char*)buffer;
+	while (pos < size) {
+		if (csock_canwrite(sck)){
+			ret =  send(sck, &p[pos], size, 0);
+			pos += ret;
+			size -= ret;
+			if(size<=0)break;
+		}
+	}
+	return ret;
 }
 
 ////////////////////////////////////////////
@@ -299,12 +295,13 @@ int csock_recv_t(SOCKET sck, void *buffer, int size, int timeout)
 	buf[pos] = '\0';
 
 	while (pos < size) {
-		if (csock_hasBytesToRead(sck)) {
-			rp = recv(sck, &buf[pos], 1, 0);
-			if (rp < 0) 
-				return -1;
-			pos++;
+		if (csock_canread(sck)) {
+			rp = recv(sck, &buf[pos], size, 0);
+			if (rp < 0) return -1;
+			pos+=rp;
+			size-=rp;
 		}
+		if(size==0)break;
 		if ((time(NULL) - now) > timeout) {
 			buf[pos] = '@';
 			return -3;
@@ -402,7 +399,7 @@ int csock_recvline_t(SOCKET sck, char *buffer, int size, int timeout)
 	buffer[pos] = '\0';
 	
 	while (pos < size) {
-		if (csock_hasBytesToRead(sck)) {
+		if (csock_canread(sck)) {
 			rp = recv(sck, &buffer[pos], 1, 0);
 			if (rp > 0) {
 				buffer[pos + 1] = '\0';
@@ -650,7 +647,7 @@ short GetParam(char *buffer,PARAMETER *param)
 }
 
 ////////////////////////////////////////////
-// IRQ_Handler 
+// IRQ_Handler ***** Separate thread
 ////////////////////////////////////////////
 #ifdef WIN32
 DWORD WINAPI IRQ_Handler(void *arg)
@@ -668,51 +665,35 @@ void* IRQ_Handler(void *arg)
     while (crate_info[crate_id].connected) { 
         if (crate_info[crate_id].sock_irq) {
 			
-			cmd[0] = '\0';
-			if (crate_info[crate_id].tout_ticks == 0) {
+			if( csock_canread(crate_info[crate_id].sock_irq)){
+				cmd[0] = '\0';
 				res = csock_recv(crate_info[crate_id].sock_irq, cmd, 255);
-				cmd[res] = '\0';
-			}
-			else {
-				res = csock_recvline_t(crate_info[crate_id].sock_irq, cmd, 255, crate_info[crate_id].tout_ticks);
-			}
-			if (res > 0) {
-				if (crate_info[crate_id].irq_callback != NULL) {
-					switch (cmd[0]) {
-						case 'L':
-							irq_type = LAM_INT;
-							irq_data = strtoul(&cmd[2], 0, 16);
-							break;
-						case 'C':
-							irq_type = COMBO_INT;
-							irq_data = strtoul(&cmd[2], 0, 16);
-							break;
-						case 'D':
-							irq_type = DEFAULT_INT;
-							irq_data = strtoul(&cmd[2], 0, 16);
-							break;
+		
+				if (res > 0) {
+					cmd[res] = '\0';
+					if (crate_info[crate_id].irq_callback != NULL) {
+						switch (cmd[0]) {
+							case 'L':
+								irq_type = LAM_INT;
+								irq_data = strtoul(&cmd[2], 0, 16);
+								break;
+							case 'C':
+								irq_type = COMBO_INT;
+								irq_data = strtoul(&cmd[2], 0, 16);
+								break;
+							case 'D':
+								irq_type = DEFAULT_INT;
+								irq_data = strtoul(&cmd[2], 0, 16);
+								break;
+						}
+						crate_info[crate_id].irq_callback((short)crate_id, irq_type, irq_data, crate_info[crate_id].userInfo);
 					}
-					crate_info[crate_id].irq_callback((short)crate_id, irq_type, irq_data, crate_info[crate_id].userInfo);
+					res = csock_send(crate_info[crate_id].sock_irq, resp, 2);
 				}
-				res = csock_send(crate_info[crate_id].sock_irq, resp, 2);
-			}
-			else {
-                crate_info[crate_id].irq_tid = 0;
-#ifdef WIN32
-				return 0;
-#else
-			    return NULL;                    
-#endif
+				else break;
 			}
 		}
-		else {
-#ifdef WIN32
-			Sleep(10);
-#else
-			usleep(100000);
-#endif
-		}
-
+		else break;
     }
     crate_info[crate_id].irq_tid = 0;
 #ifdef WIN32
@@ -747,7 +728,6 @@ short CROPEN(char *address)
 		init_done = 1;
 	}
 #endif // WIN32
-
 	crate_id = FindFreeId();
 	if (crate_id == -1)
 		return CRATE_MEMORY_ERROR;
@@ -755,15 +735,13 @@ short CROPEN(char *address)
 	crate_info[crate_id].connected = 0;
 
 	crate_info[crate_id].sock_ascii = csock_connect(address, CMD_PORT); 
-	if (crate_info[crate_id].sock_ascii == 0)
-		return CRATE_CONNECT_ERROR;
-	
+	if (crate_info[crate_id].sock_ascii == 0) return CRATE_CONNECT_ERROR;
+
 	crate_info[crate_id].sock_bin = csock_connect(address, BIN_PORT);
 	if (crate_info[crate_id].sock_bin == 0) {
 		csock_close(crate_info[crate_id].sock_ascii);
 		return CRATE_BIN_ERROR;
 	}
-
 	crate_info[crate_id].sock_irq = csock_connect(address, IRQ_PORT); 
 	if (crate_info[crate_id].sock_irq == 0) {
 		csock_close(crate_info[crate_id].sock_ascii);
@@ -811,6 +789,11 @@ short CRCLOSE(short crate_id)
 		crate_info[crate_id].irq_tid = 0;
 		
 		crate_info[crate_id].connected = 0;
+#ifdef WIN32
+		Sleep(1);
+#else
+		usleep(1000);
+#endif
         if(crate_info[crate_id].irq_tid != 0){
 #ifdef WIN32
             TerminateThread(crate_info[crate_id].irq_tid, 0);

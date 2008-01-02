@@ -34,7 +34,7 @@
 #import <netdb.h>
 #include <time.h> 
 
-#define kTinyDelay 0.0005
+#define kTinyDelay 0.0001
 
 NSString* ORC111CModelTrackTransactionsChanged = @"ORC111CModelTrackTransactionsChanged";
 NSString* ORC111CModelStationToTestChanged	= @"ORC111CModelStationToTestChanged";
@@ -51,12 +51,22 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 }
 
 @implementation ORC111CModel
+- (id) init
+{
+	self = [super init];
+	socketLock = [[NSLock alloc] init];
+	irqLock    = [[NSLock alloc] init];
+	return self;
+}
 
 -(void) dealloc
 {
 	[cmdHistory release];
     [ipAddress release];
 	[transactionTimer release];
+	[socketLock release];
+	[irqLock release];  
+
 	[self disconnect];
     [super dealloc];
 }
@@ -96,6 +106,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	float seconds = [transactionTimer seconds];
 	if(seconds>0){
 		int ts = 1./seconds;
+		if(ts>=kMaxNumberC111CTransactionsPerSecond-1)ts = kMaxNumberC111CTransactionsPerSecond-1;
 		transactionsPerSecondHistogram[ts]++;
 	}
 }
@@ -190,7 +201,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 
 - (void) setIpAddress:(NSString*)aIpAddress
 {
-	if(!aIpAddress)aIpAddress = @"192.168.0.98";
+	if(!aIpAddress)aIpAddress = @"";
     [[[self undoManager] prepareWithInvocationTarget:self] setIpAddress:ipAddress];
     
     [ipAddress autorelease];
@@ -265,21 +276,22 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 - (unsigned short)  executeCCycle
 {
 	short res;
-	@synchronized(self){
-		res = CCCC(crate_id);
-	}
+	[socketLock lock];		//begin critical section
+	res = CCCC(crate_id);
+	[socketLock unlock];	//end critical section
+
 	return res;
 }
 
 - (unsigned short)  executeZCycle
 {
 	short res;
-	@synchronized(self){
-		res=CCCZ(crate_id);
-		if(res==CRATE_CONNECT_ERROR){
-			[self setIsConnected:NO];
-		}
+	[socketLock lock];		//begin critical section
+	res=CCCZ(crate_id);
+	if(res==CRATE_CONNECT_ERROR){
+		[self setIsConnected:NO];
 	}
+	[socketLock unlock];	//end critical section
 	return res;	
 }
 
@@ -313,24 +325,24 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 - (unsigned short) testLAMForStation:(char)aStation value:(char*)result
 {
 	short res;
-	@synchronized(self){
-		res = CTLM(crate_id,aStation,result);
-		if(res==CRATE_CONNECT_ERROR){
-			[self setIsConnected:NO];
-		}
+	[socketLock lock];		//begin critical section
+	res = CTLM(crate_id,aStation,result);
+	if(res==CRATE_CONNECT_ERROR){
+		[self setIsConnected:NO];
 	}
+	[socketLock unlock];	//end critical section
 	return res;
 }
 
 - (unsigned short)  resetLAMFF
 {
 	short res;
-	@synchronized (self) {
-		res = LACK(crate_id);
-		if(res==CRATE_CONNECT_ERROR){
-			[self setIsConnected:NO];
-		}
+	[socketLock lock];		//begin critical section
+	res = LACK(crate_id);
+	if(res==CRATE_CONNECT_ERROR){
+		[self setIsConnected:NO];
 	}
+	[socketLock unlock];	//end critical section
 	return res;
 }
 
@@ -339,26 +351,26 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 {
 	short res;
 	unsigned int mask;
-	@synchronized (self) {
-		res = CLMR(crate_id,&mask);
-		if(res==CRATE_CONNECT_ERROR){
-			*stations = 0;
-			[self setIsConnected:NO];
-		}
-		else *stations = mask&0x0FFFFFF;
+	[socketLock lock];		//begin critical section
+	res = CLMR(crate_id,&mask);
+	if(res==CRATE_CONNECT_ERROR){
+		*stations = 0;
+		[self setIsConnected:NO];
 	}
+	else *stations = mask&0x0FFFFFF;
+	[socketLock unlock];	//end critical section
 	return res;
 }
 
 - (unsigned short)  setCrateInhibit:(BOOL)state
 {   
 	short res;
- 	@synchronized(self){
-		res = CCCI(crate_id,state);
-		if(res==CRATE_CONNECT_ERROR){
-			[self setIsConnected:NO];
-		}
+	[socketLock lock];		//begin critical section
+	res = CCCI(crate_id,state);
+	if(res==CRATE_CONNECT_ERROR){
+		[self setIsConnected:NO];
 	}
+	[socketLock unlock];	//end critical section
 	return res;
 }
 
@@ -366,13 +378,13 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 {   
  	short res;
 	char inhibitValue;
- 	@synchronized(self){
-		res = CTCI(crate_id,&inhibitValue);
-		if(res==CRATE_CONNECT_ERROR){
-			[self setIsConnected:NO];
-		}
-		else *state = inhibitValue;
+	[socketLock lock];		//begin critical section
+	res = CTCI(crate_id,&inhibitValue);
+	if(res==CRATE_CONNECT_ERROR){
+		[self setIsConnected:NO];
 	}
+	else *state = inhibitValue;
+	[socketLock unlock];	//end critical section
 	return res;
 }
 
@@ -383,28 +395,28 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 							 data:(unsigned short*) data
 {
 	short result;
-	@synchronized(self){
-		CRATE_OP cr_op;
-		cr_op.F = f;
-		cr_op.N = n;
-		cr_op.A = a;
-		cr_op.DATA = *data;
-		if(trackTransactions)[transactionTimer reset];
-		result = CSSA(crate_id,&cr_op);
-		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
-		if(result==CRATE_OK){
-			if(trackTransactions)[self histogramTransactions];
-			cmdResponse		= cr_op.Q;
-			cmdAccepted		= cr_op.X;
-			*data			= cr_op.DATA;
-		}
-		else if(result==CRATE_CONNECT_ERROR){
-			cmdResponse		= 0;
-			cmdAccepted		= 0;
-			*data			= 0;
-			[self setIsConnected:NO];
-		}
+	[socketLock lock];		//begin critical section
+	CRATE_OP cr_op;
+	cr_op.F = f;
+	cr_op.N = n;
+	cr_op.A = a;
+	cr_op.DATA = *data;
+	if(trackTransactions)[transactionTimer reset];
+	result = CSSA(crate_id,&cr_op);
+	[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+	if(result==CRATE_OK){
+		if(trackTransactions)[self histogramTransactions];
+		cmdResponse		= cr_op.Q;
+		cmdAccepted		= cr_op.X;
+		*data			= cr_op.DATA;
 	}
+	else if(result==CRATE_CONNECT_ERROR){
+		cmdResponse		= 0;
+		cmdAccepted		= 0;
+		*data			= 0;
+		[self setIsConnected:NO];
+	}
+	[socketLock unlock];	//end critical section
 	return result;
 }
 
@@ -413,26 +425,26 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 								f:(unsigned short) f;
 {
 	short result;
-	@synchronized(self){
-		CRATE_OP cr_op;
-		cr_op.F = f;
-		cr_op.N = n;
-		cr_op.A = a;
-		cr_op.DATA = 0;
-		if(trackTransactions)[transactionTimer reset];
-		result = CSSA(crate_id,&cr_op);
-		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
-		if(trackTransactions)[self histogramTransactions];
-		if(result==CRATE_OK){
-			cmdResponse		= cr_op.Q;
-			cmdAccepted		= cr_op.X;
-		}
-		else if(result==CRATE_CONNECT_ERROR){
-			cmdResponse		= 0;
-			cmdAccepted		= 0;
-			[self setIsConnected:NO];
-		}
+	[socketLock lock];		//begin critical section
+	CRATE_OP cr_op;
+	cr_op.F = f;
+	cr_op.N = n;
+	cr_op.A = a;
+	cr_op.DATA = 0;
+	if(trackTransactions)[transactionTimer reset];
+	result = CSSA(crate_id,&cr_op);
+	[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+	if(trackTransactions)[self histogramTransactions];
+	if(result==CRATE_OK){
+		cmdResponse		= cr_op.Q;
+		cmdAccepted		= cr_op.X;
 	}
+	else if(result==CRATE_CONNECT_ERROR){
+		cmdResponse		= 0;
+		cmdAccepted		= 0;
+		[self setIsConnected:NO];
+	}
+	[socketLock unlock];	//end critical section
 	return result;
 }
 
@@ -442,28 +454,28 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 							data:(unsigned long*) data
 {
 	short result;
-	@synchronized(self){
-		CRATE_OP cr_op;
-		cr_op.F = f;
-		cr_op.N = n;
-		cr_op.A = a;
-		cr_op.DATA = *data;
-		if(trackTransactions)[transactionTimer reset];
-		result = CFSA(crate_id,&cr_op);
-		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
-		if(trackTransactions)[self histogramTransactions];
-		if(result==CRATE_OK){
-			cmdResponse		= cr_op.Q;
-			cmdAccepted		= cr_op.X;
-			*data			= cr_op.DATA;
-		}
-		else if(result==CRATE_CONNECT_ERROR){
-			cmdResponse		= 0;
-			cmdAccepted		= 0;
-			*data			= 0;
-			[self setIsConnected:NO];
-		}
+	[socketLock lock];		//begin critical section
+	CRATE_OP cr_op;
+	cr_op.F = f;
+	cr_op.N = n;
+	cr_op.A = a;
+	cr_op.DATA = *data;
+	if(trackTransactions)[transactionTimer reset];
+	result = CFSA(crate_id,&cr_op);
+	[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+	if(trackTransactions)[self histogramTransactions];
+	if(result==CRATE_OK){
+		cmdResponse		= cr_op.Q;
+		cmdAccepted		= cr_op.X;
+		*data			= cr_op.DATA;
 	}
+	else if(result==CRATE_CONNECT_ERROR){
+		cmdResponse		= 0;
+		cmdAccepted		= 0;
+		*data			= 0;
+		[self setIsConnected:NO];
+	}
+	[socketLock unlock];	//end critical section
 	return result;
 }
 
@@ -474,6 +486,8 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 								  data:(unsigned short*) data
                                 length:(unsigned long) numWords
 {
+	short result;
+	[socketLock lock];		//begin critical section
 	BLK_TRANSF_INFO blk_info;
 	blk_info.opcode = OP_BLKSA; 
 	blk_info.F = f; 
@@ -483,7 +497,6 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	blk_info.totsize = numWords;  	
 	blk_info.timeout = 0;
 	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(int));
-	short result;
 	if(trackTransactions)[transactionTimer reset];
 	int i;
 	if(f < 16){
@@ -507,6 +520,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 		[self setIsConnected:NO];
 	}
 	free(buffer);
+	[socketLock unlock];	//end critical section
   	return result;
 }
 
@@ -516,6 +530,8 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 								  data:(unsigned long*) data
                                 length:(unsigned long)    numWords
 {
+	short result = 0;
+	[socketLock lock];		//begin critical section
 	BLK_TRANSF_INFO blk_info;
 	blk_info.opcode = OP_BLKSA; 
 	blk_info.F = f; 
@@ -525,7 +541,6 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	blk_info.totsize = numWords;  	
 	blk_info.timeout = 0;
 	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(long));
-	short result;
 	if(trackTransactions)[transactionTimer reset];
 	int i;
 	if(f < 16){
@@ -549,17 +564,16 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 		[self setIsConnected:NO];
 	}
 	free(buffer);
+	[socketLock unlock];	//end critical section
   	return result;
 }
 
 - (void) handleIRQ:(short)irq_type data:(unsigned int)irq_data
 {
+	[irqLock lock];		//begin critical section
 	switch (irq_type) { 
 		case LAM_INT: 
-			// Do something when a LAM event occurs 
-			// Write your code here 
-			NSLog(@"got LAM irq\n");
-			LACK(crate_id);
+			lamMask = irq_data;
 		break; 
 		
 		case COMBO_INT: 
@@ -570,10 +584,11 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 		
 		case DEFAULT_INT:
 			NSLog(@"got default irq\n");
-			// Do something when the ìDEFAULTî button is pressed  
+			// Do something when the 'DEFAULT' button is pressed  
 			// Write your code here 
 		break; 
 	} 
+	[irqLock unlock];		//end critical section
 }
 
 
@@ -581,22 +596,21 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 {
 	int res;
 	char response[32];
-	@synchronized(self){
-		if(![aCmd hasSuffix:@"\r"])aCmd = [aCmd stringByAppendingString:@"\r"];
-		res = CMDSR(crate_id,(char*)[aCmd cStringUsingEncoding:NSASCIIStringEncoding], response, 32);
-		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
-		if(res==CRATE_OK){
-			if(verbose){
-				if(response)NSLog(@"C111C Response: %s\n",response);
-				else NSLog(@"C111C Response: <nil>\n");
-			}
-		}
-		else {
-			[self setIsConnected:NO];
+	[socketLock lock];		//begin critical section
+	if(![aCmd hasSuffix:@"\r"])aCmd = [aCmd stringByAppendingString:@"\r"];
+	res = CMDSR(crate_id,(char*)[aCmd cStringUsingEncoding:NSASCIIStringEncoding], response, 32);
+	[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+	if(res==CRATE_OK){
+		if(verbose){
+			if(response)NSLog(@"C111C Response: %s\n",response);
+			else NSLog(@"C111C Response: <nil>\n");
 		}
 	}
+	else {
+		[self setIsConnected:NO];
+	}
+	[socketLock unlock];	//end critical section
 }
-
 
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -605,6 +619,9 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
     [self setStationToTest:[decoder decodeIntForKey:@"ORC111CModelStationToTest"]];
 	[self setIpAddress:[decoder decodeObjectForKey:@"IpAddress"]];
     [[self undoManager] enableUndoRegistration];
+	
+	socketLock = [[NSLock alloc] init];
+	irqLock    = [[NSLock alloc] init];
     return self;
 }
 
@@ -615,6 +632,20 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
     [encoder encodeObject:ipAddress forKey:@"IpAddress"];
 }
 
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{	
+	[irqLock lock];		//begin critical section
+	if(lamMask) {
+		int i;
+		for(i=0;i<25;i++){
+			if(lamMask & (0x1L<<i)){
+				[dataTakers[i] takeData:aDataPacket userInfo:userInfo];
+			}
+		}
+		LACK(crate_id);
+	}
+	[irqLock unlock];		//end critical section
+}
 
 @end
 

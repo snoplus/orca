@@ -183,7 +183,6 @@ int csock_close			(SOCKET sck);
 
 int csock_canwrite		(SOCKET sck);
 int csock_canread		(SOCKET sck);
-int csock_hasBytesToRead(SOCKET sck);
 int csock_send			(SOCKET sck, void *buffer, int size);
 int csock_sendto		(SOCKET sck, void *buffer, int size, struct sockaddr *dest);
 
