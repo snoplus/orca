@@ -122,9 +122,9 @@ typedef struct {
     short F;
     short N;
     short A;
-    short totsize;
-	short blksize;
-	short timeout;
+    unsigned short totsize;
+	unsigned short blksize;
+	unsigned short timeout;
 	short ascii_transf;
 } BLK_TRANSF_INFO;
 

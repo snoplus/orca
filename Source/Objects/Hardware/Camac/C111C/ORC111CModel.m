@@ -488,39 +488,47 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 {
 	short result;
 	[socketLock lock];		//begin critical section
-	BLK_TRANSF_INFO blk_info;
-	blk_info.opcode = OP_BLKSR; 
-	blk_info.F = f; 
-	blk_info.N = n; 
-	blk_info.A = a; 
-	blk_info.blksize = 512; //16 bit word size  
-	blk_info.totsize = numWords;  
-    blk_info.ascii_transf = 0;	
-	blk_info.timeout = 0;
-	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(int));
-	if(trackTransactions)[transactionTimer reset];
-	int i;
-	if(f < 16){
-		//CAMAC Read
-		result = BLKTRANSF(crate_id, &blk_info, buffer);
-		[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
-		if(result==CRATE_OK){
-			unsigned int* dp = buffer;
-			for(i=0;i<numWords;i++)*data++ = *dp++;
-		}
-	}
-	else {
-		//CAMAC write
-		unsigned int* dp = buffer;
-		for(i=0;i<numWords;i++) *dp++ = *data++;
-		result = BLKTRANSF(crate_id, &blk_info, buffer);
-	}
-	if(trackTransactions)[self histogramTransactions];
+	unsigned long totalWords = numWords;
 	
-	if(result==CRATE_CONNECT_ERROR){
-		[self setIsConnected:NO];
-	}
-	free(buffer);
+	do {
+		//arggg, they have a signed short somewhere as the max num for a block transfer so we have to loop		
+		unsigned long numInBlock = MIN(32000,totalWords); 
+		BLK_TRANSF_INFO blk_info;
+		blk_info.opcode = OP_BLKSR; 
+		blk_info.F = f; 
+		blk_info.N = n; 
+		blk_info.A = a; 
+		blk_info.blksize = 256;
+		blk_info.totsize = numInBlock;  
+		blk_info.ascii_transf = 0;	
+		blk_info.timeout = 0;
+		unsigned int* buffer = (unsigned int*)malloc(numInBlock*sizeof(int));
+		if(trackTransactions)[transactionTimer reset];
+		int i;
+		if(f < 16){
+			//CAMAC Read
+			result = BLKTRANSF(crate_id, &blk_info, buffer);
+			[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
+			if(result==CRATE_OK){
+				unsigned int* dp = buffer;
+				for(i=0;i<numInBlock;i++)*data++ = *dp++;
+			}
+		}
+		else {
+			//CAMAC write
+			unsigned int* dp = buffer;
+			for(i=0;i<numInBlock;i++) *dp++ = *data++;
+			result = BLKTRANSF(crate_id, &blk_info, buffer);
+		}
+		if(trackTransactions)[self histogramTransactions];
+		
+		if(result==CRATE_CONNECT_ERROR){
+			[self setIsConnected:NO];
+		}
+		free(buffer);
+		totalWords -= numInBlock;
+	}while(totalWords>0);
+	
 	[socketLock unlock];	//end critical section
   	return result;
 }

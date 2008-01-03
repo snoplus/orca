@@ -322,6 +322,7 @@ int csock_recvline(SOCKET sck, char *buffer, int size)
 	
 	while (pos < size)  {
 		rp = recv(sck, &buffer[pos], 1, 0);
+		printf("rp: %d %d %c\n",rp,buffer[pos],buffer[pos]);
 		if (rp > 0) {
 			buffer[pos + 1] = '\0';
 
@@ -632,7 +633,7 @@ int BIN_AdjustFrame(unsigned char *buff, int lenght)
 ////////////////////////////////////////////
 short GetParam(char *buffer,PARAMETER *param)
 {
-   	char *token, seps[] = " \r\0";
+   	char *token, seps[] = " \0";
 	short cPar = 0;
 	if (buffer != NULL) {
 		token = strtok(buffer, seps);
@@ -1378,74 +1379,63 @@ short BLKBUFFS(short crate_id, short value)
 ////////////////////////////////////////////
 short BLKTRANSF(short crate_id, BLK_TRANSF_INFO *blk_info, unsigned int *buffer)
 {
-	int i, j, resp, bytes_per_row, bytes_received, bytes_sent, rows, buf_index;
-	short retcode = CRATE_ERROR;
+	int i, j, resp, bytes_per_row, bytes_received, bytes_sent, rows;
+	short retcode = CRATE_OK;
 	char blk_ascii_buf[4096];
 	unsigned int row_buf[2048], transf_res;
-	PARAMETER lParam[MAX_PAR];
+	//PARAMETER lParam[MAX_PAR];
 
-	if ((crate_id > MAX_CRATE) || (crate_id < 0)) {
-		return CRATE_ID_ERROR;
-	}
+	if ((crate_id > MAX_CRATE) || (crate_id < 0))			return CRATE_ID_ERROR;
+	if (crate_info[crate_id].connected == 0)				return CRATE_CONNECT_ERROR;
+	if (BLKBUFFS(crate_id, blk_info->blksize) != CRATE_OK)	return CRATE_ERROR;
 
-	if (crate_info[crate_id].connected == 0) {
-		return CRATE_CONNECT_ERROR;
-	}
-
-	if (BLKBUFFS(crate_id, blk_info->blksize) != CRATE_OK) {
-		return retcode;
-	}
-
+	//set up the ascii block transfer command
 	switch (blk_info->opcode) {
+	
 		case OP_BLKSS:
 			sprintf(CRATE_TxBuffer,"BLKSS %d %d %d %d", blk_info->F, blk_info->N, blk_info->A, blk_info->totsize);
-			break;
+		break;
+		
 		case OP_BLKSR:
 			sprintf(CRATE_TxBuffer,"BLKSR %d %d %d %d %d", blk_info->F, blk_info->N, blk_info->A, blk_info->totsize, blk_info->timeout);
-			break;
+		break;
+		
 		case OP_BLKSA:
 			sprintf(CRATE_TxBuffer,"BLKSA %d %d %d", blk_info->F, blk_info->N, blk_info->totsize);
-			break;
+		break;
+		
 		case OP_BLKFS:
 			sprintf(CRATE_TxBuffer,"BLKFS %d %d %d %d", blk_info->F, blk_info->N, blk_info->A, blk_info->totsize);
-			break;
+		break;
+		
 		case OP_BLKFR:
 			sprintf(CRATE_TxBuffer,"BLKFR %d %d %d %d %d", blk_info->F, blk_info->N, blk_info->A, blk_info->totsize, blk_info->timeout);
-			break;
+		break;
+		
 		case OP_BLKFA:
 			sprintf(CRATE_TxBuffer,"BLKFA %d %d %d", blk_info->F, blk_info->N, blk_info->totsize);
-			break;
-		default:
-			break;
+		break;
+		
+		default: 
+		break;
 	}
 
 	switch (blk_info->F >> 3) {
 		case 0: //Read Operation
 
-			if (blk_info->ascii_transf == 0) {
-				strcat(CRATE_TxBuffer, " bin\r");
-			}
-			else {
-				strcat(CRATE_TxBuffer, "\r");
-				buffer[0] = 0;
-			}
+			if (blk_info->ascii_transf == 0) strcat(CRATE_TxBuffer, " bin");
+			strcat(CRATE_TxBuffer, "\r");
+			buffer[0] = 0;
 
 			csock_sendrecvline(crate_info[crate_id].sock_ascii, CRATE_TxBuffer, CRATE_RxBuffer, 255);
-			if (atoi(CRATE_RxBuffer) != CRATE_OK) {
-				return retcode;
-			}
+			if (atoi(CRATE_RxBuffer) != CRATE_OK) return CRATE_ERROR;
 
-			if (blk_info->ascii_transf == 0) {
-				bytes_per_row = ((blk_info->blksize + 1) * 4);
-			}
-			else {
-				bytes_per_row = (4 + (blk_info->blksize * 7));
-			}
+			if (blk_info->ascii_transf == 0) bytes_per_row = ((blk_info->blksize + 1) * 4);
+			else							 bytes_per_row = (4 + (blk_info->blksize * 7));
 
 			rows = (blk_info->totsize / blk_info->blksize) + 1;
 			
-			if (blk_info->totsize % blk_info->blksize)
-				rows++;
+			if (blk_info->totsize % blk_info->blksize) rows++;
 
 			for (i = 0; i < rows; i++) {
 				bytes_received = 0;
@@ -1459,7 +1449,7 @@ short BLKTRANSF(short crate_id, BLK_TRANSF_INFO *blk_info, unsigned int *buffer)
 					}
 
 					if (resp <= 0) {
-						return retcode;
+						return CRATE_ERROR;
 					}
 					bytes_received += resp;
 				}
@@ -1503,65 +1493,66 @@ short BLKTRANSF(short crate_id, BLK_TRANSF_INFO *blk_info, unsigned int *buffer)
 			break;
 
 		case 2: //Write Operation
-			
+
+			//NOTE: ALWAYS ascii
 			strcat(CRATE_TxBuffer, "\r");
 			
+			//send the block transfer command
 			csock_sendrecvline(crate_info[crate_id].sock_ascii, CRATE_TxBuffer, CRATE_RxBuffer, 255);
-			if (atoi(CRATE_RxBuffer) != CRATE_OK) {
-				return retcode;
-			}
+			printf("%s",CRATE_TxBuffer);
+			if (atoi(CRATE_RxBuffer) != CRATE_OK) return CRATE_ERROR;
 
-			bytes_per_row = (4 + (blk_info->blksize * 7));
-			rows = (blk_info->totsize / blk_info->blksize);
-			if ((blk_info->totsize % blk_info->blksize) != 0) {
-				rows++;
-			}
-
-			buf_index = 0;
-			for (i = 0; i < rows; i++) {
-				if (i == (rows - 1))
-					sprintf(blk_ascii_buf, "%03d", blk_info->totsize % blk_info->blksize);
-				else
-					sprintf(blk_ascii_buf, "%03d", blk_info->blksize);
+			
+			//each transmitted packet is formatted as hdr %06X %06X .... where hdr is number of values
+			int buf_index = 0;
+			int numValuesRemaining = blk_info->totsize;
+			int numToSend;
+			int ccc = 0;
+			int t = 0;
+			do {			
+				if(numValuesRemaining > blk_info->blksize) numToSend = blk_info->blksize;
+				else numToSend = numValuesRemaining;
 				
+				sprintf(&blk_ascii_buf[0], "%03d", numToSend);
 				for (j = 0; j < blk_info->blksize; j++) {
-					if (buf_index < blk_info->totsize)
+					if(j<numToSend) {
 						sprintf(&blk_ascii_buf[3 + (j * 7)], " %06X", (buffer[buf_index++] & 0xFFFFFF));
-					else
-						sprintf(&blk_ascii_buf[3 + (j * 7)], " 000000");
-				}
-				
+						t++;
+					}
+					else			sprintf(&blk_ascii_buf[3 + (j * 7)], " 000000");
+				}	
 				strcat(blk_ascii_buf, "\r");
 				
-				bytes_per_row = strlen(blk_ascii_buf);
-
 				bytes_sent = 0;
-				while (bytes_sent < bytes_per_row) {
-					resp = csock_send(crate_info[crate_id].sock_ascii, &blk_ascii_buf[bytes_sent], bytes_per_row - bytes_sent);
-					if (resp < 0) {
-        				return retcode;
-					}
-					else if (resp > 0) {
-						bytes_sent += resp;
-					}
-					else {
-					}
+				int bytesToSend = strlen(blk_ascii_buf);
+				while (bytes_sent < bytesToSend) {
+					resp = csock_send(crate_info[crate_id].sock_ascii, &blk_ascii_buf[bytes_sent], bytesToSend - bytes_sent);
+					if (resp < 0)return CRATE_ERROR;
+					else if (resp > 0) bytes_sent += resp;
 				}
-			}
-			
+				usleep(100);
+				printf("buffer: %d ret: %d  %d/%d\n",ccc,resp,t,blk_info->totsize);
+				ccc++;
+				
+				numValuesRemaining -= numToSend;
+			} while(numValuesRemaining>0);
+						
+			//get a reponse
 			csock_recvline(crate_info[crate_id].sock_ascii, CRATE_RxBuffer, 255);
-			if (GetParam(CRATE_RxBuffer,lParam)) {
-				retcode = atoi(lParam[0].x);
-				blk_info->totsize = atoi(lParam[1].x);
-			}
+			//the following doesn't appear to follow what actually comes back from the device
+			//if (GetParam(CRATE_RxBuffer,lParam)==0) {
+			//	retcode = atoi(lParam[0].x);
+			//	blk_info->totsize = atoi(lParam[1].x);
+			//	printf("total written: %d\n",blk_info->totsize);
+			//}
 
 			csock_recvline(crate_info[crate_id].sock_ascii, CRATE_RxBuffer, 255);
 
-			break;
+		break;
 		default:
-			break;
+		break;
 	}
-
+	printf("final code: %d\n",retcode);
 	return retcode;
 }
 

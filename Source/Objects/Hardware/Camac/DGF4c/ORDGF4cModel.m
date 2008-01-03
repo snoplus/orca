@@ -816,10 +816,17 @@ enum {
 	if(fpgaData){
 		int i;
 		const unsigned char* dataPtr = (unsigned char*)[fpgaData bytes];
+		unsigned short* buffer = (unsigned short*)malloc(len*sizeof(short));
 		for(i=0;i<len;i++){
-			unsigned short data = (dataPtr[i]&0x00ff);
-			[controller camacShortNAF:[self stationNumber] a:10 f:17 data:&data];
+			buffer[i] = (dataPtr[i]&0x00ff);
 		}
+		NS_DURING
+			[controller camacShortNAFBlock:[self stationNumber] a:10 f:17 data:buffer length:len];
+		NS_HANDLER
+			free(buffer);
+			[localException raise];
+		NS_ENDHANDLER
+		free(buffer);
 		NSLog(@"Loaded: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
 		
 	}
@@ -836,10 +843,18 @@ enum {
 	if(fpgaData){
 		int i;
 		const unsigned char* dataPtr = (unsigned char*)[fpgaData bytes];
+		unsigned short* buffer = (unsigned short*)malloc(len*sizeof(short));
 		for(i=0;i<len;i++){
-			unsigned short data = 	dataPtr[i]&0x00ff;
-			[controller camacShortNAF:[self stationNumber] a:9 f:17 data:&data];
+			buffer[i] = (dataPtr[i]&0x00ff);
 		}
+		NS_DURING
+			[controller camacShortNAFBlock:[self stationNumber] a:9 f:17 data:buffer length:len];
+		NS_HANDLER
+			free(buffer);
+			[localException raise];
+		NS_ENDHANDLER
+		free(buffer);
+		
 		NSLog(@"Loaded: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
 	}
 	else NSLogColor([NSColor redColor],@"Unable to open: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
