@@ -100,7 +100,7 @@ static UInt32 *fVPCICamacMem;
     camacMatch = 0;
     iter = 0;
     camacDevice = 0;
-    theHWLock       = [[NSLock alloc] init];
+    theHWLock       = [[NSRecursiveLock alloc] init];
     theStatusLock   = [[NSLock alloc] init];
     thePowerLock    = [[NSRecursiveLock alloc] init];
     theLCLock       = [[NSLock alloc] init];
@@ -475,7 +475,15 @@ static UInt32 *fVPCICamacMem;
 	return [self camacShortNAF:n a:a f:f data:&dummy];
 }
 
+- (void) lock
+{
+    [theHWLock lock];   //----begin crital section
+}
 
+- (void) unlock
+{
+    [theHWLock unlock];   //----end crital section
+}
 
 - (unsigned short)  camacShortNAF:(unsigned short) n 
 								a:(unsigned short) a 
@@ -852,7 +860,7 @@ static UInt32 *fVPCICamacMem;
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-    theHWLock       = [[NSLock alloc] init];
+    theHWLock       = [[NSRecursiveLock alloc] init];
     theStatusLock   = [[NSLock alloc] init];
     thePowerLock    = [[NSRecursiveLock alloc] init];
     theLCLock       = [[NSLock alloc] init];

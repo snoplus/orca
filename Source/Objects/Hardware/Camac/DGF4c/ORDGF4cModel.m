@@ -938,45 +938,53 @@ enum {
 	//the read-back and comparision of the DSP memory before starting the DSP.
     
     if(!dspCodePath)return; //should throw or post alarm here.
+
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    
-	[self writeCSR:kDSPResetCSRBit];
-	[ORTimer delay:0.060];
-	
-	[self writeTSAR:0x01];	//set the TSAR to the SECOND address--the first word must be loaded last
-	[ORTimer delay:0.060];
-	
-	NSLog(@"Begining DFG4c (station %d) DSP load/boot\n",[self stationNumber]);
-	NSData* fpgaData = [NSData dataWithContentsOfFile:dspCodePath];
-	int len = [fpgaData length]/4;
-	if(fpgaData && len){
-		int i;
-		const unsigned long* dataPtr = (unsigned long*)[fpgaData bytes];
-		//load the DSP--note the first word is skipped, it must be loaded last
-		for(i=1;i<len;i++){
-			[self writeDSPProgramWord:dataPtr[i]];
-		}
+    [controller lock];
+    NS_DURING
         
-		//reset the TSAR for a read back comparision
-		[self writeTSAR:0x01];
-		[ORTimer delay:0.060];
+        [self writeCSR:kDSPResetCSRBit];
+        [ORTimer delay:0.060];
         
-		//check the values........
-		long errorCount = 0;
-		for(i=1;i<len;i++){
-			if([self readDSPProgramWord] != Swap8Bits(dataPtr[i])){
-				errorCount++;
-			}
-		}
-		//.......................
-		
-		[self writeTSAR:0x00];					//reset the TSAR to the first DSP address
-		[self writeDSPProgramWord:dataPtr[0]]; //writing the first word starts the DSP
+        [self writeTSAR:0x01];	//set the TSAR to the SECOND address--the first word must be loaded last
+        [ORTimer delay:0.060];
         
-		NSLog(@"Loaded: <%@>\n",[dspCodePath stringByAbbreviatingWithTildeInPath]);
-		NSLog(@"Readback of DSP memory shows %d errors\n",errorCount);
-	}
-	else  NSLog(@"**Unable to open <%@>\n",dspCodePath);
+        NSLog(@"Begining DFG4c (station %d) DSP load/boot\n",[self stationNumber]);
+        NSData* fpgaData = [NSData dataWithContentsOfFile:dspCodePath];
+        int len = [fpgaData length]/4;
+        if(fpgaData && len){
+            int i;
+            const unsigned long* dataPtr = (unsigned long*)[fpgaData bytes];
+            //load the DSP--note the first word is skipped, it must be loaded last
+            for(i=1;i<len;i++){
+                [self writeDSPProgramWord:dataPtr[i]];
+            }
+            
+            //reset the TSAR for a read back comparision
+            [self writeTSAR:0x01];
+            [ORTimer delay:0.060];
+            
+            //check the values........
+            long errorCount = 0;
+            for(i=1;i<len;i++){
+                if([self readDSPProgramWord] != Swap8Bits(dataPtr[i])){
+                    errorCount++;
+                }
+            }
+            //.......................
+            
+            [self writeTSAR:0x00];					//reset the TSAR to the first DSP address
+            [self writeDSPProgramWord:dataPtr[0]]; //writing the first word starts the DSP
+            
+            NSLog(@"Loaded: <%@>\n",[dspCodePath stringByAbbreviatingWithTildeInPath]);
+            NSLog(@"Readback of DSP memory shows %d errors\n",errorCount);
+        }
+        else  NSLog(@"**Unable to open <%@>\n",dspCodePath);
+        [controller unlock];
+    NS_HANDLER
+        [controller unlock];
+        [localException raise];
+    NS_ENDHANDLER
 }
 
 - (void) fullInit
@@ -1200,7 +1208,7 @@ enum {
 		linearDataBufferStart	= [self readParam:@"AOUTBUFFER"];
 		linearDataBufferSize	= [self readParam:@"LOUTBUFFER"];
         
-		unsigned short i,n = MIN(kLinearBufferSize,linearDataBufferSize);
+		unsigned short n = MIN(kLinearBufferSize,linearDataBufferSize);
         //------------------------------------------------------------
         //  ---for testing.... write a some data to the data buffer
         //	[self writeTSAR:linearDataBufferStart];

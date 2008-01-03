@@ -119,11 +119,11 @@ enum {
 @interface ORPCICamacModel : ORPciCard
 {
 	@private
-    NSLock*         theHWLock;
-    NSLock*         theStatusLock;
+    NSRecursiveLock* theHWLock;
+    NSLock*          theStatusLock;
     NSRecursiveLock* thePowerLock;
-    NSLock*         theLCLock;
-    ORAlarm*        noHardwareAlarm;
+    NSLock*          theLCLock;
+    ORAlarm*          noHardwareAlarm;
     ORAlarm*        noDriverAlarm;
 	
     mach_port_t 	masterPort;
@@ -155,6 +155,8 @@ enum {
 - (void)            checkCratePower;	// check crate power
 - (void)            checkStatusErrors;	// check controller status
 - (BOOL)			powerOK;
+- (void)            lock;               //so others can lock blocks of access
+- (void)            unlock;
 
 - (unsigned short)  camacShortNAF:(unsigned short) n 
 								a:(unsigned short) a 
