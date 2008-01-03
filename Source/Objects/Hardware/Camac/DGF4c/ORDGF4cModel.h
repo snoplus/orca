@@ -88,7 +88,7 @@ union {
 		unsigned long runBehaviorMask; //synchwait, insynch, etc.
 		short decimation;
 		long numOscPoints;
-		int oscModeData[4][8192];
+		unsigned short oscModeData[4][8192];
 		unsigned short oscEnabledMask;
 		float energyRiseTime[4];
 		float energyFlatTop[4];

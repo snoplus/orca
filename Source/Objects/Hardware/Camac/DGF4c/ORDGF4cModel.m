@@ -1200,11 +1200,11 @@ enum {
 		[self writeTSAR:linearDataBufferStart];
 		[ORTimer delay:0.060];	//must delay abit
 		[oscLock lock];
-		for(i=0;i<n;i++){
-			unsigned short data;
-			[[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:&data];
-			oscModeData[aChannel][i] = data;
-		}
+		//for(i=0;i<n;i++){
+			//unsigned short data;
+			[[self adapter] camacShortNAFBlock:[self stationNumber] a:0 f:0 data:oscModeData[aChannel] length:n];
+			//oscModeData[aChannel][i] = data;
+		//}
 		numOscPoints = n;
 		[oscLock unlock];
 	}

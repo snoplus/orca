@@ -34,7 +34,7 @@
 #import <netdb.h>
 #include <time.h> 
 
-#define kTinyDelay 0.0001
+#define kTinyDelay 0.0005
 
 NSString* ORC111CModelTrackTransactionsChanged = @"ORC111CModelTrackTransactionsChanged";
 NSString* ORC111CModelStationToTestChanged	= @"ORC111CModelStationToTestChanged";
@@ -489,12 +489,13 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	short result;
 	[socketLock lock];		//begin critical section
 	BLK_TRANSF_INFO blk_info;
-	blk_info.opcode = OP_BLKSA; 
+	blk_info.opcode = OP_BLKSR; 
 	blk_info.F = f; 
 	blk_info.N = n; 
 	blk_info.A = a; 
-	blk_info.blksize = 16; //16 bit word size  
-	blk_info.totsize = numWords;  	
+	blk_info.blksize = 512; //16 bit word size  
+	blk_info.totsize = numWords;  
+    blk_info.ascii_transf = 0;	
 	blk_info.timeout = 0;
 	unsigned int* buffer = (unsigned int*)malloc(numWords*sizeof(int));
 	if(trackTransactions)[transactionTimer reset];

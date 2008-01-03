@@ -242,13 +242,13 @@ int csock_send(SOCKET sck, void *buffer, int size)
 	int ret = 0;
 	int pos = 0;
 	char* p = (char*)buffer;
-	while (pos < size) {
-		if (csock_canwrite(sck)){
+	while (size) {
+		//if (csock_canwrite(sck)){
 			ret =  send(sck, &p[pos], size, 0);
 			pos += ret;
 			size -= ret;
 			if(size<=0)break;
-		}
+		//}
 	}
 	return ret;
 }
@@ -295,12 +295,12 @@ int csock_recv_t(SOCKET sck, void *buffer, int size, int timeout)
 	buf[pos] = '\0';
 
 	while (pos < size) {
-		if (csock_canread(sck)) {
+		//if (csock_canread(sck)) {
 			rp = recv(sck, &buf[pos], size, 0);
 			if (rp < 0) return -1;
 			pos+=rp;
 			size-=rp;
-		}
+		//}
 		if(size==0)break;
 		if ((time(NULL) - now) > timeout) {
 			buf[pos] = '@';
