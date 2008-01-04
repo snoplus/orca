@@ -1788,6 +1788,7 @@ enum {
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    BOOL locked = NO;
     NS_DURING
         if(!firstTime){
 			unsigned short csr;
@@ -1795,7 +1796,8 @@ enum {
 			[controller camacShortNAF:cachedStation a:0 f:1 data:&csr];
             if(!(csr & kActiveCSRBit)){
 				if((csr & kLAMStateCSRBit) == kLAMStateCSRBit){
-					
+					[controller lock];  //begin special global critical section
+                    locked = YES;
 					unsigned short numWordsInBuffer;
 					unsigned short numLongsInBuffer;
 					BOOL padIt = NO;				
@@ -1836,6 +1838,9 @@ enum {
 					
 					//resume
 					[self writeCSR:csrValueForResuming];
+                    [controller unlock];    //end special global critical section
+                    locked = NO;
+
 				}
 				
 				
@@ -1855,6 +1860,7 @@ enum {
 		}
 		
         NS_HANDLER
+            if(locked)[controller unlock];//end special global critical section (after exception)
             NSLogError(@"",@"DFG4c Card Error",@"Take Data Loop",nil);
             [self incExceptionCount];
             [localException raise];
