@@ -89,7 +89,7 @@ union {
 		short decimation;
 		long numOscPoints;
 		unsigned short oscModeData[4][8192];
-		unsigned short oscEnabledMask;
+		int oscEnabledMask;
 		float energyRiseTime[4];
 		float energyFlatTop[4];
 		float triggerRiseTime[4];

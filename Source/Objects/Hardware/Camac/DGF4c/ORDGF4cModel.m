@@ -816,17 +816,10 @@ enum {
 	if(fpgaData){
 		int i;
 		const unsigned char* dataPtr = (unsigned char*)[fpgaData bytes];
-		unsigned short* buffer = (unsigned short*)malloc(len*sizeof(short));
 		for(i=0;i<len;i++){
-			buffer[i] = (dataPtr[i]&0x00ff);
+			unsigned short data = (dataPtr[i]&0x00ff);
+			[controller camacShortNAF:[self stationNumber] a:10 f:17 data:&data];
 		}
-		NS_DURING
-			[controller camacShortNAFBlock:[self stationNumber] a:10 f:17 data:buffer length:len];
-		NS_HANDLER
-			free(buffer);
-			[localException raise];
-		NS_ENDHANDLER
-		free(buffer);
 		NSLog(@"Loaded: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
 		
 	}
@@ -1223,11 +1216,12 @@ enum {
 		[self writeTSAR:linearDataBufferStart];
 		[ORTimer delay:0.060];	//must delay abit
 		[oscLock lock];
-		//for(i=0;i<n;i++){
-			//unsigned short data;
-			[[self adapter] camacShortNAFBlock:[self stationNumber] a:0 f:0 data:oscModeData[aChannel] length:n];
-			//oscModeData[aChannel][i] = data;
-		//}
+        int i;
+		for(i=0;i<n;i++){
+			unsigned short data;
+			[[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:oscModeData[aChannel]];
+			oscModeData[aChannel][i] = data;
+		}
 		numOscPoints = n;
 		[oscLock unlock];
 	}
