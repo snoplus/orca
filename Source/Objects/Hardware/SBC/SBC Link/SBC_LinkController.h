@@ -48,6 +48,7 @@
 	IBOutlet NSTextField*   byteRateSentField;
 	IBOutlet NSTextField*   byteRateReceivedField;
 	IBOutlet NSMatrix*      infoTypeMatrix;
+	IBOutlet NSTextField*   cbPercentField;
 
 	//IP Settings
 	IBOutlet NSTextField*	ipNumberField;

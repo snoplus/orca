@@ -415,6 +415,9 @@
 	SBC_info_struct theRunInfo =  [[model sbcLink] runInfo];
 	NSString* theRunInfoString = @"";
 	int i,num;
+
+	unsigned long aMinValue,aMaxValue,aWriteMark,aReadMark;
+	[[model sbcLink] getQueMinValue:&aMinValue maxValue:&aMaxValue head:&aWriteMark tail:&aReadMark];
 	switch([[model sbcLink] infoType]){
 		case 0:
 			theRunInfoString =                                 [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
@@ -423,10 +426,8 @@
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
 
-			unsigned long aMinValue,aMaxValue,aHeadValue,aTailValue;
-			[[model sbcLink] getQueMinValue:&aMinValue maxValue:&aMaxValue head:&aHeadValue tail:&aTailValue];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %d\n",aHeadValue]];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %d\n",aTailValue]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %d\n",aWriteMark]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %d\n",aReadMark]];
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %d\n",theRunInfo.amountInBuffer]];
 		break;
 
@@ -446,6 +447,14 @@
 			}
 		break;
 	}
+	float amountFilled;
+	float totalAmount = (float)(aMaxValue-aMinValue);
+	if(aReadMark==aWriteMark)		amountFilled = 0;
+	else if(aReadMark<aWriteMark)	amountFilled = aWriteMark-aReadMark;
+	else							amountFilled = totalAmount - (aReadMark-aWriteMark);
+	
+	
+	[cbPercentField setFloatValue:totalAmount!=0?amountFilled/totalAmount:0];
 	[runInfoField setStringValue:theRunInfoString];
 	[queView setNeedsDisplay:YES];
 }

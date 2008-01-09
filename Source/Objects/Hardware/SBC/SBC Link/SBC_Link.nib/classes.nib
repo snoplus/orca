@@ -244,6 +244,8 @@
 				<string>ORValueBar</string>
 				<key>bytesSentRateBar</key>
 				<string>ORValueBar</string>
+				<key>cbPercentField</key>
+				<string>NSTextField</string>
 				<key>connect1Button</key>
 				<string>NSButton</string>
 				<key>connectButton</key>
