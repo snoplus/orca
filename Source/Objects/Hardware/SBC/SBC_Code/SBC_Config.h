@@ -47,7 +47,7 @@ typedef struct {
 #define	kSBC_WriteError			1
 #define	kSBC_ReadError			2
 
-#define	kSBC_NumRunInfoValuesToSwap	15
+#define	kSBC_NumRunInfoValuesToSwap	12
 
 typedef struct {
     uint32_t statusBits;
@@ -60,10 +60,6 @@ typedef struct {
     uint32_t recordsTransfered;
     uint32_t wrapArounds;
 	uint32_t busErrorCount;
-	
-	uint32_t rd_error_cnt[MAX_CARDS];
-	uint32_t loop_cnt[MAX_CARDS];			// number of Clock loops in hw readout
-	uint32_t total_rate_cnt[MAX_CARDS];		// number of Clock loops in hw readout
 	
 	uint32_t  err_buf_cnt;
 	uint32_t  msg_buf_cnt;
