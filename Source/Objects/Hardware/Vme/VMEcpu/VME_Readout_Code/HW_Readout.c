@@ -341,9 +341,7 @@ void doWriteBlock(SBC_Packet* aPacket)
         break;
     }
     
-    int32_t result = 0;
-    result = 
-        vme_write(memMapHandle,startAddress,(uint8_t*)p,numItems*unitSize);
+    int32_t result = vme_write(memMapHandle,startAddress,(uint8_t*)p,numItems*unitSize);
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
@@ -441,9 +439,9 @@ void doReadBlock(SBC_Packet* aPacket)
             if (result != unitSize) break;
         }
         if (result == unitSize) result = unitSize*numItems; 
-	} else {
-        result = 
-            vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
+	} 
+	else {
+        result = vme_read(memMapHandle,startAddress,returnPayload,numItems*unitSize);
     }
     
     returnDataPtr->address         = oldAddress;
@@ -492,31 +490,25 @@ void doReadBlock(SBC_Packet* aPacket)
 /*   card to read out                                        */
 /*************************************************************/
 
-void readHW(SBC_crate_config* config)
+int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data)
 {
-    int32_t index = 0;
-    while(1){
+	if(index<config->total_cards && index>0) {
         switch(config->card_info[index].hw_type_id){
-            case kShaper:        
-                index = Readout_Shaper(config,index);  
-                break;
-            case kGretina:       
-                //index = -1;//Readout_Gretina(config,index);  
-                index = Readout_Gretina(config,index);  
-                break;
-            default:            
-                index =  -1; 
-                break;
+            case kShaper:		return Readout_Shaper(config,index,data);		break;
+            case kGretina:		return Readout_Gretina(config,index,data);		break;
+            case kTrigger32:	return Readout_TR32_Data(config,index,data);	break;
+			case kSBCLAM:		return Readout_LAM_Data(config,index,data);		break;
+            default:			return -1;										break;
         }
-        if(index>=config->total_cards || index<0)break;
     }
+	return -1;
 }
 
 /*************************************************************/
 /*             Reads out Shaper cards.                       */
 /*************************************************************/
 
-int32_t Readout_Shaper(SBC_crate_config* config,int32_t index)
+int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     uint32_t baseAddress            = config->card_info[index].base_add;
     uint32_t conversionRegOffset    = config->card_info[index].deviceSpecificData[1];
@@ -561,11 +553,10 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index)
 /*             Reads out Gretina (Mark I) cards.             */
 /*************************************************************/
 
-int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
+int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
 
-    static SBC_VmeWriteBlockStruct gretinaStruct = 
-        {0x0, 0x39, 0x1, 0x4, 0x0, 0x0}; 
+    static SBC_VmeWriteBlockStruct gretinaStruct = {0x0, 0x39, 0x1, 0x4, 0x0, 0x0}; 
     static int32_t vmeReadOutHandle = 0;
     static int32_t vmeFIFOStateReadOutHandle = 0;
     static uint32_t fifoState;
@@ -576,12 +567,11 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
     uint32_t fifoEmptyMask    = config->card_info[index].deviceSpecificData[1];
     uint32_t fifoAddress      = config->card_info[index].deviceSpecificData[2];
     uint32_t fifoAddressMod   = config->card_info[index].deviceSpecificData[3];
-    uint32_t sizeOfFIFO       = config->card_info[index].deviceSpecificData[3];
+    uint32_t sizeOfFIFO       = config->card_info[index].deviceSpecificData[4];
     uint32_t dataId           = config->card_info[index].hw_mask[0];
     uint32_t slot             = config->card_info[index].slot;
     uint32_t crate            = config->card_info[index].crate;
     uint32_t location         = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
-
 
     //read the fifo state
     int32_t result;
@@ -589,24 +579,20 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
     gretinaStruct.addressModifier = config->card_info[index].add_mod;
     if (config->card_info[index].add_mod == 0x29) {
         result = vme_read(vmeAM29Handle,fifoStateAddress,(uint8_t*)&fifoState,2); 
-    } else {
+    } 
+	else {
         gretinaStruct.address = fifoStateAddress & 0xFFFF0000;
         vmeFIFOStateReadOutHandle = openNewDevice("lsi3", &gretinaStruct);
-        if (vmeFIFOStateReadOutHandle < 0) {
-            return config->card_info[index].next_Card_Index;
-        }
-        result = vme_read(vmeFIFOStateReadOutHandle, fifoStateAddress & 0xFFFF, 
-            (uint8_t*)&fifoState, 4);
+        if (vmeFIFOStateReadOutHandle < 0) return config->card_info[index].next_Card_Index;
+        result = vme_read(vmeFIFOStateReadOutHandle, fifoStateAddress & 0xFFFF, (uint8_t*)&fifoState, 4);
         closeDevice(vmeFIFOStateReadOutHandle);
     }
+	
     if (result <= 0) {
         return config->card_info[index].next_Card_Index;
     }
      
-
-
     if ((fifoState & fifoEmptyMask) == 0) {
-
         gretinaStruct.address = fifoAddress & 0xFFFF0000; 
         gretinaStruct.addressModifier = fifoAddressMod; 
         vmeReadOutHandle = openNewDevice("lsi2", &gretinaStruct); 
@@ -628,25 +614,22 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
             result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,(uint8_t*)&theValue,4); 
             
             dataBuffer[numLongs++] = theValue;
-                        
             uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
-            
-            int32_t totalNumLongs = (numLongs + numLongsLeft);
+            int32_t totalNumLongs  = (numLongs + numLongsLeft);
              
             if ((fifoAddressMod & 0x9) == 0x9) {
                 /* No BLT's */
                 while (numLongs != totalNumLongs) {
-                    result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,
-                        (uint8_t*) (dataBuffer + numLongs),4); 
+                    result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,(uint8_t*) (dataBuffer + numLongs),4); 
                     if (result != 4) {
                         /* Error, FixME how to report this? */
                         return config->card_info[index].next_Card_Index;
                     }
                     numLongs++;
                 }
-            } else {
-                result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,
-                    (uint8_t*) (dataBuffer + numLongs),numLongsLeft*sizeof(uint32_t)); 
+            } 
+			else {
+              result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,(uint8_t*) (dataBuffer + numLongs),numLongsLeft*sizeof(uint32_t)); 
                 if (result != numLongsLeft*sizeof(uint32_t)) {
                     /* Error, FixME how to report this? */
                     return config->card_info[index].next_Card_Index;
@@ -662,8 +645,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
             //oops... really bad -- the buffer read is out of sequence -- dump it all
             uint32_t i = 0;
             while(i < sizeOfFIFO) {
-                result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,
-                    (uint8_t*) (&theValue),4); 
+                result = vme_read(vmeReadOutHandle,fifoAddress & 0xFFFF,(uint8_t*) (&theValue),4); 
                 i++;
             }
         }
@@ -676,7 +658,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index)
 /*             Reads out CAEN cards.                         */
 /*************************************************************/
 
-int32_t Readout_CAEN(SBC_crate_config* config,int32_t index)
+int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
   
     /* The deviceSpecificData is as follows:          */ 
@@ -719,3 +701,21 @@ int32_t Readout_CAEN(SBC_crate_config* config,int32_t index)
     closeDevice(vmeAM39Handle);*/
     return config->card_info[index].next_Card_Index;
 }
+
+/*************************************************************/
+/*             Readout_LAM_Data									 */
+/*************************************************************/
+int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+	//this is a pseudo object that doesn't read any hardware, it just passes information back to ORCA
+	lamData->lamNumber = config->card_info[index].slot;
+
+	SBC_Packet lamPacket;
+	lamPacket.cmdHeader.destination			  = kSBC_Process;
+	lamPacket.cmdHeader.cmdID				  = kSBC_LAM;
+	lamPacket.cmdHeader.numberBytesinPayload  = sizeof(SBC_LAM_Data);
+	memcpy(&lamPacket.payload, lamData, sizeof(SBC_LAM_Data));
+	postLAM(&lamPacket);
+	return config->card_info[index].next_Card_Index;
+}            
+

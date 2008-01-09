@@ -81,10 +81,9 @@ void stopHWRun (SBC_crate_config* config)
 	}
 }
 
-void readHW(SBC_crate_config* config)
+int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data)
 {
-	int32_t index = 0;
-	while(1){
+	if(index<config->total_cards && index>=0) {
 		switch(config->card_info[index].hw_type_id){
 			case kAcqirisDC440:														//Acqiris DC440 Digitizer
 				Readout_DC440( config->card_info[index].base_add,					//the address
@@ -95,12 +94,13 @@ void readHW(SBC_crate_config* config)
 							   ((config->card_info[index].slot  & 0x1f) << 16),		//the location (crate,card)
 								1,													//restart == YES
 								1);													//use Circular Buffer == YES
-				index = config->card_info[index].next_Card_Index;
-			break;												
-			default:			index =  -1; break;
+				return config->card_info[index].next_Card_Index;
+			break;
+															
+			default: return -1; break;
 		}
-		if(index>=config->total_cards || index<0)break;
 	}
+	return -1;
 }
 
 void FindHardware(void)

@@ -25,7 +25,7 @@
 void processHWCommand(SBC_Packet* aPacket);
 void startHWRun (SBC_crate_config* config);
 void stopHWRun (SBC_crate_config* config);
-void readHW(SBC_crate_config* config);
+int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data);
 void FindHardware(void);
 void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket);
@@ -38,7 +38,8 @@ int32_t openNewDMADevice(SBC_VmeWriteBlockStruct* aPacket, uint32_t length);
 int32_t closeDevice(int32_t deviceHandle);
 int32_t closeDMADevice(int32_t deviceHandle);
 
-int Readout_Shaper(SBC_crate_config* config,int index);
-int Readout_Gretina(SBC_crate_config* config,int index);
+int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 
 #endif
