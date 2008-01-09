@@ -1282,6 +1282,17 @@
 		84A5A22C0B35D8C7002EC2AA /* ORDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A5A22B0B35D8C7002EC2AA /* ORDetectorView.h */; };
 		84A5F05F0AB0D9D800A623AF /* ORTRS1Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A5F05D0AB0D9D800A623AF /* ORTRS1Decoders.h */; };
 		84A5F0600AB0D9D800A623AF /* ORTRS1Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A5F05E0AB0D9D800A623AF /* ORTRS1Decoders.m */; };
+		84A8B1460D35702300263D31 /* ORSBC_LAMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A8B1400D35702300263D31 /* ORSBC_LAMController.h */; };
+		84A8B1470D35702300263D31 /* ORSBC_LAMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A8B1410D35702300263D31 /* ORSBC_LAMController.m */; };
+		84A8B1480D35702300263D31 /* ORSBC_LAMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A8B1420D35702300263D31 /* ORSBC_LAMModel.h */; };
+		84A8B1490D35702300263D31 /* ORSBC_LAMModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A8B1430D35702300263D31 /* ORSBC_LAMModel.m */; };
+		84A8B14A0D35702300263D31 /* SBC_LAM.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A8B1440D35702300263D31 /* SBC_LAM.gif */; };
+		84A8B14B0D35702300263D31 /* SBC_LAM.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A8B1450D35702300263D31 /* SBC_LAM.nib */; };
+		84A8B14E0D35703300263D31 /* SBCLamView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A8B14C0D35703300263D31 /* SBCLamView.m */; };
+		84A8B14F0D35703300263D31 /* SBCLamView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A8B14D0D35703300263D31 /* SBCLamView.h */; };
+		84A8B1530D35704900263D31 /* VME_Trigger32.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A8B1510D35704900263D31 /* VME_Trigger32.h */; };
+		84A8B1540D35705700263D31 /* VME_Trigger32.c in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84A8B1500D35704900263D31 /* VME_Trigger32.c */; };
+		84A8B1550D35705700263D31 /* VME_Trigger32.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84A8B1510D35704900263D31 /* VME_Trigger32.h */; };
 		84A9518F077B6C8C00CAD99D /* Controls.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518A077B6C8C00CAD99D /* Controls.gif */; };
 		84A95190077B6C8C00CAD99D /* ClearROI.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518B077B6C8C00CAD99D /* ClearROI.gif */; };
 		84A95191077B6C8C00CAD99D /* Analyze.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84A9518C077B6C8C00CAD99D /* Analyze.gif */; };
@@ -1644,6 +1655,8 @@
 				84CEDD220CDA7DDF002CFD3A /* VME_HW_Definitions.h in VME_Copy */,
 				8493CC8C0C99FAB400B46CD4 /* HW_Readout.c in VME_Copy */,
 				8493CC8D0C99FAB400B46CD4 /* HW_Readout.h in VME_Copy */,
+				84A8B1540D35705700263D31 /* VME_Trigger32.c in VME_Copy */,
+				84A8B1550D35705700263D31 /* VME_Trigger32.h in VME_Copy */,
 			);
 			name = VME_Copy;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2745,6 +2758,16 @@
 		84A5A22B0B35D8C7002EC2AA /* ORDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDetectorView.h; path = Source/Experiments/BaseClasses/ORDetectorView.h; sourceTree = SOURCE_ROOT; };
 		84A5F05D0AB0D9D800A623AF /* ORTRS1Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORTRS1Decoders.h; path = Source/Objects/Hardware/Camac/TRS1/ORTRS1Decoders.h; sourceTree = SOURCE_ROOT; };
 		84A5F05E0AB0D9D800A623AF /* ORTRS1Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORTRS1Decoders.m; path = Source/Objects/Hardware/Camac/TRS1/ORTRS1Decoders.m; sourceTree = SOURCE_ROOT; };
+		84A8B1400D35702300263D31 /* ORSBC_LAMController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSBC_LAMController.h; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMController.h; sourceTree = SOURCE_ROOT; };
+		84A8B1410D35702300263D31 /* ORSBC_LAMController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSBC_LAMController.m; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMController.m; sourceTree = SOURCE_ROOT; };
+		84A8B1420D35702300263D31 /* ORSBC_LAMModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSBC_LAMModel.h; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMModel.h; sourceTree = SOURCE_ROOT; };
+		84A8B1430D35702300263D31 /* ORSBC_LAMModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSBC_LAMModel.m; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMModel.m; sourceTree = SOURCE_ROOT; };
+		84A8B1440D35702300263D31 /* SBC_LAM.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SBC_LAM.gif; path = Source/Objects/Hardware/SBC/SBC_LAM/SBC_LAM.gif; sourceTree = SOURCE_ROOT; };
+		84A8B1450D35702300263D31 /* SBC_LAM.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SBC_LAM.nib; path = Source/Objects/Hardware/SBC/SBC_LAM/SBC_LAM.nib; sourceTree = SOURCE_ROOT; };
+		84A8B14C0D35703300263D31 /* SBCLamView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBCLamView.m; path = "Source/Objects/Hardware/SBC/SBC Link/SBCLamView.m"; sourceTree = SOURCE_ROOT; };
+		84A8B14D0D35703300263D31 /* SBCLamView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBCLamView.h; path = "Source/Objects/Hardware/SBC/SBC Link/SBCLamView.h"; sourceTree = SOURCE_ROOT; };
+		84A8B1500D35704900263D31 /* VME_Trigger32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VME_Trigger32.c; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/VME_Trigger32.c; sourceTree = SOURCE_ROOT; };
+		84A8B1510D35704900263D31 /* VME_Trigger32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VME_Trigger32.h; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/VME_Trigger32.h; sourceTree = SOURCE_ROOT; };
 		84A9518A077B6C8C00CAD99D /* Controls.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Controls.gif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/Controls.gif"; sourceTree = SOURCE_ROOT; };
 		84A9518B077B6C8C00CAD99D /* ClearROI.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = ClearROI.gif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/ClearROI.gif"; sourceTree = SOURCE_ROOT; };
 		84A9518C077B6C8C00CAD99D /* Analyze.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Analyze.gif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/Analyze.gif"; sourceTree = SOURCE_ROOT; };
@@ -5467,6 +5490,7 @@
 			children = (
 				8493CC300C99FA0700B46CD4 /* SBC Link */,
 				8493CC3B0C99FA0700B46CD4 /* SBC_Code */,
+				84A8B13F0D35702300263D31 /* SBC_LAM */,
 			);
 			name = SBC;
 			path = Source/Objects/Hardware/SBC;
@@ -5478,6 +5502,8 @@
 				8493CC310C99FA0700B46CD4 /* SBC_Linking.h */,
 				8493CC320C99FA0700B46CD4 /* SBC_Link.h */,
 				8493CC330C99FA0700B46CD4 /* SBC_Link.m */,
+				84A8B14C0D35703300263D31 /* SBCLamView.m */,
+				84A8B14D0D35703300263D31 /* SBCLamView.h */,
 				8493CC340C99FA0700B46CD4 /* SBC_LinkController.h */,
 				8493CC350C99FA0700B46CD4 /* SBC_LinkController.m */,
 				8493CC360C99FA0700B46CD4 /* SBC_Link.nib */,
@@ -5549,6 +5575,8 @@
 				84CEDD1E0CDA7DB7002CFD3A /* VME_HW_Definitions.h */,
 				8493CC7F0C99FA4B00B46CD4 /* HW_Readout.c */,
 				8493CC800C99FA4B00B46CD4 /* HW_Readout.h */,
+				84A8B1500D35704900263D31 /* VME_Trigger32.c */,
+				84A8B1510D35704900263D31 /* VME_Trigger32.h */,
 			);
 			name = VME_Readout_Code;
 			path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code;
@@ -5868,6 +5896,20 @@
 			);
 			path = AcqirisDC440;
 			sourceTree = "<group>";
+		};
+		84A8B13F0D35702300263D31 /* SBC_LAM */ = {
+			isa = PBXGroup;
+			children = (
+				84A8B1400D35702300263D31 /* ORSBC_LAMController.h */,
+				84A8B1410D35702300263D31 /* ORSBC_LAMController.m */,
+				84A8B1420D35702300263D31 /* ORSBC_LAMModel.h */,
+				84A8B1430D35702300263D31 /* ORSBC_LAMModel.m */,
+				84A8B1440D35702300263D31 /* SBC_LAM.gif */,
+				84A8B1450D35702300263D31 /* SBC_LAM.nib */,
+			);
+			name = SBC_LAM;
+			path = Source/Objects/Hardware/SBC/SBC_LAM;
+			sourceTree = SOURCE_ROOT;
 		};
 		84AB8BB30D2314A500EC39F2 /* CmdHistory */ = {
 			isa = PBXGroup;
@@ -7962,6 +8004,10 @@
 				84AB8BC70D2314CD00EC39F2 /* ORC111CModel.h in Headers */,
 				84AB8BD20D2314DD00EC39F2 /* ORJAMFController.h in Headers */,
 				84AB8BD40D2314DD00EC39F2 /* ORJAMFModel.h in Headers */,
+				84A8B1460D35702300263D31 /* ORSBC_LAMController.h in Headers */,
+				84A8B1480D35702300263D31 /* ORSBC_LAMModel.h in Headers */,
+				84A8B14F0D35703300263D31 /* SBCLamView.h in Headers */,
+				84A8B1530D35704900263D31 /* VME_Trigger32.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8456,6 +8502,8 @@
 				84AB8BC40D2314CD00EC39F2 /* C111C.tif in Resources */,
 				84AB8BD00D2314DD00EC39F2 /* JAMF.gif in Resources */,
 				84AB8BD10D2314DD00EC39F2 /* JAMF.nib in Resources */,
+				84A8B14A0D35702300263D31 /* SBC_LAM.gif in Resources */,
+				84A8B14B0D35702300263D31 /* SBC_LAM.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9030,6 +9078,9 @@
 				84AB8BC80D2314CD00EC39F2 /* ORC111CModel.m in Sources */,
 				84AB8BD30D2314DD00EC39F2 /* ORJAMFController.m in Sources */,
 				84AB8BD50D2314DD00EC39F2 /* ORJAMFModel.m in Sources */,
+				84A8B1470D35702300263D31 /* ORSBC_LAMController.m in Sources */,
+				84A8B1490D35702300263D31 /* ORSBC_LAMModel.m in Sources */,
+				84A8B14E0D35703300263D31 /* SBCLamView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
