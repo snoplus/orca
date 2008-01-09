@@ -1417,6 +1417,16 @@
 		8479E44C0D0A1A7E007E346A /* ORCaen265Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8479E4440D0A1A7E007E346A /* ORCaen265Model.h */; };
 		8479E44D0D0A1A7E007E346A /* ORCaen265Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8479E4450D0A1A7E007E346A /* ORCaen265Model.m */; };
 		8479E44F0D0A1AD6007E346A /* Caen265Card.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8479E44E0D0A1AD6007E346A /* Caen265Card.tif */; };
+		847B710D0D2EB651000A7B34 /* SBCLamView.h in Headers */ = {isa = PBXBuildFile; fileRef = 847B710B0D2EB651000A7B34 /* SBCLamView.h */; };
+		847B710E0D2EB651000A7B34 /* SBCLamView.m in Sources */ = {isa = PBXBuildFile; fileRef = 847B710C0D2EB651000A7B34 /* SBCLamView.m */; };
+		847B71160D2EB667000A7B34 /* ORSBC_LAMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 847B71100D2EB667000A7B34 /* ORSBC_LAMController.h */; };
+		847B71170D2EB667000A7B34 /* ORSBC_LAMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 847B71110D2EB667000A7B34 /* ORSBC_LAMController.m */; };
+		847B71180D2EB667000A7B34 /* ORSBC_LAMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 847B71120D2EB667000A7B34 /* ORSBC_LAMModel.h */; };
+		847B71190D2EB667000A7B34 /* ORSBC_LAMModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 847B71130D2EB667000A7B34 /* ORSBC_LAMModel.m */; };
+		847B711A0D2EB667000A7B34 /* SBC_LAM.gif in Resources */ = {isa = PBXBuildFile; fileRef = 847B71140D2EB667000A7B34 /* SBC_LAM.gif */; };
+		847B711B0D2EB667000A7B34 /* SBC_LAM.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847B71150D2EB667000A7B34 /* SBC_LAM.nib */; };
+		847B78F30D3441D8000A7B34 /* VME_Trigger32.h in Headers */ = {isa = PBXBuildFile; fileRef = 847B78F10D3441D8000A7B34 /* VME_Trigger32.h */; };
+		847B78FE0D344605000A7B34 /* VME_Trigger32.h in VME_Code Copy  */ = {isa = PBXBuildFile; fileRef = 847B78F10D3441D8000A7B34 /* VME_Trigger32.h */; };
 		847DFD430D08C7EE0021F9CB /* NplHV.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847DFD3C0D08C7EE0021F9CB /* NplHV.nib */; };
 		847DFD440D08C7EE0021F9CB /* NplHVIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847DFD3D0D08C7EE0021F9CB /* NplHVIcon.tif */; };
 		847DFD450D08C7EE0021F9CB /* ORNplHVController.h in Headers */ = {isa = PBXBuildFile; fileRef = 847DFD3E0D08C7EE0021F9CB /* ORNplHVController.h */; };
@@ -1472,7 +1482,6 @@
 		8490B2200D0DDC3600275B5E /* C111C.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8490B21F0D0DDC3600275B5E /* C111C.tif */; };
 		8493C4E30C984AF200B46CD4 /* HW_Readout.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C4DF0C984AF200B46CD4 /* HW_Readout.h */; };
 		8493C4F00C984C9D00B46CD4 /* SBC_Linking.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493C4EF0C984C9D00B46CD4 /* SBC_Linking.h */; };
-		8493C5030C984E0500B46CD4 /* HW_Readout.c in VME_Code Copy  */ = {isa = PBXBuildFile; fileRef = 8493C4DE0C984AF200B46CD4 /* HW_Readout.c */; };
 		8493C5040C984E0500B46CD4 /* HW_Readout.h in VME_Code Copy  */ = {isa = PBXBuildFile; fileRef = 8493C4DF0C984AF200B46CD4 /* HW_Readout.h */; };
 		8493C57C0C98516900B46CD4 /* killScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493C5780C98516900B46CD4 /* killScript */; };
 		8493C57D0C98516900B46CD4 /* makeScript in Resources */ = {isa = PBXBuildFile; fileRef = 8493C5790C98516900B46CD4 /* makeScript */; };
@@ -1676,9 +1685,9 @@
 			dstPath = VME_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
+				847B78FE0D344605000A7B34 /* VME_Trigger32.h in VME_Code Copy  */,
 				8493C5E00C9854C800B46CD4 /* Makefile in VME_Code Copy  */,
 				8457B0C50CDA70FD0095F7D9 /* VME_HW_Definitions.h in VME_Code Copy  */,
-				8493C5030C984E0500B46CD4 /* HW_Readout.c in VME_Code Copy  */,
 				8493C5040C984E0500B46CD4 /* HW_Readout.h in VME_Code Copy  */,
 			);
 			name = "VME_Code Copy ";
@@ -2449,6 +2458,16 @@
 		8479E4440D0A1A7E007E346A /* ORCaen265Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen265Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Model.h; sourceTree = SOURCE_ROOT; };
 		8479E4450D0A1A7E007E346A /* ORCaen265Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen265Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Model.m; sourceTree = SOURCE_ROOT; };
 		8479E44E0D0A1AD6007E346A /* Caen265Card.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Caen265Card.tif; path = Source/Objects/Hardware/Vme/CAEN/CV265/Caen265Card.tif; sourceTree = SOURCE_ROOT; };
+		847B710B0D2EB651000A7B34 /* SBCLamView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBCLamView.h; path = "Source/Objects/Hardware/SBC/SBC Link/SBCLamView.h"; sourceTree = SOURCE_ROOT; };
+		847B710C0D2EB651000A7B34 /* SBCLamView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SBCLamView.m; path = "Source/Objects/Hardware/SBC/SBC Link/SBCLamView.m"; sourceTree = SOURCE_ROOT; };
+		847B71100D2EB667000A7B34 /* ORSBC_LAMController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSBC_LAMController.h; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMController.h; sourceTree = SOURCE_ROOT; };
+		847B71110D2EB667000A7B34 /* ORSBC_LAMController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSBC_LAMController.m; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMController.m; sourceTree = SOURCE_ROOT; };
+		847B71120D2EB667000A7B34 /* ORSBC_LAMModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSBC_LAMModel.h; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMModel.h; sourceTree = SOURCE_ROOT; };
+		847B71130D2EB667000A7B34 /* ORSBC_LAMModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSBC_LAMModel.m; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMModel.m; sourceTree = SOURCE_ROOT; };
+		847B71140D2EB667000A7B34 /* SBC_LAM.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SBC_LAM.gif; path = Source/Objects/Hardware/SBC/SBC_LAM/SBC_LAM.gif; sourceTree = SOURCE_ROOT; };
+		847B71150D2EB667000A7B34 /* SBC_LAM.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SBC_LAM.nib; path = Source/Objects/Hardware/SBC/SBC_LAM/SBC_LAM.nib; sourceTree = SOURCE_ROOT; };
+		847B78F10D3441D8000A7B34 /* VME_Trigger32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VME_Trigger32.h; sourceTree = "<group>"; };
+		847B78F20D3441D8000A7B34 /* VME_Trigger32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = VME_Trigger32.c; sourceTree = "<group>"; };
 		847BC82F05E293E80054841E /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/Unlocked.tif; sourceTree = "<group>"; };
 		847BC83105E293E80054841E /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/Locked.tif; sourceTree = "<group>"; };
 		847BC83405E2940D0054841E /* ORHWUndoSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHWUndoSet.h; path = "Source/Main Dialogs/HardwareWizard/ORHWUndoSet.h"; sourceTree = SOURCE_ROOT; };
@@ -5266,6 +5285,20 @@
 			path = Source/Objects/Hardware/Vme/CAEN/CV265;
 			sourceTree = SOURCE_ROOT;
 		};
+		847B710F0D2EB667000A7B34 /* SBC_LAM */ = {
+			isa = PBXGroup;
+			children = (
+				847B71100D2EB667000A7B34 /* ORSBC_LAMController.h */,
+				847B71110D2EB667000A7B34 /* ORSBC_LAMController.m */,
+				847B71120D2EB667000A7B34 /* ORSBC_LAMModel.h */,
+				847B71130D2EB667000A7B34 /* ORSBC_LAMModel.m */,
+				847B71140D2EB667000A7B34 /* SBC_LAM.gif */,
+				847B71150D2EB667000A7B34 /* SBC_LAM.nib */,
+			);
+			name = SBC_LAM;
+			path = Source/Objects/Hardware/SBC/SBC_LAM;
+			sourceTree = SOURCE_ROOT;
+		};
 		847BF64507A564D600F91E05 /* GateElements */ = {
 			isa = PBXGroup;
 			children = (
@@ -5458,6 +5491,7 @@
 			isa = PBXGroup;
 			children = (
 				848E240E0C96EC5F002329AE /* SBC Link */,
+				847B710F0D2EB667000A7B34 /* SBC_LAM */,
 				848E23E20C96EBB6002329AE /* SBC_Code */,
 			);
 			name = SBC;
@@ -5486,6 +5520,8 @@
 				848E24230C96EE97002329AE /* SBC_Link.m */,
 				8493C7B40C987F1D00B46CD4 /* SBC_LinkController.h */,
 				8493C7B50C987F1D00B46CD4 /* SBC_LinkController.m */,
+				847B710B0D2EB651000A7B34 /* SBCLamView.h */,
+				847B710C0D2EB651000A7B34 /* SBCLamView.m */,
 				8493C9BA0C98BABB00B46CD4 /* SBC_Link.nib */,
 				8493C5780C98516900B46CD4 /* killScript */,
 				8493C5790C98516900B46CD4 /* makeScript */,
@@ -5568,8 +5604,10 @@
 			children = (
 				8493C5DE0C9854C000B46CD4 /* Makefile */,
 				8457B0C30CDA70E70095F7D9 /* VME_HW_Definitions.h */,
-				8493C4DE0C984AF200B46CD4 /* HW_Readout.c */,
 				8493C4DF0C984AF200B46CD4 /* HW_Readout.h */,
+				8493C4DE0C984AF200B46CD4 /* HW_Readout.c */,
+				847B78F10D3441D8000A7B34 /* VME_Trigger32.h */,
+				847B78F20D3441D8000A7B34 /* VME_Trigger32.c */,
 			);
 			name = VME_Readout_Code;
 			path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code;
@@ -7999,6 +8037,10 @@
 				8446CE750D1C809600F257F0 /* ORJAMFController.h in Headers */,
 				8446CE770D1C809600F257F0 /* ORJAMFModel.h in Headers */,
 				84AB8A3D0D22FAE600EC39F2 /* ORCmdHistory.h in Headers */,
+				847B710D0D2EB651000A7B34 /* SBCLamView.h in Headers */,
+				847B71160D2EB667000A7B34 /* ORSBC_LAMController.h in Headers */,
+				847B71180D2EB667000A7B34 /* ORSBC_LAMModel.h in Headers */,
+				847B78F30D3441D8000A7B34 /* VME_Trigger32.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8511,6 +8553,8 @@
 				840710740D12FDA100FD6EFD /* NoNI488PluginHelp.plist in Resources */,
 				8446CE730D1C809600F257F0 /* JAMF.gif in Resources */,
 				8446CE740D1C809600F257F0 /* JAMF.nib in Resources */,
+				847B711A0D2EB667000A7B34 /* SBC_LAM.gif in Resources */,
+				847B711B0D2EB667000A7B34 /* SBC_LAM.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9086,6 +9130,9 @@
 				8446CE760D1C809600F257F0 /* ORJAMFController.m in Sources */,
 				8446CE780D1C809600F257F0 /* ORJAMFModel.m in Sources */,
 				84AB8A3E0D22FAE600EC39F2 /* ORCmdHistory.m in Sources */,
+				847B710E0D2EB651000A7B34 /* SBCLamView.m in Sources */,
+				847B71170D2EB667000A7B34 /* ORSBC_LAMController.m in Sources */,
+				847B71190D2EB667000A7B34 /* ORSBC_LAMModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
