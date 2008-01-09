@@ -2628,6 +2628,14 @@
 			84A8B15C0D35709800263D31 /* PBXTextBookmark */ = 84A8B15C0D35709800263D31 /* PBXTextBookmark */;
 			84A8B15D0D35709800263D31 /* PBXTextBookmark */ = 84A8B15D0D35709800263D31 /* PBXTextBookmark */;
 			84A8B15E0D35709800263D31 /* PBXTextBookmark */ = 84A8B15E0D35709800263D31 /* PBXTextBookmark */;
+			84A8B1600D35723D00263D31 /* PBXTextBookmark */ = 84A8B1600D35723D00263D31 /* PBXTextBookmark */;
+			84A8B1610D35723D00263D31 /* PBXBookmark */ = 84A8B1610D35723D00263D31 /* PBXBookmark */;
+			84A8B1620D35723D00263D31 /* PBXTextBookmark */ = 84A8B1620D35723D00263D31 /* PBXTextBookmark */;
+			84A8B1630D35723D00263D31 /* PBXTextBookmark */ = 84A8B1630D35723D00263D31 /* PBXTextBookmark */;
+			84A8B1850D357AA100263D31 /* PBXTextBookmark */ = 84A8B1850D357AA100263D31 /* PBXTextBookmark */;
+			84A8B18C0D357ADB00263D31 /* PBXTextBookmark */ = 84A8B18C0D357ADB00263D31 /* PBXTextBookmark */;
+			84A8B1900D357AFB00263D31 /* PBXTextBookmark */ = 84A8B1900D357AFB00263D31 /* PBXTextBookmark */;
+			84A8B1920D357B5400263D31 /* PBXTextBookmark */ = 84A8B1920D357B5400263D31 /* PBXTextBookmark */;
 			84AB8CE20D242C0300EC39F2 = 84AB8CE20D242C0300EC39F2 /* PBXTextBookmark */;
 			84AB8CE30D242C0300EC39F2 = 84AB8CE30D242C0300EC39F2 /* PBXTextBookmark */;
 			84AB8CE40D242C0300EC39F2 = 84AB8CE40D242C0300EC39F2 /* PBXTextBookmark */;
@@ -4549,7 +4557,7 @@
 		ignoreCount = 0;
 		lineNumber = 746;
 		location = Orca;
-		modificationTime = 221599946.478275;
+		modificationTime = 221608696.341048;
 		state = 2;
 	};
 	8425425E0BD0436C004C8065 /* ORGate1D.m:768 */ = {
@@ -4566,7 +4574,7 @@
 		ignoreCount = 0;
 		lineNumber = 768;
 		location = Orca;
-		modificationTime = 221599946.478618;
+		modificationTime = 221608696.341504;
 		state = 1;
 	};
 	842542850BD04812004C8065 /* ORCurve1D.m:453 */ = {
@@ -4583,7 +4591,7 @@
 		ignoreCount = 0;
 		lineNumber = 453;
 		location = Orca;
-		modificationTime = 221599946.47879;
+		modificationTime = 221608696.341823;
 		state = 2;
 	};
 	842543370BD04C57004C8065 /* ORCurve1D.m:445 */ = {
@@ -4600,7 +4608,7 @@
 		ignoreCount = 0;
 		lineNumber = 445;
 		location = Orca;
-		modificationTime = 221599946.478961;
+		modificationTime = 221608696.342145;
 		state = 2;
 	};
 	842543BD0BD3E2C9004C8065 /* ORCurve1D.m:466 */ = {
@@ -4617,7 +4625,7 @@
 		ignoreCount = 0;
 		lineNumber = 466;
 		location = Orca;
-		modificationTime = 221599946.479135;
+		modificationTime = 221608696.342432;
 		state = 2;
 	};
 	842543C00BD3E310004C8065 /* ORCurve1D.m:447 */ = {
@@ -4634,7 +4642,7 @@
 		ignoreCount = 0;
 		lineNumber = 447;
 		location = Orca;
-		modificationTime = 221599946.479388;
+		modificationTime = 221608696.3427;
 		state = 1;
 	};
 	842545570BD40686004C8065 /* ORDispatcherModel.m:265 */ = {
@@ -4651,7 +4659,7 @@
 		ignoreCount = 0;
 		lineNumber = 265;
 		location = Orca;
-		modificationTime = 221599946.479565;
+		modificationTime = 221608696.342988;
 		state = 2;
 	};
 	8428BC3007CBC05600C53671 /* ORDGF4cDefaultParams.plist */ = {
@@ -5034,7 +5042,7 @@
 		hitCount = 0;
 		ignoreCount = 0;
 		lineNumber = 125;
-		modificationTime = 221599946.47975;
+		modificationTime = 221608696.343269;
 		state = 2;
 	};
 	8434150B08EE0378009B7659 /* ORCrateController.h */ = {
@@ -5061,8 +5069,9 @@
 	};
 	8434A363055B3288002D3102 /* Info.plist */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {899, 756}}";
-			sepNavSelRange = "{180, 0}";
+			sepNavIntBoundsRect = "{{0, 0}, {620, 798}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 986}";
 			sepNavVisRect = "{{0, 0}, {899, 542}}";
 			sepNavWindowFrame = "{{38, 444}, {750, 558}}";
 		};
@@ -7677,7 +7686,7 @@
 		ignoreCount = 0;
 		lineNumber = 31;
 		location = Orca;
-		modificationTime = 221600067.753401;
+		modificationTime = 221608787.399599;
 		state = 1;
 	};
 	849DAB070C108E3C00044320 /* ORRamperController.h */ = {
@@ -8045,7 +8054,7 @@
 		ignoreCount = 0;
 		lineNumber = 486;
 		location = Orca;
-		modificationTime = 221599946.480121;
+		modificationTime = 221608696.343816;
 		state = 1;
 	};
 	84A588B7082AC63B00075582 /* PBXTextBookmark */ = {
@@ -8174,6 +8183,80 @@
 		rType = 0;
 		vrLen = 1993;
 		vrLoc = 1166;
+	};
+	84A8B1600D35723D00263D31 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 84A8B1500D35704900263D31 /* VME_Trigger32.c */;
+		name = "VME_Trigger32.c: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1993;
+		vrLoc = 1166;
+	};
+	84A8B1610D35723D00263D31 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = 8434A363055B3288002D3102 /* Info.plist */;
+	};
+	84A8B1620D35723D00263D31 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 84A8B1500D35704900263D31 /* VME_Trigger32.c */;
+		name = "VME_Trigger32.c: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1993;
+		vrLoc = 1166;
+	};
+	84A8B1630D35723D00263D31 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8434A363055B3288002D3102 /* Info.plist */;
+		name = "Info.plist: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 986;
+		vrLoc = 0;
+	};
+	84A8B1850D357AA100263D31 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8434A363055B3288002D3102 /* Info.plist */;
+		name = "Info.plist: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 986;
+		vrLoc = 0;
+	};
+	84A8B18C0D357ADB00263D31 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8434A363055B3288002D3102 /* Info.plist */;
+		name = "Info.plist: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 986;
+		vrLoc = 0;
+	};
+	84A8B1900D357AFB00263D31 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8434A363055B3288002D3102 /* Info.plist */;
+		name = "Info.plist: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 986;
+		vrLoc = 0;
+	};
+	84A8B1920D357B5400263D31 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 8434A363055B3288002D3102 /* Info.plist */;
+		name = "Info.plist: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 986;
+		vrLoc = 0;
 	};
 	84A9565E077B767300CAD99D /* ORPlotter2D.h */ = {
 		uiCtxt = {
@@ -8334,7 +8417,7 @@
 		ignoreCount = 0;
 		lineNumber = 301;
 		location = Orca;
-		modificationTime = 221599946.480342;
+		modificationTime = 221608696.344148;
 		state = 1;
 	};
 	84AB8CFD0D242EB300EC39F2 /* PBXTextBookmark */ = {
