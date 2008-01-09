@@ -654,9 +654,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	request->dataID					  = 0;
 	request->location				  = (([self crateNumber]&0x000000f)<<21) | (([self stationNumber]& 0x0000001f)<<16);
 	
-	[[self adapter] writeBuffer:&aPacket];
-
-	[[self adapter] readBuffer:&aPacket];
+	[[self adapter] send:&aPacket receive:&aPacket];
 	Acquiris_WaveformResponseStruct* wPtr = (Acquiris_WaveformResponseStruct*)aPacket.payload;
 	long numRecords = wPtr->numWaveformStructsToFollow;
 		
@@ -696,72 +694,59 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 - (Acquiris_GetCmdStatusStruct) doGetXXXCommand:(unsigned long)aCmdNumber cmdArgs:(NSString*)args
 {
 	Acquiris_GetCmdStatusStruct response;
-	@synchronized([self adapter]){
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination	= kAcqirisDC440;
-		aPacket.cmdHeader.cmdID			= aCmdNumber;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(Acquiris_AsciiCmdStruct);
-		
-		Acquiris_AsciiCmdStruct* cmdPtr = (Acquiris_AsciiCmdStruct*)aPacket.payload;
-		if([args length]){
-			strncpy(cmdPtr->argBuffer,[args cStringUsingEncoding:NSASCIIStringEncoding],kMaxAsciiCmdLength);
-		}
-		else cmdPtr->argBuffer[0]='\0';
-		
-		[[self adapter] writeBuffer:&aPacket];
-		
-		//get the response and just skip the header
-		[[self adapter] readBuffer:&aPacket];
-		memcpy(&response, aPacket.payload, sizeof(Acquiris_GetCmdStatusStruct));
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination	= kAcqirisDC440;
+	aPacket.cmdHeader.cmdID			= aCmdNumber;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(Acquiris_AsciiCmdStruct);
+	
+	Acquiris_AsciiCmdStruct* cmdPtr = (Acquiris_AsciiCmdStruct*)aPacket.payload;
+	if([args length]){
+		strncpy(cmdPtr->argBuffer,[args cStringUsingEncoding:NSASCIIStringEncoding],kMaxAsciiCmdLength);
 	}
+	else cmdPtr->argBuffer[0]='\0';
+	
+	[[self adapter] send:&aPacket receive:&aPacket];
+	memcpy(&response, aPacket.payload, sizeof(Acquiris_GetCmdStatusStruct));
+	
 	return response;
 }
 
 - (long) doSetXXXCommand:(unsigned long)aCmdNumber cmdArgs:(NSString*)args
 {
 	long status = 0;
-	@synchronized([self adapter]){
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination	= kAcqirisDC440;
-		aPacket.cmdHeader.cmdID			= aCmdNumber;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(Acquiris_AsciiCmdStruct);
-				
-		Acquiris_AsciiCmdStruct* cmdPtr = (Acquiris_AsciiCmdStruct*)aPacket.payload;
-		if([args length]){
-			strncpy(cmdPtr->argBuffer,[args cStringUsingEncoding:NSASCIIStringEncoding],kMaxAsciiCmdLength);
-		}
-		else cmdPtr->argBuffer[0]='\0';
-		[[self adapter] writeBuffer:&aPacket];
-		
-		//get the response and just skip the header
-		[[self adapter] readBuffer:&aPacket];
-
-		Acquiris_SetCmdStatusStruct *responsePtr = (Acquiris_SetCmdStatusStruct*)aPacket.payload;
-		status = responsePtr->status;
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination	= kAcqirisDC440;
+	aPacket.cmdHeader.cmdID			= aCmdNumber;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(Acquiris_AsciiCmdStruct);
+			
+	Acquiris_AsciiCmdStruct* cmdPtr = (Acquiris_AsciiCmdStruct*)aPacket.payload;
+	if([args length]){
+		strncpy(cmdPtr->argBuffer,[args cStringUsingEncoding:NSASCIIStringEncoding],kMaxAsciiCmdLength);
 	}
+	else cmdPtr->argBuffer[0]='\0';
+	[[self adapter] send:&aPacket receive:&aPacket];
+
+	Acquiris_SetCmdStatusStruct *responsePtr = (Acquiris_SetCmdStatusStruct*)aPacket.payload;
+	status = responsePtr->status;
 	return status;
 }
 
 - (long) doCommand:(unsigned long)aCmdNumber cmdArgs:(NSString*)args
 {
 	long status = 0;
-	@synchronized([self adapter]){
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination	= kAcqirisDC440;
-		aPacket.cmdHeader.cmdID			= aCmdNumber;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(Acquiris_AsciiCmdStruct);
-		
-		Acquiris_AsciiCmdStruct* cmdPtr = (Acquiris_AsciiCmdStruct*)aPacket.payload;
-		if([args length]){
-			strncpy(cmdPtr->argBuffer,[args cStringUsingEncoding:NSASCIIStringEncoding],kMaxAsciiCmdLength);
-		}
-		else cmdPtr->argBuffer[0]='\0';
-		[[self adapter] writeBuffer:&aPacket];
-		
-		[[self adapter] readBuffer:&aPacket];
-		Acquiris_StatusStruct *responsePtr = (Acquiris_StatusStruct*)aPacket.payload;
-		status = responsePtr->status;
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination	= kAcqirisDC440;
+	aPacket.cmdHeader.cmdID			= aCmdNumber;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(Acquiris_AsciiCmdStruct);
+	
+	Acquiris_AsciiCmdStruct* cmdPtr = (Acquiris_AsciiCmdStruct*)aPacket.payload;
+	if([args length]){
+		strncpy(cmdPtr->argBuffer,[args cStringUsingEncoding:NSASCIIStringEncoding],kMaxAsciiCmdLength);
 	}
+	else cmdPtr->argBuffer[0]='\0';
+	[[self adapter] send:&aPacket receive:&aPacket];
+	Acquiris_StatusStruct *responsePtr = (Acquiris_StatusStruct*)aPacket.payload;
+	status = responsePtr->status;
 	return status;
 }
 
@@ -873,20 +858,17 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 		if(!firstTime){
 			if([self dataAvailable]){
 
-				@synchronized([self adapter]){
-					[[self adapter] writeBuffer:&readDataPacket];
-					
-					[[self adapter] readBuffer:&returnPacket];
-					Acquiris_WaveformResponseStruct* wPtr = (Acquiris_WaveformResponseStruct*)returnPacket.payload;
-					long hitMask = wPtr->hitMask;
-					if(hitMask & 0x1)	sampleCount[0]++;
-					if(hitMask & 0x2)	sampleCount[1]++;
-					wPtr++;
-					unsigned long* dp = (unsigned long*)wPtr;
-					unsigned long totalDataLength = (returnPacket.cmdHeader.numberBytesinPayload - sizeof(Acquiris_WaveformResponseStruct))/sizeof(long);
-					if(totalDataLength){
-						[aDataPacket addLongsToFrameBuffer:dp length:totalDataLength];			
-					}
+				[[self adapter] send:&readDataPacket receive:&returnPacket];
+				
+				Acquiris_WaveformResponseStruct* wPtr = (Acquiris_WaveformResponseStruct*)returnPacket.payload;
+				long hitMask = wPtr->hitMask;
+				if(hitMask & 0x1)	sampleCount[0]++;
+				if(hitMask & 0x2)	sampleCount[1]++;
+				wPtr++;
+				unsigned long* dp = (unsigned long*)wPtr;
+				unsigned long totalDataLength = (returnPacket.cmdHeader.numberBytesinPayload - sizeof(Acquiris_WaveformResponseStruct))/sizeof(long);
+				if(totalDataLength){
+					[aDataPacket addLongsToFrameBuffer:dp length:totalDataLength];			
 				}
 			}
 		}
