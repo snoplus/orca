@@ -313,23 +313,10 @@ struct {
 	@synchronized(self){
 		if(verbose)NSLog(@"Adc values for JADC-L (station %d)\n",[self stationNumber]);
 		if(enabledMask){
-		
-			unsigned long theRawValues[16];
-			[[self adapter] camacLongNAFBlock:[self stationNumber] a:0 f:0 data:theRawValues length:16];
-
-		
 			int chan;
 			for(chan=0;chan<16;chan++){
 				if(enabledMask & (0x1L<<chan)){
-					BOOL tooLow = [self adcTooLow:theRawValues[chan]];
-					BOOL tooHigh = [self adcTooHigh:theRawValues[chan]];
-					float theValue = [self convertRawAdcToVolts:theRawValues[chan]];
-					[self setAdcValue:chan withValue:theValue];
-			
-					if(tooLow)		[self setAdcRange:chan withValue:kAdcLRangeLow];
-					else if(tooHigh)[self setAdcRange:chan withValue:kAdcLRangeHigh];
-					else			[self setAdcRange:chan withValue:kAdcLRangeOK];
-					
+					[self readAdcChannel:chan];
 					if(verbose){
 						NSString* s1 = @"In Range";
 						if(adcRange[chan] == kAdcLRangeLow)		 s1 = @"Too low";
@@ -337,12 +324,6 @@ struct {
 						NSLog(@"%2d:%.2f %@\n",chan,adcValue[chan],s1);
 					}
 				}
-				else {
-					[self setAdcValue:chan withValue:0];
-					[self setAdcRange:chan withValue:kAdcLRangeOK];		
-				}
-
-				[self _checkAlarm:chan];
 			}
 			[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
 
@@ -380,9 +361,10 @@ struct {
 	unsigned short theHighLimit[16];
 	NSLog(@"Lower and Upper limits for JADC-L (station %d)\n",[self stationNumber]);
 	int chan;
-	[[self adapter] camacShortNAFBlock:[self stationNumber] a:0 f:4 data:theLowLimit length:16]; //read lower limit
-	[[self adapter] camacShortNAFBlock:[self stationNumber] a:0 f:6 data:theHighLimit length:16]; //read lower limit
-
+	for(chan=0;chan<16;chan++){
+		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:4 data:&theLowLimit[chan]]; //read lower limit
+		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:6 data:&theHighLimit[chan]]; //read lower limit
+	}
 	for(chan=0;chan<16;chan++){
 		NSLog(@"%2d:%.2f %.2f\n",chan,[self convertRawLimitToVolts:theLowLimit[chan]],[self convertRawLimitToVolts:theHighLimit[chan]]);
 	}
@@ -416,19 +398,18 @@ struct {
 
 - (void) initBoard
 {
-
+	int chan;
+	for(chan=0;chan<16;chan++){
+		unsigned short value;
+		value = [self convertVoltsToRawLimit:lowLimits[chan]];
+		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:20 data:&value];
+		value = [self convertVoltsToRawLimit:highLimits[chan]];
+		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:22 data:&value];
+	}
 	unsigned short aMask = enabledMask;
 	[[self adapter] camacShortNAF:[self stationNumber] a:0 f:17 data:&aMask];
-
-	unsigned short buffer[16];
-	int chan;
-	for(chan=0;chan<16;chan++)buffer[chan] = [self convertVoltsToRawLimit:lowLimits[chan]];
-	[[self adapter] camacShortNAFBlock:[self stationNumber] a:0 f:20 data:buffer length:16];
-	
-	for(chan=0;chan<16;chan++)buffer[chan] = [self convertVoltsToRawLimit:highLimits[chan]];
-	[[self adapter] camacShortNAFBlock:[self stationNumber] a:0 f:22 data:buffer length:16];
-	
 }
+
 
 
 #pragma mark ¥¥¥Archival
