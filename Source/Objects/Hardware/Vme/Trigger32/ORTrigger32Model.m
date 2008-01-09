@@ -25,6 +25,8 @@
 #import "ORVmeCrateModel.h"
 #import "ORReadOutList.h"
 #import "ORDataTypeAssigner.h"
+#import "SBC_Config.h"
+#import "VME_HW_Definitions.h"
 
 #pragma mark ¥¥¥Definitions
 #define kDefaultAddressModifier		    0x29
@@ -1788,6 +1790,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 }
 
 
+//this is the obsolete data structure for the VME147 *** depreciated ****
 - (int) load_eCPU_HW_Config_Structure:(VME_crate_config*)configStruct index:(int)index
 {
     configStruct->total_cards++;
@@ -1838,6 +1841,69 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 			}
 			int savedIndex = nextIndex;
 			nextIndex = [obj load_eCPU_HW_Config_Structure:configStruct index:nextIndex];
+			if(obj == [dataTakers2 lastObject]){
+				configStruct->card_info[savedIndex].next_Card_Index = -1; //make the last object a leaf node
+			}
+		}
+    }
+    
+    configStruct->card_info[index].next_Card_Index 	 = nextIndex;
+    
+    return nextIndex;
+}
+
+
+//this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+    configStruct->total_cards++;
+    configStruct->card_info[index].hw_type_id		= kTrigger32;  //should be unique 
+    configStruct->card_info[index].hw_mask[0]		= clockDataId; //better be unique
+    configStruct->card_info[index].hw_mask[1]		= gtid1DataId; //better be unique
+    configStruct->card_info[index].hw_mask[2]		= gtid2DataId; //better be unique
+    configStruct->card_info[index].slot				= [self slot];
+    configStruct->card_info[index].add_mod			= [self addressModifier];
+    configStruct->card_info[index].base_add			= [self baseAddress];
+    
+	configStruct->card_info[index].deviceSpecificData[0] = 0;
+    if(shipEvt1Clk)		configStruct->card_info[index].deviceSpecificData[0] |= 1<<0;
+    if(shipEvt2Clk)		configStruct->card_info[index].deviceSpecificData[0] |= 1<<1;
+    if(useSoftwareGtId)	configStruct->card_info[index].deviceSpecificData[0] |= 1<<2;
+    if(useMSAM)			configStruct->card_info[index].deviceSpecificData[0] |= 1<<3;
+    if(useNoHardware)	configStruct->card_info[index].deviceSpecificData[0] |= 1<<4;
+    if(clockEnabled)	configStruct->card_info[index].deviceSpecificData[0] |= 1<<5;
+    if(trigger1GtXor)	configStruct->card_info[index].deviceSpecificData[0] |= 1<<6;
+    if(trigger2GtXor)	configStruct->card_info[index].deviceSpecificData[0] |= 1<<7;
+	configStruct->card_info[index].deviceSpecificData[1] = mSamPrescale;
+	
+    configStruct->card_info[index].num_Trigger_Indexes = 2;
+    int nextIndex = index+1;
+    
+	configStruct->card_info[index].next_Trigger_Index[0] = -1;
+	NSEnumerator* e = [dataTakers1 objectEnumerator];
+	id obj;
+	while(obj = [e nextObject]){
+		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
+			if(configStruct->card_info[index].next_Trigger_Index[0] == -1){
+				configStruct->card_info[index].next_Trigger_Index[0] = nextIndex;
+			}
+			int savedIndex = nextIndex;
+			nextIndex = [obj load_HW_Config_Structure:configStruct index:nextIndex];
+			if(obj == [dataTakers1 lastObject]){
+				configStruct->card_info[savedIndex].next_Card_Index = -1; //make the last object a leaf node
+			}
+		}
+	}
+	
+	configStruct->card_info[index].next_Trigger_Index[1] = -1;
+    e = [dataTakers2 objectEnumerator];
+    while(obj = [e nextObject]){
+		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
+			if(configStruct->card_info[index].next_Trigger_Index[1] == -1){
+				configStruct->card_info[index].next_Trigger_Index[1] = nextIndex;
+			}
+			int savedIndex = nextIndex;
+			nextIndex = [obj load_HW_Config_Structure:configStruct index:nextIndex];
 			if(obj == [dataTakers2 lastObject]){
 				configStruct->card_info[savedIndex].next_Card_Index = -1; //make the last object a leaf node
 			}

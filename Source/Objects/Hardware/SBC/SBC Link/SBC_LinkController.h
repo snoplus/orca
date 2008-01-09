@@ -27,6 +27,7 @@
 {
 	IBOutlet NSButton*				lockButton;
 	IBOutlet NSTabView*				tabView;
+    IBOutlet ORGroupView*			groupView;
 
 	//code management
 	IBOutlet NSButton*		setFilePathButton;
@@ -46,6 +47,7 @@
 	IBOutlet ORValueBar*    bytesReceivedRateBar;	
 	IBOutlet NSTextField*   byteRateSentField;
 	IBOutlet NSTextField*   byteRateReceivedField;
+	IBOutlet NSMatrix*      infoTypeMatrix;
 
 	//IP Settings
 	IBOutlet NSTextField*	ipNumberField;
@@ -96,6 +98,7 @@
 
 - (void) byteRateChanged:(NSNotification*)aNote;
 - (void) runInfoChanged:(NSNotification*)aNote;
+- (void) infoTypeChanged:(NSNotification*)aNote;
 
 - (void) initAfterConnectChanged:(NSNotification*)aNote;
 - (void) startStatusChanged:(NSNotification*)aNote;
@@ -104,6 +107,7 @@
 - (void) passWordChanged:(NSNotification*)aNote;
 - (void) ipNumberChanged:(NSNotification*)aNote;
 - (void) portNumberChanged:(NSNotification*)aNote;
+- (void) lamSlotChanged:(NSNotification*)aNotification;
 
 - (void) addressChanged:(NSNotification*)aNote;
 - (void) writeValueChanged:(NSNotification*)aNote;
@@ -112,6 +116,8 @@
 - (void) readWriteTypeChanged:(NSNotification*)aNote;
 - (void) addressModifierChanged:(NSNotification*)aNote;
 
+- (NSString*) errorString:(int)errNum;
+- (NSString*) literalToString:(int)aLiteral;
 
 
 #pragma mark •••Actions
@@ -141,6 +147,8 @@
 - (IBAction) doRangeAction:(id)sender;
 - (IBAction) readWriteTypeMatrixAction:(id)sender;
 - (IBAction) addressModifierPUAction:(id)sender;
+
+- (IBAction) infoTypeAction:(id)sender;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;

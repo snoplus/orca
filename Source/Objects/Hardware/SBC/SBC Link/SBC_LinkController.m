@@ -24,6 +24,7 @@
 #import "SBC_Linking.h"
 #import "ORCard.h"
 #import "ORVmeAdapter.h"
+#import "ORSBC_LAMModel.h"
 
 @interface SBC_LinkController (private)
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -49,6 +50,7 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
+	[groupView setGroup:model];
 		
     NSString* key = [NSString stringWithFormat: @"orca.%@%d.selectedtab",[model className],[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -124,7 +126,6 @@
 						selector : @selector(loadModeChanged:)
 							name : SBC_LinkLoadModeChanged
 						   object: [model sbcLink]];
-	   
 	   
 	   [notifyCenter addObserver : self
 						selector : @selector(runInfoChanged:)
@@ -213,6 +214,16 @@
                          name : SBC_LinkAddressModifierChanged
                        object : [model sbcLink]];
 
+  [notifyCenter addObserver : self
+                     selector : @selector(lamSlotChanged:)
+                         name : ORSBC_LAMSlotChangedNotification
+                       object : nil];
+
+  [notifyCenter addObserver : self
+                     selector : @selector(infoTypeChanged:)
+                         name : SBC_LinkInfoTypeChanged
+                       object : [model sbcLink]];
+
 }
 
 - (void) updateWindow
@@ -227,7 +238,6 @@
 	[self loadModeChanged:nil];
 
 	[self byteRateChanged:nil];
-	[self runInfoChanged:nil];
 	
 	[self ipNumberChanged:nil];
 	[self portNumberChanged:nil];
@@ -241,8 +251,9 @@
 	[self rangeChanged:nil];
     [self readWriteTypeChanged:nil];
     [self addressModifierChanged:nil];
+    [self infoTypeChanged:nil];
 	
-	[self startStatusChanged:nil];
+	[self lamSlotChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -250,6 +261,11 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:[model sbcLockName] to:secure];
     [lockButton setEnabled:secure];
+}
+
+- (void) lamSlotChanged:(NSNotification*)aNotification
+{
+	[groupView setNeedsDisplay:YES];
 }
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
@@ -285,6 +301,13 @@
 		case 1: [addressStepper setIncrement:2]; break;
 		case 2: [addressStepper setIncrement:4]; break;
 	}
+}
+
+- (void) infoTypeChanged:(NSNotification*)aNotification
+{
+	[self updateRadioCluster:infoTypeMatrix setting:[[model sbcLink] infoType]];
+	[self runInfoChanged:nil];
+
 }
 
 - (void) addressModifierChanged:(NSNotification*)aNotification
@@ -380,7 +403,6 @@
 	[filePathField setStringValue:[[[model sbcLink] filePath] stringByAbbreviatingWithTildeInPath]];
 }
 
-
 - (void) byteRateChanged:(NSNotification*)aNote
 {
 	[byteRateSentField setFloatValue:[[model sbcLink] byteRateSent]/1000.];
@@ -391,20 +413,56 @@
 - (void) runInfoChanged:(NSNotification*)aNote
 {
 	SBC_info_struct theRunInfo =  [[model sbcLink] runInfo];
-	NSString* theRunInfoString =                                 [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
-	theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Config loaded : %@\t\tWrap Arounds: %d\n",(theRunInfo.statusBits & kSBC_ConfigLoadedMask) ? @"YES":@"NO ",theRunInfo.wrapArounds]];
-	theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %d\n",(theRunInfo.statusBits & kSBC_RunningMask) ? @"YES":@"NO ",[[model sbcLink] throttle]]];
-	theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
-	theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
+	NSString* theRunInfoString = @"";
+	int i,num;
+	switch([[model sbcLink] infoType]){
+		case 0:
+			theRunInfoString =                                 [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Config loaded : %@\t\tWrap Arounds: %d\n",(theRunInfo.statusBits & kSBC_ConfigLoadedMask) ? @"YES":@"NO ",theRunInfo.wrapArounds]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %d\n",(theRunInfo.statusBits & kSBC_RunningMask) ? @"YES":@"NO ",[[model sbcLink] throttle]]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
 
-	unsigned long aMinValue,aMaxValue,aHeadValue,aTailValue;
-	[[model sbcLink] getQueMinValue:&aMinValue maxValue:&aMaxValue head:&aHeadValue tail:&aTailValue];
-	theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %d\n",aHeadValue]];
-	theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %d\n",aTailValue]];
-	theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %d\n",theRunInfo.amountInBuffer]];
+			unsigned long aMinValue,aMaxValue,aHeadValue,aTailValue;
+			[[model sbcLink] getQueMinValue:&aMinValue maxValue:&aMaxValue head:&aHeadValue tail:&aTailValue];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %d\n",aHeadValue]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %d\n",aTailValue]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %d\n",theRunInfo.amountInBuffer]];
+		break;
 
+		case 1:
+			num = theRunInfo.err_buf_cnt;
+			if(num == 0) theRunInfoString =  @"No Errors";
+			for(i=0;i<num;i++){
+				theRunInfoString =  [theRunInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.errorStrings[i]];
+			}
+		break;
+
+		case 2:
+			num = theRunInfo.msg_buf_cnt;
+			if(num == 0) theRunInfoString =  @"No Messages";
+			for(i=0;i<num;i++){
+				theRunInfoString =  [theRunInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.messageStrings[i]];
+			}
+		break;
+	}
 	[runInfoField setStringValue:theRunInfoString];
 	[queView setNeedsDisplay:YES];
+}
+
+- (NSString*) literalToString:(int)aLiteral
+{
+	NSString* s = [NSString stringWithFormat:@"%c%c%c%c",(aLiteral>>24)&0xff,(aLiteral>>16)&0xff,(aLiteral>>8)&0xff,aLiteral&0xff];
+	return s;
+}
+
+- (NSString*) errorString:(int)errNum
+{
+	switch (errNum) {
+		case kSBC_ReadError:  return @"Rd Err";
+		case kSBC_WriteError: return @"Wr Err";
+		default:return [NSString stringWithFormat:@"Err %2d",errNum];
+	}
 }
 
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
@@ -719,6 +777,13 @@
 - (IBAction) addressModifierPUAction:(id)sender
 {
 	[[model sbcLink] setAddressModifier:[[sender selectedItem] tag]];
+}
+
+- (IBAction) infoTypeAction:(id)sender
+{
+    if ([[model sbcLink] infoType] != [sender selectedTag]){
+        [[model sbcLink] setInfoType:[sender selectedTag]];
+    }
 }
 
 @end

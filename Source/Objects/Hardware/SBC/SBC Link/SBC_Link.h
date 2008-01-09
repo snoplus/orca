@@ -21,6 +21,7 @@
 
 #import "SBC_Config.h"
 #import "SBC_Cmds.h"
+#import "ORGroup.h"
 
 typedef  enum eSBC_CrateStates{
 	kIdle,
@@ -36,8 +37,9 @@ typedef  enum eSBC_CrateStates{
 
 @class  ORFileMover;
 @class  ORCard;
+@class ORSafeQueue;
 
-@interface SBC_Link : NSObject {
+@interface SBC_Link : ORGroup {
 	id				delegate;
 	ORAlarm*        eCpuDeadAlarm;
 	ORAlarm*        eRunFailedAlarm;
@@ -52,7 +54,6 @@ typedef  enum eSBC_CrateStates{
 	ORFileMover*	coreSBCFileMover;
 	ORFileMover*	specificHWFileMover;
 	NSMutableData*	theDataBuffer;
-	NSArray*		dataTakers;			//cache of data takers.
 	unsigned short  missedHeartBeat;
 	unsigned long   oldCycleCount;
 	BOOL            isRunning;
@@ -68,6 +69,7 @@ typedef  enum eSBC_CrateStates{
 	BOOL			isConnected;
     NSCalendarDate*	timeConnected;
 	int				socketfd;
+	int				irqfd;
 	int				startCrateState;
 	int				waitCount;
 	BOOL			tryingTostartCrate;
@@ -86,15 +88,24 @@ typedef  enum eSBC_CrateStates{
 	unsigned int	readWriteType;
 	BOOL			doRange;
 	unsigned short	range;
+	int				infoType;
+	NSLock*			socketLock;
+	BOOL			irqThreadRunning;
+	ORSafeQueue*    lamsToAck;
+	BOOL			stopWatchingIRQ;
+	
 }
+
 - (id)   initWithDelegate:(ORCard*)anDelegate;
 - (void) dealloc;
 - (void) wakeUp; 
 - (void) sleep ;	
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 - (int) slot;
 - (NSUndoManager*) undoManager;
+- (int) infoType;
+- (void) setInfoType:(int)aType;
 - (void) setDelegate:(ORCard*)anDelegate;
 - (id) delegate;
 - (int) loadMode;
@@ -154,6 +165,7 @@ typedef  enum eSBC_CrateStates{
 
 - (void) tasksCompleted:(id)sender;
 
+- (int) connectToPort:(unsigned short) aPort;
 - (void) getRunInfoBlock;
 - (void) reloadClient;
 - (void) killCrate;
@@ -215,8 +227,7 @@ typedef  enum eSBC_CrateStates{
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace;
 
-- (void) writeBuffer:(SBC_Packet*)aPacket;
-- (void) readBuffer:(SBC_Packet*)aPacket;
+- (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket;
 
 - (void) update;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -231,10 +242,10 @@ typedef  enum eSBC_CrateStates{
 - (NSString*) crateName;
 
 
-#pragma mark ¥¥¥DataSource
+#pragma mark â€¢â€¢â€¢DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 
-#pragma mark ¥¥¥Archival
+#pragma mark â€¢â€¢â€¢Archival
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
@@ -270,4 +281,5 @@ extern NSString* SBC_LinkRangeChanged;
 extern NSString* SBC_LinkDoRangeChanged;
 extern NSString* SBC_LinkAddressModifierChanged;
 extern NSString* SBC_LinkRWTypeChanged;
+extern NSString* SBC_LinkInfoTypeChanged;
 

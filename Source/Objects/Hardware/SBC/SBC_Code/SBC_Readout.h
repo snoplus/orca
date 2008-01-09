@@ -25,14 +25,18 @@
 
 #include "SBC_Cmds.h"
 #include "SBC_Config.h"
+#include <sys/types.h>
 
 void processBuffer(SBC_Packet* aPacket);
 void processSBCCommand(SBC_Packet* aPacket);
 void doRunCommand(SBC_Packet* aPacket);
 void sendResponse(SBC_Packet* aPacket);
-int readBuffer(SBC_Packet* aPacket);
-int writeBuffer(SBC_Packet* aPacket);
+int32_t readBuffer(SBC_Packet* aPacket);
+int32_t writeBuffer(SBC_Packet* aPacket);
+int32_t writeIRQ(int n);
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
-
+void postLAM(SBC_Packet* lamPacket);
+void LogMessage (const char *format,...);
+void LogError (const char *format,...);
 #endif

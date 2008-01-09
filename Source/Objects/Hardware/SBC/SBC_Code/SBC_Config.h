@@ -40,6 +40,14 @@ typedef struct {
 
 #define kSBC_CrateConfigSizeLongs sizeof(SBC_crate_config)/sizeof(uint32_t)
 #define kSBC_CrateConfigSizeBytes sizeof(SBC_crate_config)
+#define kSBC_MaxErrorBufferSize 8
+#define kSBC_MaxStrSize 64
+
+#define	kSBC_Success			0
+#define	kSBC_WriteError			1
+#define	kSBC_ReadError			2
+
+#define	kSBC_NumRunInfoValuesToSwap	15
 
 typedef struct {
     uint32_t statusBits;
@@ -51,6 +59,20 @@ typedef struct {
     uint32_t amountInBuffer;
     uint32_t recordsTransfered;
     uint32_t wrapArounds;
+	uint32_t busErrorCount;
+	
+	uint32_t rd_error_cnt[MAX_CARDS];
+	uint32_t loop_cnt[MAX_CARDS];			// number of Clock loops in hw readout
+	uint32_t total_rate_cnt[MAX_CARDS];		// number of Clock loops in hw readout
+	
+	uint32_t  err_buf_cnt;
+	uint32_t  msg_buf_cnt;
+	
+	//the following --DON'T-- have to be swapped-- put these last and 
+	//bump the kSBC_NumRunInfoValuesToSwap if you add any other values to the above set
+	char errorStrings[kSBC_MaxErrorBufferSize][kSBC_MaxStrSize];	// eCPU recent errors array
+	char messageStrings[kSBC_MaxErrorBufferSize][kSBC_MaxStrSize];// eCPU recent messages array
+	
 } SBC_info_struct;
 
 #define kSBC_ConfigLoadedMask    (0x1 << 0)

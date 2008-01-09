@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 
 #import "SBC_Link.h"
 #import "SBC_Linking.h"
@@ -28,6 +28,8 @@
 #import "ORDataPacket.h"
 #import "ORCard.h"
 #import "ORCrate.h"
+#import "ORSafeQueue.h"
+#import "ORSBC_LAMModel.h"
 
 #import <netdb.h>
 #import <sys/types.h>
@@ -45,7 +47,7 @@
 
 #define kSBCRateIntegrationTime 1.5
 
-#pragma mark ¥¥¥External Strings
+#pragma mark â€¢â€¢â€¢External Strings
 NSString* SBC_LinkLoadModeChanged			= @"SBC_LinkLoadModeChanged";
 NSString* SBC_LinkInitAfterConnectChanged	= @"SBC_LinkInitAfterConnectChanged";
 NSString* SBC_LinkReloadingChanged			= @"SBC_LinkReloadingChanged";
@@ -71,12 +73,19 @@ NSString* SBC_LinkRangeChanged				= @"SBC_LinkRangeChanged";
 NSString* SBC_LinkDoRangeChanged			= @"SBC_LinkDoRangeChanged";
 NSString* SBC_LinkAddressModifierChanged	= @"SBC_LinkAddressModifierChanged";
 NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
+NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 
 @interface SBC_Link (private)
 - (void) throwError:(int)anError;
 - (void) fillInScript:(NSString*)theScript;
 - (void) runFailed;
 - (void) startCrateProcess;
+- (void) watchIrqSocket;
+- (void) write:(int)aSocket buffer:(SBC_Packet*)aPacket;
+- (void) read:(int)aSocket buffer:(SBC_Packet*)aPacket;
+- (BOOL) dataAvailable:(int) sck;
+- (BOOL) canWriteTo:(int) sck;
+- (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket;
 @end
 
 @implementation SBC_Link
@@ -84,6 +93,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 {
 	self = [super init];
 	delegate = aDelegate; //don't retain.
+	socketLock = [[NSLock alloc] init];
 	return self;
 }
 
@@ -91,6 +101,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 - (void) dealloc
 {
 	[self stopCrate];
+	[socketLock release];
 	[eCpuDeadAlarm clearAlarm];
 	[eCpuDeadAlarm release];
 	[eRunFailedAlarm clearAlarm];
@@ -108,6 +119,8 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 - (void) wakeUp 
 {
 	[self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];
+
+
 }
 
 - (void) sleep 	
@@ -115,10 +128,24 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
 }
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 - (int) slot
 {
 	return [delegate slot];
+}
+
+- (int) infoType
+{
+	return infoType;
+}
+
+- (void) setInfoType:(int)aType;
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setInfoType:infoType];
+    
+    infoType = aType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkInfoTypeChanged object:self];
 }
 
 - (void) setDelegate:(ORCard*)aDelegate
@@ -489,12 +516,13 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 }
 
 
-#pragma mark ¥¥¥Archival
+#pragma mark â€¢â€¢â€¢Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super init];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setInfoType:		[decoder decodeIntForKey:   @"infoType"]];
 	[self setLoadMode:		[decoder decodeIntForKey:   @"loadMode"]];
 	[self setInitAfterConnect:[decoder decodeBoolForKey:@"InitAfterConnect"]];
 	[self setWriteValue:	[decoder decodeInt32ForKey: @"WriteValue"]];
@@ -510,13 +538,14 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
     [self setDoRange:		[decoder decodeBoolForKey:	@"DoRange"]];
     [self setReadWriteType: [decoder decodeIntForKey:   @"ReadWriteType"]];	
     [self setAddressModifier: [decoder decodeIntForKey:   @"addressModifier"]];	
-
+	socketLock = [[NSLock alloc] init];
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
+    [encoder encodeInt:infoType			forKey:@"infoType"];
     [encoder encodeInt:range			forKey:@"Range"];
     [encoder encodeBool:doRange			forKey:@"DoRange"];
 	[encoder encodeInt:loadMode			forKey:@"loadMode"];
@@ -573,20 +602,16 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 
 - (void) getRunInfoBlock
 {
-	@synchronized(self){
-		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_RunInfoRequest;
-		aPacket.cmdHeader.numberBytesinPayload	= 0;
-		
-		[self writeBuffer:&aPacket];
-		
-		//get the response....
-		[self readBuffer:&aPacket];
-		memcpy(&runInfo,aPacket.payload,sizeof(SBC_info_struct));
-				
-		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
-	}
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination			= kSBC_Process;
+	aPacket.cmdHeader.cmdID					= kSBC_RunInfoRequest;
+	aPacket.cmdHeader.numberBytesinPayload	= 0;
+	
+	[self send:&aPacket receive:&aPacket];
+	
+	memcpy(&runInfo,aPacket.payload,sizeof(SBC_info_struct));
+			
+	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
 }
 - (unsigned long) throttle
 {
@@ -786,34 +811,41 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse
 {
-	@synchronized(self){
-		SBC_Packet aPacket;
+	SBC_Packet aPacket;
+	
+	aPacket.cmdHeader.destination			= kSBC_Process;
+	aPacket.cmdHeader.cmdID					= aCmd;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_CmdOptionStruct);
+	memcpy(aPacket.payload,optionBlock,sizeof(SBC_CmdOptionStruct));
 		
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= aCmd;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_CmdOptionStruct);
-		memcpy(aPacket.payload,optionBlock,sizeof(SBC_CmdOptionStruct));
-		
-		[self writeBuffer:&aPacket];
+	NS_DURING
+		[socketLock lock]; //begin critical section
+		[self write:socketfd buffer:&aPacket];
 
 		if(askForResponse){
 			//get the response....
-			[self readBuffer:&aPacket];
+			[self read:socketfd buffer:&aPacket];
 			SBC_CmdOptionStruct* optionPtr = (SBC_CmdOptionStruct*)aPacket.payload;
 			int i;
 			for(i=0;i<kMaxOptions;i++){
 				optionBlock->option[i] = optionPtr->option[i];
 			}
 		}
-	}
+		[socketLock unlock]; //end critical section
+
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
+
 }
 
 - (void) writeLongBlock:(long*) buffer
 			 atAddress:(unsigned long) anAddress
 			 numToRead:(unsigned int)  numberLongs
 {
-	@synchronized(self){
-
+	NS_DURING
+		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
@@ -825,8 +857,12 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		writeBlockPtr++;
 		memcpy(writeBlockPtr,buffer,numberLongs*sizeof(long));
 
-		[self writeBuffer:&aPacket];
-	}
+		[self write:socketfd buffer:&aPacket];
+		[socketLock unlock]; //end critical section
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 
@@ -834,7 +870,8 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			 atAddress:(unsigned long) anAddress
 			 numToRead:(unsigned int) numberLongs
 {
-	@synchronized(self){
+	NS_DURING
+		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
@@ -844,9 +881,9 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		readBlockPtr->address		= anAddress;
 		readBlockPtr->numLongs		= numberLongs;
 
-		[self writeBuffer:&aPacket]; //write the packet
-		
-		[self readBuffer:&aPacket]; //read the response
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&aPacket]; //write the packet
+		[self read:socketfd buffer:&aPacket]; //read the response
 		
 		SBC_ReadBlockStruct* rp = (SBC_ReadBlockStruct*)aPacket.payload;
 		int numLongs = rp->numLongs;
@@ -856,7 +893,11 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		for(i=0;i<numLongs;i++){
 			buffer[i] = dp[i];
 		}
-	}
+		[socketLock unlock]; //end critical section
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 - (void) readByteBlock:(unsigned char *) buffer
@@ -865,7 +906,8 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace;
 {
-	@synchronized(self){
+	NS_DURING
+		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_VmeReadBlock;
@@ -878,9 +920,9 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		readBlockPtr->unitSize			= 1;
 		readBlockPtr->numItems			= numberBytes;
 
-		[self writeBuffer:&aPacket]; //write the packet
-		
-		[self readBuffer:&aPacket]; //read the response
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&aPacket]; //write the packet
+		[self read:socketfd buffer:&aPacket];  //read the response
 		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(!rp->errorCode){		
@@ -889,7 +931,11 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			memcpy(buffer,dp,num);
 		}
 		else [self throwError:rp->errorCode];
-	}
+		[socketLock unlock]; //end critical section
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 - (void) readWordBlock:(unsigned short *) buffer
@@ -898,7 +944,8 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
-	@synchronized(self){
+	NS_DURING
+		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_VmeReadBlock;
@@ -911,9 +958,9 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		readBlockPtr->unitSize			= 2;
 		readBlockPtr->numItems			= numberWords;
 
-		[self writeBuffer:&aPacket]; //write the packet
-		
-		[self readBuffer:&aPacket];  //read the response
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&aPacket]; //write the packet
+		[self read:socketfd buffer:&aPacket];  //read the response
 		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(!rp->errorCode){		
@@ -922,7 +969,11 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			memcpy(buffer,dp,num*sizeof(short));
 		}
 		else [self throwError:rp->errorCode];
-	}
+		[socketLock unlock]; //end critical section
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 - (void) readLongBlock:(unsigned long *) buffer
@@ -931,7 +982,8 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
-	@synchronized(self){
+	NS_DURING
+		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_VmeReadBlock;
@@ -944,9 +996,10 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		readBlockPtr->unitSize			= 4;
 		readBlockPtr->numItems			= numberLongs;
 
-		[self writeBuffer:&aPacket];	//write the packet
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&aPacket];	//write the packet
+		[self read:socketfd buffer:&aPacket];		//read the response
 		
-		[self readBuffer:&aPacket];		//read the response
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(!rp->errorCode){		
 			int num = rp->numItems;
@@ -954,7 +1007,11 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			memcpy(buffer,rp,num*sizeof(long));
 		}
 		else [self throwError:rp->errorCode];
-	}
+		[socketLock unlock]; //end critical section
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 
@@ -964,7 +1021,8 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace
 {
-	@synchronized(self){
+	NS_DURING
+		[socketLock lock]; //begin critical section
 
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
@@ -980,11 +1038,17 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		char* bPtr = (char*)(writeBlockPtr+1); //point to the payload
 		memcpy(bPtr,buffer,numberBytes);
 
-		[self writeBuffer:&aPacket];	//write the packet
-		[self readBuffer:&aPacket];		//read the response
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&aPacket];	//write the packet
+		[self read:socketfd buffer:&aPacket];		//read the response
+		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(rp->errorCode)[self throwError:rp->errorCode];
-	}
+		[socketLock unlock]; //end critical section
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 
@@ -994,7 +1058,8 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace
 {
-	@synchronized(self){
+	NS_DURING
+		[socketLock lock]; //begin critical section
 
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
@@ -1010,11 +1075,17 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		short* wPtr = (short*)(writeBlockPtr+1); //point to the payload
 		memcpy(wPtr,buffer,numberWords*sizeof(short));
 
-		[self writeBuffer:&aPacket];	//write the packet
-		[self readBuffer:&aPacket];		//read the response
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&aPacket];	//write the packet
+		[self read:socketfd buffer:&aPacket];		//read the response
+		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(rp->errorCode)[self throwError:rp->errorCode];
-	}
+		[socketLock unlock]; //end critical section
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 - (void) writeLongBlock:(unsigned long *) buffer
@@ -1023,7 +1094,8 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace
 {
-	@synchronized(self){
+	NS_DURING
+		[socketLock lock]; //begin critical section
 
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
@@ -1039,92 +1111,32 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 		writeBlockPtr++;				//point to the payload
 		memcpy(writeBlockPtr,buffer,numberLongs*sizeof(long));
 
-		[self writeBuffer:&aPacket];	//write the packet
-		[self readBuffer:&aPacket];		//read the response
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&aPacket];	//write the packet
+		[self read:socketfd buffer:&aPacket];		//read the response
+		
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(rp->errorCode)[self throwError:rp->errorCode];
-	}
+		[socketLock unlock]; //end critical section
+	NS_HANDLER
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	NS_ENDHANDLER
 }
 
-- (void) writeBuffer:(SBC_Packet*)aPacket
+- (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket
 {
-	@synchronized(self){
-		aPacket->message[0] = '\0';
-		if(!socketfd)	return;
-		int numBytesToSend = sizeof(long) +
-							 sizeof(SBC_CommandHeader) + 
-							 kSBC_MaxMessageSize + 
-							 aPacket->cmdHeader.numberBytesinPayload;
-		aPacket->numBytes = numBytesToSend;
-		char* packetPtr = (char*)aPacket;		//recast the first 'real' word in the packet
-		while (numBytesToSend) {       
-			int bytesWritten = write(socketfd,packetPtr,numBytesToSend);
-			if (bytesWritten > 0) {
-				packetPtr += bytesWritten;
-				numBytesToSend -= bytesWritten;
-				bytesSent += bytesWritten;
-			}
-			else if (bytesWritten < 0) {
-				[NSException raise:@"Write Error" format:@"Write Error %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
-			}
-		}
-	}
+	[socketLock lock]; //begin critial section
+	NS_DURING
+		[self write:socketfd buffer:aSendPacket];
+		[self read:socketfd buffer:aReceivePacket];
+	NS_HANDLER
+		[socketLock unlock]; //end critial section
+		[localException raise];
+	NS_ENDHANDLER
+	[socketLock unlock]; //end critial section
 }
 
-
-- (void) readBuffer:(SBC_Packet*)aPacket
-{	
-	@synchronized(self){
-
-		if(!socketfd)return;
-		
-		// set up the file descriptor set
-		fd_set fds;
-		FD_ZERO(&fds);
-		FD_SET(socketfd, &fds);
-
-		struct timeval tv;
-		tv.tv_sec  = 10;
-		tv.tv_usec = 0;
-
-		// wait until timeout or data received
-		int  selectionResult = select(socketfd+1, &fds, NULL, NULL, &tv);
-		if(selectionResult > 0){
-			int n;			
-			long numBytesToGet = 0;
-			n = recv(socketfd, &numBytesToGet, 4, MSG_WAITALL);	
-			if(n==0){
-				[self setIsConnected:NO];
-				[self setTimeConnected:nil];
-				[NSException raise:@"Socket Disconnected" format:@"%@ Port %d Disconnected",IPNumber,portNumber];
-			}
-			bytesReceived += sizeof(long);
-			numBytesToGet-=sizeof(long);
-			
-			char* packetPtr = (char*)&aPacket->cmdHeader;
-			while(numBytesToGet){
-				n = recv(socketfd, packetPtr, numBytesToGet, MSG_WAITALL);
-				if(n == 0) break; //connection disconnected.
-				packetPtr += n;
-				numBytesToGet -= n;
-				bytesReceived += n;
-				missedHeartBeat = 0;
-			}
-			if(n==0){
-				[self setIsConnected:NO];
-				[self setTimeConnected:nil];
-				[NSException raise:@"Socket Disconnected" format:@"%@ Port %d Disconnected",IPNumber,portNumber];
-			}
-		}
-		if (selectionResult == kSelectionError){
-			[NSException raise:@"Read Error" format:@"Read Error %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
-		}
-		else if (selectionResult == kSelectionTimeout) {
-			[NSException raise:@"ConnectionTimeOut" format:@"Connect to %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
-		}
-		if(aPacket->message[0])NSLog(@"%s\n",aPacket->message);
-	}
-} 
 
 
 - (void) update
@@ -1158,6 +1170,13 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+
+	if([[self orcaObjects] count]){
+		//set up the irq thread to watch that socket, but only if there are LAMS defined
+		stopWatchingIRQ = NO;
+		[NSThread detachNewThreadSelector:@selector(watchIrqSocket) toTarget:self withObject:nil];
+	}
+	
 	[eCpuDeadAlarm clearAlarm];
 	[eRunFailedAlarm clearAlarm];
 	throttleCount = 0;
@@ -1169,22 +1188,19 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	@synchronized(self){
-		if(++throttleCount>throttle){
-			throttleCount = 0;
-			SBC_Packet aPacket;
-			aPacket.cmdHeader.destination	= kSBC_Process;
-			aPacket.cmdHeader.cmdID			= kSBC_CBRead;
-			[self writeBuffer:&aPacket];
-			
-			//get the response....
-			[self readBuffer:&aPacket];
-			
-			unsigned long* rp = (unsigned long*)aPacket.payload;
-			long numLongs = aPacket.cmdHeader.numberBytesinPayload/sizeof(long);
-			if(numLongs){
-				[aDataPacket addLongsToFrameBuffer:rp length:numLongs];
-			}
+	//this stuff is socket based, so no need to try to ask for data too often. A larger throttleCount
+	//will result in larger sized buffers from the SBC.
+	if(++throttleCount>throttle){
+		throttleCount = 0;
+		SBC_Packet aPacket;
+		aPacket.cmdHeader.destination	= kSBC_Process;
+		aPacket.cmdHeader.cmdID			= kSBC_CBRead;
+		[self send:&aPacket receive:&aPacket];
+					
+		unsigned long* rp = (unsigned long*)aPacket.payload;
+		long numLongs = aPacket.cmdHeader.numberBytesinPayload/sizeof(long);
+		if(numLongs){
+			[aDataPacket addLongsToFrameBuffer:rp length:numLongs];
 		}
 	}
 }
@@ -1192,6 +1208,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[self tellClientToStopRun];
+	stopWatchingIRQ = YES;
 	[self getRunInfoBlock];
     /* We no longer need the throttle since we are just clearing the circular buffer.
        It will be reset when the run starts.                                           */
@@ -1199,7 +1216,6 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	if(runInfo.amountInBuffer > 0){
 		NSLog(@"%@ %d %d reading out last %d bytes in CB\nm",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
 	}
-	
 }
 
 - (BOOL) doneTakingData
@@ -1207,30 +1223,28 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	//the remote client has  been told to stop taking data, but there is probably still
 	//data in the CB. The run will not actually stop until we return YES from this method.
 	[self getRunInfoBlock];
-	return runInfo.amountInBuffer == 0;
+	return (runInfo.amountInBuffer == 0) && !irqThreadRunning;
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
+{	
 	[self performSelector:@selector(getRunInfoBlock) withObject:self afterDelay:1];
 }
 
 
 - (void) load_HW_Config:(SBC_crate_config*) aConfig
 {	
-	@synchronized(self){
-		SBC_Packet aPacket;
-		
-		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_LoadConfig;
-		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_crate_config);
-		memcpy(aPacket.payload,aConfig,sizeof(SBC_crate_config));
-		
-		[self writeBuffer:&aPacket];
-	}
+	SBC_Packet aPacket;
+	
+	aPacket.cmdHeader.destination			= kSBC_Process;
+	aPacket.cmdHeader.cmdID					= kSBC_LoadConfig;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_crate_config);
+	memcpy(aPacket.payload,aConfig,sizeof(SBC_crate_config));
+	
+	[self write:socketfd buffer:&aPacket];	
 }
 
-#pragma mark ¥¥¥DataSource
+#pragma mark â€¢â€¢â€¢DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
 {
 	*aMinValue  = 0;
@@ -1247,62 +1261,92 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 
 - (void) connect
 {
-	if(!socketfd && ([IPNumber length]!=0) && (portNumber!=0)){
+	if(!socketfd && !irqfd && ([IPNumber length]!=0) && (portNumber!=0)){
 		NS_DURING
-			if ((socketfd = socket(PF_INET, SOCK_STREAM, 0)) != kError) {
-		
-				struct sockaddr_in their_addr;						// connector's address information 
-				struct hostent* he=gethostbyname([IPNumber cStringUsingEncoding:NSASCIIStringEncoding]);
-				if(he) {
-					their_addr.sin_family = AF_INET;				// host byte order 
-					their_addr.sin_port = htons(portNumber);		// short, network byte order 
-					their_addr.sin_addr = *((struct in_addr *)he->h_addr);
-					memset(&(their_addr.sin_zero), '\0', 8);		// zero the rest of the struct 
+			//get the socket descriptor for the main com link
+			socketfd = [self connectToPort:portNumber];
 
-					if (connect(socketfd, (struct sockaddr *)&their_addr, sizeof(struct sockaddr)) != kError) {
-						long testWord = 0x0000DCBA;
-						int bytesWritten = write(socketfd,&testWord,4);
-						if(bytesWritten!=4){
-							[NSException raise:@"Test Send Failed" format:@"Couldn't connect to %@",IPNumber];
-						}
+			//send a test word to determine if swapping will be needed. All swapping is handled on the 'other' side.
+			long testWord = 0x0000DCBA;
+			int bytesWritten = write(socketfd,&testWord,4);
+			if(bytesWritten!=4) [NSException raise:@"Test Send Failed" format:@"Couldn't write to %@",IPNumber];
+
+			//get the socket descriptor for the interrupt link
+			irqfd = [self connectToPort:portNumber+1];
+
+			[self setIsConnected: YES];
+			[self setTimeConnected:[NSCalendarDate date]];
+			[self setReloading:NO];
 						
-						[self setIsConnected: YES];
-						[self setTimeConnected:[NSCalendarDate date]];
-						[self setReloading:NO];
-
-						NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
-						//[self getRunInfoBlock];
-						[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
-					}
-					else [NSException raise:@"Connection Failed" format:@"Couldn't connect to %@ Error: %d",IPNumber,errno];
-				}
-				else [NSException raise:@"HostByName Failed" format:@"Couldn't couldn't get hostname for %@",IPNumber];
-			}
-			else [NSException raise:@"Socket Failed" format:@"Couldn't couldn't get socket for %@ Port %d",IPNumber,portNumber];
+			NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
+			//[self getRunInfoBlock];
+			[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
 
 		NS_HANDLER
 			if(socketfd){
 				close(socketfd);
 				socketfd = 0;
-				[self setIsConnected: NO];
-				[self setTimeConnected:nil];
 			}
+			if(irqfd){
+				close(irqfd);
+				irqfd = 0;
+			}
+			[self setIsConnected: NO];
+			[self setTimeConnected:nil];
+
 			[localException raise];
 		NS_ENDHANDLER
 		
 	}
 }
+
 - (void) disconnect
 {
 	if(socketfd){
 		close(socketfd);
 		socketfd = 0;
-		[self setIsConnected: NO];
-		[self setTimeConnected:nil];
-		NSLog(@"Disconnected from %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
-		[[delegate crate] disconnected];
-	}	
+	}
+	if(irqfd){
+		close(irqfd);
+		irqfd = 0;
+	}
+	
+	[self setIsConnected: NO];
+	[self setTimeConnected:nil];
+	NSLog(@"Disconnected from %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
+	[[delegate crate] disconnected];
+		
 }
+
+- (int) connectToPort:(unsigned short) aPort
+{
+	//get the host info
+	struct sockaddr_in target_address;					// connector's address information 
+	struct hostent* he=gethostbyname([IPNumber cStringUsingEncoding:NSASCIIStringEncoding]);
+	if(!he) [NSException raise:@"HostByName Failed" format:@"Couldn't couldn't get hostname for %@",IPNumber];
+	
+	target_address.sin_family = AF_INET;				// host byte order 
+	target_address.sin_port = htons(aPort);				// short, network byte order 
+	target_address.sin_addr = *((struct in_addr *)he->h_addr);
+	memset(&(target_address.sin_zero), '\0', 8);		// zero the rest of the struct 
+
+    int sck = socket(AF_INET, SOCK_STREAM, 0);
+	if(sck == kError)[NSException raise:@"Socket Failed" format:@"Couldn't couldn't get a socket for %@ Port %d",IPNumber,aPort];
+	
+	int oflag = fcntl(sck, F_GETFL);
+	fcntl(sck, F_SETFL, oflag | O_NONBLOCK);
+	time_t now = time(NULL);
+	while (connect(sck, (struct sockaddr *) &target_address, sizeof(target_address)) == -1) {
+		if([self canWriteTo:sck]) break;
+		if ((time(NULL) - now) > 3){
+			[NSException raise:@"Connection Failed" format:@"Couldn't get a connection for %@ Port %d -- Is the firewire off?",IPNumber,portNumber];
+		}
+	}
+
+	return sck;
+}
+
+
 - (NSString*) crateProcessState
 {
 	switch(startCrateState){
@@ -1349,6 +1393,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	else details = [NSString stringWithFormat:@"%d",anError];
 	[NSException raise: @"SBC/VME access Error" format:[NSString stringWithFormat:@"%@:%@",baseString,details]];
 }
+
 - (void) fillInScript:(NSString*)theScript
 {
 	//edit the script and push it into the SBCReadout folder for copying to the SBC
@@ -1479,7 +1524,165 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 	else [self setTryingToStartCrate:NO];
 }
 
+- (void) watchIrqSocket
+{
+	irqThreadRunning = YES;
+	SBC_Packet aPacket;
+	lamsToAck    = [[ORSafeQueue alloc] init];
+	while([self isConnected]){
+		if([self dataAvailable:irqfd]){
+			[self readSocket:irqfd buffer:&aPacket]; //read the irq
+			int irqNumber = aPacket.payload[0];
+			int i;
+			for(i=0;i<[[self orcaObjects] count]; i++){
+				ORSBC_LAMModel* lamObj = [[self orcaObjects] objectAtIndex:i];
+				if([lamObj slot] == irqNumber){
+					if(![lamObj isBusy]){
+						[lamObj processPacket:&aPacket];
+						[lamsToAck enqueue:lamObj];
+					}
+					break;
+				}
+			}
+		}
+		
+		//ack any lams that have been processed on this side
+		int n = [lamsToAck count];
+		if(n){
+			SBC_LamAckStruct *p = (SBC_LamAckStruct*)aPacket.payload;
+			char* lamPtr = (char*)(p+1);
+			ORSBC_LAMModel* lamObj = nil;
+			do {
+				lamObj = [lamsToAck dequeue];
+				if(lamObj){
+					*lamPtr++ = [lamObj slot];
+					p->numToAck++;
+				}
+			}while(lamObj);
+			//send off the ack packet
+			[self write:irqfd buffer:&aPacket];
+		}
+		else if(stopWatchingIRQ) break;
+	}
+	
+	irqThreadRunning = NO;
+	[lamsToAck release];
+	
+	lamsToAck    = nil;
+}
 
+- (void) write:(int)aSocket buffer:(SBC_Packet*)aPacket
+{
+	//Note there are NO locks on this method, but it is private and can only be called from this object. Care must
+	//be taken that thread locks are provided at a higher level.
+	aPacket->message[0] = '\0';
+	if(!aSocket)	return;
+	int numBytesToSend = sizeof(long) +
+						 sizeof(SBC_CommandHeader) + 
+						 kSBC_MaxMessageSize + 
+						 aPacket->cmdHeader.numberBytesinPayload;
+	aPacket->numBytes = numBytesToSend;
+	char* packetPtr = (char*)aPacket;		//recast the first 'real' word in the packet
+	while (numBytesToSend) {       
+		int bytesWritten = write(aSocket,packetPtr,numBytesToSend);
+		if (bytesWritten > 0) {
+			packetPtr += bytesWritten;
+			numBytesToSend -= bytesWritten;
+			bytesSent += bytesWritten;
+		}
+		else if (bytesWritten < 0) {
+			[NSException raise:@"Write Error" format:@"Write Error %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
+		}
+	}
+}
+
+- (void) read:(int)aSocket buffer:(SBC_Packet*)aPacket
+{	
+	//Note that there are NO locks on this method, but it is private and can only be called from this object. 
+	//Care must be taken that thread locks are provided at a higher level in this object
+	if(!aSocket)return;
+	
+	// set up the file descriptor set
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(aSocket, &fds);
+
+	struct timeval tv;
+	tv.tv_sec  = 3;
+	tv.tv_usec = 0;
+
+	// wait until timeout or data received
+	int  selectionResult = select(aSocket+1, &fds, NULL, NULL, &tv);
+	if(selectionResult > 0){
+		[self readSocket:aSocket buffer:aPacket];
+	}
+	else if (selectionResult == kSelectionError){
+		[NSException raise:@"Read Error" format:@"Read Error %@ <%@>",[self crateName]];
+	}
+	else if (selectionResult == kSelectionTimeout) {
+		[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
+	}
+	if(aPacket->message[0])NSLog(@"%s\n",aPacket->message);
+} 
+
+- (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket
+{
+	int n;			
+	long numBytesToGet = 0;
+	n = recv(aSocket, &numBytesToGet, 4, MSG_WAITALL);	
+	if(n==0){
+		[self disconnect];
+		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+	}
+	bytesReceived += sizeof(long);
+	numBytesToGet -= sizeof(long);
+	
+	char* packetPtr = (char*)&aPacket->cmdHeader;
+	while(numBytesToGet){
+		n = recv(aSocket, packetPtr, numBytesToGet, MSG_WAITALL);
+		if(n == 0) break; //connection disconnected.
+		packetPtr += n;
+		numBytesToGet -= n;
+		bytesReceived += n;
+		missedHeartBeat = 0;
+	}
+	if(n==0){
+		[self disconnect];
+		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+	}
+}
+
+- (BOOL) canWriteTo:(int) sck
+{
+	fd_set wfds;
+	struct timeval tv;
+
+	FD_ZERO(&wfds);
+	FD_SET(sck, &wfds);
+
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+
+	int retval = select(sck + 1, NULL, &wfds, NULL, &tv);
+	return (retval > 0) && FD_ISSET(sck, &wfds);
+}
+
+- (BOOL) dataAvailable:(int) aSocket
+{
+	if(!aSocket)return NO;
+	
+	// set up the file descriptor set
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(aSocket, &fds);
+
+	struct timeval tv;
+	tv.tv_sec  = 0;
+	tv.tv_usec = 10000;
+
+	// wait until timeout or data received
+	int  selectionResult = select(aSocket+1, &fds, NULL, NULL, &tv);
+	return (selectionResult > 0) && FD_ISSET(aSocket, &fds);
+}
 
 @end
-

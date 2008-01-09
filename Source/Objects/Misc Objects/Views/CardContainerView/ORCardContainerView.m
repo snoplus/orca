@@ -140,13 +140,8 @@
 
 - (BOOL) canAddObject:(id)obj atPoint:(NSPoint)aPoint
 {
-	int aSlot;
-	if([self isHorizontalView]){
-		aSlot = [self slotAtPoint:aPoint];
-	}
-	else {
-		aSlot = [self slotAtPoint:aPoint];
-	}
+	int aSlot = [self slotAtPoint:aPoint];
+
 	if(aSlot > [self maxNumberOfCards]-1 || aSlot<0){
 		NSBeep();
 		NSLog(@"Rejected attempt to place card out of bounds\n");

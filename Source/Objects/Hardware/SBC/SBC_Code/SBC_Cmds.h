@@ -48,6 +48,7 @@
 #define kSBC_ConnectionStatus  0x0d
 #define kSBC_VmeReadBlock      0x0e
 #define kSBC_VmeWriteBlock     0x0f
+#define kSBC_LAM			   0x10
 
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
@@ -110,6 +111,29 @@ typedef
     }
 SBC_VmeWriteBlockStruct;
 
+typedef 
+    struct {
+        char numToAck;        /*a total count*/
+        /*followed the slot numbers of the lams to Ack (bytes)*/
+    }
+SBC_LamAckStruct;
+
+typedef 
+    struct {
+        char	 label[32];
+		uint32_t data;
+    }
+SBC_LabeledData;
+
+typedef 
+    struct {
+		uint32_t lamNumber;
+        uint32_t numFormatedWords;
+		uint32_t formatedWords[256];
+		uint32_t numberLabeledDataWords;
+		SBC_LabeledData labeledData[256];
+    }
+SBC_LAM_Data;
 
 
 #define kSBC_MaxPayloadSize    1024*200
@@ -123,6 +147,16 @@ typedef
     }
 SBC_Packet;
 
+#define kMaxNumberLams		 7
+#define kSBC_LAM_Busy		 1
+#define kSBC_LAM_Open		 1
+typedef 
+	struct {
+		char isWaitingForAck;
+		char isValid;
+		SBC_Packet lam_Packet;
+	} 
+SBC_LAM_info_struct;
 
 //---------------------
 

@@ -1,9 +1,11 @@
-//
-//  VME_HW_Definitions.h
-//  Orca
-//
-//  Created by Mark Howe on Mon Sept 10, 2007
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+/*
+ *  VME_Trigger32.h
+ *  OrcaIntel
+ *
+ *  Created by Mark Howe on 1/8/08.
+ *  Copyright 2008 CENPA, University of Washington. All rights reserved.
+ *
+ */
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -17,13 +19,8 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#ifndef _H_VMEHWDEFINITIONS_
-#define _H_VMEHWDEFINITIONS_
 
-#define kShaper    1
-#define kGretina   2
-#define kSBCLAM	   3
-#define kTrigger32 4
-#define kLAMGen	   5 /*for testing*/
+#include "SBC_Cmds.h"
 
-#endif
+int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+void ResetTR32(int32_t index,short id,unsigned short offset);

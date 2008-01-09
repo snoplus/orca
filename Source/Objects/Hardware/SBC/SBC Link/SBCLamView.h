@@ -1,9 +1,9 @@
 //
-//  VME_HW_Definitions.h
+//  SBCLamView.h
 //  Orca
 //
-//  Created by Mark Howe on Mon Sept 10, 2007
-//  Copyright � 2002 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Fri Jan 04, 2007.
+//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -17,13 +17,14 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#ifndef _H_VMEHWDEFINITIONS_
-#define _H_VMEHWDEFINITIONS_
 
-#define kShaper    1
-#define kGretina   2
-#define kSBCLAM	   3
-#define kTrigger32 4
-#define kLAMGen	   5 /*for testing*/
+#pragma mark •••Imported Files
+#import "ORCardContainerView.h"
+@class CTGradient;
 
-#endif
+@interface SBCLamView : ORCardContainerView {
+	CTGradient* gradient;
+}
+- (int)  maxNumberOfCards;
+- (int)  cardWidth;
+@end
