@@ -806,24 +806,31 @@ enum {
 
 - (void) loadSystemFPGA:(NSString*)filePath
 {
-	
-	[self writeICSR:0x01];	//prepare to configure the system FPGA
-	[ORTimer delay:0.060];	//must delay abit
-	
-	NSLog(@"Begining DFG4c (station %d) System Configuration\n",[self stationNumber]);
-	NSData* fpgaData = [NSData dataWithContentsOfFile:filePath];
-	int len = [fpgaData length];
-	if(fpgaData){
-		int i;
-		const unsigned char* dataPtr = (unsigned char*)[fpgaData bytes];
-		for(i=0;i<len;i++){
-			unsigned short data = (dataPtr[i]&0x00ff);
-			[controller camacShortNAF:[self stationNumber] a:10 f:17 data:&data];
-		}
-		NSLog(@"Loaded: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
+	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
+	NS_DURING
+		[controller lock];
+		[self writeICSR:0x01];	//prepare to configure the system FPGA
+		[ORTimer delay:0.060];	//must delay abit
 		
-	}
-	else NSLogColor([NSColor redColor],@"Unable to open: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
+		NSLog(@"Begining DFG4c (station %d) System Configuration\n",[self stationNumber]);
+		NSData* fpgaData = [NSData dataWithContentsOfFile:filePath];
+		int len = [fpgaData length];
+		if(fpgaData){
+			int i;
+			const unsigned char* dataPtr = (unsigned char*)[fpgaData bytes];
+			for(i=0;i<len;i++){
+				unsigned short data = (dataPtr[i]&0x00ff);
+				[controller camacShortNAF:[self stationNumber] a:10 f:17 data:&data];
+			}
+			NSLog(@"Loaded: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
+			
+		}
+		else NSLogColor([NSColor redColor],@"Unable to open: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
+		[controller unlock];
+	NS_HANDLER
+		[localException raise];
+	NS_ENDHANDLER
+	[controller lock];
 }
 
 - (void) loadFilterTriggerFPGAs:(NSString*)filePath
@@ -833,20 +840,21 @@ enum {
     
 	NSData* fpgaData        = [NSData dataWithContentsOfFile:filePath];
 	unsigned long len		= [fpgaData length];
+	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 	if(fpgaData){
 		int i;
 		const unsigned char* dataPtr = (unsigned char*)[fpgaData bytes];
-		unsigned short* buffer = (unsigned short*)malloc(len*sizeof(short));
-		for(i=0;i<len;i++){
-			buffer[i] = (dataPtr[i]&0x00ff);
-		}
 		NS_DURING
-			[controller camacShortNAFBlock:[self stationNumber] a:9 f:17 data:buffer length:len];
+			[controller lock];
+			for(i=0;i<len;i++){
+				unsigned short data = (dataPtr[i]&0x00ff);
+				[controller camacShortNAF:[self stationNumber] a:9 f:17 data:&data];
+			}
+			[controller unlock];
 		NS_HANDLER
-			free(buffer);
+			[controller unlock];
 			[localException raise];
 		NS_ENDHANDLER
-		free(buffer);
 		
 		NSLog(@"Loaded: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
 	}
@@ -858,9 +866,10 @@ enum {
     if(!firmWarePath)return; //should throw or post alarm here.
     
 	[[self undoManager] disableUndoRegistration];
+	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 	NS_DURING
+		[controller lock];
 		unsigned short data;
-		controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 		
 		//load the configuration data
 		NSString* rootName = [NSString stringWithCString:kBaseFirmwareFileName];
@@ -896,8 +905,10 @@ enum {
 			[ORTimer delay:0.060];
 		}
 		[[self undoManager] enableUndoRegistration];
-        
+		[controller unlock];
+       
 	NS_HANDLER
+		[controller unlock];
 		[[self undoManager] enableUndoRegistration];
 		[localException raise];
 	NS_ENDHANDLER
@@ -933,9 +944,9 @@ enum {
     if(!dspCodePath)return; //should throw or post alarm here.
 
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    [controller lock];
     NS_DURING
-        
+		[controller lock];
+       
         [self writeCSR:kDSPResetCSRBit];
         [ORTimer delay:0.060];
         
@@ -999,10 +1010,10 @@ enum {
 	if(okToLoadWhileRunning && [gOrcaGlobals runInProgress])[paramLoadLock lock];
 
     [self setComputableParams];
+	long errorCount = 0;
+	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 
 	NS_DURING 
-		long errorCount = 0;
-		controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 		unsigned short data;
 		
 		//stop the DSP runtask.
@@ -1952,20 +1963,28 @@ enum {
 		controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 		cachedStation = [self stationNumber];
 		
-		int numPage;
-		for(numPage=0;numPage<8;numPage++){
-			if(numPage==0) [self executeTask:kReadHistogramMemoryPage1];
-			else     [self executeTask:kReadHistogramMemoryNextPages];
-			
-			[self writeTSAR:bufferAddress];
-			unsigned short data[2];
-			int k;
-			for(k=0;k<bufferLength;k+=2){
-				[controller camacShortNAF:cachedStation a:0 f:0 data:&data[0] ];
-				[controller camacShortNAF:cachedStation a:0 f:0 data:&data[1] ];
-				mcaPtr[wordCount++] =  (unsigned int)(data[1]*0x10000+data[0]);
+		NS_DURING
+			[controller lock];
+			int numPage;
+			for(numPage=0;numPage<8;numPage++){
+				if(numPage==0) [self executeTask:kReadHistogramMemoryPage1];
+				else     [self executeTask:kReadHistogramMemoryNextPages];
+				
+				[self writeTSAR:bufferAddress];
+				unsigned short data[2];
+				int k;
+				for(k=0;k<bufferLength;k+=2){
+					[controller camacShortNAF:cachedStation a:0 f:0 data:&data[0] ];
+					[controller camacShortNAF:cachedStation a:0 f:0 data:&data[1] ];
+					mcaPtr[wordCount++] =  (unsigned int)(data[1]*0x10000+data[0]);
+				}
 			}
-		}
+			[controller unlock];
+		NS_HANDLER
+			[controller unlock];
+			[localException raise];
+		NS_ENDHANDLER
+		
 		mcaPtr[0] = mcaDataId | wordCount; //len in longs!
 		mcaPtr[1] = unChangingDataPart | (aChannel<<12);
 		
