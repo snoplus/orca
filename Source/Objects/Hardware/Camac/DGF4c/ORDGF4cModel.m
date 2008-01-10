@@ -828,9 +828,9 @@ enum {
 		else NSLogColor([NSColor redColor],@"Unable to open: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
 		[controller unlock];
 	NS_HANDLER
+		[controller unlock];
 		[localException raise];
 	NS_ENDHANDLER
-	[controller lock];
 }
 
 - (void) loadFilterTriggerFPGAs:(NSString*)filePath
