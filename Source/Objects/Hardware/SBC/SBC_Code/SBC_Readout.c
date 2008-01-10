@@ -67,6 +67,11 @@ pthread_mutex_t lamInfoMutex;
 int32_t  workingSocket;
 int32_t  workingIRQSocket;
 char needToSwap;
+
+//as the hw is read out, the data is put into the following temp buffer, at the end
+//of the readout cycle, it is dumped into the CB
+int32_t  dataIndex;
+int32_t* data;
 /*---------------*/
 
 void sigchld_handler(int32_t s)
@@ -147,14 +152,17 @@ int32_t main(int32_t argc, char *argv[])
         pthread_mutex_lock (&lamInfoMutex);  //begin critical section
 		memset(&lam_info ,0,sizeof(SBC_LAM_info_struct)*kMaxNumberLams);
 		pthread_mutex_unlock (&lamInfoMutex);//end critical section
-       /*-------------------------------*/
-		
+		/*-------------------------------*/
+
+		data = (int32_t*)malloc(kMaxDataBufferSize*sizeof(int32_t));
+
         SBC_Packet aPacket;
         while(!timeToExit){
             if(readBuffer(&aPacket) == 0)break;
             processBuffer(&aPacket);
         }
-        
+        free(data);
+		
         close(workingSocket);
         CB_cleanup();
         pthread_mutex_destroy(&runInfoMutex);
@@ -480,9 +488,11 @@ void* readoutThread (void* p)
 {
 
     size_t cycles = 0;
-    pthread_mutex_lock (&runInfoMutex);            //begin critical section
-    run_info.statusBits |= kSBC_RunningMask;    //set bit
-    pthread_mutex_unlock (&runInfoMutex);        //end critical section
+    pthread_mutex_lock (&runInfoMutex);				//begin critical section
+    run_info.statusBits |= kSBC_RunningMask;		//set bit
+    pthread_mutex_unlock (&runInfoMutex);			//end critical section
+
+	dataIndex = 0;
 
     while(run_info.statusBits & kSBC_RunningMask) {
         if (cycles % 10000 == 0 ) {
@@ -491,7 +501,7 @@ void* readoutThread (void* p)
           pthread_mutex_unlock (&runInfoMutex);  //end critical section
         }
         
-        readHW(&crate_config,0,0); //start at index 0, nil for the lam data
+        readHW(&crate_config,0,0,0); //start at index 0, nil for the lam data, not recursive
         cycles++; 
     }
 

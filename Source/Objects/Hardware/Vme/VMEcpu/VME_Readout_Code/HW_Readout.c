@@ -38,8 +38,9 @@ void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
 int32_t writeBuffer(SBC_Packet* aPacket);
 
-
 extern char needToSwap;
+extern int32_t  dataIndex;
+extern int32_t* data;
 
 static TUVMEDevice* vmeAM29Handle = NULL;
 static TUVMEDevice* controlHandle = NULL;
@@ -346,16 +347,21 @@ void doReadBlock(SBC_Packet* aPacket)
 /*   card to read out                                        */
 /*************************************************************/
 
-int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data)
+int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData, char recursive)
 {
     if(index<config->total_cards && index>0) {
         switch(config->card_info[index].hw_type_id){
-            case kShaper:        return Readout_Shaper(config,index,data);
-            case kGretina:        return Readout_Gretina(config,index,data);
-            case kTrigger32:    return -1; //Readout_TR32_Data(config,index,data);
-            case kSBCLAM:        return Readout_LAM_Data(config,index,data);
+            case kShaper:       return Readout_Shaper(config,index,lamData);
+            case kGretina:      return Readout_Gretina(config,index,lamData);
+            case kTrigger32:    return -1; //Readout_TR32_Data(config,index,lamData);
+            case kSBCLAM:       return Readout_LAM_Data(config,index,lamData);
             default:            return -1;
         }
+		if(!recursive && dataIndex>0){
+			if(needToSwap)SwapLongBlock(data, dataIndex);
+			CB_writeDataBlock(data,dataIndex);
+			dataIndex = 0;
+		}
     }
     return -1;
 }
@@ -387,16 +393,11 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
                 result    = read_device(vmeAM29Handle,(char*)&aValue,2,baseAddress+firstAdcRegOffset+2*channel); //short access, the adc Value
                 if(result == 2){
                     if(((dataId) & 0x80000000)){ //short form
-                        int32_t data = dataId | locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
-                        if(needToSwap)SwapLongBlock(&data,1);
-                        CB_writeDataBlock(&data,1);
+                        data[dataIndex++] = dataId | locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
                     }
                     else { //long form
-                        int32_t data[2];
-                        data[0] = dataId | 2;
-                        data[1] = locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
-                        if(needToSwap)SwapLongBlock(data,2);
-                        CB_writeDataBlock(data,2);
+                        data[dataIndex++] = dataId | 2;
+                        data[dataIndex++] = locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
                     }
                 }
             }
@@ -416,7 +417,6 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
     static TUVMEDevice* vmeFIFOStateReadOutHandle = 0;
     static TUVMEDevice* vmeDMADevice = 0;
     static uint32_t fifoState;
-    static int32_t dataBuffer[0xffff]; // no Gretina buffer should be greater than 64K
 
     //uint32_t baseAddress      = config->card_info[index].base_add;
     uint32_t fifoStateAddress = config->card_info[index].deviceSpecificData[0];
@@ -449,8 +449,9 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
         else vmeReadOutHandle = vmeAM9Handle;
 
         uint32_t numLongs = 0;
-        dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
-        dataBuffer[numLongs++] = location;
+		int32_t savedIndex = dataIndex;
+        data[dataIndex++] = dataId | 0; //we'll fill in the length later
+        data[dataIndex++] = location;
         
         //read the first int32_tword which should be the packet separator: 0xAAAAAAAA
         uint32_t theValue;
@@ -461,7 +462,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
             //read the first word of actual data so we know how much to read
             result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
             
-            dataBuffer[numLongs++] = theValue;
+            data[dataIndex++] = theValue;
             uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
             int32_t totalNumLongs  = (numLongs + numLongsLeft);
              
@@ -471,7 +472,8 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
               /* Gretina I card */
               set_dma_no_increment(true);
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
-            } else {
+            } 
+			else {
               /* Gretina IV card */
               set_dma_no_increment(false);
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
@@ -479,17 +481,16 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
             if (vmeDMADevice == NULL) {
               return config->card_info[index].next_Card_Index;
             }
-            result = read_device(vmeDMADevice,(char*)(dataBuffer+numLongs),numLongsLeft*4, 0); 
-              
+			
+            result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
+            dataIndex += numLongsLeft;
+			
             if (result != numLongsLeft*4) {
               return config->card_info[index].next_Card_Index;
             }
-            dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
-            /* Swap here?! */
-            if (needToSwap) SwapLongBlock(dataBuffer, totalNumLongs);
-            CB_writeDataBlock(dataBuffer,totalNumLongs);    
-        }
-        else {
+            data[savedIndex] |= totalNumLongs; //see, we did fill it in...
+		}
+		else {
             //oops... really bad -- the buffer read is out of sequence -- dump it all
             uint32_t i = 0;
             while(i < sizeOfFIFO) {
@@ -500,9 +501,9 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
                 i++;
             }
             //read the first word of actual data so we know how much to read
+			//note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
+			//we'll reset the index to dump the data later....
             result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-            
-            dataBuffer[numLongs++] = theValue;
             uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
              
             /* OK, now use dma access. */
@@ -510,7 +511,8 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
               /* Gretina I card */
               set_dma_no_increment(true);
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
-            } else {
+            } 
+			else {
               /* Gretina I card */
               set_dma_no_increment(false);
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
@@ -518,9 +520,9 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
             if (vmeDMADevice == NULL) {
               return config->card_info[index].next_Card_Index;
             }
-            result = read_device(vmeDMADevice,(char*)(dataBuffer+numLongs),numLongsLeft*4, 0); 
-           /* don't record the data, though */ 
-        }
+            result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
+ 			dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
+       }
     }
     return config->card_info[index].next_Card_Index;
 

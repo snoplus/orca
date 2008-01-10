@@ -27,6 +27,8 @@
 #include "SBC_Config.h"
 #include <sys/types.h>
 
+#define kMaxDataBufferSize 1024*200
+
 void processBuffer(SBC_Packet* aPacket);
 void processSBCCommand(SBC_Packet* aPacket);
 void doRunCommand(SBC_Packet* aPacket);
