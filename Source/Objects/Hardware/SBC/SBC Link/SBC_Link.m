@@ -1638,13 +1638,22 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	numBytesToGet -= sizeof(long);
 	
 	char* packetPtr = (char*)&aPacket->cmdHeader;
+    int waitCounter = 0;
 	while(numBytesToGet){
-		n = recv(aSocket, packetPtr, numBytesToGet, MSG_WAITALL);
-		if(n == 0) break; //connection disconnected.
-		packetPtr += n;
-		numBytesToGet -= n;
-		bytesReceived += n;
-		missedHeartBeat = 0;
+        if (waitCounter>10000) {
+            n=0;
+            break;
+        }
+        n = recv(aSocket, packetPtr, numBytesToGet, MSG_WAITALL);
+        if (n>=0) {
+            if(n == 0) break; //connection disconnected.
+            packetPtr += n;
+            numBytesToGet -= n;
+            bytesReceived += n;
+            missedHeartBeat = 0;
+        } else {
+            waitCounter++;
+        }
 	}
 	if(n==0){
 		[self disconnect];

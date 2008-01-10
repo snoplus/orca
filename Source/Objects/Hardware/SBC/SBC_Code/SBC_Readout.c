@@ -21,6 +21,7 @@
 //-------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -552,11 +553,11 @@ void* irqAckThread (void* p)
 
 void LogMessage (const char *format,...)
 {
-	if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
+	if(strlen(format) > kSBC_MaxStrSize*.75) return; //not a perfect check, but it will have to do....
 	va_list ap;
-	va_start (ap, template);
+	va_start (ap, format);
 	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	vfprintf (run_info.messageStrings[run_info.msg_buf_cnt], format, ap);
+	vsprintf (run_info.messageStrings[run_info.msg_buf_cnt], format, ap);
     run_info.msg_buf_cnt = (run_info.msg_buf_cnt + 1 ) % kSBC_MaxErrorBufferSize;
 	pthread_mutex_unlock (&runInfoMutex);//end critical section
 	va_end (ap);
@@ -566,9 +567,9 @@ void LogError (const char *format,...)
 {
 	if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
 	va_list ap;
-	va_start (ap, template);
+	va_start (ap, format);
 	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	vfprintf (run_info.errorStrings[run_info.err_buf_cnt], format, ap);
+	vsprintf (run_info.errorStrings[run_info.err_buf_cnt], format, ap);
     run_info.err_buf_cnt = (run_info.err_buf_cnt + 1 ) % kSBC_MaxErrorBufferSize;
 	pthread_mutex_unlock (&runInfoMutex);//end critical section
 	va_end (ap);
