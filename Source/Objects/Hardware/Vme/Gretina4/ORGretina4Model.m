@@ -728,9 +728,9 @@ static struct {
 								  withAddMod:[self addressModifier] 
 							   usingAddSpace:0x01];
 																		
-				[theController readLong:dataDump 
+				[theController readLongBlock:dataDump 
 							  atAddress:fifoAddress 
-							timesToRead:((theValue & 0xffff0000)>>16)-1  //number longs left to read
+							numToRead:((theValue & 0xffff0000)>>16)-1  //number longs left to read
 							 withAddMod:[self addressModifier] 
 						  usingAddSpace:0x01];
 				count++;
@@ -1279,11 +1279,11 @@ static struct {
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= [self addressModifier];
 	configStruct->card_info[index].base_add		= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_offsets[kProgrammingDone];
-    configStruct->card_info[index].deviceSpecificData[1]	= kGretina4FIFOEmpty;
-    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + 0x1000;
-    configStruct->card_info[index].deviceSpecificData[3]	= 0x09;
-    configStruct->card_info[index].deviceSpecificData[4]	= 0x1FFFF;
+	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_offsets[kProgrammingDone]; //fifoStateAddress
+    configStruct->card_info[index].deviceSpecificData[1]	= kGretina4FIFOEmpty; // fifoEmptyMask
+    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + 0x1000; // fifoAddress
+    configStruct->card_info[index].deviceSpecificData[3]	= 0x0B; // fifoAM
+    configStruct->card_info[index].deviceSpecificData[4]	= 0x1FFFF; // size of FIFO
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

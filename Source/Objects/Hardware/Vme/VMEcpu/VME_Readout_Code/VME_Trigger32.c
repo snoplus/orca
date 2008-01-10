@@ -21,8 +21,9 @@
 //-------------------------------------------------------------
 
 #include "VME_Trigger32.h"
+#include "universe_api.h"
 
-int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
 	//-------------------------------- local variables --------------------------//
     // HW readout pointers    
@@ -75,7 +76,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
     //read the status register
 	baseAddress = config->card_info[index].base_add;
 	
-	result    = vme_read(vmeAM29Handle,baseAddress + kStatusRegOffset,(uint8_t*)&statusReg,4); //short access, the adc Value
+	result    = read_device(vmeAM29Handle,(uint8_t*)&statusReg,4,baseAddress + kStatusRegOffset); //short access, the adc Value
     if (result!=kSBC_Success) {
 		LogError(index,"Rd Err: TR32 0x%04x Status",baseAddress);
         return config->card_info[index].next_Card_Index;
@@ -101,14 +102,14 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
         
             //must latch the clock if in soft gtid mode
  			lValue = 0;
-			result = vme_write(vmeAM29Handle,baseAddress+kTestLatchTrigger1Time,&lValue,sizeof(uint32_t));
+			result = write_device(vmeAM29Handle,&lValue,sizeof(uint32_t),baseAddress+kTestLatchTrigger1Time);
 			
              if (result != kSBC_Success) {
 				LogError(index,"Wr Err: TR32 0x%04x Trig1 Latch",baseAddress);
                return config->card_info[index].next_Card_Index;
             }
            
-			result    = vme_read(vmeAM29Handle,baseAddress + kStatusRegOffset,(uint8_t*)&gtid,4); //short access, the adc Value
+			result    = read_device(vmeAM29Handle,(uint8_t*)&gtid,4,baseAddress + kStatusRegOffset); //short access, the adc Value
 			if (result != kSBC_Success) {
 				LogError(index,"Rd Err: TR32 0x%04x Status",baseAddress);
 				return config->card_info[index].next_Card_Index;
@@ -128,7 +129,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
                 int k;
                 for(k=0;k<5;k++){
                     //read the status reg
-  					result    = vme_read(vmeAM29Handle,baseAddress + kStatusRegOffset,(uint8_t*)&statusReg,4); //short access, the adc Value
+  					result    = read_device(vmeAM29Handle,(uint8_t*)&statusReg,4,baseAddress + kStatusRegOffset); //short access, the adc Value
                   
                     if (result != kSBC_Success) {
 					   LogError(index,"Rd Err: TR32 0x%04x Status",baseAddress);
@@ -141,7 +142,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
             if(statusReg & kValidTrigger1GTClockMask){
                 //read the gtid;
                 if(!(config->card_info[index].cardSpecificData[0]&kUseSoftwareGtid)){
-					result    = vme_read(vmeAM29Handle,baseAddress + kReadTrigger1GTID,(uint8_t*)&gtid,4); //short access, the adc Value
+					result    = read_device(vmeAM29Handle,(uint8_t*)&gtid,4,baseAddress + kReadTrigger1GTID); //short access, the adc Value
 					if (result != kSBC_Success) {
                         LogError(index,'TR32',index,2,0,baseAddress + kReadTrigger1GTID,kSBC_ReadError);
 						LogError(index,"Rd Err: TR32 0x%04x Trig1 GTID",baseAddress);
@@ -161,13 +162,13 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
         }
         if(config->card_info[index].cardSpecificData[0]&kShipEvt1ClkMask){
             //read the time
-			result    = vme_read(vmeAM29Handle,baseAddress + kReadUpperTrigger1TimeReg,(uint8_t*)&high_word,4); //short access, the adc Value
+			result    = read_device(vmeAM29Handle,(uint8_t*)&high_word,4,baseAddress + kReadUpperTrigger1TimeReg); //short access, the adc Value
 			if (result != kSBC_Success) {
 				LogError(index,"Rd Err: TR32 0x%04x Upper Trig1",baseAddress);
                dataIndex = savedIndex; //dump the event back to the last marker
                 return config->card_info[index].next_Card_Index;
             }
- 			result    = vme_read(vmeAM29Handle,baseAddress + kReadLowerTrigger1TimeReg,(uint8_t*)&low_word,4); //short access, the adc Value
+ 			result    = read_device(vmeAM29Handle,(uint8_t*)&low_word,4,baseAddress + kReadLowerTrigger1TimeReg); //short access, the adc Value
 			if (result != kSBC_Success) {
 				LogError(index,"Rd Err: TR32 0x%04x Low Trig1",baseAddress);
 				dataIndex = savedIndex; //dump the event back to the last marker
@@ -199,7 +200,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
             for(i=0;i<15;i++){
                 if((reReadStatusReg & kValidTrigger1GTClockMask) && !(reReadStatusReg & kMSamEventMask)){
                     usleep(1);
-					result    = vme_read(vmeAM29Handle,baseAddress + kStatusRegOffset,(uint8_t*)&reReadStatusReg,4); //short access, the adc Value
+					result    = read_device(vmeAM29Handle,(uint8_t*)&reReadStatusReg,4,baseAddress + kStatusRegOffset); //short access, the adc Value
   
                     if (result != kSBC_Success) {
 						LogError(index,"Rd Err: TR32 0x%04x Status",baseAddress);
@@ -214,7 +215,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
             localData.userInfoWord[localData.numberUserInfoWords++] = config->card_info[index].cardSpecificData[1];
             
             sValue = 1;
-			result = vme_write(vmeAM29Handle,baseAddress+kMSamEventReset,&sValue,sizeof(uint16_t));
+			result = write_device(vmeAM29Handle,&sValue,sizeof(uint16_t),baseAddress+kMSamEventReset);
 			if (result != kSBC_Success) {
 				LogError(index,"Wr Err: TR32 0x%04x SAM Reset",baseAddress);
 			}
@@ -229,7 +230,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
     if(!(statusReg & kTrigger2EventMask)){
         //if the trigger 2 is NOT set at this point check the status word again in case an event 
         //happened while we were reading out the event 1.
-		result    = vme_read(vmeAM29Handle,baseAddress + kStatusRegOffset,(uint8_t*)&statusReg,4); //short access, the adc Value
+		result    = read_device(vmeAM29Handle,(uint8_t*)&statusReg,4,baseAddress + kStatusRegOffset); //short access, the adc Value
         if (result != kSBC_Success) {
 			LogError(index,"Rd Err: TR32 0x%04x Status",baseAddress);
             return config->card_info[index].next_Card_Index;
@@ -247,7 +248,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
         if(config->card_info[index].cardSpecificData[0]&kUseSoftwareGtid){
              //must latch the clock if in soft gtid mode
 			lValue = 0;
-			result = vme_write(vmeAM29Handle,baseAddress+kTestLatchTrigger2Time,&lValue,sizeof(uint32_t));
+			result = write_device(vmeAM29Handle,&lValue,sizeof(uint32_t),baseAddress+kTestLatchTrigger2Time);
 			if (result != kSBC_Success) {
 				LogError(index,"Wr Err: TR32 0x%04x Latch Trig2",baseAddress);
 				return config->card_info[index].next_Card_Index;
@@ -259,7 +260,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
             //should have been a gt, maybe we're too fast. try some more--but not too many times.
             int k;
             for(k=0;k<5;k++){
-				result    = vme_read(vmeAM29Handle,baseAddress + kStatusRegOffset,(uint8_t*)&statusReg,4); //short access, the adc Value
+				result    = read_device(vmeAM29Handle,(uint8_t*)&statusReg,4,baseAddress + kStatusRegOffset); //short access, the adc Value
 				if (result != kSBC_Success) {
 					LogError(index,"Rd Err: TR32 0x%04x Status",baseAddress);
 					return config->card_info[index].next_Card_Index;
@@ -296,7 +297,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
             while(leaf_index >= 0)leaf_index = Read_Out(leaf_index,0);
             
             if(!(config->card_info[index].cardSpecificData[0]&kUseSoftwareGtid)){
-				result    = vme_read(vmeAM29Handle,baseAddress + kReadTrigger2GTID,(uint8_t*)&gtid,4); //short access, the adc Value
+				result    = read_device(vmeAM29Handle,(uint8_t*)&gtid,4,baseAddress + kReadTrigger2GTID); //short access, the adc Value
                 if (result != kSBC_Success){
                     LogError(index,"Rd Err: TR32 0x%04x Trig2 GTID",baseAddress);
                     dataIndex = savedIndex; //dump the event back to the last marker
@@ -304,7 +305,7 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
                 }
             }
             else {
-  				result    = vme_read(vmeAM29Handle,baseAddress + kReadAuxGTIDReg,(uint8_t*)&gtid,4); //short access, the adc Value
+  				result    = read_device(vmeAM29Handle,(uint8_t*)&gtid,4,baseAddress + kReadAuxGTIDReg); //short access, the adc Value
 				if (result != kSBC_Success) {
 					LogError(index,"Rd Err: TR32 0x%04x AuxGTID",baseAddress);
                     return config->card_info[index].next_Card_Index;
@@ -324,14 +325,14 @@ int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* 
                 if((config->card_info[index].cardSpecificData[0]&kShipEvt2ClkMask)!=0){
                     
                     //get the time
-					result    = vme_read(vmeAM29Handle,baseAddress + kReadUpperTrigger2TimeReg,(uint8_t*)&high_word,4); //short access, the adc Value
+					result    = read_device(vmeAM29Handle,(uint8_t*)&high_word,4,baseAddress + kReadUpperTrigger2TimeReg); //short access, the adc Value
 					if (result != kSBC_Success) {
 						LogError(index,"Rd Err: TR32 0x%04x Upper Trig2",baseAddress);
                        dataIndex = savedIndex; //dump the event back to the last marker
                         return config->card_info[index].next_Card_Index;
                     }
 				
-					result    = vme_read(vmeAM29Handle,baseAddress + kReadLowerTrigger2TimeReg,(uint8_t*)&low_word,4); //short access, the adc Value
+					result    = read_device(vmeAM29Handle,(uint8_t*)&low_word,4,baseAddress + kReadLowerTrigger2TimeReg); //short access, the adc Value
                     if (result != kSBC_Success) {
   						LogError(index,"Rd Err: TR32 0x%04x LowerTrig2",baseAddress);
 						dataIndex = savedIndex; //dump the event back to the last marker
@@ -354,7 +355,7 @@ void ResetTR32(int32_t index,SBC_crate_config* config,unsigned short offset)
 {
     if(index>=0){
 		uint16_t value = 1;
-	    int32_t result = vme_write(vmeAM29Handle,config->card_info[index].base_add+offset,&value,sizeof(uint16_t));
+	    int32_t result = write_device(vmeAM29Handle,&value,sizeof(uint16_t),config->card_info[index].base_add+offset);
 		if(result != kSBC_Success){
 			LogError(index,"Wr Err: TR32 0x%04x Reset",baseAddress);
 		}
