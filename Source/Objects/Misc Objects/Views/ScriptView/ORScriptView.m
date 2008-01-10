@@ -116,7 +116,7 @@
 		if( (NSMaxRange(range) +2) < [textStorage length]-3 )		range.length += 2;
 		else if( (NSMaxRange(range) +1) < [textStorage length]-2 )	range.length += 1;
 	}
-	
+	if(range.length>[textStorage length])range.length = [textStorage length];
 	NSRange	currRange = range;
     
 	// Perform the syntax coloring:

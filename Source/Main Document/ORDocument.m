@@ -425,7 +425,10 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		NSEnumerator* e = [orcaControllers objectEnumerator];
 		id controller;
 		while(controller = [e nextObject]){
-			[controller showWindow:controller];
+			NS_DURING
+				[controller showWindow:controller];
+			NS_HANDLER
+			NS_ENDHANDLER
 		}
 		
 		
