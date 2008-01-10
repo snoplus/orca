@@ -117,7 +117,7 @@
 - (id) returnValue
 {
 
-    NSString* returnValueAsString;
+    NSString* returnValueAsString = @"0";
 
     const char *theArg = [[self methodSignature] methodReturnType];
 
