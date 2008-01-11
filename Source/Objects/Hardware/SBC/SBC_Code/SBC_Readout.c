@@ -244,7 +244,6 @@ void doRunCommand(SBC_Packet* aPacket)
     // option1 = p->option[0];
     // option2 = p->option[1];
     //....
-	LogError("run Cmd: error check");
     int32_t result = 0;
     if(aPacket->cmdHeader.cmdID == kSBC_StartRun)  result = startRun();
     else if(aPacket->cmdHeader.cmdID == kSBC_StopRun) stopRun();
