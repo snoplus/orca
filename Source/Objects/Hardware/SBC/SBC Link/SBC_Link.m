@@ -1343,6 +1343,7 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 			[NSException raise:@"Connection Failed" format:@"Couldn't get a connection for %@ Port %d -- Is the firewire off?",IPNumber,portNumber];
 		}
 	}
+	fcntl(sck, F_SETFL, oflag);
 
 	return sck;
 }
@@ -1639,23 +1640,14 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	numBytesToGet -= sizeof(long);
 	
 	char* packetPtr = (char*)&aPacket->cmdHeader;
-    int waitCounter = 0;
 	while(numBytesToGet){
-        if (waitCounter>10000) {
-            n=0;
-            break;
-        }
-        n = recv(aSocket, packetPtr, numBytesToGet, MSG_WAITALL);
-        if (n>=0) {
-            if(n == 0) break; //connection disconnected.
-            packetPtr += n;
-            numBytesToGet -= n;
-            bytesReceived += n;
-            missedHeartBeat = 0;
-        } else {
-            waitCounter++;
-        }
-	}
+		n = recv(aSocket, packetPtr, numBytesToGet, MSG_WAITALL);
+		if(n == 0) break; //connection disconnected.
+		packetPtr += n;
+		numBytesToGet -= n;
+		bytesReceived += n;
+		missedHeartBeat = 0;
+ 	}
 	if(n==0){
 		[self disconnect];
 		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
