@@ -493,7 +493,7 @@ void* readoutThread (void* p)
     pthread_mutex_unlock (&runInfoMutex);			//end critical section
 
 	dataIndex = 0;
-	index	  = 0;
+	int32_t index	  = 0;
     while(run_info.statusBits & kSBC_RunningMask) {
         if (cycles % 10000 == 0 ) {
           pthread_mutex_lock (&runInfoMutex);  //begin critical section
@@ -505,7 +505,7 @@ void* readoutThread (void* p)
 		cycles++;
 		
 		if(index>=crate_config.total_cards || index<0){
-			if(!recursive && dataIndex>0){
+			if(dataIndex>0){
 				if(needToSwap)SwapLongBlock(data, dataIndex);
 				CB_writeDataBlock(data,dataIndex);
 				dataIndex = 0;
