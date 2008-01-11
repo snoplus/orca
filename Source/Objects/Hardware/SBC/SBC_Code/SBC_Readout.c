@@ -493,17 +493,27 @@ void* readoutThread (void* p)
     pthread_mutex_unlock (&runInfoMutex);			//end critical section
 
 	dataIndex = 0;
-
+	index	  = 0;
     while(run_info.statusBits & kSBC_RunningMask) {
         if (cycles % 10000 == 0 ) {
           pthread_mutex_lock (&runInfoMutex);  //begin critical section
           run_info.readCycles = cycles;
           pthread_mutex_unlock (&runInfoMutex);  //end critical section
         }
-        
-        readHW(&crate_config,0,0,0); //start at index 0, nil for the lam data, not recursive
-        cycles++; 
-    }
+		
+		index = readHW(&crate_config,index,0,0); //nil for the lam data, not recursive
+		cycles++;
+		
+		if(index>=crate_config.total_cards || index<0){
+			if(!recursive && dataIndex>0){
+				if(needToSwap)SwapLongBlock(data, dataIndex);
+				CB_writeDataBlock(data,dataIndex);
+				dataIndex = 0;
+			}
+			index = 0;
+		}
+
+   }
 
     return NULL;
 }

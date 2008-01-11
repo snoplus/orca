@@ -349,21 +349,17 @@ void doReadBlock(SBC_Packet* aPacket)
 
 int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData, char recursive)
 {
-    if(index<config->total_cards && index>0) {
+    if(index<config->total_cards && index>=0) {
         switch(config->card_info[index].hw_type_id){
-            case kShaper:       return Readout_Shaper(config,index,lamData);
-            case kGretina:      return Readout_Gretina(config,index,lamData);
-            case kTrigger32:    return -1; //Readout_TR32_Data(config,index,lamData);
-            case kSBCLAM:       return Readout_LAM_Data(config,index,lamData);
-            default:            return -1;
+            case kShaper:       index = Readout_Shaper(config,index,lamData);			break;
+            case kGretina:      index = Readout_Gretina(config,index,lamData);			break;
+            case kTrigger32:    index = -1; //Readout_TR32_Data(config,index,lamData);	break;
+            case kSBCLAM:       index = Readout_LAM_Data(config,index,lamData);			break;
+            default:            index = -1;												break;
         }
-		if(!recursive && dataIndex>0){
-			if(needToSwap)SwapLongBlock(data, dataIndex);
-			CB_writeDataBlock(data,dataIndex);
-			dataIndex = 0;
-		}
+		return index;
     }
-    return -1;
+    else return -1;
 }
 
 /*************************************************************/
