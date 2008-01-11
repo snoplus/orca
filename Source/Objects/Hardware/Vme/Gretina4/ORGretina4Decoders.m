@@ -23,8 +23,21 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORDataTypeAssigner.h"
+#import "ORGretina4Model.h"
 
 @implementation ORGretina4WaveformDecoder
+- (id) init
+{
+    self = [super init];
+    getRatesFromDecodeStage = YES;
+    return self;
+}
+
+- (void) dealloc
+{
+	[actualGretinaCards release];
+    [super dealloc];
+}
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
@@ -82,6 +95,26 @@
 				  unitSize:2 //unit size in bytes!
 					sender:self  
 				  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
+
+	//get the actual object
+	if(getRatesFromDecodeStage){
+		NSString* aKey = [crateKey stringByAppendingString:cardKey];
+		if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
+		ORGretina4Model* obj = [actualGretinaCards objectForKey:aKey];
+		if(!obj){
+			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4Model")];
+			NSEnumerator* e = [listOfCards objectEnumerator];
+			ORGretina4Model* aCard;
+			while(aCard = [e nextObject]){
+				if([aCard slot] == card){
+					[actualGretinaCards setObject:aCard forKey:aKey];
+					obj = aCard;
+					break;
+				}
+			}
+		}
+		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+	}
 	 
     return length; //must return number of longs
 }

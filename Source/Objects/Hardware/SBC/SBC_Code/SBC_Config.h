@@ -47,7 +47,7 @@ typedef struct {
 #define	kSBC_WriteError			1
 #define	kSBC_ReadError			2
 
-#define	kSBC_NumRunInfoValuesToSwap	12
+#define	kSBC_NumRunInfoValuesToSwap	14
 
 typedef struct {
     uint32_t statusBits;
@@ -61,9 +61,11 @@ typedef struct {
     uint32_t wrapArounds;
 	uint32_t busErrorCount;
 	
-	uint32_t  err_buf_cnt;
-	uint32_t  msg_buf_cnt;
-	
+	uint32_t  err_count;
+	uint32_t  msg_count;
+	uint32_t  err_buf_index;
+	uint32_t  msg_buf_index;
+
 	//the following --DON'T-- have to be swapped-- put these last and 
 	//bump the kSBC_NumRunInfoValuesToSwap if you add any other values to the above set
 	char errorStrings[kSBC_MaxErrorBufferSize][kSBC_MaxStrSize];	// eCPU recent errors array

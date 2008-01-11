@@ -132,6 +132,7 @@ enum GretinaFIFOStates {
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
 - (id)              rateObject:(int)channel;
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
+- (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
 #pragma mark ¥¥¥specific accessors
 - (void) setExternalWindow:(int)aValue;

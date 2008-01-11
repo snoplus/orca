@@ -426,13 +426,13 @@
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
 
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %d\n",aWriteMark]];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %d\n",aReadMark]];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %d\n",theRunInfo.amountInBuffer]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9d   Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9d   Err Count   : %d\n",aReadMark,theRunInfo.msg_count]];
+			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d   Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
 		break;
 
 		case 1:
-			num = theRunInfo.err_buf_cnt;
+			num = MIN(kSBC_MaxErrorBufferSize,theRunInfo.err_count);
 			if(num == 0) theRunInfoString =  @"No Errors";
 			for(i=0;i<num;i++){
 				theRunInfoString =  [theRunInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.errorStrings[i]];
@@ -440,7 +440,7 @@
 		break;
 
 		case 2:
-			num = theRunInfo.msg_buf_cnt;
+			num = MIN(kSBC_MaxErrorBufferSize,theRunInfo.msg_count);
 			if(num == 0) theRunInfoString =  @"No Messages";
 			for(i=0;i<num;i++){
 				theRunInfoString =  [theRunInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.messageStrings[i]];
@@ -449,6 +449,7 @@
 	}
 	float amountFilled;
 	float totalAmount = (float)(aMaxValue-aMinValue);
+	
 	if(aReadMark==aWriteMark)		amountFilled = 0;
 	else if(aReadMark<aWriteMark)	amountFilled = aWriteMark-aReadMark;
 	else							amountFilled = totalAmount - (aReadMark-aWriteMark);

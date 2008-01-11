@@ -254,6 +254,7 @@ enum Gretina4FIFOStates {
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (void) checkFifoAlarm;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
+- (BOOL) bumpRateFromDecodeStage:(short)channel;
 
 #pragma mark ¥¥¥HW Wizard
 - (int) numberOfChannels;

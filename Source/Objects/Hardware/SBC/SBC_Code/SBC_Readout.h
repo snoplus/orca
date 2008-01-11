@@ -41,4 +41,5 @@ void SwapShortBlock(void* p, int32_t n);
 void postLAM(SBC_Packet* lamPacket);
 void LogMessage (const char *format,...);
 void LogError (const char *format,...);
+void LogBusError (const char *format,...);
 #endif

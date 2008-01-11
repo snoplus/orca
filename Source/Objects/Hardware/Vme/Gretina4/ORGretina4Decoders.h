@@ -27,6 +27,8 @@
 
 @interface ORGretina4WaveformDecoder : ORVmeCardDecoder {
     @private 
+        BOOL getRatesFromDecodeStage;
+        NSMutableDictionary* actualGretinaCards;
 }
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;

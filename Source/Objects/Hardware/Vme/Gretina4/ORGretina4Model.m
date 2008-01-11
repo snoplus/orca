@@ -1113,7 +1113,6 @@ static struct {
     
     [self initBoard];
     
-    isRunning = YES;
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
 
@@ -1123,6 +1122,7 @@ static struct {
 //**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    isRunning = YES;
     NSString* errorLocation = @"";
     NS_DURING
         unsigned long val;

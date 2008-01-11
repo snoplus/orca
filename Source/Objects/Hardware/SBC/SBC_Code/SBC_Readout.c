@@ -145,7 +145,12 @@ int32_t main(int32_t argc, char *argv[])
         pthread_mutex_lock (&runInfoMutex);  //begin critical section
         run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
         run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
-        run_info.readCycles        = 0;
+        run_info.readCycles			= 0;
+        run_info.busErrorCount		= 0;
+        run_info.err_count			= 0;
+        run_info.msg_count			= 0;
+        run_info.err_buf_index      = 0;
+        run_info.msg_buf_index      = 0;
         pthread_mutex_unlock (&runInfoMutex);//end critical section
 		
 		pthread_mutex_init(&lamInfoMutex, NULL);
@@ -209,7 +214,7 @@ void processSBCCommand(SBC_Packet* aPacket)
             run_info.statusBits    |= kSBC_ConfigLoadedMask;
         break;
                     
-        case kSBC_StartRun:           
+        case kSBC_StartRun:                  
             doRunCommand(aPacket); 
 		break;
 			
@@ -239,7 +244,7 @@ void doRunCommand(SBC_Packet* aPacket)
     // option1 = p->option[0];
     // option2 = p->option[1];
     //....
-
+	LogError("run Cmd: error check");
     int32_t result = 0;
     if(aPacket->cmdHeader.cmdID == kSBC_StartRun)  result = startRun();
     else if(aPacket->cmdHeader.cmdID == kSBC_StopRun) stopRun();
@@ -420,12 +425,19 @@ char startRun (void)
     /*---------------------------------*/
     CB_initialize(kCBBufferSize);
     time(&lastTime); 
+	
     pthread_mutex_lock (&runInfoMutex);  //begin critical section
-    run_info.bufferSize                = kCBBufferSize;
-    run_info.readCycles                = 0;
-    run_info.recordsTransfered        = 0;
-    run_info.wrapArounds            = 0;
-    pthread_mutex_unlock (&runInfoMutex);  //end critical section
+    run_info.bufferSize        = kCBBufferSize;
+    run_info.readCycles        = 0;
+    run_info.recordsTransfered = 0;
+    run_info.wrapArounds       = 0;
+	run_info.busErrorCount     = 0;
+	run_info.err_count         = 0;
+	run_info.msg_count         = 0;
+	run_info.err_buf_index     = 0;
+	run_info.msg_buf_index     = 0;
+	pthread_mutex_unlock (&runInfoMutex);  //end critical section
+	
     if(run_info.statusBits | kSBC_ConfigLoadedMask){
 
         startHWRun(&crate_config);
@@ -577,9 +589,10 @@ void LogMessage (const char *format,...)
 	va_list ap;
 	va_start (ap, format);
 	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	vsprintf (run_info.messageStrings[run_info.msg_buf_cnt], format, ap);
-    run_info.msg_buf_cnt = (run_info.msg_buf_cnt + 1 ) % kSBC_MaxErrorBufferSize;
+	vsprintf (run_info.messageStrings[run_info.msg_buf_index], format, ap);
+    run_info.msg_buf_index = (run_info.msg_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
 	pthread_mutex_unlock (&runInfoMutex);//end critical section
+	run_info.err_count++;
 	va_end (ap);
 }
 
@@ -589,11 +602,27 @@ void LogError (const char *format,...)
 	va_list ap;
 	va_start (ap, format);
 	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	vsprintf (run_info.errorStrings[run_info.err_buf_cnt], format, ap);
-    run_info.err_buf_cnt = (run_info.err_buf_cnt + 1 ) % kSBC_MaxErrorBufferSize;
+	vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
+    run_info.err_buf_cnt = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
+	run_info.msg_count++;
 	pthread_mutex_unlock (&runInfoMutex);//end critical section
 	va_end (ap);
 }
+
+void LogBusError (const char *format,...)
+{
+	if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
+	va_list ap;
+	va_start (ap, format);
+	pthread_mutex_lock (&runInfoMutex);  //begin critical section
+	vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
+    run_info.err_buf_cnt = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
+	run_info.msg_count++;
+	run_info.busErrorCount++;
+	pthread_mutex_unlock (&runInfoMutex);//end critical section
+	va_end (ap);
+}
+
 
 /*---------------------------------*/
 /*-------Helper Utilities----------*/

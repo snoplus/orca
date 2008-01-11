@@ -790,7 +790,7 @@ static struct {
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORGretinaWaveformDecoder",             @"decoder",
+        @"ORGretina4WaveformDecoder",            @"decoder",
         [NSNumber numberWithLong:dataId],        @"dataId",
         [NSNumber numberWithBool:YES],           @"variable",
         [NSNumber numberWithLong:-1],			 @"length",
@@ -983,7 +983,6 @@ static struct {
 	
     [self initBoard];
 	
-    isRunning = YES; 
 	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
 }
 
@@ -993,6 +992,7 @@ static struct {
 //**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    isRunning = YES; 
     NSString* errorLocation = @"";
     NS_DURING
 		unsigned short val;
