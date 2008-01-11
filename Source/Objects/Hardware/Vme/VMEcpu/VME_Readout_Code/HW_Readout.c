@@ -22,11 +22,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
+#include <errno.h>
 #include "SBC_Cmds.h"
 #include "SBC_Config.h"
 #include "HW_Readout.h"
 #include "SBC_Readout.h"
-#include <errno.h>
 #include "CircularBuffer.h"
 #include "VME_HW_Definitions.h"
 #include "VME_Trigger32.h"
@@ -245,19 +245,24 @@ void doReadBlock(SBC_Packet* aPacket)
             writeBuffer(aPacket);
             return;
          }
-    } else if(unitSize*numItems >= kDMALowerLimit) {
+    } 
+	else if(unitSize*numItems >= kDMALowerLimit) {
         if (addressSpace == 0xFF) set_dma_no_increment(true);
         else set_dma_no_increment(false);
         memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize);
         addressSpace=0x1;
         startAddress = 0x0;
-    } else if(addressModifier == 0x29 && unitSize == 2) {
+    }
+	else if(addressModifier == 0x29 && unitSize == 2) {
         memMapHandle = vmeAM29Handle;
-    } else if(addressModifier == 0x39 && unitSize == 4) {
+    } 
+	else if(addressModifier == 0x39 && unitSize == 4) {
         memMapHandle = vmeAM39Handle;
-    } else if(addressModifier == 0x9 && unitSize == 4 && startAddress < 0x2000000) {
+    } 
+	else if(addressModifier == 0x9 && unitSize == 4 && startAddress < 0x2000000) {
         memMapHandle = vmeAM9Handle;
-    } else {
+    } 
+	else {
         /* The address must be byte-aligned */ 
         startAddress = p->address & 0xFFFF;
         p->address = p->address & 0xFFFF0000;
@@ -289,15 +294,13 @@ void doReadBlock(SBC_Packet* aPacket)
         /* We have to poll the same address. */
         uint32_t i = 0;
         for (i=0;i<numItems;i++) {
-            result = 
-                read_device(memMapHandle,
-                    returnPayload + i*unitSize,unitSize,startAddress);
+            result = read_device(memMapHandle, returnPayload + i*unitSize,unitSize,startAddress);
             if (result != unitSize) break;
         }
         if (result == unitSize) result = unitSize*numItems; 
-    } else {
-        result = 
-            read_device(memMapHandle,returnPayload,numItems*unitSize,startAddress);
+    } 
+	else {
+        result = read_device(memMapHandle,returnPayload,numItems*unitSize,startAddress);
     }
     
     returnDataPtr->address         = oldAddress;
@@ -487,6 +490,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
             data[savedIndex] |= totalNumLongs; //see, we did fill it in...
 		}
 		else {
+			LogBusError("Rd Err: Getina4 0x%04x Buffer Rd Out",baseAddress);
             //oops... really bad -- the buffer read is out of sequence -- dump it all
             uint32_t i = 0;
             while(i < sizeOfFIFO) {
