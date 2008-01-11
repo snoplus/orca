@@ -1193,8 +1193,9 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	if(++throttleCount>throttle){
 		throttleCount = 0;
 		SBC_Packet aPacket;
-		aPacket.cmdHeader.destination	= kSBC_Process;
-		aPacket.cmdHeader.cmdID			= kSBC_CBRead;
+        aPacket.cmdHeader.destination	= kSBC_Process;
+        aPacket.cmdHeader.cmdID			= kSBC_CBRead;
+        aPacket.cmdHeader.numberBytesinPayload = 0;
 		[self send:&aPacket receive:&aPacket];
 					
 		unsigned long* rp = (unsigned long*)aPacket.payload;
