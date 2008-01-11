@@ -112,10 +112,8 @@
 
 - (void) setNeedsDisplay:(BOOL)flag
 {
-    //MAH commented out 10/22/03 Note: seems like this line needs to be used, but groups of ValueBars
-    //break then.
-	//[super setNeedsDisplay:flag];
 	[chainedView setNeedsDisplay:flag];
+	[super setNeedsDisplay:flag];
 }
 
 #pragma mark ¥¥¥Drawing
