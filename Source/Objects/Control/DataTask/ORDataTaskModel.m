@@ -442,7 +442,8 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 
 - (BOOL) doneTakingData
 {
-	BOOL allDone = NO;;
+	BOOL allDone = NO;
+	if(!cachedNumberDataTakers)return YES;
     int i;
     for(i=0;i<cachedNumberDataTakers;i++){
         allDone |= [cachedDataTakers[i] doneTakingData];
