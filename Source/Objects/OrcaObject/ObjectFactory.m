@@ -20,6 +20,8 @@
 
 
 #import "ObjectFactory.h"
+#import "OrcaObject.h"
+
 @interface ObjectFactory (private)
 - (void) setObject:(id)anObject;
 @end
