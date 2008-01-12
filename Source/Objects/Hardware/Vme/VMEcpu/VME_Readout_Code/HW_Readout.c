@@ -83,21 +83,23 @@ void stopHWRun (SBC_crate_config* config)
 void FindHardware(void)
 {
     vmeAM29Handle = get_new_device(0x0, 0x29, 2, 0x10000); 
-	if (vmeAM29Handle == NULL) LogBusError("Device vmeAM29Handle: %s",strerror(errNo));
+	if (vmeAM29Handle == NULL) LogBusError("Device vmeAM29Handle: %s",strerror(errno));
 	
     controlHandle = get_ctl_device(); 
-	if (controlHandle == NULL) LogBusError("Device controlHandle: %s",strerror(errNo));
+	if (controlHandle == NULL) LogBusError("Device controlHandle: %s",strerror(errno));
 	
     vmeAM39Handle = get_new_device(0x0, 0x39, 4, 0x1000000);
-	if (vmeAM39Handle == NULL) LogBusError("Device vmeAM39Handle: %s",strerror(errNo));
+	if (vmeAM39Handle == NULL) LogBusError("Device vmeAM39Handle: %s",strerror(errno));
 	
     vmeAM9Handle = get_new_device(0x0, 0x9, 4, 0x2000000);
-	if (vmeAM9Handle == NULL) LogBusError("Device vmeAM9Handle: %s",strerror(errNo));
+	if (vmeAM9Handle == NULL) LogBusError("Device vmeAM9Handle: %s",strerror(errno));
     /* The entire A16 (D16), A24 (D16), space is mapped. */
     /* The bottom of A32 (D32) is mapped up to 0x2000000. */
     /* We need to be careful!*/
   
     set_hw_byte_swap(true);
+	set_ds_negation_speed(2);
+	set_ds_high_time_blts(1);
 }
 
 void ReleaseHardware(void)
@@ -404,11 +406,11 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
                         data[dataIndex++] = locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
                     }
                 }
-				else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errNo));				
+				else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));				
             }
         }
     }
-	else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errNo));				
+	else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));				
 
     return config->card_info[index].next_Card_Index;
 }            
@@ -425,7 +427,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
     static TUVMEDevice* vmeDMADevice = 0;
     static uint32_t fifoState;
 
-    //uint32_t baseAddress      = config->card_info[index].base_add;
+    uint32_t baseAddress      = config->card_info[index].base_add;
     uint32_t fifoStateAddress = config->card_info[index].deviceSpecificData[0];
     uint32_t fifoEmptyMask    = config->card_info[index].deviceSpecificData[1];
     uint32_t fifoAddress      = config->card_info[index].deviceSpecificData[2];
@@ -498,16 +500,16 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
             data[savedIndex] |= totalNumLongs; //see, we did fill it in...
 		}
 		else {
-			if(result<0)LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errNo));
+			if(result<0)LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
 			else		LogError("Rd Err: Gretina4 0x%04x Buffer Rd Out",baseAddress);
             //oops... really bad -- the buffer read is out of sequence -- dump it all
             uint32_t i = 0;
             while(i < sizeOfFIFO) {
                 result = read_device(vmeReadOutHandle,(char*) (&theValue),4,fifoAddress); 
-                if (result == 0) // means the FIFO is empty
+                if (result == 0) { // means the FIFO is empty
                   return config->card_info[index].next_Card_Index;
-				if result < 0) {
-					LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errNo));
+				} else if (result < 0) {
+					LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
 					return config->card_info[index].next_Card_Index;
 				}
                 if (theValue == 0xAAAAAAAA) break;
@@ -517,8 +519,8 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 			//note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
 			//we'll reset the index to dump the data later....
             result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-			if result < 0) {
-				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errNo));				
+			if (result < 0) {
+				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));				
 				return config->card_info[index].next_Card_Index;
 			}
             uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
@@ -535,12 +537,12 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
             }
             if (vmeDMADevice == NULL) {
-				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errNo));
+				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
 				return config->card_info[index].next_Card_Index;
             }
             result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
-			if result < 0) {
-				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errNo));
+			if (result < 0) {
+				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
 				return config->card_info[index].next_Card_Index;
 			}
  			dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
