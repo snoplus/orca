@@ -1118,7 +1118,12 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 -(void)	mouseDown:(NSEvent*)theEvent
 {
-    if(analysisView){
+	if([theEvent clickCount]>=2){
+		if([mDataSource respondsToSelector:@selector(makeMainController)]){
+			[mDataSource makeMainController];
+		}
+	}
+    else if(analysisView){
         if([theEvent modifierFlags] & NSShiftKeyMask){
             [self addGateAction:self];
             
