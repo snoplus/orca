@@ -24,6 +24,6 @@
 #define kGretina   2
 #define kSBCLAM	   3
 #define kTrigger32 4
-#define kLAMGen	   5 /*for testing*/
+#define kCaen 	   5 
 
 #endif
