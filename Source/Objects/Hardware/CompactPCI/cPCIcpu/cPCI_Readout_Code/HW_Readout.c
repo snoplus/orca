@@ -81,7 +81,7 @@ void stopHWRun (SBC_crate_config* config)
 	}
 }
 
-int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data, char recursive)
+int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data)
 {
 	if(index<config->total_cards && index>=0) {
 		switch(config->card_info[index].hw_type_id){

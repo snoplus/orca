@@ -25,7 +25,7 @@
 void processHWCommand(SBC_Packet* aPacket);
 void startHWRun (SBC_crate_config* config);
 void stopHWRun (SBC_crate_config* config);
-int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data, char recursive);
+int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* data);
 void FindHardware(void);
 void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket);
@@ -36,5 +36,7 @@ void doVmeReadBlock(SBC_Packet* aPacket);
 int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index);
 
 #endif
