@@ -70,7 +70,7 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"IP220 (%@)",[model identifier]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"IPFIFO (%@)",[model identifier]]];
 }
 
 #pragma mark ¥¥¥Actions

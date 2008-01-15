@@ -475,10 +475,11 @@ static struct {
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
+	/*
     unsigned short readBackValue = [self readControlReg:chan];
     if((readBackValue & 0x0c1f) != theValue){
         NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xc1f,theValue & 0xc1f);
-    }
+    }*/
 }
 
 - (void) writeLEDThreshold:(int)channel
@@ -579,7 +580,7 @@ static struct {
 						   numToRead:1
 						  withAddMod:0x29
 					   usingAddSpace:0x01];
-		if((val & kGretinaFIFOEmpty) == 0){
+		if((val & kGretinaFIFOEmpty) != 0){
 			//read the first longword which should be the packet separator: 0xAAAAAAAA
 			unsigned long theValue;
 			[theController readLongBlock:&theValue 

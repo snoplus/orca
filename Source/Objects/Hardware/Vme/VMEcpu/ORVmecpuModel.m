@@ -106,6 +106,19 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	return [NSMutableArray arrayWithObject:readOutGroup];
 }
 
+#pragma mark ¥¥¥ORVmeBusProtocol Protocol
+- (void) resetContrl
+{
+	[self reset];
+}
+
+- (void) checkStatusErrors
+{
+	if (![sbcLink isConnected]) {
+		[NSException raise: OExceptionVmeAccessError format:[NSString stringWithString:@"SBC not connected."]];
+	}
+}
+
 #pragma mark ¥¥¥SBC_Linking protocol
 
 - (NSString*) cpuName

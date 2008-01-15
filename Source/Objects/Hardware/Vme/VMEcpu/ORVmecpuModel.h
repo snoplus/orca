@@ -21,13 +21,17 @@
 
 #import "ORVmeAdapter.h"
 #import "ORDataTaker.h"
+#import "ORVmeBusProtocol.h"
 #import "SBC_Linking.h"
 
 @class ORReadOutList;
 @class ORDataPacket;
 @class SBC_Link;
 
-@interface ORVmecpuModel : ORVmeAdapter <ORDataTaker,SBC_Linking>
+#pragma mark ¥¥¥Exceptions
+#define OExceptionVmeAccessError		@"Vme Access Error"
+
+@interface ORVmecpuModel : ORVmeAdapter <ORDataTaker,SBC_Linking,ORVmeBusProtocol>
 {
 	ORReadOutList*	readOutGroup;
 	SBC_Link*		sbcLink;
@@ -60,6 +64,9 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+#pragma mark ¥¥¥ORVmeBusProtocol Protocol
+- (void) resetContrl;
+- (void) checkStatusErrors;
 
 #pragma mark ¥¥¥SBC_Linking Protocol
 - (NSString*) cpuName;

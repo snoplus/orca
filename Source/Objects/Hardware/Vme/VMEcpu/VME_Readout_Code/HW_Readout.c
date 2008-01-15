@@ -98,8 +98,8 @@ void FindHardware(void)
     /* We need to be careful!*/
   
     set_hw_byte_swap(true);
-	set_ds_negation_speed(2);
-	set_ds_high_time_blts(1);
+	set_ds_negation_speed(0);
+	set_ds_high_time_blts(0);
 }
 
 void ReleaseHardware(void)
