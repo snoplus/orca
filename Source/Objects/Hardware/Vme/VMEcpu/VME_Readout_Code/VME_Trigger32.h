@@ -23,4 +23,4 @@
 #include "SBC_Cmds.h"
 
 int32_t Readout_TR32_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-void ResetTR32(int32_t index,short id,unsigned short offset);
+void ResetTR32(int32_t index,SBC_crate_config* config,unsigned short offset);
