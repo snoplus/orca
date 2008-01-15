@@ -112,8 +112,11 @@
 
 - (void) setNeedsDisplay:(BOOL)flag
 {
+	//Argg.... before 10.5 the calling the superclass would break the update chain for some reason
+	if([ORAppDelegate isMacOSX10_5]){
+		[super setNeedsDisplay:flag];
+	}
 	[chainedView setNeedsDisplay:flag];
-	[super setNeedsDisplay:flag];
 }
 
 #pragma mark ¥¥¥Drawing
@@ -129,7 +132,6 @@
 	[barColor set];
 	if(dataSource){
 		float x = [mXScale getPixAbs:[dataSource doubleValue]];
-		//[NSBezierPath fillRect:NSMakeRect(1,1,x,b.size.height-2)];
 		[gradient fillRect:NSMakeRect(1,1,x,b.size.height-2) angle:180.];
 
 	}
