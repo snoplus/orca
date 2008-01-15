@@ -32,6 +32,8 @@
     MemoryWatcher*     memoryWatcher;
     ORSplashWindowController* theSplashController;
 }
++ (BOOL)isMacOSX10_5;
++ (BOOL)isMacOSX10_4;
 
 - (MemoryWatcher*) memoryWatcher;
 - (void) setMemoryWatcher:(MemoryWatcher*)aWatcher;
