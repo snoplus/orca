@@ -19,7 +19,9 @@
 
 #import "ORCaenCardModel.h"
 #import "ORCaenDataDecoder.h"
-
+#import "SBC_Config.h"
+#import "SBC_Cmds.h"
+#import "VME_HW_Definitions.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORVmeCrateModel.h"
@@ -867,5 +869,25 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     
     return objDictionary;
 }
+
+//this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id	= kCaen; //should be unique
+	configStruct->card_info[index].hw_mask[0]	= dataId; //better be unique
+	configStruct->card_info[index].slot			= [self slot];
+	configStruct->card_info[index].crate		= [self crateNumber];
+	configStruct->card_info[index].add_mod		= [self addressModifier];
+	configStruct->card_info[index].base_add		= [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0] = [self getStatusRegisterIndex:1];
+	configStruct->card_info[index].deviceSpecificData[1] = [self getStatusRegisterIndex:2];
+	configStruct->card_info[index].deviceSpecificData[2] = [self getDataBufferSize]/sizeof(long);
+	configStruct->card_info[index].deviceSpecificData[3] = [self baseAddress] + [self getBufferOffset];
+	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	return index+1;
+}
+
 
 @end
