@@ -62,6 +62,7 @@ time_t              lastTime;
 
 pthread_t readoutThreadId;
 pthread_t irqAckThreadId;
+pthread_attr_t readoutThreadAttr;
 pthread_mutex_t runInfoMutex;
 pthread_mutex_t lamInfoMutex;
 int32_t  workingSocket;
@@ -141,6 +142,8 @@ int32_t main(int32_t argc, char *argv[])
         //Note that we don't fork, only one connection is allowed.
         /*-------------------------------*/
         /*initialize our global variables*/
+        pthread_attr_init(&readoutThreadAttr);
+        pthread_attr_setdetachstate(&readoutThreadAttr, PTHREAD_CREATE_JOINABLE);
         pthread_mutex_init(&runInfoMutex, NULL);
         pthread_mutex_lock (&runInfoMutex);  //begin critical section
         run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
@@ -167,17 +170,20 @@ int32_t main(int32_t argc, char *argv[])
             processBuffer(&aPacket);
         }
         
-        if (run_info.statusBits & kSBC_RunningMask) {
+        if(run_info.statusBits & kSBC_RunningMask) {
             /* The data process is still running, we need to stop it. */
             /* This generally happens if an error occurs on the Orca side and
                 the socket is broken. */
             stopRun();
+            /* We should exit, too, as who knows what kind of failures exist. */
+            timeToExit=1;
         }
         free(data);
 		
         close(workingSocket);
         CB_cleanup();
         pthread_mutex_destroy(&runInfoMutex);
+        pthread_attr_destroy(&readoutThreadAttr);
 
         ReleaseHardware();
         if(timeToExit)break;    
@@ -448,10 +454,10 @@ char startRun (void)
 
         startHWRun(&crate_config);
 
-        if( pthread_create(&readoutThreadId,NULL, readoutThread, 0) == 0){
-            return pthread_detach(readoutThreadId)==0;
+        if( pthread_create(&readoutThreadId,&readoutThreadAttr, readoutThread, 0) == 0){
+            return 1;
         }
-        else return 0;
+        else exit(-1);
         
     }
     else return 0;
@@ -534,7 +540,7 @@ void* readoutThread (void* p)
 
    }
 
-    return NULL;
+    pthread_exit((void *) 0);
 }
 
 void* irqAckThread (void* p)
