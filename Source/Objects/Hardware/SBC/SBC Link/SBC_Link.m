@@ -1181,7 +1181,7 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	[eRunFailedAlarm clearAlarm];
 	throttleCount = 0;
 	missedHeartBeat = 0;
-	throttle = 100;
+	throttle = 1000;
 	[self tellClientToStartRun];
 	[self update];
 }

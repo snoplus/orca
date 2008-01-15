@@ -166,6 +166,13 @@ int32_t main(int32_t argc, char *argv[])
             if(readBuffer(&aPacket) == 0)break;
             processBuffer(&aPacket);
         }
+        
+        if (run_info.statusBits & kSBC_RunningMask) {
+            /* The data process is still running, we need to stop it. */
+            /* This generally happens if an error occurs on the Orca side and
+                the socket is broken. */
+            stopRun();
+        }
         free(data);
 		
         close(workingSocket);
@@ -459,7 +466,8 @@ void stopRun()
     pthread_mutex_unlock (&runInfoMutex);  //end critical section
 
     stopHWRun(&crate_config);
-
+    // block until return
+    pthread_join(readoutThreadId, NULL);
     memset(&crate_config,0,sizeof(SBC_crate_config));
     //CB_cleanup();
 }
