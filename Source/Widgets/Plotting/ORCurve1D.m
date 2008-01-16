@@ -434,7 +434,6 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	for (i=0; i<numPoints;++i) {
 						
 		[mDataSource plotter:aPlot dataSet:dataSetID index:i x:&xValue y:&yValue];
-		NSLog(@"%d %f %f\n",i,xValue,yValue);
 		y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
 		x = [mXScale getPixAbs:xValue];
 		
