@@ -3,24 +3,32 @@
 //  Orca
 //
 //  Created by Mark Howe on Sat Nov 19 2005.
-//  Copyright Â© 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright Â¬Â© 2002 CENPA, University of Washington. All rights reserved.
 //
+
+@class ORPlotter1D;
 
 @interface ORManualPlotController : OrcaObjectController
 {
     IBOutlet NSButton*    manualPlotLockButton;
+    IBOutlet NSTableView* dataTableView;
+    IBOutlet ORPlotter1D* plotter;
 }
 
-#pragma mark ¥¥¥Initialization
+#pragma mark â€¢â€¢â€¢Initialization
 - (id) init;
 
-#pragma mark ¥¥¥Interface Management
+#pragma mark â€¢â€¢â€¢Interface Management
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) manualPlotLockChanged:(NSNotification *)aNote;
+- (void) dataChanged:(NSNotification*)aNote;
 - (void) checkGlobalSecurity;
 
-#pragma mark ¥¥¥Actions
+#pragma mark â€¢â€¢â€¢Actions
 - (IBAction) manualPlotLockAction:(id)sender;
 
+#pragma mark â€¢â€¢â€¢Data Source
+- (int)numberOfRowsInTableView:(NSTableView *)tableView;
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
 @end
