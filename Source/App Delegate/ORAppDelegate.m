@@ -54,12 +54,12 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 @implementation ORAppDelegate
 + (BOOL)isMacOSX10_5
 {
-	return (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5);
+	return (floor(NSAppKitVersionNumber) >= NSAppKitVersionNumber10_5);
 }
 
 + (BOOL)isMacOSX10_4 
 {
-	return (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4);
+	return (floor(NSAppKitVersionNumber) >= NSAppKitVersionNumber10_4);
 }
 
 
