@@ -181,6 +181,8 @@
 				<string>id</string>
 				<key>addressModifierPUAction</key>
 				<string>id</string>
+				<key>cbTest</key>
+				<string>id</string>
 				<key>connectionAction</key>
 				<string>id</string>
 				<key>doRangeAction</key>
@@ -202,6 +204,8 @@
 				<key>lockAction</key>
 				<string>id</string>
 				<key>passWordAction</key>
+				<string>id</string>
+				<key>ping</key>
 				<string>id</string>
 				<key>portNumberAction</key>
 				<string>id</string>
@@ -246,6 +250,10 @@
 				<string>ORValueBar</string>
 				<key>cbPercentField</key>
 				<string>NSTextField</string>
+				<key>cbTestButton</key>
+				<string>NSButton</string>
+				<key>cbTestProgress</key>
+				<string>NSProgressIndicator</string>
 				<key>connect1Button</key>
 				<string>NSButton</string>
 				<key>connectButton</key>
@@ -278,6 +286,10 @@
 				<string>NSButton</string>
 				<key>passWordField</key>
 				<string>NSSecureTextField</string>
+				<key>pingButton</key>
+				<string>NSButton</string>
+				<key>pingTaskProgress</key>
+				<string>NSProgressIndicator</string>
 				<key>portNumberField</key>
 				<string>NSTextField</string>
 				<key>queView</key>
