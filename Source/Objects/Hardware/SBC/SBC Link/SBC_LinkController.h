@@ -75,6 +75,12 @@
 	IBOutlet NSButton*		doRangeButton;
 	IBOutlet NSMatrix*      readWriteTypeMatrix;
 	IBOutlet NSPopUpButton* addressModifierPU;
+
+	//TCP/IP Tuning
+	IBOutlet NSButton*		pingButton;
+	IBOutlet NSProgressIndicator* pingTaskProgress;
+	IBOutlet NSButton*		cbTestButton;
+	IBOutlet NSProgressIndicator* cbTestProgress;
 }
 
 #pragma mark •••Initialization
@@ -116,6 +122,7 @@
 - (void) doRangeChanged:(NSNotification*)aNote;
 - (void) readWriteTypeChanged:(NSNotification*)aNote;
 - (void) addressModifierChanged:(NSNotification*)aNote;
+- (void) pingTaskChanged:(NSNotification*)aNote;
 
 - (NSString*) errorString:(int)errNum;
 - (NSString*) literalToString:(int)aLiteral;
@@ -150,6 +157,8 @@
 - (IBAction) addressModifierPUAction:(id)sender;
 
 - (IBAction) infoTypeAction:(id)sender;
+- (IBAction) ping:(id)sender;
+- (IBAction) cbTest:(id)sender;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;

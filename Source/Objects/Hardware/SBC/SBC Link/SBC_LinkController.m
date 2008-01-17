@@ -224,6 +224,17 @@
                          name : SBC_LinkInfoTypeChanged
                        object : [model sbcLink]];
 
+  [notifyCenter addObserver : self
+                     selector : @selector(pingTaskChanged:)
+                         name : ORSBC_LinkPingTask
+                       object : [model sbcLink]];
+
+  [notifyCenter addObserver : self
+                     selector : @selector(cbTestChanged:)
+                         name : ORSBC_LinkCBTest
+                       object : [model sbcLink]];
+
+
 }
 
 - (void) updateWindow
@@ -252,6 +263,8 @@
     [self readWriteTypeChanged:nil];
     [self addressModifierChanged:nil];
     [self infoTypeChanged:nil];
+    [self pingTaskChanged:nil];
+    [self cbTestChanged:nil];
 	
 	[self lamSlotChanged:nil];
 }
@@ -262,6 +275,23 @@
     [gSecurity setLock:[model sbcLockName] to:secure];
     [lockButton setEnabled:secure];
 }
+
+- (void) pingTaskChanged:(NSNotification*)aNote
+{
+	BOOL pingRunning = [[model sbcLink] pingTaskRunning];
+	if(pingRunning)[pingTaskProgress startAnimation:self];
+	else [pingTaskProgress stopAnimation:self];
+	[pingButton setTitle:pingRunning?@"Stop":@"Ping"];
+}
+
+- (void) cbTestChanged:(NSNotification*)aNote
+{
+	BOOL isRunning = [[model sbcLink] cbTestRunning];
+	if(isRunning)[cbTestProgress startAnimation:self];
+	else [cbTestProgress stopAnimation:self];
+	[cbTestButton setTitle:isRunning?@"Stop":@"CB Test"];
+}
+
 
 - (void) lamSlotChanged:(NSNotification*)aNotification
 {
@@ -455,7 +485,7 @@
 	else							amountFilled = totalAmount - (aReadMark-aWriteMark);
 	
 	
-	[cbPercentField setFloatValue:totalAmount!=0?amountFilled/totalAmount:0];
+	[cbPercentField setFloatValue:totalAmount!=0?100.*amountFilled/totalAmount:0];
 	[runInfoField setStringValue:theRunInfoString];
 	[queView setNeedsDisplay:YES];
 }
@@ -794,6 +824,22 @@
     if ([[model sbcLink] infoType] != [sender selectedTag]){
         [[model sbcLink] setInfoType:[sender selectedTag]];
     }
+}
+
+- (IBAction) ping:(id)sender
+{
+	NS_DURING
+		[[model sbcLink] ping];
+	NS_HANDLER
+	NS_ENDHANDLER
+}
+
+- (IBAction) cbTest:(id)sender
+{
+	NS_DURING
+		[[model sbcLink] startCBTransferTest];
+	NS_HANDLER
+	NS_ENDHANDLER
 }
 
 @end
