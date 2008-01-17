@@ -1927,7 +1927,7 @@ enum {
     }
     else {
 		float dh = oldLabelHeight-[kLongestNumber sizeWithAttributes:labelAttributes].height;
-		float totalWidth = kLongTickLength + oldLabelWidth + titleHeight;
+		float totalWidth = kLongTickLength + oldLabelWidth;// + titleHeight;
 		newOrigin.y = oldFrame.origin.y - dh/2; //1/2 to each end.
 		if(!isOpposite){
 			float upperRightX = oldFrame.origin.x + oldFrame.size.width;
