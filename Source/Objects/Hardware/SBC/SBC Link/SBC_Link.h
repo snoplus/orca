@@ -35,6 +35,11 @@ typedef  enum eSBC_CrateStates{
 	kNumStates //must be last
 }eSBC_CrateStates;
 
+typedef enum eSBC_ThrottleConsts{
+    kShrinkThrottleBy = 50,           // We shrink the throttle by this much
+    kAmountInBufferThreshold = 0x1000 // if the amount in the buffer exceeds this
+}eSBC_ThrottleConsts;
+
 @class  ORFileMover;
 @class  ORCard;
 @class ORSafeQueue;

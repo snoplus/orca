@@ -1142,7 +1142,6 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 - (void) update
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(update) object:nil];
-    
 	if(isRunning){
 		[self getRunInfoBlock];
 		if(runInfo.readCycles == oldCycleCount){
@@ -1162,7 +1161,10 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 			oldCycleCount = runInfo.readCycles;
 		}	
 	}
-
+    /*if (throttle > kShrinkThrottleBy && runInfo.amountInBuffer > kAmountInBufferThreshold) {
+        *//* Let's try diminishing the throttle */
+        /*throttle -= kShrinkThrottleBy;
+    }*/
 	if(isRunning){
 		[self performSelector:@selector(update) withObject:nil afterDelay:.5];
 	}
@@ -1593,7 +1595,7 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 			bytesSent += bytesWritten;
 		}
 		else if (bytesWritten < 0) {
-			[NSException raise:@"Write Error" format:@"Write Error %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
+			[NSException raise:@"Write Error" format:@"Write Error(%@) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
 		}
 	}
 }
@@ -1635,14 +1637,17 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	if(n==0){
 		[self disconnect];
 		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-	}
+	} else if (n<0) {
+    	[self disconnect];
+		[NSException raise:@"Socket Error" format:@"Error: %@",strerror(errno)];
+    }
 	bytesReceived += sizeof(long);
 	numBytesToGet -= sizeof(long);
 	
 	char* packetPtr = (char*)&aPacket->cmdHeader;
 	while(numBytesToGet){
 		n = recv(aSocket, packetPtr, numBytesToGet, MSG_WAITALL);
-		if(n == 0) break; //connection disconnected.
+		if(n <= 0) break; //connection disconnected.
 		packetPtr += n;
 		numBytesToGet -= n;
 		bytesReceived += n;
@@ -1651,7 +1656,10 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	if(n==0){
 		[self disconnect];
 		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-	}
+	} else if (n<0) {
+    	[self disconnect];
+		[NSException raise:@"Socket Error" format:@"Error: %@",strerror(errno)];
+    }
 }
 
 - (BOOL) canWriteTo:(int) sck

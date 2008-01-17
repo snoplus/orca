@@ -71,8 +71,8 @@ char needToSwap;
 
 //as the hw is read out, the data is put into the following temp buffer, at the end
 //of the readout cycle, it is dumped into the CB
-int32_t  dataIndex;
-int32_t* data;
+int32_t  dataIndex = 0;
+int32_t* data = 0;
 /*---------------*/
 
 void sigchld_handler(int32_t s)
@@ -82,9 +82,11 @@ void sigchld_handler(int32_t s)
 
 int32_t main(int32_t argc, char *argv[])
 {
-    int32_t sockfd,irqfd;				// listen on sock_fd, new connection on workingSocket
-    struct sockaddr_in my_addr;			// my address information
-    struct sockaddr_in their_addr;		// connector's address information
+    signal (SIGPIPE, SIG_IGN); // ignore SIGPIPE
+    
+    int32_t sockfd,irqfd;                // listen on sock_fd, new connection on workingSocket
+    struct sockaddr_in my_addr;            // my address information
+    struct sockaddr_in their_addr;        // connector's address information
     socklen_t sin_size;
     struct sigaction sa;
     int32_t yes=1;
@@ -109,8 +111,8 @@ int32_t main(int32_t argc, char *argv[])
         my_addr.sin_port = htons(thePort);     // short, network byte order
         if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))== -1) exit(1);
 
-		my_addr.sin_port = htons(thePort+1);     // short, network byte order
-		if (bind(irqfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))== -1) exit(1);
+        my_addr.sin_port = htons(thePort+1);     // short, network byte order
+        if (bind(irqfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))== -1) exit(1);
         
         if (listen(sockfd, BACKLOG) == -1) exit(1);
         if (listen(irqfd, BACKLOG) == -1 )  exit(1);
@@ -122,7 +124,7 @@ int32_t main(int32_t argc, char *argv[])
 
         FindHardware();
     
-		//the order is important here... ORCA will connect with the regular socket first, -then- the irq socket
+        //the order is important here... ORCA will connect with the regular socket first, -then- the irq socket
         sin_size = sizeof(struct sockaddr_in);
         if ((workingSocket    = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size)) == -1) exit(1);
         if ((workingIRQSocket = accept(irqfd, (struct sockaddr *)&their_addr, &sin_size)) == -1) exit(1);
@@ -135,8 +137,13 @@ int32_t main(int32_t argc, char *argv[])
         int32_t testWord;
         needToSwap = FALSE;
         int32_t n = read(workingSocket,&testWord, 4);
-        if(n == 0)    return 0 ; //disconnected -- exit
-        if(testWord == 0xBADC0000)needToSwap = TRUE;
+        if(n <= 0) return n; //disconnected or error -- exit
+        if(testWord == 0xBADC0000) {
+            needToSwap = TRUE;
+        } else if (testWord != 0x000DCBA) {
+            /* Unrecognized service trying to connect? */
+            exit(2);
+        }
         //end of swap test
 
         //Note that we don't fork, only one connection is allowed.
@@ -148,26 +155,37 @@ int32_t main(int32_t argc, char *argv[])
         pthread_mutex_lock (&runInfoMutex);  //begin critical section
         run_info.statusBits        &= ~kSBC_ConfigLoadedMask; //clr bit
         run_info.statusBits        &= ~kSBC_RunningMask;        //clr bit
-        run_info.readCycles			= 0;
-        run_info.busErrorCount		= 0;
-        run_info.err_count			= 0;
-        run_info.msg_count			= 0;
+        run_info.readCycles            = 0;
+        run_info.busErrorCount        = 0;
+        run_info.err_count            = 0;
+        run_info.msg_count            = 0;
         run_info.err_buf_index      = 0;
         run_info.msg_buf_index      = 0;
         pthread_mutex_unlock (&runInfoMutex);//end critical section
-		
-		pthread_mutex_init(&lamInfoMutex, NULL);
+        
+        pthread_mutex_init(&lamInfoMutex, NULL);
         pthread_mutex_lock (&lamInfoMutex);  //begin critical section
-		memset(&lam_info ,0,sizeof(SBC_LAM_info_struct)*kMaxNumberLams);
-		pthread_mutex_unlock (&lamInfoMutex);//end critical section
-		/*-------------------------------*/
+        memset(&lam_info ,0,sizeof(SBC_LAM_info_struct)*kMaxNumberLams);
+        pthread_mutex_unlock (&lamInfoMutex);//end critical section
+        /*-------------------------------*/
 
-		data = (int32_t*)malloc(kMaxDataBufferSize*sizeof(int32_t));
+        data = (int32_t*)malloc(kMaxDataBufferSize*sizeof(int32_t));
 
         SBC_Packet aPacket;
+        int32_t numRead = 0;
         while(!timeToExit){
-            if(readBuffer(&aPacket) == 0)break;
-            processBuffer(&aPacket);
+            if (workingSocket < 0 || workingIRQSocket < 0) {
+                /* This indicates one of the sockets has been closed, don't continue. */
+                break;
+            }
+            numRead = readBuffer(&aPacket);
+            if(numRead == 0) break;
+            if (numRead > 0) {
+                processBuffer(&aPacket);
+            } else {
+              /* if numRead is less than 0, then an error occurred.  We'll try to continue. */
+                LogError("Error reading buffer: %s", strerror(errno));
+            }
         }
         
         if(run_info.statusBits & kSBC_RunningMask) {
@@ -179,13 +197,28 @@ int32_t main(int32_t argc, char *argv[])
             timeToExit=1;
         }
         free(data);
-		
-        close(workingSocket);
+        
+        /* Close the open sockets. */
+        if (workingSocket >= 0) {
+          close(workingSocket);
+          workingSocket = -1;
+        }
+        if (workingIRQSocket >= 0) {
+          close(workingIRQSocket);
+          workingIRQSocket = -1;
+        }
+
+        /* Clean up circular buffer. */
         CB_cleanup();
+
+        /* Take care of pthread variables. */
         pthread_mutex_destroy(&runInfoMutex);
         pthread_attr_destroy(&readoutThreadAttr);
 
+        /* This releases hardware. */
         ReleaseHardware();
+
+        /* Test to see if we're exitting completely. */
         if(timeToExit)break;    
     }
     
@@ -229,23 +262,23 @@ void processSBCCommand(SBC_Packet* aPacket)
                     
         case kSBC_StartRun:                  
             doRunCommand(aPacket); 
-		break;
-			
+        break;
+            
         case kSBC_StopRun:            
             doRunCommand(aPacket); 
-		break;
+        break;
     
         case kSBC_RunInfoRequest:    
             sendRunInfo(); 
-		break;
-		
+        break;
+        
         case kSBC_CBRead:            
             sendCBRecord(); 
-		break;
-			
+        break;
+            
         case kSBC_Exit:              
             timeToExit = 1; 
-		break;
+        break;
     }
 }
 
@@ -274,14 +307,16 @@ void sendResponse(SBC_Packet* aPacket)
     
     SBC_CmdOptionStruct* p = (SBC_CmdOptionStruct*)aPacket->payload;        
     if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
-    writeBuffer(aPacket);
+    if (writeBuffer(aPacket) < 0) { 
+        LogError("sendResponse Error: %s", strerror(errno));   
+    }
 }
 
 void sendRunInfo(void)
 {
     SBC_Packet aPacket;
-    aPacket.cmdHeader.destination		= kSBC_Process;
-    aPacket.cmdHeader.cmdID				= kSBC_RunInfoRequest;
+    aPacket.cmdHeader.destination        = kSBC_Process;
+    aPacket.cmdHeader.cmdID                = kSBC_RunInfoRequest;
     aPacket.cmdHeader.numberBytesinPayload    = sizeof(SBC_info_struct);
     
     SBC_info_struct* runInfoPtr = (SBC_info_struct*)aPacket.payload;
@@ -299,7 +334,9 @@ void sendRunInfo(void)
     runInfoPtr->wrapArounds    = cbInfo.wrapArounds;
             
     if(needToSwap)SwapLongBlock(runInfoPtr,kSBC_NumRunInfoValuesToSwap);
-    writeBuffer(&aPacket);
+    if (writeBuffer(&aPacket) < 0) {
+        LogError("sendRunInfo Error: %s", strerror(errno));   
+    }
 }
 
 void sendCBRecord(void)
@@ -333,14 +370,17 @@ void sendCBRecord(void)
     run_info.recordsTransfered        += recordCount;
     pthread_mutex_unlock (&runInfoMutex);  //end critical section
 
-    writeBuffer(&aPacket);
+    if (writeBuffer(&aPacket) < 0) {
+        LogError("sendCBRecord Error: %s", strerror(errno));   
+    }
 }
 
 int32_t readBuffer(SBC_Packet* aPacket)
 { 
+    if (workingSocket < 0) return 0; // Socket unavailable
     int32_t numberBytesinPacket;
     int32_t bytesRead = read(workingSocket, &numberBytesinPacket, sizeof(int32_t));
-    if(bytesRead==0)return 0; //disconnected
+    if(bytesRead<=0) return bytesRead; //disconnected or error, return as such
     if(needToSwap)SwapLongBlock(&numberBytesinPacket,1);    
     aPacket->numBytes = numberBytesinPacket;
     numberBytesinPacket-= sizeof(int32_t);
@@ -348,7 +388,7 @@ int32_t readBuffer(SBC_Packet* aPacket)
     char* p = (char*)&aPacket->cmdHeader;
     while(numberBytesinPacket){
         bytesRead = read(workingSocket, p, numberBytesinPacket);
-        if(bytesRead == 0) return 0;    //connection disconnected.
+        if(bytesRead <= 0) return bytesRead;    //connection disconnected or error.
         p += bytesRead;
         numberBytesinPacket -= bytesRead;
     }
@@ -364,18 +404,25 @@ int32_t readBuffer(SBC_Packet* aPacket)
 
 int32_t writeBuffer(SBC_Packet* aPacket)
 { 
-    if(!workingSocket)return 0;
+    /* writeBuffer returns -1 if an error.  errno shoulc be set appropriately. */
+    if(workingSocket < 0) return -1;
     aPacket->numBytes =  sizeof(int32_t) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket->cmdHeader.numberBytesinPayload; 
     int32_t numBytesToSend = aPacket->numBytes; 
     if(needToSwap)SwapLongBlock(aPacket,sizeof(SBC_CommandHeader)/sizeof(int32_t)+1);
     char* p = (char*)aPacket;
     while (numBytesToSend) {       
         int32_t bytesWritten = write(workingSocket,p,numBytesToSend);
-        if (bytesWritten > 0) {
-            p += bytesWritten;
-            numBytesToSend -= bytesWritten;
+        /* Negative socket value indicates an error, pass it along. */
+        if (bytesWritten <= 0) {
+            if (errno == EPIPE) {
+                /* Socket was closed mid-write. */
+                close(workingSocket);
+                workingSocket = -1;
+            }
+            return -1; 
         }
-        else break;
+        p += bytesWritten;
+        numBytesToSend -= bytesWritten;
     }
     return numBytesToSend;
 }
@@ -383,30 +430,37 @@ int32_t writeBuffer(SBC_Packet* aPacket)
 
 int32_t writeIRQ(int n)
 { 
-    if(!workingIRQSocket)        return 0;
-	if(n<0 || n>=kMaxNumberLams) return 0;
-	
-	SBC_Packet* aPacket = &lam_info[n].lam_Packet;
+    if(workingIRQSocket < 0)     return -1;
+    if(n<0 || n>=kMaxNumberLams) return -1;
+    
+    SBC_Packet* aPacket = &lam_info[n].lam_Packet;
     aPacket->numBytes =  sizeof(int32_t) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket->cmdHeader.numberBytesinPayload; 
     int32_t numBytesToSend = aPacket->numBytes; 
     if(needToSwap)SwapLongBlock(aPacket,sizeof(SBC_CommandHeader)/sizeof(int32_t)+1);
     char* p = (char*)aPacket;
     while (numBytesToSend) {       
         int32_t bytesWritten = write(workingIRQSocket,p,numBytesToSend);
-        if (bytesWritten > 0) {
-            p += bytesWritten;
-            numBytesToSend -= bytesWritten;
+        /* Negative socket value indicates an error, pass it along. */
+        if (bytesWritten <= 0) { 
+            if (errno == EPIPE) {
+                /* Socket was closed mid-write. */
+                close(workingIRQSocket);
+                workingIRQSocket = -1;
+            }
+            return -1;
         }
-        else break;
+        p += bytesWritten;
+        numBytesToSend -= bytesWritten;
     }
     return numBytesToSend;
 }
 
 int32_t readIRQ(SBC_Packet* aPacket)
 { 
+    if (workingIRQSocket < 0) return 0;
     int32_t numberBytesinPacket;
     int32_t bytesRead = read(workingIRQSocket, &numberBytesinPacket, sizeof(int32_t));
-    if(bytesRead==0)return 0; //disconnected
+    if(bytesRead <= 0) return bytesRead; //disconnected or error
     if(needToSwap)SwapLongBlock(&numberBytesinPacket,1);    
     aPacket->numBytes = numberBytesinPacket;
     numberBytesinPacket -= sizeof(int32_t);
@@ -414,7 +468,7 @@ int32_t readIRQ(SBC_Packet* aPacket)
     char* p = (char*)&aPacket->cmdHeader;
     while(numberBytesinPacket){
         bytesRead = read(workingIRQSocket, p, numberBytesinPacket);
-        if(bytesRead == 0) return 0;    //connection disconnected.
+        if(bytesRead <= 0) return bytesRead;    //connection disconnected or error.
         p += bytesRead;
         numberBytesinPacket -= bytesRead;
     }
@@ -437,19 +491,19 @@ char startRun (void)
     /*---------------------------------*/
     CB_initialize(kCBBufferSize);
     time(&lastTime); 
-	
+    
     pthread_mutex_lock (&runInfoMutex);  //begin critical section
     run_info.bufferSize        = kCBBufferSize;
     run_info.readCycles        = 0;
     run_info.recordsTransfered = 0;
     run_info.wrapArounds       = 0;
-	run_info.busErrorCount     = 0;
-	run_info.err_count         = 0;
-	run_info.msg_count         = 0;
-	run_info.err_buf_index     = 0;
-	run_info.msg_buf_index     = 0;
-	pthread_mutex_unlock (&runInfoMutex);  //end critical section
-	
+    run_info.busErrorCount     = 0;
+    run_info.err_count         = 0;
+    run_info.msg_count         = 0;
+    run_info.err_buf_index     = 0;
+    run_info.msg_buf_index     = 0;
+    pthread_mutex_unlock (&runInfoMutex);  //end critical section
+    
     if(run_info.statusBits | kSBC_ConfigLoadedMask){
 
         startHWRun(&crate_config);
@@ -480,63 +534,63 @@ void stopRun()
 
 void postLAM(SBC_Packet* lamPacket)
 {
-	char needToRunAckThread = 0;
-	pthread_mutex_lock (&lamInfoMutex);		//begin critical section
-	SBC_LAM_Data* p = (SBC_LAM_Data*)(lamPacket->payload);
-	int32_t n = p->lamNumber;
-	if(!lam_info[n].isValid){
-		if(needToSwap){
-			SwapLongBlock((int32_t*)&(p->lamNumber),sizeof(int32_t));
-			int32_t num = p->numFormatedWords;
-			SwapLongBlock((int32_t*)&(p->numFormatedWords),sizeof(int32_t));
-			int32_t i;
-			for(i=0;i<num;i++)SwapLongBlock((int32_t*)&(p->formatedWords[i]),sizeof(int32_t));
-			num = p->numberLabeledDataWords;
-			SwapLongBlock((int32_t*)&(p->numberLabeledDataWords),sizeof(int32_t));
-			for(i=0;i<num;i++)SwapLongBlock((int32_t*)&(p->labeledData[i].data),sizeof(int32_t));
-		}
-		memcpy(&lam_info[n].lam_Packet, &lamPacket, sizeof(SBC_Packet));
-		lam_info[n].isValid = TRUE;
-		needToRunAckThread = TRUE;
-	}
-	
+    char needToRunAckThread = 0;
+    pthread_mutex_lock (&lamInfoMutex);        //begin critical section
+    SBC_LAM_Data* p = (SBC_LAM_Data*)(lamPacket->payload);
+    int32_t n = p->lamNumber;
+    if(!lam_info[n].isValid){
+        if(needToSwap){
+            SwapLongBlock((int32_t*)&(p->lamNumber),sizeof(int32_t));
+            int32_t num = p->numFormatedWords;
+            SwapLongBlock((int32_t*)&(p->numFormatedWords),sizeof(int32_t));
+            int32_t i;
+            for(i=0;i<num;i++)SwapLongBlock((int32_t*)&(p->formatedWords[i]),sizeof(int32_t));
+            num = p->numberLabeledDataWords;
+            SwapLongBlock((int32_t*)&(p->numberLabeledDataWords),sizeof(int32_t));
+            for(i=0;i<num;i++)SwapLongBlock((int32_t*)&(p->labeledData[i].data),sizeof(int32_t));
+        }
+        memcpy(&lam_info[n].lam_Packet, &lamPacket, sizeof(SBC_Packet));
+        lam_info[n].isValid = TRUE;
+        needToRunAckThread = TRUE;
+    }
+    
     pthread_mutex_unlock (&lamInfoMutex);   //end critical section
-	
-	if(needToRunAckThread && irqAckThreadId==0){
+    
+    if(needToRunAckThread && irqAckThreadId==0){
         if( pthread_create(&irqAckThreadId,NULL, irqAckThread, 0) == 0){
             pthread_detach(irqAckThreadId);
         }
-	}
+    }
 }
 
 void* readoutThread (void* p)
 {
 
     size_t cycles = 0;
-    pthread_mutex_lock (&runInfoMutex);				//begin critical section
-    run_info.statusBits |= kSBC_RunningMask;		//set bit
-    pthread_mutex_unlock (&runInfoMutex);			//end critical section
+    pthread_mutex_lock (&runInfoMutex);                //begin critical section
+    run_info.statusBits |= kSBC_RunningMask;        //set bit
+    pthread_mutex_unlock (&runInfoMutex);            //end critical section
 
-	dataIndex = 0;
-	int32_t index	  = 0;
+    dataIndex = 0;
+    int32_t index      = 0;
     while(run_info.statusBits & kSBC_RunningMask) {
         if (cycles % 10000 == 0 ) {
           pthread_mutex_lock (&runInfoMutex);  //begin critical section
           run_info.readCycles = cycles;
           pthread_mutex_unlock (&runInfoMutex);  //end critical section
         }
-		
-		index = readHW(&crate_config,index,0,0); //nil for the lam data, not recursive
-		cycles++;
-		
-		if(index>=crate_config.total_cards || index<0){
-			if(dataIndex>0){
-				if(needToSwap)SwapLongBlock(data, dataIndex);
-				CB_writeDataBlock(data,dataIndex);
-				dataIndex = 0;
-			}
-			index = 0;
-		}
+        
+        index = readHW(&crate_config,index,0); //nil for the lam data, not recursive
+        cycles++;
+        
+        if(index>=crate_config.total_cards || index<0){
+            if(dataIndex>0){
+                if(needToSwap)SwapLongBlock(data, dataIndex);
+                CB_writeDataBlock(data,dataIndex);
+                dataIndex = 0;
+            }
+            index = 0;
+        }
 
    }
 
@@ -545,95 +599,95 @@ void* readoutThread (void* p)
 
 void* irqAckThread (void* p)
 {
-	int i;
-	struct timeval tv;
-	tv.tv_sec  = 0;
-	tv.tv_usec = 1000;
-	while(run_info.statusBits & kSBC_RunningMask){
-		int busyCount = 0;
-		for(i=0;i<kMaxNumberLams;i++){
-			if(!lam_info[i].isWaitingForAck && lam_info[i].isValid){
-				writeIRQ(i);
-				lam_info[i].isWaitingForAck = TRUE;
-			}
-			if(lam_info[i].isWaitingForAck) busyCount++;
-		}
-		
-		if(busyCount){
-			fd_set fds;
-			FD_ZERO(&fds);
-			FD_SET(workingIRQSocket, &fds);
-			
-			/* wait until timeout or data received*/
-			int  selectionResult = select(workingIRQSocket+1, &fds, NULL, NULL, &tv);
-			if(selectionResult > 0){
-				SBC_Packet lamAckPacket;
-				if(readIRQ(&lamAckPacket)){
-					SBC_LamAckStruct* p = (SBC_LamAckStruct*)lamAckPacket.payload;
-					char numberToAck = p->numToAck; 
-					char* lamPtr = (char*)p++;
-					int n;
-					pthread_mutex_lock (&lamInfoMutex);				//begin critical section
-					for(n=0;n<numberToAck;n++){
-						if(lamPtr[n]>=0 && lamPtr[n]<kMaxNumberLams){
-							int index = lamPtr[n];
-							lam_info[index].isWaitingForAck = FALSE;
-							lam_info[index].isValid			= FALSE;
-						}
-					}
-					pthread_mutex_unlock (&lamInfoMutex);			//end critical section
-				}
-			}
-		}
-		else {
-			/*nothing waiting to be acked, so exit*/
-			break;
-		}
-	}
-	
-	irqAckThreadId = 0;
-	
-	return NULL;
+    int i;
+    struct timeval tv;
+    tv.tv_sec  = 0;
+    tv.tv_usec = 1000;
+    while(run_info.statusBits & kSBC_RunningMask){
+        int busyCount = 0;
+        for(i=0;i<kMaxNumberLams;i++){
+            if(!lam_info[i].isWaitingForAck && lam_info[i].isValid){
+                writeIRQ(i);
+                lam_info[i].isWaitingForAck = TRUE;
+            }
+            if(lam_info[i].isWaitingForAck) busyCount++;
+        }
+        
+        if(busyCount){
+            fd_set fds;
+            FD_ZERO(&fds);
+            FD_SET(workingIRQSocket, &fds);
+            
+            /* wait until timeout or data received*/
+            int  selectionResult = select(workingIRQSocket+1, &fds, NULL, NULL, &tv);
+            if(selectionResult > 0){
+                SBC_Packet lamAckPacket;
+                if(readIRQ(&lamAckPacket) > 0){
+                    SBC_LamAckStruct* p = (SBC_LamAckStruct*)lamAckPacket.payload;
+                    char numberToAck = p->numToAck; 
+                    char* lamPtr = (char*)p++;
+                    int n;
+                    pthread_mutex_lock (&lamInfoMutex);                //begin critical section
+                    for(n=0;n<numberToAck;n++){
+                        if(lamPtr[n]>=0 && lamPtr[n]<kMaxNumberLams){
+                            int index = lamPtr[n];
+                            lam_info[index].isWaitingForAck = FALSE;
+                            lam_info[index].isValid            = FALSE;
+                        }
+                    }
+                    pthread_mutex_unlock (&lamInfoMutex);            //end critical section
+                }
+            }
+        }
+        else {
+            /*nothing waiting to be acked, so exit*/
+            break;
+        }
+    }
+    
+    irqAckThreadId = 0;
+    
+    return NULL;
 }
 
 void LogMessage (const char *format,...)
 {
-	if(strlen(format) > kSBC_MaxStrSize*.75) return; //not a perfect check, but it will have to do....
-	va_list ap;
-	va_start (ap, format);
-	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	vsprintf (run_info.messageStrings[run_info.msg_buf_index], format, ap);
+    if(strlen(format) > kSBC_MaxStrSize*.75) return; //not a perfect check, but it will have to do....
+    va_list ap;
+    va_start (ap, format);
+    pthread_mutex_lock (&runInfoMutex);  //begin critical section
+    vsprintf (run_info.messageStrings[run_info.msg_buf_index], format, ap);
     run_info.msg_buf_index = (run_info.msg_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
-	pthread_mutex_unlock (&runInfoMutex);//end critical section
-	run_info.err_count++;
-	va_end (ap);
+    pthread_mutex_unlock (&runInfoMutex);//end critical section
+    run_info.err_count++;
+    va_end (ap);
 }
 
 void LogError (const char *format,...)
 {
-	if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
-	va_list ap;
-	va_start (ap, format);
-	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
+    if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
+    va_list ap;
+    va_start (ap, format);
+    pthread_mutex_lock (&runInfoMutex);  //begin critical section
+    vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
-	run_info.msg_count++;
-	pthread_mutex_unlock (&runInfoMutex);//end critical section
-	va_end (ap);
+    run_info.msg_count++;
+    pthread_mutex_unlock (&runInfoMutex);//end critical section
+    va_end (ap);
 }
 
 void LogBusError (const char *format,...)
 {
-	if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
-	va_list ap;
-	va_start (ap, format);
-	pthread_mutex_lock (&runInfoMutex);  //begin critical section
-	vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
+    if(strlen(format) > kSBC_MaxStrSize*.75)return; //not a perfect check, but it will have to do....
+    va_list ap;
+    va_start (ap, format);
+    pthread_mutex_lock (&runInfoMutex);  //begin critical section
+    vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
-	run_info.msg_count++;
-	run_info.busErrorCount++;
-	pthread_mutex_unlock (&runInfoMutex);//end critical section
-	va_end (ap);
+    run_info.msg_count++;
+    run_info.busErrorCount++;
+    pthread_mutex_unlock (&runInfoMutex);//end critical section
+    va_end (ap);
 }
 
 
