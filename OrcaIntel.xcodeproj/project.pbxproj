@@ -9249,8 +9249,8 @@
 		842E5A070C16041E00397CDF /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				" CFBundlerHelpBookFolder" = OrcaHelp;
-				CFBundleHelpBookName = OrcaHelp;
+				" CFBundlerHelpBookFolder" = "";
+				CFBundleHelpBookName = "";
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = "";
 				DEAD_CODE_STRIPPING = NO;
@@ -9285,6 +9285,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/Libraries/libIntel\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",

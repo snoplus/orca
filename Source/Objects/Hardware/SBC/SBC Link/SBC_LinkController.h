@@ -23,6 +23,7 @@
 @class ORTimedTextField;
 @class ORValueBar;
 @class ORPlotter2D;
+@class ORPlotter1D;
 
 @interface SBC_LinkController : OrcaObjectController
 {
@@ -83,6 +84,7 @@
 	IBOutlet NSButton*		cbTestButton;
 	IBOutlet NSProgressIndicator* cbTestProgress;
 	IBOutlet ORPlotter2D*	plotter;
+	IBOutlet ORPlotter1D*	histogram;
 	IBOutlet NSTextField*	numTestPointsField;
 	IBOutlet NSTextField*	numRecordsField;
 	IBOutlet NSTextField*	numErrorsField;

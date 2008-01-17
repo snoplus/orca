@@ -117,6 +117,7 @@ typedef enum eSBC_ThrottleConsts{
 	long			totalRecordsChecked;
 	long			totalErrors;
 	NSPoint         cbPoints[100];
+	int				recordSizeHisto[1000];
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -277,6 +278,8 @@ typedef enum eSBC_ThrottleConsts{
 - (double) cbTestProgress;
 - (long) totalRecordsChecked;
 - (long) totalErrors;
+- (int) recordSizeHisto:(int)aChannel;
+- (int) numHistoChannels;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;

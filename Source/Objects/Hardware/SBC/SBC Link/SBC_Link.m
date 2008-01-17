@@ -1478,6 +1478,7 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 		totalErrors = 0;
 		startBlockSize = 1000;
 		endBlockSize   = 300000;
+		memset(recordSizeHisto,0, 1000*sizeof(int));
 		deltaBlockSize = (endBlockSize-startBlockSize)/(numTestPoints-1);
 		[self doCBTransferTest];
 	}
@@ -1520,6 +1521,16 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 	SBC_CmdOptionStruct optionBlock;
 	optionBlock.option[0]	= aSize;
 	[self sendCommand:kSBC_PacketOptions withOptions:&optionBlock expectResponse:YES];
+}
+
+- (int) recordSizeHisto:(int)aChannel
+{
+	return recordSizeHisto[aChannel];
+}
+
+- (int) numHistoChannels
+{
+	return 1000;
 }
 
 @end
@@ -1978,6 +1989,9 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 			}	
 		}
 		totalRecordsChecked++;
+		if(n<1000){
+			recordSizeHisto[n]++;
+		}
 	}
 	
 	if(!exitCBTest && runInfo.amountInBuffer > 0 && totalMeasurements < 100){

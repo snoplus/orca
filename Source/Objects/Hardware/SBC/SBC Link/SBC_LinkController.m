@@ -26,6 +26,7 @@
 #import "ORVmeAdapter.h"
 #import "ORSBC_LAMModel.h"
 #import "ORPlotter2D.h"
+#import "ORPlotter1D.h"
 #import "ORAxis.h"
 
 @interface SBC_LinkController (private)
@@ -64,6 +65,11 @@
     [[plotter yScale] setRngLimitsLow:0 withHigh:20 withMinRng:10];
     [plotter setDrawWithGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
+
+	[[histogram xScale] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
+    [[histogram yScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
+    [histogram setDrawWithGradient:YES];
+
 }
 
 - (void) setModel:(id)aModel
@@ -299,7 +305,7 @@
 	BOOL pingRunning = [[model sbcLink] pingTaskRunning];
 	if(pingRunning)[pingTaskProgress startAnimation:self];
 	else [pingTaskProgress stopAnimation:self];
-	[pingButton setTitle:pingRunning?@"Stop":@"Ping"];
+	[pingButton setTitle:pingRunning?@"Stop":@"Send Ping"];
 }
 
 - (void) cbTestChanged:(NSNotification*)aNote
@@ -313,11 +319,12 @@
 		[cbTestProgress stopAnimation:self];
 		[cbTestProgress setDoubleValue:0];
 	}
-	[cbTestButton setTitle:isRunning?@"Stop":@"CB Test"];
+	[cbTestButton setTitle:isRunning?@"Stop":@"Test CB"];
 	[plotter setNeedsDisplay:YES];
 	[cbTestButton setNeedsDisplay:YES];
 	[numRecordsField setIntValue:[[model sbcLink] totalRecordsChecked]];
 	[numErrorsField setIntValue:[[model sbcLink] totalErrors]];
+	[histogram setNeedsDisplay:YES];
 }
 
 
@@ -896,6 +903,16 @@
     *xValue = track.x;
     *yValue = track.y;
     return YES;    
+}
+
+- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+    return 1000;
+}
+
+- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+{
+    return (float)[[model sbcLink] recordSizeHisto:x];
 }
 
 @end
