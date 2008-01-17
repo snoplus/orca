@@ -335,6 +335,10 @@
 				<string>NSMatrix</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
+				<key>numErrorsField</key>
+				<string>NSTextField</string>
+				<key>numRecordsField</key>
+				<string>NSTextField</string>
 				<key>numTestPointsField</key>
 				<string>NSTextField</string>
 				<key>passWordField</key>

@@ -34,6 +34,7 @@
 #include <pthread.h>
 #include "SBC_Readout.h"
 #include "HW_Readout.h"
+#include <sys/time.h>
 
 #define BACKLOG 1     // how many pending connections queue will hold
 #ifndef TRUE
@@ -744,14 +745,19 @@ void runCBTest(SBC_Packet* aPacket)
 	run_info.msg_buf_index     = 0;
 	run_info.lostByteCount	   = 0;
 	
+    struct timeval t;
+	gettimeofday(&t, NULL);
 	if(!runInProgress){
 		//fill the CB
 		CB_initialize(kCBBufferSize);
 		BufferInfo cbInfo;
+		srandom(t.tv_usec);
 		while(1){
 			dataIndex = 0;
 			int i;
-			for(i=0;i<1000;i++){
+			int recordSize = rand() % 2000 + 1;
+			data[dataIndex++] = recordSize;
+			for(i=1;i<recordSize;i++){
 				data[dataIndex++] = i;
 			}
 			

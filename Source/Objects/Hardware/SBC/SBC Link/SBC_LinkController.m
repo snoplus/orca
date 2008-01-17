@@ -60,7 +60,7 @@
     [tabView selectTabViewItemAtIndex: index];
 	
     [plotter setVectorMode:YES];
-    [[plotter xScale] setRngLimitsLow:0 withHigh:400 withMinRng:400];
+    [[plotter xScale] setRngLimitsLow:0 withHigh:300 withMinRng:300];
     [[plotter yScale] setRngLimitsLow:0 withHigh:20 withMinRng:10];
     [plotter setDrawWithGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
@@ -316,6 +316,8 @@
 	[cbTestButton setTitle:isRunning?@"Stop":@"CB Test"];
 	[plotter setNeedsDisplay:YES];
 	[cbTestButton setNeedsDisplay:YES];
+	[numRecordsField setIntValue:[[model sbcLink] totalRecordsChecked]];
+	[numErrorsField setIntValue:[[model sbcLink] totalErrors]];
 }
 
 
@@ -398,6 +400,7 @@
     [rangeStepper setEnabled:functionsExist];
     [rangeTextField setEnabled:functionsExist && [[model sbcLink] doRange]];
     [resetCrateBusButton setEnabled:functionsExist];
+    [cbTestButton setEnabled:connected];
 	
 	if(![model showBasicOps]) [functionAllowedField setStringValue:@"Low-Level Access NOT allowed with this SBC"];
 	else [functionAllowedField setStringValue:@""];
@@ -409,7 +412,11 @@
 
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL locked = [gSecurity isLocked:[model sbcLockName]];
-    
+	BOOL connected		 = [[model sbcLink] isConnected];
+ 
+	[pingButton setEnabled:!locked && !runInProgress];
+    [cbTestButton setEnabled:!locked && !runInProgress && connected];
+	
     [ipNumberField setEnabled:!locked && !runInProgress];
     [portNumberField setEnabled:!locked && !runInProgress];
     [passWordField setEnabled:!locked && !runInProgress];
@@ -816,8 +823,7 @@
 
 - (IBAction) resetCrateBusAction:(id)sender
 {
-    BOOL crateBusButtonEnabled = 
-		[resetCrateBusButton isEnabled];
+    BOOL crateBusButtonEnabled = [resetCrateBusButton isEnabled];
 	[resetCrateBusButton setEnabled:NO];
     [model reset];
 	[resetCrateBusButton setEnabled:crateBusButtonEnabled];

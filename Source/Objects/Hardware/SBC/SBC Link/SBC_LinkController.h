@@ -84,6 +84,8 @@
 	IBOutlet NSProgressIndicator* cbTestProgress;
 	IBOutlet ORPlotter2D*	plotter;
 	IBOutlet NSTextField*	numTestPointsField;
+	IBOutlet NSTextField*	numRecordsField;
+	IBOutlet NSTextField*	numErrorsField;
 }
 
 #pragma mark •••Initialization

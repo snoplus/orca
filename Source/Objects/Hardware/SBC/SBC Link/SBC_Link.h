@@ -114,6 +114,8 @@ typedef enum eSBC_ThrottleConsts{
 	double			totalTime;
 	double			totalPayload;
 	long			totalMeasurements;
+	long			totalRecordsChecked;
+	long			totalErrors;
 	NSPoint         cbPoints[100];
 }
 
@@ -206,6 +208,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) tellClientToStopRun;
 
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse;
+- (void) sendPayloadSize:(long)aSize;
 
 - (void) readLongBlock:(long*) buffer
 			 atAddress:(unsigned long) anAddress
@@ -272,6 +275,8 @@ typedef enum eSBC_ThrottleConsts{
 - (int) cbTestCount;
 - (NSPoint) cbPoint:(unsigned)i;
 - (double) cbTestProgress;
+- (long) totalRecordsChecked;
+- (long) totalErrors;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;

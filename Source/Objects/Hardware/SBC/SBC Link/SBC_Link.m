@@ -824,6 +824,9 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 
 - (void) tellClientToStartRun
 {
+
+	[self sendPayloadSize:65000];
+	
 	SBC_CmdOptionStruct optionBlock;
 	int i;
 	for(i=0;i<kMaxOptions;i++){
@@ -1357,6 +1360,11 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 
 - (void) disconnect
 {
+	if([self cbTestRunning]){
+		exitCBTest = YES;
+		[[ORGlobal sharedInstance] removeRunVeto:@"CBTest"];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+	}
 	if(socketfd){
 		close(socketfd);
 		socketfd = 0;
@@ -1458,14 +1466,18 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 
 - (void) startCBTransferTest
 {
-	if(cbTestRunning){
+	if([self cbTestRunning]){
 		exitCBTest = YES;
+		[[ORGlobal sharedInstance] removeRunVeto:@"CBTest"];
 	}
-	else {
+	else if(![gOrcaGlobals runInProgress]){
+		[[ORGlobal sharedInstance] addRunVeto:@"CBTestInProgress" comment:@"CB Test In Progress"];
 		exitCBTest = NO;
 		cbTestCount = 0;
+		totalRecordsChecked = 0;
+		totalErrors = 0;
 		startBlockSize = 1000;
-		endBlockSize   = 400000;
+		endBlockSize   = 300000;
 		deltaBlockSize = (endBlockSize-startBlockSize)/(numTestPoints-1);
 		[self doCBTransferTest];
 	}
@@ -1474,6 +1486,17 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 {
 	return cbTestCount;
 }
+
+- (long) totalRecordsChecked
+{
+	return totalRecordsChecked;
+}
+
+- (long) totalErrors
+{
+	return totalErrors;
+}
+
 
 - (NSPoint) cbPoint:(unsigned)i
 {
@@ -1488,8 +1511,15 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 
 - (double) cbTestProgress
 {
-	double val =  100*currentBlockSize/(double)(endBlockSize - startBlockSize);
+	double val =  100*currentBlockSize/(double)(endBlockSize - startBlockSize + deltaBlockSize);
 	return val;
+}
+
+- (void) sendPayloadSize:(long)aSize
+{
+	SBC_CmdOptionStruct optionBlock;
+	optionBlock.option[0]	= aSize;
+	[self sendCommand:kSBC_PacketOptions withOptions:&optionBlock expectResponse:YES];
 }
 
 @end
@@ -1880,6 +1910,8 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 		if(currentBlockSize <= endBlockSize) [self doOneCBTransferTest:currentBlockSize];
 		else {
 			exitCBTest = YES;
+			[[ORGlobal sharedInstance] removeRunVeto:@"CBTestInProgress"];
+
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
 			return;
 		}
@@ -1889,15 +1921,13 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 
 }
 
-
 - (void) doOneCBTransferTest:(long)payloadSize
 {
 	totalTime = totalPayload = totalMeasurements = 0;
 	
-	SBC_CmdOptionStruct optionBlock;
-	optionBlock.option[0]	= payloadSize;
-	[self sendCommand:kSBC_PacketOptions withOptions:&optionBlock expectResponse:YES];
+	[self sendPayloadSize:payloadSize];
 	
+	SBC_CmdOptionStruct optionBlock;
 	[self sendCommand:kSBC_CBTest withOptions:&optionBlock expectResponse:YES];
 
 	if(optionBlock.option[0] == 1){
@@ -1933,6 +1963,22 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 	totalPayload += aPacket.cmdHeader.numberBytesinPayload;
 	totalMeasurements++;
 	[timer release];
+	
+	unsigned long* rp = (unsigned long*)aPacket.payload;
+	long numLongs = aPacket.cmdHeader.numberBytesinPayload/sizeof(long);
+	unsigned long* endPt = rp + numLongs;
+	
+
+	while(rp<endPt){
+		unsigned long n = *rp++;
+		unsigned long i;
+		for(i=1;i<n;i++){
+			if(*rp++ != i){
+				totalErrors++;
+			}	
+		}
+		totalRecordsChecked++;
+	}
 	
 	if(!exitCBTest && runInfo.amountInBuffer > 0 && totalMeasurements < 100){
 		[self performSelector:@selector(sampleCBTransferSpeed) withObject:nil afterDelay:0];
