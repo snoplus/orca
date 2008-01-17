@@ -80,6 +80,14 @@
 
 - (void) taskCompleted: (NSNotification*)aNote
 {
+	[self performSelector:@selector(movetoNextTask:) withObject:aNote afterDelay:1];
+}
+
+- (void) movetoNextTask:(NSNotification*)aNote
+{
+	if([delegate respondsToSelector:@selector(taskFinished:)]){
+		[delegate taskFinished:[aNote object]];
+	}
 	[tasks removeObject:[aNote object]];
 	NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
 	[nc removeObserver:self name:NSFileHandleReadCompletionNotification object:nil];
