@@ -1368,7 +1368,7 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 			[NSException raise:@"Connection Failed" format:@"Couldn't get a connection for %@ Port %d -- Is the firewire off?",IPNumber,portNumber];
 		}
 	}
-	fcntl(sck, F_SETFL, oflag);
+	//fcntl(sck, F_SETFL, oflag | O_NONBLOCK);
 
 	return sck;
 }
@@ -1659,21 +1659,42 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 	//be taken that thread locks are provided at a higher level.
 	aPacket->message[0] = '\0';
 	if(!aSocket)	return;
+    	// set up the file descriptor set
+	fd_set write_fds;
+	FD_ZERO(&write_fds);
+	FD_SET(aSocket, &write_fds);
+
+	struct timeval tv;
+	tv.tv_sec  = 0;
+	tv.tv_usec = 100000;
+
+	// wait until timeout or data received
+    int selectionResult = 0;
+    int bytesWritten = 0;
 	int numBytesToSend = sizeof(long) +
 						 sizeof(SBC_CommandHeader) + 
 						 kSBC_MaxMessageSize + 
 						 aPacket->cmdHeader.numberBytesinPayload;
 	aPacket->numBytes = numBytesToSend;
 	char* packetPtr = (char*)aPacket;		//recast the first 'real' word in the packet
-	while (numBytesToSend) {       
-		int bytesWritten = write(aSocket,packetPtr,numBytesToSend);
+	while (numBytesToSend) {
+        selectionResult = select(aSocket+1, NULL, &write_fds, NULL, &tv);
+        if (selectionResult == kSelectionError){
+            [NSException raise:@"Write Error" format:@"Write Error %@ <%@>",[self crateName]];
+        }
+        else if (selectionResult == kSelectionTimeout) {
+            [NSException raise:@"ConnectionTimeOut" format:@"Write from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
+        }       
+		bytesWritten = write(aSocket,packetPtr,numBytesToSend);
 		if (bytesWritten > 0) {
 			packetPtr += bytesWritten;
 			numBytesToSend -= bytesWritten;
 			bytesSent += bytesWritten;
-		}
-		else if (bytesWritten < 0) {
-			[NSException raise:@"Write Error" format:@"Write Error(%@) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
+		} else if (bytesWritten < 0) {
+            if (errno == EPIPE) {
+                [self disconnect];
+            }
+			[NSException raise:@"Write Error" format:@"Write Error(%s) %@ <%@> port: %d",strerror(errno),[self crateName],IPNumber,portNumber];
 		}
 	}
 }
@@ -1710,34 +1731,75 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket
 {
 	int n;			
+    int  selectionResult = 0;
 	long numBytesToGet = 0;
-	n = recv(aSocket, &numBytesToGet, 4, MSG_WAITALL);	
+    // setting file descriptor set
+    fd_set read_fds;
+	FD_ZERO(&read_fds);
+	FD_SET(aSocket, &read_fds);
+    
+    struct timeval tv;
+	tv.tv_sec  = 0;
+	tv.tv_usec = 100000;
+    
+	n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);	
 	if(n==0){
 		[self disconnect];
 		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 	} else if (n<0) {
-    	[self disconnect];
-		[NSException raise:@"Socket Error" format:@"Error: %@",strerror(errno)];
+		[NSException raise:@"Socket Error" format:@"Error: %s",strerror(errno)];
+    } else if (n < sizeof(long)) {
+        /* We didn't get the whole word.  This probably will never happen. */
+        int numToGet = sizeof(numBytesToGet) - n;
+        char* ptrToNumBytesToGet = ((char*)&numBytesToGet) + n;
+        while (numToGet) {
+            selectionResult = select(aSocket+1, &read_fds, NULL, NULL, &tv);
+            if(selectionResult > 0){
+                    n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
+                    if(n==0){
+                        [self disconnect];
+                        [NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+                    } else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
+                        [NSException raise:@"Socket Error" format:@"Error: %s",strerror(errno)];
+                    } else {
+                        numToGet -= n;
+                        ptrToNumBytesToGet += n;    
+                    }
+            }
+            else if (selectionResult == kSelectionError){
+                [NSException raise:@"Read Error" format:@"Read Error %@ <%@>",[self crateName]];
+            }
+            else if (selectionResult == kSelectionTimeout) {
+                [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
+            }
+            
+        }
     }
-	bytesReceived += sizeof(long);
-	numBytesToGet -= sizeof(long);
+	bytesReceived += sizeof(numBytesToGet);
+	numBytesToGet -= sizeof(numBytesToGet);
 	
 	char* packetPtr = (char*)&aPacket->cmdHeader;
 	while(numBytesToGet){
-		n = recv(aSocket, packetPtr, numBytesToGet, MSG_WAITALL);
-		if(n <= 0) break; //connection disconnected.
-		packetPtr += n;
-		numBytesToGet -= n;
-		bytesReceived += n;
-		missedHeartBeat = 0;
+        selectionResult = select(aSocket+1, &read_fds, NULL, NULL, &tv);
+        if (selectionResult == kSelectionError){
+            [NSException raise:@"Read Error" format:@"Read Error %@ <%@>",[self crateName]];
+        }
+        else if (selectionResult == kSelectionTimeout) {
+            [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
+        }
+		n = recv(aSocket, packetPtr, numBytesToGet, 0);
+        if(n==0){
+            [self disconnect];
+            [NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+        } else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
+            [NSException raise:@"Socket Error" format:@"Error: %s",strerror(errno)];
+        } else {
+            packetPtr += n;
+            numBytesToGet -= n;
+            bytesReceived += n;
+            missedHeartBeat = 0;
+        }
  	}
-	if(n==0){
-		[self disconnect];
-		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-	} else if (n<0) {
-    	[self disconnect];
-		[NSException raise:@"Socket Error" format:@"Error: %@",strerror(errno)];
-    }
 }
 
 - (BOOL) canWriteTo:(int) sck

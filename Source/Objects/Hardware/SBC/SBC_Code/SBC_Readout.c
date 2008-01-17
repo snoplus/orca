@@ -374,8 +374,8 @@ int32_t readBuffer(SBC_Packet* aPacket)
     if(bytesRead<=0) return bytesRead; //disconnected or error, return as such
     if(needToSwap)SwapLongBlock(&numberBytesinPacket,1);    
     aPacket->numBytes = numberBytesinPacket;
-    numberBytesinPacket-= sizeof(int32_t);
-    int32_t returnValue        = numberBytesinPacket;
+    int32_t returnValue = numberBytesinPacket;
+    numberBytesinPacket -= sizeof(int32_t);
     char* p = (char*)&aPacket->cmdHeader;
     while(numberBytesinPacket){
         bytesRead = read(workingSocket, p, numberBytesinPacket);
