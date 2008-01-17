@@ -76,6 +76,7 @@ NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 NSString* ORSBC_LinkPingTask				= @"ORSBC_LinkPingTask";
 NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
+NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged";
 
 @interface SBC_Link (private)
 - (void) throwError:(int)anError;
@@ -99,6 +100,10 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 	self = [super init];
 	delegate = aDelegate; //don't retain.
 	socketLock = [[NSLock alloc] init];
+	
+	exitCBTest    = YES;
+	cbTestRunning = NO;
+
 	return self;
 }
 
@@ -135,6 +140,23 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 - (int) slot
 {
 	return [delegate slot];
+}
+
+- (int) numTestPoints
+{
+	return numTestPoints;
+}
+
+- (void) setNumTestPoints:(int)num
+{
+	if(num<1) num = 1;
+	else if(num>100)num = 100;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setNumTestPoints:numTestPoints];
+    
+    numTestPoints = num;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkNumCBTextPointsChanged object:self];
 }
 
 - (int) infoType
@@ -525,6 +547,8 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 	self = [super init];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self setNumTestPoints:	[decoder decodeIntForKey:   @"numTestPoints"]];
+	if(numTestPoints == 0) [self setNumTestPoints:20];
 	[self setInfoType:		[decoder decodeIntForKey:   @"infoType"]];
 	[self setLoadMode:		[decoder decodeIntForKey:   @"loadMode"]];
 	[self setInitAfterConnect:[decoder decodeBoolForKey:@"InitAfterConnect"]];
@@ -542,12 +566,17 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
     [self setReadWriteType: [decoder decodeIntForKey:   @"ReadWriteType"]];	
     [self setAddressModifier: [decoder decodeIntForKey:   @"addressModifier"]];	
 	socketLock = [[NSLock alloc] init];
+
+	exitCBTest    = YES;
+	cbTestRunning = NO;
+
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
+    [encoder encodeInt:numTestPoints	forKey:@"numTestPoints"];
     [encoder encodeInt:infoType			forKey:@"infoType"];
     [encoder encodeInt:range			forKey:@"Range"];
     [encoder encodeBool:doRange			forKey:@"DoRange"];
@@ -1437,7 +1466,7 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 		cbTestCount = 0;
 		startBlockSize = 1000;
 		endBlockSize   = 400000;
-		deltaBlockSize = 10000;
+		deltaBlockSize = (endBlockSize-startBlockSize)/(numTestPoints-1);
 		[self doCBTransferTest];
 	}
 }
@@ -1454,7 +1483,13 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 
 - (BOOL) cbTestRunning
 {
-	return cbTestRunning && !exitCBTest;
+	return cbTestRunning || !exitCBTest;
+}
+
+- (double) cbTestProgress
+{
+	double val =  100*currentBlockSize/(double)(endBlockSize - startBlockSize);
+	return val;
 }
 
 @end
@@ -1842,8 +1877,12 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 	if(!cbTestRunning){
 		currentBlockSize = startBlockSize + cbTestCount*deltaBlockSize;
 		
-		if(currentBlockSize < endBlockSize) [self doOneCBTransferTest:currentBlockSize];
-		else return;
+		if(currentBlockSize <= endBlockSize) [self doOneCBTransferTest:currentBlockSize];
+		else {
+			exitCBTest = YES;
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+			return;
+		}
 	}
 	
 	[self performSelector:@selector(doCBTransferTest) withObject:nil afterDelay:1];
@@ -1895,7 +1934,7 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 	totalMeasurements++;
 	[timer release];
 	
-	if(!exitCBTest && runInfo.amountInBuffer > 0 && totalMeasurements < 3){
+	if(!exitCBTest && runInfo.amountInBuffer > 0 && totalMeasurements < 100){
 		[self performSelector:@selector(sampleCBTransferSpeed) withObject:nil afterDelay:0];
 	}
 	else {
@@ -1903,8 +1942,8 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 			double aveTime		= totalTime/(double)totalMeasurements;
 			double avePayload	= totalPayload/(double)totalMeasurements;
 			if(aveTime){
-				cbPoints[cbTestCount].x = currentBlockSize;
-				cbPoints[cbTestCount].y = 1000*avePayload/aveTime;
+				cbPoints[cbTestCount].x = currentBlockSize/1000.;
+				cbPoints[cbTestCount].y = avePayload/aveTime;
 				cbTestCount++;
 			}
 		}

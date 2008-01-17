@@ -22,7 +22,7 @@
 @class ORQueueView;
 @class ORTimedTextField;
 @class ORValueBar;
-@class ORPlotter1D;
+@class ORPlotter2D;
 
 @interface SBC_LinkController : OrcaObjectController
 {
@@ -82,7 +82,8 @@
 	IBOutlet NSProgressIndicator* pingTaskProgress;
 	IBOutlet NSButton*		cbTestButton;
 	IBOutlet NSProgressIndicator* cbTestProgress;
-	IBOutlet ORPlotter1D*	plotter;
+	IBOutlet ORPlotter2D*	plotter;
+	IBOutlet NSTextField*	numTestPointsField;
 }
 
 #pragma mark •••Initialization
@@ -98,6 +99,7 @@
 #pragma mark ***Interface Management
 - (void) settingsLockChanged:(NSNotification*)aNote;
 
+- (void) numTestPointsChanged:(NSNotification*)aNote;
 - (void) filePathChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
 - (void) forceReloadChanged:(NSNotification*)aNote;
@@ -162,6 +164,7 @@
 - (IBAction) infoTypeAction:(id)sender;
 - (IBAction) ping:(id)sender;
 - (IBAction) cbTest:(id)sender;
+- (IBAction) numTestPointsAction:(id)sender;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;

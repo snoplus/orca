@@ -102,6 +102,7 @@ typedef enum eSBC_ThrottleConsts{
 	NSTask*			pingTask;
 
 	//cbTest varibles
+	int				numTestPoints;
 	int				cbTestCount;
 	long			startBlockSize;
 	long			endBlockSize;
@@ -124,6 +125,8 @@ typedef enum eSBC_ThrottleConsts{
 #pragma mark •••Accessors
 - (int) slot;
 - (NSUndoManager*) undoManager;
+- (int) numTestPoints;
+- (void) setNumTestPoints:(int)num;
 - (int) infoType;
 - (void) setInfoType:(int)aType;
 - (void) setDelegate:(ORCard*)anDelegate;
@@ -268,6 +271,7 @@ typedef enum eSBC_ThrottleConsts{
 - (BOOL) cbTestRunning;
 - (int) cbTestCount;
 - (NSPoint) cbPoint:(unsigned)i;
+- (double) cbTestProgress;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
@@ -311,4 +315,5 @@ extern NSString* SBC_LinkRWTypeChanged;
 extern NSString* SBC_LinkInfoTypeChanged;
 extern NSString* ORSBC_LinkPingTask;
 extern NSString* ORSBC_LinkCBTest;
+extern NSString* ORSBC_LinkNumCBTextPointsChanged;
 

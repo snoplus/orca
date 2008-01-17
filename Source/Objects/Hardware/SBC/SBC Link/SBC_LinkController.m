@@ -25,7 +25,7 @@
 #import "ORCard.h"
 #import "ORVmeAdapter.h"
 #import "ORSBC_LAMModel.h"
-#import "ORPlotter1D.h"
+#import "ORPlotter2D.h"
 #import "ORAxis.h"
 
 @interface SBC_LinkController (private)
@@ -59,9 +59,11 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
-	[plotter setUseGradient:YES];
-	[[plotter xScale] setRngDefaultsLow:0 withHigh:500000];
-	[[plotter xScale] setRngLimitsLow:0 withHigh:500000 withMinRng:20000];
+    [plotter setVectorMode:YES];
+    [[plotter xScale] setRngLimitsLow:0 withHigh:400 withMinRng:400];
+    [[plotter yScale] setRngLimitsLow:0 withHigh:20 withMinRng:10];
+    [plotter setDrawWithGradient:YES];
+    [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
 }
 
 - (void) setModel:(id)aModel
@@ -240,6 +242,10 @@
                          name : ORSBC_LinkCBTest
                        object : [model sbcLink]];
 
+  [notifyCenter addObserver : self
+                     selector : @selector(numTestPointsChanged:)
+                         name : ORSBC_LinkNumCBTextPointsChanged
+                       object : [model sbcLink]];
 
 }
 
@@ -271,6 +277,7 @@
     [self infoTypeChanged:nil];
     [self pingTaskChanged:nil];
     [self cbTestChanged:nil];
+    [self numTestPointsChanged:nil];
 	
 	[self lamSlotChanged:nil];
 }
@@ -280,6 +287,11 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:[model sbcLockName] to:secure];
     [lockButton setEnabled:secure];
+}
+
+- (void) numTestPointsChanged:(NSNotification*)aNote
+{
+	[numTestPointsField setIntValue:[[model sbcLink] numTestPoints]];
 }
 
 - (void) pingTaskChanged:(NSNotification*)aNote
@@ -293,10 +305,17 @@
 - (void) cbTestChanged:(NSNotification*)aNote
 {
 	BOOL isRunning = [[model sbcLink] cbTestRunning];
-	if(isRunning)[cbTestProgress startAnimation:self];
-	else [cbTestProgress stopAnimation:self];
+	if(isRunning){
+		[cbTestProgress startAnimation:self];
+		[cbTestProgress setDoubleValue:[[model sbcLink] cbTestProgress]];
+	}
+	else {
+		[cbTestProgress stopAnimation:self];
+		[cbTestProgress setDoubleValue:0];
+	}
 	[cbTestButton setTitle:isRunning?@"Stop":@"CB Test"];
 	[plotter setNeedsDisplay:YES];
+	[cbTestButton setNeedsDisplay:YES];
 }
 
 
@@ -844,14 +863,15 @@
 - (IBAction) cbTest:(id)sender
 {
 	NS_DURING
+		[self endEditing];
 		[[model sbcLink] startCBTransferTest];
 	NS_HANDLER
 	NS_ENDHANDLER
 }
 
-- (BOOL) useXYPlot
+- (IBAction) numTestPointsAction:(id)sender
 {
-	return YES;
+	[[model sbcLink] setNumTestPoints:[sender intValue]];
 }
 
 - (unsigned long) plotter:(id)aPlotter numPointsInSet:(int)set
