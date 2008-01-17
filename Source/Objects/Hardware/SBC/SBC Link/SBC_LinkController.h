@@ -123,6 +123,7 @@
 - (void) readWriteTypeChanged:(NSNotification*)aNote;
 - (void) addressModifierChanged:(NSNotification*)aNote;
 - (void) pingTaskChanged:(NSNotification*)aNote;
+- (void) cbTestChanged:(NSNotification*)aNote;
 
 - (NSString*) errorString:(int)errNum;
 - (NSString*) literalToString:(int)aLiteral;

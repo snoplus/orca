@@ -263,7 +263,6 @@ void processSBCCommand(SBC_Packet* aPacket)
             run_info.statusBits    |= kSBC_ConfigLoadedMask;
         break;
                     
-<<<<<<< .mine
         case kSBC_StartRun:			doRunCommand(aPacket);		break;
         case kSBC_StopRun:          doRunCommand(aPacket);		break;
         case kSBC_RunInfoRequest:   sendRunInfo();				break;
@@ -271,27 +270,6 @@ void processSBCCommand(SBC_Packet* aPacket)
 		case kSBC_CBTest:			runCBTest(aPacket);			break;
 		case kSBC_PacketOptions:	setPacketOptions(aPacket);	break;
         case kSBC_Exit:             timeToExit = 1;				break;
-=======
-        case kSBC_StartRun:                  
-            doRunCommand(aPacket); 
-        break;
-            
-        case kSBC_StopRun:            
-            doRunCommand(aPacket); 
-        break;
-    
-        case kSBC_RunInfoRequest:    
-            sendRunInfo(); 
-        break;
-        
-        case kSBC_CBRead:            
-            sendCBRecord(); 
-        break;
-            
-        case kSBC_Exit:              
-            timeToExit = 1; 
-        break;
->>>>>>> .r403
     }
 }
 
