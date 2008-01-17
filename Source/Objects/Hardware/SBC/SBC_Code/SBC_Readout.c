@@ -51,7 +51,8 @@ char startRun (void);
 void stopRun (void);
 void sendRunInfo(void);
 void sendCBRecord(void);
-
+void runCBTest(SBC_Packet* aPacket);
+void setPacketOptions(SBC_Packet* aPacket);
 
 /*----globals----*/
 char                timeToExit;
@@ -73,6 +74,7 @@ char needToSwap;
 //of the readout cycle, it is dumped into the CB
 int32_t  dataIndex = 0;
 int32_t* data = 0;
+int32_t  maxPacketSize;
 /*---------------*/
 
 void sigchld_handler(int32_t s)
@@ -91,7 +93,8 @@ int32_t main(int32_t argc, char *argv[])
     struct sigaction sa;
     int32_t yes=1;
     timeToExit = 0;
-    
+    maxPacketSize = kSBC_MaxPayloadSize;
+	
     if (argc != 2) {
         exit(1);
     }
@@ -260,6 +263,15 @@ void processSBCCommand(SBC_Packet* aPacket)
             run_info.statusBits    |= kSBC_ConfigLoadedMask;
         break;
                     
+<<<<<<< .mine
+        case kSBC_StartRun:			doRunCommand(aPacket);		break;
+        case kSBC_StopRun:          doRunCommand(aPacket);		break;
+        case kSBC_RunInfoRequest:   sendRunInfo();				break;
+        case kSBC_CBRead:           sendCBRecord();				break;
+		case kSBC_CBTest:			runCBTest(aPacket);			break;
+		case kSBC_PacketOptions:	setPacketOptions(aPacket);	break;
+        case kSBC_Exit:             timeToExit = 1;				break;
+=======
         case kSBC_StartRun:                  
             doRunCommand(aPacket); 
         break;
@@ -279,6 +291,7 @@ void processSBCCommand(SBC_Packet* aPacket)
         case kSBC_Exit:              
             timeToExit = 1; 
         break;
+>>>>>>> .r403
     }
 }
 
@@ -356,8 +369,8 @@ void sendCBRecord(void)
     do {
         int32_t nextBlockSize = CB_nextBlockSize();
         if(nextBlockSize == 0)break;
-        if((aPacket.cmdHeader.numberBytesinPayload + nextBlockSize*sizeof(int32_t)) < (kSBC_MaxPayloadSize-32)){
-            int32_t maxToRead        = (kSBC_MaxPayloadSize - aPacket.cmdHeader.numberBytesinPayload)/sizeof(int32_t);
+        if((aPacket.cmdHeader.numberBytesinPayload + nextBlockSize*sizeof(int32_t)) < (maxPacketSize-32)){
+            int32_t maxToRead        = (maxPacketSize - aPacket.cmdHeader.numberBytesinPayload)/sizeof(int32_t);
             if(!CB_readNextDataBlock(dataPtr,maxToRead)) break;
             aPacket.cmdHeader.numberBytesinPayload    += nextBlockSize*sizeof(int32_t);
             dataPtr += nextBlockSize;
@@ -427,7 +440,8 @@ int32_t writeBuffer(SBC_Packet* aPacket)
     return numBytesToSend;
 }
 
-
+//----------------------------------------------------------------------------------------------
+//writeIRQ, readIRQ... Private functions. Don't call them. They should only be called from the irqAckThread
 int32_t writeIRQ(int n)
 { 
     if(workingIRQSocket < 0)     return -1;
@@ -481,6 +495,7 @@ int32_t readIRQ(SBC_Packet* aPacket)
 
     return returnValue;
 }
+//----------------------------------------------------------------------------------------------
 
 
 char startRun (void)
@@ -579,18 +594,18 @@ void* readoutThread (void* p)
           run_info.readCycles = cycles;
           pthread_mutex_unlock (&runInfoMutex);  //end critical section
         }
-        
-        index = readHW(&crate_config,index,0); //nil for the lam data, not recursive
-        cycles++;
-        
-        if(index>=crate_config.total_cards || index<0){
-            if(dataIndex>0){
-                if(needToSwap)SwapLongBlock(data, dataIndex);
-                CB_writeDataBlock(data,dataIndex);
-                dataIndex = 0;
-            }
-            index = 0;
-        }
+		
+		index = readHW(&crate_config,index,0); //nil for the lam data
+		cycles++;
+		
+		if(index>=crate_config.total_cards || index<0){
+			if(dataIndex>0){
+				if(needToSwap)SwapLongBlock(data, dataIndex);
+				CB_writeDataBlock(data,dataIndex);
+				dataIndex = 0;
+			}
+			index = 0;
+		}
 
    }
 
@@ -718,3 +733,59 @@ void SwapShortBlock(void* p, int32_t n)
         sp++;
     }
 }
+
+void setPacketOptions(SBC_Packet* aPacket)
+{
+    SBC_CmdOptionStruct* p = (SBC_CmdOptionStruct*)aPacket->payload;
+    if(needToSwap)SwapLongBlock(p,sizeof(SBC_CmdOptionStruct)/sizeof(int32_t));
+    maxPacketSize = p->option[0];
+
+	if(maxPacketSize<=0)maxPacketSize = kSBC_MaxPayloadSize;
+	else if(maxPacketSize > kSBC_MaxPayloadSize)maxPacketSize = kSBC_MaxPayloadSize;
+
+	p->option[0] = 1;	//response...
+    sendResponse(aPacket);
+}
+
+void runCBTest(SBC_Packet* aPacket)
+{
+	char runInProgress = run_info.statusBits & kSBC_RunningMask;
+	//send back a response, doesn't really matter what
+    SBC_CmdOptionStruct* op = (SBC_CmdOptionStruct*)aPacket->payload;
+    op->option[0] = !runInProgress;
+    sendResponse(aPacket);
+
+	run_info.bufferSize        = kCBBufferSize;
+    run_info.readCycles        = 0;
+    run_info.recordsTransfered = 0;
+    run_info.wrapArounds       = 0;
+	run_info.busErrorCount     = 0;
+	run_info.err_count         = 0;
+	run_info.msg_count         = 0;
+	run_info.err_buf_index     = 0;
+	run_info.msg_buf_index     = 0;
+	run_info.lostByteCount	   = 0;
+	
+	if(!runInProgress){
+		//fill the CB
+		CB_initialize(kCBBufferSize);
+		BufferInfo cbInfo;
+		while(1){
+			dataIndex = 0;
+			int i;
+			for(i=0;i<1000;i++){
+				data[dataIndex++] = i;
+			}
+			
+			if(needToSwap)SwapLongBlock(data, dataIndex);
+			
+			CB_writeDataBlock(data,dataIndex);
+			CB_getBufferInfo(&cbInfo);
+			
+			if(cbInfo.amountInBuffer >= kCBBufferSize-10000){
+				break;
+			}
+		}
+	}
+}
+

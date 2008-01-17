@@ -98,7 +98,16 @@ typedef enum eSBC_ThrottleConsts{
 	BOOL			irqThreadRunning;
 	ORSafeQueue*    lamsToAck;
 	BOOL			stopWatchingIRQ;
-	
+
+	NSTask*			pingTask;
+
+	//cbTest varibles
+	BOOL			cbTestRunning;
+	NSDate*			lastInfoUpdate;
+	double			totalTime;
+	double			totalPayload;
+	long			totalMeasurements;
+	long			blockSize;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -175,6 +184,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) reloadClient;
 - (void) killCrate;
 - (void) taskData:(NSString*)text;
+- (void) taskFinished:(NSTask*)aTask;
 - (void) toggleCrate;
 - (void) startCrate;
 - (void) stopCrate;
@@ -246,6 +256,10 @@ typedef enum eSBC_ThrottleConsts{
 - (NSString*) sbcLockName;
 - (NSString*) crateName;
 
+- (void) ping;
+- (BOOL) pingTaskRunning;
+- (void) startCBTransferTest;
+- (BOOL) cbTestRunning;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
@@ -287,4 +301,6 @@ extern NSString* SBC_LinkDoRangeChanged;
 extern NSString* SBC_LinkAddressModifierChanged;
 extern NSString* SBC_LinkRWTypeChanged;
 extern NSString* SBC_LinkInfoTypeChanged;
+extern NSString* ORSBC_LinkPingTask;
+extern NSString* ORSBC_LinkCBTest;
 

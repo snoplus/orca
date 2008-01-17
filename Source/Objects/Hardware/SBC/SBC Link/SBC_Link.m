@@ -74,6 +74,8 @@ NSString* SBC_LinkDoRangeChanged			= @"SBC_LinkDoRangeChanged";
 NSString* SBC_LinkAddressModifierChanged	= @"SBC_LinkAddressModifierChanged";
 NSString* SBC_LinkRWTypeChanged             = @"SBC_LinkRWTypeChanged";
 NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
+NSString* ORSBC_LinkPingTask				= @"ORSBC_LinkPingTask";
+NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 
 @interface SBC_Link (private)
 - (void) throwError:(int)anError;
@@ -86,6 +88,7 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 - (BOOL) dataAvailable:(int) sck;
 - (BOOL) canWriteTo:(int) sck;
 - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket;
+- (void) cbTestReadOut;
 @end
 
 @implementation SBC_Link
@@ -119,8 +122,6 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 - (void) wakeUp 
 {
 	[self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];
-
-
 }
 
 - (void) sleep 	
@@ -613,6 +614,7 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 			
 	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
 }
+
 - (unsigned long) throttle
 {
 	return throttle;
@@ -703,6 +705,15 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	[aSequence launch];
 }
 
+- (void) taskFinished:(NSTask*)aTask
+{
+	if(aTask == pingTask){
+		[pingTask release];
+		pingTask = nil;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
+	}
+}
+
 - (void) taskData:(NSString*)text
 {
 	if([text rangeOfString:@"error:"].location!=NSNotFound){
@@ -713,7 +724,18 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 		[self setCompilerWarnings:compilerWarnings+1];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
+	else if([text rangeOfString:@"min/avg/max/stddev"].location!=NSNotFound){
+		NSScanner* scanner = [NSScanner scannerWithString:text];
+		[scanner scanUpToString:@"min/avg/max/stddev" intoString:nil];
+		[scanner scanUpToString:@"=" intoString:nil];
+		[scanner scanUpToString:@"/" intoString:nil];
+		[scanner setScanLocation:[scanner scanLocation]+1];
+		NSString* ave;
+		[scanner scanUpToString:@"/" intoString:&ave];
+		NSLog(@"ave: %.3f ms\n",[ave floatValue]);
+	}
 }
+
 - (void) toggleCrate
 {
 	if([self isConnected]){
@@ -806,7 +828,6 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	else {
 		[NSException raise:@"Run Didn't Stop" format:@"%@ failed to stop run",[self crateName]];	
 	}
-
 }
 	
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse
@@ -1379,6 +1400,61 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	return crateName;
 }
 
+- (void) ping
+{
+	if(!pingTask){
+		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
+		pingTask = [[NSTask alloc] init];
+
+		[pingTask setLaunchPath:@"/sbin/ping"];
+		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",@"128.95.100.211",nil]];
+		
+		[aSequence addTaskObj:pingTask];
+		[aSequence setVerbose:YES];
+		[aSequence setTextToDelegate:YES];
+		[aSequence launch];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkPingTask object:self];
+	}
+	else {
+		[pingTask terminate];
+	}
+}
+
+- (BOOL) pingTaskRunning
+{
+	return pingTask != nil;
+}
+
+- (void) startCBTransferTest
+{
+	if(cbTestRunning){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(cbTestReadOut) object:nil];
+		cbTestRunning = NO;
+	}
+	else {
+	
+		totalTime = totalPayload = totalMeasurements = 0;
+		
+		SBC_CmdOptionStruct optionBlock;
+		optionBlock.option[0]	= 200000;
+		[self sendCommand:kSBC_PacketOptions withOptions:&optionBlock expectResponse:YES];
+		
+		[self sendCommand:kSBC_CBTest withOptions:&optionBlock expectResponse:YES];
+
+		if(optionBlock.option[0] == 1){
+			[self performSelector:@selector(cbTestReadOut) withObject:nil afterDelay:1];
+			cbTestRunning = YES;
+			lastInfoUpdate = [[NSDate date] retain];
+		}
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+}
+
+- (BOOL) cbTestRunning
+{
+	return cbTestRunning;
+}
+
 @end
 
 @implementation SBC_Link (private)
@@ -1695,4 +1771,42 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 	return (selectionResult > 0) && FD_ISSET(aSocket, &fds);
 }
 
+
+- (void) cbTestReadOut
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(cbTestReadOut) object:nil];
+
+	NSDate* now = [NSDate date];
+	if([now timeIntervalSinceDate:lastInfoUpdate] > .5){
+		[self getRunInfoBlock];
+		[lastInfoUpdate release];
+		lastInfoUpdate = [now retain];
+	}
+	
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination	= kSBC_Process;
+	aPacket.cmdHeader.cmdID			= kSBC_CBRead;
+	aPacket.cmdHeader.numberBytesinPayload = 0;
+	
+	ORTimer* timer = [[ORTimer alloc] init];
+	[timer start];
+	[self send:&aPacket receive:&aPacket];
+	totalTime += [timer microseconds];
+	totalPayload += aPacket.cmdHeader.numberBytesinPayload;
+	totalMeasurements++;
+	[timer release];
+	
+	if(runInfo.amountInBuffer > 0 && totalMeasurements < 300){
+		[self performSelector:@selector(cbTestReadOut) withObject:nil afterDelay:0];
+	}
+	else {
+		if(totalMeasurements){
+			double aveTime		= totalTime/(double)totalMeasurements;
+			double avePayload	= totalPayload/(double)totalMeasurements;
+			if(aveTime)NSLog(@"MBytes/sec = %f\n",avePayload/aveTime);
+		}
+		cbTestRunning = NO;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+	}
+}
 @end
