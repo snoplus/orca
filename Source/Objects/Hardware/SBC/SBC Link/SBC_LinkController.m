@@ -62,7 +62,7 @@
 	
     [plotter setVectorMode:YES];
     [[plotter xScale] setRngLimitsLow:0 withHigh:300 withMinRng:300];
-    [[plotter yScale] setRngLimitsLow:0 withHigh:20 withMinRng:10];
+    [[plotter yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
     [plotter setDrawWithGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
 

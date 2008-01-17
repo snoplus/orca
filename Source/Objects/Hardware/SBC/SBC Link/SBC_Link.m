@@ -1741,8 +1741,8 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 	FD_SET(aSocket, &write_fds);
 
 	struct timeval tv;
-	tv.tv_sec  = 0;
-	tv.tv_usec = 100000;
+	tv.tv_sec  = 2;
+	tv.tv_usec = 0;
 
 	// wait until timeout or data received
     int selectionResult = 0;
@@ -1756,7 +1756,7 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 	while (numBytesToSend) {
         selectionResult = select(aSocket+1, NULL, &write_fds, NULL, &tv);
         if (selectionResult == kSelectionError){
-            [NSException raise:@"Write Error" format:@"Write Error %@ <%@>",[self crateName]];
+            [NSException raise:@"Write Error" format:@"Write Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
         }
         else if (selectionResult == kSelectionTimeout) {
             [NSException raise:@"ConnectionTimeOut" format:@"Write from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
@@ -1796,7 +1796,7 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 		[self readSocket:aSocket buffer:aPacket];
 	}
 	else if (selectionResult == kSelectionError){
-		[NSException raise:@"Read Error" format:@"Read Error %@ <%@>",[self crateName]];
+		[NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName], IPNumber,strerror(errno)];
 	}
 	else if (selectionResult == kSelectionTimeout) {
 		[NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
@@ -1815,8 +1815,8 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 	FD_SET(aSocket, &read_fds);
     
     struct timeval tv;
-	tv.tv_sec  = 0;
-	tv.tv_usec = 100000;
+	tv.tv_sec  = 2;
+	tv.tv_usec = 0;
     
 	n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);	
 	if(n==0){
@@ -1836,14 +1836,14 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
                         [self disconnect];
                         [NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
                     } else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
-                        [NSException raise:@"Socket Error" format:@"Error: %s",strerror(errno)];
+                        [NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
                     } else {
                         numToGet -= n;
                         ptrToNumBytesToGet += n;    
                     }
             }
             else if (selectionResult == kSelectionError){
-                [NSException raise:@"Read Error" format:@"Read Error %@ <%@>",[self crateName]];
+                [NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
             }
             else if (selectionResult == kSelectionTimeout) {
                 [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
@@ -1858,7 +1858,7 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 	while(numBytesToGet){
         selectionResult = select(aSocket+1, &read_fds, NULL, NULL, &tv);
         if (selectionResult == kSelectionError){
-            [NSException raise:@"Read Error" format:@"Read Error %@ <%@>",[self crateName]];
+            [NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
         }
         else if (selectionResult == kSelectionTimeout) {
             [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
@@ -1868,7 +1868,7 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
             [self disconnect];
             [NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
         } else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
-            [NSException raise:@"Socket Error" format:@"Error: %s",strerror(errno)];
+            [NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
         } else {
             packetPtr += n;
             numBytesToGet -= n;
