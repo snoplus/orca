@@ -102,12 +102,18 @@ typedef enum eSBC_ThrottleConsts{
 	NSTask*			pingTask;
 
 	//cbTest varibles
+	int				cbTestCount;
+	long			startBlockSize;
+	long			endBlockSize;
+	long			deltaBlockSize;
+	long			currentBlockSize;
 	BOOL			cbTestRunning;
+	BOOL			exitCBTest;
 	NSDate*			lastInfoUpdate;
 	double			totalTime;
 	double			totalPayload;
 	long			totalMeasurements;
-	long			blockSize;
+	NSPoint         cbPoints[100];
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -260,6 +266,8 @@ typedef enum eSBC_ThrottleConsts{
 - (BOOL) pingTaskRunning;
 - (void) startCBTransferTest;
 - (BOOL) cbTestRunning;
+- (int) cbTestCount;
+- (NSPoint) cbPoint:(unsigned)i;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;

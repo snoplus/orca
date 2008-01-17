@@ -88,7 +88,9 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 - (BOOL) dataAvailable:(int) sck;
 - (BOOL) canWriteTo:(int) sck;
 - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket;
-- (void) cbTestReadOut;
+- (void) sampleCBTransferSpeed;
+- (void) doOneCBTransferTest:(long)payloadSize;
+- (void) doCBTransferTest;
 @end
 
 @implementation SBC_Link
@@ -1428,31 +1430,31 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 - (void) startCBTransferTest
 {
 	if(cbTestRunning){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(cbTestReadOut) object:nil];
-		cbTestRunning = NO;
+		exitCBTest = YES;
 	}
 	else {
-	
-		totalTime = totalPayload = totalMeasurements = 0;
-		
-		SBC_CmdOptionStruct optionBlock;
-		optionBlock.option[0]	= 200000;
-		[self sendCommand:kSBC_PacketOptions withOptions:&optionBlock expectResponse:YES];
-		
-		[self sendCommand:kSBC_CBTest withOptions:&optionBlock expectResponse:YES];
-
-		if(optionBlock.option[0] == 1){
-			[self performSelector:@selector(cbTestReadOut) withObject:nil afterDelay:1];
-			cbTestRunning = YES;
-			lastInfoUpdate = [[NSDate date] retain];
-		}
+		exitCBTest = NO;
+		cbTestCount = 0;
+		startBlockSize = 1000;
+		endBlockSize   = 400000;
+		deltaBlockSize = 10000;
+		[self doCBTransferTest];
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+}
+- (int) cbTestCount
+{
+	return cbTestCount;
+}
+
+- (NSPoint) cbPoint:(unsigned)i
+{
+    if(i<cbTestCount)return cbPoints[i];
+    else return NSZeroPoint;
 }
 
 - (BOOL) cbTestRunning
 {
-	return cbTestRunning;
+	return cbTestRunning && !exitCBTest;
 }
 
 @end
@@ -1771,10 +1773,45 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 	return (selectionResult > 0) && FD_ISSET(aSocket, &fds);
 }
 
+- (void) doCBTransferTest
+{	
+	if(exitCBTest) return;
 
-- (void) cbTestReadOut
+	if(!cbTestRunning){
+		currentBlockSize = startBlockSize + cbTestCount*deltaBlockSize;
+		
+		if(currentBlockSize < endBlockSize) [self doOneCBTransferTest:currentBlockSize];
+		else return;
+	}
+	
+	[self performSelector:@selector(doCBTransferTest) withObject:nil afterDelay:1];
+
+}
+
+
+- (void) doOneCBTransferTest:(long)payloadSize
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(cbTestReadOut) object:nil];
+	totalTime = totalPayload = totalMeasurements = 0;
+	
+	SBC_CmdOptionStruct optionBlock;
+	optionBlock.option[0]	= payloadSize;
+	[self sendCommand:kSBC_PacketOptions withOptions:&optionBlock expectResponse:YES];
+	
+	[self sendCommand:kSBC_CBTest withOptions:&optionBlock expectResponse:YES];
+
+	if(optionBlock.option[0] == 1){
+		[self performSelector:@selector(sampleCBTransferSpeed) withObject:nil afterDelay:1];
+		cbTestRunning = YES;
+		lastInfoUpdate = [[NSDate date] retain];
+	}
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+}
+
+
+- (void) sampleCBTransferSpeed
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sampleCBTransferSpeed) object:nil];
 
 	NSDate* now = [NSDate date];
 	if([now timeIntervalSinceDate:lastInfoUpdate] > .5){
@@ -1796,17 +1833,22 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 	totalMeasurements++;
 	[timer release];
 	
-	if(runInfo.amountInBuffer > 0 && totalMeasurements < 300){
-		[self performSelector:@selector(cbTestReadOut) withObject:nil afterDelay:0];
+	if(!exitCBTest && runInfo.amountInBuffer > 0 && totalMeasurements < 3){
+		[self performSelector:@selector(sampleCBTransferSpeed) withObject:nil afterDelay:0];
 	}
 	else {
 		if(totalMeasurements){
 			double aveTime		= totalTime/(double)totalMeasurements;
 			double avePayload	= totalPayload/(double)totalMeasurements;
-			if(aveTime)NSLog(@"MBytes/sec = %f\n",avePayload/aveTime);
+			if(aveTime){
+				cbPoints[cbTestCount].x = currentBlockSize;
+				cbPoints[cbTestCount].y = 1000*avePayload/aveTime;
+				cbTestCount++;
+			}
 		}
 		cbTestRunning = NO;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
 	}
 }
+
 @end

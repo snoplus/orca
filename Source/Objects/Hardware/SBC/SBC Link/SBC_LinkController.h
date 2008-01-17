@@ -22,6 +22,7 @@
 @class ORQueueView;
 @class ORTimedTextField;
 @class ORValueBar;
+@class ORPlotter1D;
 
 @interface SBC_LinkController : OrcaObjectController
 {
@@ -81,6 +82,7 @@
 	IBOutlet NSProgressIndicator* pingTaskProgress;
 	IBOutlet NSButton*		cbTestButton;
 	IBOutlet NSProgressIndicator* cbTestProgress;
+	IBOutlet ORPlotter1D*	plotter;
 }
 
 #pragma mark •••Initialization
@@ -163,7 +165,10 @@
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
+
+
 @end
+
 @interface OrcaObject (SBC_Link)
 - (BOOL) showBasicOps;
 @end

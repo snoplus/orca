@@ -25,6 +25,8 @@
 #import "ORCard.h"
 #import "ORVmeAdapter.h"
 #import "ORSBC_LAMModel.h"
+#import "ORPlotter1D.h"
+#import "ORAxis.h"
 
 @interface SBC_LinkController (private)
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -56,6 +58,10 @@
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
+	
+	[plotter setUseGradient:YES];
+	[[plotter xScale] setRngDefaultsLow:0 withHigh:500000];
+	[[plotter xScale] setRngLimitsLow:0 withHigh:500000 withMinRng:20000];
 }
 
 - (void) setModel:(id)aModel
@@ -290,6 +296,7 @@
 	if(isRunning)[cbTestProgress startAnimation:self];
 	else [cbTestProgress stopAnimation:self];
 	[cbTestButton setTitle:isRunning?@"Stop":@"CB Test"];
+	[plotter setNeedsDisplay:YES];
 }
 
 
@@ -840,6 +847,29 @@
 		[[model sbcLink] startCBTransferTest];
 	NS_HANDLER
 	NS_ENDHANDLER
+}
+
+- (BOOL) useXYPlot
+{
+	return YES;
+}
+
+- (unsigned long) plotter:(id)aPlotter numPointsInSet:(int)set
+{
+    return [[model sbcLink] cbTestCount];
+}
+
+- (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
+{
+    if(index>100){
+        *xValue = 0;
+        *yValue = 0;
+        return NO;
+    }
+    NSPoint track = [[model sbcLink] cbPoint:index];
+    *xValue = track.x;
+    *yValue = track.y;
+    return YES;    
 }
 
 @end
