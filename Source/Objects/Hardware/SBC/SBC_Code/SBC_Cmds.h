@@ -49,6 +49,8 @@
 #define kSBC_VmeReadBlock      0x0e
 #define kSBC_VmeWriteBlock     0x0f
 #define kSBC_LAM			   0x10
+#define kSBC_CBTest			   0x11
+#define kSBC_PacketOptions	   0x12
 
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
@@ -136,7 +138,7 @@ typedef
 SBC_LAM_Data;
 
 
-#define kSBC_MaxPayloadSize    1024*200
+#define kSBC_MaxPayloadSize    1024*400
 #define kSBC_MaxMessageSize    256
 typedef 
     struct {
