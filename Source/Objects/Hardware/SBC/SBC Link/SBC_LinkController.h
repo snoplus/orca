@@ -88,6 +88,8 @@
 	IBOutlet NSTextField*	numTestPointsField;
 	IBOutlet NSTextField*	numRecordsField;
 	IBOutlet NSTextField*	numErrorsField;
+	IBOutlet NSTextField*	payloadSizeField;
+	IBOutlet NSSlider*		payloadSizeSlider;
 }
 
 #pragma mark •••Initialization
@@ -132,6 +134,7 @@
 - (void) addressModifierChanged:(NSNotification*)aNote;
 - (void) pingTaskChanged:(NSNotification*)aNote;
 - (void) cbTestChanged:(NSNotification*)aNote;
+- (void) payloadSizeChanged:(NSNotification*)aNote;
 
 - (NSString*) errorString:(int)errNum;
 - (NSString*) literalToString:(int)aLiteral;
@@ -169,9 +172,13 @@
 - (IBAction) ping:(id)sender;
 - (IBAction) cbTest:(id)sender;
 - (IBAction) numTestPointsAction:(id)sender;
+- (IBAction) payloadSizeAction:(id)sender;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
+- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
+- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
+- (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue;
 
 
 @end

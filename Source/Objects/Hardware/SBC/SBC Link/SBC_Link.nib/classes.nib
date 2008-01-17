@@ -316,6 +316,8 @@
 				<string>id</string>
 				<key>passWordAction</key>
 				<string>id</string>
+				<key>payloadSizeAction</key>
+				<string>id</string>
 				<key>ping</key>
 				<string>id</string>
 				<key>portNumberAction</key>
@@ -405,6 +407,10 @@
 				<string>NSTextField</string>
 				<key>passWordField</key>
 				<string>NSSecureTextField</string>
+				<key>payloadSizeField</key>
+				<string>NSTextField</string>
+				<key>payloadSizeSlider</key>
+				<string>NSSlider</string>
 				<key>pingButton</key>
 				<string>NSButton</string>
 				<key>pingTaskProgress</key>

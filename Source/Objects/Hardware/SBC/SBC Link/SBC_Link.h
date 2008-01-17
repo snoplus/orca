@@ -83,6 +83,7 @@ typedef enum eSBC_ThrottleConsts{
 	BOOL			verbose;
 	BOOL			forceReload;
     BOOL			initAfterConnect;
+	long			payloadSize;
 	unsigned long   bytesReceived;
 	unsigned long   bytesSent;
 	float			byteRateReceived;
@@ -179,6 +180,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) setReadWriteType:(unsigned int)aValue;
 - (unsigned long) addressModifier;
 - (void) setAddressModifier:(unsigned long)aValue;
+- (long) payloadSize;
+- (void) setPayloadSize:(long)aValue;
 
 
 - (void) calculateRates;
@@ -324,4 +327,5 @@ extern NSString* SBC_LinkInfoTypeChanged;
 extern NSString* ORSBC_LinkPingTask;
 extern NSString* ORSBC_LinkCBTest;
 extern NSString* ORSBC_LinkNumCBTextPointsChanged;
+extern NSString* ORSBC_LinkNumPayloadSizeChanged;
 
