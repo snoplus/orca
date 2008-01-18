@@ -77,6 +77,7 @@ NSString* SBC_LinkInfoTypeChanged           = @"SBC_LinkInfoTypeChanged";
 NSString* ORSBC_LinkPingTask				= @"ORSBC_LinkPingTask";
 NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged";
+NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 @interface SBC_Link (private)
 - (void) throwError:(int)anError;
@@ -547,8 +548,14 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 	self = [super init];
 	[[self undoManager] disableUndoRegistration];
 	
-	[self setNumTestPoints:	[decoder decodeIntForKey:   @"numTestPoints"]];
-	if(numTestPoints == 0) [self setNumTestPoints:20];
+	int num = [decoder decodeIntForKey:   @"numTestPoints"];
+	if(num == 0) [self setNumTestPoints:20];
+	else [self setNumTestPoints:num];
+	
+	long lnum = [decoder decodeInt32ForKey:  @"payloadSize"];
+	if(lnum==0)[self setPayloadSize:65000];
+	else [self setPayloadSize:lnum];
+		
 	[self setInfoType:		[decoder decodeIntForKey:   @"infoType"]];
 	[self setLoadMode:		[decoder decodeIntForKey:   @"loadMode"]];
 	[self setInitAfterConnect:[decoder decodeBoolForKey:@"InitAfterConnect"]];
@@ -576,6 +583,7 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
+    [encoder encodeInt32:payloadSize	forKey:@"payloadSize"];
     [encoder encodeInt:numTestPoints	forKey:@"numTestPoints"];
     [encoder encodeInt:infoType			forKey:@"infoType"];
     [encoder encodeInt:range			forKey:@"Range"];
@@ -1446,7 +1454,7 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 		pingTask = [[NSTask alloc] init];
 
 		[pingTask setLaunchPath:@"/sbin/ping"];
-		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",@"128.95.100.211",nil]];
+		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",IPNumber,nil]];
 		
 		[aSequence addTaskObj:pingTask];
 		[aSequence setVerbose:YES];
@@ -1522,6 +1530,24 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 	optionBlock.option[0]	= aSize;
 	[self sendCommand:kSBC_PacketOptions withOptions:&optionBlock expectResponse:YES];
 }
+
+- (long) payloadSize
+{
+	return payloadSize;
+}
+
+- (void) setPayloadSize:(long)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPayloadSize:payloadSize];
+    
+	if(aValue<=5000)aValue = 5000;
+	else if(aValue>350000)aValue = 35000;
+	
+    payloadSize = aValue;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkNumPayloadSizeChanged object:self];
+}
+
 
 - (int) recordSizeHisto:(int)aChannel
 {
@@ -1932,11 +1958,11 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 
 }
 
-- (void) doOneCBTransferTest:(long)payloadSize
+- (void) doOneCBTransferTest:(long)aPayloadSize
 {
 	totalTime = totalPayload = totalMeasurements = 0;
 	
-	[self sendPayloadSize:payloadSize];
+	[self sendPayloadSize:aPayloadSize];
 	
 	SBC_CmdOptionStruct optionBlock;
 	[self sendCommand:kSBC_CBTest withOptions:&optionBlock expectResponse:YES];

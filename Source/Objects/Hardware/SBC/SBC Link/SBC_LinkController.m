@@ -69,7 +69,9 @@
 	[[histogram xScale] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
     [[histogram yScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
     [histogram setDrawWithGradient:YES];
-
+	
+	[payloadSizeSlider setMinValue:0];
+	[payloadSizeSlider setMaxValue:300];
 }
 
 - (void) setModel:(id)aModel
@@ -253,6 +255,12 @@
                          name : ORSBC_LinkNumCBTextPointsChanged
                        object : [model sbcLink]];
 
+  [notifyCenter addObserver : self
+                     selector : @selector(payloadSizeChanged:)
+                         name : ORSBC_LinkNumPayloadSizeChanged
+                       object : [model sbcLink]];
+
+
 }
 
 - (void) updateWindow
@@ -284,6 +292,7 @@
     [self pingTaskChanged:nil];
     [self cbTestChanged:nil];
     [self numTestPointsChanged:nil];
+    [self payloadSizeChanged:nil];
 	
 	[self lamSlotChanged:nil];
 }
@@ -293,6 +302,17 @@
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:[model sbcLockName] to:secure];
     [lockButton setEnabled:secure];
+}
+
+- (void) payloadSizeChanged:(NSNotification*)aNote
+{
+	[plotter setNeedsDisplay:YES];
+	long size = [[model sbcLink] payloadSize]/1000;
+	[payloadSizeSlider setIntValue:size];
+	[payloadSizeField setIntValue:size];
+	if(size<25)[payloadSizeField setTextColor:[NSColor colorWithCalibratedRed:.6 green:0 blue:0 alpha:1.0]];
+	else [payloadSizeField setTextColor:[NSColor blackColor]];
+	
 }
 
 - (void) numTestPointsChanged:(NSNotification*)aNote
@@ -423,7 +443,7 @@
  
 	[pingButton setEnabled:!locked && !runInProgress];
     [cbTestButton setEnabled:!locked && !runInProgress && connected];
-	
+	[payloadSizeSlider setEnabled:!locked && !runInProgress && connected];
     [ipNumberField setEnabled:!locked && !runInProgress];
     [portNumberField setEnabled:!locked && !runInProgress];
     [passWordField setEnabled:!locked && !runInProgress];
@@ -887,6 +907,12 @@
 	[[model sbcLink] setNumTestPoints:[sender intValue]];
 }
 
+- (IBAction) payloadSizeAction:(id)sender
+{
+	[[model sbcLink] setPayloadSize:[sender intValue]*1000];
+}
+
+
 - (unsigned long) plotter:(id)aPlotter numPointsInSet:(int)set
 {
     return [[model sbcLink] cbTestCount];
@@ -913,6 +939,13 @@
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
 {
     return (float)[[model sbcLink] recordSizeHisto:x];
+}
+
+- (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue
+{
+    *xValue = [[model sbcLink] payloadSize]/1000.;
+    *yValue = 0;
+    return YES;
 }
 
 @end
