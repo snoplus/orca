@@ -82,6 +82,7 @@
 - (IBAction) autoScale:(id)sender;
 - (IBAction) zoomIn:(id)sender;
 - (IBAction) zoomOut:(id)sender; 
+- (IBAction) copy:(id)sender;
 
 - (void) savePDF:(id)sender;
 - (void) didEnd:(NSSavePanel *)sheet

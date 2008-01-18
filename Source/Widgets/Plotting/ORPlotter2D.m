@@ -456,6 +456,41 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     [mZScale rangingDonePostChange];
 }
 
+- (IBAction) copy:(id)sender
+{	
+    //declare our custom type.
+    NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSGeneralPboard];
+    [pboard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil] owner:self];
+	NSMutableString* string = [NSMutableString string];
+    
+	int numberSets = [mDataSource numberOfDataSetsInPlot:self];
+	int maxPoints = 0;
+	int set;
+	int i;
+	for(set=0;set<numberSets;set++){
+		int n = [mDataSource plotter:self numPointsInSet:set];
+
+		if(n>maxPoints)maxPoints = n;
+	}
+	
+	//make a string with the data
+	for(i=0;i<maxPoints;i++){
+		[string appendFormat:@"%d ",i];
+		for(set=0;set<numberSets;set++){
+			float xValue,yValue;
+
+			[mDataSource plotter:self dataSet:set index:i x:&xValue y:&yValue];
+			[string appendFormat:@"\t%f\t%f",xValue,yValue];
+		}	
+		[string appendFormat:@"\n"];
+	}
+	
+    if([string length]){
+		[pboard setData:[string dataUsingEncoding:NSASCIIStringEncoding] forType:NSStringPboardType]; 
+	}
+}
+
+
 -(void)	mouseDown:(NSEvent*)theEvent
 {
     [self reportMousePosition:theEvent];
