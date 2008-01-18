@@ -2051,6 +2051,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 				else {
 					productionSpeedValueValid = YES;
 					productionSpeed = avePayload/aveTime;
+					NSLog(@"Run-Time socket throughput estimated to be: %.1f MB/sec with payload size of %d KB \n",productionSpeed,payloadSize/1000);
 				}
 			}
 		}
