@@ -340,6 +340,7 @@
 		[cbTestProgress setDoubleValue:0];
 	}
 	[cbTestButton setTitle:isRunning?@"Stop":@"Test CB"];
+	[numTestPointsField setEnabled:!isRunning];
 	[plotter setNeedsDisplay:YES];
 	[cbTestButton setNeedsDisplay:YES];
 	[numRecordsField setIntValue:[[model sbcLink] totalRecordsChecked]];
