@@ -95,6 +95,8 @@
 			<dict>
 				<key>autoScale</key>
 				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
 				<key>resetScales</key>
 				<string>id</string>
 				<key>savePDF</key>
