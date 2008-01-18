@@ -188,7 +188,7 @@ NSString* ORSBC_LAMLock						= @"ORSBC_LAMLock";
 			
 			errorLocation = @"Clearing LAM";
             busy = NO;
-			
+		 	
 			errorLocation = @"LAM Reading Children";
             for(i=0;i<cachedNumberOfDataTakers;i++){
                 [[dataTakers objectAtIndex:i] takeData:aDataPacket userInfo:params];

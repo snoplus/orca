@@ -944,7 +944,8 @@
 - (BOOL) plotter:(id)aPlotter dataSet:(int)set crossHairX:(float*)xValue crossHairY:(float*)yValue
 {
     *xValue = [[model sbcLink] payloadSize]/1000.;
-    *yValue = 0;
+	if([[model sbcLink] productionSpeedValueValid])*yValue = [[model sbcLink] productionSpeed];
+    else *yValue = 0;
     return YES;
 }
 

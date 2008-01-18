@@ -1486,6 +1486,10 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		totalErrors = 0;
 		startBlockSize = 1000;
 		endBlockSize   = 300000;
+		productionSpeedValueValid = NO;
+		productionSpeed = 0;
+		doingProductionTest = NO;
+		
 		memset(recordSizeHisto,0, 1000*sizeof(int));
 		deltaBlockSize = (endBlockSize-startBlockSize)/(numTestPoints-1);
 		[self doCBTransferTest];
@@ -1556,7 +1560,16 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (int) numHistoChannels
 {
-	return 1000;
+	return 1000; //hardcoded all over the place, don't change...
+}
+- (BOOL) productionSpeedValueValid
+{
+	return productionSpeedValueValid;
+}
+
+- (float) productionSpeed
+{
+	return productionSpeed;
 }
 
 @end
@@ -1945,6 +1958,10 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		currentBlockSize = startBlockSize + cbTestCount*deltaBlockSize;
 		
 		if(currentBlockSize <= endBlockSize) [self doOneCBTransferTest:currentBlockSize];
+		else if(!productionSpeedValueValid){
+			doingProductionTest = YES;
+			[self doOneCBTransferTest:payloadSize];
+		}
 		else {
 			exitCBTest = YES;
 			[[ORGlobal sharedInstance] removeRunVeto:@"CBTestInProgress"];
@@ -2008,19 +2025,17 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 	while(rp<endPt){
 		unsigned long n = *rp++;
-		unsigned long i;
+		long i;
 		for(i=1;i<n;i++){
-			if(*rp++ != i){
-				totalErrors++;
-			}	
+			if(*rp++ != i)totalErrors++;
 		}
 		totalRecordsChecked++;
-		if(n<1000){
-			recordSizeHisto[n]++;
-		}
+		if(n<1000)recordSizeHisto[n]++;
 	}
-	
-	if(!exitCBTest && runInfo.amountInBuffer > 0 && totalMeasurements < 100){
+	int sampleSize;
+	if(doingProductionTest)sampleSize = 500;
+	else sampleSize = 100;
+	if(!exitCBTest && runInfo.amountInBuffer > 0 && totalMeasurements < sampleSize){
 		[self performSelector:@selector(sampleCBTransferSpeed) withObject:nil afterDelay:0];
 	}
 	else {
@@ -2028,9 +2043,15 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			double aveTime		= totalTime/(double)totalMeasurements;
 			double avePayload	= totalPayload/(double)totalMeasurements;
 			if(aveTime){
-				cbPoints[cbTestCount].x = currentBlockSize/1000.;
-				cbPoints[cbTestCount].y = avePayload/aveTime;
-				cbTestCount++;
+				if(!doingProductionTest){
+					cbPoints[cbTestCount].x = currentBlockSize/1000.;
+					cbPoints[cbTestCount].y = avePayload/aveTime;
+					cbTestCount++;
+				}
+				else {
+					productionSpeedValueValid = YES;
+					productionSpeed = avePayload/aveTime;
+				}
 			}
 		}
 		cbTestRunning = NO;

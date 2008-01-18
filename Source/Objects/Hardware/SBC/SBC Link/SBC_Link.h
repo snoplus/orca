@@ -117,6 +117,9 @@ typedef enum eSBC_ThrottleConsts{
 	long			totalMeasurements;
 	long			totalRecordsChecked;
 	long			totalErrors;
+	BOOL			doingProductionTest;
+	BOOL			productionSpeedValueValid;
+	float			productionSpeed;
 	NSPoint         cbPoints[100];
 	int				recordSizeHisto[1000];
 }
@@ -283,6 +286,8 @@ typedef enum eSBC_ThrottleConsts{
 - (long) totalErrors;
 - (int) recordSizeHisto:(int)aChannel;
 - (int) numHistoChannels;
+- (BOOL) productionSpeedValueValid;
+- (float) productionSpeed;
 
 #pragma mark •••DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
