@@ -46,6 +46,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 @interface ORDataTaskModel (private)
 - (void)   sendDataFromQueue;
 - (void) shipPendingRecords:(ORDataPacket*)aDataPacket;
+- (NSMutableArray*) readoutInfo:(id)anItem array:(NSMutableArray*)anArray;
 @end
 
 @implementation ORDataTaskModel
@@ -335,7 +336,12 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 		[aDataPacket addEventDescriptionItem:eventDictionary];
 	}
 //---------------------------------------------------	
-    
+ 
+	if([dataTakers count]){
+		[aDataPacket addReadoutDescription:[self readoutInfo:readOutList array:[NSMutableArray array]]];
+	}
+
+	      
     [aDataPacket generateObjectLookup];	 //MUST be done before data header will work.
 
 	if(transferDataPacket){
@@ -713,6 +719,52 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 		}
 		areRecordsPending = NO;
 	}
+}
+
+//recursively walk the readout list and produce a description that is used in the run header
+- (NSMutableArray*) readoutInfo:(id)anItem array:(NSMutableArray*)anArray
+{
+	NSArray* someChildren;
+	if([[anItem class] isSubclassOfClass: NSClassFromString(@"ORReadOutList")]){
+		someChildren = [anItem children];
+		if([someChildren count]){
+			id aChild;
+			NSEnumerator* e = [someChildren objectEnumerator];
+			while(aChild = [e nextObject]){
+				[self readoutInfo:aChild array:anArray];
+			} 
+		}
+	}
+	else if([[anItem class] isSubclassOfClass: NSClassFromString(@"ORReadOutObject")]){
+		id anObj = [anItem object];
+		NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+		[objDictionary setObject:[anObj className] forKey:@"name"];
+		id objGuardian = [anObj guardian];
+		if([objGuardian isKindOfClass:NSClassFromString(@"ORCrate")]){
+			[objDictionary setObject:[NSNumber numberWithInt:[anObj crateNumber]] forKey:@"crate"];
+			if([anObj respondsToSelector:@selector(stationNumber)]){
+				[objDictionary setObject:[NSNumber numberWithInt:[anObj stationNumber]] forKey:@"station"];
+			}
+			else if([anObj respondsToSelector:@selector(slot)]){
+				[objDictionary setObject:[NSNumber numberWithInt:[anObj slot]] forKey:@"slot"];
+			}
+		}
+		else {
+			[objDictionary setObject:[NSNumber numberWithInt:[anObj uniqueIdNumber]] forKey:@"uniqueID"];
+		}
+		someChildren = [anObj children];
+		if([someChildren count]){
+			NSMutableArray* theChildArray = [NSMutableArray array];
+			id aChild;
+			NSEnumerator* e = [someChildren objectEnumerator];
+			while(aChild = [e nextObject]){
+				[self readoutInfo:aChild array:theChildArray];
+			} 
+			[objDictionary setObject:theChildArray forKey:@"children"];
+		}
+		[anArray addObject:objDictionary];
+	}
+	return anArray;
 }
 
 @end

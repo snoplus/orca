@@ -121,4 +121,12 @@ extern NSString* ORDataTaskListLock;
 extern NSString* ORDataTaskTimeScalerChangedNotification;
 extern NSString* ORDataTaskCycleRateChangedNotification;
 
+@interface NSObject (ORDataTaskModel)
+
+- (int) stationNumber;
+- (int) slot;
+- (int) crateNumber;
+
+@end
+
 

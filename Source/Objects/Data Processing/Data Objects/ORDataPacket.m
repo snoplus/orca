@@ -107,6 +107,12 @@
     [dataDescriptionDictionary setObject:dataDictionary forKey:aKey];
 }
 
+- (void) addReadoutDescription:(id) readoutDescription
+{
+	[fileHeader setObject:readoutDescription forKey:@"ReadoutDescription"];
+}
+
+
 - (void) addEventDescriptionItem:(NSDictionary*) eventDictionary
 {
 	[fileHeader setObject:eventDictionary forKey:@"eventDescription"];

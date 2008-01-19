@@ -129,6 +129,7 @@
 - (BOOL) readBeginData: (NSFileHandle*)fp;
 - (BOOL) legalDataFile: (NSFileHandle*)fp;
 - (void) addDataDescriptionItem:(NSDictionary*) dataDictionary forKey:(NSString*)aKey;
+- (void) addReadoutDescription:(id) readoutDescription;
 - (id) fileDetails;
 - (void) generateObjectLookup;
 - (BOOL) readHeader: (NSFileHandle*)fp;
