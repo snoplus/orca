@@ -458,7 +458,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
         if (fifoAddressMod == 0x39) vmeReadOutHandle = vmeAM39Handle;
         else vmeReadOutHandle = vmeAM9Handle;
 
-        uint32_t numLongs = 0;
+        uint32_t numLongs = 2;
 		int32_t savedIndex = dataIndex;
         data[dataIndex++] = dataId | 0; //we'll fill in the length later
         data[dataIndex++] = location;
