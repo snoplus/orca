@@ -83,23 +83,23 @@ void stopHWRun (SBC_crate_config* config)
 void FindHardware(void)
 {
     vmeAM29Handle = get_new_device(0x0, 0x29, 2, 0x10000); 
-	if (vmeAM29Handle == NULL) LogBusError("Device vmeAM29Handle: %s",strerror(errno));
-	
+    if (vmeAM29Handle == NULL) LogBusError("Device vmeAM29Handle: %s",strerror(errno));
+    
     controlHandle = get_ctl_device(); 
-	if (controlHandle == NULL) LogBusError("Device controlHandle: %s",strerror(errno));
-	
+    if (controlHandle == NULL) LogBusError("Device controlHandle: %s",strerror(errno));
+    
     vmeAM39Handle = get_new_device(0x0, 0x39, 4, 0x1000000);
-	if (vmeAM39Handle == NULL) LogBusError("Device vmeAM39Handle: %s",strerror(errno));
-	
+    if (vmeAM39Handle == NULL) LogBusError("Device vmeAM39Handle: %s",strerror(errno));
+    
     vmeAM9Handle = get_new_device(0x0, 0x9, 4, 0x2000000);
-	if (vmeAM9Handle == NULL) LogBusError("Device vmeAM9Handle: %s",strerror(errno));
+    if (vmeAM9Handle == NULL) LogBusError("Device vmeAM9Handle: %s",strerror(errno));
     /* The entire A16 (D16), A24 (D16), space is mapped. */
     /* The bottom of A32 (D32) is mapped up to 0x2000000. */
     /* We need to be careful!*/
   
     set_hw_byte_swap(true);
-	set_ds_negation_speed(0);
-	set_ds_high_time_blts(0);
+    set_ds_negation_speed(0);
+    set_ds_high_time_blts(0);
 }
 
 void ReleaseHardware(void)
@@ -253,23 +253,23 @@ void doReadBlock(SBC_Packet* aPacket)
             return;
          }
     } 
-	else if(unitSize*numItems >= kDMALowerLimit) {
+    else if(unitSize*numItems >= kDMALowerLimit) {
         if (addressSpace == 0xFF) set_dma_no_increment(true);
         else set_dma_no_increment(false);
         memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize);
         addressSpace=0x1;
         startAddress = 0x0;
     }
-	else if(addressModifier == 0x29 && unitSize == 2) {
+    else if(addressModifier == 0x29 && unitSize == 2) {
         memMapHandle = vmeAM29Handle;
     } 
-	else if(addressModifier == 0x39 && unitSize == 4) {
+    else if(addressModifier == 0x39 && unitSize == 4) {
         memMapHandle = vmeAM39Handle;
     } 
-	else if(addressModifier == 0x9 && unitSize == 4 && startAddress < 0x2000000) {
+    else if(addressModifier == 0x9 && unitSize == 4 && startAddress < 0x2000000) {
         memMapHandle = vmeAM9Handle;
     } 
-	else {
+    else {
         /* The address must be byte-aligned */ 
         startAddress = p->address & 0xFFFF;
         p->address = p->address & 0xFFFF0000;
@@ -306,7 +306,7 @@ void doReadBlock(SBC_Packet* aPacket)
         }
         if (result == unitSize) result = unitSize*numItems; 
     } 
-	else {
+    else {
         result = read_device(memMapHandle,returnPayload,numItems*unitSize,startAddress);
     }
     
@@ -361,14 +361,14 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     if(index<config->total_cards && index>=0) {
         switch(config->card_info[index].hw_type_id){
-            case kShaper:       index = Readout_Shaper(config,index,lamData);		break;
-            case kGretina:      index = Readout_Gretina(config,index,lamData);		break;
-            case kTrigger32:    index = Readout_TR32_Data(config,index,lamData);	break;
-			case kCaen:			index = Readout_CAEN(config,index,lamData);			break;
-			case kSBCLAM:       index = Readout_LAM_Data(config,index,lamData);		break;
-            default:            index = -1;											break;
+            case kShaper:       index = Readout_Shaper(config,index,lamData);        break;
+            case kGretina:      index = Readout_Gretina(config,index,lamData);        break;
+            case kTrigger32:    index = Readout_TR32_Data(config,index,lamData);    break;
+            case kCaen:            index = Readout_CAEN(config,index,lamData);            break;
+            case kSBCLAM:       index = Readout_LAM_Data(config,index,lamData);        break;
+            default:            index = -1;                                            break;
         }
-		return index;
+        return index;
     }
     else return -1;
 }
@@ -407,11 +407,11 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
                         data[dataIndex++] = locationMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
                     }
                 }
-				else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));				
+                else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
             }
         }
     }
-	else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));				
+    else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
 
     return config->card_info[index].next_Card_Index;
 }            
@@ -458,8 +458,8 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
         if (fifoAddressMod == 0x39) vmeReadOutHandle = vmeAM39Handle;
         else vmeReadOutHandle = vmeAM9Handle;
 
-        uint32_t numLongs = 2;
-		int32_t savedIndex = dataIndex;
+        uint32_t numLongs = 3;
+        int32_t savedIndex = dataIndex;
         data[dataIndex++] = dataId | 0; //we'll fill in the length later
         data[dataIndex++] = location;
         
@@ -483,7 +483,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
               set_dma_no_increment(true);
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
             } 
-			else {
+            else {
               /* Gretina IV card */
               set_dma_no_increment(false);
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
@@ -491,39 +491,39 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
             if (vmeDMADevice == NULL) {
               return config->card_info[index].next_Card_Index;
             }
-			
+            
             result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
             dataIndex += numLongsLeft;
-			
+            
             if (result != numLongsLeft*4) {
               return config->card_info[index].next_Card_Index;
             }
             data[savedIndex] |= totalNumLongs; //see, we did fill it in...
-		}
-		else {
-			if(result<0)LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-			else		LogError("Rd Err: Gretina4 0x%04x Buffer Rd Out",baseAddress);
+        }
+        else {
+            if(result<0)LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+            else        LogError("Rd Err: Gretina4 0x%04x Buffer Rd Out",baseAddress);
             //oops... really bad -- the buffer read is out of sequence -- dump it all
             uint32_t i = 0;
             while(i < sizeOfFIFO) {
                 result = read_device(vmeReadOutHandle,(char*) (&theValue),4,fifoAddress); 
                 if (result == 0) { // means the FIFO is empty
                   return config->card_info[index].next_Card_Index;
-				} else if (result < 0) {
-					LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-					return config->card_info[index].next_Card_Index;
-				}
+                } else if (result < 0) {
+                    LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                    return config->card_info[index].next_Card_Index;
+                }
                 if (theValue == 0xAAAAAAAA) break;
                 i++;
             }
             //read the first word of actual data so we know how much to read
-			//note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
-			//we'll reset the index to dump the data later....
+            //note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
+            //we'll reset the index to dump the data later....
             result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-			if (result < 0) {
-				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));				
-				return config->card_info[index].next_Card_Index;
-			}
+            if (result < 0) {
+                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));                
+                return config->card_info[index].next_Card_Index;
+            }
             uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
              
             /* OK, now use dma access. */
@@ -532,21 +532,21 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
               set_dma_no_increment(true);
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
             } 
-			else {
+            else {
               /* Gretina I card */
               set_dma_no_increment(false);
               vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
             }
             if (vmeDMADevice == NULL) {
-				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-				return config->card_info[index].next_Card_Index;
+                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                return config->card_info[index].next_Card_Index;
             }
             result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
-			if (result < 0) {
-				LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-				return config->card_info[index].next_Card_Index;
-			}
- 			dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
+            if (result < 0) {
+                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                return config->card_info[index].next_Card_Index;
+            }
+             dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
        }
     }
     return config->card_info[index].next_Card_Index;
@@ -560,19 +560,19 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
 
-#define kCaen_Header 		 0x2
-#define kCaen_ValidDatum 	 0x0
-#define kCaen_EndOfBlock 	 0x4
+#define kCaen_Header          0x2
+#define kCaen_ValidDatum      0x0
+#define kCaen_EndOfBlock      0x4
 #define kCaen_NotValidDatum  0x6    
 
-#define kCaen_DataWordTypeMask	0x07000000
+#define kCaen_DataWordTypeMask    0x07000000
 #define kCaen_DataWordTypeShift 24
 #define isValidCaenData(x)      ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_ValidDatum)
 #define isNotValidCaenData(x)   ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_NotValidDatum)
-#define isCaenHeader(x)			((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_Header)
+#define isCaenHeader(x)            ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_Header)
 #define isCaenEndOfBlock(x)     ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_EndOfBlock)
 
-#define kCaen_DataChannelCountMask	0x00003f00
+#define kCaen_DataChannelCountMask    0x00003f00
 #define kCaen_DataChannelCoutShift 8
 #define caenDataChannelCount(x) (((x) & kCaen_DataChannelCountMask) >> kCaen_DataChannelCoutShift)
   
@@ -581,124 +581,124 @@ int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDa
     /* 1: statusTwo register                          */
     /* 2: fifo buffer size (in longs)                 */
     /* 3: fifo buffer address                         */
-	
-	uint16_t statusOne, statusTwo;
     
-    uint32_t baseAddress	  = config->card_info[index].base_add;
+    uint16_t statusOne, statusTwo;
+    
+    uint32_t baseAddress      = config->card_info[index].base_add;
     uint32_t statusOneAddress = baseAddress + config->card_info[index].deviceSpecificData[0];
     uint32_t statusTwoAddress = baseAddress + config->card_info[index].deviceSpecificData[1];
     uint32_t fifoAddress      = baseAddress + config->card_info[index].deviceSpecificData[3];
-	
+    
     uint32_t dataId      = config->card_info[index].hw_mask[0];
     uint32_t slot        = config->card_info[index].slot;
     uint32_t crate       = config->card_info[index].crate;
     int32_t result;
 
     //read the states
-	result = read_device(vmeAM39Handle,(char*)&statusOne,2,statusOneAddress); 
+    result = read_device(vmeAM39Handle,(char*)&statusOne,2,statusOneAddress); 
     if (result != 2) {
-		LogBusError("CAEN 0x%0x status 1 read",baseAddress);
+        LogBusError("CAEN 0x%0x status 1 read",baseAddress);
         return config->card_info[index].next_Card_Index;
     }
 
-	result = read_device(vmeAM39Handle,(char*)&statusTwo,2,statusTwoAddress); 
+    result = read_device(vmeAM39Handle,(char*)&statusTwo,2,statusTwoAddress); 
     if (result != 2) {
-		LogBusError("CAEN 0x%0x status 2 read",baseAddress);
+        LogBusError("CAEN 0x%0x status 2 read",baseAddress);
         return config->card_info[index].next_Card_Index;
     }
 
-	uint8_t bufferIsNotBusy =  !((statusOne & 0x0004) >> 2);
-	uint8_t dataIsReady	    =  statusOne & 0x0001;
-	uint8_t bufferIsFull	=  (statusTwo & 0x0004) >> 2;
+    uint8_t bufferIsNotBusy =  !((statusOne & 0x0004) >> 2);
+    uint8_t dataIsReady        =  statusOne & 0x0001;
+    uint8_t bufferIsFull    =  (statusTwo & 0x0004) >> 2;
 
-	if ((bufferIsNotBusy && dataIsReady) || bufferIsFull) {
-	
-		unsigned long dataValue;
-		//read the first word, could be a header, or the buffer could be empty now
-		result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
-		if (result != 4) {
-			LogBusError("CAEN 0x%0x FIFO header read",baseAddress);
-			return config->card_info[index].next_Card_Index;
-		}
-								
-		if(!isNotValidCaenData(dataValue)) {
-		
-			//OK some data is apparently in the buffer and is valid
-			uint32_t dataIndexStart = dataIndex; //save the start index in case we have to flush the data because of errors
-			dataIndex += 2;						 //reserve two words for the ORCA header, we'll fill it in if we get valid data
+    if ((bufferIsNotBusy && dataIsReady) || bufferIsFull) {
+    
+        unsigned long dataValue;
+        //read the first word, could be a header, or the buffer could be empty now
+        result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
+        if (result != 4) {
+            LogBusError("CAEN 0x%0x FIFO header read",baseAddress);
+            return config->card_info[index].next_Card_Index;
+        }
+                                
+        if(!isNotValidCaenData(dataValue)) {
+        
+            //OK some data is apparently in the buffer and is valid
+            uint32_t dataIndexStart = dataIndex; //save the start index in case we have to flush the data because of errors
+            dataIndex += 2;                         //reserve two words for the ORCA header, we'll fill it in if we get valid data
 
-			if(isCaenHeader(dataValue)) {
-				//got a header, store it
-				data[dataIndex++] = dataValue;
-			}
-			else {
-				//error--flush buffer
-				flush_CAEN_Fifo(config,index);
-				return config->card_info[index].next_Card_Index;
-			}
-			
-			//read out the channel count
-			int n = caenDataChannelCount(dataValue); //decode the channel from the data word
-			int i;
-			for(i=0;i<n;i++){
-				result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
-				if (result != 4) {
-					LogBusError("CAEN 0x%0x fifo read",baseAddress);
-					dataIndex = dataIndexStart; //don't allow this data out.
-					return config->card_info[index].next_Card_Index;
-				}
-			
-				if(isValidCaenData(dataValue)){
-					data[dataIndex++] = dataValue;
-				}
-				else {
-					//oh-oh. big problems flush the buffer.
-					LogError("CAEN 0x%0x fifo flushed",baseAddress);
-					dataIndex = dataIndexStart; //don't allow this data out.
-					flush_CAEN_Fifo(config,index);
-					return config->card_info[index].next_Card_Index;
-				}
-			}
-						
-			//read the end of block
-			result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
-			if (result != 4) {
-				LogBusError("CAEN 0x%0x EOB read",baseAddress);
-				dataIndex = dataIndexStart; //don't allow this data out.
-			}
+            if(isCaenHeader(dataValue)) {
+                //got a header, store it
+                data[dataIndex++] = dataValue;
+            }
+            else {
+                //error--flush buffer
+                flush_CAEN_Fifo(config,index);
+                return config->card_info[index].next_Card_Index;
+            }
+            
+            //read out the channel count
+            int n = caenDataChannelCount(dataValue); //decode the channel from the data word
+            int i;
+            for(i=0;i<n;i++){
+                result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
+                if (result != 4) {
+                    LogBusError("CAEN 0x%0x fifo read",baseAddress);
+                    dataIndex = dataIndexStart; //don't allow this data out.
+                    return config->card_info[index].next_Card_Index;
+                }
+            
+                if(isValidCaenData(dataValue)){
+                    data[dataIndex++] = dataValue;
+                }
+                else {
+                    //oh-oh. big problems flush the buffer.
+                    LogError("CAEN 0x%0x fifo flushed",baseAddress);
+                    dataIndex = dataIndexStart; //don't allow this data out.
+                    flush_CAEN_Fifo(config,index);
+                    return config->card_info[index].next_Card_Index;
+                }
+            }
+                        
+            //read the end of block
+            result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
+            if (result != 4) {
+                LogBusError("CAEN 0x%0x EOB read",baseAddress);
+                dataIndex = dataIndexStart; //don't allow this data out.
+            }
 
-			if(isCaenEndOfBlock(dataValue)){
-				data[dataIndex++] = dataValue;
-				//OK, it looks like this data block is valid, so fill in the header
-				data[dataIndexStart] = dataId |  ((dataIndex-dataIndexStart) & 0x3ffff);
-				data[dataIndexStart+1] = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
-			}
-			else {
-				//error...the end of block not where we expected it
-				LogError("CAEN 0x%0x fifo flushed",baseAddress);
-				dataIndex = dataIndexStart; //don't allow this data out.
-				flush_CAEN_Fifo(config,index);
-			}
-		}
-	}
+            if(isCaenEndOfBlock(dataValue)){
+                data[dataIndex++] = dataValue;
+                //OK, it looks like this data block is valid, so fill in the header
+                data[dataIndexStart] = dataId |  ((dataIndex-dataIndexStart) & 0x3ffff);
+                data[dataIndexStart+1] = ((crate&0x0000000f)<<21) | ((slot& 0x0000001f)<<16);
+            }
+            else {
+                //error...the end of block not where we expected it
+                LogError("CAEN 0x%0x fifo flushed",baseAddress);
+                dataIndex = dataIndexStart; //don't allow this data out.
+                flush_CAEN_Fifo(config,index);
+            }
+        }
+    }
 
     return config->card_info[index].next_Card_Index;
 }
 
 void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index)
 {
-    uint32_t fifoSize		  = config->card_info[index].deviceSpecificData[3];
+    uint32_t fifoSize          = config->card_info[index].deviceSpecificData[3];
     uint32_t fifoAddress      = config->card_info[index].base_add + config->card_info[index].deviceSpecificData[4];
-	
+    
     int i;
     unsigned long dataValue;
     for(i=0;i<fifoSize;i++){
-		int result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
-		if (result != 4) {
-			LogBusError("CAEN 0x%0x Couldn't flush fifo",config->card_info[index].base_add);
-			break;
-		}
-	}
+        int result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
+        if (result != 4) {
+            LogBusError("CAEN 0x%0x Couldn't flush fifo",config->card_info[index].base_add);
+            break;
+        }
+    }
 }
 
 /*************************************************************/
@@ -711,12 +711,12 @@ int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
 
     SBC_Packet lamPacket;
     lamPacket.cmdHeader.destination             = kSBC_Process;
-    lamPacket.cmdHeader.cmdID					= kSBC_LAM;
-    lamPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_LAM_Data);
-	
+    lamPacket.cmdHeader.cmdID                    = kSBC_LAM;
+    lamPacket.cmdHeader.numberBytesinPayload    = sizeof(SBC_LAM_Data);
+    
     memcpy(&lamPacket.payload, lamData, sizeof(SBC_LAM_Data));
     postLAM(&lamPacket);
-	
+    
     return config->card_info[index].next_Card_Index;
 }            
 
