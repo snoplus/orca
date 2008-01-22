@@ -22,17 +22,41 @@
 #pragma mark •••Imported Files
 #import "ORDataChainObject.h"
 
+#define kNumScriptArgs 5
+
+
 #pragma mark •••Forward Declarations
 @class ORDataPacket;
 @class ORFilterClient;
+@class ORScriptRunner;
 
 @interface ORFilterModel :  ORDataChainObject 
 {
     @private
-		NSData*         dataHeader;
+		NSData*				dataHeader;
+		NSString*			lastFile;
+		NSString*			script;
+		ORScriptRunner*		scriptRunner;
+		NSString*			scriptName;
+		BOOL				parsedOK;
+		NSMutableArray*		args;
+		id					inputValue;
 }
 
 #pragma mark •••Accessors
+- (NSString*) lastFile;
+- (void) setLastFile:(NSString*)aFile;
+- (NSString*) script;
+- (void) setScript:(NSString*)aString;
+- (void) setScriptNoNote:(NSString*)aString;
+- (NSString*) scriptName;
+- (void) setScriptName:(NSString*)aString;
+- (BOOL) parsedOK;
+- (id) arg:(int)index;
+- (void) setArg:(int)index withValue:(id)aValue;
+- (ORScriptRunner*) scriptRunner;
+- (id)		inputValue;
+- (void)	setInputValue:(id)aValue;
 
 #pragma mark •••Data Handling
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
@@ -40,8 +64,22 @@
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
+#pragma mark ***Script Methods
+- (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
+- (void) parseScript;
+- (void) runScript;
+- (BOOL) running;
+- (void) stopScript;
+- (void) saveFile;
+- (void) loadScriptFromFile:(NSString*)aFilePath;
+- (void) saveScriptToFile:(NSString*)aFilePath;
+
 @end
 
 extern NSString* ORFilterLock;
-
+extern NSString* ORFilterLastFileChanged;
+extern NSString* ORFilterNameChanged;
+extern NSString* ORFilterArgsChanged;
+extern NSString* ORFilterLastFileChangedChanged;
+extern NSString* ORFilterScriptChanged;
 

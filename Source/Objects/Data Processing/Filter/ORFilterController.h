@@ -18,19 +18,50 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@class ORTimedTextField;
+@class ORScriptView;
 
 @interface ORFilterController : OrcaObjectController {
 
-    IBOutlet NSButton*      lockButton;
- }
+	IBOutlet ORScriptView*		scriptView;
+    IBOutlet NSButton*			lockButton;
+ 	IBOutlet NSView*			argsView;
+	IBOutlet NSTextView*		helpView;
+	IBOutlet ORTimedTextField*	statusField;
+	IBOutlet NSView*			panelView;
+	IBOutlet NSMatrix*			argsMatrix;
+	IBOutlet id					loadSaveView;
+    IBOutlet NSTextField*		lastFileField;
+    IBOutlet NSTextField*		lastFileField1;
+    IBOutlet NSTextField*		classNameField;
+	IBOutlet NSTextField*		runStatusField;
+	IBOutlet NSButton*			runButton;
+	IBOutlet NSButton*			loadSaveButton;
+}
 
 #pragma mark •••Initialization
 - (void) registerNotificationObservers;
 
-#pragma mark •••Accessors
+#pragma mark •••Interface Management
+- (void) scriptChanged:(NSNotification*)aNote;
+- (void) runningChanged:(NSNotification*)aNote;
+- (void) textDidChange:(NSNotification*)aNote;
+- (void) argsChanged:(NSNotification*)aNote;
+- (void) errorChanged:(NSNotification*)aNote;
+- (void) lastFileChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id)sender;
+- (IBAction) listMethodsAction:(id) sender;
+- (IBAction) cancelLoadSaveAction:(id)sender;
+- (IBAction) parseScript:(id) sender;	
+- (IBAction) runScript:(id) sender;
+- (IBAction) nameAction:(id) sender;
+- (IBAction) argAction:(id) sender;
+- (IBAction) loadSaveAction:(id)sender;
+- (IBAction) loadFileAction:(id) sender;
+- (IBAction) saveAsFileAction:(id) sender;
+- (IBAction) saveFileAction:(id) sender;
 
 #pragma mark •••Interface Management
 - (void) lockChanged:(NSNotification*)aNotification;

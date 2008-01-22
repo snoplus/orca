@@ -22,9 +22,16 @@
 #pragma mark •••Imported Files
 #import "ORFilterModel.h"
 #import "ORDataPacket.h"
+#import "ORScriptRunner.h"
 
 static NSString* ORFilterInConnector 		= @"Filter In Connector";
 static NSString* ORFilterOutConnector 		= @"Filter Out Connector";
+NSString* ORFilterLastFileChanged			= @"ORFilterLastFileChanged";
+NSString* ORFilterNameChanged				= @"ORFilterNameChanged";
+NSString* ORFilterArgsChanged				= @"ORFilterArgsChanged";
+NSString* ORFilterBreakChainChanged			= @"ORFilterBreakChainChanged";
+NSString* ORFilterLastFileChangedChanged	= @"ORFilterLastFileChangedChanged";
+NSString* ORFilterScriptChanged				= @"ORFilterScriptChanged";
 
 NSString* ORFilterLock                      = @"ORFilterLock";
 
@@ -70,6 +77,31 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 }
 
 #pragma mark •••Accessors
+- (id) inputValue
+{
+	return inputValue;
+}
+
+- (void) setInputValue:(id)aValue
+{
+	[aValue retain];
+	[inputValue release];
+	inputValue = aValue;
+}
+
+- (NSString*) lastFile
+{
+	return lastFile;
+}
+
+- (void) setLastFile:(NSString*)aFile
+{
+	if(!aFile)aFile = [[NSHomeDirectory() stringByAppendingPathComponent:@"Untitled"] stringByExpandingTildeInPath];
+	[[[self undoManager] prepareWithInvocationTarget:self] setLastFile:lastFile];
+    [lastFile autorelease];
+    lastFile = [aFile copy];		
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterLastFileChangedChanged object:self];
+}
 
 #pragma mark •••Data Handling
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
@@ -94,6 +126,147 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 	dataHeader = nil;
 }
 
+- (NSString*) script
+{
+	return script;
+}
+
+- (void) setScript:(NSString*)aString
+{
+	if(!aString)aString= @"";
+    //[[[self undoManager] prepareWithInvocationTarget:self] setScript:script];
+    [script autorelease];
+    script = [aString copy];	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterScriptChanged object:self];
+}
+
+- (void) setScriptNoNote:(NSString*)aString
+{
+    [script autorelease];
+    script = [aString copy];	
+}
+
+- (NSString*) scriptName
+{
+	return scriptName;
+}
+
+- (void) setScriptName:(NSString*)aString
+{
+	if(!aString)aString = @"OrcaScript";
+    [[[self undoManager] prepareWithInvocationTarget:self] setScriptName:scriptName];
+    [scriptName autorelease];
+    scriptName = [aString copy];	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterNameChanged object:self];
+}
+
+- (id) arg:(int)index
+{
+	if(index>=0 && index<[args count])return [args objectAtIndex:index];
+	else return nil;
+}
+
+- (void) setArg:(int)index withValue:(id)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setArg:index withValue:[self arg:index]];
+	[args replaceObjectAtIndex:index withObject:aValue];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterArgsChanged object:self];
+}
+#pragma mark ***Script Methods
+- (ORScriptRunner*) scriptRunner
+{
+	return scriptRunner;
+}
+- (BOOL) parsedOK
+{
+	return parsedOK;
+}
+
+- (void) parseScript
+{
+	parsedOK = YES;
+	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
+	if(![scriptRunner running]){
+		[scriptRunner setScriptName:scriptName];
+		[scriptRunner parse:script];
+		parsedOK = [scriptRunner parsedOK];
+		if(([[NSApp currentEvent] modifierFlags] & 0x80000)>0){
+			//option key is down
+			[scriptRunner printAll];
+		}
+		[scriptRunner release];
+		scriptRunner = nil;
+	}
+}
+
+- (void) runScript
+{
+	parsedOK = YES;
+	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
+	if(![scriptRunner running]){
+		[scriptRunner setScriptName:scriptName];
+		[scriptRunner setInputValue:inputValue];
+		[scriptRunner parse:script];
+		parsedOK = [scriptRunner parsedOK];
+		if(parsedOK){
+			[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
+			[scriptRunner evaluateAll:args];
+		}
+	}
+	else {
+		[scriptRunner stop];
+		[scriptRunner release];
+		scriptRunner = nil;
+	}
+}
+
+
+- (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue
+{
+	[self setInputValue:nil];
+	if(normalFinish){
+		ORFilterModel* nextFilter =  [self objectConnectedTo: ORFilterOutConnector];
+		[nextFilter setInputValue:aValue];
+		[nextFilter runScript];
+	}
+	if(normalFinish)NSLog(@"[%@] Returned with: %@\n",[scriptRunner scriptName],aValue);
+	else NSLogColor([NSColor redColor],@"[%@] Abnormal exit!\n",[scriptRunner scriptName]);
+
+}
+
+- (void) stopScript
+{
+	[scriptRunner stop];
+	[scriptRunner release];
+	scriptRunner = nil;
+}
+
+- (BOOL) running
+{
+	return [scriptRunner running];
+}
+
+- (void) loadScriptFromFile:(NSString*)aFilePath
+{
+	[self setLastFile:aFilePath];
+	[self setScript:[NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]]];
+}
+
+- (void) saveFile
+{
+	[self saveScriptToFile:lastFile];
+}
+
+- (void) saveScriptToFile:(NSString*)aFilePath
+{
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath:[aFilePath stringByExpandingTildeInPath]]){
+		[fm removeFileAtPath:[aFilePath stringByExpandingTildeInPath] handler:nil];
+	}
+	NSData* theData = [script dataUsingEncoding:NSASCIIStringEncoding];
+	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
+	[self setLastFile:aFilePath];
+}
 
 #pragma mark •••Archival
 
@@ -101,7 +274,20 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [[self undoManager] enableUndoRegistration];
+	[self setScript:[decoder decodeObjectForKey:@"script"]];
+    [self setScriptName:[decoder decodeObjectForKey:@"scriptName"]];
+    [self setLastFile:[decoder decodeObjectForKey:@"lastFile"]];
+    args = [[decoder decodeObjectForKey:@"args"] retain];
+
+	if(!args){
+		args = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<kNumScriptArgs;i++){
+			[args addObject:[NSDecimalNumber zero]];
+		}
+	}
+	
+	[[self undoManager] enableUndoRegistration];
     
     return self;
 }
@@ -109,6 +295,10 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:script forKey:@"script"];
+    [encoder encodeObject:scriptName forKey:@"scriptName"];
+    [encoder encodeObject:args forKey:@"args"];
+    [encoder encodeObject:lastFile forKey:@"lastFile"];
 }
 
 

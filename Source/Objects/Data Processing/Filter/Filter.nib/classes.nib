@@ -42,7 +42,27 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>argAction</key>
+				<string>id</string>
+				<key>cancelLoadSaveAction</key>
+				<string>id</string>
+				<key>listMethodsAction</key>
+				<string>id</string>
+				<key>loadFileAction</key>
+				<string>id</string>
+				<key>loadSaveAction</key>
+				<string>id</string>
 				<key>lockAction</key>
+				<string>id</string>
+				<key>nameAction</key>
+				<string>id</string>
+				<key>parseScript</key>
+				<string>id</string>
+				<key>runScript</key>
+				<string>id</string>
+				<key>saveAsFileAction</key>
+				<string>id</string>
+				<key>saveFileAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -51,11 +71,69 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>argsMatrix</key>
+				<string>NSMatrix</string>
+				<key>argsView</key>
+				<string>NSView</string>
+				<key>classNameField</key>
+				<string>NSTextField</string>
+				<key>helpView</key>
+				<string>NSTextView</string>
+				<key>lastFileField</key>
+				<string>NSTextField</string>
+				<key>lastFileField1</key>
+				<string>NSTextField</string>
+				<key>loadSaveButton</key>
+				<string>NSButton</string>
+				<key>loadSaveView</key>
+				<string>id</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
+				<key>panelView</key>
+				<string>NSView</string>
+				<key>runButton</key>
+				<string>NSButton</string>
+				<key>runStatusField</key>
+				<string>NSTextField</string>
+				<key>scriptView</key>
+				<string>ORScriptView</string>
+				<key>statusField</key>
+				<string>ORTimedTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>recolorCompleteFile</key>
+				<string>id</string>
+				<key>recolorCompleteFileDeferred</key>
+				<string>id</string>
+				<key>recolorSyntaxTimer</key>
+				<string>NSTimer</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>toggleAutoSyntaxColoring</key>
+				<string>id</string>
+				<key>toggleMaintainIndentation</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORScriptView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>progress</key>
+				<string>NSProgressIndicator</string>
+				<key>status</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSTextView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
