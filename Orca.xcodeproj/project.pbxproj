@@ -1280,6 +1280,12 @@
 		84A4EE740C2C5D0A00CBC222 /* ORAcqirisDC440Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A4EE6E0C2C5D0900CBC222 /* ORAcqirisDC440Model.m */; };
 		84A5A22A0B35D8B0002EC2AA /* ORDetectorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A5A2290B35D8B0002EC2AA /* ORDetectorView.m */; };
 		84A5A22C0B35D8C7002EC2AA /* ORDetectorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A5A22B0B35D8C7002EC2AA /* ORDetectorView.h */; };
+		84A5CD590D464F4600D9833C /* Filter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84A5CD530D464F4600D9833C /* Filter.nib */; };
+		84A5CD5A0D464F4600D9833C /* Filter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84A5CD540D464F4600D9833C /* Filter.tif */; };
+		84A5CD5B0D464F4600D9833C /* ORFilterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A5CD550D464F4600D9833C /* ORFilterController.h */; };
+		84A5CD5C0D464F4600D9833C /* ORFilterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A5CD560D464F4600D9833C /* ORFilterController.m */; };
+		84A5CD5D0D464F4600D9833C /* ORFilterModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A5CD570D464F4600D9833C /* ORFilterModel.h */; };
+		84A5CD5E0D464F4600D9833C /* ORFilterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A5CD580D464F4600D9833C /* ORFilterModel.m */; };
 		84A5F05F0AB0D9D800A623AF /* ORTRS1Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A5F05D0AB0D9D800A623AF /* ORTRS1Decoders.h */; };
 		84A5F0600AB0D9D800A623AF /* ORTRS1Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84A5F05E0AB0D9D800A623AF /* ORTRS1Decoders.m */; };
 		84A8B1460D35702300263D31 /* ORSBC_LAMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84A8B1400D35702300263D31 /* ORSBC_LAMController.h */; };
@@ -2756,6 +2762,12 @@
 		84A4EE6E0C2C5D0900CBC222 /* ORAcqirisDC440Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAcqirisDC440Model.m; sourceTree = "<group>"; };
 		84A5A2290B35D8B0002EC2AA /* ORDetectorView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDetectorView.m; path = Source/Experiments/BaseClasses/ORDetectorView.m; sourceTree = SOURCE_ROOT; };
 		84A5A22B0B35D8C7002EC2AA /* ORDetectorView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDetectorView.h; path = Source/Experiments/BaseClasses/ORDetectorView.h; sourceTree = SOURCE_ROOT; };
+		84A5CD530D464F4600D9833C /* Filter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Filter.nib; path = "Source/Objects/Data Processing/Filter/Filter.nib"; sourceTree = SOURCE_ROOT; };
+		84A5CD540D464F4600D9833C /* Filter.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Filter.tif; path = "Source/Objects/Data Processing/Filter/Filter.tif"; sourceTree = SOURCE_ROOT; };
+		84A5CD550D464F4600D9833C /* ORFilterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFilterController.h; path = "Source/Objects/Data Processing/Filter/ORFilterController.h"; sourceTree = SOURCE_ROOT; };
+		84A5CD560D464F4600D9833C /* ORFilterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFilterController.m; path = "Source/Objects/Data Processing/Filter/ORFilterController.m"; sourceTree = SOURCE_ROOT; };
+		84A5CD570D464F4600D9833C /* ORFilterModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFilterModel.h; path = "Source/Objects/Data Processing/Filter/ORFilterModel.h"; sourceTree = SOURCE_ROOT; };
+		84A5CD580D464F4600D9833C /* ORFilterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFilterModel.m; path = "Source/Objects/Data Processing/Filter/ORFilterModel.m"; sourceTree = SOURCE_ROOT; };
 		84A5F05D0AB0D9D800A623AF /* ORTRS1Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORTRS1Decoders.h; path = Source/Objects/Hardware/Camac/TRS1/ORTRS1Decoders.h; sourceTree = SOURCE_ROOT; };
 		84A5F05E0AB0D9D800A623AF /* ORTRS1Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORTRS1Decoders.m; path = Source/Objects/Hardware/Camac/TRS1/ORTRS1Decoders.m; sourceTree = SOURCE_ROOT; };
 		84A8B1400D35702300263D31 /* ORSBC_LAMController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSBC_LAMController.h; path = Source/Objects/Hardware/SBC/SBC_LAM/ORSBC_LAMController.h; sourceTree = SOURCE_ROOT; };
@@ -5897,6 +5909,20 @@
 			path = AcqirisDC440;
 			sourceTree = "<group>";
 		};
+		84A5CD520D464F4600D9833C /* Filter */ = {
+			isa = PBXGroup;
+			children = (
+				84A5CD530D464F4600D9833C /* Filter.nib */,
+				84A5CD540D464F4600D9833C /* Filter.tif */,
+				84A5CD550D464F4600D9833C /* ORFilterController.h */,
+				84A5CD560D464F4600D9833C /* ORFilterController.m */,
+				84A5CD570D464F4600D9833C /* ORFilterModel.h */,
+				84A5CD580D464F4600D9833C /* ORFilterModel.m */,
+			);
+			name = Filter;
+			path = "Source/Objects/Data Processing/Filter";
+			sourceTree = SOURCE_ROOT;
+		};
 		84A8B13F0D35702300263D31 /* SBC_LAM */ = {
 			isa = PBXGroup;
 			children = (
@@ -5974,6 +6000,7 @@
 				84CFB092042A7F8F005F64B1 /* Data Storage */,
 				84C6071103C25C5E005F64B1 /* Data Objects */,
 				84C6072003C25C9F005F64B1 /* Histogram Objects */,
+				84A5CD520D464F4600D9833C /* Filter */,
 			);
 			name = "Data Processing";
 			path = "Source/Objects/Data Processing";
@@ -8008,6 +8035,8 @@
 				84A8B1480D35702300263D31 /* ORSBC_LAMModel.h in Headers */,
 				84A8B14F0D35703300263D31 /* SBCLamView.h in Headers */,
 				84A8B1530D35704900263D31 /* VME_Trigger32.h in Headers */,
+				84A5CD5B0D464F4600D9833C /* ORFilterController.h in Headers */,
+				84A5CD5D0D464F4600D9833C /* ORFilterModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8503,6 +8532,8 @@
 				84AB8BD10D2314DD00EC39F2 /* JAMF.nib in Resources */,
 				84A8B14A0D35702300263D31 /* SBC_LAM.gif in Resources */,
 				84A8B14B0D35702300263D31 /* SBC_LAM.nib in Resources */,
+				84A5CD590D464F4600D9833C /* Filter.nib in Resources */,
+				84A5CD5A0D464F4600D9833C /* Filter.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9080,6 +9111,8 @@
 				84A8B1470D35702300263D31 /* ORSBC_LAMController.m in Sources */,
 				84A8B1490D35702300263D31 /* ORSBC_LAMModel.m in Sources */,
 				84A8B14E0D35703300263D31 /* SBCLamView.m in Sources */,
+				84A5CD5C0D464F4600D9833C /* ORFilterController.m in Sources */,
+				84A5CD5E0D464F4600D9833C /* ORFilterModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
