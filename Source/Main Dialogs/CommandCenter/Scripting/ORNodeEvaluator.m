@@ -60,8 +60,6 @@
 - (id)		doAssign:(id)p op:(int)opr;
 - (id)		postAlarm:(id)p;
 - (id)		clearAlarm:(id)p;
-- (id)		c1ArgFunction:(void*)afunc name:(NSString*)functionName  args:(NSArray*)valueArray;
-- (id)		c2ArgFunction:(void*)afunc name:(NSString*)functionName  args:(NSArray*)valueArray;
 - (id)		extractValue:(int)index name:(NSString*)functionName args:(NSArray*)valueArray;
 - (NSMutableDictionary*) makeSymbolTable;
 @end
@@ -82,6 +80,7 @@
 		_one  = [[NSDecimalNumber one] retain];
 		_zero = [[NSDecimalNumber zero] retain];
 		switchLevel = 0;
+		[self setUpSysCallTable];
 	}  
 	return self;  
 }
@@ -95,6 +94,7 @@
 	[_one release];
 	[_zero release];
 	[parsedNodes release];
+	[sysCallTable release];
 	[super dealloc];
 }
 
@@ -122,6 +122,28 @@
 }
 
 #pragma mark •••Symbol Table Routines
+
+- (void) setUpSysCallTable
+{
+	if(sysCallTable)[sysCallTable release];
+	sysCallTable = [[NSMutableDictionary dictionary] retain];
+	[sysCallTable setObject:[ORSysCall sysCall:&powf name:@"pow" numArgs:2 ] forKey:@"pow"];
+	[sysCallTable setObject:[ORSysCall sysCall:&sqrtf name:@"sqrt" numArgs:1 ] forKey:@"sqrt"];
+	[sysCallTable setObject:[ORSysCall sysCall:&ceilf name:@"ceil" numArgs:1 ] forKey:@"ceil"];
+	[sysCallTable setObject:[ORSysCall sysCall:&floorf name:@"floor" numArgs:1 ] forKey:@"floor"];
+	[sysCallTable setObject:[ORSysCall sysCall:&roundf name:@"round" numArgs:1 ] forKey:@"round"];
+	[sysCallTable setObject:[ORSysCall sysCall:&cosf name:@"cos" numArgs:1 ] forKey:@"cos"];
+	[sysCallTable setObject:[ORSysCall sysCall:&sinf name:@"sin" numArgs:1 ] forKey:@"sin"];
+	[sysCallTable setObject:[ORSysCall sysCall:&tanf name:@"tan" numArgs:1 ] forKey:@"tan"];
+	[sysCallTable setObject:[ORSysCall sysCall:&acosf name:@"acos" numArgs:1 ] forKey:@"acos"];
+	[sysCallTable setObject:[ORSysCall sysCall:&asinf name:@"asin" numArgs:1 ] forKey:@"asin"];
+	[sysCallTable setObject:[ORSysCall sysCall:&atanf name:@"atan" numArgs:1 ] forKey:@"atan"];
+	[sysCallTable setObject:[ORSysCall sysCall:&abs name:@"abs" numArgs:1 ] forKey:@"abs"];
+	[sysCallTable setObject:[ORSysCall sysCall:&expf name:@"exp" numArgs:1 ] forKey:@"exp"];
+	[sysCallTable setObject:[ORSysCall sysCall:&logf name:@"log" numArgs:1 ] forKey:@"log"];
+	[sysCallTable setObject:[ORSysCall sysCall:&log10f name:@"log10" numArgs:1 ] forKey:@"log10"];
+}
+
 - (void) setArgs:(NSArray*)someArgs
 {
 
@@ -336,6 +358,7 @@
 @end
 
 @implementation ORNodeEvaluator (Interpret_private)
+
 - (id) doOperation:(id) p container:(id)aContainer
 {
 	NSComparisonResult result;
@@ -665,22 +688,8 @@
 		[anEvaluator release];
 	}
 	else {
-		//could be a unix call -- check for the ones we support
-		if([functionName isEqualToString:@"pow"])			return [self c2ArgFunction:&powf	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"sqrt"])		return [self c1ArgFunction:&sqrtf	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"ceil"])		return [self c1ArgFunction:&ceilf	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"floor"])	return [self c1ArgFunction:&floorf	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"round"])	return [self c1ArgFunction:&roundf	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"cos"])		return [self c1ArgFunction:&cos		name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"sin"])		return [self c1ArgFunction:&sin		name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"tan"])		return [self c1ArgFunction:&tan		name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"acos"])		return [self c1ArgFunction:&acos	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"asin"])		return [self c1ArgFunction:&asin	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"atan"])		return [self c1ArgFunction:&atan	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"abs"])		return [self c1ArgFunction:&fabs	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"exp"])		return [self c1ArgFunction:&expf	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"log"])		return [self c1ArgFunction:&logf	name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"log10"])	return [self c1ArgFunction:&log10f	name:functionName	args:argObject];
+		ORSysCall* aCall = [sysCallTable objectForKey:functionName];
+		if(aCall) return [aCall executeWithArgs:argObject];
 		else if([functionName isEqualToString:@"pointx"])   return [self extractValue:0			name:functionName	args:argObject];
 		else if([functionName isEqualToString:@"pointy"])   return [self extractValue:1			name:functionName	args:argObject];
 		else if([functionName isEqualToString:@"rectx"])    return [self extractValue:0			name:functionName	args:argObject];
@@ -696,7 +705,6 @@
 		
 	return returnValue;
 }
-
 
 - (id) defineArray:(id) p
 {
@@ -1006,39 +1014,6 @@
 	return nil; //never actually gets here.
 }
 
-- (id) c2ArgFunction:(void*)afunc name:(NSString*)functionName  args:(NSArray*)valueArray
-{
-
-	float (*pt2Func)(float,float);
-	pt2Func = afunc;
-	if([valueArray count] == 2){
-		float arg0 = [[valueArray objectAtIndex:0] floatValue];
-		float arg1 = [[valueArray objectAtIndex:1] floatValue];
-		return [NSDecimalNumber numberWithFloat:pt2Func(arg0,arg1)];
-	}
-	else {
-		NSLog(@"In %@, <%@> has wrong number of arguments. Check the syntax.\n",scriptName,functionName);
-		[NSException raise:@"Run time" format:@"Arg list error"];
-	}
-	return nil;
-}
-
-- (id) c1ArgFunction:(void*)afunc name:(NSString*)functionName args:(NSArray*)valueArray
-{
-
-	float (*pt1Func)(float);
-	pt1Func = afunc;
-	if([valueArray count] == 1){
-		float arg0 = [[valueArray objectAtIndex:0] floatValue];
-		return [NSDecimalNumber numberWithFloat:pt1Func(arg0)];
-	}
-	else {
-		NSLog(@"In %@, <%@> has wrong number of arguments. Check the syntax.\n",scriptName,functionName);
-		[NSException raise:@"Run time" format:@"Arg list error"];
-	}
-	return nil;
-}
-
 - (id) extractValue:(int)index name:(NSString*)functionName args:(NSArray*)valueArray
 {
 	id string = [valueArray objectAtIndex:0];
@@ -1237,6 +1212,54 @@
 		if(done)break;
 	}
 	return [lines componentsJoinedByString:@"\n"];
+}
+
+@end
+
+@implementation ORSysCall
++ (id) sysCall:(void*)aFuncPtr name:(NSString*)aFuncName obj:anObject numArgs:(int)aNumArgs 
+{
+    return [[[ORSysCall alloc] initWithCall:aFuncPtr name:aFuncName obj:anObject numArgs:aNumArgs] autorelease];
+}
+
++ (id) sysCall:(void*)aFuncPtr name:(NSString*)aFuncName  numArgs:(int)aNumArgs 
+{
+    return [[[ORSysCall alloc] initWithCall:aFuncPtr name:aFuncName  obj:nil numArgs:aNumArgs] autorelease];
+}
+
+- (id) initWithCall:(void*)afunc name:(NSString*)aFuncName obj:(id)anObj numArgs:(int)n 
+{
+	self = [super init];
+	funcPtr = (unsigned long*)afunc;
+	funcName = [aFuncName copy];
+	numArgs = n;
+	anObject = anObj;
+	return self;
+}
+
+- (void) dealloc
+{
+	[funcName release];
+	[super dealloc];
+}
+
+- (id) executeWithArgs:(NSArray*)valueArray
+{
+	float (*pt0Func)();
+	float (*pt1Func)(float);
+	float (*pt2Func)(float,float);
+	if(numArgs == [valueArray count]){
+		switch(numArgs){
+			case 0: pt0Func = funcPtr; return [NSDecimalNumber numberWithFloat:pt0Func()];
+			case 1: pt1Func = funcPtr; return [NSDecimalNumber numberWithFloat:pt1Func([[valueArray objectAtIndex:0] floatValue])];
+			case 2: pt2Func = funcPtr; return [NSDecimalNumber numberWithFloat:pt2Func([[valueArray objectAtIndex:0] floatValue],[[valueArray objectAtIndex:1] floatValue])];
+			default: return nil;
+		}
+	}
+	else {
+		[NSException raise:@"Run time" format:@"Arg list error in function: %@",funcName];
+	}
+	return nil;
 }
 
 @end

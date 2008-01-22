@@ -28,6 +28,7 @@
 	NSDecimalNumber*	 _zero;
 	NSString*			 scriptName;
 	NSDictionary*		 functionTable;
+	NSMutableDictionary* sysCallTable;
 	unsigned short       switchLevel;
 	id					 switchValue[256];
 	id					 delegate;
@@ -52,6 +53,7 @@
 - (void) setArgs:(NSArray*)someArgs;
 - (id) valueForSymbol:(NSString*) aSymbol;
 - (id) setValue:(id)aValue forSymbol:(id) aSymbol;
+- (void) setUpSysCallTable;
 
 #pragma mark •••Finders
 - (id) findObject:(id) p;
@@ -64,6 +66,24 @@
 - (void)	printAll:(NSArray*)someNodes;
 
 @end
+
+@interface ORSysCall : NSObject
+{
+	void* funcPtr;
+	NSString* funcName;
+	int numArgs;
+	id anObject;
+}
++(id) sysCall:(void*)aFuncPtr name:(NSString*)aFuncName numArgs:(int)aNumArgs;
++(id) sysCall:(void*)aFuncPtr name:(NSString*)aFuncName obj:(id)anObject numArgs:(int)aNumArgs;
+
+-(id) initWithCall:(void*)afunc name:(NSString*)aFuncName obj:(id)anObject numArgs:(int)n;
+- (id) executeWithArgs:(NSArray*)valueArray;
+
+
+@end
+
+
 @interface OrcaObject (ORNodeEvaluation)
 - (NSComparisonResult)compare:(NSNumber *)otherNumber;
 - (BOOL)	exitNow;

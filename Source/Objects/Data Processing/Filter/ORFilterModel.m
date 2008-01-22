@@ -23,6 +23,8 @@
 #import "ORFilterModel.h"
 #import "ORDataPacket.h"
 #import "ORScriptRunner.h"
+#import "ORSafeQueue.h"
+#import "ORDataPacket.h"
 
 static NSString* ORFilterInConnector 		= @"Filter In Connector";
 static NSString* ORFilterOutConnector 		= @"Filter Out Connector";
@@ -51,6 +53,10 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 
 -(void)dealloc
 {
+	if(transferDataPacket){
+		[transferDataPacket release];
+		transferDataPacket = nil;
+	}
     [super dealloc];
 }
 
@@ -106,24 +112,64 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 #pragma mark •••Data Handling
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
 {
-	//pass it on
-	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-	[theNextObject processData:someData userInfo:userInfo];
+	//put the data into a queue that is accessable from the filter task
+	[inputDataQueue enqueueArray:[someData dataArray]];
+
+	//magic happens here.... the filter task is running in another thread, processing data and 
+	//putting the results into the output queue....
+	
+	//for testing...
+	NSArray* testDataArray = [inputDataQueue dequeueArray];
+	[outputDataQueue enqueueArray:testDataArray];
+	
+	//pass on the filtered data
+	NSArray* theDataArray = [outputDataQueue dequeueArray];
+	if(theDataArray){
+		[transferDataPacket addDataFromArray:theDataArray];
+		id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
+		[theNextObject processData:transferDataPacket userInfo:nil];
+		[transferDataPacket clearData];
+	}
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {		
-	dataHeader = [[aDataPacket headerAsData] retain];
+	dataHeader		= [[aDataPacket headerAsData] retain];
+	inputDataQueue	= [[ORSafeQueue alloc] init];
+	outputDataQueue = [[ORSafeQueue alloc] init];
+
+	if(transferDataPacket){
+		[transferDataPacket release];
+		transferDataPacket = nil;
+	}
+    transferDataPacket  = [aDataPacket copy];
+    [transferDataPacket generateObjectLookup];	//MUST be done before data header in the copy will work.
+    [transferDataPacket clearData];	
+
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+
 }
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	//pass any data left in the output queue
+	NSArray* theDataArray = [outputDataQueue dequeueArray];
+	if(theDataArray){
+		[transferDataPacket addDataFromArray:theDataArray];
+		id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
+		[theNextObject processData:transferDataPacket userInfo:nil];
+		[transferDataPacket clearData];
+	}
 	[dataHeader release];
 	dataHeader = nil;
+	[inputDataQueue release];
+	inputDataQueue = nil;
+	[outputDataQueue release];
+	outputDataQueue = nil;
+	
 }
 
 - (NSString*) script
@@ -210,7 +256,7 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 		parsedOK = [scriptRunner parsedOK];
 		if(parsedOK){
 			[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
-			[scriptRunner evaluateAll:args];
+			[scriptRunner run:args sender:self];
 		}
 	}
 	else {
@@ -224,11 +270,6 @@ NSString* ORFilterLock                      = @"ORFilterLock";
 - (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue
 {
 	[self setInputValue:nil];
-	if(normalFinish){
-		ORFilterModel* nextFilter =  [self objectConnectedTo: ORFilterOutConnector];
-		[nextFilter setInputValue:aValue];
-		[nextFilter runScript];
-	}
 	if(normalFinish)NSLog(@"[%@] Returned with: %@\n",[scriptRunner scriptName],aValue);
 	else NSLogColor([NSColor redColor],@"[%@] Abnormal exit!\n",[scriptRunner scriptName]);
 

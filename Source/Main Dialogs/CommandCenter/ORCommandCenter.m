@@ -40,7 +40,7 @@ static ORCommandCenter *instance = nil;
 
 + (id) sharedInstance
 {
-    if ( instance == nil ) instance = [[self alloc] init];
+    if ( instance == nil ) instance = [[ORCommandCenter alloc] init];
     return instance;
 }
 
@@ -597,7 +597,7 @@ static ORCommandCenter *instance = nil;
 		parsedOK = [scriptRunner parsedOK];
 		if(parsedOK){
 			[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
-			[scriptRunner evaluateAll:args];
+			[scriptRunner run:args sender:self];
 		}
 	}
 	else {

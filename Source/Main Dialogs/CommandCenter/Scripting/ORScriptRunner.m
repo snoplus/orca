@@ -123,9 +123,9 @@ int yyYYINPUT(char* theBuffer,int maxSize)
 	return running;
 }
 
-- (void) run:(NSArray*)someArgs
+- (void) run:(NSArray*)someArgs sender:(id)aSender
 {
-	if(!running)[self evaluateAll:someArgs];
+	if(!running)[self evaluateAll:someArgs sender:aSender];
 }
 
 - (void) stop
@@ -215,7 +215,7 @@ int yyYYINPUT(char* theBuffer,int maxSize)
 	[eval setArgs:someArgs];
 }
 
-- (void) evaluateAll:(NSArray*)someArgs;
+- (void) evaluateAll:(NSArray*)someArgs sender:(id)aSender;
 {
 	if(!running){
 		exitNow	   = NO;

@@ -166,7 +166,7 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
 			if(newSetState == 1 && [scriptPath length]>0){
 				if(![scriptRunner running]){
 					[scriptRunner parseFile:scriptPath];
-					[scriptRunner run:nil];
+					[scriptRunner run:nil sender:self];
 				}
 			}
 			else {

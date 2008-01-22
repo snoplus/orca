@@ -324,7 +324,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 		parsedOK = [scriptRunner parsedOK];
 		if(parsedOK){
 			[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
-			[scriptRunner evaluateAll:args];
+			[scriptRunner run:args sender:self];
 		}
 	}
 	else {
