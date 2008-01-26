@@ -394,9 +394,10 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 		NSArray* dataArray = [aDataPacket dataArray];
 		int i;
 		int n = [dataArray count];
-		NSMutableData* theData = [NSMutableData dataWithCapacity:500000];
+		NSMutableData* theData = [[NSMutableData alloc] initWithCapacity:500000];
 		for(i=0;i<n;i++)[theData appendData: [dataArray objectAtIndex:i]];
 		if([theData length]>0)[clients makeObjectsPerformSelector:@selector(writeData:) withObject:theData];
+        [theData release];
 	}    
 }
 
