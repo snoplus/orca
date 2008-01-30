@@ -376,7 +376,8 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	NSEnumerator* e = [filesToReplay objectEnumerator];
 	id aFile;
 	while(aFile = [e nextObject]){
-
+		if(stop)break;
+		
 		[self performSelectorOnMainThread:@selector(setFileToReplay:) withObject:aFile waitUntilDone:YES];
 
 		NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
