@@ -316,7 +316,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 {
 	stop = YES;
     [fileAsDataPacket setStopDecodeIntoArray:YES];
-    [self replayFinished];
+    //[self replayFinished];
     NSLog(@"Replay stopped manually\n");
 }
 
