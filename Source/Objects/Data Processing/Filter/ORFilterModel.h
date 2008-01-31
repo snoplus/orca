@@ -39,12 +39,19 @@
 		NSString*			script;
 		ORScriptRunner*		scriptRunner;
 		NSString*			scriptName;
-		BOOL				parsedOK;
 		NSMutableArray*		args;
 		id					inputValue;
 		ORDataPacket*		transferDataPacket;
 		ORSafeQueue*		inputDataQueue;
 		ORSafeQueue*		outputDataQueue;
+		
+		BOOL				stopThread;
+		BOOL				running;
+		BOOL				parsedOK;
+		BOOL				normalExit;
+		unsigned			yaccInputPosition;
+		NSData*				expressionAsData;
+		BOOL				exitNow;
 }
 
 #pragma mark •••Accessors
@@ -61,6 +68,7 @@
 - (ORScriptRunner*) scriptRunner;
 - (id)		inputValue;
 - (void)	setInputValue:(id)aValue;
+- (BOOL)	exitNow;
 
 #pragma mark •••Data Handling
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
@@ -77,6 +85,16 @@
 - (void) saveFile;
 - (void) loadScriptFromFile:(NSString*)aFilePath;
 - (void) saveScriptToFile:(NSString*)aFilePath;
+- (long) hello:(long)aValue;
+
+#pragma mark •••Parsers
+- (void) parseFile:(NSString*)aPath;
+- (BOOL) parsedOK;
+- (void) parse:(NSString*)theString;
+
+#pragma mark •••Yacc Input
+- (void) setString:(NSString* )theString;
+- (int) yyinputToBuffer:(char* )theBuffer withSize:(int)maxSize;
 
 @end
 
