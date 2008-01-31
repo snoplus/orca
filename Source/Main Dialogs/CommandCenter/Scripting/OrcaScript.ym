@@ -18,7 +18,7 @@ id stringNode(char* aString);
 int yylex(void);
 NSMutableDictionary* functionList = nil;
 NSMutableArray* nodeList = nil;
-extern void yyerror(char *);
+extern void OrcaScripterror(char *);
 extern long num_lines;
 %}
 
@@ -81,7 +81,7 @@ statement
 		| iteration_statement		{ $$ = $1;}
 		| jump_statement			{ $$ = $1;}
 		| special_statement			{ $$ = $1;}
-		| VARIABLE ';'				{ yyerror ("unrecognized keyword"); return 1;}
+		| VARIABLE ';'				{ OrcaScripterror ("unrecognized keyword"); return 1;}
 		;
 
 special_statement 
@@ -203,8 +203,8 @@ postfix_expr
 		: primary_expr				{ $$ = $1;}
 		| postfix_expr INC_OP		{ $$ = executionNode(kPostInc,$1,nil);}
 		| postfix_expr DEC_OP		{ $$ = executionNode(kPostDec,$1,nil);}
-		| leftArrayElement INC_OP   { yyerror ("Array++ not allowed"); return 1;}
-		| leftArrayElement DEC_OP   { yyerror ("Array-- not allowed"); return 1;}
+		| leftArrayElement INC_OP   { OrcaScripterror ("Array++ not allowed"); return 1;}
+		| leftArrayElement DEC_OP   { OrcaScripterror ("Array-- not allowed"); return 1;}
 		;
 
 unary_expr

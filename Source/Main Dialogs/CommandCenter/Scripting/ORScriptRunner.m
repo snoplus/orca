@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORDocument.h"
 #import "ORScriptRunner.h"
 #import "NodeTree.h"
@@ -28,14 +27,14 @@ NSString* ORScriptRunnerRunningChanged = @"ORScriptRunnerRunningChanged";
 NSString* ORScriptRunnerParseError	   = @"ORScriptRunnerParseError";
 //========================================================================
 #pragma mark ¥¥¥YACC interface
-#import "y.tab.h"
+#import "OrcaScript.tab.h"
 extern void yyreset_state();
-extern void yyrestart();
+extern void OrcaScriptrestart();
 extern long num_lines;
 extern id functionList;
-extern int yyparse();
+extern int OrcaScriptparse();
 ORScriptRunner* theScriptRunner = nil;
-int yyYYINPUT(char* theBuffer,int maxSize) 
+int OrcaScriptYYINPUT(char* theBuffer,int maxSize) 
 {
 	return [theScriptRunner yyinputToBuffer:theBuffer withSize:maxSize];
 }
@@ -162,13 +161,13 @@ int yyYYINPUT(char* theBuffer,int maxSize)
 		NS_DURING {
 			
 			yyreset_state();
-			yyrestart(NULL);
+			OrcaScriptrestart(NULL);
 			
 			theScriptRunner = self;
 			[self setString:theString];
 			
 			// Call the parser    
-			yyparse();
+			OrcaScriptparse();
 			if(functionList) {
 				NSLog(@"%d Lines Parsed Successfully\n",num_lines);
 				parsedOK = YES;

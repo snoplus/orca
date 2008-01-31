@@ -2,12 +2,9 @@
 #include <stdlib.h>
 #include "OrcaScript.h"
 #include <string.h>
-#include "y.tab.h"
-extern int yyYYINPUT(char* theBuffer,int maxSize);
-#undef YY_INPUT
-#define YY_INPUT(b,r,s) (r = yyYYINPUT(b,s))
+#include "OrcaScript.tab.h"
 
-void yyerror(char *);
+void OrcaScripterror(char *);
 void comment();
 void singleLineComment();
 void grabString();
@@ -25,28 +22,28 @@ E			[Ee][+-]?{D}+
 %%
 
 {D}+{E}?			{
-						strncpy(yylval.cString,yytext,yyleng);
-						yylval.cString[yyleng] = '\0';
+						strncpy(OrcaScriptlval.cString,yytext,yyleng);
+						OrcaScriptlval.cString[yyleng] = '\0';
 						return CONSTANT;
 					}
 					
 {D}*"."{D}+({E})	{
-						strncpy(yylval.cString,yytext,yyleng);
-						yylval.cString[yyleng] = '\0';
+						strncpy(OrcaScriptlval.cString,yytext,yyleng);
+						OrcaScriptlval.cString[yyleng] = '\0';
 						return CONSTANT;
 					}
 					
 {D}*"."{D}*({E})?	{
-						strncpy(yylval.cString,yytext,yyleng);
-						yylval.cString[yyleng] = '\0';
+						strncpy(OrcaScriptlval.cString,yytext,yyleng);
+						OrcaScriptlval.cString[yyleng] = '\0';
 						return CONSTANT;
 					}
 
 0[xX]{H}+			{
-						strncpy(yylval.cString,yytext,yyleng);
-						yylval.cString[yyleng] = '\0';
-						unsigned long n = strtoul(yylval.cString,0,16);
-						sprintf(yylval.cString,"%lu",n);
+						strncpy(OrcaScriptlval.cString,yytext,yyleng);
+						OrcaScriptlval.cString[yyleng] = '\0';
+						unsigned long n = strtoul(OrcaScriptlval.cString,0,16);
+						sprintf(OrcaScriptlval.cString,"%lu",n);
 						return CONSTANT;
 					}
 
@@ -104,8 +101,8 @@ E			[Ee][+-]?{D}+
 "logfile"		return LOGFILE;
 
 {L}({L}|{D})*   {
-                strncpy(yylval.symKey,yytext,yyleng);
-				yylval.symKey[yyleng] = '\0';
+                strncpy(OrcaScriptlval.symKey,yytext,yyleng);
+				OrcaScriptlval.symKey[yyleng] = '\0';
                 return VARIABLE;
 				}
 			
@@ -113,7 +110,7 @@ E			[Ee][+-]?{D}+
 
 \n				{++num_lines;}
 
-.               yyerror("Unknown character");
+.               OrcaScripterror("Unknown character");
 
 %%
 
@@ -123,7 +120,7 @@ int yywrap(void)
     return 1;
 }
 
-void yyerror(char* s)
+void OrcaScripterror(char* s)
 {
 	NSLog(@"<%s> line %d\n",s,num_lines+1);
 	[nodeList release];
@@ -137,9 +134,9 @@ void grabString()
 	int i=0;
 	char c;
 	while ((c = input()) != '"'){
-		yylval.cString[i++] = c;
+		OrcaScriptlval.cString[i++] = c;
 	}
-	yylval.cString[i] = '\0';
+	OrcaScriptlval.cString[i] = '\0';
 }
 
 void comment()

@@ -25,7 +25,7 @@
 #import "ORCard.h"
 #import "ORCamacCard.h"
 #import "NSInvocation+Extensions.h"
-#import "y.tab.h"
+#import "OrcaScript.tab.h"
 #import <math.h>
 #import "ORAlarmCollection.h"
 
@@ -122,26 +122,26 @@
 }
 
 #pragma mark •••Symbol Table Routines
-
 - (void) setUpSysCallTable
 {
 	if(sysCallTable)[sysCallTable release];
 	sysCallTable = [[NSMutableDictionary dictionary] retain];
-	[sysCallTable setObject:[ORSysCall sysCall:&powf name:@"pow" numArgs:2 ] forKey:@"pow"];
-	[sysCallTable setObject:[ORSysCall sysCall:&sqrtf name:@"sqrt" numArgs:1 ] forKey:@"sqrt"];
-	[sysCallTable setObject:[ORSysCall sysCall:&ceilf name:@"ceil" numArgs:1 ] forKey:@"ceil"];
-	[sysCallTable setObject:[ORSysCall sysCall:&floorf name:@"floor" numArgs:1 ] forKey:@"floor"];
-	[sysCallTable setObject:[ORSysCall sysCall:&roundf name:@"round" numArgs:1 ] forKey:@"round"];
-	[sysCallTable setObject:[ORSysCall sysCall:&cosf name:@"cos" numArgs:1 ] forKey:@"cos"];
-	[sysCallTable setObject:[ORSysCall sysCall:&sinf name:@"sin" numArgs:1 ] forKey:@"sin"];
-	[sysCallTable setObject:[ORSysCall sysCall:&tanf name:@"tan" numArgs:1 ] forKey:@"tan"];
-	[sysCallTable setObject:[ORSysCall sysCall:&acosf name:@"acos" numArgs:1 ] forKey:@"acos"];
-	[sysCallTable setObject:[ORSysCall sysCall:&asinf name:@"asin" numArgs:1 ] forKey:@"asin"];
-	[sysCallTable setObject:[ORSysCall sysCall:&atanf name:@"atan" numArgs:1 ] forKey:@"atan"];
-	[sysCallTable setObject:[ORSysCall sysCall:&abs name:@"abs" numArgs:1 ] forKey:@"abs"];
-	[sysCallTable setObject:[ORSysCall sysCall:&expf name:@"exp" numArgs:1 ] forKey:@"exp"];
-	[sysCallTable setObject:[ORSysCall sysCall:&logf name:@"log" numArgs:1 ] forKey:@"log"];
-	[sysCallTable setObject:[ORSysCall sysCall:&log10f name:@"log10" numArgs:1 ] forKey:@"log10"];
+	
+	[sysCallTable setObject: [ORSysCall sysCall:&powf	name:@"pow"		numArgs:2] forKey:@"pow"];
+	[sysCallTable setObject: [ORSysCall sysCall:&sqrtf	name:@"sqrt"	numArgs:1] forKey:@"sqrt"];
+	[sysCallTable setObject: [ORSysCall sysCall:&ceilf	name:@"ceil"	numArgs:1] forKey:@"ceil"];
+	[sysCallTable setObject: [ORSysCall sysCall:&floorf	name:@"floor"	numArgs:1] forKey:@"floor"];
+	[sysCallTable setObject: [ORSysCall sysCall:&roundf	name:@"round"	numArgs:1] forKey:@"round"];
+	[sysCallTable setObject: [ORSysCall sysCall:&cosf	name:@"cos"		numArgs:1] forKey:@"cos"];
+	[sysCallTable setObject: [ORSysCall sysCall:&sinf	name:@"sin"		numArgs:1] forKey:@"sin"];
+	[sysCallTable setObject: [ORSysCall sysCall:&tanf	name:@"tan"		numArgs:1] forKey:@"tan"];
+	[sysCallTable setObject: [ORSysCall sysCall:&acosf	name:@"acos"	numArgs:1] forKey:@"acos"];
+	[sysCallTable setObject: [ORSysCall sysCall:&asinf	name:@"asin"	numArgs:1] forKey:@"asin"];
+	[sysCallTable setObject: [ORSysCall sysCall:&atanf	name:@"atan"	numArgs:1] forKey:@"atan"];
+	[sysCallTable setObject: [ORSysCall sysCall:&abs	name:@"abs"		numArgs:1] forKey:@"abs"];
+	[sysCallTable setObject: [ORSysCall sysCall:&expf	name:@"exp"		numArgs:1] forKey:@"exp"];
+	[sysCallTable setObject: [ORSysCall sysCall:&logf	name:@"log"		numArgs:1] forKey:@"log"];
+	[sysCallTable setObject: [ORSysCall sysCall:&log10f	name:@"log10"	numArgs:1] forKey:@"log10"];
 }
 
 - (void) setArgs:(NSArray*)someArgs

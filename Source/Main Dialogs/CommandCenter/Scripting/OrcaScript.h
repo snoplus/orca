@@ -1,3 +1,8 @@
+extern int OrcaScriptYYINPUT(char* theBuffer,int maxSize);
+#undef YY_INPUT
+#define YY_INPUT(b,r,s) (r = OrcaScriptYYINPUT(b,s))
+
+
 typedef enum { typeCon, typeId, typeOpr, typeSelVar, typeStr, typeArray, typeArg, typeOperationSymbol} nodeEnum;
 
 enum {
