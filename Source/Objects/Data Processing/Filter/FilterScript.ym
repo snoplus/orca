@@ -70,28 +70,28 @@ ORHashTable* symbolTable;
 %type <nPtr>  case_list break_statement constant_expr print_statement print_list special_statement
 %%
 
-program:
-        funclist                { return 1; }
+program
+        : funclist                { return 1; }
         ;
 
 
-funclist:
-		  funcdef
+funclist
+		: funcdef
 		| funclist funcdef
 		;
 
-funcdef:
-          FUNCTION VARIABLE '(' ')' '{' function '}' {parsedSuccessfully = YES; nodeType* a = ident($2); printf("got %s\n",a->ident.key);	}			
+funcdef
+		: FUNCTION VARIABLE '(' ')' '{' function '}' {parsedSuccessfully = YES; /*nodeType* a = ident($2); printf("got %s\n",a->ident.key);*/	}			
         ;
 
 
-function:
-          function statement         {addFilterNode($2);}
-		  | /*NULL*/
+function
+		: function statement         {addFilterNode($2);}
+		| /*NULL*/
         ;
 
-statement:
-		compound_statement				{ $$ = $1;}
+statement
+		: compound_statement			{ $$ = $1;}
 		| expression_statement			{ $$ = $1;}
  		| selection_statement			{ $$ = $1;}
 		| iteration_statement			{ $$ = $1;}
@@ -104,13 +104,13 @@ special_statement
 		: print_statement				{ $$ = $1; }
 		;
 
-statement_list:
-          statement                  { $$ = $1; }
-        | statement_list statement   { $$ = opr(';', 2, $1, $2); }
+statement_list
+		: statement						{ $$ = $1; }
+        | statement_list statement		{ $$ = opr(';', 2, $1, $2); }
         ;
 
-compound_statement: 
-		  '{' '}'						{ $$ = opr(';', 0); }
+compound_statement
+		: '{' '}'						{ $$ = opr(';', 0); }
 		| '{' statement_list '}'		{ $$ = $2;}
 		;							
 
@@ -122,6 +122,7 @@ expression_statement
 selection_statement
 		: IF '(' expr ')' statement					{ $$ = opr(IF,2, $3, $5); }
 		| IF '(' expr ')' statement ELSE statement	{ $$ = opr(IF,3, $3, $5, $7); }
+		| SWITCH '(' expr ')'  '{' case_list '}'	{ $$ = opr(SWITCH, 2, $3, $6); }
 		;
 
 iteration_statement
@@ -139,24 +140,25 @@ jump_statement
 		;
 
 case_list
-	: case_statement							{ $$ = $1;}
-	| case_list case_statement					{ $$ = executionNode(';', $1, $2,nil); }
+	: case_statement				{ $$ = $1;}
+	| case_list case_statement		{ $$ = opr(';', 2, $1, $2); }
 	;
 	
 case_statement
-	: CASE constant_expr ':' statement_list	break_statement		{ $$ = executionNode(CASE, $2, $4, $5,nil); }
-	| DEFAULT ':' statement_list	break_statement				{ $$ = executionNode(DEFAULT, $3, $4, nil); }
+	: CASE constant_expr ':' statement_list	break_statement		{ $$ = opr(CASE, 3, $2, $4, $5); }
+	| CASE constant_expr ':' break_statement					{ $$ = opr(CASE, 2, $2, $4); }
+	| DEFAULT			 ':' statement_list	break_statement		{ $$ = opr(DEFAULT,2, $3, $4); }
 	;
 
 break_statement
-	: BREAK	';'							{ $$ = executionNode(BREAK,nil); }
+	: BREAK	';'					{ $$ = opr(BREAK,0); }
 
 constant_expr
-	: conditional_expr				{ $$ = $1; }
+	:INTEGER					{ $$ = con($1); }
 	;
 
 expr
-		: assignment_expr			{ $$ = $1; }
+		: assignment_expr		{ $$ = $1; }
         ;
 
 primary_expr
@@ -268,7 +270,7 @@ print_statement
 		;
 //the arguments for the print or string functions
 print_list
-		: assignment_expr					{ $$ = $1; }
+		: assignment_expr				{ $$ = $1; }
 		;
 
 

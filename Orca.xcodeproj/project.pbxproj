@@ -1603,6 +1603,13 @@
 		9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C1363C40D0A7921006C550D /* ORCaen265Decoders.m */; };
 		9C1363CD0D0A7921006C550D /* ORCaen265Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C1363C50D0A7921006C550D /* ORCaen265Model.h */; };
 		9C1363CE0D0A7921006C550D /* ORCaen265Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C1363C60D0A7921006C550D /* ORCaen265Model.m */; };
+		9C2595B00D5172180039C5DF /* ORHashTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2595AE0D5172180039C5DF /* ORHashTable.h */; };
+		9C2595B10D5172180039C5DF /* ORHashTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595AF0D5172180039C5DF /* ORHashTable.m */; };
+		9C2595B70D5172460039C5DF /* FilterScript.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2595B20D5172460039C5DF /* FilterScript.h */; };
+		9C2595B80D5172460039C5DF /* FilterScript.ym in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B30D5172460039C5DF /* FilterScript.ym */; };
+		9C2595B90D5172460039C5DF /* FilterScript.lm in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B40D5172460039C5DF /* FilterScript.lm */; };
+		9C2595BA0D5172460039C5DF /* FilterScriptEx.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B50D5172460039C5DF /* FilterScriptEx.m */; };
+		9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B60D5172460039C5DF /* FilterScriptGraph.m */; };
 		9C38E5580C775F2A00255848 /* ORcPCICardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C38E5560C775F2A00255848 /* ORcPCICardDecoder.m */; };
 		9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */; };
 		9CB167790C5BC9580053CFAD /* xAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167770C5BC9580053CFAD /* xAxisMarker.gif */; };
@@ -1633,6 +1640,30 @@
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXBuildRule section */
+		9C2595AC0D5171B90039C5DF /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = sourcecode.lex;
+			isEditable = 1;
+			outputFiles = (
+				"lex.${INPUT_FILE_BASE}.m",
+			);
+			script = "cd \"${DERIVED_FILE_DIR}\" && /usr/bin/lex -P \"${INPUT_FILE_BASE}\" \"${INPUT_FILE_PATH}\" && mv \"${DERIVED_FILE_DIR}\"/lex.\"${INPUT_FILE_BASE}\".c \"${DERIVED_FILE_DIR}\"/lex.\"${INPUT_FILE_BASE}\".m";
+		};
+		9C2595AD0D5171B90039C5DF /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			fileType = sourcecode.yacc;
+			isEditable = 1;
+			outputFiles = (
+				"${INPUT_FILE_BASE}.tab.m",
+				"${INPUT_FILE_BASE}.tab.h",
+			);
+			script = "cd \"${DERIVED_FILE_DIR}\" && /usr/bin/yacc -d -b \"${INPUT_FILE_BASE}\" -p \"${INPUT_FILE_BASE}\" \"${INPUT_FILE_PATH}\" && mv \"${DERIVED_FILE_DIR}\"/\"${INPUT_FILE_BASE}\".tab.c \"${DERIVED_FILE_DIR}\"/\"${INPUT_FILE_BASE}\".tab.m";
+		};
+/* End PBXBuildRule section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		8493CC870C99FA6D00B46CD4 /* cPCI_Code Copy */ = {
@@ -3219,6 +3250,13 @@
 		9C1363C40D0A7921006C550D /* ORCaen265Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen265Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Decoders.m; sourceTree = SOURCE_ROOT; };
 		9C1363C50D0A7921006C550D /* ORCaen265Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen265Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Model.h; sourceTree = SOURCE_ROOT; };
 		9C1363C60D0A7921006C550D /* ORCaen265Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen265Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV265/ORCaen265Model.m; sourceTree = SOURCE_ROOT; };
+		9C2595AE0D5172180039C5DF /* ORHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHashTable.h; path = "Source/Objects/Misc Objects/DataStructures/ORHashTable.h"; sourceTree = SOURCE_ROOT; };
+		9C2595AF0D5172180039C5DF /* ORHashTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHashTable.m; path = "Source/Objects/Misc Objects/DataStructures/ORHashTable.m"; sourceTree = SOURCE_ROOT; };
+		9C2595B20D5172460039C5DF /* FilterScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FilterScript.h; path = "Source/Objects/Data Processing/Filter/FilterScript.h"; sourceTree = SOURCE_ROOT; };
+		9C2595B30D5172460039C5DF /* FilterScript.ym */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = FilterScript.ym; path = "Source/Objects/Data Processing/Filter/FilterScript.ym"; sourceTree = SOURCE_ROOT; };
+		9C2595B40D5172460039C5DF /* FilterScript.lm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = FilterScript.lm; path = "Source/Objects/Data Processing/Filter/FilterScript.lm"; sourceTree = SOURCE_ROOT; };
+		9C2595B50D5172460039C5DF /* FilterScriptEx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterScriptEx.m; path = "Source/Objects/Data Processing/Filter/FilterScriptEx.m"; sourceTree = SOURCE_ROOT; };
+		9C2595B60D5172460039C5DF /* FilterScriptGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterScriptGraph.m; path = "Source/Objects/Data Processing/Filter/FilterScriptGraph.m"; sourceTree = SOURCE_ROOT; };
 		9C38E5560C775F2A00255848 /* ORcPCICardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORcPCICardDecoder.m; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.m"; sourceTree = SOURCE_ROOT; };
 		9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICardDecoder.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		9C7E0885051A522B005F64D5 /* MuxScopeMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MuxScopeMap.h; path = Source/Experiments/Ncd/Detector/MuxScopeMap.h; sourceTree = SOURCE_ROOT; };
@@ -5312,6 +5350,8 @@
 				84C1331C0997C156006F2901 /* ORSafeBuffer.m */,
 				84751A2B09A5057100253B57 /* ORSafeCircularBuffer.h */,
 				84751A2C09A5057100253B57 /* ORSafeCircularBuffer.m */,
+				9C2595AE0D5172180039C5DF /* ORHashTable.h */,
+				9C2595AF0D5172180039C5DF /* ORHashTable.m */,
 			);
 			name = DataStructures;
 			path = "Source/Objects/Misc Objects/DataStructures";
@@ -5918,6 +5958,11 @@
 				84A5CD560D464F4600D9833C /* ORFilterController.m */,
 				84A5CD570D464F4600D9833C /* ORFilterModel.h */,
 				84A5CD580D464F4600D9833C /* ORFilterModel.m */,
+				9C2595B20D5172460039C5DF /* FilterScript.h */,
+				9C2595B30D5172460039C5DF /* FilterScript.ym */,
+				9C2595B40D5172460039C5DF /* FilterScript.lm */,
+				9C2595B50D5172460039C5DF /* FilterScriptEx.m */,
+				9C2595B60D5172460039C5DF /* FilterScriptGraph.m */,
 			);
 			name = Filter;
 			path = "Source/Objects/Data Processing/Filter";
@@ -8037,6 +8082,8 @@
 				84A8B1530D35704900263D31 /* VME_Trigger32.h in Headers */,
 				84A5CD5B0D464F4600D9833C /* ORFilterController.h in Headers */,
 				84A5CD5D0D464F4600D9833C /* ORFilterModel.h in Headers */,
+				9C2595B00D5172180039C5DF /* ORHashTable.h in Headers */,
+				9C2595B70D5172460039C5DF /* FilterScript.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8058,6 +8105,8 @@
 				8493CC890C99FA9B00B46CD4 /* VME_Copy */,
 			);
 			buildRules = (
+				9C2595AC0D5171B90039C5DF /* PBXBuildRule */,
+				9C2595AD0D5171B90039C5DF /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -8072,6 +8121,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Orca */;
 			projectDirPath = "";
@@ -9113,6 +9163,11 @@
 				84A8B14E0D35703300263D31 /* SBCLamView.m in Sources */,
 				84A5CD5C0D464F4600D9833C /* ORFilterController.m in Sources */,
 				84A5CD5E0D464F4600D9833C /* ORFilterModel.m in Sources */,
+				9C2595B10D5172180039C5DF /* ORHashTable.m in Sources */,
+				9C2595B80D5172460039C5DF /* FilterScript.ym in Sources */,
+				9C2595B90D5172460039C5DF /* FilterScript.lm in Sources */,
+				9C2595BA0D5172460039C5DF /* FilterScriptEx.m in Sources */,
+				9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9279,6 +9334,7 @@
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
 				YACCFLAGS = "";
+				YACC_SEPARATE_CODE_FILE = NO;
 				ZERO_LINK = NO;
 				"Zero link" = NO;
 			};

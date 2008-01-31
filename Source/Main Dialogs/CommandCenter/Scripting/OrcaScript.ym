@@ -156,6 +156,7 @@ case_list
 	
 case_statement
 	: CASE constant_expr ':' statement_list	break_statement		{ $$ = executionNode(CASE, $2, $4, $5,nil); }
+	| CASE constant_expr ':' break_statement					{ $$ = executionNode(CASE, $2, $4, nil); }
 	| DEFAULT ':' statement_list	break_statement				{ $$ = executionNode(DEFAULT, $3, $4, nil); }
 	;
 
@@ -178,7 +179,7 @@ leftArrayElement
 //the mass of syntax that follows takes care of thing like a += 1; a++; 
 //etc... basically anything that produces a value 
 constant_expr
-	: conditional_expr				{ $$ = $1; }
+	: CONSTANT					{ $$ = constantNode($1); }
 	;
 
 expr

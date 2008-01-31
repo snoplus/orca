@@ -125,7 +125,6 @@ void exNode
                 case LE_OP:				s="[<=]";			break;
                 case NE_OP:				s="[!=]";			break;
                 case EQ_OP:				s="[==]";			break;
-				case '@':				s="[ObjC]";		break;
 				case BREAK:				s="[break]";		break;
 				case EXIT:				s="[exit]";		break;
 				case RETURN:			s="[return]";		break;
