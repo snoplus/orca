@@ -15,10 +15,10 @@ typedef struct htab hashTable;
 	hashTable* hashTab[kMaxNumHashKeys];
 }
 
-- (unsigned int) hash:(char *)aKey;
-- (BOOL) setData:(long)data forKey:(char*) key;
-- (BOOL) getData:(long*)data forKey:(char*)key;
-- (BOOL) removeKey:(char *)aKey;
-- (hashTable*) findHash:(char*)aKey;
+- (unsigned int) hash:(const char *)aKey;
+- (BOOL) setData:(long)data forKey:(const char*) key;
+- (BOOL) getData:(long*)data forKey:(const char*)key;
+- (BOOL) removeKey:(const char *)aKey;
+- (hashTable*) findHash:(const char*)aKey;
 
 @end

@@ -29,7 +29,6 @@
 @class ORDataPacket;
 @class ORFilterClient;
 @class ORScriptRunner;
-@class ORSafeQueue;
 
 @interface ORFilterModel :  ORDataChainObject 
 {
@@ -42,8 +41,6 @@
 		NSMutableArray*		args;
 		id					inputValue;
 		ORDataPacket*		transferDataPacket;
-		ORSafeQueue*		inputDataQueue;
-		ORSafeQueue*		outputDataQueue;
 		
 		BOOL				stopThread;
 		BOOL				running;

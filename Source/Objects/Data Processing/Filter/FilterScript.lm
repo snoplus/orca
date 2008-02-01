@@ -21,7 +21,7 @@ H			[a-fA-F0-9]
 %%
 
 
-[0-9]+      {
+{D}+      {
                 FilterScriptlval.iValue = atoi(yytext);
                 return INTEGER;
             }
@@ -36,7 +36,7 @@ H			[a-fA-F0-9]
 					}
 
 
-[-()<>=+*/^&|;{}.] { return *yytext; }
+[-()<>=+*/%!;:\[\],{}~^&|?.] { return *yytext; }
 
 "function"		return FUNCTION;
 "/*"			{ fsComment(); }
@@ -73,12 +73,7 @@ H			[a-fA-F0-9]
 "default"		return DEFAULT;
 "print"         return PRINT;
 "break"			return BREAK;
-"exit"			return EXIT;
 "continue"		return CONTINUE;
-"return"		return RETURN;
-"sleep"			return SLEEP;
-"waituntil"		return WAITUNTIL;
-"hex"			return HEX;
 "postalarm"		return ALARM;
 "clearalarm"	return CLEAR;
 "hello"			return HELLO;

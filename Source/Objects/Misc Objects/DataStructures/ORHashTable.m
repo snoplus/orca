@@ -17,7 +17,7 @@
                        +(uint32_t)(((const uint8_t *)(d))[0]) )
 #endif
 
-- (unsigned int) hash:(char *)data
+- (unsigned int) hash:(const char *)data
 {
 uint32_t len = strlen(data);
 uint32_t hash = len, tmp;
@@ -95,7 +95,7 @@ int rem;
 	return hashval % kMaxNumHashKeys;
 }
 */
-- (BOOL) setData:(long)data forKey:(char*) key
+- (BOOL) setData:(long)data forKey:(const char*) key
 {
 	hashTable *newhash;
 	hashTable *curhash;
@@ -134,7 +134,7 @@ int rem;
 	return NO;
 }
 
-- (BOOL) getData:(long*)data forKey:(char*)key
+- (BOOL) getData:(long*)data forKey:(const char*)key
 {
 	unsigned int hashval;
 	hashTable* curhash;
@@ -179,7 +179,7 @@ int rem;
 	return NO;
 }
 
--(hashTable*) findHash:(char*) aKey
+-(hashTable*) findHash:(const char*) aKey
 {
    unsigned int hashval;
    hashTable *curhash;
@@ -214,7 +214,7 @@ int rem;
 }
 
 
-- (BOOL) removeKey:(char*) key
+- (BOOL) removeKey:(const char*) key
 {
 	unsigned int hashval;
 	hashTable*   curhash;

@@ -126,12 +126,7 @@ void exNode
                 case NE_OP:				s="[!=]";			break;
                 case EQ_OP:				s="[==]";			break;
 				case BREAK:				s="[break]";		break;
-				case EXIT:				s="[exit]";		break;
-				case RETURN:			s="[return]";		break;
 				case CONTINUE:			s="[continue]";	break;
-				case SLEEP:				s="[sleep]";		break;
-				case HEX:				s="[hex]";			break;
-				case WAITUNTIL:			s="[waituntil]";	break;				
 				case ALARM:				s="[alarm]";		break;				
 				case CLEAR:				s="[clear]";		break;				
                 case LEFT_ASSIGN:		s="[<<=]";			break;

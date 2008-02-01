@@ -23,7 +23,6 @@
 #import "ORFilterModel.h"
 #import "ORDataPacket.h"
 #import "ORScriptRunner.h"
-#import "ORSafeQueue.h"
 #import "ORDataPacket.h"
 #import "ORHashTable.h"
 #import "FilterScript.h"
@@ -51,6 +50,8 @@ extern nodeType** allFilterNodes;
 extern long numFilterLines;
 extern int graphNumber;
 extern BOOL parsedSuccessfully;
+extern ORHashTable* symbolTable;
+
 ORFilterModel* theFilterRunner = nil;
 int FilterScriptYYINPUT(char* theBuffer,int maxSize) 
 {
@@ -155,31 +156,23 @@ int filterGraph(nodeType*);
 #pragma mark •••Data Handling
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
 {
-	//put the data into a queue that is accessable from the filter task
-	[inputDataQueue enqueueArray:[someData dataArray]];
+	//pass it on
+	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
+	[theNextObject processData:someData userInfo:userInfo];
 
-	//magic happens here.... the filter task is running in another thread, processing data and 
-	//putting the results into the output queue....
-	
-	//for testing...
-	NSArray* testDataArray = [inputDataQueue dequeueArray];
-	[outputDataQueue enqueueArray:testDataArray];
-	
-	//pass on the filtered data
-	NSArray* theDataArray = [outputDataQueue dequeueArray];
-	if(theDataArray){
-		[transferDataPacket addDataFromArray:theDataArray];
-		id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-		[theNextObject processData:transferDataPacket userInfo:nil];
-		[transferDataPacket clearData];
+	unsigned i;
+	for(i=0;i<filterNodeCount;i++){
+		NS_DURING
+			ex(allFilterNodes[i],self);
+		NS_HANDLER
+		NS_ENDHANDLER
 	}
+
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {		
 	dataHeader		= [[aDataPacket headerAsData] retain];
-	inputDataQueue	= [[ORSafeQueue alloc] init];
-	outputDataQueue = [[ORSafeQueue alloc] init];
 
 	if(transferDataPacket){
 		[transferDataPacket release];
@@ -188,31 +181,47 @@ int filterGraph(nodeType*);
     transferDataPacket  = [aDataPacket copy];
     [transferDataPacket generateObjectLookup];	//MUST be done before data header in the copy will work.
     [transferDataPacket clearData];	
-
+	
+	
+	[self parseScript];
+	if(!parsedOK){
+		NSLog(@"Filter script parse error prevented run start\n");
+		[NSException raise:@"Parse Error" format:@"Filter Script parse failed."];
+	}
+	else {
+		NSDictionary* descriptionDict = [[transferDataPacket fileHeader] objectForKey:@"dataDescription"];
+		NSString* objKey;
+		NSEnumerator*  descriptionDictEnum = [descriptionDict keyEnumerator];
+		while(objKey = [descriptionDictEnum nextObject]){
+			NSDictionary* objDictionary = [descriptionDict objectForKey:objKey];
+			NSEnumerator* dataObjEnum = [objDictionary keyEnumerator];
+			NSString* dataObjKey;
+			while(dataObjKey = [dataObjEnum nextObject]){
+				NSDictionary* lowestLevel = [objDictionary objectForKey:dataObjKey];
+				NSString* decoderName = [lowestLevel objectForKey:@"decoder"];
+				long theDataId = [[lowestLevel objectForKey:@"dataId"] longValue];
+				[symbolTable setData:theDataId forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
+			} 
+		}
+   	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
+	long value;
+	if([symbolTable getData:&value forKey:"i"]){
+		NSLog(@"i: %d\n",value);
+	}
+	if([symbolTable getData:&value forKey:"j"]){
+		NSLog(@"j: %d\n",value);
+	}
 }
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	//pass any data left in the output queue
-	NSArray* theDataArray = [outputDataQueue dequeueArray];
-	if(theDataArray){
-		[transferDataPacket addDataFromArray:theDataArray];
-		id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-		[theNextObject processData:transferDataPacket userInfo:nil];
-		[transferDataPacket clearData];
-	}
+	
 	[dataHeader release];
 	dataHeader = nil;
-	[inputDataQueue release];
-	inputDataQueue = nil;
-	[outputDataQueue release];
-	outputDataQueue = nil;
-	
 }
 
 - (NSString*) script
@@ -293,13 +302,13 @@ int filterGraph(nodeType*);
 {
 	parsedOK = YES;
 	if(!running){
-		[self parse:script];
-		if(parsedSuccessfully){
+		//[self parse:script];
+		//if(parsedSuccessfully){
 			parsedOK = YES;
 			exitNow	   = NO;
 			stopThread = NO;
 			[NSThread detachNewThreadSelector:@selector(_evalMain) toTarget:self withObject:nil];
-		}
+		//}
 	}
 	else {
 		stopThread = YES;
@@ -516,6 +525,7 @@ int filterGraph(nodeType*);
 	[self performSelectorOnMainThread:@selector(postRunningChanged) withObject:nil waitUntilDone:YES];
 	[pool release];
 }
+
 - (void) postRunningChanged
 {	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerRunningChanged object:self];
