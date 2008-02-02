@@ -1568,6 +1568,8 @@
 		84F7FB620AE5566D00A5AA4C /* mysql_com.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */; };
 		84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB630AE5569100A5AA4C /* my_alloc.h */; };
 		84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */; };
+		84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FBB56F0D5401BD00780DBD /* ORFilterSymbolTable.h */; };
+		84FBB5720D5401BD00780DBD /* ORFilterSymbolTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FBB5700D5401BD00780DBD /* ORFilterSymbolTable.m */; };
 		84FD092B078F4F17004A0E46 /* CamacCmdHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84FD092A078F4F17004A0E46 /* CamacCmdHelp.plist */; };
 		84FD0DD707945D17004A0E46 /* OfflineRunHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84FD0DD607945D17004A0E46 /* OfflineRunHelp.plist */; };
 		84FD0DFA079462FB004A0E46 /* RunFailedHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84FD0DF9079462FB004A0E46 /* RunFailedHelp.plist */; };
@@ -3213,6 +3215,8 @@
 		84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql_com.h; path = Libraries/mysql_com.h; sourceTree = SOURCE_ROOT; };
 		84F7FB630AE5569100A5AA4C /* my_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_alloc.h; path = Libraries/my_alloc.h; sourceTree = SOURCE_ROOT; };
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
+		84FBB56F0D5401BD00780DBD /* ORFilterSymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFilterSymbolTable.h; path = "Source/Objects/Data Processing/Filter/ORFilterSymbolTable.h"; sourceTree = SOURCE_ROOT; };
+		84FBB5700D5401BD00780DBD /* ORFilterSymbolTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFilterSymbolTable.m; path = "Source/Objects/Data Processing/Filter/ORFilterSymbolTable.m"; sourceTree = SOURCE_ROOT; };
 		84FD092A078F4F17004A0E46 /* CamacCmdHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = CamacCmdHelp.plist; path = "Source/Objects/Hardware/Camac/Camac Base Classes/CamacCmdHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84FD0DD607945D17004A0E46 /* OfflineRunHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = OfflineRunHelp.plist; path = "Source/App Delegate/OfflineRunHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84FD0DF9079462FB004A0E46 /* RunFailedHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = RunFailedHelp.plist; path = Source/Objects/Control/RunControl/RunFailedHelp.plist; sourceTree = SOURCE_ROOT; };
@@ -5959,6 +5963,8 @@
 				84A5CD570D464F4600D9833C /* ORFilterModel.h */,
 				84A5CD580D464F4600D9833C /* ORFilterModel.m */,
 				9C2595B20D5172460039C5DF /* FilterScript.h */,
+				84FBB56F0D5401BD00780DBD /* ORFilterSymbolTable.h */,
+				84FBB5700D5401BD00780DBD /* ORFilterSymbolTable.m */,
 				9C2595B30D5172460039C5DF /* FilterScript.ym */,
 				9C2595B40D5172460039C5DF /* FilterScript.lm */,
 				9C2595B50D5172460039C5DF /* FilterScriptEx.m */,
@@ -8084,6 +8090,7 @@
 				84A5CD5D0D464F4600D9833C /* ORFilterModel.h in Headers */,
 				9C2595B00D5172180039C5DF /* ORHashTable.h in Headers */,
 				9C2595B70D5172460039C5DF /* FilterScript.h in Headers */,
+				84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9168,6 +9175,7 @@
 				9C2595B90D5172460039C5DF /* FilterScript.lm in Sources */,
 				9C2595BA0D5172460039C5DF /* FilterScriptEx.m in Sources */,
 				9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */,
+				84FBB5720D5401BD00780DBD /* ORFilterSymbolTable.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
