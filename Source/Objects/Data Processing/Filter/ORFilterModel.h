@@ -49,6 +49,7 @@
 		unsigned			yaccInputPosition;
 		NSData*				expressionAsData;
 		BOOL				exitNow;
+		long				tot;
 }
 
 #pragma mark •••Accessors
@@ -82,7 +83,9 @@
 - (void) saveFile;
 - (void) loadScriptFromFile:(NSString*)aFilePath;
 - (void) saveScriptToFile:(NSString*)aFilePath;
-- (long) hello:(long)aValue;
+
+- (long) extractRecordID:(long)aValue;
+- (long) extractRecordLen:(long)aValue;
 
 #pragma mark •••Parsers
 - (void) parseFile:(NSString*)aPath;

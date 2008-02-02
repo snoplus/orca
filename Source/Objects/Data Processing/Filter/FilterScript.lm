@@ -22,7 +22,7 @@ H			[a-fA-F0-9]
 
 
 {D}+      {
-                FilterScriptlval.iValue = atoi(yytext);
+                FilterScriptlval.iValue = atol(yytext);
                 return INTEGER;
             }
 
@@ -72,11 +72,15 @@ H			[a-fA-F0-9]
 "case"			return CASE;
 "default"		return DEFAULT;
 "print"         return PRINT;
+"printh"        return PRINTH;
 "break"			return BREAK;
 "continue"		return CONTINUE;
 "postalarm"		return ALARM;
 "clearalarm"	return CLEAR;
-"hello"			return HELLO;
+"array"			return MAKEARRAY;
+"free"			return FREEARRAY;
+"extractRecordID"			return EXTRACTRECORD_ID;
+"extractRecordLen"			return EXTRACTRECORD_LEN;
 
 {L}({L}|{D})* { 
                 strncpy(FilterScriptlval.sIndex,yytext,yyleng);

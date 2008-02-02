@@ -78,7 +78,7 @@ void exNode
     int k;              /* child number */
     int che, chm;       /* end column and mid of children */
     int cs;             /* start column of children */
-    char word[20];      /* extended node text */
+    char word[100];      /* extended node text */
 
     if (!p) return;
 
@@ -98,6 +98,7 @@ void exNode
                 case CASE:				s="[case]";		break;
                 case DEFAULT:			s="[default]";		break;
                 case PRINT:				s="[print]";		break;
+                case PRINTH:			s="[printhex]";		break;
                 case kPostInc:			s="[postInc]";		break;
                 case kPreInc:			s="[preInc]";		break;
                 case kPostDec:			s="[postDec]";		break;
@@ -138,7 +139,14 @@ void exNode
                 case OR_ASSIGN:			s="[|=]";			break;
                 case AND_ASSIGN:		s="[&=]";			break;
                 case ',':				s="[,]";			break;
-                case HELLO:				s="[hello]";		break;
+                case kDefineArray:		s="[kDefineArray]";	break;
+                case kLeftArray:		s="[kLeftArray]";	break;
+                case kArrayElement:		s="[arrayElement]";	break;
+                case kArrayAssign:		s="[kArrayAssign]";	break;
+                case kArrayListAssign:	s="[kArrayListAssign]";	break;
+				case FREEARRAY:			s="[free]";			break;
+               case EXTRACTRECORD_LEN:	s="[exgtractLen]";		break;
+               case EXTRACTRECORD_ID:	s="[exgtractID]";		break;
             }
             break;
     }
@@ -183,8 +191,8 @@ void exNode
 
 /* interface for drawing */
 
-#define lmax 200
-#define cmax 200
+#define lmax 500
+#define cmax 500
 
 char graph[lmax][cmax]; /* array for ASCII-Graphic */
 int graphNumber = 0;

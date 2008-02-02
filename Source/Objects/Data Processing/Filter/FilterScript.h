@@ -18,7 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "ORHashTable.h"
+#import "ORFilterSymbolTable.h"
 
 extern int FilterScriptYYINPUT(char* theBuffer,int maxSize);
 #undef YY_INPUT
@@ -31,7 +31,13 @@ enum {
 	kPreInc,
 	kPostDec,
 	kPreDec,
-	kConditional
+	kConditional,
+	kArrayListAssign,
+	kDefineArray,
+	kLeftArray,
+	kArrayElement,
+	kMakeArgList,
+	kArrayAssign
 };
 
 /* constants */
@@ -41,11 +47,11 @@ typedef struct {
 
 /* identifiers */
 typedef struct {
-    char key[64];                      /* key into hash table */
+    char key[100];                      /* key into hash table */
 } idNodeType;
 
 typedef struct {
-    char cString[64];                      /* key into hash table */
+    char cString[100];                      /* key into hash table */
 } strNodeType;
 
 
@@ -69,4 +75,4 @@ typedef struct nodeTypeTag {
     };
 } nodeType;
 
-extern ORHashTable* symbolTable;
+extern ORFilterSymbolTable* symbolTable;

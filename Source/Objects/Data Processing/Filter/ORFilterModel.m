@@ -24,8 +24,9 @@
 #import "ORDataPacket.h"
 #import "ORScriptRunner.h"
 #import "ORDataPacket.h"
-#import "ORHashTable.h"
+#import "ORFilterSymbolTable.h"
 #import "FilterScript.h"
+#import "ORDataTypeAssigner.h"
 
 static NSString* ORFilterInConnector 		= @"Filter In Connector";
 static NSString* ORFilterOutConnector 		= @"Filter Out Connector";
@@ -50,7 +51,7 @@ extern nodeType** allFilterNodes;
 extern long numFilterLines;
 extern int graphNumber;
 extern BOOL parsedSuccessfully;
-extern ORHashTable* symbolTable;
+extern ORFilterSymbolTable* symbolTable;
 
 ORFilterModel* theFilterRunner = nil;
 int FilterScriptYYINPUT(char* theBuffer,int maxSize) 
@@ -156,23 +157,70 @@ int filterGraph(nodeType*);
 #pragma mark •••Data Handling
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
 {
+
+	//each block of data is an array of NSData objects, each potentially containing many records..
+	NSArray* theDataArray = [someData dataArray];
+	int n = [theDataArray count];
+	int i;
+	for(i=0;i<n;i++){
+		//each record must be filtered by the filter code. 
+		NSData* data = [theDataArray objectAtIndex:i];
+		long totalLen = [data length]/sizeof(long);
+		long* ptr = (long*)[data bytes];
+		while(totalLen>0){
+			long recordLen = ExtractLength(*ptr);
+			filterData tempData;
+			
+			tempData.type		= kFilterPtrType;
+			tempData.val.pValue = ptr;
+			[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
+			
+			tempData.type		= kFilterLongType;
+			tempData.val.lValue = recordLen;
+			[symbolTable setData:tempData forKey:"CurrentRecordLen"];
+			
+			unsigned node;
+			for(node=0;node<filterNodeCount;node++){
+				NS_DURING
+					ex(allFilterNodes[node],self);
+				NS_HANDLER
+				NS_ENDHANDLER
+			}
+		
+			ptr += recordLen;
+			totalLen -= recordLen;
+			tot++;
+		}
+	}
+		
+	/*	
+		filterData tempData;
+		tempData.type = kFilterPtrType;
+		tempData.val.pValue = (long*)[data bytes];
+		[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
+		tempData.type = kFilterLongType;
+		tempData.val.lValue = [data length]/sizeof(long);
+		[symbolTable setData:tempData forKey:"CurrentRecordLen"];
+
+		unsigned node;
+		for(node=0;node<filterNodeCount;node++){
+			NS_DURING
+				ex(allFilterNodes[node],self);
+			NS_HANDLER
+			NS_ENDHANDLER
+		}
+	}
+	*/
 	//pass it on
 	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
 	[theNextObject processData:someData userInfo:userInfo];
-
-	unsigned i;
-	for(i=0;i<filterNodeCount;i++){
-		NS_DURING
-			ex(allFilterNodes[i],self);
-		NS_HANDLER
-		NS_ENDHANDLER
-	}
 
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {		
 	dataHeader		= [[aDataPacket headerAsData] retain];
+	tot = 0;
 
 	if(transferDataPacket){
 		[transferDataPacket release];
@@ -199,8 +247,10 @@ int filterGraph(nodeType*);
 			while(dataObjKey = [dataObjEnum nextObject]){
 				NSDictionary* lowestLevel = [objDictionary objectForKey:dataObjKey];
 				NSString* decoderName = [lowestLevel objectForKey:@"decoder"];
-				long theDataId = [[lowestLevel objectForKey:@"dataId"] longValue];
-				[symbolTable setData:theDataId forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
+				filterData theDataType;
+				theDataType.val.lValue= [[lowestLevel objectForKey:@"dataId"] longValue];
+				theDataType.type  = kFilterLongType;
+				[symbolTable setData:theDataType forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
 			} 
 		}
    	}
@@ -208,13 +258,28 @@ int filterGraph(nodeType*);
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	long value;
-	if([symbolTable getData:&value forKey:"i"]){
-		NSLog(@"i: %d\n",value);
+	NSLog(@"total records processed: %d\n",tot);
+
+	filterData tempData;
+	if([symbolTable getData:&tempData forKey:"runRecords"]){
+		NSLog(@"run records: %d\n",tempData.val.lValue);
 	}
-	if([symbolTable getData:&value forKey:"j"]){
-		NSLog(@"j: %d\n",value);
+	if([symbolTable getData:&tempData forKey:"shaperRecords"]){
+		NSLog(@"shaperRecords records: %d\n",tempData.val.lValue);
 	}
+	if([symbolTable getData:&tempData forKey:"ORShaperDecoderForScalers"]){
+		NSLog(@"ORShaperDecoderForScalers records: %d\n",tempData.val.lValue);
+	}
+	if([symbolTable getData:&tempData forKey:"OR4ChanTriggerDecoderFor100MHzClock"]){
+		NSLog(@"OR4ChanTriggerDecoderFor100MHzClock records: %d\n",tempData.val.lValue);
+	}
+	if([symbolTable getData:&tempData forKey:"unknownRecords"]){
+		NSLog(@"unknownRecords records: %d\n",tempData.val.lValue);
+	}
+	if([symbolTable getData:&tempData forKey:"jj"]){
+		NSLog(@"jj records: %d\n",tempData.val.lValue);
+	}
+
 }
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -302,13 +367,31 @@ int filterGraph(nodeType*);
 {
 	parsedOK = YES;
 	if(!running){
-		//[self parse:script];
-		//if(parsedSuccessfully){
+		[self parse:script];
+		if(parsedSuccessfully){
 			parsedOK = YES;
 			exitNow	   = NO;
 			stopThread = NO;
-			[NSThread detachNewThreadSelector:@selector(_evalMain) toTarget:self withObject:nil];
-		//}
+			filterData tempData;
+			long someData[30];
+			int i;
+			for(i=0;i<30;i++)someData[i]=i;
+			tempData.type = kFilterPtrType;
+			tempData.val.pValue = someData;
+			[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
+			tempData.type = kFilterLongType;
+			tempData.val.lValue = 30;
+			[symbolTable setData:tempData forKey:"CurrentRecordLen"];
+		unsigned node;
+		for(node=0;node<filterNodeCount;node++){
+			NS_DURING
+				ex(allFilterNodes[node],self);
+			NS_HANDLER
+			NS_ENDHANDLER
+		}
+
+			//[NSThread detachNewThreadSelector:@selector(_evalMain) toTarget:self withObject:nil];
+		}
 	}
 	else {
 		stopThread = YES;
@@ -476,6 +559,18 @@ int filterGraph(nodeType*);
 {
 	return aValue + 7;
 }
+
+- (long) extractRecordID:(long)aValue
+{
+	return ExtractDataId(aValue);
+}
+
+- (long) extractRecordLen:(long)aValue
+{
+	return ExtractLength(aValue);
+}
+
+
 @end
 
 @implementation ORFilterModel (private)

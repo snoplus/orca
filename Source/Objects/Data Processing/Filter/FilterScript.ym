@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "FilterScript.h"
-#import "ORHashTable.h"
+#import "ORFilterSymbolTable.h"
 
 /* prototypes */
 nodeType* opr(int oper, int nops, ...);
@@ -40,24 +40,24 @@ int ex(nodeType *p);
 int yylex(void);
 BOOL parsedSuccessfully;
 void FilterScripterror(char *s);
-ORHashTable* symbolTable;
+ORFilterSymbolTable* symbolTable;
 unsigned short      switchLevel;
 long				switchValue[512];
 
 %}
 
 %union {
-    int iValue;                 /* integer value */
-    char sIndex[64];            /* symbol table key */
+    long iValue;                 /* integer value */
+    char sIndex[100];            /* symbol table key */
     nodeType *nPtr;             /* node pointer */
 };
 
 %token <iValue> INTEGER
 %token <sIndex> VARIABLE
-%token FUNCTION WHILE DO FOR IF PRINT BREAK CONTINUE
+%token FUNCTION WHILE DO FOR IF PRINT PRINTH BREAK CONTINUE
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN
-%token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING SWITCH CASE DEFAULT 
-%token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR HELLO
+%token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING SWITCH CASE DEFAULT MAKEARRAY
+%token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR FREEARRAY EXTRACTRECORD_LEN EXTRACTRECORD_ID 
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -66,11 +66,12 @@ long				switchValue[512];
 %left  '%' '*' '/'
 %nonassoc NOT UMINUS INVERT
 
-%type <nPtr>  function statement expr statement_list compound_statement expression_statement
+%type <nPtr>  function statement expr statement_list compound_statement expression_statement arrayElement leftArrayElement
 %type <nPtr>  selection_statement iteration_statement primary_expr postfix_expr unary_expr multiplicative_expr
 %type <nPtr>  additive_expr shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr
 %type <nPtr>  logical_and_expr logical_or_expr conditional_expr assignment_expr jump_statement case_statement
-%type <nPtr>  case_list break_statement constant_expr print_statement  special_statement
+%type <nPtr>  case_list break_statement constant_expr print_statement printhex_statement  special_statement arg_list
+%type <nPtr>  rightArrayElement free_statement
 %%
 
 program
@@ -105,6 +106,9 @@ statement
 		
 special_statement 
 		: print_statement				{ $$ = $1; }
+		| printhex_statement			{ $$ = $1; }
+		| MAKEARRAY arrayElement ';'	{ $$ = $2; }
+		| free_statement				{ $$ = $1;}
 		;
 
 compound_statement
@@ -154,8 +158,32 @@ case_statement
 break_statement
 	: BREAK	';'					{ $$ = opr(BREAK,0); }
 
+//the list of arguments in a function call. ex: doTest(1,a,c)
+arg_list
+		: expr					{ $$ = $1; }
+		| arg_list ',' expr		{ $$ = opr(kMakeArgList, 2, $1, $3); }
+		;
+
+//array declaration
+//ex: array b[10];
+arrayElement
+		: VARIABLE '[' expr ']'							{ $$ = opr(kDefineArray, 2, ident($1), $3);}
+		| VARIABLE '[' expr ']' '=' '{' arg_list '}'	{ $$ = opr(kArrayListAssign, 3, ident($1),$3,$7);}
+		;
+
+//array lvar use, ex: a[1] = 10;
+leftArrayElement
+		: VARIABLE '[' expr ']'							{ $$ = opr(kLeftArray, 2, ident($1), $3);}
+		;
+
+//ex: j =  a[1];
+rightArrayElement
+		: VARIABLE '[' expr ']'							{ $$ = opr(kArrayElement, 2, ident($1), $3);}
+		;
+
 constant_expr
 	:INTEGER					{ $$ = con($1); }
+	|VARIABLE					{ $$ = ident($1); }
 	;
 
 expr
@@ -166,13 +194,19 @@ primary_expr
 		: VARIABLE					{ $$ = ident($1); }
 		| INTEGER					{ $$ = con($1); }
 		| '(' expr ')'				{ $$ = $2; }
-		| HELLO '(' expr ')'		{ $$ = opr(HELLO,1,$3);}
+		| rightArrayElement			{ $$ = $1; }
+		| EXTRACTRECORD_ID '(' expr ')'		{ $$ = opr(EXTRACTRECORD_ID,1,$3);}
+		| EXTRACTRECORD_LEN '(' expr ')'		{ $$ = opr(EXTRACTRECORD_LEN,1,$3);}
 		;
 	
 postfix_expr
 		: primary_expr				{ $$ = $1;}
 		| postfix_expr INC_OP		{ $$ = opr(kPostInc,1,$1);}
 		| postfix_expr DEC_OP		{ $$ = opr(kPostDec,1,$1);}
+		| leftArrayElement INC_OP   { FilterScripterror ("Array++ not allowed"); return 1;}
+		| leftArrayElement DEC_OP   { FilterScripterror ("Array-- not allowed"); return 1;}
+		| leftArrayElement INC_OP   { FilterScripterror ("Array++ not allowed"); return 1;}
+		| leftArrayElement DEC_OP   { FilterScripterror ("Array-- not allowed"); return 1;}
 		;
 
 unary_expr
@@ -250,6 +284,7 @@ conditional_expr
 assignment_expr
 		: conditional_expr									{ $$ = $1;}
 		| VARIABLE '=' assignment_expr						{ $$ = opr('=',2,ident($1),$3);}
+		| leftArrayElement '=' expr							{ $$ = opr(kArrayAssign, 2, $1, $3); }
 		| unary_expr MUL_ASSIGN assignment_expr				{ $$ = opr(MUL_ASSIGN,2,$1,$3);}
 		| unary_expr DIV_ASSIGN assignment_expr				{ $$ = opr(DIV_ASSIGN,2,$1,$3);}
 		| unary_expr MOD_ASSIGN assignment_expr				{ $$ = opr(MOD_ASSIGN,2,$1,$3);}
@@ -270,6 +305,17 @@ print_statement
 		| PRINT  assignment_expr  ';'		{ $$ = opr(PRINT,1, $2); }
 		;
 
+printhex_statement
+		: PRINTH '(' assignment_expr ')' ';'	{ $$ = opr(PRINTH,1, $3); }
+		| PRINTH  assignment_expr  ';'			{ $$ = opr(PRINTH,1, $2); }
+		;
+
+
+free_statement
+		: FREEARRAY '(' VARIABLE ')' ';'	{ $$ = opr(FREEARRAY,1, ident($3)); }
+		| FREEARRAY  VARIABLE  ';'			{ $$ = opr(FREEARRAY,1, ident($2)); }
+		;
+
 %%
 
 #define SIZEOF_NODETYPE ((char *)&p->con - (char *)p)
@@ -280,7 +326,7 @@ void addFilterNode(nodeType* aNode)
 		filterNodeCount = 0;
 		maxFilterNodeCount = 1000;
 		allFilterNodes = (nodeType**)malloc(maxFilterNodeCount*sizeof(nodeType));
-		symbolTable = [[ORHashTable alloc] init];
+		symbolTable = [[ORFilterSymbolTable alloc] init];
 	}
 	allFilterNodes[filterNodeCount++] = aNode;
 	if(filterNodeCount>maxFilterNodeCount){
