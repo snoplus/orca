@@ -1531,6 +1531,8 @@
 		84B8680E0D4A650200E0B132 /* FilterScriptGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B8680D0D4A650200E0B132 /* FilterScriptGraph.m */; };
 		84B868DA0D4A6DE100E0B132 /* FilterScript.ym in Sources */ = {isa = PBXBuildFile; fileRef = 84B868D80D4A6DE100E0B132 /* FilterScript.ym */; };
 		84B868DB0D4A6DE100E0B132 /* FilterScript.lm in Sources */ = {isa = PBXBuildFile; fileRef = 84B868D90D4A6DE100E0B132 /* FilterScript.lm */; };
+		84B86ECC0D539E5B00E0B132 /* ORFilterSymbolTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B86ECA0D539E5B00E0B132 /* ORFilterSymbolTable.h */; };
+		84B86ECD0D539E5B00E0B132 /* ORFilterSymbolTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B86ECB0D539E5B00E0B132 /* ORFilterSymbolTable.m */; };
 		84BAFB650C5E51FE00C91604 /* xAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BAFB610C5E51FE00C91604 /* xAxisMarker.gif */; };
 		84BAFB660C5E51FE00C91604 /* xAxisMarkerOpposite.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BAFB620C5E51FE00C91604 /* xAxisMarkerOpposite.gif */; };
 		84BAFB670C5E51FE00C91604 /* yAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BAFB630C5E51FE00C91604 /* yAxisMarker.gif */; };
@@ -2935,6 +2937,8 @@
 		84B8680D0D4A650200E0B132 /* FilterScriptGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilterScriptGraph.m; sourceTree = "<group>"; };
 		84B868D80D4A6DE100E0B132 /* FilterScript.ym */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; name = FilterScript.ym; path = "Source/Objects/Data Processing/Filter/FilterScript.ym"; sourceTree = SOURCE_ROOT; };
 		84B868D90D4A6DE100E0B132 /* FilterScript.lm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lex; name = FilterScript.lm; path = "Source/Objects/Data Processing/Filter/FilterScript.lm"; sourceTree = SOURCE_ROOT; };
+		84B86ECA0D539E5B00E0B132 /* ORFilterSymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFilterSymbolTable.h; path = "Source/Objects/Data Processing/Filter/ORFilterSymbolTable.h"; sourceTree = SOURCE_ROOT; };
+		84B86ECB0D539E5B00E0B132 /* ORFilterSymbolTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFilterSymbolTable.m; path = "Source/Objects/Data Processing/Filter/ORFilterSymbolTable.m"; sourceTree = SOURCE_ROOT; };
 		84B8B99604DB33F8005F64B1 /* Ncd.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Ncd.gif; path = Source/Experiments/Ncd/Ncd.gif; sourceTree = SOURCE_ROOT; };
 		84B8B99704DB33F8005F64B1 /* Ncd.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Ncd.nib; path = Source/Experiments/Ncd/Ncd.nib; sourceTree = SOURCE_ROOT; };
 		84B8B99804DB33F8005F64B1 /* NcdController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NcdController.h; path = Source/Experiments/Ncd/NcdController.h; sourceTree = SOURCE_ROOT; };
@@ -5976,6 +5980,8 @@
 				84A5CD3B0D464F2900D9833C /* ORFilterModel.h */,
 				84A5CD3C0D464F2900D9833C /* ORFilterModel.m */,
 				84B8665C0D4A50D900E0B132 /* FilterScript.h */,
+				84B86ECA0D539E5B00E0B132 /* ORFilterSymbolTable.h */,
+				84B86ECB0D539E5B00E0B132 /* ORFilterSymbolTable.m */,
 				84B868D80D4A6DE100E0B132 /* FilterScript.ym */,
 				84B868D90D4A6DE100E0B132 /* FilterScript.lm */,
 				84B860E10D4909DB00E0B132 /* FilterScriptEx.m */,
@@ -8107,6 +8113,7 @@
 				84A5CD410D464F2900D9833C /* ORFilterModel.h in Headers */,
 				84B862400D491CAC00E0B132 /* ORHashTable.h in Headers */,
 				84B8665D0D4A50D900E0B132 /* FilterScript.h in Headers */,
+				84B86ECC0D539E5B00E0B132 /* ORFilterSymbolTable.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9210,6 +9217,7 @@
 				84B8680E0D4A650200E0B132 /* FilterScriptGraph.m in Sources */,
 				84B868DA0D4A6DE100E0B132 /* FilterScript.ym in Sources */,
 				84B868DB0D4A6DE100E0B132 /* FilterScript.lm in Sources */,
+				84B86ECD0D539E5B00E0B132 /* ORFilterSymbolTable.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
