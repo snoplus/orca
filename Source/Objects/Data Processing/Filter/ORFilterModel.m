@@ -47,6 +47,7 @@ extern void FilterScriptrestart();
 extern int FilterScriptparse();
 extern long filterNodeCount;
 extern void freeNode(nodeType *p);
+extern void runFilterScript(id delegate);
 extern nodeType** allFilterNodes;
 extern long numFilterLines;
 extern int graphNumber;
@@ -62,7 +63,7 @@ int ex(nodeType*, id);
 int filterGraph(nodeType*);
 //========================================================================
 @interface ORFilterModel (private)
-- (void) _evalMain;
+//- (void) _evalMain;
 - (void) postRunningChanged;
 @end
 
@@ -81,12 +82,7 @@ int filterGraph(nodeType*);
 }
 
 -(void)dealloc
-{
-	if(transferDataPacket){
-		[transferDataPacket release];
-		transferDataPacket = nil;
-	}
-	
+{	
 	int i;
 	if(allFilterNodes){
 		for(i=0;i<filterNodeCount;i++){
@@ -179,38 +175,14 @@ int filterGraph(nodeType*);
 			tempData.val.lValue = recordLen;
 			[symbolTable setData:tempData forKey:"CurrentRecordLen"];
 			
-			unsigned node;
-			for(node=0;node<filterNodeCount;node++){
-				NS_DURING
-					ex(allFilterNodes[node],self);
-				NS_HANDLER
-				NS_ENDHANDLER
-			}
+			runFilterScript(self);
 		
 			ptr += recordLen;
 			totalLen -= recordLen;
 			tot++;
 		}
 	}
-		
-	/*	
-		filterData tempData;
-		tempData.type = kFilterPtrType;
-		tempData.val.pValue = (long*)[data bytes];
-		[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
-		tempData.type = kFilterLongType;
-		tempData.val.lValue = [data length]/sizeof(long);
-		[symbolTable setData:tempData forKey:"CurrentRecordLen"];
-
-		unsigned node;
-		for(node=0;node<filterNodeCount;node++){
-			NS_DURING
-				ex(allFilterNodes[node],self);
-			NS_HANDLER
-			NS_ENDHANDLER
-		}
-	}
-	*/
+	
 	//pass it on
 	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
 	[theNextObject processData:someData userInfo:userInfo];
@@ -222,14 +194,6 @@ int filterGraph(nodeType*);
 	dataHeader		= [[aDataPacket headerAsData] retain];
 	tot = 0;
 
-	if(transferDataPacket){
-		[transferDataPacket release];
-		transferDataPacket = nil;
-	}
-    transferDataPacket  = [aDataPacket copy];
-    [transferDataPacket generateObjectLookup];	//MUST be done before data header in the copy will work.
-    [transferDataPacket clearData];	
-	
 	
 	[self parseScript];
 	if(!parsedOK){
@@ -237,7 +201,7 @@ int filterGraph(nodeType*);
 		[NSException raise:@"Parse Error" format:@"Filter Script parse failed."];
 	}
 	else {
-		NSDictionary* descriptionDict = [[transferDataPacket fileHeader] objectForKey:@"dataDescription"];
+		NSDictionary* descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
 		NSString* objKey;
 		NSEnumerator*  descriptionDictEnum = [descriptionDict keyEnumerator];
 		while(objKey = [descriptionDictEnum nextObject]){
@@ -250,6 +214,7 @@ int filterGraph(nodeType*);
 				filterData theDataType;
 				theDataType.val.lValue= [[lowestLevel objectForKey:@"dataId"] longValue];
 				theDataType.type  = kFilterLongType;
+				NSLog(@"%@:0x%08x\n",decoderName,ExtractDataId(theDataType.val.lValue));
 				[symbolTable setData:theDataType forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
 			} 
 		}
@@ -365,6 +330,7 @@ int filterGraph(nodeType*);
 
 - (void) runScript
 {
+runFilterScript(self);
 	parsedOK = YES;
 	if(!running){
 		[self parse:script];
@@ -372,7 +338,7 @@ int filterGraph(nodeType*);
 			parsedOK = YES;
 			exitNow	   = NO;
 			stopThread = NO;
-			filterData tempData;
+			/*filterData tempData;
 			long someData[30];
 			int i;
 			for(i=0;i<30;i++)someData[i]=i;
@@ -382,13 +348,14 @@ int filterGraph(nodeType*);
 			tempData.type = kFilterLongType;
 			tempData.val.lValue = 30;
 			[symbolTable setData:tempData forKey:"CurrentRecordLen"];
-		unsigned node;
-		for(node=0;node<filterNodeCount;node++){
-			NS_DURING
-				ex(allFilterNodes[node],self);
-			NS_HANDLER
-			NS_ENDHANDLER
-		}
+			*/
+		//unsigned node;
+		//for(node=0;node<filterNodeCount;node++){
+		//	NS_DURING
+		//		ex(allFilterNodes[node],self);
+		//	NS_HANDLER
+		//	NS_ENDHANDLER
+		//}
 
 			//[NSThread detachNewThreadSelector:@selector(_evalMain) toTarget:self withObject:nil];
 		}
@@ -574,7 +541,7 @@ int filterGraph(nodeType*);
 @end
 
 @implementation ORFilterModel (private)
-- (void) _evalMain
+/*- (void) _evalMain
 {
 	running = YES;
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -589,7 +556,6 @@ int filterGraph(nodeType*);
 		NS_DURING
 			ex(allFilterNodes[i],self);
 		NS_HANDLER
-			if([[localException name] isEqualToString:@"return"]){
 				NSDictionary* userInfo = [localException userInfo];
 				if(userInfo){
 					//[self reportResult:[userInfo objectForKey:@"returnValue"]];
@@ -620,7 +586,7 @@ int filterGraph(nodeType*);
 	[self performSelectorOnMainThread:@selector(postRunningChanged) withObject:nil waitUntilDone:YES];
 	[pool release];
 }
-
+*/
 - (void) postRunningChanged
 {	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerRunningChanged object:self];

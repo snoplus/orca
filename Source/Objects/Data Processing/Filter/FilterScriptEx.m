@@ -26,9 +26,22 @@
 
 extern unsigned short   switchLevel;
 extern long				switchValue[512];
-
-
+extern nodeType** allFilterNodes;
+extern long filterNodeCount;
+extern long maxFilterNodeCount;
 filterData ex(nodeType*,id);
+
+void runFilterScript(id delegate)
+{
+	unsigned node;
+	for(node=0;node<filterNodeCount;node++){
+		NS_DURING
+			ex(allFilterNodes[node],delegate);
+		NS_HANDLER
+		NS_ENDHANDLER
+	}
+}
+
 void doSwitch(nodeType *p, id delegate)
 {
 	NS_DURING
@@ -124,7 +137,8 @@ void forLoop(nodeType* p, id delegate)
 void defineArray(nodeType* p, id delegate)
 {
 	int n = ex(p->opr.op[1],delegate).val.lValue;
-	long* ptr = calloc(n, sizeof(long));
+	long* ptr = 0;
+	if(n>0) ptr = calloc(n, sizeof(long));
 	filterData tempData;
 	tempData.type		= kFilterPtrType;
 	tempData.val.pValue = ptr;
@@ -141,9 +155,9 @@ void freeArray(nodeType* p, id delegate)
 				theFilterData.val.pValue = 0;
 				[symbolTable setData:theFilterData forKey:p->opr.op[0]->ident.key];
 			}
-			else {
-				[NSException raise:@"Access Violation" format:@"Free of NIL pointer"];
-			}
+			//else {
+			//	[NSException raise:@"Access Violation" format:@"Free of NIL pointer"];
+			//}
 		}
 	}
 }
@@ -209,19 +223,19 @@ filterData ex(nodeType *p,id delegate)
 			case PRINT:
 					tempData = ex(p->opr.op[0],delegate);
 					if(tempData.type == kFilterPtrType){
-						if(tempData.val.pValue) NSLog(@"%d\n", *tempData.val.pValue); 
-						else					NSLog(@"<nil ptr>\n"); 
+						if(tempData.val.pValue) printf("%ld\n", *tempData.val.pValue); 
+						else					printf("<nil ptr>\n"); 
 					}
-					else NSLog(@"%d\n", tempData.val.lValue); 
+					else printf("%ld\n", tempData.val.lValue); 
 			return tempData;
 			
 			case PRINTH:
 					tempData = ex(p->opr.op[0],delegate);
 					if(tempData.type == kFilterPtrType){
-						if(tempData.val.pValue) NSLog(@"0x%07x\n", *tempData.val.pValue); 
-						else					NSLog(@"<nil ptr>\n"); 
+						if(tempData.val.pValue) printf("0x%07lx\n", *tempData.val.pValue); 
+						else					printf("<nil ptr>\n"); 
 					}
-					else NSLog(@"0x%07x\n", tempData.val.lValue); 
+					else printf("0x%07lx\n", tempData.val.lValue); 
 			return tempData;
 			case ';':       ex(p->opr.op[0],delegate); return ex(p->opr.op[1],delegate);
 			case '=':      

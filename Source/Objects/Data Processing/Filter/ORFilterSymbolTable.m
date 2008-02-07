@@ -97,7 +97,6 @@ int rem;
 */
 - (BOOL) setData:(filterData)data forKey:(const char*) key
 {
-	printf("%s\n",key);
 	hashTable *newhash;
 	hashTable *curhash;
 	unsigned int hashval;

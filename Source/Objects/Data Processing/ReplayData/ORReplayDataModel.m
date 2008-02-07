@@ -248,9 +248,8 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     [[NSNotificationCenter defaultCenter]
 				postNotificationName:ORReplayRunningNotification
                               object: self];
-    nextObject = [self objectConnectedTo:ORReplayDataConnection];
-    [nextObject runTaskStarted:fileAsDataPacket userInfo:nil];
 	[self parseFile];
+	
 }
 
 
@@ -375,6 +374,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 {
 	NSEnumerator* e = [filesToReplay objectEnumerator];
 	id aFile;
+	BOOL doneOnce = NO;
 	while(aFile = [e nextObject]){
 		if(stop)break;
 		
@@ -397,6 +397,11 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 					[self setDataRecords:[fileAsDataPacket decodeDataIntoArrayForDelegate:self]]; 
 					
 					[self performSelectorOnMainThread:@selector(postProcessingStarted) withObject:nil waitUntilDone:NO];
+					if(!doneOnce){
+						doneOnce = YES;
+						nextObject = [self objectConnectedTo:ORReplayDataConnection];
+						[nextObject runTaskStarted:fileAsDataPacket userInfo:nil];
+					}
 					[self processData];
 					[self performSelectorOnMainThread:@selector(fileFinished) withObject:nil waitUntilDone:YES];
 					
@@ -414,6 +419,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 		}
 		[pool release];
 	}
+
     return @"done";
 }
 

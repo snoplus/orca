@@ -40,7 +40,6 @@
 		NSString*			scriptName;
 		NSMutableArray*		args;
 		id					inputValue;
-		ORDataPacket*		transferDataPacket;
 		
 		BOOL				stopThread;
 		BOOL				running;
