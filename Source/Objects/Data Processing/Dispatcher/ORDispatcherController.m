@@ -79,6 +79,12 @@
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(textDidChange:)
+                         name : NSTextDidChangeNotification
+						object: nil];	
+
 }
 
 #pragma mark ¥¥¥Actions
