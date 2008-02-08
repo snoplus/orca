@@ -1652,7 +1652,7 @@
 			outputFiles = (
 				"lex.${INPUT_FILE_BASE}.m",
 			);
-			script = "cd \"${DERIVED_FILE_DIR}\" && /usr/bin/lex -P \"${INPUT_FILE_BASE}\" \"${INPUT_FILE_PATH}\" && mv \"${DERIVED_FILE_DIR}\"/lex.\"${INPUT_FILE_BASE}\".c \"${DERIVED_FILE_DIR}\"/lex.\"${INPUT_FILE_BASE}\".m";
+			script = "cd $DERIVED_FILE_DIR && /usr/bin/Lex -P${INPUT_FILE_BASE} \"${INPUT_FILE_PATH}\"";
 		};
 		9C2595AD0D5171B90039C5DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -8127,8 +8127,7 @@
 /* Begin PBXProject section */
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
-			compatibilityVersion = "Xcode 2.4";
+			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "OrcaTiger" */;
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Orca */;
 			projectDirPath = "";
@@ -9061,7 +9060,6 @@
 				84760D580B37437400512F67 /* ORExperimentController.m in Sources */,
 				84080D2C0B3C7FBF009D3704 /* ORScriptRunner.m in Sources */,
 				84080D2E0B3C7FBF009D3704 /* NodeTree.m in Sources */,
-				84080D300B3C7FBF009D3704 /* OrcaScript.lm in Sources */,
 				843824670B41BF4800B7F417 /* ORScriptTaskController.m in Sources */,
 				843824690B41BF4800B7F417 /* ORScriptTaskModel.m in Sources */,
 				843828B00B43413500B7F417 /* ORScriptInterface.m in Sources */,
@@ -9073,7 +9071,6 @@
 				84519C6E0B5C0B0900B08915 /* GoToLine.m in Sources */,
 				8475974E0B5EF26500123411 /* ORSqlController.m in Sources */,
 				847597500B5EF26500123411 /* ORSqlModel.m in Sources */,
-				84759CF50B6036D600123411 /* OrcaScript.ym in Sources */,
 				84F7E2340B68281A00E52AA5 /* ORCrateLabelView.m in Sources */,
 				849E7C9B0B6957BF00353D50 /* ORADU200Controller.m in Sources */,
 				849E7C9D0B6957BF00353D50 /* ORADU200Model.m in Sources */,
@@ -9173,6 +9170,8 @@
 				9C2595B10D5172180039C5DF /* ORHashTable.m in Sources */,
 				9C2595B80D5172460039C5DF /* FilterScript.ym in Sources */,
 				9C2595B90D5172460039C5DF /* FilterScript.lm in Sources */,
+				84080D300B3C7FBF009D3704 /* OrcaScript.lm in Sources */,
+				84759CF50B6036D600123411 /* OrcaScript.ym in Sources */,
 				9C2595BA0D5172460039C5DF /* FilterScriptEx.m in Sources */,
 				9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */,
 				84FBB5720D5401BD00780DBD /* ORFilterSymbolTable.m in Sources */,
@@ -9490,7 +9489,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */ = {
+		84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "OrcaTiger" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				84F201BF0B6531990084F4C3 /* Development */,
