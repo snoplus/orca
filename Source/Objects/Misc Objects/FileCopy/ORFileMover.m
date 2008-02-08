@@ -302,7 +302,7 @@ NSString* ORFileMoverPercentDoneChanged = @"ORFileMoverPercentDoneChanged";
 					//fprintf(scriptFilePtr,"send \"yes\n\"\n");
 					//fprintf(scriptFilePtr,"}\n");
 					
-					fprintf(scriptFilePtr,"\"password:\" { \n");
+					fprintf(scriptFilePtr,"\"assword:\" { \n");
 					fprintf(scriptFilePtr,"send \"%s\n\"\n",[remotePassWord cStringUsingEncoding:NSASCIIStringEncoding]);
 					fprintf(scriptFilePtr,"}\n");
 						
