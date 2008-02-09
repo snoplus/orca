@@ -81,6 +81,7 @@ H			[a-fA-F0-9]
 "free"			return FREEARRAY;
 "extractRecordID"			return EXTRACTRECORD_ID;
 "extractRecordLen"			return EXTRACTRECORD_LEN;
+"addRecord"					return ADD_RECORD;
 
 {L}({L}|{D})* { 
                 strncpy(FilterScriptlval.sIndex,yytext,yyleng);

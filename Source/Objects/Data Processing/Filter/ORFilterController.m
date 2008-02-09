@@ -59,16 +59,6 @@
 					   object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(runningChanged:)
-                         name : ORScriptRunnerRunningChanged
-						object: [model scriptRunner]];	
-
-    [notifyCenter addObserver : self
-                     selector : @selector(errorChanged:)
-                         name : ORScriptRunnerParseError
-						object: [model scriptRunner]];	
-
-    [notifyCenter addObserver : self
                      selector : @selector(nameChanged:)
                          name : ORFilterNameChanged
 						object: model];	
@@ -120,7 +110,6 @@
 {
     [super updateWindow];
 	[self scriptChanged:nil];
-	[self runningChanged:nil];
 	[self argsChanged:nil];
 	[self lastFileChanged:nil];
 	
@@ -156,30 +145,6 @@
 	}
 }
 
-- (void) errorChanged:(NSNotification*)aNote
-{
-	int lineNumber = [[[aNote userInfo] objectForKey:@"ErrorLocation"] intValue];
-	[scriptView goToLine:lineNumber];
-}
-
-- (void) runningChanged:(NSNotification*)aNote
-{
-	if([model running]){
-		[statusField setStringValue:@"Started"];
-		[runStatusField setStringValue:@"Running"];
-		
-		[runButton setImage:[NSImage imageNamed:@"Stop"]];
-		[runButton setAlternateImage:[NSImage imageNamed:@"Stop"]];
-		[loadSaveButton setEnabled:NO];
-	}
-	else {
-		[statusField setStringValue:@""];
-		[runStatusField setStringValue:@""];
-		[runButton setImage:[NSImage imageNamed:@"Play"]];
-		[runButton setAlternateImage:[NSImage imageNamed:@"Play"]];
-		[loadSaveButton setEnabled:YES];
-	}
-}
 
 #pragma mark •••Data Source Methods
 - (IBAction) listMethodsAction:(id) sender
@@ -206,21 +171,6 @@
 	else [statusField setStringValue:@"ERRORS"];
 }
 	
-- (IBAction) runScript:(id) sender
-{
-	[statusField setStringValue:@""];	
-	[self endEditing];
-	[model setScript:[scriptView string]];
-	BOOL showError;
-	if(![model running]) showError = YES;
-	else showError = NO;
-	[model runScript];
-	if(showError){
-		if([model parsedOK])[statusField setStringValue:@"Parsed OK"];
-		else [statusField setStringValue:@"ERRORS"];
-	}
-}
-
 - (IBAction) nameAction:(id) sender
 {
 	[model setScriptName:[sender stringValue]];

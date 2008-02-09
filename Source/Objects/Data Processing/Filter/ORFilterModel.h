@@ -27,16 +27,12 @@
 
 #pragma mark •••Forward Declarations
 @class ORDataPacket;
-@class ORFilterClient;
-@class ORScriptRunner;
 
 @interface ORFilterModel :  ORDataChainObject 
 {
     @private
-		NSData*				dataHeader;
 		NSString*			lastFile;
 		NSString*			script;
-		ORScriptRunner*		scriptRunner;
 		NSString*			scriptName;
 		NSMutableArray*		args;
 		id					inputValue;
@@ -49,6 +45,8 @@
 		NSData*				expressionAsData;
 		BOOL				exitNow;
 		long				tot;
+		ORDataPacket*       transferDataPacket;
+		ORDataPacket*       currentDataPacket;
 }
 
 #pragma mark •••Accessors
@@ -62,7 +60,6 @@
 - (BOOL) parsedOK;
 - (id) arg:(int)index;
 - (void) setArg:(int)index withValue:(id)aValue;
-- (ORScriptRunner*) scriptRunner;
 - (id)		inputValue;
 - (void)	setInputValue:(id)aValue;
 - (BOOL)	exitNow;
@@ -74,17 +71,15 @@
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
 #pragma mark ***Script Methods
-- (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
 - (void) parseScript;
-- (void) runScript;
-- (BOOL) running;
-- (void) stopScript;
 - (void) saveFile;
 - (void) loadScriptFromFile:(NSString*)aFilePath;
 - (void) saveScriptToFile:(NSString*)aFilePath;
 
+#pragma mark ***Plugin Interface
 - (long) extractRecordID:(long)aValue;
 - (long) extractRecordLen:(long)aValue;
+- (void) addFilteredRecord:(long*)p length:(long)length;
 
 #pragma mark •••Parsers
 - (void) parseFile:(NSString*)aPath;

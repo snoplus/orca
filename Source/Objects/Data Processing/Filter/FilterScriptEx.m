@@ -202,18 +202,16 @@ filterData ex(nodeType *p,id delegate)
 		return tempData;
 		
 		case typeId:       
-			{
-				[symbolTable getData:&tempData forKey:p->ident.key];
-				return tempData;
-			}
-		break;
+			[symbolTable getData:&tempData forKey:p->ident.key];
+			return tempData;
+			
 		case typeOpr:
 			switch(p->opr.oper) {
 			case DO:		doLoop(p,delegate); return tempData;
 			case WHILE:     whileLoop(p,delegate); return tempData;
 			case FOR:		forLoop(p,delegate); return tempData;
 			case CONTINUE:	[NSException raise:@"continue" format:nil]; return tempData;
-			case IF:        if (ex(p->opr.op[0],delegate).val.lValue)     ex(p->opr.op[1],delegate);
+			case IF:        if (ex(p->opr.op[0],delegate).val.lValue) ex(p->opr.op[1],delegate);
 							else if (p->opr.nops > 2) ex(p->opr.op[2],delegate);
 							return tempData;
 			case BREAK:		[NSException raise:@"break" format:nil]; return tempData;
@@ -237,7 +235,7 @@ filterData ex(nodeType *p,id delegate)
 					}
 					else printf("0x%07lx\n", tempData.val.lValue); 
 			return tempData;
-			case ';':       ex(p->opr.op[0],delegate); return ex(p->opr.op[1],delegate);
+			case ';':       if (p->opr.nops>=1) ex(p->opr.op[0],delegate); if (p->opr.nops>=2)return ex(p->opr.op[1],delegate); else return tempData;
 			case '=':      
 				{
 					tempData = ex(p->opr.op[1],delegate);
@@ -392,6 +390,16 @@ filterData ex(nodeType *p,id delegate)
 			case EXTRACTRECORD_LEN: 
 				tempData.val.lValue =  [delegate extractRecordLen:ex(p->opr.op[0],delegate).val.lValue]; 
 			return tempData;
+			
+			case ADD_RECORD:
+				{
+					long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					long len = ex(p->opr.op[1],delegate).val.lValue;
+					if(ptr && len){
+						[delegate addFilteredRecord:ptr length:len]; 
+					}
+				}
+			break;
         }
     }
     return tempData;

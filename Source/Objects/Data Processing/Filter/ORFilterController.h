@@ -44,10 +44,8 @@
 
 #pragma mark •••Interface Management
 - (void) scriptChanged:(NSNotification*)aNote;
-- (void) runningChanged:(NSNotification*)aNote;
 - (void) textDidChange:(NSNotification*)aNote;
 - (void) argsChanged:(NSNotification*)aNote;
-- (void) errorChanged:(NSNotification*)aNote;
 - (void) lastFileChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
@@ -55,7 +53,6 @@
 - (IBAction) listMethodsAction:(id) sender;
 - (IBAction) cancelLoadSaveAction:(id)sender;
 - (IBAction) parseScript:(id) sender;	
-- (IBAction) runScript:(id) sender;
 - (IBAction) nameAction:(id) sender;
 - (IBAction) argAction:(id) sender;
 - (IBAction) loadSaveAction:(id)sender;

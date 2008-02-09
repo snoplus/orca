@@ -58,6 +58,7 @@ long				switchValue[512];
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING SWITCH CASE DEFAULT MAKEARRAY
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR FREEARRAY EXTRACTRECORD_LEN EXTRACTRECORD_ID 
+%token ADD_RECORD
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -196,15 +197,14 @@ primary_expr
 		| '(' expr ')'				{ $$ = $2; }
 		| rightArrayElement			{ $$ = $1; }
 		| EXTRACTRECORD_ID '(' expr ')'		{ $$ = opr(EXTRACTRECORD_ID,1,$3);}
-		| EXTRACTRECORD_LEN '(' expr ')'		{ $$ = opr(EXTRACTRECORD_LEN,1,$3);}
+		| EXTRACTRECORD_LEN '(' expr ')'	{ $$ = opr(EXTRACTRECORD_LEN,1,$3);}
+		| ADD_RECORD '(' expr ',' expr ')'	{ $$ = opr(ADD_RECORD,2,$3,$5);}
 		;
 	
 postfix_expr
 		: primary_expr				{ $$ = $1;}
 		| postfix_expr INC_OP		{ $$ = opr(kPostInc,1,$1);}
 		| postfix_expr DEC_OP		{ $$ = opr(kPostDec,1,$1);}
-		| leftArrayElement INC_OP   { FilterScripterror ("Array++ not allowed"); return 1;}
-		| leftArrayElement DEC_OP   { FilterScripterror ("Array-- not allowed"); return 1;}
 		| leftArrayElement INC_OP   { FilterScripterror ("Array++ not allowed"); return 1;}
 		| leftArrayElement DEC_OP   { FilterScripterror ("Array-- not allowed"); return 1;}
 		;
@@ -326,7 +326,9 @@ void addFilterNode(nodeType* aNode)
 		filterNodeCount = 0;
 		maxFilterNodeCount = 1000;
 		allFilterNodes = (nodeType**)malloc(maxFilterNodeCount*sizeof(nodeType));
-		symbolTable = [[ORFilterSymbolTable alloc] init];
+		if(!symbolTable){
+			symbolTable = [[ORFilterSymbolTable alloc] init];
+		}
 	}
 	allFilterNodes[filterNodeCount++] = aNode;
 	if(filterNodeCount>maxFilterNodeCount){

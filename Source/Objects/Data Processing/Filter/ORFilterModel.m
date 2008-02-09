@@ -22,7 +22,6 @@
 #pragma mark •••Imported Files
 #import "ORFilterModel.h"
 #import "ORDataPacket.h"
-#import "ORScriptRunner.h"
 #import "ORDataPacket.h"
 #import "ORFilterSymbolTable.h"
 #import "FilterScript.h"
@@ -30,6 +29,8 @@
 
 static NSString* ORFilterInConnector 		= @"Filter In Connector";
 static NSString* ORFilterOutConnector 		= @"Filter Out Connector";
+static NSString* ORFilterFilteredConnector  = @"Filtered Out Connector";
+
 NSString* ORFilterLastFileChanged			= @"ORFilterLastFileChanged";
 NSString* ORFilterNameChanged				= @"ORFilterNameChanged";
 NSString* ORFilterArgsChanged				= @"ORFilterArgsChanged";
@@ -62,15 +63,14 @@ int FilterScriptYYINPUT(char* theBuffer,int maxSize)
 int ex(nodeType*, id);
 int filterGraph(nodeType*);
 //========================================================================
+
 @interface ORFilterModel (private)
-//- (void) _evalMain;
-- (void) postRunningChanged;
+- (void) loadDataIDsIntoSymbolTable:(ORDataPacket*)aDataPacket;
 @end
 
 @implementation ORFilterModel
 
 #pragma mark •••Initialization
-
 - (id) init //designated initializer
 {
 	self = [super init];
@@ -92,6 +92,7 @@ int filterGraph(nodeType*);
 		allFilterNodes = nil;
 	}
 
+	[transferDataPacket release];
 	[expressionAsData release];
     [super dealloc];
 }
@@ -112,10 +113,13 @@ int filterGraph(nodeType*);
     [[self connectors] setObject:aConnector forKey:ORFilterInConnector];
     [aConnector release];
 
+    aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width/2 - kConnectorSize/2 , 0) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:aConnector forKey:ORFilterFilteredConnector];
+    [aConnector release];
+    
     aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width-kConnectorSize,[self frame].size.height/2 - kConnectorSize/2) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORFilterOutConnector];
     [aConnector release];
-    
 }
 
 #pragma mark •••Accessors
@@ -154,6 +158,24 @@ int filterGraph(nodeType*);
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
 {
 
+	if(someData != currentDataPacket){
+		[someData generateObjectLookup];	 //MUST be done before data header will work.
+		currentDataPacket = someData;
+		if(transferDataPacket){
+			[transferDataPacket release];
+			transferDataPacket = nil;
+		}
+		transferDataPacket  = [someData copy];
+		[transferDataPacket generateObjectLookup];	//MUST be done before data header will work.
+		[transferDataPacket clearData];	
+		[self loadDataIDsIntoSymbolTable:someData];
+	}
+
+	//pass it on
+	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
+	[theNextObject processData:someData userInfo:userInfo];
+
+
 	//each block of data is an array of NSData objects, each potentially containing many records..
 	NSArray* theDataArray = [someData dataArray];
 	int n = [theDataArray count];
@@ -162,96 +184,70 @@ int filterGraph(nodeType*);
 		//each record must be filtered by the filter code. 
 		NSData* data = [theDataArray objectAtIndex:i];
 		long totalLen = [data length]/sizeof(long);
-		long* ptr = (long*)[data bytes];
-		while(totalLen>0){
-			long recordLen = ExtractLength(*ptr);
-			filterData tempData;
-			
-			tempData.type		= kFilterPtrType;
-			tempData.val.pValue = ptr;
-			[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
-			
-			tempData.type		= kFilterLongType;
-			tempData.val.lValue = recordLen;
-			[symbolTable setData:tempData forKey:"CurrentRecordLen"];
-			
-			runFilterScript(self);
-		
-			ptr += recordLen;
-			totalLen -= recordLen;
-			tot++;
+		if(totalLen>0){
+			long* ptr = (long*)[data bytes];
+			while(totalLen>0){
+				long recordLen = ExtractLength(*ptr);
+				filterData tempData;
+				
+				tempData.type		= kFilterPtrType;
+				tempData.val.pValue = ptr;
+				[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
+				
+				tempData.type		= kFilterLongType;
+				tempData.val.lValue = recordLen;
+				[symbolTable setData:tempData forKey:"CurrentRecordLen"];
+				
+				runFilterScript(self);
+				
+				ptr += recordLen;
+				totalLen -= recordLen;
+				tot++;
+			}
+		}
+		else {
+			[symbolTable removeKey:"CurrentRecordPtr"];
+			[symbolTable removeKey:"CurrentRecordLen"];
 		}
 	}
-	
-	//pass it on
-	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-	[theNextObject processData:someData userInfo:userInfo];
-
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {		
-	dataHeader		= [[aDataPacket headerAsData] retain];
 	tot = 0;
 
+	currentDataPacket = nil;
 	
 	[self parseScript];
+	
 	if(!parsedOK){
 		NSLog(@"Filter script parse error prevented run start\n");
 		[NSException raise:@"Parse Error" format:@"Filter Script parse failed."];
 	}
 	else {
-		NSDictionary* descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
-		NSString* objKey;
-		NSEnumerator*  descriptionDictEnum = [descriptionDict keyEnumerator];
-		while(objKey = [descriptionDictEnum nextObject]){
-			NSDictionary* objDictionary = [descriptionDict objectForKey:objKey];
-			NSEnumerator* dataObjEnum = [objDictionary keyEnumerator];
-			NSString* dataObjKey;
-			while(dataObjKey = [dataObjEnum nextObject]){
-				NSDictionary* lowestLevel = [objDictionary objectForKey:dataObjKey];
-				NSString* decoderName = [lowestLevel objectForKey:@"decoder"];
-				filterData theDataType;
-				theDataType.val.lValue= [[lowestLevel objectForKey:@"dataId"] longValue];
-				theDataType.type  = kFilterLongType;
-				NSLog(@"%@:0x%08x\n",decoderName,ExtractDataId(theDataType.val.lValue));
-				[symbolTable setData:theDataType forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
-			} 
-		}
-   	}
+		id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
+		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
+
+		theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
+		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
+	}
 }
+
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	NSLog(@"total records processed: %d\n",tot);
+	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
+	[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
 
-	filterData tempData;
-	if([symbolTable getData:&tempData forKey:"runRecords"]){
-		NSLog(@"run records: %d\n",tempData.val.lValue);
-	}
-	if([symbolTable getData:&tempData forKey:"shaperRecords"]){
-		NSLog(@"shaperRecords records: %d\n",tempData.val.lValue);
-	}
-	if([symbolTable getData:&tempData forKey:"ORShaperDecoderForScalers"]){
-		NSLog(@"ORShaperDecoderForScalers records: %d\n",tempData.val.lValue);
-	}
-	if([symbolTable getData:&tempData forKey:"OR4ChanTriggerDecoderFor100MHzClock"]){
-		NSLog(@"OR4ChanTriggerDecoderFor100MHzClock records: %d\n",tempData.val.lValue);
-	}
-	if([symbolTable getData:&tempData forKey:"unknownRecords"]){
-		NSLog(@"unknownRecords records: %d\n",tempData.val.lValue);
-	}
-	if([symbolTable getData:&tempData forKey:"jj"]){
-		NSLog(@"jj records: %d\n",tempData.val.lValue);
-	}
-
+	theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
+	[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
+	
+	[transferDataPacket release];
+	transferDataPacket = nil;
 }
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	
-	[dataHeader release];
-	dataHeader = nil;
 }
 
 - (NSString*) script
@@ -301,10 +297,6 @@ int filterGraph(nodeType*);
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterArgsChanged object:self];
 }
 #pragma mark ***Script Methods
-- (ORScriptRunner*) scriptRunner
-{
-	return scriptRunner;
-}
 
 - (BOOL) parsedOK
 {
@@ -326,64 +318,6 @@ int filterGraph(nodeType*);
 			}
 		}
 	}
-}
-
-- (void) runScript
-{
-runFilterScript(self);
-	parsedOK = YES;
-	if(!running){
-		[self parse:script];
-		if(parsedSuccessfully){
-			parsedOK = YES;
-			exitNow	   = NO;
-			stopThread = NO;
-			/*filterData tempData;
-			long someData[30];
-			int i;
-			for(i=0;i<30;i++)someData[i]=i;
-			tempData.type = kFilterPtrType;
-			tempData.val.pValue = someData;
-			[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
-			tempData.type = kFilterLongType;
-			tempData.val.lValue = 30;
-			[symbolTable setData:tempData forKey:"CurrentRecordLen"];
-			*/
-		//unsigned node;
-		//for(node=0;node<filterNodeCount;node++){
-		//	NS_DURING
-		//		ex(allFilterNodes[node],self);
-		//	NS_HANDLER
-		//	NS_ENDHANDLER
-		//}
-
-			//[NSThread detachNewThreadSelector:@selector(_evalMain) toTarget:self withObject:nil];
-		}
-	}
-	else {
-		stopThread = YES;
-	}
-}
-
-
-- (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue
-{
-	[self setInputValue:nil];
-	if(normalFinish)NSLog(@"[%@] Returned with: %@\n",[scriptRunner scriptName],aValue);
-	else NSLogColor([NSColor redColor],@"[%@] Abnormal exit!\n",[scriptRunner scriptName]);
-
-}
-
-- (void) stopScript
-{
-	[scriptRunner stop];
-	[scriptRunner release];
-	scriptRunner = nil;
-}
-
-- (BOOL) running
-{
-	return [scriptRunner running];
 }
 
 - (void) loadScriptFromFile:(NSString*)aFilePath
@@ -472,34 +406,18 @@ runFilterScript(self);
 			}
 			else  {
 				NSLog(@"line %d: %@\n",numFilterLines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:numFilterLines]);
-				[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
-																	object:self 
-																  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:numFilterLines+1] forKey:@"ErrorLocation"]];
 			}
 
 		}
 		NS_HANDLER {
 			NSLog(@"line %d: %@\n",numFilterLines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:numFilterLines]);
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
-																	object:self 
-																  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:numFilterLines+1] forKey:@"ErrorLocation"]];
 			NSLog(@"Caught %@: %@\n",[localException name],[localException reason]);
 			//[functionList release];
 			//functionList = nil;
 		}
 		NS_ENDHANDLER
-		
 		theFilterRunner = nil;
-		//[self setFunctionTable:functionList];
-		//[eval release];
-		//eval = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable];
-		//if(inputValue){
-		//	[eval setSymbolTable:[eval makeSymbolTableFor:@"main" args:inputValue]];
-		//}
-		//[functionList release];
-		//functionList = nil;
 	}
-	//return [self functionTable];
 }
 
 
@@ -522,11 +440,6 @@ runFilterScript(self);
 	return theCopySize;
 }
 
-- (long) hello:(long)aValue
-{
-	return aValue + 7;
-}
-
 - (long) extractRecordID:(long)aValue
 {
 	return ExtractDataId(aValue);
@@ -537,58 +450,41 @@ runFilterScript(self);
 	return ExtractLength(aValue);
 }
 
+#pragma mark ***Plugin Interface
+- (void) addFilteredRecord:(long*)p length:(long)length
+{
+	if(ExtractDataId(p[0]) != 0){
+		[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:length];
+		[transferDataPacket addFrameBuffer:YES];
+		//pass it on
+		id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
+		[theNextObject processData:transferDataPacket userInfo:nil];
+		[transferDataPacket addFrameBuffer:YES];
+		[transferDataPacket clearData];
+	}
+}
 
 @end
 
 @implementation ORFilterModel (private)
-/*- (void) _evalMain
-{
-	running = YES;
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[self performSelectorOnMainThread:@selector(postRunningChanged) withObject:nil waitUntilDone:YES];
-	if([scriptName length])NSLog(@"Started %@\n",scriptName);
-	else NSLog(@"Started OrcaScript\n");
-	
-	unsigned i;
-	BOOL failed = NO;
-	for(i=0;i<filterNodeCount;i++){
-		NSAutoreleasePool* innerPool = [[NSAutoreleasePool alloc] init];			
-		NS_DURING
-			ex(allFilterNodes[i],self);
-		NS_HANDLER
-				NSDictionary* userInfo = [localException userInfo];
-				if(userInfo){
-					//[self reportResult:[userInfo objectForKey:@"returnValue"]];
-					[innerPool release];
-					break;
-				}
-			}
-			else if([[localException name] isEqualToString:@"exit"]){
-				//[self reportResult:[NSDecimalNumber numberWithInt:0]];
-				[innerPool release];
-				break;
-			}
-			else {
-				NSLogColor([NSColor redColor],@"Script will exit because of exception: %@\n",localException);
-				failed = YES;
-			}
-		NS_ENDHANDLER
-		[innerPool release];
-		if(stopThread || failed)break;
+- (void) loadDataIDsIntoSymbolTable:(ORDataPacket*)aDataPacket
+{		
+	NSDictionary* descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
+	NSString* objKey;
+	NSEnumerator*  descriptionDictEnum = [descriptionDict keyEnumerator];
+	while(objKey = [descriptionDictEnum nextObject]){
+		NSDictionary* objDictionary = [descriptionDict objectForKey:objKey];
+		NSEnumerator* dataObjEnum = [objDictionary keyEnumerator];
+		NSString* dataObjKey;
+		while(dataObjKey = [dataObjEnum nextObject]){
+			NSDictionary* lowestLevel = [objDictionary objectForKey:dataObjKey];
+			NSString* decoderName = [lowestLevel objectForKey:@"decoder"];
+			filterData theDataType;
+			theDataType.val.lValue= [[lowestLevel objectForKey:@"dataId"] longValue];
+			theDataType.type  = kFilterLongType;
+			[symbolTable setData:theDataType forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
+		} 
 	}
-	
-	if(failed){
-		NSLogColor([NSColor redColor],@"Run Time Error....Abnormal Exit\n");
-	}
-	if([scriptName length])NSLog(@"%@ Exited\n",scriptName);
-	else NSLog(@"OrcaScript Exited\n");
-	running = NO;
-	[self performSelectorOnMainThread:@selector(postRunningChanged) withObject:nil waitUntilDone:YES];
-	[pool release];
 }
-*/
-- (void) postRunningChanged
-{	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerRunningChanged object:self];
-}
+
 @end
