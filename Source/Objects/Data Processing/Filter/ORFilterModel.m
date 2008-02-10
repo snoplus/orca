@@ -26,6 +26,7 @@
 #import "ORFilterSymbolTable.h"
 #import "FilterScript.h"
 #import "ORDataTypeAssigner.h"
+#import "ORQueue.h"
 
 static NSString* ORFilterInConnector 		= @"Filter In Connector";
 static NSString* ORFilterOutConnector 		= @"Filter Out Connector";
@@ -230,6 +231,11 @@ int filterGraph(nodeType*);
 
 		theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
 		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
+		
+		int i;
+		for(i=0;i<kNumFilterStacks;i++){
+			stacks[i] = nil;
+		}
 	}
 }
 
@@ -244,6 +250,12 @@ int filterGraph(nodeType*);
 	
 	[transferDataPacket release];
 	transferDataPacket = nil;
+
+	int i;
+	for(i=0;i<kNumFilterStacks;i++){
+		[stacks[i] release];
+	}
+
 }
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -440,6 +452,7 @@ int filterGraph(nodeType*);
 	return theCopySize;
 }
 
+#pragma mark ***Plugin Interface
 - (long) extractRecordID:(long)aValue
 {
 	return ExtractDataId(aValue);
@@ -450,8 +463,7 @@ int filterGraph(nodeType*);
 	return ExtractLength(aValue);
 }
 
-#pragma mark ***Plugin Interface
-- (void) addFilteredRecord:(long*)p length:(long)length
+- (void) shipRecord:(long*)p length:(long)length
 {
 	if(ExtractDataId(p[0]) != 0){
 		[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:length];
@@ -459,9 +471,35 @@ int filterGraph(nodeType*);
 		//pass it on
 		id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
 		[theNextObject processData:transferDataPacket userInfo:nil];
-		[transferDataPacket addFrameBuffer:YES];
 		[transferDataPacket clearData];
 	}
+}
+
+- (void) pushOntoStack:(int)i record:(long*)p
+{
+	if(!stacks[i])stacks[i] = [[ORQueue alloc] init]; 
+	
+	NSData* data = [NSData dataWithBytes:p length:ExtractLength(*p)*sizeof(long)];
+	[stacks[i] enqueue:data];
+}
+
+- (long*) popFromStack:(int)i
+{
+	NSData* data = [stacks[i] dequeue];
+	return (long*)[data bytes];
+}
+
+- (void) shipStack:(int)i
+{
+	while(![stacks[i] isEmpty]){
+		[transferDataPacket addData:[stacks[i] dequeueFromBottom]];
+	}
+	[transferDataPacket addFrameBuffer:YES];
+	//pass it on
+	id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
+	[theNextObject processData:transferDataPacket userInfo:nil];
+	[transferDataPacket clearData];
+
 }
 
 @end

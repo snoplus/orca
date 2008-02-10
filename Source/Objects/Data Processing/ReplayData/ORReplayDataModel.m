@@ -483,8 +483,6 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	
 	unsigned long i;
     for(i=0;i<num;i++){
-		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-							beforeDate:[NSDate dateWithTimeIntervalSinceNow:0]];
         if(pool== nil) pool = [[NSAutoreleasePool allocWithZone:nil] init];
 		NSMutableDictionary* dataDictionary = [dataRecords objectAtIndex:i];
 		unsigned long anOffset = [[dataDictionary objectForKey:@"StartingOffset"] longValue];
@@ -507,6 +505,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 		}
 		lengthDecoded = num-i;
 		if(!(i % 10000)){
+			[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate date]];
 			[pool release];
 			pool = nil;
 		}

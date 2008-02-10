@@ -23,6 +23,7 @@
 #include "ORFilterModel.h"
 #include "FilterScript.tab.h"
 #import "StatusLog.h"
+#import "ORDataTypeAssigner.h"
 
 extern unsigned short   switchLevel;
 extern long				switchValue[512];
@@ -391,16 +392,35 @@ filterData ex(nodeType *p,id delegate)
 				tempData.val.lValue =  [delegate extractRecordLen:ex(p->opr.op[0],delegate).val.lValue]; 
 			return tempData;
 			
-			case ADD_RECORD:
+			case SHIP_RECORD:
 				{
 					long* ptr = ex(p->opr.op[0],delegate).val.pValue;
-					long len = ex(p->opr.op[1],delegate).val.lValue;
-					if(ptr && len){
-						[delegate addFilteredRecord:ptr length:len]; 
-					}
+					if(ptr) [delegate shipRecord:ptr length:ExtractLength(*ptr)]; 
 				}
 			break;
-        }
+
+			case PUSH_RECORD:
+				{
+					long stack = ex(p->opr.op[0],delegate).val.lValue;
+					long* ptr  = ex(p->opr.op[1],delegate).val.pValue;
+					if(ptr)[delegate pushOntoStack:stack record:ptr]; 
+				}
+			break;
+
+			case POP_RECORD:
+				{
+					long stack = ex(p->opr.op[0],delegate).val.lValue;
+					tempData.val.pValue = [delegate popFromStack:stack];
+				}
+			return tempData;
+
+			case SHIP_STACK:
+				{
+					long stack = ex(p->opr.op[0],delegate).val.lValue;
+					[delegate shipStack:stack];
+				}
+			return tempData;
+		}
     }
     return tempData;
 }

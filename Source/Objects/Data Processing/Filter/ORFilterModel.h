@@ -23,10 +23,11 @@
 #import "ORDataChainObject.h"
 
 #define kNumScriptArgs 5
-
+#define kNumFilterStacks 32
 
 #pragma mark •••Forward Declarations
 @class ORDataPacket;
+@class ORQueue;
 
 @interface ORFilterModel :  ORDataChainObject 
 {
@@ -47,6 +48,7 @@
 		long				tot;
 		ORDataPacket*       transferDataPacket;
 		ORDataPacket*       currentDataPacket;
+		ORQueue*			stacks[kNumFilterStacks];
 }
 
 #pragma mark •••Accessors
@@ -79,7 +81,10 @@
 #pragma mark ***Plugin Interface
 - (long) extractRecordID:(long)aValue;
 - (long) extractRecordLen:(long)aValue;
-- (void) addFilteredRecord:(long*)p length:(long)length;
+- (void) shipRecord:(long*)p length:(long)length;
+- (void) pushOntoStack:(int)i record:(long*)p;
+- (long*) popFromStack:(int)i;
+- (void) shipStack:(int)i;
 
 #pragma mark •••Parsers
 - (void) parseFile:(NSString*)aPath;

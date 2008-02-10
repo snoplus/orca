@@ -79,9 +79,12 @@ H			[a-fA-F0-9]
 "clearalarm"	return CLEAR;
 "array"			return MAKEARRAY;
 "free"			return FREEARRAY;
-"extractRecordID"			return EXTRACTRECORD_ID;
-"extractRecordLen"			return EXTRACTRECORD_LEN;
-"addRecord"					return ADD_RECORD;
+"extractRecordID"		return EXTRACTRECORD_ID;
+"extractRecordLen"		return EXTRACTRECORD_LEN;
+"shipRecord"			return SHIP_RECORD;
+"push"					return PUSH_RECORD;
+"pop"					return POP_RECORD;
+"shipStack"				return SHIP_STACK;
 
 {L}({L}|{D})* { 
                 strncpy(FilterScriptlval.sIndex,yytext,yyleng);

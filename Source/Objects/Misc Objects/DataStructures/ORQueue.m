@@ -50,6 +50,13 @@
     return [retval autorelease];
 }
 
+-(id) dequeueFromBottom
+{
+    id retval = [[list last] retain];
+    [list removeLast];
+    return [retval autorelease];
+}
+
 //simple BOOL for whether the queue is empty or not.
 -(BOOL) isEmpty
 {

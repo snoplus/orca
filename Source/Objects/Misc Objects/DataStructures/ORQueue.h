@@ -25,6 +25,7 @@
 //returns nil if the queue is empty.
 //autoreleases your object
 -(id) dequeue;
+-(id) dequeueFromBottom;
 
 //simple BOOL for whether the queue is empty or not.
 //count == 0 usually, or for linked lists it's a nil test. 
