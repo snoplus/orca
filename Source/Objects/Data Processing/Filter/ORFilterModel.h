@@ -21,6 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORDataChainObject.h"
+#import "ORBaseDecoder.h"
 
 #define kNumScriptArgs 5
 #define kNumFilterStacks 32
@@ -32,6 +33,10 @@
 @interface ORFilterModel :  ORDataChainObject 
 {
     @private
+	
+		unsigned long dataId1D;
+		unsigned long dataId2D;
+
 		NSString*			lastFile;
 		NSString*			script;
 		NSString*			scriptName;
@@ -67,6 +72,14 @@
 - (BOOL)	exitNow;
 
 #pragma mark •••Data Handling
+- (unsigned long) dataId1D;
+- (void) setDataId1D: (unsigned long) aDataId;
+- (unsigned long) dataId2D;
+- (void) setDataId2D: (unsigned long) aDataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherObj;
+- (NSDictionary*) dataRecordDescription;
+
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -104,3 +117,15 @@ extern NSString* ORFilterArgsChanged;
 extern NSString* ORFilterLastFileChangedChanged;
 extern NSString* ORFilterScriptChanged;
 
+
+@interface ORFilterDecoderFor1D : ORBaseDecoder
+{}
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end
+
+@interface ORFilterDecoderFor2D : ORBaseDecoder
+{}
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end

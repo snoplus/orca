@@ -22,7 +22,7 @@
 #pragma mark •••Imported Files
 #import "ORFilterModel.h"
 #import "ORDataPacket.h"
-#import "ORDataPacket.h"
+#import "ORDataSet.h"
 #import "ORFilterSymbolTable.h"
 #import "FilterScript.h"
 #import "ORDataTypeAssigner.h"
@@ -213,11 +213,60 @@ int filterGraph(nodeType*);
 	}
 }
 
+- (unsigned long) dataId1D { return dataId1D; }
+- (void) setDataId1D: (unsigned long) aDataId
+{
+    dataId1D = aDataId;
+}
+
+- (unsigned long) dataId2D { return dataId2D; }
+- (void) setDataId2D: (unsigned long) aDataId
+{
+    dataId2D = aDataId;
+}
+
+- (void) setDataIds:(id)assigner
+{
+    dataId1D       = [assigner assignDataIds:kLongForm];
+    dataId2D       = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+    [self setDataId1D:[anotherObj dataId1D]];
+    [self setDataId2D:[anotherObj dataId2D]];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+	
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"ORFilterDecoderFor1D",				@"decoder",
+        [NSNumber numberWithLong:dataId1D],     @"dataId",
+        [NSNumber numberWithBool:NO],           @"variable",
+        [NSNumber numberWithLong:2],            @"length",
+        nil];
+    [dataDictionary setObject:aDictionary forKey:@"Filter1D"];
+	
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"ORFilterDecoderFor2D",				@"decoder",
+        [NSNumber numberWithLong:dataId2D],     @"dataId",
+        [NSNumber numberWithBool:NO],           @"variable",
+        [NSNumber numberWithLong:3],            @"length",
+        nil];
+    [dataDictionary setObject:aDictionary forKey:@"Filter2D"];
+	
+    return dataDictionary;
+}
+
+
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {		
 	tot = 0;
 
 	currentDataPacket = nil;
+	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORFilterModel"];  
 	
 	[self parseScript];
 	
@@ -226,6 +275,8 @@ int filterGraph(nodeType*);
 		[NSException raise:@"Parse Error" format:@"Filter Script parse failed."];
 	}
 	else {
+
+
 		id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
 		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
 
@@ -233,9 +284,7 @@ int filterGraph(nodeType*);
 		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
 		
 		int i;
-		for(i=0;i<kNumFilterStacks;i++){
-			stacks[i] = nil;
-		}
+		for(i=0;i<kNumFilterStacks;i++) stacks[i] = nil;
 	}
 }
 
@@ -506,8 +555,19 @@ int filterGraph(nodeType*);
 
 @implementation ORFilterModel (private)
 - (void) loadDataIDsIntoSymbolTable:(ORDataPacket*)aDataPacket
-{		
+{	
 	NSDictionary* descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
+	
+	//we are a special case and might not be in the data stream if the data is coming from 
+	//the data replay object so we'll check and if needed will define data ids for ourselves.
+	NSDictionary* objDictionary = [descriptionDict objectForKey:@"ORFilterDecoderFor1D"];
+	long anID = [[objDictionary objectForKey:@"dataId"] longValue];
+	if(anID == 0){
+		ORDataTypeAssigner* assigner = [[ORDataTypeAssigner alloc] init];
+			
+		[assigner release];
+	}
+
 	NSString* objKey;
 	NSEnumerator*  descriptionDictEnum = [descriptionDict keyEnumerator];
 	while(objKey = [descriptionDictEnum nextObject]){
@@ -526,3 +586,59 @@ int filterGraph(nodeType*);
 }
 
 @end
+
+@implementation ORFilterDecoderFor1D
+
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr = (unsigned long*)someData;
+    unsigned long length = 2;
+
+    unsigned short index  = (ptr[1]&0x0fff0000)>>16;
+    unsigned long  value = ptr[1]&0x00000fff;
+
+    [aDataSet histogram:value numBins:4096  sender:self  withKeys:@"Filter",
+		[NSString stringWithFormat:@"%d",index],
+        nil];
+    return length; //must return number of longs processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    NSString* title= @"Filter Record (1D)\n\n";
+    
+    NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ptr[1]&0x00000fff];    
+    NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0x0fff0000)>>16];    
+
+    return [NSString stringWithFormat:@"%@%@%@",title,value,index];               
+}
+
+
+@end
+
+@implementation ORFilterDecoderFor2D
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr = (unsigned long*)someData;
+    unsigned long length = 3;
+
+    [aDataSet histogram2DX:ptr[1]&0x00000fff y:ptr[2]&0x00000fff size:256  sender:self  
+		withKeys:@"Filter2D",[NSString stringWithFormat:@"%d",(ptr[1]&0x0fff0000)>>16],
+        nil];
+
+
+    return length; //must return number of longs processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    NSString* title= @"Filter Record (2D)\n\n";
+    
+    NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0x0fff0000)>>16];    
+    NSString* valueX  = [NSString stringWithFormat:@"ValueX = %d\n",ptr[1]&0x00000fff];    
+    NSString* valueY  = [NSString stringWithFormat:@"ValueY = %d\n",ptr[2]&0x00000fff];    
+
+    return [NSString stringWithFormat:@"%@%@%@%@",title,valueX,valueY,index];               
+}
+@end
+
