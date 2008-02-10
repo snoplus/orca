@@ -161,6 +161,7 @@ int filterGraph(nodeType*);
 
 	if(someData != currentDataPacket){
 		[someData generateObjectLookup];	 //MUST be done before data header will work.
+		[self loadDataIDsIntoSymbolTable:someData];
 		currentDataPacket = someData;
 		if(transferDataPacket){
 			[transferDataPacket release];
@@ -169,7 +170,6 @@ int filterGraph(nodeType*);
 		transferDataPacket  = [someData copy];
 		[transferDataPacket generateObjectLookup];	//MUST be done before data header will work.
 		[transferDataPacket clearData];	
-		[self loadDataIDsIntoSymbolTable:someData];
 	}
 
 	//pass it on
@@ -299,6 +299,10 @@ int filterGraph(nodeType*);
 	
 	[transferDataPacket release];
 	transferDataPacket = nil;
+
+	filterData junk;
+	[symbolTable getData:&junk forKey:"ii"];
+	NSLog(@"junk=%d\n",junk.val.lValue);
 
 	int i;
 	for(i=0;i<kNumFilterStacks;i++){
@@ -551,25 +555,59 @@ int filterGraph(nodeType*);
 
 }
 
+- (long) stackCount:(int)i
+{
+	return [stacks[i] count];
+}
+
+- (void) dumpStack:(int)i
+{
+	[stacks[i] release];
+	stacks[i] = nil;
+}
+
+
 @end
 
 @implementation ORFilterModel (private)
 - (void) loadDataIDsIntoSymbolTable:(ORDataPacket*)aDataPacket
 {	
-	NSDictionary* descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
+	NSMutableDictionary* descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
+	NSString* objKey;
+	NSEnumerator*  descriptionDictEnum = [descriptionDict keyEnumerator];
 	
 	//we are a special case and might not be in the data stream if the data is coming from 
 	//the data replay object so we'll check and if needed will define data ids for ourselves.
 	NSDictionary* objDictionary = [descriptionDict objectForKey:@"ORFilterDecoderFor1D"];
 	long anID = [[objDictionary objectForKey:@"dataId"] longValue];
 	if(anID == 0){
-		ORDataTypeAssigner* assigner = [[ORDataTypeAssigner alloc] init];
-			
-		[assigner release];
+		unsigned long maxLongID = 0;
+		//loop over all objects in the descript and log the highest id
+		while(objKey = [descriptionDictEnum nextObject]){
+			NSDictionary* objDictionary = [descriptionDict objectForKey:objKey];
+			NSEnumerator* dataObjEnum = [objDictionary keyEnumerator];
+			NSString* dataObjKey;
+			while(dataObjKey = [dataObjEnum nextObject]){
+				NSDictionary* lowestLevel = [objDictionary objectForKey:dataObjKey];
+				unsigned long anID = [[lowestLevel objectForKey:@"dataId"] longValue];
+				if(IsLongForm(anID)){
+					anID >>= 18;
+					if(anID>maxLongID)maxLongID = anID;
+				}
+			} 
+		}
+		if(maxLongID>0){
+			maxLongID++;
+			[self setDataId1D:maxLongID<<18];
+			maxLongID++;
+			[self setDataId2D:maxLongID<<18];
+			[descriptionDict setObject:[self dataRecordDescription] forKey:@"ORFilterModel"];
+			[aDataPacket generateObjectLookup];
+
+		}
 	}
 
-	NSString* objKey;
-	NSEnumerator*  descriptionDictEnum = [descriptionDict keyEnumerator];
+	descriptionDictEnum = [descriptionDict keyEnumerator];
 	while(objKey = [descriptionDictEnum nextObject]){
 		NSDictionary* objDictionary = [descriptionDict objectForKey:objKey];
 		NSEnumerator* dataObjEnum = [objDictionary keyEnumerator];
@@ -578,11 +616,14 @@ int filterGraph(nodeType*);
 			NSDictionary* lowestLevel = [objDictionary objectForKey:dataObjKey];
 			NSString* decoderName = [lowestLevel objectForKey:@"decoder"];
 			filterData theDataType;
-			theDataType.val.lValue= [[lowestLevel objectForKey:@"dataId"] longValue];
+			theDataType.val.lValue = [[lowestLevel objectForKey:@"dataId"] longValue];
 			theDataType.type  = kFilterLongType;
 			[symbolTable setData:theDataType forKey:[decoderName cStringUsingEncoding:NSASCIIStringEncoding]];
 		} 
 	}
+	
+	descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
+
 }
 
 @end

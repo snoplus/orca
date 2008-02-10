@@ -85,6 +85,8 @@ H			[a-fA-F0-9]
 "push"					return PUSH_RECORD;
 "pop"					return POP_RECORD;
 "shipStack"				return SHIP_STACK;
+"dumpStack"				return DUMP_STACK;
+"stackCount"			return STACK_COUNT;
 
 {L}({L}|{D})* { 
                 strncpy(FilterScriptlval.sIndex,yytext,yyleng);

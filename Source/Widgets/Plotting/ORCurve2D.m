@@ -135,7 +135,7 @@
 	double aMinPad  = [[colorScale colorAxis] minPad];
 
 
-    for (iy=minY; iy<maxY;++iy) {
+    for (iy=minY; iy<=maxY;++iy) {
         
         y += yinc;
         
@@ -147,7 +147,7 @@
 
         xl = x = [mXScale getPixAbs:minX]-xinc/2.;
 
-        for (ix=minX; ix<maxX;++ix) {	
+        for (ix=minX; ix<=maxX;++ix) {	
             x += xinc;
             
             /* increment the running sum and check for overflow to next pixel */

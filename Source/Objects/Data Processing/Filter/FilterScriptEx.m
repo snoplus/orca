@@ -420,6 +420,21 @@ filterData ex(nodeType *p,id delegate)
 					[delegate shipStack:stack];
 				}
 			return tempData;
+			
+			case DUMP_STACK:
+				{
+					long stack = ex(p->opr.op[0],delegate).val.lValue;
+					[delegate dumpStack:stack];
+				}
+			return tempData;
+
+			case STACK_COUNT:
+				{
+					long stack = ex(p->opr.op[0],delegate).val.lValue;
+					tempData.val.pValue = [delegate stackCount:stack];
+				}
+			return tempData;
+
 		}
     }
     return tempData;

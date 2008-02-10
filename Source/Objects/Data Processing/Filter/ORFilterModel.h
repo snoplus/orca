@@ -98,6 +98,8 @@
 - (void) pushOntoStack:(int)i record:(long*)p;
 - (long*) popFromStack:(int)i;
 - (void) shipStack:(int)i;
+- (void) dumpStack:(int)i;
+- (long) stackCount:(int)i;
 
 #pragma mark •••Parsers
 - (void) parseFile:(NSString*)aPath;

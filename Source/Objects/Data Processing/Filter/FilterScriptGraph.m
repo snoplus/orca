@@ -150,7 +150,9 @@ void exNode
                 case SHIP_RECORD:		s="[shipRecord]";	break;
                 case PUSH_RECORD:		s="[push]";			break;
                 case POP_RECORD:		s="[pop]";			break;
-                case SHIP_STACK:		s="[shipRecord]";	break;
+                case SHIP_STACK:		s="[shipStack]";	break;
+                case DUMP_STACK:		s="[dumpStack]";	break;
+				case STACK_COUNT:		s="[stackCount]";	break;
             }
             break;
     }
