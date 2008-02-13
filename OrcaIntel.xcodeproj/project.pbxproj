@@ -1620,6 +1620,8 @@
 		84D975510CA1E36D000C0C76 /* ORAugerSLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D9752D0CA1E36D000C0C76 /* ORAugerSLTModel.m */; };
 		84D975D60CA41B7C000C0C76 /* ORKatrinFLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D975D50CA41B7B000C0C76 /* ORKatrinFLTDefs.h */; };
 		84D975D90CA41BBE000C0C76 /* ORIpeFLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D975D70CA41BBE000C0C76 /* ORIpeFLTDefs.h */; };
+		84DB071E0D61185700BB9855 /* FilterScriptGuide.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 84DB071D0D61185700BB9855 /* FilterScriptGuide.rtf */; };
+		84DB075B0D620BA400BB9855 /* FilterSyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84DB075A0D620BA400BB9855 /* FilterSyntaxDefinition.plist */; };
 		84E0922B0CC7F22900EFBC8F /* ORGradient_View.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E092290CC7F22800EFBC8F /* ORGradient_View.h */; };
 		84E0922C0CC7F22900EFBC8F /* ORGradient_View.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E0922A0CC7F22800EFBC8F /* ORGradient_View.m */; };
 		84E098380CC9222900EFBC8F /* stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E098370CC9222900EFBC8F /* stop.tiff */; };
@@ -3160,6 +3162,8 @@
 		84D98263079605CD0074A035 /* ORL2551Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL2551Model.h; path = Source/Objects/Hardware/Camac/L2551/ORL2551Model.h; sourceTree = SOURCE_ROOT; };
 		84D98345079716E90074A035 /* TimedWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimedWorker.h; sourceTree = "<group>"; };
 		84D98346079716E90074A035 /* TimedWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimedWorker.m; sourceTree = "<group>"; };
+		84DB071D0D61185700BB9855 /* FilterScriptGuide.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = FilterScriptGuide.rtf; path = "Source/Objects/Data Processing/Filter/FilterScriptGuide.rtf"; sourceTree = SOURCE_ROOT; };
+		84DB075A0D620BA400BB9855 /* FilterSyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = FilterSyntaxDefinition.plist; path = "Source/Objects/Data Processing/Filter/FilterSyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
 		84DDEB9B07BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = edu.washington.npl.orca.MultiPlot.plist; sourceTree = "<group>"; };
 		84DDEB9C07BD3E080060D0B4 /* MultiPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MultiPlot.nib; sourceTree = "<group>"; };
 		84DDEB9E07BD3E080060D0B4 /* ORMultiPlot.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMultiPlot.h; sourceTree = "<group>"; };
@@ -5986,6 +5990,8 @@
 				84B868D90D4A6DE100E0B132 /* FilterScript.lm */,
 				84B860E10D4909DB00E0B132 /* FilterScriptEx.m */,
 				84B8680D0D4A650200E0B132 /* FilterScriptGraph.m */,
+				84DB071D0D61185700BB9855 /* FilterScriptGuide.rtf */,
+				84DB075A0D620BA400BB9855 /* FilterSyntaxDefinition.plist */,
 			);
 			name = Filter;
 			path = "Source/Objects/Data Processing/Filter";
@@ -8632,6 +8638,8 @@
 				847B711B0D2EB667000A7B34 /* SBC_LAM.nib in Resources */,
 				84A5CD3D0D464F2900D9833C /* Filter.nib in Resources */,
 				84A5CD3E0D464F2900D9833C /* Filter.tif in Resources */,
+				84DB071E0D61185700BB9855 /* FilterScriptGuide.rtf in Resources */,
+				84DB075B0D620BA400BB9855 /* FilterSyntaxDefinition.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
