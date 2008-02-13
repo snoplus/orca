@@ -128,8 +128,6 @@ void exNode
                 case EQ_OP:				s="[==]";			break;
 				case BREAK:				s="[break]";		break;
 				case CONTINUE:			s="[continue]";	break;
-				case ALARM:				s="[alarm]";		break;				
-				case CLEAR:				s="[clear]";		break;				
                 case LEFT_ASSIGN:		s="[<<=]";			break;
                 case RIGHT_ASSIGN:		s="[>>=]";			break;
                 case ADD_ASSIGN:		s="[+=]";			break;
@@ -153,6 +151,8 @@ void exNode
                 case SHIP_STACK:		s="[shipStack]";	break;
                 case DUMP_STACK:		s="[dumpStack]";	break;
 				case STACK_COUNT:		s="[stackCount]";	break;
+				case HISTO_1D:			s="[histo1D]";		break;
+				case HISTO_2D:			s="[histo2D]";		break;
             }
             break;
     }

@@ -27,17 +27,46 @@
 
 extern unsigned short   switchLevel;
 extern long				switchValue[512];
-extern nodeType** allFilterNodes;
+extern long startFilterNodeCount;
+extern nodeType** startFilterNodes;
 extern long filterNodeCount;
+extern nodeType** filterNodes;
+extern long finishFilterNodeCount;
+extern nodeType** finishFilterNodes;
 extern long maxFilterNodeCount;
+extern long maxStartFilterNodeCount;
+extern long maxFinishFilterNodeCount;
 filterData ex(nodeType*,id);
+
+void startFilterScript(id delegate)
+{
+	unsigned node;
+	for(node=0;node<startFilterNodeCount;node++){
+		NS_DURING
+			ex(startFilterNodes[node],delegate);
+		NS_HANDLER
+		NS_ENDHANDLER
+	}
+}
+
+void finishFilterScript(id delegate)
+{
+	unsigned node;
+	for(node=0;node<finishFilterNodeCount;node++){
+		NS_DURING
+			ex(finishFilterNodes[node],delegate);
+		NS_HANDLER
+		NS_ENDHANDLER
+	}
+}
+
 
 void runFilterScript(id delegate)
 {
 	unsigned node;
 	for(node=0;node<filterNodeCount;node++){
 		NS_DURING
-			ex(allFilterNodes[node],delegate);
+			ex(filterNodes[node],delegate);
 		NS_HANDLER
 		NS_ENDHANDLER
 	}
@@ -162,19 +191,52 @@ void freeArray(nodeType* p, id delegate)
 		}
 	}
 }
+long* loadArray(long* ptr, nodeType* p)
+{
+	filterData tempData;
+    switch(p->type) {
+		case typeCon: *ptr++ = p->con.value;		 break;
+		case typeId:       
+			[symbolTable getData:&tempData forKey:p->ident.key];
+			*ptr++ = tempData.val.lValue;
+		break;
+		case typeOpr:
+			switch(p->opr.oper) {
+				case kMakeArgList:	
+					ptr = loadArray(ptr++,p->opr.op[0]); 
+					if(p->opr.nops == 2)ptr = loadArray(ptr++,p->opr.op[1]); 
+				break;
+				default: break;
+			}
+		default: break;
+	}
+	return ptr;
+}
+
+void arrayList(nodeType* p, id delegate)
+{
+	int n = ex(p->opr.op[1],delegate).val.lValue;
+	long* ptr = 0;
+	if(n>0) ptr = calloc(n, sizeof(long));
+	filterData tempData;
+	tempData.type		= kFilterPtrType;
+	tempData.val.pValue = ptr;
+	[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+	loadArray(ptr,p->opr.op[2]);
+}	
 
 
-//long arrayAssignment(nodeType* p, id delegate)
-//{
-//	int n = ex(p->opr.op[1],delegate).val.lValue;
-//	long* ptr = ex(p->opr.op[0],delegate).val.pValue;
-//	return ptr[n];
-//	else { //run time error
-//		[NSException raise:@"Array Bounds" format:@"Out of Bounds Error"];
-//	}
-//}
 
-/*void arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue
+/*filterData processLeftArray(nodeType* p, id delegate)
+{
+	int n = ex(p->opr.op[1],delegate).val.lValue;
+	long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+	filterData theResult;
+	theResult.type = kFilterLongType;
+	theResult.val.lValue = ptr[n];
+	return theResult;
+}
+void arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue
 {
 	long* ptr = ex(p->opr.op[1],delegate).val.pValue;
 	
@@ -377,12 +439,10 @@ filterData ex(nodeType *p,id delegate)
 
 			case kDefineArray:		defineArray(p,delegate); return tempData;
 			case FREEARRAY:			freeArray(p,delegate); return tempData;
-			//case kLeftArray:		return [self processLeftArray:p];
-			//case kArrayAssign:      arrayAssignment(p,delegate); return;
 
-			//case kArrayListAssign:	
-			//	tempData.type = kFilterLongType;
-			//	defineArray(p,delegate); return tempData;return [self arrayList:p];
+			case kArrayListAssign:	
+				arrayList(p,delegate);
+			return tempData;
 
 			case EXTRACTRECORD_ID: 
 				tempData.val.lValue =  [delegate extractRecordID:ex(p->opr.op[0],delegate).val.lValue]; 
@@ -408,33 +468,32 @@ filterData ex(nodeType *p,id delegate)
 			break;
 
 			case POP_RECORD:
-				{
-					long stack = ex(p->opr.op[0],delegate).val.lValue;
-					tempData.val.pValue = [delegate popFromStack:stack];
-				}
+				tempData.val.pValue = [delegate popFromStack:ex(p->opr.op[0],delegate).val.lValue];
 			return tempData;
 
 			case SHIP_STACK:
-				{
-					long stack = ex(p->opr.op[0],delegate).val.lValue;
-					[delegate shipStack:stack];
-				}
+				[delegate shipStack:ex(p->opr.op[0],delegate).val.lValue];
 			return tempData;
 			
 			case DUMP_STACK:
-				{
-					long stack = ex(p->opr.op[0],delegate).val.lValue;
-					[delegate dumpStack:stack];
-				}
+				[delegate dumpStack:ex(p->opr.op[0],delegate).val.lValue];
 			return tempData;
 
 			case STACK_COUNT:
-				{
-					long stack = ex(p->opr.op[0],delegate).val.lValue;
-					tempData.val.pValue = [delegate stackCount:stack];
-				}
+				tempData.val.lValue = [delegate stackCount:ex(p->opr.op[0],delegate).val.lValue];
+			return tempData;
+			
+			case HISTO_1D:				
+				[delegate histo1D:ex(p->opr.op[0],delegate).val.lValue value:ex(p->opr.op[1],delegate).val.lValue];
 			return tempData;
 
+			case HISTO_2D:	
+				{
+					long x = ex(p->opr.op[1],delegate).val.lValue;
+					long y = ex(p->opr.op[2],delegate).val.lValue;
+					[delegate histo2D:ex(p->opr.op[0],delegate).val.lValue x:x y:y];
+				}
+			return tempData;
 		}
     }
     return tempData;

@@ -26,6 +26,8 @@ extern int FilterScriptYYINPUT(char* theBuffer,int maxSize);
 
 typedef enum { typeCon, typeId, typeOpr } nodeEnum;
 
+typedef enum {startNodeType,filterNodeType,finishNodeType} nodetype;
+
 enum {
 	kPostInc,
 	kPreInc,

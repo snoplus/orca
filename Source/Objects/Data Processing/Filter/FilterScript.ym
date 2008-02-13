@@ -30,11 +30,20 @@ nodeType* ident(char*);
 nodeType* con(int value);
 
 void freeNode(nodeType *p);
-void addFilterNode(nodeType* node);
+void addFilterNode(int type,nodeType* node);
 
-nodeType** allFilterNodes = 0;
+nodeType** startFilterNodes = 0;
+long startFilterNodeCount = 0;
+long maxStartFilterNodeCount = 0;
+
+nodeType** filterNodes = 0;
 long filterNodeCount = 0;
 long maxFilterNodeCount = 0;
+
+nodeType** finishFilterNodes = 0;
+long finishFilterNodeCount = 0;
+long maxFinishFilterNodeCount = 0;
+
 
 int ex(nodeType *p);
 int yylex(void);
@@ -54,11 +63,11 @@ long				switchValue[512];
 
 %token <iValue> INTEGER
 %token <sIndex> VARIABLE
-%token FUNCTION WHILE DO FOR IF PRINT PRINTH BREAK CONTINUE
+%token FILTER START FINISH WHILE DO FOR IF PRINT PRINTH BREAK CONTINUE
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING SWITCH CASE DEFAULT MAKEARRAY
-%token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR FREEARRAY EXTRACTRECORD_LEN EXTRACTRECORD_ID 
-%token SHIP_RECORD PUSH_RECORD POP_RECORD SHIP_STACK DUMP_STACK STACK_COUNT
+%token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP FREEARRAY EXTRACTRECORD_LEN EXTRACTRECORD_ID 
+%token SHIP_RECORD PUSH_RECORD POP_RECORD SHIP_STACK DUMP_STACK STACK_COUNT HISTO_1D HISTO_2D
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -67,7 +76,7 @@ long				switchValue[512];
 %left  '%' '*' '/'
 %nonassoc NOT UMINUS INVERT
 
-%type <nPtr>  function statement expr statement_list compound_statement expression_statement arrayElement leftArrayElement
+%type <nPtr>  filterFunction startFunction finishFunction statement expr statement_list compound_statement expression_statement arrayElement leftArrayElement
 %type <nPtr>  selection_statement iteration_statement primary_expr postfix_expr unary_expr multiplicative_expr
 %type <nPtr>  additive_expr shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr
 %type <nPtr>  logical_and_expr logical_or_expr conditional_expr assignment_expr jump_statement case_statement
@@ -76,7 +85,7 @@ long				switchValue[512];
 %%
 
 program
-        : funclist                { return 1; }
+        : funclist                { parsedSuccessfully = YES; switchLevel = 0; return 1; }
         ;
 
 
@@ -86,12 +95,24 @@ funclist
 		;
 
 funcdef
-		: FUNCTION VARIABLE '(' ')' '{' function '}' {parsedSuccessfully = YES; switchLevel = 0;/*nodeType* a = ident($2); printf("got %s\n",a->ident.key);*/	}			
+		: FILTER	'{' filterFunction '}'
+		| START		'{' startFunction '}'
+		| FINISH	'{' finishFunction '}'
         ;
 
 
-function
-		: function statement         {addFilterNode($2);}
+filterFunction
+		: filterFunction statement         {addFilterNode(filterNodeType,$2);}
+		| /*NULL*/
+        ;
+
+startFunction
+		: startFunction statement         {addFilterNode(startNodeType,$2);}
+		| /*NULL*/
+        ;
+
+finishFunction
+		: finishFunction statement         {addFilterNode(finishNodeType,$2);}
 		| /*NULL*/
         ;
 
@@ -204,6 +225,8 @@ primary_expr
 		| SHIP_STACK  '(' expr ')'			{ $$ = opr(SHIP_STACK,1,$3);}
 		| DUMP_STACK  '(' expr ')'			{ $$ = opr(DUMP_STACK,1,$3);}
 		| STACK_COUNT '(' expr ')'			{ $$ = opr(STACK_COUNT,1,$3);}
+		| HISTO_1D    '(' expr ',' expr ')'			{ $$ = opr(HISTO_1D,2,$3,$5);}
+		| HISTO_2D    '(' expr ',' expr ',' expr ')'	{ $$ = opr(HISTO_2D,3,$3,$5,$7);}
 		;
 	
 postfix_expr
@@ -325,20 +348,48 @@ free_statement
 
 #define SIZEOF_NODETYPE ((char *)&p->con - (char *)p)
 
-void addFilterNode(nodeType* aNode)
+void addFilterNode(int type,nodeType* aNode)
 {
-	if(!allFilterNodes){
+	if(!symbolTable)symbolTable = [[ORFilterSymbolTable alloc] init];
+
+	if(!filterNodes){
 		filterNodeCount = 0;
 		maxFilterNodeCount = 1000;
-		allFilterNodes = (nodeType**)malloc(maxFilterNodeCount*sizeof(nodeType));
-		if(!symbolTable){
-			symbolTable = [[ORFilterSymbolTable alloc] init];
+		filterNodes = (nodeType**)malloc(maxFilterNodeCount*sizeof(nodeType));
+	}
+	
+	if(!startFilterNodes){
+		startFilterNodeCount = 0;
+		maxStartFilterNodeCount = 1000;
+		startFilterNodes = (nodeType**)malloc(maxStartFilterNodeCount*sizeof(nodeType));
+	}
+	
+	if(!finishFilterNodes){
+		finishFilterNodeCount = 0;
+		maxFinishFilterNodeCount = 1000;
+		finishFilterNodes = (nodeType**)malloc(maxFinishFilterNodeCount*sizeof(nodeType));
+	}
+	
+	if(type == startNodeType){
+		startFilterNodes[startFilterNodeCount++] = aNode;
+		if(startFilterNodeCount>maxStartFilterNodeCount){
+			maxStartFilterNodeCount += 1000;
+			startFilterNodes = (nodeType**)realloc(startFilterNodes, maxStartFilterNodeCount*sizeof(nodeType));
 		}
 	}
-	allFilterNodes[filterNodeCount++] = aNode;
-	if(filterNodeCount>maxFilterNodeCount){
-		maxFilterNodeCount += 1000;
-		allFilterNodes = (nodeType**)realloc(allFilterNodes, maxFilterNodeCount*sizeof(nodeType));
+	else if(type == filterNodeType){
+		filterNodes[filterNodeCount++] = aNode;
+		if(filterNodeCount>maxFilterNodeCount){
+			maxFilterNodeCount += 1000;
+			filterNodes = (nodeType**)realloc(filterNodes, maxFilterNodeCount*sizeof(nodeType));
+		}
+	}
+	else if(type == finishNodeType){
+		finishFilterNodes[finishFilterNodeCount++] = aNode;
+		if(finishFilterNodeCount>maxFinishFilterNodeCount){
+			maxFinishFilterNodeCount += 1000;
+			finishFilterNodes = (nodeType**)realloc(finishFilterNodes, maxFinishFilterNodeCount*sizeof(nodeType));
+		}
 	}
 }
 
