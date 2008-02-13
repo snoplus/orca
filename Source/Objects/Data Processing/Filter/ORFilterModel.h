@@ -24,6 +24,7 @@
 #import "ORBaseDecoder.h"
 
 #define kNumScriptArgs 5
+#define kNumDisplayValues 5
 #define kNumFilterStacks 32
 
 #pragma mark •••Forward Declarations
@@ -41,6 +42,7 @@
 		NSString*			script;
 		NSString*			scriptName;
 		NSMutableArray*		args;
+		NSMutableArray*		displayValues;
 		id					inputValue;
 		
 		BOOL				stopThread;
@@ -54,6 +56,7 @@
 		ORDataPacket*       transferDataPacket;
 		ORDataPacket*       currentDataPacket;
 		ORQueue*			stacks[kNumFilterStacks];
+		BOOL				updateScheduled;
 }
 
 - (id)   init;
@@ -71,6 +74,9 @@
 - (BOOL) parsedOK;
 - (id)	 arg:(int)index;
 - (void) setArg:(int)index withValue:(id)aValue;
+
+- (id)	 displayValue:(int)index;
+
 - (id)	 inputValue;
 - (void) setInputValue:(id)aValue;
 - (BOOL) exitNow;
@@ -106,6 +112,9 @@
 - (long) stackCount:(int)i;
 - (void) histo1D:(int)i value:(long)aValue;
 - (void) histo2D:(int)i x:(long)x y:(long)y;
+- (void) setDisplayValue:(int)index withValue:(long)aValue;
+
+- (void) scheduledUpdate;
 
 #pragma mark •••Parsers
 - (void) parseFile:(NSString*)aPath;
@@ -124,6 +133,7 @@ extern NSString* ORFilterNameChanged;
 extern NSString* ORFilterArgsChanged;
 extern NSString* ORFilterLastFileChangedChanged;
 extern NSString* ORFilterScriptChanged;
+extern NSString* ORFilterDisplayValuesChanged;
 
 
 @interface ORFilterDecoderFor1D : ORBaseDecoder

@@ -30,6 +30,7 @@
 	IBOutlet ORTimedTextField*	statusField;
 	IBOutlet NSView*			panelView;
 	IBOutlet NSMatrix*			argsMatrix;
+	IBOutlet NSMatrix*			displayValuesMatrix;
 	IBOutlet id					loadSaveView;
     IBOutlet NSTextField*		lastFileField;
     IBOutlet NSTextField*		lastFileField1;
@@ -47,6 +48,7 @@
 - (void) textDidChange:(NSNotification*)aNote;
 - (void) argsChanged:(NSNotification*)aNote;
 - (void) lastFileChanged:(NSNotification*)aNote;
+- (void) displayValuesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) lockAction:(id)sender;

@@ -90,6 +90,11 @@
                          name : ORRunStatusChangedNotification
                        object : nil];
 					   
+   [notifyCenter addObserver : self
+                     selector : @selector(displayValuesChanged:)
+                         name : ORFilterDisplayValuesChanged
+                       object : model];
+
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
@@ -114,6 +119,7 @@
 	[self scriptChanged:nil];
 	[self argsChanged:nil];
 	[self lastFileChanged:nil];
+	[self displayValuesChanged:nil];
 	
 }
 
@@ -144,6 +150,15 @@
 	int i;
 	for(i=0;i<kNumScriptArgs;i++){
 		[[argsMatrix cellWithTag:i] setObjectValue:[model arg:i]];
+	}
+}
+
+
+- (void) displayValuesChanged:(NSNotification*)aNote;
+{
+	int i;
+	for(i=0;i<kNumDisplayValues;i++){
+		[[displayValuesMatrix cellWithTag:i] setObjectValue:[model displayValue:i]];
 	}
 }
 

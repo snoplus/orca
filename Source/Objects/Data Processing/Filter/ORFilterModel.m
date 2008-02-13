@@ -35,6 +35,7 @@ static NSString* ORFilterFilteredConnector  = @"Filtered Out Connector";
 NSString* ORFilterLastFileChanged			= @"ORFilterLastFileChanged";
 NSString* ORFilterNameChanged				= @"ORFilterNameChanged";
 NSString* ORFilterArgsChanged				= @"ORFilterArgsChanged";
+NSString* ORFilterDisplayValuesChanged		= @"ORFilterDisplayValuesChanged";
 NSString* ORFilterBreakChainChanged			= @"ORFilterBreakChainChanged";
 NSString* ORFilterLastFileChangedChanged	= @"ORFilterLastFileChangedChanged";
 NSString* ORFilterScriptChanged				= @"ORFilterScriptChanged";
@@ -93,6 +94,7 @@ int filterGraph(nodeType*);
 -(void)dealloc
 {	
 	[self freeNodes];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scheduledUpdate) object:nil];
 
 	[transferDataPacket release];
 	[expressionAsData release];
@@ -410,6 +412,8 @@ int filterGraph(nodeType*);
 	[args replaceObjectAtIndex:index withObject:aValue];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterArgsChanged object:self];
 }
+
+
 #pragma mark ***Script Methods
 
 - (BOOL) parsedOK
@@ -643,6 +647,36 @@ int filterGraph(nodeType*);
 	[transferDataPacket clearData];
 }
 
+- (id) displayValue:(int)index
+{
+	if(index>=0 && index<[displayValues count])return [displayValues objectAtIndex:index];
+	else return [NSNumber numberWithLong:0];		
+}
+
+- (void) setDisplayValue:(int)index withValue:(long)aValue
+{
+	if(!displayValues){
+		displayValues = [[NSMutableArray array] retain];
+		int i;
+		for(i=0;i<kNumDisplayValues;i++){
+			[displayValues addObject:[NSNumber numberWithLong:0]];
+		}
+	}
+
+	[displayValues replaceObjectAtIndex:index withObject:[NSNumber numberWithLong:aValue]];
+
+	//we'll reduce updates to 1/sec
+	if(!updateScheduled){
+		updateScheduled = YES;	
+		[self performSelector:@selector(scheduledUpdate) withObject:nil afterDelay:.2];
+	}
+}
+
+- (void) scheduledUpdate
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
+	updateScheduled = NO;	
+}
 
 @end
 
