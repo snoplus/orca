@@ -50,11 +50,15 @@
 		unsigned			yaccInputPosition;
 		NSData*				expressionAsData;
 		BOOL				exitNow;
-		long				tot;
+		BOOL				firstTime;
 		ORDataPacket*       transferDataPacket;
 		ORDataPacket*       currentDataPacket;
 		ORQueue*			stacks[kNumFilterStacks];
 }
+
+- (id)   init;
+- (void) dealloc;
+- (void) freeNodes;
 
 #pragma mark •••Accessors
 - (NSString*) lastFile;
@@ -65,11 +69,11 @@
 - (NSString*) scriptName;
 - (void) setScriptName:(NSString*)aString;
 - (BOOL) parsedOK;
-- (id) arg:(int)index;
+- (id)	 arg:(int)index;
 - (void) setArg:(int)index withValue:(id)aValue;
-- (id)		inputValue;
-- (void)	setInputValue:(id)aValue;
-- (BOOL)	exitNow;
+- (id)	 inputValue;
+- (void) setInputValue:(id)aValue;
+- (BOOL) exitNow;
 
 #pragma mark •••Data Handling
 - (unsigned long) dataId1D;
@@ -100,6 +104,8 @@
 - (void) shipStack:(int)i;
 - (void) dumpStack:(int)i;
 - (long) stackCount:(int)i;
+- (void) histo1D:(int)i value:(long)aValue;
+- (void) histo2D:(int)i x:(long)x y:(long)y;
 
 #pragma mark •••Parsers
 - (void) parseFile:(NSString*)aPath;

@@ -40,8 +40,10 @@
 	[super awakeFromNib];
 	[panelView addSubview:argsView];
 	[statusField setTimeOut:1.5];
-	NSString*   path = [[NSBundle mainBundle] pathForResource: @"OrcaScriptGuide" ofType: @"rtf"];
+	NSString*   path = [[NSBundle mainBundle] pathForResource: @"FilterScriptGuide" ofType: @"rtf"];
 	[helpView readRTFDFromFile:path];
+	[scriptView setSyntaxDefinitionFilename:@"FilterSyntaxDefinition"];
+	[scriptView recolorCompleteFile:self];
 }
 
 
