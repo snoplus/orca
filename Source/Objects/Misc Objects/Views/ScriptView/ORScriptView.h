@@ -39,6 +39,7 @@
 	BOOL							maintainIndentation;	// Keep new lines indented at same depth as their predecessor?
 	NSTimer*						recolorTimer;			// Timer used to do the actual recoloring a little while after the last keypress.
 	BOOL							syntaxColoringBusy;		// Set while recolorRange is busy, so we don't recursively call recolorRange.
+	NSString*						syntaxDefinitionFilename;
 }
 
 - (IBAction) recolorCompleteFile: (id)sender;
@@ -57,6 +58,7 @@
 - (void)	 goToLine: (int)lineNum;
 
 - (NSString*) syntaxDefinitionFilename;
+- (void) setSyntaxDefinitionFilename:(NSString*)aFileName;
 
 - (void) colorsChanged: (NSNotification*)notification;
 - (void) turnOffWrapping;

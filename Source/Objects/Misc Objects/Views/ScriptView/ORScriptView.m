@@ -525,7 +525,14 @@
 
 - (NSString*)	syntaxDefinitionFilename
 {
-	return @"SyntaxDefinition";
+	if(!syntaxDefinitionFilename)return @"SyntaxDefinition";
+	else return syntaxDefinitionFilename;
+}
+
+- (void) setSyntaxDefinitionFilename:(NSString*)aFileName
+{
+    [syntaxDefinitionFilename release];
+    syntaxDefinitionFilename = [aFileName copy];	
 }
 
 //-----------------------------------------------------------------------------
