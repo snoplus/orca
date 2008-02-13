@@ -154,6 +154,7 @@ void exNode
 				case HISTO_1D:			s="[histo1D]";		break;
 				case HISTO_2D:			s="[histo2D]";		break;
 				case DISPLAY_VALUE:		s="[displayValue]";		break;
+				case RESET_DISPLAYS:	s="[resetDisplays]";		break;
             }
             break;
     }

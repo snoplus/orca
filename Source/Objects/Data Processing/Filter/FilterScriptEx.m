@@ -274,7 +274,7 @@ filterData ex(nodeType *p,id delegate)
 			case WHILE:     whileLoop(p,delegate); return tempData;
 			case FOR:		forLoop(p,delegate); return tempData;
 			case CONTINUE:	[NSException raise:@"continue" format:nil]; return tempData;
-			case IF:        if (ex(p->opr.op[0],delegate).val.lValue) ex(p->opr.op[1],delegate);
+			case IF:        if (ex(p->opr.op[0],delegate).val.lValue > 0) ex(p->opr.op[1],delegate);
 							else if (p->opr.nops > 2) ex(p->opr.op[2],delegate);
 							return tempData;
 			case BREAK:		[NSException raise:@"break" format:nil]; return tempData;
@@ -320,6 +320,7 @@ filterData ex(nodeType *p,id delegate)
 			case '%':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue % ex(p->opr.op[1],delegate).val.lValue; return tempData;
 			case '|':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue | ex(p->opr.op[1],delegate).val.lValue; return tempData;
 			case '&':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue & ex(p->opr.op[1],delegate).val.lValue; return tempData;
+			case '!':       tempData.val.lValue = !ex(p->opr.op[0],delegate).val.lValue; return tempData;
 			case GE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue >= ex(p->opr.op[1],delegate).val.lValue; return tempData;
 			case LE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue <= ex(p->opr.op[1],delegate).val.lValue; return tempData;
 			case NE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue != ex(p->opr.op[1],delegate).val.lValue; return tempData;
@@ -437,12 +438,12 @@ filterData ex(nodeType *p,id delegate)
 				}
 			return tempData;
 
-			case kDefineArray:		defineArray(p,delegate); return tempData;
-			case FREEARRAY:			freeArray(p,delegate); return tempData;
+			case kDefineArray:		defineArray(p,delegate); 		break;
+			case FREEARRAY:			freeArray(p,delegate); 			break;
 
 			case kArrayListAssign:	
 				arrayList(p,delegate);
-			return tempData;
+			break;
 
 			case EXTRACTRECORD_ID: 
 				tempData.val.lValue =  [delegate extractRecordID:ex(p->opr.op[0],delegate).val.lValue]; 
@@ -473,11 +474,11 @@ filterData ex(nodeType *p,id delegate)
 
 			case SHIP_STACK:
 				[delegate shipStack:ex(p->opr.op[0],delegate).val.lValue];
-			return tempData;
+			break;
 			
 			case DUMP_STACK:
 				[delegate dumpStack:ex(p->opr.op[0],delegate).val.lValue];
-			return tempData;
+			break;
 
 			case STACK_COUNT:
 				tempData.val.lValue = [delegate stackCount:ex(p->opr.op[0],delegate).val.lValue];
@@ -485,7 +486,7 @@ filterData ex(nodeType *p,id delegate)
 			
 			case HISTO_1D:				
 				[delegate histo1D:ex(p->opr.op[0],delegate).val.lValue value:ex(p->opr.op[1],delegate).val.lValue];
-			return tempData;
+			break;
 
 			case HISTO_2D:	
 				{
@@ -493,12 +494,16 @@ filterData ex(nodeType *p,id delegate)
 					long y = ex(p->opr.op[2],delegate).val.lValue;
 					[delegate histo2D:ex(p->opr.op[0],delegate).val.lValue x:x y:y];
 				}
-			return tempData;
+			break;
 
 			case DISPLAY_VALUE:	
-				[delegate setDisplayValue:ex(p->opr.op[0],delegate).val.lValue 
-								withValue:ex(p->opr.op[1],delegate).val.lValue];
-			return tempData;
+				[delegate setDisplay:ex(p->opr.op[0],delegate).val.lValue 
+						   withValue:ex(p->opr.op[1],delegate).val.lValue];
+			break;
+			
+			case RESET_DISPLAYS:
+				[delegate resetDisplays];
+			break;	
 
 		}
     }

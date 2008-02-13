@@ -18,13 +18,13 @@
 		<string>switch</string>
 		<string>case</string>
 		<string>default</string>
+		<string>start</string>
+		<string>filter</string>
+		<string>finish</string>
 	</array>
 	
 	<key>Identifiers2</key>
 	<array>
-		<string>start</string>
-		<string>filter</string>
-		<string>finish</string>
 		<string>print</string>
 		<string>printh</string>
 		<string>array</string>
@@ -39,6 +39,8 @@
 		<string>shipRecord</string>
 		<string>histo1D</string>
 		<string>histo2D</string>
+		<string>resetDisplays</string>
+		<string>display</string>
 	</array>
 
 	<key>Constants</key>
