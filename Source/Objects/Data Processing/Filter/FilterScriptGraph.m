@@ -153,6 +153,7 @@ void exNode
 				case STACK_COUNT:		s="[stackCount]";	break;
 				case HISTO_1D:			s="[histo1D]";		break;
 				case HISTO_2D:			s="[histo2D]";		break;
+				case DISPLAY_VALUE:		s="[displayValue]";		break;
             }
             break;
     }

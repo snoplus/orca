@@ -494,6 +494,12 @@ filterData ex(nodeType *p,id delegate)
 					[delegate histo2D:ex(p->opr.op[0],delegate).val.lValue x:x y:y];
 				}
 			return tempData;
+
+			case DISPLAY_VALUE:	
+				[delegate setDisplayValue:ex(p->opr.op[0],delegate).val.lValue 
+								withValue:ex(p->opr.op[1],delegate).val.lValue];
+			return tempData;
+
 		}
     }
     return tempData;

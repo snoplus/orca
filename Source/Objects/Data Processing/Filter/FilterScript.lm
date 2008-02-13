@@ -90,6 +90,7 @@ H			[a-fA-F0-9]
 "shipStack"				return SHIP_STACK;
 "dumpStack"				return DUMP_STACK;
 "stackCount"			return STACK_COUNT;
+"display"				return DISPLAY_VALUE;
 
 {L}({L}|{D})* { 
                 strncpy(FilterScriptlval.sIndex,yytext,yyleng);

@@ -79,6 +79,8 @@
 				<string>NSView</string>
 				<key>classNameField</key>
 				<string>NSTextField</string>
+				<key>displayValuesMatrix</key>
+				<string>NSMatrix</string>
 				<key>helpView</key>
 				<string>NSTextView</string>
 				<key>lastFileField</key>
