@@ -45,6 +45,7 @@
         ThreadWorker*   parseThread;
         unsigned long   totalLength;
         unsigned long   lengthDecoded;
+		BOOL			sentRunStart;
 
 }
 

@@ -248,13 +248,18 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     [[NSNotificationCenter defaultCenter]
 				postNotificationName:ORReplayRunningNotification
                               object: self];
-	nextObject = [self objectConnectedTo:ORReplayDataConnection];
-    [nextObject runTaskStarted:fileAsDataPacket userInfo:nil];
+
+	sentRunStart = NO;
 
 	[self parseFile];
 	
 }
 
+- (void) sendRunStart:(ORDataPacket*)aDataPacket
+{
+	nextObject = [self objectConnectedTo:ORReplayDataConnection];
+    [nextObject runTaskStarted:aDataPacket userInfo:nil];
+}
 
 - (void) readHeaderForFileIndex:(int)index
 {
@@ -395,7 +400,12 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 				if([fileAsDataPacket readData:fp]){
 					[self performSelectorOnMainThread:@selector(postParseStarted) withObject:nil waitUntilDone:NO];
 					[fileAsDataPacket generateObjectLookup];       //MUST be done before data header will work.
-										
+					
+					if(!sentRunStart){
+						[self performSelectorOnMainThread:@selector(sendRunStart:) withObject:fileAsDataPacket waitUntilDone:YES];
+						sentRunStart = YES;
+					}
+					
 					[self setDataRecords:[fileAsDataPacket decodeDataIntoArrayForDelegate:self]]; 
 					
 					[self performSelectorOnMainThread:@selector(postProcessingStarted) withObject:nil waitUntilDone:NO];
