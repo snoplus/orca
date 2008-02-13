@@ -20,6 +20,7 @@
 
 @class ORTimedTextField;
 @class ORScriptView;
+@class ORPlotter1D;
 
 @interface ORFilterController : OrcaObjectController {
 
@@ -38,6 +39,8 @@
 	IBOutlet NSTextField*		runStatusField;
 	IBOutlet NSButton*			runButton;
 	IBOutlet NSButton*			loadSaveButton;
+	IBOutlet NSButton*			timerEnabledCB;
+	IBOutlet ORPlotter1D*		timePlot;
 }
 
 #pragma mark •••Initialization
@@ -49,8 +52,11 @@
 - (void) argsChanged:(NSNotification*)aNote;
 - (void) lastFileChanged:(NSNotification*)aNote;
 - (void) displayValuesChanged:(NSNotification*)aNote;
+- (void) timerEnabledChanged:(NSNotification*)aNote;
+- (void) updateTiming:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) enableTimer:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) listMethodsAction:(id) sender;
 - (IBAction) cancelLoadSaveAction:(id)sender;

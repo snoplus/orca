@@ -25,6 +25,7 @@
 #import "ORTimedTextField.h"
 #import "ORScriptView.h"
 #import "ORScriptRunner.h"
+#import "ORPlotter1D.h"
 
 @implementation ORFilterController
 
@@ -94,18 +95,30 @@
                      selector : @selector(displayValuesChanged:)
                          name : ORFilterDisplayValuesChanged
                        object : model];
+   [notifyCenter addObserver : self
+                     selector : @selector(timerEnabledChanged:)
+                         name : ORFilterTimerEnabledChanged
+                       object : model];
+
+   [notifyCenter addObserver : self
+                     selector : @selector(updateTiming:)
+                         name : ORFilterUpdateTiming
+                       object : model];
 
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
 
-#pragma mark •••Actions
+
+
+
 - (void) checkGlobalSecurity
 {
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:ORFilterLock to:secure];
     [lockButton setEnabled:secure];
 }
+
 - (IBAction) lockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORFilterLock to:[sender intValue] forWindow:[self window]];
@@ -120,7 +133,7 @@
 	[self argsChanged:nil];
 	[self lastFileChanged:nil];
 	[self displayValuesChanged:nil];
-	
+	[self timerEnabledChanged:nil];
 }
 
 - (void) lockChanged:(NSNotification*)aNotification
@@ -129,6 +142,12 @@
     [lockButton setState: locked];
     
 }
+
+- (void) updateTiming:(NSNotification*)aNote
+{
+	[timePlot setNeedsDisplay:YES];
+}
+
 - (void) lastFileChanged:(NSNotification*)aNote
 {
 	[lastFileField setStringValue:[[model lastFile] stringByAbbreviatingWithTildeInPath]];
@@ -138,6 +157,12 @@
 - (void) textDidChange:(NSNotification*)aNote
 {
 	[model setScriptNoNote:[scriptView string]];
+}
+
+- (void) timerEnabledChanged:(NSNotification*)aNote
+{
+	[timerEnabledCB setState:[model timerEnabled]];
+	[timePlot setNeedsDisplay:YES];
 }
 
 - (void) scriptChanged:(NSNotification*)aNote
@@ -164,6 +189,12 @@
 
 
 #pragma mark •••Data Source Methods
+
+- (IBAction) enableTimer:(id)sender
+{
+	[model setTimerEnabled:[sender state]];
+}
+
 - (IBAction) listMethodsAction:(id) sender
 {
 	NSString* theClassName = [classNameField stringValue];
@@ -279,6 +310,17 @@
 	}
 	else [model saveFile];
 }
+
+- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+    return kFilterTimeHistoSize;
+}
+
+- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
+{
+	return [model processingTimeHist:x];
+}
+
 
 @end
 

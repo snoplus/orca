@@ -30,6 +30,9 @@
 #pragma mark •••Forward Declarations
 @class ORDataPacket;
 @class ORQueue;
+@class ORTimer;
+
+#define kFilterTimeHistoSize 4000
 
 @interface ORFilterModel :  ORDataChainObject 
 {
@@ -57,6 +60,10 @@
 		ORDataPacket*       currentDataPacket;
 		ORQueue*			stacks[kNumFilterStacks];
 		BOOL				updateScheduled;
+		unsigned long		processingTimeHist[kFilterTimeHistoSize];
+		NSLock*				timerLock;
+		BOOL				timerEnabled;
+		ORTimer*			mainTimer;
 }
 
 - (id)   init;
@@ -74,6 +81,10 @@
 - (BOOL) parsedOK;
 - (id)	 arg:(int)index;
 - (void) setArg:(int)index withValue:(id)aValue;
+- (unsigned long) processingTimeHist:(int)index;
+- (void) clearTimeHistogram;
+- (BOOL) timerEnabled;
+- (void) setTimerEnabled:(int)aState;
 
 - (id)	 displayValue:(int)index;
 
@@ -112,8 +123,8 @@
 - (long) stackCount:(int)i;
 - (void) histo1D:(int)i value:(long)aValue;
 - (void) histo2D:(int)i x:(long)x y:(long)y;
-- (void) setDisplayValue:(int)index withValue:(long)aValue;
-
+- (void) setDisplay:(int)index withValue:(long)aValue;
+- (void) resetDisplays;
 - (void) scheduledUpdate;
 
 #pragma mark •••Parsers
@@ -134,6 +145,8 @@ extern NSString* ORFilterArgsChanged;
 extern NSString* ORFilterLastFileChangedChanged;
 extern NSString* ORFilterScriptChanged;
 extern NSString* ORFilterDisplayValuesChanged;
+extern NSString* ORFilterTimerEnabledChanged;
+extern NSString* ORFilterUpdateTiming;
 
 
 @interface ORFilterDecoderFor1D : ORBaseDecoder

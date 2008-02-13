@@ -39,7 +39,8 @@ NSString* ORFilterDisplayValuesChanged		= @"ORFilterDisplayValuesChanged";
 NSString* ORFilterBreakChainChanged			= @"ORFilterBreakChainChanged";
 NSString* ORFilterLastFileChangedChanged	= @"ORFilterLastFileChangedChanged";
 NSString* ORFilterScriptChanged				= @"ORFilterScriptChanged";
-
+NSString* ORFilterTimerEnabledChanged		= @"ORFilterTimerEnabledChanged";
+NSString* ORFilterUpdateTiming				= @"ORFilterUpdateTiming";
 NSString* ORFilterLock                      = @"ORFilterLock";
 
 //========================================================================
@@ -185,6 +186,39 @@ int filterGraph(nodeType*);
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterLastFileChangedChanged object:self];
 }
 
+- (unsigned long) processingTimeHist:(int)index
+{
+    return processingTimeHist[index];
+}
+
+- (void) clearTimeHistogram
+{
+    memset(processingTimeHist,0,kFilterTimeHistoSize*sizeof(unsigned long));
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
+}
+
+- (BOOL) timerEnabled
+{
+	return timerEnabled;
+}
+
+- (void) setTimerEnabled:(int)aState
+{
+	timerEnabled = aState;
+	if(timerEnabled){
+		[self clearTimeHistogram];
+		mainTimer = [[ORTimer alloc]init];
+		[mainTimer start];
+	}
+	else {
+		[mainTimer release];
+		mainTimer = nil;
+	}
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORFilterTimerEnabledChanged
+                      object:self];
+}
+
 #pragma mark •••Data Handling
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
 {
@@ -233,8 +267,16 @@ int filterGraph(nodeType*);
 				tempData.val.lValue = recordLen;
 				[symbolTable setData:tempData forKey:"CurrentRecordLen"];
 				
+				if(timerEnabled) [mainTimer reset];
+				
 				runFilterScript(self);
 				
+				if(timerEnabled){
+					float delta = [mainTimer microseconds];
+					if(delta<kFilterTimeHistoSize)processingTimeHist[(int)delta]++;
+					else processingTimeHist[kFilterTimeHistoSize-1]++;
+				}
+			
 				ptr += recordLen;
 				totalLen -= recordLen;
 			}
@@ -296,6 +338,8 @@ int filterGraph(nodeType*);
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {		
+	[self clearTimeHistogram];
+	
 	firstTime = YES;
 	currentDataPacket = nil;
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORFilterModel"];  
@@ -355,6 +399,7 @@ int filterGraph(nodeType*);
 	
 	finishFilterScript(self);
 	[self freeNodes];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
 }
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -653,7 +698,7 @@ int filterGraph(nodeType*);
 	else return [NSNumber numberWithLong:0];		
 }
 
-- (void) setDisplayValue:(int)index withValue:(long)aValue
+- (void) setDisplay:(int)index withValue:(long)aValue
 {
 	if(!displayValues){
 		displayValues = [[NSMutableArray array] retain];
@@ -671,6 +716,15 @@ int filterGraph(nodeType*);
 		[self performSelector:@selector(scheduledUpdate) withObject:nil afterDelay:.2];
 	}
 }
+
+- (void) resetDisplays
+{
+	int i;
+	for(i=0;i<kNumDisplayValues;i++){
+		[self setDisplay:i withValue:0];
+	}
+}
+
 
 - (void) scheduledUpdate
 {
