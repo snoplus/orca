@@ -42,7 +42,7 @@
 	<key>CFBundleSignature</key>
 	<string>ORCA</string>
 	<key>CFBundleVersion</key>
-	<string>6.6.1h</string>
+	<string>6.7h</string>
 	<key>CFfile://localhost/Users/markhowe/Dev/Orca/Source/Objects/Misc%20Objects/SQL/BundleGetInfoString</key>
 	<string>Orca 6.1, Copyright ©2002 Mark Howe CENPA, University of Washington</string>
 	<key>NSMainNibFile</key>
