@@ -215,7 +215,6 @@ void graphTest (int l, int c)
     if (ok) return;
     printf ("\n+++error: l=%d, c=%d not in drawing rectangle 0, 0 ... %d, %d", 
         l, c, lmax, cmax);
-    exit (1);
 }
 
 void graphInit (void) {
