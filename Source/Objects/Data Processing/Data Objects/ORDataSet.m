@@ -240,15 +240,19 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 {
     NSEnumerator* e = [realDictionary keyEnumerator];
     id aKey;
+	NSMutableArray* keysToRemoveFromSelf = [NSMutableArray array];
     while(aKey = [e nextObject]){
         ORDataSet* aDataSet = [realDictionary objectForKey:aKey];
         if(aDataSet == anObj){
-            [self removeObjectForKey:aKey];
+			[keysToRemoveFromSelf addObject:aKey];
         }
         else {
             [[realDictionary objectForKey:aKey] removeObject:anObj];
         }
     }
+    [realDictionary removeObjectsForKeys: keysToRemoveFromSelf];
+    [sortedArray release];
+    sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
 
 }
 
