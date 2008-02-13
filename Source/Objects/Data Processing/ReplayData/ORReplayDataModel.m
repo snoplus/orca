@@ -409,9 +409,12 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 					[self setDataRecords:[fileAsDataPacket decodeDataIntoArrayForDelegate:self]]; 
 					
 					[self performSelectorOnMainThread:@selector(postProcessingStarted) withObject:nil waitUntilDone:NO];
-					[self processData];
-					[self performSelectorOnMainThread:@selector(fileFinished) withObject:nil waitUntilDone:YES];
-					
+					NS_DURING
+						[self processData];
+						[self performSelectorOnMainThread:@selector(fileFinished) withObject:nil waitUntilDone:YES];
+					NS_HANDLER
+						stop = true;
+					NS_ENDHANDLER
 				}
 				else {
 					NSLogColor([NSColor redColor],@"Problem reading <%@> for replaying.\n",[aFile stringByAbbreviatingWithTildeInPath]);
