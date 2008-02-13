@@ -1466,6 +1466,8 @@
 		84D9826B079605CD0074A035 /* ORL2551Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D98263079605CD0074A035 /* ORL2551Model.h */; };
 		84D98347079716E90074A035 /* TimedWorker.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D98345079716E90074A035 /* TimedWorker.h */; };
 		84D98348079716E90074A035 /* TimedWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D98346079716E90074A035 /* TimedWorker.m */; };
+		84DB0B700D6279F500BB9855 /* FilterSyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84DB0B6F0D6279F500BB9855 /* FilterSyntaxDefinition.plist */; };
+		84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */; };
 		84DDEBA207BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84DDEB9B07BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist */; };
 		84DDEBA307BD3E080060D0B4 /* MultiPlot.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84DDEB9C07BD3E080060D0B4 /* MultiPlot.nib */; };
 		84DDEBA507BD3E080060D0B4 /* ORMultiPlot.h in Headers */ = {isa = PBXBuildFile; fileRef = 84DDEB9E07BD3E080060D0B4 /* ORMultiPlot.h */; };
@@ -3068,6 +3070,8 @@
 		84D98263079605CD0074A035 /* ORL2551Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL2551Model.h; path = Source/Objects/Hardware/Camac/L2551/ORL2551Model.h; sourceTree = SOURCE_ROOT; };
 		84D98345079716E90074A035 /* TimedWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimedWorker.h; sourceTree = "<group>"; };
 		84D98346079716E90074A035 /* TimedWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimedWorker.m; sourceTree = "<group>"; };
+		84DB0B6F0D6279F500BB9855 /* FilterSyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = FilterSyntaxDefinition.plist; path = "Source/Objects/Data Processing/Filter/FilterSyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
+		84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = FilterScriptGuide.rtf; path = "Source/Objects/Data Processing/Filter/FilterScriptGuide.rtf"; sourceTree = SOURCE_ROOT; };
 		84DDEB9B07BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = edu.washington.npl.orca.MultiPlot.plist; sourceTree = "<group>"; };
 		84DDEB9C07BD3E080060D0B4 /* MultiPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MultiPlot.nib; sourceTree = "<group>"; };
 		84DDEB9E07BD3E080060D0B4 /* ORMultiPlot.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMultiPlot.h; sourceTree = "<group>"; };
@@ -5969,6 +5973,8 @@
 				9C2595B40D5172460039C5DF /* FilterScript.lm */,
 				9C2595B50D5172460039C5DF /* FilterScriptEx.m */,
 				9C2595B60D5172460039C5DF /* FilterScriptGraph.m */,
+				84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */,
+				84DB0B6F0D6279F500BB9855 /* FilterSyntaxDefinition.plist */,
 			);
 			name = Filter;
 			path = "Source/Objects/Data Processing/Filter";
@@ -8591,6 +8597,8 @@
 				84A8B14B0D35702300263D31 /* SBC_LAM.nib in Resources */,
 				84A5CD590D464F4600D9833C /* Filter.nib in Resources */,
 				84A5CD5A0D464F4600D9833C /* Filter.tif in Resources */,
+				84DB0B700D6279F500BB9855 /* FilterSyntaxDefinition.plist in Resources */,
+				84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
