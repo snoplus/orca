@@ -323,6 +323,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     return dictionary;
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+	return [group addParametersToDictionary:dictionary];
+}
+
 #pragma mark ¥¥¥Archival
 static NSString* ORGroupKey             = @"ORGroup";
 static NSString* ORGateGroupKey         = @"ORGateGroupKey";

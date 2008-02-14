@@ -73,6 +73,7 @@
 - (void) setGateGroup: (ORGateGroup *) aGateGroup;
 - (void) assignUniqueIDNumber:(id)anObject;
 - (void) resetAlreadyVisitedInChainSearch;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark ¥¥¥Orca Dialog Management
 - (void)    duplicateDialog:(id)dialog;
