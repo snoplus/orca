@@ -1074,6 +1074,7 @@
 		8486F45D0CC6CFB600800B1E /* ORAmi286Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F4550CC6CFB600800B1E /* ORAmi286Model.h */; };
 		8486F45E0CC6CFB600800B1E /* ORAmi286Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8486F4560CC6CFB600800B1E /* ORAmi286Model.m */; };
 		8486F4660CC6D02E00800B1E /* ORIpeDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */; };
+		848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */ = {isa = PBXBuildFile; fileRef = 848B03060D6505C6007FDEBD /* OrcaFilterScript.icns */; };
 		848CD35C08FB511B0046CD9D /* NSSplitView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */; };
 		848CD35D08FB511B0046CD9D /* NSSplitView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */; };
 		848CD41908FC3A220046CD9D /* ORAugerSLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 848CD41808FC3A220046CD9D /* ORAugerSLTDefs.h */; };
@@ -2583,6 +2584,7 @@
 		8486F4540CC6CFB600800B1E /* ORAmi286Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Decoders.m; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Decoders.m"; sourceTree = SOURCE_ROOT; };
 		8486F4550CC6CFB600800B1E /* ORAmi286Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAmi286Model.h; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Model.h"; sourceTree = SOURCE_ROOT; };
 		8486F4560CC6CFB600800B1E /* ORAmi286Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Model.m; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Model.m"; sourceTree = SOURCE_ROOT; };
+		848B03070D6505C6007FDEBD /* English */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = English; path = English.lproj/OrcaFilterScript.icns; sourceTree = "<group>"; };
 		848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSSplitView+Extensions.h"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSSplitView+Extensions.m"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		848CD41808FC3A220046CD9D /* ORAugerSLTDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerSLTDefs.h; path = "Source/Objects/Hardware/Auger/Auger Base Classes/ORAugerSLTDefs.h"; sourceTree = SOURCE_ROOT; };
@@ -3544,6 +3546,7 @@
 				84764CC005055A32005F64B1 /* UnderConstruction.gif */,
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
+				848B03060D6505C6007FDEBD /* OrcaFilterScript.icns */,
 				F54577F103AFCD1C015F64B1 /* Orca.icns */,
 				F54577F303AFCD1C015F64B1 /* OrcaDoc.icns */,
 			);
@@ -8599,6 +8602,7 @@
 				84A5CD5A0D464F4600D9833C /* Filter.tif in Resources */,
 				84DB0B700D6279F500BB9855 /* FilterSyntaxDefinition.plist in Resources */,
 				84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */,
+				848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9252,6 +9256,14 @@
 				847EA30C0545C0F8005F64B1 /* English */,
 			);
 			name = NetConnect.gif;
+			sourceTree = SOURCE_ROOT;
+		};
+		848B03060D6505C6007FDEBD /* OrcaFilterScript.icns */ = {
+			isa = PBXVariantGroup;
+			children = (
+				848B03070D6505C6007FDEBD /* English */,
+			);
+			name = OrcaFilterScript.icns;
 			sourceTree = SOURCE_ROOT;
 		};
 		84C533280652BA6B00E4731F /* MainMenu.nib */ = {
