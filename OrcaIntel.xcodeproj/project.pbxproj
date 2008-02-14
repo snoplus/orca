@@ -1639,6 +1639,7 @@
 		84EA6C400C73CD7D00083319 /* nTPCView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6C370C73CD7D00083319 /* nTPCView.m */; };
 		84F480A20CB70E3E007EFADA /* ORIpeSLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F480A00CB70E3D007EFADA /* ORIpeSLTDecoder.h */; };
 		84F480A30CB70E3E007EFADA /* ORIpeSLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F480A10CB70E3D007EFADA /* ORIpeSLTDecoder.m */; };
+		84FCF9AF0D64F5F3007BE95A /* OrcaFilterScript.icns in Resources */ = {isa = PBXBuildFile; fileRef = 84FCF9AD0D64F5F3007BE95A /* OrcaFilterScript.icns */; };
 		84FE8FA20D19918000FAD31D /* crate_lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FE8FA00D19918000FAD31D /* crate_lib.m */; };
 		84FE8FA30D19918000FAD31D /* crate_lib.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FE8FA10D19918000FAD31D /* crate_lib.h */; };
 /* End PBXBuildFile section */
@@ -3272,6 +3273,7 @@
 		84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql_com.h; path = Libraries/mysql_com.h; sourceTree = SOURCE_ROOT; };
 		84F7FB630AE5569100A5AA4C /* my_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_alloc.h; path = Libraries/my_alloc.h; sourceTree = SOURCE_ROOT; };
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
+		84FCF9AE0D64F5F3007BE95A /* English */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = English; path = English.lproj/OrcaFilterScript.icns; sourceTree = "<group>"; };
 		84FD092A078F4F17004A0E46 /* CamacCmdHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = CamacCmdHelp.plist; path = "Source/Objects/Hardware/Camac/Camac Base Classes/CamacCmdHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84FD0DD607945D17004A0E46 /* OfflineRunHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = OfflineRunHelp.plist; path = "Source/App Delegate/OfflineRunHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84FD0DF9079462FB004A0E46 /* RunFailedHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = RunFailedHelp.plist; path = Source/Objects/Control/RunControl/RunFailedHelp.plist; sourceTree = SOURCE_ROOT; };
@@ -3509,6 +3511,7 @@
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
 				F54577F103AFCD1C015F64B1 /* Orca.icns */,
+				84FCF9AD0D64F5F3007BE95A /* OrcaFilterScript.icns */,
 				F54577F303AFCD1C015F64B1 /* OrcaDoc.icns */,
 			);
 			name = Resources;
@@ -8640,6 +8643,7 @@
 				84A5CD3E0D464F2900D9833C /* Filter.tif in Resources */,
 				84DB071E0D61185700BB9855 /* FilterScriptGuide.rtf in Resources */,
 				84DB075B0D620BA400BB9855 /* FilterSyntaxDefinition.plist in Resources */,
+				84FCF9AF0D64F5F3007BE95A /* OrcaFilterScript.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9318,6 +9322,14 @@
 				84D0593E08FF39EA00A99A83 /* English */,
 			);
 			name = goBackPressed.tif;
+			sourceTree = SOURCE_ROOT;
+		};
+		84FCF9AD0D64F5F3007BE95A /* OrcaFilterScript.icns */ = {
+			isa = PBXVariantGroup;
+			children = (
+				84FCF9AE0D64F5F3007BE95A /* English */,
+			);
+			name = OrcaFilterScript.icns;
 			sourceTree = SOURCE_ROOT;
 		};
 		F54577F103AFCD1C015F64B1 /* Orca.icns */ = {

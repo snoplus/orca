@@ -267,6 +267,14 @@ int filterGraph(nodeType*);
 				tempData.val.lValue = recordLen;
 				[symbolTable setData:tempData forKey:"CurrentRecordLen"];
 				
+				unsigned long t = [runTimer microseconds]/1000;
+				if(t!=lastRunTimeValue){
+					lastRunTimeValue = t;
+					tempData.type		= kFilterLongType;
+					tempData.val.lValue = t;
+					[symbolTable setData:tempData forKey:"ElapsedTime"];
+				}
+				
 				if(timerEnabled) [mainTimer reset];
 				
 				runFilterScript(self);
@@ -375,6 +383,10 @@ int filterGraph(nodeType*);
 		theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
 		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
 		
+		runTimer = [[ORTimer alloc] init];
+		[runTimer start];
+		lastRunTimeValue = 0;
+		
 		int i;
 		for(i=0;i<kNumFilterStacks;i++) stacks[i] = nil;
 	}
@@ -399,7 +411,12 @@ int filterGraph(nodeType*);
 	
 	finishFilterScript(self);
 	[self freeNodes];
+
+	[runTimer release];
+	runTimer = nil;
+
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
+
 }
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

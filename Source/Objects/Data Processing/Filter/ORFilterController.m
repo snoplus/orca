@@ -265,7 +265,7 @@
 
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
-                                types:nil
+                                types:[NSArray arrayWithObjects:@"fs",nil]
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(loadFileDidEnd:returnCode:contextInfo:)
@@ -290,7 +290,7 @@
     }
     else {
         startingDir = NSHomeDirectory();
-        defaultFile = @"Untitled";
+        defaultFile = @"Untitled.fs";
     }
 	
     [savePanel beginSheetForDirectory:startingDir
@@ -335,7 +335,9 @@
 - (void)saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [model saveScriptToFile:[sheet filename]];
+		NSString* path = [[sheet filename] stringByDeletingPathExtension];
+		path = [path stringByAppendingPathExtension:@"fs"];
+        [model saveScriptToFile:path];
     }
 }
 @end
