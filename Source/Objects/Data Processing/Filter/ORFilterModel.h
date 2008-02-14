@@ -64,6 +64,8 @@
 		NSLock*				timerLock;
 		BOOL				timerEnabled;
 		ORTimer*			mainTimer;
+		ORTimer*			runTimer;
+		unsigned long		lastRunTimeValue;
 }
 
 - (id)   init;
