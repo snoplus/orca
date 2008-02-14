@@ -9,6 +9,22 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>fs</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>OrcaFilterScript</string>
+			<key>CFBundleTypeName</key>
+			<string>FilterScript</string>
+			<key>CFBundleTypeRole</key>
+			<string>None</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>XML</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>Orca</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
@@ -21,6 +37,8 @@
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
 			<key>NSDocumentClass</key>
 			<string>ORDocument</string>
 		</dict>
