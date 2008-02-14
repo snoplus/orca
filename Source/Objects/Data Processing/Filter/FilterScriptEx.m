@@ -284,19 +284,19 @@ filterData ex(nodeType *p,id delegate)
 			case PRINT:
 					tempData = ex(p->opr.op[0],delegate);
 					if(tempData.type == kFilterPtrType){
-						if(tempData.val.pValue) printf("%ld\n", *tempData.val.pValue); 
-						else					printf("<nil ptr>\n"); 
+						if(tempData.val.pValue) NSLog(@"%ld\n", *tempData.val.pValue); 
+						else					NSLog(@"<nil ptr>\n"); 
 					}
-					else printf("%ld\n", tempData.val.lValue); 
+					else NSLog(@"%ld\n", tempData.val.lValue); 
 			return tempData;
 			
 			case PRINTH:
 					tempData = ex(p->opr.op[0],delegate);
 					if(tempData.type == kFilterPtrType){
-						if(tempData.val.pValue) printf("0x%07lx\n", *tempData.val.pValue); 
-						else					printf("<nil ptr>\n"); 
+						if(tempData.val.pValue) NSLog(@"0x%07lx\n", *tempData.val.pValue); 
+						else					NSLog(@"<nil ptr>\n"); 
 					}
-					else printf("0x%07lx\n", tempData.val.lValue); 
+					else NSLog(@"0x%07lx\n", tempData.val.lValue); 
 			return tempData;
 			case ';':       if (p->opr.nops>=1) ex(p->opr.op[0],delegate); if (p->opr.nops>=2)return ex(p->opr.op[1],delegate); else return tempData;
 			case '=':      
