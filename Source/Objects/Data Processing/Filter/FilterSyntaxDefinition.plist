@@ -57,6 +57,7 @@
 		<string>no</string>
 		<string>CurrentRecordPtr</string>
 		<string>CurrentRecordLen</string>
+		<string>ElapsedTime</string>
 	</array>
 
 
