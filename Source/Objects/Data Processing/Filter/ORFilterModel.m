@@ -709,13 +709,13 @@ int filterGraph(nodeType*);
 	[transferDataPacket clearData];
 }
 
-- (id) displayValue:(int)index
+- (unsigned long) displayValue:(int)index
 {
-	if(index>=0 && index<[displayValues count])return [displayValues objectAtIndex:index];
-	else return [NSNumber numberWithUnsignedLong:0];		
+	if(index>=0 && index<[displayValues count])return [[displayValues objectAtIndex:index] longValue];
+	else return 0;		
 }
 
-- (void) setDisplay:(int)index withValue:(long)aValue
+- (void) setDisplay:(int)index withValue:(unsigned long)aValue
 {
 	if(!displayValues){
 		displayValues = [[NSMutableArray array] retain];
@@ -725,7 +725,7 @@ int filterGraph(nodeType*);
 		}
 	}
 
-	[displayValues replaceObjectAtIndex:index withObject:[NSNumber numberWithLong:aValue]];
+	[displayValues replaceObjectAtIndex:index withObject:[NSNumber numberWithUnsignedLong:aValue]];
 
 	//we'll reduce updates to 1/sec
 	if(!updateScheduled){

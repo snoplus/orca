@@ -183,7 +183,7 @@
 {
 	int i;
 	for(i=0;i<kNumDisplayValues;i++){
-		[[displayValuesMatrix cellWithTag:i] setObjectValue:[model displayValue:i]];
+		[[displayValuesMatrix cellWithTag:i] setDoubleValue:[model displayValue:i]];
 	}
 }
 

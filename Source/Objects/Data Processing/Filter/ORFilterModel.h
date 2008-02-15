@@ -88,7 +88,7 @@
 - (BOOL) timerEnabled;
 - (void) setTimerEnabled:(int)aState;
 
-- (id)	 displayValue:(int)index;
+- (unsigned long)	 displayValue:(int)index;
 
 - (id)	 inputValue;
 - (void) setInputValue:(id)aValue;
@@ -125,7 +125,7 @@
 - (long) stackCount:(int)i;
 - (void) histo1D:(int)i value:(long)aValue;
 - (void) histo2D:(int)i x:(long)x y:(long)y;
-- (void) setDisplay:(int)index withValue:(long)aValue;
+- (void) setDisplay:(int)index withValue:(unsigned long)aValue;
 - (void) resetDisplays;
 - (void) scheduledUpdate;
 
