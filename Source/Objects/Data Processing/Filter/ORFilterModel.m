@@ -712,7 +712,7 @@ int filterGraph(nodeType*);
 - (id) displayValue:(int)index
 {
 	if(index>=0 && index<[displayValues count])return [displayValues objectAtIndex:index];
-	else return [NSNumber numberWithLong:0];		
+	else return [NSNumber numberWithUnsignedLong:0];		
 }
 
 - (void) setDisplay:(int)index withValue:(long)aValue
@@ -721,7 +721,7 @@ int filterGraph(nodeType*);
 		displayValues = [[NSMutableArray array] retain];
 		int i;
 		for(i=0;i<kNumDisplayValues;i++){
-			[displayValues addObject:[NSNumber numberWithLong:0]];
+			[displayValues addObject:[NSNumber numberWithUnsignedLong:0]];
 		}
 	}
 

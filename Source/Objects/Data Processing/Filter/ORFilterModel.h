@@ -25,7 +25,7 @@
 
 #define kNumScriptArgs 5
 #define kNumDisplayValues 5
-#define kNumFilterStacks 32
+#define kNumFilterStacks 256
 
 #pragma mark •••Forward Declarations
 @class ORDataPacket;
