@@ -1639,11 +1639,11 @@
 		9CF2C1BC0CC195E2002B279B /* ORL8013CrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF2C1B20CC195E1002B279B /* ORL8013CrateView.h */; };
 		9CF2C1BD0CC195E2002B279B /* ORL8013CrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B30CC195E1002B279B /* ORL8013CrateView.m */; };
 		9CF39BFE0C654B41000CD58E /* ORAugerDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */; };
-		CE252F750D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */ = {isa = PBXBuildFile; fileRef = CE252F680D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
-		CE252F780D0DB66200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = CE252F680D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 		CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
+		CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */ = {isa = PBXBuildFile; fileRef = CEEBAB700D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
+		CEEBAB960D663CB300BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = CEEBAB700D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -1725,7 +1725,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				CE252F780D0DB66200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */,
+				CEEBAB960D663CB300BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3072,7 +3072,7 @@
 		84D98263079605CD0074A035 /* ORL2551Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL2551Model.h; path = Source/Objects/Hardware/Camac/L2551/ORL2551Model.h; sourceTree = SOURCE_ROOT; };
 		84D98345079716E90074A035 /* TimedWorker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimedWorker.h; sourceTree = "<group>"; };
 		84D98346079716E90074A035 /* TimedWorker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimedWorker.m; sourceTree = "<group>"; };
-		84DB0B6F0D6279F500BB9855 /* FilterSyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = FilterSyntaxDefinition.plist; path = "Source/Objects/Data Processing/Filter/FilterSyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
+		84DB0B6F0D6279F500BB9855 /* FilterSyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = FilterSyntaxDefinition.plist; path = "Source/Objects/Data Processing/Filter/FilterSyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
 		84DB0B820D627A0400BB9855 /* FilterScriptGuide.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = FilterScriptGuide.rtf; path = "Source/Objects/Data Processing/Filter/FilterScriptGuide.rtf"; sourceTree = SOURCE_ROOT; };
 		84DDEB9B07BD3E080060D0B4 /* edu.washington.npl.orca.MultiPlot.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = edu.washington.npl.orca.MultiPlot.plist; sourceTree = "<group>"; };
 		84DDEB9C07BD3E080060D0B4 /* MultiPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MultiPlot.nib; sourceTree = "<group>"; };
@@ -3292,10 +3292,10 @@
 		9CF2C1B20CC195E1002B279B /* ORL8013CrateView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL8013CrateView.h; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateView.h"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B30CC195E1002B279B /* ORL8013CrateView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateView.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateView.m"; sourceTree = SOURCE_ROOT; };
 		9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerDefs.h; path = "Source/Objects/Hardware/auger/Auger Base Classes/ORAugerDefs.h"; sourceTree = SOURCE_ROOT; };
-		CE252F680D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/PPC/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = "<group>"; };
 		CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EduWashingtonNplOrcaNi488PlugIn.h; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
+		CEEBAB700D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EduWashingtonNplOrcaNi488PlugIn.plugin; path = PlugIns/Universal/EduWashingtonNplOrcaNi488PlugIn.plugin; sourceTree = "<group>"; };
 		F51E695403AE4775015F64B1 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/App Delegate/main.m"; sourceTree = SOURCE_ROOT; };
 		F51E695503AE4775015F64B1 /* ORAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAppDelegate.h; sourceTree = "<group>"; };
 		F51E695603AE4775015F64B1 /* ORAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAppDelegate.m; sourceTree = "<group>"; };
@@ -7118,7 +7118,7 @@
 		CE68866C0D0CE0E400FA4158 /* PlugIns */ = {
 			isa = PBXGroup;
 			children = (
-				CE252F680D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin */,
+				CEEBAB700D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin */,
 			);
 			name = PlugIns;
 			sourceTree = "<group>";
@@ -8588,7 +8588,6 @@
 				9C1363B90D0A78FC006C550D /* NplHVIcon.tif in Resources */,
 				9C1363C70D0A7921006C550D /* Caen265.nib in Resources */,
 				9C1363C80D0A7921006C550D /* Caen265Card.tif in Resources */,
-				CE252F750D0DB65200731D00 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
 				CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */,
 				CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */,
 				9C086CE90D10AB6200524F47 /* mainFocalPlaneDetector.tif in Resources */,
@@ -8603,6 +8602,7 @@
 				84DB0B700D6279F500BB9855 /* FilterSyntaxDefinition.plist in Resources */,
 				84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */,
 				848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */,
+				CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
