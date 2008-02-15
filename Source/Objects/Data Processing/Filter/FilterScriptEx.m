@@ -321,6 +321,7 @@ filterData ex(nodeType *p,id delegate)
 			case '|':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue | ex(p->opr.op[1],delegate).val.lValue; return tempData;
 			case '&':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue & ex(p->opr.op[1],delegate).val.lValue; return tempData;
 			case '!':       tempData.val.lValue = !ex(p->opr.op[0],delegate).val.lValue; return tempData;
+			case '~':       tempData.val.lValue = ~ex(p->opr.op[0],delegate).val.lValue; return tempData;
 			case GE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue >= ex(p->opr.op[1],delegate).val.lValue; return tempData;
 			case LE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue <= ex(p->opr.op[1],delegate).val.lValue; return tempData;
 			case NE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue != ex(p->opr.op[1],delegate).val.lValue; return tempData;
