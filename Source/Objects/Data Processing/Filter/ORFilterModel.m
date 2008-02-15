@@ -517,7 +517,7 @@ int filterGraph(nodeType*);
 	if([fm fileExistsAtPath:[aFilePath stringByExpandingTildeInPath]]){
 		[fm removeFileAtPath:[aFilePath stringByExpandingTildeInPath] handler:nil];
 	}
-	NSData* theData = [script dataUsingEncoding:NSASCIIStringEncoding];
+	NSData* theData = [script dataUsingEncoding:NSUTF8StringEncoding];
 	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
 	[self setLastFile:aFilePath];
 }
