@@ -56,8 +56,8 @@ long				switchValue[512];
 %}
 
 %union {
-    long iValue;                 /* integer value */
-    char sIndex[100];            /* symbol table key */
+    unsigned long iValue;       /* integer value */
+    char sIndex[100];           /* symbol table key */
     nodeType *nPtr;             /* node pointer */
 };
 

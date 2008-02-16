@@ -44,7 +44,7 @@ enum {
 
 /* constants */
 typedef struct {
-    long value;                  /* value of constant */
+    unsigned long value;                  /* value of constant */
 } conNodeType;
 
 /* identifiers */

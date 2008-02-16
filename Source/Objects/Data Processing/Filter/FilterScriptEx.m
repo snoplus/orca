@@ -167,8 +167,8 @@ void forLoop(nodeType* p, id delegate)
 void defineArray(nodeType* p, id delegate)
 {
 	int n = ex(p->opr.op[1],delegate).val.lValue;
-	long* ptr = 0;
-	if(n>0) ptr = calloc(n, sizeof(long));
+	unsigned long* ptr = 0;
+	if(n>0) ptr = calloc(n, sizeof(unsigned long));
 	filterData tempData;
 	tempData.type		= kFilterPtrType;
 	tempData.val.pValue = ptr;
@@ -191,7 +191,7 @@ void freeArray(nodeType* p, id delegate)
 		}
 	}
 }
-long* loadArray(long* ptr, nodeType* p)
+unsigned long* loadArray(unsigned long* ptr, nodeType* p)
 {
 	filterData tempData;
     switch(p->type) {
@@ -216,8 +216,8 @@ long* loadArray(long* ptr, nodeType* p)
 void arrayList(nodeType* p, id delegate)
 {
 	int n = ex(p->opr.op[1],delegate).val.lValue;
-	long* ptr = 0;
-	if(n>0) ptr = calloc(n, sizeof(long));
+	unsigned long* ptr = 0;
+	if(n>0) ptr = calloc(n, sizeof(unsigned long));
 	filterData tempData;
 	tempData.type		= kFilterPtrType;
 	tempData.val.pValue = ptr;
@@ -225,30 +225,6 @@ void arrayList(nodeType* p, id delegate)
 	loadArray(ptr,p->opr.op[2]);
 }	
 
-
-
-/*filterData processLeftArray(nodeType* p, id delegate)
-{
-	int n = ex(p->opr.op[1],delegate).val.lValue;
-	long* ptr = ex(p->opr.op[0],delegate).val.pValue;
-	filterData theResult;
-	theResult.type = kFilterLongType;
-	theResult.val.lValue = ptr[n];
-	return theResult;
-}
-void arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue
-{
-	long* ptr = ex(p->opr.op[1],delegate).val.pValue;
-	
-	NSMutableArray* theArray = [self execute:[[leftNode nodeData] objectAtIndex:0] container:nil];
-	int n = [[self execute:[[leftNode nodeData] objectAtIndex:1] container:nil] longValue];
-	if(n>=0 && n<[theArray count]){
-		id val = NodeValue(1);
-		[theArray replaceObjectAtIndex:n withObject:val];
-	}
-	return nil;
-}
-*/
 filterData ex(nodeType *p,id delegate) 
 {
 	filterData tempData = {0,{0}};
@@ -399,7 +375,7 @@ filterData ex(nodeType *p,id delegate)
 			//array stuff
 			case kArrayAssign:
 				{
-					long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
 					if(ptr!=0){
 						*ptr = ex(p->opr.op[1],delegate).val.lValue;
 						tempData.type = kFilterLongType;
@@ -413,9 +389,9 @@ filterData ex(nodeType *p,id delegate)
 
 			case kLeftArray:
 				{
-					long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
 					if(ptr!=0){
-						long offset = ex(p->opr.op[1],delegate).val.lValue;
+						unsigned long offset = ex(p->opr.op[1],delegate).val.lValue;
 						tempData.type = kFilterPtrType;
 						tempData.val.pValue = ptr+offset;
 					}
@@ -427,9 +403,9 @@ filterData ex(nodeType *p,id delegate)
 
 			case kArrayElement:
 				{
-					long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
 					if(ptr!=0){
-						long offset = ex(p->opr.op[1],delegate).val.lValue;
+						unsigned long offset = ex(p->opr.op[1],delegate).val.lValue;
 						tempData.type = kFilterLongType;
 						tempData.val.lValue = ptr[offset];
 					}
@@ -456,7 +432,7 @@ filterData ex(nodeType *p,id delegate)
 			
 			case SHIP_RECORD:
 				{
-					long* ptr = ex(p->opr.op[0],delegate).val.pValue;
+					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
 					if(ptr) [delegate shipRecord:ptr length:ExtractLength(*ptr)]; 
 				}
 			break;
@@ -464,7 +440,7 @@ filterData ex(nodeType *p,id delegate)
 			case PUSH_RECORD:
 				{
 					long stack = ex(p->opr.op[0],delegate).val.lValue;
-					long* ptr  = ex(p->opr.op[1],delegate).val.pValue;
+					unsigned long* ptr  = ex(p->opr.op[1],delegate).val.pValue;
 					if(ptr)[delegate pushOntoStack:stack record:ptr]; 
 				}
 			break;
@@ -491,8 +467,8 @@ filterData ex(nodeType *p,id delegate)
 
 			case HISTO_2D:	
 				{
-					long x = ex(p->opr.op[1],delegate).val.lValue;
-					long y = ex(p->opr.op[2],delegate).val.lValue;
+					unsigned long x = ex(p->opr.op[1],delegate).val.lValue;
+					unsigned long y = ex(p->opr.op[2],delegate).val.lValue;
 					[delegate histo2D:ex(p->opr.op[0],delegate).val.lValue x:x y:y];
 				}
 			break;

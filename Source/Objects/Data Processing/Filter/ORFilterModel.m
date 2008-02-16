@@ -254,7 +254,7 @@ int filterGraph(nodeType*);
 		NSData* data = [theDataArray objectAtIndex:i];
 		long totalLen = [data length]/sizeof(long);
 		if(totalLen>0){
-			long* ptr = (long*)[data bytes];
+			unsigned long* ptr = (unsigned long*)[data bytes];
 			while(totalLen>0){
 				long recordLen = ExtractLength(*ptr);
 				filterData tempData;
@@ -621,17 +621,17 @@ int filterGraph(nodeType*);
 }
 
 #pragma mark ***Plugin Interface
-- (long) extractRecordID:(long)aValue
+- (unsigned long) extractRecordID:(unsigned long)aValue
 {
 	return ExtractDataId(aValue);
 }
 
-- (long) extractRecordLen:(long)aValue
+- (unsigned long) extractRecordLen:(unsigned long)aValue
 {
 	return ExtractLength(aValue);
 }
 
-- (void) shipRecord:(long*)p length:(long)length
+- (void) shipRecord:(unsigned long*)p length:(long)length
 {
 	if(ExtractDataId(p[0]) != 0){
 		[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:length];
@@ -643,7 +643,7 @@ int filterGraph(nodeType*);
 	}
 }
 
-- (void) pushOntoStack:(int)i record:(long*)p
+- (void) pushOntoStack:(int)i record:(unsigned long*)p
 {
 	if(!stacks[i])stacks[i] = [[ORQueue alloc] init]; 
 	
@@ -651,10 +651,10 @@ int filterGraph(nodeType*);
 	[stacks[i] enqueue:data];
 }
 
-- (long*) popFromStack:(int)i
+- (unsigned long*) popFromStack:(int)i
 {
 	NSData* data = [stacks[i] dequeue];
-	return (long*)[data bytes];
+	return (unsigned long*)[data bytes];
 }
 
 - (void) shipStack:(int)i
@@ -682,9 +682,9 @@ int filterGraph(nodeType*);
 	stacks[i] = nil;
 }
 
-- (void) histo1D:(int)i value:(long)aValue
+- (void) histo1D:(int)i value:(unsigned long)aValue
 {
-	long p[2];
+	unsigned long p[2];
 	p[0] = dataId1D | 2;
 	p[1] = (i & 0xff) << 16 | (aValue & 0xffff);
 	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:2];
@@ -695,9 +695,9 @@ int filterGraph(nodeType*);
 	[transferDataPacket clearData];
 }
 
-- (void) histo2D:(int)i x:(long)x y:(long)y
+- (void) histo2D:(int)i x:(unsigned long)x y:(unsigned long)y
 {
-	long p[2];
+	unsigned long p[2];
 	p[0] = dataId2D | 3;
 	p[1] = (i & 0xff) << 16 | (x & 0xff);
 	p[2] = (y & 0xff);

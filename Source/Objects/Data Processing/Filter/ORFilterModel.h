@@ -115,16 +115,16 @@
 - (void) saveScriptToFile:(NSString*)aFilePath;
 
 #pragma mark ***Plugin Interface
-- (long) extractRecordID:(long)aValue;
-- (long) extractRecordLen:(long)aValue;
-- (void) shipRecord:(long*)p length:(long)length;
-- (void) pushOntoStack:(int)i record:(long*)p;
-- (long*) popFromStack:(int)i;
+- (unsigned long) extractRecordID:(unsigned long)aValue;
+- (unsigned long) extractRecordLen:(unsigned long)aValue;
+- (void) shipRecord:(unsigned long*)p length:(long)length;
+- (void) pushOntoStack:(int)i record:(unsigned long*)p;
+- (unsigned long*) popFromStack:(int)i;
 - (void) shipStack:(int)i;
 - (void) dumpStack:(int)i;
 - (long) stackCount:(int)i;
-- (void) histo1D:(int)i value:(long)aValue;
-- (void) histo2D:(int)i x:(long)x y:(long)y;
+- (void) histo1D:(int)i value:(unsigned long)aValue;
+- (void) histo2D:(int)i x:(unsigned long)x y:(unsigned long)y;
 - (void) setDisplay:(int)index withValue:(unsigned long)aValue;
 - (void) resetDisplays;
 - (void) scheduledUpdate;

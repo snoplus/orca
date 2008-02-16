@@ -7,8 +7,8 @@
 typedef struct  {
 	long type;
 	union {
-		long lValue;
-		long* pValue;
+		unsigned long lValue;
+		unsigned long* pValue;
 	}val;
 }filterData;
 
