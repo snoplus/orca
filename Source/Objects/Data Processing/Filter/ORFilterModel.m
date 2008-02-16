@@ -686,7 +686,7 @@ int filterGraph(nodeType*);
 {
 	long p[2];
 	p[0] = dataId1D | 2;
-	p[1] = (i & 0xff) << 16 | (aValue & 0xfff);
+	p[1] = (i & 0xff) << 16 | (aValue & 0xffff);
 	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:2];
 	[transferDataPacket addFrameBuffer:YES];
 	//pass it on
