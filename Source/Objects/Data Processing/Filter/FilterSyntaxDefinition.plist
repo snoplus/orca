@@ -10,6 +10,7 @@
 	<array>
 		<string>else</string>
 		<string>if</string>
+		<string>unless</string>
 		<string>do</string>
 		<string>while</string>
 		<string>for</string>

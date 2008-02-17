@@ -250,9 +250,13 @@ filterData ex(nodeType *p,id delegate)
 			case WHILE:     whileLoop(p,delegate); return tempData;
 			case FOR:		forLoop(p,delegate); return tempData;
 			case CONTINUE:	[NSException raise:@"continue" format:nil]; return tempData;
-			case IF:        if (ex(p->opr.op[0],delegate).val.lValue > 0) ex(p->opr.op[1],delegate);
+			case IF:        if (!ex(p->opr.op[0],delegate).val.lValue > 0) ex(p->opr.op[1],delegate);
 							else if (p->opr.nops > 2) ex(p->opr.op[2],delegate);
 							return tempData;
+
+			case UNLESS:    if (ex(p->opr.op[0],delegate).val.lValue) ex(p->opr.op[1],delegate);
+							return tempData;
+
 			case BREAK:		[NSException raise:@"break" format:nil]; return tempData;
 			case SWITCH:	doSwitch(p,delegate); return tempData;
 			case CASE:		doCase(p,delegate); return tempData;

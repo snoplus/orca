@@ -63,7 +63,7 @@ long				switchValue[512];
 
 %token <iValue> INTEGER
 %token <sIndex> VARIABLE
-%token FILTER START FINISH WHILE DO FOR IF PRINT PRINTH BREAK CONTINUE
+%token FILTER START FINISH WHILE DO FOR IF PRINT PRINTH BREAK CONTINUE UNLESS
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING SWITCH CASE DEFAULT MAKEARRAY
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP FREEARRAY EXTRACTRECORD_LEN EXTRACTRECORD_ID 
@@ -155,6 +155,7 @@ selection_statement
 		: IF '(' expr ')' statement					{ $$ = opr(IF,2, $3, $5); }
 		| IF '(' expr ')' statement ELSE statement	{ $$ = opr(IF,3, $3, $5, $7); }
 		| SWITCH '(' expr ')'  '{' case_list '}'	{ $$ = opr(SWITCH, 2, $3, $6); }
+		| UNLESS '(' expr ')' statement				{ $$ = opr(UNLESS,2, $3, $5); }
 		;
 
 iteration_statement

@@ -94,8 +94,9 @@ void exNode
                 case WHILE:				s="[while]";		break;
                 case FOR:				s="[for]";			break;
                 case IF:				s="[if]";			break;
-                case SWITCH:			s="[switch]";		break;
-                case CASE:				s="[case]";		break;
+                case UNLESS:			s="[unless]";		break;
+				case SWITCH:			s="[switch]";		break;
+                case CASE:				s="[case]";			break;
                 case DEFAULT:			s="[default]";		break;
                 case PRINT:				s="[print]";		break;
                 case PRINTH:			s="[printhex]";		break;
