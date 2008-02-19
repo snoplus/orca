@@ -181,7 +181,6 @@ followed by waveform data (n x 1024 16-bit words)
 	[aDataSet loadWaveform: waveFormdata							//pass in the whole data set
 					offset: (2*sizeof(long)+sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/2	// Offset in bytes (2 header words + katrinEventDataStruct)
 				    unitSize: sizeof(short)							// unit size in bytes
-					mask:	0x0FFF									// when displayed all values will be masked with this value
 					sender: self 
 					withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
 					
