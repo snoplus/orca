@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
+#include <time.h>
 #include <errno.h>
 #include "SBC_Cmds.h"
 #include "SBC_Config.h"
@@ -361,12 +362,13 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     if(index<config->total_cards && index>=0) {
         switch(config->card_info[index].hw_type_id){
-            case kShaper:       index = Readout_Shaper(config,index,lamData);        break;
-            case kGretina:      index = Readout_Gretina(config,index,lamData);        break;
+            case kShaper:       index = Readout_Shaper(config,index,lamData);       break;
+            case kIP320:        index = Readout_IP320(config,index,lamData);        break;
+            case kGretina:      index = Readout_Gretina(config,index,lamData);      break;
             case kTrigger32:    index = Readout_TR32_Data(config,index,lamData);    break;
-            case kCaen:            index = Readout_CAEN(config,index,lamData);            break;
-            case kSBCLAM:       index = Readout_LAM_Data(config,index,lamData);        break;
-            default:            index = -1;                                            break;
+            case kCaen:         index = Readout_CAEN(config,index,lamData);         break;
+            case kSBCLAM:       index = Readout_LAM_Data(config,index,lamData);     break;
+            default:            index = -1;                                         break;
         }
         return index;
     }
@@ -415,6 +417,74 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
 
     return config->card_info[index].next_Card_Index;
 }            
+
+/*************************************************************/
+/*             Reads out IP320 cards.                       */
+/*************************************************************/
+
+int32_t Readout_IP320(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+    int conv[4] = {3,2,1,0};
+    uint32_t ipSlot			= config->card_info[index].deviceSpecificData[0];
+    uint32_t pollTime		= config->card_info[index].deviceSpecificData[1];
+	uint32_t baseAddress    = config->card_info[index].base_add + conv[ipSlot]*0x100;
+	uint32_t lowMask		= config->card_info[index].deviceSpecificData[2];
+	uint32_t highMask		= config->card_info[index].deviceSpecificData[3];
+  
+	//we are going to cheat and use the deviceSpecificData array to hold a varible for us
+	if(config->card_info[index].deviceSpecificData[255] == 0)
+
+
+
+	uint32_t aChannel;
+	uint32_t aMask;
+	uint32_t dummyValue = 0xffffffff;
+	uint32_t adcValue;
+
+	if(lowMask || highMask){
+		data[dataIndex++] = dataId | 24;
+		data[dataIndex++] = slotMask;
+		time_t now;
+		time(&now);
+		char timeToRead = 0;
+		//we are going to cheat and use the deviceSpecificData array to hold a varible for us
+		if(config->card_info[index].deviceSpecificData[255] == 0){
+			config->card_info[index].deviceSpecificData[255] = now;
+			timeToRead = 1;
+		}
+		else if(now - config->card_info[index].deviceSpecificData[255] >= pollTime){
+			timeToRead = 1;
+			config->card_info[index].deviceSpecificData[255] = now;
+		}
+
+		if(timeToRead){
+			data[dataIndex++] = now;
+			char enabled;
+			for(aChannel=0;aChannel<40;aChannel){
+				//do we need to read
+				if(i < 32 && (lowMask & (1L<<i)))enabled = 1;
+				else if(i>32 && (highMask & (1L<<(i-32)))enabled = 1;
+				else enabled = 0;
+				if(enabled){	
+					uint32_t aMask = 0;
+					aMask |= (aChannel%20 & kChan_mask);//bits 0-5
+					aMask |= [chanObj config->card_info[index].deviceSpecificData[4+aChannel]]    << 6;    //laod gain bits 6-7
+					aMask |= [chanObj config->card_info[index].deviceSpecificData[4+40+aChannel]] << 8;    //load mode bits 8-9
+				
+					result = write_device(vmeAM29Handle,(char*)&aMask,sizeof(uint32_t),baseAddress); //laod the constants... must to this to select chan
+
+					result = write_device(vmeAM29Handle,(char*)&dummyValue,sizeof(uint32_t),baseAddress+0x0010); //start conversion
+
+					result = read_device(vmeAM29Handle,(char*)&adcValue,sizeof(uint32_t),baseAddress+0x0020); //read adc
+					data[dataIndex++] = ((i&0xff)<<16) | ((adcValues >>3) & 0xfff);		//value needs to be shifted by 3 after the read
+				}
+			}
+		}
+	}
+
+    return config->card_info[index].next_Card_Index;
+}            
+
 
 /*************************************************************/
 /*             Reads out Gretina (Mark I) cards.             */
