@@ -22,6 +22,9 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORIP320Model.h"
 #import "ORIPCarrierModel.h"
+#import "ORVmeCrateModel.h"
+#include "VME_HW_Definitions.h"
+#import "ORDataTypeAssigner.h"
 
 #import "ORIP320Channel.h"
 
@@ -115,6 +118,13 @@ static struct {
     chanObjs = aChanArray;
 }
 
+
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+
 - (void) setPollingState:(NSTimeInterval)aState
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPollingState:pollingState];
@@ -144,8 +154,6 @@ static struct {
 }
 
 #pragma mark ¥¥¥Hardware Access
-
-
 - (unsigned long) getRegisterAddress:(short) aRegister
 {
     int ip = [self slotConv];
@@ -172,10 +180,10 @@ static struct {
     ORIP320Channel* chanObj = [chanObjs objectAtIndex:aChannel];
     unsigned short aMask = 0;
     aMask |= (aChannel%20 & kChan_mask);//bits 0-5
-        aMask |= [chanObj gain] << 6;       //bits 6-7
-        aMask |= [chanObj mode] << 8;       //bits 8-9
+	aMask |= [chanObj gain] << 6;       //bits 6-7
+	aMask |= [chanObj mode] << 8;       //bits 8-9
         
-        [[guardian adapter] writeWordBlock:&aMask
+	[[guardian adapter] writeWordBlock:&aMask
 								 atAddress:[self getRegisterAddress:kControlReg]
 								numToWrite:1L
 								withAddMod:[guardian addressModifier]
@@ -231,7 +239,8 @@ static struct {
 		short chan;
 		for(chan=0;chan<kNumIP320Channels;chan++){
 			if([[chanObjs objectAtIndex:chan] readEnabled])[self readAdcChannel:chan];
-		}	
+		}
+		valuesReadyToShip = YES;	
 	}
 }
 
@@ -240,13 +249,13 @@ static struct {
     NS_DURING 
         [self readAllAdcChannels];    
     NS_HANDLER 
-        //catch this here to prevent it from falling thru, but nothing to do.
-        NS_ENDHANDLER
+	//catch this here to prevent it from falling thru, but nothing to do.
+	NS_ENDHANDLER
         
-        [NSObject cancelPreviousPerformRequestsWithTarget:self];
-        if(pollingState!=0){
-            [self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
-        }
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	if(pollingState!=0){
+		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
+	}
 }
 
 - (void) enablePollAll:(BOOL)state
@@ -373,4 +382,160 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 	}		
 }
 
+- (unsigned long) lowMask
+{
+	int i;
+	unsigned long aMask = 0;
+	for(i=0;i<32;i++){
+		if([[chanObjs objectAtIndex:i] readEnabled]){
+			aMask |= 1L<<i;
+		}
+	}
+	return aMask;
+}
+
+- (unsigned long) highMask
+{
+	unsigned long aMask = 0;
+	int i;
+	for(i=0;i<8;i++){
+		if([[chanObjs objectAtIndex:i+32] readEnabled]){
+			aMask |= 1L<<i;
+		}
+	}
+	return aMask;
+}
+
+#pragma mark ¥¥¥Data Taker
+
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+	int i;
+	for(i=0;i<kNumIP320Channels;i++){
+		[objDictionary setObject:[[chanObjs objectAtIndex:i] parameters] forKey:[NSString stringWithFormat:@"chan%d",i]];
+	}	
+	return objDictionary;
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"ORSIP320DecoderForADC",						@"decoder",
+        [NSNumber numberWithLong:dataId],               @"dataId",
+        [NSNumber numberWithBool:YES],                  @"variable",
+        [NSNumber numberWithLong:-1],					@"length",
+        nil];
+    [dataDictionary setObject:aDictionary forKey:@"IP320"];
+    
+    return dataDictionary;
+}
+
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
+{
+	NSDictionary* aDictionary;
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+							@"Adc",											@"name",
+							[NSNumber numberWithLong:dataId],				@"dataId",
+							[NSNumber numberWithLong:kNumIP320Channels],	@"maxChannels",
+								nil];
+		
+	[anEventDictionary setObject:aDictionary forKey:@"IP320"];
+}
+
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	
+    if(![[guardian adapter] controllerCard]){
+		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
+    }
+	
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORIP320Model"];    
+    
+    //----------------------------------------------------------------------------------------
+    controller = [[guardian adapter] controllerCard]; //cache the controller for alittle bit more speed.
+    slotMask   =  (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
+	lowMask = [self lowMask];
+	highMask = [self highMask];
+
+    [self clearExceptionCount];
+}
+
+//**************************************************************************************
+// Function:	TakeData
+// Description: Read data from a card
+//**************************************************************************************
+- (void) setDataIds:(id)assigner
+{
+    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
+}
+
+- (void) syncDataIdsWith:(id)anotherCard
+{
+    [self setDataId:[anotherCard dataId]];
+}
+
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	if(valuesReadyToShip){
+		unsigned long data[23];
+		data[1] = slotMask;
+		time_t  now;
+		time(&now);
+		data[2] = now;	//seconds since 1970
+		int index = 3;
+		int i;
+		for(i=0;i<40;i++){
+			if([[chanObjs objectAtIndex:i] readEnabled]){
+				int val  = [[chanObjs objectAtIndex:i] rawValue];
+				data[index++] = (i&0xff)<<16 | val & 0xfff;
+			}
+		}
+		data[0] = dataId | index;
+		
+		if(index>3){
+			[aDataPacket addLongsToFrameBuffer:data length:index];
+		}
+		valuesReadyToShip = NO;
+	}
+}
+
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+}
+
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id = kIP320;		//should be unique
+	configStruct->card_info[index].hw_mask[0] = dataId; //better be unique
+	configStruct->card_info[index].slot 	 = [guardian slot];
+	configStruct->card_info[index].crate 	 = [self crateNumber];
+	configStruct->card_info[index].add_mod 	 = [self addressModifier];
+	configStruct->card_info[index].base_add  = [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0] = [self slot];
+	configStruct->card_info[index].deviceSpecificData[1] = MAX(1.,(unsigned long)pollingState);
+	configStruct->card_info[index].deviceSpecificData[2] = [self lowMask];
+	configStruct->card_info[index].deviceSpecificData[3] = [self highMask];
+	int i;
+	int j = 4;
+	for(i=0;i<40;i++) configStruct->card_info[index].deviceSpecificData[j++] = [[chanObjs objectAtIndex:i] gain];		
+	for(i=0;i<40;i++) configStruct->card_info[index].deviceSpecificData[j++] = [[chanObjs objectAtIndex:i] mode];		
+	
+	configStruct->card_info[index].num_Trigger_Indexes = 0;
+	
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	
+	return index+1;
+}
+
+- (void)reset
+{
+}
 @end

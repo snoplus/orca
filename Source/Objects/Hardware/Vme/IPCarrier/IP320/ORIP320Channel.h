@@ -42,6 +42,7 @@
 	ORAlarm*	lowAlarm;
 	ORAlarm*	highAlarm;
 	double		maxValue;
+	int			rawValue;
 }
 - (id) initWithAdc:(id)anAdcCard channel:(unsigned short)aChannel;
 
@@ -58,6 +59,7 @@
 - (BOOL) setChannelValue:(int)aValue;
 - (void) checkDefaults;
 - (double) maxValue;
+- (int) rawValue;
 @end
 
 @interface NSObject (IP320Card)

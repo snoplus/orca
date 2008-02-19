@@ -22,6 +22,9 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORVmeIPCard.h"
 #import "ORAdcProcessing.h"
+#import "ORDataTaker.h"
+#import "VME_eCPU_Config.h"
+#import "SBC_Config.h"
 
 enum {
     kControlReg,
@@ -44,12 +47,19 @@ enum {
     kAutoZero
 };
 
-@interface ORIP320Model : ORVmeIPCard <ORAdcProcessing>
+@interface ORIP320Model : ORVmeIPCard <ORDataTaker,ORAdcProcessing>
 {
     NSMutableArray* chanObjs;
     NSTimeInterval	pollingState;
     BOOL            hasBeenPolled;
 	NSLock*			hwLock;
+    unsigned long   dataId;
+	BOOL			valuesReadyToShip;
+	
+	//cached values -- valid ONLY during running
+	unsigned long slotMask;
+	unsigned long lowMask;
+	unsigned long highMask;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -70,6 +80,10 @@ enum {
 - (void)		   enablePollAll:(BOOL)state;
 - (void)		   enableAlarmAll:(BOOL)state;
 - (void)		   postNotification:(NSNotification*)aNote;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (unsigned long) lowMask;
+- (unsigned long) highMask;
 
 #pragma mark ¥¥¥Adc Processing Protocol
 - (void)processIsStarting;
@@ -83,6 +97,14 @@ enum {
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
 
+#pragma mark ¥¥¥DataTaker
+- (NSDictionary*) dataRecordDescription;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherShaper;
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
 @end
 

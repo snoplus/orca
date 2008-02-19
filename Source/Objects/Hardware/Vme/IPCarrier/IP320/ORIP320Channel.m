@@ -221,6 +221,7 @@
 {    
 	BOOL changed = NO;
 	@synchronized(self){
+		rawValue = aValue;
 		double convertedValue = aValue*[[parameters objectForKey:k320ChannelSlope] doubleValue] + [[parameters objectForKey:k320ChannelIntercept] doubleValue];
 		changed = (convertedValue!=[[parameters objectForKey:k320ChannelValue] doubleValue]);
 		NSNumber* theConvertedValue = [NSNumber numberWithDouble:convertedValue];
@@ -229,7 +230,10 @@
 	}
     return changed;
 }
-
+- (int) rawValue
+{
+	return rawValue;
+}
 - (double) maxValue
 {
 	return maxValue;
