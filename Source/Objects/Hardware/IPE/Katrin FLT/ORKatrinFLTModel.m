@@ -1318,14 +1318,18 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 		}
 	}
 		
-    if([[userInfo objectForKey:@"doinit"]intValue]){
-		[self initBoard];					
-	}
+    //if([[userInfo objectForKey:@"doinit"]intValue]){
+	//	[self initBoard];					
+	//}
 	
 	if(fltRunMode == kKatrinFlt_Debug_Mode)	[self restartRun];		//reset the trigger
 	else								[self reset];			//reset the r/w pointer
 	
+	[self loadTime];					//set the time on the flts to mac time
+	[self writeMode:fltRunMode];
+	[self writeHitRateMask];			//set the hit rate masks
 	[self writeTriggerControl];			//set trigger mask
+	[self loadThresholdsAndGains];
 	
 	if(ratesEnabled){
 		[self performSelector:@selector(readHitRates) 
@@ -1650,7 +1654,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 							[theWaveFormData appendBytes:&theEvent length:sizeof(katrinEventDataStruct)];
 							[theWaveFormData appendBytes:&theDebugEvent length:sizeof(katrinDebugDataStruct)];									
 							
-							int startBin = theEvent.subSec - (512 + (readoutPages-1) * 1024);
+							int startBin = theEvent.subSec - (256 + [[[self crate] adapter] nextPageDelay] + (readoutPages-1) * 1024);
 							if(startBin < 0){
 								startBin = 0x10000 + startBin;
 							}

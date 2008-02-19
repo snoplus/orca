@@ -365,10 +365,8 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[pageSizeStepper setEnabled:!lockedOrRunningMaintenance];
 
 
-	[nextPageDelaySlider setEnabled:!isRunning];
+	[nextPageDelaySlider setEnabled:!lockedOrRunningMaintenance];
 	
-    [settingLockButton setState: lockedOrRunningMaintenance];
-
 	[self enableRegControls];
 }
 
