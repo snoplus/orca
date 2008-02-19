@@ -23,18 +23,18 @@
 
 typedef struct {
     uint32_t header;
-    uint32_t total_cards;                    // total sum of all cards
-    struct {                                    // structure required for card
+    uint32_t total_cards;                   // total sum of all cards
+    struct {								// structure required for card
         uint32_t hw_type_id;                // unique hardware identifier code
-        uint32_t hw_mask[10];            // hardware identifier mask to OR into data word
-        uint32_t slot;                    // slot identifier
-        uint32_t crate;                    // crate identifier
-        uint32_t base_add;                // base addresses for each card
-        uint32_t add_mod;                // address modifier (if needed)
-        uint32_t deviceSpecificData[5];    // a card can use this block as needed.
-        uint32_t next_Card_Index;        // next card_info index to be read after this one.        
-        uint32_t num_Trigger_Indexes;    // number of triggers for this card
-        uint32_t next_Trigger_Index[3];    //card_info index for device specific trigger
+        uint32_t hw_mask[10];				// hardware identifier mask to OR into data word
+        uint32_t slot;						// slot identifier
+        uint32_t crate;						// crate identifier
+        uint32_t base_add;					// base addresses for each card
+        uint32_t add_mod;					// address modifier (if needed)
+        uint32_t deviceSpecificData[256];	// a card can use this block as needed.
+        uint32_t next_Card_Index;			// next card_info index to be read after this one.        
+        uint32_t num_Trigger_Indexes;		// number of triggers for this card
+        uint32_t next_Trigger_Index[3];		//card_info index for device specific trigger
     } card_info[MAX_CARDS];
 } SBC_crate_config;
 
