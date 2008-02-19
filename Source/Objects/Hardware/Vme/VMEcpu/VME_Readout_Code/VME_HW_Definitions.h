@@ -25,5 +25,6 @@
 #define kSBCLAM	   3
 #define kTrigger32 4
 #define kCaen 	   5 
+#define kIP320     6
 
 #endif
