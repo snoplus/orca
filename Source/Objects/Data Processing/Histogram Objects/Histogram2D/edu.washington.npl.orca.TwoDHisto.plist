@@ -6,6 +6,7 @@
 	<array>
 		<string>LogLin</string>
 		<string>Clear</string>
+		<string>Analyze</string>
         <string>NSToolbarPrintItem</string>
 		<string>NSToolbarFlexibleSpaceItem</string>
 		<string>NSToolbarCustomizeToolbarItem</string>
@@ -30,6 +31,16 @@
 			<key>ToolTip</key>
 			<string>Clear Histogram</string>
 		</dict>
+		<key>Analyze</key>
+		<dict>
+			<key>Action</key>
+			<string>doAnalysis:</string>
+			<key>Label</key>
+			<string>Analyze</string>
+			<key>ToolTip</key>
+			<string>Analyze ROI</string>
+        </dict>
+
 		<key>AutoScale</key>
 		<dict>
 			<key>Action</key>
