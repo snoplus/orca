@@ -1,87 +1,247 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {CLASS = OR1DHistoController; LANGUAGE = ObjC; SUPERCLASS = ORDataController; }, 
-        {
-            ACTIONS = {logLin = id; zoomIn = id; zoomOut = id; }; 
-            CLASS = OR2DHistoController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = ORDataController; 
-        }, 
-        {
-            CLASS = ORColorScale; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {colorAxis = ORAxis; scale = ORAxis; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {
-                clear = id; 
-                clearROI = id; 
-                doAnalysis = id; 
-                hideShowControls = id; 
-                logLin = id; 
-                printDocument = id; 
-            }; 
-            CLASS = ORDataController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                analysisDrawer = NSDrawer; 
-                containingView = NSView; 
-                hideShowButton = NSButton; 
-                plotter = id; 
-                plotterGroupView = NSView; 
-                titleField = NSTextField; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {autoScale = id; resetScales = id; savePDF = id; zoomIn = id; zoomOut = id; }; 
-            CLASS = ORPlotter2D; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                curve = id; 
-                mColorScale = ORColorScale; 
-                mDataSource = id; 
-                mXScale = ORAxis; 
-                mYScale = ORAxis; 
-                mZScale = ORAxis; 
-            }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            CLASS = ORPlotter3D; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                mColorScale = ORColorScale; 
-                mDataSource = id; 
-                mXScale = ORAxis; 
-                mYScale = ORAxis; 
-                mZScale = ORAxis; 
-            }; 
-            SUPERCLASS = NSOpenGLView; 
-        }, 
-        {
-            CLASS = ORToolbarFactory; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {owner = NSWindow; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                copy = id; 
-                decDialog = id; 
-                incDialog = id; 
-                saveDocument = id; 
-                saveDocumentAs = id; 
-            }; 
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {model = id; }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {CLASS = ZFlowLayout; LANGUAGE = ObjC; SUPERCLASS = NSView; }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORColorScale</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>colorAxis</key>
+				<string>ORAxis</string>
+				<key>scale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter2D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>curve</key>
+				<string>id</string>
+				<key>mColorScale</key>
+				<string>ORColorScale</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+				<key>mZScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>logLin</key>
+				<string>NSToolbarItem</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OR2DHistoController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORDataController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>autoScale</key>
+				<string>NSToolbarItem</string>
+				<key>clear</key>
+				<string>NSToolbarItem</string>
+				<key>clearROI</key>
+				<string>NSToolbarItem</string>
+				<key>doAnalysis</key>
+				<string>NSToolbarItem</string>
+				<key>hideShowControls</key>
+				<string>id</string>
+				<key>logLin</key>
+				<string>NSToolbarItem</string>
+				<key>printDocument</key>
+				<string>id</string>
+				<key>toggleRaw</key>
+				<string>NSToolbarItem</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORDataController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>containingView</key>
+				<string>NSView</string>
+				<key>hideShowButton</key>
+				<string>NSButton</string>
+				<key>plotter</key>
+				<string>id</string>
+				<key>plotterGroupView</key>
+				<string>NSView</string>
+				<key>positionField</key>
+				<string>NSTextField</string>
+				<key>rawDataTabView</key>
+				<string>NSTabView</string>
+				<key>rawDataTable</key>
+				<string>NSTableView</string>
+				<key>titleField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORToolbarFactory</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>owner</key>
+				<string>NSWindow</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
