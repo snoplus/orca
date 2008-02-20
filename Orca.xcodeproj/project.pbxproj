@@ -1657,7 +1657,7 @@
 			outputFiles = (
 				"lex.${INPUT_FILE_BASE}.m",
 			);
-			script = "cd ${DERIVED_FILE_DIR} && /usr/bin/Lex -P${INPUT_FILE_BASE} -olex.\"${INPUT_FILE_BASE}\".m \"${INPUT_FILE_PATH}\"";
+			script = "cd ${DERIVED_FILE_DIR} && /usr/bin/lex -P${INPUT_FILE_BASE} -olex.\"${INPUT_FILE_BASE}\".m \"${INPUT_FILE_PATH}\"";
 		};
 		9C2595AD0D5171B90039C5DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -1794,12 +1794,12 @@
 		2A943A3D08A8181C00D04541 /* ORXYScannerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORXYScannerModel.h; path = "Source/Objects/Misc Objects/XYScanner/ORXYScannerModel.h"; sourceTree = SOURCE_ROOT; };
 		2A943A3E08A8181C00D04541 /* ORXYScannerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORXYScannerModel.m; path = "Source/Objects/Misc Objects/XYScanner/ORXYScannerModel.m"; sourceTree = SOURCE_ROOT; };
 		2A943A4008A8181C00D04541 /* XYScanner.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XYScanner.nib; path = "Source/Objects/Misc Objects/XYScanner/XYScanner.nib"; sourceTree = SOURCE_ROOT; };
-		2A943A4D08A8183E00D04541 /* ORAugerCrateController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerCrateController.h; path = Source/Objects/Hardware/auger/AugerCrate/ORAugerCrateController.h; sourceTree = SOURCE_ROOT; };
-		2A943A4E08A8183E00D04541 /* ORAugerCrateController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAugerCrateController.m; path = Source/Objects/Hardware/auger/AugerCrate/ORAugerCrateController.m; sourceTree = SOURCE_ROOT; };
-		2A943A4F08A8183E00D04541 /* ORAugerCrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerCrateModel.h; path = Source/Objects/Hardware/auger/AugerCrate/ORAugerCrateModel.h; sourceTree = SOURCE_ROOT; };
-		2A943A5008A8183E00D04541 /* ORAugerCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAugerCrateModel.m; path = Source/Objects/Hardware/auger/AugerCrate/ORAugerCrateModel.m; sourceTree = SOURCE_ROOT; };
-		2A943A5108A8183E00D04541 /* ORAugerCrateView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerCrateView.h; path = Source/Objects/Hardware/auger/AugerCrate/ORAugerCrateView.h; sourceTree = SOURCE_ROOT; };
-		2A943A5208A8183E00D04541 /* ORAugerCrateView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAugerCrateView.m; path = Source/Objects/Hardware/auger/AugerCrate/ORAugerCrateView.m; sourceTree = SOURCE_ROOT; };
+		2A943A4D08A8183E00D04541 /* ORAugerCrateController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerCrateController.h; path = Source/Objects/Hardware/Auger/AugerCrate/ORAugerCrateController.h; sourceTree = SOURCE_ROOT; };
+		2A943A4E08A8183E00D04541 /* ORAugerCrateController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAugerCrateController.m; path = Source/Objects/Hardware/Auger/AugerCrate/ORAugerCrateController.m; sourceTree = SOURCE_ROOT; };
+		2A943A4F08A8183E00D04541 /* ORAugerCrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerCrateModel.h; path = Source/Objects/Hardware/Auger/AugerCrate/ORAugerCrateModel.h; sourceTree = SOURCE_ROOT; };
+		2A943A5008A8183E00D04541 /* ORAugerCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAugerCrateModel.m; path = Source/Objects/Hardware/Auger/AugerCrate/ORAugerCrateModel.m; sourceTree = SOURCE_ROOT; };
+		2A943A5108A8183E00D04541 /* ORAugerCrateView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerCrateView.h; path = Source/Objects/Hardware/Auger/AugerCrate/ORAugerCrateView.h; sourceTree = SOURCE_ROOT; };
+		2A943A5208A8183E00D04541 /* ORAugerCrateView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAugerCrateView.m; path = Source/Objects/Hardware/Auger/AugerCrate/ORAugerCrateView.m; sourceTree = SOURCE_ROOT; };
 		2A943A5C08A8194B00D04541 /* ORSerialPort.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSerialPort.h; path = "Source/Objects/Misc Objects/SerialPorts/ORSerialPort.h"; sourceTree = SOURCE_ROOT; };
 		2A943A5D08A8194B00D04541 /* ORSerialPort.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSerialPort.m; path = "Source/Objects/Misc Objects/SerialPorts/ORSerialPort.m"; sourceTree = SOURCE_ROOT; };
 		2A943A5E08A8194B00D04541 /* ORSerialPortAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSerialPortAdditions.h; path = "Source/Objects/Misc Objects/SerialPorts/ORSerialPortAdditions.h"; sourceTree = SOURCE_ROOT; };
@@ -2779,7 +2779,7 @@
 		84A16C500A7EB7CE005BC151 /* ORJADCLController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORJADCLController.m; path = Source/Objects/Hardware/Camac/ADC_L/ORJADCLController.m; sourceTree = SOURCE_ROOT; };
 		84A16C530A7EB7CE005BC151 /* ORJADCLModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORJADCLModel.h; path = Source/Objects/Hardware/Camac/ADC_L/ORJADCLModel.h; sourceTree = SOURCE_ROOT; };
 		84A16C540A7EB7CE005BC151 /* ORJADCLModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORJADCLModel.m; path = Source/Objects/Hardware/Camac/ADC_L/ORJADCLModel.m; sourceTree = SOURCE_ROOT; };
-		84A2E2B10BE64B6200F09FA2 /* AugerFLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = AugerFLT.nib; path = Source/Objects/Hardware/auger/AugerFLT/AugerFLT.nib; sourceTree = SOURCE_ROOT; };
+		84A2E2B10BE64B6200F09FA2 /* AugerFLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = AugerFLT.nib; path = Source/Objects/Hardware/Auger/AugerFLT/AugerFLT.nib; sourceTree = SOURCE_ROOT; };
 		84A30C530A1E44D400DAE618 /* HPPulser33220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HPPulser33220.nib; path = Source/Objects/Hardware/GPIB/Pulser33220/HPPulser33220.nib; sourceTree = SOURCE_ROOT; };
 		84A30C540A1E44D400DAE618 /* ORPulser33220Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulser33220Controller.h; sourceTree = "<group>"; };
 		84A30C550A1E44D400DAE618 /* ORPulser33220Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulser33220Controller.m; sourceTree = "<group>"; };
@@ -3295,7 +3295,7 @@
 		9CF2C1B10CC195E1002B279B /* ORL8013CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateModel.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B20CC195E1002B279B /* ORL8013CrateView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL8013CrateView.h; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateView.h"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B30CC195E1002B279B /* ORL8013CrateView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateView.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateView.m"; sourceTree = SOURCE_ROOT; };
-		9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerDefs.h; path = "Source/Objects/Hardware/auger/Auger Base Classes/ORAugerDefs.h"; sourceTree = SOURCE_ROOT; };
+		9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerDefs.h; path = "Source/Objects/Hardware/Auger/Auger Base Classes/ORAugerDefs.h"; sourceTree = SOURCE_ROOT; };
 		CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EduWashingtonNplOrcaNi488PlugIn.h; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
@@ -3445,7 +3445,7 @@
 				9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */,
 			);
 			name = "Auger Base Classes";
-			path = "Source/Objects/Hardware/auger/Auger Base Classes";
+			path = "Source/Objects/Hardware/Auger/Auger Base Classes";
 			sourceTree = SOURCE_ROOT;
 		};
 		2A178E4208DB3CE5001D78BC /* AugerSLT */ = {
@@ -3459,7 +3459,7 @@
 				840F34AD08F2EA5B00FC4408 /* AugerSLT.nib */,
 			);
 			name = AugerSLT;
-			path = Source/Objects/Hardware/auger/AugerSLT;
+			path = Source/Objects/Hardware/Auger/AugerSLT;
 			sourceTree = SOURCE_ROOT;
 		};
 		2A178E4C08DB3CE5001D78BC /* AugerFLT */ = {
@@ -3475,7 +3475,7 @@
 				84A2E2B10BE64B6200F09FA2 /* AugerFLT.nib */,
 			);
 			name = AugerFLT;
-			path = Source/Objects/Hardware/auger/AugerFLT;
+			path = Source/Objects/Hardware/Auger/AugerFLT;
 			sourceTree = SOURCE_ROOT;
 		};
 		2A178E9908DB3D91001D78BC /* Hardware Base Classes */ = {
@@ -3618,7 +3618,7 @@
 				2A943A4A08A8183E00D04541 /* AugerCrate */,
 			);
 			name = auger;
-			path = Source/Objects/Hardware/auger;
+			path = Source/Objects/Hardware/Auger;
 			sourceTree = SOURCE_ROOT;
 		};
 		2A943A4A08A8183E00D04541 /* AugerCrate */ = {
@@ -3634,7 +3634,7 @@
 				840F337B08F1D4D300FC4408 /* AugerCrate.tif */,
 			);
 			name = AugerCrate;
-			path = Source/Objects/Hardware/auger/AugerCrate;
+			path = Source/Objects/Hardware/Auger/AugerCrate;
 			sourceTree = SOURCE_ROOT;
 		};
 		2A943A5B08A8194B00D04541 /* SerialPorts */ = {
