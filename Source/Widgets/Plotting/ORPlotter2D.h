@@ -23,6 +23,8 @@
 
 @interface ORPlotter2D : NSView <NSCoding>
 {
+    IBOutlet ZFlowLayout*   analysisView;
+    IBOutlet NSDrawer*		analysisDrawer;
     IBOutlet ORColorScale*	mColorScale;
     IBOutlet ORAxis*		mZScale;
     IBOutlet ORAxis*		mXScale;
@@ -33,6 +35,7 @@
     NSMutableDictionary*	attributes;
 
     BOOL			shiftKeyIsDown;
+    BOOL			cmdKeyIsDown;
     BOOL			doNotDraw;
     BOOL			ignoreDoNotDrawFlag;
     
@@ -40,6 +43,7 @@
 	NSImage*		backgroundImage;
 	BOOL			useGradient;
 	CTGradient*		gradient;
+	BOOL			analyze;
 }
 
 - (id)   initWithFrame:(NSRect)aFrame;
@@ -77,12 +81,16 @@
 - (double) channelWidth;
 - (ORCurve2D*) curve;
 - (void) setCurve:(ORCurve2D*)anArray;
+- (BOOL) analyze;
+- (void) setAnalyze:(BOOL)newAnalyze;
 
 - (IBAction) resetScales:(id)sender;
 - (IBAction) autoScale:(id)sender;
 - (IBAction) zoomIn:(id)sender;
 - (IBAction) zoomOut:(id)sender; 
 - (IBAction) copy:(id)sender;
+- (IBAction) addGateAction:(id)sender;
+- (IBAction) removeGateAction:(id)sender;
 
 - (void) savePDF:(id)sender;
 - (void) didEnd:(NSSavePanel *)sheet
@@ -92,6 +100,10 @@
 - (id)	initWithCoder:(NSCoder *)coder;
 - (void) encodeWithCoder:(NSCoder *)coder;
 - (void) setVectorMode:(BOOL)state;
+- (void) mouseDown:(NSEvent*)theEvent;
+- (void) mouseDragged:(NSEvent*)theEvent;
+- (void) setShowActiveGate:(BOOL)flag;
+- (void)flagsChanged:(NSEvent *)theEvent;
 
 @end
 

@@ -23,8 +23,12 @@
 #import "ORPlotter2D.h"
 #import "ORAxis.h"
 #import "ORColorScale.h"
+#import "ORGate2D.h"
 
 #define kMaxNumRects 100
+
+NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
+
 
 @implementation ORCurve2D
 +(id) curve:(int)aDataSetID
@@ -48,6 +52,7 @@
 -(void)dealloc
 {
     [attributes release];
+	[gates release];
     [super dealloc];
 }
 
@@ -183,6 +188,11 @@
             NSRectFillList(rectList[i],rectCount[i]);
         }
     }
+	
+	if(showActiveGate){
+        [gates makeObjectsPerformSelector:@selector(drawGateInPlot:) withObject:aPlot];
+    }
+
 }
 
 - (void) drawVector:(ORPlotter2D*)aPlot
@@ -228,6 +238,7 @@
 {
     if([coder allowsKeyedCoding]){
 		[coder encodeObject:attributes forKey:@"ORCurve2DAttributes"];
+		[coder encodeObject:gates forKey:@"ORCurve2DCurves"];
     }
     else {
 		[coder encodeObject:attributes];
@@ -239,6 +250,7 @@
     self = [super init];
     if([coder allowsKeyedCoding]){
 		[self setAttributes:[coder decodeObjectForKey:@"ORCurve2DAttributes"]];    
+		[self setGates:[coder decodeObjectForKey:@"ORCurve2DCurves"]];    
     }
     else {
 		[self setAttributes:[coder decodeObject]];    
@@ -249,6 +261,165 @@
 - (double) maxValue
 {
     return maxValue;
+}
+
+
+- (NSArray*) gates
+{
+    return gates;
+}
+
+- (void) setGates:(NSMutableArray*)anArray
+{
+    [anArray retain];
+    [gates release];
+    gates = anArray;
+}
+
+- (void) addGate:(ORGate2D*)aGate
+{
+    if(!gates)[self setGates:[NSMutableArray array]];
+    [gates addObject:aGate];
+    [self setActiveGateIndex:[gates indexOfObject:aGate]];
+   // [gates makeObjectsPerformSelector:@selector(postNewGateID) withObject:nil];
+}
+
+- (void) removeActiveGate
+{
+    if([gates count]){
+		[gates removeObject:[self activeGate]];
+		[self setActiveGateIndex:activeGateIndex%[gates count]];
+		//[gates makeObjectsPerformSelector:@selector(postNewGateID) withObject:nil];
+    }
+}
+
+- (void) clearActiveGate
+{
+    //[[self activeGate] setGateValid:NO];
+}
+
+- (void) clearAllGates
+{
+    [gates makeObjectsPerformSelector:@selector(clearGates) withObject:nil];
+}
+
+- (int) gateNumber:(ORGate2D*)aGate
+{
+    return [gates indexOfObject:aGate];
+}
+- (BOOL) showActiveGate
+{
+    return showActiveGate;
+}
+
+- (void) setShowActiveGate: (BOOL) flag
+{
+    showActiveGate = flag;
+    //ORGate2D* theActiveGate = [self activeGate];
+//    if(showActiveGate){
+        //make sure there's at least one
+//		if(![gates count]){
+//			[self  addGate:[[ORGate2D alloc] init]];
+//			activeGateIndex = 0;
+//		}
+
+       //[theActiveGate setGateValid:YES];
+    //}
+    //else [theActiveGate setGateValid:NO];
+
+}
+
+- (int) gateCount
+{
+    return [gates count];
+}
+
+- (BOOL) incGate
+{
+    BOOL rollOver = NO;
+    int index = activeGateIndex+1;
+    if(index>=[gates count]){
+		index = 0;
+		rollOver = YES;
+    }
+	[self setActiveGateIndex:index];
+	NSLog(@"(inc) gate count: %d  index: %d\n",[gates count],index);
+    return rollOver;
+}
+
+- (BOOL) decGate
+{
+    BOOL rollOver = NO;
+    int index = activeGateIndex-1;
+    if(index<0){
+		index = [gates count]-1;
+		rollOver = YES;
+    }
+	[self setActiveGateIndex:index];
+	NSLog(@"(dec) gate count: %d  index: %d\n",[gates count],index);
+
+    return rollOver;
+}
+- (id) activeGate
+{
+	if([gates count]) return [gates objectAtIndex:activeGateIndex];
+	else return nil;
+}
+
+- (int)activeGateIndex 
+{
+    return activeGateIndex;
+}
+
+- (void)setActiveGateIndex:(int)anactiveGateIndex 
+{
+    activeGateIndex = anactiveGateIndex;
+	ORGate2D* aGate = [self activeGate];;
+	[[NSNotificationCenter defaultCenter]
+        postNotificationName:ORCurve2DActiveGateChanged
+                      object: aGate
+                    userInfo: nil];
+
+}
+
+- (void) doAnalysis:(ORPlotter2D*)aPlotter
+{
+	[gates makeObjectsPerformSelector:@selector(analyzePlot:) withObject:aPlotter];
+	
+}
+
+#pragma mark ¥¥¥Mouse Handling
+-(void)	mouseDown:(NSEvent*)theEvent  plotter:(ORPlotter2D*)aPlotter
+{	
+    if(showActiveGate){
+       [[self activeGate] mouseDown:theEvent plotter:aPlotter];
+    }
+//    [self reportMousePosition:theEvent plotter:aPlotter];
+}
+
+-(void)	mouseDragged:(NSEvent*)theEvent  plotter:(ORPlotter2D*)aPlotter
+{
+    if(showActiveGate){
+        [[self activeGate] mouseDragged:theEvent plotter:aPlotter];
+    }
+//    [self reportMousePosition:theEvent plotter:aPlotter];
+}
+
+
+-(void)	mouseUp:(NSEvent*)theEvent  plotter:(ORPlotter2D*)aPlotter
+{
+    if(showActiveGate){
+        [[self activeGate] mouseUp:theEvent plotter:aPlotter];
+    }
+//    [[NSNotificationCenter defaultCenter]
+  //      postNotificationName:ORPlotter2DMousePosition
+    //                  object: aPlotter 
+      //              userInfo: nil];
+}
+
+- (void)flagsChanged:(NSEvent *)theEvent  plotter:(ORPlotter2D*)aPlotter
+{
+	[[self activeGate] flagsChanged:theEvent plotter:aPlotter];
 }
 
 @end

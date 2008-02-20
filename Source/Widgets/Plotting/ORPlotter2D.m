@@ -17,6 +17,7 @@
 #import "ZFlowLayout.h"
 #import "ORColorScale.h"
 #import "CTGradient.h"
+#import "ORGate2D.h"
 
 NSString* ORPlotter2DBackgroundColor    = @"ORPlotter2DBackgroundColor";
 NSString* ORPlotter2DGridColor          = @"ORPlotter2DGridColor";
@@ -490,15 +491,93 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 	}
 }
 
-
 -(void)	mouseDown:(NSEvent*)theEvent
 {
-    [self reportMousePosition:theEvent];
+	if([theEvent clickCount]>=2){
+		//if([mDataSource respondsToSelector:@selector(makeMainController)]){
+		//	[mDataSource makeMainController];
+		//}
+	}
+    else if([analysisDrawer state] == NSDrawerOpenState){
+        if([theEvent modifierFlags] & NSShiftKeyMask){
+            [self addGateAction:self];
+        }
+        [curve mouseDown:theEvent plotter:self];
+
+    }
 }
 
 -(void)	mouseDragged:(NSEvent*)theEvent
 {
-    [self reportMousePosition:theEvent];
+	if([analysisDrawer state] == NSDrawerOpenState){
+        [curve mouseDragged:theEvent plotter:self];
+    }
+}
+
+- (void) setShowActiveGate:(BOOL)flag
+{
+    [curve setShowActiveGate:flag];
+    [self setNeedsDisplay:YES];
+    [mYScale setNeedsDisplay:YES];
+    [mXScale setNeedsDisplay:YES];
+}
+
+- (void) drawerDidOpen:(NSNotification*)aNote
+{
+    [self setNeedsDisplay:YES];
+	
+    [self setShowActiveGate:([analysisDrawer state] == NSDrawerOpenState)];
+
+    [curve makeObjectsPerformSelector:@selector(doAnalysis:) withObject:self];
+}
+
+- (IBAction) addGateAction:(id)sender
+{
+    if([analysisDrawer state] == NSDrawerOpenState){
+		ORGate2D* aGate = [[[ORGate2D alloc] init] autorelease];
+		[curve addGate: aGate];	
+		//ORAnalysisPanel1D* analysisPanel = [ORAnalysisPanel1D panel];
+		//[aGate setAnalysis:analysisPanel];
+		//[analysisPanel setGate:aGate];
+		//[analysisView setSizing:ZMakeFlowLayoutSizing( [[analysisPanel view] frame].size, 10, 0, NO )];
+		//[analysisView addSubview:[analysisPanel view]];
+	}
+}
+- (IBAction) removeGateAction:(id)sender
+{
+    [curve removeActiveGate];	
+    [self setNeedsDisplay:YES];
+}
+
+
+- (IBAction) analyze:(id)sender
+{
+    [curve doAnalysis:self];
+}
+
+
+- (BOOL) analyze
+{
+    return analyze;
+}
+- (void) setAnalyze:(BOOL)newAnalyze
+{
+    analyze=newAnalyze;
+    if(analyze)[self analyze:self];
+}
+- (void) flagsChanged:(NSEvent *)theEvent
+{
+    cmdKeyIsDown = ([theEvent modifierFlags] & NSCommandKeyMask)!=0;
+	[curve flagsChanged:theEvent plotter:self];
+    [[self window] resetCursorRects];
+    
+}
+
+- (void) resetCursorRects
+{
+    if([curve showActiveGate]){	
+		
+	}
 }
 
 @end
@@ -565,17 +644,34 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 
 - (void) keyDown:(NSEvent*)theEvent
 {
+    //tab will shift to next plot curve -- shift/tab goes backward.
 	unsigned short keyCode = [theEvent keyCode];
+    if(keyCode == 48){
+        if([theEvent modifierFlags] & NSShiftKeyMask){
+            [curve decGate];
+        }
+        else {
+            [curve incGate];
+        }
+                                    
+        [self setNeedsDisplay:YES];
+        [[self window]resetCursorRects];
+    }
     
-	if(keyCode == 0){ //'a'
+	else if(keyCode == 0){ //'a'
 		[self autoScale:nil];
 	}
 	else if(keyCode == 15){ //'r'
 		[self resetScales:nil];
 	}
+	else if(keyCode == 51){
+        //delete key
+        [self removeGateAction:self];
+    }
 	
 	else [super keyDown:theEvent];
 }
+
 
 @end
 

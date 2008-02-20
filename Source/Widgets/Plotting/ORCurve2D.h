@@ -18,17 +18,18 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
-
 @class ORPlotter2D;
+@class ORGate2D;
 
 @interface ORCurve2D : NSObject <NSCoding> {
     NSMutableDictionary*	attributes;
-    NSString*			autoSaveName;
-    BOOL			analyze;
-    int				dataSetID;
-    double			maxValue;
+    NSString*				autoSaveName;
+    BOOL					analyze;
+    int						dataSetID;
+    double					maxValue;
+	BOOL					showActiveGate;
+	int						activeGateIndex;
+	NSMutableArray*			gates;
 }
 + (id) curve:(int)aDataSetID;
 - (id) initWithCurve:(int)aDataSetID;
@@ -43,5 +44,29 @@
 - (void) drawVector:(ORPlotter2D*)aPlot;
 - (double) maxValue;
 
+- (NSArray*) gates;
+- (void) setGates:(NSMutableArray*)anArray;
+- (void) addGate:(ORGate2D*)aGate;
+- (void) removeActiveGate;
+- (int) gateNumber:(ORGate2D*)aGate;
+- (int)activeGateIndex;
+- (void)setActiveGateIndex:(int)anactiveCurveIndex;
+- (id) activeGate;
+- (BOOL) incGate;
+- (BOOL) decGate;
+- (int) gateCount;
+- (void) clearActiveGate;
+- (void) clearAllGates;
+- (BOOL) showActiveGate;
+- (void) setShowActiveGate: (BOOL) flag;
+- (void) doAnalysis:(ORPlotter2D*)aPlotter;
+- (void)flagsChanged:(NSEvent *)theEvent plotter:(ORPlotter2D*)aPlotter;
+
+#pragma mark ¥¥¥Mouse Handling
+-(void)	mouseDown:(NSEvent*)theEvent  plotter:(ORPlotter2D*)aPlotter;
+-(void)	mouseDragged:(NSEvent*)theEvent  plotter:(ORPlotter2D*)aPlotter;
+-(void)	mouseUp:(NSEvent*)theEvent  plotter:(ORPlotter2D*)aPlotter;
+
 @end
 
+extern NSString* ORCurve2DActiveGateChanged;
