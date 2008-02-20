@@ -1642,6 +1642,8 @@
 		84FCF9AF0D64F5F3007BE95A /* OrcaFilterScript.icns in Resources */ = {isa = PBXBuildFile; fileRef = 84FCF9AD0D64F5F3007BE95A /* OrcaFilterScript.icns */; };
 		84FE8FA20D19918000FAD31D /* crate_lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FE8FA00D19918000FAD31D /* crate_lib.m */; };
 		84FE8FA30D19918000FAD31D /* crate_lib.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FE8FA10D19918000FAD31D /* crate_lib.h */; };
+		9CEF4F320D6BF92900309C5C /* ORGate2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CEF4F300D6BF92900309C5C /* ORGate2D.m */; };
+		9CEF4F330D6BF92900309C5C /* ORGate2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CEF4F310D6BF92900309C5C /* ORGate2D.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -3305,6 +3307,8 @@
 		9CD6DD840BE83F1B007096CE /* ORPlotFFTController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORPlotFFTController.h; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/ORPlotFFTController.h"; sourceTree = SOURCE_ROOT; };
 		9CD6DD850BE83F1B007096CE /* ORPlotFFTController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORPlotFFTController.m; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/ORPlotFFTController.m"; sourceTree = SOURCE_ROOT; };
 		9CD6DD860BE83F1B007096CE /* PlotFFT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PlotFFT.nib; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/PlotFFT.nib"; sourceTree = SOURCE_ROOT; };
+		9CEF4F300D6BF92900309C5C /* ORGate2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORGate2D.m; path = Source/Widgets/Plotting/ORGate2D.m; sourceTree = SOURCE_ROOT; };
+		9CEF4F310D6BF92900309C5C /* ORGate2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORGate2D.h; path = Source/Widgets/Plotting/ORGate2D.h; sourceTree = SOURCE_ROOT; };
 		F51E695403AE4775015F64B1 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Source/App Delegate/main.m"; sourceTree = SOURCE_ROOT; };
 		F51E695503AE4775015F64B1 /* ORAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAppDelegate.h; sourceTree = "<group>"; };
 		F51E695603AE4775015F64B1 /* ORAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAppDelegate.m; sourceTree = "<group>"; };
@@ -6423,6 +6427,8 @@
 				84C7541906654C3D00EC5D1C /* ORCurve1D.h */,
 				84A9566E077B796F00CAD99D /* ORCurve2D.m */,
 				84A9566D077B796F00CAD99D /* ORCurve2D.h */,
+				9CEF4F300D6BF92900309C5C /* ORGate2D.m */,
+				9CEF4F310D6BF92900309C5C /* ORGate2D.h */,
 				84C7541A06654C3E00EC5D1C /* ORAxis.m */,
 				84C7541B06654C3E00EC5D1C /* ORAxis.h */,
 				842509C6067FAC9D0037C568 /* ORTimeAxis.m */,
@@ -8123,6 +8129,7 @@
 				84B862400D491CAC00E0B132 /* ORHashTable.h in Headers */,
 				84B8665D0D4A50D900E0B132 /* FilterScript.h in Headers */,
 				84B86ECC0D539E5B00E0B132 /* ORFilterSymbolTable.h in Headers */,
+				9CEF4F330D6BF92900309C5C /* ORGate2D.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9230,6 +9237,7 @@
 				84B868DA0D4A6DE100E0B132 /* FilterScript.ym in Sources */,
 				84B868DB0D4A6DE100E0B132 /* FilterScript.lm in Sources */,
 				84B86ECD0D539E5B00E0B132 /* ORFilterSymbolTable.m in Sources */,
+				9CEF4F320D6BF92900309C5C /* ORGate2D.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
