@@ -1617,6 +1617,8 @@
 		9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2595B60D5172460039C5DF /* FilterScriptGraph.m */; };
 		9C38E5580C775F2A00255848 /* ORcPCICardDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C38E5560C775F2A00255848 /* ORcPCICardDecoder.m */; };
 		9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */; };
+		9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */; };
+		9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */; };
 		9CB167790C5BC9580053CFAD /* xAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167770C5BC9580053CFAD /* xAxisMarker.gif */; };
 		9CB1677A0C5BC9580053CFAD /* yAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167780C5BC9580053CFAD /* yAxisMarker.gif */; };
 		9CB167FC0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167FA0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif */; };
@@ -3269,6 +3271,8 @@
 		9C2595B60D5172460039C5DF /* FilterScriptGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FilterScriptGraph.m; path = "Source/Objects/Data Processing/Filter/FilterScriptGraph.m"; sourceTree = SOURCE_ROOT; };
 		9C38E5560C775F2A00255848 /* ORcPCICardDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORcPCICardDecoder.m; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.m"; sourceTree = SOURCE_ROOT; };
 		9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICardDecoder.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.h"; sourceTree = SOURCE_ROOT; };
+		9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGate2D.h; sourceTree = "<group>"; };
+		9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGate2D.m; sourceTree = "<group>"; };
 		9C7E0885051A522B005F64D5 /* MuxScopeMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MuxScopeMap.h; path = Source/Experiments/Ncd/Detector/MuxScopeMap.h; sourceTree = SOURCE_ROOT; };
 		9CB167770C5BC9580053CFAD /* xAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = xAxisMarker.gif; path = Source/Widgets/Plotting/xAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		9CB167780C5BC9580053CFAD /* yAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = yAxisMarker.gif; path = Source/Widgets/Plotting/yAxisMarker.gif; sourceTree = SOURCE_ROOT; };
@@ -5965,8 +5969,8 @@
 			children = (
 				84A5CD530D464F4600D9833C /* Filter.nib */,
 				84A5CD540D464F4600D9833C /* Filter.tif */,
-				84A5CD550D464F4600D9833C /* ORFilterController.h */,
 				84A5CD560D464F4600D9833C /* ORFilterController.m */,
+				84A5CD550D464F4600D9833C /* ORFilterController.h */,
 				84A5CD570D464F4600D9833C /* ORFilterModel.h */,
 				84A5CD580D464F4600D9833C /* ORFilterModel.m */,
 				9C2595B20D5172460039C5DF /* FilterScript.h */,
@@ -6406,14 +6410,16 @@
 				84A9565F077B767300CAD99D /* ORPlotter2D.m */,
 				84C7541806654C3D00EC5D1C /* ORCurve1D.m */,
 				84C7541906654C3D00EC5D1C /* ORCurve1D.h */,
+				84C7541D06654C3E00EC5D1C /* ORGate1D.m */,
+				84C7541E06654C3E00EC5D1C /* ORGate1D.h */,
 				84A9566E077B796F00CAD99D /* ORCurve2D.m */,
 				84A9566D077B796F00CAD99D /* ORCurve2D.h */,
+				9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */,
+				9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */,
 				84C7541A06654C3E00EC5D1C /* ORAxis.m */,
 				84C7541B06654C3E00EC5D1C /* ORAxis.h */,
 				842509C6067FAC9D0037C568 /* ORTimeAxis.m */,
 				842509C7067FAC9D0037C568 /* ORTimeAxis.h */,
-				84C7541D06654C3E00EC5D1C /* ORGate1D.m */,
-				84C7541E06654C3E00EC5D1C /* ORGate1D.h */,
 				849DA7180BF4DB8400044320 /* ORTimeLine.h */,
 				849DA7190BF4DB8400044320 /* ORTimeLine.m */,
 				9CB167770C5BC9580053CFAD /* xAxisMarker.gif */,
@@ -8100,6 +8106,7 @@
 				9C2595B00D5172180039C5DF /* ORHashTable.h in Headers */,
 				9C2595B70D5172460039C5DF /* FilterScript.h in Headers */,
 				84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */,
+				9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9188,6 +9195,7 @@
 				9C2595BA0D5172460039C5DF /* FilterScriptEx.m in Sources */,
 				9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */,
 				84FBB5720D5401BD00780DBD /* ORFilterSymbolTable.m in Sources */,
+				9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
