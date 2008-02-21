@@ -110,6 +110,12 @@
                      selector : @selector(slotChanged:)
                          name : ORVmeCardSlotChangedNotification
                        object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(displayRawChanged:)
+                         name : ORIP320ModelDisplayRawChanged
+						object: model];
+
 }
 
 
@@ -117,17 +123,26 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) displayRawChanged:(NSNotification*)aNote
+{
+	[displayRawCB setIntValue: [model displayRaw]];
+	[valueTable1 reloadData];
+	[valueTable2 reloadData];
+}
+
 - (void) updateWindow
 {
     [super updateWindow];
     [self pollingStateChanged:nil];
 	[self valuesChanged:nil];
 	[self slotChanged:nil];
+	[self displayRawChanged:nil];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"IP220 (%@)",[model identifier]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"IP320 (%@)",[model identifier]]];
 }
 
 - (void) valuesChanged:(NSNotification*)aNotification
@@ -180,6 +195,12 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) displayRawAction:(id)sender
+{
+	[model setDisplayRaw:[sender intValue]];		
+}
+
 - (IBAction) readAll:(id)sender
 {
     NS_DURING
@@ -224,8 +245,16 @@
 {
     rowIndex += [aTableView tag];
     //NSParameterAssert(rowIndex >= 0 && rowIndex < kNumIP320Channels);
-    id obj = [[model chanObjs] objectAtIndex:rowIndex];
-    return [obj objectForKey:[aTableColumn identifier]];
+    ORIP320Channel* obj = [[model chanObjs] objectAtIndex:rowIndex];
+	if([[aTableColumn identifier] isEqualToString:k320ChannelValue]){
+		if([model displayRaw]){
+			return [NSString stringWithFormat:@"0x%x",[obj rawValue]];
+		}
+		else {
+			return [NSString stringWithFormat:@"%.3f",[[obj objectForKey:k320ChannelValue] doubleValue]];
+		}
+	}
+    else return [obj objectForKey:[aTableColumn identifier]];
 }
 
 // just returns the number of items we have.

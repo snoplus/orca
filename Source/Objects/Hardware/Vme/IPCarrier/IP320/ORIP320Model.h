@@ -55,6 +55,7 @@ enum {
 	NSLock*			hwLock;
     unsigned long   dataId;
 	BOOL			valuesReadyToShip;
+    BOOL			displayRaw;
 	
 	//cached values -- valid ONLY during running
 	unsigned long slotMask;
@@ -63,6 +64,8 @@ enum {
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) displayRaw;
+- (void) setDisplayRaw:(BOOL)aDisplayRaw;
 - (NSMutableArray *)chanObjs;
 - (void)setChanObjs:(NSMutableArray *)chanObjs;
 
@@ -96,6 +99,8 @@ enum {
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ¥¥¥DataTaker
 - (NSDictionary*) dataRecordDescription;
@@ -108,7 +113,9 @@ enum {
 
 @end
 
+
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORIP320ModelDisplayRawChanged;
 extern NSString* ORIP320GainChangedNotification;
 extern NSString* ORIP320ModeChangedNotification;
 extern NSString* ORIP320AdcValueChangedNotification;

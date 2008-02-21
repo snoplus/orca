@@ -27,6 +27,7 @@
 #define k320ChannelKey @"k320ChannelKey"
 #define k320ChannelReadEnabled @"k320ChannelReadEnabled"
 #define k320ChannelValue @"k320ChannelValue"
+#define k320ChannelRawValue @"k320ChannelRawValue"
 #define k320ChannelGain @"k320ChannelGain"
 #define k320ChannelMode @"k320ChannelMode"
 #define k320ChannelUnits @"k320ChannelUnits"

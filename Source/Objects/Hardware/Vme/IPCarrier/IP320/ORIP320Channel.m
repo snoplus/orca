@@ -226,6 +226,7 @@
 		changed = (convertedValue!=[[parameters objectForKey:k320ChannelValue] doubleValue]);
 		NSNumber* theConvertedValue = [NSNumber numberWithDouble:convertedValue];
 		[parameters setObject:theConvertedValue forKey:k320ChannelValue];
+		[parameters setObject:[NSNumber numberWithInt:rawValue] forKey:k320ChannelRawValue];
 		[self checkAlarm];
 	}
     return changed;

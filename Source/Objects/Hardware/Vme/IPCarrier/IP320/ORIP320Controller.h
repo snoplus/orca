@@ -32,6 +32,7 @@
         IBOutlet NSTableView* alarmTable1;
         IBOutlet NSTableView* alarmTable2;
         IBOutlet NSPopUpButton* pollingButton;
+        IBOutlet NSButton*		displayRawCB;
     
         NSView *blankView;
         NSSize adcValueSize;
@@ -45,11 +46,15 @@
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
+
+#pragma mark ***Interface Management
+- (void) displayRawChanged:(NSNotification*)aNote;
 - (void) pollingStateChanged:(NSNotification*)aNotification;
 - (void) valuesChanged:(NSNotification*)aNotification;
 - (void) slotChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) displayRawAction:(id)sender;
 - (IBAction) readAll:(id)sender;
 - (IBAction) setPollingAction:(id)sender;
 - (IBAction) enablePollAllAction:(id)sender;
@@ -58,3 +63,4 @@
 - (IBAction) enableAlarmNoneAction:(id)sender;
 
 @end
+
