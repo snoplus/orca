@@ -253,7 +253,15 @@ static struct {
 	@synchronized(self) {
 		short chan;
 		for(chan=0;chan<kNumIP320Channels;chan++){
-			if([[chanObjs objectAtIndex:chan] readEnabled])[self readAdcChannel:chan];
+			if([[chanObjs objectAtIndex:chan] readEnabled]){
+				if(chan>=20){
+					if([[chanObjs objectAtIndex:chan-20] mode] == 0x1){
+						//only read chans above 20 if chans below 20 are not diff. mode
+						[self readAdcChannel:chan];
+					}
+				}
+				else [self readAdcChannel:chan];
+			}
 		}
 		valuesReadyToShip = YES;	
 	}
