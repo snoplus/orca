@@ -424,15 +424,14 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
 
 int32_t Readout_IP320(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
+    /*
     int conv[4] = {3,2,1,0};
+	uint32_t dataId         = config->card_info[index].hw_mask[0];
     uint32_t ipSlot			= config->card_info[index].deviceSpecificData[0];
     uint32_t pollTime		= config->card_info[index].deviceSpecificData[1];
 	uint32_t baseAddress    = config->card_info[index].base_add + conv[ipSlot]*0x100;
 	uint32_t lowMask		= config->card_info[index].deviceSpecificData[2];
 	uint32_t highMask		= config->card_info[index].deviceSpecificData[3];
-  
-	//we are going to cheat and use the deviceSpecificData array to hold a varible for us
-	if(config->card_info[index].deviceSpecificData[255] == 0)
 
 
 
@@ -481,7 +480,7 @@ int32_t Readout_IP320(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 			}
 		}
 	}
-
+    */
     return config->card_info[index].next_Card_Index;
 }            
 
