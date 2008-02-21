@@ -29,6 +29,7 @@
 #import "ORIP320Channel.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORIP320ModelDisplayRawChanged = @"ORIP320ModelDisplayRawChanged";
 NSString* ORIP320GainChangedNotification 		= @"ORIP320GainChangedNotification";
 NSString* ORIP320ModeChangedNotification 		= @"ORIP320ModeChangedNotification";
 NSString* ORIP320AdcValueChangedNotification 		= @"ORIP320AdcValueChangedNotification";
@@ -102,6 +103,20 @@ static struct {
 
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) displayRaw
+{
+    return displayRaw;
+}
+
+- (void) setDisplayRaw:(BOOL)aDisplayRaw
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDisplayRaw:displayRaw];
+    
+    displayRaw = aDisplayRaw;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelDisplayRawChanged object:self];
+}
 // ===========================================================
 // - chanObjs:
 // ===========================================================
@@ -299,6 +314,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     self = [super initWithCoder:decoder];
 	    
     [[self undoManager] disableUndoRegistration];
+    [self setDisplayRaw:[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
     [self setChanObjs:[decoder decodeObjectForKey:kORIP320chanObjs]];
     [self setPollingState:[decoder decodeIntForKey:kORIP320PollingState]];
     [[self undoManager] enableUndoRegistration];
@@ -319,6 +335,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:displayRaw forKey:@"ORIP320ModelDisplayRaw"];
     [encoder encodeObject:chanObjs forKey:kORIP320chanObjs];
     [encoder encodeInt:[self pollingState] forKey:kORIP320PollingState];
 }
