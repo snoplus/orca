@@ -26,12 +26,11 @@
 
 	IBOutlet ORScriptView*		scriptView;
     IBOutlet NSButton*			lockButton;
- 	IBOutlet NSView*			argsView;
 	IBOutlet NSTextView*		helpView;
 	IBOutlet ORTimedTextField*	statusField;
 	IBOutlet NSView*			panelView;
-	IBOutlet NSMatrix*			argsMatrix;
-	IBOutlet NSMatrix*			displayValuesMatrix;
+	IBOutlet NSTableView*		inputVariablesTableView;
+	IBOutlet NSTableView*		outputVariablesTableView;
 	IBOutlet id					loadSaveView;
     IBOutlet NSTextField*		lastFileField;
     IBOutlet NSTextField*		lastFileField1;
@@ -41,6 +40,8 @@
 	IBOutlet NSButton*			loadSaveButton;
 	IBOutlet NSButton*			timerEnabledCB;
 	IBOutlet ORPlotter1D*		timePlot;
+	IBOutlet NSButton*			addInputButton;
+	IBOutlet NSButton*			removeInputButton;
 }
 
 #pragma mark •••Initialization
@@ -49,11 +50,10 @@
 #pragma mark •••Interface Management
 - (void) scriptChanged:(NSNotification*)aNote;
 - (void) textDidChange:(NSNotification*)aNote;
-- (void) argsChanged:(NSNotification*)aNote;
 - (void) lastFileChanged:(NSNotification*)aNote;
-- (void) displayValuesChanged:(NSNotification*)aNote;
 - (void) timerEnabledChanged:(NSNotification*)aNote;
 - (void) updateTiming:(NSNotification*)aNote;
+- (void) displayValuesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) enableTimer:(id)sender;
@@ -62,13 +62,21 @@
 - (IBAction) cancelLoadSaveAction:(id)sender;
 - (IBAction) parseScript:(id) sender;	
 - (IBAction) nameAction:(id) sender;
-- (IBAction) argAction:(id) sender;
 - (IBAction) loadSaveAction:(id)sender;
 - (IBAction) loadFileAction:(id) sender;
 - (IBAction) saveAsFileAction:(id) sender;
 - (IBAction) saveFileAction:(id) sender;
+- (IBAction) addInput:(id)sender;
+- (IBAction) removeInput:(id)sender;
 
 #pragma mark •••Interface Management
 - (void) lockChanged:(NSNotification*)aNotification;
+
+
+#pragma mark •••DataSource
+- (int)  numberOfRowsInTableView:(NSTableView *)aTable;
+- (id) tableView:(NSTableView *)aTable objectValueForTableColumn:(NSTableColumn *)aCol row:(int)aRow;
+- (void) tableView:(NSTableView*)aTable setObjectValue:(id)aData forTableColumn:(NSTableColumn*)aCol row:(int)aRow;
+
 @end
 

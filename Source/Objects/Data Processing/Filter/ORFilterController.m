@@ -39,7 +39,6 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[panelView addSubview:argsView];
 	[statusField setTimeOut:1.5];
 	NSString*   path = [[NSBundle mainBundle] pathForResource: @"FilterScriptGuide" ofType: @"rtf"];
 	[helpView readRTFDFromFile:path];
@@ -95,6 +94,7 @@
                      selector : @selector(displayValuesChanged:)
                          name : ORFilterDisplayValuesChanged
                        object : model];
+					   
    [notifyCenter addObserver : self
                      selector : @selector(timerEnabledChanged:)
                          name : ORFilterTimerEnabledChanged
@@ -105,11 +105,20 @@
                          name : ORFilterUpdateTiming
                        object : model];
 
+   [notifyCenter addObserver : self
+                     selector : @selector(tableViewSelectionDidChange:)
+                         name : NSTableViewSelectionDidChangeNotification
+                       object : inputVariablesTableView];
+
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 }
 
 
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+	[self checkGlobalSecurity];
+}
 
 
 - (void) checkGlobalSecurity
@@ -117,6 +126,7 @@
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:ORFilterLock to:secure];
     [lockButton setEnabled:secure];
+	[removeInputButton setEnabled:[[inputVariablesTableView selectedRowIndexes] count] >0];
 }
 
 - (IBAction) lockAction:(id)sender
@@ -124,15 +134,29 @@
     [gSecurity tryToSetLock:ORFilterLock to:[sender intValue] forWindow:[self window]];
 }
 
+- (IBAction) addInput:(id)sender
+{
+	[model addInputValue];
+	[inputVariablesTableView reloadData];
+}
+
+- (IBAction) removeInput:(id)sender
+{
+	NSIndexSet* indexSet = [inputVariablesTableView selectedRowIndexes];
+	int i;
+	int last = [indexSet lastIndex];
+	for(i=last;i!=NSNotFound;i = [indexSet indexLessThanIndex:i]){
+		[model removeInputValue:i];
+	}
+	[inputVariablesTableView reloadData];
+}
 
 #pragma mark •••Interface Management
 - (void) updateWindow
 {
     [super updateWindow];
 	[self scriptChanged:nil];
-	[self argsChanged:nil];
 	[self lastFileChanged:nil];
-	[self displayValuesChanged:nil];
 	[self timerEnabledChanged:nil];
 }
 
@@ -170,23 +194,10 @@
 	[scriptView setString:[model script]];
 }
 
-- (void) argsChanged:(NSNotification*)aNote;
+- (void) displayValuesChanged:(NSNotification*)aNote
 {
-	int i;
-	for(i=0;i<kNumScriptArgs;i++){
-		[[argsMatrix cellWithTag:i] setObjectValue:[model arg:i]];
-	}
+	[outputVariablesTableView reloadData];
 }
-
-
-- (void) displayValuesChanged:(NSNotification*)aNote;
-{
-	int i;
-	for(i=0;i<kNumDisplayValues;i++){
-		[[displayValuesMatrix cellWithTag:i] setDoubleValue:[model displayValue:i]];
-	}
-}
-
 
 #pragma mark •••Data Source Methods
 
@@ -223,19 +234,6 @@
 {
 	[model setScriptName:[sender stringValue]];
 	[[self window] setTitle:[NSString stringWithFormat:@"Script: %@",[sender stringValue]]];
-}
-
-- (IBAction) argAction:(id) sender
-{
-	int i = [[sender selectedCell] tag];
-	NSDecimalNumber* n;
-	NSString* s = [[sender selectedCell] stringValue];
-	if([s rangeOfString:@"x"].location != NSNotFound || [s rangeOfString:@"X"].location != NSNotFound){
-		unsigned long num = strtoul([s cStringUsingEncoding:NSASCIIStringEncoding],0,16);
-		n = (NSDecimalNumber*)[NSDecimalNumber numberWithUnsignedLong:num];
-	}
-	else n = [NSDecimalNumber decimalNumberWithString:s];
-	[model setArg:i withValue:n];
 }
 
 - (IBAction) loadSaveAction:(id)sender
@@ -319,6 +317,28 @@
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
 {
 	return [model processingTimeHist:x];
+}
+
+
+- (int)numberOfRowsInTableView:(NSTableView *)aTable
+{
+	if(aTable == inputVariablesTableView) return ([[model inputValues] count]);
+	else  return ([[model outputValues] count]);
+}
+
+- (id) tableView:(NSTableView *)aTable objectValueForTableColumn:(NSTableColumn *)aCol row:(int)aRow
+{
+	id anArray;
+	if(aTable == inputVariablesTableView) anArray= [model inputValues];
+	else								  anArray= [model outputValues];
+	return [[anArray objectAtIndex:aRow] objectForKey:[aCol identifier]];
+}
+
+- (void) tableView:(NSTableView*)aTable setObjectValue:(id)aData forTableColumn:(NSTableColumn*)aCol row:(int)aRow
+{
+	if(aTable == inputVariablesTableView) {
+		[[[model inputValues] objectAtIndex:aRow] setObject: aData forKey:[aCol identifier]];	
+	}
 }
 
 

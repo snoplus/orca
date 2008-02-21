@@ -44,9 +44,8 @@
 		NSString*			lastFile;
 		NSString*			script;
 		NSString*			scriptName;
-		NSMutableArray*		args;
-		NSMutableArray*		displayValues;
-		id					inputValue;
+		NSMutableArray*		inputValues;
+		NSMutableArray*		outputValues;
 		
 		BOOL				stopThread;
 		BOOL				running;
@@ -59,13 +58,13 @@
 		ORDataPacket*       transferDataPacket;
 		ORDataPacket*       currentDataPacket;
 		ORQueue*			stacks[kNumFilterStacks];
-		BOOL				updateScheduled;
 		unsigned long		processingTimeHist[kFilterTimeHistoSize];
 		NSLock*				timerLock;
 		BOOL				timerEnabled;
 		ORTimer*			mainTimer;
 		ORTimer*			runTimer;
 		unsigned long		lastRunTimeValue;
+		NSTimeInterval		lastOutputUpdateTimeRef;
 }
 
 - (id)   init;
@@ -81,18 +80,16 @@
 - (NSString*) scriptName;
 - (void) setScriptName:(NSString*)aString;
 - (BOOL) parsedOK;
-- (id)	 arg:(int)index;
-- (void) setArg:(int)index withValue:(id)aValue;
 - (unsigned long) processingTimeHist:(int)index;
 - (void) clearTimeHistogram;
 - (BOOL) timerEnabled;
 - (void) setTimerEnabled:(int)aState;
 
-- (unsigned long)	 displayValue:(int)index;
-
-- (id)	 inputValue;
-- (void) setInputValue:(id)aValue;
 - (BOOL) exitNow;
+- (NSMutableArray*) inputValues;
+- (NSMutableArray*) outputValues;
+- (void) addInputValue;
+- (void) removeInputValue:(int)i;
 
 #pragma mark •••Data Handling
 - (unsigned long) dataId1D;
@@ -125,7 +122,7 @@
 - (long) stackCount:(int)i;
 - (void) histo1D:(int)i value:(unsigned long)aValue;
 - (void) histo2D:(int)i x:(unsigned long)x y:(unsigned long)y;
-- (void) setDisplay:(int)index withValue:(unsigned long)aValue;
+- (void) setOutputValue:(int)index withValue:(unsigned long)aValue;
 - (void) resetDisplays;
 - (void) scheduledUpdate;
 

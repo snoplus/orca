@@ -52,7 +52,7 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>argAction</key>
+				<key>addInput</key>
 				<string>id</string>
 				<key>cancelLoadSaveAction</key>
 				<string>id</string>
@@ -70,6 +70,8 @@
 				<string>id</string>
 				<key>parseScript</key>
 				<string>id</string>
+				<key>removeInput</key>
+				<string>id</string>
 				<key>saveAsFileAction</key>
 				<string>id</string>
 				<key>saveFileAction</key>
@@ -81,16 +83,14 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>argsMatrix</key>
-				<string>NSMatrix</string>
-				<key>argsView</key>
-				<string>NSView</string>
+				<key>addInputButton</key>
+				<string>NSButton</string>
 				<key>classNameField</key>
 				<string>NSTextField</string>
-				<key>displayValuesMatrix</key>
-				<string>NSMatrix</string>
 				<key>helpView</key>
 				<string>NSTextView</string>
+				<key>inputVariablesTableView</key>
+				<string>NSTableView</string>
 				<key>lastFileField</key>
 				<string>NSTextField</string>
 				<key>lastFileField1</key>
@@ -101,8 +101,12 @@
 				<string>id</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
+				<key>outputVariablesTableView</key>
+				<string>NSTableView</string>
 				<key>panelView</key>
 				<string>NSView</string>
+				<key>removeInputButton</key>
+				<string>NSButton</string>
 				<key>runButton</key>
 				<string>NSButton</string>
 				<key>runStatusField</key>

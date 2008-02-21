@@ -99,6 +99,8 @@ int filterGraph(nodeType*);
 
 	[transferDataPacket release];
 	[expressionAsData release];
+	[inputValues release];
+	[outputValues release];
     [super dealloc];
 }
 
@@ -155,21 +157,34 @@ int filterGraph(nodeType*);
 }
 
 #pragma mark •••Accessors
+- (NSMutableArray*) inputValues
+{
+	return inputValues;
+}
+
+- (NSMutableArray*) outputValues
+{
+	return outputValues;
+}
+
+- (void) addInputValue
+{
+	if(!inputValues)inputValues = [[NSMutableArray array] retain];
+	[inputValues addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+			[NSString stringWithFormat:@"$%d",[inputValues count]],	@"name",
+			[NSNumber numberWithUnsignedLong:0],					@"iValue",
+			nil]];
+	
+}
+
+- (void) removeInputValue:(int)i
+{
+	[inputValues removeObjectAtIndex:i];
+}
+
 - (BOOL)	exitNow
 {
 	return exitNow;
-}
-
-- (id) inputValue
-{
-	return inputValue;
-}
-
-- (void) setInputValue:(id)aValue
-{
-	[aValue retain];
-	[inputValue release];
-	inputValue = aValue;
 }
 
 - (NSString*) lastFile
@@ -343,6 +358,16 @@ int filterGraph(nodeType*);
     return dataDictionary;
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    [objDictionary setObject:inputValues forKey:@"inputValues"];
+    [objDictionary setObject:scriptName forKey:@"scriptName"];
+    [objDictionary setObject:lastFile forKey:@"lastFile"];
+	return objDictionary;
+}
+
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {		
@@ -401,21 +426,8 @@ int filterGraph(nodeType*);
 	theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
 	[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
 	
-	[transferDataPacket release];
-	transferDataPacket = nil;
-
-	int i;
-	for(i=0;i<kNumFilterStacks;i++){
-		[stacks[i] release];
-	}
-	
-	finishFilterScript(self);
-	[self freeNodes];
-
-	[runTimer release];
-	runTimer = nil;
-
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
 
 }
 
@@ -426,6 +438,22 @@ int filterGraph(nodeType*);
 
 	theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
 	[theNextObject closeOutRun:aDataPacket userInfo:userInfo];
+
+	[transferDataPacket release];
+	transferDataPacket = nil;
+
+	finishFilterScript(self);
+	[self freeNodes];
+	
+	int i;
+	for(i=0;i<kNumFilterStacks;i++){
+		[stacks[i] release];
+	}
+
+	[runTimer release];
+	runTimer = nil;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
+
 }
 
 - (NSString*) script
@@ -462,18 +490,6 @@ int filterGraph(nodeType*);
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterNameChanged object:self];
 }
 
-- (id) arg:(int)index
-{
-	if(index>=0 && index<[args count])return [args objectAtIndex:index];
-	else return nil;
-}
-
-- (void) setArg:(int)index withValue:(id)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setArg:index withValue:[self arg:index]];
-	[args replaceObjectAtIndex:index withObject:aValue];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterArgsChanged object:self];
-}
 
 
 #pragma mark ***Script Methods
@@ -531,15 +547,7 @@ int filterGraph(nodeType*);
 	[self setScript:[decoder decodeObjectForKey:@"script"]];
     [self setScriptName:[decoder decodeObjectForKey:@"scriptName"]];
     [self setLastFile:[decoder decodeObjectForKey:@"lastFile"]];
-    args = [[decoder decodeObjectForKey:@"args"] retain];
-
-	if(!args){
-		args = [[NSMutableArray array] retain];
-		int i;
-		for(i=0;i<kNumScriptArgs;i++){
-			[args addObject:[NSDecimalNumber zero]];
-		}
-	}
+    inputValues = [[decoder decodeObjectForKey:@"inputValues"] retain];
 	
 	[[self undoManager] enableUndoRegistration];
     
@@ -551,7 +559,7 @@ int filterGraph(nodeType*);
     [super encodeWithCoder:encoder];
     [encoder encodeObject:script forKey:@"script"];
     [encoder encodeObject:scriptName forKey:@"scriptName"];
-    [encoder encodeObject:args forKey:@"args"];
+    [encoder encodeObject:inputValues forKey:@"inputValues"];
     [encoder encodeObject:lastFile forKey:@"lastFile"];
 }
 
@@ -709,44 +717,46 @@ int filterGraph(nodeType*);
 	[transferDataPacket clearData];
 }
 
-- (unsigned long) displayValue:(int)index
+- (void) setOutputValue:(int)index withValue:(unsigned long)aValue
 {
-	if(index>=0 && index<[displayValues count])return [[displayValues objectAtIndex:index] longValue];
-	else return 0;		
-}
-
-- (void) setDisplay:(int)index withValue:(unsigned long)aValue
-{
-	if(!displayValues){
-		displayValues = [[NSMutableArray array] retain];
+	if(!outputValues) outputValues = [[NSMutableArray array] retain];
+	if(index>[outputValues count]){
 		int i;
-		for(i=0;i<kNumDisplayValues;i++){
-			[displayValues addObject:[NSNumber numberWithUnsignedLong:0]];
+		for(i=[outputValues count];i<index;i++){
+			[outputValues addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys:
+			[NSString stringWithFormat:@"%d",i], @"name",
+			[NSString stringWithFormat:@"%d",0], @"iValue",
+			nil]];
 		}
 	}
-
-	[displayValues replaceObjectAtIndex:index withObject:[NSNumber numberWithUnsignedLong:aValue]];
-
-	//we'll reduce updates to 1/sec
-	if(!updateScheduled){
-		updateScheduled = YES;	
-		[self performSelector:@selector(scheduledUpdate) withObject:nil afterDelay:.2];
+	if(index==[outputValues count]){
+		[outputValues addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+			[NSString stringWithFormat:@"%d",index],   @"name",
+			[NSString stringWithFormat:@"%d",aValue], @"iValue",
+			nil]];
+	}
+	else {
+		[outputValues replaceObjectAtIndex:index withObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+			[NSString stringWithFormat:@"%d",index],  @"name",
+			[NSString stringWithFormat:@"%d",aValue], @"iValue",
+			nil]];
+	}
+	NSTimeInterval currentTimeRef = [NSDate timeIntervalSinceReferenceDate];
+	if(currentTimeRef - lastOutputUpdateTimeRef >= 1){
+		lastOutputUpdateTimeRef = currentTimeRef;
+		[self performSelectorOnMainThread:@selector(scheduledUpdate) withObject:nil waitUntilDone:NO];
 	}
 }
 
 - (void) resetDisplays
 {
-	int i;
-	for(i=0;i<kNumDisplayValues;i++){
-		[self setDisplay:i withValue:0];
-	}
+	[outputValues release];
+	outputValues = nil;
 }
-
 
 - (void) scheduledUpdate
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
-	updateScheduled = NO;	
 }
 
 @end
@@ -806,16 +816,14 @@ int filterGraph(nodeType*);
 	
 	descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
 
-	NSEnumerator* e = [args objectEnumerator];
-	id val;
-	int i=0;
+	NSEnumerator* e = [inputValues objectEnumerator];
+	NSDictionary* anInputValueDictionary;
 	filterData tempData;
-	while(val = [e nextObject]){
+	while(anInputValueDictionary = [e nextObject]){
 		tempData.type		= kFilterLongType;
-		tempData.val.lValue = [val longValue];
-		NSString* s = [NSString stringWithFormat:@"$%d",i];
-		[symbolTable setData:tempData forKey:[s cStringUsingEncoding:NSASCIIStringEncoding]];
-		i++;
+		tempData.val.lValue = [[anInputValueDictionary objectForKey:@"iValue"] unsignedLongValue];
+		NSString* aKey = [anInputValueDictionary objectForKey:@"name"];
+		[symbolTable setData:tempData forKey:[aKey cStringUsingEncoding:NSASCIIStringEncoding]];
 	}
 
 }

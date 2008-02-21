@@ -478,7 +478,7 @@ filterData ex(nodeType *p,id delegate)
 			break;
 
 			case DISPLAY_VALUE:	
-				[delegate setDisplay:ex(p->opr.op[0],delegate).val.lValue 
+				[delegate setOutputValue:ex(p->opr.op[0],delegate).val.lValue 
 						   withValue:ex(p->opr.op[1],delegate).val.lValue];
 			break;
 			
