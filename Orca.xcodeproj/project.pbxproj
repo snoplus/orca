@@ -1657,7 +1657,7 @@
 			outputFiles = (
 				"lex.${INPUT_FILE_BASE}.m",
 			);
-			script = "/usr/bin/lex --prefix=${INPUT_FILE_BASE} --outfile=${DERIVED_FILE_DIR}/lex.${INPUT_FILE_BASE}.m \"${INPUT_FILE_PATH}\"";
+			script = "if [ ${MAC_OS_X_VERSION_MAJOR} -gt 1040 ] ; then /usr/bin/lex --prefix=${INPUT_FILE_BASE} --outfile=${DERIVED_FILE_DIR}/lex.${INPUT_FILE_BASE}.m \"${INPUT_FILE_PATH}\"; else /usr/bin/lex -P${INPUT_FILE_BASE} -o${DERIVED_FILE_DIR}/lex.${INPUT_FILE_BASE}.m \"${INPUT_FILE_PATH}\"; fi";
 		};
 		9C2595AD0D5171B90039C5DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -1668,7 +1668,7 @@
 				"${INPUT_FILE_BASE}.tab.m",
 				"${INPUT_FILE_BASE}.tab.h",
 			);
-			script = "/usr/bin/yacc -d --file-prefix=${INPUT_FILE_BASE} --name-prefix=${INPUT_FILE_BASE} --output=${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.tab.c \"${INPUT_FILE_PATH}\" && cd ${DERIVED_FILES_DIR} && if [ -f ${INPUT_FILE_BASE}.tab.c ] ; then mv ${INPUT_FILE_BASE}.tab.c ${INPUT_FILE_BASE}.tab.m; fi;";
+			script = "if [ ${MAC_OS_X_VERSION_MAJOR} -gt 1040 ] ; then /usr/bin/yacc -d --file-prefix=${INPUT_FILE_BASE} --name-prefix=${INPUT_FILE_BASE} --output=${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.tab.c \"${INPUT_FILE_PATH}\" && cd ${DERIVED_FILES_DIR} && if [ -f ${INPUT_FILE_BASE}.tab.c ] ; then mv ${INPUT_FILE_BASE}.tab.c ${INPUT_FILE_BASE}.tab.m; fi; else /usr/bin/yacc -d -b ${INPUT_FILE_BASE} -p ${INPUT_FILE_BASE} -o ${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.tab.c \"${INPUT_FILE_PATH}\" && cd ${DERIVED_FILES_DIR} && if [ -f ${INPUT_FILE_BASE}.tab.c ] ; then mv ${INPUT_FILE_BASE}.tab.c ${INPUT_FILE_BASE}.tab.m; fi; fi;";
 		};
 /* End PBXBuildRule section */
 
