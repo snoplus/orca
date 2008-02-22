@@ -257,6 +257,7 @@
     else return [obj objectForKey:[aTableColumn identifier]];
 }
 
+
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
