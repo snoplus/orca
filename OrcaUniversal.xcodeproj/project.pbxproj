@@ -2201,7 +2201,7 @@
 		843828AC0B43413500B7F417 /* ORScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptInterface.h; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ORScriptInterface.h"; sourceTree = SOURCE_ROOT; };
 		843828AD0B43413500B7F417 /* ORScriptInterface.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptInterface.m; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ORScriptInterface.m"; sourceTree = SOURCE_ROOT; };
 		843828AE0B43413500B7F417 /* ScriptInterfaceTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ScriptInterfaceTask.nib; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ScriptInterfaceTask.nib"; sourceTree = SOURCE_ROOT; };
-		8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = ../../../../System/Library/Frameworks/Carbon.framework; sourceTree = SOURCE_ROOT; };
+		8439D5EE05BEFF3A0077EFF2 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		8439D65405BF31480077EFF2 /* SubviewTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SubviewTableViewController.h; path = "Source/Main Dialogs/HardwareWizard/SubviewTableViewController.h"; sourceTree = SOURCE_ROOT; };
 		8439D65505BF31480077EFF2 /* SubviewTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = SubviewTableViewCell.m; path = "Source/Main Dialogs/HardwareWizard/SubviewTableViewCell.m"; sourceTree = SOURCE_ROOT; };
 		8439D65605BF31480077EFF2 /* SubviewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SubviewTableViewCell.h; path = "Source/Main Dialogs/HardwareWizard/SubviewTableViewCell.h"; sourceTree = SOURCE_ROOT; };
@@ -2453,7 +2453,7 @@
 		847597490B5EF26500123411 /* ORSqlModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSqlModel.m; path = "Source/Objects/Misc Objects/SQL/ORSqlModel.m"; sourceTree = SOURCE_ROOT; };
 		8475974A0B5EF26500123411 /* Sql.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Sql.gif; path = "Source/Objects/Misc Objects/SQL/Sql.gif"; sourceTree = SOURCE_ROOT; };
 		8475974B0B5EF26500123411 /* Sql.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Sql.nib; path = "Source/Objects/Misc Objects/SQL/Sql.nib"; sourceTree = SOURCE_ROOT; };
-		847599850B5FF26500123411 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = ../../../../System/Library/Frameworks/QuartzCore.framework; sourceTree = SOURCE_ROOT; };
+		847599850B5FF26500123411 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
 		84759A990B6025E200123411 /* OrcaScriptGuide.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = OrcaScriptGuide.rtf; sourceTree = "<group>"; };
 		84759CF40B6036D600123411 /* OrcaScript.ym */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.yacc; name = OrcaScript.ym; path = "Source/Main Dialogs/CommandCenter/Scripting/OrcaScript.ym"; sourceTree = SOURCE_ROOT; };
 		84760CC00B370E0A00512F67 /* ORExperimentModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORExperimentModel.h; sourceTree = "<group>"; };
@@ -2830,9 +2830,9 @@
 		84A9566E077B796F00CAD99D /* ORCurve2D.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCurve2D.m; path = Source/Widgets/Plotting/ORCurve2D.m; sourceTree = SOURCE_ROOT; };
 		84A9571E077B887100CAD99D /* Example2D.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Example2D.gif; path = Source/Widgets/Plotting/Example2D.gif; sourceTree = SOURCE_ROOT; };
 		84AA48320461DE37005F64B1 /* OfflineRunAlarmHelp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = OfflineRunAlarmHelp; path = "Source/Main Document/OfflineRunAlarmHelp"; sourceTree = SOURCE_ROOT; };
-		84AA7A470545B167005F64B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = ../../../../System/Library/Frameworks/Foundation.framework; sourceTree = SOURCE_ROOT; };
-		84AA7A4F0545B17C005F64B1 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../System/Library/Frameworks/AppKit.framework; sourceTree = SOURCE_ROOT; };
-		84AA7A540545B1B2005F64B1 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = SOURCE_ROOT; };
+		84AA7A470545B167005F64B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		84AA7A4F0545B17C005F64B1 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		84AA7A540545B1B2005F64B1 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		84AB8BB40D2314A500EC39F2 /* ORCmdHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCmdHistory.h; path = "Source/Objects/Misc Objects/CmdHistory/ORCmdHistory.h"; sourceTree = SOURCE_ROOT; };
 		84AB8BB50D2314A500EC39F2 /* ORCmdHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCmdHistory.m; path = "Source/Objects/Misc Objects/CmdHistory/ORCmdHistory.m"; sourceTree = SOURCE_ROOT; };
 		84AB8BB90D2314CD00EC39F2 /* crate_lib.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = crate_lib.m; path = Source/Objects/Hardware/Camac/C111C/crate_lib.m; sourceTree = SOURCE_ROOT; };
@@ -3349,7 +3349,7 @@
 		F51E6A9E03AE4A5B015F64B1 /* OR617Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = OR617Model.m; sourceTree = "<group>"; };
 		F51E6AAB03AE4C4D015F64B1 /* ORPciCard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPciCard.h; sourceTree = "<group>"; };
 		F51E6AAC03AE4C4D015F64B1 /* ORPciCard.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPciCard.m; sourceTree = "<group>"; };
-		F539C97C03A7C80D015F64B1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../System/Library/Frameworks/IOKit.framework; sourceTree = SOURCE_ROOT; };
+		F539C97C03A7C80D015F64B1 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		F54577F203AFCD1C015F64B1 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = English; path = English.lproj/Orca.icns; sourceTree = "<group>"; };
 		F54577F403AFCD1C015F64B1 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = English; path = English.lproj/OrcaDoc.icns; sourceTree = "<group>"; };
 		F576B07F03B12320015F64B1 /* ORShaperModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORShaperModel.h; sourceTree = "<group>"; };
@@ -8626,7 +8626,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/bin/ranlib Libraries/libPPC/libmysqlclient.a";
+			shellScript = "/usr/bin/ranlib Libraries/libUniversal/libmysqlclient.a";
 		};
 /* End PBXShellScriptBuildPhase section */
 
