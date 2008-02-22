@@ -966,7 +966,7 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
     unsigned long gtid = 0;
     unsigned long data[2];
     unsigned long len;
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     
     unsigned short statusReg;
     BOOL isMSAMEvent = NO;

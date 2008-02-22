@@ -458,7 +458,7 @@
     unsigned char dataBlockByteIn[64];
     unsigned long dataBlockOut[64];
     
-    NSString* progressString;
+    NSString* progressString = @"";
     
     NS_DURING
         NSLog(@"Starting dpm Tests\n");

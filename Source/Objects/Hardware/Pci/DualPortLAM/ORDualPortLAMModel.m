@@ -187,7 +187,7 @@ static NSString *ORDualPortLAMVariables       = @"ORDualPortLAMVariables";
 //**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)params
 {
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     EcpuWriteLAMStruct eCpuLAMStruct;
     MacWriteLAMStruct macLAMStruct;
     NS_DURING

@@ -1571,7 +1571,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 			
 			if(channelMap){
 				int aChan;
-				long readAddress; 
+				long readAddress = 0; 
 				for(aChan=0;aChan<kNumFLTChannels;aChan++){
 					if( (1L<<aChan) & channelMap){
 						

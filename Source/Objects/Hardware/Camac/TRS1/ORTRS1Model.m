@@ -328,7 +328,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 				
 				unsigned char* bytePtr = (unsigned char*) (&dataBuffer[3]);
 				int ii;
-				int actualByteCount;
+				int actualByteCount = 0;
 				for(ii = 0; ii < expectedNumberDataBytes; ii++ ) {
 					unsigned short data;
 					unsigned short theStatus = [[self adapter] camacShortNAF:cachedStation a:0 f:2  data:&data];

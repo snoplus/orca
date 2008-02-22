@@ -1111,7 +1111,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 {
     unsigned short dummy;
     unsigned short statusWord;
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
 	union {
 		NSTimeInterval asTimeInterval;
 		unsigned long asLongs[2];

@@ -1350,7 +1350,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 {
     NSString* runState;
     NSString* thirdWordKey;
-    NSString* init;
+    NSString* init = @"";
     NSString* title= @"Run Control Record\n\n";
     if(dataPtr[1] & 0x8){
         runState     = @"Type       = HeartBeat\n";

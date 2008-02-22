@@ -766,7 +766,7 @@
 
 - (IBAction) test:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model test];
     NS_HANDLER

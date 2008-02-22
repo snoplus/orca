@@ -99,7 +99,7 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 - (void) stepCalibration
 {
 	int delta;
-	float rate;
+	float rate = 0.0;
 	if([[owner delegate] respondsToSelector:@selector(rateGroup)]){
 		rate = [[[[owner delegate] rateGroup]rateObject:channel] rate];
 	}

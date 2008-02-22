@@ -715,7 +715,7 @@
     unsigned char  cdata;
 	[self endEditing];
 	long value = [[model sbcLink] writeValue];
-	int address;
+	int address = 0;
     NS_DURING
 		if([model isKindOfClass:[ORVmeAdapter class]]){
 			int 			startAddress 	= [[model sbcLink] writeAddress];
@@ -786,7 +786,7 @@
     unsigned short sdata;
     unsigned char  cdata;
 	[self endEditing];
-	unsigned long address;
+	unsigned long address = 0;
 	NS_DURING
 		if([model isKindOfClass:[ORVmeAdapter class]]){
 			unsigned long 	startAddress 	= [[model sbcLink] writeAddress];

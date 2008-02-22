@@ -119,7 +119,7 @@ const float CTSmallLabelSize = 11.;
 
 - (NSImage *)badgeOfSize:(float)size forValue:(unsigned)value
   {
-  float scaleFactor;
+  float scaleFactor = 0.0;
   
   if(size <= 0)
 	[NSException raise:NSInvalidArgumentException format:@"%@ - (NSImage *)smallBadgeForValue:(unsigned)value: size (%f) must be positive", [self class], size];

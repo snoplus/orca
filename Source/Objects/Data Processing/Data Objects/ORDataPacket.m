@@ -568,7 +568,7 @@
     
     stopDecodeIntoArray = NO;
     
-    NSMutableArray* array;
+    NSMutableArray* array = nil;
     NSAutoreleasePool *pool = nil;
     NS_DURING
         array = [NSMutableArray arrayWithCapacity:1024*1000];
@@ -587,7 +587,7 @@
             if(!dPtr)break;
             NSAutoreleasePool *innerPool = [[NSAutoreleasePool allocWithZone:nil] init];
             
-			id anObj;
+			id anObj = nil;
 			if(version>=2){
 			   //get length from the first word.
 			   unsigned long val = *dPtr;

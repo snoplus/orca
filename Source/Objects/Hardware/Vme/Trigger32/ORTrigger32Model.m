@@ -640,7 +640,7 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
 
 - (void) initBoardPart1
 {
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     NS_DURING
         errorLocation = @"reset";
         [self reset];
@@ -673,7 +673,7 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
 
 - (void) initBoardPart2
 {
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     NS_DURING
         errorLocation = [NSString stringWithFormat:@"setting %@ event input enable",trigger2Name];
         [self enableTrigger2EventInput:trigger2EventInputEnable];
@@ -1460,7 +1460,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
     
     unsigned long gtid = 0;
     unsigned long len;
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     
     unsigned short statusReg;
     BOOL isMSAMEvent = NO;
@@ -1549,7 +1549,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 			}
 			
 			//keep track if data is taken if in the useSoftware GtId mode.
-			unsigned long lastFrameIndex;
+			unsigned long lastFrameIndex = 0;
 			if(useSoftwareGtId || useNoHardware){
 				lastFrameIndex = [aDataPacket frameIndex];
 			}

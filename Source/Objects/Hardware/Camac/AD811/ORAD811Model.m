@@ -206,7 +206,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     BOOL resetDone;
 	
 	union {

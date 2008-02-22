@@ -1133,7 +1133,7 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 {
 	isRunning = YES;
 	
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     NS_DURING
 		unsigned char theConversionMask = 0;
 		errorLocation = @"Reading Conversion Mask";

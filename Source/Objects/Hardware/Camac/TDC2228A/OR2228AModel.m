@@ -216,7 +216,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     NS_DURING
         
 		if(!firstTime){

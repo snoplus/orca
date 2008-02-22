@@ -291,7 +291,7 @@
 
 - (IBAction) init:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model initializeContrl];
@@ -308,7 +308,7 @@
 
 - (IBAction) test:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         [model test];
@@ -326,7 +326,7 @@
 - (IBAction) execute:(id)sender
 {
     [self endEditing];
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model execute];
@@ -347,7 +347,7 @@
 
 - (IBAction) resetController:(id)sender
 {   
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model resetContrl];
@@ -364,7 +364,7 @@
 
 - (IBAction) inhibitOnAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model setCrateInhibit:YES];
@@ -381,7 +381,7 @@
 
 - (IBAction) inhibitOffAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model setCrateInhibit:NO];
@@ -399,7 +399,7 @@
 
 - (IBAction) readInhibitAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     unsigned short inhibitState;
     NS_DURING
         [model checkCratePower];
@@ -418,7 +418,7 @@
 - (IBAction) setLamMaskAction:(id)sender
 {
     [self endEditing];
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     unsigned short maskValue = [model moduleWriteValue];
     NS_DURING
         [model checkCratePower];
@@ -437,7 +437,7 @@
 
 - (IBAction) readLamMaskAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     unsigned long maskValue;
     NS_DURING
         [model checkCratePower];
@@ -455,7 +455,7 @@
 
 - (IBAction) readLamStationsAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     unsigned long value;
     NS_DURING
         [model checkCratePower];
@@ -488,7 +488,7 @@
 
 - (IBAction) zCycleAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model executeZCycle];
@@ -505,7 +505,7 @@
 
 - (IBAction) cCycleAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model executeCCycle];
@@ -522,7 +522,7 @@
 
 - (IBAction) cCycleIAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model executeCCycleIOff];
@@ -539,7 +539,7 @@
 
 - (IBAction) zCycleIAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model executeZCycleIOn];
@@ -556,7 +556,7 @@
 
 - (IBAction) resetLamFFAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     NS_DURING
         [model checkCratePower];
         statusCC32 = [model resetLAMFF];
@@ -573,7 +573,7 @@
 
 - (IBAction) readLamFFAction:(id)sender
 {
-    unsigned short statusCC32;
+    unsigned short statusCC32 = 0;
     unsigned short value;
     NS_DURING
         [model checkCratePower];

@@ -541,7 +541,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     
     NS_DURING
         // read the status register to check for an event

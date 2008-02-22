@@ -54,7 +54,7 @@
 
 - (id) objectAtIndex:(unsigned)index
 {
-	id anObject;
+	id anObject = nil;
 	[bufferLock lock];
 	NS_DURING
 		if([self isFull])	anObject = [buffer objectAtIndex:(startIndex+index)%maxSize];
@@ -85,7 +85,7 @@
 
 - (id) lastObject
 {
-	id anObject;
+	id anObject = nil;
 	[bufferLock lock];
 	NS_DURING
 		if([self isFull])	anObject = [buffer objectAtIndex:startIndex];

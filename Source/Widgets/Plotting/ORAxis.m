@@ -1494,9 +1494,9 @@ enum {
  	int			axisStartX,axisStartY;
 	int			axisEndX,axisEndY;
 	int			axisPosition;
-	int			shortTicEndX,shortTicEndY;
+	int			shortTicEndX = 0,shortTicEndY = 0;
 	int			ticStartX,ticStartY;
-	int			longTicEndX,longTicEndY;
+	int			longTicEndX = 0,longTicEndY = 0;
 	int			gridPosition;
 	BOOL isOpposite = [self oppositePosition];
 
@@ -1765,10 +1765,10 @@ enum {
  	int			axisStartX,axisStartY;
 	int			axisEndX,axisEndY;
 	int			axisPosition;
-	int			shortTicEndX,shortTicEndY;
+	int			shortTicEndX = 0,shortTicEndY = 0;
 	int			ticStartX,ticStartY;
-	int			longTicEndX,longTicEndY;
-	int			mediumTicEndX,mediumTicEndY;
+	int			longTicEndX = 0,longTicEndY = 0;
+	int			mediumTicEndX = 0,mediumTicEndY = 0;
 	int			gridPosition;
 	
     if (isX) {
@@ -1786,7 +1786,8 @@ enum {
 		if(isOpposite)	axisPosition  = 0;
 		else			axisPosition  = [self frame].size.width;
 		axisStartX    = axisPosition;
-		axisStartY    = lowOffset-2;
+		axisStartY    = lowOffset-
+        2;
 		axisEndX	  = axisPosition;
 		axisEndY	  = highOffset+1;
 		ticStartX	  = axisPosition;

@@ -167,7 +167,7 @@ NSString* ORSBC_LAMLock						= @"ORSBC_LAMLock";
 //**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)params
 {
-    NSString* errorLocation;
+    NSString* errorLocation = @"";
     NS_DURING
 		if(busy){  
             

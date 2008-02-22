@@ -351,7 +351,7 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
             
             unsigned long aMask = [[self interfaceObj] readRelayMask];
             
-			NSString* currentRecord;
+			NSString* currentRecord = @"";
 			if(saveCurrentToFile){
 				NSCalendarDate* theDate = [NSCalendarDate date];
 				currentRecord = [NSString stringWithFormat:@"%@ ",[theDate descriptionWithCalendarFormat:@"%d/%m/%y %H:%M:%S"]];

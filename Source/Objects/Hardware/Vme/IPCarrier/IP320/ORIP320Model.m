@@ -211,7 +211,7 @@ static struct {
 	int changeCount = 0;
 	unsigned short value = 0;
 	@synchronized(self) {
-		NSString* errorLocation;
+		NSString* errorLocation = @"";
 		NS_DURING
 			
 			errorLocation = @"Control Reg Setup";

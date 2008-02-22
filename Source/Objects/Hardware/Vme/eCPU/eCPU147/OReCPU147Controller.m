@@ -274,9 +274,9 @@
 - (IBAction) dump:(id)sender
 {
     NS_DURING
-		unsigned long startAddress;
-		unsigned long numBytes;
-		NSData* buffer;
+		unsigned long startAddress = 0;
+		unsigned long numBytes = 0;
+		NSData* buffer = nil;
 		if(sender == [self dumpCodeButton]){
 			startAddress = USER_CODE_ADDRESS;
 			unsigned long len = [model codeLength];
