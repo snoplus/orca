@@ -54,7 +54,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) startRun1:(NSNumber*)doInit;
 - (void) waitForRunToStop;
 - (void) finishRunStop;
-
 @end
 
 @implementation ORRunModel
@@ -550,10 +549,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Run Modifiers
-
--(void)startRun
+- (void) startRun
 {
-    
+	
     [self setNextRunWillQuickStart:quickStart];
     if([self isRunning]){
         _forceRestart = YES;
@@ -624,7 +622,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 -(void)startRun:(BOOL)doInit
 {
-    
+	
     _forceRestart = NO;
     
     if([self isRunning]){

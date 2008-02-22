@@ -43,6 +43,7 @@
         NSMutableArray* orcaControllers;
         int		    scaleFactor;
         ORGateGroup* gateGroup;
+		ORDocumentController* documentController;
 }
 
 #pragma mark ¥¥¥Initializations

@@ -223,7 +223,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 #pragma mark ¥¥¥Window Management
 - (void) makeWindowControllers
 {
-    ORDocumentController* documentController = [[ORDocumentController alloc] init];
+    documentController = [[ORDocumentController alloc] init];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
 															object:self
@@ -268,7 +268,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 {
 	//add in the document parameters
 	NSMutableDictionary* docDict = [NSMutableDictionary dictionary];
-    [docDict setObject:[self fileName] forKey:@"documentName"];
+    [docDict setObject:[self fileURL] forKey:@"documentName"];
     [docDict setObject:[[[NSBundle mainBundle] infoDictionary]       objectForKey:@"CFBundleVersion"] forKey:@"OrcaVersion"];
     [docDict setObject:[NSString stringWithFormat:@"%@",[NSDate date]]   forKey:@"date"];
     [dictionary setObject:docDict forKey:@"Document Info"];
@@ -602,17 +602,10 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void)windowClosing:(NSNotification*)aNote
 {
-    
-    NSEnumerator* e = [orcaControllers objectEnumerator];
-    id controller;
-    while(controller = [e nextObject]){
-        if([controller window] == [aNote object]){
-            //[controller retain];
-            [orcaControllers removeObject:controller];
-            // [controller performSelector:@selector(release) withObject:nil afterDelay:.1];
-            break;
-        }
-    }
+	if([aNote object] == documentController){
+		documentController = nil;
+	}
+    [orcaControllers removeObject:[aNote object]];
 }
 
 - (BOOL)shouldCloseWindowController:(NSWindowController *)windowController 
