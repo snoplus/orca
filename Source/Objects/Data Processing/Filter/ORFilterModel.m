@@ -667,16 +667,18 @@ int filterGraph(nodeType*);
 
 - (void) shipStack:(int)i
 {
-	while(![stacks[i] isEmpty]){
-		[transferDataPacket addData:[stacks[i] dequeueFromBottom]];
-	}
-	[transferDataPacket addFrameBuffer:YES];
-	//pass it on
-	id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-	[theNextObject processData:transferDataPacket userInfo:nil];
-	[transferDataPacket clearData];
+	if(![stacks[i] isEmpty]) {
+		while(![stacks[i] isEmpty]){
+			[transferDataPacket addData:[stacks[i] dequeueFromBottom]];
+		}
+		[transferDataPacket addFrameBuffer:YES];
+		//pass it on
+		id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
+		[theNextObject processData:transferDataPacket userInfo:nil];
+		[transferDataPacket clearData];
 	
-	[self dumpStack:i];
+		[self dumpStack:i];
+	}
 }
 
 - (long) stackCount:(int)i
