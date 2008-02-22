@@ -1,6 +1,4 @@
 
-You must install the NI driver before ORCA will build correctly.
-
 You must install any needed drivers before hardware accesses will work. Find what you need in the drivers folder. 
 
 starting with svn:
@@ -16,7 +14,7 @@ starting with svn:
 3) get the sources
 cd Dev
 svn co svn://128.95.100.177/Orca
-svn co svn://128.95.100.177/OrcaIBPalette
+svn co svn://128.95.100.177/OrcaPlugin
 
 if you use OrcaRoot:
 svn co svn://128.95.100.177/OrcaRoot
@@ -24,7 +22,7 @@ svn co svn://128.95.100.177/OrcaRoot
 -double-click on the Orca.xcodeproj file to launch project builder and compile the code.
 	
 
--Note that the Drivers folder is not under svn at this time. Contact Mark to get them.
+-Note that the Drivers folder is not under svn at this time. Check the Orca help ("Getting Started" page) for a link to obtain them.
 
 Updating
  
@@ -33,7 +31,6 @@ Updating
 -to do a full update from the command line do:
 cd Dev
 svn update Orca
-
 
 
 
