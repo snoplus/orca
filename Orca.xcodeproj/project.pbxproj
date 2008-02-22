@@ -89,6 +89,7 @@
 		2ACEE0E30612266000CAD497 /* ThresholdCalibrationChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ACEE0DF0612266000CAD497 /* ThresholdCalibrationChannel.m */; };
 		2ACEE0E40612266000CAD497 /* ThresholdCalibrationTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */; };
 		2ACEE0E50612266000CAD497 /* ThresholdCalibrationTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */; };
+		2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AE87BDD0D6E486900A839FC /* libmysqlclient.a */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
 		546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA80874BDD60072A274 /* 2228ACard.gif */; };
 		546D9DB10874BDD60072A274 /* OR2228AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 546D9DA90874BDD60072A274 /* OR2228AController.h */; };
@@ -833,7 +834,6 @@
 		844D93050A0A79AA00E83C57 /* Pulser33220Icon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844D92FD0A0A79AA00E83C57 /* Pulser33220Icon.tif */; };
 		844DF9050C6A836700BEB215 /* ORMaskedWaveform.h in Headers */ = {isa = PBXBuildFile; fileRef = 844DF9030C6A836700BEB215 /* ORMaskedWaveform.h */; };
 		844DF9060C6A836700BEB215 /* ORMaskedWaveform.m in Sources */ = {isa = PBXBuildFile; fileRef = 844DF9040C6A836700BEB215 /* ORMaskedWaveform.m */; };
-		844DF91F0C6A83A400BEB215 /* libmysqlclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 844DF91E0C6A83A400BEB215 /* libmysqlclient.a */; };
 		844E4947057529A6005F11A0 /* ORTaskMaster.h in Headers */ = {isa = PBXBuildFile; fileRef = 844E4942057529A6005F11A0 /* ORTaskMaster.h */; };
 		844E4948057529A6005F11A0 /* TaskMaster.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844E4943057529A6005F11A0 /* TaskMaster.nib */; };
 		844E494B057529A6005F11A0 /* ORTaskMaster.m in Sources */ = {isa = PBXBuildFile; fileRef = 844E4946057529A6005F11A0 /* ORTaskMaster.m */; };
@@ -1657,7 +1657,7 @@
 			outputFiles = (
 				"lex.${INPUT_FILE_BASE}.m",
 			);
-			script = "cd ${DERIVED_FILE_DIR} && /usr/bin/lex -P${INPUT_FILE_BASE} -olex.\"${INPUT_FILE_BASE}\".m \"${INPUT_FILE_PATH}\"";
+			script = "/usr/bin/lex --prefix=${INPUT_FILE_BASE} --outfile=${DERIVED_FILE_DIR}/lex.${INPUT_FILE_BASE}.m \"${INPUT_FILE_PATH}\"";
 		};
 		9C2595AD0D5171B90039C5DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -1668,7 +1668,7 @@
 				"${INPUT_FILE_BASE}.tab.m",
 				"${INPUT_FILE_BASE}.tab.h",
 			);
-			script = "cd ${DERIVED_FILE_DIR} && /usr/bin/yacc -d -b \"${INPUT_FILE_BASE}\" -p \"${INPUT_FILE_BASE}\" \"${INPUT_FILE_PATH}\" && mv \"${DERIVED_FILE_DIR}\"/\"${INPUT_FILE_BASE}\".tab.c \"${DERIVED_FILE_DIR}\"/\"${INPUT_FILE_BASE}\".tab.m";
+			script = "/usr/bin/yacc -d --file-prefix=${INPUT_FILE_BASE} --name-prefix=${INPUT_FILE_BASE} --output=${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.tab.c \"${INPUT_FILE_PATH}\" && cd ${DERIVED_FILES_DIR} && if [ -f ${INPUT_FILE_BASE}.tab.c ] ; then mv ${INPUT_FILE_BASE}.tab.c ${INPUT_FILE_BASE}.tab.m; fi;";
 		};
 /* End PBXBuildRule section */
 
@@ -1816,6 +1816,7 @@
 		2ACEE0DF0612266000CAD497 /* ThresholdCalibrationChannel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationChannel.m; sourceTree = "<group>"; };
 		2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ThresholdCalibrationTask.h; sourceTree = "<group>"; };
 		2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationTask.m; sourceTree = "<group>"; };
+		2AE87BDD0D6E486900A839FC /* libmysqlclient.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmysqlclient.a; sourceTree = "<group>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
 		546D9DA90874BDD60072A274 /* OR2228AController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2228AController.h; path = Source/Objects/Hardware/Camac/TDC2228A/OR2228AController.h; sourceTree = SOURCE_ROOT; };
@@ -2306,7 +2307,6 @@
 		844D92FD0A0A79AA00E83C57 /* Pulser33220Icon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Pulser33220Icon.tif; path = Source/Objects/Hardware/GPIB/Pulser33220/Pulser33220Icon.tif; sourceTree = SOURCE_ROOT; };
 		844DF9030C6A836700BEB215 /* ORMaskedWaveform.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMaskedWaveform.h; path = "Source/Objects/Data Processing/Histogram Objects/Waveform/ORMaskedWaveform.h"; sourceTree = SOURCE_ROOT; };
 		844DF9040C6A836700BEB215 /* ORMaskedWaveform.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMaskedWaveform.m; path = "Source/Objects/Data Processing/Histogram Objects/Waveform/ORMaskedWaveform.m"; sourceTree = SOURCE_ROOT; };
-		844DF91E0C6A83A400BEB215 /* libmysqlclient.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmysqlclient.a; path = Libraries/libPPC/libmysqlclient.a; sourceTree = SOURCE_ROOT; };
 		844E4942057529A6005F11A0 /* ORTaskMaster.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORTaskMaster.h; path = "Source/Main Dialogs/TaskMaster/ORTaskMaster.h"; sourceTree = SOURCE_ROOT; };
 		844E4943057529A6005F11A0 /* TaskMaster.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TaskMaster.nib; path = "Source/Main Dialogs/TaskMaster/TaskMaster.nib"; sourceTree = SOURCE_ROOT; };
 		844E4946057529A6005F11A0 /* ORTaskMaster.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORTaskMaster.m; path = "Source/Main Dialogs/TaskMaster/ORTaskMaster.m"; sourceTree = SOURCE_ROOT; };
@@ -3379,7 +3379,7 @@
 				840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */,
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
-				844DF91F0C6A83A400BEB215 /* libmysqlclient.a in Frameworks */,
+				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3674,6 +3674,14 @@
 			name = ThresholdCalibration;
 			path = "Source/Objects/Misc Objects/ThresholdCalibration";
 			sourceTree = SOURCE_ROOT;
+		};
+		2AE87BDC0D6E486900A839FC /* libUniversal */ = {
+			isa = PBXGroup;
+			children = (
+				2AE87BDD0D6E486900A839FC /* libmysqlclient.a */,
+			);
+			path = libUniversal;
+			sourceTree = "<group>";
 		};
 		546D9DA60874BDD60072A274 /* TDC2228A */ = {
 			isa = PBXGroup;
@@ -4945,15 +4953,6 @@
 			);
 			name = Pulser33220;
 			path = Source/Objects/Hardware/GPIB/Pulser33220;
-			sourceTree = SOURCE_ROOT;
-		};
-		844DF91D0C6A83A400BEB215 /* libPPC */ = {
-			isa = PBXGroup;
-			children = (
-				844DF91E0C6A83A400BEB215 /* libmysqlclient.a */,
-			);
-			name = libPPC;
-			path = Libraries/libPPC;
 			sourceTree = SOURCE_ROOT;
 		};
 		844E494105752906005F11A0 /* TaskMaster */ = {
@@ -7009,6 +7008,7 @@
 		84F7FB520AE5558900A5AA4C /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				2AE87BDC0D6E486900A839FC /* libUniversal */,
 				84F7FB550AE555C600A5AA4C /* mysql.h */,
 				84F7FB630AE5569100A5AA4C /* my_alloc.h */,
 				84F7FB590AE5566D00A5AA4C /* mysql_version.h */,
@@ -7016,7 +7016,6 @@
 				84F7FB5B0AE5566D00A5AA4C /* typelib.h */,
 				84F7FB5C0AE5566D00A5AA4C /* my_list.h */,
 				84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */,
-				844DF91D0C6A83A400BEB215 /* libPPC */,
 			);
 			path = Libraries;
 			sourceTree = SOURCE_ROOT;
@@ -9321,6 +9320,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				" CFBundlerHelpBookFolder" = OrcaHelp;
+				ARCHS = "$(NATIVE_ARCH)";
 				CFBundleHelpBookName = OrcaHelp;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = "";
@@ -9351,8 +9351,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					Libraries,
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/Libraries/libPPC\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",
@@ -9408,8 +9410,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					Libraries,
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/Libraries/libPPC\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",
 					"-falign-loops=32",
@@ -9458,8 +9462,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					Libraries,
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/Libraries/libPPC\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",
 					"-falign-loops=32",
