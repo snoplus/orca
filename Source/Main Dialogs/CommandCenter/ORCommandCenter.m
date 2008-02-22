@@ -232,7 +232,7 @@ static ORCommandCenter *instance = nil;
     [serverSocket scheduleOnCurrentRunLoop];
     [serverSocket setDelegate:self];
     
-    NSLog( @"Orca Command: Waiting for connections on port %d\n",socketPort );
+    NSLog( @"Orca Command: Ready for connections on port %d\n",socketPort );
 }
 
 #pragma mark •••Delegate Methods
