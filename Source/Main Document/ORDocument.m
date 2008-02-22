@@ -80,7 +80,12 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [statusText release];
-	[orcaControllers makeObjectsPerformSelector:@selector(close)];
+	
+	NS_DURING
+		[orcaControllers makeObjectsPerformSelector:@selector(close)];
+	NS_HANDLER
+	NS_ENDHANDLER
+	
     [orcaControllers release];
     [group sleep];
     [group release];
@@ -223,7 +228,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 #pragma mark ¥¥¥Window Management
 - (void) makeWindowControllers
 {
-    documentController = [[ORDocumentController alloc] init];
+    ORDocumentController* documentController = [[ORDocumentController alloc] init];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
 															object:self
@@ -602,10 +607,16 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (void)windowClosing:(NSNotification*)aNote
 {
-	if([aNote object] == documentController){
-		documentController = nil;
+	int i;
+	for(i=0;i<[orcaControllers count];i++){
+		if([[orcaControllers objectAtIndex:i] window] == [aNote object]){
+			NS_DURING
+				[orcaControllers removeObject:[orcaControllers objectAtIndex:i]];
+			NS_HANDLER
+			NS_ENDHANDLER
+			break;
+		}
 	}
-    [orcaControllers removeObject:[aNote object]];
 }
 
 - (BOOL)shouldCloseWindowController:(NSWindowController *)windowController 
