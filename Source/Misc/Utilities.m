@@ -13,8 +13,8 @@
 //-------------------------------------------------------------
 
 
-#import </usr/include/objc/objc-class.h>
-#import </usr/include/objc/Protocol.h>
+#import <objc/objc-class.h>
+#import <objc/Protocol.h>
 
 //-----------------------------------------------------------------------------
 /*!\func	convertTimeCharToLong
