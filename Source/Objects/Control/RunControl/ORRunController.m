@@ -422,7 +422,7 @@
     [self endEditing];
 	
 	if(![[model document] fileURL]){
-		NSBeginAlertSheet(@"You have yet to save this UNTITLED configuration!!\n",
+		NSBeginAlertSheet(@"You have NOT named this configuration!!\n",
                       @"OK",
                       nil,
                       nil,[self window],
