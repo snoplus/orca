@@ -80,8 +80,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [statusText release];
-	[orcaControllers makeObjectsPerformSelector:@selector(close)];
-    [orcaControllers release];
+	NS_DURING
+		[orcaControllers makeObjectsPerformSelector:@selector(close)];
+		[orcaControllers release];
+	NS_HANDLER
+	NS_ENDHANDLER
     [group sleep];
     [group release];
     [self setGateGroup: nil];
@@ -608,8 +611,11 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     while(controller = [e nextObject]){
         if([controller window] == [aNote object]){
             //[controller retain];
-            [orcaControllers removeObject:controller];
-            // [controller performSelector:@selector(release) withObject:nil afterDelay:.1];
+			NS_DURING
+				[orcaControllers removeObject:controller];
+			NS_HANDLER
+			NS_ENDHANDLER
+           // [controller performSelector:@selector(release) withObject:nil afterDelay:.1];
             break;
         }
     }
