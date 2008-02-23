@@ -90,7 +90,6 @@
 - (IBAction) runTypeLockAction:(id)sender;
 - (IBAction) definitionsFileAction:(id)sender;
 - (IBAction) listVetoAction:(id)sender;
-- (void) startRun;
 
 #pragma mark ¥¥¥Interface Management
 - (void) updateButtons;

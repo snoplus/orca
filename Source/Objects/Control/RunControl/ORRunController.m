@@ -114,12 +114,12 @@
     [notifyCenter addObserver: self
                      selector: @selector(runTypeChanged:)
                          name: ORRunTypeChangedNotification
-                       object: [model document]];
+                       object: [self document]];
     
     [notifyCenter addObserver: self
                      selector: @selector(remoteControlChanged:)
                          name: ORRunRemoteControlChangedNotification
-                       object: [model document]];
+                       object: [self document]];
     
     [notifyCenter addObserver: self
                      selector: @selector(runNumberLockChanged:)
@@ -420,32 +420,6 @@
 -(IBAction)startRunAction:(id)sender
 {
     [self endEditing];
-	
-	if(![[model document] fileURL]){
-		NSBeginAlertSheet(@"You have NOT named this configuration!!\n",
-                      @"OK",
-                      nil,
-                      nil,[self window],
-                      self,
-                      @selector(_runConfirmSheetDidEnd:returnCode:contextInfo:),
-                      nil,
-                      nil,@"You'll have to save it before you can start a run");
-		
-
-	}
-	else [self startRun];
-}
-
-- (void) _runConfirmSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
-{
-    if(returnCode == NSAlertDefaultReturn){
-		//do nothing
-	}    
-}
-
-	
-- (void) startRun
-{
     [statusField setStringValue:@"Starting..."];
     [startRunButton setEnabled:NO];
     [restartRunButton setEnabled:NO];

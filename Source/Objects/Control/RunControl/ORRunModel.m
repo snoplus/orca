@@ -54,6 +54,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) startRun1:(NSNumber*)doInit;
 - (void) waitForRunToStop;
 - (void) finishRunStop;
+
 @end
 
 @implementation ORRunModel
@@ -549,9 +550,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Run Modifiers
-- (void) startRun
+
+-(void)startRun
 {
-	
+    
     [self setNextRunWillQuickStart:quickStart];
     if([self isRunning]){
         _forceRestart = YES;
@@ -622,7 +624,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 -(void)startRun:(BOOL)doInit
 {
-	
+    
     _forceRestart = NO;
     
     if([self isRunning]){
@@ -1350,7 +1352,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 {
     NSString* runState;
     NSString* thirdWordKey;
-    NSString* init = @"";
+    NSString* init;
     NSString* title= @"Run Control Record\n\n";
     if(dataPtr[1] & 0x8){
         runState     = @"Type       = HeartBeat\n";
