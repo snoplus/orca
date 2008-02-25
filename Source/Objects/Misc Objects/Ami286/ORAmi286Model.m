@@ -289,7 +289,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			[hiAlarm release];
 			hiAlarm = nil;
 		}
-		if(alarmStatus[index] & (1<<4)){
+		if(alarmStatus[index] & (1<<3)){
 			if(!lowAlarm){
 				lowAlarm = [[ORAlarm alloc] initWithName:@"Ami 286 Low Level" severity:kRangeAlarm];
 				[lowAlarm setSticky:YES];
