@@ -404,7 +404,9 @@ int filterGraph(nodeType*);
 		id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
 		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
 
-		[aDataPacket setFilePrefix:@"FilteredRun"];
+		NSString* currentPrefix = [aDataPacket filePrefix];
+		if(currentPrefix)[aDataPacket setFilePrefix:[currentPrefix stringByAppendingString:@"Filtered"]];
+		else [aDataPacket setFilePrefix:@"FilteredRun"];
 		theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
 		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
 		
