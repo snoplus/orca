@@ -214,6 +214,7 @@
 {
 	return [model useDataObject:aPlotter dataSet:set];
 }
+
 - (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
     return [model numberBins];
