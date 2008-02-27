@@ -32,10 +32,16 @@
     unsigned long 	overFlow;
     unsigned int 	numberBins;
     unsigned long* 	histogram;
+	BOOL			rebin;
+	unsigned int	rebinNumber;
 }
 
 
 #pragma mark ¥¥¥Accessors
+- (BOOL)rebin;
+- (void) setRebin:(BOOL)aFlag;
+- (unsigned short) rebinNumber;
+- (void) setRebinNumber:(unsigned int)avalue;
 - (void) processResponse:(NSDictionary*)aResponse;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
@@ -64,4 +70,6 @@
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
 @end
 
+extern NSString* OR1DHisotRebinChanged;
+extern NSString* OR1DHisotRebinNumberChanged;
 

@@ -18,15 +18,24 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "ORDataController.h"
+
 @interface OR1DHistoController : ORDataController {
+	IBOutlet NSButton*		rebinCB;
+	IBOutlet NSTextField*	rebinNumberTextField;
 }
--(id)init;
+
+- (id) init;
 - (void) awakeFromNib;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) mousePositionChanged:(NSNotification*) aNote;
+- (void) rebinNumberChanged:(NSNotification*) aNote;
+- (void) rebinChanged:(NSNotification*) aNote;
+
+- (IBAction) rebinAction:(id)sender;
+- (IBAction) rebinNumberAction:(id)sender;
+
 @end

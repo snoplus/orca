@@ -7,6 +7,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
 				<key>tasksCompleted</key>
 				<string>id</string>
 			</dict>
@@ -24,10 +26,24 @@
 			<string>NSView</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>rebinAction</key>
+				<string>id</string>
+				<key>rebinNumberAction</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>OR1DHistoController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>rebinCB</key>
+				<string>NSButton</string>
+				<key>rebinNumberTextField</key>
+				<string>NSTextField</string>
+			</dict>
 			<key>SUPERCLASS</key>
 			<string>ORDataController</string>
 		</dict>

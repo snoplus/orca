@@ -24,6 +24,10 @@
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
 
+NSString* OR1DHisotRebinChanged			= @"OR1DHisotRebinChanged";
+NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
+
+
 @implementation OR1DHisto
 
 - (id) init 
@@ -55,6 +59,38 @@
     dataId = aDataId;
 }
 
+- (BOOL)rebin
+{
+	return rebin;
+}
+
+- (void) setRebin:(BOOL)aFlag
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setRebin:rebin];
+    
+	rebin = aFlag;
+	[[NSNotificationCenter defaultCenter]
+		postNotificationName:OR1DHisotRebinChanged
+                      object:self];
+}
+
+- (unsigned short) rebinNumber
+{
+	return rebinNumber;
+}
+
+- (void) setRebinNumber:(unsigned int)avalue
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setRebinNumber:rebinNumber];
+    
+	if(avalue<1)avalue=1;
+	rebinNumber = avalue;
+    
+	[[NSNotificationCenter defaultCenter]
+		postNotificationName:OR1DHisotRebinNumberChanged
+                      object:self];
+}
+
 -(void)setNumberBins:(int)aNumberBins
 {
 	[dataSetLock lock];
@@ -83,8 +119,20 @@
 {
     unsigned long theValue;
 	[dataSetLock lock];
-    if(aChan<numberBins)theValue = histogram[aChan];
-    else theValue = 0;
+	
+	if(!rebin || rebinNumber == 0){
+		if(aChan<numberBins)theValue = histogram[aChan];
+		else theValue = 0;
+	}
+	else {
+		int i;
+		theValue =0;
+		int start = aChan*rebinNumber;
+		for(i=0;i<rebinNumber;i++){
+			theValue += histogram[start+i];
+		}
+	}
+	
 	[dataSetLock unlock];
     return theValue;
 }
@@ -114,12 +162,24 @@
 
 - (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-    return numberBins;
+	if(rebin && rebinNumber>1)return numberBins/rebinNumber;
+    else return numberBins;
 }
 
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
-    return [self value:x];
+	if(!rebin || rebinNumber == 0){
+		return [self value:x];
+	}
+	else {
+		int i;
+		long sum =0;
+		int start = x*rebinNumber;
+		for(i=0;i<rebinNumber;i++){
+			sum += [self value:start+i];
+		}
+		return sum;
+	}
 }
 - (void) setDataIds:(id)assigner
 {

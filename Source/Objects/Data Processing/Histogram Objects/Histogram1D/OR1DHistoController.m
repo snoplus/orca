@@ -20,6 +20,7 @@
 
 
 #pragma mark ¥¥¥Imported Files
+#import "OR1DHisto.h"
 #import "OR1DHistoController.h"
 #import "ORPlotter1D.h"
 #import "ORAxis.h"
@@ -40,6 +41,8 @@
     [super awakeFromNib];
 	[plotter setUseGradient:YES];
     [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+	[self rebinChanged:nil];
+	[self rebinNumberChanged:nil];
 
 }
 
@@ -49,11 +52,34 @@
     
     [super registerNotificationObservers];
     
+ 
      [notifyCenter addObserver : self
                      selector : @selector(mousePositionChanged:)
                          name : ORPlotter1DMousePosition
                        object : plotter];
     
+     [notifyCenter addObserver : self
+                     selector : @selector(rebinChanged:)
+                         name : OR1DHisotRebinChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(rebinNumberChanged:)
+                         name : OR1DHisotRebinNumberChanged
+                       object : model];
+
+}
+
+- (void) rebinNumberChanged:(NSNotification*) aNote
+{
+	[rebinNumberTextField setIntValue:[model rebinNumber]];
+    [plotter setNeedsDisplay:YES];
+}
+
+- (void) rebinChanged:(NSNotification*) aNote
+{
+	[rebinCB setIntValue:[model rebin]];
+    [plotter setNeedsDisplay:YES];
 }
 
 - (void) mousePositionChanged:(NSNotification*) aNote
@@ -76,7 +102,22 @@
 	[plotter copy:sender];
 }
 
+- (IBAction) rebinAction:(id)sender
+{
+	[model setRebin:[sender intValue]];
+}
+
+- (IBAction) rebinNumberAction:(id)sender
+{
+	[model setRebinNumber:[sender intValue]];
+}
+
 #pragma mark ¥¥¥Data Source
+- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+    return [model numberOfPointsInPlot:aPlotter dataSet:set];
+}
+
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [model numberBins];
