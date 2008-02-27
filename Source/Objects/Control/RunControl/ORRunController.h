@@ -18,8 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
 @class StopLightView;
 
 @interface ORRunController : OrcaObjectController  {
