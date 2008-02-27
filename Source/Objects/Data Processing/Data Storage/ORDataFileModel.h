@@ -52,9 +52,15 @@
 		float		maxFileSize;
 		int			fileSegment;
 		BOOL		fileLimitExceeded;
+		NSString* filePrefix;
+		BOOL useFolderStructure;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) useFolderStructure;
+- (void) setUseFolderStructure:(BOOL)aUseFolderStructure;
+- (NSString*) filePrefix;
+- (void) setFilePrefix:(NSString*)aFilePrefix;
 - (int) fileSegment;
 - (void) setFileSegment:(int)aFileSegment;
 - (float) maxFileSize;
@@ -101,6 +107,8 @@
 
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORDataFileModelUseFolderStructureChanged;
+extern NSString* ORDataFileModelFilePrefixChanged;
 extern NSString* ORDataFileModelFileSegmentChanged;
 extern NSString* ORDataFileModelMaxFileSizeChanged;
 extern NSString* ORDataFileModelLimitSizeChanged;

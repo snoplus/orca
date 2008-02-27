@@ -70,6 +70,16 @@ enum {
 
 #pragma  mark ¥¥¥Actions
 
+- (IBAction) useFolderStructureAction:(id)sender
+{
+	[model setUseFolderStructure:[sender intValue]];	
+}
+
+- (IBAction) filePrefixTextFieldAction:(id)sender
+{
+	[model setFilePrefix:[sender stringValue]];	
+}
+
 - (IBAction) maxFileSizeTextFieldAction:(id)sender
 {
 	[model setMaxFileSize:[sender floatValue]];	
@@ -119,6 +129,16 @@ enum {
 
 #pragma mark ¥¥¥Interface Management
 
+- (void) useFolderStructureChanged:(NSNotification*)aNote
+{
+	[useFolderStructureCB setIntValue: [model useFolderStructure]];
+}
+
+- (void) filePrefixChanged:(NSNotification*)aNote
+{
+	[filePrefixTextField setStringValue: [model filePrefix]];
+}
+
 - (void) maxFileSizeChanged:(NSNotification*)aNote
 {
 	[maxFileSizeTextField setFloatValue: [model maxFileSize]];
@@ -166,6 +186,12 @@ enum {
 					 selector : @selector(dirChanged:)
 						 name : ORFolderDirectoryNameChangedNotification
 						object: [model dataFolder]];
+ 
+	   [notifyCenter addObserver : self
+					 selector : @selector(dirChanged:)
+						 name : ORDataFileModelUseFolderStructureChanged
+						object: model];
+
 	
     [notifyCenter addObserver : self
 					 selector : @selector(copyEnabledChanged:)
@@ -207,6 +233,16 @@ enum {
                          name : ORRunStatusChangedNotification
 						object: nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(filePrefixChanged:)
+                         name : ORDataFileModelFilePrefixChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(useFolderStructureChanged:)
+                         name : ORDataFileModelUseFolderStructureChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -222,6 +258,8 @@ enum {
     [self lockChanged:nil];
 	[self limitSizeChanged:nil];
 	[self maxFileSizeChanged:nil];
+	[self filePrefixChanged:nil];
+	[self useFolderStructureChanged:nil];
 }
 
 
@@ -256,6 +294,8 @@ enum {
     [saveConfigurationCB setEnabled: !locked];
 	[maxFileSizeTextField setEnabled: !(locked || isRunning) && [model limitSize]];
 	[limitSizeCB setEnabled: !(locked || isRunning)];
+	[filePrefixTextField setEnabled:!(locked || isRunning)];
+	[useFolderStructureCB setEnabled:!(locked || isRunning)];
 }
 
 - (void) fileChanged:(NSNotification*)note
@@ -311,9 +351,14 @@ enum {
 
 - (void) dirChanged:(NSNotification*)note
 {    
-    ORSmartFolder* theDataFoler = [model dataFolder];
-    if(note==nil || [note object] == theDataFoler){
-		if([theDataFoler directoryName]!=nil)[dirTextField setStringValue: [theDataFoler directoryName]];
+    ORSmartFolder* theDataFolder = [model dataFolder];
+    if(note==nil || [note object] == theDataFolder || [note object] == model){
+		if([model useFolderStructure]){
+			if([theDataFolder finalDirectoryName]!=nil)[dirTextField setStringValue: [theDataFolder finalDirectoryName]];
+		}
+		else {
+			if([theDataFolder directoryName]!=nil)[dirTextField setStringValue: [theDataFolder directoryName]];
+		}
     }
 }
 

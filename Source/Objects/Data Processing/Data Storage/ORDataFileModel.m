@@ -26,6 +26,8 @@
 #import "ORSmartFolder.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORDataFileModelUseFolderStructureChanged = @"ORDataFileModelUseFolderStructureChanged";
+NSString* ORDataFileModelFilePrefixChanged = @"ORDataFileModelFilePrefixChanged";
 NSString* ORDataFileModelFileSegmentChanged = @"ORDataFileModelFileSegmentChanged";
 NSString* ORDataFileModelMaxFileSizeChanged = @"ORDataFileModelMaxFileSizeChanged";
 NSString* ORDataFileModelLimitSizeChanged = @"ORDataFileModelLimitSizeChanged";
@@ -68,6 +70,7 @@ static const int currentVersion = 1;           // Current version
 
 - (void) dealloc
 {
+    [filePrefix release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [filePointer release];
@@ -154,8 +157,8 @@ static const int currentVersion = 1;           // Current version
     if(saveConfiguration && [[self document] isDocumentEdited]){
         [[self document] saveDocument:nil];
         unsigned long runNumber = [[[aNotification userInfo] objectForKey:@"RunNumber"] longValue];
-        [configFolder ensureExists:[configFolder directoryName]]; 
-        [[self document] copyDocumentTo:[[configFolder directoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%d",runNumber]];
+        [configFolder ensureExists:[configFolder finalDirectoryName]]; 
+        [[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%d",runNumber]];
     }
 }
 
@@ -173,6 +176,38 @@ static const int currentVersion = 1;           // Current version
 
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) useFolderStructure
+{
+    return useFolderStructure;
+}
+
+- (void) setUseFolderStructure:(BOOL)aUseFolderStructure
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseFolderStructure:useFolderStructure];
+    
+    useFolderStructure = aUseFolderStructure;
+	[dataFolder setUseFolderStructure:aUseFolderStructure];
+	[configFolder setUseFolderStructure:aUseFolderStructure];
+	[statusFolder setUseFolderStructure:aUseFolderStructure];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelUseFolderStructureChanged object:self];
+}
+
+- (NSString*) filePrefix
+{
+    return filePrefix;
+}
+
+- (void) setFilePrefix:(NSString*)aFilePrefix
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFilePrefix:filePrefix];
+    if(aFilePrefix == nil)aFilePrefix = @"Run";
+    [filePrefix autorelease];
+    filePrefix = [aFilePrefix copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelFilePrefixChanged object:self];
+}
 
 - (int) fileSegment
 {
@@ -226,6 +261,7 @@ static const int currentVersion = 1;           // Current version
     [aDataFolder retain];
     [dataFolder release];
     dataFolder = aDataFolder;
+	[dataFolder setDefaultLastPathComponent:@"Data"];
 }
 
 - (ORSmartFolder *)statusFolder 
@@ -238,6 +274,7 @@ static const int currentVersion = 1;           // Current version
     [aStatusFolder retain];
     [statusFolder release];
     statusFolder = aStatusFolder;
+	[statusFolder setDefaultLastPathComponent:@"Logs"];
 }
 
 - (ORSmartFolder *)configFolder 
@@ -250,6 +287,7 @@ static const int currentVersion = 1;           // Current version
     [aConfigFolder retain];
     [configFolder release];
     configFolder = aConfigFolder;
+	[configFolder setDefaultLastPathComponent:@"Configurations"];
 }
 
 - (void) setFileName:(NSString*)aFileName
@@ -296,7 +334,7 @@ static const int currentVersion = 1;           // Current version
 
 - (NSString*) tempDir
 {
-    return [dataFolder ensureSubFolder:@"openFiles" inFolder:[dataFolder directoryName]];
+    return [dataFolder ensureSubFolder:@"openFiles" inFolder:[dataFolder finalDirectoryName]];
 }
 
 // ===========================================================
@@ -363,6 +401,7 @@ static const int currentVersion = 1;           // Current version
     
     if([[ORGlobal sharedInstance] runMode] == kNormalRun){
         //open file and write headers
+		if(filePrefix)[aDataPacket setFilePrefix:filePrefix];
         if([aDataPacket filePrefix]!=nil){
             [self setFileName:[NSString stringWithFormat:@"%@%d",[aDataPacket filePrefix],[aDataPacket runNumber]]];
         }
@@ -370,8 +409,8 @@ static const int currentVersion = 1;           // Current version
 		
         
         if(fileName){
-            NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
-            NSLog(@"Opening dataFile: %@\n",[fullFileName stringByAbbreviatingWithTildeInPath]);
+			NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
+			NSLog(@"Opening dataFile: %@\n",[fullFileName stringByAbbreviatingWithTildeInPath]);
 			
 			[[aDataPacket headerAsData] writeToFile:fullFileName atomically:YES];
 			NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:fullFileName];
@@ -421,7 +460,7 @@ static const int currentVersion = 1;           // Current version
         
         NSString* tmpFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
         NSLog(@"Closing dataFile: %@\n",[tmpFileName stringByAbbreviatingWithTildeInPath]);
-        NSString* fullFileName = [[[dataFolder directoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:[self fileName]];
+        NSString* fullFileName = [[[dataFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:[self fileName]];
 		BOOL copiedOK = [[NSFileManager defaultManager] movePath:tmpFileName toPath:fullFileName handler:nil];
         if(copiedOK){
             NSLog(@"Moving dataFile to : %@\n",[fullFileName stringByAbbreviatingWithTildeInPath]);
@@ -459,8 +498,8 @@ static const int currentVersion = 1;           // Current version
 	    //start a copy of the Status File
 	    statusFileName = [[NSString stringWithFormat:@"ORStatus_%d.log",[aDataPacket runNumber]] retain];
         
-        [statusFolder ensureExists:[statusFolder directoryName]];
-        NSString* fullStatusFileName = [[[statusFolder directoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
+        [statusFolder ensureExists:[statusFolder finalDirectoryName]];
+        NSString* fullStatusFileName = [[[statusFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
 	    NSFileManager* fm = [NSFileManager defaultManager];
 	    [fm createFileAtPath:fullStatusFileName contents:nil attributes:nil];
 	    NSFileHandle* statusFilePointer = [NSFileHandle fileHandleForWritingAtPath:fullStatusFileName];
@@ -558,6 +597,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setUseFolderStructure:[decoder decodeBoolForKey:@"ORDataFileModelUseFolderStructure"]];
+    [self setFilePrefix:[decoder decodeObjectForKey:@"ORDataFileModelFilePrefix"]];
     [self setMaxFileSize:[decoder decodeFloatForKey:@"ORDataFileModelMaxFileSize"]];
     [self setLimitSize:[decoder decodeBoolForKey:@"ORDataFileModelLimitSize"]];
     int  version = [decoder decodeIntForKey:ORDataVersion];
@@ -606,6 +647,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:useFolderStructure forKey:@"ORDataFileModelUseFolderStructure"];
+    [encoder encodeObject:filePrefix forKey:@"ORDataFileModelFilePrefix"];
     [encoder encodeFloat:maxFileSize forKey:@"ORDataFileModelMaxFileSize"];
     [encoder encodeBool:limitSize forKey:@"ORDataFileModelLimitSize"];
     [encoder encodeInt:currentVersion forKey:ORDataVersion];

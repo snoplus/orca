@@ -7,6 +7,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
 				<key>tasksCompleted</key>
 				<string>id</string>
 			</dict>
@@ -42,6 +44,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>filePrefixTextFieldAction</key>
+				<string>id</string>
 				<key>limitSizeAction</key>
 				<string>id</string>
 				<key>lockButtonAction</key>
@@ -51,6 +55,8 @@
 				<key>saveConfigurationAction</key>
 				<string>id</string>
 				<key>stopSendingAction</key>
+				<string>id</string>
+				<key>useFolderStructureAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -74,6 +80,8 @@
 				<key>deleteStatusField</key>
 				<string>NSTextField</string>
 				<key>dirTextField</key>
+				<string>NSTextField</string>
+				<key>filePrefixTextField</key>
 				<string>NSTextField</string>
 				<key>fileTextField</key>
 				<string>NSTextField</string>
@@ -99,6 +107,8 @@
 				<string>NSButton</string>
 				<key>tabView</key>
 				<string>NSTabView</string>
+				<key>useFolderStructureCB</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
