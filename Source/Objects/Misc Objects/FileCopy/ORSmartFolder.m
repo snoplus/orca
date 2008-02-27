@@ -224,6 +224,40 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
                           object: self];
 }
 
+- (BOOL) useFolderStructure
+{
+	return useFolderStructure;
+}
+
+- (void) setUseFolderStructure:(BOOL)aFlag;
+{
+	useFolderStructure = aFlag;
+}
+
+- (NSString*) finalDirectoryName
+{
+	NSCalendarDate* date = [NSCalendarDate date];
+	NSString* year  = [NSString stringWithFormat:@"%d",[date yearOfCommonEra]];
+	NSString* month = [NSString stringWithFormat:@"%d",[date monthOfYear]];
+	NSString* path = [self directoryName];
+	path = [path stringByAppendingPathComponent:year];
+	path = [path stringByAppendingPathComponent:month];
+	
+	if(defaultLastPathComponent) path = [path stringByAppendingPathComponent:defaultLastPathComponent];
+	return path;
+}
+
+- (NSString*) defaultLastPathComponent
+{
+	return defaultLastPathComponent;
+}
+
+- (void) setDefaultLastPathComponent:(NSString*)aString
+{
+    [defaultLastPathComponent autorelease];
+    defaultLastPathComponent = [aString copy];
+}
+
 
 - (NSString*) directoryName
 {
@@ -235,7 +269,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
     
     [directoryName autorelease];
     directoryName = [aNewDirectoryName copy];
-    
+ 	      
     [[NSNotificationCenter defaultCenter] 
 		    postNotificationName:ORFolderDirectoryNameChangedNotification 
                           object: self];

@@ -1,42 +1,108 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {
-            ACTIONS = {
-                chooseDirButtonAction = id; 
-                copyButtonAction = id; 
-                copyEnabledAction = id; 
-                deleteButtonAction = id; 
-                deleteEnabledAction = id; 
-                lockButtonAction = id; 
-                passWordSecureTextFieldAction = id; 
-                remoteHostTextFieldAction = id; 
-                remotePathTextFieldAction = id; 
-                transferPopupButtonAction = id; 
-                userNameTextFieldAction = id; 
-                verboseButtonAction = id; 
-            }; 
-            CLASS = ORSmartFolder; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                chooseDirButton = NSButton; 
-                copyButton = NSButton; 
-                deleteButton = NSButton; 
-                dirTextField = NSTextField; 
-                enableCopyButton = NSButton; 
-                enableDeleteButton = NSButton; 
-                lockButton = NSButton; 
-                passWordSecureTextField = NSSecureTextField; 
-                remoteHostTextField = NSTextField; 
-                remotePathTextField = NSTextField; 
-                titleField = NSTextField; 
-                transferTypePopupButton = NSPopUpButton; 
-                userNameTextField = NSTextField; 
-                verboseButton = NSButton; 
-                view = NSView; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>chooseDirButtonAction</key>
+				<string>id</string>
+				<key>copyButtonAction</key>
+				<string>id</string>
+				<key>copyEnabledAction</key>
+				<string>id</string>
+				<key>deleteButtonAction</key>
+				<string>id</string>
+				<key>deleteEnabledAction</key>
+				<string>id</string>
+				<key>lockButtonAction</key>
+				<string>id</string>
+				<key>passWordSecureTextFieldAction</key>
+				<string>id</string>
+				<key>remoteHostTextFieldAction</key>
+				<string>id</string>
+				<key>remotePathTextFieldAction</key>
+				<string>id</string>
+				<key>transferPopupButtonAction</key>
+				<string>id</string>
+				<key>userNameTextFieldAction</key>
+				<string>id</string>
+				<key>verboseButtonAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORSmartFolder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>chooseDirButton</key>
+				<string>NSButton</string>
+				<key>copyButton</key>
+				<string>NSButton</string>
+				<key>deleteButton</key>
+				<string>NSButton</string>
+				<key>dirTextField</key>
+				<string>NSTextField</string>
+				<key>enableCopyButton</key>
+				<string>NSButton</string>
+				<key>enableDeleteButton</key>
+				<string>NSButton</string>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>passWordSecureTextField</key>
+				<string>NSSecureTextField</string>
+				<key>remoteHostTextField</key>
+				<string>NSTextField</string>
+				<key>remotePathTextField</key>
+				<string>NSTextField</string>
+				<key>titleField</key>
+				<string>NSTextField</string>
+				<key>transferTypePopupButton</key>
+				<string>NSPopUpButton</string>
+				<key>userNameTextField</key>
+				<string>NSTextField</string>
+				<key>verboseButton</key>
+				<string>NSButton</string>
+				<key>view</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

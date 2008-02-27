@@ -58,6 +58,8 @@
 	NSWindow*   window;
 	BOOL	    sheetDisplayed;
 	BOOL	    lockEnabledState;
+	BOOL		useFolderStructure;
+	NSString*	defaultLastPathComponent;
 	
         //------------------internal use only
         NSString*	statusFileName;
@@ -97,10 +99,14 @@
 
 #pragma mark ***Accessors
 - (NSUndoManager*) undoManager;
+- (BOOL) useFolderStructure;
+- (void) setUseFolderStructure:(BOOL)aFlag;
 - (BOOL) copyEnabled;
 - (void) setCopyEnabled:(BOOL)aNewCopyEnabled;
 - (BOOL) deleteWhenCopied;
 - (void) setDeleteWhenCopied:(BOOL)aNewDeleteWhenCopied;
+- (NSString*) defaultLastPathComponent;
+- (void) setDefaultLastPathComponent:(NSString*)aString;
 - (NSString*) remoteHost;
 - (void) setRemoteHost:(NSString*)aNewRemoteHost;
 - (NSString*) remotePath;
@@ -111,6 +117,7 @@
 - (void) setPassWord:(NSString*)aNewPassWord;
 - (BOOL) verbose;
 - (void) setVerbose:(BOOL)aNewVerbose;
+- (NSString*) finalDirectoryName;
 - (NSString*) directoryName;
 - (void) setDirectoryName:(NSString*)aNewDirectoryName;
 - (BOOL) queueIsRunning;
