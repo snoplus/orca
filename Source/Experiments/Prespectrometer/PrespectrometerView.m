@@ -38,10 +38,16 @@
 			NSRect theRect = NSOffsetRect(segRect,j*segSize,-i*segSize - segSize);
 			[aPath appendBezierPathWithRect:theRect];
 			[segmentPaths addObject:aPath];
+
+			[labelPathSet addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+												[NSNumber numberWithFloat:theRect.origin.x+3],@"X",
+												[NSNumber numberWithFloat:NSMidY(theRect)],@"Y",nil]];
 			
+
 			theRect = NSInsetRect(theRect,segSize/2.5,segSize/2.5);
 			aPath = [[NSBezierPath bezierPathWithOvalInRect:theRect] retain];
 			[errorPaths addObject:aPath];
+			
 		}
 	}
 	[segmentPathSet addObject:segmentPaths];
