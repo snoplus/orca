@@ -27,6 +27,7 @@
 	@protected
 		NSMutableArray* segmentPathSet;
 		NSMutableArray* errorPathSet;
+		NSMutableArray* labelPathSet;
 		int selectedSet;
 		int selectedPath;
 		id delegate;

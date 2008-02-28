@@ -34,12 +34,15 @@
 	BOOL			somethingSelected;
 	int				displayType;
 	BOOL			scheduledToHistogram;
+    BOOL showNames;
 }
 
 - (id) init;
 - (void) registerNotificationObservers;
 
 #pragma mark •••Accessors
+- (BOOL) showNames;
+- (void) setShowNames:(BOOL)aShowNames;
 - (int) displayType;
 - (void) setDisplayType:(int)aDisplayType;
 - (NSString*) selectionString;
@@ -92,6 +95,7 @@
 
 @end
 
+extern NSString* ORExperimentModelShowNamesChanged;
 extern NSString* ExperimentModelDisplayTypeChanged;
 extern NSString* ExperimentModelSelectionStringChanged;
 extern NSString* ExperimentHardwareCheckChangedNotification;

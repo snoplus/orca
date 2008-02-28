@@ -28,6 +28,7 @@
 #import "ORDetectorSegment.h"
 #import "ORSegmentGroup.h"
 
+NSString* ORExperimentModelShowNamesChanged = @"ORExperimentModelShowNamesChanged";
 NSString* ExperimentModelDisplayTypeChanged				 = @"ExperimentModelDisplayTypeChanged";
 NSString* ExperimentModelSelectionStringChanged			 = @"ExperimentModelSelectionStringChanged";
 NSString* ExperimentHardwareCheckChangedNotification     = @"ExperimentHardwareCheckChangedNotification";
@@ -236,6 +237,20 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) showNames
+{
+    return showNames;
+}
+
+- (void) setShowNames:(BOOL)aShowNames
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowNames:showNames];
+    
+    showNames = aShowNames;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORExperimentModelShowNamesChanged object:self];
+}
 - (void) setSomethingSelected:(BOOL)aFlag
 {
     somethingSelected = aFlag;
@@ -374,6 +389,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setShowNames:[decoder decodeBoolForKey:@"ORExperimentModelShowNames"]];
     [self setDisplayType:[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
     [self setCaptureDate:[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
 	segmentGroups = [[decoder decodeObjectForKey:	 @"ExperimentSegmentGroups"] retain];
@@ -389,6 +405,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:showNames forKey:@"ORExperimentModelShowNames"];
     [encoder encodeInt:displayType forKey:   @"ExperimentModelDisplayType"];
     [encoder encodeObject:captureDate forKey:@"ExperimentCaptureDate"];
     [encoder encodeObject:segmentGroups forKey:@"ExperimentSegmentGroups"];

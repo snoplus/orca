@@ -27,6 +27,7 @@
 
 @interface ORExperimentController : OrcaObjectController {
     IBOutlet NSTabView*		tabView;
+	IBOutlet NSButton*		showNamesCB;
 
 	//detector View tab view
 	IBOutlet NSMatrix*		displayTypeMatrix;
@@ -49,6 +50,11 @@
     IBOutlet NSTextField*	runNumberField;
     IBOutlet NSTextField*	runStatusField;
     IBOutlet NSTextField*	elapsedTimeField;
+    IBOutlet NSButton*      timedRunCB;
+    IBOutlet NSButton*      repeatRunCB;
+    IBOutlet NSTextField*   timeLimitField;
+    IBOutlet NSMatrix*      runModeMatrix;
+    IBOutlet NSProgressIndicator* 	runBar;
 
 	//items in the  details tab view
 	IBOutlet NSMatrix*		displayTypeMatrix1;
@@ -78,6 +84,7 @@
 - (void) setDetectorTitle;
 
 #pragma mark •••Actions
+- (IBAction) showNamesAction:(id)sender;
 - (IBAction) displayTypeAction:(id)sender;
 - (IBAction) primaryAdcClassNameAction:(id)sender;
 - (IBAction) mapLockAction:(id)sender;
@@ -88,6 +95,10 @@
 - (IBAction) savePrimaryMapFileAction:(id)sender;
 - (IBAction) startRunAction:(id)sender;
 - (IBAction) stopRunAction:(id)sender;
+- (IBAction) timeLimitTextAction:(id)sender;
+- (IBAction) timedRunCBAction:(id)sender;
+- (IBAction) repeatRunCBAction:(id)sender;
+- (IBAction) runModeAction:(id)sender;
 
 #pragma mark •••Details Actions
 - (IBAction) detailsLockAction:(id)sender;
@@ -95,6 +106,7 @@
 
 
 #pragma mark •••Interface Management
+- (void) showNamesChanged:(NSNotification*)aNote;
 - (void) updateRunInfo:(NSNotification*)aNote;
 - (void) findRunControl:(NSNotification*)aNote;
 - (void) selectionChanged:(NSNotification*)aNote;
@@ -117,6 +129,11 @@
 - (void) updateForReplayMode;
 - (void) newTotalRateAvailable:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNotification;
+- (void) timedRunChangted:(NSNotification*)aNote;
+- (void) runModeChanged:(NSNotification*)aNote;
+- (void) runTimeLimitChanged:(NSNotification*)aNote;
+- (void) repeatRunChanged:(NSNotification*)aNote;
+-(void) elapsedTimeChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Details Interface Management
 - (void) histogramsUpdated:(NSNotification*)aNote;

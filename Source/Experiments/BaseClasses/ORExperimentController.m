@@ -227,10 +227,36 @@
 						 name : ORRunStatusChangedNotification
 					   object : nil];
 
+
     [notifyCenter addObserver : self
-					 selector : @selector(updateRunInfo:)
-						 name : ORRunElapsedTimeChangedNotification
+					 selector : @selector(timedRunChangted:)
+						 name : ORRunTimedRunChangedNotification
 					   object : nil];
+
+   [notifyCenter addObserver : self
+					 selector : @selector(repeatRunChanged:)
+						 name : ORRunRepeatRunChangedNotification
+					   object : nil];
+
+   [notifyCenter addObserver : self
+					 selector : @selector(runTimeLimitChanged:)
+						 name : ORRunTimeLimitChangedNotification
+					   object : nil];
+
+   [notifyCenter addObserver : self
+					 selector : @selector(runModeChanged:)
+						 name : ORRunModeChangedNotification
+					   object : nil];
+
+   [notifyCenter addObserver: self
+                     selector: @selector(elapsedTimeChanged:)
+                         name: ORRunElapsedTimeChangedNotification
+                       object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(showNamesChanged:)
+                         name : ORExperimentModelShowNamesChanged
+						object: model];
 
 }
 
@@ -250,6 +276,12 @@
 	[self displayTypeChanged:nil];	
 	[self primaryAdcClassNameChanged:nil];
 	[self selectionChanged:nil];
+
+	[self timedRunChangted:nil];
+	[self runModeChanged:nil];
+	[self runTimeLimitChanged:nil];
+	[self repeatRunChanged:nil];
+	[self elapsedTimeChanged:nil];
 	
 		//details
 	[self detailsLockChanged:nil];
@@ -258,6 +290,7 @@
 	[self scaleValueHistogram];
     [valueHistogramsPlot setNeedsDisplay:YES];
 	[primaryValuesView reloadData];
+	[self showNamesChanged:nil];
 }
 
 - (void) findRunControl:(NSNotification*)aNote
@@ -267,20 +300,60 @@
 	[startRunButton setEnabled:runControl!=nil];
 }
 
+- (void) timedRunChangted:(NSNotification*)aNote
+{
+	[timedRunCB setIntValue:[runControl timedRun]];
+	[repeatRunCB setEnabled:[runControl timedRun]];
+	[timeLimitField setEnabled:[runControl timedRun]];
+}
+
+- (void) runModeChanged:(NSNotification*)aNote
+{
+	[runModeMatrix selectCellWithTag: [[ORGlobal sharedInstance] runMode]];
+}
+
+- (void) runTimeLimitChanged:(NSNotification*)aNote
+{
+	[timeLimitField setIntValue:[runControl timeLimit]];		
+}
+
+- (void) repeatRunChanged:(NSNotification*)aNote
+{
+	[repeatRunCB setIntValue:[runControl repeatRun]];
+}
+
+
+-(void) elapsedTimeChanged:(NSNotification*)aNotification
+{
+
+	[elapsedTimeField setStringValue:[runControl elapsedTimeString]];
+	
+	if([runControl timedRun]){
+		double timeLimit = [runControl timeLimit];
+		double elapsedTime = [runControl elapsedTime];
+		[runBar setDoubleValue:100*elapsedTime/timeLimit];
+	}
+}
+
+
 - (void) updateRunInfo:(NSNotification*)aNote
 {
 	if(runControl)	{
 		[runStatusField setStringValue:[runControl shortStatus]];
 		[runNumberField setIntValue:[runControl runNumber]];
+		
 		if([runControl isRunning]){
-			int hr,min,sec;
-			NSTimeInterval elapsedTime = [runControl elapsedTime];
-			hr = elapsedTime/3600;
-			min =(elapsedTime - hr*3600)/60;
-			sec = elapsedTime - hr*3600 - min*60;
-			[elapsedTimeField setStringValue:[NSString stringWithFormat:@"%02d:%02d:%02d",hr,min,sec]];
+			[runBar setIndeterminate:!([runControl timedRun] && ![runControl remoteControl])];
+			[runBar setDoubleValue:0];
+			[runBar startAnimation:self];
+
 		}
-		else [elapsedTimeField setStringValue:@"---"];
+		else {
+			[elapsedTimeField setStringValue:@"---"];
+			[runBar setDoubleValue:0];
+			[runBar stopAnimation:self];
+			[runBar setIndeterminate:NO];
+		}
 	}
 	else {
 		[runStatusField setStringValue:@"---"];
@@ -288,6 +361,9 @@
 		[elapsedTimeField setStringValue:@"---"];
 	}
 	[stopRunButton setEnabled:[runControl isRunning]];
+	[timedRunCB setEnabled:![runControl isRunning]];
+	[timeLimitField setEnabled:![runControl isRunning]];
+	[runModeMatrix setEnabled:![runControl isRunning]];
 }
 
 
@@ -302,6 +378,12 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) showNamesAction:(id)sender
+{
+	[model setShowNames:[sender intValue]];	
+}
+
 - (IBAction) startRunAction:(id)sender
 {
 	if([runControl isRunning])[runControl restartRun];
@@ -310,7 +392,30 @@
 
 - (IBAction) stopRunAction:(id)sender
 {
-	[runControl stopRun];
+	[runControl haltRun];
+}
+
+- (IBAction) timeLimitTextAction:(id)sender
+{
+	[runControl setTimeLimit:[sender intValue]];
+}
+
+- (IBAction) timedRunCBAction:(id)sender
+{
+	[runControl setTimedRun:[sender intValue]];
+}
+
+- (IBAction) repeatRunCBAction:(id)sender
+{
+	[runControl setRepeatRun:[sender intValue]];
+}
+
+- (IBAction) runModeAction:(id)sender
+{
+    int tag = [[runModeMatrix selectedCell] tag];
+    if(tag != [[ORGlobal sharedInstance] runMode]){
+        [[ORGlobal sharedInstance] setRunMode:tag];
+    }
 }
 
 - (IBAction) displayTypeAction:(id)sender
@@ -389,10 +494,6 @@
                           contextInfo:NULL];
 }
 
-
-
-
-
 - (IBAction) mapLockAction:(id)sender
 {
     [gSecurity tryToSetLock:[model experimentMapLock] to:[sender intValue] forWindow:[self window]];
@@ -417,6 +518,13 @@
 }
 
 #pragma mark •••Interface Management
+
+- (void) showNamesChanged:(NSNotification*)aNote
+{
+	[showNamesCB setIntValue: [model showNames]];
+	[detectorView setNeedsDisplay:YES];
+}
+
 - (void) scaleAction:(NSNotification*)aNotification
 {
 	if(aNotification == nil || [aNotification object] == [ratePlot xScale]){

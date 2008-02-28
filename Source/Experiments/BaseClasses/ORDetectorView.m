@@ -49,6 +49,8 @@
 	[segmentPathSet removeAllObjects];
 	if(!errorPathSet)errorPathSet = [[NSMutableArray array] retain];
 	[errorPathSet removeAllObjects];
+	if(!labelPathSet)labelPathSet = [[NSMutableArray array] retain];
+	[labelPathSet removeAllObjects];
 }
 
 - (BOOL) acceptsFirstResponder
@@ -135,6 +137,10 @@
 	BOOL displayErrors = ([delegate hardwareCheck]==0) || ([delegate cardCheck]==0);
 	int setIndex;
 	int numSets = [segmentPathSet count];
+	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+																		[NSFont fontWithName:@"Monaco" size:9], NSFontAttributeName,
+																		[NSColor whiteColor], NSForegroundColorAttributeName,
+																		nil];	
 	for(setIndex = 0;setIndex<numSets;setIndex++){
 		int segmentIndex;
 		NSArray* arrayOfSegmentPaths = [segmentPathSet objectAtIndex:setIndex];
@@ -184,7 +190,24 @@
 		[[NSColor colorWithCalibratedRed:.7 green:.2 blue:.2 alpha:1] set];
 		[segmentPath stroke];
 	}
-} 
+
+	if([delegate showNames]){
+		for(setIndex = 0;setIndex<numSets;setIndex++){
+			int segmentIndex;
+			NSArray* arrayOfSegmentPaths = [segmentPathSet objectAtIndex:setIndex];
+			int numSegments = [arrayOfSegmentPaths count];
+			ORSegmentGroup* segmentGroup = [delegate segmentGroup:setIndex];
+			for(segmentIndex = 0;segmentIndex<numSegments;segmentIndex++){
+				NSString* name = [[segmentGroup segment:segmentIndex] objectForKey:@"kName"];
+				ORDetectorSegment* seg = [labelPathSet objectAtIndex:segmentIndex];
+				float x = [[seg objectForKey:@"X"] floatValue];
+				float y = [[seg objectForKey:@"Y"] floatValue];
+				
+				[name drawAtPoint:NSMakePoint(x,y) withAttributes:attributes];
+			}
+		}
+	} 
+}
 
 - (void)setFrameSize:(NSSize)newSize
 {

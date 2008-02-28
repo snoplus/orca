@@ -24,7 +24,8 @@
 typedef  enum  kSegmentNameConstants { //don't change the order
     kSegmentNumber,
     kCardSlot,         
-    kChannel,      
+    kChannel,
+	kName,      
     kNumKeys //must be last
 }kSegmentNameConstants;
 
@@ -47,6 +48,7 @@ typedef  enum  kSegmentNameConstants { //don't change the order
 
 #pragma mark ¥¥¥Accessors
 - (id) description;
+- (NSString*) name;
 - (id) hardwareCard;
 - (void) setShape:(NSBezierPath*)aPath;
 - (void) setErrorShape:(NSBezierPath*)aPath;

@@ -35,6 +35,7 @@ static struct {
 	{ @"kSegmentNumber",	0},
 	{ @"kCardSlot",			0},
 	{ @"kChannel",			0},
+	{ @"kName",				0},
 };
 
 NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
@@ -49,6 +50,7 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 	
 	[self setObject:@"--" forKey:kSegmentParam[kCardSlot].key];
 	[self setObject:@"--" forKey:kSegmentParam[kChannel].key];
+	[self setObject:@"--" forKey:kSegmentParam[kName].key];
     return self;
 }
 
@@ -81,6 +83,10 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 	errorShape = aPath;
 }
 
+- (NSString*) name
+{
+	return [params objectForKey:kSegmentParam[kName].key];
+}
 
 - (short) threshold
 {
@@ -373,6 +379,7 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 	string = [string stringByAppendingFormat:   @"Channel  : %d\n",[self channel]];
 	string = [string stringByAppendingFormat:   @"Threshold: %d\n",[self threshold]];
 	string = [string stringByAppendingFormat:   @"Gain     : %d\n",[self gain]];
+	if([self name])string = [string stringByAppendingFormat:   @"Name     : %@\n",[self name]];
 	return string;
 }
 
