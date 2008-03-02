@@ -125,7 +125,12 @@
 	}
 	[delegate selectedSet:selectedSet segment:selectedPath];
 	if(selectedSet>=0 && selectedPath>=0 && [anEvent clickCount] >= 2){
-		[delegate showDialogForSet:selectedSet segment:selectedPath];
+		if([anEvent modifierFlags] & NSCommandKeyMask){
+			[delegate showDataSetForSet:selectedSet segment:selectedPath];
+		}
+		else {
+			[delegate showDialogForSet:selectedSet segment:selectedPath];
+		}
 	}
 	[self setNeedsDisplay:YES];
 }

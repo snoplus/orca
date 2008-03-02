@@ -35,6 +35,15 @@
     return result;
 }
 
+- (id) objectForKeyArray:(NSMutableArray*)anArray
+{
+	if([anArray count] == 0)return self;
+	else {
+		id aKey = [anArray objectAtIndex:0];
+		[anArray removeObjectAtIndex:0];
+		return [[self objectForKey:aKey] objectForKeyArray:anArray];;
+    }
+}
 
 - (id) nestedObjectForKey:(id)firstKey,...
 {

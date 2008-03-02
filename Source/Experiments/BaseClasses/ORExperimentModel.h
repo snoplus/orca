@@ -78,6 +78,7 @@
 - (void) collectRatesFromAllGroups;
 - (ORSegmentGroup*) segmentGroup:(int)aSet;
 - (void) showDialogForSet:(int)setIndex segment:(int)index;
+- (void) showDataSetForSet:(int)aSet segment:(int)index;
 - (void) setSegmentErrorClassName:(NSString*)aClassName card:(int)card channel:(int)channel;
 - (void) histogram;
 - (void) initHardware;

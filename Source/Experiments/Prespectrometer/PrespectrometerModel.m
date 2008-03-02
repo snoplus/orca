@@ -22,6 +22,7 @@
 #pragma mark ¥¥¥Imported Files
 #import "PrespectrometerModel.h"
 #import "ORSegmentGroup.h"
+#import "ORDataSet.h"
 
 @implementation PrespectrometerModel
 
@@ -41,6 +42,40 @@
     ORSegmentGroup* group = [[ORSegmentGroup alloc] initWithName:@"Prespectrometer" numSegments:64];
 	[self addGroup:group];
 	[group release];
+}
+
+- (void) showDataSetForSet:(int)aSet segment:(int)index
+{ 
+	if(aSet>=0 && aSet < [segmentGroups count]){
+		ORSegmentGroup* aGroup = [segmentGroups objectAtIndex:aSet];
+		NSString* cardName = [aGroup segment:index objectForKey:@"kCardSlot"];
+		NSString* chanName = [aGroup segment:index objectForKey:@"kChannel"];
+		if(cardName && chanName && ![cardName hasPrefix:@"-"] && ![chanName hasPrefix:@"-"]){
+			ORDataSet* aDataSet = nil;
+			[[[self document] collectObjectsOfClass:NSClassFromString(@"OrcaObject")] makeObjectsPerformSelector:@selector(clearLoopChecked)];
+			NSArray* objs = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+			if([objs count]){
+				NSArray* arrayOfHistos = [[objs objectAtIndex:0] collectConnectedObjectsOfClass:NSClassFromString(@"ORHistoModel")];
+				if([arrayOfHistos count]){
+					id histoObj = [arrayOfHistos objectAtIndex:0];
+					if([[aGroup adcClassName] isEqualToString:@"ORShaperModel"]){
+						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper", @"Crate  0",
+																[NSString stringWithFormat:@"Card %2d",[cardName intValue]], 
+																[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
+																nil]];
+					}
+					else if([[aGroup adcClassName] isEqualToString:@"ORKatrinFLTModel"]){
+						aDataSet = [histoObj objectForKeyArray:[NSMutableArray arrayWithObjects:@"Shaper", @"Crate  0",
+																[NSString stringWithFormat:@"Station %2d",[cardName intValue]], 
+																[NSString stringWithFormat:@"Channel %2d",[chanName intValue]],
+																nil]];
+					}
+					
+					[aDataSet doDoubleClick:nil];
+				}
+			}
+		}
+	}
 }
 
 - (int)  maxNumSegments

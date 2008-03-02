@@ -188,6 +188,16 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 	++totalCounts;
 }
 
+- (id) objectForKeyArray:(NSMutableArray*)anArray
+{
+	if([anArray count] == 0)return data;
+	else {
+		id aKey = [anArray objectAtIndex:0];
+		[anArray removeObjectAtIndex:0];
+		return [[realDictionary objectForKey:aKey] objectForKeyArray:anArray];;
+    }
+}
+
 #pragma mark •••Writing Data
 - (void) writeDataToFile:(FILE*)aFile
 {

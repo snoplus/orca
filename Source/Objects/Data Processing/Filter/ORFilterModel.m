@@ -177,6 +177,14 @@ int filterGraph(nodeType*);
 	
 }
 
+- (NSArray*) collectConnectedObjectsOfClass:(Class)aClass
+{
+    NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
+	id obj = [[connectors objectForKey:ORFilterOutConnector] connectedObject];
+	[collection addObjectsFromArray:[obj collectConnectedObjectsOfClass:aClass]];
+	return collection;
+}
+
 - (void) removeInputValue:(int)i
 {
 	[inputValues removeObjectAtIndex:i];

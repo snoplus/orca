@@ -146,6 +146,13 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 		[aGroup showDialogForSegment:index];
 	}
 }
+
+- (void) showDataSetForSet:(int)aSet segment:(int)index
+{ 
+	//not implemented... up to subclasses to define
+}
+
+
 - (void) histogram
 {
 	[segmentGroups makeObjectsPerformSelector:@selector(histogram)];
@@ -251,6 +258,7 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORExperimentModelShowNamesChanged object:self];
 }
+
 - (void) setSomethingSelected:(BOOL)aFlag
 {
     somethingSelected = aFlag;

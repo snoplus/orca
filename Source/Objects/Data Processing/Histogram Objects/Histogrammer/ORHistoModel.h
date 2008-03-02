@@ -43,6 +43,7 @@
 - (void) makeConnectors;
 
 #pragma mark ¥¥¥Accessors
+- (id) objectForKeyArray:(NSMutableArray*)anArray;
 - (ORDataSet*) 	dataSet;
 - (void)        setDataSet:(ORDataSet*)aDataSet;
 - (void)        setDirectoryName:(NSString*)aFileName;

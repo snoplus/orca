@@ -37,6 +37,7 @@
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (id) objectForKeyArray:(NSMutableArray*)anArray;
 - (ORDataSet*) dataSetWithName:(NSString*)aName;
 - (void) setKey:(NSString*)aKey;
 - (NSString*) key;

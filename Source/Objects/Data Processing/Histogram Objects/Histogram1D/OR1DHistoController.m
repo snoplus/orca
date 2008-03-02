@@ -70,15 +70,32 @@
 
 }
 
+- (void) dataSetChanged:(NSNotification*)aNotification
+{
+	[self rebinNumberChanged:nil];
+	[self rebinChanged:nil];
+	
+	[super dataSetChanged:aNotification];
+}
+
 - (void) rebinNumberChanged:(NSNotification*) aNote
 {
 	[rebinNumberTextField setIntValue:[model rebinNumber]];
+	if([model fullName]){
+        [[self window] setTitle:[model fullName]];
+        [titleField setStringValue:[model fullName]];
+    }
+
     [plotter setNeedsDisplay:YES];
 }
 
 - (void) rebinChanged:(NSNotification*) aNote
 {
 	[rebinCB setIntValue:[model rebin]];
+	if([model fullName]){
+        [[self window] setTitle:[model fullName]];
+        [titleField setStringValue:[model fullName]];
+    }
     [plotter setNeedsDisplay:YES];
 }
 
@@ -95,7 +112,6 @@
     }
 }
 
-
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender
 {
@@ -104,6 +120,7 @@
 
 - (IBAction) rebinAction:(id)sender
 {
+	[self endEditing];
 	[model setRebin:[sender intValue]];
 }
 

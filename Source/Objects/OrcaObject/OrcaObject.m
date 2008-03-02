@@ -614,6 +614,41 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     else return nil;
 }
 
+- (BOOL) loopChecked
+{
+	return loopChecked;
+}
+
+- (void) setLoopChecked:(BOOL)aFlag
+{
+	loopChecked = aFlag;
+}
+- (void) clearLoopChecked
+{
+	loopChecked = NO;
+}
+
+- (NSArray*) collectConnectedObjectsOfClass:(Class)aClass
+{
+    NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
+	[self setLoopChecked:YES];
+	NSEnumerator* e = [connectors objectEnumerator];
+	id obj;
+	while(obj = [e nextObject]){
+		id connectedObject = [obj connectedObject];
+		if(![connectedObject loopChecked]){
+			[connectedObject setLoopChecked:YES];
+			if([self isKindOfClass:aClass]){
+				[collection addObject:self];
+			}
+			[collection addObjectsFromArray:[connectedObject collectConnectedObjectsOfClass:aClass]];
+		}
+	}
+	return collection;
+}
+
+
+
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     //subclass responsibility

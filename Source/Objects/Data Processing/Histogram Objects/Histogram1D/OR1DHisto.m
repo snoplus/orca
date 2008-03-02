@@ -76,6 +76,7 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
 
 - (unsigned short) rebinNumber
 {
+	if(rebinNumber==0)rebinNumber = 1;
 	return rebinNumber;
 }
 
@@ -164,6 +165,14 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
 {
 	if(rebin && rebinNumber>1)return numberBins/rebinNumber;
     else return numberBins;
+}
+
+- (NSString*) fullName
+{
+	if(rebin && rebinNumber>=2){
+		return [NSString stringWithFormat:@"%@ (%d->1)",[super fullName],rebinNumber];
+	}
+	else return [super fullName];
 }
 
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 

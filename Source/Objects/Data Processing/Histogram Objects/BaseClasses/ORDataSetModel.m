@@ -57,6 +57,7 @@ NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
 {
 	dataSet = aDataSet;	 //don't retain things like this.
 }
+
 - (id) dataSet
 {
 	return dataSet;

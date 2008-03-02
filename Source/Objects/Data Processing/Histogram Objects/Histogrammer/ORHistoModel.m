@@ -137,6 +137,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	return theCollection;
 }
 
+- (id) objectForKeyArray:(NSMutableArray*)anArray
+{
+	return [dataSet objectForKeyArray:anArray] ;
+}
 
 #pragma mark ¥¥¥Accessors
 - (ORDataSet*) dataSet

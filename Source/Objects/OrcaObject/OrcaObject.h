@@ -47,7 +47,7 @@ extern NSString* ORObjArrayPtrPBType;
         NSMutableDictionary* connectors;
  		BOOL		alreadyVisitedInChainSearch;
         NSMutableDictionary* miscAttributes;
-		
+		BOOL	loopChecked;
     @private
         //internal flags
         BOOL		aWake;
@@ -64,6 +64,9 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) makeMainController;
 
 #pragma mark ¥¥¥Accessors
+- (void)		setLoopChecked:(BOOL)aFlag;
+- (void)		clearLoopChecked;
+- (BOOL)		loopChecked;
 - (int)			x;
 - (int) 		y;
 - (id) 			guardian;
@@ -144,6 +147,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) setHighlightedYES;
 - (void) setHighlightedNO;
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
+- (NSArray*) collectConnectedObjectsOfClass:(Class)aClass;
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol;
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
 - (id) findObjectWithFullID:(NSString*)aFullID;
