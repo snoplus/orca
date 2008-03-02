@@ -97,10 +97,12 @@
 
 - (IBAction) removeItemAction:(id)sender
 { 
-    [model removeFilesWithIndexes:[fileListView selectedRowIndexes]];
+	NSIndexSet* selectedSet = [fileListView selectedRowIndexes];
+	[fileListView deselectAll:self];
+
+    [model removeFilesWithIndexes:selectedSet];
     
     [fileListView reloadData];
-    [fileListView deselectAll:self];
 }
 
 
@@ -335,6 +337,7 @@
 
 - (void) fileListChanged:(NSNotification*)note
 {
+	[fileListView reloadData];
 	[self loadHeader];
 }
 

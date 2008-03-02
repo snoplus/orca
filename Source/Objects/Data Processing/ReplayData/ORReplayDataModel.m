@@ -297,25 +297,22 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 
 - (void) removeFilesWithIndexes:(NSIndexSet*)indexSet;
 {
-    NSRange theRange = NSMakeRange(0,100);
-    unsigned int buffer[100];
     NSMutableArray* filesToRemove = [NSMutableArray array];
-    while(1){
-        unsigned int n = [indexSet getIndexes:buffer maxCount:100 inIndexRange:&theRange];
-        int i;
-        for(i=0;i<n;i++){
-            [filesToRemove addObject:[filesToReplay objectAtIndex:buffer[i]]];
-        }
-        if(n<100)break;
+	unsigned current_index = [indexSet firstIndex];
+    while (current_index != NSNotFound)
+    {
+		[filesToRemove addObject:[filesToReplay objectAtIndex:current_index]];
+        current_index = [indexSet indexGreaterThanIndex: current_index];
     }
+	if([filesToRemove count]){
+		[[[self undoManager] prepareWithInvocationTarget:self] addFilesToReplay:filesToRemove];
+		[filesToReplay removeObjectsInArray:filesToRemove];
     
-    [[[self undoManager] prepareWithInvocationTarget:self] addFilesToReplay:filesToRemove];
-    [filesToReplay removeObjectsInArray:filesToRemove];
     
-    
-    [[NSNotificationCenter defaultCenter]
+		[[NSNotificationCenter defaultCenter]
 			    postNotificationName:ORReplayFileListChangedNotification
                               object: self];
+	}
 }
 
 
