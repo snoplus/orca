@@ -1619,6 +1619,12 @@
 		9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */; };
 		9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */; };
 		9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */; };
+		9C91A5740D7421FD00C7AF85 /* HeaderExplorer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9C91A56E0D7421FD00C7AF85 /* HeaderExplorer.gif */; };
+		9C91A5750D7421FD00C7AF85 /* HeaderExplorer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C91A56F0D7421FD00C7AF85 /* HeaderExplorer.nib */; };
+		9C91A5760D7421FD00C7AF85 /* ORHeaderExplorerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C91A5700D7421FD00C7AF85 /* ORHeaderExplorerController.h */; };
+		9C91A5770D7421FD00C7AF85 /* ORHeaderExplorerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C91A5710D7421FD00C7AF85 /* ORHeaderExplorerController.m */; };
+		9C91A5780D7421FD00C7AF85 /* ORHeaderExplorerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C91A5720D7421FD00C7AF85 /* ORHeaderExplorerModel.h */; };
+		9C91A5790D7421FD00C7AF85 /* ORHeaderExplorerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C91A5730D7421FD00C7AF85 /* ORHeaderExplorerModel.m */; };
 		9CB167790C5BC9580053CFAD /* xAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167770C5BC9580053CFAD /* xAxisMarker.gif */; };
 		9CB1677A0C5BC9580053CFAD /* yAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167780C5BC9580053CFAD /* yAxisMarker.gif */; };
 		9CB167FC0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167FA0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif */; };
@@ -3274,6 +3280,12 @@
 		9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGate2D.h; sourceTree = "<group>"; };
 		9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGate2D.m; sourceTree = "<group>"; };
 		9C7E0885051A522B005F64D5 /* MuxScopeMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MuxScopeMap.h; path = Source/Experiments/Ncd/Detector/MuxScopeMap.h; sourceTree = SOURCE_ROOT; };
+		9C91A56E0D7421FD00C7AF85 /* HeaderExplorer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HeaderExplorer.gif; path = "Source/Objects/Data Processing/HeaderExplorer/HeaderExplorer.gif"; sourceTree = SOURCE_ROOT; };
+		9C91A56F0D7421FD00C7AF85 /* HeaderExplorer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HeaderExplorer.nib; path = "Source/Objects/Data Processing/HeaderExplorer/HeaderExplorer.nib"; sourceTree = SOURCE_ROOT; };
+		9C91A5700D7421FD00C7AF85 /* ORHeaderExplorerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHeaderExplorerController.h; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerController.h"; sourceTree = SOURCE_ROOT; };
+		9C91A5710D7421FD00C7AF85 /* ORHeaderExplorerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHeaderExplorerController.m; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerController.m"; sourceTree = SOURCE_ROOT; };
+		9C91A5720D7421FD00C7AF85 /* ORHeaderExplorerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHeaderExplorerModel.h; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerModel.h"; sourceTree = SOURCE_ROOT; };
+		9C91A5730D7421FD00C7AF85 /* ORHeaderExplorerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHeaderExplorerModel.m; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerModel.m"; sourceTree = SOURCE_ROOT; };
 		9CB167770C5BC9580053CFAD /* xAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = xAxisMarker.gif; path = Source/Widgets/Plotting/xAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		9CB167780C5BC9580053CFAD /* yAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = yAxisMarker.gif; path = Source/Widgets/Plotting/yAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		9CB167FA0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = xAxisMarkerOpposite.gif; path = Source/Widgets/Plotting/xAxisMarkerOpposite.gif; sourceTree = SOURCE_ROOT; };
@@ -6057,6 +6069,7 @@
 				84071B660D185E7F00FD6EFD /* BaseClasses */,
 				840DFF0703C37EAA00DCF929 /* Data Flow */,
 				849F4C6A0768DA920087E9A8 /* DataExplorer */,
+				9C91A56D0D7421FD00C7AF85 /* HeaderExplorer */,
 				84E427D6054EFFCA0057208F /* ReplayData */,
 				84539E8E080AD92B00615B6D /* Listener */,
 				8499148404BB3E05005F64B1 /* Dispatcher */,
@@ -7089,6 +7102,20 @@
 			path = Source/Widgets/GradientView;
 			sourceTree = SOURCE_ROOT;
 		};
+		9C91A56D0D7421FD00C7AF85 /* HeaderExplorer */ = {
+			isa = PBXGroup;
+			children = (
+				9C91A56E0D7421FD00C7AF85 /* HeaderExplorer.gif */,
+				9C91A56F0D7421FD00C7AF85 /* HeaderExplorer.nib */,
+				9C91A5700D7421FD00C7AF85 /* ORHeaderExplorerController.h */,
+				9C91A5710D7421FD00C7AF85 /* ORHeaderExplorerController.m */,
+				9C91A5720D7421FD00C7AF85 /* ORHeaderExplorerModel.h */,
+				9C91A5730D7421FD00C7AF85 /* ORHeaderExplorerModel.m */,
+			);
+			name = HeaderExplorer;
+			path = "Source/Objects/Data Processing/HeaderExplorer";
+			sourceTree = SOURCE_ROOT;
+		};
 		9CD6DD800BE83F1B007096CE /* PlotFFT */ = {
 			isa = PBXGroup;
 			children = (
@@ -8106,6 +8133,8 @@
 				9C2595B70D5172460039C5DF /* FilterScript.h in Headers */,
 				84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */,
 				9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */,
+				9C91A5760D7421FD00C7AF85 /* ORHeaderExplorerController.h in Headers */,
+				9C91A5780D7421FD00C7AF85 /* ORHeaderExplorerModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8609,6 +8638,8 @@
 				84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */,
 				848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */,
 				CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
+				9C91A5740D7421FD00C7AF85 /* HeaderExplorer.gif in Resources */,
+				9C91A5750D7421FD00C7AF85 /* HeaderExplorer.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9195,6 +9226,8 @@
 				9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */,
 				84FBB5720D5401BD00780DBD /* ORFilterSymbolTable.m in Sources */,
 				9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */,
+				9C91A5770D7421FD00C7AF85 /* ORHeaderExplorerController.m in Sources */,
+				9C91A5790D7421FD00C7AF85 /* ORHeaderExplorerModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
