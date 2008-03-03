@@ -347,6 +347,18 @@
 		842539FE0BCD7BFE004C8065 /* ORCARootServiceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */; };
 		84253BB20BCDA410004C8065 /* ORCARoot.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84253BB10BCDA410004C8065 /* ORCARoot.gif */; };
 		842702810B5EE938009176B4 /* katrin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842702800B5EE937009176B4 /* katrin.gif */; };
+		8428ADE00D7CACD00093D35E /* HeaderExplorer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8428ADD40D7CACD00093D35E /* HeaderExplorer.gif */; };
+		8428ADE10D7CACD00093D35E /* HeaderExplorer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8428ADD50D7CACD00093D35E /* HeaderExplorer.nib */; };
+		8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8428ADD60D7CACD00093D35E /* ORHeaderExplorerController.h */; };
+		8428ADE30D7CACD00093D35E /* ORHeaderExplorerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8428ADD70D7CACD00093D35E /* ORHeaderExplorerController.m */; };
+		8428ADE40D7CACD00093D35E /* ORHeaderExplorerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8428ADD80D7CACD00093D35E /* ORHeaderExplorerModel.h */; };
+		8428ADE50D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8428ADD90D7CACD00093D35E /* ORHeaderExplorerModel.m */; };
+		8428ADE60D7CACD00093D35E /* HeaderExplorer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8428ADDA0D7CACD00093D35E /* HeaderExplorer.gif */; };
+		8428ADE70D7CACD00093D35E /* HeaderExplorer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8428ADDB0D7CACD00093D35E /* HeaderExplorer.nib */; };
+		8428ADE80D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8428ADDC0D7CACD00093D35E /* ORHeaderExplorerController.h */; };
+		8428ADE90D7CACD00093D35E /* ORHeaderExplorerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8428ADDD0D7CACD00093D35E /* ORHeaderExplorerController.m */; };
+		8428ADEA0D7CACD00093D35E /* ORHeaderExplorerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8428ADDE0D7CACD00093D35E /* ORHeaderExplorerModel.h */; };
+		8428ADEB0D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8428ADDF0D7CACD00093D35E /* ORHeaderExplorerModel.m */; };
 		8428BC3107CBC05600C53671 /* ORDGF4cDefaultParams.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8428BC3007CBC05600C53671 /* ORDGF4cDefaultParams.plist */; };
 		8428E5E70820678A00F1CF6E /* StopLightView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8428E5E50820678A00F1CF6E /* StopLightView.h */; };
 		8428E5E80820678A00F1CF6E /* StopLightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8428E5E60820678A00F1CF6E /* StopLightView.m */; };
@@ -2100,6 +2112,18 @@
 		842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCARootServiceController.m; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceController.m"; sourceTree = SOURCE_ROOT; };
 		84253BB10BCDA410004C8065 /* ORCARoot.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = ORCARoot.gif; path = "Source/Main Dialogs/ORCARootService/ORCARoot.gif"; sourceTree = SOURCE_ROOT; };
 		842702800B5EE937009176B4 /* katrin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = katrin.gif; path = Source/Experiments/Katrin/katrin.gif; sourceTree = SOURCE_ROOT; };
+		8428ADD40D7CACD00093D35E /* HeaderExplorer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HeaderExplorer.gif; path = "Source/Objects/Data Processing/HeaderExplorer/HeaderExplorer.gif"; sourceTree = SOURCE_ROOT; };
+		8428ADD50D7CACD00093D35E /* HeaderExplorer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HeaderExplorer.nib; path = "Source/Objects/Data Processing/HeaderExplorer/HeaderExplorer.nib"; sourceTree = SOURCE_ROOT; };
+		8428ADD60D7CACD00093D35E /* ORHeaderExplorerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHeaderExplorerController.h; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerController.h"; sourceTree = SOURCE_ROOT; };
+		8428ADD70D7CACD00093D35E /* ORHeaderExplorerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHeaderExplorerController.m; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerController.m"; sourceTree = SOURCE_ROOT; };
+		8428ADD80D7CACD00093D35E /* ORHeaderExplorerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHeaderExplorerModel.h; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerModel.h"; sourceTree = SOURCE_ROOT; };
+		8428ADD90D7CACD00093D35E /* ORHeaderExplorerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHeaderExplorerModel.m; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerModel.m"; sourceTree = SOURCE_ROOT; };
+		8428ADDA0D7CACD00093D35E /* HeaderExplorer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HeaderExplorer.gif; path = "Source/Objects/Data Processing/HeaderExplorer/HeaderExplorer.gif"; sourceTree = SOURCE_ROOT; };
+		8428ADDB0D7CACD00093D35E /* HeaderExplorer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HeaderExplorer.nib; path = "Source/Objects/Data Processing/HeaderExplorer/HeaderExplorer.nib"; sourceTree = SOURCE_ROOT; };
+		8428ADDC0D7CACD00093D35E /* ORHeaderExplorerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHeaderExplorerController.h; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerController.h"; sourceTree = SOURCE_ROOT; };
+		8428ADDD0D7CACD00093D35E /* ORHeaderExplorerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHeaderExplorerController.m; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerController.m"; sourceTree = SOURCE_ROOT; };
+		8428ADDE0D7CACD00093D35E /* ORHeaderExplorerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHeaderExplorerModel.h; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerModel.h"; sourceTree = SOURCE_ROOT; };
+		8428ADDF0D7CACD00093D35E /* ORHeaderExplorerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHeaderExplorerModel.m; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerModel.m"; sourceTree = SOURCE_ROOT; };
 		8428BC3007CBC05600C53671 /* ORDGF4cDefaultParams.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = ORDGF4cDefaultParams.plist; path = Source/Objects/Hardware/Camac/DGF4c/ORDGF4cDefaultParams.plist; sourceTree = SOURCE_ROOT; };
 		8428E5E50820678A00F1CF6E /* StopLightView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = StopLightView.h; sourceTree = "<group>"; };
 		8428E5E60820678A00F1CF6E /* StopLightView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = StopLightView.m; sourceTree = "<group>"; };
@@ -4578,6 +4602,20 @@
 			path = "Source/Main Dialogs/ORCARootService";
 			sourceTree = SOURCE_ROOT;
 		};
+		8428ADD30D7CACD00093D35E /* HeaderExplorer */ = {
+			isa = PBXGroup;
+			children = (
+				8428ADD40D7CACD00093D35E /* HeaderExplorer.gif */,
+				8428ADD50D7CACD00093D35E /* HeaderExplorer.nib */,
+				8428ADD60D7CACD00093D35E /* ORHeaderExplorerController.h */,
+				8428ADD70D7CACD00093D35E /* ORHeaderExplorerController.m */,
+				8428ADD80D7CACD00093D35E /* ORHeaderExplorerModel.h */,
+				8428ADD90D7CACD00093D35E /* ORHeaderExplorerModel.m */,
+			);
+			name = HeaderExplorer;
+			path = "Source/Objects/Data Processing/HeaderExplorer";
+			sourceTree = SOURCE_ROOT;
+		};
 		8428E5E40820678A00F1CF6E /* StopLight */ = {
 			isa = PBXGroup;
 			children = (
@@ -6057,6 +6095,13 @@
 				84071B660D185E7F00FD6EFD /* BaseClasses */,
 				840DFF0703C37EAA00DCF929 /* Data Flow */,
 				849F4C6A0768DA920087E9A8 /* DataExplorer */,
+				8428ADD30D7CACD00093D35E /* HeaderExplorer */,
+				8428ADDA0D7CACD00093D35E /* HeaderExplorer.gif */,
+				8428ADDB0D7CACD00093D35E /* HeaderExplorer.nib */,
+				8428ADDC0D7CACD00093D35E /* ORHeaderExplorerController.h */,
+				8428ADDD0D7CACD00093D35E /* ORHeaderExplorerController.m */,
+				8428ADDE0D7CACD00093D35E /* ORHeaderExplorerModel.h */,
+				8428ADDF0D7CACD00093D35E /* ORHeaderExplorerModel.m */,
 				84E427D6054EFFCA0057208F /* ReplayData */,
 				84539E8E080AD92B00615B6D /* Listener */,
 				8499148404BB3E05005F64B1 /* Dispatcher */,
@@ -8106,6 +8151,10 @@
 				9C2595B70D5172460039C5DF /* FilterScript.h in Headers */,
 				84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */,
 				9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */,
+				8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */,
+				8428ADE40D7CACD00093D35E /* ORHeaderExplorerModel.h in Headers */,
+				8428ADE80D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */,
+				8428ADEA0D7CACD00093D35E /* ORHeaderExplorerModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8609,6 +8658,10 @@
 				84DB0B830D627A0400BB9855 /* FilterScriptGuide.rtf in Resources */,
 				848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */,
 				CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
+				8428ADE00D7CACD00093D35E /* HeaderExplorer.gif in Resources */,
+				8428ADE10D7CACD00093D35E /* HeaderExplorer.nib in Resources */,
+				8428ADE60D7CACD00093D35E /* HeaderExplorer.gif in Resources */,
+				8428ADE70D7CACD00093D35E /* HeaderExplorer.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9195,6 +9248,10 @@
 				9C2595BB0D5172460039C5DF /* FilterScriptGraph.m in Sources */,
 				84FBB5720D5401BD00780DBD /* ORFilterSymbolTable.m in Sources */,
 				9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */,
+				8428ADE30D7CACD00093D35E /* ORHeaderExplorerController.m in Sources */,
+				8428ADE50D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */,
+				8428ADE90D7CACD00093D35E /* ORHeaderExplorerController.m in Sources */,
+				8428ADEB0D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
