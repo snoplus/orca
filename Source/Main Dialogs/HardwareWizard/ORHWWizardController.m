@@ -1350,12 +1350,12 @@ static ORHWWizardController *sharedInstance = nil;
 {
     
     BOOL skip = NO;
-    NSDecimalNumber* returnValue;
+    NSDecimalNumber* returnValue = nil;
     //convert aValue to a NSDecimalNumber
     NSDecimalNumber* aDecimalValue = [NSDecimalNumber decimalNumberWithString:[aValue stringValue]];
     
-    NSInvocation* invocationForGetter;
-    NSInvocation* invocationForSetter;
+    NSInvocation* invocationForGetter = nil;
+    NSInvocation* invocationForSetter = nil;
     
     //set up the undo invocation for this action
     NSInvocation* invocationForUndo = [NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:[paramObj setMethodSelector]]];

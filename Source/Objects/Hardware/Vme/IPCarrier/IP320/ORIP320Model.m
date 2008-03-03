@@ -453,7 +453,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
         [NSNumber numberWithBool:YES],                  @"variable",
         [NSNumber numberWithLong:-1],					@"length",
         nil];
-    [dataDictionary setObject:aDictionary forKey:@"IP320"];
+    [dataDictionary setObject:aDictionary forKey:@"IP320ADC"];
     
     return dataDictionary;
 }

@@ -560,7 +560,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
             int i;
             for(i=0;i<4;i++){
                 if(statusReg & (0x1<<(i+1))){
-					unsigned long eventPlaceHolder;
+					unsigned long eventPlaceHolder = 0;
 					BOOL ship = shipClockMask & (0x1<<(i+1));
 					if(ship){
 						eventPlaceHolder = [aDataPacket reserveSpaceInFrameBuffer:3];

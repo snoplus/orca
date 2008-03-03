@@ -271,7 +271,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 		NSString*				deviceNameAsString;  
 		io_name_t				deviceName;
 		IOUSBDeviceInterface182**	deviceInterface;
-		ORUSBInterface*			usbCallbackData;
+		ORUSBInterface*			usbCallbackData = 0;
 
 
 		NS_DURING

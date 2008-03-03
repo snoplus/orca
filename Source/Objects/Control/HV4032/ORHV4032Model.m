@@ -671,7 +671,7 @@ static NSString *ORHVPollingState 	= @"ORHVPollingState";
         int theDACVoltage 	 = [hvSupply dacValue];
         int theTargetVoltage = [hvSupply targetVoltage];			
         int theState = [hvSupply rampState];
-		int theValueToSet;
+		int theValueToSet = 0;
 
 		if(theTargetVoltage==0 && theState != kHV4032Panic && theState != kHV4032Done){
 			theState = kHV4032Zero;

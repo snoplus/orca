@@ -1058,7 +1058,7 @@
 
     if (!p) return @"";
 	
-	NSMutableString* line;
+	NSMutableString* line = @"?";
 	
     switch([(Node*)p type]) {
         case typeCon:				line = [NSMutableString stringWithFormat:@"c(%@)",		[p nodeData]];	break;

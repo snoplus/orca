@@ -458,7 +458,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscSetChnlCoupling: (short) aChnl
 {
-    NSString*	command;
+    NSString*	command = nil;
 	
     if ( [ self checkChnlNum: aChnl ] ){
         
@@ -1500,7 +1500,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 //--------------------------------------------------------------------------------
 - (void) 	takeDataTask: (id) notUsed 
 {
-	ORDataPacket* aDataPacket;
+	ORDataPacket* aDataPacket = nil;
     do {
         
         mDataThreadRunning = YES;
@@ -1740,7 +1740,7 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
 //-----------------------------------------------------------------------------
 - (NSString*) triggerSourceAsString
 {
-	NSString* source;
+	NSString* source = nil;
 	
 // Get the trigger source first.
 	switch( [ self triggerSource ] )

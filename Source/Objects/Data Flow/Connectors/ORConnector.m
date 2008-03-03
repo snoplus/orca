@@ -437,7 +437,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     if(hidden)			 return;
     if(connector == nil) return;
 	
-	NSShadow* theShadow;
+	NSShadow* theShadow = nil;
 	if([self guardian]){
 		[NSGraphicsContext saveGraphicsState]; 
 		

@@ -302,7 +302,7 @@
 
 - (void) loadAlarmStatusForIndex:(int)index
 {	
-	NSTextField* tf;
+	NSTextField* tf = nil;
 	if(index == 0)		tf = alarmStatus0;
 	else if(index == 1) tf = alarmStatus1;
 	else if(index == 2) tf = alarmStatus2;

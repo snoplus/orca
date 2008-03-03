@@ -50,15 +50,6 @@ typedef struct _CTGradientElement
 
 - (CTGradient *)gradientWithAlphaComponent:(float)alpha;
 
-- (CTGradient *)addColorStop:(NSColor *)color atPosition:(float)position;	//positions given relative to [0,1]
-- (CTGradient *)removeColorStopAtIndex:(unsigned)index;
-- (CTGradient *)removeColorStopAtPosition:(float)position;
-
-
-- (NSColor *)colorStopAtIndex:(unsigned)index;
-- (NSColor *)colorAtPosition:(float)position;
-
-
 - (void)drawSwatchInRect:(NSRect)rect;
 - (void)fillRect:(NSRect)rect angle:(float)angle;					//fills rect with axial gradient
 																	//	angle in degrees

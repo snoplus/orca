@@ -658,8 +658,8 @@ void* IRQ_Handler(void *arg)
 {
     short crate_id = *((short *)arg);
     char cmd[256], resp[2];
-	short irq_type, res;
-	unsigned int irq_data;
+	short irq_type = 0, res;
+	unsigned int irq_data =  0;;
     resp[0] = 'A';
     resp[1] = '\r';
     
@@ -1379,7 +1379,8 @@ short BLKBUFFS(short crate_id, short value)
 ////////////////////////////////////////////
 short BLKTRANSF(short crate_id, BLK_TRANSF_INFO *blk_info, unsigned int *buffer)
 {
-	int i, j, resp, bytes_per_row, bytes_received, bytes_sent, rows;
+	int i, j, bytes_per_row, bytes_received, bytes_sent, rows;
+	int resp = 0;
 	short retcode = CRATE_OK;
 	char blk_ascii_buf[4096];
 	unsigned int row_buf[2048], transf_res;

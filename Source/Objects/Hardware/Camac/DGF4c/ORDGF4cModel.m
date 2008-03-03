@@ -1230,7 +1230,7 @@ enum {
         int i;
 		for(i=0;i<n;i++){
 			unsigned short data;
-			[[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:oscModeData[aChannel]];
+			[[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:&data];
 			oscModeData[aChannel][i] = data;
 		}
 		numOscPoints = n;
@@ -1542,7 +1542,7 @@ enum {
 	double FF[8192],FF2[8192],TimeStamp[2048];
 	double dt,Xwait;    /* dt is the time between Trace samples. */
 	long FL,FG;   /* fast filter times are set here */
-	long ndat,k,kmin,kmax,n,tcount,MaxTimeIndex;
+	long ndat,k,kmin,kmax,n,tcount,MaxTimeIndex = 0;
 	double threshold,t0,t1,TriggerLevelShift,avg,MaxTimeDiff;
 	double localAmplitude, s1,s0; // used to determine which tau fit was best
 	long TFcount;
@@ -2522,7 +2522,7 @@ enum {
 	/* Check InputEventSize for list modes (0x101, 0x102, 0x103)  */
 	/* and must not exceed EventBufferSize; Check OutputEventSize */
 	/* for all list modes.								          */
-
+	chl				= 0;
 	bhl				= kBufferHeaderLength;				//Buffer Head Length
 	ehl				= kEventHeaderLength;				//Event Head Length
 	leventbuffer	= kEventBufferLength;				//Event Buffer Length

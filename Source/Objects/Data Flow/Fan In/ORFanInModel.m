@@ -103,7 +103,7 @@ static NSString *kFanInConnectorKey[10]  = {
     
 	
 	// Create the shadow below and to the right of the shape.
-	NSShadow* theShadow;
+	NSShadow* theShadow = nil;
 	if([self guardian]){
 		[NSGraphicsContext saveGraphicsState]; 
 		theShadow = [[NSShadow alloc] init]; 

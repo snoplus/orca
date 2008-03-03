@@ -373,6 +373,7 @@ int filterGraph(nodeType*);
     [objDictionary setObject:inputValues forKey:@"inputValues"];
     [objDictionary setObject:scriptName forKey:@"scriptName"];
     [objDictionary setObject:lastFile forKey:@"lastFile"];
+    [dictionary setObject:objDictionary forKey:@"FilterObject"];
 	return objDictionary;
 }
 

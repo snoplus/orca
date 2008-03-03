@@ -133,7 +133,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	}
     NSSize theIconSize = [aCachedImage size];
     NSPoint theOffset = NSZeroPoint;
-    NSImage* netConnectIcon;
+    NSImage* netConnectIcon = nil;
     if(remoteControl){
         netConnectIcon = [NSImage imageNamed:@"NetConnect"];
         theIconSize.width += 10;
@@ -1352,7 +1352,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 {
     NSString* runState;
     NSString* thirdWordKey;
-    NSString* init;
+    NSString* init = @"";
     NSString* title= @"Run Control Record\n\n";
     if(dataPtr[1] & 0x8){
         runState     = @"Type       = HeartBeat\n";

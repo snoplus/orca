@@ -142,7 +142,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
     NSSize theIconSize = [aCachedImage size];
     NSPoint theOffset = NSZeroPoint;
-    NSImage* netConnectIcon;
+    NSImage* netConnectIcon = nil;
     if(connectionProtocol == kHPPulserUseIP){
         netConnectIcon = [NSImage imageNamed:@"NetConnect"];
         theIconSize.width += 10;

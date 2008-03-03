@@ -38,7 +38,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 - (id) initWithService:(io_object_t) aDevice
 {
 	self = [super init];
-	IOReturn err;
+	IOReturn err = 0;
 	SInt32	theScore;
 	
 	mIsochRunLoop = 0;

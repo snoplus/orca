@@ -897,7 +897,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (float) timeAtValue:(float)value
 {
-	float newTime;
+	float newTime = 0.0;
 	if(panic){
 		newTime = value/kPanicRate;
 	}

@@ -681,7 +681,7 @@ static UInt32 *fVPCICamacMem;
 // return system assigned PCI bus number
 - (kern_return_t)  getPCIBusNumber:(unsigned char*) data
 {
-    kern_return_t result;
+    kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
         result =  IOConnectMethodScalarIScalarO(
@@ -700,7 +700,7 @@ static UInt32 *fVPCICamacMem;
 // return system assigned PCI device number
 - (kern_return_t)  getPCIDeviceNumber:(unsigned char*) data
 {
-    kern_return_t result;
+    kern_return_t result=0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
         result =   IOConnectMethodScalarIScalarO(
@@ -719,7 +719,7 @@ static UInt32 *fVPCICamacMem;
 // return system assigned PCI function number
 - (kern_return_t)  getPCIFunctionNumber:(unsigned char*) data
 {
-    kern_return_t result;
+    kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
         result =  IOConnectMethodScalarIScalarO(
@@ -764,7 +764,7 @@ static UInt32 *fVPCICamacMem;
 {
     [thePowerLock lock];   //----begin critical section
                            //unsigned short statusLCRC = [self readLCRegister:kLCDControlOffset];
-    unsigned short statusLCRC;
+    unsigned short statusLCRC = 0;
     if(hardwareExists){
         volatile UInt16 *address = (UInt16 *)&fVLCReg[kLCDControlOffset];
         statusLCRC = Swap8BitsIn16(*address);

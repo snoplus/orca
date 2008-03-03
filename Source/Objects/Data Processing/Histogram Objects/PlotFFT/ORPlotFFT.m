@@ -99,8 +99,8 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 	NSMutableArray* array = [NSMutableArray array];
 	for(i=0;i<n;i++){
 		float r = [[realArray objectAtIndex:i] floatValue];
-		float i = [[imaginaryArray objectAtIndex:i] floatValue];
-		[array addObject:[NSNumber numberWithFloat:(r*r)+(i*i)]];
+		float ii = [[imaginaryArray objectAtIndex:i] floatValue];
+		[array addObject:[NSNumber numberWithFloat:(r*r)+(ii*ii)]];
 	}
 	[self setPowerSpectrumArray:array];
     if(aaRealArray || anImaginaryArray)[self incrementTotalCounts];

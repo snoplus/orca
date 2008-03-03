@@ -226,7 +226,7 @@ readon:
 - (void) writeString:(NSString*)aCommand
 {
 	[usbLock lock];
-	UInt8 pipe;
+	UInt8 pipe = outPipe;
 	if(transferType == kUSBBulk)		 pipe = outPipe;
 	else if(transferType == kUSBInterrupt) pipe = interruptOutPipe;
 
@@ -383,7 +383,7 @@ readon:
 	int result;
     [usbLock lock];
 	unsigned long actualRead = amountRead;
-	UInt8 pipe;
+	UInt8 pipe = inPipe;
 	if(transferType == kUSBBulk)		 pipe = inPipe;
 	else if(transferType == kUSBInterrupt) pipe = interruptInPipe;
 	
@@ -418,7 +418,7 @@ readon:
 - (void) writeBytesOnInterruptPipe:(void*)bytes length:(int)length
 {
 	[usbLock lock];
-	UInt8 pipe;
+	UInt8 pipe = outPipe;
 	if(transferType == kUSBBulk)		 pipe = outPipe;
 	else if(transferType == kUSBInterrupt) pipe = interruptOutPipe;
 	IOReturn kr = (*interface)->WritePipe(interface, pipe, bytes, length);

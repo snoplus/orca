@@ -414,7 +414,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 
 - (unsigned long) setConfigureTrigClass
 {
-	unsigned long sourcePattern;
+	unsigned long sourcePattern = 0x00000000;
 	switch(triggerSource){
 		case 0: sourcePattern = 0x80000000; break;
 		case 1: sourcePattern = 0x00000001; break;

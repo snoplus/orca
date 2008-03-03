@@ -549,7 +549,7 @@ struct {
 // return system assigned PCI bus number
 - (kern_return_t) getPCIBusNumber:(unsigned char *) data
 {
-    kern_return_t result;
+    kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
         result = IOConnectMethodScalarIScalarO(
@@ -568,7 +568,7 @@ struct {
 // return system assigned PCI device number
 - (kern_return_t) getPCIDeviceNumber:(unsigned char *)data
 {
-    kern_return_t result;
+    kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
         result =  IOConnectMethodScalarIScalarO(
@@ -587,7 +587,7 @@ struct {
 // return system assigned PCI function number
 - (kern_return_t) getPCIFunctionNumber:(unsigned char *)data;
 {
-    kern_return_t result;
+    kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
         result =   IOConnectMethodScalarIScalarO(
@@ -606,7 +606,7 @@ struct {
 - (kern_return_t) readPCIConfigRegister:(unsigned int) address
                             withDataPtr:(unsigned int *) data;
 {
-    kern_return_t result;
+    kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
         result =  IOConnectMethodScalarIScalarO(
@@ -627,7 +627,7 @@ struct {
 - (kern_return_t) getPCIConfigurationData:(unsigned int) maxAddress
                               withDataPtr:(PCIConfigStructUser *)pciData
 {
-    kern_return_t result;
+    kern_return_t result = 0;
     IOByteCount pciDataSize;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){

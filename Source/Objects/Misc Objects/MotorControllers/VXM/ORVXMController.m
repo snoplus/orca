@@ -553,7 +553,7 @@
 }
 - (double)pieChartView:(SMPieChartView *)inPieChartView dataForSliceIndex:(unsigned int)inSliceIndex
 {
-	double motorPosition;
+	double motorPosition = 0.0;
 	
 	if(inPieChartView == motorPie1){
 	

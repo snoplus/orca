@@ -595,7 +595,7 @@ static NSString *NcdMuxdelayAdcRead 		= @"NcdMuxdelayAdcRead";
 
 - (mux_result) sendCmd:(unsigned long) anOutputWord
 {
-	mux_result theResult;
+	mux_result theResult = 0;
 	[sendLock lock];
 	
 	NS_DURING

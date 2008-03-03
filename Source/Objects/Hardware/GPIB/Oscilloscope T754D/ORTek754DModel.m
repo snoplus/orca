@@ -178,8 +178,8 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
 	long		returnLength = 0;
     long		timeLong = 0;
-	NSString*	dateStr;
-	NSString*  	timeStr;
+	NSString*	dateStr = nil;
+	NSString*  	timeStr =nil;
 	NSString*	dateTime;
     char		timeBuffer[ 50 ];
     short 		i = 0;
@@ -487,7 +487,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscSetChnlCoupling: (short) aChnl
 {
-    NSString*	command;
+    NSString*	command = nil;
 	
     if ( [ self checkChnlNum: aChnl ] ){
         
@@ -1667,7 +1667,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (void) 	takeDataTask: (id) notUsed 
 {
 
-	ORDataPacket* aDataPacket;
+	ORDataPacket* aDataPacket = nil;
     while(1) {
         
         mDataThreadRunning = YES;

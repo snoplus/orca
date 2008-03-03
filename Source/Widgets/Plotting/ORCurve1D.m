@@ -243,11 +243,11 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	double backwardSum = 0;
 	int n = averageWindow/2;
 	double dn = (double)n;		
-	char*  cPtr;
-	short* sPtr;
-	long*  lPtr;
-	NSData* theData;
-	unsigned long offset;
+	char*  cPtr = nil;
+	short* sPtr = nil;
+	long*  lPtr = nil;
+	NSData* theData = nil;
+	unsigned long offset = 0;
 	unsigned short unitSize;
 	double theValue;
 	
@@ -424,7 +424,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	BOOL aLog = [mYScale isLog];
 	BOOL aInt = [mYScale integer];
 	double aMinPad = [mYScale minPad];
-	double theValue;
+	double theValue = 0;
 
 	yl   = [mYScale getPixAbs:theValue];
 	xl	 = [mXScale getPixAbs:minX];
@@ -487,7 +487,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	BOOL aLog = [mYScale isLog];
 	BOOL aInt = [mYScale integer];
 	double aMinPad = [mYScale minPad];
-	double theValue;
+	double theValue = 0;
 
 	yl   = [mYScale getPixAbs:theValue];
 	xl	 = [mXScale getPixAbs:minX];
@@ -582,9 +582,9 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
  	char*  cPtr;
 	short* sPtr;
 	long*  lPtr;
-	NSData* theData;
-	unsigned long offset;
-	unsigned short unitSize;
+	NSData* theData = nil;
+	unsigned long offset = 0;
+	unsigned short unitSize = -1;
 	double theValue;
 	
 	if([mDataSource useDataObject:aPlot dataSet:dataSetID]){

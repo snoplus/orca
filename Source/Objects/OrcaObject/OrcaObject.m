@@ -417,7 +417,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 	
     if(NSIntersectsRect(aRect,[self frame])){
 		
-		NSShadow* theShadow;
+		NSShadow* theShadow = nil;
 		if([self guardian]){
 			[NSGraphicsContext saveGraphicsState]; 
 			
