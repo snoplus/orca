@@ -25,6 +25,7 @@
 @interface NSDictionary (OrcaExtensions)
 - (NSArray*) allKeysStartingWith:(NSString*)aString;
 - (id) nestedObjectForKey:(id)firstKey,...;
+- (id) objectForKeyArray:(NSMutableArray*)anArray;
 - (NSData*) asData;
 + (id) dictionaryWithPList:(id)plist;
 @end
