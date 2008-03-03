@@ -326,8 +326,8 @@
 -(void) elapsedTimeChanged:(NSNotification*)aNotification
 {
 
-	[elapsedTimeField setStringValue:[runControl elapsedTimeString]];
-	
+	if(runControl)[elapsedTimeField setStringValue:[runControl elapsedTimeString]];
+	else [elapsedTimeField setStringValue:@"---"];
 	if([runControl timedRun]){
 		double timeLimit = [runControl timeLimit];
 		double elapsedTime = [runControl elapsedTime];

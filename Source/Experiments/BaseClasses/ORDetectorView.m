@@ -204,11 +204,13 @@
 			ORSegmentGroup* segmentGroup = [delegate segmentGroup:setIndex];
 			for(segmentIndex = 0;segmentIndex<numSegments;segmentIndex++){
 				NSString* name = [[segmentGroup segment:segmentIndex] objectForKey:@"kName"];
-				ORDetectorSegment* seg = [labelPathSet objectAtIndex:segmentIndex];
-				float x = [[seg objectForKey:@"X"] floatValue];
-				float y = [[seg objectForKey:@"Y"] floatValue];
+				if([name length] && ![name isEqualToString:@"--"]){
+					ORDetectorSegment* seg = [labelPathSet objectAtIndex:segmentIndex];
+					float x = [[seg objectForKey:@"X"] floatValue];
+					float y = [[seg objectForKey:@"Y"] floatValue];
 				
-				[name drawAtPoint:NSMakePoint(x,y) withAttributes:attributes];
+					[name drawAtPoint:NSMakePoint(x,y) withAttributes:attributes];
+				}
 			}
 		}
 	} 

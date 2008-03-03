@@ -333,7 +333,7 @@
 #pragma mark ¥¥¥Data Source Methods
 
 #define GET_CHILDREN NSArray* children; \
-ORReadOutList* guardian;\
+ORReadOutList* guardian = nil;\
 if(ov == totalListView){\
 	if(!item) children = [[[[model document] group] orcaObjects] sortedArrayUsingSelector:@selector(sortCompare:)]; \
         else if([item respondsToSelector:@selector(orcaObjects)])children = [[item orcaObjects]sortedArrayUsingSelector:@selector(sortCompare:)]; \
