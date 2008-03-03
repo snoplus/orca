@@ -133,7 +133,8 @@
 - (id) fileDetails;
 - (void) generateObjectLookup;
 - (BOOL) readHeader: (NSFileHandle*)fp;
--(unsigned long)decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (BOOL) readHeaderReturnRunLength: (NSFileHandle*)fp runStart:(unsigned long*)runStart runEnd:(unsigned long*)runEnd;
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

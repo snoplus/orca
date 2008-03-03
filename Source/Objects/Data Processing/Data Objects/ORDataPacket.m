@@ -26,13 +26,13 @@
 #import "ORDataTaker.h"
 #import "ORDataTypeAssigner.h"
 #import "ORGateGroup.h"
+#import "NSDictionary+Extensions.h"
 
 #define kDataVersion 3
 #define kMinSize 4096*2
 #define kMinCapacity 4096
 
 @implementation ORDataPacket
-
 - (id)init
 {
     self = [super init];
@@ -814,6 +814,44 @@
     return YES;
 }
 
+- (BOOL) readHeaderReturnRunLength: (NSFileHandle*)fp runStart:(unsigned long*)runStart runEnd:(unsigned long*)runEnd
+{
+	//a special function for reading the file and extracting the run length
+	//assumes special knowledge of the run record
+	int i;
+	[fp seekToFileOffset:0];
+	if(![self legalDataFile:fp])return NO;
+	if(![self readHeader:fp])return NO;
+	NSData* aRunrecord = [fp readDataOfLength:4*4]; //read the first run record (4 longs)
+	unsigned long* run1 = (unsigned long*)[aRunrecord bytes];
+	if(needToSwap)for(i=0;i<4;i++)run1[i] = CFSwapInt32(run1[i]);
+	[fp seekToEndOfFile];
+	[fp seekToFileOffset:[fp offsetInFile] - 4*4];
+	aRunrecord = [fp readDataOfLength:4*4]; //read the first run record (4 longs)
+	unsigned long* run2 = (unsigned long*)[aRunrecord bytes];
+	if(needToSwap)for(i=0;i<4;i++)run2[i] = CFSwapInt32(run2[i]);
+	
+	unsigned long runId = [[[fileHeader objectForKeyArray:
+								[NSMutableArray arrayWithObjects:  @"dataDescription",
+															@"ORRunModel",
+															@"Run",
+															nil]] objectForKey:@"dataId"] longValue];
+
+	if(ExtractDataId(run1[0]) == runId && ExtractDataId(run2[0]) == runId){
+		
+		if(!(run1[1] & 0x8) && !(run2[1] & 0x8)){        
+			if((run1[1] & 0x1) && !(run2[1] & 0x1)){
+				//OK, we have a start and end run record
+				//return the run length in seconds
+				*runStart = run1[3];
+				*runEnd = run2[3];
+				return YES;
+			}
+		}		
+		
+	}
+	return NO;
+}
 
 - (void) writeData: (NSFileHandle*)fp
 {
