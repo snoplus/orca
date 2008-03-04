@@ -1647,6 +1647,12 @@
 		9CF2C1BC0CC195E2002B279B /* ORL8013CrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF2C1B20CC195E1002B279B /* ORL8013CrateView.h */; };
 		9CF2C1BD0CC195E2002B279B /* ORL8013CrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B30CC195E1002B279B /* ORL8013CrateView.m */; };
 		9CF39BFE0C654B41000CD58E /* ORAugerDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */; };
+		A8743B310D7D82330049C68C /* KatrinSLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = A8743B2A0D7D82330049C68C /* KatrinSLT.nib */; };
+		A8743B320D7D82330049C68C /* KatrinSLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = A8743B2B0D7D82330049C68C /* KatrinSLTCard.gif */; };
+		A8743B340D7D82330049C68C /* ORKatrinSLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = A8743B2D0D7D82330049C68C /* ORKatrinSLTController.h */; };
+		A8743B350D7D82330049C68C /* ORKatrinSLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8743B2E0D7D82330049C68C /* ORKatrinSLTController.m */; };
+		A8743B360D7D82330049C68C /* ORKatrinSLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = A8743B2F0D7D82330049C68C /* ORKatrinSLTModel.h */; };
+		A8743B370D7D82330049C68C /* ORKatrinSLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = A8743B300D7D82330049C68C /* ORKatrinSLTModel.m */; };
 		CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
@@ -3308,6 +3314,12 @@
 		9CF2C1B20CC195E1002B279B /* ORL8013CrateView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL8013CrateView.h; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateView.h"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B30CC195E1002B279B /* ORL8013CrateView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateView.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateView.m"; sourceTree = SOURCE_ROOT; };
 		9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerDefs.h; path = "Source/Objects/Hardware/Auger/Auger Base Classes/ORAugerDefs.h"; sourceTree = SOURCE_ROOT; };
+		A8743B2A0D7D82330049C68C /* KatrinSLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = KatrinSLT.nib; sourceTree = "<group>"; };
+		A8743B2B0D7D82330049C68C /* KatrinSLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = KatrinSLTCard.gif; sourceTree = "<group>"; };
+		A8743B2D0D7D82330049C68C /* ORKatrinSLTController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORKatrinSLTController.h; sourceTree = "<group>"; };
+		A8743B2E0D7D82330049C68C /* ORKatrinSLTController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORKatrinSLTController.m; sourceTree = "<group>"; };
+		A8743B2F0D7D82330049C68C /* ORKatrinSLTModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORKatrinSLTModel.h; sourceTree = "<group>"; };
+		A8743B300D7D82330049C68C /* ORKatrinSLTModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORKatrinSLTModel.m; sourceTree = "<group>"; };
 		CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EduWashingtonNplOrcaNi488PlugIn.h; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
@@ -6868,6 +6880,7 @@
 		84F46F090CA44255007EFADA /* IPE */ = {
 			isa = PBXGroup;
 			children = (
+				A8743B290D7D82330049C68C /* Katrin SLT */,
 				84F46F0A0CA44255007EFADA /* IPE Base Classes */,
 				84F46F110CA44255007EFADA /* IPE Crate */,
 				84F46F1A0CA44255007EFADA /* IPE FLT */,
@@ -7146,6 +7159,19 @@
 			name = "L8013 Crate";
 			path = "Source/Objects/Hardware/Camac/L8013 Crate";
 			sourceTree = SOURCE_ROOT;
+		};
+		A8743B290D7D82330049C68C /* Katrin SLT */ = {
+			isa = PBXGroup;
+			children = (
+				A8743B2A0D7D82330049C68C /* KatrinSLT.nib */,
+				A8743B2B0D7D82330049C68C /* KatrinSLTCard.gif */,
+				A8743B2D0D7D82330049C68C /* ORKatrinSLTController.h */,
+				A8743B2E0D7D82330049C68C /* ORKatrinSLTController.m */,
+				A8743B2F0D7D82330049C68C /* ORKatrinSLTModel.h */,
+				A8743B300D7D82330049C68C /* ORKatrinSLTModel.m */,
+			);
+			path = "Katrin SLT";
+			sourceTree = "<group>";
 		};
 		CE68866C0D0CE0E400FA4158 /* PlugIns */ = {
 			isa = PBXGroup;
@@ -8135,6 +8161,8 @@
 				9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */,
 				9C91A5760D7421FD00C7AF85 /* ORHeaderExplorerController.h in Headers */,
 				9C91A5780D7421FD00C7AF85 /* ORHeaderExplorerModel.h in Headers */,
+				A8743B340D7D82330049C68C /* ORKatrinSLTController.h in Headers */,
+				A8743B360D7D82330049C68C /* ORKatrinSLTModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8172,7 +8200,6 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Orca */;
 			projectDirPath = "";
@@ -8640,6 +8667,8 @@
 				CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
 				9C91A5740D7421FD00C7AF85 /* HeaderExplorer.gif in Resources */,
 				9C91A5750D7421FD00C7AF85 /* HeaderExplorer.nib in Resources */,
+				A8743B310D7D82330049C68C /* KatrinSLT.nib in Resources */,
+				A8743B320D7D82330049C68C /* KatrinSLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9228,6 +9257,8 @@
 				9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */,
 				9C91A5770D7421FD00C7AF85 /* ORHeaderExplorerController.m in Sources */,
 				9C91A5790D7421FD00C7AF85 /* ORHeaderExplorerModel.m in Sources */,
+				A8743B350D7D82330049C68C /* ORKatrinSLTController.m in Sources */,
+				A8743B370D7D82330049C68C /* ORKatrinSLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
