@@ -8171,7 +8171,7 @@
 /* Begin PBXProject section */
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "OrcaUniversal" */;
+			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
 			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Orca */;
@@ -9565,7 +9565,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "OrcaUniversal" */ = {
+		84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				84F201BF0B6531990084F4C3 /* Development */,

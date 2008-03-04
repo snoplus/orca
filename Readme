@@ -20,7 +20,7 @@ if you use OrcaRoot:
 svn co svn://128.95.100.177/OrcaRoot
 	
 -double-click on the Orca.xcodeproj file to launch project builder and compile the code.
-	
+-alternatively type "open Orca.xcodeproj"
 
 -Note that the Drivers folder is not under svn at this time. Check the Orca help ("Getting Started" page) for a link to obtain them.
 
