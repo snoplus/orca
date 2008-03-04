@@ -38,7 +38,26 @@ enum {
 #define kGain_mask   0x00c0
 #define kChan_mask   0x001f
 
+#define kCAL0_mask  0x0014
+#define kCAL1_mask  0x0015
+#define kCAL2_mask  0x0016
+#define kCAL3_mask  0x0017
+#define kAUTOZERO_mask  0x0300
+
+#define kCAL0_volt 4.9000
+#define kCAL1_volt 2.4500
+#define kCAL2_volt 1.2250
+#define kCAL3_volt 0.6125
+#define kAUTOZERO_volt 0.0000
+
 #define kNumIP320Channels 40
+
+#define kMinus5to5 -5
+#define kMinus10to10 -10
+#define k0to10 0
+#define kUncalibrated 1
+
+#define knumGainSettings 4
 
 enum {
     kDiff0_19_Cal0_3,
@@ -46,6 +65,18 @@ enum {
     kSingle20_39,
     kAutoZero
 };
+
+struct{
+int kCardJumperSetting;
+float kSlope_m;
+float kIdeal_Volt_Span;
+float kIdeal_Zero;
+float kVoltCALLO;
+short kCountCALLO;
+float kVoltCALHI;
+short kCountCALHI;
+}CalibrationConstants[knumGainSettings];
+
 
 @interface ORIP320Model : ORVmeIPCard <ORDataTaker,ORAdcProcessing>
 {
@@ -56,6 +87,9 @@ enum {
     unsigned long   dataId;
 	BOOL			valuesReadyToShip;
     BOOL			displayRaw;
+	int				cardJumperSetting;
+	
+	
 	
 	//cached values -- valid ONLY during running
 	unsigned long slotMask;
@@ -64,6 +98,17 @@ enum {
 }
 
 #pragma mark ¥¥¥Accessors
+- (int)  cardJumperSetting;
+- (void) setCardJumperSetting:(int)aCardJumperSetting;
+//calibration rotines
+- (void) setCardCalibration;
+- (void) loadCALHIControReg:(unsigned short)gain;
+- (void) loadCALLOControReg:(unsigned short)gain;
+- (void)  calculateCalibrationSlope:(unsigned short)gain;
+- (unsigned short) calculateCorrectedCount:(unsigned short)gain CountActual:(unsigned short)CountActual;
+- (void) callibrateIP320;
+
+
 - (BOOL) displayRaw;
 - (void) setDisplayRaw:(BOOL)aDisplayRaw;
 - (NSMutableArray *)chanObjs;
@@ -87,6 +132,7 @@ enum {
 - (void) setDataId: (unsigned long) DataId;
 - (unsigned long) lowMask;
 - (unsigned long) highMask;
+
 
 #pragma mark ¥¥¥Adc Processing Protocol
 - (void)processIsStarting;
