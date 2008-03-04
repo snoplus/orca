@@ -27,6 +27,9 @@
 #import "ORDataTypeAssigner.h"
 
 #import "ORIP320Channel.h"
+#include <math.h>
+
+
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORIP320ModelDisplayRawChanged = @"ORIP320ModelDisplayRawChanged";
@@ -66,6 +69,7 @@ static struct {
         [chanObjs addObject:[[[ORIP320Channel alloc] initWithAdc:self channel:i]autorelease]];
     }
     [[self undoManager] enableUndoRegistration];
+	
     return self;
 }
 
@@ -117,6 +121,77 @@ static struct {
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelDisplayRawChanged object:self];
 }
+
+- (int)  cardJumperSetting
+{
+	return cardJumperSetting;
+}
+
+
+- (void) setCardJumperSetting: (int)aCardJumperSetting
+{	
+	cardJumperSetting = aCardJumperSetting;
+//	int gain;
+//	for(gain=0;gain<knumGainSettings;gain++){cardJumperSetting= aCardJumperSetting;}
+	switch(cardJumperSetting)
+	{
+		case(kMinus5to5):
+			NSLog(@"IP320 Card is set to -5 to 5 Volts\n");
+			break;
+		case(kMinus10to10):
+			NSLog(@"IP320 Card is set to -10 to 10 Volts\n");
+			break;
+		case(k0to10):
+			NSLog(@"IP320 Card is set to 0 to 10 Volts\n");
+			break;
+		case(kUncalibrated):
+			NSLog(@"IP320 Card is uncalibrated\n");
+			break;
+	}
+
+}
+
+- (void) setCardCalibration{
+	int countergain=0;
+	switch(cardJumperSetting){
+		case(kMinus5to5):
+			NSLog(@"Calibrating IP320 for -5 to 5 Voltage Range\n");
+			
+			for(countergain=0;countergain<knumGainSettings;countergain++)
+			{
+				CalibrationConstants[countergain].kIdeal_Volt_Span=10.000;
+				CalibrationConstants[countergain].kIdeal_Zero=-5.0000;
+			}
+			[self callibrateIP320];
+			break;
+		case(kMinus10to10):
+			NSLog(@"Calibrating IP320 for -10 to 10 Voltage Range\n");
+
+			for(countergain=0;countergain<knumGainSettings;countergain++){
+				CalibrationConstants[countergain].kIdeal_Volt_Span=20.000;
+				CalibrationConstants[countergain].kIdeal_Zero=-10.0000;
+			}
+			[self callibrateIP320];
+			break;
+		case(k0to10):
+			NSLog(@"Calibrating IP320 for 0 to 10 Voltage Range\n");
+			for(countergain=0;countergain<knumGainSettings;countergain++){
+				CalibrationConstants[countergain].kIdeal_Volt_Span=10.000;
+				CalibrationConstants[countergain].kIdeal_Zero=0.0000;
+				
+			}
+			[self callibrateIP320];
+			break;
+		case(kUncalibrated):
+			NSLog(@"IP320 returns uncorrected value.\n");
+			break;
+	}
+}
+
+
+
+
+
 // ===========================================================
 // - chanObjs:
 // ===========================================================
@@ -205,20 +280,9 @@ static struct {
 							 usingAddSpace:kAccessRemoteIO];
 }
 
-- (unsigned short) readAdcChannel:(unsigned short)aChannel
+- (void) loadConversionStart
 {
-    
-	int changeCount = 0;
-	unsigned short value = 0;
-	@synchronized(self) {
-		NSString* errorLocation = @"";
-		NS_DURING
-			
-			errorLocation = @"Control Reg Setup";
-			[self loadConstants:aChannel];
-			
 			unsigned short modifier = [guardian addressModifier];
-			errorLocation = @"Converion Start";
 			unsigned short dummyValue = 0xFFFF;
 			id cachedController = [guardian adapter];
 			[cachedController writeWordBlock:&dummyValue
@@ -226,17 +290,52 @@ static struct {
 									numToWrite:1L
 									withAddMod:modifier
 								 usingAddSpace:kAccessRemoteIO];
-			
-			errorLocation = @"Adc Read";
-			[cachedController readWordBlock:(unsigned short*)&value
-									atAddress:[self getRegisterAddress:kADCDataReg]
+
+
+}
+
+-(unsigned short) readDataBlock
+{	
+	unsigned short value = 0;
+	unsigned short modifier = [guardian addressModifier];
+	id cachedController = [guardian adapter];
+	[cachedController readWordBlock:(unsigned short*)&value
+									atAddress:[self getRegisterAddress:kControlReg]
 									numToRead:1L
 								   withAddMod:modifier
 								usingAddSpace:kAccessRemoteIO];
+
+
 			
-			//the value needs to be shifted by 3 bits after the read. That's how is comes off the card....
-			if([[chanObjs objectAtIndex:aChannel] setChannelValue:(value>>3) & 0x0fff])changeCount++;
+	 if((value & 0x8000) == 0x8000){
+			[cachedController readWordBlock:(unsigned short*)&value
+									atAddress:[self getRegisterAddress:kADCDataReg]
+									numToRead:1L
+								withAddMod:modifier
+								usingAddSpace:kAccessRemoteIO];
 			
+				//the value needs to be shifted by 4 bits after the read. That's how is comes off the card....
+			value=((value>>4) & 0x0fff);
+	}
+	return value;
+}
+
+- (unsigned short) readAdcChannel:(unsigned short)aChannel//Brandon's Version
+{
+	int changeCount = 0;
+	unsigned short value = 0;
+	unsigned short corrected_value = 0;
+	@synchronized(self) {
+		NSString* errorLocation = @"";
+		NS_DURING
+			errorLocation = @"Control Reg Setup";
+			[self loadConstants:aChannel];
+			errorLocation = @"Converion Start";
+			[self loadConversionStart];
+			errorLocation = @"Adc Read";
+			value=[self readDataBlock];
+			corrected_value=[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] CountActual:value];
+			if([[chanObjs objectAtIndex:aChannel] setChannelValue:corrected_value])changeCount++;
 		NS_HANDLER
 			NSLogError(@"",[NSString stringWithFormat:@"IP320 %d,%@",[self slot],[self identifier]],errorLocation,nil);
 			[NSException raise:[NSString stringWithFormat:@"IP320 Read Adc Channel %d Failed",aChannel] format:@"Error Location: %@",errorLocation];
@@ -245,7 +344,133 @@ static struct {
 			[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORIP320AdcValueChangedNotification object:self] waitUntilDone:NO];
 		}
 	}
-    return value;
+//	NSLog(@"the corected value is %d\n",[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] CountActual:value]);
+	return corrected_value;
+}
+//Calibration routines
+- (void) loadCALHIControReg:(unsigned short)gain{
+//	int cJS = CalibrationConstants[gain].kCardJumperSetting;
+	
+	unsigned short aMaskCALHI = 0x0000;
+	if((cardJumperSetting==kMinus5to5&&gain==0)||(cardJumperSetting==kMinus10to10&&gain<=1)||(cardJumperSetting==k0to10&&gain<=1))
+	{
+		CalibrationConstants[gain].kVoltCALHI=kCAL0_volt;
+		aMaskCALHI|=kCAL0_mask;
+		aMaskCALHI|=(gain<<6);	
+	}
+	else if((cardJumperSetting==kMinus5to5&&gain==1)||(cardJumperSetting==kMinus10to10&&gain==2)||(cardJumperSetting==k0to10&&gain==2))
+	{
+		CalibrationConstants[gain].kVoltCALHI=kCAL1_volt;
+		aMaskCALHI|=kCAL1_mask;
+		aMaskCALHI|=(gain<<6);	
+	}
+	else if((cardJumperSetting==kMinus5to5&&gain==2)||(cardJumperSetting==kMinus10to10&&gain==3)||(cardJumperSetting==k0to10&&gain==3))
+	{
+		CalibrationConstants[gain].kVoltCALHI=kCAL2_volt;
+		aMaskCALHI|=kCAL2_mask;
+		aMaskCALHI|=(gain<<6);	
+	}
+	else if(cardJumperSetting==kMinus5to5&&gain==3)
+	{
+		CalibrationConstants[gain].kVoltCALHI=kCAL3_volt;
+		aMaskCALHI|=kCAL3_mask;
+		aMaskCALHI|=(gain<<6);	
+	}
+	float kVoltCALHI=CalibrationConstants[gain].kVoltCALHI;
+	[[guardian adapter] writeWordBlock:&aMaskCALHI
+								atAddress:[self getRegisterAddress:kControlReg]
+								numToWrite:1L
+								withAddMod:[guardian addressModifier]
+								usingAddSpace:kAccessRemoteIO];
+	
+
+}
+
+- (void) loadCALLOControReg:(unsigned short)gain
+{
+	unsigned short aMaskCALLO = 0;
+//Find CountCALLO
+	if(cardJumperSetting==k0to10){
+			CalibrationConstants[gain].kVoltCALLO=kCAL3_volt;
+			aMaskCALLO|=kCAL3_mask;
+			aMaskCALLO|=(gain<<6);
+	}
+	else {
+		CalibrationConstants[gain].kVoltCALLO=kAUTOZERO_volt;
+		aMaskCALLO|=kAUTOZERO_mask;
+		aMaskCALLO|=(gain<<6);
+		
+	}
+	[[guardian adapter] writeWordBlock:&aMaskCALLO
+								atAddress:[self getRegisterAddress:kControlReg]
+								numToWrite:1L
+								withAddMod:[guardian addressModifier]
+								usingAddSpace:kAccessRemoteIO];
+}
+
+-(void) calculateCalibrationSlope:(unsigned short)gain
+{ 
+	float slope;
+	slope=pow(2,gain)*(CalibrationConstants[gain].kVoltCALHI-CalibrationConstants[gain].kVoltCALLO)/(CalibrationConstants[gain].kCountCALHI-CalibrationConstants[gain].kCountCALLO);
+	CalibrationConstants[gain].kSlope_m=slope;
+}
+
+-(unsigned short) calculateCorrectedCount:(unsigned short)gain CountActual:(unsigned short)CountActual{
+	unsigned short Corrected_count;
+	if(cardJumperSetting==kUncalibrated){Corrected_count=CountActual;}
+	else{
+	Corrected_count=CountActual;
+	Corrected_count+=((CalibrationConstants[gain].kVoltCALLO*pow(2,gain))-CalibrationConstants[gain].kIdeal_Zero)/CalibrationConstants[gain].kSlope_m;
+	Corrected_count= Corrected_count-CalibrationConstants[gain].kCountCALLO;
+	Corrected_count=Corrected_count*(4096*CalibrationConstants[gain].kSlope_m)/CalibrationConstants[gain].kIdeal_Volt_Span;
+	}
+	return Corrected_count;
+	
+}
+- (void) callibrateIP320{
+		int gain =0;
+		unsigned short ReadNumber = 10;
+		@synchronized(self) {
+		NSString* errorLocation = @"";
+		NS_DURING
+			for(gain=0;gain<=3;gain++){
+				
+				errorLocation = @"CountCALHI Control Reg Setup";
+				[self loadCALHIControReg:gain];
+				unsigned short CountCALHI;
+				int i=0;
+				for(i=0;i<ReadNumber;i++){
+					errorLocation = @"CountCALHI Converion Start";
+					[self loadConversionStart];
+					errorLocation = @"CountCALHI Adc Read";
+					CountCALHI+=[self readDataBlock];
+				}
+				CountCALHI=CountCALHI/ReadNumber;
+				CalibrationConstants[gain].kCountCALHI=CountCALHI;
+				
+				errorLocation = @"CountCALLO Control Reg Setup";
+				[self loadCALLOControReg:gain];
+				unsigned short CountCALLO;
+				for(i=0;i<ReadNumber;i++){
+					errorLocation = @"CountCALLO Converion Start";
+					[self loadConversionStart];
+					errorLocation = @"CountCALLO Adc Read";
+					CountCALLO+=[self readDataBlock];
+				}
+				CountCALLO=CountCALLO/ReadNumber;
+				CalibrationConstants[gain].kCountCALLO=CountCALLO;
+				[self calculateCalibrationSlope:gain];
+				
+				NSLog(@"Calibraton Slope at gain %f is %f\n",pow(2,gain),CalibrationConstants[gain].kSlope_m);
+			}
+			
+			
+		NS_HANDLER
+			NSLogError(@"",[NSString stringWithFormat:@"IP320 %d,%@",[self slot],[self identifier]],errorLocation,nil);
+			[NSException raise:[NSString stringWithFormat:@"IP320 Calibration Failed"] format:@"Error Location: %@",errorLocation];
+		NS_ENDHANDLER
+	}
+
 }
 
 - (void) readAllAdcChannels
@@ -266,6 +491,8 @@ static struct {
 		valuesReadyToShip = YES;	
 	}
 }
+
+
 
 - (void) _pollAllChannels
 {
