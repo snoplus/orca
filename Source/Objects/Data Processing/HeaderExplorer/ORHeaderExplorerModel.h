@@ -50,10 +50,15 @@
 		NSMutableArray* runArray;
 		unsigned long	minRunStartTime;
 		unsigned long	maxRunEndTime;
+		int				selectionDate;
+		int				selectedRunIndex;
 
 }
 
 #pragma mark •••Accessors
+- (int)  selectionDate;
+- (void) setSelectionDate:(int)aValue;
+- (NSDictionary*) runDictionaryForIndex:(int)index;
 - (unsigned long)   total;
 - (unsigned long)   numberLeft;
 - (NSArray *)   dataRecords;
@@ -80,6 +85,7 @@
 - (void) removeAll;
 - (void) removeFiles:(NSMutableArray*)anArray;
 - (void) readHeaders;
+- (void) findSelectedRun;
 
 #pragma mark •••Data Handling
 - (void) parseFile;
@@ -103,3 +109,5 @@ extern NSString* ORHeaderExplorerInProgressNotification;
 
 extern NSString* ORHeaderExplorerParseEndedNotification;
 extern NSString* ORHeaderExplorerReadingNotification;
+extern NSString* ORHeaderExplorerSelectionDateNotification;
+extern NSString* ORHeaderExplorerRunSelectionChanged;

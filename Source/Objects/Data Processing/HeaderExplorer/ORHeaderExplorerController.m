@@ -24,6 +24,7 @@
 #import "ORHeaderExplorerModel.h"
 #import "ORHeaderItem.h"
 #import "ORDataSet.h"
+#import "CTGradient.h"
 
 @interface ORHeaderExplorerController (private)
 - (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -51,11 +52,10 @@
 - (void) awakeFromNib
 {
     [fileListView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+	[runSummaryTextView setFont:[NSFont fontWithName:@"Monaco" size:10]];
 	[progressIndicatorBottom setIndeterminate:NO];
     [super awakeFromNib];    
 }
-
-#pragma mark •••Accessors
 
 
 #pragma  mark •••Actions
@@ -164,6 +164,10 @@
 	
 }
 
+- (IBAction) selectionDateAction:(id)sender
+{
+	[model setSelectionDate:[sender intValue]];
+}
 
 #pragma mark •••Interface Management
 - (void) registerNotificationObservers
@@ -182,18 +186,37 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(stopped:)
-                         name : ORReadHeaderStoppedNotification
+                         name : ORHeaderExplorerParseEndedNotification
                         object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(selectionDateChanged:)
+                         name : ORHeaderExplorerParseEndedNotification
+                        object: model];
+
     [notifyCenter addObserver : self
                      selector : @selector(reading:)
                          name : ORHeaderExplorerReadingNotification
                         object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(selectionDateChanged:)
+                         name : ORHeaderExplorerSelectionDateNotification
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(runSelectionChanged:)
+                         name : ORHeaderExplorerRunSelectionChanged
+                        object: model];
+
 }
 
 - (void) updateWindow
 {
     [self fileListChanged:nil];
+    [self selectionDateChanged:nil];
+    [self runSelectionChanged:nil];
+	
 	[workingOnField setStringValue:@""];
 }
 
@@ -222,6 +245,15 @@
 	[progressIndicatorBottom setIndeterminate:NO];
 	[progressIndicatorBottom stopAnimation:self];
 	[runTimeView setNeedsDisplay:YES];
+	
+	unsigned long absStart = [model minRunStartTime];
+	unsigned long absEnd   = [model maxRunEndTime];
+	if(absStart>0 && absEnd>0){
+		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:absStart];
+		[runStartField setObjectValue:d];
+		d = [NSCalendarDate dateWithTimeIntervalSince1970:absEnd];
+		[runEndField setObjectValue:d];
+	}
 
 }
 
@@ -236,6 +268,45 @@
 }
 
 #pragma mark •••Interface Management
+- (void) selectionDateChanged:(NSNotification*)note
+{
+	[selectionDateSlider setIntValue:[model selectionDate]];
+}
+
+- (void) runSelectionChanged:(NSNotification*)note
+{
+	unsigned long absStart		= [model minRunStartTime];
+	unsigned long absEnd		= [model maxRunEndTime];
+	NSDictionary* runDictionary = [model runDictionaryForIndex:[model selectedRunIndex]];
+	unsigned long selectionDate	= absStart + ((absEnd - absStart) * [model selectionDate]/100.);
+	if(absStart>0 && absEnd>0){
+		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
+		[selectionDateField setObjectValue:d];
+		[runTimeView setNeedsDisplay:YES];
+		[headerView reloadData];
+		if(runDictionary){
+			NSString* units = @"Bytes";
+			float fileSize = [[runDictionary objectForKey:@"FileSize"] floatValue];
+			if(fileSize>1000000){
+				fileSize /= 1000000.;
+				units = @"MBytes";
+			}
+			else if(fileSize>1000){
+				fileSize /=1000.;
+				units = @"KBytes";
+			}
+			NSString* s = [NSString stringWithFormat:@"Run Number: %@\n",[runDictionary objectForKey:@"RunNumber"]];
+			NSCalendarDate* startTime = [NSCalendarDate dateWithTimeIntervalSince1970:[[runDictionary objectForKey:@"RunStart"] unsignedLongValue]];
+			s = [s stringByAppendingFormat:@"Started   : %@\n",startTime];
+			s = [s stringByAppendingFormat:@"Run Length: %@ sec\n",[runDictionary objectForKey:@"RunLength"]];
+			s = [s stringByAppendingFormat:@"File Size : %.2f %@\n",fileSize,units];
+			[runSummaryTextView setString:s];
+		}
+		else [runSummaryTextView setString:@"no valid selection"];
+	}
+	else [runSummaryTextView setString:@"no valid selection"];
+	
+}
 
 - (void) fileListChanged:(NSNotification*)note
 {
@@ -343,6 +414,13 @@
     return YES;
 }
 
+#pragma mark •••Data Source
+- (unsigned long) minRunStartTime {return [model minRunStartTime];}
+- (unsigned long) maxRunEndTime	  {return [model maxRunEndTime];}
+- (long) numberRuns {return [model numberRuns];}
+- (id) run:(int)index objectForKey:(id)aKey { return [model run:index objectForKey:aKey]; }
+- (int) selectedRunIndex { return [model selectedRunIndex]; }
+
 
 @end
 
@@ -430,26 +508,51 @@
     }
 }
 
-#pragma mark •••Data Source
-- (unsigned long) minRunStartTime {return [model minRunStartTime];}
-- (unsigned long) maxRunEndTime	  {return [model maxRunEndTime];}
-- (long) numberRuns {return [model numberRuns];}
-- (id) run:(int)index objectForKey:(id)aKey { return [model run:index objectForKey:aKey]; }
-
 @end
 
 @implementation ORRunTimeView
 
+- (void) dealloc
+{
+	[selectedGradient release];
+	[backgroundGradient release];
+	[normalGradient release];
+	[super dealloc];
+}
+
+- (void) awakeFromNib
+{
+	float red,green,blue;
+	red = 0; green = 1; blue = 0;
+	normalGradient = [[CTGradient 
+						gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
+						               endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]] retain];
+
+
+	red = 1; green = 0; blue = 0;
+	selectedGradient = [[CTGradient 
+						gradientWithBeginningColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
+						               endingColor:[NSColor colorWithCalibratedRed:.5*red green:.5*green blue:.5*blue alpha:1]] retain];
+
+
+	float gray = 1.0;
+	backgroundGradient = [[CTGradient 
+						gradientWithBeginningColor:[NSColor colorWithCalibratedRed:gray green:gray blue:gray alpha:1]
+						               endingColor:[NSColor colorWithCalibratedRed:.7*gray green:.7*gray blue:.7*gray alpha:1]] retain];
+
+}
+
 - (void) drawRect:(NSRect)aRect
 {
-	[[NSColor whiteColor] set];
-	[NSBezierPath fillRect:[self bounds]];
-	[[NSColor whiteColor] set];
+	[NSBezierPath setDefaultLineWidth:1];
+	[backgroundGradient fillRect:[self bounds] angle:0];
+	[[NSColor blackColor] set];
 	[NSBezierPath strokeRect:[self bounds]];
-	
+		
 	unsigned long absStart = [dataSource minRunStartTime];
-	unsigned long absEnd   = [dataSource maxRunEndTime];	
+	unsigned long absEnd   = [dataSource maxRunEndTime];
 	long n = [dataSource numberRuns];
+	long selectedRunIndex = [dataSource selectedRunIndex];
 	int i;
 	for(i=0;i<n;i++){
 	
@@ -457,10 +560,12 @@
 		unsigned long end   = [[dataSource run:i objectForKey:@"RunEnd"] unsignedLongValue];
 
 		if(start && end){
-			float x1 = [self bounds].size.width*((start-absStart)/(float)(absEnd-absStart));
-			NSRect aRect = NSMakeRect(x1,0,5,[self bounds].size.height);
-			[[NSColor redColor] set];
-			[NSBezierPath fillRect:aRect];
+			float h = [self bounds].size.height;
+			float y1 = h*(start-absStart)/(float)(absEnd-absStart);
+			float y2 = h*(end-absStart)/(float)(absEnd-absStart);
+			NSRect aRect = NSMakeRect(0,y1,[self bounds].size.width,y2-y1);
+			if(i==selectedRunIndex)[selectedGradient fillRect:aRect angle:0];
+			else [normalGradient fillRect:aRect angle:0];
 			[[NSColor blackColor] set];
 			[NSBezierPath strokeRect:aRect];
 		}

@@ -31,6 +31,11 @@
 	IBOutlet NSTextField* 	workingOnField;
 	IBOutlet NSProgressIndicator* 	progressIndicatorBottom;
 	IBOutlet NSView* 		runTimeView;
+	IBOutlet NSTextField* 	runStartField;
+	IBOutlet NSTextField* 	runEndField;
+	IBOutlet NSTextField* 	selectionDateField;
+	IBOutlet NSSlider*		selectionDateSlider;
+	IBOutlet NSTextView* 	runSummaryTextView;
 }
 
 #pragma mark •••Accessors
@@ -43,23 +48,36 @@
 - (IBAction) removeItemAction:(id)sender;
 - (IBAction) saveListAction:(id)sender;
 - (IBAction) loadListAction:(id)sender;
+- (IBAction) selectionDateAction:(id)sender;
 
 #pragma mark •••Interface Management
 - (void) registerNotificationObservers;
-- (void) fileListChanged:(NSNotification*)note;
-- (void) started:(NSNotification *)aNotification;
-- (void) stopped:(NSNotification *)aNotification;
-- (void) reading:(NSNotification *)aNotification;
+- (void) fileListChanged:(NSNotification*)aNote;
+- (void) selectionDateChanged:(NSNotification*)aNote;
+- (void) runSelectionChanged:(NSNotification*)aNote;
+- (void) started:(NSNotification *)aNote;
+- (void) stopped:(NSNotification *)aNote;
+- (void) reading:(NSNotification *)aNote;
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (unsigned long) minRunStartTime;
+- (unsigned long) maxRunEndTime;
+- (long) numberRuns;
+- (id) run:(int)index objectForKey:(id)aKey;
 
 @end
+
+@class CTGradient;
 
 @interface ORRunTimeView : NSView
 {
 	IBOutlet id dataSource;
+	CTGradient* selectedGradient;
+	CTGradient* backgroundGradient;
+	CTGradient* normalGradient;
+	
 }
 
 - (void) drawRect:(NSRect)aRect;
@@ -69,6 +87,7 @@
 @interface NSObject (RunTimeView)
 - (unsigned long) minRunStartTime;
 - (unsigned long) maxRunEndTime;
+- (int) selectedRunIndex;
 - (long) numberRuns;
 - (id) run:(int)index objectForKey:(id)aKey;
 @end

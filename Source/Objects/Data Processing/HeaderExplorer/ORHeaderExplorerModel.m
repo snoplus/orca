@@ -30,15 +30,15 @@
 #import "ThreadWorker.h"
 
 #pragma mark •••Notification Strings
-NSString* ORHeaderExplorerListChangedNotification = @"ORHeaderExplorerListChangedNotification";
-NSString* ORHeaderExplorerAtEndNotification       = @"ORHeaderExplorerAtEndNotification";
-NSString* ORHeaderExplorerInProgressNotification  = @"ORHeaderExplorerInProgressNotification";
-
-
+NSString* ORHeaderExplorerListChangedNotification		= @"ORHeaderExplorerListChangedNotification";
+NSString* ORHeaderExplorerAtEndNotification				= @"ORHeaderExplorerAtEndNotification";
+NSString* ORHeaderExplorerInProgressNotification		= @"ORHeaderExplorerInProgressNotification";
+NSString* ORHeaderExplorerSelectionDateNotification		= @"ORHeaderExplorerSelectionDateNotification";
 NSString* ORHeaderExplorerRunningNotification			= @"ORHeaderExplorerRunningNotification";
 NSString* ORReadHeaderStoppedNotification				= @"ORReadHeaderStoppedNotification";
 NSString* ORHeaderExplorerParseEndedNotification		= @"ORHeaderExplorerParseEndedNotification";
 NSString* ORHeaderExplorerReadingNotification			= @"ORHeaderExplorerReadingNotification";
+NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelectionChanged";
 
 #pragma mark •••Definitions
 
@@ -89,6 +89,29 @@ NSString* ORHeaderExplorerReadingNotification			= @"ORHeaderExplorerReadingNotif
 }
 
 #pragma mark •••Accessors
+- (int) selectedRunIndex
+{
+	return selectedRunIndex;
+}
+
+- (int) selectionDate
+{
+	return selectionDate;
+}
+
+- (void) setSelectionDate:(int)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectionDate:selectionDate];
+
+    selectionDate = aValue;
+	
+	[self findSelectedRun];
+	
+    [[NSNotificationCenter defaultCenter]
+			    postNotificationName:ORHeaderExplorerSelectionDateNotification
+                              object: self];
+}
+
 - (unsigned long)   total
 {
 	return [filesToReplay count];
@@ -99,6 +122,13 @@ NSString* ORHeaderExplorerReadingNotification			= @"ORHeaderExplorerReadingNotif
 	return numberLeft;
 }
 
+- (NSDictionary*) runDictionaryForIndex:(int)index
+{
+	if(index>=0 && index<[runArray count]){
+		return [runArray objectAtIndex:index];
+	}
+	else return nil;
+}
 
 - (id) dataRecordAtIndex:(int)index
 {
@@ -213,6 +243,28 @@ NSString* ORHeaderExplorerReadingNotification			= @"ORHeaderExplorerReadingNotif
 {
     [lastFilePath release];
     lastFilePath = [aSetLastListPath copy];
+}
+
+- (void) findSelectedRun
+{
+	int index;
+	int n = [runArray count];
+	unsigned long actualDate	= minRunStartTime + ((maxRunEndTime - minRunStartTime) * selectionDate/5000.);
+	for(index=0;index<n;index++){
+		NSDictionary* runDictionary = [runArray objectAtIndex:index];
+		unsigned long start = [[runDictionary objectForKey:@"RunStart"] unsignedLongValue];
+		unsigned long end   = [[runDictionary objectForKey:@"RunEnd"] unsignedLongValue];
+		if(actualDate > start && actualDate < end){
+			if(selectedRunIndex != index){
+				selectedRunIndex = index;
+				[self setHeader: [runDictionary objectForKey:@"FileHeader"]];
+				[[NSNotificationCenter defaultCenter]
+							postNotificationName:ORHeaderExplorerRunSelectionChanged
+								object: self];
+				break;
+			}
+		}
+	}
 }
 
 - (unsigned long) minRunStartTime {return minRunStartTime;}
@@ -340,18 +392,26 @@ NSString* ORHeaderExplorerReadingNotification			= @"ORHeaderExplorerReadingNotif
 		dataRecords = nil;
 		[fileAsDataPacket clearData];
 		if(fp){
-			unsigned long runStart=0;
-			unsigned long runEnd=0;
-			if([fileAsDataPacket readHeaderReturnRunLength:fp runStart:&runStart runEnd:&runEnd]){
+		
+			unsigned long runStart  = 0;
+			unsigned long runEnd    = 0;
+			unsigned long runNumber = 0;
+			
+			if([fileAsDataPacket readHeaderReturnRunLength:fp runStart:&runStart runEnd:&runEnd runNumber:&runNumber]){
 				[self performSelectorOnMainThread:@selector(postReadStarted) withObject:nil waitUntilDone:NO];
 				if(runStart!=0 && runEnd!=0){
 					if(runStart < minRunStartTime) minRunStartTime = runStart;
 					if(runEnd > maxRunEndTime)     maxRunEndTime   = runEnd;
+					[fp seekToEndOfFile];
+					
 					[runArray addObject:
 						[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							[NSNumber numberWithUnsignedLong:runStart],	@"RunStart",
-							[NSNumber numberWithUnsignedLong:runEnd],	@"RunEnd",
-							[fileAsDataPacket fileHeader],				@"FileHeader",
+							[NSNumber numberWithUnsignedLong:runStart],			@"RunStart",
+							[NSNumber numberWithUnsignedLong:runEnd],			@"RunEnd",
+							[NSNumber numberWithUnsignedLong:runEnd-runStart],	@"RunLength",
+							[NSNumber numberWithUnsignedLong:runNumber],		@"RunNumber",
+							[NSNumber numberWithUnsignedLong:[fp offsetInFile]],	@"FileSize",
+							[ORHeaderItem headerFromObject:[fileAsDataPacket fileHeader] named:@"Root"], @"FileHeader",
 							nil
 						]
 					];

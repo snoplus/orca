@@ -47,6 +47,8 @@
 				<string>id</string>
 				<key>selectButtonAction</key>
 				<string>id</string>
+				<key>selectionDateAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORHeaderExplorerController</string>
@@ -66,10 +68,20 @@
 				<string>NSProgressIndicator</string>
 				<key>replayButton</key>
 				<string>NSButton</string>
+				<key>runEndField</key>
+				<string>NSTextField</string>
+				<key>runStartField</key>
+				<string>NSTextField</string>
+				<key>runSummaryTextView</key>
+				<string>NSTextView</string>
 				<key>runTimeView</key>
 				<string>NSView</string>
 				<key>selectButton</key>
 				<string>NSButton</string>
+				<key>selectionDateField</key>
+				<string>NSTextField</string>
+				<key>selectionDateSlider</key>
+				<string>NSSlider</string>
 				<key>viewHeaderFile</key>
 				<string>NSTextField</string>
 				<key>workingOnField</key>
