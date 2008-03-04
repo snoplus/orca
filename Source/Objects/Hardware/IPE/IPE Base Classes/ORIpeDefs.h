@@ -52,6 +52,12 @@
  *
  *
  * History:
+ * - 1.1-9 - Bug fixes
+ *            - Moved swapping of waveform elements from model to the decoder (KatrinFLT)
+ *              Note: The format of the run files recorded with PowerPC CPUs will change.
+ *            - Added the full trigger data to the multiplicity data set.
+ *              Added some very simple graphical display.
+ *              3.3.08 (ak)
  * - 1.1-8 - Acceleration of Slt memory readout: 
  *            - The Slt memory access was implementted by single access
  *              instead of using faster block transfer. 

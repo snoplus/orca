@@ -604,6 +604,7 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) usePBusSimAction:(id)sender
 {
+    NSLog(@"PbusSim action\n");
 	[model setPBusSim:[sender intValue]];
 }
 

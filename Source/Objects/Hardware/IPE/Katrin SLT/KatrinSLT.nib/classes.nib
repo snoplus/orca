@@ -1,0 +1,125 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {"" = id; }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                calibrateAction = id; 
+                controlCheckBoxAction = id; 
+                controlRegAction = id; 
+                deadTimeAction = id; 
+                definePatternFileAction = id; 
+                displayEventLoopAction = id; 
+                displayTriggerAction = id; 
+                dumpROMAction = id; 
+                dumpTriggerRAM = id; 
+                forceTrigger = id; 
+                inhibitCheckBoxAction = id; 
+                initBoardAction = id; 
+                interruptMaskAction = id; 
+                loadPatternFile = id; 
+                loadPulserAction = id; 
+                myAction = id; 
+                nHitAction = id; 
+                nHitThresholdAction = id; 
+                nextPageDelayAction = id; 
+                pageSizeAction = id; 
+                pollNowAction = id; 
+                pollRateAction = id; 
+                pulseOnceAction = id; 
+                pulserAmpAction = id; 
+                pulserDelayAction = id; 
+                readAllAction = id; 
+                readRegAction = id; 
+                readStatus = id; 
+                releaseAllPagesAction = id; 
+                releaseSWInhibitAction = id; 
+                reportAllAction = id; 
+                resetHWAction = id; 
+                selectRegisterAction = id; 
+                setSWInhibitAction = id; 
+                settingLockAction = id; 
+                triggerSourceAction = id; 
+                usePBusSimAction = id; 
+                versionAction = id; 
+                vetoTimeAction = id; 
+                writeRegAction = id; 
+                writeValueAction = id; 
+            }; 
+            CLASS = ORKatrinSLTController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                actualPageField = NSTextField; 
+                calibrateButton = NSButton; 
+                controlCheckBoxMatrix = NSMatrix; 
+                deadTimeButton = NSButton; 
+                definePatternFileButton = NSButton; 
+                displayEventLoopButton = NSButton; 
+                displayTriggerButton = NSButton; 
+                dumpROMButton = NSButton; 
+                forceTrigger1Button = NSButton; 
+                forceTriggerButton = NSButton; 
+                inhibitCheckBoxMatrix = NSMatrix; 
+                inhibitMaskMatrix = NSMatrix; 
+                initBoard1Button = NSButton; 
+                initBoardButton = NSButton; 
+                interruptMaskMatrix = NSMatrix; 
+                loadPatternFileButton = NSButton; 
+                nHitField = NSTextField; 
+                nHitStepper = NSStepper; 
+                nHitThresholdField = NSTextField; 
+                nHitThresholdStepper = NSStepper; 
+                nextPageDelayField = NSTextField; 
+                nextPageDelaySlider = NSSlider; 
+                nextPageField = NSTextField; 
+                pageSizeField = NSTextField; 
+                pageSizeStepper = NSStepper; 
+                pageStatusMatrix = NSMatrix; 
+                patternFilePathField = NSTextField; 
+                pollRatePopup = NSPopUpButton; 
+                pollRunningIndicator = NSProgressIndicator; 
+                pulserAmpField = NSTextField; 
+                pulserDelayField = NSTextField; 
+                readAllMatrix = NSMatrix; 
+                readBoardButton = NSButton; 
+                regReadButton = NSButton; 
+                regWriteButton = NSButton; 
+                regWriteValueStepper = NSStepper; 
+                regWriteValueTextField = NSTextField; 
+                registerPopUp = NSPopUpButton; 
+                relSWInhibitButton = NSButton; 
+                releaseAllPagesButton = NSButton; 
+                resetHWButton = NSButton; 
+                secStrobeSrcPU = NSPopUpButton; 
+                setSWInhibitButton = NSButton; 
+                settingLockButton = NSButton; 
+                startSrcPU = NSPopUpButton; 
+                statusMatrix = NSMatrix; 
+                triggerSrcMatrix = NSMatrix; 
+                usePBusSimButton = NSButton; 
+                versionButton = NSButton; 
+                versionField = NSTextField; 
+                vetoTimeButton = NSButton; 
+                watchDogPU = NSPopUpButton; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
+            CLASS = OrcaController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -72,7 +72,8 @@ enum {
 
 @interface ORIpeSLTModel : ORIpeFireWireCard <ORDataTaker>
 {
-	@private
+//	@private
+	@protected
 		//control reg 
 		BOOL veto;
 		BOOL extInhibit;

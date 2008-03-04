@@ -2,11 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>IBDocumentLocation</key>
-	<string>554 67 487 454 0 0 1280 832 </string>
-	<key>IBFramework Version</key>
-	<string>446.1</string>
-	<key>IBSystem Version</key>
-	<string>8S165</string>
+	<key>JavaSourceSubpath</key>
+	<string>_KatrinSLT_EOArchive.java</string>
 </dict>
 </plist>
