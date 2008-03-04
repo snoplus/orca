@@ -16,6 +16,8 @@
                 enablePollAllAction = id; 
                 enablePollNoneAction = id; 
                 readAll = id; 
+                setCalibration = id; 
+                setCardJumperSettings = id; 
                 setPollingAction = id; 
             }; 
             CLASS = ORIP320Controller; 
@@ -25,6 +27,7 @@
                 alarmTable2 = NSTableView; 
                 calibrationTable1 = NSTableView; 
                 calibrationTable2 = NSTableView; 
+                cardSettingsMatrix = NSMatrix; 
                 displayRawCB = NSButton; 
                 pollingButton = NSPopUpButton; 
                 tabView = NSTabView; 
