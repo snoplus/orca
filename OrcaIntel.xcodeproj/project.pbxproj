@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D0EF35E0D7D879900E4CCAD /* KatrinSLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D0EF3580D7D879900E4CCAD /* KatrinSLT.nib */; };
+		2D0EF35F0D7D879900E4CCAD /* KatrinSLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2D0EF3590D7D879900E4CCAD /* KatrinSLTCard.gif */; };
+		2D0EF3600D7D879900E4CCAD /* ORKatrinSLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D0EF35A0D7D879900E4CCAD /* ORKatrinSLTController.h */; };
+		2D0EF3610D7D879900E4CCAD /* ORKatrinSLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D0EF35B0D7D879900E4CCAD /* ORKatrinSLTController.m */; };
+		2D0EF3620D7D879900E4CCAD /* ORKatrinSLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D0EF35C0D7D879900E4CCAD /* ORKatrinSLTModel.h */; };
+		2D0EF3630D7D879900E4CCAD /* ORKatrinSLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D0EF35D0D7D879900E4CCAD /* ORKatrinSLTModel.m */; };
 		840710730D12FDA100FD6EFD /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840710710D12FDA100FD6EFD /* NoNI488DriversHelp.plist */; };
 		840710740D12FDA100FD6EFD /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840710720D12FDA100FD6EFD /* NoNI488PluginHelp.plist */; };
 		84071B4C0D185E3A00FD6EFD /* ORDataChainObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 84071B4A0D185E3A00FD6EFD /* ORDataChainObject.h */; };
@@ -1807,6 +1813,12 @@
 		2ACEE0DF0612266000CAD497 /* ThresholdCalibrationChannel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationChannel.m; sourceTree = "<group>"; };
 		2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ThresholdCalibrationTask.h; sourceTree = "<group>"; };
 		2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationTask.m; sourceTree = "<group>"; };
+		2D0EF3580D7D879900E4CCAD /* KatrinSLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = KatrinSLT.nib; sourceTree = "<group>"; };
+		2D0EF3590D7D879900E4CCAD /* KatrinSLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = KatrinSLTCard.gif; sourceTree = "<group>"; };
+		2D0EF35A0D7D879900E4CCAD /* ORKatrinSLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKatrinSLTController.h; sourceTree = "<group>"; };
+		2D0EF35B0D7D879900E4CCAD /* ORKatrinSLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKatrinSLTController.m; sourceTree = "<group>"; };
+		2D0EF35C0D7D879900E4CCAD /* ORKatrinSLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORKatrinSLTModel.h; sourceTree = "<group>"; };
+		2D0EF35D0D7D879900E4CCAD /* ORKatrinSLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORKatrinSLTModel.m; sourceTree = "<group>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
 		546D9DA90874BDD60072A274 /* OR2228AController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2228AController.h; path = Source/Objects/Hardware/Camac/TDC2228A/OR2228AController.h; sourceTree = SOURCE_ROOT; };
@@ -3622,6 +3634,19 @@
 			name = ThresholdCalibration;
 			path = "Source/Objects/Misc Objects/ThresholdCalibration";
 			sourceTree = SOURCE_ROOT;
+		};
+		2D0EF3570D7D879900E4CCAD /* Katrin SLT */ = {
+			isa = PBXGroup;
+			children = (
+				2D0EF3580D7D879900E4CCAD /* KatrinSLT.nib */,
+				2D0EF3590D7D879900E4CCAD /* KatrinSLTCard.gif */,
+				2D0EF35A0D7D879900E4CCAD /* ORKatrinSLTController.h */,
+				2D0EF35B0D7D879900E4CCAD /* ORKatrinSLTController.m */,
+				2D0EF35C0D7D879900E4CCAD /* ORKatrinSLTModel.h */,
+				2D0EF35D0D7D879900E4CCAD /* ORKatrinSLTModel.m */,
+			);
+			path = "Katrin SLT";
+			sourceTree = "<group>";
 		};
 		546D9DA60874BDD60072A274 /* TDC2228A */ = {
 			isa = PBXGroup;
@@ -6716,6 +6741,7 @@
 		84D973590CA1D4E2000C0C76 /* IPE */ = {
 			isa = PBXGroup;
 			children = (
+				2D0EF3570D7D879900E4CCAD /* Katrin SLT */,
 				84D9735A0CA1D4E2000C0C76 /* IPE Base Classes */,
 				84D973640CA1D4E2000C0C76 /* IPE Crate */,
 				84D973770CA1D4E2000C0C76 /* IPE SLT */,
@@ -8159,6 +8185,8 @@
 				9CEF4F330D6BF92900309C5C /* ORGate2D.h in Headers */,
 				8428ADC80D7CACAB0093D35E /* ORHeaderExplorerController.h in Headers */,
 				8428ADCA0D7CACAB0093D35E /* ORHeaderExplorerModel.h in Headers */,
+				2D0EF3600D7D879900E4CCAD /* ORKatrinSLTController.h in Headers */,
+				2D0EF3620D7D879900E4CCAD /* ORKatrinSLTModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8682,6 +8710,8 @@
 				84FCF9AF0D64F5F3007BE95A /* OrcaFilterScript.icns in Resources */,
 				8428ADC60D7CACAB0093D35E /* HeaderExplorer.gif in Resources */,
 				8428ADC70D7CACAB0093D35E /* HeaderExplorer.nib in Resources */,
+				2D0EF35E0D7D879900E4CCAD /* KatrinSLT.nib in Resources */,
+				2D0EF35F0D7D879900E4CCAD /* KatrinSLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9271,6 +9301,8 @@
 				9CEF4F320D6BF92900309C5C /* ORGate2D.m in Sources */,
 				8428ADC90D7CACAB0093D35E /* ORHeaderExplorerController.m in Sources */,
 				8428ADCB0D7CACAB0093D35E /* ORHeaderExplorerModel.m in Sources */,
+				2D0EF3610D7D879900E4CCAD /* ORKatrinSLTController.m in Sources */,
+				2D0EF3630D7D879900E4CCAD /* ORKatrinSLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
