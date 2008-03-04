@@ -943,6 +943,21 @@
 		84749DC707D66BDF001553EC /* ORVmeDaughterCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 84749DC507D66BDF001553EC /* ORVmeDaughterCard.m */; };
 		84749DCF07D66EBC001553EC /* ORVmeCarrierCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84749DCD07D66EBC001553EC /* ORVmeCarrierCard.h */; };
 		84749DD007D66EBC001553EC /* ORVmeCarrierCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 84749DCE07D66EBC001553EC /* ORVmeCarrierCard.m */; };
+		8474A8F70D7CCD5400F2DF60 /* IpeV4Crate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8474A8EE0D7CCD5400F2DF60 /* IpeV4Crate.nib */; };
+		8474A8F80D7CCD5400F2DF60 /* IpeV4Crate.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8474A8EF0D7CCD5400F2DF60 /* IpeV4Crate.tif */; };
+		8474A8F90D7CCD5400F2DF60 /* IpeV4CrateBig.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8474A8F00D7CCD5400F2DF60 /* IpeV4CrateBig.tif */; };
+		8474A8FC0D7CCD5400F2DF60 /* ORIpeV4CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8474A8F30D7CCD5400F2DF60 /* ORIpeV4CrateModel.h */; };
+		8474A8FD0D7CCD5400F2DF60 /* ORIpeV4CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474A8F40D7CCD5400F2DF60 /* ORIpeV4CrateModel.m */; };
+		8474A8FE0D7CCD5400F2DF60 /* ORIpeV4CrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8474A8F50D7CCD5400F2DF60 /* ORIpeV4CrateView.h */; };
+		8474A8FF0D7CCD5400F2DF60 /* ORIpeV4CrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474A8F60D7CCD5400F2DF60 /* ORIpeV4CrateView.m */; };
+		8474A9010D7CCD7000F2DF60 /* ORIpeV4CrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474A9000D7CCD7000F2DF60 /* ORIpeV4CrateController.m */; };
+		8474A9040D7CCE2100F2DF60 /* ORIpeV4CrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8474A9030D7CCE2100F2DF60 /* ORIpeV4CrateController.h */; };
+		8474A9950D7DBD1E00F2DF60 /* KatrinSLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8474A98F0D7DBD1E00F2DF60 /* KatrinSLT.nib */; };
+		8474A9960D7DBD1E00F2DF60 /* KatrinSLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8474A9900D7DBD1E00F2DF60 /* KatrinSLTCard.gif */; };
+		8474A9970D7DBD1E00F2DF60 /* ORKatrinSLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8474A9910D7DBD1E00F2DF60 /* ORKatrinSLTController.h */; };
+		8474A9980D7DBD1E00F2DF60 /* ORKatrinSLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474A9920D7DBD1E00F2DF60 /* ORKatrinSLTController.m */; };
+		8474A9990D7DBD1E00F2DF60 /* ORKatrinSLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8474A9930D7DBD1E00F2DF60 /* ORKatrinSLTModel.h */; };
+		8474A99A0D7DBD1E00F2DF60 /* ORKatrinSLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8474A9940D7DBD1E00F2DF60 /* ORKatrinSLTModel.m */; };
 		84751A2D09A5057100253B57 /* ORSafeCircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 84751A2B09A5057100253B57 /* ORSafeCircularBuffer.h */; };
 		84751A2E09A5057100253B57 /* ORSafeCircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 84751A2C09A5057100253B57 /* ORSafeCircularBuffer.m */; };
 		8475974D0B5EF26500123411 /* ORSqlController.h in Headers */ = {isa = PBXBuildFile; fileRef = 847597460B5EF26500123411 /* ORSqlController.h */; };
@@ -2455,6 +2470,21 @@
 		84749DC507D66BDF001553EC /* ORVmeDaughterCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVmeDaughterCard.m; sourceTree = "<group>"; };
 		84749DCD07D66EBC001553EC /* ORVmeCarrierCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeCarrierCard.h; sourceTree = "<group>"; };
 		84749DCE07D66EBC001553EC /* ORVmeCarrierCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVmeCarrierCard.m; sourceTree = "<group>"; };
+		8474A8EE0D7CCD5400F2DF60 /* IpeV4Crate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeV4Crate.nib; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/IpeV4Crate.nib"; sourceTree = SOURCE_ROOT; };
+		8474A8EF0D7CCD5400F2DF60 /* IpeV4Crate.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = IpeV4Crate.tif; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/IpeV4Crate.tif"; sourceTree = SOURCE_ROOT; };
+		8474A8F00D7CCD5400F2DF60 /* IpeV4CrateBig.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = IpeV4CrateBig.tif; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/IpeV4CrateBig.tif"; sourceTree = SOURCE_ROOT; };
+		8474A8F30D7CCD5400F2DF60 /* ORIpeV4CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4CrateModel.h; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateModel.h"; sourceTree = SOURCE_ROOT; };
+		8474A8F40D7CCD5400F2DF60 /* ORIpeV4CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4CrateModel.m; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateModel.m"; sourceTree = SOURCE_ROOT; };
+		8474A8F50D7CCD5400F2DF60 /* ORIpeV4CrateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4CrateView.h; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateView.h"; sourceTree = SOURCE_ROOT; };
+		8474A8F60D7CCD5400F2DF60 /* ORIpeV4CrateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4CrateView.m; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateView.m"; sourceTree = SOURCE_ROOT; };
+		8474A9000D7CCD7000F2DF60 /* ORIpeV4CrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4CrateController.m; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateController.m"; sourceTree = SOURCE_ROOT; };
+		8474A9030D7CCE2100F2DF60 /* ORIpeV4CrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4CrateController.h; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateController.h"; sourceTree = SOURCE_ROOT; };
+		8474A98F0D7DBD1E00F2DF60 /* KatrinSLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = KatrinSLT.nib; path = "Source/Objects/Hardware/IPE/Katrin SLT/KatrinSLT.nib"; sourceTree = SOURCE_ROOT; };
+		8474A9900D7DBD1E00F2DF60 /* KatrinSLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = KatrinSLTCard.gif; path = "Source/Objects/Hardware/IPE/Katrin SLT/KatrinSLTCard.gif"; sourceTree = SOURCE_ROOT; };
+		8474A9910D7DBD1E00F2DF60 /* ORKatrinSLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKatrinSLTController.h; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTController.h"; sourceTree = SOURCE_ROOT; };
+		8474A9920D7DBD1E00F2DF60 /* ORKatrinSLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKatrinSLTController.m; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTController.m"; sourceTree = SOURCE_ROOT; };
+		8474A9930D7DBD1E00F2DF60 /* ORKatrinSLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKatrinSLTModel.h; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTModel.h"; sourceTree = SOURCE_ROOT; };
+		8474A9940D7DBD1E00F2DF60 /* ORKatrinSLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKatrinSLTModel.m; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTModel.m"; sourceTree = SOURCE_ROOT; };
 		84751A2B09A5057100253B57 /* ORSafeCircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSafeCircularBuffer.h; sourceTree = "<group>"; };
 		84751A2C09A5057100253B57 /* ORSafeCircularBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSafeCircularBuffer.m; sourceTree = "<group>"; };
 		847532B303BE5C3B005A89CB /* ORDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDefaults.h; sourceTree = "<group>"; };
@@ -5266,6 +5296,37 @@
 			path = M321;
 			sourceTree = "<group>";
 		};
+		8474A8ED0D7CCD5400F2DF60 /* IpeV4 Crate */ = {
+			isa = PBXGroup;
+			children = (
+				8474A8EE0D7CCD5400F2DF60 /* IpeV4Crate.nib */,
+				8474A8EF0D7CCD5400F2DF60 /* IpeV4Crate.tif */,
+				8474A8F00D7CCD5400F2DF60 /* IpeV4CrateBig.tif */,
+				8474A9000D7CCD7000F2DF60 /* ORIpeV4CrateController.m */,
+				8474A9030D7CCE2100F2DF60 /* ORIpeV4CrateController.h */,
+				8474A8F30D7CCD5400F2DF60 /* ORIpeV4CrateModel.h */,
+				8474A8F40D7CCD5400F2DF60 /* ORIpeV4CrateModel.m */,
+				8474A8F50D7CCD5400F2DF60 /* ORIpeV4CrateView.h */,
+				8474A8F60D7CCD5400F2DF60 /* ORIpeV4CrateView.m */,
+			);
+			name = "IpeV4 Crate";
+			path = "Source/Objects/Hardware/IPE/IpeV4 Crate";
+			sourceTree = SOURCE_ROOT;
+		};
+		8474A98E0D7DBD1E00F2DF60 /* Katrin SLT */ = {
+			isa = PBXGroup;
+			children = (
+				8474A98F0D7DBD1E00F2DF60 /* KatrinSLT.nib */,
+				8474A9900D7DBD1E00F2DF60 /* KatrinSLTCard.gif */,
+				8474A9910D7DBD1E00F2DF60 /* ORKatrinSLTController.h */,
+				8474A9920D7DBD1E00F2DF60 /* ORKatrinSLTController.m */,
+				8474A9930D7DBD1E00F2DF60 /* ORKatrinSLTModel.h */,
+				8474A9940D7DBD1E00F2DF60 /* ORKatrinSLTModel.m */,
+			);
+			name = "Katrin SLT";
+			path = "Source/Objects/Hardware/IPE/Katrin SLT";
+			sourceTree = SOURCE_ROOT;
+		};
 		847597450B5EF26500123411 /* SQL */ = {
 			isa = PBXGroup;
 			children = (
@@ -6884,9 +6945,11 @@
 			children = (
 				84F46F0A0CA44255007EFADA /* IPE Base Classes */,
 				84F46F110CA44255007EFADA /* IPE Crate */,
+				8474A8ED0D7CCD5400F2DF60 /* IpeV4 Crate */,
 				84F46F1A0CA44255007EFADA /* IPE FLT */,
 				84F46F240CA44255007EFADA /* IPE SLT */,
 				84F46F2D0CA44255007EFADA /* Katrin FLT */,
+				8474A98E0D7DBD1E00F2DF60 /* Katrin SLT */,
 			);
 			name = IPE;
 			path = Source/Objects/Hardware/IPE;
@@ -8135,6 +8198,11 @@
 				9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */,
 				8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */,
 				8428ADE40D7CACD00093D35E /* ORHeaderExplorerModel.h in Headers */,
+				8474A8FC0D7CCD5400F2DF60 /* ORIpeV4CrateModel.h in Headers */,
+				8474A8FE0D7CCD5400F2DF60 /* ORIpeV4CrateView.h in Headers */,
+				8474A9040D7CCE2100F2DF60 /* ORIpeV4CrateController.h in Headers */,
+				8474A9970D7DBD1E00F2DF60 /* ORKatrinSLTController.h in Headers */,
+				8474A9990D7DBD1E00F2DF60 /* ORKatrinSLTModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8640,6 +8708,11 @@
 				CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
 				8428ADE00D7CACD00093D35E /* HeaderExplorer.gif in Resources */,
 				8428ADE10D7CACD00093D35E /* HeaderExplorer.nib in Resources */,
+				8474A8F70D7CCD5400F2DF60 /* IpeV4Crate.nib in Resources */,
+				8474A8F80D7CCD5400F2DF60 /* IpeV4Crate.tif in Resources */,
+				8474A8F90D7CCD5400F2DF60 /* IpeV4CrateBig.tif in Resources */,
+				8474A9950D7DBD1E00F2DF60 /* KatrinSLT.nib in Resources */,
+				8474A9960D7DBD1E00F2DF60 /* KatrinSLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9228,6 +9301,11 @@
 				9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */,
 				8428ADE30D7CACD00093D35E /* ORHeaderExplorerController.m in Sources */,
 				8428ADE50D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */,
+				8474A8FD0D7CCD5400F2DF60 /* ORIpeV4CrateModel.m in Sources */,
+				8474A8FF0D7CCD5400F2DF60 /* ORIpeV4CrateView.m in Sources */,
+				8474A9010D7CCD7000F2DF60 /* ORIpeV4CrateController.m in Sources */,
+				8474A9980D7DBD1E00F2DF60 /* ORKatrinSLTController.m in Sources */,
+				8474A99A0D7DBD1E00F2DF60 /* ORKatrinSLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
