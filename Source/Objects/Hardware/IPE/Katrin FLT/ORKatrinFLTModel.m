@@ -1487,7 +1487,11 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 		// ak 11.7.07
 		page1 = nextEventPage;
 		usleep(1);
-		if (nLoops % 100000 == 0){
+		
+		// Generate event every 2 sec
+	    unsigned long sec = [self readTime];
+	    if (sec > lastSec + 1) {
+   		    lastSec = sec; // Store the  actual second counter		
 			page1 = (nextEventPage + 1) % 512;
 			//NSLog(@"Pages: %d %d (last %d, loops %d)\n", page0, page1, nextEventPage, nLoops);
 			usleep(100); 
@@ -1654,37 +1658,35 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 							[theWaveFormData appendBytes:&theEvent length:sizeof(katrinEventDataStruct)];
 							[theWaveFormData appendBytes:&theDebugEvent length:sizeof(katrinDebugDataStruct)];									
 							
-							int startBin = theEvent.subSec - (256 + [[[self crate] adapter] nextPageDelay] + (readoutPages-1) * 1024);
+							// Calculate start bin
+							// Note: The Flt uses a fixed post trigger time of 512 bin
+							//       This time is different from the central nextpage delay used by the Slt
+							//       ak, 29.2.08
+							int startBin = theEvent.subSec - (512 + (readoutPages-1) * 1024);
 							if(startBin < 0){
 								startBin = 0x10000 + startBin;
 							}
 							
+														
 							// Use block read mode.
 							// With every 32bit (long word) two 12bit ADC values are transmitted
 							// ak 19.6.07
 							[theWaveFormData setLength:totalLength*sizeof(long)]; //we're going to dump directly into the NSData object so
 																				  //we have to set the total size first. (Note: different than 'Capacity')
 							int j;
-							unsigned long buf[512];
 							unsigned long addr =  (startBin & 0xffff);
-							short* waveFormPtr = ((short*)[theWaveFormData bytes]) + (4*sizeof(short))
-								+ (sizeof(katrinEventDataStruct)/sizeof(short))
-								+ (sizeof(katrinDebugDataStruct)/sizeof(short)); //point to start of waveform
+							short* waveFormPtr = ((short*)[theWaveFormData bytes]) + (4*sizeof(short));
+							//	+ (sizeof(katrinEventDataStruct)/sizeof(short))
+							//	+ (sizeof(katrinDebugDataStruct)/sizeof(short)); //point to start of waveform
 								
-							short* wPtr = waveFormPtr;
+							unsigned long *lPtr = (unsigned long *) waveFormPtr;
 							for (j=0;j<readoutPages;j++){
 								
 								readAddress =  memoryAddress | (aChan << kKatrinFlt_ChannelAddress) | addr;
-								[fireWireCard read:readAddress data:buf size:512*sizeof(long)];						
-								
-								// The order of the shorts has to be switched (endianess)
-								int i;
-								for (i=0;i<512;i++){
-									*wPtr++ =  (buf[i]       & 0xffff); // 12bit ADC + flags
-									*wPtr++ =  ((buf[i]>>16) & 0xffff); // 12bits ADC + flags
-								}	 
+								[fireWireCard read:readAddress data:lPtr size:512*sizeof(long)];														
 								
 								addr = (addr + 1024) % 0x10000;
+								lPtr = lPtr + 512;
 							}
 							
 							if(usingPBusSimulation){
@@ -1699,6 +1701,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 							// Check if the data is completely in the buffer
 							// In case of a second strobe the recording is not continuos at the 
 							// end of the buffer.
+							// TODO: Implement a more intelligent readout for traces in the beginning of the second, ak 29.2.08
 							if (theEvent.subSec > 1024 * readoutPages){
 								[aDataPacket addData:theWaveFormData]; //ship the waveform
 							} 

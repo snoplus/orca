@@ -109,7 +109,7 @@
 	bool			useResetTimestamp; //!< Event loop: Flag to indicate that the current hardwarde version supports reset time stamps
 
 	// Parameters for periodic readout mode
-	unsigned long	lastSec;		//!< Periodic readout: Buffer for the last second in preriodically readout mode
+	unsigned long	lastSec;		//!< Periodic readout: Buffer for the last second in periodically readout mode
 	unsigned long	activeChMap;	//!< Periodic readout: List of active channels 
 	unsigned long	actualThreshold[22];//!< Periodic readout: Actually threshold during threshold scan
 	unsigned long	savedThreshold[22];	//!< Periodic readout: Original threshold saved from current configuration 

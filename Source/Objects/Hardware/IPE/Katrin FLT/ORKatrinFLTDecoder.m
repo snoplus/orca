@@ -174,9 +174,27 @@ followed by waveform data (n x 1024 16-bit words)
 			  numBins:32768 
 			  sender:self  
 			  withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
+
+	
+	// Change order of shorts in the ADC trace for PowerPC CPUs	
+	// Note: This the endian swap itself is handled by the firewire drivers.
+	//       The swap of the shorts has been moved from the model code
+	// ak, 29.2.08
+	if (ntohl(1) == 1) { // big endian host
+		// Point to ADC data
+		ptr += (sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/sizeof(unsigned long);
+		
+		// The order of the shorts has to be switched (endianess)
+		int i;
+		int traceLen = (length / 512) * 512;
+		
+		for (i=0;i< traceLen;i++)
+		    ptr[i] = (ptr[i] >> 16)  |  (ptr[i] << 16);
+    }
 	
 	// Set up the waveform
 	NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
+
 
 	[aDataSet loadWaveform: waveFormdata							//pass in the whole data set
 					offset: (2*sizeof(long)+sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/2	// Offset in bytes (2 header words + katrinEventDataStruct)
@@ -190,6 +208,7 @@ followed by waveform data (n x 1024 16-bit words)
 					
     return length; //must return number of longs processed.
 }
+
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
