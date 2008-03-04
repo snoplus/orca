@@ -155,6 +155,10 @@
 - (void)  plotter:(id) aPlotter dataSet:(int)set index:(int)i time:(unsigned long*)x y:(float*)y;
 @end
 
+@interface NSObject (ORPlotter1D)
+- (void) makeMainController;
+@end
+
 extern NSString* ORPlotter1DBackgroundColor;
 extern NSString* ORPlotter1DGridColor;
 extern NSString* ORPlotter1DataColor;
