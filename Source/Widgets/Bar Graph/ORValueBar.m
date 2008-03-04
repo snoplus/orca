@@ -23,6 +23,13 @@
 #import "ORAxis.h"
 #import "CTGradient.h"
 
+#ifndef NSAppKitVersionNumber10_5
+#define NSAppKitVersionNumber10_5 949
+#endif
+
+#ifndef NSAppKitVersionNumber10_4
+#define NSAppKitVersionNumber10_4 824
+#endif
 
 @implementation ORValueBar
 
@@ -113,7 +120,7 @@
 - (void) setNeedsDisplay:(BOOL)flag
 {
 	//Argg.... before 10.5 the calling the superclass would break the update chain for some reason
-	if([ORAppDelegate isMacOSX10_5]){
+	if((floor(NSAppKitVersionNumber) >= NSAppKitVersionNumber10_5)){
 		[super setNeedsDisplay:flag];
 	}
 	[chainedView setNeedsDisplay:flag];
