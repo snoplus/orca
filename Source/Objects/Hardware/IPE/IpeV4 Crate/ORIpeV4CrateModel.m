@@ -77,6 +77,11 @@
 							  
 }
 
+- (void) makeConnectors
+{
+	//no connectors
+}
+
 - (void) makeMainController
 {
     [self linkToController:@"ORIpeV4CrateController"];
