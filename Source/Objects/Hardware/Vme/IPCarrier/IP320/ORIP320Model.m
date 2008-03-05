@@ -675,7 +675,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORSIP320DecoderForADC",						@"decoder",
+        @"ORIP320DecoderForAdc",						@"decoder",
         [NSNumber numberWithLong:dataId],               @"dataId",
         [NSNumber numberWithBool:YES],                  @"variable",
         [NSNumber numberWithLong:-1],					@"length",
