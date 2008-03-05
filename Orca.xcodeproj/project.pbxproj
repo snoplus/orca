@@ -1593,6 +1593,12 @@
 		84FD0EFC0794743A004A0E46 /* TriggerCheckHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84FD0EF80794743A004A0E46 /* TriggerCheckHelp.plist */; };
 		84FD0EFD0794743A004A0E46 /* MuxCheckHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84FD0EF90794743A004A0E46 /* MuxCheckHelp.plist */; };
 		84FD0EFE0794743A004A0E46 /* HardwareCheckHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84FD0EFA0794743A004A0E46 /* HardwareCheckHelp.plist */; };
+		84FDF5290D7E1EAE003AE119 /* KatrinSLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FDF5230D7E1EAE003AE119 /* KatrinSLT.nib */; };
+		84FDF52A0D7E1EAE003AE119 /* KatrinSLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FDF5240D7E1EAE003AE119 /* KatrinSLTCard.gif */; };
+		84FDF52B0D7E1EAE003AE119 /* ORKatrinSLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FDF5250D7E1EAE003AE119 /* ORKatrinSLTController.h */; };
+		84FDF52C0D7E1EAE003AE119 /* ORKatrinSLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FDF5260D7E1EAE003AE119 /* ORKatrinSLTController.m */; };
+		84FDF52D0D7E1EAE003AE119 /* ORKatrinSLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FDF5270D7E1EAE003AE119 /* ORKatrinSLTModel.h */; };
+		84FDF52E0D7E1EAE003AE119 /* ORKatrinSLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FDF5280D7E1EAE003AE119 /* ORKatrinSLTModel.m */; };
 		84FE07D007B403ED00E2CB0E /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FE07CE07B403ED00E2CB0E /* NSString+Extensions.m */; };
 		84FE07D107B403ED00E2CB0E /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FE07CF07B403ED00E2CB0E /* NSString+Extensions.h */; };
 		84FFCAA60636D5B10069432F /* C792.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FFCAA00636D5B10069432F /* C792.gif */; };
@@ -3253,6 +3259,12 @@
 		84FD0EF80794743A004A0E46 /* TriggerCheckHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = TriggerCheckHelp.plist; path = Source/Experiments/Ncd/TriggerCheckHelp.plist; sourceTree = SOURCE_ROOT; };
 		84FD0EF90794743A004A0E46 /* MuxCheckHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MuxCheckHelp.plist; path = Source/Experiments/Ncd/MuxCheckHelp.plist; sourceTree = SOURCE_ROOT; };
 		84FD0EFA0794743A004A0E46 /* HardwareCheckHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = HardwareCheckHelp.plist; path = Source/Experiments/Ncd/HardwareCheckHelp.plist; sourceTree = SOURCE_ROOT; };
+		84FDF5230D7E1EAE003AE119 /* KatrinSLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = KatrinSLT.nib; path = "Source/Objects/Hardware/IPE/Katrin SLT/KatrinSLT.nib"; sourceTree = SOURCE_ROOT; };
+		84FDF5240D7E1EAE003AE119 /* KatrinSLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = KatrinSLTCard.gif; path = "Source/Objects/Hardware/IPE/Katrin SLT/KatrinSLTCard.gif"; sourceTree = SOURCE_ROOT; };
+		84FDF5250D7E1EAE003AE119 /* ORKatrinSLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKatrinSLTController.h; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTController.h"; sourceTree = SOURCE_ROOT; };
+		84FDF5260D7E1EAE003AE119 /* ORKatrinSLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKatrinSLTController.m; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTController.m"; sourceTree = SOURCE_ROOT; };
+		84FDF5270D7E1EAE003AE119 /* ORKatrinSLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKatrinSLTModel.h; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTModel.h"; sourceTree = SOURCE_ROOT; };
+		84FDF5280D7E1EAE003AE119 /* ORKatrinSLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKatrinSLTModel.m; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTModel.m"; sourceTree = SOURCE_ROOT; };
 		84FE07CE07B403ED00E2CB0E /* NSString+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSString+Extensions.m"; path = "Source/Cocoa Extensions/NSString+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		84FE07CF07B403ED00E2CB0E /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "Source/Cocoa Extensions/NSString+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		84FE6584047D9140005F64B1 /* ORHVSupply.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHVSupply.h; path = Source/Objects/Control/HVControl/ORHVSupply.h; sourceTree = SOURCE_ROOT; };
@@ -6893,6 +6905,7 @@
 				84F46F1A0CA44255007EFADA /* IPE FLT */,
 				84F46F240CA44255007EFADA /* IPE SLT */,
 				84F46F2D0CA44255007EFADA /* Katrin FLT */,
+				84FDF5220D7E1EAE003AE119 /* Katrin SLT */,
 			);
 			name = IPE;
 			path = Source/Objects/Hardware/IPE;
@@ -7066,6 +7079,20 @@
 			);
 			name = Workers;
 			path = "Source/Objects/Misc Objects/Workers";
+			sourceTree = SOURCE_ROOT;
+		};
+		84FDF5220D7E1EAE003AE119 /* Katrin SLT */ = {
+			isa = PBXGroup;
+			children = (
+				84FDF5230D7E1EAE003AE119 /* KatrinSLT.nib */,
+				84FDF5240D7E1EAE003AE119 /* KatrinSLTCard.gif */,
+				84FDF5250D7E1EAE003AE119 /* ORKatrinSLTController.h */,
+				84FDF5260D7E1EAE003AE119 /* ORKatrinSLTController.m */,
+				84FDF5270D7E1EAE003AE119 /* ORKatrinSLTModel.h */,
+				84FDF5280D7E1EAE003AE119 /* ORKatrinSLTModel.m */,
+			);
+			name = "Katrin SLT";
+			path = "Source/Objects/Hardware/IPE/Katrin SLT";
 			sourceTree = SOURCE_ROOT;
 		};
 		84FFCA9F0636D5B10069432F /* CV792 */ = {
@@ -8142,6 +8169,8 @@
 				8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */,
 				8428ADE40D7CACD00093D35E /* ORHeaderExplorerModel.h in Headers */,
 				84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */,
+				84FDF52B0D7E1EAE003AE119 /* ORKatrinSLTController.h in Headers */,
+				84FDF52D0D7E1EAE003AE119 /* ORKatrinSLTModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8647,6 +8676,8 @@
 				CEEBAB7D0D6637F000BE95A0 /* EduWashingtonNplOrcaNi488PlugIn.plugin in Resources */,
 				8428ADE00D7CACD00093D35E /* HeaderExplorer.gif in Resources */,
 				8428ADE10D7CACD00093D35E /* HeaderExplorer.nib in Resources */,
+				84FDF5290D7E1EAE003AE119 /* KatrinSLT.nib in Resources */,
+				84FDF52A0D7E1EAE003AE119 /* KatrinSLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9236,6 +9267,8 @@
 				8428ADE30D7CACD00093D35E /* ORHeaderExplorerController.m in Sources */,
 				8428ADE50D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */,
 				84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */,
+				84FDF52C0D7E1EAE003AE119 /* ORKatrinSLTController.m in Sources */,
+				84FDF52E0D7E1EAE003AE119 /* ORKatrinSLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
