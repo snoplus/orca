@@ -347,6 +347,8 @@
 		842539FE0BCD7BFE004C8065 /* ORCARootServiceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */; };
 		84253BB20BCDA410004C8065 /* ORCARoot.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84253BB10BCDA410004C8065 /* ORCARoot.gif */; };
 		842702810B5EE938009176B4 /* katrin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842702800B5EE937009176B4 /* katrin.gif */; };
+		84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */; };
+		84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */; };
 		8428ADE00D7CACD00093D35E /* HeaderExplorer.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8428ADD40D7CACD00093D35E /* HeaderExplorer.gif */; };
 		8428ADE10D7CACD00093D35E /* HeaderExplorer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8428ADD50D7CACD00093D35E /* HeaderExplorer.nib */; };
 		8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8428ADD60D7CACD00093D35E /* ORHeaderExplorerController.h */; };
@@ -2106,6 +2108,8 @@
 		842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCARootServiceController.m; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceController.m"; sourceTree = SOURCE_ROOT; };
 		84253BB10BCDA410004C8065 /* ORCARoot.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = ORCARoot.gif; path = "Source/Main Dialogs/ORCARootService/ORCARoot.gif"; sourceTree = SOURCE_ROOT; };
 		842702800B5EE937009176B4 /* katrin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = katrin.gif; path = Source/Experiments/Katrin/katrin.gif; sourceTree = SOURCE_ROOT; };
+		84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIP320Decoders.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.h; sourceTree = SOURCE_ROOT; };
+		84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIP320Decoders.m; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.m; sourceTree = SOURCE_ROOT; };
 		8428ADD40D7CACD00093D35E /* HeaderExplorer.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HeaderExplorer.gif; path = "Source/Objects/Data Processing/HeaderExplorer/HeaderExplorer.gif"; sourceTree = SOURCE_ROOT; };
 		8428ADD50D7CACD00093D35E /* HeaderExplorer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HeaderExplorer.nib; path = "Source/Objects/Data Processing/HeaderExplorer/HeaderExplorer.nib"; sourceTree = SOURCE_ROOT; };
 		8428ADD60D7CACD00093D35E /* ORHeaderExplorerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHeaderExplorerController.h; path = "Source/Objects/Data Processing/HeaderExplorer/ORHeaderExplorerController.h"; sourceTree = SOURCE_ROOT; };
@@ -4934,6 +4938,8 @@
 				84456C6A068A35070055DDFA /* ORIP320Channel.m */,
 				8445671E0687A7C70055DDFA /* ORIP320Controller.h */,
 				8445671F0687A7C70055DDFA /* ORIP320Controller.m */,
+				84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */,
+				84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */,
 				8445671B0687A7C70055DDFA /* IP320.gif */,
 				8445671C0687A7C70055DDFA /* IP320.nib */,
 			);
@@ -8135,6 +8141,7 @@
 				9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */,
 				8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */,
 				8428ADE40D7CACD00093D35E /* ORHeaderExplorerModel.h in Headers */,
+				84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9228,6 +9235,7 @@
 				9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */,
 				8428ADE30D7CACD00093D35E /* ORHeaderExplorerController.m in Sources */,
 				8428ADE50D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */,
+				84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
