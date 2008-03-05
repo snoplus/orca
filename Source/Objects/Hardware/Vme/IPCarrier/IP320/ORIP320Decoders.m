@@ -53,19 +53,18 @@
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
 	NSString* ipSlotKey  = [NSString stringWithFormat:@"IPSlot %2d\n",*ptr&0x0000000f];
 
-	*ptr++;
+	ptr++;
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z"];
-	NSString* theTime    = [NSString stringWithFormat:@"IPSlot %2d\n",*ptr&0x0000000f];
 
 	NSString* adcString = @"";
-	int n = length - 4;
+	int n = length - 3;
 	int i;
 	for(i=0;i<n;i++){
-		*ptr++;
+		ptr++;
 		adcString   = [adcString stringByAppendingFormat:@"ADC(%02d) = 0x%x\n",(*ptr>>16)&0x000000ff, *ptr&0x00000fff];
     }
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,ipSlotKey,theTime,adcString];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,ipSlotKey,date,adcString];               
 }
 
 
