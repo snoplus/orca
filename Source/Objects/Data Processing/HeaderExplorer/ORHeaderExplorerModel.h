@@ -56,6 +56,8 @@
 }
 
 #pragma mark •••Accessors
+- (int) selectedRunIndex;
+- (void) setSelectedRunIndex:(int)anIndex;
 - (int)  selectionDate;
 - (void) setSelectionDate:(int)aValue;
 - (NSDictionary*) runDictionaryForIndex:(int)index;

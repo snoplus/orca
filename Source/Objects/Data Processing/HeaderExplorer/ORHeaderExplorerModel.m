@@ -94,6 +94,17 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 	return selectedRunIndex;
 }
 
+- (void) setSelectedRunIndex:(int)anIndex
+{
+	if(anIndex!=selectedRunIndex){
+		selectedRunIndex = anIndex;
+		[[NSNotificationCenter defaultCenter]
+			postNotificationName:ORHeaderExplorerRunSelectionChanged
+				object: self];
+	}
+}
+
+
 - (int) selectionDate
 {
 	return selectionDate;
@@ -248,22 +259,23 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 - (void) findSelectedRun
 {
 	int index;
+	BOOL valid = NO;
 	int n = [runArray count];
-	unsigned long actualDate	= minRunStartTime + ((maxRunEndTime - minRunStartTime) * selectionDate/5000.);
+	unsigned long actualDate	= minRunStartTime + ((maxRunEndTime - minRunStartTime) * selectionDate/1000.);
 	for(index=0;index<n;index++){
 		NSDictionary* runDictionary = [runArray objectAtIndex:index];
 		unsigned long start = [[runDictionary objectForKey:@"RunStart"] unsignedLongValue];
 		unsigned long end   = [[runDictionary objectForKey:@"RunEnd"] unsignedLongValue];
-		if(actualDate > start && actualDate < end){
-			if(selectedRunIndex != index){
-				selectedRunIndex = index;
-				[self setHeader: [runDictionary objectForKey:@"FileHeader"]];
-				[[NSNotificationCenter defaultCenter]
-							postNotificationName:ORHeaderExplorerRunSelectionChanged
-								object: self];
-				break;
-			}
+		if(actualDate > start && actualDate <= end){
+			[self setSelectedRunIndex: index];
+			[self setHeader: [runDictionary objectForKey:@"FileHeader"]];
+			valid = YES;
+			break;
 		}
+	}
+	if(!valid){
+		[self setHeader: nil];
+		[self setSelectedRunIndex: -1];
 	}
 }
 

@@ -277,13 +277,11 @@
 {
 	unsigned long absStart		= [model minRunStartTime];
 	unsigned long absEnd		= [model maxRunEndTime];
-	NSDictionary* runDictionary = [model runDictionaryForIndex:[model selectedRunIndex]];
 	unsigned long selectionDate	= absStart + ((absEnd - absStart) * [model selectionDate]/100.);
-	if(absStart>0 && absEnd>0){
+	if(absStart>0 && absEnd>0 && [model selectedRunIndex]>=0){
+		NSDictionary* runDictionary = [model runDictionaryForIndex:[model selectedRunIndex]];
 		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
 		[selectionDateField setObjectValue:d];
-		[runTimeView setNeedsDisplay:YES];
-		[headerView reloadData];
 		if(runDictionary){
 			NSString* units = @"Bytes";
 			float fileSize = [[runDictionary objectForKey:@"FileSize"] floatValue];
@@ -305,7 +303,9 @@
 		else [runSummaryTextView setString:@"no valid selection"];
 	}
 	else [runSummaryTextView setString:@"no valid selection"];
-	
+	[runTimeView setNeedsDisplay:YES];
+	[headerView reloadData];
+
 }
 
 - (void) fileListChanged:(NSNotification*)note
