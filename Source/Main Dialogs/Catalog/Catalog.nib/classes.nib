@@ -1,190 +1,405 @@
-{
-    IBClasses = (
-        {CLASS = BiStateView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {
-            ACTIONS = {"" = id; }; 
-            CLASS = FirstResponder; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {taskFinished = id; tasksCompleted = id; }; 
-            CLASS = NSObject; 
-            LANGUAGE = ObjC; 
-        }, 
-        {CLASS = NSView; LANGUAGE = ObjC; SUPERCLASS = NSResponder; }, 
-        {
-            ACTIONS = {
-                setLogScale = id; 
-                shiftLeft = id; 
-                shiftRight = id; 
-                zoomIn = id; 
-                zoomOut = id; 
-            }; 
-            CLASS = ORAxis; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            CLASS = ORColorScale; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {colorAxis = ORAxis; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            CLASS = ORDetectorView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {delegate = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {
-                captureStateAction = id; 
-                detailsLockAction = id; 
-                detectorLockAction = id; 
-                displayTypeAction = id; 
-                initAction = id; 
-                mapLockAction = id; 
-                primaryAdcClassNameAction = id; 
-                readPrimaryMapFileAction = id; 
-                repeatRunCBAction = id; 
-                reportConfigAction = id; 
-                runModeAction = id; 
-                savePrimaryMapFileAction = id; 
-                showNamesAction = id; 
-                startRunAction = id; 
-                stopRunAction = id; 
-                timeLimitTextAction = id; 
-                timedRunCBAction = id; 
-            }; 
-            CLASS = ORExperimentController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                captureDateField = NSTextField; 
-                captureStateButton = NSButton; 
-                cardCheckView = BiStateView; 
-                detailsLockButton = NSButton; 
-                detectorLockButton = NSButton; 
-                detectorView = ORDetectorView; 
-                displayTypeMatrix = NSMatrix; 
-                displayTypeMatrix1 = NSMatrix; 
-                elapsedTimeField = NSTextField; 
-                hardwareCheckView = BiStateView; 
-                histogramTitle = NSTextField; 
-                initButton = NSButton; 
-                mapLockButton = NSButton; 
-                primaryAdcClassNamePopup = NSPopUpButton; 
-                primaryColorAxisLogCB = NSButton; 
-                primaryColorScale = ORColorScale; 
-                primaryMapFileTextField = NSTextField; 
-                primaryRateField = NSTextField; 
-                primaryTableView = NSTableView; 
-                primaryValuesView = NSTableView; 
-                rateLogCB = NSButton; 
-                ratePlot = ORPlotter1D; 
-                readPrimaryMapFileButton = NSButton; 
-                repeatRunCB = NSButton; 
-                reportStateButton = NSButton; 
-                runBar = NSProgressIndicator; 
-                runModeMatrix = NSMatrix; 
-                runNumberField = NSTextField; 
-                runStatusField = NSTextField; 
-                savePrimaryMapFileButton = NSButton; 
-                selectionStringTextView = NSTextView; 
-                showNamesCB = NSButton; 
-                startRunButton = NSButton; 
-                stopRunButton = NSButton; 
-                tabView = NSTabView; 
-                timeLimitField = NSTextField; 
-                timedRunCB = NSButton; 
-                valueHistogramsPlot = ORPlotter1D; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {
-                addGateAction = id; 
-                analyze = id; 
-                autoScale = id; 
-                averageWindowAction = id; 
-                centerOnPeak = id; 
-                clearActiveCurveGates = id; 
-                clearActiveGate = id; 
-                clearAllGates = id; 
-                copy = id; 
-                differentiateAction = id; 
-                removeGateAction = id; 
-                resetScales = id; 
-                savePDF = id; 
-                xAndYAutoScale = id; 
-            }; 
-            CLASS = ORPlotter1D; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                analysisDrawer = NSDrawer; 
-                analysisView = ZFlowLayout; 
-                mDataSource = id; 
-                mXScale = ORAxis; 
-                mYScale = ORAxis; 
-            }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
-        {
-            CLASS = ObjectFactory; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {object = id; }; 
-            SUPERCLASS = NSButton; 
-        }, 
-        {
-            ACTIONS = {
-                copy = id; 
-                decDialog = id; 
-                incDialog = id; 
-                saveDocument = id; 
-                saveDocumentAs = id; 
-            }; 
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {
-            ACTIONS = {click = id; }; 
-            CLASS = OrcaObjectFactory; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = ObjectFactory; 
-        }, 
-        {CLASS = ZFlowLayout; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {
-            ACTIONS = {
-                clrSelectionAction = id; 
-                readSecondaryMapFileAction = id; 
-                saveSecondaryMapFileAction = id; 
-                secondaryAdcClassNameAction = id; 
-                viewDialogAction = id; 
-            }; 
-            CLASS = nTPCController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                anodeScale = ORAxis; 
-                cathodeScale = ORAxis; 
-                clrSelectionButton = NSButton; 
-                detectorTitle = NSTextField; 
-                readSecondaryMapFileButton = NSButton; 
-                saveSecondaryMapFileButton = NSButton; 
-                secondaryAdcClassNamePopup = NSPopUpButton; 
-                secondaryColorAxisLogCB = NSButton; 
-                secondaryColorScale = ORColorScale; 
-                secondaryMapFileTextField = NSTextField; 
-                secondaryRateField = NSTextField; 
-                secondaryTableView = NSTableView; 
-                secondaryValuesView = NSTableView; 
-                showDialogButton = NSButton; 
-            }; 
-            SUPERCLASS = ORExperimentController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>click</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectFactory</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ObjectFactory</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORDetectorView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>delegate</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>BiStateView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>clrSelectionAction</key>
+				<string>id</string>
+				<key>readSecondaryMapFileAction</key>
+				<string>id</string>
+				<key>saveSecondaryMapFileAction</key>
+				<string>id</string>
+				<key>secondaryAdcClassNameAction</key>
+				<string>id</string>
+				<key>viewDialogAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>nTPCController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>anodeScale</key>
+				<string>ORAxis</string>
+				<key>cathodeScale</key>
+				<string>ORAxis</string>
+				<key>clrSelectionButton</key>
+				<string>NSButton</string>
+				<key>detectorTitle</key>
+				<string>NSTextField</string>
+				<key>readSecondaryMapFileButton</key>
+				<string>NSButton</string>
+				<key>saveSecondaryMapFileButton</key>
+				<string>NSButton</string>
+				<key>secondaryAdcClassNamePopup</key>
+				<string>NSPopUpButton</string>
+				<key>secondaryColorAxisLogCB</key>
+				<string>NSButton</string>
+				<key>secondaryColorScale</key>
+				<string>ORColorScale</string>
+				<key>secondaryMapFileTextField</key>
+				<string>NSTextField</string>
+				<key>secondaryRateField</key>
+				<string>NSTextField</string>
+				<key>secondaryTableView</key>
+				<string>NSTableView</string>
+				<key>secondaryValuesView</key>
+				<string>NSTableView</string>
+				<key>showDialogButton</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>ORExperimentController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORColorScale</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>colorAxis</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key></key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ObjectFactory</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>object</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSButton</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>captureStateAction</key>
+				<string>id</string>
+				<key>detailsLockAction</key>
+				<string>id</string>
+				<key>detectorLockAction</key>
+				<string>id</string>
+				<key>displayTypeAction</key>
+				<string>id</string>
+				<key>initAction</key>
+				<string>id</string>
+				<key>mapLockAction</key>
+				<string>id</string>
+				<key>primaryAdcClassNameAction</key>
+				<string>id</string>
+				<key>readPrimaryMapFileAction</key>
+				<string>id</string>
+				<key>repeatRunCBAction</key>
+				<string>id</string>
+				<key>reportConfigAction</key>
+				<string>id</string>
+				<key>runModeAction</key>
+				<string>id</string>
+				<key>savePrimaryMapFileAction</key>
+				<string>id</string>
+				<key>showNamesAction</key>
+				<string>id</string>
+				<key>startRunAction</key>
+				<string>id</string>
+				<key>stopRunAction</key>
+				<string>id</string>
+				<key>timeLimitTextAction</key>
+				<string>id</string>
+				<key>timedRunCBAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORExperimentController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>captureDateField</key>
+				<string>NSTextField</string>
+				<key>captureStateButton</key>
+				<string>NSButton</string>
+				<key>cardCheckView</key>
+				<string>BiStateView</string>
+				<key>detailsLockButton</key>
+				<string>NSButton</string>
+				<key>detectorLockButton</key>
+				<string>NSButton</string>
+				<key>detectorView</key>
+				<string>ORDetectorView</string>
+				<key>displayTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>displayTypeMatrix1</key>
+				<string>NSMatrix</string>
+				<key>elapsedTimeField</key>
+				<string>NSTextField</string>
+				<key>hardwareCheckView</key>
+				<string>BiStateView</string>
+				<key>histogramTitle</key>
+				<string>NSTextField</string>
+				<key>initButton</key>
+				<string>NSButton</string>
+				<key>mapLockButton</key>
+				<string>NSButton</string>
+				<key>primaryAdcClassNamePopup</key>
+				<string>NSPopUpButton</string>
+				<key>primaryColorAxisLogCB</key>
+				<string>NSButton</string>
+				<key>primaryColorScale</key>
+				<string>ORColorScale</string>
+				<key>primaryMapFileTextField</key>
+				<string>NSTextField</string>
+				<key>primaryRateField</key>
+				<string>NSTextField</string>
+				<key>primaryTableView</key>
+				<string>NSTableView</string>
+				<key>primaryValuesView</key>
+				<string>NSTableView</string>
+				<key>rateLogCB</key>
+				<string>NSButton</string>
+				<key>ratePlot</key>
+				<string>ORPlotter1D</string>
+				<key>readPrimaryMapFileButton</key>
+				<string>NSButton</string>
+				<key>repeatRunCB</key>
+				<string>NSButton</string>
+				<key>reportStateButton</key>
+				<string>NSButton</string>
+				<key>runBar</key>
+				<string>NSProgressIndicator</string>
+				<key>runModeMatrix</key>
+				<string>NSMatrix</string>
+				<key>runNumberField</key>
+				<string>NSTextField</string>
+				<key>runStatusField</key>
+				<string>NSTextField</string>
+				<key>savePrimaryMapFileButton</key>
+				<string>NSButton</string>
+				<key>selectionStringTextView</key>
+				<string>NSTextView</string>
+				<key>showNamesCB</key>
+				<string>NSButton</string>
+				<key>startRunButton</key>
+				<string>NSButton</string>
+				<key>stopRunButton</key>
+				<string>NSButton</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
+				<key>timeLimitField</key>
+				<string>NSTextField</string>
+				<key>timedRunCB</key>
+				<string>NSButton</string>
+				<key>valueHistogramsPlot</key>
+				<string>ORPlotter1D</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
