@@ -236,14 +236,21 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 
 - (NSString*) finalDirectoryName
 {
-	NSCalendarDate* date = [NSCalendarDate date];
-	NSString* year  = [NSString stringWithFormat:@"%d",[date yearOfCommonEra]];
-	NSString* month = [NSString stringWithFormat:@"%d",[date monthOfYear]];
-	NSString* path = [self directoryName];
-	path = [path stringByAppendingPathComponent:year];
-	path = [path stringByAppendingPathComponent:month];
+	NSString* path = @"~"; //default
+	if(useFolderStructure){
+		NSCalendarDate* date = [NSCalendarDate date];
+		NSString* year  = [NSString stringWithFormat:@"%d",[date yearOfCommonEra]];
+		NSString* month = [NSString stringWithFormat:@"%d",[date monthOfYear]];
+		path = [self directoryName];
+		path = [path stringByAppendingPathComponent:year];
+		path = [path stringByAppendingPathComponent:month];
 	
-	if(defaultLastPathComponent) path = [path stringByAppendingPathComponent:defaultLastPathComponent];
+		if(defaultLastPathComponent) path = [path stringByAppendingPathComponent:defaultLastPathComponent];
+	}
+	else {
+		path = [self directoryName];
+		if(defaultLastPathComponent) path = [path stringByAppendingPathComponent:defaultLastPathComponent];
+	}
 	return path;
 }
 
