@@ -147,7 +147,25 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart
 followed by waveform data (n x 1024 16-bit words)
 </pre>
   *
-  */
+  * All data is stored in the orignal format except for the short data type arrays of the waveform data. 
+  * The litle endian machines will store the orignal data that comes from the electronics. 
+  * The electronics uses also little endian byte order. The organisation is as follows
+<pre>  
+1H 1L 2H 2L 3H 3L 4H 4L ...
+</pre>
+  *
+  * The big endian machines will swap the bytes (under the assumption of a long array)
+  *
+<pre>
+2L 2H 2L 1H 4L 4H 3L 3H ...
+</pre>
+  * This is the byte format stored by the big endian machines.
+  * In order to display the waveforms in the correct order a second correction is necessary
+  * Before display 1 -2, 3 -4 , .. have to be changed.
+  * The little endian machines will apply the normal endian swap to the stored data 
+  * and can display the data correctly without any further operation.
+  *
+  */ 
 //-------------------------------------------------------------
 
 
