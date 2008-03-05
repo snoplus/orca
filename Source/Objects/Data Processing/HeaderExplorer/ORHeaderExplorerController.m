@@ -244,7 +244,6 @@
 	[progressIndicatorBottom setDoubleValue:0.0];
 	[progressIndicatorBottom setIndeterminate:NO];
 	[progressIndicatorBottom stopAnimation:self];
-	[runTimeView setNeedsDisplay:YES];
 	
 	unsigned long absStart = [model minRunStartTime];
 	unsigned long absEnd   = [model maxRunEndTime];
@@ -254,7 +253,9 @@
 		d = [NSCalendarDate dateWithTimeIntervalSince1970:absEnd];
 		[runEndField setObjectValue:d];
 	}
-
+	[model setSelectionDate:[selectionDateSlider intValue]];
+	
+	[self runSelectionChanged:nil];
 }
 
 - (void) reading:(NSNotification *)aNotification
@@ -274,9 +275,12 @@
 	unsigned long absStart		= [model minRunStartTime];
 	unsigned long absEnd		= [model maxRunEndTime];
 	unsigned long selectionDate	= absStart + ((absEnd - absStart) * [model selectionDate]/1000.);
-	NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
-	[selectionDateField setObjectValue:d];
-
+	if(absStart && absEnd){
+		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
+		[selectionDateField setObjectValue:d];
+	}
+	[runTimeView setNeedsDisplay:YES];
+	[headerView reloadData];
 }
 
 - (void) runSelectionChanged:(NSNotification*)note
@@ -302,6 +306,8 @@
 			s = [s stringByAppendingFormat:@"Run Length: %@ sec\n",[runDictionary objectForKey:@"RunLength"]];
 			s = [s stringByAppendingFormat:@"File Size : %.2f %@",fileSize,units];
 			[runSummaryTextView setString:s];
+						
+			[fileListView selectRowIndexes:[NSIndexSet indexSetWithIndex: [model selectedRunIndex]] byExtendingSelection:NO] ;
 		}
 		else [runSummaryTextView setString:@"no valid selection"];
 	}
@@ -427,6 +433,7 @@
 {
 	[model setSelectionDate:aValue];
 }
+
 @end
 
 @implementation ORHeaderExplorerController (private)
