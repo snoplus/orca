@@ -814,7 +814,10 @@
     return YES;
 }
 
-- (BOOL) readHeaderReturnRunLength: (NSFileHandle*)fp runStart:(unsigned long*)runStart runEnd:(unsigned long*)runEnd
+- (BOOL) readHeaderReturnRunLength: (NSFileHandle*)fp 
+						  runStart:(unsigned long*)aRunStart 
+							runEnd:(unsigned long*)aRunEnd
+							runNumber:(unsigned long*)aRunNumber
 {
 	//a special function for reading the file and extracting the run length
 	//assumes special knowledge of the run record
@@ -843,8 +846,9 @@
 			if((run1[1] & 0x1) && !(run2[1] & 0x1)){
 				//OK, we have a start and end run record
 				//return the run length in seconds
-				*runStart = run1[3];
-				*runEnd = run2[3];
+				*aRunNumber= run1[2];
+				*aRunStart = run1[3];
+				*aRunEnd = run2[3];
 				return YES;
 			}
 		}		
