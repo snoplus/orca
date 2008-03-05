@@ -878,6 +878,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     NSString* s             = firstArg;
     ORDataSet* currentLevel = self;
     ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCounts]; // was missing -tb- 2008-02-07
     
     do {
         nextLevel = [currentLevel objectForKey:s];
@@ -899,6 +900,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     if(!timeSeries){
         timeSeries = [[ORPlotTimeSeries alloc] init];
         [timeSeries setKey:[nextLevel key]];
+		[timeSeries setDataSet:self]; // was missing -tb- 2008-02-07
         [nextLevel setData:timeSeries];
         [timeSeries setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
         [timeSeries release];
