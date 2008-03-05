@@ -261,12 +261,12 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 	int index;
 	BOOL valid = NO;
 	int n = [runArray count];
-	unsigned long actualDate	= minRunStartTime + ((maxRunEndTime - minRunStartTime) * selectionDate/1000.);
+	unsigned long actualDate	= minRunStartTime + ((maxRunEndTime - minRunStartTime) * (selectionDate/1000.));
 	for(index=0;index<n;index++){
 		NSDictionary* runDictionary = [runArray objectAtIndex:index];
 		unsigned long start = [[runDictionary objectForKey:@"RunStart"] unsignedLongValue];
 		unsigned long end   = [[runDictionary objectForKey:@"RunEnd"] unsignedLongValue];
-		if(actualDate > start && actualDate <= end){
+		if(actualDate >= start && actualDate < end){
 			[self setSelectedRunIndex: index];
 			[self setHeader: [runDictionary objectForKey:@"FileHeader"]];
 			valid = YES;

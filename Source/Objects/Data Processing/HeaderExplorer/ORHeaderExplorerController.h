@@ -58,6 +58,7 @@
 - (void) started:(NSNotification *)aNote;
 - (void) stopped:(NSNotification *)aNote;
 - (void) reading:(NSNotification *)aNote;
+- (void) moveSliderTo:(long)aValue;
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;

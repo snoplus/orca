@@ -271,17 +271,20 @@
 - (void) selectionDateChanged:(NSNotification*)note
 {
 	[selectionDateSlider setIntValue:[model selectionDate]];
+	unsigned long absStart		= [model minRunStartTime];
+	unsigned long absEnd		= [model maxRunEndTime];
+	unsigned long selectionDate	= absStart + ((absEnd - absStart) * [model selectionDate]/1000.);
+	NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
+	[selectionDateField setObjectValue:d];
+
 }
 
 - (void) runSelectionChanged:(NSNotification*)note
 {
 	unsigned long absStart		= [model minRunStartTime];
 	unsigned long absEnd		= [model maxRunEndTime];
-	unsigned long selectionDate	= absStart + ((absEnd - absStart) * [model selectionDate]/100.);
 	if(absStart>0 && absEnd>0 && [model selectedRunIndex]>=0){
 		NSDictionary* runDictionary = [model runDictionaryForIndex:[model selectedRunIndex]];
-		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
-		[selectionDateField setObjectValue:d];
 		if(runDictionary){
 			NSString* units = @"Bytes";
 			float fileSize = [[runDictionary objectForKey:@"FileSize"] floatValue];
@@ -293,11 +296,11 @@
 				fileSize /=1000.;
 				units = @"KBytes";
 			}
-			NSString* s = [NSString stringWithFormat:@"Run Number: %@\n",[runDictionary objectForKey:@"RunNumber"]];
+			NSString* s = [NSString stringWithFormat:@"Run Summary:\nRun Number: %@\n",[runDictionary objectForKey:@"RunNumber"]];
 			NSCalendarDate* startTime = [NSCalendarDate dateWithTimeIntervalSince1970:[[runDictionary objectForKey:@"RunStart"] unsignedLongValue]];
 			s = [s stringByAppendingFormat:@"Started   : %@\n",startTime];
 			s = [s stringByAppendingFormat:@"Run Length: %@ sec\n",[runDictionary objectForKey:@"RunLength"]];
-			s = [s stringByAppendingFormat:@"File Size : %.2f %@\n",fileSize,units];
+			s = [s stringByAppendingFormat:@"File Size : %.2f %@",fileSize,units];
 			[runSummaryTextView setString:s];
 		}
 		else [runSummaryTextView setString:@"no valid selection"];
@@ -305,7 +308,6 @@
 	else [runSummaryTextView setString:@"no valid selection"];
 	[runTimeView setNeedsDisplay:YES];
 	[headerView reloadData];
-
 }
 
 - (void) fileListChanged:(NSNotification*)note
@@ -421,7 +423,10 @@
 - (id) run:(int)index objectForKey:(id)aKey { return [model run:index objectForKey:aKey]; }
 - (int) selectedRunIndex { return [model selectedRunIndex]; }
 
-
+- (void) moveSliderTo:(long)aValue
+{
+	[model setSelectionDate:aValue];
+}
 @end
 
 @implementation ORHeaderExplorerController (private)
@@ -570,6 +575,13 @@
 			[NSBezierPath strokeRect:aRect];
 		}
 	}
+}
+
+- (void) mouseDown:(NSEvent*)anEvent
+{
+    NSPoint mouseLoc =  [self convertPoint:[anEvent locationInWindow] fromView:nil];
+	unsigned long selectedPoint = (mouseLoc.y/[self bounds].size.height)*1000.;
+	[dataSource moveSliderTo:selectedPoint];
 }
 
 @end
