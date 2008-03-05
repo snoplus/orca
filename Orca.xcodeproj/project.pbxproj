@@ -1599,6 +1599,15 @@
 		84FDF52C0D7E1EAE003AE119 /* ORKatrinSLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FDF5260D7E1EAE003AE119 /* ORKatrinSLTController.m */; };
 		84FDF52D0D7E1EAE003AE119 /* ORKatrinSLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FDF5270D7E1EAE003AE119 /* ORKatrinSLTModel.h */; };
 		84FDF52E0D7E1EAE003AE119 /* ORKatrinSLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FDF5280D7E1EAE003AE119 /* ORKatrinSLTModel.m */; };
+		84FDF54F0D7F084E003AE119 /* IpeV4Crate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FDF5460D7F084E003AE119 /* IpeV4Crate.nib */; };
+		84FDF5500D7F084E003AE119 /* IpeV4Crate.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84FDF5470D7F084E003AE119 /* IpeV4Crate.tif */; };
+		84FDF5510D7F084E003AE119 /* IpeV4CrateBig.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84FDF5480D7F084E003AE119 /* IpeV4CrateBig.tif */; };
+		84FDF5520D7F084E003AE119 /* ORIpeV4CrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FDF5490D7F084E003AE119 /* ORIpeV4CrateController.h */; };
+		84FDF5530D7F084E003AE119 /* ORIpeV4CrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FDF54A0D7F084E003AE119 /* ORIpeV4CrateController.m */; };
+		84FDF5540D7F084E003AE119 /* ORIpeV4CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FDF54B0D7F084E003AE119 /* ORIpeV4CrateModel.h */; };
+		84FDF5550D7F084E003AE119 /* ORIpeV4CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FDF54C0D7F084E003AE119 /* ORIpeV4CrateModel.m */; };
+		84FDF5560D7F084E003AE119 /* ORIpeV4CrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FDF54D0D7F084E003AE119 /* ORIpeV4CrateView.h */; };
+		84FDF5570D7F084E003AE119 /* ORIpeV4CrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FDF54E0D7F084E003AE119 /* ORIpeV4CrateView.m */; };
 		84FE07D007B403ED00E2CB0E /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FE07CE07B403ED00E2CB0E /* NSString+Extensions.m */; };
 		84FE07D107B403ED00E2CB0E /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FE07CF07B403ED00E2CB0E /* NSString+Extensions.h */; };
 		84FFCAA60636D5B10069432F /* C792.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FFCAA00636D5B10069432F /* C792.gif */; };
@@ -3265,6 +3274,15 @@
 		84FDF5260D7E1EAE003AE119 /* ORKatrinSLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKatrinSLTController.m; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTController.m"; sourceTree = SOURCE_ROOT; };
 		84FDF5270D7E1EAE003AE119 /* ORKatrinSLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORKatrinSLTModel.h; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTModel.h"; sourceTree = SOURCE_ROOT; };
 		84FDF5280D7E1EAE003AE119 /* ORKatrinSLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORKatrinSLTModel.m; path = "Source/Objects/Hardware/IPE/Katrin SLT/ORKatrinSLTModel.m"; sourceTree = SOURCE_ROOT; };
+		84FDF5460D7F084E003AE119 /* IpeV4Crate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeV4Crate.nib; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/IpeV4Crate.nib"; sourceTree = SOURCE_ROOT; };
+		84FDF5470D7F084E003AE119 /* IpeV4Crate.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = IpeV4Crate.tif; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/IpeV4Crate.tif"; sourceTree = SOURCE_ROOT; };
+		84FDF5480D7F084E003AE119 /* IpeV4CrateBig.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = IpeV4CrateBig.tif; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/IpeV4CrateBig.tif"; sourceTree = SOURCE_ROOT; };
+		84FDF5490D7F084E003AE119 /* ORIpeV4CrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4CrateController.h; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateController.h"; sourceTree = SOURCE_ROOT; };
+		84FDF54A0D7F084E003AE119 /* ORIpeV4CrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4CrateController.m; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateController.m"; sourceTree = SOURCE_ROOT; };
+		84FDF54B0D7F084E003AE119 /* ORIpeV4CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4CrateModel.h; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateModel.h"; sourceTree = SOURCE_ROOT; };
+		84FDF54C0D7F084E003AE119 /* ORIpeV4CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4CrateModel.m; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateModel.m"; sourceTree = SOURCE_ROOT; };
+		84FDF54D0D7F084E003AE119 /* ORIpeV4CrateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4CrateView.h; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateView.h"; sourceTree = SOURCE_ROOT; };
+		84FDF54E0D7F084E003AE119 /* ORIpeV4CrateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4CrateView.m; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateView.m"; sourceTree = SOURCE_ROOT; };
 		84FE07CE07B403ED00E2CB0E /* NSString+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSString+Extensions.m"; path = "Source/Cocoa Extensions/NSString+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		84FE07CF07B403ED00E2CB0E /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "Source/Cocoa Extensions/NSString+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		84FE6584047D9140005F64B1 /* ORHVSupply.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHVSupply.h; path = Source/Objects/Control/HVControl/ORHVSupply.h; sourceTree = SOURCE_ROOT; };
@@ -6902,6 +6920,7 @@
 			children = (
 				84F46F0A0CA44255007EFADA /* IPE Base Classes */,
 				84F46F110CA44255007EFADA /* IPE Crate */,
+				84FDF5450D7F084E003AE119 /* IpeV4 Crate */,
 				84F46F1A0CA44255007EFADA /* IPE FLT */,
 				84F46F240CA44255007EFADA /* IPE SLT */,
 				84F46F2D0CA44255007EFADA /* Katrin FLT */,
@@ -7093,6 +7112,23 @@
 			);
 			name = "Katrin SLT";
 			path = "Source/Objects/Hardware/IPE/Katrin SLT";
+			sourceTree = SOURCE_ROOT;
+		};
+		84FDF5450D7F084E003AE119 /* IpeV4 Crate */ = {
+			isa = PBXGroup;
+			children = (
+				84FDF5460D7F084E003AE119 /* IpeV4Crate.nib */,
+				84FDF5470D7F084E003AE119 /* IpeV4Crate.tif */,
+				84FDF5480D7F084E003AE119 /* IpeV4CrateBig.tif */,
+				84FDF5490D7F084E003AE119 /* ORIpeV4CrateController.h */,
+				84FDF54A0D7F084E003AE119 /* ORIpeV4CrateController.m */,
+				84FDF54B0D7F084E003AE119 /* ORIpeV4CrateModel.h */,
+				84FDF54C0D7F084E003AE119 /* ORIpeV4CrateModel.m */,
+				84FDF54D0D7F084E003AE119 /* ORIpeV4CrateView.h */,
+				84FDF54E0D7F084E003AE119 /* ORIpeV4CrateView.m */,
+			);
+			name = "IpeV4 Crate";
+			path = "Source/Objects/Hardware/IPE/IpeV4 Crate";
 			sourceTree = SOURCE_ROOT;
 		};
 		84FFCA9F0636D5B10069432F /* CV792 */ = {
@@ -8171,6 +8207,9 @@
 				84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */,
 				84FDF52B0D7E1EAE003AE119 /* ORKatrinSLTController.h in Headers */,
 				84FDF52D0D7E1EAE003AE119 /* ORKatrinSLTModel.h in Headers */,
+				84FDF5520D7F084E003AE119 /* ORIpeV4CrateController.h in Headers */,
+				84FDF5540D7F084E003AE119 /* ORIpeV4CrateModel.h in Headers */,
+				84FDF5560D7F084E003AE119 /* ORIpeV4CrateView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8208,6 +8247,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Orca */;
 			projectDirPath = "";
@@ -8677,6 +8717,9 @@
 				8428ADE10D7CACD00093D35E /* HeaderExplorer.nib in Resources */,
 				84FDF5290D7E1EAE003AE119 /* KatrinSLT.nib in Resources */,
 				84FDF52A0D7E1EAE003AE119 /* KatrinSLTCard.gif in Resources */,
+				84FDF54F0D7F084E003AE119 /* IpeV4Crate.nib in Resources */,
+				84FDF5500D7F084E003AE119 /* IpeV4Crate.tif in Resources */,
+				84FDF5510D7F084E003AE119 /* IpeV4CrateBig.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9268,6 +9311,9 @@
 				84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */,
 				84FDF52C0D7E1EAE003AE119 /* ORKatrinSLTController.m in Sources */,
 				84FDF52E0D7E1EAE003AE119 /* ORKatrinSLTModel.m in Sources */,
+				84FDF5530D7F084E003AE119 /* ORIpeV4CrateController.m in Sources */,
+				84FDF5550D7F084E003AE119 /* ORIpeV4CrateModel.m in Sources */,
+				84FDF5570D7F084E003AE119 /* ORIpeV4CrateView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
