@@ -129,9 +129,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 }
 
 - (void) setFileToReplay:(NSString*)newFileToReplay
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFileToReplay:fileToReplay];
-    
+{    
     [fileToReplay autorelease];
     fileToReplay=[newFileToReplay retain];
     
