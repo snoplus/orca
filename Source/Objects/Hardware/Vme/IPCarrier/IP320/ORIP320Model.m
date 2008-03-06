@@ -25,6 +25,7 @@
 #import "ORVmeCrateModel.h"
 #include "VME_HW_Definitions.h"
 #import "ORDataTypeAssigner.h"
+#import "ORTimer.h"
 
 #import "ORIP320Channel.h"
 #include <math.h>
@@ -68,8 +69,8 @@ static struct {
     for(i=0;i<kNumIP320Channels;i++){
         [chanObjs addObject:[[[ORIP320Channel alloc] initWithAdc:self channel:i]autorelease]];
     }
+	[self setCardJumperSetting:kUncalibrated];
     [[self undoManager] enableUndoRegistration];
-	
     return self;
 }
 
@@ -122,30 +123,30 @@ static struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelDisplayRawChanged object:self];
 }
 
-- (int)  cardJumperSetting
-{
-	return cardJumperSetting;
-}
 
 
 - (void) setCardJumperSetting: (int)aCardJumperSetting
-{	
-	cardJumperSetting = aCardJumperSetting;
-//	int gain;
-//	for(gain=0;gain<knumGainSettings;gain++){cardJumperSetting= aCardJumperSetting;}
+{
+	int cardJumperSetting = aCardJumperSetting;
+	int gain;
+	for(gain=0;gain<knumGainSettings;gain++){CalibrationConstants[gain].kCardJumperSetting= aCardJumperSetting;}
 	switch(cardJumperSetting)
 	{
 		case(kMinus5to5):
 			NSLog(@"IP320 Card is set to -5 to 5 Volts\n");
+			[self setCardCalibration];
 			break;
 		case(kMinus10to10):
 			NSLog(@"IP320 Card is set to -10 to 10 Volts\n");
+			[self setCardCalibration];
 			break;
 		case(k0to10):
 			NSLog(@"IP320 Card is set to 0 to 10 Volts\n");
+			[self setCardCalibration];
 			break;
 		case(kUncalibrated):
 			NSLog(@"IP320 Card is uncalibrated\n");
+			[self setCardCalibration];
 			break;
 	}
 
@@ -153,6 +154,7 @@ static struct {
 
 - (void) setCardCalibration{
 	int countergain=0;
+	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 	switch(cardJumperSetting){
 		case(kMinus5to5):
 			NSLog(@"Calibrating IP320 for -5 to 5 Voltage Range\n");
@@ -349,8 +351,7 @@ static struct {
 }
 //Calibration routines
 - (void) loadCALHIControReg:(unsigned short)gain{
-//	int cJS = CalibrationConstants[gain].kCardJumperSetting;
-	
+	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 	unsigned short aMaskCALHI = 0x0000;
 	if((cardJumperSetting==kMinus5to5&&gain==0)||(cardJumperSetting==kMinus10to10&&gain<=1)||(cardJumperSetting==k0to10&&gain<=1))
 	{
@@ -389,6 +390,8 @@ static struct {
 - (void) loadCALLOControReg:(unsigned short)gain
 {
 	unsigned short aMaskCALLO = 0;
+	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
+
 //Find CountCALLO
 	if(cardJumperSetting==k0to10){
 			CalibrationConstants[gain].kVoltCALLO=kCAL3_volt;
@@ -417,6 +420,8 @@ static struct {
 
 -(unsigned short) calculateCorrectedCount:(unsigned short)gain CountActual:(unsigned short)CountActual{
 	unsigned short Corrected_count;
+	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
+
 	if(cardJumperSetting==kUncalibrated){Corrected_count=CountActual;}
 	else{
 	Corrected_count=CountActual;
@@ -437,6 +442,7 @@ static struct {
 				
 				errorLocation = @"CountCALHI Control Reg Setup";
 				[self loadCALHIControReg:gain];
+				[ORTimer delay:0.01];
 				unsigned short CountCALHI;
 				int i=0;
 				for(i=0;i<ReadNumber;i++){
@@ -450,6 +456,8 @@ static struct {
 				
 				errorLocation = @"CountCALLO Control Reg Setup";
 				[self loadCALLOControReg:gain];
+				[ORTimer delay:0.01];
+
 				unsigned short CountCALLO;
 				for(i=0;i<ReadNumber;i++){
 					errorLocation = @"CountCALLO Converion Start";
@@ -551,8 +559,10 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     [[self undoManager] disableUndoRegistration];
     [self setDisplayRaw:[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
     [self setChanObjs:[decoder decodeObjectForKey:kORIP320chanObjs]];
-    [self setPollingState:[decoder decodeIntForKey:kORIP320PollingState]];
-    [[self undoManager] enableUndoRegistration];
+	//[self setCardJumperSetting:[decoder decodeIntForKey:@"ORIP320ModelsetCardJumpertSetting"]];
+    [self setCardJumperSetting:kUncalibrated];
+	[self setPollingState:[decoder decodeIntForKey:kORIP320PollingState]];
+	[[self undoManager] enableUndoRegistration];
     
     
     if(chanObjs == nil){
@@ -573,6 +583,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     [encoder encodeBool:displayRaw forKey:@"ORIP320ModelDisplayRaw"];
     [encoder encodeObject:chanObjs forKey:kORIP320chanObjs];
     [encoder encodeInt:[self pollingState] forKey:kORIP320PollingState];
+//	[encoder encodeInt:CalibrationConstants[0].kCardJumperSetting forKey:@"ORIP320ModelsetCardJumpertSetting"];
 }
 
 #pragma mark ¥¥¥Bit Processing Protocol

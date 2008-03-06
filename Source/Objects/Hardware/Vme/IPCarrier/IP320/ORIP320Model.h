@@ -87,7 +87,6 @@ short kCountCALHI;
     unsigned long   dataId;
 	BOOL			valuesReadyToShip;
     BOOL			displayRaw;
-	int				cardJumperSetting;
 	
 	
 	
@@ -98,7 +97,6 @@ short kCountCALHI;
 }
 
 #pragma mark ¥¥¥Accessors
-- (int)  cardJumperSetting;
 - (void) setCardJumperSetting:(int)aCardJumperSetting;
 //calibration rotines
 - (void) setCardCalibration;
