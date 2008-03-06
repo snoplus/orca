@@ -22,6 +22,8 @@
 - (NSArray *)tabJoinedComponents;
 - (NSString *)joinAsLinesOfEndingType:(LineEndingType)type;
 - (NSData *)dataWithLineEndingType:(LineEndingType)lineEndingType;
+- (id) objectForKeyArray:(NSMutableArray*)anArray;
+
 @end
 
 @interface NSMutableArray (OrcaExtensions)

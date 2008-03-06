@@ -53,9 +53,15 @@
 		int				selectedRunIndex;
 
     BOOL autoProcess;
+    NSString* searchKey;
+    BOOL useFilter;
 }
 
 #pragma mark •••Accessors
+- (BOOL) useFilter;
+- (void) setUseFilter:(BOOL)aUseFilter;
+- (NSString*) searchKey;
+- (void) setSearchKey:(NSString*)aSearchKey;
 - (BOOL) autoProcess;
 - (void) setAutoProcess:(BOOL)aAutoProcess;
 - (int) selectedRunIndex;
@@ -99,6 +105,8 @@
 
 
 #pragma mark •••External String Definitions
+extern NSString* ORHeaderExplorerModelUseFilterChanged;
+extern NSString* ORHeaderExplorerSearchKeyChanged;
 extern NSString* ORHeaderExplorerAutoProcessChanged;
 extern NSString* ORHeaderExplorerListChanged;
 extern NSString* ORHeaderExplorerProcessing;

@@ -25,6 +25,7 @@
 #import "ORHeaderItem.h"
 #import "ORDataSet.h"
 #import "CTGradient.h"
+#import "ORDataExplorerModel.h"
 
 @interface ORHeaderExplorerController (private)
 - (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -54,13 +55,46 @@
     [fileListView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 	[runSummaryTextView setFont:[NSFont fontWithName:@"Monaco" size:10]];
 	[progressIndicatorBottom setIndeterminate:NO];
+	[fileListView setDoubleAction:@selector(doubleClick:)];
+
     [super awakeFromNib];    
 }
 
 
 #pragma  mark •••Actions
 
-- (void) autoProcessAction:(id)sender
+- (void) useFilterAction:(id)sender
+{
+	[self endEditing];
+	[model setUseFilter:[sender intValue]];	
+	[model readHeaders];
+}
+
+- (IBAction) searchKeyAction:(id)sender
+{
+	[model setSearchKey:[sender stringValue]];
+}
+
+- (IBAction) doubleClick:(id)sender
+{
+	if(sender == fileListView || sender==runTimeView){
+		int index = [fileListView selectedRow];
+		NSArray* files = [model filesToProcess];
+		if(index>=0 && index<[files count]){
+			id selectedObj = [files objectAtIndex: [fileListView selectedRow]];
+			NSArray* objects = [[model document] collectObjectsOfClass:NSClassFromString(@"ORDataExplorerModel")];
+			if([objects count]){
+				ORDataExplorerModel* explorer = [objects objectAtIndex:0]; //just use the first one
+				[explorer setFileToExplore:selectedObj];
+				[explorer makeMainController];
+				[explorer parseFile];
+			}
+			else NSLog(@"Header Explorer: No DataExplorer in configuration\n");
+		}
+	}
+}
+
+- (IBAction) autoProcessAction:(id)sender
 {
 	[model setAutoProcess:[sender intValue]];	
 }
@@ -113,6 +147,7 @@
 
 - (IBAction) replayButtonAction:(id)sender
 {
+	[self endEditing];
     if(![model isProcessing]){
         [model readHeaders];
         [selectButton setEnabled:NO];
@@ -176,6 +211,17 @@
 
 #pragma mark •••Interface Management
 
+- (void) useFilterChanged:(NSNotification*)aNote
+{
+	[useFilterCB setIntValue: [model useFilter]];
+}
+
+- (void) searchKeyChanged:(NSNotification*)aNote
+{
+	[searchKeyField setStringValue: [model searchKey]];
+	[useFilterCB setEnabled:[[model searchKey] length]>0]; 	
+}
+
 - (void) autoProcessChanged:(NSNotification*)aNote
 {
 	[autoProcessCB setIntValue: [model autoProcess]];
@@ -234,6 +280,16 @@
                          name : ORHeaderExplorerAutoProcessChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(searchKeyChanged:)
+                         name : ORHeaderExplorerSearchKeyChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(useFilterChanged:)
+                         name : ORHeaderExplorerModelUseFilterChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -243,34 +299,40 @@
     [self runSelectionChanged:nil];
     [self headerChanged:nil];
 	
-	[workingOnField setStringValue:@""];
+	[progressField setStringValue:@""];
 	[self autoProcessChanged:nil];
+	[self searchKeyChanged:nil];
+	[self useFilterChanged:nil];
 }
 
 
 - (void)started:(NSNotification *)aNote
 {
+	[useFilterCB setEnabled:NO];
 	[fileListView setEnabled:NO];
 	[replayButton setEnabled:YES];
 	[selectButton setEnabled:NO];
+	[saveButton setEnabled:NO];
+	[loadButton setEnabled:NO];
 	[replayButton setTitle:@"Stop"];
 	[progressIndicator startAnimation:self];
-	[progressField setStringValue:@"In Progress"];
 	[progressIndicatorBottom startAnimation:self];
 }
 
 - (void)stopped:(NSNotification *)aNote
 {
+	[useFilterCB setEnabled:YES];
 	[fileListView setEnabled:YES];
 	[replayButton setEnabled:YES];
 	[selectButton setEnabled:YES];
+	[saveButton setEnabled:YES];
+	[loadButton setEnabled:YES];
 	[replayButton setTitle:@"Process"];
 	[progressIndicator stopAnimation:self];
-	[progressField setStringValue:@""];
-	[workingOnField setStringValue:@""];
 	[progressIndicatorBottom setDoubleValue:0.0];
 	[progressIndicatorBottom setIndeterminate:NO];
 	[progressIndicatorBottom stopAnimation:self];
+	[progressField setStringValue:@""];
 	
 	unsigned long absStart = [model minRunStartTime];
 	unsigned long absEnd   = [model maxRunEndTime];
@@ -286,8 +348,8 @@
 - (void) processingFile:(NSNotification *)aNote
 {
 	NSString* theFileName = [model fileToProcess];
-	if(theFileName)[workingOnField setStringValue:[NSString stringWithFormat:@"Reading:%@",[theFileName stringByAbbreviatingWithTildeInPath]]];
-	else [workingOnField setStringValue:@""];
+	if(theFileName)[progressField setStringValue:[NSString stringWithFormat:@"Reading:%@",[theFileName stringByAbbreviatingWithTildeInPath]]];
+	else [progressField setStringValue:@""];
 
 	unsigned long total = [model total];
     if(total>0)[progressIndicatorBottom setDoubleValue:100. - (100.*[model numberLeft]/(double)total)];
@@ -331,7 +393,7 @@
 				fileSize /=1000.;
 				units = @"KBytes";
 			}
-			NSString* s = [NSString stringWithFormat:@"Run Summary:\nRun Number: %@\n",[runDictionary objectForKey:@"RunNumber"]];
+			NSString* s = [NSString stringWithFormat:@"Run Summary\nRun Number: %@\n",[runDictionary objectForKey:@"RunNumber"]];
 			NSCalendarDate* startTime = [NSCalendarDate dateWithTimeIntervalSince1970:[[runDictionary objectForKey:@"RunStart"] unsignedLongValue]];
 			s = [s stringByAppendingFormat:@"Started   : %@\n",startTime];
 			s = [s stringByAppendingFormat:@"Run Length: %@ sec\n",[runDictionary objectForKey:@"RunLength"]];
@@ -342,11 +404,12 @@
 		}
 		else {
 			[runSummaryTextView setString:@"no valid selection"];
-			[fileListView deselectAll:self];
+			//[fileListView deselectAll:self];
 		}
 	}
 	else {
 		[runSummaryTextView setString:@"no valid selection"];
+		//[fileListView deselectAll:self];
 	}
 	[runTimeView setNeedsDisplay:YES];
 }
@@ -360,8 +423,6 @@
 {
 	[headerView reloadData];
 }
-
-
 
 #pragma mark •••Data Source Methods
 
@@ -377,8 +438,11 @@
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item 
 {
     if(outlineView == headerView){
-        if(!item) return [[model header] count]>0;
-        else      return [item count]>0;
+        if(!item) return NO;		
+        else {
+			if([item respondsToSelector:@selector(isLeafNode)])return ![item isLeafNode];
+			else return NO;
+		}
     }
     else return NO;
 }
@@ -397,7 +461,8 @@
     if(outlineView == headerView){
         if([[tableColumn identifier] isEqualToString:@"LevelName"]){
             if(item==0) return [[model header] name];
-            else        return [item name];
+			else if([item respondsToSelector:@selector(name)])return [item name];
+            else     return @"Number";
         }
         else if([[tableColumn identifier] isEqualToString:@"Value"]){
             if(item==0){
@@ -406,14 +471,17 @@
                             attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]];
             }
             else {
-                if([item isLeafNode]){
-                    return [NSString stringWithFormat:@"%@",[item object]];
-                }
-                else {
-                    return [[NSAttributedString alloc] 
-                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",[item count]] 
-                            attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]];            
-                }
+				if([item respondsToSelector:@selector(isLeafNode)]){
+					if([item isLeafNode]){
+						return [NSString stringWithFormat:@"%@",[item object]];
+					}
+					else {
+						return [[NSAttributedString alloc] 
+							initWithString:[NSString stringWithFormat:@"%d key/value pairs",[item count]] 
+								attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]];            
+					}
+				}
+				else return item;
             }
         }
         
@@ -650,6 +718,9 @@
     NSPoint mouseLoc =  [self convertPoint:[anEvent locationInWindow] fromView:nil];
 	unsigned long selectedPoint = (mouseLoc.y/[self bounds].size.height)*1000.;
 	[dataSource setSelectionDate:selectedPoint];
+	if([anEvent clickCount] >= 2){
+		[dataSource doubleClick:self];
+	}
 }
 
 @end

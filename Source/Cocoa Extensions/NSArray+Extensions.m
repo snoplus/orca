@@ -64,6 +64,23 @@
    return [dataString dataUsingEncoding: NSASCIIStringEncoding];
 }
 
+- (id) objectForKeyArray:(NSMutableArray*)anArray
+{
+	if([anArray count] == 0)return self;
+	else {
+		id aKey = [anArray objectAtIndex:0];
+		[anArray removeObjectAtIndex:0];
+		long index = [aKey intValue];
+		if(index>=0 && index < [self count]){
+			id anObj = [self objectAtIndex:index];
+			if([anObj respondsToSelector:@selector(objectForKeyArray:)]){
+				return [anObj objectForKeyArray:anArray];
+			}
+			else return anObj;
+		}
+		else return self;
+	}
+}
 
 @end
 

@@ -39,6 +39,8 @@
 				<string>id</string>
 				<key>delete</key>
 				<string>id</string>
+				<key>doubleClick</key>
+				<string>id</string>
 				<key>loadListAction</key>
 				<string>id</string>
 				<key>removeItemAction</key>
@@ -47,9 +49,13 @@
 				<string>id</string>
 				<key>saveListAction</key>
 				<string>id</string>
+				<key>searchKeyAction</key>
+				<string>id</string>
 				<key>selectButtonAction</key>
 				<string>id</string>
 				<key>selectionDateAction</key>
+				<string>id</string>
+				<key>useFilterAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -64,6 +70,8 @@
 				<string>NSTableView</string>
 				<key>headerView</key>
 				<string>NSOutlineView</string>
+				<key>loadButton</key>
+				<string>NSButton</string>
 				<key>progressField</key>
 				<string>NSTextField</string>
 				<key>progressIndicator</key>
@@ -80,16 +88,18 @@
 				<string>NSTextView</string>
 				<key>runTimeView</key>
 				<string>NSView</string>
+				<key>saveButton</key>
+				<string>NSButton</string>
+				<key>searchKeyField</key>
+				<string>NSTextField</string>
 				<key>selectButton</key>
 				<string>NSButton</string>
 				<key>selectionDateField</key>
 				<string>NSTextField</string>
 				<key>selectionDateSlider</key>
 				<string>NSSlider</string>
-				<key>viewHeaderFile</key>
-				<string>NSTextField</string>
-				<key>workingOnField</key>
-				<string>NSTextField</string>
+				<key>useFilterCB</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>

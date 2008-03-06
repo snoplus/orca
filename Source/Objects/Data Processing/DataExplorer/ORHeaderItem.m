@@ -122,7 +122,10 @@
 
 - (unsigned) count
 {
-    return [items count];
+    if([self isLeafNode]){
+		return 1;
+	}
+	else return [items count];
 }
 - (BOOL) isLeafNode
 {
@@ -130,7 +133,8 @@
 }
 - (id) childAtIndex:(int)index
 {
-    return [items objectAtIndex:index];
+	if([self isLeafNode])return object;
+    else return [items objectAtIndex:index];
 }
 
 @end

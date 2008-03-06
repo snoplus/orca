@@ -21,27 +21,29 @@
 
 @interface ORHeaderExplorerController : OrcaObjectController  {
     @private
-	IBOutlet NSButton* 		selectButton;
-	IBOutlet NSButton*		autoProcessCB;
-	IBOutlet NSButton* 		replayButton;
-	IBOutlet NSTableView*   fileListView;
-    IBOutlet NSOutlineView*	headerView;
-	IBOutlet NSTextField* 	viewHeaderFile;
-	IBOutlet NSProgressIndicator* 	progressIndicator;
-	IBOutlet NSTextField* 	progressField;
-	IBOutlet NSTextField* 	workingOnField;
-	IBOutlet NSProgressIndicator* 	progressIndicatorBottom;
-	IBOutlet NSView* 		runTimeView;
-	IBOutlet NSTextField* 	runStartField;
-	IBOutlet NSTextField* 	runEndField;
-	IBOutlet NSTextField* 	selectionDateField;
-	IBOutlet NSSlider*		selectionDateSlider;
-	IBOutlet NSTextView* 	runSummaryTextView;
+		IBOutlet NSButton* 		selectButton;
+		IBOutlet NSButton*		useFilterCB;
+		IBOutlet NSTextField*	searchKeyField;
+		IBOutlet NSButton*		autoProcessCB;
+		IBOutlet NSButton* 		replayButton;
+		IBOutlet NSButton* 		saveButton;
+		IBOutlet NSButton* 		loadButton;
+		IBOutlet NSTableView*   fileListView;
+		IBOutlet NSOutlineView*	headerView;
+		IBOutlet NSProgressIndicator* 	progressIndicator;
+		IBOutlet NSTextField* 	progressField;
+		IBOutlet NSProgressIndicator* 	progressIndicatorBottom;
+		IBOutlet NSView* 		runTimeView;
+		IBOutlet NSTextField* 	runStartField;
+		IBOutlet NSTextField* 	runEndField;
+		IBOutlet NSTextField* 	selectionDateField;
+		IBOutlet NSSlider*		selectionDateSlider;
+		IBOutlet NSTextView* 	runSummaryTextView;
 }
 
-#pragma mark •••Accessors
-
 #pragma  mark •••Actions
+- (IBAction) useFilterAction:(id)sender;
+- (IBAction) searchKeyAction:(id)sender;
 - (IBAction) autoProcessAction:(id)sender;
 - (IBAction) selectButtonAction:(id)sender;
 - (IBAction) replayButtonAction:(id)sender;
@@ -51,8 +53,11 @@
 - (IBAction) saveListAction:(id)sender;
 - (IBAction) loadListAction:(id)sender;
 - (IBAction) selectionDateAction:(id)sender;
+- (IBAction) doubleClick:(id)sender;
 
 #pragma mark •••Interface Management
+- (void) useFilterChanged:(NSNotification*)aNote;
+- (void) searchKeyChanged:(NSNotification*)aNote;
 - (void) autoProcessChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) fileListChanged:(NSNotification*)aNote;

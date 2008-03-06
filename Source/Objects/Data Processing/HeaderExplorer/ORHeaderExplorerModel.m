@@ -27,7 +27,9 @@
 #import "ORHeaderItem.h"
 
 #pragma mark •••Notification Strings
-NSString* ORHeaderExplorerAutoProcessChanged = @"ORHeaderExplorerAutoProcessChanged";
+NSString* ORHeaderExplorerModelUseFilterChanged = @"ORHeaderExplorerModelUseFilterChanged";
+NSString* ORHeaderExplorerSearchKeyChanged = @"ORHeaderExplorerSearchKeyChanged";
+NSString* ORHeaderExplorerAutoProcessChanged	= @"ORHeaderExplorerAutoProcessChanged";
 NSString* ORHeaderExplorerListChanged			= @"ORHeaderExplorerListChanged";
 
 NSString* ORHeaderExplorerProcessing			= @"ORHeaderExplorerProcessing";
@@ -63,6 +65,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 
 - (void) dealloc
 {
+    [searchKey release];
     [lastListPath release];
 	[lastFilePath release];
 	
@@ -85,6 +88,36 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) useFilter
+{
+    return useFilter;
+}
+
+- (void) setUseFilter:(BOOL)aUseFilter
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseFilter:useFilter];
+    
+    useFilter = aUseFilter;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerModelUseFilterChanged object:self];
+}
+
+- (NSString*) searchKey
+{
+    return searchKey;
+}
+
+- (void) setSearchKey:(NSString*)aSearchKey
+{
+	if(aSearchKey==nil)aSearchKey=@"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setSearchKey:searchKey];
+    
+    [searchKey autorelease];
+    searchKey = [aSearchKey copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerSearchKeyChanged object:self];
+}
 
 - (BOOL) autoProcess
 {
@@ -376,14 +409,21 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 					if(runEnd > maxRunEndTime)     maxRunEndTime   = runEnd;
 					[fp seekToEndOfFile];
 					
+					id d;
+					if([searchKey length] && useFilter){
+						NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[searchKey componentsSeparatedByString:@"/"]]; //must be mutable
+						d = [[fileAsDataPacket fileHeader] objectForKeyArray:keyArray];
+					}
+					else d = [fileAsDataPacket fileHeader];
+					
 					[runArray addObject:
 						[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							[NSNumber numberWithUnsignedLong:runStart],			@"RunStart",
-							[NSNumber numberWithUnsignedLong:runEnd],			@"RunEnd",
-							[NSNumber numberWithUnsignedLong:runEnd-runStart],	@"RunLength",
-							[NSNumber numberWithUnsignedLong:runNumber],		@"RunNumber",
-							[NSNumber numberWithUnsignedLong:[fp offsetInFile]],	@"FileSize",
-							[ORHeaderItem headerFromObject:[fileAsDataPacket fileHeader] named:@"Root"], @"FileHeader",
+							[NSNumber numberWithUnsignedLong:runStart],			 @"RunStart",
+							[NSNumber numberWithUnsignedLong:runEnd],			 @"RunEnd",
+							[NSNumber numberWithUnsignedLong:runEnd-runStart],	 @"RunLength",
+							[NSNumber numberWithUnsignedLong:runNumber],		 @"RunNumber",
+							[NSNumber numberWithUnsignedLong:[fp offsetInFile]], @"FileSize",
+							[ORHeaderItem headerFromObject:d named:@"Root"],	 @"FileHeader",
 							nil
 						]
 					];
@@ -415,6 +455,8 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
     self = [super initWithCoder:decoder];
     
 	[[self undoManager] disableUndoRegistration];
+    [self setUseFilter:[decoder decodeBoolForKey:@"ORHeaderExplorerModelUseFilter"]];
+    [self setSearchKey:[decoder decodeObjectForKey:@"ORHeaderExplorerModelSearchKey"]];
     [self setAutoProcess:[decoder decodeBoolForKey:@"ORHeaderExplorerModelAutoProcess"]];
 	[self addFilesToProcess:[decoder decodeObjectForKey:ORHeaderExplorerList]];
 	[self setLastListPath:[decoder decodeObjectForKey:ORLastListPath]];
@@ -427,6 +469,8 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:useFilter forKey:@"ORHeaderExplorerModelUseFilter"];
+    [encoder encodeObject:searchKey forKey:@"ORHeaderExplorerModelSearchKey"];
     [encoder encodeBool:autoProcess forKey:@"ORHeaderExplorerModelAutoProcess"];
     [encoder encodeObject:filesToProcess forKey:ORHeaderExplorerList];
     [encoder encodeObject:lastListPath forKey:ORLastListPath];

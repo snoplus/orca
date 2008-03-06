@@ -41,7 +41,11 @@
 	else {
 		id aKey = [anArray objectAtIndex:0];
 		[anArray removeObjectAtIndex:0];
-		return [[self objectForKey:aKey] objectForKeyArray:anArray];;
+		id anObj = [self objectForKey:aKey];
+		if([anObj respondsToSelector:@selector(objectForKeyArray:)]){
+			return [anObj objectForKeyArray:anArray];
+		}
+		else return self;
     }
 }
 
