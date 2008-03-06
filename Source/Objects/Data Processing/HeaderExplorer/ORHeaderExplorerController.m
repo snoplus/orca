@@ -209,6 +209,11 @@
                          name : ORHeaderExplorerRunSelectionChanged
                         object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(tableViewSelectionDidChange:)
+                         name : NSTableViewSelectionDidChangeNotification
+                        object: nil];
+
 }
 
 - (void) updateWindow
@@ -274,7 +279,7 @@
 	[selectionDateSlider setIntValue:[model selectionDate]];
 	unsigned long absStart		= [model minRunStartTime];
 	unsigned long absEnd		= [model maxRunEndTime];
-	unsigned long selectionDate	= absStart + ((absEnd - absStart) * [model selectionDate]/1000.);
+	unsigned long selectionDate	= absStart + ((absEnd - absStart) * [model selectionDate]/[selectionDateSlider maxValue]);
 	if(absStart && absEnd){
 		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
 		[selectionDateField setObjectValue:d];
@@ -309,9 +314,14 @@
 						
 			[fileListView selectRowIndexes:[NSIndexSet indexSetWithIndex: [model selectedRunIndex]] byExtendingSelection:NO] ;
 		}
-		else [runSummaryTextView setString:@"no valid selection"];
+		else {
+			[runSummaryTextView setString:@"no valid selection"];
+			[fileListView deselectAll:self];
+		}
 	}
-	else [runSummaryTextView setString:@"no valid selection"];
+	else {
+		[runSummaryTextView setString:@"no valid selection"];
+	}
 	[runTimeView setNeedsDisplay:YES];
 	[headerView reloadData];
 }
@@ -319,6 +329,9 @@
 - (void) fileListChanged:(NSNotification*)note
 {
 	[fileListView reloadData];
+	[self moveSliderTo:0];
+	//[model setSelectedRunIndex:-1];
+	//[headerView reloadData];
 }
 
 
@@ -381,8 +394,6 @@
     else return nil;
 }
 
-
-
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
     if([[model filesToReplay] count]){
@@ -398,7 +409,6 @@
     
     return [[model filesToReplay] count];
 }
-
 
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
 {
@@ -420,6 +430,28 @@
     [self processFileList:[NSArray arrayWithContentsOfFile:@"OrcaJunkTemp"]];
     [fm removeFileAtPath:@"OrcaJunkTemp" handler:nil];
     return YES;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+	if([aNotification object] == fileListView){
+		int n = [fileListView numberOfSelectedRows];
+		if(n == 1){
+			int i = [fileListView selectedRow];
+			[model setSelectedRunIndex:i];
+			unsigned long absStart = [model minRunStartTime];
+			unsigned long absEnd   = [model maxRunEndTime];
+			
+			unsigned long start = [[model run:i objectForKey:@"RunStart"] unsignedLongValue];
+			unsigned long end   = [[model run:i objectForKey:@"RunEnd"] unsignedLongValue];
+			unsigned long mid = start + (end-start)/2.;
+			[self moveSliderTo:[selectionDateSlider maxValue]*(mid - absStart)/(absEnd-absStart)];
+		}
+		else {
+			[model setSelectedRunIndex:-1];
+			[headerView reloadData];
+		}
+	}
 }
 
 #pragma mark •••Data Source
@@ -519,6 +551,7 @@
         else NSLog(@"<%@> replay list is empty\n",listPath);
     }
 }
+
 
 @end
 

@@ -102,6 +102,7 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 			postNotificationName:ORHeaderExplorerRunSelectionChanged
 				object: self];
 	}
+	if(anIndex<0)[self setHeader: nil];
 }
 
 
@@ -158,13 +159,9 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 }
 
 - (void) setFileToReplay:(NSString*)newFileToReplay
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFileToReplay:fileToReplay];
-    
+{    
     [fileToReplay autorelease];
     fileToReplay=[newFileToReplay retain];
-    
-	NSLog(@"Reading Header: %@\n",[newFileToReplay  stringByAbbreviatingWithTildeInPath]);
 }
 
 - (NSArray *) dataRecords
@@ -301,6 +298,8 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 {
 
 	if([self isReplaying]) return;
+
+
 	stop = NO;
 	numberLeft = [filesToReplay count];
     [[NSNotificationCenter defaultCenter]
