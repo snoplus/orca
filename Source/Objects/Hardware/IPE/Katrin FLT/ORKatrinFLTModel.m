@@ -1675,9 +1675,9 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 																				  //we have to set the total size first. (Note: different than 'Capacity')
 							int j;
 							unsigned long addr =  (startBin & 0xffff);
-							short* waveFormPtr = ((short*)[theWaveFormData bytes]) + (4*sizeof(short));
-							//	+ (sizeof(katrinEventDataStruct)/sizeof(short))
-							//	+ (sizeof(katrinDebugDataStruct)/sizeof(short)); //point to start of waveform
+							short* waveFormPtr = ((short*)[theWaveFormData bytes]) + (4*sizeof(short))
+								+ (sizeof(katrinEventDataStruct)/sizeof(short))
+								+ (sizeof(katrinDebugDataStruct)/sizeof(short)); //point to start of waveform
 								
 							unsigned long *lPtr = (unsigned long *) waveFormPtr;
 							for (j=0;j<readoutPages;j++){
