@@ -139,6 +139,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ^^^^ ^^^^------------------------------ channel (0..22)
             ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+^ ------------------------------------- flag to indicate that the ADC have been swapped
         ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
 		                   ^^ ^^^^ ^^^^ eventID (0..1024)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
@@ -187,6 +188,7 @@ followed by waveform data (n x 1024 16-bit words)
 	
 	
 	katrinEventDataStruct* ePtr = (katrinEventDataStruct*) ptr;
+	bool isSwapped          = ePtr->eventID >> 31; 
 	
 	[aDataSet histogram:ePtr->energy 
 			  numBins:32768 
@@ -198,7 +200,7 @@ followed by waveform data (n x 1024 16-bit words)
 	// Note: This the endian swap itself is handled by the firewire drivers.
 	//       The swap of the shorts has been moved from the model code
 	// ak, 29.2.08
-	if (ntohl(1) == 1) { // big endian host
+	if ((ntohl(1) == 1) && (!isSwapped) ){ // big endian host
 		// Point to ADC data
 		ptr += (sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/sizeof(unsigned long);
 		
@@ -208,6 +210,8 @@ followed by waveform data (n x 1024 16-bit words)
 		
 		for (i=0;i< traceLen;i++)
 		    ptr[i] = (ptr[i] >> 16)  |  (ptr[i] << 16);
+			
+		ePtr->eventID = ePtr->eventID | (0x1 << 31); // set isSpapped flag	
     }
 	
 	// Set up the waveform
