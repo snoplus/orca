@@ -59,6 +59,11 @@
 
 
 #pragma  mark •••Actions
+
+- (void) autoProcessAction:(id)sender
+{
+	[model setAutoProcess:[sender intValue]];	
+}
 - (IBAction) selectButtonAction:(id)sender
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -170,41 +175,52 @@
 }
 
 #pragma mark •••Interface Management
+
+- (void) autoProcessChanged:(NSNotification*)aNote
+{
+	[autoProcessCB setIntValue: [model autoProcess]];
+}
+
 - (void) registerNotificationObservers
 {
 	[super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [notifyCenter addObserver : self
                      selector : @selector(fileListChanged:)
-                         name : ORHeaderExplorerListChangedNotification
+                         name : ORHeaderExplorerListChanged
                         object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(started:)
-                         name : ORHeaderExplorerRunningNotification
+                         name : ORHeaderExplorerProcessing
                         object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(stopped:)
-                         name : ORHeaderExplorerStoppedNotification
+                         name : ORHeaderExplorerProcessingFinished
                         object: model];
 	
     [notifyCenter addObserver : self
+                     selector : @selector(processingFile:)
+                         name : ORHeaderExplorerProcessingFile
+                        object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(oneFileDone:)
+                         name : ORHeaderExplorerOneFileDone
+                        object: model];
+
+    [notifyCenter addObserver : self
                      selector : @selector(selectionDateChanged:)
-                         name : ORHeaderExplorerProcessingEndedNotification
+                         name : ORHeaderExplorerSelectionDate
                         object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(reading:)
-                         name : ORHeaderExplorerReadingNotification
+                     selector : @selector(headerChanged:)
+                         name : ORHeaderExplorerHeaderChanged
                         object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(selectionDateChanged:)
-                         name : ORHeaderExplorerSelectionDateNotification
-                        object: model];
-
-    [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector(runSelectionChanged:)
                          name : ORHeaderExplorerRunSelectionChanged
                         object: model];
@@ -213,12 +229,10 @@
                      selector : @selector(tableViewSelectionDidChange:)
                          name : NSTableViewSelectionDidChangeNotification
                         object: nil];
-						
-	[notifyCenter addObserver : self
-                     selector : @selector(selectionDateChanged:)
-                         name : ORHeaderExplorerOneFileDoneNotification
-                        object: model];
-					
+    [notifyCenter addObserver : self
+                     selector : @selector(autoProcessChanged:)
+                         name : ORHeaderExplorerAutoProcessChanged
+						object: model];
 
 }
 
@@ -227,12 +241,14 @@
     [self fileListChanged:nil];
     [self selectionDateChanged:nil];
     [self runSelectionChanged:nil];
+    [self headerChanged:nil];
 	
 	[workingOnField setStringValue:@""];
+	[self autoProcessChanged:nil];
 }
 
 
-- (void)started:(NSNotification *)aNotification
+- (void)started:(NSNotification *)aNote
 {
 	[fileListView setEnabled:NO];
 	[replayButton setEnabled:YES];
@@ -243,7 +259,7 @@
 	[progressIndicatorBottom startAnimation:self];
 }
 
-- (void)stopped:(NSNotification *)aNotification
+- (void)stopped:(NSNotification *)aNote
 {
 	[fileListView setEnabled:YES];
 	[replayButton setEnabled:YES];
@@ -265,11 +281,9 @@
 		[runEndField setObjectValue:d];
 	}
 	[model setSelectionDate:[selectionDateSlider intValue]];
-	
-	[self runSelectionChanged:nil];
 }
 
-- (void) reading:(NSNotification *)aNotification
+- (void) processingFile:(NSNotification *)aNote
 {
 	NSString* theFileName = [model fileToProcess];
 	if(theFileName)[workingOnField setStringValue:[NSString stringWithFormat:@"Reading:%@",[theFileName stringByAbbreviatingWithTildeInPath]]];
@@ -278,6 +292,12 @@
 	unsigned long total = [model total];
     if(total>0)[progressIndicatorBottom setDoubleValue:100. - (100.*[model numberLeft]/(double)total)];
 }
+
+- (void) oneFileDone:(NSNotification *)aNote
+{
+	[runTimeView setNeedsDisplay:YES];
+}
+
 
 #pragma mark •••Interface Management
 - (void) selectionDateChanged:(NSNotification*)note
@@ -290,8 +310,8 @@
 		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
 		[selectionDateField setObjectValue:d];
 	}
-	[runTimeView setNeedsDisplay:YES];
-	[headerView reloadData];
+	//[runTimeView setNeedsDisplay:YES];
+	//[headerView reloadData];
 }
 
 - (void) runSelectionChanged:(NSNotification*)note
@@ -329,16 +349,18 @@
 		[runSummaryTextView setString:@"no valid selection"];
 	}
 	[runTimeView setNeedsDisplay:YES];
+}
+
+- (void) fileListChanged:(NSNotification*)aNote
+{
+	[fileListView reloadData];
+}
+
+- (void) headerChanged:(NSNotification*)aNote
+{
 	[headerView reloadData];
 }
 
-- (void) fileListChanged:(NSNotification*)note
-{
-	[fileListView reloadData];
-	[self moveSliderTo:0];
-	//[model setSelectedRunIndex:-1];
-	//[headerView reloadData];
-}
 
 
 #pragma mark •••Data Source Methods
@@ -438,9 +460,9 @@
     return YES;
 }
 
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+- (void)tableViewSelectionDidChange:(NSNotification *)aNote
 {
-	if([aNotification object] == fileListView){
+	if([aNote object] == fileListView){
 		int n = [fileListView numberOfSelectedRows];
 		if(n == 1){
 			int i = [fileListView selectedRow];
@@ -451,7 +473,7 @@
 			unsigned long start = [[model run:i objectForKey:@"RunStart"] unsignedLongValue];
 			unsigned long end   = [[model run:i objectForKey:@"RunEnd"] unsignedLongValue];
 			unsigned long mid = start + (end-start)/2.;
-			[self moveSliderTo:[selectionDateSlider maxValue]*(mid - absStart)/(absEnd-absStart)];
+			[model setSelectionDate:[selectionDateSlider maxValue]*(mid - absStart)/(absEnd-absStart)];
 		}
 		else {
 			[model setSelectedRunIndex:-1];
@@ -467,7 +489,7 @@
 - (id) run:(int)index objectForKey:(id)aKey { return [model run:index objectForKey:aKey]; }
 - (int) selectedRunIndex { return [model selectedRunIndex]; }
 
-- (void) moveSliderTo:(long)aValue
+- (void) setSelectionDate:(long)aValue
 {
 	[model setSelectionDate:aValue];
 }
@@ -627,7 +649,7 @@
 {
     NSPoint mouseLoc =  [self convertPoint:[anEvent locationInWindow] fromView:nil];
 	unsigned long selectedPoint = (mouseLoc.y/[self bounds].size.height)*1000.;
-	[dataSource moveSliderTo:selectedPoint];
+	[dataSource setSelectionDate:selectedPoint];
 }
 
 @end

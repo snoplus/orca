@@ -40,13 +40,11 @@
         NSString*       lastFilePath;
 		NSString*       fileToProcess;
         ORDataPacket*   fileAsDataPacket;
-        NSArray*        dataRecords;
 
         BOOL			reading;
         unsigned long   total;
         unsigned long   numberLeft;
         unsigned long   currentFileIndex;
-		BOOL			sentRunStart;
 		
 		NSMutableArray* runArray;
 		unsigned long	minRunStartTime;
@@ -54,9 +52,12 @@
 		int				selectionDate;
 		int				selectedRunIndex;
 
+    BOOL autoProcess;
 }
 
 #pragma mark •••Accessors
+- (BOOL) autoProcess;
+- (void) setAutoProcess:(BOOL)aAutoProcess;
 - (int) selectedRunIndex;
 - (void) setSelectedRunIndex:(int)anIndex;
 - (int)  selectionDate;
@@ -64,9 +65,6 @@
 - (NSDictionary*) runDictionaryForIndex:(int)index;
 - (unsigned long)   total;
 - (unsigned long)   numberLeft;
-- (NSArray *)   dataRecords;
-- (void)        setDataRecords: (NSArray *) aDataRecords;
-- (id)          dataRecordAtIndex:(int)index;
 - (NSString*)   fileToProcess;
 - (void)        setFileToProcess:(NSString*)newFileToProcess;
 - (NSArray*) filesToProcess;
@@ -93,17 +91,22 @@
 #pragma mark •••Data Handling
 - (void) readNextFile;
 
+#pragma mark •••Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
-#pragma mark •••External String Definitions
-extern NSString* ORHeaderExplorerListChangedNotification;
-extern NSString* ORHeaderExplorerAtEndNotification;
-extern NSString* ORHeaderExplorerRunningNotification;
-extern NSString* ORHeaderExplorerStoppedNotification;
-extern NSString* ORHeaderExplorerInProgressNotification;
 
-extern NSString* ORHeaderExplorerProcessingEndedNotification;
-extern NSString* ORHeaderExplorerReadingNotification;
-extern NSString* ORHeaderExplorerSelectionDateNotification;
+#pragma mark •••External String Definitions
+extern NSString* ORHeaderExplorerAutoProcessChanged;
+extern NSString* ORHeaderExplorerListChanged;
+extern NSString* ORHeaderExplorerProcessing;
+extern NSString* ORHeaderExplorerProcessingFinished;
+
+extern NSString* ORHeaderExplorerProcessingEnded;
+extern NSString* ORHeaderExplorerProcessingFile;
+extern NSString* ORHeaderExplorerSelectionDate;
 extern NSString* ORHeaderExplorerRunSelectionChanged;
-extern NSString* ORHeaderExplorerOneFileDoneNotification;
+extern NSString* ORHeaderExplorerOneFileDone;
+extern NSString* ORHeaderExplorerHeaderChanged;

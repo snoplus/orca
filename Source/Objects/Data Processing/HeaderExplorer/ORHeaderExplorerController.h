@@ -22,6 +22,7 @@
 @interface ORHeaderExplorerController : OrcaObjectController  {
     @private
 	IBOutlet NSButton* 		selectButton;
+	IBOutlet NSButton*		autoProcessCB;
 	IBOutlet NSButton* 		replayButton;
 	IBOutlet NSTableView*   fileListView;
     IBOutlet NSOutlineView*	headerView;
@@ -41,6 +42,7 @@
 #pragma mark •••Accessors
 
 #pragma  mark •••Actions
+- (IBAction) autoProcessAction:(id)sender;
 - (IBAction) selectButtonAction:(id)sender;
 - (IBAction) replayButtonAction:(id)sender;
 - (IBAction) delete:(id)sender;
@@ -51,18 +53,21 @@
 - (IBAction) selectionDateAction:(id)sender;
 
 #pragma mark •••Interface Management
+- (void) autoProcessChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) fileListChanged:(NSNotification*)aNote;
 - (void) selectionDateChanged:(NSNotification*)aNote;
 - (void) runSelectionChanged:(NSNotification*)aNote;
 - (void) started:(NSNotification *)aNote;
 - (void) stopped:(NSNotification *)aNote;
-- (void) reading:(NSNotification *)aNote;
-- (void) moveSliderTo:(long)aValue;
+- (void) processingFile:(NSNotification *)aNote;
+- (void) oneFileDone:(NSNotification *)aNote;
+- (void) headerChanged:(NSNotification*)aNote;
+- (void) setSelectionDate:(long)aValue;
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (int) numberOfRowsInTableView:(NSTableView *)aTableView;
 - (unsigned long) minRunStartTime;
 - (unsigned long) maxRunEndTime;
 - (long) numberRuns;
