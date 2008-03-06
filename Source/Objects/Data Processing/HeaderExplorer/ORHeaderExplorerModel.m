@@ -35,15 +35,16 @@ NSString* ORHeaderExplorerAtEndNotification				= @"ORHeaderExplorerAtEndNotifica
 NSString* ORHeaderExplorerInProgressNotification		= @"ORHeaderExplorerInProgressNotification";
 NSString* ORHeaderExplorerSelectionDateNotification		= @"ORHeaderExplorerSelectionDateNotification";
 NSString* ORHeaderExplorerRunningNotification			= @"ORHeaderExplorerRunningNotification";
-NSString* ORReadHeaderStoppedNotification				= @"ORReadHeaderStoppedNotification";
-NSString* ORHeaderExplorerParseEndedNotification		= @"ORHeaderExplorerParseEndedNotification";
+NSString* ORHeaderExplorerStoppedNotification			= @"ORHeaderExplorerStoppedNotification";
+NSString* ORHeaderExplorerProcessingEndedNotification	= @"ORHeaderExplorerProcessingEndedNotification";
 NSString* ORHeaderExplorerReadingNotification			= @"ORHeaderExplorerReadingNotification";
 NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelectionChanged";
+NSString* ORHeaderExplorerOneFileDoneNotification		= @"ORHeaderExplorerOneFileDoneNotification";
 
 #pragma mark •••Definitions
 
 @interface ORHeaderExplorerModel (private)
-- (void) replayFinished;
+- (void) processFinished;
 - (void) fileFinished;
 @end
 
@@ -68,15 +69,14 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
     [lastListPath release];
 	[lastFilePath release];
 	
-    [filesToReplay release];
+    [filesToProcess release];
     [fileAsDataPacket release];
-	[fileToReplay release];
+	[fileToProcess release];
 	[runArray release];
     [dataRecords release];
 
     [super dealloc];
 }
-
 
 - (void) setUpImage
 {
@@ -126,7 +126,7 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 
 - (unsigned long)   total
 {
-	return [filesToReplay count];
+	return [filesToProcess count];
 }
 
 - (unsigned long)   numberLeft
@@ -152,16 +152,16 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
     return fileAsDataPacket;
 }
 
-- (NSString*) fileToReplay
+- (NSString*) fileToProcess
 {
-    if(fileToReplay)return fileToReplay;
+    if(fileToProcess)return fileToProcess;
     else return @"";
 }
 
-- (void) setFileToReplay:(NSString*)newFileToReplay
+- (void) setFileToProcess:(NSString*)newFileToProcess
 {    
-    [fileToReplay autorelease];
-    fileToReplay=[newFileToReplay retain];
+    [fileToProcess autorelease];
+    fileToProcess=[newFileToProcess retain];
 }
 
 - (NSArray *) dataRecords
@@ -176,38 +176,38 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
     dataRecords = aDataRecords;
 }
 
-- (NSArray*) filesToReplay
+- (NSArray*) filesToProcess
 {
-    return filesToReplay;
+    return filesToProcess;
 }
 
-- (void) addFilesToReplay:(NSMutableArray*)newFilesToReplay
+- (void) addFilesToProcess:(NSMutableArray*)newFilesToProcess
 {
     
-    if(!filesToReplay){
-        filesToReplay = [[NSMutableArray array] retain];
+    if(!filesToProcess){
+        filesToProcess = [[NSMutableArray array] retain];
     }
     
-    [[[self undoManager] prepareWithInvocationTarget:self] removeFiles:newFilesToReplay];
+    [[[self undoManager] prepareWithInvocationTarget:self] removeFiles:newFilesToProcess];
     
     
     //remove dups
-    NSEnumerator* newListEnummy = [newFilesToReplay objectEnumerator];
+    NSEnumerator* newListEnummy = [newFilesToProcess objectEnumerator];
     id newFileName;
     while(newFileName = [newListEnummy nextObject]){
-        NSEnumerator* oldListEnummy = [filesToReplay objectEnumerator];
+        NSEnumerator* oldListEnummy = [filesToProcess objectEnumerator];
         id oldFileName;
         while(oldFileName = [oldListEnummy nextObject]){
             if([oldFileName isEqualToString:newFileName]){
-                [filesToReplay removeObject:oldFileName];
+                [filesToProcess removeObject:oldFileName];
                 break;
             }
         }
         
     }
     
-    [filesToReplay addObjectsFromArray:newFilesToReplay];
-    [filesToReplay sortUsingSelector:@selector(caseInsensitiveCompare:)];
+    [filesToProcess addObjectsFromArray:newFilesToProcess];
+    [filesToProcess sortUsingSelector:@selector(caseInsensitiveCompare:)];
     
     [[NSNotificationCenter defaultCenter]
 			    postNotificationName:ORHeaderExplorerListChangedNotification
@@ -227,9 +227,9 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
     header = aHeader;
 }
 
-- (BOOL)isReplaying
+- (BOOL)isProcessing
 {
-    return parseThread!=nil;
+    return reading;
 }
 
 - (NSString *) lastListPath
@@ -291,35 +291,44 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 
 - (void) removeAll
 {
-    [filesToReplay removeAllObjects];
+    [filesToProcess removeAllObjects];
 }
 
 - (void) readHeaders
 {
 
-	if([self isReplaying]) return;
+	if([self isProcessing]) return;
 
-
+	[runArray release];
+	runArray = [[NSMutableArray array] retain];
+	
+	reading = YES;
 	stop = NO;
-	numberLeft = [filesToReplay count];
+	numberLeft = [filesToProcess count];
     [[NSNotificationCenter defaultCenter]
 				postNotificationName:ORHeaderExplorerRunningNotification
                               object: self];
 
 	sentRunStart = NO;
+    
+    [self setDataRecords:nil];
+    [self setHeader:nil];
+    
+    if(fileAsDataPacket)[fileAsDataPacket release];
+    fileAsDataPacket = [[ORDataPacket alloc] init];
 
-	[self parseFile];
-	
-}
-
-- (void) sendRunStart:(ORDataPacket*)aDataPacket
-{
+	minRunStartTime = 0xffffffff;
+	maxRunEndTime = 0;
+    currentFileIndex = 0;
+	if ([filesToProcess count]){
+		[self performSelector:@selector(readNextFile) withObject:nil afterDelay:.1];
+	}
 }
 
 - (void) removeFiles:(NSMutableArray*)anArray
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] addFilesToReplay:anArray];
-    [filesToReplay removeObjectsInArray:anArray];
+    [[[self undoManager] prepareWithInvocationTarget:self] addFilesToProcess:anArray];
+    [filesToProcess removeObjectsInArray:anArray];
     [[NSNotificationCenter defaultCenter]
 			    postNotificationName:ORHeaderExplorerListChangedNotification
                               object: self];
@@ -331,12 +340,12 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
     NSMutableArray* filesToRemove = [NSMutableArray array];
 	unsigned current_index = [indexSet firstIndex];
     while (current_index != NSNotFound){
-		[filesToRemove addObject:[filesToReplay objectAtIndex:current_index]];
+		[filesToRemove addObject:[filesToProcess objectAtIndex:current_index]];
         current_index = [indexSet indexGreaterThanIndex: current_index];
     }
 	if([filesToRemove count]){
-		[[[self undoManager] prepareWithInvocationTarget:self] addFilesToReplay:filesToRemove];
-		[filesToReplay removeObjectsInArray:filesToRemove];
+		[[[self undoManager] prepareWithInvocationTarget:self] addFilesToProcess:filesToRemove];
+		[filesToProcess removeObjectsInArray:filesToRemove];
     
     
 		[[NSNotificationCenter defaultCenter]
@@ -346,59 +355,25 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 }
 
 
-- (void) stopReplay
+- (void) stopProcessing
 {
 	stop = YES;
-    //[self replayFinished];
-    NSLog(@"Replay stopped manually\n");
+    //[self processFinished];
+    NSLog(@"Header Explorer stopped manually\n");
 }
 
 //-----
 #pragma mark •••File Actions
-- (BOOL) parseInProgress
+
+- (void) readNextFile
 {
-    return parseThread != nil;
-}
-
-- (void) parseFile
-{
-    if(parseThread)return;
-    
-    [self setDataRecords:nil];
-    //[self setHeader:nil];
-    
-    if(fileAsDataPacket)[fileAsDataPacket release];
-    fileAsDataPacket = [[ORDataPacket alloc] init];
-    
-    
-    parseThread = [[ThreadWorker workOn:self withSelector:@selector(parse:thread:)
-                             withObject:nil
-                         didEndSelector:@selector(parseThreadExited:)] retain];
-        
-    if(!parseThread){
-        [self parseThreadExited:nil];
-    }
-}
-
-
--(id) parse:(id)userInfo thread:(id)tw
-{
-	NSEnumerator* e = [filesToReplay objectEnumerator];
-	id aFile;
-	minRunStartTime = 0xffffffff;
-	maxRunEndTime = 0;
-	[runArray release];
-	runArray = [[NSMutableArray array] retain];
-
-	while(aFile = [e nextObject]){
-		if(stop)break;
+	if(!stop && currentFileIndex < [filesToProcess count]){
+		id aFile = [filesToProcess objectAtIndex:currentFileIndex];
 		
-		[self performSelectorOnMainThread:@selector(setFileToReplay:) withObject:aFile waitUntilDone:YES];
+		[self setFileToProcess:aFile];
 
-		NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
 		NSFileHandle* fp = [NSFileHandle fileHandleForReadingAtPath:aFile];
-		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                                 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.001]];
+
 		[dataRecords release];
 		dataRecords = nil;
 		[fileAsDataPacket clearData];
@@ -409,7 +384,9 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 			unsigned long runNumber = 0;
 			
 			if([fileAsDataPacket readHeaderReturnRunLength:fp runStart:&runStart runEnd:&runEnd runNumber:&runNumber]){
-				[self performSelectorOnMainThread:@selector(postReadStarted) withObject:nil waitUntilDone:NO];
+				[[NSNotificationCenter defaultCenter]
+					postNotificationName:ORHeaderExplorerReadingNotification
+								  object: self];
 				if(runStart!=0 && runEnd!=0){
 					if(runStart < minRunStartTime) minRunStartTime = runStart;
 					if(runEnd > maxRunEndTime)     maxRunEndTime   = runEnd;
@@ -427,36 +404,24 @@ NSString* ORHeaderExplorerRunSelectionChanged			= @"ORHeaderExplorerRunSelection
 						]
 					];
 					
-					[self performSelectorOnMainThread:@selector(fileFinished) withObject:nil waitUntilDone:YES];
+					[self fileFinished];
 				}
 				else NSLogColor([NSColor redColor],@"Problem reading <%@> for exploring.\n",[aFile stringByAbbreviatingWithTildeInPath]);
 			}
 			else NSLogColor([NSColor redColor],@" <%@> doesn't appear to be a legal ORCA data file.\n",[aFile stringByAbbreviatingWithTildeInPath]);
 		}
 		else NSLogColor([NSColor redColor],@"Could NOT Open <%@> for exploring.\n",[aFile stringByAbbreviatingWithTildeInPath]);
-		[pool release];
+		currentFileIndex++;
+		[self performSelector:@selector(readNextFile) withObject:nil afterDelay:.01];
 	}
-
-    return @"done";
-}
-
-- (void) parseThreadExited:(id)userInfo
-{
-    [self replayFinished];
+	else {
+		reading = NO;
+		[self processFinished];
 	
-    [parseThread release];
-    parseThread = nil;
-    [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORHeaderExplorerParseEndedNotification
+		[[NSNotificationCenter defaultCenter]
+			    postNotificationName:ORHeaderExplorerProcessingEndedNotification
                               object: self];
-    
-}
-
-- (void) postReadStarted
-{
-    [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORHeaderExplorerReadingNotification
-                              object: self];
+	}
 }
 
 #pragma mark •••Archival
@@ -469,7 +434,7 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
     self = [super initWithCoder:decoder];
     
 	[[self undoManager] disableUndoRegistration];
-	[self addFilesToReplay:[decoder decodeObjectForKey:ORHeaderExplorerList]];
+	[self addFilesToProcess:[decoder decodeObjectForKey:ORHeaderExplorerList]];
 	[self setLastListPath:[decoder decodeObjectForKey:ORLastListPath]];
 	[self setLastFilePath:[decoder decodeObjectForKey:ORLastFilePath]];
 	[[self undoManager] enableUndoRegistration];
@@ -480,7 +445,7 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:filesToReplay forKey:ORHeaderExplorerList];
+    [encoder encodeObject:filesToProcess forKey:ORHeaderExplorerList];
     [encoder encodeObject:lastListPath forKey:ORLastListPath];
     [encoder encodeObject:lastFilePath forKey:ORLastFilePath];
     
@@ -489,7 +454,7 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
 @end
 
 @implementation ORHeaderExplorerModel (private)
-- (void) replayFinished
+- (void) processFinished
 {
     [self fileFinished];
     
@@ -503,7 +468,7 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
     [self setDataRecords:nil];
 	      
     [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORReadHeaderStoppedNotification
+				postNotificationName:ORHeaderExplorerStoppedNotification
                               object: self];
 
 }
@@ -512,6 +477,10 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
 {
     [nextObject runTaskBoundary:fileAsDataPacket userInfo:nil];
 	numberLeft--;
+	    [[NSNotificationCenter defaultCenter]
+				postNotificationName:ORHeaderExplorerOneFileDoneNotification
+                              object: self];
+
 }
 
 

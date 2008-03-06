@@ -32,19 +32,20 @@
 {
     @private
 		BOOL			stop;
-        NSMutableArray*	filesToReplay;
+        NSMutableArray*	filesToProcess;
         id              nextObject;
 
         ORHeaderItem*   header;
         NSString*       lastListPath;
         NSString*       lastFilePath;
-		NSString*       fileToReplay;
+		NSString*       fileToProcess;
         ORDataPacket*   fileAsDataPacket;
         NSArray*        dataRecords;
 
-        ThreadWorker*   parseThread;
+        BOOL			reading;
         unsigned long   total;
         unsigned long   numberLeft;
+        unsigned long   currentFileIndex;
 		BOOL			sentRunStart;
 		
 		NSMutableArray* runArray;
@@ -66,13 +67,13 @@
 - (NSArray *)   dataRecords;
 - (void)        setDataRecords: (NSArray *) aDataRecords;
 - (id)          dataRecordAtIndex:(int)index;
-- (NSString*)   fileToReplay;
-- (void)        setFileToReplay:(NSString*)newFileToReplay;
-- (NSArray*) filesToReplay;
-- (void) addFilesToReplay:(NSMutableArray*)newFilesToReplay;
+- (NSString*)   fileToProcess;
+- (void)        setFileToProcess:(NSString*)newFileToProcess;
+- (NSArray*) filesToProcess;
+- (void) addFilesToProcess:(NSMutableArray*)newFilesToProcess;
 - (ORHeaderItem *)header;
 - (void)setHeader:(ORHeaderItem *)aHeader;
-- (BOOL)isReplaying;
+- (BOOL)isProcessing;
 - (NSString *) lastListPath;
 - (void) setLastListPath: (NSString *) aSetLastListPath;
 - (NSString *) lastFilePath;
@@ -81,24 +82,16 @@
 - (unsigned long)	maxRunEndTime;
 
 #pragma mark •••Data Handling
-- (void) stopReplay;
+- (void) stopProcessing;
 - (void) removeFilesWithIndexes:(NSIndexSet*)indexSet;
-- (void) stopReplay;
+- (void) stopProcessing;
 - (void) removeAll;
 - (void) removeFiles:(NSMutableArray*)anArray;
 - (void) readHeaders;
 - (void) findSelectedRun;
 
 #pragma mark •••Data Handling
-- (void) parseFile;
-- (BOOL) parseInProgress;
-
-#pragma mark •••Thread
-- (id) parse:(id)userInfo thread:(id)tw;
-- (void) parseThreadExited:(id)userInfo;
-- (id) parse:(id)userInfo thread:(id)tw;
-- (void)parseThreadExited:(id)userInfo;
-- (void) postReadStarted;
+- (void) readNextFile;
 
 @end
 
@@ -106,10 +99,11 @@
 extern NSString* ORHeaderExplorerListChangedNotification;
 extern NSString* ORHeaderExplorerAtEndNotification;
 extern NSString* ORHeaderExplorerRunningNotification;
-extern NSString* ORReadHeaderStoppedNotification;
+extern NSString* ORHeaderExplorerStoppedNotification;
 extern NSString* ORHeaderExplorerInProgressNotification;
 
-extern NSString* ORHeaderExplorerParseEndedNotification;
+extern NSString* ORHeaderExplorerProcessingEndedNotification;
 extern NSString* ORHeaderExplorerReadingNotification;
 extern NSString* ORHeaderExplorerSelectionDateNotification;
 extern NSString* ORHeaderExplorerRunSelectionChanged;
+extern NSString* ORHeaderExplorerOneFileDoneNotification;

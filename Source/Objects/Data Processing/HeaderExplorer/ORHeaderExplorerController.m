@@ -108,12 +108,12 @@
 
 - (IBAction) replayButtonAction:(id)sender
 {
-    if(![model isReplaying]){
+    if(![model isProcessing]){
         [model readHeaders];
         [selectButton setEnabled:NO];
     }
     else {
-        [model stopReplay];
+        [model stopProcessing];
     }
 }
 
@@ -186,12 +186,12 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(stopped:)
-                         name : ORHeaderExplorerParseEndedNotification
+                         name : ORHeaderExplorerStoppedNotification
                         object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(selectionDateChanged:)
-                         name : ORHeaderExplorerParseEndedNotification
+                         name : ORHeaderExplorerProcessingEndedNotification
                         object: model];
 
     [notifyCenter addObserver : self
@@ -213,6 +213,12 @@
                      selector : @selector(tableViewSelectionDidChange:)
                          name : NSTableViewSelectionDidChangeNotification
                         object: nil];
+						
+	[notifyCenter addObserver : self
+                     selector : @selector(selectionDateChanged:)
+                         name : ORHeaderExplorerOneFileDoneNotification
+                        object: model];
+					
 
 }
 
@@ -265,7 +271,7 @@
 
 - (void) reading:(NSNotification *)aNotification
 {
-	NSString* theFileName = [model fileToReplay];
+	NSString* theFileName = [model fileToProcess];
 	if(theFileName)[workingOnField setStringValue:[NSString stringWithFormat:@"Reading:%@",[theFileName stringByAbbreviatingWithTildeInPath]]];
 	else [workingOnField setStringValue:@""];
 
@@ -396,8 +402,8 @@
 
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-    if([[model filesToReplay] count]){
-        id obj = [[model filesToReplay]  objectAtIndex:rowIndex];
+    if([[model filesToProcess] count]){
+        id obj = [[model filesToProcess]  objectAtIndex:rowIndex];
         return [obj stringByAbbreviatingWithTildeInPath];
     }
     else return nil;
@@ -407,7 +413,7 @@
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     
-    return [[model filesToReplay] count];
+    return [[model filesToProcess] count];
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
@@ -499,7 +505,7 @@
         }
     }
 	
-    [model addFilesToReplay:theFinalList];
+    [model addFilesToProcess:theFinalList];
     [fileListView reloadData];
 }
 
@@ -534,7 +540,7 @@
     if(returnCode){
         NSString* listPath = [[sheet filenames] objectAtIndex:0];
         [model setLastListPath:listPath];
-        [[model filesToReplay] writeToFile:listPath atomically:YES];
+        [[model filesToProcess] writeToFile:listPath atomically:YES];
     }
 }
 
@@ -545,7 +551,7 @@
         NSMutableArray* theList = [NSMutableArray arrayWithContentsOfFile:listPath];
         if(theList){
             [model removeAll];
-            [model addFilesToReplay:theList];
+            [model addFilesToProcess:theList];
             [fileListView reloadData];
         }
         else NSLog(@"<%@> replay list is empty\n",listPath);
