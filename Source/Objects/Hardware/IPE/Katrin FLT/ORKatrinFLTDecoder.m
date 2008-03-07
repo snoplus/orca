@@ -199,6 +199,7 @@ followed by waveform data (n x 1024 16-bit words)
 	// Change order of shorts in the ADC trace for PowerPC CPUs	
 	// Note: This the endian swap itself is handled by the firewire drivers.
 	//       The swap of the shorts has been moved from the model code
+	//       Every data set should be only swapped once (!)
 	// ak, 29.2.08
 	if ((ntohl(1) == 1) && (!isSwapped) ){ // big endian host
 		// Point to ADC data

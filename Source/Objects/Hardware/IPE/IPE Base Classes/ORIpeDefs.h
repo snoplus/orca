@@ -53,6 +53,8 @@
  *
  * History:
  * - 1.2-9 - KatrinSLT dialog
+ *            - Fixed readout windows of ADC traces with more than one trigger
+ *              7.3.08 (ak)
  *            - Added KatrinSLT dialog that only contains the Katrin relevant settings.
  *            - Added the full trigger data to the multiplicity data set.
  *              Added some very simple graphical display.
@@ -121,6 +123,6 @@
  
 /** Version of the IPE-DAQ object.
   * The version number is independand fron the Orca version. */ 
-#define ORIPE_VERSION @"1.1-8"
+#define ORIPE_VERSION @"1.2-9"
 
 

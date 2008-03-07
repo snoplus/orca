@@ -1302,7 +1302,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     if(![[[self crate] adapter] serviceIsAlive]){
 		[NSException raise:@"No FireWire Service" format:@"Check Crate Power and FireWire Cable."];
     }
-	
+			
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORKatrinFLTModel"];    
@@ -1522,6 +1522,27 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 		data = dataBuffer;
 		[fireWireCard read:pageAddress data:data size:nPages*4*sizeof(long)];
 	
+	
+	    // Determine the readout address for all ADC traces
+		// The first trigger stops the recording of the ADC traces
+		// 		
+		// Calculate start bin
+		// Note: The Flt uses a fixed post trigger time of 512 bin
+		//       This time is different from the central nextpage delay used by the Slt
+		//       ak, 29.2.08
+		int firstEventSubSec = data[1];
+		int startBin = firstEventSubSec - (512 + (readoutPages-1) * 1024);
+		if(startBin < 0){
+			startBin = 0x10000 + startBin;
+		}
+		
+		
+		if(checkWaveFormEnabled){
+		  if (nPages > 1) 
+		    NSLog(@"nEvents=%8d (%12d,%8d) nPages=%3d\n", nEvents+1, data[2], data[1], nPages);
+		}
+		
+        int nPagesHandled = 0; 
 		while(page0 != page1){
 			katrinDebugDataStruct theDebugEvent;
 			
@@ -1658,15 +1679,6 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 							[theWaveFormData appendBytes:&theEvent length:sizeof(katrinEventDataStruct)];
 							[theWaveFormData appendBytes:&theDebugEvent length:sizeof(katrinDebugDataStruct)];									
 							
-							// Calculate start bin
-							// Note: The Flt uses a fixed post trigger time of 512 bin
-							//       This time is different from the central nextpage delay used by the Slt
-							//       ak, 29.2.08
-							int startBin = theEvent.subSec - (512 + (readoutPages-1) * 1024);
-							if(startBin < 0){
-								startBin = 0x10000 + startBin;
-							}
-							
 														
 							// Use block read mode.
 							// With every 32bit (long word) two 12bit ADC values are transmitted
@@ -1716,7 +1728,8 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 				} // end of loop over all channel
 				
 			}
-			
+		
+		    nPagesHandled +=1;
 		} // end of while	
 		
 		// Reset after readout req. to start data aquisition in debug mode again	
