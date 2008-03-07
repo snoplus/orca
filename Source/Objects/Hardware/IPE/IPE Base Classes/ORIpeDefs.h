@@ -6,6 +6,13 @@
     email                : kopmann@ipe.fzk.de
  ***************************************************************************/
 
+/*
+Doxygen documentation:
+- generate the documentation in a shell with:
+  doxygen Orca.doxygen
+- read the documentation by opening Orca-api/html/index.html in a html-Browser
+*/
+
 
 /** @mainpage IPE-DAQ Electronics Object for Orca
  * 
@@ -27,6 +34,8 @@
  *   - One Central Configuration board (ORIpeSLTModel)
  *   - Up to 20 Trigger boards (ORIpeFLTModel)
  *
+ *
+ *   <br><br><br><br><sub> Source of this documentation: ORIpeDefs.h</sub>
  */
 
 
@@ -52,6 +61,10 @@
  *
  *
  * History:
+ * - 1.2-10 - Katrin FLT dialog
+ *            - tabs "Histogram" and "Veto" added (requires appropriate FPGA version)
+ *            - in "Settings" a new mode "DAQ Run Mode" was added
+ *              7.3.08 (-tb-)
  * - 1.2-9 - KatrinSLT dialog
  *            - Fixed readout windows of ADC traces with more than one trigger
  *              7.3.08 (ak)
@@ -118,11 +131,25 @@
  *           19.7.07 (ak)
  *
  *   
+ *   <br><br><br><br><sub> Source of this documentation: ORIpeDefs.h</sub>
  */
  
  
+/** @page addingconfigvariables Adding configuration variables
+ *  Configuration variables are variables, which are attributes of the model and should
+ *  be stored in the Orca configuration file (e.g. fltMode, daqRunMode, ...). Usually they
+ *  have a representation in the controller (the GUI). E.g. "daqRunMode" has a counter part in the controller,
+ *  "fltMode" has not.
+ *  As example, in the comments for - (int) ORKatrinFLTModel::histoBinWidth there is a checklist of all coding tasks which are
+ *  necessary to add a new configuration variable.
+ *
+ *   
+ *   <br><br><br><br><sub> Source of this documentation: ORIpeDefs.h</sub>
+ */
+
+
 /** Version of the IPE-DAQ object.
-  * The version number is independand fron the Orca version. */ 
-#define ORIPE_VERSION @"1.2-9"
+  * The version number is independent from the Orca version. */ 
+#define ORIPE_VERSION @"1.2-10"
 
 
