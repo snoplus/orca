@@ -105,7 +105,7 @@
 
 
 #pragma mark •••External String Definitions
-extern NSString* ORHeaderExplorerModelUseFilterChanged;
+extern NSString* ORHeaderExplorerUseFilterChanged;
 extern NSString* ORHeaderExplorerSearchKeyChanged;
 extern NSString* ORHeaderExplorerAutoProcessChanged;
 extern NSString* ORHeaderExplorerListChanged;

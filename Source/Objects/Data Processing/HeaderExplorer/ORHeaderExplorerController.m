@@ -52,6 +52,11 @@
 
 - (void) awakeFromNib
 {
+    NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%d.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    [tabView selectTabViewItemAtIndex: index];
+
     [fileListView registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 	[runSummaryTextView setFont:[NSFont fontWithName:@"Monaco" size:10]];
 	[progressIndicatorBottom setIndeterminate:NO];
@@ -62,6 +67,13 @@
 
 
 #pragma  mark •••Actions
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%d.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+	
+}
 
 - (void) useFilterAction:(id)sender
 {
@@ -287,9 +299,8 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(useFilterChanged:)
-                         name : ORHeaderExplorerModelUseFilterChanged
+                         name : ORHeaderExplorerUseFilterChanged
 						object: model];
-
 }
 
 - (void) updateWindow
@@ -301,8 +312,8 @@
 	
 	[progressField setStringValue:@""];
 	[self autoProcessChanged:nil];
-	[self searchKeyChanged:nil];
 	[self useFilterChanged:nil];
+	[self searchKeyChanged:nil];
 }
 
 

@@ -98,6 +98,8 @@
 				<string>NSTextField</string>
 				<key>selectionDateSlider</key>
 				<string>NSSlider</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
 				<key>useFilterCB</key>
 				<string>NSButton</string>
 			</dict>

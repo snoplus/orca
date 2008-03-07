@@ -39,6 +39,7 @@
 		IBOutlet NSTextField* 	selectionDateField;
 		IBOutlet NSSlider*		selectionDateSlider;
 		IBOutlet NSTextView* 	runSummaryTextView;
+		IBOutlet NSTabView*     tabView;
 }
 
 #pragma  mark •••Actions

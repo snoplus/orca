@@ -27,8 +27,8 @@
 #import "ORHeaderItem.h"
 
 #pragma mark •••Notification Strings
-NSString* ORHeaderExplorerModelUseFilterChanged = @"ORHeaderExplorerModelUseFilterChanged";
-NSString* ORHeaderExplorerSearchKeyChanged = @"ORHeaderExplorerSearchKeyChanged";
+NSString* ORHeaderExplorerUseFilterChanged		= @"ORHeaderExplorerUseFilterChanged";
+NSString* ORHeaderExplorerSearchKeyChanged		= @"ORHeaderExplorerSearchKeyChanged";
 NSString* ORHeaderExplorerAutoProcessChanged	= @"ORHeaderExplorerAutoProcessChanged";
 NSString* ORHeaderExplorerListChanged			= @"ORHeaderExplorerListChanged";
 
@@ -100,7 +100,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
     
     useFilter = aUseFilter;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerModelUseFilterChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerUseFilterChanged object:self];
 }
 
 - (NSString*) searchKey
@@ -295,7 +295,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 
 - (void) addFilesToProcess:(NSMutableArray*)newFilesToProcess
 {
-    
+	if(!newFilesToProcess)return;
     if(!filesToProcess){
         filesToProcess = [[NSMutableArray array] retain];
     }
@@ -409,24 +409,23 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 					if(runEnd > maxRunEndTime)     maxRunEndTime   = runEnd;
 					[fp seekToEndOfFile];
 					
-					id d;
+					id headerData;
 					if([searchKey length] && useFilter){
 						NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[searchKey componentsSeparatedByString:@"/"]]; //must be mutable
-						d = [[fileAsDataPacket fileHeader] objectForKeyArray:keyArray];
+						headerData = [[fileAsDataPacket fileHeader] objectForKeyArray:keyArray];
 					}
-					else d = [fileAsDataPacket fileHeader];
+					else headerData = [fileAsDataPacket fileHeader];
 					
-					[runArray addObject:
-						[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							[NSNumber numberWithUnsignedLong:runStart],			 @"RunStart",
-							[NSNumber numberWithUnsignedLong:runEnd],			 @"RunEnd",
-							[NSNumber numberWithUnsignedLong:runEnd-runStart],	 @"RunLength",
-							[NSNumber numberWithUnsignedLong:runNumber],		 @"RunNumber",
-							[NSNumber numberWithUnsignedLong:[fp offsetInFile]], @"FileSize",
-							[ORHeaderItem headerFromObject:d named:@"Root"],	 @"FileHeader",
-							nil
-						]
-					];
+					NSMutableDictionary* runDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+							[NSNumber numberWithUnsignedLong:runStart],				  @"RunStart",
+							[NSNumber numberWithUnsignedLong:runEnd],				  @"RunEnd",
+							[NSNumber numberWithUnsignedLong:runEnd-runStart],		  @"RunLength",
+							[NSNumber numberWithUnsignedLong:runNumber],			  @"RunNumber",
+							[NSNumber numberWithUnsignedLong:[fp offsetInFile]],	  @"FileSize",
+							[ORHeaderItem headerFromObject:headerData named:@"Root"], @"FileHeader",
+							nil];
+							
+					[runArray addObject:runDictionary];
 					
 					[self fileFinished];
 				}
@@ -446,21 +445,17 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 }
 
 #pragma mark •••Archival
-static NSString* ORHeaderExplorerList 			= @"ORHeaderExplorerList";
-static NSString* ORLastListPath 			= @"ORLastListPath";
-static NSString* ORLastFilePath 			= @"ORLastFilePath";
-
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
 	[[self undoManager] disableUndoRegistration];
-    [self setUseFilter:[decoder decodeBoolForKey:@"ORHeaderExplorerModelUseFilter"]];
-    [self setSearchKey:[decoder decodeObjectForKey:@"ORHeaderExplorerModelSearchKey"]];
-    [self setAutoProcess:[decoder decodeBoolForKey:@"ORHeaderExplorerModelAutoProcess"]];
-	[self addFilesToProcess:[decoder decodeObjectForKey:ORHeaderExplorerList]];
-	[self setLastListPath:[decoder decodeObjectForKey:ORLastListPath]];
-	[self setLastFilePath:[decoder decodeObjectForKey:ORLastFilePath]];
+    [self setUseFilter:		[decoder decodeBoolForKey:	@"useFilter"]];
+    [self setSearchKey:		[decoder decodeObjectForKey:@"searchKey"]];
+    [self setAutoProcess:	[decoder decodeBoolForKey:	@"autoProcess"]];
+	[self addFilesToProcess:[decoder decodeObjectForKey:@"filesToProcess"]];
+	[self setLastListPath:	[decoder decodeObjectForKey:@"lastListPath"]];
+	[self setLastFilePath:	[decoder decodeObjectForKey:@"lastFilePath"]];
 	[[self undoManager] enableUndoRegistration];
     
     return self;
@@ -469,12 +464,12 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:useFilter forKey:@"ORHeaderExplorerModelUseFilter"];
-    [encoder encodeObject:searchKey forKey:@"ORHeaderExplorerModelSearchKey"];
-    [encoder encodeBool:autoProcess forKey:@"ORHeaderExplorerModelAutoProcess"];
-    [encoder encodeObject:filesToProcess forKey:ORHeaderExplorerList];
-    [encoder encodeObject:lastListPath forKey:ORLastListPath];
-    [encoder encodeObject:lastFilePath forKey:ORLastFilePath];
+    [encoder encodeBool:useFilter		forKey: @"useFilter"];
+    [encoder encodeObject:searchKey		forKey: @"searchKey"];
+    [encoder encodeBool:autoProcess		forKey: @"autoProcess"];
+    [encoder encodeObject:filesToProcess forKey:@"filesToProcess"];
+    [encoder encodeObject:lastListPath	forKey: @"lastListPath"];
+    [encoder encodeObject:lastFilePath	forKey: @"lastFilePath"];
     
 }
 
