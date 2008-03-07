@@ -661,9 +661,8 @@ NSLog(@"Awaking from NIB ...\n");
   */
 - (void) fltRunModeChanged:(NSNotification*)aNote
 {
-NSLog(@"Received notification  -fltModeChanged- ...\n");
-
-	//[modeButton selectItemAtIndex:[model fltRunMode]]; obsolete ! -tb-
+    //debug output -tb- NSLog(@"Received notification  -fltModeChanged- ...\n");
+	//[modeButton selectItemAtIndex:[model fltRunMode]]; TODO: obsolete ! -tb-
 	//[modeButton selectItemAtIndex:[model daqRunMode]];//-tb-
     [fltModeField setIntValue:[model fltRunMode]];
 	[self settingsLockChanged:nil];	//TODO: still needed? -tb- 2008-02-08
@@ -673,10 +672,9 @@ NSLog(@"Received notification  -fltModeChanged- ...\n");
   */
 - (void) daqRunModeChanged:(NSNotification*)aNote
 {
-NSLog(@"Received notification  -daqRunModeChanged- ... new is %i\n", [model daqRunMode]);
-
+    //debug output -tb- NSLog(@"Received notification  -daqRunModeChanged- ... new is %i\n", [model daqRunMode]);
 	//[modeButton selectItemAtIndex:[model fltRunMode]];
-    NSLog(@"DAQ run mode is %i\n", [model daqRunMode]);
+    //debug output -tb- NSLog(@"DAQ run mode is %i\n", [model daqRunMode]);
 	[daqRunModeButton selectItemWithTag:[model daqRunMode]];//-tb-
 	[self settingsLockChanged:nil];	//TODO: still needed? -tb- 2008-02-08
 }
