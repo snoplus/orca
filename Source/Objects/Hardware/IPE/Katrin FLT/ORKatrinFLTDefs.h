@@ -39,10 +39,21 @@
 #define kKatrinFlt_Cntrl_ReadPtr_Mask		0x1ff
 
 
+// this are the flt run modes (fltRunMode; hardware modes)
 #define kKatrinFlt_Debug_Mode		0
 #define kKatrinFlt_Run_Mode			1
 #define kKatrinFlt_Measure_Mode		2
 #define kKatrinFlt_Test_Mode		3
+
+//the daq run modes (daqRunMode) (see in the FLT Settings)
+//see setDaqRunMode for the according fltModes
+#define kKatrinFlt_DaqEnergyTrace_Mode		0
+#define kKatrinFlt_DaqEnergy_Mode			1
+#define kKatrinFlt_DaqHitrate_Mode          2
+#define kKatrinFlt_DaqThresholdScan_Mode	4
+#define kKatrinFlt_DaqTest_Mode             3
+#define kKatrinFlt_DaqHistogram_Mode        5
+#define kKatrinFlt_DaqVeto_Mode             6
 
 #define kKatrinFlt_Intack			 0x40000000
 #define kKatrinFlt_Read				 0x80000000
@@ -67,6 +78,15 @@ typedef struct {
 	unsigned long energy;
 } katrinEventDataStruct;
 
+/** Katrin event structure. 
+  *
+  *  
+  */
+typedef struct {
+	unsigned long sec;
+	unsigned long hitrate;
+} katrinHitRateDataStruct;
+
 
 typedef struct {
 	// Added reset time stamp, ak 2.7.07
@@ -79,6 +99,13 @@ typedef struct {
 	unsigned long channelMap; // 8bit channel + 24 channelMap
 	unsigned long threshold;   
 	unsigned long hitrate;
-} katrinHitRateDataStruct;
+} katrinThresholdScanDataStruct;
 
+typedef struct { // -tb- 2008-02-27
+	unsigned long readoutSec;
+	unsigned long recordingTimeSec;
+	unsigned long firstBin;
+	unsigned long lastBin;
+	unsigned long histogramLength;
+} katrinHistogramDataStruct;
 

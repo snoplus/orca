@@ -143,8 +143,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
         ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
 		                   ^^ ^^^^ ^^^^ eventID (0..1024)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec of restart
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart 
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec of restart/reset
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart/reset
 followed by waveform data (n x 1024 16-bit words)
 </pre>
   *
@@ -276,7 +276,118 @@ followed by waveform data (n x 1024 16-bit words)
 @end
 
 
-@implementation ORKatrinFLTDecoderForHitRate
+
+
+
+
+@implementation ORKatrinFLTDecoderForHitRate   //TODO: work in progress ... -tb-
+
+//-------------------------------------------------------------
+/** Data format for hitrate mode:
+  *
+<pre>
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+^^^^ ^^^^ ^^^^ ^^-----------------------data id
+                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+^^^^ ^^^--------------------------------spare
+        ^ ^^^---------------------------crate
+             ^ ^^^^---------------------card
+			        ^^^^ ^^^^ ----------channel
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx hitrate
+</pre>
+    Orca identifies the type of binary data record by the header bytes.
+    By this it finds this class (its selector is connected with its ID in
+     - (NSDictionary*) dataRecordDescription
+  */ //-tb- 2008-02-6
+//-------------------------------------------------------------
+
+
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+	katrinHitRateDataStruct* ePtr;
+
+    unsigned long* ptr = (unsigned long*)someData;
+	
+	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
+	++ptr;										 
+	
+	//crate and card from second word
+	unsigned char crate		= (*ptr>>21) & 0xf;
+	unsigned char card		= (*ptr>>16) & 0x1f;
+	unsigned char chan		= (*ptr>>8) & 0xff;
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* stationKey	= [self getStationKey: card];	
+	NSString* channelKey	= [self getChannelKey: chan];	
+	++ptr;	
+	
+	// Get the global data from the first event
+    // ptr to event data
+	ePtr = (katrinHitRateDataStruct*) ptr;			//recast to event structure
+
+    //NSLog(@"Channel %08x - %8d %8d\n", ePtr->channelMap, ePtr->sec, ePtr->subSec);
+    float fHitrate = ePtr->hitrate;
+   NSLog(@"Receiving hitrate data for chan %d: (%d, %d, %f)\n",chan, ePtr->sec, ePtr->hitrate, fHitrate);
+
+ 
+    #if 1
+	[aDataSet histogram:ePtr->hitrate 
+					  numBins:32768 
+					  sender:self  
+					  withKeys: @"FLT",@"HitrateHistogram",crateKey,stationKey,channelKey,nil];
+    #endif
+
+    #if 1
+    // data formats are in ORDataSet.h/.m (histogram:,loadTimeSeries:,loadWaveform: etc) -tb- 2008-02-04
+	[aDataSet loadTimeSeries: ePtr->hitrate
+                      atTime:ePtr->sec
+					  sender:self  
+					  withKeys: @"FLT",@"HitrateTimeSerie",crateKey,stationKey,channelKey,nil];
+    #endif
+
+    return length; //must return number of longs processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    NSString* title= @"Katrin FLT Hitrate Record\n\n";
+	++ptr;		//skip the first word (dataID and length)
+    
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8)  & 0xff];
+
+	++ptr;		//point to event struct
+	katrinHitRateDataStruct* ePtr = (katrinHitRateDataStruct*)ptr;			//recast to event structure
+	
+	NSString* hitrate        = [NSString stringWithFormat:@"Hitrate     = %d\n",ePtr->hitrate];
+
+	NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ePtr->sec];
+	NSString* sampleDate     = [NSString stringWithFormat:@"Date       = %@\n", [theDate descriptionWithCalendarFormat:@"%m/%d/%y"]];
+	NSString* sampleTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
+
+	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->sec];
+		
+
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@",title,crate,card,chan,
+	                    hitrate,sampleDate,sampleTime,seconds];               
+
+}
+@end
+
+
+
+
+
+
+
+
+
+
+
+@implementation ORKatrinFLTDecoderForThresholdScan   //renamed from ORKatrinFLTDecoderForHitRate to ORKatrinFLTDecoderForThresholdScan -tb- 2008-02
 
 //-------------------------------------------------------------
 /** Data format for frequency plot
@@ -327,7 +438,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 	++ptr;		//point to event struct
 	
 	
-	katrinHitRateDataStruct* ePtr = (katrinHitRateDataStruct*) ptr;
+	katrinThresholdScanDataStruct* ePtr = (katrinThresholdScanDataStruct*) ptr;
 	
 /*
     // Calculate the multiplicity of the bin 
@@ -385,7 +496,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 
-    NSString* title= @"Katrin FLT Hitrate Record\n\n";
+    NSString* title= @"Katrin FLT ThresholdScan Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
     NSString* crate     = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
@@ -393,7 +504,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
     NSString* chan      = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
 	++ptr;		//point to next structure
 	
-	katrinHitRateDataStruct* ePtr = (katrinHitRateDataStruct*)ptr;			//recast to event structure
+	katrinThresholdScanDataStruct* ePtr = (katrinThresholdScanDataStruct*)ptr;			//recast to event structure
 	
 	NSString* threshold	= [NSString stringWithFormat:@"Threshold  = %d\n",ePtr->threshold];
 	NSString* hitrate	= [NSString stringWithFormat:@"Hitrate    = %d\n",ePtr->hitrate];
@@ -404,3 +515,141 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 }
 
 @end
+
+
+
+
+@implementation ORKatrinFLTDecoderForHistogram
+
+//-------------------------------------------------------------
+/** Data format for hardware histogram
+  *
+<pre>  
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+^^^^ ^^^^ ^^^^ ^^-----------------------data id
+                 ^^ ^^^^ ^^^^ ^^^^ ^^^^-length in longs
+
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+^^^^ ^^^--------------------------------spare
+        ^ ^^^---------------------------crate
+             ^ ^^^^---------------------card
+			        ^^^^ ^^^^-----------channel
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+^^^^ ^^^^------------------------------ channel (0..22)
+            ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
+        ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
+		                   ^^ ^^^^ ^^^^ eventID (0..1024)
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec of restart/reset
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart/reset
+followed by waveform data (n x 1024 16-bit words)
+</pre>
+  *
+  */
+//-------------------------------------------------------------
+
+
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+
+    unsigned long* ptr = (unsigned long*)someData;
+	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
+
+	++ptr;											//crate, card,channel from second word
+	unsigned char crate		= (*ptr>>21) & 0xf;
+	unsigned char card		= (*ptr>>16) & 0x1f;
+	unsigned char chan		= (*ptr>>8) & 0xff;
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* stationKey	= [self getStationKey: card];	
+	NSString* channelKey	= [self getChannelKey: chan];
+		
+	++ptr;		//point to event struct
+	
+	
+	katrinHistogramDataStruct* ePtr = (katrinHistogramDataStruct*) ptr;
+	NSLog(@"Keys:%@ %@ %@ %@ %@ \n", @"FLT",@"HitrateTimeSerie",crateKey,stationKey,channelKey);
+	NSLog(@"  readoutSec = %d \n", ePtr->readoutSec);
+	NSLog(@"  recordingTimeSec = %d \n", ePtr->recordingTimeSec);
+	NSLog(@"  firstBin = %d \n", ePtr->firstBin);
+	NSLog(@"  lastBin = %d \n", ePtr->lastBin);
+	NSLog(@"  histogramLength = %d \n", ePtr->histogramLength);
+
+    ptr = ptr + (sizeof(katrinHistogramDataStruct)/sizeof(long));
+    
+    int i;
+    unsigned long aValue;
+    for(i=0; i< ePtr->histogramLength;i++){
+        aValue=*ptr;
+        NSLog(@"  Bin %i = %d \n", i,aValue);
+       	++ptr;		//point to event struct
+    }
+	
+	//[aDataSet histogram:ePtr->energy 
+	//		  numBins:32768 
+	//		  sender:self  
+	//		  withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
+	
+	// Set up the waveform
+	//NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
+
+	//[aDataSet loadWaveform: waveFormdata							//pass in the whole data set
+	//				offset: (2*sizeof(long)+sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/2	// Offset in bytes (2 header words + katrinEventDataStruct)
+	//			    unitSize: sizeof(short)							// unit size in bytes
+	//				mask:	0x0FFF									// when displayed all values will be masked with this value
+	//				sender: self 
+	//				withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
+					
+
+    //ptr = ptr + (sizeof(katrinEventDataStruct) + sizeof(katrinDebugDataStruct)) / sizeof(long);
+	//NSLog(@" len = %d (%d), %x %x %x\n", length, ptr - (unsigned long *) someData , ptr[0], ptr[1], ptr[2]);
+					
+    return length; //must return number of longs processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+
+    NSString* title= @"Katrin FLT Waveform Record\n\n";
+	++ptr;		//skip the first word (dataID and length)
+    
+    NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Station    = %d\n",(*ptr>>16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Channel    = %d\n",(*ptr>>8) & 0xff];
+	++ptr;		//point to next structure
+
+	katrinHistogramDataStruct* ePtr = (katrinHistogramDataStruct*)ptr;			//recast to event structure
+
+	NSLog(@" readoutSec = %d \n", ePtr->readoutSec);
+	NSLog(@" recordingTimeSec = %d \n", ePtr->recordingTimeSec);
+	NSLog(@" firstBin = %d \n", ePtr->firstBin);
+	NSLog(@" lastBin = %d \n", ePtr->lastBin);
+	NSLog(@" histogramLength = %d \n", ePtr->histogramLength);
+	
+	NSString* readoutSec	= [NSString stringWithFormat:@"ReadoutSec = %d\n",ePtr->readoutSec];
+	NSString* recordingTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->recordingTimeSec];
+	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %d\n",ePtr->firstBin];
+	NSString* lastBin	= [NSString stringWithFormat:@"lastBin = %d\n",ePtr->lastBin];
+	NSString* histogramLength	= [NSString stringWithFormat:@"histogramLength = %d\n",ePtr->histogramLength];
+
+
+    // Decode extra debug information
+	//ptr = ptr + sizeof(katrinEventDataStruct) / sizeof(unsigned long);
+	//katrinDebugDataStruct* dPtr = (katrinDebugDataStruct*) ptr;
+
+
+
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
+	                       readoutSec,recordingTimeSec,firstBin,lastBin,histogramLength]; 
+}
+
+
+
+@end
+
+
+
+
+

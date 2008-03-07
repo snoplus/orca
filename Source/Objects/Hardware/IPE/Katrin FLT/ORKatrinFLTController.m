@@ -50,8 +50,9 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-
+    
     settingSize     = NSMakeSize(546,680);
+    histogramSize   = NSMakeSize(550,680);  // new -tb- 2008-01
     rateSize	    = NSMakeSize(430,615);
     testSize	    = NSMakeSize(400,500);
 
@@ -76,6 +77,24 @@
 	[totalRate setBackgroundColor:[NSColor whiteColor]];
 	[totalRate setBarColor:[NSColor greenColor]];
 
+    //setup the histogramming stuff
+    //NSArray histogramData;    //TODO: store the histogram somewhere -tb-
+    //double *histogramData=new double [1024];
+    //[eSamplePopUpButton removeAllItems];
+    int i;
+    #if 0
+    [eSamplePopUpButton insertItemWithTitle: @"0 (1)" atIndex: 0];
+    [eSamplePopUpButton insertItemWithTitle: @"1 (2)" atIndex: 1];
+    [eSamplePopUpButton insertItemWithTitle: @"2 (4)" atIndex: 2];
+    [eSamplePopUpButton insertItemWithTitle: @"3 (8)" atIndex: 3];
+    [eSamplePopUpButton insertItemWithTitle: @"4 (16)" atIndex: 4];
+    [eSamplePopUpButton insertItemWithTitle: @"5 (32)" atIndex: 5];
+    [eSamplePopUpButton insertItemWithTitle: @"6 (64)" atIndex: 6];
+    [eSamplePopUpButton insertItemWithTitle: @"7 (128)" atIndex: 7];
+    [eSamplePopUpButton insertItemWithTitle: @"8 (256)" atIndex: 8];
+    [eSamplePopUpButton selectItemAtIndex: 2];//TODO: get it from config file -tb-
+NSLog(@"Awaking from NIB ...\n");
+    #endif
 
     [self updateWindow];
 }
@@ -106,9 +125,14 @@
 					   object : model];
 
 
+    [notifyCenter addObserver : self 
+                     selector : @selector(fltRunModeChanged:)
+                         name : ORKatrinFLTModelFltRunModeChanged
+                       object : model];
+					   
     [notifyCenter addObserver : self
-                     selector : @selector(modeChanged:)
-                         name : ORKatrinFLTModelModeChanged
+                     selector : @selector(daqRunModeChanged:)
+                         name : ORKatrinFLTModelDaqRunModeChanged
                        object : model];
 					   
     [notifyCenter addObserver : self
@@ -240,6 +264,80 @@
                          name : ORKatrinFLTModelCheckWaveFormEnabledChanged
 						object: model];
 
+    //hardware histogramming -tb- 2008-02-08
+    [notifyCenter addObserver : self
+                     selector : @selector(histoBinWidthChanged:)
+                         name : ORKatrinFLTModelHistoBinWidthChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoMinEnergyChanged:)
+                         name : ORKatrinFLTModelHistoMinEnergyChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoMaxEnergyChanged:)
+                         name : ORKatrinFLTModelHistoMaxEnergyChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoFirstBinChanged:)
+                         name : ORKatrinFLTModelHistoFirstBinChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoLastBinChanged:)
+                         name : ORKatrinFLTModelHistoLastBinChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoRunTimeChanged:)
+                         name : ORKatrinFLTModelHistoRunTimeChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoRecordingTimeChanged:)
+                         name : ORKatrinFLTModelHistoRecordingTimeChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoTestValuesChanged:)
+                         name : ORKatrinFLTModelHistoTestValuesChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoTestPlotterWantDisplay:)
+                         name : ORKatrinFLTModelHistoTestPlotterWantDisplay
+                       object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(histoCalibrationChanChanged:)
+                         name : ORKatrinFLTModelHistoCalibrationChanChanged
+                       object : model];
+					   
+     
+    
+    
+    
+    
+  int iiiii;  
+#if 0   // TODO: remove it - used for copy and paste -tb-
+    istoMinEnergy
+    istoMaxEnergy
+    istoFirstBin
+    istoLastBin
+    istoRunTime
+    istoRecordingTime
+
+
+    ORKatrinFLTModelHistoMinEnergyChanged
+    ORKatrinFLTModelHistoMaxEnergyChanged
+    ORKatrinFLTModelHistoFirstBinChanged
+    ORKatrinFLTModelHistoLastBinChanged
+    ORKatrinFLTModelHistoRunTimeChanged
+    ORKatrinFLTModelHistoRecordingTimeChanged
+#endif
+
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -254,7 +352,8 @@
     [super updateWindow];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
-	[self modeChanged:nil];
+	[self fltRunModeChanged:nil];
+	[self daqRunModeChanged:nil];
 	[self gainArrayChanged:nil];
 	[self thresholdArrayChanged:nil];
 	[self triggersEnabledArrayChanged:nil];
@@ -275,6 +374,16 @@
     [self miscAttributesChanged:nil];
 	[self readoutPagesChanged:nil];	
 	[self checkWaveFormEnabledChanged:nil];
+    //hardware histogramming -tb- 2008-02-08
+	[self histoBinWidthChanged:nil];
+	[self histoMinEnergyChanged: nil];
+	[self histoMaxEnergyChanged: nil];
+	[self histoFirstBinChanged: nil];
+	[self histoLastBinChanged: nil];
+	[self histoRunTimeChanged: nil];
+	[self histoRecordingTimeChanged: nil];
+	[self histoCalibrationChanChanged: nil];
+
 }
 
 - (void) checkGlobalSecurity
@@ -299,9 +408,9 @@
     
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
     [settingLockButton setState: locked];
-	[readControlButton setEnabled:!lockedOrRunningMaintenance];
-	[writeControlButton setEnabled:!lockedOrRunningMaintenance];
-	[modeButton setEnabled:!lockedOrRunningMaintenance];
+	[readFltModeButton setEnabled:!lockedOrRunningMaintenance];
+	[writeFltModeButton setEnabled:!lockedOrRunningMaintenance];
+	[daqRunModeButton setEnabled:!lockedOrRunningMaintenance];
 	[resetButton setEnabled:!lockedOrRunningMaintenance];
 	[triggerButton setEnabled:isRunning]; // only active in run mode, ak 4.7.07
     [gainTextFields setEnabled:!lockedOrRunningMaintenance];
@@ -548,10 +657,28 @@
 }
 
 
-- (void) modeChanged:(NSNotification*)aNote
+/** The FLT mode register value.
+  */
+- (void) fltRunModeChanged:(NSNotification*)aNote
 {
-	[modeButton selectItemAtIndex:[model fltRunMode]];
-	[self settingsLockChanged:nil];	
+NSLog(@"Received notification  -fltModeChanged- ...\n");
+
+	//[modeButton selectItemAtIndex:[model fltRunMode]]; obsolete ! -tb-
+	//[modeButton selectItemAtIndex:[model daqRunMode]];//-tb-
+    [fltModeField setIntValue:[model fltRunMode]];
+	[self settingsLockChanged:nil];	//TODO: still needed? -tb- 2008-02-08
+}
+
+/** The DAQ run mode popup value.
+  */
+- (void) daqRunModeChanged:(NSNotification*)aNote
+{
+NSLog(@"Received notification  -daqRunModeChanged- ... new is %i\n", [model daqRunMode]);
+
+	//[modeButton selectItemAtIndex:[model fltRunMode]];
+    NSLog(@"DAQ run mode is %i\n", [model daqRunMode]);
+	[daqRunModeButton selectItemWithTag:[model daqRunMode]];//-tb-
+	[self settingsLockChanged:nil];	//TODO: still needed? -tb- 2008-02-08
 }
 
 - (void) broadcastTimeChanged:(NSNotification*)aNote
@@ -597,13 +724,72 @@
 	[readoutPagesField setIntValue:[model readoutPages]];
 }
 
+- (void) histoBinWidthChanged:(NSNotification*)aNote
+{
+    [eSamplePopUpButton selectItemAtIndex:[model histoBinWidth]];
+}
+- (void) histoMinEnergyChanged:(NSNotification*)aNote
+{
+    [eMinField setIntValue:[model histoMinEnergy]];
+}
+- (void) histoMaxEnergyChanged: (NSNotification*)aNote
+{
+    [eMaxField setIntValue:[model histoMaxEnergy]];
+}
+- (void) histoFirstBinChanged: (NSNotification*)aNote
+{
+    [firstBinField setIntValue:[model histoFirstBin]];
+}
+- (void) histoLastBinChanged: (NSNotification*)aNote
+{
+    [lastBinField setIntValue:[model histoLastBin]];
+}
+- (void) histoRunTimeChanged: (NSNotification*)aNote
+{
+    [tRunField setIntValue:[model histoRunTime]];
+}
+- (void) histoRecordingTimeChanged: (NSNotification*)aNote
+{
+    [tRecField setIntValue:[model histoRecordingTime]];
+}
+- (void) histoTestValuesChanged:(NSNotification*)aNote
+{
+		//debug -tb- NSLog(@"histoTestValuesChanged called\n");
+        // update time, adjust progress circle, ... -tb-
+        //set the state of progress indicator
+        if([model histoCalibrationIsRunning])
+            [histoProgressIndicator startAnimation:nil];
+        else
+            [histoProgressIndicator stopAnimation:nil];
+        // update the timer
+        //char s[256];
+        //sprintf(s, "%6.2f",[model histoTestElapsedTime]);
+        //NSString *str=s;
+        //[histoElapsedTimeField setStringValue: str];
+        [histoElapsedTimeField setDoubleValue: [model histoTestElapsedTime]];
+
+}
+
+- (void) histoCalibrationChanChanged:(NSNotification*)aNote
+{
+    NSString *string1 = [NSString stringWithFormat:@"%i",[model histoCalibrationChan]];    
+    [histoCalibrationChanNumPopUpButton selectItemWithTitle: string1];
+}
+
+- (void) histoTestPlotterWantDisplay:(NSNotification*)aNote
+{
+    //[histogramPlotterId display];
+    [histogramPlotterId setNeedsDisplay:YES]; // -tb- this doesn't do the job - why?
+}
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     [[self window] setContentView:blankView];
     switch([tabView indexOfTabViewItem:tabViewItem]){
         case  0: [self resizeWindowToSize:settingSize];     break;
-		case  1: [self resizeWindowToSize:rateSize];	    break;
+        case  1: [self resizeWindowToSize:histogramSize];   break;
+		case  2: [self resizeWindowToSize:rateSize];	    break;
+		case  3: [self resizeWindowToSize:testSize];	    break;
 		default: [self resizeWindowToSize:testSize];	    break;
     }
     [[self window] setContentView:totalView];
@@ -638,7 +824,13 @@
 }
 
 
-
+/** @todo FPGA-Bug
+  * In FLT settings click on "read" for thresholds and gains. From time to time (between
+  * 4 to 30 times) there are wrong values for the gains: very oftenly the last value is wrong (127
+  * or 96 instead of 100), sometimes the second value (instead of 1 it is 0 or 100).
+  * (FPGA version is the first "histogramming version".)
+  * (This bug report is in ORKatrinFLTController.m  -tb- 2008-02-29 )
+  */ //-tb- 2008-02-29
 - (IBAction) readThresholdsGains:(id)sender
 {
 	NS_DURING
@@ -698,7 +890,7 @@
 }
 
 
-- (IBAction) readControlButtonAction:(id)sender
+- (IBAction) readFltModeButtonAction:(id)sender
 {
 	[self endEditing];
 	NS_DURING
@@ -710,7 +902,7 @@
 	NS_ENDHANDLER
 }
 
-- (IBAction) writeControlButtonAction:(id)sender
+- (IBAction) writeFltModeButtonAction:(id)sender
 {
 	[self endEditing];
 	NS_DURING
@@ -727,9 +919,10 @@
     [gSecurity tryToSetLock:ORKatrinFLTSettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) modeAction: (id) sender
+- (IBAction) daqRunModeAction: (id) sender
 {
-	[model setFltRunMode:[modeButton indexOfSelectedItem]];
+	//[model setDaqRunMode:[daqRunModeButton indexOfSelectedItem]];
+	[model setDaqRunMode: [[daqRunModeButton selectedItem]tag]  ];
 }
 
 - (IBAction) versionAction: (id) sender
@@ -893,13 +1086,253 @@
 	}
 }
 
+
+//TODO: from here HWHisto
+- (IBAction) helloButtonAction:(id)sender
+{
+    NSLog(@"This is  helloButtonAction\n");
+}
+
+- (IBAction) readEMinButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    
+    unsigned int EMin = [model readEMin];
+    [eMinField setIntValue:EMin ];
+    //NSLog(@"This is  readEMinButtonAction\n");
+    NSLog(@"EMin is %i\n",EMin);
+}
+
+- (IBAction) writeEMinButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    
+    //NSLog(@"This is  writeEMinButtonAction\n");
+    NSLog(@"title is string %@ (int val %i)\n", [eMinField stringValue ],
+          [eMinField intValue ]);
+    unsigned int EMin = [eMinField intValue ];
+    [model writeEMin:EMin];
+}
+
+- (IBAction) readEMaxButtonAction:(id)sender
+{
+    //TODO: this will probably change in the next FPGA version -tb-
+    NSLog(@"This is  readEMaxButtonAction\n");
+}
+
+- (IBAction) writeEMaxButtonAction:(id)sender
+{
+    //TODO: this will probably change in the next FPGA version -tb-
+    NSLog(@"This is  writeEMaxButtonAction\n");
+}
+
+- (IBAction) readTRecButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    
+    unsigned int tRec = [model readTRec];
+    NSLog(@"This is  readTRecButtonAction: tRec = %i\n",tRec);
+    [tRecField setIntValue:tRec ];
+}
+
+- (IBAction) readTRunAction:(id)sender
+{
+    NSLog(@"This is   readTRunAction\n");
+}
+
+- (IBAction) writeTRunAction:(id)sender
+{
+    NSLog(@"This is   writeTRunAction\n");
+}
+
+- (IBAction) readFirstBinButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    unsigned int Pixel = 0; // TODO: for testing: it is not per pixel, but per FPGA
+    
+    NSLog(@"This is   readFirstBinButtonAction:%i\n", [model readFirstBinOfPixel: Pixel]);
+    [firstBinField setIntValue: [model readFirstBinOfPixel: Pixel] ];
+}
+
+- (IBAction) readLastBinButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    unsigned int Pixel = 0; // TODO: for testing: it is not per pixel, but per FPGA
+    
+    NSLog(@"This is   readLastBinButtonAction: %i\n",[model readLastBinOfPixel: Pixel]);
+    [lastBinField setIntValue: [model readLastBinOfPixel: Pixel] ];
+}
+
+- (IBAction) changedBinWidthPopupButtonAction:(id)sender;
+{
+    //TODO: CATCH EXCEPTIONS -tb-
+    //NSLog(@"This is    changedESamplePopupButtonAction: selected %i\n",[sender indexOfSelectedItem]);
+    [model setHistoBinWidth:[sender indexOfSelectedItem]];
+}
+- (IBAction) changedHistoMinEnergyAction:(id)sender
+{    [model setHistoMinEnergy:[sender intValue]];  }
+
+- (IBAction) changedHistoMaxEnergyAction:(id)sender // for now: unused -tb- 2008-03-06
+{    [model setHistoMaxEnergy:[sender intValue]];  }
+
+- (IBAction) changedHistoFirstBinAction:(id)sender
+{    [model setHistoFirstBin:[sender indexOfSelectedItem]];  }
+
+- (IBAction) changedHistoLastBinAction:(id)sender
+{    [model setHistoLastBin:[sender indexOfSelectedItem]];  }
+- (IBAction) changedHistoRunTimeAction:(id)sender
+{    [model setHistoRunTime:[sender intValue]];  }
+- (IBAction) changedHistoRecordingTimeAction:(id)sender
+{    [model setHistoRecordingTime:[sender indexOfSelectedItem]];  }
+    
+    
+    
+    
+    
+    
+
+- (IBAction) startHistogramButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    [self endEditing];
+    NSLog(@"This is    startHistogramButtonAction\n");
+    [model startHistogramOfPixel:0];  //TODO: testing for pixel 0 -tb-
+    [histoProgressIndicator startAnimation:nil];
+    //[self readTRecButtonAction:nil];
+    //[self readFirstBinButtonAction:nil];
+    //[self readLastBinButtonAction:nil];
+}
+
+- (IBAction) stopHistogramButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    
+    //NSLog(@"This is    stopHistogramButtonAction\n");
+    [histoProgressIndicator stopAnimation:nil];
+    [model stopHistogramOfPixel:0];  //TODO: testing for pixel 0 -tb-
+    NSLog(@"Rec time is: %i\n",[model readTRec]);
+    //[model setHistoRecordingTime:[model readTRec]];  //TODO: testing for pixel 0 -tb-
+    //[self histoRunTimeChanged:nil];
+    //[self histoRecordingTimeChanged:nil];
+    //[model setHistoFirstBin:[model readFirstBinOfPixel:0]];
+    //[model setHistoLastBin:[model readLastBinOfPixel:0]];
+    //  [self readTRecButtonAction:nil];
+    //  [self readFirstBinButtonAction:nil];
+    //  [self readLastBinButtonAction:nil];
+    //[histogramPlotterId forcedUpdate:nil];
+    //[histogramPlotterId setNeedsDisplay:YES]; //TODO: make notification and let respond it to it -tb-
+    //[histogramPlotterId display]; //moved to histoTestPlotterWantDisplay
+
+}
+
+- (IBAction) readHistogramDataButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    
+    NSLog(@"This is  readHistogramDataButtonAction\n");
+    [model readHistogramDataOfPixel:0];  //TODO: testing for pixel 0 -tb-
+    //[histogramPlotterId setNeedsDisplay:YES];//TODO: make notification and let respond it to it -tb-
+
+
+}
+
+- (IBAction) readCurrentStatusButtonAction:(id)sender
+{
+    
+    //TODO: CATCH EXCEPTIONS -tb-
+    
+    NSLog(@"This is  readCurrentStatusButtonAction\n");
+    [model readCurrentStatusOfPixel:0];  //TODO: testing for pixel 0 -tb-
+}
+
+- (IBAction) changedHistoCalibrationChanPopupButtonAction:(id)sender
+{
+    int chan=[[[histoCalibrationChanNumPopUpButton selectedItem] title ] intValue];
+    [model setHistoCalibrationChan: chan];
+    //TODO: maybe converting title to integer is better? -tb-
+}
+
+
+- (IBAction) vetoTestButtonAction:(id)sender
+{
+    // button states:  NSOnState, NSOffState  or NSMixedState 
+    // ... use outlet vetoEnableButton
+    NSLog(@"This is  vetoTestButtonAction, state is %i\n",[sender state]);
+    // -tb- [model setVetoEnable: [sender state]];  //TODO: testing for pixel 0 -tb-
+}
+
+- (IBAction) readVetoStateButtonAction:(id)sender
+{
+// -tb- unused
+    NSLog(@"Veto state is  %8x\n",[model readVetoState]);
+}
+
+- (IBAction) readEnableVetoButtonAction:(id)sender
+{
+    NSLog(@"Veto state is  %8x\n",[model readVetoState]);
+    if([model readVetoState])
+        [vetoEnableButton setState: NSOnState];
+    else
+        [vetoEnableButton setState: NSOffState];
+}
+
+- (IBAction) writeEnableVetoButtonAction:(id)sender
+{
+    NSLog(@"Write Veto state   %8x\n",[vetoEnableButton state]);
+    if([vetoEnableButton state]==NSOnState)
+      [model setVetoEnable: 1];  //TODO: testing for pixel 0 -tb-
+    else
+      [model setVetoEnable: 0];  //TODO: testing for pixel 0 -tb-
+}
+
+- (IBAction) readVetoDataButtonAction:(id)sender
+{
+    NSLog(@"This is readVetoDataButtonAction\n");
+    NSLog(@"sizeof(unsigned int) is %i\n",sizeof(unsigned int));
+    
+    //system("say reading veto data");  // -tb- a test ...
+    
+    [model readVetoDataFrom:0 to:10];
+}
+
+
 #pragma mark ¥¥¥Plot DataSource
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
+//RatesPlotter1D
+	//NSLog(@"    DEBUG: This is  - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set\n" );
+    //if(aPlotter)
+	//  NSLog(@"Plottername is %@\n",[aPlotter name] );
+    if(histogramPlotterId == aPlotter){
+  	    //NSLog(@"    DEBUG:   Testing: YES, it is the histo plotter\n" );
+        return 1024;
+    }else{
+	    //NSLog(@"    DEBUG:   Testing: NO, it is not the histo plotter\n" );
+    }
+
 	return [[model  totalRate]count];
 }
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
+	//-tb- NSLog(@"This is  - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x\n" );
+    if(histogramPlotterId == aPlotter){
+        //if(![model histogramData]) return 200.0 + 100.0 * sin(0.01*x);   // testing: returns a sine wave
+        //return 200.0 + 100.0 * sin(0.01*x);   // testing: returns a sine wave
+        //if(x<0 || x>1023) return 0.0;
+        //return     [model readHistogramDataOfPixel:0 atBin:x];  //TODO: testing for pixel 0 -tb-
+        //return     [[[model histogramData] objectAtIndex:x] intValue];  //TODO: testing for pixel 0 -tb-
+        unsigned int num = [model getHistogramDataUI: x];
+        return (float)num;
+    }
+
 	int count = [[model totalRate]count];
 	return [[model totalRate] valueAtIndex:count-x-1];
 }

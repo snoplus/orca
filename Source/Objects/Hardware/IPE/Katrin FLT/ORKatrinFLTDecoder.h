@@ -47,10 +47,23 @@
 @end
 
 
-/** Decoder for the threshold scan stream. 
+/** Decoder for the hitrate stream.   (copy of "event data stream" -tb-)
   * This objects are generated in Flt measure mode.
   */
 @interface ORKatrinFLTDecoderForHitRate : ORIpeCardDecoder {
+}
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+
+
+
+/** Decoder for the threshold scan stream. 
+  * This objects are generated in Flt measure mode.
+  */
+@interface ORKatrinFLTDecoderForThresholdScan : ORIpeCardDecoder {
   int lastEnergy[22];		//!< Energy of the last sample. Used to calculate the difference per sample
   int lastHitrate[22];		//!< Trigger rate of the last sample. Used to calculate the difference per sample
 }
@@ -58,3 +71,18 @@
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
+
+
+
+
+/** Decoder for the hardware histogram data stream.  
+  * This objects are generated in Flt measure mode + Histogramming flag set.
+  */
+@interface ORKatrinFLTDecoderForHistogram : ORIpeCardDecoder {
+}
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+

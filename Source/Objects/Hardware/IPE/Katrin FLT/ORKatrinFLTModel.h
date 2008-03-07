@@ -76,11 +76,15 @@
 {
     // Hardware configuration
     int				fltRunMode;		//!< Run modes: 0 = debug, 1 = run, 2 = measure, 3=test
+    int				daqRunMode;		//!< Run modes: 0 = Energy+Trace, 1 = Energy, 2 = Hitrate, 3 = Threshold Scan, 4=Test
     NSMutableArray* thresholds;     //!< Array to keep the threshold of all 22 channel
-    NSMutableArray* gains;			//!< Aarry to keep the 
-    unsigned long	dataId;         //!< Id used to identify energy data set (run mode)
-	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (debug mode)
-	unsigned long   hitRateId;		//!< Id used to identify the data from the threshold scan (measure mode)
+    NSMutableArray* gains;			//!< Array to keep the gains.
+    unsigned long	dataId;         //!< Id used to identify energy data set (daq run mode)
+	unsigned long	waveFormId;		//!< Id used to identify energy+trace data set (daq debug mode)
+	unsigned long   hitRateId;		//!< Id used to identify the data from the hitrate data set (daq hitrate mode)
+	unsigned long   thresholdScanId;		//!< Id used to identify the data from the threshold scan (daq measure mode)
+	unsigned long   histogramId;		//!< Id used to identify the data from the hardware histogram (daq histogram mode)
+	unsigned long   vetoId;		        //!< Id used to identify the data from the veto mode (daq veto mode)
     NSMutableArray* triggersEnabled;	//!< Array to keep the activated channel for the trigger
     NSMutableArray* shapingTimes;		//!< Length of the triangular filter
 	NSMutableArray* hitRatesEnabled;	//!< Array to store the activated trigger rate measurement
@@ -137,6 +141,24 @@
     unsigned short tMode;
     int testPatternCount;
     BOOL checkWaveFormEnabled;
+    //hardware histogramming -tb- 2008-02-08
+    int oldFltRunModeMode;
+    int histoBinWidth;    //!< The bin width of the @e hardware @e histogramming bins.
+    unsigned int histoMinEnergy;    //!< The minimum energy for the @e hardware @e histogramming.
+    unsigned int histoMaxEnergy;    //!< The maximum energy for the @e hardware @e histogramming.
+    unsigned int histoFirstBin;     //!< The first bin (of 1024) not equal zero.
+    unsigned int histoLastBin;      //!< The last bin (of 1024) not equal zero.
+    unsigned int histoRunTime;      //!< The length of the time loop (0=endless, not 0: length in sec).
+    unsigned int histoRecordingTime;  //!< The recording time since start of time loop (in sec).
+    NSMutableArray* histogramData;    //!< Array to keep the hardware histogram.
+    unsigned int* histogramDataUI;    //!< Array to keep the raw hardware histogram. TODO: which one? -tb- 2008-02-18
+    int histoStartTimeSec;   //!< Start time (sec) of the test @e hardware @e histogram.
+    int histoStartTimeUSec;  //!< Start time (usec) of the test @e hardware @e histogram.
+    int histoStopTimeSec;    //!< Stop time (sec) of the test @e hardware @e histogram.
+    int histoStopTimeUSec;   //!< Stop time (usec) of the test @e hardware @e histogram.
+    BOOL histoCalibrationIsRunning;
+    double histoTestElapsedTime;
+    unsigned int histoCalibrationChan;  //!< The currently selected channel for histogramming calibration.
 	
 	//place to cache some values so they don't have to be calculated every time thru the run loop.
 	unsigned long	statusAddress;
@@ -179,6 +201,12 @@
 - (void) setWaveFormId: (unsigned long) aWaveFormId;
 - (unsigned long) hitRateId;
 - (void) setHitRateId: (unsigned long) aHitRateId;
+- (unsigned long) thresholdScanId;
+- (void) setThresholdScanId: (unsigned long) athresholdScanId;
+- (unsigned long) histogramId;
+- (void) setHistogramId: (unsigned long) aValue;
+- (unsigned long) vetoId;
+- (void) setVetoId: (unsigned long) aValue;
 
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
@@ -208,6 +236,9 @@
 
 - (int) fltRunMode;
 - (void) setFltRunMode:(int)aMode;
+- (int) daqRunMode;
+- (void) setDaqRunMode:(int)aMode;
+
 - (void) loadTime;
 - (void) enableAllHitRates:(BOOL)aState;
 - (float) hitRate:(unsigned short)aChan;
@@ -222,6 +253,7 @@
 
 - (unsigned short) readoutPages; // ak, 2.7.07
 - (void) setReadoutPages:(unsigned short)aReadoutPage; // ak, 2.7.07
+
 
 
 #pragma mark ¥¥¥HW Access
@@ -285,6 +317,58 @@
   * in the hardware and the last page variable of the readout loop */
 - (void) restartRun;   // ak 2.7.07
 
+#pragma mark ¥¥¥¥hw histogram access
+//hardware histogramming -tb- 2008-02-08
+- (int) histoBinWidth;
+- (void) setHistoBinWidth:(int)aHistoBinWidth;
+- (unsigned int) histoMinEnergy;
+- (void) setHistoMinEnergy:(unsigned int)aValue;
+- (unsigned int) histoMaxEnergy;
+- (void) setHistoMaxEnergy:(unsigned int)aValue;
+- (unsigned int) histoFirstBin;
+- (void) setHistoFirstBin:(unsigned int)aValue;
+- (unsigned int) histoLastBin;
+- (void) setHistoLastBin:(unsigned int)aValue;
+- (unsigned int) histoRunTime;
+- (void) setHistoRunTime:(unsigned int)aValue;
+- (unsigned int) histoRecordingTime;
+- (void) setHistoRecordingTime:(unsigned int)aValue;
+- (BOOL)   histoCalibrationIsRunning;
+- (void)   setHistoCalibrationIsRunning: (BOOL)aValue;
+- (double) histoTestElapsedTime;
+- (void)   setHistoTestElapsedTime: (double)aTime;
+- (unsigned int) histoCalibrationChan;
+- (void) setHistoCalibrationChan:(unsigned int)aValue;
+
+
+- (NSMutableArray*) histogramData;
+- (unsigned int*) histogramDataUI;
+- (unsigned int) getHistogramDataUI: (int)index;
+
+- (unsigned int) readEMin;
+- (void) writeEMin:(unsigned int)EMin;
+- (unsigned int) readEMax;
+- (void) writeEMax:(unsigned int)EMax;
+- (unsigned int) readTRun;
+- (void) writeTRun:(unsigned int)TRun;
+- (void) writeStartHistogram:(unsigned int)histoBinWidth;
+- (void) writeStopHistogram;
+- (unsigned int) readTRec;
+- (unsigned int) readFirstBinOfPixel:(unsigned int)aPixel;
+- (unsigned int) readLastBinOfPixel:(unsigned int)aPixel;
+- (void) startHistogramOfPixel:(unsigned int)aPixel;
+- (void) checkHistogramTest;
+- (void) stopHistogramOfPixel:(unsigned int)aPixel;
+- (void) oneSecAfterStopHistogramOfPixel;
+- (void) readHistogramDataOfPixel:(unsigned int)aPixel;
+- (unsigned int) readHistogramDataOfPixel:(unsigned int)aPixel atBin:(unsigned int)aBin ;
+- (void) readCurrentStatusOfPixel:(unsigned int)aPixel;
+- (unsigned int) readHistogramControlRegisterOfPixel:(unsigned int)aPixel;
+- (void) writeHistogramControlRegisterOfPixel:(unsigned int)aPixel value:(unsigned int)aValue;
+- (void) setVetoEnable:(int)aState;
+- (int) readVetoState;
+- (void) readVetoDataFrom:(int)fromIndex to:(int)toIndex;
+
 #pragma mark ¥¥¥Archival
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -299,8 +383,12 @@
 - (void) postHitRateChange;
 
 #pragma mark ¥¥¥SubSets of TakeData
+- (void) takeDataHitrateMode:(ORDataPacket*)aDataPacket;
 - (void) takeDataMeasureMode:(ORDataPacket*)aDataPacket;
 - (void) takeDataRunOrDebugMode:(ORDataPacket*) aDataPacket;
+- (void) takeDataHistogramMode:(ORDataPacket*)aDataPacket;
+- (void) pauseHistogrammingAndReadOutData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeDataVetoMode:(ORDataPacket*)aDataPacket;
 
 #pragma mark ¥¥¥HW Wizard
 - (int) numberOfChannels;
@@ -356,8 +444,22 @@ extern NSString* ORKatrinFLTChan;
 extern NSString* ORKatrinFLTModelGainsChanged;
 extern NSString* ORKatrinFLTModelTestPatternsChanged;
 extern NSString* ORKatrinFLTModelThresholdsChanged;
-extern NSString* ORKatrinFLTModelModeChanged;
+extern NSString* ORKatrinFLTModelFltRunModeChanged;
+extern NSString* ORKatrinFLTModelDaqRunModeChanged;
 extern NSString* ORKatrinFLTSettingsLock;
 
 extern NSString* ORKatrinFLTModelReadoutPagesChanged;
 extern NSString* ORKatrinSLTModelName;
+
+extern NSString* ORKatrinFLTModelHistoBinWidthChanged;
+extern NSString* ORKatrinFLTModelHistoMinEnergyChanged;
+extern NSString* ORKatrinFLTModelHistoMaxEnergyChanged;
+extern NSString* ORKatrinFLTModelHistoFirstBinChanged;
+extern NSString* ORKatrinFLTModelHistoLastBinChanged;
+extern NSString* ORKatrinFLTModelHistoRunTimeChanged;
+extern NSString* ORKatrinFLTModelHistoRecordingTimeChanged;
+extern NSString* ORKatrinFLTModelHistoTestValuesChanged;    
+extern NSString* ORKatrinFLTModelHistoTestPlotterWantDisplay;    
+extern NSString* ORKatrinFLTModelHistoCalibrationChanChanged;
+
+
