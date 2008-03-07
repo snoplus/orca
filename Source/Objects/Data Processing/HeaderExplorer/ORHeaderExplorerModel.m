@@ -506,6 +506,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 				postNotificationName:ORHeaderExplorerProcessingFinished
                               object: self];
 
+	[self loadHeader];
 }
 
 - (void) fileFinished
