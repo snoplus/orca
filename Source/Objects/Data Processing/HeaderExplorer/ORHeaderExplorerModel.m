@@ -157,9 +157,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setSelectionDate:selectionDate];
 
     selectionDate = aValue;
-	
-	[self findSelectedRun];
-	
+		
     [[NSNotificationCenter defaultCenter]
 			    postNotificationName:ORHeaderExplorerSelectionDate
                               object: self];
@@ -215,7 +213,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
     return header; 
 }
 
-- (void)setHeader:(ORHeaderItem *)aHeader
+- (void) setHeader:(ORHeaderItem *)aHeader
 {
     [aHeader retain];
     [header release];
@@ -225,6 +223,25 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 				postNotificationName:ORHeaderExplorerHeaderChanged
 								object: self];
 }
+
+- (void) loadHeader
+{
+	if(selectedRunIndex>=0 && selectedRunIndex<[runArray count]){
+		id aHeader = [[runArray objectAtIndex:selectedRunIndex] objectForKey:@"FileHeader"];
+		id headerData;
+		if([searchKey length] && useFilter){
+			NSString* s = searchKey;
+			if([searchKey hasSuffix:@"/"])s = [searchKey substringToIndex:[searchKey length]-1];
+			NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[s componentsSeparatedByString:@"/"]]; //must be mutable
+			headerData = [aHeader objectForKeyArray:keyArray];
+		}
+		else headerData = aHeader;
+		
+		[self setHeader:[ORHeaderItem headerFromObject:headerData named:@"Root"]];
+	}
+	else [self setHeader:nil];
+}
+
 
 - (BOOL)isProcessing
 {
@@ -252,7 +269,13 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
     lastFilePath = [aSetLastListPath copy];
 }
 
-- (void) findSelectedRun
+- (void) findSelectedRunByIndex:(int)anIndex
+{
+	[self setSelectedRunIndex: anIndex];
+	[self loadHeader];
+}
+
+- (void) findSelectedRunByDate
 {
 	int index;
 	BOOL valid = NO;
@@ -264,14 +287,14 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 		unsigned long end   = [[runDictionary objectForKey:@"RunEnd"] unsignedLongValue];
 		if(actualDate >= start && actualDate < end){
 			[self setSelectedRunIndex: index];
-			[self setHeader: [runDictionary objectForKey:@"FileHeader"]];
+			[self loadHeader];
 			valid = YES;
 			break;
 		}
 	}
 	if(!valid){
 		[self setSelectedRunIndex: -1];
-		[self setHeader: nil];
+		[self setHeader:nil];
 	}
 }
 
@@ -354,6 +377,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 
 - (void) stopProcessing
 {
+	reading = NO;
 	stop = YES;
     NSLog(@"Header Explorer stopped manually\n");
 }
@@ -361,7 +385,6 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 #pragma mark •••File Actions
 - (void) readHeaders
 {
-	if([self isProcessing]) return;
 	
 	[runArray release];
 	runArray = [[NSMutableArray array] retain];
@@ -373,7 +396,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
     if(fileAsDataPacket)[fileAsDataPacket release];
     fileAsDataPacket = [[ORDataPacket alloc] init];
 
-    [self setHeader:nil];
+	[self setHeader:nil];
 	minRunStartTime  = 0xffffffff;
 	maxRunEndTime	 = 0;
     currentFileIndex = 0;
@@ -409,20 +432,13 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 					if(runEnd > maxRunEndTime)     maxRunEndTime   = runEnd;
 					[fp seekToEndOfFile];
 					
-					id headerData;
-					if([searchKey length] && useFilter){
-						NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[searchKey componentsSeparatedByString:@"/"]]; //must be mutable
-						headerData = [[fileAsDataPacket fileHeader] objectForKeyArray:keyArray];
-					}
-					else headerData = [fileAsDataPacket fileHeader];
-					
 					NSMutableDictionary* runDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 							[NSNumber numberWithUnsignedLong:runStart],				  @"RunStart",
 							[NSNumber numberWithUnsignedLong:runEnd],				  @"RunEnd",
 							[NSNumber numberWithUnsignedLong:runEnd-runStart],		  @"RunLength",
 							[NSNumber numberWithUnsignedLong:runNumber],			  @"RunNumber",
 							[NSNumber numberWithUnsignedLong:[fp offsetInFile]],	  @"FileSize",
-							[ORHeaderItem headerFromObject:headerData named:@"Root"], @"FileHeader",
+							[fileAsDataPacket fileHeader],							  @"FileHeader",
 							nil];
 							
 					[runArray addObject:runDictionary];
@@ -435,10 +451,9 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 		}
 		else NSLogColor([NSColor redColor],@"Could NOT Open <%@> for exploring.\n",[aFile stringByAbbreviatingWithTildeInPath]);
 		currentFileIndex++;
-		[self performSelector:@selector(readNextFile) withObject:nil afterDelay:.01];
+		[self performSelector:@selector(readNextFile) withObject:nil afterDelay:0];
 	}
 	else {
-		reading = NO;
 		[self processFinished];
 	}
 	[[self undoManager] enableUndoRegistration];
@@ -478,6 +493,8 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 @implementation ORHeaderExplorerModel (private)
 - (void) processFinished
 {    
+	reading = NO;
+	stop = NO;
     [nextObject runTaskStopped:fileAsDataPacket userInfo:nil];
     [nextObject closeOutRun:fileAsDataPacket userInfo:nil];
 

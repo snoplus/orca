@@ -23,7 +23,7 @@
     @private
 		IBOutlet NSButton* 		selectButton;
 		IBOutlet NSButton*		useFilterCB;
-		IBOutlet NSTextField*	searchKeyField;
+		IBOutlet NSTextView*	searchKeyView;
 		IBOutlet NSButton*		autoProcessCB;
 		IBOutlet NSButton* 		replayButton;
 		IBOutlet NSButton* 		saveButton;
@@ -44,7 +44,6 @@
 
 #pragma  mark •••Actions
 - (IBAction) useFilterAction:(id)sender;
-- (IBAction) searchKeyAction:(id)sender;
 - (IBAction) autoProcessAction:(id)sender;
 - (IBAction) selectButtonAction:(id)sender;
 - (IBAction) replayButtonAction:(id)sender;
@@ -57,6 +56,7 @@
 - (IBAction) doubleClick:(id)sender;
 
 #pragma mark •••Interface Management
+- (void) searchEditedChanged:(NSNotification*)aNote;
 - (void) useFilterChanged:(NSNotification*)aNote;
 - (void) searchKeyChanged:(NSNotification*)aNote;
 - (void) autoProcessChanged:(NSNotification*)aNote;
@@ -70,6 +70,7 @@
 - (void) oneFileDone:(NSNotification *)aNote;
 - (void) headerChanged:(NSNotification*)aNote;
 - (void) setSelectionDate:(long)aValue;
+- (void) findSelectedRunByDate;
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;

@@ -62,6 +62,8 @@
 	[progressIndicatorBottom setIndeterminate:NO];
 	[fileListView setDoubleAction:@selector(doubleClick:)];
 
+	[searchKeyView setString: [model searchKey]];
+	[searchKeyView setFont:[NSFont systemFontOfSize:10]];
     [super awakeFromNib];    
 }
 
@@ -79,12 +81,7 @@
 {
 	[self endEditing];
 	[model setUseFilter:[sender intValue]];	
-	[model readHeaders];
-}
-
-- (IBAction) searchKeyAction:(id)sender
-{
-	[model setSearchKey:[sender stringValue]];
+	[model loadHeader];
 }
 
 - (IBAction) doubleClick:(id)sender
@@ -219,9 +216,23 @@
 - (IBAction) selectionDateAction:(id)sender
 {
 	[model setSelectionDate:[sender intValue]];
+	[model findSelectedRunByDate];
 }
 
 #pragma mark •••Interface Management
+
+- (void) searchEditedChanged:(NSNotification*)aNote
+{
+	if(searchKeyView == [aNote object]){
+		NSString* s = [searchKeyView string];
+		if([s hasSuffix:@"\n"]){
+			s = [s substringWithRange:NSMakeRange(0,[s length]-1)];
+			[searchKeyView setString:s];
+		}
+		[model setSearchKey:s];
+		[model loadHeader];
+	}
+}
 
 - (void) useFilterChanged:(NSNotification*)aNote
 {
@@ -230,8 +241,8 @@
 
 - (void) searchKeyChanged:(NSNotification*)aNote
 {
-	[searchKeyField setStringValue: [model searchKey]];
-	[useFilterCB setEnabled:[[model searchKey] length]>0]; 	
+	//[searchKeyView setString: [model searchKey]];
+	//[useFilterCB setEnabled:[[model searchKey] length]>0]; 	
 }
 
 - (void) autoProcessChanged:(NSNotification*)aNote
@@ -301,6 +312,12 @@
                      selector : @selector(useFilterChanged:)
                          name : ORHeaderExplorerUseFilterChanged
 						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(searchEditedChanged:)
+                         name : NSTextDidChangeNotification
+						object: nil];
+
 }
 
 - (void) updateWindow
@@ -340,7 +357,6 @@
 	[loadButton setEnabled:YES];
 	[replayButton setTitle:@"Process"];
 	[progressIndicator stopAnimation:self];
-	[progressIndicatorBottom setDoubleValue:0.0];
 	[progressIndicatorBottom setIndeterminate:NO];
 	[progressIndicatorBottom stopAnimation:self];
 	[progressField setStringValue:@""];
@@ -354,6 +370,7 @@
 		[runEndField setObjectValue:d];
 	}
 	[model setSelectionDate:[selectionDateSlider intValue]];
+	[progressIndicatorBottom setDoubleValue:0.0];
 }
 
 - (void) processingFile:(NSNotification *)aNote
@@ -369,6 +386,8 @@
 - (void) oneFileDone:(NSNotification *)aNote
 {
 	[runTimeView setNeedsDisplay:YES];
+	unsigned long total = [model total];
+    if(total>0)[progressIndicatorBottom setDoubleValue:100. - (100.*[model numberLeft]/(double)total)];
 }
 
 
@@ -545,7 +564,7 @@
 		int n = [fileListView numberOfSelectedRows];
 		if(n == 1){
 			int i = [fileListView selectedRow];
-			[model setSelectedRunIndex:i];
+			[model findSelectedRunByIndex:i];
 			unsigned long absStart = [model minRunStartTime];
 			unsigned long absEnd   = [model maxRunEndTime];
 			
@@ -555,7 +574,7 @@
 			[model setSelectionDate:[selectionDateSlider maxValue]*(mid - absStart)/(absEnd-absStart)];
 		}
 		else {
-			[model setSelectedRunIndex:-1];
+			[model findSelectedRunByIndex:-1];
 			[headerView reloadData];
 		}
 	}
@@ -568,10 +587,8 @@
 - (id) run:(int)index objectForKey:(id)aKey { return [model run:index objectForKey:aKey]; }
 - (int) selectedRunIndex { return [model selectedRunIndex]; }
 
-- (void) setSelectionDate:(long)aValue
-{
-	[model setSelectionDate:aValue];
-}
+- (void) setSelectionDate:(long)aValue { [model setSelectionDate:aValue]; }
+- (void) findSelectedRunByDate { [model findSelectedRunByDate]; }
 
 @end
 
@@ -619,7 +636,8 @@
         NSDirectoryEnumerator* e = [fm enumeratorAtPath:aPath];
         NSString *file;
         while (file = [e nextObject]) {
-            [fm fileExistsAtPath:file isDirectory:&isDirectory];
+			NSString* fullPath = [aPath stringByAppendingPathComponent:file];
+           [fm fileExistsAtPath:fullPath isDirectory:&isDirectory];
             if(!isDirectory){
                 //just a file
                 if([file rangeOfString:@"Run"].location != NSNotFound){
@@ -723,15 +741,21 @@
 		}
 	}
 }
+- (BOOL)mouseDownCanMoveWindow
+{
+	return NO;
+}
 
 - (void) mouseDown:(NSEvent*)anEvent
 {
     NSPoint mouseLoc =  [self convertPoint:[anEvent locationInWindow] fromView:nil];
 	unsigned long selectedPoint = (mouseLoc.y/[self bounds].size.height)*1000.;
 	[dataSource setSelectionDate:selectedPoint];
+	[dataSource findSelectedRunByDate];
 	if([anEvent clickCount] >= 2){
 		[dataSource doubleClick:self];
 	}
+	[self setNeedsDisplay:YES];
 }
 
 @end

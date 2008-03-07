@@ -49,8 +49,6 @@
 				<string>id</string>
 				<key>saveListAction</key>
 				<string>id</string>
-				<key>searchKeyAction</key>
-				<string>id</string>
 				<key>selectButtonAction</key>
 				<string>id</string>
 				<key>selectionDateAction</key>
@@ -90,8 +88,8 @@
 				<string>NSView</string>
 				<key>saveButton</key>
 				<string>NSButton</string>
-				<key>searchKeyField</key>
-				<string>NSTextField</string>
+				<key>searchKeyView</key>
+				<string>NSTextView</string>
 				<key>selectButton</key>
 				<string>NSButton</string>
 				<key>selectionDateField</key>

@@ -77,6 +77,7 @@
 - (void) addFilesToProcess:(NSMutableArray*)newFilesToProcess;
 - (ORHeaderItem *)header;
 - (void)setHeader:(ORHeaderItem *)aHeader;
+- (void) loadHeader;
 - (BOOL)isProcessing;
 - (NSString *) lastListPath;
 - (void) setLastListPath: (NSString *) aSetLastListPath;
@@ -92,7 +93,8 @@
 - (void) removeAll;
 - (void) removeFiles:(NSMutableArray*)anArray;
 - (void) readHeaders;
-- (void) findSelectedRun;
+- (void) findSelectedRunByDate;
+- (void) findSelectedRunByIndex:(int)anIndex;
 
 #pragma mark •••Data Handling
 - (void) readNextFile;
