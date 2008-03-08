@@ -293,8 +293,14 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 		}
 	}
 	if(!valid){
-		[self setSelectedRunIndex: -1];
-		[self setHeader:nil];
+		if(actualDate>=maxRunEndTime){
+			[self setSelectedRunIndex: [runArray count]-1];
+			[self loadHeader];
+		}
+		else {
+			[self setSelectedRunIndex: -1];
+			[self setHeader:nil];
+		}
 	}
 }
 

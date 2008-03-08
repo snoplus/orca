@@ -218,7 +218,7 @@
 - (IBAction) selectionDateAction:(id)sender
 {
 	sliderDrag = YES;
-	[model setSelectionDate:[sender intValue]];
+	[model setSelectionDate:[selectionDateSlider maxValue]-[sender intValue]];
 	[model findSelectedRunByDate];
 	sliderDrag = NO;
 }
@@ -366,7 +366,7 @@
 	[progressField setStringValue:@""];
 	
 	[self setRunBoundaryTimes];
-	[model setSelectionDate:[selectionDateSlider intValue]];
+	[model setSelectionDate:[selectionDateSlider maxValue] - [selectionDateSlider intValue]];
 	[progressIndicatorBottom setDoubleValue:0.0];
 	
 }
@@ -403,7 +403,7 @@
 #pragma mark •••Interface Management
 - (void) selectionDateChanged:(NSNotification*)note
 {
-	if(!sliderDrag)[selectionDateSlider setIntValue:[model selectionDate]];
+	if(!sliderDrag)[selectionDateSlider setIntValue:[selectionDateSlider maxValue] - [model selectionDate]];
 	
 	unsigned long absStart		= [model minRunStartTime];
 	unsigned long absEnd		= [model maxRunEndTime];
@@ -718,6 +718,11 @@
 						gradientWithBeginningColor:[NSColor colorWithCalibratedRed:gray green:gray blue:gray alpha:1]
 						               endingColor:[NSColor colorWithCalibratedRed:.7*gray green:.7*gray blue:.7*gray alpha:1]] retain];
 
+}
+
+- (BOOL) isFlipped
+{
+	return YES;
 }
 
 - (void) drawRect:(NSRect)aRect
