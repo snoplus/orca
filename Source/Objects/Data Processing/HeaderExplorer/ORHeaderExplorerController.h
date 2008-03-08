@@ -40,6 +40,8 @@
 		IBOutlet NSSlider*		selectionDateSlider;
 		IBOutlet NSTextView* 	runSummaryTextView;
 		IBOutlet NSTabView*     tabView;
+		
+		BOOL					sliderDrag;
 }
 
 #pragma  mark •••Actions

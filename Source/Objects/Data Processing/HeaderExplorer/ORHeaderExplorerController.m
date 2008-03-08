@@ -215,8 +215,10 @@
 
 - (IBAction) selectionDateAction:(id)sender
 {
+	sliderDrag = YES;
 	[model setSelectionDate:[sender intValue]];
 	[model findSelectedRunByDate];
+	sliderDrag = NO;
 }
 
 #pragma mark •••Interface Management
@@ -394,7 +396,8 @@
 #pragma mark •••Interface Management
 - (void) selectionDateChanged:(NSNotification*)note
 {
-	[selectionDateSlider setIntValue:[model selectionDate]];
+	if(!sliderDrag)[selectionDateSlider setIntValue:[model selectionDate]];
+	
 	unsigned long absStart		= [model minRunStartTime];
 	unsigned long absEnd		= [model maxRunEndTime];
 	unsigned long selectionDate	= absStart + ((absEnd - absStart) * [model selectionDate]/[selectionDateSlider maxValue]);
@@ -402,8 +405,6 @@
 		NSCalendarDate* d = [NSCalendarDate dateWithTimeIntervalSince1970:selectionDate];
 		[selectionDateField setObjectValue:d];
 	}
-	//[runTimeView setNeedsDisplay:YES];
-	//[headerView reloadData];
 }
 
 - (void) runSelectionChanged:(NSNotification*)note
