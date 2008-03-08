@@ -65,7 +65,6 @@
 	[searchKeyView setString: [model searchKey]];
 	[searchKeyView setFont:[NSFont systemFontOfSize:10]];
 	[self setRunBoundaryTimes];
-	
     [super awakeFromNib];    
 }
 
@@ -367,6 +366,7 @@
 	
 	[self setRunBoundaryTimes];
 	[model setSelectionDate:[selectionDateSlider maxValue] - [selectionDateSlider intValue]];
+	[model findSelectedRunByDate];
 	[progressIndicatorBottom setDoubleValue:0.0];
 	
 }
@@ -454,6 +454,11 @@
 
 - (void) fileListChanged:(NSNotification*)aNote
 {
+	int n = [fileListView numberOfSelectedRows];
+	if(n == 1){
+		int i = [fileListView selectedRow];
+		[model findSelectedRunByIndex:i];
+	}
 	[fileListView reloadData];
 }
 
