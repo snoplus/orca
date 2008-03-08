@@ -81,7 +81,7 @@
     //NSArray histogramData;    //TODO: store the histogram somewhere -tb-
     //double *histogramData=new double [1024];
     //[eSamplePopUpButton removeAllItems];
-    int i;
+
     #if 0
     [eSamplePopUpButton insertItemWithTitle: @"0 (1)" atIndex: 0];
     [eSamplePopUpButton insertItemWithTitle: @"1 (2)" atIndex: 1];
@@ -315,12 +315,6 @@ NSLog(@"Awaking from NIB ...\n");
                          name : ORKatrinFLTModelHistoCalibrationChanChanged
                        object : model];
 					   
-     
-    
-    
-    
-    
-  int iiiii;  
 #if 0   // TODO: remove it - used for copy and paste -tb-
     istoMinEnergy
     istoMaxEnergy
