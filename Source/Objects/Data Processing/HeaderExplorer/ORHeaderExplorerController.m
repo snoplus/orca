@@ -64,6 +64,8 @@
 
 	[searchKeyView setString: [model searchKey]];
 	[searchKeyView setFont:[NSFont systemFontOfSize:10]];
+	[self setRunBoundaryTimes];
+	
     [super awakeFromNib];    
 }
 
@@ -363,6 +365,13 @@
 	[progressIndicatorBottom stopAnimation:self];
 	[progressField setStringValue:@""];
 	
+	[self setRunBoundaryTimes];
+	[model setSelectionDate:[selectionDateSlider intValue]];
+	[progressIndicatorBottom setDoubleValue:0.0];
+	
+}
+- (void) setRunBoundaryTimes
+{
 	unsigned long absStart = [model minRunStartTime];
 	unsigned long absEnd   = [model maxRunEndTime];
 	if(absStart>0 && absEnd>0){
@@ -371,8 +380,6 @@
 		d = [NSCalendarDate dateWithTimeIntervalSince1970:absEnd];
 		[runEndField setObjectValue:d];
 	}
-	[model setSelectionDate:[selectionDateSlider intValue]];
-	[progressIndicatorBottom setDoubleValue:0.0];
 }
 
 - (void) processingFile:(NSNotification *)aNote

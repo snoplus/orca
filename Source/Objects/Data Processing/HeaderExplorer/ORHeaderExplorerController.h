@@ -73,6 +73,7 @@
 - (void) headerChanged:(NSNotification*)aNote;
 - (void) setSelectionDate:(long)aValue;
 - (void) findSelectedRunByDate;
+- (void) setRunBoundaryTimes;
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
