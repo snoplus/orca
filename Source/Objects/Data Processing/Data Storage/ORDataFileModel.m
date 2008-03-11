@@ -496,7 +496,7 @@ static const int currentVersion = 1;           // Current version
     
     if([[ORGlobal sharedInstance] runMode] == kNormalRun){
 	    //start a copy of the Status File
-	    statusFileName = [[NSString stringWithFormat:@"ORStatus_%d.log",[aDataPacket runNumber]] retain];
+	    statusFileName = [[NSString stringWithFormat:@"%@%d.log",[self filePrefix],[aDataPacket runNumber]] retain];
         
         [statusFolder ensureExists:[statusFolder finalDirectoryName]];
         NSString* fullStatusFileName = [[[statusFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
