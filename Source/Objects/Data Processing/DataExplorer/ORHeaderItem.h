@@ -27,6 +27,7 @@
     NSString* classType;
     NSMutableArray* items;
     id object;
+	ORHeaderItem* guardian;
 }
 
 + (ORHeaderItem*) headerFromObject:(id)anObject named:(NSString*)aName;
@@ -38,6 +39,11 @@
 - (void) setClassType: (NSString *) aType;
 - (id) object;
 - (void) setObject: (id) anObject;
+
+- (void) setGuardian:(ORHeaderItem*)anObject;
+- (ORHeaderItem*) guardian;
+- (NSString*) path;
+- (NSString*) reversedPath;
 
 - (NSMutableArray *) items;
 - (void) setItems: (NSMutableArray *) anItems;

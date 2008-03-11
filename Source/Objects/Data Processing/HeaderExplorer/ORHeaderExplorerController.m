@@ -51,7 +51,7 @@
 }
 
 - (void) awakeFromNib
-{
+{		
     NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%d.selectedtab",[model uniqueIdNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
@@ -62,14 +62,17 @@
 	[progressIndicatorBottom setIndeterminate:NO];
 	[fileListView setDoubleAction:@selector(doubleClick:)];
 
-	[searchKeyView setString: [model searchKey]];
-	[searchKeyView setFont:[NSFont systemFontOfSize:10]];
+    [searchKeyTableView registerForDraggedTypes: [NSArray arrayWithObject:NSStringPboardType] ];
+    [headerView registerForDraggedTypes: [NSArray arrayWithObject:NSStringPboardType] ];
+	[searchKeyTableView reloadData];
+	
 	[self setRunBoundaryTimes];
     [super awakeFromNib];    
 }
 
 
 #pragma  mark •••Actions
+
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%d.selectedtab",[model uniqueIdNumber]];
@@ -134,24 +137,80 @@
     
 }
 
-- (IBAction)delete:(id)sender
+- (IBAction) addSearchKeys:(id)sender
+{
+	[model addSearchKeys:[NSMutableArray arrayWithObject:@""]];
+}
+
+- (IBAction) deleteSearchKeys:(id)sender
+{
+	if([searchKeyTableView selectedRow]!=-1){
+		NSIndexSet* selectedSet = [searchKeyTableView selectedRowIndexes];
+		[searchKeyTableView deselectAll:self];
+		[model removeSearchKeysWithIndexes:selectedSet];
+		[searchKeyTableView reloadData];
+	}
+}
+
+- (IBAction) copy:(id)sender
+{
+	if([[self window] firstResponder] == headerView){
+		[self copyHeader:[headerView selectedItem] toPasteBoard:[NSPasteboard generalPasteboard]];
+	}
+}
+
+- (void) copyHeader:(ORHeaderItem*)item toPasteBoard:(NSPasteboard*)pboard
+{
+	if(item){
+		NSString* thePath = [item path];
+		if([thePath hasPrefix:@"Root"] || [thePath hasPrefix:@"Key"]){
+			thePath = [thePath substringFromIndex:[thePath rangeOfString:@"/"].location+1];
+		}
+		if([thePath hasPrefix:@"Root"] || [thePath hasPrefix:@"Key"]){
+			thePath = [thePath substringFromIndex:[thePath rangeOfString:@"/"].location+1];
+		}
+		NSMutableArray* parts = [[[thePath componentsSeparatedByString:@"/"] mutableCopy] autorelease];
+		thePath = [parts componentsJoinedByString:@"/"];
+
+		NSArray *types   = [NSArray arrayWithObjects: NSStringPboardType, nil];
+		[pboard declareTypes:types owner:self];
+		[pboard setString:thePath forType:NSStringPboardType];
+		
+		NSPasteboard* pb = [NSPasteboard generalPasteboard];
+		[pb declareTypes:types owner:self];
+		[pb setString:thePath forType:NSStringPboardType];
+	}
+}
+
+- (unsigned int) draggingSourceOperationMaskForLocal:(BOOL)isLocal
+{
+	return NSDragOperationCopy;
+}
+
+- (IBAction) delete:(id)sender
 {
     [self removeItemAction:nil];
 }
 
-- (IBAction)cut:(id)sender
+- (IBAction) cut:(id)sender
 {
     [self removeItemAction:nil];
 }
 
 - (IBAction) removeItemAction:(id)sender
 { 
-	NSIndexSet* selectedSet = [fileListView selectedRowIndexes];
-	[fileListView deselectAll:self];
-
-    [model removeFilesWithIndexes:selectedSet];
-    
-    [fileListView reloadData];
+	if([[self window] firstResponder] == fileListView){
+		NSIndexSet* selectedSet = [fileListView selectedRowIndexes];
+		[fileListView deselectAll:self];
+		[model removeFilesWithIndexes:selectedSet];
+		[fileListView reloadData];
+	}
+	else if([[self window] firstResponder] == searchKeyTableView){
+		NSIndexSet* selectedSet = [searchKeyTableView selectedRowIndexes];
+		[searchKeyTableView deselectAll:self];
+		[model removeSearchKeysWithIndexes:selectedSet];
+		[searchKeyTableView reloadData];
+	}
 }
 
 
@@ -185,7 +244,6 @@
 						modalDelegate:self
 					   didEndSelector:@selector(saveListDidEnd:returnCode:contextInfo:)
 						  contextInfo:nil];
-    
 }
 
 - (IBAction) loadListAction:(id)sender
@@ -223,17 +281,20 @@
 }
 
 #pragma mark •••Interface Management
-
-- (void) searchEditedChanged:(NSNotification*)aNote
+- (void) searchEditedChanged:(NSNotification *)aNote
 {
-	if(searchKeyView == [aNote object]){
-		NSString* s = [searchKeyView string];
+	if(searchKeyTableView == [aNote object]){
+		id tv = [[aNote userInfo] objectForKey:@"NSFieldEditor"];
+		id s = [tv string];
 		if([s hasSuffix:@"\n"]){
 			s = [s substringWithRange:NSMakeRange(0,[s length]-1)];
-			[searchKeyView setString:s];
 		}
-		[model setSearchKey:s];
-		[model loadHeader];
+		int index = [searchKeyTableView selectedRow];
+		NSMutableArray* keys = [model searchKeys];
+		if(s){	
+			[keys replaceObjectAtIndex:index withObject:s];
+			[model loadHeader];
+		}
 	}
 }
 
@@ -242,10 +303,11 @@
 	[useFilterCB setIntValue: [model useFilter]];
 }
 
-- (void) searchKeyChanged:(NSNotification*)aNote
+- (void) searchKeysChanged:(NSNotification*)aNote
 {
-	//[searchKeyView setString: [model searchKey]];
-	//[useFilterCB setEnabled:[[model searchKey] length]>0]; 	
+	[searchKeyTableView reloadData];
+	[useFilterCB setEnabled:[[model searchKeys] count]>0]; 	
+	[model loadHeader];
 }
 
 - (void) autoProcessChanged:(NSNotification*)aNote
@@ -297,28 +359,31 @@
                          name : ORHeaderExplorerRunSelectionChanged
                         object: model];
 
+						
 	[notifyCenter addObserver : self
                      selector : @selector(tableViewSelectionDidChange:)
                          name : NSTableViewSelectionDidChangeNotification
                         object: nil];
+							
+						
     [notifyCenter addObserver : self
                      selector : @selector(autoProcessChanged:)
                          name : ORHeaderExplorerAutoProcessChanged
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(searchKeyChanged:)
-                         name : ORHeaderExplorerSearchKeyChanged
+                     selector : @selector(searchKeysChanged:)
+                         name : ORHeaderExplorerSearchKeysChanged
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(useFilterChanged:)
+                     selector : @selector(textDidChange:)
                          name : ORHeaderExplorerUseFilterChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(searchEditedChanged:)
-                         name : NSTextDidChangeNotification
+                         name : NSControlTextDidChangeNotification
 						object: nil];
 
 }
@@ -333,7 +398,7 @@
 	[progressField setStringValue:@""];
 	[self autoProcessChanged:nil];
 	[self useFilterChanged:nil];
-	[self searchKeyChanged:nil];
+	[self searchKeysChanged:nil];
 }
 
 
@@ -504,8 +569,14 @@
     if(outlineView == headerView){
         if([[tableColumn identifier] isEqualToString:@"LevelName"]){
             if(item==0) return [[model header] name];
-			else if([item respondsToSelector:@selector(name)])return [item name];
-            else     return @"Number";
+			else if([item respondsToSelector:@selector(name)]){
+				NSString* theName = [item name];
+				if([theName hasPrefix:@"Key"]){
+						[outlineView performSelector:@selector(expandItem:) withObject:item afterDelay:0];
+				}
+				return theName;
+			}
+            else     return @"Value";
         }
         else if([[tableColumn identifier] isEqualToString:@"Value"]){
             if(item==0){
@@ -535,43 +606,76 @@
 
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-    if([[model filesToProcess] count]){
-        id obj = [[model filesToProcess]  objectAtIndex:rowIndex];
-        return [obj stringByAbbreviatingWithTildeInPath];
-    }
-    else return nil;
+	if(aTableView == fileListView){
+		if([[model filesToProcess] count]){
+			id obj = [[model filesToProcess]  objectAtIndex:rowIndex];
+			return [obj stringByAbbreviatingWithTildeInPath];
+		}
+	}
+	else if(aTableView == searchKeyTableView){
+		if([[model searchKeys] count]){
+			if([[aTableColumn identifier] isEqualToString:@"index"])return [NSString stringWithFormat:@"%d",rowIndex];
+			else return [[model searchKeys] objectAtIndex:rowIndex];
+		}
+	}
+    return nil;
+}
+
+- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+	if(aTableView == searchKeyTableView){ 
+		NSParameterAssert(rowIndex >= 0 && rowIndex < [[model searchKeys] count]);
+		[[model searchKeys] replaceObjectAtIndex:rowIndex withObject:anObject];
+	}
 }
 
 // just returns the number of items we have.
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-    
-    return [[model filesToProcess] count];
+    if(aTableView == fileListView){
+		return [[model filesToProcess] count];
+	}
+	else if(aTableView == searchKeyTableView){
+		return [[model searchKeys] count];
+	}
+	else return 0;
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
 {
-    [headerView setNeedsDisplay:YES];
     return YES;
 }
 
-- (NSDragOperation) tableView:(NSTableView *) tableView validateDrop:(id <NSDraggingInfo>) info proposedRow:(int) row proposedDropOperation:(NSTableViewDropOperation) operation
+- (NSDragOperation) tableView:(NSTableView *) aTableView validateDrop:(id <NSDraggingInfo>) info proposedRow:(int) row proposedDropOperation:(NSTableViewDropOperation) operation
 {
-    return NSDragOperationCopy;
+    return NSDragOperationAll;
 }
 
-- (BOOL)tableView:(NSTableView*)tv acceptDrop:(id <NSDraggingInfo>)info row:(int)row dropOperation:(NSTableViewDropOperation)op
+- (BOOL)tableView:(NSTableView*)aTableView acceptDrop:(id <NSDraggingInfo>)info row:(int)row dropOperation:(NSTableViewDropOperation)op
 {
-    NSPasteboard* pb = [info draggingPasteboard];
-    NSData* data = [pb dataForType:NSFilenamesPboardType];
-    NSFileManager* fm = [NSFileManager defaultManager];
-    [fm createFileAtPath:@"OrcaJunkTemp" contents:data attributes:nil];
-    [self processFileList:[NSArray arrayWithContentsOfFile:@"OrcaJunkTemp"]];
-    [fm removeFileAtPath:@"OrcaJunkTemp" handler:nil];
-    return YES;
+	NSPasteboard* pb = [info draggingPasteboard];
+	if(aTableView == fileListView){
+		NSData* data = [pb dataForType:NSFilenamesPboardType];
+		NSFileManager* fm = [NSFileManager defaultManager];
+		[fm createFileAtPath:@"OrcaJunkTemp" contents:data attributes:nil];
+		[self processFileList:[NSArray arrayWithContentsOfFile:@"OrcaJunkTemp"]];
+		[fm removeFileAtPath:@"OrcaJunkTemp" handler:nil];
+		return YES;
+	}
+	else 	if(aTableView == searchKeyTableView	){
+		if(op == NSTableViewDropOn){
+			[model replace:row withSearchKey: [[info draggingPasteboard] stringForType:NSStringPboardType]];
+		}
+		else {
+			[model insert:row withSearchKey: [[info draggingPasteboard] stringForType:NSStringPboardType]];
+		}
+		
+		return YES;
+	}
+	else return NO;
 }
 
-- (void)tableViewSelectionDidChange:(NSNotification *)aNote
+- (void) tableViewSelectionDidChange:(NSNotification *)aNote
 {
 	if([aNote object] == fileListView){
 		int n = [fileListView numberOfSelectedRows];
@@ -591,6 +695,19 @@
 			[headerView reloadData];
 		}
 	}
+	if([aNote object] == searchKeyTableView){
+		[removeSearchKeyButton setEnabled:[[searchKeyTableView selectedRowIndexes] count]>0];
+	}
+}
+
+- (BOOL)outlineView:(NSOutlineView *)ov writeItems:(NSArray*)writeItems toPasteboard:(NSPasteboard*)pboard
+{
+	if(ov == headerView){
+		[self copyHeader:[writeItems objectAtIndex:0] toPasteBoard:pboard];
+
+		return YES;
+    }
+	return NO;
 }
 
 #pragma mark •••Data Source

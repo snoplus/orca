@@ -52,16 +52,20 @@
 		int				selectionDate;
 		int				selectedRunIndex;
 
-    BOOL autoProcess;
-    NSString* searchKey;
-    BOOL useFilter;
+		BOOL			autoProcess;
+		NSMutableArray*	searchKeys;
+		BOOL			useFilter;
 }
 
 #pragma mark •••Accessors
 - (BOOL) useFilter;
 - (void) setUseFilter:(BOOL)aUseFilter;
-- (NSString*) searchKey;
-- (void) setSearchKey:(NSString*)aSearchKey;
+- (NSMutableArray*) searchKeys;
+- (void) addSearchKeys:(NSMutableArray*)newKeys;
+- (void) removeSearchKeys:(NSMutableArray*)anArray;
+- (void) removeSearchKeysWithIndexes:(NSIndexSet*)indexSet;
+- (void) replace:(int)index withSearchKey:(NSString*)aKey;
+- (void) insert:(int)index withSearchKey:(NSString*)aKey;
 - (BOOL) autoProcess;
 - (void) setAutoProcess:(BOOL)aAutoProcess;
 - (int) selectedRunIndex;
@@ -108,7 +112,6 @@
 
 #pragma mark •••External String Definitions
 extern NSString* ORHeaderExplorerUseFilterChanged;
-extern NSString* ORHeaderExplorerSearchKeyChanged;
 extern NSString* ORHeaderExplorerAutoProcessChanged;
 extern NSString* ORHeaderExplorerListChanged;
 extern NSString* ORHeaderExplorerProcessing;
@@ -120,3 +123,6 @@ extern NSString* ORHeaderExplorerSelectionDate;
 extern NSString* ORHeaderExplorerRunSelectionChanged;
 extern NSString* ORHeaderExplorerOneFileDone;
 extern NSString* ORHeaderExplorerHeaderChanged;
+
+extern NSString* ORHeaderExplorerSearchKeysChanged;
+

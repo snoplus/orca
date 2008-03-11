@@ -36,7 +36,9 @@
         int i;
         for(i=0;i<[sortedArray count];i++){
             NSString* aKey = [sortedArray objectAtIndex:i];
-            [item addObject:[ORHeaderItem headerFromObject:[anObject objectForKey:aKey] named:aKey]];
+			ORHeaderItem* h = [ORHeaderItem headerFromObject:[anObject objectForKey:aKey] named:aKey];
+			[h setGuardian:item];
+            [item addObject:h];
         }
     }
     //might be an Array
@@ -44,7 +46,9 @@
         int i;
         for(i=0;i<[anObject count];i++){
             NSString* aKey = [NSString stringWithFormat:@"%d",i];
-            [item addObject:[ORHeaderItem headerFromObject:[anObject objectAtIndex:i] named:aKey]];
+			ORHeaderItem* h = [ORHeaderItem headerFromObject:[anObject objectAtIndex:i] named:aKey];
+  			[h setGuardian:item];
+			[item addObject:h];
         }
     }
     else {
@@ -65,6 +69,40 @@
 
     [super dealloc];
 }
+
+- (NSString*) path
+{
+	NSArray* parts = [[self reversedPath] componentsSeparatedByString:@"/"];
+	NSMutableArray* reversedParts = [NSMutableArray array];
+	if([parts count]>2){
+		NSEnumerator* e = [parts reverseObjectEnumerator];
+		NSString* part;
+		while(part = [e nextObject]){
+			[reversedParts addObject:part];
+		}
+		return [reversedParts componentsJoinedByString:@"/"];
+	}
+	else return @"";
+}
+
+- (NSString*) reversedPath
+{
+	if([self guardian]){
+		return [[name stringByAppendingString:@"/"] stringByAppendingString:[[self guardian] reversedPath]];
+	}
+	return name;
+}
+
+- (void) setGuardian:(ORHeaderItem*)anObject
+{
+	guardian = anObject; //don't retain
+}
+
+- (ORHeaderItem*) guardian
+{
+	return guardian;
+}
+
 
 - (NSString *) name
 {

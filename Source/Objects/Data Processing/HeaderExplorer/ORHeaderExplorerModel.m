@@ -28,7 +28,6 @@
 
 #pragma mark •••Notification Strings
 NSString* ORHeaderExplorerUseFilterChanged		= @"ORHeaderExplorerUseFilterChanged";
-NSString* ORHeaderExplorerSearchKeyChanged		= @"ORHeaderExplorerSearchKeyChanged";
 NSString* ORHeaderExplorerAutoProcessChanged	= @"ORHeaderExplorerAutoProcessChanged";
 NSString* ORHeaderExplorerListChanged			= @"ORHeaderExplorerListChanged";
 
@@ -40,6 +39,7 @@ NSString* ORHeaderExplorerOneFileDone			= @"ORHeaderExplorerOneFileDone";
 NSString* ORHeaderExplorerSelectionDate			= @"ORHeaderExplorerSelectionDate";
 NSString* ORHeaderExplorerRunSelectionChanged	= @"ORHeaderExplorerRunSelectionChanged";
 NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
+NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChanged";
 
 #pragma mark •••Definitions
 
@@ -65,7 +65,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 
 - (void) dealloc
 {
-    [searchKey release];
+    [searchKeys release];
     [lastListPath release];
 	[lastFilePath release];
 	
@@ -103,21 +103,76 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerUseFilterChanged object:self];
 }
 
-- (NSString*) searchKey
+- (NSMutableArray*) searchKeys
 {
-    return searchKey;
+    return searchKeys;
 }
 
-- (void) setSearchKey:(NSString*)aSearchKey
+- (void) setSearchKeys:(NSMutableArray*)anArray
 {
-	if(aSearchKey==nil)aSearchKey=@"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setSearchKey:searchKey];
+	[anArray retain];
+	[searchKeys release];
+	searchKeys = anArray;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerSearchKeysChanged object:self];
+	
+}
+
+- (void) replace:(int)index withSearchKey:(NSString*)aKey
+{
+	[searchKeys replaceObjectAtIndex:index withObject:aKey];
+    [[NSNotificationCenter defaultCenter]
+			    postNotificationName:ORHeaderExplorerSearchKeysChanged
+                              object: self];      
+}
+
+- (void) insert:(int)index withSearchKey:(NSString*)aKey
+{
+	if(index>[searchKeys count])[searchKeys addObject:aKey];
+	else [searchKeys insertObject:aKey atIndex:index];
+    [[NSNotificationCenter defaultCenter]
+			    postNotificationName:ORHeaderExplorerSearchKeysChanged
+                              object: self];      
+}
+
+
+- (void) addSearchKeys:(NSMutableArray*)newKeys
+{
+	if(!newKeys)return;
+    if(!searchKeys)searchKeys = [[NSMutableArray array] retain];
     
-    [searchKey autorelease];
-    searchKey = [aSearchKey copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORHeaderExplorerSearchKeyChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] removeSearchKeys:newKeys];
+    
+    [searchKeys addObjectsFromArray:newKeys];
+    
+    [[NSNotificationCenter defaultCenter]
+			    postNotificationName:ORHeaderExplorerSearchKeysChanged
+                              object: self];      
 }
+
+- (void) removeSearchKeys:(NSMutableArray*)anArray
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] addSearchKeys:anArray];
+    [searchKeys removeObjectsInArray:anArray];
+
+    [[NSNotificationCenter defaultCenter]
+			    postNotificationName:ORHeaderExplorerSearchKeysChanged
+                              object: self];
+}
+
+- (void) removeSearchKeysWithIndexes:(NSIndexSet*)indexSet
+{
+    NSMutableArray* keysToRemove = [NSMutableArray array];
+	unsigned current_index = [indexSet firstIndex];
+    while (current_index != NSNotFound){
+		[keysToRemove addObject:[searchKeys objectAtIndex:current_index]];
+        current_index = [indexSet indexGreaterThanIndex: current_index];
+    }
+	if([keysToRemove count]){
+		[self removeSearchKeys:keysToRemove];    
+	}
+}
+
 
 - (BOOL) autoProcess
 {
@@ -228,16 +283,30 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 {
 	if(selectedRunIndex>=0 && selectedRunIndex<[runArray count]){
 		id aHeader = [[runArray objectAtIndex:selectedRunIndex] objectForKey:@"FileHeader"];
+		int index;
+		int n = [searchKeys count];
 		id headerData;
-		if([searchKey length] && useFilter){
-			NSString* s = searchKey;
-			if([searchKey hasSuffix:@"/"])s = [searchKey substringToIndex:[searchKey length]-1];
-			NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[s componentsSeparatedByString:@"/"]]; //must be mutable
-			headerData = [aHeader objectForKeyArray:keyArray];
+		NSMutableDictionary* filteredStuff = [NSMutableDictionary dictionary];
+		if(n){
+			for(index = 0;index<n;index++){
+				id searchKey = [searchKeys objectAtIndex:index];
+				if(useFilter){
+					NSString* s = searchKey;
+					if([searchKey hasSuffix:@"/"])s = [searchKey substringToIndex:[searchKey length]-1];
+					NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[s componentsSeparatedByString:@"/"]]; //must be mutable
+					headerData = [aHeader objectForKeyArray:keyArray];
+					if(headerData){
+						[filteredStuff setObject:headerData forKey:[NSString stringWithFormat:@"Key %d",index]];
+					}
+				}
+			}
+			if([filteredStuff count]){
+				[self setHeader:[ORHeaderItem headerFromObject:filteredStuff named:@"Root"]];
+			}
+			else [self setHeader:[ORHeaderItem headerFromObject:aHeader named:@"Root"]];
+
 		}
-		else headerData = aHeader;
-		
-		[self setHeader:[ORHeaderItem headerFromObject:headerData named:@"Root"]];
+		else [self setHeader:[ORHeaderItem headerFromObject:aHeader named:@"Root"]];
 	}
 	else [self setHeader:nil];
 }
@@ -472,7 +541,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
     
 	[[self undoManager] disableUndoRegistration];
     [self setUseFilter:		[decoder decodeBoolForKey:	@"useFilter"]];
-    [self setSearchKey:		[decoder decodeObjectForKey:@"searchKey"]];
+    [self setSearchKeys:	[decoder decodeObjectForKey:@"searchKeys"]];
     [self setAutoProcess:	[decoder decodeBoolForKey:	@"autoProcess"]];
 	[self addFilesToProcess:[decoder decodeObjectForKey:@"filesToProcess"]];
 	[self setLastListPath:	[decoder decodeObjectForKey:@"lastListPath"]];
@@ -486,7 +555,7 @@ NSString* ORHeaderExplorerHeaderChanged			= @"ORHeaderExplorerHeaderChanged";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:useFilter		forKey: @"useFilter"];
-    [encoder encodeObject:searchKey		forKey: @"searchKey"];
+    [encoder encodeObject:searchKeys	forKey: @"searchKeys"];
     [encoder encodeBool:autoProcess		forKey: @"autoProcess"];
     [encoder encodeObject:filesToProcess forKey:@"filesToProcess"];
     [encoder encodeObject:lastListPath	forKey: @"lastListPath"];

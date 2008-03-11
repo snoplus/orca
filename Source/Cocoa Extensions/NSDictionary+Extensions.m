@@ -45,7 +45,10 @@
 		if([anObj respondsToSelector:@selector(objectForKeyArray:)]){
 			return [anObj objectForKeyArray:anArray];
 		}
-		else return self;
+		else {
+			if(anObj)return anObj;
+			else return self;
+		}
     }
 }
 

@@ -18,12 +18,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@class ORHeaderItem;
 
 @interface ORHeaderExplorerController : OrcaObjectController  {
     @private
+		IBOutlet NSButton* 		addSearchKeyButton;
+		IBOutlet NSButton* 		removeSearchKeyButton;
 		IBOutlet NSButton* 		selectButton;
 		IBOutlet NSButton*		useFilterCB;
-		IBOutlet NSTextView*	searchKeyView;
+		IBOutlet NSTableView*	searchKeyTableView;
 		IBOutlet NSButton*		autoProcessCB;
 		IBOutlet NSButton* 		replayButton;
 		IBOutlet NSButton* 		saveButton;
@@ -56,11 +59,13 @@
 - (IBAction) loadListAction:(id)sender;
 - (IBAction) selectionDateAction:(id)sender;
 - (IBAction) doubleClick:(id)sender;
+- (IBAction)addSearchKeys:(id)sender;
+- (IBAction)deleteSearchKeys:(id)sender;
 
 #pragma mark •••Interface Management
 - (void) searchEditedChanged:(NSNotification*)aNote;
 - (void) useFilterChanged:(NSNotification*)aNote;
-- (void) searchKeyChanged:(NSNotification*)aNote;
+- (void) searchKeysChanged:(NSNotification*)aNote;
 - (void) autoProcessChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) fileListChanged:(NSNotification*)aNote;
@@ -74,6 +79,7 @@
 - (void) setSelectionDate:(long)aValue;
 - (void) findSelectedRunByDate;
 - (void) setRunBoundaryTimes;
+- (void) tableViewSelectionDidChange:(NSNotification *)aNote;
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
@@ -82,6 +88,7 @@
 - (unsigned long) maxRunEndTime;
 - (long) numberRuns;
 - (id) run:(int)index objectForKey:(id)aKey;
+- (void) copyHeader:(ORHeaderItem*)anItem toPasteBoard:(NSPasteboard*)pboard;
 
 @end
 

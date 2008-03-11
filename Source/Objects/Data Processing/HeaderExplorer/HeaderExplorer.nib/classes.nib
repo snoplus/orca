@@ -33,11 +33,15 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>addSearchKeys</key>
+				<string>id</string>
 				<key>autoProcessAction</key>
 				<string>id</string>
 				<key>cut</key>
 				<string>id</string>
 				<key>delete</key>
+				<string>id</string>
+				<key>deleteSearchKeys</key>
 				<string>id</string>
 				<key>doubleClick</key>
 				<string>id</string>
@@ -62,6 +66,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>addSearchKeyButton</key>
+				<string>NSButton</string>
 				<key>autoProcessCB</key>
 				<string>NSButton</string>
 				<key>fileListView</key>
@@ -76,6 +82,8 @@
 				<string>NSProgressIndicator</string>
 				<key>progressIndicatorBottom</key>
 				<string>NSProgressIndicator</string>
+				<key>removeSearchKeyButton</key>
+				<string>NSButton</string>
 				<key>replayButton</key>
 				<string>NSButton</string>
 				<key>runEndField</key>
@@ -88,8 +96,8 @@
 				<string>NSView</string>
 				<key>saveButton</key>
 				<string>NSButton</string>
-				<key>searchKeyView</key>
-				<string>NSTextView</string>
+				<key>searchKeyTableView</key>
+				<string>NSTableView</string>
 				<key>selectButton</key>
 				<string>NSButton</string>
 				<key>selectionDateField</key>
