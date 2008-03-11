@@ -74,7 +74,7 @@
 {
 	NSArray* parts = [[self reversedPath] componentsSeparatedByString:@"/"];
 	NSMutableArray* reversedParts = [NSMutableArray array];
-	if([parts count]>2){
+	if([parts count]){
 		NSEnumerator* e = [parts reverseObjectEnumerator];
 		NSString* part;
 		while(part = [e nextObject]){
