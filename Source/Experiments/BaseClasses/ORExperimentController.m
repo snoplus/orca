@@ -381,6 +381,7 @@
 
 - (IBAction) showNamesAction:(id)sender
 {
+	[self endEditing];
 	[model setShowNames:[sender intValue]];	
 }
 
@@ -404,16 +405,19 @@
 
 - (IBAction) timedRunCBAction:(id)sender
 {
+	[self endEditing];
 	[runControl setTimedRun:[sender intValue]];
 }
 
 - (IBAction) repeatRunCBAction:(id)sender
 {
+	[self endEditing];
 	[runControl setRepeatRun:[sender intValue]];
 }
 
 - (IBAction) runModeAction:(id)sender
 {
+	[self endEditing];
     int tag = [[runModeMatrix selectedCell] tag];
     if(tag != [[ORGlobal sharedInstance] runMode]){
         [[ORGlobal sharedInstance] setRunMode:tag];
@@ -422,6 +426,7 @@
 
 - (IBAction) displayTypeAction:(id)sender
 {
+	[self endEditing];
 	int type = [[sender selectedCell] tag];
 	[model setDisplayType:type];	
 	[self setValueHistogramTitle];
