@@ -288,7 +288,7 @@ void doReadBlock(SBC_Packet* aPacket)
 
     /*OK, got address and # to read, set up the response and go get the data*/
     aPacket->cmdHeader.destination = kSBC_Process;
-    aPacket->cmdHeader.cmdID       = kSBC_VmeReadBlock;
+    aPacket->cmdHeader.cmdID       = kSBC_ReadBlock;
     aPacket->cmdHeader.numberBytesinPayload    
         = sizeof(SBC_VmeReadBlockStruct) + numItems*unitSize;
 

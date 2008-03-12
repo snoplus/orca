@@ -30,8 +30,6 @@ void FindHardware(void);
 void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket);
 void doReadBlock(SBC_Packet* aPacket);
-void doVmeWriteBlock(SBC_Packet* aPacket);
-void doVmeReadBlock(SBC_Packet* aPacket);
 
 int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);

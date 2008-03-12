@@ -46,8 +46,6 @@
 #define kSBC_StopRun           0x0b
 #define kSBC_CBRead            0x0c
 #define kSBC_ConnectionStatus  0x0d
-#define kSBC_VmeReadBlock      0x0e
-#define kSBC_VmeWriteBlock     0x0f
 #define kSBC_LAM			   0x10
 #define kSBC_CBTest			   0x11
 #define kSBC_PacketOptions	   0x12
@@ -112,6 +110,23 @@ typedef
         /*followed by the requested data, number of items from above*/
     }
 SBC_VmeWriteBlockStruct;
+
+typedef 
+    struct {
+        uint32_t address;        /*first address*/
+        uint32_t errorCode;    /*filled on return*/
+        uint32_t numItems;        /*number Items of data to follow*/
+        /*followed by the requested data, number of items from above*/
+    }
+SBC_IPEv4WriteBlockStruct;
+
+typedef 
+    struct {
+        uint32_t address;        /*first address*/
+        uint32_t errorCode;    /*filled on return*/
+        uint32_t numItems;        /*number of items to read*/
+    }
+SBC_IPEv4ReadBlockStruct;
 
 typedef 
     struct {

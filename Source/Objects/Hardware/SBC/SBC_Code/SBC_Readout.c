@@ -245,14 +245,12 @@ void processSBCCommand(SBC_Packet* aPacket)
 {
     switch(aPacket->cmdHeader.cmdID){
         case kSBC_WriteBlock:        
-        case kSBC_VmeWriteBlock:
             pthread_mutex_lock (&runInfoMutex);                            //begin critical section
             doWriteBlock(aPacket); 
             pthread_mutex_unlock (&runInfoMutex);                        //end critical section
         break;
         
         case kSBC_ReadBlock:
-        case kSBC_VmeReadBlock:        
             pthread_mutex_lock (&runInfoMutex);                            //begin critical section
             doReadBlock(aPacket);  
             pthread_mutex_unlock (&runInfoMutex);                        //end critical section

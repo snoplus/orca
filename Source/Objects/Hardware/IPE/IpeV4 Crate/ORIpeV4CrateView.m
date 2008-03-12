@@ -38,7 +38,7 @@
 
 - (NSPoint) suggestPasteLocationFor:(id)aCard
 {
-	if( [aCard isKindOfClass:NSClassFromString(@"ORIpeV4CrateControllerCard")]){
+	if( [aCard isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]){
 		if([self slotRangeEmpty:NSMakeRange(10,1)]){
             return [self constrainLocation:NSMakePoint(10*[self cardWidth],0)];
 		}
@@ -52,14 +52,14 @@
 {
 	if([super canAddObject:obj atPoint:aPoint]){
 		int aSlot = [self slotAtPoint:aPoint];
-		if( [obj isKindOfClass:NSClassFromString(@"ORIpeV4FireWireCard")]){
-			if(aSlot != 0){
+		if( [obj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]){
+			if(aSlot != 10){
 				NSLog(@"Rejected attempt to place IPE V4 controller in non-controller slot\n");
 				return NO;
 			}
 		}
 		else {
-			if(aSlot == 0){
+			if(aSlot == 10){
 				NSLog(@"Rejected attempt to place IPE V4 card in controller slot\n");
 				return NO;
 			}
@@ -74,7 +74,6 @@
 	NSRange objRange			 = NSMakeRange(aSlot,1);
 	NSRange legalControllerRange = NSMakeRange(10,1);
 	
-	//last check.. Camac restricts the last two slots for the controller
 	if([aCard isKindOfClass:NSClassFromString(@"ORIpeV4CrateSLTModel")]){
 		if(!NSEqualRanges(legalControllerRange,objRange))	return NO;
 	}

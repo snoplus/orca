@@ -346,7 +346,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (NSString*) filePath
 {
-    return filePath;
+	if(!filePath)return @"";
+    else return filePath;
 }
 
 - (void) setFilePath:(NSString*)aPath
@@ -362,7 +363,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (NSString*) userName
 {
-    return userName;
+	if(!userName)return @"";
+    else return userName;
 }
 
 - (void) setUserName:(NSString*)aUserName
@@ -378,7 +380,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (NSString*) passWord
 {
-    return passWord;
+	if(!passWord)return @"";
+    else return passWord;
 }
 
 - (void) setPassWord:(NSString*)aPassWord
@@ -394,6 +397,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (int) portNumber
 {
+	if(portNumber ==0)portNumber = 44667;
     return portNumber;
 }
 
@@ -437,6 +441,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (NSString*) IPNumber
 {
+	if(!IPNumber)return @"";
     return IPNumber;
 }
 
@@ -973,7 +978,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_VmeReadBlock;
+		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
 			
 		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
@@ -1011,7 +1016,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_VmeReadBlock;
+		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
 			
 		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
@@ -1049,7 +1054,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_VmeReadBlock;
+		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
 			
 		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
@@ -1089,7 +1094,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_VmeWriteBlock;
+		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberBytes;
 		
 		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket.payload;
@@ -1126,7 +1131,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_VmeWriteBlock;
+		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberWords*sizeof(short);
 		
 		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket.payload;
@@ -1162,7 +1167,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
-		aPacket.cmdHeader.cmdID					= kSBC_VmeWriteBlock;
+		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeWriteBlockStruct) + numberLongs*sizeof(long);
 		
 		SBC_VmeWriteBlockStruct* writeBlockPtr = (SBC_VmeWriteBlockStruct*)aPacket.payload;
