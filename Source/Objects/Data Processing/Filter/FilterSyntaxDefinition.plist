@@ -31,6 +31,7 @@
 		<string>array</string>
 		<string>extractRecordID</string>
 		<string>extractRecordLen</string>
+		<string>extractValue</string>
 		<string>shipRecord</string>
 		<string>push</string>
 		<string>pop</string>

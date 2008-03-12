@@ -434,6 +434,13 @@ filterData ex(nodeType *p,id delegate)
 			case EXTRACTRECORD_LEN: 
 				tempData.val.lValue =  [delegate extractRecordLen:ex(p->opr.op[0],delegate).val.lValue]; 
 			return tempData;
+
+			case EXTRACT_VALUE: 
+				tempData.val.lValue =  [delegate extractValue:ex(p->opr.op[0],delegate).val.lValue 
+														 mask:ex(p->opr.op[1],delegate).val.lValue
+													thenShift:ex(p->opr.op[2],delegate).val.lValue]; 
+			return tempData;
+
 			
 			case SHIP_RECORD:
 				{

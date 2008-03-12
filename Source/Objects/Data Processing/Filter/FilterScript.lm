@@ -83,6 +83,7 @@ H			[a-fA-F0-9]
 "free"			return FREEARRAY;
 "extractRecordID"		return EXTRACTRECORD_ID;
 "extractRecordLen"		return EXTRACTRECORD_LEN;
+"extractValue"			return EXTRACT_VALUE;
 "shipRecord"			return SHIP_RECORD;
 "push"					return PUSH_RECORD;
 "pop"					return POP_RECORD;

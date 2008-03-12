@@ -102,6 +102,7 @@ unless(<condition>)\{\
 \b0 \
 id = extractRecordID(<var>);	//returns dataid of current record\
 len = extractRecordLen(<var>);	//returns # longs in current record\
+val = extractValue(<var>,<mask>,<shift>); //returns (var & mask) >> shift\
 shipRecord(<ptr>);			//ships record pointed to by <ptr>\
 push(<var>,<ptr>);			//push record pointed to by <ptr> onto stack <var>\
 ptr = pop(<var>);				//pop a record from stack <var>\

@@ -117,6 +117,7 @@
 #pragma mark ***Plugin Interface
 - (unsigned long) extractRecordID:(unsigned long)aValue;
 - (unsigned long) extractRecordLen:(unsigned long)aValue;
+- (unsigned long) extractValue:(unsigned long)aValue mask:(unsigned long)aMask thenShift:(unsigned long)shift;
 - (void) shipRecord:(unsigned long*)p length:(long)length;
 - (void) pushOntoStack:(int)i record:(unsigned long*)p;
 - (unsigned long*) popFromStack:(int)i;

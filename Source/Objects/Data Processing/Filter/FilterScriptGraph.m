@@ -159,6 +159,7 @@ void exNode
 				case STRIPCHART:		s="[stripChart]";	break;
 				case DISPLAY_VALUE:		s="[displayValue]";	break;
 				case RESET_DISPLAYS:	s="[resetDisplays]";break;
+				case EXTRACT_VALUE:		s="[extractValue]";break;
             }
             break;
     }

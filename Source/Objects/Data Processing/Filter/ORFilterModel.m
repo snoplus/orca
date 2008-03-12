@@ -666,6 +666,11 @@ int filterGraph(nodeType*);
 	return ExtractLength(aValue);
 }
 
+- (unsigned long) extractValue:(unsigned long)aValue mask:(unsigned long)aMask thenShift:(unsigned long)shift
+{
+	return (aValue & aMask) >> shift;
+}
+
 - (void) shipRecord:(unsigned long*)p length:(long)length
 {
 	if(ExtractDataId(p[0]) != 0){
