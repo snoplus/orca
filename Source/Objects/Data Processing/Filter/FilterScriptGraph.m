@@ -149,13 +149,16 @@ void exNode
                 case SHIP_RECORD:		s="[shipRecord]";	break;
                 case PUSH_RECORD:		s="[push]";			break;
                 case POP_RECORD:		s="[pop]";			break;
+                case BOTTOM_POP_RECORD:	s="[bottomPop]";			break;
                 case SHIP_STACK:		s="[shipStack]";	break;
                 case DUMP_STACK:		s="[dumpStack]";	break;
 				case STACK_COUNT:		s="[stackCount]";	break;
 				case HISTO_1D:			s="[histo1D]";		break;
 				case HISTO_2D:			s="[histo2D]";		break;
-				case DISPLAY_VALUE:		s="[displayValue]";		break;
-				case RESET_DISPLAYS:	s="[resetDisplays]";		break;
+				case TIME:				s="[time]";			break;
+				case STRIPCHART:		s="[stripChart]";	break;
+				case DISPLAY_VALUE:		s="[displayValue]";	break;
+				case RESET_DISPLAYS:	s="[resetDisplays]";break;
             }
             break;
     }

@@ -105,6 +105,7 @@ len = extractRecordLen(<var>);	//returns # longs in current record\
 shipRecord(<ptr>);			//ships record pointed to by <ptr>\
 push(<var>,<ptr>);			//push record pointed to by <ptr> onto stack <var>\
 ptr = pop(<var>);				//pop a record from stack <var>\
+ptr = bottomPop(<var>);		//pop a record from bottom of stack <var>\
 stackCount(<var>);			//returns the number of items in stack <var>\
 dumpStack(<var>);			//delete all records from stack <var>\
 shipStack(<var>);			//put the contents stack <var> into data stream\
@@ -114,8 +115,10 @@ shipStack(<var>);			//put the contents stack <var> into data stream\
 						//were pushed onto stack\
 histo1D(<var1>,<var2>);		//load the value <val2> into 1D histogram <var1>\
 histo2D(<var1>,<x>,<y>);		//load the values <x>,<y> into 2D histogram <var1>\
+stripChart(<var1>,<time>,<var2>);	//load <var2> into strip chart <var1> at <time>\
 display(<var1>,<var2>);		//load value <var2> into display slot <var1>\
 resetDisplays();				//load value 0 into all display slots\
+time();					//returns number of seconds since 1/1/1970\
 \
 
 \b Special Variables\

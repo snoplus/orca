@@ -34,14 +34,17 @@
 		<string>shipRecord</string>
 		<string>push</string>
 		<string>pop</string>
+		<string>bottomPop</string>
 		<string>dumpStack</string>
 		<string>shipStack</string>
 		<string>stackCount</string>
 		<string>shipRecord</string>
 		<string>histo1D</string>
 		<string>histo2D</string>
+		<string>timeChart</string>
 		<string>resetDisplays</string>
 		<string>display</string>
+		<string>time</string>
 	</array>
 
 	<key>Constants</key>

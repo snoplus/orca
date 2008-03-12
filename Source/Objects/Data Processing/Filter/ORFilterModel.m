@@ -331,16 +331,24 @@ int filterGraph(nodeType*);
     dataId2D = aDataId;
 }
 
+- (unsigned long) dataIdStrip { return dataIdStrip; }
+- (void) setDataIdStrip: (unsigned long) aDataId
+{
+    dataIdStrip = aDataId;
+}
+
 - (void) setDataIds:(id)assigner
 {
     dataId1D       = [assigner assignDataIds:kLongForm];
     dataId2D       = [assigner assignDataIds:kLongForm];
+    dataIdStrip       = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherObj
 {
     [self setDataId1D:[anotherObj dataId1D]];
     [self setDataId2D:[anotherObj dataId2D]];
+    [self setDataIdStrip:[anotherObj dataIdStrip]];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -362,6 +370,14 @@ int filterGraph(nodeType*);
         [NSNumber numberWithLong:3],            @"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"Filter2D"];
+
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"ORFilterDecoderForStrip",				@"decoder",
+        [NSNumber numberWithLong:dataIdStrip],   @"dataId",
+        [NSNumber numberWithBool:NO],           @"variable",
+        [NSNumber numberWithLong:3],            @"length",
+        nil];
+    [dataDictionary setObject:aDictionary forKey:@"StripChart"];
 	
     return dataDictionary;
 }
@@ -676,6 +692,13 @@ int filterGraph(nodeType*);
 	return (unsigned long*)[data bytes];
 }
 
+- (unsigned long*) popFromStackBottom:(int)i
+{
+	NSData* data = [stacks[i] dequeueFromBottom];
+	return (unsigned long*)[data bytes];
+}
+
+
 - (void) shipStack:(int)i
 {
 	if(![stacks[i] isEmpty]) {
@@ -729,6 +752,21 @@ int filterGraph(nodeType*);
 	[theNextObject processData:transferDataPacket userInfo:nil];
 	[transferDataPacket clearData];
 }
+
+- (void) stripChart:(int)i time:(unsigned long)aTimeIndex value:(unsigned long)aValue
+{
+	unsigned long p[2];
+	p[0] = dataIdStrip | 3;
+	p[1] = (i & 0xffff) << 16 | (aValue & 0xffff); 
+	p[2] = aTimeIndex;
+	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:3];
+	[transferDataPacket addFrameBuffer:YES];
+	//pass it on
+	id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
+	[theNextObject processData:transferDataPacket userInfo:nil];
+	[transferDataPacket clearData];
+}
+
 
 - (void) setOutputValue:(int)index withValue:(unsigned long)aValue
 {
@@ -806,6 +844,8 @@ int filterGraph(nodeType*);
 			[self setDataId1D:maxLongID<<18];
 			maxLongID++;
 			[self setDataId2D:maxLongID<<18];
+			maxLongID++;
+			[self setDataIdStrip:maxLongID<<18];
 			[descriptionDict setObject:[self dataRecordDescription] forKey:@"ORFilterModel"];
 			[aDataPacket generateObjectLookup];
 
@@ -890,11 +930,36 @@ int filterGraph(nodeType*);
 {
     NSString* title= @"Filter Record (2D)\n\n";
     
-    NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0x0fff0000)>>16];    
-    NSString* valueX  = [NSString stringWithFormat:@"ValueX = %d\n",ptr[1]&0x00000fff];    
-    NSString* valueY  = [NSString stringWithFormat:@"ValueY = %d\n",ptr[2]&0x00000fff];    
+    NSString* index   = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0x0fff0000)>>16];    
+    NSString* valueX  = [NSString stringWithFormat: @"ValueX = %d\n",ptr[1]&0x00000fff];    
+    NSString* valueY  = [NSString stringWithFormat: @"ValueY = %d\n",ptr[2]&0x00000fff];    
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,valueX,valueY,index];               
+}
+@end
+
+@implementation ORFilterDecoderForStrip
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr = (unsigned long*)someData;
+    unsigned long length = 3;
+
+    [aDataSet loadTimeSeries:ptr[1]&0xFFFF atTime:ptr[2] sender:self  
+		withKeys:@"FilterStripChart",[NSString stringWithFormat:@"%d",(ptr[1]&0xffff0000)>>16],
+        nil];
+		
+    return length; //must return number of longs processed.
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    NSString* title= @"Filter Time Series\n\n";
+    
+    NSString* index  =     [NSString stringWithFormat: @"Index = %d\n",(ptr[1] & 0xffff0000)>>16];    
+    NSString* timeValue  = [NSString stringWithFormat: @"Time  = %d\n",ptr[1] & 0x0000ffff];    
+    NSString* value  =     [NSString stringWithFormat: @"Value = %d\n",ptr[2]];    
+
+    return [NSString stringWithFormat:@"%@%@%@%@",title,index,timeValue,value];               
 }
 @end
 

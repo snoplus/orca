@@ -67,8 +67,8 @@ long				switchValue[512];
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING SWITCH CASE DEFAULT MAKEARRAY
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP FREEARRAY EXTRACTRECORD_LEN EXTRACTRECORD_ID 
-%token SHIP_RECORD PUSH_RECORD POP_RECORD SHIP_STACK DUMP_STACK STACK_COUNT HISTO_1D HISTO_2D
-%token DISPLAY_VALUE RESET_DISPLAYS
+%token SHIP_RECORD PUSH_RECORD POP_RECORD SHIP_STACK DUMP_STACK STACK_COUNT HISTO_1D HISTO_2D STRIPCHART
+%token DISPLAY_VALUE RESET_DISPLAYS TIME AVE_STACK BOTTOM_POP_RECORD
 
 %nonassoc IFX
 %nonassoc ELSE
@@ -225,13 +225,16 @@ primary_expr
 		| SHIP_RECORD '(' expr ')'			{ $$ = opr(SHIP_RECORD,1,$3);}
 		| PUSH_RECORD '(' expr ',' expr ')'	{ $$ = opr(PUSH_RECORD,2,$3,$5);}
 		| POP_RECORD  '(' expr ')'			{ $$ = opr(POP_RECORD,1,$3);}
+		| BOTTOM_POP_RECORD  '(' expr ')'	{ $$ = opr(BOTTOM_POP_RECORD,1,$3);}
 		| SHIP_STACK  '(' expr ')'			{ $$ = opr(SHIP_STACK,1,$3);}
 		| DUMP_STACK  '(' expr ')'			{ $$ = opr(DUMP_STACK,1,$3);}
 		| STACK_COUNT '(' expr ')'			{ $$ = opr(STACK_COUNT,1,$3);}
 		| HISTO_1D    '(' expr ',' expr ')'				{ $$ = opr(HISTO_1D,2,$3,$5);}
 		| HISTO_2D    '(' expr ',' expr ',' expr ')'	{ $$ = opr(HISTO_2D,3,$3,$5,$7);}
+		| STRIPCHART   '(' expr ',' expr ',' expr ')'	{ $$ = opr(STRIPCHART,3,$3,$5,$7);}
 		| DISPLAY_VALUE '(' expr ',' expr ')'	{ $$ = opr(DISPLAY_VALUE,2,$3,$5);}
 		| RESET_DISPLAYS '('  ')'				{ $$ = opr(RESET_DISPLAYS,0);}
+		| TIME '('  ')'							{ $$ = opr(TIME,0);}
 		;
 	
 postfix_expr

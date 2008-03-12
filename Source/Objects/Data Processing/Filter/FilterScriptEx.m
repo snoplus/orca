@@ -24,6 +24,7 @@
 #include "FilterScript.tab.h"
 #import "StatusLog.h"
 #import "ORDataTypeAssigner.h"
+#import <time.h>
 
 extern unsigned short   switchLevel;
 extern long				switchValue[512];
@@ -452,6 +453,10 @@ filterData ex(nodeType *p,id delegate)
 			case POP_RECORD:
 				tempData.val.pValue = [delegate popFromStack:ex(p->opr.op[0],delegate).val.lValue];
 			return tempData;
+			
+			case BOTTOM_POP_RECORD:
+				tempData.val.pValue = [delegate popFromStackBottom:ex(p->opr.op[0],delegate).val.lValue];
+			return tempData;
 
 			case SHIP_STACK:
 				[delegate shipStack:ex(p->opr.op[0],delegate).val.lValue];
@@ -476,6 +481,23 @@ filterData ex(nodeType *p,id delegate)
 					[delegate histo2D:ex(p->opr.op[0],delegate).val.lValue x:x y:y];
 				}
 			break;
+
+			case STRIPCHART:	
+				{
+					unsigned long aTime = ex(p->opr.op[1],delegate).val.lValue;
+					unsigned long aValue = ex(p->opr.op[2],delegate).val.lValue;
+					[delegate stripChart:ex(p->opr.op[0],delegate).val.lValue time:aTime value:aValue];
+				}
+			break;
+
+			case TIME:	
+				{
+				time_t theTime;
+				time(&theTime);
+				tempData.val.lValue = theTime;
+				}
+			break;
+
 
 			case DISPLAY_VALUE:	
 				[delegate setOutputValue:ex(p->opr.op[0],delegate).val.lValue 

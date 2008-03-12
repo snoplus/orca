@@ -40,6 +40,7 @@
 	
 		unsigned long dataId1D;
 		unsigned long dataId2D;
+		unsigned long dataIdStrip;
 
 		NSString*			lastFile;
 		NSString*			script;
@@ -96,6 +97,8 @@
 - (void) setDataId1D: (unsigned long) aDataId;
 - (unsigned long) dataId2D;
 - (void) setDataId2D: (unsigned long) aDataId;
+- (unsigned long) dataIdStrip;
+- (void) setDataIdStrip: (unsigned long) aDataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObj;
 - (NSDictionary*) dataRecordDescription;
@@ -117,11 +120,13 @@
 - (void) shipRecord:(unsigned long*)p length:(long)length;
 - (void) pushOntoStack:(int)i record:(unsigned long*)p;
 - (unsigned long*) popFromStack:(int)i;
+- (unsigned long*) popFromStackBottom:(int)i;
 - (void) shipStack:(int)i;
 - (void) dumpStack:(int)i;
 - (long) stackCount:(int)i;
 - (void) histo1D:(int)i value:(unsigned long)aValue;
 - (void) histo2D:(int)i x:(unsigned long)x y:(unsigned long)y;
+- (void) stripChart:(int)i time:(unsigned long)x value:(unsigned long)y;
 - (void) setOutputValue:(int)index withValue:(unsigned long)aValue;
 - (void) resetDisplays;
 - (void) scheduledUpdate;
@@ -159,3 +164,11 @@ extern NSString* ORFilterUpdateTiming;
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 @end
+
+@interface ORFilterDecoderForStrip : ORBaseDecoder
+{}
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end
+
+
