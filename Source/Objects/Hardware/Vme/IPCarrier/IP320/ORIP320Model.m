@@ -443,7 +443,7 @@ static struct {
 				errorLocation = @"CountCALHI Control Reg Setup";
 				[self loadCALHIControReg:gain];
 				[ORTimer delay:0.01];
-				unsigned short CountCALHI;
+				unsigned short CountCALHI=0;
 				int i=0;
 				for(i=0;i<ReadNumber;i++){
 					errorLocation = @"CountCALHI Converion Start";
@@ -458,7 +458,7 @@ static struct {
 				[self loadCALLOControReg:gain];
 				[ORTimer delay:0.01];
 
-				unsigned short CountCALLO;
+				unsigned short CountCALLO=0;
 				for(i=0;i<ReadNumber;i++){
 					errorLocation = @"CountCALLO Converion Start";
 					[self loadConversionStart];
