@@ -332,6 +332,21 @@
 		8421608A094F8910002E68B7 /* ORAdcController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84216087094F8910002E68B7 /* ORAdcController.m */; };
 		8421608B094F8910002E68B7 /* Adc.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84216088094F8910002E68B7 /* Adc.nib */; };
 		84216094094F8B90002E68B7 /* ORAdcProcessing.h in Headers */ = {isa = PBXBuildFile; fileRef = 84216093094F8B90002E68B7 /* ORAdcProcessing.h */; };
+		842251320D8845390048D331 /* IpeV4SLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842251240D8845390048D331 /* IpeV4SLT.nib */; };
+		842251330D8845390048D331 /* IpeV4SLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842251250D8845390048D331 /* IpeV4SLTCard.gif */; };
+		842251340D8845390048D331 /* ORIpeV4SLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842251260D8845390048D331 /* ORIpeV4SLTController.h */; };
+		842251350D8845390048D331 /* ORIpeV4SLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842251270D8845390048D331 /* ORIpeV4SLTController.m */; };
+		842251360D8845390048D331 /* ORIpeV4SLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 842251280D8845390048D331 /* ORIpeV4SLTDecoder.h */; };
+		842251370D8845390048D331 /* ORIpeV4SLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 842251290D8845390048D331 /* ORIpeV4SLTDecoder.m */; };
+		842251380D8845390048D331 /* ORIpeV4SLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 8422512A0D8845390048D331 /* ORIpeV4SLTDefs.h */; };
+		842251390D8845390048D331 /* ORIpeV4SLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8422512B0D8845390048D331 /* ORIpeV4SLTModel.h */; };
+		8422513A0D8845390048D331 /* ORIpeV4SLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8422512C0D8845390048D331 /* ORIpeV4SLTModel.m */; };
+		8422513C0D8845390048D331 /* HW_Readout.h in Headers */ = {isa = PBXBuildFile; fileRef = 8422512F0D8845390048D331 /* HW_Readout.h */; };
+		8422513E0D8845390048D331 /* SLTv4_HW_Definitions.h in Headers */ = {isa = PBXBuildFile; fileRef = 842251310D8845390048D331 /* SLTv4_HW_Definitions.h */; };
+		8422513F0D8845500048D331 /* HW_Readout.c in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 8422512E0D8845390048D331 /* HW_Readout.c */; };
+		842251400D8845500048D331 /* HW_Readout.h in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 8422512F0D8845390048D331 /* HW_Readout.h */; };
+		842251410D8845500048D331 /* Makefile in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 842251300D8845390048D331 /* Makefile */; };
+		842251420D8845500048D331 /* SLTv4_HW_Definitions.h in SLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 842251310D8845390048D331 /* SLTv4_HW_Definitions.h */; };
 		842509C8067FAC9D0037C568 /* ORTimeAxis.m in Sources */ = {isa = PBXBuildFile; fileRef = 842509C6067FAC9D0037C568 /* ORTimeAxis.m */; };
 		842509C9067FAC9D0037C568 /* ORTimeAxis.h in Headers */ = {isa = PBXBuildFile; fileRef = 842509C7067FAC9D0037C568 /* ORTimeAxis.h */; };
 		842538510BC6E006004C8065 /* HP6622a.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8425384B0BC6E006004C8065 /* HP6622a.nib */; };
@@ -1696,6 +1711,20 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		842241B00D85EA7F0048D331 /* SLTv4_Copy */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				8422513F0D8845500048D331 /* HW_Readout.c in SLTv4_Copy */,
+				842251400D8845500048D331 /* HW_Readout.h in SLTv4_Copy */,
+				842251410D8845500048D331 /* Makefile in SLTv4_Copy */,
+				842251420D8845500048D331 /* SLTv4_HW_Definitions.h in SLTv4_Copy */,
+			);
+			name = SLTv4_Copy;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8493CC870C99FA6D00B46CD4 /* cPCI_Code Copy */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2108,6 +2137,19 @@
 		842162F7043E6317005F64B1 /* ORSelectionTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORSelectionTask.m; sourceTree = "<group>"; };
 		842162FA043E6317005F64B1 /* NetSocket.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NetSocket.h; sourceTree = "<group>"; };
 		842162FB043E6317005F64B1 /* NetSocket.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NetSocket.m; sourceTree = "<group>"; };
+		842251240D8845390048D331 /* IpeV4SLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeV4SLT.nib; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/IpeV4SLT.nib"; sourceTree = SOURCE_ROOT; };
+		842251250D8845390048D331 /* IpeV4SLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = IpeV4SLTCard.gif; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/IpeV4SLTCard.gif"; sourceTree = SOURCE_ROOT; };
+		842251260D8845390048D331 /* ORIpeV4SLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4SLTController.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTController.h"; sourceTree = SOURCE_ROOT; };
+		842251270D8845390048D331 /* ORIpeV4SLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4SLTController.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTController.m"; sourceTree = SOURCE_ROOT; };
+		842251280D8845390048D331 /* ORIpeV4SLTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4SLTDecoder.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTDecoder.h"; sourceTree = SOURCE_ROOT; };
+		842251290D8845390048D331 /* ORIpeV4SLTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4SLTDecoder.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTDecoder.m"; sourceTree = SOURCE_ROOT; };
+		8422512A0D8845390048D331 /* ORIpeV4SLTDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4SLTDefs.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTDefs.h"; sourceTree = SOURCE_ROOT; };
+		8422512B0D8845390048D331 /* ORIpeV4SLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeV4SLTModel.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTModel.h"; sourceTree = SOURCE_ROOT; };
+		8422512C0D8845390048D331 /* ORIpeV4SLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4SLTModel.m; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/ORIpeV4SLTModel.m"; sourceTree = SOURCE_ROOT; };
+		8422512E0D8845390048D331 /* HW_Readout.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = HW_Readout.c; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code/HW_Readout.c"; sourceTree = SOURCE_ROOT; };
+		8422512F0D8845390048D331 /* HW_Readout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HW_Readout.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code/HW_Readout.h"; sourceTree = SOURCE_ROOT; };
+		842251300D8845390048D331 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code/Makefile"; sourceTree = SOURCE_ROOT; };
+		842251310D8845390048D331 /* SLTv4_HW_Definitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SLTv4_HW_Definitions.h; path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code/SLTv4_HW_Definitions.h"; sourceTree = SOURCE_ROOT; };
 		842509C6067FAC9D0037C568 /* ORTimeAxis.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORTimeAxis.m; path = Source/Widgets/Plotting/ORTimeAxis.m; sourceTree = SOURCE_ROOT; };
 		842509C7067FAC9D0037C568 /* ORTimeAxis.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORTimeAxis.h; path = Source/Widgets/Plotting/ORTimeAxis.h; sourceTree = SOURCE_ROOT; };
 		8425384B0BC6E006004C8065 /* HP6622a.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HP6622a.nib; path = Source/Objects/Hardware/GPIB/HP6622a/HP6622a.nib; sourceTree = SOURCE_ROOT; };
@@ -4595,6 +4637,36 @@
 			path = NetSocket;
 			sourceTree = "<group>";
 		};
+		842251230D8845390048D331 /* IpeV4 SLT */ = {
+			isa = PBXGroup;
+			children = (
+				842251240D8845390048D331 /* IpeV4SLT.nib */,
+				842251250D8845390048D331 /* IpeV4SLTCard.gif */,
+				842251260D8845390048D331 /* ORIpeV4SLTController.h */,
+				842251270D8845390048D331 /* ORIpeV4SLTController.m */,
+				842251280D8845390048D331 /* ORIpeV4SLTDecoder.h */,
+				842251290D8845390048D331 /* ORIpeV4SLTDecoder.m */,
+				8422512A0D8845390048D331 /* ORIpeV4SLTDefs.h */,
+				8422512B0D8845390048D331 /* ORIpeV4SLTModel.h */,
+				8422512C0D8845390048D331 /* ORIpeV4SLTModel.m */,
+				8422512D0D8845390048D331 /* SLTv4_Readout_Code */,
+			);
+			name = "IpeV4 SLT";
+			path = "Source/Objects/Hardware/IPE/IpeV4 SLT";
+			sourceTree = SOURCE_ROOT;
+		};
+		8422512D0D8845390048D331 /* SLTv4_Readout_Code */ = {
+			isa = PBXGroup;
+			children = (
+				8422512E0D8845390048D331 /* HW_Readout.c */,
+				8422512F0D8845390048D331 /* HW_Readout.h */,
+				842251300D8845390048D331 /* Makefile */,
+				842251310D8845390048D331 /* SLTv4_HW_Definitions.h */,
+			);
+			name = SLTv4_Readout_Code;
+			path = "Source/Objects/Hardware/IPE/IpeV4 SLT/SLTv4_Readout_Code";
+			sourceTree = SOURCE_ROOT;
+		};
 		8425384A0BC6E006004C8065 /* HP6622a */ = {
 			isa = PBXGroup;
 			children = (
@@ -6921,6 +6993,7 @@
 				84F46F0A0CA44255007EFADA /* IPE Base Classes */,
 				84F46F110CA44255007EFADA /* IPE Crate */,
 				84FDF5450D7F084E003AE119 /* IpeV4 Crate */,
+				842251230D8845390048D331 /* IpeV4 SLT */,
 				84F46F1A0CA44255007EFADA /* IPE FLT */,
 				84F46F240CA44255007EFADA /* IPE SLT */,
 				84F46F2D0CA44255007EFADA /* Katrin FLT */,
@@ -8210,6 +8283,12 @@
 				84FDF5520D7F084E003AE119 /* ORIpeV4CrateController.h in Headers */,
 				84FDF5540D7F084E003AE119 /* ORIpeV4CrateModel.h in Headers */,
 				84FDF5560D7F084E003AE119 /* ORIpeV4CrateView.h in Headers */,
+				842251340D8845390048D331 /* ORIpeV4SLTController.h in Headers */,
+				842251360D8845390048D331 /* ORIpeV4SLTDecoder.h in Headers */,
+				842251380D8845390048D331 /* ORIpeV4SLTDefs.h in Headers */,
+				842251390D8845390048D331 /* ORIpeV4SLTModel.h in Headers */,
+				8422513C0D8845390048D331 /* HW_Readout.h in Headers */,
+				8422513E0D8845390048D331 /* SLTv4_HW_Definitions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8229,6 +8308,7 @@
 				8493D2A60C99FBF100B46CD4 /* SBC_Code Copy */,
 				8493CC870C99FA6D00B46CD4 /* cPCI_Code Copy */,
 				8493CC890C99FA9B00B46CD4 /* VME_Copy */,
+				842241B00D85EA7F0048D331 /* SLTv4_Copy */,
 			);
 			buildRules = (
 				9C2595AC0D5171B90039C5DF /* PBXBuildRule */,
@@ -8720,6 +8800,8 @@
 				84FDF54F0D7F084E003AE119 /* IpeV4Crate.nib in Resources */,
 				84FDF5500D7F084E003AE119 /* IpeV4Crate.tif in Resources */,
 				84FDF5510D7F084E003AE119 /* IpeV4CrateBig.tif in Resources */,
+				842251320D8845390048D331 /* IpeV4SLT.nib in Resources */,
+				842251330D8845390048D331 /* IpeV4SLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9314,6 +9396,9 @@
 				84FDF5530D7F084E003AE119 /* ORIpeV4CrateController.m in Sources */,
 				84FDF5550D7F084E003AE119 /* ORIpeV4CrateModel.m in Sources */,
 				84FDF5570D7F084E003AE119 /* ORIpeV4CrateView.m in Sources */,
+				842251350D8845390048D331 /* ORIpeV4SLTController.m in Sources */,
+				842251370D8845390048D331 /* ORIpeV4SLTDecoder.m in Sources */,
+				8422513A0D8845390048D331 /* ORIpeV4SLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
