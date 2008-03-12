@@ -641,6 +641,14 @@
 	else return 0;
 }
 
+- (BOOL) outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
+{
+	if(![model useFilter]){
+		return YES;
+	}
+	else return NO;
+}
+
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
 {
     return YES;
