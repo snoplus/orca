@@ -386,12 +386,14 @@
 
 - (IBAction) startRunAction:(id)sender
 {
+	[self endEditing];
 	if([runControl isRunning])[runControl restartRun];
 	else [runControl startRun];
 }
 
 - (IBAction) stopRunAction:(id)sender
 {
+	[self endEditing];
 	[runControl haltRun];
 }
 
