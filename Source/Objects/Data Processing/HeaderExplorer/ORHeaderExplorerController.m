@@ -656,7 +656,8 @@
 
 - (NSDragOperation) tableView:(NSTableView *) aTableView validateDrop:(id <NSDraggingInfo>) info proposedRow:(int) row proposedDropOperation:(NSTableViewDropOperation) operation
 {
-    return NSDragOperationAll;
+	if(![model useFilter])return NSDragOperationAll;
+	else return NSDragOperationNone;
 }
 
 - (BOOL)tableView:(NSTableView*)aTableView acceptDrop:(id <NSDraggingInfo>)info row:(int)row dropOperation:(NSTableViewDropOperation)op

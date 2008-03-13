@@ -120,6 +120,7 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 
 - (void) replace:(int)index withSearchKey:(NSString*)aKey
 {
+    if(!searchKeys)searchKeys = [[NSMutableArray array] retain];
 	[searchKeys replaceObjectAtIndex:index withObject:aKey];
     [[NSNotificationCenter defaultCenter]
 			    postNotificationName:ORHeaderExplorerSearchKeysChanged
@@ -128,6 +129,7 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 
 - (void) insert:(int)index withSearchKey:(NSString*)aKey
 {
+    if(!searchKeys)searchKeys = [[NSMutableArray array] retain];
 	if(index>[searchKeys count])[searchKeys addObject:aKey];
 	else [searchKeys insertObject:aKey atIndex:index];
     [[NSNotificationCenter defaultCenter]
