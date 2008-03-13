@@ -582,9 +582,18 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
         NSArray* totalList = [anObj familyList];    
         NSEnumerator* e = [totalList objectEnumerator];
         id objToBeRemoved;
+		id controllersToRemove;
         while(objToBeRemoved = [e nextObject]){
-            id controllersToRemove = [self findControllersWithModel:objToBeRemoved];
+            controllersToRemove = [self findControllersWithModel:objToBeRemoved];
             [orcaControllers removeObjectsInArray:controllersToRemove];
+			//tricky, we also have to worry about objects that have subobjects that have dialogs
+			id subObjectsToBeRemoved = [objToBeRemoved subObjectsThatMayHaveDialogs];
+			NSEnumerator* e1 = [subObjectsToBeRemoved objectEnumerator];
+			id subObjectToBeRemoved;
+			while(subObjectToBeRemoved = [e1 nextObject]){
+				controllersToRemove = [self findControllersWithModel:subObjectToBeRemoved];
+	            [orcaControllers removeObjectsInArray:controllersToRemove];
+			}
         }
     }
     

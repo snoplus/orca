@@ -672,6 +672,13 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     else return nil;
 }
 
+- (NSArray*) subObjectsThatMayHaveDialogs
+{
+	//subclasses can override as needed.
+	return nil;
+}
+
+
 - (id) findObjectWithFullID:(NSString*)aFullID;
 {
     if([aFullID isEqualToString:[self fullID]])return self;

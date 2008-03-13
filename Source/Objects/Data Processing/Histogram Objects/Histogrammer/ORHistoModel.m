@@ -137,6 +137,11 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	return theCollection;
 }
 
+- (NSArray*) subObjectsThatMayHaveDialogs
+{
+	return [dataSet collectionOfDataSets];
+}
+
 - (id) objectForKeyArray:(NSMutableArray*)anArray
 {
 	return [dataSet objectForKeyArray:anArray] ;

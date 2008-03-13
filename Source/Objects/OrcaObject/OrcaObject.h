@@ -150,6 +150,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (NSArray*) collectConnectedObjectsOfClass:(Class)aClass;
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol;
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
+- (NSArray*) subObjectsThatMayHaveDialogs;
 - (id) findObjectWithFullID:(NSString*)aFullID;
 - (void) postWarning:(NSString*)warningString;
 

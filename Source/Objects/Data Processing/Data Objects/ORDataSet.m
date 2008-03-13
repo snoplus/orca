@@ -230,6 +230,22 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     return collection;
 }
 
+- (NSArray*) collectionOfDataSets
+{
+    NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
+	[collection addObject:self];
+	if(data) [collection addObject:data]; //leaf node
+	else {
+		NSEnumerator* e  = [realDictionary keyEnumerator];
+		id aKey;
+		while(aKey = [e nextObject]){
+			[collection addObjectsFromArray:[[realDictionary objectForKey:aKey] collectionOfDataSets]];
+		}	
+	}
+	return collection;
+}
+
+
 #pragma mark •••Primative NSDictionary Methods
 - (unsigned) count
 {

@@ -735,7 +735,7 @@ int filterGraph(nodeType*);
 {
 	unsigned long p[2];
 	p[0] = dataId1D | 2;
-	p[1] = (i & 0xff) << 16 | (aValue & 0xffff);
+	p[1] = (i & 0xff) << 24 | (aValue & 0x00ffffff);
 	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:2];
 	[transferDataPacket addFrameBuffer:YES];
 	//pass it on
@@ -748,8 +748,8 @@ int filterGraph(nodeType*);
 {
 	unsigned long p[2];
 	p[0] = dataId2D | 3;
-	p[1] = (i & 0xff) << 16 | (x & 0xff);
-	p[2] = (y & 0xff);
+	p[1] = (i & 0xff) << 24 | (x & 0xffff);
+	p[2] = (y & 0xffff);
 	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:3];
 	[transferDataPacket addFrameBuffer:YES];
 	//pass it on
@@ -895,8 +895,8 @@ int filterGraph(nodeType*);
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 2;
 
-    unsigned short index  = (ptr[1]&0x0fff0000)>>16;
-    unsigned long  value = ptr[1]&0x00000fff;
+    unsigned short index  = (ptr[1]&0xff00000)>>24;
+    unsigned long  value = ptr[1]&0x00ffffff;
 
     [aDataSet histogram:value numBins:4096  sender:self  withKeys:@"Filter",
 		[NSString stringWithFormat:@"%d",index],
@@ -908,8 +908,8 @@ int filterGraph(nodeType*);
 {
     NSString* title= @"Filter Record (1D)\n\n";
     
-    NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ptr[1]&0x00000fff];    
-    NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0x0fff0000)>>16];    
+    NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ptr[1]&0x00ffffff];    
+    NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0xff00000)>>24];    
 
     return [NSString stringWithFormat:@"%@%@%@",title,value,index];               
 }
@@ -923,8 +923,8 @@ int filterGraph(nodeType*);
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 3;
 
-    [aDataSet histogram2DX:ptr[1]&0x00000fff y:ptr[2]&0x00000fff size:256  sender:self  
-		withKeys:@"Filter2D",[NSString stringWithFormat:@"%d",(ptr[1]&0x0fff0000)>>16],
+    [aDataSet histogram2DX:ptr[1]&0x0000ffff y:ptr[2]&0x0000ffff size:256  sender:self  
+		withKeys:@"Filter2D",[NSString stringWithFormat:@"%d",(ptr[1]&0xff00000)>>24],
         nil];
 
 
@@ -935,9 +935,9 @@ int filterGraph(nodeType*);
 {
     NSString* title= @"Filter Record (2D)\n\n";
     
-    NSString* index   = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0x0fff0000)>>16];    
-    NSString* valueX  = [NSString stringWithFormat: @"ValueX = %d\n",ptr[1]&0x00000fff];    
-    NSString* valueY  = [NSString stringWithFormat: @"ValueY = %d\n",ptr[2]&0x00000fff];    
+    NSString* index   = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0xff00000)>>24];    
+    NSString* valueX  = [NSString stringWithFormat: @"ValueX = %d\n",ptr[1]&0x0000ffff];    
+    NSString* valueY  = [NSString stringWithFormat: @"ValueY = %d\n",ptr[2]&0x0000ffff];    
 
     return [NSString stringWithFormat:@"%@%@%@%@",title,valueX,valueY,index];               
 }

@@ -288,7 +288,7 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
 {
     if([gates count]){
 		[gates removeObject:[self activeGate]];
-		[self setActiveGateIndex:activeGateIndex%[gates count]];
+		if([gates count])[self setActiveGateIndex:activeGateIndex%[gates count]];
 		//[gates makeObjectsPerformSelector:@selector(postNewGateID) withObject:nil];
     }
 }
