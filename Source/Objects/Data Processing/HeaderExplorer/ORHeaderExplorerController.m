@@ -73,19 +73,24 @@
 
 #pragma  mark •••Actions
 
-- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-    NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%d.selectedtab",[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-	
-}
-
-- (void) useFilterAction:(id)sender
+- (IBAction) useFilterAction:(id)sender
 {
 	[self endEditing];
 	[model setUseFilter:[sender intValue]];	
 	[model loadHeader];
+}
+
+- (IBAction) plotFilteredData:(id)sender
+{
+	NSIndexSet* selectedSet = [searchKeyTableView selectedRowIndexes];
+	if([selectedSet count]){
+		unsigned i = [selectedSet firstIndex];
+		while (i != NSNotFound){
+			[model assembleDataForPlotting:i];
+			i = [selectedSet indexGreaterThanIndex: i];
+		}
+
+	}
 }
 
 - (IBAction) doubleClick:(id)sender
@@ -377,11 +382,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(textDidChange:)
-                         name : ORHeaderExplorerUseFilterChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(searchEditedChanged:)
                          name : NSControlTextDidChangeNotification
 						object: nil];
@@ -399,6 +399,7 @@
 	[self autoProcessChanged:nil];
 	[self useFilterChanged:nil];
 	[self searchKeysChanged:nil];
+	[self tableViewSelectionDidChange:nil];
 }
 
 
@@ -704,8 +705,10 @@
 			[headerView reloadData];
 		}
 	}
-	if([aNote object] == searchKeyTableView){
-		[removeSearchKeyButton setEnabled:[[searchKeyTableView selectedRowIndexes] count]>0];
+	if([aNote object] == searchKeyTableView || !aNote){
+		int n = [[searchKeyTableView selectedRowIndexes] count];
+		[removeSearchKeyButton setEnabled:n>0];
+		[printButton setEnabled:n>0];
 	}
 }
 
@@ -717,6 +720,14 @@
 		return YES;
     }
 	return NO;
+}
+
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    NSString* key = [NSString stringWithFormat: @"orca.ORHeaderExplorer%d.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+	
 }
 
 #pragma mark •••Data Source

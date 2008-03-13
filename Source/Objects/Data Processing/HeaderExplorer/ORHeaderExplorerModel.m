@@ -281,34 +281,43 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 								object: self];
 }
 
+- (NSMutableDictionary*) filteredHeader:(id)aHeader
+{
+	int index;
+	int n = [searchKeys count];
+	id headerData;
+	NSMutableDictionary* filteredStuff = [NSMutableDictionary dictionary];
+	if(n){
+		for(index = 0;index<n;index++){
+			id searchKey = [searchKeys objectAtIndex:index];
+			NSString* s = searchKey;
+			if([searchKey hasSuffix:@"/"])s = [searchKey substringToIndex:[searchKey length]-1];
+			NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[s componentsSeparatedByString:@"/"]]; //must be mutable
+			headerData = [aHeader objectForKeyArray:keyArray];
+			if(headerData){
+				[filteredStuff setObject:headerData forKey:[NSString stringWithFormat:@"Key %d",index]];
+			}
+		}
+		if([filteredStuff count]){
+			return filteredStuff;
+		}
+		else return aHeader;
+
+	}
+	else return aHeader;
+}
+
 - (void) loadHeader
 {
 	if(selectedRunIndex>=0 && selectedRunIndex<[runArray count]){
 		id aHeader = [[runArray objectAtIndex:selectedRunIndex] objectForKey:@"FileHeader"];
-		int index;
-		int n = [searchKeys count];
-		id headerData;
-		NSMutableDictionary* filteredStuff = [NSMutableDictionary dictionary];
-		if(n){
-			for(index = 0;index<n;index++){
-				id searchKey = [searchKeys objectAtIndex:index];
-				if(useFilter){
-					NSString* s = searchKey;
-					if([searchKey hasSuffix:@"/"])s = [searchKey substringToIndex:[searchKey length]-1];
-					NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[s componentsSeparatedByString:@"/"]]; //must be mutable
-					headerData = [aHeader objectForKeyArray:keyArray];
-					if(headerData){
-						[filteredStuff setObject:headerData forKey:[NSString stringWithFormat:@"Key %d",index]];
-					}
-				}
-			}
-			if([filteredStuff count]){
-				[self setHeader:[ORHeaderItem headerFromObject:filteredStuff named:@"Root"]];
-			}
-			else [self setHeader:[ORHeaderItem headerFromObject:aHeader named:@"Root"]];
-
+		if(useFilter){
+			NSMutableDictionary* filteredStuff = [self filteredHeader:aHeader];
+			[self setHeader:[ORHeaderItem headerFromObject:filteredStuff named:@"Root"]];
 		}
-		else [self setHeader:[ORHeaderItem headerFromObject:aHeader named:@"Root"]];
+		else {
+			[self setHeader:[ORHeaderItem headerFromObject:aHeader named:@"Root"]];
+		}
 	}
 	else [self setHeader:nil];
 }
@@ -371,6 +380,55 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 		else {
 			[self setSelectedRunIndex: -1];
 			[self setHeader:nil];
+		}
+	}
+}
+- (void) assembleDataForPlotting
+{
+	if(useFilter){
+		int n = [searchKeys count];
+		int i;
+		for(i=0;i<n;i++){
+			[self assembleDataForPlotting:i];
+		}
+	}
+}
+
+- (void) assembleDataForPlotting:(int)keyNumber
+{
+	NSLog(@"Key %d : %@ (by Run Number)\n",keyNumber,[searchKeys objectAtIndex:keyNumber]);
+	int n = [runArray count];
+	int i;
+	for(i=0;i<n;i++){
+		NSNumber* runNumber = [[runArray objectAtIndex:i] objectForKey:@"RunNumber"];
+		id aHeader = [[runArray objectAtIndex:i] objectForKey:@"FileHeader"];
+		NSMutableDictionary* filteredStuff = [self filteredHeader:aHeader];
+		if(filteredStuff){
+			ORHeaderItem* headerItem = [ORHeaderItem headerFromObject:filteredStuff named:@"Root"];
+			//there are only certain things we can plot, namely arrays and values
+			//A valid plot set will be at Root/Key n/array or Root/Key n/value
+			if([[headerItem name] isEqualToString:@"Root"]){
+				ORHeaderItem* keyItem = [[headerItem items] objectAtIndex:keyNumber];
+				if([[keyItem name] hasPrefix:@"Key"]){
+					if([keyItem object]){
+						NSLog(@"%@ %@\n",runNumber, [keyItem object]);
+					}
+					else {
+						NSArray* array = [keyItem items];
+						int n = [array count];
+						int i;
+						for(i=0;i<n;i++){
+							ORHeaderItem* lowestItem = headerItem = [array objectAtIndex:i];
+							if([lowestItem object]){
+								NSLog(@"%@ %@\n",runNumber, [lowestItem object]);
+							}
+						}						
+					}
+				}
+				else {
+					NSLog(@"Not valid\n");
+				}
+			}
 		}
 	}
 }

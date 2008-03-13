@@ -82,6 +82,7 @@
 - (ORHeaderItem *)header;
 - (void)setHeader:(ORHeaderItem *)aHeader;
 - (void) loadHeader;
+- (NSMutableDictionary*) filteredHeader:(id)aHeader;
 - (BOOL)isProcessing;
 - (NSString *) lastListPath;
 - (void) setLastListPath: (NSString *) aSetLastListPath;
@@ -99,8 +100,9 @@
 - (void) readHeaders;
 - (void) findSelectedRunByDate;
 - (void) findSelectedRunByIndex:(int)anIndex;
+- (void) assembleDataForPlotting;
+- (void) assembleDataForPlotting:(int)keyNumber;
 
-#pragma mark •••Data Handling
 - (void) readNextFile;
 
 #pragma mark •••Archival

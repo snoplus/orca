@@ -47,6 +47,8 @@
 				<string>id</string>
 				<key>loadListAction</key>
 				<string>id</string>
+				<key>plotFilteredData</key>
+				<string>id</string>
 				<key>removeItemAction</key>
 				<string>id</string>
 				<key>replayButtonAction</key>
@@ -75,6 +77,8 @@
 				<key>headerView</key>
 				<string>NSOutlineView</string>
 				<key>loadButton</key>
+				<string>NSButton</string>
+				<key>printButton</key>
 				<string>NSButton</string>
 				<key>progressField</key>
 				<string>NSTextField</string>

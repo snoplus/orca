@@ -24,6 +24,7 @@
     @private
 		IBOutlet NSButton* 		addSearchKeyButton;
 		IBOutlet NSButton* 		removeSearchKeyButton;
+		IBOutlet NSButton* 		printButton;
 		IBOutlet NSButton* 		selectButton;
 		IBOutlet NSButton*		useFilterCB;
 		IBOutlet NSTableView*	searchKeyTableView;
@@ -47,21 +48,6 @@
 		BOOL					sliderDrag;
 }
 
-#pragma  mark •••Actions
-- (IBAction) useFilterAction:(id)sender;
-- (IBAction) autoProcessAction:(id)sender;
-- (IBAction) selectButtonAction:(id)sender;
-- (IBAction) replayButtonAction:(id)sender;
-- (IBAction) delete:(id)sender;
-- (IBAction) cut:(id)sender;
-- (IBAction) removeItemAction:(id)sender;
-- (IBAction) saveListAction:(id)sender;
-- (IBAction) loadListAction:(id)sender;
-- (IBAction) selectionDateAction:(id)sender;
-- (IBAction) doubleClick:(id)sender;
-- (IBAction)addSearchKeys:(id)sender;
-- (IBAction)deleteSearchKeys:(id)sender;
-
 #pragma mark •••Interface Management
 - (void) searchEditedChanged:(NSNotification*)aNote;
 - (void) useFilterChanged:(NSNotification*)aNote;
@@ -80,6 +66,23 @@
 - (void) findSelectedRunByDate;
 - (void) setRunBoundaryTimes;
 - (void) tableViewSelectionDidChange:(NSNotification *)aNote;
+
+#pragma  mark •••Actions
+- (IBAction) useFilterAction:(id)sender;
+- (IBAction) autoProcessAction:(id)sender;
+- (IBAction) selectButtonAction:(id)sender;
+- (IBAction) replayButtonAction:(id)sender;
+- (IBAction) delete:(id)sender;
+- (IBAction) cut:(id)sender;
+- (IBAction) removeItemAction:(id)sender;
+- (IBAction) saveListAction:(id)sender;
+- (IBAction) loadListAction:(id)sender;
+- (IBAction) selectionDateAction:(id)sender;
+- (IBAction) doubleClick:(id)sender;
+- (IBAction)addSearchKeys:(id)sender;
+- (IBAction)deleteSearchKeys:(id)sender;
+- (IBAction) plotFilteredData:(id)sender;
+
 
 #pragma mark •••Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex;
