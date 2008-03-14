@@ -30,7 +30,7 @@
 #import "ORIP320Channel.h"
 #include <math.h>
 
-#define DELAYTIME .00003 //30 microsecond delay to allow for the 8.5 microsecond settling time of the input
+#define DELAYTIME .00005 //50 microsecond delay to allow for the 8.5 microsecond settling time of the input
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORIP320ModelDisplayRawChanged = @"ORIP320ModelDisplayRawChanged";
