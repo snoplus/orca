@@ -1,55 +1,136 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {
-            ACTIONS = {taskFinished = id; tasksCompleted = id; }; 
-            CLASS = NSObject; 
-            LANGUAGE = ObjC; 
-        }, 
-        {CLASS = NSView; LANGUAGE = ObjC; SUPERCLASS = NSResponder; }, 
-        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            ACTIONS = {
-                displayRawAction = id; 
-                enableAlarmAllAction = id; 
-                enableAlarmNoneAction = id; 
-                enablePollAllAction = id; 
-                enablePollNoneAction = id; 
-                readAll = id; 
-                setCalibration = id; 
-                setCardJumperSettings = id; 
-                setPollingAction = id; 
-            }; 
-            CLASS = ORIP320Controller; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                alarmTable1 = NSTableView; 
-                alarmTable2 = NSTableView; 
-                calibrationTable1 = NSTableView; 
-                calibrationTable2 = NSTableView; 
-                cardSettingsMatrix = NSMatrix; 
-                displayRawCB = NSButton; 
-                pollingButton = NSPopUpButton; 
-                tabView = NSTabView; 
-                valueTable1 = NSTableView; 
-                valueTable2 = NSTableView; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
-        {
-            ACTIONS = {
-                copy = id; 
-                decDialog = id; 
-                incDialog = id; 
-                saveDocument = id; 
-                saveDocumentAs = id; 
-            }; 
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>displayRawAction</key>
+				<string>id</string>
+				<key>enableAlarmAllAction</key>
+				<string>id</string>
+				<key>enableAlarmNoneAction</key>
+				<string>id</string>
+				<key>enablePollAllAction</key>
+				<string>id</string>
+				<key>enablePollNoneAction</key>
+				<string>id</string>
+				<key>readAll</key>
+				<string>id</string>
+				<key>setCalibration</key>
+				<string>id</string>
+				<key>setCardJumperSettings</key>
+				<string>id</string>
+				<key>setPollingAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORIP320Controller</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>alarmTable1</key>
+				<string>NSTableView</string>
+				<key>alarmTable2</key>
+				<string>NSTableView</string>
+				<key>calibrationTable1</key>
+				<string>NSTableView</string>
+				<key>calibrationTable2</key>
+				<string>NSTableView</string>
+				<key>cardSettingsMatrix</key>
+				<string>NSMatrix</string>
+				<key>displayRawCB</key>
+				<string>NSButton</string>
+				<key>pollingButton</key>
+				<string>NSPopUpButton</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
+				<key>valueTable1</key>
+				<string>NSTableView</string>
+				<key>valueTable2</key>
+				<string>NSTableView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
