@@ -210,35 +210,37 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
     }
     if(hwObject){
-
         NSBezierPath* path = [NSBezierPath bezierPath];
         if(maxValue-minValue != 0){
             NSPoint theCenter = NSMakePoint((theIconSize.width-10.)/2.+1.,27.);
-			float slope     = -180./(maxValue-minValue);
-			float intercept = 90;
-            if(lowLimit>minValue){
-                float lowLimitAngle = slope*lowLimit + intercept;
-                [path appendBezierPathWithArcWithCenter:theCenter radius:30.
-                            startAngle:lowLimitAngle endAngle:180.];
-                [path lineToPoint:theCenter];
-                [path closePath];
-                [[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
-                [path fill];
-                [path removeAllPoints];
+           if(lowLimit>minValue){
+                float lowLimitAngle = 180*(lowLimit-minValue)/(maxValue-minValue);
+				if(lowLimitAngle>=0 && lowLimitAngle<=180){
+					[path appendBezierPathWithArcWithCenter:theCenter radius:30.
+								startAngle:0 endAngle:lowLimitAngle];
+					[path lineToPoint:theCenter];
+					[path closePath];
+					[[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
+					[path fill];
+					[path removeAllPoints];
+				}
             }
             if(highLimit<maxValue){
-                 float highLimitAngle = slope*highLimit + intercept;
-                [path appendBezierPathWithArcWithCenter:theCenter radius:30.
-                            startAngle:0. endAngle:highLimitAngle];
-                [path lineToPoint:theCenter];
-                [path closePath];
-                [[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
-                [path fill];
-                [path removeAllPoints];
+				float highLimitAngle = 180*(highLimit-minValue)/(maxValue-minValue);
+				if(highLimitAngle>=0 && highLimitAngle<=180){
+
+					[path appendBezierPathWithArcWithCenter:theCenter radius:30.
+                            startAngle:highLimitAngle endAngle:180.];
+					[path lineToPoint:theCenter];
+					[path closePath];
+					[[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
+					[path fill];
+					[path removeAllPoints];
+				}
             }
             
 			NSBezierPath* needlepath = [NSBezierPath bezierPath];
-			float needleAngle = slope*hwValue + intercept;
+			float needleAngle = 180*(hwValue-minValue)/(maxValue-minValue);
             [needlepath appendBezierPathWithArcWithCenter:theCenter radius:30.
                         startAngle:needleAngle endAngle:needleAngle];
             [needlepath lineToPoint:theCenter];
