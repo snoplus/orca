@@ -214,7 +214,8 @@ const float CTSmallLabelSize = 11.;
 
 - (void)badgeApplicationDockIconWithValue:(unsigned)value insetX:(float)dx y:(float)dy
   {
-  NSImage *appIcon      = [NSImage imageNamed:@"NSApplicationIcon"];
+  //MAH 3/14/08 commented out -- seems to crash 10.5 sometimes.... will convert to the 10.5 when everone has updated
+/*  NSImage *appIcon      = [NSImage imageNamed:@"NSApplicationIcon"];
   NSImage *badgeOverlay = [self badgeOverlayImageForValue:value insetX:dx y:dy];
   
   //Put the appIcon underneath the badgeOverlay
@@ -223,6 +224,7 @@ const float CTSmallLabelSize = 11.;
   [badgeOverlay unlockFocus];
   
   [NSApp setApplicationIconImage:badgeOverlay];
+*/
   }
 
 #pragma mark -
