@@ -30,7 +30,7 @@
 #import "ORIP320Channel.h"
 #include <math.h>
 
-
+#define DELAYTIME .00003 //30 microsecond delay to allow for the 8.5 microsecond settling time of the input
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORIP320ModelDisplayRawChanged = @"ORIP320ModelDisplayRawChanged";
@@ -152,7 +152,8 @@ static struct {
 
 }
 
-- (void) setCardCalibration{
+- (void) setCardCalibration
+{
 	int countergain=0;
 	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 	switch(cardJumperSetting){
@@ -197,14 +198,16 @@ static struct {
 // ===========================================================
 // - chanObjs:
 // ===========================================================
-- (NSMutableArray *)chanObjs {
+- (NSMutableArray *)chanObjs
+{
     return chanObjs; 
 }
 
 // ===========================================================
 // - setChanObjs:
 // ===========================================================
-- (void)setChanObjs:(NSMutableArray *)aChanArray {
+- (void)setChanObjs:(NSMutableArray *)aChanArray 
+{
     [aChanArray retain];
     [chanObjs release];
     chanObjs = aChanArray;
@@ -332,10 +335,12 @@ static struct {
 		NS_DURING
 			errorLocation = @"Control Reg Setup";
 			[self loadConstants:aChannel];
+			[ORTimer delay:DELAYTIME];
+
 			errorLocation = @"Converion Start";
 			[self loadConversionStart];
 			errorLocation = @"Adc Read";
-			value=[self readDataBlock];
+			value+=[self readDataBlock];
 			corrected_value=[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] CountActual:value];
 			if([[chanObjs objectAtIndex:aChannel] setChannelValue:corrected_value])changeCount++;
 		NS_HANDLER
@@ -377,7 +382,6 @@ static struct {
 		aMaskCALHI|=kCAL3_mask;
 		aMaskCALHI|=(gain<<6);	
 	}
-	float kVoltCALHI=CalibrationConstants[gain].kVoltCALHI;
 	[[guardian adapter] writeWordBlock:&aMaskCALHI
 								atAddress:[self getRegisterAddress:kControlReg]
 								numToWrite:1L
@@ -456,7 +460,7 @@ static struct {
 				
 				errorLocation = @"CountCALLO Control Reg Setup";
 				[self loadCALLOControReg:gain];
-				[ORTimer delay:0.01];
+				[ORTimer delay:DELAYTIME];
 
 				unsigned short CountCALLO=0;
 				for(i=0;i<ReadNumber;i++){
