@@ -21,23 +21,31 @@
 
 @class ORPlotter2D;
 @class ORGateKey;
+@class ORPoint;
+@class ORCurve2D;
 
 @interface ORGate2D : NSObject {
+	ORCurve2D*		mCurve;
 	BOOL            displayGate;
 	ORGateKey*      cachedGate;
 	NSString*       displayedGateName;
-	int             gate1,gate2;
 	NSMutableArray* points;
+	ORPoint*		selectedPoint;	//x in x-axis coords, y in y-axis coords
 	BOOL			cmdKeyIsDown;
-	
+	BOOL			mouseIsDown;
+	BOOL			dragWholePath;
+	NSBezierPath*   theGatePath;
+	NSPoint			dragStartPoint;
+	BOOL			drawControlPoints;
+
 }
+- (id) initForCurve:(ORCurve2D*)aCurve;
 
 #pragma mark •••Accessors
 - (NSArray*)points;
 - (void) setPoints:(NSMutableArray*)somePoints;
 
 - (void) mouseDown:(NSEvent*)theEvent plotter:(ORPlotter2D*)aPlotter;
-- (void) doDrag:(NSEvent*)theEvent  plotter:(ORPlotter2D*)aPlotter;
 - (void) mouseDragged:(NSEvent*)theEvent plotter:(ORPlotter2D*)aPlotter;
 - (void) mouseUp:(NSEvent*)theEvent plotter:(ORPlotter2D*)aPlotter;
 - (void) analyzePlot:(ORPlotter2D*)aPlot;
@@ -45,14 +53,16 @@
 
 @end
 
+#define kPointSize 6
+
 @interface ORPoint : NSObject {
-	NSPoint point;
+	NSPoint xyPosition;
 }
 + (id) point:(NSPoint)aPoint;
 
 - (id) initWithPoint:(NSPoint)aPoint;
-- (NSPoint) point;
-- (void) setPoint:(NSPoint)aPoint;
+- (NSPoint) xyPosition;
+- (void) setXyPosition:(NSPoint)aPoint;
 - (void) drawPointInPlot:(ORPlotter2D*)aPlotter;
 
 @end

@@ -514,6 +514,13 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     }
 }
 
+-(void)	mouseUp:(NSEvent*)theEvent
+{
+	if([analysisDrawer state] == NSDrawerOpenState){
+        [curve mouseUp:theEvent plotter:self];
+    }
+}
+
 - (void) setShowActiveGate:(BOOL)flag
 {
     [curve setShowActiveGate:flag];
@@ -534,7 +541,7 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 - (IBAction) addGateAction:(id)sender
 {
     if([analysisDrawer state] == NSDrawerOpenState){
-		ORGate2D* aGate = [[[ORGate2D alloc] init] autorelease];
+		ORGate2D* aGate = [[[ORGate2D alloc] initForCurve:curve] autorelease];
 		[curve addGate: aGate];	
 		//ORAnalysisPanel1D* analysisPanel = [ORAnalysisPanel1D panel];
 		//[aGate setAnalysis:analysisPanel];

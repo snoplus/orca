@@ -31,7 +31,7 @@
     IBOutlet ORAxis*		mYScale;
     IBOutlet  id            mDataSource;    
 
-    id                      curve;
+    id						curve;
     NSMutableDictionary*	attributes;
 
     BOOL			shiftKeyIsDown;
@@ -102,6 +102,7 @@
 - (void) setVectorMode:(BOOL)state;
 - (void) mouseDown:(NSEvent*)theEvent;
 - (void) mouseDragged:(NSEvent*)theEvent;
+- (void) mouseUp:(NSEvent*)theEvent;
 - (void) setShowActiveGate:(BOOL)flag;
 - (void)flagsChanged:(NSEvent *)theEvent;
 
