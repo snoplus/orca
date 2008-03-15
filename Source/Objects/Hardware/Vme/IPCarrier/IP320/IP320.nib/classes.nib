@@ -54,11 +54,9 @@
 				<string>id</string>
 				<key>enablePollNoneAction</key>
 				<string>id</string>
+				<key>modeAction</key>
+				<string>id</string>
 				<key>readAll</key>
-				<string>id</string>
-				<key>setCalibration</key>
-				<string>id</string>
-				<key>setCardJumperSettings</key>
 				<string>id</string>
 				<key>setPollingAction</key>
 				<string>id</string>
@@ -77,10 +75,10 @@
 				<string>NSTableView</string>
 				<key>calibrationTable2</key>
 				<string>NSTableView</string>
-				<key>cardSettingsMatrix</key>
-				<string>NSMatrix</string>
 				<key>displayRawCB</key>
 				<string>NSButton</string>
+				<key>modePopUpButton</key>
+				<string>NSPopUpButton</string>
 				<key>pollingButton</key>
 				<string>NSPopUpButton</string>
 				<key>tabView</key>

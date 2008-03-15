@@ -30,18 +30,20 @@
 #import "ORIP320Channel.h"
 #include <math.h>
 
-#define DELAYTIME .00005 //50 microsecond delay to allow for the 8.5 microsecond settling time of the input
+#define KDelayTime .00005 //50 microsecond delay to allow for the 8.5 microsecond settling time of the input
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORIP320ModelDisplayRawChanged = @"ORIP320ModelDisplayRawChanged";
-NSString* ORIP320GainChangedNotification 		= @"ORIP320GainChangedNotification";
-NSString* ORIP320ModeChangedNotification 		= @"ORIP320ModeChangedNotification";
+NSString* ORIP320ModelDisplayRawChanged				= @"ORIP320ModelDisplayRawChanged";
+NSString* ORIP320GainChangedNotification			= @"ORIP320GainChangedNotification";
+NSString* ORIP320ModeChangedNotification			= @"ORIP320ModeChangedNotification";
 NSString* ORIP320AdcValueChangedNotification 		= @"ORIP320AdcValueChangedNotification";
 
 NSString* ORIP320WriteValueChangedNotification		= @"IP320 WriteValue Changed Notification";
 NSString* ORIP320ReadMaskChangedNotification 		= @"IP320 ReadMask Changed Notification";
 NSString* ORIP320ReadValueChangedNotification		= @"IP320 ReadValue Changed Notification";
 NSString* ORIP320PollingStateChangedNotification	= @"ORIP320PollingStateChangedNotification";
+NSString* ORIP320ModelModeChanged					= @"ORIP320ModelModeChanged";
+
 
 static struct {
     NSString* regName;
@@ -108,6 +110,20 @@ static struct {
 
 
 #pragma mark ¥¥¥Accessors
+- (void) setMode:(int)aMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMode:mode];
+    
+    mode = aMode;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelModeChanged object:self];
+
+}
+
+- (int) mode
+{
+	return mode;
+}
 
 - (BOOL) displayRaw
 {
@@ -276,7 +292,7 @@ static struct {
     unsigned short aMask = 0;
     aMask |= (aChannel%20 & kChan_mask);//bits 0-5
 	aMask |= [chanObj gain] << 6;       //bits 6-7
-	aMask |= [chanObj mode] << 8;       //bits 8-9
+	aMask |= [self mode] << 8;			//bits 8-9
         
 	[[guardian adapter] writeWordBlock:&aMask
 								 atAddress:[self getRegisterAddress:kControlReg]
@@ -335,12 +351,12 @@ static struct {
 		NS_DURING
 			errorLocation = @"Control Reg Setup";
 			[self loadConstants:aChannel];
-			[ORTimer delay:DELAYTIME];
+			[ORTimer delay:KDelayTime];
 
 			errorLocation = @"Converion Start";
 			[self loadConversionStart];
 			errorLocation = @"Adc Read";
-			value+=[self readDataBlock];
+			value += [self readDataBlock];
 			corrected_value=[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] CountActual:value];
 			if([[chanObjs objectAtIndex:aChannel] setChannelValue:corrected_value])changeCount++;
 		NS_HANDLER
@@ -354,30 +370,27 @@ static struct {
 //	NSLog(@"the corected value is %d\n",[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] CountActual:value]);
 	return corrected_value;
 }
+
 //Calibration routines
 - (void) loadCALHIControReg:(unsigned short)gain{
 	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 	unsigned short aMaskCALHI = 0x0000;
-	if((cardJumperSetting==kMinus5to5&&gain==0)||(cardJumperSetting==kMinus10to10&&gain<=1)||(cardJumperSetting==k0to10&&gain<=1))
-	{
+	if((cardJumperSetting==kMinus5to5&&gain==0)||(cardJumperSetting==kMinus10to10&&gain<=1)||(cardJumperSetting==k0to10&&gain<=1)){
 		CalibrationConstants[gain].kVoltCALHI=kCAL0_volt;
 		aMaskCALHI|=kCAL0_mask;
 		aMaskCALHI|=(gain<<6);	
 	}
-	else if((cardJumperSetting==kMinus5to5&&gain==1)||(cardJumperSetting==kMinus10to10&&gain==2)||(cardJumperSetting==k0to10&&gain==2))
-	{
+	else if((cardJumperSetting==kMinus5to5&&gain==1)||(cardJumperSetting==kMinus10to10&&gain==2)||(cardJumperSetting==k0to10&&gain==2)){
 		CalibrationConstants[gain].kVoltCALHI=kCAL1_volt;
 		aMaskCALHI|=kCAL1_mask;
 		aMaskCALHI|=(gain<<6);	
 	}
-	else if((cardJumperSetting==kMinus5to5&&gain==2)||(cardJumperSetting==kMinus10to10&&gain==3)||(cardJumperSetting==k0to10&&gain==3))
-	{
+	else if((cardJumperSetting==kMinus5to5&&gain==2)||(cardJumperSetting==kMinus10to10&&gain==3)||(cardJumperSetting==k0to10&&gain==3)){
 		CalibrationConstants[gain].kVoltCALHI=kCAL2_volt;
 		aMaskCALHI|=kCAL2_mask;
 		aMaskCALHI|=(gain<<6);	
 	}
-	else if(cardJumperSetting==kMinus5to5&&gain==3)
-	{
+	else if(cardJumperSetting==kMinus5to5&&gain==3){
 		CalibrationConstants[gain].kVoltCALHI=kCAL3_volt;
 		aMaskCALHI|=kCAL3_mask;
 		aMaskCALHI|=(gain<<6);	
@@ -460,7 +473,7 @@ static struct {
 				
 				errorLocation = @"CountCALLO Control Reg Setup";
 				[self loadCALLOControReg:gain];
-				[ORTimer delay:DELAYTIME];
+				[ORTimer delay:KDelayTime];
 
 				unsigned short CountCALLO=0;
 				for(i=0;i<ReadNumber;i++){
@@ -757,7 +770,10 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 		data[2] = now;	//seconds since 1970
 		int index = 3;
 		int i;
-		for(i=0;i<40;i++){
+		int n;
+		if(mode == 0) n = 20;
+		else n = 40;
+		for(i=0;i<n;i++){
 			if([[chanObjs objectAtIndex:i] readEnabled]){
 				int val  = [[chanObjs objectAtIndex:i] rawValue];
 				data[index++] = (i&0xff)<<16 | val & 0xfff;
@@ -790,10 +806,10 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 	configStruct->card_info[index].deviceSpecificData[1] = MAX(1.,(unsigned long)pollingState);
 	configStruct->card_info[index].deviceSpecificData[2] = [self lowMask];
 	configStruct->card_info[index].deviceSpecificData[3] = [self highMask];
+	configStruct->card_info[index].deviceSpecificData[4] = [self mode];
 	int i;
-	int j = 4;
+	int j = 5;
 	for(i=0;i<40;i++) configStruct->card_info[index].deviceSpecificData[j++] = [[chanObjs objectAtIndex:i] gain];		
-	for(i=0;i<40;i++) configStruct->card_info[index].deviceSpecificData[j++] = [[chanObjs objectAtIndex:i] mode];		
 	
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	

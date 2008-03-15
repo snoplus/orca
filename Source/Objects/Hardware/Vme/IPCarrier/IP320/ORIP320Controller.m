@@ -44,7 +44,7 @@
 - (void) awakeFromNib
 {
     adcValueSize    = NSMakeSize(385,422);
-    calibrationSize = NSMakeSize(520,385);
+    calibrationSize = NSMakeSize(520,430);
     alarmSize       = NSMakeSize(490,443);
     
     blankView = [[NSView alloc] init];
@@ -69,10 +69,6 @@
     [[[calibrationTable1 tableColumnWithIdentifier:k320ChannelGain ]dataCell]setFont:[NSFont systemFontOfSize:10]];
     [[[calibrationTable2 tableColumnWithIdentifier:k320ChannelGain ]dataCell]setFont:[NSFont systemFontOfSize:10]];
     
-    [[[calibrationTable1 tableColumnWithIdentifier:k320ChannelMode ]dataCell]setControlSize:NSSmallControlSize];
-    [[[calibrationTable2 tableColumnWithIdentifier:k320ChannelMode ]dataCell]setControlSize:NSSmallControlSize];
-    [[[calibrationTable1 tableColumnWithIdentifier:k320ChannelMode ]dataCell]setFont:[NSFont systemFontOfSize:10]];
-    [[[calibrationTable2 tableColumnWithIdentifier:k320ChannelMode ]dataCell]setFont:[NSFont systemFontOfSize:10]];
     
     int i;
     int val = 1;
@@ -83,11 +79,7 @@
         [popupCell addItemWithTitle:[NSString stringWithFormat:@"%d",val]];
         val *= 2;
 	}
-	
-    id popupCell = [[calibrationTable1 tableColumnWithIdentifier:k320ChannelMode ]dataCell];
-    [popupCell addItemWithTitle:@"Diff."];
-    [popupCell addItemWithTitle:@"Single"];
-	
+		
     [super awakeFromNib];
 }
 
@@ -116,6 +108,10 @@
                          name : ORIP320ModelDisplayRawChanged
 						object: model];
 
+   [notifyCenter addObserver : self
+                     selector : @selector(modeChanged:)
+                         name : ORIP320ModelModeChanged
+						object: model];
 }
 
 
@@ -137,12 +133,18 @@
     [self pollingStateChanged:nil];
 	[self valuesChanged:nil];
 	[self slotChanged:nil];
+	[self modeChanged:nil];
 	[self displayRawChanged:nil];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"IP320 (%@)",[model identifier]]];
+}
+
+- (void) modeChanged:(NSNotification*)aNotification
+{
+	[modePopUpButton selectItemWithTag:[model mode]];
 }
 
 - (void) valuesChanged:(NSNotification*)aNotification
@@ -196,10 +198,16 @@
 
 #pragma mark ¥¥¥Actions
 
-- (void) displayRawAction:(id)sender
+- (IBAction) displayRawAction:(id)sender
 {
 	[model setDisplayRaw:[sender intValue]];		
 }
+
+- (IBAction) modeAction:(id)sender
+{
+	[model setMode:[[sender selectedItem] tag]];
+}
+
 
 - (IBAction) readAll:(id)sender
 {
@@ -241,6 +249,19 @@
 
 
 #pragma mark ¥¥¥Data Source
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row
+{
+	if([model mode] == 1)return YES;
+	else {
+		if( tableView == valueTable2 || 
+			tableView == calibrationTable2 ||
+			tableView == alarmTable2 ) {
+				return NO;
+		}
+		else return YES;
+	}
+}
+
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
     rowIndex += [aTableView tag];

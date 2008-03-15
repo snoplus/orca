@@ -29,7 +29,6 @@
 #define k320ChannelValue @"k320ChannelValue"
 #define k320ChannelRawValue @"k320ChannelRawValue"
 #define k320ChannelGain @"k320ChannelGain"
-#define k320ChannelMode @"k320ChannelMode"
 #define k320ChannelUnits @"k320ChannelUnits"
 #define k320ChannelSlope @"k320ChannelSlope"
 #define k320ChannelIntercept @"k320ChannelIntercept"
@@ -53,7 +52,6 @@
 - (void) unableToSetNilForKey:(NSString*)aKey;
 - (void) setObject:(id)obj forKey:(id)aKey;
 - (void) checkAlarm;
-- (int)  mode;
 - (int)  gain;
 - (int)  channel;
 - (BOOL) readEnabled;

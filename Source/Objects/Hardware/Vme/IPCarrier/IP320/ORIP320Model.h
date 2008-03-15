@@ -87,7 +87,7 @@ short kCountCALHI;
     unsigned long   dataId;
 	BOOL			valuesReadyToShip;
     BOOL			displayRaw;
-	
+	int				mode;
 	
 	
 	//cached values -- valid ONLY during running
@@ -115,7 +115,8 @@ short kCountCALHI;
 - (void) setPollingState:(NSTimeInterval)aState;
 - (NSTimeInterval) pollingState;
 - (BOOL) hasBeenPolled;
-
+- (void)			setMode:(int)aMode;
+- (int)				mode;
 - (unsigned long)  getRegisterAddress:(short) aRegister;
 - (unsigned long)  getAddressOffset:(short) anIndex;
 - (NSString*)      getRegisterName:(short) anIndex;
@@ -167,4 +168,4 @@ extern NSString* ORIP320WriteValueChangedNotification;
 extern NSString* ORIP320ReadMaskChangedNotification;
 extern NSString* ORIP320ReadValueChangedNotification;
 extern NSString* ORIP320PollingStateChangedNotification;
-
+extern NSString* ORIP320ModelModeChanged;

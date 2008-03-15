@@ -99,21 +99,6 @@
 	}
 }
 
-
-- (int) mode
-{
-	int result = 0;
-	@synchronized(self){
-		int mode = [[parameters objectForKey:k320ChannelMode] intValue];
-		if([self channel]<20){
-			if(mode == 0)result = 0x0; //diff. input for channels 0-19
-			else result = 0x1;         //single ended input for channels 0-19
-		}
-		else result = 0x2; //channels 20-39 can only be single ended.
-	}
-	return result;
-}
-
 - (int) gain
 {
 	BOOL result;
@@ -247,14 +232,6 @@
     if(![parameters objectForKey:k320ChannelIntercept])[parameters setObject:[NSNumber numberWithDouble:0.0] forKey:k320ChannelIntercept];
     if(![parameters objectForKey:k320ChannelSlope])[parameters setObject:[NSNumber numberWithDouble:1.0] forKey:k320ChannelSlope];
     if(![parameters objectForKey:k320ChannelGain])[parameters setObject:[NSNumber numberWithInt:0] forKey:k320ChannelGain];
-    if(![parameters objectForKey:k320ChannelMode]){
-        if([self channel]< 20){
-            [parameters setObject:[NSNumber numberWithInt:0] forKey:k320ChannelMode];
-        }
-        else {
-            [parameters setObject:[NSNumber numberWithInt:1] forKey:k320ChannelMode];
-        }
-    }
     if(![parameters objectForKey:k320ChannelUnits])[parameters setObject:@"" forKey:k320ChannelUnits];
     if(![parameters objectForKey:k320ChannelAlarmEnabled])[parameters setObject:[NSNumber numberWithBool:NO] forKey:k320ChannelAlarmEnabled];
     if(![parameters objectForKey:k320ChannelLowValue])[parameters setObject:[NSNumber numberWithInt:0] forKey:k320ChannelLowValue];
