@@ -397,7 +397,8 @@ int32_t writeBuffer(SBC_Packet* aPacket)
     /* writeBuffer returns -1 if an error.  errno shoulc be set appropriately. */
     if(workingSocket < 0) return -1;
     aPacket->numBytes =  sizeof(int32_t) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket->cmdHeader.numberBytesinPayload; 
-    int32_t numBytesToSend = aPacket->numBytes; 
+    int32_t numBytesToSend = aPacket->numBytes;
+
     if(needToSwap)SwapLongBlock(aPacket,sizeof(SBC_CommandHeader)/sizeof(int32_t)+1);
     char* p = (char*)aPacket;
     while (numBytesToSend) {       

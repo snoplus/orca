@@ -1679,6 +1679,8 @@
 		9CF2C1BC0CC195E2002B279B /* ORL8013CrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF2C1B20CC195E1002B279B /* ORL8013CrateView.h */; };
 		9CF2C1BD0CC195E2002B279B /* ORL8013CrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CF2C1B30CC195E1002B279B /* ORL8013CrateView.m */; };
 		9CF39BFE0C654B41000CD58E /* ORAugerDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */; };
+		A892F1FA0D901CFA003406A1 /* Pbus_Link.h in Headers */ = {isa = PBXBuildFile; fileRef = A892F1F80D901CFA003406A1 /* Pbus_Link.h */; };
+		A892F1FB0D901CFA003406A1 /* Pbus_Link.m in Sources */ = {isa = PBXBuildFile; fileRef = A892F1F90D901CFA003406A1 /* Pbus_Link.m */; };
 		CE6885E50D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h in Headers */ = {isa = PBXBuildFile; fileRef = CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */; };
 		CEC7C6EB0D0DCB68008BA8FE /* NoNI488PluginHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */; };
 		CEC7C6ED0D0DCB73008BA8FE /* NoNI488DriversHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */; };
@@ -1714,7 +1716,7 @@
 		842241B00D85EA7F0048D331 /* SLTv4_Copy */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "";
+			dstPath = SLTv4_Readout_Code;
 			dstSubfolderSpec = 7;
 			files = (
 				8422513F0D8845500048D331 /* HW_Readout.c in SLTv4_Copy */,
@@ -3384,6 +3386,8 @@
 		9CF2C1B20CC195E1002B279B /* ORL8013CrateView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL8013CrateView.h; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateView.h"; sourceTree = SOURCE_ROOT; };
 		9CF2C1B30CC195E1002B279B /* ORL8013CrateView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL8013CrateView.m; path = "Source/Objects/Hardware/Camac/L8013 Crate/ORL8013CrateView.m"; sourceTree = SOURCE_ROOT; };
 		9CF39BFD0C654B41000CD58E /* ORAugerDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerDefs.h; path = "Source/Objects/Hardware/Auger/Auger Base Classes/ORAugerDefs.h"; sourceTree = SOURCE_ROOT; };
+		A892F1F80D901CFA003406A1 /* Pbus_Link.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Pbus_Link.h; sourceTree = "<group>"; };
+		A892F1F90D901CFA003406A1 /* Pbus_Link.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Pbus_Link.m; sourceTree = "<group>"; };
 		CE6885E40D0CDDCE00FA4158 /* EduWashingtonNplOrcaNi488PlugIn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = EduWashingtonNplOrcaNi488PlugIn.h; sourceTree = "<group>"; };
 		CEC7C6EA0D0DCB68008BA8FE /* NoNI488PluginHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488PluginHelp.plist; sourceTree = "<group>"; };
 		CEC7C6EC0D0DCB73008BA8FE /* NoNI488DriversHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = NoNI488DriversHelp.plist; sourceTree = "<group>"; };
@@ -4640,6 +4644,8 @@
 		842251230D8845390048D331 /* IpeV4 SLT */ = {
 			isa = PBXGroup;
 			children = (
+				A892F1F80D901CFA003406A1 /* Pbus_Link.h */,
+				A892F1F90D901CFA003406A1 /* Pbus_Link.m */,
 				842251240D8845390048D331 /* IpeV4SLT.nib */,
 				842251250D8845390048D331 /* IpeV4SLTCard.gif */,
 				842251260D8845390048D331 /* ORIpeV4SLTController.h */,
@@ -8289,6 +8295,7 @@
 				842251390D8845390048D331 /* ORIpeV4SLTModel.h in Headers */,
 				8422513C0D8845390048D331 /* HW_Readout.h in Headers */,
 				8422513E0D8845390048D331 /* SLTv4_HW_Definitions.h in Headers */,
+				A892F1FA0D901CFA003406A1 /* Pbus_Link.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8327,7 +8334,6 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Orca */;
 			projectDirPath = "";
@@ -9399,6 +9405,7 @@
 				842251350D8845390048D331 /* ORIpeV4SLTController.m in Sources */,
 				842251370D8845390048D331 /* ORIpeV4SLTDecoder.m in Sources */,
 				8422513A0D8845390048D331 /* ORIpeV4SLTModel.m in Sources */,
+				A892F1FB0D901CFA003406A1 /* Pbus_Link.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

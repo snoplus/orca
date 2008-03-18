@@ -29,6 +29,7 @@
 @class ORDataPacket;
 @class TimedWorker;
 @class ORIpeFLTModel;
+@class Pbus_Link;
 @class SBC_Link;
 
 #define SLT_TRIGGER_SW    0x01  // Software
@@ -142,8 +143,7 @@ enum {
 		unsigned long   lastSimSec;
 		unsigned long   pageSize; //< Length of the ADC data (0..100us)
 
-		SBC_Link*		sbcLink;
-		
+		Pbus_Link*		pbusLink;
 }
 
 #pragma mark •••Initialization

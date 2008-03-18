@@ -29,7 +29,7 @@
 #import "unistd.h"
 #import "TimedWorker.h"
 #import "ORDataTypeAssigner.h"
-#import "SBC_Link.h"
+#import "Pbus_Link.h"
 #import "SLTv4_HW_Definitions.h"
 
 enum {
@@ -236,7 +236,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) wakeUp
 {
     if([self aWake])return;
-	[sbcLink wakeUp];
+	[pbusLink wakeUp];
     [super wakeUp];
     if(![gOrcaGlobals runInProgress]){
         [poller runWithTarget:self selector:@selector(readAllStatus)];
@@ -246,17 +246,17 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) sleep
 {
     [super sleep];
-	[sbcLink sleep];
+	[pbusLink sleep];
     [poller stop];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
 	NS_DURING
-		if(!sbcLink){
-			sbcLink = [[SBC_Link alloc] initWithDelegate:self];
+		if(!pbusLink){
+			pbusLink = [[Pbus_Link alloc] initWithDelegate:self];
 		}
-		[sbcLink connect];
+		[pbusLink connect];
 	NS_HANDLER
 	NS_ENDHANDLER
 }
@@ -319,7 +319,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (SBC_Link*)sbcLink
 {
-	return sbcLink;
+	return pbusLink;
 }
 
 - (TimedWorker *) poller
@@ -1338,11 +1338,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 
-	sbcLink = [[decoder decodeObjectForKey:@"SBC_Link"] retain];
-	if(!sbcLink){
-		sbcLink = [[SBC_Link alloc] initWithDelegate:self];
+	pbusLink = [[decoder decodeObjectForKey:@"Pbus_Link"] retain];
+	if(!pbusLink){
+		pbusLink = [[Pbus_Link alloc] initWithDelegate:self];
 	}
-	else [sbcLink setDelegate:self];
+	else [pbusLink setDelegate:self];
 
 	//status reg
 	[self setPatternFilePath:		[decoder decodeObjectForKey:@"ORIpeV4SLTModelPatternFilePath"]];
@@ -1398,7 +1398,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	[super encodeWithCoder:encoder];
 
-	[encoder encodeObject:sbcLink		forKey:@"SBC_Link"];
+	[encoder encodeObject:pbusLink		forKey:@"Pbus_Link"];
 	
 	//status reg
 	[encoder encodeObject:patternFilePath forKey:@"ORIpeV4SLTModelPatternFilePath"];
@@ -1533,7 +1533,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
  
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
-	[sbcLink runTaskStarted:aDataPacket userInfo:userInfo];
+	[pbusLink runTaskStarted:aDataPacket userInfo:userInfo];
 	
 }
 
@@ -1541,8 +1541,8 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	if(!first){
 		//event readout controlled by the SLT cpu now. ORCA reads out 
-		//the resulting data from a generic circular buffer in the sbcLink code.
-		[sbcLink takeData:aDataPacket userInfo:userInfo];
+		//the resulting data from a generic circular buffer in the pbusLink code.
+		[pbusLink takeData:aDataPacket userInfo:userInfo];
 	}
 	else {
 		[self releaseAllPages];
@@ -1556,7 +1556,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	[self setSwInhibit];
 
-	[sbcLink runTaskStopped:aDataPacket userInfo:userInfo];
+	[pbusLink runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	if(pollingWasRunning) {
 		[poller runWithTarget:self selector:@selector(readAllStatus)];
@@ -1737,41 +1737,35 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 #pragma mark •••SBC I/O layer
 - (unsigned long) read:(unsigned long) address
 {
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	unsigned long theData;
-	[sbcLink readLongBlock:&theData
+	[pbusLink readLongBlockPbus:&theData
 					atAddress:address
-					numToRead:1
-				   withAddMod:0
-				usingAddSpace:0];
+					numToRead: 1];
 	return theData;
 }
 
 - (void) read:(unsigned long long) address data:(unsigned long*)theData size:(unsigned long)len;
 { 
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
-	[sbcLink readLongBlock:theData
+	[pbusLink readLongBlockPbus:theData
 					atAddress:address
-					numToRead:len
-				   withAddMod:0
-				usingAddSpace:0];
+					numToRead:len];
 }
 
 
 - (void) write:(unsigned long) address value:(unsigned long) aValue
 {
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
-	[sbcLink writeLongBlock:&aValue
+	[pbusLink writeLongBlockPbus:&aValue
 					 atAddress:address
-					numToWrite:1
-					withAddMod:0
-				 usingAddSpace:0];
+					numToWrite:1];
 }
 
 - (void) writeBitsAtAddress:(unsigned long)address 
@@ -1779,7 +1773,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 					   mask:(unsigned long)aMask 
 					shifted:(int)shiftAmount
 {
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 
@@ -1791,7 +1785,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) setBitsHighAtAddress:(unsigned long)address 
 						 mask:(unsigned long)aMask
 {
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	unsigned long buffer = [self  read:address];
@@ -1806,7 +1800,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 			   numberSlots:(unsigned long)  nSlots 
 			 slotIncrement:(unsigned long)  incrSlots
 {
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 
@@ -1823,7 +1817,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 			length:(unsigned long)  length 
 		 increment:(unsigned long)  incr
 {
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 
@@ -1838,7 +1832,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 			 length:(unsigned long)  length 
 		  increment:(unsigned long)  incr
 {
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 
@@ -1853,7 +1847,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 			 length:(unsigned long)  length 
 		  increment:(unsigned long)  incr
 {
-	if(![sbcLink isConnected]){
+	if(![pbusLink isConnected]){
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	int i;
@@ -1872,7 +1866,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	
 	[self load_HW_Config_Structure:&configStruct index:index];
 		
-	[sbcLink load_HW_Config:&configStruct];
+	[pbusLink load_HW_Config:&configStruct];
 }
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index

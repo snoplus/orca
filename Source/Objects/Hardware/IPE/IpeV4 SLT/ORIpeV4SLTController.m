@@ -70,7 +70,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     cpuManagementSize	= NSMakeSize(555,450);
     cpuTestsSize		= NSMakeSize(555,305);
 	
-	[[self window] setTitle:@"IPE-DAQ-V3 SLT"];	
+	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];	
 
     [super awakeFromNib];
     [self updateWindow];
@@ -316,6 +316,15 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[self patternFilePathChanged:nil];
 	[self readAllChanged:nil];
 }
+
+
+- (void) checkGlobalSecurity
+{
+    [super checkGlobalSecurity]; 
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORIpeV4SLTSettingsLock to:secure];
+}
+
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {

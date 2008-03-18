@@ -125,6 +125,7 @@
 - (void) displayTriggerChanged:(NSNotification*)aNote;
 - (void) populatePullDown;
 - (void) updateWindow;
+- (void) checkGlobalSecurity;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 
 - (void) endAllEditing:(NSNotification*)aNote;

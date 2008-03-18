@@ -31,6 +31,7 @@
 #include "CircularBuffer.h"
 #include "SLTv4_HW_Definitions.h"
 
+#include "pbusinterface.h"
 
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
@@ -45,6 +46,9 @@ extern int32_t* data;
 //TUVMEDevice* controlHandle = NULL;
 //TUVMEDevice* vmeAM39Handle = NULL;
 //TUVMEDevice* vmeAM9Handle = NULL;
+
+
+
 
 void processHWCommand(SBC_Packet* aPacket)
 {
@@ -81,11 +85,13 @@ void stopHWRun (SBC_crate_config* config)
 void FindHardware(void)
 {
 	//open device driver(s), get device driver handles
+        pbusInit("FE.ini");
 }
 
 void ReleaseHardware(void)
 {
 	//release / close device driver(s)
+        pbusFree();
 }
 
 void doWriteBlock(SBC_Packet* aPacket)
@@ -101,8 +107,19 @@ void doWriteBlock(SBC_Packet* aPacket)
 	if(needToSwap) SwapLongBlock(lptr,numItems);
     
 	//**** use device driver call to write data to HW
-	int32_t result = 0;	//temp... replace with following:
-	//int32_t result = write_device(memMapHandle,(char*)p,numItems*unitSize,startAddress);
+    int32_t result = 0;
+	int32_t perr = 0;
+    if (numItems == 1){
+	  perr = pbusWrite(startAddress, *lptr);
+    } else {
+      perr = pbusWriteBlock(startAddress, (unsigned long *) lptr, numItems);
+    }
+
+    // Result needs to be the number of bytes read or an error code
+    if (perr == 0) result = numItems * sizeof(uint32_t);
+	else result = -perr;
+	
+    //printf("Addr = %08x  NumItems = %d, data=%08lx (res=%d)\n", startAddress, numItems, lPtr[0], result);   
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
@@ -150,17 +167,30 @@ void doReadBlock(SBC_Packet* aPacket)
 
     SBC_IPEv4ReadBlockStruct* returnDataPtr = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
     char* returnPayload = (char*)(returnDataPtr+1);
-
+    unsigned long *lPtr = (unsigned long *) returnPayload;
 	
-	int32_t result = 0; //temp--- replace with the following:
-    //use device driver to read HW
-	//int32_t result = read_device(memMapHandle,returnPayload,numItems*unitSize,startAddress);
-    
+    // use device driver to read HW
+    int32_t result = 0;
+	int32_t perr = 0;
+    if (numItems == 1){
+	  perr = pbusRead(startAddress, lPtr);
+    } else {
+      perr = pbusReadBlock(startAddress, lPtr, numItems);
+    }
+  
+ 
+    // Result needs to be the number of bytes read or an error code
+    if (perr == 0) result = numItems * sizeof(uint32_t);
+	else result = -perr;
+	
+    //printf("Addr = %08x  NumItems = %d, data=%08lx (res=%d)\n", startAddress, numItems, lPtr[0], result);   
+
+ 
     returnDataPtr->address         = startAddress;
     returnDataPtr->numItems        = numItems;
     if(result == (numItems*sizeof(uint32_t))){
         returnDataPtr->errorCode = 0;
-		if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
+	if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
     }
     else {
         sprintf(aPacket->message,"error: %d %d : %s\n",(int32_t)result,(int32_t)errno,strerror(errno));
@@ -198,7 +228,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 /*************************************************************/
 int32_t Readout_Sltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
-	/* ----- example from the old shaper readout ---------
+	/* -----  example from the old shaper readout ---------
 	//data that is to be shipped is just put into the data[] array, incrementing the dataIndex each time
 	//note: don't initialize or reset the dataIndex, if you need the possiblity of discarding a record, then
 	//save the dataIndex at the start of the creation of a record and reset to that point if the record is to
@@ -250,3 +280,5 @@ int32_t Readout_Fltv4(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamD
 	*/
     return config->card_info[index].next_Card_Index;
 }
+
+

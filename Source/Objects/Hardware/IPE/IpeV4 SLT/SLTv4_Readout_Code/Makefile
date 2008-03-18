@@ -9,8 +9,13 @@ OBJECTS = $(SOURCES:.c=.o)
 #LFLAGS  = -lpthread -lstdc++ -L/usr/local/universe/lib -luniverse_api
 
 #----add in flags for your driver libraries and include files
-UCFLAGS =  -g -Wall -gstabs+ -D_LINUX 
-LFLAGS  = -lpthread -lstdc++ 
+#UCFLAGS =  -g -Wall -gstabs+ -D_LINUX -fexceptions 
+UCFLAGS =  -g -Wall  -gstabs+
+#LFLAGS  = -fexceptions -lpbusaccess -lPbus1394 -lakutil -lpthread -lstdc++ \
+#                                /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation \
+#                                /System/Library/Frameworks/IOKit.framework/IOKit 
+LFLAGS  =  -fexceptions -lpbusaccess -lPbusSim -lHw -lPbusSim -lakutil -lpthread -lstdc++ 
+ 
 
 LIBs    = 
 

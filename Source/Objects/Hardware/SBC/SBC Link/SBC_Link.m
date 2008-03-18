@@ -79,6 +79,7 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged";
 NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
+/*
 @interface SBC_Link (private)
 - (void) throwError:(int)anError;
 - (void) fillInScript:(NSString*)theScript;
@@ -94,6 +95,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) doOneCBTransferTest:(long)payloadSize;
 - (void) doCBTransferTest;
 @end
+*/
 
 @implementation SBC_Link
 - (id)   initWithDelegate:(ORCard*)aDelegate
@@ -1071,6 +1073,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(!rp->errorCode){		
 			int num = rp->numItems;
+
 			rp++;
 			memcpy(buffer,rp,num*sizeof(long));
 		}
@@ -1191,6 +1194,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[localException raise];
 	NS_ENDHANDLER
 }
+
 
 - (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket
 {
@@ -1577,9 +1581,6 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	return productionSpeed;
 }
 
-@end
-
-@implementation SBC_Link (private)
 
 - (void) throwError:(int)anError
 {
@@ -1862,7 +1863,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	tv.tv_sec  = 2;
 	tv.tv_usec = 0;
     
-	n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);	
+	n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);
 	if(n==0){
 		[self disconnect];
 		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];

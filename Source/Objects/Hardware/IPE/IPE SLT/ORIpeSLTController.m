@@ -324,7 +324,6 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-    
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORIpeSLTSettingsLock];
     BOOL locked = [gSecurity isLocked:ORIpeSLTSettingsLock];
 	BOOL isRunning = [gOrcaGlobals runInProgress];

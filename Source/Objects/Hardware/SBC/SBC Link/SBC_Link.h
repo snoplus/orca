@@ -261,6 +261,7 @@ typedef enum eSBC_ThrottleConsts{
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace;
 
+
 - (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket;
 
 - (void) update;
@@ -295,6 +296,21 @@ typedef enum eSBC_ThrottleConsts{
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
+
+- (void) throwError:(int)anError;
+- (void) fillInScript:(NSString*)theScript;
+- (void) runFailed;
+- (void) startCrateProcess;
+- (void) watchIrqSocket;
+- (void) write:(int)aSocket buffer:(SBC_Packet*)aPacket;
+- (void) read:(int)aSocket buffer:(SBC_Packet*)aPacket;
+- (BOOL) dataAvailable:(int) sck;
+- (BOOL) canWriteTo:(int) sck;
+- (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket;
+- (void) sampleCBTransferSpeed;
+- (void) doOneCBTransferTest:(long)payloadSize;
+- (void) doCBTransferTest;
 
 @end
 
