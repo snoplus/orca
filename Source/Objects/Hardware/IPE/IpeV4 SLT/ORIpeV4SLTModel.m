@@ -1720,7 +1720,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (NSString*) sbcLockName
 {
-	return ORSLTV4cpuLock;
+	return ORIpeV4SLTSettingsLock;
 }
 
 - (NSString*) sbcLocalCodePath

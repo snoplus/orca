@@ -95,7 +95,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [super registerNotificationObservers];
-    
+	      
     [notifyCenter addObserver : self
                      selector : @selector(controlRegChanged:)
                          name : ORIpeV4SLTControlRegChanged
@@ -322,7 +322,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
     [super checkGlobalSecurity]; 
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    [gSecurity setLock:ORIpeV4SLTSettingsLock to:secure];
+    [gSecurity setLock:[model sbcLockName] to:secure];
 }
 
 
@@ -350,6 +350,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[readBoardButton setEnabled:!lockedOrRunningMaintenance];
     [controlCheckBoxMatrix setEnabled:!lockedOrRunningMaintenance];
     [inhibitCheckBoxMatrix setEnabled:!lockedOrRunningMaintenance];
+	[triggerSrcMatrix setEnabled:!lockedOrRunningMaintenance]; 
+	[watchDogPU setEnabled:!lockedOrRunningMaintenance]; 
+	[secStrobeSrcPU setEnabled:!lockedOrRunningMaintenance]; 
+	[startSrcPU setEnabled:!lockedOrRunningMaintenance]; 
 
 	[versionButton setEnabled:!isRunning];
 	[deadTimeButton setEnabled:!isRunning];

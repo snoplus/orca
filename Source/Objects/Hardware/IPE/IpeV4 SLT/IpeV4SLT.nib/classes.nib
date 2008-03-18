@@ -372,7 +372,13 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>setCalibrationIntercept</key>
+				<string>id</string>
+				<key>setCalibrationSlope</key>
+				<string>id</string>
 				<key>setLogScale</key>
+				<string>id</string>
+				<key>setShowCalibratedScale</key>
 				<string>id</string>
 				<key>shiftLeft</key>
 				<string>id</string>

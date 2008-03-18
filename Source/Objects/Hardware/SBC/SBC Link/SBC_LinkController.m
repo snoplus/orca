@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark â€¢â€¢â€¢Imported Files
+#pragma mark ¥¥¥Imported Files
 
 #import "SBC_LinkController.h"
 #import "SBC_Link.h"
@@ -36,7 +36,7 @@
 
 @implementation SBC_LinkController
 
-#pragma mark â€¢â€¢â€¢Initialization
+#pragma mark ¥¥¥Initialization
 
 - (id) init
 {
@@ -87,7 +87,7 @@
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
-#pragma mark â€¢â€¢â€¢Notifications
+#pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -341,6 +341,8 @@
 	}
 	[cbTestButton setTitle:isRunning?@"Stop":@"Test CB"];
 	[numTestPointsField setEnabled:!isRunning];
+	[killCrateButton setEnabled:!isRunning];
+
 	[plotter setNeedsDisplay:YES];
 	[cbTestButton setNeedsDisplay:YES];
 	[numRecordsField setIntValue:[[model sbcLink] totalRecordsChecked]];
@@ -358,6 +360,7 @@
 {
     BOOL locked = [gSecurity isLocked:[model sbcLockName]];   
     [lockButton setState: locked];
+	[self sbcLockChanged:aNotification];
 }
 
 - (void) loadModeChanged:(NSNotification*)aNote
@@ -429,7 +432,9 @@
     [rangeTextField setEnabled:functionsExist && [[model sbcLink] doRange]];
     [resetCrateBusButton setEnabled:functionsExist];
     [cbTestButton setEnabled:connected];
-	
+
+	[self loadModeChanged:nil];
+
 	if(![model showBasicOps]) [functionAllowedField setStringValue:@"Low-Level Access NOT allowed with this SBC"];
 	else [functionAllowedField setStringValue:@""];
 
@@ -451,9 +456,12 @@
     [userNameField setEnabled:!locked && !runInProgress];
     [connectButton setEnabled:!locked && !runInProgress];
     [connect1Button setEnabled:!locked && !runInProgress];
-
+	[killCrateButton setEnabled:!locked && !runInProgress];
+    [loadModeMatrix setEnabled:!locked && !runInProgress];
+    [forceReloadButton setEnabled:!locked && !runInProgress];
+    [verboseButton setEnabled:!locked && !runInProgress];
+	
 	[self setToggleCrateButtonState];
-
 }
 
 - (void) setToggleCrateButtonState
@@ -609,7 +617,7 @@
 	[writeValueStepper setIntValue:[[model sbcLink] writeValue]];
 }
 
-#pragma mark â€¢â€¢â€¢Actions
+#pragma mark ¥¥¥Actions
 - (IBAction) lockAction:(id)sender
 {
     [gSecurity tryToSetLock:[model sbcLockName] to:[sender intValue] forWindow:[self window]];
