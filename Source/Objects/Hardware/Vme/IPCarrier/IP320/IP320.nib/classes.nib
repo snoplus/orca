@@ -50,6 +50,8 @@
 				<string>id</string>
 				<key>enableAlarmNoneAction</key>
 				<string>id</string>
+				<key>enableCalibrationAction</key>
+				<string>id</string>
 				<key>enablePollAllAction</key>
 				<string>id</string>
 				<key>enablePollNoneAction</key>
@@ -57,6 +59,8 @@
 				<key>modeAction</key>
 				<string>id</string>
 				<key>readAll</key>
+				<string>id</string>
+				<key>setJumperSettings</key>
 				<string>id</string>
 				<key>setPollingAction</key>
 				<string>id</string>
