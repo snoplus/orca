@@ -196,6 +196,19 @@
 	[alarmTable2 reloadData];
 }
 
+- (IBAction) setJumperSettings:(id)sender
+{
+	[model setCardJumperSetting:[[sender selectedItem] tag]];
+	
+}
+
+- (IBAction) enableCalibrationAction:(id)sender
+{
+	[model setCardCalibration];
+
+}
+
+
 #pragma mark ¥¥¥Actions
 
 - (IBAction) displayRawAction:(id)sender
