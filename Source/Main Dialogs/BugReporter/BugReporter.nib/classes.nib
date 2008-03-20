@@ -57,6 +57,8 @@
 			<dict>
 				<key>bodyField</key>
 				<string>NSTextView</string>
+				<key>categoryMatrix</key>
+				<string>NSMatrix</string>
 				<key>infoForm</key>
 				<string>NSForm</string>
 				<key>mailForm</key>

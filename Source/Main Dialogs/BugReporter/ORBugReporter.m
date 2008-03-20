@@ -40,6 +40,8 @@
 
 	[[mailForm cellWithTag:0] setStringValue:bugMan];
 	[[mailForm cellWithTag:2] setStringValue:@"Orca Bug"];
+	
+	[categoryMatrix selectCellWithTag:3];
 }
 
 //this method is needed so the global menu commands will be passes on correctly.
@@ -91,6 +93,14 @@
 		NSString* versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
 
 		s = [s stringByAppendingFormat:@"\n\n-----------------------------------------\n"];
+		switch([[categoryMatrix selectedCell] tag]){
+			case 0:	s = [s stringByAppendingFormat:@"Bug Category: Crasher\n"]; break;
+			case 1:	s = [s stringByAppendingFormat:@"Bug Category: Critical\n"]; break;
+			case 2:	s = [s stringByAppendingFormat:@"Bug Category: Annoying\n"]; break;
+			case 3:	s = [s stringByAppendingFormat:@"Bug Category: Minor\n"]; break;
+			default:s = [s stringByAppendingFormat:@"Bug Category: Feature Request\n"]; break;
+		}
+		s = [s stringByAppendingFormat:@"-----------------------------------------\n"];
 		s = [s stringByAppendingFormat:@"MacOS %u.%u.%u\n",major,minor,bugFix];
 		s = [s stringByAppendingFormat:@"Orca Version : %@\n",versionString];
 

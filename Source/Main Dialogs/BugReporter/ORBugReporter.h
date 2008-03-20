@@ -22,6 +22,7 @@
 	IBOutlet NSForm* mailForm;
 	IBOutlet NSForm* infoForm;
 	IBOutlet NSTextView* bodyField;
+	IBOutlet NSMatrix* categoryMatrix;
 }
 
 - (id) init;
