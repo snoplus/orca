@@ -21,16 +21,29 @@
 
 #import "ORGate2D.h"
 #import "ORPlotter2D.h"
-#import "ORGateKey.h"
-#import "ORGateGroup.h"
 #import "ORAxis.h"
 #import "ORCurve2D.h"
+#import "ORAnalysisPanel2D.h"
+
+NSString* ORGate2DValid	    = @"ORGate1DValid";
+
+NSString* ORGate2DValidChangedNotification            = @"ORGate2DValidChangedNotification";
+NSString* ORGate2DAverageChangedNotification          = @"ORGate2DAverageChangedNotification";
+NSString* ORGate2DTotalSumChangedNotification         = @"ORGate2DTotalSumChangedNotification";
+NSString* ORGate2DNumberChangedNotification           = @"ORGate2DNumberChangedNotification";
+NSString* ORGate2DDisplayGateChangedNotification      = @"ORGate2DDisplayGateChangedNotification";
+NSString* ORGate2DDisplayedGateChangedNotification    = @"ORGate2DDisplayedGateChangedNotification";
+NSString* ORGate2DPeakXChangedNotification            = @"ORGate2DPeakXChangedNotification";
+NSString* ORGate2DPeakYChangedNotification            = @"ORGate2DPeakYChangedNotification";
 
 @implementation ORGate2D
 - (id) initForCurve:(ORCurve2D*)aCurve
 {
 	self = [self init];
 	mCurve = aCurve;
+	[self setAttributes:[NSMutableDictionary dictionary]];
+	[self setDefaults];
+	[self registerNotificationObservers];
 	return self;
 }
 
@@ -48,14 +61,161 @@
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [attributes release];
 	[points dealloc];
 	[theGatePath dealloc];
+	[analysis release];
 	[super dealloc];
+}
+
+- (void) setDefaults
+{
+    [self setAttributes:[NSMutableDictionary dictionary]];
+    [self setGateValid:YES];
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(gateNameChanged:)
+                         name: @"ORGate1DNameChangedNotification"
+                       object: nil];
+}
+
+- (void) postNewGateID
+{    
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORGate2DNumberChangedNotification
+                      object:self
+                    userInfo: nil];
+}
+
+- (BOOL) gateIsActive
+{
+	return [mCurve activeGate] == self;
+}
+
+- (BOOL) gateValid
+{
+    return [[attributes objectForKey:ORGate2DValid] boolValue];
+}
+
+- (void) setGateValid:(BOOL)newGateValid
+{
+    [attributes setObject:[NSNumber numberWithBool:newGateValid] forKey:ORGate2DValid];
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORGate2DValidChangedNotification
+                      object:self
+                    userInfo: nil];
+}
+
+- (ORAnalysisPanel2D *)analysis 
+{
+    return analysis; 
+}
+
+- (void)setAnalysis:(ORAnalysisPanel2D *)anAnalysis 
+{
+    [anAnalysis retain];
+    [analysis release];
+    analysis = anAnalysis;
+}
+
+- (NSMutableDictionary *)attributes 
+{
+    return attributes; 
+}
+
+- (void)setAttributes:(NSMutableDictionary *)anAttributes 
+{
+    [anAttributes retain];
+    [attributes release];
+    attributes = anAttributes;
+}
+
+- (BOOL) analyze
+{
+    return analyze;
+}
+
+- (void) setAnalyze:(BOOL)newAnalyze
+{
+    analyze=newAnalyze;
 }
 
 - (NSArray*)points
 {
 	return points;
+}
+
+- (int) curveNumber
+{
+    return [mCurve dataSetID]; 
+}
+
+- (int) gateNumber
+{
+    return [mCurve gateNumber:self]; 
+}
+
+- (double) average
+{
+	return average;
+}
+
+- (void) setAverage:(double)newAve
+{
+	average = newAve;
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORGate2DAverageChangedNotification
+                      object:self
+                    userInfo: nil];
+}
+
+
+- (void) setPeakx:(int)aValue
+{
+    peakx = aValue;
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORGate2DPeakXChangedNotification
+                      object:self
+                    userInfo: nil];
+}
+
+- (int)  peakx
+{
+    return peakx;
+}
+
+- (void) setPeaky:(int)aValue
+{
+    peaky = aValue;
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORGate2DPeakYChangedNotification
+                      object:self
+                    userInfo: nil];
+}
+
+- (int)  peaky
+{
+    return peaky;
+}
+
+- (double) totalSum
+{
+    return totalSum;
+}
+
+- (void) setTotalSum:(double)newTotalSum
+{
+    totalSum=newTotalSum;
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORGate2DTotalSumChangedNotification
+                      object:self
+                    userInfo: nil];
 }
 
 - (void) setPoints:(NSMutableArray*)somePoints
@@ -67,14 +227,18 @@
 
 - (void) drawGateInPlot:(ORPlotter2D*)aPlot
 {
-	if([points count]){
+    if([self gateValid]){
 		ORAxis* yAxis = [aPlot yScale];
         ORAxis* xAxis = [aPlot xScale];
 
-		if(cmdKeyIsDown || drawControlPoints){
-			[points makeObjectsPerformSelector:@selector(drawPointInPlot:) withObject:aPlot];
+		if([mCurve activeGate] == self){
+			if(cmdKeyIsDown || drawControlPoints){
+				[points makeObjectsPerformSelector:@selector(drawPointInPlot:) withObject:aPlot];
+			}	
 		}
-		
+		else {
+			drawControlPoints = NO;
+		}
 		[theGatePath release];
 		
 		theGatePath = [[NSBezierPath bezierPath] retain];
@@ -98,7 +262,8 @@
 		[theGatePath lineToPoint:aConvertedPoint1];
 
 
-		[[NSColor redColor] set];
+		if([[aPlot curve] activeGate] == self)[[NSColor redColor] set];
+		else [[NSColor grayColor] set];
 		[theGatePath setLineWidth:1];
 		[theGatePath stroke];
 	}
@@ -106,8 +271,8 @@
 
 - (void) mouseDown:(NSEvent*)theEvent plotter:(ORPlotter2D*)aPlotter
 {
+	NSPoint localPoint = [aPlotter convertPoint:[theEvent locationInWindow] fromView:nil];
 	if(drawControlPoints || cmdKeyIsDown) {
-		NSPoint localPoint = [aPlotter convertPoint:[theEvent locationInWindow] fromView:nil];
 		NSEnumerator* e = [points objectEnumerator];
 		ORPoint* aPoint;
 		mouseIsDown = YES;
@@ -129,17 +294,19 @@
 			}
 		}
 		
-		if(!selectedPoint){
-			if([theGatePath containsPoint:localPoint]){
-				dragStartPoint.y = [[aPlotter yScale] getValAbs:localPoint.y];
-				dragStartPoint.x = [[aPlotter xScale] getValAbs:localPoint.x];
-
-				dragWholePath = YES;
-			}
-		}
 		
 		[aPlotter setNeedsDisplay:YES];	
 	}
+	
+	if(!selectedPoint){
+		if([theGatePath containsPoint:localPoint]){
+			dragStartPoint.y = [[aPlotter yScale] getValAbs:localPoint.y];
+			dragStartPoint.x = [[aPlotter xScale] getValAbs:localPoint.x];
+
+			dragWholePath = YES;
+		}
+	}
+
 }
 
 - (void) mouseDragged:(NSEvent*)theEvent plotter:(ORPlotter2D*)aPlotter;
@@ -157,11 +324,9 @@
 		float deltaX = localPoint.x - dragStartPoint.x;
 		float deltaY = localPoint.y - dragStartPoint.y;
 		while(aPoint = [e nextObject]){
-			if(aPoint != selectedPoint){
-				float x = [aPoint xyPosition].x + deltaX;
-				float y = [aPoint xyPosition].y + deltaY;
-				[aPoint setXyPosition:NSMakePoint(x,y)];
-			}
+			float x = [aPoint xyPosition].x + deltaX;
+			float y = [aPoint xyPosition].y + deltaY;
+			[aPoint setXyPosition:NSMakePoint(x,y)];
 		}
 		dragStartPoint = localPoint;
 	}
@@ -218,9 +383,8 @@
 
 - (void) analyzePlot:(ORPlotter2D*)aPlot
 {
-    long		sumVal;
  
-    if(theGatePath /*&& analyze*/){
+    if([self gateValid]/* && analyze*/){
   
 		NSBezierPath* channelPath = [NSBezierPath bezierPath];
 		
@@ -239,7 +403,11 @@
 			unsigned short numBinsPerSide;
 			unsigned long* data = [mDataSource plotter:aPlot dataSet:dataSet numberBinsPerSide:&numBinsPerSide];
 		
-			sumVal  = 0;
+			long sumVal = 0;
+			long maxVal = 0;
+			long xLoc = -1;
+			long yLoc = -1;
+			float aveVal = -1;
 			
 			NSRect gateBounds = [channelPath bounds];
 			long xStart = gateBounds.origin.x;
@@ -247,15 +415,27 @@
 			long xEnd   = gateBounds.origin.x + gateBounds.size.width;
 			long yEnd   = gateBounds.origin.y + gateBounds.size.height;
 			long x,y;
+			long count = 0;
 			for (y=yStart; y<yEnd; ++y) {
 				for (x=xStart; x<xEnd; ++x) {
 					if([channelPath containsPoint:NSMakePoint(x,y)]){
+						++count;
 						unsigned long z = data[x + y*numBinsPerSide];
+						if(z > maxVal){
+							maxVal = z;
+							xLoc = x;
+							yLoc = y;
+						}
 						sumVal += z;
 					}
 				}
 			}
-			NSLog(@"sum: %d\n",sumVal);
+			if(count>0)aveVal = sumVal/(float)count;
+			else aveVal = -1;
+			[self setAverage:aveVal];
+			[self setTotalSum:sumVal];
+			[self setPeakx:xLoc];
+			[self setPeaky:yLoc];
 		}
     }
 }

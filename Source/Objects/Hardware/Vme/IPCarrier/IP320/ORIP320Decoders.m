@@ -23,14 +23,27 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORDataTypeAssigner.h"
+#import "ORIP320Model.h"
 
 @implementation ORIP320DecoderForAdc
+- (id) init
+{
+    self = [super init];
+    getValuesFromDecoderStage = YES;
+    return self;
+}
+
+- (void) dealloc
+{
+	[actualIP320s release];
+    [super dealloc];
+}
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr	 = (unsigned long*)someData;
     unsigned long length = ExtractLength(*ptr);
-	*ptr++;
+	ptr++;
 	unsigned char crate  = (*ptr&0x01e00000)>>21;
 	unsigned char card   = (*ptr& 0x001f0000)>>16;
 	unsigned char ipSlot = *ptr&0x0000000f;
@@ -39,6 +52,27 @@
 	NSString* ipSlotKey  = [NSString stringWithFormat:@"IPSlot %2d",ipSlot];
 	
 	[aDataSet loadGenericData:@" " sender:self withKeys:@"IP320",crateKey,cardKey,ipSlotKey,nil];
+
+	//get the actual object
+	if(getValuesFromDecoderStage){
+		NSString* ip320Key = [crateKey stringByAppendingString:cardKey];
+		if(!actualIP320s)actualIP320s = [[NSMutableDictionary alloc] init];
+		ORIP320Model* obj = [actualIP320s objectForKey:ip320Key];
+		if(!obj){
+			NSArray* listOfIP320s = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORIP320Model")];
+			NSEnumerator* e = [listOfIP320s objectEnumerator];
+			ORIP320Model* anIP320;
+			while(anIP320 = [e nextObject]){
+				if([anIP320 crateNumber] == crate && [[anIP320 guardian] slot] == card && [anIP320 slot] == ipSlot){
+					[actualIP320s setObject:anIP320 forKey:ip320Key];
+					obj = anIP320;
+					break;
+				}
+			}
+		}
+		getValuesFromDecoderStage = [obj processDataBlock:(unsigned long*)someData length:length];
+	}
+
 	
     return length; //must return number of longs processed.
 }
@@ -49,9 +83,9 @@
     NSString* title= @"IP320 ADC Record\n\n";
 
 	ptr++;
-    NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-	NSString* ipSlotKey  = [NSString stringWithFormat:@"IPSlot %2d\n",*ptr&0x0000000f];
+    NSString* crate			= [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
+    NSString* card			= [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+	NSString* ipSlotKey		= [NSString stringWithFormat:@"IPSlot %2d\n",*ptr&0x0000000f];
 
 	ptr++;
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];

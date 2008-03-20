@@ -70,3 +70,4 @@
 @end
 
 extern NSString* ORCurve2DActiveGateChanged;
+

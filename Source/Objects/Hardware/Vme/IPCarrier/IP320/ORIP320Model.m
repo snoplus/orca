@@ -55,7 +55,9 @@ static struct {
 };
 
 @interface ORIP320Model (private)
-- (void) _setUpPolling;
+- (void) _setUpPolling:(BOOL)verbose;
+- (void) _stopPolling;
+- (void) _startPolling;
 - (void) _pollAllChannels;
 @end
 
@@ -78,7 +80,7 @@ static struct {
 
 -(void)dealloc
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[self _stopPolling];
     [chanObjs release];
     [super dealloc];
 }
@@ -86,7 +88,7 @@ static struct {
 - (void) wakeUp
 {
     if(![self aWake]){
-        [self _setUpPolling];
+        [self _setUpPolling:NO];
     }
     [super wakeUp];
 }
@@ -242,7 +244,7 @@ static struct {
     
     pollingState = aState;
     
-    [self performSelector:@selector(_setUpPolling) withObject:nil afterDelay:0.5];
+    [self performSelector:@selector(_startPolling) withObject:nil afterDelay:0.5];
     
     [[NSNotificationCenter defaultCenter]
 		postNotificationName:ORIP320PollingStateChangedNotification
@@ -356,8 +358,8 @@ static struct {
 			errorLocation = @"Converion Start";
 			[self loadConversionStart];
 			errorLocation = @"Adc Read";
-			value += [self readDataBlock];
-			corrected_value=[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] CountActual:value];
+			value = [self readDataBlock];
+			corrected_value = [self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] countActual:value];
 			if([[chanObjs objectAtIndex:aChannel] setChannelValue:corrected_value])changeCount++;
 		NS_HANDLER
 			NSLogError(@"",[NSString stringWithFormat:@"IP320 %d,%@",[self slot],[self identifier]],errorLocation,nil);
@@ -367,7 +369,7 @@ static struct {
 			[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORIP320AdcValueChangedNotification object:self] waitUntilDone:NO];
 		}
 	}
-//	NSLog(@"the corected value is %d\n",[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] CountActual:value]);
+//	NSLog(@"the corected value is %d\n",[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] countActual:value]);
 	return corrected_value;
 }
 
@@ -435,21 +437,23 @@ static struct {
 	CalibrationConstants[gain].kSlope_m=slope;
 }
 
--(unsigned short) calculateCorrectedCount:(unsigned short)gain CountActual:(unsigned short)CountActual{
-	unsigned short Corrected_count;
+-(unsigned short) calculateCorrectedCount:(unsigned short)gain countActual:(unsigned short)countActual
+{
+	unsigned short corrected_count;
 	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 
-	if(cardJumperSetting==kUncalibrated){Corrected_count=CountActual;}
-	else{
-	Corrected_count=CountActual;
-	Corrected_count+=((CalibrationConstants[gain].kVoltCALLO*pow(2,gain))-CalibrationConstants[gain].kIdeal_Zero)/CalibrationConstants[gain].kSlope_m;
-	Corrected_count= Corrected_count-CalibrationConstants[gain].kCountCALLO;
-	Corrected_count=Corrected_count*(4096*CalibrationConstants[gain].kSlope_m)/CalibrationConstants[gain].kIdeal_Volt_Span;
+	if(cardJumperSetting==kUncalibrated) { corrected_count=countActual; }
+	else {
+		corrected_count=countActual;
+		corrected_count+=((CalibrationConstants[gain].kVoltCALLO*pow(2,gain))-CalibrationConstants[gain].kIdeal_Zero)/CalibrationConstants[gain].kSlope_m;
+		corrected_count= corrected_count-CalibrationConstants[gain].kCountCALLO;
+		corrected_count=corrected_count*(4096*CalibrationConstants[gain].kSlope_m)/CalibrationConstants[gain].kIdeal_Volt_Span;
 	}
-	return Corrected_count;
+	return corrected_count;
 	
 }
-- (void) callibrateIP320{
+- (void) callibrateIP320
+{
 		int gain =0;
 		unsigned short ReadNumber = 10;
 		@synchronized(self) {
@@ -551,17 +555,32 @@ static struct {
 
 
 #pragma mark ¥¥¥Polling
-- (void) _setUpPolling
+- (void) _stopPolling
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	pollRunning = NO;
+}
+
+- (void) _startPolling
+{
+	[self _setUpPolling:YES];
+}
+
+- (void) _setUpPolling:(BOOL)verbose
+{
+
+	if(pollRunning)return;
+	
     if(pollingState!=0){        
-        NSLog(@"Polling IP320,%d,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],[self slotConv],pollingState);
-        [NSObject cancelPreviousPerformRequestsWithTarget:self];
+		pollRunning = YES;
+        if(verbose)NSLog(@"Polling IP320,%d,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],[self slotConv],pollingState);
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
         [self performSelector:@selector(_pollAllChannels) withObject:self afterDelay:pollingState];
         [self _pollAllChannels];
     }
     else {
         [NSObject cancelPreviousPerformRequestsWithTarget:self];
-        NSLog(@"Not Polling IP320,%d,%d,%d\n",[self crateNumber],[self slot],[self slotConv]);
+        if(verbose)NSLog(@"Not Polling IP320,%d,%d,%d\n",[self crateNumber],[self slot],[self slotConv]);
     }
 }
 
@@ -614,7 +633,8 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 //note that everything called by these routines MUST be threadsafe
 - (void) startProcessCycle
 {
-    [self readAllAdcChannels];
+	//let the polling stay in the polling loop....
+   // [self readAllAdcChannels];
 }
 
 - (void) endProcessCycle
@@ -743,6 +763,13 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 	lowMask = [self lowMask];
 	highMask = [self highMask];
 
+	//here's some tricky stuff Part 1. A run is about to start. Our polling may be moved to an SBC.
+	//so we stop polling here. If we are in NOT one of the SBC's children, then our polling
+	//will be restarted in the takedata method. 
+	first = NO;
+	[self _stopPolling];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+
     [self clearExceptionCount];
 }
 
@@ -762,6 +789,13 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	if(!first){
+		//here's some tricky stuff Part 2. The run has started and since we got here
+		//we are taking data from the MAC, so we restart the polling.
+		[self _setUpPolling:NO];
+		isRunning = YES;
+	}
+	
 	if(valuesReadyToShip){
 		unsigned long data[23];
 		data[1] = slotMask;
@@ -791,17 +825,51 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	//here's some tricky stuff Part 3. The run has stopped. Restart the polling.
+	//If it's already running, this will do nothing.
+	isRunning = NO;
+	[self _setUpPolling:NO];
+}
+
+- (BOOL) processDataBlock:(unsigned long*)ptr length:(short)n;
+{
+	//here's some tricky stuff Part 4. If our polling loop is in the SBC, our values will
+	//come from there. This method will use the values from the decoder unless running, in
+	//which case, the values will be refused and we'll return NO -- telling the decoder not
+	//to bother. 
+	if(isRunning)return NO;
+	
+	//first word is header, skip
+	//second word is location, skip (could do some error checking here, I suppose)
+	//third word is time... to do: use in strip chart
+	//starting four word is n - 3 data words
+	short changeCount = 0;
+	int i;
+	for(i=3;i<n-3;i++){
+		unsigned short chan  = (ptr[i]>>16) & 0x000000ff;
+		unsigned short value = ptr[i] & 0x00000fff;
+		unsigned short corrected_value = [self calculateCorrectedCount:[[chanObjs objectAtIndex:chan] gain] countActual:value];
+		if([[chanObjs objectAtIndex:chan] setChannelValue:corrected_value])changeCount++;
+	}
+	
+	if(changeCount){
+		//since this will be called from the process data thread, we have to be carefull and post the notification on the main thread
+		//to update graphics
+		[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORIP320AdcValueChangedNotification object:self] waitUntilDone:NO];
+	}
+	
+    return YES;
 }
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
 	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id = kIP320;		//should be unique
-	configStruct->card_info[index].hw_mask[0] = dataId; //better be unique
-	configStruct->card_info[index].slot 	 = [guardian slot];
-	configStruct->card_info[index].crate 	 = [self crateNumber];
-	configStruct->card_info[index].add_mod 	 = [self addressModifier];
-	configStruct->card_info[index].base_add  = [self baseAddress];
+	configStruct->card_info[index].hw_type_id	= kIP320;		//should be unique
+	configStruct->card_info[index].hw_mask[0]	= dataId; //better be unique
+	configStruct->card_info[index].slot			= [guardian slot];
+	configStruct->card_info[index].crate		= [self crateNumber];
+	configStruct->card_info[index].add_mod		= [self addressModifier];
+	configStruct->card_info[index].base_add		= [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0] = [self slot];
 	configStruct->card_info[index].deviceSpecificData[1] = MAX(1.,(unsigned long)pollingState);
 	configStruct->card_info[index].deviceSpecificData[2] = [self lowMask];

@@ -281,21 +281,21 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
     if(!gates)[self setGates:[NSMutableArray array]];
     [gates addObject:aGate];
     [self setActiveGateIndex:[gates indexOfObject:aGate]];
-   // [gates makeObjectsPerformSelector:@selector(postNewGateID) withObject:nil];
+    [gates makeObjectsPerformSelector:@selector(postNewGateID) withObject:nil];
 }
 
 - (void) removeActiveGate
 {
-    if([gates count]){
+    if([gates count]>1){
 		[gates removeObject:[self activeGate]];
-		if([gates count])[self setActiveGateIndex:activeGateIndex%[gates count]];
-		//[gates makeObjectsPerformSelector:@selector(postNewGateID) withObject:nil];
+		[self setActiveGateIndex:activeGateIndex%[gates count]];
+		[gates makeObjectsPerformSelector:@selector(postNewGateID) withObject:nil];
     }
 }
 
 - (void) clearActiveGate
 {
-    //[[self activeGate] setGateValid:NO];
+    [[self activeGate] setGateValid:NO];
 }
 
 - (void) clearAllGates
@@ -315,17 +315,11 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
 - (void) setShowActiveGate: (BOOL) flag
 {
     showActiveGate = flag;
-    //ORGate2D* theActiveGate = [self activeGate];
-//    if(showActiveGate){
-        //make sure there's at least one
-//		if(![gates count]){
-//			[self  addGate:[[ORGate2D alloc] init]];
-//			activeGateIndex = 0;
-//		}
-
-       //[theActiveGate setGateValid:YES];
-    //}
-    //else [theActiveGate setGateValid:NO];
+    ORGate2D* theActiveGate = [self activeGate];
+    if(showActiveGate){
+       [theActiveGate setGateValid:YES];
+    }
+    else [theActiveGate setGateValid:NO];
 
 }
 
@@ -343,7 +337,6 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
 		rollOver = YES;
     }
 	[self setActiveGateIndex:index];
-	NSLog(@"(inc) gate count: %d  index: %d\n",[gates count],index);
     return rollOver;
 }
 
@@ -356,7 +349,6 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
 		rollOver = YES;
     }
 	[self setActiveGateIndex:index];
-	NSLog(@"(dec) gate count: %d  index: %d\n",[gates count],index);
 
     return rollOver;
 }
@@ -384,8 +376,7 @@ NSString* ORCurve2DActiveGateChanged = @"ORCurve2DActiveGateChanged";
 
 - (void) doAnalysis:(ORPlotter2D*)aPlotter
 {
-	[gates makeObjectsPerformSelector:@selector(analyzePlot:) withObject:aPlotter];
-	
+	[gates makeObjectsPerformSelector:@selector(analyzePlot:) withObject:aPlotter];	
 }
 
 #pragma mark ¥¥¥Mouse Handling

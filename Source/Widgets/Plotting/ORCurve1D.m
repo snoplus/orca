@@ -724,12 +724,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 {
     showActiveGate = flag;
     ORGate1D* theActiveGate = [self activeGate];
-    if(showActiveGate){
-        //make sure there's at least one
-        if(!gates || [gates count] == 0){
-            [self addGate:nil];
-        }
-        
+    if(showActiveGate){        
         if([theActiveGate gateMinChannel] == 0 && [theActiveGate gateMaxChannel]==0){
             //OK never been shown before... set some defaults
             double range = [[aPlotter xScale] maxValue]-[[aPlotter xScale] minValue];

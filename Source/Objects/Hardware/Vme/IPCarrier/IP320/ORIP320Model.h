@@ -88,7 +88,9 @@ short kCountCALHI;
 	BOOL			valuesReadyToShip;
     BOOL			displayRaw;
 	int				mode;
-	
+	BOOL			first;
+    BOOL			isRunning;
+	BOOL			pollRunning;
 	
 	//cached values -- valid ONLY during running
 	unsigned long slotMask;
@@ -103,7 +105,7 @@ short kCountCALHI;
 - (void) loadCALHIControReg:(unsigned short)gain;
 - (void) loadCALLOControReg:(unsigned short)gain;
 - (void)  calculateCalibrationSlope:(unsigned short)gain;
-- (unsigned short) calculateCorrectedCount:(unsigned short)gain CountActual:(unsigned short)CountActual;
+- (unsigned short) calculateCorrectedCount:(unsigned short)gain countActual:(unsigned short)CountActual;
 - (void) callibrateIP320;
 
 
@@ -155,6 +157,7 @@ short kCountCALHI;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
+- (BOOL) processDataBlock:(unsigned long*)ptr length:(short)n;
 
 @end
 

@@ -23,12 +23,12 @@
 @class ORGateKey;
 @class ORPoint;
 @class ORCurve2D;
+@class ORAnalysisPanel2D;
 
 @interface ORGate2D : NSObject {
 	ORCurve2D*		mCurve;
-	BOOL            displayGate;
-	ORGateKey*      cachedGate;
-	NSString*       displayedGateName;
+	NSMutableDictionary*	attributes;
+	ORAnalysisPanel2D*		analysis;
 	NSMutableArray* points;
 	ORPoint*		selectedPoint;	//x in x-axis coords, y in y-axis coords
 	BOOL			cmdKeyIsDown;
@@ -37,14 +37,42 @@
 	NSBezierPath*   theGatePath;
 	NSPoint			dragStartPoint;
 	BOOL			drawControlPoints;
+	BOOL			analyze;
+	double			totalSum;
+	float           peaky;
+	float           peakx;
+	float			average;
 
 }
 - (id) initForCurve:(ORCurve2D*)aCurve;
+- (void) setDefaults;
+- (void) registerNotificationObservers;
 
 #pragma mark •••Accessors
+- (BOOL) gateIsActive;
+- (BOOL) gateValid;
+- (int) curveNumber;
+- (int) gateNumber;
+- (void) setGateValid:(BOOL)newGateValid;
+- (void) postNewGateID;
 - (NSArray*)points;
 - (void) setPoints:(NSMutableArray*)somePoints;
-
+- (ORAnalysisPanel2D *)analysis;
+- (void)setAnalysis:(ORAnalysisPanel2D *)anAnalysis;
+- (NSMutableDictionary *)attributes;
+- (void)setAttributes:(NSMutableDictionary *)anAttributes;
+- (BOOL) analyze;
+- (void) setAnalyze:(BOOL)newAnalyze;
+- (BOOL) gateValid;
+- (void) setGateValid:(BOOL)newGateValid;
+- (double) average;
+- (void) setAverage:(double)newAve;
+- (double) totalSum;
+- (void) setTotalSum:(double)newTotalSum;
+- (void) setPeakx:(int)aValue;
+- (int)  peakx;
+- (void) setPeaky:(int)aValue;;
+- (int)  peaky;
 - (void) mouseDown:(NSEvent*)theEvent plotter:(ORPlotter2D*)aPlotter;
 - (void) mouseDragged:(NSEvent*)theEvent plotter:(ORPlotter2D*)aPlotter;
 - (void) mouseUp:(NSEvent*)theEvent plotter:(ORPlotter2D*)aPlotter;
@@ -68,4 +96,12 @@
 @end
 
 extern NSString* ORPointChanged;
+extern NSString* ORGate2DValidChangedNotification;
+extern NSString* ORGate2DAverageChangedNotification;
+extern NSString* ORGate2DTotalSumChangedNotification;
+extern NSString* ORGate2DNumberChangedNotification;
+extern NSString* ORGate2DDisplayGateChangedNotification;
+extern NSString* ORGate2DDisplayedGateChangedNotification;
+extern NSString* ORGate2DPeakXChangedNotification;
+extern NSString* ORGate2DPeakYChangedNotification;
 

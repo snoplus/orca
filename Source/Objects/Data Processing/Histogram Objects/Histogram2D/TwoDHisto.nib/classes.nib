@@ -67,9 +67,13 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
 				<key>autoScale</key>
 				<string>id</string>
 				<key>copy</key>
+				<string>id</string>
+				<key>removeGateAction</key>
 				<string>id</string>
 				<key>resetScales</key>
 				<string>id</string>

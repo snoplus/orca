@@ -18,6 +18,7 @@
 #import "ORColorScale.h"
 #import "CTGradient.h"
 #import "ORGate2D.h"
+#import "ORAnalysisPanel2D.h"
 
 NSString* ORPlotter2DBackgroundColor    = @"ORPlotter2DBackgroundColor";
 NSString* ORPlotter2DGridColor          = @"ORPlotter2DGridColor";
@@ -65,6 +66,9 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 - (void) awakeFromNib
 {
     
+    [self initCurve];
+	[self setDefaults];
+
     //make sure the scales get drawn first so that the grid arrays have been
     //created before we are drawn.
     ORAxis* xs = [mXScale retain];
@@ -77,8 +81,6 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     [[self superview] addSubview:ys positioned:NSWindowBelow relativeTo:self];
     [ys release];
     
-    [self initCurve];
-    [self setDefaults];
     
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self
@@ -96,14 +98,9 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
     if(!attributes){
         [self setAttributes:[NSMutableDictionary dictionary]];
         
-        [self setBackgroundColor:[NSColor whiteColor]];
+        [self setBackgroundColor:[NSColor colorWithCalibratedRed:1. green:1. blue:1. alpha:0]];
         [self setGridColor:[NSColor grayColor]];
-        [self setDataColor:[NSColor redColor] dataSet:0];
-        [self setDataColor:[NSColor greenColor] dataSet:1];
-        [self setDataColor:[NSColor blueColor] dataSet:2];
-        [self setDataColor:[NSColor yellowColor] dataSet:3];
-        [self setDataColor:[NSColor brownColor] dataSet:4];
-        [self setDataColor:[NSColor blackColor] dataSet:5];
+		[self  setDrawWithGradient:YES];
     }
     [curve setDefaults];
     [[self undoManager] enableUndoRegistration];
@@ -118,6 +115,10 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 - (void) initCurve
 {
     [self setCurve:[ORCurve2D curve:0]];    
+
+    if(mDataSource){
+		[self addGateAction:self];
+    }
 }
 
 - (void) setDrawWithGradient:(BOOL)flag
@@ -294,6 +295,11 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
             [curve drawVector:self];
         }
     }
+
+    if(analysisDrawer && ([analysisDrawer state] == NSDrawerOpenState)){
+        [curve doAnalysis:self];
+    }
+
 }
 
 - (void)setIgnoreDoNotDrawFlag:(BOOL)aFlag
@@ -540,15 +546,15 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 
 - (IBAction) addGateAction:(id)sender
 {
-    if([analysisDrawer state] == NSDrawerOpenState){
-		ORGate2D* aGate = [[[ORGate2D alloc] initForCurve:curve] autorelease];
-		[curve addGate: aGate];	
-		//ORAnalysisPanel1D* analysisPanel = [ORAnalysisPanel1D panel];
-		//[aGate setAnalysis:analysisPanel];
-		//[analysisPanel setGate:aGate];
-		//[analysisView setSizing:ZMakeFlowLayoutSizing( [[analysisPanel view] frame].size, 10, 0, NO )];
-		//[analysisView addSubview:[analysisPanel view]];
-	}
+	ORGate2D* aGate = [[ORGate2D alloc] initForCurve:curve];
+	[curve addGate: aGate];	
+	ORAnalysisPanel2D* analysisPanel = [ORAnalysisPanel2D panel];
+	[aGate setAnalysis:analysisPanel];
+	[analysisPanel setGate:aGate];
+	[analysisView setSizing:ZMakeFlowLayoutSizing( [[analysisPanel view] frame].size, 10, 0, NO )];
+	[analysisView addSubview:[analysisPanel view]];
+	[aGate release];
+	
 }
 - (IBAction) removeGateAction:(id)sender
 {

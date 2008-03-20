@@ -323,6 +323,7 @@ const float kGateAlpha2 = .1;
 {
     return [[attributes objectForKey:ORGate1DValid] boolValue];
 }
+
 - (void) setGateValid:(BOOL)newGateValid
 {
     [attributes setObject:[NSNumber numberWithBool:newGateValid] forKey:ORGate1DValid];
