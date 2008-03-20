@@ -70,3 +70,12 @@
 - (NSUndoManager*) undoManager;
 @end
 
+
+//a category on NSApplication so we can easily get the OS version
+@interface NSApplication (SystemVersion)
+
+- (void)getSystemVersionMajor:(unsigned *)major
+                        minor:(unsigned *)minor
+                       bugFix:(unsigned *)bugFix;
+
+@end

@@ -42,24 +42,22 @@
 NSString* kCrashLogLocation     = @"~/Library/Logs/CrashReporter/Orca.crash.log";
 NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 
-#ifndef NSAppKitVersionNumber10_5
-#define NSAppKitVersionNumber10_5 949
-#endif
-
-#ifndef NSAppKitVersionNumber10_4
-#define NSAppKitVersionNumber10_4 824
-#endif
-
 
 @implementation ORAppDelegate
 + (BOOL)isMacOSX10_5
 {
-	return (floor(NSAppKitVersionNumber) >= NSAppKitVersionNumber10_5);
+	unsigned major, minor, bugFix;
+    [[NSApplication sharedApplication] getSystemVersionMajor:&major minor:&minor bugFix:&bugFix];
+
+	return (minor >= 5);
 }
 
 + (BOOL)isMacOSX10_4 
 {
-	return (floor(NSAppKitVersionNumber) >= NSAppKitVersionNumber10_4);
+	unsigned major, minor, bugFix;
+    [[NSApplication sharedApplication] getSystemVersionMajor:&major minor:&minor bugFix:&bugFix];
+
+	return (minor >= 4);
 }
 
 
@@ -297,6 +295,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     
     
 	[self showStatusLog:self];
+
 	
     NSLog(@"-------------------------------------------------\n");
     NSLog(@"            Orca (v%@) Has Started               \n",versionString);
@@ -305,6 +304,9 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
         NSLog(@"   (After crash or hard debugger stop)       \n");
     }
     NSLog(@"-------------------------------------------------\n");
+	unsigned major, minor, bugFix;
+    [[NSApplication sharedApplication] getSystemVersionMajor:&major minor:&minor bugFix:&bugFix];
+    NSLog(@"Running MacOS %u.%u.%u %@\n", major, minor, bugFix,minor>=5?@"":@"(Note: some ORCA features require 10.5. Please update)");
     
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
         [self mailCrashLog];
@@ -431,3 +433,39 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 }
 @end
 
+@implementation NSApplication (SystemVersion)
+
+- (void)getSystemVersionMajor:(unsigned *)major
+                        minor:(unsigned *)minor
+                       bugFix:(unsigned *)bugFix;
+{
+    OSErr err;
+    SInt32 systemVersion, versionMajor, versionMinor, versionBugFix;
+    if ((err = Gestalt(gestaltSystemVersion, &systemVersion)) != noErr) goto fail;
+    if (systemVersion < 0x1040)
+    {
+        if (major) *major = ((systemVersion & 0xF000) >> 12) * 10 +
+            ((systemVersion & 0x0F00) >> 8);
+        if (minor) *minor = (systemVersion & 0x00F0) >> 4;
+        if (bugFix) *bugFix = (systemVersion & 0x000F);
+    }
+    else
+    {
+        if ((err = Gestalt(gestaltSystemVersionMajor, &versionMajor)) != noErr) goto fail;
+        if ((err = Gestalt(gestaltSystemVersionMinor, &versionMinor)) != noErr) goto fail;
+        if ((err = Gestalt(gestaltSystemVersionBugFix, &versionBugFix)) != noErr) goto fail;
+        if (major) *major = versionMajor;
+        if (minor) *minor = versionMinor;
+        if (bugFix) *bugFix = versionBugFix;
+    }
+    
+    return;
+    
+fail:
+    NSLog(@"Unable to obtain system version: %ld", (long)err);
+    if (major) *major = 10;
+    if (minor) *minor = 0;
+    if (bugFix) *bugFix = 0;
+}
+
+@end
