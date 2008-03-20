@@ -1596,6 +1596,9 @@
 		84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */; };
 		84FB4E010D91E1D90055813E /* ORAnalysisPanel2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */; };
 		84FB4E020D91E1D90055813E /* ORAnalysisPanel2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */; };
+		84FB4E220D92F7560055813E /* BugReporter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FB4E1F0D92F7560055813E /* BugReporter.nib */; };
+		84FB4E230D92F7560055813E /* ORBugReporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FB4E200D92F7560055813E /* ORBugReporter.h */; };
+		84FB4E240D92F7560055813E /* ORBugReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FB4E210D92F7560055813E /* ORBugReporter.m */; };
 		84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FBB56F0D5401BD00780DBD /* ORFilterSymbolTable.h */; };
 		84FBB5720D5401BD00780DBD /* ORFilterSymbolTable.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FBB5700D5401BD00780DBD /* ORFilterSymbolTable.m */; };
 		84FD092B078F4F17004A0E46 /* CamacCmdHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84FD092A078F4F17004A0E46 /* CamacCmdHelp.plist */; };
@@ -3302,6 +3305,9 @@
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
 		84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAnalysisPanel2D.m; path = Source/Widgets/Plotting/ORAnalysisPanel2D.m; sourceTree = SOURCE_ROOT; };
 		84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAnalysisPanel2D.h; path = Source/Widgets/Plotting/ORAnalysisPanel2D.h; sourceTree = SOURCE_ROOT; };
+		84FB4E1F0D92F7560055813E /* BugReporter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BugReporter.nib; path = "Source/Main Dialogs/BugReporter/BugReporter.nib"; sourceTree = SOURCE_ROOT; };
+		84FB4E200D92F7560055813E /* ORBugReporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBugReporter.h; path = "Source/Main Dialogs/BugReporter/ORBugReporter.h"; sourceTree = SOURCE_ROOT; };
+		84FB4E210D92F7560055813E /* ORBugReporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORBugReporter.m; path = "Source/Main Dialogs/BugReporter/ORBugReporter.m"; sourceTree = SOURCE_ROOT; };
 		84FBB56F0D5401BD00780DBD /* ORFilterSymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFilterSymbolTable.h; path = "Source/Objects/Data Processing/Filter/ORFilterSymbolTable.h"; sourceTree = SOURCE_ROOT; };
 		84FBB5700D5401BD00780DBD /* ORFilterSymbolTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFilterSymbolTable.m; path = "Source/Objects/Data Processing/Filter/ORFilterSymbolTable.m"; sourceTree = SOURCE_ROOT; };
 		84FD092A078F4F17004A0E46 /* CamacCmdHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = CamacCmdHelp.plist; path = "Source/Objects/Hardware/Camac/Camac Base Classes/CamacCmdHelp.plist"; sourceTree = SOURCE_ROOT; };
@@ -7185,6 +7191,17 @@
 			path = "Source/Objects/Misc Objects/Workers";
 			sourceTree = SOURCE_ROOT;
 		};
+		84FB4E1E0D92F7560055813E /* BugReporter */ = {
+			isa = PBXGroup;
+			children = (
+				84FB4E1F0D92F7560055813E /* BugReporter.nib */,
+				84FB4E200D92F7560055813E /* ORBugReporter.h */,
+				84FB4E210D92F7560055813E /* ORBugReporter.m */,
+			);
+			name = BugReporter;
+			path = "Source/Main Dialogs/BugReporter";
+			sourceTree = SOURCE_ROOT;
+		};
 		84FDF5220D7E1EAE003AE119 /* Katrin SLT */ = {
 			isa = PBXGroup;
 			children = (
@@ -7386,6 +7403,7 @@
 				84AD4C2C0BA21B7A003C7ABE /* WindowList */,
 				8407750B0CEE7CAC0073F5A9 /* HelpCenter */,
 				848E3BC509DB0B3E0003F7A2 /* MailCenter */,
+				84FB4E1E0D92F7560055813E /* BugReporter */,
 				842539F40BCD7BFE004C8065 /* ORCARootService */,
 			);
 			path = "Main Dialogs";
@@ -8303,6 +8321,7 @@
 				8422513E0D8845390048D331 /* SLTv4_HW_Definitions.h in Headers */,
 				A892F1FA0D901CFA003406A1 /* Pbus_Link.h in Headers */,
 				84FB4E020D91E1D90055813E /* ORAnalysisPanel2D.h in Headers */,
+				84FB4E230D92F7560055813E /* ORBugReporter.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8816,6 +8835,7 @@
 				84FDF5510D7F084E003AE119 /* IpeV4CrateBig.tif in Resources */,
 				842251320D8845390048D331 /* IpeV4SLT.nib in Resources */,
 				842251330D8845390048D331 /* IpeV4SLTCard.gif in Resources */,
+				84FB4E220D92F7560055813E /* BugReporter.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9415,6 +9435,7 @@
 				8422513A0D8845390048D331 /* ORIpeV4SLTModel.m in Sources */,
 				A892F1FB0D901CFA003406A1 /* Pbus_Link.m in Sources */,
 				84FB4E010D91E1D90055813E /* ORAnalysisPanel2D.m in Sources */,
+				84FB4E240D92F7560055813E /* ORBugReporter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
