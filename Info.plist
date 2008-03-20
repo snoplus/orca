@@ -45,11 +45,10 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>Orca</string>
-	
+	<key>CFBundleIconFile</key>
+	<string>Orca</string>
 	<key>ReportBugsTo</key>
 	<string>howe@npl.washington.edu</string>
-
-
 	<key>CFBundleIdentifier</key>
 	<string>edu.washington.npl.orca</string>
 	<key>CFBundleInfoDictionaryVersion</key>
