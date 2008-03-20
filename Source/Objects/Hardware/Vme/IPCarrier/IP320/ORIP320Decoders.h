@@ -26,9 +26,6 @@
 @class ORDataSet;
 
 @interface ORIP320DecoderForAdc : ORVmeCardDecoder {
-    @private 
-        BOOL getValuesFromDecoderStage;
-        NSMutableDictionary* actualIP320s;
 }
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;

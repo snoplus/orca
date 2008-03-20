@@ -23,7 +23,6 @@
 #import "ORIP320Model.h"
 #import "ORIPCarrierModel.h"
 #import "ORVmeCrateModel.h"
-#include "VME_HW_Definitions.h"
 #import "ORDataTypeAssigner.h"
 #import "ORTimer.h"
 
@@ -517,7 +516,7 @@ static struct {
 				else [self readAdcChannel:chan];
 			}
 		}
-		valuesReadyToShip = YES;	
+		readCount++;	
 	}
 }
 
@@ -526,7 +525,8 @@ static struct {
 - (void) _pollAllChannels
 {
     NS_DURING 
-        [self readAllAdcChannels];    
+        [self readAllAdcChannels]; 
+		[self shipValues];   
     NS_HANDLER 
 	//catch this here to prevent it from falling thru, but nothing to do.
 	NS_ENDHANDLER
@@ -571,7 +571,8 @@ static struct {
 
 	if(pollRunning)return;
 	
-    if(pollingState!=0){        
+    if(pollingState!=0){  
+		readCount = 0;
 		pollRunning = YES;
         if(verbose)NSLog(@"Polling IP320,%d,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],[self slotConv],pollingState);
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -706,8 +707,17 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 	return aMask;
 }
 
-#pragma mark ¥¥¥Data Taker
+#pragma mark ¥¥¥Data Records
 
+- (void) setDataIds:(id)assigner
+{
+    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
+}
+
+- (void) syncDataIdsWith:(id)anotherCard
+{
+    [self setDataId:[anotherCard dataId]];
+}
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
@@ -733,75 +743,23 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     return dataDictionary;
 }
 
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
+
+-(void) shipValues
 {
-	NSDictionary* aDictionary;
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"Adc",											@"name",
-							[NSNumber numberWithLong:dataId],				@"dataId",
-							[NSNumber numberWithLong:kNumIP320Channels],	@"maxChannels",
-								nil];
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+
+	if(runInProgress){
+		unsigned long data[43];
 		
-	[anEventDictionary setObject:aDictionary forKey:@"IP320"];
-}
-
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	
-    if(![[guardian adapter] controllerCard]){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-    }
-	
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORIP320Model"];    
-    
-    //----------------------------------------------------------------------------------------
-    controller = [[guardian adapter] controllerCard]; //cache the controller for alittle bit more speed.
-    slotMask   =  (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
-	lowMask = [self lowMask];
-	highMask = [self highMask];
-
-	//here's some tricky stuff Part 1. A run is about to start. Our polling may be moved to an SBC.
-	//so we stop polling here. If we are in NOT one of the SBC's children, then our polling
-	//will be restarted in the takedata method. 
-	first = NO;
-	[self _stopPolling];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-
-    [self clearExceptionCount];
-}
-
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card
-//**************************************************************************************
-- (void) setDataIds:(id)assigner
-{
-    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
-}
-
-- (void) syncDataIdsWith:(id)anotherCard
-{
-    [self setDataId:[anotherCard dataId]];
-}
-
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	if(!first){
-		//here's some tricky stuff Part 2. The run has started and since we got here
-		//we are taking data from the MAC, so we restart the polling.
-		[self _setUpPolling:NO];
-		isRunning = YES;
-	}
-	
-	if(valuesReadyToShip){
-		unsigned long data[23];
-		data[1] = slotMask;
-		time_t  now;
-		time(&now);
-		data[2] = now;	//seconds since 1970
+		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
+		
+		//get the time(UT!)
+		time_t	theTime;
+		time(&theTime);
+		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t ut_time = mktime(theTimeGMTAsStruct);
+		data[2] = ut_time;	//seconds since 1970
+		
 		int index = 3;
 		int i;
 		int n;
@@ -816,77 +774,11 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 		data[0] = dataId | index;
 		
 		if(index>3){
-			[aDataPacket addLongsToFrameBuffer:data length:index];
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+														object:[NSData dataWithBytes:data length:index*sizeof(long)]];
 		}
-		valuesReadyToShip = NO;
 	}
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	//here's some tricky stuff Part 3. The run has stopped. Restart the polling.
-	//If it's already running, this will do nothing.
-	isRunning = NO;
-	[self _setUpPolling:NO];
-}
-
-- (BOOL) processDataBlock:(unsigned long*)ptr length:(short)n;
-{
-	//here's some tricky stuff Part 4. If our polling loop is in the SBC, our values will
-	//come from there. This method will use the values from the decoder unless running, in
-	//which case, the values will be refused and we'll return NO -- telling the decoder not
-	//to bother. 
-	if(isRunning)return NO;
-	
-	//first word is header, skip
-	//second word is location, skip (could do some error checking here, I suppose)
-	//third word is time... to do: use in strip chart
-	//starting four word is n - 3 data words
-	short changeCount = 0;
-	int i;
-	for(i=3;i<n-3;i++){
-		unsigned short chan  = (ptr[i]>>16) & 0x000000ff;
-		unsigned short value = ptr[i] & 0x00000fff;
-		unsigned short corrected_value = [self calculateCorrectedCount:[[chanObjs objectAtIndex:chan] gain] countActual:value];
-		if([[chanObjs objectAtIndex:chan] setChannelValue:corrected_value])changeCount++;
-	}
-	
-	if(changeCount){
-		//since this will be called from the process data thread, we have to be carefull and post the notification on the main thread
-		//to update graphics
-		[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORIP320AdcValueChangedNotification object:self] waitUntilDone:NO];
-	}
-	
-    return YES;
-}
-
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kIP320;		//should be unique
-	configStruct->card_info[index].hw_mask[0]	= dataId; //better be unique
-	configStruct->card_info[index].slot			= [guardian slot];
-	configStruct->card_info[index].crate		= [self crateNumber];
-	configStruct->card_info[index].add_mod		= [self addressModifier];
-	configStruct->card_info[index].base_add		= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0] = [self slot];
-	configStruct->card_info[index].deviceSpecificData[1] = MAX(1.,(unsigned long)pollingState);
-	configStruct->card_info[index].deviceSpecificData[2] = [self lowMask];
-	configStruct->card_info[index].deviceSpecificData[3] = [self highMask];
-	configStruct->card_info[index].deviceSpecificData[4] = [self mode];
-	int i;
-	int j = 5;
-	for(i=0;i<40;i++) configStruct->card_info[index].deviceSpecificData[j++] = [[chanObjs objectAtIndex:i] gain];		
-	
-	configStruct->card_info[index].num_Trigger_Indexes = 0;
-	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
-	
-	return index+1;
-}
-
-- (void)reset
-{
-}
 @end

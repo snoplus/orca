@@ -22,9 +22,6 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORVmeIPCard.h"
 #import "ORAdcProcessing.h"
-#import "ORDataTaker.h"
-#import "VME_eCPU_Config.h"
-#import "SBC_Config.h"
 
 enum {
     kControlReg,
@@ -78,24 +75,17 @@ short kCountCALHI;
 }CalibrationConstants[knumGainSettings];
 
 
-@interface ORIP320Model : ORVmeIPCard <ORDataTaker,ORAdcProcessing>
+@interface ORIP320Model : ORVmeIPCard <ORAdcProcessing>
 {
     NSMutableArray* chanObjs;
     NSTimeInterval	pollingState;
     BOOL            hasBeenPolled;
 	NSLock*			hwLock;
     unsigned long   dataId;
-	BOOL			valuesReadyToShip;
+	unsigned long	readCount;
     BOOL			displayRaw;
 	int				mode;
-	BOOL			first;
-    BOOL			isRunning;
 	BOOL			pollRunning;
-	
-	//cached values -- valid ONLY during running
-	unsigned long slotMask;
-	unsigned long lowMask;
-	unsigned long highMask;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -149,15 +139,11 @@ short kCountCALHI;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
-#pragma mark ¥¥¥DataTaker
+#pragma mark ¥¥¥DataRecords
 - (NSDictionary*) dataRecordDescription;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
-- (BOOL) processDataBlock:(unsigned long*)ptr length:(short)n;
+-(void) shipValues;
 
 @end
 
