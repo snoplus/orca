@@ -437,8 +437,11 @@
         else         return ([item count] != 0);
     }
     else {
-        if(!item) return [[model header] count]>0;
-        else      return [item count]>0;
+        if(!item) return NO;		
+        else {
+			if([item respondsToSelector:@selector(isLeafNode)])return ![item isLeafNode];
+			else return NO;
+		}
     }
 }
 
