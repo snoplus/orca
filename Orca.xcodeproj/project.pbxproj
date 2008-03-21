@@ -1674,6 +1674,7 @@
 		9CD6DD8B0BE83F1B007096CE /* ORPlotFFTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CD6DD840BE83F1B007096CE /* ORPlotFFTController.h */; };
 		9CD6DD8C0BE83F1B007096CE /* ORPlotFFTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CD6DD850BE83F1B007096CE /* ORPlotFFTController.m */; };
 		9CD6DD8D0BE83F1B007096CE /* PlotFFT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9CD6DD860BE83F1B007096CE /* PlotFFT.nib */; };
+		9CDEF4790D941B3300FEE85A /* Analysis2D.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9CDEF4780D941B3300FEE85A /* Analysis2D.nib */; };
 		9CF2C1B40CC195E1002B279B /* L8013Crate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CF2C1AA0CC195E1002B279B /* L8013Crate.gif */; };
 		9CF2C1B50CC195E2002B279B /* L8013Crate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9CF2C1AB0CC195E1002B279B /* L8013Crate.nib */; };
 		9CF2C1B60CC195E2002B279B /* L8013CrateSmall.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9CF2C1AC0CC195E1002B279B /* L8013CrateSmall.tif */; };
@@ -3386,6 +3387,7 @@
 		9CD6DD840BE83F1B007096CE /* ORPlotFFTController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORPlotFFTController.h; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/ORPlotFFTController.h"; sourceTree = SOURCE_ROOT; };
 		9CD6DD850BE83F1B007096CE /* ORPlotFFTController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORPlotFFTController.m; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/ORPlotFFTController.m"; sourceTree = SOURCE_ROOT; };
 		9CD6DD860BE83F1B007096CE /* PlotFFT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PlotFFT.nib; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/PlotFFT.nib"; sourceTree = SOURCE_ROOT; };
+		9CDEF4780D941B3300FEE85A /* Analysis2D.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Analysis2D.nib; path = Source/Widgets/Plotting/Analysis2D.nib; sourceTree = SOURCE_ROOT; };
 		9CF2C1AA0CC195E1002B279B /* L8013Crate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = L8013Crate.gif; path = "Source/Objects/Hardware/Camac/L8013 Crate/L8013Crate.gif"; sourceTree = SOURCE_ROOT; };
 		9CF2C1AB0CC195E1002B279B /* L8013Crate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = L8013Crate.nib; path = "Source/Objects/Hardware/Camac/L8013 Crate/L8013Crate.nib"; sourceTree = SOURCE_ROOT; };
 		9CF2C1AC0CC195E1002B279B /* L8013CrateSmall.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = L8013CrateSmall.tif; path = "Source/Objects/Hardware/Camac/L8013 Crate/L8013CrateSmall.tif"; sourceTree = SOURCE_ROOT; };
@@ -6580,6 +6582,7 @@
 				9CB167FB0C5BD3CE0053CFAD /* yAxisMarkerOpposite.gif */,
 				84A9571E077B887100CAD99D /* Example2D.gif */,
 				84451A0806750B3600A19654 /* Analysis1D.nib */,
+				9CDEF4780D941B3300FEE85A /* Analysis2D.nib */,
 			);
 			path = Plotting;
 			sourceTree = "<group>";
@@ -8836,6 +8839,7 @@
 				842251320D8845390048D331 /* IpeV4SLT.nib in Resources */,
 				842251330D8845390048D331 /* IpeV4SLTCard.gif in Resources */,
 				84FB4E220D92F7560055813E /* BugReporter.nib in Resources */,
+				9CDEF4790D941B3300FEE85A /* Analysis2D.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
