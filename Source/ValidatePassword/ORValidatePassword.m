@@ -19,6 +19,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+
 #import "ORValidatePassword.h"
 
 @interface ORValidatePassword (private)
@@ -27,11 +28,16 @@
 @end
 
 @implementation ORValidatePassword
++ (id) defaultValidate
+{
+    ORValidatePassword* validatePassword = [[[ORValidatePassword alloc] init] retain];
+    return validatePassword;
+}
 + (id) validateForWindow:(NSWindow *)aDocWindow modalDelegate:(id)aModalDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo
 {
-    ORValidatePassword* validatePassword = [[ORValidatePassword alloc] init];
+    ORValidatePassword* validatePassword = [[[ORValidatePassword alloc] init] retain];
     [validatePassword beginSheetForWindow:aDocWindow modalDelegate:aModalDelegate didEndSelector:aDidEndSelector contextInfo:aContextInfo];
-    return [validatePassword autorelease];
+    return validatePassword;
 }
 
 - (id) init
@@ -46,6 +52,7 @@
     modalWindow = aDocWindow;
     modalDelegate = aModalDelegate; 
     didEndSelector = aDidEndSelector; 
+    [aContextInfo retain];
     [NSApp beginSheet:passWordPanel modalForWindow:aDocWindow modalDelegate:self didEndSelector:@selector(_panelDidEnd:returnCode:contextInfo:) contextInfo:aContextInfo];
 }
 
