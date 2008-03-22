@@ -24,6 +24,7 @@
 
 @interface ORSecurity : NSObject {
     NSMutableDictionary* locks;
+	id					 passWordPanel;
 }
 + (id) sharedInstance;
 

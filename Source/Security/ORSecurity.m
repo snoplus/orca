@@ -75,10 +75,10 @@ static ORSecurity* sharedInstance = nil;
         if([self isLocked:aLockName]){
             //to unlock requires a password.
             NSDictionary* contextInfo = [NSDictionary dictionaryWithObject:aLockName forKey:@"LockName"];
-            [ORValidatePassword validateForWindow:aWindow 
+            passWordPanel = [[ORValidatePassword validateForWindow:aWindow 
                                     modalDelegate:self 
                                    didEndSelector:@selector(_validatePWDidEnd:returnCode:contextInfo:) 
-                                      contextInfo:contextInfo];
+                                      contextInfo:contextInfo] retain];
         }
         else {
             //already unlocked, nothing to do.
@@ -158,6 +158,8 @@ static ORSecurity* sharedInstance = nil;
     else {
         [self setLock:lockName to:YES];
     }
+	[passWordPanel release];
+	passWordPanel = nil;
 }
 
 @end
