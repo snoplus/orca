@@ -19,7 +19,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORValidatePassword.h"
 
 @interface ORValidatePassword (private)

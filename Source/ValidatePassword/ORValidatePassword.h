@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #define kPasswordCancelled  0
 #define kGoodPassword       1
 #define kBadPassword	    2
