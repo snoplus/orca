@@ -23,6 +23,7 @@
 #import "ORGate1D.h";
 #import "ORPlotter1D.h"
 #import "ORTimeLine.h"
+#import "ORCalibration.h"
 
 NSString* ORPlotter1DMousePosition = @"ORPlotter1DMousePosition";
 NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
@@ -643,12 +644,21 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
     if([aPlotter mouse:p inRect:[aPlotter bounds]]){
         ORAxis* xScale = [aPlotter xScale];
         int x = floor([xScale convertPoint:p.x]+.5);
+		id theCalibration = [[[aPlotter dataSource] model] calibration];
+		float finalX = x;
+		if(theCalibration && [theCalibration useCalibration]){
+			finalX = [theCalibration convertedValueForChannel:x];
+		}
         float y = [[aPlotter dataSource] plotter:aPlotter dataSet:dataSetID dataValue:x ];
         [[NSNotificationCenter defaultCenter]
             postNotificationName:ORPlotter1DMousePosition
                           object: aPlotter 
-                        userInfo: [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:x],@"x",[NSNumber numberWithFloat:y],@"y",nil]];
-        
+                        userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
+								[NSNumber numberWithFloat:finalX],	@"x",
+								[NSNumber numberWithFloat:y],		@"y",
+								[NSNumber numberWithFloat:x],		@"plotx",
+								[NSNumber numberWithFloat:y],		@"ploty",
+								nil]];
     }
 }
 

@@ -336,7 +336,6 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     if(analysisDrawer && ([analysisDrawer state] == NSDrawerOpenState)){
         [curves makeObjectsPerformSelector:@selector(doAnalysis:) withObject:self];
     }
-
 }
 - (void) xAndYAutoScale
 {

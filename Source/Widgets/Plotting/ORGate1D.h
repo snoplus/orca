@@ -93,6 +93,11 @@ enum {
 - (void) setGateValid:(BOOL)newGateValid;
 - (int) gateMinChannel;
 - (void) setGateMinChannel:(int)newGateMin;
+- (float) gateMaxValue;
+- (float) gateMinValue;
+- (float) gatePeakValue;
+- (float) gateCentroid;
+- (float) gateSigma;
 - (int) gateMaxChannel;
 - (void) setGateMaxChannel:(int)newGateMax;
 - (double) average;

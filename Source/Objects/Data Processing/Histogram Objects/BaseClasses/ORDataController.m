@@ -169,7 +169,7 @@
 - (void) dataSetChanged:(NSNotification*)aNotification
 {
     if(!aNotification || [aNotification object] == model || [aNotification object] == self){
-        [plotter setNeedsDisplay:YES];
+        [[plotter xScale] setNeedsDisplay:YES];
 		[rawDataTable reloadData];
     }
 }
@@ -319,12 +319,12 @@
 											styleMask:[[self window] styleMask]];
     NSSize minSize = [[self window] minSize];
     if([hideShowButton state] == NSOnState){
-        aFrame.size.height += 65;
+        aFrame.size.height += 85;
         minSize.height = 300;
     }
     else {
-        aFrame.size.height -= 65;
-        minSize.height = 300-65;
+        aFrame.size.height -= 85;
+        minSize.height = 300-85;
     }
     [[self window] setMinSize:minSize];
     [self resizeWindowToSize:aFrame.size];

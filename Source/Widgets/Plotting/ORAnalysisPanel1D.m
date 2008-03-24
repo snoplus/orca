@@ -366,8 +366,8 @@
 {
     if(([aNotification object] == gate)  || (aNotification == nil)){
         if([gate gateValid]){
-            [gateMinField setIntValue: [gate gateMinChannel]];
-            [gateWidthField setIntValue:fabs([gate gateMaxChannel]-[gate gateMinChannel])];
+            [gateMinField setFloatValue: [gate gateMinValue]];
+            [gateWidthField setFloatValue:fabs([gate gateMaxValue]-[gate gateMinValue])];
         }
         else {          
             [gateMinField setStringValue:@"---"];	
@@ -380,8 +380,8 @@
 {
     if(([aNotification object] == gate) && [gate gateValid] || (aNotification == nil)){
         if([gate gateValid]){
-            [gateMaxField setIntValue: [gate gateMaxChannel]-1];
-            [gateWidthField setIntValue:fabs([gate gateMaxChannel]-[gate gateMinChannel])];
+            [gateMaxField setFloatValue: [gate gateMaxValue]];
+            [gateWidthField setFloatValue:fabs([gate gateMaxValue]-[gate gateMinValue])];
         }
         else {          
             [gateMaxField setStringValue:@"---"];	
@@ -407,21 +407,21 @@
 - (void) centroidChanged:(NSNotification*)aNotification
 {
     if(([aNotification object] == gate) &&[gate gateValid] || (aNotification == nil)){
-        [centroidField setFloatValue: [gate centroid]];
+        [centroidField setFloatValue: [gate gateCentroid]];
     }
 }
 
 - (void) sigmaChanged:(NSNotification*)aNotification
 {
     if(([aNotification object] == gate) &&[gate gateValid] || (aNotification == nil)){
-        [sigmaField setFloatValue: [gate sigma]];
+        [sigmaField setFloatValue: [gate gateSigma]];
     }
 }
 
 - (void) peakxChanged:(NSNotification*)aNotification
 {
     if(([aNotification object] == gate) &&[gate gateValid] || (aNotification == nil)){
-        [gatePeakXField setIntValue: [gate peakx]];
+        [gatePeakXField setFloatValue: [gate gatePeakValue]];
     }
 }
 - (void) peakyChanged:(NSNotification*)aNotification

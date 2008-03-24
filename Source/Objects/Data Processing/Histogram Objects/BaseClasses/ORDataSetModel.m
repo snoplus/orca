@@ -53,6 +53,18 @@ NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
 }
 
 #pragma mark ¥¥¥Accessors
+- (id) calibration
+{
+	return calibration;
+}
+
+- (void) setCalibration:(id)aCalibration
+{
+	[aCalibration retain];
+	[calibration release];
+	calibration  = aCalibration;
+}
+
 - (void) setDataSet:(id)aDataSet
 {
 	dataSet = aDataSet;	 //don't retain things like this.
@@ -224,6 +236,7 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
 	dataSetLock = [[NSLock alloc] init];
     [self setKey:[decoder decodeObjectForKey:ORDataSetModelKey]];
     [self setFullName:[decoder decodeObjectForKey:ORDataSetModelFullName]];
+	[self setCalibration:[decoder decodeObjectForKey:@"calibration"]];
 	
     
     [[self undoManager] enableUndoRegistration];
@@ -237,7 +250,7 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:key forKey:ORDataSetModelKey];
     [encoder encodeObject:fullName forKey:ORDataSetModelFullName];
-	
+    [encoder encodeObject:calibration forKey:@"calibration"];
 }
 
 - (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray

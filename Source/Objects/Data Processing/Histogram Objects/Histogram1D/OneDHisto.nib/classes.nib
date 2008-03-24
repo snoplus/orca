@@ -5,6 +5,14 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>taskFinished</key>
@@ -28,6 +36,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>calibrate</key>
+				<string>id</string>
 				<key>rebinAction</key>
 				<string>id</string>
 				<key>rebinNumberAction</key>
@@ -39,6 +49,10 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>calibrateButton</key>
+				<string>NSButton</string>
+				<key>calibrationPanel</key>
+				<string>id</string>
 				<key>rebinCB</key>
 				<string>NSButton</string>
 				<key>rebinNumberTextField</key>
@@ -150,7 +164,13 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>setCalibrationIntercept</key>
+				<string>id</string>
+				<key>setCalibrationSlope</key>
+				<string>id</string>
 				<key>setLogScale</key>
+				<string>id</string>
+				<key>setShowCalibratedScale</key>
 				<string>id</string>
 				<key>shiftLeft</key>
 				<string>id</string>

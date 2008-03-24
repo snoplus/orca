@@ -27,6 +27,7 @@
 #import "ORGate.h"
 #import "ORGateKey.h"
 #import "ORGateGroup.h"
+#import "ORCalibration.h"
 #import "ORCARootServiceDefs.h"
 #import "NSDictionary+Extensions.h"
 
@@ -344,6 +345,46 @@ const float kGateAlpha2 = .1;
         postNotificationName:ORGateMinChangedNotification
                       object:self
                     userInfo: nil];
+}
+
+- (float) gateMaxValue
+{
+	int val = [self gateMaxChannel];
+	id theCalibration = [[mPlot xScale] calibration];
+	if(theCalibration && [theCalibration useCalibration])return [theCalibration convertedValueForChannel:val];
+	else return val;
+}
+
+- (float) gateMinValue
+{
+	int val = [self gateMinChannel];
+	id theCalibration = [[mPlot xScale] calibration];
+	if(theCalibration && [theCalibration useCalibration])return [theCalibration convertedValueForChannel:val];
+	else return val;
+}
+
+- (float) gatePeakValue
+{
+	int val = [self peakx];
+	id theCalibration = [[mPlot xScale] calibration];
+	if(theCalibration && [theCalibration useCalibration])return [theCalibration convertedValueForChannel:val];
+	else return val;
+}
+
+- (float) gateCentroid
+{
+	int val = [self centroid];
+	id theCalibration = [[mPlot xScale] calibration];
+	if(theCalibration && [theCalibration useCalibration])return [theCalibration convertedValueForChannel:val];
+	else return val;
+}
+
+- (float) gateSigma
+{
+	int val = [self sigma];
+	id theCalibration = [[mPlot xScale] calibration];
+	if(theCalibration && [theCalibration useCalibration])return [theCalibration convertedValueForChannel:val];
+	else return val;
 }
 
 - (int) gateMaxChannel

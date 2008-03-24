@@ -13,44 +13,42 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
 #define		kMaxLongTicks	100
 
 long roundToLong(double x);
 
 @interface ORAxis : NSView <NSCoding>
 {
-    IBOutlet NSView*	    viewToScale;
-		int						gridCount;
-    	float					gridArray[kMaxLongTicks];	// array for storing long tick locations
-		int						lowOffset;		// pixel position of scale start
-		int						highOffset;		// pixel position of scale end
-		NSMutableDictionary*    attributes;
-		NSMutableDictionary*    labelAttributes;
-		id      preferenceController;
-		double  fscl;			// scaling factor
-		double  pinVal;			// scale value at pin point
-		double  pinPix;			// pixel position of pointpoint during grab
-		int   dpos;			// highOffset - lowOffset
-		BOOL	xaxis;			// flag for x scale (1=x, 0=y)
-		BOOL	pinned;			// flag for scale pinned
-		BOOL	invertPin;		// flag to invert the sense of pinned flag
-		int   nearPinFlag;		// -1/0/1 = below/at/above pin point for cursor
-		BOOL	dragFlag;		// flag pressed if option is down during drag
-		BOOL	saveRng;
-		double  mGrabValue;
-		BOOL	mDragInProgress;
-		BOOL	mMarkerDragInProgress;
-		BOOL    firstDrag;
-		
-		//cache some variables that are heavily used in tight loops.
-		BOOL   isMinPadCached;
-		BOOL   isLogCached;
-		BOOL   isIntegerCached;
-		double cachedMinPad;
-		BOOL   cachedIsLog;
-		BOOL   cachedInteger;
+	IBOutlet NSView*	    viewToScale;
+	int						gridCount;
+	float					gridArray[kMaxLongTicks];	// array for storing long tick locations
+	int						lowOffset;		// pixel position of scale start
+	int						highOffset;		// pixel position of scale end
+	NSMutableDictionary*    attributes;
+	NSMutableDictionary*    labelAttributes;
+	id      preferenceController;
+	double  fscl;			// scaling factor
+	double  pinVal;			// scale value at pin point
+	double  pinPix;			// pixel position of pointpoint during grab
+	int   dpos;			// highOffset - lowOffset
+	BOOL	xaxis;			// flag for x scale (1=x, 0=y)
+	BOOL	pinned;			// flag for scale pinned
+	BOOL	invertPin;		// flag to invert the sense of pinned flag
+	int   nearPinFlag;		// -1/0/1 = below/at/above pin point for cursor
+	BOOL	dragFlag;		// flag pressed if option is down during drag
+	BOOL	saveRng;
+	double  mGrabValue;
+	BOOL	mDragInProgress;
+	BOOL	mMarkerDragInProgress;
+	BOOL    firstDrag;
+	
+	//cache some variables that are heavily used in tight loops.
+	BOOL   isMinPadCached;
+	BOOL   isLogCached;
+	BOOL   isIntegerCached;
+	double cachedMinPad;
+	BOOL   cachedIsLog;
+	BOOL   cachedInteger;
 }
 
 - (id) initWithFrame:(NSRect)aFrame;
@@ -73,12 +71,13 @@ long roundToLong(double x);
 - (BOOL) allowShifts;
 - (BOOL) oppositePosition;
 - (void) setOppositePosition:(BOOL)state;
-	/** Scale specific methods **/
+- (id)   calibration;
 - (BOOL) isXAxis;
 - (BOOL) checkRngLow:(double *)low withHigh:(double *)high;
 - (BOOL) setRngLow:(double)low withHigh:(double) high;
 - (int) setDefaultRng;
 - (int) setFullRng;
+
 - (NSFont*) textFont;
 - (void) setTextFont:(NSFont*) font;
 - (NSColor*) color;
@@ -159,6 +158,11 @@ long roundToLong(double x);
 
 @end
 
+@interface NSView (dataSource)
+- (id) dataSource;
+- (id) model;
+@end
+
 //attributes
 extern NSString* ORAxisMinValue;
 extern NSString* ORAxisMaxValue;
@@ -177,6 +181,7 @@ extern NSString* ORAxisPadding;
 extern NSString* ORAxisMinSave;
 extern NSString* ORAxisMaxSave;
 extern NSString* ORAxisLabel;
+
 extern NSString* ORAxisAllowShifts;
 extern NSString* ORAxisFont;
 extern NSString* ORAxisIsOpposite;

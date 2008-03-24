@@ -30,7 +30,7 @@
 
     NSMutableArray*         curves;
     NSMutableDictionary*	attributes;
-
+	
     BOOL			analyze;
     int				activeCurveIndex;
     BOOL			shiftKeyIsDown;

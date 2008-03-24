@@ -14,6 +14,7 @@
 #import "ORAxis.h"
 #import <math.h>
 #import "ORAxisPreferences.h"
+#import "ORCalibration.h"
 
 @interface ORAxis (private)
 - (double) startDrag:(NSPoint) p;		// start drag procedure and return grab value
@@ -42,16 +43,16 @@ NSString* kDefFont = @"Helvetica";
 /*
  * Definitions for text size calculations
  */
-#define kLongestNumber	    @"1000M"				// longest scale label
-#define	kXNumberCenter		    0				// x-label dx (center)
-#define	kXNumberTopEdge		    (kLongTickLength + 1)       // x-label dy (top edge)
+#define kLongestNumber			@"1000M"				// longest scale label
+#define	kXNumberCenter		    0						// x-label dx (center)
+#define	kXNumberTopEdge		    (kLongTickLength + 1)   // x-label dy (top edge)
 #define	kYNumberRightEdge	    (-kLongTickLength - 3)	// y-label dx (right edge)
-#define	kYNumberCenter		    0				// y-label dy (center)
+#define	kYNumberCenter		    0						// y-label dy (center)
 #define	kXAxisRoomLeft		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2)		// room needed left of x axis
 #define	kXAxisRoomRight		    ([kLongestNumber sizeWithAttributes:labelAttributes].width/2)		// room needed right of x axis
 #define	kYAxisRoomAbove		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room above y axis
 #define	kYAxisRoomBelow		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room below y axis
-#define	kXNumberOptimalSeparation   ([kLongestNumber sizeWithAttributes:labelAttributes].width * 7/4)      // optimal x scale label sep
+#define	kXNumberOptimalSeparation   ([kLongestNumber sizeWithAttributes:labelAttributes].width * 7/3)      // optimal x scale label sep
 #define	kYNumberOptimalSeparation   ([kLongestNumber sizeWithAttributes:labelAttributes].height * 3)		// optimal y scale label sep
 #define kPixelTolerancePinCursor    4				// pixel tolerance for pin cursor
 
@@ -73,30 +74,31 @@ static char	symbols[]	= "fpnµm\0kMG";		// symbols for exponents
 NSString* ORAxisRangeChangedNotification    = @"ORAxis Range Changed";
 
 //attributes
-NSString* ORAxisMinValue 	= @"ORAxisMinValue";
-NSString* ORAxisMaxValue 	= @"ORAxisMaxValue";
-NSString* ORAxisMinLimit 	= @"ORAxisMinLimit";
-NSString* ORAxisMaxLimit 	= @"ORAxisMaxLimit";
-NSString* ORAxisUseLog		= @"ORAxisUseLog";
-NSString* ORAxisColor		= @"ORAxisColor";
-NSString* ORAxisIsOpposite	= @"ORAxisIsOpposite";
-NSString* ORAxisDefaultRangeHigh = @"ORAxisDefaultRangeHigh";
-NSString* ORAxisDefaultRangeLow  = @"ORAxisDefaultRangeLow";
-NSString* ORAxisMinimumRange     = @"ORAxisMinimumRange";
-NSString* ORAxisInteger		= @"ORAxisInteger";
-NSString* ORAxisIgnoreMouse = @"ORAxisIgnoreMouse";
-NSString* ORAxisMinPad		= @"ORAxisMinPad";
-NSString* ORAxisMaxPad		= @"ORAxisMaxPad";
-NSString* ORAxisPadding		= @"ORAxisPadding";
-NSString* ORAxisMinSave		= @"ORAxisMinSave";
-NSString* ORAxisMaxSave		= @"ORAxisMaxSave";
-NSString* ORAxisAllowShifts = @"ORAxisAllowShifts";
-NSString* ORAxisFont		= @"ORAxisFont";
-NSString* ORAxisLabel		= @"ORAxisLabel";
-NSString* kMarker			= @"kMarker";
+NSString* ORAxisMinValue			= @"ORAxisMinValue";
+NSString* ORAxisMaxValue			= @"ORAxisMaxValue";
+NSString* ORAxisMinLimit			= @"ORAxisMinLimit";
+NSString* ORAxisMaxLimit			= @"ORAxisMaxLimit";
+NSString* ORAxisUseLog				= @"ORAxisUseLog";
+NSString* ORAxisColor				= @"ORAxisColor";
+NSString* ORAxisIsOpposite			= @"ORAxisIsOpposite";
+NSString* ORAxisDefaultRangeHigh	= @"ORAxisDefaultRangeHigh";
+NSString* ORAxisDefaultRangeLow		= @"ORAxisDefaultRangeLow";
+NSString* ORAxisMinimumRange		= @"ORAxisMinimumRange";
+NSString* ORAxisInteger				= @"ORAxisInteger";
+NSString* ORAxisIgnoreMouse			= @"ORAxisIgnoreMouse";
+NSString* ORAxisMinPad				= @"ORAxisMinPad";
+NSString* ORAxisMaxPad				= @"ORAxisMaxPad";
+NSString* ORAxisPadding				= @"ORAxisPadding";
+NSString* ORAxisMinSave				= @"ORAxisMinSave";
+NSString* ORAxisMaxSave				= @"ORAxisMaxSave";
+NSString* ORAxisAllowShifts			= @"ORAxisAllowShifts";
+NSString* ORAxisFont				= @"ORAxisFont";
+NSString* ORAxisLabel				= @"ORAxisLabel";
 
-NSString* kDefaultXAxisPrefs = @".xaxis";
-NSString* kDefaultYAxisPrefs = @".yaxis";
+NSString* kMarker					= @"kMarker";
+
+NSString* kDefaultXAxisPrefs		= @".xaxis";
+NSString* kDefaultYAxisPrefs		= @".yaxis";
 
 enum {
     kShrinkPlot,
@@ -210,7 +212,6 @@ enum {
 {
 	return [[attributes objectForKey:ORAxisIsOpposite] boolValue];
 }
-
 
 - (void) setOppositePosition:(BOOL)state
 {
@@ -931,7 +932,9 @@ enum {
 
 - (double) optimalLabelSeparation
 {
-    if([self isXAxis])return kXNumberOptimalSeparation;
+    if([self isXAxis]){
+		return kXNumberOptimalSeparation;
+	}
     else return kYNumberOptimalSeparation;
     
 }
@@ -1181,20 +1184,42 @@ enum {
     [viewToScale setNeedsDisplay:YES];
     
 }
+	
+- (id) calibration
+{
+	if ([viewToScale respondsToSelector:@selector(dataSource)]){
+		if([[viewToScale dataSource] respondsToSelector:@selector(model)]){
+			id theCalibration = [[[viewToScale dataSource] model] calibration];
+			if(![theCalibration ignoreCalibration]) return theCalibration;
+			else return nil;
+		}
+	}
+	return nil;
+}
+
 - (void) drawTitle
 {
 	[[NSColor blackColor] set];
 	NSString* label = [self label];
-	NSSize labelSize = [label sizeWithAttributes:labelAttributes];
 	BOOL isOpposite = [self oppositePosition];
 	if([self isXAxis]){
+		id theCalibration = [self calibration];
+		if([theCalibration useCalibration]){
+			NSString* calibrationUnits = [theCalibration units];
+			if([calibrationUnits length]){
+				if ([label length]) label = [label stringByAppendingFormat:@"(%@)",calibrationUnits];
+				else				label = [NSString stringWithFormat:@"Energy (%@)",calibrationUnits];
+			}
+		}
+		NSSize labelSize = [label sizeWithAttributes:labelAttributes];
 		float xc = [self frame].size.width/2;
 		if(isOpposite) [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,[self frame].size.height - labelSize.height) withAttributes:labelAttributes];
 		else [label drawAtPoint:NSMakePoint(xc - labelSize.width/2,0) withAttributes:labelAttributes];
 	}
 	else {
+		NSSize labelSize = [label sizeWithAttributes:labelAttributes];
 		float labelAndTic = kLongTickLength + [@"300M" sizeWithAttributes:labelAttributes].width;
-		float totalWidth = labelAndTic + labelSize.height;
+		float totalWidth = labelAndTic + labelSize.height;		
 		float x =  [self frame].size.height/2 - labelSize.width/2;
 		NSAffineTransform *transform = [NSAffineTransform transform];
 		NSGraphicsContext *context   = [NSGraphicsContext currentContext];
@@ -1205,12 +1230,11 @@ enum {
 		[context saveGraphicsState];
 		[transform concat];
 		
+
 		if(isOpposite)[label drawAtPoint:NSMakePoint(x,labelSize.height-20) withAttributes:labelAttributes];
 		else          [label drawAtPoint:NSMakePoint(x,labelAndTic) withAttributes:labelAttributes];
 		
 		[context restoreGraphicsState];
-
-
 	}
 }
 @end
@@ -1681,9 +1705,8 @@ enum {
 
 
 /* drawLinScale - draw a linear scale */
-- (void) drawLinScale {
-    
-	
+- (void) drawLinScale 
+{
 	BOOL isX =	[self isXAxis];
     NSBezierPath* theAxis = [NSBezierPath bezierPath];
     
@@ -1691,7 +1714,6 @@ enum {
 	BOOL isOpposite = [self oppositePosition];
     
     double tstep  = [self getValRel:[self optimalLabelSeparation]]; // distance between ticks (scale units)
-    
     int		sign = 1;			// sign of scale range
     if (tstep < 0) {
         sign = -1;
@@ -1718,9 +1740,6 @@ enum {
     else		 	  { sep = 1; ticks = 5; }
     
     if (!power && [self integer]) ticks = sep;		// no sub-ticks for integer scales
-    /*
-     ** End of old getSep() routine
-     */
     double step  = sep  * order;   //dis between two digits
     int   ival   = floor([self minPad]/step);
     double val	 = ival * step;			// value for first label below scale
@@ -1738,7 +1757,7 @@ enum {
             sep  *= 10;
 		break;
         case 2:
-            if (suffix) {			// a- (void) extra trailing zeros if suffix
+            if (suffix) {			//extra trailing zeros if suffix
                 suffix= symbols[(power-kFirstSymbolExponent)/3+1];		// next suffix
                 dec   = 1;			// use decimal point (/10)
             } 
@@ -1786,8 +1805,7 @@ enum {
 		if(isOpposite)	axisPosition  = 0;
 		else			axisPosition  = [self frame].size.width;
 		axisStartX    = axisPosition;
-		axisStartY    = lowOffset-
-        2;
+		axisStartY    = lowOffset-2;
 		axisEndX	  = axisPosition;
 		axisEndY	  = highOffset+1;
 		ticStartX	  = axisPosition;
@@ -1835,7 +1853,14 @@ enum {
 			longTicEndX   = axisPosition - kLongTickLength;
 		}
 	}    
-
+	
+	//for now, at least, only the x axis is allowed to be calibrated.
+	id theCalibration = nil;
+	BOOL useCalibration = NO;
+	if(isX) {
+		theCalibration = [self calibration];
+		useCalibration = [theCalibration useCalibration];
+	}
 	for (;;) {
 		if(isX){
 			ticStartX = lowOffset + [self getPixRel:val];				// get pixel position
@@ -1867,13 +1892,29 @@ enum {
 			if (gridCount<kMaxLongTicks) {
 				gridArray[gridCount++] = gridPosition;
 			}
-			NSString* axisNumberString;
+			
+			NSString* axisNumberString = @"";
+			
 			if (!ival) axisNumberString = @"0";
-			else if (dec) {
-				if (ival<0) axisNumberString = [NSString stringWithFormat:@"-%.1d.%.1d%c",(-ival)/10,(-ival)%10,suffix];
-				else		axisNumberString = [NSString stringWithFormat:@"%.1d.%.1d%c",ival/10,ival%10,suffix];
-			} else			axisNumberString = [NSString stringWithFormat:@"%d%c",ival,suffix];
+			else {
+				if(!useCalibration){
+					if (dec) {
+						if (ival<0) axisNumberString = [NSString stringWithFormat:@"-%.1d.%.1d%c",(-ival)/10,((int)-ival)%10,suffix];
+						else		axisNumberString = [NSString stringWithFormat:@"%.1d.%.1d%c",ival/10,(int)ival%10,suffix];
+					}	
+					else			axisNumberString = [NSString stringWithFormat:@"%.1d%c",ival,suffix];
+				}
+				else {
+					float ticValue = [theCalibration convertedValueForChannel:ival];
+					if (dec) {
+						if (ival<0) axisNumberString = [NSString stringWithFormat:@"-%.1f.%.3f%c",(-ticValue)/10,((int)-ticValue)%10,suffix];
+						else		axisNumberString = [NSString stringWithFormat:@"%.1f.%.3f%c",ticValue/10,(int)ticValue%10,suffix];
+					}	
+					else			axisNumberString = [NSString stringWithFormat:@"%.3f%c",ticValue,suffix];
+				}
+			}
 			NSSize axisNumberSize = [axisNumberString sizeWithAttributes:labelAttributes];
+			
 			if(isX){
 				if(isOpposite) [axisNumberString drawAtPoint:NSMakePoint(ticStartX+kXNumberCenter - axisNumberSize.width/2,axisPosition + kLongTickLength+3) withAttributes:labelAttributes];
 				else [axisNumberString drawAtPoint:NSMakePoint(ticStartX+kXNumberCenter - axisNumberSize.width/2,axisPosition-kXNumberTopEdge-1-axisNumberSize.height) withAttributes:labelAttributes];

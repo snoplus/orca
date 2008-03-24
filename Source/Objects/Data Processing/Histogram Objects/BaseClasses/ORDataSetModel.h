@@ -28,12 +28,15 @@
     BOOL				scheduledForUpdate;
 	NSLock*				dataSetLock;
 	id					dataSet;
+	id					calibration;
 }
 
 #pragma mark ¥¥¥Accessors
 - (void) setDataSet:(id)aDataSet;
 - (id) dataSet;
 
+- (id) calibration;
+- (void) setCalibration:(id)aCalibration;
 - (void) setKey:(NSString*)akey;
 - (NSString*)key;
 - (void) setFullName:(NSString*)aString;

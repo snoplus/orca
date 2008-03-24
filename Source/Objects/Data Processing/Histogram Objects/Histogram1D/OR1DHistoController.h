@@ -21,11 +21,15 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDataController.h"
 
+@class ORCalibration;
+
 @interface OR1DHistoController : ORDataController {
 	IBOutlet NSButton*		rebinCB;
 	IBOutlet NSTextField*	rebinNumberTextField;
+	IBOutlet NSButton*		calibrateButton;
+	ORCalibration*		calibration;
+	id						calibrationPanel;
 }
-
 - (id) init;
 - (void) awakeFromNib;
 
@@ -37,5 +41,6 @@
 
 - (IBAction) rebinAction:(id)sender;
 - (IBAction) rebinNumberAction:(id)sender;
+- (IBAction) calibrate:(id)sender;
 
 @end

@@ -111,6 +111,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (BOOL) changesAllowed;
 - (NSMutableDictionary*) miscAttributesForKey:(NSString*)aKey;
 - (void) setMiscAttributes:(NSMutableDictionary*)someAttributes forKey:(NSString*)aKey;
+- (id) calibration;
 
 #pragma mark ¥¥¥ID Helpers
 - (NSString*)		objectName;

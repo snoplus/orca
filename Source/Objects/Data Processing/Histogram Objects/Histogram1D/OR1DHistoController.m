@@ -25,6 +25,11 @@
 #import "ORPlotter1D.h"
 #import "ORAxis.h"
 #import "ORCurve1D.h"
+#import "ORCalibration.h"
+
+@interface OR1DHistoController (private)
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+@end
 
 @implementation OR1DHistoController
 
@@ -34,6 +39,12 @@
 {
     self = [super initWithWindowNibName:@"OneDHisto"];
     return self;
+}
+
+- (void) dealloc
+{
+	[calibration release];
+	[super dealloc];
 }
 
 - (void) awakeFromNib
@@ -103,9 +114,9 @@
 {
     if([aNote userInfo]){
         NSDictionary* info = [aNote userInfo];
-        int x = [[info objectForKey:@"x"] intValue];
+        float x = [[info objectForKey:@"x"] floatValue];
         float y = [[info objectForKey:@"y"] floatValue];
-        [positionField setStringValue:[NSString stringWithFormat:@"x: %d  y: %.0f",x,y]];
+        [positionField setStringValue:[NSString stringWithFormat:@"x: %.3f  y: %.0f",x,y]];
     }
     else {
         [positionField setStringValue:@""];
@@ -113,6 +124,19 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) calibrate:(id)sender
+{
+	NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
+																	         model , @"ObjectToUpdate",
+																	         nil];
+	calibrationPanel = [[ORCalibrationPane calibrateForWindow:[self window] 
+										   modalDelegate:self 
+										  didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
+											 contextInfo:aContextInfo] retain];
+
+}
+
+
 - (IBAction) copy:(id)sender
 {
 	[plotter copy:sender];
@@ -147,3 +171,14 @@
 }
 
 @end
+
+@implementation OR1DHistoController (private)
+
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	[calibrationPanel release];
+	calibrationPanel = nil;
+}
+
+@end
+

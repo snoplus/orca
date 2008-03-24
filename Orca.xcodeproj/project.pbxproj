@@ -1675,6 +1675,9 @@
 		9CD6DD8C0BE83F1B007096CE /* ORPlotFFTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CD6DD850BE83F1B007096CE /* ORPlotFFTController.m */; };
 		9CD6DD8D0BE83F1B007096CE /* PlotFFT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9CD6DD860BE83F1B007096CE /* PlotFFT.nib */; };
 		9CDEF4790D941B3300FEE85A /* Analysis2D.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9CDEF4780D941B3300FEE85A /* Analysis2D.nib */; };
+		9CDEF5C80D9456A800FEE85A /* Calibration.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9CDEF5C50D9456A800FEE85A /* Calibration.nib */; };
+		9CDEF5C90D9456A800FEE85A /* ORCalibration.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CDEF5C60D9456A800FEE85A /* ORCalibration.h */; };
+		9CDEF5CA0D9456A800FEE85A /* ORCalibration.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDEF5C70D9456A800FEE85A /* ORCalibration.m */; };
 		9CF2C1B40CC195E1002B279B /* L8013Crate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CF2C1AA0CC195E1002B279B /* L8013Crate.gif */; };
 		9CF2C1B50CC195E2002B279B /* L8013Crate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9CF2C1AB0CC195E1002B279B /* L8013Crate.nib */; };
 		9CF2C1B60CC195E2002B279B /* L8013CrateSmall.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9CF2C1AC0CC195E1002B279B /* L8013CrateSmall.tif */; };
@@ -3388,6 +3391,9 @@
 		9CD6DD850BE83F1B007096CE /* ORPlotFFTController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORPlotFFTController.m; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/ORPlotFFTController.m"; sourceTree = SOURCE_ROOT; };
 		9CD6DD860BE83F1B007096CE /* PlotFFT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PlotFFT.nib; path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT/PlotFFT.nib"; sourceTree = SOURCE_ROOT; };
 		9CDEF4780D941B3300FEE85A /* Analysis2D.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Analysis2D.nib; path = Source/Widgets/Plotting/Analysis2D.nib; sourceTree = SOURCE_ROOT; };
+		9CDEF5C50D9456A800FEE85A /* Calibration.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Calibration.nib; path = "Source/Objects/Misc Objects/Views/Calibration/Calibration.nib"; sourceTree = SOURCE_ROOT; };
+		9CDEF5C60D9456A800FEE85A /* ORCalibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCalibration.h; path = "Source/Objects/Misc Objects/Views/Calibration/ORCalibration.h"; sourceTree = SOURCE_ROOT; };
+		9CDEF5C70D9456A800FEE85A /* ORCalibration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCalibration.m; path = "Source/Objects/Misc Objects/Views/Calibration/ORCalibration.m"; sourceTree = SOURCE_ROOT; };
 		9CF2C1AA0CC195E1002B279B /* L8013Crate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = L8013Crate.gif; path = "Source/Objects/Hardware/Camac/L8013 Crate/L8013Crate.gif"; sourceTree = SOURCE_ROOT; };
 		9CF2C1AB0CC195E1002B279B /* L8013Crate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = L8013Crate.nib; path = "Source/Objects/Hardware/Camac/L8013 Crate/L8013Crate.nib"; sourceTree = SOURCE_ROOT; };
 		9CF2C1AC0CC195E1002B279B /* L8013CrateSmall.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = L8013CrateSmall.tif; path = "Source/Objects/Hardware/Camac/L8013 Crate/L8013CrateSmall.tif"; sourceTree = SOURCE_ROOT; };
@@ -6556,8 +6562,10 @@
 			children = (
 				84C7540F06654C3D00EC5D1C /* ORAnalysisPanel1D.m */,
 				84C7541006654C3D00EC5D1C /* ORAnalysisPanel1D.h */,
+				84451A0806750B3600A19654 /* Analysis1D.nib */,
 				84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */,
 				84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */,
+				9CDEF4780D941B3300FEE85A /* Analysis2D.nib */,
 				84C7541706654C3D00EC5D1C /* ORPlotter1D.m */,
 				84C7541C06654C3E00EC5D1C /* ORPlotter1D.h */,
 				84A9565E077B767300CAD99D /* ORPlotter2D.h */,
@@ -6576,13 +6584,11 @@
 				842509C7067FAC9D0037C568 /* ORTimeAxis.h */,
 				849DA7180BF4DB8400044320 /* ORTimeLine.h */,
 				849DA7190BF4DB8400044320 /* ORTimeLine.m */,
+				84A9571E077B887100CAD99D /* Example2D.gif */,
 				9CB167770C5BC9580053CFAD /* xAxisMarker.gif */,
 				9CB167780C5BC9580053CFAD /* yAxisMarker.gif */,
 				9CB167FA0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif */,
 				9CB167FB0C5BD3CE0053CFAD /* yAxisMarkerOpposite.gif */,
-				84A9571E077B887100CAD99D /* Example2D.gif */,
-				84451A0806750B3600A19654 /* Analysis1D.nib */,
-				9CDEF4780D941B3300FEE85A /* Analysis2D.nib */,
 			);
 			path = Plotting;
 			sourceTree = "<group>";
@@ -6799,6 +6805,7 @@
 				8428E5E40820678A00F1CF6E /* StopLight */,
 				84CF3B3B05E6BF0700C5C320 /* PlacardScrollView */,
 				8443514A0B56D75F0033B918 /* TextFinder */,
+				9CDEF5C40D9456A800FEE85A /* Calibration */,
 				847997A008DB69FC00D848FB /* PieChart */,
 			);
 			name = Views;
@@ -7302,6 +7309,17 @@
 			);
 			name = PlotFFT;
 			path = "Source/Objects/Data Processing/Histogram Objects/PlotFFT";
+			sourceTree = SOURCE_ROOT;
+		};
+		9CDEF5C40D9456A800FEE85A /* Calibration */ = {
+			isa = PBXGroup;
+			children = (
+				9CDEF5C50D9456A800FEE85A /* Calibration.nib */,
+				9CDEF5C60D9456A800FEE85A /* ORCalibration.h */,
+				9CDEF5C70D9456A800FEE85A /* ORCalibration.m */,
+			);
+			name = Calibration;
+			path = "Source/Objects/Misc Objects/Views/Calibration";
 			sourceTree = SOURCE_ROOT;
 		};
 		9CF2C1A90CC195E1002B279B /* L8013 Crate */ = {
@@ -8325,6 +8343,7 @@
 				A892F1FA0D901CFA003406A1 /* Pbus_Link.h in Headers */,
 				84FB4E020D91E1D90055813E /* ORAnalysisPanel2D.h in Headers */,
 				84FB4E230D92F7560055813E /* ORBugReporter.h in Headers */,
+				9CDEF5C90D9456A800FEE85A /* ORCalibration.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8840,6 +8859,7 @@
 				842251330D8845390048D331 /* IpeV4SLTCard.gif in Resources */,
 				84FB4E220D92F7560055813E /* BugReporter.nib in Resources */,
 				9CDEF4790D941B3300FEE85A /* Analysis2D.nib in Resources */,
+				9CDEF5C80D9456A800FEE85A /* Calibration.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9440,6 +9460,7 @@
 				A892F1FB0D901CFA003406A1 /* Pbus_Link.m in Sources */,
 				84FB4E010D91E1D90055813E /* ORAnalysisPanel2D.m in Sources */,
 				84FB4E240D92F7560055813E /* ORBugReporter.m in Sources */,
+				9CDEF5CA0D9456A800FEE85A /* ORCalibration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

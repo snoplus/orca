@@ -49,7 +49,6 @@
 - (void) setTotalCounts:(unsigned long) newCount;
 - (void) incrementTotalCounts;
 - (unsigned long) recountTotal;
-
 - (id) 	 data;
 - (void) setData:(id)someData;
 - (void) clear;

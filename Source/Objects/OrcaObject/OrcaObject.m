@@ -249,6 +249,10 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
     //subclasses will override
 }
 
+- (id) calibration
+{
+	return nil;
+}
 
 - ( NSMutableArray*)children
 {
