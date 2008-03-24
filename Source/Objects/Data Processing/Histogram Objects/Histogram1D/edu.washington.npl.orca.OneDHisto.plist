@@ -13,6 +13,16 @@
 	</array>
 	<key>Items</key>
 	<dict>
+		<key>Calibrate</key>
+		<dict>
+			<key>Action</key>
+			<string>calibrate:</string>
+			<key>Label</key>
+			<string>Calibrate</string>
+			<key>ToolTip</key>
+			<string>Energy Calibration</string>
+		</dict>
+
 		<key>LogLin</key>
 		<dict>
 			<key>Action</key>
