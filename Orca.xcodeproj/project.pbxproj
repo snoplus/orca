@@ -1185,6 +1185,7 @@
 		849B26D90B2F48490007484F /* ORDetectorSegment.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B26D70B2F48490007484F /* ORDetectorSegment.h */; };
 		849B26DA0B2F48490007484F /* ORDetectorSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 849B26D80B2F48490007484F /* ORDetectorSegment.m */; };
 		849B472E0D98298B00AD79A0 /* AutoScale.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849B472D0D98298B00AD79A0 /* AutoScale.tif */; };
+		849B47300D982AC000AD79A0 /* Calibrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849B472F0D982AC000AD79A0 /* Calibrate.gif */; };
 		849C68010A2CC20B00511E30 /* CCUSB.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FD0A2CC20B00511E30 /* CCUSB.nib */; };
 		849C68020A2CC20B00511E30 /* CCUSB.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849C67FE0A2CC20B00511E30 /* CCUSB.tif */; };
 		849C68030A2CC20B00511E30 /* ORCCUSBModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849C67FF0A2CC20B00511E30 /* ORCCUSBModel.h */; };
@@ -2766,6 +2767,7 @@
 		849B26D70B2F48490007484F /* ORDetectorSegment.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDetectorSegment.h; path = Source/Experiments/BaseClasses/ORDetectorSegment.h; sourceTree = SOURCE_ROOT; };
 		849B26D80B2F48490007484F /* ORDetectorSegment.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDetectorSegment.m; path = Source/Experiments/BaseClasses/ORDetectorSegment.m; sourceTree = SOURCE_ROOT; };
 		849B472D0D98298B00AD79A0 /* AutoScale.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AutoScale.tif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/AutoScale.tif"; sourceTree = SOURCE_ROOT; };
+		849B472F0D982AC000AD79A0 /* Calibrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Calibrate.gif; sourceTree = "<group>"; };
 		849C67FD0A2CC20B00511E30 /* CCUSB.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = CCUSB.nib; sourceTree = "<group>"; };
 		849C67FE0A2CC20B00511E30 /* CCUSB.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CCUSB.tif; path = Source/Objects/Hardware/Camac/CCUSB/CCUSB.tif; sourceTree = SOURCE_ROOT; };
 		849C67FF0A2CC20B00511E30 /* ORCCUSBModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCCUSBModel.h; sourceTree = "<group>"; };
@@ -5428,6 +5430,7 @@
 				84A9518D077B6C8C00CAD99D /* Clear.gif */,
 				84A9518E077B6C8C00CAD99D /* LogLin.gif */,
 				849DA6FF0BF276AC00044320 /* RawPlot.gif */,
+				849B472F0D982AC000AD79A0 /* Calibrate.gif */,
 			);
 			name = BaseClasses;
 			path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses";
@@ -8864,6 +8867,7 @@
 				9CDEF4790D941B3300FEE85A /* Analysis2D.nib in Resources */,
 				9CDEF5C80D9456A800FEE85A /* Calibration.nib in Resources */,
 				849B472E0D98298B00AD79A0 /* AutoScale.tif in Resources */,
+				849B47300D982AC000AD79A0 /* Calibrate.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
