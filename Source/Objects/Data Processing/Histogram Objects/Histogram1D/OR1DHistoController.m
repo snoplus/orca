@@ -43,7 +43,6 @@
 
 - (void) dealloc
 {
-	[calibration release];
 	[super dealloc];
 }
 

@@ -22,11 +22,19 @@
 
 @interface ORCalibrationPane : NSWindowController 
 {
+	IBOutlet NSButton*		customButton;
+	IBOutlet NSButton*		catalogButton;
+	IBOutlet NSButton*		storeButton;
+	IBOutlet NSButton*		deleteButton;
+	IBOutlet NSPopUpButton*	selectionPU;
 	IBOutlet NSButton*		ignoreButton;
 	IBOutlet NSButton*		calibrateButton;
 	IBOutlet NSForm*		channelForm;
 	IBOutlet NSForm*		valueForm;
 	IBOutlet NSTextField*	unitsField;
+	IBOutlet NSTextField*	nameField;
+	IBOutlet NSButton*		cancelButton;
+	IBOutlet NSButton*		applyButton;
 	
 	id						objectToCalibrate;
 	NSDictionary*			contextInfo;
@@ -38,7 +46,14 @@
 - (void) beginSheetFor:(NSWindow *)aWindow delegate:(id)aDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo;
 - (void) calibrate;
 - (void) setContext:(NSDictionary*)someContext;
+- (void) enableControls;
+- (void) populateSelectionPU;
+- (void) loadUI:(ORCalibration*) aCalibration;
 
+- (IBAction) storeAction:(id)sender;
+- (IBAction) typeAction:(id)sender;
+- (IBAction) selectionAction:(id)sender;
+- (IBAction) deleteAction:(id)sender;
 - (IBAction) apply:(id)sender;
 - (IBAction) done:(id)sender;
 - (IBAction) cancel:(id)sender;
@@ -52,6 +67,8 @@
 	NSString*		units;
 	BOOL			calibrationValid;
 	BOOL			ignoreCalibration;
+	int				type;
+	NSString*		calibrationName;
 }
 
 - (id) initCalibrationArray:(NSArray*)calArray;
@@ -64,6 +81,10 @@
 - (BOOL) useCalibration;
 - (NSString*) units;
 - (void) setUnits:(NSString*)unitString;
+- (void) setCalibrationName:(NSString*)nameString;
+- (NSString*) calibrationName;
+- (void) setType:(int)aType;
+- (int) type;
 - (float) convertedValueForChannel:(float)aChannel;
 
 #pragma mark •••Archival

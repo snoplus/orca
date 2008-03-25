@@ -25,7 +25,9 @@
     IBOutlet NSMatrix* legendMatrix;
     IBOutlet NSTextField* plotNameField;
     BOOL	scheduledForUpdate;
+	id		calibrationPanel;
 }
+
 - (id)   init;
 - (void) modelRemoved:(NSNotification*)aNote;
 - (void) setLegend;
@@ -36,4 +38,5 @@
 - (void) activePlotChanged:(NSNotification*)aNote;
 
 - (IBAction) plotNameAction:(id)sender;
+- (IBAction) calibrate:(id)sender;
 @end

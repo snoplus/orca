@@ -25,6 +25,11 @@
 #import "ORPlotter1D.h"
 #import "ORAxis.h"
 #import "ORDataSet.h"
+#import "ORCalibration.h"
+
+@interface ORMultiPlotController (private)
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+@end
 
 @implementation ORMultiPlotController
 
@@ -169,8 +174,19 @@
     [model setPlotName:[sender stringValue]];
 }
 
-
 #pragma mark ¥¥¥Actions
+- (IBAction) calibrate:(id)sender
+{
+	NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
+																	         model , @"ObjectToUpdate",
+																	         nil];
+	calibrationPanel = [[ORCalibrationPane calibrateForWindow:[self window] 
+										   modalDelegate:self 
+										  didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
+											 contextInfo:aContextInfo] retain];
+
+}
+
 - (IBAction) copy:(id)sender
 {
 	[plotter copy:sender];
@@ -193,3 +209,14 @@
 }
 
 @end
+
+@implementation ORMultiPlotController (private)
+
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	[calibrationPanel release];
+	calibrationPanel = nil;
+}
+
+@end
+

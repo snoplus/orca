@@ -32,7 +32,15 @@
 				<string>id</string>
 				<key>cancel</key>
 				<string>id</string>
+				<key>deleteAction</key>
+				<string>id</string>
 				<key>done</key>
+				<string>id</string>
+				<key>selectionAction</key>
+				<string>id</string>
+				<key>storeAction</key>
+				<string>id</string>
+				<key>typeAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -41,14 +49,30 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>applyButton</key>
+				<string>NSButton</string>
 				<key>calibrateButton</key>
+				<string>NSButton</string>
+				<key>cancelButton</key>
+				<string>NSButton</string>
+				<key>catalogButton</key>
 				<string>NSButton</string>
 				<key>channelForm</key>
 				<string>NSForm</string>
+				<key>customButton</key>
+				<string>NSButton</string>
+				<key>deleteButton</key>
+				<string>NSButton</string>
 				<key>ignoreButton</key>
 				<string>NSButton</string>
+				<key>nameField</key>
+				<string>NSTextField</string>
 				<key>objectToCalibrate</key>
 				<string>id</string>
+				<key>selectionPU</key>
+				<string>NSPopUpButton</string>
+				<key>storeButton</key>
+				<string>NSButton</string>
 				<key>unitsField</key>
 				<string>NSTextField</string>
 				<key>valueForm</key>

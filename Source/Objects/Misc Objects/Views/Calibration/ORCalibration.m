@@ -44,25 +44,46 @@
 
 - (void) awakeFromNib
 {
-
+	[self populateSelectionPU];
 	ORCalibration* calibration = [[contextInfo objectForKey:@"ObjectToCalibrate"] calibration];
-	if(calibration){
-		NSArray* calArray = [calibration calibrationArray];
+	[self loadUI:calibration];
+}
+
+- (void) loadUI:(ORCalibration*) aCalibration
+{
+	if(aCalibration){
+		NSArray* calArray = [aCalibration calibrationArray];
 		[[channelForm cellWithTag:0] setObjectValue:[calArray objectAtIndex:0]]; 
 		[[channelForm cellWithTag:1] setObjectValue:[calArray objectAtIndex:1]]; 
 		[[valueForm cellWithTag:0] setObjectValue:[calArray objectAtIndex:2]]; 
 		[[valueForm cellWithTag:1] setObjectValue:[calArray objectAtIndex:3]]; 
-		[unitsField setStringValue:[calibration units]];
-		[ignoreButton setIntValue:[calibration ignoreCalibration]];
+		[unitsField setStringValue:[aCalibration units]];
+		[nameField setStringValue:[aCalibration calibrationName]];
+		[ignoreButton setIntValue:[aCalibration ignoreCalibration]];
+		[catalogButton setIntValue:[aCalibration type]];
+		[customButton setIntValue:![aCalibration type]];
+		if([[aCalibration calibrationName] length]){
+			if([selectionPU indexOfItemWithTitle:[aCalibration calibrationName]] >=0){
+				[selectionPU selectItemWithTitle:[aCalibration calibrationName]];
+			}
+			else [selectionPU selectItemWithTitle:@"---"];;
+		}
+		else [selectionPU selectItemWithTitle:@"---"];
 	}
 	else {
 		[[channelForm cellWithTag:0] setIntValue:0]; 
 		[[channelForm cellWithTag:1] setIntValue:1000]; 
 		[[valueForm cellWithTag:0] setFloatValue:0]; 
 		[[valueForm cellWithTag:1] setFloatValue:1000]; 
-		[unitsField setStringValue:@"Kev"];
+		[unitsField setStringValue:@"keV"];
 		[ignoreButton setIntValue:NO];
+		[nameField setStringValue:@""];
+		[catalogButton setIntValue:0];
+		[customButton setIntValue:1];
+		[selectionPU selectItemWithTitle:@"---"];
 	}
+	[self enableControls];
+
 }
 
 - (void) setContext:(NSDictionary*)someContext;
@@ -86,10 +107,104 @@
 	id cal		= [[ORCalibration alloc] initCalibrationArray:calArray];
 	
 	[cal setUnits:[unitsField stringValue]];
+	[cal setCalibrationName:[nameField stringValue]];
+	[cal setType:[customButton intValue]];
 	[cal setIgnoreCalibration:[ignoreButton intValue]];
+	
+	if([storeButton intValue]== 1 && [[nameField stringValue] length]){
+		NSMutableDictionary* calDic = [[NSUserDefaults standardUserDefaults] objectForKey:@"ORCACalibrations"];
+		if(!calDic) {
+			calDic = [NSMutableDictionary dictionary];
+			[[NSUserDefaults standardUserDefaults] setObject:calDic forKey:@"ORCACalibrations"];
+		}
+		NSMutableData*   calAsData     = [NSMutableData data];
+		NSKeyedArchiver* archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:calAsData];
+		[archiver encodeObject:cal forKey:@"aCalibration"];
+		[archiver finishEncoding];		
+
+		[calDic setObject:calAsData forKey:[nameField stringValue]];
+		
+		[self populateSelectionPU];
+		[selectionPU selectItemWithTitle:[nameField stringValue]];
+	}
 	[[contextInfo objectForKey:@"ObjectToCalibrate"] setCalibration:cal];
 	[[contextInfo objectForKey:@"ObjectToUpdate"] postUpdate];
 	[cal release];
+}
+
+- (void) populateSelectionPU
+{
+	[selectionPU removeAllItems];
+	[selectionPU addItemWithTitle:@"---"];
+	NSDictionary* calDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:@"ORCACalibrations"];
+	NSArray* keys = [calDictionary allKeys];
+	NSArray* sortedKeys = [keys sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+	[selectionPU addItemsWithTitles:sortedKeys];
+}
+
+- (void) enableControls
+{
+	[channelForm  setEnabled: [customButton intValue]  == 1];
+	[valueForm    setEnabled: [customButton intValue]  == 1];
+	[unitsField   setEnabled: [customButton intValue]  == 1];
+	[nameField    setEnabled: [customButton intValue]  == 1 && [storeButton intValue] == 1];
+	[storeButton  setEnabled: [customButton intValue]  == 1];
+	
+	[selectionPU  setEnabled: [catalogButton intValue] == 1];
+	[deleteButton setEnabled: [catalogButton intValue] == 1 &&  [selectionPU indexOfSelectedItem] != 0];
+	
+	[cancelButton setEnabled:[customButton intValue]  == 1];
+	[applyButton setEnabled:[customButton intValue]  == 1];
+}
+
+- (IBAction) storeAction:(id)sender
+{
+	[self enableControls];
+}
+
+- (IBAction) typeAction:(id)sender
+{
+	if(sender == customButton){
+		[catalogButton setIntValue:0];
+		[customButton setIntValue:1];
+	}
+	else {
+		[catalogButton setIntValue:1];
+		[customButton setIntValue:0];
+	}
+	[self enableControls];
+}
+
+- (IBAction) selectionAction:(id)sender
+{
+	NSMutableDictionary* calDic = [[NSUserDefaults standardUserDefaults] objectForKey:@"ORCACalibrations"];
+	NSData*   calAsData     = [calDic objectForKey:[selectionPU titleOfSelectedItem]];
+	NSKeyedUnarchiver* unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:calAsData];
+	ORCalibration* cal = [unarchiver decodeObjectForKey:@"aCalibration"];
+	[cal setType:1];
+	[cal setCalibrationName:[selectionPU titleOfSelectedItem]];
+	[unarchiver finishDecoding];
+	[unarchiver release];
+	[self loadUI:cal];
+	[self calibrate];
+}
+
+- (IBAction) deleteAction:(id)sender
+{	
+	NSMutableDictionary* calDic = [[NSUserDefaults standardUserDefaults] objectForKey:@"ORCACalibrations"];
+	[calDic removeObjectForKey:[selectionPU titleOfSelectedItem]];
+	[self populateSelectionPU];
+	[selectionPU selectItemAtIndex:0];
+	[self loadUI:nil];
+	if([selectionPU numberOfItems] > 1){
+		[catalogButton setIntValue:1]; 
+		[customButton setIntValue:0]; 
+	}
+	else {
+		[catalogButton setIntValue:0]; 
+		[customButton setIntValue:1]; 
+	}
+	[self enableControls];
 }
 
 - (IBAction) apply:(id)sender
@@ -125,6 +240,7 @@
 - (void)dealloc
 {
 	[calibrationArray release];
+	[calibrationName release];
 	[super dealloc];
 }
 
@@ -170,6 +286,16 @@
 	ignoreCalibration = aState;
 }
 
+- (void) setType:(int)aType
+{
+	type = aType;
+}
+
+- (int) type
+{
+	return type;
+}
+
 - (NSString*) units
 {
 	if(!units)return @"";
@@ -181,6 +307,18 @@
 	if(!unitString) unitString = @"";
 	[units autorelease];
 	units = [unitString copy];
+}
+
+- (void) setCalibrationName:(NSString*)nameString
+{
+	if(!nameString) nameString = @"";
+	[calibrationName autorelease];
+	calibrationName = [nameString copy];
+}
+
+- (NSString*) calibrationName
+{
+	return calibrationName;
 }
 
 - (BOOL) useCalibration
@@ -197,9 +335,10 @@
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self		= [super init];
-    calibrationArray = [[decoder decodeObjectForKey:	@"calibrationArray"] retain];
-	[self setUnits:[decoder decodeObjectForKey:@"units"]];
-	[self setIgnoreCalibration:[decoder decodeBoolForKey:@"ignoreCalibration"]];
+    calibrationArray =			[[decoder decodeObjectForKey:	@"calibrationArray"] retain];
+	[self setUnits:				[decoder decodeObjectForKey:@"units"]];
+	[self setIgnoreCalibration:	[decoder decodeBoolForKey:@"ignoreCalibration"]];
+	[self setCalibrationName:	[decoder decodeObjectForKey:@"calibrationName"]];
 	[self calibrate];
     return self;
 }
@@ -208,7 +347,8 @@
 {
     [encoder encodeObject:calibrationArray	forKey: @"calibrationArray"];
 	[encoder encodeObject:units				forKey:@"units"];
-	[encoder encodeBool:ignoreCalibration forKey:@"ignoreCalibration"];
+	[encoder encodeBool:ignoreCalibration	forKey:@"ignoreCalibration"];
+	[encoder encodeObject:calibrationName	forKey:@"calibrationName"];
 }
 
 

@@ -1902,7 +1902,7 @@ enum {
 						if (ival<0) axisNumberString = [NSString stringWithFormat:@"-%.1d.%.1d%c",(-ival)/10,((int)-ival)%10,suffix];
 						else		axisNumberString = [NSString stringWithFormat:@"%.1d.%.1d%c",ival/10,(int)ival%10,suffix];
 					}	
-					else			axisNumberString = [NSString stringWithFormat:@"%.1d%c",ival,suffix];
+					else			axisNumberString = [NSString stringWithFormat:@"%d%c",ival,suffix];
 				}
 				else {
 					float ticValue = [theCalibration convertedValueForChannel:ival];
