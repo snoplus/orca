@@ -71,8 +71,8 @@
 		else [selectionPU selectItemWithTitle:@"---"];
 	}
 	else {
-		[[channelForm cellWithTag:0] setIntValue:0]; 
-		[[channelForm cellWithTag:1] setIntValue:1000]; 
+		[[channelForm cellWithTag:0] setFloatValue:0]; 
+		[[channelForm cellWithTag:1] setFloatValue:1000]; 
 		[[valueForm cellWithTag:0] setFloatValue:0]; 
 		[[valueForm cellWithTag:1] setFloatValue:1000]; 
 		[unitsField setStringValue:@"keV"];
@@ -265,13 +265,13 @@
 
 - (void) calibrate
 {
-	int   c0 = [[calibrationArray objectAtIndex:0] intValue];
-	int   c1 = [[calibrationArray objectAtIndex:1] intValue];
+	float c0 = [[calibrationArray objectAtIndex:0] floatValue];
+	float c1 = [[calibrationArray objectAtIndex:1] floatValue];
 	float v0 = [[calibrationArray objectAtIndex:2] floatValue];
 	float v1 = [[calibrationArray objectAtIndex:3] floatValue];
 	if(c0 != c1){
-		slope = (v1-v0)/(float)(c1-c0);
-		intercept = (v0*c1 - v1*c0)/(float)(c1-c0);
+		slope = (v1-v0)/(c1-c0);
+		intercept = (v0*c1 - v1*c0)/(c1-c0);
 		calibrationValid = YES;
 	}
 	else {
