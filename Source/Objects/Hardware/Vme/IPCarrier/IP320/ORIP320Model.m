@@ -32,6 +32,8 @@
 #define KDelayTime .00005 //50 microsecond delay to allow for the 8.5 microsecond settling time of the input
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORIP320ModelLogFileChanged				= @"ORIP320ModelLogFileChanged";
+NSString* ORIP320ModelLogToFileChanged				= @"ORIP320ModelLogToFileChanged";
 NSString* ORIP320ModelDisplayRawChanged				= @"ORIP320ModelDisplayRawChanged";
 NSString* ORIP320GainChangedNotification			= @"ORIP320GainChangedNotification";
 NSString* ORIP320ModeChangedNotification			= @"ORIP320ModeChangedNotification";
@@ -79,6 +81,7 @@ static struct {
 
 -(void)dealloc
 {
+    [logFile release];
 	[self _stopPolling];
     [chanObjs release];
     [super dealloc];
@@ -88,6 +91,9 @@ static struct {
 {
     if(![self aWake]){
         [self _setUpPolling:NO];
+		if(logToFile){
+			[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];		
+		}
     }
     [super wakeUp];
 }
@@ -111,6 +117,40 @@ static struct {
 
 
 #pragma mark ¥¥¥Accessors
+
+- (NSString*) logFile
+{
+    return logFile;
+}
+
+- (void) setLogFile:(NSString*)aLogFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLogFile:logFile];
+				
+    [logFile autorelease];
+    logFile = [aLogFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelLogFileChanged object:self];
+}
+
+- (BOOL) logToFile
+{
+    return logToFile;
+}
+
+- (void) setLogToFile:(BOOL)aLogToFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLogToFile:logToFile];
+    
+    logToFile = aLogToFile;
+	
+	if(logToFile)[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];
+	else [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(writeLogBufferToFile) object:nil];
+
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelLogToFileChanged object:self];
+}
+
 - (void) setMode:(int)aMode
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMode:mode];
@@ -140,7 +180,25 @@ static struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelDisplayRawChanged object:self];
 }
 
-
+- (void) writeLogBufferToFile
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(writeLogBufferToFile) object:nil];
+	if(logToFile && [logBuffer count] && [logFile length]){
+		if(![[NSFileManager defaultManager] fileExistsAtPath:[logFile stringByExpandingTildeInPath]]){
+			[[NSFileManager defaultManager] createFileAtPath:[logFile stringByExpandingTildeInPath] contents:nil attributes:nil];
+		}
+		
+		NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:[logFile stringByExpandingTildeInPath]];
+		int i;
+		int n = [logBuffer count];
+		for(i=0;i<n;i++){
+			[fh writeData:[[logBuffer objectAtIndex:i] dataUsingEncoding:NSASCIIStringEncoding]];
+		}
+		[fh closeFile];
+		[logBuffer removeAllObjects];
+	}
+	[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];
+}
 
 - (void) setCardJumperSetting: (int)aCardJumperSetting
 {
@@ -504,19 +562,36 @@ static struct {
 - (void) readAllAdcChannels
 {
 	@synchronized(self) {
+		NSString*   outputString = nil;
+		if(logToFile) {
+			//get the time(UT!)
+			time_t		theTime;
+			time(&theTime);
+			struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+			time_t ut_time = mktime(theTimeGMTAsStruct);
+			outputString = [NSString stringWithFormat:@"%u ",ut_time];
+		}
+
 		short chan;
 		for(chan=0;chan<kNumIP320Channels;chan++){
 			if([[chanObjs objectAtIndex:chan] readEnabled]){
-				if(chan>=20){
-					if([[chanObjs objectAtIndex:chan-20] mode] == 0x1){
-						//only read chans above 20 if chans below 20 are not diff. mode
-						[self readAdcChannel:chan];
-					}
-				}
-				else [self readAdcChannel:chan];
+				if(mode == 0 && chan>=20)break;	//if differential, don't read chan >= 20
+				[self readAdcChannel:chan];
+				if(logToFile)outputString = [outputString stringByAppendingFormat:@"%6.3f ",[self convertedValue:chan]];
+			}
+			else if(logToFile) outputString = [outputString stringByAppendingString:@"0 "];
+		}
+		
+		if(logToFile){
+			outputString = [outputString stringByAppendingString:@"\n"];
+			//accumulate into a buffer, we'll write the file later
+			if(!logBuffer)logBuffer = [[NSMutableArray arrayWithCapacity:1024] retain];
+			if([outputString length]){
+				[logBuffer addObject:outputString];
 			}
 		}
-		readCount++;	
+		
+		readCount++;		
 	}
 }
 
@@ -531,7 +606,7 @@ static struct {
 	//catch this here to prevent it from falling thru, but nothing to do.
 	NS_ENDHANDLER
         
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
 	if(pollingState!=0){
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
 	}
@@ -557,7 +632,7 @@ static struct {
 #pragma mark ¥¥¥Polling
 - (void) _stopPolling
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
 	pollRunning = NO;
 }
 
@@ -575,12 +650,12 @@ static struct {
 		readCount = 0;
 		pollRunning = YES;
         if(verbose)NSLog(@"Polling IP320,%d,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],[self slotConv],pollingState);
-		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
         [self performSelector:@selector(_pollAllChannels) withObject:self afterDelay:pollingState];
         [self _pollAllChannels];
     }
     else {
-        [NSObject cancelPreviousPerformRequestsWithTarget:self];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
         if(verbose)NSLog(@"Not Polling IP320,%d,%d,%d\n",[self crateNumber],[self slot],[self slotConv]);
     }
 }
@@ -594,6 +669,8 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     self = [super initWithCoder:decoder];
 	    
     [[self undoManager] disableUndoRegistration];
+    [self setLogFile:[decoder decodeObjectForKey:@"ORIP320ModelLogFile"]];
+    [self setLogToFile:[decoder decodeBoolForKey:@"ORIP320ModelLogToFile"]];
     [self setDisplayRaw:[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
     [self setChanObjs:[decoder decodeObjectForKey:kORIP320chanObjs]];
 	//[self setCardJumperSetting:[decoder decodeIntForKey:@"ORIP320ModelsetCardJumpertSetting"]];
@@ -617,6 +694,8 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:logFile forKey:@"ORIP320ModelLogFile"];
+    [encoder encodeBool:logToFile forKey:@"ORIP320ModelLogToFile"];
     [encoder encodeBool:displayRaw forKey:@"ORIP320ModelDisplayRaw"];
     [encoder encodeObject:chanObjs forKey:kORIP320chanObjs];
     [encoder encodeInt:[self pollingState] forKey:kORIP320PollingState];

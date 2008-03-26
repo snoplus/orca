@@ -25,6 +25,9 @@
 #import "ORIP320Channel.h"
 
 
+@interface ORIP320Controller (private)
+- (void) selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
 
 @implementation ORIP320Controller
 
@@ -43,7 +46,7 @@
 
 - (void) awakeFromNib
 {
-    adcValueSize    = NSMakeSize(385,422);
+    adcValueSize    = NSMakeSize(385,442);
     calibrationSize = NSMakeSize(520,430);
     alarmSize       = NSMakeSize(490,443);
     
@@ -112,6 +115,16 @@
                      selector : @selector(modeChanged:)
                          name : ORIP320ModelModeChanged
 						object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(logToFileChanged:)
+                         name : ORIP320ModelLogToFileChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(logFileChanged:)
+                         name : ORIP320ModelLogFileChanged
+						object: model];
+
 }
 
 
@@ -119,6 +132,17 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) logFileChanged:(NSNotification*)aNote
+{
+	if([model logFile])[logFileTextField setStringValue: [model logFile]];
+	else [logFileTextField setStringValue: @"---"];
+}
+
+- (void) logToFileChanged:(NSNotification*)aNote
+{
+	[logToFileButton setIntValue: [model logToFile]];
+}
 
 - (void) displayRawChanged:(NSNotification*)aNote
 {
@@ -135,6 +159,8 @@
 	[self slotChanged:nil];
 	[self modeChanged:nil];
 	[self displayRawChanged:nil];
+	[self logToFileChanged:nil];
+	[self logFileChanged:nil];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -167,6 +193,7 @@
 	[pollingButton selectItemAtIndex:[pollingButton indexOfItemWithTag:[model pollingState]]];
 }
 
+#pragma mark ¥¥¥Actions
 - (IBAction) enablePollAllAction:(id)sender
 {
 	[model enablePollAll:YES];
@@ -198,18 +225,46 @@
 
 - (IBAction) setJumperSettings:(id)sender
 {
-	[model setCardJumperSetting:[[sender selectedItem] tag]];
-	
+	[model setCardJumperSetting:[[sender selectedItem] tag]];	
 }
 
 - (IBAction) enableCalibrationAction:(id)sender
 {
 	[model setCardCalibration];
-
 }
 
+- (IBAction) selectFileAction:(id)sender
+{
+	NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Log To File"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+	NSString* fullPath = [[model logFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = @"OrcaScript";
+    }
+	
+    [savePanel beginSheetForDirectory:startingDir
+                                 file:defaultFile
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(selectLogFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
 
-#pragma mark ¥¥¥Actions
+ }
+
+- (IBAction) logToFileAction:(id)sender
+{
+	[model setLogToFile:[sender intValue]];	
+}
 
 - (IBAction) displayRawAction:(id)sender
 {
@@ -312,3 +367,13 @@
 
 
 @end
+
+@implementation ORIP320Controller (private)
+- (void)selectLogFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model setLogFile:[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath]];
+    }
+}
+@end
+

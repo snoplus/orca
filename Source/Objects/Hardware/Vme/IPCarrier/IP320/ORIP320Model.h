@@ -86,9 +86,16 @@ short kCountCALHI;
     BOOL			displayRaw;
 	int				mode;
 	BOOL			pollRunning;
+    BOOL			logToFile;
+    NSString*		logFile;
+	NSMutableArray*	logBuffer;
 }
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) logFile;
+- (void) setLogFile:(NSString*)aLogFile;
+- (BOOL) logToFile;
+- (void) setLogToFile:(BOOL)aLogToFile;
 - (void) setCardJumperSetting:(int)aCardJumperSetting;
 //calibration rotines
 - (void) setCardCalibration;
@@ -149,6 +156,8 @@ short kCountCALHI;
 
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORIP320ModelLogFileChanged;
+extern NSString* ORIP320ModelLogToFileChanged;
 extern NSString* ORIP320ModelDisplayRawChanged;
 extern NSString* ORIP320GainChangedNotification;
 extern NSString* ORIP320ModeChangedNotification;

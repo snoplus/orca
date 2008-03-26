@@ -24,16 +24,19 @@
 
 @interface ORIP320Controller : OrcaObjectController  {
     @private
-        IBOutlet NSTabView*   tabView;
-        IBOutlet NSTableView* valueTable1;
-        IBOutlet NSTableView* valueTable2;
-        IBOutlet NSTableView* calibrationTable1;
-        IBOutlet NSTableView* calibrationTable2;
-        IBOutlet NSTableView* alarmTable1;
-        IBOutlet NSTableView* alarmTable2;
+        IBOutlet NSTabView*		tabView;
+       IBOutlet NSTableView*	valueTable1;
+        IBOutlet NSTableView*	valueTable2;
+        IBOutlet NSTableView*	calibrationTable1;
+        IBOutlet NSTableView*	calibrationTable2;
+        IBOutlet NSTableView*	alarmTable1;
+        IBOutlet NSTableView*	alarmTable2;
         IBOutlet NSPopUpButton* pollingButton;
         IBOutlet NSPopUpButton* modePopUpButton;
         IBOutlet NSButton*		displayRawCB;
+		IBOutlet NSTextField*	logFileTextField;
+		IBOutlet NSButton*		logToFileButton;
+		IBOutlet NSButton*		selectLogFileButton;
     
         NSView *blankView;
         NSSize adcValueSize;
@@ -49,6 +52,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
+- (void) logFileChanged:(NSNotification*)aNote;
+- (void) logToFileChanged:(NSNotification*)aNote;
 - (void) displayRawChanged:(NSNotification*)aNote;
 - (void) pollingStateChanged:(NSNotification*)aNotification;
 - (void) valuesChanged:(NSNotification*)aNotification;
@@ -56,6 +61,7 @@
 - (void) modeChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) logToFileAction:(id)sender;
 - (IBAction) displayRawAction:(id)sender;
 - (IBAction) readAll:(id)sender;
 - (IBAction) setPollingAction:(id)sender;
@@ -67,6 +73,7 @@
 - (IBAction) setPollingAction:(id)sender;
 - (IBAction) setJumperSettings:(id)sender;
 - (IBAction) enableCalibrationAction:(id)sender;
+- (IBAction) selectFileAction:(id)sender;
 
 
 

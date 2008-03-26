@@ -64,9 +64,13 @@
 				<string>id</string>
 				<key>enablePollNoneAction</key>
 				<string>id</string>
+				<key>logToFileAction</key>
+				<string>id</string>
 				<key>modeAction</key>
 				<string>id</string>
 				<key>readAll</key>
+				<string>id</string>
+				<key>selectFileAction</key>
 				<string>id</string>
 				<key>setJumperSettings</key>
 				<string>id</string>
@@ -89,10 +93,16 @@
 				<string>NSTableView</string>
 				<key>displayRawCB</key>
 				<string>NSButton</string>
+				<key>logFileTextField</key>
+				<string>NSTextField</string>
+				<key>logToFileButton</key>
+				<string>NSButton</string>
 				<key>modePopUpButton</key>
 				<string>NSPopUpButton</string>
 				<key>pollingButton</key>
 				<string>NSPopUpButton</string>
+				<key>selectLogFileButton</key>
+				<string>NSButton</string>
 				<key>tabView</key>
 				<string>NSTabView</string>
 				<key>valueTable1</key>
