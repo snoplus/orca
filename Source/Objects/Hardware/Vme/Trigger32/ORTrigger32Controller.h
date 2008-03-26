@@ -23,6 +23,7 @@
 	
     //Setup tab
     IBOutlet NSTabView*		tabView;
+	IBOutlet NSButton*		restartClkAtRunStartButton;
     IBOutlet NSTextField*   slotField;
     IBOutlet NSStepper* 	addressStepper;
     IBOutlet NSTextField* 	addressText;
@@ -119,6 +120,7 @@
 #pragma mark ¥¥¥Accessors
 
 #pragma mark ¥¥¥Interface Management
+- (void) restartClkAtRunStartChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNotification;
 - (void) baseAddressChanged:(NSNotification*)aNotification;
 
@@ -153,6 +155,7 @@
 - (void) prescaleChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) restartClkAtRunStartAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) prescaleAction:(id)sender;
 

@@ -193,9 +193,19 @@
 
 
 
+    [notifyCenter addObserver : self
+                     selector : @selector(restartClkAtRunStartChanged:)
+                         name : ORTrigger32ModelRestartClkAtRunStartChanged
+						object: model];
+
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) restartClkAtRunStartChanged:(NSNotification*)aNote
+{
+	[restartClkAtRunStartButton setIntValue: [model restartClkAtRunStart]];
+}
 - (void) updateWindow
 {
     [super updateWindow];
@@ -222,6 +232,7 @@
     [self liveTimeEnabledChanged:nil];
     [self timeClockLowerChanged:nil];
     [self timeClockUpperChanged:nil];
+	[self restartClkAtRunStartChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -486,6 +497,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) restartClkAtRunStartAction:(id)sender
+{
+	[model setRestartClkAtRunStart:[sender intValue]];	
+}
 
 - (IBAction) settingLockAction:(id) sender
 {

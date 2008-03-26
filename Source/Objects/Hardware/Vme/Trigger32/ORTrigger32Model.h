@@ -178,9 +178,12 @@ enum {
     long long   last_scope_live;
 	long		noDataCount;  
 	long		totalDataCount;
+    BOOL		restartClkAtRunStart;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) restartClkAtRunStart;
+- (void) setRestartClkAtRunStart:(BOOL)aRestartClkAtRunStart;
 - (BOOL) isRunning;
 - (int) mSamPrescale;
 - (void) setMSamPrescale:(int)aValue;
@@ -326,9 +329,15 @@ enum {
 #pragma mark ¥¥¥GTID Generator
 - (unsigned long)  requestGTID;
 
+#pragma mark ¥¥¥Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
+
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORTrigger32ModelRestartClkAtRunStartChanged;
 extern NSString* ORTrigger32TestValueChangedNotification;
 extern NSString* ORTrigger32GtIdValueChangedNotification;
 extern NSString* ORTrigger32LowerTimeValueChangedNotification;

@@ -33,6 +33,7 @@
 #define kDefaultBaseAddress		    0x0007000
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORTrigger32ModelRestartClkAtRunStartChanged = @"ORTrigger32ModelRestartClkAtRunStartChanged";
 NSString* ORTrigger32TestValueChangedNotification       = @"ORTrigger32TestValueChangedNotification";
 NSString* ORTrigger32GtIdValueChangedNotification 	= @"ORTrigger32GtIdValueChangedNotification";
 NSString* ORTrigger32LowerTimeValueChangedNotification	= @"ORTrigger32LowerTimeValueChangedNotification";
@@ -130,6 +131,20 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) restartClkAtRunStart
+{
+    return restartClkAtRunStart;
+}
+
+- (void) setRestartClkAtRunStart:(BOOL)aRestartClkAtRunStart
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRestartClkAtRunStart:restartClkAtRunStart];
+    
+    restartClkAtRunStart = aRestartClkAtRunStart;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTrigger32ModelRestartClkAtRunStartChanged object:self];
+}
 - (BOOL) liveTimeCalcRunning
 {
     return liveTimeCalcRunning;
@@ -1122,6 +1137,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
     [[self undoManager] disableUndoRegistration];
     
     
+    [self setRestartClkAtRunStart:[decoder decodeBoolForKey:@"ORTrigger32ModelRestartClkAtRunStart"]];
     [self setLowerTimeValue:[decoder decodeInt32ForKey:ORTriggerClockLow]];
     [self setUpperTimeValue:[decoder decodeInt32ForKey:ORTriggerClockUpper]];
     [self setTestRegisterValue:[decoder decodeInt32ForKey:ORTriggerTestReg]];
@@ -1171,6 +1187,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 {
     [super encodeWithCoder:encoder];
     
+    [encoder encodeBool:restartClkAtRunStart forKey:@"ORTrigger32ModelRestartClkAtRunStart"];
     [encoder encodeInt32:[self lowerTimeValue] forKey:ORTriggerClockLow];
     [encoder encodeInt32:[self upperTimeValue] forKey:ORTriggerClockUpper];
     [encoder encodeInt32:[self testRegisterValue] forKey:ORTriggerTestReg];
@@ -1438,6 +1455,9 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
     
     if(!useNoHardware){
 		[self initBoardPart2];
+		if(restartClkAtRunStart){
+			[self resetClock];
+		}
     }
     
     [self clearExceptionCount];
