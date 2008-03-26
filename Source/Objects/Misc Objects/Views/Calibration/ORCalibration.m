@@ -100,29 +100,34 @@
 
 - (void) calibrate
 {
+	if(![[self window] makeFirstResponder:[self window]]){
+		[[self window] endEditingFor:nil];		
+	}
 	NSArray* calArray = [NSArray arrayWithObjects:  [[channelForm cellWithTag:0] objectValue],
 													[[channelForm cellWithTag:1] objectValue],
 													[[valueForm   cellWithTag:0] objectValue],
 													[[valueForm   cellWithTag:1] objectValue],nil];
 	id cal		= [[ORCalibration alloc] initCalibrationArray:calArray];
-	
 	[cal setUnits:[unitsField stringValue]];
 	[cal setCalibrationName:[nameField stringValue]];
 	[cal setType:[customButton intValue]];
 	[cal setIgnoreCalibration:[ignoreButton intValue]];
 	
 	if([storeButton intValue]== 1 && [[nameField stringValue] length]){
-		NSMutableDictionary* calDic = [[NSUserDefaults standardUserDefaults] objectForKey:@"ORCACalibrations"];
-		if(!calDic) {
-			calDic = [NSMutableDictionary dictionary];
-			[[NSUserDefaults standardUserDefaults] setObject:calDic forKey:@"ORCACalibrations"];
-		}
+	
+		NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+		NSMutableDictionary* calDic = [NSMutableDictionary dictionaryWithDictionary:[defaults dictionaryForKey:@"ORCACalibrations"]];
+		if(!calDic) calDic = [NSMutableDictionary dictionaryWithCapacity:10];
+			
 		NSMutableData*   calAsData     = [NSMutableData data];
 		NSKeyedArchiver* archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:calAsData];
 		[archiver encodeObject:cal forKey:@"aCalibration"];
 		[archiver finishEncoding];		
-
+		
 		[calDic setObject:calAsData forKey:[nameField stringValue]];
+		[defaults setObject:calDic forKey:@"ORCACalibrations"];
+		
+		[defaults synchronize];
 		
 		[self populateSelectionPU];
 		[selectionPU selectItemWithTitle:[nameField stringValue]];
@@ -136,10 +141,13 @@
 {
 	[selectionPU removeAllItems];
 	[selectionPU addItemWithTitle:@"---"];
-	NSDictionary* calDictionary = [[NSUserDefaults standardUserDefaults] objectForKey:@"ORCACalibrations"];
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	NSDictionary* calDictionary = [defaults objectForKey:@"ORCACalibrations"];
 	NSArray* keys = [calDictionary allKeys];
-	NSArray* sortedKeys = [keys sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-	[selectionPU addItemsWithTitles:sortedKeys];
+	if([keys count]){
+		NSArray* sortedKeys = [keys sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+		[selectionPU addItemsWithTitles:sortedKeys];
+	}
 }
 
 - (void) enableControls
@@ -177,21 +185,27 @@
 
 - (IBAction) selectionAction:(id)sender
 {
-	NSMutableDictionary* calDic = [[NSUserDefaults standardUserDefaults] objectForKey:@"ORCACalibrations"];
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	NSMutableDictionary* calDic = [defaults objectForKey:@"ORCACalibrations"];
 	NSData*   calAsData     = [calDic objectForKey:[selectionPU titleOfSelectedItem]];
-	NSKeyedUnarchiver* unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:calAsData];
-	ORCalibration* cal = [unarchiver decodeObjectForKey:@"aCalibration"];
-	[cal setType:1];
-	[cal setCalibrationName:[selectionPU titleOfSelectedItem]];
-	[unarchiver finishDecoding];
-	[unarchiver release];
-	[self loadUI:cal];
+	if(calAsData){
+		NSKeyedUnarchiver* unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:calAsData];
+		ORCalibration* cal = [unarchiver decodeObjectForKey:@"aCalibration"];
+		[cal setType:1];
+		[cal setCalibrationName:[selectionPU titleOfSelectedItem]];
+		[unarchiver finishDecoding];
+		[unarchiver release];
+		[self loadUI:cal];
+	}
+	else [self loadUI:nil];
+
 	[self calibrate];
 }
 
 - (IBAction) deleteAction:(id)sender
 {	
-	NSMutableDictionary* calDic = [[NSUserDefaults standardUserDefaults] objectForKey:@"ORCACalibrations"];
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	NSMutableDictionary* calDic = [defaults objectForKey:@"ORCACalibrations"];
 	[calDic removeObjectForKey:[selectionPU titleOfSelectedItem]];
 	[self populateSelectionPU];
 	[selectionPU selectItemAtIndex:0];
