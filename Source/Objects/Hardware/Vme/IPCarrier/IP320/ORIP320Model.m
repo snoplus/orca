@@ -33,6 +33,7 @@
 #define KDelayTime .00005 //50 microsecond delay to allow for the 8.5 microsecond settling time of the input
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORIP320ModelCardJumperSettingChanged = @"ORIP320ModelCardJumperSettingChanged";
 NSString* ORIP320ModelShipRecordsChanged			= @"ORIP320ModelShipRecordsChanged";
 NSString* ORIP320ModelLogFileChanged				= @"ORIP320ModelLogFileChanged";
 NSString* ORIP320ModelLogToFileChanged				= @"ORIP320ModelLogToFileChanged";
@@ -62,6 +63,7 @@ static struct {
 - (void) _stopPolling;
 - (void) _startPolling;
 - (void) _pollAllChannels;
+- (void) _callibrateIP320;
 @end
 
 @implementation ORIP320Model
@@ -116,9 +118,25 @@ static struct {
     [self linkToController:@"ORIP320Controller"];
 }
 
-
+- (void) awakeAfterDocumentLoaded
+{
+	[self calibrate];
+}
 
 #pragma mark ¥¥¥Accessors
+- (int) cardJumperSetting
+{
+    return cardJumperSetting;
+}
+
+- (void) setCardJumperSetting:(int)aCardJumperSetting
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCardJumperSetting:cardJumperSetting];
+    
+    cardJumperSetting = aCardJumperSetting;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelCardJumperSettingChanged object:self];
+}
 
 - (BOOL) shipRecords
 {
@@ -216,75 +234,15 @@ static struct {
 	[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];
 }
 
-- (void) setCardJumperSetting: (int)aCardJumperSetting
+- (void) reportCardCalibration
 {
-	int cardJumperSetting = aCardJumperSetting;
-	int gain;
-	for(gain=0;gain<knumGainSettings;gain++){CalibrationConstants[gain].kCardJumperSetting= aCardJumperSetting;}
-	switch(cardJumperSetting)
-	{
-		case(kMinus5to5):
-			NSLog(@"IP320 Card is set to -5 to 5 Volts\n");
-			[self setCardCalibration];
-			break;
-		case(kMinus10to10):
-			NSLog(@"IP320 Card is set to -10 to 10 Volts\n");
-			[self setCardCalibration];
-			break;
-		case(k0to10):
-			NSLog(@"IP320 Card is set to 0 to 10 Volts\n");
-			[self setCardCalibration];
-			break;
-		case(kUncalibrated):
-			NSLog(@"IP320 Card is uncalibrated\n");
-			[self setCardCalibration];
-			break;
-	}
-
-}
-
-- (void) setCardCalibration
-{
-	int countergain=0;
-	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 	switch(cardJumperSetting){
-		case(kMinus5to5):
-			NSLog(@"Calibrating IP320 for -5 to 5 Voltage Range\n");
-			
-			for(countergain=0;countergain<knumGainSettings;countergain++)
-			{
-				CalibrationConstants[countergain].kIdeal_Volt_Span=10.000;
-				CalibrationConstants[countergain].kIdeal_Zero=-5.0000;
-			}
-			[self callibrateIP320];
-			break;
-		case(kMinus10to10):
-			NSLog(@"Calibrating IP320 for -10 to 10 Voltage Range\n");
-
-			for(countergain=0;countergain<knumGainSettings;countergain++){
-				CalibrationConstants[countergain].kIdeal_Volt_Span=20.000;
-				CalibrationConstants[countergain].kIdeal_Zero=-10.0000;
-			}
-			[self callibrateIP320];
-			break;
-		case(k0to10):
-			NSLog(@"Calibrating IP320 for 0 to 10 Voltage Range\n");
-			for(countergain=0;countergain<knumGainSettings;countergain++){
-				CalibrationConstants[countergain].kIdeal_Volt_Span=10.000;
-				CalibrationConstants[countergain].kIdeal_Zero=0.0000;
-				
-			}
-			[self callibrateIP320];
-			break;
-		case(kUncalibrated):
-			NSLog(@"IP320 returns uncorrected value.\n");
-			break;
+		case(kMinus5to5):NSLog(@"IP320 Card is set to -5 to 5 Volts\n");		break;
+		case(kMinus10to10):NSLog(@"IP320 Card is set to -10 to 10 Volts\n");	break;
+		case(k0to10):NSLog(@"IP320 Card is set to 0 to 10 Volts\n");			break;
+		case(kUncalibrated):NSLog(@"IP320 Card is uncalibrated\n");				break;
 	}
 }
-
-
-
-
 
 // ===========================================================
 // - chanObjs:
@@ -448,25 +406,24 @@ static struct {
 
 //Calibration routines
 - (void) loadCALHIControReg:(unsigned short)gain{
-	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 	unsigned short aMaskCALHI = 0x0000;
-	if((cardJumperSetting==kMinus5to5&&gain==0)||(cardJumperSetting==kMinus10to10&&gain<=1)||(cardJumperSetting==k0to10&&gain<=1)){
-		CalibrationConstants[gain].kVoltCALHI=kCAL0_volt;
+	if((cardJumperSetting==kMinus5to5 && gain==0)||(cardJumperSetting==kMinus10to10&&gain<=1)||(cardJumperSetting==k0to10&&gain<=1)){
+		calibrationConstants[gain].kVoltCALHI=kCAL0_volt;
 		aMaskCALHI|=kCAL0_mask;
 		aMaskCALHI|=(gain<<6);	
 	}
-	else if((cardJumperSetting==kMinus5to5&&gain==1)||(cardJumperSetting==kMinus10to10&&gain==2)||(cardJumperSetting==k0to10&&gain==2)){
-		CalibrationConstants[gain].kVoltCALHI=kCAL1_volt;
+	else if((cardJumperSetting==kMinus5to5 && gain==1)||(cardJumperSetting==kMinus10to10&&gain==2)||(cardJumperSetting==k0to10&&gain==2)){
+		calibrationConstants[gain].kVoltCALHI=kCAL1_volt;
 		aMaskCALHI|=kCAL1_mask;
 		aMaskCALHI|=(gain<<6);	
 	}
-	else if((cardJumperSetting==kMinus5to5&&gain==2)||(cardJumperSetting==kMinus10to10&&gain==3)||(cardJumperSetting==k0to10&&gain==3)){
-		CalibrationConstants[gain].kVoltCALHI=kCAL2_volt;
+	else if((cardJumperSetting==kMinus5to5 && gain==2)||(cardJumperSetting==kMinus10to10&&gain==3)||(cardJumperSetting==k0to10&&gain==3)){
+		calibrationConstants[gain].kVoltCALHI=kCAL2_volt;
 		aMaskCALHI|=kCAL2_mask;
 		aMaskCALHI|=(gain<<6);	
 	}
-	else if(cardJumperSetting==kMinus5to5&&gain==3){
-		CalibrationConstants[gain].kVoltCALHI=kCAL3_volt;
+	else if(cardJumperSetting==kMinus5to5 && gain==3){
+		calibrationConstants[gain].kVoltCALHI=kCAL3_volt;
 		aMaskCALHI|=kCAL3_mask;
 		aMaskCALHI|=(gain<<6);	
 	}
@@ -482,16 +439,15 @@ static struct {
 - (void) loadCALLOControReg:(unsigned short)gain
 {
 	unsigned short aMaskCALLO = 0;
-	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 
 //Find CountCALLO
 	if(cardJumperSetting==k0to10){
-			CalibrationConstants[gain].kVoltCALLO=kCAL3_volt;
+			calibrationConstants[gain].kVoltCALLO=kCAL3_volt;
 			aMaskCALLO|=kCAL3_mask;
 			aMaskCALLO|=(gain<<6);
 	}
 	else {
-		CalibrationConstants[gain].kVoltCALLO=kAUTOZERO_volt;
+		calibrationConstants[gain].kVoltCALLO=kAUTOZERO_volt;
 		aMaskCALLO|=kAUTOZERO_mask;
 		aMaskCALLO|=(gain<<6);
 		
@@ -506,30 +462,69 @@ static struct {
 -(void) calculateCalibrationSlope:(unsigned short)gain
 { 
 	float slope;
-	slope=pow(2,gain)*(CalibrationConstants[gain].kVoltCALHI-CalibrationConstants[gain].kVoltCALLO)/(CalibrationConstants[gain].kCountCALHI-CalibrationConstants[gain].kCountCALLO);
-	CalibrationConstants[gain].kSlope_m=slope;
+	slope=pow(2,gain)*(calibrationConstants[gain].kVoltCALHI-calibrationConstants[gain].kVoltCALLO)/(calibrationConstants[gain].kCountCALHI-calibrationConstants[gain].kCountCALLO);
+	calibrationConstants[gain].kSlope_m=slope;
 }
 
 -(unsigned short) calculateCorrectedCount:(unsigned short)gain countActual:(unsigned short)countActual
 {
 	unsigned short corrected_count;
-	int cardJumperSetting=CalibrationConstants[0].kCardJumperSetting;
 
 	if(cardJumperSetting==kUncalibrated) { corrected_count=countActual; }
 	else {
 		corrected_count=countActual;
-		corrected_count+=((CalibrationConstants[gain].kVoltCALLO*pow(2,gain))-CalibrationConstants[gain].kIdeal_Zero)/CalibrationConstants[gain].kSlope_m;
-		corrected_count= corrected_count-CalibrationConstants[gain].kCountCALLO;
-		corrected_count=corrected_count*(4096*CalibrationConstants[gain].kSlope_m)/CalibrationConstants[gain].kIdeal_Volt_Span;
+		corrected_count+=((calibrationConstants[gain].kVoltCALLO*pow(2,gain))-calibrationConstants[gain].kIdeal_Zero)/calibrationConstants[gain].kSlope_m;
+		corrected_count= corrected_count-calibrationConstants[gain].kCountCALLO;
+		corrected_count=corrected_count*(4096*calibrationConstants[gain].kSlope_m)/calibrationConstants[gain].kIdeal_Volt_Span;
 	}
 	return corrected_count;
 	
 }
-- (void) callibrateIP320
+
+- (void) calibrate
 {
-		int gain =0;
-		unsigned short ReadNumber = 10;
-		@synchronized(self) {
+	int countergain=0;
+	switch(cardJumperSetting){
+		case(kMinus5to5):
+			NSLog(@"Calibrating IP320 for -5 to 5 Voltage Range\n");
+			
+			for(countergain=0;countergain<kNumGainSettings;countergain++){
+				calibrationConstants[countergain].kIdeal_Volt_Span=10.000;
+				calibrationConstants[countergain].kIdeal_Zero=-5.0000;
+			}
+			[self _callibrateIP320];
+		break;
+		
+		case(kMinus10to10):
+			NSLog(@"Calibrating IP320 for -10 to 10 Voltage Range\n");
+
+			for(countergain=0;countergain<kNumGainSettings;countergain++){
+				calibrationConstants[countergain].kIdeal_Volt_Span=20.000;
+				calibrationConstants[countergain].kIdeal_Zero=-10.0000;
+			}
+			[self _callibrateIP320];
+		break;
+		
+		case(k0to10):
+			NSLog(@"Calibrating IP320 for 0 to 10 Voltage Range\n");
+			for(countergain=0;countergain<kNumGainSettings;countergain++){
+				calibrationConstants[countergain].kIdeal_Volt_Span=10.000;
+				calibrationConstants[countergain].kIdeal_Zero=0.0000;
+			}
+			[self _callibrateIP320];
+		break;
+		
+		case(kUncalibrated):
+			NSLog(@"IP320 returns uncorrected value.\n");
+		break;
+	}
+}
+
+- (void) _callibrateIP320
+{
+	int gain =0;
+	unsigned short ReadNumber = 10;
+	@synchronized(self) {
 		NSString* errorLocation = @"";
 		NS_DURING
 			for(gain=0;gain<=3;gain++){
@@ -546,7 +541,7 @@ static struct {
 					CountCALHI+=[self readDataBlock];
 				}
 				CountCALHI=CountCALHI/ReadNumber;
-				CalibrationConstants[gain].kCountCALHI=CountCALHI;
+				calibrationConstants[gain].kCountCALHI=CountCALHI;
 				
 				errorLocation = @"CountCALLO Control Reg Setup";
 				[self loadCALLOControReg:gain];
@@ -560,10 +555,10 @@ static struct {
 					CountCALLO+=[self readDataBlock];
 				}
 				CountCALLO=CountCALLO/ReadNumber;
-				CalibrationConstants[gain].kCountCALLO=CountCALLO;
+				calibrationConstants[gain].kCountCALLO=CountCALLO;
 				[self calculateCalibrationSlope:gain];
 				
-				NSLog(@"Calibraton Slope at gain %f is %f\n",pow(2,gain),CalibrationConstants[gain].kSlope_m);
+				NSLog(@"Calibraton Slope at gain %f is %f\n",pow(2,gain),calibrationConstants[gain].kSlope_m);
 			}
 			
 			
@@ -610,8 +605,6 @@ static struct {
 		readCount++;		
 	}
 }
-
-
 
 - (void) _pollAllChannels
 {
@@ -687,12 +680,13 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     self = [super initWithCoder:decoder];
 	    
     [[self undoManager] disableUndoRegistration];
+    [self setCardJumperSetting:[decoder decodeIntForKey:@"ORIP320ModelCardJumperSetting"]];
     [self setShipRecords:[decoder decodeBoolForKey:@"ORIP320ModelShipRecords"]];
     [self setLogFile:[decoder decodeObjectForKey:@"ORIP320ModelLogFile"]];
     [self setLogToFile:[decoder decodeBoolForKey:@"ORIP320ModelLogToFile"]];
     [self setDisplayRaw:[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
     [self setChanObjs:[decoder decodeObjectForKey:kORIP320chanObjs]];
-	//[self setCardJumperSetting:[decoder decodeIntForKey:@"ORIP320ModelsetCardJumpertSetting"]];
+	[self setCardJumperSetting:[decoder decodeIntForKey:@"ORIP320ModelsetCardJumpertSetting"]];
     [self setCardJumperSetting:kUncalibrated];
 	[self setPollingState:[decoder decodeIntForKey:kORIP320PollingState]];
 	[[self undoManager] enableUndoRegistration];
@@ -713,13 +707,14 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:cardJumperSetting forKey:@"ORIP320ModelCardJumperSetting"];
     [encoder encodeBool:shipRecords forKey:@"ORIP320ModelShipRecords"];
     [encoder encodeObject:logFile forKey:@"ORIP320ModelLogFile"];
     [encoder encodeBool:logToFile forKey:@"ORIP320ModelLogToFile"];
     [encoder encodeBool:displayRaw forKey:@"ORIP320ModelDisplayRaw"];
     [encoder encodeObject:chanObjs forKey:kORIP320chanObjs];
     [encoder encodeInt:[self pollingState] forKey:kORIP320PollingState];
-//	[encoder encodeInt:CalibrationConstants[0].kCardJumperSetting forKey:@"ORIP320ModelsetCardJumpertSetting"];
+	[encoder encodeInt:cardJumperSetting forKey:@"ORIP320ModelsetCardJumpertSetting"];
 }
 
 #pragma mark ¥¥¥Bit Processing Protocol

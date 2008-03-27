@@ -49,12 +49,12 @@ enum {
 
 #define kNumIP320Channels 40
 
-#define kMinus5to5 -5
-#define kMinus10to10 -10
-#define k0to10 0
-#define kUncalibrated 1
+#define kMinus5to5		-5
+#define kMinus10to10	-10
+#define k0to10			0
+#define kUncalibrated	1
 
-#define knumGainSettings 4
+#define kNumGainSettings 4
 
 enum {
     kDiff0_19_Cal0_3,
@@ -64,15 +64,15 @@ enum {
 };
 
 struct{
-int kCardJumperSetting;
-float kSlope_m;
-float kIdeal_Volt_Span;
-float kIdeal_Zero;
-float kVoltCALLO;
-short kCountCALLO;
-float kVoltCALHI;
-short kCountCALHI;
-}CalibrationConstants[knumGainSettings];
+	int kCardJumperSetting;
+	float kSlope_m;
+	float kIdeal_Volt_Span;
+	float kIdeal_Zero;
+	float kVoltCALLO;
+	short kCountCALLO;
+	float kVoltCALHI;
+	short kCountCALHI;
+} calibrationConstants[kNumGainSettings];
 
 
 @interface ORIP320Model : ORVmeIPCard <ORAdcProcessing>
@@ -89,10 +89,13 @@ short kCountCALHI;
     BOOL			logToFile;
     NSString*		logFile;
 	NSMutableArray*	logBuffer;
-    BOOL shipRecords;
+    BOOL			shipRecords;
+    int				cardJumperSetting;
 }
 
 #pragma mark ¥¥¥Accessors
+- (int) cardJumperSetting;
+- (void) setCardJumperSetting:(int)aCardJumperSetting;
 - (BOOL) shipRecords;
 - (void) setShipRecords:(BOOL)aShipRecords;
 - (NSString*) logFile;
@@ -101,12 +104,11 @@ short kCountCALHI;
 - (void) setLogToFile:(BOOL)aLogToFile;
 - (void) setCardJumperSetting:(int)aCardJumperSetting;
 //calibration rotines
-- (void) setCardCalibration;
+- (void) calibrate;
 - (void) loadCALHIControReg:(unsigned short)gain;
 - (void) loadCALLOControReg:(unsigned short)gain;
 - (void)  calculateCalibrationSlope:(unsigned short)gain;
 - (unsigned short) calculateCorrectedCount:(unsigned short)gain countActual:(unsigned short)CountActual;
-- (void) callibrateIP320;
 
 
 - (BOOL) displayRaw;
@@ -159,6 +161,7 @@ short kCountCALHI;
 
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORIP320ModelCardJumperSettingChanged;
 extern NSString* ORIP320ModelShipRecordsChanged;
 extern NSString* ORIP320ModelLogFileChanged;
 extern NSString* ORIP320ModelLogToFileChanged;

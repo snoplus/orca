@@ -130,6 +130,11 @@
                          name : ORIP320ModelShipRecordsChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(cardJumperSettingChanged:)
+                         name : ORIP320ModelCardJumperSettingChanged
+						object: model];
+
 }
 
 
@@ -137,7 +142,6 @@
 
 
 #pragma mark ¥¥¥Interface Management
-
 - (void) shipRecordsChanged:(NSNotification*)aNote
 {
 	[shipRecordsButton setIntValue: [model shipRecords]];
@@ -172,6 +176,12 @@
 	[self logToFileChanged:nil];
 	[self logFileChanged:nil];
 	[self shipRecordsChanged:nil];
+	[self cardJumperSettingChanged:nil];
+}
+
+- (void) cardJumperSettingChanged:(NSNotification*)aNotification
+{
+	[jumperSettingsPU selectItemWithTag:[model cardJumperSetting]];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -205,8 +215,7 @@
 }
 
 #pragma mark ¥¥¥Actions
-
-- (void) shipRecordsAction:(id)sender
+- (IBAction) shipRecordsAction:(id)sender
 {
 	[model setShipRecords:[sender intValue]];	
 }
@@ -245,9 +254,9 @@
 	[model setCardJumperSetting:[[sender selectedItem] tag]];	
 }
 
-- (IBAction) enableCalibrationAction:(id)sender
+- (IBAction) calibrateAction:(id)sender
 {
-	[model setCardCalibration];
+	[model calibrate];
 }
 
 - (IBAction) selectFileAction:(id)sender

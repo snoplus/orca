@@ -38,6 +38,8 @@
 		IBOutlet NSTextField*	logFileTextField;
 		IBOutlet NSButton*		logToFileButton;
 		IBOutlet NSButton*		selectLogFileButton;
+		IBOutlet NSButton*		calibrateButton;
+		IBOutlet NSPopUpButton*	jumperSettingsPU;
     
         NSView *blankView;
         NSSize adcValueSize;
@@ -53,6 +55,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
+- (void) cardJumperSettingChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) logFileChanged:(NSNotification*)aNote;
 - (void) logToFileChanged:(NSNotification*)aNote;
@@ -75,7 +78,7 @@
 - (IBAction) modeAction:(id)sender;
 - (IBAction) setPollingAction:(id)sender;
 - (IBAction) setJumperSettings:(id)sender;
-- (IBAction) enableCalibrationAction:(id)sender;
+- (IBAction) calibrateAction:(id)sender;
 - (IBAction) selectFileAction:(id)sender;
 
 
