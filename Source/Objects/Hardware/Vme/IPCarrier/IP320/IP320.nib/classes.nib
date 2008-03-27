@@ -52,13 +52,13 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>calibrateAction</key>
+				<string>id</string>
 				<key>displayRawAction</key>
 				<string>id</string>
 				<key>enableAlarmAllAction</key>
 				<string>id</string>
 				<key>enableAlarmNoneAction</key>
-				<string>id</string>
-				<key>enableCalibrationAction</key>
 				<string>id</string>
 				<key>enablePollAllAction</key>
 				<string>id</string>
@@ -89,12 +89,16 @@
 				<string>NSTableView</string>
 				<key>alarmTable2</key>
 				<string>NSTableView</string>
+				<key>calibrateButton</key>
+				<string>NSButton</string>
 				<key>calibrationTable1</key>
 				<string>NSTableView</string>
 				<key>calibrationTable2</key>
 				<string>NSTableView</string>
 				<key>displayRawCB</key>
 				<string>NSButton</string>
+				<key>jumperSettingsPU</key>
+				<string>NSPopUpButton</string>
 				<key>logFileTextField</key>
 				<string>NSTextField</string>
 				<key>logToFileButton</key>
