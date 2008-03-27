@@ -103,7 +103,7 @@ struct{
 - (BOOL) logToFile;
 - (void) setLogToFile:(BOOL)aLogToFile;
 - (void) setCardJumperSetting:(int)aCardJumperSetting;
-//calibration rotines
+//calibration routines
 - (void) calibrate;
 - (void) loadCALHIControReg:(unsigned short)gain;
 - (void) loadCALLOControReg:(unsigned short)gain;
