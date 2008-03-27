@@ -992,6 +992,8 @@
 		84799A3E08DF5C6400D848FB /* ORSplashWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84799A3A08DF5C6400D848FB /* ORSplashWindowController.m */; };
 		84799A3F08DF5C6400D848FB /* SplashScreen.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84799A3B08DF5C6400D848FB /* SplashScreen.nib */; };
 		84799B3908DF70B300D848FB /* CENPA.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84799B3808DF70B200D848FB /* CENPA.gif */; };
+		847A46D80D9C3C18002125DE /* ORJAMFDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 847A46D60D9C3C18002125DE /* ORJAMFDecoders.h */; };
+		847A46D90D9C3C18002125DE /* ORJAMFDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 847A46D70D9C3C18002125DE /* ORJAMFDecoders.m */; };
 		847BC83205E293E80054841E /* Unlocked.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC82E05E293E80054841E /* Unlocked.tif */; };
 		847BC83305E293E80054841E /* Locked.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83005E293E80054841E /* Locked.tif */; };
 		847BC83805E2940D0054841E /* ORHWUndoSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 847BC83405E2940D0054841E /* ORHWUndoSet.h */; };
@@ -2565,6 +2567,8 @@
 		84799A3A08DF5C6400D848FB /* ORSplashWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSplashWindowController.m; path = "Source/Main Dialogs/SplashScreen/ORSplashWindowController.m"; sourceTree = SOURCE_ROOT; };
 		84799A3B08DF5C6400D848FB /* SplashScreen.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SplashScreen.nib; path = "Source/Main Dialogs/SplashScreen/SplashScreen.nib"; sourceTree = SOURCE_ROOT; };
 		84799B3808DF70B200D848FB /* CENPA.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = CENPA.gif; path = "Source/Main Dialogs/SplashScreen/CENPA.gif"; sourceTree = SOURCE_ROOT; };
+		847A46D60D9C3C18002125DE /* ORJAMFDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORJAMFDecoders.h; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFDecoders.h; sourceTree = SOURCE_ROOT; };
+		847A46D70D9C3C18002125DE /* ORJAMFDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFDecoders.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFDecoders.m; sourceTree = SOURCE_ROOT; };
 		847BC82F05E293E80054841E /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/Unlocked.tif; sourceTree = "<group>"; };
 		847BC83105E293E80054841E /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/Locked.tif; sourceTree = "<group>"; };
 		847BC83405E2940D0054841E /* ORHWUndoSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHWUndoSet.h; path = "Source/Main Dialogs/HardwareWizard/ORHWUndoSet.h"; sourceTree = SOURCE_ROOT; };
@@ -6199,6 +6203,8 @@
 				84AB8BCD0D2314DD00EC39F2 /* ORJAMFController.m */,
 				84AB8BCE0D2314DD00EC39F2 /* ORJAMFModel.h */,
 				84AB8BCF0D2314DD00EC39F2 /* ORJAMFModel.m */,
+				847A46D60D9C3C18002125DE /* ORJAMFDecoders.h */,
+				847A46D70D9C3C18002125DE /* ORJAMFDecoders.m */,
 			);
 			name = JAM_F;
 			path = Source/Objects/Hardware/Camac/JAM_F;
@@ -8350,6 +8356,7 @@
 				84FB4E020D91E1D90055813E /* ORAnalysisPanel2D.h in Headers */,
 				84FB4E230D92F7560055813E /* ORBugReporter.h in Headers */,
 				9CDEF5C90D9456A800FEE85A /* ORCalibration.h in Headers */,
+				847A46D80D9C3C18002125DE /* ORJAMFDecoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9469,6 +9476,7 @@
 				84FB4E010D91E1D90055813E /* ORAnalysisPanel2D.m in Sources */,
 				84FB4E240D92F7560055813E /* ORBugReporter.m in Sources */,
 				9CDEF5CA0D9456A800FEE85A /* ORCalibration.m in Sources */,
+				847A46D90D9C3C18002125DE /* ORJAMFDecoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
