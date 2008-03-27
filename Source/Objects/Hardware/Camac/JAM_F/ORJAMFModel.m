@@ -660,8 +660,8 @@ struct {
     [dataDictionary setObject:aDictionary forKey:@"JAMFADC"];
     
     return dataDictionary;
+	
 }
-
 
 -(void) shipValues
 {
