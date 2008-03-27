@@ -76,6 +76,8 @@
 				<string>id</string>
 				<key>setPollingAction</key>
 				<string>id</string>
+				<key>shipRecordsAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORIP320Controller</string>
@@ -102,6 +104,8 @@
 				<key>pollingButton</key>
 				<string>NSPopUpButton</string>
 				<key>selectLogFileButton</key>
+				<string>NSButton</string>
+				<key>shipRecordsButton</key>
 				<string>NSButton</string>
 				<key>tabView</key>
 				<string>NSTabView</string>
