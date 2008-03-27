@@ -42,6 +42,8 @@
 	[[mailForm cellWithTag:2] setStringValue:@"Orca Bug"];
 	
 	[categoryMatrix selectCellWithTag:3];
+	[bodyField setString:@""];
+
 }
 
 //this method is needed so the global menu commands will be passes on correctly.
@@ -53,6 +55,7 @@
 #pragma mark •••Actions
 - (IBAction) showBugReporter:(id)sender
 {
+	[bodyField setString:@""];
     [[self window] makeKeyAndOrderFront:nil];
 }
 
