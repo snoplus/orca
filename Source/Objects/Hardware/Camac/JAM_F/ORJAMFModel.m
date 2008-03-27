@@ -31,7 +31,9 @@
 #import "ORHWWizSelection.h"
 #import "ORTimeRate.h"
 #import "ORAxis.h"
+#import "ORDataTypeAssigner.h"
 
+NSString* ORJAMFModelShipRecordsChanged = @"ORJAMFModelShipRecordsChanged";
 NSString* ORJAMFModelScanEnabledChanged = @"ORJAMFModelScanEnabledChanged";
 NSString* ORJAMFModelScanLimitChanged = @"ORJAMFModelScanLimitChanged";
 NSString* ORJAMFModelPollingStateChanged	= @"ORJAMFModelPollingStateChanged";
@@ -107,6 +109,26 @@ struct {
 }
 
 #pragma mark •••Accessors
+
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+
+- (BOOL) shipRecords
+{
+    return shipRecords;
+}
+
+- (void) setShipRecords:(BOOL)aShipRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:shipRecords];
+    
+    shipRecords = aShipRecords;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelShipRecordsChanged object:self];
+}
 
 - (BOOL) scanEnabled
 {
@@ -334,10 +356,6 @@ struct {
 	@synchronized(self){
 		if(verbose)NSLog(@"Adc values for JAM-F (station %d)\n",[self stationNumber]);
 		if(enabledMask){
-		
-			unsigned short theRawValues[16];
-
-		
 			int chan;
 			for(chan=0;chan<16;chan++){
 				if(enabledMask & (0x1L<<chan)){
@@ -445,6 +463,7 @@ struct {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+    [self setShipRecords:[decoder decodeBoolForKey:@"ORJAMFModelShipRecords"]];
     [self setScanEnabled:[decoder decodeBoolForKey:@"ORJAMFModelScanEnabled"]];
     [self setScanLimit:[decoder decodeIntForKey:@"ORJAMFModelScanLimit"]];
     [self setPollingState:[decoder decodeIntForKey:@"ORJAMFModelPollingState"]];
@@ -467,6 +486,7 @@ struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];	
+    [encoder encodeBool:shipRecords forKey:@"ORJAMFModelShipRecords"];
     [encoder encodeBool:scanEnabled forKey:@"ORJAMFModelScanEnabled"];
     [encoder encodeInt:scanLimit forKey:@"ORJAMFModelScanLimit"];
     [encoder encodeInt:pollingState			forKey:@"ORJAMFModelPollingState"];
@@ -611,6 +631,62 @@ struct {
 	
 }
 
+#pragma mark •••Data Records
+
+- (void) setDataIds:(id)assigner
+{
+    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
+}
+
+- (void) syncDataIdsWith:(id)anotherCard
+{
+    [self setDataId:[anotherCard dataId]];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"ORJAMFDecoderForAdc",							@"decoder",
+        [NSNumber numberWithLong:dataId],               @"dataId",
+        [NSNumber numberWithBool:YES],                  @"variable",
+        [NSNumber numberWithLong:-1],					@"length",
+        nil];
+    [dataDictionary setObject:aDictionary forKey:@"JAMFADC"];
+    
+    return dataDictionary;
+}
+
+
+-(void) shipValues
+{
+	if([gOrcaGlobals runInProgress]){
+		unsigned long data[32];
+		
+		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self stationNumber]&0xf);
+		
+		//get the time(UT!)
+		time_t	theTime;
+		time(&theTime);
+		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t ut_time = mktime(theTimeGMTAsStruct);
+		data[2] = ut_time;	//seconds since 1970
+		
+		int index = 3;
+		int i;
+		for(i=0;i<16;i++){
+			if(enabledMask & (1<<i)){
+				data[index++] = (i&0xff)<<16 | theRawValues[i] & 0xffff;
+			}
+		}
+		data[0] = dataId | index;
+		
+		if(index>3){
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+														object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+		}
+	}
+}
 
 @end
 
@@ -685,7 +761,8 @@ struct {
 - (void) _pollAllChannels
 {
     NS_DURING 
-        [self readAdcs:NO];    
+        [self readAdcs:NO];
+		if(shipRecords) [self shipValues];    
     NS_HANDLER 
         //catch this here to prevent it from falling thru, but nothing to do.
 	NS_ENDHANDLER
@@ -695,4 +772,6 @@ struct {
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
 	}
 }
+
+
 @end
