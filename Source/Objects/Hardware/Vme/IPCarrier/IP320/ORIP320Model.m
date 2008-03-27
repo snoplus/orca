@@ -24,6 +24,7 @@
 #import "ORIPCarrierModel.h"
 #import "ORVmeCrateModel.h"
 #import "ORDataTypeAssigner.h"
+#import "ORDataPacket.h"
 #import "ORTimer.h"
 
 #import "ORIP320Channel.h"
