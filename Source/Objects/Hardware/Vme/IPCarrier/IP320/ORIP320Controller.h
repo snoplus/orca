@@ -25,7 +25,8 @@
 @interface ORIP320Controller : OrcaObjectController  {
     @private
         IBOutlet NSTabView*		tabView;
-       IBOutlet NSTableView*	valueTable1;
+		IBOutlet NSButton*		shipRecordsButton;
+		IBOutlet NSTableView*	valueTable1;
         IBOutlet NSTableView*	valueTable2;
         IBOutlet NSTableView*	calibrationTable1;
         IBOutlet NSTableView*	calibrationTable2;
@@ -52,6 +53,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
+- (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) logFileChanged:(NSNotification*)aNote;
 - (void) logToFileChanged:(NSNotification*)aNote;
 - (void) displayRawChanged:(NSNotification*)aNote;
@@ -61,6 +63,7 @@
 - (void) modeChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) logToFileAction:(id)sender;
 - (IBAction) displayRawAction:(id)sender;
 - (IBAction) readAll:(id)sender;

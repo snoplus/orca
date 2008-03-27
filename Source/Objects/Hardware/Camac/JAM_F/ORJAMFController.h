@@ -29,6 +29,7 @@
 @interface ORJAMFController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton;
+		IBOutlet NSButton*		shipRecordsButton;
 		IBOutlet NSButton*		scanEnabledCB;
 		IBOutlet NSMatrix*		scanLimitMatrix;
 		IBOutlet NSPopUpButton* pollingStatePopup;
@@ -66,6 +67,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) scanEnabledChanged:(NSNotification*)aNote;
 - (void) scanLimitChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
@@ -85,6 +87,7 @@
 #pragma mark •••Accessors
 
 #pragma mark •••Actions
+- (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) scanEnabledAction:(id)sender;
 - (IBAction) scanLimitAction:(id)sender;
 - (IBAction) pollingStatePopupAction:(id)sender;

@@ -89,9 +89,12 @@ short kCountCALHI;
     BOOL			logToFile;
     NSString*		logFile;
 	NSMutableArray*	logBuffer;
+    BOOL shipRecords;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) shipRecords;
+- (void) setShipRecords:(BOOL)aShipRecords;
 - (NSString*) logFile;
 - (void) setLogFile:(NSString*)aLogFile;
 - (BOOL) logToFile;
@@ -156,6 +159,7 @@ short kCountCALHI;
 
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORIP320ModelShipRecordsChanged;
 extern NSString* ORIP320ModelLogFileChanged;
 extern NSString* ORIP320ModelLogToFileChanged;
 extern NSString* ORIP320ModelDisplayRawChanged;

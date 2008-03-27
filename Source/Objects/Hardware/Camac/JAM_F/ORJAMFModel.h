@@ -41,6 +41,7 @@
 		float highLimits[16];
 		float adcValue[16];
 		int adcRange[16];
+		unsigned short theRawValues[16];
 		ORAlarm* highAlarms[16];
 		ORAlarm* lowAlarms[16];
 		ORTimeRate* timeRates[16];
@@ -54,8 +55,10 @@
         unsigned long 	unChangingDataPart;
         unsigned short cachedStation;
 		int pollingState;
-    int scanLimit;
-    BOOL scanEnabled;
+		int scanLimit;
+		BOOL scanEnabled;
+		unsigned long   dataId;
+		BOOL shipRecords;
 }
 
 #pragma mark •••Initialization
@@ -63,6 +66,10 @@
 - (void) dealloc;
         
 #pragma mark •••Accessors
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (BOOL) shipRecords;
+- (void) setShipRecords:(BOOL)aShipRecords;
 - (BOOL) scanEnabled;
 - (void) setScanEnabled:(BOOL)aScanEnabled;
 - (int) scanLimit;
@@ -118,12 +125,19 @@
 - (double) convertedValue:(int)channel;
 - (double) maxValueForChan:(int)channel;
 
+#pragma mark •••DataRecords
+- (NSDictionary*) dataRecordDescription;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherShaper;
+-(void) shipValues;
+
 #pragma mark •••HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 @end
 
+extern NSString* ORJAMFModelShipRecordsChanged;
 extern NSString* ORJAMFModelScanEnabledChanged;
 extern NSString* ORJAMFModelScanLimitChanged;
 extern NSString* ORJAMFModelPollingStateChanged;

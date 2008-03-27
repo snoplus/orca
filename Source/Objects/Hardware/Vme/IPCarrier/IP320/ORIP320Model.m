@@ -32,6 +32,7 @@
 #define KDelayTime .00005 //50 microsecond delay to allow for the 8.5 microsecond settling time of the input
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORIP320ModelShipRecordsChanged			= @"ORIP320ModelShipRecordsChanged";
 NSString* ORIP320ModelLogFileChanged				= @"ORIP320ModelLogFileChanged";
 NSString* ORIP320ModelLogToFileChanged				= @"ORIP320ModelLogToFileChanged";
 NSString* ORIP320ModelDisplayRawChanged				= @"ORIP320ModelDisplayRawChanged";
@@ -117,6 +118,20 @@ static struct {
 
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) shipRecords
+{
+    return shipRecords;
+}
+
+- (void) setShipRecords:(BOOL)aShipRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:shipRecords];
+    
+    shipRecords = aShipRecords;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelShipRecordsChanged object:self];
+}
 
 - (NSString*) logFile
 {
@@ -601,7 +616,9 @@ static struct {
 {
     NS_DURING 
         [self readAllAdcChannels]; 
-		[self shipValues];   
+		if(shipRecords){
+			[self shipValues]; 
+		}
     NS_HANDLER 
 	//catch this here to prevent it from falling thru, but nothing to do.
 	NS_ENDHANDLER
@@ -669,6 +686,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     self = [super initWithCoder:decoder];
 	    
     [[self undoManager] disableUndoRegistration];
+    [self setShipRecords:[decoder decodeBoolForKey:@"ORIP320ModelShipRecords"]];
     [self setLogFile:[decoder decodeObjectForKey:@"ORIP320ModelLogFile"]];
     [self setLogToFile:[decoder decodeBoolForKey:@"ORIP320ModelLogToFile"]];
     [self setDisplayRaw:[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
@@ -694,6 +712,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:shipRecords forKey:@"ORIP320ModelShipRecords"];
     [encoder encodeObject:logFile forKey:@"ORIP320ModelLogFile"];
     [encoder encodeBool:logToFile forKey:@"ORIP320ModelLogToFile"];
     [encoder encodeBool:displayRaw forKey:@"ORIP320ModelDisplayRaw"];

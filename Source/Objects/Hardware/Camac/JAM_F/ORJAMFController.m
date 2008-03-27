@@ -157,9 +157,19 @@
                          name : ORJAMFModelScanEnabledChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipRecordsChanged:)
+                         name : ORJAMFModelShipRecordsChanged
+						object: model];
+
 }
 
 #pragma mark •••Interface Management
+
+- (void) shipRecordsChanged:(NSNotification*)aNote
+{
+	[shipRecordsButton setIntValue: [model shipRecords]];
+}
 
 - (void) scanEnabledChanged:(NSNotification*)aNote
 {
@@ -188,6 +198,7 @@
     [self miscAttributesChanged:nil];
 	[self scanLimitChanged:nil];
 	[self scanEnabledChanged:nil];
+	[self shipRecordsChanged:nil];
 }
 
 - (void) scaleAction:(NSNotification*)aNotification
@@ -432,6 +443,7 @@
 	[readIdButton setEnabled:!lockedOrRunningMaintenance];
 	[scanLimitMatrix setEnabled:!lockedOrRunningMaintenance];
 	[scanEnabledCB setEnabled:!lockedOrRunningMaintenance];
+	[shipRecordsButton setEnabled:!locked];
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -448,6 +460,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) shipRecordsAction:(id)sender
+{
+	[model setShipRecords:[sender intValue]];	
+}
 
 - (void) scanEnabledAction:(id)sender
 {

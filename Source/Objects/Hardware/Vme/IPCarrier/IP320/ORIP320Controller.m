@@ -125,6 +125,11 @@
                          name : ORIP320ModelLogFileChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipRecordsChanged:)
+                         name : ORIP320ModelShipRecordsChanged
+						object: model];
+
 }
 
 
@@ -132,6 +137,11 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) shipRecordsChanged:(NSNotification*)aNote
+{
+	[shipRecordsButton setIntValue: [model shipRecords]];
+}
 
 - (void) logFileChanged:(NSNotification*)aNote
 {
@@ -161,6 +171,7 @@
 	[self displayRawChanged:nil];
 	[self logToFileChanged:nil];
 	[self logFileChanged:nil];
+	[self shipRecordsChanged:nil];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -194,6 +205,12 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) shipRecordsAction:(id)sender
+{
+	[model setShipRecords:[sender intValue]];	
+}
+
 - (IBAction) enablePollAllAction:(id)sender
 {
 	[model enablePollAll:YES];
