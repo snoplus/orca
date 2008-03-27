@@ -25,10 +25,15 @@
 @class ORDataPacket;
 @class ORDataSet;
 
+
 @interface ORTrigger32DecoderFor100MHzClockRecord : ORVmeCardDecoder 
 {}
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end
+
+@interface ORTrigger32DecoderFor10MHzClockRecord : ORTrigger32DecoderFor100MHzClockRecord 
+{}
 @end
 
 @interface ORTrigger32DecoderForGTIDRecord : ORVmeCardDecoder 

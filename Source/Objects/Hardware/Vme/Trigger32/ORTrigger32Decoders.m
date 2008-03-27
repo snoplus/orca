@@ -23,6 +23,8 @@
 #import "ORTrigger32Model.h"
 #import "ORDataTypeAssigner.h"
 
+@implementation ORTrigger32DecoderFor10MHzClockRecord
+@end
 
 @implementation ORTrigger32DecoderFor100MHzClockRecord
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
@@ -43,7 +45,7 @@
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-    NSString* title= @"Trigger32 100MHz Clock Record\n\n";
+    NSString* title= @"Trigger32 10MHz Clock Record\n\n";
     NSString* trigger = [NSString stringWithFormat:@"Trigger   = %d\n",(ptr[1]>>24)&0x1?1:2];
     NSString* upper   = [NSString stringWithFormat:@"Upper Reg = %d\n",ptr[1]&0x00ffffff];
     NSString* lower   = [NSString stringWithFormat:@"Lower Reg = %d\n",ptr[2]];

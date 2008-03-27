@@ -1298,12 +1298,12 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTrigger32DecoderFor100MHzClockRecord",  @"decoder",
+        @"ORTrigger32DecoderFor10MHzClockRecord",  @"decoder",
         [NSNumber numberWithLong:clockDataId],      @"dataId",
         [NSNumber numberWithBool:NO],               @"variable",
         [NSNumber numberWithLong:3],                @"length",
         nil];
-    [dataDictionary setObject:aDictionary forKey:@"100MHz Clock Record"];
+    [dataDictionary setObject:aDictionary forKey:@"10MHz Clock Record"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
         @"ORTrigger32DecoderForGTID1Record",                  @"decoder",
