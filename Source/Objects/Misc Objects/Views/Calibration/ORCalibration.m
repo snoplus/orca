@@ -205,8 +205,9 @@
 - (IBAction) deleteAction:(id)sender
 {	
 	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
-	NSMutableDictionary* calDic = [defaults objectForKey:@"ORCACalibrations"];
+	NSMutableDictionary* calDic = [NSMutableDictionary dictionaryWithDictionary:[defaults dictionaryForKey:@"ORCACalibrations"]];
 	[calDic removeObjectForKey:[selectionPU titleOfSelectedItem]];
+	[defaults setObject:calDic forKey:@"ORCACalibrations"];
 	[self populateSelectionPU];
 	[selectionPU selectItemAtIndex:0];
 	[self loadUI:nil];
