@@ -108,7 +108,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
 	NSString* subSec        = [NSString stringWithFormat:@"SubSeconds = %d\n", ePtr->subSec];
 	NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %d\n", ePtr->eventID & 0xffff];
     NSString* nPages		= [NSString stringWithFormat:@"Stored Pg  = %d\n", ePtr->eventID >> 16];
-	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3ffff];	
+	NSString* chMap	    	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
 		
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
@@ -255,7 +255,7 @@ followed by waveform data (n x 1024 16-bit words)
 	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->sec];
 	NSString* subSec    	= [NSString stringWithFormat:@"Subseconds = %d\n", ePtr->subSec];
 	NSString* eventID		= [NSString stringWithFormat:@"Event ID   = %d\n", ePtr->eventID & 0xffff];
-	NSString* chMap   		= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3ffff];	
+	NSString* chMap   		= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
 
 
     // Decode extra debug information
@@ -508,7 +508,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 	
 	NSString* threshold	= [NSString stringWithFormat:@"Threshold  = %d\n",ePtr->threshold];
 	NSString* hitrate	= [NSString stringWithFormat:@"Hitrate    = %d\n",ePtr->hitrate];
-	NSString* chMap   	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3ffff];	
+	NSString* chMap   	= [NSString stringWithFormat:@"Channelmap = 0x%06x\n", ePtr->channelMap & 0x3fffff];	
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,chan,
 	                       threshold,hitrate,chMap];
