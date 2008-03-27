@@ -827,6 +827,11 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 	return objDictionary;
 }
 
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP320"];
+}
+
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];

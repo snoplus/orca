@@ -643,6 +643,11 @@ struct {
     [self setDataId:[anotherCard dataId]];
 }
 
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"JAMF"];
+}
+
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
