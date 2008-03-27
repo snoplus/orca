@@ -686,8 +686,6 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     [self setLogToFile:[decoder decodeBoolForKey:@"ORIP320ModelLogToFile"]];
     [self setDisplayRaw:[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
     [self setChanObjs:[decoder decodeObjectForKey:kORIP320chanObjs]];
-	[self setCardJumperSetting:[decoder decodeIntForKey:@"ORIP320ModelsetCardJumpertSetting"]];
-    [self setCardJumperSetting:kUncalibrated];
 	[self setPollingState:[decoder decodeIntForKey:kORIP320PollingState]];
 	[[self undoManager] enableUndoRegistration];
     
