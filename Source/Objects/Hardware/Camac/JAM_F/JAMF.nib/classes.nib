@@ -5,8 +5,18 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
 				<key>tasksCompleted</key>
 				<string>id</string>
 			</dict>
@@ -49,6 +59,8 @@
 				<key>scanLimitAction</key>
 				<string>id</string>
 				<key>settingLockAction</key>
+				<string>id</string>
+				<key>shipRecordsAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -123,6 +135,8 @@
 				<string>NSButton</string>
 				<key>settingLockDocField</key>
 				<string>NSTextField</string>
+				<key>shipRecordsButton</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
