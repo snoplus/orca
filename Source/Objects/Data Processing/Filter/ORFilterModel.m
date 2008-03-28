@@ -27,7 +27,11 @@
 #import "FilterScript.h"
 #import "ORDataTypeAssigner.h"
 #import "ORQueue.h"
+#import "ORFilterPluginBaseClass.h"
 
+NSString* ORFilterModelUsePluginChanged = @"ORFilterModelUsePluginChanged";
+NSString* ORFilterModelPluginValidChanged = @"ORFilterModelPluginValidChanged";
+NSString* ORFilterModelPluginPathChanged = @"ORFilterModelPluginPathChanged";
 static NSString* ORFilterInConnector 		= @"Filter In Connector";
 static NSString* ORFilterOutConnector 		= @"Filter Out Connector";
 static NSString* ORFilterFilteredConnector  = @"Filtered Out Connector";
@@ -94,6 +98,8 @@ int filterGraph(nodeType*);
 
 -(void)dealloc
 {	
+    [pluginPath release];
+	[pluginInstance release];
 	[self freeNodes];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scheduledUpdate) object:nil];
 
@@ -102,6 +108,11 @@ int filterGraph(nodeType*);
 	[inputValues release];
 	[outputValues release];
     [super dealloc];
+}
+
+- (void) awakeAfterDocumentLoaded
+{
+	[self loadPlugin]; //temp
 }
 
 - (void) freeNodes
@@ -157,6 +168,50 @@ int filterGraph(nodeType*);
 }
 
 #pragma mark •••Accessors
+
+- (BOOL) usePlugin
+{
+    return usePlugin;
+}
+
+- (void) setUsePlugin:(BOOL)aUsePlugin
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUsePlugin:usePlugin];
+    
+    usePlugin = aUsePlugin;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFilterModelUsePluginChanged object:self];
+}
+
+- (BOOL) pluginValid
+{
+    return pluginValid;
+}
+
+- (void) setPluginValid:(BOOL)aPluginValid
+{
+    pluginValid = aPluginValid;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFilterModelPluginValidChanged object:self];
+}
+
+- (NSString*) pluginPath
+{
+    return pluginPath;
+}
+
+- (void) setPluginPath:(NSString*)aPluginPath
+{
+	if(!aPluginPath)aPluginPath = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setPluginPath:pluginPath];
+    
+    [pluginPath autorelease];
+    pluginPath = [aPluginPath copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFilterModelPluginPathChanged object:self];
+
+}
+
 - (NSMutableArray*) inputValues
 {
 	return inputValues;
@@ -248,9 +303,19 @@ int filterGraph(nodeType*);
 
 	if(someData != currentDataPacket){
 		[someData generateObjectLookup];	 //MUST be done before data header will work.
-		[self loadDataIDsIntoSymbolTable:someData];
+		if(usePlugin && firstTime){
+			[symbolTable release];
+			symbolTable = [[ORFilterSymbolTable alloc] init];
+		}
 		if(firstTime){
-			startFilterScript(self);
+			[self loadDataIDsIntoSymbolTable:someData];
+			if(usePlugin){
+				[pluginInstance setSymbolTable:symbolTable];
+				[pluginInstance start];
+			}
+			else {
+				startFilterScript(self);
+			}
 			firstTime = NO;
 		}
 		currentDataPacket = someData;
@@ -300,8 +365,12 @@ int filterGraph(nodeType*);
 				
 				if(timerEnabled) [mainTimer reset];
 				
-				runFilterScript(self);
-				
+				if(usePlugin){
+					[pluginInstance filter];
+				}
+				else {
+					runFilterScript(self);
+				}
 				if(timerEnabled){
 					float delta = [mainTimer microseconds];
 					if(delta<kFilterTimeHistoSize)processingTimeHist[(int)delta]++;
@@ -385,7 +454,7 @@ int filterGraph(nodeType*);
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     
-    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:inputValues forKey:@"inputValues"];
     [objDictionary setObject:scriptName forKey:@"scriptName"];
     [objDictionary setObject:lastFile forKey:@"lastFile"];
@@ -393,7 +462,62 @@ int filterGraph(nodeType*);
 	return objDictionary;
 }
 
+- (BOOL) filterPluginIsValid:(Class) filterClass
+{
+    if([filterClass isSubclassOfClass:[ORFilterPluginBaseClass class]])return YES;
+    else return NO;
+}
 
+- (void) reloadPlugin
+{
+	if([ORAppDelegate isMacOSX10_5]){
+        NSBundle* currBundle = [NSBundle bundleWithPath:[pluginPath stringByExpandingTildeInPath]];
+		[pluginInstance release];
+		pluginInstance = nil;
+		[currBundle unload];
+	}
+	[self loadPlugin];
+}
+
+- (void) loadPlugin
+{  
+	BOOL pluginAvailable = NO;
+	[pluginInstance release];
+	pluginInstance = nil;
+	if([pluginPath length]){
+        NSBundle* currBundle = [NSBundle bundleWithPath:[pluginPath stringByExpandingTildeInPath]];
+        if(currBundle){
+            Class currPrincipalClass = [currBundle principalClass];
+            if(currPrincipalClass && [self filterPluginIsValid:currPrincipalClass]) {  // Validation
+                pluginInstance = [[currPrincipalClass alloc] initWithDelegate:self];
+                if(pluginInstance) {
+					pluginAvailable = YES;
+					NSLog(@"Loaded Filter Plugin: %@\n",pluginPath);
+				}
+            }
+        }
+    }
+	[self setPluginValid:pluginAvailable];
+}
+
+
+- (void) verifyFilterIsReady
+{
+	if(usePlugin){
+		if(!pluginValid){
+			NSLog(@"Filter Plugin <%@> is not Valid. Run Not Allowed.\n",pluginPath);
+			[NSException raise:@"Plugin Error" format:@"Plugin not valid."];
+		}
+	}
+	else {
+		[self parseScript];
+	
+		if(!parsedOK){
+			NSLog(@"Filter script parse error prevented run start\n");
+			[NSException raise:@"Parse Error" format:@"Filter Script parse failed."];
+		}
+	}
+}
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {		
 	[self clearTimeHistogram];
@@ -402,51 +526,47 @@ int filterGraph(nodeType*);
 	currentDataPacket = nil;
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORFilterModel"];  
 	
-	[self parseScript];
-	
-	if(!parsedOK){
-		NSLog(@"Filter script parse error prevented run start\n");
-		[NSException raise:@"Parse Error" format:@"Filter Script parse failed."];
-	}
-	else {
+	[self verifyFilterIsReady]; //throws on error
 
-		NSMutableDictionary* theHeader = [aDataPacket fileHeader];
-		NSMutableDictionary* runControlSection = [theHeader objectForKey:@"Run Control"];
-		if(runControlSection)[aDataPacket setRunNumber:[[runControlSection objectForKey:@"RunNumber"] longValue]];
-		else {
-			NSMutableDictionary* objectSection = [theHeader objectForKey:@"ObjectInfo"];	
-			NSMutableArray* dataChainArray = [objectSection objectForKey:@"DataChain"];
-			id item;
-			NSEnumerator* e = [dataChainArray objectEnumerator];
-			while(item = [e nextObject]){
-				id runNum = [item objectForKey:@"RunNumber"];
-				if(runNum){
-					[aDataPacket setRunNumber:[runNum longValue]];
-					break;
-				}
+	NSMutableDictionary* theHeader = [aDataPacket fileHeader];
+	NSMutableDictionary* runControlSection = [theHeader objectForKey:@"Run Control"];
+	if(runControlSection)[aDataPacket setRunNumber:[[runControlSection objectForKey:@"RunNumber"] longValue]];
+	else {
+		NSMutableDictionary* objectSection = [theHeader objectForKey:@"ObjectInfo"];	
+		NSMutableArray* dataChainArray = [objectSection objectForKey:@"DataChain"];
+		id item;
+		NSEnumerator* e = [dataChainArray objectEnumerator];
+		while(item = [e nextObject]){
+			id runNum = [item objectForKey:@"RunNumber"];
+			if(runNum){
+				[aDataPacket setRunNumber:[runNum longValue]];
+				break;
 			}
 		}
-		id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
-
-		NSString* currentPrefix = [aDataPacket filePrefix];
-		if(currentPrefix)[aDataPacket setFilePrefix:[currentPrefix stringByAppendingString:@"Filtered"]];
-		else [aDataPacket setFilePrefix:@"FilteredRun"];
-		theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-		[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
-		
-		runTimer = [[ORTimer alloc] init];
-		[runTimer start];
-		lastRunTimeValue = 0;
-		
-		int i;
-		for(i=0;i<kNumFilterStacks;i++) stacks[i] = nil;
 	}
+	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
+	[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
+
+	NSString* currentPrefix = [aDataPacket filePrefix];
+	if(currentPrefix)[aDataPacket setFilePrefix:[currentPrefix stringByAppendingString:@"Filtered"]];
+	else [aDataPacket setFilePrefix:@"FilteredRun"];
+	theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
+	[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
+	
+	runTimer = [[ORTimer alloc] init];
+	[runTimer start];
+	lastRunTimeValue = 0;
+	
+	int i;
+	for(i=0;i<kNumFilterStacks;i++) stacks[i] = nil;
+	
 }
 
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	[symbolTable release];
+	symbolTable = nil;
 	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
 	[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
 
@@ -469,7 +589,13 @@ int filterGraph(nodeType*);
 	[transferDataPacket release];
 	transferDataPacket = nil;
 
-	finishFilterScript(self);
+	if(usePlugin){
+		[pluginInstance finish];
+	}
+	else {
+		finishFilterScript(self);
+	}
+
 	[self freeNodes];
 	
 	int i;
@@ -571,6 +697,8 @@ int filterGraph(nodeType*);
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+    [self setUsePlugin:[decoder decodeBoolForKey:@"ORFilterModelUsePlugin"]];
+    [self setPluginPath:[decoder decodeObjectForKey:@"pluginPath"]];
 	[self setScript:[decoder decodeObjectForKey:@"script"]];
     [self setScriptName:[decoder decodeObjectForKey:@"scriptName"]];
     [self setLastFile:[decoder decodeObjectForKey:@"lastFile"]];
@@ -584,6 +712,8 @@ int filterGraph(nodeType*);
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:usePlugin forKey:@"ORFilterModelUsePlugin"];
+    [encoder encodeObject:pluginPath forKey:@"pluginPath"];
     [encoder encodeObject:script forKey:@"script"];
     [encoder encodeObject:scriptName forKey:@"scriptName"];
     [encoder encodeObject:inputValues forKey:@"inputValues"];
@@ -773,7 +903,7 @@ int filterGraph(nodeType*);
 }
 
 
-- (void) setOutputValue:(int)index withValue:(unsigned long)aValue
+- (void) setOutput:(int)index withValue:(unsigned long)aValue
 {
 	if(!outputValues) outputValues = [[NSMutableArray array] retain];
 	if(index>[outputValues count]){
@@ -883,7 +1013,6 @@ int filterGraph(nodeType*);
 		NSString* aKey = [anInputValueDictionary objectForKey:@"name"];
 		[symbolTable setData:tempData forKey:[aKey cStringUsingEncoding:NSASCIIStringEncoding]];
 	}
-
 }
 
 @end

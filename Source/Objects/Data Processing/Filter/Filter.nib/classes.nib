@@ -5,6 +5,14 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>taskFinished</key>
@@ -76,6 +84,10 @@
 				<string>id</string>
 				<key>saveFileAction</key>
 				<string>id</string>
+				<key>selectPluginPath</key>
+				<string>id</string>
+				<key>usePluginAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORFilterController</string>
@@ -93,8 +105,6 @@
 				<string>NSTableView</string>
 				<key>lastFileField</key>
 				<string>NSTextField</string>
-				<key>lastFileField1</key>
-				<string>NSTextField</string>
 				<key>loadSaveButton</key>
 				<string>NSButton</string>
 				<key>loadSaveView</key>
@@ -105,6 +115,12 @@
 				<string>NSTableView</string>
 				<key>panelView</key>
 				<string>NSView</string>
+				<key>pluginNameField</key>
+				<string>NSTextField</string>
+				<key>pluginPathField</key>
+				<string>NSTextField</string>
+				<key>pluginValidField</key>
+				<string>NSTextField</string>
 				<key>removeInputButton</key>
 				<string>NSButton</string>
 				<key>runButton</key>
@@ -119,6 +135,10 @@
 				<string>ORPlotter1D</string>
 				<key>timerEnabledCB</key>
 				<string>NSButton</string>
+				<key>typeField</key>
+				<string>NSTextField</string>
+				<key>usePluginMatrix</key>
+				<string>NSMatrix</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>

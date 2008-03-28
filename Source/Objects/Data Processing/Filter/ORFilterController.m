@@ -27,6 +27,13 @@
 #import "ORScriptRunner.h"
 #import "ORPlotter1D.h"
 
+@interface ORFilterController (private)
+- (void) pluginPathSelectDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+@end
+
+
 @implementation ORFilterController
 
 #pragma mark •••Initialization
@@ -54,6 +61,9 @@
 {
 	[super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+	//we don't want this notification
+	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 
 	[notifyCenter addObserver: self 
 					 selector: @selector(scriptChanged:) 
@@ -110,10 +120,33 @@
                          name : NSTableViewSelectionDidChangeNotification
                        object : inputVariablesTableView];
 
-	//we don't want this notification
-	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
+   [notifyCenter addObserver : self
+                     selector : @selector(pluginPathChanged:)
+                         name : ORFilterModelPluginPathChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(pluginValidChanged:)
+                         name : ORFilterModelPluginValidChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(usePluginChanged:)
+                         name : ORFilterModelUsePluginChanged
+						object: model];
+
 }
 
+- (void) updateWindow
+{
+    [super updateWindow];
+	[self scriptChanged:nil];
+	[self lastFileChanged:nil];
+	[self timerEnabledChanged:nil];
+	[self pluginPathChanged:nil];
+	[self pluginValidChanged:nil];
+	[self usePluginChanged:nil];
+}
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
@@ -127,6 +160,89 @@
     [gSecurity setLock:ORFilterLock to:secure];
     [lockButton setEnabled:secure];
 	[removeInputButton setEnabled:[[inputVariablesTableView selectedRowIndexes] count] >0];
+}
+
+
+#pragma mark •••Interface Management
+
+- (void) usePluginChanged:(NSNotification*)aNote
+{
+	[usePluginMatrix selectCellWithTag: [model usePlugin]];
+	[self setLabelFields];
+}
+
+- (void) setLabelFields
+{
+	if([model usePlugin]){
+		[typeField setStringValue:@"Plugin:"];
+		[lastFileField setStringValue:[[[model pluginPath] lastPathComponent] stringByDeletingPathExtension]];
+	}
+	else {
+		[typeField setStringValue:@"Script:"];
+		[lastFileField setStringValue:[[model lastFile] stringByAbbreviatingWithTildeInPath]];
+	}
+
+}
+
+- (void) pluginValidChanged:(NSNotification*)aNote
+{
+	[pluginValidField setStringValue: [model pluginValid]?@"YES":@"NO"];
+	[pluginValidField setTextColor:[model pluginValid] ? 
+												[NSColor colorWithCalibratedRed:0 green:.5 blue:0 alpha:1] :
+												[NSColor colorWithCalibratedRed:.5 green:0 blue:0 alpha:1]];
+}
+
+- (void) pluginPathChanged:(NSNotification*)aNote
+{
+	[pluginPathField setStringValue: [[[model pluginPath] stringByAbbreviatingWithTildeInPath] stringByDeletingLastPathComponent]];
+	[pluginNameField setStringValue: [[[model pluginPath] lastPathComponent] stringByDeletingPathExtension]];
+	[self setLabelFields];
+}
+
+
+- (void) lockChanged:(NSNotification*)aNotification
+{
+    BOOL locked = [gSecurity isLocked:ORFilterLock];
+    [lockButton setState: locked];
+    
+}
+
+- (void) updateTiming:(NSNotification*)aNote
+{
+	[timePlot setNeedsDisplay:YES];
+}
+
+- (void) lastFileChanged:(NSNotification*)aNote
+{
+	[self setLabelFields];
+}
+
+- (void) textDidChange:(NSNotification*)aNote
+{
+	[model setScriptNoNote:[scriptView string]];
+}
+
+- (void) timerEnabledChanged:(NSNotification*)aNote
+{
+	[timerEnabledCB setState:[model timerEnabled]];
+	[timePlot setNeedsDisplay:YES];
+}
+
+- (void) scriptChanged:(NSNotification*)aNote
+{
+	[scriptView setString:[model script]];
+}
+
+- (void) displayValuesChanged:(NSNotification*)aNote
+{
+	[outputVariablesTableView reloadData];
+}
+
+#pragma mark •••Actions
+
+- (IBAction) usePluginAction:(id)sender
+{
+	[model setUsePlugin:[[sender selectedCell] tag]];	
 }
 
 - (IBAction) lockAction:(id)sender
@@ -151,55 +267,27 @@
 	[inputVariablesTableView reloadData];
 }
 
-#pragma mark •••Interface Management
-- (void) updateWindow
+- (IBAction) selectPluginPath:(id)sender
 {
-    [super updateWindow];
-	[self scriptChanged:nil];
-	[self lastFileChanged:nil];
-	[self timerEnabledChanged:nil];
-}
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+	NSString* fullPath = [[model pluginPath] stringByExpandingTildeInPath];
+    if(fullPath) startingDir = [fullPath stringByDeletingLastPathComponent];
+    else		 startingDir = NSHomeDirectory();
 
-- (void) lockChanged:(NSNotification*)aNotification
-{
-    BOOL locked = [gSecurity isLocked:ORFilterLock];
-    [lockButton setState: locked];
-    
-}
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(pluginPathSelectDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
 
-- (void) updateTiming:(NSNotification*)aNote
-{
-	[timePlot setNeedsDisplay:YES];
 }
-
-- (void) lastFileChanged:(NSNotification*)aNote
-{
-	[lastFileField setStringValue:[[model lastFile] stringByAbbreviatingWithTildeInPath]];
-	[lastFileField1 setStringValue:[[model lastFile] stringByAbbreviatingWithTildeInPath]];
-}
-
-- (void) textDidChange:(NSNotification*)aNote
-{
-	[model setScriptNoNote:[scriptView string]];
-}
-
-- (void) timerEnabledChanged:(NSNotification*)aNote
-{
-	[timerEnabledCB setState:[model timerEnabled]];
-	[timePlot setNeedsDisplay:YES];
-}
-
-- (void) scriptChanged:(NSNotification*)aNote
-{
-	[scriptView setString:[model script]];
-}
-
-- (void) displayValuesChanged:(NSNotification*)aNote
-{
-	[outputVariablesTableView reloadData];
-}
-
-#pragma mark •••Data Source Methods
 
 - (IBAction) enableTimer:(id)sender
 {
@@ -243,7 +331,7 @@
 									modalDelegate:self
 								   didEndSelector:NULL
 									  contextInfo:NULL];
-	[lastFileField setStringValue:[[model lastFile] stringByAbbreviatingWithTildeInPath]];
+	[self setLabelFields];
 }
 
 
@@ -345,14 +433,24 @@
 @end
 
 @implementation ORFilterController (private)
-- (void)loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+
+- (void) pluginPathSelectDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model setPluginPath:[[[sheet filenames] objectAtIndex:0]stringByAbbreviatingWithTildeInPath]];
+		[model loadPlugin]; 
+    }
+}
+
+
+- (void) loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         [model loadScriptFromFile:[[[sheet filenames] objectAtIndex:0]stringByAbbreviatingWithTildeInPath]];
     }
 }
 
-- (void)saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
 		NSString* path = [[sheet filename] stringByDeletingPathExtension];

@@ -66,6 +66,10 @@
 		ORTimer*			runTimer;
 		unsigned long		lastRunTimeValue;
 		NSTimeInterval		lastOutputUpdateTimeRef;
+		NSString*			pluginPath;
+		BOOL				pluginValid;
+		id					pluginInstance;
+		BOOL				usePlugin;
 }
 
 - (id)   init;
@@ -73,6 +77,12 @@
 - (void) freeNodes;
 
 #pragma mark •••Accessors
+- (BOOL) usePlugin;
+- (void) setUsePlugin:(BOOL)aUsePlugin;
+- (BOOL) pluginValid;
+- (void) setPluginValid:(BOOL)aPluginValid;
+- (NSString*) pluginPath;
+- (void) setPluginPath:(NSString*)aPluginPath;
 - (NSString*) lastFile;
 - (void) setLastFile:(NSString*)aFile;
 - (NSString*) script;
@@ -103,6 +113,7 @@
 - (void) syncDataIdsWith:(id)anotherObj;
 - (NSDictionary*) dataRecordDescription;
 
+- (void) verifyFilterIsReady;
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -115,6 +126,9 @@
 - (void) saveScriptToFile:(NSString*)aFilePath;
 
 #pragma mark ***Plugin Interface
+- (BOOL) filterPluginIsValid:(Class) filterClass;
+- (void) reloadPlugin;
+- (void) loadPlugin;
 - (unsigned long) extractRecordID:(unsigned long)aValue;
 - (unsigned long) extractRecordLen:(unsigned long)aValue;
 - (unsigned long) extractValue:(unsigned long)aValue mask:(unsigned long)aMask thenShift:(unsigned long)shift;
@@ -128,7 +142,7 @@
 - (void) histo1D:(int)i value:(unsigned long)aValue;
 - (void) histo2D:(int)i x:(unsigned long)x y:(unsigned long)y;
 - (void) stripChart:(int)i time:(unsigned long)x value:(unsigned long)y;
-- (void) setOutputValue:(int)index withValue:(unsigned long)aValue;
+- (void) setOutput:(int)index withValue:(unsigned long)aValue;
 - (void) resetDisplays;
 - (void) scheduledUpdate;
 
@@ -141,8 +155,16 @@
 - (void) setString:(NSString* )theString;
 - (int) yyinputToBuffer:(char* )theBuffer withSize:(int)maxSize;
 
+#pragma mark •••Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
+
+extern NSString* ORFilterModelUsePluginChanged;
+extern NSString* ORFilterModelPluginValidChanged;
+extern NSString* ORFilterModelPluginPathChanged;
 extern NSString* ORFilterLock;
 extern NSString* ORFilterLastFileChanged;
 extern NSString* ORFilterNameChanged;
@@ -172,4 +194,7 @@ extern NSString* ORFilterUpdateTiming;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;
 @end
 
+@interface NSObject (Filter)
+- (BOOL) unload;
+@end
 

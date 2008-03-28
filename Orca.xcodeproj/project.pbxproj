@@ -994,6 +994,8 @@
 		84799B3908DF70B300D848FB /* CENPA.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84799B3808DF70B200D848FB /* CENPA.gif */; };
 		847A46D80D9C3C18002125DE /* ORJAMFDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 847A46D60D9C3C18002125DE /* ORJAMFDecoders.h */; };
 		847A46D90D9C3C18002125DE /* ORJAMFDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 847A46D70D9C3C18002125DE /* ORJAMFDecoders.m */; };
+		847A48540D9C5D30002125DE /* ORFilterPluginBaseClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 847A48520D9C5D30002125DE /* ORFilterPluginBaseClass.m */; };
+		847A48550D9C5D30002125DE /* ORFilterPluginBaseClass.h in Headers */ = {isa = PBXBuildFile; fileRef = 847A48530D9C5D30002125DE /* ORFilterPluginBaseClass.h */; };
 		847BC83205E293E80054841E /* Unlocked.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC82E05E293E80054841E /* Unlocked.tif */; };
 		847BC83305E293E80054841E /* Locked.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847BC83005E293E80054841E /* Locked.tif */; };
 		847BC83805E2940D0054841E /* ORHWUndoSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 847BC83405E2940D0054841E /* ORHWUndoSet.h */; };
@@ -2569,6 +2571,8 @@
 		84799B3808DF70B200D848FB /* CENPA.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = CENPA.gif; path = "Source/Main Dialogs/SplashScreen/CENPA.gif"; sourceTree = SOURCE_ROOT; };
 		847A46D60D9C3C18002125DE /* ORJAMFDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORJAMFDecoders.h; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFDecoders.h; sourceTree = SOURCE_ROOT; };
 		847A46D70D9C3C18002125DE /* ORJAMFDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORJAMFDecoders.m; path = Source/Objects/Hardware/Camac/JAM_F/ORJAMFDecoders.m; sourceTree = SOURCE_ROOT; };
+		847A48520D9C5D30002125DE /* ORFilterPluginBaseClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFilterPluginBaseClass.m; path = "Source/Objects/Data Processing/Filter/ORFilterPluginBaseClass.m"; sourceTree = SOURCE_ROOT; };
+		847A48530D9C5D30002125DE /* ORFilterPluginBaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFilterPluginBaseClass.h; path = "Source/Objects/Data Processing/Filter/ORFilterPluginBaseClass.h"; sourceTree = SOURCE_ROOT; };
 		847BC82F05E293E80054841E /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/Unlocked.tif; sourceTree = "<group>"; };
 		847BC83105E293E80054841E /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/Locked.tif; sourceTree = "<group>"; };
 		847BC83405E2940D0054841E /* ORHWUndoSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHWUndoSet.h; path = "Source/Main Dialogs/HardwareWizard/ORHWUndoSet.h"; sourceTree = SOURCE_ROOT; };
@@ -6136,6 +6140,8 @@
 			children = (
 				84A5CD530D464F4600D9833C /* Filter.nib */,
 				84A5CD540D464F4600D9833C /* Filter.tif */,
+				847A48520D9C5D30002125DE /* ORFilterPluginBaseClass.m */,
+				847A48530D9C5D30002125DE /* ORFilterPluginBaseClass.h */,
 				84A5CD560D464F4600D9833C /* ORFilterController.m */,
 				84A5CD550D464F4600D9833C /* ORFilterController.h */,
 				84A5CD570D464F4600D9833C /* ORFilterModel.h */,
@@ -8357,6 +8363,7 @@
 				84FB4E230D92F7560055813E /* ORBugReporter.h in Headers */,
 				9CDEF5C90D9456A800FEE85A /* ORCalibration.h in Headers */,
 				847A46D80D9C3C18002125DE /* ORJAMFDecoders.h in Headers */,
+				847A48550D9C5D30002125DE /* ORFilterPluginBaseClass.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9477,6 +9484,7 @@
 				84FB4E240D92F7560055813E /* ORBugReporter.m in Sources */,
 				9CDEF5CA0D9456A800FEE85A /* ORCalibration.m in Sources */,
 				847A46D90D9C3C18002125DE /* ORJAMFDecoders.m in Sources */,
+				847A48540D9C5D30002125DE /* ORFilterPluginBaseClass.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

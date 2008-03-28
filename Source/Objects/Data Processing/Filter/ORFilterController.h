@@ -25,6 +25,11 @@
 @interface ORFilterController : OrcaObjectController {
 
 	IBOutlet ORScriptView*		scriptView;
+	IBOutlet NSMatrix*			usePluginMatrix;
+	IBOutlet NSTextField*		typeField;
+	IBOutlet NSTextField*		pluginValidField;
+	IBOutlet NSTextField*		pluginPathField;
+	IBOutlet NSTextField*		pluginNameField;
     IBOutlet NSButton*			lockButton;
 	IBOutlet NSTextView*		helpView;
 	IBOutlet ORTimedTextField*	statusField;
@@ -33,7 +38,6 @@
 	IBOutlet NSTableView*		outputVariablesTableView;
 	IBOutlet id					loadSaveView;
     IBOutlet NSTextField*		lastFileField;
-    IBOutlet NSTextField*		lastFileField1;
     IBOutlet NSTextField*		classNameField;
 	IBOutlet NSTextField*		runStatusField;
 	IBOutlet NSButton*			runButton;
@@ -48,6 +52,10 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) setLabelFields;
+- (void) usePluginChanged:(NSNotification*)aNote;
+- (void) pluginValidChanged:(NSNotification*)aNote;
+- (void) pluginPathChanged:(NSNotification*)aNote;
 - (void) scriptChanged:(NSNotification*)aNote;
 - (void) textDidChange:(NSNotification*)aNote;
 - (void) lastFileChanged:(NSNotification*)aNote;
@@ -56,6 +64,7 @@
 - (void) displayValuesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) usePluginAction:(id)sender;
 - (IBAction) enableTimer:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) listMethodsAction:(id) sender;
@@ -68,10 +77,10 @@
 - (IBAction) saveFileAction:(id) sender;
 - (IBAction) addInput:(id)sender;
 - (IBAction) removeInput:(id)sender;
+- (IBAction) selectPluginPath:(id)sender;
 
 #pragma mark •••Interface Management
 - (void) lockChanged:(NSNotification*)aNotification;
-
 
 #pragma mark •••DataSource
 - (int)  numberOfRowsInTableView:(NSTableView *)aTable;
