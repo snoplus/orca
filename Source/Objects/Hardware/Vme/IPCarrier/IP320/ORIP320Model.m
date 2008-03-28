@@ -223,6 +223,8 @@ static struct {
 		}
 		
 		NSFileHandle* fh = [NSFileHandle fileHandleForUpdatingAtPath:[logFile stringByExpandingTildeInPath]];
+		[fh seekToEndOfFile];
+		
 		int i;
 		int n = [logBuffer count];
 		for(i=0;i<n;i++){
