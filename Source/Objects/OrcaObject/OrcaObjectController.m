@@ -98,6 +98,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 - (void) documentClosing:(NSNotification*)aNotification
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];	
+	[[self window] close];
 }
 
 #pragma mark ¥¥¥Messages From Delegate
