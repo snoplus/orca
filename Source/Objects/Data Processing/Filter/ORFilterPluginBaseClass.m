@@ -50,7 +50,7 @@
 {
 	//subclass will need to override
 }
-- (void) filter
+- (void) filter:(unsigned long*) currentRecordPtr length:(unsigned long)aLen
 {
 	//subclass will need to override
 }

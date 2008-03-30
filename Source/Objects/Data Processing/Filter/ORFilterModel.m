@@ -344,17 +344,10 @@ int filterGraph(nodeType*);
 		if(totalLen>0){
 			unsigned long* ptr = (unsigned long*)[data bytes];
 			while(totalLen>0){
+			
 				long recordLen = ExtractLength(*ptr);
+				
 				filterData tempData;
-				
-				tempData.type		= kFilterPtrType;
-				tempData.val.pValue = ptr;
-				[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
-				
-				tempData.type		= kFilterLongType;
-				tempData.val.lValue = recordLen;
-				[symbolTable setData:tempData forKey:"CurrentRecordLen"];
-				
 				unsigned long t = [runTimer microseconds]/1000;
 				if(t!=lastRunTimeValue){
 					lastRunTimeValue = t;
@@ -366,10 +359,19 @@ int filterGraph(nodeType*);
 				if(timerEnabled) [mainTimer reset];
 				
 				if(usePlugin){
-					[pluginInstance filter];
+					[pluginInstance filter:ptr length:recordLen];
 				}
 				else {
+					tempData.type		= kFilterPtrType;
+					tempData.val.pValue = ptr;
+					[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
+				
+					tempData.type		= kFilterLongType;
+					tempData.val.lValue = recordLen;
+					[symbolTable setData:tempData forKey:"CurrentRecordLen"];
+					
 					runFilterScript(self);
+					
 				}
 				if(timerEnabled){
 					float delta = [mainTimer microseconds];

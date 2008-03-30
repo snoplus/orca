@@ -37,7 +37,7 @@
 - (unsigned long) value:(const char*)aKey;
 
 - (void) start;
-- (void) filter;
+- (void) filter:(unsigned long*) currentRecordPtr length:(unsigned long)aLen;
 - (void) finish;
 
 @end

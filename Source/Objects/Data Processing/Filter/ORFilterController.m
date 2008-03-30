@@ -270,7 +270,7 @@
 - (IBAction) selectPluginPath:(id)sender
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseDirectories:YES];
     [openPanel setCanChooseFiles:YES];
     [openPanel setAllowsMultipleSelection:NO];
     [openPanel setPrompt:@"Choose"];
@@ -281,7 +281,7 @@
 
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
-                                types:nil
+                                types:[NSArray arrayWithObject:@"bundle"]
                        modalForWindow:[self window]
                         modalDelegate:self
                        didEndSelector:@selector(pluginPathSelectDidEnd:returnCode:contextInfo:)
