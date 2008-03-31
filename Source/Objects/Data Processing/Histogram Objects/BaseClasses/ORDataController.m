@@ -169,6 +169,7 @@
 - (void) dataSetChanged:(NSNotification*)aNotification
 {
     if(!aNotification || [aNotification object] == model || [aNotification object] == self){
+        [plotter setNeedsDisplay:YES];
         [[plotter xScale] setNeedsDisplay:YES];
 		[rawDataTable reloadData];
     }
