@@ -457,9 +457,9 @@ int filterGraph(nodeType*);
 {
     
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
-    [objDictionary setObject:inputValues forKey:@"inputValues"];
-    [objDictionary setObject:scriptName forKey:@"scriptName"];
-    [objDictionary setObject:lastFile forKey:@"lastFile"];
+	if(inputValues) [objDictionary setObject:inputValues forKey:@"inputValues"];
+    if(scriptName)  [objDictionary setObject:scriptName forKey:@"scriptName"];
+    if(lastFile)	[objDictionary setObject:lastFile forKey:@"lastFile"];
     [dictionary setObject:objDictionary forKey:@"FilterObject"];
 	return objDictionary;
 }
@@ -633,7 +633,8 @@ int filterGraph(nodeType*);
 
 - (NSString*) scriptName
 {
-	return scriptName;
+	if([scriptName length])return @"";
+	else return scriptName;
 }
 
 - (void) setScriptName:(NSString*)aString
