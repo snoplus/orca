@@ -70,6 +70,8 @@
 		BOOL				pluginValid;
 		id					pluginInstance;
 		BOOL				usePlugin;
+		id					thePassThruObject;  //cache the object on the other side of the pass thru connection
+		id					theFilteredObject;	//cache the object on the other side of the filter connection
 }
 
 - (id)   init;

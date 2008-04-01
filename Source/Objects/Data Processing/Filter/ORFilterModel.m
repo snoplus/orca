@@ -329,8 +329,7 @@ int filterGraph(nodeType*);
 	}
 
 	//pass it on
-	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-	[theNextObject processData:someData userInfo:userInfo];
+	[thePassThruObject processData:someData userInfo:userInfo];
 
 
 	//each block of data is an array of NSData objects, each potentially containing many records..
@@ -459,7 +458,7 @@ int filterGraph(nodeType*);
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
 	if(inputValues) [objDictionary setObject:inputValues forKey:@"inputValues"];
     if(scriptName)  [objDictionary setObject:scriptName forKey:@"scriptName"];
-    if(lastFile)	[objDictionary setObject:lastFile forKey:@"lastFile"];
+    if(lastFile) [objDictionary setObject:lastFile forKey:@"lastFile"];
     [dictionary setObject:objDictionary forKey:@"FilterObject"];
 	return objDictionary;
 }
@@ -546,14 +545,16 @@ int filterGraph(nodeType*);
 			}
 		}
 	}
-	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-	[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
 
 	NSString* currentPrefix = [aDataPacket filePrefix];
 	if(currentPrefix)[aDataPacket setFilePrefix:[currentPrefix stringByAppendingString:@"Filtered"]];
 	else [aDataPacket setFilePrefix:@"FilteredRun"];
-	theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-	[theNextObject runTaskStarted:aDataPacket userInfo:userInfo];
+
+	thePassThruObject = [self objectConnectedTo:ORFilterOutConnector];
+	theFilteredObject = [self objectConnectedTo:ORFilterFilteredConnector];
+
+	[thePassThruObject runTaskStarted:aDataPacket userInfo:userInfo];
+	[theFilteredObject runTaskStarted:aDataPacket userInfo:userInfo];
 	
 	runTimer = [[ORTimer alloc] init];
 	[runTimer start];
@@ -569,11 +570,9 @@ int filterGraph(nodeType*);
 {
 	[symbolTable release];
 	symbolTable = nil;
-	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-	[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
-
-	theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-	[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
+	
+	[thePassThruObject runTaskStopped:aDataPacket userInfo:userInfo];
+	[theFilteredObject runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
@@ -582,11 +581,8 @@ int filterGraph(nodeType*);
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	id theNextObject = [self objectConnectedTo:ORFilterOutConnector];
-	[theNextObject closeOutRun:aDataPacket userInfo:userInfo];
-
-	theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-	[theNextObject closeOutRun:aDataPacket userInfo:userInfo];
+	[thePassThruObject closeOutRun:aDataPacket userInfo:userInfo];
+	[theFilteredObject closeOutRun:aDataPacket userInfo:userInfo];
 
 	[transferDataPacket release];
 	transferDataPacket = nil;
@@ -810,8 +806,7 @@ int filterGraph(nodeType*);
 		[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:length];
 		[transferDataPacket addFrameBuffer:YES];
 		//pass it on
-		id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-		[theNextObject processData:transferDataPacket userInfo:nil];
+		[theFilteredObject processData:transferDataPacket userInfo:nil];
 		[transferDataPacket clearData];
 	}
 }
@@ -845,8 +840,7 @@ int filterGraph(nodeType*);
 		}
 		[transferDataPacket addFrameBuffer:YES];
 		//pass it on
-		id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-		[theNextObject processData:transferDataPacket userInfo:nil];
+		[theFilteredObject processData:transferDataPacket userInfo:nil];
 		[transferDataPacket clearData];
 	
 		[self dumpStack:i];
@@ -872,8 +866,7 @@ int filterGraph(nodeType*);
 	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:2];
 	[transferDataPacket addFrameBuffer:YES];
 	//pass it on
-	id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-	[theNextObject processData:transferDataPacket userInfo:nil];
+	[theFilteredObject processData:transferDataPacket userInfo:nil];
 	[transferDataPacket clearData];
 }
 
@@ -886,8 +879,7 @@ int filterGraph(nodeType*);
 	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:3];
 	[transferDataPacket addFrameBuffer:YES];
 	//pass it on
-	id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-	[theNextObject processData:transferDataPacket userInfo:nil];
+	[theFilteredObject processData:transferDataPacket userInfo:nil];
 	[transferDataPacket clearData];
 }
 
@@ -900,8 +892,7 @@ int filterGraph(nodeType*);
 	[transferDataPacket addLongsToFrameBuffer:(unsigned long*)p length:3];
 	[transferDataPacket addFrameBuffer:YES];
 	//pass it on
-	id theNextObject = [self objectConnectedTo:ORFilterFilteredConnector];
-	[theNextObject processData:transferDataPacket userInfo:nil];
+	[theFilteredObject processData:transferDataPacket userInfo:nil];
 	[transferDataPacket clearData];
 }
 
