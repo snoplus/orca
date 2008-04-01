@@ -188,6 +188,11 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 	[sbcLink takeData:aDataPacket userInfo:userInfo];
 }
 
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+	[sbcLink runIsStopping:aDataPacket userInfo:userInfo];
+}
+
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[sbcLink runTaskStopped:aDataPacket userInfo:userInfo];
