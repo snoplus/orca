@@ -192,6 +192,10 @@
 - (void) modeChanged:(NSNotification*)aNotification
 {
 	[modePopUpButton selectItemWithTag:[model mode]];
+	[valueTableScrollView setHidden:![model mode]];
+	[calibrationTableScrollView setHidden:![model mode]];
+	[alarmTableScrollView setHidden:![model mode]];
+
 }
 
 - (void) valuesChanged:(NSNotification*)aNotification

@@ -28,10 +28,13 @@
 		IBOutlet NSButton*		shipRecordsButton;
 		IBOutlet NSTableView*	valueTable1;
         IBOutlet NSTableView*	valueTable2;
+		IBOutlet NSScrollView*  valueTableScrollView;
         IBOutlet NSTableView*	calibrationTable1;
         IBOutlet NSTableView*	calibrationTable2;
+		IBOutlet NSScrollView*  calibrationTableScrollView;
         IBOutlet NSTableView*	alarmTable1;
         IBOutlet NSTableView*	alarmTable2;
+		IBOutlet NSScrollView*  alarmTableScrollView;
         IBOutlet NSPopUpButton* pollingButton;
         IBOutlet NSPopUpButton* modePopUpButton;
         IBOutlet NSButton*		displayRawCB;

@@ -89,12 +89,16 @@
 				<string>NSTableView</string>
 				<key>alarmTable2</key>
 				<string>NSTableView</string>
+				<key>alarmTableScrollView</key>
+				<string>NSScrollView</string>
 				<key>calibrateButton</key>
 				<string>NSButton</string>
 				<key>calibrationTable1</key>
 				<string>NSTableView</string>
 				<key>calibrationTable2</key>
 				<string>NSTableView</string>
+				<key>calibrationTableScrollView</key>
+				<string>NSScrollView</string>
 				<key>displayRawCB</key>
 				<string>NSButton</string>
 				<key>jumperSettingsPU</key>
@@ -117,6 +121,8 @@
 				<string>NSTableView</string>
 				<key>valueTable2</key>
 				<string>NSTableView</string>
+				<key>valueTableScrollView</key>
+				<string>NSScrollView</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
