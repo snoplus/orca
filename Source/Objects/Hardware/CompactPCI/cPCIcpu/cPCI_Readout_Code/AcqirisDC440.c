@@ -513,7 +513,8 @@ void Readout_DC440(int32_t boardID,int32_t numberSamples,int32_t enableMask,int3
 			ViStatus status = AcqrsD1_readData(boardID, channel+1, &readParams, dataPtr , &wfDesc, &segDesc);
 			if(status == VI_SUCCESS){
 				wPtr->hitMask |= (1<<channel);							//the hitMask is used to compute rates
-				numberShortsInSample = wfDesc.returnedSamplesPerSeg;	//actual short word count
+				numberShortsInSample = wfDesc.returnedSamplesPerSeg +	//actual short word count
+                                       wfDesc.indexFirstPoint;
 				numberLongsInSample = (numberShortsInSample+1)/2;		//rounded to next long word boundary
 
 				//update the size of payload
@@ -531,7 +532,7 @@ void Readout_DC440(int32_t boardID,int32_t numberSamples,int32_t enableMask,int3
 			recordPtr->timeStampLo			= segDesc.timeStampLo;
 			recordPtr->timeStampHi			= segDesc.timeStampHi;
 			recordPtr->offsetToValidData	= wfDesc.indexFirstPoint;
-			recordPtr->numShorts			= numberShortsInSample;
+			recordPtr->numShorts			= numberShortsInSample - wfDesc.indexFirstPoint;
 			
 			//advance our pointers
 			recordPtr = (Acquiris_OrcaWaveformStruct*)((int32_t*)(recordPtr+1) + numberLongsInSample); //point to next recordStart
