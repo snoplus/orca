@@ -270,6 +270,8 @@
 		84178D510923C4B100C15D2B /* ORSocketClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 84178D4F0923C4B100C15D2B /* ORSocketClient.m */; };
 		84178E0C0923F60F00C15D2B /* ORCommandClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434A3E4055C223A002D3102 /* ORCommandClient.m */; };
 		841BBACE0572DC4800735A3A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8434A363055B3288002D3102 /* Info.plist */; };
+		841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */; };
+		841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */; };
 		841C842D07EB418A0028BEED /* Motor.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841C842407EB418A0028BEED /* Motor.nib */; };
 		841C842E07EB418A0028BEED /* MotorBreakpointHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 841C842507EB418A0028BEED /* MotorBreakpointHelp.plist */; };
 		841C842F07EB418A0028BEED /* ORMotorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 841C842607EB418A0028BEED /* ORMotorController.h */; };
@@ -1412,6 +1414,10 @@
 		84BB920507E210090092B367 /* ORMotorSweeper.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BB920307E210090092B367 /* ORMotorSweeper.m */; };
 		84BB97FB07E613B50092B367 /* ORMotorPattern.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BB97F907E613B50092B367 /* ORMotorPattern.m */; };
 		84BB97FC07E613B50092B367 /* ORMotorPattern.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BB97FA07E613B50092B367 /* ORMotorPattern.h */; };
+		84BC16550DA14F3600D3935C /* Caen1720.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BC164F0DA14F3600D3935C /* Caen1720.nib */; };
+		84BC16560DA14F3600D3935C /* ORCaen1720Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BC16500DA14F3600D3935C /* ORCaen1720Controller.h */; };
+		84BC16580DA14F3600D3935C /* ORCaen1720Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BC16520DA14F3600D3935C /* ORCaen1720Model.h */; };
+		84BC165C0DA1527300D3935C /* Caen1720Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84BC165B0DA1527300D3935C /* Caen1720Card.gif */; };
 		84C12E780993E3FA006F2901 /* ORProcessHistoryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E720993E3FA006F2901 /* ORProcessHistoryController.h */; };
 		84C12E790993E3FA006F2901 /* ORProcessHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C12E730993E3FA006F2901 /* ORProcessHistoryController.m */; };
 		84C12E7A0993E3FA006F2901 /* ORProcessHistoryModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C12E740993E3FA006F2901 /* ORProcessHistoryModel.h */; };
@@ -2084,6 +2090,8 @@
 		8418DC520531EF7A005F64B1 /* ORPulserDistribModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulserDistribModel.h; sourceTree = "<group>"; };
 		8418DC530531EF7A005F64B1 /* ORPulserDistribModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulserDistribModel.m; sourceTree = "<group>"; };
 		8418DC540531EF7A005F64B1 /* PulserDistrib.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PulserDistrib.nib; sourceTree = "<group>"; };
+		841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Controller.m; sourceTree = SOURCE_ROOT; };
+		841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Model.m; sourceTree = SOURCE_ROOT; };
 		841C842407EB418A0028BEED /* Motor.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Motor.nib; sourceTree = "<group>"; };
 		841C842507EB418A0028BEED /* MotorBreakpointHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = MotorBreakpointHelp.plist; sourceTree = "<group>"; };
 		841C842607EB418A0028BEED /* ORMotorController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMotorController.h; sourceTree = "<group>"; };
@@ -3036,6 +3044,10 @@
 		84BB920307E210090092B367 /* ORMotorSweeper.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORMotorSweeper.m; sourceTree = "<group>"; };
 		84BB97F907E613B50092B367 /* ORMotorPattern.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMotorPattern.m; path = "Source/Objects/Misc Objects/Workers/MotorWorker/ORMotorPattern.m"; sourceTree = SOURCE_ROOT; };
 		84BB97FA07E613B50092B367 /* ORMotorPattern.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMotorPattern.h; path = "Source/Objects/Misc Objects/Workers/MotorWorker/ORMotorPattern.h"; sourceTree = SOURCE_ROOT; };
+		84BC164F0DA14F3600D3935C /* Caen1720.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Caen1720.nib; sourceTree = "<group>"; };
+		84BC16500DA14F3600D3935C /* ORCaen1720Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCaen1720Controller.h; sourceTree = "<group>"; };
+		84BC16520DA14F3600D3935C /* ORCaen1720Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCaen1720Model.h; sourceTree = "<group>"; };
+		84BC165B0DA1527300D3935C /* Caen1720Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = Caen1720Card.gif; sourceTree = "<group>"; };
 		84BC3FDD04B9D899005F64B1 /* ORReadOutList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORReadOutList.h; path = Source/Objects/OrcaObject/ORReadOutList.h; sourceTree = SOURCE_ROOT; };
 		84BC3FDE04B9D899005F64B1 /* ORReadOutList.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORReadOutList.m; path = Source/Objects/OrcaObject/ORReadOutList.m; sourceTree = SOURCE_ROOT; };
 		84BC3FE104B9DA78005F64B1 /* NSArray+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSArray+Extensions.h"; path = "Source/Cocoa Extensions/NSArray+Extensions.h"; sourceTree = SOURCE_ROOT; };
@@ -6487,6 +6499,20 @@
 			path = "Source/Objects/Misc Objects/Workers/MotorWorker";
 			sourceTree = SOURCE_ROOT;
 		};
+		84BC164D0DA14F3600D3935C /* CV1720 */ = {
+			isa = PBXGroup;
+			children = (
+				84BC165B0DA1527300D3935C /* Caen1720Card.gif */,
+				84BC164F0DA14F3600D3935C /* Caen1720.nib */,
+				84BC16500DA14F3600D3935C /* ORCaen1720Controller.h */,
+				841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */,
+				84BC16520DA14F3600D3935C /* ORCaen1720Model.h */,
+				841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */,
+			);
+			name = CV1720;
+			path = Source/Objects/Hardware/Vme/CAEN/CV1720;
+			sourceTree = SOURCE_ROOT;
+		};
 		84BC63C2043A38F7005F64B1 /* CircularBuffer */ = {
 			isa = PBXGroup;
 			children = (
@@ -7703,6 +7729,7 @@
 				84DE591F051F7AF9005F64B1 /* CV785 */,
 				F5B1802703B297FD015F64B1 /* CV775 */,
 				9C1363BE0D0A7921006C550D /* CV265 */,
+				84BC164D0DA14F3600D3935C /* CV1720 */,
 			);
 			name = CAEN;
 			path = Source/Objects/Hardware/Vme/CAEN;
@@ -8364,6 +8391,8 @@
 				9CDEF5C90D9456A800FEE85A /* ORCalibration.h in Headers */,
 				847A46D80D9C3C18002125DE /* ORJAMFDecoders.h in Headers */,
 				847A48550D9C5D30002125DE /* ORFilterPluginBaseClass.h in Headers */,
+				84BC16560DA14F3600D3935C /* ORCaen1720Controller.h in Headers */,
+				84BC16580DA14F3600D3935C /* ORCaen1720Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8882,6 +8911,8 @@
 				9CDEF5C80D9456A800FEE85A /* Calibration.nib in Resources */,
 				849B472E0D98298B00AD79A0 /* AutoScale.tif in Resources */,
 				849B47300D982AC000AD79A0 /* Calibrate.gif in Resources */,
+				84BC16550DA14F3600D3935C /* Caen1720.nib in Resources */,
+				84BC165C0DA1527300D3935C /* Caen1720Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9485,6 +9516,8 @@
 				9CDEF5CA0D9456A800FEE85A /* ORCalibration.m in Sources */,
 				847A46D90D9C3C18002125DE /* ORJAMFDecoders.m in Sources */,
 				847A48540D9C5D30002125DE /* ORFilterPluginBaseClass.m in Sources */,
+				841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */,
+				841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
