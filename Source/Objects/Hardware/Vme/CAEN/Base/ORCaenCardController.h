@@ -69,7 +69,8 @@
 #pragma mark ***Initialization
 - (id)		initWithWindowNibName: (NSString*) aNibName;
 - (void)	dealloc;
- 	
+- (NSSize)	thresholdDialogSize;
+
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 

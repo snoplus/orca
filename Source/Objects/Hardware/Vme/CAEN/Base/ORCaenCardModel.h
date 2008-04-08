@@ -30,9 +30,6 @@
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
 
-// General constants
-#define kNumChannels 32
-
 // Bit Set 2 Register Masks
 #define kMemTest	0x01
 #define kOffline	0x02
@@ -76,7 +73,7 @@ typedef struct RegisterNamesStruct {
     unsigned long   writeValue;
     
 // Threshold information
-    unsigned short  thresholds[ kNumChannels ];
+    unsigned short  thresholds[ 32 ];
     unsigned long dataId;
     ORCaenDataDecoder* dataDecoder;
 

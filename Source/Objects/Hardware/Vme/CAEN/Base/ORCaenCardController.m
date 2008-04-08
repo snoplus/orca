@@ -55,7 +55,7 @@
 {
 
     settingSize     = NSMakeSize(280,400);
-    thresholdSize   = NSMakeSize(290,570);
+    thresholdSize   = [self thresholdDialogSize];
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -73,6 +73,11 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 
+}
+
+- (NSSize) thresholdDialogSize
+{
+	return NSMakeSize(290,570);
 }
 
 #pragma mark ¥¥¥Notfications
@@ -174,7 +179,7 @@
     [self basicLockChanged:nil];
     
     // Loop though all threshold scale parameters and reset them.
-    for (i = 0; i < kNumChannels; i++){
+    for (i = 0; i < [model numberOfChannels]; i++){
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:caenChnl];
     

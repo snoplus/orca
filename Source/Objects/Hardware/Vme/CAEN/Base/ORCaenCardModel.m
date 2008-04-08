@@ -271,9 +271,9 @@ NSString* 	caenChnl				= @"CAEN Chnl";
         if (theRegIndex == [self getThresholdIndex]){
             start = theChannelIndex;
             end = theChannelIndex;
-            if(theChannelIndex >= kNumChannels) {
+            if(theChannelIndex >= [self numberOfChannels]) {
                 start = 0;
-                end = kNumChannels - 1;
+                end = [self numberOfChannels] - 1;
             }
             
             // Loop through the thresholds and read them.
@@ -336,9 +336,9 @@ NSString* 	caenChnl				= @"CAEN Chnl";
         if(theRegIndex == [self getThresholdIndex]) {
             start = theChannelIndex;
             end 	= theChannelIndex;
-            if(theChannelIndex >= kNumChannels){
+            if(theChannelIndex >= [self numberOfChannels]){
                 start = 0;
-                end = kNumChannels - 1;
+                end = [self numberOfChannels] - 1;
             }
             for (i = start; i <= end; i++){
                 [self setThreshold:i threshold:theValue];
@@ -436,7 +436,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 - (void) readThresholds
 {
     short			i;
-    for (i = 0; i < kNumChannels; i++){
+    for (i = 0; i < [self numberOfChannels]; i++){
         [self readThreshold:i];
     }
 }
@@ -451,7 +451,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 {
     short	i;
     
-    for (i = 0; i < kNumChannels; i++){
+    for (i = 0; i < [self numberOfChannels]; i++){
         [self writeThreshold:i];
     }
 }
@@ -547,7 +547,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     [self setWriteValue:[aDecoder decodeInt32ForKey:CAENWriteValue]];
     
     // Get the thresholds
-    for (i = 0; i < kNumChannels; i++){
+    for (i = 0; i < [self numberOfChannels]; i++){
         [self setThreshold:i
                  threshold:[aDecoder decodeIntForKey:
                      [NSString stringWithFormat:CAENThresholdChnl, i]]];
@@ -577,7 +577,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     [anEncoder encodeInt32:[self writeValue] forKey:CAENWriteValue];
     
     // Save the thresholds
-    for (i = 0; i < kNumChannels; i++){
+    for (i = 0; i < [self numberOfChannels]; i++){
         [anEncoder encodeInt:[self threshold:i]
                       forKey:[NSString stringWithFormat:CAENThresholdChnl, i]];
     }
@@ -851,7 +851,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 {
     short	i;
     NSLog(@"%@ Thresholds\n",[self identifier]);
-    for (i = 0; i < kNumChannels; i++){
+    for (i = 0; i < [self numberOfChannels]; i++){
         NSLog(@"chan:%d value:0x%04x\n",i,[self threshold:i]);
     }
     
@@ -861,8 +861,8 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     int i;
-    NSMutableArray* array = [NSMutableArray arrayWithCapacity:kNumChannels];
-    for(i=0;i<kNumChannels;i++){
+    NSMutableArray* array = [NSMutableArray arrayWithCapacity:[self numberOfChannels]];
+    for(i=0;i<[self numberOfChannels];i++){
         [array addObject:[NSNumber numberWithShort:thresholds[i]]];
     }
     [objDictionary setObject:array forKey:@"thresholds"];
