@@ -1,6 +1,6 @@
 //
 //  ORScriptView.m
-//  UKSyntaxColoredDocument
+//  From UKSyntaxColoredDocument
 //
 //  Created by Mark Howe on 1/3/07.
 //  Copyright 2007 CENPA, University of Washington. All rights reserved.
@@ -683,6 +683,8 @@
 
 
 		int							vStartOffs = 0;
+
+		[vScanner setCaseSensitive:YES];
 		
 		// Skip any leading whitespace chars, somehow NSScanner doesn't do that:
 		while( vStartOffs < [[s string] length] ){
