@@ -19,6 +19,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORMailCenter.h"
+#import "ORMailer.h"
 
 @implementation ORMailCenter
 
@@ -33,7 +34,6 @@
 }
 
 #pragma mark ***Accessors
-
 
 - (id)init
 {
@@ -89,34 +89,21 @@
 		[[self window] endEditingFor:nil];		
 	}
 	
-	BOOL okToSend = YES;
-	if(![[mailForm cellWithTag:0] stringValue] || [[[mailForm cellWithTag:0] stringValue] rangeOfString:@"@"].location == NSNotFound){
-		okToSend = NO;
-		NSRunAlertPanel(@"Mail Center",@"No Destination Address Given", nil, nil, nil);
-	}
-	if(okToSend){
-		if([[[mailForm cellWithTag:2] stringValue] length] == 0){
-			int choice = NSRunAlertPanel(@"Mail Center",@"\nNo Subject...",@"Cancel",@"Send Anyway",nil);
-			if(choice != NSAlertAlternateReturn){		
-				okToSend = NO;
-			}
-		}
-	}
-	
-	if(okToSend){
-	
-		NSString *encodedSubject   = [NSString stringWithFormat:@"SUBJECT=%@",    [[[mailForm cellWithTag:2] stringValue] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
-		NSString *encodedBody      = [NSString stringWithFormat:@"BODY=%@",       [[bodyField string] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
-		NSString *encodedCC        = [NSString stringWithFormat:@"CC=%@",         [[[mailForm cellWithTag:1] stringValue] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
-		NSString *encodedTo        = [[[mailForm cellWithTag:0] stringValue] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
-		NSString *encodedURLString = [NSString stringWithFormat:@"mailto:%@?%@&%@&%@", encodedTo, encodedCC, encodedSubject, encodedBody];
+	NSData* theRTFDData = [bodyField RTFDFromRange:NSMakeRange(0,[[bodyField string] length])];;
 
-		@synchronized([NSApp delegate]){
-			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:encodedURLString]];
-		}
-		
-		[[self window] performClose:self];
-	}
+	NSDictionary* attrib;
+	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
+	
+	ORMailer* mailer = [ORMailer mailer];
+	[mailer setTo:[[mailForm cellWithTag:0] stringValue]];
+	[mailer setCc:[[mailForm cellWithTag:1] stringValue]];
+	[mailer setSubject:[[mailForm cellWithTag:2] stringValue]];
+	[mailer setBody:theContent];
+	[theContent release];
+	
+	[mailer send:[self window]];
+	
+	//[[self window] performClose:self];
 }
 
 @end

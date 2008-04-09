@@ -1522,6 +1522,8 @@
 		84E5B30F0715E16700C7B798 /* NcdCableCheckTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */; };
 		84E6FB220B2DDC6000CAA7C5 /* ObjectFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */; };
 		84E6FB230B2DDC6100CAA7C5 /* ObjectFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */; };
+		84E743440DAD5EF00099CAEE /* ORMailer.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E743420DAD5EEF0099CAEE /* ORMailer.h */; };
+		84E743450DAD5EF00099CAEE /* ORMailer.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E743430DAD5EEF0099CAEE /* ORMailer.m */; };
 		84EA6C9F0C73D11200083319 /* nTPC.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EA6C950C73D11200083319 /* nTPC.nib */; };
 		84EA6CA00C73D11200083319 /* nTPC.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EA6C960C73D11200083319 /* nTPC.tif */; };
 		84EA6CA10C73D11200083319 /* nTPCConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6C970C73D11200083319 /* nTPCConstants.h */; };
@@ -3236,6 +3238,8 @@
 		84E5B30E0715E16700C7B798 /* NcdCableCheckTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdCableCheckTask.nib; path = Source/Experiments/Ncd/CableCheckTask/NcdCableCheckTask.nib; sourceTree = SOURCE_ROOT; };
 		84E6FB200B2DDC5F00CAA7C5 /* ObjectFactory.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ObjectFactory.m; path = Source/Objects/OrcaObject/ObjectFactory.m; sourceTree = SOURCE_ROOT; };
 		84E6FB210B2DDC6000CAA7C5 /* ObjectFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ObjectFactory.h; path = Source/Objects/OrcaObject/ObjectFactory.h; sourceTree = SOURCE_ROOT; };
+		84E743420DAD5EEF0099CAEE /* ORMailer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMailer.h; path = "Source/Main Dialogs/MailCenter/ORMailer.h"; sourceTree = SOURCE_ROOT; };
+		84E743430DAD5EEF0099CAEE /* ORMailer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMailer.m; path = "Source/Main Dialogs/MailCenter/ORMailer.m"; sourceTree = SOURCE_ROOT; };
 		84EA6C950C73D11200083319 /* nTPC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = nTPC.nib; path = Source/Experiments/nTPC/nTPC.nib; sourceTree = SOURCE_ROOT; };
 		84EA6C960C73D11200083319 /* nTPC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = nTPC.tif; path = Source/Experiments/nTPC/nTPC.tif; sourceTree = SOURCE_ROOT; };
 		84EA6C970C73D11200083319 /* nTPCConstants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = nTPCConstants.h; path = Source/Experiments/nTPC/nTPCConstants.h; sourceTree = SOURCE_ROOT; };
@@ -5695,6 +5699,8 @@
 		848E3BC509DB0B3E0003F7A2 /* MailCenter */ = {
 			isa = PBXGroup;
 			children = (
+				84E743420DAD5EEF0099CAEE /* ORMailer.h */,
+				84E743430DAD5EEF0099CAEE /* ORMailer.m */,
 				848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */,
 				848E3BC709DB0B3E0003F7A2 /* ORMailCenter.m */,
 				848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */,
@@ -8393,6 +8399,7 @@
 				847A48550D9C5D30002125DE /* ORFilterPluginBaseClass.h in Headers */,
 				84BC16560DA14F3600D3935C /* ORCaen1720Controller.h in Headers */,
 				84BC16580DA14F3600D3935C /* ORCaen1720Model.h in Headers */,
+				84E743440DAD5EF00099CAEE /* ORMailer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9518,6 +9525,7 @@
 				847A48540D9C5D30002125DE /* ORFilterPluginBaseClass.m in Sources */,
 				841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */,
 				841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */,
+				84E743450DAD5EF00099CAEE /* ORMailer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

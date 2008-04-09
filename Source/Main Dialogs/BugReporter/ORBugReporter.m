@@ -19,7 +19,8 @@
 
 #pragma mark •••Imported Files
 #import "ORBugReporter.h"
-#import <Message/NSMailDelivery.h>
+#import "ORMailer.h"
+
 
 @implementation ORBugReporter
 
@@ -126,24 +127,20 @@
 
 		[bodyField setString:s];
 
-
 		NSData* theRTFDData = [bodyField RTFDFromRange:NSMakeRange(0,[s length])];
 
 		NSDictionary* attrib;
 		NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
 		
-		NSMutableDictionary* headerDict = [NSMutableDictionary dictionary];
-		[headerDict setObject:[[mailForm cellWithTag:0] stringValue]  forKey:@"To"];
-		NSString* processedCCString = [[[[mailForm cellWithTag:1] stringValue] componentsSeparatedByString:@","] componentsJoinedByString:@""];
-		NSArray* ccArray = [processedCCString componentsSeparatedByString:@" "];
-		[headerDict setObject:ccArray  forKey:@"Cc"];
-		[headerDict setObject:[[mailForm cellWithTag:2] stringValue]  forKey:@"Subject"];
-		
-		@synchronized([NSApp delegate]){
-			[NSMailDelivery deliverMessage:theContent headers:headerDict format:NSMIMEMailFormat protocol:nil];	
-		}
+		ORMailer* mailer = [ORMailer mailer];
+		[mailer setTo:[[mailForm cellWithTag:0] stringValue]];
+		[mailer setCc:[[mailForm cellWithTag:1] stringValue]];
+		[mailer setSubject:[[mailForm cellWithTag:2] stringValue]];
+		[mailer setBody:theContent];
 		[theContent release];
 		
+		[mailer send:self];
+
 		[[self window] performClose:self];
 	}
 }
