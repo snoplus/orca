@@ -121,6 +121,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     
     aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize-2,[self frame].size.height-[self frame].size.height/2+kConnectorSize/2) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORDataTaskDataOut];
+	[aConnector setIoType:kOutputConnector];
     [aConnector release];
     
 }

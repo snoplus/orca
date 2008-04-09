@@ -81,6 +81,7 @@ static NSString *kFanOutConnectorKey[10]  = {
     //first the input connector
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x],[self y]+[self frame].size.height/2 - kConnectorSize/2) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORFanOutInputConnection];
+	[aConnector setIoType:kInputConnector];
     [aConnector release];
     //then the input connectors
     int i;
@@ -90,6 +91,7 @@ static NSString *kFanOutConnectorKey[10]  = {
     for(i=0;i<n;i++){
         aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x]+[self frame].size.width-kConnectorSize,[self y]+y_offset) withGuardian:self withObjectLink:self];
         [[self connectors] setObject:aConnector forKey:kFanOutConnectorKey[i]];
+		[aConnector setIoType:kOutputConnector];
         [aConnector release];
         y_offset += 2*kConnectorSize;
     }

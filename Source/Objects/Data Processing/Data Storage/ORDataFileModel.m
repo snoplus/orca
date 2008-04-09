@@ -89,6 +89,7 @@ static const int currentVersion = 1;           // Current version
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x],[self y]+15) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORDataFileConnection];
+	[aConnector setIoType:kInputConnector];
     [aConnector release];
 }
 

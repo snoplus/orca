@@ -132,6 +132,9 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(2,[self frame].size.height/2 - kConnectorSize/2) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:MuxBoxToControllerConnect];
+	[aConnector setConnectorType: 'MuxI' ];
+	[aConnector addRestrictedConnectionType: 'MuxO' ]; //can only connect to Mux outputs
+	[aConnector setIoType:kInputConnector];
     [aConnector release];
 }
 

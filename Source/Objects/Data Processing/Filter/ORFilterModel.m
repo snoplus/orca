@@ -156,14 +156,17 @@ int filterGraph(nodeType*);
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(0,2*[self frame].size.height/3. - kConnectorSize/2) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORFilterInConnector];
+	[aConnector setIoType:kInputConnector];
     [aConnector release];
 
     aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width/2 - kConnectorSize/2 , 0) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORFilterFilteredConnector];
+	[aConnector setIoType:kOutputConnector];
     [aConnector release];
     
     aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width-kConnectorSize,2*[self frame].size.height/3. - kConnectorSize/2) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORFilterOutConnector];
+	[aConnector setIoType:kOutputConnector];
     [aConnector release];
 }
 

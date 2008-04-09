@@ -63,15 +63,18 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x],[self y]) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORHistoDataConnection];
+	[aConnector setIoType:kInputConnector];
     [aConnector release];
 
     aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x]+[self frame].size.width - kConnectorSize ,[self y] ) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORHistoPassThruConnection];
+	[aConnector setIoType:kOutputConnector];
     [aConnector release];
 
     
     aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x]+[self frame].size.width - kConnectorSize ,[self y]+[self frame].size.height - kConnectorSize) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORHistoDataOutConnection];
+	[aConnector setIoType:kOutputConnector];
     [aConnector release];
 
 

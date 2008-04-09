@@ -29,6 +29,10 @@
 #define kSmallVerticalRect 	3
 #define kSmallDot			4
 
+#define kInOutConnector		0	//Either (default)
+#define kInputConnector		1	//only input
+#define kOutputConnector	2	//only output
+
 @interface ORConnector : NSObject <NSCoding> {
 	id			 guardian;
 	id  		 objectLink;
@@ -44,6 +48,7 @@
 	int			 lineType;
 	int 		 connectorImageType;
 	int 		 connectorType;
+	int 		 ioType;
 	int 		 identifer;
     NSColor*     onColor;
     NSColor*     offColor;
@@ -89,6 +94,10 @@
 - (void) 		setOnImage: (NSImage*)anImage;
 - (NSImage*) 	offImage;
 - (void) 		setOffImage: (NSImage*)anImage;
+
+- (int) 		ioType;
+- (void) 		setIoType: (int)aType;
+
 - (NSMutableArray*) restrictedList;
 - (void) setRestrictedList:(NSMutableArray*)newRestrictedList;
 
@@ -98,6 +107,8 @@
 - (void) 		setConnectorType:(unsigned long) type;
 - (void)		addRestrictedConnectionType:(unsigned long)type;
 - (NSRect)      lineBounds;
+- (BOOL)		acceptsIoType:(unsigned long)aType;
+- (BOOL)		acceptsIoType:(unsigned long)aType;
 
 #pragma mark ¥¥¥Undoable Actions
 - (void) 		setConnection: (ORConnector*)aConnection;

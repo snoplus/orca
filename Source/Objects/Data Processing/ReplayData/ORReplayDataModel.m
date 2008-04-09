@@ -86,6 +86,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 {
 	ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize,30) withGuardian:self withObjectLink:self];
 	[[self connectors] setObject:aConnector forKey:ORReplayDataConnection];
+	[aConnector setIoType:kOutputConnector];
 	[aConnector release];
 }
 

@@ -277,9 +277,23 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 {
     lineType = aType;
 }
+
 - (unsigned long) connectorType
 {
     return connectorType;
+}
+
+- (int) ioType
+{
+	return ioType;
+}
+
+- (void) setIoType: (int)aType
+{
+	if(aType > kOutputConnector){
+		aType = kInOutConnector; //just default it...
+	}
+	ioType = aType;
 }
 
 - (void) setConnectorType:(unsigned long) type
@@ -296,8 +310,6 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     [restrictedList addObject:[NSNumber numberWithLong:type]];
 }
 
-
-
 - (BOOL) acceptsConnectionType:(unsigned long)aType
 {
     if([restrictedList count]){
@@ -310,6 +322,17 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     }
     else return aType == [self connectorType];
 }
+
+- (BOOL) acceptsIoType:(unsigned long)aType
+{
+	if( aType == kInOutConnector || ioType == kInOutConnector)return YES;
+	else {
+		if(aType == kInputConnector && ioType == kOutputConnector)return YES;
+		else if(aType == kOutputConnector && ioType == kInputConnector)return YES;
+		else return NO;
+	}
+}
+
 
 - (int) connectorImageType
 {
@@ -369,7 +392,8 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 		[aConnector disconnect];
     }
     if(aConnector!=nil && aConnector != self  && [aConnector guardian] != guardian){
-		if([self acceptsConnectionType:[aConnector connectorType]] && [aConnector acceptsConnectionType:[self connectorType]]){
+		if( [self acceptsConnectionType:[aConnector connectorType]] && [aConnector acceptsConnectionType:connectorType] && 
+			[self acceptsIoType:[aConnector ioType]] && [aConnector acceptsIoType:ioType] ){
 			[self setConnection:aConnector];
 			[aConnector setConnection:self];
 		}
@@ -530,6 +554,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     [self setConnection:[decoder decodeObjectForKey:@"ORConnector Connection"]];
     [self setConnectorImageType:[decoder decodeIntForKey:@"ORConnectorImageType"]];
     [self setConnectorType:[decoder decodeInt32ForKey:@"ORConnector Type"]];
+    [self setIoType:[decoder decodeIntForKey:@"ORConnector IO Type"]];
     [self setIdentifer:[decoder decodeIntForKey:@"ORConnectorID"]];
     [self setRestrictedList:[decoder decodeObjectForKey:@"ORConnectorRestrictedList"]];
     [self setHidden:[decoder decodeBoolForKey:@"Hidden"]];
@@ -555,6 +580,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     [encoder encodeConditionalObject:connector forKey:@"ORConnector Connection"];
     [encoder encodeInt:connectorImageType forKey:@"ORConnectorImageType"];
     [encoder encodeInt32:connectorType forKey:@"ORConnector Type"];
+    [encoder encodeInt:ioType forKey:@"ORConnector IO Type"];
     [encoder encodeInt:identifer forKey:@"ORConnectorID"];
     [encoder encodeObject:restrictedList forKey:@"ORConnectorRestrictedList"];
     [encoder encodeBool:hidden forKey:@"Hidden"];

@@ -97,6 +97,8 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 																		  [self frame].size.height - 15-i*(kConnectorSize+.5)) withGuardian:self withObjectLink:[self muxBoxHw]];
         [[self connectors] setObject:aConnector forKey:NcdMuxConnectors[i]];
         [aConnector setIdentifer:i];
+		[aConnector setConnectorType: 'MuxO' ];
+		[aConnector addRestrictedConnectionType: 'MuxI' ]; //can only connect to MuxBox inputs
         [aConnector release];
     }
     
@@ -104,6 +106,8 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
         ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(85, [self frame].size.height - 15-i*(kConnectorSize+.5)) withGuardian:self withObjectLink:[self muxBoxHw]];
         [[self connectors] setObject:aConnector forKey:NcdMuxConnectors[i+4]];
         [aConnector setIdentifer:i+4];
+		[aConnector setConnectorType: 'MuxO' ];
+		[aConnector addRestrictedConnectionType: 'MuxI' ]; //can only connect to MuxBox inputs
         [aConnector release];
     }
     
