@@ -19,7 +19,6 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORMailCenter.h"
-#import <Message/NSMailDelivery.h>
 
 @implementation ORMailCenter
 
@@ -105,22 +104,16 @@
 	}
 	
 	if(okToSend){
-		NSData* theRTFDData = [bodyField RTFDFromRange:NSMakeRange(0,[[bodyField string] length])];;
+	
+		NSString *encodedSubject   = [NSString stringWithFormat:@"SUBJECT=%@",    [[[mailForm cellWithTag:2] stringValue] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
+		NSString *encodedBody      = [NSString stringWithFormat:@"BODY=%@",       [[bodyField string] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
+		NSString *encodedCC        = [NSString stringWithFormat:@"CC=%@",         [[[mailForm cellWithTag:1] stringValue] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
+		NSString *encodedTo        = [[[mailForm cellWithTag:0] stringValue] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
+		NSString *encodedURLString = [NSString stringWithFormat:@"mailto:%@?%@&%@&%@", encodedTo, encodedCC, encodedSubject, encodedBody];
 
-		NSDictionary* attrib;
-		NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
-		
-		NSMutableDictionary* headerDict = [NSMutableDictionary dictionary];
-		[headerDict setObject:[[mailForm cellWithTag:0] stringValue]  forKey:@"To"];
-		NSString* processedCCString = [[[[mailForm cellWithTag:1] stringValue] componentsSeparatedByString:@","] componentsJoinedByString:@""];
-		NSArray* ccArray = [processedCCString componentsSeparatedByString:@" "];
-		[headerDict setObject:ccArray  forKey:@"Cc"];
-		[headerDict setObject:[[mailForm cellWithTag:2] stringValue]  forKey:@"Subject"];
-		
 		@synchronized([NSApp delegate]){
-			[NSMailDelivery deliverMessage:theContent headers:headerDict format:NSMIMEMailFormat protocol:nil];	
+			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:encodedURLString]];
 		}
-		[theContent release];
 		
 		[[self window] performClose:self];
 	}
