@@ -16,13 +16,14 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
+@class ORMailer;
 @interface ORBugReporter : NSWindowController
 {
 	IBOutlet NSForm* mailForm;
 	IBOutlet NSForm* infoForm;
 	IBOutlet NSTextView* bodyField;
 	IBOutlet NSMatrix* categoryMatrix;
+	ORMailer* mailer;
 }
 
 - (id) init;

@@ -29,6 +29,7 @@ extern NSString *ORMailerMailType;
 	NSAttributedString *body;
 	NSString *from;
 	NSModalSession session;
+	id delegate;
 }
 
 + (ORMailer *)mailer;
@@ -54,6 +55,10 @@ extern NSString *ORMailerMailType;
 - (NSString *)from;
 - (void)setFrom:(NSString *)value;
 
-- (BOOL) send:(NSWindow*) aWindow;
+- (void) send:(id)aDelegate;
 
+@end
+
+@interface NSObject (ORMailer)
+- (void) mailSent;
 @end

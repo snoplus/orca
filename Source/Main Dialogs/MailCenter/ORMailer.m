@@ -21,10 +21,13 @@
 #import <Message/NSMailDelivery.h>
 
 @interface ORMailer (private)
-- (BOOL) sendUrlEmail:(NSWindow*) aWindow;
-- (BOOL) sendMailEmail:(NSWindow*) aWindow;
-- (void) noAddressSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) sendUrlEmail;
+- (void) sendMailEmail;
 - (void) noSubjectSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) noAddressSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (BOOL) addressOK;
+- (BOOL) subjectOK;
+- (void) sendit;
 @end
 
 @implementation ORMailer
@@ -65,7 +68,7 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 	return type;
 }
 
-- (void)setType:(NSString *)value 
+- (void) setType:(NSString *)value 
 {
     [type release];
     type = [value copy];
@@ -131,16 +134,16 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 	from = [value copy];
 }
 
-- (BOOL) send:(NSWindow*) aWindow 
+- (void) send:(id)aDelegate
 {
+	delegate = aDelegate;
 	if ([type isEqualToString:ORMailerUrlType]) {
-		return [self sendUrlEmail:aWindow];
+		[self sendUrlEmail];
 	}
 	if ([type isEqualToString:ORMailerMailType]) {
-		return [self sendMailEmail:aWindow];
+		[self sendMailEmail];
 	}
 	// better not get here
-	return NO;
 }
 
 - (NSArray *)ccArray {
@@ -151,7 +154,7 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 
 @implementation ORMailer (private)
 
-- (BOOL) sendUrlEmail:(NSWindow*) aWindow
+- (void) sendUrlEmail
 {
 	NSString *encodedSubject	= [NSString stringWithFormat:@"SUBJECT=%@",[subject stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
 	NSString *encodedBody		= [NSString stringWithFormat:@"BODY=%@",[[self bodyString] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
@@ -160,55 +163,68 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 	NSURL *mailtoURL			= [NSURL URLWithString:encodedURLString];
 	@synchronized([NSApp delegate]){
 		[[NSWorkspace sharedWorkspace] openURL:mailtoURL];
+		if([delegate respondsToSelector:@selector(mailSent)]){
+			[delegate performSelector:@selector(mailSent) withObject:nil afterDelay:0];
+		}
 	}
-	return YES;
 }
 
-- (BOOL) sendMailEmail:(NSWindow*) aWindow
+- (BOOL) addressOK
 {
-	BOOL okToSend = YES;
-	@synchronized([NSApp delegate]){
+	return [to length]!=0 && [to rangeOfString:@"@"].location != NSNotFound;
+}
 
-		if(!to || [to rangeOfString:@"@"].location == NSNotFound){
-			okToSend = NO;
-			NSBeginAlertSheet(@"ORCA Mail",
-                      @"OK",
-                      nil,
-                      nil,
-					  aWindow,
-                      self,
-                      @selector(noAddressSheetDidEnd:returnCode:contextInfo:),
-                      nil,
-                      nil,@"No Destination Address Given");
-			session = [NSApp beginModalSessionForWindow:aWindow];
-			[NSApp runModalSession:session];
+- (BOOL) subjectOK
+{
+	return [subject length]!=0;
+}
+
+- (void) sendMailEmail
+{
+	if ([self addressOK]){
+		if([self subjectOK]){
+			[self sendit];
 		}
-		if(okToSend){
-			if([subject length] == 0){
-				NSDictionary* userInfo = [NSDictionary dictionaryWithObject:aWindow forKey:@"Window"];
-				NSBeginAlertSheet(@"ORCA Mail",
-                      @"Cancel",
-                      @"Send Anyway",
-                      nil,
-					  aWindow,
-                      self,
-                      @selector(noSubjectSheetDidEnd:returnCode:contextInfo:),
-                      nil,
-                      userInfo,@"No Subject...");
-			}
+		else {
+			NSBeginAlertSheet(@"ORCA Mail",
+				  @"Cancel",
+				  @"Send Anyway",
+				  nil,
+				  [delegate window],
+				  self,
+				  @selector(noSubjectSheetDidEnd:returnCode:contextInfo:),
+				  nil,
+				  nil,@"No Subject...");		
 		}
 	}
-	return okToSend;
+	else {
+		NSBeginAlertSheet(@"ORCA Mail",
+			  @"OK",
+			  nil,
+			  nil,
+			  [delegate window],
+			  self,
+			  @selector(noAddressSheetDidEnd:returnCode:contextInfo:),
+			  nil,
+			  nil,@"No Destination Address Given");
+	}
 }
 
 - (void) noAddressSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	[NSApp endModalSession:session];
+
 }
 
 - (void) noSubjectSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
-	if(returnCode != NSAlertAlternateReturn){		
+	if(returnCode == NSAlertAlternateReturn){
+		[self sendit];
+	}
+}
+
+- (void) sendit
+{
+	@synchronized([NSApp delegate]){
 		BOOL configured = [NSMailDelivery hasDeliveryClassBeenConfigured];
 		if(configured){
 			NSMutableDictionary *headersDict = [NSMutableDictionary dictionary];
@@ -220,22 +236,25 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 										format:NSMIMEMailFormat
 									protocol:nil];
 			NSLog(@"email sent to: %@\n",to);
+			if([delegate respondsToSelector:@selector(mailSent)]){
+				[delegate performSelector:@selector(mailSent) withObject:nil afterDelay:0];
+			}
+			
 		}
 		else {
 			NSBeginAlertSheet(@"ORCA Mail",
-                      @"OK",
-                      nil,
-                      nil,
-					  [userInfo objectForKey:@"window"],
-                      self,
-                      nil,
-                      nil,
-                      nil,@"e-mail could NOT be sent because eMail delivery has not been configured in Mail.app");
+					  @"OK",
+					  nil,
+					  nil,
+					  nil,
+					  self,
+					  nil,
+					  nil,
+					  nil,@"e-mail could NOT be sent because eMail delivery has not been configured in Mail.app");
 
 			NSLogColor([NSColor redColor], @"e-mail could NOT be sent because eMail delivery has not been configured in Mail.app\n");
-		}
+		}	
 	}
 }
-
 
 @end

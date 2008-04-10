@@ -31,6 +31,12 @@
     return self;
 }
 
+- (void) dealloc
+{
+	[mailer release];
+	[super dealloc];
+}
+
 - (void) awakeFromNib
 {
 
@@ -65,84 +71,78 @@
 	if(![[self window] makeFirstResponder:[self window]]){
 		[[self window] endEditingFor:nil];		
 	}
+
+	NSString* s = [bodyField string];
+	NSString* startString = [s copy];
+	unsigned major,minor,bugFix;
+	[NSApp getSystemVersionMajor:&major
+						minor:&minor
+					   bugFix:&bugFix];
+
+
+	CFBundleRef localInfoBundle = CFBundleGetMainBundle();
+	NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
 	
-	BOOL okToSend = YES;
-	if(![[mailForm cellWithTag:0] stringValue] || [[[mailForm cellWithTag:0] stringValue] rangeOfString:@"@"].location == NSNotFound){
-		okToSend = NO;
-		NSRunAlertPanel(@"Mail Center",@"No Destination Address Given", nil, nil, nil);
+	CFBundleGetLocalInfoDictionary( localInfoBundle );
+	
+	NSString* versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
+
+	s = [s stringByAppendingFormat:@"\n\n-----------------------------------------\n"];
+	switch([[categoryMatrix selectedCell] tag]){
+		case 0:	s = [s stringByAppendingFormat:@"Bug Category: Crasher\n"]; break;
+		case 1:	s = [s stringByAppendingFormat:@"Bug Category: Critical\n"]; break;
+		case 2:	s = [s stringByAppendingFormat:@"Bug Category: Annoying\n"]; break;
+		case 3:	s = [s stringByAppendingFormat:@"Bug Category: Minor\n"]; break;
+		default:s = [s stringByAppendingFormat:@"Bug Category: Feature Request\n"]; break;
 	}
-	if(okToSend){
-		if([[[mailForm cellWithTag:2] stringValue] length] == 0){
-			int choice = NSRunAlertPanel(@"Bug Center",@"\nNo Subject...",@"Cancel",@"Send Anyway",nil);
-			if(choice != NSAlertAlternateReturn){		
-				okToSend = NO;
-			}
+	s = [s stringByAppendingFormat:@"-----------------------------------------\n"];
+	s = [s stringByAppendingFormat:@"MacOS %u.%u.%u\n",major,minor,bugFix];
+	s = [s stringByAppendingFormat:@"Orca Version : %@\n",versionString];
+
+	BOOL foundOne = NO;
+	NSArray* theNames = [[NSHost currentHost] names];
+	NSEnumerator* e = [theNames objectEnumerator];
+	id aName;
+	while(aName = [e nextObject]){
+		NSArray* parts = [aName componentsSeparatedByString:@"."];
+		if([parts count] >= 3){
+			s = [s stringByAppendingFormat:@"Machine : %@\n",aName];
+			foundOne = YES;
+			break;
 		}
 	}
+	if(!foundOne) s = [s stringByAppendingFormat:@"Machine : %@\n",[[NSHost currentHost] names]];
 	
-	if(okToSend){
+	s = [s stringByAppendingFormat:@"Submitted by : %@\n",[[infoForm cellWithTag:0] stringValue]];
+	s = [s stringByAppendingFormat:@"Institution : %@\n",[[infoForm cellWithTag:1] stringValue]];
 	
-		NSString* s = [bodyField string];
-		unsigned major,minor,bugFix;
-		[NSApp getSystemVersionMajor:&major
-							minor:&minor
-						   bugFix:&bugFix];
+	[bodyField setString:s];
+	
+	NSData* theRTFDData = [bodyField RTFDFromRange:NSMakeRange(0,[[bodyField string] length])];;
 
+	NSDictionary* attrib;
+	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
+	
+	if(mailer)[mailer release];
+	mailer = [[ORMailer mailer] retain];
+	[mailer setTo:		[[mailForm cellWithTag:0] stringValue]];
+	[mailer setCc:		[[mailForm cellWithTag:1] stringValue]];
+	[mailer setSubject:	[[mailForm cellWithTag:2] stringValue]];
+	[mailer setBody:	theContent];
+	[theContent release];
+	
+	
+	[bodyField setString:startString];
+	[startString release];
+	[mailer send:self];
 
-		CFBundleRef localInfoBundle = CFBundleGetMainBundle();
-		NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-		
-		CFBundleGetLocalInfoDictionary( localInfoBundle );
-		
-		NSString* versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
+}
 
-		s = [s stringByAppendingFormat:@"\n\n-----------------------------------------\n"];
-		switch([[categoryMatrix selectedCell] tag]){
-			case 0:	s = [s stringByAppendingFormat:@"Bug Category: Crasher\n"]; break;
-			case 1:	s = [s stringByAppendingFormat:@"Bug Category: Critical\n"]; break;
-			case 2:	s = [s stringByAppendingFormat:@"Bug Category: Annoying\n"]; break;
-			case 3:	s = [s stringByAppendingFormat:@"Bug Category: Minor\n"]; break;
-			default:s = [s stringByAppendingFormat:@"Bug Category: Feature Request\n"]; break;
-		}
-		s = [s stringByAppendingFormat:@"-----------------------------------------\n"];
-		s = [s stringByAppendingFormat:@"MacOS %u.%u.%u\n",major,minor,bugFix];
-		s = [s stringByAppendingFormat:@"Orca Version : %@\n",versionString];
-
-		BOOL foundOne = NO;
-		NSArray* theNames = [[NSHost currentHost] names];
-		NSEnumerator* e = [theNames objectEnumerator];
-		id aName;
-		while(aName = [e nextObject]){
-			NSArray* parts = [aName componentsSeparatedByString:@"."];
-			if([parts count] >= 3){
-				s = [s stringByAppendingFormat:@"Machine : %@\n",aName];
-				foundOne = YES;
-				break;
-			}
-		}
-		if(!foundOne) s = [s stringByAppendingFormat:@"Machine : %@\n",[[NSHost currentHost] names]];
-		
-		s = [s stringByAppendingFormat:@"Submitted by : %@\n",[[infoForm cellWithTag:0] stringValue]];
-		s = [s stringByAppendingFormat:@"Institution : %@\n",[[infoForm cellWithTag:1] stringValue]];
-
-		[bodyField setString:s];
-
-		NSData* theRTFDData = [bodyField RTFDFromRange:NSMakeRange(0,[s length])];
-
-		NSDictionary* attrib;
-		NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
-		
-		ORMailer* mailer = [ORMailer mailer];
-		[mailer setTo:[[mailForm cellWithTag:0] stringValue]];
-		[mailer setCc:[[mailForm cellWithTag:1] stringValue]];
-		[mailer setSubject:[[mailForm cellWithTag:2] stringValue]];
-		[mailer setBody:theContent];
-		[theContent release];
-		
-		[mailer send:self];
-
-		[[self window] performClose:self];
-	}
+- (void) mailSent
+{
+	[mailer release];
+	mailer = nil;
+	[[self window] performClose:self];
 }
 
 @end

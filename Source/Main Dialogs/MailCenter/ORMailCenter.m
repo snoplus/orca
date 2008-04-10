@@ -46,6 +46,7 @@
 
 - (void) dealloc
 {
+	[mailer release];
     [fileToAttach release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
@@ -94,16 +95,23 @@
 	NSDictionary* attrib;
 	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
 	
-	ORMailer* mailer = [ORMailer mailer];
+	if(mailer)[mailer release];
+	mailer = [[ORMailer mailer] retain];
 	[mailer setTo:[[mailForm cellWithTag:0] stringValue]];
 	[mailer setCc:[[mailForm cellWithTag:1] stringValue]];
 	[mailer setSubject:[[mailForm cellWithTag:2] stringValue]];
 	[mailer setBody:theContent];
 	[theContent release];
 	
-	[mailer send:[self window]];
+	[mailer send:self];
 	
-	//[[self window] performClose:self];
+}
+
+- (void) mailSent
+{
+	[mailer release];
+	mailer = nil;
+	[[self window] performClose:self];
 }
 
 @end

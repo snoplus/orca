@@ -21,6 +21,7 @@
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataSet;
+@class ORMailer;
 
 @interface ORMailCenter : NSWindowController
 {
@@ -29,6 +30,7 @@
 	
 	BOOL selfRetained;
 	NSString* fileToAttach;
+	ORMailer* mailer;
 }
 
 + (id) mailCenter;
@@ -42,4 +44,6 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) send:(id)sender;
+- (void) mailSent;
+
 @end
