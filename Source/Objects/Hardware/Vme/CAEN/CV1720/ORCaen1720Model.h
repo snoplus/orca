@@ -110,6 +110,7 @@ enum {
     unsigned long	postTriggerSetting;
     unsigned short	enabledMask;
 	unsigned long   dataId;
+	BOOL			first; 
 }
 
 #pragma mark ***Accessors
@@ -143,6 +144,7 @@ enum {
 #pragma mark ***Register - General routines
 - (void)			read;
 - (void)			write;
+- (void)			report;
 - (void)			read:(unsigned short) pReg returnValue:(unsigned long*) pValue;
 - (void)			write:(unsigned short) pReg sendValue:(unsigned long) pValue;
 - (short)			getNumberRegisters;
@@ -153,6 +155,8 @@ enum {
 - (short)			getThresholdIndex;
 - (short)			getOutputBufferIndex;
 - (void)			generateSoftwareTrigger;
+- (void)			softwareReset;
+- (void)			clearAllMemory;
 
 #pragma mark ***HW Init
 - (void)			initBoard;
@@ -173,16 +177,15 @@ enum {
 - (BOOL)			dataReset: (short) anIndex;
 - (BOOL)			swReset: (short) anIndex;
 - (BOOL)			hwReset: (short) anIndex;
-- (void)			readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned short*) pValue;
 - (void)			writeThresholds;
 - (unsigned short)	threshold:(unsigned short) aChnl;
-- (void)			setThreshold:(unsigned short) aChnl threshold:(unsigned long) aValue;
-- (void)			writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned short) pValue;
+- (void)			setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
+- (void)			writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue;
+- (void)			readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue;
 - (void)			writeDacs;
 - (void)			writeDac:(unsigned short) pChan;
 - (float)			convertDacToVolts:(unsigned short)aDacValue;
 - (unsigned short)	convertVoltsToDac:(float)aVoltage;
-- (void)			readThreshold:(unsigned short) pChan;
 - (void)			writeThreshold:(unsigned short) pChan;
 - (void)			readOverUnderThresholds;
 

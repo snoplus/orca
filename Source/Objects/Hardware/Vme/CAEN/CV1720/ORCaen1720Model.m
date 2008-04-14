@@ -29,7 +29,7 @@
 
 // Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
-#define k792DefaultAddressModifier 	0x39
+#define k792DefaultAddressModifier 	0x09
 
 // Define all the registers available to this unit.
 static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
@@ -422,7 +422,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 
 
 
-- (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned short*) pValue
+- (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
 {
     // Make sure that register is valid
     if (pReg >= [self getNumberRegisters]) {
@@ -436,7 +436,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     }
     
     // Perform the read operation.
-    [[self adapter] readWordBlock:pValue
+    [[self adapter] readLongBlock:pValue
                         atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
                         numToRead:1
                        withAddMod:[self addressModifier]
@@ -444,7 +444,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     
 }
 
-- (void) writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned short) pValue
+- (void) writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue
 {
 	unsigned long theValue = pValue;
     // Check that register is a valid register.
@@ -475,11 +475,11 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     return thresholds[aChnl];
 }
 
-- (void) setThreshold:(unsigned short) aChnl threshold:(unsigned long) aValue
+- (void) setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
 {
     
     // Set the undo manager action.  The label has already been set by the controller calling this method.
-    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl threshold:[self threshold:aChnl]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl withValue:[self threshold:aChnl]];
     
     // Set the new value in the model.
     thresholds[aChnl] = aValue;
@@ -515,8 +515,8 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
             
             // Loop through the thresholds and read them.
             for(i = start; i <= end; i++){
-                [self readThreshold:i];
-                NSLog(@"%@ %2d = 0x%04lx\n", reg[theRegIndex].regName,i, [self threshold:i]);
+				[self readChan:i reg:theRegIndex returnValue:&theValue];
+                NSLog(@"%@ %2d = 0x%04lx\n", reg[theRegIndex].regName,i, theValue);
             }
         }
 		else {
@@ -550,7 +550,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     
     NS_DURING
         
-        NSLog(@"Register is:%d\n", theRegIndex);
+        NSLog(@"Register is:%@\n", [self getRegisterName:theRegIndex]);
         NSLog(@"Index is   :%d\n", theChannelIndex);
         NSLog(@"Value is   :0x%04x\n", theValue);
         
@@ -563,9 +563,9 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
             }
             for (i = start; i <= end; i++){
                 if(theRegIndex == kThresholds){
-					[self setThreshold:i threshold:theValue];
+					[self setThreshold:i withValue:theValue];
 				}
-				[self write:theRegIndex sendValue: theValue];
+				[self writeChan:i reg:theRegIndex sendValue:theValue];
             }
         }
         
@@ -629,23 +629,6 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 }
 
 
-- (void) readThreshold:(unsigned short) pChan
-{
-    
-    unsigned long value;
-    
-    // Read the threshold
-    [[self adapter] readLongBlock:&value
-                        atAddress:[self baseAddress] + [self getThresholdOffset] + (pChan * 0x100)
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    
-    // Store new value
-    [self setThreshold:pChan threshold:value];
-    
-}
-
 - (void) writeThreshold:(unsigned short) pChan
 {
     unsigned long 	threshold = [self threshold:pChan];
@@ -681,9 +664,9 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 
 - (void) writeDac:(unsigned short) pChan
 {
-    unsigned long 	threshold = [self threshold:pChan];
+    unsigned long 	aValue = [self dac:pChan];
     
-    [[self adapter] writeLongBlock:&threshold
+    [[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kDacs].addressOffset + (pChan * 0x100)
                         numToWrite:1
                         withAddMod:[self addressModifier]
@@ -739,6 +722,66 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
                      usingAddSpace:0x01];
 }
 
+- (void) report
+{
+	unsigned long enabled, threshold, numOU, status, bufferOccupancy, dacValue,triggerSrc;
+	[self read:kChanEnableMask returnValue:&enabled];
+	[self read:kTrigSrcEnblMask returnValue:&triggerSrc];
+	int chan;
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Chan Enabled Thres  NumOver Status Buffers  Offset trigSrc\n");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
+	for(chan=0;chan<8;chan++){
+		[self readChan:chan reg:kThresholds returnValue:&threshold];
+		[self readChan:chan reg:kNumOUThreshold returnValue:&numOU];
+		[self readChan:chan reg:kStatus returnValue:&status];
+		[self readChan:chan reg:kBufferOccupancy returnValue:&bufferOccupancy];
+		[self readChan:chan reg:kDacs returnValue:&dacValue];
+		NSString* statusString;
+		if(status & 0x10)			statusString = @"Error";
+		else if(status & 0x04)		statusString = @"Busy ";
+		else {
+			if(status & 0x02)		statusString = @"Empty";
+			else if(status & 0x01)	statusString = @"Full ";
+		}
+		NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"  %d     %@    0x%04x  0x%04x  %@  0x%04x  0x%04x  %@\n",chan,enabled&(1<<chan)?@"E":@"X",threshold&0xfff,numOU&0xfff,statusString, bufferOccupancy&0x7ff,dacValue, triggerSrc&(1<<chan)?@"Y":@"N");
+	}
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
+
+	unsigned long aValue;
+	[self read:kBufferOrganization returnValue:&aValue];
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"# Buffer Blocks : %d\n",(long)powf(2.,(float)aValue));
+
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Software Trigger: %@\n",triggerSrc&0x80000000?@"Enabled":@"Disabled");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"External Trigger: %@\n",triggerSrc&0x40000000?@"Enabled":@"Disabled");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Trigger nHit    : %d\n",(triggerSrc&0x00c000000) >> 24);
+
+	
+	[self read:kAcqControl returnValue:&aValue];
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Triggers Count  : %@\n",aValue&0x4?@"Accepted":@"All");
+	if(aValue&0x3 == 0x00)      NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Register-Controlled Run Mode\n");
+	else if(aValue&0x3 == 0x01) NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"S-In Controlled run Mode\n");
+	else if(aValue&0x3 == 0x10) NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"S-In Gate\n");
+	else if(aValue&0x3 == 0x11) NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Multi-Board Sync\n");
+
+	[self read:kCustomSize returnValue:&aValue];
+	if(aValue)NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : %d\n",aValue);
+	else      NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : Disabled\n");
+
+	[self read:kAcqStatus returnValue:&aValue];
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Board Ready     : %@\n",aValue&0x100?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Locked      : %@\n",aValue&0x80?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Bypass      : %@\n",aValue&0x40?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Clock source    : %@\n",aValue&0x20?@"External":@"Internal");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Buffer full     : %@\n",aValue&0x10?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Ready    : %@\n",aValue&0x08?@"YES":@"NO");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run             : %@\n",aValue&0x04?@"ON":@"OFF");
+
+	[self read:kEventStored returnValue:&aValue];
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Stored   : %d\n",aValue);
+
+} 
+
 - (void) initBoard
 {
 	[self writeThresholds];
@@ -762,11 +805,44 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 - (void) writeThresholds
 {
     short	i;
-    
     for (i = 0; i < [self numberOfChannels]; i++){
         [self writeThreshold:i];
     }
 }
+
+- (void) softwareReset
+{
+	unsigned long aValue = 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kSWReset].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+
+}
+
+- (void) clearAllMemory
+{
+	unsigned long aValue = 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kSWClear].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+
+}
+
+- (void) writeTriggerCount
+{
+	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+	
+}
+
 
 - (void) writeTriggerSource
 {
@@ -832,11 +908,8 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    
-    NSString* decoderName = [[NSStringFromClass([self class]) componentsSeparatedByString:@"Model"] componentsJoinedByString:@"DecoderFor"];
-    decoderName = [decoderName stringByAppendingString:@"CAEN"];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORCaen1720WaveformDecoder",				"decoder",
+	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"ORCaen1720WaveformDecoder",				@"decoder",
         [NSNumber numberWithLong:dataId],           @"dataId",
         [NSNumber numberWithBool:YES],              @"variable",
         [NSNumber numberWithLong:-1],               @"length",
@@ -848,7 +921,6 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 
 - (void) reset
 {
-    //required by the datataking protocal.
 }
 
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
@@ -862,21 +934,33 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
     
     controller = [self adapter]; //cache for speed
-	     
+	first = YES;     
     [self initBoard];
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 {
+	NS_DURING
+		if(!first){
+			first = NO;
+		}
+		else {
+			[self clearAllMemory];
+			[self writeAcquistionControl:YES];
+		}
+	NS_HANDLER
+	NS_ENDHANDLER
+
 }
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
+	[self writeAcquistionControl:NO];
 }
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"CAEN 792 (Slot %d) ",[self slot]];
+    return [NSString stringWithFormat:@"CAEN 1720 (Slot %d) ",[self slot]];
 }
 
 #pragma mark ***Archival
@@ -896,7 +980,8 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 
 	int i;
     for (i = 0; i < [self numberOfChannels]; i++){
-        [self setDac:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENDacChnl%d", i]]];
+        [self setDac:i withValue:      [aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENDacChnl%d", i]]];
+        [self setThreshold:i withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENThresChnl%d", i]]];
     }
     
     [[self undoManager] enableUndoRegistration];
@@ -916,7 +1001,8 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 	[anEncoder encodeInt:channelConfigMask forKey:@"channelConfigMask"];
 	int i;
 	for (i = 0; i < [self numberOfChannels]; i++){
-        [anEncoder encodeInt:dac[i] forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];
+        [anEncoder encodeInt32:dac[i] forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];
+        [anEncoder encodeInt32:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresChnl%d", i]];
     }
 }
 
@@ -937,7 +1023,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
     [p setFormat:@"##0" upperLimit:1200 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setThreshold:threshold:) getMethod:@selector(threshold:)];
+    [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
 	[p setCanBeRamped:YES];
 	[p setInitMethodSelector:@selector(writeThresholds)];
     [a addObject:p];

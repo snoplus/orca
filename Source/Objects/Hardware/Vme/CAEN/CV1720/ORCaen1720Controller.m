@@ -246,9 +246,9 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 - (void) triggerSourceMaskChanged:(NSNotification*)aNote
 {
 	int i;
-	unsigned short mask = [model triggerSourceMask];
+	unsigned long mask = [model triggerSourceMask];
 	for(i=0;i<kNumTrigSourceBits;i++){
-		[[triggerSourceMaskMatrix cellWithTag:i] setIntValue:(mask & (1<<trigSrcToMaskBit[i])) !=0];
+		[[triggerSourceMaskMatrix cellWithTag:i] setIntValue:(mask & (1L<<trigSrcToMaskBit[i])) !=0];
 	}
 }
 
@@ -293,8 +293,16 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 - (void) thresholdChanged:(NSNotification*) aNotification
 {
 // Get the channel that changed and then set the GUI value using the model value.
-	int chnl = [[[aNotification userInfo] objectForKey:ORCaen1720Chnl] intValue];
-	[[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
+	if(aNotification){
+		int chnl = [[[aNotification userInfo] objectForKey:ORCaen1720Chnl] intValue];
+		[[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
+	}
+	else {
+		int i;
+		for (i = 0; i < [model numberOfChannels]; i++){
+			[[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
+		}
+	}
 }
 
 - (void) dacChanged: (NSNotification*) aNotification
@@ -370,7 +378,7 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
     }
 } 
 
-- (IBAction) read:(id) pSender
+- (IBAction) basicRead:(id) pSender
 {
 	NS_DURING
 		[self endEditing];		// Save in memory user changes before executing command.
@@ -381,7 +389,7 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
     NS_ENDHANDLER
 }
 
-- (IBAction) write:(id) pSender
+- (IBAction) basicWrite:(id) pSender
 {
 	NS_DURING
 		[self endEditing];		// Save in memory user changes before executing command.
@@ -428,6 +436,28 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
     [gSecurity tryToSetLock:ORCaen1720SettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
+- (IBAction) report: (id) sender
+{
+	NS_DURING
+		[model report];
+	NS_HANDLER
+        NSRunAlertPanel([localException name], @"%@\nRead failed", @"OK", nil, nil,
+                        localException);
+	NS_ENDHANDLER
+}
+
+- (IBAction) initBoard: (id) sender
+{
+	NS_DURING
+		[model initBoard];
+		NSLog(@"Caen 1720 Card %d inited\n",[model slot]);
+	NS_HANDLER
+        NSRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
+                        localException);
+	NS_ENDHANDLER
+}
+
+
 - (void) enabledMaskAction:(id)sender
 {
 	int i;
@@ -447,9 +477,9 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 - (IBAction) triggerSourceMaskAction:(id)sender
 {
 	int i;
-	unsigned short mask = 0;
+	unsigned long mask = 0;
 	for(i=0;i<kNumTrigSourceBits;i++){
-		if([[sender cellWithTag:i] intValue]) mask |= (1 << trigSrcToMaskBit[i]);
+		if([[sender cellWithTag:i] intValue]) mask |= (1L << trigSrcToMaskBit[i]);
 	}
 	[model setTriggerSourceMask:mask];	
 }
@@ -458,6 +488,7 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 {
 	[model setCoincidenceLevel:[sender intValue]];	
 }
+
 - (IBAction) generateTriggerAction:(id)sender
 {
 	NS_DURING
@@ -503,7 +534,7 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 {
     if ([aSender intValue] != [model threshold:[[aSender selectedCell] tag]]){
         [[[model document] undoManager] setActionName:@"Set thresholds"]; // Set name of undo.
-        [model setThreshold:[[aSender selectedCell] tag] threshold:[aSender intValue]]; // Set new value
+        [model setThreshold:[[aSender selectedCell] tag] withValue:[aSender intValue]]; // Set new value
     }
 }
 

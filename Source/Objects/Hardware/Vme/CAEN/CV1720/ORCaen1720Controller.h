@@ -53,6 +53,10 @@
 	IBOutlet NSTextField*	customSizeTextField;
 	IBOutlet NSMatrix*		channelConfigMaskMatrix;
     IBOutlet NSMatrix*		overUnderMatrix;
+	
+    IBOutlet NSButton*		initButton;
+    IBOutlet NSButton*		reportButton;
+
 
     IBOutlet NSButton*		basicLockButton;
     IBOutlet NSButton*		settingsLockButton;
@@ -96,10 +100,13 @@
 - (IBAction) selectRegisterAction: (id) aSender;
 - (IBAction) selectChannelAction: (id) aSender;
 
-- (IBAction) read: (id) sender;
-- (IBAction) write: (id) sender;
+- (IBAction) basicRead: (id) sender;
+- (IBAction) basicWrite: (id) sender;
 - (IBAction) basicLockAction:(id)sender;
 - (IBAction) settingsLockAction:(id)sender;
+
+- (IBAction) report: (id) sender;
+- (IBAction) initBoard: (id) sender;
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) postTriggerSettingTextFieldAction:(id)sender;
 - (IBAction) triggerSourceMaskAction:(id)sender;

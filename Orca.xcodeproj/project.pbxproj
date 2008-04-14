@@ -1405,6 +1405,8 @@
 		84B63CE809783832005B20A5 /* PushButton.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE109783832005B20A5 /* PushButton.nib */; };
 		84B63CE909783832005B20A5 /* PushButtonOff.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE209783832005B20A5 /* PushButtonOff.tif */; };
 		84B63CEA09783832005B20A5 /* PushButtonOn.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B63CE309783832005B20A5 /* PushButtonOn.tif */; };
+		84B771400DB3DFBB004798B2 /* ORCaen1720Decoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B7713E0DB3DFBB004798B2 /* ORCaen1720Decoder.h */; };
+		84B771410DB3DFBB004798B2 /* ORCaen1720Decoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7713F0DB3DFBB004798B2 /* ORCaen1720Decoder.m */; };
 		84B7F8D60820551F00721869 /* bigdotcolormask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7F8D30820551F00721869 /* bigdotcolormask.tif */; };
 		84B7F8D70820551F00721869 /* bigdottopmask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7F8D40820551F00721869 /* bigdottopmask.tif */; };
 		84B7F8D80820551F00721869 /* bigdotshadow.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7F8D50820551F00721869 /* bigdotshadow.tif */; };
@@ -3020,6 +3022,8 @@
 		84B649B50406ECBA005F64B1 /* NcdMux.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = NcdMux.gif; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMux/NcdMux.gif"; sourceTree = SOURCE_ROOT; };
 		84B649B70407013B005F64B1 /* NcdMuxHWModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NcdMuxHWModel.h; sourceTree = "<group>"; };
 		84B649B80407013B005F64B1 /* NcdMuxHWModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NcdMuxHWModel.m; sourceTree = "<group>"; };
+		84B7713E0DB3DFBB004798B2 /* ORCaen1720Decoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen1720Decoder.h; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Decoder.h; sourceTree = SOURCE_ROOT; };
+		84B7713F0DB3DFBB004798B2 /* ORCaen1720Decoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Decoder.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Decoder.m; sourceTree = SOURCE_ROOT; };
 		84B7DF8604E1A425005F64B1 /* ORRateGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRateGroup.h; sourceTree = "<group>"; };
 		84B7DF8704E1A425005F64B1 /* ORRateGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRateGroup.m; sourceTree = "<group>"; };
 		84B7DF9E04E1C53D005F64B1 /* ORValueBar.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORValueBar.h; sourceTree = "<group>"; };
@@ -6514,6 +6518,8 @@
 				841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */,
 				84BC16520DA14F3600D3935C /* ORCaen1720Model.h */,
 				841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */,
+				84B7713E0DB3DFBB004798B2 /* ORCaen1720Decoder.h */,
+				84B7713F0DB3DFBB004798B2 /* ORCaen1720Decoder.m */,
 			);
 			name = CV1720;
 			path = Source/Objects/Hardware/Vme/CAEN/CV1720;
@@ -8400,6 +8406,7 @@
 				84BC16560DA14F3600D3935C /* ORCaen1720Controller.h in Headers */,
 				84BC16580DA14F3600D3935C /* ORCaen1720Model.h in Headers */,
 				84E743440DAD5EF00099CAEE /* ORMailer.h in Headers */,
+				84B771400DB3DFBB004798B2 /* ORCaen1720Decoder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9526,6 +9533,7 @@
 				841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */,
 				841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */,
 				84E743450DAD5EF00099CAEE /* ORMailer.m in Sources */,
+				84B771410DB3DFBB004798B2 /* ORCaen1720Decoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
