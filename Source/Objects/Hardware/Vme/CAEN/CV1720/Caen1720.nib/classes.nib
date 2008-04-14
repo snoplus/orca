@@ -58,6 +58,10 @@
 				<string>id</string>
 				<key>basicLockAction</key>
 				<string>id</string>
+				<key>basicRead</key>
+				<string>id</string>
+				<key>basicWrite</key>
+				<string>id</string>
 				<key>channelConfigMaskAction</key>
 				<string>id</string>
 				<key>coincidenceLevelTextFieldAction</key>
@@ -72,9 +76,11 @@
 				<string>id</string>
 				<key>generateTriggerAction</key>
 				<string>id</string>
+				<key>initBoard</key>
+				<string>id</string>
 				<key>postTriggerSettingTextFieldAction</key>
 				<string>id</string>
-				<key>read</key>
+				<key>report</key>
 				<string>id</string>
 				<key>selectChannelAction</key>
 				<string>id</string>
@@ -85,8 +91,6 @@
 				<key>thresholdAction</key>
 				<string>id</string>
 				<key>triggerSourceMaskAction</key>
-				<string>id</string>
-				<key>write</key>
 				<string>id</string>
 				<key>writeValueAction</key>
 				<string>id</string>
@@ -129,6 +133,8 @@
 				<string>NSMatrix</string>
 				<key>hrTextField</key>
 				<string>NSTextField</string>
+				<key>initButton</key>
+				<string>NSButton</string>
 				<key>overUnderMatrix</key>
 				<string>NSMatrix</string>
 				<key>postTriggerSettingTextField</key>
@@ -141,6 +147,8 @@
 				<string>NSTextField</string>
 				<key>registerReadWriteTextField</key>
 				<string>NSTextField</string>
+				<key>reportButton</key>
+				<string>NSButton</string>
 				<key>settingsLockButton</key>
 				<string>NSButton</string>
 				<key>softwareTriggerButton</key>
