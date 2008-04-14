@@ -26,94 +26,6 @@
 			<string>ObjC</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>baseAddressAction</key>
-				<string>id</string>
-				<key>basicLockAction</key>
-				<string>id</string>
-				<key>read</key>
-				<string>id</string>
-				<key>readThresholds</key>
-				<string>id</string>
-				<key>selectChannelAction</key>
-				<string>id</string>
-				<key>selectRegisterAction</key>
-				<string>id</string>
-				<key>thresholdChangedAction</key>
-				<string>id</string>
-				<key>thresholdLockAction</key>
-				<string>id</string>
-				<key>write</key>
-				<string>id</string>
-				<key>writeThresholds</key>
-				<string>id</string>
-				<key>writeValueAction</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORCaenCardController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>addressStepper</key>
-				<string>NSStepper</string>
-				<key>addressTextField</key>
-				<string>NSTextField</string>
-				<key>basicLockButton</key>
-				<string>NSButton</string>
-				<key>basicLockDocField</key>
-				<string>NSTextField</string>
-				<key>basicReadButton</key>
-				<string>NSButton</string>
-				<key>basicWriteButton</key>
-				<string>NSButton</string>
-				<key>channelPopUp</key>
-				<string>NSPopUpButton</string>
-				<key>drTextField</key>
-				<string>NSTextField</string>
-				<key>hrTextField</key>
-				<string>NSTextField</string>
-				<key>regNameField</key>
-				<string>NSTextField</string>
-				<key>registerAddressPopUp</key>
-				<string>NSPopUpButton</string>
-				<key>registerOffsetTextField</key>
-				<string>NSTextField</string>
-				<key>registerReadWriteTextField</key>
-				<string>NSTextField</string>
-				<key>slotField</key>
-				<string>NSTextField</string>
-				<key>srTextField</key>
-				<string>NSTextField</string>
-				<key>stepperA</key>
-				<string>NSMatrix</string>
-				<key>stepperB</key>
-				<string>NSMatrix</string>
-				<key>tabView</key>
-				<string>NSTabView</string>
-				<key>thresholdA</key>
-				<string>NSMatrix</string>
-				<key>thresholdB</key>
-				<string>NSMatrix</string>
-				<key>thresholdLockButton</key>
-				<string>NSButton</string>
-				<key>thresholdLockDocField</key>
-				<string>NSTextField</string>
-				<key>thresholdReadButton</key>
-				<string>NSButton</string>
-				<key>thresholdWriteButton</key>
-				<string>NSButton</string>
-				<key>writeValueStepper</key>
-				<string>NSStepper</string>
-				<key>writeValueTextField</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>OrcaObjectController</string>
-		</dict>
-		<dict>
 			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
@@ -140,7 +52,43 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>acquisitionModeAction</key>
+				<string>id</string>
+				<key>baseAddressAction</key>
+				<string>id</string>
+				<key>basicLockAction</key>
+				<string>id</string>
+				<key>channelConfigMaskAction</key>
+				<string>id</string>
+				<key>coincidenceLevelTextFieldAction</key>
+				<string>id</string>
+				<key>countAllTriggersAction</key>
+				<string>id</string>
+				<key>customSizeAction</key>
+				<string>id</string>
 				<key>dacAction</key>
+				<string>id</string>
+				<key>enabledMaskAction</key>
+				<string>id</string>
+				<key>generateTriggerAction</key>
+				<string>id</string>
+				<key>postTriggerSettingTextFieldAction</key>
+				<string>id</string>
+				<key>read</key>
+				<string>id</string>
+				<key>selectChannelAction</key>
+				<string>id</string>
+				<key>selectRegisterAction</key>
+				<string>id</string>
+				<key>settingsLockAction</key>
+				<string>id</string>
+				<key>thresholdAction</key>
+				<string>id</string>
+				<key>triggerSourceMaskAction</key>
+				<string>id</string>
+				<key>write</key>
+				<string>id</string>
+				<key>writeValueAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -149,11 +97,69 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>acquisitionModeMatrix</key>
+				<string>NSMatrix</string>
+				<key>addressStepper</key>
+				<string>NSStepper</string>
+				<key>addressTextField</key>
+				<string>NSTextField</string>
+				<key>basicLockButton</key>
+				<string>NSButton</string>
+				<key>basicLockDocField</key>
+				<string>NSTextField</string>
+				<key>basicReadButton</key>
+				<string>NSButton</string>
+				<key>basicWriteButton</key>
+				<string>NSButton</string>
+				<key>channelConfigMaskMatrix</key>
+				<string>NSMatrix</string>
+				<key>channelPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>coincidenceLevelTextField</key>
+				<string>NSTextField</string>
+				<key>countAllTriggersMatrix</key>
+				<string>NSMatrix</string>
+				<key>customSizeTextField</key>
+				<string>NSTextField</string>
 				<key>dacMatrix</key>
 				<string>NSMatrix</string>
+				<key>drTextField</key>
+				<string>NSTextField</string>
+				<key>enabledMaskMatrix</key>
+				<string>NSMatrix</string>
+				<key>hrTextField</key>
+				<string>NSTextField</string>
+				<key>overUnderMatrix</key>
+				<string>NSMatrix</string>
+				<key>postTriggerSettingTextField</key>
+				<string>NSTextField</string>
+				<key>regNameField</key>
+				<string>NSTextField</string>
+				<key>registerAddressPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>registerOffsetTextField</key>
+				<string>NSTextField</string>
+				<key>registerReadWriteTextField</key>
+				<string>NSTextField</string>
+				<key>settingsLockButton</key>
+				<string>NSButton</string>
+				<key>softwareTriggerButton</key>
+				<string>NSButton</string>
+				<key>srTextField</key>
+				<string>NSTextField</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
+				<key>thresholdMatrix</key>
+				<string>NSMatrix</string>
+				<key>triggerSourceMaskMatrix</key>
+				<string>NSMatrix</string>
+				<key>writeValueStepper</key>
+				<string>NSStepper</string>
+				<key>writeValueTextField</key>
+				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>ORCaenCardController</string>
+			<string>OrcaObjectController</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>

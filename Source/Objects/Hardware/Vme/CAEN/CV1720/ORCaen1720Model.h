@@ -1,14 +1,11 @@
-//--------------------------------------------------------------------------------
-/*!\class	ORCaen1720Model
- * \brief	Handles all access to CAEN CV792 ADC module.
- * \methods
- *			\li \b 			- Constructor
- *			\li \b 
- * \note
- * \author	Mark A. Howe
- * \history	2004-04-21 (MAH) - Original
- */
-//-----------------------------------------------------------
+//
+//ORCaen1720Model.h
+//Orca
+//
+//Created by Mark Howe on Mon Apr 14 2008.
+//Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
+//
+//-------------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
 //Astrophysics (CENPA) sponsored in part by the United States 
@@ -22,7 +19,19 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "ORCaenCardModel.h"
+#import "ORVmeIOCard.h"
+#import "ORDataTaker.h"
+#import "ORHWWizard.h"
+#import "ORCaenDataDecoder.h"
+
+typedef struct  {
+	NSString*       regName;
+	bool			dataReset;
+	bool			softwareReset;
+	bool			hwReset;
+	unsigned long 	addressOffset;
+	short			accessType;
+} Caen1720RegisterNamesStruct; 
 
 // Declaration of constants for module.
 enum {
@@ -30,7 +39,7 @@ enum {
 	kZS_Thres,				//0x1024
 	kZS_NsAmp,				//0x1028
 	kThresholds,			//0x1084
-	kTimeOUThreshold,		//0x1084
+	kNumOUThreshold,		//0x1084
 	kStatus,				//0x1088
 	kFirmwareVersion,		//0x108C
 	kBufferOccupancy,		//0x1094
@@ -47,7 +56,7 @@ enum {
 	kSWTrigger,				//0x8108
 	kTrigSrcEnblMask,		//0x810C
 	kFPTrigOutEnblMask,		//0x8110
-	kPostTriSetting,		//0x8114
+	kPostTrigSetting,		//0x8114
 	kFPIOData,				//0x8118
 	kFPIOControl,			//0x811C
 	kChanEnableMask,		//0x8120
@@ -58,6 +67,7 @@ enum {
 	kMonitorMode,			//0x8144
 	kEventSize,				//0x814C
 	kVMEControl,			//0xEF00
+	kVMEStatus,				//0xEF04
 	kBoardID,				//0xEF08
 	kMultCastBaseAdd,		//0xEF0C
 	kRelocationAdd,			//0xEF10		
@@ -76,17 +86,65 @@ enum {
 
 // Size of output buffer
 #define kEventBufferSize 0x0FFC
+enum {
+	kReadOnly,
+	kWriteOnly,
+	kReadWrite
+};
 
 // Class definition
-@interface ORCaen1720Model : ORCaenCardModel
+@interface ORCaen1720Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
-	unsigned short dac[8];
+	unsigned short  selectedRegIndex;
+    unsigned short  selectedChannel;
+    unsigned long   writeValue;
+	unsigned short  thresholds[8];
+	unsigned short	dac[8];
+	unsigned short	overUnderThreshold[8];
+    unsigned short	channelConfigMask;
+    unsigned long	customSize;
+    BOOL			countAllTriggers;
+    unsigned short	acquisitionMode;
+    unsigned short  coincidenceLevel;
+    unsigned long   triggerSourceMask;
+    unsigned long	postTriggerSetting;
+    unsigned short	enabledMask;
+	unsigned long   dataId;
 }
 
 #pragma mark ***Accessors
+- (unsigned short) 	selectedRegIndex;
+- (void)			setSelectedRegIndex: (unsigned short) anIndex;
+- (unsigned short) 	selectedChannel;
+- (void)			setSelectedChannel: (unsigned short) anIndex;
+- (unsigned long) 	writeValue;
+- (void)			setWriteValue: (unsigned long) anIndex;
+- (unsigned short)	enabledMask;
+- (void)			setEnabledMask:(unsigned short)aEnabledMask;
+- (unsigned long)	postTriggerSetting;
+- (void)			setPostTriggerSetting:(unsigned long)aPostTriggerSetting;
+- (unsigned long)	triggerSourceMask;
+- (void)			setTriggerSourceMask:(unsigned long)aTriggerSourceMask;
+- (unsigned short)	coincidenceLevel;
+- (void)			setCoincidenceLevel:(unsigned short)aCoincidenceLevel;
+- (unsigned short)	acquisitionMode;
+- (void)			setAcquisitionMode:(unsigned short)aMode;
+- (BOOL)			countAllTriggers;
+- (void)			setCountAllTriggers:(BOOL)aCountAllTriggers;
+- (unsigned long)	customSize;
+- (void)			setCustomSize:(unsigned long)aCustomSize;
+- (unsigned short)	channelConfigMask;
+- (void)			setChannelConfigMask:(unsigned short)aChannelConfigMask;
+- (unsigned short)	dac:(unsigned short) aChnl;
+- (void)			setDac:(unsigned short) aChnl withValue:(unsigned short) aValue;
+- (unsigned short)	overUnderThreshold:(unsigned short) aChnl;
+- (void)			setOverUnderThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue;
 
 #pragma mark ***Register - General routines
-- (void)			initBoard;
+- (void)			read;
+- (void)			write;
+- (void)			read:(unsigned short) pReg returnValue:(unsigned long*) pValue;
+- (void)			write:(unsigned short) pReg sendValue:(unsigned long) pValue;
 - (short)			getNumberRegisters;
 - (unsigned long) 	getBufferOffset;
 - (unsigned short) 	getDataBufferSize;
@@ -94,31 +152,77 @@ enum {
 - (short)			getStatusRegisterIndex: (short) aRegister;
 - (short)			getThresholdIndex;
 - (short)			getOutputBufferIndex;
-- (unsigned short) dac:(unsigned short) aChnl;
-- (void) setDac:(unsigned short) aChnl withValue:(unsigned short) aValue;
+- (void)			generateSoftwareTrigger;
+
+#pragma mark ***HW Init
+- (void)			initBoard;
+- (void)			writeChannelConfiguration;
+- (void)			writeCustomSize;
+- (void)			writeAcquistionControl:(BOOL)start;
+- (void)			writeTriggerSource;
+- (void)			writePostTriggerSetting;
+- (void)			writeChannelEnabledMask;
+
 
 #pragma mark ***Register - Register specific routines
+- (unsigned short) selectedRegIndex;
+- (void) setSelectedRegIndex:(unsigned short) anIndex;
 - (NSString*) 		getRegisterName: (short) anIndex;
 - (unsigned long) 	getAddressOffset: (short) anIndex;
 - (short)			getAccessType: (short) anIndex;
-- (short)			getAccessSize: (short) anIndex;
 - (BOOL)			dataReset: (short) anIndex;
 - (BOOL)			swReset: (short) anIndex;
 - (BOOL)			hwReset: (short) anIndex;
 - (void)			readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned short*) pValue;
+- (void)			writeThresholds;
+- (unsigned short)	threshold:(unsigned short) aChnl;
+- (void)			setThreshold:(unsigned short) aChnl threshold:(unsigned long) aValue;
 - (void)			writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned short) pValue;
 - (void)			writeDacs;
 - (void)			writeDac:(unsigned short) pChan;
 - (float)			convertDacToVolts:(unsigned short)aDacValue;
 - (unsigned short)	convertVoltsToDac:(float)aVoltage;
+- (void)			readThreshold:(unsigned short) pChan;
+- (void)			writeThreshold:(unsigned short) pChan;
+- (void)			readOverUnderThresholds;
 
-#pragma mark ***Hardware Access
+#pragma mark •••DataTaker
+- (unsigned long)	dataId;
+- (void)			setDataId: (unsigned long) DataId;
+- (void)			setDataIds:(id)assigner;
+- (void)			syncDataIdsWith:(id)anotherShaper;
+- (NSDictionary*)	dataRecordDescription;
+- (void)			runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void)			takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void)			runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+
+#pragma mark ***Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
-
-extern NSString*	caenChnlDacChanged;
-
+extern NSString* ORCaen1720SelectedRegIndexChanged;
+extern NSString* ORCaen1720SelectedChannelChanged;
+extern NSString* ORCaen1720WriteValueChanged;
+extern NSString* ORCaen1720ModelEnabledMaskChanged;
+extern NSString* ORCaen1720ModelPostTriggerSettingChanged;
+extern NSString* ORCaen1720ModelTriggerSourceMaskChanged;
+extern NSString* ORCaen1720ModelCoincidenceLevelChanged;
+extern NSString* ORCaen1720ModelAcquisitionModeChanged;
+extern NSString* ORCaen1720ModelCountAllTriggersChanged;
+extern NSString* ORCaen1720ModelCustomSizeChanged;
+extern NSString* ORCaen1720ModelChannelConfigMaskChanged;
+extern NSString* ORCaen1720ChnlDacChanged;
+extern NSString* ORCaen1720OverUnderThresholdChanged;
+extern NSString* ORCaen1720Chnl;
+extern NSString* ORCaen1720ChnlThresholdChanged;
+extern NSString* ORCaen1720SelectedRegIndexChanged;
+extern NSString* ORCaen1720SelectedRegIndexChanged;
+extern NSString* ORCaen1720SelectedChannelChanged;
+extern NSString* ORCaen1720WriteValueChanged;
+extern NSString* ORCaen1720BasicLock;
+extern NSString* ORCaen1720SettingsLock;
 
 //the decoder concrete decoder class
 @interface ORCaen1720DecoderForCAEN : ORCaenDataDecoder
