@@ -5,8 +5,18 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
 				<key>tasksCompleted</key>
 				<string>id</string>
 			</dict>
@@ -170,13 +180,23 @@
 				<string>id</string>
 				<key>readPrimaryMapFileAction</key>
 				<string>id</string>
+				<key>repeatRunCBAction</key>
+				<string>id</string>
 				<key>reportConfigAction</key>
 				<string>id</string>
+				<key>runModeAction</key>
+				<string>id</string>
 				<key>savePrimaryMapFileAction</key>
+				<string>id</string>
+				<key>showNamesAction</key>
 				<string>id</string>
 				<key>startRunAction</key>
 				<string>id</string>
 				<key>stopRunAction</key>
+				<string>id</string>
+				<key>timeLimitTextAction</key>
+				<string>id</string>
+				<key>timedRunCBAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -231,8 +251,14 @@
 				<string>ORPlotter1D</string>
 				<key>readPrimaryMapFileButton</key>
 				<string>NSButton</string>
+				<key>repeatRunCB</key>
+				<string>NSButton</string>
 				<key>reportStateButton</key>
 				<string>NSButton</string>
+				<key>runBar</key>
+				<string>NSProgressIndicator</string>
+				<key>runModeMatrix</key>
+				<string>NSMatrix</string>
 				<key>runNumberField</key>
 				<string>NSTextField</string>
 				<key>runStatusField</key>
@@ -241,12 +267,18 @@
 				<string>NSButton</string>
 				<key>selectionStringTextView</key>
 				<string>NSTextView</string>
+				<key>showNamesCB</key>
+				<string>NSButton</string>
 				<key>startRunButton</key>
 				<string>NSButton</string>
 				<key>stopRunButton</key>
 				<string>NSButton</string>
 				<key>tabView</key>
 				<string>NSTabView</string>
+				<key>timeLimitField</key>
+				<string>NSTextField</string>
+				<key>timedRunCB</key>
+				<string>NSButton</string>
 				<key>valueHistogramsPlot</key>
 				<string>ORPlotter1D</string>
 			</dict>
