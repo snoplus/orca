@@ -27,7 +27,6 @@
 #define kNumTrigSourceBits 10
 
 int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
-int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 
 @implementation ORCaen1720Controller
 
@@ -47,12 +46,12 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 - (void) awakeFromNib
 {
 
-    settingSize     = NSMakeSize(280,400);
-    thresholdSize   = NSMakeSize(490,470);
+    basicSize      = NSMakeSize(280,400);
+    settingsSize   = NSMakeSize(455,490);
+    monitoringSize = NSMakeSize(455,490);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-
 
     [registerAddressPopUp setAlignment:NSCenterTextAlignment];
     [channelPopUp setAlignment:NSCenterTextAlignment];
@@ -247,9 +246,11 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 {
 	int i;
 	unsigned long mask = [model triggerSourceMask];
-	for(i=0;i<kNumTrigSourceBits;i++){
-		[[triggerSourceMaskMatrix cellWithTag:i] setIntValue:(mask & (1L<<trigSrcToMaskBit[i])) !=0];
+	for(i=0;i<8;i++){
+		[[chanTriggerMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
 	}
+	[[otherTriggerMatrix cellWithTag:0] setIntValue:(mask & (1L << 30)) !=0];
+	[[otherTriggerMatrix cellWithTag:1] setIntValue:(mask & (1L << 31)) !=0];
 }
 
 - (void) coincidenceLevelChanged:(NSNotification*)aNote
@@ -446,6 +447,17 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 	NS_ENDHANDLER
 }
 
+- (IBAction) loadThresholds: (id) sender
+{
+	NS_DURING
+		[model writeThresholds];
+		NSLog(@"Caen 1720 Card %d thresholds loaded\n",[model slot]);
+	NS_HANDLER
+        NSRunAlertPanel([localException name], @"%@\nThreshold loading failed", @"OK", nil, nil,
+                        localException);
+	NS_ENDHANDLER
+}
+
 - (IBAction) initBoard: (id) sender
 {
 	NS_DURING
@@ -478,9 +490,11 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 {
 	int i;
 	unsigned long mask = 0;
-	for(i=0;i<kNumTrigSourceBits;i++){
-		if([[sender cellWithTag:i] intValue]) mask |= (1L << trigSrcToMaskBit[i]);
+	for(i=0;i<8;i++){
+		if([[chanTriggerMatrix cellWithTag:i] intValue]) mask |= (1L << i);
 	}
+	if([[otherTriggerMatrix cellWithTag:0] intValue]) mask |= (1L << 30);
+	if([[otherTriggerMatrix cellWithTag:1] intValue]) mask |= (1L << 31);
 	[model setTriggerSourceMask:mask];	
 }
 
@@ -587,12 +601,17 @@ int trigSrcToMaskBit[kNumTrigSourceBits]    = {0,1,2,3,4,5,6,7,30,31};
 {
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:settingSize];
+		[self resizeWindowToSize:basicSize];
 		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 1){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:thresholdSize];
+		[self resizeWindowToSize:settingsSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:monitoringSize];
 		[[self window] setContentView:tabView];
     }
 

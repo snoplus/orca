@@ -25,7 +25,7 @@
 //--------------------------------------------------------------------------------
 // Class ORCaen1720Decoder
 //--------------------------------------------------------------------------------
-@interface ORCaen1720Decoder : ORVmeCardDecoder {
+@interface ORCaen1720WaveformDecoder : ORVmeCardDecoder {
 }
 
 @end

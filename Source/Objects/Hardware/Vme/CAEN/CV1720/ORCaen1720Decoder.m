@@ -22,24 +22,60 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
+/*
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
+-----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+--------^-^^^--------------------------- Crate number
+-------------^-^^^^--------------------- Card number
+--------------------------------------^- 1=Standard, 0=Pack2.5
+....Followed by the event as described in the manual
+*/
 
-//--------------------------------------------------------------------------------
-// Implementation ORCaen1720Decoder
-//--------------------------------------------------------------------------------
-@implementation ORCaen1720Decoder
+@implementation ORCaen1720WaveformDecoder
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
 
 	ptr++; //point to location
-	unsigned char crate   = (*ptr&0x01e00000)>>21;
-	unsigned char card   = (*ptr& 0x001f0000)>>16;
-	NSString* crateKey = [self getCrateKey: crate];
-	NSString* cardKey = [self getCardKey: card];
+	NSString* crateKey	= [self getCrateKey: (*ptr&0x01e00000)>>21];
+	NSString* cardKey	= [self getCardKey: (*ptr& 0x001f0000)>>16];
+	BOOL packed = *ptr& 0x00000001;
 	
-   // [aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Shaper", crateKey,cardKey,channelKey,nil];
+	ptr++; //point to start of event
+	//unsigned long eventSize = *ptr & 0x0fffffff;
 	
+	ptr++; //point to 2nd word
+	unsigned long channelMask = *ptr & 0x0000000f;
+	short numChans = 0;
+	short chan[8];
+	int i;
+	for(i=0;i<8;i++){
+		if(channelMask & (1<<i)){
+			chan[numChans] = i;
+			numChans++;
+		}
+	}
+	for(i=0;i<numChans;i++){
+//		NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
+		
+//		[tmpData setLength:packetLength*sizeof(long)];
+//		unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+//		int i;
+//		int wordCount = 0;
+//		for(i=0;i<packetLength;i++){
+//			dPtr[wordCount++] =	0x00000fff & *ptr;		
+//			dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
+//			ptr++;
+//		}
+//		[aDataSet loadWaveform:tmpData 
+//						offset:0 //bytes!
+//					  unitSize:2 //unit size in bytes!
+//						sender:self  
+//					  withKeys:@"Gretina", @"Waveforms",crateKey,cardKey,channelKey,nil];
+	}
     return length; //must return number of bytes processed.
 }
 

@@ -78,6 +78,8 @@
 				<string>id</string>
 				<key>initBoard</key>
 				<string>id</string>
+				<key>loadThresholds</key>
+				<string>id</string>
 				<key>postTriggerSettingTextFieldAction</key>
 				<string>id</string>
 				<key>report</key>
@@ -115,6 +117,8 @@
 				<string>NSButton</string>
 				<key>basicWriteButton</key>
 				<string>NSButton</string>
+				<key>chanTriggerMatrix</key>
+				<string>NSMatrix</string>
 				<key>channelConfigMaskMatrix</key>
 				<string>NSMatrix</string>
 				<key>channelPopUp</key>
@@ -135,6 +139,10 @@
 				<string>NSTextField</string>
 				<key>initButton</key>
 				<string>NSButton</string>
+				<key>loadThresholdsButton</key>
+				<string>NSButton</string>
+				<key>otherTriggerMatrix</key>
+				<string>NSMatrix</string>
 				<key>overUnderMatrix</key>
 				<string>NSMatrix</string>
 				<key>postTriggerSettingTextField</key>

@@ -79,12 +79,14 @@ static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
 	{@"BLT Event Num",		false,	true, 	true,	0xEF1C,		kReadWrite},
 	{@"Scratch",			false,	true, 	true,	0xEF20,		kReadWrite},
 	{@"SW Reset",			false,	false, 	false,	0xEF24,		kWriteOnly},
-	{@"SW Clear",			false,	false, 	false,	0xEF28,		kWriteOnly},
-	{@"Flash Enable",		false,	false, 	true,	0xEF2C,		kReadWrite},
-	{@"Flash Data",			false,	false, 	true,	0xEF30,		kReadWrite},
-	{@"Config Reload",		false,	false, 	false,	0xEF34,		kWriteOnly},
-	{@"Config ROM",			false,	false, 	false,	0xF000,		kReadOnly}
+	{@"SW Clear",			false,	false, 	false,	0xEF28,		kWriteOnly}
+//	{@"Flash Enable",		false,	false, 	true,	0xEF2C,		kReadWrite},
+//	{@"Flash Data",			false,	false, 	true,	0xEF30,		kReadWrite},
+//	{@"Config Reload",		false,	false, 	false,	0xEF34,		kWriteOnly},
+//	{@"Config ROM",			false,	false, 	false,	0xF000,		kReadOnly}
 };
+
+#define kEventReadyMask 0x4
 
 NSString* ORCaen1720ModelEnabledMaskChanged			= @"ORCaen1720ModelEnabledMaskChanged";
 NSString* ORCaen1720ModelPostTriggerSettingChanged	= @"ORCaen1720ModelPostTriggerSettingChanged";
@@ -556,16 +558,18 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     NS_DURING
         
         NSLog(@"Register is:%@\n", [self getRegisterName:theRegIndex]);
-        NSLog(@"Index is   :%d\n", theChannelIndex);
         NSLog(@"Value is   :0x%04x\n", theValue);
         
         if (theRegIndex >= kZS_Thres && theRegIndex<=kAdcConfig){
             start	= theChannelIndex;
             end 	= theChannelIndex;
             if(theChannelIndex >= [self numberOfChannels]){
+				NSLog(@"Channel: ALL\n");
                 start = 0;
                 end = [self numberOfChannels] - 1;
             }
+			else NSLog(@"Channel: %d\n", theChannelIndex);
+
             for (i = start; i <= end; i++){
                 if(theRegIndex == kThresholds){
 					[self setThreshold:i withValue:theValue];
@@ -690,30 +694,9 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 
 - (void) writeChannelConfiguration
 {
-	//there is some mystery about the channel config set/clr bits....
-	//This is our best guess so far about what to do.
-	//load the channel Config 
-
-	//clear ALL of the channel config bits
-    unsigned long mask = 0xff;	
-    [[self adapter] writeLongBlock:&mask
-                         atAddress:[self baseAddress] + reg[kChanConfigBitClr].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-
-	mask = [self channelConfigMask];
+	unsigned long mask = [self channelConfigMask];
 	[[self adapter] writeLongBlock:&mask
                          atAddress:[self baseAddress] + reg[kChanConfig].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-					 
-
-	//set the enabled channel's channel config bits
-	mask = [self enabledMask];
-    [[self adapter] writeLongBlock:&mask
-                         atAddress:[self baseAddress] + reg[kChanConfigBitSet].addressOffset
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -744,14 +727,18 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 		[self readChan:chan reg:kStatus returnValue:&status];
 		[self readChan:chan reg:kBufferOccupancy returnValue:&bufferOccupancy];
 		[self readChan:chan reg:kDacs returnValue:&dacValue];
-		NSString* statusString;
+		NSString* statusString = @"";
 		if(status & 0x20)			statusString = @"Error";
 		else if(status & 0x04)		statusString = @"Busy ";
 		else {
 			if(status & 0x02)		statusString = @"Empty";
 			else if(status & 0x01)	statusString = @"Full ";
 		}
-		NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"  %d     %@    0x%04x  0x%04x  %@  0x%04x  %6.3f  %@\n",chan,enabled&(1<<chan)?@"E":@"X",threshold&0xfff,numOU&0xfff,statusString, bufferOccupancy&0x7ff,[self convertDacToVolts:dacValue], triggerSrc&(1<<chan)?@"Y":@"N");
+		NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"  %d     %@    0x%04x  0x%04x  %@  0x%04x  %6.3f  %@\n",
+				chan, enabled&(1<<chan)?@"E":@"X",
+				threshold&0xfff, numOU&0xfff,statusString, 
+				bufferOccupancy&0x7ff, [self convertDacToVolts:dacValue], 
+				triggerSrc&(1<<chan)?@"Y":@"N");
 	}
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
 
@@ -788,14 +775,12 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 
 - (void) initBoard
 {
-	[self softwareReset];
-	[self clearAllMemory];
 	[self writeThresholds];
 	[self writeChannelConfiguration];
 	[self writeCustomSize];
 	[self writeTriggerSource];
 	[self writeChannelEnabledMask];
-	[self writeDacs];
+	//[self writeDacs];
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
@@ -939,7 +924,11 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
     
-    controller = [self adapter]; //cache for speed
+	//cache for speed    
+	controller = [self adapter]; 
+	statusReg  = [self baseAddress] + reg[kAcqStatus].addressOffset;
+	location   =  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x400)>>11);
+
 	first = YES;     
     [self initBoard];
 }
@@ -949,6 +938,20 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 	NS_DURING
 		if(!first){
 			first = NO;
+			unsigned long status;
+			
+			[controller writeLongBlock:&status
+								 atAddress:statusReg
+								numToWrite:1
+								withAddMod:addressModifier 
+							 usingAddSpace:0x01];
+			if(status & kEventReadyMask){
+				//OK, at least one event is ready
+				NSLog(@"event in buffer\n");
+				
+				
+			}
+			
 		}
 		else {
 			[self writeAcquistionControl:YES];

@@ -44,6 +44,8 @@
     IBOutlet NSMatrix*		thresholdMatrix;
     IBOutlet NSButton*		softwareTriggerButton;
 	IBOutlet NSMatrix*		enabledMaskMatrix;
+	IBOutlet NSMatrix*		chanTriggerMatrix;
+	IBOutlet NSMatrix*		otherTriggerMatrix;
 	IBOutlet NSTextField*	postTriggerSettingTextField;
 	IBOutlet NSMatrix*		triggerSourceMaskMatrix;
 	IBOutlet NSTextField*	coincidenceLevelTextField;
@@ -56,14 +58,16 @@
 	
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
+    IBOutlet NSButton*		loadThresholdsButton;
 
 
     IBOutlet NSButton*		basicLockButton;
     IBOutlet NSButton*		settingsLockButton;
 
     NSView *blankView;
-    NSSize settingSize;
-    NSSize thresholdSize;
+    NSSize basicSize;
+    NSSize settingsSize;
+    NSSize monitoringSize;
 
 }
 
@@ -107,6 +111,7 @@
 
 - (IBAction) report: (id) sender;
 - (IBAction) initBoard: (id) sender;
+- (IBAction) loadThresholds: (id) sender;
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) postTriggerSettingTextFieldAction:(id)sender;
 - (IBAction) triggerSourceMaskAction:(id)sender;
