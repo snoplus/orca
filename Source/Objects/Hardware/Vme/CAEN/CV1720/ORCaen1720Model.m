@@ -30,7 +30,12 @@
 // Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
 #define k792DefaultAddressModifier 	0x09
-
+static NSString* Caen1720RunModeString[4] = {
+	@"Register-Controlled",
+	@"S-In Controlled",
+	@"S-In Gate",
+	@"Multi-Board Sync",
+};
 // Define all the registers available to this unit.
 static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly}, //not implemented in HW yet
@@ -688,20 +693,22 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 	//there is some mystery about the channel config set/clr bits....
 	//This is our best guess so far about what to do.
 	//load the channel Config 
-	unsigned long mask = [self channelConfigMask];
+
+	//clear ALL of the channel config bits
+    unsigned long mask = 0xff;	
+    [[self adapter] writeLongBlock:&mask
+                         atAddress:[self baseAddress] + reg[kChanConfigBitClr].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+
+	mask = [self channelConfigMask];
 	[[self adapter] writeLongBlock:&mask
                          atAddress:[self baseAddress] + reg[kChanConfig].addressOffset
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 					 
-	//clear ALL of the channel config bits
-    mask = 0xff;	
-    [[self adapter] writeLongBlock:&mask
-                         atAddress:[self baseAddress] + reg[kChanConfigBitClr].addressOffset
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
 
 	//set the enabled channel's channel config bits
 	mask = [self enabledMask];
@@ -738,13 +745,13 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 		[self readChan:chan reg:kBufferOccupancy returnValue:&bufferOccupancy];
 		[self readChan:chan reg:kDacs returnValue:&dacValue];
 		NSString* statusString;
-		if(status & 0x10)			statusString = @"Error";
+		if(status & 0x20)			statusString = @"Error";
 		else if(status & 0x04)		statusString = @"Busy ";
 		else {
 			if(status & 0x02)		statusString = @"Empty";
 			else if(status & 0x01)	statusString = @"Full ";
 		}
-		NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"  %d     %@    0x%04x  0x%04x  %@  0x%04x  0x%04x  %@\n",chan,enabled&(1<<chan)?@"E":@"X",threshold&0xfff,numOU&0xfff,statusString, bufferOccupancy&0x7ff,dacValue, triggerSrc&(1<<chan)?@"Y":@"N");
+		NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"  %d     %@    0x%04x  0x%04x  %@  0x%04x  %6.3f  %@\n",chan,enabled&(1<<chan)?@"E":@"X",threshold&0xfff,numOU&0xfff,statusString, bufferOccupancy&0x7ff,[self convertDacToVolts:dacValue], triggerSrc&(1<<chan)?@"Y":@"N");
 	}
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
 
@@ -759,10 +766,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 	
 	[self read:kAcqControl returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Triggers Count  : %@\n",aValue&0x4?@"Accepted":@"All");
-	if(aValue&0x3 == 0x00)      NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Register-Controlled Run Mode\n");
-	else if(aValue&0x3 == 0x01) NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"S-In Controlled run Mode\n");
-	else if(aValue&0x3 == 0x10) NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"S-In Gate\n");
-	else if(aValue&0x3 == 0x11) NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Multi-Board Sync\n");
+	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run Mode        : %@\n",Caen1720RunModeString[aValue&0x3]);
 
 	[self read:kCustomSize returnValue:&aValue];
 	if(aValue)NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : %d\n",aValue);
@@ -776,7 +780,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Buffer full     : %@\n",aValue&0x10?@"YES":@"NO");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Ready    : %@\n",aValue&0x08?@"YES":@"NO");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run             : %@\n",aValue&0x04?@"ON":@"OFF");
-
+	
 	[self read:kEventStored returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Stored   : %d\n",aValue);
 
@@ -784,12 +788,14 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 
 - (void) initBoard
 {
+	[self softwareReset];
+	[self clearAllMemory];
 	[self writeThresholds];
-	[self writeDacs];
 	[self writeChannelConfiguration];
 	[self writeCustomSize];
 	[self writeTriggerSource];
 	[self writeChannelEnabledMask];
+	[self writeDacs];
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
@@ -945,7 +951,6 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 			first = NO;
 		}
 		else {
-			[self clearAllMemory];
 			[self writeAcquistionControl:YES];
 		}
 	NS_HANDLER
