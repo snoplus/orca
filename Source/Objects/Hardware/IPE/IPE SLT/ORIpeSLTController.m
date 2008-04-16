@@ -144,17 +144,17 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : ORIpeSLTModelNHitChanged
 						object: model];
     [notifyCenter addObserver : self
-                     selector : @selector(pageSize:)
+                     selector : @selector(pageSizeChanged:)
                          name : ORIpeSLTModelPageSizeChanged
 						object: model];
 						
     [notifyCenter addObserver : self
-                     selector : @selector(pageSize:)
+                     selector : @selector(pageSizeChanged:)
                          name : ORIpeSLTModelDisplayEventLoopChanged
 						object: model];
 						
     [notifyCenter addObserver : self
-                     selector : @selector(pageSize:)
+                     selector : @selector(pageSizeChanged:)
                          name : ORIpeSLTModelDisplayTriggerChanged
 						object: model];
 
