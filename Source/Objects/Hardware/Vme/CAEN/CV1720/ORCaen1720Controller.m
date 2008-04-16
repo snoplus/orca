@@ -47,8 +47,8 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 
     basicSize      = NSMakeSize(280,400);
-    settingsSize   = NSMakeSize(455,490);
-    monitoringSize = NSMakeSize(455,490);
+    settingsSize   = NSMakeSize(465,510);
+    monitoringSize = NSMakeSize(783,320);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -234,6 +234,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	unsigned short mask = [model enabledMask];
 	for(i=0;i<[model numberOfChannels];i++){
 		[[enabledMaskMatrix cellWithTag:i] setIntValue:(mask & (1<<i)) !=0];
+		[[enabled2MaskMatrix cellWithTag:i] setIntValue:(mask & (1<<i)) !=0];
 	}
 }
 

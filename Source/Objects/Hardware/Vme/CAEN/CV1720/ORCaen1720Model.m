@@ -25,6 +25,7 @@
 #import "ORHWWizSelection.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
+#import "ORRateGroup.h"
 
 
 // Address information for this unit.
@@ -105,6 +106,7 @@ NSString* ORCaen1720SelectedRegIndexChanged			= @"ORCaen1720SelectedRegIndexChan
 NSString* ORCaen1720WriteValueChanged				= @"ORCaen1720WriteValueChanged";
 NSString* ORCaen1720BasicLock						= @"ORCaen1720BasicLock";
 NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
+NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
 
 @implementation ORCaen1720Model
 
@@ -122,7 +124,54 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     return self;
 }
 
+- (void) dealloc 
+{
+    [waveFormRateGroup release];
+    [super dealloc];
+}
+
 #pragma mark ***Accessors
+- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+{
+	if(groupTag == 0){
+		if(counterTag>=0 && counterTag<8){
+			return waveFormCount[counterTag];
+		}	
+		else return 0;
+	}
+	else return 0;
+}
+
+- (void) setRateIntegrationTime:(double)newIntegrationTime
+{
+	//we this here so we have undo/redo on the rate object.
+    [[[self undoManager] prepareWithInvocationTarget:self] setRateIntegrationTime:[waveFormRateGroup integrationTime]];
+    [waveFormRateGroup setIntegrationTime:newIntegrationTime];
+}
+
+- (id) rateObject:(int)channel
+{
+    return [waveFormRateGroup rateObject:channel];
+}
+
+- (ORRateGroup*) waveFormRateGroup
+{
+    return waveFormRateGroup;
+}
+
+- (void) setWaveFormRateGroup:(ORRateGroup*)newRateGroup
+{
+    [newRateGroup retain];
+    [waveFormRateGroup release];
+    waveFormRateGroup = newRateGroup;
+    
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORCaen1720RateGroupChanged
+                      object:self];    
+}
+
+
+
 - (unsigned short) selectedRegIndex
 {
     return selectedRegIndex;
@@ -909,6 +958,19 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     return dataDictionary;
 }
 
+-(void) startRates
+{
+    [self clearWaveFormCounts];
+    [waveFormRateGroup start:self];
+}
+
+- (void) clearWaveFormCounts
+{
+    int i;
+    for(i=0;i<8;i++){
+        waveFormCount[i]=0;
+    }
+}
 
 - (void) reset
 {
@@ -930,6 +992,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 	location   =  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x400)>>11);
 
 	first = YES;     
+    [self startRates];
     [self initBoard];
 }
 
@@ -963,6 +1026,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
+    [waveFormRateGroup stop];
 	[self writeAcquistionControl:NO];
 }
 
@@ -985,6 +1049,14 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
     [self setCountAllTriggers:[aDecoder decodeBoolForKey:@"countAllTriggers"]];
     [self setCustomSize:[aDecoder decodeInt32ForKey:@"customSize"]];
     [self setChannelConfigMask:[aDecoder decodeIntForKey:@"channelConfigMask"]];
+    [self setWaveFormRateGroup:[aDecoder decodeObjectForKey:@"waveFormRateGroup"]];
+    
+    if(!waveFormRateGroup){
+        [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:8 groupTag:0] autorelease]];
+        [waveFormRateGroup setIntegrationTime:5];
+    }
+    [waveFormRateGroup resetRates];
+    [waveFormRateGroup calcRates];
 
 	int i;
     for (i = 0; i < [self numberOfChannels]; i++){
@@ -1007,6 +1079,7 @@ NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 	[anEncoder encodeBool:countAllTriggers forKey:@"countAllTriggers"];
 	[anEncoder encodeInt32:customSize forKey:@"customSize"];
 	[anEncoder encodeInt:channelConfigMask forKey:@"channelConfigMask"];
+    [anEncoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
 	int i;
 	for (i = 0; i < [self numberOfChannels]; i++){
         [anEncoder encodeInt32:dac[i] forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];

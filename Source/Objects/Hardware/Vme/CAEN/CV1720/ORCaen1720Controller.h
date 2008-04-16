@@ -21,6 +21,9 @@
 #pragma mark •••Imported Files
 #import "OrcaObjectController.h";
 
+@class ORValueBar;
+@class ORPlotter1D;
+
 @interface ORCaen1720Controller : OrcaObjectController {
     IBOutlet NSTabView* 	tabView;
     IBOutlet NSStepper* 	addressStepper;
@@ -59,8 +62,22 @@
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
     IBOutlet NSButton*		loadThresholdsButton;
+	
+	//rates page
+	IBOutlet NSMatrix*      rateTextFields;
+    IBOutlet NSStepper*     integrationStepper;
+    IBOutlet NSTextField*   integrationText;
+    IBOutlet NSTextField*   totalRateText;
+    IBOutlet NSMatrix*      enabled2MaskMatrix;
 
+    IBOutlet ORValueBar*    rate0;
+    IBOutlet ORValueBar*    totalRate;
+    IBOutlet NSButton*      rateLogCB;
+    IBOutlet NSButton*      totalRateLogCB;
+    IBOutlet ORPlotter1D*   timeRatePlot;
+    IBOutlet NSButton*      timeRateLogCB;
 
+	
     IBOutlet NSButton*		basicLockButton;
     IBOutlet NSButton*		settingsLockButton;
 

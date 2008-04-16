@@ -92,6 +92,8 @@ enum {
 	kReadWrite
 };
 
+@class ORRateGroup;
+
 // Class definition
 @interface ORCaen1720Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
@@ -113,9 +115,16 @@ enum {
 	BOOL			first; 
 	unsigned int    statusReg;
 	unsigned long   location;
+	ORRateGroup*	waveFormRateGroup;
+	unsigned long 	waveFormCount[8];
 }
 
 #pragma mark ***Accessors
+- (void)			clearWaveFormCounts;
+- (void)			setRateIntegrationTime:(double)newIntegrationTime;
+- (id)				rateObject:(int)channel;
+- (ORRateGroup*)	waveFormRateGroup;
+- (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;
 - (unsigned short) 	selectedRegIndex;
 - (void)			setSelectedRegIndex: (unsigned short) anIndex;
 - (unsigned short) 	selectedChannel;
@@ -228,6 +237,7 @@ extern NSString* ORCaen1720SelectedChannelChanged;
 extern NSString* ORCaen1720WriteValueChanged;
 extern NSString* ORCaen1720BasicLock;
 extern NSString* ORCaen1720SettingsLock;
+extern NSString* ORCaen1720RateGroupChanged;
 
 //the decoder concrete decoder class
 @interface ORCaen1720DecoderForCAEN : ORCaenDataDecoder
