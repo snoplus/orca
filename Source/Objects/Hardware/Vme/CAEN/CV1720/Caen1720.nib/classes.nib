@@ -107,6 +107,8 @@
 				<string>id</string>
 				<key>enabledMaskAction</key>
 				<string>id</string>
+				<key>eventSizeAction</key>
+				<string>id</string>
 				<key>generateTriggerAction</key>
 				<string>id</string>
 				<key>initBoard</key>
@@ -174,6 +176,10 @@
 				<string>NSMatrix</string>
 				<key>enabledMaskMatrix</key>
 				<string>NSMatrix</string>
+				<key>eventSizePopUp</key>
+				<string>NSPopUpButton</string>
+				<key>eventSizeTextField</key>
+				<string>NSTextField</string>
 				<key>hrTextField</key>
 				<string>NSTextField</string>
 				<key>initButton</key>

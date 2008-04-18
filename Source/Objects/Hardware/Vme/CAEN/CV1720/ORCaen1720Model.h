@@ -120,6 +120,7 @@ enum {
 	ORAlarm*        bufferFullAlarm;
 	int				bufferEmptyCount;
 	BOOL			isRunning;
+    int				eventSize;
 	
 	//cached variables, valid only during running
 	unsigned int    statusReg;
@@ -129,6 +130,8 @@ enum {
 }
 
 #pragma mark ***Accessors
+- (int)				eventSize;
+- (void)			setEventSize:(int)aEventSize;
 - (int)				bufferState;
 - (void)			clearWaveFormCounts;
 - (void)			setRateIntegrationTime:(double)newIntegrationTime;
@@ -203,6 +206,7 @@ enum {
 - (unsigned short)	convertVoltsToDac:(float)aVoltage;
 - (void)			writeThreshold:(unsigned short) pChan;
 - (void)			readOverUnderThresholds;
+- (void)			writeBufferOrganization;
 
 #pragma mark •••DataTaker
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
@@ -221,6 +225,7 @@ enum {
 
 @end
 
+extern NSString* ORCaen1720ModelEventSizeChanged;
 extern NSString* ORCaen1720SelectedRegIndexChanged;
 extern NSString* ORCaen1720SelectedChannelChanged;
 extern NSString* ORCaen1720WriteValueChanged;

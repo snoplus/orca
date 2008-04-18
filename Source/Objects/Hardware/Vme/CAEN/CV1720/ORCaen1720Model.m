@@ -32,6 +32,7 @@
 // Address information for this unit.
 #define k792DefaultBaseAddress 		0xa00000
 #define k792DefaultAddressModifier 	0x09
+NSString* ORCaen1720ModelEventSizeChanged = @"ORCaen1720ModelEventSizeChanged";
 static NSString* Caen1720RunModeString[4] = {
 	@"Register-Controlled",
 	@"S-In Controlled",
@@ -134,6 +135,22 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 }
 
 #pragma mark ***Accessors
+
+- (int) eventSize
+{
+    return eventSize;
+}
+
+- (void) setEventSize:(int)aEventSize
+{
+	if(aEventSize == 0)aEventSize = 0xa; //default
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setEventSize:eventSize];
+    
+    eventSize = aEventSize;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelEventSizeChanged object:self];
+}
 - (int)	bufferState
 {
 	return bufferState;
@@ -805,6 +822,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	[self writeCustomSize];
 	[self writeTriggerSource];
 	[self writeChannelEnabledMask];
+	[self writeBufferOrganization];
 	[self writeDacs];
 }
 
@@ -856,7 +874,6 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-	
 }
 
 
@@ -865,6 +882,17 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	unsigned long aValue = ((coincidenceLevel&0x7)<<24) | (triggerSourceMask & 0xffffffff);
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kTrigSrcEnblMask].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+	
+}
+
+- (void) writeBufferOrganization
+{
+	unsigned long aValue = (unsigned long)pow(2.,(float)eventSize);
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kBufferOrganization].addressOffset
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -891,7 +919,6 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
                      usingAddSpace:0x01];
 	
 }
-
 
 - (void) writeAcquistionControl:(BOOL)start
 {
@@ -1020,21 +1047,21 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 		bufferState = (status & 0x10) >> 4;			
 		if(status & kEventReadyMask){
 			//OK, at least one event is ready
-			unsigned long eventSize;
-			[controller readLongBlock:&eventSize
+			unsigned long theEventSize;
+			[controller readLongBlock:&theEventSize
 							 atAddress:eventSizeReg
 							numToRead:1
 							withAddMod:addressModifier 
 						 usingAddSpace:0x01];
 		
-			NSMutableData* theData = [NSMutableData dataWithCapacity:2+eventSize*sizeof(long)];
-			[theData setLength:(2+eventSize)*sizeof(long)];
+			NSMutableData* theData = [NSMutableData dataWithCapacity:2+bufferEmptyCount*sizeof(long)];
+			[theData setLength:(2+bufferEmptyCount)*sizeof(long)];
 			unsigned long* p = (unsigned long*)[theData bytes];
-			*p++ = dataId | (2 + eventSize);
+			*p++ = dataId | (2 + bufferEmptyCount);
 			*p++ = location; 
 			[controller readLongBlock:p
 							 atAddress:dataReg
-							numToRead:eventSize
+							numToRead:bufferEmptyCount
 							withAddMod:addressModifier 
 						 usingAddSpace:0x01];
 						 
@@ -1094,6 +1121,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
     self = [super initWithCoder:aDecoder];
 
     [[self undoManager] disableUndoRegistration];
+    [self setEventSize:[aDecoder decodeIntForKey:@"ORCaen1720ModelEventSize"]];
     [self setEnabledMask:[aDecoder decodeIntForKey:@"ORCaen1720ModelEnabledMask"]];
     [self setPostTriggerSetting:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelPostTriggerSetting"]];
     [self setTriggerSourceMask:[aDecoder decodeInt32ForKey:@"ORCaen1720ModelTriggerSourceMask"]];
@@ -1124,6 +1152,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
     [super encodeWithCoder:anEncoder];
+	[anEncoder encodeInt:eventSize forKey:@"ORCaen1720ModelEventSize"];
 	[anEncoder encodeInt:enabledMask forKey:@"ORCaen1720ModelEnabledMask"];
 	[anEncoder encodeInt32:postTriggerSetting forKey:@"ORCaen1720ModelPostTriggerSetting"];
 	[anEncoder encodeInt32:triggerSourceMask forKey:@"ORCaen1720ModelTriggerSourceMask"];

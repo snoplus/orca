@@ -58,6 +58,8 @@
 	IBOutlet NSTextField*	customSizeTextField;
 	IBOutlet NSMatrix*		channelConfigMaskMatrix;
     IBOutlet NSMatrix*		overUnderMatrix;
+	IBOutlet NSPopUpButton* eventSizePopUp;
+	IBOutlet NSTextField*	eventSizeTextField;
 	
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
@@ -97,6 +99,7 @@
 - (void) registerRates;
 
 #pragma mark ***Interface Management
+- (void) eventSizeChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*) aNote;
@@ -121,6 +124,7 @@
 - (void) totalRateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) eventSizeAction:(id)sender;
 - (IBAction) integrationAction:(id)sender;
 - (IBAction) baseAddressAction: (id) aSender;
 - (IBAction) writeValueAction: (id) aSender;

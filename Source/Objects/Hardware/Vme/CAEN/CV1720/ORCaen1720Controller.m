@@ -52,7 +52,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 
     basicSize      = NSMakeSize(280,400);
-    settingsSize   = NSMakeSize(465,510);
+    settingsSize   = NSMakeSize(630,450);
     monitoringSize = NSMakeSize(783,320);
     
     blankView = [[NSView alloc] init];
@@ -78,105 +78,105 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [ super registerNotificationObservers ];
 	
-    [notifyCenter addObserver:self
-					 selector:@selector(baseAddressChanged:)
-						 name:ORVmeIOCardBaseAddressChangedNotification
-					   object:model];
+    [notifyCenter addObserver : self
+					 selector : @selector(baseAddressChanged:)
+						 name : ORVmeIOCardBaseAddressChangedNotification
+					   object : model];
 	
-    [notifyCenter addObserver:self
-					 selector:@selector(selectedRegIndexChanged:)
-						 name:ORCaen1720SelectedRegIndexChanged
-					   object:model];
+    [notifyCenter addObserver : self
+					 selector : @selector(selectedRegIndexChanged:)
+						 name : ORCaen1720SelectedRegIndexChanged
+					   object : model];
 	
-    [notifyCenter addObserver:self
-					 selector:@selector(selectedRegChannelChanged:)
-						 name:ORCaen1720SelectedChannelChanged
-					   object:model];
+    [notifyCenter addObserver : self
+					 selector : @selector(selectedRegChannelChanged:)
+						 name : ORCaen1720SelectedChannelChanged
+					   object : model];
 		
-    [notifyCenter addObserver:self
-					 selector:@selector(writeValueChanged:)
-						 name:ORCaen1720WriteValueChanged
-					   object:model];
+    [notifyCenter addObserver : self
+					 selector : @selector(writeValueChanged:)
+						 name : ORCaen1720WriteValueChanged
+					   object : model];
 	
-    [notifyCenter addObserver:self
-					 selector:@selector(thresholdChanged:)
-						 name:ORCaen1720ChnlThresholdChanged
-					   object:model];
+    [notifyCenter addObserver : self
+					 selector : @selector(thresholdChanged:)
+						 name : ORCaen1720ChnlThresholdChanged
+					   object : model];
 	
-	[notifyCenter addObserver:self
-					 selector:@selector(dacChanged:)
-						 name:ORCaen1720ChnlDacChanged
-					   object:model];
+	[notifyCenter addObserver : self
+					 selector : @selector(dacChanged:)
+						 name : ORCaen1720ChnlDacChanged
+					   object : model];
 	
-	[notifyCenter addObserver:self
-					 selector:@selector(overUnderChanged:)
-						 name:ORCaen1720OverUnderThresholdChanged
-					   object:model];
+	[notifyCenter addObserver : self
+					 selector : @selector(overUnderChanged:)
+						 name : ORCaen1720OverUnderThresholdChanged
+					   object : model];
 	
-    [notifyCenter addObserver:self
-                     selector:@selector(channelConfigMaskChanged:)
-                         name:ORCaen1720ModelChannelConfigMaskChanged
-						object:model];
+    [notifyCenter addObserver : self
+                     selector : @selector(channelConfigMaskChanged:)
+                         name : ORCaen1720ModelChannelConfigMaskChanged
+					   object : model];
 	
-    [notifyCenter addObserver:self
-                     selector:@selector(customSizeChanged:)
-                         name:ORCaen1720ModelCustomSizeChanged
-						object:model];
+    [notifyCenter addObserver : self
+                     selector : @selector(customSizeChanged:)
+                         name : ORCaen1720ModelCustomSizeChanged
+						object : model];
 	
-    [notifyCenter addObserver:self
-                     selector:@selector(countAllTriggersChanged:)
-                         name:ORCaen1720ModelCountAllTriggersChanged
-						object:model];
+    [notifyCenter addObserver : self
+                     selector : @selector(countAllTriggersChanged:)
+                         name : ORCaen1720ModelCountAllTriggersChanged
+						object : model];
 	
-    [notifyCenter addObserver:self
-                     selector:@selector(acquisitionModeChanged:)
-                         name:ORCaen1720ModelAcquisitionModeChanged
-						object:model];
+    [notifyCenter addObserver : self
+                     selector : @selector(acquisitionModeChanged:)
+                         name : ORCaen1720ModelAcquisitionModeChanged
+						object : model];
 	
-    [notifyCenter addObserver:self
-                     selector:@selector(coincidenceLevelChanged:)
-                         name:ORCaen1720ModelCoincidenceLevelChanged
-						object:model];
+    [notifyCenter addObserver : self
+                     selector : @selector(coincidenceLevelChanged:)
+                         name : ORCaen1720ModelCoincidenceLevelChanged
+						object : model];
 	
-    [notifyCenter addObserver:self
-                     selector:@selector(triggerSourceMaskChanged:)
-                         name:ORCaen1720ModelTriggerSourceMaskChanged
-						object:model];
+    [notifyCenter addObserver : self
+                     selector : @selector(triggerSourceMaskChanged:)
+                         name : ORCaen1720ModelTriggerSourceMaskChanged
+						object : model];
 	
-    [notifyCenter addObserver:self
-                     selector:@selector(postTriggerSettingChanged:)
-                         name:ORCaen1720ModelPostTriggerSettingChanged
-						object:model];
+    [notifyCenter addObserver : self
+                     selector : @selector(postTriggerSettingChanged:)
+                         name : ORCaen1720ModelPostTriggerSettingChanged
+						object : model];
 	
-    [notifyCenter addObserver:self
-                     selector:@selector(enabledMaskChanged:)
-                         name:ORCaen1720ModelEnabledMaskChanged
-						object:model];
+    [notifyCenter addObserver : self
+                     selector : @selector(enabledMaskChanged:)
+                         name : ORCaen1720ModelEnabledMaskChanged
+						object : model];
 	
-   [notifyCenter addObserver:self
-					 selector:@selector(basicLockChanged:)
-						 name:ORCaen1720BasicLock
-						object:nil];
+   [notifyCenter addObserver : self
+					 selector : @selector(basicLockChanged:)
+						 name : ORCaen1720BasicLock
+						object : nil];
 
-   [notifyCenter addObserver:self
-					selector:@selector(settingsLockChanged:)
-						name:ORCaen1720SettingsLock
-					   object:nil];
+   [notifyCenter addObserver : self
+					selector : @selector(settingsLockChanged:)
+						name : ORCaen1720SettingsLock
+					   object : nil];
 					   
-   [notifyCenter addObserver:self
-					selector:@selector(basicLockChanged:)
-						name:ORCaen1720BasicLock
-					   object:nil];
+   [notifyCenter addObserver : self
+					selector : @selector(basicLockChanged:)
+						name : ORCaen1720BasicLock
+					   object : nil];
 
-    [notifyCenter addObserver:self
-                     selector:@selector(integrationChanged:)
-                         name:ORRateGroupIntegrationChangedNotification
-                       object:nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(integrationChanged:)
+                         name : ORRateGroupIntegrationChangedNotification
+                       object : nil];
  
-    [notifyCenter addObserver:self
-					 selector:@selector(totalRateChanged:)
-						 name:ORRateGroupTotalRateChangedNotification
-					   object:nil];
+    [notifyCenter addObserver : self
+					 selector : @selector(totalRateChanged:)
+						 name : ORRateGroupTotalRateChangedNotification
+					   object : nil];
 
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
@@ -193,6 +193,11 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
                      selector : @selector(setBufferStateLabel)
                          name : ORCaen1720ModelBufferCheckChanged
                        object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(eventSizeChanged:)
+                         name : ORCaen1720ModelEventSizeChanged
+						object: model];
 
 	[self registerRates];
 
@@ -243,6 +248,14 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [self waveFormRateChanged:nil];
     [self settingsLockChanged:nil];
 
+	[self eventSizeChanged:nil];
+}
+
+- (void) eventSizeChanged:(NSNotification*)aNote
+{
+	[eventSizePopUp selectItemAtIndex:	[model eventSize]];
+	[eventSizeTextField setIntValue:	1024./powf(2.,(float)[model eventSize])]; //in KB
+	
 }
 
 - (void) checkGlobalSecurity
@@ -479,6 +492,11 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 }
 
 #pragma mark •••Actions
+
+- (void) eventSizeAction:(id)sender
+{
+	[model setEventSize:[sender indexOfSelectedItem]];	
+}
 
 - (IBAction) integrationAction:(id)sender
 {
