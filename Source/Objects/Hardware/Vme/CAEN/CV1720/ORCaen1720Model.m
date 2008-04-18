@@ -26,6 +26,7 @@
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORRateGroup.h"
+#import "VME_HW_Definitions.h"
 
 
 // Address information for this unit.
@@ -87,7 +88,7 @@ static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
 //	{@"Config ROM",			false,	false, 	false,	0xF000,		kReadOnly}
 };
 
-#define kEventReadyMask 0x4
+#define kEventReadyMask 0x8
 
 NSString* ORCaen1720ModelEnabledMaskChanged			= @"ORCaen1720ModelEnabledMaskChanged";
 NSString* ORCaen1720ModelPostTriggerSettingChanged	= @"ORCaen1720ModelPostTriggerSettingChanged";
@@ -107,6 +108,7 @@ NSString* ORCaen1720WriteValueChanged				= @"ORCaen1720WriteValueChanged";
 NSString* ORCaen1720BasicLock						= @"ORCaen1720BasicLock";
 NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
 NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
+NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChanged";
 
 @implementation ORCaen1720Model
 
@@ -127,10 +129,16 @@ NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
 - (void) dealloc 
 {
     [waveFormRateGroup release];
+	[bufferFullAlarm release];
     [super dealloc];
 }
 
 #pragma mark ***Accessors
+- (int)	bufferState
+{
+	return bufferState;
+}
+
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
@@ -169,8 +177,6 @@ NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
         postNotificationName:ORCaen1720RateGroupChanged
                       object:self];    
 }
-
-
 
 - (unsigned short) selectedRegIndex
 {
@@ -359,39 +365,6 @@ NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
 {
     return kNumRegisters;
 }
-
-- (unsigned long) getBufferOffset
-{
-    return reg[kOutputBuffer].addressOffset;
-}
-
-- (unsigned short) getDataBufferSize
-{
-    return kEventBufferSize;
-}
-
-- (unsigned long) getThresholdOffset
-{
-   return reg[kThresholds].addressOffset;
-}
-
-- (short) getStatusRegisterIndex:(short) aRegister
-{
-  //  if (aRegister == 1) return kStatusRegister1;
-   // else		return kStatusRegister2;
-	return 0;
-}
-
-- (short) getThresholdIndex
-{
-    return kThresholds;
-}
-
-- (short) getOutputBufferIndex
-{
-    return kOutputBuffer;
-}
-
 
 #pragma mark ***Register - Register specific routines
 
@@ -692,7 +665,7 @@ NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
     unsigned long 	threshold = [self threshold:pChan];
     
     [[self adapter] writeLongBlock:&threshold
-                         atAddress:[self baseAddress] + [self getThresholdOffset] + (pChan * 0x100)
+                         atAddress:[self baseAddress] + reg[kThresholds].addressOffset + (pChan * 0x100)
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -824,12 +797,15 @@ NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
 
 - (void) initBoard
 {
+	//customSize = 0x200;
+	[self clearAllMemory];
+	[self softwareReset];
 	[self writeThresholds];
 	[self writeChannelConfiguration];
 	[self writeCustomSize];
 	[self writeTriggerSource];
 	[self writeChannelEnabledMask];
-	//[self writeDacs];
+	[self writeDacs];
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
@@ -928,6 +904,37 @@ NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
 	
 }
 
+- (void) checkBufferAlarm
+{
+	if((bufferState == 1) && isRunning){
+		bufferEmptyCount = 0;
+		if(!bufferFullAlarm){
+			NSString* alarmName = [NSString stringWithFormat:@"Buffer FULL V1720 (slot %d)",[self slot]];
+			bufferFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
+			[bufferFullAlarm setSticky:YES];
+			[bufferFullAlarm setHelpString:@"The rate is too high. Adjust the Threshold accordingly."];
+			[bufferFullAlarm postAlarm];
+		}
+	}
+	else {
+		bufferEmptyCount++;
+		if(bufferEmptyCount>=5){
+			[bufferFullAlarm clearAlarm];
+			[bufferFullAlarm release];
+			bufferFullAlarm = nil;
+			bufferEmptyCount = 0;
+		}
+	}
+	if(isRunning){
+		[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1.5];
+	}
+	else {
+		[bufferFullAlarm clearAlarm];
+		[bufferFullAlarm release];
+		bufferFullAlarm = nil;
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelBufferCheckChanged object:self];
+}
 
 #pragma mark ***DataTaker
 - (unsigned long) dataId { return dataId; }
@@ -987,38 +994,59 @@ NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
     
 	//cache for speed    
-	controller = [self adapter]; 
-	statusReg  = [self baseAddress] + reg[kAcqStatus].addressOffset;
-	location   =  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x400)>>11);
-
-	first = YES;     
+	controller		= [self adapter]; 
+	statusReg		= [self baseAddress] + reg[kAcqStatus].addressOffset;
+	eventSizeReg	= [self baseAddress] + reg[kEventSize].addressOffset;
+	dataReg			= [self baseAddress] + reg[kOutputBuffer].addressOffset;
+	location		=  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x800)>>11);
+	isRunning		= NO;
     [self startRates];
     [self initBoard];
+	[self writeAcquistionControl:YES];
+	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 {
 	NS_DURING
-		if(!first){
-			first = NO;
-			unsigned long status;
-			
-			[controller writeLongBlock:&status
-								 atAddress:statusReg
-								numToWrite:1
-								withAddMod:addressModifier 
-							 usingAddSpace:0x01];
-			if(status & kEventReadyMask){
-				//OK, at least one event is ready
-				NSLog(@"event in buffer\n");
-				
-				
+		unsigned long status;
+		isRunning = YES; 
+		
+		[controller readLongBlock:&status
+							 atAddress:statusReg
+							numToRead:1
+							withAddMod:addressModifier 
+						 usingAddSpace:0x01];
+		bufferState = (status & 0x10) >> 4;			
+		if(status & kEventReadyMask){
+			//OK, at least one event is ready
+			unsigned long eventSize;
+			[controller readLongBlock:&eventSize
+							 atAddress:eventSizeReg
+							numToRead:1
+							withAddMod:addressModifier 
+						 usingAddSpace:0x01];
+		
+			NSMutableData* theData = [NSMutableData dataWithCapacity:2+eventSize*sizeof(long)];
+			[theData setLength:(2+eventSize)*sizeof(long)];
+			unsigned long* p = (unsigned long*)[theData bytes];
+			*p++ = dataId | (2 + eventSize);
+			*p++ = location; 
+			[controller readLongBlock:p
+							 atAddress:dataReg
+							numToRead:eventSize
+							withAddMod:addressModifier 
+						 usingAddSpace:0x01];
+						 
+			[aDataPacket addData:theData];
+			unsigned short chanMask = p[1]; //remember, the point was already inc'ed to the start of data
+			int i;
+			for(i=0;i<8;i++){
+				if(chanMask & (1<<i)) ++waveFormCount[i]; 
 			}
+		}
+		
 			
-		}
-		else {
-			[self writeAcquistionControl:YES];
-		}
 	NS_HANDLER
 	NS_ENDHANDLER
 
@@ -1026,13 +1054,38 @@ NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
+    isRunning = NO;
     [waveFormRateGroup stop];
 	[self writeAcquistionControl:NO];
+	short i;
+    for(i=0;i<8;i++)waveFormCount[i] = 0;
 }
 
 - (NSString*) identifier
 {
     return [NSString stringWithFormat:@"CAEN 1720 (Slot %d) ",[self slot]];
+}
+
+//this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id	= kCaen1720; //should be unique
+	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
+	configStruct->card_info[index].slot			= [self slot];
+	configStruct->card_info[index].crate		= [self crateNumber];
+	configStruct->card_info[index].add_mod		= [self addressModifier];
+	configStruct->card_info[index].base_add		= [self baseAddress];
+	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + reg[kAcqStatus].addressOffset;
+    configStruct->card_info[index].deviceSpecificData[1]	= [self baseAddress] + reg[kEventSize].addressOffset;
+    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + reg[kOutputBuffer].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[3]	= [self baseAddress] + reg[kAcqControl].addressOffset;
+	configStruct->card_info[index].deviceSpecificData[4]	= (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x800)>>11);
+	configStruct->card_info[index].num_Trigger_Indexes		= 0;
+	
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	
+	return index+1;
 }
 
 #pragma mark ***Archival

@@ -38,44 +38,81 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 {
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
-
 	ptr++; //point to location
-	NSString* crateKey	= [self getCrateKey: (*ptr&0x01e00000)>>21];
-	NSString* cardKey	= [self getCardKey: (*ptr& 0x001f0000)>>16];
-	BOOL packed = *ptr& 0x00000001;
+	NSString* crateKey	= [self getCrateKey: (*ptr&0x01e00000)>>21 ];
+	NSString* cardKey	= [self getCardKey:  (*ptr& 0x001f0000)>>16];
+	BOOL packed = *ptr & 0x00000001;
 	
 	ptr++; //point to start of event
-	//unsigned long eventSize = *ptr & 0x0fffffff;
+	unsigned long eventSize = *ptr & 0x0fffffff;
+
+	ptr++; //point to 2nd word of event
+	unsigned long channelMask = *ptr & 0x000000ff;
+	//NSLog(@"Channel Mask: %d Len: %d Size: %d\n",channelMask,length,eventSize);
+	ptr++; //point to 3rd word of event
+	ptr++; //point to 4th word of event
+	ptr++; //point to start of data
+
+	NSString* channelKey	= [self getChannelKey: 0];
 	
-	ptr++; //point to 2nd word
-	unsigned long channelMask = *ptr & 0x0000000f;
-	short numChans = 0;
-	short chan[8];
-	int i;
-	for(i=0;i<8;i++){
-		if(channelMask & (1<<i)){
-			chan[numChans] = i;
-			numChans++;
-		}
-	}
-	for(i=0;i<numChans;i++){
-//		NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
-		
-//		[tmpData setLength:packetLength*sizeof(long)];
-//		unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-//		int i;
-//		int wordCount = 0;
-//		for(i=0;i<packetLength;i++){
-//			dPtr[wordCount++] =	0x00000fff & *ptr;		
-//			dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
-//			ptr++;
+//	short numChans = 0;
+//	short chan[8];
+//	int i;
+//	for(i=0;i<8;i++){
+//		if(channelMask & (1<<i)){
+//			chan[numChans] = i;
+//			numChans++;
 //		}
-//		[aDataSet loadWaveform:tmpData 
-//						offset:0 //bytes!
-//					  unitSize:2 //unit size in bytes!
-//						sender:self  
-//					  withKeys:@"Gretina", @"Waveforms",crateKey,cardKey,channelKey,nil];
+//	}
+//	for(i=0;i<numChans;i++){
+		//NSLog(@"eventSize: %d\n",eventSize);
+	if(packed){
+		eventSize -= 4;
+		NSMutableData* tmpData = [NSMutableData dataWithCapacity:3*eventSize*sizeof(unsigned short)];
+		
+		[tmpData setLength:3*eventSize*sizeof(unsigned short)];
+		unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+		int i;
+		int wordCount = 0;
+		unsigned long aWordMask = 0x3f;
+		for(i=0;i<eventSize*2;i++){
+			dPtr[wordCount] =	aWordMask & *ptr;
+			aWordMask = aWordMask << 6;
+			if(aWordMask == 0xc0000000){
+				ptr++;
+				aWordMask  = 0x3f;
+			}
+			dPtr[wordCount] |= (aWordMask & *ptr)<<12;
+			wordCount++;
+		}
+			
+		[aDataSet loadWaveform:tmpData 
+						offset:0 //bytes!
+					  unitSize:2 //unit size in bytes!
+						sender:self  
+					  withKeys:@"CAEN", @"Waveforms",crateKey,cardKey,channelKey,nil];
+
 	}
+	else {
+		eventSize -= 4;
+		NSMutableData* tmpData = [NSMutableData dataWithCapacity:2*eventSize*sizeof(unsigned short)];
+		
+		[tmpData setLength:2*eventSize*sizeof(unsigned short)];
+		unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+		int i;
+		int wordCount = 0;
+		for(i=0;i<eventSize;i++){
+			dPtr[wordCount++] =	0x00000fff & *ptr;		
+			dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
+			ptr++;
+		}
+		[aDataSet loadWaveform:tmpData 
+						offset:0 //bytes!
+					  unitSize:2 //unit size in bytes!
+						sender:self  
+					  withKeys:@"CAEN", @"Waveforms",crateKey,cardKey,channelKey,nil];
+	}
+	
     return length; //must return number of bytes processed.
 }
 

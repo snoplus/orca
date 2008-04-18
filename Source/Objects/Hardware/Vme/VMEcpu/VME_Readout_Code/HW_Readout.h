@@ -36,6 +36,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_IP320(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index);
 
 #endif

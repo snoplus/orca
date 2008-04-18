@@ -22,6 +22,11 @@
 #import "ORCaen1720Controller.h"
 #import "ORCaenDataDecoder.h"
 #import "ORCaen1720Model.h"
+#import "ORValueBar.h"
+#import "ORPlotter1D.h"
+#import "ORTimeRate.h"
+#import "ORRate.h"
+#import "ORRateGroup.h"
 
 #define kNumChanConfigBits 5
 #define kNumTrigSourceBits 10
@@ -108,64 +113,118 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 						 name:ORCaen1720OverUnderThresholdChanged
 					   object:model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(channelConfigMaskChanged:)
-                         name : ORCaen1720ModelChannelConfigMaskChanged
-						object: model];
+    [notifyCenter addObserver:self
+                     selector:@selector(channelConfigMaskChanged:)
+                         name:ORCaen1720ModelChannelConfigMaskChanged
+						object:model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(customSizeChanged:)
-                         name : ORCaen1720ModelCustomSizeChanged
-						object: model];
+    [notifyCenter addObserver:self
+                     selector:@selector(customSizeChanged:)
+                         name:ORCaen1720ModelCustomSizeChanged
+						object:model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(countAllTriggersChanged:)
-                         name : ORCaen1720ModelCountAllTriggersChanged
-						object: model];
+    [notifyCenter addObserver:self
+                     selector:@selector(countAllTriggersChanged:)
+                         name:ORCaen1720ModelCountAllTriggersChanged
+						object:model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(acquisitionModeChanged:)
-                         name : ORCaen1720ModelAcquisitionModeChanged
-						object: model];
+    [notifyCenter addObserver:self
+                     selector:@selector(acquisitionModeChanged:)
+                         name:ORCaen1720ModelAcquisitionModeChanged
+						object:model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(coincidenceLevelChanged:)
-                         name : ORCaen1720ModelCoincidenceLevelChanged
-						object: model];
+    [notifyCenter addObserver:self
+                     selector:@selector(coincidenceLevelChanged:)
+                         name:ORCaen1720ModelCoincidenceLevelChanged
+						object:model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerSourceMaskChanged:)
-                         name : ORCaen1720ModelTriggerSourceMaskChanged
-						object: model];
+    [notifyCenter addObserver:self
+                     selector:@selector(triggerSourceMaskChanged:)
+                         name:ORCaen1720ModelTriggerSourceMaskChanged
+						object:model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(postTriggerSettingChanged:)
-                         name : ORCaen1720ModelPostTriggerSettingChanged
-						object: model];
+    [notifyCenter addObserver:self
+                     selector:@selector(postTriggerSettingChanged:)
+                         name:ORCaen1720ModelPostTriggerSettingChanged
+						object:model];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(enabledMaskChanged:)
-                         name : ORCaen1720ModelEnabledMaskChanged
-						object: model];
+    [notifyCenter addObserver:self
+                     selector:@selector(enabledMaskChanged:)
+                         name:ORCaen1720ModelEnabledMaskChanged
+						object:model];
 	
-   [notifyCenter addObserver : self
-					 selector : @selector(basicLockChanged:)
-						 name : ORCaen1720BasicLock
-						object: nil];
+   [notifyCenter addObserver:self
+					 selector:@selector(basicLockChanged:)
+						 name:ORCaen1720BasicLock
+						object:nil];
 
-   [notifyCenter addObserver : self
-					 selector : @selector(settingsLockChanged:)
-						 name : ORCaen1720SettingsLock
-						object: nil];
+   [notifyCenter addObserver:self
+					selector:@selector(settingsLockChanged:)
+						name:ORCaen1720SettingsLock
+					   object:nil];
+					   
+   [notifyCenter addObserver:self
+					selector:@selector(basicLockChanged:)
+						name:ORCaen1720BasicLock
+					   object:nil];
 
+    [notifyCenter addObserver:self
+                     selector:@selector(integrationChanged:)
+                         name:ORRateGroupIntegrationChangedNotification
+                       object:nil];
+ 
+    [notifyCenter addObserver:self
+					 selector:@selector(totalRateChanged:)
+						 name:ORRateGroupTotalRateChangedNotification
+					   object:nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(settingsLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(basicLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
+					   
+
+    [notifyCenter addObserver : self
+                     selector : @selector(setBufferStateLabel)
+                         name : ORCaen1720ModelBufferCheckChanged
+                       object : model];
+
+	[self registerRates];
 
 }
+
+- (void) registerRates
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+    
+    [notifyCenter removeObserver:self name:ORRateChangedNotification object:nil];
+    
+    NSEnumerator* e = [[[model waveFormRateGroup] rates] objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+    
+        [notifyCenter removeObserver:self name:ORRateChangedNotification object:obj];
+
+        [notifyCenter addObserver:self
+                         selector:@selector(waveFormRateChanged:)
+                             name:ORRateChangedNotification
+                           object:obj];
+    }
+}
+
 
 #pragma mark ***Interface Management
 - (void) updateWindow
 {
 	[super updateWindow];
+    [self integrationChanged:nil];
     [self writeValueChanged:nil];
+    [self totalRateChanged:nil];
     [self selectedRegIndexChanged:nil];
     [self selectedRegChannelChanged:nil];
 	[self baseAddressChanged:nil];
@@ -181,7 +240,9 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[self postTriggerSettingChanged:nil];
 	[self enabledMaskChanged:nil];
     [self basicLockChanged:nil];
+    [self waveFormRateChanged:nil];
     [self settingsLockChanged:nil];
+
 }
 
 - (void) checkGlobalSecurity
@@ -191,6 +252,51 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [basicLockButton setEnabled:secure];
     [gSecurity setLock:ORCaen1720SettingsLock to:secure];
     [settingsLockButton setEnabled:secure];
+}
+- (void) integrationChanged:(NSNotification*)aNotification
+{
+    ORRateGroup* theRateGroup = [aNotification object];
+    if(aNotification == nil || [model waveFormRateGroup] == theRateGroup || [aNotification object] == model){
+        double dValue = [[model waveFormRateGroup] integrationTime];
+        [integrationStepper setDoubleValue:dValue];
+        [integrationText setDoubleValue: dValue];
+    }
+}
+
+- (void) setBufferStateLabel
+{
+	if(![gOrcaGlobals runInProgress]){
+		[bufferStateField setTextColor:[NSColor blackColor]];
+		[bufferStateField setStringValue:@"--"];
+	}
+	else {
+		int val = [model bufferState];
+		if(val = [model bufferState]) {
+			[bufferStateField setTextColor:[NSColor redColor]];
+			[bufferStateField setStringValue:@"Full"];
+		}
+		else {
+			[bufferStateField setTextColor:[NSColor blackColor]];
+			[bufferStateField setStringValue:@"Ready"];
+		}
+	}
+}
+
+- (void) totalRateChanged:(NSNotification*)aNotification
+{
+	ORRateGroup* theRateObj = [aNotification object];
+	if(aNotification == nil || [model waveFormRateGroup] == theRateObj){
+		
+		[totalRateText setFloatValue: [theRateObj totalRate]];
+		[totalRate setNeedsDisplay:YES];
+	}
+}
+
+- (void) waveFormRateChanged:(NSNotification*)aNote
+{
+    ORRate* theRateObj = [aNote object];		
+    [[rateTextFields cellWithTag:[theRateObj tag]] setFloatValue: [theRateObj rate]];
+    [rate0 setNeedsDisplay:YES];
 }
 
 - (void) writeValueChanged:(NSNotification*) aNotification
@@ -368,9 +474,19 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
    // BOOL runInProgress				= [gOrcaGlobals runInProgress];
    // BOOL locked						= [gSecurity isLocked:ORCaen1720BasicLock];
    // BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1720BasicLock];
+	[self setBufferStateLabel];
+	[self setBufferStateLabel];
 }
 
 #pragma mark •••Actions
+
+- (IBAction) integrationAction:(id)sender
+{
+    [self endEditing];
+    if([sender doubleValue] != [[model waveFormRateGroup]integrationTime]){
+        [model setRateIntegrationTime:[sender doubleValue]];		
+    }
+}
 - (IBAction) baseAddressAction:(id) aSender
 {
     // Make sure that value has changed.
@@ -620,6 +736,32 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 
+}
+
+#pragma mark •••Data Source
+- (double) getBarValue:(int)tag
+{
+	
+	return [[[[model waveFormRateGroup]rates] objectAtIndex:tag] rate];
+}
+
+- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+	return [[[model waveFormRateGroup]timeRate]count];
+}
+
+- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+{
+	if(set == 0){
+		int count = [[[model waveFormRateGroup]timeRate] count];
+		return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
+	}
+	return 0;
+}
+
+- (unsigned long)  	secondsPerUnit:(id) aPlotter
+{
+	return [[[model waveFormRateGroup]timeRate]sampleTime];
 }
 
 @end

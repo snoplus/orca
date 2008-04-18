@@ -76,6 +76,7 @@
     IBOutlet NSButton*      totalRateLogCB;
     IBOutlet ORPlotter1D*   timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
+    IBOutlet NSTextField*   bufferStateField;
 
 	
     IBOutlet NSButton*		basicLockButton;
@@ -93,9 +94,11 @@
  	
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (void) registerRates;
 
 #pragma mark ***Interface Management
 - (void) updateWindow;
+- (void) integrationChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*) aNote;
 - (void) writeValueChanged: (NSNotification*) aNote;
 - (void) selectedRegIndexChanged: (NSNotification*) aNote;
@@ -113,9 +116,12 @@
 - (void) overUnderChanged: (NSNotification*) aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
-- (void) thresholdChanged: (NSNotification*) aNotification;
+- (void) thresholdChanged: (NSNotification*) aNote;
+- (void) waveFormRateChanged:(NSNotification*)aNote;
+- (void) totalRateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) integrationAction:(id)sender;
 - (IBAction) baseAddressAction: (id) aSender;
 - (IBAction) writeValueAction: (id) aSender;
 - (IBAction) selectRegisterAction: (id) aSender;
@@ -146,5 +152,10 @@
 - (void)    updateRegisterDescription: (short) aRegisterIndex;
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 
+#pragma mark •••Data Source
+- (double) getBarValue:(int)tag;
+- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
+- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
+- (unsigned long)  	secondsPerUnit:(id) aPlotter;
 
 @end

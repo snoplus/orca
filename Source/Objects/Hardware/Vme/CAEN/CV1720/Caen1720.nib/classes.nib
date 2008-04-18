@@ -111,6 +111,8 @@
 				<string>id</string>
 				<key>initBoard</key>
 				<string>id</string>
+				<key>integrationAction</key>
+				<string>id</string>
 				<key>loadThresholds</key>
 				<string>id</string>
 				<key>postTriggerSettingTextFieldAction</key>
@@ -150,6 +152,8 @@
 				<string>NSButton</string>
 				<key>basicWriteButton</key>
 				<string>NSButton</string>
+				<key>bufferStateField</key>
+				<string>NSTextField</string>
 				<key>chanTriggerMatrix</key>
 				<string>NSMatrix</string>
 				<key>channelConfigMaskMatrix</key>

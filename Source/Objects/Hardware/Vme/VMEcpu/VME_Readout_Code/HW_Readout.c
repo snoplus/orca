@@ -5,7 +5,7 @@
 //  Created by Mark Howe on Mon Sept 10, 2007
 //  Copyright © 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
+//This program was prepared for the Regents of the University of
 //Washington at the Center for Experimental Nuclear Physics and 
 //Astrophysics (CENPA) sponsored in part by the United States 
 //Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
@@ -367,6 +367,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
             case kTrigger32:    index = Readout_TR32_Data(config,index,lamData);    break;
             case kCaen:         index = Readout_CAEN(config,index,lamData);         break;
             case kSBCLAM:       index = Readout_LAM_Data(config,index,lamData);     break;
+            case kCaen1720:     index = Readout_CAEN1720(config,index,lamData);break;
             default:            index = -1;                                         break;
         }
         return index;
@@ -413,6 +414,51 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
         }
     }
     else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
+
+    return config->card_info[index].next_Card_Index;
+}
+            
+int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+    uint32_t baseAddress	= config->card_info[index].base_add;
+    uint32_t statusReg		= config->card_info[index].deviceSpecificData[0];
+    uint32_t eventSizeReg	= config->card_info[index].deviceSpecificData[1];
+    uint32_t outputBuffReg	= config->card_info[index].deviceSpecificData[2];
+	uint32_t theMod = config->card_info[index].add_mod;
+	
+	static TUVMEDevice* caenDMADevice = 0;
+	
+	uint32_t theStatus;
+    int32_t result    = read_device(vmeAM9Handle,(char*)&theStatus,4,statusReg); //long access, the status reg
+    if(result > 0 && (theStatus & 0x8)){
+		//at least one event is ready
+		uint32_t eventSize;
+		result    = read_device(vmeAM9Handle,(char*)&eventSize,4,eventSizeReg); //long access, the event size
+		if(result > 0 && eventSize>0){
+			uint32_t startIndex = dataIndex;
+			uint32_t dataId     = config->card_info[index].hw_mask[0];
+			//uint32_t slot       = config->card_info[index].slot;
+			//uint32_t crate      = config->card_info[index].crate;
+			
+			data[dataIndex++] = dataId | (2+eventSize);
+			data[dataIndex++] = config->card_info[index].hw_mask[4]; //crate, card, pack2.5
+
+			//just pound on one address, the card does the incrementing.
+			set_dma_no_increment(true);
+			caenDMADevice = get_dma_device(outputBuffReg, theMod, 4);
+            
+            if (caenDMADevice == NULL) return config->card_info[index].next_Card_Index;
+            
+            result = read_device(caenDMADevice,(char*)(&data[dataIndex]),eventSize*4, 0); 
+            dataIndex += eventSize;
+            
+            if (result != eventSize*4) {
+				dataIndex = startIndex; //just flush the event
+				return config->card_info[index].next_Card_Index;
+            }
+		}
+		else if (result < 0)LogBusError("Rd Err: V1720 0x%04x %s",baseAddress,strerror(errno));                
+	}
 
     return config->card_info[index].next_Card_Index;
 }            

@@ -23,6 +23,7 @@
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
 #import "ORCaenDataDecoder.h"
+#import "SBC_Config.h"
 
 typedef struct  {
 	NSString*       regName;
@@ -78,9 +79,9 @@ enum {
 	kSWReset,				//0xEF24
 	kSWClear,				//0xEF28
 	//kFlashEnable,			//0xEF2C
-	//kFlashData,				//0xEF30
-	//kConfigReload,			//0xEF34
-	//kConfigROM,				//0xF000
+	//kFlashData,			//0xEF30
+	//kConfigReload,		//0xEF34
+	//kConfigROM,			//0xF000
 	kNumRegisters
 };
 
@@ -93,10 +94,12 @@ enum {
 };
 
 @class ORRateGroup;
+@class ORAlarm;
 
 // Class definition
 @interface ORCaen1720Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
+	unsigned long   dataId;
 	unsigned short  selectedRegIndex;
     unsigned short  selectedChannel;
     unsigned long   writeValue;
@@ -111,15 +114,22 @@ enum {
     unsigned long   triggerSourceMask;
     unsigned long	postTriggerSetting;
     unsigned short	enabledMask;
-	unsigned long   dataId;
-	BOOL			first; 
-	unsigned int    statusReg;
-	unsigned long   location;
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[8];
+    int				bufferState;
+	ORAlarm*        bufferFullAlarm;
+	int				bufferEmptyCount;
+	BOOL			isRunning;
+	
+	//cached variables, valid only during running
+	unsigned int    statusReg;
+	unsigned long   location;
+	unsigned long	eventSizeReg;
+	unsigned long	dataReg;
 }
 
 #pragma mark ***Accessors
+- (int)				bufferState;
 - (void)			clearWaveFormCounts;
 - (void)			setRateIntegrationTime:(double)newIntegrationTime;
 - (id)				rateObject:(int)channel;
@@ -159,15 +169,10 @@ enum {
 - (void)			read:(unsigned short) pReg returnValue:(unsigned long*) pValue;
 - (void)			write:(unsigned short) pReg sendValue:(unsigned long) pValue;
 - (short)			getNumberRegisters;
-- (unsigned long) 	getBufferOffset;
-- (unsigned short) 	getDataBufferSize;
-- (unsigned long) 	getThresholdOffset;
-- (short)			getStatusRegisterIndex: (short) aRegister;
-- (short)			getThresholdIndex;
-- (short)			getOutputBufferIndex;
 - (void)			generateSoftwareTrigger;
 - (void)			softwareReset;
 - (void)			clearAllMemory;
+- (void)			checkBufferAlarm;
 
 #pragma mark ***HW Init
 - (void)			initBoard;
@@ -177,7 +182,6 @@ enum {
 - (void)			writeTriggerSource;
 - (void)			writePostTriggerSetting;
 - (void)			writeChannelEnabledMask;
-
 
 #pragma mark ***Register - Register specific routines
 - (unsigned short) selectedRegIndex;
@@ -201,6 +205,7 @@ enum {
 - (void)			readOverUnderThresholds;
 
 #pragma mark •••DataTaker
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (unsigned long)	dataId;
 - (void)			setDataId: (unsigned long) DataId;
 - (void)			setDataIds:(id)assigner;
@@ -238,6 +243,7 @@ extern NSString* ORCaen1720WriteValueChanged;
 extern NSString* ORCaen1720BasicLock;
 extern NSString* ORCaen1720SettingsLock;
 extern NSString* ORCaen1720RateGroupChanged;
+extern NSString* ORCaen1720ModelBufferCheckChanged;
 
 //the decoder concrete decoder class
 @interface ORCaen1720DecoderForCAEN : ORCaenDataDecoder
