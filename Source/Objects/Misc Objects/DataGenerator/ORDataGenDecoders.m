@@ -115,6 +115,24 @@ static NSString* kCardKey[8] = {
 		kChanKey[(ptr[1]&0x0000f000)>>12],
         nil];
 
+    [aDataSet loadData2DX:ptr[1]&0x00000fff y:ptr[2]&0x00000fff z:1 size:256  sender:self  withKeys:@"DataGen2D_Set",
+		kCardKey[(ptr[1]&0x000f0000)>>16],
+		kChanKey[(ptr[1]&0x0000f000)>>12],
+        nil];
+
+
+	NSDate* now = [NSDate date];
+	if(lastTime == 0){
+		lastTime = [now retain];
+	}
+	if([now timeIntervalSinceDate:lastTime] > 1){
+		[aDataSet clearDataUpdate:NO withKeys:@"DataGen2D_Set",
+			kCardKey[(ptr[1]&0x000f0000)>>16],
+			kChanKey[(ptr[1]&0x0000f000)>>12],
+			nil];
+		[lastTime release];
+		lastTime = [now retain];
+	}
 
     return length; //must return number of longs processed.
 }

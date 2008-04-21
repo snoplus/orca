@@ -141,6 +141,23 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     [data runTaskStopped];
 }
 
+- (void) clearWithUpdate:(BOOL)update
+{
+    totalCounts = 0;
+    NSEnumerator* e = [realDictionary  objectEnumerator];
+    ORDataSet* d;
+    while(d = [e nextObject]){
+        [d clear];
+    }
+    
+    [data clear];
+	if(update){
+         [[NSNotificationCenter defaultCenter]
+			postNotificationName:ORDataSetCleared
+                          object:self
+                        userInfo: nil];
+	}
+}
 
 - (void) clear
 {
@@ -647,8 +664,85 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     else [histo mergeHistogram:ptr numValues:numBins];
 }
 
-
-
+- (void) loadData2DX:(unsigned long)xValue y:(unsigned long)yValue z:(unsigned long)zValue size:(unsigned short)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...
+{
+    va_list myArgs;
+    va_start(myArgs,firstArg);
+    
+    NSString* s             = firstArg;
+    ORDataSet* currentLevel = self;
+    ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCounts];
+    
+    do {
+        nextLevel = [currentLevel objectForKey:s];
+        if(nextLevel){
+            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+            currentLevel = nextLevel;
+        }
+        else {
+            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+            [currentLevel setObject:nextLevel forKey:s];
+            currentLevel = nextLevel;
+            [nextLevel release];
+        }
+        [currentLevel incrementTotalCounts];
+        
+    } while(s = va_arg(myArgs, NSString *));
+    
+    
+    OR2DHisto* histo = [nextLevel data];
+    if(!histo){
+        histo = [[OR2DHisto alloc] init];
+        [histo setKey:[nextLevel key]];
+        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+        [histo setNumberBinsPerSide:numBins];
+        [nextLevel setData:histo];
+        [histo loadX:xValue y:yValue z:zValue];  
+        [histo release];
+        [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORDataSetAdded
+                              object:self
+                            userInfo: nil];
+    }
+    
+    else {
+		[histo loadX:xValue y:yValue z:zValue];
+    }
+    va_end(myArgs);
+    
+}
+- (void) clearDataUpdate:(BOOL)update withKeys:(NSString*)firstArg,...
+{
+    va_list myArgs;
+    va_start(myArgs,firstArg);
+    
+    NSString* s             = firstArg;
+    ORDataSet* currentLevel = self;
+    ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCounts];
+    
+    do {
+        nextLevel = [currentLevel objectForKey:s];
+        if(nextLevel){
+            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+            currentLevel = nextLevel;
+        }
+        else {
+            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+            [currentLevel setObject:nextLevel forKey:s];
+            currentLevel = nextLevel;
+            [nextLevel release];
+        }
+        [currentLevel incrementTotalCounts];
+        
+    } while(s = va_arg(myArgs, NSString *));
+    
+	[nextLevel clearWithUpdate:update];
+	
+    va_end(myArgs);
+    
+}
 
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize sender:(id)obj  withKeys:(NSString*)firstArg,...
 {

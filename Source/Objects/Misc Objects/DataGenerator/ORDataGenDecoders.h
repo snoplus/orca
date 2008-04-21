@@ -35,7 +35,9 @@
 @end
 
 @interface ORDataGenDecoderForTestData2D : ORBaseDecoder
-{}
+{
+	NSDate* lastTime;
+}
 - (NSString*) getChannelKey:(unsigned short)aChan;
 - (NSString*) getCardKey:(unsigned short)aCard;
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;

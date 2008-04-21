@@ -50,7 +50,9 @@
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray;
 - (void) mergeHistogram:(unsigned long*)ptr numValues:(unsigned long)numBins;
+- (void) load:(unsigned long*)ptr numValues:(unsigned long)num;
 - (void) histogramX:(unsigned short)aXValue y:(unsigned short)aYValue;
+- (void) loadX:(unsigned short)aXValue y:(unsigned short)aYValue z:(unsigned short)aZValue;
 - (void) clear;
 
 #pragma mark ¥¥¥Writing Data
