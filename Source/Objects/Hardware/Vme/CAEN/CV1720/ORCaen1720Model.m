@@ -122,7 +122,9 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
     [self setBaseAddress:k792DefaultBaseAddress];
     [self setAddressModifier:k792DefaultAddressModifier];
 	[self setEnabledMask:0xFF];
+    [self setEventSize:0xa];
     [[self undoManager] enableUndoRegistration];
+    
    
     return self;
 }
@@ -143,7 +145,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 
 - (void) setEventSize:(int)aEventSize
 {
-	if(aEventSize == 0)aEventSize = 0xa; //default
+	//if(aEventSize == 0)aEventSize = 0xa; //default
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setEventSize:eventSize];
     
@@ -890,7 +892,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 
 - (void) writeBufferOrganization
 {
-	unsigned long aValue = (unsigned long)pow(2.,(float)eventSize);
+	unsigned long aValue = eventSize;//(unsigned long)pow(2.,(float)eventSize);
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kBufferOrganization].addressOffset
                         numToWrite:1
