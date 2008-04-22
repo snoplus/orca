@@ -923,6 +923,14 @@
 		8468E6FA06932C3F00B57CE8 /* NcdLogAmpTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 8468E6F806932C3F00B57CE8 /* NcdLogAmpTask.h */; };
 		8468E6FB06932C4000B57CE8 /* NcdLogAmpTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 8468E6F906932C3F00B57CE8 /* NcdLogAmpTask.m */; };
 		846A08F20B77BAAA00B811F4 /* NoADUDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */; };
+		846C512C0DBD3221005D6566 /* NplpCMeter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846C51260DBD3221005D6566 /* NplpCMeter.nib */; };
+		846C512D0DBD3221005D6566 /* NplpCMeterIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846C51270DBD3221005D6566 /* NplpCMeterIcon.tif */; };
+		846C512E0DBD3221005D6566 /* ORNplpCMeterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 846C51280DBD3221005D6566 /* ORNplpCMeterController.h */; };
+		846C512F0DBD3221005D6566 /* ORNplpCMeterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 846C51290DBD3221005D6566 /* ORNplpCMeterController.m */; };
+		846C51300DBD3221005D6566 /* ORNplpCMeterModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 846C512A0DBD3221005D6566 /* ORNplpCMeterModel.h */; };
+		846C51310DBD3221005D6566 /* ORNplpCMeterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 846C512B0DBD3221005D6566 /* ORNplpCMeterModel.m */; };
+		846C513C0DBD4614005D6566 /* ORNplpCMeterDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 846C513A0DBD4614005D6566 /* ORNplpCMeterDecoders.h */; };
+		846C513D0DBD4614005D6566 /* ORNplpCMeterDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 846C513B0DBD4614005D6566 /* ORNplpCMeterDecoders.m */; };
 		846F4B95098FDA7B00BF0031 /* ORRunVetoController.h in Headers */ = {isa = PBXBuildFile; fileRef = 846F4B8D098FDA7B00BF0031 /* ORRunVetoController.h */; };
 		846F4B96098FDA7B00BF0031 /* ORRunVetoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 846F4B8E098FDA7B00BF0031 /* ORRunVetoController.m */; };
 		846F4B97098FDA7B00BF0031 /* ORRunVetoModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 846F4B8F098FDA7B00BF0031 /* ORRunVetoModel.h */; };
@@ -2504,6 +2512,14 @@
 		8468E6F806932C3F00B57CE8 /* NcdLogAmpTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdLogAmpTask.h; sourceTree = "<group>"; };
 		8468E6F906932C3F00B57CE8 /* NcdLogAmpTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdLogAmpTask.m; sourceTree = "<group>"; };
 		846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = NoADUDriverHelp.plist; path = Source/Objects/Hardware/USB/ADU200/NoADUDriverHelp.plist; sourceTree = SOURCE_ROOT; };
+		846C51260DBD3221005D6566 /* NplpCMeter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NplpCMeter.nib; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/NplpCMeter.nib"; sourceTree = SOURCE_ROOT; };
+		846C51270DBD3221005D6566 /* NplpCMeterIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NplpCMeterIcon.tif; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/NplpCMeterIcon.tif"; sourceTree = SOURCE_ROOT; };
+		846C51280DBD3221005D6566 /* ORNplpCMeterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNplpCMeterController.h; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/ORNplpCMeterController.h"; sourceTree = SOURCE_ROOT; };
+		846C51290DBD3221005D6566 /* ORNplpCMeterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNplpCMeterController.m; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/ORNplpCMeterController.m"; sourceTree = SOURCE_ROOT; };
+		846C512A0DBD3221005D6566 /* ORNplpCMeterModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNplpCMeterModel.h; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/ORNplpCMeterModel.h"; sourceTree = SOURCE_ROOT; };
+		846C512B0DBD3221005D6566 /* ORNplpCMeterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNplpCMeterModel.m; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/ORNplpCMeterModel.m"; sourceTree = SOURCE_ROOT; };
+		846C513A0DBD4614005D6566 /* ORNplpCMeterDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNplpCMeterDecoders.h; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/ORNplpCMeterDecoders.h"; sourceTree = SOURCE_ROOT; };
+		846C513B0DBD4614005D6566 /* ORNplpCMeterDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNplpCMeterDecoders.m; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/ORNplpCMeterDecoders.m"; sourceTree = SOURCE_ROOT; };
 		846E0278052A2F8E005F64B1 /* VME_eCPU_Config.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VME_eCPU_Config.h; path = "Source/Objects/Hardware/Vme/Vme Base Classes/VME_eCPU_Config.h"; sourceTree = SOURCE_ROOT; };
 		846F4B8D098FDA7B00BF0031 /* ORRunVetoController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRunVetoController.h; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto/ORRunVetoController.h; sourceTree = SOURCE_ROOT; };
 		846F4B8E098FDA7B00BF0031 /* ORRunVetoController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRunVetoController.m; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto/ORRunVetoController.m; sourceTree = SOURCE_ROOT; };
@@ -4624,6 +4640,7 @@
 			children = (
 				84AB8BB30D2314A500EC39F2 /* CmdHistory */,
 				9C1363AF0D0A78FC006C550D /* NplHV */,
+				846C51250DBD3221005D6566 /* NplPicoCoulombMeter */,
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
 				2AAB08F808E36CCE00BB0792 /* Testing */,
 				844048AB08350BEE000D03DB /* MemoryWatcher */,
@@ -5368,6 +5385,22 @@
 			);
 			name = LogAmpTask;
 			path = Source/Experiments/Ncd/LogAmpTask;
+			sourceTree = SOURCE_ROOT;
+		};
+		846C51250DBD3221005D6566 /* NplPicoCoulombMeter */ = {
+			isa = PBXGroup;
+			children = (
+				846C51260DBD3221005D6566 /* NplpCMeter.nib */,
+				846C51270DBD3221005D6566 /* NplpCMeterIcon.tif */,
+				846C51280DBD3221005D6566 /* ORNplpCMeterController.h */,
+				846C51290DBD3221005D6566 /* ORNplpCMeterController.m */,
+				846C512A0DBD3221005D6566 /* ORNplpCMeterModel.h */,
+				846C512B0DBD3221005D6566 /* ORNplpCMeterModel.m */,
+				846C513A0DBD4614005D6566 /* ORNplpCMeterDecoders.h */,
+				846C513B0DBD4614005D6566 /* ORNplpCMeterDecoders.m */,
+			);
+			name = NplPicoCoulombMeter;
+			path = "Source/Objects/Misc Objects/NplPicoCoulombMeter";
 			sourceTree = SOURCE_ROOT;
 		};
 		846F4B8C098FDA7A00BF0031 /* RunVeto */ = {
@@ -8407,6 +8440,9 @@
 				84BC16580DA14F3600D3935C /* ORCaen1720Model.h in Headers */,
 				84E743440DAD5EF00099CAEE /* ORMailer.h in Headers */,
 				84B771400DB3DFBB004798B2 /* ORCaen1720Decoder.h in Headers */,
+				846C512E0DBD3221005D6566 /* ORNplpCMeterController.h in Headers */,
+				846C51300DBD3221005D6566 /* ORNplpCMeterModel.h in Headers */,
+				846C513C0DBD4614005D6566 /* ORNplpCMeterDecoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8927,6 +8963,8 @@
 				849B47300D982AC000AD79A0 /* Calibrate.gif in Resources */,
 				84BC16550DA14F3600D3935C /* Caen1720.nib in Resources */,
 				84BC165C0DA1527300D3935C /* Caen1720Card.gif in Resources */,
+				846C512C0DBD3221005D6566 /* NplpCMeter.nib in Resources */,
+				846C512D0DBD3221005D6566 /* NplpCMeterIcon.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9534,6 +9572,9 @@
 				841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */,
 				84E743450DAD5EF00099CAEE /* ORMailer.m in Sources */,
 				84B771410DB3DFBB004798B2 /* ORCaen1720Decoder.m in Sources */,
+				846C512F0DBD3221005D6566 /* ORNplpCMeterController.m in Sources */,
+				846C51310DBD3221005D6566 /* ORNplpCMeterModel.m in Sources */,
+				846C513D0DBD4614005D6566 /* ORNplpCMeterDecoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
