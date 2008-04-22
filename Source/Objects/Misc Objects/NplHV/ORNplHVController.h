@@ -18,11 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
 #import "OrcaObjectController.h"
-
-@class ORUSB;
 
 @interface ORNplHVController : OrcaObjectController 
 {
