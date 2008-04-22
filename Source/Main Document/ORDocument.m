@@ -372,14 +372,19 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[[self undoManager] removeAllActions];
 		
-		NSLog(@"Saved Configuration: %@\n",[self fileName]);
+		[self performSelector:@selector(printSaved) withObject:nil afterDelay:0];
 		
 		return data;
 	}
     
     return nil;
 }
-    
+
+- (void) printSaved
+{
+	NSLog(@"Saved Configuration: %@\n",[self fileName]);
+}
+
 - (BOOL)loadDataRepresentation:(NSData *)data ofType:(NSString *)type
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"

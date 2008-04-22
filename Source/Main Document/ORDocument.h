@@ -87,6 +87,7 @@
 - (void)    saveDefaultFileName;
 - (void)    windowMovedToFront:(NSWindowController*)aController;
 - (void)    checkControllers;
+- (void)	printSaved;
 
 @end
 
