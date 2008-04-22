@@ -240,7 +240,7 @@ NSString* ORFolderTransferTypeChangedNotification	= @"ORFolderTransferTypeChange
 	if(useFolderStructure){
 		NSCalendarDate* date = [NSCalendarDate date];
 		NSString* year  = [NSString stringWithFormat:@"%d",[date yearOfCommonEra]];
-		NSString* month = [NSString stringWithFormat:@"%d",[date monthOfYear]];
+		NSString* month = [NSString stringWithFormat:@"%02d",[date monthOfYear]];
 		path = [self directoryName];
 		path = [path stringByAppendingPathComponent:year];
 		path = [path stringByAppendingPathComponent:month];
