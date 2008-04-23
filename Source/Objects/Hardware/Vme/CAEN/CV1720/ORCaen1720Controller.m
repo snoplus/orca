@@ -244,11 +244,11 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[self triggerSourceMaskChanged:nil];
 	[self postTriggerSettingChanged:nil];
 	[self enabledMaskChanged:nil];
-    [self basicLockChanged:nil];
     [self waveFormRateChanged:nil];
-    [self settingsLockChanged:nil];
+ 	[self eventSizeChanged:nil];
 
-	[self eventSizeChanged:nil];
+	[self settingsLockChanged:nil];
+    [self basicLockChanged:nil];
 }
 
 - (void) eventSizeChanged:(NSNotification*)aNote
@@ -266,6 +266,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [gSecurity setLock:ORCaen1720SettingsLock to:secure];
     [settingsLockButton setEnabled:secure];
 }
+
 - (void) integrationChanged:(NSNotification*)aNotification
 {
     ORRateGroup* theRateGroup = [aNotification object];
@@ -484,11 +485,38 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {	
-   // BOOL runInProgress				= [gOrcaGlobals runInProgress];
-   // BOOL locked						= [gSecurity isLocked:ORCaen1720BasicLock];
-   // BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1720BasicLock];
+    BOOL runInProgress				= [gOrcaGlobals runInProgress];
+    BOOL locked						= [gSecurity isLocked:ORCaen1720SettingsLock];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1720SettingsLock];
+    [settingsLockButton setState: locked];
 	[self setBufferStateLabel];
-	[self setBufferStateLabel];
+    [thresholdMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
+    [otherTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [chanTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [postTriggerSettingTextField setEnabled:!lockedOrRunningMaintenance]; 
+    [triggerSourceMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [coincidenceLevelTextField setEnabled:!lockedOrRunningMaintenance]; 
+    [dacMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [acquisitionModeMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [countAllTriggersMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [channelConfigMaskMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [eventSizePopUp setEnabled:!lockedOrRunningMaintenance]; 
+    [loadThresholdsButton setEnabled:!lockedOrRunningMaintenance]; 
+    [initButton setEnabled:!lockedOrRunningMaintenance]; 
+
+	//these must NOT or can not be changed when run in progress
+    [customSizeTextField setEnabled:!locked && !runInProgress]; 
+    [eventSizePopUp setEnabled:!locked && !runInProgress]; 
+    [enabledMaskMatrix setEnabled:!locked && !runInProgress]; 
+
+    NSString* s = @"";
+    if(lockedOrRunningMaintenance){
+		if(runInProgress && ![gSecurity isLocked:ORCaen1720SettingsLock])s = @"Not in Maintenance Run.";
+    }
+    [settingsLockDocField setStringValue:s];
+
+
 }
 
 #pragma mark •••Actions

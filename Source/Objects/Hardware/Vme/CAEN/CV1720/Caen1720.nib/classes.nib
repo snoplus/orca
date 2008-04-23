@@ -214,6 +214,8 @@
 				<string>NSButton</string>
 				<key>settingsLockButton</key>
 				<string>NSButton</string>
+				<key>settingsLockDocField</key>
+				<string>NSTextField</string>
 				<key>softwareTriggerButton</key>
 				<string>NSButton</string>
 				<key>srTextField</key>

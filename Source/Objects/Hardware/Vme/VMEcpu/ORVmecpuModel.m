@@ -174,8 +174,8 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	dataTakers = [[readOutGroup allObjects] retain];	//cache of data takers.
-    
+	dataTakers = [[readOutGroup allObjects] retain];								//cache of data takers.
+    [userInfo setObject:[NSNumber numberWithBool:YES] forKey:kSBCisDataTaker];		//tell our objects that ORCA is NOT the dataTaker
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
     while(obj = [e nextObject]){

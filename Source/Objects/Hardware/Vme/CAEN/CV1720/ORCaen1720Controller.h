@@ -83,6 +83,8 @@
 	
     IBOutlet NSButton*		basicLockButton;
     IBOutlet NSButton*		settingsLockButton;
+	IBOutlet NSTextField*   settingsLockDocField;
+
 
     NSView *blankView;
     NSSize basicSize;

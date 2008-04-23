@@ -23,6 +23,8 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
+#define kSBCisDataTaker @"kSBCisDataTaker"
+
 @protocol ORDataTaker
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

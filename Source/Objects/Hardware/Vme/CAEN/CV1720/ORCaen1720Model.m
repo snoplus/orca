@@ -1017,7 +1017,13 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
    if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     }
-    
+    BOOL sbcRun = [[userInfo objectForKey:kSBCisDataTaker] boolValue];
+	if(sbcRun){
+		NSLog(@"the SBC is in control\n");
+	}
+	else {
+		NSLog(@"ORCA is in control\n");
+	}
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
