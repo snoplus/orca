@@ -174,17 +174,20 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	dataTakers = [[readOutGroup allObjects] retain];								//cache of data takers.
-    [userInfo setObject:[NSNumber numberWithBool:YES] forKey:kSBCisDataTaker];		//tell our objects that ORCA is NOT the dataTaker
+	dataTakers = [[readOutGroup allObjects] retain];									//cache of data takers.
+
+	NSMutableDictionary* extraUserInfo = [NSMutableDictionary dictionaryWithDictionary:userInfo];		
+    [extraUserInfo setObject:[NSNumber numberWithBool:YES] forKey:kSBCisDataTaker];		//tell our objects that ORCA is NOT the dataTaker
+
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
-        [obj runTaskStarted:aDataPacket userInfo:userInfo];
+        [obj runTaskStarted:aDataPacket userInfo:extraUserInfo];
     }
     
     //load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
-	[sbcLink runTaskStarted:aDataPacket userInfo:userInfo];
+	[sbcLink runTaskStarted:aDataPacket userInfo:extraUserInfo];
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
