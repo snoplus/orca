@@ -694,9 +694,10 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 {
 	int i;
 	for(i=0;i<8;i++){
-		[[self adapter] writeLongBlock:&overUnderThreshold[i]
+		unsigned long aValue = overUnderThreshold[i];
+		[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-                        numTowrite:1
+                        numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	}
@@ -1106,6 +1107,15 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	short i;
     for(i=0;i<8;i++)waveFormCount[i] = 0;
 }
+
+- (BOOL) bumpRateFromDecodeStage:(short)channel
+{
+	if(isRunning)return NO;
+    
+    ++waveFormCount[channel];
+    return YES;
+}
+
 
 - (NSString*) identifier
 {

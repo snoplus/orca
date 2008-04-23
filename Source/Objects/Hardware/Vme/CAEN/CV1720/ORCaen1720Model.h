@@ -219,6 +219,7 @@ enum {
 - (void)			runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
 - (void)			takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void)			runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

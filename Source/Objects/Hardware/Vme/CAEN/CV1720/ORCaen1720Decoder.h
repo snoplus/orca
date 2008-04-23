@@ -25,7 +25,11 @@
 //--------------------------------------------------------------------------------
 // Class ORCaen1720Decoder
 //--------------------------------------------------------------------------------
-@interface ORCaen1720WaveformDecoder : ORVmeCardDecoder {
+@interface ORCaen1720WaveformDecoder : ORVmeCardDecoder 
+{
+    @private 
+        BOOL getRatesFromDecodeStage;
+        NSMutableDictionary* actualCards;
 }
 
 @end
