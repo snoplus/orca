@@ -136,7 +136,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 				NSEnumerator* e = [listOfCards objectEnumerator];
 				ORCaen1720Model* aCard;
 				while(aCard = [e nextObject]){
-					if(/*[aCard crateNumber] == crate &&*/ [aCard slot] == card){
+					if([aCard crateNumber] == crate && [aCard slot] == card){
 						[actualCards setObject:aCard forKey:aKey];
 						obj = aCard;
 						break;
