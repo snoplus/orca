@@ -117,6 +117,8 @@
 				<string>id</string>
 				<key>loadThresholds</key>
 				<string>id</string>
+				<key>overUnderAction</key>
+				<string>id</string>
 				<key>postTriggerSettingTextFieldAction</key>
 				<string>id</string>
 				<key>report</key>

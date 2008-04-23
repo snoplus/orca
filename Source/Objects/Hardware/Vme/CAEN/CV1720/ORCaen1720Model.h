@@ -185,6 +185,7 @@ enum {
 - (void)			writeTriggerSource;
 - (void)			writePostTriggerSetting;
 - (void)			writeChannelEnabledMask;
+- (void)			writeOverUnderThresholds;
 
 #pragma mark ***Register - Register specific routines
 - (unsigned short) selectedRegIndex;

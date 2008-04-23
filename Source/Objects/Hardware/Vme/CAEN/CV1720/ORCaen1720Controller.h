@@ -152,6 +152,7 @@
 - (IBAction) channelConfigMaskAction:(id)sender;
 - (IBAction) dacAction: (id) aSender;
 - (IBAction) thresholdAction: (id) aSender;
+- (IBAction) overUnderAction: (id) aSender;
 
 #pragma mark •••Misc Helpers
 - (void)    populatePullDown;

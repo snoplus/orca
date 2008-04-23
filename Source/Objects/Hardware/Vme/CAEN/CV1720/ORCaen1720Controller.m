@@ -491,6 +491,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [settingsLockButton setState: locked];
 	[self setBufferStateLabel];
     [thresholdMatrix setEnabled:!lockedOrRunningMaintenance]; 
+    [overUnderMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [softwareTriggerButton setEnabled:!lockedOrRunningMaintenance]; 
     [otherTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
     [chanTriggerMatrix setEnabled:!lockedOrRunningMaintenance]; 
@@ -705,6 +706,12 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	[[[model document] undoManager] setActionName:@"Set dacs"]; // Set name of undo.
 	[model setDac:[[aSender selectedCell] tag] withValue:[model convertVoltsToDac:[[aSender selectedCell] floatValue]]]; // Set new value
+}
+
+- (IBAction) overUnderAction: (id) aSender
+{
+	[[[model document] undoManager] setActionName:@"Set Over_Under"]; // Set name of undo.
+	[model setOverUnderThreshold:[[aSender selectedCell] tag] withValue:[[aSender selectedCell] intValue]]; // Set new value
 }
 
 - (IBAction) thresholdAction:(id) aSender

@@ -690,6 +690,18 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
                      usingAddSpace:0x01];
 }
 
+- (void) writeOverUnderThresholds
+{
+	int i;
+	for(i=0;i<8;i++){
+		[[self adapter] writeLongBlock:&overUnderThreshold[i]
+                         atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
+                        numTowrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+	}
+}
+
 - (void) readOverUnderThresholds
 {
 	int i;
@@ -700,7 +712,6 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
                         numToRead:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-		[self setOverUnderThreshold:i withValue:value];
 	}
 }
 
@@ -816,7 +827,6 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 
 - (void) initBoard
 {
-	//customSize = 0x200;
 	[self clearAllMemory];
 	[self softwareReset];
 	[self writeThresholds];
@@ -825,6 +835,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	[self writeTriggerSource];
 	[self writeChannelEnabledMask];
 	[self writeBufferOrganization];
+	[self writeOverUnderThresholds];
 	[self writeDacs];
 }
 
@@ -1151,6 +1162,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
     for (i = 0; i < [self numberOfChannels]; i++){
         [self setDac:i withValue:      [aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENDacChnl%d", i]]];
         [self setThreshold:i withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENThresChnl%d", i]]];
+        [self setOverUnderThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENOverUnderChnl%d", i]]];
     }
     
     [[self undoManager] enableUndoRegistration];
@@ -1174,6 +1186,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	for (i = 0; i < [self numberOfChannels]; i++){
         [anEncoder encodeInt32:dac[i] forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];
         [anEncoder encodeInt32:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresChnl%d", i]];
+        [anEncoder encodeInt:overUnderThreshold[i] forKey:[NSString stringWithFormat:@"CAENOverUnderChnl%d", i]];
     }
 }
 
