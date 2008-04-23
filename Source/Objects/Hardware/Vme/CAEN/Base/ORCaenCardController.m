@@ -209,6 +209,12 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
 
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+}
+
 - (void) basicLockChanged:(NSNotification*)aNotification
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];

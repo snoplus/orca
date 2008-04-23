@@ -60,6 +60,8 @@
     IBOutlet NSMatrix*		overUnderMatrix;
 	IBOutlet NSPopUpButton* eventSizePopUp;
 	IBOutlet NSTextField*	eventSizeTextField;
+    IBOutlet NSTextField*	slotField;
+    IBOutlet NSTextField*	slot1Field;
 	
     IBOutlet NSButton*		initButton;
     IBOutlet NSButton*		reportButton;
@@ -124,6 +126,7 @@
 - (void) thresholdChanged: (NSNotification*) aNote;
 - (void) waveFormRateChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
+- (void) slotChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) eventSizeAction:(id)sender;

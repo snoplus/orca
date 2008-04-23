@@ -198,7 +198,13 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
                      selector : @selector(eventSizeChanged:)
                          name : ORCaen1720ModelEventSizeChanged
 						object: model];
-
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(slotChanged:)
+						 name : ORVmeCardSlotChangedNotification
+					   object : model];
+	
+	
 	[self registerRates];
 
 }
@@ -246,9 +252,23 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	[self enabledMaskChanged:nil];
     [self waveFormRateChanged:nil];
  	[self eventSizeChanged:nil];
+ 	[self slotChanged:nil];
 
 	[self settingsLockChanged:nil];
     [self basicLockChanged:nil];
+}
+
+- (void) slotChanged:(NSNotification*)aNotification
+{
+	[slotField setIntValue: [model slot]];
+	[slot1Field setIntValue: [model slot]];
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+}
+
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
 
 - (void) eventSizeChanged:(NSNotification*)aNote
