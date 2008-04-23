@@ -911,8 +911,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 }
 
 - (void) writeLongBlock:(long*) buffer
-			 atAddress:(unsigned long) anAddress
-			 numToRead:(unsigned int)  numberLongs
+			  atAddress:(unsigned long) anAddress
+			 numToWrite:(unsigned int)  numberLongs
 {
 	NS_DURING
 		[socketLock lock]; //begin critical section

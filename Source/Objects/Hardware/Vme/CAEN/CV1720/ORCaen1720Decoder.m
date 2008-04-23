@@ -61,7 +61,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	
 	ptr++; //point to start of event
 	unsigned long eventSize = *ptr & 0x0fffffff;
-
+    if ( eventSize != length - 2 ) return length;
 	ptr++; //point to 2nd word of event
 	unsigned long channelMask = *ptr & 0x000000ff;
 	//NSLog(@"Channel Mask: %d Len: %d Size: %d\n",channelMask,length,eventSize);

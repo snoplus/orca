@@ -779,8 +779,8 @@
 	else {
 		address = [[model sbcLink] writeAddress];
 		[[model sbcLink] writeLongBlock:&value
-				atAddress:address
-				numToRead:1];
+				 atAddress:address
+				numToWrite:1];
 	}
     NS_HANDLER
         NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,

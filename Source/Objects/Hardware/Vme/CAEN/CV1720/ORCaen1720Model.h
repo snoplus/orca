@@ -121,6 +121,7 @@ enum {
 	int				bufferEmptyCount;
 	BOOL			isRunning;
     int				eventSize;
+    unsigned long   numberBLTEventsToReadout;
 	
 	//cached variables, valid only during running
 	unsigned int    statusReg;
@@ -164,6 +165,8 @@ enum {
 - (void)			setDac:(unsigned short) aChnl withValue:(unsigned short) aValue;
 - (unsigned short)	overUnderThreshold:(unsigned short) aChnl;
 - (void)			setOverUnderThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue;
+- (unsigned long)	numberBLTEventsToReadout;
+- (void)			setNumberBLTEventsToReadout:(unsigned long)aNumberOfBLTEvents;
 
 #pragma mark ***Register - General routines
 - (void)			read;
@@ -185,6 +188,8 @@ enum {
 - (void)			writeTriggerSource;
 - (void)			writePostTriggerSetting;
 - (void)			writeChannelEnabledMask;
+- (void)            writeNumberBLTEvents:(BOOL)enable;
+- (void)            writeEnableBerr:(BOOL)enable;
 - (void)			writeOverUnderThresholds;
 
 #pragma mark ***Register - Register specific routines
@@ -239,6 +244,7 @@ extern NSString* ORCaen1720ModelAcquisitionModeChanged;
 extern NSString* ORCaen1720ModelCountAllTriggersChanged;
 extern NSString* ORCaen1720ModelCustomSizeChanged;
 extern NSString* ORCaen1720ModelChannelConfigMaskChanged;
+extern NSString* ORCaen1720ModelNumberBLTEventsToReadoutChanged;
 extern NSString* ORCaen1720ChnlDacChanged;
 extern NSString* ORCaen1720OverUnderThresholdChanged;
 extern NSString* ORCaen1720Chnl;

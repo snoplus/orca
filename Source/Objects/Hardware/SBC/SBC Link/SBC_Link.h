@@ -217,13 +217,20 @@ typedef enum eSBC_ThrottleConsts{
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse;
 - (void) sendPayloadSize:(long)aSize;
 
+/* For the read*Block functions, the address space is used in VME 
+   to determine if the block read is incrementing or not.  
+   Use usingAddSpace:0x1 for incrementing addresses.
+       usingAddSpace:0xFF for non-incrementing addresses.  
+       usingAddSpace:oxFFFF accesses the control registers
+                            of the bridge chip.  */
+
 - (void) readLongBlock:(long*) buffer
 			 atAddress:(unsigned long) anAddress
 			 numToRead:(unsigned int) numberLongs;
 
 - (void) writeLongBlock:(long*) buffer
-			 atAddress:(unsigned long) anAddress
-			 numToRead:(unsigned int)  numberLongs;
+			  atAddress:(unsigned long) anAddress
+			 numToWrite:(unsigned int)  numberLongs;
 
 - (void) readLongBlock:(unsigned long *) readAddress
 			 atAddress:(unsigned int) vmeAddress

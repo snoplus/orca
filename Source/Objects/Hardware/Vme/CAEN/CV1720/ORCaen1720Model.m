@@ -73,7 +73,7 @@ static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
 	{@"Monitor Mode",		false,	true, 	true,	0x8144,		kReadWrite},
 	{@"Event Size",			true,	true, 	true,	0x814C,		kReadOnly},
 	{@"VME Control",		false,	false, 	true,	0xEF00,		kReadWrite},
-	{@"VME Status",			false,	false, 	false,	0xEF00,		kReadOnly},
+	{@"VME Status",			false,	false, 	false,	0xEF04,		kReadOnly},
 	{@"Board ID",			false,	true, 	true,	0xEF08,		kReadWrite},
 	{@"MultCast Base Add",	false,	false, 	true,	0xEF0C,		kReadWrite},
 	{@"Relocation Add",		false,	false, 	true,	0xEF10,		kReadWrite},
@@ -91,25 +91,26 @@ static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
 
 #define kEventReadyMask 0x8
 
-NSString* ORCaen1720ModelEnabledMaskChanged			= @"ORCaen1720ModelEnabledMaskChanged";
-NSString* ORCaen1720ModelPostTriggerSettingChanged	= @"ORCaen1720ModelPostTriggerSettingChanged";
-NSString* ORCaen1720ModelTriggerSourceMaskChanged	= @"ORCaen1720ModelTriggerSourceMaskChanged";
-NSString* ORCaen1720ModelCoincidenceLevelChanged	= @"ORCaen1720ModelCoincidenceLevelChanged";
-NSString* ORCaen1720ModelAcquisitionModeChanged		= @"ORCaen1720ModelAcquisitionModeChanged";
-NSString* ORCaen1720ModelCountAllTriggersChanged	= @"ORCaen1720ModelCountAllTriggersChanged";
-NSString* ORCaen1720ModelCustomSizeChanged			= @"ORCaen1720ModelCustomSizeChanged";
-NSString* ORCaen1720ModelChannelConfigMaskChanged	= @"ORCaen1720ModelChannelConfigMaskChanged";
-NSString* ORCaen1720ChnlDacChanged					= @"ORCaen1720ChnlDacChanged";
-NSString* ORCaen1720OverUnderThresholdChanged		= @"ORCaen1720OverUnderThresholdChanged";
-NSString* ORCaen1720Chnl							= @"ORCaen1720Chnl";
-NSString* ORCaen1720ChnlThresholdChanged			= @"ORCaen1720ChnlThresholdChanged";
-NSString* ORCaen1720SelectedChannelChanged			= @"ORCaen1720SelectedChannelChanged";
-NSString* ORCaen1720SelectedRegIndexChanged			= @"ORCaen1720SelectedRegIndexChanged";
-NSString* ORCaen1720WriteValueChanged				= @"ORCaen1720WriteValueChanged";
-NSString* ORCaen1720BasicLock						= @"ORCaen1720BasicLock";
-NSString* ORCaen1720SettingsLock					= @"ORCaen1720SettingsLock";
-NSString* ORCaen1720RateGroupChanged				= @"ORCaen1720RateGroupChanged";
-NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChanged";
+NSString* ORCaen1720ModelEnabledMaskChanged                 = @"ORCaen1720ModelEnabledMaskChanged";
+NSString* ORCaen1720ModelPostTriggerSettingChanged          = @"ORCaen1720ModelPostTriggerSettingChanged";
+NSString* ORCaen1720ModelTriggerSourceMaskChanged           = @"ORCaen1720ModelTriggerSourceMaskChanged";
+NSString* ORCaen1720ModelCoincidenceLevelChanged            = @"ORCaen1720ModelCoincidenceLevelChanged";
+NSString* ORCaen1720ModelAcquisitionModeChanged             = @"ORCaen1720ModelAcquisitionModeChanged";
+NSString* ORCaen1720ModelCountAllTriggersChanged            = @"ORCaen1720ModelCountAllTriggersChanged";
+NSString* ORCaen1720ModelCustomSizeChanged                  = @"ORCaen1720ModelCustomSizeChanged";
+NSString* ORCaen1720ModelChannelConfigMaskChanged           = @"ORCaen1720ModelChannelConfigMaskChanged";
+NSString* ORCaen1720ModelNumberBLTEventsToReadoutChanged    = @"ORCaen1720ModelNumberBLTEventsToReadoutChanged";
+NSString* ORCaen1720ChnlDacChanged                          = @"ORCaen1720ChnlDacChanged";
+NSString* ORCaen1720OverUnderThresholdChanged               = @"ORCaen1720OverUnderThresholdChanged";
+NSString* ORCaen1720Chnl                                    = @"ORCaen1720Chnl";
+NSString* ORCaen1720ChnlThresholdChanged                    = @"ORCaen1720ChnlThresholdChanged";
+NSString* ORCaen1720SelectedChannelChanged                  = @"ORCaen1720SelectedChannelChanged";
+NSString* ORCaen1720SelectedRegIndexChanged                 = @"ORCaen1720SelectedRegIndexChanged";
+NSString* ORCaen1720WriteValueChanged                       = @"ORCaen1720WriteValueChanged";
+NSString* ORCaen1720BasicLock                               = @"ORCaen1720BasicLock";
+NSString* ORCaen1720SettingsLock                            = @"ORCaen1720SettingsLock";
+NSString* ORCaen1720RateGroupChanged                        = @"ORCaen1720RateGroupChanged";
+NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelBufferCheckChanged";
 
 @implementation ORCaen1720Model
 
@@ -123,6 +124,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
     [self setAddressModifier:k792DefaultAddressModifier];
 	[self setEnabledMask:0xFF];
     [self setEventSize:0xa];
+    [self setNumberBLTEventsToReadout:1];
     [[self undoManager] enableUndoRegistration];
     
    
@@ -366,6 +368,20 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
     channelConfigMask = aChannelConfigMask;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelChannelConfigMaskChanged object:self];
+}
+
+- (unsigned long) numberBLTEventsToReadout
+{
+    return numberBLTEventsToReadout; 
+}
+
+- (void) setNumberBLTEventsToReadout:(unsigned long) numBLTEvents
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNumberBLTEventsToReadout:numberBLTEventsToReadout];
+    
+    numberBLTEventsToReadout = numBLTEvents;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelNumberBLTEventsToReadoutChanged object:self];
 }
 
 - (void) setUpImage
@@ -828,7 +844,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 
 - (void) initBoard
 {
-	[self clearAllMemory];
+	//[self clearAllMemory];
 	[self softwareReset];
 	[self writeThresholds];
 	[self writeChannelConfiguration];
@@ -838,16 +854,21 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	[self writeBufferOrganization];
 	[self writeOverUnderThresholds];
 	[self writeDacs];
+	[self writePostTriggerSetting];
+    
+
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
 { 
 	return 2*aDacValue/65535. - 0.9999;  
+    //return 2*((short)aDacValue)/65535.;  
 }
 
 - (unsigned short) convertVoltsToDac:(float)aVoltage  
 { 
 	return 65535. * (aVoltage+1)/2.; 
+    //return (unsigned short)((short) (65535. * (aVoltage)/2.)); 
 }
 
 - (void) writeThresholds
@@ -945,6 +966,35 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	
 }
 
+- (void) writeNumberBLTEvents:(BOOL)enable
+{
+    unsigned long aValue = (enable) ? numberBLTEventsToReadout : 0;
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kBLTEventNum].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
+- (void) writeEnableBerr:(BOOL)enable
+{
+    unsigned long aValue;
+	[[self adapter] readLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
+                        numToRead:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+                     
+    if ( enable ) aValue |= 0x10;
+    else aValue &= 0xFFEF;
+    
+	[[self adapter] writeLongBlock:&aValue
+                         atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
+                        numToWrite:1
+                        withAddMod:[self addressModifier]
+                     usingAddSpace:0x01];
+}
+
 - (void) checkBufferAlarm
 {
 	if((bufferState == 1) && isRunning){
@@ -1029,13 +1079,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
    if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     }
-    BOOL sbcRun = [[userInfo objectForKey:kSBCisDataTaker] boolValue];
-	if(sbcRun){
-		NSLog(@"the SBC is in control\n");
-	}
-	else {
-		NSLog(@"ORCA is in control\n");
-	}
+
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
@@ -1047,8 +1091,19 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	dataReg			= [self baseAddress] + reg[kOutputBuffer].addressOffset;
 	location		=  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x800)>>11);
 	isRunning		= NO;
+    
+    BOOL sbcRun = [[userInfo objectForKey:kSBCisDataTaker] boolValue];
+	/*if(sbcRun){
+		NSLog(@"the SBC is in control\n");
+	}
+	else {
+		NSLog(@"ORCA is in control\n");
+	}*/
     [self startRates];
     [self initBoard];
+    [self setNumberBLTEventsToReadout:1];  // Hardcode this for now
+    [self writeNumberBLTEvents:sbcRun];
+    [self writeEnableBerr:sbcRun];
 	[self writeAcquistionControl:YES];
 	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
 }
@@ -1064,7 +1119,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 							numToRead:1
 							withAddMod:addressModifier 
 						 usingAddSpace:0x01];
-		bufferState = (status & 0x10) >> 4;			
+		bufferState = (status & 0x10) >> 4;						
 		if(status & kEventReadyMask){
 			//OK, at least one event is ready
 			unsigned long theEventSize;
@@ -1074,16 +1129,16 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 							withAddMod:addressModifier 
 						 usingAddSpace:0x01];
 		
-			NSMutableData* theData = [NSMutableData dataWithCapacity:2+bufferEmptyCount*sizeof(long)];
-			[theData setLength:(2+bufferEmptyCount)*sizeof(long)];
+			NSMutableData* theData = [NSMutableData dataWithCapacity:2+theEventSize*sizeof(long)];
+			[theData setLength:(2+theEventSize)*sizeof(long)];
 			unsigned long* p = (unsigned long*)[theData bytes];
-			*p++ = dataId | (2 + bufferEmptyCount);
+			*p++ = dataId | (2 + theEventSize);
 			*p++ = location; 
 			[controller readLongBlock:p
 							 atAddress:dataReg
-							numToRead:bufferEmptyCount
+							numToRead:theEventSize
 							withAddMod:addressModifier 
-						 usingAddSpace:0x01];
+						 usingAddSpace:0xFF]; //we set it to not increment the address.
 						 
 			[aDataPacket addData:theData];
 			unsigned short chanMask = p[1]; //remember, the point was already inc'ed to the start of data
@@ -1132,11 +1187,16 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= [self addressModifier];
 	configStruct->card_info[index].base_add		= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + reg[kAcqStatus].addressOffset;
-    configStruct->card_info[index].deviceSpecificData[1]	= [self baseAddress] + reg[kEventSize].addressOffset;
-    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + reg[kOutputBuffer].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[3]	= [self baseAddress] + reg[kAcqControl].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[4]	= (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x800)>>11);
+	configStruct->card_info[index].deviceSpecificData[0]	= reg[kEventStored].addressOffset; //Status buffer
+    configStruct->card_info[index].deviceSpecificData[1]	= reg[kEventSize].addressOffset; // "next event size" address
+    configStruct->card_info[index].deviceSpecificData[2]	= reg[kOutputBuffer].addressOffset; // fifo Address
+    configStruct->card_info[index].deviceSpecificData[3]	= 0x0C; // fifo Address Modifier (A32 MBLT)
+    configStruct->card_info[index].deviceSpecificData[4]	= 0xFFC; // fifo Size
+    configStruct->card_info[index].deviceSpecificData[5]	= (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x800)>>11);
+    configStruct->card_info[index].deviceSpecificData[6]	= reg[kVMEControl].addressOffset; // VME Control address
+    configStruct->card_info[index].deviceSpecificData[7]	= reg[kBLTEventNum].addressOffset; // Num of BLT events address
+    
+    
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -1160,6 +1220,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
     [self setCustomSize:[aDecoder decodeInt32ForKey:@"customSize"]];
     [self setChannelConfigMask:[aDecoder decodeIntForKey:@"channelConfigMask"]];
     [self setWaveFormRateGroup:[aDecoder decodeObjectForKey:@"waveFormRateGroup"]];
+    [self setNumberBLTEventsToReadout:[aDecoder decodeInt32ForKey:@"numberBLTEventsToReadout"]];
     
     if(!waveFormRateGroup){
         [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:8 groupTag:0] autorelease]];
@@ -1192,6 +1253,7 @@ NSString* ORCaen1720ModelBufferCheckChanged			= @"ORCaen1720ModelBufferCheckChan
 	[anEncoder encodeInt32:customSize forKey:@"customSize"];
 	[anEncoder encodeInt:channelConfigMask forKey:@"channelConfigMask"];
     [anEncoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
+    [anEncoder encodeInt32:numberBLTEventsToReadout forKey:@"numberBLTEventsToReadout"];
 	int i;
 	for (i = 0; i < [self numberOfChannels]; i++){
         [anEncoder encodeInt32:dac[i] forKey:[NSString stringWithFormat:@"CAENDacChnl%d", i]];
