@@ -80,7 +80,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	}
 	eventSize -= 4;
 	eventSize = eventSize/numChans;
-	for(i=0;i<numChans;i++){
+    int j;
+	for(j=0;j<numChans;j++){
 		if(packed){
 			
 			NSMutableData* tmpData = [NSMutableData dataWithCapacity:3*eventSize*sizeof(unsigned short)];
@@ -105,7 +106,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 							offset:0 //bytes!
 						  unitSize:2 //unit size in bytes!
 							sender:self  
-						  withKeys:@"CAEN", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[i]],nil];
+						  withKeys:@"CAEN", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
 
 		}
 		else {
@@ -124,7 +125,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 							offset:0 //bytes!
 						  unitSize:2 //unit size in bytes!
 							sender:self  
-						  withKeys:@"CAEN", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[i]],nil];
+						  withKeys:@"CAEN", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
 		}
 		
 		if(getRatesFromDecodeStage){

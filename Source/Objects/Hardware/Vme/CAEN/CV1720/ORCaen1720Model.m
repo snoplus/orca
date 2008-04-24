@@ -1104,6 +1104,8 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [self setNumberBLTEventsToReadout:1];  // Hardcode this for now
     [self writeNumberBLTEvents:sbcRun];
     [self writeEnableBerr:sbcRun];
+
+
 	[self writeAcquistionControl:YES];
 	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
 }
@@ -1128,7 +1130,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 							numToRead:1
 							withAddMod:addressModifier 
 						 usingAddSpace:0x01];
-		
+            if ( theEventSize == 0 ) return;
 			NSMutableData* theData = [NSMutableData dataWithCapacity:2+theEventSize*sizeof(long)];
 			[theData setLength:(2+theEventSize)*sizeof(long)];
 			unsigned long* p = (unsigned long*)[theData bytes];
@@ -1192,7 +1194,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     configStruct->card_info[index].deviceSpecificData[2]	= reg[kOutputBuffer].addressOffset; // fifo Address
     configStruct->card_info[index].deviceSpecificData[3]	= 0x0C; // fifo Address Modifier (A32 MBLT)
     configStruct->card_info[index].deviceSpecificData[4]	= 0xFFC; // fifo Size
-    configStruct->card_info[index].deviceSpecificData[5]	= (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x800)>>11);
+    configStruct->card_info[index].deviceSpecificData[5]	= location;
     configStruct->card_info[index].deviceSpecificData[6]	= reg[kVMEControl].addressOffset; // VME Control address
     configStruct->card_info[index].deviceSpecificData[7]	= reg[kBLTEventNum].addressOffset; // Num of BLT events address
     
