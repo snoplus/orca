@@ -85,6 +85,7 @@ static struct {
 
 -(void)dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [logFile release];
 	[self _stopPolling];
     [chanObjs release];
@@ -701,6 +702,10 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     }
 	[chanObjs makeObjectsPerformSelector:@selector(setAdcCard:) withObject:self];
 	   	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                     selector : @selector(writeLogBufferToFile)
+                         name : ORRunStatusChangedNotification
+						object: nil]; 
     return self;
 }
 
