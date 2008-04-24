@@ -61,6 +61,9 @@ Doxygen documentation:
  *
  *
  * History:
+ * - 1.2-11 - Slt Decoder for Trigger data
+ *            - Changed from histogram2D to the data2D display type
+ *              24.4.08 (ak)
  * - 1.2-10 - Katrin FLT dialog
  *            - tabs "Histogram" and "Veto" added (requires appropriate FPGA version)
  *            - in "Settings" a new mode "DAQ Run Mode" was added
@@ -150,6 +153,6 @@ Doxygen documentation:
 
 /** Version of the IPE-DAQ object.
   * The version number is independent from the Orca version. */ 
-#define ORIPE_VERSION @"1.2-10"
+#define ORIPE_VERSION @"1.2-11"
 
 
