@@ -62,7 +62,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Lo
 
 	++ptr;		//point to event counter
 	
-	NSString* eventCounter    = [NSString stringWithFormat:@"Event     = %d\n",*ptr++];
+	NSString* eventCounter    = [NSString stringWithFormat:@"EventCount = %d\n",*ptr++];
 	NSString* timeStampHi     = [NSString stringWithFormat:@"Time Hi   = %d\n",*ptr++];
 	NSString* timeStampLo     = [NSString stringWithFormat:@"Time Lo   = %d\n",*ptr++];		
 
@@ -107,9 +107,9 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 	NSString* stationKey	= [self getStationKey: card];	
 		
 	++ptr;		//point to event count
-	NSString* eventCount = [NSString stringWithFormat:@"%d",*ptr];
-	[aDataSet loadGenericData:eventCount sender:self withKeys:@"EventCount",@"Ipe SLT", crateKey,stationKey,nil];
-	/*				
+	//NSString* eventCount = [NSString stringWithFormat:@"%d",*ptr];
+	//[aDataSet loadGenericData:eventCount sender:self withKeys:@"SLT",@"Ipe SLT", crateKey,stationKey,nil];
+					
 				
 	// Display data, ak 12.2.08
 	++ptr;		//point to trigger data
@@ -123,10 +123,10 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 	for (i=0;i<20;i++) xyProj[i] = 0;
 	for (k=0;k<100;k++) tyProj[k] = 0;
 	
-	for (k=0;k<20*pageSize;k++){
+	for (k=0;k<length;k++){
 		xyProj[k%20] = xyProj[k%20] | (pMult[k] & 0x3fffff);
 	}  
-	for (k=0;k<20*pageSize;k++){
+	for (k=0;k<length;k++){
 		if (xyProj[k%20]) {
 			tyProj[k/20] = tyProj[k/20] | (pMult[k] & 0x3fffff);
 		}
@@ -140,8 +140,9 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 	}
 	
 	
-	// Clear dataset
-    [aDataSet clear];	
+	// Clear SLT dataset
+    [aDataSet clearDataUpdate:NO  withKeys:@"SLT",@"TriggerData",crateKey,stationKey,nil];
+   
 	
 	for(j=0;j<22;j++){
 		//NSMutableString* s = [NSMutableString stringWithFormat:@"%2d: ",j];
@@ -151,14 +152,16 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 			//else							   [s appendFormat:@"."];
 			
 			if (((xyProj[i]>>j) & 0x1) == 0x1) {
-	          [aDataSet histogram2DX: i 
+	          [aDataSet loadData2DX: i 
                     y: j
+					z: 1
 					size: 130                          
 					sender: self 
 					withKeys: @"SLT", @"TriggerData",crateKey,stationKey,nil];
 			}
 		}
 		//[s appendFormat:@"   "];
+
 		
 		// trigger timing
 		for (k=0;k<pageSize;k++){
@@ -166,8 +169,9 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 			//else							   [s appendFormat:@"."];
 			
 			if (((tyProj[k]>>j) & 0x1) == 0x1 ){
-	          [aDataSet histogram2DX: k+30 
+	          [aDataSet loadData2DX: k+30 
                     y: j
+					z: 1
 					size: 130                          
 					sender: self 
 					withKeys: @"SLT", @"TriggerData",crateKey,stationKey,nil];
@@ -178,7 +182,7 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 	}
 	
 	//NSLogFont(aFont,@"\n");	
-	*/
+	
 					
     return length; //must return number of longs processed.
 }

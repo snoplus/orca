@@ -1617,6 +1617,14 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 			memcpy( pMult, buffer + iPageStart, (2000 - iPageStart)*sizeof(unsigned long));  
 			memcpy( pMult + 2000 - iPageStart, buffer, iPageStart*sizeof(unsigned long));  
 			
+			
+			if (usingPBusSimulation){
+			   // Write random trigger data
+			   for (i=0;i<2000;i++){
+			      pMult[i] = (eventCounter + i) & (0x3fffff);
+			   }
+            }
+			
 			int nTriggered = 0;
 		    unsigned long xyProj[20];
 			unsigned long tyProj[100];
@@ -1634,13 +1642,17 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 			// ship the pixel multiplicity data for all 20 cards 
 			// the data is send in hardware format: 100 x 1u of trigger data of all cards is collected.
 			// ak 3.3.08
-			unsigned long multiplicityRecord[3 + 20];
-			multiplicityRecord[0] = multiplicityId | (20 + 3);	
+			// Ship trigger memory and not projection only !!!
+            unsigned long multiplicityRecord[3 + 2000];
+            multiplicityRecord[0] = multiplicityId | (20*pageSize + 3);
+			
 			multiplicityRecord[1] = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16; 
 			multiplicityRecord[2] = eventCounter;
-			for(i=0;i<20;i++) multiplicityRecord[3+i] = xyProj[i];
-			[aDataPacket addLongsToFrameBuffer:multiplicityRecord length:20 + 3];
-			//[aDataPacket addLongsToFrameBuffer:multiplicityRecord length:20*pageSize + 3];
+			
+			// Ship trigger memory and not projection only !!!
+            memcpy(multiplicityRecord+3, pMult, 2000*sizeof(unsigned long));
+            [aDataPacket addLongsToFrameBuffer:multiplicityRecord length:20*pageSize + 3];
+ 
 
 
 			int lStart = (lTimeL >> 11) & 0x3ff;
