@@ -598,8 +598,6 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setUseFolderStructure:[decoder decodeBoolForKey:@"ORDataFileModelUseFolderStructure"]];
-    [self setFilePrefix:[decoder decodeObjectForKey:@"ORDataFileModelFilePrefix"]];
     [self setMaxFileSize:[decoder decodeFloatForKey:@"ORDataFileModelMaxFileSize"]];
     [self setLimitSize:[decoder decodeBoolForKey:@"ORDataFileModelLimitSize"]];
     int  version = [decoder decodeIntForKey:ORDataVersion];
@@ -635,6 +633,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
         [self setConfigFolder:[decoder decodeObjectForKey:ORDataConfigFolderName]];
     }
     
+	[self setFilePrefix:[decoder decodeObjectForKey:@"ORDataFileModelFilePrefix"]];
+	[self setUseFolderStructure:[decoder decodeBoolForKey:@"ORDataFileModelUseFolderStructure"]];
     [self setSaveConfiguration:[decoder decodeBoolForKey:ORDataSaveConfiguration]];
     
     [[self undoManager] enableUndoRegistration];
