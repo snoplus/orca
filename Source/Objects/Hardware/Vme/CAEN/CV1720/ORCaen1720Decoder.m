@@ -106,7 +106,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 							offset:0 //bytes!
 						  unitSize:2 //unit size in bytes!
 							sender:self  
-						  withKeys:@"CAEN", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+						  withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
 
 		}
 		else {
@@ -125,7 +125,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 							offset:0 //bytes!
 						  unitSize:2 //unit size in bytes!
 							sender:self  
-						  withKeys:@"CAEN", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+						  withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
 		}
 		
 		if(getRatesFromDecodeStage){
