@@ -119,10 +119,10 @@ io_service_t rootService()
 
 NSString* listMethods(Class aClass)
 {
-	return listMethodWithOptions(aClass,YES); 
+	return listMethodWithOptions(aClass,YES,YES); 
 }
 
-NSString* listMethodWithOptions(Class aClass,BOOL verbose)
+NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass)
 {
 	NSMutableString* resultString = [NSMutableString stringWithString:@""];
     struct objc_class *class = aClass;
@@ -152,10 +152,12 @@ NSString* listMethodWithOptions(Class aClass,BOOL verbose)
         }
     } while ( mlist = class_nextMethodList(aClass, &iterator) );
     
-    if (class->super_class == nil && verbose) [resultString appendFormat: @"%s has no superclass\n", name];
-    else {
-        if(verbose)[resultString appendFormat: @"\n%s superclass: %s\n", name, class->super_class->name];
-        [resultString appendString: listMethodWithOptions( class->super_class,verbose)];
-    }
+	if(showSuperClass){
+		if (class->super_class == nil && verbose) [resultString appendFormat: @"%s has no superclass\n", name];
+		else {
+			if(verbose)[resultString appendFormat: @"\n%s superclass: %s\n", name, class->super_class->name];
+			[resultString appendString: listMethodWithOptions( class->super_class,verbose,showSuperClass)];
+		}
+	 }
 	return resultString;
 }

@@ -28,6 +28,7 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 
+NSString* ORScriptTaskModelShowSuperClassChanged = @"ORScriptTaskModelShowSuperClassChanged";
 NSString* ORScriptTaskScriptChanged			= @"ORScriptTaskScriptChanged";
 NSString* ORScriptTaskNameChanged			= @"ORScriptTaskNameChanged";
 NSString* ORScriptTaskArgsChanged			= @"ORScriptTaskArgsChanged";
@@ -159,6 +160,20 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) showSuperClass
+{
+    return showSuperClass;
+}
+
+- (void) setShowSuperClass:(BOOL)aShowSuperClass
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowSuperClass:showSuperClass];
+    
+    showSuperClass = aShowSuperClass;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptTaskModelShowSuperClassChanged object:self];
+}
 
 - (BOOL) breakChain
 {
@@ -390,6 +405,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     
     [[self undoManager] disableUndoRegistration];
 	
+    [self setShowSuperClass:[decoder decodeBoolForKey:@"showSuperClass"]];
     [self setBreakChain:[decoder decodeBoolForKey:@"breakChain"]];
     [self setScript:[decoder decodeObjectForKey:@"script"]];
     [self setScriptName:[decoder decodeObjectForKey:@"scriptName"]];
@@ -416,6 +432,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:showSuperClass forKey:@"showSuperClass"];
     [encoder encodeObject:task forKey:@"task"];
     [encoder encodeObject:script forKey:@"script"];
     [encoder encodeObject:scriptName forKey:@"scriptName"];

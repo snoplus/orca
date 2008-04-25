@@ -28,6 +28,7 @@
 
 @interface ORScriptTaskController : OrcaObjectController {
 	IBOutlet ORTimedTextField*	statusField;
+	IBOutlet NSButton*			showSuperClassButton;
 	IBOutlet NSTextField*		nameField;
 	IBOutlet NSTextField*		runStatusField;
 	IBOutlet ORScriptView*		scriptView;
@@ -52,6 +53,7 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Interface Management
+- (void) showSuperClassChanged:(NSNotification*)aNote;
 - (void) scriptChanged:(NSNotification*)aNote;
 - (void) runningChanged:(NSNotification*)aNote;
 - (void) nameChanged:(NSNotification*)aNote;
@@ -62,6 +64,7 @@
 - (void) lastFileChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) showSuperClassAction:(id)sender;
 - (IBAction) listMethodsAction:(id) sender;
 - (IBAction) cancelLoadSaveAction:(id)sender;
 - (IBAction) loadSaveAction:(id)sender;

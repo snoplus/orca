@@ -5,8 +5,18 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
 				<key>tasksCompleted</key>
 				<string>id</string>
 			</dict>
@@ -88,6 +98,8 @@
 				<string>id</string>
 				<key>saveFileAction</key>
 				<string>id</string>
+				<key>showSuperClassAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORScriptTaskController</string>
@@ -127,6 +139,8 @@
 				<string>NSTextField</string>
 				<key>scriptView</key>
 				<string>ORScriptView</string>
+				<key>showSuperClassButton</key>
+				<string>NSButton</string>
 				<key>statusField</key>
 				<string>ORTimedTextField</string>
 			</dict>

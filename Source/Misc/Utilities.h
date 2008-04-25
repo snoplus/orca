@@ -34,4 +34,4 @@ id		ORKeyFromId(id anObj);
 int		random_range(int lowest_number, int highest_number);
 io_service_t rootService();
 NSString* listMethods(Class aClass);
-NSString* listMethodWithOptions(Class aClass,BOOL verbose);
+NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass);

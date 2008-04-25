@@ -42,6 +42,7 @@
 	id						inputValue;
 	BOOL					breakChain;
 	unsigned long		    dataId;
+    BOOL					showSuperClass;
 }
 
 
@@ -54,6 +55,8 @@
 - (void) runningChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (BOOL)	showSuperClass;
+- (void)	setShowSuperClass:(BOOL)aShowSuperClass;
 - (BOOL)	breakChain;
 - (void)	setBreakChain:(BOOL)aState;
 - (id)		inputValue;
@@ -97,6 +100,7 @@
 
 @end
 
+extern NSString* ORScriptTaskModelShowSuperClassChanged;
 extern NSString* ORScriptTaskScriptChanged;
 extern NSString* ORScriptTaskNameChanged;
 extern NSString* ORScriptTaskArgsChanged;

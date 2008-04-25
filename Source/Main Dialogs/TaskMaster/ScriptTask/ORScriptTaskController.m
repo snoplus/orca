@@ -104,6 +104,11 @@
 
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(showSuperClassChanged:)
+                         name : ORScriptTaskModelShowSuperClassChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -115,9 +120,15 @@
 	[self argsChanged:nil];
 	[self lastFileChanged:nil];
 	[self breakChainChanged:nil];
+	[self showSuperClassChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) showSuperClassChanged:(NSNotification*)aNote
+{
+	[showSuperClassButton setIntValue: [model showSuperClass]];
+}
 
 - (void) lastFileChanged:(NSNotification*)aNote
 {
@@ -179,11 +190,17 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) showSuperClassAction:(id)sender
+{
+	[model setShowSuperClass:[sender intValue]];	
+}
+
 - (IBAction) listMethodsAction:(id) sender
 {
 	NSString* theClassName = [classNameField stringValue];
 	if([theClassName length]){
-		NSLog(@"\n%@\n",listMethods(NSClassFromString(theClassName)));
+		NSLog(@"\n%@\n",listMethodWithOptions(NSClassFromString(theClassName),YES,[model showSuperClass]));
 	}
 }
 
