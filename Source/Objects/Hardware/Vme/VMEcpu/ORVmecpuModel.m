@@ -197,11 +197,21 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    NSEnumerator* e = [dataTakers objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        [obj runIsStopping:aDataPacket userInfo:userInfo];
+    }
 	[sbcLink runIsStopping:aDataPacket userInfo:userInfo];
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    NSEnumerator* e = [dataTakers objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        [obj runTaskStopped:aDataPacket userInfo:userInfo];
+    }
 	[sbcLink runTaskStopped:aDataPacket userInfo:userInfo];
 }
 
