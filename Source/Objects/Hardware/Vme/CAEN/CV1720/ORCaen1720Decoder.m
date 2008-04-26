@@ -114,9 +114,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 			
 			[tmpData setLength:2*eventSize*sizeof(unsigned short)];
 			unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-			int i;
+			int k;
 			int wordCount = 0;
-			for(i=0;i<eventSize;i++){
+			for(k=0;k<eventSize;k++){
 				dPtr[wordCount++] =	0x00000fff & *ptr;		
 				dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
 				ptr++;
@@ -144,7 +144,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 					}
 				}
 			}
-			getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan[i]];
+			getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:chan[j]];
 		}
 
 	}

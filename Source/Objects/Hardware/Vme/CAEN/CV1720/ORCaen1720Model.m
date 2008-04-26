@@ -844,7 +844,8 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 
 - (void) initBoard
 {
-	//[self clearAllMemory];
+    [self writeAcquistionControl:NO]; // Make sure it's off.
+	[self clearAllMemory];
 	[self softwareReset];
 	[self writeThresholds];
 	[self writeChannelConfiguration];
@@ -925,13 +926,12 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 
 - (void) writeBufferOrganization
 {
-	unsigned long aValue = eventSize;//(unsigned long)pow(2.,(float)eventSize);
+	unsigned long aValue = eventSize;//(unsigned long)pow(2.,(float)eventSize);	
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + reg[kBufferOrganization].addressOffset
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-	
 }
 
 - (void) writeChannelEnabledMask
