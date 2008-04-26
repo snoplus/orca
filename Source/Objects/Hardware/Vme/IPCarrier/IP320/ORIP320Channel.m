@@ -20,6 +20,7 @@
 
 
 #import "ORIP320Channel.h"
+#import "ORDataSet.h"
 
 @implementation ORIP320Channel
 
@@ -34,7 +35,9 @@
 // ===========================================================
 //  - dealloc:
 // ===========================================================
-- (void)dealloc {
+- (void)dealloc 
+{
+	[dataSet release];
 	[highAlarm clearAlarm];
 	[lowAlarm clearAlarm];
 	[highAlarm release];
@@ -64,6 +67,12 @@
     [parameters release];
     parameters = aParameters;
 }
+
+- (void) showTimeSeries
+{
+	[dataSet doDoubleClick:self];
+}
+
 
 - (void) unableToSetNilForKey:(NSString*)aKey
 {
@@ -202,17 +211,20 @@
 	}
 }
 
-- (BOOL) setChannelValue:(int)aValue
+- (BOOL) setChannelValue:(int)aValue time:(time_t)aTime
 {    
 	BOOL changed = NO;
 	@synchronized(self){
 		rawValue = aValue;
-		double convertedValue = aValue*[[parameters objectForKey:k320ChannelSlope] doubleValue] + [[parameters objectForKey:k320ChannelIntercept] doubleValue];
+		float convertedValue = aValue*[[parameters objectForKey:k320ChannelSlope] doubleValue] + [[parameters objectForKey:k320ChannelIntercept] doubleValue];
 		changed = (convertedValue!=[[parameters objectForKey:k320ChannelValue] doubleValue]);
-		NSNumber* theConvertedValue = [NSNumber numberWithDouble:convertedValue];
+		NSNumber* theConvertedValue = [NSNumber numberWithFloat:convertedValue];
 		[parameters setObject:theConvertedValue forKey:k320ChannelValue];
 		[parameters setObject:[NSNumber numberWithInt:rawValue] forKey:k320ChannelRawValue];
 		[self checkAlarm];
+		if(!dataSet)dataSet = [[ORDataSet alloc] initWithKey:@"IP320" guardian:nil];
+		[dataSet loadTimeSeries:convertedValue atTime:aTime sender:self withKeys:[NSString stringWithFormat:@"%d",[self channel]],nil];
+
 	}
     return changed;
 }

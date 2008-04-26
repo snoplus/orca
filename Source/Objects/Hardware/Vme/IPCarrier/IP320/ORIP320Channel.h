@@ -36,6 +36,8 @@
 #define k320ChannelLowValue @"k320ChannelLowValue"
 #define k320ChannelHighValue @"k320ChannelHighValue"
 
+@class ORDataSet;
+
 @interface ORIP320Channel : NSObject {
 	id			adcCard;
     NSMutableDictionary* parameters;
@@ -43,6 +45,7 @@
 	ORAlarm*	highAlarm;
 	double		maxValue;
 	int			rawValue;
+	ORDataSet*	dataSet;
 }
 - (id) initWithAdc:(id)anAdcCard channel:(unsigned short)aChannel;
 
@@ -55,10 +58,11 @@
 - (int)  gain;
 - (int)  channel;
 - (BOOL) readEnabled;
-- (BOOL) setChannelValue:(int)aValue;
+- (BOOL) setChannelValue:(int)aValue time:(time_t)aTime;
 - (void) checkDefaults;
 - (double) maxValue;
 - (int) rawValue;
+- (void) showTimeSeries;
 @end
 
 @interface NSObject (IP320Card)

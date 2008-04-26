@@ -126,7 +126,7 @@ struct{
 - (NSString*)      getRegisterName:(short) anIndex;
 - (short)          getNumRegisters;
 - (void)           loadConstants:(unsigned short)aChannel;
-- (unsigned short) readAdcChannel:(unsigned short)aChannel;
+- (unsigned short) readAdcChannel:(unsigned short)aChannel time:(time_t)aTime;
 - (void)           readAllAdcChannels;
 - (void)		   enablePollAll:(BOOL)state;
 - (void)		   enableAlarmAll:(BOOL)state;
@@ -135,7 +135,7 @@ struct{
 - (void) setDataId: (unsigned long) DataId;
 - (unsigned long) lowMask;
 - (unsigned long) highMask;
-
+- (void) showTimeSeries:(int)aChan;
 
 #pragma mark ¥¥¥Adc Processing Protocol
 - (void)processIsStarting;

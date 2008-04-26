@@ -300,6 +300,11 @@ static struct {
     return hasBeenPolled;
 }
 
+- (void) showTimeSeries:(int)aChan
+{
+	[[chanObjs objectAtIndex:aChan] showTimeSeries];
+}
+
 #pragma mark ¥¥¥Hardware Access
 - (unsigned long) getRegisterAddress:(short) aRegister
 {
@@ -377,7 +382,8 @@ static struct {
 	return value;
 }
 
-- (unsigned short) readAdcChannel:(unsigned short)aChannel//Brandon's Version
+- (unsigned short) readAdcChannel:(unsigned short)aChannel time:(time_t)aTime
+//Brandon's Version
 {
 	int changeCount = 0;
 	unsigned short value = 0;
@@ -394,7 +400,7 @@ static struct {
 			errorLocation = @"Adc Read";
 			value = [self readDataBlock];
 			corrected_value = [self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] countActual:value];
-			if([[chanObjs objectAtIndex:aChannel] setChannelValue:corrected_value])changeCount++;
+			if([[chanObjs objectAtIndex:aChannel] setChannelValue:corrected_value time:aTime])changeCount++;
 		NS_HANDLER
 			NSLogError(@"",[NSString stringWithFormat:@"IP320 %d,%@",[self slot],[self identifier]],errorLocation,nil);
 			[NSException raise:[NSString stringWithFormat:@"IP320 Read Adc Channel %d Failed",aChannel] format:@"Error Location: %@",errorLocation];
@@ -576,13 +582,14 @@ static struct {
 - (void) readAllAdcChannels
 {
 	@synchronized(self) {
+		//get the time(UT!)
+		time_t		theTime;
+		time(&theTime);
+		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t ut_time = mktime(theTimeGMTAsStruct);
+		
 		NSString*   outputString = nil;
 		if(logToFile) {
-			//get the time(UT!)
-			time_t		theTime;
-			time(&theTime);
-			struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-			time_t ut_time = mktime(theTimeGMTAsStruct);
 			outputString = [NSString stringWithFormat:@"%u ",ut_time];
 		}
 
@@ -590,7 +597,7 @@ static struct {
 		for(chan=0;chan<kNumIP320Channels;chan++){
 			if([[chanObjs objectAtIndex:chan] readEnabled]){
 				if(mode == 0 && chan>=20)break;	//if differential, don't read chan >= 20
-				[self readAdcChannel:chan];
+				[self readAdcChannel:chan time:ut_time];
 				if(logToFile)outputString = [outputString stringByAppendingFormat:@"%6.3f ",[self convertedValue:chan]];
 			}
 			else if(logToFile) outputString = [outputString stringByAppendingString:@"0 "];

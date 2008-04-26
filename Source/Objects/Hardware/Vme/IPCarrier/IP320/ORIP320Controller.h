@@ -69,6 +69,7 @@
 - (void) modeChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) doubleClick:(id)sender;
 - (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) logToFileAction:(id)sender;
 - (IBAction) displayRawAction:(id)sender;

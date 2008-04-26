@@ -82,7 +82,10 @@
         [popupCell addItemWithTitle:[NSString stringWithFormat:@"%d",val]];
         val *= 2;
 	}
-		
+	
+	[valueTable1 setDoubleAction:@selector(doubleClick:)];
+	[valueTable2 setDoubleAction:@selector(doubleClick:)];
+	
     [super awakeFromNib];
 }
 
@@ -219,6 +222,13 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) doubleClick:(id)sender
+{
+	int chan = [sender selectedRow];
+	if(sender == valueTable1)		[model showTimeSeries:chan];
+	else if(sender == valueTable2)	[model showTimeSeries:chan+20];
+}
+
 - (IBAction) shipRecordsAction:(id)sender
 {
 	[model setShipRecords:[sender intValue]];	
