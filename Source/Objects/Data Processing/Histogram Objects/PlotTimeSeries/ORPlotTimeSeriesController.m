@@ -41,7 +41,7 @@
 {
     [super awakeFromNib];
 	[[plotter yScale]  setInteger:NO];
-    [[plotter yScale] setRngLimitsLow:-500 withHigh:5E9 withMinRng:1];
+    [[plotter yScale] setRngLimitsLow:-500 withHigh:5E9 withMinRng:.5];
     [[plotter yScale] setRngDefaultsLow:0 withHigh:500];
 	[self updateWindow];
 
