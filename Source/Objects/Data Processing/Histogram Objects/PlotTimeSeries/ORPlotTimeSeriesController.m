@@ -128,7 +128,7 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
 {
-	if([[tableColumn identifier] isEqualToString:@"Value"])return [NSNumber numberWithInt:[[model timeSeries] valueAtIndex:row]];
+	if([[tableColumn identifier] isEqualToString:@"Value"])return [NSNumber numberWithFloat:[[model timeSeries] valueAtIndex:row]];
 	else return [NSDate dateWithTimeIntervalSince1970:[[model timeSeries] timeAtIndex:row]];
 }
 
