@@ -21,6 +21,7 @@
 
 #import "ORIP320Channel.h"
 #import "ORDataSet.h"
+#import "ORIP320Model.h"
 
 @implementation ORIP320Channel
 
@@ -70,7 +71,8 @@
 
 - (void) showTimeSeries
 {
-	[dataSet doDoubleClick:self];
+	ORDataSet* ds = [dataSet objectForKey:[NSString stringWithFormat:@"IP320,%d,%d,%@,%d",[[adcCard guardian] crateNumber],[[adcCard guardian] slot],[adcCard identifier],[self channel]]];
+	[ds doDoubleClick:self];
 }
 
 
@@ -223,7 +225,7 @@
 		[parameters setObject:[NSNumber numberWithInt:rawValue] forKey:k320ChannelRawValue];
 		[self checkAlarm];
 		if(!dataSet)dataSet = [[ORDataSet alloc] initWithKey:@"IP320" guardian:nil];
-		[dataSet loadTimeSeries:convertedValue atTime:aTime sender:self withKeys:[NSString stringWithFormat:@"%d",[self channel]],nil];
+		[dataSet loadTimeSeries:convertedValue atTime:aTime sender:self withKeys:[NSString stringWithFormat:@"IP320,%d,%d,%@,%d",[[adcCard guardian] crateNumber],[[adcCard guardian] slot],[adcCard identifier],[self channel]],nil];
 
 	}
     return changed;

@@ -64,6 +64,7 @@
 - (void) removeObjectForKey: (id) aKey;
 - (void) processResponse:(NSDictionary*)aResponse;
 - (NSArray*) collectionOfDataSets;
+- (id) objectForKey: (id) aKey;
 
 #pragma mark •••Level Info
 - (BOOL) leafNode;
