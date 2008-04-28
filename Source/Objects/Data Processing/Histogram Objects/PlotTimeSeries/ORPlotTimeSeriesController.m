@@ -40,7 +40,7 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    [[plotter yScale] setRngLimitsLow:-500 withHigh:5E9 withMinRng:25];
+    [[plotter yScale] setRngLimitsLow:-500 withHigh:5E9 withMinRng:1];
     [[plotter yScale] setRngDefaultsLow:0 withHigh:500];
 	[self updateWindow];
 
