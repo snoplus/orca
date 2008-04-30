@@ -421,24 +421,23 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
             
 int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
-    uint32_t baseAddress	= config->card_info[index].base_add;
+    uint32_t baseAddress		= config->card_info[index].base_add;
     uint32_t numEventsAvailReg	= config->card_info[index].deviceSpecificData[0];
-    uint32_t eventSizeReg	= config->card_info[index].deviceSpecificData[1];
-    uint32_t fifoBuffReg	= config->card_info[index].deviceSpecificData[2];
-    uint32_t fifoAddressMod	= config->card_info[index].deviceSpecificData[3];
-    uint32_t fifoBuffSize	= config->card_info[index].deviceSpecificData[4];
-    uint32_t location   	= config->card_info[index].deviceSpecificData[5];
+    uint32_t eventSizeReg		= config->card_info[index].deviceSpecificData[1];
+    uint32_t fifoBuffReg		= config->card_info[index].deviceSpecificData[2];
+    uint32_t fifoAddressMod		= config->card_info[index].deviceSpecificData[3];
+    uint32_t fifoBuffSize		= config->card_info[index].deviceSpecificData[4];
+    uint32_t location			= config->card_info[index].deviceSpecificData[5];
     uint32_t numBLTEventsReg	= config->card_info[index].deviceSpecificData[7];
     uint32_t theMod             = config->card_info[index].add_mod;
 	
-    static TUVMEDevice* caenDMADevice = 0;
+    TUVMEDevice* caenDMADevice = 0;
     TUVMEDevice* memMapHandle = get_new_device(baseAddress, theMod, 4, 0);
     if ( memMapHandle == NULL ) return config->card_info[index].next_Card_Index; 
+
     uint32_t numEventsToReadout = 0;
-    uint32_t theStatus;
-    int32_t result;
-    result = read_device(memMapHandle,(char*)&numEventsToReadout,
-                         sizeof(numEventsToReadout),numBLTEventsReg); 
+	
+    int32_t result = read_device(memMapHandle,(char*)&numEventsToReadout,sizeof(numEventsToReadout),numBLTEventsReg); 
     if ( result != sizeof(numEventsToReadout) ) { 
       LogBusError("CAEN 0x%0x Couldn't read register", numBLTEventsReg);
       close_device(memMapHandle);
@@ -451,19 +450,16 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
       close_device(memMapHandle);
       return config->card_info[index].next_Card_Index;
     }
-    //long access, the status reg
-    result = read_device(memMapHandle,(char*)&theStatus,4,numEventsAvailReg); 
-    if(result == sizeof(theStatus) && (theStatus > 0)){
-      //at least one event is ready
+    
+	uint32_t numEventsAvail;	
+	result = read_device(memMapHandle,(char*)&numEventsAvail,4,numEventsAvailReg);	//long access, the status reg
+    if(result == sizeof(numEventsAvail) && (numEventsAvail > 0)){					//if at least one event is ready
       uint32_t eventSize;
-      //long access, the event size 
-      result    = read_device(memMapHandle,(char*)&eventSize,4,eventSizeReg); 
+      result    = read_device(memMapHandle,(char*)&eventSize,4,eventSizeReg);		//long access, the event size 
       if(result == sizeof(eventSize) && eventSize>0){
          uint32_t startIndex = dataIndex;
          uint32_t dataId     = config->card_info[index].hw_mask[0];
-         //uint32_t slot       = config->card_info[index].slot;
-         //uint32_t crate      = config->card_info[index].crate;
-         if ( numEventsToReadout*(eventSize+1) + 2> kMaxDataBufferSize-dataIndex ) {
+        if ( numEventsToReadout*(eventSize+1) + 2> kMaxDataBufferSize-dataIndex ) {
            /* We can't read out. */ 
            LogError("Temp buffer too small, requested (%d) > available (%d)",
                      numEventsToReadout*(eventSize+1)+2, 
@@ -471,9 +467,10 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
            close_device( memMapHandle );
            return config->card_info[index].next_Card_Index;
          } 
+		 
+		 //load ORCA header info
          data[dataIndex++] = dataId | (2+numEventsToReadout*eventSize);
-         //crate, card, pack2.5
-         data[dataIndex++] = location; 
+         data[dataIndex++] = location; //location = crate and card number
 
          set_dma_no_increment(false);
          caenDMADevice = get_dma_device(fifoBuffReg+baseAddress, fifoAddressMod, 8);
@@ -512,7 +509,8 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
          }
          // Reading out with a BERR coudl leave an extra word on the end, get rid of it.
          dataIndex -= numberOfEndWords;
-      } else LogBusError("Rd Err: V1720 0x%04x %s",baseAddress,strerror(errno));                
+      } 
+	  else LogBusError("Rd Err: V1720 0x%04x %s",baseAddress,strerror(errno));                
     }
 
     close_device( memMapHandle );
