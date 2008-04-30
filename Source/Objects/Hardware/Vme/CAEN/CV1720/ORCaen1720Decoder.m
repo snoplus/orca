@@ -57,7 +57,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	int card  = (*ptr& 0x001f0000)>>16;
 	NSString* crateKey	= [self getCrateKey: crate ];
 	NSString* cardKey	= [self getCardKey:  card];
-	BOOL packed = *ptr & 0x00000001;
 	
 	ptr++; //point to start of event
 	unsigned long eventSize = *ptr & 0x0fffffff;
@@ -82,52 +81,23 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	eventSize = eventSize/numChans;
     int j;
 	for(j=0;j<numChans;j++){
-		if(packed){
-			
-			NSMutableData* tmpData = [NSMutableData dataWithCapacity:3*eventSize*sizeof(unsigned short)];
-			
-			[tmpData setLength:3*eventSize*sizeof(unsigned short)];
-			unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-			int i;
-			int wordCount = 0;
-			unsigned long aWordMask = 0x3f;
-			for(i=0;i<eventSize*2;i++){
-				dPtr[wordCount] =	aWordMask & *ptr;
-				aWordMask = aWordMask << 6;
-				if(aWordMask == 0xc0000000){
-					ptr++;
-					aWordMask  = 0x3f;
-				}
-				dPtr[wordCount] |= (aWordMask & *ptr)<<12;
-				wordCount++;
-			}
-				
-			[aDataSet loadWaveform:tmpData 
-							offset:0 //bytes!
-						  unitSize:2 //unit size in bytes!
-							sender:self  
-						  withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
-
-		}
-		else {
-			NSMutableData* tmpData = [NSMutableData dataWithCapacity:2*eventSize*sizeof(unsigned short)];
-			
-			[tmpData setLength:2*eventSize*sizeof(unsigned short)];
-			unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-			int k;
-			int wordCount = 0;
-			for(k=0;k<eventSize;k++){
-				dPtr[wordCount++] =	0x00000fff & *ptr;		
-				dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
-				ptr++;
-			}
-			[aDataSet loadWaveform:tmpData 
-							offset:0 //bytes!
-						  unitSize:2 //unit size in bytes!
-							sender:self  
-						  withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
-		}
+		NSMutableData* tmpData = [NSMutableData dataWithCapacity:2*eventSize*sizeof(unsigned short)];
 		
+		[tmpData setLength:2*eventSize*sizeof(unsigned short)];
+		unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+		int k;
+		int wordCount = 0;
+		for(k=0;k<eventSize;k++){
+			dPtr[wordCount++] =	0x00000fff & *ptr;		
+			dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
+			ptr++;
+		}
+		[aDataSet loadWaveform:tmpData 
+						offset:0 //bytes!
+					  unitSize:2 //unit size in bytes!
+						sender:self  
+					  withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+					  
 		if(getRatesFromDecodeStage){
 			NSString* aKey = [crateKey stringByAppendingString:cardKey];
 			if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];

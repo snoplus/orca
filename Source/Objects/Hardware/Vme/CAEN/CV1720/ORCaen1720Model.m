@@ -366,7 +366,10 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setChannelConfigMask:channelConfigMask];
     
     channelConfigMask = aChannelConfigMask;
-
+	
+	//can't get the packed form to work so just make sure that bit is cleared.
+	channelConfigMask &= ~(1L<<11);
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelChannelConfigMaskChanged object:self];
 }
 
@@ -1089,16 +1092,11 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	statusReg		= [self baseAddress] + reg[kAcqStatus].addressOffset;
 	eventSizeReg	= [self baseAddress] + reg[kEventSize].addressOffset;
 	dataReg			= [self baseAddress] + reg[kOutputBuffer].addressOffset;
-	location		=  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16) | ((channelConfigMask&0x800)>>11);
+	location		=  (([self crateNumber]&0x01e)<<21) | (([self slot]& 0x0000001f)<<16);
 	isRunning		= NO;
     
     BOOL sbcRun = [[userInfo objectForKey:kSBCisDataTaker] boolValue];
-	/*if(sbcRun){
-		NSLog(@"the SBC is in control\n");
-	}
-	else {
-		NSLog(@"ORCA is in control\n");
-	}*/
+
     [self startRates];
     [self initBoard];
     [self setNumberBLTEventsToReadout:1];  // Hardcode this for now
