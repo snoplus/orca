@@ -22,6 +22,8 @@
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORCaen1720Model.h"
+#import <time.h>
+
 /*
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
@@ -52,6 +54,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 {
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
+
 	ptr++; //point to location
 	int crate = (*ptr&0x01e00000)>>21;
 	int card  = (*ptr& 0x001f0000)>>16;
@@ -80,24 +83,38 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	eventSize -= 4;
 	eventSize = eventSize/numChans;
     int j;
+    
+    BOOL fullDecode = NO;
+    if(numChans){
+        time_t now;
+        time(&now);
+        if(now - lastTime >= 1){
+            fullDecode = YES;
+            lastTime = now;
+        }
+    }
+    
 	for(j=0;j<numChans;j++){
-		NSMutableData* tmpData = [NSMutableData dataWithCapacity:2*eventSize*sizeof(unsigned short)];
-		
-		[tmpData setLength:2*eventSize*sizeof(unsigned short)];
-		unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-		int k;
-		int wordCount = 0;
-		for(k=0;k<eventSize;k++){
-			dPtr[wordCount++] =	0x00000fff & *ptr;		
-			dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
-			ptr++;
-		}
-		[aDataSet loadWaveform:tmpData 
-						offset:0 //bytes!
-					  unitSize:2 //unit size in bytes!
-						sender:self  
-					  withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
-					  
+        if(fullDecode){
+            NSMutableData* tmpData = [[[NSMutableData alloc] initWithLength:2*eventSize*sizeof(unsigned short)] autorelease];
+            
+            unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+            int k;
+            int wordCount = 0;
+            for(k=0;k<eventSize;k++){
+                dPtr[wordCount++] =	0x00000fff & *ptr;		
+                dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
+                ptr++;
+            }
+            [aDataSet loadWaveform:tmpData 
+                            offset:0 //bytes!
+                          unitSize:2 //unit size in bytes!
+                            sender:self  
+                          withKeys:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+        }
+        else {
+            [aDataSet incrementCount:@"CAEN1720", @"Waveforms",crateKey,cardKey,[self getChannelKey: chan[j]],nil];
+        }
 		if(getRatesFromDecodeStage){
 			NSString* aKey = [crateKey stringByAppendingString:cardKey];
 			if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];

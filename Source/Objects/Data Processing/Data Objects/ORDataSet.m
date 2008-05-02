@@ -797,6 +797,38 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 }
 
 
+- (void) incrementCount:(NSString*)firstArg,...
+{
+    //an optimization.... some times a decoder may choose increment the count but not do a full decode. 
+    va_list myArgs;
+    va_start(myArgs,firstArg);
+    
+    NSString* s             = firstArg;
+    ORDataSet* currentLevel = self;
+    ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCounts];
+    
+    do {
+        nextLevel = [currentLevel objectForKey:s];
+        if(nextLevel){
+            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+            currentLevel = nextLevel;
+        }
+        else {
+            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+            [currentLevel setObject:nextLevel forKey:s];
+            currentLevel = nextLevel;
+            [nextLevel release];
+        }
+        [currentLevel incrementTotalCounts];
+        
+    } while(s = va_arg(myArgs, NSString *));
+    
+    va_end(myArgs);
+    
+}
+
+
 - (void) loadWaveform:(NSData*)aWaveForm offset:(unsigned long)anOffset unitSize:(int)aUnitSize mask:(unsigned long)aMask sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
     va_list myArgs;

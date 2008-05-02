@@ -70,6 +70,7 @@
 - (BOOL) leafNode;
 
 #pragma mark •••Data Insertion
+- (void) incrementCount:(NSString*)firstArg,...;
 - (void) loadHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray;
 - (void) loadHistogram2D:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray;
 - (void) histogram:(unsigned long)aValue numBins:(unsigned long)numBins sender:(id)obj  withKeys:(NSString*)key,...;
