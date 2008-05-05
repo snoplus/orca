@@ -750,10 +750,10 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 - (IBAction) autoScale:(id)sender
 {
-    int          i, minX, maxX;
-    double          t, minY, maxY;
+    int         i, minX, maxX;
+    double      t, minY, maxY;
     double	    rngY = 0;
-    
+    double		minYRange = [mYScale minimumRange];
     /* determine the maximum value of the data */
     minX = [mXScale minValue];
     maxX = MIN([mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex],[mXScale maxValue]);
@@ -808,7 +808,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
    // double mmin = 0;
    // if(minY<0)mmin = -250 - 0.2*rngY;
     
-    [mYScale setRngLimitsLow:-5E6 withHigh:5E9 withMinRng:25];
+    [mYScale setRngLimitsLow:-5E6 withHigh:5E9 withMinRng:minYRange];
     [mYScale setRngLow:MAX(0,minY) withHigh:mmax];
     //[mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:100];
     //[mXScale setRngLow:0 withHigh:maxX];
