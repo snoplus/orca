@@ -469,7 +469,20 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = Source/Objects/Hardware/IPE
+INPUT                  = Source/Objects/Hardware/IPE \
+                         ../OrcaRoot/Applications/orcaroot_ipe_katrin.cc \
+                         ../OrcaRoot/Decoders/ORKatrinFLTEnergyDecoder.cc \
+                         ../OrcaRoot/Decoders/ORKatrinFLTEnergyDecoder.hh \
+                         ../OrcaRoot/Decoders/ORKatrinFLTWaveformDecoder.cc \
+                         ../OrcaRoot/Decoders/ORKatrinFLTWaveformDecoder.hh \
+                         ../OrcaRoot/Processors/ORKatrinFLTEnergyTreeWriter.cc \
+                         ../OrcaRoot/Processors/ORKatrinFLTEnergyTreeWriter.hh \
+                         ../OrcaRoot/Processors/ORKatrinFLTWaveformTreeWriter.cc \
+                         ../OrcaRoot/Processors/ORKatrinFLTWaveformTreeWriter.hh \
+                         ../OrcaRoot/Processors/ORKatrinFLTWaveformDumper.cc \
+                         ../OrcaRoot/Processors/ORKatrinFLTWaveformDumper.hh \
+#                         ../OrcaRoot/Processors/ \
+ #
 
 # This tag can be used to specify the character encoding of the source files that 
 # doxygen parses. Internally doxygen uses the UTF-8 encoding, which is also the default 
