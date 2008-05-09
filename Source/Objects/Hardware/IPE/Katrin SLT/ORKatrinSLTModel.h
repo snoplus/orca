@@ -19,21 +19,25 @@
 //-------------------------------------------------------------
 
 
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 #import "ORIpeSLTModel.h"
 #import "ORDataTaker.h"
+//#import "ORKatrinFLTModel.h"//SLT needs to call some FLT code to init histogramming -tb- 2008-04-24
 
 @class ORReadOutList;
 @class ORDataPacket;
 @class TimedWorker;
+@class ORKatrinFLTModel;
 
 
 @interface ORKatrinSLTModel : ORIpeSLTModel 
 {
-		
+		//for hw histogram access
+        ORKatrinFLTModel *firstHistoModeFLT;
+        BOOL fltsInHistoDaqMode;
 }
 
-#pragma mark ¥¥¥Initialization
+#pragma mark â€¢â€¢â€¢Initialization
 - (id)   init;
 - (void) dealloc;
 - (void) setUpImage;
@@ -41,11 +45,17 @@
 
 - (void) initBoard;
 
-#pragma mark ¥¥¥DataTaker
+#pragma mark â€¢â€¢â€¢â€¢hw histogram access
+- (int) waitForSecondStrobeOfFLT:(ORKatrinFLTModel *)flt;
+- (void) startAllHistoModeFLTs;
+- (void) stopAllHistoModeFLTs;
+
+#pragma mark â€¢â€¢â€¢DataTaker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
 @end
 
+extern NSString* ORKatrinSLTModelHW_ResetChanged;
 

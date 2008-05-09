@@ -20,6 +20,7 @@
 
 
 #import "ORKatrinSLTModel.h"
+#import "ORKatrinFLTModel.h"//SLT needs to call some FLT code to init and stop histogramming -tb- 2008-04-24
 
 
 @implementation ORKatrinSLTModel
@@ -51,6 +52,10 @@
 
 - (void) initBoard
 {
+//TODO: called from ORIpeSLTModel ... - (void) runIsAboutToStart:(NSNotification*)aNote -tb- 2008-03-28
+//TODO: maybe ORKatrinSLTModel should reimplement ... runIsAboutToStart: ... ??? -tb-
+//TODO: ... and the notifications, too? -tb-
+//TODO: should check if we can start the run (see comments in ORIpeSLTModel) -tb- 2008-03-28
    // Define variables that are not in the dialog
    //
    // Control register
@@ -71,10 +76,154 @@
 }
 
 
-#pragma mark ���Data Taker
+#pragma mark ••••hw histogram access
+
+// this is for testing and debugging the hardware histogramming (espec. timing) -tb- 2008-04-11
+#define USE_TILLS_HISTO_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
+#ifdef USE_TILLS_HISTO_DEBUG_MACRO
+  #define    DebugHistoTB(x) x
+#else
+  #define    DebugHistoTB(x) 
+#endif
+
+/** Wait for the second strobe of the given FLT card. Returns current second.
+  * Will wait for max. 1.1 second
+  */
+- (int) waitForSecondStrobeOfFLT:(ORKatrinFLTModel *)flt;
+{
+    if(!flt) return -1;
+    int i,lastSec,sec;
+    lastSec=[flt readTime];
+    for(i=0;i<10000;i++){
+        sec = [flt readTime];
+        if(sec!=lastSec){
+            DebugHistoTB(  NSLog(@"SLT:waitForSecondStrobeOfFLT until i=%i (x 100 usecs) for page toggle\n",i);  )
+            return sec;
+        }
+        usleep(100);
+    }
+    DebugHistoTB(  NSLog(@"SLT:waitForSecondStrobeOfFLT until i=%i (x 100 usecs) for page toggle\n",i);  )
+    return -2;
+}
+
+/** Set EMin, TRun, BinWidth and start with according clear bit.
+  */
+- (void) startAllHistoModeFLTs
+{
+    //
+    struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+    //timing
+        int currentSec;
+        int currentUSec;
+    gettimeofday(&t,NULL);
+    currentSec = t.tv_sec;  
+    currentUSec = t.tv_usec;  
+
+		NSArray* cards = [[self crate] orcaObjects];
+		NSEnumerator* e = [cards objectEnumerator];
+		id card;
+        ORKatrinFLTModel *flt;
+		while (card = [e nextObject]){
+			if([card isKindOfClass:NSClassFromString(@"ORKatrinFLTModel")]){
+                flt=(ORKatrinFLTModel *)card;
+                if([flt daqRunMode] == kKatrinFlt_DaqHistogram_Mode){
+                    DebugHistoTB( NSLog(@"SLT:startAllHistoModeFLTs: init+starting FLT %i\n",[card slot]); )
+                    //set timing info
+                    [flt setHistoStartWaitingForPageToggle: FALSE];
+                    [flt setHistoLastActivePage: [flt readCurrentHistogramPageNum]];
+                    [flt setHistoLastPageToggleSec: currentSec usec: currentUSec];
+                    // write TRun, EMin, BinWidth
+                    //histogramming registers (now I use a broadcast: chan 31)
+                    [flt writeEMin:[flt histoMinEnergy] forChan: 31];
+                    [flt writeTRun:[flt histoRunTime] forChan: 31];
+                    [flt writeHistogramSettingsForChan:31 mode: [flt histoStopIfNotCleared]  binWidth: [flt histoBinWidth] ];
+                    [flt writeStartHistogramForChan:31 withClear: [flt histoClearAtStart] ];
+                }
+			}
+		}
+    //[firstHistoModeFLT writeHistogramControlRegisterForSlot: 31 chan: 31 value: 1]; //broadcast to the crate
+}
+
+- (void) stopAllHistoModeFLTs;
+{
+    //TODO: could loop over all FLTs and stop only the ones which are really in histogramming mode
+    if(firstHistoModeFLT){
+        [firstHistoModeFLT writeHistogramControlRegisterForSlot: 31 chan: 31 value: 0]; //broadcast to the crate
+        [self waitForSecondStrobeOfFLT:firstHistoModeFLT];
+    }
+		NSArray* cards = [[self crate] orcaObjects];
+		NSEnumerator* e = [cards objectEnumerator];
+		id card;
+        ORKatrinFLTModel *flt;
+		while (card = [e nextObject]){
+			if([card isKindOfClass:NSClassFromString(@"ORKatrinFLTModel")]){
+                flt=(ORKatrinFLTModel *)card;
+                if([flt daqRunMode] == kKatrinFlt_DaqHistogram_Mode){
+                    DebugHistoTB( NSLog(@"SLT:stopAllHistoModeFLTs: stopping FLT %i\n",[card slot]); )
+                    // left over for the FLT runTaskStopped
+                }
+			}
+		}
+}
+
+#pragma mark •••Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
+    
+    //TEST: accessing the FLTs -tb-
+    NSLog(@"==== ORKatrinSLTModel::runTaskStarted ====\n");
+    #if 0
+    NSLog(@"Loop 1:  loop over FLTs ---------\n");  //NO! -tb-
+    //lets cycle through the FLTs
+    int i;
+    for(i=0; i<kNumFLTChannels; i++){
+        ORKatrinFLTModel * flt=[dataTakers objectAtIndex:i];
+        if(flt) NSLog(@"Loop 1: found a object in for loop at i= %i\n",i);
+    }
+    #endif
+    #if 0
+    NSLog(@"Loop 2:  loop over FLTs --------- dataTakers %p\n",dataTakers);  //NO! -tb-
+    NSEnumerator* e = [dataTakers objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        //[obj runTaskStarted:aDataPacket userInfo:userInfo];
+        if(obj) NSLog(@"Loop 2: found a object in NSEnumerator ptr= %p\n",obj);
+    }
+    #endif
+    #if 0
+    //readOutGroup ->children
+    NSLog(@"Loop 4:  loop over FLTs -----readOutGroup ->children----\n");  //NO! -tb-
+    //lets cycle through the FLTs
+    int i;
+    for(i=0; i<[[self children] count]; i++){
+        ORKatrinFLTModel * flt=[[self children] objectAtIndex:i];
+        if(flt) NSLog(@"Loop 4: found a object in for loop at i= %i\n",i);
+    }
+    #endif
+    #if 0
+    {
+        NSLog(@"Loop 3:  loop over FLTs ---------\n");  //YES!!!!! -tb-
+		NSArray* cards = [[self crate] orcaObjects];
+		NSEnumerator* e = [cards objectEnumerator];
+		id card;
+		while (card = [e nextObject]){
+			if([card isKindOfClass:NSClassFromString(@"ORIpeFLTModel")]){
+                // if we have ORKatrinFLTModel cards, this search does not match
+                NSLog(@"  Loop 3: found a ORIpeFLTModel in slot %i\n",[card slot]);
+			}
+			if([card isKindOfClass:NSClassFromString(@"ORIpeCard")]){
+                // if we have ORKatrinFLTModel cards, this search does not match
+                NSLog(@"  Loop 3: found a ORIpeCard in slot %i\n",[card slot]);
+			}
+			if([card isKindOfClass:NSClassFromString(@"ORKatrinFLTModel")]){
+				//try to access a card. if it throws then we have to load the FPGAs
+				//[card readControlStatus];
+				//break;	//only need to try one
+                NSLog(@"  Loop 3: found a ORKatrinFLTModel in slot %i\n",[card slot]);
+			}
+		}
+    }
+    #endif
     [self clearExceptionCount];
 	
 	
@@ -124,6 +273,59 @@
 
 	first = YES;
 	
+    //place here the startup for the histogram mode: stop (if running), clear, start (in takeData?) -tb-
+    #if 1
+    {
+        NSLog(@"Loop over FLTs ---------\n");  //YES!!!!! -tb-
+		NSArray* cards = [[self crate] orcaObjects];
+		NSEnumerator* e = [cards objectEnumerator];
+		id card;
+        ORKatrinFLTModel *flt;
+        firstHistoModeFLT=0;//remember first FLT in list -tb-
+        fltsInHistoDaqMode=FALSE; //make this global
+        BOOL histoIsRunning=FALSE;
+		while (card = [e nextObject]){
+			if([card isKindOfClass:NSClassFromString(@"ORKatrinFLTModel")]){
+                flt=(ORKatrinFLTModel *)card;
+				//try to access a card. if it throws then we have to load the FPGAs
+				//[card readControlStatus];
+				//break;	//only need to try one
+                NSLog(@"  Loop 3: found a ORKatrinFLTModel in slot %i\n",[card slot]);
+                if([flt daqRunMode] == kKatrinFlt_DaqHistogram_Mode){
+                    fltsInHistoDaqMode=TRUE;
+                    if(!firstHistoModeFLT) firstHistoModeFLT=flt;
+                    if([flt histogrammingIsActiveForChan:0]) histoIsRunning=TRUE;//testing chan 0 is enough -tb-
+                }
+			}
+		}
+        if(fltsInHistoDaqMode) NSLog(@"SLT::runTaskStarted: At least one FLT is in histogram DAQ mode. Handle histogramming!\n");
+        if(histoIsRunning) NSLog(@"SLT::runTaskStarted: At least one FLT is still running in histogram mode; STOP all.\n");
+        //stop histogramming
+        if(histoIsRunning){
+            //wait after second strobe (use firstFLT for timing) TODO: ask Denis: is SLT and FLT timer syncronous? -tb-
+            [self waitForSecondStrobeOfFLT:firstHistoModeFLT];
+            //broadcast to all cards a "stop histogramming"
+            [firstHistoModeFLT writeHistogramControlRegisterForSlot: 31 chan: 31 value: 0]; //broadcast to the crate
+            //wait after second strobe (use firstFLT for timing)
+            //[self waitForSecondStrobeOfFLT:firstHistoModeFLT];
+        }
+        //clear run
+        if(fltsInHistoDaqMode){ //TODO: under construction -tb- (up to now: throw away first data record)
+            //swInhibit
+            //set TRun to 1
+            //wait after second strobe
+            //start histogramming with clear
+            //wait after second strobe
+            //clear + stop
+            //swRelease
+        }
+        //start histogramming modes
+        if(fltsInHistoDaqMode){ //TODO: under construction -tb- (up to now: throw away first data record)
+            //I do it in takeData ... if(first) ... to be sure that this is called AFTER runTaskStarted of the FLTs
+            //  to avoid that they overwrite some settings -tb-
+        }
+    }
+    #endif
 }
 
 
@@ -132,8 +334,19 @@
 
 	if(first){
 		[self releaseAllPages];
+        if(fltsInHistoDaqMode){
+            // wait for second strobe
+            [self waitForSecondStrobeOfFLT:firstHistoModeFLT];
+            // start histogramming
+            [self startAllHistoModeFLTs];
+            // wait for second strobe - THEN histogramming will start -tb-
+            [self waitForSecondStrobeOfFLT:firstHistoModeFLT];
+            //need to set the FLT timers
+            
+        }
 		[self releaseSwInhibit];
 		//[self writeReg:kSLTResetDeadTime value:0];
+        //start histogramming
 		first = NO;
 	} else {	
 	
@@ -302,6 +515,11 @@
 {
 
 	[self setSwInhibit];
+    
+    //place here the stopping for the histogram mode: stop+wait 1 sec -tb-
+    #if 1
+    [self stopAllHistoModeFLTs];
+    #endif
 
 /*	
 	dataTakers = [[readOutGroup allObjects] retain];	//cache of data takers.
