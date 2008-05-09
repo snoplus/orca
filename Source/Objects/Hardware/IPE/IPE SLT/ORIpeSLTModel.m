@@ -209,6 +209,8 @@ NSString* ORIpeSLTModelPageSizeChanged			= @"ORIpeSLTModelPageSizeChanged";
 NSString* ORIpeSLTModelDisplayTriggerChanged	= @"ORIpeSLTModelDisplayTrigerChanged";
 NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoopChanged";
 
+NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged";
+
 @implementation ORIpeSLTModel
 
 - (id) init
@@ -350,7 +352,11 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 
 - (void) runIsAboutToStart:(NSNotification*)aNote
 {
-	if([readOutGroup count] == 0){
+    //TODO: ORRunModel sends out ORRunAboutToStartNotification (in -(void)runStarted:...) -tb- 2008-03-28
+    //TODO: SLT should not init the board without check whether we can run, e.g. check if calibration run is active -tb- 2008-03-28
+    //TODO: why is it not in runTaskStarted: ... ??????? -tb- 
+    
+	if([readOutGroup count] == 0){//TODO: [readOutGroup count]: what is this?????????????? -tb- 2008-03-28
 		[self initBoard];
 	}	
 }
@@ -1267,6 +1273,8 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 	[self hw_reset];
 }
 
+/** This is called from ORIpeSLTControler::resetHWAction.
+  */
 - (void) hw_config
 {
 	NSLog(@"SLT: HW Configure\n");
@@ -1277,7 +1285,11 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 	[self readReg:kSLTStatusReg];
 
 	[guardian checkCards];
-
+    
+    // after HW reset the FLTs should receive a notification or we should call initVersionRevision from here
+    // so they can detect new FPGA firmware  -tb- 2008-04-22
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSLTModelHW_ResetChanged object:self];
+    NSLog(@"Posting notificaton ORIpeSLTModelHW_ResetChanged with self = %p\n",self);
 }
 
 - (void) hw_reset
@@ -1512,7 +1524,7 @@ NSString* ORIpeSLTModelDisplayEventLoopChanged	= @"ORIpeSLTModelDisplayEventLoop
 	[self setSwInhibit];
 	
     if([[userInfo objectForKey:@"doinit"]intValue]){
-		[self initBoard];					
+		[self initBoard];  //TODO: I think this was already called from self runIsAboutToStart: ... -tb- 2008-03-28 ---> Andreas, Mark					
 	}	
 
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.

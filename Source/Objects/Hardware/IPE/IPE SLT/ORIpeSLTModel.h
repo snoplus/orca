@@ -317,4 +317,5 @@ extern NSString* ORIpeSLTModelNextPageDelayChanged;
 extern NSString* ORIpeSLTModelPageStatusChanged;
 extern NSString* ORIpeSLTModelPollRateChanged;
 extern NSString* ORIpeSLTModelReadAllChanged;
+extern NSString* ORIpeSLTModelHW_ResetChanged;
 
