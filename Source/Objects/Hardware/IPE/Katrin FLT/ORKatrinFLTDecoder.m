@@ -523,6 +523,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 
 //-------------------------------------------------------------
 /** Data format for hardware histogram
+
+  TODO: THIS (the docu) IS STILL UNDER DEVELOPMENT -tb-
   *
 <pre>  
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
@@ -554,7 +556,9 @@ followed by waveform data (n x 1024 16-bit words)
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
-
+    //debug output -tb-
+    NSLog(@"  ORKatrinFLTDecoderForHistogram::decodeData:\n");
+    
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
 
@@ -579,14 +583,81 @@ followed by waveform data (n x 1024 16-bit words)
 
     ptr = ptr + (sizeof(katrinHistogramDataStruct)/sizeof(long));
     
+    #if 1
+    //this is really brute force, but the histogramWW methods make problems ... -tb-
     int i;
     unsigned long aValue;
+    unsigned long aBin;
     for(i=0; i< ePtr->histogramLength;i++){
-        aValue=*ptr;
-        NSLog(@"  Bin %i = %d \n", i,aValue);
-       	++ptr;		//point to event struct
+        aValue=*(ptr+i);
+        aBin = i+ (ePtr->firstBin);
+        if(aValue) NSLog(@"  Bin %i = %d \n", aBin,aValue);
+       	#if 1
+        int j;
+        for(j=0;j<aValue;j++){
+            //NSLog(@"  Fill Bin %i = %d times \n", aBin,aValue);
+	        [aDataSet histogram:aBin 
+			      numBins:1024 
+			      sender:self  
+			      withKeys: @"FLT",@"Histogram",crateKey,stationKey,channelKey,nil];
+        }
+        #endif
     }
+    #endif
+    
+    #if 0 
+    int i;
+    unsigned long aValue;
+    unsigned long aBin;
+    for(i=0; i< ePtr->histogramLength;i++){
+        aValue=*(ptr+i);
+        aBin = i+ePtr->firstBin;
+        if(aValue) NSLog(@"  Bin %i = %d \n", i,aValue);
+       	#if 0
+    	[aDataSet histogramWW: aBin
+                  weight:      aValue
+			      numBins:     1024 
+			      sender:self  
+			      withKeys: @"FLT",@"Histogram",crateKey,stationKey,channelKey,nil];
+        #endif
+    }
+    #endif
 	
+
+    #if 0 //macht Problems -tb-
+    NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
+    [keyArray insertObject:@"FLT" atIndex:0];
+    [keyArray insertObject:@"Histogram" atIndex:1];
+    [keyArray insertObject:crateKey atIndex:2];
+    [keyArray insertObject:stationKey atIndex:3];
+    [keyArray insertObject:channelKey atIndex:4];
+
+	[aDataSet loadHistogramSampleWW:  ptr  
+			  numBins:                1024  // is fixed in the current FPGA version -tb- 2008-03-13 
+              startAtBin:             ePtr->firstBin
+			  sampleLength:           ePtr->histogramLength 
+              withKeyArray:           keyArray];
+    #endif
+    
+    
+    
+    #if 0
+    // test - ok          
+    NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
+    [keyArray insertObject:@"FLT" atIndex:0];
+    [keyArray insertObject:@"Histogram" atIndex:1];
+    [keyArray insertObject:crateKey atIndex:2];
+    [keyArray insertObject:stationKey atIndex:3];
+    [keyArray insertObject:channelKey atIndex:4];
+
+	[aDataSet loadHistogram:  ptr 
+			  numBins:        ePtr->histogramLength 
+              withKeyArray:   keyArray];
+    #endif
+
+
+
+//OLD - Remove it:
 	//[aDataSet histogram:ePtr->energy 
 	//		  numBins:32768 
 	//		  sender:self  
@@ -612,7 +683,7 @@ followed by waveform data (n x 1024 16-bit words)
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 
-    NSString* title= @"Katrin FLT Waveform Record\n\n";
+    NSString* title= @"Katrin FLT Histogram Record\n\n";
 	++ptr;		//skip the first word (dataID and length)
     
     NSString* crate = [NSString stringWithFormat:@"Crate      = %d\n",(*ptr>>21) & 0xf];

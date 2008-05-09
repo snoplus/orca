@@ -102,10 +102,10 @@ typedef struct {
 } katrinThresholdScanDataStruct;
 
 typedef struct { // -tb- 2008-02-27
-	unsigned long readoutSec;
-	unsigned long recordingTimeSec;
-	unsigned long firstBin;
-	unsigned long lastBin;
-	unsigned long histogramLength;
+	long readoutSec;
+	long recordingTimeSec;
+	long firstBin;
+	long lastBin;
+	long histogramLength; //don't use unsigned! - it may become negative, at least temporaryly -tb-
 } katrinHistogramDataStruct;
 

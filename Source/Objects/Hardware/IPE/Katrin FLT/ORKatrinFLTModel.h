@@ -107,6 +107,7 @@
 	unsigned long	nSkippedEvents;	//!< Event loop: Number of skipped events
 	unsigned long	nMissingEvents;	//!< Event  loop: 
 	BOOL            overflowDetected;	//!< Event  loop: Flag to indicate an event buffer overflow in the current run
+	int             overflowDetectedCounter;	//!< @see #overflowDetected; counts the  event buffer overflows
 	float           nBuffer;		//!< Event loop: Number of pages in the hardware event buffer 
     unsigned long   resetSec;		//!< Event loop: Time stamp of the last reset..  
 	unsigned long   resetSubSec;	//!< Event loop: Time stmp of the last reset
@@ -141,25 +142,51 @@
     unsigned short tMode;
     int testPatternCount;
     BOOL checkWaveFormEnabled;
-    //hardware histogramming -tb- 2008-02-08
-    int oldFltRunModeMode;
+    BOOL checkEnergyEnabled;
+    
+    // Parameters for hardware histogramming -tb- 2008-02-08
     int histoBinWidth;    //!< The bin width of the @e hardware @e histogramming bins.
-    unsigned int histoMinEnergy;    //!< The minimum energy for the @e hardware @e histogramming.
+    unsigned int histoMinEnergy;    //!< The minimum energy for the @e hardware @e histogramming. In GUI: Offset ...
     unsigned int histoMaxEnergy;    //!< The maximum energy for the @e hardware @e histogramming.
     unsigned int histoFirstBin;     //!< The first bin (of 1024) not equal zero.
     unsigned int histoLastBin;      //!< The last bin (of 1024) not equal zero.
-    unsigned int histoRunTime;      //!< The length of the time loop (0=endless, not 0: length in sec).
+    unsigned int histoRunTime;      //!< The length of the time loop (0=endless, not 0: length in sec). In GUI: RefreshTime
     unsigned int histoRecordingTime;  //!< The recording time since start of time loop (in sec).
-    NSMutableArray* histogramData;    //!< Array to keep the hardware histogram.
-    unsigned int* histogramDataUI;    //!< Array to keep the raw hardware histogram. TODO: which one? -tb- 2008-02-18
+    NSMutableArray* histogramData;    //!< Array of NSData objects to keep the hardware histogram.
+    int histogramDataFirstBin[kNumFLTChannels];
+    int histogramDataLastBin[kNumFLTChannels];
+    int histogramDataRecTimeSec[kNumFLTChannels];
+    int histogramDataSum[kNumFLTChannels];
     int histoStartTimeSec;   //!< Start time (sec) of the test @e hardware @e histogram.
     int histoStartTimeUSec;  //!< Start time (usec) of the test @e hardware @e histogram.
     int histoStopTimeSec;    //!< Stop time (sec) of the test @e hardware @e histogram.
     int histoStopTimeUSec;   //!< Stop time (usec) of the test @e hardware @e histogram.
-    BOOL histoCalibrationIsRunning;
-    double histoTestElapsedTime;
+    int histoLastSecStrobeSec;   //!<  time (sec) of last second strobe.
+    int histoLastSecStrobeUSec;  //!<  time (usec) of last second strobe.
+    int histoLastPageToggleSec;   //!<  time (sec) of last page toggle.
+    int histoLastPageToggleUSec;  //!<  time (usec) of last page toggle.
+    int histoPreToggleSec;             //!<  time (sec) of last pre toggle cycle.
+    int histoPreToggleUSec;            //!<  time (usec) of last pre toggle cycle.
+    double lastDiffTime;               //!<used for timing of histogramming
+    int lastDelayTime;               //!<used for timing: number of 0.1 (0delayTime) seconds since histoStartTimeSec/USec
+    int currentDelayTime;               //!<used for timing: number of 0.1 (0delayTime) seconds since histoStartTimeSec/USec
+    int histoLastActivePage;         //!<  number (0/1) of last active memory page
+    BOOL histoCalibrationIsRunning;  //!< Used for calibration run and normal run - TRUE if intentionally  running
+    double histoCalibrationElapsedTime;
     unsigned int histoCalibrationChan;  //!< The currently selected channel for histogramming calibration.
-	
+    int savedDaqRunMode;  /*!< Saves the daq run mode during histogram calibration run; ==-1 means 'undefined', 
+                               otherwise == kKatrinFlt_DaqHistogram_Mode etc.*/
+    BOOL showHitratesDuringHistoCalibration;   //!<"Show hitrates" check mark (will not be saved in the .Orca file -tb-)
+	BOOL histoClearAtStart ; //!< HW histogramming clear bit (HistStatusReg)
+	BOOL histoClearAfterReadout ; //!< HW histogramming clear flag (software)
+	BOOL histoStopIfNotCleared ;//!< HW histogramming mode bit (HistParamReg)
+    BOOL histoStartWaitingForPageToggle;
+
+    BOOL histoWaitForPageToggle;//!<internal parameter
+    // Parameters for low-level register readout
+    int readWriteRegisterChan;    //!< The channel/group currently selected in the low-level tab -tb-
+    NSString *readWriteRegisterName; //!< The register name currently selected in the low-level tab -tb-
+    
 	//place to cache some values so they don't have to be calculated every time thru the run loop.
 	unsigned long	statusAddress;
 	unsigned long	triggerMemAddress;
@@ -168,7 +195,24 @@
 	BOOL			usingPBusSimulation;
 	/** Reference to the Slt board for hardware access */
 	ORIpeFireWireCard* fireWireCard; 
+    
+    //Parameters for the post trigger time handling -tb- 2008-03-07
+    int postTriggerTime;        //!< number of values read out after trigger bin (default: 511) 
+    BOOL dataAquisitionStopped; //!< hardware flag
+    BOOL dataAquisitionIsRestarting;//!< hardware flag
+
+    //Parameters for the FPGA configuration: version, revision, application ID ("features")
+    unsigned long versionRegister;//!< The raw 32-bit version register content
+    BOOL versionRegisterIsUptodate;
+    BOOL stdFeatureIsAvailable;
+    BOOL vetoFeatureIsAvailable;
+    BOOL histoFeatureIsAvailable;
+
+    BOOL shouldDumpPagecounter;//TODO: debug - remove -tb- 2008-03-18
+
 }
+- ( BOOL) shouldDumpPagecounter;//TODO: debug - remove -tb- 2008-03-18
+- (void)      setShouldDumpPagecounter:(BOOL)aBool;//TODO: debug - remove -tb- 2008-03-18
 
 #pragma mark ¥¥¥Initialization
 - (id) init;
@@ -176,9 +220,33 @@
 - (void) setUpImage;
 - (void) makeMainController;
 
+#pragma mark ¥¥¥Notifications
+- (void) registerNotificationObservers;
+- (void) serviceChanged:(NSNotification*)aNote;
+
 #pragma mark ¥¥¥Accessors
+- (unsigned long) versionRegister;//!< The raw 32-bit version register content
+- (void) setVersionRegister:(unsigned long)aValue;
+- (int) versionRegApplicationID;
+- (int) versionRegHWVersionHex;
+/** Since version 3 we have the version register. 
+  * (0 means: no hardware detected, 2 means: probably old version detected).
+  * @see versionRegister
+  */ //-tb-
+- (int) versionRegHWVersion;
+- (int) versionRegHWSubVersion;
+- (int) versionRegCFPGAVersion;
+- (int) versionRegFPGA6Version;
+- (BOOL) stdFeatureIsAvailable;
+- (BOOL) vetoFeatureIsAvailable;
+- (BOOL) histoFeatureIsAvailable;
+- (void) setStdFeatureIsAvailable:(BOOL)aBool;
+- (void) setVetoFeatureIsAvailable:(BOOL)aBool;
+- (void) setHistoFeatureIsAvailable:(BOOL)aBool;
 - (BOOL) checkWaveFormEnabled;
 - (void) setCheckWaveFormEnabled:(BOOL)aCheckWaveFormEnabled;
+- (BOOL) checkEnergyEnabled;
+- (void) setCheckEnergyEnabled:(BOOL)aCheck;
 - (int) testPatternCount;
 - (void) setTestPatternCount:(int)aTestPatternCount;
 - (unsigned short) tMode;
@@ -238,6 +306,9 @@
 - (void) setFltRunMode:(int)aMode;
 - (int) daqRunMode;
 - (void) setDaqRunMode:(int)aMode;
+- (int) postTriggerTime;// -tb- 2008-03-07
+- (void) setPostTriggerTime:(int)aValue;
+
 
 - (void) loadTime;
 - (void) enableAllHitRates:(BOOL)aState;
@@ -255,11 +326,15 @@
 - (void) setReadoutPages:(unsigned short)aReadoutPage; // ak, 2.7.07
 
 
-
 #pragma mark ¥¥¥HW Access
 //all can raise exceptions
+- (void) writePostTriggerTime:(unsigned int)aValue; // -tb- tmp
+- (void) readPostTriggerTime;
+
 - (void)	checkPresence;
 - (int)		readVersion;
+- (unsigned long)		readVersionRevision;
+- (void)	initVersionRevision;
 - (int)		readFPGAVersion:(int) fpga;
 - (int)		readCardId;
 - (BOOL)	readHasData;
@@ -317,14 +392,17 @@
   * in the hardware and the last page variable of the readout loop */
 - (void) restartRun;   // ak 2.7.07
 
-#pragma mark ¥¥¥¥hw histogram access
+#pragma mark ¥¥¥¥Hardware Histogramming
+#pragma mark ¥¥¥Hardware Histogramming Accessors
 //hardware histogramming -tb- 2008-02-08
+- (int) histoChanToGroupMap:(int)aChannel;
 - (int) histoBinWidth;
 - (void) setHistoBinWidth:(int)aHistoBinWidth;
 - (unsigned int) histoMinEnergy;
 - (void) setHistoMinEnergy:(unsigned int)aValue;
 - (unsigned int) histoMaxEnergy;
 - (void) setHistoMaxEnergy:(unsigned int)aValue;
+- (void) recalcHistoMaxEnergy;
 - (unsigned int) histoFirstBin;
 - (void) setHistoFirstBin:(unsigned int)aValue;
 - (unsigned int) histoLastBin;
@@ -335,39 +413,81 @@
 - (void) setHistoRecordingTime:(unsigned int)aValue;
 - (BOOL)   histoCalibrationIsRunning;
 - (void)   setHistoCalibrationIsRunning: (BOOL)aValue;
-- (double) histoTestElapsedTime;
-- (void)   setHistoTestElapsedTime: (double)aTime;
+- (double) histoCalibrationElapsedTime;
+- (void)   setHistoCalibrationElapsedTime: (double)aTime;
 - (unsigned int) histoCalibrationChan;
 - (void) setHistoCalibrationChan:(unsigned int)aValue;
-
-
+- (BOOL) showHitratesDuringHistoCalibration;
+- (void) setShowHitratesDuringHistoCalibration:(BOOL)aValue;
+- (BOOL) histoClearAtStart;
+- (void) setHistoClearAtStart:(BOOL)aValue;
+- (BOOL) histoClearAfterReadout;
+- (void) setHistoClearAfterReadout:(BOOL)aValue;
+- (BOOL) histoStopIfNotCleared;
+- (void) setHistoStopIfNotCleared:(BOOL)aValue;
+//
 - (NSMutableArray*) histogramData;
-- (unsigned int*) histogramDataUI;
-- (unsigned int) getHistogramDataUI: (int)index;
-
-- (unsigned int) readEMin;
-- (void) writeEMin:(unsigned int)EMin;
-- (unsigned int) readEMax;
-- (void) writeEMax:(unsigned int)EMax;
-- (unsigned int) readTRun;
-- (void) writeTRun:(unsigned int)TRun;
-- (void) writeStartHistogram:(unsigned int)histoBinWidth;
+- (unsigned int) getHistogramData: (int)index forChan:(int)aChan;
+#pragma mark ¥¥¥Hardware Histogramming HW Access
+- (unsigned long) readEMin;
+- (unsigned long) readEMinForChan:(int)aChan;
+- (void) writeEMin:(int)EMin;
+- (void) writeEMin:(int)EMin forChan:(int)aChan;
+- (unsigned long) readEMax;
+- (unsigned long) readEMaxForChan:(int)aChan;
+- (void) writeEMax:(int)EMax;
+- (void) writeEMax:(int)EMax forChan:(int)aChan;
+- (unsigned long) readTRun;
+- (unsigned long) readTRunForChan:(int)aChan; 
+- (void) writeTRun:(int)TRun;
+- (void) writeTRun:(int)TRun  forChan:(int)aChan; 
+- (void) writeStartHistogram:(unsigned int)aHistoBinWidth;
+- (void) writeStartHistogram:(unsigned int)aHistoBinWidth  forChan:(int)aChan;
 - (void) writeStopHistogram;
-- (unsigned int) readTRec;
-- (unsigned int) readFirstBinOfPixel:(unsigned int)aPixel;
-- (unsigned int) readLastBinOfPixel:(unsigned int)aPixel;
-- (void) startHistogramOfPixel:(unsigned int)aPixel;
-- (void) checkHistogramTest;
-- (void) stopHistogramOfPixel:(unsigned int)aPixel;
-- (void) oneSecAfterStopHistogramOfPixel;
-- (void) readHistogramDataOfPixel:(unsigned int)aPixel;
+- (void) writeStopHistogramForChan:(int)aChan;
+//new since histogramming ver. 3.x -tb- >>>>>>>>
+- (void) writeStartHistogramForChan:(int)aChan withClear:(BOOL)clear;
+- (void) writeHistogramSettingsForChan:(int)aChan mode:(unsigned int)aMode binWidth:(unsigned int)aHistoBinWidth;
+//new since histogramming ver. 3.x -tb- <<<<<<<<
+- (unsigned long) readTRec;
+- (unsigned long) readTRecForChan:(int)aChan; 
+- (unsigned long) readFirstBinForChan:(int)aChan;
+- (unsigned long) readLastBinForChan:(int)aPixel;
+- (void) startCalibrationHistogramOfChan:(int)aChan;
+- (void) checkCalibrationHistogram;
+- (void) stopCalibrationHistogram;
+- (unsigned int) histogramDataAdress:(int)aBin forChan:(int)aChan;
+- (void) readHistogramDataForChan:(unsigned int)aPixel;
 - (unsigned int) readHistogramDataOfPixel:(unsigned int)aPixel atBin:(unsigned int)aBin ;
 - (void) readCurrentStatusOfPixel:(unsigned int)aPixel;
-- (unsigned int) readHistogramControlRegisterOfPixel:(unsigned int)aPixel;
-- (void) writeHistogramControlRegisterOfPixel:(unsigned int)aPixel value:(unsigned int)aValue;
+- (int)  readCurrentHistogramPageNum;
+- (void) clearCurrentHistogramPageForChan:(unsigned int)aChan;
+- (BOOL) histogrammingIsActiveForChan:(unsigned int)aChan;
+- (unsigned long) readHistogramControlRegisterOfPixel:(unsigned int)aPixel;//TODO: rename to ...ForChan -tb-
+- (void) writeHistogramControlRegisterForSlot:(int)aSlot chan:(int)aChan value:(unsigned long)aValue;
+- (void) writeHistogramControlRegisterOfPixel:(unsigned int)aPixel value:(unsigned long)aValue;
+- (unsigned long) readHistogramSettingsRegisterOfPixel:(unsigned int)aPixel;
+- (void) writeHistogramSettingsRegisterOfPixel:(unsigned int)aPixel value:(unsigned long)aValue;
+
+- (void) setHistoLastPageToggleSec:(int) sec usec:(int) usec;
+- (void) setHistoStartWaitingForPageToggle:(BOOL) aValue;
+- (void) setHistoLastActivePage:(int) aValue;
+
+#pragma mark ¥¥¥Veto HW Access
 - (void) setVetoEnable:(int)aState;
-- (int) readVetoState;
+- (int)  readVetoState;
 - (void) readVetoDataFrom:(int)fromIndex to:(int)toIndex;
+#pragma mark ¥¥¥Low-level Register Access
+//- (unsigned long) getRegisterAdress:(NSString*)aRegisterName withChan:(int)aChan;
+    int readWriteRegisterChannel;    //!< The channel/group currently selected in the low-level tab -tb-
+    NSString *readWriteRegisterName; //!< The register name currently selected in the low-level tab -tb-
+-(int) readWriteRegisterChan;
+-(void) setReadWriteRegisterChan:(int)aChan;
+-(NSString *) readWriteRegisterName;
+-(void) setReadWriteRegisterName:(NSString *)aName;
+- (unsigned long) registerAdressWithName:(NSString *)aName  forChan:(int)aChan;
+- (unsigned long) readRegisterWithName:(NSString *)aName  forChan:(int)aChan;
+- (unsigned long) writeRegisterWithName:(NSString *)aName  forChan:(int)aChan value:(unsigned long) aValue;
 
 #pragma mark ¥¥¥Archival
 - (id) initWithCoder:(NSCoder*)decoder;
@@ -388,6 +508,7 @@
 - (void) takeDataRunOrDebugMode:(ORDataPacket*) aDataPacket;
 - (void) takeDataHistogramMode:(ORDataPacket*)aDataPacket;
 - (void) pauseHistogrammingAndReadOutData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) readOutHistogramDataV3:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeDataVetoMode:(ORDataPacket*)aDataPacket;
 
 #pragma mark ¥¥¥HW Wizard
@@ -422,7 +543,10 @@
 					 n:(int) n;
 @end
 
+extern NSString* ORKatrinFLTModelVersionRevisionChanged;
+extern NSString* ORKatrinFLTModelAvailableFeaturesChanged;
 extern NSString* ORKatrinFLTModelCheckWaveFormEnabledChanged;
+extern NSString* ORKatrinFLTModelCheckEnergyEnabledChanged;
 extern NSString* ORKatrinFLTModelTestPatternCountChanged;
 extern NSString* ORKatrinFLTModelTModeChanged;
 extern NSString* ORKatrinFLTModelTestParamChanged;
@@ -447,6 +571,7 @@ extern NSString* ORKatrinFLTModelThresholdsChanged;
 extern NSString* ORKatrinFLTModelFltRunModeChanged;
 extern NSString* ORKatrinFLTModelDaqRunModeChanged;
 extern NSString* ORKatrinFLTSettingsLock;
+extern NSString* ORKatrinFLTModelPostTriggerTimeChanged;
 
 extern NSString* ORKatrinFLTModelReadoutPagesChanged;
 extern NSString* ORKatrinSLTModelName;
@@ -458,8 +583,15 @@ extern NSString* ORKatrinFLTModelHistoFirstBinChanged;
 extern NSString* ORKatrinFLTModelHistoLastBinChanged;
 extern NSString* ORKatrinFLTModelHistoRunTimeChanged;
 extern NSString* ORKatrinFLTModelHistoRecordingTimeChanged;
-extern NSString* ORKatrinFLTModelHistoTestValuesChanged;    
-extern NSString* ORKatrinFLTModelHistoTestPlotterWantDisplay;    
+extern NSString* ORKatrinFLTModelHistoCalibrationValuesChanged;    
+extern NSString* ORKatrinFLTModelHistoCalibrationPlotterChanged;    
+extern NSString* ORKatrinFLTModelShowHitratesDuringHistoCalibrationChanged;
+extern NSString* ORKatrinFLTModelHistoClearAtStartChanged;
+extern NSString* ORKatrinFLTModelHistoClearAfterReadoutChanged;
+extern NSString* ORKatrinFLTModelHistoStopIfNotClearedChanged;
 extern NSString* ORKatrinFLTModelHistoCalibrationChanChanged;
+extern NSString* ORKatrinFLTModelHistoPageNumChanged;
+extern NSString* ORKatrinFLTModelReadWriteRegisterChanChanged;
+extern NSString* ORKatrinFLTModelReadWriteRegisterNameChanged;
 
 

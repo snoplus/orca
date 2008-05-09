@@ -92,13 +92,25 @@
 				<string>id</string>
 				<key>changedHistoRunTimeAction</key>
 				<string>id</string>
+				<key>checkEnergyEnabledAction</key>
+				<string>id</string>
 				<key>checkWaveFormEnabledAction</key>
+				<string>id</string>
+				<key>clearCurrentHistogramPageButtonAction</key>
 				<string>id</string>
 				<key>daqRunModeAction</key>
 				<string>id</string>
 				<key>gainAction</key>
 				<string>id</string>
 				<key>helloButtonAction</key>
+				<string>id</string>
+				<key>histoClearAfterReadoutAction</key>
+				<string>id</string>
+				<key>histoClearAtStartAction</key>
+				<string>id</string>
+				<key>histoSetStandardButtonAction</key>
+				<string>id</string>
+				<key>histoStopIfNotClearedAction</key>
 				<string>id</string>
 				<key>hitRateAllAction</key>
 				<string>id</string>
@@ -113,6 +125,8 @@
 				<key>loadTimeAction</key>
 				<string>id</string>
 				<key>numTestPatternsAction</key>
+				<string>id</string>
+				<key>postTriggTimeAction</key>
 				<string>id</string>
 				<key>readCurrentStatusButtonAction</key>
 				<string>id</string>
@@ -130,6 +144,14 @@
 				<string>id</string>
 				<key>readLastBinButtonAction</key>
 				<string>id</string>
+				<key>readPostTriggTimeAction</key>
+				<string>id</string>
+				<key>readRegisterAdressButtonAction</key>
+				<string>id</string>
+				<key>readRegisterButtonAction</key>
+				<string>id</string>
+				<key>readRegisterWithAdressButtonAction</key>
+				<string>id</string>
 				<key>readTRecButtonAction</key>
 				<string>id</string>
 				<key>readTRunAction</key>
@@ -142,6 +164,10 @@
 				<string>id</string>
 				<key>readVetoStateButtonAction</key>
 				<string>id</string>
+				<key>readWriteRegisterChanPopUpButtonAction</key>
+				<string>id</string>
+				<key>readWriteRegisterNamePopUpButtonAction</key>
+				<string>id</string>
 				<key>readoutPagesAction</key>
 				<string>id</string>
 				<key>resetAction</key>
@@ -149,6 +175,8 @@
 				<key>settingLockAction</key>
 				<string>id</string>
 				<key>shapingTimeAction</key>
+				<string>id</string>
+				<key>showHitratesDuringHistoCalibrationAction</key>
 				<string>id</string>
 				<key>startHistogramButtonAction</key>
 				<string>id</string>
@@ -172,6 +200,8 @@
 				<string>id</string>
 				<key>versionAction</key>
 				<string>id</string>
+				<key>versionFeatureCheckButtonAction</key>
+				<string>id</string>
 				<key>vetoTestButtonAction</key>
 				<string>id</string>
 				<key>writeEMaxButtonAction</key>
@@ -181,6 +211,12 @@
 				<key>writeEnableVetoButtonAction</key>
 				<string>id</string>
 				<key>writeFltModeButtonAction</key>
+				<string>id</string>
+				<key>writePostTriggTimeAction</key>
+				<string>id</string>
+				<key>writeRegisterButtonAction</key>
+				<string>id</string>
+				<key>writeRegisterWithAdressButtonAction</key>
 				<string>id</string>
 				<key>writeTRunAction</key>
 				<string>id</string>
@@ -195,6 +231,8 @@
 			<dict>
 				<key>broadcastTimeCB</key>
 				<string>NSButton</string>
+				<key>checkEnergyEnabledButton</key>
+				<string>NSButton</string>
 				<key>checkWaveFormEnabledButton</key>
 				<string>NSButton</string>
 				<key>daqRunModeButton</key>
@@ -205,9 +243,13 @@
 				<string>NSTextField</string>
 				<key>eSamplePopUpButton</key>
 				<string>NSPopUpButton</string>
+				<key>energyDaqModeMenuItem</key>
+				<string>NSMenuItem</string>
 				<key>firstBinField</key>
 				<string>NSTextField</string>
 				<key>fltModeField</key>
+				<string>NSTextField</string>
+				<key>fltNumberField</key>
 				<string>NSTextField</string>
 				<key>gainTextFields</key>
 				<string>NSMatrix</string>
@@ -215,10 +257,24 @@
 				<string>NSButton</string>
 				<key>histoCalibrationChanNumPopUpButton</key>
 				<string>NSPopUpButton</string>
+				<key>histoClearAfterReadoutButton</key>
+				<string>NSButton</string>
+				<key>histoClearAtStartButton</key>
+				<string>NSButton</string>
 				<key>histoElapsedTimeField</key>
+				<string>NSTextField</string>
+				<key>histoMessageAboutFPGAVersionField</key>
+				<string>NSTextField</string>
+				<key>histoPageField</key>
 				<string>NSTextField</string>
 				<key>histoProgressIndicator</key>
 				<string>NSProgressIndicator</string>
+				<key>histoStopIfNotClearedButton</key>
+				<string>NSButton</string>
+				<key>histoStopIfNotClearedPopUpButton</key>
+				<string>NSPopUpButton</string>
+				<key>histogramDaqModeMenuItem</key>
+				<string>NSMenuItem</string>
 				<key>histogramPlotterId</key>
 				<string>ORPlotter1D</string>
 				<key>hitRateAllButton</key>
@@ -235,24 +291,44 @@
 				<string>NSTextField</string>
 				<key>loadTimeButton</key>
 				<string>NSButton</string>
+				<key>maxEnergyField0</key>
+				<string>NSTextField</string>
 				<key>numTestPatternsField</key>
 				<string>NSTextField</string>
 				<key>numTestPatternsStepper</key>
 				<string>NSStepper</string>
 				<key>patternTable</key>
 				<string>NSTableView</string>
+				<key>postTriggTimeField</key>
+				<string>NSTextField</string>
 				<key>rate0</key>
 				<string>ORValueBar</string>
 				<key>rateLogCB</key>
 				<string>NSButton</string>
 				<key>rateTextFields</key>
 				<string>NSMatrix</string>
+				<key>readCalibrationHistogramDataButton</key>
+				<string>NSButton</string>
+				<key>readEnableVetoButton</key>
+				<string>NSButton</string>
 				<key>readFltModeButton</key>
+				<string>NSButton</string>
+				<key>readHistogramStatusRegButton</key>
 				<string>NSButton</string>
 				<key>readThresholdsGainsButton</key>
 				<string>NSButton</string>
 				<key>readTimeButton</key>
 				<string>NSButton</string>
+				<key>readVetoDataButton</key>
+				<string>NSButton</string>
+				<key>readWriteRegisterAdressField</key>
+				<string>NSTextField</string>
+				<key>readWriteRegisterChanPopUpButton</key>
+				<string>NSPopUpButton</string>
+				<key>readWriteRegisterField</key>
+				<string>NSTextField</string>
+				<key>readWriteRegisterNamePopUpButton</key>
+				<string>NSPopUpButton</string>
 				<key>readoutPagesField</key>
 				<string>NSTextField</string>
 				<key>resetButton</key>
@@ -267,7 +343,15 @@
 				<string>NSPopUpButton</string>
 				<key>shapingTimePU3</key>
 				<string>NSPopUpButton</string>
+				<key>showHitratesDuringHistoCalibrationButton</key>
+				<string>NSButton</string>
+				<key>startCalibrationHistogramButton</key>
+				<string>NSButton</string>
+				<key>startSelfCalibrationHistogramButton</key>
+				<string>NSButton</string>
 				<key>statusButton</key>
+				<string>NSButton</string>
+				<key>stopCalibrationHistogramButton</key>
 				<string>NSButton</string>
 				<key>tModeMatrix</key>
 				<string>NSMatrix</string>
@@ -305,9 +389,21 @@
 				<string>NSMatrix</string>
 				<key>versionButton</key>
 				<string>NSButton</string>
+				<key>versionHistoCheckButton</key>
+				<string>NSButton</string>
+				<key>versionStdCheckButton</key>
+				<string>NSButton</string>
+				<key>versionVetoCheckButton</key>
+				<string>NSButton</string>
+				<key>vetoDaqModeMenuItem</key>
+				<string>NSMenuItem</string>
 				<key>vetoEnableButton</key>
 				<string>NSButton</string>
+				<key>writeEnableVetoButton</key>
+				<string>NSButton</string>
 				<key>writeFltModeButton</key>
+				<string>NSButton</string>
+				<key>writePostTriggerTimeButton</key>
 				<string>NSButton</string>
 				<key>writeThresholdsGainsButton</key>
 				<string>NSButton</string>

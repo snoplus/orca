@@ -29,9 +29,17 @@
 @interface ORKatrinFLTController : OrcaObjectController {
 	@private
         IBOutlet NSButton*		settingLockButton; 
+		IBOutlet NSTextField*   fltNumberField;
 		IBOutlet NSButton*		checkWaveFormEnabledButton;
+		IBOutlet NSButton*		checkEnergyEnabledButton;
 		IBOutlet NSPopUpButton*	daqRunModeButton;//!<The tag needs to be equal to the daq run mode. See ORKatrinFLTModel.h for values.
+		IBOutlet NSMenuItem*    energyDaqModeMenuItem;
+		IBOutlet NSMenuItem*    vetoDaqModeMenuItem;
+		IBOutlet NSMenuItem*    histogramDaqModeMenuItem;
 		IBOutlet NSButton*		versionButton;
+		IBOutlet NSButton*		versionStdCheckButton;
+		IBOutlet NSButton*		versionHistoCheckButton;
+		IBOutlet NSButton*		versionVetoCheckButton;
 		IBOutlet NSButton*		statusButton;
 		IBOutlet NSButton*		readFltModeButton;
 		IBOutlet NSTextField*   fltModeField;
@@ -50,29 +58,51 @@
 		IBOutlet NSPopUpButton* shapingTimePU1;
 		IBOutlet NSPopUpButton* shapingTimePU2;
 		IBOutlet NSPopUpButton* shapingTimePU3;
+		IBOutlet NSTextField*	maxEnergyField0;
 		IBOutlet NSTextField*	hitRateLengthField;
 		IBOutlet NSButton*		hitRateAllButton;
 		IBOutlet NSButton*		hitRateNoneButton;
         IBOutlet NSButton*		broadcastTimeCB;
+
+		IBOutlet NSTextField*	postTriggTimeField;// -tb-
+		IBOutlet NSButton*	    writePostTriggerTimeButton;// -tb-
+
 		
 		IBOutlet NSTextField*	readoutPagesField; // ak, 2.7.07
         
-        //histogram page
+        //histogram page/tab view -tb-
+        IBOutlet NSButton*		startCalibrationHistogramButton;
+        IBOutlet NSButton*		stopCalibrationHistogramButton;
+        IBOutlet NSButton*		readCalibrationHistogramDataButton;
+        IBOutlet NSButton*		startSelfCalibrationHistogramButton;
+        IBOutlet NSButton*		readHistogramStatusRegButton;
         IBOutlet NSButton*		helloButton; // -tb- 2008/1/17
         IBOutlet NSTextField*	eMinField;
         IBOutlet NSTextField*	eMaxField;
-        //EMax buttons missing
+        IBOutlet NSTextField*	histoMessageAboutFPGAVersionField;
+        //EMax buttons missing - up to now not necessary -tb-
         IBOutlet NSTextField*	tRunField;
         IBOutlet NSTextField*	tRecField;
-        // TRun buttons missing
+        // TRun buttons missing - up to now not necessary -tb-
         IBOutlet NSTextField*	firstBinField;
         IBOutlet NSTextField*	lastBinField;
         IBOutlet ORPlotter1D*      histogramPlotterId;
-        IBOutlet NSButton*		vetoEnableButton;
         IBOutlet NSPopUpButton* eSamplePopUpButton;////eSample=BW TODO: rename to binWidth -tb-
         IBOutlet NSProgressIndicator* histoProgressIndicator;
         IBOutlet NSTextField*	histoElapsedTimeField;
-        IBOutlet NSPopUpButton* histoCalibrationChanNumPopUpButton;////eSample=BW TODO: rename to binWidth -tb-
+        IBOutlet NSPopUpButton* histoCalibrationChanNumPopUpButton;
+        IBOutlet NSTextField*	histoPageField;
+        IBOutlet NSButton*		showHitratesDuringHistoCalibrationButton;
+        IBOutlet NSButton*		histoClearAtStartButton;
+        IBOutlet NSButton*		histoClearAfterReadoutButton;        
+        IBOutlet NSButton*		histoStopIfNotClearedButton;//TODO: removed -remove actions -tb-
+        IBOutlet NSPopUpButton*	histoStopIfNotClearedPopUpButton;
+
+        //veto page/tab view -tb-
+        IBOutlet NSButton*		vetoEnableButton;
+        IBOutlet NSButton*		readEnableVetoButton;
+        IBOutlet NSButton*		writeEnableVetoButton;
+        IBOutlet NSButton*		readVetoDataButton;
         
 
 		//rate page
@@ -106,6 +136,11 @@
 		NSSize					rateSize;
 		NSSize					testSize;
 		NSView*					blankView;
+        
+        IBOutlet NSPopUpButton* readWriteRegisterChanPopUpButton;// -tb-
+        IBOutlet NSPopUpButton* readWriteRegisterNamePopUpButton;// -tb-
+		IBOutlet NSTextField*	readWriteRegisterField;// -tb-
+		IBOutlet NSTextField*	readWriteRegisterAdressField;// -tb-
 		
 };
 #pragma mark ¥¥¥Initialization
@@ -118,12 +153,15 @@
 
 #pragma mark ¥¥¥Interface Management
 - (void) checkWaveFormEnabledChanged:(NSNotification*)aNote;
+- (void) checkEnergyEnabledChanged:(NSNotification*)aNote;
 - (void) updateWindow;
+- (void) versionRevisionChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) numTestPattersChanged:(NSNotification*)aNote;
 - (void) fltRunModeChanged:(NSNotification*)aNote;
 - (void) daqRunModeChanged:(NSNotification*)aNote;
+- (void) postTriggerTimeChanged:(NSNotification*)aNote;
 - (void) gainChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
 - (void) gainArrayChanged:(NSNotification*)aNote;
@@ -155,18 +193,25 @@
 - (void) histoLastBinChanged:(NSNotification*)aNote;
 - (void) histoRunTimeChanged:(NSNotification*)aNote;
 - (void) histoRecordingTimeChanged:(NSNotification*)aNote;
-- (void) histoTestValuesChanged:(NSNotification*)aNote;
+- (void) histoCalibrationValuesChanged:(NSNotification*)aNote;
+- (void) histoCalibrationPlotterChanged:(NSNotification*)aNote;
 - (void) histoCalibrationChanChanged:(NSNotification*)aNote;
+- (void) histoPageNumChanged:(NSNotification*)aNote;
+- (void) showHitratesDuringHistoCalibrationChanged:(NSNotification*)aNote;
+- (void) histoClearAtStartChanged:(NSNotification*)aNote;
+- (void) histoClearAfterReadoutChanged:(NSNotification*)aNote;
+- (void) histoStopIfNotClearedChanged:(NSNotification*)aNote;
 
-    
-    
-    
-    
-    
+- (void) availableFeaturesChanged:(NSNotification*)aNote;
+
+//low level -tb-
+- (void) readWriteRegisterChanChanged:(NSNotification*)aNote;
+- (void) readWriteRegisterNameChanged:(NSNotification*)aNote;
 
 
 #pragma mark ¥¥¥Actions
 - (IBAction) checkWaveFormEnabledAction:(id)sender;
+- (IBAction) checkEnergyEnabledAction:(id)sender;
 - (IBAction) numTestPatternsAction:(id)sender;
 - (IBAction) readThresholdsGains:(id)sender;
 - (IBAction) writeThresholdsGains:(id)sender;
@@ -179,6 +224,7 @@
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) daqRunModeAction: (id) sender;
 - (IBAction) versionAction: (id) sender;
+- (IBAction) versionFeatureCheckButtonAction: (id) sender;
 - (IBAction) testAction: (id) sender;
 - (IBAction) resetAction: (id) sender;
 - (IBAction) triggerAction: (id) sender; 
@@ -195,6 +241,9 @@
 - (IBAction) tModeAction: (id) sender;
 - (IBAction) initTPAction: (id) sender;
 - (IBAction) readoutPagesAction: (id) sender; // ak 2.7.07
+- (IBAction) postTriggTimeAction: (id) sender; // -tb- tmp
+- (IBAction) readPostTriggTimeAction: (id) sender; // -tb- tmp
+- (IBAction) writePostTriggTimeAction: (id) sender; // -tb- tmp
 - (IBAction) helloButtonAction:(id)sender;//from here: hardware histogramming -tb- 2008-1-17
 - (IBAction) readEMinButtonAction:(id)sender;
 - (IBAction) writeEMinButtonAction:(id)sender;
@@ -213,17 +262,31 @@
 - (IBAction) changedHistoRunTimeAction:(id)sender;
 - (IBAction) changedHistoRecordingTimeAction:(id)sender;
 
+- (IBAction) histoSetStandardButtonAction:(id)sender;
 - (IBAction) startHistogramButtonAction:(id)sender;
 - (IBAction) stopHistogramButtonAction:(id)sender;
 - (IBAction) readHistogramDataButtonAction:(id)sender;
 - (IBAction) readCurrentStatusButtonAction:(id)sender;
 - (IBAction) changedHistoCalibrationChanPopupButtonAction:(id)sender;
-
+- (IBAction) clearCurrentHistogramPageButtonAction:(id)sender;
+- (IBAction) showHitratesDuringHistoCalibrationAction:(id)sender;
+- (IBAction) histoClearAtStartAction:(id)sender;
+- (IBAction) histoStopIfNotClearedAction:(id)sender;
+- (IBAction) histoClearAtStartAction:(id)sender;
+- (IBAction) histoClearAfterReadoutAction:(id)sender;
 - (IBAction) vetoTestButtonAction:(id)sender;
 - (IBAction) readVetoStateButtonAction:(id)sender;
 - (IBAction) readEnableVetoButtonAction:(id)sender;
 - (IBAction) writeEnableVetoButtonAction:(id)sender;
 - (IBAction) readVetoDataButtonAction:(id)sender;
+
+- (IBAction) readWriteRegisterChanPopUpButtonAction:(id)sender;
+- (IBAction) readWriteRegisterNamePopUpButtonAction:(id)sender;
+- (IBAction) readRegisterAdressButtonAction:(id)sender;
+- (IBAction) readRegisterButtonAction:(id)sender;
+- (IBAction) writeRegisterButtonAction:(id)sender;
+- (IBAction) readRegisterWithAdressButtonAction:(id)sender;
+- (IBAction) writeRegisterWithAdressButtonAction:(id)sender;
 
 
 
