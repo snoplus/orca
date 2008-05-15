@@ -397,9 +397,11 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 			[self setConnection:aConnector];
 			[aConnector setConnection:self];
 		}
-		else NSRunAlertPanel(@"Illegal Connection",@"Connection refused!",nil,nil,nil);
+		else{
+			NSRunAlertPanel(@"Illegal Connection",@"Connection refused!",nil,nil,nil);
+		}
     }
-    else if(aConnector!=nil)NSRunAlertPanel(@"Illegal Connection",@"Connection refused!",nil,nil,nil);
+    else if(aConnector!=nil && aConnector != self)NSRunAlertPanel(@"Illegal Connection",@"Connection refused!",nil,nil,nil);
 }
 
 - (void) disconnect
