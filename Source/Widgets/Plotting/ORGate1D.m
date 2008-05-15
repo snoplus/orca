@@ -365,7 +365,7 @@ const float kGateAlpha2 = .1;
 
 - (float) gatePeakValue
 {
-	int val = [self peakx];
+	float val = [self peakx];
 	id theCalibration = [[mPlot xScale] calibration];
 	if(theCalibration && [theCalibration useCalibration])return [theCalibration convertedValueForChannel:val];
 	else return val;
@@ -373,7 +373,7 @@ const float kGateAlpha2 = .1;
 
 - (float) gateCentroid
 {
-	int val = [self centroid];
+	float val = [self centroid];
 	id theCalibration = [[mPlot xScale] calibration];
 	if(theCalibration && [theCalibration useCalibration])return [theCalibration convertedValueForChannel:val];
 	else return val;
@@ -381,7 +381,7 @@ const float kGateAlpha2 = .1;
 
 - (float) gateSigma
 {
-	int val = [self sigma];
+	float val = [self sigma];
 	id theCalibration = [[mPlot xScale] calibration];
 	if(theCalibration && [theCalibration useCalibration])return [theCalibration convertedValueForChannel:val];
 	else return val;
