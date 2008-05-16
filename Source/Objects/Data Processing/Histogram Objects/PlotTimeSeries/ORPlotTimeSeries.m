@@ -75,6 +75,11 @@ NSString* ORPlotTimeSeriesShowChanged = @"ORPlotTimeSeriesShowChanged";
 	[super incrementTotalCounts];
 }
 
+- (int)	count
+{
+	return [timeSeries count];
+}
+
 #pragma mark ¥¥¥Writing Data
 - (void) writeDataToFile:(FILE*)aFile
 {

@@ -22,10 +22,11 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDataController.h"
 @interface ORMultiPlotController : ORDataController {
-    IBOutlet NSMatrix* legendMatrix;
-    IBOutlet NSTextField* plotNameField;
-    BOOL	scheduledForUpdate;
-	id		calibrationPanel;
+	@protected
+		IBOutlet NSMatrix* legendMatrix;
+		IBOutlet NSTextField* plotNameField;
+		BOOL	scheduledForUpdate;
+		id		calibrationPanel;
 }
 
 - (id)   init;

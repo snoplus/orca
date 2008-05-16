@@ -41,6 +41,7 @@
 - (void) clear;
 - (ORTimeSeries*) timeSeries;
 - (void) addValue:(float)aValue atTime:(unsigned long)aTime;
+- (int)	count;
 
 #pragma mark ¥¥¥Writing Data
 - (void) writeDataToFile:(FILE*)aFile;
