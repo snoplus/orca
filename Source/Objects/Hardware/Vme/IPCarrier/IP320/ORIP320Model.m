@@ -26,7 +26,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimer.h"
-
+#import "ORDataSet.h"
 #import "ORIP320Channel.h"
 #include <math.h>
 
@@ -41,6 +41,7 @@ NSString* ORIP320ModelDisplayRawChanged				= @"ORIP320ModelDisplayRawChanged";
 NSString* ORIP320GainChangedNotification			= @"ORIP320GainChangedNotification";
 NSString* ORIP320ModeChangedNotification			= @"ORIP320ModeChangedNotification";
 NSString* ORIP320AdcValueChangedNotification 		= @"ORIP320AdcValueChangedNotification";
+NSString* ORIP320ModelMultiPlotsChangedNotification = @"ORIP320ModelMultiPlotsChangedNotification";
 
 NSString* ORIP320WriteValueChangedNotification		= @"IP320 WriteValue Changed Notification";
 NSString* ORIP320ReadMaskChangedNotification 		= @"IP320 ReadMask Changed Notification";
@@ -86,7 +87,10 @@ static struct {
 -(void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [multiPlots makeObjectsPerformSelector:@selector(invalidateDataSource) withObject:nil];
+    [multiPlots release];
     [logFile release];
+    [dataSet release];
 	[self _stopPolling];
     [chanObjs release];
     [super dealloc];
@@ -125,6 +129,59 @@ static struct {
 }
 
 #pragma mark ¥¥¥Accessors
+- (ORDataSet*) dataSet
+{
+	return dataSet;
+}
+
+- (void) setDataSet:(ORDataSet*)aDataSet
+{
+    [aDataSet retain];
+    [dataSet release];
+    dataSet = aDataSet;
+    
+    [multiPlots makeObjectsPerformSelector:@selector(setDataSource:) withObject:dataSet];
+    
+}
+
+- (NSMutableArray *) multiPlots
+{
+    return multiPlots; 
+}
+
+- (void) setMultiPlots: (NSMutableArray *) aMultiPlots
+{
+    [aMultiPlots retain];
+    [multiPlots release];
+    multiPlots = aMultiPlots;
+}
+
+- (void) addMultiPlot:(id)aMultiPlot
+{
+    if(!multiPlots){
+        [self setMultiPlots:[NSMutableArray array]];
+    }
+    
+    [[[self undoManager] prepareWithInvocationTarget:self] removeMultiPlot:aMultiPlot];
+    
+    [multiPlots addObject:aMultiPlot];
+    
+    [[NSNotificationCenter defaultCenter]
+				postNotificationName:ORIP320ModelMultiPlotsChangedNotification
+                              object: self ];
+}
+
+- (void) removeMultiPlot:(id)aMultiPlot
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] addMultiPlot:aMultiPlot];
+    
+    [aMultiPlot removeFrom:multiPlots];
+    
+    [[NSNotificationCenter defaultCenter]
+				postNotificationName:ORIP320ModelMultiPlotsChangedNotification
+                              object: self ];
+}
+
 - (int) cardJumperSetting
 {
     return cardJumperSetting;
@@ -267,11 +324,15 @@ static struct {
 
 
 - (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (void) setDataId: (unsigned long) aDataId
 {
-    dataId = DataId;
+    dataId = aDataId;
 }
-
+- (unsigned long) convertedDataId { return convertedDataId; }
+- (void) setConvertedDataId: (unsigned long) aDataId
+{
+    convertedDataId = aDataId;
+}
 - (void) setPollingState:(NSTimeInterval)aState
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPollingState:pollingState];
@@ -298,11 +359,6 @@ static struct {
 - (BOOL) hasBeenPolled 
 { 
     return hasBeenPolled;
-}
-
-- (void) showTimeSeries:(int)aChan
-{
-	[[chanObjs objectAtIndex:aChan] showTimeSeries];
 }
 
 #pragma mark ¥¥¥Hardware Access
@@ -401,6 +457,7 @@ static struct {
 			value = [self readDataBlock];
 			corrected_value = [self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] countActual:value];
 			if([[chanObjs objectAtIndex:aChannel] setChannelValue:corrected_value time:aTime])changeCount++;
+						
 		NS_HANDLER
 			NSLogError(@"",[NSString stringWithFormat:@"IP320 %d,%@",[self slot],[self identifier]],errorLocation,nil);
 			[NSException raise:[NSString stringWithFormat:@"IP320 Read Adc Channel %d Failed",aChannel] format:@"Error Location: %@",errorLocation];
@@ -621,7 +678,8 @@ static struct {
     NS_DURING 
         [self readAllAdcChannels]; 
 		if(shipRecords){
-			[self shipValues]; 
+			[self shipRawValues]; 
+			[self shipConvertedValues]; 
 		}
     NS_HANDLER 
 	//catch this here to prevent it from falling thru, but nothing to do.
@@ -632,6 +690,7 @@ static struct {
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
 	}
 }
+
 
 - (void) enablePollAll:(BOOL)state
 {
@@ -697,8 +756,10 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     [self setDisplayRaw:[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
     [self setChanObjs:[decoder decodeObjectForKey:kORIP320chanObjs]];
 	[self setPollingState:[decoder decodeIntForKey:kORIP320PollingState]];
+	[self setMultiPlots:[decoder decodeObjectForKey:@"multiPlots"]];
+    [self setDataSet:[decoder decodeObjectForKey:@"dataSet"]];
 	[[self undoManager] enableUndoRegistration];
-    
+   
     
     if(chanObjs == nil){
         [self setChanObjs:[NSMutableArray array]];
@@ -708,6 +769,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
         }
     }
 	[chanObjs makeObjectsPerformSelector:@selector(setAdcCard:) withObject:self];
+    [multiPlots makeObjectsPerformSelector:@selector(setDataSource:) withObject:dataSet];
 	   	
 	[[NSNotificationCenter defaultCenter] addObserver : self
                      selector : @selector(writeLogBufferToFile)
@@ -719,6 +781,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:dataSet forKey:@"dataSet"];
     [encoder encodeInt:cardJumperSetting forKey:@"ORIP320ModelCardJumperSetting"];
     [encoder encodeBool:shipRecords forKey:@"ORIP320ModelShipRecords"];
     [encoder encodeObject:logFile forKey:@"ORIP320ModelLogFile"];
@@ -727,6 +790,8 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     [encoder encodeObject:chanObjs forKey:kORIP320chanObjs];
     [encoder encodeInt:[self pollingState] forKey:kORIP320PollingState];
 	[encoder encodeInt:cardJumperSetting forKey:@"ORIP320ModelsetCardJumpertSetting"];
+    [encoder encodeObject:multiPlots forKey:@"multiPlots"];
+
 }
 
 #pragma mark ¥¥¥Bit Processing Protocol
@@ -817,12 +882,14 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 
 - (void) setDataIds:(id)assigner
 {
-    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
+    dataId			= [assigner assignDataIds:kLongForm];
+    convertedDataId = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setDataId:[anotherCard dataId]];
+    [self setConvertedDataId:[anotherCard convertedDataId]];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -850,12 +917,39 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
         [NSNumber numberWithLong:-1],					@"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"IP320ADC"];
-    
+
+    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"ORIP320DecoderForValue",						@"decoder",
+        [NSNumber numberWithLong:convertedDataId],      @"dataId",
+        [NSNumber numberWithBool:YES],                  @"variable",
+        [NSNumber numberWithLong:-1],					@"length",
+        nil];
+    [dataDictionary setObject:aDictionary forKey:@"IP320Value"];
+	
     return dataDictionary;
 }
 
+- (void) loadConvertedTimeSeries:(float)convertedValue atTime:(time_t) aTime forChannel:(int) channel
+{
+	if(!dataSet)[self setDataSet:[[[ORDataSet alloc] initWithKey:@"IP320" guardian:nil] autorelease]];
+	[dataSet loadTimeSeries:convertedValue atTime:aTime sender:self withKeys:@"IP320",@"Value",
+															[NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
+															[NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
+															[self identifier],
+															[NSString stringWithFormat:@"Chan %02d",channel],nil];
+}
 
--(void) shipValues
+- (void) loadRawTimeSeries:(float)aRawValue atTime:(time_t) aTime forChannel:(int) channel
+{
+	if(!dataSet)[self setDataSet:[[[ORDataSet alloc] initWithKey:@"IP320" guardian:nil] autorelease]];
+	[dataSet loadTimeSeries:aRawValue atTime:aTime sender:self withKeys:@"IP320",@"Raw",
+															[NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
+															[NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
+															[self identifier],
+															[NSString stringWithFormat:@"Chan %02d",channel],nil];
+}
+
+- (void) shipRawValues
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
 
@@ -885,9 +979,117 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 		data[0] = dataId | index;
 		
 		if(index>3){
+			//the full record goes into the data stream via a notification
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 														object:[NSData dataWithBytes:data length:index*sizeof(long)]];
 		}
+	}
+}
+
+- (void) shipConvertedValues
+{
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+
+	if(runInProgress){
+		unsigned long data[83];
+		
+		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
+		
+		//get the time(UT!)
+		time_t	theTime;
+		time(&theTime);
+		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t ut_time = mktime(theTimeGMTAsStruct);
+		data[2] = ut_time;	//seconds since 1970
+		
+		int index = 3;
+		int n;
+		if(mode == 0) n = 20;
+		else n = 40;
+
+		union {
+			long asLong;
+			float asFloat;
+		} theValue;
+
+
+		int i;
+		for(i=0;i<n;i++){
+			if([[chanObjs objectAtIndex:i] readEnabled]){
+				data[index++] = i;
+				theValue.asFloat =  (float)[self convertedValue:i];
+				data[index++] = theValue.asLong;
+			}
+		}
+		data[0] = convertedDataId | index;
+		
+		if(index>3){
+			//the full record goes into the data stream via a notification
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+														object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+		}
+	}
+}
+
+- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+{
+    return (item == nil) ? 1  : [item numberOfChildren];
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+{
+    return    (item == nil) ? [self numberOfChildren]!=0 : ([item numberOfChildren] != 0);
+}
+
+- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+{
+    if(item)   return [item childAtIndex:index];
+    else	return dataSet;
+}
+
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+{
+    return  ((item == nil) ? @"IP320" : [item name]);
+}
+
+- (unsigned)  numberOfChildren
+{
+    int count =  [dataSet count];
+    return count;
+}
+
+- (id)   childAtIndex:(int)index
+{
+    NSEnumerator* e = [dataSet objectEnumerator];
+    id obj;
+    id child = nil;
+    short i = 0;
+    while(obj = [e nextObject]){
+        if(i++ == index){
+            child = [[obj retain] autorelease];
+            break;
+        }
+    }
+    return child;
+}
+
+- (BOOL) leafNode
+{
+	return NO;
+}
+
+- (id)   name
+{
+    return @"TimeSeries";
+}
+
+- (void) removeDataSet:(ORDataSet*)item
+{
+    if([[item name] isEqualToString: [self name]]) {
+        [self setDataSet:nil];
+    }
+    else { 
+		[dataSet removeObject:item];
 	}
 }
 

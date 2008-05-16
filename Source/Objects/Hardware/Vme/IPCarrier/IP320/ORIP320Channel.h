@@ -18,25 +18,20 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
+#pragma mark ***Param Keys
+#define k320ChannelKey			@"Key"
+#define k320ChannelReadEnabled	@"ReadEnabled"
+#define k320ChannelValue		@"Value"
+#define k320ChannelRawValue		@"RawValue"
+#define k320ChannelGain			@"Gain"
+#define k320ChannelUnits		@"Units"
+#define k320ChannelSlope		@"Slope"
+#define k320ChannelIntercept	@"Intercept"
+#define k320ChannelAlarmEnabled @"AlarmEnabled"
+#define k320ChannelLowValue		@"LowValue"
+#define k320ChannelHighValue	@"HighValue"
 
 @class ORAlarm;
-
-#pragma mark ***Param Keys
-#define k320ChannelKey @"k320ChannelKey"
-#define k320ChannelReadEnabled @"k320ChannelReadEnabled"
-#define k320ChannelValue @"k320ChannelValue"
-#define k320ChannelRawValue @"k320ChannelRawValue"
-#define k320ChannelGain @"k320ChannelGain"
-#define k320ChannelUnits @"k320ChannelUnits"
-#define k320ChannelSlope @"k320ChannelSlope"
-#define k320ChannelIntercept @"k320ChannelIntercept"
-#define k320ChannelAlarmEnabled @"k320ChannelAlarmEnabled"
-#define k320ChannelLowValue @"k320ChannelLowValue"
-#define k320ChannelHighValue @"k320ChannelHighValue"
-
-@class ORDataSet;
 
 @interface ORIP320Channel : NSObject {
 	id			adcCard;
@@ -45,7 +40,6 @@
 	ORAlarm*	highAlarm;
 	double		maxValue;
 	int			rawValue;
-	ORDataSet*	dataSet;
 }
 - (id) initWithAdc:(id)anAdcCard channel:(unsigned short)aChannel;
 
@@ -62,7 +56,6 @@
 - (void) checkDefaults;
 - (double) maxValue;
 - (int) rawValue;
-- (void) showTimeSeries;
 @end
 
 @interface NSObject (IP320Card)

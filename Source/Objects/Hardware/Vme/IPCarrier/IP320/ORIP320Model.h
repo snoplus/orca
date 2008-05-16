@@ -23,6 +23,8 @@
 #import "ORVmeIPCard.h"
 #import "ORAdcProcessing.h"
 
+@class ORDataSet;
+
 enum {
     kControlReg,
     kConvertCmd,
@@ -77,11 +79,13 @@ struct{
 
 @interface ORIP320Model : ORVmeIPCard <ORAdcProcessing>
 {
+	ORDataSet*   dataSet;
     NSMutableArray* chanObjs;
     NSTimeInterval	pollingState;
     BOOL            hasBeenPolled;
 	NSLock*			hwLock;
     unsigned long   dataId;
+    unsigned long   convertedDataId;
 	unsigned long	readCount;
     BOOL			displayRaw;
 	int				mode;
@@ -91,6 +95,7 @@ struct{
 	NSMutableArray*	logBuffer;
     BOOL			shipRecords;
     int				cardJumperSetting;
+	NSMutableArray* multiPlots;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -109,6 +114,10 @@ struct{
 - (void) loadCALLOControReg:(unsigned short)gain;
 - (void)  calculateCalibrationSlope:(unsigned short)gain;
 - (unsigned short) calculateCorrectedCount:(unsigned short)gain countActual:(unsigned short)CountActual;
+- (NSMutableArray *)    multiPlots;
+- (void) setMultiPlots:(NSMutableArray *) aMultiPlots;
+- (void) addMultiPlot:(id)aMultiPlot;
+- (void) removeMultiPlot:(id)aMultiPlot;
 
 
 - (BOOL) displayRaw;
@@ -133,9 +142,10 @@ struct{
 - (void)		   postNotification:(NSNotification*)aNote;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
+- (unsigned long) convertedDataId;
+- (void) setConvertedDataId: (unsigned long) DataId;
 - (unsigned long) lowMask;
 - (unsigned long) highMask;
-- (void) showTimeSeries:(int)aChan;
 
 #pragma mark ¥¥¥Adc Processing Protocol
 - (void)processIsStarting;
@@ -155,10 +165,28 @@ struct{
 - (NSDictionary*) dataRecordDescription;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
--(void) shipValues;
+- (void) shipRawValues;
+- (void) shipConvertedValues;
+- (void) loadConvertedTimeSeries:(float)convertedValue atTime:(time_t) aTime forChannel:(int) channel;
+- (void) loadRawTimeSeries:(float)convertedValue atTime:(time_t) aTime forChannel:(int) channel;
+
+
+#pragma mark ¥¥¥DataSource
+- (int)  outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
+- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
+- (unsigned)  numberOfChildren;
+- (id)   childAtIndex:(int)index;
+- (id)   name;
+- (void) removeDataSet:(ORDataSet*)aSet;
+- (BOOL) leafNode;
 
 @end
 
+@interface NSObject (ORHistModel)
+- (void) removeFrom:(NSMutableArray*)anArray;
+@end
 
 #pragma mark ¥¥¥External String Definitions
 extern NSString* ORIP320ModelCardJumperSettingChanged;
@@ -174,3 +202,4 @@ extern NSString* ORIP320ReadMaskChangedNotification;
 extern NSString* ORIP320ReadValueChangedNotification;
 extern NSString* ORIP320PollingStateChangedNotification;
 extern NSString* ORIP320ModelModeChanged;
+extern NSString* ORIP320ModelMultiPlotsChangedNotification;

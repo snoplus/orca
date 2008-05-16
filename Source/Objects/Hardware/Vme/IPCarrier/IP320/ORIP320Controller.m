@@ -23,6 +23,8 @@
 #import "ORIP320Controller.h"
 #import "ORIP320Model.h"
 #import "ORIP320Channel.h"
+#import "ORTimeMultiPlot.h"
+#import "ORDataSet.h"
 
 
 @interface ORIP320Controller (private)
@@ -46,9 +48,10 @@
 
 - (void) awakeFromNib
 {
-    adcValueSize    = NSMakeSize(385,442);
+    adcValueSize    = NSMakeSize(380,442);
     calibrationSize = NSMakeSize(520,430);
     alarmSize       = NSMakeSize(490,443);
+	dataSize       = NSMakeSize(380,443);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -83,9 +86,11 @@
         val *= 2;
 	}
 	
-	[valueTable1 setDoubleAction:@selector(doubleClick:)];
-	[valueTable2 setDoubleAction:@selector(doubleClick:)];
-	
+    [outlineView setDoubleAction:@selector(doubleClick:)];
+    [multiPlotView setDoubleAction:@selector(doubleClickMultiPlot:)];
+	[splitView loadLayoutWithName:[NSString stringWithFormat:@"IP320-%d",[model uniqueIdNumber]]];
+	[plotGroupButton setEnabled:NO];    
+
     [super awakeFromNib];
 }
 
@@ -138,13 +143,95 @@
                          name : ORIP320ModelCardJumperSettingChanged
 						object: model];
 
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(multiPlotsChanged:)
+                         name : ORIP320ModelMultiPlotsChangedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(multiPlotsChanged:)
+                         name : ORMultiPlotDataSetItemsChangedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(multiPlotsChanged:)
+                         name : ORMultiPlotNameChangedNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(outlineViewSelectionDidChange:)
+                         name : NSOutlineViewSelectionDidChangeNotification
+                       object : outlineView];
+
+   [notifyCenter addObserver : self
+                     selector : @selector(dataChanged:)
+                         name : ORDataSetDataChanged
+                       object : nil];
+
 }
 
 
 #pragma mark ¥¥¥Accessors
+- (void) setModel:(id)aModel
+{    
+    [super setModel:aModel];
+    [outlineView setDoubleAction:@selector(doubleClick:)];
+    [multiPlotView setDoubleAction:@selector(doubleClickMultiPlot:)];
+    [outlineView setDataSource:aModel];
+    [self updateWindow];
+}
 
 
 #pragma mark ¥¥¥Interface Management
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+    if([notification object] == outlineView){
+        NSMutableArray *selection = [NSMutableArray arrayWithArray:[outlineView allSelectedItems]];
+    
+        int validCount = 0;
+        int i;
+        for(i=0;i<[selection count];i++){
+            id aDataSet = [selection objectAtIndex:i];
+            if([aDataSet leafNode]){
+                id obj = [aDataSet data];
+                if([obj canJoinMultiPlot]){
+                    validCount++;
+                }
+            }
+        }
+        [plotGroupButton setEnabled:validCount];
+    }
+}
+- (void) multiPlotsChanged:(NSNotification*)aNotification
+{
+	[multiPlotView reloadData];
+}
+
+- (void) dataChanged:(NSNotification*)aNotification
+{
+    if(!scheduledToUpdate2){
+        [self performSelector:@selector(doDataUpdate) withObject:nil afterDelay:1.0];
+        scheduledToUpdate2 = YES;
+    }
+}
+
+- (void) doDataUpdate
+{
+    scheduledToUpdate2 = NO;
+    [outlineView reloadData];
+    [multiPlotView reloadData];
+    //[outlineView reloadItem:[model dataSet] reloadChildren:YES];
+}
+
+- (void) doUpdate
+{
+    scheduledToUpdate1 = NO;
+    [outlineView reloadData];
+    [multiPlotView reloadData];
+    //[outlineView reloadItem:[model dataSet] reloadChildren:YES];
+}
+
 - (void) shipRecordsChanged:(NSNotification*)aNote
 {
 	[shipRecordsButton setIntValue: [model shipRecords]];
@@ -171,6 +258,8 @@
 - (void) updateWindow
 {
     [super updateWindow];
+    [self modelChanged:nil];
+    [self dataChanged:nil];
     [self pollingStateChanged:nil];
 	[self valuesChanged:nil];
 	[self slotChanged:nil];
@@ -180,6 +269,15 @@
 	[self logFileChanged:nil];
 	[self shipRecordsChanged:nil];
 	[self cardJumperSettingChanged:nil];
+}
+
+- (void) modelChanged:(NSNotification*)aNotification
+{
+    if(!aNotification || [aNotification object] == self){
+        //[outlineView reloadItem:[model dataSet] reloadChildren:YES];
+        [outlineView reloadData];
+        [multiPlotView reloadData];
+    }
 }
 
 - (void) cardJumperSettingChanged:(NSNotification*)aNotification
@@ -203,17 +301,19 @@
 
 - (void) valuesChanged:(NSNotification*)aNotification
 {
-    if(!scheduledToUpdate){
+    if(!scheduledToUpdate1){
         [self performSelector:@selector(reloadData) withObject:nil afterDelay:1.0];
-        scheduledToUpdate = YES;
+        scheduledToUpdate1 = YES;
     }
 }
 
 - (void) reloadData
 {
-    scheduledToUpdate = NO;
+    scheduledToUpdate1 = NO;
 	[valueTable1 reloadData];
 	[valueTable2 reloadData];
+    [outlineView reloadData];
+    [multiPlotView reloadData];
 }
 
 - (void) pollingStateChanged:(NSNotification*)aNotification
@@ -221,12 +321,105 @@
 	[pollingButton selectItemAtIndex:[pollingButton indexOfItemWithTag:[model pollingState]]];
 }
 
+
+- (BOOL) validateMenuItem:(NSMenuItem*)menuItem
+{
+    if ([menuItem action] == @selector(cut:)) {
+        return [outlineView selectedRow] >= 0 || [multiPlotView selectedRow]>=0;
+    }
+    else if ([menuItem action] == @selector(delete:)) {
+        return [outlineView selectedRow] >= 0 || [multiPlotView selectedRow]>=0;
+    }    
+    else if ([menuItem action] == @selector(copy:)) {
+        return NO;
+    }
+    else  return [super validateMenuItem:menuItem];
+}
+
 #pragma mark ¥¥¥Actions
+- (IBAction)delete:(id)sender
+{
+    [self removeItemAction:nil];
+}
+
+- (IBAction)cut:(id)sender
+{
+    [self removeItemAction:nil];
+}
+
+- (IBAction) removeItemAction:(id)sender
+{ 
+    if([[self window] firstResponder] == outlineView){
+        NSArray *selection = [outlineView allSelectedItems];
+        NSEnumerator* e = [selection objectEnumerator];
+        id item;
+        while(item = [e nextObject]){
+            [model removeDataSet:item];
+        }
+        [[model dataSet] recountTotal];
+        [outlineView deselectAll:self];
+        [outlineView reloadData];
+    }
+    else {
+        NSArray *selection = [multiPlotView allSelectedItems];
+        NSEnumerator* e = [selection objectEnumerator];
+        id item;
+        while(item = [e nextObject]){
+            if([item isKindOfClass:[ORTimeMultiPlot class]]){
+                [model removeMultiPlot:item];
+            }
+            else {//if([item isKindOfClass:[ORMultiPlotDataItem class]]){
+                [item removeSelf];
+            }
+        }
+        [multiPlotView deselectAll:self];
+        [multiPlotView reloadData];
+    }
+}
+
+- (IBAction) doubleClickMultiPlot:(id)sender
+{
+    id selectedObj = [multiPlotView itemAtRow:[multiPlotView selectedRow]];
+    [selectedObj doDoubleClick:sender];
+}
+
 - (IBAction) doubleClick:(id)sender
 {
-	int chan = [sender selectedRow];
-	if(sender == valueTable1)		[model showTimeSeries:chan];
-	else if(sender == valueTable2)	[model showTimeSeries:chan+20];
+    id selectedObj = [outlineView itemAtRow:[outlineView selectedRow]];
+    [selectedObj doDoubleClick:sender];
+}
+
+- (IBAction) plotGroupAction:(id)sender
+{
+    NSMutableArray *selection = [NSMutableArray arrayWithArray:[outlineView allSelectedItems]];
+    //launch the multiplot for the selection array...
+    ORTimeMultiPlot* newMultiPlot = [[ORTimeMultiPlot alloc] init];
+    
+    NSEnumerator* e = [selection objectEnumerator];
+    ORDataSet* aDataSet;
+    int validCount = 0;
+    while(aDataSet = [e nextObject]){
+        if([aDataSet leafNode]){
+            id obj = [aDataSet data];
+            if([obj canJoinMultiPlot]){
+                [newMultiPlot addDataSetName:[[aDataSet data] shortName]];
+                validCount++;
+				if(![newMultiPlot dataSet]){
+					[newMultiPlot setDataSet:[model dataSet]];
+				}
+            }
+        }
+    }
+    if(validCount){
+        [newMultiPlot setDataSource:[model dataSet]];
+        [newMultiPlot doDoubleClick:nil];
+        [model addMultiPlot:newMultiPlot];
+    }
+    [newMultiPlot release];
+    [multiPlotView reloadData];
+    [outlineView deselectAll:self];
+    [outlineView reloadData];
+
 }
 
 - (IBAction) shipRecordsAction:(id)sender
@@ -247,7 +440,6 @@
 	[valueTable1 reloadData];
 	[valueTable2 reloadData];
 }
-
 
 - (IBAction) enableAlarmAllAction:(id)sender
 {
@@ -331,7 +523,9 @@
     [model setPollingState:(NSTimeInterval)[[sender selectedItem] tag]];
 }
 
-- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+
+
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
@@ -346,6 +540,11 @@
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:alarmSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 3){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:dataSize];
 		[[self window] setContentView:tabView];
     }
 	
@@ -405,6 +604,67 @@
 	}
 }
 
+#pragma  mark ¥¥¥Delegate Responsiblities
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    return NO;
+}
+
+#pragma mark ¥¥¥Data Source Methods
+- (int)outlineView:(NSOutlineView *)ov numberOfChildrenOfItem:(id)item
+{
+    if(ov == outlineView){
+        return  (item == nil) ? [model numberOfChildren]  : [item numberOfChildren];
+    }
+    else {
+        if(!item)return [[model multiPlots] count];
+        else {
+            if([item respondsToSelector:@selector(count)])return [item count];
+            else return 0;
+        }
+    }
+}
+
+- (BOOL)outlineView:(NSOutlineView *)ov isItemExpandable:(id)item
+{
+    if(ov == outlineView){
+        return   (item == nil) ? [model numberOfChildren] != 0 : ([item numberOfChildren] != 0);
+    }
+    else {
+        if(!item)return [[model multiPlots] count]!=0;
+        else {
+            if([item respondsToSelector:@selector(count)])return [item count]!=0;
+            else return NO;
+        }
+    }
+}
+
+- (id)outlineView:(NSOutlineView *)ov child:(int)index ofItem:(id)item
+{
+    id anObj;
+    if(ov == outlineView){
+        if(!item)   anObj = model;
+        else        anObj = [item childAtIndex:index];
+    }
+    else {
+        if(!item)   anObj = [[model multiPlots] objectAtIndex:index];
+        else  anObj = [item objectAtIndex:index];
+    }
+    return anObj;
+}
+
+- (id)outlineView:(NSOutlineView *)ov objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+{
+    if(ov == outlineView){
+        return  ((item == nil) ? [model name] : [item name]);
+    }
+    else {
+        if([tableColumn identifier]){
+            return [item description];
+        }
+        else return nil;
+    }
+}
 
 @end
 

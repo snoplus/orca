@@ -43,12 +43,18 @@
 		IBOutlet NSButton*		selectLogFileButton;
 		IBOutlet NSButton*		calibrateButton;
 		IBOutlet NSPopUpButton*	jumperSettingsPU;
-    
-        NSView *blankView;
-        NSSize adcValueSize;
-        NSSize calibrationSize;
-        NSSize alarmSize;
-		BOOL   scheduledToUpdate;
+		IBOutlet NSSplitView*	splitView;
+		IBOutlet NSOutlineView* outlineView;
+		IBOutlet NSOutlineView* multiPlotView;
+		IBOutlet NSButton* 		plotGroupButton;
+   
+        NSView* blankView;
+        NSSize  adcValueSize;
+        NSSize  calibrationSize;
+        NSSize  alarmSize;
+        NSSize  dataSize;
+		BOOL    scheduledToUpdate1;
+		BOOL    scheduledToUpdate2;
 
 }
 
@@ -63,12 +69,18 @@
 - (void) logFileChanged:(NSNotification*)aNote;
 - (void) logToFileChanged:(NSNotification*)aNote;
 - (void) displayRawChanged:(NSNotification*)aNote;
-- (void) pollingStateChanged:(NSNotification*)aNotification;
-- (void) valuesChanged:(NSNotification*)aNotification;
-- (void) slotChanged:(NSNotification*)aNotification;
-- (void) modeChanged:(NSNotification*)aNotification;
+- (void) pollingStateChanged:(NSNotification*)aNote;
+- (void) valuesChanged:(NSNotification*)aNote;
+- (void) slotChanged:(NSNotification*)aNote;
+- (void) modeChanged:(NSNotification*)aNote;
+- (void) modelChanged:(NSNotification*)aNote;
+- (void) doDataUpdate;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) delete:(id)sender;
+- (IBAction) cut:(id)sender;
+- (IBAction) removeItemAction:(id)sender;
+- (IBAction) doubleClickMultiPlot:(id)sender;
 - (IBAction) doubleClick:(id)sender;
 - (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) logToFileAction:(id)sender;
@@ -84,8 +96,7 @@
 - (IBAction) setJumperSettings:(id)sender;
 - (IBAction) calibrateAction:(id)sender;
 - (IBAction) selectFileAction:(id)sender;
-
-
+- (IBAction) plotGroupAction:(id)sender;
 
 @end
 

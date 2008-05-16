@@ -20,7 +20,6 @@
 
 
 #import "ORIP320Channel.h"
-#import "ORDataSet.h"
 #import "ORIP320Model.h"
 
 @implementation ORIP320Channel
@@ -38,7 +37,6 @@
 // ===========================================================
 - (void)dealloc 
 {
-	[dataSet release];
 	[highAlarm clearAlarm];
 	[lowAlarm clearAlarm];
 	[highAlarm release];
@@ -63,18 +61,12 @@
 // ===========================================================
 // - setParameters:
 // ===========================================================
-- (void)setParameters:(NSMutableDictionary *)aParameters {
+- (void) setParameters:(NSMutableDictionary *)aParameters 
+{
     [aParameters retain];
     [parameters release];
     parameters = aParameters;
 }
-
-- (void) showTimeSeries
-{
-	ORDataSet* ds = [dataSet objectForKey:[NSString stringWithFormat:@"IP320,%d,%d,%@,%d",[[adcCard guardian] crateNumber],[[adcCard guardian] slot],[adcCard identifier],[self channel]]];
-	[ds doDoubleClick:self];
-}
-
 
 - (void) unableToSetNilForKey:(NSString*)aKey
 {
@@ -85,13 +77,14 @@
 {
 	id resultObj = nil;
 	@synchronized(self){
-		if(![[parameters objectForKey:k320ChannelReadEnabled]boolValue]){
+		if(![[parameters objectForKey:k320ChannelReadEnabled] boolValue]){
 			if([aKey isEqualToString:k320ChannelValue])return @"-";
 			else if([aKey isEqualToString:k320ChannelUnits])return @"-";
 			else if([aKey isEqualToString:k320ChannelSlope])return @"-";
 			else if([aKey isEqualToString:k320ChannelIntercept])return @"-";
 		}
 		resultObj =  [parameters objectForKey:aKey];
+		if(!resultObj)[parameters objectForKey:[@"k320Channel" stringByAppendingString:aKey]]; //backward compatibility
 	}
 	return resultObj;
 }
@@ -189,13 +182,13 @@
 				}
 			}
 			else {
-					[highAlarm clearAlarm];
-					[highAlarm release];
-					highAlarm = nil;
+				[highAlarm clearAlarm];
+				[highAlarm release];
+				highAlarm = nil;
 					
-					[lowAlarm clearAlarm];
-					[lowAlarm release];
-					lowAlarm = nil;
+				[lowAlarm clearAlarm];
+				[lowAlarm release];
+				lowAlarm = nil;
 			}
 		}
 		else {
@@ -224,16 +217,18 @@
 		[parameters setObject:theConvertedValue forKey:k320ChannelValue];
 		[parameters setObject:[NSNumber numberWithInt:rawValue] forKey:k320ChannelRawValue];
 		[self checkAlarm];
-		if(!dataSet)dataSet = [[ORDataSet alloc] initWithKey:@"IP320" guardian:nil];
-		[dataSet loadTimeSeries:convertedValue atTime:aTime sender:self withKeys:[NSString stringWithFormat:@"IP320,%d,%d,%@,%d",[[adcCard guardian] crateNumber],[[adcCard guardian] slot],[adcCard identifier],[self channel]],nil];
+		[adcCard loadConvertedTimeSeries:convertedValue atTime:aTime forChannel:[self channel]];
+		[adcCard loadRawTimeSeries:aValue atTime:aTime forChannel:[self channel]];
 
 	}
     return changed;
 }
+
 - (int) rawValue
 {
 	return rawValue;
 }
+
 - (double) maxValue
 {
 	return maxValue;
