@@ -126,6 +126,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>arrangeInCircle</key>
+				<string>id</string>
 				<key>decDialog</key>
 				<string>id</string>
 				<key>incDialog</key>
@@ -232,6 +234,10 @@
 			<dict>
 				<key>bodyField</key>
 				<string>NSTextView</string>
+				<key>categoryMatrix</key>
+				<string>NSMatrix</string>
+				<key>infoForm</key>
+				<string>NSForm</string>
 				<key>mailForm</key>
 				<string>NSForm</string>
 			</dict>
