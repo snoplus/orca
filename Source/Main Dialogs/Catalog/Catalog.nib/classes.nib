@@ -13,32 +13,6 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>click</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>OrcaObjectFactory</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ObjectFactory</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
 			<key>CLASS</key>
 			<string>ORDetectorView</string>
 			<key>LANGUAGE</key>
@@ -48,22 +22,6 @@
 				<key>delegate</key>
 				<string>id</string>
 			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>BiStateView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
 		</dict>
@@ -121,19 +79,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ORColorScale</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>colorAxis</key>
-				<string>ORAxis</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -173,6 +118,117 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSButton</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>click</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectFactory</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ObjectFactory</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>BiStateView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORColorScale</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>colorAxis</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -297,62 +353,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>copy</key>
-				<string>id</string>
-				<key>decDialog</key>
-				<string>id</string>
-				<key>incDialog</key>
-				<string>id</string>
-				<key>saveDocument</key>
-				<string>id</string>
-				<key>saveDocumentAs</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>OrcaObjectController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>model</key>
-				<string>id</string>
-				<key>warningField</key>
-				<string>ORTimedTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>setLogScale</key>
-				<string>id</string>
-				<key>shiftLeft</key>
-				<string>id</string>
-				<key>shiftRight</key>
-				<string>id</string>
-				<key>zoomIn</key>
-				<string>id</string>
-				<key>zoomOut</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORAxis</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>preferenceController</key>
-				<string>id</string>
-				<key>viewToScale</key>
-				<string>NSView</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
