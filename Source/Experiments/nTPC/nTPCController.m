@@ -71,7 +71,6 @@
 
 -(void) awakeFromNib
 {
-    [super awakeFromNib];
 	
 	[anodeScale setRngLimitsLow:0 withHigh:127 withMinRng:127];
     [anodeScale setRngDefaultsLow:0 withHigh:127];
@@ -80,6 +79,7 @@
     [cathodeScale setRngDefaultsLow:0 withHigh:63];
 
 	[self populateClassNamePopup:secondaryAdcClassNamePopup];
+    [super awakeFromNib];
 		
 }
 
