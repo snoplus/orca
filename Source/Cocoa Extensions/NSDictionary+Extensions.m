@@ -79,6 +79,41 @@
 	return data;
 }
 
+- (unsigned long) uLongForKey:(NSString*)aKey
+{
+	return [[self objectForKey:aKey] unsignedLongValue];
+}
+- (long) longForKey:(NSString*)aKey
+{
+	return [[self objectForKey:aKey] unsignedLongValue];
+}
+
+- (unsigned short) uShortForKey:(NSString*)aKey
+{
+	return [[self objectForKey:aKey] unsignedShortValue];
+}
+
+- (short) shortForKey:(NSString*)aKey
+{
+	return [[self objectForKey:aKey] shortValue];
+}
+
+- (unsigned int) uIntForKey:(NSString*)aKey
+{
+	return [[self objectForKey:aKey] unsignedIntValue];
+}
+
+- (int) intForKey:(NSString*)aKey
+{
+	return [[self objectForKey:aKey] intValue];
+}
+
+- (BOOL) boolForKey:(NSString*)aKey
+{
+	return [[self objectForKey:aKey] boolValue];
+}
+
+
 + (id) dictionaryWithPList:(id)plist
 {
 	//write request to temp file because we want the form you get from a disk file...the string to property list isn't right.

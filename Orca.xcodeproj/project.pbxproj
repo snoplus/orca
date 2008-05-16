@@ -1115,6 +1115,12 @@
 		848CD35C08FB511B0046CD9D /* NSSplitView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */; };
 		848CD35D08FB511B0046CD9D /* NSSplitView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */; };
 		848CD41908FC3A220046CD9D /* ORAugerSLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 848CD41808FC3A220046CD9D /* ORAugerSLTDefs.h */; };
+		848D842A0DDE060100D44B81 /* edu.washington.npl.orca.TimeMultiPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 848D84240DDE060100D44B81 /* edu.washington.npl.orca.TimeMultiPlot.plist */; };
+		848D842B0DDE060100D44B81 /* ORTimeMultiPlot.h in Headers */ = {isa = PBXBuildFile; fileRef = 848D84250DDE060100D44B81 /* ORTimeMultiPlot.h */; };
+		848D842C0DDE060100D44B81 /* ORTimeMultiPlot.m in Sources */ = {isa = PBXBuildFile; fileRef = 848D84260DDE060100D44B81 /* ORTimeMultiPlot.m */; };
+		848D842D0DDE060100D44B81 /* ORTimeMultiPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 848D84270DDE060100D44B81 /* ORTimeMultiPlotController.h */; };
+		848D842E0DDE060100D44B81 /* ORTimeMultiPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 848D84280DDE060100D44B81 /* ORTimeMultiPlotController.m */; };
+		848D842F0DDE060100D44B81 /* TimeMultiPlot.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848D84290DDE060100D44B81 /* TimeMultiPlot.nib */; };
 		848E201C059282F400B6708F /* statusWindow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E201B059282F400B6708F /* statusWindow.gif */; };
 		848E206A0592891800B6708F /* alarmMaster.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E20690592891800B6708F /* alarmMaster.gif */; };
 		848E2102059378C800B6708F /* catalog.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E2101059378C700B6708F /* catalog.gif */; };
@@ -1179,6 +1185,22 @@
 		84978B4D0702190100B7887E /* ORDataTypeAssigner.m in Sources */ = {isa = PBXBuildFile; fileRef = 84978B4B0702190100B7887E /* ORDataTypeAssigner.m */; };
 		8498069D09A6584200086E71 /* ORSocketThreadedClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 8498069B09A6584200086E71 /* ORSocketThreadedClient.h */; };
 		8498069E09A6584200086E71 /* ORSocketThreadedClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8498069C09A6584200086E71 /* ORSocketThreadedClient.m */; };
+		849901930DC91C5A00E82DB4 /* SNOCrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849901920DC91C5A00E82DB4 /* SNOCrate.gif */; };
+		849928170DCB997C00E82DB4 /* MTC.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8499280F0DCB997C00E82DB4 /* MTC.nib */; };
+		849928180DCB997C00E82DB4 /* MTCCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849928100DCB997C00E82DB4 /* MTCCard.gif */; };
+		849928190DCB997C00E82DB4 /* ORMTCController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849928110DCB997C00E82DB4 /* ORMTCController.h */; };
+		8499281A0DCB997C00E82DB4 /* ORMTCController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849928120DCB997C00E82DB4 /* ORMTCController.m */; };
+		8499281B0DCB997C00E82DB4 /* ORMTCDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 849928130DCB997C00E82DB4 /* ORMTCDecoders.h */; };
+		8499281C0DCB997C00E82DB4 /* ORMTCDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 849928140DCB997C00E82DB4 /* ORMTCDecoders.m */; };
+		8499281D0DCB997C00E82DB4 /* ORMTCModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849928150DCB997C00E82DB4 /* ORMTCModel.h */; };
+		8499281E0DCB997C00E82DB4 /* ORMTCModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849928160DCB997C00E82DB4 /* ORMTCModel.m */; };
+		849929AB0DCFCA5900E82DB4 /* ORMTC_Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 849929AA0DCFCA5900E82DB4 /* ORMTC_Constants.h */; };
+		84992CB40DD21F3800E82DB4 /* HP3458a.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84992CAE0DD21F3800E82DB4 /* HP3458a.nib */; };
+		84992CB50DD21F3800E82DB4 /* HP3458a.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84992CAF0DD21F3800E82DB4 /* HP3458a.tif */; };
+		84992CB60DD21F3800E82DB4 /* ORHP3458aController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84992CB00DD21F3800E82DB4 /* ORHP3458aController.h */; };
+		84992CB70DD21F3800E82DB4 /* ORHP3458aController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84992CB10DD21F3800E82DB4 /* ORHP3458aController.m */; };
+		84992CB80DD21F3800E82DB4 /* ORHP3458aModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84992CB20DD21F3800E82DB4 /* ORHP3458aModel.h */; };
+		84992CB90DD21F3800E82DB4 /* ORHP3458aModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84992CB30DD21F3800E82DB4 /* ORHP3458aModel.m */; };
 		84997E850CE37CBA002CFA70 /* ORVme64CrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */; };
 		84997E860CE37CBA002CFA70 /* ORVme64CrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */; };
 		84997E870CE37CBA002CFA70 /* ORVme64CrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */; };
@@ -1188,6 +1210,22 @@
 		84997E8B0CE37CBA002CFA70 /* Vme64Crate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84997E820CE37CBA002CFA70 /* Vme64Crate.gif */; };
 		84997E8C0CE37CBA002CFA70 /* Vme64Crate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84997E830CE37CBA002CFA70 /* Vme64Crate.nib */; };
 		84997E8D0CE37CBA002CFA70 /* Vme64CrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84997E840CE37CBA002CFA70 /* Vme64CrateSmall.gif */; };
+		8499FE8D0DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8499FE840DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist */; };
+		8499FE8E0DC8E9B700E82DB4 /* ORSNOCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FE850DC8E9B700E82DB4 /* ORSNOCrateController.h */; };
+		8499FE8F0DC8E9B700E82DB4 /* ORSNOCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */; };
+		8499FE900DC8E9B700E82DB4 /* ORSNOCrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FE870DC8E9B700E82DB4 /* ORSNOCrateModel.h */; };
+		8499FE910DC8E9B700E82DB4 /* ORSNOCrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FE880DC8E9B700E82DB4 /* ORSNOCrateModel.m */; };
+		8499FE920DC8E9B700E82DB4 /* ORSNOCrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FE890DC8E9B700E82DB4 /* ORSNOCrateView.h */; };
+		8499FE930DC8E9B700E82DB4 /* ORSNOCrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FE8A0DC8E9B700E82DB4 /* ORSNOCrateView.m */; };
+		8499FE940DC8E9B700E82DB4 /* SNOCrate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8499FE8B0DC8E9B700E82DB4 /* SNOCrate.nib */; };
+		8499FF910DC9090400E82DB4 /* ORSNOCard.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FF8F0DC9090400E82DB4 /* ORSNOCard.h */; };
+		8499FF920DC9090400E82DB4 /* ORSNOCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FF900DC9090400E82DB4 /* ORSNOCard.m */; };
+		8499FFDD0DC90F5800E82DB4 /* ORXL1Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FFDA0DC90F5800E82DB4 /* ORXL1Model.h */; };
+		8499FFDE0DC90F5800E82DB4 /* ORXL1Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FFDB0DC90F5800E82DB4 /* ORXL1Model.m */; };
+		8499FFDF0DC90F5800E82DB4 /* XL1Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8499FFDC0DC90F5800E82DB4 /* XL1Card.gif */; };
+		8499FFE40DC9102700E82DB4 /* ORXL2Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8499FFE10DC9102700E82DB4 /* ORXL2Model.h */; };
+		8499FFE50DC9102700E82DB4 /* ORXL2Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8499FFE20DC9102700E82DB4 /* ORXL2Model.m */; };
+		8499FFE60DC9102700E82DB4 /* XL2Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8499FFE30DC9102700E82DB4 /* XL2Card.gif */; };
 		849B25EC0B2F34F90007484F /* Prespectrometer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849B25E40B2F34F90007484F /* Prespectrometer.nib */; };
 		849B25ED0B2F34FA0007484F /* prespectrometer.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849B25E50B2F34F90007484F /* prespectrometer.tif */; };
 		849B25EE0B2F34FA0007484F /* PrespectrometerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849B25E60B2F34F90007484F /* PrespectrometerController.h */; };
@@ -2712,6 +2750,12 @@
 		848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSSplitView+Extensions.h"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSSplitView+Extensions.m"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		848CD41808FC3A220046CD9D /* ORAugerSLTDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerSLTDefs.h; path = "Source/Objects/Hardware/Auger/Auger Base Classes/ORAugerSLTDefs.h"; sourceTree = SOURCE_ROOT; };
+		848D84240DDE060100D44B81 /* edu.washington.npl.orca.TimeMultiPlot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.TimeMultiPlot.plist; path = "Source/Objects/Data Processing/Histogram Objects/TimeMultiPlot/edu.washington.npl.orca.TimeMultiPlot.plist"; sourceTree = SOURCE_ROOT; };
+		848D84250DDE060100D44B81 /* ORTimeMultiPlot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTimeMultiPlot.h; path = "Source/Objects/Data Processing/Histogram Objects/TimeMultiPlot/ORTimeMultiPlot.h"; sourceTree = SOURCE_ROOT; };
+		848D84260DDE060100D44B81 /* ORTimeMultiPlot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTimeMultiPlot.m; path = "Source/Objects/Data Processing/Histogram Objects/TimeMultiPlot/ORTimeMultiPlot.m"; sourceTree = SOURCE_ROOT; };
+		848D84270DDE060100D44B81 /* ORTimeMultiPlotController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTimeMultiPlotController.h; path = "Source/Objects/Data Processing/Histogram Objects/TimeMultiPlot/ORTimeMultiPlotController.h"; sourceTree = SOURCE_ROOT; };
+		848D84280DDE060100D44B81 /* ORTimeMultiPlotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTimeMultiPlotController.m; path = "Source/Objects/Data Processing/Histogram Objects/TimeMultiPlot/ORTimeMultiPlotController.m"; sourceTree = SOURCE_ROOT; };
+		848D84290DDE060100D44B81 /* TimeMultiPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = TimeMultiPlot.nib; path = "Source/Objects/Data Processing/Histogram Objects/TimeMultiPlot/TimeMultiPlot.nib"; sourceTree = SOURCE_ROOT; };
 		848E201B059282F400B6708F /* statusWindow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = statusWindow.gif; path = "Source/Main Document/statusWindow.gif"; sourceTree = SOURCE_ROOT; };
 		848E20690592891800B6708F /* alarmMaster.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = alarmMaster.gif; path = "Source/Main Document/alarmMaster.gif"; sourceTree = SOURCE_ROOT; };
 		848E2101059378C700B6708F /* catalog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = catalog.gif; path = "Source/Main Document/catalog.gif"; sourceTree = SOURCE_ROOT; };
@@ -2778,11 +2822,28 @@
 		84978B4B0702190100B7887E /* ORDataTypeAssigner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORDataTypeAssigner.m; sourceTree = "<group>"; };
 		8498069B09A6584200086E71 /* ORSocketThreadedClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSocketThreadedClient.h; sourceTree = "<group>"; };
 		8498069C09A6584200086E71 /* ORSocketThreadedClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSocketThreadedClient.m; sourceTree = "<group>"; };
+		8499012F0DC9197C00E82DB4 /* SNOCrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SNOCrate.gif; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/SNOCrate.gif"; sourceTree = SOURCE_ROOT; };
+		849901920DC91C5A00E82DB4 /* SNOCrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SNOCrate.gif; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/SNOCrate.gif"; sourceTree = SOURCE_ROOT; };
 		8499148604BB3E05005F64B1 /* Dispatcher.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Dispatcher.nib; sourceTree = "<group>"; };
 		8499148704BB3E05005F64B1 /* ORDispatcherController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDispatcherController.h; sourceTree = "<group>"; };
 		8499148804BB3E05005F64B1 /* ORDispatcherController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDispatcherController.m; sourceTree = "<group>"; };
 		8499148B04BB3E05005F64B1 /* ORDispatcherModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDispatcherModel.h; sourceTree = "<group>"; };
 		8499148C04BB3E05005F64B1 /* ORDispatcherModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDispatcherModel.m; sourceTree = "<group>"; };
+		8499280F0DCB997C00E82DB4 /* MTC.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MTC.nib; path = "Source/Objects/Custom Hardware/SNO+/MTC/MTC.nib"; sourceTree = SOURCE_ROOT; };
+		849928100DCB997C00E82DB4 /* MTCCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = MTCCard.gif; path = "Source/Objects/Custom Hardware/SNO+/MTC/MTCCard.gif"; sourceTree = SOURCE_ROOT; };
+		849928110DCB997C00E82DB4 /* ORMTCController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMTCController.h; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCController.h"; sourceTree = SOURCE_ROOT; };
+		849928120DCB997C00E82DB4 /* ORMTCController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMTCController.m; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCController.m"; sourceTree = SOURCE_ROOT; };
+		849928130DCB997C00E82DB4 /* ORMTCDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMTCDecoders.h; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCDecoders.h"; sourceTree = SOURCE_ROOT; };
+		849928140DCB997C00E82DB4 /* ORMTCDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMTCDecoders.m; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCDecoders.m"; sourceTree = SOURCE_ROOT; };
+		849928150DCB997C00E82DB4 /* ORMTCModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMTCModel.h; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCModel.h"; sourceTree = SOURCE_ROOT; };
+		849928160DCB997C00E82DB4 /* ORMTCModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMTCModel.m; path = "Source/Objects/Custom Hardware/SNO+/MTC/ORMTCModel.m"; sourceTree = SOURCE_ROOT; };
+		849929AA0DCFCA5900E82DB4 /* ORMTC_Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMTC_Constants.h; sourceTree = "<group>"; };
+		84992CAE0DD21F3800E82DB4 /* HP3458a.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HP3458a.nib; path = Source/Objects/Hardware/GPIB/HP3458a/HP3458a.nib; sourceTree = SOURCE_ROOT; };
+		84992CAF0DD21F3800E82DB4 /* HP3458a.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HP3458a.tif; path = Source/Objects/Hardware/GPIB/HP3458a/HP3458a.tif; sourceTree = SOURCE_ROOT; };
+		84992CB00DD21F3800E82DB4 /* ORHP3458aController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHP3458aController.h; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aController.h; sourceTree = SOURCE_ROOT; };
+		84992CB10DD21F3800E82DB4 /* ORHP3458aController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP3458aController.m; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aController.m; sourceTree = SOURCE_ROOT; };
+		84992CB20DD21F3800E82DB4 /* ORHP3458aModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHP3458aModel.h; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aModel.h; sourceTree = SOURCE_ROOT; };
+		84992CB30DD21F3800E82DB4 /* ORHP3458aModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP3458aModel.m; path = Source/Objects/Hardware/GPIB/HP3458a/ORHP3458aModel.m; sourceTree = SOURCE_ROOT; };
 		84997E7C0CE37CBA002CFA70 /* ORVme64CrateController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateController.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateController.h; sourceTree = SOURCE_ROOT; };
 		84997E7D0CE37CBA002CFA70 /* ORVme64CrateModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVme64CrateModel.h; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateModel.h; sourceTree = SOURCE_ROOT; };
 		84997E7E0CE37CBA002CFA70 /* ORVme64CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVme64CrateModel.m; path = Source/Objects/Hardware/Vme/VME64Crate/ORVme64CrateModel.m; sourceTree = SOURCE_ROOT; };
@@ -2792,6 +2853,22 @@
 		84997E820CE37CBA002CFA70 /* Vme64Crate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Vme64Crate.gif; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64Crate.gif; sourceTree = SOURCE_ROOT; };
 		84997E830CE37CBA002CFA70 /* Vme64Crate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Vme64Crate.nib; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64Crate.nib; sourceTree = SOURCE_ROOT; };
 		84997E840CE37CBA002CFA70 /* Vme64CrateSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Vme64CrateSmall.gif; path = Source/Objects/Hardware/Vme/VME64Crate/Vme64CrateSmall.gif; sourceTree = SOURCE_ROOT; };
+		8499FE840DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoSNOCratePowerHelp.plist; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/NoSNOCratePowerHelp.plist"; sourceTree = SOURCE_ROOT; };
+		8499FE850DC8E9B700E82DB4 /* ORSNOCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNOCrateController.h; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateController.h"; sourceTree = SOURCE_ROOT; };
+		8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCrateController.m; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateController.m"; sourceTree = SOURCE_ROOT; };
+		8499FE870DC8E9B700E82DB4 /* ORSNOCrateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNOCrateModel.h; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateModel.h"; sourceTree = SOURCE_ROOT; };
+		8499FE880DC8E9B700E82DB4 /* ORSNOCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCrateModel.m; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateModel.m"; sourceTree = SOURCE_ROOT; };
+		8499FE890DC8E9B700E82DB4 /* ORSNOCrateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNOCrateView.h; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateView.h"; sourceTree = SOURCE_ROOT; };
+		8499FE8A0DC8E9B700E82DB4 /* ORSNOCrateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCrateView.m; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/ORSNOCrateView.m"; sourceTree = SOURCE_ROOT; };
+		8499FE8B0DC8E9B700E82DB4 /* SNOCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SNOCrate.nib; path = "Source/Objects/Custom Hardware/SNO+/SNOCrate/SNOCrate.nib"; sourceTree = SOURCE_ROOT; };
+		8499FF8F0DC9090400E82DB4 /* ORSNOCard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNOCard.h; path = "Source/Objects/Custom Hardware/SNO+/SNO Base Classes/ORSNOCard.h"; sourceTree = SOURCE_ROOT; };
+		8499FF900DC9090400E82DB4 /* ORSNOCard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNOCard.m; path = "Source/Objects/Custom Hardware/SNO+/SNO Base Classes/ORSNOCard.m"; sourceTree = SOURCE_ROOT; };
+		8499FFDA0DC90F5800E82DB4 /* ORXL1Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXL1Model.h; path = "Source/Objects/Custom Hardware/SNO+/XL1/ORXL1Model.h"; sourceTree = SOURCE_ROOT; };
+		8499FFDB0DC90F5800E82DB4 /* ORXL1Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXL1Model.m; path = "Source/Objects/Custom Hardware/SNO+/XL1/ORXL1Model.m"; sourceTree = SOURCE_ROOT; };
+		8499FFDC0DC90F5800E82DB4 /* XL1Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = XL1Card.gif; path = "Source/Objects/Custom Hardware/SNO+/XL1/XL1Card.gif"; sourceTree = SOURCE_ROOT; };
+		8499FFE10DC9102700E82DB4 /* ORXL2Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXL2Model.h; path = "Source/Objects/Custom Hardware/SNO+/XL2/ORXL2Model.h"; sourceTree = SOURCE_ROOT; };
+		8499FFE20DC9102700E82DB4 /* ORXL2Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXL2Model.m; path = "Source/Objects/Custom Hardware/SNO+/XL2/ORXL2Model.m"; sourceTree = SOURCE_ROOT; };
+		8499FFE30DC9102700E82DB4 /* XL2Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = XL2Card.gif; path = "Source/Objects/Custom Hardware/SNO+/XL2/XL2Card.gif"; sourceTree = SOURCE_ROOT; };
 		849B25E40B2F34F90007484F /* Prespectrometer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Prespectrometer.nib; path = Source/Experiments/Prespectrometer/Prespectrometer.nib; sourceTree = SOURCE_ROOT; };
 		849B25E50B2F34F90007484F /* prespectrometer.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = prespectrometer.tif; path = Source/Experiments/Prespectrometer/prespectrometer.tif; sourceTree = SOURCE_ROOT; };
 		849B25E60B2F34F90007484F /* PrespectrometerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrespectrometerController.h; path = Source/Experiments/Prespectrometer/PrespectrometerController.h; sourceTree = SOURCE_ROOT; };
@@ -5733,6 +5810,20 @@
 			path = "Source/Objects/Misc Objects/Ami286";
 			sourceTree = SOURCE_ROOT;
 		};
+		848D84230DDE060100D44B81 /* TimeMultiPlot */ = {
+			isa = PBXGroup;
+			children = (
+				848D84240DDE060100D44B81 /* edu.washington.npl.orca.TimeMultiPlot.plist */,
+				848D84250DDE060100D44B81 /* ORTimeMultiPlot.h */,
+				848D84260DDE060100D44B81 /* ORTimeMultiPlot.m */,
+				848D84270DDE060100D44B81 /* ORTimeMultiPlotController.h */,
+				848D84280DDE060100D44B81 /* ORTimeMultiPlotController.m */,
+				848D84290DDE060100D44B81 /* TimeMultiPlot.nib */,
+			);
+			name = TimeMultiPlot;
+			path = "Source/Objects/Data Processing/Histogram Objects/TimeMultiPlot";
+			sourceTree = SOURCE_ROOT;
+		};
 		848E3BC509DB0B3E0003F7A2 /* MailCenter */ = {
 			isa = PBXGroup;
 			children = (
@@ -5909,6 +6000,37 @@
 			path = "Source/Objects/Data Processing/Dispatcher";
 			sourceTree = SOURCE_ROOT;
 		};
+		8499280E0DCB997C00E82DB4 /* MTC */ = {
+			isa = PBXGroup;
+			children = (
+				8499280F0DCB997C00E82DB4 /* MTC.nib */,
+				849928100DCB997C00E82DB4 /* MTCCard.gif */,
+				849928110DCB997C00E82DB4 /* ORMTCController.h */,
+				849928120DCB997C00E82DB4 /* ORMTCController.m */,
+				849928130DCB997C00E82DB4 /* ORMTCDecoders.h */,
+				849928140DCB997C00E82DB4 /* ORMTCDecoders.m */,
+				849928150DCB997C00E82DB4 /* ORMTCModel.h */,
+				849928160DCB997C00E82DB4 /* ORMTCModel.m */,
+				849929AA0DCFCA5900E82DB4 /* ORMTC_Constants.h */,
+			);
+			name = MTC;
+			path = "Source/Objects/Custom Hardware/SNO+/MTC";
+			sourceTree = SOURCE_ROOT;
+		};
+		84992CAD0DD21F3800E82DB4 /* HP3458a */ = {
+			isa = PBXGroup;
+			children = (
+				84992CAE0DD21F3800E82DB4 /* HP3458a.nib */,
+				84992CAF0DD21F3800E82DB4 /* HP3458a.tif */,
+				84992CB00DD21F3800E82DB4 /* ORHP3458aController.h */,
+				84992CB10DD21F3800E82DB4 /* ORHP3458aController.m */,
+				84992CB20DD21F3800E82DB4 /* ORHP3458aModel.h */,
+				84992CB30DD21F3800E82DB4 /* ORHP3458aModel.m */,
+			);
+			name = HP3458a;
+			path = Source/Objects/Hardware/GPIB/HP3458a;
+			sourceTree = SOURCE_ROOT;
+		};
 		84997E7B0CE37CBA002CFA70 /* VME64Crate */ = {
 			isa = PBXGroup;
 			children = (
@@ -5924,6 +6046,68 @@
 			);
 			name = VME64Crate;
 			path = Source/Objects/Hardware/Vme/VME64Crate;
+			sourceTree = SOURCE_ROOT;
+		};
+		8499FE810DC8E86800E82DB4 /* SNO+ */ = {
+			isa = PBXGroup;
+			children = (
+				8499FF8E0DC9090400E82DB4 /* SNO Base Classes */,
+				8499FE820DC8E9B700E82DB4 /* SNOCrate */,
+				8499FFD90DC90F5800E82DB4 /* XL1 */,
+				8499FFE00DC9102700E82DB4 /* XL2 */,
+				8499280E0DCB997C00E82DB4 /* MTC */,
+			);
+			name = "SNO+";
+			path = "Source/Objects/Custom Hardware/SNO+";
+			sourceTree = SOURCE_ROOT;
+		};
+		8499FE820DC8E9B700E82DB4 /* SNOCrate */ = {
+			isa = PBXGroup;
+			children = (
+				849901920DC91C5A00E82DB4 /* SNOCrate.gif */,
+				8499FE840DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist */,
+				8499FE850DC8E9B700E82DB4 /* ORSNOCrateController.h */,
+				8499FE860DC8E9B700E82DB4 /* ORSNOCrateController.m */,
+				8499FE870DC8E9B700E82DB4 /* ORSNOCrateModel.h */,
+				8499FE880DC8E9B700E82DB4 /* ORSNOCrateModel.m */,
+				8499FE890DC8E9B700E82DB4 /* ORSNOCrateView.h */,
+				8499FE8A0DC8E9B700E82DB4 /* ORSNOCrateView.m */,
+				8499FE8B0DC8E9B700E82DB4 /* SNOCrate.nib */,
+			);
+			name = SNOCrate;
+			path = "Source/Objects/Custom Hardware/SNO+/SNOCrate";
+			sourceTree = SOURCE_ROOT;
+		};
+		8499FF8E0DC9090400E82DB4 /* SNO Base Classes */ = {
+			isa = PBXGroup;
+			children = (
+				8499FF8F0DC9090400E82DB4 /* ORSNOCard.h */,
+				8499FF900DC9090400E82DB4 /* ORSNOCard.m */,
+			);
+			name = "SNO Base Classes";
+			path = "Source/Objects/Custom Hardware/SNO+/SNO Base Classes";
+			sourceTree = SOURCE_ROOT;
+		};
+		8499FFD90DC90F5800E82DB4 /* XL1 */ = {
+			isa = PBXGroup;
+			children = (
+				8499FFDA0DC90F5800E82DB4 /* ORXL1Model.h */,
+				8499FFDB0DC90F5800E82DB4 /* ORXL1Model.m */,
+				8499FFDC0DC90F5800E82DB4 /* XL1Card.gif */,
+			);
+			name = XL1;
+			path = "Source/Objects/Custom Hardware/SNO+/XL1";
+			sourceTree = SOURCE_ROOT;
+		};
+		8499FFE00DC9102700E82DB4 /* XL2 */ = {
+			isa = PBXGroup;
+			children = (
+				8499FFE10DC9102700E82DB4 /* ORXL2Model.h */,
+				8499FFE20DC9102700E82DB4 /* ORXL2Model.m */,
+				8499FFE30DC9102700E82DB4 /* XL2Card.gif */,
+			);
+			name = XL2;
+			path = "Source/Objects/Custom Hardware/SNO+/XL2";
 			sourceTree = SOURCE_ROOT;
 		};
 		849B25E30B2F34F90007484F /* Prespectrometer */ = {
@@ -6688,6 +6872,7 @@
 				84C493A104059AEA005F64B1 /* GPIB Base Classes */,
 				84C493A804059AEA005F64B1 /* Oscilloscope Base */,
 				84C4939704059AEA005F64B1 /* ENET-GPIB */,
+				84992CAD0DD21F3800E82DB4 /* HP3458a */,
 				8425384A0BC6E006004C8065 /* HP6622a */,
 				844D92F50A0A79AA00E83C57 /* Pulser33220 */,
 				847D7A7104701EB6005F64B1 /* HPPulser */,
@@ -6758,6 +6943,7 @@
 				847E6C120CFF4C3200E963C6 /* eGun */,
 				843CDF55071C9C0A009D7D30 /* RandomPulser */,
 				84C4948C0405A0C0005F64B1 /* Ncd Hardware */,
+				8499FE810DC8E86800E82DB4 /* SNO+ */,
 			);
 			name = "Custom Hardware";
 			path = "Source/Objects/Custom Hardware";
@@ -6834,6 +7020,7 @@
 				2A41A2B2089AB2A0003D77DD /* ScalerSum */,
 				84F689C9044F7837005F64B1 /* Waveform */,
 				84DDEB9A07BD3E080060D0B4 /* HistogramMultiPlot */,
+				848D84230DDE060100D44B81 /* TimeMultiPlot */,
 				844E6B5F03C274CE005F64B1 /* Histogrammer */,
 				849DA7070BF4DB3000044320 /* PlotTimeSeries */,
 				841DA0E90781F09B0099BBF6 /* Histogram1D */,
@@ -7648,6 +7835,7 @@
 				843A54CD07BBE7A500534C27 /* 4ChanTrigger */,
 				84929E8104439586005F64B1 /* Trigger */,
 				8467E6A406480F0A00A35E6A /* Trigger32 */,
+				8499012F0DC9197C00E82DB4 /* SNOCrate.gif */,
 				84749D0A07D6526F001553EC /* MCarrier */,
 				845115E104030088005F64B1 /* IPCarrier */,
 				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
@@ -8443,6 +8631,20 @@
 				846C512E0DBD3221005D6566 /* ORNplpCMeterController.h in Headers */,
 				846C51300DBD3221005D6566 /* ORNplpCMeterModel.h in Headers */,
 				846C513C0DBD4614005D6566 /* ORNplpCMeterDecoders.h in Headers */,
+				8499FE8E0DC8E9B700E82DB4 /* ORSNOCrateController.h in Headers */,
+				8499FE900DC8E9B700E82DB4 /* ORSNOCrateModel.h in Headers */,
+				8499FE920DC8E9B700E82DB4 /* ORSNOCrateView.h in Headers */,
+				8499FF910DC9090400E82DB4 /* ORSNOCard.h in Headers */,
+				8499FFDD0DC90F5800E82DB4 /* ORXL1Model.h in Headers */,
+				8499FFE40DC9102700E82DB4 /* ORXL2Model.h in Headers */,
+				849928190DCB997C00E82DB4 /* ORMTCController.h in Headers */,
+				8499281B0DCB997C00E82DB4 /* ORMTCDecoders.h in Headers */,
+				8499281D0DCB997C00E82DB4 /* ORMTCModel.h in Headers */,
+				849929AB0DCFCA5900E82DB4 /* ORMTC_Constants.h in Headers */,
+				84992CB60DD21F3800E82DB4 /* ORHP3458aController.h in Headers */,
+				84992CB80DD21F3800E82DB4 /* ORHP3458aModel.h in Headers */,
+				848D842B0DDE060100D44B81 /* ORTimeMultiPlot.h in Headers */,
+				848D842D0DDE060100D44B81 /* ORTimeMultiPlotController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8965,6 +9167,17 @@
 				84BC165C0DA1527300D3935C /* Caen1720Card.gif in Resources */,
 				846C512C0DBD3221005D6566 /* NplpCMeter.nib in Resources */,
 				846C512D0DBD3221005D6566 /* NplpCMeterIcon.tif in Resources */,
+				8499FE8D0DC8E9B700E82DB4 /* NoSNOCratePowerHelp.plist in Resources */,
+				8499FE940DC8E9B700E82DB4 /* SNOCrate.nib in Resources */,
+				8499FFDF0DC90F5800E82DB4 /* XL1Card.gif in Resources */,
+				8499FFE60DC9102700E82DB4 /* XL2Card.gif in Resources */,
+				849901930DC91C5A00E82DB4 /* SNOCrate.gif in Resources */,
+				849928170DCB997C00E82DB4 /* MTC.nib in Resources */,
+				849928180DCB997C00E82DB4 /* MTCCard.gif in Resources */,
+				84992CB40DD21F3800E82DB4 /* HP3458a.nib in Resources */,
+				84992CB50DD21F3800E82DB4 /* HP3458a.tif in Resources */,
+				848D842A0DDE060100D44B81 /* edu.washington.npl.orca.TimeMultiPlot.plist in Resources */,
+				848D842F0DDE060100D44B81 /* TimeMultiPlot.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9575,6 +9788,19 @@
 				846C512F0DBD3221005D6566 /* ORNplpCMeterController.m in Sources */,
 				846C51310DBD3221005D6566 /* ORNplpCMeterModel.m in Sources */,
 				846C513D0DBD4614005D6566 /* ORNplpCMeterDecoders.m in Sources */,
+				8499FE8F0DC8E9B700E82DB4 /* ORSNOCrateController.m in Sources */,
+				8499FE910DC8E9B700E82DB4 /* ORSNOCrateModel.m in Sources */,
+				8499FE930DC8E9B700E82DB4 /* ORSNOCrateView.m in Sources */,
+				8499FF920DC9090400E82DB4 /* ORSNOCard.m in Sources */,
+				8499FFDE0DC90F5800E82DB4 /* ORXL1Model.m in Sources */,
+				8499FFE50DC9102700E82DB4 /* ORXL2Model.m in Sources */,
+				8499281A0DCB997C00E82DB4 /* ORMTCController.m in Sources */,
+				8499281C0DCB997C00E82DB4 /* ORMTCDecoders.m in Sources */,
+				8499281E0DCB997C00E82DB4 /* ORMTCModel.m in Sources */,
+				84992CB70DD21F3800E82DB4 /* ORHP3458aController.m in Sources */,
+				84992CB90DD21F3800E82DB4 /* ORHP3458aModel.m in Sources */,
+				848D842C0DDE060100D44B81 /* ORTimeMultiPlot.m in Sources */,
+				848D842E0DDE060100D44B81 /* ORTimeMultiPlotController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

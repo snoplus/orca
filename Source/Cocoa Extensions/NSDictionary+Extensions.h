@@ -28,4 +28,11 @@
 - (id) objectForKeyArray:(NSMutableArray*)anArray;
 - (NSData*) asData;
 + (id) dictionaryWithPList:(id)plist;
+- (unsigned long) uLongForKey:(NSString*)aKey;
+- (long) longForKey:(NSString*)aKey;
+- (unsigned short) uShortForKey:(NSString*)aKey;
+- (short) shortForKey:(NSString*)aKey;
+- (unsigned int) uIntForKey:(NSString*)aKey;
+- (int) intForKey:(NSString*)aKey;
+- (BOOL) boolForKey:(NSString*)aKey;
 @end
