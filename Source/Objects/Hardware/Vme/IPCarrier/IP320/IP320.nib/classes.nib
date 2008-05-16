@@ -13,17 +13,12 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
-			<string>NSObject</string>
+			<string>NSSplitView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -50,11 +45,27 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>NSOutlineView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTableView</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>calibrateAction</key>
 				<string>id</string>
+				<key>cut</key>
+				<string>id</string>
+				<key>delete</key>
+				<string>id</string>
 				<key>displayRawAction</key>
+				<string>id</string>
+				<key>doubleClick</key>
+				<string>id</string>
+				<key>doubleClickMultiPlot</key>
 				<string>id</string>
 				<key>enableAlarmAllAction</key>
 				<string>id</string>
@@ -68,7 +79,11 @@
 				<string>id</string>
 				<key>modeAction</key>
 				<string>id</string>
+				<key>plotGroupAction</key>
+				<string>id</string>
 				<key>readAll</key>
+				<string>id</string>
+				<key>removeItemAction</key>
 				<string>id</string>
 				<key>selectFileAction</key>
 				<string>id</string>
@@ -109,12 +124,20 @@
 				<string>NSButton</string>
 				<key>modePopUpButton</key>
 				<string>NSPopUpButton</string>
+				<key>multiPlotView</key>
+				<string>NSOutlineView</string>
+				<key>outlineView</key>
+				<string>NSOutlineView</string>
+				<key>plotGroupButton</key>
+				<string>NSButton</string>
 				<key>pollingButton</key>
 				<string>NSPopUpButton</string>
 				<key>selectLogFileButton</key>
 				<string>NSButton</string>
 				<key>shipRecordsButton</key>
 				<string>NSButton</string>
+				<key>splitView</key>
+				<string>NSSplitView</string>
 				<key>tabView</key>
 				<string>NSTabView</string>
 				<key>valueTable1</key>
@@ -154,6 +177,19 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
