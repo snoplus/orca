@@ -40,6 +40,11 @@
 	return YES; //default. override if needed.
 }
 
+- (BOOL) validateLayoutItems:(NSMenuItem*)menuItem
+{
+	return NO;
+}
+
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
 {	
     return [self dropPositionOK:[sender draggedImageLocation]];

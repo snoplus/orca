@@ -445,9 +445,8 @@
     return YES;
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem*)menuItem
+- (BOOL) validateMenuItem:(NSMenuItem*)menuItem
 {
-    
     int selectedCount = [[group selectedObjects]count];
     BOOL changesAllowed = [group changesAllowed];
     if ([menuItem action] == @selector(paste:)) {
@@ -467,10 +466,23 @@
         if(!changesAllowed)return NO;
         else return selectedCount>0;
     }
+	else if ([menuItem action] == @selector(selectAll:)){
+		return changesAllowed;
+	}
     
-    return YES;
+    return [self validateLayoutItems:menuItem];
 }
 
+- (BOOL) validateLayoutItems:(NSMenuItem*)menuItem
+{
+    int selectedCount = [[group selectedObjects] count];
+    BOOL changesAllowed = [group changesAllowed];
+    if ([menuItem action] == @selector(arrangeInCircle:)) {
+        if(!changesAllowed)return NO;
+        else return selectedCount>0;
+    }
+	return NO;
+}
 
 - (void) clearSelections:(BOOL)shiftKeyDown
 {
@@ -490,6 +502,44 @@
 
 
 #pragma mark ¥¥¥Actions
+
+- (IBAction) arrangeInCircle:(id)sender
+{
+	int count = [[group selectedObjects] count];
+	NSArray* sortedArray = [[group selectedObjects] sortedArrayUsingSelector:@selector(sortCompare:)];
+	//first find ranges
+	float xMin = 9.99E100;
+	float xMax = -9.99E100;
+	float yMin = 9.99E100;
+	float yMax = -9.99E100;
+	NSEnumerator* e = [sortedArray objectEnumerator];
+	id obj;
+	while(obj = [e nextObject]){
+	
+		float midX = [obj frame].origin.x;
+		if(midX > xMax)xMax = midX;
+		if(midX < xMin)xMin = midX;
+		
+		float midY = [obj frame].origin.y;
+		if(midY > yMax)yMax = midY;
+		if(midY < yMin)yMin = midY;
+	}
+	
+	float radius = MAX((xMax - xMin),(xMax - xMin))/2.;
+	NSPoint center = NSMakePoint(xMin + radius,yMin + radius);
+	float deltaAngle = 2.*3.14159/(float)count;
+	e = [sortedArray objectEnumerator];
+	float a = 0;
+	while(obj = [e nextObject]){
+		float newX = center.x  + radius*cosf(a);
+		float newY = center.y + radius*sinf(a);
+		[obj moveTo:NSMakePoint(newX,newY)];
+		a += deltaAngle;
+	}
+
+}
+
+
 - (IBAction)copy:(id)sender
 {
     [savedObjects release];
@@ -534,17 +584,36 @@
         NSEnumerator* e = [objectList objectEnumerator];
         NSNumber* aPointer;
         while(aPointer = [e nextObject]){
+			BOOL okToPaste = YES;
             OrcaObject* anObject = (OrcaObject*)[aPointer longValue];
-            OrcaObject* newObject = [anObject copy]; 
-            NSPoint newLocation =   [self suggestPasteLocationFor:newObject];
-            if(newLocation.x != -1 && newLocation.y != -1){
-                [self moveObject:newObject to:newLocation];
-                [newObject setHighlightedYES]; 
-                NSMutableArray* newObjects = [NSMutableArray array];
-                [newObjects addObject:newObject];
-                [group addObjects:newObjects];
-            }
-            [newObject release];
+			if([anObject solitaryObject]){
+				NSArray* existingObjects = [[[NSApp delegate]document] collectObjectsOfClass:[anObject class]];
+				if([existingObjects count]){
+					okToPaste = NO;
+					NSBeep();
+					NSLog(@"Ooops, you can not have two %@ objects in the configuration\n",NSStringFromClass([anObject class]));
+				}
+			} 
+			if([anObject solitaryInViewObject]){
+				NSArray* existingObjects = [group collectObjectsOfClass:[anObject class]];
+				if([existingObjects count]){
+					okToPaste = NO;
+					NSBeep();
+					NSLog(@"Ooops, you can not have two %@ objects in that container object\n",NSStringFromClass([anObject class]));
+				}
+			} 
+			if(okToPaste){
+				OrcaObject* newObject = [anObject copy]; 
+				NSPoint newLocation =   [self suggestPasteLocationFor:newObject];
+				if(newLocation.x != -1 && newLocation.y != -1){
+					[self moveObject:newObject to:newLocation];
+					[newObject setHighlightedYES]; 
+					NSMutableArray* newObjects = [NSMutableArray array];
+					[newObjects addObject:newObject];
+					[group addObjects:newObjects];
+				}
+				[newObject release];
+			}
         }
         
         [self  copy:nil];
@@ -946,7 +1015,18 @@
                         NSLog(@"Ooops, you can not have two %@ objects in the configuration\n",NSStringFromClass([anObject class]));
                     }
                 } 
-                if([self canAddObject:anObject atPoint:newPoint] && okToDrop){
+				if([anObject solitaryInViewObject]){
+                    NSArray* existingObjects = [group collectObjectsOfClass:[anObject class]];
+                    if([existingObjects count]){
+                        okToDrop = NO;
+                        NSBeep();
+                        NSLog(@"Ooops, you can not have two %@ objects in that container object\n",NSStringFromClass([anObject class]));
+                    }
+                } 
+
+				
+							   
+				if([self canAddObject:anObject atPoint:newPoint] && okToDrop){
                     OrcaObject* newObject = [anObject copy];
                     [self moveObject:newObject to:newPoint];
                     [newObject setHighlighted:YES]; 

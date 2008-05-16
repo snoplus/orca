@@ -288,6 +288,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	NSMutableArray* crates			= [NSMutableArray array];
 	NSMutableArray* dataChain		= [NSMutableArray array];
 	NSMutableArray* gpib			= [NSMutableArray array];
+	NSMutableDictionary* exp		= [NSMutableDictionary dictionary];
 	NSEnumerator* e					= [allObjects objectEnumerator];
 	id anObj;
 	while(anObj = [e nextObject]){
@@ -306,6 +307,11 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 				[anObj addObjectInfoToArray:gpib];
 			}
 		}
+		else if([anObj isKindOfClass:NSClassFromString(@"ORExperimentModel")]){
+			if([anObj respondsToSelector:@selector(addParametersToDictionary:)]){
+				[anObj addParametersToDictionary:objectInfoDictionary];
+			}
+		}
 	}
 	
 	
@@ -317,6 +323,9 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	}
 	if([gpib count]){
 		[objectInfoDictionary setObject:gpib forKey:@"Gpib"];
+	}
+	if([exp count]){
+		[objectInfoDictionary setObject:exp forKey:@"Experiments"];
 	}
 	
 	//add the Object Info into the dictionary from our argument list.

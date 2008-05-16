@@ -47,6 +47,7 @@
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard;
 - (BOOL) showLabels;
 - (void) setShowLabels:(BOOL)aState;
+- (NSComparisonResult)sortCompare:(OrcaObject*)anObj;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

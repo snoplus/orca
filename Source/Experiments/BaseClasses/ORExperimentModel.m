@@ -431,6 +431,21 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     return stateDictionary;
 }
 
+- (void) addObjectInfoToArray:(NSMutableArray*)anArray
+{
+	NSMutableDictionary* stateDictionary = [NSMutableDictionary dictionary];
+	[self addParametersToDictionary:stateDictionary];
+	NSMutableDictionary* dictionary = [NSMutableDictionary dictionary];
+	NSEnumerator* e = [stateDictionary keyEnumerator];
+	id aKey;
+	while(aKey = [e nextObject]){
+		NSDictionary* d = [stateDictionary objectForKey:aKey];
+		[dictionary addEntriesFromDictionary:d];
+	}							
+	
+	[anArray addObject:dictionary];
+}
+
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];

@@ -101,6 +101,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (void)		setTag:(int)aTag;
 - (int)         tagBase;
 - (BOOL)        solitaryObject;
+- (BOOL)		solitaryInViewObject;
 - (void)        askForUniqueIDNumber;
 - (void)        setUniqueIdNumber:(unsigned long)anIdNumber;
 - (unsigned long) uniqueIdNumber;

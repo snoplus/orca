@@ -288,6 +288,10 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 {
 }
 
+- (NSComparisonResult)sortCompare:(OrcaObject*)anObj
+{
+    return [self tag] - [anObj tag];
+}
 
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard
 {

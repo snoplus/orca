@@ -709,6 +709,12 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     return NO;
 }
 
+- (BOOL) solitaryInViewObject
+{
+    return NO;
+}
+
+
 - (NSMutableDictionary*) miscAttributesForKey:(NSString*)aKey
 {
 	return [miscAttributes objectForKey:aKey];
