@@ -78,10 +78,16 @@
 
 #pragma mark ••••hw histogram access
 
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+
 // this is for testing and debugging the hardware histogramming (espec. timing) -tb- 2008-04-11
 #define USE_TILLS_HISTO_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
-#ifdef USE_TILLS_HISTO_DEBUG_MACRO
-  #define    DebugHistoTB(x) x
+    #ifdef USE_TILLS_HISTO_DEBUG_MACRO
+      #define    DebugHistoTB(x) x
+    #else
+      #define    DebugHistoTB(x) 
+    #endif
+
 #else
   #define    DebugHistoTB(x) 
 #endif

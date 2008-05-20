@@ -1529,13 +1529,18 @@ return hitRateId;
 #pragma mark ¥¥¥¥hw histogram access
 
 // this is for testing and debugging the hardware histogramming (espec. timing) -tb- 2008-04-11
-#define USE_TILLS_HISTO_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
-#ifdef USE_TILLS_HISTO_DEBUG_MACRO
-  #define    DebugHistoTB(x) x
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+
+    #define USE_TILLS_HISTO_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
+    #ifdef USE_TILLS_HISTO_DEBUG_MACRO
+      #define    DebugHistoTB(x) x
+    #else
+      #define    DebugHistoTB(x) 
+    #endif
+
 #else
   #define    DebugHistoTB(x) 
 #endif
-
 /** In the v3 crate version we have histogramming for the first channel of a group 
   * (ch 0,1,12,13= group 0,1,2,3)(ch 2,3,14,15= group 0,1,2,3).
   * This method translates channel number to group number. If the channel is not available,
