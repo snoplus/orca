@@ -523,8 +523,6 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx Hitrate
 
 //-------------------------------------------------------------
 /** Data format for hardware histogram
-
-  TODO: THIS (the docu) IS STILL UNDER DEVELOPMENT -tb-
   *
 <pre>  
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
@@ -536,19 +534,18 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
         ^ ^^^---------------------------crate
              ^ ^^^^---------------------card
 			        ^^^^ ^^^^-----------channel
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subSec
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
-^^^^ ^^^^------------------------------ channel (0..22)
-            ^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ channel Map (22bit, 1 bit set denoting the channel number)  
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx 
-        ^ ^^^^ ^^^^-------------------- number of page in hardware buffer
-		                   ^^ ^^^^ ^^^^ eventID (0..1024)
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx energy
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx sec of restart/reset
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx subsec of restart/reset
-followed by waveform data (n x 1024 16-bit words)
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx readoutSec
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx recordingTimeSec
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx firstBin
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx lastBin
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramLength
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx maxHistogramLength
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx binSize
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 </pre>
+
+  * For more infos: see
+  * readOutHistogramDataV3:(ORDataPacket*)aDataPacket userInfo:(id)userInfo (in model)
   *
   */
 //-------------------------------------------------------------
@@ -557,7 +554,7 @@ followed by waveform data (n x 1024 16-bit words)
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
     //debug output -tb-
-    NSLog(@"  ORKatrinFLTDecoderForHistogram::decodeData:\n");
+    //NSLog(@"  ORKatrinFLTDecoderForHistogram::decodeData:\n");
     
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length	= ExtractLength(*ptr);	 //get length from first word
@@ -574,111 +571,94 @@ followed by waveform data (n x 1024 16-bit words)
 	
 	
 	katrinHistogramDataStruct* ePtr = (katrinHistogramDataStruct*) ptr;
+    #if 0 //debug output -tb-
 	NSLog(@"Keys:%@ %@ %@ %@ %@ \n", @"FLT",@"HitrateTimeSerie",crateKey,stationKey,channelKey);
 	NSLog(@"  readoutSec = %d \n", ePtr->readoutSec);
 	NSLog(@"  recordingTimeSec = %d \n", ePtr->recordingTimeSec);
 	NSLog(@"  firstBin = %d \n", ePtr->firstBin);
 	NSLog(@"  lastBin = %d \n", ePtr->lastBin);
 	NSLog(@"  histogramLength = %d \n", ePtr->histogramLength);
+	NSLog(@"  maxHistogramLength = %d \n", ePtr->maxHistogramLength);
+	NSLog(@"  binSize = %d \n", ePtr->binSize);
+	NSLog(@"  offsetEMin = %d \n", ePtr->offsetEMin);
+    #endif
 
     ptr = ptr + (sizeof(katrinHistogramDataStruct)/sizeof(long));
     
-    #if 1
-    //this is really brute force, but the histogramWW methods make problems ... -tb-
-    int i;
-    unsigned long aValue;
-    unsigned long aBin;
-    for(i=0; i< ePtr->histogramLength;i++){
-        aValue=*(ptr+i);
-        aBin = i+ (ePtr->firstBin);
-        if(aValue) NSLog(@"  Bin %i = %d \n", aBin,aValue);
-       	#if 1
-        int j;
-        for(j=0;j<aValue;j++){
-            //NSLog(@"  Fill Bin %i = %d times \n", aBin,aValue);
-	        [aDataSet histogram:aBin 
-			      numBins:1024 
-			      sender:self  
-			      withKeys: @"FLT",@"Histogram",crateKey,stationKey,channelKey,nil];
+    #if 0
+    {
+        // this is really brute force, but probably we want the second version (see below) ... -tb-
+        // this counts every single event in the histogram as one event in data monitor -tb-
+        int i;
+        unsigned long aValue;
+        unsigned long aBin;
+        for(i=0; i< ePtr->histogramLength;i++){
+            aValue=*(ptr+i);
+            aBin = i+ (ePtr->firstBin);
+            //if(aValue) NSLog(@"  Bin %i = %d \n", aBin,aValue);
+            #if 1
+            int j;
+            for(j=0;j<aValue;j++){
+                //NSLog(@"  Fill Bin %i = %d times \n", aBin,aValue);
+                [aDataSet histogram:aBin 
+                            numBins:1024 
+                             sender:self  
+                           withKeys: @"FLT",
+                 @"Histogram (all counts)", // use better name -tb-
+                 crateKey,stationKey,channelKey,nil];
+            }
+            #endif
         }
-        #endif
     }
     #endif
     
-    #if 0 
-    int i;
-    unsigned long aValue;
-    unsigned long aBin;
-    for(i=0; i< ePtr->histogramLength;i++){
-        aValue=*(ptr+i);
-        aBin = i+ePtr->firstBin;
-        if(aValue) NSLog(@"  Bin %i = %d \n", i,aValue);
-       	#if 0
-    	[aDataSet histogramWW: aBin
-                  weight:      aValue
-			      numBins:     1024 
-			      sender:self  
-			      withKeys: @"FLT",@"Histogram",crateKey,stationKey,channelKey,nil];
-        #endif
+
+    #if 1
+    // this counts one histogram as one event in data monitor -tb-
+    if(ePtr->histogramLength){
+        int numBins = 512;
+        unsigned long data[numBins];// v3: histogram length is 512 -tb-
+        int i;
+        for(i=0; i< numBins;i++) data[i]=0;
+        for(i=0; i< ePtr->histogramLength;i++){
+            data[i+(ePtr->firstBin)]=*(ptr+i);
+            //NSLog(@"Decoder: HistoEntry %i: bin %i val %i\n",i,i+(ePtr->firstBin),data[i+(ePtr->firstBin)]);
+        }
+        NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
+        [keyArray insertObject:@"FLT" atIndex:0];
+        [keyArray insertObject:@"Histogram" atIndex:1]; //TODO: use better name -tb-
+        [keyArray insertObject:crateKey atIndex:2];
+        [keyArray insertObject:stationKey atIndex:3];
+        [keyArray insertObject:channelKey atIndex:4];
+        
+        [aDataSet mergeHistogram:  data  
+                         numBins:  numBins  // is fixed in the current FPGA version -tb- 2008-03-13 
+                    withKeyArray:  keyArray];
     }
-    #endif
-	
-
-    #if 0 //macht Problems -tb-
-    NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
-    [keyArray insertObject:@"FLT" atIndex:0];
-    [keyArray insertObject:@"Histogram" atIndex:1];
-    [keyArray insertObject:crateKey atIndex:2];
-    [keyArray insertObject:stationKey atIndex:3];
-    [keyArray insertObject:channelKey atIndex:4];
-
-	[aDataSet loadHistogramSampleWW:  ptr  
-			  numBins:                1024  // is fixed in the current FPGA version -tb- 2008-03-13 
-              startAtBin:             ePtr->firstBin
-			  sampleLength:           ePtr->histogramLength 
-              withKeyArray:           keyArray];
     #endif
     
     
     
     #if 0
-    // test - ok          
-    NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
-    [keyArray insertObject:@"FLT" atIndex:0];
-    [keyArray insertObject:@"Histogram" atIndex:1];
-    [keyArray insertObject:crateKey atIndex:2];
-    [keyArray insertObject:stationKey atIndex:3];
-    [keyArray insertObject:channelKey atIndex:4];
-
-	[aDataSet loadHistogram:  ptr 
-			  numBins:        ePtr->histogramLength 
-              withKeyArray:   keyArray];
+    // test - ok  -tb-
+    {        
+        NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
+        [keyArray insertObject:@"FLT" atIndex:0];
+        [keyArray insertObject:@"Histogram (loadHistogram test)" atIndex:1];
+        [keyArray insertObject:crateKey atIndex:2];
+        [keyArray insertObject:stationKey atIndex:3];
+        [keyArray insertObject:channelKey atIndex:4];
+        
+        [aDataSet loadHistogram:  ptr 
+                        numBins:        ePtr->histogramLength 
+                   withKeyArray:   keyArray];
+    }
     #endif
 
-
-
-//OLD - Remove it:
-	//[aDataSet histogram:ePtr->energy 
-	//		  numBins:32768 
-	//		  sender:self  
-	//		  withKeys: @"FLT",@"Energy",crateKey,stationKey,channelKey,nil];
-	
-	// Set up the waveform
-	//NSData* waveFormdata = [NSData dataWithBytes:someData length:length*sizeof(long)];
-
-	//[aDataSet loadWaveform: waveFormdata							//pass in the whole data set
-	//				offset: (2*sizeof(long)+sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/2	// Offset in bytes (2 header words + katrinEventDataStruct)
-	//			    unitSize: sizeof(short)							// unit size in bytes
-	//				mask:	0x0FFF									// when displayed all values will be masked with this value
-	//				sender: self 
-	//				withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
-					
-
-    //ptr = ptr + (sizeof(katrinEventDataStruct) + sizeof(katrinDebugDataStruct)) / sizeof(long);
-	//NSLog(@" len = %d (%d), %x %x %x\n", length, ptr - (unsigned long *) someData , ptr[0], ptr[1], ptr[2]);
-					
     return length; //must return number of longs processed.
 }
+
+
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
@@ -704,16 +684,14 @@ followed by waveform data (n x 1024 16-bit words)
 	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %d\n",ePtr->firstBin];
 	NSString* lastBin	= [NSString stringWithFormat:@"lastBin = %d\n",ePtr->lastBin];
 	NSString* histogramLength	= [NSString stringWithFormat:@"histogramLength = %d\n",ePtr->histogramLength];
+	NSString* maxHistogramLength	= [NSString stringWithFormat:@"maxHistogramLength = %d\n",ePtr->maxHistogramLength];
+	NSString* binSize	= [NSString stringWithFormat:@"binSize = %d\n",ePtr->binSize];
+	NSString* offsetEMin	= [NSString stringWithFormat:@"offsetEMin = %d\n",ePtr->offsetEMin];
 
 
-    // Decode extra debug information
-	//ptr = ptr + sizeof(katrinEventDataStruct) / sizeof(unsigned long);
-	//katrinDebugDataStruct* dPtr = (katrinDebugDataStruct*) ptr;
-
-
-
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
-	                       readoutSec,recordingTimeSec,firstBin,lastBin,histogramLength]; 
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
+	                       readoutSec,recordingTimeSec,firstBin,lastBin,histogramLength,
+                           maxHistogramLength,binSize,offsetEMin]; 
 }
 
 

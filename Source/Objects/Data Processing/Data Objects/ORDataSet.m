@@ -572,6 +572,51 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     
 }
 
+// merger for hw histograms -tb- 2008-03-23
+- (void) mergeHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray
+{
+    
+    int n = [keyArray count];
+    int i;
+    ORDataSet* currentLevel = self;
+    ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCounts];
+    
+    for(i=0;i<n;i++){
+        NSString* s = [keyArray objectAtIndex:i];
+        nextLevel = [currentLevel objectForKey:s];
+        if(nextLevel){
+            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+            currentLevel = nextLevel;
+        }
+        else {
+            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+            [currentLevel setObject:nextLevel forKey:s];
+            currentLevel = nextLevel;
+            [nextLevel release];
+        }
+        [currentLevel incrementTotalCounts];
+    }
+    
+    OR1DHisto* histo = [nextLevel data];
+    if(!histo){
+        histo = [[OR1DHisto alloc] init];
+        [histo setKey:[nextLevel key]];
+        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+        [histo setNumberBins:numBins];
+        [nextLevel setData:histo];
+		[histo setDataSet:self];
+        [histo mergeHistogram:ptr numValues:numBins];
+        [histo release];
+        [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORDataSetAdded
+                              object:self
+                            userInfo: nil];
+    }
+    else [histo mergeHistogram:ptr numValues:numBins];
+}
+
+
 
 - (void) histogram2DX:(unsigned long)xValue y:(unsigned long)yValue size:(unsigned short)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...
 {

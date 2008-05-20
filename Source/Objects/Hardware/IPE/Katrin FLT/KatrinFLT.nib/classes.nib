@@ -5,6 +5,14 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>taskFinished</key>
@@ -107,6 +115,8 @@
 				<key>histoClearAfterReadoutAction</key>
 				<string>id</string>
 				<key>histoClearAtStartAction</key>
+				<string>id</string>
+				<key>histoSelfCalibrationButtonAction</key>
 				<string>id</string>
 				<key>histoSetStandardButtonAction</key>
 				<string>id</string>

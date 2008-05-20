@@ -75,6 +75,7 @@
 - (void) loadHistogram2D:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray;
 - (void) histogram:(unsigned long)aValue numBins:(unsigned long)numBins sender:(id)obj  withKeys:(NSString*)key,...;
 - (void) histogramWW:(unsigned long)aValue weight:(unsigned long)aWeight numBins:(unsigned long)numBins sender:(id)obj  withKeys:(NSString*)key,...;
+- (void) mergeHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray;
 - (void) histogram2DX:(unsigned long)xValue y:(unsigned long)yValue size:(unsigned short)numBins  sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) loadData2DX:(unsigned long)xValue y:(unsigned long)yValue z:(unsigned long)zValue size:(unsigned short)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) clearDataUpdate:(BOOL)update withKeys:(NSString*)firstArg,...;

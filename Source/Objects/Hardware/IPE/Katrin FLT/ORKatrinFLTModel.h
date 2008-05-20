@@ -207,12 +207,7 @@
     BOOL stdFeatureIsAvailable;
     BOOL vetoFeatureIsAvailable;
     BOOL histoFeatureIsAvailable;
-
-    BOOL shouldDumpPagecounter;//TODO: debug - remove -tb- 2008-03-18
-
 }
-- ( BOOL) shouldDumpPagecounter;//TODO: debug - remove -tb- 2008-03-18
-- (void)      setShouldDumpPagecounter:(BOOL)aBool;//TODO: debug - remove -tb- 2008-03-18
 
 #pragma mark ¥¥¥Initialization
 - (id) init;
@@ -225,6 +220,7 @@
 - (void) serviceChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
+- (void) showVersionRevision;
 - (unsigned long) versionRegister;//!< The raw 32-bit version register content
 - (void) setVersionRegister:(unsigned long)aValue;
 - (int) versionRegApplicationID;
@@ -425,9 +421,12 @@
 - (void) setHistoClearAfterReadout:(BOOL)aValue;
 - (BOOL) histoStopIfNotCleared;
 - (void) setHistoStopIfNotCleared:(BOOL)aValue;
+- (void) histoSetStandard;
 //
 - (NSMutableArray*) histogramData;
 - (unsigned int) getHistogramData: (int)index forChan:(int)aChan;
+- (void) setHistogramData: (int)index forChan:(int)aChan value:(int) aValue;
+- (void) clearHistogramDataForChan:(int)aChan;
 #pragma mark ¥¥¥Hardware Histogramming HW Access
 - (unsigned long) readEMin;
 - (unsigned long) readEMinForChan:(int)aChan;
@@ -453,9 +452,13 @@
 - (unsigned long) readTRecForChan:(int)aChan; 
 - (unsigned long) readFirstBinForChan:(int)aChan;
 - (unsigned long) readLastBinForChan:(int)aPixel;
+
+- (int) getHistoBinOfEnergy:(int) energy withOffsetEMin:(int) emin binSize:(int) bs;
+- (void) histoSimulateReadHistogramDataForChan:(int)aChan;
 - (void) startCalibrationHistogramOfChan:(int)aChan;
 - (void) checkCalibrationHistogram;
 - (void) stopCalibrationHistogram;
+- (void) histoRunSelfCalibration;
 - (unsigned int) histogramDataAdress:(int)aBin forChan:(int)aChan;
 - (void) readHistogramDataForChan:(unsigned int)aPixel;
 - (unsigned int) readHistogramDataOfPixel:(unsigned int)aPixel atBin:(unsigned int)aBin ;

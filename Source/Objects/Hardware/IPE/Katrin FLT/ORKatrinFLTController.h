@@ -265,6 +265,7 @@
 - (IBAction) histoSetStandardButtonAction:(id)sender;
 - (IBAction) startHistogramButtonAction:(id)sender;
 - (IBAction) stopHistogramButtonAction:(id)sender;
+- (IBAction) histoSelfCalibrationButtonAction:(id)sender;
 - (IBAction) readHistogramDataButtonAction:(id)sender;
 - (IBAction) readCurrentStatusButtonAction:(id)sender;
 - (IBAction) changedHistoCalibrationChanPopupButtonAction:(id)sender;

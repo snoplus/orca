@@ -395,7 +395,7 @@
     [super updateWindow];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
-	[self fltRunModeChanged:nil];
+	//[self fltRunModeChanged:nil];
 	[self daqRunModeChanged:nil];
 	[self postTriggerTimeChanged:nil];
 	[self gainArrayChanged:nil];
@@ -692,8 +692,8 @@
 	// Set title of FLT configuration window, ak 15.6.07
 	[[self window] setTitle:[NSString stringWithFormat:@"Katrin FLT Card (Slot %d)",[model stationNumber]]];
 	[fltNumberField setStringValue:[NSString stringWithFormat:@"FLT%d",[model stationNumber]]];
+    //added a field with the number at the left border for better visibility -tb-
     
-    //TODO: add a field with the number at the left border for better visibility -tb-
     //reread the firmware version -tb-
     [model initVersionRevision];
 }
@@ -966,19 +966,11 @@
   * or 96 instead of 100), sometimes the second value (instead of 1 it is 0 or 100).
   * (FPGA version is the first "histogramming version".)
   * (This bug report is in ORKatrinFLTController.m  -tb- 2008-02-29 )
+  *
+  * NOT FIXED: This happens in the disabled channels. Their values are undefined. (-tb- 2008-05-14)
   */ //-tb- 2008-02-29
 - (IBAction) readThresholdsGains:(id)sender
 {
-#if 0
-//TODO: REMOVE it (readThresholdsGains debug) -tb-
-int t=1000000;
-[model setShouldDumpPagecounter:TRUE];
-NSLog(@"uSleeping %i\n",t);
-usleep(t);
-NSLog(@"Wake up\n");
-[model setShouldDumpPagecounter:TRUE];
-return;
-#endif
 	NS_DURING
 		int i;
         NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
@@ -1099,7 +1091,10 @@ return;
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	NS_ENDHANDLER
-    [model initVersionRevision];//TODO: output format needs improvement -tb- 2008-03-11
+    
+    //read out version/revision register and show result in log window -tb-
+    [model initVersionRevision];
+    [model showVersionRevision];
 }
 
 /** Responds to all feature/application check buttons (std, histo, veto).
@@ -1169,19 +1164,23 @@ return;
     // check std and energy item
     if(![model histoFeatureIsAvailable] && ![model vetoFeatureIsAvailable]){
     	[energyDaqModeMenuItem setEnabled:TRUE]; // in histogram mode we have no energy mode -tb-
-        if(currSelection == histogramDaqModeMenuItem || currSelection == vetoDaqModeMenuItem)//I came from histo or veto mode -tb-
+        ////if(currSelection == histogramDaqModeMenuItem || currSelection == vetoDaqModeMenuItem){//I came from histo or veto mode -tb-
+        if([model daqRunMode] == kKatrinFlt_DaqHistogram_Mode || [model daqRunMode] == kKatrinFlt_DaqVeto_Mode){//I came from histo or veto mode -tb-
             [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
             currSelection = [daqRunModeButton selectedItem];
+        }
     }
     
     // check histo config
     if(![model histoFeatureIsAvailable]){
         [histogramDaqModeMenuItem setEnabled:FALSE];
-        if(currSelection == histogramDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        ////if(currSelection == histogramDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        if([model daqRunMode] == kKatrinFlt_DaqHistogram_Mode) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
         // take the "best" (=most oftenly needed) mode as default -tb-
         [histoMessageAboutFPGAVersionField setHidden:FALSE];
     }else{
-        if(currSelection == energyDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
+        ////if(currSelection == energyDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
+        if([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode) [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
         [histogramDaqModeMenuItem setEnabled:TRUE];
     	[energyDaqModeMenuItem setEnabled:FALSE]; // in histogram mode we have no energy mode -tb-
         [histoMessageAboutFPGAVersionField setHidden:TRUE];
@@ -1190,9 +1189,16 @@ return;
     // check veto config
     if(![model vetoFeatureIsAvailable]){
         [vetoDaqModeMenuItem setEnabled:FALSE];
-        if(currSelection == vetoDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        ////if(currSelection == vetoDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        if([model daqRunMode] == kKatrinFlt_DaqVeto_Mode){
+            if([model histoFeatureIsAvailable])
+                [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
+            else
+                [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        }
     }else{
-        if(currSelection == energyDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqVeto_Mode];
+        ////if(currSelection == energyDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqVeto_Mode];
+        if([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode) [model setDaqRunMode:kKatrinFlt_DaqVeto_Mode];
         [vetoDaqModeMenuItem setEnabled:TRUE];
     	[energyDaqModeMenuItem setEnabled:FALSE]; // in histogram mode we have no energy mode -tb-
     }
@@ -1268,9 +1274,14 @@ return;
 
 - (IBAction) writeRegisterButtonAction:(id)sender
 {
-	int val   =	[readWriteRegisterField intValue];
+	unsigned long val;//   =	[readWriteRegisterField integerValue];
+    //NSString *s=[NSString stringWithString: [readWriteRegisterField stringValue] ];
+    //NSLog(@"String is %@\n",s);
+    unsigned long  val2 = [[NSString stringWithString: [readWriteRegisterField stringValue] ] longLongValue];
+    val=val2;
+    NSLog(@"LongLong  is %Lu\n",val2);
     int aChan = [model readWriteRegisterChan];
-    NSLog(@"Write to Register: >%@< for chan/group %i  value %i\n",[model readWriteRegisterName],aChan,val);
+    NSLog(@"Write to Register: >%@< for chan/group %i  value %lu\n",[model readWriteRegisterName],aChan,val);
     [model writeRegisterWithName: [model readWriteRegisterName] forChan:aChan value: val];
 }
 
@@ -1283,7 +1294,7 @@ return;
 
 - (IBAction) writeRegisterWithAdressButtonAction:(id)sender
 {
-	int val   =	[readWriteRegisterField intValue];
+    unsigned long  val = [[NSString stringWithString: [readWriteRegisterField stringValue] ] longLongValue];
 	int adr   =	[readWriteRegisterAdressField intValue];
     NSLog(@"writeRegisterWithAdressButtonAction: write adr: %i  val %i\n",adr,val);
     [model write: adr   value: val];
@@ -1561,9 +1572,7 @@ return;
 {
     [self endEditing];
     //NSLog(@"This is    histoSetStandardButtonAction \n" );
-    [model setHistoClearAtStart: YES];
-    [model setHistoClearAfterReadout: YES];
-    [model setHistoStopIfNotCleared: NO];
+    [model histoSetStandard];
 }
 
 - (IBAction) startHistogramButtonAction:(id)sender
@@ -1593,6 +1602,11 @@ return;
     //[histogramPlotterId setNeedsDisplay:YES]; //TODO: make notification and let respond it to it -tb-
     //[histogramPlotterId display]; //moved to histoCalibrationPlotterChanged
 
+}
+
+- (IBAction) histoSelfCalibrationButtonAction:(id)sender
+{
+    [model histoRunSelfCalibration];
 }
 
 - (IBAction) readHistogramDataButtonAction:(id)sender
