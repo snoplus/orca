@@ -174,55 +174,11 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
             NSLog(@"Version: VersionRevisionReg (raw) 0x%x is not valid!\n",versionRegister );
             NSLog(@"    You probably use an old FPGA configuration version; version register reset to 1.\n");
             versionRegister = 0x00100000;
-            #if 0
-            int flag=0;
-            {//TODO: remove - qick hack for collab. meeting, to enable postTrigg for old FPGA vers. -tb-
-                int val;
-                
-                unsigned int func  = 0x2; // = b010
-                unsigned int LAddr0 = 0x01; // UNUSED   0x01 is postTrigg
-                unsigned int Pixel = 0; // we assume that all pixels have the same E_min, E_max, ...
-                // debug output -tb- NSLog(@"writeEMax: Pbus register is 0x%x, TRun is %i\n",
-                // debug output -tb-    [self read:([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)], TRun  ); 	
-                
-                val = [self read:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0)];
-                int ptt = val;
-                [self writePostTriggerTime:23];
-                val = [self read:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0)];
-                if(val==23) flag=1;
-                [self writePostTriggerTime:ptt];//restore old value
-                 NSLog(@"    PostTriggerCheck: success - set HW version to 3.\n");
-            }
-            if(flag) versionRegister = 0x00300000;
-            #endif
         }
-        #if 0
-        versionRegApplicationID= (versionRegister >> 24) & 0xff;
-        versionRegHWVersionHex = (versionRegister >> 16) & 0xff;
-        versionRegHWVersion    = (versionRegister >> 20) & 0x0f;
-        versionRegHWSubVersion = (versionRegister >> 16) & 0x0f;
-        versionRegCFPGAVersion = (versionRegister >>  8) & 0xff;
-        versionRegFPGA6Version = (versionRegister      ) & 0xff;
-        #endif
-        #if 0  //moved to showVersionRevision
-        //NSLog(@"Version: VersionRevisionReg (raw) 0x%x\n",versionRegister );
-        //NSLog(@"Version 0x%x, Revision 0x%x (%u=0x%x)\n",(versionRegister & 0xffff0000) >>16,(versionRegister & 0x0000ffff),versionRegister,versionRegister );
-        //NSLog(@"Version %i, Revision %i (%u=0x%x)\n",(versionRegister & 0xffff0000) >>16,(versionRegister & 0x0000ffff),versionRegister,versionRegister );
-        NSLog(@"Version+Revision Register of FLT %i: 0x%08x \n",[self stationNumber],[self  versionRegister] );
-        NSLog(@"    Version: FPGA firmware version   0x%02x  (major %i, minor %i)\n", [self versionRegHWVersionHex], [self versionRegHWVersion], [self versionRegHWSubVersion]);
-        //#ifndef __DEVELOPMENT__
-        NSLog(@"    Version: application/feature ID 0x%x\n", [self versionRegApplicationID]);
-        NSLog(@"    Version: CFPGA version 0x%02x\n", [self versionRegCFPGAVersion]);
-        NSLog(@"    Version: FPGA6 version 0x%02x\n", [self versionRegFPGA6Version]);
-        //#endif
-        #endif
-
-
-        //versionRegApplicationID
     NS_HANDLER
         NSLog(@"FLT %i: reading Version+Revision Register failed - emulate ver. 2\n",[self slot]+1 );
-        versionRegister = 0;
-            versionRegister = 0x00200000;//TODO: in simulation mode I should/could emulate version 3.x -tb- 2008-04-21
+        //versionRegister = 0;
+        versionRegister = 0x00200000;//  in simulation mode this will emulate version 3.x -tb- 2008-04-21
 	NS_ENDHANDLER
     versionRegisterIsUptodate=TRUE;
     if([self versionRegHWVersion]==1){// old version - no posttrigger
@@ -251,11 +207,11 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
         //NSLog(@"Version %i, Revision %i (%u=0x%x)\n",(versionRegister & 0xffff0000) >>16,(versionRegister & 0x0000ffff),versionRegister,versionRegister );
         NSLog(@"Version+Revision Register of FLT %i: 0x%08x \n",[self stationNumber],[self  versionRegister] );
         NSLog(@"    Version: FPGA firmware version   0x%02x  (major %i, minor %i)\n", [self versionRegHWVersionHex], [self versionRegHWVersion], [self versionRegHWSubVersion]);
-        //#ifndef __DEVELOPMENT__
+        #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
         NSLog(@"    Version: application/feature ID 0x%x\n", [self versionRegApplicationID]);
         NSLog(@"    Version: CFPGA version 0x%02x\n", [self versionRegCFPGAVersion]);
         NSLog(@"    Version: FPGA6 version 0x%02x\n", [self versionRegFPGA6Version]);
-        //#endif
+        #endif
 }
 
 - (unsigned long) versionRegister
@@ -266,8 +222,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     versionRegister=aValue;
 }
 
-//! Contols available features (applications).
-//TODO: work in progress -tb- 2008-03-14
+//! Controls available features (applications).
 - (int) versionRegApplicationID {return  (versionRegister >> 24) & 0xff;}
 
 //see .h file for more information
@@ -277,7 +232,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 - (int) versionRegCFPGAVersion  {return  (versionRegister >>  8) & 0xff;}
 - (int) versionRegFPGA6Version  {return  (versionRegister      ) & 0xff;}
 
-- (BOOL) stdFeatureIsAvailable   {return stdFeatureIsAvailable;}
+- (BOOL) stdFeatureIsAvailable   {return stdFeatureIsAvailable;}   // this is always true, could remove it -tb-
 - (BOOL) vetoFeatureIsAvailable  {return vetoFeatureIsAvailable;}
 - (BOOL) histoFeatureIsAvailable {return histoFeatureIsAvailable;}
 - (void) setStdFeatureIsAvailable:(BOOL)aBool
@@ -304,15 +259,26 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 
 - (id) init
 {
-    //NSLog(@"ORKatrinFLTModel::init\n" ); //TODO: WHEN IS THIS METHOD CALLED ? -tb- 2008-03-13
+    //NSLog(@"ORKatrinFLTModel::init\n" ); //TODO : WHEN IS THIS METHOD CALLED ? -tb- 2008-03-13
                                            //answer: at least when dragging a new card from catalog to the crate -tb-
                                            // - so we reallay need to init the most important settings e.g. strings -tb-
     self = [super init];
     
+    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+    {//in init: and initWithCoder:
+        static bool firstTimeCalled=TRUE;
+        if(firstTimeCalled){
+            firstTimeCalled=FALSE;
+            NSLog(@"ORKatrinFLTModel: WARNING: You are using a development version of Orca!\n");
+            NSLog(@"    (In XCode, we recommend switching to 'Deployment Configuration' and recompiling Orca.)\n" );
+        }
+    }
+    #endif
+    
     //init: read version register of flt and itentify the available applications:
     versionRegisterIsUptodate=FALSE;
     //[self initVersionRevision];//if called here, usually firewire is not yest available  (see initWithCoder) -tb-
-    postTriggerTime=511;//TODO: initialization; is this the right place? -tb- 2008-03-07
+    postTriggerTime=511;//TODO : initialization; is this the right place? -tb- 2008-03-07 --- yes! see comment above -tb-
     readWriteRegisterName=@"ControlStatus";
     return self;
 }
@@ -349,7 +315,6 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
-    //NSLog(@"ORKatrinFLTModel::Register Notifications<---\n");//TODO: REMOVE - devug output -tb-
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
             
     [notifyCenter addObserver : self
@@ -973,7 +938,7 @@ return hitRateId;
 
 - (void) readPostTriggerTime
 {
-    //TODO: USE A BROADCAST -tb-
+    //TODO: write a function with channel as parameter -tb-
     int val;
 
     unsigned int func  = 0x2; // = b010
@@ -1015,7 +980,8 @@ return hitRateId;
 	return (data >> kKatrinFlt_Cntl_Version_Shift) & kKatrinFlt_Cntl_Version_Mask; // 3bit
 }
 
-- (unsigned long)  readVersionRevision //TODO: still under construction -tb- 2008-03-11
+//*! Read out the version/revision/feature register.
+- (unsigned long)  readVersionRevision
 {	
     unsigned int func  = 0x0; // = b000
     unsigned int LAddr0 = 0x01; // 0x01 is version.revision register
@@ -1059,7 +1025,7 @@ return hitRateId;
 	unsigned long data = [self readControlStatus];
     int value = (data >> kKatrinFlt_Cntrl_Mode_Shift) & kKatrinFlt_Cntrl_Mode_Mask; // 4bit
 	//-tb- [self setFltRunMode: (data >> kKatrinFlt_Cntrl_Mode_Shift) & kKatrinFlt_Cntrl_Mode_Mask]; // 4bit
-    //NSLog(@"readMode: hw=%d, daq=%d \n",fltRunMode,daqRunMode);//TODO: debug output -tb-    
+    //NSLog(@"readMode: hw=%d, daq=%d \n",fltRunMode,daqRunMode); 
 	return value;
 }
 
@@ -1725,9 +1691,9 @@ return hitRateId;
 - (void) setHistoCalibrationChan:(unsigned int)aValue
 {
     histoCalibrationChan = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationChanChanged object:self];
     [self setHistoFirstBin:histogramDataFirstBin[aValue]];//TODO: init with 511 -tb-
     [self setHistoLastBin:histogramDataLastBin[aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationChanChanged object:self];
 }
 
 - (BOOL) showHitratesDuringHistoCalibration {return showHitratesDuringHistoCalibration;}
@@ -1963,12 +1929,12 @@ return hitRateId;
     //HistControlReg
     unsigned int func  = 0x6; // = b110
     unsigned int LAddr12 = 0x1; //0x1 is Histogrm:ControlReg
-    unsigned int CLRBit = 0x0;  // the clear bit TODO: testing ... -tb-
+    unsigned int CLRBit = 0x0;  // the clear bit 
     unsigned int startBit = 0x1;
     unsigned int numBit = 0x0;
     switch(aChan){
-    case 0: case 1: case 12: case 13: numBit = 0x0; break;
-    case 3: case 4: case 14: case 15: numBit = 0x1; break;// this is obsolete/unused -tb-
+    case 0: case 1: case 12: case 13:  case 31: numBit = 0x0; break;
+    case 3: case 4: case 14: case 15:           numBit = 0x1; break;// this is obsolete/unused -tb-
     }
     if(clear) CLRBit = 0x1;
     
@@ -2001,7 +1967,7 @@ return hitRateId;
   */  //-tb-
 - (void) writeStopHistogram
 {
-    //TODO: use broadcast -tb-
+    //or use broadcast:  ...writeStopHistogramForChan:31... -tb-
     int chan,group;
     for(chan=0; chan < kNumFLTChannels;chan++){
         group=[self histoChanToGroupMap:chan];
@@ -2033,8 +1999,6 @@ return hitRateId;
         regVal &= 0xfffffffc;// set the start/stop bit0 to 0=stop and prepare bit1 to 0
         regVal |= (numBit << 1) ; //
     }else{
-//TODO:
-//NSLog(@"WARNING: writeStopHistogramForChan: EMULATING   Version 3.x\n");//TODO: debug - REMOVE -tb-
         //new version (>=3.0): we use only the first bit in HistTriggControlReg
         regVal = (numBit << 1) ; //we use only numBit == 0 but to be sure ... -tb-
     }
@@ -2145,7 +2109,7 @@ return hitRateId;
         }
         
         //check that we can actually run: is the run mode as needed?
-        if(kKatrinFlt_DaqHistogram_Mode != [self daqRunMode]){ //TODO: could also check flt mode for 1 -tb-
+        if(kKatrinFlt_DaqHistogram_Mode != [self daqRunMode]){ 
             savedDaqRunMode = [self daqRunMode];
             [self setDaqRunMode: kKatrinFlt_DaqHistogram_Mode];
             NSLog(@"WARNING: Histogram Calibration Run: switched DAQ Run Mode to 'Histogram' mode\n");
@@ -2215,28 +2179,24 @@ return hitRateId;
         [self writeTRun:histoRunTime forChan: 31 /*aPixel*/];
         
         //clear the pages: (clears the pages in a 2 second "pre run")
-        // TODO: under construction -tb-
-        // TODO: under construction -tb-
-        // TODO: under construction -tb-
-        // TODO: under construction -tb-
-        // TODO: under construction -tb-
-        if(0 && histoClearAtStart){
-            //    set TRun to 1, start histogramming with CLEAR bit, wait 1.1 sec or until page 1 is active, clear page, set TRun back
-            //NSLog(@"WARNING: startCalibrationHistogramOfChan: EMULATING   Version 3.x\n");//TODO: change after version register is available -tb-
-            [self writeTRun:1 forChan:aPixel];
-            [self writeStartHistogramForChan:aPixel withClear: histoClearAtStart];
+        //    set TRun to 1, start histogramming with CLEAR bit, wait 1.1 sec or until page 1 is active, clear page, set TRun back
+        if(histoClearAtStart){
+            sltmodel = [[self crate] adapter];
+            [self writeTRun:1 forChan: 31 /*aPixel*/];
+            [sltmodel setSwInhibit];// suppress events -tb-
+            [self writeStartHistogramForChan: 31 /*aPixel*/ withClear: histoClearAtStart];
             // will be cleared at start ... [self clearCurrentHistogramPageForChan:aPixel];// clear page 0 ...
             usleep(100000);
             while([self readCurrentHistogramPageNum] == 0){//wait until page 1 is active
                 usleep(100000);
                 NSLog(@"Waiting to clear page 1 (now %i)\n",[self readCurrentHistogramPageNum]);
             }
-            [self clearCurrentHistogramPageForChan:aPixel];// clear page 1
-            [self writeStopHistogramForChan:aPixel];       //stop 'clear' run
+            [self clearCurrentHistogramPageForChan: 31 /*aPixel*/];// clear page 1
+            [self writeStopHistogramForChan: 31 /*aPixel*/];       //stop 'clear' run
             //usleep(1000001);
+            [sltmodel releaseSwInhibit];// allow events -tb-
             //restore TRun
-            [self writeTRun:histoRunTime forChan:aPixel];
-            
+            [self writeTRun:histoRunTime forChan: 31 /*aPixel*/];
         }
         
         //START HISTOGRAMMING:
@@ -2291,7 +2251,7 @@ return hitRateId;
         histoPreToggleSec      = histoLastSecStrobeSec; 
         histoPreToggleUSec     = histoLastSecStrobeUSec; 
         
-        //remember the start time TODO: work in progress -tb- 2008-02-18
+        //remember the start time 
         // there are (Auger) methods readTime and readTimeSubSec (from self), do they work for Katrin? -tb-
         //struct timeval t;//    struct timezone tz; is obsolete ... -tb-
         gettimeofday(&t,NULL);
@@ -2317,7 +2277,7 @@ return hitRateId;
         }
         
         //check that we can actually run: is the run mode as needed?
-        if(kKatrinFlt_DaqHistogram_Mode != [self daqRunMode]){ //TODO: could also check flt mode for 1 -tb-
+        if(kKatrinFlt_DaqHistogram_Mode != [self daqRunMode]){
             savedDaqRunMode = [self daqRunMode];
             [self setDaqRunMode: kKatrinFlt_DaqHistogram_Mode];
             NSLog(@"WARNING: Histogram Calibration Run: switched DAQ Run Mode to 'Histogram' mode\n");
@@ -3163,6 +3123,17 @@ return hitRateId;
 - (id)initWithCoder:(NSCoder*)decoder
 {
     //NSLog(@"Katrin FLT Card (%i) initWithCoder <---- decoder %p\n",[self slot], decoder);
+    
+    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+    {//in init: and initWithCoder:
+        static bool firstTimeCalled=TRUE;
+        if(firstTimeCalled){
+            firstTimeCalled=FALSE;
+            NSLog(@"ORKatrinFLTModel: WARNING: You are using a development version of Orca!\n");
+            NSLog(@"    (In XCode, we recommend switching to 'Deployment Configuration' and recompiling Orca.)\n" );
+        }
+    }
+    #endif
 
     self = [super initWithCoder:decoder];
 	
@@ -3300,7 +3271,7 @@ return hitRateId;
     
     //version control - at this time firewire is (sometimes) not available -tb- 2008-03-13
     NS_DURING
-    //NSLog(@"--- initWithDecoder::Read from register initVersionRevision---\n");
+    //NSLog(@"--- initWithCoder::Read from register initVersionRevision---\n");
     [self initVersionRevision];
     NS_HANDLER
     versionRegisterIsUptodate=FALSE;
@@ -3309,7 +3280,7 @@ return hitRateId;
         [self setVetoFeatureIsAvailable:  YES];
         [self setHistoFeatureIsAvailable: YES];
     }
-    NSLog(@"initWithDecoder::Read from register initVersionRevision FAILED\n");
+    NSLog(@"initWithCoder::Read from register initVersionRevision FAILED\n");
     NS_ENDHANDLER
 		
 

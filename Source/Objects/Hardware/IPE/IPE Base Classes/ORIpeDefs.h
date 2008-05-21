@@ -55,12 +55,23 @@ Doxygen documentation:
  *   Ideal would be a combination with the hardware version display?!
  * - Compensate the filter length!!!
  * - Data object for DeadTime
- * - Objects for histograms in Flt data stream
+ * - Objects for histograms in Flt data stream - and OrcaRoot decoder
  * - Implementation of cFP-Interface
  * - Avoid error messages overflow in run mode
  *
  *
  * History:
+ * - 1.2-12 - Katrin FLT dialog
+ *            - First official release of the histogramming FGPA configuration (crate shipped to UW end of April):
+ *              Version/Revision/Feature register on FLT (enables auto detection of FPGA configurations);
+ *              PostTriggerTime setting in FLT;
+ *              Onboard histogramming with page toggle
+ *            - Starting hw histogramming moved to SLT (reason: syncronized startup) and made with broadcast
+ *            - A lot of extensions in the FLT histogramming tab.
+ *            - Pbus simulation mode: basic simulation of histogramming functionality.
+ *            - Number of channels in histogram FPGA configuration: 4
+ *            - Number of channels in standard and veto FPGA configuration: 20
+ *              16.5.08 (-tb-)
  * - 1.2-11 - Slt Decoder for Trigger data
  *            - Changed from histogram2D to the data2D display type
  *              24.4.08 (ak)
@@ -153,6 +164,6 @@ Doxygen documentation:
 
 /** Version of the IPE-DAQ object.
   * The version number is independent from the Orca version. */ 
-#define ORIPE_VERSION @"1.2-11"
+#define ORIPE_VERSION @"1.2-12"
 
 
