@@ -67,8 +67,7 @@
     NSMutableArray* array = [NSMutableArray array];
 	id seg;
     while(seg = [segEnum nextObject]){
-		NSStringEncoding enc;
-		NSString* contents = [NSString stringWithContentsOfFile: [[seg mapFile] stringByExpandingTildeInPath] usedEncoding:&enc error:nil] ;
+		NSString* contents = [NSString stringWithContentsOfFile: [[seg mapFile] stringByExpandingTildeInPath]] ;
 		NSArray* lines = [contents componentsSeparatedByString:@"\n"]; 
         [array addObjectsFromArray:lines];
     }
