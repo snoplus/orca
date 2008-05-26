@@ -175,6 +175,7 @@
     [dataCatalogView deselectAll:self];
     [detailsView setNeedsDisplay:YES];
     [dataView reloadData];
+	[model parseFile];
 
 }
 
