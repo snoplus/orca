@@ -107,8 +107,8 @@ followed by multiplicity data (20 longwords -- 1 pixel mask per card)
 	NSString* stationKey	= [self getStationKey: card];	
 		
 	++ptr;		//point to event count
-	//NSString* eventCount = [NSString stringWithFormat:@"%d",*ptr];
-	//[aDataSet loadGenericData:eventCount sender:self withKeys:@"SLT",@"Ipe SLT", crateKey,stationKey,nil];
+	NSString* eventCount = [NSString stringWithFormat:@"%d",*ptr];
+	[aDataSet loadGenericData:eventCount sender:self withKeys:@"SLT",@"EventCount", crateKey,stationKey,nil];
 					
 				
 	// Display data, ak 12.2.08
