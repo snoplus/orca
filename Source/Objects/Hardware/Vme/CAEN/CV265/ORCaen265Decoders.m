@@ -65,7 +65,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
 	short chan = (*ptr >> 13) & 0x7;
-	[aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Caen265", crateKey,cardKey,[self getChannelKey: chan],nil];
+    if ((((*ptr) >> 12) & 0x1) == 0) { //ignore 15 bit dynamic range
+        [aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Caen265", crateKey,cardKey,[self getChannelKey: chan],nil];
+    }
     return length; //must return number of longs processed.
 }
 
