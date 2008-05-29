@@ -295,6 +295,15 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     }
 }
 
+- (void) drawIcons:(NSRect)aRect
+{
+    int n = [orcaObjects count];
+    int i;
+    for(i=0;i<n;i++){
+        [[orcaObjects objectAtIndex:i] drawIcon:aRect withTransparency:1];
+    }
+}
+
 
 - (NSArray*)selectedObjects
 {
