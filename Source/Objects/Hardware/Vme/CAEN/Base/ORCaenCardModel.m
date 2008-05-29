@@ -368,7 +368,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 * \note	Gets offset to register from unit register map.
 */
 //--------------------------------------------------------------------------------
-- (void) read:(unsigned short) pReg returnValue:(unsigned short*) pValue
+- (void) read:(unsigned short) pReg returnValue:(void*) pValue
 {
     // Make sure that register is valid
     if (pReg >= [self getNumberRegisters]) {
@@ -382,12 +382,24 @@ NSString* 	caenChnl				= @"CAEN Chnl";
     }
     
     // Perform the read operation.
-    [[self adapter] readWordBlock:pValue
+	if ([self getAccessSize:pReg] == kD16){
+		unsigned short aValue;
+		[[self adapter] readWordBlock:&aValue
                         atAddress:[self baseAddress] + [self getAddressOffset:pReg]
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
-    
+		*((unsigned short*)pValue) = aValue;
+	}
+	else {
+		unsigned long aValue;
+		[[self adapter] readLongBlock:&aValue
+                        atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+		*((unsigned long*)pValue) = aValue;
+	}
 }
 
 //--------------------------------------------------------------------------------
@@ -399,7 +411,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 * \note	Gets offset to register from unit register map.
 */
 //--------------------------------------------------------------------------------
-- (void) write:(unsigned short) pReg sendValue:(unsigned short) pValue
+- (void) write:(unsigned short) pReg sendValue:(unsigned long) pValue
 {
     // Check that register is a valid register.
     if (pReg >= [self getNumberRegisters]){
@@ -415,15 +427,24 @@ NSString* 	caenChnl				= @"CAEN Chnl";
     // Do actual write
     NS_DURING
         if ([self getAccessSize:pReg] == kD16){
-            [[self adapter] writeWordBlock:&pValue
+			unsigned short aValue = (unsigned short)pValue;
+            [[self adapter] writeWordBlock:&aValue
                                  atAddress:[self baseAddress] + [self getAddressOffset:pReg]
                                 numToWrite:1
                                 withAddMod:[self addressModifier]
                              usingAddSpace:0x01];
             
         }
-        NS_HANDLER
-            NS_ENDHANDLER
+		else {
+            [[self adapter] writeLongBlock:&pValue
+                                 atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+                                numToWrite:1
+                                withAddMod:[self addressModifier]
+                             usingAddSpace:0x01];
+
+		}
+		NS_HANDLER
+		NS_ENDHANDLER
 }
 
 

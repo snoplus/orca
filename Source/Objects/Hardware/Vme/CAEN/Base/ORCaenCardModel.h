@@ -29,6 +29,8 @@
 #import "ORDataPacket.h"
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
+#import "SBC_Config.h"
+#import "VME_HW_Definitions.h"
 
 // Bit Set 2 Register Masks
 #define kMemTest	0x01
@@ -102,8 +104,8 @@ typedef struct RegisterNamesStruct {
 #pragma mark ***CAEN commands
 - (void)		read;
 - (void)		write;
-- (void)		read: (unsigned short) pReg returnValue: (unsigned short*) pValue;
-- (void)		write: (unsigned short) pReg sendValue: (unsigned short) pValue;
+- (void)		read: (unsigned short) pReg returnValue: (void*) pValue;
+- (void)		write: (unsigned short) pReg sendValue: (unsigned long) pValue;
 
 - (void)		readThresholds;
 - (void)		writeThresholds;
