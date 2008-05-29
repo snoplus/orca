@@ -142,6 +142,7 @@ extern NSString* ORObjArrayPtrPBType;
 #pragma mark ¥¥¥Drawing
 - (void) drawSelf:(NSRect)aRect;
 - (void) drawSelf:(NSRect)aRect withTransparency:(float)aTransparency;
+- (void) drawIcon:(NSRect)aRect withTransparency:(float)aTransparency;
 - (void) drawImageAtOffset:(NSPoint)anOffset withTransparency:(float)aTransparency;
 - (void) drawConnections:(NSRect)aRect withTransparency:(float)aTransparency;
 
