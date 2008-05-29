@@ -161,16 +161,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 //--------------------------------------------------------------------------------
 - (unsigned long) getThresholdOffset
 {
-    //<<<<<<< ORCaen775Model.m
 	return reg[kThresholds].addressOffset;
-    /*=======
-	[[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannel:[self selectedChannel]];
-	selectedChannel = anIndex;
-	[[NSNotificationCenter defaultCenter]
-					postNotificationName:OR775SelectedChannelChanged
-                                  object:self];
-    >>>>>>> 1.2
-    */
 }
 
 //--------------------------------------------------------------------------------
