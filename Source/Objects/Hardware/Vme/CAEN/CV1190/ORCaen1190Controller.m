@@ -20,6 +20,8 @@
 #import "ORCaenDataDecoder.h"
 #import "ORCaen1190Model.h"
 #import "ORValueBarGroup.h"
+#import "ORRate.h"
+#import "ORRateGroup.h"
 
 @implementation ORCaen1190Controller
 #pragma mark ***Initialization
@@ -31,7 +33,8 @@
 
 - (void) awakeFromNib
 {
-    ratesSize     = NSMakeSize(500,600);
+    setupSize     = NSMakeSize(230,550);
+    ratesSize     = NSMakeSize(300,630);
 	[valueBarGroup0 setTotalBars:32];
 
 	int i;
@@ -53,7 +56,7 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
-    [ super registerNotificationObservers ];
+    [super registerNotificationObservers];
 	
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	
@@ -71,7 +74,26 @@
 	[notifyCenter addObserver: self selector: @selector(leadingTimeResolutionChanged:)	name: ORCaen1190LeadingTimeResolutionChanged	object: model];
 	[notifyCenter addObserver: self selector: @selector(leadingWidthResolutionChanged:)	name: ORCaen1190LeadingWidthResolutionChanged	object: model];
 
+    [self registerRates];
+
 }
+
+- (void) registerRates
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+	[notifyCenter removeObserver:self name:ORRateChangedNotification object:nil];
+	
+	NSEnumerator* e = [[[model tdcRateGroup] rates] objectEnumerator];
+	id obj;
+	while(obj = [e nextObject]){
+		[notifyCenter addObserver : self
+						 selector : @selector(tdcRateChanged:)
+							 name : ORRateChangedNotification
+						   object : obj];
+	}
+}
+
 
 - (void) updateWindow
 {
@@ -88,6 +110,7 @@
 	[self leadingTimeResolutionChanged:nil];
 	[self leadingWidthResolutionChanged:nil];
 	[self deadTimeChanged:nil];
+    [self adcRateChanged:nil];
 }
 
 #pragma mark ***Interface Management
@@ -118,6 +141,15 @@
 	}
 }
 
+- (void) adcRateChanged:(NSNotification*)aNote
+{
+	ORRate* theRateObj = [aNote object];	
+	if([model paramGroup] == ([theRateObj tag]/32)) {		
+		[[rateMatrix0 cellWithTag:[theRateObj tag]] setFloatValue: [theRateObj rate]];
+		[valueBar0 setNeedsDisplay:YES];
+	}
+}
+
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
@@ -126,6 +158,11 @@
 		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:setupSize];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 2){
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:ratesSize];
 		[[self window] setContentView:tabView];

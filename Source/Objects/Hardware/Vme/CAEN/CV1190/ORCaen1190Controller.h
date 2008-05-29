@@ -44,6 +44,7 @@
 	IBOutlet ORValueBar*	valueBar0;
 	IBOutlet ORValueBarGroup* valueBarGroup0;
  
+	NSSize setupSize;
 	NSSize ratesSize;
 }
 
@@ -52,6 +53,7 @@
  	
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (void) registerRates;
 - (void) updateWindow;
 - (void) setChannelLabels;
 
@@ -70,6 +72,7 @@
 - (void) paramGroupChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
+- (void) adcRateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) deadTimeAction:(id)sender;
