@@ -92,66 +92,66 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [super registerNotificationObservers];
-
+	
     // Register any changes to first base tab
     [notifyCenter addObserver:self
-	      selector:@selector(baseAddressChanged:)
-		  name:ORVmeIOCardBaseAddressChangedNotification
-		object:model];
-
-
+					 selector:@selector(baseAddressChanged:)
+						 name:ORVmeIOCardBaseAddressChangedNotification
+					   object:model];
+	
+	
     [notifyCenter addObserver:self
-	      selector:@selector(selectedRegIndexChanged:)
-		  name:caenSelectedRegIndexChanged
-		object:model];
-
+					 selector:@selector(selectedRegIndexChanged:)
+						 name:caenSelectedRegIndexChanged
+					   object:model];
+	
     [notifyCenter addObserver:self
-	      selector:@selector(selectedRegChannelChanged:)
-		  name:caenSelectedChannelChanged
-		object:model];
-
-
+					 selector:@selector(selectedRegChannelChanged:)
+						 name:caenSelectedChannelChanged
+					   object:model];
+	
+	
     [notifyCenter addObserver:self
-	  selector:@selector(writeValueChanged:)
-	      name:caenWriteValueChanged
-	    object:model];
-
+					 selector:@selector(writeValueChanged:)
+						 name:caenWriteValueChanged
+					   object:model];
+	
     // Register any changes to thresholds
     [notifyCenter addObserver:self
-	      selector:@selector(thresholdChanged:)
-		  name:caenChnlThresholdChanged
-		object:model];
-
-
+					 selector:@selector(thresholdChanged:)
+						 name:caenChnlThresholdChanged
+					   object:model];
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(thresholdLockChanged:)
                          name : [self thresholdLockName]
-                       object: nil];
-
+						object: nil];
+	
     [notifyCenter addObserver : self
                      selector : @selector(basicLockChanged:)
                          name : [self basicLockName]
-                       object: nil];
-
-
-   [notifyCenter addObserver : self
-	    selector : @selector(basicLockChanged:)
-	    name : ORRunStatusChangedNotification
-	    object : nil];
-
-
-   [notifyCenter addObserver : self
-	    selector : @selector(thresholdLockChanged:)
-	    name : ORRunStatusChangedNotification
-	    object : nil];
-
-
+						object: nil];
+	
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(basicLockChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(thresholdLockChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
+	
     [notifyCenter addObserver : self
-		selector : @selector(slotChanged:)
-		name : ORVmeCardSlotChangedNotification
-		object : model];
-
-
+					 selector : @selector(slotChanged:)
+						 name : ORVmeCardSlotChangedNotification
+					   object : model];
+	
+	
 }
 
 - (NSString*) thresholdLockName {return @"OverRide This";}
@@ -579,14 +579,14 @@
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
-	[[self window] setContentView:blankView];
-	[self resizeWindowToSize:settingSize];
-	[[self window] setContentView:tabView];
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:settingSize];
+		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 1){
-	[[self window] setContentView:blankView];
-	[self resizeWindowToSize:thresholdSize];
-	[[self window] setContentView:tabView];
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:thresholdSize];
+		[[self window] setContentView:tabView];
     }
 
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
