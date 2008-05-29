@@ -47,19 +47,6 @@
 			<string>OrcaObjectController</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
 			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
@@ -110,6 +97,19 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>
