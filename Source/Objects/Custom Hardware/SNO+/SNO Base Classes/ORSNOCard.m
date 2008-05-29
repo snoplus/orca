@@ -18,24 +18,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 #import "ORSNOCard.h"
 
-
-#pragma mark ¥¥¥Notification Strings
-NSString* ORSNOCardSlotChangedNotification 	= @"ORSNOCardSlotChangedNotification";
+#pragma mark â€¢â€¢â€¢Notification Strings
+NSString* ORSNOCardSlotChanged 	= @"ORSNOCardSlotChanged";
 
 @implementation ORSNOCard
 
-#pragma mark ¥¥¥Inialization
-- (void) dealloc
-{
-    [super dealloc];
-}
-
-#pragma mark ¥¥¥Accessors
-
+#pragma mark â€¢â€¢â€¢Accessors
 - (Class) guardianClass 
 {
 	return NSClassFromString(@"ORSNOCrateModel");
@@ -43,6 +34,6 @@ NSString* ORSNOCardSlotChangedNotification 	= @"ORSNOCardSlotChangedNotification
 
 - (NSString*) cardSlotChangedNotification
 {
-    return ORSNOCardSlotChangedNotification;
+    return ORSNOCardSlotChanged;
 }
 @end

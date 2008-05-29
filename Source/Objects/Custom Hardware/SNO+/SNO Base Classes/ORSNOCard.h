@@ -31,4 +31,4 @@
 @end
 
 #pragma mark ¥¥¥Extern Definitions
-extern NSString* ORSNOCardSlotChangedNotification;
+extern NSString* ORSNOCardSlotChanged;

@@ -52,6 +52,9 @@ const struct {
 	{0x0000d000,	0x06800000}
 };
 
+
+NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
+
 @implementation ORSNOCrateModel
 
 #pragma mark •••initialization
@@ -80,8 +83,8 @@ const struct {
     
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
-        [transform translateXBy:7 yBy:25];
-        [transform scaleXBy:.38 yBy:.3];
+        [transform translateXBy:5 yBy:13];
+        [transform scaleXBy:.39 yBy:.44];
         [transform concat];
         NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
         OrcaObject* anObject;
@@ -117,6 +120,30 @@ const struct {
 	[[self orcaObjects] makeObjectsPerformSelector:@selector(disconnected)];
 }
 
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian
+{
+    return [aGuardian isKindOfClass:[self guardianClass]];	
+}
+
+- (Class) guardianClass 
+{
+	return NSClassFromString(@"ORSNORackModel");
+}
+
+- (void) setSlot:(int)aSlot
+{
+	slot = aSlot;
+    [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORSNOCrateSlotChanged
+                              object:self];
+
+}
+
+- (int) slot
+{
+	return slot;
+}
+
 #pragma mark •••Accessors
 - (unsigned long) memoryAddress
 {
@@ -147,43 +174,11 @@ const struct {
 	   
     [notifyCenter addObserver : self
                      selector : @selector(viewChanged:)
-                         name : ORSNOCardSlotChangedNotification
+                         name : ORSNOCardSlotChanged
                        object : nil];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(powerFailed:)
-                         name : @"VmePowerFailedNotification"
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(powerRestored:)
-                         name : @"VmePowerRestoredNotification"
-                       object : nil];
 }
 
-
-- (void) powerFailed:(NSNotification*)aNotification
-{
-    if([aNotification object] == [self controllerCard]){
-        [self setPowerOff:YES];
-		if(!cratePowerAlarm){
-			cratePowerAlarm = [[ORAlarm alloc] initWithName:@"No SNO Crate Power" severity:0];
-			[cratePowerAlarm setSticky:YES];
-			[cratePowerAlarm setHelpStringFromFile:@"NoSNOCratePowerHelp"];
-			[cratePowerAlarm postAlarm];
-		} 
-    }
-}
-
-- (void) powerRestored:(NSNotification*)aNotification
-{
-    if([aNotification object] == [self controllerCard]){
-        [self setPowerOff:NO];
-		[cratePowerAlarm clearAlarm];
-		[cratePowerAlarm release];
-		cratePowerAlarm = nil;
-    }
-}
 - (NSString*) identifier
 {
     return [NSString stringWithFormat:@"SNO Crate %d",[self crateNumber]];

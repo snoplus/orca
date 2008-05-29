@@ -150,7 +150,7 @@
     [self guardian:guardian positionConnectorsForCard:self];
     
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORSNOCardSlotChangedNotification
+			postNotificationName:ORSNOCardSlotChanged
                           object: self];
 }
 

@@ -26,12 +26,17 @@
 #pragma mark •••Forward Declarations
 
 @interface ORSNOCrateModel : ORCrate  {
+	int slot;
 }
 
 - (void) setUpImage;
 - (void) makeMainController;
 - (void) connected;
 - (void) disconnected;
+- (Class) guardianClass;
+- (BOOL) acceptsGuardian: (OrcaObject *)aGuardian;
+- (void) setSlot:(int)aSlot;
+- (int) slot;
 
 #pragma mark •••Accessors
 - (unsigned long) memoryAddress;
@@ -39,8 +44,6 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (void) powerFailed:(NSNotification*)aNotification;
-- (void) powerRestored:(NSNotification*)aNotification;
-
-
 @end
+
+extern NSString* ORSNOCrateSlotChanged;

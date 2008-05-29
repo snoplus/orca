@@ -57,7 +57,7 @@
 
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
-						 name : ORSNOCardSlotChangedNotification
+						 name : ORSNOCardSlotChanged
 					   object : model];
 }
 
