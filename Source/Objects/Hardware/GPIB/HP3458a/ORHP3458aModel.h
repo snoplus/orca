@@ -47,6 +47,7 @@ typedef struct  {
 - (void) readVoltages;
 - (int) getNumberItemsForMaxInput;
 - (NSString*) getMaxInputName:(int)i;
+- (NSString*) trucateToCR:(char*)cString;
 
 #pragma mark •••Hardware Access
 - (void) readIDString;
@@ -55,6 +56,7 @@ typedef struct  {
 - (void) sendAllToHW;
 - (void) readAllHW;
 - (void) sendFuncDef;
+- (void) resetHW;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)aDecoder;

@@ -25,6 +25,8 @@
 
 #define kNplpCMeterPort 5000
 #define kNplpCNumChannels 4
+#define kNplpCStart  "B"
+#define kNplpCStop	 "Q"
 
 @class NetSocket;
 @class ORAlarm;
@@ -65,6 +67,8 @@
 
 #pragma mark ***Utilities
 - (void) connect;
+- (void) start;
+- (void) stop;
 
 #pragma mark •••DataRecords
 - (NSDictionary*) dataRecordDescription;

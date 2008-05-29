@@ -32,6 +32,7 @@
     IBOutlet NSTextField*   commandField;
     IBOutlet NSButton*		sendCommandButton;
 
+    IBOutlet NSButton*		resetButton;
     IBOutlet NSButton*		sendToHWButton;
     IBOutlet NSButton*		readFromHWButton;
 
@@ -57,6 +58,7 @@
 - (IBAction) sendCommandAction:(id)sender;
 - (IBAction) sendToHWAction:(id)sender;
 - (IBAction) readHWAction:(id)sender;
+- (IBAction) resetAction:(id)sender;
 
 @end
 

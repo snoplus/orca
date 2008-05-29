@@ -48,10 +48,11 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 	NSString* deviceId  = [NSString stringWithFormat:@"device%2d",*ptr&0x0000000f];
 	ptr++; //point to time 
 	int i;
+
 	for(i=0;i<length-3;i++){
 		ptr++;
-		NSString* channelKey			= [self getChannelKey:(*ptr&0x00f00000)>>20];
-		[aDataSet histogram:(*ptr & 0x000fffff)<<8 numBins:4095 sender:self withKeys:@"NplpCMeter",deviceId,channelKey,nil];
+		NSString* channelKey			= [self getChannelKey:(*ptr&0x00600000)>>21];
+		[aDataSet histogram:(*ptr & 0x000fffff)>>9 numBins:4095 sender:self withKeys:@"NplpCMeter",deviceId,channelKey,nil];
 	}
     return length; //must return number of longs processed.
 }

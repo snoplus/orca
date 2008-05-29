@@ -33,6 +33,7 @@ NSString* ORNplpCMeterAverageChanged		= @"ORNplpCMeterAverageChanged";
 NSString* ORNplpCMeterFrameError			= @"ORNplpCMeterFrameError";
 NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
 
+
 @implementation ORNplpCMeterModel
 
 - (void) makeMainController
@@ -139,6 +140,7 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
         [self setIsConnected:[socket isConnected]];
 	}
 	else {
+		[self stop];
 		[self setSocket:nil];	
         [self setIsConnected:[socket isConnected]];
 	}
@@ -174,6 +176,7 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
 {
     if(inNetSocket == socket){
         [self setIsConnected:[socket isConnected]];
+		[self start];
     }
 }
 
@@ -194,6 +197,17 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
     }
 }
 
+- (void) start
+{
+	[socket write:&kNplpCStart length:1];
+	[self setFrameError:0];
+}
+
+- (void) stop
+{
+	[socket write:&kNplpCStop length:1];
+}
+
 #pragma mark •••Data Records
 - (unsigned long) dataId
 {
@@ -207,12 +221,17 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
 
 - (void) setDataIds:(id)assigner
 {
-    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
+    dataId       = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setDataId:[anotherCard dataId]];
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"NplpCMeter"];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -234,8 +253,8 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
 	if(meterData){
 	
 		unsigned int numBytes = [meterData length];
-		if([self validateMeterData]){
-			if(numBytes%4 == 0) {											//OK, we know we got a integer number of long words
+		if(numBytes%4 == 0) {											//OK, we know we got a integer number of long words
+			if([self validateMeterData]){
 				unsigned long data[1003];									//max buffer size is 1000 data words + ORCA header
 				unsigned int numLongsToShip = numBytes/sizeof(long);		//convert size to longs
 				numLongsToShip = numLongsToShip<1000?numLongsToShip:1000;	//don't exceed the data array
@@ -253,9 +272,10 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
 				
 				int i;
 				for(i=0;i<numLongsToShip;i++){
+					p[i] = CFSwapInt32BigToHost(p[i]);
 					data[3+i] = p[i];
-					int chan = (p[i] & 0xff000000) >> 24;
-					if(chan < kNplpCNumChannels) [dataStack[chan] enqueue: [NSNumber numberWithLong:p[i] & 0x00ffffff]];
+					int chan = (p[i] & 0x00600000) >> 21;
+					if(chan < kNplpCNumChannels) [dataStack[chan] enqueue: [NSNumber numberWithLong:p[i] & 0x000fffff]];
 				}
 				
 				[self averageMeterData];
@@ -276,11 +296,12 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
 				}
 				[self setReceiveCount: receiveCount + numLongsToShip];
 			}
-		}
-		else {
-			[meterData release];
-			meterData = nil;
-			[self setFrameError:frameError+1];
+			
+			else {
+				[meterData release];
+				meterData = nil;
+				[self setFrameError:frameError+1];
+			}
 		}
 	}
 }
@@ -290,17 +311,21 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
 	int chan;
 	for(chan=0;chan<kNplpCNumChannels;chan++){
 		int count = [dataStack[chan] count];
-		NSEnumerator* e = [dataStack[chan] objectEnumerator];
-		NSNumber* aValue;
-		long sum = 0;
-		while(aValue = [e nextObject]){
-			sum += [aValue longValue];
+		if(count){
+			NSEnumerator* e = [dataStack[chan] objectEnumerator];
+			NSNumber* aValue;
+			long sum = 0;
+			while(aValue = [e nextObject]){
+				sum += [aValue longValue];
+			}
+			[self setMeter:chan average:sum/(float)count];
+			if(count>10){
+				int j;
+				for(j=0;j<count-10;j++)[dataStack[chan] dequeueFromBottom];
+			}
 		}
-		[self setMeter:chan average:sum/(float)count];
-		if(count>10){
-			int j;
-			for(j=0;j<count-10;j++)[dataStack[chan] dequeueFromBottom];
-		}
+		else [self setMeter:chan average:0];
+
 	}
 }
 
@@ -310,7 +335,8 @@ NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
 	unsigned int len = [meterData length];
 	int i;
 	for(i=4;i<len;i+=4){
-		if(p[i] != p[i-4]+1)return NO;
+		if(p[i-4] == 255 && p[i] == 0)return YES;
+		else if(p[i] != p[i-4]+1)return NO;
 	}
 	return YES;
 }

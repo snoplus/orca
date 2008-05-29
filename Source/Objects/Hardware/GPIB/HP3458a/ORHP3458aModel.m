@@ -235,9 +235,18 @@ HP3458aNamesStruct aciNames[aciCount] = {
 		char reply[32];
 		reply[0]='\0';
 		long n = [self writeReadGPIBDevice:@"ID?" data:reply maxLength:32];
-		if(n>0)reply[n-1]='\0';
-		NSLog(@"HP3458a ID = %c\n",reply);
+		if(n>0){			
+			NSLog(@"HP3458a ID = %@\n",[self trucateToCR:reply]);
+		}
+		else NSLog(@"Illegal response to ID?\n");
 	}
+}
+
+- (NSString*) trucateToCR:(char*)cString
+{
+	NSString* s = [NSString stringWithCString:cString encoding:NSASCIIStringEncoding];
+	NSRange r = [s rangeOfString:@"\r"];
+	return [s substringToIndex:r.location];
 }
 
 - (void) doSelfTest
@@ -246,29 +255,35 @@ HP3458aNamesStruct aciNames[aciCount] = {
 		char reply[32];
 		reply[0]='\0';
 		long n = [self writeReadGPIBDevice:@"TEST?" data:reply maxLength:32];
-		if(n>0)reply[n-1]='\0';
-		//NSLog(@"HP3458a Self Test Response: %@\n",[self decodeErrorNumber:atoi(reply)]);
+		if(n>0){
+			NSLog(@"HP3458a Self Test Response: = %@\n",[self trucateToCR:reply]);
+		}
+		else NSLog(@"Illegal response to ID?\n");
 	}
 }
 
 - (void) sendFuncDef
 {
 	if(functionDef< 14){
-//		if([self isConnected]){
+		if([self isConnected]){
 			float scale = [self getFullScale];
 			NSString* cmd = [NSString stringWithFormat:@"FUNC %@,%@",
 						funcDefNames[functionDef],
 						scale==-1?@"AUTO":[NSString stringWithFormat:@"%.2f",scale]];
-			//[self writeToGPIBDevice:cmd];
+			[self writeToGPIBDevice:cmd];
 			NSLog(@"HP3458a Func: = %@\n",cmd);
 		}
-//	}
+	}
 }
 
 - (void) readVoltages
 {
 }
 
+- (void) resetHW
+{
+	[self writeToGPIBDevice:@"RESET"];
+}
 
 - (void) logSystemResponse
 {
@@ -287,6 +302,7 @@ HP3458aNamesStruct aciNames[aciCount] = {
 
 - (void) readAllHW
 {
+	
 }
 
 #pragma mark •••Archival

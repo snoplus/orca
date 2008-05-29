@@ -161,8 +161,17 @@
 {
 	NS_DURING
 		[self endEditing];
-		if([commandField stringValue]){
-			[model writeToGPIBDevice:[commandField stringValue]];
+		NSString* cmd = [commandField stringValue];
+		if(cmd){
+			if([cmd rangeOfString:@"?"].location != NSNotFound){
+				char reply[1024];
+				long n = [model writeReadGPIBDevice:cmd data:reply maxLength:1024];
+				if(n>0)reply[n-1]='\0';
+				NSLog(@"%@\n",[model trucateToCR:reply]);
+			}
+			else {
+				[model writeToGPIBDevice:[commandField stringValue]];
+			}
 		}
 	NS_HANDLER
         NSLog( [ localException reason ] );
@@ -236,6 +245,22 @@
                          nil,				// alternate button
                          nil );				// other button
 	NS_ENDHANDLER
+}
+
+- (IBAction) resetAction:(id)sender
+{
+	NS_DURING
+		[self endEditing];
+		[model resetHW];
+	NS_HANDLER
+        NSLog( [ localException reason ] );
+        NSRunAlertPanel( [ localException name ], 	// Name of panel
+                         [ localException reason ],	// Reason for error
+                         @"OK",				// Okay button
+                         nil,				// alternate button
+                         nil );				// other button
+	NS_ENDHANDLER
+	
 }
 
 - (void) populatePullDown
