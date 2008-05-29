@@ -62,10 +62,26 @@
 	return mXScale;
 }
 
+- (void) setXScale:(id)aScale
+{
+	mXScale = aScale;
+}
+
+- (void) setDataSource:(id)aSource
+{
+	dataSource = aSource;
+}
+
 - (ORValueBar*) chainedView
 {
 	return chainedView;
 }
+
+- (void) setChainedView:(id)aView
+{
+	chainedView = aView;
+}
+
 
 - (void) setBackgroundColor:(NSColor*)aColor
 {

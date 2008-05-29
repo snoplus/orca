@@ -41,6 +41,9 @@
 - (void) setBarColor:(NSColor*)aColor;
 - (NSColor*) barColor;
 - (ORAxis*) xScale;
+- (void) setXScale:(id)aScale;
+- (void) setDataSource:(id)aSource;
+- (void) setChainedView:(id)aView;
 - (ORValueBar*) chainedView;
 - (int) tag;
 - (void) setTag:(int)newTag;
