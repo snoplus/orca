@@ -133,6 +133,12 @@
 		8407751E0CEE7CAD0073F5A9 /* ORHelpCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 840775100CEE7CAC0073F5A9 /* ORHelpCenter.h */; };
 		8407751F0CEE7CAD0073F5A9 /* ORHelpCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 840775110CEE7CAC0073F5A9 /* ORHelpCenter.m */; };
 		840775220CEE7CAD0073F5A9 /* SnapBack.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 840775140CEE7CAC0073F5A9 /* SnapBack.tiff */; };
+		8407F0E50DEF66DB000F1441 /* Caen862.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8407F0DF0DEF66DB000F1441 /* Caen862.nib */; };
+		8407F0E60DEF66DB000F1441 /* ORCaen862Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8407F0E00DEF66DB000F1441 /* ORCaen862Controller.h */; };
+		8407F0E70DEF66DB000F1441 /* ORCaen862Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407F0E10DEF66DB000F1441 /* ORCaen862Controller.m */; };
+		8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8407F0E20DEF66DB000F1441 /* ORCaen862Model.h */; };
+		8407F0E90DEF66DB000F1441 /* ORCaen862Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407F0E30DEF66DB000F1441 /* ORCaen862Model.m */; };
+		8407F0EB0DEF6700000F1441 /* C862.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8407F0EA0DEF6700000F1441 /* C862.gif */; };
 		84080D2B0B3C7FBF009D3704 /* ORScriptRunner.h in Headers */ = {isa = PBXBuildFile; fileRef = 84080D240B3C7FBE009D3704 /* ORScriptRunner.h */; };
 		84080D2C0B3C7FBF009D3704 /* ORScriptRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 84080D250B3C7FBE009D3704 /* ORScriptRunner.m */; };
 		84080D2D0B3C7FBF009D3704 /* NodeTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 84080D260B3C7FBE009D3704 /* NodeTree.h */; };
@@ -2008,6 +2014,12 @@
 		840775100CEE7CAC0073F5A9 /* ORHelpCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHelpCenter.h; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.h"; sourceTree = SOURCE_ROOT; };
 		840775110CEE7CAC0073F5A9 /* ORHelpCenter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHelpCenter.m; path = "Source/Main Dialogs/HelpCenter/ORHelpCenter.m"; sourceTree = SOURCE_ROOT; };
 		840775140CEE7CAC0073F5A9 /* SnapBack.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = SnapBack.tiff; path = "Source/Main Dialogs/HelpCenter/SnapBack.tiff"; sourceTree = SOURCE_ROOT; };
+		8407F0DF0DEF66DB000F1441 /* Caen862.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen862.nib; path = Source/Objects/Hardware/Vme/CAEN/CV862/Caen862.nib; sourceTree = SOURCE_ROOT; };
+		8407F0E00DEF66DB000F1441 /* ORCaen862Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen862Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV862/ORCaen862Controller.h; sourceTree = SOURCE_ROOT; };
+		8407F0E10DEF66DB000F1441 /* ORCaen862Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen862Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV862/ORCaen862Controller.m; sourceTree = SOURCE_ROOT; };
+		8407F0E20DEF66DB000F1441 /* ORCaen862Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen862Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV862/ORCaen862Model.h; sourceTree = SOURCE_ROOT; };
+		8407F0E30DEF66DB000F1441 /* ORCaen862Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen862Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV862/ORCaen862Model.m; sourceTree = SOURCE_ROOT; };
+		8407F0EA0DEF6700000F1441 /* C862.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = C862.gif; path = Source/Objects/Hardware/Vme/CAEN/CV862/C862.gif; sourceTree = SOURCE_ROOT; };
 		84080D240B3C7FBE009D3704 /* ORScriptRunner.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORScriptRunner.h; sourceTree = "<group>"; };
 		84080D250B3C7FBE009D3704 /* ORScriptRunner.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORScriptRunner.m; sourceTree = "<group>"; };
 		84080D260B3C7FBE009D3704 /* NodeTree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NodeTree.h; path = "Source/Main Dialogs/CommandCenter/Scripting/NodeTree.h"; sourceTree = SOURCE_ROOT; };
@@ -4058,6 +4070,20 @@
 			);
 			name = HelpCenter;
 			path = "Source/Main Dialogs/HelpCenter";
+			sourceTree = SOURCE_ROOT;
+		};
+		8407F0DD0DEF66DB000F1441 /* CV862 */ = {
+			isa = PBXGroup;
+			children = (
+				8407F0EA0DEF6700000F1441 /* C862.gif */,
+				8407F0DF0DEF66DB000F1441 /* Caen862.nib */,
+				8407F0E00DEF66DB000F1441 /* ORCaen862Controller.h */,
+				8407F0E10DEF66DB000F1441 /* ORCaen862Controller.m */,
+				8407F0E20DEF66DB000F1441 /* ORCaen862Model.h */,
+				8407F0E30DEF66DB000F1441 /* ORCaen862Model.m */,
+			);
+			name = CV862;
+			path = Source/Objects/Hardware/Vme/CAEN/CV862;
 			sourceTree = SOURCE_ROOT;
 		};
 		84080D230B3C7FBE009D3704 /* Scripting */ = {
@@ -8037,6 +8063,7 @@
 				F5B1802103B297FD015F64B1 /* Base */,
 				84FFCA9F0636D5B10069432F /* CV792 */,
 				84DE591F051F7AF9005F64B1 /* CV785 */,
+				8407F0DD0DEF66DB000F1441 /* CV862 */,
 				F5B1802703B297FD015F64B1 /* CV775 */,
 				9C1363BE0D0A7921006C550D /* CV265 */,
 				848D8B230DE23D2400D44B81 /* CV1190 */,
@@ -8730,6 +8757,8 @@
 				844B42C10DE5D5680061AE80 /* ORSNORackModel.h in Headers */,
 				844B42C30DE5D5680061AE80 /* ORSNORackView.h in Headers */,
 				843D35500DEF1C9300330F3F /* ORCaen1190Decoders.h in Headers */,
+				8407F0E60DEF66DB000F1441 /* ORCaen862Controller.h in Headers */,
+				8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9267,6 +9296,8 @@
 				848D8B2B0DE23D2400D44B81 /* Caen1190.nib in Resources */,
 				844B42C50DE5D5680061AE80 /* SNORack.gif in Resources */,
 				844B42C60DE5D5680061AE80 /* SNORack.nib in Resources */,
+				8407F0E50DEF66DB000F1441 /* Caen862.nib in Resources */,
+				8407F0EB0DEF6700000F1441 /* C862.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9897,6 +9928,8 @@
 				844B42C20DE5D5680061AE80 /* ORSNORackModel.m in Sources */,
 				844B42C40DE5D5680061AE80 /* ORSNORackView.m in Sources */,
 				843D354F0DEF1C9300330F3F /* ORCaen1190Decoders.m in Sources */,
+				8407F0E70DEF66DB000F1441 /* ORCaen862Controller.m in Sources */,
+				8407F0E90DEF66DB000F1441 /* ORCaen862Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
