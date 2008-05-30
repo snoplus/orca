@@ -28,6 +28,7 @@
 @class ORDataPacket;
 @class TimedWorker;
 @class ORKatrinFLTModel;
+@class ORAlarm;
 
 
 @interface ORKatrinSLTModel : ORIpeSLTModel 
@@ -35,6 +36,7 @@
 		//for hw histogram access
         ORKatrinFLTModel *firstHistoModeFLT;
         BOOL fltsInHistoDaqMode;
+		ORAlarm* fltFPGAConfigurationAlarm;
 }
 
 #pragma mark •••Initialization
@@ -44,6 +46,10 @@
 - (void) makeMainController;
 
 - (void) initBoard;
+
+#pragma mark •••Accessors
+- (ORAlarm*) fltFPGAConfigurationAlarm;
+- (void) setFltFPGAConfigurationAlarm:(ORAlarm*) aAlarm;
 
 #pragma mark ••••hw histogram access
 - (int) waitForSecondStrobeOfFLT:(ORKatrinFLTModel *)flt;

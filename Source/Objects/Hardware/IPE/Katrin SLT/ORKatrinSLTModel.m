@@ -75,6 +75,19 @@
    [super initBoard];
 }
 
+#pragma mark •••Accessors
+/** Used to open the alarm view only once if there are the same alarms from several 
+  * FLTs (which is usually the case for FPGA configuration detection).
+  */  //-tb-
+- (ORAlarm*) fltFPGAConfigurationAlarm
+{
+    return fltFPGAConfigurationAlarm;
+}
+
+- (void) setFltFPGAConfigurationAlarm:(ORAlarm*) aAlarm
+{
+    fltFPGAConfigurationAlarm=aAlarm;
+}
 
 #pragma mark ••••hw histogram access
 
