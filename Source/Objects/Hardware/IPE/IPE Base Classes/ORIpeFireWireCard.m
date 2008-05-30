@@ -226,7 +226,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 	if([fireWireInterface serviceAlive]) return [fireWireInterface read_raw:address];
 	else {
 		if(!pBusSim){
-			NSLogColor([NSColor redColor],@"No Firewire Service: check cables and power!\n");
+			NSLogColor([NSColor redColor],@"No Firewire-Service: check cables and power!\n");
 			[NSException raise:@"ORFireWireInterface" format:@"No Firewire Service: check cables and power"];
 		}
 		else return 0;
