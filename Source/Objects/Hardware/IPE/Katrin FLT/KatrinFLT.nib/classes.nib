@@ -13,27 +13,6 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>CLASS</key>
 			<string>ORValueBar</string>
 			<key>LANGUAGE</key>
@@ -118,6 +97,8 @@
 				<string>id</string>
 				<key>histoSelfCalibrationButtonAction</key>
 				<string>id</string>
+				<key>histoSelfCalibrationPercentAction</key>
+				<string>id</string>
 				<key>histoSetStandardButtonAction</key>
 				<string>id</string>
 				<key>histoStopIfNotClearedAction</key>
@@ -139,10 +120,6 @@
 				<key>postTriggTimeAction</key>
 				<string>id</string>
 				<key>readCurrentStatusButtonAction</key>
-				<string>id</string>
-				<key>readEMaxButtonAction</key>
-				<string>id</string>
-				<key>readEMinButtonAction</key>
 				<string>id</string>
 				<key>readEnableVetoButtonAction</key>
 				<string>id</string>
@@ -214,10 +191,6 @@
 				<string>id</string>
 				<key>vetoTestButtonAction</key>
 				<string>id</string>
-				<key>writeEMaxButtonAction</key>
-				<string>id</string>
-				<key>writeEMinButtonAction</key>
-				<string>id</string>
 				<key>writeEnableVetoButtonAction</key>
 				<string>id</string>
 				<key>writeFltModeButtonAction</key>
@@ -279,6 +252,8 @@
 				<string>NSTextField</string>
 				<key>histoProgressIndicator</key>
 				<string>NSProgressIndicator</string>
+				<key>histoSelfCalibrationPercentField</key>
+				<string>NSTextField</string>
 				<key>histoStopIfNotClearedButton</key>
 				<string>NSButton</string>
 				<key>histoStopIfNotClearedPopUpButton</key>
@@ -422,14 +397,6 @@
 			<string>OrcaObjectController</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>ORTimeAxis</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORAxis</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>copy</key>
@@ -484,6 +451,35 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimeAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORAxis</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>

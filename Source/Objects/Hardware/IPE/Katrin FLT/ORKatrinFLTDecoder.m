@@ -654,6 +654,38 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
                    withKeyArray:   keyArray];
     }
     #endif
+    
+    
+    #if 1
+    {
+        // this is very similar to the first version ('brute force'),
+        // but probably it is usefull as it is in 'energy mode' units ... -tb-
+        int i;
+        unsigned long aValue;
+        unsigned long aBin;
+        unsigned long energy;
+        for(i=0; i< ePtr->histogramLength;i++){
+            aValue=*(ptr+i);
+            aBin = i+ (ePtr->firstBin);
+            energy= ( ((aBin) << (ePtr->binSize))/2 )   + ePtr->offsetEMin;
+            //TODO: fill all bins from this one to the next energy -tb- 2008-05-30
+            //if(aValue) NSLog(@"  Bin %i = %d \n", aBin,aValue);
+            #if 1
+            int j;
+            for(j=0;j<aValue;j++){
+                //NSLog(@"  Fill Bin %i = %d times \n", aBin,aValue);
+                [aDataSet histogram:energy 
+                            numBins:32768 
+                             sender:self  
+                           withKeys: @"FLT",
+                 @"Histogram (energy mode units)", // use better name -tb-
+                 crateKey,stationKey,channelKey,nil];
+            }
+            #endif
+        }
+    }
+    #endif
+    
 
     return length; //must return number of longs processed.
 }

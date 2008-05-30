@@ -21,6 +21,7 @@
 
 #import "ORKatrinFltDefs.h"
 #import "ORKatrinFLTModel.h"
+#import "ORKatrinSLTModel.h"
 #import "ORIpeSLTModel.h"
 #import "ORIpeCrateModel.h"
 #import "ORIpeFireWireCard.h"
@@ -43,11 +44,17 @@
   
   
 //#define USE_ENERGY_SHIFT
-#define USE_TILLS_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
-#ifdef USE_TILLS_DEBUG_MACRO
-  #define    DebugTB(x) x
+
+// -tb-
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+    #define USE_TILLS_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
+    #ifdef USE_TILLS_DEBUG_MACRO
+      #define    DebugTB(x) x
+    #else
+      #define    DebugTB(x) 
+    #endif
 #else
-  #define    DebugTB(x) 
+    #define    DebugTB(x) 
 #endif
 
 NSString* ORKatrinFLTModelVersionRevisionChanged     = @"ORKatrinFLTModelVersionRevisionChanged";
@@ -90,6 +97,7 @@ NSString* ORKatrinFLTModelHistoFirstBinChanged       = @"ORKatrinFLTModelHistoFi
 NSString* ORKatrinFLTModelHistoLastBinChanged        = @"ORKatrinFLTModelHistoLastBinChanged";
 NSString* ORKatrinFLTModelHistoRunTimeChanged        = @"ORKatrinFLTModelHistoRunTimeChanged";
 NSString* ORKatrinFLTModelHistoRecordingTimeChanged  = @"ORKatrinFLTModelHistoRecordingTimeChanged";
+NSString* ORKatrinFLTModelHistoSelfCalibrationPercentChanged  = @"ORKatrinFLTModelHistoSelfCalibrationPercentChanged";
 NSString* ORKatrinFLTModelHistoCalibrationValuesChanged   = @"ORKatrinFLTModelHistoCalibrationValuesChanged";
 NSString* ORKatrinFLTModelHistoCalibrationPlotterChanged  = @"ORKatrinFLTModelHistoCalibrationPlotterChanged";
 NSString* ORKatrinFLTModelHistoCalibrationChanChanged     = @"ORKatrinFLTModelHistoCalibrationChanChanged";
@@ -157,11 +165,20 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
   */
 - (void)	initVersionRevision;
 {
+    sltmodel = [[self crate] adapter];
+	if(![[sltmodel fireWireInterface] serviceAlive]){
+        NSLog(@"FLT %i: initVersionRevision: no firewire service (slt %p, firewire %p)\n",[self slot]+1,sltmodel,[sltmodel fireWireInterface] );
+	}
+    unsigned long oldVersionRegister = versionRegister;
     //NSLog(@"FLT %i: read Version+Revision Register\n",[self slot]+1 );
     //NSLog(@"   (Current value: 0x%08x)\n",[self versionRegister] );
     NS_DURING
         versionRegister = 	[self readVersionRevision];
         if(versionRegister==0){// probably no firewire
+            NSLog(@"FLT %i:  Version+Revision Register is 0 - probably firewire not yet established!\n",[self slot]+1 );
+            // is below in default part ... [self setStdFeatureIsAvailable:     TRUE];//in this case we allow everything -tb-
+            //[self setHistoFeatureIsAvailable:   TRUE]; 
+            //[self setVetoFeatureIsAvailable:    TRUE]; 
         }
         //check for old versions
         unsigned long test = 0xa0 | [self slot];
@@ -176,28 +193,88 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
             versionRegister = 0x00100000;
         }
     NS_HANDLER
-        NSLog(@"FLT %i: reading Version+Revision Register failed - emulate ver. 2\n",[self slot]+1 );
-        //versionRegister = 0;
         versionRegister = 0x00200000;//  in simulation mode this will emulate version 3.x -tb- 2008-04-21
+        NSLog(@"FLT %i: reading Version+Revision Register failed - emulate ver. %i\n",[self stationNumber]/*[self slot]+1*/,[self versionRegHWVersion] );
+versionRegisterIsUptodate=FALSE;
+        //versionRegister = 0;
 	NS_ENDHANDLER
-    versionRegisterIsUptodate=TRUE;
+    
+    if([self slot]==0){// a new created FLT - not yet dropped into a slot
+       versionRegisterIsUptodate=FALSE;
+       return;
+    }
+    
     if([self versionRegHWVersion]==1){// old version - no posttrigger
         [self setPostTriggerTime:511];// the default
     }
     
-    [self setStdFeatureIsAvailable:   TRUE];// std is always available (maybe for reduced number of channels)
+    if([self versionRegHWVersionHex] >= 0x30){// in v3: "histo version" has no "standard version"!
+        if(([self versionRegApplicationID] & 0x2))
+           [self setStdFeatureIsAvailable:   FALSE];// std is always available (maybe for reduced number of channels)
+        else                                        // NO, this is not true any more ... -tb- 2008-05 (e.g. energy mode=standard is not available in histogramming)
+           [self setStdFeatureIsAvailable:   TRUE];// std is always available (maybe for reduced number of channels)
+    }
+    
     if([self versionRegHWVersion]>=0x3){
         [self setVetoFeatureIsAvailable:  ([self versionRegApplicationID] & 0x1)];
         [self setHistoFeatureIsAvailable: ([self versionRegApplicationID] & 0x2)];
     }else{  //default
-        [self setVetoFeatureIsAvailable:  NO];
-        [self setHistoFeatureIsAvailable: YES];
+        //[self setVetoFeatureIsAvailable:  NO];  //use this to use histo config. as default
+        //[self setHistoFeatureIsAvailable: YES];
+        [self setStdFeatureIsAvailable:  YES];
+        [self setVetoFeatureIsAvailable: YES];
+        [self setHistoFeatureIsAvailable:YES];
+    }
+    
+    //warnings (only if a FPGA configuration was (probably) detected)
+    if([self versionRegHWVersion]>=0x3){
+        if( (oldVersionRegister!=versionRegister) || !versionRegisterIsUptodate){
+            //message if: 1. register changed, 2. first call
+            sltmodel = [[self crate] adapter];
+            ORAlarm *alarm = [sltmodel fltFPGAConfigurationAlarm];
+            //TODO: could move this all to SLT funtcion; memory management? -tb- 2008-05-29
+            if(!alarm){
+			    alarm = [[ORAlarm alloc] initWithName:@"FLT FPGA configuration detected." severity:kInformationAlarm];
+			    [alarm setSticky:YES];
+			    [alarm setAcknowledged:NO];	
+                [alarm setHelpString:@"See Status Log for details."];
+                [sltmodel setFltFPGAConfigurationAlarm: alarm];
+		    }
+            [alarm setAcknowledged:NO];
+		    [alarm postAlarm];
+            
+            if([self stdFeatureIsAvailable]){
+                NSLogColor([NSColor redColor],@"========================================\n");
+                NSLogColor([NSColor redColor],@"FLT Slot %i: STANDARD FPGA configuration detected!\n",[self stationNumber]);
+                NSLogColor([NSColor redColor],@"========================================\n");
+                NSLogColor([NSColor redColor],@"Available features in this configuration: PostTrigger, 20 channels\n");
+                NSLogColor([NSColor redColor],@"Not available: hardware histogramming, veto mode\n");
+                NSLogColor([NSColor redColor],@"----------------------------------------\n");
+            }
+            if([self histoFeatureIsAvailable]){
+                NSLogColor([NSColor redColor],@"========================================\n");
+                NSLogColor([NSColor redColor],@"FLT Slot %i: HISTOGRAMMING FPGA configuration detected!\n",[self stationNumber]);
+                NSLogColor([NSColor redColor],@"========================================\n");
+                NSLogColor([NSColor redColor],@"Available features in this configuration: hardware histogram, 4 channels\n");
+                NSLogColor([NSColor redColor],@"Not available: energy daq mode, veto mode\n");
+                NSLogColor([NSColor redColor],@"----------------------------------------\n");
+            }
+            if([self vetoFeatureIsAvailable]){
+                NSLogColor([NSColor redColor],@"========================================\n");
+                NSLogColor([NSColor redColor],@"FLT Slot %i: VETO FPGA configuration detected!\n",[self stationNumber]);
+                NSLogColor([NSColor redColor],@"========================================\n");
+                NSLogColor([NSColor redColor],@"Available features in this configuration: veto functions, 20 channels\n");
+                NSLogColor([NSColor redColor],@"Not available: hardware histogram\n");
+                NSLogColor([NSColor redColor],@"----------------------------------------\n");
+            }
+        }
     }
     
     //updates for GUI:
     [self recalcHistoMaxEnergy];
     //send out notification
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelVersionRevisionChanged object:self];
+    versionRegisterIsUptodate=TRUE;
 }
 
 - (void) showVersionRevision
@@ -327,6 +404,14 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
                          name : @"ORIpeSLTModelHW_ResetChanged" //copied from ORKatrinSLTModel.m -tb- 2008-03-13
                        object : [[self crate] adapter] ];//SLT is [[self crate] adapter] -tb-
     
+    #if 0
+    //notify this to check for the fpga configuration after slot change -tb-
+    //  instead I overwrite setSlot:(int)aSlot - there I can access the old slot number -tb-
+    [notifyCenter addObserver : self
+					 selector : @selector(slotChanged:)
+						 name : ORIpeCardSlotChangedNotification
+					   object : self];
+    #endif
 
 }
 
@@ -338,6 +423,47 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 	//	//[self checkAndLoadFPGAs];
 	//	[self readVersion];
 	//}
+}
+
+/** OBSOLETE: 
+  * The FLT waits for this notification 'cause inserting a new FLT card into the crate will assign
+  * slot number 0 first and then change to the selected slot - this way we can detect when a new FLT was
+  * created and can read the FPGA configuration.
+  * (Instead of waiting for the notification we could overwrite the method and call [super setSlot:...] of ORCard?) -tb-
+  *
+  * Also moving a FLT icon into a slot without real FLT counterpart will result in a change of the detected
+  * configuration.
+  */
+- (void) slotChanged:(NSNotification*)aNote
+{
+    NSLog(@"ORKatrinFLTModel::Received Notification slotChanged <--- new slot is %i (this is OBSOLETE)\n",[self slot]);
+    [self initVersionRevision]; // -tb- 2008-03-13
+	//if([fireWireInterface serviceAlive]){
+	//	//[self checkAndLoadFPGAs];
+	//	[self readVersion];
+	//}
+}
+
+/** The FLT waits for this notification 'cause inserting a new FLT card into the crate will assign
+  * slot number 0 first and then change to the selected slot - this way we can detect when a new FLT was
+  * created and can read the FPGA configuration.
+  * (Instead of waiting for the notification we could overwrite the method and call [super setSlot:...] of ORCard?) -tb-
+  *
+  * Also moving a FLT icon into a slot without real FLT counterpart will result in a change of the detected
+  * configuration.
+  *
+  * Overwritten from ORCard.
+
+  */
+- (void) 	setSlot:(int)aSlot
+{
+    int oldSlot = [self slot];
+    //NSLog(@"This is FLT %i: setSlot:(int)aSlot - calling super ... move to slot %i\n",[self slot]+1,aSlot+1 );
+    [super setSlot:aSlot];
+    if(oldSlot != [self slot]){
+        //NSLog(@"This is FLT %i: the slot really changed!\n",[self slot]+1  );
+        [self initVersionRevision]; // -tb- 2008-03-13
+  }
 }
 
 
@@ -1615,13 +1741,14 @@ return hitRateId;
 {
     // compute max possible energy in histogram
     int numBins;
-    if([self versionRegHWVersion]<0x2){
+    if([self versionRegHWVersion]==0x2){
         numBins=1024;
         [self setHistoMaxEnergy: (histoMinEnergy+ ((1<<histoBinWidth)*numBins))];  // temporary ? -tb- 2008-03-06
         return;
     }
     numBins=512;
-    [self setHistoMaxEnergy: (histoMinEnergy+ ((1<<histoBinWidth)*numBins)/2)];  // temporary ? -tb- 2008-03-06
+    //[self setHistoMaxEnergy: (histoMinEnergy+ ((1<<histoBinWidth)*numBins)/2)];  // temporary ? -tb- 2008-03-06
+    [self setHistoMaxEnergy: [self getHistoEnergyOfBin: numBins withOffsetEMin: histoMinEnergy binSize: histoBinWidth]];
 }
 
 //! This is the first bin value which will be displayed on the GUI.
@@ -1663,6 +1790,18 @@ return hitRateId;
     histoRecordingTime = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoRecordingTimeChanged object:self];
 }
+
+- (int) histoSelfCalibrationPercent
+{    return histoSelfCalibrationPercent;    }
+
+- (void) setHistoSelfCalibrationPercent:(int)aValue
+{
+    if(aValue<0) aValue=0;
+    if(aValue>100) aValue=100;
+    histoSelfCalibrationPercent = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoSelfCalibrationPercentChanged object:self];
+}
+
 
 - (BOOL)   histoCalibrationIsRunning
 {    return histoCalibrationIsRunning;    }
@@ -1768,6 +1907,19 @@ return hitRateId;
         if(dataPtr)  dataPtr[index]=aValue;
         else{
             NSLog(@"ERROR in getHistogramData:forChan: bad data pointer\n");
+        }
+    }
+}
+
+//!< Add aValue to the histogram data array for given channel at given index (index with range check => slow!).
+- (void) addHistogramData: (int)index forChan:(int)aChan value:(int) aValue
+{
+    if(histogramData && index>=0 && index<1024){
+        unsigned int *dataPtr=0; //place where the data is stored
+        dataPtr=(unsigned int *)[[histogramData objectAtIndex:aChan] bytes];
+        if(dataPtr)  dataPtr[index]+=aValue;
+        else{
+            NSLog(@"ERROR in addHistogramData:forChan: bad data pointer\n");
         }
     }
 }
@@ -2044,28 +2196,48 @@ return hitRateId;
 }
 
 
-/** Returns the histogram bin the given energy falls in for the given offset and bin size.
+/** Returns the histogram bin the given energy falls in for the given offset emin and bin size bs.
+  * energy will be in "EnergyMode" units, emin and bs in "user interface" units.
+  energy is double as for the binsize 1/2 the energy can be given in 1/5 steps/units.
   */ //-tb-
-- (int) getHistoBinOfEnergy:(int) energy withOffsetEMin:(int) emin binSize:(int) bs
+- (int) getHistoBinOfEnergy:(double) energy withOffsetEMin:(int) emin binSize:(int) bs
 {
-    return ((energy-emin)) >> (bs);
+    int ienergy = (energy-emin)*2;
+    return (ienergy) >> (bs);
     //return ((energy-emin)*2) >> (bs);  //this would give a comb shape -tb-
+}
+
+/** Returns the energy (at left end of the bin)  the given histogram bin contains for the given offset emin and bin size bs.
+  * energy will be in "EnergyMode" units, emin and bs in "user interface" units.
+  * For bs == 0 (i.e. binsize 1/2) the energy will be rounded down (to be a int value).
+  */ //-tb-
+- (int) getHistoEnergyOfBin:(int) bin  withOffsetEMin:(int) emin binSize:(int) bs
+{
+    return ( ((bin) << (bs))/2 )   + emin;
+    //return (emin+ ((1<<bs)*bin)/2)];
 }
 
 /** Write some data to the histogram buffer of the given channel (for simulation mode).
   */ //-tb-
 - (void) histoSimulateReadHistogramDataForChan:(int)aChan
 {
+    //DebugHistoTB(  NSLog(@"   histoSimulateReadHistogramDataForChan: chan %i\n",aChan);  )
     int val=aChan+1;
     int i,energy,bin,sum=0,firstBin=511, lastBin=0;
+    if([self histoClearAfterReadout])
+    for(i=0;i<1024;i++){//TODO: use something like bufferMaxIndex ... -tb-
+        [self setHistogramData: i forChan:aChan value: 0];
+    }
+
     for(i=0;i<200*val;i++){
         energy=val*400+i;
-        bin=[self getHistoBinOfEnergy: energy withOffsetEMin:histoMinEnergy binSize:histoBinWidth];
+        bin=[self getHistoBinOfEnergy: (0.5*energy) withOffsetEMin:histoMinEnergy binSize:histoBinWidth];
         if(bin<0) bin=0;
         if(bin>511) bin=511;
         if(i==0) firstBin=bin;
         if(i>190*val) lastBin=bin;
-        [self setHistogramData: bin forChan:aChan value: val];
+        [self addHistogramData: bin forChan:aChan value: val];
+        //DebugHistoTB(  NSLog(@"   SIM: writing: bin %i (energy %f) chan %i value %i\n",bin,(0.5*energy), aChan, val);  )
         sum += val;
     }
         // buffer all data for later readout and display
@@ -2366,6 +2538,7 @@ return hitRateId;
   	//usingPBusSimulation		  = [fireWireCard pBusSim];
     //BEGIN -  - of (pbus) simulatin mode -tb- 2008-04-06
     if(usingPBusSimulation){
+        unsigned int chan=[self histoCalibrationChan];
         static double delayTime = 0.1; // in sec.: its a kind of 'local const' -tb-
         unsigned long tRun;
         unsigned long tRec;
@@ -2373,15 +2546,28 @@ return hitRateId;
         if(tRun != 0){// we are in "restart mode": read out the histogram when tRun elapsed
             tRec = histoLastPageToggleSec;
             if(  tRec >= tRun){//after tRun seconds write a histogram and reset timer
-                NSLog(@"ORKatrinFLT %02d: emulate readout in histogram mode (cal.).\n",[self stationNumber]);
+                DebugHistoTB(  NSLog(@"ORKatrinFLT %02d: emulate readout in histogram mode (cal.).\n",[self stationNumber]);  )
+                //copied from TakeDataHistogramMode ... readOutHistogramDataV3 ... -tb-
+                [self histoSimulateReadHistogramDataForChan: chan];
+                //update GUI
+                [self setHistoFirstBin: histogramDataFirstBin[chan]];
+                [self setHistoLastBin:  histogramDataLastBin[chan]];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationPlotterChanged object:self];
                 histoLastPageToggleSec=0;
+                if(histoSelfCalibrationCounter) histoSelfCalibrationCounter++;
+                if(histoSelfCalibrationCounter>4){
+                    DebugHistoTB(  NSLog(@"ORKatrinFLT %i: Histogramming: should stop self calibration.\n",[self stationNumber]);  )
+                    [self stopCalibrationHistogram];
+                    //histoSelfCalibrationCounter=0;
+                    [self histoAnalyseSelfCalibrationRun];
+                }
             }
         }//else if TRun == 0 we have to emulate the "read out" after run stop i.e. in runTaskStopped
         // Wait for the second strobe
         unsigned long sec = [self readTime];   //QUESTION is this the crate time? format? yes; full seconds -tb- 2008-02-26
         [self setHistoCalibrationElapsedTime: sec - histoStartTimeSec];
         if ( sec-lastSec >=1 ) {  // 2 = every  3 seconds
-            NSLog(@"This is   takeDataHistogramMode heartbeat: %i\n",sec);
+            DebugHistoTB(  NSLog(@"This is   takeDataHistogramMode heartbeat: %i\n",sec);  )
             // send notification to GUI
             [self setHistoRecordingTime:histoLastPageToggleSec];
             histoLastPageToggleSec ++; //increase every second to emulate the TRun counter on the board
@@ -2458,15 +2644,28 @@ return hitRateId;
         gettimeofday(&t,NULL);
         if(histoStartWaitingForPageToggle){
             histoCurrentActivePage = [self readCurrentHistogramPageNum];
-            if(histoCurrentActivePage != histoLastActivePage){
+            if(histoCurrentActivePage != histoLastActivePage){//TODO: I could additionally check if TRun elapsed -tb-
                 // yes, there was the toggle, read out the page/histogram
                 DebugHistoTB(  NSLog(@"READ HISTOGRAM\n");  )
                 [self readHistogramDataForChan:aPixel];
                 //now display it, care not to clear the display in the next lines ...
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationPlotterChanged object:self];
                 //first bin/last bin needs display now, they will be cleared afterwards
-                [self setHistoFirstBin:[self readFirstBinForChan:aPixel]];
-                [self setHistoLastBin: [self readLastBinForChan:aPixel]];
+                [self setHistoFirstBin: histogramDataFirstBin[aPixel]];
+                [self setHistoLastBin:  histogramDataLastBin[aPixel]];
+                // dont read again from hardware [self setHistoFirstBin:[self readFirstBinForChan:aPixel]];
+                //[self setHistoLastBin: [self readLastBinForChan:aPixel]];
+                
+                //handle the self calibration run
+                if(histoSelfCalibrationCounter) histoSelfCalibrationCounter++;
+                if(histoSelfCalibrationCounter>4){ //after 4 runs all buffers were cleared
+                    DebugHistoTB(  NSLog(@"ORKatrinFLT %i: Histogramming: should stop self calibration.\n",[self stationNumber]);  )
+                    [self stopCalibrationHistogram];
+                    //histoSelfCalibrationCounter=0;
+                    [self histoAnalyseSelfCalibrationRun];
+                    return;
+                }
+
                 //CLEAR
                 if([self histoClearAfterReadout]){
                     DebugHistoTB(  NSLog(@"CLEAR HISTOGRAM\n");  )
@@ -2479,7 +2678,7 @@ return hitRateId;
                 histoLastActivePage = histoCurrentActivePage;
                 histoLastPageToggleSec = histoPreToggleSec;   //used for timing of page toggle.
                 histoLastPageToggleUSec= histoPreToggleUSec;  //  ''
-                                                       //maybe the time from last call would be better
+                                                              //maybe the time from last call would be better
             } // else continue ... waiting for toggle ...
         }
         //remember for next call
@@ -2671,6 +2870,8 @@ return hitRateId;
             savedDaqRunMode = -1;
         }
         
+        histoSelfCalibrationCounter = 0;
+        
         NSLog(@"Recording time was: %i\n",[self readTRec]);
         
         NSLog(@"Histogram Calibration Run: FINISHED\n");
@@ -2731,16 +2932,110 @@ return hitRateId;
   * - Bin Size = fit according to the shaping time (so that the full range fits into hw histogram)
   * - calibration run starten (TRun Ÿbernehmen, wenn TRun != 0, sonst TRun = 10)
   * - cut given percentage of hits (from left and right) and  adjust EMin and BinSize, so that remaining counts fit into hw histogram
-  */
+  */  //-tb-
 - (void) histoRunSelfCalibration
 {
     NSLog(@"Self Calibration is still under construction!\n");
+    // 0. Set Standard settings
+   [self histoSetStandard];
+    // 1. Emin=0
+    [self setHistoMinEnergy:0];
+    // 2. adjust bin size according to shaping time (1.+2. is to assure all energies will fit into histogram)
+    int shapingT = [self shapingTime: [self histoChanToGroupMap:histoCalibrationChan]];
+        //NSLog(@"histoRunSelfCalibration: shapingTime is %i (of ch %i)\n",shapingT,histoCalibrationChan);
+    int max=((0x1 << shapingT) * 4096) /8;  // this is the max energy in energy mode
+    int maxhisto;
+    int numbinsize=16;
+    int numBins=512;
+    int bs; // the bin size
+    for(bs=0;bs<numbinsize-1;bs++){
+        //maxhisto=(histoMinEnergy+ ((1<<bs)*numBins)/2);
+        maxhisto=[self getHistoEnergyOfBin: numBins withOffsetEMin: histoMinEnergy binSize: bs];
+        //NSLog(@"Compare maxhisto %i (%i) with max %i\n",maxhisto,[self getHistoEnergyOfBin: numBins withOffsetEMin: 0 binSize: bs],max);
+        if(maxhisto>=max) break;
+    }
+    [self setHistoBinWidth:bs];
+    // 3. set the RefreshTime
+    if(histoRunTime == 0  ||  histoRunTime <5) [self setHistoRunTime: 5];
+    
+    // x. start histogramming
+    histoSelfCalibrationCounter = 1;
+    [self startCalibrationHistogramOfChan:[self histoCalibrationChan]];
+    //final analysis is in - (void) histoAnalyseSelfCalibrationRun called in checkHisto...
+}
 
+/** "Cut" histoSelfCalibrationPercent*0.5 from left and right, fit the remaining histogram into the 512 bins.
+  *
+  */
+- (void) histoAnalyseSelfCalibrationRun
+{
+    DebugHistoTB(    NSLog(@"histoAnalyseSelfCalibrationRun: analyse results of run!\n" );   )
+    int aChan=[self histoCalibrationChan];
+    unsigned int *dataPtr=0; //place where the data is stored
+    dataPtr=(unsigned int *)[[histogramData objectAtIndex:aChan] bytes];
+    int i,sum=0, num=1024;
+    for(i=0;i< num ;i++) sum += dataPtr[i];
+    if(sum==0){
+        NSLog(@"WARNING: Histogramming Self Calibration Run:  there were no events!\n"); 
+        goto clean_up_mark;
+    }
+    double p2 = 0.005*((100-histoSelfCalibrationPercent)*sum);// 0.005 = 0.01 / 2 ; ps is the number of hits to be cut away left and right
+    DebugHistoTB(   NSLog(@"histoAnalyseSelfCalibrationRun:  histosum %i p2 %f \n", sum ,p2);   )
+    //the indices left and right are the border bins to fit into the histogram
+    int left=0,right=num-1;
+    sum=0;
+    for(i=0;i< num ;i++){
+        left=i;
+        sum += dataPtr[i];
+    DebugHistoTB(  if(i<3 || sum>0)  NSLog(@"histoAnalyseSelfCalibrationRun: indices: left %i right %i sum %i p2 %f \n",left, right,sum ,p2);   )
+        if(sum>p2) break;
+    }
+    sum=0;
+    for(i=num-1;i>=0 ;i--){
+        right=i;
+        sum += dataPtr[i];
+    DebugHistoTB(   if((i>num-4) || sum>0)   NSLog(@"histoAnalyseSelfCalibrationRun: indices: left %i right %i sum %i p2 %f \n",left, right,sum ,p2);   )
+        if(sum>p2) break;
+    }
+    DebugHistoTB(    NSLog(@"histoAnalyseSelfCalibrationRun: indices: left %i right %i\n",left, right );   )
+    
+    //compute leftenergy, rightenergy
+    int leftenergy, rightenergy, emin,binsize;
+    emin = [self histoMinEnergy];
+    binsize = [self histoBinWidth];
+    leftenergy =  [self getHistoEnergyOfBin:left withOffsetEMin: emin binSize: binsize];
+    rightenergy = [self getHistoEnergyOfBin:right withOffsetEMin: emin binSize: binsize];
+    //DebugHistoTB(    NSLog(@"histoAnalyseSelfCalibrationRun: leftenergy %i rightenergy %i\n",leftenergy, rightenergy );   )
+    //now compute bin size so that (rightenergy-leftenergy) will fit into histogram
+    {// copy from histoRunSelfCalibration
+        int max= (rightenergy-leftenergy);
+        int maxhisto;
+        int numbinsize=16;
+        int numBins=512;
+        int bs; // the bin size
+        for(bs=0;bs<numbinsize-1;bs++){
+            //maxhisto=(histoMinEnergy+ ((1<<bs)*numBins)/2);
+            maxhisto=[self getHistoEnergyOfBin: numBins withOffsetEMin: 0 binSize: bs];
+            //NSLog(@"Compare maxhisto %i (%i) with max %i\n",maxhisto,[self getHistoEnergyOfBin: numBins withOffsetEMin: 0 binSize: bs],max);
+            if(maxhisto>=max) break;
+        }
+        DebugHistoTB(    NSLog(@"Histo Self calibration suggestion: bin size %i, min energy %i\n",bs,leftenergy);  )
+        leftenergy = (leftenergy/10)*10; //round down
+        if(bs==0) bs=1;//we prefer 1
+        DebugHistoTB(    NSLog(@"Histo Self calibration:  take: bin size %i, min energy %i\n",bs,leftenergy);  )
+        [self setHistoBinWidth:bs];
+        // ... and set EMin to leftenergy
+        [self setHistoMinEnergy:leftenergy];
+    }
+    
+    clean_up_mark:
+    //clean up
+    histoSelfCalibrationCounter=0;
 }
 
 
-/** Returns the histogram data  adress for the read access to the crate.
-  * @param aBin the bin; if aBin==0 the base adress (=adress of bin 0) is returned.
+/** Returns the histogram data  address for the read access to the crate.
+  * @param aBin the bin; if aBin==0 the base address (=address of bin 0) is returned.
   * This adress is ORed with the bin number to get the value of the according bin.
   * @param aGroup there is no range check! 
   */
@@ -2980,7 +3275,7 @@ return hitRateId;
     
     
     //NSLog(@"readLastBinForChan:%i Pbus register is %x\n",aPixel, ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)  ); 	
-    NSLog(@"  setVetoEnable: adress %8x, state %8x\n",adress,regVal  ); 	
+    NSLog(@"  setVetoEnable: address %8x, state %8x\n",adress,regVal  ); 	
 
 	[self write:   adress value: regVal];
 
@@ -3192,6 +3487,7 @@ return hitRateId;
     [self setHistoClearAtStart:		    [decoder decodeIntForKey:@"ORKatrinFLTModelHistoClearAtStart"]];
     [self setHistoClearAfterReadout:	[decoder decodeIntForKey:@"ORKatrinFLTModelHistoClearAfterReadout"]];
     [self setHistoStopIfNotCleared:		[decoder decodeIntForKey:@"ORKatrinFLTModelHistoStopIfNotCleared"]];
+    [self setHistoSelfCalibrationPercent:[decoder decodeIntForKey:@"ORKatrinFLTModelHistoSelfCalibrationPercent"]];
     
 	
 	// TODO: Get reference to Slt model
@@ -3332,11 +3628,11 @@ return hitRateId;
     [encoder encodeInt:readWriteRegisterChan    forKey:@"ORKatrinFLTModelReadWriteRegisterChan"];	
     [encoder encodeObject:readWriteRegisterName forKey:@"ORKatrinFLTModelReadWriteRegisterName"];	
     [encoder encodeInt:showHitratesDuringHistoCalibration     forKey:@"ORKatrinFLTModelShowHitratesDuringHistoCalibration"];	
-    [encoder encodeInt:histoClearAtStart     forKey:@"ORKatrinFLTModelHistoClearAtStart"];	
-    [encoder encodeInt:histoClearAfterReadout     forKey:@"ORKatrinFLTModelHistoClearAfterReadout"];	
-    [encoder encodeInt:histoStopIfNotCleared     forKey:@"ORKatrinFLTModelHistoStopIfNotCleared"];	
+    [encoder encodeInt:histoClearAtStart           forKey:@"ORKatrinFLTModelHistoClearAtStart"];	
+    [encoder encodeInt:histoClearAfterReadout      forKey:@"ORKatrinFLTModelHistoClearAfterReadout"];	
+    [encoder encodeInt:histoStopIfNotCleared       forKey:@"ORKatrinFLTModelHistoStopIfNotCleared"];	
+    [encoder encodeInt:histoSelfCalibrationPercent forKey:@"ORKatrinFLTModelHistoSelfCalibrationPercent"];	
     
-
 
 }
 
@@ -3446,7 +3742,9 @@ return hitRateId;
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NSLog(@"---- ORKatrinFLTModel::runTaskStarted (%i)----\n", [self slot]);
+    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+    //NSLog(@"---- ORKatrinFLTModel::runTaskStarted (%i)----\n", [self slot]);
+    #endif
 
 	firstTime = YES;
     nLoops = 0; // Counter for the readout loops
@@ -3638,7 +3936,7 @@ return hitRateId;
             //[self writeEMax:histoMaxEnergy forChan:aPixel];
             [self writeTRun:histoRunTime forChan: 31 /*aPixel*/];
             //clear the pages: (clears the pages in a 2 second "pre run")
-            // TODO: under construction -tb-
+            //    moved to SLT ... -tb-
             //  write HistSettingsReg
             [self writeHistogramSettingsForChan:31 mode: histoStopIfNotCleared  binWidth: histoBinWidth ];
             #endif
@@ -4859,7 +5157,6 @@ NSLog(@"This is   takeDataHistogramMode heartbeat: %i\n",sec);
     for(chan=0; chan<kNumFLTChannels;chan++){
         if(  ([self histoChanToGroupMap:chan] == -1)  ) continue; //this chan is not available
         if(  (![self triggerEnabled:chan])   ) continue; //this chan is not activated
-        //THE FOLLOWING PART WAS FOR FPGAversion <3
         DebugHistoTB(  NSLog(@"readOutHistogramDataV3: chan %i\n",chan);  )
         katrinHistogramDataStruct theEventData;
         

@@ -54,7 +54,7 @@
     settingSize     = NSMakeSize(546,680);
     histogramSize   = NSMakeSize(550,680);  // new -tb- 2008-01
     rateSize	    = NSMakeSize(430,615);
-    testSize	    = NSMakeSize(400,500);
+    testSize	    = NSMakeSize(400,640);  // renamed to low-level -tb- 2008-04
 
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
@@ -123,12 +123,11 @@
                      selector : @selector(settingsLockChanged:)
                          name : ORKatrinFLTSettingsLock
                         object: nil];
-    
+
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORIpeCardSlotChangedNotification
 					   object : model];
-
 
     [notifyCenter addObserver : self
 					 selector : @selector(versionRevisionChanged:)
@@ -366,6 +365,11 @@
                        object : model];
 					   
     [notifyCenter addObserver : self
+                     selector : @selector(histoSelfCalibrationPercentChanged:)
+                         name : ORKatrinFLTModelHistoSelfCalibrationPercentChanged
+                       object : model];
+					   
+    [notifyCenter addObserver : self
                      selector : @selector(readWriteRegisterChanChanged:)
                          name : ORKatrinFLTModelReadWriteRegisterChanChanged
                        object : model];
@@ -432,6 +436,8 @@
 	[self histoClearAtStartChanged: nil];
 	[self histoClearAfterReadoutChanged: nil];    
 	[self histoStopIfNotClearedChanged: nil];
+	[self histoSelfCalibrationPercentChanged: nil];
+
     //-tb-
     [self versionRevisionChanged: nil];
     [self availableFeaturesChanged: nil];
@@ -695,7 +701,7 @@
     //added a field with the number at the left border for better visibility -tb-
     
     //reread the firmware version -tb-
-    [model initVersionRevision];
+    //[model initVersionRevision];//TODO: <---- should remove this -tb-
 }
 
 - (void) gainArrayChanged:(NSNotification*)aNotification
@@ -857,11 +863,13 @@
             //[histoCalibrationChanNumPopUpButton setEnabled:FALSE];
             [eSamplePopUpButton setEnabled:FALSE];
             [startCalibrationHistogramButton setEnabled:FALSE];
+            [startSelfCalibrationHistogramButton setEnabled:FALSE];
         }else{
             [histoProgressIndicator stopAnimation:nil];
             //[histoCalibrationChanNumPopUpButton setEnabled:TRUE];
             [eSamplePopUpButton setEnabled:TRUE];
             [startCalibrationHistogramButton setEnabled:TRUE];
+            [startSelfCalibrationHistogramButton setEnabled:TRUE];
         }
         // update the timer
         //char s[256];
@@ -875,7 +883,7 @@
 {
     NSString *string1 = [NSString stringWithFormat:@"%i",[model histoCalibrationChan]];    
     [histoCalibrationChanNumPopUpButton selectItemWithTitle: string1];
-    //NSLog(@"Changed histo cal. channel to %@\n",string1);//TODO: REMOVE - debug out -tb-
+    //NSLog(@"Changed histo cal. channel to %@\n",string1);
     // in this case we want to display the histogram of the selected channel in the plot.
     [histogramPlotterId setNeedsDisplay:YES];
 }
@@ -888,7 +896,6 @@
 
 - (void) showHitratesDuringHistoCalibrationChanged:(NSNotification*)aNote
 {
-    //[histoPageField setIntValue: [model histoPageNum]];//TODO: write this getter for the model -tb-
     [showHitratesDuringHistoCalibrationButton setIntValue: [model showHitratesDuringHistoCalibration]];
 }
 
@@ -905,6 +912,11 @@
     [histoStopIfNotClearedPopUpButton selectItemAtIndex:[model histoStopIfNotCleared]];  
 }
 
+- (void) histoSelfCalibrationPercentChanged:(NSNotification*)aNote
+{
+    //NSLog(@"ORKatrinFLTController:histoSelfCalibrationPercentChanged\n");
+    [histoSelfCalibrationPercentField setIntValue:[model histoSelfCalibrationPercent]];
+}
 
 - (void) histoCalibrationPlotterChanged:(NSNotification*)aNote
 {
@@ -1260,7 +1272,7 @@
 - (IBAction) readRegisterAdressButtonAction:(id)sender
 {
     unsigned long adress = [model registerAdressWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
-    NSLog(@"Adress for Register %@ for chan/group %i is %i (0x%08x)\n",
+    NSLog(@"Address for Register %@ for chan/group %i is %i (0x%08x)\n",
         [model readWriteRegisterName],[model readWriteRegisterChan],adress,adress);
 }
 
@@ -1478,38 +1490,9 @@
     NSLog(@"This is  helloButtonAction\n");
 }
 
-- (IBAction) readEMinButtonAction:(id)sender
-{
-    unsigned int EMin = [model readEMin];
-    //[eMinField setIntValue:EMin ];
-    //NSLog(@"This is  readEMinButtonAction\n");
-    NSLog(@"EMin is %i (Register %i)\n",EMin*2,EMin);
-}
-
-- (IBAction) writeEMinButtonAction:(id)sender
-{
-    //NSLog(@"This is  writeEMinButtonAction\n");
-    NSLog(@"Writing EMin (title string %@,int val %i)\n", [eMinField stringValue ],
-          [eMinField intValue ]);
-    unsigned int EMin = [eMinField intValue ];
-    [model writeEMin:EMin];
-}
-
-- (IBAction) readEMaxButtonAction:(id)sender
-{
-    //TODO: this will probably change in the next FPGA version -tb- 2008 Jan.
-    NSLog(@"This is  readEMaxButtonAction - disabled\n");
-}
-
-- (IBAction) writeEMaxButtonAction:(id)sender
-{
-    //TODO: this will probably change in the next FPGA version -tb- 2008 Jan.
-    NSLog(@"This is  writeEMaxButtonAction - disabled\n\n");
-}
 
 - (IBAction) readTRecButtonAction:(id)sender
 {
-    
     //TODO: CATCH EXCEPTIONS -tb-
     
     unsigned int tRec = [model readTRec];
@@ -1607,6 +1590,11 @@
 - (IBAction) histoSelfCalibrationButtonAction:(id)sender
 {
     [model histoRunSelfCalibration];
+}
+
+- (IBAction) histoSelfCalibrationPercentAction:(id)sender
+{
+    [model setHistoSelfCalibrationPercent:[histoSelfCalibrationPercentField intValue]];
 }
 
 - (IBAction) readHistogramDataButtonAction:(id)sender
@@ -1766,7 +1754,7 @@
             unsigned int *dataPtr=(unsigned int *)[[histogramData objectAtIndex:chan] bytes];
             return (float) (dataPtr[x]);
         }
-        return (float)0.0;
+        return (float)123.0;
     }
     
     //the default "hitrate plotter" ...

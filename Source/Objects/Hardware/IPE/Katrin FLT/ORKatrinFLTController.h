@@ -92,6 +92,7 @@
         IBOutlet NSTextField*	histoElapsedTimeField;
         IBOutlet NSPopUpButton* histoCalibrationChanNumPopUpButton;
         IBOutlet NSTextField*	histoPageField;
+        IBOutlet NSTextField*	histoSelfCalibrationPercentField;
         IBOutlet NSButton*		showHitratesDuringHistoCalibrationButton;
         IBOutlet NSButton*		histoClearAtStartButton;
         IBOutlet NSButton*		histoClearAfterReadoutButton;        
@@ -201,6 +202,7 @@
 - (void) histoClearAtStartChanged:(NSNotification*)aNote;
 - (void) histoClearAfterReadoutChanged:(NSNotification*)aNote;
 - (void) histoStopIfNotClearedChanged:(NSNotification*)aNote;
+- (void) histoSelfCalibrationPercentChanged:(NSNotification*)aNote;
 
 - (void) availableFeaturesChanged:(NSNotification*)aNote;
 
@@ -245,10 +247,6 @@
 - (IBAction) readPostTriggTimeAction: (id) sender; // -tb- tmp
 - (IBAction) writePostTriggTimeAction: (id) sender; // -tb- tmp
 - (IBAction) helloButtonAction:(id)sender;//from here: hardware histogramming -tb- 2008-1-17
-- (IBAction) readEMinButtonAction:(id)sender;
-- (IBAction) writeEMinButtonAction:(id)sender;
-- (IBAction) readEMaxButtonAction:(id)sender;
-- (IBAction) writeEMaxButtonAction:(id)sender;
 - (IBAction) readTRecButtonAction:(id)sender;
 - (IBAction) readTRunAction:(id)sender;
 - (IBAction) writeTRunAction:(id)sender;
@@ -266,6 +264,7 @@
 - (IBAction) startHistogramButtonAction:(id)sender;
 - (IBAction) stopHistogramButtonAction:(id)sender;
 - (IBAction) histoSelfCalibrationButtonAction:(id)sender;
+- (IBAction) histoSelfCalibrationPercentAction:(id)sender;
 - (IBAction) readHistogramDataButtonAction:(id)sender;
 - (IBAction) readCurrentStatusButtonAction:(id)sender;
 - (IBAction) changedHistoCalibrationChanPopupButtonAction:(id)sender;

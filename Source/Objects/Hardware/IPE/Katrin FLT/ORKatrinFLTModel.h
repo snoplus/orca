@@ -144,7 +144,7 @@
     BOOL checkWaveFormEnabled;
     BOOL checkEnergyEnabled;
     
-    // Parameters for hardware histogramming -tb- 2008-02-08
+    // Parameters for hardware histogramming (stored in .Orca file) -tb- 2008-02-08
     int histoBinWidth;    //!< The bin width of the @e hardware @e histogramming bins.
     unsigned int histoMinEnergy;    //!< The minimum energy for the @e hardware @e histogramming. In GUI: Offset ...
     unsigned int histoMaxEnergy;    //!< The maximum energy for the @e hardware @e histogramming.
@@ -152,6 +152,8 @@
     unsigned int histoLastBin;      //!< The last bin (of 1024) not equal zero.
     unsigned int histoRunTime;      //!< The length of the time loop (0=endless, not 0: length in sec). In GUI: RefreshTime
     unsigned int histoRecordingTime;  //!< The recording time since start of time loop (in sec).
+    int histoSelfCalibrationPercent;  //!< The percentage for the histogramming self calibration.
+    // Internal parameters for hardware histogramming -tb- 
     NSMutableArray* histogramData;    //!< Array of NSData objects to keep the hardware histogram.
     int histogramDataFirstBin[kNumFLTChannels];
     int histogramDataLastBin[kNumFLTChannels];
@@ -171,7 +173,9 @@
     int lastDelayTime;               //!<used for timing: number of 0.1 (0delayTime) seconds since histoStartTimeSec/USec
     int currentDelayTime;               //!<used for timing: number of 0.1 (0delayTime) seconds since histoStartTimeSec/USec
     int histoLastActivePage;         //!<  number (0/1) of last active memory page
+    
     BOOL histoCalibrationIsRunning;  //!< Used for calibration run and normal run - TRUE if intentionally  running
+    int  histoSelfCalibrationCounter; //!< Flag and counter for the self calibration feature.
     double histoCalibrationElapsedTime;
     unsigned int histoCalibrationChan;  //!< The currently selected channel for histogramming calibration.
     int savedDaqRunMode;  /*!< Saves the daq run mode during histogram calibration run; ==-1 means 'undefined', 
@@ -181,6 +185,7 @@
 	BOOL histoClearAfterReadout ; //!< HW histogramming clear flag (software)
 	BOOL histoStopIfNotCleared ;//!< HW histogramming mode bit (HistParamReg)
     BOOL histoStartWaitingForPageToggle;
+    
 
     BOOL histoWaitForPageToggle;//!<internal parameter
     // Parameters for low-level register readout
@@ -218,6 +223,9 @@
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) serviceChanged:(NSNotification*)aNote;
+- (void) slotChanged:(NSNotification*)aNote;
+
+- (void) 	setSlot:(int)aSlot;
 
 #pragma mark ¥¥¥Accessors
 - (void) showVersionRevision;
@@ -407,6 +415,8 @@
 - (void) setHistoRunTime:(unsigned int)aValue;
 - (unsigned int) histoRecordingTime;
 - (void) setHistoRecordingTime:(unsigned int)aValue;
+- (int) histoSelfCalibrationPercent;
+- (void) setHistoSelfCalibrationPercent:(int)aValue;
 - (BOOL)   histoCalibrationIsRunning;
 - (void)   setHistoCalibrationIsRunning: (BOOL)aValue;
 - (double) histoCalibrationElapsedTime;
@@ -426,6 +436,7 @@
 - (NSMutableArray*) histogramData;
 - (unsigned int) getHistogramData: (int)index forChan:(int)aChan;
 - (void) setHistogramData: (int)index forChan:(int)aChan value:(int) aValue;
+- (void) addHistogramData: (int)index forChan:(int)aChan value:(int) aValue;
 - (void) clearHistogramDataForChan:(int)aChan;
 #pragma mark ¥¥¥Hardware Histogramming HW Access
 - (unsigned long) readEMin;
@@ -453,12 +464,14 @@
 - (unsigned long) readFirstBinForChan:(int)aChan;
 - (unsigned long) readLastBinForChan:(int)aPixel;
 
-- (int) getHistoBinOfEnergy:(int) energy withOffsetEMin:(int) emin binSize:(int) bs;
+- (int) getHistoBinOfEnergy:(double) energy withOffsetEMin:(int) emin binSize:(int) bs;
+- (int) getHistoEnergyOfBin:(int) bin  withOffsetEMin:(int) emin binSize:(int) bs;
 - (void) histoSimulateReadHistogramDataForChan:(int)aChan;
 - (void) startCalibrationHistogramOfChan:(int)aChan;
 - (void) checkCalibrationHistogram;
 - (void) stopCalibrationHistogram;
 - (void) histoRunSelfCalibration;
+- (void) histoAnalyseSelfCalibrationRun;
 - (unsigned int) histogramDataAdress:(int)aBin forChan:(int)aChan;
 - (void) readHistogramDataForChan:(unsigned int)aPixel;
 - (unsigned int) readHistogramDataOfPixel:(unsigned int)aPixel atBin:(unsigned int)aBin ;
@@ -586,6 +599,7 @@ extern NSString* ORKatrinFLTModelHistoFirstBinChanged;
 extern NSString* ORKatrinFLTModelHistoLastBinChanged;
 extern NSString* ORKatrinFLTModelHistoRunTimeChanged;
 extern NSString* ORKatrinFLTModelHistoRecordingTimeChanged;
+extern NSString* ORKatrinFLTModelHistoSelfCalibrationPercentChanged;
 extern NSString* ORKatrinFLTModelHistoCalibrationValuesChanged;    
 extern NSString* ORKatrinFLTModelHistoCalibrationPlotterChanged;    
 extern NSString* ORKatrinFLTModelShowHitratesDuringHistoCalibrationChanged;
