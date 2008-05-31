@@ -31,7 +31,8 @@
 //^^^^ ^^^^ ^^^^ ^^---------------------- device type
 //		           ^^ ^^^^ ^^^^ ^^^^ ^^^^ length of record including this header
 //0000 0000 0000 0000 0000 0000 0000 0000
-//^^^^ ^^^------------------------------- spare
+//^^^^ ^--------------------------------- spare
+//      ^^------------------------------- spare
 //        ^ ^^^-------------------------- crate
 //             ^ ^^^^-------------------- card
 // n bytes of raw data follow.
@@ -98,7 +99,7 @@
     ptr++; //point to the location info
 	unsigned char crate			= (*ptr&0x01e00000)>>21;
 	unsigned char card			= (*ptr& 0x001f0000)>>16;
-	unsigned char edgeDection	= (*ptr& 0x0E000000)>>25; 
+	unsigned char edgeDection	= (*ptr& 0x06000000)>>25; 
 	int i;
 	for(i=0;i<length-2;i++) {
 		if((ptr[i]>>27) & 0x1f == 0) {

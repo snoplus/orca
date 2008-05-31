@@ -499,8 +499,8 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 //^^^^ ^^^^ ^^^^ ^^---------------------- device type
 //		           ^^ ^^^^ ^^^^ ^^^^ ^^^^ length of record including this header
 //0000 0000 0000 0000 0000 0000 0000 0000
-//^^^^----------------------------------- spare
-//     ^^^------------------------------- edge detection
+//^^^^-^--------------------------------- spare
+//      ^^------------------------------- edge detection
 //        ^ ^^^-------------------------- crate
 //             ^ ^^^^-------------------- card
 // n bytes of raw data follow.
