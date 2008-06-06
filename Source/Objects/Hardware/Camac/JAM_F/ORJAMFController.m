@@ -329,7 +329,7 @@
 
 - (void) pollingStateChanged:(NSNotification*)aNote
 {
-	[pollingStatePopup selectItemAtIndex: [model pollingState]];
+	[pollingStatePopup selectItemWithTag: [model pollingState]];
 }
 
 - (void) lastReadChanged:(NSNotification*)aNote
@@ -479,9 +479,7 @@
 
 - (void) pollingStatePopupAction:(id)sender
 {
-	int index = [sender indexOfSelectedItem];
-	if(index == 0) [model setPollingState:0];	
-	else [model setPollingState:[[sender titleOfSelectedItem] intValue]]; 
+	[model setPollingState:[[sender selectedItem]tag]]; 
 }
 
 - (void) rangeIndexPopupAction:(id)sender
