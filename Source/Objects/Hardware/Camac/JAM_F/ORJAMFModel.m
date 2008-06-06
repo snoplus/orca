@@ -668,7 +668,7 @@ struct {
 	if([gOrcaGlobals runInProgress]){
 		unsigned long data[32];
 		
-		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self stationNumber]&0xf);
+		data[1] = (([self crateNumber]&0x01e)<<21) | (([self stationNumber]& 0x0000001f)<<16);
 		
 		//get the time(UT!)
 		time_t	theTime;
