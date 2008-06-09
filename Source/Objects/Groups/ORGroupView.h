@@ -74,6 +74,7 @@
 - (IBAction) paste:(id)sender;
 - (IBAction) delete:(id)sender;
 - (IBAction) arrangeInCircle:(id)sender;
+- (IBAction) alignLeft:(id)sender;
 
 #pragma mark ¥¥¥Drag and Drop
 - (NSPoint) constrainLocation:(NSPoint)aPoint;

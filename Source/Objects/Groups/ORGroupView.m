@@ -481,6 +481,10 @@
         if(!changesAllowed)return NO;
         else return selectedCount>0;
     }
+    else if ([menuItem action] == @selector(alignLeft:)) {
+        if(!changesAllowed)return NO;
+        else return selectedCount>0;
+    }
 	return NO;
 }
 
@@ -502,6 +506,17 @@
 
 
 #pragma mark ¥¥¥Actions
+- (IBAction) alignLeft:(id)sender
+{
+	NSArray* items = [group selectedObjects];
+	NSEnumerator* e = [items objectEnumerator];
+	id obj = [e nextObject];
+	float x = [obj frame].origin.x;
+	while(obj = [e nextObject]){
+		[obj moveTo:NSMakePoint(x,[obj frame].origin.y)];
+	}
+
+}
 
 - (IBAction) arrangeInCircle:(id)sender
 {
