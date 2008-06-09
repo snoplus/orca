@@ -22,6 +22,7 @@
 #pragma mark •••Imported Files
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
+#import "ORXL1Model.h"
 
 
 #define kMaxSNOCrates 20
@@ -164,6 +165,45 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 		return 0; //to get rid of compiler warning, can't really get here
 	}
 }
+- (void) assumeDisplayOf:(ORConnector*)aConnector
+{
+    [guardian assumeDisplayOf:aConnector];
+}
+
+- (void) removeDisplayOf:(ORConnector*)aConnector
+{
+    [guardian removeDisplayOf:aConnector];
+}
+
+
+- (void) setGuardian:(id)aGuardian
+{
+    id oldGuardian = guardian;
+    [super setGuardian:aGuardian];
+    
+    NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
+    id anObject;
+    while(anObject = [e nextObject]){
+        if(aGuardian == nil){
+            [anObject guardianRemovingDisplayOfConnectors:oldGuardian ];
+        }
+        [anObject guardianAssumingDisplayOfConnectors:aGuardian];
+        if(aGuardian != nil){
+            [anObject guardian:self positionConnectorsForCard:anObject];
+        }
+    }
+}
+
+- (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard
+{
+	NSRect aFrame = [aConnector localFrame];
+    float x =  5+[aCard slot] * 17 * .285 ;
+    float y = 40 + [self slot] * [self frame].size.height +  ([self slot]*17);
+	if([aConnector ioType] == kOutputConnector)y += 35;
+    aFrame.origin = NSMakePoint(x,y);
+    [aConnector setLocalFrame:aFrame];
+}
+
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -182,6 +222,25 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 - (NSString*) identifier
 {
     return [NSString stringWithFormat:@"SNO Crate %d",[self crateNumber]];
+}
+
+
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+	[[self undoManager] disableUndoRegistration];
+    
+    [self setSlot:[decoder decodeIntForKey:@"slot"]];
+	[[self undoManager] enableUndoRegistration];
+	    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+	[encoder encodeInt:[self slot] forKey:@"slot"];
 }
 
 @end

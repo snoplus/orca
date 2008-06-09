@@ -391,7 +391,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     if([aConnector connector]!=nil){
 		[aConnector disconnect];
     }
-    if(aConnector!=nil && aConnector != self  && [aConnector guardian] != guardian){
+    if(aConnector!=nil && aConnector != self  && [aConnector objectLink] != objectLink){
 		if( [self acceptsConnectionType:[aConnector connectorType]] && [aConnector acceptsConnectionType:connectorType] && 
 			[self acceptsIoType:[aConnector ioType]] && [aConnector acceptsIoType:ioType] ){
 			[self setConnection:aConnector];

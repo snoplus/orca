@@ -101,7 +101,7 @@
         else NSLog(@"%@ ID Prom appears to contain garbage.\n",[self identifier]);
 
     NS_HANDLER
-        NSLog(@"%@ raised exception during probe. Position probably empty.\n",[self identifier]);
+        NSLog(@"%@ raised exception during probe. gion probably empty.\n",[self identifier]);
     NS_ENDHANDLER
 
 }

@@ -121,6 +121,8 @@
 }
 
 
+
+
 - (void) drawContents:(NSRect)aRect
 {
     [group drawIcons:aRect];	

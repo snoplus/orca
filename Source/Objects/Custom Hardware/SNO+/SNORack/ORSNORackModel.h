@@ -25,6 +25,7 @@
 }
 - (void) setUpImage;
 - (void) makeMainController;
+- (int) rackNumber;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;

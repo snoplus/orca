@@ -238,6 +238,7 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 - (void) setCrateNumber: (unsigned int) aCrateNumber
 {
     crateNumber = aCrateNumber;
+	[self setTag:crateNumber];
 	[[NSNotificationCenter defaultCenter]
 		postNotificationName:ORCrateModelCrateNumberChanged
                       object:self];

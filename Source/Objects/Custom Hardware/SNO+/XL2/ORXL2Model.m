@@ -44,17 +44,21 @@
 
 - (void) makeConnectors
 {
-    //make and cache our connector. However this connector will be 'owned' by another object (the crate)
+    //make and cache our connector. However this connector will be 'owned' by another object (the SNORack)
     //so we don't add it to our list of connectors. It will be added to the true owner later.
     [self setInputConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
     [self setOutputConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
         
 	[inputConnector setConnectorType: 'XL2I'];
+	[inputConnector setConnectorImageType:kSmallDot]; 
+	[inputConnector setIoType:kInputConnector];
 	[inputConnector addRestrictedConnectionType: 'XL2O']; //can only connect to XL2O inputs
 	[inputConnector addRestrictedConnectionType: 'XL1O']; //and XL1O inputs
 	[inputConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
 	
 	[outputConnector setConnectorType: 'XL2O'];
+	[outputConnector setConnectorImageType:kSmallDot]; 
+	[outputConnector setIoType:kOutputConnector];
 	[outputConnector addRestrictedConnectionType: 'XL2I']; //can only connect to XL2I inputs
 	[outputConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
 
@@ -62,27 +66,16 @@
 
 - (void) positionConnector:(ORConnector*)aConnector
 {
-	//the SNO Crate is a special object, always arranged in a circle to mimic the actual layout in the SNO Cave.
-	//to make the layout look good, we arrange the XL2 connectors in a custom way.
-	int crateNumber = [[self guardian] crateNumber];
+	
 	float x,y;
 	NSRect aFrame = [[self guardian] frame];
-	float rightX	= aFrame.size.width - 10;
-	float topY		= aFrame.size.height-10;
-	float bottomY	= 0;
-	if(aConnector == inputConnector){
-		if(      crateNumber>=0  && crateNumber <= 3)	{x = 0;      y = bottomY;}
-		else if( crateNumber>=4  && crateNumber <= 6)	{x = rightX; y = bottomY;}
-		else if( crateNumber>=7  && crateNumber <= 13)	{x = rightX; y = topY;}
-		else if( crateNumber>=14 && crateNumber <= 16)	{x = 0;      y = topY;}
-		else										    {x = 0;      y = bottomY;}
+	if(aConnector == inputConnector) {
+		x = 0;      
+		y = 0;
 	}
 	else {
-		if(      crateNumber>=0  && crateNumber <= 3)	{x = 0;      y = topY;}
-		else if( crateNumber>=4  && crateNumber <= 6)	{x = 0;      y = bottomY;}
-		else if( crateNumber>=7  && crateNumber <= 13)	{x = rightX; y = bottomY;}
-		else if( crateNumber>=14 && crateNumber <= 16)	{x = rightX; y = topY;}
-		else										    {x = 0;      y = topY;}
+		x = 0;      
+		y = aFrame.size.height-10;
 	}
 	aFrame = [aConnector localFrame];
 	aFrame.origin = NSMakePoint(x,y);

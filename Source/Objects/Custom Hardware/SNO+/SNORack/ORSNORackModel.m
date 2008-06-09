@@ -51,7 +51,12 @@
         while(anObject = [e nextObject]){
             BOOL oldHighlightState = [anObject highlighted];
             [anObject setHighlighted:NO];
-            [anObject drawIcon:NSMakeRect(0,0,500,[aCachedImage size].height) withTransparency:1];
+            if([self guardian]){
+				[anObject drawSelf:NSMakeRect(0,0,500,[aCachedImage size].height) withTransparency:1];
+			}
+			else {
+				[anObject drawIcon:NSMakeRect(0,0,500,[aCachedImage size].height) withTransparency:1];
+			}
             [anObject setHighlighted:oldHighlightState];
         }
     }
@@ -69,7 +74,6 @@
     [self linkToController:@"ORSNORackController"];
 }
 
-
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
@@ -86,6 +90,11 @@
                        object : nil];
 }
 
+- (int) rackNumber
+{
+	return [self uniqueIdNumber];
+}
+
 - (void) viewChanged:(NSNotification*)aNotification
 {
     [self setUpImage];
@@ -93,7 +102,11 @@
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"SNO Rack %d",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"SNO Rack %d",[self rackNumber]];
 }
 
+- (NSComparisonResult)sortCompare:(OrcaObject*)anObj
+{
+    return [self uniqueIdNumber] - [anObj uniqueIdNumber];
+}
 @end
