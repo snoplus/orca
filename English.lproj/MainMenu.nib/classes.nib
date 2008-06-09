@@ -15,6 +15,87 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>jumpButtonClicked</key>
+				<string>id</string>
+				<key>orderFrontGoToPanel</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>GoToLine</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>dialogueView</key>
+				<string>id</string>
+				<key>lineNumberField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>arrangeInCircle</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>mailContent</key>
+				<string>id</string>
+				<key>openStatusLog</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>send</key>
+				<string>id</string>
+				<key>showBugReporter</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORBugReporter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>bodyField</key>
+				<string>NSTextView</string>
+				<key>categoryMatrix</key>
+				<string>NSMatrix</string>
+				<key>infoForm</key>
+				<string>NSForm</string>
+				<key>mailForm</key>
+				<string>NSForm</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>findNext</key>
 				<string>id</string>
 				<key>findNextAndOrderFindPanelOut</key>
@@ -72,36 +153,6 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>jumpButtonClicked</key>
-				<string>id</string>
-				<key>orderFrontGoToPanel</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>GoToLine</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>dialogueView</key>
-				<string>id</string>
-				<key>lineNumberField</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
 				<key>showAboutBox</key>
 				<string>id</string>
 			</dict>
@@ -120,31 +171,6 @@
 				<key>versionField</key>
 				<string>id</string>
 			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>arrangeInCircle</key>
-				<string>id</string>
-				<key>decDialog</key>
-				<string>id</string>
-				<key>incDialog</key>
-				<string>id</string>
-				<key>mailContent</key>
-				<string>id</string>
-				<key>openStatusLog</key>
-				<string>id</string>
-				<key>shiftLeft</key>
-				<string>id</string>
-				<key>shiftRight</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>FirstResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
 		</dict>
@@ -214,32 +240,6 @@
 				<string>id</string>
 				<key>webView</key>
 				<string>id</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>send</key>
-				<string>id</string>
-				<key>showBugReporter</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORBugReporter</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>bodyField</key>
-				<string>NSTextView</string>
-				<key>categoryMatrix</key>
-				<string>NSMatrix</string>
-				<key>infoForm</key>
-				<string>NSForm</string>
-				<key>mailForm</key>
-				<string>NSForm</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
