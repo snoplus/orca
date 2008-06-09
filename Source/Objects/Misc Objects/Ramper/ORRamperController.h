@@ -40,7 +40,8 @@
 	IBOutlet ORAxis*			yAxis;
 	NSMutableArray*				rampItemControllers;
 }
-
+- (NSString*) windowNibName;
+- (NSString*) rampItemNibFileName;
 - (ORRampItem*) selectedRampItem;
 - (void) addRampItem:(ORRampItem*)anItem;
 - (void) removeRampItem:(ORRampItem*)anItem;

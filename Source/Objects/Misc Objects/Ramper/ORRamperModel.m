@@ -191,6 +191,10 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 	NS_ENDHANDLER
 }
 
+- (NSString*) lockName
+{
+	return ORRamperObjectListLock;
+}
 
 #pragma mark ¥¥¥Ramping
 - (int) runningCount

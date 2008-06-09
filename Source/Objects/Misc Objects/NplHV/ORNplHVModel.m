@@ -22,10 +22,18 @@
 #pragma mark •••Imported Files
 #import "ORNplHVModel.h"
 #import "NetSocket.h"
+#import "ORHWWizParam.h"
+#import "ORHWWizSelection.h"
+#import "ORHVRampItem.h"
 
-NSString* ORNplHVModelCmdStringChanged = @"ORNplHVModelCmdStringChanged";
+NSString* ORNplHVModelWriteValueChanged		= @"ORNplHVModelWriteValueChanged";
+NSString* ORNplHVModelFunctionChanged		= @"ORNplHVModelFunctionChanged";
+NSString* ORNplHVModelChannelChanged		= @"ORNplHVModelChannelChanged";
+NSString* ORNplHVModelBoardChanged			= @"ORNplHVModelBoardChanged";
+NSString* ORNplHVModelCmdStringChanged		= @"ORNplHVModelCmdStringChanged";
 NSString* ORNplHVModelIsConnectedChanged	= @"ORNplHVModelIsConnectedChanged";
 NSString* ORNplHVModelIpAddressChanged		= @"ORNplHVModelIpAddressChanged";
+NSString* ORNplHVLock						= @"ORNplHVLock";
 
 @implementation ORNplHVModel
 
@@ -36,7 +44,6 @@ NSString* ORNplHVModelIpAddressChanged		= @"ORNplHVModelIpAddressChanged";
 
 - (void) dealloc
 {
-    [cmdString release];
 	[socket close];
 	[socket release];
     [super dealloc];
@@ -56,34 +63,100 @@ NSString* ORNplHVModelIpAddressChanged		= @"ORNplHVModelIpAddressChanged";
     [self setImage:[NSImage imageNamed:@"NplHVIcon"]];
 }
 
-
-- (id)  dialogLock
+- (void) addRampItem
 {
-	return @"ORNplHVLock";
+	ORHVRampItem* aRampItem = [[ORHVRampItem alloc] initWithOwner:self];
+	[rampItems addObject:aRampItem];
+	[aRampItem release];
+}
+
+- (void) ensureMinimumNumberOfRampItems
+{
+	if(!rampItems)[self setRampItems:[NSMutableArray array]];
+	if([rampItems count] == 0){
+		int i;
+		[[self undoManager] disableUndoRegistration];
+		for(i=0;i<[self numberOfChannels];i++){
+			ORHVRampItem* aRampItem = [[ORHVRampItem alloc] initWithOwner:self];
+			[aRampItem setTargetName:[self className]];
+			[aRampItem setChannelNumber:i];
+			[aRampItem setParameterName:@"Voltage"];
+			[aRampItem loadParams:self];
+			[rampItems addObject:aRampItem];
+			[aRampItem release];
+		}
+		[[self undoManager] enableUndoRegistration];
+	}
 }
 
 #pragma mark ***Accessors
-
-- (NSString*) cmdString
+- (NSString*) lockName
 {
-    return cmdString;
+	return ORNplHVLock;
 }
 
-- (void) setCmdString:(NSString*)aCmdString
-{
-	if(!aCmdString)aCmdString = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setCmdString:cmdString];
-    
-	[cmdString autorelease];
-    cmdString = [aCmdString copy];    
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelCmdStringChanged object:self];
+- (int) writeValue
+{
+    return writeValue;
+}
+
+- (void) setWriteValue:(int)aWriteValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:writeValue];
+    
+    writeValue = aWriteValue;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelWriteValueChanged object:self];
+}
+
+- (int) functionNumber
+{
+    return functionNumber;
+}
+
+- (void) setFunctionNumber:(int)aFunction
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFunctionNumber:functionNumber];
+    
+    functionNumber = aFunction;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelFunctionChanged object:self];
+}
+
+- (int) channel
+{
+    return channel;
+}
+
+- (void) setChannel:(int)aChannel
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setChannel:channel];
+    
+    channel = aChannel;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelChannelChanged object:self];
+}
+
+- (int) board
+{
+    return board;
+}
+
+- (void) setBoard:(int)aBoard
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBoard:board];
+    
+    board = aBoard;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelBoardChanged object:self];
 }
 
 - (NetSocket*) socket
 {
 	return socket;
 }
+
 - (void) setSocket:(NetSocket*)aSocket
 {
 	if(aSocket != socket)[socket close];
@@ -134,6 +207,58 @@ NSString* ORNplHVModelIpAddressChanged		= @"ORNplHVModelIpAddressChanged";
 	return isConnected;
 }
 
+- (int) adc:(int)aChan
+{
+	if(aChan>=0 && aChan < [self numberOfChannels])return adc[aChan];
+	else return 0;
+}
+
+- (void) setAdc:(int)aChan withValue:(int)aValue
+{
+	if(aChan>=0 && aChan < [self numberOfChannels]){
+		adc[aChan] = aValue;
+	}
+}
+
+- (int) dac:(int)aChan
+{
+	if(aChan>=0 && aChan < [self numberOfChannels])return dac[aChan];
+	else return 0;
+}
+
+- (void) setDac:(int)aChan withValue:(int)aValue
+{
+	if(aChan>=0 && aChan < [self numberOfChannels]){
+		dac[aChan] = aValue;
+	}
+}
+
+- (int) current:(int)aChan
+{
+	if(aChan>=0 && aChan < [self numberOfChannels])return current[aChan];
+	else return 0;
+}
+
+- (void) setCurrent:(int)aChan withValue:(int)aValue
+{
+	if(aChan>=0 && aChan < [self numberOfChannels]){
+		current[aChan] = aValue;
+	}
+}
+
+- (int) controlReg:(int)aChan
+{
+	if(aChan>=0 && aChan < [self numberOfChannels])return controlReg[aChan];
+	else return 0;
+}
+
+- (void) setControlReg:(int)aChan withValue:(int)aValue
+{
+	if(aChan>=0 && aChan < [self numberOfChannels]){
+		controlReg[aChan] = aValue;
+	}
+}
+
 #pragma mark ***Delegate Methods
 - (void) netsocketConnected:(NetSocket*)inNetSocket
 {
@@ -145,8 +270,12 @@ NSString* ORNplHVModelIpAddressChanged		= @"ORNplHVModelIpAddressChanged";
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
 {
     if(inNetSocket == socket){
-		NSString* theString = [[inNetSocket readString:NSASCIIStringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		NSLog(@"From NPL HV: %@\n",theString);
+		NSData* theData = [inNetSocket readData];
+		char* theBytes = (char*)[theData bytes];
+		int i;
+		for(i=0;i<[theData length];i++){
+			NSLog(@"From NPL HV [%d]: 0x%x\n",i,theBytes[i]);
+		}
 	}
 }
 
@@ -166,8 +295,11 @@ NSString* ORNplHVModelIpAddressChanged		= @"ORNplHVModelIpAddressChanged";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setCmdString:[decoder decodeObjectForKey:@"ORNplHVModelCmdString"]];
-	[self setIpAddress:[decoder decodeObjectForKey:@"ORNplHVModelIpAddress"]];
+    [self setWriteValue:	[decoder decodeIntForKey:	@"writeValue"]];
+    [self setFunctionNumber:[decoder decodeIntForKey:	@"function"]];
+    [self setChannel:		[decoder decodeIntForKey:	@"channel"]];
+    [self setBoard:			[decoder decodeIntForKey:	@"board"]];
+	[self setIpAddress:		[decoder decodeObjectForKey:@"ipAddress"]];
     [[self undoManager] enableUndoRegistration];    
 		
     return self;
@@ -176,12 +308,99 @@ NSString* ORNplHVModelIpAddressChanged		= @"ORNplHVModelIpAddressChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:cmdString forKey:@"ORNplHVModelCmdString"];
-    [encoder encodeObject:ipAddress forKey:@"ORNplHVModelIpAddress"];
+    [encoder encodeInt:writeValue		forKey: @"writeValue"];
+    [encoder encodeInt:functionNumber	forKey: @"function"];
+    [encoder encodeInt:channel			forKey: @"channel"];
+    [encoder encodeInt:board			forKey: @"board"];
+    [encoder encodeObject:ipAddress		forKey: @"ipAddress"];
 }
 
-- (void) sendCmd:(NSString*)aCmd
-{
-	if(aCmd)[socket writeString:aCmd encoding:NSASCIIStringEncoding];
+- (void) sendCmd
+{	
+	//send the values from the basic ops
+	char bytes[6];
+	bytes[0] = 5;
+	bytes[1] = ((board & 0xf)<<4) | ((channel & 0x3)<<2) | (functionNumber & 0x3);
+	bytes[2] = 0;
+	bytes[3] = (writeValue>>16 & 0xf);
+	bytes[4] = (writeValue>>8 & 0xf); 
+	bytes[5] = writeValue & 0xf; 
+	[socket write:bytes length:6];
 }
+
+- (SEL) getMethodSelector
+{
+	return @selector(dac:);
+}
+
+- (SEL) setMethodSelector
+{
+	return @selector(setDac:withValue:);
+}
+
+- (SEL) initMethodSelector
+{
+	//fake out, so we can actually do the load ourselves
+	return @selector(junk);
+}
+
+- (void) junk
+{
+}
+
+- (void) loadDac:(int)aChan
+{
+	//send the values from the basic ops
+	char bytes[6];
+	bytes[0] = 5;
+	bytes[1] = ((1 & 0xf)<<4) | ((aChan & 0x3)<<2) | (2 & 0x3); //set dac
+	bytes[2] = 0;
+	int aValue = dac[aChan];
+	bytes[3] = (aValue>>16 & 0xf);
+	bytes[4] = (aValue>>8 & 0xf); 
+	bytes[5] = aValue & 0xf; 
+	[socket write:bytes length:6];
+}
+
+#pragma mark •••HW Wizard
+//the next two methods exist only to 'fake' out Hardware wizard and the Ramper so this item can be selected
+- (int) crateNumber	{	return 0;	}
+- (int) slot		{	return [self tag];	}
+
+- (int) numberOfChannels
+{
+    return 8;
+}
+
+- (BOOL) hasParmetersToRamp
+{
+	return YES;
+}
+
+- (NSArray*) wizardParameters
+{
+    NSMutableArray* a = [NSMutableArray array];
+    ORHWWizParam* p;
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Voltage"];
+    [p setFormat:@"##0" upperLimit:3000 lowerLimit:0 stepSize:1 units:@"V"];
+    [p setSetMethod:@selector(setDac:withValue:) getMethod:@selector(dac:)];
+	[p setInitMethodSelector:@selector(sendCmd)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+	    
+    return a;
+}
+
+- (NSArray*) wizardSelections
+{
+    NSMutableArray* a = [NSMutableArray array];
+    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate"	className:@"ORNplHVModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card"		className:@"ORNplHVModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel"	className:@"ORNplHVModel"]];
+    return a;
+	
+}
+
 @end

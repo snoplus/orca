@@ -27,10 +27,10 @@
 #import "ORHWWizard.h"
 
 @implementation ORRampItemController
-- (id) init
+- (id) initWithNib:(NSString*)aNibName
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"RampItem" owner: self];	
+        [NSBundle loadNibNamed: aNibName owner: self];	
     }
 	return self;
 }
@@ -343,6 +343,7 @@
 
 - (IBAction) startStop:(id)sender
 {
+	[self endEditing];
 	if([model isRunning]){
 		[model stopRamper];
 	}

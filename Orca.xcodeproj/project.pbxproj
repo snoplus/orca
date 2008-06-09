@@ -139,6 +139,11 @@
 		8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8407F0E20DEF66DB000F1441 /* ORCaen862Model.h */; };
 		8407F0E90DEF66DB000F1441 /* ORCaen862Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407F0E30DEF66DB000F1441 /* ORCaen862Model.m */; };
 		8407F0EB0DEF6700000F1441 /* C862.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8407F0EA0DEF6700000F1441 /* C862.gif */; };
+		8407FAB40DF9A32F000F1441 /* HVRampItem.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8407FAAF0DF9A32F000F1441 /* HVRampItem.nib */; };
+		8407FBA80DF9CC22000F1441 /* ORHVRampItemController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407FBA30DF9CC22000F1441 /* ORHVRampItemController.m */; };
+		8407FBA90DF9CC22000F1441 /* ORHVRampItemController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8407FBA40DF9CC22000F1441 /* ORHVRampItemController.h */; };
+		8407FBAA0DF9CC22000F1441 /* ORHVRampItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 8407FBA50DF9CC22000F1441 /* ORHVRampItem.m */; };
+		8407FBAB0DF9CC22000F1441 /* ORHVRampItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 8407FBA60DF9CC22000F1441 /* ORHVRampItem.h */; };
 		84080D2B0B3C7FBF009D3704 /* ORScriptRunner.h in Headers */ = {isa = PBXBuildFile; fileRef = 84080D240B3C7FBE009D3704 /* ORScriptRunner.h */; };
 		84080D2C0B3C7FBF009D3704 /* ORScriptRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 84080D250B3C7FBE009D3704 /* ORScriptRunner.m */; };
 		84080D2D0B3C7FBF009D3704 /* NodeTree.h in Headers */ = {isa = PBXBuildFile; fileRef = 84080D260B3C7FBE009D3704 /* NodeTree.h */; };
@@ -2020,6 +2025,11 @@
 		8407F0E20DEF66DB000F1441 /* ORCaen862Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen862Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV862/ORCaen862Model.h; sourceTree = SOURCE_ROOT; };
 		8407F0E30DEF66DB000F1441 /* ORCaen862Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen862Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV862/ORCaen862Model.m; sourceTree = SOURCE_ROOT; };
 		8407F0EA0DEF6700000F1441 /* C862.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = C862.gif; path = Source/Objects/Hardware/Vme/CAEN/CV862/C862.gif; sourceTree = SOURCE_ROOT; };
+		8407FAAF0DF9A32F000F1441 /* HVRampItem.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HVRampItem.nib; path = "Source/Objects/Misc Objects/NplHV/HVRampItem.nib"; sourceTree = SOURCE_ROOT; };
+		8407FBA30DF9CC22000F1441 /* ORHVRampItemController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVRampItemController.m; path = "Source/Objects/Misc Objects/NplHV/ORHVRampItemController.m"; sourceTree = SOURCE_ROOT; };
+		8407FBA40DF9CC22000F1441 /* ORHVRampItemController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVRampItemController.h; path = "Source/Objects/Misc Objects/NplHV/ORHVRampItemController.h"; sourceTree = SOURCE_ROOT; };
+		8407FBA50DF9CC22000F1441 /* ORHVRampItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVRampItem.m; path = "Source/Objects/Misc Objects/NplHV/ORHVRampItem.m"; sourceTree = SOURCE_ROOT; };
+		8407FBA60DF9CC22000F1441 /* ORHVRampItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVRampItem.h; path = "Source/Objects/Misc Objects/NplHV/ORHVRampItem.h"; sourceTree = SOURCE_ROOT; };
 		84080D240B3C7FBE009D3704 /* ORScriptRunner.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORScriptRunner.h; sourceTree = "<group>"; };
 		84080D250B3C7FBE009D3704 /* ORScriptRunner.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORScriptRunner.m; sourceTree = "<group>"; };
 		84080D260B3C7FBE009D3704 /* NodeTree.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NodeTree.h; path = "Source/Main Dialogs/CommandCenter/Scripting/NodeTree.h"; sourceTree = SOURCE_ROOT; };
@@ -7646,6 +7656,11 @@
 				9C1363B40D0A78FC006C550D /* ORNplHVController.m */,
 				9C1363B50D0A78FC006C550D /* ORNplHVModel.h */,
 				9C1363B60D0A78FC006C550D /* ORNplHVModel.m */,
+				8407FAAF0DF9A32F000F1441 /* HVRampItem.nib */,
+				8407FBA30DF9CC22000F1441 /* ORHVRampItemController.m */,
+				8407FBA40DF9CC22000F1441 /* ORHVRampItemController.h */,
+				8407FBA50DF9CC22000F1441 /* ORHVRampItem.m */,
+				8407FBA60DF9CC22000F1441 /* ORHVRampItem.h */,
 			);
 			name = NplHV;
 			path = "Source/Objects/Misc Objects/NplHV";
@@ -8759,6 +8774,8 @@
 				843D35500DEF1C9300330F3F /* ORCaen1190Decoders.h in Headers */,
 				8407F0E60DEF66DB000F1441 /* ORCaen862Controller.h in Headers */,
 				8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */,
+				8407FBA90DF9CC22000F1441 /* ORHVRampItemController.h in Headers */,
+				8407FBAB0DF9CC22000F1441 /* ORHVRampItem.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9298,6 +9315,7 @@
 				844B42C60DE5D5680061AE80 /* SNORack.nib in Resources */,
 				8407F0E50DEF66DB000F1441 /* Caen862.nib in Resources */,
 				8407F0EB0DEF6700000F1441 /* C862.gif in Resources */,
+				8407FAB40DF9A32F000F1441 /* HVRampItem.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9930,6 +9948,8 @@
 				843D354F0DEF1C9300330F3F /* ORCaen1190Decoders.m in Sources */,
 				8407F0E70DEF66DB000F1441 /* ORCaen862Controller.m in Sources */,
 				8407F0E90DEF66DB000F1441 /* ORCaen862Model.m in Sources */,
+				8407FBA80DF9CC22000F1441 /* ORHVRampItemController.m in Sources */,
+				8407FBAA0DF9CC22000F1441 /* ORHVRampItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

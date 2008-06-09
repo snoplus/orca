@@ -32,7 +32,7 @@
 @implementation ORRamperController
 - (id) init
 {
-    self = [super initWithWindowNibName:@"Ramper"];
+    self = [super initWithWindowNibName:[self windowNibName]];
     return self;
 }
 
@@ -42,6 +42,11 @@
 	[allViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
 	[rampItemControllers release];
 	[super dealloc];
+}
+
+- (NSString*) windowNibName
+{
+	return @"Ramper";
 }
 
 - (void) awakeFromNib
@@ -66,6 +71,11 @@
     return rampItemContentView;
 }
 
+- (NSString*) rampItemNibFileName
+{
+	//subclasses can specify a differant RampItem nib file if needed.
+	return @"RampItem";
+}
 
 - (void) addRampItem:(ORRampItem*)anItem
 {
@@ -176,6 +186,7 @@
                      selector : @selector(selectionChanged:)
                          name : ORRampItemTargetNameChanged
                        object : nil];
+					   
     [notifyCenter addObserver : self
                      selector : @selector(selectionChanged:)
                          name : ORRampItemTargetChanged
@@ -262,12 +273,24 @@
 {
 	[self setButtonStates];
 	ORRampItem* item = [model selectedRampItem];
+	if(!item){
+		[model setSelectedRampItem:[[model rampItems] objectAtIndex:0]];
+		item = [model selectedRampItem];
+	}
 	[titleField setStringValue:[NSString stringWithFormat:@"%@",[item itemName]]];
+	
+	NSMutableArray* rampItems = [model rampItems];
+	NSEnumerator* e = [rampItems objectEnumerator];
+	ORRampItem* anItem;
+	while(anItem = [e nextObject]){
+		[anItem scaleToMaxTime:[xAxis maxValue]];
+	}
+
 }
 
 - (void) setButtonStates
 {
-	BOOL locked = [gSecurity isLocked:ORRamperObjectListLock];
+	BOOL locked = [gSecurity isLocked:[model lockName]];
 	BOOL lockedOrRunning = locked | [[model selectedRampItem] isRunning];
 	[downRampPathMatrix setEnabled:!lockedOrRunning];
 	[downRateTextField setEnabled:!lockedOrRunning];

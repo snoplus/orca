@@ -18,28 +18,48 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import "OrcaObjectController.h"
+#import "ORRamperController.h"
 
-@interface ORNplHVController : OrcaObjectController 
+@interface ORNplHVController : ORRamperController 
 {
 	IBOutlet NSTextField*	ipConnectedTextField;
-	IBOutlet NSTextField*	cmdStringTextField;
+	IBOutlet NSTextField*	writeValueField;
+	IBOutlet NSPopUpButton* functionPU;
+	IBOutlet NSPopUpButton* channelPU;
+	IBOutlet NSPopUpButton* boardPU;
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSButton*		ipConnectButton;
+	IBOutlet NSButton*		lockButton;
+	IBOutlet NSButton*		sendButton;
+	//lots of other Outlets inherited from the RamperController
+	IBOutlet NSView*		totalView;
+	IBOutlet NSTabView*		tabView;	
+	NSSize					basicOpsSize;
+	NSSize					rampOpsSize;
+	NSView*					blankView;
 }
 
 #pragma mark •••Notifications
 
 #pragma mark ***Interface Management
-- (void) cmdStringChanged:(NSNotification*)aNote;
+- (void) writeValueChanged:(NSNotification*)aNote;
+- (void) functionChanged:(NSNotification*)aNote;
+- (void) channelChanged:(NSNotification*)aNote;
+- (void) boardChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
+- (void) lockChanged:(NSNotification*)aNote;
+- (void) setButtonStates;
 
 #pragma mark •••Actions
-- (IBAction) cmdStringTextFieldAction:(id)sender;
+- (IBAction) writeValueAction:(id)sender;
+- (IBAction) functionAction:(id)sender;
+- (IBAction) channelAction:(id)sender;
+- (IBAction) boardAction:(id)sender;
 - (IBAction) ipAddressTextFieldAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
 - (IBAction) sendCmdAction:(id)sender;
+- (IBAction) lockAction:(id) sender;
 
 @end
 

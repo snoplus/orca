@@ -27,6 +27,8 @@
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
 
+@class ORMTC_DB;
+
 @interface ORMTCModel :  ORVmeIOCard <ORDataTaker>
 {
     @private

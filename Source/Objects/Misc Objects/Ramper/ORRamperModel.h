@@ -38,6 +38,7 @@
 - (void) ensureMinimumNumberOfRampItems;
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) lockName;
 - (NSMutableArray*) wayPoints;
 - (float) rampTarget;
 - (NSMutableArray*) rampItems;

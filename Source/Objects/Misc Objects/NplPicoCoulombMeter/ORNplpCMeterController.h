@@ -31,8 +31,6 @@
 	IBOutlet NSButton*		dialogLock;
 }
 
-#pragma mark •••Notifications
-
 #pragma mark ***Interface Management
 - (void) receiveCountChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;

@@ -45,6 +45,7 @@
 }
 
 #pragma mark ***Interface Management
+- (id) initWithNib:(NSString*)aNibName;
 - (void) awakeFromNib;
 - (void) registerNotificationObservers;
 - (void) updateWindow;

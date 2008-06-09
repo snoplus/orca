@@ -99,7 +99,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (ORRampItemController*) makeController:(id)anOwner
 {
-	ORRampItemController* theController =  [[ORRampItemController alloc] init];
+	ORRampItemController* theController =  [[ORRampItemController alloc] initWithNib:[anOwner rampItemNibFileName]];
 	[theController setOwner:anOwner];
 	[theController setModel:self];
 	return [theController autorelease];

@@ -147,6 +147,7 @@
 
 - (IBAction) connectAction:(id)sender
 {
+	[self endEditing];
 	[model connect];
 }
 

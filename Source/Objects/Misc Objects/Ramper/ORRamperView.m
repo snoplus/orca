@@ -48,6 +48,7 @@
 
 - (void)drawRect:(NSRect)rect 
 {
+
 	ORRampItem* model = [dataSource selectedRampItem];
 	NSRect rampArea = [self bounds];
 	
@@ -75,7 +76,7 @@
 
 	if(!gradient) gradient = [[CTGradient unifiedNormalGradient] retain];
 	[gradient fillRect:rampArea angle:90.];
-
+	[NSBezierPath setDefaultLineWidth:1];
 	[[NSColor grayColor] set];
 	[NSBezierPath strokeRect:rampArea];
 		
@@ -131,7 +132,7 @@
 
 
 	float targetLineY = [yAxis getPixAbs:[model rampTarget]];
-	[[NSColor colorWithCalibratedRed:.8 green:.3 blue:.3 alpha:.7] set];
+	[[NSColor colorWithCalibratedRed:.8 green:.3 blue:.3 alpha:1] set];
 	[NSBezierPath strokeLineFromPoint:NSMakePoint(0,targetLineY+.2) toPoint:NSMakePoint([self bounds].size.width-bugPadWidth,targetLineY+.2)];
 	if(![model isRunning]){
 		[rightTargetBug compositeToPoint:NSMakePoint([self bounds].size.width - [rightTargetBug size].width,

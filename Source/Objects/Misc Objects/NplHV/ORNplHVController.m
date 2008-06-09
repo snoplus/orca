@@ -29,6 +29,27 @@
     return self;
 }
 
+- (void) dealloc
+{
+	[blankView release];
+	[super dealloc];
+}
+
+- (void) awakeFromNib
+{
+    [super awakeFromNib];
+
+    basicOpsSize	= NSMakeSize(320,320);
+    rampOpsSize		= NSMakeSize(570,750);
+    blankView		= [[NSView alloc] init];
+	
+    NSString* key = [NSString stringWithFormat: @"orca.ORNplHV%d.selectedtab",[model uniqueIdNumber]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    [tabView selectTabViewItemAtIndex: index];
+
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
@@ -45,10 +66,34 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(cmdStringChanged:)
-                         name : ORNplHVModelCmdStringChanged
+                     selector : @selector(boardChanged:)
+                         name : ORNplHVModelBoardChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(channelChanged:)
+                         name : ORNplHVModelChannelChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(functionChanged:)
+                         name : ORNplHVModelFunctionChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(writeValueChanged:)
+                         name : ORNplHVModelWriteValueChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+					 selector : @selector(lockChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(lockChanged:)
+						 name : ORNplHVLock
+						object: nil];
 }
 
 
@@ -58,12 +103,65 @@
     
 	[self ipAddressChanged:nil];
 	[self isConnectedChanged:nil];
-	[self cmdStringChanged:nil];
+	[self boardChanged:nil];
+	[self channelChanged:nil];
+	[self functionChanged:nil];
+	[self writeValueChanged:nil];
+    [self lockChanged:nil];
 }
 
-- (void) cmdStringChanged:(NSNotification*)aNote
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	[cmdStringTextField setObjectValue: [model cmdString]];
+    [[self window] setContentView:blankView];
+    switch([tabView indexOfTabViewItem:tabViewItem]){
+        case  0: [self resizeWindowToSize:basicOpsSize];    break;
+		case  1: [self resizeWindowToSize:rampOpsSize];	    break;
+    }
+    [[self window] setContentView:totalView];
+            
+    NSString* key = [NSString stringWithFormat: @"orca.ORNplHV%d.selectedtab",[model uniqueIdNumber]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+    
+}
+
+
+- (void) checkGlobalSecurity
+{
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORNplHVLock to:secure];
+    [lockButton setEnabled:secure];
+}
+
+- (void) lockChanged:(NSNotification*)aNotification
+{
+	[self setButtonStates];
+}
+
+- (void) updateButtons
+{
+	[writeValueField setEnabled:[model functionNumber] >= 2];
+}
+
+- (void) writeValueChanged:(NSNotification*)aNote
+{
+	[writeValueField setIntValue: [model writeValue]];
+}
+
+- (void) functionChanged:(NSNotification*)aNote
+{
+	[functionPU selectItemAtIndex: [model functionNumber]];
+	[self updateButtons];
+}
+
+- (void) channelChanged:(NSNotification*)aNote
+{
+	[channelPU selectItemAtIndex: [model channel]];
+}
+
+- (void) boardChanged:(NSNotification*)aNote
+{
+	[boardPU selectItemAtIndex: [model board]];
 }
 
 #pragma mark •••Notifications
@@ -78,22 +176,53 @@
 	[ipAddressTextField setStringValue: [model ipAddress]];
 }
 
-
 - (void) setButtonStates
 {
-
     BOOL runInProgress  = [gOrcaGlobals runInProgress];
-    BOOL locked			= [gSecurity isLocked:[model dialogLock]] || [model lockGUI];
+    BOOL locked			= [gSecurity isLocked:ORNplHVLock];
+	int  ramping		= [model runningCount]>0;
 
-	[ipConnectButton setEnabled:!runInProgress || !locked];
-	[ipAddressTextField setEnabled:!locked];
+    [lockButton setState: locked];
+	[ipConnectButton setEnabled:!runInProgress || !locked && !ramping];
+	[ipAddressTextField setEnabled:!locked && !ramping];
+	[writeValueField setEnabled:!locked && [model functionNumber] >= 2 && !ramping];
+	[functionPU setEnabled:!locked && !ramping];
+	[channelPU setEnabled:!locked && !ramping];
+	[boardPU setEnabled:!locked && !ramping];
+	[sendButton setEnabled:!locked && !ramping];
+	[super setButtonStates];
+}
+
+- (NSString*) windowNibName
+{
+	return @"NplHV";
+}
+
+- (NSString*) rampItemNibFileName
+{
+	//subclasses can specify a differant RampItem nib file if needed.
+	return @"HVRampItem";
 }
 
 #pragma mark •••Actions
-
-- (void) cmdStringTextFieldAction:(id)sender
+- (void) writeValueAction:(id)sender
 {
-	[model setCmdString:[sender objectValue]];	
+	[model setWriteValue:[sender intValue]];	
+}
+
+- (void) functionAction:(id)sender
+{
+	[model setFunctionNumber:[sender indexOfSelectedItem]];	
+}
+
+- (void) channelAction:(id)sender
+{
+	[model setChannel:[sender indexOfSelectedItem]];	
+}
+
+- (void) boardAction:(id)sender
+{
+	[model setBoard:[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) ipAddressTextFieldAction:(id)sender
@@ -103,12 +232,18 @@
 
 - (IBAction) connectAction:(id)sender
 {
+	[self endEditing];
 	[model connect];
 }
 
 - (IBAction) sendCmdAction:(id)sender
 {
-	[model sendCmd:[model cmdString]];
+	[self endEditing];
+	[model sendCmd];
 }
 
+- (IBAction) lockAction:(id) sender
+{
+    [gSecurity tryToSetLock:ORNplHVLock to:[sender intValue] forWindow:[self window]];
+}
 @end
