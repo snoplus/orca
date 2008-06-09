@@ -217,7 +217,7 @@
 
 - (void) setFitOrder:(int)order
 {
-	if(order<1)order = 1;
+	if(order<0)order = 0;
 	else if(order>10)order = 10;
 	fitOrder = order;
 	[self fitOrderChanged];
