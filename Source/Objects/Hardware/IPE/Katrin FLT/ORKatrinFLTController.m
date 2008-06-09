@@ -51,10 +51,10 @@
 {
     [super awakeFromNib];
     
-    settingSize     = NSMakeSize(546,680);
-    histogramSize   = NSMakeSize(550,680);  // new -tb- 2008-01
-    rateSize	    = NSMakeSize(430,615);
-    testSize	    = NSMakeSize(400,640);  // renamed to low-level -tb- 2008-04
+    settingSize     = NSMakeSize(560,680);
+    histogramSize   = NSMakeSize(555,680);  // new -tb- 2008-01
+    rateSize	    = NSMakeSize(435,615);
+    testSize	    = NSMakeSize(405,640);  // renamed to low-level -tb- 2008-04
 
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
@@ -115,14 +115,19 @@
     
     
     [notifyCenter addObserver : self
-                     selector : @selector(settingsLockChanged:)
+                     selector : @selector(updateGUI:)
                          name : ORRunStatusChangedNotification
                        object : nil];
     
     [notifyCenter addObserver : self
-                     selector : @selector(settingsLockChanged:)
+                     selector : @selector(updateGUI:)
                          name : ORKatrinFLTSettingsLock
                         object: nil];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(updateGUI:)
+						 name : ORKatrinFLTModelAvailableFeaturesChanged
+					   object : model];
 
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
@@ -134,10 +139,6 @@
 						 name : ORKatrinFLTModelVersionRevisionChanged
 					   object : model];
 
-    [notifyCenter addObserver : self
-					 selector : @selector(availableFeaturesChanged:)
-						 name : ORKatrinFLTModelAvailableFeaturesChanged
-					   object : model];
 
     [notifyCenter addObserver : self 
                      selector : @selector(fltRunModeChanged:)
@@ -398,7 +399,6 @@
 {
     [super updateWindow];
     [self slotChanged:nil];
-    [self settingsLockChanged:nil];
 	//[self fltRunModeChanged:nil];
 	[self daqRunModeChanged:nil];
 	[self postTriggerTimeChanged:nil];
@@ -440,10 +440,9 @@
 
     //-tb-
     [self versionRevisionChanged: nil];
-    [self availableFeaturesChanged: nil];
     [self readWriteRegisterChanChanged: nil];
     [self readWriteRegisterNameChanged: nil];
-
+    [self updateGUI:nil]; //mah -- consolidated the gui updates jun 9,2008 
 }
 
 - (void) checkGlobalSecurity
@@ -456,7 +455,7 @@
 	
 }
 
-- (void) settingsLockChanged:(NSNotification*)aNotification
+- (void) updateGUI:(NSNotification*)aNotification
 {
     
     BOOL runInProgress = [gOrcaGlobals runInProgress];
@@ -473,11 +472,7 @@
 	[daqRunModeButton setEnabled:!lockedOrRunningMaintenance];
 	[resetButton setEnabled:!lockedOrRunningMaintenance];
 	[triggerButton setEnabled:isRunning]; // only active in run mode, ak 4.7.07
-    [gainTextFields setEnabled:!lockedOrRunningMaintenance];
-    [thresholdTextFields setEnabled:!lockedOrRunningMaintenance];
 	//[readThresholdsGainsButton setEnabled:!lockedOrRunningMaintenance]; //TODO: should be moved to "Test" tab -tb- 2008-03-14
-    [triggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
-    [hitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
     [writeThresholdsGainsButton setEnabled:!lockedOrRunningMaintenance];
     [loadTimeButton setEnabled:!locked];
     [readTimeButton setEnabled:!locked];
@@ -516,8 +511,7 @@
 
 	[tModeMatrix setEnabled:!locked];
 	[initTPButton setEnabled:!locked];
-    
-    
+
     //HW histogramming GUI -tb- 2008
     [eMinField setEnabled:!lockedOrRunningMaintenance];
     [tRunField setEnabled:!lockedOrRunningMaintenance];
@@ -534,6 +528,91 @@
     [writeEnableVetoButton  setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
     [readVetoDataButton     setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
 
+    //set the checkmarks
+    [versionStdCheckButton   setIntValue: [model stdFeatureIsAvailable]];
+    [versionHistoCheckButton setIntValue: [model histoFeatureIsAvailable]];
+    [versionVetoCheckButton  setIntValue: [model vetoFeatureIsAvailable]];
+
+    //[daqRunModeButton setAutoenablesItems:YES];
+    [daqRunModeButton setAutoenablesItems:NO];  // needed only once ? -tb- 
+    
+    //if in daq run mode popup there was something selected which is disabled, then change selection to an other mode
+    // in fact: histogram replaces energy mode in histogram FPGA config. (and same for veto)
+    NSMenuItem *currSelection = [daqRunModeButton selectedItem];
+    //    if(currSelection == histogramDaqModeMenuItem) NSLog(@"currSelection == histogramDaqModeMenuItem\n");
+    //    if(currSelection == vetoDaqModeMenuItem) NSLog(@"currSelection == vetoDaqModeMenuItem\n");
+    //    if(currSelection == energyDaqModeMenuItem) NSLog(@"currSelection == energyDaqModeMenuItem\n");
+
+    // check std and energy item
+    if(![model histoFeatureIsAvailable] && ![model vetoFeatureIsAvailable]){
+    	[energyDaqModeMenuItem setEnabled:TRUE]; // in histogram mode we have no energy mode -tb-
+        ////if(currSelection == histogramDaqModeMenuItem || currSelection == vetoDaqModeMenuItem){//I came from histo or veto mode -tb-
+        if([model daqRunMode] == kKatrinFlt_DaqHistogram_Mode || [model daqRunMode] == kKatrinFlt_DaqVeto_Mode){//I came from histo or veto mode -tb-
+            [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+            currSelection = [daqRunModeButton selectedItem];
+        }
+    }
+    
+    // check histo config
+    if(![model histoFeatureIsAvailable]){
+        [histogramDaqModeMenuItem setEnabled:FALSE];
+        ////if(currSelection == histogramDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        if([model daqRunMode] == kKatrinFlt_DaqHistogram_Mode) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        // take the "best" (=most oftenly needed) mode as default -tb-
+        [histoMessageAboutFPGAVersionField setHidden:FALSE];
+    }
+	else{
+        ////if(currSelection == energyDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
+        if([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode) [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
+        [histogramDaqModeMenuItem setEnabled:TRUE];
+    	[energyDaqModeMenuItem setEnabled:FALSE]; // in histogram mode we have no energy mode -tb-
+        [histoMessageAboutFPGAVersionField setHidden:TRUE];
+    }
+    
+    // check veto config
+    if(![model vetoFeatureIsAvailable]){
+        [vetoDaqModeMenuItem setEnabled:FALSE];
+        ////if(currSelection == vetoDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        if([model daqRunMode] == kKatrinFlt_DaqVeto_Mode){
+            if([model histoFeatureIsAvailable])
+                [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
+            else
+                [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
+        }
+    }
+	else{
+        ////if(currSelection == energyDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqVeto_Mode];
+        if([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode) [model setDaqRunMode:kKatrinFlt_DaqVeto_Mode];
+        [vetoDaqModeMenuItem setEnabled:TRUE];
+    	[energyDaqModeMenuItem setEnabled:FALSE]; // in histogram mode we have no energy mode -tb-
+    }
+
+    //disable or grey out the unavailable channels
+	BOOL availiable;
+	if([model histoFeatureIsAvailable]){//we have only channels 0,1,12,13 -tb-
+		int chan;
+		for(chan=0; chan < kNumFLTChannels; chan++){
+			if([model histoChanToGroupMap:chan] == -1) availiable = NO;
+			else									   availiable = !lockedOrRunningMaintenance;
+			
+			[[gainTextFields  cellWithTag:chan]		 setEnabled: availiable];
+			[[thresholdTextFields  cellWithTag:chan] setEnabled: availiable];
+			[[triggerEnabledCBs  cellWithTag:chan]   setEnabled: availiable];
+			[[hitRateEnabledCBs  cellWithTag:chan]   setEnabled: availiable];
+		}
+	}
+	else {//in std or veto config we dont have channels 10,11 -tb-
+		int chan;
+		for(chan=0; chan < kNumFLTChannels; chan++){
+			if(chan == 10 || chan == 11) availiable = NO;
+			else					     availiable = !lockedOrRunningMaintenance;
+			 
+			[[gainTextFields  cellWithTag:chan]		  setEnabled: availiable];
+			[[thresholdTextFields  cellWithTag:chan]  setEnabled: availiable];
+			[[triggerEnabledCBs  cellWithTag:chan]	  setEnabled: availiable];
+			[[hitRateEnabledCBs  cellWithTag:chan]    setEnabled: availiable];
+		}
+	}
 }
 
 - (void) numTestPattersChanged:(NSNotification*)aNote
@@ -760,7 +839,7 @@
 	//[modeButton selectItemAtIndex:[model fltRunMode]]; TODO: obsolete ! -tb-
 	//[modeButton selectItemAtIndex:[model daqRunMode]];//-tb-
     [fltModeField setIntValue:[model fltRunMode]];
-	[self settingsLockChanged:nil];	//TODO: still needed? -tb- 2008-02-08
+	[self updateGUI:nil];	//TODO: still needed? -tb- 2008-02-08
 }
 
 /** The DAQ run mode popup value.
@@ -771,7 +850,7 @@
 	//[modeButton selectItemAtIndex:[model fltRunMode]];
     //debug output -tb- NSLog(@"DAQ run mode is %i\n", [model daqRunMode]);
 	[daqRunModeButton selectItemWithTag:[model daqRunMode]];//-tb-
-	[self settingsLockChanged:nil];	// still needed? -tb- 2008-02-08 ... YES, updates the GUI!
+	[self updateGUI:nil];	// still needed? -tb- 2008-02-08 ... YES, updates the GUI!
 }
 
 /** Post trigger time is available since FLT version 0x60, HW version 0x30.
@@ -779,7 +858,7 @@
 - (void) postTriggerTimeChanged:(NSNotification*)aNote
 {
 	[postTriggTimeField setIntValue:[model postTriggerTime]];
-	//[self settingsLockChanged:nil];	//TODO: still needed? -tb- 2008-02-08
+	//[self updateGUI:nil];	//TODO: still needed? -tb- 2008-02-08
 }
 
 - (void) broadcastTimeChanged:(NSNotification*)aNote
@@ -1155,97 +1234,6 @@
         [postTriggTimeField         setEnabled: TRUE];
     }
 }
-
-- (void) availableFeaturesChanged:(NSNotification*)aNote //-tb-
-{
-    //set the checkmarks
-    [versionStdCheckButton   setIntValue: [model stdFeatureIsAvailable]];
-    [versionHistoCheckButton setIntValue: [model histoFeatureIsAvailable]];
-    [versionVetoCheckButton  setIntValue: [model vetoFeatureIsAvailable]];
-
-    //[daqRunModeButton setAutoenablesItems:YES];
-    [daqRunModeButton setAutoenablesItems:NO];  // needed only once ? -tb- 
-    
-    //if in daq run mode popup there was something selected which is disabled, then change selection to an other mode
-    // in fact: histogram replaces energy mode in histogram FPGA config. (and same for veto)
-    NSMenuItem *currSelection = [daqRunModeButton selectedItem];
-    //    if(currSelection == histogramDaqModeMenuItem) NSLog(@"currSelection == histogramDaqModeMenuItem\n");
-    //    if(currSelection == vetoDaqModeMenuItem) NSLog(@"currSelection == vetoDaqModeMenuItem\n");
-    //    if(currSelection == energyDaqModeMenuItem) NSLog(@"currSelection == energyDaqModeMenuItem\n");
-
-    // check std and energy item
-    if(![model histoFeatureIsAvailable] && ![model vetoFeatureIsAvailable]){
-    	[energyDaqModeMenuItem setEnabled:TRUE]; // in histogram mode we have no energy mode -tb-
-        ////if(currSelection == histogramDaqModeMenuItem || currSelection == vetoDaqModeMenuItem){//I came from histo or veto mode -tb-
-        if([model daqRunMode] == kKatrinFlt_DaqHistogram_Mode || [model daqRunMode] == kKatrinFlt_DaqVeto_Mode){//I came from histo or veto mode -tb-
-            [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
-            currSelection = [daqRunModeButton selectedItem];
-        }
-    }
-    
-    // check histo config
-    if(![model histoFeatureIsAvailable]){
-        [histogramDaqModeMenuItem setEnabled:FALSE];
-        ////if(currSelection == histogramDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
-        if([model daqRunMode] == kKatrinFlt_DaqHistogram_Mode) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
-        // take the "best" (=most oftenly needed) mode as default -tb-
-        [histoMessageAboutFPGAVersionField setHidden:FALSE];
-    }else{
-        ////if(currSelection == energyDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
-        if([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode) [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
-        [histogramDaqModeMenuItem setEnabled:TRUE];
-    	[energyDaqModeMenuItem setEnabled:FALSE]; // in histogram mode we have no energy mode -tb-
-        [histoMessageAboutFPGAVersionField setHidden:TRUE];
-    }
-    
-    // check veto config
-    if(![model vetoFeatureIsAvailable]){
-        [vetoDaqModeMenuItem setEnabled:FALSE];
-        ////if(currSelection == vetoDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
-        if([model daqRunMode] == kKatrinFlt_DaqVeto_Mode){
-            if([model histoFeatureIsAvailable])
-                [model setDaqRunMode:kKatrinFlt_DaqHistogram_Mode];
-            else
-                [model setDaqRunMode:kKatrinFlt_DaqEnergy_Mode];
-        }
-    }else{
-        ////if(currSelection == energyDaqModeMenuItem) [model setDaqRunMode:kKatrinFlt_DaqVeto_Mode];
-        if([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode) [model setDaqRunMode:kKatrinFlt_DaqVeto_Mode];
-        [vetoDaqModeMenuItem setEnabled:TRUE];
-    	[energyDaqModeMenuItem setEnabled:FALSE]; // in histogram mode we have no energy mode -tb-
-    }
-
-    //disable or grey out the unavailable channels
-    //  I did not manage to disable the fields, so I gray them out -tb-
-    if([model histoFeatureIsAvailable]){//we have only channels 0,1,12,13 -tb-
-        int chan;
-        for(chan=0; chan < kNumFLTChannels; chan++){
-            if([model histoChanToGroupMap:chan] ==-1){
-                [[gainTextFields  cellWithTag:chan] setBackgroundColor: [NSColor lightGrayColor]];
-                [[thresholdTextFields  cellWithTag:chan] setBackgroundColor: [NSColor lightGrayColor]];
-                //[[gainTextFields  cellWithTag:chan] setEnabled: FALSE];
-            }
-        }
-    }else{//in std or veto config we dont have channels 10,11 -tb-
-        int chan;
-        for(chan=0; chan < kNumFLTChannels; chan++){
-             [[gainTextFields  cellWithTag:chan] setBackgroundColor: [NSColor whiteColor]];
-             [[thresholdTextFields  cellWithTag:chan] setBackgroundColor: [NSColor whiteColor]];
-             //[[gainTextFields  cellWithTag:chan] setEnabled: TRUE];
-        }
-        [[gainTextFields  cellWithTag:10] setBackgroundColor: [NSColor lightGrayColor]];
-        [[gainTextFields  cellWithTag:11] setBackgroundColor: [NSColor lightGrayColor]];
-        //[[gainTextFields  cellWithTag:10] setEnabled: FALSE];
-        //[[gainTextFields  cellWithTag:11] setEnabled: FALSE];
-        [[thresholdTextFields  cellWithTag:10] setBackgroundColor: [NSColor lightGrayColor]];
-        [[thresholdTextFields  cellWithTag:11] setBackgroundColor: [NSColor lightGrayColor]];
-    }
-    
-	[self settingsLockChanged:nil];	//  -tb-  update the GUI!
-
-}
-
-
 
 - (void) readWriteRegisterChanChanged:(NSNotification*)aNote
 {

@@ -157,7 +157,7 @@
 - (void) checkEnergyEnabledChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 - (void) versionRevisionChanged:(NSNotification*)aNote;
-- (void) settingsLockChanged:(NSNotification*)aNote;
+- (void) updateGUI:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) numTestPattersChanged:(NSNotification*)aNote;
 - (void) fltRunModeChanged:(NSNotification*)aNote;
@@ -203,8 +203,6 @@
 - (void) histoClearAfterReadoutChanged:(NSNotification*)aNote;
 - (void) histoStopIfNotClearedChanged:(NSNotification*)aNote;
 - (void) histoSelfCalibrationPercentChanged:(NSNotification*)aNote;
-
-- (void) availableFeaturesChanged:(NSNotification*)aNote;
 
 //low level -tb-
 - (void) readWriteRegisterChanChanged:(NSNotification*)aNote;
