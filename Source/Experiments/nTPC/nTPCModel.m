@@ -69,11 +69,17 @@
     while(seg = [segEnum nextObject]){
 		NSString* contents = [NSString stringWithContentsOfFile: [[seg mapFile] stringByExpandingTildeInPath]] ;
 		NSArray* lines = [contents componentsSeparatedByString:@"\n"]; 
-        [array addObjectsFromArray:lines];
+		NSEnumerator* e = [lines objectEnumerator];
+		NSString* aLine;
+		//limit to the first three items
+		while(aLine = [e nextObject]){
+			NSMutableArray* items = [[aLine componentsSeparatedByString:@","] mutableCopy];
+			if([items count] > 3)[items removeObjectsInRange:NSMakeRange(3,[items count]-3)];
+			[array addObject: [items componentsJoinedByString:@","]];
+			[items release];
+		} 
     }
     if([array count])[objDictionary setObject:array forKey:@"Geometry"];
-
-	
         
     [aDictionary setObject:objDictionary forKey:@"nTPC"];
     return aDictionary;
