@@ -220,6 +220,11 @@ NSString* ORIpeCardExceptionCountChanged		= @"ORIpeCardExceptionCountChanged";
 							  increment:  incr];
 }
 
+- (void)	initVersionRevision
+{
+	//subclass responsiblity
+}
+
 #pragma mark ¥¥¥archival
 - (id)initWithCoder:(NSCoder*)decoder
 {

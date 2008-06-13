@@ -378,8 +378,20 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 - (void) serviceChanged:(NSNotification*)aNote
 {
 	if([fireWireInterface serviceAlive]){
-		//[self checkAndLoadFPGAs];
+		[self checkAndLoadFPGAs];
 		[self readVersion];
+		NS_DURING
+			NSArray* cards = [[self crate] orcaObjects];
+			NSEnumerator* e = [cards objectEnumerator];
+			id card;
+			while (card = [e nextObject]){
+				if([card isKindOfClass:NSClassFromString(@"ORIpeCard")]){
+					[card initVersionRevision];
+				}
+			}
+		NS_HANDLER
+			NSLogColor([NSColor redColor],@"SLT failed FLT FPGA load attempt\n");
+		NS_ENDHANDLER
 	}
 }
 
@@ -391,7 +403,8 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 		NSEnumerator* e = [cards objectEnumerator];
 		id card;
 		while (card = [e nextObject]){
-			if([card isKindOfClass:NSClassFromString(@"ORIpeFLTModel")]){
+			if([card isKindOfClass:NSClassFromString(@"ORIpeCard")] &&
+			  ![card isKindOfClass:[self class]]){
 				//try to access a card. if it throws then we have to load the FPGAs
 				[card readControlStatus];
 				break;	//only need to try one

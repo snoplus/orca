@@ -57,6 +57,7 @@ typedef struct IpeRegisterNamesStruct {
 - (void)clearExceptionCount;
 - (void)incExceptionCount;
 - (int) displayedSlotNumber;
+- (void) initVersionRevision;
 
 - (void) checkPresence;
 

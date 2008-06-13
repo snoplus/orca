@@ -20,7 +20,8 @@
 
 
 #import "ORKatrinSLTModel.h"
-#import "ORKatrinFLTModel.h"//SLT needs to call some FLT code to init and stop histogramming -tb- 2008-04-24
+#import "ORKatrinFLTModel.h"     //SLT needs to call some FLT code to init and stop histogramming -tb- 2008-04-24
+#import "ORFireWireInterface.h"
 
 
 @implementation ORKatrinSLTModel
@@ -74,6 +75,17 @@
 
    [super initBoard];
 }
+
+
+//MAH added the initBoard call
+- (void) serviceChanged:(NSNotification*)aNote
+{
+	if([[self fireWireInterface] serviceAlive]){
+		[self initBoard];
+	}
+	[super serviceChanged:aNote];
+}
+
 
 #pragma mark •••Accessors
 /** Used to open the alarm view only once if there are the same alarms from several 

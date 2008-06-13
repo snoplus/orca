@@ -110,14 +110,6 @@ NSString* ORKatrinFLTModelHistoStopIfNotClearedChanged     = @"ORKatrinFLTModelH
 NSString* ORKatrinFLTModelReadWriteRegisterChanChanged     = @"ORKatrinFLTModelReadWriteRegisterChanChanged";
 NSString* ORKatrinFLTModelReadWriteRegisterNameChanged     = @"ORKatrinFLTModelReadWriteRegisterNameChanged";
 
-    
-    
-
-
-    
-    
-    
-
 enum {
 	kFLTControlRegCode			= 0x0L,
 	kFLTTimeCounterCode			= 0x1L,
@@ -195,7 +187,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     NS_HANDLER
         versionRegister = 0x00200000;//  in simulation mode this will emulate version 3.x -tb- 2008-04-21
         NSLog(@"FLT %i: reading Version+Revision Register failed - emulate ver. %i\n",[self stationNumber]/*[self slot]+1*/,[self versionRegHWVersion] );
-versionRegisterIsUptodate=FALSE;
+		versionRegisterIsUptodate=FALSE;
         //versionRegister = 0;
 	NS_ENDHANDLER
     
@@ -228,15 +220,14 @@ versionRegisterIsUptodate=FALSE;
     
     //warnings (only if a FPGA configuration was (probably) detected)
     if([self versionRegHWVersion]>=0x3){
-        if( (oldVersionRegister!=versionRegister) || !versionRegisterIsUptodate){
+        if( (oldVersionRegister!=versionRegister)){
             //message if: 1. register changed, 2. first call
             sltmodel = [[self crate] adapter];
             ORAlarm *alarm = [sltmodel fltFPGAConfigurationAlarm];
             //TODO: could move this all to SLT funtcion; memory management? -tb- 2008-05-29
             if(!alarm){
-			    alarm = [[ORAlarm alloc] initWithName:@"FLT FPGA configuration detected." severity:kInformationAlarm];
-			    [alarm setSticky:YES];
-			    [alarm setAcknowledged:NO];	
+			    alarm = [[ORAlarm alloc] initWithName:@"FLT FPGA change detected." severity:kInformationAlarm];
+			    [alarm setSticky:NO];
                 [alarm setHelpString:@"See Status Log for details."];
                 [sltmodel setFltFPGAConfigurationAlarm: alarm];
 		    }
@@ -372,9 +363,7 @@ versionRegisterIsUptodate=FALSE;
 	[thresholds release];
 	[gains release];
 	[totalRate release];
-    if(histogramData){
-        [histogramData release]; //do I need to release the NSMutableDate in this array? no; I already released it -tb-
-    }
+    [histogramData release]; //do I need to release the NSMutableDate in this array? no; I already released it -tb-
 	[super dealloc];
 }
 
@@ -417,8 +406,10 @@ versionRegisterIsUptodate=FALSE;
 
 - (void) serviceChanged:(NSNotification*)aNote
 {
+	//----
+	//moved this to the SLT code. MAH 06/10/08
     //NSLog(@"ORKatrinFLTModel::Received Notification serviceChanged or HW_Reset<---\n");
-    [self initVersionRevision]; // -tb- 2008-03-13
+    //[self initVersionRevision]; // -tb- 2008-03-13
 	//if([fireWireInterface serviceAlive]){
 	//	//[self checkAndLoadFPGAs];
 	//	[self readVersion];
@@ -3565,20 +3556,30 @@ return hitRateId;
         }
 	}
     
+	//------------------------------------------------------------------------------------------
+	//Till -- a better solution here is to save the current feature set, then probe for the feature set 
+	//only if the firewire service toggles or if the user pushes the version button. 
+	[self setStdFeatureIsAvailable:   [decoder decodeBoolForKey:@"stdFeatureIsAvailable"]];
+	[self setVetoFeatureIsAvailable:  [decoder decodeBoolForKey:@"vetoFeatureIsAvailable"]];
+	[self setHistoFeatureIsAvailable: [decoder decodeBoolForKey:@"histoFeatureIsAvailable"]];
+	[self setVersionRegister:		  [decoder decodeIntForKey:@"versionRegister"]];
+	
+	/*
     //version control - at this time firewire is (sometimes) not available -tb- 2008-03-13
     NS_DURING
-    //NSLog(@"--- initWithCoder::Read from register initVersionRevision---\n");
-    [self initVersionRevision];
+		//NSLog(@"--- initWithCoder::Read from register initVersionRevision---\n");
+		[self initVersionRevision];
     NS_HANDLER
-    versionRegisterIsUptodate=FALSE;
-    {  //set default
-        [self setStdFeatureIsAvailable:   YES];
-        [self setVetoFeatureIsAvailable:  YES];
-        [self setHistoFeatureIsAvailable: YES];
-    }
-    NSLog(@"initWithCoder::Read from register initVersionRevision FAILED\n");
+		versionRegisterIsUptodate=FALSE;
+		{  //set default
+			[self setStdFeatureIsAvailable:   YES];
+			[self setVetoFeatureIsAvailable:  YES];
+			[self setHistoFeatureIsAvailable: YES];
+		}
+		NSLog(@"initWithCoder::Read from register initVersionRevision FAILED\n");
     NS_ENDHANDLER
-		
+	*/	
+	//------------------------------------------------------------------------------------------
 
     [[self undoManager] enableUndoRegistration];
 	
@@ -3632,8 +3633,11 @@ return hitRateId;
     [encoder encodeInt:histoClearAfterReadout      forKey:@"ORKatrinFLTModelHistoClearAfterReadout"];	
     [encoder encodeInt:histoStopIfNotCleared       forKey:@"ORKatrinFLTModelHistoStopIfNotCleared"];	
     [encoder encodeInt:histoSelfCalibrationPercent forKey:@"ORKatrinFLTModelHistoSelfCalibrationPercent"];	
-    
 
+    [encoder encodeBool:stdFeatureIsAvailable  forKey:@"stdFeatureIsAvailable"];	
+    [encoder encodeBool:vetoFeatureIsAvailable forKey:@"vetoFeatureIsAvailable"];	
+    [encoder encodeBool:histoFeatureIsAvailable forKey:@"histoFeatureIsAvailable"];	
+    [encoder encodeInt:versionRegister forKey:@"versionRegister"];	
 }
 
 
