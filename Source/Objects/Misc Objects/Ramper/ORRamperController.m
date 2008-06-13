@@ -277,15 +277,16 @@
 		[model setSelectedRampItem:[[model rampItems] objectAtIndex:0]];
 		item = [model selectedRampItem];
 	}
-	[titleField setStringValue:[NSString stringWithFormat:@"%@",[item itemName]]];
-	
-	NSMutableArray* rampItems = [model rampItems];
-	NSEnumerator* e = [rampItems objectEnumerator];
-	ORRampItem* anItem;
-	while(anItem = [e nextObject]){
-		[anItem scaleToMaxTime:[xAxis maxValue]];
-	}
+	if(item && [item targetObject]){
+		[titleField setStringValue:[NSString stringWithFormat:@"%@",[item itemName]]];
 
+		NSMutableArray* rampItems = [model rampItems];
+		NSEnumerator* e = [rampItems objectEnumerator];
+		ORRampItem* anItem;
+		while(anItem = [e nextObject]){
+			[anItem scaleToMaxTime:[xAxis maxValue]];
+		}
+	}
 }
 
 - (void) setButtonStates

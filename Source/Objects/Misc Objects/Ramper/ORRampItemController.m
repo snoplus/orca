@@ -180,7 +180,7 @@
 			if(index<0)[targetNamePU addItemWithTitle:theName];
 		}
 	}
-	[targetNamePU selectItemWithTitle:[model targetName]];
+	if([model targetName])[targetNamePU selectItemWithTitle:[model targetName]];
 }
 
 - (NSMutableDictionary*) miscAttributesForKey:(NSString*)aKey

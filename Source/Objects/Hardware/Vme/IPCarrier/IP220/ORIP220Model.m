@@ -75,6 +75,10 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 {
 	if(index<16){
 		[[[self undoManager] prepareWithInvocationTarget:self] setOutputVoltage:index withValue:outputVoltage[index]];
+
+		if(aValue< -10)aValue = -10;
+		else if(aValue>9.98)aValue = 9.98;
+		
 		outputVoltage[index] = aValue;
 		[[NSNotificationCenter defaultCenter]
 			postNotificationName:ORIP220VoltageChanged
