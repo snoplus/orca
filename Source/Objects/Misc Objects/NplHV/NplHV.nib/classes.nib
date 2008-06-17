@@ -190,6 +190,8 @@
 				<string>id</string>
 				<key>sendCmdAction</key>
 				<string>id</string>
+				<key>version</key>
+				<string>id</string>
 				<key>writeValueAction</key>
 				<string>id</string>
 			</dict>

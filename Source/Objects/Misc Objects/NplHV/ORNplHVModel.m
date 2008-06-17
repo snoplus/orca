@@ -21,19 +21,14 @@
 
 #pragma mark •••Imported Files
 #import "ORNplHVModel.h"
-#import "NetSocket.h"
+#import "ORNPLCommBoardModel.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORHVRampItem.h"
 
-NSString* ORNplHVModelWriteValueChanged		= @"ORNplHVModelWriteValueChanged";
-NSString* ORNplHVModelFunctionChanged		= @"ORNplHVModelFunctionChanged";
-NSString* ORNplHVModelChannelChanged		= @"ORNplHVModelChannelChanged";
-NSString* ORNplHVModelBoardChanged			= @"ORNplHVModelBoardChanged";
-NSString* ORNplHVModelCmdStringChanged		= @"ORNplHVModelCmdStringChanged";
-NSString* ORNplHVModelIsConnectedChanged	= @"ORNplHVModelIsConnectedChanged";
-NSString* ORNplHVModelIpAddressChanged		= @"ORNplHVModelIpAddressChanged";
 NSString* ORNplHVLock						= @"ORNplHVLock";
+NSString* HVToCommBoxConnector				= @"HVToCommBoxConnector";
+
 
 @implementation ORNplHVModel
 
@@ -44,24 +39,31 @@ NSString* ORNplHVLock						= @"ORNplHVLock";
 
 - (void) dealloc
 {
-	[socket close];
-	[socket release];
     [super dealloc];
-}
-
-- (void) awakeAfterDocumentLoaded
-{
-	NS_DURING
-		[self connect];
-		[self connectionChanged];
-	NS_HANDLER
-	NS_ENDHANDLER
 }
 
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"NplHVIcon"]];
 }
+
+- (void) awakeAfterDocumentLoaded
+{
+	comBoard	= [[[[self connectors] objectForKey:HVToCommBoxConnector] connector] objectLink];
+	boardNumber = [[[[self connectors] objectForKey:HVToCommBoxConnector] connector] identifer];
+
+}
+
+ - (void) makeConnectors
+ {
+	ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(0,[self frame].size.height/2 - kConnectorSize/2) withGuardian:self withObjectLink:self];
+	[[self connectors] setObject:aConnector forKey:HVToCommBoxConnector];
+	[aConnector setConnectorType: 'NSLV' ];
+	[aConnector setIoType:kInputConnector];
+	[aConnector addRestrictedConnectionType: 'NCmO' ]; //can only connect to Comm Boards
+	[aConnector release];
+}
+
 
 - (void) addRampItem
 {
@@ -93,118 +95,6 @@ NSString* ORNplHVLock						= @"ORNplHVLock";
 - (NSString*) lockName
 {
 	return ORNplHVLock;
-}
-
-
-- (int) writeValue
-{
-    return writeValue;
-}
-
-- (void) setWriteValue:(int)aWriteValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:writeValue];
-    
-    writeValue = aWriteValue;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelWriteValueChanged object:self];
-}
-
-- (int) functionNumber
-{
-    return functionNumber;
-}
-
-- (void) setFunctionNumber:(int)aFunction
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFunctionNumber:functionNumber];
-    
-    functionNumber = aFunction;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelFunctionChanged object:self];
-}
-
-- (int) channel
-{
-    return channel;
-}
-
-- (void) setChannel:(int)aChannel
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setChannel:channel];
-    
-    channel = aChannel;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelChannelChanged object:self];
-}
-
-- (int) board
-{
-    return board;
-}
-
-- (void) setBoard:(int)aBoard
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setBoard:board];
-    
-    board = aBoard;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelBoardChanged object:self];
-}
-
-- (NetSocket*) socket
-{
-	return socket;
-}
-
-- (void) setSocket:(NetSocket*)aSocket
-{
-	if(aSocket != socket)[socket close];
-	[aSocket retain];
-	[socket release];
-	socket = aSocket;
-    [socket setDelegate:self];
-}
-
-- (void) setIsConnected:(BOOL)aFlag
-{
-    isConnected = aFlag;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelIsConnectedChanged object:self];
-}
-
-- (NSString*) ipAddress
-{
-    return ipAddress;
-}
-
-- (void) setIpAddress:(NSString*)aIpAddress
-{
-	if(!aIpAddress)aIpAddress = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setIpAddress:ipAddress];
-    
-    [ipAddress autorelease];
-    ipAddress = [aIpAddress copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORNplHVModelIpAddressChanged object:self];
-}
-
-
-- (void) connect
-{
-	if(!isConnected){
-		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kNplHVPort]];	
-        [self setIsConnected:[socket isConnected]];
-	}
-	else {
-		[self setSocket:nil];	
-        [self setIsConnected:[socket isConnected]];
-	}
-}
-
-- (BOOL) isConnected
-{
-	return isConnected;
 }
 
 - (int) adc:(int)aChan
@@ -259,34 +149,6 @@ NSString* ORNplHVLock						= @"ORNplHVLock";
 	}
 }
 
-#pragma mark ***Delegate Methods
-- (void) netsocketConnected:(NetSocket*)inNetSocket
-{
-    if(inNetSocket == socket){
-        [self setIsConnected:[socket isConnected]];
-    }
-}
-
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
-{
-    if(inNetSocket == socket){
-		NSData* theData = [inNetSocket readData];
-		char* theBytes = (char*)[theData bytes];
-		int i;
-		for(i=0;i<[theData length];i++){
-			NSLog(@"From NPL HV [%d]: 0x%x\n",i,theBytes[i]);
-		}
-	}
-}
-
-- (void) netsocketDisconnected:(NetSocket*)inNetSocket
-{
-    if(inNetSocket == socket){
-        [self setIsConnected:NO];
-		[socket autorelease];
-		socket = nil;
-    }
-}
 
 
 #pragma mark ***Archival
@@ -295,11 +157,6 @@ NSString* ORNplHVLock						= @"ORNplHVLock";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setWriteValue:	[decoder decodeIntForKey:	@"writeValue"]];
-    [self setFunctionNumber:[decoder decodeIntForKey:	@"function"]];
-    [self setChannel:		[decoder decodeIntForKey:	@"channel"]];
-    [self setBoard:			[decoder decodeIntForKey:	@"board"]];
-	[self setIpAddress:		[decoder decodeObjectForKey:@"ipAddress"]];
     [[self undoManager] enableUndoRegistration];    
 		
     return self;
@@ -308,15 +165,14 @@ NSString* ORNplHVLock						= @"ORNplHVLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:writeValue		forKey: @"writeValue"];
-    [encoder encodeInt:functionNumber	forKey: @"function"];
-    [encoder encodeInt:channel			forKey: @"channel"];
-    [encoder encodeInt:board			forKey: @"board"];
-    [encoder encodeObject:ipAddress		forKey: @"ipAddress"];
 }
 
 - (void) sendCmd
 {	
+/*
+    ORConnector* aConnection = [[[self connectors] objectForKey:HVToCommBoxConnector] connector];
+    int board =  [aConnection identifer];
+
 	//send the values from the basic ops
 	char bytes[6];
 	bytes[0] = 5;
@@ -326,6 +182,7 @@ NSString* ORNplHVLock						= @"ORNplHVLock";
 	bytes[4] = (writeValue>>8 & 0xf); 
 	bytes[5] = writeValue & 0xf; 
 	[socket write:bytes length:6];
+*/
 }
 
 - (SEL) getMethodSelector
@@ -359,8 +216,21 @@ NSString* ORNplHVLock						= @"ORNplHVLock";
 	bytes[3] = (aValue>>16 & 0xf);
 	bytes[4] = (aValue>>8 & 0xf); 
 	bytes[5] = aValue & 0xf; 
-	[socket write:bytes length:6];
+	//[socket write:bytes length:6];
 }
+
+- (void) version
+{
+	[comBoard sendB:boardNumber s:0 f:01 controlReg: kNplHVRevision | kNplHvRead valueLen:1 value:0];
+}
+
+- (void) connectionChanged
+{
+	comBoard	= [[[[self connectors] objectForKey:HVToCommBoxConnector] connector] objectLink];
+	boardNumber = [[[[self connectors] objectForKey:HVToCommBoxConnector] connector] identifer];
+}
+
+
 
 #pragma mark •••HW Wizard
 //the next two methods exist only to 'fake' out Hardware wizard and the Ramper so this item can be selected
@@ -369,7 +239,7 @@ NSString* ORNplHVLock						= @"ORNplHVLock";
 
 - (int) numberOfChannels
 {
-    return 8;
+    return 4;
 }
 
 - (BOOL) hasParmetersToRamp

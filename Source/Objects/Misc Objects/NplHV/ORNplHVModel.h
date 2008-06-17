@@ -23,18 +23,33 @@
 #import "ORRamperModel.h"
 #import "ORHWWizard.h"
 
-#define kNplHVPort 5000
-
 @class NetSocket;
 
-@interface ORNplHVModel : ORRamperModel <ORHWWizard,ORHWRamping> {
-    NSString* ipAddress;
-    BOOL isConnected;
-	NetSocket* socket;
-    int board;
-    int channel;
-    int functionNumber;
-    int writeValue;
+//reg defs for ADC AD7734
+
+#define kNplHVCommReg			0x0
+#define kNplHVIOPort			0x1
+#define kNplHVRevision			0x2
+#define kNplHVTest				0x3
+#define kNplHVIOAdcStatus		0x4
+#define kNplHVCheckSum			0x5
+#define kNplHVAdc0ScaleCalib	0x6
+#define kNplHVAdcFullScale		0x7
+#define kNplHVChanData			0x8
+#define kNplHVChan0ScaleCal		0x10
+#define kNplHVChanFSCal			0x18
+#define kNplHVChanStatus		0x20
+#define kNplHVChanSetup			0x28
+#define kNplHVChanConvTime		0x30
+#define kNplHVMode				0x38
+
+#define kNplHvRead				0x40
+#define kNplHvWrite				0x00
+
+@interface ORNplHVModel : ORRamperModel <ORHWWizard,ORHWRamping> 
+{
+	id comBoard;
+	int boardNumber;
 	int dac[8];
 	int adc[8];
 	int current[8];
@@ -42,21 +57,6 @@
 }
 
 #pragma mark ***Accessors
-- (int) writeValue;
-- (void) setWriteValue:(int)aWriteValue;
-- (int) functionNumber;
-- (void) setFunctionNumber:(int)aFunction;
-- (int) channel;
-- (void) setChannel:(int)aChannel;
-- (int) board;
-- (void) setBoard:(int)aBoard;
-- (NetSocket*) socket;
-- (void) setSocket:(NetSocket*)aSocket;
-- (BOOL) isConnected;
-- (void) setIsConnected:(BOOL)aFlag;
-- (NSString*) ipAddress;
-- (void) setIpAddress:(NSString*)aIpAddress;
-
 - (int) adc:(int)aChan;
 - (void) setAdc:(int)channel withValue:(int)aValue;
 - (int) dac:(int)aChan;
@@ -70,9 +70,9 @@
 - (SEL) initMethodSelector;
 - (void) junk;
 - (void) loadDac:(int)aChan;
+- (void) version;
 
 #pragma mark ***Utilities
-- (void) connect;
 - (void) sendCmd;
 
 #pragma mark ***Archival
@@ -81,10 +81,3 @@
 @end
 
 extern NSString* ORNplHVLock;
-extern NSString* ORNplHVModelWriteValueChanged;
-extern NSString* ORNplHVModelFunctionChanged;
-extern NSString* ORNplHVModelChannelChanged;
-extern NSString* ORNplHVModelBoardChanged;
-extern NSString* ORNplHVModelCmdStringChanged;
-extern NSString* ORNplHVModelIsConnectedChanged;
-extern NSString* ORNplHVModelIpAddressChanged;

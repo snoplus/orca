@@ -373,7 +373,6 @@
 		842539FC0BCD7BFE004C8065 /* ORCARootService.nib in Resources */ = {isa = PBXBuildFile; fileRef = 842539F70BCD7BFE004C8065 /* ORCARootService.nib */; };
 		842539FD0BCD7BFE004C8065 /* ORCARootServiceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 842539F80BCD7BFE004C8065 /* ORCARootServiceController.h */; };
 		842539FE0BCD7BFE004C8065 /* ORCARootServiceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */; };
-		84253BB20BCDA410004C8065 /* ORCARoot.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84253BB10BCDA410004C8065 /* ORCARoot.gif */; };
 		842702810B5EE938009176B4 /* katrin.gif in Resources */ = {isa = PBXBuildFile; fileRef = 842702800B5EE937009176B4 /* katrin.gif */; };
 		84281C7E0D7E19C50021B820 /* ORIP320Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */; };
 		84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */; };
@@ -419,7 +418,6 @@
 		842DAEBF0A82CA8400C942A2 /* ORBiRa2351IModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 842DAEB90A82CA8400C942A2 /* ORBiRa2351IModel.h */; };
 		842DAEC00A82CA8400C942A2 /* ORBiRa2351IModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 842DAEBA0A82CA8400C942A2 /* ORBiRa2351IModel.m */; };
 		8431D2FF096F11E600995510 /* DGF4c.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8431D2FE096F11E600995510 /* DGF4c.nib */; };
-		843278DC0BD413E100D19DCD /* ORCARootService.gif in Resources */ = {isa = PBXBuildFile; fileRef = 843278DB0BD413E100D19DCD /* ORCARootService.gif */; };
 		8434149D08EDF240009B7659 /* NoFireWireServiceHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8434149C08EDF240009B7659 /* NoFireWireServiceHelp.plist */; };
 		8434150D08EE0378009B7659 /* ORCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8434150B08EE0378009B7659 /* ORCrateController.h */; };
 		8434150E08EE0378009B7659 /* ORCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434150C08EE0378009B7659 /* ORCrateController.m */; };
@@ -960,6 +958,14 @@
 		846F4BA2098FE10900BF0031 /* RunNotVetoed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846F4BA1098FE10900BF0031 /* RunNotVetoed.tif */; };
 		846F4BE8098FFECC00BF0031 /* RunControlVetoed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846F4BE7098FFECC00BF0031 /* RunControlVetoed.tif */; };
 		846F4D4209900F2B00BF0031 /* RunVetoed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846F4D4109900F2B00BF0031 /* RunVetoed.tif */; };
+		8470194D0E02EDAC00195E3E /* NPLCommBoard.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847019470E02EDAC00195E3E /* NPLCommBoard.nib */; };
+		8470194E0E02EDAC00195E3E /* NPLCommBoardIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847019480E02EDAC00195E3E /* NPLCommBoardIcon.tif */; };
+		8470194F0E02EDAC00195E3E /* ORNPLCommBoardController.h in Headers */ = {isa = PBXBuildFile; fileRef = 847019490E02EDAC00195E3E /* ORNPLCommBoardController.h */; };
+		847019500E02EDAC00195E3E /* ORNPLCommBoardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8470194A0E02EDAC00195E3E /* ORNPLCommBoardController.m */; };
+		847019510E02EDAC00195E3E /* ORNPLCommBoardModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8470194B0E02EDAC00195E3E /* ORNPLCommBoardModel.h */; };
+		847019520E02EDAC00195E3E /* ORNPLCommBoardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8470194C0E02EDAC00195E3E /* ORNPLCommBoardModel.m */; };
+		84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AC90E0342F200195E3E /* ORCARoot.tif */; };
+		84701AD40E0344CF00195E3E /* ORCARootService.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AD30E0344CF00195E3E /* ORCARootService.tif */; };
 		84719DF4090591ED0077548A /* ORAugerFLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84719DF2090591ED0077548A /* ORAugerFLTDecoder.h */; };
 		84719DF5090591ED0077548A /* ORAugerFLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84719DF3090591ED0077548A /* ORAugerFLTDecoder.m */; };
 		84719DFA090593160077548A /* ORAugerCardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84719DF8090593160077548A /* ORAugerCardDecoder.h */; };
@@ -2278,7 +2284,6 @@
 		842539F70BCD7BFE004C8065 /* ORCARootService.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ORCARootService.nib; path = "Source/Main Dialogs/ORCARootService/ORCARootService.nib"; sourceTree = SOURCE_ROOT; };
 		842539F80BCD7BFE004C8065 /* ORCARootServiceController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCARootServiceController.h; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceController.h"; sourceTree = SOURCE_ROOT; };
 		842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCARootServiceController.m; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceController.m"; sourceTree = SOURCE_ROOT; };
-		84253BB10BCDA410004C8065 /* ORCARoot.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = ORCARoot.gif; path = "Source/Main Dialogs/ORCARootService/ORCARoot.gif"; sourceTree = SOURCE_ROOT; };
 		842702800B5EE937009176B4 /* katrin.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = katrin.gif; path = Source/Experiments/Katrin/katrin.gif; sourceTree = SOURCE_ROOT; };
 		84281C7C0D7E19C50021B820 /* ORIP320Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIP320Decoders.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.h; sourceTree = SOURCE_ROOT; };
 		84281C7D0D7E19C50021B820 /* ORIP320Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIP320Decoders.m; path = Source/Objects/Hardware/Vme/IPCarrier/IP320/ORIP320Decoders.m; sourceTree = SOURCE_ROOT; };
@@ -2344,7 +2349,6 @@
 		842F2341047D3655005F64B1 /* ThreadWorker.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ThreadWorker.m; path = "Source/Objects/Misc Objects/Workers/ThreadWorker.m"; sourceTree = SOURCE_ROOT; };
 		842F2343047D365F005F64B1 /* ThreadWorker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ThreadWorker.h; path = "Source/Objects/Misc Objects/Workers/ThreadWorker.h"; sourceTree = SOURCE_ROOT; };
 		8431D2FE096F11E600995510 /* DGF4c.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = DGF4c.nib; path = Source/Objects/Hardware/Camac/DGF4c/DGF4c.nib; sourceTree = SOURCE_ROOT; };
-		843278DB0BD413E100D19DCD /* ORCARootService.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = ORCARootService.gif; path = "Source/Main Document/ORCARootService.gif"; sourceTree = SOURCE_ROOT; };
 		8434149C08EDF240009B7659 /* NoFireWireServiceHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = NoFireWireServiceHelp.plist; path = "Source/Objects/Misc Objects/FireWire/NoFireWireServiceHelp.plist"; sourceTree = SOURCE_ROOT; };
 		8434150B08EE0378009B7659 /* ORCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCrateController.h; sourceTree = "<group>"; };
 		8434150C08EE0378009B7659 /* ORCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCrateController.m; sourceTree = "<group>"; };
@@ -2617,6 +2621,14 @@
 		846F4BA1098FE10900BF0031 /* RunNotVetoed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RunNotVetoed.tif; sourceTree = "<group>"; };
 		846F4BE7098FFECC00BF0031 /* RunControlVetoed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunControlVetoed.tif; path = Source/Objects/Control/RunControl/RunControlVetoed.tif; sourceTree = SOURCE_ROOT; };
 		846F4D4109900F2B00BF0031 /* RunVetoed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunVetoed.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto/RunVetoed.tif; sourceTree = SOURCE_ROOT; };
+		847019470E02EDAC00195E3E /* NPLCommBoard.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NPLCommBoard.nib; path = "Source/Objects/Misc Objects/NPLCommBoard/NPLCommBoard.nib"; sourceTree = SOURCE_ROOT; };
+		847019480E02EDAC00195E3E /* NPLCommBoardIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NPLCommBoardIcon.tif; path = "Source/Objects/Misc Objects/NPLCommBoard/NPLCommBoardIcon.tif"; sourceTree = SOURCE_ROOT; };
+		847019490E02EDAC00195E3E /* ORNPLCommBoardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardController.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardController.h"; sourceTree = SOURCE_ROOT; };
+		8470194A0E02EDAC00195E3E /* ORNPLCommBoardController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNPLCommBoardController.m; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardController.m"; sourceTree = SOURCE_ROOT; };
+		8470194B0E02EDAC00195E3E /* ORNPLCommBoardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardModel.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.h"; sourceTree = SOURCE_ROOT; };
+		8470194C0E02EDAC00195E3E /* ORNPLCommBoardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNPLCommBoardModel.m; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.m"; sourceTree = SOURCE_ROOT; };
+		84701AC90E0342F200195E3E /* ORCARoot.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARoot.tif; path = "Source/Main Dialogs/ORCARootService/ORCARoot.tif"; sourceTree = SOURCE_ROOT; };
+		84701AD30E0344CF00195E3E /* ORCARootService.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARootService.tif; path = "Source/Main Document/ORCARootService.tif"; sourceTree = SOURCE_ROOT; };
 		84719DF2090591ED0077548A /* ORAugerFLTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerFLTDecoder.h; path = Source/Objects/Hardware/Auger/AugerFLT/ORAugerFLTDecoder.h; sourceTree = SOURCE_ROOT; };
 		84719DF3090591ED0077548A /* ORAugerFLTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAugerFLTDecoder.m; path = Source/Objects/Hardware/Auger/AugerFLT/ORAugerFLTDecoder.m; sourceTree = SOURCE_ROOT; };
 		84719DF8090593160077548A /* ORAugerCardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerCardDecoder.h; path = "Source/Objects/Hardware/Auger/Auger Base Classes/ORAugerCardDecoder.h"; sourceTree = SOURCE_ROOT; };
@@ -4787,6 +4799,7 @@
 			isa = PBXGroup;
 			children = (
 				84AB8BB30D2314A500EC39F2 /* CmdHistory */,
+				847019460E02EDAC00195E3E /* NPLCommBoard */,
 				9C1363AF0D0A78FC006C550D /* NplHV */,
 				846C51250DBD3221005D6566 /* NplPicoCoulombMeter */,
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
@@ -4910,7 +4923,7 @@
 				842539F60BCD7BFE004C8065 /* ORCARootService.m */,
 				842539F80BCD7BFE004C8065 /* ORCARootServiceController.h */,
 				842539F90BCD7BFE004C8065 /* ORCARootServiceController.m */,
-				84253BB10BCDA410004C8065 /* ORCARoot.gif */,
+				84701AC90E0342F200195E3E /* ORCARoot.tif */,
 				842539F70BCD7BFE004C8065 /* ORCARootService.nib */,
 			);
 			name = ORCARootService;
@@ -5580,6 +5593,20 @@
 			);
 			name = RunVeto;
 			path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto;
+			sourceTree = SOURCE_ROOT;
+		};
+		847019460E02EDAC00195E3E /* NPLCommBoard */ = {
+			isa = PBXGroup;
+			children = (
+				847019470E02EDAC00195E3E /* NPLCommBoard.nib */,
+				847019480E02EDAC00195E3E /* NPLCommBoardIcon.tif */,
+				847019490E02EDAC00195E3E /* ORNPLCommBoardController.h */,
+				8470194A0E02EDAC00195E3E /* ORNPLCommBoardController.m */,
+				8470194B0E02EDAC00195E3E /* ORNPLCommBoardModel.h */,
+				8470194C0E02EDAC00195E3E /* ORNPLCommBoardModel.m */,
+			);
+			name = NPLCommBoard;
+			path = "Source/Objects/Misc Objects/NPLCommBoard";
 			sourceTree = SOURCE_ROOT;
 		};
 		8472AD670A82BD8E0069A069 /* BiRa3251 */ = {
@@ -7874,7 +7901,7 @@
 				844E5CD606236ACD0051849B /* TaskMaster.gif */,
 				847BF76607A588B700F91E05 /* GateKeeper.gif */,
 				840B7DAF094DFBCB00B1B135 /* ProcessCenter.tif */,
-				843278DB0BD413E100D19DCD /* ORCARootService.gif */,
+				84701AD30E0344CF00195E3E /* ORCARootService.tif */,
 				F51E697203AE4775015F64B1 /* Document.nib */,
 			);
 			path = "Main Document";
@@ -8776,6 +8803,8 @@
 				8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */,
 				8407FBA90DF9CC22000F1441 /* ORHVRampItemController.h in Headers */,
 				8407FBAB0DF9CC22000F1441 /* ORHVRampItem.h in Headers */,
+				8470194F0E02EDAC00195E3E /* ORNPLCommBoardController.h in Headers */,
+				847019510E02EDAC00195E3E /* ORNPLCommBoardModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9192,8 +9221,6 @@
 				842538510BC6E006004C8065 /* HP6622a.nib in Resources */,
 				842538520BC6E006004C8065 /* HP6622a.tif in Resources */,
 				842539FC0BCD7BFE004C8065 /* ORCARootService.nib in Resources */,
-				84253BB20BCDA410004C8065 /* ORCARoot.gif in Resources */,
-				843278DC0BD413E100D19DCD /* ORCARootService.gif in Resources */,
 				84A2E2B20BE64B6200F09FA2 /* AugerFLT.nib in Resources */,
 				849DA4DF0BE7BBE600044320 /* LakeShore210.nib in Resources */,
 				849DA4E00BE7BBE600044320 /* LakeShore210.tif in Resources */,
@@ -9316,6 +9343,10 @@
 				8407F0E50DEF66DB000F1441 /* Caen862.nib in Resources */,
 				8407F0EB0DEF6700000F1441 /* C862.gif in Resources */,
 				8407FAB40DF9A32F000F1441 /* HVRampItem.nib in Resources */,
+				8470194D0E02EDAC00195E3E /* NPLCommBoard.nib in Resources */,
+				8470194E0E02EDAC00195E3E /* NPLCommBoardIcon.tif in Resources */,
+				84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */,
+				84701AD40E0344CF00195E3E /* ORCARootService.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9950,6 +9981,8 @@
 				8407F0E90DEF66DB000F1441 /* ORCaen862Model.m in Sources */,
 				8407FBA80DF9CC22000F1441 /* ORHVRampItemController.m in Sources */,
 				8407FBAA0DF9CC22000F1441 /* ORHVRampItem.m in Sources */,
+				847019500E02EDAC00195E3E /* ORNPLCommBoardController.m in Sources */,
+				847019520E02EDAC00195E3E /* ORNPLCommBoardModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

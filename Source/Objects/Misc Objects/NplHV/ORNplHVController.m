@@ -55,36 +55,6 @@
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
     [ super registerNotificationObservers ];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(ipAddressChanged:)
-                         name : ORNplHVModelIpAddressChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(isConnectedChanged:)
-                         name : ORNplHVModelIsConnectedChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(boardChanged:)
-                         name : ORNplHVModelBoardChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(channelChanged:)
-                         name : ORNplHVModelChannelChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(functionChanged:)
-                         name : ORNplHVModelFunctionChanged
-						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(writeValueChanged:)
-                         name : ORNplHVModelWriteValueChanged
-						object: model];
-
 	[notifyCenter addObserver : self
 					 selector : @selector(lockChanged:)
 						 name : ORRunStatusChangedNotification
@@ -101,12 +71,6 @@
 {
     [ super updateWindow ];
     
-	[self ipAddressChanged:nil];
-	[self isConnectedChanged:nil];
-	[self boardChanged:nil];
-	[self channelChanged:nil];
-	[self functionChanged:nil];
-	[self writeValueChanged:nil];
     [self lockChanged:nil];
 }
 
@@ -140,55 +104,20 @@
 
 - (void) updateButtons
 {
-	[writeValueField setEnabled:[model functionNumber] >= 2];
 }
 
-- (void) writeValueChanged:(NSNotification*)aNote
-{
-	[writeValueField setIntValue: [model writeValue]];
-}
 
-- (void) functionChanged:(NSNotification*)aNote
-{
-	[functionPU selectItemAtIndex: [model functionNumber]];
-	[self updateButtons];
-}
 
-- (void) channelChanged:(NSNotification*)aNote
-{
-	[channelPU selectItemAtIndex: [model channel]];
-}
-
-- (void) boardChanged:(NSNotification*)aNote
-{
-	[boardPU selectItemAtIndex: [model board]];
-}
 
 #pragma mark •••Notifications
-- (void) isConnectedChanged:(NSNotification*)aNote
-{
-	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
-	[ipConnectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
-}
-
-- (void) ipAddressChanged:(NSNotification*)aNote
-{
-	[ipAddressTextField setStringValue: [model ipAddress]];
-}
 
 - (void) setButtonStates
 {
-    BOOL runInProgress  = [gOrcaGlobals runInProgress];
+    //BOOL runInProgress  = [gOrcaGlobals runInProgress];
     BOOL locked			= [gSecurity isLocked:ORNplHVLock];
 	int  ramping		= [model runningCount]>0;
 
     [lockButton setState: locked];
-	[ipConnectButton setEnabled:!runInProgress || !locked && !ramping];
-	[ipAddressTextField setEnabled:!locked && !ramping];
-	[writeValueField setEnabled:!locked && [model functionNumber] >= 2 && !ramping];
-	[functionPU setEnabled:!locked && !ramping];
-	[channelPU setEnabled:!locked && !ramping];
-	[boardPU setEnabled:!locked && !ramping];
 	[sendButton setEnabled:!locked && !ramping];
 	[super setButtonStates];
 }
@@ -205,36 +134,6 @@
 }
 
 #pragma mark •••Actions
-- (void) writeValueAction:(id)sender
-{
-	[model setWriteValue:[sender intValue]];	
-}
-
-- (void) functionAction:(id)sender
-{
-	[model setFunctionNumber:[sender indexOfSelectedItem]];	
-}
-
-- (void) channelAction:(id)sender
-{
-	[model setChannel:[sender indexOfSelectedItem]];	
-}
-
-- (void) boardAction:(id)sender
-{
-	[model setBoard:[sender indexOfSelectedItem]];	
-}
-
-- (IBAction) ipAddressTextFieldAction:(id)sender
-{
-	[model setIpAddress:[sender stringValue]];	
-}
-
-- (IBAction) connectAction:(id)sender
-{
-	[self endEditing];
-	[model connect];
-}
 
 - (IBAction) sendCmdAction:(id)sender
 {
@@ -246,4 +145,10 @@
 {
     [gSecurity tryToSetLock:ORNplHVLock to:[sender intValue] forWindow:[self window]];
 }
+
+- (IBAction) version:(id)sender
+{
+	[model version];
+}
+
 @end

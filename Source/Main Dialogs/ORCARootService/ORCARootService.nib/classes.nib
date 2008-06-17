@@ -1,49 +1,95 @@
-{
-    IBClasses = (
-        {
-            ACTIONS = {"" = id; }; 
-            CLASS = FirstResponder; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {
-            ACTIONS = {
-                autoReconnectAction = id; 
-                connectAction = id; 
-                connectAtStartAction = id; 
-                lockAction = id; 
-                setHostAction = id; 
-                setPortAction = id; 
-            }; 
-            CLASS = ORCARootServiceController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                autoReconnectButton = NSButton; 
-                connectAtStartButton = NSButton; 
-                connectButton = NSButton; 
-                hostField = NSTextField; 
-                lockButton = NSButton; 
-                portField = NSTextField; 
-                statusField = NSTextField; 
-                timeField = NSTextField; 
-            }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {
-            ACTIONS = {
-                recolorCompleteFile = id; 
-                recolorCompleteFileDeferred = id; 
-                recolorSyntaxTimer = id; 
-                toggleAutoSyntaxColoring = id; 
-                toggleMaintainIndentation = id; 
-            }; 
-            CLASS = ORScriptView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {progress = NSProgressIndicator; status = NSTextField; }; 
-            SUPERCLASS = NSTextView; 
-        }, 
-        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key></key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>autoReconnectAction</key>
+				<string>id</string>
+				<key>connectAction</key>
+				<string>id</string>
+				<key>connectAtStartAction</key>
+				<string>id</string>
+				<key>lockAction</key>
+				<string>id</string>
+				<key>setHostAction</key>
+				<string>id</string>
+				<key>setPortAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORCARootServiceController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>autoReconnectButton</key>
+				<string>NSButton</string>
+				<key>connectAtStartButton</key>
+				<string>NSButton</string>
+				<key>connectButton</key>
+				<string>NSButton</string>
+				<key>hostField</key>
+				<string>NSTextField</string>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>portField</key>
+				<string>NSTextField</string>
+				<key>statusField</key>
+				<string>NSTextField</string>
+				<key>timeField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
