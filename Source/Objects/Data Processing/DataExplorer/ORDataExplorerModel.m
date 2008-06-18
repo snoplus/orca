@@ -27,6 +27,8 @@
 #import "ThreadWorker.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORDataExplorerModelHistoErrorFlagChanged = @"ORDataExplorerModelHistoErrorFlagChanged";
+NSString* ORDataExplorerModelMultiCatalogChanged = @"ORDataExplorerModelMultiCatalogChanged";
 NSString* ORDataExplorerFileChangedNotification     = @"ORDataExplorerFileChangedNotification";
 NSString* ORDataExplorerParseStartedNotification    = @"ORDataExplorerParseStartedNotification";
 NSString* ORDataExplorerParseEndedNotification      = @"ORDataExplorerParseEndedNotification";
@@ -57,6 +59,32 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) histoErrorFlag
+{
+    return histoErrorFlag;
+}
+
+- (void) setHistoErrorFlag:(BOOL)aHistoErrorFlag
+{
+    histoErrorFlag = aHistoErrorFlag;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerModelHistoErrorFlagChanged object:self];
+}
+
+- (BOOL) multiCatalog
+{
+    return multiCatalog;
+}
+
+- (void) setMultiCatalog:(BOOL)aMultiCatalog
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMultiCatalog:multiCatalog];
+    
+    multiCatalog = aMultiCatalog;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerModelMultiCatalogChanged object:self];
+}
 - (ORDataSet*) dataSet
 {
     return dataSet;
@@ -217,6 +245,8 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 
 - (void) parseFile
 {
+	[self setHistoErrorFlag:NO];
+	
     if(parseThread)return;
     
     totalLength   = 0;
@@ -292,16 +322,15 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 }
 
 #pragma mark ¥¥¥Archival
-static NSString* ORDataExplorerFileName 		= @"ORDataExplorerFileName";
-static NSString* ORDataExplorerDataSet 			= @"ORDataExplorerDataSet";
 
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
 	[[self undoManager] disableUndoRegistration];
-	[self setFileToExplore:[decoder decodeObjectForKey:ORDataExplorerFileName]];
-    [self setDataSet:[decoder decodeObjectForKey:ORDataExplorerDataSet]];
+    [self setMultiCatalog:	[decoder decodeBoolForKey:		@"ORDataExplorerModelMultiCatalog"]];
+	[self setFileToExplore:	[decoder decodeObjectForKey:	@"ORDataExplorerFileName"]];
+    [self setDataSet:		[decoder decodeObjectForKey:	@"ORDataExplorerDataSet"]];
 	[[self undoManager] enableUndoRegistration];
     
     if(!dataSet)[self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease]];
@@ -313,8 +342,9 @@ static NSString* ORDataExplorerDataSet 			= @"ORDataExplorerDataSet";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:fileToExplore forKey:ORDataExplorerFileName];
-    [encoder encodeObject:dataSet forKey:ORDataExplorerDataSet];
+    [encoder encodeBool:multiCatalog	forKey: @"ORDataExplorerModelMultiCatalog"];
+    [encoder encodeObject:fileToExplore forKey: @"ORDataExplorerFileName"];
+    [encoder encodeObject:dataSet		forKey: @"ORDataExplorerDataSet"];
     
 }
 

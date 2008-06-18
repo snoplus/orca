@@ -25,6 +25,7 @@
 @interface ORDataExplorerController : OrcaObjectController  {
     @private
         IBOutlet NSButton*          selectFileButton;
+		IBOutlet NSButton*			multiCatalogCB;
         IBOutlet NSButton*          parseButton;
         IBOutlet NSButton*          clearCountsButton;
         IBOutlet NSButton*          scanNextButton;
@@ -38,7 +39,8 @@
         IBOutlet NSTextView*		detailsView;
         IBOutlet NSOutlineView*     dataCatalogView;
         IBOutlet NSProgressIndicator*     parseProgressBar;
-        
+        IBOutlet NSTextField*		multiCatalogWarningField;
+		
         BOOL                        scheduledToUpdate;
         long                        currentSearchIndex;
         BOOL                        stopScan;
@@ -55,6 +57,7 @@
 - (void) setScanInProgress:(BOOL)state;
 
 #pragma  mark ¥¥¥Actions
+- (IBAction) multiCatalogAction:(id)sender;
 - (IBAction) catalogAllAction:(id)sender;
 - (IBAction) scanNextButtonAction:(id)sender;
 - (IBAction) stopScanButtonAction:(id)sender;
@@ -73,6 +76,8 @@
 - (void) catalogAll;
 
 #pragma mark ¥¥¥Interface Management
+- (void) histoErrorFlagChanged:(NSNotification*)aNote;
+- (void) multiCatalogChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;

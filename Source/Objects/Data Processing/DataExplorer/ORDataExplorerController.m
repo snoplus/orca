@@ -69,6 +69,11 @@
 
 #pragma  mark ¥¥¥Actions
 
+- (void) multiCatalogAction:(id)sender
+{
+	[model setMultiCatalog:[sender intValue]];	
+}
+
 - (IBAction) flushButtonAction:(id)sender
 {
     [model flushMemory];
@@ -176,7 +181,6 @@
     [detailsView setNeedsDisplay:YES];
     [dataView reloadData];
 	[model parseFile];
-
 }
 
 - (IBAction)delete:(id)sender
@@ -273,6 +277,9 @@
 {
     unsigned long num = [[model dataRecords] count];
 	if(num >0){
+	
+		if([model multiCatalog])[model setHistoErrorFlag:YES];
+
 		if(stopScan || currentSearchIndex>=num-1){
 			[self setScanInProgress:NO];
 			[dataView selectRowIndexes:[NSIndexSet indexSetWithIndex:num-1] byExtendingSelection:NO];
@@ -308,6 +315,13 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) multiCatalogChanged:(NSNotification*)aNote
+{
+	[multiCatalogCB setIntValue: [model multiCatalog]];
+	[self updateButtons];
+}
+
 - (void) registerNotificationObservers
 {
 	[super registerNotificationObservers];
@@ -337,7 +351,15 @@
                          name : NSTableViewSelectionDidChangeNotification
                        object : dataView];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(multiCatalogChanged:)
+                         name : ORDataExplorerModelMultiCatalogChanged
+						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(histoErrorFlagChanged:)
+                         name : ORDataExplorerModelHistoErrorFlagChanged
+						object: model];
 
 }
 
@@ -346,6 +368,8 @@
 	[super updateWindow];
     [self fileNameChanged:nil];
     [self fileParseEnded:nil];
+	[self multiCatalogChanged:nil];
+	[self histoErrorFlagChanged:nil];
 }
 
 
@@ -360,6 +384,14 @@
     [selectFileButton setEnabled:!scanInProgress && !parsing];
     [catalogAllButton setEnabled:!scanInProgress && !parsing];
     [flushButton setEnabled:!scanInProgress && !parsing];
+	[multiCatalogCB setEnabled:!scanInProgress && !parsing];
+	[multiCatalogWarningField setStringValue:[model histoErrorFlag]?@"Counts and Histograms will be inaccurate!":@""];
+}
+
+
+- (void) histoErrorFlagChanged:(NSNotification*)aNotification
+{
+	[self updateButtons];
 }
 
 - (void) dataChanged:(NSNotification*)aNotification
@@ -528,8 +560,10 @@
     int row = [tv selectedRow];
     if(tv == dataView && row != -1){
         [self process:row];
+		if([model multiCatalog])[model setHistoErrorFlag:YES];
     }
 }
+
 - (void) process:(unsigned long)row
 {
     if(![model dataSet])[model createDataSet];
@@ -537,8 +571,9 @@
     ORDataPacket* d = [model fileAsDataPacket];
     unsigned long offset = [[dataDictionary objectForKey:@"StartingOffset"] longValue];
     id aKey = [dataDictionary objectForKey:@"Key"];
-    if(![[dataDictionary objectForKey:@"DecodedOnce"] boolValue]){
-		[model byteSwapOneRecordAtOffset:offset forKey:aKey];
+	BOOL alreadyDecodedOnce = [[dataDictionary objectForKey:@"DecodedOnce"] boolValue];
+    if(!alreadyDecodedOnce || [model multiCatalog]){
+		if(!alreadyDecodedOnce)[model byteSwapOneRecordAtOffset:offset forKey:aKey];
         [model decodeOneRecordAtOffset:offset forKey:aKey];
         [dataDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"DecodedOnce"]; 
     }

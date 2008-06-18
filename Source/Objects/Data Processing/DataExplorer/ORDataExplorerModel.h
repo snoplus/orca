@@ -39,10 +39,15 @@
         ThreadWorker*   parseThread;
         unsigned        totalLength;
         unsigned        lengthDecoded;
-        
+		BOOL			multiCatalog;
+		BOOL			histoErrorFlag;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) histoErrorFlag;
+- (void) setHistoErrorFlag:(BOOL)aHistoErrorFlag;
+- (BOOL) multiCatalog;
+- (void) setMultiCatalog:(BOOL)aMultiCatalog;
 - (ORDataSet*) 	dataSet;
 - (void)        setDataSet:(ORDataSet*)aDataSet;
 - (NSString*)   fileToExplore;
@@ -77,9 +82,16 @@
 -(id) parse:(id)userInfo thread:(id)tw;
 -(void) parseThreadExited:(id)userInfo;
 
+#pragma mark ¥¥¥Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
+
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORDataExplorerModelHistoErrorFlagChanged;
+extern NSString* ORDataExplorerModelMultiCatalogChanged;
 extern NSString* ORDataExplorerFileChangedNotification;
 extern NSString* ORDataExplorerDataChanged;
 extern NSString* ORDataExplorerParseStartedNotification;
