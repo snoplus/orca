@@ -48,10 +48,10 @@
 
 - (void) awakeFromNib
 {
-    adcValueSize    = NSMakeSize(380,442);
+    adcValueSize    = NSMakeSize(380,452);
     calibrationSize = NSMakeSize(520,430);
     alarmSize       = NSMakeSize(490,443);
-	dataSize       = NSMakeSize(380,443);
+	dataSize       = NSMakeSize(390,443);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
