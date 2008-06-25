@@ -99,6 +99,7 @@ struct{
 }
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) getSlotKey:(unsigned short)aSlot;
 - (int) cardJumperSetting;
 - (void) setCardJumperSetting:(int)aCardJumperSetting;
 - (BOOL) shipRecords;

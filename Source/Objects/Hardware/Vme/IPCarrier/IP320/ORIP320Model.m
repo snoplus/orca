@@ -929,13 +929,25 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     return dataDictionary;
 }
 
+- (NSString*) getSlotKey:(unsigned short)aSlot
+{
+	NSString* slotName[4] = {
+		@"IP D",
+		@"IP C",
+		@"IP B",
+		@"IP A"};
+
+	if(aSlot<4) return slotName[aSlot];
+	else return [NSString stringWithFormat:@"IP %2d",aSlot];		
+}
+
 - (void) loadConvertedTimeSeries:(float)convertedValue atTime:(time_t) aTime forChannel:(int) channel
 {
 	if(!dataSet)[self setDataSet:[[[ORDataSet alloc] initWithKey:@"IP320" guardian:nil] autorelease]];
 	[dataSet loadTimeSeries:convertedValue atTime:aTime sender:self withKeys:@"IP320",@"Value",
 															[NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
 															[NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
-															[self identifier],
+															[self getSlotKey:[self slot]],
 															[NSString stringWithFormat:@"Chan %02d",channel],nil];
 }
 
@@ -945,7 +957,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 	[dataSet loadTimeSeries:aRawValue atTime:aTime sender:self withKeys:@"IP320",@"Raw",
 															[NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
 															[NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
-															[self identifier],
+															[self getSlotKey:[self slot]],
 															[NSString stringWithFormat:@"Chan %02d",channel],nil];
 }
 

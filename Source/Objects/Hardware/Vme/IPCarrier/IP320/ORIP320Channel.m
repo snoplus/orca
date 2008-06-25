@@ -116,7 +116,9 @@
 {
     int result;
 	@synchronized(self){
-		result = [[parameters objectForKey:k320ChannelKey] intValue];
+		id d = [parameters objectForKey:k320ChannelKey];
+		if(!d)d = [parameters objectForKey:@"k320ChannelKey"];
+		result = [d intValue];
 	}
 	return result;
 }

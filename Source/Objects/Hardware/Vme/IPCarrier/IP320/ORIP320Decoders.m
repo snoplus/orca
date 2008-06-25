@@ -25,7 +25,21 @@
 #import "ORDataTypeAssigner.h"
 #import "ORIP320Model.h"
 
+
+static NSString* kIPSlotKey[4] = {
+		@"IP D",
+		@"IP C",
+		@"IP B",
+		@"IP A"
+};
 @implementation ORIP320DecoderForAdc
+
+- (NSString*) getSlotKey:(unsigned short)aSlot
+{
+	if(aSlot<4) return kIPSlotKey[aSlot];
+	else return [NSString stringWithFormat:@"IP %2d",aSlot];		
+}
+
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr	 = (unsigned long*)someData;
@@ -36,7 +50,8 @@
 	unsigned char ipSlot = *ptr&0x0000000f;
 	NSString* crateKey	 = [self getCrateKey: crate];
 	NSString* cardKey	 = [self getCardKey: card];
-	NSString* ipSlotKey  = [NSString stringWithFormat:@"IPSlot %2d",ipSlot];
+	NSString* ipSlotKey  = [self getSlotKey:ipSlot];
+	
 	ptr++; //point to time
 	unsigned long theTime = *ptr;
 
@@ -66,11 +81,12 @@
 	ptr++;
     NSString* crate			= [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
     NSString* card			= [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-	NSString* ipSlotKey		= [NSString stringWithFormat:@"IPSlot %2d\n",*ptr&0x0000000f];
+	NSString* ipSlotKey		= [NSString stringWithFormat:@"IP    = %@\n",[self getSlotKey:*ptr&0x0000000f]];
 
 	ptr++;
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z"];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+
 
 	NSString* adcString = @"";
 	int n = length - 3;
@@ -79,6 +95,7 @@
 		ptr++;
 		adcString   = [adcString stringByAppendingFormat:@"ADC(%02d) = 0x%x\n",(*ptr>>16)&0x000000ff, *ptr&0x00000fff];
     }
+
     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,ipSlotKey,date,adcString];               
 }
 
@@ -87,7 +104,14 @@
 
 
 
+
 @implementation ORIP320DecoderForValue
+
+- (NSString*) getSlotKey:(unsigned short)aSlot
+{
+	if(aSlot<4) return kIPSlotKey[aSlot];
+	else return [NSString stringWithFormat:@"IP %2d",aSlot];		
+}
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
@@ -99,7 +123,7 @@
 	unsigned char ipSlot = *ptr&0x0000000f;
 	NSString* crateKey	 = [self getCrateKey: crate];
 	NSString* cardKey	 = [self getCardKey: card];
-	NSString* ipSlotKey  = [NSString stringWithFormat:@"IPSlot %2d",ipSlot];
+	NSString* ipSlotKey  = [self getSlotKey:ipSlot];
 	ptr++; //point to time
 	unsigned long theTime = *ptr;
 	//[aDataSet loadGenericData:@" " sender:self withKeys:@"IP320",crateKey,cardKey,ipSlotKey,nil];
@@ -139,7 +163,7 @@
 	ptr++;
     NSString* crate			= [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
     NSString* card			= [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-	NSString* ipSlotKey		= [NSString stringWithFormat:@"IPSlot %2d\n",*ptr&0x0000000f];
+	NSString* ipSlotKey		= [NSString stringWithFormat:@"IP    = %@\n",[self getSlotKey:*ptr&0x0000000f]];
 
 	ptr++;
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
