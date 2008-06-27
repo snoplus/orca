@@ -960,6 +960,16 @@
 		8468E6FA06932C3F00B57CE8 /* NcdLogAmpTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 8468E6F806932C3F00B57CE8 /* NcdLogAmpTask.h */; };
 		8468E6FB06932C4000B57CE8 /* NcdLogAmpTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 8468E6F906932C3F00B57CE8 /* NcdLogAmpTask.m */; };
 		846A08F20B77BAAA00B811F4 /* NoADUDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */; };
+		846B8F0F0E15972A00C41F9D /* ICS8065Box.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F080E15972A00C41F9D /* ICS8065Box.tif */; };
+		846B8F100E15972A00C41F9D /* m8065Service.x in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F090E15972A00C41F9D /* m8065Service.x */; };
+		846B8F110E15972A00C41F9D /* ORICS8065.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846B8F0A0E15972A00C41F9D /* ORICS8065.nib */; };
+		846B8F120E15972A00C41F9D /* ORICS8065Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 846B8F0B0E15972A00C41F9D /* ORICS8065Controller.h */; };
+		846B8F130E15972A00C41F9D /* ORICS8065Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B8F0C0E15972A00C41F9D /* ORICS8065Controller.m */; };
+		846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 846B8F0D0E15972A00C41F9D /* ORICS8065Model.h */; };
+		846B8F150E15972A00C41F9D /* ORICS8065Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B8F0E0E15972A00C41F9D /* ORICS8065Model.m */; };
+		846B8F1C0E15973500C41F9D /* vxi11.h in Headers */ = {isa = PBXBuildFile; fileRef = 846B8F170E15973500C41F9D /* vxi11.h */; };
+		846B8F1D0E15973500C41F9D /* vxi11_clnt.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B8F180E15973500C41F9D /* vxi11_clnt.m */; };
+		846B8F200E15973500C41F9D /* vxi11_xdr.m in Sources */ = {isa = PBXBuildFile; fileRef = 846B8F1B0E15973500C41F9D /* vxi11_xdr.m */; };
 		846C512C0DBD3221005D6566 /* NplpCMeter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846C51260DBD3221005D6566 /* NplpCMeter.nib */; };
 		846C512D0DBD3221005D6566 /* NplpCMeterIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846C51270DBD3221005D6566 /* NplpCMeterIcon.tif */; };
 		846C512E0DBD3221005D6566 /* ORNplpCMeterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 846C51280DBD3221005D6566 /* ORNplpCMeterController.h */; };
@@ -2640,6 +2650,16 @@
 		8468E6F806932C3F00B57CE8 /* NcdLogAmpTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdLogAmpTask.h; sourceTree = "<group>"; };
 		8468E6F906932C3F00B57CE8 /* NcdLogAmpTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdLogAmpTask.m; sourceTree = "<group>"; };
 		846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = NoADUDriverHelp.plist; path = Source/Objects/Hardware/USB/ADU200/NoADUDriverHelp.plist; sourceTree = SOURCE_ROOT; };
+		846B8F080E15972A00C41F9D /* ICS8065Box.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ICS8065Box.tif; path = Source/Objects/Hardware/GPIB/ICS8065/ICS8065Box.tif; sourceTree = SOURCE_ROOT; };
+		846B8F090E15972A00C41F9D /* m8065Service.x */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = m8065Service.x; path = Source/Objects/Hardware/GPIB/ICS8065/m8065Service.x; sourceTree = SOURCE_ROOT; };
+		846B8F0A0E15972A00C41F9D /* ORICS8065.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ORICS8065.nib; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065.nib; sourceTree = SOURCE_ROOT; };
+		846B8F0B0E15972A00C41F9D /* ORICS8065Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORICS8065Controller.h; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065Controller.h; sourceTree = SOURCE_ROOT; };
+		846B8F0C0E15972A00C41F9D /* ORICS8065Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORICS8065Controller.m; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065Controller.m; sourceTree = SOURCE_ROOT; };
+		846B8F0D0E15972A00C41F9D /* ORICS8065Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORICS8065Model.h; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065Model.h; sourceTree = SOURCE_ROOT; };
+		846B8F0E0E15972A00C41F9D /* ORICS8065Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORICS8065Model.m; path = Source/Objects/Hardware/GPIB/ICS8065/ORICS8065Model.m; sourceTree = SOURCE_ROOT; };
+		846B8F170E15973500C41F9D /* vxi11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vxi11.h; path = Source/Objects/Hardware/GPIB/vxi11/vxi11.h; sourceTree = SOURCE_ROOT; };
+		846B8F180E15973500C41F9D /* vxi11_clnt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vxi11_clnt.m; path = Source/Objects/Hardware/GPIB/vxi11/vxi11_clnt.m; sourceTree = SOURCE_ROOT; };
+		846B8F1B0E15973500C41F9D /* vxi11_xdr.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vxi11_xdr.m; path = Source/Objects/Hardware/GPIB/vxi11/vxi11_xdr.m; sourceTree = SOURCE_ROOT; };
 		846C51260DBD3221005D6566 /* NplpCMeter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NplpCMeter.nib; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/NplpCMeter.nib"; sourceTree = SOURCE_ROOT; };
 		846C51270DBD3221005D6566 /* NplpCMeterIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NplpCMeterIcon.tif; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/NplpCMeterIcon.tif"; sourceTree = SOURCE_ROOT; };
 		846C51280DBD3221005D6566 /* ORNplpCMeterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNplpCMeterController.h; path = "Source/Objects/Misc Objects/NplPicoCoulombMeter/ORNplpCMeterController.h"; sourceTree = SOURCE_ROOT; };
@@ -5636,6 +5656,32 @@
 			path = Source/Experiments/Ncd/LogAmpTask;
 			sourceTree = SOURCE_ROOT;
 		};
+		846B8F070E15972A00C41F9D /* ICS8065 */ = {
+			isa = PBXGroup;
+			children = (
+				846B8F080E15972A00C41F9D /* ICS8065Box.tif */,
+				846B8F090E15972A00C41F9D /* m8065Service.x */,
+				846B8F0A0E15972A00C41F9D /* ORICS8065.nib */,
+				846B8F0B0E15972A00C41F9D /* ORICS8065Controller.h */,
+				846B8F0C0E15972A00C41F9D /* ORICS8065Controller.m */,
+				846B8F0D0E15972A00C41F9D /* ORICS8065Model.h */,
+				846B8F0E0E15972A00C41F9D /* ORICS8065Model.m */,
+			);
+			name = ICS8065;
+			path = Source/Objects/Hardware/GPIB/ICS8065;
+			sourceTree = SOURCE_ROOT;
+		};
+		846B8F160E15973500C41F9D /* vxi11 */ = {
+			isa = PBXGroup;
+			children = (
+				846B8F170E15973500C41F9D /* vxi11.h */,
+				846B8F180E15973500C41F9D /* vxi11_clnt.m */,
+				846B8F1B0E15973500C41F9D /* vxi11_xdr.m */,
+			);
+			name = vxi11;
+			path = Source/Objects/Hardware/GPIB/vxi11;
+			sourceTree = SOURCE_ROOT;
+		};
 		846C51250DBD3221005D6566 /* NplPicoCoulombMeter */ = {
 			isa = PBXGroup;
 			children = (
@@ -7082,8 +7128,10 @@
 			isa = PBXGroup;
 			children = (
 				84C493A104059AEA005F64B1 /* GPIB Base Classes */,
+				846B8F160E15973500C41F9D /* vxi11 */,
 				84C493A804059AEA005F64B1 /* Oscilloscope Base */,
 				84C4939704059AEA005F64B1 /* ENET-GPIB */,
+				846B8F070E15972A00C41F9D /* ICS8065 */,
 				84992CAD0DD21F3800E82DB4 /* HP3458a */,
 				8425384A0BC6E006004C8065 /* HP6622a */,
 				844D92F50A0A79AA00E83C57 /* Pulser33220 */,
@@ -8884,6 +8932,9 @@
 				14E1790F0E14535B004BDE8F /* ORUnivVoltHVCrateModel.h in Headers */,
 				14E179110E14535B004BDE8F /* ORUnivVoltHVCrateView.h in Headers */,
 				14E179470E152FDA004BDE8F /* ORUnivVoltHVCrateExceptions.h in Headers */,
+				846B8F120E15972A00C41F9D /* ORICS8065Controller.h in Headers */,
+				846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */,
+				846B8F1C0E15973500C41F9D /* vxi11.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9431,6 +9482,9 @@
 				14E179140E14535B004BDE8F /* UnivVoltHVCrate.nib in Resources */,
 				14E179150E14535B004BDE8F /* UnivVoltHVCrateSmall.gif in Resources */,
 				140D81BD0E15713C0080492E /* UnivVoltHVIcon.gif in Resources */,
+				846B8F0F0E15972A00C41F9D /* ICS8065Box.tif in Resources */,
+				846B8F100E15972A00C41F9D /* m8065Service.x in Resources */,
+				846B8F110E15972A00C41F9D /* ORICS8065.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10073,6 +10127,10 @@
 				14E1790E0E14535B004BDE8F /* ORUnivVoltHVCrateController.m in Sources */,
 				14E179100E14535B004BDE8F /* ORUnivVoltHVCrateModel.m in Sources */,
 				14E179120E14535B004BDE8F /* ORUnivVoltHVCrateView.m in Sources */,
+				846B8F130E15972A00C41F9D /* ORICS8065Controller.m in Sources */,
+				846B8F150E15972A00C41F9D /* ORICS8065Model.m in Sources */,
+				846B8F1D0E15973500C41F9D /* vxi11_clnt.m in Sources */,
+				846B8F200E15973500C41F9D /* vxi11_xdr.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
