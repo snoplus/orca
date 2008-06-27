@@ -37,7 +37,7 @@ NSString* ORUnivVoltHVUSBConnector		    = @"ORUnivVoltHVUSBConnector";
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
     //so, we cache the image here so that each crate can have its own version for drawing into.
     //---------------------------------------------------------------------------------------------------
-    NSImage* aCachedImage = [NSImage imageNamed:@"UnivVoltHVCrate"];
+    NSImage* aCachedImage = [NSImage imageNamed:@"UnivVoltHVCrateSmall"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
