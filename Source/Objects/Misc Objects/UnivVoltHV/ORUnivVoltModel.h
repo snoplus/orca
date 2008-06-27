@@ -21,7 +21,7 @@
 
 #pragma mark •••Imported Filesg
 
-//#import "ORHPPulserModel.h"
+#import "ORCard.h"
 
 #define kNplpCMeterPort 5000
 #define kNplpCNumChannels 4
@@ -32,7 +32,7 @@
 @class ORAlarm;
 @class ORQueue;
 
-@interface ORUnivVoltModel : OrcaObject 
+@interface ORUnivVoltModel : ORCard 
 {
 	NSLock* localLock;
     NSString* ipAddress;
