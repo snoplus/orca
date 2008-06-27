@@ -56,6 +56,7 @@
 #pragma mark ***Initialization
 - (id)			init;
 - (void) 		updateWindow;
+- (void)		populatePullDowns;
 
 #pragma mark •••Actions
 - (IBAction) 	query: (id) aSender;

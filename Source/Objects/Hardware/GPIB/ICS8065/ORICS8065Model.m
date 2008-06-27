@@ -512,10 +512,11 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		dwrp.io_timeout = 3000; 
 		dwrp.lock_timeout = 3000;
 		dwrp.flags = 0;
-		dwrp.termChar = 0;
+		dwrp.termChar = '\n';
 		dwrr = device_read_1(&dwrp, rpcClient); 
-		memcpy(aData,dwrr->data.data_val,dwrr->data.data_len);
 		
+		//To do: There has to be some serious error checking put in here, asap.....
+		memcpy(aData,dwrr->data.data_val,dwrr->data.data_len);
         if (dwrr->error != 0) {
             [ mErrorMsg setString:  @"***Error: read" ];
             [ self gpibError: mErrorMsg number:dwrr->error]; 
@@ -525,10 +526,11 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         // Successful read.
         else {
             nReadBytes = dwrr->data.data_len;
-            
+			aData[nReadBytes] = '\0';
+          
             // Allow monitoring of commands.
             if ( mMonitorRead ) {
-                NSMutableDictionary* userInfo = [ NSMutableDictionary dictionary ];			
+                NSMutableDictionary* userInfo = [ NSMutableDictionary dictionary ];	
                 NSString* dataStr = [[ NSString alloc ] initWithBytes: aData length: nReadBytes encoding: NSASCIIStringEncoding ];
                 [ userInfo setObject: [ NSString stringWithFormat: @"Read - Address: %d length: %d data: %@\n", 
                     aPrimaryAddress, nReadBytes, dataStr ] 
@@ -591,11 +593,12 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		dwrp.io_timeout = 3000; 
 		dwrp.lock_timeout = 3000;
 		dwrp.flags = 0;
+		if(![aCommand hasSuffix:@"\n"])aCommand = [aCommand stringByAppendingString:@"\n"];
 		dwrp.data.data_len = [aCommand length];
 		dwrp.data.data_val = (char *)[ aCommand cStringUsingEncoding:NSASCIIStringEncoding ];
 		dwrr = device_write_1(&dwrp, rpcClient); 
 		
-        if ( dwrr->error != 0 ) {
+        if (dwrr &&  dwrr->error != 0 ) {
             [ mErrorMsg setString:  @"***Error: write" ];
             [ self gpibError: mErrorMsg number: dwrr->error]; 
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];

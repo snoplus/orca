@@ -36,6 +36,7 @@
         [ self disableAll ];
     } 
 	else {
+        [ self populatePullDowns ];
         [ self setTestButtonsEnabled: false ];
         [ self changeIbstaStatus: 0 ];
         [ self changeStatusSummary: 0 error: 0 count: 0 ];
@@ -363,6 +364,22 @@
     [mCommand setStringValue:[NSString stringWithFormat:@""]];
 }
 
+- (void) populatePullDowns
+{
+    short	i;
+    
+// Remove all items from popup menus
+    [mPrimaryAddress removeAllItems];
+        
+// Repopulate Primary GPIB address
+    for ( i = 0; i <  kMaxGpibAddresses; i++ ) {
+        [mPrimaryAddress insertItemWithTitle:[NSString stringWithFormat:@"%d", i]
+                                      atIndex:i];
+    } 
+    
+    mPrimaryAddressValue = -1;
+   [ self changePrimaryAddress:nil];
+}
 
 //--------------------------------------------------------------------------------
 /*!
