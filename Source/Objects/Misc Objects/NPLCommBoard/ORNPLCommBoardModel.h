@@ -29,18 +29,27 @@
     BOOL isConnected;
 	NetSocket* socket;
     int board;
-    int channel;
+    int bloc;
     int functionNumber;
     int writeValue;
+    int numBytesToSend;
+    NSString* cmdString;
+    int controlReg;
 }
 
 #pragma mark ***Accessors
+- (int) controlReg;
+- (void) setControlReg:(int)aControlReg;
+- (NSString*) cmdString;
+- (void) setCmdString:(NSString*)aCmdString;
+- (int) numBytesToSend;
+- (void) setNumBytesToSend:(int)aNumBytesToSend;
 - (int) writeValue;
 - (void) setWriteValue:(int)aWriteValue;
 - (int) functionNumber;
 - (void) setFunctionNumber:(int)aFunction;
-- (int) channel;
-- (void) setChannel:(int)aChannel;
+- (int) bloc;
+- (void) setBloc:(int)aBloc;
 - (int) board;
 - (void) setBoard:(int)aBoard;
 - (NetSocket*) socket;
@@ -49,7 +58,8 @@
 - (void) setIsConnected:(BOOL)aFlag;
 - (NSString*) ipAddress;
 - (void) setIpAddress:(NSString*)aIpAddress;
-- (void) sendB:(int)b s:(int)s f:(int)f controlReg:(int)aReg valueLen:(int)len value:(int)aValue;
+- (void) sendBoard:(int)b bloc:(int)s function:(int)f controlReg:(int)aReg  value:(int)aValue cmdLen:(int)aLen;
+- (void) formatCmdString;
 
 #pragma mark ***Utilities
 - (void) connect;
@@ -60,10 +70,14 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+
+extern NSString* ORNPLCommBoardModelControlRegChanged;
+extern NSString* ORNPLCommBoardModelCmdStringChanged;
+extern NSString* ORNPLCommBoardModelNumBytesToSendChanged;
 extern NSString* ORNPLCommBoardLock;
 extern NSString* ORNPLCommBoardModelWriteValueChanged;
 extern NSString* ORNPLCommBoardModelFunctionChanged;
-extern NSString* ORNPLCommBoardModelChannelChanged;
+extern NSString* ORNPLCommBoardModelBlocChanged;
 extern NSString* ORNPLCommBoardModelBoardChanged;
 extern NSString* ORNPLCommBoardModelIsConnectedChanged;
 extern NSString* ORNPLCommBoardModelIpAddressChanged;

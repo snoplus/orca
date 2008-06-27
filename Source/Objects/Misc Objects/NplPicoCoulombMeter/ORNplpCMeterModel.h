@@ -86,4 +86,4 @@ extern NSString* ORNplpCMeterIsConnectedChanged;
 extern NSString* ORNplpCMeterIpAddressChanged;
 extern NSString* ORNplpCMeterAverageChanged;
 extern NSString* ORNplpCMeterFrameError;
-extern NSString* ORNplPCMeterLock;
+extern NSString* ORNplpCMeterLock;

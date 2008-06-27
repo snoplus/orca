@@ -51,8 +51,8 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(channelChanged:)
-                         name : ORNPLCommBoardModelChannelChanged
+                     selector : @selector(blocChanged:)
+                         name : ORNPLCommBoardModelBlocChanged
 						object: model];
 
     [notifyCenter addObserver : self
@@ -74,6 +74,21 @@
 					 selector : @selector(lockChanged:)
 						 name : ORNPLCommBoardLock
 						object: nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(numBytesToSendChanged:)
+                         name : ORNPLCommBoardModelNumBytesToSendChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cmdStringChanged:)
+                         name : ORNPLCommBoardModelCmdStringChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(controlRegChanged:)
+                         name : ORNPLCommBoardModelControlRegChanged
+						object: model];
+
 }
 
 
@@ -84,13 +99,29 @@
 	[self ipAddressChanged:nil];
 	[self isConnectedChanged:nil];
 	[self boardChanged:nil];
-	[self channelChanged:nil];
+	[self blocChanged:nil];
 	[self functionChanged:nil];
 	[self writeValueChanged:nil];
     [self lockChanged:nil];
+	[self numBytesToSendChanged:nil];
+	[self cmdStringChanged:nil];
+	[self controlRegChanged:nil];
 }
 
+- (void) controlRegChanged:(NSNotification*)aNote
+{
+	[controlRegTextField setIntValue: [model controlReg]];
+}
 
+- (void) cmdStringChanged:(NSNotification*)aNote
+{
+	[cmdStringTextField setStringValue: [model cmdString]];
+}
+
+- (void) numBytesToSendChanged:(NSNotification*)aNote
+{
+	[numBytesToSendPU selectItemAtIndex: [model numBytesToSend]-3];
+}
 
 - (void) checkGlobalSecurity
 {
@@ -120,9 +151,9 @@
 	[self updateButtons];
 }
 
-- (void) channelChanged:(NSNotification*)aNote
+- (void) blocChanged:(NSNotification*)aNote
 {
-	[channelPU selectItemAtIndex: [model channel]];
+	[blocPU selectItemAtIndex: [model bloc]];
 }
 
 - (void) boardChanged:(NSNotification*)aNote
@@ -150,10 +181,12 @@
     [lockButton setState: locked];
 	[ipConnectButton setEnabled:!runInProgress || !locked];
 	[ipAddressTextField setEnabled:!locked];
-	[writeValueField setEnabled:!locked && [model functionNumber] >= 2];
+	[writeValueField setEnabled:!locked];
 	[functionPU setEnabled:!locked ];
-	[channelPU setEnabled:!locked];
+	[blocPU setEnabled:!locked];
 	[boardPU setEnabled:!locked];
+	[controlRegTextField setEnabled:!locked];
+	[numBytesToSendPU setEnabled:!locked];
 	[sendButton setEnabled:!locked];
 }
 
@@ -169,6 +202,16 @@
 }
 
 #pragma mark •••Actions
+- (void) controlRegAction:(id)sender
+{
+	[model setControlReg:[sender intValue]];	
+}
+
+- (void) numBytesToSendAction:(id)sender
+{
+	[model setNumBytesToSend:[sender indexOfSelectedItem]+3];	
+}
+
 - (void) writeValueAction:(id)sender
 {
 	[model setWriteValue:[sender intValue]];	
@@ -179,9 +222,9 @@
 	[model setFunctionNumber:[sender indexOfSelectedItem]];	
 }
 
-- (void) channelAction:(id)sender
+- (void) blocAction:(id)sender
 {
-	[model setChannel:[sender indexOfSelectedItem]];	
+	[model setBloc:[sender indexOfSelectedItem]];	
 }
 
 - (void) boardAction:(id)sender
@@ -210,4 +253,5 @@
 {
     [gSecurity tryToSetLock:ORNPLCommBoardLock to:[sender intValue] forWindow:[self window]];
 }
+
 @end

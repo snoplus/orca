@@ -42,6 +42,7 @@
 - (IBAction) version:(id)sender;
 - (IBAction) sendCmdAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
+- (IBAction) initBoard:(id) sender;
 
 @end
 

@@ -23,9 +23,12 @@
 @interface ORNPLCommBoardController : OrcaObjectController 
 {
 	IBOutlet NSTextField*	ipConnectedTextField;
+	IBOutlet NSTextField*	controlRegTextField;
+	IBOutlet NSTextField*	cmdStringTextField;
+	IBOutlet NSPopUpButton* numBytesToSendPU;
 	IBOutlet NSTextField*	writeValueField;
 	IBOutlet NSPopUpButton* functionPU;
-	IBOutlet NSPopUpButton* channelPU;
+	IBOutlet NSPopUpButton* blocPU;
 	IBOutlet NSPopUpButton* boardPU;
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSButton*		ipConnectButton;
@@ -36,9 +39,12 @@
 #pragma mark •••Notifications
 
 #pragma mark ***Interface Management
+- (void) controlRegChanged:(NSNotification*)aNote;
+- (void) cmdStringChanged:(NSNotification*)aNote;
+- (void) numBytesToSendChanged:(NSNotification*)aNote;
 - (void) writeValueChanged:(NSNotification*)aNote;
 - (void) functionChanged:(NSNotification*)aNote;
-- (void) channelChanged:(NSNotification*)aNote;
+- (void) blocChanged:(NSNotification*)aNote;
 - (void) boardChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
@@ -46,9 +52,11 @@
 - (void) setButtonStates;
 
 #pragma mark •••Actions
+- (IBAction) controlRegAction:(id)sender;
+- (IBAction) numBytesToSendAction:(id)sender;
 - (IBAction) writeValueAction:(id)sender;
 - (IBAction) functionAction:(id)sender;
-- (IBAction) channelAction:(id)sender;
+- (IBAction) blocAction:(id)sender;
 - (IBAction) boardAction:(id)sender;
 - (IBAction) ipAddressTextFieldAction:(id)sender;
 - (IBAction) connectAction:(id)sender;

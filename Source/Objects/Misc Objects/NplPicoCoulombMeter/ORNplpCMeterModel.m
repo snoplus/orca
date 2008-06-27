@@ -31,7 +31,7 @@ NSString* ORNplpCMeterIsConnectedChanged	= @"ORNplpCMeterIsConnectedChanged";
 NSString* ORNplpCMeterIpAddressChanged		= @"ORNplpCMeterIpAddressChanged";
 NSString* ORNplpCMeterAverageChanged		= @"ORNplpCMeterAverageChanged";
 NSString* ORNplpCMeterFrameError			= @"ORNplpCMeterFrameError";
-NSString* ORNplPCMeterLock					= @"ORNplPCMeterLock";
+NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 
 
 @implementation ORNplpCMeterModel

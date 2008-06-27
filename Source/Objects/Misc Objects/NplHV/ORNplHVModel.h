@@ -25,8 +25,13 @@
 
 @class NetSocket;
 
-//reg defs for ADC AD7734
+#define kNplHVCurrentAdc		0x0
+#define kNplHVVoltageAdc		0x1
+#define kNplHVDac				0x2
+#define kNplHVStatusControl		0x3
 
+
+//reg defs for ADC AD7734
 #define kNplHVCommReg			0x0
 #define kNplHVIOPort			0x1
 #define kNplHVRevision			0x2
@@ -46,7 +51,7 @@
 #define kNplHvRead				0x40
 #define kNplHvWrite				0x00
 
-@interface ORNplHVModel : ORRamperModel <ORHWWizard,ORHWRamping> 
+@interface ORNplHVModel : ORRamperModel
 {
 	id comBoard;
 	int boardNumber;
@@ -70,7 +75,11 @@
 - (SEL) initMethodSelector;
 - (void) junk;
 - (void) loadDac:(int)aChan;
-- (void) version;
+- (void) revision;
+- (void) setVoltageReg:(int)aReg chan:(int)aChan value:(int)aValue;
+- (void) setCurrentReg:(int)aReg chan:(int)aChan value:(int)aValue;
+- (int) numberOfChannels;
+- (void) initBoard;
 
 #pragma mark ***Utilities
 - (void) sendCmd;

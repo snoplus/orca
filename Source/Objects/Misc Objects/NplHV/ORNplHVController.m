@@ -148,7 +148,12 @@
 
 - (IBAction) version:(id)sender
 {
-	[model version];
+	[model revision];
+}
+
+- (IBAction) initBoard:(id) sender
+{
+	[model initBoard];
 }
 
 @end

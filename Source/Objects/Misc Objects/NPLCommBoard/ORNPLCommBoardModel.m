@@ -18,16 +18,17 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark •••Imported Files
 #import "ORNPLCommBoardModel.h"
 #import "NetSocket.h"
 
+NSString* ORNPLCommBoardModelControlRegChanged		= @"ORNPLCommBoardModelControlRegChanged";
+NSString* ORNPLCommBoardModelCmdStringChanged       = @"ORNPLCommBoardModelCmdStringChanged";
+NSString* ORNPLCommBoardModelNumBytesToSendChanged  = @"ORNPLCommBoardModelNumBytesToSendChanged";
 NSString* ORNPLCommBoardModelWriteValueChanged		= @"ORNPLCommBoardModelWriteValueChanged";
 NSString* ORNPLCommBoardModelFunctionChanged		= @"ORNPLCommBoardModelFunctionChanged";
-NSString* ORNPLCommBoardModelChannelChanged			= @"ORNPLCommBoardModelChannelChanged";
+NSString* ORNPLCommBoardModelBlocChanged			= @"ORNPLCommBoardModelBlocChanged";
 NSString* ORNPLCommBoardModelBoardChanged			= @"ORNPLCommBoardModelBoardChanged";
-NSString* ORNPLCommBoardModelCmdStringChanged		= @"ORNPLCommBoardModelCmdStringChanged";
 NSString* ORNPLCommBoardModelIsConnectedChanged		= @"ORNPLCommBoardModelIsConnectedChanged";
 NSString* ORNPLCommBoardModelIpAddressChanged		= @"ORNPLCommBoardModelIpAddressChanged";
 NSString* ORNPLCommBoardLock						= @"ORNPLCommBoardLock";
@@ -39,7 +40,6 @@ static NSString* NPLComConnectors[8] = {
 };
 
 @implementation ORNPLCommBoardModel
-
 - (void) makeMainController
 {
     [self linkToController:@"ORNPLCommBoardController"];
@@ -47,6 +47,7 @@ static NSString* NPLComConnectors[8] = {
 
 - (void) dealloc
 {
+    [cmdString release];
 	[socket close];
 	[socket release];
     [super dealloc];
@@ -80,10 +81,88 @@ static NSString* NPLComConnectors[8] = {
 		[aConnector addRestrictedConnectionType: 'NSLV' ]; //can only connect to Slave Boards
         [aConnector release];
     }
-
 }
 
 #pragma mark ***Accessors
+
+- (int) controlReg
+{
+    return controlReg;
+}
+
+- (void) setControlReg:(int)aControlReg
+{
+	if(aControlReg<0)		 aControlReg = 0;
+	else if(aControlReg>255) aControlReg = 255;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setControlReg:controlReg];
+    
+    controlReg = aControlReg;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelControlRegChanged object:self];
+}
+
+- (void) formatCmdString
+{
+
+	char bytes[3];
+	if(numBytesToSend == 5){
+		bytes[0] = (writeValue>>16 & 0xf);
+		bytes[1] = (writeValue>>8 & 0xf); 
+		bytes[2] = writeValue & 0xf; 
+	}
+	else if(numBytesToSend == 4){
+		bytes[0] = (writeValue>>8 & 0xf);
+		bytes[1] = (writeValue & 0xf); 
+		bytes[2] = 0;
+	}
+	else if(numBytesToSend == 3){
+		bytes[0] = (writeValue & 0xf); 
+		bytes[1] = 0;
+		bytes[2] = 0;
+	}
+	NSString* s = [NSString stringWithFormat:@"0x%02x 0x%02x 0x%02x",
+					numBytesToSend,
+					(([self board] & 0xf)<<4) | (([self bloc] & 0x3)<<2) | ([self functionNumber] & 0x3),
+					[self controlReg]];
+	int i;
+	for(i=0;i<numBytesToSend-2;i++){
+		s = [s stringByAppendingFormat:@" 0x%02x",(unsigned char)bytes[i]];
+	}
+	[self setCmdString:s];
+}
+
+- (NSString*) cmdString
+{
+    return cmdString;
+}
+
+- (void) setCmdString:(NSString*)aCmdString
+{
+    [cmdString autorelease];
+    cmdString = [aCmdString copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelCmdStringChanged object:self];
+}
+
+- (int) numBytesToSend
+{
+    return numBytesToSend;
+}
+
+- (void) setNumBytesToSend:(int)aNumBytesToSend
+{
+	if(aNumBytesToSend<3)		aNumBytesToSend = 3;
+	else if(aNumBytesToSend>5)	aNumBytesToSend = 5;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setNumBytesToSend:numBytesToSend];
+    
+    numBytesToSend = aNumBytesToSend;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelNumBytesToSendChanged object:self];
+	[self formatCmdString];
+}
+
 - (NSString*) lockName
 {
 	return ORNPLCommBoardLock;
@@ -101,6 +180,7 @@ static NSString* NPLComConnectors[8] = {
     writeValue = aWriteValue;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelWriteValueChanged object:self];
+	[self formatCmdString];
 }
 
 - (int) functionNumber
@@ -115,20 +195,22 @@ static NSString* NPLComConnectors[8] = {
     functionNumber = aFunction;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelFunctionChanged object:self];
+	[self formatCmdString];
 }
 
-- (int) channel
+- (int) bloc
 {
-    return channel;
+    return bloc;
 }
 
-- (void) setChannel:(int)aChannel
+- (void) setBloc:(int)aBloc
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setChannel:channel];
+    [[[self undoManager] prepareWithInvocationTarget:self] setBloc:bloc];
     
-    channel = aChannel;
+    bloc = aBloc;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelChannelChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelBlocChanged object:self];
+	[self formatCmdString];
 }
 
 - (int) board
@@ -143,6 +225,7 @@ static NSString* NPLComConnectors[8] = {
     board = aBoard;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelBoardChanged object:self];
+	[self formatCmdString];
 }
 
 - (NetSocket*) socket
@@ -216,7 +299,7 @@ static NSString* NPLComConnectors[8] = {
 		char* theBytes = (char*)[theData bytes];
 		int i;
 		for(i=0;i<[theData length];i++){
-			NSLog(@"From NPL HV [%d]: 0x%x\n",i,theBytes[i]);
+			NSLog(@"Received [%d]: 0x%02x\n",i,(unsigned char)theBytes[i]);
 		}
 	}
 }
@@ -237,9 +320,11 @@ static NSString* NPLComConnectors[8] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setControlReg:	[decoder decodeIntForKey:	@"controlReg"]];
+    [self setNumBytesToSend:[decoder decodeIntForKey:	@"numBytesToSend"]];
     [self setWriteValue:	[decoder decodeIntForKey:	@"writeValue"]];
     [self setFunctionNumber:[decoder decodeIntForKey:	@"function"]];
-    [self setChannel:		[decoder decodeIntForKey:	@"channel"]];
+    [self setBloc:			[decoder decodeIntForKey:	@"bloc"]];
     [self setBoard:			[decoder decodeIntForKey:	@"board"]];
 	[self setIpAddress:		[decoder decodeObjectForKey:@"ipAddress"]];
     [[self undoManager] enableUndoRegistration];    
@@ -250,53 +335,52 @@ static NSString* NPLComConnectors[8] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:controlReg		forKey: @"controlReg"];
+    [encoder encodeInt:numBytesToSend	forKey: @"numBytesToSend"];
     [encoder encodeInt:writeValue		forKey: @"writeValue"];
     [encoder encodeInt:functionNumber	forKey: @"function"];
-    [encoder encodeInt:channel			forKey: @"channel"];
+    [encoder encodeInt:bloc				forKey: @"bloc"];
     [encoder encodeInt:board			forKey: @"board"];
     [encoder encodeObject:ipAddress		forKey: @"ipAddress"];
 }
 
-- (void) sendB:(int)b s:(int)s f:(int)f controlReg:(int)aReg valueLen:(int)len value:(int)aValue
+- (void) sendBoard:(int)b bloc:(int)s function:(int)f controlReg:(int)aReg value:(int)aValue cmdLen:(int)aLen
 {
 	//send the values from the basic ops
 	char bytes[6];
-	bytes[0] = 2 + len;
+	bytes[0] = aLen;
 	bytes[1] = ((b & 0xf)<<4) | ((s & 0x3)<<2) | (f & 0x3);
 	bytes[2] = aReg;	
-	if(len == 3){
+	if(aLen == 5){
 		bytes[3] = (writeValue>>16 & 0xf);
 		bytes[4] = (writeValue>>8 & 0xf); 
 		bytes[5] = writeValue & 0xf; 
 	}
-	else if(len == 2){
+	else if(aLen == 4){
 		bytes[3] = (writeValue>>8 & 0xf);
 		bytes[4] = (writeValue & 0xf); 
 	}
-	else if(len == 1){
+	else if(aLen == 3){
 		bytes[3] = (writeValue & 0xf); 
 	}
 
 	int i;
-	for(i=0;i<2 + len + 1;i++){
+	for(i=0;i< 1 + aLen;i++){
 		NSLog(@"%d: 0x%0x\n",i,bytes[i]);
 	}
 
-	[socket write:bytes length:2 + len + 1];
+	[socket write:bytes length:aLen + 1];
 	
 }
 
 - (void) sendCmd
 {	
-	//send the values from the basic ops
-	char bytes[6];
-	bytes[0] = 5;
-	bytes[1] = ((board & 0xf)<<4) | ((channel & 0x3)<<2) | (functionNumber & 0x3);
-	bytes[2] = 0;
-	bytes[3] = (writeValue>>16 & 0xf);
-	bytes[4] = (writeValue>>8 & 0xf); 
-	bytes[5] = writeValue & 0xf; 
-	[socket write:bytes length:6];
+	[self sendBoard: [self board] 
+			   bloc: [self bloc] 
+		   function: [self functionNumber] 
+		 controlReg: [self controlReg] 
+			  value: [self writeValue]
+		     cmdLen: [self numBytesToSend]]; 
 }
 
 @end

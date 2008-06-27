@@ -67,7 +67,7 @@
     
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
-                         name : ORNplPCMeterLock
+                         name : ORNplpCMeterLock
                         object: nil];
 
 }
@@ -88,7 +88,7 @@
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    [gSecurity setLock:ORNplPCMeterLock to:secure];
+    [gSecurity setLock:ORNplpCMeterLock to:secure];
     [dialogLock setEnabled:secure];
 }
 
@@ -130,7 +130,7 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-    BOOL locked			= [gSecurity isLocked:ORNplPCMeterLock];
+    BOOL locked			= [gSecurity isLocked:ORNplpCMeterLock];
 
 	[ipConnectButton setEnabled:!locked];
 	[ipAddressTextField setEnabled:!locked];
@@ -153,7 +153,7 @@
 
 - (IBAction) dialogLockAction:(id)sender
 {
-    [gSecurity tryToSetLock:ORNplPCMeterLock to:[sender intValue] forWindow:[self window]];
+    [gSecurity tryToSetLock:ORNplpCMeterLock to:[sender intValue] forWindow:[self window]];
 }
 
 @end

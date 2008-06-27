@@ -219,9 +219,49 @@ NSString* HVToCommBoxConnector				= @"HVToCommBoxConnector";
 	//[socket write:bytes length:6];
 }
 
-- (void) version
+- (void) initBoard
 {
-	[comBoard sendB:boardNumber s:0 f:01 controlReg: kNplHVRevision | kNplHvRead valueLen:1 value:0];
+	int chan;
+	for(chan = 0 ; chan<[self numberOfChannels] ; chan++){
+		//set up the Voltage Adc
+		[self setVoltageReg:kNplHVChanConvTime	chan:chan value:0xff]; //set conversion time to max
+		[self setVoltageReg:kNplHVChanSetup		chan:chan value:0x5];  //bits 0,1 are gain, bit 2 is enables chan for continous conversion
+		[self setVoltageReg:kNplHVMode			chan:chan value:0x20]; //20 = continous and 16 bit output word
+
+		//set up the Current Adc
+		[self setCurrentReg:kNplHVChanConvTime	chan:chan value:0xff]; //set conversion time to max
+		[self setCurrentReg:kNplHVChanSetup		chan:chan value:0x5];  //bits 0,1 are gain, bit 2 is enables chan for continous conversion
+		[self setCurrentReg:kNplHVMode			chan:chan value:0x20]; //20 = continous and 16 bit output word
+
+	}
+}
+
+- (void) setVoltageReg:(int)aReg chan:(int)aChan value:(int)aValue
+{
+	[comBoard sendBoard: boardNumber 
+				   bloc: aChan % 4
+			   function: kNplHVVoltageAdc
+			 controlReg: aReg + aChan
+				  value: aValue
+				 cmdLen: 3];	
+}
+
+- (void) setCurrentReg:(int)aReg chan:(int)aChan value:(int)aValue
+{
+	[comBoard sendBoard: boardNumber 
+				   bloc: aChan % 4
+			   function: kNplHVCurrentAdc
+			 controlReg: aReg + aChan
+				  value: aValue
+				 cmdLen: 3];	
+}
+
+
+
+
+- (void) revision
+{
+	[comBoard sendBoard:boardNumber bloc:0 function:kNplHVVoltageAdc controlReg: kNplHVRevision | kNplHvRead value:0 cmdLen:3];
 }
 
 - (void) connectionChanged
@@ -230,35 +270,33 @@ NSString* HVToCommBoxConnector				= @"HVToCommBoxConnector";
 	boardNumber = [[[[self connectors] objectForKey:HVToCommBoxConnector] connector] identifer];
 }
 
-
-
 #pragma mark •••HW Wizard
 //the next two methods exist only to 'fake' out Hardware wizard and the Ramper so this item can be selected
-- (int) crateNumber	{	return 0;	}
-- (int) slot		{	return [self tag];	}
+//- (int) crateNumber	{	return 0;	}
+//- (int) slot		{	return [self tag];	}
 
 - (int) numberOfChannels
 {
     return 4;
 }
 
-- (BOOL) hasParmetersToRamp
-{
-	return YES;
-}
+//- (BOOL) hasParmetersToRamp
+//{
+//	return YES;
+//}
 
 - (NSArray*) wizardParameters
 {
     NSMutableArray* a = [NSMutableArray array];
-    ORHWWizParam* p;
+//    ORHWWizParam* p;
     
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Voltage"];
-    [p setFormat:@"##0" upperLimit:3000 lowerLimit:0 stepSize:1 units:@"V"];
-    [p setSetMethod:@selector(setDac:withValue:) getMethod:@selector(dac:)];
-	[p setInitMethodSelector:@selector(sendCmd)];
-	[p setCanBeRamped:YES];
-    [a addObject:p];
+//    p = [[[ORHWWizParam alloc] init] autorelease];
+//    [p setName:@"Voltage"];
+//    [p setFormat:@"##0" upperLimit:3000 lowerLimit:0 stepSize:1 units:@"V"];
+//    [p setSetMethod:@selector(setDac:withValue:) getMethod:@selector(dac:)];
+//	[p setInitMethodSelector:@selector(sendCmd)];
+//	[p setCanBeRamped:YES];
+//    [a addObject:p];
 	    
     return a;
 }
