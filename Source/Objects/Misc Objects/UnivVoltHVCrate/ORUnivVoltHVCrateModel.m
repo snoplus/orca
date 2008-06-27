@@ -52,8 +52,8 @@ NSString* ORUnivVoltHVUSBConnector		    = @"ORUnivVoltHVUSBConnector";
     
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
-        [transform translateXBy:20 yBy:40];
-        [transform scaleXBy:.62 yBy:.62];
+        [transform translateXBy:5 yBy:10];
+        [transform scaleXBy:.3 yBy:.25];
         [transform concat];
         NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
         OrcaObject* anObject;
