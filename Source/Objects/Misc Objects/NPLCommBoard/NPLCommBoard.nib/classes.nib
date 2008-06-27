@@ -39,17 +39,23 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>blocAction</key>
+				<string>id</string>
 				<key>boardAction</key>
 				<string>id</string>
 				<key>channelAction</key>
 				<string>id</string>
 				<key>connectAction</key>
 				<string>id</string>
+				<key>controlRegAction</key>
+				<string>id</string>
 				<key>functionAction</key>
 				<string>id</string>
 				<key>ipAddressTextFieldAction</key>
 				<string>id</string>
 				<key>lockAction</key>
+				<string>id</string>
+				<key>numBytesToSendAction</key>
 				<string>id</string>
 				<key>sendCmdAction</key>
 				<string>id</string>
@@ -62,10 +68,16 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>blocPU</key>
+				<string>NSPopUpButton</string>
 				<key>boardPU</key>
 				<string>NSPopUpButton</string>
 				<key>channelPU</key>
 				<string>NSPopUpButton</string>
+				<key>cmdStringTextField</key>
+				<string>NSTextField</string>
+				<key>controlRegTextField</key>
+				<string>NSTextField</string>
 				<key>functionPU</key>
 				<string>NSPopUpButton</string>
 				<key>ipAddressTextField</key>
@@ -76,6 +88,8 @@
 				<string>NSTextField</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
+				<key>numBytesToSendPU</key>
+				<string>NSPopUpButton</string>
 				<key>sendButton</key>
 				<string>NSButton</string>
 				<key>writeValueField</key>
