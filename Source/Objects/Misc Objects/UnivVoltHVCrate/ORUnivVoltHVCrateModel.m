@@ -52,20 +52,20 @@ NSString* ORUnivVoltHVUSBConnector		    = @"ORUnivVoltHVUSBConnector";
     
     if([[self orcaObjects] count]){
         NSAffineTransform* transform = [NSAffineTransform transform];
-        [transform translateXBy:5 yBy:10];
-        [transform scaleXBy:.3 yBy:.25];
+        [transform translateXBy: 5 yBy: 10];
+        [transform scaleXBy: 0.45 yBy: 0.45];
         [transform concat];
         NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
         OrcaObject* anObject;
         while(anObject = [e nextObject]){
             BOOL oldHighlightState = [anObject highlighted];
-            [anObject setHighlighted:NO];
-            [anObject drawSelf:NSMakeRect(0,0,500,[[self image] size].height)];
+            [anObject setHighlighted: NO];
+            [anObject drawSelf: NSMakeRect(0, 0, 500, [[self image] size].height)];
             [anObject setHighlighted:oldHighlightState];
         }
     }
     [i unlockFocus];
-    [self setImage:i];
+    [self setImage: i];
     [i release];
     
     [[NSNotificationCenter defaultCenter]
@@ -90,6 +90,7 @@ NSString* ORUnivVoltHVUSBConnector		    = @"ORUnivVoltHVUSBConnector";
 
 - (void) connectionChanged
 {
+/*
 	ORConnector* controllerConnector = [[self connectors] objectForKey:[self crateAdapterConnectorKey]];
 	ORConnector* usbConnector = [[self connectors] objectForKey:ORUnivVoltHVUSBConnector];
 	if(![usbConnector isConnected] && ![controllerConnector isConnected]){
@@ -108,8 +109,8 @@ NSString* ORUnivVoltHVUSBConnector		    = @"ORUnivVoltHVUSBConnector";
 		}
 	}
 	else {
-		if([usbConnector isConnected]){
-			usingUSB = YES;
+//		if([usbConnector isConnected]){
+//			usingUSB = YES;
 			[controllerConnector setHidden:YES];
 		}
 		else {
@@ -117,6 +118,7 @@ NSString* ORUnivVoltHVUSBConnector		    = @"ORUnivVoltHVUSBConnector";
 			[usbConnector setHidden:YES];
 		}
 	}
+	*/
 }
 
 #pragma mark •••Accessors
@@ -187,6 +189,7 @@ NSString* ORUnivVoltHVUSBConnector		    = @"ORUnivVoltHVUSBConnector";
 
 - (void) pollCratePower
 {
+/*
 	if(usingUSB){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCratePower) object:nil];
 		NS_DURING
@@ -198,17 +201,57 @@ NSString* ORUnivVoltHVUSBConnector		    = @"ORUnivVoltHVUSBConnector";
 		[self performSelector:@selector(pollCratePower) withObject:nil afterDelay:10];
 	}
 	else [super pollCratePower];
+	*/
 }
 
 
-- (id) controllerCard
+- (void) setIsConnected:(BOOL)aFlag
 {
-	if(usingUSB){
-		return [self adapter];
+    isConnected = aFlag;
+/*
+	[self setReceiveCount:0];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORUnivVoltIsConnectedChanged object:self];
+	*/
+}
+
+- (NSString*) ipAddress
+{
+    return ipAddress;
+}
+
+- (void) setIpAddress: (NSString*)aIpAddress
+{
+	if(!aIpAddress)aIpAddress = @"";
+    [[[self undoManager] prepareWithInvocationTarget: self] setIpAddress: ipAddress];
+    
+    [ipAddress autorelease];
+    ipAddress = [aIpAddress copy];    
+/*
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORUnivVoltCrateIpAddressChanged object:self];
+	*/
+}
+
+
+- (void) connect
+{
+/*
+	if(!isConnected){
+
+		[self setSocket: [NetSocket netsocketConnectedToHost: ipAddress port: kUnivVoltHVCratePort]];	
+        [self setIsConnected:[socket isConnected]];
 	}
 	else {
-		return [self objectConnectedTo:[self crateAdapterConnectorKey]];
+		[self stop];
+		[self setSocket:nil];	
+        [self setIsConnected:[socket isConnected]];
 	}
+*/
+}
+
+- (BOOL) isConnected
+{
+	return isConnected;
 }
 
 - (void) runAboutToStart:(NSNotification*)aNote

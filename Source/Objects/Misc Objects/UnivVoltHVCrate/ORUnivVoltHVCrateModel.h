@@ -22,11 +22,17 @@
 #pragma mark •••Imported Files
 
 #import "ORCrate.h"
+#define kUnivVoltHVCratePort 1090
+#define kUnivVoltHVAddress 192.168.1.10
+
 #pragma mark •••Forward Declarations
 @class ORConnector;
 
 @interface ORUnivVoltHVCrateModel : ORCrate  {
-	BOOL usingUSB;
+	NSLock*		localLock;
+    NSString*	ipAddress;
+    BOOL		isConnected;
+//	NetSocket*	socket;
 }
 
 #pragma mark •••Accessors

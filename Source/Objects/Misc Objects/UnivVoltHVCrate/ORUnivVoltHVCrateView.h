@@ -26,7 +26,10 @@
 }
 - (int) maxNumberOfCards;
 - (int) cardWidth;
-- (BOOL) validateLayoutItems:(NSMenuItem*)menuItem;
+- (BOOL) validateLayoutItems: (NSMenuItem*)menuItem;
+- (int) slotAtPoint: (NSPoint)aPoint;
+
 //- (BOOL) canAddObject:(id)obj atPoint:(NSPoint)aPoint;
+//- (NSPoint) suggestPasteLocationFor: (id)aCard;
 //- (NSPoint) suggestPasteLocationFor:(id)aCard;
 @end

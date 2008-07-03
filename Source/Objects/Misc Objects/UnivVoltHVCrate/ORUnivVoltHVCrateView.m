@@ -31,33 +31,51 @@
 
 - (int) cardWidth
 {
-    return 16;
+    return 20;
 }
 
-- (BOOL) validateLayoutItems:(NSMenuItem*)menuItem
+- (BOOL) validateLayoutItems: (NSMenuItem*)menuItem
 {
 	return YES;
 }
-/*- (NSPoint) suggestPasteLocationFor:(id)aCard
+
+// This routine is overridden because cards in crate start at 0 but go from right to left.
+- (int)slotAtPoint: (NSPoint)aPoint 
 {
-	NSRange legalControllerRange = NSMakeRange([self maxNumberOfCards]-2,2);
-	if( [aCard isKindOfClass:NSClassFromString(@"ORUnivVoltHVControllerCard")]){
-		if([self slotRangeEmpty:legalControllerRange]){
-            return [self constrainLocation:NSMakePoint(([self maxNumberOfCards]-2)*[self cardWidth],0)];
-		}
-		else return NSMakePoint(-1,-1);
+	if([self isHorizontalView]){
+		int maxX;
+		int position;
+		maxX = [self cardWidth] * [self maxNumberOfCards];
+		position = maxX - (int)aPoint.x;
+		return floor( position ) / [self cardWidth] - 1; // Cards start at 0 and go from right to left
+//		return floor(((int)aPoint.x)/[self cardWidth]);
 	}
 	else {
-		NSPoint aPoint = [super suggestPasteLocationFor:aCard];
-		if(aPoint.x != -1 && aPoint.y != -1){
-			NSRange cardRange = NSMakeRange([self slotAtPoint:aPoint],[aCard numberSlotsUsed]);
-			if(NSIntersectionRange(legalControllerRange,cardRange).length != 0) return NSMakePoint(-1,-1);
+		return floor(((int)aPoint.y)/[self cardWidth]);
+	}
+}
+
+/*
+- (NSPoint) suggestPasteLocationFor: (id)aCard
+{
+	NSRange legalControllerRange = NSMakeRange(0, [self maxNumberOfCards] - 1);
+	if( [aCard isKindOfClass: NSClassFromString(@"ORUnivVoltControllerCard") ] ){
+		if( [self slotRangeEmpty: legalControllerRange] ){
+            return [self constrainLocation: NSMakePoint(([self maxNumberOfCards] - 1) * [self cardWidth], 0)];
+		}
+		else return NSMakePoint(-1, -1);
+	}
+	else {
+		NSPoint aPoint = [super suggestPasteLocationFor: aCard];
+		if( aPoint.x != -1 && aPoint.y != -1 ){
+			NSRange cardRange = NSMakeRange( [self slotAtPoint: aPoint], [aCard numberSlotsUsed] );
+			if( NSIntersectionRange(legalControllerRange,cardRange).length != 0 ) return NSMakePoint(-1,-1);
 		}
 		return aPoint;
 	}
 }
-
-
+*/
+/*
 - (BOOL) slotRangeEmpty:(NSRange)slotRange
 {	
     NSEnumerator* e = [[self group] objectEnumerator];
