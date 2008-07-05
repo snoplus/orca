@@ -986,12 +986,6 @@
 		846F4BA2098FE10900BF0031 /* RunNotVetoed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846F4BA1098FE10900BF0031 /* RunNotVetoed.tif */; };
 		846F4BE8098FFECC00BF0031 /* RunControlVetoed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846F4BE7098FFECC00BF0031 /* RunControlVetoed.tif */; };
 		846F4D4209900F2B00BF0031 /* RunVetoed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846F4D4109900F2B00BF0031 /* RunVetoed.tif */; };
-		8470194D0E02EDAC00195E3E /* NPLCommBoard.nib in Resources */ = {isa = PBXBuildFile; fileRef = 847019470E02EDAC00195E3E /* NPLCommBoard.nib */; };
-		8470194E0E02EDAC00195E3E /* NPLCommBoardIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 847019480E02EDAC00195E3E /* NPLCommBoardIcon.tif */; };
-		8470194F0E02EDAC00195E3E /* ORNPLCommBoardController.h in Headers */ = {isa = PBXBuildFile; fileRef = 847019490E02EDAC00195E3E /* ORNPLCommBoardController.h */; };
-		847019500E02EDAC00195E3E /* ORNPLCommBoardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8470194A0E02EDAC00195E3E /* ORNPLCommBoardController.m */; };
-		847019510E02EDAC00195E3E /* ORNPLCommBoardModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8470194B0E02EDAC00195E3E /* ORNPLCommBoardModel.h */; };
-		847019520E02EDAC00195E3E /* ORNPLCommBoardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8470194C0E02EDAC00195E3E /* ORNPLCommBoardModel.m */; };
 		84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AC90E0342F200195E3E /* ORCARoot.tif */; };
 		84701AD40E0344CF00195E3E /* ORCARootService.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AD30E0344CF00195E3E /* ORCARootService.tif */; };
 		84719DF4090591ED0077548A /* ORAugerFLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84719DF2090591ED0077548A /* ORAugerFLTDecoder.h */; };
@@ -1787,6 +1781,12 @@
 		9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */; };
 		9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */; };
 		9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */; };
+		9C7DCCA70E202C1B0034CC44 /* NPLCommBoard.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA10E202C1B0034CC44 /* NPLCommBoard.nib */; };
+		9C7DCCA80E202C1B0034CC44 /* NPLCommBoardIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA20E202C1B0034CC44 /* NPLCommBoardIcon.tif */; };
+		9C7DCCA90E202C1B0034CC44 /* ORNPLCommBoardController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7DCCA30E202C1B0034CC44 /* ORNPLCommBoardController.h */; };
+		9C7DCCAA0E202C1B0034CC44 /* ORNPLCommBoardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA40E202C1B0034CC44 /* ORNPLCommBoardController.m */; };
+		9C7DCCAB0E202C1B0034CC44 /* ORNPLCommBoardModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7DCCA50E202C1B0034CC44 /* ORNPLCommBoardModel.h */; };
+		9C7DCCAC0E202C1B0034CC44 /* ORNPLCommBoardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA60E202C1B0034CC44 /* ORNPLCommBoardModel.m */; };
 		9CB167790C5BC9580053CFAD /* xAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167770C5BC9580053CFAD /* xAxisMarker.gif */; };
 		9CB1677A0C5BC9580053CFAD /* yAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167780C5BC9580053CFAD /* yAxisMarker.gif */; };
 		9CB167FC0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167FA0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif */; };
@@ -2677,12 +2677,6 @@
 		846F4BA1098FE10900BF0031 /* RunNotVetoed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RunNotVetoed.tif; sourceTree = "<group>"; };
 		846F4BE7098FFECC00BF0031 /* RunControlVetoed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunControlVetoed.tif; path = Source/Objects/Control/RunControl/RunControlVetoed.tif; sourceTree = SOURCE_ROOT; };
 		846F4D4109900F2B00BF0031 /* RunVetoed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RunVetoed.tif; path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto/RunVetoed.tif; sourceTree = SOURCE_ROOT; };
-		847019470E02EDAC00195E3E /* NPLCommBoard.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NPLCommBoard.nib; path = "Source/Objects/Misc Objects/NPLCommBoard/NPLCommBoard.nib"; sourceTree = SOURCE_ROOT; };
-		847019480E02EDAC00195E3E /* NPLCommBoardIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NPLCommBoardIcon.tif; path = "Source/Objects/Misc Objects/NPLCommBoard/NPLCommBoardIcon.tif"; sourceTree = SOURCE_ROOT; };
-		847019490E02EDAC00195E3E /* ORNPLCommBoardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardController.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardController.h"; sourceTree = SOURCE_ROOT; };
-		8470194A0E02EDAC00195E3E /* ORNPLCommBoardController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNPLCommBoardController.m; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardController.m"; sourceTree = SOURCE_ROOT; };
-		8470194B0E02EDAC00195E3E /* ORNPLCommBoardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardModel.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.h"; sourceTree = SOURCE_ROOT; };
-		8470194C0E02EDAC00195E3E /* ORNPLCommBoardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNPLCommBoardModel.m; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.m"; sourceTree = SOURCE_ROOT; };
 		84701AC90E0342F200195E3E /* ORCARoot.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARoot.tif; path = "Source/Main Dialogs/ORCARootService/ORCARoot.tif"; sourceTree = SOURCE_ROOT; };
 		84701AD30E0344CF00195E3E /* ORCARootService.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARootService.tif; path = "Source/Main Document/ORCARootService.tif"; sourceTree = SOURCE_ROOT; };
 		84719DF2090591ED0077548A /* ORAugerFLTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAugerFLTDecoder.h; path = Source/Objects/Hardware/Auger/AugerFLT/ORAugerFLTDecoder.h; sourceTree = SOURCE_ROOT; };
@@ -3627,6 +3621,12 @@
 		9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICardDecoder.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGate2D.h; sourceTree = "<group>"; };
 		9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGate2D.m; sourceTree = "<group>"; };
+		9C7DCCA10E202C1B0034CC44 /* NPLCommBoard.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NPLCommBoard.nib; path = "Source/Objects/Misc Objects/NPLCommBoard/NPLCommBoard.nib"; sourceTree = SOURCE_ROOT; };
+		9C7DCCA20E202C1B0034CC44 /* NPLCommBoardIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NPLCommBoardIcon.tif; path = "Source/Objects/Misc Objects/NPLCommBoard/NPLCommBoardIcon.tif"; sourceTree = SOURCE_ROOT; };
+		9C7DCCA30E202C1B0034CC44 /* ORNPLCommBoardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardController.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardController.h"; sourceTree = SOURCE_ROOT; };
+		9C7DCCA40E202C1B0034CC44 /* ORNPLCommBoardController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNPLCommBoardController.m; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardController.m"; sourceTree = SOURCE_ROOT; };
+		9C7DCCA50E202C1B0034CC44 /* ORNPLCommBoardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardModel.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.h"; sourceTree = SOURCE_ROOT; };
+		9C7DCCA60E202C1B0034CC44 /* ORNPLCommBoardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNPLCommBoardModel.m; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.m"; sourceTree = SOURCE_ROOT; };
 		9C7E0885051A522B005F64D5 /* MuxScopeMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MuxScopeMap.h; path = Source/Experiments/Ncd/Detector/MuxScopeMap.h; sourceTree = SOURCE_ROOT; };
 		9CB167770C5BC9580053CFAD /* xAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = xAxisMarker.gif; path = Source/Widgets/Plotting/xAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		9CB167780C5BC9580053CFAD /* yAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = yAxisMarker.gif; path = Source/Widgets/Plotting/yAxisMarker.gif; sourceTree = SOURCE_ROOT; };
@@ -4891,7 +4891,7 @@
 				14E179030E14535B004BDE8F /* UnivVoltHVCrate */,
 				143B09AB0E11666700FE9DB8 /* UnivVoltHV */,
 				84AB8BB30D2314A500EC39F2 /* CmdHistory */,
-				847019460E02EDAC00195E3E /* NPLCommBoard */,
+				9C7DCCA00E202C1B0034CC44 /* NPLCommBoard */,
 				9C1363AF0D0A78FC006C550D /* NplHV */,
 				846C51250DBD3221005D6566 /* NplPicoCoulombMeter */,
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
@@ -5711,20 +5711,6 @@
 			);
 			name = RunVeto;
 			path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto;
-			sourceTree = SOURCE_ROOT;
-		};
-		847019460E02EDAC00195E3E /* NPLCommBoard */ = {
-			isa = PBXGroup;
-			children = (
-				847019470E02EDAC00195E3E /* NPLCommBoard.nib */,
-				847019480E02EDAC00195E3E /* NPLCommBoardIcon.tif */,
-				847019490E02EDAC00195E3E /* ORNPLCommBoardController.h */,
-				8470194A0E02EDAC00195E3E /* ORNPLCommBoardController.m */,
-				8470194B0E02EDAC00195E3E /* ORNPLCommBoardModel.h */,
-				8470194C0E02EDAC00195E3E /* ORNPLCommBoardModel.m */,
-			);
-			name = NPLCommBoard;
-			path = "Source/Objects/Misc Objects/NPLCommBoard";
 			sourceTree = SOURCE_ROOT;
 		};
 		8472AD670A82BD8E0069A069 /* BiRa3251 */ = {
@@ -7839,6 +7825,20 @@
 			path = Source/Widgets/GradientView;
 			sourceTree = SOURCE_ROOT;
 		};
+		9C7DCCA00E202C1B0034CC44 /* NPLCommBoard */ = {
+			isa = PBXGroup;
+			children = (
+				9C7DCCA10E202C1B0034CC44 /* NPLCommBoard.nib */,
+				9C7DCCA20E202C1B0034CC44 /* NPLCommBoardIcon.tif */,
+				9C7DCCA30E202C1B0034CC44 /* ORNPLCommBoardController.h */,
+				9C7DCCA40E202C1B0034CC44 /* ORNPLCommBoardController.m */,
+				9C7DCCA50E202C1B0034CC44 /* ORNPLCommBoardModel.h */,
+				9C7DCCA60E202C1B0034CC44 /* ORNPLCommBoardModel.m */,
+			);
+			name = NPLCommBoard;
+			path = "Source/Objects/Misc Objects/NPLCommBoard";
+			sourceTree = SOURCE_ROOT;
+		};
 		9CD6DD800BE83F1B007096CE /* PlotFFT */ = {
 			isa = PBXGroup;
 			children = (
@@ -8923,8 +8923,6 @@
 				8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */,
 				8407FBA90DF9CC22000F1441 /* ORHVRampItemController.h in Headers */,
 				8407FBAB0DF9CC22000F1441 /* ORHVRampItem.h in Headers */,
-				8470194F0E02EDAC00195E3E /* ORNPLCommBoardController.h in Headers */,
-				847019510E02EDAC00195E3E /* ORNPLCommBoardModel.h in Headers */,
 				143B09B40E11666800FE9DB8 /* ORUnivVoltController.h in Headers */,
 				143B09B60E11666800FE9DB8 /* ORUnivVoltDecoders.h in Headers */,
 				143B09B80E11666800FE9DB8 /* ORUnivVoltModel.h in Headers */,
@@ -8935,6 +8933,8 @@
 				846B8F120E15972A00C41F9D /* ORICS8065Controller.h in Headers */,
 				846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */,
 				846B8F1C0E15973500C41F9D /* vxi11.h in Headers */,
+				9C7DCCA90E202C1B0034CC44 /* ORNPLCommBoardController.h in Headers */,
+				9C7DCCAB0E202C1B0034CC44 /* ORNPLCommBoardModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9473,8 +9473,6 @@
 				8407F0E50DEF66DB000F1441 /* Caen862.nib in Resources */,
 				8407F0EB0DEF6700000F1441 /* C862.gif in Resources */,
 				8407FAB40DF9A32F000F1441 /* HVRampItem.nib in Resources */,
-				8470194D0E02EDAC00195E3E /* NPLCommBoard.nib in Resources */,
-				8470194E0E02EDAC00195E3E /* NPLCommBoardIcon.tif in Resources */,
 				84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */,
 				84701AD40E0344CF00195E3E /* ORCARootService.tif in Resources */,
 				143B09BA0E11666800FE9DB8 /* UnivVolt.nib in Resources */,
@@ -9485,6 +9483,8 @@
 				846B8F0F0E15972A00C41F9D /* ICS8065Box.tif in Resources */,
 				846B8F100E15972A00C41F9D /* m8065Service.x in Resources */,
 				846B8F110E15972A00C41F9D /* ORICS8065.nib in Resources */,
+				9C7DCCA70E202C1B0034CC44 /* NPLCommBoard.nib in Resources */,
+				9C7DCCA80E202C1B0034CC44 /* NPLCommBoardIcon.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10119,8 +10119,6 @@
 				8407F0E90DEF66DB000F1441 /* ORCaen862Model.m in Sources */,
 				8407FBA80DF9CC22000F1441 /* ORHVRampItemController.m in Sources */,
 				8407FBAA0DF9CC22000F1441 /* ORHVRampItem.m in Sources */,
-				847019500E02EDAC00195E3E /* ORNPLCommBoardController.m in Sources */,
-				847019520E02EDAC00195E3E /* ORNPLCommBoardModel.m in Sources */,
 				143B09B50E11666800FE9DB8 /* ORUnivVoltController.m in Sources */,
 				143B09B70E11666800FE9DB8 /* ORUnivVoltDecoders.m in Sources */,
 				143B09B90E11666800FE9DB8 /* ORUnivVoltModel.m in Sources */,
@@ -10131,6 +10129,8 @@
 				846B8F150E15972A00C41F9D /* ORICS8065Model.m in Sources */,
 				846B8F1D0E15973500C41F9D /* vxi11_clnt.m in Sources */,
 				846B8F200E15973500C41F9D /* vxi11_xdr.m in Sources */,
+				9C7DCCAA0E202C1B0034CC44 /* ORNPLCommBoardController.m in Sources */,
+				9C7DCCAC0E202C1B0034CC44 /* ORNPLCommBoardModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
