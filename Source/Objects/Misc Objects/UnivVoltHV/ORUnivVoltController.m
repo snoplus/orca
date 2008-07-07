@@ -80,9 +80,9 @@
     [self settingsLockChanged:nil];
 	[self ipAddressChanged:nil];
 	[self isConnectedChanged:nil];
-	[self frameErrorChanged:nil];
+//	[self frameErrorChanged:nil];
 	[self averageChanged:nil];
-	[self receiveCountChanged:nil];
+//	[self receiveCountChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -91,12 +91,12 @@
     [gSecurity setLock:ORUnivVoltLock to:secure];
     [dialogLock setEnabled:secure];
 }
-
+/*
 - (void) receiveCountChanged:(NSNotification*)aNote
 {
 	[receiveCountField setIntValue: [model receiveCount]];
 }
-
+*/
 #pragma mark •••Notifications
 - (void) isConnectedChanged:(NSNotification*)aNote
 {
@@ -108,26 +108,12 @@
 {
 	[ipAddressTextField setStringValue: [model ipAddress]];
 }
-
+/*
 - (void) frameErrorChanged:(NSNotification*)aNote
 {
 	[frameErrorField setIntValue: [model frameError]];
 }
-
-- (void) averageChanged:(NSNotification*)aNote
-{
-	if(!aNote){
-		int chan;
-		for(chan=0;chan<kNplpCNumChannels;chan++){
-			[[averageValueMatrix cellWithTag:chan] setFloatValue:0];
-		}
-	}
-	else {
-		int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-		[[averageValueMatrix cellWithTag:chan] setFloatValue:12*[model meterAverage:chan]/1048576.0]; //12 pC/20bits full scale
-	}
-}
-
+*/
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
     BOOL locked			= [gSecurity isLocked:ORUnivVoltLock];

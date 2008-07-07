@@ -19,24 +19,23 @@
 //-------------------------------------------------------------
 
 #import "OrcaObjectController.h"
+//#import "ORCard.h"
 
-@interface ORUnivVoltController : OrcaObjectController 
-{
+@interface ORUnivVoltController : OrcaObjectController {
+//@interface ORUnivVoltController : ORCard {
 	IBOutlet NSTextField*	ipConnectedTextField;
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSButton*		ipConnectButton;
-	IBOutlet NSTextField*	frameErrorField;
-	IBOutlet NSTextField*	receiveCountField;
 	IBOutlet NSMatrix*		averageValueMatrix;
 	IBOutlet NSButton*		dialogLock;
 }
 
 #pragma mark ***Interface Management
-- (void) receiveCountChanged:(NSNotification*)aNote;
+//- (void) receiveCountChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
-- (void) frameErrorChanged:(NSNotification*)aNote;
-- (void) averageChanged:(NSNotification*)aNote;
+//- (void) frameErrorChanged:(NSNotification*)aNote;
+//- (void) averageChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
