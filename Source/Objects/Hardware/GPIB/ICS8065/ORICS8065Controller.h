@@ -30,17 +30,10 @@
       
 // Test tab
     IBOutlet NSPopUpButton	*mPrimaryAddress;
-    IBOutlet NSTextField	*mSecondaryAddress;
     IBOutlet NSTextField	*mCommand;
     IBOutlet NSTextView		*mResult;
     IBOutlet NSTextField	*mConfigured;
-    
-    IBOutlet NSTextField	*mibsta;
-    IBOutlet NSTextField	*miberr;
-    IBOutlet NSTextField	*mibcntl;
-    
-    IBOutlet NSMatrix		*mIbstaErrors;
-    
+        
     IBOutlet NSButton		*connectButton;
     IBOutlet NSButton		*mQuery;
     IBOutlet NSButton		*mWrite;
@@ -73,8 +66,6 @@
 #pragma mark ***Support
 - (void)	isConnectedChanged:(NSNotification*)aNote;
 - (void)	ipAddressChanged:(NSNotification*)aNote;
-- (void)    changeIbstaStatus: (int) aStatus;
-- (void)    changeStatusSummary: (int) aStatus error: (int) anError count: (long) aCount;
 - (void)    setTestButtonsEnabled: (BOOL) aValue;
 - (void)    testLockChanged: (NSNotification*) aNotification;
 - (void)    checkGlobalSecurity;

@@ -38,8 +38,6 @@
 	else {
         [ self populatePullDowns ];
         [ self setTestButtonsEnabled: false ];
-        [ self changeIbstaStatus: 0 ];
-        [ self changeStatusSummary: 0 error: 0 count: 0 ];
         [ self testLockChanged: nil ];
         [ self updateWindow ];
     }
@@ -99,7 +97,6 @@
     [ connectButton setEnabled: !locked && !runInProgress ];
     [ ipConnectButton setEnabled: !locked && !runInProgress ];
     [ mPrimaryAddress setEnabled: !locked && !runInProgress ];
-    [ mSecondaryAddress setEnabled: !locked && !runInProgress ];
     [ mCommand setEnabled: !locked && !runInProgress];
     [ mQuery setEnabled: !locked && !runInProgress ];
     [ mWrite setEnabled: !locked && !runInProgress ];
@@ -232,8 +229,7 @@
             if ( [[self model] checkAddress:primaryAddress] )
                 [[self model] deactivateAddress:primaryAddress];
             
-            [[self model] setupDevice:primaryAddress secondaryAddress:
-                                                [[mSecondaryAddress stringValue] intValue]];
+            [[self model] setupDevice:primaryAddress];
             [mConfigured setStringValue:[NSString stringWithFormat:
                                                 @"Configured:%d\n", primaryAddress]];
             [self setTestButtonsEnabled:true];
@@ -247,12 +243,6 @@
                         nil, 						// alternate button
                         nil );						// other button
     NS_ENDHANDLER
-    
-    [self changeIbstaStatus:[[self model] ibsta]];
-    [self changeStatusSummary:[[self model] ibsta] 
-                         error:[[self model] iberr] 
-                         count:[[self model] ibcntl]];
-
 }
 
 
@@ -327,32 +317,6 @@
 
 
 #pragma mark ***Support
-- (void) changeIbstaStatus: (int) aStatus
-{
-    short 				i;
-    static	short ibstaLoc[kNumIbstaBits] = { 15, 14, 13, 12, 11, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
-    NSTextFieldCell	*tmpObject;
-    
-//    printf( "ibsta %d\n", aStatus );
-        
-    for ( i = 0; i < kNumIbstaBits; i++ )
-    {
-        tmpObject = [mIbstaErrors cellAtRow:i column:0];
-        
-        if ( aStatus & ( 1 << ibstaLoc[i] ) )
-            [tmpObject setTextColor:[NSColor blackColor]];
-
-        else
-            [tmpObject setTextColor:[NSColor grayColor]];
-    }    
-}
-
-- (void) changeStatusSummary:(int) aStatus error:(int) anError count:(long) aCount
-{
-    [mibsta setStringValue:[NSString stringWithFormat:@"%#0x", aStatus]];
-    [miberr setStringValue: [NSString stringWithFormat:@"%#0x", anError]];
-    [mibcntl setStringValue:[NSString stringWithFormat:@"%d", aCount]];
-}
 
 
 - (void) updateWindow
@@ -360,7 +324,6 @@
     [super updateWindow];
 	[self ipAddressChanged:nil];
 	[self isConnectedChanged:nil];
-    [mSecondaryAddress setStringValue:[NSString stringWithFormat:@""]];
     [mCommand setStringValue:[NSString stringWithFormat:@""]];
 }
 
@@ -408,13 +371,8 @@
 - (void) disableAll
 {
     [ mPrimaryAddress setEnabled:NO ];
-    [ mSecondaryAddress setEnabled:NO ];
     [ mCommand setEnabled:NO ];
     [ mConfigured setEnabled:NO ];
-    [ mibsta setEnabled:NO ];
-    [ miberr setEnabled:NO ];
-    [ mibcntl setEnabled:NO ];
-    [ mIbstaErrors setEnabled:NO ];
     [ mQuery setEnabled:NO ];
     [ mWrite setEnabled:NO ];
     [ mRead setEnabled:NO ];

@@ -39,8 +39,9 @@
 
 	int i;
 	for(i=0;i<32;i++){
-		[[rateMatrix0 cellAtRow:i column:0] setFloatValue:i*10.2];
 		[[enabledMatrix0 cellAtRow:i column:0] setTag:i];
+		[[rateMatrix0 cellAtRow:i column:0] setTag:i];
+		
 	}
 	[super awakeFromNib];
 }
@@ -110,7 +111,7 @@
 	[self leadingTimeResolutionChanged:nil];
 	[self leadingWidthResolutionChanged:nil];
 	[self deadTimeChanged:nil];
-    [self adcRateChanged:nil];
+    [self tdcRateChanged:nil];
 }
 
 #pragma mark ***Interface Management
@@ -141,11 +142,11 @@
 	}
 }
 
-- (void) adcRateChanged:(NSNotification*)aNote
+- (void) tdcRateChanged:(NSNotification*)aNote
 {
 	ORRate* theRateObj = [aNote object];	
 	if([model paramGroup] == ([theRateObj tag]/32)) {		
-		[[rateMatrix0 cellWithTag:[theRateObj tag]] setFloatValue: [theRateObj rate]];
+		[[rateMatrix0 cellWithTag:[theRateObj tag]%32] setFloatValue: [theRateObj rate]];
 		[valueBar0 setNeedsDisplay:YES];
 	}
 }

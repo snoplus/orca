@@ -96,7 +96,6 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 }
 
 #pragma mark ***Accessors
-
 - (void) setIntegrationTime:(double)newIntegrationTime
 {
 	//we this here so we have undo/redo on the rate object.
@@ -113,6 +112,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 {
 	return tdcRateGroup;
 }
+
 - (void) setTdcRateGroup:(ORRateGroup*)newTdcRateGroup
 {
 	[newTdcRateGroup retain];
@@ -510,7 +510,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     
     unsigned short 	theStatus;
  	isRunning = YES;
-	
+						
     NS_DURING
         [self read:kStatusRegister returnValue:&theStatus];
 		BOOL dataIsReady 	= theStatus & 0x0001;
@@ -584,11 +584,20 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [self setWindowWidth:	[aDecoder decodeIntForKey:@"windowWidth"]];
 	[self setParamGroup:	[aDecoder decodeIntForKey:@"paramGroup"]];
 	[self setAcqMode:		[aDecoder decodeIntForKey:@"acqMode"]];
- 
+	[self setTdcRateGroup:  [aDecoder decodeObjectForKey:@"tdcRateGroup"]];
+
 	int i;
     for (i = 0; i < 4; i++){
         [self setEnabledMask:i withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"enabledMask%d", i]]];
     }
+   
+	if(!tdcRateGroup){
+		[self setTdcRateGroup:[[[ORRateGroup alloc] initGroup:128 groupTag:0] autorelease]];
+	    [tdcRateGroup setIntegrationTime:5];
+    }
+    [self startRates];
+    [tdcRateGroup resetRates];
+    [tdcRateGroup calcRates];
    
     [[self undoManager] enableUndoRegistration];
     
@@ -613,6 +622,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	[anEncoder encodeInt:searchMargin		forKey:@"searchMargin"];
 	[anEncoder encodeInt:windowOffset		forKey:@"windowOffset"];
 	[anEncoder encodeInt:windowWidth		forKey:@"windowWidth"];
+    [anEncoder encodeObject:tdcRateGroup	forKey:@"tdcRateGroup"];
     for (i = 0; i < 4; i++){
         [anEncoder encodeInt32:enabledMask[i] forKey:[NSString stringWithFormat:@"enabledMask%d", i]];
     }

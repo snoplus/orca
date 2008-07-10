@@ -72,7 +72,7 @@
 - (void) paramGroupChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
-- (void) adcRateChanged:(NSNotification*)aNote;
+- (void) tdcRateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) deadTimeAction:(id)sender;

@@ -15,7 +15,7 @@
 //Washington reserve all rights in the program. Neither the authors,
 //University of Washington, or U.S. Government make any warranty, 
 //express or implied, or assume any liability or responsibility 
-//for the use of this software.
+//for the use of this softwagre.
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
@@ -45,7 +45,6 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     
     for ( i = 0; i < kMaxGpibAddresses; i++ ){
         memset(&mDeviceLink[i],0,sizeof(Create_LinkResp));
-        mDeviceSecondaryAddress[ i ] = 0;
     } 
     
 }
@@ -73,20 +72,17 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 //--------------------------------------------------------------------------------
 - (void) dealloc
 {
+	int i;
+    for ( i = 0; i < kMaxGpibAddresses; i++ ){
+        if ( mDeviceLink[i].lid != 0 ){
+			[self deactivateAddress:i];
+		}
+	} 
+
 	if(rpcClient)clnt_destroy(rpcClient);
-    [noDriverAlarm clearAlarm];
-    [noDriverAlarm release];
-    [noPluginAlarm clearAlarm];
-    [noPluginAlarm release];
-    [iCS8065Instance release];
     [theHWLock release];
     [ mErrorMsg release ];
     [ super dealloc ];
-}
-
-- (NSString*) pluginName
-{
-    return @"EduWashingtonNplOrcaNi488PlugIn.plugin";
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -214,32 +210,6 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     return( mErrorMsg );
 }
 
-#pragma mark ***gpib Methods
-- (int) ibsta
-{
-    if ( [ self isEnabled ]) {
-        return( [iCS8065Instance ibsta] );
-    }
-    return 0;
-}
-
-- (int) iberr
-{
-    if ( [ self isEnabled ]) {
-        return( [iCS8065Instance iberr] );
-    }
-    return 0;
-}
-
-- (long) ibcntl
-{
-    if ( [ self isEnabled ]) {
-        return( [iCS8065Instance ibcntl] );
-    }
-    return 0;
-}
-
-
 #pragma mark ***Basic commands
 //--------------------------------------------------------------------------------
 /*! \method		changePrimaryAddress
@@ -353,7 +323,8 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         
         // Deactivate the device
 		destroy_link_1(&mDeviceLink[aPrimaryAddress].lid,rpcClient);
-       
+        memset(&mDeviceLink[aPrimaryAddress],0,sizeof(Create_LinkResp));
+		
 		 if ( 0){
             [ mErrorMsg setString: @"***Error: deactivate" ];
             [ self gpibError: mErrorMsg number:-1];
@@ -442,11 +413,10 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 	mMonitorWrite = aMonitorWrite;
 }
 
-- (void) setupDevice: (short) aPrimaryAddress secondaryAddress: (short) aSecondaryAddress
+- (void) setupDevice: (short) aPrimaryAddress
     //--------------------------------------------------------------------------------
     /*" Sets up communication with the GPIB device. 
     _{#aPrimaryAddress	- The primary address for the GPIB device.}
-    _{#aSecondaryAddress - Normally not used.  Set to 0 if not used.}
     "*/
     //--------------------------------------------------------------------------------
 {  
@@ -456,8 +426,6 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         [theHWLock lock];   //-----begin critical section
        // [ self checkDeviceThrow: aPrimaryAddress checkSetup: false ];
         
-        mDeviceSecondaryAddress[ aPrimaryAddress ] = aSecondaryAddress;
-
 		Create_LinkParms crlp;
 		crlp.clientId = (long)rpcClient;
 		crlp.lockDevice = 0;
@@ -713,7 +681,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
             else {
                 short		listen = 1;
                 
-                //[ iCS8065Instance ibln:mDeviceLink[ aPrimaryAddress ] 
+                //[ g ibln:mDeviceLink[ aPrimaryAddress ] 
                   //      pad:aPrimaryAddress 
                     //    sad:mDeviceSecondaryAddress[ aPrimaryAddress ] 
                       //  listen:&listen ];

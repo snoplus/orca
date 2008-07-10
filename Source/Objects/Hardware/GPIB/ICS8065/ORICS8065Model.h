@@ -28,8 +28,6 @@
 #pragma mark ***Errors
 #define OExceptionGpibError	@"GPIBError"
 
-#import "EduWashingtonNplOrcaNi488PlugIn.h"
-
 #pragma mark ***Class Definition
 @interface ORICS8065Model : OrcaObject {
     NSString* ipAddress;
@@ -37,14 +35,10 @@
 	CLIENT* rpcClient;
 	
     Create_LinkResp             mDeviceLink[ kMaxGpibAddresses ];
-    short                       mDeviceSecondaryAddress[ kMaxGpibAddresses ];  
     NSMutableString*            mErrorMsg;  
     NSRecursiveLock*            theHWLock;
 	bool                        mMonitorRead;
 	bool                        mMonitorWrite;
-    ORAlarm*                    noDriverAlarm;
-    ORAlarm*                    noPluginAlarm;
-    EduWashingtonNplOrcaNi488PlugIn*  iCS8065Instance;
 }
 
 #pragma mark ***Initialization.
@@ -52,7 +46,6 @@
 - (id) 		init;
 - (void) 	dealloc;
 - (void) 	makeConnectors;
-- (NSString*) pluginName;
 
 #pragma mark ***Accessors
 - (CLIENT*) rpcClient;
@@ -62,9 +55,6 @@
 - (NSString*) ipAddress;
 - (void)	setIpAddress:(NSString*)aIpAddress;
 - (BOOL)    isEnabled;
-- (int) 	ibsta;
-- (int)		iberr;
-- (long)	ibcntl;
 - (NSMutableString*)	errorMsg;
 - (void)	connect;
 
@@ -74,7 +64,7 @@
 - (BOOL) 	checkAddress: (short) aPrimaryAddress;
 - (void) 	deactivateAddress: (short) aPrimaryAddress;
 - (void) 	resetDevice: (short) aPrimaryAddress;
-- (void) 	setupDevice: (short) aPrimaryAddress secondaryAddress: (short) aSecondaryAddress;
+- (void) 	setupDevice: (short) aPrimaryAddress;
 - (long) 	readFromDevice: (short) aPrimaryAddress data: (char*) aData 
                                                maxLength: (long) aMaxLength;
 - (void) 	writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand;
@@ -84,14 +74,12 @@
 - (void) 	enableEOT:(short)aPrimaryAddress state: (BOOL) state;
 - (void) 	wait: (short) aPrimaryAddress mask: (short) aWaitMask;
 
-
 - (void)	checkDeviceThrow: (short) aPrimaryAddress;
 - (void)	checkDeviceThrow: (short) aPrimaryAddress checkSetup: (BOOL) aState;
 - (void)	gpibError: (NSMutableString*) aMsg number:(int)errNum;
 - (id) 		getGpibController;
 - (void)	setGPIBMonitorRead: (bool) aMonitorRead;
 - (void)	setGPIBMonitorWrite: (bool) aMonitorWrite;
-
 @end
 
 #pragma mark ***Notification string definitions.
