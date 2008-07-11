@@ -84,6 +84,7 @@
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) objectsRemoved:(NSNotification*)aNote;
+- (void) removeObjects:(NSArray*)objects;
 
 #pragma mark ¥¥¥Archival
 - (id)	 initWithCoder:(NSCoder*)decoder;

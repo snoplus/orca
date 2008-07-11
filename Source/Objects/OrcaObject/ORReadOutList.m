@@ -340,17 +340,25 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 
 - (void) objectsRemoved:(NSNotification*)aNote
 {
-	NSArray* removedObjects = [[aNote userInfo] objectForKey:ORGroupObjectList];
-	NSEnumerator* e = [removedObjects objectEnumerator];
+	[self removeObjects:[[aNote userInfo] objectForKey:ORGroupObjectList]];
+}
+
+- (void) removeObjects:(NSArray*)objects
+{
+	NSEnumerator* e = [objects objectEnumerator];
     
 	id removedObject;
 	while(removedObject = [e nextObject]){
+		if([removedObject isKindOfClass:[ORGroup class]]){
+			[self removeObjects:[removedObject orcaObjects]];
+		}
 		id item;
 		while(item = [self itemHolding:removedObject]){
 			[self removeObject:item];
 		}
 	}
 }
+
 
 - (id) itemHolding:(id)anObject
 {
