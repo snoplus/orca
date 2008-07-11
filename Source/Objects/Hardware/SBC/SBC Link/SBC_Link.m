@@ -679,7 +679,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"/bin/rm",@"-r",@"ORCA",nil]];
+				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"/bin/rm",@"-rf",@"ORCA",nil]];
 		[aSequence setVerbose:verbose];
 		[aSequence setTextToDelegate:YES];
 				 
