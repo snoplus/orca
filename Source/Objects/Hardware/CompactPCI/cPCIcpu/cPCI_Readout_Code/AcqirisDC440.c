@@ -133,7 +133,7 @@ void processAcquirisDC440Command(SBC_Packet* aPacket)
 			
 			aString[0] = '\0';
 			for (i = 0; i < NumInstruments; i++){
-				sprintf(&aString[strlen(aString)],"%ld,%ld,%s,",digitizer[0].instrumentID,digitizer[0].serialNumber,digitizer[0].name);
+				sprintf(&aString[strlen(aString)],"%ld,%ld,%s,",digitizer[i].instrumentID,digitizer[i].serialNumber,digitizer[i].name);
 			}
 		
 			aPacket->cmdHeader.destination	= kAcqirisDC440;
