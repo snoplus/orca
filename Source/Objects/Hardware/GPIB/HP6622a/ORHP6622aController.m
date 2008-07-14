@@ -145,7 +145,7 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORHP6622aLock];
 	BOOL runInProgress  = [gOrcaGlobals runInProgress];
 	
-	BOOL locked		= [gSecurity isLocked:ORHP6622aLock];
+	//BOOL locked		= [gSecurity isLocked:ORHP6622aLock];
       
 	[sendCommandButton setEnabled:!lockedOrRunningMaintenance];
 	[commandField setEnabled:!lockedOrRunningMaintenance];

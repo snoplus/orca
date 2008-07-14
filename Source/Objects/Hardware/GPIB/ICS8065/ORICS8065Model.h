@@ -30,15 +30,16 @@
 
 #pragma mark ***Class Definition
 @interface ORICS8065Model : OrcaObject {
-    NSString* ipAddress;
-    BOOL isConnected;
-	CLIENT* rpcClient;
-	
-    Create_LinkResp             mDeviceLink[ kMaxGpibAddresses ];
+    NSString*					ipAddress;
+    BOOL						isConnected;
+	CLIENT*						rpcClient;
+    Create_LinkResp             mDeviceLink[kMaxGpibAddresses];
     NSMutableString*            mErrorMsg;  
     NSRecursiveLock*            theHWLock;
 	bool                        mMonitorRead;
 	bool                        mMonitorWrite;
+    int							primaryAddress;
+    NSString*					command;
 }
 
 #pragma mark ***Initialization.
@@ -48,8 +49,12 @@
 - (void) 	makeConnectors;
 
 #pragma mark ***Accessors
+- (NSString*) command;
+- (void)	setCommand:(NSString*)aCommand;
+- (int)		primaryAddress;
+- (void)	setPrimaryAddress:(int)aPrimaryAddress;
 - (CLIENT*) rpcClient;
-- (void) setRpcClient:(CLIENT*)anRpcClient;
+- (void)	setRpcClient:(CLIENT*)anRpcClient;
 - (BOOL)	isConnected;
 - (void)	setIsConnected:(BOOL)aFlag;
 - (NSString*) ipAddress;
@@ -59,10 +64,9 @@
 - (void)	connect;
 
 #pragma mark ***Commands
-- (void) 	changePrimaryAddress: (short) anOldPrimaryAddress newAddress: (short) aNewPrimaryAddress;
 - (void) 	changeState: (short) aPrimaryAddress online: (BOOL) aState;
 - (BOOL) 	checkAddress: (short) aPrimaryAddress;
-- (void) 	deactivateAddress: (short) aPrimaryAddress;
+- (void) 	deactivateDevice: (short) aPrimaryAddress;
 - (void) 	resetDevice: (short) aPrimaryAddress;
 - (void) 	setupDevice: (short) aPrimaryAddress;
 - (long) 	readFromDevice: (short) aPrimaryAddress data: (char*) aData 
@@ -74,15 +78,20 @@
 - (void) 	enableEOT:(short)aPrimaryAddress state: (BOOL) state;
 - (void) 	wait: (short) aPrimaryAddress mask: (short) aWaitMask;
 
-- (void)	checkDeviceThrow: (short) aPrimaryAddress;
-- (void)	checkDeviceThrow: (short) aPrimaryAddress checkSetup: (BOOL) aState;
 - (void)	gpibError: (NSMutableString*) aMsg number:(int)errNum;
 - (id) 		getGpibController;
 - (void)	setGPIBMonitorRead: (bool) aMonitorRead;
 - (void)	setGPIBMonitorWrite: (bool) aMonitorWrite;
+
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
+
 #pragma mark ***Notification string definitions.
+extern NSString* ORICS8065ModelCommandChanged;
+extern NSString* ORICS8065PrimaryAddressChanged;
 extern NSString* ORGpib1MonitorNotification;
 extern NSString* ORICS8065TestLock;
 extern NSString* ORGPIB1BoardChangedNotification;

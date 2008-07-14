@@ -18,9 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #define kNumIbstaBits 14
-
 
 @interface ORICS8065Controller : OrcaObjectController {
 // Setup tab
@@ -29,8 +27,8 @@
 	IBOutlet NSButton*		ipConnectButton;
       
 // Test tab
-    IBOutlet NSPopUpButton	*mPrimaryAddress;
-    IBOutlet NSTextField	*mCommand;
+    IBOutlet NSPopUpButton	*primaryAddressPU;
+    IBOutlet NSTextField	*commandTextField;
     IBOutlet NSTextView		*mResult;
     IBOutlet NSTextField	*mConfigured;
         
@@ -43,33 +41,35 @@
 	
 	IBOutlet NSTextView*	monitorView;
 
-    int		mPrimaryAddressValue;
 }
 
 #pragma mark ***Initialization
-- (id)			init;
-- (void) 		updateWindow;
-- (void)		populatePullDowns;
+- (id)		init;
+- (void) 	updateWindow;
+- (void)	populatePullDowns;
+- (void)    setTestButtonsEnabled: (BOOL) aValue;
 
 #pragma mark •••Actions
+- (IBAction) commandTextFieldAction:(id)sender;
 - (IBAction) 	query: (id) aSender;
 - (IBAction) 	write: (id) aSender;
 - (IBAction) 	read: (id) aSender;
 - (IBAction) 	connect: (id) aSender;
-- (IBAction)	changePrimaryAddress: (id) aSender;
+- (IBAction)	primaryAddressAction: (id) aSender;
 - (IBAction)    testLockAction:(id)sender;
 - (IBAction)	changeMonitorRead: (id) aSender;
 - (IBAction)	changeMonitorWrite: (id) aSender;
 - (IBAction)	ipAddressTextFieldAction:(id)sender;
 - (IBAction)	connectAction:(id)sender;
 
-#pragma mark ***Support
+#pragma mark ***Interface Management
+- (void) commandChanged:(NSNotification*)aNote;
+- (void)	primaryAddressChanged:(NSNotification*)aNote;
 - (void)	isConnectedChanged:(NSNotification*)aNote;
 - (void)	ipAddressChanged:(NSNotification*)aNote;
-- (void)    setTestButtonsEnabled: (BOOL) aValue;
 - (void)    testLockChanged: (NSNotification*) aNotification;
 - (void)    checkGlobalSecurity;
 - (void)    disableAll;
 
-
 @end
+

@@ -21,11 +21,15 @@
 				<string>id</string>
 				<key>changePrimaryAddress</key>
 				<string>id</string>
+				<key>commandTextFieldAction</key>
+				<string>id</string>
 				<key>connect</key>
 				<string>id</string>
 				<key>connectAction</key>
 				<string>id</string>
 				<key>ipAddressTextFieldAction</key>
+				<string>id</string>
+				<key>primaryAddressAction</key>
 				<string>id</string>
 				<key>query</key>
 				<string>id</string>
@@ -42,6 +46,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>commandTextField</key>
+				<string>NSTextField</string>
 				<key>connectButton</key>
 				<string>NSButton</string>
 				<key>ipAddressTextField</key>
@@ -49,8 +55,6 @@
 				<key>ipConnectButton</key>
 				<string>NSButton</string>
 				<key>ipConnectedTextField</key>
-				<string>NSTextField</string>
-				<key>mCommand</key>
 				<string>NSTextField</string>
 				<key>mConfigured</key>
 				<string>NSTextField</string>
@@ -76,6 +80,8 @@
 				<string>NSTextField</string>
 				<key>monitorView</key>
 				<string>NSTextView</string>
+				<key>primaryAddressPU</key>
+				<string>NSPopUpButton</string>
 				<key>testLockButton</key>
 				<string>NSButton</string>
 			</dict>
