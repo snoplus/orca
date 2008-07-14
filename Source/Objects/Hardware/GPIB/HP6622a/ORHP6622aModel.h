@@ -79,6 +79,7 @@
 - (void) logSystemResponse;
 - (void) sendAllToHW;
 - (void) readAllHW;
+- (void) sendClear;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)aDecoder;
