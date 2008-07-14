@@ -36,6 +36,7 @@
     IBOutlet NSMatrix*		ocProtectionMatrix;
     IBOutlet NSMatrix*		setCurrentMatrix;
     IBOutlet NSMatrix*		actCurrentMatrix;
+    IBOutlet NSButton*		sendClearButton;
 
     IBOutlet NSMatrix*		resetOverVoltageMatrix;
     IBOutlet NSMatrix*		resetOcProctectionMatrix;
@@ -73,6 +74,7 @@
 - (IBAction) ocProtectionOnAction:(id)sender;
 - (IBAction) resetOverVoltageAction:(id)sender;
 - (IBAction) resetOcProtectionAction:(id)sender;
+- (IBAction) setClearAction:(id)sender;
 
 @end
 
