@@ -230,6 +230,7 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
 		char reply[32];
 		reply[0]='\0';
 		long n = [self writeReadGPIBDevice:[NSString stringWithFormat:@"VOUT? %d",i+1] data:reply maxLength:32];
+		[self setActVoltage:i withValue:atof(reply)];
 		if(n>0){
 			reply[n-1]='\0';
 			[self setActVoltage:i withValue:atof(reply)];
@@ -244,6 +245,7 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
 		char reply[32];
 		reply[0]='\0';
 		long n = [self writeReadGPIBDevice:[NSString stringWithFormat:@"IOUT? %d",i+1] data:reply maxLength:32];
+		[self setActCurrent:i withValue:atof(reply)];
 		if(n>0){
 			reply[n-1]='\0';
 			[self setActCurrent:i withValue:atof(reply)];
@@ -258,6 +260,7 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
 		char reply[32];
 		reply[0]='\0';
 		long n = [self writeReadGPIBDevice:[NSString stringWithFormat:@"OVSET? %d",i+1] data:reply maxLength:32];
+		[self setOverVoltage:i withValue:atof(reply)];
 		if(n>0){
 			reply[n-1]='\0';
 			[self setOverVoltage:i withValue:atof(reply)];
@@ -279,7 +282,7 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
 {
 	int i;
 	for(i=0;i<kHP6622aNumberSupplies;i++){
-		[self writeToGPIBDevice:[NSString stringWithFormat:@"OCP %d,%.2f",i+1,overVoltage[i]]];
+		[self writeToGPIBDevice:[NSString stringWithFormat:@"OVSET %d,%.2f",i+1,overVoltage[i]]];
 		NSLog(@"HP6622a chan %d OverVoltage set to %.2f\n",i+1,overVoltage[i]);
 		[self logSystemResponse];
 	}
@@ -289,7 +292,7 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
 {
 	int i;
 	for(i=0;i<kHP6622aNumberSupplies;i++){
-		[self writeToGPIBDevice:[NSString stringWithFormat:@"OVSET %d,%d",i+1,ocProtectionOn[i]]];
+		[self writeToGPIBDevice:[NSString stringWithFormat:@"OCP %d,%d",i+1,ocProtectionOn[i]]];
 		NSLog(@"HP6622a chan %d Over Current Protection set to %@\n",i+1,ocProtectionOn[i]?@"ON":@"OFF");
 		[self logSystemResponse];
 	}
@@ -323,7 +326,6 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
 	[self writeVoltages];
 	[self writeCurrents];
 	[self writeOverVoltage];
-	[self writeOverVoltage];
 	[self writeOCProtection];
 	[self writeOutputOn];
 }
@@ -333,6 +335,13 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
 	[self readVoltages];
 	[self readCurrents];
 	[self readOverVoltages];
+}
+
+- (void) sendClear
+{
+	[self writeToGPIBDevice:[NSString stringWithFormat:@"CLR"]];
+	NSLog(@"HP6622a sent CLR command %@\n");
+	[self logSystemResponse];
 }
 
 #pragma mark ¥¥¥Archival
