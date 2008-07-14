@@ -37,6 +37,7 @@
                 resetOverVoltageAction = id; 
                 sendCommandAction = id; 
                 sendToHWAction = id; 
+                setClearAction = id; 
                 setCurrentAction = id; 
                 setOverVoltageAction = id; 
                 setVoltageAction = id; 
@@ -58,6 +59,7 @@
                 readIdButton = NSButton; 
                 resetOcProctectionMatrix = NSMatrix; 
                 resetOverVoltageMatrix = NSMatrix; 
+                sendClearButton = NSButton; 
                 sendCommandButton = NSButton; 
                 sendToHWButton = NSButton; 
                 setCurrentMatrix = NSMatrix; 
