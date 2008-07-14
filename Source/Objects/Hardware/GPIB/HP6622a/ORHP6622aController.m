@@ -145,19 +145,19 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORHP6622aLock];
 	BOOL runInProgress  = [gOrcaGlobals runInProgress];
 	
-	//BOOL locked		= [gSecurity isLocked:ORHP6622aLock];
+	BOOL locked		= [gSecurity isLocked:ORHP6622aLock];
       
 	[sendCommandButton setEnabled:!lockedOrRunningMaintenance];
 	[commandField setEnabled:!lockedOrRunningMaintenance];
 	
-	[outputOnMatrix setEnabled:!lockedOrRunningMaintenance];
-	[setVoltageMatrix setEnabled:!lockedOrRunningMaintenance];
-	[setCurrentMatrix setEnabled:!lockedOrRunningMaintenance];
-	[overVoltageMatrix setEnabled:!lockedOrRunningMaintenance];
+	[outputOnMatrix     setEnabled:!lockedOrRunningMaintenance];
+	[setVoltageMatrix   setEnabled:!lockedOrRunningMaintenance];
+	[setCurrentMatrix   setEnabled:!lockedOrRunningMaintenance];
+	[overVoltageMatrix  setEnabled:!lockedOrRunningMaintenance];
 	[ocProtectionMatrix setEnabled:!lockedOrRunningMaintenance];
 	[ocProtectionMatrix setEnabled:!lockedOrRunningMaintenance];
-	[sendToHWButton setEnabled:!lockedOrRunningMaintenance];
-	[readFromHWButton setEnabled:!lockedOrRunningMaintenance];
+	[sendToHWButton     setEnabled:!lockedOrRunningMaintenance];
+	[readFromHWButton   setEnabled:!lockedOrRunningMaintenance];
 	
 	NSString* s = @"";
 	if(lockedOrRunningMaintenance){
@@ -254,6 +254,7 @@
 {
 	NS_DURING
 		[model readIDString];
+
 	NS_HANDLER
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
@@ -395,6 +396,20 @@
 {
 	NS_DURING
 		[model resetOcProtection:[[sender selectedCell] tag]];
+	NS_HANDLER
+        NSLog( [ localException reason ] );
+        NSRunAlertPanel( [ localException name ], 	// Name of panel
+                         [ localException reason ],	// Reason for error
+                         @"OK",				// Okay button
+                         nil,				// alternate button
+                         nil );				// other button
+	NS_ENDHANDLER
+}
+
+- (IBAction) setClearAction:(id)sender
+{
+	NS_DURING
+		[model sendClear];
 	NS_HANDLER
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
