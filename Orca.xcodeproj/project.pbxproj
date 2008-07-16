@@ -15,9 +15,6 @@
 		143AEEA70E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 143AEE990E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m */; };
 		143AEEA80E2E988F003E3CAC /* ORUnivVoltHVCrateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 143AEE9A0E2E988F003E3CAC /* ORUnivVoltHVCrateView.h */; };
 		143AEEA90E2E988F003E3CAC /* ORUnivVoltHVCrateView.m in Sources */ = {isa = PBXBuildFile; fileRef = 143AEE9B0E2E988F003E3CAC /* ORUnivVoltHVCrateView.m */; };
-		143AEEAA0E2E988F003E3CAC /* Crate.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 143AEE9D0E2E988F003E3CAC /* Crate.jpg */; };
-		143AEEAB0E2E988F003E3CAC /* UnivVoltHVcrate.ai in Resources */ = {isa = PBXBuildFile; fileRef = 143AEE9E0E2E988F003E3CAC /* UnivVoltHVcrate.ai */; };
-		143AEEAC0E2E988F003E3CAC /* UnivVoltHVcrateSmall.ai in Resources */ = {isa = PBXBuildFile; fileRef = 143AEE9F0E2E988F003E3CAC /* UnivVoltHVcrateSmall.ai */; };
 		143AEEAD0E2E988F003E3CAC /* UnivVoltHVCrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 143AEEA00E2E988F003E3CAC /* UnivVoltHVCrate.gif */; };
 		143AEEAE0E2E988F003E3CAC /* UnivVoltHVCrate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 143AEEA10E2E988F003E3CAC /* UnivVoltHVCrate.nib */; };
 		143AEEAF0E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 143AEEA20E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif */; };
@@ -1942,9 +1939,6 @@
 		143AEE990E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltHVCrateModel.m; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltHVCrateModel.m"; sourceTree = SOURCE_ROOT; };
 		143AEE9A0E2E988F003E3CAC /* ORUnivVoltHVCrateView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltHVCrateView.h; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltHVCrateView.h"; sourceTree = SOURCE_ROOT; };
 		143AEE9B0E2E988F003E3CAC /* ORUnivVoltHVCrateView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltHVCrateView.m; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltHVCrateView.m"; sourceTree = SOURCE_ROOT; };
-		143AEE9D0E2E988F003E3CAC /* Crate.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = Crate.jpg; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/support/Crate.jpg"; sourceTree = SOURCE_ROOT; };
-		143AEE9E0E2E988F003E3CAC /* UnivVoltHVcrate.ai */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = UnivVoltHVcrate.ai; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/support/UnivVoltHVcrate.ai"; sourceTree = SOURCE_ROOT; };
-		143AEE9F0E2E988F003E3CAC /* UnivVoltHVcrateSmall.ai */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = UnivVoltHVcrateSmall.ai; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/support/UnivVoltHVcrateSmall.ai"; sourceTree = SOURCE_ROOT; };
 		143AEEA00E2E988F003E3CAC /* UnivVoltHVCrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVCrate.gif; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/UnivVoltHVCrate.gif"; sourceTree = SOURCE_ROOT; };
 		143AEEA10E2E988F003E3CAC /* UnivVoltHVCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = UnivVoltHVCrate.nib; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/UnivVoltHVCrate.nib"; sourceTree = SOURCE_ROOT; };
 		143AEEA20E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVCrateSmall.gif; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/UnivVoltHVCrateSmall.gif"; sourceTree = SOURCE_ROOT; };
@@ -3811,9 +3805,6 @@
 		143AEE9C0E2E988F003E3CAC /* support */ = {
 			isa = PBXGroup;
 			children = (
-				143AEE9D0E2E988F003E3CAC /* Crate.jpg */,
-				143AEE9E0E2E988F003E3CAC /* UnivVoltHVcrate.ai */,
-				143AEE9F0E2E988F003E3CAC /* UnivVoltHVcrateSmall.ai */,
 			);
 			name = support;
 			path = "Source/Objects/Misc Objects/UnivVoltHVCrate/support";
@@ -9538,9 +9529,6 @@
 				9C7DCCA80E202C1B0034CC44 /* NPLCommBoardIcon.tif in Resources */,
 				9C8846850E2D8D960099B98E /* ORHP4405A.nib in Resources */,
 				9C8846A60E2D90ED0099B98E /* HP4405A.gif in Resources */,
-				143AEEAA0E2E988F003E3CAC /* Crate.jpg in Resources */,
-				143AEEAB0E2E988F003E3CAC /* UnivVoltHVcrate.ai in Resources */,
-				143AEEAC0E2E988F003E3CAC /* UnivVoltHVcrateSmall.ai in Resources */,
 				143AEEAD0E2E988F003E3CAC /* UnivVoltHVCrate.gif in Resources */,
 				143AEEAE0E2E988F003E3CAC /* UnivVoltHVCrate.nib in Resources */,
 				143AEEAF0E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif in Resources */,
