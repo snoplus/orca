@@ -72,7 +72,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 //--------------------------------------------------------------------------------
 - (void) setUpImage
 {
-    [ self setImage: [ NSImage imageNamed: @"HP4405ASpectralAnalyzer" ]];
+    [ self setImage: [ NSImage imageNamed: @"HP4405A" ]];
 }
 
 //--------------------------------------------------------------------------------
@@ -998,7 +998,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
     } 	
 }
 
-#pragma mark ¥¥¥Archival
+#pragma mark â€¢â€¢â€¢Archival
 //--------------------------------------------------------------------------------
 /*!\method  initWithCoder  
  * \brief	Initialize object using archived settings.
