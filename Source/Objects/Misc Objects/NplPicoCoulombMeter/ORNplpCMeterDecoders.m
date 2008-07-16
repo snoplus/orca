@@ -34,7 +34,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^- Unix time (GMT
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ^^^^ ^^^^------------------------------- id counter
-----------^^^^-------------------------- chan
+----------^----------------------------- signal?
+-----------^^--------------------------- chan
+-------------^-------------------------- a or b
 ---------------^^^^ ^^^^ ^^^^ ^^^^ ^^^^- data (full scale = 12pC)
 ....followed records to fullfill the total length
 */
@@ -63,11 +65,11 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
     NSString* title= @"NplpCMeter Record\n\n";
 
 	ptr++;
-	NSString* deviceId  = [NSString stringWithFormat:@"device%2d",*ptr&0x0000000f];
+	NSString* deviceId  = [NSString stringWithFormat:@"device%2d\n",*ptr&0x0000000f];
 
 	ptr++;
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
-	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z"];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
 
 	NSString* valueString = @"";
 	int n = length - 3;
