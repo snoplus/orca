@@ -21,8 +21,6 @@
 
 #pragma mark •••Imported Filesg
 
-#import "ORHPPulserModel.h"
-
 #define kNplpCMeterPort 5000
 #define kNplpCNumChannels 4
 #define kNplpCStart  "B"
