@@ -256,6 +256,19 @@ NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged"
 	}
 }
 
+- (void) hvPanic
+{
+}
+
+- (void) hvOn
+{
+}
+
+- (void) hvOff
+{
+}
+
+
 #pragma mark ***Accessor
 - (NSString*) ipAddress
 {
@@ -304,6 +317,7 @@ NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged"
 		socket = nil;
     }
 }
+
 
 /*- (void) netsocket: (NetSocket*) inNetSocket dataAvailable: (unsigned) inAmount
 {

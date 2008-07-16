@@ -49,9 +49,13 @@
 
 #pragma mark ***Crate actions
 - (NSString *) obtainHVStatus;
+- (void) hvOn;
+- (void) hvOff;
+- (void) hvPanic;
+- (void) connect;
 
 #pragma mark ***Utilities
-- (void) connect;
+//- (void) connect;
 
 @end
 

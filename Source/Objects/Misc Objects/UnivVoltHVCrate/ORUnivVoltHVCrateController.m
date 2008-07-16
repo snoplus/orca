@@ -69,6 +69,27 @@
 	[model connect];
 }
 
+- (IBAction) getEthernetParamAction: (id) aSender
+{
+}
+
+- (IBAction) getConfigParamAction: (id) aSender
+{
+	
+}
+
+- (IBAction) hvOnAction: (id) aSender
+{
+}
+
+- (IBAction) hvOffAction: (id) aSender
+{
+}
+
+- (IBAction) panicOffAction: (id) aSender
+{
+}
+
 
 - (void) showError:(NSException*)anException name:(NSString*)name
 {

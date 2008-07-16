@@ -33,6 +33,7 @@
 	IBOutlet NSScrollView*	outputArea;
 	IBOutlet NSTextField*	ipAddress;
 	IBOutlet NSTextField*	hvStatusField;
+	IBOutlet NSTextField*	generalDialog;
 }
 
 #pragma mark *Accessors
@@ -43,11 +44,12 @@
 
 #pragma mark •••Actions
 - (IBAction) connectAction: (id) aSender;
-//- (IBAction) hvOn: (id) aSender;
-//- (IBAction) hvOff: (id) aSender;
-//- (IBAction) panicOff: (id) aSender;
+- (IBAction) getEthernetParamAction: (id) aSender;
+- (IBAction) getConfigParamAction: (id) aSender;
+- (IBAction) hvOnAction: (id) aSender;
+- (IBAction) hvOffAction: (id) aSender;
+- (IBAction) panicOffAction: (id) aSender;
 //- (IBAction) setInhibitOffAction:(id)sender;
-//- (IBAction) showConfig: (id) aSender;
 - (IBAction) showHVStatusAction: (id) aSender;
 - (void) showError: (NSException*) anException name: (NSString*)name;
 @end

@@ -161,9 +161,15 @@
 			<dict>
 				<key>connectAction</key>
 				<string>id</string>
-				<key>connectToCrate</key>
+				<key>getConfigParamAction</key>
 				<string>id</string>
-				<key>showHVStatus</key>
+				<key>getEthernetParamAction</key>
+				<string>id</string>
+				<key>hvOffAction</key>
+				<string>id</string>
+				<key>hvOnAction</key>
+				<string>id</string>
+				<key>panicOffAction</key>
 				<string>id</string>
 				<key>showHVStatusAction</key>
 				<string>id</string>
@@ -176,6 +182,8 @@
 			<dict>
 				<key>ethernetConnectButton</key>
 				<string>NSButton</string>
+				<key>generalDialog</key>
+				<string>NSTextField</string>
 				<key>hvStatusField</key>
 				<string>NSTextField</string>
 				<key>ipAddress</key>
