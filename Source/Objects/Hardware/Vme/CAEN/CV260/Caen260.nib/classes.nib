@@ -199,6 +199,8 @@
 			<dict>
 				<key>addressText</key>
 				<string>NSTextField</string>
+				<key>channelLabelMatrix</key>
+				<string>NSMatrix</string>
 				<key>disableAllButton</key>
 				<string>NSButton</string>
 				<key>enableAllButton</key>
