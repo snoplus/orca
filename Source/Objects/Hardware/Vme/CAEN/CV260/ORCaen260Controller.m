@@ -67,7 +67,15 @@
                          name : ORCaen260ModelScalerValueChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(pollingStateChanged:)
+                         name : ORCaen260ModelPollingStateChanged
+						object: model];
 
+   [notifyCenter addObserver : self
+                     selector : @selector(shipRecordsChanged:)
+                         name : ORCaen260ModelShipRecordsChanged
+						object: model];
 }
 
 #pragma mark •••Interface Management
@@ -84,6 +92,8 @@
     [super updateWindow];
 	[self enabledMaskChanged:nil];
 	[self scalerValueChanged:nil];
+	[self shipRecordsChanged:nil];
+    [self pollingStateChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -107,6 +117,16 @@
     [disableAllButton setEnabled:!lockedOrRunningMaintenance];
     [clearScalersButton setEnabled:!lockedOrRunningMaintenance];
     [readScalersButton setEnabled:!lockedOrRunningMaintenance];
+}
+
+- (void) shipRecordsChanged:(NSNotification*)aNote
+{
+	[shipRecordsButton setIntValue: [model shipRecords]];
+}
+
+- (void) pollingStateChanged:(NSNotification*)aNotification
+{
+	[pollingButton selectItemAtIndex:[pollingButton indexOfItemWithTag:[model pollingState]]];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -214,6 +234,16 @@
         NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Read Scalers", @"OK", nil, nil,
                         localException);
     NS_ENDHANDLER
+}
+
+- (IBAction) shipRecordsAction:(id)sender
+{
+	[model setShipRecords:[sender intValue]];	
+}
+
+- (IBAction) setPollingAction:(id)sender
+{
+    [model setPollingState:(NSTimeInterval)[[sender selectedItem] tag]];
 }
 
 - (void) populatePullDown

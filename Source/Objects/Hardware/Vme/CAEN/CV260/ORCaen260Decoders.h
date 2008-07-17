@@ -23,7 +23,7 @@
 @class ORDataPacket;
 @class ORDataSet;
 
-@interface ORCaen260DecoderForAdc : ORVmeCardDecoder {
+@interface ORCaen260DecoderForScaler : ORVmeCardDecoder {
 }
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;

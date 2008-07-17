@@ -92,7 +92,6 @@
 - (IBAction) enableAlarmAllAction:(id)sender;
 - (IBAction) enableAlarmNoneAction:(id)sender;
 - (IBAction) modeAction:(id)sender;
-- (IBAction) setPollingAction:(id)sender;
 - (IBAction) setJumperSettings:(id)sender;
 - (IBAction) calibrateAction:(id)sender;
 - (IBAction) selectFileAction:(id)sender;

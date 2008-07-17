@@ -31,6 +31,9 @@
 	IBOutlet NSButton*		resetInhibitButton;
 	IBOutlet NSButton*		clearScalersButton;
 	IBOutlet NSButton*		readScalersButton;
+	IBOutlet NSPopUpButton* pollingButton;
+	IBOutlet NSButton*		shipRecordsButton;
+
 }
 
 - (void) registerNotificationObservers;
@@ -39,6 +42,8 @@
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) scalerValueChanged:(NSNotification*)aNote;
+- (void) shipRecordsChanged:(NSNotification*)aNote;
+- (void) pollingStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) enabledMaskAction:(id)sender;
@@ -48,4 +53,6 @@
 - (IBAction) resetInhibitAction:(id)sender;
 - (IBAction) clearScalers:(id)sender;
 - (IBAction) readScalers:(id)sender;
+- (IBAction) shipRecordsAction:(id)sender;
+- (IBAction) setPollingAction:(id)sender;
 @end

@@ -65,6 +65,16 @@ static RegisterNamesStruct reg[kNumberOfV260Registers] = {
 NSString* ORCaen260ModelEnabledMaskChanged	 = @"ORCaen260ModelEnabledMaskChanged";
 NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
 NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged";
+NSString* ORCaen260ModelPollingStateChanged	 = @"ORCaen260ModelPollingStateChanged";
+NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged";
+
+@interface ORCaen260Model (private)
+- (void) _setUpPolling:(BOOL)verbose;
+- (void) _stopPolling;
+- (void) _startPolling;
+- (void) _pollAllChannels;
+- (void) _shipValues;
+@end
 
 @implementation ORCaen260Model
 
@@ -83,7 +93,22 @@ NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged
 
 - (void) dealloc
 {    
+	[self _stopPolling];
     [super dealloc];
+}
+
+- (void) wakeUp
+{
+    if(![self aWake]){
+        [self _setUpPolling:NO];
+    }
+    [super wakeUp];
+}
+
+- (void) sleep
+{
+    [super sleep];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
 - (void) setUpImage
@@ -124,6 +149,20 @@ NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged
 	else return scalerValue[index];
 }
 
+- (void) setPollingState:(NSTimeInterval)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollingState:pollingState];
+    
+    pollingState = aState;
+    
+    [self performSelector:@selector(_startPolling) withObject:nil afterDelay:0.5];
+    
+    [[NSNotificationCenter defaultCenter]
+		postNotificationName:ORCaen260ModelPollingStateChanged
+                      object: self];
+    
+}
+
 - (void) setScalerValue:(unsigned long)aValue index:(int)index
 {
 	if(index<0)return;
@@ -132,6 +171,67 @@ NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelScalerValueChanged 
 		object:self
 		userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
+
+}
+- (BOOL) shipRecords
+{
+    return shipRecords;
+}
+
+- (void) setShipRecords:(BOOL)aShipRecords
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:shipRecords];
+    
+    shipRecords = aShipRecords;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelShipRecordsChanged object:self];
+}
+
+- (NSTimeInterval)	pollingState
+{
+    return pollingState;
+}
+
+- (void) _pollAllChannels
+{
+    NS_DURING 
+        [self readScalers]; 
+		if(shipRecords){
+			[self _shipValues]; 
+		}
+    NS_HANDLER 
+		NSLogError(@"CV260",@"Polling Error",nil);
+	NS_ENDHANDLER
+        
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+	if(pollingState!=0){
+		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
+	}
+}
+
+- (void) _shipValues
+{
+   BOOL runInProgress = [gOrcaGlobals runInProgress];
+
+	if(runInProgress){
+		unsigned long data[19];
+		
+		data[0] = dataId | 19;
+		data[1] = (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16  | (enabledMask & 0x0000ffff);
+		data[2] = lastReadTime;	//seconds since 1970
+
+		int index = 3;
+		int i;
+		for(i=0;i<kNumCaen260Channels;i++){
+			data[index++] = scalerValue[i];
+		}
+		
+		if(index>3){
+			//the full record goes into the data stream via a notification
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+														object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+		}
+	}
 
 }
 
@@ -158,12 +258,40 @@ NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged
 
 - (void) setDataIds:(id)assigner
 {
-    dataId = [assigner assignDataIds:kShortForm]; //short form preferred
+    dataId = [assigner assignDataIds:kLongForm]; //short form preferred
 }
 
 - (void) syncDataIdsWith:(id)anotherCaen260
 {
     [self setDataId:[anotherCaen260 dataId]];
+}
+- (void) _stopPolling
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+	pollRunning = NO;
+}
+
+- (void) _startPolling
+{
+	[self _setUpPolling:YES];
+}
+
+- (void) _setUpPolling:(BOOL)verbose
+{
+	if(pollRunning)return;
+	
+    if(pollingState!=0){  
+		pollRunning = YES;
+        if(verbose)NSLog(@"Polling Caen260,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],pollingState);
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+        [self performSelector:@selector(_pollAllChannels) withObject:self afterDelay:pollingState];
+        [self _pollAllChannels];
+    }
+    else {
+		pollRunning = NO;
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
+        if(verbose)NSLog(@"Not Polling Caen260,%d,%d\n",[self crateNumber],[self slot]);
+    }
 }
 
 #pragma mark •••Hardware Access
@@ -225,11 +353,16 @@ NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged
 - (void) readScalers
 {
 	int i;
+	//get the time(UT!)
+	time_t	theTime;
+	time(&theTime);
+	struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+	lastReadTime = mktime(theTimeGMTAsStruct);
 	for(i=0;i<kNumCaen260Channels;i++){
 		if(enabledMask & (0x1<<i)){
 			unsigned long aValue = 0;
 			[[self adapter] readLongBlock:&aValue
-							atAddress:[self baseAddress]+[self getAddressOffset:kCounter0 + (i%4*0x04)]
+							atAddress:[self baseAddress]+[self getAddressOffset:kCounter0 + (i*0x04)]
 							numToRead:1
 						withAddMod:[self addressModifier]
 						usingAddSpace:0x01];
@@ -244,10 +377,10 @@ NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORCaen260DecoderForAdc",			@"decoder",
+        @"ORCaen260DecoderForScaler",		@"decoder",
         [NSNumber numberWithLong:dataId],	@"dataId",
         [NSNumber numberWithBool:NO],		@"variable",
-        [NSNumber numberWithLong:IsShortForm(dataId)?1:3],@"length",
+        [NSNumber numberWithLong:19],		@"length",
         nil];
     [dataDictionary setObject:aDictionary forKey:@"Caen260"];
     
@@ -261,6 +394,7 @@ NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
+	[self setPollingState:[decoder decodeIntForKey:@"pollingState"]];
 	
     [[self undoManager] enableUndoRegistration];
     
@@ -272,6 +406,7 @@ NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:[self pollingState] forKey:@"pollingState"];
 	
 }
 

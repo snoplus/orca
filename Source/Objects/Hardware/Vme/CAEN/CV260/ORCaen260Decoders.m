@@ -26,62 +26,60 @@
 #import "ORDataTypeAssigner.h"
 
 /*
-Short Form:
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-^^^^ ^^--------------------------------- V265 ID (from header)
---------^-^^^--------------------------- Crate number
--------------^-^^^^--------------------- Card number
---------------------^^^----------------- Channel number
------------------------^---------------- Range Type (0==12 bit, 1==15bit)
--------------------------^^^^ ^^^^ ^^^^- adc value
-
-Long Form:
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-^^^^ ^^^^ ^^^^ ^^----------------------- V265 ID (from header)
------------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length (always 2 longs)
+^^^^ ^^^^ ^^^^ ^^----------------------- V260 ID (from header)
+-----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length (always 20 longs)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 --------^-^^^--------------------------- Crate number
 -------------^-^^^^--------------------- Card number
---------------------^^^----------------- Channel number
------------------------^---------------- Range Type (0==12 bit, 1==15bit)
--------------------------^^^^ ^^^^ ^^^^- adc value
+--------------------^^^^ ^^^^ ^^^^ ^^^^- enabled mask
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  UT time of last read
 */
 
 
-@implementation ORCaen260DecoderForAdc
+@implementation ORCaen260DecoderForScaler
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
-    unsigned long length;
     unsigned long* ptr = (unsigned long*)someData;
-	if(IsLongForm(*ptr)) {
-        ptr++;
-        length = 2;
-    } else {
-        length = 1;
-    }
+	ptr++; //point to the location word
 	unsigned char crate   = (*ptr&0x01e00000)>>21;
 	unsigned char card   = (*ptr& 0x001f0000)>>16;
+	//unsigned char mask   = (*ptr& 0x0000ffff);
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
-	short chan = (*ptr >> 13) & 0x7;
-    if ((((*ptr) >> 12) & 0x1) == 0) { //ignore 15 bit dynamic range
-        [aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"Caen260", crateKey,cardKey,[self getChannelKey: chan],nil];
-    }
-    return length; //must return number of longs processed.
+	ptr++;	//point to the time
+	ptr++;	//first data word
+	int i;
+	for(i=0;i<kNumCaen260Channels;i++){
+		NSString* valueString = [NSString stringWithFormat:@"%u",*ptr];
+		NSString* channelKey = [self getChannelKey:i];
+
+		[aDataSet loadGenericData:valueString sender:self withKeys:@"Scalers",@"V260",  crateKey,cardKey,channelKey,nil];
+		ptr++;
+	}
+    return 19; //must return number of longs processed.
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
-    NSString* title= @"Caen260 ADC Record\n\n";
-	if(IsLongForm(*ptr))ptr++;
+    NSString* title= @"Caen260 Scaler Record\n\n";
+	ptr++; //point to location
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",(*ptr>>13)&0x7];
-	NSString* type  = [NSString stringWithFormat:@"Range = %@\n",*ptr&0x00001000?@"12 Bit":@"15 Bit"];
-	NSString* data  = [NSString stringWithFormat:@"Value = 0x%x\n",*ptr&0x00000fff];
-	    
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,crate,card,chan,type,data];               
+    NSString* mask  = [NSString stringWithFormat:@"Mask  = 0x%x\n",(*ptr)&0xffff];
+	ptr++; //point to time
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:*ptr];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+	ptr++; //first data word	
+	int i;
+	NSString* s = [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,mask,date];
+	for(i=0;i<kNumCaen260Channels;i++){
+		s = [s stringByAppendingFormat:@"%d:%u\n",i,*ptr];
+		ptr++;
+	}
+	
+    return s;               
 }
 
 

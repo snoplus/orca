@@ -68,13 +68,12 @@ enum {
 @interface ORCaen260Model :  ORCaenCardModel
 {
     @private
-		BOOL isRunning;
-		short adcIndex;
-        unsigned short enabledMask;
-		unsigned long  scalerValue[kNumCaen260Channels];
-		//cached values for use while running only
-		unsigned long location;
- 
+		BOOL			pollRunning;
+        unsigned short	enabledMask;
+		unsigned long	scalerValue[kNumCaen260Channels];
+		NSTimeInterval	pollingState;
+		BOOL			shipRecords;
+		time_t			lastReadTime;
 }
 
 #pragma mark •••Initialization
@@ -84,6 +83,8 @@ enum {
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (BOOL) shipRecords;
+- (void) setShipRecords:(BOOL)aShipRecords;
 - (unsigned long) scalerValue:(int)index;
 - (void) setScalerValue:(unsigned long)aValue index:(int)index;
 - (unsigned short) enabledMask;
@@ -92,6 +93,8 @@ enum {
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCaen260;
+- (void) setPollingState:(NSTimeInterval)aState;
+- (NSTimeInterval) pollingState;
 
 #pragma mark •••Hardware Access
 - (unsigned short) 	readBoardVersion;
@@ -112,5 +115,7 @@ enum {
 #pragma mark •••External String Definitions
 extern NSString* ORCaen260ModelEnabledMaskChanged;
 extern NSString* ORCaen260ModelScalerValueChanged;
+extern NSString* ORCaen260ModelPollingStateChanged;
+extern NSString* ORCaen260ModelShipRecordsChanged;
 
 extern NSString* ORCaen260SettingsLock;
