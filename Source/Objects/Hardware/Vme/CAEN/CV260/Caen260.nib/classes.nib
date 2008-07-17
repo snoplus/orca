@@ -14,23 +14,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ORValueBar</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>chainedView</key>
-				<string>id</string>
-				<key>dataSource</key>
-				<string>id</string>
-				<key>mXScale</key>
-				<string>id</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -88,34 +71,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>setLogScale</key>
-				<string>id</string>
-				<key>shiftLeft</key>
-				<string>id</string>
-				<key>shiftRight</key>
-				<string>id</string>
-				<key>zoomIn</key>
-				<string>id</string>
-				<key>zoomOut</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORAxis</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>preferenceController</key>
-				<string>id</string>
-				<key>viewToScale</key>
-				<string>NSView</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -219,23 +174,6 @@
 			<string>OrcaObjectController</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>ORValueBarGroup</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>dataSource</key>
-				<string>id</string>
-				<key>valueBar0</key>
-				<string>ORValueBar</string>
-				<key>xScale</key>
-				<string>ORAxis</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>disableAllAction</key>
@@ -248,9 +186,9 @@
 				<string>id</string>
 				<key>probeBoard</key>
 				<string>id</string>
-				<key>suppressZerosAction</key>
+				<key>retsetInhibitAction</key>
 				<string>id</string>
-				<key>triggerAction</key>
+				<key>setInhibitAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -271,9 +209,9 @@
 				<string>NSButton</string>
 				<key>probeButton</key>
 				<string>NSButton</string>
-				<key>suppressZerosButton</key>
+				<key>resetInhibitButton</key>
 				<string>NSButton</string>
-				<key>triggerButton</key>
+				<key>setInhibitButton</key>
 				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
