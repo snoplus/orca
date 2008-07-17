@@ -29,6 +29,17 @@
     return self;
 }
 
+- (void) awakeFromNib
+{
+	int i;
+	for(i=0;i<kNumCaen260Channels;i++){
+		[[enabledMaskMatrix cellAtRow:i column:0] setTag:i];
+		[[channelLabelMatrix cellAtRow:i column:0] setIntValue:i];
+	}
+
+	[super awakeFromNib];	
+}
+
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {

@@ -24,6 +24,7 @@
 	IBOutlet NSButton*		enableAllButton;
 	IBOutlet NSButton*		disableAllButton;
 	IBOutlet NSMatrix*		enabledMaskMatrix;
+	IBOutlet NSMatrix*		channelLabelMatrix;
     IBOutlet NSTextField* 	addressText;
     IBOutlet NSButton*		initButton;
 	IBOutlet NSButton*		probeButton;
