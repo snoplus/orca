@@ -63,7 +63,6 @@ static RegisterNamesStruct reg[kNumberOfV260Registers] = {
 
 #pragma mark •••Notification Strings
 NSString* ORCaen260ModelEnabledMaskChanged	 = @"ORCaen260ModelEnabledMaskChanged";
-NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
 NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged";
 NSString* ORCaen260ModelPollingStateChanged	 = @"ORCaen260ModelPollingStateChanged";
 NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged";
@@ -136,6 +135,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 - (BOOL)          swReset:(short) anIndex			{ return reg[anIndex].softwareReset; }
 - (BOOL)          hwReset:(short) anIndex			{ return reg[anIndex].hwReset; }
 - (NSString*)	  basicLockName						{ return @"ORCaen270BasicLock"; }
+- (NSString*)	  thresholdLockName					{ return @"ORCaen270ThresholdLock"; }
 
 - (NSString*) identifier
 {
@@ -196,12 +196,13 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 {
     NS_DURING 
         [self readScalers]; 
-		if(shipRecords){
-			[self _shipValues]; 
-		}
     NS_HANDLER 
 		NSLogError(@"CV260",@"Polling Error",nil);
 	NS_ENDHANDLER
+	
+	if(shipRecords){
+		[self _shipValues]; 
+	}
         
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
 	if(pollingState!=0){
@@ -278,8 +279,6 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 
 - (void) _setUpPolling:(BOOL)verbose
 {
-	if(pollRunning)return;
-	
     if(pollingState!=0){  
 		pollRunning = YES;
         if(verbose)NSLog(@"Polling Caen260,%d,%d  every %.0f seconds.\n",[self crateNumber],[self slot],pollingState);
@@ -387,6 +386,10 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
     return dataDictionary;
 }
 
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
+}
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder

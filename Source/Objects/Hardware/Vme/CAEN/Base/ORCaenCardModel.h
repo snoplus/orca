@@ -27,8 +27,6 @@
 #import "ORVmeIOCard.h"
 #import "ORCaenDataDecoder.h"
 #import "ORDataPacket.h"
-#import "ORDataTaker.h"
-#import "ORHWWizard.h"
 #import "SBC_Config.h"
 #import "VME_HW_Definitions.h"
 
@@ -63,7 +61,7 @@ typedef struct RegisterNamesStruct {
 @class ORCaenDataDecoder;
  
 // Class declaration.
-@interface ORCaenCardModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping> {
+@interface ORCaenCardModel : ORVmeIOCard  {
 // Error handling
     unsigned long   	errorCount;
     unsigned long       totalEventCounter;
@@ -149,6 +147,8 @@ typedef struct RegisterNamesStruct {
 - (void) 	runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
 
 #pragma mark ¥¥¥HW Wizard
+- (BOOL) hasParmetersToRamp;
+- (void) reset;
 - (int) numberOfChannels;
 - (NSArray*) wizardSelections;
 - (NSArray*) wizardParameters;

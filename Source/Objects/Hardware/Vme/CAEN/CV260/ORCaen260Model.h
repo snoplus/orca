@@ -118,4 +118,3 @@ extern NSString* ORCaen260ModelScalerValueChanged;
 extern NSString* ORCaen260ModelPollingStateChanged;
 extern NSString* ORCaen260ModelShipRecordsChanged;
 
-extern NSString* ORCaen260SettingsLock;

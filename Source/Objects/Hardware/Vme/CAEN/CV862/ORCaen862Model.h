@@ -21,6 +21,8 @@
 //-------------------------------------------------------------
 
 #import "ORCaenCardModel.h"
+#import "ORDataTaker.h"
+#import "ORHWWizard.h"
 
 // Declaration of constants for module.
 enum {
@@ -68,7 +70,7 @@ enum {
 #define k862OutputBufferSize 0x07FF
 
 // Class definition
-@interface ORCaen862Model : ORCaenCardModel
+@interface ORCaen862Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
 }
 

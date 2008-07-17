@@ -23,6 +23,8 @@
 //-------------------------------------------------------------
 
 #import "ORCaenCardModel.h"
+#import "ORDataTaker.h"
+#import "ORHWWizard.h"
 
 // Declaration of constants for module.
 enum {
@@ -71,7 +73,7 @@ enum {
 
 
 // Class definition
-@interface ORCaen785Model : ORCaenCardModel
+@interface ORCaen785Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
 }
 

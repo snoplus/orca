@@ -18,7 +18,8 @@
 //-------------------------------------------------------------
 
 #import "ORCaenCardModel.h"
-#import "ORCaenCardModel.h"
+#import "ORDataTaker.h"
+#import "ORHWWizard.h"
 
 @class ORRateGroup;
 @class ORTimer;
@@ -58,7 +59,7 @@ enum {
 #define kADCOutputBufferSize 0x0FFC
 
 // Class definition
-@interface ORCaen1190Model : ORCaenCardModel
+@interface ORCaen1190Model : ORCaenCardModel <ORDataTaker,ORHWWizard,ORHWRamping>
 {
 	ORTimer*		aTimer;
 	unsigned long	enabledMask[4];

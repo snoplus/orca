@@ -54,7 +54,7 @@
 	
     [notifyCenter addObserver : self
 					 selector : @selector(basicLockChanged:)
-						 name : ORCaen260SettingsLock
+						 name : [self basicLockName]
 						object: nil];
 	
     [notifyCenter addObserver : self
@@ -99,15 +99,17 @@
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    [gSecurity setLock:ORCaen260SettingsLock to:secure];
+    [gSecurity setLock:[self basicLockName] to:secure];
+    [gSecurity setLock:[self thresholdLockName] to:secure];
     [basicLockButton setEnabled:secure];
+    [thresholdLockButton setEnabled:secure];
 }
 
 - (void) basicLockChanged:(NSNotification*)aNotification
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen260SettingsLock];
-    BOOL locked = [gSecurity isLocked:ORCaen260SettingsLock];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self basicLockName]];
+    BOOL locked = [gSecurity isLocked:[self basicLockName]];
 	
     [basicLockButton setState: locked];
     [addressStepper setEnabled:!locked && !runInProgress];
@@ -115,8 +117,25 @@
     
     [enableAllButton setEnabled:!lockedOrRunningMaintenance];
     [disableAllButton setEnabled:!lockedOrRunningMaintenance];
+    [basicReadButton setEnabled:!lockedOrRunningMaintenance];
+    [basicWriteButton setEnabled:!lockedOrRunningMaintenance];
+}
+
+- (void) thresholdLockChanged:(NSNotification*)aNotification
+{
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:[self thresholdLockName]];
+    BOOL locked = [gSecurity isLocked:[self thresholdLockName]];
+	
+    [thresholdLockButton setState: locked];
+    [enabledMaskMatrix setEnabled:!locked && !runInProgress];
+    [setInhibitButton setEnabled:!locked && !runInProgress];
+    
+    [resetInhibitButton setEnabled:!lockedOrRunningMaintenance];
     [clearScalersButton setEnabled:!lockedOrRunningMaintenance];
     [readScalersButton setEnabled:!lockedOrRunningMaintenance];
+    [pollingButton setEnabled:!lockedOrRunningMaintenance];
+    [shipRecordsButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) shipRecordsChanged:(NSNotification*)aNote
@@ -167,11 +186,6 @@
 		if(state)aMask |= (1<<i);
 	}
 	[model setEnabledMask:aMask];	
-}
-
-- (IBAction) settingLockAction:(id) sender
-{
-    [gSecurity tryToSetLock:ORCaen260SettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
 - (IBAction)enableAllAction:(id)sender
@@ -263,16 +277,16 @@
 {
     if([tabView indexOfTabViewItem:tabViewItem] == 0){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:NSMakeSize(560,630)];
+		[self resizeWindowToSize:NSMakeSize(268,420)];
 		[[self window] setContentView:tabView];
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 1){
 		[[self window] setContentView:blankView];
-		[self resizeWindowToSize:NSMakeSize(560,630)];
+		[self resizeWindowToSize:NSMakeSize(357,452)];
 		[[self window] setContentView:tabView];
     }
 
-    NSString* key = [NSString stringWithFormat: @"orca.ORCaenV260Card%d.selectedtab",[model slot]];
+    NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 
