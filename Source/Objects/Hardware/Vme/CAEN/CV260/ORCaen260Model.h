@@ -95,6 +95,9 @@ enum {
 - (void) syncDataIdsWith:(id)anotherCaen260;
 - (void) setPollingState:(NSTimeInterval)aState;
 - (NSTimeInterval) pollingState;
+- (void) registerNotificationObservers;
+- (void) runAboutToStart:(NSNotification*)aNote;
+- (void) runAboutToStop:(NSNotification*)aNote;
 
 #pragma mark •••Hardware Access
 - (unsigned short) 	readBoardVersion;
@@ -102,6 +105,7 @@ enum {
 - (void)			setInhibit;
 - (void)			resetInhibit;
 - (void)			clearScalers;
+- (void)			incScalers;
 - (void)			readScalers;
 
 #pragma mark •••Data Header

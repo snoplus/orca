@@ -93,6 +93,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 - (void) dealloc
 {    
 	[self _stopPolling];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
@@ -294,6 +295,35 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 }
 
 #pragma mark •••Hardware Access
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(runAboutToStart:)
+                         name: ORRunAboutToStartNotification
+                       object: nil];
+    
+    
+    [notifyCenter addObserver: self
+                     selector: @selector(runAboutToStop:)
+                         name: ORRunAboutToStopNotification
+                       object: nil];
+}
+
+- (void) runAboutToStart:(NSNotification*)aNote
+{
+	NSLog(@"clearing scaler values for CV260,%d,%d\n",[self crateNumber],[self slot]);
+	[self clearScalers];
+}
+
+- (void) runAboutToStop:(NSNotification*)aNote
+{
+	if(pollRunning){
+		[self _pollAllChannels];
+	}
+}
+
 - (unsigned short) 	readBoardVersion
 {
     unsigned short aValue = 0;
@@ -349,6 +379,18 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 					
 }
 
+- (void) incScalers
+{
+	unsigned short aValue = 0;
+    [[self adapter] writeWordBlock:&aValue
+						atAddress:[self baseAddress]+[self getAddressOffset:kScalerIncrease]
+						numToWrite:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+					
+}
+
+
 - (void) readScalers
 {
 	int i;
@@ -398,9 +440,10 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 	
     [[self undoManager] disableUndoRegistration];
 	[self setPollingState:[decoder decodeIntForKey:@"pollingState"]];
+	[self setShipRecords:[decoder decodeBoolForKey:@"shipRecords"]];
 	
     [[self undoManager] enableUndoRegistration];
-    
+    [self registerNotificationObservers];
     [self setAddressModifier:0x39];
 	
     return self;
@@ -410,13 +453,8 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 {
     [super encodeWithCoder:encoder];
     [encoder encodeInt:[self pollingState] forKey:@"pollingState"];
+    [encoder encodeBool:[self pollingState] forKey:@"shipRecords"];
 	
 }
 
-
-- (BOOL) partOfEvent:(unsigned short)aChannel
-{
-	//included to satisfy the protocal... change if needed
-	return NO;
-}
 @end

@@ -184,6 +184,8 @@
 				<string>id</string>
 				<key>enabledMaskAction</key>
 				<string>id</string>
+				<key>incScalers</key>
+				<string>id</string>
 				<key>readScalers</key>
 				<string>id</string>
 				<key>resetInhibitAction</key>
@@ -203,6 +205,8 @@
 			<dict>
 				<key>channelLabelMatrix</key>
 				<string>NSMatrix</string>
+				<key>clear1ScalersButton</key>
+				<string>NSButton</string>
 				<key>clearScalersButton</key>
 				<string>NSButton</string>
 				<key>disableAllButton</key>
@@ -211,6 +215,8 @@
 				<string>NSButton</string>
 				<key>enabledMaskMatrix</key>
 				<string>NSMatrix</string>
+				<key>incScalersButton</key>
+				<string>NSButton</string>
 				<key>pollingButton</key>
 				<string>NSPopUpButton</string>
 				<key>readScalersButton</key>

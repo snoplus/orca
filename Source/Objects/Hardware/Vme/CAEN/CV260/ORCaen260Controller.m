@@ -133,6 +133,8 @@
     
     [resetInhibitButton setEnabled:!lockedOrRunningMaintenance];
     [clearScalersButton setEnabled:!lockedOrRunningMaintenance];
+    [clear1ScalersButton setEnabled:!lockedOrRunningMaintenance];
+    [incScalersButton setEnabled:!lockedOrRunningMaintenance];
     [readScalersButton setEnabled:!lockedOrRunningMaintenance];
     [pollingButton setEnabled:!lockedOrRunningMaintenance];
     [shipRecordsButton setEnabled:!lockedOrRunningMaintenance];
@@ -249,6 +251,20 @@
                         localException);
     NS_ENDHANDLER
 }
+
+- (IBAction) incScalers:(id)sender
+{
+   NS_DURING
+        [model incScalers];
+		NSLog(@"Inc Scalers on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    NS_HANDLER
+        NSLog(@"Inc Scalers of Caen260 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Inc Scalers", @"OK", nil, nil,
+                        localException);
+    NS_ENDHANDLER
+}
+
 
 - (IBAction) shipRecordsAction:(id)sender
 {

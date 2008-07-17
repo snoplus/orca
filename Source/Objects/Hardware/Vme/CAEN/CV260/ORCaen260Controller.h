@@ -30,6 +30,8 @@
 	IBOutlet NSButton*		setInhibitButton;
 	IBOutlet NSButton*		resetInhibitButton;
 	IBOutlet NSButton*		clearScalersButton;
+	IBOutlet NSButton*		clear1ScalersButton;
+	IBOutlet NSButton*		incScalersButton;
 	IBOutlet NSButton*		readScalersButton;
 	IBOutlet NSPopUpButton* pollingButton;
 	IBOutlet NSButton*		shipRecordsButton;
@@ -52,6 +54,7 @@
 - (IBAction) setInhibitAction:(id)sender;
 - (IBAction) resetInhibitAction:(id)sender;
 - (IBAction) clearScalers:(id)sender;
+- (IBAction) incScalers:(id)sender;
 - (IBAction) readScalers:(id)sender;
 - (IBAction) shipRecordsAction:(id)sender;
 - (IBAction) setPollingAction:(id)sender;

@@ -34,6 +34,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 -------------^-^^^^--------------------- Card number
 --------------------^^^^ ^^^^ ^^^^ ^^^^- enabled mask
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  UT time of last read
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 0
+..
+..
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  counter 15
 */
 
 
