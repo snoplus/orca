@@ -50,21 +50,9 @@
                      selector : @selector(enabledMaskChanged:)
                          name : ORCaen260ModelEnabledMaskChanged
 						object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(suppressZerosChanged:)
-                         name : ORCaen260ModelSuppressZerosChanged
-						object: model];
-
 }
 
 #pragma mark •••Interface Management
-
-- (void) suppressZerosChanged:(NSNotification*)aNote
-{
-	[suppressZerosButton setIntValue: [model suppressZeros]];
-}
-
 - (void) enabledMaskChanged:(NSNotification*)aNote
 {
 	int i;
@@ -77,7 +65,6 @@
 {
     [super updateWindow];
 	[self enabledMaskChanged:nil];
-	[self suppressZerosChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -98,10 +85,8 @@
     [addressText setEnabled:!locked && !runInProgress];
     
     [initButton setEnabled:!lockedOrRunningMaintenance];
-    [suppressZerosButton setEnabled:!lockedOrRunningMaintenance];
     [enableAllButton setEnabled:!lockedOrRunningMaintenance];
     [disableAllButton setEnabled:!lockedOrRunningMaintenance];
-    [triggerButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -117,12 +102,6 @@
 }
 
 #pragma mark •••Actions
-
-- (void) suppressZerosAction:(id)sender
-{
-	[model setSuppressZeros:[sender intValue]];	
-}
-
 - (void) enabledMaskAction:(id)sender
 {
 	int i;
@@ -148,6 +127,33 @@
 {
 	[model setEnabledMask:0];
 }
+
+- (IBAction) setInhibitAction:(id)sender
+{
+   NS_DURING
+        [model setInhibit];
+		NSLog(@"Set Inhibit on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    NS_HANDLER
+        NSLog(@"Set Inhibit of Caen260 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Set Inhibit", @"OK", nil, nil,
+                        localException);
+    NS_ENDHANDLER
+}
+
+- (IBAction) retsetInhibitAction:(id)sender
+{
+   NS_DURING
+        [model resetInhibit];
+		NSLog(@"Reset Inhibit on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    NS_HANDLER
+        NSLog(@"Reset Inhibit of Caen260 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 seset Inhibit", @"OK", nil, nil,
+                        localException);
+    NS_ENDHANDLER
+}
+
 
 
 -(IBAction)initBoard:(id)sender
@@ -187,21 +193,6 @@
 						localException);
     NS_ENDHANDLER
 }
-
-- (IBAction) triggerAction:(id)sender
-{
-    NS_DURING
-        [model trigger];		//force trigger
-		NSLog(@"Triggered Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
-        
-    NS_HANDLER
-        NSLog(@"Trigger of Caen260 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Trigger", @"OK", nil, nil,
-                        localException);
-    NS_ENDHANDLER
-
-}
-
 
 - (void) populatePullDown
 {

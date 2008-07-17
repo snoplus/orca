@@ -27,7 +27,7 @@
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
 
-#define 	kNumCaen260Channels 		8
+#define 	kNumCaen260Channels 		16
 
 #pragma mark •••Register Definitions
 enum {
@@ -98,14 +98,13 @@ enum {
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCaen260;
 
-
-
 #pragma mark •••Hardware Access
 - (void)			initBoard;
 - (unsigned short) 	readBoardID;
 - (unsigned short) 	readBoardVersion;
 - (unsigned short) 	readFixedCode;
-- (void)			trigger;
+- (void)			setInhibit;
+- (void)			resetInhibit;
 
 #pragma mark •••Data Header
 - (NSDictionary*) dataRecordDescription;

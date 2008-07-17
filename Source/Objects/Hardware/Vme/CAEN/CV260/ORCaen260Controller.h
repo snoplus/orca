@@ -21,29 +21,30 @@
 
 @interface ORCaen260Controller : ORCaenCardController {
 
-	IBOutlet NSButton*		suppressZerosButton;
 	IBOutlet NSButton*		enableAllButton;
 	IBOutlet NSButton*		disableAllButton;
 	IBOutlet NSMatrix*		enabledMaskMatrix;
     IBOutlet NSTextField* 	addressText;
     IBOutlet NSButton*		initButton;
 	IBOutlet NSButton*		probeButton;
-    IBOutlet NSButton*		triggerButton;
+
+	IBOutlet NSButton*		setInhibitButton;
+	IBOutlet NSButton*		resetInhibitButton;
+
 }
 
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
-- (void) suppressZerosChanged:(NSNotification*)aNote;
 - (void) enabledMaskChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Actions
-- (IBAction) suppressZerosAction:(id)sender;
 - (IBAction) enabledMaskAction:(id)sender;
 - (IBAction) initBoard:(id)sender;
 - (IBAction) probeBoard:(id)sender;
 - (IBAction) enableAllAction:(id)sender;
 - (IBAction) disableAllAction:(id)sender;
-- (IBAction) triggerAction:(id)sender;
+- (IBAction) setInhibitAction:(id)sender;
+- (IBAction) retsetInhibitAction:(id)sender;
 @end
