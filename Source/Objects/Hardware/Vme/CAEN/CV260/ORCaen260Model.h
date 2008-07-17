@@ -31,15 +31,36 @@
 
 #pragma mark •••Register Definitions
 enum {
-	kStatusControl,
-	kClear,
-	kDAC,
-	kGateGeneration,
-	kDataRegister,
-	kFixedCode,
-	kBoardID,
 	kVersion,
-	kNumberOfV265Registers			//must be last
+	kModualType,
+	kFixedCode,
+	kInterruptJumpers,
+	kScalerIncrease,
+	kInhibitReset,
+	kInhibitSet,
+	kClear,
+	kCounter0,
+	kCounter1,
+	kCounter2,
+	kCounter3,
+	kCounter4,
+	kCounter5,
+	kCounter6,
+	kCounter7,
+	kCounter8,
+	kCounter9,
+	kCounter10,
+	kCounter11,
+	kCounter12,
+	kCounter13,
+	kCounter14,
+	kCounter15,
+	kClearVMEInterrupt,
+	kDisableVMEInterrupt,
+	kEnableVMEInterrupt,
+	kInterruptLevel,
+	kInterruptVector,
+	kNumberOfV260Registers			//must be last
 };
 
 #pragma mark •••Forward Declarations

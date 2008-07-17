@@ -18,24 +18,16 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORCaen260Controller.h"
 #import "ORCaen260Model.h"
 
-
 @implementation ORCaen260Controller
-
 -(id)init
 {
     self = [super initWithWindowNibName:@"Caen260"];
 	
     return self;
 }
-
-- (void) awakeFromNib
-{
-    [super awakeFromNib];
- }
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -50,12 +42,7 @@
 					   object : model];
 	
     [notifyCenter addObserver : self
-					 selector : @selector(baseAddressChanged:)
-						 name : ORVmeIOCardBaseAddressChangedNotification
-					   object : model];
-	
-    [notifyCenter addObserver : self
-					 selector : @selector(settingsLockChanged:)
+					 selector : @selector(basicLockChanged:)
 						 name : ORCaen260SettingsLock
 						object: nil];
 	
@@ -89,9 +76,6 @@
 - (void) updateWindow
 {
     [super updateWindow];
-    [self baseAddressChanged:nil];
-	[self slotChanged:nil];
-	[self settingsLockChanged:nil];
 	[self enabledMaskChanged:nil];
 	[self suppressZerosChanged:nil];
 }
@@ -100,16 +84,16 @@
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORCaen260SettingsLock to:secure];
-    [settingLockButton setEnabled:secure];
+    [basicLockButton setEnabled:secure];
 }
 
-- (void) settingsLockChanged:(NSNotification*)aNotification
+- (void) basicLockChanged:(NSNotification*)aNotification
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen260SettingsLock];
     BOOL locked = [gSecurity isLocked:ORCaen260SettingsLock];
 	
-    [settingLockButton setState: locked];
+    [basicLockButton setState: locked];
     [addressStepper setEnabled:!locked && !runInProgress];
     [addressText setEnabled:!locked && !runInProgress];
     
@@ -130,12 +114,6 @@
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[NSString stringWithFormat:@"Caen260 Card (Slot %d)",[model slot]]];
-}
-
-- (void) baseAddressChanged:(NSNotification*)aNotification
-{
-	[self updateStepper:addressStepper setting:[model baseAddress]];
-	[addressText setIntValue: [model baseAddress]];
 }
 
 #pragma mark •••Actions
@@ -159,14 +137,6 @@
 - (IBAction) settingLockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORCaen260SettingsLock to:[sender intValue] forWindow:[self window]];
-}
-
--(IBAction)baseAddressAction:(id)sender
-{
-	if([sender intValue] != [model baseAddress]){
-		[[self undoManager] setActionName: @"Set Base Address"];
-		[model setBaseAddress:[sender intValue]];		
-	}
 }
 
 - (IBAction)enableAllAction:(id)sender
@@ -229,6 +199,39 @@
         NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Trigger", @"OK", nil, nil,
                         localException);
     NS_ENDHANDLER
+
+}
+
+
+- (void) populatePullDown
+{
+    short	i;
+        
+    [registerAddressPopUp removeAllItems];
+    
+    for (i = 0; i < [model getNumberRegisters]; i++) {
+        [registerAddressPopUp insertItemWithTitle:[model 
+                                    getRegisterName:i] 
+                                            atIndex:i];
+    }
+    
+}
+- (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+    if([tabView indexOfTabViewItem:tabViewItem] == 0){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:NSMakeSize(560,630)];
+		[[self window] setContentView:tabView];
+    }
+    else if([tabView indexOfTabViewItem:tabViewItem] == 1){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:NSMakeSize(560,630)];
+		[[self window] setContentView:tabView];
+    }
+
+    NSString* key = [NSString stringWithFormat: @"orca.ORCaenV260Card%d.selectedtab",[model slot]];
+    int index = [tabView indexOfTabViewItem:tabViewItem];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 
 }
 
