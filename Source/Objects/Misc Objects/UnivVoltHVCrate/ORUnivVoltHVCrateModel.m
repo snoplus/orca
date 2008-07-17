@@ -211,7 +211,7 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 		NSRange isItContained;
 		
 		// Write the command.
-		[socket write: command length: [command length]];	
+		[socket write: [command cStringUsingEncoding: NSASCIIStringEncoding] length: [command length]];	
 	
 		// Read back response from crate
 		[socket read: &retBuffer amount: 256];
@@ -230,7 +230,7 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 		finalStatus = [retString substringWithRange: extResponse];
 		NSLog( @"Returned value %@", finalStatus );
 		
-			}
+	}
 	
 	@catch (NSException *exception) {
 
@@ -265,7 +265,15 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 	if (!isConnected)
 	{
 		[self setSocket: [NetSocket netsocketConnectedToHost: ipAddress port: kUnivVoltHVCratePort]];	
-        [self setIsConnected: [socket isConnected]];
+        [self setIsConnected: [socket isConnected]];  // setIsConnected sends out notification.
+		if ( isConnected )
+		{
+			NSLog( @"Connected to %@", ipAddress );
+		}
+		else
+		{
+			NSLog( @"Disconnected from %@", ipAddress );
+		}
 	}
 }
 

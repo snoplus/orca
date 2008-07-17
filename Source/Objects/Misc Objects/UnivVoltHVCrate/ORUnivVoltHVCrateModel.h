@@ -23,7 +23,7 @@
 
 #import "ORCrate.h"
 #define kUnivVoltHVCratePort 1090
-#define kUnivVoltHVAddress 192.168.1.10
+#define kUnivVoltHVAddress "192.168.1.10"
 
 #pragma mark •••Forward Declarations
 @class ORConnector;
