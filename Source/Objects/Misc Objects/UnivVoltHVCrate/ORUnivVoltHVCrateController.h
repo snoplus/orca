@@ -30,8 +30,9 @@
 @interface ORUnivVoltHVCrateController : ORCrateController
 {
     IBOutlet NSButton*		ethernetConnectButton;
+	IBOutlet NSTextField*	ipConnectedTextField;
 	IBOutlet NSScrollView*	outputArea;
-	IBOutlet NSTextField*	ipAddress;
+	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSTextField*	hvStatusField;
 	IBOutlet NSTextField*	generalDialog;
 }
@@ -41,8 +42,10 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) isConnectedChanged: (NSNotification *) aNote;
+- (void) ipAddressChanged: (NSNotification *) aNotes;
 
 #pragma mark •••Actions
+- (IBAction) ipAddressTextFieldAction: (id) aSender;
 - (IBAction) connectAction: (id) aSender;
 - (IBAction) getEthernetParamAction: (id) aSender;
 - (IBAction) getConfigParamAction: (id) aSender;

@@ -25,9 +25,9 @@
 #import "ORMacModel.h"
 
 //NSString* ORUnivVoltHVUSBConnector				= @"ORUnivVoltHVUSBConnector";
-NSString* ORUnivVoltHVCrateIsConnectedChanged		= @"ORUnivVoltHVCrateIsConnectedChanged";
-NSString* ORUnivVoltHVCrateIpAddressChanged		    = @"ORUnivVoltHVCrateIpAddressChanged";
-NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged";
+NSString* ORUnivVoltHVCrateIsConnectedChangedNotification		= @"ORUnivVoltHVCrateIsConnectedChangedNotification";
+NSString* ORUnivVoltHVCrateIpAddressChangedNotification		    = @"ORUnivVoltHVCrateIpAddressChangedNotification";
+NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateStatusChangedNotification";
 
 @implementation ORUnivVoltHVCrateModel
 
@@ -133,16 +133,28 @@ NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged"
 }
 
 #pragma mark •••Accessors
-/*- (NSString*) adapterArchiveKey
+
+- (NSString*) ipAddress
 {
-	return @"UnivVoltHV Adapter";
+    return ipAddress;
 }
-*/
+
+- (void) setIpAddress: (NSString *) anIpAddress
+{
+	if (!anIpAddress) anIpAddress = @"";
+    [[[self undoManager] prepareWithInvocationTarget: self] setIpAddress: anIpAddress];
+    
+    [ipAddress autorelease];
+    ipAddress = [anIpAddress copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVCrateIpAddressChangedNotification object: self];
+}
 
 - (NetSocket*) socket
 {
 	return socket;
 }
+
 - (void) setSocket: (NetSocket*) aSocket
 {
 	if(aSocket != socket)[socket close];
@@ -154,15 +166,16 @@ NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged"
 
 //------------------------------------
 //depreciated (11/29/06) remove someday
-- (NSString*) crateAdapterConnectorKey
+/*- (NSString*) crateAdapterConnectorKey
 {
 	return @"UnivVoltHV Crate Adapter Connector";
 }
+*/
 //------------------------------------
 
 
 #pragma mark •••Notifications
-- (void) registerNotificationObservers
+/*- (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
@@ -184,7 +197,7 @@ NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged"
                          name : @"UnivVoltHVCratePowerOff"
                        object : nil];
 }
-
+*/
 - (NSString *) obtainHVStatus
 {
 	NSString*	finalStatus;
@@ -269,22 +282,6 @@ NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged"
 }
 
 
-#pragma mark ***Accessor
-- (NSString*) ipAddress
-{
-    return ipAddress;
-}
-
-- (void) setIpAddress: (NSString *) anIpAddress
-{
-	if (!anIpAddress) anIpAddress = @"";
-    [[[self undoManager] prepareWithInvocationTarget: self] setIpAddress: anIpAddress];
-    
-    [ipAddress autorelease];
-    ipAddress = [anIpAddress copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVCrateIpAddressChanged object: self];
-}
 
 #pragma mark ***Utilities
 
@@ -297,7 +294,7 @@ NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged"
 {
     isConnected = aFlag;
 //	[self setReceiveCount: 0];
-    [[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVCrateIsConnectedChanged object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVCrateIsConnectedChangedNotification object: self];
 }
 
 #pragma mark ***Delegate Methods
@@ -327,5 +324,29 @@ NSString* ORUnivVoltHVCrateHVStatusChanged			= @"ORUnivVoltHVCrateStatusChanged"
 	}
 }
 */
+
+#pragma mark ***Archival
+// Encode decode variable names.
+static NSString*	ORUnivVoltHVCrateIPAddress		= @"ORUnivVoltHVCrateIPAddress";
+
+- (id) initWithCoder: (NSCoder*) aDecoder
+{
+    self = [super initWithCoder: aDecoder];
+    
+    [[self undoManager] disableUndoRegistration];
+	[self setIpAddress: [aDecoder decodeObjectForKey: ORUnivVoltHVCrateIPAddress]];
+    [[self undoManager] enableUndoRegistration];    
+		
+    return self;
+}
+
+- (void)encodeWithCoder: (NSCoder*) anEncoder
+{
+    [super encodeWithCoder: anEncoder];
+    [anEncoder encodeObject: ipAddress forKey: ORUnivVoltHVCrateIPAddress];
+}
+
+
+
 
 @end

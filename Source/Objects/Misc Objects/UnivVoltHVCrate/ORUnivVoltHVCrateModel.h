@@ -41,7 +41,7 @@
 - (void) setIpAddress: (NSString *) anIpAddress;
 
 #pragma mark •••Notifications
-- (void) registerNotificationObservers;
+//- (void) registerNotificationObservers;
 - (NetSocket*) socket;
 - (void) setSocket: (NetSocket*) aSocket;
 - (BOOL) isConnected;
@@ -57,10 +57,14 @@
 #pragma mark ***Utilities
 //- (void) connect;
 
+#pragma mark ***Archival
+- (id)   initWithCoder: (NSCoder*) aDecoder;
+- (void) encodeWithCoder: (NSCoder*) anEncoder;
+
 @end
 
-
-NSString* ORUnivVoltHVCrateIsConnectedChanged;
-NSString* ORUnivVoltHVCrateIpAddressChanged;
-NSString* ORUnivVoltHVCrateHVStatusChanged;
+#pragma mark ***Notification string definitions.
+extern NSString* ORUnivVoltHVCrateIsConnectedChangedNotification;
+extern NSString* ORUnivVoltHVCrateIpAddressChangedNotification;
+extern NSString* ORUnivVoltHVCrateHVStatusChangedNotification;
 

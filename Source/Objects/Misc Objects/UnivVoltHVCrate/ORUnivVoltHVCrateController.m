@@ -26,7 +26,8 @@
 //#import "ORUnivVoltHVBusProtocol.h"
 #import "ORUnivVoltHVCrateExceptions.h"
 
-//ORUnivVoltHVCrateIsConnectedChanged = @"ORUnivVoltHVCrateIsConnectedChanged";
+//NSString* ORUnivVoltHVCrateIsConnectedChangedNotification = @"ORUnivVoltHVCrateIsConnectedChangedNotification";
+//NSString* ORUnivVoltHVCrateIpAddressChangedNotification = @"ORUnivVoltHVCrateIpAddressChangedNotification";
 
 
 @implementation ORUnivVoltHVCrateController
@@ -49,13 +50,33 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
     [notifyCenter addObserver : self
                      selector : @selector( isConnectedChanged: )
-                         name : @"ORUnivVoltHVCrateIsConnectedChanged"
-                       object : nil];
+                         name : ORUnivVoltHVCrateIsConnectedChangedNotification
+                       object : model];
+					   
+					
+    [notifyCenter addObserver : self
+                     selector : @selector( ipAddressChanged: )
+                         name : ORUnivVoltHVCrateIpAddressChangedNotification
+                       object : model];
+}
+
+- (void) updateWindow
+{
+    [ super updateWindow ];
+    
+//    [self settingsLockChanged:nil];
+	[self ipAddressChanged: nil];
+	[self isConnectedChanged: nil];
+}
+
+- (void) ipAddressChanged: (NSNotification*) aNote
+{
+	[ipAddressTextField setStringValue: [model ipAddress]];
 }
 
 - (void) isConnectedChanged: (NSNotification *) aNote
 {
-	[ipAddress setStringValue: [model isConnected] ? @"Connected" : @"NotConnected"];
+	[ipConnectedTextField setStringValue: [model isConnected] ? @"Connected" : @"Disconnected"];
 	[ethernetConnectButton setTitle: [model isConnected] ? @"Disconnect" : @"Connect"];
 }
 
@@ -63,9 +84,14 @@
 
 
 #pragma mark •••Actions
+- (IBAction) ipAddressTextFieldAction: (id) aSender
+{
+	[model setIpAddress: [aSender stringValue]];	
+}
+
 - (IBAction) connectAction: (id) aSender
 {
-	[model setIpAddress: [ipAddress stringValue]];
+	[model setIpAddress: [ipAddressTextField stringValue]];
 	[model connect];
 }
 
@@ -102,12 +128,6 @@
                         [anException name],name);
     }
 }
-
-- (IBAction) ipAddressTextFieldAction: (id)sender
-{
-	[model setIpAddress: [sender stringValue]];	
-}
-
 
 - (IBAction) showHVStatusAction: (id) aSender
 {

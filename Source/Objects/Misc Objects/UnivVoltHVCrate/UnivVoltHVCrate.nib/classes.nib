@@ -169,6 +169,8 @@
 				<string>id</string>
 				<key>hvOnAction</key>
 				<string>id</string>
+				<key>ipAddressTextFieldAction</key>
+				<string>id</string>
 				<key>panicOffAction</key>
 				<string>id</string>
 				<key>showHVStatusAction</key>
@@ -186,7 +188,9 @@
 				<string>NSTextField</string>
 				<key>hvStatusField</key>
 				<string>NSTextField</string>
-				<key>ipAddress</key>
+				<key>ipAddressTextField</key>
+				<string>NSTextField</string>
+				<key>ipConnectedTextField</key>
 				<string>NSTextField</string>
 				<key>outputArea</key>
 				<string>NSScrollView</string>
