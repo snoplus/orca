@@ -362,7 +362,7 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 		if(enabledMask & (0x1<<i)){
 			unsigned long aValue = 0;
 			[[self adapter] readLongBlock:&aValue
-							atAddress:[self baseAddress]+[self getAddressOffset:kCounter0 + (i*0x04)]
+							atAddress:[self baseAddress]+[self getAddressOffset:kCounter0] + (i*0x04)
 							numToRead:1
 						withAddMod:[self addressModifier]
 						usingAddSpace:0x01];
