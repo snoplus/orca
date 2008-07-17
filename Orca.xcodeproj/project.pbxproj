@@ -1781,6 +1781,14 @@
 		9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */; };
 		9C7B5AA00D6771CC00B8BECC /* ORGate2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */; };
 		9C7B5AA10D6771CC00B8BECC /* ORGate2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */; };
+		9C7CE7E40E2FC22500F63679 /* Caen260.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C7CE7DC0E2FC22500F63679 /* Caen260.nib */; };
+		9C7CE7E50E2FC22500F63679 /* CV260Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9C7CE7DD0E2FC22500F63679 /* CV260Card.gif */; };
+		9C7CE7E60E2FC22500F63679 /* ORCaen260Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7CE7DE0E2FC22500F63679 /* ORCaen260Controller.h */; };
+		9C7CE7E70E2FC22500F63679 /* ORCaen260Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7CE7DF0E2FC22500F63679 /* ORCaen260Controller.m */; };
+		9C7CE7E80E2FC22500F63679 /* ORCaen260Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7CE7E00E2FC22500F63679 /* ORCaen260Decoders.h */; };
+		9C7CE7E90E2FC22500F63679 /* ORCaen260Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7CE7E10E2FC22500F63679 /* ORCaen260Decoders.m */; };
+		9C7CE7EA0E2FC22500F63679 /* ORCaen260Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7CE7E20E2FC22500F63679 /* ORCaen260Model.h */; };
+		9C7CE7EB0E2FC22500F63679 /* ORCaen260Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7CE7E30E2FC22500F63679 /* ORCaen260Model.m */; };
 		9C7DCCA70E202C1B0034CC44 /* NPLCommBoard.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA10E202C1B0034CC44 /* NPLCommBoard.nib */; };
 		9C7DCCA80E202C1B0034CC44 /* NPLCommBoardIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA20E202C1B0034CC44 /* NPLCommBoardIcon.tif */; };
 		9C7DCCA90E202C1B0034CC44 /* ORNPLCommBoardController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7DCCA30E202C1B0034CC44 /* ORNPLCommBoardController.h */; };
@@ -3629,6 +3637,14 @@
 		9C38E5570C775F2A00255848 /* ORcPCICardDecoder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORcPCICardDecoder.h; path = "Source/Objects/Hardware/CompactPCI/cPCI Base Classes/ORcPCICardDecoder.h"; sourceTree = SOURCE_ROOT; };
 		9C7B5A9E0D6771CC00B8BECC /* ORGate2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGate2D.h; sourceTree = "<group>"; };
 		9C7B5A9F0D6771CC00B8BECC /* ORGate2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGate2D.m; sourceTree = "<group>"; };
+		9C7CE7DC0E2FC22500F63679 /* Caen260.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen260.nib; path = Source/Objects/Hardware/Vme/CAEN/CV260/Caen260.nib; sourceTree = SOURCE_ROOT; };
+		9C7CE7DD0E2FC22500F63679 /* CV260Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = CV260Card.gif; path = Source/Objects/Hardware/Vme/CAEN/CV260/CV260Card.gif; sourceTree = SOURCE_ROOT; };
+		9C7CE7DE0E2FC22500F63679 /* ORCaen260Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen260Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV260/ORCaen260Controller.h; sourceTree = SOURCE_ROOT; };
+		9C7CE7DF0E2FC22500F63679 /* ORCaen260Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen260Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV260/ORCaen260Controller.m; sourceTree = SOURCE_ROOT; };
+		9C7CE7E00E2FC22500F63679 /* ORCaen260Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen260Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV260/ORCaen260Decoders.h; sourceTree = SOURCE_ROOT; };
+		9C7CE7E10E2FC22500F63679 /* ORCaen260Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen260Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV260/ORCaen260Decoders.m; sourceTree = SOURCE_ROOT; };
+		9C7CE7E20E2FC22500F63679 /* ORCaen260Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen260Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV260/ORCaen260Model.h; sourceTree = SOURCE_ROOT; };
+		9C7CE7E30E2FC22500F63679 /* ORCaen260Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen260Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV260/ORCaen260Model.m; sourceTree = SOURCE_ROOT; };
 		9C7DCCA10E202C1B0034CC44 /* NPLCommBoard.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NPLCommBoard.nib; path = "Source/Objects/Misc Objects/NPLCommBoard/NPLCommBoard.nib"; sourceTree = SOURCE_ROOT; };
 		9C7DCCA20E202C1B0034CC44 /* NPLCommBoardIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = NPLCommBoardIcon.tif; path = "Source/Objects/Misc Objects/NPLCommBoard/NPLCommBoardIcon.tif"; sourceTree = SOURCE_ROOT; };
 		9C7DCCA30E202C1B0034CC44 /* ORNPLCommBoardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardController.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardController.h"; sourceTree = SOURCE_ROOT; };
@@ -7859,6 +7875,22 @@
 			path = Source/Widgets/GradientView;
 			sourceTree = SOURCE_ROOT;
 		};
+		9C7CE7DB0E2FC22500F63679 /* CV260 */ = {
+			isa = PBXGroup;
+			children = (
+				9C7CE7DC0E2FC22500F63679 /* Caen260.nib */,
+				9C7CE7DD0E2FC22500F63679 /* CV260Card.gif */,
+				9C7CE7DE0E2FC22500F63679 /* ORCaen260Controller.h */,
+				9C7CE7DF0E2FC22500F63679 /* ORCaen260Controller.m */,
+				9C7CE7E00E2FC22500F63679 /* ORCaen260Decoders.h */,
+				9C7CE7E10E2FC22500F63679 /* ORCaen260Decoders.m */,
+				9C7CE7E20E2FC22500F63679 /* ORCaen260Model.h */,
+				9C7CE7E30E2FC22500F63679 /* ORCaen260Model.m */,
+			);
+			name = CV260;
+			path = Source/Objects/Hardware/Vme/CAEN/CV260;
+			sourceTree = SOURCE_ROOT;
+		};
 		9C7DCCA00E202C1B0034CC44 /* NPLCommBoard */ = {
 			isa = PBXGroup;
 			children = (
@@ -8266,6 +8298,7 @@
 			children = (
 				F5B1802103B297FD015F64B1 /* Base */,
 				84FFCA9F0636D5B10069432F /* CV792 */,
+				9C7CE7DB0E2FC22500F63679 /* CV260 */,
 				84DE591F051F7AF9005F64B1 /* CV785 */,
 				8407F0DD0DEF66DB000F1441 /* CV862 */,
 				F5B1802703B297FD015F64B1 /* CV775 */,
@@ -8980,6 +9013,9 @@
 				143AEEA50E2E988F003E3CAC /* ORUnivVoltHVCrateExceptions.h in Headers */,
 				143AEEA60E2E988F003E3CAC /* ORUnivVoltHVCrateModel.h in Headers */,
 				143AEEA80E2E988F003E3CAC /* ORUnivVoltHVCrateView.h in Headers */,
+				9C7CE7E60E2FC22500F63679 /* ORCaen260Controller.h in Headers */,
+				9C7CE7E80E2FC22500F63679 /* ORCaen260Decoders.h in Headers */,
+				9C7CE7EA0E2FC22500F63679 /* ORCaen260Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9532,6 +9568,8 @@
 				143AEEAD0E2E988F003E3CAC /* UnivVoltHVCrate.gif in Resources */,
 				143AEEAE0E2E988F003E3CAC /* UnivVoltHVCrate.nib in Resources */,
 				143AEEAF0E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif in Resources */,
+				9C7CE7E40E2FC22500F63679 /* Caen260.nib in Resources */,
+				9C7CE7E50E2FC22500F63679 /* CV260Card.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10181,6 +10219,9 @@
 				143AEEA40E2E988F003E3CAC /* ORUnivVoltHVCrateController.m in Sources */,
 				143AEEA70E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m in Sources */,
 				143AEEA90E2E988F003E3CAC /* ORUnivVoltHVCrateView.m in Sources */,
+				9C7CE7E70E2FC22500F63679 /* ORCaen260Controller.m in Sources */,
+				9C7CE7E90E2FC22500F63679 /* ORCaen260Decoders.m in Sources */,
+				9C7CE7EB0E2FC22500F63679 /* ORCaen260Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
