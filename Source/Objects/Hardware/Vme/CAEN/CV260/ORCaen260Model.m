@@ -36,27 +36,27 @@ static RegisterNamesStruct reg[kNumberOfV260Registers] = {
 	{@"Inhibite Reset",		0,0,0, 0x54, kReadWrite,kD16},
 	{@"Inhibite Set",		0,0,0, 0x52, kReadWrite,kD16},
 	{@"Clear",				0,0,0, 0x50, kReadWrite,kD16},
-	{@"Counter 0",			0,0,0, 0x10, kReadOnly,	kD16},
-	{@"Counter 1",			0,0,0, 0x14, kReadOnly,	kD16},
-	{@"Counter 2",			0,0,0, 0x18, kReadOnly,	kD16},
-	{@"Counter 3",			0,0,0, 0x1C, kReadOnly,	kD16},
-	{@"Counter 4",			0,0,0, 0x20, kReadOnly,	kD16},
-	{@"Counter 5",			0,0,0, 0x24, kReadOnly,	kD16},
-	{@"Counter 6",			0,0,0, 0x2C, kReadOnly,	kD16},
-	{@"Counter 7",			0,0,0, 0x30, kReadOnly,	kD16},
-	{@"Counter 8",			0,0,0, 0x32, kReadOnly,	kD16},
-	{@"Counter 9",			0,0,0, 0x34, kReadOnly,	kD16},
-	{@"Counter 10",			0,0,0, 0x3C, kReadOnly,	kD16},
-	{@"Counter 11",			0,0,0, 0x40, kReadOnly,	kD16},
-	{@"Counter 12",			0,0,0, 0x42, kReadOnly,	kD16},
-	{@"Counter 13",			0,0,0, 0x44, kReadOnly,	kD16},
-	{@"Counter 14",			0,0,0, 0x48, kReadOnly,	kD16},
-	{@"Counter 15",			0,0,0, 0x4C, kReadOnly,	kD16},
+	{@"Counter 0",			0,0,0, 0x10, kReadOnly,	kD32},
+	{@"Counter 1",			0,0,0, 0x14, kReadOnly,	kD32},
+	{@"Counter 2",			0,0,0, 0x18, kReadOnly,	kD32},
+	{@"Counter 3",			0,0,0, 0x1C, kReadOnly,	kD32},
+	{@"Counter 4",			0,0,0, 0x20, kReadOnly,	kD32},
+	{@"Counter 5",			0,0,0, 0x24, kReadOnly,	kD32},
+	{@"Counter 6",			0,0,0, 0x2C, kReadOnly,	kD32},
+	{@"Counter 7",			0,0,0, 0x30, kReadOnly,	kD32},
+	{@"Counter 8",			0,0,0, 0x32, kReadOnly,	kD32},
+	{@"Counter 9",			0,0,0, 0x34, kReadOnly,	kD32},
+	{@"Counter 10",			0,0,0, 0x3C, kReadOnly,	kD32},
+	{@"Counter 11",			0,0,0, 0x40, kReadOnly,	kD32},
+	{@"Counter 12",			0,0,0, 0x42, kReadOnly,	kD32},
+	{@"Counter 13",			0,0,0, 0x44, kReadOnly,	kD32},
+	{@"Counter 14",			0,0,0, 0x48, kReadOnly,	kD32},
+	{@"Counter 15",			0,0,0, 0x4C, kReadOnly,	kD32},
 	{@"Clear VME Interrupt",0,0,0, 0x0C, kReadWrite,		kD16},
 	{@"Disable VME Interrupt",	0,0,0, 0xA, kReadWrite,		kD16},
 	{@"Enable VME Interrupt",	0,0,0, 0x08, kReadWrite,	kD16},
 	{@"Interrupt Level",		0,0,0, 0x06, kWriteOnly,	kD16},
-	{@"Interrupt Vector",		0,0,0, 0x04, kReadOnly,		kD16},
+	{@"Interrupt Vector",		0,0,0, 0x04, kWriteOnly,	kD16},
 };
 
 
@@ -210,14 +210,24 @@ NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
     return aValue;
 }
 
-- (void) trigger
+- (void) setInhibit
 {
-//	unsigned short aValue = 0;
-//    [[self adapter] writeWordBlock:&aValue
-//						atAddress:[self baseAddress]+[self getAddressOffset:kGateGeneration]
-//						numToWrite:1
-//					   withAddMod:[self addressModifier]
-//					usingAddSpace:0x01];
+	unsigned short aValue = 0;
+    [[self adapter] writeWordBlock:&aValue
+						atAddress:[self baseAddress]+[self getAddressOffset:kInhibitSet]
+						numToWrite:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+}
+
+- (void) resetInhibit
+{
+	unsigned short aValue = 0;
+    [[self adapter] writeWordBlock:&aValue
+						atAddress:[self baseAddress]+[self getAddressOffset:kInhibitReset]
+						numToWrite:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
 }
 
 
