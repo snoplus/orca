@@ -61,6 +61,13 @@
                      selector : @selector(enabledMaskChanged:)
                          name : ORCaen260ModelEnabledMaskChanged
 						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(scalerValueChanged:)
+                         name : ORCaen260ModelScalerValueChanged
+						object: model];
+
+
 }
 
 #pragma mark •••Interface Management
@@ -76,6 +83,7 @@
 {
     [super updateWindow];
 	[self enabledMaskChanged:nil];
+	[self scalerValueChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -93,11 +101,12 @@
 	
     [basicLockButton setState: locked];
     [addressStepper setEnabled:!locked && !runInProgress];
-    [addressText setEnabled:!locked && !runInProgress];
+    [addressTextField setEnabled:!locked && !runInProgress];
     
-    [initButton setEnabled:!lockedOrRunningMaintenance];
     [enableAllButton setEnabled:!lockedOrRunningMaintenance];
     [disableAllButton setEnabled:!lockedOrRunningMaintenance];
+    [clearScalersButton setEnabled:!lockedOrRunningMaintenance];
+    [readScalersButton setEnabled:!lockedOrRunningMaintenance];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -110,6 +119,22 @@
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[NSString stringWithFormat:@"Caen260 Card (Slot %d)",[model slot]]];
+}
+
+- (void) scalerValueChanged:(NSNotification*)aNotification
+{
+	if(aNotification==nil){
+		int i;
+		for(i=0;i<kNumCaen260Channels;i++){
+			[[scalerValueMatrix cellAtRow:i column:0] setIntValue:[model scalerValue:i]];
+		}
+	}
+	else {
+		int index = [[[aNotification userInfo]objectForKey:@"Channel"] intValue];
+		if(index>=0 && index < kNumCaen260Channels){
+			[[scalerValueMatrix cellAtRow:index column:0] setIntValue:[model scalerValue:index]];
+		}
+	}
 }
 
 #pragma mark •••Actions
@@ -152,7 +177,7 @@
     NS_ENDHANDLER
 }
 
-- (IBAction) retsetInhibitAction:(id)sender
+- (IBAction) resetInhibitAction:(id)sender
 {
    NS_DURING
         [model resetInhibit];
@@ -160,48 +185,34 @@
         
     NS_HANDLER
         NSLog(@"Reset Inhibit of Caen260 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 seset Inhibit", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 reset Inhibit", @"OK", nil, nil,
                         localException);
     NS_ENDHANDLER
 }
 
-
-
--(IBAction)initBoard:(id)sender
+- (IBAction) clearScalers:(id)sender
 {
-    NS_DURING
-		[self endEditing];
-        [model reset];		//initialize and load hardward
-		NSLog(@"Initialized Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+   NS_DURING
+        [model clearScalers];
+		NSLog(@"Clear Scalers on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
     NS_HANDLER
-        NSLog(@"Reset and Init of Caen260 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Reset and Init", @"OK", nil, nil,
+        NSLog(@"Clear Scalers of Caen260 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Clear Scalers", @"OK", nil, nil,
                         localException);
     NS_ENDHANDLER
 }
 
--(IBAction) probeBoard:(id)sender
+- (IBAction) readScalers:(id)sender
 {
-	[self endEditing];    
-	NS_DURING
-		unsigned short fixedCode	= [model readFixedCode];
-		NSLog(@"Probing CAEN V265,%d,%d\n",[model crateNumber],[model slot]);
-		if(fixedCode == 0xFAF5){
-			unsigned short boardID		= [model readBoardID];
-			unsigned short boardVersion = [model readBoardVersion];
-			NSLog(@"Board Manufacturer Code: 0x%x %@\n",boardID>>10,[model decodeManufacturerCode:boardID>>10]);
-			NSLog(@"Board Module Code: 0x%x %@\n",boardID&0x3ff,[model decodeModuleCode:boardID&0x3ff]);
-			NSLog(@"Board Series Number: 0x%x\n",boardVersion&0xfff);
-			NSLog(@"Board Version: 0x%x (%@)\n",boardVersion>>12,boardVersion>>12 == 0?@"NIM":@"ECL");
-		}
-		else {
-			NSLog(@"Fixed Code Readback == 0x%x (should have been 0xFAF5)\n",fixedCode);
-		}
-	   NS_HANDLER
-        NSLog(@"Probe Caen260 Board FAILED.\n");
-		NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
-						localException);
+   NS_DURING
+        [model readScalers];
+		NSLog(@"Read Scalers on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
+        
+    NS_HANDLER
+        NSLog(@"Read Scalers of Caen260 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Read Scalers", @"OK", nil, nil,
+                        localException);
     NS_ENDHANDLER
 }
 

@@ -25,27 +25,27 @@
 	IBOutlet NSButton*		disableAllButton;
 	IBOutlet NSMatrix*		enabledMaskMatrix;
 	IBOutlet NSMatrix*		channelLabelMatrix;
-    IBOutlet NSTextField* 	addressText;
-    IBOutlet NSButton*		initButton;
-	IBOutlet NSButton*		probeButton;
+	IBOutlet NSMatrix*		scalerValueMatrix;
 
 	IBOutlet NSButton*		setInhibitButton;
 	IBOutlet NSButton*		resetInhibitButton;
-
+	IBOutlet NSButton*		clearScalersButton;
+	IBOutlet NSButton*		readScalersButton;
 }
 
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
 - (void) enabledMaskChanged:(NSNotification*)aNote;
-- (void) slotChanged:(NSNotification*)aNotification;
+- (void) slotChanged:(NSNotification*)aNote;
+- (void) scalerValueChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) enabledMaskAction:(id)sender;
-- (IBAction) initBoard:(id)sender;
-- (IBAction) probeBoard:(id)sender;
 - (IBAction) enableAllAction:(id)sender;
 - (IBAction) disableAllAction:(id)sender;
 - (IBAction) setInhibitAction:(id)sender;
-- (IBAction) retsetInhibitAction:(id)sender;
+- (IBAction) resetInhibitAction:(id)sender;
+- (IBAction) clearScalers:(id)sender;
+- (IBAction) readScalers:(id)sender;
 @end

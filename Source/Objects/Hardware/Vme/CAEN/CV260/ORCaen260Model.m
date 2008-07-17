@@ -62,9 +62,9 @@ static RegisterNamesStruct reg[kNumberOfV260Registers] = {
 
 
 #pragma mark •••Notification Strings
-NSString* ORCaen260ModelSuppressZerosChanged = @"ORCaen260ModelSuppressZerosChanged";
 NSString* ORCaen260ModelEnabledMaskChanged	 = @"ORCaen260ModelEnabledMaskChanged";
 NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
+NSString* ORCaen260ModelScalerValueChanged	 = @"ORCaen260ModelScalerValueChanged";
 
 @implementation ORCaen260Model
 
@@ -117,18 +117,22 @@ NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
     return [NSString stringWithFormat:@"CAEN 260 (Slot %d) ",[self slot]];
 }
 
-- (BOOL) suppressZeros
+- (unsigned long) scalerValue:(int)index
 {
-    return suppressZeros;
+	if(index<0)return 0;
+	else if(index>kNumCaen260Channels)return 0;
+	else return scalerValue[index];
 }
 
-- (void) setSuppressZeros:(BOOL)aSuppressZeros
+- (void) setScalerValue:(unsigned long)aValue index:(int)index
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setSuppressZeros:suppressZeros];
-    
-    suppressZeros = aSuppressZeros;
+	if(index<0)return;
+	else if(index>kNumCaen260Channels)return;
+	scalerValue[index] = aValue;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelScalerValueChanged 
+		object:self
+		userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen260ModelSuppressZerosChanged object:self];
 }
 
 - (unsigned short) enabledMask
@@ -163,29 +167,6 @@ NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
 }
 
 #pragma mark •••Hardware Access
-- (void) initBoard
-{
-	unsigned short aValue = 0; //anything value will do
-    [[self adapter] writeWordBlock:&aValue
-						atAddress:[self baseAddress]+[self getAddressOffset:kClear]
-						numToWrite:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-}
-
-
-- (unsigned short) 	readBoardID
-{
-    unsigned short aValue = 0;
-    [[self adapter] readWordBlock:&aValue
-						atAddress:[self baseAddress]+[self getAddressOffset:kVersion]
-						numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-    return aValue;
-}
-
 - (unsigned short) 	readBoardVersion
 {
     unsigned short aValue = 0;
@@ -230,6 +211,34 @@ NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
 					usingAddSpace:0x01];
 }
 
+- (void) clearScalers
+{
+	unsigned short aValue = 0;
+    [[self adapter] writeWordBlock:&aValue
+						atAddress:[self baseAddress]+[self getAddressOffset:kClear]
+						numToWrite:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+					
+}
+
+- (void) readScalers
+{
+	int i;
+	for(i=0;i<kNumCaen260Channels;i++){
+		if(enabledMask & (0x1<<i)){
+			unsigned long aValue = 0;
+			[[self adapter] readLongBlock:&aValue
+							atAddress:[self baseAddress]+[self getAddressOffset:kCounter0 + (i*0x04)]
+							numToRead:1
+						withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+			[self setScalerValue:aValue index:i];
+		}
+		else [self setScalerValue:0 index:i];
+
+	}
+}
 
 - (NSDictionary*) dataRecordDescription
 {
@@ -245,124 +254,6 @@ NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
     return dataDictionary;
 }
 
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
-{
-	NSDictionary* aDictionary;
-	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"Adc",				@"name",
-							[NSNumber numberWithLong:dataId],@"dataId",
-							[NSNumber numberWithLong:8],@"maxChannels",
-								nil];
-		
-	[anEventDictionary setObject:aDictionary forKey:@"Caen260"];
-}
-
-
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	
-    if(![[self adapter] controllerCard]){
-		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-    }
-	
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORCaen260Model"];    
-    
-    //----------------------------------------------------------------------------------------
-    controller = [self adapter]; //cache the controller for alittle bit more speed.
-//	statusAddress = [self baseAddress]+register_offsets[kStatusControl];
-//	fifoAddress   = [self baseAddress]+register_offsets[kDataRegister];
-	location      =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
-	usingShortForm = IsShortForm(dataId);
-    //usingShortForm = dataId & 0x80000000;
-    [self clearExceptionCount];
-	
-	[self initBoard];
-	isRunning = NO;
-
-}
-
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card
-//**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	isRunning = YES;
-    NS_DURING
-		unsigned short statusValue = 0;
-		[controller readWordBlock:&statusValue
-						atAddress:statusAddress
-						numToRead:1
-					   withAddMod:[ self addressModifier]
-					usingAddSpace:0x01];
-					
-		if(statusValue & 0x8000){
-			unsigned short dataValue;
-			[controller readWordBlock:&dataValue
-								atAddress:fifoAddress
-								numToRead:1
-							   withAddMod:[self addressModifier]
-							usingAddSpace:0x01];
-			short chan = (dataValue >> 13) & 0x7;
-			if(enabledMask & (1L<<chan)){
-				if(!(suppressZeros && (dataValue & 0xfff)==0)){
-					if(usingShortForm){
-						unsigned long dataWord = dataId | location | (dataValue & 0x7fff);
-						[aDataPacket addLongsToFrameBuffer:&dataWord length:1];
-					}
-					else {
-						//unlikely we have been assigned the long form,but just in case....
-						unsigned long dataRecord[2];
-						dataRecord[0] = dataId | 2;
-						dataRecord[1] = location | dataValue & 0x7fff;
-						[aDataPacket addLongsToFrameBuffer:dataRecord length:2];
-					}
-				}
-			}
-		}
-		
-	NS_HANDLER
-		NSLogError(@"",@"Caen260 Card Error",nil);
-		[self incExceptionCount];
-		[localException raise];
-	NS_ENDHANDLER
-}
-
-
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-	isRunning = NO;
-}
-
-
-- (void) reset
-{
-	[self initBoard]; 
-    
-}
-
-//this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-/*	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id = kCaen260; //should be unique
-	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
-	configStruct->card_info[index].slot 	 = [self slot];
-	configStruct->card_info[index].crate 	 = [self crateNumber];
-	configStruct->card_info[index].add_mod 	 = [self addressModifier];
-	configStruct->card_info[index].base_add  = [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0] = onlineMask;
-	configStruct->card_info[index].deviceSpecificData[1] = register_offsets[kConversionStatusRegister];
-	configStruct->card_info[index].deviceSpecificData[2] = register_offsets[kADC1OutputRegister];
-	configStruct->card_info[index].num_Trigger_Indexes = 0;
-	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
-*/	
-	return index+1;
-}
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -383,18 +274,6 @@ NSString* ORCaen260SettingsLock				 = @"ORCaen260SettingsLock";
     [super encodeWithCoder:encoder];
 	
 }
-
-/*- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
-{
-    
-    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    [encoder encodeBool:suppressZeros forKey:@"ORCaen260ModelSuppressZeros"];
-    [encoder encodeInt:enabledMask forKey:@"ORCaen260ModelEnabledMask"];
-    [objDictionary setObject:thresholds forKey:@"thresholds"];
-        
-	return objDictionary;
-}
-*/
 
 
 - (BOOL) partOfEvent:(unsigned short)aChannel

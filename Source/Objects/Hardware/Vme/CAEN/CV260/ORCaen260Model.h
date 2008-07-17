@@ -23,7 +23,6 @@
 #pragma mark •••Imported Files
 
 #import "ORCaenCardModel.h"
-#import "ORDataTaker.h"
 #import "VME_eCPU_Config.h"
 #import "SBC_Config.h"
 
@@ -66,18 +65,14 @@ enum {
 #pragma mark •••Forward Declarations
 @class ORRateGroup;
 
-@interface ORCaen260Model :  ORCaenCardModel <ORDataTaker>
+@interface ORCaen260Model :  ORCaenCardModel
 {
     @private
 		BOOL isRunning;
 		short adcIndex;
         unsigned short enabledMask;
-		BOOL suppressZeros;
-		
+		unsigned long  scalerValue[kNumCaen260Channels];
 		//cached values for use while running only
-		BOOL usingShortForm;
-		unsigned long statusAddress;
-		unsigned long fifoAddress;
 		unsigned long location;
  
 }
@@ -89,8 +84,8 @@ enum {
 - (void) makeMainController;
 
 #pragma mark •••Accessors
-- (BOOL) suppressZeros;
-- (void) setSuppressZeros:(BOOL)aSuppressZeros;
+- (unsigned long) scalerValue:(int)index;
+- (void) setScalerValue:(unsigned long)aValue index:(int)index;
 - (unsigned short) enabledMask;
 - (void) setEnabledMask:(unsigned short)aEnabledMask;
 - (unsigned long) dataId;
@@ -99,31 +94,23 @@ enum {
 - (void) syncDataIdsWith:(id)anotherCaen260;
 
 #pragma mark •••Hardware Access
-- (void)			initBoard;
-- (unsigned short) 	readBoardID;
 - (unsigned short) 	readBoardVersion;
 - (unsigned short) 	readFixedCode;
 - (void)			setInhibit;
 - (void)			resetInhibit;
+- (void)			clearScalers;
+- (void)			readScalers;
 
 #pragma mark •••Data Header
 - (NSDictionary*) dataRecordDescription;
-- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
-
-#pragma mark •••Data Taking
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) reset;
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
-- (BOOL) partOfEvent:(unsigned short)aChannel;
 
 #pragma mark •••Archival
-- (id)initWithCoder:(NSCoder*)decoder;
-- (void)encodeWithCoder:(NSCoder*)encoder;
+- (id) initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
 #pragma mark •••External String Definitions
-extern NSString* ORCaen260ModelSuppressZerosChanged;
 extern NSString* ORCaen260ModelEnabledMaskChanged;
+extern NSString* ORCaen260ModelScalerValueChanged;
+
 extern NSString* ORCaen260SettingsLock;
