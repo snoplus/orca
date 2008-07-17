@@ -190,6 +190,10 @@
 				<string>id</string>
 				<key>setInhibitAction</key>
 				<string>id</string>
+				<key>setPollingAction</key>
+				<string>id</string>
+				<key>shipRecordsAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORCaen260Controller</string>
@@ -207,6 +211,8 @@
 				<string>NSButton</string>
 				<key>enabledMaskMatrix</key>
 				<string>NSMatrix</string>
+				<key>pollingButton</key>
+				<string>NSPopUpButton</string>
 				<key>readScalersButton</key>
 				<string>NSButton</string>
 				<key>resetInhibitButton</key>
@@ -214,6 +220,8 @@
 				<key>scalerValueMatrix</key>
 				<string>NSMatrix</string>
 				<key>setInhibitButton</key>
+				<string>NSButton</string>
+				<key>shipRecordsButton</key>
 				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
