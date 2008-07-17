@@ -176,17 +176,17 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clearScalers</key>
+				<string>id</string>
 				<key>disableAllAction</key>
 				<string>id</string>
 				<key>enableAllAction</key>
 				<string>id</string>
 				<key>enabledMaskAction</key>
 				<string>id</string>
-				<key>initBoard</key>
+				<key>readScalers</key>
 				<string>id</string>
-				<key>probeBoard</key>
-				<string>id</string>
-				<key>retsetInhibitAction</key>
+				<key>resetInhibitAction</key>
 				<string>id</string>
 				<key>setInhibitAction</key>
 				<string>id</string>
@@ -197,22 +197,22 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>addressText</key>
-				<string>NSTextField</string>
 				<key>channelLabelMatrix</key>
 				<string>NSMatrix</string>
+				<key>clearScalersButton</key>
+				<string>NSButton</string>
 				<key>disableAllButton</key>
 				<string>NSButton</string>
 				<key>enableAllButton</key>
 				<string>NSButton</string>
 				<key>enabledMaskMatrix</key>
 				<string>NSMatrix</string>
-				<key>initButton</key>
-				<string>NSButton</string>
-				<key>probeButton</key>
+				<key>readScalersButton</key>
 				<string>NSButton</string>
 				<key>resetInhibitButton</key>
 				<string>NSButton</string>
+				<key>scalerValueMatrix</key>
+				<string>NSMatrix</string>
 				<key>setInhibitButton</key>
 				<string>NSButton</string>
 			</dict>
