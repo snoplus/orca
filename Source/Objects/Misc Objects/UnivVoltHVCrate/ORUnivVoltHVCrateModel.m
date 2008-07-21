@@ -202,7 +202,7 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 {
 	NSString*	finalStatus;
 	NSString*	retString;
-	NSString*	command = @"HVSTATUS";
+	NSString*	command = @"HVSTATUS\n";
 	char retBuffer[ 256 ];
 	
 	@try
@@ -213,6 +213,8 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 		// Write the command.
 		[socket write: [command cStringUsingEncoding: NSASCIIStringEncoding] length: [command length]];	
 	
+		// Interpret return response
+		//[self interpretResponse: kHVStatus];
 		// Read back response from crate
 		[socket read: &retBuffer amount: 256];
 	
@@ -228,8 +230,7 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 		}
 		
 		finalStatus = [retString substringWithRange: extResponse];
-		NSLog( @"Returned value %@", finalStatus );
-		
+		NSLog( @"Returned value %@", finalStatus );		
 	}
 	
 	@catch (NSException *exception) {
@@ -262,19 +263,29 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 
 - (void) connect
 {
+	
 	if (!isConnected)
 	{
+//		char retBuffer[ 256 ];
+
 		[self setSocket: [NetSocket netsocketConnectedToHost: ipAddress port: kUnivVoltHVCratePort]];	
-        [self setIsConnected: [socket isConnected]];  // setIsConnected sends out notification.
-		if ( isConnected )
-		{
-			NSLog( @"Connected to %@", ipAddress );
-		}
-		else
-		{
-			NSLog( @"Disconnected from %@", ipAddress );
-		}
+//        [self setIsConnected: [socket isConnected]];  // setIsConnected sends out notification.
+//		if ( isConnected )
+//		{
+//			NSLog( @"Connected to %@", ipAddress );
+//			[socket read: &retBuffer amount: 256];
+//			NSLog( @"Return from connect %s", retBuffer);
+//		}
+//		else
+//		{
+//			NSLog( @"Disconnected from %@", ipAddress );
+//		}
 	}
+}
+- (void) disconnect
+{
+	if (isConnected ) {	
+		[socket close];	}
 }
 
 - (void) hvPanic
@@ -323,12 +334,12 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
     }
 }
 
-
-/*- (void) netsocket: (NetSocket*) inNetSocket dataAvailable: (unsigned) inAmount
+/*
+- (void) netsocket: (NetSocket*) anInNetSocket dataAvailable: (unsigned) anInAmount
 {
-    if (inNetSocket == socket) {
-		[self dataBuffer: [inNetSocket readData]];
-		[self shipValues];
+    if (anInNetSocket == socket) {
+		[self dataBuffer: [anInNetSocket readData]];
+//		[self append];
 	}
 }
 */

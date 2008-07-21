@@ -30,10 +30,11 @@
 @class NetSocket;
 
 @interface ORUnivVoltHVCrateModel : ORCrate  {
-	NSLock*		localLock;
-    NSString*	ipAddress;
-    BOOL		isConnected;
-	NetSocket*	socket;
+	NSLock*			localLock;
+    NSString*		ipAddress;
+	NSMutableData*	univVoltData;
+    BOOL			isConnected;
+	NetSocket*		socket;
 }
 
 #pragma mark •••Accessors

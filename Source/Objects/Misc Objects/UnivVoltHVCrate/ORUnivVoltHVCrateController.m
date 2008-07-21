@@ -78,6 +78,7 @@
 {
 	[ipConnectedTextField setStringValue: [model isConnected] ? @"Connected" : @"Disconnected"];
 	[ethernetConnectButton setTitle: [model isConnected] ? @"Disconnect" : @"Connect"];
+	[model isConnected] ? [model disconnect] : [model connect];
 }
 
 #pragma mark •••Interface Management
@@ -131,8 +132,6 @@
 
 - (IBAction) showHVStatusAction: (id) aSender
 {
-//	NSString* testStr = [[NSString alloc] initWithFormat: @"HVOFF"];
-//	[hvStatusField setStringValue: testStr];
 	[hvStatusField setStringValue: [model obtainHVStatus]];
 }
 
