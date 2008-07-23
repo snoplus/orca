@@ -70,6 +70,7 @@ NSString* ORKatrinFLTModelShapingTimesChanged		 = @"ORKatrinFLTModelShapingTimes
 NSString* ORKatrinFLTModelTriggersEnabledChanged	 = @"ORKatrinFLTModelTriggersEnabledChanged";
 NSString* ORKatrinFLTModelGainsChanged				 = @"ORKatrinFLTModelGainsChanged";
 NSString* ORKatrinFLTModelThresholdsChanged			 = @"ORKatrinFLTModelThresholdsChanged";
+NSString* ORKatrinFLTModelFilterGapChanged			 = @"ORKatrinFLTModelFilterGapChanged";
 NSString* ORKatrinFLTModelFltRunModeChanged			 = @"ORKatrinFLTModelFltRunModeChanged";
 NSString* ORKatrinFLTModelDaqRunModeChanged			 = @"ORKatrinFLTModelDaqRunModeChanged";
 NSString* ORKatrinFLTSettingsLock					 = @"ORKatrinFLTSettingsLock";
@@ -159,7 +160,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 {
     sltmodel = [[self crate] adapter];
 	if(![[sltmodel fireWireInterface] serviceAlive]){
-        NSLog(@"FLT %i: initVersionRevision: no firewire service (slt %p, firewire %p)\n",[self slot]+1,sltmodel,[sltmodel fireWireInterface] );
+        NSLog(@"FLT %i: initVersionRevision: no firewire service (pointers: sltmodel %p, firewireInterface %p)\n",[self slot]+1,sltmodel,[sltmodel fireWireInterface] );
 	}
     unsigned long oldVersionRegister = versionRegister;
     //NSLog(@"FLT %i: read Version+Revision Register\n",[self slot]+1 );
@@ -182,6 +183,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
             // -tb-
             NSLog(@"Version: VersionRevisionReg (raw) 0x%x is not valid!\n",versionRegister );
             NSLog(@"    You probably use an old FPGA configuration version; version register reset to 1.\n");
+            NSLog(@"    You should set posttrigger time to 511 manually!\n");
             versionRegister = 0x00100000;
         }
     NS_HANDLER
@@ -211,11 +213,12 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
         [self setVetoFeatureIsAvailable:  ([self versionRegApplicationID] & 0x1)];
         [self setHistoFeatureIsAvailable: ([self versionRegApplicationID] & 0x2)];
     }else{  //default
-        //[self setVetoFeatureIsAvailable:  NO];  //use this to use histo config. as default
-        //[self setHistoFeatureIsAvailable: YES];
-        [self setStdFeatureIsAvailable:  YES];
-        [self setVetoFeatureIsAvailable: YES];
-        [self setHistoFeatureIsAvailable:YES];
+        //In KatrinFLTController;;versionRevisionChanged (via notification at the end of this function) the checkboxes will be enabled ... -tb-
+        ////[self setVetoFeatureIsAvailable:  NO];  //use this to use histo config. as default
+        ////[self setHistoFeatureIsAvailable: YES];
+        //[self setStdFeatureIsAvailable:  YES];
+        //[self setVetoFeatureIsAvailable: YES];
+        //[self setHistoFeatureIsAvailable:YES];
     }
     
     //warnings (only if a FPGA configuration was (probably) detected)
@@ -303,6 +306,8 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 - (BOOL) stdFeatureIsAvailable   {return stdFeatureIsAvailable;}   // this is always true, could remove it -tb-
 - (BOOL) vetoFeatureIsAvailable  {return vetoFeatureIsAvailable;}
 - (BOOL) histoFeatureIsAvailable {return histoFeatureIsAvailable;}
+- (BOOL) filterGapFeatureIsAvailable {return filterGapFeatureIsAvailable;}
+
 - (void) setStdFeatureIsAvailable:(BOOL)aBool
 {
     stdFeatureIsAvailable=aBool;
@@ -321,6 +326,12 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 - (void) setHistoFeatureIsAvailable:(BOOL)aBool
 {
     histoFeatureIsAvailable=aBool;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelAvailableFeaturesChanged object:self];
+}
+
+- (void) setFilterGapFeatureIsAvailable:(BOOL)aBool
+{
+    filterGapFeatureIsAvailable=aBool;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelAvailableFeaturesChanged object:self];
 }
 
@@ -836,6 +847,19 @@ return hitRateId;
 	[self postAdcInfoProvidingValueChanged];
 }
 
+- (int) filterGap
+{ return filterGap; }
+
+- (void) setFilterGap:(int) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFilterGap:filterGap];
+    filterGap = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelFilterGapChanged object:self];
+}
+
+
+
+
 //ORAdcInfoProviding protocol requirement
 - (void) postAdcInfoProvidingValueChanged
 {
@@ -1079,6 +1103,24 @@ return hitRateId;
     NSLog(@"reading in HW  postTriggTime  FPGA %i is %i\n",Pixel,val);
 }
 
+
+/** Read out the filter gap of fpga 0 (they all should be the same).
+  * There is no function '- (void) writeFilterGap:(int)aValue'
+  * as it is part of the trigger control register which is set by the
+  * writeTriggerControl function.
+  *
+  * New since fpga6 version 4 (2008-07-11).
+  */ //-tb-
+- (void) readFilterGap
+{
+    unsigned long triggControlReg;
+    int gap;
+    int fpga=0;
+    triggControlReg = [self readTriggerControl: fpga];
+    gap=(triggControlReg >> 4) & 0x3;
+    NSLog(@"KatrinFLT %i: read FilterGap: %i ( triggCtrlReg 0x%4x)\n",[self stationNumber],gap,triggControlReg);
+    //NSLog(@"readFilterGap: %i\n",gap);
+}
 
 
 - (void) checkPresence
@@ -1382,6 +1424,12 @@ return hitRateId;
 				}
 			}
 		}
+
+        // set the filter gap
+        if(filterGapFeatureIsAvailable){
+            aValue &=  0xffffffcf;//clear bit 4-5
+            aValue |=  (filterGap << 4);
+        }
 		
 		[self write:([self slot] << 24) | (kFLTTriggerControlCode << kKatrinFlt_AddressSpace) | (trigChanConvFLT[fpga][0]<<kKatrinFlt_ChannelAddress)  value:aValue];
 		unsigned long checkValue = [self read:([self slot] << 24) | (kFLTTriggerControlCode << kKatrinFlt_AddressSpace) | (trigChanConvFLT[fpga][0]<<kKatrinFlt_ChannelAddress)];
@@ -3562,6 +3610,7 @@ return hitRateId;
 	[self setStdFeatureIsAvailable:   [decoder decodeBoolForKey:@"stdFeatureIsAvailable"]];
 	[self setVetoFeatureIsAvailable:  [decoder decodeBoolForKey:@"vetoFeatureIsAvailable"]];
 	[self setHistoFeatureIsAvailable: [decoder decodeBoolForKey:@"histoFeatureIsAvailable"]];
+	[self setFilterGapFeatureIsAvailable: [decoder decodeBoolForKey:@"filterGapFeatureIsAvailable"]];
 	[self setVersionRegister:		  [decoder decodeIntForKey:@"versionRegister"]];
 	
 	/*
@@ -3637,6 +3686,7 @@ return hitRateId;
     [encoder encodeBool:stdFeatureIsAvailable  forKey:@"stdFeatureIsAvailable"];	
     [encoder encodeBool:vetoFeatureIsAvailable forKey:@"vetoFeatureIsAvailable"];	
     [encoder encodeBool:histoFeatureIsAvailable forKey:@"histoFeatureIsAvailable"];	
+    [encoder encodeBool:filterGapFeatureIsAvailable forKey:@"filterGapFeatureIsAvailable"];	
     [encoder encodeInt:versionRegister forKey:@"versionRegister"];	
 }
 
@@ -3739,6 +3789,7 @@ return hitRateId;
     [objDictionary setObject:shapingTimes		forKey:@"shapingTimes"];
     [objDictionary setObject:[NSNumber numberWithInt:daqRunMode]    		forKey:@"daqRunMode"];
 	//TODO: maybe a string is better?(!) or both? -tb- 2008-02-27
+    [objDictionary setObject:[NSNumber numberWithInt: filterGap]    		forKey:@"filterGapSetting"];
     
     
 	return objDictionary;
@@ -3760,12 +3811,13 @@ return hitRateId;
 	//check that we can actually run
     if(![[[self crate] adapter] serviceIsAlive]){
 		[NSException raise:@"No FireWire Service" format:@"Check Crate Power and FireWire Cable."];
-        //return; 
+        //return;  //TODO: ??? -tb-
     }
 
     // Don't start run, if histogramming test is active
     // TODO: SLT resets the hardware in ["SLT runIsAboutToStart ..."], so if we come here, histogramming already has been terminated by SLT -tb-
     // TODO: how should we handle this? -tb-
+    // TODO: answer (2008-07-16): move this check to SLT! -tb-
     if ([self histoCalibrationIsRunning]) {
 		[NSException raise:@"Histogramming calibration is running" format:@"Stop calibration run and select proper histogramming parameters"]; 
         return; 
@@ -3820,6 +3872,15 @@ return hitRateId;
      */
     //debug output -tb- NSLog(@"1\n");[self readPostTriggerTime];//TODO: debugging - remove it -tb-
 	
+    //the filter gap setting will be written to FLT by [self writeTriggerControl], test it ... -tb-
+    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+    // set the filter gap
+    if(filterGapFeatureIsAvailable){
+        [self readFilterGap];
+    }
+    #endif
+
+    
 	if(ratesEnabled){
 		[self performSelector:@selector(readHitRates) 
 				   withObject:nil 
@@ -3885,7 +3946,7 @@ return hitRateId;
 		useResetTimestamp = NO;
 		NSLog(@"Warning: Old design - reset timestamps not available");
 	NS_ENDHANDLER	
-    
+        
     //THE HARDWARE HISTOGRAMMING PART
     // write the options for hardware histogramming and activate histogramming -tb- 2008-03-05
     if(daqRunMode == kKatrinFlt_DaqHistogram_Mode){	
@@ -4380,7 +4441,7 @@ return hitRateId;
                  }
              }
              if(checkEnergyEnabled)
-             {//TODO: debugging - REMOVE or make "Additional energy test ..." flag -tb-
+             {// TODO: debugging - REMOVE or make "Additional energy test ..." flag -tb- ... OK, done -tb-
               // 1.read energy from energy register
               // 2.read status register, extract write pointer
               // 3.if write pointer did not change, the energy value from energy memory and from

@@ -61,6 +61,12 @@ Doxygen documentation:
  *
  *
  * History:
+ * - 1.2-13 - Katrin FLT
+ *            - from this version on (Orca svn revision > 986) old FPGA configurations won't be supported any more
+ *              to simplify detection of FPGA configurations
+ *            - feature bitfield and versionRevisionRegister content will be stored in the .Orca file; reading the register
+ *              will write out messages only if detecting another configuration
+ *              11.06.08 (-tb-)
  * - 1.2-12 - Katrin FLT dialog
  *            - First official release of the histogramming FGPA configuration (crate shipped to UW end of April):
  *              Version/Revision/Feature register on FLT (enables auto detection of FPGA configurations);
@@ -164,6 +170,6 @@ Doxygen documentation:
 
 /** Version of the IPE-DAQ object.
   * The version number is independent from the Orca version. */ 
-#define ORIPE_VERSION @"1.2-12"
+#define ORIPE_VERSION @"1.2-13"
 
 

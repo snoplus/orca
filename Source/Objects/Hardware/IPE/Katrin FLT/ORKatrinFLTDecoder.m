@@ -201,7 +201,15 @@ followed by waveform data (n x 1024 16-bit words)
 	//       The swap of the shorts has been moved from the model code
 	//       Every data set should be only swapped once (!)
 	// ak, 29.2.08
+    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+    NSLog(@"ORKatrinFLTDecoder::decodeData: flag isSwapped is  %d (0x%x), (ntohl(1) == 1) is  (%d) \n", isSwapped,ePtr->eventID, (ntohl(1) == 1));
+    if( (ntohl(1) == 1) )
+        NSLog(@"    ORKatrinFLTDecoder::decodeData:   is big endian host!\n" );
+    #endif
 	if ((ntohl(1) == 1) && (!isSwapped) ){ // big endian host
+        #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+        NSLog(@"    ORKatrinFLTDecoder::decodeData:   will swap unsigned long  NOW!\n" );
+        #endif
 		// Point to ADC data
 		ptr += (sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/sizeof(unsigned long);
 		
@@ -213,6 +221,7 @@ followed by waveform data (n x 1024 16-bit words)
 		    ptr[i] = (ptr[i] >> 16)  |  (ptr[i] << 16);
 			
 		ePtr->eventID = ePtr->eventID | (0x1 << 31); // set isSpapped flag	
+	    isSwapped          = ePtr->eventID >> 31; 
     }
 	
 	// Set up the waveform
@@ -224,10 +233,41 @@ followed by waveform data (n x 1024 16-bit words)
 				    unitSize: sizeof(short)							// unit size in bytes
 					sender: self 
 					withKeys: @"FLT", @"Waveform",crateKey,stationKey,channelKey,nil];
+
+    //'swap back' = undo the swap made above -tb-
+    //this is due to the bug reported by Michelle in July 2008 -tb-
+    //(the problem was: if in a fan out on slot 1 there was the DataMonitor and on a higher slot the
+    //  DataFile, the flag was set to 1 by DataMonitor and saved by DataFile -tb-)
+    //  1. recalculate the ptr position: 
+    ptr = (unsigned long*)someData;
+    ++ptr;
+    ++ptr;
+    //  2. swap back:
+	if ((ntohl(1) == 1) && (isSwapped) ){ // big endian host
+        #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+        NSLog(@"    ORKatrinFLTDecoder::decodeData:   will swap back unsigned long  NOW!\n" );
+        #endif
+		// Point to ADC data
+		ptr += (sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/sizeof(unsigned long);
+		
+		// The order of the shorts has to be switched (endianess)
+		int i;
+		int traceLen = (length / 512) * 512;
+		
+		for (i=0;i< traceLen;i++)
+		    ptr[i] = (ptr[i] >> 16)  |  (ptr[i] << 16);
+			
+		ePtr->eventID = ePtr->eventID & ~(0x1 << 31); // unset isSpapped flag	
+	    isSwapped          = ePtr->eventID >> 31; 
+        if(isSwapped) NSLog(@"ERROR: swap-flag wrong in ORKatrinFLTDecoder!\n");
+    }
 					
 
+    #if 0
+    ptr = (unsigned long*)someData; ++ptr; ++ptr:
     ptr = ptr + (sizeof(katrinEventDataStruct) + sizeof(katrinDebugDataStruct)) / sizeof(long);
-	//NSLog(@" len = %d (%d), %x %x %x\n", length, ptr - (unsigned long *) someData , ptr[0], ptr[1], ptr[2]);
+	NSLog(@" len = %d (%d), %x %x %x\n", length, ptr - (unsigned long *) someData , ptr[0], ptr[1], ptr[2]);
+    #endif
 					
     return length; //must return number of longs processed.
 }

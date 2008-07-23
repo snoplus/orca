@@ -36,10 +36,12 @@
 		IBOutlet NSMenuItem*    energyDaqModeMenuItem;
 		IBOutlet NSMenuItem*    vetoDaqModeMenuItem;
 		IBOutlet NSMenuItem*    histogramDaqModeMenuItem;
+		IBOutlet NSTextField*   daqRunModeInfoField;
 		IBOutlet NSButton*		versionButton;
 		IBOutlet NSButton*		versionStdCheckButton;
 		IBOutlet NSButton*		versionHistoCheckButton;
 		IBOutlet NSButton*		versionVetoCheckButton;
+		IBOutlet NSButton*		versionFilterGapCheckButton;
 		IBOutlet NSButton*		statusButton;
 		IBOutlet NSButton*		readFltModeButton;
 		IBOutlet NSTextField*   fltModeField;
@@ -58,6 +60,7 @@
 		IBOutlet NSPopUpButton* shapingTimePU1;
 		IBOutlet NSPopUpButton* shapingTimePU2;
 		IBOutlet NSPopUpButton* shapingTimePU3;
+		IBOutlet NSPopUpButton* filterGapPopup;
 		IBOutlet NSTextField*	maxEnergyField0;
 		IBOutlet NSTextField*	hitRateLengthField;
 		IBOutlet NSButton*		hitRateAllButton;
@@ -231,6 +234,7 @@
 - (IBAction) loadTimeAction: (id) sender;
 - (IBAction) readTimeAction: (id) sender;
 - (IBAction) shapingTimeAction: (id) sender;
+- (IBAction) filterGapAction: (id) sender;
 - (IBAction) hitRateLengthAction: (id) sender;
 - (IBAction) hitRateAllAction: (id) sender;
 - (IBAction) hitRateNoneAction: (id) sender;

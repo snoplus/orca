@@ -207,6 +207,11 @@
 					   object : model];
 
     [notifyCenter addObserver : self
+					 selector : @selector(filterGapChanged:)
+						 name : ORKatrinFLTModelFilterGapChanged
+					   object : model];
+
+    [notifyCenter addObserver : self
 					 selector : @selector(hitRateLengthChanged:)
 						 name : ORKatrinFLTModelHitRateLengthChanged
 					   object : model];
@@ -490,11 +495,18 @@
     
     //TODO: need check for FPGA HW version -tb- 2008-03-25
     // Denis wants put this into the Histo+Veto versions, too -tb-
-    [postTriggTimeField         setEnabled:(!lockedOrRunningMaintenance) && ([model versionRegHWVersionHex] >= 0x30)];
-    [writePostTriggerTimeButton setEnabled:(!lockedOrRunningMaintenance) && ([model versionRegHWVersionHex] >= 0x30)]; 
+    
+    // we let the user decide to set the necessary settings ...
+    //[postTriggTimeField         setEnabled:(!lockedOrRunningMaintenance) && ([model versionRegHWVersionHex] >= 0x30)];
+    //[writePostTriggerTimeButton setEnabled:(!lockedOrRunningMaintenance) && ([model versionRegHWVersionHex] >= 0x30)]; 
+	//[checkWaveFormEnabledButton setEnabled:!lockedOrRunningMaintenance && ([model daqRunMode] == kKatrinFlt_DaqEnergyTrace_Mode)];
+	//[checkEnergyEnabledButton   setEnabled:!lockedOrRunningMaintenance && ([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode)];
 
-	[checkWaveFormEnabledButton setEnabled:!lockedOrRunningMaintenance && ([model daqRunMode] == kKatrinFlt_DaqEnergyTrace_Mode)];
-	[checkEnergyEnabledButton   setEnabled:!lockedOrRunningMaintenance && ([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode)];
+    [postTriggTimeField         setEnabled:(!lockedOrRunningMaintenance)];
+    [writePostTriggerTimeButton setEnabled:(!lockedOrRunningMaintenance)]; 
+
+	[checkWaveFormEnabledButton setEnabled:!lockedOrRunningMaintenance];
+	[checkEnergyEnabledButton   setEnabled:!lockedOrRunningMaintenance];
 
 	if(testsAreRunning){
 		[testButton setEnabled: YES];
@@ -532,6 +544,7 @@
     [versionStdCheckButton   setIntValue: [model stdFeatureIsAvailable]];
     [versionHistoCheckButton setIntValue: [model histoFeatureIsAvailable]];
     [versionVetoCheckButton  setIntValue: [model vetoFeatureIsAvailable]];
+    [versionFilterGapCheckButton  setIntValue: [model filterGapFeatureIsAvailable]];
 
     //[daqRunModeButton setAutoenablesItems:YES];
     [daqRunModeButton setAutoenablesItems:NO];  // needed only once ? -tb- 
@@ -613,6 +626,14 @@
 			[[hitRateEnabledCBs  cellWithTag:chan]    setEnabled: availiable];
 		}
 	}
+    
+    // check filter gap config
+    if(![model filterGapFeatureIsAvailable]){
+        [filterGapPopup setEnabled:FALSE];
+    }
+	else{
+        [filterGapPopup setEnabled:TRUE];
+    }
 }
 
 - (void) numTestPattersChanged:(NSNotification*)aNote
@@ -831,10 +852,17 @@
 }
 
 
+- (void) filterGapChanged:(NSNotification*)aNotification
+{
+    //NSLog(@"ORKatrinFLTController::filterGapChanged: %i\n",[model filterGap]);
+    [filterGapPopup  selectItemAtIndex: [model filterGap]];
+}
+
 /** The FLT mode register value.
   */
 - (void) fltRunModeChanged:(NSNotification*)aNote
 {
+    //TODO: this is OBSOLETE, use DaqRunMode instead -tb- 2008-07-22
     //debug output -tb- NSLog(@"Received notification  -fltModeChanged- ...\n");
 	//[modeButton selectItemAtIndex:[model fltRunMode]]; TODO: obsolete ! -tb-
 	//[modeButton selectItemAtIndex:[model daqRunMode]];//-tb-
@@ -849,7 +877,35 @@
     //debug output -tb- NSLog(@"Received notification  -daqRunModeChanged- ... new is %i\n", [model daqRunMode]);
 	//[modeButton selectItemAtIndex:[model fltRunMode]];
     //debug output -tb- NSLog(@"DAQ run mode is %i\n", [model daqRunMode]);
-	[daqRunModeButton selectItemWithTag:[model daqRunMode]];//-tb-
+    int daqRunMode = [model daqRunMode];
+	[daqRunModeButton selectItemWithTag: daqRunMode];//-tb-
+    switch(daqRunMode){
+        case 0: //debug mode (kKatrinFlt_DaqEnergyTrace_Mode)
+            [daqRunModeInfoField setStringValue:@"Info: Debug mode. Measurement: ADC traces and energy."
+                                                 "\nFor investigating waveforms."];
+            break;
+        case 1: //run mode
+            [daqRunModeInfoField setStringValue:@"Info: Run mode.\nData: single ADC energy events."];
+            break;
+        case 2: //hitrate mode
+            [daqRunModeInfoField setStringValue:@"Info: Measure mode.\nData: hitrate only."];
+            break;
+        case 3: //test mode
+            [daqRunModeInfoField setStringValue:@"Info: test mode."];
+            break;
+        case 4: //threshold scan mode kKatrinFlt_DaqThresholdScan_Mode
+            [daqRunModeInfoField setStringValue:@"Info: Run mode. Scans several values for the threshold."];
+            break;
+        case 5: //threshold scan mode kKatrinFlt_DaqHistogram_Mode
+            [daqRunModeInfoField setStringValue:@"Info: Run mode. Data: energy histogram."];
+            break;
+        case 6: //threshold scan mode kKatrinFlt_DaqVeto_Mode
+            [daqRunModeInfoField setStringValue:@"Info: Run mode with Veto feature."];
+            break;
+        default: //unknown mode
+            [daqRunModeInfoField setStringValue:@"No info available."];
+            break;
+    }
 	[self updateGUI:nil];	// still needed? -tb- 2008-02-08 ... YES, updates the GUI!
 }
 
@@ -1207,6 +1263,10 @@
         //NSLog(@"FLTController versionFeatureCheckButton: versionVetoCheckButton\n");
         [model setVetoFeatureIsAvailable:[versionVetoCheckButton state]== NSOnState];
     }
+    if(sender == versionFilterGapCheckButton){
+        //NSLog(@"FLTController versionFeatureCheckButton: versionVetoCheckButton\n");
+        [model setFilterGapFeatureIsAvailable:[versionFilterGapCheckButton state]== NSOnState];
+    }
 
 }
 
@@ -1371,6 +1431,16 @@
 		[[self undoManager] setActionName: @"Set ShapingTime"]; 
 		[model setShapingTime:[sender tag] withValue:[sender indexOfSelectedItem]];
 	}
+}
+
+- (IBAction) filterGapAction: (id) sender
+{
+	//if([sender intValue] != [model shapingTime:[[sender selectedCell] tag]]){// bug: was gain instead of shapingTime -tb-
+    //NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag]);
+    //[model setFilterGap:[sender tag]];
+    int val=[[[filterGapPopup selectedItem] title ] intValue];
+    NSLog(@"filterGapAction: value %i \n", val);
+    [model setFilterGap: val];
 }
 
 - (IBAction) hitRateLengthAction: (id) sender

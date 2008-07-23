@@ -94,7 +94,7 @@
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
 	unsigned short  readoutPages;	//!< Number of pages to read in debug mode
     int             energyShift[kNumFLTChannels];    //!< Shift to get constant energy values independend from the shaping time 
-
+    int             filterGap;  //!< Size of the HW filter gap.
 	
 	// Parameters for event triggered readout mode
     BOOL			broadcastTime;
@@ -212,6 +212,7 @@
     BOOL stdFeatureIsAvailable;
     BOOL vetoFeatureIsAvailable;
     BOOL histoFeatureIsAvailable;
+    BOOL filterGapFeatureIsAvailable;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -244,9 +245,11 @@
 - (BOOL) stdFeatureIsAvailable;
 - (BOOL) vetoFeatureIsAvailable;
 - (BOOL) histoFeatureIsAvailable;
+- (BOOL) filterGapFeatureIsAvailable;
 - (void) setStdFeatureIsAvailable:(BOOL)aBool;
 - (void) setVetoFeatureIsAvailable:(BOOL)aBool;
 - (void) setHistoFeatureIsAvailable:(BOOL)aBool;
+- (void) setFilterGapFeatureIsAvailable:(BOOL)aBool;
 - (BOOL) checkWaveFormEnabled;
 - (void) setCheckWaveFormEnabled:(BOOL)aCheckWaveFormEnabled;
 - (BOOL) checkEnergyEnabled;
@@ -305,6 +308,8 @@
 - (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
 - (void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 - (void) setShapingTime:(unsigned short) aGroup withValue:(unsigned short)aShapingTime;
+- (int) filterGap;
+- (void) setFilterGap:(int) aValue;
 
 - (int) fltRunMode;
 - (void) setFltRunMode:(int)aMode;
@@ -332,8 +337,10 @@
 
 #pragma mark ¥¥¥HW Access
 //all can raise exceptions
-- (void) writePostTriggerTime:(unsigned int)aValue; // -tb- tmp
+- (void) writePostTriggerTime:(unsigned int)aValue; // -tb-  
 - (void) readPostTriggerTime;
+
+- (void) readFilterGap;
 
 - (void)	checkPresence;
 - (int)		readVersion;
@@ -584,6 +591,7 @@ extern NSString* ORKatrinFLTChan;
 extern NSString* ORKatrinFLTModelGainsChanged;
 extern NSString* ORKatrinFLTModelTestPatternsChanged;
 extern NSString* ORKatrinFLTModelThresholdsChanged;
+extern NSString* ORKatrinFLTModelFilterGapChanged;
 extern NSString* ORKatrinFLTModelFltRunModeChanged;
 extern NSString* ORKatrinFLTModelDaqRunModeChanged;
 extern NSString* ORKatrinFLTSettingsLock;
