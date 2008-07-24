@@ -881,11 +881,11 @@
 	[daqRunModeButton selectItemWithTag: daqRunMode];//-tb-
     switch(daqRunMode){
         case 0: //debug mode (kKatrinFlt_DaqEnergyTrace_Mode)
-            [daqRunModeInfoField setStringValue:@"Info: Debug mode. Measurement: ADC traces and energy."
+            [daqRunModeInfoField setStringValue:@"Info: Debug mode. Data: ADC traces and energy."
                                                  "\nFor investigating waveforms."];
             break;
         case 1: //run mode
-            [daqRunModeInfoField setStringValue:@"Info: Run mode.\nData: single ADC energy events."];
+            [daqRunModeInfoField setStringValue:@"Info: Run mode. Data: single ADC energy events. Standard mode."];
             break;
         case 2: //hitrate mode
             [daqRunModeInfoField setStringValue:@"Info: Measure mode.\nData: hitrate only."];
@@ -897,10 +897,10 @@
             [daqRunModeInfoField setStringValue:@"Info: Run mode. Scans several values for the threshold."];
             break;
         case 5: //threshold scan mode kKatrinFlt_DaqHistogram_Mode
-            [daqRunModeInfoField setStringValue:@"Info: Run mode. Data: energy histogram."];
+            [daqRunModeInfoField setStringValue:@"Info: Run mode. Data: energy histogram. For high hitrates."];
             break;
         case 6: //threshold scan mode kKatrinFlt_DaqVeto_Mode
-            [daqRunModeInfoField setStringValue:@"Info: Run mode with Veto feature."];
+            [daqRunModeInfoField setStringValue:@"Info: Run mode with Veto feature. Dedicated for veto detector."];
             break;
         default: //unknown mode
             [daqRunModeInfoField setStringValue:@"No info available."];
@@ -1225,6 +1225,12 @@
 
 - (IBAction) versionAction: (id) sender
 {
+    //read out version/revision register and show result in log window -tb-
+    [model initVersionRevision];
+    
+    if([model versionRegHWVersion] >= 0x3){
+        [model showVersionRevision];
+    }else{
 	NS_DURING
 		NSLog(@"FLT %d Revision: %d\n",[model stationNumber],[model readVersion]);
 		int fpga;
@@ -1238,10 +1244,7 @@
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
 	NS_ENDHANDLER
-    
-    //read out version/revision register and show result in log window -tb-
-    [model initVersionRevision];
-    [model showVersionRevision];
+    }
 }
 
 /** Responds to all feature/application check buttons (std, histo, veto).
@@ -1264,7 +1267,7 @@
         [model setVetoFeatureIsAvailable:[versionVetoCheckButton state]== NSOnState];
     }
     if(sender == versionFilterGapCheckButton){
-        //NSLog(@"FLTController versionFeatureCheckButton: versionVetoCheckButton\n");
+        //NSLog(@"FLTController versionFeatureCheckButton: versionFilterGapCheckButton\n");
         [model setFilterGapFeatureIsAvailable:[versionFilterGapCheckButton state]== NSOnState];
     }
 
@@ -1281,10 +1284,20 @@
         [versionStdCheckButton   setEnabled: FALSE];
         [versionHistoCheckButton setEnabled: FALSE];
         [versionVetoCheckButton  setEnabled: FALSE];
+        if([model versionRegFPGA6Version]==0x04)
+            [versionFilterGapCheckButton  setEnabled: FALSE];
+        else
+            [versionFilterGapCheckButton  setEnabled: TRUE];
     }else{
         [versionStdCheckButton   setEnabled: TRUE];
         [versionHistoCheckButton setEnabled: TRUE];
         [versionVetoCheckButton  setEnabled: TRUE];
+        [versionFilterGapCheckButton  setEnabled: TRUE];
+    }
+    if([model versionRegHWVersion] >=3  && [model versionRegFPGA6Version]>=0x04){ //since then we have the filter gap feature
+        [versionFilterGapCheckButton  setEnabled: FALSE];
+    }else{
+        [versionFilterGapCheckButton  setEnabled: TRUE];
     }
     if([model versionRegHWVersion] ==1){ //PROBABLY OLD VERSION,no posttrigger time
         [writePostTriggerTimeButton setEnabled: FALSE];

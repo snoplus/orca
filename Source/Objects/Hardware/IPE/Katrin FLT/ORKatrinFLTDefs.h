@@ -25,8 +25,8 @@
 #define kKatrinFlt_Pages 64
 
 // Position of the bit fields
-#define kKatrinFlt_Cntl_Version_Shift		29
-#define kKatrinFlt_Cntl_Version_Mask		0x7
+#define kKatrinFlt_Cntl_Version_Shift		29     //!< This is obsolete since FPGA firmware 3.x -tb-
+#define kKatrinFlt_Cntl_Version_Mask		0x7    //!< This is obsolete since FPGA firmware 3.x -tb-
 #define kKatrinFlt_Cntrl_CardID_Shift		24
 #define kKatrinFlt_Cntrl_CardID_Mask		0x1f
 #define kKatrinFlt_Cntrl_BufState_Shift		22   

@@ -160,7 +160,8 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 {
     sltmodel = [[self crate] adapter];
 	if(![[sltmodel fireWireInterface] serviceAlive]){
-        NSLog(@"FLT %i: initVersionRevision: no firewire service (pointers: sltmodel %p, firewireInterface %p)\n",[self slot]+1,sltmodel,[sltmodel fireWireInterface] );
+        NSLog(@"FLT %i: initVersionRevision: no firewire service \n",[self slot]+1  );
+        //NSLog(@"FLT %i: initVersionRevision: no firewire service (pointers: sltmodel %p, firewireInterface %p)\n",[self slot]+1,sltmodel,[sltmodel fireWireInterface] );
 	}
     unsigned long oldVersionRegister = versionRegister;
     //NSLog(@"FLT %i: read Version+Revision Register\n",[self slot]+1 );
@@ -194,8 +195,8 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 	NS_ENDHANDLER
     
     if([self slot]==0){// a new created FLT - not yet dropped into a slot
-       versionRegisterIsUptodate=FALSE;
-       return;
+        versionRegisterIsUptodate=FALSE;
+        return;
     }
     
     if([self versionRegHWVersion]==1){// old version - no posttrigger
@@ -219,6 +220,15 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
         //[self setStdFeatureIsAvailable:  YES];
         //[self setVetoFeatureIsAvailable: YES];
         //[self setHistoFeatureIsAvailable:YES];
+    }
+    
+    //set filter gap feature (dont change it, if HWVersion <= 2 ... )
+    if([self versionRegHWVersion]>=0x3){
+        if([self versionRegApplicationID]==0 && [self versionRegFPGA6Version]>=0x04 ){//only in standard fpga since FPGA6>4
+            [self setFilterGapFeatureIsAvailable: YES];
+        }else{
+            [self setFilterGapFeatureIsAvailable: NO];
+        }
     }
     
     //warnings (only if a FPGA configuration was (probably) detected)
@@ -1133,13 +1143,14 @@ return hitRateId;
 	NS_ENDHANDLER
 }
 
+//*! The revision bits in the Status Control Register are obsolete since FPGA firmware versions 3.xx (since begin of 2008).
 - (int)  readVersion
 {	
 	unsigned long data = [self readControlStatus];
 	return (data >> kKatrinFlt_Cntl_Version_Shift) & kKatrinFlt_Cntl_Version_Mask; // 3bit
 }
 
-//*! Read out the version/revision/feature register.
+//*! Read out the version/revision/feature register. New since FPGA firmware versions 3.xx (since begin of 2008).
 - (unsigned long)  readVersionRevision
 {	
     unsigned int func  = 0x0; // = b000
@@ -1152,6 +1163,7 @@ return hitRateId;
 	//return (data >> kKatrinFlt_Cntl_Version_Shift) & kKatrinFlt_Cntl_Version_Mask; // 3bit
 }
 
+//*! The version bits in the Trigger Control Register are obsolete since FPGA firmware versions 3.xx (since begin of 2008).
 -(int) readFPGAVersion:(int) fpga
 {
 	unsigned long data = [self readTriggerControl:fpga];
