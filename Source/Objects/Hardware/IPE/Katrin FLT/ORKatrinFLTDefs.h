@@ -103,7 +103,7 @@ typedef struct {
 
 typedef struct { // -tb- 2008-02-27
 	long readoutSec;
-	long recordingTimeSec;
+	long recordingTimeSec;  //! this holds the refresh time -tb-
 	long firstBin;
 	long lastBin;
 	long histogramLength; //don't use unsigned! - it may become negative, at least temporaryly -tb-

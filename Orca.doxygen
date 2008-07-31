@@ -2,6 +2,8 @@
 #
 # (Parsed files: see   INPUT   =  ... tag)
 #
+# call with: doxygen Orca.doxygen
+#
 # -tb- 2008-03-07
 
 
@@ -471,8 +473,12 @@ WARN_LOGFILE           =
 
 INPUT                  = Source/Objects/Hardware/IPE \
                          ../OrcaRoot/Applications/orcaroot_ipe_katrin.cc \
+                         ../OrcaRoot/Processors/ORVTreeWriter.hh \
+                         ../OrcaRoot/Processors/ORVTreeWriter.cc \
                          ../OrcaRoot/Decoders/ORKatrinFLTEnergyDecoder.cc \
                          ../OrcaRoot/Decoders/ORKatrinFLTEnergyDecoder.hh \
+                         ../OrcaRoot/Decoders/ORKatrinFLTEnergyHistogramDecoder.cc \
+                         ../OrcaRoot/Decoders/ORKatrinFLTEnergyHistogramDecoder.hh \
                          ../OrcaRoot/Decoders/ORKatrinFLTWaveformDecoder.cc \
                          ../OrcaRoot/Decoders/ORKatrinFLTWaveformDecoder.hh \
                          ../OrcaRoot/Processors/ORKatrinFLTEnergyTreeWriter.cc \

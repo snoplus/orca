@@ -176,6 +176,7 @@
 - (void) hitRateEnabledChanged:(NSNotification*)aNote;
 - (void) shapingTimesArrayChanged:(NSNotification*)aNote;
 - (void) shapingTimeChanged:(NSNotification*)aNote;
+- (void) filterGapChanged:(NSNotification*)aNote;
 - (void) hitRateLengthChanged:(NSNotification*)aNote;
 - (void) hitRateChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;

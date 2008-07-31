@@ -412,6 +412,7 @@
 	[self triggersEnabledArrayChanged:nil];
 	[self hitRatesEnabledArrayChanged:nil];
 	[self shapingTimesArrayChanged:nil];
+    [self filterGapChanged:nil];
 	[self hitRateLengthChanged:nil];
 	[self hitRateChanged:nil];
     [self updateTimePlot:nil];

@@ -2295,6 +2295,7 @@ return hitRateId;
     histogramDataFirstBin[aChan]=firstBin;
     histogramDataLastBin[aChan]=lastBin;
     histogramDataSum[aChan]=sum;
+    histogramDataRecTimeSec[aChan]=histoRecordingTime;
 
 }
 
@@ -4507,7 +4508,7 @@ return hitRateId;
 							
 							unsigned long totalLength = (2 + (sizeof(katrinEventDataStruct)/sizeof(long)) 
 														 + (sizeof(katrinDebugDataStruct)/sizeof(long))
-														 + readoutPages*512);	// longs
+														 + readoutPages*512);	// longs (1 page=1024 shorts [16 bit] are stored in 512 longs [32 bit])
 							NSMutableData* theWaveFormData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
 							unsigned long header = waveFormId | totalLength;
 							
@@ -5171,7 +5172,8 @@ NSLog(@"This is   takeDataHistogramMode heartbeat: %i\n",sec);
     //TODO : was still under construction, now obsolete ...  - for testing: read the first channel -tb-
     // now read out the histogram and write it to the Orca data stream
     theEventData.readoutSec = stopsec;
-    theEventData.recordingTimeSec = [self readTRec];
+    //theEventData.recordingTimeSec = [self readTRec];
+    theEventData.recordingTimeSec = histoRunTime;
     theEventData.firstBin  = [self readFirstBinForChan: 0];
     theEventData.lastBin   = [self readLastBinForChan:  0];
     theEventData.histogramLength = theEventData.lastBin - theEventData.firstBin +1;
@@ -5246,7 +5248,9 @@ NSLog(@"This is   takeDataHistogramMode heartbeat: %i\n",sec);
         
         // now read out the histogram and write it to the Orca data stream
         theEventData.readoutSec = stopsec;
-        theEventData.recordingTimeSec = histogramDataRecTimeSec[chan];//was readout in takeDataHistogramMode[self readTRecForChan:chan];
+        //theEventData.recordingTimeSec = histoRecordingTime;
+        //theEventData.recordingTimeSec = histogramDataRecTimeSec[chan];//was readout in takeDataHistogramMode[self readTRecForChan:chan];
+        theEventData.recordingTimeSec =  histoRunTime; //changed 2008-07 to store the refresh time -tb-
         theEventData.firstBin  = histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
         theEventData.lastBin   = histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
         theEventData.histogramLength = theEventData.lastBin - theEventData.firstBin +1;

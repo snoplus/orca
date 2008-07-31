@@ -157,7 +157,7 @@
     NSMutableArray* histogramData;    //!< Array of NSData objects to keep the hardware histogram.
     int histogramDataFirstBin[kNumFLTChannels];
     int histogramDataLastBin[kNumFLTChannels];
-    int histogramDataRecTimeSec[kNumFLTChannels];
+    int histogramDataRecTimeSec[kNumFLTChannels]; // obsolete 2008-07 -tb-
     int histogramDataSum[kNumFLTChannels];
     int histoStartTimeSec;   //!< Start time (sec) of the test @e hardware @e histogram.
     int histoStartTimeUSec;  //!< Start time (usec) of the test @e hardware @e histogram.

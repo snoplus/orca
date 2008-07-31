@@ -575,7 +575,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
              ^ ^^^^---------------------card
 			        ^^^^ ^^^^-----------channel
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx readoutSec
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx recordingTimeSec
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx refreshTime  (was recordingTimeSec)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx firstBin
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx lastBin
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramLength
@@ -614,7 +614,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
     #if 0 //debug output -tb-
 	NSLog(@"Keys:%@ %@ %@ %@ %@ \n", @"FLT",@"HitrateTimeSerie",crateKey,stationKey,channelKey);
 	NSLog(@"  readoutSec = %d \n", ePtr->readoutSec);
-	NSLog(@"  recordingTimeSec = %d \n", ePtr->recordingTimeSec);
+	//NSLog(@"  recordingTimeSec = %d \n", ePtr->recordingTimeSec);
+	NSLog(@"  refreshTimeSec = %d \n", ePtr->recordingTimeSec);
 	NSLog(@"  firstBin = %d \n", ePtr->firstBin);
 	NSLog(@"  lastBin = %d \n", ePtr->lastBin);
 	NSLog(@"  histogramLength = %d \n", ePtr->histogramLength);
@@ -746,13 +747,15 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 	katrinHistogramDataStruct* ePtr = (katrinHistogramDataStruct*)ptr;			//recast to event structure
 
 	NSLog(@" readoutSec = %d \n", ePtr->readoutSec);
-	NSLog(@" recordingTimeSec = %d \n", ePtr->recordingTimeSec);
+	//NSLog(@" recordingTimeSec = %d \n", ePtr->recordingTimeSec);
+	NSLog(@" refreshTimeSec = %d \n", ePtr->recordingTimeSec);
 	NSLog(@" firstBin = %d \n", ePtr->firstBin);
 	NSLog(@" lastBin = %d \n", ePtr->lastBin);
 	NSLog(@" histogramLength = %d \n", ePtr->histogramLength);
 	
 	NSString* readoutSec	= [NSString stringWithFormat:@"ReadoutSec = %d\n",ePtr->readoutSec];
-	NSString* recordingTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->recordingTimeSec];
+	//NSString* recordingTimeSec	= [NSString stringWithFormat:@"recordingTimeSec = %d\n",ePtr->recordingTimeSec];
+	NSString* refreshTimeSec	= [NSString stringWithFormat:@"refreshTimeSec = %d\n",ePtr->recordingTimeSec];
 	NSString* firstBin	= [NSString stringWithFormat:@"firstBin = %d\n",ePtr->firstBin];
 	NSString* lastBin	= [NSString stringWithFormat:@"lastBin = %d\n",ePtr->lastBin];
 	NSString* histogramLength	= [NSString stringWithFormat:@"histogramLength = %d\n",ePtr->histogramLength];
@@ -762,7 +765,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 
 
     return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan,
-	                       readoutSec,recordingTimeSec,firstBin,lastBin,histogramLength,
+	                       readoutSec,refreshTimeSec,firstBin,lastBin,histogramLength,
                            maxHistogramLength,binSize,offsetEMin]; 
 }
 
