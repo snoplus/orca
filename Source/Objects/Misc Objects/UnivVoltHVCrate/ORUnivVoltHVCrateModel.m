@@ -24,15 +24,16 @@
 #import "NetSocket.h"
 #import "ORMacModel.h"
 
-//NSString* ORUnivVoltHVUSBConnector				= @"ORUnivVoltHVUSBConnector";
 NSString* ORUnivVoltHVCrateIsConnectedChangedNotification		= @"ORUnivVoltHVCrateIsConnectedChangedNotification";
 NSString* ORUnivVoltHVCrateIpAddressChangedNotification		    = @"ORUnivVoltHVCrateIpAddressChangedNotification";
 NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateStatusChangedNotification";
+NSString* ORUnivVoltHVStatusAvailableNotification				= @"ORUnivVoltHVStatusAvailableNotification";
+NSString* ORConfigAvailableNotification							= @"ORConfigAvailableNotification";
+NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 
 @implementation ORUnivVoltHVCrateModel
 
 #pragma mark •••initialization
-
 
 - (void) setUpImage
 {
@@ -79,8 +80,8 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 
 - (void) dealloc
 {
-	[socket close];
-	[socket release];
+	[mSocket close];
+	[mSocket release];
 	
 
 /*
@@ -133,12 +134,6 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 }
 
 #pragma mark •••Accessors
-
-- (NSString*) ipAddress
-{
-    return ipAddress;
-}
-
 - (void) setIpAddress: (NSString *) anIpAddress
 {
 	if (!anIpAddress) anIpAddress = @"";
@@ -150,18 +145,39 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
     [[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVCrateIpAddressChangedNotification object: self];
 }
 
+- (NSString*) hvStatus
+{ 
+	return( mReturnFromSocket );
+}
+
+- (NSString *) ethernetConfig
+{
+	return( mReturnFromSocket );
+}
+
+- (NSString *) config
+{
+	return( mReturnFromSocket );
+}
+
+- (NSString*) ipAddress
+{
+    return ipAddress;
+}
+
+#pragma mark ***Crate Actions
 - (NetSocket*) socket
 {
-	return socket;
+	return mSocket;
 }
 
 - (void) setSocket: (NetSocket*) aSocket
 {
-	if(aSocket != socket)[socket close];
+	if(aSocket != mSocket)[mSocket close];
 	[aSocket retain];
-	[socket release];
-	socket = aSocket;
-    [socket setDelegate: self];
+	[mSocket release];
+	mSocket = aSocket;
+    [mSocket setDelegate: self];
 }
 
 //------------------------------------
@@ -175,6 +191,31 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 
 
 #pragma mark •••Notifications
+- (void) handleDataReturn: (NSData*) aSomeData
+{
+//	NSString* returnFromSocket;	
+	// For commands that return ascii data parse the data.
+	if ( mLastCommand <= 3 ) {  // kUVEnet
+		mReturnFromSocket = [self interpretDataFromSocket: aSomeData];
+	}
+
+	switch( mLastCommand )
+	{
+		case eUVHVStatus: // 	
+			[[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVStatusAvailableNotification object: self];	
+			break;	
+			
+		case eUVConfig:
+			[[NSNotificationCenter defaultCenter] postNotificationName: ORConfigAvailableNotification object: self];
+			break;
+			
+		case eUVEnet:
+			[[NSNotificationCenter defaultCenter] postNotificationName: OREnetAvailableNotification object: self];
+
+	}
+	return;
+}
+
 /*- (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -198,25 +239,28 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
                        object : nil];
 }
 */
-- (NSString *) obtainHVStatus
+- (void) obtainHVStatus
 {
-	NSString*	finalStatus;
-	NSString*	retString;
-	NSString*	command = @"HVSTATUS\n";
-	char retBuffer[ 256 ];
+//	NSString*	finalStatus;
+//	NSString*	retString;
 	
 	@try
 	{
-		NSRange extResponse;
-		NSRange isItContained;
+		NSString* command = [NSString stringWithFormat: @"HVSTATUS"];	
+		const char* buffer = [command cStringUsingEncoding: NSASCIIStringEncoding];
 		
 		// Write the command.
-		[socket write: [command cStringUsingEncoding: NSASCIIStringEncoding] length: [command length]];	
-	
+		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
+		[mSocket write: buffer length: [command length] + 1];	
+
+/*		int lenString = strlen( charBuffer );
+		NSLog( @"Length of command string %d", lenString );
+		[mSocket write: charBuffer length: [command length]];	
+*/	
 		// Interpret return response
 		//[self interpretResponse: kHVStatus];
 		// Read back response from crate
-		[socket read: &retBuffer amount: 256];
+/*		[mSocket read: &retBuffer amount: 256];
 	
 		retString = [[NSString alloc] initWithCString: (char *)retBuffer encoding: NSASCIIStringEncoding];
 		NSLog( @"retString %@ ", retString );
@@ -230,7 +274,8 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 		}
 		
 		finalStatus = [retString substringWithRange: extResponse];
-		NSLog( @"Returned value %@", finalStatus );		
+		NSLog( @"Returned value %@", finalStatus );	
+		*/	
 	}
 	
 	@catch (NSException *exception) {
@@ -240,11 +285,10 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 	
 	@finally
 	{
-		[retString release];
-		[command release];
+	//	[command release];
 	}
 
-	return ( finalStatus );
+	return;
 }
 
 /*- (void) powerFailed:(NSNotification*)aNotification
@@ -264,16 +308,15 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 - (void) connect
 {
 	
-	if (!isConnected)
+	if (!mIsConnected)
 	{
-//		char retBuffer[ 256 ];
 
 		[self setSocket: [NetSocket netsocketConnectedToHost: ipAddress port: kUnivVoltHVCratePort]];	
-//        [self setIsConnected: [socket isConnected]];  // setIsConnected sends out notification.
+//        [self setIsConnected: [mSocket isConnected]];  // setIsConnected sends out notification.
 //		if ( isConnected )
 //		{
 //			NSLog( @"Connected to %@", ipAddress );
-//			[socket read: &retBuffer amount: 256];
+//			[mSocket read: &retBuffer amount: 256];
 //			NSLog( @"Return from connect %s", retBuffer);
 //		}
 //		else
@@ -284,8 +327,9 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 }
 - (void) disconnect
 {
-	if (isConnected ) {	
-		[socket close];	}
+	if (mIsConnected ) {	
+		[mSocket close];
+	}
 }
 
 - (void) hvPanic
@@ -303,15 +347,70 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 
 
 #pragma mark ***Utilities
+- (NSString *) interpretDataFromSocket: (NSData *)aDataObject
+{
+	NSString*	returnStringFromSocket;
+	char		returnBufferArray[ 257 ];
+//	char		tmpArray[ 2 ];
+	int			lengthOfReturn = 0;
+	int			i;
+	int			count;
+	BOOL		newLine;
+	
+//	tmpArray[ 1 ] = '\0';
+
+	@try
+	{
+		// Get amount of data and data itself.
+		lengthOfReturn = [aDataObject length];
+		[aDataObject getBytes: returnBufferArray length: lengthOfReturn];
+		NSLog( @"Return string: %s  length: %d", returnBufferArray, lengthOfReturn );
+		
+		count = 0;
+		newLine = YES;
+		
+		// Loop through characters in data array since there exist embedded \0 in the array.  We replace these '\0'
+		// with \n.
+		for ( i = 0; i < lengthOfReturn; i++ )
+		{
+			if ( newLine && returnBufferArray[ i ] == 'C' ) {
+				newLine = NO;
+			}
+
+			if ( !newLine && returnBufferArray[ i ] == '\0' ) {
+
+				newLine = YES;
+				returnBufferArray[ i ] = '\n';
+				count++;
+			}
+//			tmpArray[ 0 ] = returnBufferArray[ i ];
+//			NSLog( @"Char( %d ): %s", i, tmpArray );
+		}
+		
+		// Convert modified char array to string.
+		returnStringFromSocket = [[[NSString alloc] initWithFormat: @"%s\n", returnBufferArray] autorelease];
+		NSLog( @"Full return string:\n %@", returnStringFromSocket );
+		return ( returnStringFromSocket );
+    }
+	@catch (NSException *exception) {
+
+		NSLog(@"handleDataReturn: Caught %@: %@", [exception name], [exception  reason]);
+	} 
+	
+	@finally
+	{
+		return( returnStringFromSocket );
+	}
+}
 
 - (BOOL) isConnected
 {
-	return isConnected;
+	return mIsConnected;
 }
 
 - (void) setIsConnected: (BOOL) aFlag
 {
-    isConnected = aFlag;
+    mIsConnected = aFlag;
 //	[self setReceiveCount: 0];
     [[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVCrateIsConnectedChangedNotification object: self];
 }
@@ -319,30 +418,29 @@ NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateSt
 #pragma mark ***Delegate Methods
 - (void) netsocketConnected: (NetSocket*) inNetSocket
 {
-    if(inNetSocket == socket){
-        [self setIsConnected: [socket isConnected]];
+    if(inNetSocket == mSocket){
+        [self setIsConnected: [mSocket isConnected]];
     }
 }
 
 - (void) netsocketDisconnected: (NetSocket*) inNetSocket
 {
-    if (inNetSocket == socket)
+    if (inNetSocket == mSocket)
 	{
         [self setIsConnected: NO];
-		[socket autorelease];
-		socket = nil;
+		[mSocket autorelease];
+		mSocket = nil;
     }
 }
 
-/*
+
 - (void) netsocket: (NetSocket*) anInNetSocket dataAvailable: (unsigned) anInAmount
 {
-    if (anInNetSocket == socket) {
-		[self dataBuffer: [anInNetSocket readData]];
-//		[self append];
+    if (anInNetSocket == mSocket) {
+		[self handleDataReturn: [anInNetSocket readData]];
 	}
 }
-*/
+
 
 #pragma mark ***Archival
 // Encode decode variable names.

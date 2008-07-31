@@ -58,6 +58,21 @@
                      selector : @selector( ipAddressChanged: )
                          name : ORUnivVoltHVCrateIpAddressChangedNotification
                        object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector( displayHVStatus: )
+                         name : ORUnivVoltHVStatusAvailableNotification
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector( displayConfig: )
+                         name : ORConfigAvailableNotification
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector( displayEnet: )
+                         name : OREnetAvailableNotification
+                       object : model];
 }
 
 - (void) updateWindow
@@ -78,7 +93,7 @@
 {
 	[ipConnectedTextField setStringValue: [model isConnected] ? @"Connected" : @"Disconnected"];
 	[ethernetConnectButton setTitle: [model isConnected] ? @"Disconnect" : @"Connect"];
-	[model isConnected] ? [model disconnect] : [model connect];
+//	[model isConnected] ? [model disconnect] : [model connect];
 }
 
 #pragma mark •••Interface Management
@@ -92,17 +107,27 @@
 
 - (IBAction) connectAction: (id) aSender
 {
-	[model setIpAddress: [ipAddressTextField stringValue]];
-	[model connect];
+	if ( [model isConnected] ) {
+		[model disconnect];
+	}
+	else {	
+		[model setIpAddress: [ipAddressTextField stringValue]];
+		[model connect];
+	}
 }
 
 - (IBAction) getEthernetParamAction: (id) aSender
 {
+	if ( [model isConnected] ) {
+		[model obtainEthernetConfig];
+	}
 }
 
 - (IBAction) getConfigParamAction: (id) aSender
 {
-	
+	if ( [model isConnected] ) {
+		[model obtainConfig];
+	}
 }
 
 - (IBAction) hvOnAction: (id) aSender
@@ -132,7 +157,22 @@
 
 - (IBAction) showHVStatusAction: (id) aSender
 {
-	[hvStatusField setStringValue: [model obtainHVStatus]];
+	[model obtainHVStatus];
+}
+
+- (void) displayHVStatus
+{
+	[hvStatusField setStringValue: [model hvStatus]];
+}
+
+- (void) displayConfig
+{
+	[outputArea setString: [model config]];
+}
+
+- (void) displayEnet
+{
+	[outputArea setString: [model ethernetConfig]];
 }
 
 @end

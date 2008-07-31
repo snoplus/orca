@@ -25,6 +25,10 @@
 #define kUnivVoltHVCratePort 1090
 #define kUnivVoltHVAddress "192.168.1.10"
 
+// Commands
+enum hveCommands {eUVHVStatus = 1, eUVConfig, eUVEnet};
+typedef enum hveCommands hveCommands;
+
 #pragma mark •••Forward Declarations
 @class ORConnector;
 @class NetSocket;
@@ -32,14 +36,18 @@
 @interface ORUnivVoltHVCrateModel : ORCrate  {
 	NSLock*			localLock;
     NSString*		ipAddress;
-	NSMutableData*	univVoltData;
-    BOOL			isConnected;
-	NetSocket*		socket;
+	NSString*		mReturnFromSocket;  // Used to get last return
+	hveCommands		mLastCommand;
+    BOOL			mIsConnected;
+	NetSocket*		mSocket;
 }
 
 #pragma mark •••Accessors
 - (NSString*) ipAddress;
 - (void) setIpAddress: (NSString *) anIpAddress;
+- (NSString*) hvStatus;
+- (NSString *) ethernetConfig;
+- (NSString *) config;
 
 #pragma mark •••Notifications
 //- (void) registerNotificationObservers;
@@ -49,14 +57,17 @@
 - (void) setIsConnected: (BOOL) aFlag;
 
 #pragma mark ***Crate actions
-- (NSString *) obtainHVStatus;
+- (void) handleDataReturn: (NSData*) someData;
+- (void) obtainHVStatus;
+- (void) obtainEthernetConfig;
+- (void) obtainConfig;
 - (void) hvOn;
 - (void) hvOff;
 - (void) hvPanic;
 - (void) connect;
 
 #pragma mark ***Utilities
-//- (void) connect;
+- (NSString *) interpretDataFromSocket: (NSData *) aSomeData;
 
 #pragma mark ***Archival
 - (id)   initWithCoder: (NSCoder*) aDecoder;
@@ -68,4 +79,6 @@
 extern NSString* ORUnivVoltHVCrateIsConnectedChangedNotification;
 extern NSString* ORUnivVoltHVCrateIpAddressChangedNotification;
 extern NSString* ORUnivVoltHVCrateHVStatusChangedNotification;
-
+extern NSString* ORUnivVoltHVStatusAvailableNotification;
+extern NSString* ORConfigAvailableNotification;
+extern NSString* OREnetAvailableNotification;

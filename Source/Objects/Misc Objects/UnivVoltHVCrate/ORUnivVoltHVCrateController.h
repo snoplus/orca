@@ -31,10 +31,10 @@
 {
     IBOutlet NSButton*		ethernetConnectButton;
 	IBOutlet NSTextField*	ipConnectedTextField;
-	IBOutlet NSScrollView*	outputArea;
+	IBOutlet NSTextView*	outputArea;
 	IBOutlet NSTextField*	ipAddressTextField;
 	IBOutlet NSTextField*	hvStatusField;
-	IBOutlet NSTextField*	generalDialog;
+//	IBOutlet NSTextField*	generalDialog;
 }
 
 #pragma mark *Accessors
@@ -43,6 +43,7 @@
 - (void) registerNotificationObservers;
 - (void) isConnectedChanged: (NSNotification *) aNote;
 - (void) ipAddressChanged: (NSNotification *) aNotes;
+- (void) displayHVStatus;
 
 #pragma mark •••Actions
 - (IBAction) ipAddressTextFieldAction: (id) aSender;

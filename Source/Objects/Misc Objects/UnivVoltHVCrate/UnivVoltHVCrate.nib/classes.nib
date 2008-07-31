@@ -193,7 +193,7 @@
 				<key>ipConnectedTextField</key>
 				<string>NSTextField</string>
 				<key>outputArea</key>
-				<string>NSScrollView</string>
+				<string>NSTextView</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>ORCrateController</string>
