@@ -4288,11 +4288,22 @@ return hitRateId;
 			page1 = 0; 
 			nPages = (512 + page1 - page0) %512; // Recalculate
 		}	
+        
+        // Maximal block size is 128 x 4 = 512 (by Firewire) ak 2008-08-01
+        if (nPages > 128) {
+          page1 = (512 + page1 - (nPages - 128)) %512;
+          nPages = 128;
+        }
+        
+        // check the nPages ... -tb-
+        if(checkEnergyEnabled){
+            if(nPages > 128) NSLog(@"ERROR: takeDataRunOrDebugMode:nPages exceeds maximum firewire block size!\n");
+        }
+        
 		
 		unsigned long pageAddress = triggerMemAddress + (page0<<2);				
 		data = dataBuffer;
-		[fireWireCard read:pageAddress data:data size:nPages*4*sizeof(long)];
-	
+        [fireWireCard read:pageAddress data:data size:nPages*4*sizeof(long)];
 	
 	    // Determine the readout address for all ADC traces
 		// The first trigger stops the recording of the ADC traces
@@ -4301,6 +4312,7 @@ return hitRateId;
 		// Note: The Flt uses a fixed post trigger time of 512 bin
 		//       This time is different from the central nextpage delay used by the Slt
 		//       ak, 29.2.08
+        //       the post trigger time is now a free parameter -tb- 2008-06-xx
 		int firstEventSubSec = data[1];
 		//int startBin = firstEventSubSec - (512 + (readoutPages-1) * 1024);
         //TODO: tmp -tb-  is global int posttrig = 512;
@@ -4438,6 +4450,7 @@ return hitRateId;
 #endif
 
 #if 1
+             #if 0 // old check -tb-
              if(checkEnergyEnabled){//check the "trigger enabled"
                  static BOOL triggEnabled=TRUE;
                  unsigned short triggEnabledChan0 = ([self readTriggerControl:0 /* fpga 0 */] >> 8) &0x1;
@@ -4453,6 +4466,7 @@ return hitRateId;
                                  theEvent.sec, theEvent.subSec);
                  }
              }
+             #endif
              if(checkEnergyEnabled)
              {// TODO: debugging - REMOVE or make "Additional energy test ..." flag -tb- ... OK, done -tb-
               // 1.read energy from energy register
