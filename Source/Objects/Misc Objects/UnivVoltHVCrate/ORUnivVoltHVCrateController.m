@@ -35,8 +35,25 @@
 - (id) init
 {
     self = [super initWithWindowNibName:@"UnivVoltHVCrate"];
-    return self;
+	if ( self ) {
+		[model setIpAddress: [[NSString alloc] initWithFormat: @"192.168.1.10"]];
+	}
+    return self;	
 }
+
+- (void) awakeFromNib
+{
+	[super awakeFromNib];
+	
+	NSString* testString = [[NSString alloc] initWithString: @"See if anything appears in text view.\n"];
+	NSLog( @" IPAddress: ",[model ipAddress] );
+	[ipAddressTextField setStringValue: [model ipAddress]];
+//	[mReturnStringFromSocket setString: testString];
+//	[mReturnStringFromSocket appendString: testString1];
+	NSString* returnStringFromSocket = [[NSString alloc] initWithFormat: @"%@", testString];
+	[outputArea setString: returnStringFromSocket];	
+}
+
 
 - (void) setCrateTitle
 {
@@ -162,18 +179,22 @@
 	[model obtainHVStatus];
 }
 
+#pragma mark ***Respond to notifications actions from model handleDataReturn
 - (void) displayHVStatus
 {
+	NSLog( @"HVStatus display: %@", [model hvStatus]);
 	[hvStatusField setStringValue: [model hvStatus]];
 }
 
 - (void) displayConfig
 {
+	NSLog( @"Config display: %@", [model config]);
 	[outputArea setString: [model config]];
 }
 
 - (void) displayEnet
 {
+	NSLog( @"Ethernet display: %@", [model ethernetConfig]);
 	[outputArea setString: [model ethernetConfig]];
 }
 

@@ -202,16 +202,19 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 	switch( mLastCommand )
 	{
 		case eUVHVStatus: // 	
+			NSLog( @"Send notification about HVStatus.");
 			[[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVStatusAvailableNotification object: self];	
 			break;	
 			
 		case eUVConfig:
+			NSLog( @"Send notification about Config.");
 			[[NSNotificationCenter defaultCenter] postNotificationName: ORConfigAvailableNotification object: self];
 			break;
 			
 		case eUVEnet:
+			NSLog( @"Send notification about Ethernet.");
 			[[NSNotificationCenter defaultCenter] postNotificationName: OREnetAvailableNotification object: self];
-
+			break;
 	}
 	return;
 }
