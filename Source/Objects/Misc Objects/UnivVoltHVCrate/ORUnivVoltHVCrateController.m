@@ -118,6 +118,7 @@
 
 - (IBAction) getEthernetParamAction: (id) aSender
 {
+	NSLog( @"getEthernetParamAction" );
 	if ( [model isConnected] ) {
 		[model obtainEthernetConfig];
 	}
@@ -125,6 +126,7 @@
 
 - (IBAction) getConfigParamAction: (id) aSender
 {
+	NSLog( @"getConfigParamAction" );
 	if ( [model isConnected] ) {
 		[model obtainConfig];
 	}
