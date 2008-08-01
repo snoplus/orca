@@ -287,23 +287,53 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 	{
 	//	[command release];
 	}
-
-	return;
 }
 
-/*- (void) powerFailed:(NSNotification*)aNotification
+- (void) obtainConfig
 {
-    if([aNotification object] == [self controllerCard] || [[aNotification object] guardian] == self){
-        if(!cratePowerAlarm){
-            cratePowerAlarm = [[ORAlarm alloc] initWithName:@"No UnivVoltHV Crate Power" severity:kHardwareAlarm];
-            [cratePowerAlarm setSticky:YES];
-            [cratePowerAlarm setHelpStringFromFile:@"NoUnivVoltHVCratePowerHelp"];
-            [cratePowerAlarm postAlarm];
-        } 
-        [self setPowerOff:YES];
-    }
+	
+	@try
+	{
+		NSString* command = [NSString stringWithFormat: @"CONFIG"];	
+		const char* buffer = [command cStringUsingEncoding: NSASCIIStringEncoding];
+		
+		// Write the command.
+		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
+		[mSocket write: buffer length: [command length] + 1];	
+	}
+	@catch (NSException *exception) {
+
+			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
+	} 
+	
+	@finally
+	{
+	//	[command release];
+	}
 }
-*/
+
+- (void) obtainEthernetConfig
+{
+	
+	@try
+	{
+		NSString* command = [NSString stringWithFormat: @"Enet"];	
+		const char* buffer = [command cStringUsingEncoding: NSASCIIStringEncoding];
+		
+		// Write the command.
+		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
+		[mSocket write: buffer length: [command length] + 1];	
+	}
+	@catch (NSException *exception) {
+
+			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
+	} 
+	
+	@finally
+	{
+	//	[command release];
+	}
+}
 
 - (void) connect
 {
