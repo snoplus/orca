@@ -26,7 +26,7 @@
 #define kUnivVoltHVAddress "192.168.1.10"
 
 // Commands
-enum hveCommands {eUVHVStatus = 1, eUVConfig, eUVEnet};
+enum hveCommands {eUVNoCommand = 0, eUVHVStatus, eUVConfig, eUVEnet};
 typedef enum hveCommands hveCommands;
 
 #pragma mark •••Forward Declarations
@@ -76,9 +76,9 @@ typedef enum hveCommands hveCommands;
 @end
 
 #pragma mark ***Notification string definitions.
-extern NSString* ORUnivVoltHVCrateIsConnectedChangedNotification;
-extern NSString* ORUnivVoltHVCrateIpAddressChangedNotification;
-extern NSString* ORUnivVoltHVCrateHVStatusChangedNotification;
-extern NSString* ORUnivVoltHVStatusAvailableNotification;
-extern NSString* ORConfigAvailableNotification;
-extern NSString* OREnetAvailableNotification;
+extern NSString* ORUVHVCrateIsConnectedChangedNotification;
+extern NSString* ORUVHVCrateIpAddressChangedNotification;
+//extern NSString* ORUnivVoltHVCrateHVStatusChangedNotification;
+extern NSString* ORUVHVCrateHVStatusAvailableNotification;
+extern NSString* ORUVHVCrateConfigAvailableNotification;
+extern NSString* ORUVHVCrateEnetAvailableNotification;

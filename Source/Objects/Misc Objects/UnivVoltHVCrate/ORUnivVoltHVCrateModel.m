@@ -24,16 +24,25 @@
 #import "NetSocket.h"
 #import "ORMacModel.h"
 
-NSString* ORUnivVoltHVCrateIsConnectedChangedNotification		= @"ORUnivVoltHVCrateIsConnectedChangedNotification";
-NSString* ORUnivVoltHVCrateIpAddressChangedNotification		    = @"ORUnivVoltHVCrateIpAddressChangedNotification";
-NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateStatusChangedNotification";
-NSString* ORUnivVoltHVStatusAvailableNotification				= @"ORUnivVoltHVStatusAvailableNotification";
-NSString* ORConfigAvailableNotification							= @"ORConfigAvailableNotification";
-NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
+NSString* ORUVHVCrateIsConnectedChangedNotification		= @"ORUVHVCrateIsConnectedChangedNotification";
+NSString* ORUVHVCrateIpAddressChangedNotification	    = @"ORUVHVCrateIpAddressChangedNotification";
+//NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateStatusChangedNotification";
+NSString* ORUVHVCrateHVStatusAvailableNotification		= @"ORUVHVCrateHVStatusAvailableNotification";
+NSString* ORUVHVCrateConfigAvailableNotification		= @"ORUVHVCrateConfigAvailableNotification";
+NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailableNotification";
 
 @implementation ORUnivVoltHVCrateModel
 
 #pragma mark •••initialization
+
+- (id) init
+{
+	self = [super init];
+	if ( self ) {
+		mLastCommand = eUVNoCommand;
+	}
+	return ( self );
+}
 
 - (void) setUpImage
 {
@@ -142,7 +151,7 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
     [ipAddress autorelease];
     ipAddress = [anIpAddress copy];    
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVCrateIpAddressChangedNotification object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateIpAddressChangedNotification object: self];
 }
 
 - (NSString*) hvStatus
@@ -199,21 +208,24 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 		mReturnFromSocket = [self interpretDataFromSocket: aSomeData];
 	}
 
+	NSLog( @"LastCommand: %d", mLastCommand );
 	switch( mLastCommand )
 	{
+		case eUVNoCommand:
+			break;
 		case eUVHVStatus: // 	
 			NSLog( @"Send notification about HVStatus.");
-			[[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVStatusAvailableNotification object: self];	
+			[[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateHVStatusAvailableNotification object: self];	
 			break;	
 			
 		case eUVConfig:
 			NSLog( @"Send notification about Config.");
-			[[NSNotificationCenter defaultCenter] postNotificationName: ORConfigAvailableNotification object: self];
+			[[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateConfigAvailableNotification object: self];
 			break;
 			
 		case eUVEnet:
 			NSLog( @"Send notification about Ethernet.");
-			[[NSNotificationCenter defaultCenter] postNotificationName: OREnetAvailableNotification object: self];
+			[[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateEnetAvailableNotification object: self];
 			break;
 	}
 	return;
@@ -255,6 +267,7 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 		// Write the command.
 		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
 		[mSocket write: buffer length: [command length] + 1];	
+		mLastCommand = eUVHVStatus;
 
 /*		int lenString = strlen( charBuffer );
 		NSLog( @"Length of command string %d", lenString );
@@ -303,6 +316,7 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 		// Write the command.
 		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
 		[mSocket write: buffer length: [command length] + 1];	
+		mLastCommand = eUVConfig;
 	}
 	@catch (NSException *exception) {
 
@@ -325,7 +339,8 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 		
 		// Write the command.
 		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
-		[mSocket write: buffer length: [command length] + 1];	
+		[mSocket write: buffer length: [command length] + 1];
+		mLastCommand = eUVEnet;	
 	}
 	@catch (NSException *exception) {
 
@@ -397,7 +412,7 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 		// Get amount of data and data itself.
 		lengthOfReturn = [aDataObject length];
 		[aDataObject getBytes: returnBufferArray length: lengthOfReturn];
-		NSLog( @"Return string: %s  length: %d", returnBufferArray, lengthOfReturn );
+		NSLog( @"Return string '%s'  length: %d", returnBufferArray, lengthOfReturn );
 		
 		count = 0;
 		newLine = YES;
@@ -445,7 +460,7 @@ NSString* OREnetAvailableNotification							= @"OREnetAvailableNotification";
 {
     mIsConnected = aFlag;
 //	[self setReceiveCount: 0];
-    [[NSNotificationCenter defaultCenter] postNotificationName: ORUnivVoltHVCrateIsConnectedChangedNotification object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateIsConnectedChangedNotification object: self];
 }
 
 #pragma mark ***Delegate Methods

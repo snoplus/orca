@@ -23,11 +23,7 @@
 #pragma mark •••Imported Files
 #import "ORUnivVoltHVCrateController.h"
 #import "ORUnivVoltHVCrateModel.h"
-//#import "ORUnivVoltHVBusProtocol.h"
 #import "ORUnivVoltHVCrateExceptions.h"
-
-//NSString* ORUnivVoltHVCrateIsConnectedChangedNotification = @"ORUnivVoltHVCrateIsConnectedChangedNotification";
-//NSString* ORUnivVoltHVCrateIpAddressChangedNotification = @"ORUnivVoltHVCrateIpAddressChangedNotification";
 
 
 @implementation ORUnivVoltHVCrateController
@@ -67,28 +63,28 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
     [notifyCenter addObserver : self
                      selector : @selector( isConnectedChanged: )
-                         name : ORUnivVoltHVCrateIsConnectedChangedNotification
+                         name : ORUVHVCrateIsConnectedChangedNotification
                        object : model];
 					   
 					
     [notifyCenter addObserver : self
                      selector : @selector( ipAddressChanged: )
-                         name : ORUnivVoltHVCrateIpAddressChangedNotification
+                         name : ORUVHVCrateIpAddressChangedNotification
                        object : model];
 					   
     [notifyCenter addObserver : self
                      selector : @selector( displayHVStatus: )
-                         name : ORUnivVoltHVStatusAvailableNotification
+                         name : ORUVHVCrateHVStatusAvailableNotification
                        object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector( displayConfig: )
-                         name : ORConfigAvailableNotification
+                         name : ORUVHVCrateConfigAvailableNotification
                        object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector( displayEnet: )
-                         name : OREnetAvailableNotification
+                         name : ORUVHVCrateEnetAvailableNotification
                        object : model];
 }
 
@@ -112,9 +108,6 @@
 	[ethernetConnectButton setTitle: [model isConnected] ? @"Disconnect" : @"Connect"];
 //	[model isConnected] ? [model disconnect] : [model connect];
 }
-
-#pragma mark •••Interface Management
-
 
 #pragma mark •••Actions
 - (IBAction) ipAddressTextFieldAction: (id) aSender
