@@ -4356,8 +4356,8 @@ return hitRateId;
 			if (lastEventId < 8888) {
 				int diffId = (1024 + eventId - lastEventId) % 1024; 
 				if (diffId > 1){
-					nMissingEvents = nMissingEvents + diffId;
-					
+					nMissingEvents = nMissingEvents + diffId - 1; // -1 is a small correction for the current ID: the ID is other than expected, 
+                                                                  // but from here we will read out again correctly -tb-
 					if (!overflowDetected){
 						//NSLogError(@"",@"Katrin FLT Card Error",[NSString stringWithFormat:@"Card%d",[self stationNumber]],@"OverFlow",nil);
 						//NSLog(@"Event %d  -  EventId check failed: %d - %d = %d\n", nEvents, eventId, lastEventId, diffId);
@@ -4375,7 +4375,7 @@ return hitRateId;
 			if(bufState == 0x3){
                 //if(overflowDetected) NSLog(@"First overflowDetected  sec %i subsec %i\n",  theEvent.sec, theEvent.subSec);//TODO: REMOVE IT - debugging -tb- 2008-03-17
                 overflowDetected = true;
-                overflowDetectedCounter++;
+                overflowDetectedCounter++;//TODO: ask denis: when this will be resetted? -tb-
             }
 						
 			if(usingPBusSimulation){	
@@ -5523,7 +5523,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 	NSLogFont(aFont,@"Trigger rate   : %d\n", 0);
 	NSLogFont(aFont,@"Hw-Buffer      : %f\n", nBuffer);
     NSLogFont(aFont,@"Buffer overflow: %@\n", (overflowDetected) ? @"YES" : @"NO");
-    NSLogFont(aFont,@"Buffer overflow: %d\n", overflowDetectedCounter);
+    //NSLogFont(aFont,@"Buffer overflow: %d\n", overflowDetectedCounter);
 	NSLogFont(aFont,@"Missing events : %d\n", nMissingEvents);
 	NSLogFont(aFont,@"Skipped events : %d\n", nSkippedEvents);
     NSLogFont(aFont,@"Maximal rate   : %d\n", 0);

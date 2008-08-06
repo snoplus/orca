@@ -286,6 +286,30 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
 }
 
 
+//!For merging energy histograms -tb-
+- (void) mergeEnergyHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins maxBins:(unsigned long)maxBins
+                                                 firstBin:(unsigned long)firstBin   stepSize:(unsigned long)stepSize 
+                                                   counts:(unsigned long)counts
+
+{
+    if(!histogram || numberBins != maxBins){
+        [self setNumberBins:maxBins];
+    }
+	[dataSetLock lock];
+    int i,index;
+    for( (index=firstBin,i=0); i<numBins; (index+=stepSize,i++) ){
+        if(index>=numberBins){
+            overFlow += ptr[i];
+            histogram[numberBins-1] += ptr[i];
+        }else{
+            histogram[index] += ptr[i];
+        }
+    }
+	[dataSetLock unlock];
+    [self setTotalCounts: totalCounts+counts];
+}
+
+
 - (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray
 {
     NSMutableData* dataToShip = [NSMutableData data];

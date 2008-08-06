@@ -54,6 +54,9 @@
 - (void) histogram:(unsigned long)aValue;
 - (void) histogramWW:(unsigned long)aValue weight:(unsigned long) weight; // ak 6.8.07
 - (void) mergeHistogram:(unsigned long*)ptr numValues:(unsigned long)numBins;
+- (void) mergeEnergyHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins maxBins:(unsigned long)maxBins
+                                                 firstBin:(unsigned long)firstBin   stepSize:(unsigned long)stepSize 
+                                                   counts:(unsigned long)counts;
 - (void) clear;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;

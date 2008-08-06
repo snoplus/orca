@@ -48,6 +48,7 @@
 - (unsigned long) totalCounts;
 - (void) setTotalCounts:(unsigned long) newCount;
 - (void) incrementTotalCounts;
+- (void) incrementTotalCountsBy:(unsigned long) aValue;
 - (unsigned long) recountTotal;
 - (id) 	 data;
 - (void) setData:(id)someData;
@@ -76,6 +77,7 @@
 - (void) histogram:(unsigned long)aValue numBins:(unsigned long)numBins sender:(id)obj  withKeys:(NSString*)key,...;
 - (void) histogramWW:(unsigned long)aValue weight:(unsigned long)aWeight numBins:(unsigned long)numBins sender:(id)obj  withKeys:(NSString*)key,...;
 - (void) mergeHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray;
+- (void) mergeEnergyHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins   maxBins:(unsigned long)maxBins  firstBin:(unsigned long)firstBin  stepSize:(unsigned long)stepSize   counts:(unsigned long)counts withKeys:(NSString*)firstArg,...;
 - (void) histogram2DX:(unsigned long)xValue y:(unsigned long)yValue size:(unsigned short)numBins  sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) loadData2DX:(unsigned long)xValue y:(unsigned long)yValue z:(unsigned long)zValue size:(unsigned short)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) clearDataUpdate:(BOOL)update withKeys:(NSString*)firstArg,...;

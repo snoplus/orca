@@ -205,6 +205,12 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 	++totalCounts;
 }
 
+- (void) incrementTotalCountsBy:(unsigned long) aValue
+{
+	totalCounts += aValue;
+}
+
+
 - (id) objectForKeyArray:(NSMutableArray*)anArray
 {
 	if([anArray count] == 0)return data;
@@ -572,7 +578,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     
 }
 
-// merger for hw histograms -tb- 2008-03-23
+//! merger for hw histograms -tb- 2008-03-23
 - (void) mergeHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins withKeyArray:(NSArray*)keyArray
 {
     
@@ -614,6 +620,90 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
                             userInfo: nil];
     }
     else [histo mergeHistogram:ptr numValues:numBins];
+}
+
+
+
+/** Merger for hw histograms with offset, stepsize and sum -tb- 2008-08-05.
+  *
+  * Fills the histogram beginning from firstBin, every 'stepSize'-th entry will be 
+  * filled (firstBin, firstBin+stepSize,firstBin+2*stepSize, ...).
+  */
+- (void) mergeEnergyHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins   maxBins:(unsigned long)maxBins  firstBin:(unsigned long)firstBin  stepSize:(unsigned long)stepSize   counts:(unsigned long)counts withKeys:(NSString*)firstArg,...
+{
+    va_list myArgs;
+    va_start(myArgs,firstArg);
+    
+    NSString* s             = firstArg;
+    ORDataSet* currentLevel = self;
+    ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCountsBy: counts];
+    
+    do {
+        nextLevel = [currentLevel objectForKey:s];
+        if(nextLevel){
+            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+            currentLevel = nextLevel;
+        }
+        else {
+            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+            [currentLevel setObject:nextLevel forKey:s];
+            currentLevel = nextLevel;
+            [nextLevel release];
+        }
+        [currentLevel incrementTotalCountsBy: counts];
+        
+    } while(s = va_arg(myArgs, NSString *));
+    
+    
+    #if 0
+    int n = [keyArray count];
+    int i;
+    ORDataSet* currentLevel = self;
+    ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCounts];
+    
+    for(i=0;i<n;i++){
+        NSString* s = [keyArray objectAtIndex:i];
+        nextLevel = [currentLevel objectForKey:s];
+        if(nextLevel){
+            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+            currentLevel = nextLevel;
+        }
+        else {
+            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+            [currentLevel setObject:nextLevel forKey:s];
+            currentLevel = nextLevel;
+            [nextLevel release];
+        }
+        [currentLevel incrementTotalCounts];
+    }
+    #endif
+    
+    OR1DHisto* histo = [nextLevel data];
+    if(!histo){
+        histo = [[OR1DHisto alloc] init];
+        [histo setKey:[nextLevel key]];
+        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+        [histo setNumberBins:maxBins];
+        [nextLevel setData:histo];
+		[histo setDataSet:self];
+        //--> [histo mergeHistogram:ptr numValues:numBins];
+        [histo mergeEnergyHistogram:ptr numBins:numBins    maxBins:maxBins
+                                       firstBin:firstBin  stepSize:stepSize 
+                                         counts:counts];
+
+        [histo release];
+        [[NSNotificationCenter defaultCenter]
+                postNotificationName:ORDataSetAdded
+                              object:self
+                            userInfo: nil];
+    }
+    else //[histo mergeHistogram:ptr numValues:numBins];
+            [histo mergeEnergyHistogram:ptr numBins:numBins maxBins:maxBins
+                                                 firstBin:firstBin   stepSize:stepSize 
+                                                   counts:counts];
+
 }
 
 

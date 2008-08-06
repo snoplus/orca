@@ -29,7 +29,7 @@
 #define kKatrinFlt_Cntl_Version_Mask		0x7    //!< This is obsolete since FPGA firmware 3.x -tb-
 #define kKatrinFlt_Cntrl_CardID_Shift		24
 #define kKatrinFlt_Cntrl_CardID_Mask		0x1f
-#define kKatrinFlt_Cntrl_BufState_Shift		22   
+#define kKatrinFlt_Cntrl_BufState_Shift		22     //!<In the FLT manual of Denis this is also called "FifoState".
 #define kKatrinFlt_Cntrl_BufState_Mask		0x3   
 #define kKatrinFlt_Cntrl_Mode_Shift			20
 #define kKatrinFlt_Cntrl_Mode_Mask			0x3

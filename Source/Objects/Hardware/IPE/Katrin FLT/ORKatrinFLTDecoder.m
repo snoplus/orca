@@ -624,7 +624,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
 	NSLog(@"  offsetEMin = %d \n", ePtr->offsetEMin);
     #endif
 
-    ptr = ptr + (sizeof(katrinHistogramDataStruct)/sizeof(long));
+    ptr = ptr + (sizeof(katrinHistogramDataStruct)/sizeof(long));// points now to the histogram data -tb-
     
     #if 0
     {
@@ -667,7 +667,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
         }
         NSMutableArray*  keyArray = [NSMutableArray arrayWithCapacity:5];
         [keyArray insertObject:@"FLT" atIndex:0];
-        [keyArray insertObject:@"Histogram" atIndex:1]; //TODO: use better name -tb-
+        [keyArray insertObject:@"Energy Histogram (HW)" atIndex:1]; //TODO: 1. use better name 2. keep memory clean -tb-
         [keyArray insertObject:crateKey atIndex:2];
         [keyArray insertObject:stationKey atIndex:3];
         [keyArray insertObject:channelKey atIndex:4];
@@ -697,7 +697,10 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
     #endif
     
     
-    #if 1
+    
+    
+    //this slows down the system at very high rates - an improved version is below -tb-
+    #if 0
     {
         // this is very similar to the first version ('brute force'),
         // but probably it is usefull as it is in 'energy mode' units ... -tb-
@@ -719,11 +722,37 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
                             numBins:32768 
                              sender:self  
                            withKeys: @"FLT",
-                 @"Histogram (energy mode units)", // use better name -tb-
+                 @"Histogram - TEST+DEBUG - (energy mode units)", // use better name -tb-
                  crateKey,stationKey,channelKey,nil];
             }
             #endif
         }
+    }
+    #endif
+    
+    
+    #if 1
+    {
+        // this is very similar to the first version (with speed up improvement 2008-08-05),
+        // but probably it is usefull as it is in 'energy mode' units ... -tb-
+        int i;
+        //first compute the sum of events:
+        unsigned int sumEvents=0;
+        for(i=0; i< ePtr->histogramLength;i++){
+            sumEvents += *(ptr+i);
+        }
+        unsigned long energy;
+        energy= ( ((ePtr->firstBin) << (ePtr->binSize))/2 )   + ePtr->offsetEMin;
+        [aDataSet mergeEnergyHistogram: ptr
+                          numBins: ePtr->histogramLength  
+                          maxBins: 65536  //32768
+                         firstBin: energy   
+                         stepSize: ePtr->binSize
+                           counts: sumEvents
+                         withKeys: @"FLT",
+                                   @"Energy Histogram (HW, energy mode units)", // use better name -tb-
+                                   crateKey,stationKey,channelKey,nil];
+        
     }
     #endif
     
