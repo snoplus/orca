@@ -76,16 +76,16 @@
 - (void)	oscSetDataReturnMode;
 - (void)	oscStopAcquisition;
                                                     
-#pragma mark ¥¥¥DataTaker
+#pragma mark â€¢â€¢â€¢DataTaker
 - (NSDictionary*) dataRecordDescription;
 - (void) 	runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
 - (void)	takeDataTask:(id)userInfo;
 - (void) 	runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
 
 #pragma mark ***Specialty routines.
-- (NSString*) 	triggerSourceAsString;
+//- (NSString*) 	triggerSourceAsString;
 - (void)	oscHP4405AConvertTime: (unsigned long long*) a10MhzTime timeToConvert: (char*) aCharTime;
-
+- (void) doNothing;
 /*- 
 - 
 - (BOOL)	OscResetOscilloscope;	

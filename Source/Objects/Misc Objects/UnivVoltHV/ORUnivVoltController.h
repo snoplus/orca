@@ -35,7 +35,7 @@
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) ipAddressChanged:(NSNotification*)aNote;
 //- (void) frameErrorChanged:(NSNotification*)aNote;
-//- (void) averageChanged:(NSNotification*)aNote;
+- (void) averageChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions

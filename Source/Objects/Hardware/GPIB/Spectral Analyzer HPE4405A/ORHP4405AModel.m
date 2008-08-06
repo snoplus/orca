@@ -128,8 +128,12 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 //--------------------------------------------------------------------------------
 - (void) doNothing
 {
+//inserted to get rid of compiler warnings MAH -8/06/08
 }
-
+- (long)	oscGetDateTime
+{
+	return 0; //inserted to get rid of compiler warnings MAH -8/06/08
+}
 
 //--------------------------------------------------------------------------------
 /*!\method  oscBusy
@@ -679,6 +683,9 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
  * \note	
  */
 //--------------------------------------------------------------------------------
+- (void)	oscSetDataReturnMode
+{
+}
 
 //--------------------------------------------------------------------------------
 /*!\method  oscStopAcquisition
