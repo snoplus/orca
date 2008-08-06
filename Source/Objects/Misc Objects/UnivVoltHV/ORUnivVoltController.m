@@ -97,6 +97,12 @@
 	[receiveCountField setIntValue: [model receiveCount]];
 }
 */
+
+- (void) averageChanged:(NSNotification*)aNote
+{
+	//inserted to remove compiler warning MAH 08/06/08
+}
+
 #pragma mark •••Notifications
 - (void) isConnectedChanged:(NSNotification*)aNote
 {
