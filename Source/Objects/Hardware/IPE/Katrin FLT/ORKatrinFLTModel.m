@@ -3625,6 +3625,8 @@ return hitRateId;
 	[self setHistoFeatureIsAvailable: [decoder decodeBoolForKey:@"histoFeatureIsAvailable"]];
 	[self setFilterGapFeatureIsAvailable: [decoder decodeBoolForKey:@"filterGapFeatureIsAvailable"]];
 	[self setVersionRegister:		  [decoder decodeIntForKey:@"versionRegister"]];
+    
+    [self setFilterGap: [decoder decodeIntForKey:@"filterGapSetting"]];
 	
 	/*
     //version control - at this time firewire is (sometimes) not available -tb- 2008-03-13
@@ -3701,6 +3703,9 @@ return hitRateId;
     [encoder encodeBool:histoFeatureIsAvailable forKey:@"histoFeatureIsAvailable"];	
     [encoder encodeBool:filterGapFeatureIsAvailable forKey:@"filterGapFeatureIsAvailable"];	
     [encoder encodeInt:versionRegister forKey:@"versionRegister"];	
+
+    [encoder encodeInt:filterGap forKey:@"filterGapSetting"];	
+
 }
 
 
@@ -4274,8 +4279,10 @@ return hitRateId;
 	unsigned long dataBuffer[2048];
 	unsigned long *data;
 	
-	int nPages = (512 + page1 - page0) %512;			
+    int nPagesHw = (512 + page1 - page0) %512; 
+	int nPages = nPagesHw;			
 	
+    
 	// Read the event data for a complete block of events
     //NSLog(@"dataAquisitionStopped = %i, dataAquisitionIsRestarting = %i\n",dataAquisitionStopped,dataAquisitionIsRestarting);usleep(1000);
 	if (nPages > 0){
@@ -4336,7 +4343,7 @@ return hitRateId;
 			
 			// Move the pointer to the next page	
 			page0 = (page0 + 1) % 512;	// Go to the next page 
-			nPages = (512 + page1 - page0) %512;				
+			nPages = (512 + page1 - page0) %512;
 			nextEventPage = page0; // Store the page pointer for the next readout call
 			
 			//read the event from the trigger memory and format into an event structure
@@ -4344,7 +4351,8 @@ return hitRateId;
 			katrinEventDataStruct theEvent;
 			theEvent.channelMap = channelMap;
 			int eventId = data[0] & 0x3ff;
-			theEvent.eventID	= (nPages << 16) | eventId;
+			//theEvent.eventID	= (nPages << 16) | eventId;
+			theEvent.eventID	= ((nPagesHw - nPagesHandled) << 16) | eventId;
 			theEvent.subSec     = data[1];
 			theEvent.sec        = data[2];
 			
