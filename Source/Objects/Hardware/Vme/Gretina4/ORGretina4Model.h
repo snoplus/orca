@@ -36,6 +36,8 @@
 #define kGretina4FIFOAlmostFull		0x800000
 #define kGretina4FIFOAllFull		0x1000000
 
+#define kGretina4PacketSeparator    0xAAAAAAAA
+
 #pragma mark ¥¥¥Register Definitions
 enum {
 	kBoardID,					//[0] board ID
@@ -122,6 +124,7 @@ enum Gretina4FIFOStates {
     int fifoState;
 	ORAlarm*        fifoFullAlarm;
 	int				fifoEmptyCount;
+    int             fifoLostEvents;
 
 	//cache to speed takedata
 	unsigned long location;
@@ -232,9 +235,8 @@ enum Gretina4FIFOStates {
 - (void) writeRawDataSlidingLength:(int)channel;
 - (void) writeRawDataWindowLength:(int)channel;
 - (unsigned short) readFifoState;
-- (unsigned long) readFIFO:(unsigned long)offset;
-- (void) writeFIFO:(unsigned long)index value:(unsigned long)aValue;
 - (int) clearFIFO;
+- (int) findNextEventInTheFIFO;
 - (void) findNoiseFloors;
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
@@ -247,6 +249,7 @@ enum Gretina4FIFOStates {
 - (NSDictionary*) dataRecordDescription;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (unsigned long) waveFormCount:(int)aChannel;
 - (void)   startRates;

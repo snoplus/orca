@@ -258,6 +258,7 @@ static struct {
             [cardInfo addObject:[NSNumber numberWithInt:cardConstants[i].initialValue]];
         }
     }	
+    fifoLostEvents = 0;
 }
 
 - (void) cardInfo:(int)index setObject:(id)aValue
@@ -596,7 +597,10 @@ static struct {
 
 - (void) writeControlReg:(int)chan enabled:(BOOL)forceEnable
 {
- 
+    /* writeControlReg writes the current model state to the board.  If forceEnable is NO, *
+     * then all the channels are disabled.  Otherwise, the channels are enabled according  *
+     * to the model state.                                                                 */
+     
     BOOL startStop;
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
@@ -674,35 +678,29 @@ static struct {
     else						return kHalfFull;
 }
 
-- (unsigned long) readFIFO:(unsigned long)index
-{
-    unsigned long theValue = 0 ;
-    [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress]*0x100 + (4*index)
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    return theValue;
-}
-
-- (void) writeFIFO:(unsigned long)index value:(unsigned long)aValue
-{
-    [[self adapter] writeLongBlock:&aValue
-                         atAddress:([self baseAddress]*0x100) + (4*index)
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-}
-
 - (int) clearFIFO
 {
+    /* clearFIFO clears the FIFO and then resets the enabled flags on the board to whatever *
+     * was currently set *ON THE BOARD*.                                                    */
 	int count = 0;
-	NSDate* startDate = [NSDate date];
     fifoStateAddress  = [self baseAddress] + register_offsets[kProgrammingDone];
     fifoAddress       = [self baseAddress] + 0x1000;
 	theController     = [self adapter];
 	unsigned long  dataDump[0xffff];
-	BOOL error		  = NO;
+	//BOOL error		  = NO;
+	//NSDate* startDate = [NSDate date];
+    
+    short boardStateEnabled[kNumGretina4Channels];
+    short modelStateEnabled[kNumGretina4Channels];
+    int i;
+    for(i=0;i<kNumGretina4Channels;i++) {
+        /* First thing, disable all the channels so that nothing is filling the buffer. */
+        /* Reading the *BOARD STATE* (i.e. *not* the *MODEL* state) */
+        boardStateEnabled[i] = [self readControlReg:i] & 0x1;
+        modelStateEnabled[i] = [self enabled:i];
+        [self writeControlReg:i enabled:NO];
+    }
+    
     while(1){
 		unsigned long val;
 		//read the fifo state
@@ -712,7 +710,7 @@ static struct {
 						  withAddMod:[self addressModifier]
 					   usingAddSpace:0x01];
 		if((val & kGretina4FIFOEmpty) == 0){
-			//read the first longword which should be the packet separator: 0xAAAAAAAA
+			//read the first longword which should be the packet separator:
 			unsigned long theValue;
 			[theController readLongBlock:&theValue 
 							   atAddress:fifoAddress 
@@ -720,7 +718,7 @@ static struct {
 							  withAddMod:[self addressModifier] 
 						   usingAddSpace:0x01];
 			
-			if(theValue==0xAAAAAAAA){
+			if(theValue==kGretina4PacketSeparator){
 				//read the first word of actual data so we know how much to read
 				[theController readLongBlock:&theValue 
 								   atAddress:fifoAddress 
@@ -734,26 +732,89 @@ static struct {
 							 withAddMod:[self addressModifier] 
 						  usingAddSpace:0x01];
 				count++;
+			} else {
+                NSLog(@"Clearing FIFO: FIFO corrupted on Gretina4 card (slot %d), searching for next event... \n",[self slot]);
+                count += [self findNextEventInTheFIFO];
+                NSLog(@"Clearing FIFO: Next event found on Gretina4 card (slot %d), continuing to clear FIFO. \n",[self slot]);
 			}
-			else {
-				error = YES;
-				break;
-			}
-		}
-		else break;
+		} else { 
+            /* The FIFO has been cleared. */
+            break;
+        }
 
+        /* Do we need the following anymore? */
+        /*
 		if([[NSDate date] timeIntervalSinceDate:startDate] > 10){
 			error = YES;
 			break;
-		}
+		}*/
     }
 
+    /*
 	if(error){
 		NSLog(@"Unable to clear FIFO on Gretina4 card (slot %d)\n",[self slot]);
 		[NSException raise:@"Gretina card Error" format:@"unable to clear FIFO on Gretina4 card (slot %d)",[self slot]];
 	}
-	
+    */
+
+    for(i=0;i<kNumGretina4Channels;i++) {
+        /* Now reenable all the channels that were enabled before (on the *BOARD*). */
+        [self setEnabled:i withValue:boardStateEnabled[i]];
+        [self writeControlReg:i enabled:YES];
+        [self setEnabled:i withValue:modelStateEnabled[i]];
+    }	
 	return count;
+}
+
+- (int) findNextEventInTheFIFO
+{
+    /* Somehow the FIFO got corrupted and is no longer aligned along event boundaries.           *
+     * This function will read through to the next boundary and read out the next full event,    *
+     * leaving the FIFO aligned along an event.  The function returns the number of events lost. */
+     
+    unsigned long val;
+    //read the fifo state, sanity check to make sure there is actually another event.
+    while (1) {
+        [theController readLongBlock:&val
+                           atAddress:fifoStateAddress
+                           numToRead:1
+                          withAddMod:[self addressModifier]
+                       usingAddSpace:0x01];
+        
+        if((val & kGretina4FIFOEmpty) != 0) {
+            /* We read until the FIFO is empty, meaning we are aligned */
+            return 1; // We have only lost one event.
+        } else {
+            /* We need to continue reading until finding the packet separator */
+            //read the first longword which should be the packet separator:
+            unsigned long theValue;
+            [theController readLongBlock:&theValue 
+                               atAddress:fifoAddress 
+                               numToRead:1 
+                              withAddMod:[self addressModifier] 
+                           usingAddSpace:0x01];
+            
+            if (theValue==kGretina4PacketSeparator) {
+                //read the first word of actual data so we know how much to read
+                [theController readLongBlock:&theValue 
+                                   atAddress:fifoAddress 
+                                   numToRead:1 
+                                  withAddMod:[self addressModifier] 
+                               usingAddSpace:0x01];
+                unsigned long numberLeftToRead = ((theValue & 0xffff0000)>>16)-1;
+                unsigned long* dataDump = malloc(sizeof(unsigned long)*numberLeftToRead);
+                [theController readLongBlock:dataDump 
+                              atAddress:fifoAddress 
+                            numToRead:  numberLeftToRead //number longs left to read
+                             withAddMod:[self addressModifier] 
+                          usingAddSpace:0x01];
+                free(dataDump);
+                return 2; // We have lost two events
+            }
+            
+            /* If we've gotten here, it means we have to continue some more. */
+        } 
+    }
 }
 
 - (void) findNoiseFloors
@@ -1104,10 +1165,11 @@ static struct {
     fifoStateAddress= [self baseAddress] + register_offsets[kProgrammingDone];
     
     short i;
-    for(i=0;i<kNumGretina4Channels;i++){
+    for(i=0;i<kNumGretina4Channels;i++) {
         [self writeControlReg:i enabled:NO];
     }
     [self clearFIFO];
+    fifoLostEvents = 0;
     dataBuffer = (unsigned long*)malloc(0xffff * sizeof(long));
     [self startRates];
     
@@ -1138,7 +1200,7 @@ static struct {
             dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
             dataBuffer[numLongs++] = location;
             
-            //read the first longword which should be the packet separator: 0xAAAAAAAA
+            //read the first longword which should be the packet separator:
             unsigned long theValue;
             [theController readLongBlock:&theValue 
                                atAddress:fifoAddress 
@@ -1146,7 +1208,7 @@ static struct {
                               withAddMod:[self addressModifier] 
                            usingAddSpace:0x01];
             
-            if(theValue==0xAAAAAAAA){
+            if(theValue==kGretina4PacketSeparator){
                 
                 //read the first word of actual data so we know how much to read
                 [theController readLongBlock:&theValue 
@@ -1170,11 +1232,11 @@ static struct {
                 long totalNumLongs = (numLongs + numLongsLeft);
                 dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
                 [aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
-            }
-            else {
-                //oops... really bad -- the buffer read is out of sequence -- dump it all
-                [self clearFIFO];
-                NSLogError(@"Gretina4",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO flushed",nil);
+            } else {
+                //oops... the buffer read is out of sequence
+                NSLogError(@"Gretina4",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- Looking for next event",nil);
+                fifoLostEvents += [self findNextEventInTheFIFO];
+                NSLogError(@"Gretina4",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- Next event found",nil);
             }
         }
     
@@ -1185,6 +1247,15 @@ static struct {
     NS_ENDHANDLER
 }
 
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    /* Disable all channels.  The remaining buffer should be readout. */
+    int i;
+    for(i=0;i<kNumGretina4Channels;i++){					
+        [self writeControlReg:i enabled:NO];
+    }
+}
+
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     isRunning = NO;
@@ -1193,9 +1264,12 @@ static struct {
     short i;
     for(i=0;i<kNumGretina4Channels;i++){					
 		waveFormCount[i] = 0;
-        [self writeControlReg:i enabled:NO];
     }
     free(dataBuffer);
+    if ( fifoLostEvents != 0 ) {
+        NSLogError( @"Gretina4 ",[NSString stringWithFormat:@"(slot %d):",[self slot]],
+                    [NSString stringWithFormat:@" lost events due to buffer corruption: %d",fifoLostEvents],nil);
+    }
 }
 
 - (void) checkFifoAlarm

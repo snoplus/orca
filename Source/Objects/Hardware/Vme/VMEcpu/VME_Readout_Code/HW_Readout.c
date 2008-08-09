@@ -546,111 +546,114 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
     int32_t result;
     fifoState = 0;
     if (config->card_info[index].add_mod == 0x29) {
-        result = read_device(vmeAM29Handle,(char*)&fifoState,2,fifoStateAddress); 
+      result = read_device(vmeAM29Handle,(char*)&fifoState,2,fifoStateAddress); 
     } 
     else {
-        vmeFIFOStateReadOutHandle = vmeAM9Handle; 
-        result = read_device(vmeFIFOStateReadOutHandle, (char*)&fifoState, 4, fifoStateAddress);
+      vmeFIFOStateReadOutHandle = vmeAM9Handle; 
+      result = read_device(vmeFIFOStateReadOutHandle, (char*)&fifoState, 4, fifoStateAddress);
     }
     
     if (result <= 0) {
-        return config->card_info[index].next_Card_Index;
+      return config->card_info[index].next_Card_Index;
     }
      
     if ((fifoState & fifoEmptyMask) == 0 || (fifoAddressMod == 0x39 && (fifoState & fifoEmptyMask) != 0)) {
-        if (fifoAddressMod == 0x39) vmeReadOutHandle = vmeAM39Handle;
-        else vmeReadOutHandle = vmeAM9Handle;
+      if (fifoAddressMod == 0x39) {
+        vmeReadOutHandle = vmeAM39Handle;
+      } else {
+        vmeReadOutHandle = vmeAM9Handle;
+      }
 
-        uint32_t numLongs = 3;
-        int32_t savedIndex = dataIndex;
-        data[dataIndex++] = dataId | 0; //we'll fill in the length later
-        data[dataIndex++] = location;
-        
-        //read the first int32_tword which should be the packet separator: 0xAAAAAAAA
-        uint32_t theValue;
-        result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-        
-        if (result == 4 && (theValue==0xAAAAAAAA)){
-            
-            //read the first word of actual data so we know how much to read
-            result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-            
-            data[dataIndex++] = theValue;
-            uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
-            int32_t totalNumLongs  = (numLongs + numLongsLeft);
-             
+      uint32_t numLongs = 3;
+      int32_t savedIndex = dataIndex;
+      data[dataIndex++] = dataId | 0; //we'll fill in the length later
+      data[dataIndex++] = location;
+      
+      //read the first int32_tword which should be the packet separator: 0xAAAAAAAA
+      uint32_t theValue;
+      result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
+      
+      if (result == 4 && (theValue==0xAAAAAAAA)){
+          
+          //read the first word of actual data so we know how much to read
+          result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
+          
+          data[dataIndex++] = theValue;
+          uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
+          int32_t totalNumLongs  = (numLongs + numLongsLeft);
+           
 
-            /* OK, now use dma access. */
-            if (fifoAddressMod == 0x39) {
-              /* Gretina I card */
-              set_dma_no_increment(true);
-              vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
-            } 
-            else {
-              /* Gretina IV card */
-              set_dma_no_increment(false);
-              vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
-            }
-            if (vmeDMADevice == NULL) {
+          /* OK, now use dma access. */
+          if (fifoAddressMod == 0x39) {
+            /* Gretina I card */
+            set_dma_no_increment(true);
+            vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
+          } else {
+            /* Gretina IV card */
+            set_dma_no_increment(false);
+            vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
+          }
+
+          if (vmeDMADevice == NULL) {
+            return config->card_info[index].next_Card_Index;
+          }
+          
+          result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
+          dataIndex += numLongsLeft;
+          
+          if (result != numLongsLeft*4) {
+            return config->card_info[index].next_Card_Index;
+          }
+          data[savedIndex] |= totalNumLongs; //see, we did fill it in...
+      } else if(result < 0) {
+        LogBusError("Rd Err: Gretina 0x%04x %s",baseAddress,strerror(errno));
+      } else {
+        LogError("Rd Err: Gretina 0x%04x Buffer out of sequence, trying to recover",baseAddress);
+        //oops... really bad -- the buffer read is out of sequence -- try to recover 
+        uint32_t i = 0;
+        while(i < sizeOfFIFO) {
+            result = read_device(vmeReadOutHandle,(char*) (&theValue),4,fifoAddress); 
+            if (result == 0) { // means the FIFO is empty
               return config->card_info[index].next_Card_Index;
+            } else if (result < 0) {
+                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                return config->card_info[index].next_Card_Index;
             }
-            
-            result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
-            dataIndex += numLongsLeft;
-            
-            if (result != numLongsLeft*4) {
-              return config->card_info[index].next_Card_Index;
-            }
-            data[savedIndex] |= totalNumLongs; //see, we did fill it in...
+            if (theValue == 0xAAAAAAAA) break;
+            i++;
         }
+        //read the first word of actual data so we know how much to read
+        //note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
+        //we'll reset the index to dump the data later....
+        result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
+        if (result < 0) {
+            LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));                
+            return config->card_info[index].next_Card_Index;
+        }
+        uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
+         
+        /* OK, now use dma access. */
+        if (fifoAddressMod == 0x39) {
+          /* Gretina I card */
+          set_dma_no_increment(true);
+          vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
+        } 
         else {
-            if(result<0)LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-            else        LogError("Rd Err: Gretina4 0x%04x Buffer Rd Out",baseAddress);
-            //oops... really bad -- the buffer read is out of sequence -- dump it all
-            uint32_t i = 0;
-            while(i < sizeOfFIFO) {
-                result = read_device(vmeReadOutHandle,(char*) (&theValue),4,fifoAddress); 
-                if (result == 0) { // means the FIFO is empty
-                  return config->card_info[index].next_Card_Index;
-                } else if (result < 0) {
-                    LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-                    return config->card_info[index].next_Card_Index;
-                }
-                if (theValue == 0xAAAAAAAA) break;
-                i++;
-            }
-            //read the first word of actual data so we know how much to read
-            //note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
-            //we'll reset the index to dump the data later....
-            result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-            if (result < 0) {
-                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));                
-                return config->card_info[index].next_Card_Index;
-            }
-            uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
-             
-            /* OK, now use dma access. */
-            if (fifoAddressMod == 0x39) {
-              /* Gretina I card */
-              set_dma_no_increment(true);
-              vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
-            } 
-            else {
-              /* Gretina I card */
-              set_dma_no_increment(false);
-              vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
-            }
-            if (vmeDMADevice == NULL) {
-                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-                return config->card_info[index].next_Card_Index;
-            }
-            result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
-            if (result < 0) {
-                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-                return config->card_info[index].next_Card_Index;
-            }
-             dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
-       }
+          /* Gretina I card */
+          set_dma_no_increment(false);
+          vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4);
+        }
+        if (vmeDMADevice == NULL) {
+            LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+            return config->card_info[index].next_Card_Index;
+        }
+        result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
+        if (result < 0) {
+            LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+            return config->card_info[index].next_Card_Index;
+        }
+         dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
+      }
     }
     return config->card_info[index].next_Card_Index;
 
