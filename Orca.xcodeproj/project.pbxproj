@@ -3809,21 +3809,12 @@
 				143AEE990E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m */,
 				143AEE9A0E2E988F003E3CAC /* ORUnivVoltHVCrateView.h */,
 				143AEE9B0E2E988F003E3CAC /* ORUnivVoltHVCrateView.m */,
-				143AEE9C0E2E988F003E3CAC /* support */,
 				143AEEA00E2E988F003E3CAC /* UnivVoltHVCrate.gif */,
 				143AEEA10E2E988F003E3CAC /* UnivVoltHVCrate.nib */,
 				143AEEA20E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif */,
 			);
 			name = UnivVoltHVCrate;
 			path = "Source/Objects/Misc Objects/UnivVoltHVCrate";
-			sourceTree = SOURCE_ROOT;
-		};
-		143AEE9C0E2E988F003E3CAC /* support */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = support;
-			path = "Source/Objects/Misc Objects/UnivVoltHVCrate/support";
 			sourceTree = SOURCE_ROOT;
 		};
 		143B09AB0E11666700FE9DB8 /* UnivVoltHV */ = {
