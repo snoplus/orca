@@ -348,13 +348,12 @@ char FindAcqirisDC440s(void)
 		}
 		char name[20];
 		int32_t serialNumber,busNumber,digitizerNumber;
-		//InstrumentID[i] = i;
+		InstrumentID[i] = i;
 		AcqrsD1_getInstrumentData(InstrumentID[i],name,&serialNumber,&busNumber,&digitizerNumber);
 		strcpy(digitizer[i].name,name);
 		digitizer[i].busNumber		= busNumber;
 		digitizer[i].serialNumber	= serialNumber;
-		digitizer[i].instrumentID	= digitizerNumber;
- 		InstrumentID[i] = digitizerNumber;
+		digitizer[i].instrumentID	= InstrumentID[i];
 	}
 	return status;	
 }
