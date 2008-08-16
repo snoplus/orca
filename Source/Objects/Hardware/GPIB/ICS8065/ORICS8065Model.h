@@ -69,6 +69,7 @@
 - (void) 	deactivateDevice: (short) aPrimaryAddress;
 - (void) 	resetDevice: (short) aPrimaryAddress;
 - (void) 	setupDevice: (short) aPrimaryAddress;
+- (void) 	setupDevice: (short) aPrimaryAddress secondaryAddress: (short) aSecondaryAddress;
 - (long) 	readFromDevice: (short) aPrimaryAddress data: (char*) aData 
                                                maxLength: (long) aMaxLength;
 - (void) 	writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand;

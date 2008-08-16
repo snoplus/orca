@@ -270,6 +270,11 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 	mMonitorWrite = aMonitorWrite;
 }
 
+- (void) 	setupDevice: (short) aPrimaryAddress secondaryAddress: (short) aSecondaryAddress
+{
+	[self setupDevice:aPrimaryAddress];
+}
+
 - (void) setupDevice: (short) aPrimaryAddress
 {  
     if(![self isEnabled])return;
