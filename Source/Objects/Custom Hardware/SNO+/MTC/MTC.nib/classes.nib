@@ -77,6 +77,16 @@
 			<dict>
 				<key>autoIncrementAction</key>
 				<string>id</string>
+				<key>basicRead</key>
+				<string>id</string>
+				<key>basicStatus</key>
+				<string>id</string>
+				<key>basicStop</key>
+				<string>id</string>
+				<key>basicWrite</key>
+				<string>id</string>
+				<key>buttonPushed</key>
+				<string>id</string>
 				<key>memoryOffsetTextFieldAction</key>
 				<string>id</string>
 				<key>readAction</key>
@@ -88,6 +98,54 @@
 				<key>selectedRegisterAction</key>
 				<string>id</string>
 				<key>settingLockAction</key>
+				<string>id</string>
+				<key>settingsComments</key>
+				<string>id</string>
+				<key>settingsDefValFile</key>
+				<string>id</string>
+				<key>settingsDefaultGetSet</key>
+				<string>id</string>
+				<key>settingsDefaultSaveSet</key>
+				<string>id</string>
+				<key>settingsLoadDBFile</key>
+				<string>id</string>
+				<key>settingsLoadDefVals</key>
+				<string>id</string>
+				<key>settingsMTCDelete</key>
+				<string>id</string>
+				<key>settingsMTCRecordGet</key>
+				<string>id</string>
+				<key>settingsMTCRecordSaveAs</key>
+				<string>id</string>
+				<key>settingsPrint</key>
+				<string>id</string>
+				<key>settingsXilinxFile</key>
+				<string>id</string>
+				<key>standardFindTriggerZeroes</key>
+				<string>id</string>
+				<key>standardFirePedestals</key>
+				<string>id</string>
+				<key>standardInitMTC</key>
+				<string>id</string>
+				<key>standardInitMTCno10MHz</key>
+				<string>id</string>
+				<key>standardInitMTCnoXilinx</key>
+				<string>id</string>
+				<key>standardInitMTCnoXilinxno10MHz</key>
+				<string>id</string>
+				<key>standardLoad10MHzCounter</key>
+				<string>id</string>
+				<key>standardLoadMTCADacs</key>
+				<string>id</string>
+				<key>standardLoadOnlineGTMasks</key>
+				<string>id</string>
+				<key>standardMakeOnlineCrateMasks</key>
+				<string>id</string>
+				<key>standardPeriodicReadout</key>
+				<string>id</string>
+				<key>standardSetCoarseDelay</key>
+				<string>id</string>
+				<key>standardStopFindTriggerZeroes</key>
 				<string>id</string>
 				<key>statusReportAction</key>
 				<string>id</string>
