@@ -78,4 +78,42 @@
 #pragma mark •••Helper
 - (void) populatePullDown;
 
+#pragma mark •••Button Stubs
+//Actions for the various buttons in the MTC dialog.  There is a generic "buttonPushed()" method that
+//is called by each of the individual actions to avoid redundant code.
+
+//Basic Ops buttons.
+- (IBAction) buttonPushed:(id) sender;
+- (IBAction) basicRead:(id) sender;
+- (IBAction) basicWrite:(id) sender;
+- (IBAction) basicStatus:(id) sender;
+- (IBAction) basicStop:(id) sender;
+
+//MTC Init Ops buttons.
+- (IBAction) standardInitMTC:(id) sender;
+- (IBAction) standardInitMTCnoXilinx:(id) sender;
+- (IBAction) standardInitMTCno10MHz:(id) sender;
+- (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender;
+- (IBAction) standardMakeOnlineCrateMasks:(id) sender;
+- (IBAction) standardLoad10MHzCounter:(id) sender;
+- (IBAction) standardLoadOnlineGTMasks:(id) sender;
+- (IBAction) standardLoadMTCADacs:(id) sender;
+- (IBAction) standardSetCoarseDelay:(id) sender;
+- (IBAction) standardFirePedestals:(id) sender;
+- (IBAction) standardFindTriggerZeroes:(id) sender;
+- (IBAction) standardStopFindTriggerZeroes:(id) sender;
+- (IBAction) standardPeriodicReadout:(id) sender;
+
+//Settings buttons.
+- (IBAction) settingsLoadDBFile:(id) sender;
+- (IBAction) settingsDefValFile:(id) sender;
+- (IBAction) settingsXilinxFile:(id) sender;
+- (IBAction) settingsDefaultGetSet:(id) sender;
+- (IBAction) settingsMTCRecordGet:(id) sender;
+- (IBAction) settingsMTCRecordSaveAs:(id) sender;
+- (IBAction) settingsMTCDelete:(id) sender;
+- (IBAction) settingsLoadDefVals:(id) sender;
+- (IBAction) settingsPrint:(id) sender;
+- (IBAction) settingsComments:(id) sender;
+- (IBAction) settingsDefaultSaveSet:(id) sender;
 @end

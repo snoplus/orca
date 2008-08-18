@@ -309,5 +309,101 @@
 	[model reportStatus];
 }
 
+//Basic Ops buttons.
+- (void) buttonPushed:(id) sender {
+	NSLog(@"Input received from %@\n", [sender title] );	//This is the only real method.  The other button push methods just call this one.
+}
+- (IBAction) basicRead:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) basicWrite:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) basicStatus:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) basicStop:(id) sender {
+	[self buttonPushed:sender];
+}
+
+//MTC Init Ops buttons.
+- (IBAction) standardInitMTC:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardInitMTCnoXilinx:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardInitMTCno10MHz:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardMakeOnlineCrateMasks:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardLoad10MHzCounter:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardLoadOnlineGTMasks:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardLoadMTCADacs:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardSetCoarseDelay:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardFirePedestals:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardFindTriggerZeroes:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardStopFindTriggerZeroes:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) standardPeriodicReadout:(id) sender {
+	[self buttonPushed:sender];
+}
+
+//Settings buttons.
+- (IBAction) settingsLoadDBFile:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsDefValFile:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsXilinxFile:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsDefaultGetSet:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsMTCRecordGet:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsMTCRecordSaveAs:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsMTCDelete:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsLoadDefVals:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsPrint:(id) sender {
+	[self buttonPushed:sender];
+}
+- (IBAction) settingsComments:(id) sender {
+	[self buttonPushed:sender];
+}
+
+- (IBAction) settingsDefaultSaveSet:(id) sender {
+	[self buttonPushed:sender];
+}
+
+
+
 
 @end
