@@ -70,10 +70,6 @@
 - (IBAction) memoryOffsetTextFieldAction:(id)sender;
 - (IBAction) selectedRegisterAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
-- (IBAction) readAction:(id) sender;
-- (IBAction) writeAction:(id) sender;
-- (IBAction) stopAction:(id) sender;
-- (IBAction) statusReportAction:(id) sender;
 
 #pragma mark •••Helper
 - (void) populatePullDown;
@@ -81,9 +77,9 @@
 #pragma mark •••Button Stubs
 //Actions for the various buttons in the MTC dialog.  There is a generic "buttonPushed()" method that
 //is called by each of the individual actions to avoid redundant code.
+- (IBAction) buttonPushed:(id) sender;
 
 //Basic Ops buttons.
-- (IBAction) buttonPushed:(id) sender;
 - (IBAction) basicRead:(id) sender;
 - (IBAction) basicWrite:(id) sender;
 - (IBAction) basicStatus:(id) sender;
