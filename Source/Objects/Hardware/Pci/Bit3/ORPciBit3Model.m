@@ -258,6 +258,11 @@ struct {
     [noHardwareAlarm clearAlarm];
     [noHardwareAlarm release];
     noHardwareAlarm = nil;
+
+    [noDriverAlarm clearAlarm];
+    [noDriverAlarm release];
+    noDriverAlarm = nil;
+
     
     // unmap Bit3 address spaces
     IOConnectUnmapMemory(dataPort, 1, mach_task_self(), CSRRegisterAddress);
