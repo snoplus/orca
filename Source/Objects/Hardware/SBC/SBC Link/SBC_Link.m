@@ -1282,15 +1282,19 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[self tellClientToStopRun];
-	stopWatchingIRQ = YES;
-	[self getRunInfoBlock];
-    /* We no longer need the throttle since we are just clearing the circular buffer.
-       It will be reset when the run starts.                                           */
-    throttle = 0;
-	if(runInfo.amountInBuffer > 0){
-		NSLog(@"%@ %d %d reading out last %d bytes in CB\nm",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
-	}
+	NS_DURING
+		[self tellClientToStopRun];
+		stopWatchingIRQ = YES;
+		[self getRunInfoBlock];
+		/* We no longer need the throttle since we are just clearing the circular buffer.
+		It will be reset when the run starts.                                           */
+		throttle = 0;
+		if(runInfo.amountInBuffer > 0){
+			NSLog(@"%@ %d %d reading out last %d bytes in CB\nm",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
+		}
+	NS_HANDLER
+		NSLog(@"%@\n",localException);
+	NS_ENDHANDLER
 }
 
 - (BOOL) doneTakingData
