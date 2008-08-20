@@ -21,7 +21,7 @@
 #import <WebKit/WebKit.h>
 #import "ORHelpCenter.h"
 
-#define kORCAHelpURL @"http://128.95.100.177/~markhowe"
+#define kORCAHelpURL @"http://orca.physics.unc.edu/~markhowe"
 
 @implementation ORHelpCenter
 - (id)init
