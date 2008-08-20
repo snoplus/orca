@@ -33,7 +33,10 @@
 #include "VME_Trigger32.h"
 #include "universe_api.h"
 
-#define kDMALowerLimit 0x100 //require 256 bytes
+#define kDMALowerLimit   0x100 //require 256 bytes
+#define kControlSpace    0xFFFF
+#define kPollSameAddress 0xFF
+
 
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
@@ -98,6 +101,7 @@ void FindHardware(void)
     /* The bottom of A32 (D32) is mapped up to 0x2000000. */
     /* We need to be careful!*/
   
+    /* The following is particular to the concurrent boards. */
     set_hw_byte_swap(true);
     set_ds_negation_speed(0);
     set_ds_high_time_blts(0);
@@ -105,16 +109,16 @@ void FindHardware(void)
 
 void ReleaseHardware(void)
 {
-    close_device(vmeAM29Handle);    
-    close_device(vmeAM39Handle);    
-    close_device(vmeAM9Handle);    
+    if (vmeAM29Handle) close_device(vmeAM29Handle);    
+    if (vmeAM39Handle) close_device(vmeAM39Handle);    
+    if (vmeAM9Handle)  close_device(vmeAM9Handle);    
 }
 
 
 void doWriteBlock(SBC_Packet* aPacket)
 {
     SBC_VmeWriteBlockStruct* p = (SBC_VmeWriteBlockStruct*)aPacket->payload;
-    if(needToSwap)SwapLongBlock(p,sizeof(SBC_VmeWriteBlockStruct)/sizeof(int32_t));
+    if(needToSwap) SwapLongBlock(p,sizeof(SBC_VmeWriteBlockStruct)/sizeof(int32_t));
 
     uint32_t startAddress   = p->address;
     uint32_t oldAddress     = p->address;
@@ -126,7 +130,7 @@ void doWriteBlock(SBC_Packet* aPacket)
     bool deleteHandle = false;
     bool useDMADevice = false;
 
-    if (addressSpace == 0xFFFF) {
+    if (addressSpace == kControlSpace) {
         memMapHandle = controlHandle;
         if (unitSize != sizeof(uint32_t) && numItems != 1) {
             sprintf(aPacket->message,"error: size and number not correct");
@@ -136,7 +140,7 @@ void doWriteBlock(SBC_Packet* aPacket)
         }
     } else if(unitSize*numItems >= kDMALowerLimit) {
 	useDMADevice = true;
-        if (addressSpace == 0xFF) { 
+        if (addressSpace == kPollSameAddress) { 
           memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, false);
         } else {
           memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, true);
@@ -184,7 +188,7 @@ void doWriteBlock(SBC_Packet* aPacket)
     
     int32_t result = 0;
     if (!deleteHandle && !useDMADevice) lock_device(memMapHandle);
-    if (addressSpace == 0xFF) {
+    if (addressSpace == kPollSameAddress) {
         /* We have to poll the same address. */
         uint32_t i = 0;
         for (i=0;i<numItems;i++) {
@@ -195,16 +199,20 @@ void doWriteBlock(SBC_Packet* aPacket)
         }
         if (result == unitSize) result = unitSize*numItems; 
     } else {
-        result = 
-            write_device(memMapHandle,(char*)p,numItems*unitSize,startAddress);
+        result = write_device(memMapHandle,(char*)p,
+                              numItems*unitSize,startAddress);
     }
     if (!deleteHandle && !useDMADevice) unlock_device(memMapHandle);
+    if (useDMADevice) {
+        release_dma_device();
+    }
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
     /* non-0 means an error*/
     SBC_VmeWriteBlockStruct* returnDataPtr = 
         (SBC_VmeWriteBlockStruct*)aPacket->payload;
+
     returnDataPtr->address         = oldAddress;
     returnDataPtr->addressModifier = addressModifier;
     returnDataPtr->addressSpace    = addressSpace;
@@ -213,23 +221,20 @@ void doWriteBlock(SBC_Packet* aPacket)
 
     if(result == (numItems*unitSize)){
         returnDataPtr->errorCode = 0;
-    }
-    else {
+    } else {
         aPacket->cmdHeader.numberBytesinPayload    
           = sizeof(SBC_VmeWriteBlockStruct);
         returnDataPtr->errorCode = result;        
     }
 
     lptr = (int32_t*)returnDataPtr;
-    if(needToSwap)SwapLongBlock(lptr,numItems);
+    if(needToSwap) SwapLongBlock(lptr,numItems);
 
     writeBuffer(aPacket);    
+
     if (deleteHandle) {
         close_device(memMapHandle);
     } 
-    if (useDMADevice) {
-        release_dma_device();
-    }
 
 }
 
@@ -255,7 +260,7 @@ void doReadBlock(SBC_Packet* aPacket)
         writeBuffer(aPacket);
         return;
     }
-    if (addressSpace == 0xFFFF) {
+    if (addressSpace == kControlSpace) {
         memMapHandle = controlHandle;
         if (unitSize != sizeof(uint32_t) && numItems != 1) {
             sprintf(aPacket->message,"error: size and number not correct");
@@ -267,12 +272,12 @@ void doReadBlock(SBC_Packet* aPacket)
     else if(unitSize*numItems >= kDMALowerLimit) {
         // Use DMA access which is normally faster.
 	useDMADevice = true;
-        if (addressSpace == 0xFF) {
-          memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, false);
+        if (addressSpace == kPollSameAddress) {
+            memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, false);
          } else {
-          memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, true);
+            memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, true);
          }
-        addressSpace=0x1; // reset this for the later call.
+        addressSpace =0x1; // reset this for the later call.
         startAddress = 0x0;
     }
     else if(addressModifier == 0x29 && unitSize == 2) {
@@ -287,7 +292,7 @@ void doReadBlock(SBC_Packet* aPacket)
     else {
         /* The address must be byte-aligned */ 
         startAddress = p->address & 0xFFFF;
-        p->address = p->address & 0xFFFF0000;
+        p->address   = p->address & 0xFFFF0000;
         
         memMapHandle = get_new_device(p->address, addressModifier, unitSize, 0); 
         if (memMapHandle == NULL) {
@@ -313,7 +318,7 @@ void doReadBlock(SBC_Packet* aPacket)
     int32_t result = 0;
     
     if (!deleteHandle && !useDMADevice) lock_device(memMapHandle);
-    if (addressSpace == 0xFF) {
+    if (addressSpace == kPollSameAddress) {
         /* We have to poll the same address. */
         uint32_t i = 0;
         for (i=0;i<numItems;i++) {
@@ -321,11 +326,13 @@ void doReadBlock(SBC_Packet* aPacket)
             if (result != unitSize) break;
         }
         if (result == unitSize) result = unitSize*numItems; 
-    } 
-    else {
+    } else {
         result = read_device(memMapHandle,returnPayload,numItems*unitSize,startAddress);
     }
     if (!deleteHandle && !useDMADevice) unlock_device(memMapHandle);
+    if (useDMADevice) {
+        release_dma_device();
+    }
     
     returnDataPtr->address         = oldAddress;
     returnDataPtr->addressModifier = addressModifier;
@@ -346,8 +353,7 @@ void doReadBlock(SBC_Packet* aPacket)
                 if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
                 break;
         }
-    }
-    else {
+    } else {
         sprintf(aPacket->message,"error: %d %d : %s\n",
            (int32_t)result,(int32_t)errno,strerror(errno));
         aPacket->cmdHeader.numberBytesinPayload    
@@ -364,9 +370,6 @@ void doReadBlock(SBC_Packet* aPacket)
     if (deleteHandle) {
         close_device(memMapHandle);
     } 
-    if (useDMADevice) {
-        release_dma_device();
-    }
 
 }
 
@@ -430,8 +433,7 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
                 } else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
             }
         }
-    }
-    else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
+    } else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
     unlock_device(vmeAM29Handle);
 
     return config->card_info[index].next_Card_Index;
@@ -440,12 +442,12 @@ int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lam
 int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     uint32_t baseAddress        = config->card_info[index].base_add;
-    uint32_t numEventsAvailReg    = config->card_info[index].deviceSpecificData[0];
-    uint32_t eventSizeReg        = config->card_info[index].deviceSpecificData[1];
+    uint32_t numEventsAvailReg  = config->card_info[index].deviceSpecificData[0];
+    uint32_t eventSizeReg       = config->card_info[index].deviceSpecificData[1];
     uint32_t fifoBuffReg        = config->card_info[index].deviceSpecificData[2];
-    uint32_t fifoAddressMod        = config->card_info[index].deviceSpecificData[3];
-    uint32_t fifoBuffSize        = config->card_info[index].deviceSpecificData[4];
-    uint32_t location            = config->card_info[index].deviceSpecificData[5];
+    uint32_t fifoAddressMod     = config->card_info[index].deviceSpecificData[3];
+    uint32_t fifoBuffSize       = config->card_info[index].deviceSpecificData[4];
+    uint32_t location           = config->card_info[index].deviceSpecificData[5];
     uint32_t numBLTEventsReg    = config->card_info[index].deviceSpecificData[7];
     uint32_t theMod             = config->card_info[index].add_mod;
     
@@ -457,79 +459,79 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
     
     int32_t result = read_device(memMapHandle,(char*)&numEventsToReadout,sizeof(numEventsToReadout),numBLTEventsReg); 
     if ( result != sizeof(numEventsToReadout) ) { 
-      LogBusError("CAEN 0x%0x Couldn't read register", numBLTEventsReg);
-      close_device(memMapHandle);
-      return config->card_info[index].next_Card_Index;
+        LogBusError("CAEN 0x%0x Couldn't read register", numBLTEventsReg);
+        close_device(memMapHandle);
+        return config->card_info[index].next_Card_Index;
     }
     if ( numEventsToReadout == 0 ) {
-      // We will have a problem, this needs to be set *before*
-      // starting a run.
-      LogError("CAEN: BLT Events register must be set BEFORE run start");
-      close_device(memMapHandle);
-      return config->card_info[index].next_Card_Index;
+        // We will have a problem, this needs to be set *before*
+        // starting a run.
+        LogError("CAEN: BLT Events register must be set BEFORE run start");
+        close_device(memMapHandle);
+        return config->card_info[index].next_Card_Index;
     }
     
     uint32_t numEventsAvail;    
     result = read_device(memMapHandle,(char*)&numEventsAvail,4,numEventsAvailReg);    //long access, the status reg
     if(result == sizeof(numEventsAvail) && (numEventsAvail > 0)){                    //if at least one event is ready
-      uint32_t eventSize;
-      result    = read_device(memMapHandle,(char*)&eventSize,4,eventSizeReg);        //long access, the event size 
-      if(result == sizeof(eventSize) && eventSize>0){
-         uint32_t startIndex = dataIndex;
-         uint32_t dataId     = config->card_info[index].hw_mask[0];
-        if ( numEventsToReadout*(eventSize+1) + 2> kMaxDataBufferSize-dataIndex ) {
-           /* We can't read out. */ 
-           LogError("Temp buffer too small, requested (%d) > available (%d)",
-                     numEventsToReadout*(eventSize+1)+2, 
-                     kMaxDataBufferSize-dataIndex);
-           close_device( memMapHandle );
-           return config->card_info[index].next_Card_Index;
-         } 
-         
-         //load ORCA header info
-         data[dataIndex++] = dataId | (2+numEventsToReadout*eventSize);
-         data[dataIndex++] = location; //location = crate and card number
-
-         caenDMADevice = get_dma_device(fifoBuffReg+baseAddress, fifoAddressMod, 8, true);
-    
-         if (caenDMADevice == NULL) {
-           close_device( memMapHandle );
-           return config->card_info[index].next_Card_Index;
-         }
-         uint32_t numBytesRead = 0;
-         result = fifoBuffSize;
-         while ( result == fifoBuffSize ) { 
-           result = read_device(caenDMADevice,(char*)(data + dataIndex),
-                                fifoBuffSize, 0); 
-           if ( result < 0 ) {
-             LogBusError("Error reading DMA for V1720: %s", strerror(errno));
-             dataIndex = startIndex;
-             close_device( memMapHandle );
-             release_dma_device();
-             return config->card_info[index].next_Card_Index;
-           }
-           dataIndex += result/4;
-           if ( dataIndex + fifoBuffSize/4 > kMaxDataBufferSize ) {
-             /* Error checking, for some reason we will read past our buffer.*/
-             /* Reset to not do that. */
-             dataIndex = startIndex;
-             LogError("CAEN V1720: Error reading into buffer, trying to continue.");
-           } 
-           numBytesRead += result;
-         }
-         uint32_t numberOfEndWords = 0;         
-         if ( data[dataIndex-1] == 0xFFFFFFFF ) numberOfEndWords = 1;
- 
-         if ( numBytesRead != numEventsToReadout*(eventSize+numberOfEndWords)*4 ) {
-           dataIndex = startIndex; //just flush the event
-           close_device( memMapHandle );
-           release_dma_device();
-           return config->card_info[index].next_Card_Index;
-         }
-         // Reading out with a BERR coudl leave an extra word on the end, get rid of it.
-         dataIndex -= numberOfEndWords;
-      } 
-      else LogBusError("Rd Err: V1720 0x%04x %s",baseAddress,strerror(errno));                
+        uint32_t eventSize;
+        result    = read_device(memMapHandle,(char*)&eventSize,4,eventSizeReg);        //long access, the event size 
+        if(result == sizeof(eventSize) && eventSize>0){
+            uint32_t startIndex = dataIndex;
+            uint32_t dataId     = config->card_info[index].hw_mask[0];
+            if ( numEventsToReadout*(eventSize+1) + 2> kMaxDataBufferSize-dataIndex ) {
+                /* We can't read out. */ 
+                LogError("Temp buffer too small, requested (%d) > available (%d)",
+                          numEventsToReadout*(eventSize+1)+2, 
+                          kMaxDataBufferSize-dataIndex);
+                close_device( memMapHandle );
+                return config->card_info[index].next_Card_Index;
+            } 
+            
+            //load ORCA header info
+            data[dataIndex++] = dataId | (2+numEventsToReadout*eventSize);
+            data[dataIndex++] = location; //location = crate and card number
+          
+            caenDMADevice = get_dma_device(fifoBuffReg+baseAddress, fifoAddressMod, 8, true);
+          
+            if (caenDMADevice == NULL) {
+                close_device( memMapHandle );
+                return config->card_info[index].next_Card_Index;
+            }
+            uint32_t numBytesRead = 0;
+            result = fifoBuffSize;
+            while ( result == fifoBuffSize ) { 
+                result = read_device(caenDMADevice,(char*)(data + dataIndex),
+                                     fifoBuffSize, 0); 
+                if ( result < 0 ) {
+                    LogBusError("Error reading DMA for V1720: %s", strerror(errno));
+                    dataIndex = startIndex;
+                    close_device( memMapHandle );
+                    release_dma_device();
+                    return config->card_info[index].next_Card_Index;
+                }
+                dataIndex += result/4;
+                if ( dataIndex + fifoBuffSize/4 > kMaxDataBufferSize ) {
+                    /* Error checking, for some reason we will read past our buffer.*/
+                    /* Reset to not do that. */
+                    dataIndex = startIndex;
+                    LogError("CAEN V1720: Error reading into buffer, trying to continue.");
+                } 
+                numBytesRead += result;
+            }
+            uint32_t numberOfEndWords = 0;         
+            if ( data[dataIndex-1] == 0xFFFFFFFF ) numberOfEndWords = 1;
+          
+            if ( numBytesRead != numEventsToReadout*(eventSize+numberOfEndWords)*4 ) {
+                dataIndex = startIndex; //just flush the event
+                close_device( memMapHandle );
+                release_dma_device();
+                return config->card_info[index].next_Card_Index;
+            }
+            // Reading out with a BERR coudl leave an extra word on the end, get rid of it.
+            dataIndex -= numberOfEndWords;
+        } 
+        else LogBusError("Rd Err: V1720 0x%04x %s",baseAddress,strerror(errno));                
     }
 
     release_dma_device();
@@ -546,10 +548,10 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
 int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
 
-    static TUVMEDevice* vmeReadOutHandle = 0;
-    static TUVMEDevice* vmeFIFOStateReadOutHandle = 0;
-    static TUVMEDevice* vmeDMADevice = 0;
-    static uint32_t fifoState;
+    TUVMEDevice* vmeReadOutHandle = 0;
+    TUVMEDevice* vmeFIFOStateReadOutHandle = 0;
+    TUVMEDevice* vmeDMADevice = 0;
+    uint32_t fifoState;
 
     uint32_t baseAddress      = config->card_info[index].base_add;
     uint32_t fifoStateAddress = config->card_info[index].deviceSpecificData[0];
@@ -567,124 +569,122 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
     fifoState = 0;
 
     if (config->card_info[index].add_mod == 0x29) {
-      lock_device(vmeAM29Handle);
-      result = read_device(vmeAM29Handle,(char*)&fifoState,2,fifoStateAddress); 
-      unlock_device(vmeAM29Handle);
+        lock_device(vmeAM29Handle);
+        result = read_device(vmeAM29Handle,(char*)&fifoState,2,fifoStateAddress); 
+        unlock_device(vmeAM29Handle);
     } else {
-      vmeFIFOStateReadOutHandle = vmeAM9Handle; 
-      lock_device(vmeFIFOStateReadOutHandle);
-      result = read_device(vmeFIFOStateReadOutHandle, (char*)&fifoState, 4, fifoStateAddress);
-      unlock_device(vmeFIFOStateReadOutHandle);
+        vmeFIFOStateReadOutHandle = vmeAM9Handle; 
+        lock_device(vmeFIFOStateReadOutHandle);
+        result = read_device(vmeFIFOStateReadOutHandle, (char*)&fifoState, 4, fifoStateAddress);
+        unlock_device(vmeFIFOStateReadOutHandle);
     }
     
     if (result <= 0) {
-      return config->card_info[index].next_Card_Index;
+        return config->card_info[index].next_Card_Index;
     }
      
     if ((fifoState & fifoEmptyMask) == 0 || (fifoAddressMod == 0x39 && (fifoState & fifoEmptyMask) != 0)) {
-      if (fifoAddressMod == 0x39) {
-        vmeReadOutHandle = vmeAM39Handle;
-      } else {
-        vmeReadOutHandle = vmeAM9Handle;
-      }
-
-      uint32_t numLongs = 3;
-      int32_t savedIndex = dataIndex;
-      data[dataIndex++] = dataId | 0; //we'll fill in the length later
-      data[dataIndex++] = location;
-      
-      //read the first int32_tword which should be the packet separator: 0xAAAAAAAA
-      uint32_t theValue;
-      lock_device(vmeReadOutHandle);
-      result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-      
-      if (result == 4 && (theValue==0xAAAAAAAA)){
-          
-          //read the first word of actual data so we know how much to read
-          result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-	  unlock_device(vmeReadOutHandle);
-          
-          data[dataIndex++] = theValue;
-          uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
-          int32_t totalNumLongs  = (numLongs + numLongsLeft);
-           
-
-          /* OK, now use dma access. */
-          if (fifoAddressMod == 0x39) {
-            /* Gretina I card */
-            vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4, false);
-          } else {
-            /* Gretina IV card */
-            vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4, true);
-          }
-
-          if (vmeDMADevice == NULL) {
-            return config->card_info[index].next_Card_Index;
-          }
-          
-          result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
-	  release_dma_device();
-          dataIndex += numLongsLeft;
-          
-          if (result != numLongsLeft*4) {
-            return config->card_info[index].next_Card_Index;
-          }
-          data[savedIndex] |= totalNumLongs; //see, we did fill it in...
-
-      } else if(result < 0) {
-	unlock_device(vmeReadOutHandle);
-        LogBusError("Rd Err: Gretina 0x%04x %s",baseAddress,strerror(errno));
-
-      } else {
-        LogError("Rd Err: Gretina 0x%04x Buffer out of sequence, trying to recover",baseAddress);
-        //oops... really bad -- the buffer read is out of sequence -- try to recover 
-        uint32_t i = 0;
-        while(i < sizeOfFIFO) {
-            result = read_device(vmeReadOutHandle,(char*) (&theValue),4,fifoAddress); 
-            if (result == 0) { // means the FIFO is empty
-              unlock_device(vmeReadOutHandle);
-              return config->card_info[index].next_Card_Index;
-            } else if (result < 0) {
-              unlock_device(vmeReadOutHandle);
-              LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-              return config->card_info[index].next_Card_Index;
-            }
-            if (theValue == 0xAAAAAAAA) break;
-            i++;
-        }
-        //read the first word of actual data so we know how much to read
-        //note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
-        //we'll reset the index to dump the data later....
-        result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
-        unlock_device(vmeReadOutHandle);
-
-        if (result < 0) {
-            LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));                
-            return config->card_info[index].next_Card_Index;
-        }
-        uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
-         
-        /* OK, now use dma access. */
         if (fifoAddressMod == 0x39) {
-          /* Gretina I card */
-          vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4, false);
-        } 
-        else {
-          /* Gretina IV card */
-          vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4, true);
+            vmeReadOutHandle = vmeAM39Handle;
+        } else {
+            vmeReadOutHandle = vmeAM9Handle;
         }
-        if (vmeDMADevice == NULL) {
-            LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-            return config->card_info[index].next_Card_Index;
+       
+        uint32_t numLongs = 3;
+        int32_t savedIndex = dataIndex;
+        data[dataIndex++] = dataId | 0; //we'll fill in the length later
+        data[dataIndex++] = location;
+        
+        //read the first int32_tword which should be the packet separator: 0xAAAAAAAA
+        uint32_t theValue;
+        lock_device(vmeReadOutHandle);
+        result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
+        
+        if (result == 4 && (theValue==0xAAAAAAAA)){
+            //read the first word of actual data so we know how much to read
+            result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
+            unlock_device(vmeReadOutHandle);
+            
+            data[dataIndex++] = theValue;
+            uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
+            int32_t totalNumLongs  = (numLongs + numLongsLeft);
+             
+       
+            /* OK, now use dma access. */
+            if (fifoAddressMod == 0x39) {
+                /* Gretina I card */
+                vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4, false);
+            } else {
+                /* Gretina IV card */
+                vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4, true);
+            }
+       
+            if (vmeDMADevice == NULL) {
+                return config->card_info[index].next_Card_Index;
+            }
+            
+            result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
+            release_dma_device();
+            dataIndex += numLongsLeft;
+            
+            if (result != numLongsLeft*4) {
+                return config->card_info[index].next_Card_Index;
+            }
+            data[savedIndex] |= totalNumLongs; //see, we did fill it in...
+       
+        } else if(result < 0) {
+            unlock_device(vmeReadOutHandle);
+            LogBusError("Rd Err: Gretina 0x%04x %s",baseAddress,strerror(errno));
+        } else {
+            //oops... really bad -- the buffer read is out of sequence -- try to recover 
+            LogError("Rd Err: Gretina 0x%04x Buffer out of sequence, trying to recover",baseAddress);
+            uint32_t i = 0;
+            while(i < sizeOfFIFO) {
+                result = read_device(vmeReadOutHandle,(char*) (&theValue),4,fifoAddress); 
+                if (result == 0) { // means the FIFO is empty
+                    unlock_device(vmeReadOutHandle);
+                    return config->card_info[index].next_Card_Index;
+                } else if (result < 0) {
+                    unlock_device(vmeReadOutHandle);
+                    LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                    return config->card_info[index].next_Card_Index;
+                }
+                if (theValue == 0xAAAAAAAA) break;
+                i++;
+            }
+            //read the first word of actual data so we know how much to read
+            //note that we are NOT going to save the data, but we do use the data buffer to hold the garbage
+            //we'll reset the index to dump the data later....
+            result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
+            unlock_device(vmeReadOutHandle);
+           
+            if (result < 0) {
+                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));                
+                return config->card_info[index].next_Card_Index;
+            }
+            uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
+             
+            /* OK, now use dma access. */
+            if (fifoAddressMod == 0x39) {
+                /* Gretina I card */
+                vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4, false);
+            } 
+            else {
+                /* Gretina IV card */
+                vmeDMADevice = get_dma_device(fifoAddress, fifoAddressMod, 4, true);
+            }
+            if (vmeDMADevice == NULL) {
+                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                return config->card_info[index].next_Card_Index;
+            }
+            result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
+            release_dma_device();
+            if (result < 0) {
+                LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
+                return config->card_info[index].next_Card_Index;
+            }
+            dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
         }
-        result = read_device(vmeDMADevice,(char*)(&data[dataIndex]),numLongsLeft*4, 0); 
-	release_dma_device();
-        if (result < 0) {
-            LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
-            return config->card_info[index].next_Card_Index;
-        }
-         dataIndex = savedIndex; //DUMP the data by reseting the data Index back to where it was when we got it.
-      }
     }
     return config->card_info[index].next_Card_Index;
 
@@ -697,21 +697,21 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
 
-#define kCaen_Header          0x2
-#define kCaen_ValidDatum      0x0
-#define kCaen_EndOfBlock      0x4
-#define kCaen_NotValidDatum  0x6    
-
-#define kCaen_DataWordTypeMask    0x07000000
-#define kCaen_DataWordTypeShift 24
-#define isValidCaenData(x)      ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_ValidDatum)
-#define isNotValidCaenData(x)   ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_NotValidDatum)
-#define isCaenHeader(x)            ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_Header)
-#define isCaenEndOfBlock(x)     ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_EndOfBlock)
-
-#define kCaen_DataChannelCountMask    0x00003f00
+#define kCaen_Header               0x2
+#define kCaen_ValidDatum           0x0
+#define kCaen_EndOfBlock           0x4
+#define kCaen_NotValidDatum        0x6    
+#define kCaen_DataWordTypeMask     0x07000000
+#define kCaen_DataWordTypeShift    24
+#define kCaen_DataChannelCountMask 0x00003f00
 #define kCaen_DataChannelCoutShift 8
-#define caenDataChannelCount(x) (((x) & kCaen_DataChannelCountMask) >> kCaen_DataChannelCoutShift)
+
+#define isValidCaenData(x)       ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_ValidDatum)
+#define isNotValidCaenData(x)    ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_NotValidDatum)
+#define isCaenHeader(x)          ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_Header)
+#define isCaenEndOfBlock(x)      ((((x) & kCaen_DataWordTypeMask) >> kCaen_DataWordTypeShift) == kCaen_EndOfBlock)
+#define caenDataChannelCount(x)  (((x) & kCaen_DataChannelCountMask) >> kCaen_DataChannelCoutShift)
+
   
     /* The deviceSpecificData is as follows:          */ 
     /* 0: statusOne register                          */
@@ -748,12 +748,12 @@ int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDa
     }
 
     uint8_t bufferIsNotBusy =  !((statusOne & 0x0004) >> 2);
-    uint8_t dataIsReady        =  statusOne & 0x0001;
+    uint8_t dataIsReady     =  statusOne & 0x0001;
     uint8_t bufferIsFull    =  (statusTwo & 0x0004) >> 2;
 
     if ((bufferIsNotBusy && dataIsReady) || bufferIsFull) {
     
-        unsigned long dataValue;
+        uint32_t dataValue;
         //read the first word, could be a header, or the buffer could be empty now
         result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
         if (result != 4) {
@@ -771,8 +771,7 @@ int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDa
             if(isCaenHeader(dataValue)) {
                 //got a header, store it
                 data[dataIndex++] = dataValue;
-            }
-            else {
+            } else {
                 //error--flush buffer
                 flush_CAEN_Fifo(config,index);
                 unlock_device(vmeAM39Handle);
@@ -780,8 +779,8 @@ int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDa
             }
             
             //read out the channel count
-            int n = caenDataChannelCount(dataValue); //decode the channel from the data word
-            int i;
+            int32_t n = caenDataChannelCount(dataValue); //decode the channel from the data word
+            int32_t i;
             for(i=0;i<n;i++){
                 result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
                 if (result != 4) {
@@ -832,13 +831,14 @@ int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDa
 
 void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index)
 {
-    uint32_t fifoSize          = config->card_info[index].deviceSpecificData[3];
-    uint32_t fifoAddress      = config->card_info[index].base_add + config->card_info[index].deviceSpecificData[4];
+    /* The vmeAM39Handle device *must* be locked before calling this function. */
+    uint32_t fifoSize    = config->card_info[index].deviceSpecificData[3];
+    uint32_t fifoAddress = config->card_info[index].base_add + config->card_info[index].deviceSpecificData[4];
     
-    int i;
-    unsigned long dataValue;
+    int32_t i;
+    uint32_t dataValue;
     for(i=0;i<fifoSize;i++){
-        int result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
+        int32_t result = read_device(vmeAM39Handle,(char*)&dataValue,4,fifoAddress); 
         if (result != 4) {
             LogBusError("CAEN 0x%0x Couldn't flush fifo",config->card_info[index].base_add);
             break;
@@ -855,9 +855,9 @@ int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
     lamData->lamNumber = config->card_info[index].slot;
 
     SBC_Packet lamPacket;
-    lamPacket.cmdHeader.destination             = kSBC_Process;
-    lamPacket.cmdHeader.cmdID                    = kSBC_LAM;
-    lamPacket.cmdHeader.numberBytesinPayload    = sizeof(SBC_LAM_Data);
+    lamPacket.cmdHeader.destination           = kSBC_Process;
+    lamPacket.cmdHeader.cmdID                 = kSBC_LAM;
+    lamPacket.cmdHeader.numberBytesinPayload  = sizeof(SBC_LAM_Data);
     
     memcpy(&lamPacket.payload, lamData, sizeof(SBC_LAM_Data));
     postLAM(&lamPacket);
