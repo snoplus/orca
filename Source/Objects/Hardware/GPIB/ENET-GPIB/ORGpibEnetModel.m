@@ -56,8 +56,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     
     mErrorMsg = [[ NSMutableString alloc ] initWithFormat: @"" ];
     
-    for ( i = 0; i < kMaxGpibAddresses; i++ )
-    {
+    for ( i = 0; i < kMaxGpibAddresses; i++ ){
         mDeviceUnit[ i ] = kNotInitialized;
         mDeviceSecondaryAddress[ i ] = 0;
     } 
@@ -85,7 +84,8 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [noDriverAlarm setHelpStringFromFile:@"NoNI488DriversHelp"];
 
         }
-    } else {
+    } 
+	else {
         /* It's not here, let's make sure the user knows that. */
         NSLogColor([NSColor redColor],[NSString stringWithFormat:@"*** Unable To Locate %@. Please re-install Orca. ***\n",[ self pluginName ]]);
         noPluginAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Plugin %@ not Found",[self pluginName]] severity:0];
@@ -788,7 +788,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     if ( ! [ self isEnabled ]) return;
     NS_DURING
         // Handle the master error register and extract error.
-        [theHWLock unlock];   //-----end critical section
+        [theHWLock lock];   //-----begin critical section
         [ aMsg appendString: [ NSString stringWithFormat:  @" ibsta = 0x%x < ", [ gpibEnetInstance ibsta ] ]];
         
         NSMutableString *errorType = [[ NSMutableString alloc ] initWithFormat: @"" ];
