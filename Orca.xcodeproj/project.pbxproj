@@ -3652,14 +3652,14 @@
 		9C7DCCA50E202C1B0034CC44 /* ORNPLCommBoardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardModel.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.h"; sourceTree = SOURCE_ROOT; };
 		9C7DCCA60E202C1B0034CC44 /* ORNPLCommBoardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNPLCommBoardModel.m; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.m"; sourceTree = SOURCE_ROOT; };
 		9C7E0885051A522B005F64D5 /* MuxScopeMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MuxScopeMap.h; path = Source/Experiments/Ncd/Detector/MuxScopeMap.h; sourceTree = SOURCE_ROOT; };
-		9C88467D0E2D8D960099B98E /* ORHP4405A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ORHP4405A.nib; path = "Spectral Analyzer HPE4405A/ORHP4405A.nib"; sourceTree = "<group>"; };
-		9C88467E0E2D8D960099B98E /* ORHP4405AController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHP4405AController.h; path = "Spectral Analyzer HPE4405A/ORHP4405AController.h"; sourceTree = "<group>"; };
-		9C88467F0E2D8D960099B98E /* ORHP4405AController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP4405AController.m; path = "Spectral Analyzer HPE4405A/ORHP4405AController.m"; sourceTree = "<group>"; };
-		9C8846800E2D8D960099B98E /* ORHP4405AData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHP4405AData.h; path = "Spectral Analyzer HPE4405A/ORHP4405AData.h"; sourceTree = "<group>"; };
-		9C8846810E2D8D960099B98E /* ORHP4405AData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP4405AData.m; path = "Spectral Analyzer HPE4405A/ORHP4405AData.m"; sourceTree = "<group>"; };
-		9C8846820E2D8D960099B98E /* ORHP4405AModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHP4405AModel.h; path = "Spectral Analyzer HPE4405A/ORHP4405AModel.h"; sourceTree = "<group>"; };
-		9C8846830E2D8D960099B98E /* ORHP4405AModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHP4405AModel.m; path = "Spectral Analyzer HPE4405A/ORHP4405AModel.m"; sourceTree = "<group>"; };
-		9C8846A50E2D90ED0099B98E /* HP4405A.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HP4405A.gif; path = "Spectral Analyzer HPE4405A/HP4405A.gif"; sourceTree = "<group>"; };
+		9C88467D0E2D8D960099B98E /* ORHP4405A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ORHP4405A.nib; sourceTree = "<group>"; };
+		9C88467E0E2D8D960099B98E /* ORHP4405AController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AController.h; sourceTree = "<group>"; };
+		9C88467F0E2D8D960099B98E /* ORHP4405AController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AController.m; sourceTree = "<group>"; };
+		9C8846800E2D8D960099B98E /* ORHP4405AData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AData.h; sourceTree = "<group>"; };
+		9C8846810E2D8D960099B98E /* ORHP4405AData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AData.m; sourceTree = "<group>"; };
+		9C8846820E2D8D960099B98E /* ORHP4405AModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AModel.h; sourceTree = "<group>"; };
+		9C8846830E2D8D960099B98E /* ORHP4405AModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AModel.m; sourceTree = "<group>"; };
+		9C8846A50E2D90ED0099B98E /* HP4405A.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = HP4405A.gif; sourceTree = "<group>"; };
 		9CB167770C5BC9580053CFAD /* xAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = xAxisMarker.gif; path = Source/Widgets/Plotting/xAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		9CB167780C5BC9580053CFAD /* yAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = yAxisMarker.gif; path = Source/Widgets/Plotting/yAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		9CB167FA0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = xAxisMarkerOpposite.gif; path = Source/Widgets/Plotting/xAxisMarkerOpposite.gif; sourceTree = SOURCE_ROOT; };
@@ -6140,9 +6140,8 @@
 				8492D7500B7A891C0065F3DE /* Gretina.nib */,
 				8492D7510B7A891C0065F3DE /* GretinaCard.gif */,
 			);
-			name = Gretina;
-			path = Source/Objects/Hardware/Vme/Gretina;
-			sourceTree = SOURCE_ROOT;
+			path = Gretina;
+			sourceTree = "<group>";
 		};
 		8493CC2F0C99FA0700B46CD4 /* SBC */ = {
 			isa = PBXGroup;
@@ -7151,14 +7150,6 @@
 				84C4939704059AEA005F64B1 /* ENET-GPIB */,
 				846B8F070E15972A00C41F9D /* ICS8065 */,
 				9C88467B0E2D8D960099B98E /* Spectral Analyzer HPE4405A */,
-				9C8846A50E2D90ED0099B98E /* HP4405A.gif */,
-				9C88467D0E2D8D960099B98E /* ORHP4405A.nib */,
-				9C88467E0E2D8D960099B98E /* ORHP4405AController.h */,
-				9C88467F0E2D8D960099B98E /* ORHP4405AController.m */,
-				9C8846800E2D8D960099B98E /* ORHP4405AData.h */,
-				9C8846810E2D8D960099B98E /* ORHP4405AData.m */,
-				9C8846820E2D8D960099B98E /* ORHP4405AModel.h */,
-				9C8846830E2D8D960099B98E /* ORHP4405AModel.m */,
 				84992CAD0DD21F3800E82DB4 /* HP3458a */,
 				8425384A0BC6E006004C8065 /* HP6622a */,
 				844D92F50A0A79AA00E83C57 /* Pulser33220 */,
@@ -7899,6 +7890,14 @@
 		9C88467B0E2D8D960099B98E /* Spectral Analyzer HPE4405A */ = {
 			isa = PBXGroup;
 			children = (
+				9C8846A50E2D90ED0099B98E /* HP4405A.gif */,
+				9C88467D0E2D8D960099B98E /* ORHP4405A.nib */,
+				9C88467E0E2D8D960099B98E /* ORHP4405AController.h */,
+				9C88467F0E2D8D960099B98E /* ORHP4405AController.m */,
+				9C8846800E2D8D960099B98E /* ORHP4405AData.h */,
+				9C8846810E2D8D960099B98E /* ORHP4405AData.m */,
+				9C8846820E2D8D960099B98E /* ORHP4405AModel.h */,
+				9C8846830E2D8D960099B98E /* ORHP4405AModel.m */,
 			);
 			name = "Spectral Analyzer HPE4405A";
 			path = "Source/Objects/Hardware/GPIB/Spectral Analyzer HPE4405A";
@@ -8168,8 +8167,8 @@
 				8467E6A406480F0A00A35E6A /* Trigger32 */,
 				84749D0A07D6526F001553EC /* MCarrier */,
 				845115E104030088005F64B1 /* IPCarrier */,
-				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
 				8492D70E0B7A80770065F3DE /* Gretina */,
+				84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */,
 			);
 			path = Vme;
 			sourceTree = "<group>";
