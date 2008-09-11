@@ -149,7 +149,7 @@ enum Gretina4FIFOStates {
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumGretina4Channels];
-	BOOL isRunning;
+	BOOL			isRunning;
 
     int fifoState;
 	ORAlarm*        fifoFullAlarm;
@@ -174,8 +174,13 @@ enum Gretina4FIFOStates {
 	int noiseFloorOffset;
     float noiseFloorIntegrationTime;
 	
+    NSString* mainFPGADownLoadState;
 	BOOL isFlashWriteEnabled;
-
+    NSString* fpgaFilePath;
+	BOOL stopDownLoadingMainFPGA;
+	BOOL downLoadMainFPGAInProgress;
+    int fpgaDownProgress;
+	NSLock* progressLock;
 }
 
 - (id) init;
@@ -184,6 +189,13 @@ enum Gretina4FIFOStates {
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (BOOL) downLoadMainFPGAInProgress;
+- (void) setDownLoadMainFPGAInProgress:(BOOL)aState;
+- (int) fpgaDownProgress;
+- (NSString*) mainFPGADownLoadState;
+- (void) setMainFPGADownLoadState:(NSString*)aMainFPGADownLoadState;
+- (NSString*) fpgaFilePath;
+- (void) setFpgaFilePath:(NSString*)aFpgaFilePath;
 - (float) noiseFloorIntegrationTime;
 - (void) setNoiseFloorIntegrationTime:(float)aNoiseFloorIntegrationTime;
 - (int) fifoState;
@@ -273,17 +285,10 @@ enum Gretina4FIFOStates {
 - (void) findNoiseFloors;
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
-- (void) testFlashStatusRegisterWithNoFlashCmd;
-- (void) testFlashStatusRegisterWithFlashCmd;
-- (void) blockEraseFlashAtBlock:(unsigned long)blockNumber;
-- (void) programFlashBufferAtAddress:(const void*)theData 
-						startAddress:(unsigned long)anAddress 
-						numberOfBytesToWrite:(unsigned long)aNumber;
-- (void) blockEraseFlash;					   
-- (void) programFlashBuffer:(NSData*)theData;
-- (void) resetFlashStatus;
-- (void) enableFlashEraseAndProg;
-- (void) disableFlashEraseAndProg;
+
+#pragma mark ¥¥¥FPGA download
+- (void) startDownLoadingMainFPGA;
+- (void) stopDownLoadingMainFPGA;
 
 #pragma mark ¥¥¥Data Taker
 - (unsigned long) dataId;
@@ -317,6 +322,10 @@ enum Gretina4FIFOStates {
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey;
 @end
 
+extern NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged;
+extern NSString* ORGretina4ModelFpgaDownProgressChanged;
+extern NSString* ORGretina4ModelMainFPGADownLoadStateChanged;
+extern NSString* ORGretina4ModelFpgaFilePathChanged;
 extern NSString* ORGretina4ModelNoiseFloorIntegrationTimeChanged;
 extern NSString* ORGretina4ModelNoiseFloorOffsetChanged;
 

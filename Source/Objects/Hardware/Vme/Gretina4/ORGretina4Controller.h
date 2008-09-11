@@ -28,6 +28,7 @@
 @interface ORGretina4Controller : OrcaObjectController 
 {
     IBOutlet NSTabView* 	tabView;
+
     //basic ops page
 	IBOutlet NSMatrix*		enabledMatrix;
 	IBOutlet NSMatrix*		cfdEnabledMatrix;
@@ -79,6 +80,13 @@
     IBOutlet NSButton*      statusButton;
     IBOutlet NSButton*      noiseFloorButton;
     IBOutlet NSTextField*   fifoState;
+	
+	//FPGA download
+	IBOutlet NSTextField*			fpgaFilePathField;
+	IBOutlet NSButton*				loadMainFPGAButton;
+	IBOutlet NSButton*				stopFPGALoadButton;
+    IBOutlet NSProgressIndicator*	loadFPGAProgress;
+	IBOutlet NSTextField*			mainFPGADownLoadStateField;
 
     //rate page
     IBOutlet NSMatrix*      rateTextFields;
@@ -94,10 +102,6 @@
     IBOutlet ORPlotter1D*   timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
 	
-	//FPGA page
-	IBOutlet NSButton*		loadMainFPGAFromFile;
-    IBOutlet NSProgressIndicator* loadFPGAProgress;
-
 
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
@@ -117,6 +121,10 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Interface Management
+- (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
+- (void) fpgaDownProgressChanged:(NSNotification*)aNote;
+- (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote;
+- (void) fpgaFilePathChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
@@ -147,9 +155,6 @@
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
-- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
-            returnCode:(int)returnCode
-           contextInfo:(void*)contextInfo;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) baseAddressAction:(id)sender;
@@ -181,6 +186,7 @@
 - (IBAction) dataDelayAction:(id)sender;
 - (IBAction) dataLengthAction:(id)sender;
 - (IBAction) downloadMainFPGAAction:(id)sender;
+- (IBAction) stopLoadingMainFPGAAction:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (double)  getBarValue:(int)tag;

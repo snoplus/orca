@@ -30,6 +30,13 @@
 #import "ORTimeRate.h"
 #import "ORRate.h"
 
+@interface ORGretina4Controller (private)
+
+- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
+						 returnCode:(int)returnCode
+						contextInfo:(void*)contextInfo;
+@end
+
 @implementation ORGretina4Controller
 
 -(id)init
@@ -220,16 +227,44 @@
                      selector : @selector(cfdThresholdChanged:)
                          name : ORGretina4ModelCFDThresholdChanged
                        object : model];
+					   
     [notifyCenter addObserver : self
                      selector : @selector(dataDelayChanged:)
                          name : ORGretina4ModelDataDelayChanged
                        object : model];
+					   
     [notifyCenter addObserver : self
                      selector : @selector(dataLengthChanged:)
                          name : ORGretina4ModelDataLengthChanged
                        object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector(fpgaFilePathChanged:)
+                         name : ORGretina4ModelFpgaFilePathChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(mainFPGADownLoadStateChanged:)
+                         name : ORGretina4ModelMainFPGADownLoadStateChanged
+						object: model];
+ 
+	[notifyCenter addObserver : self
+                     selector : @selector(fpgaDownProgressChanged:)
+                         name : ORGretina4ModelFpgaDownProgressChanged
+						object: model];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(fpgaDownInProgressChanged:)
+                         name : ORGretina4ModelMainFPGADownLoadInProgressChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(settingsLockChanged:)
+                         name : ORGretina4ModelMainFPGADownLoadInProgressChanged
+                       object : nil];
 
     [self registerRates];
+
 }
 
 - (void) registerRates
@@ -284,9 +319,35 @@
 	[self noiseFloorOffsetChanged:nil];
 
 
+	[self fpgaFilePathChanged:nil];
+	[self mainFPGADownLoadStateChanged:nil];
+	[self fpgaDownProgressChanged:nil];
+	[self fpgaDownInProgressChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) fpgaDownInProgressChanged:(NSNotification*)aNote
+{
+	if([model downLoadMainFPGAInProgress])[loadFPGAProgress startAnimation:self];
+	else [loadFPGAProgress stopAnimation:self];
+}
+
+- (void) fpgaDownProgressChanged:(NSNotification*)aNote
+{
+	NSLog(@"%d\n",[model fpgaDownProgress]);
+	[loadFPGAProgress setDoubleValue:(double)[model fpgaDownProgress]];
+}
+
+- (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote
+{
+	[mainFPGADownLoadStateField setStringValue: [model mainFPGADownLoadState]];
+}
+
+- (void) fpgaFilePathChanged:(NSNotification*)aNote
+{
+	[fpgaFilePathField setStringValue: [[model fpgaFilePath] stringByAbbreviatingWithTildeInPath]];
+}
+
 - (void) enabledChanged:(NSNotification*)aNote
 {
 	short i;
@@ -449,33 +510,37 @@
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORGretina4SettingsLock];
     BOOL locked = [gSecurity isLocked:ORGretina4SettingsLock];
-    
+    BOOL downloading = [model downLoadMainFPGAInProgress];
+	
 	[self setFifoStateLabel];
 	
     [settingLockButton setState: locked];
-    [addressText setEnabled:!locked && !runInProgress];
-    [initButton setEnabled:!lockedOrRunningMaintenance];
-    [clearFIFOButton setEnabled:!locked && !runInProgress];
-	[noiseFloorButton setEnabled:!locked && !runInProgress];
-	[statusButton setEnabled:!lockedOrRunningMaintenance];
-	[probeButton setEnabled:!locked && !runInProgress];
-	[enabledMatrix setEnabled:!lockedOrRunningMaintenance];
-	[cfdEnabledMatrix setEnabled:!lockedOrRunningMaintenance];
-	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance];
-	[debugMatrix setEnabled:!lockedOrRunningMaintenance];
-	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance];
-	[ledThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-	[cfdDelayMatrix setEnabled:!lockedOrRunningMaintenance];
-	[cfdFractionMatrix setEnabled:!lockedOrRunningMaintenance];
-	[cfdThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
-	[dataDelayMatrix setEnabled:!lockedOrRunningMaintenance];
-	[dataLengthMatrix setEnabled:!lockedOrRunningMaintenance];
-	[cardInfoMatrix setEnabled:!lockedOrRunningMaintenance];
+    [addressText setEnabled:!locked && !runInProgress && !downloading];
+    [initButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [clearFIFOButton setEnabled:!locked && !runInProgress && !downloading];
+	[noiseFloorButton setEnabled:!locked && !runInProgress && !downloading];
+	[statusButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[probeButton setEnabled:!locked && !runInProgress && !downloading];
+	[enabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[cfdEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[poleZeroEnabledMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[debugMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[pileUpMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[ledThresholdMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[cfdDelayMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[cfdFractionMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[cfdThresholdMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[dataDelayMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[dataLengthMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[cardInfoMatrix setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[resetButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+	[loadMainFPGAButton setEnabled:!locked && !downloading];
+	[stopFPGALoadButton setEnabled:!locked && downloading];
 	
 	int i;
 	for(i=0;i<kNumGretina4Channels;i++){
-		[polarityPU[i] setEnabled:!lockedOrRunningMaintenance];
-		[triggerModePU[i] setEnabled:!lockedOrRunningMaintenance];
+		[polarityPU[i] setEnabled:!lockedOrRunningMaintenance && !downloading];
+		[triggerModePU[i] setEnabled:!lockedOrRunningMaintenance && !downloading];
 	}		
 }
 
@@ -538,7 +603,6 @@
         [integrationText setDoubleValue: dValue];
     }
 }
-
 
 - (void) scaleAction:(NSNotification*)aNotification
 {
@@ -610,20 +674,6 @@
     }
 }
 
-- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
-            returnCode:(int)returnCode
-           contextInfo:(void*)contextInfo
-{
-    if(returnCode){
-        NSString* fileName = [sheet filename];
-		NSData* dataFromFile = [NSData dataWithContentsOfFile:fileName];
-		[model blockEraseFlash];
-		[model programFlashBuffer:dataFromFile];
-		//[self setBuffer:(const unsigned short*)[dataFromFile bytes] length:[dataFromFile length]/2];		
-		//[self performSelector:@selector(programFlashBuffer) withObject:self afterDelay:0.1];
-		NSLog(@"Programming Complete.\n");
-    }
-}
 
 #pragma mark ¥¥¥Actions
 - (IBAction) enabledAction:(id)sender
@@ -891,19 +941,22 @@
 	[openPanel setCanChooseDirectories:NO];
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:NO];
-	[openPanel setPrompt:@"Select bin file to upload to FPGA"];
+	[openPanel setPrompt:@"Select FPGA Binary File"];
 	[openPanel beginSheetForDirectory:NSHomeDirectory()
 								 file:nil
-								types:[NSArray arrayWithObjects:@"bin",nil]
+								types:nil //[NSArray arrayWithObjects:@"bin",nil]
 					   modalForWindow:[self window]
 						modalDelegate:self
 					   didEndSelector:@selector(openPanelForMainFPGADidEnd:returnCode:contextInfo:)
 						  contextInfo:NULL];
 }
 
+- (IBAction) stopLoadingMainFPGAAction:(id)sender
+{
+	[model stopDownLoadingMainFPGA];
+}
 
 #pragma mark ¥¥¥Data Source
-
 - (double) getBarValue:(int)tag
 {
 	
@@ -927,6 +980,20 @@
 - (unsigned long)  	secondsPerUnit:(id) aPlotter
 {
 	return [[[model waveFormRateGroup]timeRate]sampleTime];
+}
+
+@end
+
+@implementation ORGretina4Controller (private)
+
+- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
+						 returnCode:(int)returnCode
+						contextInfo:(void*)contextInfo
+{
+    if(returnCode){
+		[model setFpgaFilePath:[sheet filename]];
+		[model startDownLoadingMainFPGA];
+    }
 }
 
 @end

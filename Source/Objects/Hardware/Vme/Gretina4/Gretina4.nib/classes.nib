@@ -200,6 +200,8 @@
 				<string>id</string>
 				<key>settingLockAction</key>
 				<string>id</string>
+				<key>stopLoadingMainFPGAAction</key>
+				<string>id</string>
 				<key>triggerModeAction</key>
 				<string>id</string>
 			</dict>
@@ -235,6 +237,8 @@
 				<string>NSMatrix</string>
 				<key>fifoState</key>
 				<string>NSTextField</string>
+				<key>fpgaFilePathField</key>
+				<string>NSTextField</string>
 				<key>initButton</key>
 				<string>NSButton</string>
 				<key>integrationStepper</key>
@@ -243,8 +247,12 @@
 				<string>NSTextField</string>
 				<key>ledThresholdMatrix</key>
 				<string>NSMatrix</string>
-				<key>loadMainFPGAFromFile</key>
+				<key>loadFPGAProgress</key>
+				<string>NSProgressIndicator</string>
+				<key>loadMainFPGAButton</key>
 				<string>NSButton</string>
+				<key>mainFPGADownLoadStateField</key>
+				<string>NSTextField</string>
 				<key>noiseFloorButton</key>
 				<string>NSButton</string>
 				<key>noiseFloorIntegrationField</key>
@@ -296,6 +304,8 @@
 				<key>startNoiseFloorButton</key>
 				<string>NSButton</string>
 				<key>statusButton</key>
+				<string>NSButton</string>
+				<key>stopFPGALoadButton</key>
 				<string>NSButton</string>
 				<key>tabView</key>
 				<string>NSTabView</string>

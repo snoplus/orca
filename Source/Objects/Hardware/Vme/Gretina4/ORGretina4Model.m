@@ -29,6 +29,9 @@
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
 
+NSString* ORGretina4ModelFpgaDownProgressChanged = @"ORGretina4ModelFpgaDownProgressChanged";
+NSString* ORGretina4ModelMainFPGADownLoadStateChanged = @"ORGretina4ModelMainFPGADownLoadStateChanged";
+NSString* ORGretina4ModelFpgaFilePathChanged	= @"ORGretina4ModelFpgaFilePathChanged";
 NSString* ORGretina4ModelNoiseFloorIntegrationTimeChanged = @"ORGretina4ModelNoiseFloorIntegrationTimeChanged";
 NSString* ORGretina4ModelNoiseFloorOffsetChanged = @"ORGretina4ModelNoiseFloorOffsetChanged";
 NSString* ORGretina4CardInfoUpdated				= @"ORGretina4CardInfoUpdated";
@@ -50,6 +53,25 @@ NSString* ORGretina4ModelCFDFractionChanged		= @"ORGretina4ModelCFDFractionChang
 NSString* ORGretina4ModelCFDThresholdChanged	= @"ORGretina4ModelCFDThresholdChanged";
 NSString* ORGretina4ModelDataDelayChanged		= @"ORGretina4ModelDataDelayChanged";
 NSString* ORGretina4ModelDataLengthChanged		= @"ORGretina4ModelDataLengthChanged";
+NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged		= @"ORGretina4ModelMainFPGADownLoadInProgressChanged";
+
+@interface ORGretina4Model (private)
+- (void) programFlashBuffer:(NSData*)theData;
+- (void) resetFlashStatus;
+- (void) enableFlashEraseAndProg;
+- (void) disableFlashEraseAndProg;
+- (void) testFlashStatusRegisterWithNoFlashCmd;
+- (void) testFlashStatusRegisterWithFlashCmd;
+- (void) blockEraseFlashAtBlock:(unsigned long)blockNumber;
+- (void) programFlashBufferAtAddress:(const void*)theData 
+						startAddress:(unsigned long)anAddress 
+						numberOfBytesToWrite:(unsigned long)aNumber;
+- (void) blockEraseFlash;					   
+- (void) programFlashBuffer:(NSData*)theData;
+- (void) setProgressStateOnMainThread:(NSString*)aState;
+- (void) updateDownLoadProgress;
+- (void) downloadingMainFPGADone;
+@end
 
 
 @implementation ORGretina4Model
@@ -155,10 +177,13 @@ static struct {
 
 - (void) dealloc 
 {
+    [mainFPGADownLoadState release];
+    [fpgaFilePath release];
     [waveFormRateGroup release];
     [cardInfo release];
 	[fifoFullAlarm clearAlarm];
 	[fifoFullAlarm release];
+	[progressLock release];
     [super dealloc];
 }
 
@@ -178,6 +203,54 @@ static struct {
 }
 
 #pragma mark ***Accessors
+- (BOOL) downLoadMainFPGAInProgress
+{
+	return downLoadMainFPGAInProgress;
+}
+
+- (void) setDownLoadMainFPGAInProgress:(BOOL)aState
+{
+	downLoadMainFPGAInProgress = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelMainFPGADownLoadInProgressChanged object:self];	
+}
+
+- (int) fpgaDownProgress
+{
+	int temp;
+	[progressLock lock];
+    temp = fpgaDownProgress;
+	[progressLock unlock];
+    return temp;
+}
+
+- (NSString*) mainFPGADownLoadState
+{
+	if(!mainFPGADownLoadState) return @"--";
+    else return mainFPGADownLoadState;
+}
+
+- (void) setMainFPGADownLoadState:(NSString*)aMainFPGADownLoadState
+{
+	if(!aMainFPGADownLoadState) aMainFPGADownLoadState = @"--";
+    [mainFPGADownLoadState autorelease];
+    mainFPGADownLoadState = [aMainFPGADownLoadState copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelMainFPGADownLoadStateChanged object:self];
+}
+
+- (NSString*) fpgaFilePath
+{
+    return fpgaFilePath;
+}
+
+- (void) setFpgaFilePath:(NSString*)aFpgaFilePath
+{
+	if(!aFpgaFilePath)aFpgaFilePath = @"";
+    [fpgaFilePath autorelease];
+    fpgaFilePath = [aFpgaFilePath copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelFpgaFilePathChanged object:self];
+}
 
 - (float) noiseFloorIntegrationTime
 {
@@ -976,243 +1049,30 @@ static struct {
 	[[self undoManager] enableUndoRegistration];
 }
 
-- (void) testFlashStatusRegisterWithNoFlashCmd
+- (void) startDownLoadingMainFPGA
 {
-	unsigned long tempToRead;
-	while(1) {
-		// Checking status to make sure that flash is ready
-		[[self adapter] readLongBlock:&tempToRead
-						atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
-						numToRead:1
-						withAddMod:[self addressModifier]
-						usingAddSpace:0x01];		
-		if ( (tempToRead & kGretina4FlashReady) != 0 ) break;
+	if(!progressLock)progressLock = [[NSLock alloc] init];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelFpgaDownProgressChanged object:self];
+
+	stopDownLoadingMainFPGA = NO;
+	NSData* dataFromFile = [NSData dataWithContentsOfFile:fpgaFilePath];
+
+	//to minimize disruptions to the download thread we'll check and update the progress from the main thread via a timer.
+	fpgaDownProgress = 0;
+
+	[self setDownLoadMainFPGAInProgress: YES];
+	[self updateDownLoadProgress];
+
+	[NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:dataFromFile];
+}
+
+- (void) stopDownLoadingMainFPGA
+{
+	if(downLoadMainFPGAInProgress){
+		stopDownLoadingMainFPGA = YES;
 	}
-	
 }
 
-- (void) testFlashStatusRegisterWithFlashCmd
-{
-	unsigned long tempToWrite = kGretina4FlashStatusRegCmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	[self testFlashStatusRegisterWithNoFlashCmd];
-}
-
-- (void) blockEraseFlashAtBlock:(unsigned long)blockNumber
-{
-
-	/* First setup the block erase */
-	if (!isFlashWriteEnabled) {
-		NSLog(@"Gretina4: Error erasing flash, not enabled.\n");
-		return;
-	}
-	unsigned long tempToWrite = 0x0;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-					 
-	tempToWrite = kGretina4FlashBlockEraseCmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-
-	/* Now denote which block we're going to do. */
-	tempToWrite = blockNumber*kGretina4FlashBlockSize;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-					 
-	/* And confirm. */
-	tempToWrite = kGretina4FlashConfirmCmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];					 
-
-	/* Now make sure that it finishes correctly. We don't need to issue the flash command to
-	   read the status register because the confirm command already sets that.  */
-	[self testFlashStatusRegisterWithNoFlashCmd];
-	
-}
-
-- (void) blockEraseFlash
-{
-	/* We only erase the blocks currently used in the Gretina4 specification. */
-	[self enableFlashEraseAndProg];
-	unsigned int i;
-	for (i=0; i<kGretina4UsedFlashBlocks; i++ ) {
-		NS_DURING
-			[self blockEraseFlashAtBlock:i];
-		NS_HANDLER
-			NSLog(@"Gretina4 exception erasing flash.\n");
-		NS_ENDHANDLER
-	}
-	[self disableFlashEraseAndProg];
-	
-	[self resetFlashStatus];
-}
-
--(void) resetFlashStatus
-{
-	unsigned long tempToWrite = kGretina4FlashClearrSRCmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-					 
-	tempToWrite = kGretina4FlashReadArrayCmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	tempToWrite = 0x0;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-}
-
-- (void) enableFlashEraseAndProg
-{
-	unsigned long tempToWrite = kGretina4FlashEnableWrite;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kVMEGPControl]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	isFlashWriteEnabled = YES;
-}
-
-- (void) disableFlashEraseAndProg
-{
-	unsigned long tempToWrite = kGretina4FlashDisableWrite;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kVMEGPControl]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-					 
-	isFlashWriteEnabled = NO;
-}
-
-- (void) programFlashBufferAtAddress:(const void*)theData 
-						startAddress:(unsigned long)anAddress 
-						numberOfBytesToWrite:(unsigned long)aNumber
-{
-	static char bufferToWrite[kGretina4FlashBufferBytes];
-	if ( aNumber > kGretina4FlashBufferBytes ) {
-		NSLog(@"Gretina4: Trying to program too many bytes in flash memory.\n");
-		return;
-	}
-	if ( !isFlashWriteEnabled ) {
-		NSLog(@"Gretina4: Error programming flash, is not enabled.\n");
-		return;
-	}
-	/* Load the words into the bufferToWrite */
-
-	memcpy(bufferToWrite, theData, aNumber);
-	
-	if ( aNumber < kGretina4FlashBufferBytes ) {
-		unsigned int i;
-		for ( i=aNumber; i<kGretina4FlashBufferBytes; i++ ) {
-			bufferToWrite[i] = 0;
-		}
-	} 	
-	unsigned long tempToWrite = anAddress;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-					 
-	tempToWrite = kGretina4FlashWriteCmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-	
-	while(1) {
-		// Checking status to make sure that flash is ready
-		/* This is slightly different since we give another command if the status hasn't updated. */
-		[[self adapter] readLongBlock:&tempToWrite
-							 atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
-							numToRead:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];		
-		if ( (tempToWrite & kGretina4FlashReady)  == 0 ) {
-			tempToWrite = kGretina4FlashWriteCmd;
-			[[self adapter] writeLongBlock:&tempToWrite
-								 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-								numToWrite:1
-								withAddMod:[self addressModifier]
-							 usingAddSpace:0x01];			
-		} else break;
-	}
-	
-	// Setting how many we are trying to write
-	tempToWrite = (aNumber/2) - 1;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-
-	// Loading all the words in
-	unsigned long i;
-	for ( i=0; i<aNumber; i+=4 ) {
-		tempToWrite =   (((unsigned long)bufferToWrite[i]) & 0xFF) |    
-						(((unsigned long)(bufferToWrite[i+1]) <<  8) & 0xFF00) |    
-						(((unsigned long)(bufferToWrite[i+2]) << 16) & 0xFF0000)|    
-						(((unsigned long)(bufferToWrite[i+3]) << 24) & 0xFF000000);
-		[[self adapter] writeLongBlock:&tempToWrite
-							 atAddress:[self baseAddress] + fpga_register_offsets[kFlashDataWithAddrIncr]
-							numToWrite:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];	
-	}
-
-	// Finishing the write
-	tempToWrite = kGretina4FlashConfirmCmd;
-	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
-						numToWrite:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-					 
-	[self testFlashStatusRegisterWithNoFlashCmd];
-}
-
-- (void) programFlashBuffer:(NSData*)theData 
-{
-	[self enableFlashEraseAndProg];
-	unsigned long address = 0x0;
-	while (address < [theData length] ) {
-		[ self programFlashBufferAtAddress:([theData bytes] + address)
-					startAddress:address
-					numberOfBytesToWrite:( ( ([theData length]-address) > kGretina4FlashBufferBytes) 
-									? kGretina4FlashBufferBytes : ([theData length]-address) )];
-		address += kGretina4FlashBufferBytes;
-	}
-	[self disableFlashEraseAndProg];
-	
-	[self resetFlashStatus];
-}
 
 #pragma mark ¥¥¥Data Taker
 - (unsigned long) dataId { return dataId; }
@@ -1624,8 +1484,9 @@ static struct {
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setNoiseFloorIntegrationTime:[decoder decodeFloatForKey:@"NoiseFloorIntegrationTime"]];
-    [self setNoiseFloorOffset:[decoder decodeIntForKey:@"NoiseFloorOffset"]];
+    [self setFpgaFilePath:				[decoder decodeObjectForKey:@"fpgaFilePath"]];
+    [self setNoiseFloorIntegrationTime:	[decoder decodeFloatForKey:@"NoiseFloorIntegrationTime"]];
+    [self setNoiseFloorOffset:			[decoder decodeIntForKey:@"NoiseFloorOffset"]];
     cardInfo = [[decoder decodeObjectForKey:@"cardInfo"] retain];
     
     
@@ -1640,17 +1501,17 @@ static struct {
 	
 	int i;
 	for(i=0;i<kNumGretina4Channels;i++){
-		[self setEnabled:i withValue:[decoder decodeIntForKey:[@"enabled" stringByAppendingFormat:@"%d",i]]];
-		[self setDebug:i withValue:[decoder decodeIntForKey:[@"debug" stringByAppendingFormat:@"%d",i]]];
-		[self setPileUp:i withValue:[decoder decodeIntForKey:[@"pileUp" stringByAppendingFormat:@"%d",i]]];
-		[self setPolarity:i withValue:[decoder decodeIntForKey:[@"polarity" stringByAppendingFormat:@"%d",i]]];
-		[self setTriggerMode:i withValue:[decoder decodeIntForKey:[@"triggerMode" stringByAppendingFormat:@"%d",i]]];
+		[self setEnabled:i		withValue:[decoder decodeIntForKey:[@"enabled"	stringByAppendingFormat:@"%d",i]]];
+		[self setDebug:i		withValue:[decoder decodeIntForKey:[@"debug"	stringByAppendingFormat:@"%d",i]]];
+		[self setPileUp:i		withValue:[decoder decodeIntForKey:[@"pileUp"	stringByAppendingFormat:@"%d",i]]];
+		[self setPolarity:i		withValue:[decoder decodeIntForKey:[@"polarity" stringByAppendingFormat:@"%d",i]]];
+		[self setTriggerMode:i	withValue:[decoder decodeIntForKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]]];
 		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
 		[self setCFDThreshold:i withValue:[decoder decodeIntForKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]]];
-		[self setCFDDelay:i withValue:[decoder decodeIntForKey:[@"cfdDelay" stringByAppendingFormat:@"%d",i]]];
-		[self setCFDFraction:i withValue:[decoder decodeIntForKey:[@"cfdFraction" stringByAppendingFormat:@"%d",i]]];
-		[self setDataDelay:i withValue:[decoder decodeIntForKey:[@"dataDelay" stringByAppendingFormat:@"%d",i]]];
-		[self setDataLength:i withValue:[decoder decodeIntForKey:[@"dataLength" stringByAppendingFormat:@"%d",i]]];
+		[self setCFDDelay:i		withValue:[decoder decodeIntForKey:[@"cfdDelay"		stringByAppendingFormat:@"%d",i]]];
+		[self setCFDFraction:i	withValue:[decoder decodeIntForKey:[@"cfdFraction"	stringByAppendingFormat:@"%d",i]]];
+		[self setDataDelay:i	withValue:[decoder decodeIntForKey:[@"dataDelay"	stringByAppendingFormat:@"%d",i]]];
+		[self setDataLength:i	withValue:[decoder decodeIntForKey:[@"dataLength"	stringByAppendingFormat:@"%d",i]]];
 	}
 	      
     [[self undoManager] enableUndoRegistration];
@@ -1661,23 +1522,24 @@ static struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeFloat:noiseFloorIntegrationTime forKey:@"NoiseFloorIntegrationTime"];
-    [encoder encodeInt:noiseFloorOffset forKey:@"NoiseFloorOffset"];
-    [encoder encodeObject:cardInfo forKey:@"cardInfo"];
-    [encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
+    [encoder encodeObject:fpgaFilePath				forKey:@"fpgaFilePath"];
+    [encoder encodeFloat:noiseFloorIntegrationTime	forKey:@"NoiseFloorIntegrationTime"];
+    [encoder encodeInt:noiseFloorOffset				forKey:@"NoiseFloorOffset"];
+    [encoder encodeObject:cardInfo					forKey:@"cardInfo"];
+    [encoder encodeObject:waveFormRateGroup			forKey:@"waveFormRateGroup"];
 	int i;
  	for(i=0;i<kNumGretina4Channels;i++){
-		[encoder encodeInt:enabled[i] forKey:[@"enabled" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:debug[i] forKey:[@"debug" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:pileUp[i] forKey:[@"pileUp" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:polarity[i] forKey:[@"polarity" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:triggerMode[i] forKey:[@"triggerMode" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdFraction[i] forKey:[@"cfdFraction" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdDelay[i] forKey:[@"cfdDelay" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdThreshold[i] forKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:ledThreshold[i] forKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:dataDelay[i] forKey:[@"dataDelay" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:dataLength[i] forKey:[@"dataLength" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:enabled[i]		forKey:[@"enabled"		stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:debug[i]			forKey:[@"debug"		stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:pileUp[i]		forKey:[@"pileUp"		stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:polarity[i]		forKey:[@"polarity"		stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:triggerMode[i]	forKey:[@"triggerMode"	stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:cfdFraction[i]	forKey:[@"cfdFraction"	stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:cfdDelay[i]		forKey:[@"cfdDelay"		stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:cfdThreshold[i]	forKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:ledThreshold[i]	forKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:dataDelay[i]		forKey:[@"dataDelay"	stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt:dataLength[i]	forKey:[@"dataLength"	stringByAppendingFormat:@"%d",i]];
 	}
 
  }
@@ -1720,6 +1582,305 @@ static struct {
 	}
 	[dictionary setObject:ar forKey:aKey];
 }
+@end
 
+@implementation ORGretina4Model (private)
+
+- (void) updateDownLoadProgress
+{
+	//call only from main thread
+	NSLog(@"update\n");
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelFpgaDownProgressChanged object:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:(self) selector:@selector(updateDownLoadProgress) object:nil];
+	if(downLoadMainFPGAInProgress)[self performSelector:@selector(updateDownLoadProgress) withObject:nil afterDelay:.1];
+}
+
+- (void) setFpgaDownProgress:(int)aFpgaDownProgress
+{
+	[progressLock lock];
+    fpgaDownProgress = aFpgaDownProgress;
+	[progressLock unlock];
+}
+
+- (void) setProgressStateOnMainThread:(NSString*)aState
+{
+	if(!aState)aState = @"--";
+	//this post a notification to the GUI so it must be done on the main thread
+	[self performSelectorOnMainThread:@selector(setMainFPGADownLoadState:) withObject:aState waitUntilDone:NO];
+}
+
+- (void) fpgaDownLoadThread:(NSData*)dataFromFile
+{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	
+	NS_DURING
+		[self setProgressStateOnMainThread:@"Block Erase"];
+		if(!stopDownLoadingMainFPGA) [self blockEraseFlash];
+		[self setProgressStateOnMainThread:@"Programming"];
+		if(!stopDownLoadingMainFPGA) [self programFlashBuffer:dataFromFile];
+		//[self setBuffer:(const unsigned short*)[dataFromFile bytes] length:[dataFromFile length]/2];		
+		//[self performSelector:@selector(programFlashBuffer) withObject:self afterDelay:0.1];
+	NS_HANDLER
+		[self setProgressStateOnMainThread:@"Exception"];
+	NS_ENDHANDLER
+	[self performSelectorOnMainThread:@selector(downloadingMainFPGADone) withObject:nil waitUntilDone:NO];
+	[pool release];
+}
+
+- (void) programFlashBuffer:(NSData*)theData 
+{
+	//[self enableFlashEraseAndProg];
+	unsigned long address = 0x0;
+	long totalSize = [theData length];
+	while (address < totalSize ) {
+
+		[ self programFlashBufferAtAddress:([theData bytes] + address)
+					startAddress:address
+					numberOfBytesToWrite:( ( ([theData length]-address) > kGretina4FlashBufferBytes) 
+									? kGretina4FlashBufferBytes : ([theData length]-address) )];
+		address += kGretina4FlashBufferBytes;
+		if(stopDownLoadingMainFPGA)break;
+		
+		if(address%(totalSize/1000) == 0){
+			[self setFpgaDownProgress: 100. * address/(float)totalSize];
+		}
+	}
+	if(!stopDownLoadingMainFPGA) [self disableFlashEraseAndProg];
+	if(!stopDownLoadingMainFPGA) [self resetFlashStatus];
+	[self setFpgaDownProgress: 100];
+	[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];
+	[self setFpgaDownProgress: 0];
+}
+
+- (void) blockEraseFlash
+{
+	/* We only erase the blocks currently used in the Gretina4 specification. */
+	[self enableFlashEraseAndProg];
+	unsigned int i;
+	for (i=0; i<kGretina4UsedFlashBlocks; i++ ) {
+		NS_DURING
+			[self blockEraseFlashAtBlock:i];
+		NS_HANDLER
+			NSLog(@"Gretina4 exception erasing flash.\n");
+		NS_ENDHANDLER
+	}
+	[self disableFlashEraseAndProg];
+	
+	[self resetFlashStatus];
+}
+
+-(void) resetFlashStatus
+{
+	unsigned long tempToWrite = kGretina4FlashClearrSRCmd;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+					 
+	tempToWrite = kGretina4FlashReadArrayCmd;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	tempToWrite = 0x0;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+- (void) enableFlashEraseAndProg
+{
+	unsigned long tempToWrite = kGretina4FlashEnableWrite;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kVMEGPControl]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	isFlashWriteEnabled = YES;
+}
+
+- (void) disableFlashEraseAndProg
+{
+	unsigned long tempToWrite = kGretina4FlashDisableWrite;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kVMEGPControl]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+					 
+	isFlashWriteEnabled = NO;
+}
+
+- (void) programFlashBufferAtAddress:(const void*)theData 
+						startAddress:(unsigned long)anAddress 
+						numberOfBytesToWrite:(unsigned long)aNumber
+{
+	static char bufferToWrite[kGretina4FlashBufferBytes];
+	if ( aNumber > kGretina4FlashBufferBytes ) {
+		NSLog(@"Gretina4: Trying to program too many bytes in flash memory.\n");
+		return;
+	}
+	if ( !isFlashWriteEnabled ) {
+		NSLog(@"Gretina4: Error programming flash, is not enabled.\n");
+		return;
+	}
+	/* Load the words into the bufferToWrite */
+
+	memcpy(bufferToWrite, theData, aNumber);
+	
+	if ( aNumber < kGretina4FlashBufferBytes ) {
+		unsigned int i;
+		for ( i=aNumber; i<kGretina4FlashBufferBytes; i++ ) {
+			bufferToWrite[i] = 0;
+		}
+	} 	
+	unsigned long tempToWrite = anAddress;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+					 
+	tempToWrite = kGretina4FlashWriteCmd;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+	while(1) {
+		// Checking status to make sure that flash is ready
+		/* This is slightly different since we give another command if the status hasn't updated. */
+		[[self adapter] readLongBlock:&tempToWrite
+							 atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
+							numToRead:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];		
+		if ( (tempToWrite & kGretina4FlashReady)  == 0 ) {
+			tempToWrite = kGretina4FlashWriteCmd;
+			[[self adapter] writeLongBlock:&tempToWrite
+								 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+								numToWrite:1
+								withAddMod:[self addressModifier]
+							 usingAddSpace:0x01];			
+		} else break;
+	}
+	
+	// Setting how many we are trying to write
+	tempToWrite = (aNumber/2) - 1;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+
+	// Loading all the words in
+	unsigned long i;
+	for ( i=0; i<aNumber; i+=4 ) {
+		tempToWrite =   (((unsigned long)bufferToWrite[i]) & 0xFF) |    
+						(((unsigned long)(bufferToWrite[i+1]) <<  8) & 0xFF00) |    
+						(((unsigned long)(bufferToWrite[i+2]) << 16) & 0xFF0000)|    
+						(((unsigned long)(bufferToWrite[i+3]) << 24) & 0xFF000000);
+		[[self adapter] writeLongBlock:&tempToWrite
+							 atAddress:[self baseAddress] + fpga_register_offsets[kFlashDataWithAddrIncr]
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];	
+	}
+
+	// Finishing the write
+	tempToWrite = kGretina4FlashConfirmCmd;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+					 
+	[self testFlashStatusRegisterWithNoFlashCmd];
+}
+
+- (void) testFlashStatusRegisterWithNoFlashCmd
+{
+	unsigned long tempToRead;
+	while(1) {
+		// Checking status to make sure that flash is ready
+		[[self adapter] readLongBlock:&tempToRead
+						atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
+						numToRead:1
+						withAddMod:[self addressModifier]
+						usingAddSpace:0x01];		
+		if ( (tempToRead & kGretina4FlashReady) != 0 ) break;
+	}
+	
+}
+
+- (void) testFlashStatusRegisterWithFlashCmd
+{
+	unsigned long tempToWrite = kGretina4FlashStatusRegCmd;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	[self testFlashStatusRegisterWithNoFlashCmd];
+}
+
+- (void) blockEraseFlashAtBlock:(unsigned long)blockNumber
+{
+
+	/* First setup the block erase */
+	if (!isFlashWriteEnabled) {
+		NSLog(@"Gretina4: Error erasing flash, not enabled.\n");
+		return;
+	}
+	unsigned long tempToWrite = 0x0;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+					 
+	tempToWrite = kGretina4FlashBlockEraseCmd;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+
+	/* Now denote which block we're going to do. */
+	tempToWrite = blockNumber*kGretina4FlashBlockSize;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+					 
+	/* And confirm. */
+	tempToWrite = kGretina4FlashConfirmCmd;
+	[[self adapter] writeLongBlock:&tempToWrite
+						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];					 
+
+	/* Now make sure that it finishes correctly. We don't need to issue the flash command to
+	   read the status register because the confirm command already sets that.  */
+	[self testFlashStatusRegisterWithNoFlashCmd];
+	
+}
+
+- (void) downloadingMainFPGADone
+{
+	[self setProgressStateOnMainThread:@"--"];
+	if(!stopDownLoadingMainFPGA) NSLog(@"Programming Complete.\n");
+	else						 NSLog(@"Programming manually stopped before done\n");
+	[self setDownLoadMainFPGAInProgress: NO];
+
+}
 
 @end
