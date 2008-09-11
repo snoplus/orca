@@ -53,6 +53,10 @@
 #define kGretina4FlashStatusRegCmd	0x70
 #define kGretina4FlashClearrSRCmd	0x50
 
+#define kGretina4ResetMainFPGACmd	0x30
+#define kGretina4ReloadMainFPGACmd	0x3
+#define kGretina4MainFPGAIsLoaded	0x41
+
 
 #pragma mark ¥¥¥Register Definitions
 enum {

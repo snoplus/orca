@@ -334,7 +334,6 @@
 
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote
 {
-	NSLog(@"%d\n",[model fpgaDownProgress]);
 	[loadFPGAProgress setDoubleValue:(double)[model fpgaDownProgress]];
 }
 
