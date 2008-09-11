@@ -38,6 +38,22 @@
 
 #define kGretina4PacketSeparator    0xAAAAAAAA
 
+#define kGretina4FlashMaxWordCount	0xF
+#define kGretina4FlashBlockSize		( 128 * 1024 )
+#define kGretina4FlashBlocks		128
+#define kGretina4UsedFlashBlocks	( kGretina4FlashBlocks / 4 )
+#define kGretina4FlashBufferBytes	32
+#define kGretina4FlashReady			0x80
+#define kGretina4FlashEnableWrite	0x10
+#define kGretina4FlashDisableWrite	0x0
+#define kGretina4FlashConfirmCmd	0xD0
+#define kGretina4FlashWriteCmd		0xE8
+#define kGretina4FlashBlockEraseCmd	0x20
+#define kGretina4FlashReadArrayCmd	0xFF
+#define kGretina4FlashStatusRegCmd	0x70
+#define kGretina4FlashClearrSRCmd	0x50
+
+
 #pragma mark ¥¥¥Register Definitions
 enum {
 	kBoardID,					//[0] board ID
@@ -87,6 +103,21 @@ enum {
 	kNumberOfGretina4Registers	//must be last
 };
 
+enum {
+	kMainFPGAControl,			//[0] Main Digitizer FPGA configuration register
+	kMainFPGAStatus,			//[1] Main Digitizer FPGA status register
+	kVoltageAndTemperature,		//[2] Voltage and Temperature Status
+	kVMEGPControl,				//[3] General Purpose VME Control Settings
+	kVMETimeoutValue,			//[4] VME Timeout Value Register
+	kVMEFPGAVersionStatus,		//[5] VME Version/Status
+	kVMEFPGASandbox,			//[6] VME FPGA Sandbox Register Block
+	kFlashAddress,				//[7] Flash Address
+	kFlashDataWithAddrIncr,		//[8] Flash Data with Auto-increment address
+	kFlashData,					//[9] Flash Data
+	kFlashCommandRegister,		//[10] Flash Command Register
+	kNumberOfFPGARegisters
+};
+
 enum Gretina4FIFOStates {
 	kEmpty,
 	kAlmostEmpty,	
@@ -100,7 +131,6 @@ enum Gretina4FIFOStates {
   @private
 	unsigned long   dataId;
 	unsigned long*  dataBuffer;
-	BOOL            inited;
 
 	NSMutableArray* cardInfo;
     short			enabled[kNumGretina4Channels];
@@ -143,6 +173,9 @@ enum Gretina4FIFOStates {
 	int noiseFloorTestValue;
 	int noiseFloorOffset;
     float noiseFloorIntegrationTime;
+	
+	BOOL isFlashWriteEnabled;
+
 }
 
 - (id) init;
@@ -240,6 +273,17 @@ enum Gretina4FIFOStates {
 - (void) findNoiseFloors;
 - (void) stepNoiseFloor;
 - (BOOL) noiseFloorRunning;
+- (void) testFlashStatusRegisterWithNoFlashCmd;
+- (void) testFlashStatusRegisterWithFlashCmd;
+- (void) blockEraseFlashAtBlock:(unsigned long)blockNumber;
+- (void) programFlashBufferAtAddress:(const void*)theData 
+						startAddress:(unsigned long)anAddress 
+						numberOfBytesToWrite:(unsigned long)aNumber;
+- (void) blockEraseFlash;					   
+- (void) programFlashBuffer:(NSData*)theData;
+- (void) resetFlashStatus;
+- (void) enableFlashEraseAndProg;
+- (void) disableFlashEraseAndProg;
 
 #pragma mark ¥¥¥Data Taker
 - (unsigned long) dataId;

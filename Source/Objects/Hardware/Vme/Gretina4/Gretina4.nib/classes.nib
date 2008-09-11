@@ -1,179 +1,408 @@
-{
-    IBClasses = (
-        {
-            ACTIONS = {"" = id; }; 
-            CLASS = FirstResponder; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {ACTIONS = {tasksCompleted = id; }; CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {CLASS = NSView; LANGUAGE = ObjC; SUPERCLASS = NSResponder; }, 
-        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            ACTIONS = {
-                setLogScale = id; 
-                shiftLeft = id; 
-                shiftRight = id; 
-                zoomIn = id; 
-                zoomOut = id; 
-            }; 
-            CLASS = ORAxis; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {
-                baseAddressAction = id; 
-                cardInfoAction = id; 
-                cfdDelayAction = id; 
-                cfdEnabledAction = id; 
-                cfdFractionAction = id; 
-                cfdThresholdAction = id; 
-                clearFIFO = id; 
-                closeNoiseFloorPanel = id; 
-                dataDelayAction = id; 
-                dataLengthAction = id; 
-                debugAction = id; 
-                enabledAction = id; 
-                findNoiseFloors = id; 
-                initBoard = id; 
-                integrationAction = id; 
-                ledThresholdAction = id; 
-                noiseFloorIntegrationAction = id; 
-                noiseFloorOffsetAction = id; 
-                openNoiseFloorPanel = id; 
-                pileUpAction = id; 
-                polarityAction = id; 
-                poleZeroEnabledAction = id; 
-                probeBoard = id; 
-                readStatus = id; 
-                resetBoard = id; 
-                settingLockAction = id; 
-                triggerModeAction = id; 
-            }; 
-            CLASS = ORGretina4Controller; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                addressText = NSTextField; 
-                cardInfoMatrix = NSMatrix; 
-                cfdDelayMatrix = NSMatrix; 
-                cfdEnabledMatrix = NSMatrix; 
-                cfdFractionMatrix = NSMatrix; 
-                cfdThresholdMatrix = NSMatrix; 
-                clearFIFOButton = NSButton; 
-                dataDelayMatrix = NSMatrix; 
-                dataLengthMatrix = NSMatrix; 
-                debugMatrix = NSMatrix; 
-                enabled2Matrix = NSMatrix; 
-                enabledMatrix = NSMatrix; 
-                fifoState = NSTextField; 
-                initButton = NSButton; 
-                integrationStepper = NSStepper; 
-                integrationText = NSTextField; 
-                ledThresholdMatrix = NSMatrix; 
-                noiseFloorButton = NSButton; 
-                noiseFloorIntegrationField = NSTextField; 
-                noiseFloorOffsetField = NSTextField; 
-                noiseFloorPanel = NSPanel; 
-                noiseFloorProgress = NSProgressIndicator; 
-                pileUpMatrix = NSMatrix; 
-                polarityPU0 = NSPopUpButton; 
-                polarityPU1 = NSPopUpButton; 
-                polarityPU2 = NSPopUpButton; 
-                polarityPU3 = NSPopUpButton; 
-                polarityPU4 = NSPopUpButton; 
-                polarityPU5 = NSPopUpButton; 
-                polarityPU6 = NSPopUpButton; 
-                polarityPU7 = NSPopUpButton; 
-                polarityPU8 = NSPopUpButton; 
-                polarityPU9 = NSPopUpButton; 
-                poleZeroEnabledMatrix = NSMatrix; 
-                probeButton = NSButton; 
-                rate0 = ORValueBar; 
-                rateLogCB = NSButton; 
-                rateTextFields = NSMatrix; 
-                resetButton = NSButton; 
-                settingLockButton = NSButton; 
-                slotField = NSTextField; 
-                startNoiseFloorButton = NSButton; 
-                statusButton = NSButton; 
-                tabView = NSTabView; 
-                timeRateLogCB = NSButton; 
-                timeRatePlot = ORPlotter1D; 
-                totalRate = ORValueBar; 
-                totalRateLogCB = NSButton; 
-                totalRateText = NSTextField; 
-                triggerModePU0 = NSPopUpButton; 
-                triggerModePU1 = NSPopUpButton; 
-                triggerModePU2 = NSPopUpButton; 
-                triggerModePU3 = NSPopUpButton; 
-                triggerModePU4 = NSPopUpButton; 
-                triggerModePU5 = NSPopUpButton; 
-                triggerModePU6 = NSPopUpButton; 
-                triggerModePU7 = NSPopUpButton; 
-                triggerModePU8 = NSPopUpButton; 
-                triggerModePU9 = NSPopUpButton; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {
-                addGateAction = id; 
-                analyze = id; 
-                autoScale = id; 
-                averageWindowAction = id; 
-                centerOnPeak = id; 
-                clearActiveCurveGates = id; 
-                clearActiveGate = id; 
-                clearAllGates = id; 
-                copy = id; 
-                differentiateAction = id; 
-                removeGateAction = id; 
-                resetScales = id; 
-                savePDF = id; 
-                xAndYAutoScale = id; 
-            }; 
-            CLASS = ORPlotter1D; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                analysisDrawer = NSDrawer; 
-                analysisView = ZFlowLayout; 
-                mDataSource = id; 
-                mXScale = ORAxis; 
-                mYScale = ORAxis; 
-            }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {CLASS = ORTimeAxis; LANGUAGE = ObjC; SUPERCLASS = ORAxis; }, 
-        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
-        {
-            CLASS = ORValueBar; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {
-                copy = id; 
-                decDialog = id; 
-                incDialog = id; 
-                modelStepperAction = id; 
-                modelSwitchAction = id; 
-                saveDocument = id; 
-                saveDocumentAs = id; 
-            }; 
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                model = id; 
-                modelStepper = NSStepper; 
-                modelSwitchPopUp = NSPopUpButton; 
-                warningField = ORTimedTextField; 
-            }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {CLASS = ZFlowLayout; LANGUAGE = ObjC; SUPERCLASS = NSView; }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORValueBar</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>chainedView</key>
+				<string>id</string>
+				<key>dataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key></key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>modelStepperAction</key>
+				<string>id</string>
+				<key>modelSwitchAction</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>modelStepper</key>
+				<string>NSStepper</string>
+				<key>modelSwitchPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>baseAddressAction</key>
+				<string>id</string>
+				<key>cardInfoAction</key>
+				<string>id</string>
+				<key>cfdDelayAction</key>
+				<string>id</string>
+				<key>cfdEnabledAction</key>
+				<string>id</string>
+				<key>cfdFractionAction</key>
+				<string>id</string>
+				<key>cfdThresholdAction</key>
+				<string>id</string>
+				<key>clearFIFO</key>
+				<string>id</string>
+				<key>closeNoiseFloorPanel</key>
+				<string>id</string>
+				<key>dataDelayAction</key>
+				<string>id</string>
+				<key>dataLengthAction</key>
+				<string>id</string>
+				<key>debugAction</key>
+				<string>id</string>
+				<key>downloadMainFPGAAction</key>
+				<string>id</string>
+				<key>enabledAction</key>
+				<string>id</string>
+				<key>findNoiseFloors</key>
+				<string>id</string>
+				<key>initBoard</key>
+				<string>id</string>
+				<key>integrationAction</key>
+				<string>id</string>
+				<key>ledThresholdAction</key>
+				<string>id</string>
+				<key>noiseFloorIntegrationAction</key>
+				<string>id</string>
+				<key>noiseFloorOffsetAction</key>
+				<string>id</string>
+				<key>openNoiseFloorPanel</key>
+				<string>id</string>
+				<key>pileUpAction</key>
+				<string>id</string>
+				<key>polarityAction</key>
+				<string>id</string>
+				<key>poleZeroEnabledAction</key>
+				<string>id</string>
+				<key>probeBoard</key>
+				<string>id</string>
+				<key>readStatus</key>
+				<string>id</string>
+				<key>resetBoard</key>
+				<string>id</string>
+				<key>settingLockAction</key>
+				<string>id</string>
+				<key>triggerModeAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORGretina4Controller</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>addressText</key>
+				<string>NSTextField</string>
+				<key>cardInfoMatrix</key>
+				<string>NSMatrix</string>
+				<key>cfdDelayMatrix</key>
+				<string>NSMatrix</string>
+				<key>cfdEnabledMatrix</key>
+				<string>NSMatrix</string>
+				<key>cfdFractionMatrix</key>
+				<string>NSMatrix</string>
+				<key>cfdThresholdMatrix</key>
+				<string>NSMatrix</string>
+				<key>clearFIFOButton</key>
+				<string>NSButton</string>
+				<key>dataDelayMatrix</key>
+				<string>NSMatrix</string>
+				<key>dataLengthMatrix</key>
+				<string>NSMatrix</string>
+				<key>debugMatrix</key>
+				<string>NSMatrix</string>
+				<key>enabled2Matrix</key>
+				<string>NSMatrix</string>
+				<key>enabledMatrix</key>
+				<string>NSMatrix</string>
+				<key>fifoState</key>
+				<string>NSTextField</string>
+				<key>initButton</key>
+				<string>NSButton</string>
+				<key>integrationStepper</key>
+				<string>NSStepper</string>
+				<key>integrationText</key>
+				<string>NSTextField</string>
+				<key>ledThresholdMatrix</key>
+				<string>NSMatrix</string>
+				<key>loadMainFPGAFromFile</key>
+				<string>NSButton</string>
+				<key>noiseFloorButton</key>
+				<string>NSButton</string>
+				<key>noiseFloorIntegrationField</key>
+				<string>NSTextField</string>
+				<key>noiseFloorOffsetField</key>
+				<string>NSTextField</string>
+				<key>noiseFloorPanel</key>
+				<string>NSPanel</string>
+				<key>noiseFloorProgress</key>
+				<string>NSProgressIndicator</string>
+				<key>pileUpMatrix</key>
+				<string>NSMatrix</string>
+				<key>polarityPU0</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU1</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU2</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU3</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU4</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU5</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU6</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU7</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU8</key>
+				<string>NSPopUpButton</string>
+				<key>polarityPU9</key>
+				<string>NSPopUpButton</string>
+				<key>poleZeroEnabledMatrix</key>
+				<string>NSMatrix</string>
+				<key>probeButton</key>
+				<string>NSButton</string>
+				<key>rate0</key>
+				<string>ORValueBar</string>
+				<key>rateLogCB</key>
+				<string>NSButton</string>
+				<key>rateTextFields</key>
+				<string>NSMatrix</string>
+				<key>resetButton</key>
+				<string>NSButton</string>
+				<key>settingLockButton</key>
+				<string>NSButton</string>
+				<key>slotField</key>
+				<string>NSTextField</string>
+				<key>startNoiseFloorButton</key>
+				<string>NSButton</string>
+				<key>statusButton</key>
+				<string>NSButton</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
+				<key>timeRateLogCB</key>
+				<string>NSButton</string>
+				<key>timeRatePlot</key>
+				<string>ORPlotter1D</string>
+				<key>totalRate</key>
+				<string>ORValueBar</string>
+				<key>totalRateLogCB</key>
+				<string>NSButton</string>
+				<key>totalRateText</key>
+				<string>NSTextField</string>
+				<key>triggerModePU0</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU1</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU2</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU3</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU4</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU5</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU6</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU7</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU8</key>
+				<string>NSPopUpButton</string>
+				<key>triggerModePU9</key>
+				<string>NSPopUpButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimeAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORAxis</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

@@ -610,6 +610,21 @@
     }
 }
 
+- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
+            returnCode:(int)returnCode
+           contextInfo:(void*)contextInfo
+{
+    if(returnCode){
+        NSString* fileName = [sheet filename];
+		NSData* dataFromFile = [NSData dataWithContentsOfFile:fileName];
+		[model blockEraseFlash];
+		[model programFlashBuffer:dataFromFile];
+		//[self setBuffer:(const unsigned short*)[dataFromFile bytes] length:[dataFromFile length]/2];		
+		//[self performSelector:@selector(programFlashBuffer) withObject:self afterDelay:0.1];
+		NSLog(@"Programming Complete.\n");
+    }
+}
+
 #pragma mark ¥¥¥Actions
 - (IBAction) enabledAction:(id)sender
 {
@@ -868,6 +883,22 @@
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
+}
+
+- (IBAction) downloadMainFPGAAction:(id)sender
+{
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+	[openPanel setCanChooseDirectories:NO];
+	[openPanel setCanChooseFiles:YES];
+	[openPanel setAllowsMultipleSelection:NO];
+	[openPanel setPrompt:@"Select bin file to upload to FPGA"];
+	[openPanel beginSheetForDirectory:NSHomeDirectory()
+								 file:nil
+								types:[NSArray arrayWithObjects:@"bin",nil]
+					   modalForWindow:[self window]
+						modalDelegate:self
+					   didEndSelector:@selector(openPanelForMainFPGADidEnd:returnCode:contextInfo:)
+						  contextInfo:NULL];
 }
 
 

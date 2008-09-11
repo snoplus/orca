@@ -93,6 +93,10 @@
     IBOutlet NSButton*      totalRateLogCB;
     IBOutlet ORPlotter1D*   timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
+	
+	//FPGA page
+	IBOutlet NSButton*		loadMainFPGAFromFile;
+    IBOutlet NSProgressIndicator* loadFPGAProgress;
 
 
     //offset panel
@@ -143,6 +147,9 @@
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
+- (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
+            returnCode:(int)returnCode
+           contextInfo:(void*)contextInfo;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) baseAddressAction:(id)sender;
@@ -173,6 +180,7 @@
 - (IBAction) cfdThresholdAction:(id)sender;
 - (IBAction) dataDelayAction:(id)sender;
 - (IBAction) dataLengthAction:(id)sender;
+- (IBAction) downloadMainFPGAAction:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (double)  getBarValue:(int)tag;
