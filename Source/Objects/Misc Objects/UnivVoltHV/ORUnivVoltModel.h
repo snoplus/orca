@@ -33,10 +33,12 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 @interface ORUnivVoltModel : ORCard 
 {
 	id						adapter;
-	NSMutableArray*			mChannelDict;
+	NSMutableArray*			channelArray;
 }
 
 #pragma mark •••Accessors
+- (NSMutableArray*) channelArray;
+- (void) setChannelArray:(NSMutableArray*)anArray;
 - (NSMutableDictionary*) channelDictionary: (int) aCurrentChnl;
 - (int)   chnlEnabled: (int) aCurrentChnl;
 - (void)  setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl;

@@ -33,7 +33,9 @@
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
-    [ super registerNotificationObservers ];
+  
+	  [super registerNotificationObservers];
+
     
 /*    [notifyCenter addObserver : self
                      selector : @selector( slotChanged: )

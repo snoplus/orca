@@ -94,29 +94,42 @@ NSString* ORHVkMCDZ = @"MCDZ";
 }
 
 #pragma mark ***Accessors
+- (NSMutableArray*) channelArray
+{
+	return channelArray;
+}
+
+- (void) setChannelArray:(NSMutableArray*)anArray
+{
+	[anArray retain];
+	[channelArray release];
+	channelArray = anArray;
+}
+
 - (NSMutableDictionary*) channelDictionary: (int) aCurrentChnl
 {
-	return( [mChannelDict objectAtIndex: aCurrentChnl] );
+	return( [channelArray objectAtIndex: aCurrentChnl] );
 }
 
 - (int) chnlEnabled: (int) aCurrentChnl
 {
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: aCurrentChnl];
+	NSMutableDictionary* tmpChnl = [channelArray objectAtIndex: aCurrentChnl];
 	return( [[tmpChnl objectForKey: ORHVkChnlEnabled] intValue] );
 }
 
 - (void) setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl
 {
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: aCurrentChnl];
+	NSMutableDictionary* tmpChnl = [channelArray objectAtIndex: aCurrentChnl];
 	
 	NSNumber* enabledNumber = [NSNumber numberWithInt: anEnabled];
 	[tmpChnl setObject: enabledNumber forKey: enabledNumber];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitEnabledChanged object: self];		
 }
+
 - (float) demandHV: (int) aChnl
 {
-	NSDictionary* tmpChnl = [mChannelDict objectAtIndex: aChnl];
+	NSDictionary* tmpChnl = [channelArray objectAtIndex: aChnl];
 	
 	return ( [[tmpChnl objectForKey: ORHVkDemandHV] floatValue] );
 }
@@ -134,7 +147,7 @@ NSString* ORHVkMCDZ = @"MCDZ";
 	
 	// Now update dictionary
 	
-	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: aChnl];
+	NSMutableDictionary* tmpChnl = [channelArray objectAtIndex: aChnl];
 	return( [[tmpChnl objectForKey: ORHVkDemandHV] floatValue] );
 }
 
@@ -244,37 +257,35 @@ NSString* ORHVkMCDZ = @"MCDZ";
 #pragma mark ***Archival
 - (id) initWithCoder: (NSCoder*) decoder
 {
-	int i;
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+	[self setChannelArray: [decoder decodeObjectForKey: @"channelArray"]];
 	
-	for ( i = 0; i < ORHVNumChannels; i++ )
-	{
-		NSDictionary* tmpChnl = [NSMutableDictionary dictionaryWithCapacity: ORUVUnitNumParameters];
-		tmpChnl = [decoder decodeObjectForKey: @"ORUVUnitParameters"];
-		[mChannelDict insertObject: tmpChnl atIndex: i];
+	if(!channelArray){
+		//first time.... set up the structure....
+		[self setChannelArray:[NSMutableArray array]];
+		int i;
+		for(i=0;i<ORHVNumChannels;i++){
+			[channelArray addObject:[NSMutableDictionary dictionary]];
+		}
 	}
+	
     [[self undoManager] enableUndoRegistration];    
-		
+	
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-	int i;
     [super encodeWithCoder:encoder];
-	for ( i = 0; i < ORHVNumChannels; i++ ) 
-	{
-		NSDictionary* tmpChnl = [mChannelDict objectAtIndex: i];
-		[encoder encodeObject: tmpChnl forKey: @"ORUVUnitParameters"];
-	}
+	[encoder encodeObject:@"channelArray"];
 }
 
 #pragma mark •••Utilities
 - (void) printDictionary: (int) aCurrentChnl
 {
-	NSDictionary*	tmpChnl = [mChannelDict objectAtIndex: aCurrentChnl];
+	NSDictionary*	tmpChnl = [channelArray objectAtIndex: aCurrentChnl];
 	
 	float			value;
 	
