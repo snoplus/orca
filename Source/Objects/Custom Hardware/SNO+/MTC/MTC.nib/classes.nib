@@ -75,31 +75,39 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>autoIncrementAction</key>
+				<key>basicAutoIncrementAction</key>
 				<string>id</string>
-				<key>basicRead</key>
+				<key>basicMemoryOffsetAction</key>
 				<string>id</string>
-				<key>basicStatus</key>
+				<key>basicReadAction</key>
 				<string>id</string>
-				<key>basicStop</key>
+				<key>basicRepeatCountAction</key>
 				<string>id</string>
-				<key>basicWrite</key>
+				<key>basicRepeatDelayAction</key>
+				<string>id</string>
+				<key>basicSelectedRegisterAction</key>
+				<string>id</string>
+				<key>basicStatusAction</key>
+				<string>id</string>
+				<key>basicStopAction</key>
+				<string>id</string>
+				<key>basicUseMemoryAction</key>
+				<string>id</string>
+				<key>basicWriteAction</key>
+				<string>id</string>
+				<key>basicWriteValueAction</key>
 				<string>id</string>
 				<key>buttonPushed</key>
 				<string>id</string>
-				<key>memoryOffsetTextFieldAction</key>
+				<key>eSumViewTypeAction</key>
+				<string>id</string>
+				<key>lockAction</key>
+				<string>id</string>
+				<key>nHitViewTypeAction</key>
 				<string>id</string>
 				<key>readAction</key>
 				<string>id</string>
-				<key>repeatCountTextFieldAction</key>
-				<string>id</string>
-				<key>repeatDelayTextFieldAction</key>
-				<string>id</string>
-				<key>selectedRegisterAction</key>
-				<string>id</string>
-				<key>settingLockAction</key>
-				<string>id</string>
-				<key>settingsComments</key>
+				<key>settingsControlRegMaskAction</key>
 				<string>id</string>
 				<key>settingsDefValFile</key>
 				<string>id</string>
@@ -107,15 +115,25 @@
 				<string>id</string>
 				<key>settingsDefaultSaveSet</key>
 				<string>id</string>
+				<key>settingsESumAction</key>
+				<string>id</string>
+				<key>settingsGTCrateMaskAction</key>
+				<string>id</string>
+				<key>settingsGTMaskAction</key>
+				<string>id</string>
 				<key>settingsLoadDBFile</key>
 				<string>id</string>
 				<key>settingsLoadDefVals</key>
 				<string>id</string>
-				<key>settingsMTCDelete</key>
-				<string>id</string>
-				<key>settingsMTCRecordGet</key>
+				<key>settingsMTCDAction</key>
 				<string>id</string>
 				<key>settingsMTCRecordSaveAs</key>
+				<string>id</string>
+				<key>settingsNHitAction</key>
+				<string>id</string>
+				<key>settingsNewComments</key>
+				<string>id</string>
+				<key>settingsPEDCrateMaskAction</key>
 				<string>id</string>
 				<key>settingsPrint</key>
 				<string>id</string>
@@ -151,11 +169,7 @@
 				<string>id</string>
 				<key>stopAction</key>
 				<string>id</string>
-				<key>useMemoryAction</key>
-				<string>id</string>
 				<key>writeAction</key>
-				<string>id</string>
-				<key>writeValueTextFieldAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -166,43 +180,99 @@
 			<dict>
 				<key>autoIncrementCB</key>
 				<string>NSButton</string>
+				<key>basicOpsLockButton</key>
+				<string>NSButton</string>
 				<key>basicOpsRunningIndicator</key>
 				<string>NSProgressIndicator</string>
+				<key>coarseDelayField</key>
+				<string>NSTextField</string>
+				<key>commentButton</key>
+				<string>NSButton</string>
+				<key>commentsField</key>
+				<string>NSTextField</string>
+				<key>controlRegMaskMatrix</key>
+				<string>NSMatrix</string>
+				<key>defaultFileField</key>
+				<string>NSTextField</string>
+				<key>eSumViewTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>esumMatrix</key>
+				<string>NSMatrix</string>
+				<key>fineDelayField</key>
+				<string>NSTextField</string>
+				<key>fineSlopeField</key>
+				<string>NSTextField</string>
+				<key>globalTriggerCrateMaskMatrix</key>
+				<string>NSMatrix</string>
+				<key>globalTriggerCrateMaskMatrix2</key>
+				<string>NSMatrix</string>
+				<key>globalTriggerMaskMatrix</key>
+				<string>NSMatrix</string>
+				<key>globalTriggerMaskMatrix2</key>
+				<string>NSMatrix</string>
+				<key>high10MhzClockField</key>
+				<string>NSTextField</string>
+				<key>lastFileLoadedField</key>
+				<string>NSTextField</string>
 				<key>loadFilePathField</key>
+				<string>NSTextField</string>
+				<key>lockOutWidthField</key>
+				<string>NSTextField</string>
+				<key>low10MhzClockField</key>
 				<string>NSTextField</string>
 				<key>memBaseAddressStepper</key>
 				<string>NSStepper</string>
 				<key>memBaseAddressText</key>
 				<string>NSTextField</string>
+				<key>memoryOffsetField</key>
+				<string>NSTextField</string>
 				<key>memoryOffsetStepper</key>
 				<string>NSStepper</string>
-				<key>memoryOffsetTextField</key>
+				<key>minDelayOffsetField</key>
+				<string>NSTextField</string>
+				<key>nHitViewTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>nhit100LoPrescaleField</key>
+				<string>NSTextField</string>
+				<key>nhitMatrix</key>
+				<string>NSMatrix</string>
+				<key>pedCrateMaskMatrix</key>
+				<string>NSMatrix</string>
+				<key>pedCrateMaskMatrix2</key>
+				<string>NSMatrix</string>
+				<key>pedestalWidthField</key>
+				<string>NSTextField</string>
+				<key>pulserPeriodField</key>
 				<string>NSTextField</string>
 				<key>regBaseAddressStepper</key>
 				<string>NSStepper</string>
 				<key>regBaseAddressText</key>
 				<string>NSTextField</string>
+				<key>repeatCountField</key>
+				<string>NSTextField</string>
 				<key>repeatCountStepper</key>
 				<string>NSStepper</string>
-				<key>repeatCountTextField</key>
+				<key>repeatDelayField</key>
 				<string>NSTextField</string>
 				<key>repeatDelayStepper</key>
 				<string>NSStepper</string>
-				<key>repeatDelayTextField</key>
-				<string>NSTextField</string>
 				<key>selectedRegisterPU</key>
 				<string>NSPopUpButton</string>
-				<key>settingLockButton</key>
+				<key>settingsLockButton</key>
 				<string>NSButton</string>
 				<key>slotField</key>
 				<string>NSTextField</string>
+				<key>standardOpsLockButton</key>
+				<string>NSButton</string>
 				<key>tabView</key>
 				<string>NSTabView</string>
 				<key>useMemoryMatrix</key>
 				<string>NSMatrix</string>
+				<key>writeValueField</key>
+				<string>NSTextField</string>
 				<key>writeValueStepper</key>
 				<string>NSStepper</string>
-				<key>writeValueTextField</key>
+				<key>xilinxFileField</key>
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>

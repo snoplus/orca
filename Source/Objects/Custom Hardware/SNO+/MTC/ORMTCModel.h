@@ -29,6 +29,8 @@
 
 @class ORMTC_DB;
 
+#define MTCLockOutWidth @"MTCLockOutWidth"
+
 @interface ORMTCModel :  ORVmeIOCard <ORDataTaker>
 {
     @private
@@ -36,7 +38,7 @@
 		NSFileHandle*			loadFile;
 		unsigned long			dataId;
 		unsigned long			memBaseAddress;
-		NSMutableDictionary*	parameters;
+		NSMutableDictionary*	mtcDataBase;
 		
 		//basic ops
 		int						selectedRegister;
@@ -50,8 +52,15 @@
 		BOOL					doReadOp;
 		BOOL					autoIncrement;
 		BOOL					basicOpsRunning;
+		
+		//settings
+		NSString*				lastFileLoaded;
+		NSString*				lastFile;
+		NSString*				defaultFile;
+		
+		int						nHitViewType;
+		int						eSumViewType;
 }
-
 
 #pragma mark •••Initialization
 - (id) init;
@@ -61,6 +70,18 @@
 - (BOOL) solitaryObject;
 
 #pragma mark •••Accessors
+- (int) eSumViewType;
+- (void) setESumViewType:(int)aESumViewType;
+- (int) nHitViewType;
+- (void) setNHitViewType:(int)aNHitViewType;
+- (NSString*) xilinxFile;
+- (void) setXilinxFile:(NSString*)aDefaultFile;
+- (NSString*) defaultFile;
+- (void) setDefaultFile:(NSString*)aDefaultFile;
+- (NSString*) lastFile;
+- (void) setLastFile:(NSString*)aLastFile;
+- (NSString*) lastFileLoaded;
+- (void) setLastFileLoaded:(NSString*)aLastFile;
 - (BOOL) basicOpsRunning;
 - (void) setBasicOpsRunning:(BOOL)aBasicOpsRunning;
 - (BOOL) autoIncrement;
@@ -77,13 +98,33 @@
 - (void) setMemoryOffset:(unsigned long)aMemoryOffset;
 - (int) selectedRegister;
 - (void) setSelectedRegister:(int)aSelectedRegister;
-- (NSMutableDictionary*) parameters;
-- (void) setParameters:(NSMutableDictionary*)aParameters;
+- (NSMutableDictionary*) mtcDataBase;
+- (id) dbObjectByName:(NSString*)aKey;
+- (void) setMtcDataBase:(NSMutableDictionary*)aNestedDictionary;
 - (NSString*) loadFilePath;
 - (void) setLoadFilePath:(NSString*)aLoadFilePath;
 - (unsigned long) memBaseAddress;
 - (unsigned long) baseAddress;
-- (unsigned long) parameter:(NSString*)aKey;
+
+- (short) dbLookTableSize;
+- (NSString*) getDBKeyByIndex:(short) anIndex;
+- (NSString*) getDBDefaultByIndex:(short) anIndex;
+- (id) dbObjectByIndex:(int)anIndex;
+- (void) setDbLong:(long) aValue forIndex:(int)anIndex;
+- (void) setDbFloat:(float) aValue forIndex:(int)anIndex;
+- (void) setDbObject:(id) anObject forIndex:(int)anIndex;
+- (float) dbFloatByIndex:(int)anIndex;
+- (int) dbIntByIndex:(int)anIndex;
+
+#pragma mark •••Converters
+- (unsigned long) mVoltsToRaw:(float) mVolts;
+- (float) rawTomVolts:(long) aRawValue;
+- (unsigned long) mVoltsToNHits:(float) mVolts dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
+- (float) NHitsTomVolts:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
+- (long) NHitsToRaw:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit;
+- (float) mVoltsTopC:(float) mVolts dcOffset:(float)dcOffset mVperpC:(float)mVperp;
+- (float) pCTomVolts:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
+- (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperp;
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId;
@@ -154,7 +195,7 @@
 - (void) setupPulserRateAndEnable:(double) pulserPeriodVal;
 - (void) fireMTCPedestalsFixedNumber:(unsigned long) numPedestals;
 - (void) basicMTCReset;
-- (void) loadParameters;
+- (void) loadMtcDataBase;
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
 - (void) setUpTheFile;
@@ -165,11 +206,19 @@
 - (void) readBasicOps;
 - (void) writeBasicOps;
 - (void) stopBasicOps;
-
 - (void) reportStatus;
+
+#pragma mark •••Settings
+- (void) saveSet:(NSString*)filePath;
+- (void) loadSet:(NSString*)filePath;
 
 @end
 
+extern NSString* ORMTCModelESumViewTypeChanged;
+extern NSString* ORMTCModelNHitViewTypeChanged;
+extern NSString* ORMTCModelDefaultFileChanged;
+extern NSString* ORMTCModelLastFileChanged;
+extern NSString* ORMTCModelLastFileLoadedChanged;
 extern NSString* ORMTCModelBasicOpsRunningChanged;
 extern NSString* ORMTCModelAutoIncrementChanged;
 extern NSString* ORMTCModelUseMemoryChanged;
@@ -179,5 +228,6 @@ extern NSString* ORMTCModelWriteValueChanged;
 extern NSString* ORMTCModelMemoryOffsetChanged;
 extern NSString* ORMTCModelSelectedRegisterChanged;
 extern NSString* ORMTCModelLoadFilePathChanged;
-extern NSString* ORMTCSettingsLock;
+extern NSString* ORMTCModelMtcDataBaseChanged;
+extern NSString* ORMTCLock;
 

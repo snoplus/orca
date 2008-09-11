@@ -18,12 +18,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
-
-
 @interface NSDictionary (OrcaExtensions)
 - (NSArray*) allKeysStartingWith:(NSString*)aString;
+- (id) objectForNestedKey:(NSString*)aStringList;
 - (id) nestedObjectForKey:(id)firstKey,...;
 - (id) objectForKeyArray:(NSMutableArray*)anArray;
 - (NSData*) asData;
@@ -35,4 +32,8 @@
 - (unsigned int) uIntForKey:(NSString*)aKey;
 - (int) intForKey:(NSString*)aKey;
 - (BOOL) boolForKey:(NSString*)aKey;
+@end
+
+@interface NSMutableDictionary (OrcaExtensions)
+- (void) setObject:(id)anObject forNestedKey:(NSString*)aStringList;
 @end

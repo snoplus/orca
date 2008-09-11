@@ -21,16 +21,17 @@
 @interface ORMTCController : OrcaObjectController {
 
     IBOutlet NSTabView*		tabView;
+	//basic Ops
 	IBOutlet NSProgressIndicator* basicOpsRunningIndicator;
 	IBOutlet NSButton*		autoIncrementCB;
 	IBOutlet NSMatrix*		useMemoryMatrix;
-	IBOutlet NSTextField*	repeatDelayTextField;
+	IBOutlet NSTextField*	repeatDelayField;
 	IBOutlet NSStepper*		repeatDelayStepper;
-	IBOutlet NSTextField*	repeatCountTextField;
+	IBOutlet NSTextField*	repeatCountField;
 	IBOutlet NSStepper*		repeatCountStepper;
-	IBOutlet NSTextField*	writeValueTextField;
+	IBOutlet NSTextField*	writeValueField;
 	IBOutlet NSStepper*		writeValueStepper;
-	IBOutlet NSTextField*	memoryOffsetTextField;
+	IBOutlet NSTextField*	memoryOffsetField;
 	IBOutlet NSStepper*		memoryOffsetStepper;
 	IBOutlet NSPopUpButton* selectedRegisterPU;
 	IBOutlet NSTextField*	loadFilePathField;
@@ -39,12 +40,59 @@
     IBOutlet NSTextField* 	regBaseAddressText;
     IBOutlet NSStepper* 	memBaseAddressStepper;
     IBOutlet NSTextField* 	memBaseAddressText;
-	IBOutlet NSButton*		settingLockButton;
- }
+	IBOutlet NSButton*		basicOpsLockButton;
+ 	IBOutlet NSTextField*	defaultFileField;
+	
+	//standard Ops
+	IBOutlet NSButton*		standardOpsLockButton;
+
+	//settings
+	IBOutlet NSMatrix*		eSumViewTypeMatrix;
+	IBOutlet NSMatrix*		nHitViewTypeMatrix;
+ 	IBOutlet NSTextField*	xilinxFileField;
+	IBOutlet NSButton*		settingsLockButton;
+	IBOutlet NSTextField*	lastFileLoadedField;
+ 	IBOutlet NSTextField*	lockOutWidthField;
+ 	IBOutlet NSTextField*	pedestalWidthField;
+ 	IBOutlet NSTextField*	nhit100LoPrescaleField;
+ 	IBOutlet NSTextField*	pulserPeriodField;
+ 	IBOutlet NSTextField*	low10MhzClockField;
+ 	IBOutlet NSTextField*	high10MhzClockField;
+ 	IBOutlet NSTextField*	fineSlopeField;
+ 	IBOutlet NSTextField*	minDelayOffsetField;
+ 	IBOutlet NSTextField*	coarseDelayField;
+ 	IBOutlet NSTextField*	fineDelayField;
+
+	IBOutlet NSMatrix*		globalTriggerMaskMatrix;
+	IBOutlet NSMatrix*		globalTriggerCrateMaskMatrix;
+	IBOutlet NSMatrix*		pedCrateMaskMatrix;
+	IBOutlet NSMatrix*		controlRegMaskMatrix;
+	IBOutlet NSMatrix*		nhitMatrix;
+	IBOutlet NSMatrix*		esumMatrix;
+	IBOutlet NSTextField*	commentsField;
+	IBOutlet NSButton*		commentButton;
+
+	//trigger
+	IBOutlet NSMatrix*		globalTriggerMaskMatrix2;
+	IBOutlet NSMatrix*		globalTriggerCrateMaskMatrix2;
+	IBOutlet NSMatrix*		pedCrateMaskMatrix2;
+
+
+    NSView* blankView;
+    NSSize  basicOpsSize;
+    NSSize  standardOpsSize;
+    NSSize  settingsSize;
+    NSSize  triggerSize;
+
+}
 
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) eSumViewTypeChanged:(NSNotification*)aNote;
+- (void) nHitViewTypeChanged:(NSNotification*)aNote;
+- (void) mtcDataBaseChanged:(NSNotification*)aNote;
+- (void) defaultFileChanged:(NSNotification*)aNote;
 - (void) basicOpsRunningChanged:(NSNotification*)aNote;
 - (void) autoIncrementChanged:(NSNotification*)aNote;
 - (void) useMemoryChanged:(NSNotification*)aNote;
@@ -54,22 +102,13 @@
 - (void) memoryOffsetChanged:(NSNotification*)aNote;
 - (void) selectedRegisterChanged:(NSNotification*)aNote;
 - (void) loadFilePathChanged:(NSNotification*)aNote;
-- (void) settingsLockChanged:(NSNotification*)aNotification;
-- (void) slotChanged:(NSNotification*)aNotification;
-- (void) regBaseAddressChanged:(NSNotification*)aNotification;
-- (void) memBaseAddressChanged:(NSNotification*)aNotification;
+- (void) settingsLockChanged:(NSNotification*)aNote;
+- (void) slotChanged:(NSNotification*)aNote;
+- (void) regBaseAddressChanged:(NSNotification*)aNote;
+- (void) memBaseAddressChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
-
-
-#pragma mark •••Actions
-- (IBAction) autoIncrementAction:(id)sender;
-- (IBAction) useMemoryAction:(id)sender;
-- (IBAction) repeatDelayTextFieldAction:(id)sender;
-- (IBAction) repeatCountTextFieldAction:(id)sender;
-- (IBAction) writeValueTextFieldAction:(id)sender;
-- (IBAction) memoryOffsetTextFieldAction:(id)sender;
-- (IBAction) selectedRegisterAction:(id)sender;
-- (IBAction) settingLockAction:(id) sender;
+- (void) loadMasks;
+- (void) lastFileLoadedChanged:(NSNotification*)aNote;
 
 #pragma mark •••Helper
 - (void) populatePullDown;
@@ -79,13 +118,23 @@
 //is called by each of the individual actions to avoid redundant code.
 - (IBAction) buttonPushed:(id) sender;
 
-//Basic Ops buttons.
-- (IBAction) basicRead:(id) sender;
-- (IBAction) basicWrite:(id) sender;
-- (IBAction) basicStatus:(id) sender;
-- (IBAction) basicStop:(id) sender;
+#pragma mark •••Actions
+- (IBAction) lockAction:(id) sender;
 
-//MTC Init Ops buttons.
+//Basic Ops
+- (IBAction) basicReadAction:(id) sender;
+- (IBAction) basicWriteAction:(id) sender;
+- (IBAction) basicStatusAction:(id) sender;
+- (IBAction) basicStopAction:(id) sender;
+- (IBAction) basicAutoIncrementAction:(id)sender;
+- (IBAction) basicUseMemoryAction:(id)sender;
+- (IBAction) basicRepeatDelayAction:(id)sender;
+- (IBAction) basicRepeatCountAction:(id)sender;
+- (IBAction) basicWriteValueAction:(id)sender;
+- (IBAction) basicMemoryOffsetAction:(id)sender;
+- (IBAction) basicSelectedRegisterAction:(id)sender;
+
+//MTC Init Ops
 - (IBAction) standardInitMTC:(id) sender;
 - (IBAction) standardInitMTCnoXilinx:(id) sender;
 - (IBAction) standardInitMTCno10MHz:(id) sender;
@@ -100,16 +149,24 @@
 - (IBAction) standardStopFindTriggerZeroes:(id) sender;
 - (IBAction) standardPeriodicReadout:(id) sender;
 
-//Settings buttons.
+//Settings
+- (IBAction) eSumViewTypeAction:(id)sender;
+- (IBAction) nHitViewTypeAction:(id)sender;
 - (IBAction) settingsLoadDBFile:(id) sender;
 - (IBAction) settingsDefValFile:(id) sender;
 - (IBAction) settingsXilinxFile:(id) sender;
 - (IBAction) settingsDefaultGetSet:(id) sender;
-- (IBAction) settingsMTCRecordGet:(id) sender;
+- (IBAction) settingsDefaultSaveSet:(id) sender;
 - (IBAction) settingsMTCRecordSaveAs:(id) sender;
-- (IBAction) settingsMTCDelete:(id) sender;
 - (IBAction) settingsLoadDefVals:(id) sender;
 - (IBAction) settingsPrint:(id) sender;
-- (IBAction) settingsComments:(id) sender;
-- (IBAction) settingsDefaultSaveSet:(id) sender;
+- (IBAction) settingsNewComments:(id) sender;
+- (IBAction) settingsMTCDAction:(id) sender;
+- (IBAction) settingsNHitAction:(id) sender;
+- (IBAction) settingsESumAction:(id) sender;
+- (IBAction) settingsGTMaskAction:(id) sender;
+- (IBAction) settingsGTCrateMaskAction:(id) sender;
+- (IBAction) settingsControlRegMaskAction:(id) sender; 
+- (IBAction) settingsPEDCrateMaskAction:(id) sender; 
+
 @end

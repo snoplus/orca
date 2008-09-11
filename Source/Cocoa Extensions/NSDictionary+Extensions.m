@@ -35,6 +35,12 @@
     return result;
 }
 
+
+- (id) objectForNestedKey:(NSString*)aStringList
+{
+	return [self objectForKeyArray:[NSMutableArray arrayWithArray:[aStringList componentsSeparatedByString:@","]]];
+}
+
 - (id) objectForKeyArray:(NSMutableArray*)anArray
 {
 	if([anArray count] == 0)return self;
@@ -125,4 +131,26 @@
 	free(tmpName);
 	return theResponse;
 }
+@end
+
+@implementation NSMutableDictionary (OrcaExtensions)
+
+- (void) setObject:(id)anObject forNestedKey:(NSString*)aStringList
+{
+	NSMutableArray* anArrayOfKeys = [NSMutableArray arrayWithArray:[aStringList componentsSeparatedByString:@","]];
+	id firstKey = [anArrayOfKeys objectAtIndex:0];
+	if([anArrayOfKeys count] == 1){
+		[self setObject:anObject forKey:firstKey];
+	}
+	else {
+		id obj = [self objectForKey:firstKey];
+		if(!obj){
+			obj = [NSMutableDictionary dictionary];
+			[self setObject:obj forKey:firstKey];
+		}
+		[anArrayOfKeys removeObjectAtIndex:0];
+		[obj setObject:anObject forNestedKey:[anArrayOfKeys componentsJoinedByString:@","]];
+	}
+}
+
 @end

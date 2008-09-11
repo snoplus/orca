@@ -25,11 +25,17 @@
 #import "ORVmeCrateModel.h"
 #import "ORDataTypeAssigner.h"
 #import "ORMTC_Constants.h"
+#import "NSDictionary+Extensions.h"
 
 #pragma mark •••Definitions
 
-NSString* ORMTCModelBasicOpsRunningChanged = @"ORMTCModelBasicOpsRunningChanged";
-NSString* ORMTCModelAutoIncrementChanged = @"ORMTCModelAutoIncrementChanged";
+NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
+NSString* ORMTCModelNHitViewTypeChanged		= @"ORMTCModelNHitViewTypeChanged";
+NSString* ORMTCModelDefaultFileChanged		= @"ORMTCModelDefaultFileChanged";
+NSString* ORMTCModelLastFileChanged			= @"ORMTCModelLastFileChanged";
+NSString* ORMTCModelLastFileChangedLoaded	= @"ORMTCModelLastFileLoadedChanged";
+NSString* ORMTCModelBasicOpsRunningChanged	= @"ORMTCModelBasicOpsRunningChanged";
+NSString* ORMTCModelAutoIncrementChanged	= @"ORMTCModelAutoIncrementChanged";
 NSString* ORMTCModelUseMemoryChanged		= @"ORMTCModelUseMemoryChanged";
 NSString* ORMTCModelRepeatDelayChanged		= @"ORMTCModelRepeatDelayChanged";
 NSString* ORMTCModelRepeatCountChanged		= @"ORMTCModelRepeatCountChanged";
@@ -37,34 +43,109 @@ NSString* ORMTCModelWriteValueChanged		= @"ORMTCModelWriteValueChanged";
 NSString* ORMTCModelMemoryOffsetChanged		= @"ORMTCModelMemoryOffsetChanged";
 NSString* ORMTCModelSelectedRegisterChanged = @"ORMTCModelSelectedRegisterChanged";
 NSString* ORMTCModelLoadFilePathChanged		= @"ORMTCModelLoadFilePathChanged";
-NSString* ORMTCSettingsLock					= @"ORMTCSettingsLock";
+NSString* ORMTCModelMtcDataBaseChanged		= @"ORMTCModelMtcDataBaseChanged";
+NSString* ORMTCModelLastFileLoadedChanged	= @"ORMTCModelLastFileLoadedChanged";
+
+NSString* ORMTCLock							= @"ORMTCLock";
 
 static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
-	{ @"ControlReg"	    , 0   ,0x29,	0x01 },
-	{ @"SerialReg"		, 4   ,0x29,	0x01 },
-	{ @"DacCntReg"		, 8   ,0x29,	0x01 },
-	{ @"SoftGtReg"		, 12  ,0x29,	0x01 },
-	{ @"Pedestal Width"	, 16  ,0x29,	0x01 },
-	{ @"Coarse Delay"	, 20  ,0x29,	0x01 },
-	{ @"Fine Delay"		, 24  ,0x29,	0x01 },
-	{ @"ThresModReg"	, 28  ,0x29,	0x01 },
-	{ @"PmskReg"		, 32  ,0x29,	0x01 },
-	{ @"ScaleReg"		, 36  ,0x29,	0x01 },
-	{ @"BwrAddOutReg"	, 40  ,0x29,	0x01 },
-	{ @"BbaReg"			, 44  ,0x29,	0x01 },
-	{ @"GtLockReg"		, 48  ,0x29,	0x01 },
-	{ @"MaskReg"		, 52  ,0x29,	0x01 },
-	{ @"XilProgReg"		, 56  ,0x29,	0x01 },
-	{ @"GmskReg"		, 60  ,0x29,	0x01 },
-	{ @"OcGtReg"		, 128 ,0x29,	0x01 },
-	{ @"C50_0_31Reg"	, 132 ,0x29,	0x01 },
-	{ @"C50_32_42Reg"	, 16  ,0x29,	0x01 },
-	{ @"C10_0_31Reg"	, 140 ,0x29,	0x01 },
-	{ @"C10_32_52Reg"	, 144 ,0x29,	0x01 }
+	{ @"ControlReg"	    , 0   ,0x29,	0x01 },   //0
+	{ @"SerialReg"		, 4   ,0x29,	0x01 },   //1
+	{ @"DacCntReg"		, 8   ,0x29,	0x01 },   //2
+	{ @"SoftGtReg"		, 12  ,0x29,	0x01 },   //3
+	{ @"Pedestal Width"	, 16  ,0x29,	0x01 },   //4
+	{ @"Coarse Delay"	, 20  ,0x29,	0x01 },   //5
+	{ @"Fine Delay"		, 24  ,0x29,	0x01 },   //6
+	{ @"ThresModReg"	, 28  ,0x29,	0x01 },   //7
+	{ @"PmskReg"		, 32  ,0x29,	0x01 },   //8
+	{ @"ScaleReg"		, 36  ,0x29,	0x01 },   //9
+	{ @"BwrAddOutReg"	, 40  ,0x29,	0x01 },   //10
+	{ @"BbaReg"			, 44  ,0x29,	0x01 },   //11
+	{ @"GtLockReg"		, 48  ,0x29,	0x01 },   //12
+	{ @"MaskReg"		, 52  ,0x29,	0x01 },   //13
+	{ @"XilProgReg"		, 56  ,0x29,	0x01 },   //14
+	{ @"GmskReg"		, 60  ,0x29,	0x01 },   //15
+	{ @"OcGtReg"		, 128 ,0x29,	0x01 },   //16
+	{ @"C50_0_31Reg"	, 132 ,0x29,	0x01 },   //17
+	{ @"C50_32_42Reg"	, 16  ,0x29,	0x01 },   //18
+	{ @"C10_0_31Reg"	, 140 ,0x29,	0x01 },   //19
+	{ @"C10_32_52Reg"	, 144 ,0x29,	0x01 }	  //20
+};
+
+static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
+	{ @"MTC/D,LockOutWidth",	   	@"1.1" },   //0
+	{ @"MTC/D,PedestalWidth",		@"1.2" },   //1
+	{ @"MTC/D,Nhit100LoPrescale",	@"1.3" },   //2
+	{ @"MTC/D,PulserPeriod",		@"1.4" },   //3
+	{ @"MTC/D,Low10MhzClock",		@"1.5" },   //4
+	{ @"MTC/D,High10MhzClock",		@"1.6" },   //5
+	{ @"MTC/D,FineSlope",			@"1.7" },   //6
+	{ @"MTC/D,MinDelayOffset",		@"1.8" },   //7
+	{ @"MTC/D,CoarseDelay",			@"1.9" },   //8
+	{ @"MTC/D,FineDelay",			@"2.0" },   //9
+	{ @"MTC/D,GtMask",				@"32000" }, //10
+	{ @"MTC/D,GtCrateMask",			@"16" },	//11
+	{ @"MTC/D,PEDCrateMask",		@"32" },	//12
+	{ @"MTC/D,ControlMask",			@"1" },		//13
+	
+	//defaults for the MTC A NHit
+	{ @"MTC/A,NHit100Hi,Threshold",	@"1"},		//14
+	{ @"MTC/A,NHit100Med,Threshold",@"2"},		//15
+	{ @"MTC/A,NHit100Lo,Threshold",	@"3"},		//16
+	{ @"MTC/A,NHit20,Threshold",	@"4"},		//17
+	{ @"MTC/A,NHit20LB,Threshold",	@"5"},		//18
+	{ @"MTC/A,OWLN,Threshold",		@"6"},		//19
+	
+	{ @"MTC/A,NHit100Hi,mV/Adc",	@"10"},		//20
+	{ @"MTC/A,NHit100Med,m/VAdc",	@"20"},		//21
+	{ @"MTC/A,NHit100Lo,mV/Adc",	@"30"},		//22
+	{ @"MTC/A,NHit20,mV/Adc",		@"40"},		//23
+	{ @"MTC/A,NHit20LB,mV/Adc",		@"50"},		//24
+	{ @"MTC/A,OWLN,mV/Adc",			@"60"},		//25
+
+	{ @"MTC/A,NHit100Hi,mV/Hit",	@"10"},		//26
+	{ @"MTC/A,NHit100Med,mV/Hit",	@"20"},		//27
+	{ @"MTC/A,NHit100Lo,mV/Hit",	@"30"},		//28
+	{ @"MTC/A,NHit20,mV/Hit",		@"40"},		//29
+	{ @"MTC/A,NHit20LB,mV/Hit",		@"50"},		//30
+	{ @"MTC/A,OWLN,mV/Hit",			@"60"},		//31
+	
+	{ @"MTC/A,NHit100Hi,dcOffset",	@"10"},		//32
+	{ @"MTC/A,NHit100Med,dcOffset",	@"20"},		//33
+	{ @"MTC/A,NHit100Lo,dcOffset",	@"30"},		//34
+	{ @"MTC/A,NHit20,dcOffset",		@"40"},		//35
+	{ @"MTC/A,NHit20LB,dcOffset",	@"50"},		//36
+	{ @"MTC/A,OWLN,dcOffset",		@"60"},		//37
+	
+	//defaults for the MTC A ESUM
+	{ @"MTC/A,ESumLow,Threshold",	@"10"},		//38
+	{ @"MTC/A,ESumHi,Threshold",	@"20"},		//39
+	{ @"MTC/A,OWLELo,Threshold",	@"30"},		//40
+	{ @"MTC/A,OWLEHi,Threshold",	@"40"},		//41
+
+	{ @"MTC/A,ESumLow,mV/Adc",		@"10"},		//42
+	{ @"MTC/A,ESumHi,mV/Adc",		@"20"},		//43
+	{ @"MTC/A,OWLELo,mV/Adc",		@"30"},		//44
+	{ @"MTC/A,OWLEHi,mV/Adc",		@"40"},		//45
+
+	{ @"MTC/A,ESumLow,mV/pC",		@"10"},		//46
+	{ @"MTC/A,ESumHi,mV/pC",		@"20"},		//47
+	{ @"MTC/A,OWLELo,mV/pC",		@"30"},		//48
+	{ @"MTC/A,OWLEHi,mV/pC",		@"40"},		//49
+
+	{ @"MTC/A,ESumLow,dcOffset",	@"10"},		//50
+	{ @"MTC/A,ESumHi,dcOffset",		@"20"},		//51
+	{ @"MTC/A,OWLELo,dcOffset",		@"30"},		//52
+	{ @"MTC/A,OWLEHi,dcOffset",		@"40"},		//53
+	
+	{@"Comments",					@"Nothing Noted"},		//54
+	{@"XilinxFilePath",				@"--"},		//55
+
 };
 
 @interface ORMTCModel (private)
 - (void) doBasicOp;
+- (void) setupDefaults;
 @end
 
 @implementation ORMTCModel
@@ -82,7 +163,10 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 
 - (void) dealloc
 {
-    [parameters release];
+    [defaultFile release];
+    [lastFile release];
+    [lastFileLoaded release];
+    [mtcDataBase release];
     [loadFilePath release];
 	[loadFile release];
     [super dealloc];
@@ -93,18 +177,107 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
     [self setImage:[NSImage imageNamed:@"MTCCard"]];
 }
 
-
 - (void) makeMainController
 {
     [self linkToController:@"ORMTCController"];
 }
 
+
+- (void) wakeUp
+{
+    if(![self aWake]){
+    }
+    [super wakeUp];
+}
+
 - (BOOL) solitaryObject
 {
-    return NO;
+    return YES;
 }
 
 #pragma mark •••Accessors
+
+- (int) eSumViewType
+{
+    return eSumViewType;
+}
+
+- (void) setESumViewType:(int)aESumViewType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setESumViewType:eSumViewType];
+    
+    eSumViewType = aESumViewType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelESumViewTypeChanged object:self];
+}
+
+- (int) nHitViewType
+{
+    return nHitViewType;
+}
+
+- (void) setNHitViewType:(int)aNHitViewType
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNHitViewType:nHitViewType];
+    
+    nHitViewType = aNHitViewType;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelNHitViewTypeChanged object:self];
+}
+- (NSString*) xilinxFile
+{
+    return [self dbObjectByIndex:kXilinxFile];
+}
+
+- (void) setXilinxFile:(NSString*)aDefaultFile
+{
+ 	if(!aDefaultFile)aDefaultFile = @"--";
+	[self setDbObject:aDefaultFile forIndex:kXilinxFile];
+}
+
+- (NSString*) defaultFile
+{
+    return defaultFile;
+}
+
+- (void) setDefaultFile:(NSString*)aDefaultFile
+{
+ 	if(!aDefaultFile)aDefaultFile = @"--";
+    [[[self undoManager] prepareWithInvocationTarget:self] setDefaultFile:defaultFile];
+	
+    [defaultFile autorelease];
+    defaultFile = [aDefaultFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelDefaultFileChanged object:self];
+}
+
+- (NSString*) lastFile
+{
+    return lastFile;
+}
+
+- (void) setLastFile:(NSString*)aLastFile
+{
+    [lastFile autorelease];
+    lastFile = [aLastFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelLastFileChanged object:self];
+}
+
+- (NSString*) lastFileLoaded
+{
+    return lastFileLoaded;
+}
+
+- (void) setLastFileLoaded:(NSString*)aFile
+{
+	if(!aFile)aFile = @"--";
+    [lastFileLoaded autorelease];
+    lastFileLoaded = [aFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelLastFileLoadedChanged object:self];
+}
+
 
 - (BOOL) basicOpsRunning
 {
@@ -218,16 +391,21 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelSelectedRegisterChanged object:self];
 }
 
-- (NSMutableDictionary*) parameters
+- (NSMutableDictionary*) mtcDataBase
 {
-    return parameters;
+    return mtcDataBase;
 }
 
-- (void) setParameters:(NSMutableDictionary*)aParameters
+- (void) setMtcDataBase:(NSMutableDictionary*)aNestedDictionary
 {
-    [aParameters retain];
-    [parameters release];
-    parameters = aParameters;
+    [[[self undoManager] prepareWithInvocationTarget:self] setMtcDataBase:mtcDataBase];
+
+    [aNestedDictionary retain];
+    [mtcDataBase release];
+    mtcDataBase = aNestedDictionary;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMtcDataBaseChanged object:self];
+
 }
 
 - (NSString*) loadFilePath
@@ -237,6 +415,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 
 - (void) setLoadFilePath:(NSString*)aLoadFilePath
 {
+	if(!aLoadFilePath)aLoadFilePath = @"--";
     [[[self undoManager] prepareWithInvocationTarget:self] setLoadFilePath:loadFilePath];
     
     [loadFilePath autorelease];
@@ -257,13 +436,59 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
     return 0x00007000;
 }
 
+#pragma mark •••Converters
+- (unsigned long) mVoltsToRaw:(float) mVolts
+{
+	return (long)(((mVolts + 5000.0)*0.4096)+.5);
+}
+
+- (float) rawTomVolts:(long) aRawValue
+{
+	return (aRawValue*2.44140625)-5000.0;
+}
+
+- (unsigned long) mVoltsToNHits:(float) mVolts dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit
+{
+	float NHits_per_mVolts = 0.0;
+	if(mVperNHit)NHits_per_mVolts = 1/mVperNHit;
+	return (mVolts - dcOffset)*NHits_per_mVolts +.5;	
+}
+
+- (float) NHitsTomVolts:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit
+{
+	return dcOffset + (mVperNHit*NHits);
+}
+
+- (long) NHitsToRaw:(float) NHits dcOffset:(float)dcOffset mVperNHit:(float)mVperNHit
+{
+	float mVolts = [self NHitsTomVolts:NHits dcOffset:dcOffset mVperNHit:mVperNHit];
+	return [self mVoltsToRaw:mVolts];
+}
+
+- (float) mVoltsTopC:(float) mVolts dcOffset:(float)dcOffset mVperpC:(float)mVperpC
+{
+	float pC_per_mVolts = 0.0;
+	if(mVperpC)pC_per_mVolts = 1/mVperpC;
+	return (mVolts - dcOffset)*pC_per_mVolts;	
+}
+
+- (float) pCTomVolts:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperpC
+{
+	return (float)dcOffset + (mVperpC*pC);
+}
+
+- (long) pCToRaw:(float) pC dcOffset:(float)dcOffset mVperpC:(float)mVperpC
+{
+	float mVolts = [self pCTomVolts:pC dcOffset:dcOffset mVperpC:mVperpC];
+	return [self mVoltsToRaw:mVolts];
+}
+
 #pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
     dataId = DataId;
 }
-
 
 - (NSDictionary*) dataRecordDescription
 {
@@ -308,15 +533,24 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setAutoIncrement:[decoder decodeBoolForKey:@"ORMTCModelAutoIncrement"]];
-    [self setUseMemory:		[decoder decodeIntForKey:	@"ORMTCModelUseMemory"]];
-    [self setRepeatDelay:	[decoder decodeIntForKey:	@"ORMTCModelRepeatDelay"]];
-    [self setRepeatCount:	[decoder decodeIntForKey:	@"ORMTCModelRepeatCount"]];
-    [self setWriteValue:	[decoder decodeInt32ForKey:	@"ORMTCModelWriteValue"]];
-    [self setMemoryOffset:	[decoder decodeInt32ForKey:	@"ORMTCModelMemoryOffset"]];
-    [self setSelectedRegister:[decoder decodeIntForKey:	@"ORMTCModelSelectedRegister"]];
-    [self setParameters:	[decoder decodeObjectForKey:@"ORMTCModelParameters"]];
-    [self setLoadFilePath:	[decoder decodeObjectForKey:@"ORMTCModelLoadFilePath"]];
+    [self setESumViewType:	[decoder decodeIntForKey:		@"ORMTCModelESumViewType"]];
+    [self setNHitViewType:	[decoder decodeIntForKey:		@"ORMTCModelNHitViewType"]];
+    [self setDefaultFile:	[decoder decodeObjectForKey:	@"ORMTCModelDefaultFile"]];
+    [self setLastFile:		[decoder decodeObjectForKey:	@"ORMTCModelLastFile"]];
+    [self setLastFileLoaded:[decoder decodeObjectForKey:	@"ORMTCModelLastFileLoaded"]];
+    [self setAutoIncrement:	[decoder decodeBoolForKey:		@"ORMTCModelAutoIncrement"]];
+    [self setUseMemory:		[decoder decodeIntForKey:		@"ORMTCModelUseMemory"]];
+    [self setRepeatDelay:	[decoder decodeIntForKey:		@"ORMTCModelRepeatDelay"]];
+    [self setRepeatCount:	[decoder decodeIntForKey:		@"ORMTCModelRepeatCount"]];
+    [self setWriteValue:	[decoder decodeInt32ForKey:		@"ORMTCModelWriteValue"]];
+    [self setMemoryOffset:	[decoder decodeInt32ForKey:		@"ORMTCModelMemoryOffset"]];
+    [self setSelectedRegister:[decoder decodeIntForKey:		@"ORMTCModelSelectedRegister"]];
+    [self setMtcDataBase:	[decoder decodeObjectForKey:	@"ORMTCModelMtcDataBase"]];
+    [self setLoadFilePath:	[decoder decodeObjectForKey:	@"ORMTCModelLoadFilePath"]];
+	
+	if(!mtcDataBase)[self setupDefaults];
+	
+	
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -325,17 +559,21 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeBool:autoIncrement forKey:@"ORMTCModelAutoIncrement"];
+	[encoder encodeInt:eSumViewType		forKey:@"ORMTCModelESumViewType"];
+	[encoder encodeInt:nHitViewType		forKey:@"ORMTCModelNHitViewType"];
+	[encoder encodeObject:defaultFile	forKey:@"ORMTCModelDefaultFile"];
+	[encoder encodeObject:lastFile		forKey:@"ORMTCModelLastFile"];
+	[encoder encodeObject:lastFileLoaded forKey:@"ORMTCModelLastFileLoaded"];
+	[encoder encodeBool:autoIncrement	forKey:@"ORMTCModelAutoIncrement"];
 	[encoder encodeInt:useMemory		forKey:@"ORMTCModelUseMemory"];
 	[encoder encodeInt:repeatDelay		forKey:@"ORMTCModelRepeatDelay"];
 	[encoder encodeInt:repeatCount		forKey:@"ORMTCModelRepeatCount"];
 	[encoder encodeInt32:writeValue		forKey:@"ORMTCModelWriteValue"];
 	[encoder encodeInt32:memoryOffset	forKey:@"ORMTCModelMemoryOffset"];
 	[encoder encodeInt:selectedRegister forKey:@"ORMTCModelSelectedRegister"];
-	[encoder encodeObject:parameters	forKey:@"ORMTCModelParameters"];
+	[encoder encodeObject:mtcDataBase	forKey:@"ORMTCModelMtcDataBase"];
 	[encoder encodeObject:loadFilePath	forKey:@"ORMTCModelLoadFilePath"];
 }
-
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
@@ -346,7 +584,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 
 - (void) setDataIds:(id)assigner
 {
-    dataId       = [assigner assignDataIds:kShortForm]; //short form preferred
+    dataId = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherMTC
@@ -358,10 +596,31 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 {
 }
 
-- (unsigned long) parameter:(NSString*)aKey
+#pragma mark •••DB Helpers
+- (void) setDbLong:(long) aValue forIndex:(int)anIndex
 {
-	return [[parameters objectForKey:aKey] unsignedLongValue];
+	[self setDbObject:[NSNumber numberWithLong:aValue] forIndex:anIndex];
 }
+- (void) setDbFloat:(float) aValue forIndex:(int)anIndex
+{
+	[self setDbObject:[NSNumber numberWithFloat:aValue] forIndex:anIndex];
+}
+
+- (void) setDbObject:(id) anObject forIndex:(int)anIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDbObject:[mtcDataBase objectForNestedKey:[self getDBKeyByIndex:anIndex]] forIndex:anIndex];
+	[mtcDataBase setObject:anObject forNestedKey:[self getDBKeyByIndex:anIndex]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMtcDataBaseChanged object:self];
+}
+
+- (short)     dbLookTableSize					  { return kDbLookUpTableSize; }
+- (id)        dbObjectByIndex:(int)anIndex		  { return [mtcDataBase objectForNestedKey:[self getDBKeyByIndex:anIndex]]; }
+- (float)     dbFloatByIndex:(int)anIndex		  { return [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex:anIndex]] floatValue]; }
+- (int)       dbIntByIndex:(int)anIndex			  { return [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex:anIndex]] intValue]; }
+- (id)        dbObjectByName:(NSString*)aKey	  { return [mtcDataBase objectForNestedKey:aKey]; }
+- (NSString*) getDBKeyByIndex:(short) anIndex	  { return dbLookUpTable[anIndex].key; }
+- (NSString*) getDBDefaultByIndex:(short) anIndex { return dbLookUpTable[anIndex].defaultValue; }
+
 
 #pragma mark •••HW Access
 - (short) getNumberRegisters
@@ -460,23 +719,25 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 	NS_ENDHANDLER
 	
 }
+#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
+#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
 
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
 {
 	NS_DURING
-		if (!parameters)[self loadParameters];						// STEP 0 : Open the MTC Database
-		if (loadTheMTCXilinxFile) [self loadMTCXilinx];			// STEP 1 : Load the Xilinx
+		if (!mtcDataBase)[self loadMtcDataBase];						// STEP 0 : Open the MTC Database
+		if (loadTheMTCXilinxFile) [self loadMTCXilinx];				// STEP 1 : Load the Xilinx
 		[self clearGlobalTriggerWordMask];							// STEP 2: Clear the GT Word Mask
 		[self clearPedestalCrateMask];								// STEP 3: Clear the Pedestal Crate Mask
 		[self clearGTCrateMask];									// STEP 4: Clear the GT Crate Mask
 		[self loadTheMTCADacs];										// STEP 5: Load the DACs	
 		[self clearTheControlRegister];								// STEP 6: Clear the Control Register
 		[self zeroTheGTCounter];									// STEP 7: Clear the GT Counter
-		[self setTheLockoutWidth:[parameters uLongForKey:kMtcLockOutWidth]];	// STEP 8: Set the Lockout Width	
+		[self setTheLockoutWidth:uShortDBValue(kLockOutWidth)];	// STEP 8: Set the Lockout Width	
 		[self setThePrescaleValue];									// STEP 9:  Load the NHIT 100 LO prescale value
-		[self setThePulserRate:[parameters uLongForKey:kPulserPeriod]];			// STEP 10: Load the Pulser
-		[self setThePedestalWidth:[parameters uLongForKey:kPed_Width]];			// STEP 11: Set the Pedestal Width
-		[self setupPulseGTDelaysCoarse:[parameters uLongForKey:kPed_GT_Coarse_Delay] fine:[parameters uLongForKey:kPed_GT_Fine_Delay]]; // STEP 12: Setup the Pulse GT Delays
+		[self setThePulserRate:uLongDBValue(kPulserPeriod)];		// STEP 10: Load the Pulser
+		[self setThePedestalWidth:uLongDBValue(kPedestalWidth)];	// STEP 11: Set the Pedestal Width
+		[self setupPulseGTDelaysCoarse:uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)]; // STEP 12: Setup the Pulse GT Delays
 		if( loadThe10MHzClock)[self setMtcTime];					// STEP 13: Load the 10MHz Counter
 		[self resetTheMemory];										// STEP 14: Reset the Memory	 
 		//[self setGTCrateMask];									// STEP 15: Set the GT Crate Mask from MTC database
@@ -495,8 +756,8 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 
 - (void) setGlobalTriggerWordMask
 {
-	if (!parameters) [self loadParameters];
-	[self write:kMtcMaskReg value:[parameters uLongForKey:kGtMask]];
+	if (!mtcDataBase) [self loadMtcDataBase];
+	[self write:kMtcMaskReg value:uLongDBValue(kGtMask)];
 }
 
 
@@ -530,8 +791,8 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 
 - (void) setPedestalCrateMask
 {
-	if (!parameters)[self loadParameters];
-	[self write:kMtcPmskReg value:[parameters uLongForKey:kPedCrateMask]];
+	if (!mtcDataBase)[self loadMtcDataBase];
+	[self write:kMtcPmskReg value: uLongDBValue(kPEDCrateMask)];
 }
 
 - (void) clearGTCrateMask
@@ -541,8 +802,8 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 
 - (void) setGTCrateMask
 {
-	if (!parameters)[self loadParameters];
-	[self write:kMtcGmskReg value:[parameters uLongForKey:kGTCrateMask]];
+	if (!mtcDataBase)[self loadMtcDataBase];
+	[self write:kMtcGmskReg value: uLongDBValue(kGtCrateMask)];
 }
 
 - (unsigned long) getGTCrateMask
@@ -778,7 +1039,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 {
 	NS_DURING
 		//value from 1 to 65535
-		unsigned long write_value = (0xffff - ([parameters uLongForKey:kNH100_Low_Prescale] - 1));// 1 prescale/~N+1 NHIT_100_LOs
+		unsigned long write_value = (0xffff - (uLongDBValue(kNhit100LoPrescale) - 1));// 1 prescale/~N+1 NHIT_100_LOs
 
 		// write the prescale  value in MTC_SCALE_REG
 		[self write:kMtcScaleReg value:write_value];
@@ -803,7 +1064,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 {		
 	NS_DURING
 
-		if (!parameters) [self loadParameters];
+		if (!mtcDataBase) [self loadMtcDataBase];
 		
 		[self setupGTCorseDelay:theCoarseDelay];	
 		[self setupGTFineDelay:theAddelValue];
@@ -927,9 +1188,9 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 // 							  GT coarse delay, GT Lockout Width, pedestal width in ns and a 
 //							  specified crate mask set in MTC Databse. Trigger mask is EXT_8.
 	NS_DURING
-		if (!parameters)[self loadParameters];									//STEP 0 : Open the MTC Database
+		if (!mtcDataBase)[self loadMtcDataBase];									//STEP 0 : Open the MTC Database
 		[self basicMTCPedestalGTrigSetup];										//STEP 1: Perfom the basic setup for pedestals and gtrigs
-		[self setupPulserRateAndEnable:[parameters uLongForKey:kPulserPeriod]];	// STEP 2 : Setup pulser rate and enable
+		[self setupPulserRateAndEnable:uLongDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
 
 	
 	NS_HANDLER
@@ -943,15 +1204,15 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 {
 
 	NS_DURING
-		if (!parameters)[self loadParameters];							//STEP 0 : Open the MTC Database
+		if (!mtcDataBase)[self loadMtcDataBase];							//STEP 0 : Open the MTC Database
 		//[self clearGlobalTriggerWordMask];							//STEP 0a:	//added 01/24/98 QRA
 		[self enablePedestal];											// STEP 1 : Enable Pedestal	
 		[self setPedestalCrateMask];									// STEP 2: Mask in crates for pedestals (PMSK)
 		[self setGTCrateMask];											// STEP 3: Mask  Mask in crates fo GTRIGs (GMSK)
-		[self setupPulseGTDelaysCoarse:[parameters uLongForKey:kPed_GT_Coarse_Delay] fine:[parameters uLongForKey:kPed_GT_Fine_Delay]]; // STEP 4: Set thSet the GTRIG/PED delay in ns
-		[self setTheLockoutWidth:[parameters uLongForKey:kLockOut_Width]];		// STEP 5: Set the GT lockout width in ns	
-		[self setThePedestalWidth:[parameters uLongForKey:kPed_Width]];			// STEP 6:Set the Pedestal width in ns
-		[self setSingleGTWordMask:[parameters uLongForKey:kGtMask]];			// STEP 7:Mask in global trigger word(MASK)
+		[self setupPulseGTDelaysCoarse: uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)]; // STEP 4: Set thSet the GTRIG/PED delay in ns
+		[self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];		// STEP 5: Set the GT lockout width in ns	
+		[self setThePedestalWidth: uLongDBValue(kPedestalWidth)];		// STEP 6:Set the Pedestal width in ns
+		[self setSingleGTWordMask: uLongDBValue(kGtMask)];				// STEP 7:Mask in global trigger word(MASK)
 	
 	
 	NS_HANDLER
@@ -1002,8 +1263,8 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 - (void) basicMTCReset
 {
 	NS_DURING
-		if (!parameters)			
-			[self loadParameters];
+		if (!mtcDataBase)			
+			[self loadMtcDataBase];
 	
 		[self disablePulser];
 		[self clearGTCrateMask];
@@ -1011,7 +1272,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 		[self clearGlobalTriggerWordMask];
 		[self resetTheMemory];
 		[self zeroTheGTCounter];
-		[self setTheLockoutWidth:[parameters uLongForKey:kLockOut_Width]];		
+		[self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];		
 		[self setThePrescaleValue];		
 	
 	NS_HANDLER
@@ -1021,7 +1282,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 }
 
 
-- (void) loadParameters
+- (void) loadMtcDataBase
 {
 /*
 	// check to see the database pointers exist, if not create them										  
@@ -1146,7 +1407,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 
 	unsigned long bitCount		= 0UL;
 	unsigned long readValue		= 0UL;
-	unsigned long aValue	= 0UL;
+	unsigned long aValue		= 0UL;
 	
 	BOOL firstPass = TRUE;
 
@@ -1285,8 +1546,9 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 {
 	NS_DURING
 
-		if (!parameters) [self loadParameters];
-		unsigned long aValue = [parameters uLongForKey:kTubRegister];
+		if (!mtcDataBase) [self loadMtcDataBase];
+	//	unsigned long aValue = [parameters uLongForKey:kTubRegister];
+	unsigned long aValue =0;   ////remove and reinstate above line+++++++++++++++++++++++++++++++
 		
 		unsigned long shift_value;
 		unsigned long theRegValue;
@@ -1345,6 +1607,17 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 	NSLog(@"Mtc control reg: 0x%0x\n", [self getMTC_CSR]);
 }
 
+- (void) saveSet:(NSString*)filePath
+{
+	[mtcDataBase writeToFile:filePath atomically:NO];
+} 
+
+- (void) loadSet:(NSString*)filePath
+{	
+	[self setMtcDataBase:[NSMutableDictionary dictionaryWithContentsOfFile: filePath]];
+	[self setLastFileLoaded:filePath];
+}
+
 @end
 
 @implementation ORMTCModel (private)
@@ -1363,6 +1636,7 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 			}
 		}
 		else {
+			//TBD.....
 			if(doReadOp){
 			}
 			else {
@@ -1378,6 +1652,23 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 		NSLog(@"Mtc basic op exception: %@\n",localException);
 	NS_ENDHANDLER
 }
+
+- (void) setupDefaults
+{
+	NSMutableDictionary* aDictionary = [NSMutableDictionary dictionaryWithCapacity:100];
+	int i;
+	for(i=0;i<kDBComments;i++){
+		NSDecimalNumber* defaultValue = [NSDecimalNumber decimalNumberWithString:[self getDBDefaultByIndex:i]];
+		[aDictionary setObject:defaultValue forNestedKey:[self getDBKeyByIndex:i]];
+	}
+	for(i=kDBComments;i<kDbLookUpTableSize;i++){
+		[aDictionary setObject:[self getDBDefaultByIndex:i] forNestedKey:[self getDBKeyByIndex:i]];
+	}
+	[self setMtcDataBase:aDictionary];
+
+}
+
+
 
 @end
 

@@ -54,6 +54,90 @@ enum {
 };
 
 
+typedef struct  {
+	NSString*   key;
+	NSString*	defaultValue;
+} SnoMtcDBInfoStruct; 
+
+enum {
+	kLockOutWidth,   
+	kPedestalWidth,
+	kNhit100LoPrescale,
+	kPulserPeriod,
+	kLow10MhzClock,
+	kHigh10MhzClock,
+	kFineSlope,
+	kMinDelayOffset,
+	kCoarseDelay,
+	kFineDelay,
+	kGtMask,
+	kGtCrateMask,
+	kPEDCrateMask,
+	kControlMask,
+	
+	//NHit -- note the offsets (defined below).. if you add anything you MUST adjust the offsets also
+	kNHit100HiThreshold, //+0	
+	kNHit100MedThreshold,
+	kNHit100LoThreshold,	
+	kNHit20Threshold,	
+	kNHit20LBThreshold,	
+	kOWLNThreshold,		
+	
+	kNHit100HimVperAdc,	//+6
+	kNHit100MedmVperVAdc,	
+	kNHit100LomVperAdc,	
+	kNHit20mVperAdc,		
+	kNHit20LBmVperAdc,		
+	kOWLNmVperAdc,			
+
+	kNHit100HimVperNHit, //kmVoltPerNHit_Offset
+	kNHit100MedmVperNHit,	
+	kNHit100LomVperNHit,	
+	kNHit20mVperNHit,		
+	kNHit20LBmVperNHit,		
+	kOWLNmVperNHit,			
+	
+	kNHit100HidcOffset,	//kNHitDcOffset_Offset
+	kNHit100MeddcOffset,	
+	kNHit100LodcOffset,	
+	kNHit20dcOffset,		
+	kNHit20LBdcOffset,	
+	kOWLNdcOffset,		
+	
+	//ESUM
+	kESumLowThreshold,	
+	kESumHiThreshold,	
+	kOWLELoThreshold,	
+	kOWLEHiThreshold,	
+
+	kESumLowmVperAdc,//+4	
+	kESumHimVperAdc,		
+	kOWLELomVperAdc,
+	kOWLEHimVperAdc,
+
+	kESumLowmVperpC, //+kmVoltPerpC_Offset
+	kESumHimVperpC,
+	kOWLELomVperpC,
+	kOWLEHimVperpC,
+
+	kESumLowdcOffset, //+kESumDcOffset_Offset
+	kESumHidcOffset,
+	kOWLELodcOffset,
+	kOWLEHidcOffset,
+	
+	//other -- numbers go ABOVE this
+	kDBComments,
+	kXilinxFile,
+	
+	kDbLookUpTableSize //must be last
+};
+
+#define kNHitDcOffset_Offset	18
+#define kmVoltPerNHit_Offset	12
+
+#define kmVoltPerpC_Offset		 8
+#define kESumDcOffset_Offset	12
+
 
 // GTWrod Masks for the MTC
 #define MTC_NHIT_100_LO_MASK				0x00000001
@@ -136,7 +220,17 @@ enum {
 #define TUB_SCLK  						 	0x00000800
 #define TUB_SLATCH 							0x00001000
 
-#pragma mark •••Param Names
+#define kNHitsViewRaw    0
+#define kNHitsViewmVolts 1
+#define kNHitsViewNHits  2
+
+#define kESumViewRaw		0
+#define kESumViewmVolts		1
+#define kESumVieweSumRel	2
+#define kESumViewpC			3
+
+
+/*#pragma mark •••Param Names
 #define kMtcLockOutWidth		 @"MtcLockOutWidth"
 #define kPulserPeriod			 @"PulserPeriod"
 #define kPulserWidth			 @"PulserWidth"
@@ -151,3 +245,4 @@ enum {
 #define kTubRegister			 @"TubRegister"
 #define	kPed_GT_Fine_Slope		 @"Ped_GT_Fine_Slope"
 #define kPed_GT_Min_Delay_Offset @"Ped_GT_Min_Delay_Offset"
+*/
