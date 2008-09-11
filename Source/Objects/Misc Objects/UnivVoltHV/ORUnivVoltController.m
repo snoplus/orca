@@ -29,47 +29,45 @@
     return self;
 }
 
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
     [ super registerNotificationObservers ];
     
+/*    [notifyCenter addObserver : self
+                     selector : @selector( slotChanged: )
+                         name : ORUVHVSlotChanged
+						object: model];
+*/
+
     [notifyCenter addObserver : self
-                     selector : @selector(ipAddressChanged:)
-                         name : ORUnivVoltIpAddressChanged
+                     selector : @selector( channelEnabledChanged:)
+                         name : ORUVUnitEnabledChanged
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(isConnectedChanged:)
-                         name : ORUnivVoltIsConnectedChanged
+                     selector : @selector( demandHVChanged:)
+                         name : ORUVUnitDemandHVChanged
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(frameErrorChanged:)
-                         name : ORUnivVoltFrameError
+                     selector : @selector( measuredHVChanged:)
+                         name : ORUVUnitMeasuredHVChanged
 						object: model];
 
+/*
     [notifyCenter addObserver : self
-                     selector : @selector(averageChanged:)
-                         name : ORUnivVoltAverageChanged
-						object: model];
-						
-    [notifyCenter addObserver : self
-                     selector : @selector(receiveCountChanged:)
-                         name : ORUnivVoltReceiveCountChanged
-						object: model];
-
+                     selector : @selector( measuredCurrentChanged: )
+                         name : ORHVMeasuredCurrentChanged
+*/
+/*						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
                          name : ORRunStatusChangedNotification
-                       object : nil];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(settingsLockChanged:)
-                         name : ORUnivVoltLock
-                        object: nil];
-
+					   object : nil];
+*/
 }
 
 
@@ -77,49 +75,50 @@
 {
     [ super updateWindow ];
     
-    [self settingsLockChanged:nil];
-	[self ipAddressChanged:nil];
-	[self isConnectedChanged:nil];
+//    [self settingsLockChanged:nil];
+//	[self ipAddressChanged:nil];
+//	[self isConnectedChanged:nil];
 //	[self frameErrorChanged:nil];
-	[self averageChanged:nil];
+//	[self averageChanged:nil];
 //	[self receiveCountChanged:nil];
 }
 
-- (void) checkGlobalSecurity
+- (void) channelEnabledChanged: (NSNotification*) aNote
+{
+	[mChnlEnabled setIntValue: [model chnlEnabled: mCurrentChnl]];
+}
+
+- (void) demandHVChanged: (NSNotification*) aNote
+{
+	[mChnlEnabled setFloatValue: [model demandHV: mCurrentChnl]];
+}
+
+- (void) measuredHVChanged: (NSNotification*) aNote
+{
+	[mDemandHV setFloatValue: [model measuredHV: mCurrentChnl]];
+}
+
+
+/*- (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORUnivVoltLock to:secure];
     [dialogLock setEnabled:secure];
 }
+*/
 /*
 - (void) receiveCountChanged:(NSNotification*)aNote
 {
 	[receiveCountField setIntValue: [model receiveCount]];
 }
 */
-
-- (void) averageChanged:(NSNotification*)aNote
-{
-	//inserted to remove compiler warning MAH 08/06/08
-}
-
-#pragma mark •••Notifications
-- (void) isConnectedChanged:(NSNotification*)aNote
-{
-	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
-	[ipConnectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
-}
-
-- (void) ipAddressChanged:(NSNotification*)aNote
-{
-	[ipAddressTextField setStringValue: [model ipAddress]];
-}
 /*
 - (void) frameErrorChanged:(NSNotification*)aNote
 {
 	[frameErrorField setIntValue: [model frameError]];
 }
 */
+/*
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
     BOOL locked			= [gSecurity isLocked:ORUnivVoltLock];
@@ -130,22 +129,178 @@
     [dialogLock setState: locked];
 
 }
-
+*/
 #pragma mark •••Actions
-- (IBAction) ipAddressTextFieldAction:(id)sender
+- (IBAction) setChannelNumberField: (id) aSender
 {
-	[model setIpAddress:[sender stringValue]];	
+	 mCurrentChnl = [mChannelNumber intValue];
+	[self setChnlValues: mCurrentChnl];
+	[mChannelStepper setIntValue: mCurrentChnl];
 }
 
-- (IBAction) connectAction:(id)sender
+- (IBAction) setChannelNumberStepper: (id) aSender
 {
-	[self endEditing];
-	[model connect];
+	mCurrentChnl = [mChannelStepper intValue];
+	[self setChnlValues: mCurrentChnl];
+	[mChannelNumber setIntValue: mCurrentChnl];
 }
 
-- (IBAction) dialogLockAction:(id)sender
+- (IBAction) setChnlEnabled: (id) aSender
 {
-    [gSecurity tryToSetLock:ORUnivVoltLock to:[sender intValue] forWindow:[self window]];
+	int enabled = [mChnlEnabled state];
+	
+//	NSNumber* enabledObj = [NSNumber numberWithBool: enabled];
+
+	[model setChannelEnabled: enabled chnl: mCurrentChnl];
 }
+
+- (IBAction) setDemandHV: (id) aSender
+{
+	
+//	NSLog( @"Number of items in dictionary in setDemandHV: %d", [mChannelDict count] );
+	[model setDemandHV: [mDemandHV stringValue]];
+}
+
+- (void) updateDemandHV: (NSNotification*) aNote
+{
+	float demandHV = [model demandHV: mCurrentChnl];
+	[mDemandHV setFloatValue: demandHV];
+//	NSString* demandHV = [NSString stringWithString: [mDemandHV stringValue]];
+
+}
+/*
+- (IBAction) setChnlEnabled: (id) aSender
+{
+	bool enabled = [mChnlEnabled state];
+	
+	NSNumber* enabledObj = [NSNumber numberWithBool: enabled];
+
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
+	[tmpChnl setObject: enabledObj forKey: ORHVkChnlEnabled];
+}
+
+- (IBAction) setTripCurrent: (id) aSender
+{
+	NSString* tripCurrent = [NSString stringWithString: [mTripCurrent stringValue]];
+
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
+	[tmpChnl setObject: tripCurrent forKey: ORHVkTripCurrent];
+}
+
+- (IBAction) setRampUpRate: (id) aSender
+{
+	NSString* rampUpRate = [NSString stringWithString: [mRampUpRate stringValue]];
+
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
+	[tmpChnl setObject: rampUpRate forKey: ORHVkRampUpRate];
+}
+
+- (IBAction) setRampDownRate: (id) aSender
+{
+	NSString* rampDownRate = [NSString stringWithString: [mRampDownRate stringValue]];
+
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
+	[tmpChnl setObject: rampDownRate forKey: ORHVkRampDownRate];
+}
+
+- (IBAction) setMVDZ: (id) aSender
+{
+	NSString* MVDZ = [NSString stringWithString: [mMVDZ stringValue]];
+
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
+	[tmpChnl setObject: MVDZ forKey: ORHVkMVDZ];
+}
+
+- (IBAction) setMCDZ: (id) aSender
+{
+	NSString* MCDZ = [NSString stringWithString: [mMVDZ stringValue]];
+
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: mCurrentChnl];
+	[tmpChnl setObject: MCDZ forKey: ORHVkMCDZ];
+}
+*/
+- (IBAction) updateTable: (id) aSender
+{
+	[mModuleTable reloadData];	
+}
+
+#pragma mark •••Table handling routines
+- (int) numberOfRowsInTableView: (NSTableView*) aTableView
+{
+	return( ORHVNumChannels );
+}
+
+- (void) tableView: (NSTableView*) aTableView
+       setObjectValue: (id) anObject
+	   forTableColumn: (NSTableColumn*) aTableColumn
+	   row: (int) aRowIndex
+{
+//	NSMutableDictionary* tmpChnl = [[model dictionary] objectAtIndex: aRowIndex];
+	NSString* colIdentifier = [aTableColumn identifier];
+	NSMutableDictionary* tmpChnl = [model channelDictionary: aRowIndex];
+	[tmpChnl setObject: anObject forKey: colIdentifier];
+}
+
+- (id) tableView: (NSTableView*) aTableView
+	   objectValueForTableColumn: (NSTableColumn*) aTableColumn
+	   row: (int) aRowIndex
+{
+	NSMutableDictionary* tmpChnl = [model channelDictionary: aRowIndex];
+	NSString* colIdentifier = [aTableColumn identifier];
+	if ( [colIdentifier isEqualToString: @"chnlEnabled"]) NSLog( @"Row: %d, column: %@", aRowIndex, colIdentifier );
+	return( [tmpChnl objectForKey: colIdentifier] );
+}
+
+#pragma mark •••Utilities
+- (void) setChnlValues: (int) aCurrentChannel
+{
+	NSDictionary*	tmpChnl = [model channelDictionary: aCurrentChannel];
+	bool			state = [mChnlEnabled state];
+	int				status;
+	
+	[model printDictionary: mCurrentChnl];
+	
+	[mChnlEnabled setState: state];
+	[mDemandHV setStringValue: [tmpChnl objectForKey: ORHVkDemandHV] ];
+	[mMeasuredHV setStringValue: [tmpChnl objectForKey: ORHVkMeasuredHV]];
+	[mMeasuredCurrent setStringValue: [tmpChnl objectForKey: ORHVkMeasuredCurrent]];
+	[mTripCurrent setStringValue: [tmpChnl objectForKey: ORHVkTripCurrent]];
+	[mRampUpRate setStringValue: [tmpChnl objectForKey: ORHVkRampUpRate]];
+	[mRampDownRate setStringValue: [tmpChnl objectForKey: ORHVkRampDownRate]];
+	[mMVDZ setStringValue: [tmpChnl objectForKey: ORHVkMVDZ]];
+	[mMCDZ setStringValue: [tmpChnl objectForKey: ORHVkMCDZ]];
+	
+	// status case statement
+	status =  [[tmpChnl objectForKey: ORHVkStatus] boolValue];
+	switch ( status ) {
+		case eHVUEnabled:
+			[mStatus setStringValue: @"Enabled"];
+			break;
+			
+		case eHVURampingUp:
+			[mStatus setStringValue: @"Ramping up"];
+			break;
+			
+		case eHVURampingDown:
+			[mStatus setStringValue: @"Ramping down"];
+			break;
+			
+		case evHVUTripForSupplyLimits:
+			[mStatus setStringValue: @"Trip for viol. spply lmt"];
+			break;
+			
+		case eHVUTripForUserCurrent:
+			[mStatus setStringValue: @"Trip for viol. current lmt"];
+			break;
+			
+		case eHVUTripForHVError:
+			break;
+		case eHVUTripForHVLimit:
+		default:
+			break;
+	}
+	
+}
+
 
 @end

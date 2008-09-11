@@ -26,16 +26,30 @@
 #import "ORDataPacket.h"
 #import "ORQueue.h"
 
-NSString* ORUnivVoltReceiveCountChanged	= @"ORUnivVoltReceiveCountChanged";
-NSString* ORUnivVoltIsConnectedChanged	= @"ORUnivVoltIsConnectedChanged";
-NSString* ORUnivVoltIpAddressChanged	= @"ORUnivVoltIpAddressChanged";
-NSString* ORUnivVoltAverageChanged		= @"ORUnivVoltAverageChanged";
-NSString* ORUnivVoltFrameError			= @"ORUnivVoltFrameError";
-NSString* ORUnivVoltLock				= @"ORUnivVoltLock";
+NSString* ORUVUnitEnabledChanged			= @"ORUVUnitEnabledChanged";
+NSString* ORUVUnitDemandHVChanged			= @"ORUVUnitDemandHVChanged";
+NSString* ORUVUnitMeasuredHVChanged			= @"ORUVUnitMeasuredHVChanged";
+NSString* ORUVUnitMeasuredCurrentChanged	= @"ORUVUnitMeasuredCurrentChanged";
+NSString* ORUVUnitTripCurrentChanged		= @"ORUVUnitTripCurrentChanged";
+
+NSString* ORUVUnitSlotChanged				= @"ORUVUnitSlotChanged";
+
+// HV Unit parameters
+NSString* ORHVkChnlEnabled = @"chnlEnabled";
+NSString* ORHVkDemandHV = @"demandHV";
+NSString* ORHVkMeasuredHV = @"measuredHV";
+NSString* ORHVkMeasuredCurrent = @"measuredCurrent";
+NSString* ORHVkTripCurrent = @"tripCurrent";
+NSString* ORHVkRampUpRate = @"RampUpRate";
+NSString* ORHVkRampDownRate = @"RampDownRate";
+NSString* ORHVkStatus = @"Status";
+NSString* ORHVkMVDZ = @"MVDZ";
+NSString* ORHVkMCDZ = @"MCDZ";
+
 
 
 @implementation ORUnivVoltModel
-
+#pragma mark •••Init/Dealloc
 /*- (NSString*) fullID
 {
     return [NSString stringWithFormat:@"%@,%d,%d",NSStringFromClass([self class]),[self crateNumber], [self stationNumber]];
@@ -48,17 +62,17 @@ NSString* ORUnivVoltLock				= @"ORUnivVoltLock";
 
 - (void) makeMainController
 {
-    [self linkToController:@"ORUnivVoltController"];
+    [self linkToController: @"ORUnivVoltController"];
 }
 
 - (void) dealloc
 {
-	[socket close];
-	[socket release];
-	[meterData release];
+//	[socket close];
+//	[socket release];
+//	[meterData release];
 	
-	int i;
-	for(i=0;i<kNplpCNumChannels;i++) [dataStack[i] release];
+//	int i;
+//	for(i=0;i<kNplpCNumChannels;i++) [dataStack[i] release];
 	
     [super dealloc];
 }
@@ -67,11 +81,9 @@ NSString* ORUnivVoltLock				= @"ORUnivVoltLock";
 {
 	NS_DURING
 	
-		int i;
-		for(i=0;i<kNplpCNumChannels;i++) dataStack[i] = [[ORQueue alloc] init];
+//		int i;
+//		for(i = 0; i < kNplpCNumChannels; i++) dataStack[i] = [[ORQueue alloc] init];
 		
-		[self connect];
-		[self connectionChanged];
 	NS_HANDLER
 	NS_ENDHANDLER
 }
@@ -82,142 +94,54 @@ NSString* ORUnivVoltLock				= @"ORUnivVoltLock";
 }
 
 #pragma mark ***Accessors
-
-- (unsigned short) receiveCount
+- (NSMutableDictionary*) channelDictionary: (int) aCurrentChnl
 {
-    return receiveCount;
+	return( [mChannelDict objectAtIndex: aCurrentChnl] );
 }
 
-- (void) setReceiveCount:(unsigned short)aCount
+- (int) chnlEnabled: (int) aCurrentChnl
 {
-    receiveCount = aCount;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORUnivVoltReceiveCountChanged object:self];
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: aCurrentChnl];
+	return( [[tmpChnl objectForKey: ORHVkChnlEnabled] intValue] );
 }
 
-- (NetSocket*) socket
+- (void) setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl
 {
-	return socket;
-}
-- (void) setSocket:(NetSocket*)aSocket
-{
-	if(aSocket != socket)[socket close];
-	[aSocket retain];
-	[socket release];
-	socket = aSocket;
-    [socket setDelegate:self];
-}
-
-- (unsigned int) frameError
-{
-	return frameError;
-}
-
-- (void) setFrameError:(unsigned int)aValue
-{
-	frameError = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORUnivVoltFrameError object:self];
-
-}
-
-- (void) setIsConnected:(BOOL)aFlag
-{
-    isConnected = aFlag;
-	[self setReceiveCount:0];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORUnivVoltIsConnectedChanged object:self];
-}
-
-- (NSString*) ipAddress
-{
-    return ipAddress;
-}
-
-- (void) setIpAddress:(NSString*)aIpAddress
-{
-	if(!aIpAddress)aIpAddress = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setIpAddress:ipAddress];
-    
-    [ipAddress autorelease];
-    ipAddress = [aIpAddress copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORUnivVoltIpAddressChanged object:self];
-}
-
-
-- (void) connect
-{
-	if(!isConnected){
-		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kNplpCMeterPort]];	
-        [self setIsConnected:[socket isConnected]];
-	}
-	else {
-		[self stop];
-		[self setSocket:nil];	
-        [self setIsConnected:[socket isConnected]];
-	}
-}
-
-- (BOOL) isConnected
-{
-	return isConnected;
-}
-
-- (float) meterAverage:(unsigned short)aChannel
-{
-	if(aChannel<kNplpCNumChannels)return meterAverage[aChannel];
-	else return 0;
-}
-
-- (void) setMeter:(int)chan average:(float)aValue
-{
-	meterAverage[chan] = aValue;
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORUnivVoltAverageChanged object:self userInfo:userInfo];
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: aCurrentChnl];
 	
+	NSNumber* enabledNumber = [NSNumber numberWithInt: anEnabled];
+	[tmpChnl setObject: enabledNumber forKey: enabledNumber];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitEnabledChanged object: self];		
+}
+- (float) demandHV: (int) aChnl
+{
+	NSDictionary* tmpChnl = [mChannelDict objectAtIndex: aChnl];
+	
+	return ( [[tmpChnl objectForKey: ORHVkDemandHV] floatValue] );
 }
 
-- (void) appendMeterData:(NSData*)someData
+- (void) setDemandHV: (float) aDemandHV
 {
-	if(!meterData)meterData = [[NSMutableData alloc] initWithCapacity:1024];
-	[meterData appendData:someData];
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitDemandHVChanged object: self];	
 }
+
+
+- (float) measuredHV: (int) aChnl
+{
+	// Send command to get HV
+//	[adapter sendCommand: @"RC"];
+	
+	// Now update dictionary
+	
+	NSMutableDictionary* tmpChnl = [mChannelDict objectAtIndex: aChnl];
+	return( [[tmpChnl objectForKey: ORHVkDemandHV] floatValue] );
+}
+
 
 #pragma mark ***Delegate Methods
-- (void) netsocketConnected:(NetSocket*)inNetSocket
-{
-    if(inNetSocket == socket){
-        [self setIsConnected:[socket isConnected]];
-		[self start];
-    }
-}
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
-{
-    if(inNetSocket == socket){
-		[self appendMeterData:[inNetSocket readData]];
-		[self shipValues];
-	}
-}
-
-- (void) netsocketDisconnected:(NetSocket*)inNetSocket
-{
-    if(inNetSocket == socket){
-        [self setIsConnected:NO];
-		[socket autorelease];
-		socket = nil;
-    }
-}
-
-- (void) start
-{
-	[socket write:&kNplpCStart length:1];
-	[self setFrameError:0];
-}
-
-- (void) stop
-{
-	[socket write:&kNplpCStop length:1];
-}
-
+/*
 #pragma mark •••Data Records
 - (unsigned long) dataId
 {
@@ -316,48 +240,21 @@ NSString* ORUnivVoltLock				= @"ORUnivVoltLock";
 	}
 }
 
-- (void) averageMeterData
-{
-	int chan;
-	for(chan=0;chan<kNplpCNumChannels;chan++){
-		int count = [dataStack[chan] count];
-		if(count){
-			NSEnumerator* e = [dataStack[chan] objectEnumerator];
-			NSNumber* aValue;
-			long sum = 0;
-			while(aValue = [e nextObject]){
-				sum += [aValue longValue];
-			}
-			[self setMeter:chan average:sum/(float)count];
-			if(count>10){
-				int j;
-				for(j=0;j<count-10;j++)[dataStack[chan] dequeueFromBottom];
-			}
-		}
-		else [self setMeter:chan average:0];
-
-	}
-}
-
-- (BOOL) validateMeterData
-{
-	unsigned char* p = (unsigned char*)[meterData bytes];
-	unsigned int len = [meterData length];
-	int i;
-	for(i=4;i<len;i+=4){
-		if(p[i-4] == 255 && p[i] == 0)return YES;
-		else if(p[i] != p[i-4]+1)return NO;
-	}
-	return YES;
-}
-
+*/
 #pragma mark ***Archival
-- (id)initWithCoder:(NSCoder*)decoder
+- (id) initWithCoder: (NSCoder*) decoder
 {
+	int i;
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-	[self setIpAddress:[decoder decodeObjectForKey:@"ORUnivVoltModelIpAddress"]];
+	
+	for ( i = 0; i < ORHVNumChannels; i++ )
+	{
+		NSDictionary* tmpChnl = [NSMutableDictionary dictionaryWithCapacity: ORUVUnitNumParameters];
+		tmpChnl = [decoder decodeObjectForKey: @"ORUVUnitParameters"];
+		[mChannelDict insertObject: tmpChnl atIndex: i];
+	}
     [[self undoManager] enableUndoRegistration];    
 		
     return self;
@@ -365,8 +262,40 @@ NSString* ORUnivVoltLock				= @"ORUnivVoltLock";
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
+	int i;
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:ipAddress forKey:@"ORUnivVoltModelIpAddress"];
+	for ( i = 0; i < ORHVNumChannels; i++ ) 
+	{
+		NSDictionary* tmpChnl = [mChannelDict objectAtIndex: i];
+		[encoder encodeObject: tmpChnl forKey: @"ORUVUnitParameters"];
+	}
+}
+
+#pragma mark •••Utilities
+- (void) printDictionary: (int) aCurrentChnl
+{
+	NSDictionary*	tmpChnl = [mChannelDict objectAtIndex: aCurrentChnl];
+	
+	float			value;
+	
+	value = [[tmpChnl objectForKey: ORHVkDemandHV] floatValue];
+	NSLog( @"Demand HV: %g", value );
+	value = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
+	NSLog( @"Measured HV: %g", value );
+	value = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
+	NSLog( @"Measured Current: %f", [tmpChnl objectForKey: ORHVkMeasuredCurrent] );
+	value = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
+	NSLog( @"Trip current: %f", [tmpChnl objectForKey: ORHVkTripCurrent] );
+	value = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
+	NSLog( @"RampUpRate: %f", [tmpChnl objectForKey: ORHVkRampUpRate] );
+	value = [[tmpChnl objectForKey: ORHVkRampDownRate] floatValue];
+	NSLog( @"RampDownRate: %f", value );
+	value = [[tmpChnl objectForKey: ORHVkStatus] floatValue];
+	NSLog( @"Status: %d", value );
+	value = [[tmpChnl objectForKey: ORHVkMCDZ] floatValue];
+	NSLog( @"MVDZ: %f", value );
+	value = [[tmpChnl objectForKey: ORHVkMCDZ] floatValue];
+	NSLog( @"MCDZ: %f", value );
 }
 
 

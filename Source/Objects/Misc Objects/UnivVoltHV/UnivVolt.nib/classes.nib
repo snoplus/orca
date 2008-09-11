@@ -15,11 +15,13 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>connectAction</key>
+				<key>setChannelNumberField</key>
 				<string>id</string>
-				<key>dialogLockAction</key>
+				<key>setChannelNumberStepper</key>
 				<string>id</string>
-				<key>ipAddressTextFieldAction</key>
+				<key>setChnlEnabled</key>
+				<string>id</string>
+				<key>setDemandHV</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -28,19 +30,31 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>averageValueMatrix</key>
-				<string>NSMatrix</string>
-				<key>dialogLock</key>
+				<key>mChannelNumber</key>
+				<string>NSTextField</string>
+				<key>mChannelStepper</key>
+				<string>NSStepperCell</string>
+				<key>mChnlEnabled</key>
 				<string>NSButton</string>
-				<key>frameErrorField</key>
+				<key>mDemandHV</key>
 				<string>NSTextField</string>
-				<key>ipAddressTextField</key>
+				<key>mMCDZ</key>
 				<string>NSTextField</string>
-				<key>ipConnectButton</key>
-				<string>NSButton</string>
-				<key>ipConnectedTextField</key>
+				<key>mMVDZ</key>
 				<string>NSTextField</string>
-				<key>receiveCountField</key>
+				<key>mMeasuredCurrent</key>
+				<string>NSTextField</string>
+				<key>mMeasuredHV</key>
+				<string>NSTextField</string>
+				<key>mModuleTable</key>
+				<string>NSTableView</string>
+				<key>mRampDownRate</key>
+				<string>NSTextField</string>
+				<key>mRampUpRate</key>
+				<string>NSTextField</string>
+				<key>mStatus</key>
+				<string>NSTextField</string>
+				<key>mTripCurrent</key>
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>

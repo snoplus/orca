@@ -23,67 +23,54 @@
 
 #import "ORCard.h"
 
-#define kNplpCMeterPort 5000
-#define kNplpCNumChannels 4
-#define kNplpCStart  "B"
-#define kNplpCStop	 "Q"
+#define ORHVNumChannels 12
+#define ORUVUnitNumParameters 9
 
-@class NetSocket;
-@class ORAlarm;
-@class ORQueue;
+enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSupplyLimits = 4,
+                eHVUTripForUserCurrent, eHVUTripForHVError, eHVUTripForHVLimit};
+
 
 @interface ORUnivVoltModel : ORCard 
 {
-	NSLock* localLock;
-    NSString* ipAddress;
-    BOOL isConnected;
-	NetSocket* socket;
-    unsigned long dataId;
-	NSMutableData* meterData;
-	int frameError;
-	ORQueue* dataStack[kNplpCNumChannels];
-	float meterAverage[kNplpCNumChannels];
-    unsigned short receiveCount;
+	id						adapter;
+	NSMutableArray*			mChannelDict;
 }
 
-#pragma mark ***Accessors
-- (unsigned short) receiveCount;
-- (void) setReceiveCount:(unsigned short)aCount;
-- (unsigned int) frameError;
-- (void) setFrameError:(unsigned int)aValue;
-- (NetSocket*) socket;
-- (void) setSocket:(NetSocket*)aSocket;
-- (BOOL) isConnected;
-- (void) setIsConnected:(BOOL)aFlag;
-- (NSString*) ipAddress;
-- (void) setIpAddress:(NSString*)aIpAddress;
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) aDataId;
-- (void) appendMeterData:(NSData*)someData;
-- (BOOL) validateMeterData;
-- (void) averageMeterData;
-- (void) setMeter:(int)chan average:(float)aValue;
-- (float) meterAverage:(unsigned short)aChannel;
+#pragma mark •••Accessors
+- (NSMutableDictionary*) channelDictionary: (int) aCurrentChnl;
+- (int)   chnlEnabled: (int) aCurrentChnl;
+- (void)  setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl;
+- (void)  setDemandHV: (float) aDemandHV;
+- (float) demandHV: (int) aChnl;
+- (float) measuredHV: (int) aChnl;
 
-#pragma mark ***Utilities
-- (void) connect;
-- (void) start;
-- (void) stop;
+#pragma mark •••Utilities
+- (void) printDictionary: (int) aCurrentChnl;
 
 #pragma mark •••DataRecords
-- (NSDictionary*) dataRecordDescription;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherShaper;
-- (void) shipValues;
 
 #pragma mark ***Archival
-- (id)   initWithCoder:(NSCoder*)decoder;
-- (void) encodeWithCoder:(NSCoder*)encoder;
+- (id) initWithCoder: (NSCoder*) decoder;
+- (void) encodeWithCoder: (NSCoder*) encoder;
 @end
 
-extern NSString* ORUnivVoltReceiveCountChanged;
-extern NSString* ORUnivVoltIsConnectedChanged;
-extern NSString* ORUnivVoltIpAddressChanged;
-extern NSString* ORUnivVoltAverageChanged;
-extern NSString* ORUnivVoltFrameError;
-extern NSString* ORUnivVoltLock;
+extern NSString* ORUVUnitEnabledChanged;
+extern NSString* ORUVUnitDemandHVChanged;
+extern NSString* ORUVUnitMeasuredHVChanged;
+extern NSString* ORUVUnitMeasuredCurrentChanged;
+extern NSString* ORUVUnitSlotChanged;
+extern NSString* ORUVUnitTripCurrentChanged;
+
+// HV unit Parameters
+extern NSString* ORHVkChnlEnabled;
+extern NSString* ORHVkDemandHV;
+extern NSString* ORHVkMeasuredHV;
+extern NSString* ORHVkMeasuredCurrent;
+extern NSString* ORHVkTripCurrent;
+extern NSString* ORHVkRampUpRate;
+extern NSString* ORHVkRampDownRate;
+extern NSString* ORHVkStatus;
+extern NSString* ORHVkMVDZ;
+extern NSString* ORHVkMCDZ;
+
+//extern NSString* ORUnivVoltLock;

@@ -22,26 +22,65 @@
 //#import "ORCard.h"
 
 @interface ORUnivVoltController : OrcaObjectController {
-//@interface ORUnivVoltController : ORCard {
-	IBOutlet NSTextField*	ipConnectedTextField;
-	IBOutlet NSTextField*	ipAddressTextField;
-	IBOutlet NSButton*		ipConnectButton;
-	IBOutlet NSMatrix*		averageValueMatrix;
-	IBOutlet NSButton*		dialogLock;
+	IBOutlet NSStepperCell*			mChannelStepper;
+	IBOutlet NSTableView*			mModuleTable;
+	IBOutlet NSButton*				mChnlEnabled;
+	IBOutlet NSTextField*			mChannelNumber;
+	IBOutlet NSTextField*			mDemandHV;
+	IBOutlet NSTextField*			mMeasuredHV;
+	IBOutlet NSTextField*			mMeasuredCurrent;
+	IBOutlet NSTextField*			mTripCurrent;
+	IBOutlet NSTextField*			mStatus;
+	IBOutlet NSTextField*			mRampUpRate;
+	IBOutlet NSTextField*			mRampDownRate;
+	IBOutlet NSTextField*			mMVDZ;				// measured HV dead zone.  Reading has to change by more than this amount for measured HV to update.
+	IBOutlet NSTextField*			mMCDZ;				// measured current dead zone.  "
+	char							mStatusByte;
+	int								mCurrentChnl;		// Current channel visible in display.
 }
 
-#pragma mark ***Interface Management
-//- (void) receiveCountChanged:(NSNotification*)aNote;
-- (void) isConnectedChanged:(NSNotification*)aNote;
-- (void) ipAddressChanged:(NSNotification*)aNote;
-//- (void) frameErrorChanged:(NSNotification*)aNote;
-- (void) averageChanged:(NSNotification*)aNote;
-- (void) settingsLockChanged:(NSNotification*)aNote;
+#pragma mark •••Notifications
+- (void) updateWindow;
+- (void) demandHVChanged: (NSNotification*) aNote;
+- (void) measuredHVChanged: (NSNotification*) aNote;
+- (void) channelEnabledChanged: (NSNotification*) aNote;
+//- (void) settingsLockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) ipAddressTextFieldAction:(id)sender;
-- (IBAction) connectAction:(id)sender;
-- (IBAction) dialogLockAction:(id)sender;
+- (IBAction) setChannelNumberField: (id) aSender;
+- (IBAction) setChannelNumberStepper: (id) aSender;
+- (IBAction) setDemandHV: (id) aSender;
+- (IBAction) setChnlEnabled: (id) aSender;
+//- (IBAction) setTripCurrent: (id) aSender;
+//- (IBAction) setRampUpRate: (id) aSender;
+//- (IBAction) setRampDownRate: (id) aSender;
+//- (IBAction) setMVDZ: (id) aSender;
+//- (IBAction) setMCDZ: (id) aSender;
+//- (IBAction) updateTable: (id) aSender;
+
+#pragma mark ***Getters
+//- (float) demandHV: (int) aChannel;
+//- (bool) isChnlEnabled: (int) aChannel;
+//- (bool) chnlEnabled: (int) aChannel;
+//- (float) measuredCurrent: (int) aChannel;
+//- (float) tripCurrent: (int) aChannel;
+//- (float) rampUpRate: (int) aChannel;
+//- (float) demandHV: (int) aChannel;
+
+#pragma mark ***Data methods
+- (int) numberOfRowsInTableView: (NSTableView*) aTableView;
+- (void) tableView: (NSTableView*) aTableView
+       setObjectValue: (id) anObject
+	   forTableColumn: (NSTableColumn*) aTableColumn
+	   row: (int) aRowIndex;
+- (id) tableView: (NSTableView*) aTableView
+	   objectValueForTableColumn: (NSTableColumn*) aTableColumn
+	   row: (int) aRowIndex;
+
+#pragma mark ***Accessors
+
+#pragma mark ***Utilities
+- (void) setChnlValues: (int) aCurrentChannel;
 
 @end
 
