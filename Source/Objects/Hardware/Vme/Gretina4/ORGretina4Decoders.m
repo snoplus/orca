@@ -49,7 +49,7 @@
 
 	ptr++; //first word of the actual card packet
 	int channel		 = *ptr&0xF;
-	int packetLength = (*ptr>>16) - 7;
+	int packetLength = ((*ptr & kGretina4NumberWordsMask) >>16) - 7;
 	
 /*	ptr++; //point to led0-15 && 16-31
 	unsigned short led1 = *ptr & 0xffff;

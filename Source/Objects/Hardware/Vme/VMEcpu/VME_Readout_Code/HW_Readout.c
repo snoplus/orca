@@ -548,6 +548,9 @@ int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
 int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
 
+#define kGretinaPacketSeparater 0xAAAAAAAA
+#define kGretinaNumberWordsMask 0x07FF0000
+	
     TUVMEDevice* vmeReadOutHandle = 0;
     TUVMEDevice* vmeFIFOStateReadOutHandle = 0;
     TUVMEDevice* vmeDMADevice = 0;
@@ -600,13 +603,13 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
         lock_device(vmeReadOutHandle);
         result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
         
-        if (result == 4 && (theValue==0xAAAAAAAA)){
+        if (result == 4 && (theValue==kGretinaPacketSeparater)){
             //read the first word of actual data so we know how much to read
             result = read_device(vmeReadOutHandle,(char*)&theValue,4,fifoAddress); 
             unlock_device(vmeReadOutHandle);
             
             data[dataIndex++] = theValue;
-            uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
+            uint32_t numLongsLeft  = ((theValue & kGretinaNumberWordsMask)>>16)-1;
             int32_t totalNumLongs  = (numLongs + numLongsLeft);
              
        
@@ -649,7 +652,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
                     LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));
                     return config->card_info[index].next_Card_Index;
                 }
-                if (theValue == 0xAAAAAAAA) break;
+                if (theValue == kGretinaPacketSeparater) break;
                 i++;
             }
             //read the first word of actual data so we know how much to read
@@ -662,7 +665,7 @@ int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
                 LogBusError("Rd Err: Gretina4 0x%04x %s",baseAddress,strerror(errno));                
                 return config->card_info[index].next_Card_Index;
             }
-            uint32_t numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
+            uint32_t numLongsLeft  = ((theValue & kGretinaNumberWordsMask)>>16)-1;
              
             /* OK, now use dma access. */
             if (fifoAddressMod == 0x39) {

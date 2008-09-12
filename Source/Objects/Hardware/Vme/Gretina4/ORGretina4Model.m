@@ -818,7 +818,7 @@ static struct {
 																		
 				[theController readLongBlock:dataDump 
 							  atAddress:fifoAddress 
-							numToRead:((theValue & 0xffff0000)>>16)-1  //number longs left to read
+							numToRead:((theValue & kGretina4NumberWordsMask)>>16)-1  //number longs left to read
 							 withAddMod:[self addressModifier] 
 						  usingAddSpace:0x01];
 				count++;
@@ -891,7 +891,7 @@ static struct {
                                    numToRead:1 
                                   withAddMod:[self addressModifier] 
                                usingAddSpace:0x01];
-                unsigned long numberLeftToRead = ((theValue & 0xffff0000)>>16)-1;
+                unsigned long numberLeftToRead = ((theValue & kGretina4NumberWordsMask)>>16)-1;
                 unsigned long* dataDump = malloc(sizeof(unsigned long)*numberLeftToRead);
                 [theController readLongBlock:dataDump 
                               atAddress:fifoAddress 
@@ -1335,7 +1335,7 @@ static struct {
                 
                 ++waveFormCount[theValue & 0x7];  //grab the channel and inc the count
                 
-                unsigned long numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
+                unsigned long numLongsLeft  = ((theValue & kGretina4NumberWordsMask)>>16)-1;
                 
                 [theController readLong:&dataBuffer[numLongs] 
                               atAddress:fifoAddress 

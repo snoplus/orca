@@ -38,6 +38,8 @@
 
 #define kGretina4PacketSeparator    0xAAAAAAAA
 
+#define kGretina4NumberWordsMask	0x7FF0000
+
 #define kGretina4FlashMaxWordCount	0xF
 #define kGretina4FlashBlockSize		( 128 * 1024 )
 #define kGretina4FlashBlocks		128
