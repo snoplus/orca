@@ -51,11 +51,11 @@
 - (IBAction) setChannelNumberStepper: (id) aSender;
 - (IBAction) setDemandHV: (id) aSender;
 - (IBAction) setChnlEnabled: (id) aSender;
-//- (IBAction) setTripCurrent: (id) aSender;
-//- (IBAction) setRampUpRate: (id) aSender;
-//- (IBAction) setRampDownRate: (id) aSender;
-//- (IBAction) setMVDZ: (id) aSender;
-//- (IBAction) setMCDZ: (id) aSender;
+- (IBAction) setTripCurrent: (id) aSender;
+- (IBAction) setRampUpRate: (id) aSender;
+- (IBAction) setRampDownRate: (id) aSender;
+- (IBAction) setMVDZ: (id) aSender;
+- (IBAction) setMCDZ: (id) aSender;
 //- (IBAction) updateTable: (id) aSender;
 
 #pragma mark ***Getters

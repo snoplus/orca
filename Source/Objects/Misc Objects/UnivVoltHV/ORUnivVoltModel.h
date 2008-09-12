@@ -33,7 +33,7 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 @interface ORUnivVoltModel : ORCard 
 {
 	id						adapter;
-	NSMutableArray*			channelArray;
+	NSMutableArray*			mChannelArray;
 }
 
 #pragma mark •••Accessors
@@ -42,9 +42,19 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 - (NSMutableDictionary*) channelDictionary: (int) aCurrentChnl;
 - (int)   chnlEnabled: (int) aCurrentChnl;
 - (void)  setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl;
-- (void)  setDemandHV: (float) aDemandHV;
-- (float) demandHV: (int) aChnl;
-- (float) measuredHV: (int) aChnl;
+- (float) demandHV: (int) aCurrentChnl;
+- (void)  setDemandHV: (float) aDemandHV chnl: (int) aCurrentChnl;
+- (float) tripCurrent: (int) aCurrentChnl;
+- (void)  setTripCurrent: (float) aTripCurrent chnl: (int) aCurrentChnl;
+- (float) rampUpRate: (int) aCurrentChnl;
+- (void)  setRampUpRate: (float) aRampUpRate chnl: (int) aCurrentChnl;
+- (float) rampDownRate: (int) aCurrentChnl;
+- (void)  setRampDownRate: (float) aRampDownRate chnl: (int) aCurrentChnl;
+- (float) MVDZ: (int) aCurrentChnl;
+- (void)  setMVDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
+- (float) MCDZ: (int) aCurrentChnl;
+- (void)  setMCDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
+- (float) measuredHV: (int) aCurrentChnl;
 
 #pragma mark •••Utilities
 - (void) printDictionary: (int) aCurrentChnl;
@@ -62,6 +72,10 @@ extern NSString* ORUVUnitMeasuredHVChanged;
 extern NSString* ORUVUnitMeasuredCurrentChanged;
 extern NSString* ORUVUnitSlotChanged;
 extern NSString* ORUVUnitTripCurrentChanged;
+extern NSString* ORUVUnitRampUpRateChanged;
+extern NSString* ORUVUnitRampDownRateChanged;
+extern NSString* ORUVUnitMVDZChanged;
+extern NSString* ORUVUnitMCDZChanged;
 
 // HV unit Parameters
 extern NSString* ORHVkChnlEnabled;

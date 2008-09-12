@@ -63,6 +63,26 @@
                      selector : @selector( measuredCurrentChanged: )
                          name : ORHVMeasuredCurrentChanged
 */
+   [notifyCenter addObserver : self
+                     selector : @selector( tripCurrentChanged:)
+                         name : ORUVUnitTripCurrentChanged
+						object: model];
+
+   [notifyCenter addObserver : self
+                     selector : @selector( upRampRateChanged:)
+                         name : ORUVUnitRampUpRateChanged
+						object: model];
+
+   [notifyCenter addObserver : self
+                     selector : @selector( downRampRateChanged:)
+                         name : ORUVUnitRampDownRateChanged
+						object: model];
+
+  [notifyCenter addObserver : self
+                     selector : @selector( MVDZChanged:)
+                         name : ORUVUnitMVDZChanged
+						object: model];
+
 /*						object: model];
 
     [notifyCenter addObserver : self
@@ -92,13 +112,24 @@
 
 - (void) demandHVChanged: (NSNotification*) aNote
 {
-	[mChnlEnabled setFloatValue: [model demandHV: mCurrentChnl]];
+	[mDemandHV setFloatValue: [model demandHV: mCurrentChnl]];
 }
 
 - (void) measuredHVChanged: (NSNotification*) aNote
 {
-	[mDemandHV setFloatValue: [model measuredHV: mCurrentChnl]];
+	[mMeasuredHV setFloatValue: [model measuredHV: mCurrentChnl]];
 }
+
+- (void) tripCurrentChanged: (NSNotification*) aNote
+{
+	[mTripCurrent setFloatValue: [model tripCurrent: mCurrentChnl]];
+}
+
+- (void) rampUprRateChanged: (NSNotification*) aNote
+{
+	[mRampUpRate setFloatValue: [model rampUpRate: mCurrentChnl]];
+}
+
 
 
 /*- (void) checkGlobalSecurity
@@ -162,14 +193,41 @@
 //	NSLog( @"Number of items in dictionary in setDemandHV: %d", [mChannelDict count] );
 	[model setDemandHV: [mDemandHV stringValue]];
 }
+- (IBAction) setTripCurrent: (id) aSender
+{
+	
+}
 
-- (void) updateDemandHV: (NSNotification*) aNote
+- (IBAction) setRampUpRate: (id) aSender
+{
+	[model setRampUpRate: [mRampUpRate stringValue]];
+}
+
+- (IBAction) setRampDownRate: (id) aSender
+{
+	[model setRampDownRate: [mRampDownRate stringValue]];
+}
+
+- (IBAction) setMVDZ: (id) aSender
+{
+	[model setMVDZ: [mMVDZ stringValue]];
+}
+
+- (IBAction) setMCDZ: (id) aSender
+{
+	[model setMCDZ: [mMCDZ stringValue]];
+}
+
+
+
+/*- (void) demandHV: (NSNotification*) aNote
 {
 	float demandHV = [model demandHV: mCurrentChnl];
 	[mDemandHV setFloatValue: demandHV];
 //	NSString* demandHV = [NSString stringWithString: [mDemandHV stringValue]];
 
 }
+*/
 /*
 - (IBAction) setChnlEnabled: (id) aSender
 {
