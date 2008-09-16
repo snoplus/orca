@@ -26,5 +26,7 @@
 #define kTrigger32 4
 #define kCaen 	   5 
 #define kCaen1720  6 
+#define kMtc	   7 
+#define kFec	   8 
 
 #endif

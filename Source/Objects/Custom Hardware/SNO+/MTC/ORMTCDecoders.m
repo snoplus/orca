@@ -30,7 +30,7 @@
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);;
+	unsigned long length = ExtractLength(*ptr);
     return length; //must return number of bytes processed.
 }
 

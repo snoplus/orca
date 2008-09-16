@@ -28,6 +28,7 @@
 #import "SBC_Config.h"
 
 @class ORMTC_DB;
+@class ORReadOutList;
 
 #define MTCLockOutWidth @"MTCLockOutWidth"
 
@@ -60,6 +61,11 @@
 		
 		int						nHitViewType;
 		int						eSumViewType;
+		
+		//data taking variables
+		ORReadOutList*  triggerGroup;
+		NSString*		triggerName;
+		NSArray*		dataTakers;       //cache of data takers.
 }
 
 #pragma mark •••Initialization
@@ -70,6 +76,10 @@
 - (BOOL) solitaryObject;
 
 #pragma mark •••Accessors
+- (ORReadOutList*) triggerGroup;
+- (void) setTriggerGroup:(ORReadOutList*)newTrigger1Group;
+- (NSString *) triggerName;
+- (void) setTriggerName: (NSString *) aTrigger1Name;
 - (int) eSumViewType;
 - (void) setESumViewType:(int)aESumViewType;
 - (int) nHitViewType;
@@ -115,6 +125,7 @@
 - (void) setDbObject:(id) anObject forIndex:(int)anIndex;
 - (float) dbFloatByIndex:(int)anIndex;
 - (int) dbIntByIndex:(int)anIndex;
+- (int) dacValueByIndex:(short)anIndex;
 
 #pragma mark •••Converters
 - (unsigned long) mVoltsToRaw:(float) mVolts;
@@ -182,6 +193,7 @@
 - (void) setThePrescaleValue;
 - (void) setupPulseGTDelaysCoarse:(unsigned short) theCoarseDelay fine:(unsigned short) theAddelValue;
 - (void) setupGTCorseDelay:(unsigned short) theCoarseDelay;
+- (void) setupGTCorseDelay;
 - (void) setupGTFineDelay:(unsigned short) theAddelValue;
 - (void) setThePulserRate:(float) thePulserPeriodValue;
 - (void) setThePulserRate:(float) thePulserPeriodValue setToInfinity:(BOOL) setToInfinity;
@@ -195,7 +207,6 @@
 - (void) setupPulserRateAndEnable:(double) pulserPeriodVal;
 - (void) fireMTCPedestalsFixedNumber:(unsigned long) numPedestals;
 - (void) basicMTCReset;
-- (void) loadMtcDataBase;
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
 - (void) setUpTheFile;
@@ -229,5 +240,6 @@ extern NSString* ORMTCModelMemoryOffsetChanged;
 extern NSString* ORMTCModelSelectedRegisterChanged;
 extern NSString* ORMTCModelLoadFilePathChanged;
 extern NSString* ORMTCModelMtcDataBaseChanged;
+extern NSString* ORMtcTriggerNameChanged;
 extern NSString* ORMTCLock;
 

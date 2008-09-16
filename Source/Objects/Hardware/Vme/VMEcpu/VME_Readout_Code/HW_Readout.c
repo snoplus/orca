@@ -389,7 +389,9 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
             case kTrigger32:    index = Readout_TR32_Data(config,index,lamData);    break;
             case kCaen:         index = Readout_CAEN(config,index,lamData);         break;
             case kSBCLAM:       index = Readout_LAM_Data(config,index,lamData);     break;
-            case kCaen1720:     index = Readout_CAEN1720(config,index,lamData);break;
+            case kCaen1720:     index = Readout_CAEN1720(config,index,lamData);		break;
+            case kMtc:			index = Readout_MTC(config,index,lamData);			break;
+            case kFec:			index = Readout_Fec(config,index,lamData);			break;
             default:            index = -1;                                         break;
         }
         return index;
@@ -398,9 +400,52 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 }
 
 /*************************************************************/
+/*             Reads out the Mtc card.                       */
+/*************************************************************/
+int32_t Readout_MTC(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+    uint32_t leaf_index;
+    uint32_t baseAddress            = config->card_info[index].base_add;
+	char triggered = 0;
+    //uint32_t conversionRegOffset    = config->card_info[index].deviceSpecificData[1];
+    
+    lock_device(vmeAM29Handle);
+	//add mtc read-out specifics.... TBD
+	
+	//check for trigger, if trigger exists, set triggered = 1
+	
+	if(triggered){
+		//we have a trigger so read out the FECs for event
+		leaf_index = config->card_info[index].next_Trigger_Index[0];
+		while(leaf_index >= 0) {
+			leaf_index = readHW(config,leaf_index,lamData);
+		}
+	}
+
+    unlock_device(vmeAM29Handle);
+
+    return config->card_info[index].next_Card_Index;
+}
+
+/*************************************************************/
+/*             Reads out the Mtc card.                       */
+/*************************************************************/
+int32_t Readout_Fec(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+    uint32_t baseAddress            = config->card_info[index].base_add;
+    //uint32_t conversionRegOffset    = config->card_info[index].deviceSpecificData[1];
+    
+    lock_device(vmeAM29Handle);
+	//add fec read-out specifics.... TBD
+	
+    unlock_device(vmeAM29Handle);
+
+    return config->card_info[index].next_Card_Index;
+}
+
+/*************************************************************/
 /*             Reads out Shaper cards.                       */
 /*************************************************************/
-
 int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     uint32_t baseAddress            = config->card_info[index].base_add;

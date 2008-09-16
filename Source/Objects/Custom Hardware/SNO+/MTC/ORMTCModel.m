@@ -26,6 +26,9 @@
 #import "ORDataTypeAssigner.h"
 #import "ORMTC_Constants.h"
 #import "NSDictionary+Extensions.h"
+#import "ORReadOutList.h"
+#import "SBC_Config.h"
+#import "VME_HW_Definitions.h"
 
 #pragma mark •••Definitions
 
@@ -45,6 +48,7 @@ NSString* ORMTCModelSelectedRegisterChanged = @"ORMTCModelSelectedRegisterChange
 NSString* ORMTCModelLoadFilePathChanged		= @"ORMTCModelLoadFilePathChanged";
 NSString* ORMTCModelMtcDataBaseChanged		= @"ORMTCModelMtcDataBaseChanged";
 NSString* ORMTCModelLastFileLoadedChanged	= @"ORMTCModelLastFileLoadedChanged";
+NSString* ORMtcTriggerNameChanged			= @"ORMtcTriggerNameChanged";
 
 NSString* ORMTCLock							= @"ORMTCLock";
 
@@ -138,9 +142,29 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 	{ @"MTC/A,OWLELo,dcOffset",		@"30"},		//52
 	{ @"MTC/A,OWLEHi,dcOffset",		@"40"},		//53
 	
-	{@"Comments",					@"Nothing Noted"},		//54
-	{@"XilinxFilePath",				@"--"},		//55
+	{ @"MTC,tub",					@"40"},		//54
+	
+	{@"Comments",					@"Nothing Noted"},		//55
+	{@"XilinxFilePath",				@"--"},		//56
 
+};
+
+int mtcDacIndexes[14]=
+{
+	kNHit100HiThreshold,	
+	kNHit100MedThreshold,
+	kNHit100LoThreshold,	
+	kNHit20Threshold,	
+	kNHit20LBThreshold,	
+	kOWLNThreshold,		
+	kESumLowThreshold,	
+	kESumHiThreshold,	
+	kOWLELoThreshold,	
+	kOWLEHiThreshold,
+	kControlMask,
+	kGtMask,
+	kGtCrateMask,
+	kPEDCrateMask
 };
 
 @interface ORMTCModel (private)
@@ -155,6 +179,11 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
     self = [super init];
 	
     [[self undoManager] disableUndoRegistration];
+	[self setTriggerName:@"Trigger"];
+    
+    ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:triggerName];
+    [self setTriggerGroup:r1];
+    [r1 release];
 	
     [[self undoManager] enableUndoRegistration];
 	
@@ -163,6 +192,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 
 - (void) dealloc
 {
+    [triggerGroup release];
     [defaultFile release];
     [lastFile release];
     [lastFileLoaded release];
@@ -196,6 +226,40 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 }
 
 #pragma mark •••Accessors
+
+- (unsigned short) addressModifier
+{
+	return 0x29;
+}
+
+- (ORReadOutList*) triggerGroup
+{
+    return triggerGroup;
+}
+
+- (void) setTriggerGroup:(ORReadOutList*)newTriggerGroup
+{
+    [triggerGroup autorelease];
+    triggerGroup=[newTriggerGroup retain];
+}
+- (NSString *) triggerName
+{
+    return triggerName;
+}
+
+- (void) setTriggerName: (NSString *) aTriggerName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerName:triggerName];
+    [triggerName autorelease];
+    triggerName = [aTriggerName copy];
+    
+    [triggerGroup setIdentifier:triggerName];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMtcTriggerNameChanged
+                                                        object:self];
+    
+    
+}
 
 - (int) eSumViewType
 {
@@ -484,6 +548,11 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 }
 
 #pragma mark •••Data Taker
+- (NSMutableArray*) children {
+    //methods exists to give common interface across all objects for display in lists
+    return [NSMutableArray arrayWithObjects:triggerGroup,nil];
+}
+
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {
@@ -505,25 +574,109 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
+{        
+    if(![[self adapter] controllerCard]){
+		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
+    }
+    
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORMTCModel"];
+    
+
+    dataTakers = [[triggerGroup allObjects] retain];	//cache of data takers.
+    
+    NSEnumerator* e = [dataTakers objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+		[obj runTaskStarted:aDataPacket userInfo:userInfo];
+    }
+        
 }
 
 //**************************************************************************************
 // Function:	TakeData
-// Description: Read data from a card
+// Description: Read data from a card From Mac. IfSBC is used, then this routine is NOT used.
 //**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    NSString* errorLocation = @"";
+    
+    NS_DURING
+		//errorLocation = @"Reading Status Reg";
+		//do something to see if the fecs need to be read out.
+		//if((statusReg & kTrigger1EventMask)){
+			//OK finally go out and read all the data takers scheduled to be read out with a trigger 1 event.
+			//errorLocation = @"Reading Children";
+			//[self _readOutChildren:dataTakers1 dataPacket:aDataPacket  useParams:YES withGTID:gtid isMSAMEvent:isMSAMEvent];
+		//}
+
+	NS_HANDLER
+		NSLogError(@"",@"Mtc Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	NS_ENDHANDLER
+
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    NSEnumerator* e = [dataTakers objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+		[obj runTaskStopped:aDataPacket userInfo:userInfo];
+    }
+
+    [dataTakers release];
+}
+
+- (void) saveReadOutList:(NSFileHandle*)aFile
+{
+    [triggerGroup saveUsingFile:aFile];
+}
+
+- (void) loadReadOutList:(NSFileHandle*)aFile
+{
+    [self setTriggerGroup:[[[ORReadOutList alloc] initWithIdentifier:@"Mtc Trigger"]autorelease]];
+    [triggerGroup loadUsingFile:aFile];
 }
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-	return -1; //TBD
+    configStruct->total_cards++;
+    configStruct->card_info[index].hw_type_id		= kMtc;			//should be unique 
+    configStruct->card_info[index].hw_mask[0]		= dataId;		//better be unique
+    configStruct->card_info[index].slot				= [self slot];
+    configStruct->card_info[index].add_mod			= [self addressModifier];
+    configStruct->card_info[index].base_add			= [self baseAddress];
+    
+	configStruct->card_info[index].deviceSpecificData[0] = [self memoryOffset];
+	configStruct->card_info[index].deviceSpecificData[1] = 0x01; //address space for the reg access
+	configStruct->card_info[index].deviceSpecificData[2] = 0x02; //address space for the memory access
+	
+    configStruct->card_info[index].num_Trigger_Indexes = 1;
+    int nextIndex = index+1;
+    
+	configStruct->card_info[index].next_Trigger_Index[0] = -1;
+	NSEnumerator* e = [dataTakers objectEnumerator];
+	id obj;
+	while(obj = [e nextObject]){
+		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
+			if(configStruct->card_info[index].next_Trigger_Index[0] == -1){
+				configStruct->card_info[index].next_Trigger_Index[0] = nextIndex;
+			}
+			int savedIndex = nextIndex;
+			nextIndex = [obj load_HW_Config_Structure:configStruct index:nextIndex];
+			if(obj == [dataTakers lastObject]){
+				configStruct->card_info[savedIndex].next_Card_Index = -1; //make the last object a leaf node
+			}
+		}
+	}
+	    
+    configStruct->card_info[index].next_Card_Index 	 = nextIndex;
+    
+    return nextIndex;
 }
 
 
@@ -547,8 +700,13 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
     [self setSelectedRegister:[decoder decodeIntForKey:		@"ORMTCModelSelectedRegister"]];
     [self setMtcDataBase:	[decoder decodeObjectForKey:	@"ORMTCModelMtcDataBase"]];
     [self setLoadFilePath:	[decoder decodeObjectForKey:	@"ORMTCModelLoadFilePath"]];
+    [self setTriggerGroup:  [decoder decodeObjectForKey:    @"ORMtcTriggerGroup"]];
+    [self setTriggerName:	[decoder decodeObjectForKey:	@"ORMtcTrigger1Name"]];
 	
 	if(!mtcDataBase)[self setupDefaults];
+    if(triggerName == nil || [triggerName length]==0){
+        [self setTriggerName:@"Trigger"];
+    }
 	
 	
     [[self undoManager] enableUndoRegistration];
@@ -573,6 +731,8 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 	[encoder encodeInt:selectedRegister forKey:@"ORMTCModelSelectedRegister"];
 	[encoder encodeObject:mtcDataBase	forKey:@"ORMTCModelMtcDataBase"];
 	[encoder encodeObject:loadFilePath	forKey:@"ORMTCModelLoadFilePath"];
+    [encoder encodeObject:triggerGroup	forKey:@"ORMtcTriggerGroup"];
+    [encoder encodeObject:triggerName	forKey:@"ORMtcTriggerName"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -619,8 +779,8 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 - (int)       dbIntByIndex:(int)anIndex			  { return [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex:anIndex]] intValue]; }
 - (id)        dbObjectByName:(NSString*)aKey	  { return [mtcDataBase objectForNestedKey:aKey]; }
 - (NSString*) getDBKeyByIndex:(short) anIndex	  { return dbLookUpTable[anIndex].key; }
-- (NSString*) getDBDefaultByIndex:(short) anIndex { return dbLookUpTable[anIndex].defaultValue; }
-
+- (NSString*) getDBDefaultByIndex:(short) anIndex { return dbLookUpTable[anIndex].defaultValue;  }
+- (int)       dacValueByIndex:(short)anIndex	  { return [self dbIntByIndex:mtcDacIndexes[anIndex]]; }
 
 #pragma mark •••HW Access
 - (short) getNumberRegisters
@@ -725,7 +885,6 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
 {
 	NS_DURING
-		if (!mtcDataBase)[self loadMtcDataBase];						// STEP 0 : Open the MTC Database
 		if (loadTheMTCXilinxFile) [self loadMTCXilinx];				// STEP 1 : Load the Xilinx
 		[self clearGlobalTriggerWordMask];							// STEP 2: Clear the GT Word Mask
 		[self clearPedestalCrateMask];								// STEP 3: Clear the Pedestal Crate Mask
@@ -756,7 +915,6 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 
 - (void) setGlobalTriggerWordMask
 {
-	if (!mtcDataBase) [self loadMtcDataBase];
 	[self write:kMtcMaskReg value:uLongDBValue(kGtMask)];
 }
 
@@ -791,7 +949,6 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 
 - (void) setPedestalCrateMask
 {
-	if (!mtcDataBase)[self loadMtcDataBase];
 	[self write:kMtcPmskReg value: uLongDBValue(kPEDCrateMask)];
 }
 
@@ -802,7 +959,6 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 
 - (void) setGTCrateMask
 {
-	if (!mtcDataBase)[self loadMtcDataBase];
 	[self write:kMtcGmskReg value: uLongDBValue(kGtCrateMask)];
 }
 
@@ -1063,8 +1219,6 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 - (void) setupPulseGTDelaysCoarse:(unsigned short) theCoarseDelay fine:(unsigned short) theAddelValue
 {		
 	NS_DURING
-
-		if (!mtcDataBase) [self loadMtcDataBase];
 		
 		[self setupGTCorseDelay:theCoarseDelay];	
 		[self setupGTFineDelay:theAddelValue];
@@ -1081,6 +1235,11 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 		[localException raise];			
 	
 	NS_ENDHANDLER
+}
+
+- (void) setupGTCorseDelay
+{
+	[self setupGTCorseDelay:[self dbIntByIndex:kCoarseDelay]];
 }
 
 - (void) setupGTCorseDelay:(unsigned short) theCoarseDelay
@@ -1188,8 +1347,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 // 							  GT coarse delay, GT Lockout Width, pedestal width in ns and a 
 //							  specified crate mask set in MTC Databse. Trigger mask is EXT_8.
 	NS_DURING
-		if (!mtcDataBase)[self loadMtcDataBase];									//STEP 0 : Open the MTC Database
-		[self basicMTCPedestalGTrigSetup];										//STEP 1: Perfom the basic setup for pedestals and gtrigs
+		[self basicMTCPedestalGTrigSetup];								//STEP 1: Perfom the basic setup for pedestals and gtrigs
 		[self setupPulserRateAndEnable:uLongDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
 
 	
@@ -1204,7 +1362,6 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 {
 
 	NS_DURING
-		if (!mtcDataBase)[self loadMtcDataBase];							//STEP 0 : Open the MTC Database
 		//[self clearGlobalTriggerWordMask];							//STEP 0a:	//added 01/24/98 QRA
 		[self enablePedestal];											// STEP 1 : Enable Pedestal	
 		[self setPedestalCrateMask];									// STEP 2: Mask in crates for pedestals (PMSK)
@@ -1263,8 +1420,6 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 - (void) basicMTCReset
 {
 	NS_DURING
-		if (!mtcDataBase)			
-			[self loadMtcDataBase];
 	
 		[self disablePulser];
 		[self clearGTCrateMask];
@@ -1281,41 +1436,9 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 	NS_ENDHANDLER
 }
 
-
-- (void) loadMtcDataBase
-{
-/*
-	// check to see the database pointers exist, if not create them										  
-	if (the_mtc_db == NIL_POINTER){
-		the_mtc_db = new CMTC_DB;
-		the_mtc_db -> IMTC_DB();
-		openedMtc_Database = TRUE;
-	}
-	
-	// STEP 2: Read the database file
-	// the MTC four letter code for now is hardwired to be kDefaultMtcRecord --- QRA: 5/11/97			
-	the_mtc_db->Read_Data(kDefaultMtcRecord);				
-	if ( the_mtc_db -> Key() == 0 ){ 	// not a valid key
-
-		the_mtc_db->SetToDefaultVals();
-		//load default values
-		the_mtc_db->Write_Data(the_mtc_db->Key());
-
-		the_mtc_db->Read_Data(the_mtc_db->Key());
-		if(the_mtc_db->Key() != kDefaultMtcRecord){
-			//still did not read back the proper key
-			//nothing more to be done..give up
-			Failure(kSilentErr,0);
-			NSLog(@"MTC database not found!\n");
-		}
-
-	}
-*/
-}
-
 - (void) loadTheMTCADacs
 {
-/*
+
 	//-------------- variables -----------------
 
 	short	index, bitIndex, dacIndex;
@@ -1326,15 +1449,12 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 	//-------------- variables -----------------
 
 	NS_DURING
-		
-		// STEP 1: Open the database file if not already opened
-		if (!parameters)[self loadParameters];
-					
+							
 		// STEP 3: load the DAC values from the database into dacValues[14]
-		for (index = 0; index < 14 ; index++)
-			dacValues[index] = the_mtc_db -> Trigger_DAC(CMTC_DB::sMTCTriggerInfo[index].db_index);
-			dacValues[index] = [parameters uLongForKey: index:index]; -> Trigger_DAC(CMTC_DB::sMTCTriggerInfo[index].db_index);
-
+		for (index = 0; index < 14 ; index++){
+			dacValues[index] = [self dacValueByIndex:index];
+		}
+		
 		// STEP 4: Set DACSEL in Register 2 high[in hardware it's inverted -- i.e. it is set low]
 		[self write:kMtcDacCntReg value:MTC_DAC_CNT_DACSEL];
 		
@@ -1383,7 +1503,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 	
 	NS_ENDHANDLER
 		
-*/
+
 }
 
 - (void) loadMTCXilinx
@@ -1546,9 +1666,7 @@ static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
 {
 	NS_DURING
 
-		if (!mtcDataBase) [self loadMtcDataBase];
-	//	unsigned long aValue = [parameters uLongForKey:kTubRegister];
-	unsigned long aValue =0;   ////remove and reinstate above line+++++++++++++++++++++++++++++++
+		unsigned long aValue = [self  dbIntByIndex:kTub];
 		
 		unsigned long shift_value;
 		unsigned long theRegValue;

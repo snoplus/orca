@@ -542,22 +542,22 @@
 //MTC Init Ops buttons.
 - (IBAction) standardInitMTC:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model initializeMtc:YES load10MHzClock:YES]; 
 }
 
 - (IBAction) standardInitMTCnoXilinx:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model initializeMtc:NO load10MHzClock:YES]; 
 }
 
 - (IBAction) standardInitMTCno10MHz:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model initializeMtc:YES load10MHzClock:NO]; 
 }
 
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model initializeMtc:NO load10MHzClock:NO]; 
 }
 
 - (IBAction) standardMakeOnlineCrateMasks:(id) sender 
@@ -577,17 +577,17 @@
 
 - (IBAction) standardLoadMTCADacs:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model loadTheMTCADacs];
 }
 
 - (IBAction) standardSetCoarseDelay:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model setupGTCorseDelay];
 }
 
 - (IBAction) standardFirePedestals:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model fireMTCPedestalsFixedRate];
 }
 
 - (IBAction) standardFindTriggerZeroes:(id) sender 

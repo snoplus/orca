@@ -125,6 +125,8 @@ enum {
 	kOWLELodcOffset,
 	kOWLEHidcOffset,
 	
+	kTub,
+	
 	//other -- numbers go ABOVE this
 	kDBComments,
 	kXilinxFile,
