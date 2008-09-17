@@ -74,7 +74,6 @@
 	NSRange objRange			 = NSMakeRange(aSlot,1);
 	NSRange legalControllerRange = NSMakeRange(0,1);
 	
-	//last check.. Camac restricts the last two slots for the controller
 	if([aCard isKindOfClass:NSClassFromString(@"ORIpeSLTModel")]){
 		if(!NSEqualRanges(legalControllerRange,objRange))	return NO;
 	}
