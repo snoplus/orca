@@ -136,66 +136,6 @@
 			<string>NSView</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>ORTimeAxis</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORAxis</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>addGateAction</key>
-				<string>id</string>
-				<key>analyze</key>
-				<string>id</string>
-				<key>autoScale</key>
-				<string>id</string>
-				<key>averageWindowAction</key>
-				<string>id</string>
-				<key>centerOnPeak</key>
-				<string>id</string>
-				<key>clearActiveCurveGates</key>
-				<string>id</string>
-				<key>clearActiveGate</key>
-				<string>id</string>
-				<key>clearAllGates</key>
-				<string>id</string>
-				<key>copy</key>
-				<string>id</string>
-				<key>differentiateAction</key>
-				<string>id</string>
-				<key>removeGateAction</key>
-				<string>id</string>
-				<key>resetScales</key>
-				<string>id</string>
-				<key>savePDF</key>
-				<string>id</string>
-				<key>xAndYAutoScale</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORPlotter1D</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>analysisDrawer</key>
-				<string>NSDrawer</string>
-				<key>analysisView</key>
-				<string>ZFlowLayout</string>
-				<key>mDataSource</key>
-				<string>id</string>
-				<key>mXScale</key>
-				<string>ORAxis</string>
-				<key>mYScale</key>
-				<string>ORAxis</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>calibrateAction</key>
@@ -254,7 +194,7 @@
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
-			<string>ORIpeFLTController</string>
+			<string>ORIpeV4FLTController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
@@ -336,6 +276,66 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimeAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORAxis</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
