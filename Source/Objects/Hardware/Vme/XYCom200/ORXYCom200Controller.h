@@ -22,150 +22,49 @@
 #pragma mark ***Imported Files
 #import "OrcaObjectController.h";
 #import "ORXYCom200Model.h"
-@class ORValueBar;
-@class ORPlotter1D;
 
 @interface ORXYCom200Controller : OrcaObjectController 
-{
-    IBOutlet NSTabView* 	tabView;
-    //basic ops page
-	IBOutlet NSMatrix*		enabledMatrix;
-	IBOutlet NSMatrix*		debugMatrix;
-	IBOutlet NSMatrix*		pileUpMatrix;
-	IBOutlet NSMatrix*		ledThresholdMatrix;
-	IBOutlet NSMatrix*		cfdDelayMatrix;
-	IBOutlet NSMatrix*		cfdFractionMatrix;
-	IBOutlet NSMatrix*		cfdThresholdMatrix;
-	IBOutlet NSMatrix*		dataDelayMatrix;
-	IBOutlet NSMatrix*		dataLengthMatrix;
-
-	//arrggg! why can't you put a popup into a NSMatrix????
-	IBOutlet NSPopUpButton*	polarityPU0;
-	IBOutlet NSPopUpButton*	polarityPU1;
-	IBOutlet NSPopUpButton*	polarityPU2;
-	IBOutlet NSPopUpButton*	polarityPU3;
-	IBOutlet NSPopUpButton*	polarityPU4;
-	IBOutlet NSPopUpButton*	polarityPU5;
-	IBOutlet NSPopUpButton*	polarityPU6;
-	IBOutlet NSPopUpButton*	polarityPU7;
-	NSPopUpButton* polarityPU[kNumXYCom200Channels];
-	
-	IBOutlet NSPopUpButton*	triggerModePU0;
-	IBOutlet NSPopUpButton*	triggerModePU1;
-	IBOutlet NSPopUpButton*	triggerModePU2;
-	IBOutlet NSPopUpButton*	triggerModePU3;
-	IBOutlet NSPopUpButton*	triggerModePU4;
-	IBOutlet NSPopUpButton*	triggerModePU5;
-	IBOutlet NSPopUpButton*	triggerModePU6;
-	IBOutlet NSPopUpButton*	triggerModePU7;
-	NSPopUpButton* triggerModePU[kNumXYCom200Channels];
-
-	
+{	
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
-    IBOutlet NSMatrix*      cardInfoMatrix;
-
     IBOutlet NSButton*      settingLockButton;
-    IBOutlet NSButton*      initButton;
-    IBOutlet NSButton*      clearFIFOButton;
-    IBOutlet NSButton*      probeButton;
-    IBOutlet NSButton*      statusButton;
-    IBOutlet NSButton*      noiseFloorButton;
-    IBOutlet NSTextField*   fifoState;
-
-    //rate page
-    IBOutlet NSMatrix*      rateTextFields;
-    IBOutlet NSStepper*     integrationStepper;
-    IBOutlet NSTextField*   integrationText;
-    IBOutlet NSTextField*   totalRateText;
-    IBOutlet NSMatrix*      enabled2Matrix;
-
-    IBOutlet ORValueBar*    rate0;
-    IBOutlet ORValueBar*    totalRate;
-    IBOutlet NSButton*      rateLogCB;
-    IBOutlet NSButton*      totalRateLogCB;
-    IBOutlet ORPlotter1D*   timeRatePlot;
-    IBOutlet NSButton*      timeRateLogCB;
-
-
-    //offset panel
-    IBOutlet NSPanel*				noiseFloorPanel;
-    IBOutlet NSTextField*			noiseFloorOffsetField;
-    IBOutlet NSTextField*			noiseFloorIntegrationField;
-    IBOutlet NSButton*				startNoiseFloorButton;
-    IBOutlet NSProgressIndicator*	noiseFloorProgress;
-
-    NSView *blankView;
-    NSSize settingSize;
-    NSSize rateSize;
-
+	
+    // Register Box
+    IBOutlet NSStepper* 	addressStepper;
+    IBOutlet NSTextField* 	addressTextField;
+    IBOutlet NSStepper* 	writeValueStepper;
+    IBOutlet NSTextField* 	writeValueTextField;
+    IBOutlet NSPopUpButton*	registerAddressPopUp;
+    IBOutlet NSPopUpButton*	channelPopUp;
+    IBOutlet NSButton*		basicWriteButton;
+    IBOutlet NSButton*		basicReadButton;
+	IBOutlet NSTextField*	registerOffsetField;
+	IBOutlet NSTextField*   regNameField;
 }
 
 - (id)   init;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) populatePullDown;
 
 #pragma mark •••Interface Management
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
-- (void) updateCardInfo:(NSNotification*)aNote;
-- (void) registerRates;
-- (void) rateGroupChanged:(NSNotification*)aNote;
-- (void) waveFormRateChanged:(NSNotification*)aNote;
-- (void) noiseFloorChanged:(NSNotification*)aNote;
-- (void) totalRateChanged:(NSNotification*)aNote;
-- (void) noiseFloorOffsetChanged:(NSNotification*)aNote;
-- (void) setFifoStateLabel;
-- (void) enabledChanged:(NSNotification*)aNote;
-- (void) debugChanged:(NSNotification*)aNote;
-- (void) pileUpChanged:(NSNotification*)aNote;
-- (void) polarityChanged:(NSNotification*)aNote;
-- (void) triggerModeChanged:(NSNotification*)aNote;
-- (void) ledThresholdChanged:(NSNotification*)aNote;
-- (void) cfdDelayChanged:(NSNotification*)aNote;
-- (void) cfdFractionChanged:(NSNotification*)aNote;
-- (void) cfdThresholdChanged:(NSNotification*)aNote;
-- (void) dataDelayChanged:(NSNotification*)aNote;
-- (void) dataLengthChanged:(NSNotification*)aNote;
-- (void) miscAttributesChanged:(NSNotification*)aNote;
-
-- (void) scaleAction:(NSNotification*)aNote;
-- (void) integrationChanged:(NSNotification*)aNote;
-- (void) updateTimePlot:(NSNotification*)aNote;
-- (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
+- (void) writeValueChanged: (NSNotification*) aNotification;
+- (void) selectedRegIndexChanged: (NSNotification*) aNotification;
+- (void) slotChanged:(NSNotification*)aNotification;
+- (void) updateRegisterDescription:(short) aRegisterIndex;
 
 #pragma mark •••Actions
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
-- (IBAction) cardInfoAction:(id) sender;
-- (IBAction) probeBoard:(id)sender;
-- (IBAction) readStatus:(id)sender;
-- (IBAction) initBoard:(id)sender;
-- (IBAction) clearFIFO:(id)sender;
-- (IBAction) integrationAction:(id)sender;
-- (IBAction) findNoiseFloors:(id)sender;
-- (IBAction) noiseFloorOffsetAction:(id)sender;
-- (IBAction) openNoiseFloorPanel:(id)sender;
-- (IBAction) closeNoiseFloorPanel:(id)sender;
-- (IBAction) noiseFloorIntegrationAction:(id)sender;
+- (IBAction) baseAddressAction: (id) aSender;
+- (IBAction) writeValueAction: (id) aSender;
+- (IBAction) selectRegisterAction: (id) aSender;
+- (IBAction) selectChannelAction: (id) aSender;
 
-- (IBAction) enabledAction:(id)sender;
-- (IBAction) debugAction:(id)sender;
-- (IBAction) pileUpAction:(id)sender;
-- (IBAction) polarityAction:(id)sender;
-- (IBAction) triggerModeAction:(id)sender;
-- (IBAction) ledThresholdAction:(id)sender;
-- (IBAction) cfdFractionAction:(id)sender;
-- (IBAction) cfdDelayAction:(id)sender;
-- (IBAction) cfdThresholdAction:(id)sender;
-- (IBAction) dataDelayAction:(id)sender;
-- (IBAction) dataLengthAction:(id)sender;
-
-#pragma mark •••Data Source
-- (double)  getBarValue:(int)tag;
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
-- (unsigned long)  	secondsPerUnit:(id) aPlotter;
+- (IBAction) read: (id) pSender;
+- (IBAction) write: (id) pSender;
 
 @end

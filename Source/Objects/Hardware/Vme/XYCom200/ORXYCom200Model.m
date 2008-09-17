@@ -21,88 +21,54 @@
 
 #pragma mark ***Imported Files
 #import "ORXYCom200Model.h"
-#import "ORDataTypeAssigner.h"
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORVmeCrateModel.h"
-#import "ORRateGroup.h"
-#import "ORTimer.h"
-#import "VME_HW_Definitions.h"
 
-NSString* ORXYCom200ModelNoiseFloorIntegrationTimeChanged = @"ORXYCom200ModelNoiseFloorIntegrationTimeChanged";
-NSString* ORXYCom200ModelNoiseFloorOffsetChanged = @"ORXYCom200ModelNoiseFloorOffsetChanged";
-NSString* ORXYCom200CardInfoUpdated				= @"ORXYCom200CardInfoUpdated";
-NSString* ORXYCom200RateGroupChangedNotification	= @"ORXYCom200RateGroupChangedNotification";
-NSString* ORXYCom200SettingsLock					= @"ORXYCom200SettingsLock";
-NSString* ORXYCom200NoiseFloorChanged			= @"ORXYCom200NoiseFloorChanged";
-NSString* ORXYCom200ModelFIFOCheckChanged		= @"ORXYCom200ModelFIFOCheckChanged";
-
-NSString* ORXYCom200ModelEnabledChanged			= @"ORXYCom200ModelEnabledChanged";
-NSString* ORXYCom200ModelDebugChanged			= @"ORXYCom200ModelDebugChanged";
-NSString* ORXYCom200ModelPileUpChanged			= @"ORXYCom200ModelPileUpChanged";
-NSString* ORXYCom200ModelPolarityChanged			= @"ORXYCom200ModelPolarityChanged";
-NSString* ORXYCom200ModelTriggerModeChanged		= @"ORXYCom200ModelTriggerModeChanged";
-NSString* ORXYCom200ModelLEDThresholdChanged		= @"ORXYCom200ModelLEDThresholdChanged";
-NSString* ORXYCom200ModelCFDDelayChanged			= @"ORXYCom200ModelCFDDelayChanged";
-NSString* ORXYCom200ModelCFDFractionChanged		= @"ORXYCom200ModelCFDFractionChanged";
-NSString* ORXYCom200ModelCFDThresholdChanged		= @"ORXYCom200ModelCFDThresholdChanged";
-NSString* ORXYCom200ModelDataDelayChanged		= @"ORXYCom200ModelDataDelayChanged";
-NSString* ORXYCom200ModelDataLengthChanged		= @"ORXYCom200ModelDataLengthChanged";
-
+#pragma mark ***Notification Strings
+NSString*	ORXYCom200SettingsLock				= @"ORXYCom200SettingsLock";
+NSString* 	ORXYCom200SelectedRegIndexChanged	= @"ORXYCom200SelectedRegIndexChanged";
+NSString* 	ORXYCom200SelectedChannelChanged	= @"ORXYCom200SelectedChannelChanged";
+NSString* 	ORXYCom200WriteValueChanged			= @"ORXYCom200WriteValueChanged";
 
 @implementation ORXYCom200Model
-#pragma mark •••Static Declarations
-//offsets from the base address
-static unsigned long register_offsets[kNumberOfXYCom200Registers] = {
-    0x00, //[0] board ID
-    0x02, //[1] Programming done
-    0x04, //[2] External Window
-    0x06, //[3] Pileup Window
-    0x08, //[4] Noise Window
-    0x0a, //[5] Extrn trigger sliding length
-    0x0c, //[6] Collection time
-    0x0e, //[7] Integration time
-    0x10, //[8] Control/Status
-    0x20, //[9] LED Threshold
-    0x30, //[10] CFD Parameters
-    0x40, //[11] Raw data sliding length
-    0x50, //[28] Raw data window length
-    0x60, //[30] Debug data buffer address
-    0x62  //[31] Dbug data buffer data
-};
 
-enum {
-    kExternalWindowIndex,
-    kPileUpWindowIndex,
-    kNoiseWindowIndex,
-    kExtTrigLengthIndex,
-    kCollectionTimeIndex,
-    kIntegrationTimeIndex
-};
+#pragma mark •••Static Declarations
 
 static struct {
-    NSString*	name;
-    NSString*	units;
-    unsigned long	regOffset;
-    unsigned short	mask; 
-    short		initialValue;
-    float		ratio; //conversion constants
-} cardConstants[kNumXYCom200CardParams] = {
-    {@"External Window",	@"",	0x04,	0x7FF,	0x07FF, 1.},
-    {@"Pileup Window",		@"us",	0x06,	0x7FF,	0x0400,	10./(float)0x400},
-    {@"Noise Window",		@"ns",	0x08,	0x07F,	0x0040,	640./(float)0x40},
-    {@"Ext Trigger Length", @"us",	0x0a,	0x7FF,	0x01C2,	4.5/(float)0x1C2},
-    {@"Collection Time",	@"us",	0x0c,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
-    {@"Integration Time",	@"us",	0x0e,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
-};
-
+	NSString*	  regName;
+	unsigned long addressOffset;
+} mIOXY200Reg[kNumRegs]={
+	{@"General Control",			0x01},
+	{@"Service Request",			0x03},
+	{@"A Data Direction",		0x05},
+	{@"B Data Direction",		0x07},
+	{@"C Data Direction",		0x09},
+	{@"Interrupt Vector",		0x0b},
+	{@"A Control",				0x0d},
+	{@"B Control",				0x0f},
+	{@"A Data",					0x11},
+	{@"B Data",					0x13},
+	{@"C Data",					0x19},
+	{@"A Alternate",				0x15},
+	{@"B Alternate",				0x17},
+	{@"Status",					0x1b},
+	{@"Timer Control",			0x21},
+	{@"Timer Interrupt Vector",	0x23},
+	{@"Timer Status",			0x35},
+	{@"Counter Preload High",	0x27},
+	{@"Counter Preload Mid",		0x29},
+	{@"Counter Preload Low",		0x2b},
+	{@"Count High",				0x2f},
+	{@"Count Mid",				0x31},		
+	{@"Count Lo",				0x33}		
+};	
 
 #pragma mark ***Initialization
 - (id) init 
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
-    [self initParams];
     [self setAddressModifier:0x29];
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -110,10 +76,6 @@ static struct {
 
 - (void) dealloc 
 {
-    [waveFormRateGroup release];
-    [cardInfo release];
-	[fifoFullAlarm clearAlarm];
-	[fifoFullAlarm release];
     [super dealloc];
 }
 
@@ -129,684 +91,147 @@ static struct {
 
 #pragma mark ***Accessors
 
-- (float) noiseFloorIntegrationTime
+- (unsigned short) selectedRegIndex
 {
-    return noiseFloorIntegrationTime;
+    return selectedRegIndex;
 }
 
-- (void) setNoiseFloorIntegrationTime:(float)aNoiseFloorIntegrationTime
+- (void) setSelectedRegIndex:(unsigned short) anIndex
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setNoiseFloorIntegrationTime:noiseFloorIntegrationTime];
-
-    if(aNoiseFloorIntegrationTime<.01)aNoiseFloorIntegrationTime = .01;
-	else if(aNoiseFloorIntegrationTime>5)aNoiseFloorIntegrationTime = 5;
-	
-    noiseFloorIntegrationTime = aNoiseFloorIntegrationTime;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelNoiseFloorIntegrationTimeChanged object:self];
-}
-
-- (int) fifoState
-{
-    return fifoState;
-}
-
-- (void) setFifoState:(int)aFifoState
-{
-    fifoState = aFifoState;
-}
-
-- (int) noiseFloorOffset
-{
-    return noiseFloorOffset;
-}
-
-- (void) setNoiseFloorOffset:(int)aNoiseFloorOffset
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNoiseFloorOffset:noiseFloorOffset];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRegIndex:[self selectedRegIndex]];
     
-    noiseFloorOffset = aNoiseFloorOffset;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelNoiseFloorOffsetChanged object:self];
-}
-
-- (ORRateGroup*) waveFormRateGroup
-{
-    return waveFormRateGroup;
-}
-- (void) setWaveFormRateGroup:(ORRateGroup*)newRateGroup
-{
-    [newRateGroup retain];
-    [waveFormRateGroup release];
-    waveFormRateGroup = newRateGroup;
+    selectedRegIndex = anIndex;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORXYCom200RateGroupChangedNotification
-                      object:self];    
+        postNotificationName:ORXYCom200SelectedRegIndexChanged
+                      object:self];
 }
 
-- (BOOL) noiseFloorRunning
+- (unsigned short) selectedChannel
 {
-	return noiseFloorRunning;
+    return selectedChannel;
 }
 
-- (id) rateObject:(int)channel
+- (void) setSelectedChannel:(unsigned short) anIndex
 {
-    return [waveFormRateGroup rateObject:channel];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannel:[self selectedChannel]];
+    
+    selectedChannel = anIndex;
+    
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORXYCom200SelectedChannelChanged
+                      object:self];
 }
 
-- (void) initParams
+
+- (unsigned long) writeValue
 {
-
-	int i;
-	for(i=0;i<kNumXYCom200Channels;i++){
-		enabled[i]			= YES;
-		debug[i]			= NO;
-		pileUp[i]			= NO;
-		polarity[i]			= 0x3;
-		triggerMode[i]		= 0x0;
-		ledThreshold[i]		= 0x7FFF;
-		cfdDelay[i]			= 0x3f;
-		cfdFraction[i]		= 0x0;
-		cfdThreshold[i]		= 0x10;
-		dataDelay[i]		= 0x1C2;
-		dataLength[i]		= 1024;
-	}
-	
-    if(!cardInfo){
-        cardInfo = [[NSMutableArray array] retain];
-        int i;
-        for(i=0;i<kNumXYCom200CardParams;i++){
-            [cardInfo addObject:[NSNumber numberWithInt:cardConstants[i].initialValue]];
-        }
-    }	
+    return writeValue;
 }
 
-- (void) cardInfo:(int)index setObject:(id)aValue
-{	
-    [[[self undoManager] prepareWithInvocationTarget:self] cardInfo:index setObject:[self cardInfo:index]];
-    [cardInfo replaceObjectAtIndex:index withObject:aValue];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200CardInfoUpdated object:self];
-}
-
-- (id) rawCardValue:(int)index value:(id)aValue 
-{	
-    float theValue = [aValue floatValue];
-    unsigned short theRawValue = theValue / cardConstants[index].ratio;
-    return [NSNumber numberWithInt: theRawValue & cardConstants[index].mask];
-}
-
-- (id) convertedCardValue:(int)index
-{	
-    int theValue  = [[cardInfo objectAtIndex:index] intValue];
-    float theConvertedValue = theValue * cardConstants[index].ratio;
-    return [NSNumber numberWithFloat: theConvertedValue];
-}
-
-
-- (id) cardInfo:(int)index
+- (void) setWriteValue:(unsigned long) aValue
 {
-    return [cardInfo objectAtIndex:index];
+    [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
+    
+    writeValue = aValue;
+    
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:ORXYCom200WriteValueChanged
+                      object:self];
 }
 
-
-- (void) setRateIntegrationTime:(double)newIntegrationTime
-{
-	//we this here so we have undo/redo on the rate object.
-    [[[self undoManager] prepareWithInvocationTarget:self] setRateIntegrationTime:[waveFormRateGroup integrationTime]];
-    [waveFormRateGroup setIntegrationTime:newIntegrationTime];
-}
-
-#pragma mark •••Rates
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
-{
-	if(groupTag == 0){
-		if(counterTag>=0 && counterTag<kNumXYCom200Channels){
-			return waveFormCount[counterTag];
-		}	
-		else return 0;
-	}
-	else return 0;
-}
-#pragma mark •••specific accessors
-- (void) setExternalWindow:(int)aValue { [self cardInfo:kExternalWindowIndex  setObject:[NSNumber numberWithInt:aValue]]; }
-- (void) setPileUpWindow:(int)aValue   { [self cardInfo:kPileUpWindowIndex    setObject:[NSNumber numberWithInt:aValue]]; }
-- (void) setNoiseWindow:(int)aValue    { [self cardInfo:kNoiseWindowIndex		setObject:[NSNumber numberWithInt:aValue]]; }
-- (void) setExtTrigLength:(int)aValue  { [self cardInfo:kExtTrigLengthIndex   setObject:[NSNumber numberWithInt:aValue]]; }
-- (void) setCollectionTime:(int)aValue { [self cardInfo:kCollectionTimeIndex  setObject:[NSNumber numberWithInt:aValue]]; }
-- (void) setIntegratonTime:(int)aValue { [self cardInfo:kIntegrationTimeIndex setObject:[NSNumber numberWithInt:aValue]]; }
-
-- (int) externalWindow   { return [[self cardInfo:kExternalWindowIndex] intValue]; }
-- (int) pileUpWindow	 { return [[self cardInfo:kPileUpWindowIndex] intValue]; }
-- (int) noiseWindow		 { return [[self cardInfo:kNoiseWindowIndex] intValue]; }
-- (int) extTrigLength    { return [[self cardInfo:kExtTrigLengthIndex] intValue]; }
-- (int) collectionTime   { return [[self cardInfo:kCollectionTimeIndex] intValue]; }
-- (int) integrationTime  { return [[self cardInfo:kIntegrationTimeIndex] intValue]; }
-
-- (void) setEnabled:(short)chan withValue:(short)aValue		
-{ 
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:chan withValue:enabled[chan]];
-	enabled[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelEnabledChanged object:self];
-}
-
-- (void) setDebug:(short)chan withValue:(short)aValue	
-{ 
-    [[[self undoManager] prepareWithInvocationTarget:self] setDebug:chan withValue:debug[chan]];
-	debug[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelDebugChanged object:self];
-}
-
-- (void) setPileUp:(short)chan withValue:(short)aValue		
-{ 
-    [[[self undoManager] prepareWithInvocationTarget:self] setPileUp:chan withValue:pileUp[chan]];
-	pileUp[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelPileUpChanged object:self];
-}
-
-- (void) setPolarity:(short)chan withValue:(int)aValue		
-{
-	if(aValue<0)aValue=0;
-	else if(aValue>0x3)aValue= 0x3;
-    [[[self undoManager] prepareWithInvocationTarget:self] setPolarity:chan withValue:polarity[chan]];
-	polarity[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelPolarityChanged object:self];
-}
-
-- (void) setTriggerMode:(short)chan withValue:(int)aValue	
-{ 
-	if(aValue<0)aValue=0;
-	else if(aValue>0x2)aValue= 0x2;
-    [[[self undoManager] prepareWithInvocationTarget:self] setTriggerMode:chan withValue:triggerMode[chan]];
-	triggerMode[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelTriggerModeChanged object:self];
-}
-
-- (void) setLEDThreshold:(short)chan withValue:(int)aValue 
-{ 
-	if(aValue<0)aValue=0;
-	else if(aValue>0x7FFF)aValue = 0x7FFF;
-    [[[self undoManager] prepareWithInvocationTarget:self] setLEDThreshold:chan withValue:ledThreshold[chan]];
-	ledThreshold[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelLEDThresholdChanged object:self];
-}
-
-- (void) setCFDDelay:(short)chan withValue:(int)aValue		
-{
-	if(aValue<0)aValue=0;
-	else if(aValue>0x3F)aValue = 0x3F;
-    [[[self undoManager] prepareWithInvocationTarget:self] setCFDDelay:chan withValue:cfdDelay[chan]];
-	cfdDelay[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelCFDDelayChanged object:self];
-}
-
-- (void) setCFDFraction:(short)chan withValue:(int)aValue	
-{ 
-	if(aValue<0)aValue=0;
-	else if(aValue>0x11)aValue = 0x11;
-    [[[self undoManager] prepareWithInvocationTarget:self] setCFDFraction:chan withValue:cfdFraction[chan]];
-	cfdFraction[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelCFDFractionChanged object:self];
-}
-
-- (void) setCFDThreshold:(short)chan withValue:(int)aValue  
-{
-	if(aValue<0)aValue=0;
-	else if(aValue>0x1F)aValue = 0x1F;
-    [[[self undoManager] prepareWithInvocationTarget:self] setCFDThreshold:chan withValue:cfdThreshold[chan]];
-	cfdThreshold[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelCFDThresholdChanged object:self];
-}
-
-- (void) setDataDelay:(short)chan withValue:(int)aValue     
-{
-	if(aValue<0)aValue=0;
-	else if(aValue>0x7FF)aValue = 0x7FF;
-    [[[self undoManager] prepareWithInvocationTarget:self] setDataDelay:chan withValue:dataDelay[chan]];
-	dataDelay[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelDataDelayChanged object:self];
-}
-
-- (void) setDataLength:(short)chan withValue:(int)aValue    
-{
-	if(aValue<1)aValue=1;
-	else if(aValue>1024)aValue = 1024;
-    [[[self undoManager] prepareWithInvocationTarget:self] setDataLength:chan withValue:dataLength[chan]];
-	dataLength[chan] = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelDataLengthChanged object:self];
-}
-
-- (int) enabled:(short)chan			{ return enabled[chan]; }
-- (int) debug:(short)chan			{ return debug[chan]; }
-- (int) pileUp:(short)chan			{ return pileUp[chan];}
-- (int) polarity:(short)chan		{ return polarity[chan];}
-- (int) triggerMode:(short)chan		{ return triggerMode[chan];}
-- (int) ledThreshold:(short)chan	{ return ledThreshold[chan]; }
-- (int) cfdDelay:(short)chan		{ return cfdDelay[chan]; }
-- (int) cfdFraction:(short)chan		{ return cfdFraction[chan]; }
-- (int) cfdThreshold:(short)chan	{ return cfdThreshold[chan]; }
-- (int) dataDelay:(short)chan		{ return dataDelay[chan]; }
-- (int) dataLength:(short)chan		{ return dataLength[chan]; }
-
-
-- (float) cfdDelayConverted:(short)chan		{ return cfdDelay[chan]*630./(float)0x3F; }		//convert to ns
-- (float) cfdThresholdConverted:(short)chan	{ return cfdThreshold[chan]*160./(float)0x10; }	//convert to kev
-- (float) dataDelayConverted:(short)chan	{ return dataDelay[chan]*4.5/(float)0x01C2; }	//convert to µs
-- (float) dataLengthConverted:(short)chan	{ return dataLength[chan]; }	//convert to ns
-
-- (void) setCFDDelayConverted:(short)chan withValue:(float)aValue
-{
-	[self setCFDDelay:chan withValue:aValue*0x3F/630.];		//ns -> raw
-}
-	
-- (void) setCFDThresholdConverted:(short)chan withValue:(float)aValue
-{
-	[self setCFDThreshold:chan withValue:aValue*0x10/160.];		//kev -> raw
-}
-
-- (void) setDataDelayConverted:(short)chan withValue:(float)aValue;
-{
-	[self setDataDelay:chan withValue:aValue*0x01C2/4.5];		//µs -> raw
-} 
- 
-- (void) setDataLengthConverted:(short)chan withValue:(float)aValue
-{
-	[self setDataLength:chan withValue:aValue];		//ns -> raw
-}  
 
 #pragma mark •••Hardware Access
 
-- (short) readBoardID
-{
-    unsigned short theValue = 0;
-    [[self adapter] readWordBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kBoardID]
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    return theValue & 0xffff;
-}
-
 - (void) initBoard
 {
-    //write the card level params
-    int i;
-    for(i=0;i<kNumXYCom200CardParams;i++){
-        unsigned short theValue = [[cardInfo objectAtIndex:i] shortValue];
-        [[self adapter] writeWordBlock:&theValue
-                             atAddress:[self baseAddress] + cardConstants[i].regOffset
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                         usingAddSpace:0x01];
-    }
-    //write the channel level params
-    for(i=0;i<kNumXYCom200Channels;i++){
-        [self writeControlReg:i enabled:YES];
-        [self writeLEDThreshold:i];
-        [self writeCFDParameters:i];
-        [self writeRawDataSlidingLength:i];
-        [self writeRawDataWindowLength:i];
-    }
-    
 }
 
-- (short) readControlReg:(int)channel
+- (void) read
 {
-    unsigned short theValue = 0 ;
-    [[self adapter] readWordBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kControlStatus] + 2*channel
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    
-    return theValue & 0xffff;
-}
-
-- (void) writeControlReg:(int)chan enabled:(BOOL)forceEnable
-{
- 
-    BOOL startStop;
-    if(forceEnable)	startStop= enabled[chan];
-    else			startStop = NO;
+	//read hw based on the dialog settings
+    short theChannelIndex	= [self selectedChannel];
+    short theRegIndex 		= [self selectedRegIndex];
+    short theValue;
 	
-    unsigned short theValue = (polarity[chan] << 10) | (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
-    [[self adapter] writeWordBlock:&theValue
-                         atAddress:[self baseAddress] + register_offsets[kControlStatus] + 2*chan
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	/*
-    unsigned short readBackValue = [self readControlReg:chan];
-    if((readBackValue & 0x0c1f) != theValue){
-        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xc1f,theValue & 0xc1f);
-    }*/
-}
-
-- (void) writeLEDThreshold:(int)channel
-{    
-    [[self adapter] writeWordBlock:(unsigned short*)&ledThreshold[channel]
-                         atAddress:[self baseAddress] + register_offsets[kLEDThreshold] + 2*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    
-}
-
-- (void) writeCFDParameters:(int)channel
-{    
-    unsigned short theValue = (cfdDelay[channel] << 7) | (cfdFraction[channel] << 5) | cfdThreshold[channel];
-    [[self adapter] writeWordBlock:&theValue
-                         atAddress:[self baseAddress] + register_offsets[kCFDParameters] + 2*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    
-}
-
-- (void) writeRawDataSlidingLength:(int)channel
-{    
-    [[self adapter] writeWordBlock:(unsigned short*)&dataDelay[channel]
-                         atAddress:[self baseAddress] + register_offsets[kRawDataSlidingLength] + 2*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    
-}
-
-- (void) writeRawDataWindowLength:(int)channel
-{    
-	unsigned short aValue = dataLength[channel]-1;
-    [[self adapter] writeWordBlock:&aValue
-                         atAddress:[self baseAddress] + register_offsets[kRawDataWindowLength] + 2*channel
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-    
-}
-
-
-- (unsigned short) readFifoState
-{
-    unsigned short theValue = 0 ;
-    [[self adapter] readWordBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
-    
-    
-    if((theValue & kXYCom200FIFOAllFull)==0)		return kFull;
-    else if((theValue & kXYCom200FIFOHalfFull)==0)	return kHalfFull;
-    else if((theValue & kXYCom200FIFOEmpty)==0)		return kEmpty;
-    else if((theValue & kXYCom200FIFOAlmostEmpty)==0)	return kAlmostEmpty;
-    else						return kSome;
-}
-
-- (unsigned long) readFIFO:(unsigned long)index
-{
-    unsigned long theValue = 0 ;
-    [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress]*0x100 + (4*index)
-                        numToRead:1
-                       withAddMod:0x39
-                    usingAddSpace:0x01];
-    return theValue;
-}
-
-- (void) writeFIFO:(unsigned long)index value:(unsigned long)aValue
-{
-    [[self adapter] writeLongBlock:&aValue
-                         atAddress:([self baseAddress]*0x100) + (4*index)
-                        numToWrite:1
-                        withAddMod:0x39
-                     usingAddSpace:0x01];
-}
-
-- (int) clearFIFO
-{
-	int count = 0;
-	NSDate* startDate = [NSDate date];
-    fifoStateAddress  = [self baseAddress] + register_offsets[kProgrammingDone];
-    fifoAddress       = [self baseAddress]*0x100;
-	//theController     = [[self crate] controllerCard];
-	theController     = [self adapter];
-	unsigned long  dataDump[kXYCom200FIFOAllFull];
-	BOOL error		  = NO;
-    while(1){
-		unsigned short val;
-		//read the fifo state
-		[theController readWordBlock:&val
-						   atAddress:fifoStateAddress
-						   numToRead:1
-						  withAddMod:0x29
-					   usingAddSpace:0x01];
-		if((val & kXYCom200FIFOEmpty) != 0){
-			//read the first longword which should be the packet separator: 0xAAAAAAAA
-			unsigned long theValue;
-			[theController readLongBlock:&theValue 
-							   atAddress:fifoAddress 
-							   numToRead:1
-							  withAddMod:0x39 
-						   usingAddSpace:0x01];
-			
-			if(theValue==0xAAAAAAAA){
-				//read the first word of actual data so we know how much to read
-				[theController readLongBlock:&theValue 
-								   atAddress:fifoAddress 
-								   numToRead:1 
-								  withAddMod:0x39 
-							   usingAddSpace:0x01];
-																		
-				[theController readLong:dataDump 
-							  atAddress:fifoAddress 
-							timesToRead:((theValue & 0xffff0000)>>16)-1  //number longs left to read
-							 withAddMod:0x39 
-						  usingAddSpace:0x01];
-				count++;
-			}
-			else {
-				error = YES;
-				break;
-			}
-		}
-		else break;
-
-		if([[NSDate date] timeIntervalSinceDate:startDate] > 10){
-            NSLog(@"That took a long time but seems to have been successful (slot %d)\n",[self slot]);
-			//error = YES;
-			break;
-		}
-    }
-
-	if(error){
-		NSLog(@"unable to clear FIFO on XYCom200 card (slot %d)\n",[self slot]);
-		[NSException raise:@"XYCom200 card Error" format:@"unable to clear FIFO on XYCom200 card (slot %d)",[self slot]];
-	}
-	
-	return count;
-}
-
-- (void) findNoiseFloors
-{
-	if(noiseFloorRunning){
-		noiseFloorRunning = NO;
-	}
-	else {
-		noiseFloorState = 0;
-		noiseFloorRunning = YES;
-		[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:0];
-	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200NoiseFloorChanged object:self];
-}
-
-- (void) stepNoiseFloor
-{
-	[[self undoManager] disableUndoRegistration];
-  
     NS_DURING
-		unsigned short val;
-
-		switch(noiseFloorState){
-			case 0: //init
-				//disable all channels
-				[self initBoard];
-				int i;
-				for(i=0;i<kNumXYCom200Channels;i++){
-					oldEnabled[i] = [self enabled:i];
-					[self setEnabled:i withValue:NO];
-					[self writeControlReg:i enabled:NO];
-					oldLEDThreshold[i] = [self ledThreshold:i];
-					[self setLEDThreshold:i withValue:0x7fff];
-					newLEDThreshold[i] = 0x7fff;
-				}
-				noiseFloorWorkingChannel = -1;
-				//find first channel
-				for(i=0;i<kNumXYCom200Channels;i++){
-					if(oldEnabled[i]){
-						noiseFloorWorkingChannel = i;
-						break;
-					}
-				}
-				if(noiseFloorWorkingChannel>=0){
-					noiseFloorLow			= 0;
-					noiseFloorHigh		= 0x7FFF;
-					noiseFloorTestValue	= 0x7FFF/2;              //Initial probe position
-					[self setLEDThreshold:noiseFloorWorkingChannel withValue:noiseFloorHigh];
-					[self writeLEDThreshold:noiseFloorWorkingChannel];
-					[self setEnabled:noiseFloorWorkingChannel withValue:YES];
-					[self writeControlReg:noiseFloorWorkingChannel enabled:YES];
-					[self clearFIFO];
-					noiseFloorState = 1;
-				}
-				else {
-					noiseFloorState = 2; //nothing to do
-				}
-			break;
+        
+            [self read:theRegIndex returnValue:&theValue];
 			
-			case 1:
-				if(noiseFloorLow <= noiseFloorHigh) {
-					[self setLEDThreshold:noiseFloorWorkingChannel withValue:noiseFloorTestValue];
-					[self writeLEDThreshold:noiseFloorWorkingChannel];
-					noiseFloorState = 2;	//go check for data
-				}
-				else {
-					newLEDThreshold[noiseFloorWorkingChannel] = noiseFloorTestValue + noiseFloorOffset;
-					[self setEnabled:noiseFloorWorkingChannel withValue:NO];
-					[self writeControlReg:noiseFloorWorkingChannel enabled:NO];
-					[self setLEDThreshold:noiseFloorWorkingChannel withValue:0x7fff];
-					[self writeLEDThreshold:noiseFloorWorkingChannel];
-					noiseFloorState = 3;	//done with this channel
-				}
-			break;
-			
-			case 2:
-				//read the fifo state
-				[[self adapter] readWordBlock:&val
-									   atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
-									   numToRead:1
-									  withAddMod:0x29
-								   usingAddSpace:0x01];
-
-				if((val & kXYCom200FIFOEmpty) != 0){
-					//there's some data in fifo so we're too low with the threshold
-					[self setLEDThreshold:noiseFloorWorkingChannel withValue:0x7fff];
-					[self writeLEDThreshold:noiseFloorWorkingChannel];
-					[self clearFIFO];
-					noiseFloorLow = noiseFloorTestValue + 1;
-				}
-				else noiseFloorHigh = noiseFloorTestValue - 1;										//no data so continue lowering threshold
-				noiseFloorTestValue = noiseFloorLow+((noiseFloorHigh-noiseFloorLow)/2);     //Next probe position.
-				noiseFloorState = 1;	//continue with this channel
-			break;
-			
-			case 3:
-				//go to next channel
-				noiseFloorLow		= 0;
-				noiseFloorHigh		= 0x7FFF;
-				noiseFloorTestValue	= 0x7FFF/2;              //Initial probe position
-				//find first channel
-				int startChan = noiseFloorWorkingChannel+1;
-				noiseFloorWorkingChannel = -1;
-				for(i=startChan;i<kNumXYCom200Channels;i++){
-					if(oldEnabled[i]){
-						noiseFloorWorkingChannel = i;
-						break;
-					}
-				}
-				if(noiseFloorWorkingChannel >= startChan){
-					[self setEnabled:noiseFloorWorkingChannel withValue:YES];
-					[self writeControlReg:noiseFloorWorkingChannel enabled:YES];
-					noiseFloorState = 1;
-				}
-				else {
-					noiseFloorState = 4;
-				}
-			break;
-							
-			case 4: //finish up	
-				//load new results
-				for(i=0;i<kNumXYCom200Channels;i++){
-					[self setEnabled:i withValue:oldEnabled[i]];
-					[self setLEDThreshold:i withValue:newLEDThreshold[i]];
-				}
-				[self initBoard];
-				noiseFloorRunning = NO;
-			break;
-		}
-		if(noiseFloorRunning){
-			[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:noiseFloorIntegrationTime];
-		}
-		else {
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200NoiseFloorChanged object:self];
-		}
-    NS_HANDLER
-        int i;
-        for(i=0;i<kNumXYCom200Channels;i++){
-            [self setEnabled:i withValue:oldEnabled[i]];
-            [self setLEDThreshold:i withValue:oldLEDThreshold[i]];
-        }
-		NSLog(@"XYCom200 LED threshold finder quit because of exception\n");
-    NS_ENDHANDLER
-	[[self undoManager] enableUndoRegistration];
+            NSLog(@"CAEN reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
+        
+        NS_HANDLER
+            NSLog(@"Can't Read [%@] on the %@.\n",
+                  [self getRegisterName:theRegIndex], [self identifier]);
+            [localException raise];
+        NS_ENDHANDLER
 }
 
 
-#pragma mark •••Data Taker
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+//--------------------------------------------------------------------------------
+/*!\method  write
+* \brief	Writes data out to a CAEN VME device register.
+* \note
+*/
+//--------------------------------------------------------------------------------
+- (void) write
 {
-    dataId = DataId;
-}
-- (void) setDataIds:(id)assigner
-{
-    dataId       = [assigner assignDataIds:kLongForm]; //short form preferred
-}
-
-- (void) syncDataIdsWith:(id)anotherCard
-{
-    [self setDataId:[anotherCard dataId]];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORXYCom2004WaveformDecoder",            @"decoder",
-        [NSNumber numberWithLong:dataId],        @"dataId",
-        [NSNumber numberWithBool:YES],           @"variable",
-        [NSNumber numberWithLong:-1],			 @"length",
-        nil];
-    [dataDictionary setObject:aDictionary forKey:@"XYCom200"];
+     
+ 	//write hw based on the dialog settings
+	long theValue			=  [self writeValue];
+    short theChannelIndex	= [self selectedChannel];
+    short theRegIndex 		= [self selectedRegIndex];
     
-    return dataDictionary;
+    NS_DURING
+        
+        NSLog(@"Register is:%d\n", theRegIndex);
+        NSLog(@"Index is   :%d\n", theChannelIndex);
+        NSLog(@"Value is   :0x%04x\n", theValue);
+        
+		[self write:theRegIndex sendValue:(short) theValue];
+        
+        NS_HANDLER
+            NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
+                  theValue, [self getRegisterName:theRegIndex],[self identifier]);
+            [localException raise];
+        NS_ENDHANDLER
 }
 
+- (void) read:(unsigned short) pReg returnValue:(void*) pValue
+{
+    // Make sure that register is valid
+    if (pReg >= [self getNumberRegisters]) {
+        [NSException raise:@"Illegal Register" format:@"Register index out of bounds on %@",[self identifier]];
+    }
+    
+    
+	unsigned short aValue;
+	[[self adapter] readWordBlock:&aValue
+                        atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+                        numToRead:1
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+					
+	*((unsigned short*)pValue) = aValue;
+}
+
+- (void) write:(unsigned short) pReg sendValue:(unsigned long) pValue
+{
+    // Check that register is a valid register.
+    if (pReg >= [self getNumberRegisters]){
+        [NSException raise:@"Illegal Register" format:@"Register index out of bounds on %@",[self identifier]];
+    }
+    
+	unsigned short aValue = (unsigned short)pValue;
+	[[self adapter] writeWordBlock:&aValue
+						 atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+	
+}
 
 #pragma mark •••HW Wizard
--(BOOL) hasParmetersToRamp
-{
-	return YES;
-}
 - (int) numberOfChannels
 {
     return kNumXYCom200Channels;
@@ -814,125 +239,8 @@ static struct {
 
 - (NSArray*) wizardParameters
 {
-    NSMutableArray* a = [NSMutableArray array];
-    ORHWWizParam* p;
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"External Window"];
-    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:cardConstants[kExternalWindowIndex].units];
-    [p setSetMethod:@selector(setExternalWindow:) getMethod:@selector(externalWindow)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Pileup Window"];
-    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:cardConstants[kPileUpWindowIndex].units];
-    [p setSetMethod:@selector(setPileUpWindow:) getMethod:@selector(pileUpWindow)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Noise Window"];
-    [p setFormat:@"##0" upperLimit:0x3f lowerLimit:0 stepSize:1 units:cardConstants[kNoiseWindowIndex].units];
-    [p setSetMethod:@selector(setNoiseWindow:) getMethod:@selector(noiseWindow)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Ext Trig Length"];
-    [p setFormat:@"##0" upperLimit:0x7ff lowerLimit:0 stepSize:1 units:cardConstants[kExtTrigLengthIndex].units];
-    [p setSetMethod:@selector(setExtTrigLength:) getMethod:@selector(extTrigLength)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Collection Time"];
-    [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:cardConstants[kCollectionTimeIndex].units];
-    [p setSetMethod:@selector(setCollectionTime:) getMethod:@selector(collectionTime)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Integration Time"];
-    [p setFormat:@"##0" upperLimit:0xff lowerLimit:0 stepSize:1 units:cardConstants[kIntegrationTimeIndex].units];
-    [p setSetMethod:@selector(setIntegrationTime:) getMethod:@selector(integrationTime)];
-    [p setActionMask:kAction_Set_Mask];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Polarity"];
-    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setPolarity:withValue:) getMethod:@selector(polarity:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Trigger Mode"];
-    [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setTriggerMode:withValue:) getMethod:@selector(triggerMode:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Pile Up"];
-    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setPileUp:withValue:) getMethod:@selector(pileUp:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Enabled"];
-    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setEnable:withValue:) getMethod:@selector(enable:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Debug Mode"];
-    [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
-    [p setSetMethod:@selector(setDebug:withValue:) getMethod:@selector(debug:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"LED Threshold"];
-    [p setFormat:@"##0" upperLimit:0x7fff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setLEDThreshold:withValue:) getMethod:@selector(ledThreshold:)];
-	[p setCanBeRamped:YES];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"CFD Delay"];
-    [p setFormat:@"##0" upperLimit:630 lowerLimit:0 stepSize:1 units:@"ns"];
-    [p setSetMethod:@selector(setCFDDelayConverted:withValue:) getMethod:@selector(cfdDelayConverted:)];
-	[p setCanBeRamped:YES];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"CFD Fraction"];
-    [p setFormat:@"##0" upperLimit:0x3 lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setCFDFraction:withValue:) getMethod:@selector(cfdFraction:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"CFD Threshold"];
-    [p setFormat:@"##0.0" upperLimit:160 lowerLimit:0 stepSize:1 units:@"Kev"];
-	[p setCanBeRamped:YES];
-    [p setSetMethod:@selector(setCFDThresholdConverted:withValue:) getMethod:@selector(cfdThresholdConverted:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Data Delay"];
-    [p setFormat:@"##0.00" upperLimit:4.5 lowerLimit:0 stepSize:.01 units:@"us"];
-    [p setSetMethod:@selector(setDataDelayConverted:withValue:) getMethod:@selector(dataDelayConverted:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Data Length"];
-    [p setFormat:@"##0" upperLimit:1024 lowerLimit:1 stepSize:1 units:@"pts"];
-    [p setSetMethod:@selector(setDataLengthConverted:withValue:) getMethod:@selector(dataLengthConverted:)];
-    [a addObject:p];
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setUseValue:NO];
-    [p setName:@"Init"];
-    [p setSetMethodSelector:@selector(initBoard)];
-    [a addObject:p];
+    NSMutableArray* a = [NSMutableArray array];    
+
     
     return a;
 }
@@ -956,214 +264,19 @@ static struct {
     else return [[cardDictionary objectForKey:param] objectAtIndex:aChannel];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (short) getNumberRegisters
 {
-    if(![[self adapter] controllerCard]){
-        [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
-    }
-    
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORXYCom200Model"];    
-    
-    //cache some stuff
-    location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
-    //theController   = [[self crate] controllerCard];
-    theController   = [self adapter];
-    fifoAddress     = [self baseAddress]*0x100;
-    fifoStateAddress= [self baseAddress] + register_offsets[kProgrammingDone];
-    
-    short i;
-    for(i=0;i<kNumXYCom200Channels;i++){
-        [self writeControlReg:i enabled:NO];
-    }
-    [self clearFIFO];
-    dataBuffer = (unsigned long*)malloc(0xffff * sizeof(long));
-    [self startRates];
-	
-    [self initBoard];
-	
-	[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1];
+	return kNumRegs;
 }
 
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card
-//**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (NSString*) getRegisterName:(short) anIndex
 {
-    isRunning = YES; 
-    NSString* errorLocation = @"";
-    NS_DURING
-		unsigned short val;
-		//read the fifo state
-		[theController readWordBlock:&val
-						   atAddress:fifoStateAddress
-						   numToRead:1
-						  withAddMod:0x29
-					   usingAddSpace:0x01];
-		fifoState = val;			
-		if((val & kXYCom200FIFOEmpty) != 0){
-			unsigned long numLongs = 0;
-			dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
-			dataBuffer[numLongs++] = location;
-			
-			//read the first longword which should be the packet separator: 0xAAAAAAAA
-			unsigned long theValue;
-			[theController readLongBlock:&theValue 
-							   atAddress:fifoAddress 
-							   numToRead:1 
-							  withAddMod:0x39 
-						   usingAddSpace:0x01];
-			
-			if(theValue==0xAAAAAAAA){
-				
-				//read the first word of actual data so we know how much to read
-				[theController readLongBlock:&theValue 
-								   atAddress:fifoAddress 
-								   numToRead:1 
-								  withAddMod:0x39 
-							   usingAddSpace:0x01];
-				
-				dataBuffer[numLongs++] = theValue;
-				
-				++waveFormCount[theValue & 0x7];  //grab the channel and inc the count
-				
-				unsigned long numLongsLeft  = ((theValue & 0xffff0000)>>16)-1;
-				
-				[theController readLong:&dataBuffer[numLongs] 
-							  atAddress:fifoAddress 
-							timesToRead:numLongsLeft 
-							 withAddMod:0x39 
-						  usingAddSpace:0x01];
-						  
-				long totalNumLongs = (numLongs + numLongsLeft);
-				dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
-				[aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
-			}
-			else {
-				//oops... really bad -- the buffer read is out of sequence -- dump it all
-				[self clearFIFO];
-				NSLogError(@"XYCom200",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO flushed",nil);
-			}
-		} 
-        NS_HANDLER
-            NSLogError(@"",@"XYCom200 Card Error",errorLocation,nil);
-            [self incExceptionCount];
-            [localException raise];
-        NS_ENDHANDLER
+    return mIOXY200Reg[anIndex].regName;
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (unsigned long) getAddressOffset:(short) anIndex
 {
-    isRunning = NO;
-    [waveFormRateGroup stop];
-    //stop all channels
-    short i;
-    for(i=0;i<kNumXYCom200Channels;i++){					
-		waveFormCount[i] = 0;
-        [self writeControlReg:i enabled:NO];
-    }
-    free(dataBuffer);
-}
-
-//this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
-- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
-{
-
-    /* The current hardware specific data is:               *
-     *                                                      *
-     * 0: FIFO state address                                *
-     * 1: FIFO empty state mask                             *
-     * 2: FIFO address                                      *
-     * 3: FIFO address AM                                   *
-     * 4: FIFO size                                         */
-    
-	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id	= kXYCom200; //should be unique
-	configStruct->card_info[index].hw_mask[0] 	= dataId; //better be unique
-	configStruct->card_info[index].slot			= [self slot];
-	configStruct->card_info[index].crate		= [self crateNumber];
-	configStruct->card_info[index].add_mod		= [self addressModifier];
-	configStruct->card_info[index].base_add		= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_offsets[kProgrammingDone];
-    configStruct->card_info[index].deviceSpecificData[1]	= kXYCom200FIFOEmpty;
-    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] * 0x100;
-    configStruct->card_info[index].deviceSpecificData[3]	= 0x39;
-    configStruct->card_info[index].deviceSpecificData[4]	= 0x4000;
-	configStruct->card_info[index].num_Trigger_Indexes		= 0;
-	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
-	
-	return index+1;
-}
-
-
-
-
-
-- (void) checkFifoAlarm
-{
-	if(((fifoState & kXYCom200FIFOAllFull) == 0) && isRunning){
-		fifoEmptyCount = 0;
-		if(!fifoFullAlarm){
-			NSString* alarmName = [NSString stringWithFormat:@"FIFO FULL XYCom200 (slot %d)",[self slot]];
-			fifoFullAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kDataFlowAlarm];
-			[fifoFullAlarm setSticky:YES];
-			[fifoFullAlarm setHelpString:@"The rate is too high. Adjust the LED Threshold accordingly."];
-			[fifoFullAlarm postAlarm];
-		}
-	}
-	else {
-		fifoEmptyCount++;
-		if(fifoEmptyCount>=5){
-			[fifoFullAlarm clearAlarm];
-			[fifoFullAlarm release];
-			fifoFullAlarm = nil;
-		}
-	}
-	if(isRunning){
-		[self performSelector:@selector(checkFifoAlarm) withObject:nil afterDelay:1.5];
-	}
-	else {
-		[fifoFullAlarm clearAlarm];
-		[fifoFullAlarm release];
-		fifoFullAlarm = nil;
-	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200ModelFIFOCheckChanged object:self];
-}
-
-- (void) reset
-{
-}
-
-
-- (BOOL) bumpRateFromDecodeStage:(short)channel
-{
-    if(isRunning)return NO;
-    
-    ++waveFormCount[channel];
-    return YES;
-}
-
-- (unsigned long) waveFormCount:(int)aChannel
-{
-    return waveFormCount[aChannel];
-}
-
--(void) startRates
-{
-    [self clearWaveFormCounts];
-    [waveFormRateGroup start:self];
-}
-
-- (void) clearWaveFormCounts
-{
-    int i;
-    for(i=0;i<kNumXYCom200Channels;i++){
-        waveFormCount[i]=0;
-    }
+    return mIOXY200Reg[anIndex].addressOffset;
 }
 
 #pragma mark •••Archival
@@ -1172,35 +285,7 @@ static struct {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    
-    [self setNoiseFloorIntegrationTime:[decoder decodeFloatForKey:@"NoiseFloorIntegrationTime"]];
-    [self setNoiseFloorOffset:[decoder decodeIntForKey:@"NoiseFloorOffset"]];
-    cardInfo = [[decoder decodeObjectForKey:@"cardInfo"] retain];
-    
-    
-    [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
-    
-    if(!waveFormRateGroup){
-        [self setWaveFormRateGroup:[[[ORRateGroup alloc] initGroup:kNumXYCom200Channels groupTag:0] autorelease]];
-        [waveFormRateGroup setIntegrationTime:5];
-    }
-    [waveFormRateGroup resetRates];
-    [waveFormRateGroup calcRates];
-	
-	int i;
-	for(i=0;i<kNumXYCom200Channels;i++){
-		[self setEnabled:i withValue:[decoder decodeIntForKey:[@"enabled" stringByAppendingFormat:@"%d",i]]];
-		[self setDebug:i withValue:[decoder decodeIntForKey:[@"debug" stringByAppendingFormat:@"%d",i]]];
-		[self setPileUp:i withValue:[decoder decodeIntForKey:[@"pileUp" stringByAppendingFormat:@"%d",i]]];
-		[self setPolarity:i withValue:[decoder decodeIntForKey:[@"polarity" stringByAppendingFormat:@"%d",i]]];
-		[self setTriggerMode:i withValue:[decoder decodeIntForKey:[@"triggerMode" stringByAppendingFormat:@"%d",i]]];
-		[self setLEDThreshold:i withValue:[decoder decodeIntForKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]]];
-		[self setCFDThreshold:i withValue:[decoder decodeIntForKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]]];
-		[self setCFDDelay:i withValue:[decoder decodeIntForKey:[@"cfdDelay" stringByAppendingFormat:@"%d",i]]];
-		[self setCFDFraction:i withValue:[decoder decodeIntForKey:[@"cfdFraction" stringByAppendingFormat:@"%d",i]]];
-		[self setDataDelay:i withValue:[decoder decodeIntForKey:[@"dataDelay" stringByAppendingFormat:@"%d",i]]];
-		[self setDataLength:i withValue:[decoder decodeIntForKey:[@"dataLength" stringByAppendingFormat:@"%d",i]]];
-	}
+
 	      
     [[self undoManager] enableUndoRegistration];
     
@@ -1210,45 +295,15 @@ static struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeFloat:noiseFloorIntegrationTime forKey:@"NoiseFloorIntegrationTime"];
-    [encoder encodeInt:noiseFloorOffset forKey:@"NoiseFloorOffset"];
-    [encoder encodeObject:cardInfo forKey:@"cardInfo"];
-    [encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
-	int i;
- 	for(i=0;i<kNumXYCom200Channels;i++){
-		[encoder encodeInt:enabled[i] forKey:[@"enabled" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:debug[i] forKey:[@"debug" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:pileUp[i] forKey:[@"pileUp" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:polarity[i] forKey:[@"polarity" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:triggerMode[i] forKey:[@"triggerMode" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdFraction[i] forKey:[@"cfdFraction" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdDelay[i] forKey:[@"cfdDelay" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:cfdThreshold[i] forKey:[@"cfdThreshold" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:ledThreshold[i] forKey:[@"ledThreshold" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:dataDelay[i] forKey:[@"dataDelay" stringByAppendingFormat:@"%d",i]];
-		[encoder encodeInt:dataLength[i] forKey:[@"dataLength" stringByAppendingFormat:@"%d",i]];
-	}
-
+ 
  }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    short i;
-    for(i=0;i<kNumXYCom200CardParams;i++){
-        [objDictionary setObject:[self cardInfo:i] forKey:cardConstants[i].name];
-    }  
-	[self addCurrentState:objDictionary cArray:enabled forKey:@"Enabled"];
-	[self addCurrentState:objDictionary cArray:debug forKey:@"Debug Mode"];
-	[self addCurrentState:objDictionary cArray:pileUp forKey:@"Pile Up"];
-	[self addCurrentState:objDictionary cArray:polarity forKey:@"Polarity"];
-	[self addCurrentState:objDictionary cArray:triggerMode forKey:@"Trigger Mode"];
-	[self addCurrentState:objDictionary cArray:ledThreshold forKey:@"LED Threshold"];
-	[self addCurrentState:objDictionary cArray:cfdDelay forKey:@"CFD Delay"];
-	[self addCurrentState:objDictionary cArray:cfdFraction forKey:@"CFD Fraction"];
-	[self addCurrentState:objDictionary cArray:cfdThreshold forKey:@"CFD Threshold"];
-	[self addCurrentState:objDictionary cArray:dataDelay forKey:@"Data Delay"];
-	[self addCurrentState:objDictionary cArray:dataLength forKey:@"Data Length"];
+
+	//[self addCurrentState:objDictionary cArray:enabled forKey:@"Enabled"];
+
 	
 	
     return objDictionary;
