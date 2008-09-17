@@ -848,6 +848,15 @@
 		844357560B5AC9E00033B918 /* SyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844357490B5AC9DC0033B918 /* SyntaxDefinition.plist */; };
 		844384C40B273F9C00A94E26 /* ORAdcInfoProviding.m in Sources */ = {isa = PBXBuildFile; fileRef = 844384C30B273F9C00A94E26 /* ORAdcInfoProviding.m */; };
 		844384C80B273FB600A94E26 /* ORAdcInfoProviding.h in Headers */ = {isa = PBXBuildFile; fileRef = 844384C70B273FB600A94E26 /* ORAdcInfoProviding.h */; };
+		844445770E81311500A1440D /* IpeV4FLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8444456E0E81311500A1440D /* IpeV4FLT.nib */; };
+		844445780E81311500A1440D /* IpeV4FLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8444456F0E81311500A1440D /* IpeV4FLTCard.gif */; };
+		844445790E81311500A1440D /* ORIpeV4FLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844445700E81311500A1440D /* ORIpeV4FLTController.h */; };
+		8444457A0E81311500A1440D /* ORIpeV4FLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844445710E81311500A1440D /* ORIpeV4FLTController.m */; };
+		8444457B0E81311500A1440D /* ORIpeV4FLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 844445720E81311500A1440D /* ORIpeV4FLTDecoder.h */; };
+		8444457C0E81311500A1440D /* ORIpeV4FLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 844445730E81311500A1440D /* ORIpeV4FLTDecoder.m */; };
+		8444457D0E81311500A1440D /* ORIpeV4FLTDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 844445740E81311500A1440D /* ORIpeV4FLTDefs.h */; };
+		8444457E0E81311500A1440D /* ORIpeV4FLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844445750E81311500A1440D /* ORIpeV4FLTModel.h */; };
+		8444457F0E81311500A1440D /* ORIpeV4FLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 844445760E81311500A1440D /* ORIpeV4FLTModel.m */; };
 		844514840674DF9600A19654 /* LC950Oscilloscope.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8445147C0674DF9500A19654 /* LC950Oscilloscope.gif */; };
 		844514850674DF9600A19654 /* ORLC950.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8445147D0674DF9500A19654 /* ORLC950.nib */; };
 		844514860674DF9600A19654 /* ORLC950Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8445147E0674DF9500A19654 /* ORLC950Controller.h */; };
@@ -2520,6 +2529,15 @@
 		844357490B5AC9DC0033B918 /* SyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = SyntaxDefinition.plist; path = "Source/Objects/Misc Objects/Views/ScriptView/SyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
 		844384C30B273F9C00A94E26 /* ORAdcInfoProviding.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAdcInfoProviding.m; path = "Source/Objects/Hardware/Hardware Base Classes/ORAdcInfoProviding.m"; sourceTree = SOURCE_ROOT; };
 		844384C70B273FB600A94E26 /* ORAdcInfoProviding.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAdcInfoProviding.h; path = "Source/Objects/Hardware/Hardware Base Classes/ORAdcInfoProviding.h"; sourceTree = SOURCE_ROOT; };
+		8444456E0E81311500A1440D /* IpeV4FLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = IpeV4FLT.nib; sourceTree = "<group>"; };
+		8444456F0E81311500A1440D /* IpeV4FLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = IpeV4FLTCard.gif; sourceTree = "<group>"; };
+		844445700E81311500A1440D /* ORIpeV4FLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeV4FLTController.h; sourceTree = "<group>"; };
+		844445710E81311500A1440D /* ORIpeV4FLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORIpeV4FLTController.m; sourceTree = "<group>"; };
+		844445720E81311500A1440D /* ORIpeV4FLTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeV4FLTDecoder.h; sourceTree = "<group>"; };
+		844445730E81311500A1440D /* ORIpeV4FLTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORIpeV4FLTDecoder.m; sourceTree = "<group>"; };
+		844445740E81311500A1440D /* ORIpeV4FLTDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeV4FLTDefs.h; sourceTree = "<group>"; };
+		844445750E81311500A1440D /* ORIpeV4FLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORIpeV4FLTModel.h; sourceTree = "<group>"; };
+		844445760E81311500A1440D /* ORIpeV4FLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORIpeV4FLTModel.m; sourceTree = "<group>"; };
 		8444A5FB04BC8382005F64B1 /* ORDispatcherClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDispatcherClient.h; path = "Source/Objects/Data Processing/Dispatcher/ORDispatcherClient.h"; sourceTree = SOURCE_ROOT; };
 		8444A5FC04BC8382005F64B1 /* ORDispatcherClient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDispatcherClient.m; path = "Source/Objects/Data Processing/Dispatcher/ORDispatcherClient.m"; sourceTree = SOURCE_ROOT; };
 		8445147C0674DF9500A19654 /* LC950Oscilloscope.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LC950Oscilloscope.gif; sourceTree = "<group>"; };
@@ -5363,6 +5381,23 @@
 			path = "Source/Objects/Misc Objects/Views/ScriptView";
 			sourceTree = SOURCE_ROOT;
 		};
+		8444456D0E81311500A1440D /* IpeV4 FLT */ = {
+			isa = PBXGroup;
+			children = (
+				844445750E81311500A1440D /* ORIpeV4FLTModel.h */,
+				844445760E81311500A1440D /* ORIpeV4FLTModel.m */,
+				8444456F0E81311500A1440D /* IpeV4FLTCard.gif */,
+				844445700E81311500A1440D /* ORIpeV4FLTController.h */,
+				844445710E81311500A1440D /* ORIpeV4FLTController.m */,
+				844445720E81311500A1440D /* ORIpeV4FLTDecoder.h */,
+				844445730E81311500A1440D /* ORIpeV4FLTDecoder.m */,
+				844445740E81311500A1440D /* ORIpeV4FLTDefs.h */,
+				8444456E0E81311500A1440D /* IpeV4FLT.nib */,
+			);
+			name = "IpeV4 FLT";
+			path = "Source/Objects/Hardware/IPE/IpeV4 FLT";
+			sourceTree = SOURCE_ROOT;
+		};
 		8445147B0674DF9500A19654 /* Oscilloscope LC950 */ = {
 			isa = PBXGroup;
 			children = (
@@ -7577,6 +7612,7 @@
 				84F46F110CA44255007EFADA /* IPE Crate */,
 				84FDF5450D7F084E003AE119 /* IpeV4 Crate */,
 				842251230D8845390048D331 /* IpeV4 SLT */,
+				8444456D0E81311500A1440D /* IpeV4 FLT */,
 				84F46F1A0CA44255007EFADA /* IPE FLT */,
 				84F46F240CA44255007EFADA /* IPE SLT */,
 				84F46F2D0CA44255007EFADA /* Katrin FLT */,
@@ -9006,6 +9042,10 @@
 				9C7CE7E60E2FC22500F63679 /* ORCaen260Controller.h in Headers */,
 				9C7CE7E80E2FC22500F63679 /* ORCaen260Decoders.h in Headers */,
 				9C7CE7EA0E2FC22500F63679 /* ORCaen260Model.h in Headers */,
+				844445790E81311500A1440D /* ORIpeV4FLTController.h in Headers */,
+				8444457B0E81311500A1440D /* ORIpeV4FLTDecoder.h in Headers */,
+				8444457D0E81311500A1440D /* ORIpeV4FLTDefs.h in Headers */,
+				8444457E0E81311500A1440D /* ORIpeV4FLTModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9560,6 +9600,8 @@
 				143AEEAF0E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif in Resources */,
 				9C7CE7E40E2FC22500F63679 /* Caen260.nib in Resources */,
 				9C7CE7E50E2FC22500F63679 /* CV260Card.gif in Resources */,
+				844445770E81311500A1440D /* IpeV4FLT.nib in Resources */,
+				844445780E81311500A1440D /* IpeV4FLTCard.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10212,6 +10254,9 @@
 				9C7CE7E70E2FC22500F63679 /* ORCaen260Controller.m in Sources */,
 				9C7CE7E90E2FC22500F63679 /* ORCaen260Decoders.m in Sources */,
 				9C7CE7EB0E2FC22500F63679 /* ORCaen260Model.m in Sources */,
+				8444457A0E81311500A1440D /* ORIpeV4FLTController.m in Sources */,
+				8444457C0E81311500A1440D /* ORIpeV4FLTDecoder.m in Sources */,
+				8444457F0E81311500A1440D /* ORIpeV4FLTModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
