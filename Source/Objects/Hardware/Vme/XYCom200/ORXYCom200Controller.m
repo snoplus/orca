@@ -1,7 +1,7 @@
 //-------------------------------------------------------------------------
 //  ORXYCom200Controller.h
 //
-//  Created by Mark A. Howe on Wednesday 02/07/2007.
+//  Created by Mark A. Howe on Wednesday 9/18/2008.
 //  Copyright (c) 2007 CENPA. University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
@@ -17,18 +17,8 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-
 #pragma mark ***Imported Files
-#import <Cocoa/Cocoa.h>
 #import "ORXYCom200Controller.h"
-#import "ORRateGroup.h"
-#import "ORRate.h"
-#import "ORValueBar.h"
-#import "ORPlotter1D.h"
-#import "ORAxis.h"
-#import "ORTimeRate.h"
-#import "ORRate.h"
 
 @implementation ORXYCom200Controller
 
@@ -49,10 +39,8 @@
 	[super awakeFromNib];
 	
     [registerAddressPopUp setAlignment:NSCenterTextAlignment];
-    [channelPopUp setAlignment:NSCenterTextAlignment];
 	    
     [self populatePullDown];
-
 }
 
 #pragma mark •••Notifications
@@ -87,11 +75,6 @@
 					   object:model];
 	
     [notifyCenter addObserver:self
-					 selector:@selector(selectedRegChannelChanged:)
-						 name:ORXYCom200SelectedChannelChanged
-					   object:model];
-	
-    [notifyCenter addObserver:self
 					 selector:@selector(writeValueChanged:)
 						 name:ORXYCom200WriteValueChanged
 					   object:model]; 
@@ -120,16 +103,13 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-    
     BOOL runInProgress = [gOrcaGlobals runInProgress];
    // BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXYCom200SettingsLock];
     BOOL locked = [gSecurity isLocked:ORXYCom200SettingsLock];
     	
     [settingLockButton setState: locked];
     [addressText setEnabled:!locked && !runInProgress];
-	
 }
-
 
 - (void) setModel:(id)aModel
 {
@@ -150,24 +130,13 @@
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNotification
 {
-
-	//  Set value of popup
 	short index = [model selectedRegIndex];
 	[self updatePopUpButton:registerAddressPopUp setting:index];
 	[self updateRegisterDescription:index];
-
-    
-}
-
-
-- (void) selectedRegChannelChanged:(NSNotification*) aNotification
-{
-	[self updatePopUpButton:channelPopUp setting:[model selectedChannel]];
 }
 
 - (void) writeValueChanged:(NSNotification*) aNotification
 {
-	//  Set value of both text and stepper
 	[self updateStepper:writeValueStepper setting:[model writeValue]];
 	[writeValueTextField setIntValue:[model writeValue]];
 }
@@ -186,13 +155,6 @@
     [gSecurity tryToSetLock:ORXYCom200SettingsLock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) selectChannelAction:(id) aSender
-{
-    if ([aSender indexOfSelectedItem] != [model selectedChannel]){
-		[[[model document] undoManager] setActionName:@"Select Channel"]; // Set undo name
-		[model setSelectedChannel:[aSender indexOfSelectedItem]]; // Set new value
-    }
-}
 - (IBAction) writeValueAction:(id) aSender
 {
     // Make sure that value has changed.
@@ -204,7 +166,6 @@
 
 - (IBAction) selectRegisterAction:(id) aSender
 {
-    // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedRegIndex]){
 	    [[[model document] undoManager] setActionName:@"Select Register"]; // Set undo name
 	    [model setSelectedRegIndex:[aSender indexOfSelectedItem]]; // set new value
@@ -233,57 +194,21 @@
     NS_ENDHANDLER
 }
 
--(IBAction)initBoard:(id)sender
-{
-    NS_DURING
-        [self endEditing];
-        [model initBoard];		//initialize and load hardward
-        NSLog(@"Initialized XYCom200 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
-        
-    NS_HANDLER
-        NSLog(@"Reset and Init of XYCom200 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\nFailed XYCom200 Reset and Init", @"OK", nil, nil,
-                        localException);
-    NS_ENDHANDLER
-}
-
-
 #pragma mark ***Misc Helpers
 - (void) populatePullDown
 {
-    short	i;
-        
-// Clear all the popup items.
     [registerAddressPopUp removeAllItems];
-    [channelPopUp removeAllItems];
     
-// Populate the register popup
+    short	i;
     for (i = 0; i < [model getNumberRegisters]; i++) {
         [registerAddressPopUp insertItemWithTitle:[model 
                                     getRegisterName:i] 
                                             atIndex:i];
     }
     
-// Populate the channel popup
-    for (i = 0; i < 32; i++) {
-        [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i] 
-                                    atIndex:i];
-    }
-
-    [channelPopUp insertItemWithTitle:@"All" atIndex:32];
-
     [self selectedRegIndexChanged:nil];
-
 }
 
-//--------------------------------------------------------------------------------
-/*!
- * \method  updateRegisterDescription
- * \brief	Update description of register on dialog.
- * \param	aRegisterIndex			- The index to update.
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (void) updateRegisterDescription:(short) aRegisterIndex
 {
     [registerOffsetField setStringValue:

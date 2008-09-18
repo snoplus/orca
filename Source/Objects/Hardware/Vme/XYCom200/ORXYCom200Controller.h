@@ -1,7 +1,7 @@
 //-------------------------------------------------------------------------
 //  ORXYCom200Controller.h
 //
-//  Created by Mark A. Howe on Wednesday 02/07/2007.
+//  Created by Mark A. Howe on Wednesday 9/18/2008.
 //  Copyright (c) 2007 CENPA. University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
@@ -16,8 +16,6 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-//-------------------------------------------------------------------------
 
 #pragma mark ***Imported Files
 #import "OrcaObjectController.h";
@@ -35,7 +33,6 @@
     IBOutlet NSStepper* 	writeValueStepper;
     IBOutlet NSTextField* 	writeValueTextField;
     IBOutlet NSPopUpButton*	registerAddressPopUp;
-    IBOutlet NSPopUpButton*	channelPopUp;
     IBOutlet NSButton*		basicWriteButton;
     IBOutlet NSButton*		basicReadButton;
 	IBOutlet NSTextField*	registerOffsetField;
@@ -59,10 +56,8 @@
 #pragma mark •••Actions
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
-- (IBAction) baseAddressAction: (id) aSender;
 - (IBAction) writeValueAction: (id) aSender;
 - (IBAction) selectRegisterAction: (id) aSender;
-- (IBAction) selectChannelAction: (id) aSender;
 
 - (IBAction) read: (id) pSender;
 - (IBAction) write: (id) pSender;
