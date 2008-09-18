@@ -26,30 +26,31 @@
 #import "ORDataPacket.h"
 #import "ORQueue.h"
 
-NSString* ORUVUnitEnabledChanged			= @"ORUVUnitEnabledChanged";
-NSString* ORUVUnitDemandHVChanged			= @"ORUVUnitDemandHVChanged";
-NSString* ORUVUnitMeasuredHVChanged			= @"ORUVUnitMeasuredHVChanged";
-NSString* ORUVUnitMeasuredCurrentChanged	= @"ORUVUnitMeasuredCurrentChanged";
-NSString* ORUVUnitTripCurrentChanged		= @"ORUVUnitTripCurrentChanged";
-NSString* ORUVUnitRampUpRateChanged			= @"ORUVUnitRampUpRateChanged";
-NSString* ORUVUnitRampDownRateChanged		= @"ORUVUnitRampDownRateChanged";
-NSString* ORUVUnitMVDZChanged				= @"ORUVUnitMVDZChanged";
-NSString* ORUVUnitMCDZChanged				= @"ORUVUnitMCDZChanged";
+NSString* ORUVChnlEnabledChanged			= @"ORUVChnlEnabledChanged";
+NSString* ORUVChnlDemandHVChanged			= @"ORUVChnlDemandHVChanged";
+NSString* ORUVChnlMeasuredHVChanged			= @"ORUVChnlMeasuredHVChanged";
+NSString* ORUVChnlMeasuredCurrentChanged	= @"ORUVChnlMeasuredCurrentChanged";
+NSString* ORUVChnlTripCurrentChanged		= @"ORUVChnlTripCurrentChanged";
+NSString* ORUVChnlRampUpRateChanged			= @"ORUVChnlRampUpRateChanged";
+NSString* ORUVChnlRampDownRateChanged		= @"ORUVChnlRampDownRateChanged";
+NSString* ORUVChnlMVDZChanged				= @"ORUVChnlMVDZChanged";
+NSString* ORUVChnlMCDZChanged				= @"ORUVChnlMCDZChanged";
+NSString* ORUVChnlHVLimitChanged			= @"ORUVChnlHVLimitChanged";
 
-//NSString* ORUVUnitSlotChanged				= @"ORUVUnitSlotChanged";
+//NSString* ORUVChnlSlotChanged				= @"ORUVChnlSlotChanged";
 
 // HV Unit parameters
 NSString* ORHVkChnlEnabled = @"chnlEnabled";
-NSString* ORHVkDemandHV = @"demandHV";
-NSString* ORHVkMeasuredHV = @"measuredHV";
 NSString* ORHVkMeasuredCurrent = @"measuredCurrent";
-NSString* ORHVkTripCurrent = @"tripCurrent";
+NSString* ORHVkMeasuredHV = @"measuredHV";
+NSString* ORHVkDemandHV = @"demandHV";
 NSString* ORHVkRampUpRate = @"RampUpRate";
 NSString* ORHVkRampDownRate = @"RampDownRate";
+NSString* ORHVkTripCurrent = @"tripCurrent";
 NSString* ORHVkStatus = @"Status";
 NSString* ORHVkMVDZ = @"MVDZ";
 NSString* ORHVkMCDZ = @"MCDZ";
-
+NSString* ORHVkHVLimit = @"HVLimit";
 
 
 @implementation ORUnivVoltModel
@@ -128,7 +129,7 @@ NSString* ORHVkMCDZ = @"MCDZ";
 	NSNumber* enabledNumber = [NSNumber numberWithInt: anEnabled];
 	[tmpChnl setObject: enabledNumber forKey: enabledNumber];
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitEnabledChanged object: self];		
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVChnlEnabledChanged object: self];		
 }
 
 - (float) demandHV: (int) aChnl
@@ -140,15 +141,27 @@ NSString* ORHVkMCDZ = @"MCDZ";
 
 - (void) setDemandHV: (float) aDemandHV chnl: (int) aCurChannel
 {
-	NSMutableDictionary* tmpUnit = [mChannelArray objectAtIndex: aCurChannel];
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	NSNumber* demandHV = [NSNumber numberWithFloat: aDemandHV];
-	[tmpUnit setObject: demandHV forKey: ORHVkDemandHV];
+	[tmpChnl setObject: demandHV forKey: ORHVkDemandHV];
 	
 	// Put specific code here to talk with unit.
 	
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitDemandHVChanged object: self];	
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVChnlDemandHVChanged object: self];	
 }
+
+- (float) measuredCurrent: (int) aChnl
+{
+	// Send command to get HV
+//	[adapter sendCommand: @"RC"];
+	
+	// Now update dictionary
+	
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
+	return( [[tmpChnl objectForKey: ORHVkMeasuredCurrent] floatValue] );
+}
+
 
 
 - (float) measuredHV: (int) aChnl
@@ -174,12 +187,12 @@ NSString* ORHVkMCDZ = @"MCDZ";
 
 - (void) setTripCurrent: (float) aTripCurrent chnl: (int) aCurChannel
 {
-	NSMutableDictionary* tmpUnit = [mChannelArray objectAtIndex: aCurChannel];
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	NSNumber* tripCurrent = [NSNumber numberWithFloat: aTripCurrent];
-	[tmpUnit setObject: tripCurrent forKey: ORHVkTripCurrent];
+	[tmpChnl setObject: tripCurrent forKey: ORHVkTripCurrent];
 	
 	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitTripCurrentChanged object: self];	
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVChnlTripCurrentChanged object: self];	
 }
 
 - (float) rampUpRate: (int) aChnl
@@ -195,12 +208,12 @@ NSString* ORHVkMCDZ = @"MCDZ";
 
 - (void) setRampUpRate: (float) aRampUpRate chnl: (int) aCurChannel
 {
-	NSMutableDictionary* tmpUnit = [mChannelArray objectAtIndex: aCurChannel];
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	NSNumber* rampUpRate = [NSNumber numberWithFloat: aRampUpRate];
-	[tmpUnit setObject: rampUpRate forKey: ORHVkRampUpRate];
+	[tmpChnl setObject: rampUpRate forKey: ORHVkRampUpRate];
 	
 	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitRampUpRateChanged object: self];	
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVChnlRampUpRateChanged object: self];	
 }
 
 
@@ -218,34 +231,41 @@ NSString* ORHVkMCDZ = @"MCDZ";
 
 - (void) setRampDownRate: (float) aRampDownRate chnl: (int) aCurChannel
 {
-	NSMutableDictionary* tmpUnit = [mChannelArray objectAtIndex: aCurChannel];
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	NSNumber* rampDownRate = [NSNumber numberWithFloat: aRampDownRate];
-	[tmpUnit setObject: rampDownRate forKey: ORHVkRampUpRate];
+	[tmpChnl setObject: rampDownRate forKey: ORHVkRampUpRate];
 	
 	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitRampDownRateChanged object: self];	
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVChnlRampDownRateChanged object: self];	
 }
 
+- (NSString*) status: (int) aCurChannel
+{
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
+	NSString* status = [tmpChnl objectForKey: ORHVkStatus];
+	[status autorelease];
+	return( status );
+}
 
-- (float) MVDZ: (int) aChnl
+- (float) MVDZ: (int) aCurChannel
 {
 	// Send command to get HV
 //	[adapter sendCommand: @"RC"];
 	
 	// Now update dictionary
 	
-	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	return( [[tmpChnl objectForKey: ORHVkMVDZ] floatValue] );
 }
 
 - (void) setMVDZ: (float) aChargeWindow chnl: (int) aCurChannel
 {
-	NSMutableDictionary* tmpUnit = [mChannelArray objectAtIndex: aCurChannel];
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	NSNumber* hvWindow = [NSNumber numberWithFloat: aChargeWindow];
-	[tmpUnit setObject: hvWindow forKey: ORHVkMVDZ];
+	[tmpChnl setObject: hvWindow forKey: ORHVkMVDZ];
 	
 	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitMVDZChanged object: self];	
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVChnlMVDZChanged object: self];	
 }
 - (float) MCDZ: (int) aChnl
 {
@@ -260,12 +280,22 @@ NSString* ORHVkMCDZ = @"MCDZ";
 
 - (void) setMCDZ: (float) aChargeWindow chnl: (int) aCurChannel
 {
-	NSMutableDictionary* tmpUnit = [mChannelArray objectAtIndex: aCurChannel];
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	NSNumber* chargeWindow = [NSNumber numberWithFloat: aChargeWindow];
-	[tmpUnit setObject: chargeWindow forKey: ORHVkMCDZ];
+	[tmpChnl setObject: chargeWindow forKey: ORHVkMCDZ];
 	
 	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVUnitMCDZChanged object: self];	
+	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVChnlMCDZChanged object: self];	
+}
+
+- (float) HVLimit: (int) aCurChannel
+{
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
+	return( [[tmpChnl objectForKey: ORHVkHVLimit] floatValue] );
+}
+
+- (void) getValues: (int ) aCurChannel
+{
 }
 
 #pragma mark ***Delegate Methods
@@ -382,9 +412,41 @@ NSString* ORHVkMCDZ = @"MCDZ";
 		//first time.... set up the structure....
 		[self setChannelArray: [NSMutableArray array]];
 		int i;
+		
+		// Put in dummy values for testing.
 		for(i=0 ; i<ORHVNumChannels; i++ )
 		{
-			[mChannelArray addObject: [NSMutableDictionary dictionary]];
+			NSNumber* chnl = [NSNumber numberWithInt: i];
+			NSNumber* measuredCurrent = [NSNumber numberWithFloat: ((float)i * 1.0)];
+			NSNumber* measuredHV = [NSNumber numberWithFloat: (1000.0 + 10.0 * (float)i)];
+			NSNumber* demandHV = [NSNumber numberWithFloat: (2000.0 + (float) i)];
+			NSNumber* rampUpRate = [NSNumber numberWithFloat: 61.3];
+			NSNumber* rampDownRate = [NSNumber numberWithFloat: 61.3];
+			NSNumber* tripCurrent = [NSNumber numberWithFloat: 2550.0];
+			NSString* status = [NSString stringWithString: @"enabled"];
+			NSNumber* enabled = [NSNumber numberWithInt: 1];
+			NSNumber* MVDZ = [NSNumber numberWithFloat: 1.5];
+			NSNumber* MCDZ = [NSNumber numberWithFloat: 1.3];
+			NSNumber* HVLimit = [NSNumber numberWithFloat: 1580.0];
+			
+			NSMutableDictionary* tmpChnl = [NSMutableDictionary dictionaryWithCapacity: 9];
+			
+			[tmpChnl setObject: chnl forKey: @"channel"];
+			[tmpChnl setObject: measuredCurrent forKey: ORHVkMeasuredCurrent];
+			[tmpChnl setObject: measuredHV forKey: ORHVkMeasuredHV];
+			[tmpChnl setObject: demandHV forKey: ORHVkDemandHV];
+			[tmpChnl setObject: tripCurrent	forKey: ORHVkTripCurrent];
+			[tmpChnl setObject: enabled forKey: ORHVkChnlEnabled];
+			[tmpChnl setObject: rampUpRate forKey: ORHVkRampUpRate];			
+			[tmpChnl setObject: rampDownRate forKey: ORHVkRampDownRate];
+			[tmpChnl setObject: status forKey: ORHVkStatus];
+			[tmpChnl setObject: MVDZ forKey: ORHVkMVDZ];			
+			[tmpChnl setObject: MCDZ forKey: ORHVkMCDZ];
+			[tmpChnl setObject: HVLimit forKey: ORHVkHVLimit];			
+
+			[tmpChnl setObject: status forKey: ORHVkStatus];
+			
+			[mChannelArray insertObject: tmpChnl atIndex: i];
 		}
 	}
 	
@@ -400,30 +462,67 @@ NSString* ORHVkMCDZ = @"MCDZ";
 }
 
 #pragma mark •••Utilities
+- (void) interpretReturn: (NSString* ) aRawData dataStore: (NSMutableDictionary* ) aDataStore
+{
+	
+	if ( [aRawData length] )
+	{
+		NSString*	values[ ORUVChnlNumParameters ];
+		NSScanner* scanner = [NSScanner scannerWithString: aRawData];
+		NSCharacterSet* blankSet = [NSCharacterSet characterSetWithCharactersInString: @" "];
+		int i = 0;
+		for ( i = 0; i < ORUVChnlNumParameters; i++ )
+		{
+			[scanner scanUpToCharactersFromSet: blankSet intoString: &values[ i ]];
+			[scanner setScanLocation: [scanner scanLocation] + 1];
+
+		}
+	}
+//	[scanner setCharactersToBeSkipped: newlineCharacterSet];
+
+}
+
 - (void) printDictionary: (int) aCurrentChnl
 {
 	NSDictionary*	tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];
 	
-	float			value;
+	float			valuef;
+	NSString* 		values;
 	
-	value = [[tmpChnl objectForKey: ORHVkDemandHV] floatValue];
-	NSLog( @"Demand HV: %g", value );
-	value = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
-	NSLog( @"Measured HV: %g", value );
-	value = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
-	NSLog( @"Measured Current: %f", [tmpChnl objectForKey: ORHVkMeasuredCurrent] );
-	value = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
-	NSLog( @"Trip current: %f", [tmpChnl objectForKey: ORHVkTripCurrent] );
-	value = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
-	NSLog( @"RampUpRate: %f", [tmpChnl objectForKey: ORHVkRampUpRate] );
-	value = [[tmpChnl objectForKey: ORHVkRampDownRate] floatValue];
-	NSLog( @"RampDownRate: %f", value );
-	value = [[tmpChnl objectForKey: ORHVkStatus] floatValue];
-	NSLog( @"Status: %d", value );
-	value = [[tmpChnl objectForKey: ORHVkMCDZ] floatValue];
-	NSLog( @"MVDZ: %f", value );
-	value = [[tmpChnl objectForKey: ORHVkMCDZ] floatValue];
-	NSLog( @"MCDZ: %f", value );
+	NSLog( @"Channel: %d\n", aCurrentChnl);
+	
+	valuef = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
+	NSLog( @"Measured Current: %f\n", [tmpChnl objectForKey: ORHVkMeasuredCurrent] );
+
+	valuef = [[tmpChnl objectForKey: ORHVkMeasuredCurrent] floatValue];
+	NSLog( @"Measured HV: %g\n", valuef );
+
+	valuef = [[tmpChnl objectForKey: ORHVkMeasuredHV] floatValue];
+	NSLog( @"Demand HV: %g\n", valuef );
+
+	valuef = [[tmpChnl objectForKey: ORHVkDemandHV] floatValue];
+	NSLog( @"RampUpRate: %f\n", valuef );
+
+	valuef = [[tmpChnl objectForKey: ORHVkRampDownRate] floatValue];
+	NSLog( @"RampDownRate: %f\n", valuef );
+
+	valuef = [[tmpChnl objectForKey: ORHVkTripCurrent] floatValue];
+	NSLog( @"Trip current: %f\n", valuef );
+
+	valuef = [[tmpChnl objectForKey: ORHVkChnlEnabled] floatValue];
+	NSLog( @"Trip current: %f\n", valuef );
+
+	values = [tmpChnl objectForKey: ORHVkStatus];
+	NSLog( @"Status: %@\n", values );
+	
+	valuef = [[tmpChnl objectForKey: ORHVkMCDZ] floatValue];
+	NSLog( @"MVDZ: %f\n", valuef );
+	
+	valuef = [[tmpChnl objectForKey: ORHVkMCDZ] floatValue];
+	NSLog( @"MCDZ: %f\n", valuef );
+
+	valuef = [[tmpChnl objectForKey: ORHVkHVLimit] floatValue];
+	NSLog( @"MCDZ: %f\n", valuef );	
 }
 
 

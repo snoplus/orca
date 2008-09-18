@@ -23,6 +23,16 @@
 				<string>id</string>
 				<key>setDemandHV</key>
 				<string>id</string>
+				<key>setMCDZ</key>
+				<string>id</string>
+				<key>setMVDZ</key>
+				<string>id</string>
+				<key>setRampDownRate</key>
+				<string>id</string>
+				<key>setRampUpRate</key>
+				<string>id</string>
+				<key>setTripCurrent</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORUnivVoltController</string>
@@ -30,13 +40,17 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>mChannelNumber</key>
+				<key>mChannelNumberField</key>
 				<string>NSTextField</string>
-				<key>mChannelStepper</key>
-				<string>NSStepperCell</string>
+				<key>mChannelStepperField</key>
+				<string>NSStepper</string>
 				<key>mChnlEnabled</key>
 				<string>NSButton</string>
+				<key>mChnlTable</key>
+				<string>NSTableView</string>
 				<key>mDemandHV</key>
+				<string>NSTextField</string>
+				<key>mHVLimit</key>
 				<string>NSTextField</string>
 				<key>mMCDZ</key>
 				<string>NSTextField</string>
@@ -46,8 +60,6 @@
 				<string>NSTextField</string>
 				<key>mMeasuredHV</key>
 				<string>NSTextField</string>
-				<key>mModuleTable</key>
-				<string>NSTableView</string>
 				<key>mRampDownRate</key>
 				<string>NSTextField</string>
 				<key>mRampUpRate</key>

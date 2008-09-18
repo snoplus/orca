@@ -22,10 +22,10 @@
 //#import "ORCard.h"
 
 @interface ORUnivVoltController : OrcaObjectController {
-	IBOutlet NSStepperCell*			mChannelStepper;
-	IBOutlet NSTableView*			mModuleTable;
+	IBOutlet NSTableView*			mChnlTable;
 	IBOutlet NSButton*				mChnlEnabled;
-	IBOutlet NSTextField*			mChannelNumber;
+	IBOutlet NSStepper*				mChannelStepperField;
+	IBOutlet NSTextField*			mChannelNumberField;
 	IBOutlet NSTextField*			mDemandHV;
 	IBOutlet NSTextField*			mMeasuredHV;
 	IBOutlet NSTextField*			mMeasuredCurrent;
@@ -35,15 +35,24 @@
 	IBOutlet NSTextField*			mRampDownRate;
 	IBOutlet NSTextField*			mMVDZ;				// measured HV dead zone.  Reading has to change by more than this amount for measured HV to update.
 	IBOutlet NSTextField*			mMCDZ;				// measured current dead zone.  "
+	IBOutlet NSTextField*			mHVLimit;	
 	char							mStatusByte;
 	int								mCurrentChnl;		// Current channel visible in display.
 }
 
 #pragma mark •••Notifications
 - (void) updateWindow;
-- (void) demandHVChanged: (NSNotification*) aNote;
-- (void) measuredHVChanged: (NSNotification*) aNote;
 - (void) channelEnabledChanged: (NSNotification*) aNote;
+- (void) measuredCurrentChanged: (NSNotification*) aNote;
+- (void) measuredHVChanged: (NSNotification*) aNote;
+- (void) demandHVChanged: (NSNotification*) aNote;
+- (void) rampUpRateChanged: (NSNotification*) aNote;
+- (void) rampDownRateChanged: (NSNotification*) aNote;
+- (void) tripCurrentChanged: (NSNotification*) aNote;
+- (void) statusChanged: (NSNotification*) aNotes;
+- (void) MVDZChanged: (NSNotification*) aNote;
+- (void) MCDZChanged: (NSNotification*) aNote;
+- (void) hvLimitChanged: (NSNotification*) aNote;
 //- (void) settingsLockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions

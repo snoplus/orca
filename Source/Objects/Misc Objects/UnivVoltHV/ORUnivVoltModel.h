@@ -24,7 +24,7 @@
 #import "ORCard.h"
 
 #define ORHVNumChannels 12
-#define ORUVUnitNumParameters 9
+#define ORUVChnlNumParameters 11 //see below for list.
 
 enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSupplyLimits = 4,
                 eHVUTripForUserCurrent, eHVUTripForHVError, eHVUTripForHVLimit};
@@ -40,8 +40,10 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 - (NSMutableArray*) channelArray;
 - (void) setChannelArray:(NSMutableArray*)anArray;
 - (NSMutableDictionary*) channelDictionary: (int) aCurrentChnl;
-- (int)   chnlEnabled: (int) aCurrentChnl;
 - (void)  setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl;
+- (int)   chnlEnabled: (int) aCurrentChnl;
+- (float) measuredCurrent: (int) aCurrentChnl;
+- (float) measuredHV: (int) aCurrentChnl;
 - (float) demandHV: (int) aCurrentChnl;
 - (void)  setDemandHV: (float) aDemandHV chnl: (int) aCurrentChnl;
 - (float) tripCurrent: (int) aCurrentChnl;
@@ -50,13 +52,15 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 - (void)  setRampUpRate: (float) aRampUpRate chnl: (int) aCurrentChnl;
 - (float) rampDownRate: (int) aCurrentChnl;
 - (void)  setRampDownRate: (float) aRampDownRate chnl: (int) aCurrentChnl;
+- (NSString*) status: (int) aCurrentChnl;
 - (float) MVDZ: (int) aCurrentChnl;
 - (void)  setMVDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
 - (float) MCDZ: (int) aCurrentChnl;
 - (void)  setMCDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
-- (float) measuredHV: (int) aCurrentChnl;
+- (float)  HVLimit: (int) aCurrentChnl;
 
 #pragma mark •••Utilities
+- (void) interpretReturn: (NSString* ) aRawData dataStore: (NSMutableDictionary* ) aDataStore;
 - (void) printDictionary: (int) aCurrentChnl;
 
 #pragma mark •••DataRecords
@@ -66,27 +70,29 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 - (void) encodeWithCoder: (NSCoder*) encoder;
 @end
 
-extern NSString* ORUVUnitEnabledChanged;
-extern NSString* ORUVUnitDemandHVChanged;
-extern NSString* ORUVUnitMeasuredHVChanged;
-extern NSString* ORUVUnitMeasuredCurrentChanged;
-extern NSString* ORUVUnitSlotChanged;
-extern NSString* ORUVUnitTripCurrentChanged;
-extern NSString* ORUVUnitRampUpRateChanged;
-extern NSString* ORUVUnitRampDownRateChanged;
-extern NSString* ORUVUnitMVDZChanged;
-extern NSString* ORUVUnitMCDZChanged;
+extern NSString* ORUVChnlEnabledChanged;
+extern NSString* ORUVChnlDemandHVChanged;
+extern NSString* ORUVChnlMeasuredHVChanged;
+extern NSString* ORUVChnlMeasuredCurrentChanged;
+extern NSString* ORUVChnlSlotChanged;
+extern NSString* ORUVChnlTripCurrentChanged;
+extern NSString* ORUVChnlRampUpRateChanged;
+extern NSString* ORUVChnlRampDownRateChanged;
+extern NSString* ORUVChnlMVDZChanged;
+extern NSString* ORUVChnlMCDZChanged;
+extern NSString* ORUVChnlHVLimitChanged;
 
 // HV unit Parameters
-extern NSString* ORHVkChnlEnabled;
-extern NSString* ORHVkDemandHV;
-extern NSString* ORHVkMeasuredHV;
-extern NSString* ORHVkMeasuredCurrent;
-extern NSString* ORHVkTripCurrent;
-extern NSString* ORHVkRampUpRate;
-extern NSString* ORHVkRampDownRate;
-extern NSString* ORHVkStatus;
-extern NSString* ORHVkMVDZ;
-extern NSString* ORHVkMCDZ;
+extern NSString* ORHVkChnlEnabled;      //1
+extern NSString* ORHVkMeasuredCurrent;	//2
+extern NSString* ORHVkMeasuredHV;		//3
+extern NSString* ORHVkDemandHV;		    //4
+extern NSString* ORHVkRampUpRate;		//5
+extern NSString* ORHVkRampDownRate;		//6
+extern NSString* ORHVkTripCurrent;		//7
+extern NSString* ORHVkStatus;			//8
+extern NSString* ORHVkMVDZ;				//9
+extern NSString* ORHVkMCDZ;				//10
+extern NSString* ORHVkHVLimit;			//11
 
 //extern NSString* ORUnivVoltLock;
