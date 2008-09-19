@@ -35,8 +35,7 @@
 @interface ORMTCModel :  ORVmeIOCard <ORDataTaker>
 {
     @private
-		NSString*				loadFilePath;
-		NSFileHandle*			loadFile;
+		NSFileHandle*			xilinxFileHandle;
 		unsigned long			dataId;
 		unsigned long			memBaseAddress;
 		NSMutableDictionary*	mtcDataBase;
@@ -84,8 +83,8 @@
 - (void) setESumViewType:(int)aESumViewType;
 - (int) nHitViewType;
 - (void) setNHitViewType:(int)aNHitViewType;
-- (NSString*) xilinxFile;
-- (void) setXilinxFile:(NSString*)aDefaultFile;
+- (NSString*) xilinxFilePath;
+- (void) setXilinxFilePath:(NSString*)aDefaultFile;
 - (NSString*) defaultFile;
 - (void) setDefaultFile:(NSString*)aDefaultFile;
 - (NSString*) lastFile;
@@ -111,8 +110,6 @@
 - (NSMutableDictionary*) mtcDataBase;
 - (id) dbObjectByName:(NSString*)aKey;
 - (void) setMtcDataBase:(NSMutableDictionary*)aNestedDictionary;
-- (NSString*) loadFilePath;
-- (void) setLoadFilePath:(NSString*)aLoadFilePath;
 - (unsigned long) memBaseAddress;
 - (unsigned long) baseAddress;
 
@@ -209,7 +206,6 @@
 - (void) basicMTCReset;
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
-- (void) setUpTheFile;
 - (void) finishXilinxLoad;
 - (void) setTubRegister;
 
@@ -238,7 +234,7 @@ extern NSString* ORMTCModelRepeatCountChanged;
 extern NSString* ORMTCModelWriteValueChanged;
 extern NSString* ORMTCModelMemoryOffsetChanged;
 extern NSString* ORMTCModelSelectedRegisterChanged;
-extern NSString* ORMTCModelLoadFilePathChanged;
+extern NSString* ORMTCModelXlinixPathChanged;
 extern NSString* ORMTCModelMtcDataBaseChanged;
 extern NSString* ORMtcTriggerNameChanged;
 extern NSString* ORMTCLock;

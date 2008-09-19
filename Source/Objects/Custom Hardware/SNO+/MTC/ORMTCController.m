@@ -107,11 +107,6 @@
 						object: nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(loadFilePathChanged:)
-                         name : ORMTCModelLoadFilePathChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(selectedRegisterChanged:)
                          name : ORMTCModelSelectedRegisterChanged
 						object: model];
@@ -186,7 +181,6 @@
     [self memBaseAddressChanged:nil];
     [self slotChanged:nil];
     [self settingsLockChanged:nil];
-	[self loadFilePathChanged:nil];
 	[self selectedRegisterChanged:nil];
 	[self memoryOffsetChanged:nil];
 	[self writeValueChanged:nil];
@@ -305,7 +299,7 @@
 	
 	NSString* xilinxFile = [model dbObjectByIndex: kXilinxFile];
 	if(!xilinxFile) xilinxFile = @"---";
-	[xilinxFileField setStringValue: [xilinxFile stringByAbbreviatingWithTildeInPath]];
+	[xilinxFilePathField setStringValue: [xilinxFile stringByAbbreviatingWithTildeInPath]];
 }
 
 - (void) loadMasks
@@ -384,9 +378,9 @@
 	[selectedRegisterPU selectItemAtIndex: [model selectedRegister]];
 }
 
-- (void) loadFilePathChanged:(NSNotification*)aNote
+- (void) loadXilinxPathChanged:(NSNotification*)aNote
 {
-	[loadFilePathField setStringValue: [model loadFilePath]];
+	[xilinxFilePathField setStringValue: [[model xilinxFilePath] stringByAbbreviatingWithTildeInPath]];
 }
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
@@ -642,8 +636,8 @@
     [openPanel setPrompt:@"Choose"];
     NSString* startingDir;
 	
-	NSString* fullPath = [[model xilinxFile] stringByExpandingTildeInPath];
-    if(fullPath)	startingDir = [[model xilinxFile] stringByDeletingLastPathComponent];
+	NSString* fullPath = [[model xilinxFilePath] stringByExpandingTildeInPath];
+    if(fullPath)	startingDir = [[model xilinxFilePath] stringByDeletingLastPathComponent];
     else			startingDir = NSHomeDirectory();
 	
     [openPanel beginSheetForDirectory:startingDir
@@ -827,7 +821,7 @@
 - (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-        [model setXilinxFile:[[sheet filenames] objectAtIndex:0]];
+        [model setXilinxFilePath:[[sheet filenames] objectAtIndex:0]];
 		NSLog(@"MTC Xilinx default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
     }
 }

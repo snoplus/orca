@@ -272,7 +272,7 @@
 				<string>NSTextField</string>
 				<key>writeValueStepper</key>
 				<string>NSStepper</string>
-				<key>xilinxFileField</key>
+				<key>xilinxFilePathField</key>
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>

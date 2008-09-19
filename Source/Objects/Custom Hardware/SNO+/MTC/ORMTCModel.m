@@ -45,7 +45,7 @@ NSString* ORMTCModelRepeatCountChanged		= @"ORMTCModelRepeatCountChanged";
 NSString* ORMTCModelWriteValueChanged		= @"ORMTCModelWriteValueChanged";
 NSString* ORMTCModelMemoryOffsetChanged		= @"ORMTCModelMemoryOffsetChanged";
 NSString* ORMTCModelSelectedRegisterChanged = @"ORMTCModelSelectedRegisterChanged";
-NSString* ORMTCModelLoadFilePathChanged		= @"ORMTCModelLoadFilePathChanged";
+NSString* ORMTCModelXilinxPathChanged		= @"ORMTCModelXilinxPathChanged";
 NSString* ORMTCModelMtcDataBaseChanged		= @"ORMTCModelMtcDataBaseChanged";
 NSString* ORMTCModelLastFileLoadedChanged	= @"ORMTCModelLastFileLoadedChanged";
 NSString* ORMtcTriggerNameChanged			= @"ORMtcTriggerNameChanged";
@@ -197,8 +197,6 @@ int mtcDacIndexes[14]=
     [lastFile release];
     [lastFileLoaded release];
     [mtcDataBase release];
-    [loadFilePath release];
-	[loadFile release];
     [super dealloc];
 }
 
@@ -288,12 +286,13 @@ int mtcDacIndexes[14]=
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelNHitViewTypeChanged object:self];
 }
-- (NSString*) xilinxFile
+
+- (NSString*) xilinxFilePath
 {
     return [self dbObjectByIndex:kXilinxFile];
 }
 
-- (void) setXilinxFile:(NSString*)aDefaultFile
+- (void) setXilinxFilePath:(NSString*)aDefaultFile
 {
  	if(!aDefaultFile)aDefaultFile = @"--";
 	[self setDbObject:aDefaultFile forIndex:kXilinxFile];
@@ -470,22 +469,6 @@ int mtcDacIndexes[14]=
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMtcDataBaseChanged object:self];
 
-}
-
-- (NSString*) loadFilePath
-{
-    return loadFilePath;
-}
-
-- (void) setLoadFilePath:(NSString*)aLoadFilePath
-{
-	if(!aLoadFilePath)aLoadFilePath = @"--";
-    [[[self undoManager] prepareWithInvocationTarget:self] setLoadFilePath:loadFilePath];
-    
-    [loadFilePath autorelease];
-    loadFilePath = [aLoadFilePath copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelLoadFilePathChanged object:self];
 }
 
 
@@ -699,7 +682,6 @@ int mtcDacIndexes[14]=
     [self setMemoryOffset:	[decoder decodeInt32ForKey:		@"ORMTCModelMemoryOffset"]];
     [self setSelectedRegister:[decoder decodeIntForKey:		@"ORMTCModelSelectedRegister"]];
     [self setMtcDataBase:	[decoder decodeObjectForKey:	@"ORMTCModelMtcDataBase"]];
-    [self setLoadFilePath:	[decoder decodeObjectForKey:	@"ORMTCModelLoadFilePath"]];
     [self setTriggerGroup:  [decoder decodeObjectForKey:    @"ORMtcTriggerGroup"]];
     [self setTriggerName:	[decoder decodeObjectForKey:	@"ORMtcTrigger1Name"]];
 	
@@ -730,7 +712,6 @@ int mtcDacIndexes[14]=
 	[encoder encodeInt32:memoryOffset	forKey:@"ORMTCModelMemoryOffset"];
 	[encoder encodeInt:selectedRegister forKey:@"ORMTCModelSelectedRegister"];
 	[encoder encodeObject:mtcDataBase	forKey:@"ORMTCModelMtcDataBase"];
-	[encoder encodeObject:loadFilePath	forKey:@"ORMTCModelLoadFilePath"];
     [encoder encodeObject:triggerGroup	forKey:@"ORMtcTriggerGroup"];
     [encoder encodeObject:triggerName	forKey:@"ORMtcTriggerName"];
 }
@@ -1542,8 +1523,15 @@ int mtcDacIndexes[14]=
 	NS_DURING
 		
 		// setup the file name 		
-		[self setUpTheFile];
-		theData = [loadFile readDataToEndOfFile];			// load the entire content of the file
+		//setup the file parameters for the xilinx load operation	
+		if([[NSFileManager defaultManager] fileExistsAtPath:[self xilinxFilePath]]){
+			xilinxFileHandle = [[NSFileHandle fileHandleForReadingAtPath:[self xilinxFilePath]] retain];
+			theData = [xilinxFileHandle readDataToEndOfFile];			// load the entire content of the file
+		}
+		else {
+			NSLog(@"Couldn't open the MTC Xilinx file %s!\n",[self xilinxFilePath]);
+			[NSException raise:@"Couldn't open Xilinx File" format:	[self xilinxFilePath]];	
+		}
 		char* charData = (char*)[theData bytes];
 
 		long index = [theData length];	// total number of charcters 
@@ -1646,20 +1634,11 @@ int mtcDacIndexes[14]=
 	NS_ENDHANDLER
 }
 
-- (void) setUpTheFile
-{
-	//setup the file parameters for the xilinx load operation	
-	if([[NSFileManager defaultManager] fileExistsAtPath:loadFilePath]){
-		loadFile = [[NSFileHandle fileHandleForReadingAtPath:loadFilePath] retain];
-	}
-	else NSLog(@"Couldn't open the MTC Xilinx file %s!\n",loadFilePath);
-}
-
 - (void) finishXilinxLoad
 {
-	[loadFile closeFile];
-	[loadFile release];
-	loadFile = nil;
+	[xilinxFileHandle closeFile];
+	[xilinxFileHandle release];
+	xilinxFileHandle = nil;
 }
 
 - (void) setTubRegister

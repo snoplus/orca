@@ -34,7 +34,6 @@
 	IBOutlet NSTextField*	memoryOffsetField;
 	IBOutlet NSStepper*		memoryOffsetStepper;
 	IBOutlet NSPopUpButton* selectedRegisterPU;
-	IBOutlet NSTextField*	loadFilePathField;
     IBOutlet NSTextField*   slotField;
     IBOutlet NSStepper* 	regBaseAddressStepper;
     IBOutlet NSTextField* 	regBaseAddressText;
@@ -49,7 +48,7 @@
 	//settings
 	IBOutlet NSMatrix*		eSumViewTypeMatrix;
 	IBOutlet NSMatrix*		nHitViewTypeMatrix;
- 	IBOutlet NSTextField*	xilinxFileField;
+ 	IBOutlet NSTextField*	xilinxFilePathField;
 	IBOutlet NSButton*		settingsLockButton;
 	IBOutlet NSTextField*	lastFileLoadedField;
  	IBOutlet NSTextField*	lockOutWidthField;
@@ -101,7 +100,6 @@
 - (void) writeValueChanged:(NSNotification*)aNote;
 - (void) memoryOffsetChanged:(NSNotification*)aNote;
 - (void) selectedRegisterChanged:(NSNotification*)aNote;
-- (void) loadFilePathChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) regBaseAddressChanged:(NSNotification*)aNote;
