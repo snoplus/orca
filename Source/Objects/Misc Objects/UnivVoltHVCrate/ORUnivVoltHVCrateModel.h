@@ -32,26 +32,29 @@ typedef enum hveCommands hveCommands;
 #pragma mark •••Forward Declarations
 @class ORConnector;
 @class NetSocket;
+@class ORQueue;
 
 @interface ORUnivVoltHVCrateModel : ORCrate  {
 	NSLock*			localLock;
     NSString*		ipAddress;
 	NSString*		mReturnFromSocket;  // Used to get last return
-	hveCommands		mLastCommand;
+	NSString*		mLastError;
+//	hveCommands		mLastCommand;
     BOOL			mIsConnected;
 	NetSocket*		mSocket;
+	ORQueue*		mQueue;
 }
 
 #pragma mark •••Accessors
 - (NSString*) ipAddress;
-- (void) setIpAddress: (NSString *) anIpAddress;
 - (NSString*) hvStatus;
-- (NSString *) ethernetConfig;
-- (NSString *) config;
+- (NSString*) ethernetConfig;
+- (NSString*) config;
+- (NetSocket*) socket;
 
 #pragma mark •••Notifications
 //- (void) registerNotificationObservers;
-- (NetSocket*) socket;
+- (void) setIpAddress: (NSString *) anIpAddress;
 - (void) setSocket: (NetSocket*) aSocket;
 - (BOOL) isConnected;
 - (void) setIsConnected: (BOOL) aFlag;
@@ -65,9 +68,13 @@ typedef enum hveCommands hveCommands;
 - (void) hvOff;
 - (void) hvPanic;
 - (void) connect;
+- (void) sendGeneralCommand: (NSString*) aCommand;
+
 
 #pragma mark ***Utilities
 - (NSString *) interpretDataFromSocket: (NSData *) aSomeData;
+- (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand;
+
 
 #pragma mark ***Archival
 - (id)   initWithCoder: (NSCoder*) aDecoder;
@@ -82,3 +89,10 @@ extern NSString* ORUVHVCrateIpAddressChangedNotification;
 extern NSString* ORUVHVCrateHVStatusAvailableNotification;
 extern NSString* ORUVHVCrateConfigAvailableNotification;
 extern NSString* ORUVHVCrateEnetAvailableNotification;
+
+#pragma mark •••Constants for command queue
+//extern NSString* UVkUnit;
+//extern NSString* UVkChnl;
+//extern NSString* UVkCommand;
+
+

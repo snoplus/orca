@@ -23,6 +23,7 @@
 #import "ORUnivVoltHVCrateModel.h"
 #import "NetSocket.h"
 #import "ORMacModel.h"
+#import "ORQueue.h"
 
 NSString* ORUVHVCrateIsConnectedChangedNotification		= @"ORUVHVCrateIsConnectedChangedNotification";
 NSString* ORUVHVCrateIpAddressChangedNotification	    = @"ORUVHVCrateIpAddressChangedNotification";
@@ -30,6 +31,17 @@ NSString* ORUVHVCrateIpAddressChangedNotification	    = @"ORUVHVCrateIpAddressCh
 NSString* ORUVHVCrateHVStatusAvailableNotification		= @"ORUVHVCrateHVStatusAvailableNotification";
 NSString* ORUVHVCrateConfigAvailableNotification		= @"ORUVHVCrateConfigAvailableNotification";
 NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailableNotification";
+
+// HV Module commands
+NSString* ORHVkCrateHVStatus							= @"HVSTATUS";
+NSString* ORHVkCrateConfig							    = @"CONFIG";
+NSString* ORHVkCrateEnet								= @"ENET";
+
+NSString* ORHVkModuleDMP								= @"DMP";
+
+NSString* UVkUnit	 = @"Unit";
+NSString* UVkChnl    = @"Chnl";
+NSString* UVkCommand = @"Command";
 
 @implementation ORUnivVoltHVCrateModel
 
@@ -39,7 +51,7 @@ NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailable
 {
 	self = [super init];
 	if ( self ) {
-		mLastCommand = eUVNoCommand;
+		mQueue = [ORQueue init];
 	}
 	return ( self );
 }
@@ -174,12 +186,12 @@ NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailable
     return ipAddress;
 }
 
-#pragma mark ***Crate Actions
 - (NetSocket*) socket
 {
 	return mSocket;
 }
 
+#pragma mark ***Crate Actions
 - (void) setSocket: (NetSocket*) aSocket
 {
 	if(aSocket != mSocket)[mSocket close];
@@ -188,6 +200,19 @@ NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailable
 	mSocket = aSocket;
     [mSocket setDelegate: self];
 }
+ 
+- (void) obtainHVStatus
+{
+	int		unit = -1;
+	int		chnl = -1;
+	[self sendCommand: unit channel: chnl command: ORHVkCrateHVStatus];
+}
+
+- (void) sendGeneralCommand: (NSString*) aCommand
+{
+	[self sendCommand: -1 channel: -1 command: aCommand];
+}
+
 
 //------------------------------------
 //depreciated (11/29/06) remove someday
@@ -202,32 +227,50 @@ NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailable
 #pragma mark •••Notifications
 - (void) handleDataReturn: (NSData*) aSomeData
 {
-//	NSString* returnFromSocket;	
+	// Get oldest command
+	NSDictionary* recentCommand = [mQueue dequeue];
+	
+	// Check that it matches return.
+	NSString* command = [recentCommand objectForKey: UVkCommand];
+	
 	// For commands that return ascii data parse the data.
-	if ( mLastCommand <= 3 ) {  // kUVEnet
-		mReturnFromSocket = [self interpretDataFromSocket: aSomeData];
-	}
-
-	NSLog( @"LastCommand: %d", mLastCommand );
-	switch( mLastCommand )
+	mReturnFromSocket = [self interpretDataFromSocket: aSomeData];
+	NSArray* tokens = [mReturnFromSocket componentsSeparatedByString: @" "]; 
+	
+	NSLog( @"Queue command %s, return command %s", recentCommand, tokens[ 0 ] );
+	
+	if ([tokens count] > 0 && [[tokens objectAtIndex: 0] isEqualTo: command]) 
 	{
-		case eUVNoCommand:
-			break;
-		case eUVHVStatus: // 	
+		NSString* command = [tokens objectAtIndex: 0];
+		
+		// crate only returns.
+		if ( [command isEqualTo: ORHVkCrateHVStatus] )
+		{
 			NSLog( @"Send notification about HVStatus.");
-			[[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateHVStatusAvailableNotification object: self];	
-			break;	
-			
-		case eUVConfig:
+			[[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateHVStatusAvailableNotification object: self];
+		}
+		else if ( [command isEqualTo: ORHVkCrateConfig] )
+		{
 			NSLog( @"Send notification about Config.");
 			[[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateConfigAvailableNotification object: self];
-			break;
-			
-		case eUVEnet:
+		}
+		
+		else if ( [command isEqualTo: ORHVkCrateEnet] )
+		{
+			NSLog( @"Send notification about Enet.");
+			[[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateConfigAvailableNotification object: self];
+		}
+		
+		else if ( [command isEqualTo: ORHVkModuleDMP] )
+		{
 			NSLog( @"Send notification about Ethernet.");
 			[[NSNotificationCenter defaultCenter] postNotificationName: ORUVHVCrateEnetAvailableNotification object: self];
-			break;
+		}
 	}
+
+//		if ( mLastError != Nil ) [mLastError release];
+//		[mLastError stringWithSting: @"Returned data from HV unit '%s' with last command queue '%s'.", 
+//		NSLog( mLastError 
 	return;
 }
 
@@ -254,70 +297,15 @@ NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailable
                        object : nil];
 }
 */
-- (void) obtainHVStatus
-{
-//	NSString*	finalStatus;
-//	NSString*	retString;
-	
-	@try
-	{
-		NSString* command = [NSString stringWithFormat: @"HVSTATUS"];	
-		const char* buffer = [command cStringUsingEncoding: NSASCIIStringEncoding];
-		
-		// Write the command.
-		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
-		[mSocket write: buffer length: [command length] + 1];	
-		mLastCommand = eUVHVStatus;
-
-/*		int lenString = strlen( charBuffer );
-		NSLog( @"Length of command string %d", lenString );
-		[mSocket write: charBuffer length: [command length]];	
-*/	
-		// Interpret return response
-		//[self interpretResponse: kHVStatus];
-		// Read back response from crate
-/*		[mSocket read: &retBuffer amount: 256];
-	
-		retString = [[NSString alloc] initWithCString: (char *)retBuffer encoding: NSASCIIStringEncoding];
-		NSLog( @"retString %@ ", retString );
-	
-		isItContained  = [retString rangeOfString: command];
-		if ( isItContained.length > 0 ) {
-			extResponse = NSMakeRange( command.length + 1, [retString length]- command.length -1 );
-		} 
-		else {
-			extResponse = NSMakeRange( 0, 0 );
-		}
-		
-		finalStatus = [retString substringWithRange: extResponse];
-		NSLog( @"Returned value %@", finalStatus );	
-		*/	
-	}
-	
-	@catch (NSException *exception) {
-
-			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
-	} 
-	
-	@finally
-	{
-	//	[command release];
-	}
-}
 
 - (void) obtainConfig
 {
 	
 	@try
 	{
-		NSString* command = [NSString stringWithFormat: @"CONFIG"];	
-		const char* buffer = [command cStringUsingEncoding: NSASCIIStringEncoding];
-		
-		// Write the command.
-		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
-		[mSocket write: buffer length: [command length] + 1];	
-		mLastCommand = eUVConfig;
+		[self sendCommand: -1 channel: -1 command: ORHVkCrateConfig];
 	}
+	
 	@catch (NSException *exception) {
 
 			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
@@ -334,13 +322,13 @@ NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailable
 	
 	@try
 	{
-		NSString* command = [NSString stringWithFormat: @"Enet"];	
-		const char* buffer = [command cStringUsingEncoding: NSASCIIStringEncoding];
-		
+/*		NSString* command = [NSString stringWithFormat: ORHVkCrateEnet];	
+			
 		// Write the command.
-		NSLog( @"Command: %s,  length:%d", buffer, [command length] + 1 );
-		[mSocket write: buffer length: [command length] + 1];
-		mLastCommand = eUVEnet;	
+		
+		
+*/
+//		mLastCommand = eUVEnet;	
 	}
 	@catch (NSException *exception) {
 
@@ -455,6 +443,39 @@ NSString* ORUVHVCrateEnetAvailableNotification		    = @"ORUVHVCrateEnetAvailable
 {
 	return mIsConnected;
 }
+
+- (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand
+{
+//	@try
+		NSNumber* unitObj = [NSNumber numberWithInt: aCurrentUnit];
+		NSNumber* chnlObj = [NSNumber numberWithInt: aCurrentChnl];
+		
+		NSMutableDictionary* commandObj = [NSMutableDictionary dictionaryWithCapacity: 3];
+		
+		[commandObj setObject: unitObj forKey: UVkUnit];
+		[commandObj setObject: chnlObj forKey: UVkChnl];
+		[commandObj setObject: aCommand forKey: UVkCommand];
+
+		[mQueue enqueue: commandObj];
+		
+		if (aCurrentChnl < 0 ) 
+		{
+			const char* buffer = [aCommand cStringUsingEncoding: NSASCIIStringEncoding];
+		
+			NSLog( @"Command: %s,  length:%d", buffer, [aCommand length] + 1 );
+			[mSocket write: buffer length: [aCommand length] + 1];	
+//			mLastCommand = eUVHVStatus;
+		}
+		
+//	@catch (NSException *exception) {
+
+//			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
+//	} 
+	
+//	@finally
+
+
+ }
 
 - (void) setIsConnected: (BOOL) aFlag
 {
