@@ -92,8 +92,8 @@
 	//}
 	//data is actually 2's complement. detwiler 08/26/08
 	for(i=0;i<packetLength;i++){
-     dPtr[wordCount++] =    (0x00003fff & *ptr) | (((0x00002000 & *ptr)>0)*0x0000d000);
-     dPtr[wordCount++] =    ((0x3fff0000 & *ptr) | (((0x20000000 & *ptr)>0)*0xd0000000)) >> 16;
+     dPtr[wordCount++] =    (0x00003fff & *ptr) | (((0x00002000 & *ptr)>0)*0x0000e000);
+     dPtr[wordCount++] =    ((0x3fff0000 & *ptr) | (((0x20000000 & *ptr)>0)*0xe0000000)) >> 16;
      ptr++;
  }
     [aDataSet loadWaveform:tmpData 
