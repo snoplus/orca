@@ -303,6 +303,9 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			if([deviceNameAsString rangeOfString:@"Display"].location != NSNotFound){
 				[NSException raise: @"USB Exception" format:@"Skipping device"];
 			} 
+			if([deviceNameAsString rangeOfString:@"LaserJet"].location != NSNotFound){
+				[NSException raise: @"USB Exception" format:@"Skipping device"];
+			} 
 
 
 
