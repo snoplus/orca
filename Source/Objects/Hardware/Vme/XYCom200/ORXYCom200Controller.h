@@ -71,6 +71,7 @@
 - (void) selectedRegIndexChanged: (NSNotification*) aNotification;
 - (void) slotChanged:(NSNotification*)aNotification;
 - (void) updateRegisterDescription:(short) aRegisterIndex;
+- (void) initSquareWave:(int)chipIndex;
 
 #pragma mark •••Actions
 - (IBAction) selectedPLTPUAction:(id)sender;
@@ -127,6 +128,8 @@
 	IBOutlet   NSTextField* preloadHighField;
 	IBOutlet   NSTextField* timerControlField;
 	IBOutlet   NSTextField* periodField;
+	
+	IBOutlet   NSButton* easyTimerStartButton;
 	
 	//local state
 	id						model;
@@ -223,6 +226,7 @@
 - (IBAction) preloadHighAction:(id)sender;
 - (IBAction) timerControlAction:(id)sender;
 - (IBAction) periodAction:(id)sender;
+- (IBAction) easyTimerStartAction:(id)sender;
 
 
 @end

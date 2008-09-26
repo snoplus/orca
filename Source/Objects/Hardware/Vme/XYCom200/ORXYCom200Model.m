@@ -509,11 +509,12 @@ NSString* mIOXY200SubModeName[4][3] = {
 //               is worth 2.048 msecs.  So to convert 10ths of seconds to ticks
 //               one multiplies by 48.828125
 //              The tick is for the complete square wave period.
-- (void) initSqWave:(int)i period:(unsigned short) period
+- (void) initSqWave:(int)i
 {
 	
 	ORPISlashTChip* chip = [chips objectAtIndex:i];	
-
+	int period = [chip period];
+	
 	[self initOutA:i];
 	
 	// convert time to upper and lower ticks

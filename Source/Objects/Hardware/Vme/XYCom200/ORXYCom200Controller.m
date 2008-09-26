@@ -219,7 +219,7 @@
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model initBoard];
     NS_HANDLER
-        NSRunAlertPanel([localException name], @"%@\nInit failed: %@", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"Init failed: %@", @"OK", nil, nil,
                         localException);
     NS_ENDHANDLER	
 }
@@ -229,7 +229,7 @@
 	NS_DURING
 		[model report];
     NS_HANDLER
-        NSRunAlertPanel([localException name], @"%@\nReport failed: %@", @"OK", nil, nil,
+        NSRunAlertPanel([localException name], @"%Report failed: %@", @"OK", nil, nil,
                         localException);
     NS_ENDHANDLER
 }
@@ -290,6 +290,16 @@
     NS_ENDHANDLER
 }
 
+- (void) initSquareWave:(int)chipIndex
+{
+	NS_DURING
+		[self endEditing];		// Save in memory user changes before executing command.
+		[model initSqWave:chipIndex];	
+    NS_HANDLER
+        NSRunAlertPanel([localException name], @"Init Square Wave failed: ", @"OK", nil, nil,
+                        localException);
+    NS_ENDHANDLER	
+}
 #pragma mark ***Misc Helpers
 - (void) populatePopup
 {
@@ -609,6 +619,8 @@
 	[preloadMiddleField  setEnabled: !lockedOrRunningMaintenance ];
 	[preloadLowField  setEnabled: !lockedOrRunningMaintenance ];
 	[periodField  setEnabled: !lockedOrRunningMaintenance ];
+	[easyTimerStartButton  setEnabled: !lockedOrRunningMaintenance ];
+
 }
 
 //Gen Reg
@@ -941,9 +953,14 @@
 	[model setTimerControl:[sender intValue]];	
 }
 
-- (void) periodAction:(id)sender
+- (IBAction) periodAction:(id)sender
 {
 	[model setPeriod:[sender intValue]];	
+}
+
+- (IBAction) easyTimerStartAction:(id)sender
+{
+	[owner  initSquareWave:chipIndex];	
 }
 
 - (void) populatePopup

@@ -109,7 +109,7 @@ enum {
 - (void) writeTimerData:(int)anIndex;
 - (void) initOutA:(int) i;
 - (void) initOutB:(int) i;
-- (void) initSqWave:(int)index period:(unsigned short) period;
+- (void) initSqWave:(int)index;
 
 #pragma mark ***Register - Register specific routines
 - (short)			getNumberRegisters;

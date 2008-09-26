@@ -48,6 +48,8 @@
 				<string>id</string>
 				<key>H4SensePUAction</key>
 				<string>id</string>
+				<key>easyTimerStartAction</key>
+				<string>id</string>
 				<key>modePUAction</key>
 				<string>id</string>
 				<key>periodAction</key>
@@ -111,6 +113,8 @@
 				<string>NSPopUpButton</string>
 				<key>H4SensePU</key>
 				<string>NSPopUpButton</string>
+				<key>easyTimerStartButton</key>
+				<string>NSButton</string>
 				<key>modeField</key>
 				<string>NSTextField</string>
 				<key>modePU</key>
