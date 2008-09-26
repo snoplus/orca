@@ -863,6 +863,7 @@
 		8444460C0E815C0D00A1440D /* ORXYCom200Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 844446040E815C0D00A1440D /* ORXYCom200Model.m */; };
 		8444460D0E815C0D00A1440D /* XYCom200.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844446050E815C0D00A1440D /* XYCom200.nib */; };
 		8444460E0E815C0D00A1440D /* XYCom200Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 844446060E815C0D00A1440D /* XYCom200Card.gif */; };
+		844506DF0E896F5A005677E7 /* PISlashTChip.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844506DE0E896F5A005677E7 /* PISlashTChip.nib */; };
 		844514840674DF9600A19654 /* LC950Oscilloscope.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8445147C0674DF9500A19654 /* LC950Oscilloscope.gif */; };
 		844514850674DF9600A19654 /* ORLC950.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8445147D0674DF9500A19654 /* ORLC950.nib */; };
 		844514860674DF9600A19654 /* ORLC950Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8445147E0674DF9500A19654 /* ORLC950Controller.h */; };
@@ -2552,6 +2553,7 @@
 		844446060E815C0D00A1440D /* XYCom200Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = XYCom200Card.gif; path = Source/Objects/Hardware/Vme/XYCom200/XYCom200Card.gif; sourceTree = SOURCE_ROOT; };
 		8444A5FB04BC8382005F64B1 /* ORDispatcherClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDispatcherClient.h; path = "Source/Objects/Data Processing/Dispatcher/ORDispatcherClient.h"; sourceTree = SOURCE_ROOT; };
 		8444A5FC04BC8382005F64B1 /* ORDispatcherClient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDispatcherClient.m; path = "Source/Objects/Data Processing/Dispatcher/ORDispatcherClient.m"; sourceTree = SOURCE_ROOT; };
+		844506DE0E896F5A005677E7 /* PISlashTChip.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PISlashTChip.nib; path = Source/Objects/Hardware/Vme/XYCom200/PISlashTChip.nib; sourceTree = SOURCE_ROOT; };
 		8445147C0674DF9500A19654 /* LC950Oscilloscope.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = LC950Oscilloscope.gif; sourceTree = "<group>"; };
 		8445147D0674DF9500A19654 /* ORLC950.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ORLC950.nib; sourceTree = "<group>"; };
 		8445147E0674DF9500A19654 /* ORLC950Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORLC950Controller.h; sourceTree = "<group>"; };
@@ -5418,6 +5420,7 @@
 				844446030E815C0D00A1440D /* ORXYCom200Model.h */,
 				844446040E815C0D00A1440D /* ORXYCom200Model.m */,
 				844446050E815C0D00A1440D /* XYCom200.nib */,
+				844506DE0E896F5A005677E7 /* PISlashTChip.nib */,
 				844446060E815C0D00A1440D /* XYCom200Card.gif */,
 			);
 			name = XYCom200;
@@ -9633,6 +9636,7 @@
 				844445780E81311500A1440D /* IpeV4FLTCard.gif in Resources */,
 				8444460D0E815C0D00A1440D /* XYCom200.nib in Resources */,
 				8444460E0E815C0D00A1440D /* XYCom200Card.gif in Resources */,
+				844506DF0E896F5A005677E7 /* PISlashTChip.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

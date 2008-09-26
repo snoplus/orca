@@ -87,13 +87,23 @@
 			<dict>
 				<key>baseAddressAction</key>
 				<string>id</string>
+				<key>initBoard</key>
+				<string>id</string>
+				<key>lockAction</key>
+				<string>id</string>
+				<key>portADirectionMatrixAction</key>
+				<string>id</string>
+				<key>portBDirectionMatrixAction</key>
+				<string>id</string>
+				<key>portCDirectionMatrixAction</key>
+				<string>id</string>
 				<key>read</key>
 				<string>id</string>
-				<key>selectChannelAction</key>
+				<key>report</key>
 				<string>id</string>
 				<key>selectRegisterAction</key>
 				<string>id</string>
-				<key>settingLockAction</key>
+				<key>selectedPLTPUAction</key>
 				<string>id</string>
 				<key>write</key>
 				<string>id</string>
@@ -112,18 +122,34 @@
 				<string>NSTextField</string>
 				<key>addressTextField</key>
 				<string>NSTextField</string>
+				<key>basicOpsLockButton</key>
+				<string>NSButton</string>
 				<key>basicReadButton</key>
 				<string>NSButton</string>
 				<key>basicWriteButton</key>
 				<string>NSButton</string>
-				<key>channelPopUp</key>
-				<string>NSPopUpButton</string>
+				<key>chip1View</key>
+				<string>NSView</string>
+				<key>chip2View</key>
+				<string>NSView</string>
+				<key>initBoardButton</key>
+				<string>NSButton</string>
+				<key>portADirectionMatrix</key>
+				<string>NSMatrix</string>
+				<key>portBDirectionMatrix</key>
+				<string>NSMatrix</string>
+				<key>portCDirectionMatrix</key>
+				<string>NSMatrix</string>
 				<key>regNameField</key>
 				<string>NSTextField</string>
 				<key>registerAddressPopUp</key>
 				<string>NSPopUpButton</string>
 				<key>registerOffsetField</key>
 				<string>NSTextField</string>
+				<key>reportButton</key>
+				<string>NSButton</string>
+				<key>selectedPLTPU</key>
+				<string>NSPopUpButton</string>
 				<key>settingLockButton</key>
 				<string>NSButton</string>
 				<key>slotField</key>
