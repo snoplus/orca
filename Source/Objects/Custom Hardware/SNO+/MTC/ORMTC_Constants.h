@@ -24,8 +24,8 @@
 typedef struct  {
 	NSString*   regName;
 	short		addressOffset;
-	short		addressSpace;
 	short		addressModifier;
+	short		addressSpace;
 } SnoMtcNamesStruct; 
 
 enum {

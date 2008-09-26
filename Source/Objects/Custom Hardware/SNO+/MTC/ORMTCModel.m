@@ -52,28 +52,35 @@ NSString* ORMtcTriggerNameChanged			= @"ORMtcTriggerNameChanged";
 
 NSString* ORMTCLock							= @"ORMTCLock";
 
+#define kMTCRegAddressBase		0x00007000
+#define kMTCRegAddressModifier	0x29
+#define kMTCRegAddressSpace		0x01
+#define kMTCMemAddressBase		0x03800000
+#define kMTCMemAddressModifier	0x09
+#define kMTCMemAddressSpace		0x02
+
 static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
-	{ @"ControlReg"	    , 0   ,0x29,	0x01 },   //0
-	{ @"SerialReg"		, 4   ,0x29,	0x01 },   //1
-	{ @"DacCntReg"		, 8   ,0x29,	0x01 },   //2
-	{ @"SoftGtReg"		, 12  ,0x29,	0x01 },   //3
-	{ @"Pedestal Width"	, 16  ,0x29,	0x01 },   //4
-	{ @"Coarse Delay"	, 20  ,0x29,	0x01 },   //5
-	{ @"Fine Delay"		, 24  ,0x29,	0x01 },   //6
-	{ @"ThresModReg"	, 28  ,0x29,	0x01 },   //7
-	{ @"PmskReg"		, 32  ,0x29,	0x01 },   //8
-	{ @"ScaleReg"		, 36  ,0x29,	0x01 },   //9
-	{ @"BwrAddOutReg"	, 40  ,0x29,	0x01 },   //10
-	{ @"BbaReg"			, 44  ,0x29,	0x01 },   //11
-	{ @"GtLockReg"		, 48  ,0x29,	0x01 },   //12
-	{ @"MaskReg"		, 52  ,0x29,	0x01 },   //13
-	{ @"XilProgReg"		, 56  ,0x29,	0x01 },   //14
-	{ @"GmskReg"		, 60  ,0x29,	0x01 },   //15
-	{ @"OcGtReg"		, 128 ,0x29,	0x01 },   //16
-	{ @"C50_0_31Reg"	, 132 ,0x29,	0x01 },   //17
-	{ @"C50_32_42Reg"	, 16  ,0x29,	0x01 },   //18
-	{ @"C10_0_31Reg"	, 140 ,0x29,	0x01 },   //19
-	{ @"C10_32_52Reg"	, 144 ,0x29,	0x01 }	  //20
+	{ @"ControlReg"	    , 0   ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //0
+	{ @"SerialReg"		, 4   ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //1
+	{ @"DacCntReg"		, 8   ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //2
+	{ @"SoftGtReg"		, 12  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //3
+	{ @"Pedestal Width"	, 16  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //4
+	{ @"Coarse Delay"	, 20  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //5
+	{ @"Fine Delay"		, 24  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //6
+	{ @"ThresModReg"	, 28  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //7
+	{ @"PmskReg"		, 32  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //8
+	{ @"ScaleReg"		, 36  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //9
+	{ @"BwrAddOutReg"	, 40  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //10
+	{ @"BbaReg"			, 44  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //11
+	{ @"GtLockReg"		, 48  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //12
+	{ @"MaskReg"		, 52  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //13
+	{ @"XilProgReg"		, 56  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //14
+	{ @"GmskReg"		, 60  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //15
+	{ @"OcGtReg"		, 128 ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //16
+	{ @"C50_0_31Reg"	, 132 ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //17
+	{ @"C50_32_42Reg"	, 136  ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //18
+	{ @"C10_0_31Reg"	, 140 ,kMTCRegAddressModifier, kMTCRegAddressSpace },   //19
+	{ @"C10_32_52Reg"	, 144 ,kMTCRegAddressModifier, kMTCRegAddressSpace }	//20
 };
 
 static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
@@ -475,12 +482,12 @@ int mtcDacIndexes[14]=
 //hardcoded base addresses (unlikely to ever change)
 - (unsigned long) memBaseAddress
 {
-    return 0x03800000;
+    return kMTCMemAddressBase;
 }
 
 - (unsigned long) baseAddress
 {
-    return 0x00007000;
+    return kMTCRegAddressBase;
 }
 
 #pragma mark •••Converters
@@ -1526,7 +1533,7 @@ int mtcDacIndexes[14]=
 		//setup the file parameters for the xilinx load operation	
 		if([[NSFileManager defaultManager] fileExistsAtPath:[self xilinxFilePath]]){
 			xilinxFileHandle = [[NSFileHandle fileHandleForReadingAtPath:[self xilinxFilePath]] retain];
-			theData = [xilinxFileHandle readDataToEndOfFile];			// load the entire content of the file
+			theData = [[xilinxFileHandle readDataToEndOfFile] retain];			// load the entire content of the file
 		}
 		else {
 			NSLog(@"Couldn't open the MTC Xilinx file %s!\n",[self xilinxFilePath]);
@@ -1630,6 +1637,7 @@ int mtcDacIndexes[14]=
 		[theData release];
 		theData = nil;				
 		NSLog(@"Xilinx load failed for the MTC/D.\n");
+		[localException raise];
 	
 	NS_ENDHANDLER
 }

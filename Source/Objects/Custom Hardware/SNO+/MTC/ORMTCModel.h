@@ -37,7 +37,6 @@
     @private
 		NSFileHandle*			xilinxFileHandle;
 		unsigned long			dataId;
-		unsigned long			memBaseAddress;
 		NSMutableDictionary*	mtcDataBase;
 		
 		//basic ops
