@@ -1513,7 +1513,7 @@ int mtcDacIndexes[14]=
 		[NSException raise:@"Couldn't open Xilinx File" format:	[self xilinxFilePath]];	
 	}
 	
-	if([[self adapter] isKindOfClass:NSClassFromString(@"SBCLink")]){
+	if([[self adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")]){
 		[self loadXilinxUsingSBC:theData];
 	}
 	else {
@@ -1792,18 +1792,25 @@ int mtcDacIndexes[14]=
 	SNOMtc_XilinxLoadStruct* payloadPtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
 	payloadPtr->baseAddress		= [self baseAddress];
 	payloadPtr->addressModifier	= [self addressModifier];
+	payloadPtr->errorCode	    = 1;
 	payloadPtr->programRegOffset= reg[kMtcXilProgReg].addressOffset;
 	payloadPtr->fileSize		= [theData length];
 	const char* dataPtr			= (const char*)[theData bytes];
 	char* p = (char*)payloadPtr + sizeof(SNOMtc_XilinxLoadStruct);
 	strncpy(p, dataPtr, [theData length]);
 
-	[[self adapter] send:&aPacket receive:&aPacket];
-	SNOMtc_XilinxLoadStruct *responsePtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
-	errorCode = responsePtr->errorCode;
-	NSLog(@"Xilinx file sent to the SBC. Status: %d\n",errorCode);
-	if(errorCode)NSLog(@"%s\n",aPacket.message);
-	else NSLog(@"Looks like success\n");
+	NS_DURING
+		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
+		SNOMtc_XilinxLoadStruct *responsePtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
+		errorCode = responsePtr->errorCode;
+		NSLog(@"Xilinx file sent to the SBC. Status: %d\n",errorCode);
+		if(errorCode)NSLog(@"%s\n",aPacket.message);
+		else NSLog(@"Looks like success\n");
+	NS_HANDLER
+		[self finishXilinxLoad];
+		NSLog(@"Xilinx load failed for the MTC/D.\n");
+		[localException raise];
+	NS_ENDHANDLER
 	//we don't use the file locally, so just close the file 
 	[self finishXilinxLoad];
 }
