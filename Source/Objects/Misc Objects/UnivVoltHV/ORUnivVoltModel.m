@@ -2,7 +2,7 @@
 //  ORUnivVoltModel.m
 //  Orca
 //
-//  Created by Mark Howe on Mon Apr 21 2008
+//  Created by Jan Wouters on Mon Apr 21 2008
 //  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
@@ -21,6 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORUnivVoltModel.h"
+#import "ORUnivVoltHVCrateModel.h"
 #import "NetSocket.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
@@ -98,7 +99,55 @@ NSString* ORHVkHVLimit = @"HVLimit";
     [self setImage:[NSImage imageNamed:@"UnivVoltHVIcon"]];
 }
 
-#pragma mark ***Accessors
+#pragma mark •••Notifications
+- (void) registerNotificationObservers{
+//    [super registerNotificationObservers];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
+    [notifyCenter addObserver : self
+                     selector : @selector( unitNotification: )
+                         name : ORUnitInfoAvailableNotification
+                       object : nil];
+					   
+}
+
+- (void) unitNotification: (NSNotification *) aNote
+{
+//	NSDictionary* userInfo = [aNote userInfo];	
+}
+
+#pragma mark •••sendCommands
+- (void) loadValues
+{
+	int			i;
+	int			j;
+	float		value;
+	NSString*	command;
+	
+	NSArray* setCommands = [NSArray arrayWithObjects:  @"CE",@"DV", @"RUP", @"RDN", @"TC", @"MVDZ", @"MVDZ"];
+	for ( j = 0; j < [setCommands count]; j++ )
+	{
+		for ( i = 0; i < ORHVNumChannels; i++ )
+		{
+			NSMutableDictionary* chnlDict = [mChannelArray objectAtIndex: i];
+			NSString* dictKey = [setCommands objectAtIndex: j];
+			NSNumber* valueObj = [chnlDict objectForKey: dictKey];
+			value = [valueObj floatValue];
+			if ( i == 0 )
+			{
+				command = [NSString stringWithFormat: @"LD S%d %@ %d ", [self slot], value];
+			}
+			else
+			{
+				command = [command stringByAppendingFormat: @"%@ %d", command, value];
+			}
+				
+			[guardian sendCrateCommand: command];
+		}
+	}
+}
+
+
+#pragma mark •••Accessors
 - (NSMutableArray*) channelArray
 {
 	return( mChannelArray );
@@ -146,8 +195,6 @@ NSString* ORHVkHVLimit = @"HVLimit";
 	[tmpChnl setObject: demandHV forKey: ORHVkDemandHV];
 	
 	// Put specific code here to talk with unit.
-	
-	
 	[[NSNotificationCenter defaultCenter] postNotificationName: ORUVChnlDemandHVChanged object: self];	
 }
 
@@ -462,7 +509,7 @@ NSString* ORHVkHVLimit = @"HVLimit";
 }
 
 #pragma mark •••Utilities
-- (void) interpretReturn: (NSString* ) aRawData dataStore: (NSMutableDictionary* ) aDataStore
+/*- (void) interpretReturn: (NSString* ) aRawData dataStore: (NSMutableDictionary* ) aDataStore
 {
 	
 	if ( [aRawData length] )
@@ -481,7 +528,7 @@ NSString* ORHVkHVLimit = @"HVLimit";
 //	[scanner setCharactersToBeSkipped: newlineCharacterSet];
 
 }
-
+*/
 - (void) printDictionary: (int) aCurrentChnl
 {
 	NSDictionary*	tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];

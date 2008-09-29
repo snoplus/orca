@@ -52,7 +52,7 @@
 - (IBAction) getConfigParamAction: (id) aSender;
 - (IBAction) hvOnAction: (id) aSender;
 - (IBAction) hvOffAction: (id) aSender;
-- (IBAction) panicOffAction: (id) aSender;
+- (IBAction) panicAction: (id) aSender;
 //- (IBAction) setInhibitOffAction:(id)sender;
 - (IBAction) showHVStatusAction: (id) aSender;
 - (void) showError: (NSException*) anException name: (NSString*)name;

@@ -36,6 +36,9 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 	NSMutableArray*			mChannelArray;
 }
 
+#pragma mark •••Send Commands
+- (void)  loadValues;
+
 #pragma mark •••Accessors
 - (NSMutableArray*) channelArray;
 - (void) setChannelArray:(NSMutableArray*)anArray;
@@ -60,7 +63,7 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 - (float)  HVLimit: (int) aCurrentChnl;
 
 #pragma mark •••Utilities
-- (void) interpretReturn: (NSString* ) aRawData dataStore: (NSMutableDictionary* ) aDataStore;
+//- (void) interpretReturn: (NSString* ) aRawData dataStore: (NSMutableDictionary* ) aDataStore;
 - (void) printDictionary: (int) aCurrentChnl;
 
 #pragma mark •••DataRecords

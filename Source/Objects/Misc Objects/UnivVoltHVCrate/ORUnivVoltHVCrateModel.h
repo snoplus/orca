@@ -68,13 +68,12 @@ typedef enum hveCommands hveCommands;
 - (void) hvOff;
 - (void) hvPanic;
 - (void) connect;
-- (void) sendGeneralCommand: (NSString*) aCommand;
+- (void) sendCrateCommand: (NSString*) aCommand;
 
 
 #pragma mark ***Utilities
-- (NSString *) interpretDataFromSocket: (NSData *) aSomeData;
 - (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand;
-
+- (NSString*) interpretDataFromSocket: (NSData*) aDataObject returnCode: (int*) aReturnCode;
 
 #pragma mark ***Archival
 - (id)   initWithCoder: (NSCoder*) aDecoder;
@@ -89,10 +88,11 @@ extern NSString* ORUVHVCrateIpAddressChangedNotification;
 extern NSString* ORUVHVCrateHVStatusAvailableNotification;
 extern NSString* ORUVHVCrateConfigAvailableNotification;
 extern NSString* ORUVHVCrateEnetAvailableNotification;
+extern NSString* ORUnitInfoAvailableNotification;
 
 #pragma mark •••Constants for command queue
-//extern NSString* UVkUnit;
-//extern NSString* UVkChnl;
-//extern NSString* UVkCommand;
+extern NSString* UVkUnit;
+extern NSString* UVkChnl;
+extern NSString* UVkCommand;
 
 

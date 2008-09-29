@@ -171,7 +171,7 @@
 				<string>id</string>
 				<key>ipAddressTextFieldAction</key>
 				<string>id</string>
-				<key>panicOffAction</key>
+				<key>panicAction</key>
 				<string>id</string>
 				<key>showHVStatusAction</key>
 				<string>id</string>
@@ -184,8 +184,6 @@
 			<dict>
 				<key>ethernetConnectButton</key>
 				<string>NSButton</string>
-				<key>generalDialog</key>
-				<string>NSTextField</string>
 				<key>hvStatusField</key>
 				<string>NSTextField</string>
 				<key>ipAddressTextField</key>

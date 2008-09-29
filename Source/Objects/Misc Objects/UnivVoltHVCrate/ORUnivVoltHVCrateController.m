@@ -57,8 +57,7 @@
 }
 
 #pragma mark •••Notifications
-- (void) registerNotificationObservers
-{
+- (void) registerNotificationObservers{
     [super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
     [notifyCenter addObserver : self
@@ -144,14 +143,17 @@
 
 - (IBAction) hvOnAction: (id) aSender
 {
+	[model hvOn];
 }
 
 - (IBAction) hvOffAction: (id) aSender
 {
+	[model hvOff];
 }
 
-- (IBAction) panicOffAction: (id) aSender
+- (IBAction) panicAction: (id) aSender
 {
+	[model hvPanic];
 }
 
 
