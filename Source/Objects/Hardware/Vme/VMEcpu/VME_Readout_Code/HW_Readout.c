@@ -31,6 +31,7 @@
 #include "CircularBuffer.h"
 #include "VME_HW_Definitions.h"
 #include "VME_Trigger32.h"
+#include "SNOMtc.h"
 #include "universe_api.h"
 
 #define kDMALowerLimit   0x100 //require 256 bytes
@@ -53,12 +54,12 @@ TUVMEDevice* vmeAM9Handle = NULL;
 
 void processHWCommand(SBC_Packet* aPacket)
 {
-    /*look at the first word to get the destination*/
-    int32_t destination = aPacket->cmdHeader.destination;
-
-    switch(destination){
-//        default:              processUnknownCommand(aPacket); break;
-    }
+	/*look at the first word to get the destination*/
+	int32_t destination = aPacket->cmdHeader.destination;
+	switch(destination){
+		case kSNOMtc:		processMTCCommand(aPacket); break;
+		default:			break;
+	}
 }
 
 void startHWRun (SBC_crate_config* config)
@@ -405,7 +406,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 int32_t Readout_MTC(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     uint32_t leaf_index;
-    uint32_t baseAddress            = config->card_info[index].base_add;
+    //uint32_t baseAddress            = config->card_info[index].base_add;
 	char triggered = 0;
     //uint32_t conversionRegOffset    = config->card_info[index].deviceSpecificData[1];
     
@@ -432,7 +433,7 @@ int32_t Readout_MTC(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDat
 /*************************************************************/
 int32_t Readout_Fec(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
-    uint32_t baseAddress            = config->card_info[index].base_add;
+    //uint32_t baseAddress            = config->card_info[index].base_add;
     //uint32_t conversionRegOffset    = config->card_info[index].deviceSpecificData[1];
     
     lock_device(vmeAM29Handle);

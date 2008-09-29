@@ -29,6 +29,8 @@
 #import "ORReadOutList.h"
 #import "SBC_Config.h"
 #import "VME_HW_Definitions.h"
+#import "SNOMtcCmds.h"
+#import "SBC_Link.h"
 
 #pragma mark •••Definitions
 
@@ -177,6 +179,9 @@ int mtcDacIndexes[14]=
 @interface ORMTCModel (private)
 - (void) doBasicOp;
 - (void) setupDefaults;
+- (void) loadXilinxUsingLocalAdapter:(NSData*) theData;
+- (void) loadXilinxUsingSBC:(NSData*) theData;
+- (void) finishXilinxLoad;
 @end
 
 @implementation ORMTCModel
@@ -1496,157 +1501,24 @@ int mtcDacIndexes[14]=
 
 - (void) loadMTCXilinx
 {
-
-	//--------------------------- The file format as of 1/7/97 -------------------------------------
-	//
-	// 1st field: Beginning of the comment block -- /
-	//			  If no backslash then you will get an error message and Xilinx load will abort
-	// Now include your comment.
-	// The comment block is delimited by another backslash.
-	// If no backslash at the end of the comment block then you will get error message.
-	//
-	// After the comment block include the data in ACSII binary.
-	// No spaces or other characters in between data. It will complain otherwise.
-	//
-	//----------------------------------------------------------------------------------------------
-
-	//-------------- variables -----------------
-	NSData* theData;	
-
-	unsigned long bitCount		= 0UL;
-	unsigned long readValue		= 0UL;
-	unsigned long aValue		= 0UL;
+	NSData* theData;
+	// setup the file name 		
+	//setup the file parameters for the xilinx load operation	
+	if([[NSFileManager defaultManager] fileExistsAtPath:[self xilinxFilePath]]){
+		xilinxFileHandle = [[NSFileHandle fileHandleForReadingAtPath:[self xilinxFilePath]] retain];
+		theData = [[xilinxFileHandle readDataToEndOfFile] retain];			// load the entire content of the file
+	}
+	else {
+		NSLog(@"Couldn't open the MTC Xilinx file %s!\n",[self xilinxFilePath]);
+		[NSException raise:@"Couldn't open Xilinx File" format:	[self xilinxFilePath]];	
+	}
 	
-	BOOL firstPass = TRUE;
-
-	const unsigned long DATA_HIGH_CLOCK_LOW = 0x00000001; 	 // bit 0 high and bit 1 low
-	const unsigned long DATA_LOW_CLOCK_LOW  = 0x00000000;  	 // bit 0 low and bit 1 low
-
-	//------------------------------------------
-	
-
-//	NSLog(@"Loading the MTC Xilinx chips....\n"); 
-	
-	NS_DURING
-		
-		// setup the file name 		
-		//setup the file parameters for the xilinx load operation	
-		if([[NSFileManager defaultManager] fileExistsAtPath:[self xilinxFilePath]]){
-			xilinxFileHandle = [[NSFileHandle fileHandleForReadingAtPath:[self xilinxFilePath]] retain];
-			theData = [[xilinxFileHandle readDataToEndOfFile] retain];			// load the entire content of the file
-		}
-		else {
-			NSLog(@"Couldn't open the MTC Xilinx file %s!\n",[self xilinxFilePath]);
-			[NSException raise:@"Couldn't open Xilinx File" format:	[self xilinxFilePath]];	
-		}
-		char* charData = (char*)[theData bytes];
-
-		long index = [theData length];	// total number of charcters 
-		
-		// set  all bits, except bit 3[PROG_EN], low -- new step 1/16/97
-		aValue = 0x00000008;
-		[self write:kMtcXilProgReg value:aValue];
-
-		// set  all bits, except bit 1[CCLK], low
-		aValue = 0x00000002;						
-		[self write:kMtcXilProgReg value:aValue];
-
-		[ORTimer delay:.1]; // 100 msec delay
-		unsigned long i;
-		for (i = 1;i < index;i++){
-
-			if ( (firstPass) && (*charData != '/') ){
-				*charData++;
-				[self finishXilinxLoad];
-				[theData release];
-				theData = nil;				
-				NSLog(@"Invalid first character in Xilinx file.\n");
-				[NSException raise:@"Xilinx load failed" format:@""];
-			}
-			
-			if (firstPass){
-
-				*charData++;							// for the first slash
-				i++;  									// need to keep track of i
-	   							 
-				while(*charData++ != '/'){
-
-					i++;
-					if ( i>index ){
-						[self finishXilinxLoad];				
-						[theData release];
-						theData = nil;				
-						NSLog(@"Comment block not delimited by a backslash.\n");	
-						[NSException raise:@"Xilinx load failed" format:@""];
-					}
-
-				}
-
-			}
-			firstPass = FALSE;
-
-			// strip carriage return, tabs
-			if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
-				*charData++;
-			}
-			else{
-
-				bitCount++;
-
-				if ( *charData == '1' ) {
-					aValue = DATA_HIGH_CLOCK_LOW;	// bit 0 high and bit 1 low
-				}
-				else if ( *charData == '0' ) {
-					aValue = DATA_LOW_CLOCK_LOW;	// bit 0 low and bit 1 low
-				}
-				else {
-					[self finishXilinxLoad];				
-					[theData release];
-					theData = nil;				
-					NSLog(@"Invalid character in Xilinx file.\n");
-					[NSException raise:@"Xilinx load failed" format:@""];
-				}
-				*charData++;
-												
-				[self write:kMtcXilProgReg value:aValue];
-			    // perform bitwise OR to set the bit 1 high[toggle clock high] 
-				aValue |= (1UL << 1);		
-
-				[self write:kMtcXilProgReg value:aValue];
-				
-			}
-			
-		}
-
-		[ORTimer delay:.100]; // 100 msec delay
-
-		// check to see if the Xilinx was loaded properly 
-		// read the bit 2, this should be high if the Xilinx was loaded
-		readValue = [self read:kMtcXilProgReg];
-
-		if (!(readValue & 0x000000010))	// bit 4, PROGRAM*, should be high for Xilinx success		
-			NSLog(@"Xilinx load failed for the MTC/D!\n");
-
-		[self finishXilinxLoad];
-		[theData release];
-		theData = nil;				
-		
-	NS_HANDLER
-	
-		[self finishXilinxLoad];
-		[theData release];
-		theData = nil;				
-		NSLog(@"Xilinx load failed for the MTC/D.\n");
-		[localException raise];
-	
-	NS_ENDHANDLER
-}
-
-- (void) finishXilinxLoad
-{
-	[xilinxFileHandle closeFile];
-	[xilinxFileHandle release];
-	xilinxFileHandle = nil;
+	if([[self adapter] isKindOfClass:NSClassFromString(@"SBCLink")]){
+		[self loadXilinxUsingSBC:theData];
+	}
+	else {
+		[self loadXilinxUsingLocalAdapter:theData];
+	}
 }
 
 - (void) setTubRegister
@@ -1773,6 +1645,175 @@ int mtcDacIndexes[14]=
 
 }
 
+- (void) loadXilinxUsingLocalAdapter:(NSData*) theData
+{
+	//--------------------------- The file format as of 1/7/97 -------------------------------------
+	//
+	// 1st field: Beginning of the comment block -- /
+	//			  If no backslash then you will get an error message and Xilinx load will abort
+	// Now include your comment.
+	// The comment block is delimited by another backslash.
+	// If no backslash at the end of the comment block then you will get error message.
+	//
+	// After the comment block include the data in ACSII binary.
+	// No spaces or other characters in between data. It will complain otherwise.
+	//
+	//----------------------------------------------------------------------------------------------
+
+	//-------------- variables -----------------
+
+	unsigned long bitCount		= 0UL;
+	unsigned long readValue		= 0UL;
+	unsigned long aValue		= 0UL;
+	
+	BOOL firstPass = TRUE;
+
+	const unsigned long DATA_HIGH_CLOCK_LOW = 0x00000001; 	 // bit 0 high and bit 1 low
+	const unsigned long DATA_LOW_CLOCK_LOW  = 0x00000000;  	 // bit 0 low and bit 1 low
+
+	//------------------------------------------
+	
+
+//	NSLog(@"Loading the MTC Xilinx chips....\n"); 
+	
+	NS_DURING
+		
+		char* charData = (char*)[theData bytes];
+
+		long index = [theData length];	// total number of charcters 
+		
+		// set  all bits, except bit 3[PROG_EN], low -- new step 1/16/97
+		aValue = 0x00000008;
+		[self write:kMtcXilProgReg value:aValue];
+
+		// set  all bits, except bit 1[CCLK], low
+		aValue = 0x00000002;						
+		[self write:kMtcXilProgReg value:aValue];
+
+		[ORTimer delay:.1]; // 100 msec delay
+		unsigned long i;
+		for (i = 1;i < index;i++){
+
+			if ( (firstPass) && (*charData != '/') ){
+				*charData++;
+				[self finishXilinxLoad];
+				[theData release];
+				theData = nil;				
+				NSLog(@"Invalid first character in Xilinx file.\n");
+				[NSException raise:@"Xilinx load failed" format:@""];
+			}
+			
+			if (firstPass){
+
+				*charData++;							// for the first slash
+				i++;  									// need to keep track of i
+	   							 
+				while(*charData++ != '/'){
+
+					i++;
+					if ( i>index ){
+						[self finishXilinxLoad];				
+						[theData release];
+						theData = nil;				
+						NSLog(@"Comment block not delimited by a backslash.\n");	
+						[NSException raise:@"Xilinx load failed" format:@""];
+					}
+
+				}
+
+			}
+			firstPass = FALSE;
+
+			// strip carriage return, tabs
+			if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
+				*charData++;
+			}
+			else{
+
+				bitCount++;
+
+				if ( *charData == '1' ) {
+					aValue = DATA_HIGH_CLOCK_LOW;	// bit 0 high and bit 1 low
+				}
+				else if ( *charData == '0' ) {
+					aValue = DATA_LOW_CLOCK_LOW;	// bit 0 low and bit 1 low
+				}
+				else {
+					[self finishXilinxLoad];				
+					[theData release];
+					theData = nil;				
+					NSLog(@"Invalid character in Xilinx file.\n");
+					[NSException raise:@"Xilinx load failed" format:@""];
+				}
+				*charData++;
+												
+				[self write:kMtcXilProgReg value:aValue];
+			    // perform bitwise OR to set the bit 1 high[toggle clock high] 
+				aValue |= (1UL << 1);		
+
+				[self write:kMtcXilProgReg value:aValue];
+				
+			}
+			
+		}
+
+		[ORTimer delay:.100]; // 100 msec delay
+
+		// check to see if the Xilinx was loaded properly 
+		// read the bit 2, this should be high if the Xilinx was loaded
+		readValue = [self read:kMtcXilProgReg];
+
+		if (!(readValue & 0x000000010))	// bit 4, PROGRAM*, should be high for Xilinx success		
+			NSLog(@"Xilinx load failed for the MTC/D!\n");
+
+		[self finishXilinxLoad];
+		[theData release];
+		theData = nil;				
+		
+	NS_HANDLER
+	
+		[self finishXilinxLoad];
+		[theData release];
+		theData = nil;				
+		NSLog(@"Xilinx load failed for the MTC/D.\n");
+		[localException raise];
+	
+	NS_ENDHANDLER
+}
+
+- (void) loadXilinxUsingSBC:(NSData*) theData
+{	
+	long errorCode = 0;
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination	= kSNOMtc;
+	aPacket.cmdHeader.cmdID			= kSNOMtcLoadXilinx;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SNOMtc_XilinxLoadStruct);
+	
+	SNOMtc_XilinxLoadStruct* payloadPtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
+	payloadPtr->baseAddress		= [self baseAddress];
+	payloadPtr->addressModifier	= [self addressModifier];
+	payloadPtr->programRegOffset= reg[kMtcXilProgReg].addressOffset;
+	payloadPtr->fileSize		= [theData length];
+	const char* dataPtr			= (const char*)[theData bytes];
+	char* p = (char*)payloadPtr + sizeof(SNOMtc_XilinxLoadStruct);
+	strncpy(p, dataPtr, [theData length]);
+
+	[[self adapter] send:&aPacket receive:&aPacket];
+	SNOMtc_XilinxLoadStruct *responsePtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
+	errorCode = responsePtr->errorCode;
+	NSLog(@"Xilinx file sent to the SBC. Status: %d\n",errorCode);
+	if(errorCode)NSLog(@"%s\n",aPacket.message);
+	else NSLog(@"Looks like success\n");
+	//we don't use the file locally, so just close the file 
+	[self finishXilinxLoad];
+}
+
+- (void) finishXilinxLoad
+{
+	[xilinxFileHandle closeFile];
+	[xilinxFileHandle release];
+	xilinxFileHandle = nil;
+}
 
 
 @end

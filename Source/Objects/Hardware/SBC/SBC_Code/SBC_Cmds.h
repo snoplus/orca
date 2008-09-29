@@ -32,6 +32,7 @@
 /*destinations*/
 #define kSBC_Process           0x1
 #define kAcqirisDC440          0x2
+#define kSNOMtc				   0x3
 
 /* SBC commands */
 #define kSBC_Command           0x01

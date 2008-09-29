@@ -205,7 +205,6 @@
 - (void) basicMTCReset;
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
-- (void) finishXilinxLoad;
 - (void) setTubRegister;
 
 #pragma mark •••BasicOps
