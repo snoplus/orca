@@ -590,21 +590,22 @@ NSString* UVkCommand									= @"Command";
 // is the form of the command where x is the slot number.  If command is directed at specific channel
 // then command is of the form Sx.y where y is the channel number. 
 //------------------------------------------------------------------------------------------------
-- (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand
+- (void) sendCommand: (NSString*) aCommand
 {
-	NSString* fullCommand;
+//	NSString* fullCommand;
 //	@try
-		NSNumber* unitObj = [NSNumber numberWithInt: aCurrentUnit];
-		NSNumber* chnlObj = [NSNumber numberWithInt: aCurrentChnl];
+//		NSNumber* unitObj = [NSNumber numberWithInt: aCurrentUnit];
+//		NSNumber* chnlObj = [NSNumber numberWithInt: aCurrentChnl];
 		
-		NSMutableDictionary* commandObj = [NSMutableDictionary dictionaryWithCapacity: 3];
+//		NSMutableDictionary* commandObj = [NSMutableDictionary dictionaryWithCapacity: 3];
 		
-		[commandObj setObject: unitObj forKey: UVkUnit];
-		[commandObj setObject: chnlObj forKey: UVkChnl];
-		[commandObj setObject: aCommand forKey: UVkCommand];
+//		[commandObj setObject: unitObj forKey: UVkUnit];
+//		[commandObj setObject: chnlObj forKey: UVkChnl];
+//		[commandObj setObject: aCommand forKey: UVkCommand];
 
-		[mQueue enqueue: commandObj];
+		[mQueue enqueue: aCommand];
 		
+/*
 		if ( aCurrentChnl > -1 )
 		{
 			fullCommand = [aCommand stringByAppendingFormat: @" S%d.%d", aCurrentUnit, aCurrentChnl];
@@ -617,10 +618,10 @@ NSString* UVkCommand									= @"Command";
 		{
 			fullCommand = aCommand;
 		}
-			
-		const char* buffer = [fullCommand cStringUsingEncoding: NSASCIIStringEncoding];
+*/			
+		const char* buffer = [aCommand cStringUsingEncoding: NSASCIIStringEncoding];
 		
-		NSLog( @"Command: %s,  length:%d", buffer, [fullCommand length] + 1 );
+		NSLog( @"Command: %s,  length:%d", buffer, [aCommand length] + 1 );
 		[mSocket write: buffer length: [aCommand length] + 1];	
 //			mLastCommand = eUVHVStatus;
 		

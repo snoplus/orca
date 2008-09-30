@@ -68,11 +68,10 @@ typedef enum hveCommands hveCommands;
 - (void) hvOff;
 - (void) hvPanic;
 - (void) connect;
-- (void) sendCrateCommand: (NSString*) aCommand;
+- (void) sendCommand: (NSString*) aCommand;
 
 
 #pragma mark ***Utilities
-- (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand;
 - (NSString*) interpretDataFromSocket: (NSData*) aDataObject returnCode: (int*) aReturnCode;
 
 #pragma mark ***Archival

@@ -41,17 +41,17 @@ NSString* ORUVChnlHVLimitChanged			= @"ORUVChnlHVLimitChanged";
 //NSString* ORUVChnlSlotChanged				= @"ORUVChnlSlotChanged";
 
 // HV Unit parameters
-NSString* ORHVkChnlEnabled = @"chnlEnabled";
-NSString* ORHVkMeasuredCurrent = @"measuredCurrent";
-NSString* ORHVkMeasuredHV = @"measuredHV";
-NSString* ORHVkDemandHV = @"demandHV";
-NSString* ORHVkRampUpRate = @"RampUpRate";
-NSString* ORHVkRampDownRate = @"RampDownRate";
-NSString* ORHVkTripCurrent = @"tripCurrent";
+NSString* ORHVkChnlEnabled = @"CE";
+NSString* ORHVkMeasuredCurrent = @"MC";
+NSString* ORHVkMeasuredHV = @"MV";
+NSString* ORHVkDemandHV = @"DV";
+NSString* ORHVkRampUpRate = @"RUP";
+NSString* ORHVkRampDownRate = @"RDN";
+NSString* ORHVkTripCurrent = @"TC";
 NSString* ORHVkStatus = @"Status";
 NSString* ORHVkMVDZ = @"MVDZ";
 NSString* ORHVkMCDZ = @"MCDZ";
-NSString* ORHVkHVLimit = @"HVLimit";
+NSString* ORHVkHVLimit = @"HVL";
 
 
 @implementation ORUnivVoltModel
@@ -85,13 +85,85 @@ NSString* ORHVkHVLimit = @"HVLimit";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
-	
-//		int i;
-//		for(i = 0; i < kNplpCNumChannels; i++) dataStack[i] = [[ORQueue alloc] init];
+//	NS_DURING
+
+		// Load dictionary with commands supported for this unit.
+		NSArray* keysCmd = [NSArray arrayWithObjects: @"NAME", @"SLOT", @"CHNL", nil];
 		
-	NS_HANDLER
-	NS_ENDHANDLER
+		NSArray* objectsCmd0 = [NSArray arrayWithObjects: @"DMP", @"YES", @"YES", nil];
+		NSDictionary* tmpCmd0 = [NSDictionary dictionaryWithObjects: objectsCmd0 forKeys: keysCmd];
+		[mCommands insertObject: tmpCmd0 atIndex: 0];
+		
+		NSArray* objectsCmd1 = [NSArray arrayWithObjects: @"LD", @"YES", @"YES", nil];
+		NSDictionary* tmpCmd1 = [NSDictionary dictionaryWithObjects: objectsCmd1 forKeys: keysCmd];
+		[mCommands insertObject: tmpCmd1 atIndex: 1];
+		
+
+
+		// load array with dictionary values for parameters - Store name of n
+		NSArray* keys = [NSArray arrayWithObjects: @"RW", @"TYPE", nil];
+				
+		
+		NSArray* objects0 = [NSArray arrayWithObjects: @"R", @"int", nil];
+		NSDictionary* tmpParam0 = [NSDictionary dictionaryWithObjects: objects0 forKeys: keys];
+		[mParams setObject: tmpParam0 forKey: @"Chnl"];
+
+		NSArray* objects1 = [NSArray arrayWithObjects: @"R", @"FLOAT", nil];
+		NSDictionary* tmpParam1 = [NSDictionary dictionaryWithObjects: objects1 forKeys: keys];
+		[mParams setObject: tmpParam1 forKey: ORHVkMeasuredCurrent];
+
+		NSArray* objects2 = [NSArray arrayWithObjects: @"R", @"float", nil];
+		NSDictionary* tmpParam2 = [NSDictionary dictionaryWithObjects: objects2 forKeys: keys];
+		[mParams setObject: tmpParam2 forKey: ORHVkMeasuredHV];
+
+		NSArray* objects3 = [NSArray arrayWithObjects:  @"R", @"int", nil];
+		NSDictionary* tmpParam3 = [NSDictionary dictionaryWithObjects: objects3 forKeys: keys];
+		[mParams setObject: tmpParam3 forKey: @"Status"];
+
+		NSArray* objects4 = [NSArray arrayWithObjects: @"W", @"int", nil];
+		NSDictionary* tmpParam4 = [NSDictionary dictionaryWithObjects: objects4 forKeys: keys];
+		[mParams setObject: tmpParam4 forKey: @"CE"];
+
+		NSArray* objects5 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSDictionary* tmpParam5 = [NSDictionary dictionaryWithObjects: objects5 forKeys: keys];
+		[mParams setObject: tmpParam5 forKey: ORHVkDemandHV];
+
+		NSArray* objects6 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSDictionary* tmpParam6 = [NSDictionary dictionaryWithObjects: objects6 forKeys: keys];
+		[mParams setObject: tmpParam6 forKey: ORHVkRampUpRate];
+
+		NSArray* objects7 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSDictionary* tmpParam7 = [NSDictionary dictionaryWithObjects: objects7 forKeys: keys];
+		[mParams setObject: tmpParam7 forKey: ORHVkRampDownRate];
+
+		NSArray* objects8 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSDictionary* tmpParam8 = [NSDictionary dictionaryWithObjects: objects8 forKeys: keys];
+		[mParams setObject: tmpParam8 forKey: ORHVkTripCurrent];
+		
+		NSArray* objects9 = [NSArray arrayWithObjects: @"W", @"NSSTRING", nil];
+		NSDictionary* tmpParam9 = [NSDictionary dictionaryWithObjects: objects9 forKeys: keys];
+		[mParams setObject: tmpParam9 forKey: ORHVkStatus];
+
+		NSArray* objects10 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSDictionary* tmpParam10 = [NSDictionary dictionaryWithObjects: objects10 forKeys: keys];
+		[mParams setObject: tmpParam10 forKey: ORHVkMVDZ];
+		
+		NSArray* objects11 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSDictionary* tmpParam11 = [NSDictionary dictionaryWithObjects: objects11 forKeys: keys];
+		[mParams setObject: tmpParam11 forKey: ORHVkMCDZ];
+		
+		NSArray* objects12 = [NSArray arrayWithObjects: @"R", @"int", nil];
+		NSDictionary* tmpParam12 = [NSDictionary dictionaryWithObjects: objects12 forKeys: keys];
+		[mParams setObject: tmpParam12 forKey: ORHVkHVLimit];
+
+	
+		[mParams retain];
+		
+
+//		mAllParams = [NSArray arrayWithObjects: @"Chnl", @"MC", @"MV", @"Status", @"CE", @"DV", @"RUP", @"RDN", @"TC", @"MVDZ", @"MVDZ", @"HVL", nil];
+		
+//	NS_HANDLER
+//	NS_ENDHANDLER
 }
 
 - (void) setUpImage
@@ -112,7 +184,8 @@ NSString* ORHVkHVLimit = @"HVLimit";
 
 - (void) unitNotification: (NSNotification *) aNote
 {
-//	NSDictionary* userInfo = [aNote userInfo];	
+	NSDictionary* userInfo = [aNote userInfo];	
+	[userInfo objectForKey: @"Slot"];
 }
 
 #pragma mark •••sendCommands
@@ -120,28 +193,35 @@ NSString* ORHVkHVLimit = @"HVLimit";
 {
 	int			i;
 	int			j;
-	float		value;
-	NSString*	command;
-	
-	NSArray* setCommands = [NSArray arrayWithObjects:  @"CE",@"DV", @"RUP", @"RDN", @"TC", @"MVDZ", @"MVDZ"];
-	for ( j = 0; j < [setCommands count]; j++ )
+//	float		value;
+
+	NSArray* allKeys = [mParams allKeys];
+	for ( j = 0; j < [mParams count]; j++ )
 	{
-		for ( i = 0; i < ORHVNumChannels; i++ )
+		NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
+		NSString*	command = [dictObj objectForKey: @"NAME"];		
+		NSString*	writable = [mParams objectForKey: @"RW"];
+		if ( [writable isEqualTo: @"W"] )
 		{
-			NSMutableDictionary* chnlDict = [mChannelArray objectAtIndex: i];
-			NSString* dictKey = [setCommands objectAtIndex: j];
-			NSNumber* valueObj = [chnlDict objectForKey: dictKey];
-			value = [valueObj floatValue];
-			if ( i == 0 )
+			for ( i = 0; i < ORHVNumChannels; i++ )
 			{
-				command = [NSString stringWithFormat: @"LD S%d %@ %d ", [self slot], value];
-			}
-			else
-			{
-				command = [command stringByAppendingFormat: @"%@ %d", command, value];
-			}
+				NSMutableDictionary* chnlDict = [mChannelArray objectAtIndex: i]; // Get values we want to set for channel.
+				NSNumber* valueObj = [chnlDict objectForKey: command];
+			
+				if ( i == 0 )
+				{
+					command = [NSString stringWithFormat: @"LD S%d.%d", [self slot], i];
+				}
+			
+				if ( [[dictObj objectForKey: @"TYPE"] isEqualTo: @"INT"] )
+					command = [command stringByAppendingFormat: @" %d", [valueObj intValue]];
+				else if ([[dictObj objectForKey: @"TYPE"] isEqualTo: @"FLOAT"])
+					command = [command stringByAppendingFormat: @" %g", [valueObj floatValue]];
 				
-			[guardian sendCrateCommand: command];
+	//			command = [NSString stringWithFormat: @"LD S%d.%d %@ %d ", [self slot], i, value];
+			}
+			
+			[guardian sendCommand: command];
 		}
 	}
 }
@@ -168,7 +248,8 @@ NSString* ORHVkHVLimit = @"HVLimit";
 - (int) chnlEnabled: (int) aCurrentChnl
 {
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];
-	return( [[tmpChnl objectForKey: ORHVkChnlEnabled] intValue] );
+	NSNumber* numObj = [tmpChnl objectForKey: [tmpChnl objectForKey: @"CE"]];
+	return( [numObj intValue] );
 }
 
 - (void) setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl
@@ -185,7 +266,7 @@ NSString* ORHVkHVLimit = @"HVLimit";
 {
 	NSDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
 	
-	return ( [[tmpChnl objectForKey: ORHVkDemandHV] floatValue] );
+	return ( [[tmpChnl objectForKey: @"DV"] floatValue] );
 }
 
 - (void) setDemandHV: (float) aDemandHV chnl: (int) aCurChannel
@@ -497,6 +578,7 @@ NSString* ORHVkHVLimit = @"HVLimit";
 		}
 	}
 	
+	[mChannelArray retain];
     [[self undoManager] enableUndoRegistration];    
 	
     return self;

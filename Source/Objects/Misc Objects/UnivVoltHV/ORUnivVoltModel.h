@@ -34,6 +34,10 @@ enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSup
 {
 	id						adapter;
 	NSMutableArray*			mChannelArray;
+//	NSArray*				mSetCommands;
+//	NSArray*				mAllCommands;
+	NSMutableDictionary*	mParams;
+	NSMutableArray*			mCommands;
 }
 
 #pragma mark •••Send Commands
