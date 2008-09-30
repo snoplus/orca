@@ -31,9 +31,9 @@
 #include "SNOMtc.h"
 
 extern TUVMEDevice* vmeAM29Handle;
-extern int32_t  dataIndex;
-extern int32_t* data;
-extern char needToSwap;
+extern int32_t		dataIndex;
+extern int32_t*		data;
+extern char			needToSwap;
 
 void processMTCCommand(SBC_Packet* aPacket)
 {
@@ -55,8 +55,7 @@ void loadXilinx(SBC_Packet* aPacket)
 	int32_t addressModifier = p->addressModifier;
 	int32_t programReg      = baseAddress + p->programRegOffset;
 	int32_t fileSize        = p->fileSize;
-	int32_t index			= fileSize;	
-	
+	int32_t lastByte		= fileSize;	
 	p += sizeof(SNOMtc_XilinxLoadStruct);	//point to the file data
 	uint8_t* charData = (uint8_t*)p;		//recast the pointer
 	
@@ -85,7 +84,6 @@ void loadXilinx(SBC_Packet* aPacket)
 	const uint32_t DATA_LOW_CLOCK_LOW  = 0x00000000;  	 // bit 0 low and bit 1 low
 	
 	lock_device(vmeAM29Handle);
-	
 	aValue = 0x00000008;				// set  all bits, except bit 3[PROG_EN], low -- new step 1/16/97
 	result = write_device(vmeAM29Handle, (char*)(&aValue), 4, programReg);
 	if(result == 4){
@@ -99,25 +97,24 @@ void loadXilinx(SBC_Packet* aPacket)
 		errorFlag = 1;	//early exit
 	}
 	
-	uint32_t i;
-	if(errorFlag) for (i=1; i<index; i++){
-		
+	uint32_t byte = 0;
+	if(!errorFlag) for (byte=0; byte<lastByte; byte++){
 		if ( (firstPass) && (*charData != '/') ){
 			strcpy(errorMessage,"Invalid first character in Xilinx file.");		
-			errorFlag = 1;	//early exit
+			errorFlag = 2;	//early exit
 			break;
 		}
 		
 		if (firstPass){
 			
-			*charData++;							// for the first slash
-			i++;  									// need to keep track of i
+			charData++;							// for the first slash
+			byte++;  							// need to keep track of i
 			
 			while(*charData++ != '/'){
-				i++;
-				if ( i>index ){			
+				byte++;
+				if ( byte>lastByte ){			
 					strcpy(errorMessage,"Comment block not delimited by a backslash..");		
-					errorFlag = 1;
+					errorFlag = 3;
 					break;		//early exit
 				}
 			}
@@ -129,7 +126,7 @@ void loadXilinx(SBC_Packet* aPacket)
 		
 		// strip carriage return, tabs
 		if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
-			*charData++;
+			charData++;
 		}
 		else {
 			
@@ -139,51 +136,56 @@ void loadXilinx(SBC_Packet* aPacket)
 			else if ( *charData == '0' ) aValue = DATA_LOW_CLOCK_LOW;	// bit 0 low and bit 1 low
 			else {
 				strcpy(errorMessage,"Invalid character in Xilinx file.");		
-				errorFlag = 1;
+				errorFlag = 4;
 				break; //early exit
 			}
-			*charData++;
+			charData++;
 
 			result = write_device(vmeAM29Handle, (char*)(&aValue), 4, programReg);
 			if(result == 4){
 				aValue |= (1UL << 1);	 // perform bitwise OR to set the bit 1 high[toggle clock high]	
 				
 				result = write_device(vmeAM29Handle, (char*)(&aValue), 4, programReg);
-				errorFlag = 1;
+				errorFlag = 5;
 			}
-			else errorFlag = 1;
+			else errorFlag = 6;
 			
 			if(errorFlag){
 				strcpy(errorMessage,"Xilinx load failed. Unable to toggle mtc clock.");		
-				errorFlag = 1;
+				errorFlag = 7;
 				break; //early exit
 			}
 		}
 	}
-	
-	usleep(100000); // 10 msec delay
-	// check to see if the Xilinx was loaded properly 
-	// read the bit 2, this should be high if the Xilinx was loaded
-	result = read_device(vmeAM29Handle,(char*)(&readValue),4,programReg);
-	
-	if ((result != 4) | !(readValue & 0x000000010)){	// bit 4, PROGRAM*, should be high for Xilinx success		
-		if(result!=4)strcpy(errorMessage,"Xilinx load failed for the MTC/D! (final check failed)");		
-		else strcpy(errorMessage,"Xilinx load failed for the MTC/D! (PROGRAM*, bit 4 not high at end)");		
-		errorFlag = 1;
+	if(!errorFlag){
+		
+		usleep(100000); // 10 msec delay
+		// check to see if the Xilinx was loaded properly 
+		// read the bit 2, this should be high if the Xilinx was loaded
+		result = read_device(vmeAM29Handle,(char*)(&readValue),4,programReg);
+		
+		if ((result != 4) | !(readValue & 0x000000010)){	// bit 4, PROGRAM*, should be high for Xilinx success		
+			if(result!=4)strcpy(errorMessage,"Xilinx load failed for the MTC/D! (final check failed)");		
+			else strcpy(errorMessage,"Xilinx load failed for the MTC/D! (PROGRAM*, bit 4 not high at end)");		
+			errorFlag |= 0x80000000;
+		}
 	}
-	
 	/* echo the structure back with the error code*/
 	/* 0 == no Error*/
 	/* non-0 means an error*/
 	SNOMtc_XilinxLoadStruct* returnDataPtr = (SNOMtc_XilinxLoadStruct*)aPacket->payload;
-	strncpy(aPacket->message,errorMessage,kSBC_MaxMessageSize);
-	aPacket->message[kSBC_MaxMessageSize-1] = '\0';
+	uint32_t errLen = strlen(errorMessage);
+	if(errLen >= kSBC_MaxMessageSize-1){
+		errLen = kSBC_MaxMessageSize-1;
+		aPacket->message[kSBC_MaxMessageSize-1] = '\0';	
+	}
+	strncpy(aPacket->message,errorMessage,errLen);
 	
 	returnDataPtr->baseAddress      = baseAddress;
 	returnDataPtr->programRegOffset = programReg;
 	returnDataPtr->addressModifier  = addressModifier;
 	returnDataPtr->errorCode		= errorFlag;
-	returnDataPtr->fileSize         = 0;
+	returnDataPtr->fileSize         = byte;
 	
 	int32_t* lptr = (int32_t*)returnDataPtr;
 	if(needToSwap) SwapLongBlock(lptr,sizeof(SNOMtc_XilinxLoadStruct)/sizeof(int32_t));

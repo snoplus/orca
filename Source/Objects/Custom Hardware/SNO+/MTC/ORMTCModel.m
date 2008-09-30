@@ -1695,7 +1695,7 @@ int mtcDacIndexes[14]=
 		for (i = 1;i < index;i++){
 
 			if ( (firstPass) && (*charData != '/') ){
-				*charData++;
+				charData++;
 				[self finishXilinxLoad];
 				[theData release];
 				theData = nil;				
@@ -1705,7 +1705,7 @@ int mtcDacIndexes[14]=
 			
 			if (firstPass){
 
-				*charData++;							// for the first slash
+				charData++;							// for the first slash
 				i++;  									// need to keep track of i
 	   							 
 				while(*charData++ != '/'){
@@ -1726,7 +1726,7 @@ int mtcDacIndexes[14]=
 
 			// strip carriage return, tabs
 			if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
-				*charData++;
+				charData++;
 			}
 			else{
 
@@ -1745,7 +1745,7 @@ int mtcDacIndexes[14]=
 					NSLog(@"Invalid character in Xilinx file.\n");
 					[NSException raise:@"Xilinx load failed" format:@""];
 				}
-				*charData++;
+				charData++;
 												
 				[self write:kMtcXilProgReg value:aValue];
 			    // perform bitwise OR to set the bit 1 high[toggle clock high] 
@@ -1800,6 +1800,9 @@ int mtcDacIndexes[14]=
 	//really should be an error check here that the file isn't bigger than the max payload size
 	char* p = (char*)payloadPtr + sizeof(SNOMtc_XilinxLoadStruct);
 	strncpy(p, dataPtr, [theData length]);
+	
+	//we don't use the file locally, so just close the file 
+	[self finishXilinxLoad];
 
 	NS_DURING
 		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
@@ -1814,12 +1817,9 @@ int mtcDacIndexes[14]=
 			NSLog(@"Xilinx file sent to the SBC. Status: %d\n",errorCode);
 		}
 	NS_HANDLER
-		[self finishXilinxLoad];
 		NSLog(@"Xilinx load failed for the MTC/D.\n");
 		[localException raise];
 	NS_ENDHANDLER
-	//we don't use the file locally, so just close the file 
-	[self finishXilinxLoad];
 }
 
 - (void) finishXilinxLoad
