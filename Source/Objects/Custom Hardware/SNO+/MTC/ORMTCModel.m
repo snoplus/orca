@@ -1784,18 +1784,20 @@ int mtcDacIndexes[14]=
 - (void) loadXilinxUsingSBC:(NSData*) theData
 {	
 	long errorCode = 0;
+	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
 	SBC_Packet aPacket;
 	aPacket.cmdHeader.destination	= kSNOMtc;
 	aPacket.cmdHeader.cmdID			= kSNOMtcLoadXilinx;
-	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SNOMtc_XilinxLoadStruct);
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SNOMtc_XilinxLoadStruct) + numLongs*sizeof(long);
 	
 	SNOMtc_XilinxLoadStruct* payloadPtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
 	payloadPtr->baseAddress		= [self baseAddress];
 	payloadPtr->addressModifier	= [self addressModifier];
-	payloadPtr->errorCode	    = 1;
+	payloadPtr->errorCode	    = 666;
 	payloadPtr->programRegOffset= reg[kMtcXilProgReg].addressOffset;
 	payloadPtr->fileSize		= [theData length];
 	const char* dataPtr			= (const char*)[theData bytes];
+	//really should be an error check here that the file isn't bigger than the max payload size
 	char* p = (char*)payloadPtr + sizeof(SNOMtc_XilinxLoadStruct);
 	strncpy(p, dataPtr, [theData length]);
 
@@ -1803,9 +1805,14 @@ int mtcDacIndexes[14]=
 		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
 		SNOMtc_XilinxLoadStruct *responsePtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
 		errorCode = responsePtr->errorCode;
-		NSLog(@"Xilinx file sent to the SBC. Status: %d\n",errorCode);
-		if(errorCode)NSLog(@"%s\n",aPacket.message);
-		else NSLog(@"Looks like success\n");
+		if(errorCode){
+			NSLog(@"%s\n",aPacket.message);
+			[NSException raise:@"Xilinx load failed" format:@""];
+		}
+		else {
+			NSLog(@"Looks like success\n");
+			NSLog(@"Xilinx file sent to the SBC. Status: %d\n",errorCode);
+		}
 	NS_HANDLER
 		[self finishXilinxLoad];
 		NSLog(@"Xilinx load failed for the MTC/D.\n");
