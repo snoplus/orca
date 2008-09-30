@@ -896,8 +896,8 @@ int mtcDacIndexes[14]=
 		NSLog(@"Initialization of the MTC complete.\n");
 
 	NS_HANDLER
-		NSLog(@"***Initialization of the MTC (%s Xilinx, %s 10MHz clock) failed!***\n", 
-			loadTheMTCXilinxFile?"with":"no", loadThe10MHzClock?"load":"don't load");
+		NSLog(@"***Initialization of the MTC (%@ Xilinx, %@ 10MHz clock) failed!***\n", 
+			loadTheMTCXilinxFile?@"with":@"no", loadThe10MHzClock?@"load":@"don't load");
 	NS_ENDHANDLER
 }
 
@@ -1509,7 +1509,7 @@ int mtcDacIndexes[14]=
 		theData = [[xilinxFileHandle readDataToEndOfFile] retain];			// load the entire content of the file
 	}
 	else {
-		NSLog(@"Couldn't open the MTC Xilinx file %s!\n",[self xilinxFilePath]);
+		NSLog(@"Couldn't open the MTC Xilinx file %@!\n",[self xilinxFilePath]);
 		[NSException raise:@"Couldn't open Xilinx File" format:	[self xilinxFilePath]];	
 	}
 	

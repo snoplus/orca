@@ -28,5 +28,6 @@
 #define kCaen1720  6 
 #define kMtc	   7 
 #define kFec	   8 
+#define kSIS3300   9 
 
 #endif
