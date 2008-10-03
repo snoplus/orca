@@ -27,6 +27,7 @@
 #import "ORPlotter1D.h"
 #import "ORTimeRate.h"
 #import "ORMTC_Constants.h"
+#import "ORSelectorSequence.h"
 
 #pragma mark •••PrivateInterface
 @interface ORMTCController (private)
@@ -68,7 +69,8 @@
 	[self setMaskTags:globalTriggerMaskMatrix2];
 	[self setMaskTags:globalTriggerCrateMaskMatrix2];
 	[self setMaskTags:pedCrateMaskMatrix2];
-		
+	[initProgressField setHidden:YES];
+	
     [super awakeFromNib];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORMTC%d.selectedtab",[model slot]];
@@ -166,11 +168,26 @@
                          name : ORMTCModelNHitViewTypeChanged
 						object: model];
 
-    [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector(eSumViewTypeChanged:)
                          name : ORMTCModelESumViewTypeChanged
 						object: model];
- 
+						
+    [notifyCenter addObserver : self
+                     selector : @selector(sequenceRunning:)
+                         name : ORSequenceRunning
+						object: model];
+						
+    [notifyCenter addObserver : self
+                     selector : @selector(sequenceStopped:)
+                         name : ORSequenceStopped
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sequenceProgress:)
+                         name : ORSequenceProgress
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -202,9 +219,61 @@
     [settingsLockButton setEnabled:secure];
     [basicOpsLockButton setEnabled:secure];
     [standardOpsLockButton setEnabled:secure];
+	[self updateButtons];
 }
 
 #pragma mark •••Interface Management
+
+- (void) updateButtons
+{
+    //BOOL runInProgress = [gOrcaGlobals runInProgress];
+   //BOOL locked	= [gSecurity isLocked:ORMTCLock] ;
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORMTCLock] | sequenceRunning;
+
+	[initMtcButton				setEnabled: !lockedOrRunningMaintenance];
+	[initNoXilinxButton			setEnabled: !lockedOrRunningMaintenance];
+	[initNo10MHzButton			setEnabled: !lockedOrRunningMaintenance];
+	[initNoXilinxNo100MHzButton setEnabled: !lockedOrRunningMaintenance];
+	[makeCrateMaskButton		setEnabled: !lockedOrRunningMaintenance];
+	[load10MhzCounterButton		setEnabled: !lockedOrRunningMaintenance];
+	[loadOnlineMaskButton		setEnabled: !lockedOrRunningMaintenance];
+	[loadDacsButton				setEnabled: !lockedOrRunningMaintenance];
+	[firePedestalsButton		setEnabled: !lockedOrRunningMaintenance];
+	[triggerZeroMatrix			setEnabled: !lockedOrRunningMaintenance];
+	[findTriggerZerosButton		setEnabled: !lockedOrRunningMaintenance];
+	[continuousButton			setEnabled: !lockedOrRunningMaintenance];
+	[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
+	[stopTriggerZeroButton		setEnabled: !lockedOrRunningMaintenance];
+	[passiveOnlyButton			setEnabled: !lockedOrRunningMaintenance];
+	[setCoarseDelayButton		setEnabled: !lockedOrRunningMaintenance];
+}
+
+- (void) sequenceRunning:(NSNotification*)aNote
+{
+	sequenceRunning = YES;
+	[initProgressBar startAnimation:self];
+	[initProgressBar setDoubleValue:0];
+	[initProgressField setHidden:NO];
+	[initProgressField setFloatValue:0];
+	[self updateButtons];
+}
+
+- (void) sequenceStopped:(NSNotification*)aNote
+{
+	[initProgressField setHidden:YES];
+	[initProgressBar setDoubleValue:0];
+	[initProgressBar stopAnimation:self];
+	sequenceRunning = NO;
+	[self updateButtons];
+}
+
+- (void) sequenceProgress:(NSNotification*)aNote
+{
+	double progress = [[[aNote userInfo] objectForKey:@"progress"] floatValue];
+	[initProgressBar setDoubleValue:progress];
+	[initProgressField setFloatValue:progress/100.];
+}
+
 - (void) eSumViewTypeChanged:(NSNotification*)aNote
 {
 	[eSumViewTypeMatrix selectCellWithTag: [model eSumViewType]];

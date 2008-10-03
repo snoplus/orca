@@ -44,7 +44,24 @@
 	
 	//standard Ops
 	IBOutlet NSButton*		standardOpsLockButton;
-
+	IBOutlet NSButton*		initMtcButton;
+	IBOutlet NSButton*		initNoXilinxButton;
+	IBOutlet NSButton*		initNo10MHzButton;
+	IBOutlet NSButton*		initNoXilinxNo100MHzButton;
+	IBOutlet NSButton*		makeCrateMaskButton;
+	IBOutlet NSButton*		load10MhzCounterButton;
+	IBOutlet NSButton*		loadOnlineMaskButton;
+	IBOutlet NSButton*		setCoarseDelayButton;
+	IBOutlet NSButton*		loadDacsButton;
+	IBOutlet NSButton*		firePedestalsButton;
+	IBOutlet NSMatrix*		triggerZeroMatrix;
+	IBOutlet NSButton*		findTriggerZerosButton;
+	IBOutlet NSButton*		continuousButton;
+	IBOutlet NSButton*		stopTriggerZeroButton;
+	IBOutlet NSButton*		passiveOnlyButton;
+	IBOutlet NSProgressIndicator* initProgressBar;
+	IBOutlet NSTextField*	initProgressField;
+	
 	//settings
 	IBOutlet NSMatrix*		eSumViewTypeMatrix;
 	IBOutlet NSMatrix*		nHitViewTypeMatrix;
@@ -76,7 +93,7 @@
 	IBOutlet NSMatrix*		globalTriggerCrateMaskMatrix2;
 	IBOutlet NSMatrix*		pedCrateMaskMatrix2;
 
-
+	BOOL	sequenceRunning;
     NSView* blankView;
     NSSize  basicOpsSize;
     NSSize  standardOpsSize;
@@ -88,6 +105,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) updateButtons;
 - (void) eSumViewTypeChanged:(NSNotification*)aNote;
 - (void) nHitViewTypeChanged:(NSNotification*)aNote;
 - (void) mtcDataBaseChanged:(NSNotification*)aNote;
@@ -107,6 +125,8 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (void) loadMasks;
 - (void) lastFileLoadedChanged:(NSNotification*)aNote;
+- (void) sequenceRunning:(NSNotification*)aNote;
+- (void) sequenceStopped:(NSNotification*)aNote;
 
 #pragma mark •••Helper
 - (void) populatePullDown;

@@ -37,7 +37,7 @@ int32_t Readout_LAM_Data(SBC_crate_config* config,int32_t index, SBC_LAM_Data* l
 int32_t Readout_IP320(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
-int32_t Readout_Mtc(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+int32_t Readout_MTC(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Fec(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index);
 

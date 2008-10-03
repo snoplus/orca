@@ -198,6 +198,8 @@
 				<string>id</string>
 				<key>ipAddressTextFieldAction</key>
 				<string>id</string>
+				<key>panicAction</key>
+				<string>id</string>
 				<key>panicOffAction</key>
 				<string>id</string>
 				<key>setInhibitOffAction</key>

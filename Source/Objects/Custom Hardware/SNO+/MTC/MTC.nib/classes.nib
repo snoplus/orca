@@ -190,6 +190,8 @@
 				<string>NSButton</string>
 				<key>commentsField</key>
 				<string>NSTextField</string>
+				<key>continuousButton</key>
+				<string>NSButton</string>
 				<key>controlRegMaskMatrix</key>
 				<string>NSMatrix</string>
 				<key>defaultFileField</key>
@@ -198,10 +200,14 @@
 				<string>NSMatrix</string>
 				<key>esumMatrix</key>
 				<string>NSMatrix</string>
+				<key>findTriggerZerosButton</key>
+				<string>NSButton</string>
 				<key>fineDelayField</key>
 				<string>NSTextField</string>
 				<key>fineSlopeField</key>
 				<string>NSTextField</string>
+				<key>firePedestalsButton</key>
+				<string>NSButton</string>
 				<key>globalTriggerCrateMaskMatrix</key>
 				<string>NSMatrix</string>
 				<key>globalTriggerCrateMaskMatrix2</key>
@@ -212,14 +218,34 @@
 				<string>NSMatrix</string>
 				<key>high10MhzClockField</key>
 				<string>NSTextField</string>
+				<key>initMtcButton</key>
+				<string>NSButton</string>
+				<key>initNo10MHzButton</key>
+				<string>NSButton</string>
+				<key>initNoXilinxButton</key>
+				<string>NSButton</string>
+				<key>initNoXilinxNo100MHzButton</key>
+				<string>NSButton</string>
+				<key>initProgressBar</key>
+				<string>NSProgressIndicator</string>
+				<key>initProgressField</key>
+				<string>NSTextField</string>
 				<key>lastFileLoadedField</key>
 				<string>NSTextField</string>
+				<key>load10MhzCounterButton</key>
+				<string>NSButton</string>
+				<key>loadDacsButton</key>
+				<string>NSButton</string>
 				<key>loadFilePathField</key>
 				<string>NSTextField</string>
+				<key>loadOnlineMaskButton</key>
+				<string>NSButton</string>
 				<key>lockOutWidthField</key>
 				<string>NSTextField</string>
 				<key>low10MhzClockField</key>
 				<string>NSTextField</string>
+				<key>makeCrateMaskButton</key>
+				<string>NSButton</string>
 				<key>memBaseAddressStepper</key>
 				<string>NSStepper</string>
 				<key>memBaseAddressText</key>
@@ -236,6 +262,8 @@
 				<string>NSTextField</string>
 				<key>nhitMatrix</key>
 				<string>NSMatrix</string>
+				<key>passiveOnlyButton</key>
+				<string>NSButton</string>
 				<key>pedCrateMaskMatrix</key>
 				<string>NSMatrix</string>
 				<key>pedCrateMaskMatrix2</key>
@@ -258,14 +286,20 @@
 				<string>NSStepper</string>
 				<key>selectedRegisterPU</key>
 				<string>NSPopUpButton</string>
+				<key>setCoarseDelayButton</key>
+				<string>NSButton</string>
 				<key>settingsLockButton</key>
 				<string>NSButton</string>
 				<key>slotField</key>
 				<string>NSTextField</string>
 				<key>standardOpsLockButton</key>
 				<string>NSButton</string>
+				<key>stopTriggerZeroButton</key>
+				<string>NSButton</string>
 				<key>tabView</key>
 				<string>NSTabView</string>
+				<key>triggerZeroMatrix</key>
+				<string>NSMatrix</string>
 				<key>useMemoryMatrix</key>
 				<string>NSMatrix</string>
 				<key>writeValueField</key>

@@ -31,9 +31,9 @@
 #import "VME_HW_Definitions.h"
 #import "SNOMtcCmds.h"
 #import "SBC_Link.h"
+#import "ORSelectorSequence.h"
 
 #pragma mark •••Definitions
-
 NSString* ORMTCModelESumViewTypeChanged		= @"ORMTCModelESumViewTypeChanged";
 NSString* ORMTCModelNHitViewTypeChanged		= @"ORMTCModelNHitViewTypeChanged";
 NSString* ORMTCModelDefaultFileChanged		= @"ORMTCModelDefaultFileChanged";
@@ -877,28 +877,35 @@ int mtcDacIndexes[14]=
 
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
 {
-	NS_DURING
-		if (loadTheMTCXilinxFile) [self loadMTCXilinx];				// STEP 1 : Load the Xilinx
-		[self clearGlobalTriggerWordMask];							// STEP 2: Clear the GT Word Mask
-		[self clearPedestalCrateMask];								// STEP 3: Clear the Pedestal Crate Mask
-		[self clearGTCrateMask];									// STEP 4: Clear the GT Crate Mask
-		[self loadTheMTCADacs];										// STEP 5: Load the DACs	
-		[self clearTheControlRegister];								// STEP 6: Clear the Control Register
-		[self zeroTheGTCounter];									// STEP 7: Clear the GT Counter
-		[self setTheLockoutWidth:uShortDBValue(kLockOutWidth)];	// STEP 8: Set the Lockout Width	
-		[self setThePrescaleValue];									// STEP 9:  Load the NHIT 100 LO prescale value
-		[self setThePulserRate:uLongDBValue(kPulserPeriod)];		// STEP 10: Load the Pulser
-		[self setThePedestalWidth:uLongDBValue(kPedestalWidth)];	// STEP 11: Set the Pedestal Width
-		[self setupPulseGTDelaysCoarse:uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)]; // STEP 12: Setup the Pulse GT Delays
-		if( loadThe10MHzClock)[self setMtcTime];					// STEP 13: Load the 10MHz Counter
-		[self resetTheMemory];										// STEP 14: Reset the Memory	 
-		//[self setGTCrateMask];									// STEP 15: Set the GT Crate Mask from MTC database
-		NSLog(@"Initialization of the MTC complete.\n");
+	NS_DURING		
+		ORSelectorSequence* seq = [ORSelectorSequence selectorSequenceWithDelegate:self];
+		if (loadTheMTCXilinxFile) [[seq forTarget:self] loadMTCXilinx];				// STEP 1 : Load the Xilinx
+		[[seq forTarget:self] clearGlobalTriggerWordMask];							// STEP 2: Clear the GT Word Mask
+		[[seq forTarget:self] clearPedestalCrateMask];								// STEP 3: Clear the Pedestal Crate Mask
+		[[seq forTarget:self] clearGTCrateMask];									// STEP 4: Clear the GT Crate Mask
+		[[seq forTarget:self] loadTheMTCADacs];										// STEP 5: Load the DACs	
+		[[seq forTarget:self] clearTheControlRegister];								// STEP 6: Clear the Control Register
+		[[seq forTarget:self] zeroTheGTCounter];									// STEP 7: Clear the GT Counter
+		[[seq forTarget:self] setTheLockoutWidth:uShortDBValue(kLockOutWidth)];	// STEP 8: Set the Lockout Width	
+		[[seq forTarget:self] setThePrescaleValue];									// STEP 9:  Load the NHIT 100 LO prescale value
+		[[seq forTarget:self] setThePulserRate:uLongDBValue(kPulserPeriod)];		// STEP 10: Load the Pulser
+		[[seq forTarget:self] setThePedestalWidth:uLongDBValue(kPedestalWidth)];	// STEP 11: Set the Pedestal Width
+		[[seq forTarget:self] setupPulseGTDelaysCoarse:uLongDBValue(kCoarseDelay) fine:uLongDBValue(kFineDelay)]; // STEP 12: Setup the Pulse GT Delays
+		if( loadThe10MHzClock)[[seq forTarget:self] setMtcTime];					// STEP 13: Load the 10MHz Counter
+		[[seq forTarget:self] resetTheMemory];										// STEP 14: Reset the Memory	 
+		//[[seq forTarget:self] setGTCrateMask];									// STEP 15: Set the GT Crate Mask from MTC database
+		[[seq forTarget:self] initializeMtcDone];
+		[seq startSequence];
 
 	NS_HANDLER
 		NSLog(@"***Initialization of the MTC (%@ Xilinx, %@ 10MHz clock) failed!***\n", 
 			loadTheMTCXilinxFile?@"with":@"no", loadThe10MHzClock?@"load":@"don't load");
 	NS_ENDHANDLER
+}
+
+- (void) initializeMtcDone
+{
+	NSLog(@"Initialization of the MTC complete.\n");
 }
 
 - (void) clearGlobalTriggerWordMask
@@ -1012,7 +1019,7 @@ int mtcDacIndexes[14]=
 	static unsigned long theSecondsToSubtract = 0;
 
  	if( theSecondsToSubtract == 0 ) {
-		theSecondsToSubtract =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:@"GMT"]];
+		theSecondsToSubtract =  (unsigned long)[[NSDate date] timeIntervalSinceDate:[NSCalendarDate dateWithYear:1996 month:1 day:1 hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]];
  	}
 /* 
  	//load the 10MHz clock from mac time....eventually we will 

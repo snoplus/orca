@@ -59,7 +59,7 @@
 		
 		int						nHitViewType;
 		int						eSumViewType;
-		
+
 		//data taking variables
 		ORReadOutList*  triggerGroup;
 		NSString*		triggerName;
@@ -165,6 +165,7 @@
 - (void) sendMTC_SoftGt;
 - (void) sendMTC_SoftGt:(BOOL) setGTMask;
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock;
+- (void) initializeMtcDone;
 - (void) clearGlobalTriggerWordMask;
 - (void) setGlobalTriggerWordMask;
 - (unsigned long) getMTC_GTWordMask;
