@@ -254,7 +254,7 @@
 	[initProgressBar startAnimation:self];
 	[initProgressBar setDoubleValue:0];
 	[initProgressField setHidden:NO];
-	[initProgressField setFloatValue:0];
+	[initProgressField setDoubleValue:0];
 	[self updateButtons];
 }
 
@@ -625,12 +625,12 @@
 
 - (IBAction) standardLoad10MHzCounter:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model load10MHzClock];
 }
 
 - (IBAction) standardLoadOnlineGTMasks:(id) sender 
 {
-	[self buttonPushed:sender];
+	[model setGlobalTriggerWordMask];
 }
 
 - (IBAction) standardLoadMTCADacs:(id) sender 

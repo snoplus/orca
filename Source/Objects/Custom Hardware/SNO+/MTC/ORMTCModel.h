@@ -207,6 +207,7 @@
 - (void) loadTheMTCADacs;
 - (void) loadMTCXilinx;
 - (void) setTubRegister;
+- (void) load10MHzClock;
 
 #pragma mark •••BasicOps
 - (void) readBasicOps;

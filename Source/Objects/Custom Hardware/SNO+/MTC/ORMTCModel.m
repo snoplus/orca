@@ -833,27 +833,62 @@ int mtcDacIndexes[14]=
 
 - (unsigned long) getMTC_CSR
 {
-	return [self read:kMtcControlReg];
+	unsigned long aValue = 0;
+	NS_DURING
+		aValue =   [self read:kMtcControlReg];
+	NS_HANDLER
+		NSLog(@"Couldn't get a MTC CSR!\n");
+		NSLog(@"Exception: %@\n",localException);
+	NS_ENDHANDLER
+	return aValue;
 }
 
 - (unsigned long) getMTC_GTID
 {
-	return [self read:kMtcOcGtReg] & 0xffffff;
+	unsigned long aValue = 0;
+	NS_DURING
+		aValue =  [self read:kMtcOcGtReg] & 0xffffff;
+	NS_HANDLER
+		NSLog(@"Couldn't get a MTC GTID!\n");
+		NSLog(@"Exception: %@\n",localException);
+	NS_ENDHANDLER
+	return aValue;
 }
 
 - (unsigned long) getMTC_PedWidth
 {
-	return [self read:kMtcPwIdReg] & 0xff;
+	unsigned long aValue = 0;
+	NS_DURING
+		aValue =  [self read:kMtcPwIdReg] & 0xff;
+	NS_HANDLER
+		NSLog(@"Couldn't get a MTC Ped Width!\n");
+		NSLog(@"Exception: %@\n",localException);
+	NS_ENDHANDLER
+	return aValue;
 }
 
 - (unsigned long) getMTC_CoarseDelay
 {
-	return [self read:kMtcRtdelReg] & 0xff;
+	unsigned long aValue = 0;
+	NS_DURING
+		aValue = [self read:kMtcRtdelReg] & 0xff;
+	NS_HANDLER
+		NSLog(@"Couldn't get a MTC Coarse Delay!\n");
+		NSLog(@"Exception: %@\n",localException);
+	NS_ENDHANDLER
+	return aValue;
 }
 
 - (unsigned long) getMTC_FineDelay
 {
-	return [self read:kMtcAddelReg] & 0xff;
+	unsigned long aValue = 0;
+	NS_DURING
+		aValue = [self read:kMtcAddelReg] & 0xff;
+	NS_HANDLER
+		NSLog(@"Couldn't get a MTC Fine Delay!\n");
+		NSLog(@"Exception: %@\n",localException);
+	NS_ENDHANDLER
+	return aValue;
 }
 
 - (void) sendMTC_SoftGt
@@ -869,6 +904,7 @@ int mtcDacIndexes[14]=
 		[self clearSingleGTWordMask:MTC_SOFT_GT_MASK];				// Step 3: clear the SOFT_GT mask
 	NS_HANDLER
 		NSLog(@"Couldn't send a MTC SOFT_GT!\n");
+		NSLog(@"Exception: %@\n",localException);
 	NS_ENDHANDLER
 	
 }
@@ -878,8 +914,15 @@ int mtcDacIndexes[14]=
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
 {
 	NS_DURING		
+		NSLog(@"Starting MTC init process....\n");
 		ORSelectorSequence* seq = [ORSelectorSequence selectorSequenceWithDelegate:self];
-		if (loadTheMTCXilinxFile) [[seq forTarget:self] loadMTCXilinx];				// STEP 1 : Load the Xilinx
+		if (loadTheMTCXilinxFile) {
+			if([[self adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")]){
+				NSLog(@"Sending Xilinx file to the SBC. (Can take a few seconds)\n");
+			}
+
+			[[seq forTarget:self] loadMTCXilinx];									// STEP 1 : Load the Xilinx
+		}
 		[[seq forTarget:self] clearGlobalTriggerWordMask];							// STEP 2: Clear the GT Word Mask
 		[[seq forTarget:self] clearPedestalCrateMask];								// STEP 3: Clear the Pedestal Crate Mask
 		[[seq forTarget:self] clearGTCrateMask];									// STEP 4: Clear the GT Crate Mask
@@ -900,6 +943,8 @@ int mtcDacIndexes[14]=
 	NS_HANDLER
 		NSLog(@"***Initialization of the MTC (%@ Xilinx, %@ 10MHz clock) failed!***\n", 
 			loadTheMTCXilinxFile?@"with":@"no", loadThe10MHzClock?@"load":@"don't load");
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
 	NS_ENDHANDLER
 }
 
@@ -910,26 +955,51 @@ int mtcDacIndexes[14]=
 
 - (void) clearGlobalTriggerWordMask
 {
-	[self write:kMtcMaskReg value:0];
+	NS_DURING
+		[self write:kMtcMaskReg value:0];
+		NSLog(@"Cleared GT Mask\n");
+	NS_HANDLER
+		NSLog(@"Could not clear GT word mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 - (void) setGlobalTriggerWordMask
 {
-	[self write:kMtcMaskReg value:uLongDBValue(kGtMask)];
+	NS_DURING
+		[self write:kMtcMaskReg value:uLongDBValue(kGtMask)];
+		NSLog(@"Set GT Mask: 0x%08x\n",uLongDBValue(kGtMask));
+	NS_HANDLER
+		NSLog(@"Could not set a set GT word mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 
 - (unsigned long) getMTC_GTWordMask
 {
-	return [self read:kMtcGmskReg] & 0x03FFFFFF;							
+	unsigned long aValue = 0;
+	NS_DURING	
+		aValue =  [self read:kMtcGmskReg] & 0x03FFFFFF;							
+	NS_HANDLER
+		NSLog(@"Could not get GT word mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER
+	return aValue;
 }
 
 - (void) setSingleGTWordMask:(unsigned long) gtWordMask
 {	
 	NS_DURING
 		[self setBits:kMtcGmskReg mask:gtWordMask];
+		NSLog(@"Set GT Mask: 0x%08x\n",uLongDBValue(kGtMask));
 	NS_HANDLER
 		NSLog(@"Could not set a MTC GT word mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
 	NS_ENDHANDLER
 }
 
@@ -937,47 +1007,100 @@ int mtcDacIndexes[14]=
 {
 	NS_DURING
 		[self clrBits:kMtcGmskReg mask:gtWordMask];
+		NSLog(@"Set GT Mask: 0x%08x\n",uLongDBValue(kGtMask));
 	NS_HANDLER
 		NSLog(@"Could not clear a MTC GT word mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
 	NS_ENDHANDLER	
 }
 
 - (void) clearPedestalCrateMask
 {
-	[self write:kMtcPmskReg value:0];
+	NS_DURING
+		[self write:kMtcPmskReg value:0];
+		NSLog(@"Cleared Ped Mask\n");
+	NS_HANDLER
+		NSLog(@"Could not clear a Ped mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER	
 }
 
 - (void) setPedestalCrateMask
 {
-	[self write:kMtcPmskReg value: uLongDBValue(kPEDCrateMask)];
+	NS_DURING
+		[self write:kMtcPmskReg value: uLongDBValue(kPEDCrateMask)];
+		NSLog(@"Set Ped Mask: 0x%08x\n",uLongDBValue(kPEDCrateMask));
+	NS_HANDLER
+		NSLog(@"Could not set a Ped crate mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER	
 }
 
 - (void) clearGTCrateMask
 {
-	[self write:kMtcGmskReg value:0];
+	NS_DURING
+		[self write:kMtcGmskReg value:0];
+		NSLog(@"Cleared GT Crate Mask\n");
+	NS_HANDLER
+		NSLog(@"Could not clear GT crate mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER	
 }
 
 - (void) setGTCrateMask
 {
-	[self write:kMtcGmskReg value: uLongDBValue(kGtCrateMask)];
+	NS_DURING
+		[self write:kMtcGmskReg value: uLongDBValue(kGtCrateMask)];
+		NSLog(@"Set GT Crate Mask: 0x%08x\n",uLongDBValue(kGtCrateMask));
+	NS_HANDLER
+		NSLog(@"Could not set GT crate mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER	
 }
 
 - (unsigned long) getGTCrateMask
 {
-	return [self read:kMtcGmskReg] & 0x01FFFFFF;	
+	unsigned long aValue = 0;
+	NS_DURING
+		aValue =  [self read:kMtcGmskReg] & 0x01FFFFFF;	
+	NS_HANDLER
+		NSLog(@"Could not get GT crate mask!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER
+	return aValue;	
 }
 
 - (void) clearTheControlRegister
 {
-	[self write:kMtcControlReg value:0];
+	NS_DURING
+		[self write:kMtcControlReg value:0];
+		NSLog(@"Cleared Control Reg\n");
+	NS_HANDLER
+		NSLog(@"Could not clear control reg!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 - (void) resetTheMemory
 {
-	//Clear the MTC/D memory, the fifo write pointer and the BBA Register
-	[self write:kMtcBbaReg value:0];
-	[self setBits:kMtcControlReg mask:MTC_CSR_FIFO_RESET];
-	[self clrBits:kMtcControlReg mask:MTC_CSR_FIFO_RESET];
+	NS_DURING
+		//Clear the MTC/D memory, the fifo write pointer and the BBA Register
+		[self write:kMtcBbaReg value:0];
+		[self setBits:kMtcControlReg mask:MTC_CSR_FIFO_RESET];
+		[self clrBits:kMtcControlReg mask:MTC_CSR_FIFO_RESET];
+		NSLog(@"Reset MTC memory\n");
+	NS_HANDLER
+		NSLog(@"Could not reset MTC memory!\n");					
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 - (void) setTheGTCounter:(unsigned long) theGTCounterValue
@@ -1000,10 +1123,10 @@ int mtcDacIndexes[14]=
 		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENGT];
 		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENGT];
 		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENGT];
-	
+		NSLog(@"Loaded the GT counter\n");			
 	NS_HANDLER
 		NSLog(@"Could not load the MTC GT counter!\n");			
-	
+		[localException raise];
 	NS_ENDHANDLER
 }
 
@@ -1091,6 +1214,7 @@ int mtcDacIndexes[14]=
 		[self getThe10MHzCounterLow:&lower high:&upper];
 		theValue =  ((double) 4294967296.0 * (double)upper + (double)lower) * 1e-7;
 	NS_HANDLER
+		[localException raise];
 	NS_ENDHANDLER
 	return theValue;
 }
@@ -1108,6 +1232,10 @@ int mtcDacIndexes[14]=
 
 }
 
+- (void) load10MHzClock
+{
+	[self setThe10MHzCounterLow:uLongDBValue(kLow10MhzClock) high:uLongDBValue(kHigh10MhzClock)];
+}
 
 // SetThe10MHzCounter
 - (void) setThe10MHzCounterLow:(unsigned long) lowerValue high:(unsigned long) upperValue
@@ -1136,17 +1264,28 @@ int mtcDacIndexes[14]=
 		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
 		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
 		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_EN10];
+		NSLog(@"Loaded 10MHz counter\n");
 
 	NS_HANDLER
 		NSLog(@"Could not load the 10MHz counter!\n");
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
 	NS_ENDHANDLER
 }
 
 
 - (void) getThe10MHzCounterLow:(unsigned long*) lowerValue high:(unsigned long*) upperValue
 {
-	*lowerValue = [self read:kMtcC10_0_31Reg];
-	*upperValue = [self read:kMtcC10_32_52Reg] & 0x001fffffUL;
+	*lowerValue = 0;
+	*upperValue  = 0;
+	NS_DURING
+		*lowerValue = [self read:kMtcC10_0_31Reg];
+		*upperValue = [self read:kMtcC10_32_52Reg] & 0x001fffffUL;
+	NS_HANDLER
+		NSLog(@"Could not get 10MHz counter values!\n");		
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
+	NS_ENDHANDLER
 }
 
 - (void) setTheLockoutWidth:(unsigned short) theLockoutWidthValue
@@ -1167,7 +1306,8 @@ int mtcDacIndexes[14]=
 	
 	NS_HANDLER
 		NSLog(@"Could not load the MTC GT lockout width!\n");		
-	
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];
 	NS_ENDHANDLER
 }
 
@@ -1186,6 +1326,7 @@ int mtcDacIndexes[14]=
 	
 	NS_HANDLER
 		NSLog(@"Could not load the MTC pedestal width!\n");	
+		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
 	
 	NS_ENDHANDLER
@@ -1205,10 +1346,10 @@ int mtcDacIndexes[14]=
 		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPR];
 		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPR];
 		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPR];
-
 	
 	NS_HANDLER
 		NSLog(@"Could not load the MTC prescale value!\n");		
+		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
 	
 	NS_ENDHANDLER
@@ -1232,6 +1373,7 @@ int mtcDacIndexes[14]=
 	
 	NS_HANDLER
 		NSLog(@"Could not setup the MTC PULSE_GT delays!\n");	
+		NSLog(@"Exception: %@\n",localException);
 		[localException raise];			
 	
 	NS_ENDHANDLER
@@ -1254,22 +1396,40 @@ int mtcDacIndexes[14]=
 		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPW];
 		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPW];
 		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPW];
+		NSLog(@"Set GT Coarse Delay to 0x%02x\n",aValue);
 
 	NS_HANDLER
 		NSLog(@"Could not setup the MTC GT course delay!\n");			
+		NSLog(@"Exception: %@\n",localException);
 		[localException raise];			
 	
 	NS_ENDHANDLER
 }
 
-- (void) setupGTFineDelay:(unsigned short) theAddelValue
+- (void) setupGTFineDelay:(unsigned short) aValue
 {	
-	[self write:kMtcAddelReg value:theAddelValue];
+	NS_DURING
+		[self write:kMtcAddelReg value:aValue];
+		NSLog(@"Set GT Fine Delay to 0x%02x\n",aValue);
+	NS_HANDLER
+		NSLog(@"Could not set GT fine delay!\n");			
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];			
+	
+	NS_ENDHANDLER
 }
 
 - (void) setThePulserRate:(float) thePulserPeriodValue
 {
-	[self setThePulserRate:thePulserPeriodValue setToInfinity:NO];
+	NS_DURING
+		[self setThePulserRate:thePulserPeriodValue setToInfinity:NO];
+		NSLog(@"Set GT Pusler rate\n");			
+	NS_HANDLER
+		NSLog(@"Could not set GT Pusler rate!\n");			
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];			
+	
+	NS_ENDHANDLER
 }
 
 - (void) setThePulserRate:(float) thePulserPeriodValue setToInfinity:(BOOL) setToInfinity
@@ -1298,13 +1458,10 @@ int mtcDacIndexes[14]=
 
 		}		
 
-//		float frequencyValue = (float)( 781.25/((float)pulserShiftValue + 1.0) );					// in KHz
-//		if (frequencyValue < 0.001)
-//			NSLog(@"Pulser frequency set @ %3.10f mHz.\n",(frequencyValue * 1000000.0));
-//		else if (frequencyValue <= 1.0)
-//			NSLog(@"Pulser frequency set @ %3.10f Hz.\n",(frequencyValue * 1000.0));
-//		else if (frequencyValue > 1.0)		
-//			NSLog(@"Pulser frequency set @ %3.4f KHz.\n",frequencyValue);
+		float frequencyValue = (float)( 781.25/((float)pulserShiftValue + 1.0) );					// in KHz
+		if (frequencyValue < 0.001)		NSLog(@"Pulser frequency set @ %3.10f mHz.\n",(frequencyValue * 1000000.0));
+		else if (frequencyValue <= 1.0)	NSLog(@"Pulser frequency set @ %3.10f Hz.\n",(frequencyValue * 1000.0));
+		else if (frequencyValue > 1.0)	NSLog(@"Pulser frequency set @ %3.4f KHz.\n",frequencyValue);
 
 	
 	NS_HANDLER
@@ -1316,29 +1473,59 @@ int mtcDacIndexes[14]=
 
 - (void) loadEnablePulser
 {
-	[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-	[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
-	[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
+	NS_DURING
+		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
+		[self setBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
+		[self clrBits:kMtcControlReg mask:MTC_CSR_LOAD_ENPS];
+		NSLog(@"loaded/enabled the pulser!\n");		
+	NS_HANDLER
+		NSLog(@"Unable to load/enable the pulser!\n");		
+		[localException raise];	
+	NS_ENDHANDLER
 }
 
 - (void) enablePulser
 {
-	[self setBits:kMtcControlReg mask:MTC_CSR_PULSE_EN];
+	NS_DURING
+		[self setBits:kMtcControlReg mask:MTC_CSR_PULSE_EN];
+		NSLog(@"Enabled Pulser!\n");		
+	NS_HANDLER
+		NSLog(@"Unable to enable the pulser!\n");		
+		[localException raise];	
+	NS_ENDHANDLER
 }
 
 - (void) disablePulser
 {
-	[self clrBits:kMtcControlReg mask:MTC_CSR_PULSE_EN];
+	NS_DURING
+		[self clrBits:kMtcControlReg mask:MTC_CSR_PULSE_EN];
+		NSLog(@"Disabled Pedestals!\n");		
+	NS_HANDLER
+		NSLog(@"Unable to disable the pulser!\n");		
+		[localException raise];	
+	NS_ENDHANDLER
 }
 
 - (void)  enablePedestal
 {
-	[self setBits:kMtcControlReg mask:MTC_CSR_PED_EN];
+	NS_DURING
+		[self setBits:kMtcControlReg mask:MTC_CSR_PED_EN];
+		NSLog(@"Enabled Pedestals!\n");		
+	NS_HANDLER
+		NSLog(@"Unable to enable the Pedestals!\n");		
+		[localException raise];	
+	NS_ENDHANDLER
 }
 
 - (void)  disablePedestal
 {
-	[self clrBits:kMtcControlReg mask:MTC_CSR_PED_EN];
+	NS_DURING
+		[self clrBits:kMtcControlReg mask:MTC_CSR_PED_EN];
+		NSLog(@"Disabled Pedestals!\n");		
+	NS_HANDLER
+		NSLog(@"Unable to disable the Pedestals!\n");		
+		[localException raise];	
+	NS_ENDHANDLER
 }
 
 - (void) fireMTCPedestalsFixedRate
@@ -1349,12 +1536,9 @@ int mtcDacIndexes[14]=
 	NS_DURING
 		[self basicMTCPedestalGTrigSetup];								//STEP 1: Perfom the basic setup for pedestals and gtrigs
 		[self setupPulserRateAndEnable:uLongDBValue(kPulserPeriod)];	// STEP 2 : Setup pulser rate and enable
-
-	
 	NS_HANDLER
 		NSLog(@"MTC failed to fire pedestals at the specified settings!\n");		
 		[localException raise];	
-	
 	NS_ENDHANDLER
 }
 
@@ -1370,8 +1554,6 @@ int mtcDacIndexes[14]=
 		[self setTheLockoutWidth: uLongDBValue(kLockOutWidth)];		// STEP 5: Set the GT lockout width in ns	
 		[self setThePedestalWidth: uLongDBValue(kPedestalWidth)];		// STEP 6:Set the Pedestal width in ns
 		[self setSingleGTWordMask: uLongDBValue(kGtMask)];				// STEP 7:Mask in global trigger word(MASK)
-	
-	
 	NS_HANDLER
 		NSLog(@"Failure during MTC pedestal setup!\n");
 		[localException raise];
@@ -1410,7 +1592,6 @@ int mtcDacIndexes[14]=
 		[self clearSingleGTWordMask:MTC_EXT_8_MASK];
 		[self disablePulser];
 		[self disablePedestal];
-	
 	NS_HANDLER
 		NSLog(@"couldn't fire pedestal\n");
 		[localException raise];
@@ -1432,7 +1613,7 @@ int mtcDacIndexes[14]=
 	
 	NS_HANDLER
 		NSLog(@"Could not perform basic MTC reset!\n");
-	
+		[localException raise];
 	NS_ENDHANDLER
 }
 
@@ -1496,11 +1677,11 @@ int mtcDacIndexes[14]=
 
 		// STEP 5: Set DACSEL in Register 2 low[in hardware it's inverted -- i.e. it is set high], with all other bits low
 		[self write:kMtcDacCntReg value:0];
+		NSLog(@"Loaded the MTC/A DACs\n");
 	
 	NS_HANDLER
-		NSLog(@"Could not load the MTC/A DACs!\n");
-	
-	
+		NSLog(@"Could not load the MTC/A DACs!\n");		
+		[localException raise];
 	NS_ENDHANDLER
 		
 
@@ -1560,6 +1741,7 @@ int mtcDacIndexes[14]=
 	
 	NS_HANDLER
 		NSLog(@"Failed to load Tub serial register\n");
+		[localException raise];
 	NS_ENDHANDLER
 }
 
@@ -1634,6 +1816,7 @@ int mtcDacIndexes[14]=
 		}
 	NS_HANDLER
 		NSLog(@"Mtc basic op exception: %@\n",localException);
+		[localException raise];
 	NS_ENDHANDLER
 }
 
@@ -1820,8 +2003,7 @@ int mtcDacIndexes[14]=
 			[NSException raise:@"Xilinx load failed" format:@""];
 		}
 		else {
-			NSLog(@"Looks like success\n");
-			NSLog(@"Xilinx file sent to the SBC. Status: %d\n",errorCode);
+			NSLog(@"Looks like success. (Program Reg reported Successful load)\n");
 		}
 	NS_HANDLER
 		NSLog(@"Xilinx load failed for the MTC/D.\n");
