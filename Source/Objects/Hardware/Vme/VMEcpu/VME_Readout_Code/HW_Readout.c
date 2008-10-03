@@ -391,7 +391,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
             case kCaen:         index = Readout_CAEN(config,index,lamData);         break;
             case kSBCLAM:       index = Readout_LAM_Data(config,index,lamData);     break;
             case kCaen1720:     index = Readout_CAEN1720(config,index,lamData);		break;
-            case kMtc:			index = Readout_Mtc(config,index,lamData);			break;
+            case kMtc:			index = Readout_MTC(config,index,lamData);			break;
             case kFec:			index = Readout_Fec(config,index,lamData);			break;
             default:            index = -1;                                         break;
         }
@@ -403,7 +403,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 /*************************************************************/
 /*             Reads out the Mtc card.                       */
 /*************************************************************/
-int32_t Readout_Mtc(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+int32_t Readout_MTC(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
 {
     uint32_t leaf_index;
     //uint32_t baseAddress            = config->card_info[index].base_add;
