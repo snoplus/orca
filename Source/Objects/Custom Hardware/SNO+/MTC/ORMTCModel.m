@@ -86,20 +86,20 @@ static SnoMtcNamesStruct reg[kMtcNumRegisters] = {
 };
 
 static SnoMtcDBInfoStruct dbLookUpTable[kDbLookUpTableSize] = {
-	{ @"MTC/D,LockOutWidth",	   	@"1.1" },   //0
-	{ @"MTC/D,PedestalWidth",		@"1.2" },   //1
-	{ @"MTC/D,Nhit100LoPrescale",	@"1.3" },   //2
-	{ @"MTC/D,PulserPeriod",		@"1.4" },   //3
-	{ @"MTC/D,Low10MhzClock",		@"1.5" },   //4
-	{ @"MTC/D,High10MhzClock",		@"1.6" },   //5
-	{ @"MTC/D,FineSlope",			@"1.7" },   //6
-	{ @"MTC/D,MinDelayOffset",		@"1.8" },   //7
-	{ @"MTC/D,CoarseDelay",			@"1.9" },   //8
-	{ @"MTC/D,FineDelay",			@"2.0" },   //9
-	{ @"MTC/D,GtMask",				@"32000" }, //10
-	{ @"MTC/D,GtCrateMask",			@"16" },	//11
-	{ @"MTC/D,PEDCrateMask",		@"32" },	//12
-	{ @"MTC/D,ControlMask",			@"1" },		//13
+	{ @"MTC/D,LockOutWidth",	   	@"420" },   //0
+	{ @"MTC/D,PedestalWidth",		@"52" },   //1
+	{ @"MTC/D,Nhit100LoPrescale",	@"1" },   //2
+	{ @"MTC/D,PulserPeriod",		@"10.0" },   //3
+	{ @"MTC/D,Low10MhzClock",		@"0" },   //4
+	{ @"MTC/D,High10MhzClock",		@"0" },   //5
+	{ @"MTC/D,FineSlope",			@"0.0" },   //6
+	{ @"MTC/D,MinDelayOffset",		@"18.0" },   //7
+	{ @"MTC/D,CoarseDelay",			@"60" },   //8
+	{ @"MTC/D,FineDelay",			@"0" },   //9
+	{ @"MTC/D,GtMask",				@"0" }, //10
+	{ @"MTC/D,GtCrateMask",			@"0" },	//11
+	{ @"MTC/D,PEDCrateMask",		@"0" },	//12
+	{ @"MTC/D,ControlMask",			@"0" },		//13
 	
 	//defaults for the MTC A NHit
 	{ @"MTC/A,NHit100Hi,Threshold",	@"1"},		//14
@@ -908,8 +908,8 @@ int mtcDacIndexes[14]=
 	NS_ENDHANDLER
 	
 }
-#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedShortValue]
-#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] unsignedLongValue]
+#define uShortDBValue(A) [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] intValue]
+#define uLongDBValue(A)  [[mtcDataBase objectForNestedKey:[self getDBKeyByIndex: A]] longLongValue]
 
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
 {
@@ -1794,11 +1794,11 @@ int mtcDacIndexes[14]=
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doBasicOp) object:nil];
 		if(useMemory){
 			if(doReadOp){
-				NSLog(@"%@: %d\n",reg[selectedRegister].regName,[self read:selectedRegister]);
+				NSLog(@"%@: 0x%08x\n",reg[selectedRegister].regName,[self read:selectedRegister]);
 			}
 			else {
 				[self write:selectedRegister value:writeValue];
-				NSLog(@"Wrote %d to %@\n",writeValue,reg[selectedRegister].regName);
+				NSLog(@"Wrote 0x%08x to %@\n",writeValue,reg[selectedRegister].regName);
 			}
 		}
 		else {
