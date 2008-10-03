@@ -51,10 +51,10 @@ void loadXilinx(SBC_Packet* aPacket)
 	
 	//pull the addresses and offsets from the payload
 	uint32_t baseAddress    = p->baseAddress;
-	int32_t addressModifier = p->addressModifier;
-	int32_t programReg      = baseAddress + p->programRegOffset;
-	int32_t fileSize        = p->fileSize;
-	int32_t lastByte		= fileSize;
+	uint32_t addressModifier = p->addressModifier;
+	uint32_t programReg      = baseAddress + p->programRegOffset;
+	uint32_t fileSize        = p->fileSize;
+	uint32_t lastByte		= fileSize;
 	uint8_t* charData		= (uint8_t*)p;			//recast p so we can treat it like a char ptr.
 	charData += sizeof(SNOMtc_XilinxLoadStruct);	//point to the file data
 	
