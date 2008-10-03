@@ -886,7 +886,7 @@ int mtcDacIndexes[14]=
 		[[seq forTarget:self] loadTheMTCADacs];										// STEP 5: Load the DACs	
 		[[seq forTarget:self] clearTheControlRegister];								// STEP 6: Clear the Control Register
 		[[seq forTarget:self] zeroTheGTCounter];									// STEP 7: Clear the GT Counter
-		[[seq forTarget:self] setTheLockoutWidth:uShortDBValue(kLockOutWidth)];	// STEP 8: Set the Lockout Width	
+		[[seq forTarget:self] setTheLockoutWidth:uShortDBValue(kLockOutWidth)];		// STEP 8: Set the Lockout Width	
 		[[seq forTarget:self] setThePrescaleValue];									// STEP 9:  Load the NHIT 100 LO prescale value
 		[[seq forTarget:self] setThePulserRate:uLongDBValue(kPulserPeriod)];		// STEP 10: Load the Pulser
 		[[seq forTarget:self] setThePedestalWidth:uLongDBValue(kPedestalWidth)];	// STEP 11: Set the Pedestal Width

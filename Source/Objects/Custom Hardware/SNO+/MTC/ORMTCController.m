@@ -302,7 +302,7 @@
 	[coarseDelayField		setFloatValue:	[model dbFloatByIndex: kCoarseDelay]];
 	[fineDelayField			setFloatValue:	[model dbFloatByIndex: kFineDelay]];
 	
-	[self loadMasks];
+	[self displayMasks];
 
 	//load the nhit values
 	int col,row;
@@ -371,7 +371,7 @@
 	[xilinxFilePathField setStringValue: [xilinxFile stringByAbbreviatingWithTildeInPath]];
 }
 
-- (void) loadMasks
+- (void) displayMasks
 {
 	int i;
 	int maskValue = [model dbIntByIndex: kGtMask];
@@ -621,11 +621,6 @@
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender 
 {
 	[model initializeMtc:NO load10MHzClock:NO]; 
-}
-
-- (IBAction) standardMakeOnlineCrateMasks:(id) sender 
-{
-	[self buttonPushed:sender];
 }
 
 - (IBAction) standardLoad10MHzCounter:(id) sender 

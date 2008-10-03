@@ -123,7 +123,7 @@
 - (void) regBaseAddressChanged:(NSNotification*)aNote;
 - (void) memBaseAddressChanged:(NSNotification*)aNote;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
-- (void) loadMasks;
+- (void) displayMasks;
 - (void) lastFileLoadedChanged:(NSNotification*)aNote;
 - (void) sequenceRunning:(NSNotification*)aNote;
 - (void) sequenceStopped:(NSNotification*)aNote;
@@ -157,7 +157,6 @@
 - (IBAction) standardInitMTCnoXilinx:(id) sender;
 - (IBAction) standardInitMTCno10MHz:(id) sender;
 - (IBAction) standardInitMTCnoXilinxno10MHz:(id) sender;
-- (IBAction) standardMakeOnlineCrateMasks:(id) sender;
 - (IBAction) standardLoad10MHzCounter:(id) sender;
 - (IBAction) standardLoadOnlineGTMasks:(id) sender;
 - (IBAction) standardLoadMTCADacs:(id) sender;
