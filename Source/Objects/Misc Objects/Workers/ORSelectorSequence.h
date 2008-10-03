@@ -19,12 +19,15 @@
 //-------------------------------------------------------------
 
 @interface ORSelectorSequence : NSObject {
-	int						tag;
-	NSMutableArray*			tasks;
-	NSMutableDictionary*	nextTask;
-	int startCount;
-	id delegate;
+	@private
+		id  delegate;
+		int	tag;
+		int startCount;
+	
+		NSMutableArray*			selectors;
+		NSMutableDictionary*	nextSelector;
 }
+
 + (id) selectorSequenceWithDelegate:(id)aDelegate;
 - (id) initWithDelegate:(id)aDelegate;
 - (void) dealloc;
@@ -37,7 +40,7 @@
 @end
 
 @interface NSObject (ORSelectorSequence)
-- (void) tasksCompleted:(id)sender;
+- (void) sequenceCompleted:(id)sender;
 @end
 
 extern NSString* ORSequenceRunning;

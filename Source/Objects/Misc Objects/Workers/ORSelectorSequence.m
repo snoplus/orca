@@ -46,9 +46,26 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSequenceStopped 
 														object:delegate
 													  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:tag],@"tag",nil]];
-	[tasks release];
-	[nextTask release];
+	[selectors release];
+	[nextSelector release];
 	[super dealloc];
+}
+
+//--------------------------------------------------------------
+//Here's the meat of this object. Call it like:
+// [[seq forTarget:aTarget] setX:x y:y];
+//
+// Since this object doesn't implement it the selector will fall 
+// thru to the forwardInvocation method, 
+// turned into an NSInvocation, and added to the list to sequence
+// thru when the sequence is started.
+//----------------------------------------------------------------
+- (id) forTarget:(id)aTarget
+{
+	if(nextSelector)[nextSelector release];
+	nextSelector = [[NSMutableDictionary dictionary] retain];
+	[nextSelector setObject:aTarget forKey:@"target"];
+	return self;
 }
 
 - (void) setTag:(int)aTag
@@ -56,17 +73,9 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 	tag = aTag;
 }
 
-- (id) forTarget:(id)aTarget
-{
-	if(nextTask)[nextTask release];
-	nextTask = [[NSMutableDictionary dictionary] retain];
-	[nextTask setObject:aTarget forKey:@"target"];
-	return self;
-}
-
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
 {
-	id target = [nextTask objectForKey:@"target"];
+	id target = [nextSelector objectForKey:@"target"];
 		
 	if(target && ![self respondsToSelector:aSelector]){
 		return [target methodSignatureForSelector:aSelector];
@@ -78,12 +87,12 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 
 - (void) forwardInvocation:(NSInvocation *)invocation
 {
-	if(nextTask){
-		[nextTask setObject:invocation forKey:@"invocation"];
-		if(!tasks)tasks = [[NSMutableArray array] retain];
-		[tasks addObject: nextTask];
-		[nextTask release];
-		nextTask = nil;
+	if(nextSelector){
+		[nextSelector setObject:invocation forKey:@"invocation"];
+		if(!selectors)selectors = [[NSMutableArray array] retain];
+		[selectors addObject: nextSelector];
+		[nextSelector release];
+		nextSelector = nil;
 	}
 }
 
@@ -92,7 +101,7 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSequenceRunning 
 														object:delegate
 													  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:tag],@"tag",nil]];
-	startCount = [tasks count];
+	startCount = [selectors count];
 	[self retain];
 	[self performSelector:@selector(doOneItem) withObject:nil afterDelay:0];
 }
@@ -100,10 +109,10 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 - (void) stopSequence
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[tasks release];
-	tasks = nil;
+	[selectors release];
+	selectors = nil;
 	[self autorelease];
-	[delegate tasksCompleted:self];
+	[delegate sequenceCompleted:self];
 }
 
 @end
@@ -113,15 +122,15 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	NS_DURING
-		if([tasks count]){
-			NSMutableDictionary* theTask = [tasks objectAtIndex:0];
+		if([selectors count]){
+			NSMutableDictionary* theTask = [selectors objectAtIndex:0];
 			
 			id target					 = [theTask objectForKey:@"target"];
 			NSInvocation* theInvocation  = [theTask objectForKey:@"invocation"];
 		
 			[theInvocation invokeWithTarget:target];
-			[tasks removeObject:theTask];
-			float progress = 100. - 100.*[tasks count]/(float)startCount;
+			[selectors removeObject:theTask];
+			float progress = 100. - 100.*[selectors count]/(float)startCount;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORSequenceProgress 
 																object:delegate
 																userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:progress],@"progress",[NSNumber numberWithInt:tag],@"tag",nil]];
@@ -130,7 +139,7 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 
 		}
 		else {
-			if([delegate respondsToSelector:@selector(tasksCompleted:)]) [delegate tasksCompleted:self];
+			if([delegate respondsToSelector:@selector(sequenceCompleted:)]) [delegate sequenceCompleted:self];
 			[self autorelease];
 		}
 	
