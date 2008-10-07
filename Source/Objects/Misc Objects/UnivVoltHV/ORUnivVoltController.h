@@ -21,6 +21,7 @@
 #import "OrcaObjectController.h"
 //#import "ORCard.h"
 
+
 @interface ORUnivVoltController : OrcaObjectController {
 	IBOutlet NSTableView*			mChnlTable;
 	IBOutlet NSButton*				mChnlEnabled;
@@ -65,6 +66,8 @@
 - (IBAction) setRampDownRate: (id) aSender;
 - (IBAction) setMVDZ: (id) aSender;
 - (IBAction) setMCDZ: (id) aSender;
+- (IBAction) setHardwareValues: (id) aSender;
+- (IBAction) hardwareValues: (id) aSender;
 //- (IBAction) updateTable: (id) aSender;
 
 #pragma mark ***Getters

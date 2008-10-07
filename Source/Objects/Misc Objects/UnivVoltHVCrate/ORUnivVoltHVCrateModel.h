@@ -43,6 +43,7 @@ typedef enum hveCommands hveCommands;
     BOOL			mIsConnected;
 	NetSocket*		mSocket;
 	ORQueue*		mQueue;
+	NSDictionary*	mReturnToUnit;
 }
 
 #pragma mark •••Accessors
@@ -51,6 +52,7 @@ typedef enum hveCommands hveCommands;
 - (NSString*) ethernetConfig;
 - (NSString*) config;
 - (NetSocket*) socket;
+- (NSDictionary*) returnDataToHVUnit;
 
 #pragma mark •••Notifications
 //- (void) registerNotificationObservers;
@@ -68,7 +70,7 @@ typedef enum hveCommands hveCommands;
 - (void) hvOff;
 - (void) hvPanic;
 - (void) connect;
-- (void) sendCommand: (NSString*) aCommand;
+- (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand;
 
 
 #pragma mark ***Utilities
@@ -81,17 +83,20 @@ typedef enum hveCommands hveCommands;
 @end
 
 #pragma mark ***Notification string definitions.
-extern NSString* ORUVHVCrateIsConnectedChangedNotification;
-extern NSString* ORUVHVCrateIpAddressChangedNotification;
+extern NSString* UVHVCrateIsConnectedChangedNotification;
+extern NSString* UVHVCrateIpAddressChangedNotification;
 //extern NSString* ORUnivVoltHVCrateHVStatusChangedNotification;
-extern NSString* ORUVHVCrateHVStatusAvailableNotification;
-extern NSString* ORUVHVCrateConfigAvailableNotification;
-extern NSString* ORUVHVCrateEnetAvailableNotification;
-extern NSString* ORUnitInfoAvailableNotification;
+extern NSString* UVHVCrateHVStatusAvailableNotification;
+extern NSString* UVHVCrateConfigAvailableNotification;
+extern NSString* UVHVCrateEnetAvailableNotification;
+extern NSString* UVHVUnitInfoAvailableNotification ;
 
-#pragma mark •••Constants for command queue
-extern NSString* UVkUnit;
+#pragma mark •••Constants for command queue dictionary entry and data return dictionary.
+// Data return dictionary extern definitions.
+extern NSString* UVkSlot;
 extern NSString* UVkChnl;
 extern NSString* UVkCommand;
+extern NSString* UVkReturn;
+
 
 

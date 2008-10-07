@@ -45,17 +45,17 @@
 
     [notifyCenter addObserver : self
                      selector : @selector( channelEnabledChanged:)
-                         name : ORUVChnlEnabledChanged
+                         name : UVChnlEnabledChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector( demandHVChanged:)
-                         name : ORUVChnlDemandHVChanged
+                         name : UVChnlDemandHVChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector( measuredHVChanged:)
-                         name : ORUVChnlMeasuredHVChanged
+                         name : UVChnlMeasuredHVChanged
 						object: model];
 
 /*
@@ -65,37 +65,37 @@
 */
    [notifyCenter addObserver : self
                      selector : @selector( rampUpRateChanged:)
-                         name : ORUVChnlRampUpRateChanged
+                         name : UVChnlRampUpRateChanged
 						object: model];
 
    [notifyCenter addObserver : self
                      selector : @selector( rampDownRateChanged:)
-                         name : ORUVChnlRampDownRateChanged
+                         name : UVChnlRampDownRateChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector( tripCurrentChanged:)
-                         name : ORUVChnlTripCurrentChanged
+                         name : UVChnlTripCurrentChanged
 						object: model];
 
 	[notifyCenter addObserver : self
                      selector : @selector( statusChanged:)
-                         name : ORUVChnlMVDZChanged
+                         name : UVChnlMVDZChanged
 						object: model];
 						
    [notifyCenter addObserver : self
                      selector : @selector( MVDZChanged:)
-                         name : ORUVChnlMVDZChanged
+                         name : UVChnlMVDZChanged
 						object: model];
 						
     [notifyCenter addObserver : self
                      selector : @selector( MCDZChanged:)
-                         name : ORUVChnlMVDZChanged
+                         name : UVChnlMVDZChanged
 						object: model];
 						
     [notifyCenter addObserver : self
                      selector : @selector( hvLimitChanged:)
-                         name : ORUVChnlHVLimitChanged
+                         name : UVChnlHVLimitChanged
 						object: model];						
 }
 
@@ -183,6 +183,20 @@
 	[mHVLimit setFloatValue: [model HVLimit: mCurrentChnl]];
 }
 
+- (IBAction) updateTable: (id) aSender
+{
+	[mChnlTable reloadData];	
+}
+
+- (IBAction) hardwareValues: (id) aSender
+{
+}
+
+- (IBAction) setHardwareValues: (id) aSender
+{
+}
+
+
 /*- (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
@@ -260,14 +274,7 @@
 }
 
 
-/*- (void) demandHV: (NSNotification*) aNote
-{
-	float demandHV = [model demandHV: mCurrentChnl];
-	[mDemandHV setFloatValue: demandHV];
-//	NSString* demandHV = [NSString stringWithString: [mDemandHV stringValue]];
-
-}
-*/
+#pragma mark ***Code no longer used.
 /*
 - (IBAction) setChnlEnabled: (id) aSender
 {
@@ -319,10 +326,6 @@
 	[tmpChnl setObject: MCDZ forKey: ORHVkMCDZ];
 }
 */
-- (IBAction) updateTable: (id) aSender
-{
-	[mChnlTable reloadData];	
-}
 
 #pragma mark •••Table handling routines
 - (int) numberOfRowsInTableView: (NSTableView*) aTableView
@@ -361,18 +364,18 @@
 	[model printDictionary: mCurrentChnl];
 	
 	[mChnlEnabled setState: state];
-	[mMeasuredCurrent setStringValue: [tmpChnl objectForKey: ORHVkMeasuredCurrent]];
-	[mMeasuredHV setStringValue: [tmpChnl objectForKey: ORHVkMeasuredHV]];
-	[mDemandHV setStringValue: [tmpChnl objectForKey: ORHVkDemandHV] ];
-	[mRampUpRate setStringValue: [tmpChnl objectForKey: ORHVkRampUpRate]];
-	[mRampDownRate setStringValue: [tmpChnl objectForKey: ORHVkRampDownRate]];
-	[mTripCurrent setStringValue: [tmpChnl objectForKey: ORHVkTripCurrent]];
-	[mMVDZ setStringValue: [tmpChnl objectForKey: ORHVkMVDZ]];
-	[mMCDZ setStringValue: [tmpChnl objectForKey: ORHVkMCDZ]];
-	[mHVLimit setStringValue: [tmpChnl objectForKey: ORHVkHVLimit]];
+	[mMeasuredCurrent setStringValue: [tmpChnl objectForKey: HVkMeasuredCurrent]];
+	[mMeasuredHV setStringValue: [tmpChnl objectForKey: HVkMeasuredHV]];
+	[mDemandHV setStringValue: [tmpChnl objectForKey: HVkDemandHV] ];
+	[mRampUpRate setStringValue: [tmpChnl objectForKey: HVkRampUpRate]];
+	[mRampDownRate setStringValue: [tmpChnl objectForKey: HVkRampDownRate]];
+	[mTripCurrent setStringValue: [tmpChnl objectForKey: HVkTripCurrent]];
+	[mMVDZ setStringValue: [tmpChnl objectForKey: HVkMVDZ]];
+	[mMCDZ setStringValue: [tmpChnl objectForKey: HVkMCDZ]];
+	[mHVLimit setStringValue: [tmpChnl objectForKey: HVkHVLimit]];
 	
 	// status case statement
-	status =  [[tmpChnl objectForKey: ORHVkStatus] intValue];
+	status =  [[tmpChnl objectForKey: HVkStatus] intValue];
 	switch ( status ) {
 		case eHVUEnabled:
 			[mStatus setStringValue: @"Enabled"];

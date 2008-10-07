@@ -62,28 +62,28 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
     [notifyCenter addObserver : self
                      selector : @selector( isConnectedChanged: )
-                         name : ORUVHVCrateIsConnectedChangedNotification
+                         name : UVHVCrateIsConnectedChangedNotification
                        object : model];
 					   
 					
     [notifyCenter addObserver : self
                      selector : @selector( ipAddressChanged: )
-                         name : ORUVHVCrateIpAddressChangedNotification
+                         name : UVHVCrateIpAddressChangedNotification
                        object : model];
 					   
     [notifyCenter addObserver : self
                      selector : @selector( displayHVStatus: )
-                         name : ORUVHVCrateHVStatusAvailableNotification
+                         name : UVHVCrateHVStatusAvailableNotification
                        object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector( displayConfig: )
-                         name : ORUVHVCrateConfigAvailableNotification
+                         name : UVHVCrateConfigAvailableNotification
                        object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector( displayEnet: )
-                         name : ORUVHVCrateEnetAvailableNotification
+                         name : UVHVCrateEnetAvailableNotification
                        object : model];
 }
 
