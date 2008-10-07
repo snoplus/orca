@@ -32,6 +32,7 @@ NSString* UVHVCrateHVStatusAvailableNotification		= @"UVHVCrateHVStatusAvailable
 NSString* UVHVCrateConfigAvailableNotification			= @"UVHVCrateConfigAvailableNotification";
 NSString* UVHVCrateEnetAvailableNotification		    = @"UVHVCrateEnetAvailableNotification";
 NSString* UVHVUnitInfoAvailableNotification             = @"UVHVUnitInfoAvailableNotification";
+NSString* UVHVSocketNotConnectedNotification			= @"UVHVSocketNotConnectedNotification";
 
 // HV Module commands
 NSString* ORHVkCrateHVStatus							= @"HVSTATUS";
@@ -48,6 +49,8 @@ NSString* UVkSlot	 = @"Slot";
 NSString* UVkChnl    = @"Chnl";
 NSString* UVkCommand = @"Command";
 NSString* UVkReturn  = @"Return";
+
+NSString* UVkErrorMsg = @"ErrorMsg";
 
 @implementation ORUnivVoltHVCrateModel
 
@@ -254,7 +257,16 @@ NSString* UVkReturn  = @"Return";
 		const char* buffer = [fullCommand cStringUsingEncoding: NSASCIIStringEncoding];
 		
 		NSLog( @"Command: %s,  length:%d", buffer, [fullCommand length] + 1 );
-		[mSocket write: buffer length: [aCommand length] + 1];	
+		if (mSocket != nil )
+		{
+			[mSocket write: buffer length: [aCommand length] + 1];	
+		}
+		else
+		{
+			NSString* errorMsg = [NSString stringWithFormat: @"Socket not connected for HV Crate."];
+			NSDictionary* errorMsgDict = [NSDictionary dictionaryWithObject: errorMsg forKey: UVkErrorMsg];
+			[[NSNotificationCenter defaultCenter] postNotificationName: UVHVSocketNotConnectedNotification object: self userInfo: errorMsgDict];
+		}
 	}	
 	@catch (NSException *exception) {
 
@@ -353,18 +365,18 @@ NSString* UVkReturn  = @"Return";
 			if ( [retCommand isEqualTo: ORHVkCrateHVStatus] )
 			{
 				NSLog( @"Send notification about HVStatus.");
-//				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
 			}
 			else if ( [retCommand isEqualTo: ORHVkCrateConfig] )
 			{
 				NSLog( @"Send notification about Config.");
-//				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
+				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
 			}
 		
 			else if ( [retCommand isEqualTo: ORHVkCrateEnet] )
 			{
 				NSLog( @"Send notification about Enet.");
-//				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
+				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
 			}
 //		
 			// notify HV unit about return from command.

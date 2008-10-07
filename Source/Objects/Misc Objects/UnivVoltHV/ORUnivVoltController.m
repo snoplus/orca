@@ -21,6 +21,7 @@
 
 #import "ORUnivVoltController.h"
 #import "ORUnivVoltModel.h"
+#import "ORUnivVoltHVCrateModel.h"
 
 @implementation ORUnivVoltController
 - (id) init
@@ -57,6 +58,11 @@
                      selector : @selector( measuredHVChanged:)
                          name : UVChnlMeasuredHVChanged
 						object: model];
+						
+	[notifyCenter  addObserver: self
+	                  selector: @selector( writeErrorMsg: )
+					     name : UVHVSocketNotConnectedNotification
+					   object : nil];
 
 /*
     [notifyCenter addObserver : self
@@ -97,6 +103,12 @@
                      selector : @selector( hvLimitChanged:)
                          name : UVChnlHVLimitChanged
 						object: model];						
+
+	[notifyCenter  addObserver: self
+	                  selector: @selector( errorMsg: )
+					     name : UVHVSocketNotConnectedNotification
+					   object : nil];
+
 }
 
 
@@ -183,19 +195,11 @@
 	[mHVLimit setFloatValue: [model HVLimit: mCurrentChnl]];
 }
 
-- (IBAction) updateTable: (id) aSender
+- (void) writeErrorMsg: (NSNotification*) aNote
 {
-	[mChnlTable reloadData];	
+	NSDictionary* errorDict = [aNote userInfo];
+	[mCmdStatus setStringValue: [errorDict objectForKey: UVkErrorMsg]];
 }
-
-- (IBAction) hardwareValues: (id) aSender
-{
-}
-
-- (IBAction) setHardwareValues: (id) aSender
-{
-}
-
 
 /*- (void) checkGlobalSecurity
 {
@@ -230,22 +234,18 @@
 	mCurrentChnl = [mChannelStepperField intValue];
 	[mChannelNumberField setIntValue: mCurrentChnl];
 	[self setChnlValues: mCurrentChnl];
-	[self updateWindow];
+	// setChannelNumberField - updates display
 }
 
 - (IBAction) setChnlEnabled: (id) aSender
 {
 	int enabled = [mChnlEnabled state];
-	
-//	NSNumber* enabledObj = [NSNumber numberWithBool: enabled];
 
 	[model setChannelEnabled: enabled chnl: mCurrentChnl];
 }
 
 - (IBAction) setDemandHV: (id) aSender
-{
-	
-//	NSLog( @"Number of items in dictionary in setDemandHV: %d", [mChannelDict count] );
+{	
 	[model setDemandHV: [mDemandHV stringValue]];
 }
 - (IBAction) setTripCurrent: (id) aSender
@@ -272,6 +272,22 @@
 {
 	[model setMCDZ: [mMCDZ stringValue]];
 }
+
+- (IBAction) updateTable: (id) aSender
+{
+	[mChnlTable reloadData];	
+}
+
+- (IBAction) hardwareValues: (id) aSender
+{
+	[model getValues];
+}
+
+- (IBAction) setHardwareValues: (id) aSender
+{
+	[model loadValues];
+}
+
 
 
 #pragma mark ***Code no longer used.
@@ -359,7 +375,7 @@
 {
 	NSDictionary*	tmpChnl = [model channelDictionary: aCurrentChannel];
 	bool			state = [mChnlEnabled state];
-	int				status;
+//	int				status;
 
 	[model printDictionary: mCurrentChnl];
 	
@@ -375,41 +391,8 @@
 	[mHVLimit setStringValue: [tmpChnl objectForKey: HVkHVLimit]];
 	
 	// status case statement
-	status =  [[tmpChnl objectForKey: HVkStatus] intValue];
-	switch ( status ) {
-		case eHVUEnabled:
-			[mStatus setStringValue: @"Enabled"];
-			break;
-			
-		case eHVURampingUp:
-			[mStatus setStringValue: @"Ramping up"];
-			break;
-			
-		case eHVURampingDown:
-			[mStatus setStringValue: @"Ramping down"];
-			break;
-			
-		case evHVUTripForSupplyLimits:
-			[mStatus setStringValue: @"Trip for viol. spply lmt."];
-			break;
-			
-		case eHVUTripForUserCurrent:
-			[mStatus setStringValue: @"Trip for viol. current lmt."];
-			break;
-			
-		case eHVUTripForHVError:
-			[mStatus setStringValue: @"Trip of HV limit"];
-			break;
-			
-		case eHVUTripForHVLimit:
-			[mStatus setStringValue: @"Trip for viol. volt. lmt."];
-			break;
-			
-		default:
-			[mStatus setStringValue: @"unknown status"];
-			break;
-	}
-	
+	[mStatus setStringValue: [tmpChnl objectForKey: HVkStatus]];
+
 }
 
 

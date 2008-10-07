@@ -36,7 +36,8 @@
 	IBOutlet NSTextField*			mRampDownRate;
 	IBOutlet NSTextField*			mMVDZ;				// measured HV dead zone.  Reading has to change by more than this amount for measured HV to update.
 	IBOutlet NSTextField*			mMCDZ;				// measured current dead zone.  "
-	IBOutlet NSTextField*			mHVLimit;	
+	IBOutlet NSTextField*			mHVLimit;
+	IBOutlet NSTextField*			mCmdStatus;			// Status of executed command.
 	char							mStatusByte;
 	int								mCurrentChnl;		// Current channel visible in display.
 }
@@ -54,6 +55,7 @@
 - (void) MVDZChanged: (NSNotification*) aNote;
 - (void) MCDZChanged: (NSNotification*) aNote;
 - (void) hvLimitChanged: (NSNotification*) aNote;
+- (void) writeErrorMsg: (NSNotification*) aNote;
 //- (void) settingsLockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions

@@ -37,11 +37,12 @@ typedef enum hveStatus hveStatus;
 	NSMutableArray*			mChannelArray;
 //	NSArray*				mSetCommands;
 //	NSArray*				mAllCommands;
-	NSMutableDictionary*	mParams;
-	NSMutableArray*			mCommands;
+	NSMutableDictionary*	mParams;	//Dictionary of HV unit parameters indicating type of parameter and whether it is R or R/W. 
+	NSMutableArray*			mCommands;  //Crate commands for HV Unit
 }
 
 #pragma mark •••Send Commands
+- (void)  getValues;
 - (void)  loadValues;
 
 #pragma mark •••Accessors
@@ -66,6 +67,7 @@ typedef enum hveStatus hveStatus;
 - (float) MCDZ: (int) aCurrentChnl;
 - (void)  setMCDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
 - (float)  HVLimit: (int) aCurrentChnl;
+
 
 #pragma mark •••Interpret data
 - (void) interpretDataReturn: (NSNotification*) aNote;

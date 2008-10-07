@@ -57,10 +57,6 @@ NSString* UVChnlMCDZChanged				= @"ChnlMCDZChanged";
 NSString* UVChnlHVLimitChanged			= @"ChnlHVLimitChanged";
 
 
-// Store in dictionary indicating if parameter is read only or r/w;
-NSString* UVkRead = @"R";
-NSString* UVkWrite = @"W";
-
 // Commands possible from HV Unit.
 NSString* HVkModuleDMP	= @"DMP";
 
@@ -69,6 +65,19 @@ NSString* HVkModuleDMP	= @"DMP";
 //NSString* UVkChnl    = @"Chnl";
 //NSString* UVkCommand = @"Command";
 //NSString* UVkReturn  = @"Return";
+
+// params dictionary holds NAME, R/W and TYPE
+NSString* UVkNAME = @"NAME";
+NSString* UVkReadWrite = @"RW";
+NSString* UVkType = @"TYPE";
+
+NSString* UVkRead = @"R";
+NSString* UVkWrite = @"W";
+
+NSString* UVkInt = @"int";
+NSString* UVkFloat = @"float";
+NSString* UVkString = @"string";
+
 
 @implementation ORUnivVoltModel
 #pragma mark •••Init/Dealloc
@@ -96,9 +105,10 @@ NSString* HVkModuleDMP	= @"DMP";
 - (void) awakeAfterDocumentLoaded
 {
 //	NS_DURING
+		mParams = [NSMutableDictionary dictionaryWithCapacity: ORUVChnlNumParameters];
 
 		// Load dictionary with commands supported for this unit.
-		NSArray* keysCmd = [NSArray arrayWithObjects: @"NAME", @"SLOT", @"CHNL", nil];
+		NSArray* keysCmd = [NSArray arrayWithObjects: UVkNAME, @"SLOT", @"CHNL", nil];
 		
 		NSArray* objectsCmd0 = [NSArray arrayWithObjects: @"DMP", @"YES", @"YES", nil];
 		NSDictionary* tmpCmd0 = [NSDictionary dictionaryWithObjects: objectsCmd0 forKeys: keysCmd];
@@ -110,58 +120,58 @@ NSString* HVkModuleDMP	= @"DMP";
 		
 
 		// load array with dictionary values for parameters - Store name of n
-		NSArray* keys = [NSArray arrayWithObjects: @"RW", @"TYPE", nil];
+		NSArray* keys = [NSArray arrayWithObjects: UVkReadWrite, UVkType, nil];
 				
 		
-		NSArray* objects0 = [NSArray arrayWithObjects: @"R", @"int", nil];
+		NSArray* objects0 = [NSArray arrayWithObjects: UVkRead, @"int", nil];
 		NSDictionary* tmpParam0 = [NSDictionary dictionaryWithObjects: objects0 forKeys: keys];
 		[mParams setObject: tmpParam0 forKey: @"Chnl"];
 
-		NSArray* objects1 = [NSArray arrayWithObjects: @"R", @"FLOAT", nil];
+		NSArray* objects1 = [NSArray arrayWithObjects: UVkRead, UVkFloat, nil];
 		NSDictionary* tmpParam1 = [NSDictionary dictionaryWithObjects: objects1 forKeys: keys];
 		[mParams setObject: tmpParam1 forKey: HVkMeasuredCurrent];
 
-		NSArray* objects2 = [NSArray arrayWithObjects: @"R", @"float", nil];
+		NSArray* objects2 = [NSArray arrayWithObjects: UVkRead, UVkFloat, nil];
 		NSDictionary* tmpParam2 = [NSDictionary dictionaryWithObjects: objects2 forKeys: keys];
 		[mParams setObject: tmpParam2 forKey: HVkMeasuredHV];
 
-		NSArray* objects3 = [NSArray arrayWithObjects:  @"R", @"int", nil];
+		NSArray* objects3 = [NSArray arrayWithObjects:  UVkRead, UVkInt, nil];
 		NSDictionary* tmpParam3 = [NSDictionary dictionaryWithObjects: objects3 forKeys: keys];
 		[mParams setObject: tmpParam3 forKey: @"ST"];
 
-		NSArray* objects4 = [NSArray arrayWithObjects: @"W", @"int", nil];
+		NSArray* objects4 = [NSArray arrayWithObjects: UVkWrite, UVkInt, nil];
 		NSDictionary* tmpParam4 = [NSDictionary dictionaryWithObjects: objects4 forKeys: keys];
 		[mParams setObject: tmpParam4 forKey: HVkChannelEnabled];
 
-		NSArray* objects5 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSArray* objects5 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam5 = [NSDictionary dictionaryWithObjects: objects5 forKeys: keys];
 		[mParams setObject: tmpParam5 forKey: HVkDemandHV];
 
-		NSArray* objects6 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSArray* objects6 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam6 = [NSDictionary dictionaryWithObjects: objects6 forKeys: keys];
 		[mParams setObject: tmpParam6 forKey: HVkRampUpRate];
 
-		NSArray* objects7 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSArray* objects7 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam7 = [NSDictionary dictionaryWithObjects: objects7 forKeys: keys];
 		[mParams setObject: tmpParam7 forKey: HVkRampDownRate];
 
-		NSArray* objects8 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSArray* objects8 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam8 = [NSDictionary dictionaryWithObjects: objects8 forKeys: keys];
 		[mParams setObject: tmpParam8 forKey: HVkTripCurrent];
 		
-		NSArray* objects9 = [NSArray arrayWithObjects: @"W", @"NSSTRING", nil];
+		NSArray* objects9 = [NSArray arrayWithObjects: UVkWrite, @"NSSTRING", nil];
 		NSDictionary* tmpParam9 = [NSDictionary dictionaryWithObjects: objects9 forKeys: keys];
 		[mParams setObject: tmpParam9 forKey: HVkStatus];
 
-		NSArray* objects10 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSArray* objects10 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam10 = [NSDictionary dictionaryWithObjects: objects10 forKeys: keys];
 		[mParams setObject: tmpParam10 forKey: HVkMVDZ];
 		
-		NSArray* objects11 = [NSArray arrayWithObjects: @"W", @"float", nil];
+		NSArray* objects11 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam11 = [NSDictionary dictionaryWithObjects: objects11 forKeys: keys];
 		[mParams setObject: tmpParam11 forKey: HVkMCDZ];
 		
-		NSArray* objects12 = [NSArray arrayWithObjects: @"R", @"int", nil];
+		NSArray* objects12 = [NSArray arrayWithObjects: UVkRead, UVkInt, nil];
 		NSDictionary* tmpParam12 = [NSDictionary dictionaryWithObjects: objects12 forKeys: keys];
 		[mParams setObject: tmpParam12 forKey: HVkHVLimit];
 
@@ -190,6 +200,20 @@ NSString* HVkModuleDMP	= @"DMP";
 
 
 #pragma mark •••sendCommands
+- (void) getValues
+{
+	int		i;	
+	int		slot;
+	
+	slot = [self slot];
+	for ( i = 0; i < ORHVNumChannels; i++ )
+	{
+		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, i];
+		[[self crate] sendCommand: slot channel: i command: command];
+
+	}
+}
+
 - (void) loadValues
 {
 	int			i;
@@ -202,7 +226,7 @@ NSString* HVkModuleDMP	= @"DMP";
 		NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
 		NSString*	command = [dictObj objectForKey: @"NAME"];		
 		NSString*	writable = [mParams objectForKey: @"RW"];
-		if ( [writable isEqualTo: @"W"] )
+		if ( [writable isEqualTo: UVkWrite] )
 		{
 			for ( i = 0; i < ORHVNumChannels; i++ )
 			{
@@ -214,7 +238,7 @@ NSString* HVkModuleDMP	= @"DMP";
 					command = [NSString stringWithFormat: @"LD S%d.%d", [self slot], i];
 				}
 			
-				if ( [[dictObj objectForKey: @"TYPE"] isEqualTo: @"INT"] )
+				if ( [[dictObj objectForKey: @"TYPE"] isEqualTo: UVkInt] )
 					command = [command stringByAppendingFormat: @" %d", [valueObj intValue]];
 				else if ([[dictObj objectForKey: @"TYPE"] isEqualTo: @"FLOAT"])
 					command = [command stringByAppendingFormat: @" %g", [valueObj floatValue]];
@@ -222,7 +246,7 @@ NSString* HVkModuleDMP	= @"DMP";
 	//			command = [NSString stringWithFormat: @"LD S%d.%d %@ %d ", [self slot], i, value];
 			}
 			
-			[guardian sendCommand: [guardian slot] channel: i command: command];
+			[[self crate] sendCommand: [self slot] channel: i command: command];
 		}
 	}
 }
@@ -263,11 +287,11 @@ NSString* HVkModuleDMP	= @"DMP";
 	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlEnabledChanged object: self];		
 }
 
-- (float) demandHV: (int) aChnl
+- (float) demandHV: (int) aCurChannel
 {
-	NSDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
+	NSDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	
-	return ( [[tmpChnl objectForKey: @"DV"] floatValue] );
+	return ( [[tmpChnl objectForKey: HVkDemandHV] floatValue] );
 }
 
 - (void) setDemandHV: (float) aDemandHV chnl: (int) aCurChannel
@@ -424,9 +448,6 @@ NSString* HVkModuleDMP	= @"DMP";
 	return( [[tmpChnl objectForKey: HVkHVLimit] floatValue] );
 }
 
-- (void) getValues: (int ) aCurChannel
-{
-}
 
 #pragma mark •••Interpret Data
 - (void) interpretDataReturn: (NSNotification*) aNote
@@ -435,12 +456,12 @@ NSString* HVkModuleDMP	= @"DMP";
 		int slotThisUnit;
 	
 		// Get data for this channel from crate - in ORCA place data in NOTIFICATION Object.
-		NSDictionary* returnData = [guardian returnDataToHVUnit];
+		NSDictionary* returnData = [[self crate] returnDataToHVUnit];
 		NSLog ( @"Command from dictionary '%@'", [returnData objectForKey: UVkCommand]);
 		[returnData retain];
 	
 		NSNumber* slotNum = [returnData objectForKey: UVkSlot];
-		slotThisUnit = [guardian slot];
+		slotThisUnit = [self slot];
 		if ( [slotNum intValue] == slotThisUnit )
 		{
 			NSString* retCmd = [returnData objectForKey: UVkCommand];
