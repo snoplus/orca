@@ -325,6 +325,7 @@ static ORProcessThread* sharedInstance = nil;
 		NS_DURING
 			//tell all the output hw to write out the current state
 			[outputs endProcessCycle];
+			[inputs endProcessCycle];
 			[allProcesses makeObjectsPerformSelector:@selector(endProcessCycle)];
 		NS_HANDLER
 		NS_ENDHANDLER
