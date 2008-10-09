@@ -96,6 +96,7 @@ struct{
     BOOL			shipRecords;
     int				cardJumperSetting;
 	NSMutableArray* multiPlots;
+    BOOL            readOnce;
 }
 
 #pragma mark ¥¥¥Accessors
