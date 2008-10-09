@@ -801,6 +801,7 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 - (void)processIsStarting
 {
 	[self _stopPolling];
+    readOnce = NO;
 }
 
 - (void)processIsStopping
@@ -811,20 +812,23 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 //note that everything called by these routines MUST be threadsafe
 - (void) startProcessCycle
 {
-   NS_DURING 
-        [self readAllAdcChannels]; 
-		if(shipRecords){
-			[self shipRawValues]; 
-			[self shipConvertedValues]; 
-		}
-    NS_HANDLER 
-	//catch this here to prevent it from falling thru, but nothing to do.
-	NS_ENDHANDLER
+    if(!readOnce){
+        NS_DURING 
+            [self readAllAdcChannels]; 
+            if(shipRecords){
+                [self shipRawValues]; 
+                [self shipConvertedValues]; 
+            }
+            readOnce = YES;
+        NS_HANDLER 
+        //catch this here to prevent it from falling thru, but nothing to do.
+        NS_ENDHANDLER
+    }
 }
 
 - (void) endProcessCycle
 {
-    //nothing to do
+   readOnce = NO;
 }
 
 - (int) processValue:(int)channel
