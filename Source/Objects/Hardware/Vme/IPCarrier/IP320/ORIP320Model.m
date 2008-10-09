@@ -125,7 +125,10 @@ static struct {
 
 - (void) awakeAfterDocumentLoaded
 {
-	[self calibrate];
+	NS_DURING
+		[self calibrate];
+	NS_HANDLER
+	NS_ENDHANDLER
 }
 
 #pragma mark ¥¥¥Accessors
@@ -797,16 +800,26 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 #pragma mark ¥¥¥Bit Processing Protocol
 - (void)processIsStarting
 {
+	[self _stopPolling];
 }
 
 - (void)processIsStopping
 {
+	[self _startPolling];
 }
+
 //note that everything called by these routines MUST be threadsafe
 - (void) startProcessCycle
 {
-	//let the polling stay in the polling loop....
-   // [self readAllAdcChannels];
+   NS_DURING 
+        [self readAllAdcChannels]; 
+		if(shipRecords){
+			[self shipRawValues]; 
+			[self shipConvertedValues]; 
+		}
+    NS_HANDLER 
+	//catch this here to prevent it from falling thru, but nothing to do.
+	NS_ENDHANDLER
 }
 
 - (void) endProcessCycle
