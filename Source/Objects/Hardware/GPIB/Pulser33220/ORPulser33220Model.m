@@ -390,6 +390,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 		else {
 			if(!noUSBAlarm){
 				noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for Pulser"] severity:kHardwareAlarm];
+				[noUSBAlarm setHelpString:@"\n\nThe USB interface is no longer available for this object. This could mean the cable is disconnected or the power is off"];
 				[noUSBAlarm setSticky:YES];		
 			}
 			[noUSBAlarm setAcknowledged:NO];
