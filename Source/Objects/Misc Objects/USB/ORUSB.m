@@ -340,7 +340,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			if (KERN_SUCCESS != kr) {
 				[NSException raise: @"USB Exception" format:@"Unable to get USB device location"];
 			}
-			NSLog(@"location: %d\n",locationID);
+			NSLog(@"location: %u\n",locationID);
 
 			
 			kr = (*deviceInterface)->GetDeviceVendor(deviceInterface, &vendor);

@@ -277,6 +277,11 @@ void registryChanged(
     //[self setSerialPorts:[decoder decodeObjectForKey:@"serialPorts"]];
     [[self undoManager] enableUndoRegistration];
 	[self scanForSerialPorts];
+	
+	if(!usb){
+		usb = [[ORUSB alloc] init];
+		[usb awakeAfterDocumentLoaded];
+	}
     return self;
 }
 

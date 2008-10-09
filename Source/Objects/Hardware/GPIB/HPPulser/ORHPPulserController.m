@@ -710,14 +710,14 @@
 	[yScale setNeedsDisplay:YES];
 	[xScale setNeedsDisplay:YES];
 	[plotter setNeedsDisplay:YES];
-	[progress setDoubleValue:[model downloadIndex]]; 
 	[downloadButton setEnabled:![model loading] && ![model lockGUI]];
 	
-	[progress setIndeterminate:NO];
-	[progress stopAnimation:self];
 	[downloadTypeField setStringValue:@""];
 
+	[progress stopAnimation:self];
+	[progress setIndeterminate:NO];
 	[progress setDoubleValue:0]; 
+	
 	[self setButtonStates];
 }
 

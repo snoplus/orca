@@ -162,9 +162,15 @@
                          name : ORMacModelEolTypeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(tableViewSelectionDidChange:)
+                         name : NSTableViewSelectionDidChangeNotification
+						object: nil];
+
+
 }
 
-- (void) tableViewSelectionIsChanging:(NSNotification*)aNote
+- (void) tableViewSelectionDidChange:(NSNotification*)aNote
 {
 	if([aNote object] == serialPortView || !aNote){
 		int index = [serialPortView selectedRow];
@@ -223,7 +229,7 @@
 - (void) updateWindow
 {
     [self documentLockChanged:nil];
-    [self tableViewSelectionIsChanging:nil];
+    [self tableViewSelectionDidChange:nil];
     [groupView setNeedsDisplay:YES];
     [serialPortView reloadData];
 	int index = [usbDevicesView selectedRow];
@@ -302,7 +308,7 @@
             NSLog(@"%@\n",options);
         }
         [serialPortView reloadData];
-        [self tableViewSelectionIsChanging:nil];
+        [self tableViewSelectionDidChange:nil];
     }
 }
 

@@ -62,7 +62,7 @@
 - (void) eolTypeChanged:(NSNotification*)aNote;
 - (void) documentLockChanged:(NSNotification*)aNotification;
 - (void) groupChanged:(NSNotification*)note;
-- (void) tableViewSelectionIsChanging:(NSNotification*)aNote;
+- (void) tableViewSelectionDidChange:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) eolTypeAction:(id)sender;

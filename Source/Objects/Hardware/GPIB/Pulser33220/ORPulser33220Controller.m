@@ -121,6 +121,7 @@
 	[connectionProtocolMatrix setEnabled:[model canChangeConnectionProtocol]];
 	if([model canChangeConnectionProtocol])[connectionNoteTextField setStringValue:@""];
 	else [connectionNoteTextField setStringValue:@"Disconnect Icon to Enable"];
+	[self populateInterfacePopup:[model getUSBController]];
 }
 
 - (void) ipConnectedChanged:(NSNotification*)aNote
@@ -151,6 +152,7 @@
 	[connectionProtocolMatrix selectCellWithTag:[model connectionProtocol]];
 	[connectionProtocolTabView selectTabViewItemAtIndex:[model connectionProtocol]];
 	[[self window] setTitle:[model title]];
+	[self populateInterfacePopup:[model getUSBController]];
 }
 
 - (void) setButtonStates
