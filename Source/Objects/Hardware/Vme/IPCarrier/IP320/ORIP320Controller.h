@@ -25,6 +25,7 @@
 @interface ORIP320Controller : OrcaObjectController  {
     @private
         IBOutlet NSTabView*		tabView;
+		IBOutlet NSTextField*   calibrationDateField;
 		IBOutlet NSButton*		shipRecordsButton;
 		IBOutlet NSTableView*	valueTable1;
         IBOutlet NSTableView*	valueTable2;
@@ -64,6 +65,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ***Interface Management
+- (void) calibrationDateChanged:(NSNotification*)aNote;
 - (void) cardJumperSettingChanged:(NSNotification*)aNote;
 - (void) shipRecordsChanged:(NSNotification*)aNote;
 - (void) logFileChanged:(NSNotification*)aNote;

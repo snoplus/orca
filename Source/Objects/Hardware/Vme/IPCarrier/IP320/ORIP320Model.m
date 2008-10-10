@@ -33,7 +33,8 @@
 #define KDelayTime .00005 //50 microsecond delay to allow for the 8.5 microsecond settling time of the input
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORIP320ModelCardJumperSettingChanged = @"ORIP320ModelCardJumperSettingChanged";
+NSString* ORIP320ModelCalibrationDateChanged		= @"ORIP320ModelCalibrationDateChanged";
+NSString* ORIP320ModelCardJumperSettingChanged		= @"ORIP320ModelCardJumperSettingChanged";
 NSString* ORIP320ModelShipRecordsChanged			= @"ORIP320ModelShipRecordsChanged";
 NSString* ORIP320ModelLogFileChanged				= @"ORIP320ModelLogFileChanged";
 NSString* ORIP320ModelLogToFileChanged				= @"ORIP320ModelLogToFileChanged";
@@ -79,13 +80,13 @@ static struct {
     for(i=0;i<kNumIP320Channels;i++){
         [chanObjs addObject:[[[ORIP320Channel alloc] initWithAdc:self channel:i]autorelease]];
     }
-	[self setCardJumperSetting:kUncalibrated];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
 -(void)dealloc
 {
+    [calibrationDate release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [multiPlots makeObjectsPerformSelector:@selector(invalidateDataSource) withObject:nil];
     [multiPlots release];
@@ -123,23 +124,21 @@ static struct {
     [self linkToController:@"ORIP320Controller"];
 }
 
-- (void) awakeAfterDocumentLoaded
-{
-	NS_DURING
-		[self calibrate];
-	NS_HANDLER
-	NS_ENDHANDLER
-}
-
-- (void) connected
-{
-	NS_DURING
-		[self calibrate];
-	NS_HANDLER
-	NS_ENDHANDLER
-}
-
 #pragma mark ¥¥¥Accessors
+- (NSDate*) calibrationDate
+{
+    return calibrationDate;
+}
+
+- (void) setCalibrationDate:(NSDate*)aCalibrationDate
+{
+    [aCalibrationDate retain];
+    [calibrationDate release];
+    calibrationDate = aCalibrationDate;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelCalibrationDateChanged object:self];
+}
+
 - (ORDataSet*) dataSet
 {
 	return dataSet;
@@ -560,6 +559,7 @@ static struct {
 
 - (void) calibrate
 {
+	[self setCalibrationDate:[NSDate date]];
 	int countergain=0;
 	switch(cardJumperSetting){
 		case(kMinus5to5):
@@ -650,6 +650,10 @@ static struct {
 - (void) readAllAdcChannels
 {
 	@synchronized(self) {
+		if(!calibrationLoaded && calibrationDate){
+			calibrationLoaded = YES;
+			[self calibrate];
+		}
 		//get the time(UT!)
 		time_t		theTime;
 		time(&theTime);
@@ -751,25 +755,19 @@ static struct {
 }
 
 #pragma mark ¥¥¥Archival
-static NSString* kORIP320chanObjs   = @"kORIP320chanObjs";
-static NSString *kORIP320PollingState   = @"kORIP320PollingState";
-
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
 	    
     [[self undoManager] disableUndoRegistration];
-    [self setCardJumperSetting:[decoder decodeIntForKey:@"ORIP320ModelCardJumperSetting"]];
-    [self setShipRecords:[decoder decodeBoolForKey:@"ORIP320ModelShipRecords"]];
-    [self setLogFile:[decoder decodeObjectForKey:@"ORIP320ModelLogFile"]];
-    [self setLogToFile:[decoder decodeBoolForKey:@"ORIP320ModelLogToFile"]];
-    [self setDisplayRaw:[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
-    [self setChanObjs:[decoder decodeObjectForKey:kORIP320chanObjs]];
-	[self setPollingState:[decoder decodeIntForKey:kORIP320PollingState]];
-	[self setMultiPlots:[decoder decodeObjectForKey:@"multiPlots"]];
-    [self setDataSet:[decoder decodeObjectForKey:@"dataSet"]];
-	[[self undoManager] enableUndoRegistration];
-   
+    [self setShipRecords:				[decoder decodeBoolForKey:@"ORIP320ModelShipRecords"]];
+    [self setLogFile:					[decoder decodeObjectForKey:@"ORIP320ModelLogFile"]];
+    [self setLogToFile:					[decoder decodeBoolForKey:@"ORIP320ModelLogToFile"]];
+    [self setDisplayRaw:				[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
+    [self setChanObjs:					[decoder decodeObjectForKey:@"kORIP320chanObjs"]];
+	[self setPollingState:				[decoder decodeIntForKey:@"kORIP320PollingState"]];
+	[self setMultiPlots:				[decoder decodeObjectForKey:@"multiPlots"]];
+    [self setDataSet:					[decoder decodeObjectForKey:@"dataSet"]];
     
     if(chanObjs == nil){
         [self setChanObjs:[NSMutableArray array]];
@@ -780,6 +778,21 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
     }
 	[chanObjs makeObjectsPerformSelector:@selector(setAdcCard:) withObject:self];
     [multiPlots makeObjectsPerformSelector:@selector(setDataSource:) withObject:dataSet];
+
+    [self setCalibrationDate:			[decoder decodeObjectForKey:@"calibrationDate"]];
+    [self setCardJumperSetting:			[decoder decodeIntForKey:@"cardJumperSetting"]];
+	int gain;
+	for(gain=0;gain<kNumGainSettings;gain++){
+		calibrationConstants[gain].kSlope_m			= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kSlope_m%d",gain]];
+		calibrationConstants[gain].kIdeal_Volt_Span = [decoder decodeFloatForKey:[NSString stringWithFormat:@"kIdeal_Volt_Span%d",gain]];
+		calibrationConstants[gain].kIdeal_Zero		= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kIdeal_Zero%d",gain]];
+		calibrationConstants[gain].kVoltCALLO		= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kVoltCALLO%d",gain]];
+		calibrationConstants[gain].kCountCALLO		= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kCountCALLO%d",gain]];
+		calibrationConstants[gain].kVoltCALHI		= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kVoltCALHI%d",gain]];
+		calibrationConstants[gain].kCountCALHI		= [decoder decodeIntForKey:  [NSString stringWithFormat:@"kCountCALHI%d",gain]];
+	}
+
+	[[self undoManager] enableUndoRegistration];
 	   	
 	[[NSNotificationCenter defaultCenter] addObserver : self
                      selector : @selector(writeLogBufferToFile)
@@ -792,17 +805,26 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:dataSet forKey:@"dataSet"];
-    [encoder encodeInt:cardJumperSetting forKey:@"ORIP320ModelCardJumperSetting"];
-    [encoder encodeBool:shipRecords forKey:@"ORIP320ModelShipRecords"];
-    [encoder encodeObject:logFile forKey:@"ORIP320ModelLogFile"];
-    [encoder encodeBool:logToFile forKey:@"ORIP320ModelLogToFile"];
-    [encoder encodeBool:displayRaw forKey:@"ORIP320ModelDisplayRaw"];
-    [encoder encodeObject:chanObjs forKey:kORIP320chanObjs];
-    [encoder encodeInt:[self pollingState] forKey:kORIP320PollingState];
-	[encoder encodeInt:cardJumperSetting forKey:@"ORIP320ModelsetCardJumpertSetting"];
-    [encoder encodeObject:multiPlots forKey:@"multiPlots"];
-
+    [encoder encodeObject:calibrationDate	forKey:@"calibrationDate"];
+    [encoder encodeObject:dataSet			forKey:@"dataSet"];
+    [encoder encodeBool:shipRecords			forKey:@"ORIP320ModelShipRecords"];
+    [encoder encodeObject:logFile			forKey:@"ORIP320ModelLogFile"];
+    [encoder encodeBool:logToFile			forKey:@"ORIP320ModelLogToFile"];
+    [encoder encodeBool:displayRaw			forKey:@"ORIP320ModelDisplayRaw"];
+    [encoder encodeObject:chanObjs			forKey:@"kORIP320chanObjs"];
+    [encoder encodeInt:[self pollingState]	forKey:@"kORIP320PollingState"];
+    [encoder encodeObject:multiPlots		forKey:@"multiPlots"];
+	
+	[encoder encodeInt:cardJumperSetting	forKey:@"cardJumperSetting"];
+	int gain;
+	for(gain=0;gain<kNumGainSettings;gain++){
+		[encoder encodeFloat:calibrationConstants[gain].kSlope_m			forKey:[NSString stringWithFormat:@"kSlope_m%d",gain]];
+		[encoder encodeFloat:calibrationConstants[gain].kIdeal_Volt_Span	forKey:[NSString stringWithFormat:@"kIdeal_Volt_Span%d",gain]];
+		[encoder encodeFloat:calibrationConstants[gain].kIdeal_Zero			forKey:[NSString stringWithFormat:@"kIdeal_Zero%d",gain]];
+		[encoder encodeFloat:calibrationConstants[gain].kCountCALLO			forKey:[NSString stringWithFormat:@"kCountCALLO%d",gain]];
+		[encoder encodeFloat:calibrationConstants[gain].kVoltCALHI			forKey:[NSString stringWithFormat:@"kVoltCALHI%d",gain]];
+		[encoder encodeInt:calibrationConstants[gain].kCountCALHI			forKey:[NSString stringWithFormat:@"kCountCALHI%d",gain]];		
+	}
 }
 
 #pragma mark ¥¥¥Bit Processing Protocol

@@ -66,7 +66,6 @@ enum {
 };
 
 struct{
-	int kCardJumperSetting;
 	float kSlope_m;
 	float kIdeal_Volt_Span;
 	float kIdeal_Zero;
@@ -79,7 +78,7 @@ struct{
 
 @interface ORIP320Model : ORVmeIPCard <ORAdcProcessing>
 {
-	ORDataSet*   dataSet;
+	ORDataSet*		dataSet;
     NSMutableArray* chanObjs;
     NSTimeInterval	pollingState;
     BOOL            hasBeenPolled;
@@ -97,9 +96,13 @@ struct{
     int				cardJumperSetting;
 	NSMutableArray* multiPlots;
     BOOL            readOnce;
+	BOOL			calibrationLoaded;
+    NSDate*			calibrationDate;
 }
 
 #pragma mark ¥¥¥Accessors
+- (NSDate*) calibrationDate;
+- (void) setCalibrationDate:(NSDate*)aCalibrationDate;
 - (NSString*) getSlotKey:(unsigned short)aSlot;
 - (int) cardJumperSetting;
 - (void) setCardJumperSetting:(int)aCardJumperSetting;
@@ -191,6 +194,7 @@ struct{
 @end
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORIP320ModelCalibrationDateChanged;
 extern NSString* ORIP320ModelCardJumperSettingChanged;
 extern NSString* ORIP320ModelShipRecordsChanged;
 extern NSString* ORIP320ModelLogFileChanged;

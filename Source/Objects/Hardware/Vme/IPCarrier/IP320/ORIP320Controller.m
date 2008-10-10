@@ -51,7 +51,7 @@
     adcValueSize    = NSMakeSize(380,452);
     calibrationSize = NSMakeSize(520,430);
     alarmSize       = NSMakeSize(490,443);
-	dataSize       = NSMakeSize(390,443);
+	dataSize        = NSMakeSize(390,443);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -169,6 +169,11 @@
                          name : ORDataSetDataChanged
                        object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(calibrationDateChanged:)
+                         name : ORIP320ModelCalibrationDateChanged
+						object: model];
+
 }
 
 
@@ -184,6 +189,12 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) calibrationDateChanged:(NSNotification*)aNote
+{
+	[calibrationDateField setObjectValue: [model calibrationDate]];
+}
+
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
     if([notification object] == outlineView){
@@ -269,6 +280,7 @@
 	[self logFileChanged:nil];
 	[self shipRecordsChanged:nil];
 	[self cardJumperSettingChanged:nil];
+	[self calibrationDateChanged:nil];
 }
 
 - (void) modelChanged:(NSNotification*)aNotification

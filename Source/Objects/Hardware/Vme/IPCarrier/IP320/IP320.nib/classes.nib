@@ -108,6 +108,8 @@
 				<string>NSScrollView</string>
 				<key>calibrateButton</key>
 				<string>NSButton</string>
+				<key>calibrationDateField</key>
+				<string>NSTextField</string>
 				<key>calibrationTable1</key>
 				<string>NSTableView</string>
 				<key>calibrationTable2</key>
@@ -181,6 +183,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
