@@ -23,4 +23,5 @@
 - (NSString*) sbcLocalCodePath;
 - (NSString*) codeResourcePath;
 - (NSString*) cpuName;
+- (void) setConnected:(BOOL)state;
 @end

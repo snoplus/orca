@@ -1713,6 +1713,11 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 #pragma mark •••SBC_Linking protocol
 
+- (void) setConnected:(BOOL)state
+{
+	//not doing anything with this yet... stub here to meet protocol
+}
+
 - (NSString*) cpuName
 {
 	return [NSString stringWithFormat:@"SLT (Crate %d)",[self crateNumber]];

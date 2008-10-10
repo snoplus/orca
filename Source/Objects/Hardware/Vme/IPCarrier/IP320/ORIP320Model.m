@@ -711,6 +711,15 @@ static struct {
     }
 }
 
+- (void) powerFailed:(NSNotification*)aNote
+{
+	//do nothing for now
+}
+
+- (void) powerRestored:(NSNotification*)aNote
+{
+	[self calibrate];
+}
 
 #pragma mark ¥¥¥Polling
 - (void) _stopPolling
@@ -778,6 +787,18 @@ static NSString *kORIP320PollingState   = @"kORIP320PollingState";
                      selector : @selector(writeLogBufferToFile)
                          name : ORRunStatusChangedNotification
 						object: nil]; 
+
+    [[NSNotificationCenter defaultCenter] addObserver : self
+                     selector : @selector(powerFailed:)
+                         name : @"VmePowerFailedNotification"
+                       object : nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver : self
+                     selector : @selector(powerRestored:)
+                         name : @"VmePowerRestoredNotification"
+                       object : nil];
+
+
     return self;
 }
 
