@@ -193,4 +193,15 @@
     return self;
 }
 
+
+- (void) connected
+{
+	[[self orcaObjects] makeObjectsPerformSelector:@selector(connected)];
+}
+
+- (void) disconnected
+{
+	[[self orcaObjects] makeObjectsPerformSelector:@selector(disconnected)];
+}
+
 @end
