@@ -121,17 +121,6 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 #pragma mark ¥¥¥SBC_Linking protocol
 
-- (void) setConnected:(BOOL)state
-{
-	//the crate will treat a connection as an indication of power (or not)
-	if (![sbcLink isConnected]) {
-		[NSException raise: OExceptionVmeAccessError format:@"VmePowerFailedNotification"];
-	}
-	else {
-		[NSException raise: OExceptionVmeAccessError format:@"VmePowerRestoredNotification"];
-	}
-}
-
 - (NSString*) cpuName
 {
 	return [NSString stringWithFormat:@"VME CPU (Crate %d)",[self crateNumber]];

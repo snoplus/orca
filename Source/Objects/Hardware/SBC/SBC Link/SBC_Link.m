@@ -416,14 +416,6 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
                           object: self];
 
 	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
-	
-	if([delegate respondsToSelector:@selector(setConnected:)]){
-		NS_DURING
-			[delegate setConnected:aNewIsConnected];
-		NS_HANDLER
-		NS_ENDHANDLER
-	}
-
 }
 
 - (NSCalendarDate*) timeConnected

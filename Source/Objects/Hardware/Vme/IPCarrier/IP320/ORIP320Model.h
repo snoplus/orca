@@ -148,8 +148,6 @@ struct{
 - (void) setConvertedDataId: (unsigned long) DataId;
 - (unsigned long) lowMask;
 - (unsigned long) highMask;
-- (void)		  powerFailed:(NSNotification*)aNote;
-- (void)		  powerRestored:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Adc Processing Protocol
 - (void)processIsStarting;

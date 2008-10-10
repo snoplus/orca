@@ -115,12 +115,6 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 
 
 #pragma mark ¥¥¥SBC_Linking protocol
-
-- (void) setConnected:(BOOL)state
-{
-	//not doing anything with this yet.. stub here to meet protocol
-}
-
 - (NSString*) cpuName
 {
 	return [NSString stringWithFormat:@"cPCI CPU (Crate %d)",[self crateNumber]];
