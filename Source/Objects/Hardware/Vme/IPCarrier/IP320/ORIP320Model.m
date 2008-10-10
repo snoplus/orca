@@ -563,36 +563,34 @@ static struct {
 	int countergain=0;
 	switch(cardJumperSetting){
 		case(kMinus5to5):
-			NSLog(@"Calibrating IP320 for -5 to 5 Voltage Range\n");
-			
 			for(countergain=0;countergain<kNumGainSettings;countergain++){
 				calibrationConstants[countergain].kIdeal_Volt_Span=10.000;
 				calibrationConstants[countergain].kIdeal_Zero=-5.0000;
 			}
 			[self _callibrateIP320];
+			NSLog(@"Calibrated IP320 for -5 to 5 Voltage Range\n");
 		break;
 		
 		case(kMinus10to10):
-			NSLog(@"Calibrating IP320 for -10 to 10 Voltage Range\n");
-
 			for(countergain=0;countergain<kNumGainSettings;countergain++){
 				calibrationConstants[countergain].kIdeal_Volt_Span=20.000;
 				calibrationConstants[countergain].kIdeal_Zero=-10.0000;
 			}
 			[self _callibrateIP320];
+			NSLog(@"Calibrated IP320 for -10 to 10 Voltage Range\n");
 		break;
 		
 		case(k0to10):
-			NSLog(@"Calibrating IP320 for 0 to 10 Voltage Range\n");
 			for(countergain=0;countergain<kNumGainSettings;countergain++){
 				calibrationConstants[countergain].kIdeal_Volt_Span=10.000;
 				calibrationConstants[countergain].kIdeal_Zero=0.0000;
 			}
 			[self _callibrateIP320];
+			NSLog(@"Calibrated IP320 for 0 to 10 Voltage Range\n");
 		break;
 		
 		case(kUncalibrated):
-			NSLog(@"IP320 returns uncorrected value.\n");
+			//NSLog(@"IP320 returns uncorrected value.\n");
 		break;
 	}
 }
@@ -650,9 +648,9 @@ static struct {
 - (void) readAllAdcChannels
 {
 	@synchronized(self) {
-		if(!calibrationLoaded && calibrationDate){
-			calibrationLoaded = YES;
+		if(!calibrationLoaded){
 			[self calibrate];
+			calibrationLoaded = YES;
 		}
 		//get the time(UT!)
 		time_t		theTime;
