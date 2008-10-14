@@ -120,8 +120,7 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     [notifyCenter addObserver : self
                      selector : @selector(lineTypeChanged:)
                          name : ORLineTypeChangedNotification
-                       object : nil];
-    
+                       object : nil];  
 }
 
 - (void) lineColorChanged:(NSNotification*)aNotification
@@ -534,7 +533,9 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
     connector = aConnection;
     
     [guardian connectionChanged];
-    
+	if(guardian!=objectLink){
+		[objectLink connectionChanged];
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName: ORConnectionChanged object:guardian];
     
 }
