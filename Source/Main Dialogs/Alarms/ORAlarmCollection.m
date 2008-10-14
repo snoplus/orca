@@ -154,7 +154,6 @@ NSString* ORAlarmCollectionEmailEnabledChanged = @"ORAlarmCollectionEmailEnabled
                      selector : @selector(alarmWasAcknowledged:)
                          name : ORAlarmWasAcknowledgedNotification
                        object : nil];
-    
 }
 
 #pragma mark •••Alarm Management
@@ -175,6 +174,7 @@ NSString* ORAlarmCollectionEmailEnabledChanged = @"ORAlarmCollectionEmailEnabled
     if([alarms count] == 0){
         [self setBeepTimer:nil];
 		RestoreApplicationDockTileImage();
+		[[[ORAlarmController sharedAlarmController] window]orderOut:self];
     }
 	else {
 		[myBadge badgeApplicationDockIconWithValue:[alarms count] insetX:0 y:0];
