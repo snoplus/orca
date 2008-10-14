@@ -85,6 +85,11 @@
                      selector : @selector( displayEnet: )
                          name : UVHVCrateEnetAvailableNotification
                        object : model];
+					   
+    [notifyCenter addObserver : self
+                     selector : @selector( writeErrorMsg: )
+                         name : UVHVSocketNotConnectedNotification
+                       object : model];	
 }
 
 - (void) updateWindow
@@ -107,6 +112,14 @@
 	[ethernetConnectButton setTitle: [model isConnected] ? @"Disconnect" : @"Connect"];
 //	[model isConnected] ? [model disconnect] : [model connect];
 }
+
+- (void) writeErrorMsg: (NSNotification*) aNote
+{
+	NSDictionary* errorDict = [aNote userInfo];
+	NSLog( @"error: %@", [errorDict objectForKey: UVkErrorMsg] );
+	[outputArea setString: [errorDict objectForKey: UVkErrorMsg]];
+}
+
 
 #pragma mark •••Actions
 - (IBAction) ipAddressTextFieldAction: (id) aSender
@@ -143,12 +156,12 @@
 
 - (IBAction) hvOnAction: (id) aSender
 {
-	[model hvOn];
+	[model turnHVOn];
 }
 
 - (IBAction) hvOffAction: (id) aSender
 {
-	[model hvOff];
+	[model turnHVOff];
 }
 
 - (IBAction) panicAction: (id) aSender

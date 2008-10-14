@@ -105,7 +105,7 @@
 						object: model];						
 
 	[notifyCenter  addObserver: self
-	                  selector: @selector( errorMsg: )
+	                  selector: @selector( writeErrorMsg: )
 					     name : UVHVSocketNotConnectedNotification
 					   object : nil];
 
@@ -198,6 +198,7 @@
 - (void) writeErrorMsg: (NSNotification*) aNote
 {
 	NSDictionary* errorDict = [aNote userInfo];
+	NSLog( @"error: %@", [errorDict objectForKey: UVkErrorMsg] );
 	[mCmdStatus setStringValue: [errorDict objectForKey: UVkErrorMsg]];
 }
 
@@ -345,8 +346,7 @@
 
 #pragma mark •••Table handling routines
 - (int) numberOfRowsInTableView: (NSTableView*) aTableView
-{
-	return( ORHVNumChannels );
+{	return( UVkNumChannels );
 }
 
 - (void) tableView: (NSTableView*) aTableView

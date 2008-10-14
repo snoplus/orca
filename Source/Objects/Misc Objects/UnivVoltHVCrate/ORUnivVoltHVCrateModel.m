@@ -34,13 +34,15 @@ NSString* UVHVCrateEnetAvailableNotification		    = @"UVHVCrateEnetAvailableNoti
 NSString* UVHVUnitInfoAvailableNotification             = @"UVHVUnitInfoAvailableNotification";
 NSString* UVHVSocketNotConnectedNotification			= @"UVHVSocketNotConnectedNotification";
 
-// HV Module commands
+// HV crate commands
 NSString* ORHVkCrateHVStatus							= @"HVSTATUS";
 NSString* ORHVkCrateConfig							    = @"CONFIG";
 NSString* ORHVkCrateEnet								= @"ENET";
-NSString* ORHVkHVPanic									= @"IMOFF";
-NSString* ORHVkHVOn										= @"HVON";
-NSString* ORHVkHVOff									= @"HVOFF";
+NSString* ORHVkCrateHVPanic								= @"IMOFF";
+NSString* ORHVkCrateHVOn								= @"HVON";
+NSString* ORHVkCrateHVOff								= @"HVOFF";
+
+NSString* ORHVkNoReturn = @"No Return";
 
 //NSString* ORHVkModuleDMP								= @"DMP";
 
@@ -177,17 +179,30 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 - (NSString*) hvStatus
 { 
-	return( mReturnFromSocket );
+	NSDictionary* queuedCommand = [mQueue dequeue];
+	NSString* command = [queuedCommand objectForKey: UVkCommand];
+	if ( [command isEqualTo: ORHVkCrateHVStatus] )
+		return( [queuedCommand objectForKey: UVkReturn] );
+	return( ORHVkNoReturn );
 }
 
 - (NSString *) ethernetConfig
 {
-	return( mReturnFromSocket );
+	NSDictionary* queuedCommand = [mQueue dequeue];
+	NSString* command = [queuedCommand objectForKey: UVkCommand];
+	if ( [command isEqualTo: ORHVkCrateEnet] )
+		return( [queuedCommand objectForKey: UVkReturn] );
+	return( ORHVkNoReturn );
+
 }
 
 - (NSString *) config
 {
-	return( mReturnFromSocket );
+	NSDictionary* queuedCommand = [mQueue dequeue];
+	NSString* command = [queuedCommand objectForKey: UVkCommand];
+	if ( [command isEqualTo: ORHVkCrateConfig] )
+		return( [queuedCommand objectForKey: UVkReturn] );
+	return( ORHVkNoReturn );
 }
 
 - (NSString*) ipAddress
@@ -221,9 +236,24 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 {
 	int		unit = -1;
 	int		chnl = -1;
-	[self sendCommand: unit channel: chnl command: ORHVkCrateHVStatus];
+	[self sendCrateCommand: ORHVkCrateHVStatus];
 }
  
+
+- (void) hvPanic
+{
+	[self sendCrateCommand: ORHVkCrateHVPanic];
+}
+
+- (void) turnHVOn
+{
+	[self sendCrateCommand: ORHVkCrateHVOn];
+}
+
+- (void) turnHVOff
+{
+	[self sendCrateCommand: ORHVkCrateHVOff];
+}
 
 - (void) sendCrateCommand: (NSString*) aCommand
 {
@@ -256,14 +286,14 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		
 		const char* buffer = [fullCommand cStringUsingEncoding: NSASCIIStringEncoding];
 		
-		NSLog( @"Command: %s,  length:%d", buffer, [fullCommand length] + 1 );
+		NSLog( @"Command: %s,  length:%d\n", buffer, [fullCommand length] + 1 );
 		if (mSocket != nil )
 		{
 			[mSocket write: buffer length: [aCommand length] + 1];	
 		}
 		else
 		{
-			NSString* errorMsg = [NSString stringWithFormat: @"Socket not connected for HV Crate."];
+			NSString* errorMsg = [NSString stringWithFormat: @"Socket not connected to Crate.\n"];
 			NSDictionary* errorMsgDict = [NSDictionary dictionaryWithObject: errorMsg forKey: UVkErrorMsg];
 			[[NSNotificationCenter defaultCenter] postNotificationName: UVHVSocketNotConnectedNotification object: self userInfo: errorMsgDict];
 		}
@@ -317,6 +347,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		[returnFromSocket retain];
 		NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
 		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
+ 
 		[returnFromSocket release];
 		
 	// Make sure we have data returned from HV Crate.
@@ -373,10 +404,22 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
 			}
 		
-			else if ( [retCommand isEqualTo: ORHVkCrateEnet] )
+			else if ( [retCommand isEqualTo: ORHVkCrateHVOn] )
 			{
-				NSLog( @"Send notification about Enet.");
-				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
+				NSLog( @"Send notification about HVOn.");
+				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+			}
+//		
+			else if ( [retCommand isEqualTo: ORHVkCrateHVOff] )
+			{
+				NSLog( @"Send notification about HVOff.");
+				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+			}
+//		
+			else if ( [retCommand isEqualTo: ORHVkCrateHVPanic] )
+			{
+				NSLog( @"Send notification about Panic.");
+				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
 			}
 //		
 			// notify HV unit about return from command.
@@ -553,12 +596,13 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	
 	@try
 	{
-/*		NSString* command = [NSString stringWithFormat: ORHVkCrateEnet];	
+		NSString* command = [NSString stringWithFormat: ORHVkCrateEnet];	
+		[self sendCrateCommand: command];
 			
 		// Write the command.
 		
 		
-*/
+
 //		mLastCommand = eUVEnet;	
 	}
 	@catch (NSException *exception) {
@@ -601,20 +645,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	}
 }
 
-- (void) hvPanic
-{
-	[self sendCrateCommand: ORHVkHVPanic];
-}
-
-- (void) hvOn
-{
-	[self sendCrateCommand: ORHVkHVOn];
-}
-
-- (void) hvOff
-{
-	[self sendCrateCommand: ORHVkHVOff];
-}
 
 
 

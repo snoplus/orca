@@ -52,6 +52,8 @@
 				<string>NSButton</string>
 				<key>mChnlTable</key>
 				<string>NSTableView</string>
+				<key>mCmdStatus</key>
+				<string>NSTextField</string>
 				<key>mDemandHV</key>
 				<string>NSTextField</string>
 				<key>mHVLimit</key>

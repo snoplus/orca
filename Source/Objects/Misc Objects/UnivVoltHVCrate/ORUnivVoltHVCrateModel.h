@@ -37,7 +37,7 @@ typedef enum hveCommands hveCommands;
 @interface ORUnivVoltHVCrateModel : ORCrate  {
 	NSLock*			localLock;
     NSString*		ipAddress;
-	NSString*		mReturnFromSocket;  // Used to get last return
+//	NSString*		mReturnFromSocket;  // Used to get last return
 	NSString*		mLastError;
 //	hveCommands		mLastCommand;
     BOOL			mIsConnected;
@@ -49,6 +49,9 @@ typedef enum hveCommands hveCommands;
 #pragma mark •••Accessors
 - (NSString*) ipAddress;
 - (NSString*) hvStatus;
+//- (NSString*) hvOn;
+//- (NSString*) hvOff;
+//- (NSString*) hvPanic;
 - (NSString*) ethernetConfig;
 - (NSString*) config;
 - (NetSocket*) socket;
@@ -66,11 +69,12 @@ typedef enum hveCommands hveCommands;
 - (void) obtainHVStatus;
 - (void) obtainEthernetConfig;
 - (void) obtainConfig;
-- (void) hvOn;
-- (void) hvOff;
+- (void) turnHVOn;
+- (void) turnHVOff;
 - (void) hvPanic;
 - (void) connect;
 - (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand;
+- (void) sendCrateCommand: (NSString*) aCommand;
 
 
 #pragma mark ***Utilities

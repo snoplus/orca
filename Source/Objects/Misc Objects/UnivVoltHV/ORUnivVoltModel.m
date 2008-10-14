@@ -66,8 +66,19 @@ NSString* HVkModuleDMP	= @"DMP";
 //NSString* UVkCommand = @"Command";
 //NSString* UVkReturn  = @"Return";
 
+#define UVHVkNumChannels 12
+
+// Keys
+//NSString* UVkCOMMAND = @"Command"; defined in ORUnivVoltHVCrateModel.h
+NSString* UVkRW = @"RW";
+NSString* UVkTYPE = @"Type";
+
+// Type of parameter
+NSString* UVkFLOAT	= @"float";
+NSString* UVkINT	= @"int";
+NSString* UVkSTRING = @"NSString";
+
 // params dictionary holds NAME, R/W and TYPE
-NSString* UVkNAME = @"NAME";
 NSString* UVkReadWrite = @"RW";
 NSString* UVkType = @"TYPE";
 
@@ -105,10 +116,10 @@ NSString* UVkString = @"string";
 - (void) awakeAfterDocumentLoaded
 {
 //	NS_DURING
-		mParams = [NSMutableDictionary dictionaryWithCapacity: ORUVChnlNumParameters];
+		mParams = [NSMutableDictionary dictionaryWithCapacity: UVkChnlNumParameters];
 
-		// Load dictionary with commands supported for this unit.
-		NSArray* keysCmd = [NSArray arrayWithObjects: UVkNAME, @"SLOT", @"CHNL", nil];
+		// ---- Load dictionary with commands supported for this unit ----
+		NSArray* keysCmd = [NSArray arrayWithObjects: UVkCommand, @"SLOT", @"CHNL", nil];
 		
 		NSArray* objectsCmd0 = [NSArray arrayWithObjects: @"DMP", @"YES", @"YES", nil];
 		NSDictionary* tmpCmd0 = [NSDictionary dictionaryWithObjects: objectsCmd0 forKeys: keysCmd];
@@ -119,65 +130,80 @@ NSString* UVkString = @"string";
 		[mCommands insertObject: tmpCmd1 atIndex: 1];
 		
 
-		// load array with dictionary values for parameters - Store name of n
-		NSArray* keys = [NSArray arrayWithObjects: UVkReadWrite, UVkType, nil];
+		// --- load array with dictionary values for parameters - Store name, R/W, and type.
+		NSArray* keys = [NSArray arrayWithObjects: UVkCommand, UVkReadWrite, UVkType, nil];
 				
 		
-		NSArray* objects0 = [NSArray arrayWithObjects: UVkRead, @"int", nil];
+		NSArray* objects0 = [NSArray arrayWithObjects: @"Chnl", UVkRead, @"int", nil];
 		NSDictionary* tmpParam0 = [NSDictionary dictionaryWithObjects: objects0 forKeys: keys];
 		[mParams setObject: tmpParam0 forKey: @"Chnl"];
 
-		NSArray* objects1 = [NSArray arrayWithObjects: UVkRead, UVkFloat, nil];
+		NSArray* objects1 = [NSArray arrayWithObjects: HVkMeasuredCurrent, UVkRead, UVkFloat, nil];
 		NSDictionary* tmpParam1 = [NSDictionary dictionaryWithObjects: objects1 forKeys: keys];
 		[mParams setObject: tmpParam1 forKey: HVkMeasuredCurrent];
 
-		NSArray* objects2 = [NSArray arrayWithObjects: UVkRead, UVkFloat, nil];
+		NSArray* objects2 = [NSArray arrayWithObjects: HVkMeasuredHV, UVkRead, UVkFloat, nil];
 		NSDictionary* tmpParam2 = [NSDictionary dictionaryWithObjects: objects2 forKeys: keys];
 		[mParams setObject: tmpParam2 forKey: HVkMeasuredHV];
 
-		NSArray* objects3 = [NSArray arrayWithObjects:  UVkRead, UVkInt, nil];
-		NSDictionary* tmpParam3 = [NSDictionary dictionaryWithObjects: objects3 forKeys: keys];
-		[mParams setObject: tmpParam3 forKey: @"ST"];
-
-		NSArray* objects4 = [NSArray arrayWithObjects: UVkWrite, UVkInt, nil];
-		NSDictionary* tmpParam4 = [NSDictionary dictionaryWithObjects: objects4 forKeys: keys];
-		[mParams setObject: tmpParam4 forKey: HVkChannelEnabled];
-
-		NSArray* objects5 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
+		NSArray* objects5 = [NSArray arrayWithObjects:HVkDemandHV, UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam5 = [NSDictionary dictionaryWithObjects: objects5 forKeys: keys];
 		[mParams setObject: tmpParam5 forKey: HVkDemandHV];
 
-		NSArray* objects6 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
+		NSArray* objects6 = [NSArray arrayWithObjects: HVkRampUpRate, UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam6 = [NSDictionary dictionaryWithObjects: objects6 forKeys: keys];
 		[mParams setObject: tmpParam6 forKey: HVkRampUpRate];
 
-		NSArray* objects7 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
+		NSArray* objects7 = [NSArray arrayWithObjects: HVkRampDownRate, UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam7 = [NSDictionary dictionaryWithObjects: objects7 forKeys: keys];
 		[mParams setObject: tmpParam7 forKey: HVkRampDownRate];
 
-		NSArray* objects8 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
+		NSArray* objects8 = [NSArray arrayWithObjects: HVkTripCurrent, UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam8 = [NSDictionary dictionaryWithObjects: objects8 forKeys: keys];
 		[mParams setObject: tmpParam8 forKey: HVkTripCurrent];
 		
-		NSArray* objects9 = [NSArray arrayWithObjects: UVkWrite, @"NSSTRING", nil];
-		NSDictionary* tmpParam9 = [NSDictionary dictionaryWithObjects: objects9 forKeys: keys];
-		[mParams setObject: tmpParam9 forKey: HVkStatus];
+		NSArray* objects4 = [NSArray arrayWithObjects: HVkChannelEnabled, UVkWrite, UVkInt, nil];
+		NSDictionary* tmpParam4 = [NSDictionary dictionaryWithObjects: objects4 forKeys: keys];
+		[mParams setObject: tmpParam4 forKey: HVkChannelEnabled];
 
-		NSArray* objects10 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
+		NSArray* objects3 = [NSArray arrayWithObjects: HVkStatus, UVkRead, UVkInt, nil];
+		NSDictionary* tmpParam3 = [NSDictionary dictionaryWithObjects: objects3 forKeys: keys];
+		[mParams setObject: tmpParam3 forKey: HVkStatus];
+
+		NSArray* objects10 = [NSArray arrayWithObjects: HVkMVDZ, UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam10 = [NSDictionary dictionaryWithObjects: objects10 forKeys: keys];
 		[mParams setObject: tmpParam10 forKey: HVkMVDZ];
 		
-		NSArray* objects11 = [NSArray arrayWithObjects: UVkWrite, UVkFloat, nil];
+		NSArray* objects11 = [NSArray arrayWithObjects: HVkMCDZ, UVkWrite, UVkFloat, nil];
 		NSDictionary* tmpParam11 = [NSDictionary dictionaryWithObjects: objects11 forKeys: keys];
 		[mParams setObject: tmpParam11 forKey: HVkMCDZ];
 		
-		NSArray* objects12 = [NSArray arrayWithObjects: UVkRead, UVkInt, nil];
+		NSArray* objects12 = [NSArray arrayWithObjects: HVkHVLimit, UVkRead, UVkInt, nil];
 		NSDictionary* tmpParam12 = [NSDictionary dictionaryWithObjects: objects12 forKeys: keys];
 		[mParams setObject: tmpParam12 forKey: HVkHVLimit];
 
-	
+
 		[mParams retain];
-				
+		
+		// Debug code - normally commented out.
+			//Debug code - 
+	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
+	NSLog( @"command: %@,  type: %@,  R/W: %@\n", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
+	                                            [[dictObjDeb objectForKey: UVkType] stringValue],
+												[[dictObjDeb objectForKey: UVkRW] stringValue] );
+	NSArray*	allKeys = [mParams allKeys];
+	int j;
+	for ( j = 0; j < [mParams count]; j++ )
+	{
+		NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
+		NSString*	commandDict = [dictObj objectForKey: UVkCommand];		
+		NSString*	writableDict = [dictObj objectForKey: UVkRW];
+		NSString*   typeDict = [dictObj objectForKey: UVkType ];
+//		int			i;
+		
+		NSLog( @" Command '%@', R/W :%@, Type: %@\n", commandDict, writableDict, typeDict );
+	}
+		
 //	NS_HANDLER
 //	NS_ENDHANDLER
 }
@@ -206,7 +232,7 @@ NSString* UVkString = @"string";
 	int		slot;
 	
 	slot = [self slot];
-	for ( i = 0; i < ORHVNumChannels; i++ )
+	for ( i = 0; i < UVkNumChannels; i++ )
 	{
 		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, i];
 		[[self crate] sendCommand: slot channel: i command: command];
@@ -216,40 +242,54 @@ NSString* UVkString = @"string";
 
 - (void) loadValues
 {
-	int			i;
+//	int			i;
 	int			j;
 //	float		value;
-
-	NSArray* allKeys = [mParams allKeys];
+	NSString*	command;
+	
+	//Debug code - 
+	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
+	NSLog( @"command: %@,  type: %@,  R/W: %@", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
+	                                            [[dictObjDeb objectForKey: UVkType] stringValue],
+												[[dictObjDeb objectForKey: UVkRW] stringValue] );
+	NSArray*	allKeys = [mParams allKeys];
+	
 	for ( j = 0; j < [mParams count]; j++ )
 	{
 		NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
-		NSString*	command = [dictObj objectForKey: @"NAME"];		
-		NSString*	writable = [mParams objectForKey: @"RW"];
-		if ( [writable isEqualTo: UVkWrite] )
+		NSString*	commandDict = [dictObj objectForKey: UVkCommand];		
+		NSString*	writableDict = [dictObj objectForKey: UVkRW];
+		NSString*   typeDict = [dictObj objectForKey: UVkType ];
+		int			i;
+		
+		NSLog( @" Command '%@', R/W :%@, Type: %@", commandDict, writableDict, typeDict );
+		
+		if ( [writableDict isEqualTo: UVkWrite] )
 		{
-			for ( i = 0; i < ORHVNumChannels; i++ )
+			for ( i = 0; i < UVHVkNumChannels; i++ )
 			{
 				NSMutableDictionary* chnlDict = [mChannelArray objectAtIndex: i]; // Get values we want to set for channel.
-				NSNumber* valueObj = [chnlDict objectForKey: command];
+				NSNumber* valueObj = [chnlDict objectForKey: commandDict];
 			
 				if ( i == 0 )
 				{
-					command = [NSString stringWithFormat: @"LD S%d.%d", [self slot], i];
+					command = [NSString stringWithFormat: @"LD S%d.%d %@", [self slot], i, commandDict];
 				}
 			
-				if ( [[dictObj objectForKey: @"TYPE"] isEqualTo: UVkInt] )
+				if ( [[dictObj objectForKey: UVkType] isEqualTo: UVkINT] )
 					command = [command stringByAppendingFormat: @" %d", [valueObj intValue]];
-				else if ([[dictObj objectForKey: @"TYPE"] isEqualTo: @"FLOAT"])
+				else if ([[dictObj objectForKey: UVkType] isEqualTo: UVkFLOAT])
 					command = [command stringByAppendingFormat: @" %g", [valueObj floatValue]];
+				else if ([[dictObj objectForKey: UVkType] isEqualTo: UVkSTRING])
+					command = [command stringByAppendingFormat: @" %@", [valueObj stringValue]];
 				
-	//			command = [NSString stringWithFormat: @"LD S%d.%d %@ %d ", [self slot], i, value];
 			}
 			
-			[[self crate] sendCommand: [self slot] channel: i command: command];
+			[[ self crate] sendCommand: [self slot] channel: i command: command];
 		}
 	}
 }
+
 
 
 #pragma mark •••Accessors
@@ -702,7 +742,7 @@ NSString* UVkString = @"string";
 		int i;
 		
 		// Put in dummy values for testing.
-		for(i=0 ; i<ORHVNumChannels; i++ )
+		for(i = 0 ; i < UVkNumChannels; i++ )
 		{
 			NSNumber* chnl = [NSNumber numberWithInt: i];
 			NSNumber* measuredCurrent = [NSNumber numberWithFloat: ((float)i * 1.0)];

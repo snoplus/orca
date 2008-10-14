@@ -23,8 +23,8 @@
 
 #import "ORCard.h"
 
-#define ORHVNumChannels 12
-#define ORUVChnlNumParameters 11 //see below for list.
+#define UVkNumChannels 12
+#define UVkChnlNumParameters 11 //see below for list.
 
 enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSupplyLimits = 4,
                 eHVUTripForUserCurrent, eHVUTripForHVError, eHVUTripForHVLimit};
