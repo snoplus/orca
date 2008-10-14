@@ -195,7 +195,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		[eval release];
 		eval = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable];
 		if(inputValue){
-			[eval setSymbolTable:[eval makeSymbolTableFor:@"main" args:inputValue]];
+			[eval setSymbolTable:[eval makeSymbolTableFor:@"main" args:[NSArray arrayWithObject:inputValue]]];
 		}
 		[functionList release];
 		functionList = nil;
