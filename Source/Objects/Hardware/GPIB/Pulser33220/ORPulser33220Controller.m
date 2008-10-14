@@ -85,7 +85,7 @@
 
 - (void) awakeFromNib
 {
-	[self populateInterfacePopup:[model getUSBController]];
+	[self populateInterfacePopup];
 	[super awakeFromNib];
 }
 
@@ -104,7 +104,7 @@
 #pragma mark ¥¥¥Notifications
 - (void) serialNumberChanged:(NSNotification*)aNote
 {
-	if(![model serialNumber] || ![model usbInterface])[serialNumberPopup selectItemAtIndex:0];
+	if(![model serialNumber] || ![[model serialNumber] length] || ![model usbInterface])[serialNumberPopup selectItemAtIndex:0];
 	else [serialNumberPopup selectItemWithTitle:[model serialNumber]];
 	if([model connectionProtocol] == kHPPulserUseUSB){
 		[[self window] setTitle:[model title]];
@@ -113,7 +113,7 @@
 
 - (void) interfacesChanged:(NSNotification*)aNote
 {
-	[self populateInterfacePopup:[aNote object]];
+	[self populateInterfacePopup];
 }
 
 - (void) canChangeConnectionProtocolChanged:(NSNotification*)aNote
@@ -121,7 +121,7 @@
 	[connectionProtocolMatrix setEnabled:[model canChangeConnectionProtocol]];
 	if([model canChangeConnectionProtocol])[connectionNoteTextField setStringValue:@""];
 	else [connectionNoteTextField setStringValue:@"Disconnect Icon to Enable"];
-	[self populateInterfacePopup:[model getUSBController]];
+	[self populateInterfacePopup];
 }
 
 - (void) ipConnectedChanged:(NSNotification*)aNote
@@ -152,7 +152,7 @@
 	[connectionProtocolMatrix selectCellWithTag:[model connectionProtocol]];
 	[connectionProtocolTabView selectTabViewItemAtIndex:[model connectionProtocol]];
 	[[self window] setTitle:[model title]];
-	[self populateInterfacePopup:[model getUSBController]];
+	[self populateInterfacePopup];
 }
 
 - (void) setButtonStates
@@ -202,9 +202,9 @@
 	NS_ENDHANDLER
 }
 
-- (void) populateInterfacePopup:(ORUSB*)usb
+- (void) populateInterfacePopup
 {
-	NSArray* interfaces = [usb interfacesForVender:[model vendorID] product:[model productID]];
+	NSArray* interfaces = [model usbInterfaces];
 	[serialNumberPopup removeAllItems];
 	[serialNumberPopup addItemWithTitle:@"N/A"];
 	NSEnumerator* e = [interfaces objectEnumerator];
@@ -216,7 +216,12 @@
 		}
 	}
 	[self validateInterfacePopup];
-	if([model serialNumber])[serialNumberPopup selectItemWithTitle:[model serialNumber]];
+	if([[model serialNumber] length] > 0){
+		if([serialNumberPopup indexOfItemWithTitle:[model serialNumber]]>=0){
+			[serialNumberPopup selectItemWithTitle:[model serialNumber]];
+		}
+		else [serialNumberPopup selectItemAtIndex:0];
+	}
 	else [serialNumberPopup selectItemAtIndex:0];
 }
 
@@ -231,7 +236,6 @@
 			[[serialNumberPopup itemWithTitle:serialNumber] setEnabled:YES];
 		}
 		else [[serialNumberPopup itemWithTitle:serialNumber] setEnabled:NO];
-
 	}
 }
 

@@ -56,7 +56,7 @@
 - (IBAction) connectionProtocolAction:(id)sender;
 - (IBAction) remoteAction:(id)sender;
 
-- (void) populateInterfacePopup:(ORUSB*)usb;
+- (void) populateInterfacePopup;
 - (void) validateInterfacePopup;
 
 @end

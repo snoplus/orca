@@ -55,6 +55,8 @@
 - (void) makeGPIBConnectors;
 - (void) adjustConnectors:(BOOL)force;
 - (id) getUSBController;
+- (NSArray*) usbInterfaces;
+- (void) checkNoUsbAlarm;
 
 #pragma mark ***Accessors
 - (ORUSBInterface*) usbInterface;
