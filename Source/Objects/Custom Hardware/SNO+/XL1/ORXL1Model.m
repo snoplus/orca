@@ -21,6 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORXL1Model.h"
+#import "ORXL2Model.h"
 #import "ORCrate.h"
 #import "ORSNOCard.h"
 
@@ -64,6 +65,18 @@
     [connectorName release];
     connectorName = aName;
     
+}
+
+- (id) getXL1
+{
+	return self;
+}
+
+- (void) setCrateNumbers
+{
+	//we'll drop in here if any of the XL1/2 connections change -- this is initiated from the XL2s only or we'll get an infinite loop
+	ORXL2Model* nextXL2 = [connector connectedObject];
+	[nextXL2 setCrateNumber:0];
 }
 
 - (ORConnector*) connector

@@ -42,6 +42,8 @@
 - (void)         guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
 - (void)         guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void)         guardianAssumingDisplayOfConnectors:(id)aGuardian;
+- (void)		 setCrateNumber:(int)crateNumber;
+- (id)			getXL1;
 
 @end
 

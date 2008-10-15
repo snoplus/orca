@@ -20,6 +20,7 @@
 
 #pragma mark •••Imported Files
 #import "ORXL2Model.h"
+#import "ORXL1Model.h"
 #import "ORCrate.h"
 #import "ORSNOCard.h"
 
@@ -191,7 +192,24 @@
     [aGuardian assumeDisplayOf:[self outputConnector]];
 }
 
+- (id) getXL1
+{
+	id obj = [inputConnector connectedObject];
+	return [obj getXL1];
+}
 
+- (void) connectionChanged
+{
+	ORXL1Model* theXL1 = [self getXL1];
+	[theXL1 setCrateNumbers];
+}
+
+- (void) setCrateNumber:(int)crateNumber
+{
+	[[self guardian] setCrateNumber:crateNumber];
+	ORXL2Model* nextXL2 = [outputConnector connectedObject];
+	[nextXL2 setCrateNumber:crateNumber+1];
+}
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder

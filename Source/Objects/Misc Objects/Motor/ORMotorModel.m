@@ -165,17 +165,11 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
                      selector: @selector(runStopped:)
                          name: ORRunStoppedNotification
                        object: nil];
-    
-    [notifyCenter addObserver: self
-                     selector: @selector(connectionChanged:)
-                         name: ORConnectionChanged
-                       object: nil];
-    
 }
 
-- (void) connectionChanged:(NSNotification*)aNote
+- (void) connectionChanged
 {
-    if([aNote object] == self && [self motorController]){
+    if([self motorController]){
         [[self motorController] assignTag:self];
         NS_DURING
             [[self motorController] readMotor:self];
