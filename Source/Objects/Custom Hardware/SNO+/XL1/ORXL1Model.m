@@ -111,7 +111,6 @@
     [aConnector setLocalFrame:aFrame];
 }
 
-
 - (void) setGuardian:(id)aGuardian
 {
     

@@ -27,6 +27,7 @@
 #pragma mark ¥¥¥Accessors
 - (NSString*) cardSlotChangedNotification;
 - (Class)	guardianClass;
+- (int) tagBase;
 
 @end
 

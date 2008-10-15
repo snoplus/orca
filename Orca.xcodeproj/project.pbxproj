@@ -1591,6 +1591,21 @@
 		84C7542D06654C3E00EC5D1C /* ORGate1D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C7541D06654C3E00EC5D1C /* ORGate1D.m */; };
 		84C7542E06654C3E00EC5D1C /* ORGate1D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C7541E06654C3E00EC5D1C /* ORGate1D.h */; };
 		84C859050665624C00FBAF9C /* Bugs.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84C859040665624C00FBAF9C /* Bugs.tif */; };
+		84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3630EA4EB2E0060076A /* Fec32.gif */; };
+		84CEA36D0EA4EB2E0060076A /* Fec32.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3640EA4EB2E0060076A /* Fec32.nib */; };
+		84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3650EA4EB2E0060076A /* Fec32Card.gif */; };
+		84CEA36F0EA4EB2E0060076A /* ORFec32Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA3660EA4EB2E0060076A /* ORFec32Controller.h */; };
+		84CEA3700EA4EB2E0060076A /* ORFec32Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA3670EA4EB2E0060076A /* ORFec32Controller.m */; };
+		84CEA3710EA4EB2E0060076A /* ORFec32Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA3680EA4EB2E0060076A /* ORFec32Model.h */; };
+		84CEA3720EA4EB2E0060076A /* ORFec32Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA3690EA4EB2E0060076A /* ORFec32Model.m */; };
+		84CEA3730EA4EB2E0060076A /* ORFec32View.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA36A0EA4EB2E0060076A /* ORFec32View.h */; };
+		84CEA3740EA4EB2E0060076A /* ORFec32View.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA36B0EA4EB2E0060076A /* ORFec32View.m */; };
+		84CEA6E70EA623A50060076A /* FecDaughterCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA6E10EA623A50060076A /* FecDaughterCard.gif */; };
+		84CEA6E80EA623A50060076A /* FecDaughterCard.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA6E20EA623A50060076A /* FecDaughterCard.nib */; };
+		84CEA6E90EA623A50060076A /* ORFecDaughterCardController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA6E30EA623A50060076A /* ORFecDaughterCardController.h */; };
+		84CEA6EA0EA623A50060076A /* ORFecDaughterCardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA6E40EA623A50060076A /* ORFecDaughterCardController.m */; };
+		84CEA6EB0EA623A50060076A /* ORFecDaughterCardModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEA6E50EA623A50060076A /* ORFecDaughterCardModel.h */; };
+		84CEA6EC0EA623A50060076A /* ORFecDaughterCardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CEA6E60EA623A50060076A /* ORFecDaughterCardModel.m */; };
 		84CEDD160CDA7D9E002CFD3A /* Gretina4.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEDD0E0CDA7D9E002CFD3A /* Gretina4.nib */; };
 		84CEDD170CDA7D9E002CFD3A /* Gretina4Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEDD0F0CDA7D9E002CFD3A /* Gretina4Card.gif */; };
 		84CEDD180CDA7D9E002CFD3A /* ORGretina4Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CEDD100CDA7D9E002CFD3A /* ORGretina4Controller.h */; };
@@ -3429,6 +3444,21 @@
 		84CDDA4F047171B1005F64B1 /* ORHPPulserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHPPulserController.m; sourceTree = "<group>"; };
 		84CDDA5404717389005F64B1 /* ORTek754DData.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORTek754DData.h; path = "Source/Objects/Hardware/GPIB/Oscilloscope T754D/ORTek754DData.h"; sourceTree = SOURCE_ROOT; };
 		84CDDA5504717389005F64B1 /* ORTek754DData.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORTek754DData.m; path = "Source/Objects/Hardware/GPIB/Oscilloscope T754D/ORTek754DData.m"; sourceTree = SOURCE_ROOT; };
+		84CEA3630EA4EB2E0060076A /* Fec32.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Fec32.gif; path = "Source/Objects/Custom Hardware/SNO+/Fec32/Fec32.gif"; sourceTree = SOURCE_ROOT; };
+		84CEA3640EA4EB2E0060076A /* Fec32.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Fec32.nib; path = "Source/Objects/Custom Hardware/SNO+/Fec32/Fec32.nib"; sourceTree = SOURCE_ROOT; };
+		84CEA3650EA4EB2E0060076A /* Fec32Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Fec32Card.gif; path = "Source/Objects/Custom Hardware/SNO+/Fec32/Fec32Card.gif"; sourceTree = SOURCE_ROOT; };
+		84CEA3660EA4EB2E0060076A /* ORFec32Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFec32Controller.h; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32Controller.h"; sourceTree = SOURCE_ROOT; };
+		84CEA3670EA4EB2E0060076A /* ORFec32Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFec32Controller.m; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32Controller.m"; sourceTree = SOURCE_ROOT; };
+		84CEA3680EA4EB2E0060076A /* ORFec32Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFec32Model.h; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32Model.h"; sourceTree = SOURCE_ROOT; };
+		84CEA3690EA4EB2E0060076A /* ORFec32Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFec32Model.m; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32Model.m"; sourceTree = SOURCE_ROOT; };
+		84CEA36A0EA4EB2E0060076A /* ORFec32View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFec32View.h; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32View.h"; sourceTree = SOURCE_ROOT; };
+		84CEA36B0EA4EB2E0060076A /* ORFec32View.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFec32View.m; path = "Source/Objects/Custom Hardware/SNO+/Fec32/ORFec32View.m"; sourceTree = SOURCE_ROOT; };
+		84CEA6E10EA623A50060076A /* FecDaughterCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = FecDaughterCard.gif; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/FecDaughterCard.gif"; sourceTree = SOURCE_ROOT; };
+		84CEA6E20EA623A50060076A /* FecDaughterCard.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = FecDaughterCard.nib; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/FecDaughterCard.nib"; sourceTree = SOURCE_ROOT; };
+		84CEA6E30EA623A50060076A /* ORFecDaughterCardController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFecDaughterCardController.h; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardController.h"; sourceTree = SOURCE_ROOT; };
+		84CEA6E40EA623A50060076A /* ORFecDaughterCardController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFecDaughterCardController.m; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardController.m"; sourceTree = SOURCE_ROOT; };
+		84CEA6E50EA623A50060076A /* ORFecDaughterCardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFecDaughterCardModel.h; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardModel.h"; sourceTree = SOURCE_ROOT; };
+		84CEA6E60EA623A50060076A /* ORFecDaughterCardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFecDaughterCardModel.m; path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard/ORFecDaughterCardModel.m"; sourceTree = SOURCE_ROOT; };
 		84CEDD0E0CDA7D9E002CFD3A /* Gretina4.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Gretina4.nib; path = Source/Objects/Hardware/Vme/Gretina4/Gretina4.nib; sourceTree = SOURCE_ROOT; };
 		84CEDD0F0CDA7D9E002CFD3A /* Gretina4Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Gretina4Card.gif; path = Source/Objects/Hardware/Vme/Gretina4/Gretina4Card.gif; sourceTree = SOURCE_ROOT; };
 		84CEDD100CDA7D9E002CFD3A /* ORGretina4Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGretina4Controller.h; path = Source/Objects/Hardware/Vme/Gretina4/ORGretina4Controller.h; sourceTree = SOURCE_ROOT; };
@@ -6429,6 +6459,8 @@
 				8499FFD90DC90F5800E82DB4 /* XL1 */,
 				8499FFE00DC9102700E82DB4 /* XL2 */,
 				8499280E0DCB997C00E82DB4 /* MTC */,
+				84CEA3620EA4EB2E0060076A /* Fec32 */,
+				84CEA6E00EA623A50060076A /* FecDaughterCard */,
 			);
 			name = "SNO+";
 			path = "Source/Objects/Custom Hardware/SNO+";
@@ -6640,9 +6672,8 @@
 				849E7C910B6956C800353D50 /* ADU200 */,
 				84A4E8950C287CA900CBC222 /* USBtoGPIB */,
 			);
-			name = USB;
-			path = Source/Objects/Hardware/USB;
-			sourceTree = SOURCE_ROOT;
+			path = USB;
+			sourceTree = "<group>";
 		};
 		849E7C910B6956C800353D50 /* ADU200 */ = {
 			isa = PBXGroup;
@@ -7437,6 +7468,36 @@
 			path = Source/Misc;
 			sourceTree = SOURCE_ROOT;
 		};
+		84CEA3620EA4EB2E0060076A /* Fec32 */ = {
+			isa = PBXGroup;
+			children = (
+				84CEA3630EA4EB2E0060076A /* Fec32.gif */,
+				84CEA3640EA4EB2E0060076A /* Fec32.nib */,
+				84CEA3650EA4EB2E0060076A /* Fec32Card.gif */,
+				84CEA3660EA4EB2E0060076A /* ORFec32Controller.h */,
+				84CEA3670EA4EB2E0060076A /* ORFec32Controller.m */,
+				84CEA3680EA4EB2E0060076A /* ORFec32Model.h */,
+				84CEA3690EA4EB2E0060076A /* ORFec32Model.m */,
+				84CEA36A0EA4EB2E0060076A /* ORFec32View.h */,
+				84CEA36B0EA4EB2E0060076A /* ORFec32View.m */,
+			);
+			path = Fec32;
+			sourceTree = "<group>";
+		};
+		84CEA6E00EA623A50060076A /* FecDaughterCard */ = {
+			isa = PBXGroup;
+			children = (
+				84CEA6E10EA623A50060076A /* FecDaughterCard.gif */,
+				84CEA6E20EA623A50060076A /* FecDaughterCard.nib */,
+				84CEA6E30EA623A50060076A /* ORFecDaughterCardController.h */,
+				84CEA6E40EA623A50060076A /* ORFecDaughterCardController.m */,
+				84CEA6E50EA623A50060076A /* ORFecDaughterCardModel.h */,
+				84CEA6E60EA623A50060076A /* ORFecDaughterCardModel.m */,
+			);
+			name = FecDaughterCard;
+			path = "Source/Objects/Custom Hardware/SNO+/FecDaughterCard";
+			sourceTree = SOURCE_ROOT;
+		};
 		84CEDD0D0CDA7D9E002CFD3A /* Gretina4 */ = {
 			isa = PBXGroup;
 			children = (
@@ -8219,7 +8280,6 @@
 				842F19A603B8EAF3005F64B1 /* Control */,
 				840EFFA30944B28F00049827 /* ProcessLogic */,
 				F51E698503AE4775015F64B1 /* Hardware */,
-				849E7C900B6956B200353D50 /* USB */,
 				84C4948A0405A0C0005F64B1 /* Custom Hardware */,
 			);
 			name = Objects;
@@ -8250,6 +8310,7 @@
 				2A943A4908A8183E00D04541 /* auger */,
 				84F46F090CA44255007EFADA /* IPE */,
 				84C4939604059AEA005F64B1 /* GPIB */,
+				849E7C900B6956B200353D50 /* USB */,
 			);
 			path = Hardware;
 			sourceTree = "<group>";
@@ -9137,6 +9198,11 @@
 				84BAA2A50E92A81A00E19946 /* ORSIS3300Decoders.h in Headers */,
 				84BAA2A70E92A81A00E19946 /* ORSIS3300Model.h in Headers */,
 				84BAA72C0E964ED900E19946 /* ORSelectorSequence.h in Headers */,
+				84CEA36F0EA4EB2E0060076A /* ORFec32Controller.h in Headers */,
+				84CEA3710EA4EB2E0060076A /* ORFec32Model.h in Headers */,
+				84CEA3730EA4EB2E0060076A /* ORFec32View.h in Headers */,
+				84CEA6E90EA623A50060076A /* ORFecDaughterCardController.h in Headers */,
+				84CEA6EB0EA623A50060076A /* ORFecDaughterCardModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9698,6 +9764,11 @@
 				844506DF0E896F5A005677E7 /* PISlashTChip.nib in Resources */,
 				84BAA2A90E92A81A00E19946 /* SIS3300.nib in Resources */,
 				84BAA2AA0E92A81A00E19946 /* SIS3300Card.gif in Resources */,
+				84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */,
+				84CEA36D0EA4EB2E0060076A /* Fec32.nib in Resources */,
+				84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */,
+				84CEA6E70EA623A50060076A /* FecDaughterCard.gif in Resources */,
+				84CEA6E80EA623A50060076A /* FecDaughterCard.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10359,6 +10430,11 @@
 				84BAA2A60E92A81A00E19946 /* ORSIS3300Decoders.m in Sources */,
 				84BAA2A80E92A81A00E19946 /* ORSIS3300Model.m in Sources */,
 				84BAA72D0E964ED900E19946 /* ORSelectorSequence.m in Sources */,
+				84CEA3700EA4EB2E0060076A /* ORFec32Controller.m in Sources */,
+				84CEA3720EA4EB2E0060076A /* ORFec32Model.m in Sources */,
+				84CEA3740EA4EB2E0060076A /* ORFec32View.m in Sources */,
+				84CEA6EA0EA623A50060076A /* ORFecDaughterCardController.m in Sources */,
+				84CEA6EC0EA623A50060076A /* ORFecDaughterCardModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

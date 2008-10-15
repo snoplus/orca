@@ -39,7 +39,6 @@
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard;
 - (void) guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void) guardianAssumingDisplayOfConnectors:(id)aGuardian;
-- (void) connectionChanged;
 - (void) setCrateNumbers;
 - (id)   getXL1;
 

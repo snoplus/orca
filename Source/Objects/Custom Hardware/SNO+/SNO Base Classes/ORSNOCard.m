@@ -36,4 +36,26 @@ NSString* ORSNOCardSlotChanged 	= @"ORSNOCardSlotChanged";
 {
     return ORSNOCardSlotChanged;
 }
+- (int) tagBase
+{
+    return 1;
+}
+
+- (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
+{
+}
+
+- (void) guardianRemovingDisplayOfConnectors:(id)aGuardian
+{
+}
+
+- (void) guardianAssumingDisplayOfConnectors:(id)aGuardian
+{
+}
+
+- (void) positionConnector:(ORConnector*)aConnector
+{
+}
+
+
 @end

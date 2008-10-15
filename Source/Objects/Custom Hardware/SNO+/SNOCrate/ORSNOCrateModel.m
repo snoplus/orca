@@ -134,10 +134,15 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 - (void) setSlot:(int)aSlot
 {
 	slot = aSlot;
+	NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
+    id anObject;
+    while(anObject = [e nextObject]){
+		[anObject guardian:self positionConnectorsForCard:anObject];
+    }
+
     [[NSNotificationCenter defaultCenter]
                 postNotificationName:ORSNOCrateSlotChanged
                               object:self];
-
 }
 
 - (int) slot
@@ -197,7 +202,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard
 {
 	NSRect aFrame = [aConnector localFrame];
-    float x =  5+[aCard slot] * 17 * .285 ;
+    float x =  7+[aCard slot] * 17 * .285 ;
     float y = 40 + [self slot] * [self frame].size.height +  ([self slot]*17);
 	if([aConnector ioType] == kOutputConnector)y += 35;
     aFrame.origin = NSMakePoint(x,y);
