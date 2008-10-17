@@ -1014,6 +1014,8 @@
 		8472AD710A82BD8F0069A069 /* ORBiRa3251OController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AD6B0A82BD8E0069A069 /* ORBiRa3251OController.m */; };
 		8472AD720A82BD8F0069A069 /* ORBiRa3251OModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8472AD6C0A82BD8E0069A069 /* ORBiRa3251OModel.h */; };
 		8472AD730A82BD8F0069A069 /* ORBiRa3251OModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8472AD6D0A82BD8E0069A069 /* ORBiRa3251OModel.m */; };
+		8473B9E40EA7BB6A00B89FF0 /* ORFecPmtsView.h in Headers */ = {isa = PBXBuildFile; fileRef = 8473B9E20EA7BB6A00B89FF0 /* ORFecPmtsView.h */; };
+		8473B9E50EA7BB6A00B89FF0 /* ORFecPmtsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8473B9E30EA7BB6A00B89FF0 /* ORFecPmtsView.m */; };
 		84742FB10A40C00F00172389 /* ORCamacListProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 84742FB00A40C00F00172389 /* ORCamacListProtocol.h */; };
 		84749D1B07D6526F001553EC /* M321.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84749D0C07D6526F001553EC /* M321.gif */; };
 		84749D1C07D6526F001553EC /* M321.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84749D0D07D6526F001553EC /* M321.nib */; };
@@ -2770,6 +2772,8 @@
 		8472AD6B0A82BD8E0069A069 /* ORBiRa3251OController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBiRa3251OController.m; path = Source/Objects/Hardware/Camac/BiRa3251/ORBiRa3251OController.m; sourceTree = SOURCE_ROOT; };
 		8472AD6C0A82BD8E0069A069 /* ORBiRa3251OModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORBiRa3251OModel.h; path = Source/Objects/Hardware/Camac/BiRa3251/ORBiRa3251OModel.h; sourceTree = SOURCE_ROOT; };
 		8472AD6D0A82BD8E0069A069 /* ORBiRa3251OModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBiRa3251OModel.m; path = Source/Objects/Hardware/Camac/BiRa3251/ORBiRa3251OModel.m; sourceTree = SOURCE_ROOT; };
+		8473B9E20EA7BB6A00B89FF0 /* ORFecPmtsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFecPmtsView.h; sourceTree = "<group>"; };
+		8473B9E30EA7BB6A00B89FF0 /* ORFecPmtsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFecPmtsView.m; sourceTree = "<group>"; };
 		84742FB00A40C00F00172389 /* ORCamacListProtocol.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCamacListProtocol.h; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacListProtocol.h"; sourceTree = SOURCE_ROOT; };
 		84749D0C07D6526F001553EC /* M321.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = M321.gif; sourceTree = "<group>"; };
 		84749D0D07D6526F001553EC /* M321.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = M321.nib; sourceTree = "<group>"; };
@@ -7480,6 +7484,8 @@
 				84CEA3690EA4EB2E0060076A /* ORFec32Model.m */,
 				84CEA36A0EA4EB2E0060076A /* ORFec32View.h */,
 				84CEA36B0EA4EB2E0060076A /* ORFec32View.m */,
+				8473B9E20EA7BB6A00B89FF0 /* ORFecPmtsView.h */,
+				8473B9E30EA7BB6A00B89FF0 /* ORFecPmtsView.m */,
 			);
 			path = Fec32;
 			sourceTree = "<group>";
@@ -9203,6 +9209,7 @@
 				84CEA3730EA4EB2E0060076A /* ORFec32View.h in Headers */,
 				84CEA6E90EA623A50060076A /* ORFecDaughterCardController.h in Headers */,
 				84CEA6EB0EA623A50060076A /* ORFecDaughterCardModel.h in Headers */,
+				8473B9E40EA7BB6A00B89FF0 /* ORFecPmtsView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10435,6 +10442,7 @@
 				84CEA3740EA4EB2E0060076A /* ORFec32View.m in Sources */,
 				84CEA6EA0EA623A50060076A /* ORFecDaughterCardController.m in Sources */,
 				84CEA6EC0EA623A50060076A /* ORFecDaughterCardModel.m in Sources */,
+				8473B9E50EA7BB6A00B89FF0 /* ORFecPmtsView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

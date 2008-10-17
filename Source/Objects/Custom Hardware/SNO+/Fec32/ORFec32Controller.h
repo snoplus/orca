@@ -24,9 +24,12 @@
 
 #pragma mark •••Forward Declarations
 @class ORFec32View;
+@class ORFecPmtsView;
 
 @interface ORFec32Controller : OrcaObjectController  {
     IBOutlet ORFec32View* groupView;
+    IBOutlet ORFecPmtsView* pmtView;
+	IBOutlet NSButton*	 testButton;
  }
 
 #pragma mark •••Accessors

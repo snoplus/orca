@@ -37,6 +37,21 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>ORFecPmtsView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>anchorView</key>
+				<string>id</string>
+				<key>controller</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>copy</key>
@@ -120,6 +135,10 @@
 			<dict>
 				<key>groupView</key>
 				<string>ORFec32View</string>
+				<key>pmtView</key>
+				<string>ORFecPmtsView</string>
+				<key>testButton</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>

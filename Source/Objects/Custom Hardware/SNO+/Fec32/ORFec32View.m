@@ -30,13 +30,13 @@
 
 - (int) cardWidth
 {
-    return 78;
+    return 39;
 }
 
 - (int)slotAtPoint:(NSPoint)aPoint 
 {
 	float y = aPoint.y;
-	float h = [self bounds].size.height;
+	float h = [self frame].size.height;
 	int cardWidth = [self cardWidth];
 	
 	if(y>=0 && y<cardWidth)						return 0;
@@ -48,19 +48,22 @@
 
 - (BOOL) dropPositionOK:(NSPoint)aPoint
 {
-    short h = [self bounds].size.height;
+	aPoint = [self convertPoint:aPoint fromView:nil];
+
+    short h = [self frame].size.height;
 	int cardWidth = [self cardWidth];
     short y = aPoint.y;
-    if(y >= 0 &&  y < cardWidth*2)		     return YES;
-    else if(y >= y - cardWidth*2-5 && y < h) return YES;
-    else								     return NO;
+	BOOL dropStatus = NO;
+    if((y >= 0) &&  (y < cardWidth*2))				dropStatus = YES;
+    else if((y >= (h - cardWidth*2)) && (y < h))	dropStatus = YES;
+	return dropStatus;
 }
 
 - (NSPoint) constrainLocation:(NSPoint)aPoint
 {
     NSPoint validPoint = aPoint; //default to nonsense
 	validPoint.y = -10000;
-    short h = [self bounds].size.height;
+    short h = [self frame].size.height;
     short y = aPoint.y;
 	int cardWidth = [self cardWidth];
     if(y<cardWidth)validPoint.y = 0;
@@ -82,8 +85,8 @@
 			switch(slot){
 				case 0:  aPoint.y = 5; break;
 				case 1:  aPoint.y = [self cardWidth]+5; break;
-				case 2:  aPoint.y = [self bounds].size.height - 2*[self cardWidth]+5;  break;
-				default: aPoint.y = [self bounds].size.height - [self cardWidth]+5;	break;
+				case 2:  aPoint.y = [self frame].size.height - 2*[self cardWidth]+5;  break;
+				default: aPoint.y = [self frame].size.height - [self cardWidth]+5;	break;
 			}
             return [self constrainLocation:aPoint];
         }
@@ -122,7 +125,7 @@
 		e = [sortedSelection objectEnumerator];
 		while(obj = [e nextObject]){
 			int newSlot = [obj slot] + slotInc;
-			float h = [self bounds].size.height;
+			float h = [self frame].size.height;
 			int cardWidth = [self cardWidth];
 			float newY;
 			switch(newSlot){

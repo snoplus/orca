@@ -23,7 +23,7 @@
 #import "ORFec32Controller.h"
 #import "ORFec32Model.h"
 #import "ORFec32View.h"
-
+#import "ORFecPmtsView.h"
 
 @implementation ORFec32Controller
 
@@ -38,6 +38,7 @@
 - (void) awakeFromNib
 {
     [groupView setGroup:model];
+	[testButton setEnabled:YES];
     [super awakeFromNib];
 }
 
@@ -103,7 +104,7 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"IP Carrier (Slot %d)",[model slot]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Fec32 (Slot %d)",[model slot]]];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -114,6 +115,7 @@
 -(void) groupChanged:(NSNotification*)note
 {
 	[self updateWindow];
+	[pmtView setNeedsDisplay:YES];
 }
 
 
