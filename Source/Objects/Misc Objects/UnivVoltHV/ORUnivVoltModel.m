@@ -66,7 +66,7 @@ NSString* HVkModuleDMP	= @"DMP";
 //NSString* UVkCommand = @"Command";
 //NSString* UVkReturn  = @"Return";
 
-#define UVHVkNumChannels 12
+#define HVkNumChannels 12
 
 // Keys
 //NSString* UVkCOMMAND = @"Command"; defined in ORUnivVoltHVCrateModel.h
@@ -219,7 +219,7 @@ NSString* UVkString = @"string";
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
     [notifyCenter addObserver : self
                      selector : @selector( interpretDataReturn: )
-                         name : UVHVUnitInfoAvailableNotification
+                         name : HVUnitInfoAvailableNotification
                        object : nil];
 					   
 }
@@ -266,7 +266,7 @@ NSString* UVkString = @"string";
 		
 		if ( [writableDict isEqualTo: UVkWrite] )
 		{
-			for ( i = 0; i < UVHVkNumChannels; i++ )
+			for ( i = 0; i < HVkNumChannels; i++ )
 			{
 				NSMutableDictionary* chnlDict = [mChannelArray objectAtIndex: i]; // Get values we want to set for channel.
 				NSNumber* valueObj = [chnlDict objectForKey: commandDict];

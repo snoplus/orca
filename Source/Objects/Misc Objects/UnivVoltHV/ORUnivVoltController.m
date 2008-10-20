@@ -40,7 +40,7 @@
     
 /*    [notifyCenter addObserver : self
                      selector : @selector( slotChanged: )
-                         name : ORUVHVSlotChanged
+                         name : ORHVSlotChanged
 						object: model];
 */
 
@@ -61,7 +61,7 @@
 						
 	[notifyCenter  addObserver: self
 	                  selector: @selector( writeErrorMsg: )
-					     name : UVHVSocketNotConnectedNotification
+					     name : HVSocketNotConnectedNotification
 					   object : nil];
 
 /*
@@ -106,7 +106,7 @@
 
 	[notifyCenter  addObserver: self
 	                  selector: @selector( writeErrorMsg: )
-					     name : UVHVSocketNotConnectedNotification
+					     name : HVSocketNotConnectedNotification
 					   object : nil];
 
 }

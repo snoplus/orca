@@ -62,33 +62,33 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
     [notifyCenter addObserver : self
                      selector : @selector( isConnectedChanged: )
-                         name : UVHVCrateIsConnectedChangedNotification
+                         name : HVCrateIsConnectedChangedNotification
                        object : model];
 					   
 					
     [notifyCenter addObserver : self
                      selector : @selector( ipAddressChanged: )
-                         name : UVHVCrateIpAddressChangedNotification
+                         name : HVCrateIpAddressChangedNotification
                        object : model];
 					   
     [notifyCenter addObserver : self
                      selector : @selector( displayHVStatus: )
-                         name : UVHVCrateHVStatusAvailableNotification
+                         name : HVCrateHVStatusAvailableNotification
                        object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector( displayConfig: )
-                         name : UVHVCrateConfigAvailableNotification
+                         name : HVCrateConfigAvailableNotification
                        object : model];
 
     [notifyCenter addObserver : self
                      selector : @selector( displayEnet: )
-                         name : UVHVCrateEnetAvailableNotification
+                         name : HVCrateEnetAvailableNotification
                        object : model];
 					   
     [notifyCenter addObserver : self
                      selector : @selector( writeErrorMsg: )
-                         name : UVHVSocketNotConnectedNotification
+                         name : HVSocketNotConnectedNotification
                        object : model];	
 }
 
@@ -196,8 +196,9 @@
 
 - (void) displayConfig
 {
-	NSLog( @"Config display: %@", [model config]);
-	[outputArea setString: [model config]];
+	NSString* returnData = [model config];	
+	NSLog( @"Config display: %@", returnData);
+	[outputArea setString: returnData];
 }
 
 - (void) displayEnet

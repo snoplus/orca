@@ -25,14 +25,14 @@
 #import "ORMacModel.h"
 #import "ORQueue.h"
 
-NSString* UVHVCrateIsConnectedChangedNotification		= @"UVHVCrateIsConnectedChangedNotification";
-NSString* UVHVCrateIpAddressChangedNotification			= @"UVHVCrateIpAddressChangedNotification";
+NSString* HVCrateIsConnectedChangedNotification			= @"HVCrateIsConnectedChangedNotification";
+NSString* HVCrateIpAddressChangedNotification			= @"HVCrateIpAddressChangedNotification";
 //NSString* ORUnivVoltHVCrateHVStatusChangedNotification			= @"ORUnivVoltHVCrateStatusChangedNotification";
-NSString* UVHVCrateHVStatusAvailableNotification		= @"UVHVCrateHVStatusAvailableNotification";
-NSString* UVHVCrateConfigAvailableNotification			= @"UVHVCrateConfigAvailableNotification";
-NSString* UVHVCrateEnetAvailableNotification		    = @"UVHVCrateEnetAvailableNotification";
-NSString* UVHVUnitInfoAvailableNotification             = @"UVHVUnitInfoAvailableNotification";
-NSString* UVHVSocketNotConnectedNotification			= @"UVHVSocketNotConnectedNotification";
+NSString* HVCrateHVStatusAvailableNotification			= @"HVCrateHVStatusAvailableNotification";
+NSString* HVCrateConfigAvailableNotification			= @"HVCrateConfigAvailableNotification";
+NSString* HVCrateEnetAvailableNotification				= @"HVCrateEnetAvailableNotification";
+NSString* HVUnitInfoAvailableNotification				= @"HVUnitInfoAvailableNotification";
+NSString* HVSocketNotConnectedNotification				= @"HVSocketNotConnectedNotification";
 
 // HV crate commands
 NSString* ORHVkCrateHVStatus							= @"HVSTATUS";
@@ -62,8 +62,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 {
 	self = [super init];
 	if ( self ) {
-		mQueue = [[ORQueue alloc] init];
-		[mQueue retain];
 	}
 	return ( self );
 }
@@ -176,7 +174,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
     [ipAddress autorelease];
     ipAddress = [anIpAddress copy];    
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateIpAddressChangedNotification object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: HVCrateIpAddressChangedNotification object: self];
 }
 
 - (NSString*) hvStatus
@@ -195,7 +193,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	if ( [command isEqualTo: ORHVkCrateEnet] )
 		return( [queuedCommand objectForKey: UVkReturn] );
 	return( ORHVkNoReturn );
-
 }
 
 - (NSString *) config
@@ -203,7 +200,16 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	NSDictionary* queuedCommand = [mQueue dequeue];
 	NSString* command = [queuedCommand objectForKey: UVkCommand];
 	if ( [command isEqualTo: ORHVkCrateConfig] )
-		return( [queuedCommand objectForKey: UVkReturn] );
+	{
+		NSArray* tokens = [queuedCommand objectForKey: UVkReturn];
+		int i;
+		NSString* result = [NSString stringWithString: [tokens objectAtIndex: 1]];
+		for (i = 1; i < [tokens count]; i++ )
+		{	
+			NSString* result = [result stringByAppendingString: result];
+		}
+		return( result );
+	}
 	return( ORHVkNoReturn );
 }
 
@@ -280,6 +286,12 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		[commandObj setObject: chnlObj forKey: UVkChnl];
 		[commandObj setObject: aCommand forKey: UVkCommand];
 
+		if ( mQueue == nil )
+		{
+			mQueue = [[ORQueue alloc] init];
+			[mQueue retain];
+		}
+
 		[mQueue enqueue: commandObj];
 		
 		fullCommand = aCommand;
@@ -295,7 +307,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		{
 			NSString* errorMsg = [NSString stringWithFormat: @"Socket not connected to Crate.\n"];
 			NSDictionary* errorMsgDict = [NSDictionary dictionaryWithObject: errorMsg forKey: UVkErrorMsg];
-			[[NSNotificationCenter defaultCenter] postNotificationName: UVHVSocketNotConnectedNotification object: self userInfo: errorMsgDict];
+			[[NSNotificationCenter defaultCenter] postNotificationName: HVSocketNotConnectedNotification object: self userInfo: errorMsgDict];
 		}
 	}	
 	@catch (NSException *exception) {
@@ -399,37 +411,40 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 				// crate only returns.
 				if ( [retCommand isEqualTo: ORHVkCrateHVStatus] )
 				{
+
+					[self setupReturnDict: retSlot channel: retChnl command: retCommand  returnString: tokens];
 					NSLog( @"Send notification about HVStatus.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				}
 				
 				else if ( [retCommand isEqualTo: ORHVkCrateConfig] )
 				{
 					NSLog( @"Send notification about Config.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
 				}
 		
 				else if ( [retCommand isEqualTo: ORHVkCrateHVOn] )
 				{
 					NSLog( @"Send notification about HVOn.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				}
 //		
 				else if ( [retCommand isEqualTo: ORHVkCrateHVOff] )
 				{
 					NSLog( @"Send notification about HVOff.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				}
 //		
 				else if ( [retCommand isEqualTo: ORHVkCrateHVPanic] )
 				{
 					NSLog( @"Send notification about Panic.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				}
 			
 				// Handle return to HV unit.
 				else
 				{
+					
 					// Create return dictionary.
 					NSLog( @"Send notification about HV Unit - slot: %d, chnl: %d\n", retSlotNum, retChnlNum);
 					NSArray *keys = [NSArray arrayWithObjects: UVkSlot, UVkChnl, UVkCommand, UVkReturn, nil];
@@ -442,7 +457,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 				
 					// notify HV unit about return from command.
 					mReturnToUnit = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateEnetAvailableNotification object: self userInfo: mReturnToUnit];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateEnetAvailableNotification object: self userInfo: mReturnToUnit];
 
 					NSLog( @"Writing command '%@' for return dictionary.", [mReturnToUnit objectForKey: UVkCommand] );
 //					[mReturnToUnit retain];  // ***When Using notification will have to be changed.
@@ -524,37 +539,37 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 				if ( [command isEqualTo: ORHVkCrateHVStatus] )
 				{
 					NSLog( @"Send notification about HVStatus.");
-				[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+				[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				
 				}
 				else if ( [command isEqualTo: ORHVkCrateConfig] )
 				{
 					NSLog( @"Send notification about Config.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
 				}
 		
 				else if ( [command isEqualTo: ORHVkCrateEnet] )
 				{
 					NSLog( @"Send notification about Enet.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateConfigAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
 				}
 				
 				else if ( [command isEqualTo: ORHVkHVOn] )
 				{
 					NSLog( @"Send notification about HV being turned on.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				}
 				
 				else if ( [command isEqualTo: ORHVkHVOff] )
 				{
 					NSLog( @"Send notification about HV being turned off.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				}
 
 				else if ( [command isEqualTo: ORHVkHVPanic] )
 				{
 					NSLog( @"Send notification about HV PANIC.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateHVStatusAvailableNotification object: self];
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				}
 			}
 		
@@ -582,8 +597,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 
 - (void) obtainConfig
-{
-	
+{	
 	@try
 	{
 		[self sendCommand: -1 channel: -1 command: ORHVkCrateConfig];
@@ -601,8 +615,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 }
 
 - (void) obtainEthernetConfig
-{
-	
+{	
 	@try
 	{
 		NSString* command = [NSString stringWithFormat: ORHVkCrateEnet];	
@@ -671,6 +684,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 //			3 - Crate is in local command.  Need to turn key.
 //			4 - Last command a PANIC.
 //			
+//------------------------------------------------------------------------------------------
 - (NSString*) interpretDataFromSocket: (NSData*) aDataObject returnCode: (int*) aReturnCode
 {
 	const int	NUMcCODENUM = 5;
@@ -704,7 +718,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		}
 		
 		displayArray[ 1 ] = '\0';
-		for ( i = 0; i < lengthOfReturn; i++ ) {
+/*		for ( i = 0; i < lengthOfReturn; i++ ) {
 			displayArray[ 0 ] = returnBufferArray[ i ];
 			if ( returnBufferArray[ i ] == '\0' ) 
 				displayArray[ 0 ] = '-';
@@ -713,7 +727,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 			NSLog( @"Interpreted.  Char( %d ): %s\n", i, displayArray );
 		}
-		
+*/		
 		nChar = 0;
 				
 		// Find the C and \0 in the character array.  Replace them with \n except for the last
@@ -762,12 +776,13 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		}
 		
 		// Debugging display each character in returnBufferString.		
+/*
 		displayArray[ 1 ] = '\0';
 		for ( i = 0; i < nChar; i++ ) {
 			displayArray[ 0 ] = returnBufferString[ i ];
 			NSLog( @"Char( %d ): %s\n", i, displayArray );
 		}
-			
+*/			
 
 		// Get the return code as both number and string.
 		returnCodeAsString = [[NSString alloc] initWithBytes: returnCodeArray length: 5 encoding: NSASCIIStringEncoding];
@@ -802,10 +817,28 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 {
     mIsConnected = aFlag;
 //	[self setReceiveCount: 0];
-    [[NSNotificationCenter defaultCenter] postNotificationName: UVHVCrateIsConnectedChangedNotification object: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: HVCrateIsConnectedChangedNotification object: self];
 }
 
-#pragma mark ***Delegate Methods
+
+- (void) setupReturnDict: (NSNumber*) aSlotNum 
+                 channel: (NSNumber*) aChnlNum 
+				 command: (NSString*) aCommand 
+			returnString: (NSArray*) aRetTokens
+{
+	NSLog( @"Send notification data return - slot: %d, chnl: %d\n", [aSlotNum intValue], [aChnlNum intValue]);
+	NSArray *keys = [NSArray arrayWithObjects: UVkSlot, UVkChnl, UVkCommand, UVkReturn, nil];
+	NSArray *data = [NSArray arrayWithObjects:  aSlotNum, aChnlNum, aCommand, aRetTokens, nil];
+	if ( mReturnToUnit != nil )
+	{
+		[mReturnToUnit release];
+	}
+				
+	// notify HV unit about return from command.
+	mReturnToUnit = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
+}
+
+#pragma mark •••Delegate Methods
 - (void) netsocketConnected: (NetSocket*) inNetSocket
 {
     if(inNetSocket == mSocket){
