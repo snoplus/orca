@@ -62,7 +62,8 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 {
 	self = [super init];
 	if ( self ) {
-		mQueue = [ORQueue init];
+		mQueue = [[ORQueue alloc] init];
+		[mQueue retain];
 	}
 	return ( self );
 }
@@ -112,6 +113,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 - (void) dealloc
 {
+	if ( mQueue != nil ) [mQueue dealloc];
 	[mSocket close];
 	[mSocket release];
 	
