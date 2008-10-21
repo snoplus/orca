@@ -110,6 +110,11 @@
                      selector: @selector(quickStartChanged:)
                          name: ORRemoteRunQuickStartChanged
                        object: model];
+
+   [notifyCenter addObserver: self
+                     selector: @selector(offlineChanged:)
+                         name: ORRemoteRunModelOfflineChanged
+                       object: model];
     
     [notifyCenter addObserver: self
                      selector: @selector(remoteHostChanged:)
@@ -152,6 +157,7 @@
     [self startTimeChanged:nil];
     [self runNumberChanged:nil];
     [self quickStartChanged:nil];
+    [self offlineChanged:nil];
     [self remoteHostChanged:nil];
     [self remotePortChanged:nil];
 	[self connectAtStartChanged:nil];
@@ -330,14 +336,20 @@
 	}
 }
 
--(void)startTimeChanged:(NSNotification*)aNotification
+-(void) startTimeChanged:(NSNotification*)aNotification
 {
 	[timeStartedField setObjectValue:[model startTime]];
 }
 
--(void)quickStartChanged:(NSNotification *)notification
+-(void) quickStartChanged:(NSNotification *)notification
 {
 	[self updateTwoStateCheckbox:quickStartCB setting:[model quickStart]];
+	[self updateButtons];
+}
+
+-(void) offlineChanged:(NSNotification *)notification
+{
+	[self updateTwoStateCheckbox:offlineCB setting:[model offline]];
 	[self updateButtons];
 }
 
@@ -401,6 +413,13 @@
     }
 }
 
+-(IBAction)offlineCBAction:(id)sender
+{
+    if([model quickStart] != [sender intValue]){
+        [[self undoManager] setActionName: @"Set Offline"];
+        [model setOffline:[sender intValue]];
+    }
+}
 
 -(IBAction)timeLimitStepperAction:(id)sender
 {

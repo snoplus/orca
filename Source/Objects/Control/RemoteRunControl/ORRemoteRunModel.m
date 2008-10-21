@@ -27,6 +27,7 @@
 
 #pragma mark ¥¥¥Definitions
 
+NSString* ORRemoteRunModelOfflineChanged	= @"ORRemoteRunModelOfflineChanged";
 NSString* ORRemoteRunIsConnectedChanged     = @"ORRemoteRunIsConnectedChanged";
 NSString* ORRemoteRunAutoReconnectChanged   = @"ORRemoteRunAutoReconnectChanged";
 NSString* ORRemoteRunConnectAtStartChanged  = @"ORRemoteRunConnectAtStartChanged";
@@ -119,6 +120,19 @@ NSString* ORRemoteRunLock                    = @"ORRemoteRunLock";
 
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) offline
+{
+    return offline;
+}
+
+- (void) setOffline:(BOOL)aOffline
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOffline:offline];
+    offline = aOffline;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRemoteRunModelOfflineChanged object:self];
+}
+
 - (BOOL) isConnected
 {
 	return isConnected;
@@ -457,6 +471,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setOffline:[decoder decodeBoolForKey:@"offline"]];
     [self setTimeLimit:[decoder decodeInt32ForKey:ORRunTimeLimit]];
     [self setTimedRun:[decoder decodeBoolForKey:ORRunTimedRun]];
     [self setRepeatRun:[decoder decodeBoolForKey:ORRunRepeatRun]];
@@ -476,6 +491,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
 -(void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:offline forKey:@"offline"];
     [encoder encodeInt32:timeLimit forKey:ORRunTimeLimit];
     [encoder encodeBool:timedRun forKey:ORRunTimedRun];
     [encoder encodeBool:repeatRun forKey:ORRunRepeatRun];
@@ -499,6 +515,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [objDictionary setObject:[NSNumber numberWithLong:ut_time]          forKey:@"startTime"];
     [objDictionary setObject:[NSNumber numberWithFloat:refTime]         forKey:@"refTime"];
     [objDictionary setObject:[NSNumber numberWithBool:quickStart]       forKey:@"quickStart"];
+    [objDictionary setObject:[NSNumber numberWithBool:offline]			forKey:@"offline"];
     [objDictionary setObject:[NSNumber numberWithLong:[self runNumber]] forKey:@"RunNumber"];
     
     [dictionary setObject:objDictionary forKey:@"Run Control"];
@@ -577,6 +594,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [self sendCmd:@"timeLimit = [RunControl timeLimit];"];
     [self sendCmd:@"timeToGo = [RunControl timeToGo];"];
     [self sendCmd:@"quickStart = [RunControl quickStart];"];
+    [self sendCmd:@"offline = [RunControl offlineRun];"];
     [self sendCmd:@"runningState = [RunControl runningState];"];
     [self sendCmd:@"startTime = [RunControl startTimeAsString];"];
 }
@@ -587,6 +605,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setRepeatRun:%d];" ,repeatRun]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setTimedRun:%d];"  ,timedRun]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setQuickStart:%d];",quickStart]];
+    [self sendCmd:[NSString stringWithFormat:@"[RunControl setOfflineRun:%d];",offline]];
 }
 
 #pragma mark ***Delegate Methods

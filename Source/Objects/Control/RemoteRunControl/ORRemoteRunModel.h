@@ -47,12 +47,15 @@
         BOOL        autoReconnect;
         BOOL        isConnected;
 		NSTimeInterval timeHalted;
+		BOOL		offline;
 }
 
 
 #pragma mark ¥¥¥Initialization
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) offline;
+- (void) setOffline:(BOOL)aOffline;
 - (BOOL) isConnected;
 - (void) setIsConnected:(BOOL)aIsConnected;
 - (BOOL) autoReconnect;
@@ -108,6 +111,9 @@
 - (void) sendSetup;
 - (void) sendCmd:(NSString*)aCmd;
 
+- (void) encodeWithCoder:(NSCoder*)encoder;
+- (id)   initWithCoder:(NSCoder*)decoder;
+
 #pragma mark ***Delegate Methods
 - (void) netsocketConnected:(id)aSocket;
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
@@ -118,6 +124,8 @@
 @end
 
 
+
+extern NSString* ORRemoteRunModelOfflineChanged;
 extern NSString* ORRemoteRunTimedRunChanged;
 extern NSString* ORRemoteRunRepeatRunChanged;
 extern NSString* ORRemoteRunTimeLimitChanged;

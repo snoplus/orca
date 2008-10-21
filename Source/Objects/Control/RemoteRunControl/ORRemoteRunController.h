@@ -26,6 +26,7 @@
     IBOutlet NSButton*  restartRunButton;
     IBOutlet NSButton*  stopRunButton;
     IBOutlet NSButton*  quickStartCB;
+    IBOutlet NSButton*  offlineCB;
     IBOutlet NSButton*  connectButton;
 	IBOutlet NSTextField*   connectionStatusField;
     
@@ -65,6 +66,7 @@
 - (IBAction) timedRunCBAction:(id)sender;
 - (IBAction) repeatRunCBAction:(id)sender;
 - (IBAction) quickStartCBAction:(id)sender;
+- (IBAction) offlineCBAction:(id)sender;
 - (IBAction) remoteHostAction:(id)sender;
 - (IBAction) remotePortAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
@@ -87,6 +89,7 @@
 - (void) timeToGoChanged:(NSNotification*)aNotification;
 - (void) runNumberChanged:(NSNotification*)aNotification;
 - (void) quickStartChanged:(NSNotification *)notification;
+- (void) offlineChanged:(NSNotification *)notification;
 - (void) connectAtStartChanged:(NSNotification*)note;
 - (void) autoReconnectChanged:(NSNotification*)note;
 
