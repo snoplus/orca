@@ -47,6 +47,7 @@ NSString* ORHVkNoReturn = @"No Return";
 //NSString* ORHVkModuleDMP								= @"DMP";
 
 // Entries in data return dictionary
+NSString* UVkCmdId	 = @"CmdId";
 NSString* UVkSlot	 = @"Slot";
 NSString* UVkChnl    = @"Chnl";
 NSString* UVkCommand = @"Command";
@@ -107,11 +108,13 @@ NSString* UVkErrorMsg = @"ErrorMsg";
     [[NSNotificationCenter defaultCenter]
                 postNotificationName:OROrcaObjectImageChanged
                               object:self];
+		
 }
 
 - (void) dealloc
 {
-	if ( mQueue != nil ) [mQueue dealloc];
+	if ( mCmdQueue != nil ) [mCmdQueue dealloc];
+//	if ( mQueueReturn != nil ) [mQueueReturn dealloc];
 	[mSocket close];
 	[mSocket release];
 	
@@ -134,35 +137,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 - (void) connectionChanged
 {
-/*
-	ORConnector* controllerConnector = [[self connectors] objectForKey:[self crateAdapterConnectorKey]];
-	ORConnector* usbConnector = [[self connectors] objectForKey:ORUnivVoltHVUSBConnector];
-	if(![usbConnector isConnected] && ![controllerConnector isConnected]){
-		[usbConnector setHidden:NO];
-		[controllerConnector setHidden:NO];
-		if(cratePowerAlarm){
-			[self setPowerOff:NO];
-		    [cratePowerAlarm clearAlarm];
-			[cratePowerAlarm release];
-			cratePowerAlarm = nil;
-			[self viewChanged:nil];
-			[[NSNotificationCenter defaultCenter]
-                postNotificationName:ORForceRedraw
-                              object:self];
-
-		}
-	}
-	else {
-//		if([usbConnector isConnected]){
-//			usingUSB = YES;
-			[controllerConnector setHidden:YES];
-		}
-		else {
-			usingUSB = NO;
-			[usbConnector setHidden:YES];
-		}
-	}
-	*/
 }
 
 #pragma mark •••Accessors
@@ -179,37 +153,33 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 - (NSString*) hvStatus
 { 
-	NSDictionary* queuedCommand = [mQueue dequeue];
-	NSString* command = [queuedCommand objectForKey: UVkCommand];
-	if ( [command isEqualTo: ORHVkCrateHVStatus] )
-		return( [queuedCommand objectForKey: UVkReturn] );
+	if (mMostRecentHVStatus != nil )
+	{
+		return( mMostRecentHVStatus );
+	}	
 	return( ORHVkNoReturn );
 }
 
 - (NSString *) ethernetConfig
 {
-	NSDictionary* queuedCommand = [mQueue dequeue];
-	NSString* command = [queuedCommand objectForKey: UVkCommand];
-	if ( [command isEqualTo: ORHVkCrateEnet] )
-		return( [queuedCommand objectForKey: UVkReturn] );
+	if (mMostRecentEnetConfig != nil )
+	{
+		return( mMostRecentEnetConfig );
+	}	
 	return( ORHVkNoReturn );
 }
 
 - (NSString *) config
 {
-	NSDictionary* queuedCommand = [mQueue dequeue];
-	NSString* command = [queuedCommand objectForKey: UVkCommand];
-	if ( [command isEqualTo: ORHVkCrateConfig] )
+//	NSDictionary* queuedCommand = [mQueue dequeue];
+//	NSString* command = [queuedCommand objectForKey: UVkCommand];
+//	NSString* command = [mReturnToUnit objectForKey: UVkCommand];
+	
+//	if ( [command isEqualTo: ORHVkCrateConfig] )
+	if (mMostRecentConfig != nil )
 	{
-		NSArray* tokens = [queuedCommand objectForKey: UVkReturn];
-		int i;
-		NSString* result = [NSString stringWithString: [tokens objectAtIndex: 1]];
-		for (i = 1; i < [tokens count]; i++ )
-		{	
-			NSString* result = [result stringByAppendingString: result];
-		}
-		return( result );
-	}
+		return( mMostRecentConfig );
+	}	
 	return( ORHVkNoReturn );
 }
 
@@ -223,10 +193,11 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	return mSocket;
 }
 
-- (NSDictionary*) returnDataToHVUnit
+/*- (NSDictionary*) returnDataToHVUnit
 {
 	return( mReturnToUnit );
 }
+*/
 
 #pragma mark ***Crate Actions
 - (void) setSocket: (NetSocket*) aSocket
@@ -263,7 +234,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 - (void) sendCrateCommand: (NSString*) aCommand
 {
-	[self sendCommand: -1 channel: -1 command: aCommand];
+	[self queueCommand: 0 totalCmds: 1 slot: -1 channel: -1 command: aCommand];
 }
 
 //------------------------------------------------------------------------------------------------
@@ -271,45 +242,77 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 // to entire crate cannot have slot and channel number set.  If command is only for slot then Sx.
 // is the form of the command where x is the slot number.  If command is directed at specific channel
 // then command is of the form Sx.y where y is the channel number. 
+//
+// Implemented both cmdQueue and retQueue queues.  queueCommand allows the queuing of multiple
+// commands in cmdQueue.  If only one command is queued then this routine automatically sends 
+// that command.  If many commands need to be sent then queueCommand can be called multiple times 
+// without a single command being sent. A single call to sendCommandBasic with ensure that all the 
+// queued
+// commands are sent out in order.  sendCommandBasic works in tandem with HandleReturnData to 
+// ensure that commands are sent and received synchonously, which is required by the hardware.
+// each return is received from the hardware.
+
+// sendCommand is issued, the number of commands to send is also given.  This routine will wait until
+// all commands have been issued.  
+//  
 //------------------------------------------------------------------------------------------------
-- (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand
+- (void) queueCommand: (int) aCmdId			// 0 based.
+		     totalCmds: (int) aTotalCmds
+                  slot: (int) aCurrentUnit 
+			   channel: (int) aCurrentChnl 
+			   command: (NSString*) aCommand 
 {
-	NSString* fullCommand;
+
+	if ( aCmdId == 11 )
+		NSLog( @"id: %d, total: %d\n", aCmdId, aTotalCmds );
+		
 	@try
 	{
-		NSNumber* unitObj = [NSNumber numberWithInt: aCurrentUnit];
-		NSNumber* chnlObj = [NSNumber numberWithInt: aCurrentChnl];
+		// see if all commands have been downloaded.
+		if ( aTotalCmds > aCmdId )	
+		{
+			// Have first command - set up parameters
+			if ( aCmdId == 0 )
+			{
+				mCmdsToProcess = aTotalCmds;
+//				mRetsToProcess = aTotalCmds;
+				mTotalCmds = aTotalCmds;
+			}
 		
-		NSMutableDictionary* commandObj = [NSMutableDictionary dictionaryWithCapacity: 3];
+			if ( mCmdQueue == nil )
+			{
+				mCmdQueue = [[ORQueue alloc] init];
+				[mCmdQueue retain];
+			}
 		
-		[commandObj setObject: unitObj forKey: UVkSlot];
-		[commandObj setObject: chnlObj forKey: UVkChnl];
-		[commandObj setObject: aCommand forKey: UVkCommand];
+			// Create command dictionary object
+			NSNumber* cmdId = [NSNumber numberWithInt: aCmdId];
+			NSNumber* unitObj = [NSNumber numberWithInt: aCurrentUnit];
+			NSNumber* chnlObj = [NSNumber numberWithInt: aCurrentChnl];
+		
+			NSMutableDictionary* commandObj = [NSMutableDictionary dictionaryWithCapacity: 4];
+		
+			[commandObj setObject: cmdId forKey: UVkCmdId];
+			[commandObj setObject: unitObj forKey: UVkSlot];
+			[commandObj setObject: chnlObj forKey: UVkChnl];
+			[commandObj setObject: aCommand forKey: UVkCommand];
 
-		if ( mQueue == nil )
-		{
-			mQueue = [[ORQueue alloc] init];
-			[mQueue retain];
+			mCmdsToProcess--;
+			mRetsToProcess++;
+			[mCmdQueue enqueue: commandObj];
+			
+			NSLog( @"Queue cmd with id: %d - %@\n", aCmdId, aCommand );
+//			} 
 		}
-
-		[mQueue enqueue: commandObj];
 		
-		fullCommand = aCommand;
-		
-		const char* buffer = [fullCommand cStringUsingEncoding: NSASCIIStringEncoding];
-		
-		NSLog( @"Command: %s,  length:%d\n", buffer, [fullCommand length] + 1 );
-		if (mSocket != nil )
+		// Queue has been filled so dequeue a single command.
+		if ( mCmdsToProcess == 0 && mTotalCmds == mRetsToProcess )
 		{
-			[mSocket write: buffer length: [aCommand length] + 1];	
-		}
-		else
-		{
-			NSString* errorMsg = [NSString stringWithFormat: @"Socket not connected to Crate.\n"];
-			NSDictionary* errorMsgDict = [NSDictionary dictionaryWithObject: errorMsg forKey: UVkErrorMsg];
-			[[NSNotificationCenter defaultCenter] postNotificationName: HVSocketNotConnectedNotification object: self userInfo: errorMsgDict];
-		}
+			[self sendCommandBasic];
+		}	
+		
 	}	
+	
 	@catch (NSException *exception) {
 
 			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
@@ -320,6 +323,13 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	}
 }
 
+/*- (void) sendCommandFromQueue
+{
+	NSDictionary* cmdDictObj = [mCmdQueue dequeue];
+	
+	[self sendCommandBasic: cmdDictObj];
+}
+*/
 
 //------------------------------------
 //depreciated (11/29/06) remove someday
@@ -332,9 +342,20 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 
 #pragma mark •••Notifications
+//------------------------------------------------------------------------------------------------
+// Sends used to respond to data returns from HV crate.  Called by delegate method netSocket::
+// dataAvailable. 
+//
+// This routine processes the returned data and places it on an output queue.  It sends all the
+// appropriate notifications once all commands have been processed.  In the meantime it stores
+// all the returned data in a retQueue.  See sendCommand method for more details.  Only HVUnit
+// needs to send multiple commands so only returns from the HVUnit are stored in Queue.
+//  
+//------------------------------------------------------------------------------------------------
 - (void) handleDataReturn: (NSData*) aSomeData
 {
 	NSString*	retSlotChnl;
+	NSString*	returnFromSocket;
 	NSNumber*   retSlot;
 	NSNumber*   retChnl;
 	int			returnCode;
@@ -345,22 +366,21 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	int			j;
 	int			i;
 
-	@try {
+	@try {		
 		// Get oldest command
-		NSDictionary* queuedCommand = [mQueue dequeue];
+		NSDictionary* queuedCommand = [mCmdQueue dequeue];
 	
 		// Check Get data from Queued dictionary entry.
 		NSString* queuedCommandStr = [queuedCommand objectForKey: UVkCommand];
+		NSNumber* cmdId = [queuedCommand objectForKey: UVkCmdId];
 //		NSNumber* queuedSlot = [queuedCommand objectForKey: UVkSlot];
 		NSNumber* queuedChnl = [queuedCommand objectForKey: UVkChnl];
 	
 		// Parse the returned data.
-		NSString* returnFromSocket = [self interpretDataFromSocket: aSomeData returnCode: &returnCode];
-		[returnFromSocket retain];
+		returnFromSocket = [[self interpretDataFromSocket: aSomeData returnCode: &returnCode] retain];
 		NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
 		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
  
-		[returnFromSocket release];
 		
 		// Make sure we have data returned from HV Crate.
 		if ( [tokens count] > 0 )
@@ -377,17 +397,17 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 					char retChar = [retSlotChnl characterAtIndex: 0];
 					if ( retChar == 'S' || retChar == 's' )
 					{
-					NSScanner* scannerForSlotAndChnl = [NSScanner scannerWithString: retSlotChnl];
-					[scannerForSlotAndChnl setScanLocation: 1];
-					[scannerForSlotAndChnl scanInt: &retSlotNum];
-					retSlot = [NSNumber numberWithInt: retSlotNum];
-					scanLoc = [scannerForSlotAndChnl scanLocation];
-					[scannerForSlotAndChnl setScanLocation: scanLoc + 1];
-					[scannerForSlotAndChnl scanInt: &retChnlNum];
-					retChnl = [NSNumber numberWithInt: retChnlNum];
-					f_NotFound = NO;
-				} // End parsing address.
-					i++;
+						NSScanner* scannerForSlotAndChnl = [NSScanner scannerWithString: retSlotChnl];
+						[scannerForSlotAndChnl setScanLocation: 1];
+						[scannerForSlotAndChnl scanInt: &retSlotNum];
+						retSlot = [NSNumber numberWithInt: retSlotNum];
+						scanLoc = [scannerForSlotAndChnl scanLocation];
+						[scannerForSlotAndChnl setScanLocation: scanLoc + 1];
+						[scannerForSlotAndChnl scanInt: &retChnlNum];
+						retChnl = [NSNumber numberWithInt: retChnlNum];
+						f_NotFound = NO;
+					} // End parsing address.
+				i++;
 				}	// End looking for address
 			}
 		
@@ -401,7 +421,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 				for ( j = 0;  j < [tokens count]; j++ )
 				{
 					NSString* object = [tokens objectAtIndex: j];
-					NSLog( @"Token ( %d ) string: %@\n", i, object );
+					NSLog( @"Token ( %d ) string: %@\n", j, object );
 				}
 	
 //			NSLog( @"Queue command %@, return command %@", queuedCommandStr, [tokens objectAtIndex: 0] );
@@ -409,198 +429,118 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 //			if ( [channelNum intValue] < 0 ) { // crate command
 		
 				// crate only returns.
-				if ( [retCommand isEqualTo: ORHVkCrateHVStatus] )
+				if ( [retCommand isEqualTo: ORHVkCrateHVStatus] || [retCommand isEqualTo: ORHVkCrateHVOn]
+				      || [retCommand isEqualTo:  ORHVkCrateHVOff] || [retCommand isEqualTo: ORHVkCrateHVPanic] )
 				{
+					NSNumber* slotForCrate = [NSNumber numberWithInt: -1];
+					NSNumber* chnlForCrate = [NSNumber numberWithInt: -1];
+					[self setupReturnDict: slotForCrate channel: chnlForCrate command: retCommand  returnString: tokens];
 
+					if ( mMostRecentHVStatus != nil ) [mMostRecentHVStatus release];
+					mMostRecentHVStatus = [[NSString stringWithString: returnFromSocket] retain];
 					[self setupReturnDict: retSlot channel: retChnl command: retCommand  returnString: tokens];
-					NSLog( @"Send notification about HVStatus.");
+					
+					NSLog( @"Send notification about HVStatus change.");
 					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
 				}
 				
 				else if ( [retCommand isEqualTo: ORHVkCrateConfig] )
 				{
+					NSNumber* slotForCrate = [NSNumber numberWithInt: -1];
+					NSNumber* chnlForCrate = [NSNumber numberWithInt: -1];
+					[self setupReturnDict: slotForCrate channel: chnlForCrate command: retCommand  returnString: tokens];
+					if ( mMostRecentConfig != nil ) [mMostRecentConfig release];
+					mMostRecentConfig = [[NSString stringWithString: returnFromSocket] retain];
 					NSLog( @"Send notification about Config.");
 					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
 				}
 		
-				else if ( [retCommand isEqualTo: ORHVkCrateHVOn] )
+				else if ( [retCommand isEqualTo: ORHVkCrateEnet] )
 				{
-					NSLog( @"Send notification about HVOn.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
+					NSNumber* slotForCrate = [NSNumber numberWithInt: -1];
+					NSNumber* chnlForCrate = [NSNumber numberWithInt: -1];
+					[self setupReturnDict: slotForCrate channel: chnlForCrate command: retCommand  returnString: tokens];
+					if ( mMostRecentEnetConfig != nil ) [mMostRecentEnetConfig release];
+					mMostRecentEnetConfig = [[NSString stringWithString: returnFromSocket] retain];
+					NSLog( @"Send notification about Enet Config.");
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateEnetAvailableNotification object: self];
 				}
-//		
-				else if ( [retCommand isEqualTo: ORHVkCrateHVOff] )
-				{
-					NSLog( @"Send notification about HVOff.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
-				}
-//		
-				else if ( [retCommand isEqualTo: ORHVkCrateHVPanic] )
-				{
-					NSLog( @"Send notification about Panic.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
-				}
+				
 			
 				// Handle return to HV unit.
 				else
 				{
-					
-					// Create return dictionary.
-					NSLog( @"Send notification about HV Unit - slot: %d, chnl: %d\n", retSlotNum, retChnlNum);
-					NSArray *keys = [NSArray arrayWithObjects: UVkSlot, UVkChnl, UVkCommand, UVkReturn, nil];
-					NSArray *data = [NSArray arrayWithObjects:  retSlot, retChnl, retCommand, tokens, nil];
-//					chnlNumber = [NSNumber* numberWithInt: chnlNum];
-					if ( mReturnToUnit != nil )
-					{
-						[mReturnToUnit release];
-					}
-				
-					// notify HV unit about return from command.
-					mReturnToUnit = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateEnetAvailableNotification object: self userInfo: mReturnToUnit];
-
-					NSLog( @"Writing command '%@' for return dictionary.", [mReturnToUnit objectForKey: UVkCommand] );
-//					[mReturnToUnit retain];  // ***When Using notification will have to be changed.
-				}  // End if looking for returned command.
-			}			// End if looking if returned command equals queued command.
+					[self handleUnitReturn: cmdId slot: retSlot channel: retChnl command: retCommand retTokens: tokens];
+				}			// End if looking if returned command equals queued command.
+			}
 		}
 	}
 	@catch (NSException * e) {
 		NSLog( @"Caught exception '%@'.", [e reason] );
 	}
-	@finally {
-	
+	@finally {	
+		if ( returnFromSocket != nil )
+		[returnFromSocket release];
 	}
 	return;
-
-/*
-{
-	int			i;
-	int			returnCode;
-	bool		f_NotFound;
-	int			retSlot;
-	int			scanLoc;
-	int			retChnl;
-	
-	f_NotFound = YES;
-	i = 0;
-
-	// Get oldest command
-	NSDictionary* recentCommand = [mQueue dequeue];
-	
-	// Check that it matches return.
-	NSString* command = [recentCommand objectForKey: UVkCommand];
-	NSNumber* chnlNum = [recentCommand objectForKey: UVkChnl];
-	NSNumber* slotNum = [recentCommand objectForKey: UVkUnit];
-	
-	// For commands that return ascii data parse the data.
-	mReturnFromSocket = [self interpretDataFromSocket: aSomeData returnCode: &returnCode];
-	NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
-	NSArray* tokens = [mReturnFromSocket componentsSeparatedByCharactersInSet: separators]; 
-	
-	// Get slot and channel
-	while ( f_NotFound && i < [tokens count] )
-	{
-		NSString* slotChnl = [tokens objectAtIndex: 1];
-		char retChar = [slotChnl characterAtIndex: 0];
-		if ( retChar == 'S' || retChar == 's' )
-		{
-			NSScanner* scannerForSlotAndChnl = [NSScanner scannerWithString: slotChnl];
-			[scannerForSlotAndChnl setScanLocation: 1];
-			[scannerForSlotAndChnl scanInt: &retSlot];
-			scanLoc = [scannerForSlotAndChnl scanLocation];
-			[scannerForSlotAndChnl setScanLocation: scanLoc + 1];
-			[scannerForSlotAndChnl scanInt: &retChnl];
-			f_NotFound = NO;
-		}
-	}
-	
-	
-	if ( [tokens count] > 0 )
-	{
-		NSString* retCommand = [tokens objectAtIndex: 0];
-		NSLog( @"Returned command '%@', recent command '%@'.", retCommand, command );
-		if ( [retCommand isEqualTo: command]  )
-		{
-			// Debug only.
-			for ( i = 0; i < [tokens count]; i++ )
-			{
-				NSString* object = [tokens objectAtIndex: i];
-				NSLog( @"Token ( %d ) string: %@\n", i, object );
-			}
-	
-	
-			NSString* command = [tokens objectAtIndex: 0];
-			NSLog( @"Queue command %@, return command %@", recentCommand, tokens[ 0 ] );
-	
-			if ( [chnlNum intValue] < 0 ) { // crate command
-		
-				// crate only returns.
-				if ( [command isEqualTo: ORHVkCrateHVStatus] )
-				{
-					NSLog( @"Send notification about HVStatus.");
-				[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
-				
-				}
-				else if ( [command isEqualTo: ORHVkCrateConfig] )
-				{
-					NSLog( @"Send notification about Config.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
-				}
-		
-				else if ( [command isEqualTo: ORHVkCrateEnet] )
-				{
-					NSLog( @"Send notification about Enet.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
-				}
-				
-				else if ( [command isEqualTo: ORHVkHVOn] )
-				{
-					NSLog( @"Send notification about HV being turned on.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
-				}
-				
-				else if ( [command isEqualTo: ORHVkHVOff] )
-				{
-					NSLog( @"Send notification about HV being turned off.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
-				}
-
-				else if ( [command isEqualTo: ORHVkHVPanic] )
-				{
-					NSLog( @"Send notification about HV PANIC.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
-				}
-			}
-		
-			// notify HV unit about return from command.
-			else
-			{
-				
-				NSMutableDictionary* channelIdentification = [[NSMutableDictionary alloc] init]; 
-				[channelIdentification setObject: slotNum forKey: UVkUnit];
-				[channelIdentification setObject: chnlNum forKey: UVkChnl];
-				[channelIdentification setObject: command forKey: UVkCommand];
-				NSDictionary* channelIdObj = [NSDictionary dictionaryWithDictionary: channelIdentification];
-				NSLog( @"Send notification about HV Unit - slot: %d, chnl: %d\n", slotNum, chnlNum);
-				[[NSNotificationCenter defaultCenter] postNotificationName: ORUnitInfoAvailableNotification object: self userInfo: channelIdObj];
-			}
-		}
-	}
-
-//		if ( mLastError != Nil ) [mLastError release];
-//		[mLastError stringWithSting: @"Returned data from HV unit '%s' with last command queue '%s'.", 
-//		NSLog( mLastError 
-	return;
-	*/
 }
 
+
+- (void) handleUnitReturn: (NSNumber *) aCmdId
+				     slot: (NSNumber *) aRetSlot 
+                  channel: (NSNumber *) aRetChnl 
+				  command: (NSString *) aCommand 
+				retTokens: (NSArray *) aTokens
+{
+	// Create return dictionary.
+	if ( mRetQueue == nil )
+	{
+		mRetQueue = [[ORQueue alloc] init];
+		[mRetQueue retain];
+	}
+	
+	// send notification for one queued return.
+	if ( mRetsToProcess > 0 )
+	{
+		NSDictionary* returnDict = [mRetQueue dequeue];
+		mRetsToProcess--;
+		NSLog( @"dequeue data grom return queue for HV Unit - cmdId: %d, slot: %d, chnl: %d, command '%@'\n", 
+				[aCmdId intValue], [aRetSlot intValue], [aRetChnl intValue], aCommand );
+
+		[[NSNotificationCenter defaultCenter] postNotificationName: HVUnitInfoAvailableNotification object: self userInfo: returnDict];
+		if ( mRetsToProcess	> 0 ) 
+		{
+			// Call sendCommand to issue the remainder of the commands.
+		   [self sendCommandBasic];
+		}
+	}
+	
+	// Queue a return
+	else
+	{
+		NSLog( @"Store  data into return queue for HV Unit - cmdId: %d, slot: %d, chnl: %d\n", 
+				[aCmdId intValue], [aRetSlot intValue], [aRetChnl intValue] );
+		NSArray *keys = [NSArray arrayWithObjects: UVkCmdId, UVkSlot, UVkChnl, UVkCommand, UVkReturn, nil];
+		NSArray *data = [NSArray arrayWithObjects:  aCmdId, aRetSlot, aRetChnl, aCommand, aTokens, nil];
+		NSDictionary* retObj = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
+		
+		[mRetQueue enqueue: retObj];
+	}
+		// notify HV unit about return from command.
+/*		mReturnToUnit = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
+						[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateEnetAvailableNotification object: self userInfo: mReturnToUnit];
+
+						NSLog( @"Writing command '%@' for return dictionary.", [mReturnToUnit objectForKey: UVkCommand] );
+//					[mReturnToUnit retain];  // ***When Using notification will have to be changed.
+					}  // End if looking for returned command.
+*/
+}
 
 - (void) obtainConfig
 {	
 	@try
 	{
-		[self sendCommand: -1 channel: -1 command: ORHVkCrateConfig];
+		[self queueCommand: 1 totalCmds: 1 slot: -1 channel: -1 command: ORHVkCrateConfig];
 	}
 	
 	@catch (NSException *exception) {
@@ -820,7 +760,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
     [[NSNotificationCenter defaultCenter] postNotificationName: HVCrateIsConnectedChangedNotification object: self];
 }
 
-
 - (void) setupReturnDict: (NSNumber*) aSlotNum 
                  channel: (NSNumber*) aChnlNum 
 				 command: (NSString*) aCommand 
@@ -829,13 +768,47 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	NSLog( @"Send notification data return - slot: %d, chnl: %d\n", [aSlotNum intValue], [aChnlNum intValue]);
 	NSArray *keys = [NSArray arrayWithObjects: UVkSlot, UVkChnl, UVkCommand, UVkReturn, nil];
 	NSArray *data = [NSArray arrayWithObjects:  aSlotNum, aChnlNum, aCommand, aRetTokens, nil];
-	if ( mReturnToUnit != nil )
+	if ( mReturnToCrate != nil )
 	{
-		[mReturnToUnit release];
+		[mReturnToCrate release];
 	}
 				
 	// notify HV unit about return from command.
-	mReturnToUnit = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
+	mReturnToCrate = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
+}
+
+// Actually takes command off of queue and sends it to the HV Crate.
+
+- (void) sendCommandBasic
+{
+	NSString* fullCommand = nil;
+	NSDictionary* cmdDictObj = 0;
+	if ( [mCmdQueue isEmpty] && mCmdsToProcess > 0)
+	{
+		NSLog( @"Error  - sendCommandBasic has empty cmd queue even though there should still be %d cmds to process.\n" );
+	}
+	else
+	{	
+		cmdDictObj = [mCmdQueue dequeue];
+	}
+	
+	if ( cmdDictObj != nil )
+	{
+		fullCommand = [cmdDictObj objectForKey: UVkCommand];
+		const char* buffer = [fullCommand cStringUsingEncoding: NSASCIIStringEncoding];
+		
+		NSLog( @"SendCommandBasic - Command '%s',  length:%d\n", buffer, [fullCommand length] + 1 );
+		if (mSocket != nil )
+		{
+			[mSocket write: buffer length: [fullCommand length] + 1];	
+		}
+		else
+		{
+			NSString* errorMsg = [NSString stringWithFormat: @"Socket not connected to Crate.\n"];
+			NSDictionary* errorMsgDict = [NSDictionary dictionaryWithObject: errorMsg forKey: UVkErrorMsg];
+			[[NSNotificationCenter defaultCenter] postNotificationName: HVSocketNotConnectedNotification object: self userInfo: errorMsgDict];
+		}
+	}
 }
 
 #pragma mark •••Delegate Methods
@@ -885,5 +858,150 @@ static NSString*	ORUnivVoltHVCrateIPAddress		= @"ORUnivVoltHVCrateIPAddress";
     [super encodeWithCoder: anEncoder];
     [anEncoder encodeObject: ipAddress forKey: ORUnivVoltHVCrateIPAddress];
 }
+
+// Unused code - getting crate return data from HV unit return.  Did work - but simplified.
+/*		NSArray* tokens = [mReturnToUnit objectForKey: UVkReturn];
+		int i;
+		NSString* result = [NSString stringWithString: [tokens objectAtIndex: 0]];
+		for (i = 1; i < [tokens count]; i++ )
+		{	
+			result = [result stringByAppendingFormat: @" %@", [tokens objectAtIndex: i]];
+		}
+		
+		// setup mMostRecentConfig parameter which holds last config.
+		if ( mMostRecentConfig != nil )
+			[mMostRecentConfig release];
+		
+			
+		mMostRecentConfig = [NSString stringWithString: result];
+		[mMostRecentConfig retain];
+		return( result );
+	}
+	else if ( mMostRecentConfig != nil )
+		return( mMostRecentConfig );
+*/
+
+/* Old version of - (void) handleDataReturn: (NSData) aSomeData
+{
+	int			i;
+	int			returnCode;
+	bool		f_NotFound;
+	int			retSlot;
+	int			scanLoc;
+	int			retChnl;
+	
+	f_NotFound = YES;
+	i = 0;
+
+	// Get oldest command
+	NSDictionary* recentCommand = [mQueue dequeue];
+	
+	// Check that it matches return.
+	NSString* command = [recentCommand objectForKey: UVkCommand];
+	NSNumber* chnlNum = [recentCommand objectForKey: UVkChnl];
+	NSNumber* slotNum = [recentCommand objectForKey: UVkUnit];
+	
+	// For commands that return ascii data parse the data.
+	mReturnFromSocket = [self interpretDataFromSocket: aSomeData returnCode: &returnCode];
+	NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
+	NSArray* tokens = [mReturnFromSocket componentsSeparatedByCharactersInSet: separators]; 
+	
+	// Get slot and channel
+	while ( f_NotFound && i < [tokens count] )
+	{
+		NSString* slotChnl = [tokens objectAtIndex: 1];
+		char retChar = [slotChnl characterAtIndex: 0];
+		if ( retChar == 'S' || retChar == 's' )
+		{
+			NSScanner* scannerForSlotAndChnl = [NSScanner scannerWithString: slotChnl];
+			[scannerForSlotAndChnl setScanLocation: 1];
+			[scannerForSlotAndChnl scanInt: &retSlot];
+			scanLoc = [scannerForSlotAndChnl scanLocation];
+			[scannerForSlotAndChnl setScanLocation: scanLoc + 1];
+			[scannerForSlotAndChnl scanInt: &retChnl];
+			f_NotFound = NO;
+		}
+	}
+	
+	
+	if ( [tokens count] > 0 )
+	{
+		NSString* retCommand = [tokens objectAtIndex: 0];
+		NSLog( @"Returned command '%@', recent command '%@'.", retCommand, command );
+		if ( [retCommand isEqualTo: command]  )
+		{
+			// Debug only.
+			for ( i = 0; i < [tokens count]; i++ )
+			{
+				NSString* object = [tokens objectAtIndex: i];
+				NSLog( @"Token ( %d ) string: %@\n", i, object );
+			}
+	
+	
+			NSString* command = [tokens objectAtIndex: 0];
+			NSLog( @"Queue command %@, return command %@", recentCommand, tokens[ 0 ] );
+	
+			if ( [chnlNum intValue] < 0 ) { // crate command
+		
+				// crate only returns.
+				if ( [command isEqualTo: ORHVkCrateHVStatus] )
+				{
+					NSLog( @"Send notification about HVStatus.");
+				[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
+				
+				}
+				else if ( [command isEqualTo: ORHVkCrateConfig] )
+				{
+					NSLog( @"Send notification about Config.");
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
+				}
+		
+				else if ( [command isEqualTo: ORHVkCrateEnet] )
+				{
+					NSLog( @"Send notification about Enet.");
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
+				}
+				
+				else if ( [command isEqualTo: ORHVkHVOn] )
+				{
+					NSLog( @"Send notification about HV being turned on.");
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
+				}
+				
+				else if ( [command isEqualTo: ORHVkHVOff] )
+				{
+					NSLog( @"Send notification about HV being turned off.");
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
+				}
+
+				else if ( [command isEqualTo: ORHVkHVPanic] )
+				{
+					NSLog( @"Send notification about HV PANIC.");
+					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
+				}
+			}
+		
+			// notify HV unit about return from command.
+			else
+			{
+				
+				NSMutableDictionary* channelIdentification = [[NSMutableDictionary alloc] init]; 
+				[channelIdentification setObject: slotNum forKey: UVkUnit];
+				[channelIdentification setObject: chnlNum forKey: UVkChnl];
+				[channelIdentification setObject: command forKey: UVkCommand];
+				NSDictionary* channelIdObj = [NSDictionary dictionaryWithDictionary: channelIdentification];
+				NSLog( @"Send notification about HV Unit - slot: %d, chnl: %d\n", slotNum, chnlNum);
+				[[NSNotificationCenter defaultCenter] postNotificationName: ORUnitInfoAvailableNotification object: self userInfo: channelIdObj];
+			}
+		}
+	}
+
+//		if ( mLastError != Nil ) [mLastError release];
+//		[mLastError stringWithSting: @"Returned data from HV unit '%s' with last command queue '%s'.", 
+//		NSLog( mLastError 
+	return;
+	*/
+
+
 
 @end

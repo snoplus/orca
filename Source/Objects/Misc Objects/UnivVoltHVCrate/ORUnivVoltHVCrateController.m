@@ -64,8 +64,7 @@
                      selector : @selector( isConnectedChanged: )
                          name : HVCrateIsConnectedChangedNotification
                        object : model];
-					   
-					
+					   					
     [notifyCenter addObserver : self
                      selector : @selector( ipAddressChanged: )
                          name : HVCrateIpAddressChangedNotification
@@ -188,20 +187,22 @@
 }
 
 #pragma mark ***Respond to notifications actions from model handleDataReturn
-- (void) displayHVStatus
+- (void) displayHVStatus: (NSNotification *) aNotes
+
 {
 	NSLog( @"HVStatus display: %@", [model hvStatus]);
 	[hvStatusField setStringValue: [model hvStatus]];
 }
 
-- (void) displayConfig
+- (void) displayConfig: (NSNotification *) aNotes
 {
 	NSString* returnData = [model config];	
 	NSLog( @"Config display: %@", returnData);
 	[outputArea setString: returnData];
 }
 
-- (void) displayEnet
+- (void) displayEnet: (NSNotification *) aNotes
+
 {
 	NSLog( @"Ethernet display: %@", [model ethernetConfig]);
 	[outputArea setString: [model ethernetConfig]];

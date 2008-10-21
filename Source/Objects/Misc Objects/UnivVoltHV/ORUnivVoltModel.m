@@ -235,7 +235,7 @@ NSString* UVkString = @"string";
 	for ( i = 0; i < UVkNumChannels; i++ )
 	{
 		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, i];
-		[[self crate] sendCommand: slot channel: i command: command];
+		[[self crate] queueCommand: i totalCmds: UVkNumChannels slot: slot channel: i command: command];
 
 	}
 }
@@ -265,6 +265,7 @@ NSString* UVkString = @"string";
 		NSLog( @" Command '%@', R/W :%@, Type: %@", commandDict, writableDict, typeDict );
 		
 		if ( [writableDict isEqualTo: UVkWrite] )
+		
 		{
 			for ( i = 0; i < HVkNumChannels; i++ )
 			{
@@ -285,7 +286,7 @@ NSString* UVkString = @"string";
 				
 			}
 			
-			[[ self crate] sendCommand: [self slot] channel: i command: command];
+			[[ self crate] queueCommand: i totalCmds: HVkNumChannels slot: [self slot] channel: i command: command];
 		}
 	}
 }
@@ -495,8 +496,11 @@ NSString* UVkString = @"string";
 	@try {
 		int slotThisUnit;
 	
+		// Data is in notification - Get data
+		NSDictionary* returnData = [aNote userInfo];
+		
 		// Get data for this channel from crate - in ORCA place data in NOTIFICATION Object.
-		NSDictionary* returnData = [[self crate] returnDataToHVUnit];
+//		NSDictionary* returnData = [[self crate] returnDataToHVUnit];
 		NSLog ( @"Command from dictionary '%@'", [returnData objectForKey: UVkCommand]);
 		[returnData retain];
 	

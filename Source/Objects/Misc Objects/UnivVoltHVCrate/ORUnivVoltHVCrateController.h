@@ -43,7 +43,9 @@
 - (void) registerNotificationObservers;
 - (void) isConnectedChanged: (NSNotification *) aNote;
 - (void) ipAddressChanged: (NSNotification *) aNotes;
-- (void) displayHVStatus;
+- (void) displayHVStatus: (NSNotification *) aNotes;
+- (void) displayConfig: (NSNotification *) aNotes;
+- (void) displayEnet: (NSNotification *) aNotes;
 
 #pragma mark •••Actions
 - (IBAction) ipAddressTextFieldAction: (id) aSender;

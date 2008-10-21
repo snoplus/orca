@@ -42,9 +42,15 @@ typedef enum hveCommands hveCommands;
 //	hveCommands		mLastCommand;
     BOOL			mIsConnected;
 	NetSocket*		mSocket;
-	ORQueue*		mQueue;
-	NSDictionary*	mReturnToUnit;
-//	NSString*		mReturn;
+	ORQueue*		mCmdQueue;
+	ORQueue*		mRetQueue;
+	NSDictionary*	mReturnToCrate;
+	NSString*		mMostRecentConfig;
+	NSString*		mMostRecentHVStatus;
+	NSString*		mMostRecentEnetConfig;
+	int				mCmdsToProcess;
+	int				mRetsToProcess;
+	int				mTotalCmds;
 }
 
 #pragma mark •••Accessors
@@ -56,7 +62,7 @@ typedef enum hveCommands hveCommands;
 - (NSString*) ethernetConfig;
 - (NSString*) config;
 - (NetSocket*) socket;
-- (NSDictionary*) returnDataToHVUnit;
+//- (NSDictionary*) returnDataToHVUnit;
 
 #pragma mark •••Notifications
 //- (void) registerNotificationObservers;
@@ -74,7 +80,12 @@ typedef enum hveCommands hveCommands;
 - (void) turnHVOff;
 - (void) hvPanic;
 - (void) connect;
-- (void) sendCommand: (int) aCurrentUnit channel: (int) aCurrentChnl command: (NSString*) aCommand;
+- (void) queueCommand: (int) aCmdId 
+			totalCmds: (int) aTotalCmds
+				 slot: (int) aCurrentUnit 
+			  channel: (int) aCurrentChnl
+			  command: (NSString*) aCommand;
+			  
 - (void) sendCrateCommand: (NSString*) aCommand;
 
 
@@ -85,6 +96,14 @@ typedef enum hveCommands hveCommands;
 				 command: (NSString*) aCommand 
 		    returnString: (NSArray*) aRetTokens;
 
+- (void) handleUnitReturn: (NSNumber *) aCmdId
+				     slot: (NSNumber *) aRetSlot 
+                  channel: (NSNumber *) aRetChnl 
+				  command: (NSString *) aCommand 
+				retTokens: (NSArray *) aTokens;
+				
+- (void) sendCommandBasic;
+				
 #pragma mark ***Archival
 - (id)   initWithCoder: (NSCoder*) aDecoder;
 - (void) encodeWithCoder: (NSCoder*) anEncoder;
