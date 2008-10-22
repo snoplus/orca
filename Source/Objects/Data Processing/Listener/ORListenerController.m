@@ -170,6 +170,7 @@
 
 - (IBAction) connectButtonAction:(id)sender
 {
+	[self endEditing];
     if([model isConnected]){
         [model connectSocket:NO];
     }

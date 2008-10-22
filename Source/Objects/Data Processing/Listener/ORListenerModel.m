@@ -301,9 +301,11 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 - (void) connectSocket:(BOOL)state
 {
     if(state){
+		checkedForSwap = NO;
         [self setSocket:[NetSocket netsocketConnectedToHost:remoteHost port:remotePort]];
     }
     else {
+		checkedForSwap = NO;
         [socket close];
         [self stopProcessing];
         [self setIsConnected:[socket isConnected]];
@@ -453,7 +455,11 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 		unsigned long* lptr = (unsigned long*)buffer;
         unsigned long recordHeader = *lptr;
 		unsigned long dataId = ExtractDataId(recordHeader);
-		
+		if(!checkedForSwap){
+			//first record to process is always a header
+			[dataPacket legalHeaderPtr:lptr];
+			checkedForSwap = YES;
+		}
 		if(dataId == 0x00000000){
 			//new style headers always have a id of zero.
 			unsigned long length = ExtractLength(recordHeader)*4; //bytes
@@ -539,7 +545,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
         //set up the process thread control lock
         if( timeToStopProcessThread ) [ timeToStopProcessThread release ];
         timeToStopProcessThread  = [[ NSConditionLock alloc ] initWithCondition: NO ];
-        
+        [timeToStopProcessThread lockWhenCondition:NO];
         [NSThread detachNewThreadSelector:@selector(processDataFromQueue) toTarget:self withObject:nil];
     }        
 }
