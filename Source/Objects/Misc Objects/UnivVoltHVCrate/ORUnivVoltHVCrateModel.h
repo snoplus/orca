@@ -37,13 +37,13 @@ typedef enum hveCommands hveCommands;
 @interface ORUnivVoltHVCrateModel : ORCrate  {
 	NSLock*			localLock;
     NSString*		ipAddress;
-//	NSString*		mReturnFromSocket;  // Used to get last return
 	NSString*		mLastError;
-//	hveCommands		mLastCommand;
     BOOL			mIsConnected;
+	BOOL			mCmdQueueBlocked; // Prevents execution of two multi-cmd tasks simultaineously.
 	NetSocket*		mSocket;
-	ORQueue*		mCmdQueue;
+	ORQueue*		mCmdCmdQueue;
 	ORQueue*		mRetQueue;
+	NSDictionary*	mLastCmdIssued;
 	NSDictionary*	mReturnToCrate;
 	NSString*		mMostRecentConfig;
 	NSString*		mMostRecentHVStatus;
@@ -73,6 +73,7 @@ typedef enum hveCommands hveCommands;
 
 #pragma mark ***Crate actions
 - (void) handleDataReturn: (NSData*) someData;
+- (void) handleCrateReturn: (NSString*) aCrateCmd retString: aRetString retTokens: aRetTokens;
 - (void) obtainHVStatus;
 - (void) obtainEthernetConfig;
 - (void) obtainConfig;
@@ -80,7 +81,7 @@ typedef enum hveCommands hveCommands;
 - (void) turnHVOff;
 - (void) hvPanic;
 - (void) connect;
-- (void) queueCommand: (int) aCmdId 
+- (BOOL) queueCommand: (int) aCmdId 
 			totalCmds: (int) aTotalCmds
 				 slot: (int) aCurrentUnit 
 			  channel: (int) aCurrentChnl
@@ -89,12 +90,13 @@ typedef enum hveCommands hveCommands;
 - (void) sendCrateCommand: (NSString*) aCommand;
 
 
-#pragma mark ***Utilities
+#pragma mark •••Utilities
+- (void) dequeueAllReturns;
 - (NSString*) interpretDataFromSocket: (NSData*) aDataObject returnCode: (int*) aReturnCode;
-- (void) setupReturnDict: (NSNumber*) aSlotNum 
-                 channel: (NSNumber*) aChnlNum 
-				 command: (NSString*) aCommand 
-		    returnString: (NSArray*) aRetTokens;
+- (NSDictionary*) setupReturnDict: (NSNumber*) aSlotNum 
+                          channel: (NSNumber*) aChnlNum 
+				          command: (NSString*) aCommand 
+			         returnString: (NSArray*) aRetTokens;
 
 - (void) handleUnitReturn: (NSNumber *) aCmdId
 				     slot: (NSNumber *) aRetSlot 

@@ -2,20 +2,78 @@
 //  ORUnivVoltHVCrateModel.m
 //  Orca
 //
-//  Created by Mark Howe on Fri Nov 22 2002.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
-//-----------------------------------------------------------
-//This program was prepared for the Regents of the University of 
-//Washington at the Center for Experimental Nuclear Physics and 
-//Astrophysics (CENPA) sponsored in part by the United States 
-//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-//The University has certain rights in the program pursuant to 
-//the contract and the program should not be copied or distributed 
-//outside your organization.  The DOE and the University of 
-//Washington reserve all rights in the program. Neither the authors,
-//University of Washington, or U.S. Government make any warranty, 
-//express or implied, or assume any liability or responsibility 
-//for the use of this software.
+//  Created by Jan Wouters.
+//  Copyright © 2008 LANS, all rights reserved.
+//-------------------------------------------------------------
+// Command processing notes:
+// 1) Communication between crate and computer is synchronous.
+//    One command leads to one data return.  Sending two commands
+//    without waiting for data returns leads to unpredictable
+//    behavour.
+// 2) Method queueCommand allows one to queue up multiple 
+//    commands.
+//			flags:
+//			  mCmdsToProcess - total number of commands that
+//					will be queued.  This flag is decremented
+//					by one until all commands have been queued.
+//			  mRetsToProcess - total number of data returns
+//					expected.  Starts at zero and is incremented
+//					by one for each command added to mCmdCmdQueue.
+//			  mTotalCmds - Total cmds that will be processed
+//
+//			Structures:
+//			  mCmdCmdQueue - Holds queued up commands and is used  
+//					by sendCommandBasic to dequeue appropriate
+//					command.
+//
+//			Notes:
+//			  Need two identical queues because one is dequeued
+//			  in sendCommandBasic while other is dequeued in
+//			  handleDataReturn.
+//
+//		Logic: when mRetsToProcess == mTotalCmds routine calls
+//				sendCommandBasic to send out one command.
+// 3) Method sendCommandBasic deques a single command from 
+//		command queue and sends it to the HV crate.
+//			Structures:
+//			  mLastCmdIssued - Holds last command issued by this
+//				routine.
+
+// 4) method handleDataReturn is called by netsocket method
+//    dataAvailable.  This methods processes data returned
+//	  by HV crate.  If command is crate command, then one only
+//	  expects one data return.  For HV unit usually issue multiple
+//	  commands and thus expect multiple returns.
+//
+//	  Dequeues command from cmd mCmdRetQueue, which is a 
+//    duplicate of mCmdCmdQueue.  Compares it to data returned
+//	  by HV crate to ensure data return matches what we sent.
+//	
+//			flags:
+//			  mRetsToProcess - Number of returns that have not 
+//				yet been processed.  Decremented by one each
+//				time a new return is received.  (Check routine
+//				setupReturnDict where decrement actually occurs.
+//
+//			 Structures:
+//			  mCmdRetQueue - Holds queued up commands and is used
+//					by handleDataReturn to match command with return
+//					data.
+//			  mRetQueue - Holds dictionaries holding returned data.
+//
+//			Notes:
+//			  Uses routine handleUnitReturn to actually queue up
+//			  dictionary returns in mRetQueue.
+//			  Uses routine 
+//
+//			LOOPING:
+//			  If all expected returns not yet received, calls
+//			  sendCommandBasic which dequeues next command from
+//			  mCmdCmdQueue. Handles return when it comes and
+//			  queues it up.  After last cmd-return data pair
+//			  are issued callls routine dequeueAllReturns which
+//			  sends the appropriate notifications out.
+//			  
 //-------------------------------------------------------------
 
 
@@ -111,35 +169,37 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		
 }
 
+//---------------------------------------------------------------------------------------------------
 - (void) dealloc
 {
-	if ( mCmdQueue != nil ) [mCmdQueue dealloc];
-//	if ( mQueueReturn != nil ) [mQueueReturn dealloc];
+	if ( mCmdCmdQueue != nil ) [mCmdCmdQueue dealloc];
+	if ( mRetQueue != nil ) [mRetQueue dealloc];
 	[mSocket close];
 	[mSocket release];
 	
 
-/*
-	for( i = 0; i < kNplpCNumChannels;i++) 
-		[dataStack[i] release];
-*/	
     [super dealloc];
 }
+
+//---------------------------------------------------------------------------------------------------
 - (void) makeMainController
 {
     [self linkToController: @"ORUnivVoltHVCrateController"];
 }
 
+//---------------------------------------------------------------------------------------------------
 - (void) makeConnectors
 {
 	//since CAMAC can have usb or pci adapters, we let the controllers make the connectors
 }
 
+//---------------------------------------------------------------------------------------------------
 - (void) connectionChanged
 {
 }
 
 #pragma mark •••Accessors
+//---------------------------------------------------------------------------------------------------
 - (void) setIpAddress: (NSString *) anIpAddress
 {
 	if (!anIpAddress) anIpAddress = @"";
@@ -151,6 +211,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
     [[NSNotificationCenter defaultCenter] postNotificationName: HVCrateIpAddressChangedNotification object: self];
 }
 
+//---------------------------------------------------------------------------------------------------
 - (NSString*) hvStatus
 { 
 	if (mMostRecentHVStatus != nil )
@@ -160,6 +221,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	return( ORHVkNoReturn );
 }
 
+//---------------------------------------------------------------------------------------------------
 - (NSString *) ethernetConfig
 {
 	if (mMostRecentEnetConfig != nil )
@@ -169,6 +231,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	return( ORHVkNoReturn );
 }
 
+//---------------------------------------------------------------------------------------------------
 - (NSString *) config
 {
 //	NSDictionary* queuedCommand = [mQueue dequeue];
@@ -183,11 +246,13 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	return( ORHVkNoReturn );
 }
 
+//---------------------------------------------------------------------------------------------------
 - (NSString*) ipAddress
 {
     return ipAddress;
 }
 
+//---------------------------------------------------------------------------------------------------
 - (NetSocket*) socket
 {
 	return mSocket;
@@ -200,6 +265,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 */
 
 #pragma mark ***Crate Actions
+//---------------------------------------------------------------------------------------------------
 - (void) setSocket: (NetSocket*) aSocket
 {
 	if(aSocket != mSocket)[mSocket close];
@@ -209,8 +275,10 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	
 	// setIsConnected sends notification message
     [mSocket setDelegate: self];
+	mCmdQueueBlocked = NO;  // Now that socket is setup allow commands to be issued.
 }
  
+//---------------------------------------------------------------------------------------------------
 - (void) obtainHVStatus
 {
 	[self sendCrateCommand: ORHVkCrateHVStatus];
@@ -238,79 +306,78 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 }
 
 //------------------------------------------------------------------------------------------------
-// Sends actual command to crate and unit from computer.  Please note that commands that are sent
-// to entire crate cannot have slot and channel number set.  If command is only for slot then Sx.
-// is the form of the command where x is the slot number.  If command is directed at specific channel
-// then command is of the form Sx.y where y is the channel number. 
+// Queues commands onto mCmdCmdQueue.  If only one command is to be executed this routine calls
+// sendCommandBasic to have it executed.
+// For multiple commands returns after each command is queued up until all commands are in queue.
+// Note that commands that are sent to entire crate do not have slot and channel number set.  
+// If command is only for slot then Sx is the form of the command where x is the slot number.  
+// If command is directed at specific channel then command is of the form Sx.y where y is the 
+// channel number. 
 //
-// Implemented both cmdQueue and retQueue queues.  queueCommand allows the queuing of multiple
-// commands in cmdQueue.  If only one command is queued then this routine automatically sends 
-// that command.  If many commands need to be sent then queueCommand can be called multiple times 
-// without a single command being sent. A single call to sendCommandBasic with ensure that all the 
-// queued
-// commands are sent out in order.  sendCommandBasic works in tandem with HandleReturnData to 
-// ensure that commands are sent and received synchonously, which is required by the hardware.
-// each return is received from the hardware.
-
-// sendCommand is issued, the number of commands to send is also given.  This routine will wait until
-// all commands have been issued.  
-//  
+// (See top of this file for additional details.)
 //------------------------------------------------------------------------------------------------
-- (void) queueCommand: (int) aCmdId			// 0 based.
+- (BOOL) queueCommand: (int) aCmdId			// 0 based.
 		     totalCmds: (int) aTotalCmds
                   slot: (int) aCurrentUnit 
 			   channel: (int) aCurrentChnl 
 			   command: (NSString*) aCommand 
 {
-
+	BOOL	queuedCmd = NO;
+	
 	if ( aCmdId == 11 )
 		NSLog( @"id: %d, total: %d\n", aCmdId, aTotalCmds );
-		
+	
 	@try
 	{
-		// see if all commands have been downloaded.
-		if ( aTotalCmds > aCmdId )	
-		{
-			// Have first command - set up parameters
-			if ( aCmdId == 0 )
-			{
-				mCmdsToProcess = aTotalCmds;
-//				mRetsToProcess = aTotalCmds;
-				mTotalCmds = aTotalCmds;
-			}
-		
-			if ( mCmdQueue == nil )
-			{
-				mCmdQueue = [[ORQueue alloc] init];
-				[mCmdQueue retain];
-			}
-		
-			// Create command dictionary object
-			NSNumber* cmdId = [NSNumber numberWithInt: aCmdId];
-			NSNumber* unitObj = [NSNumber numberWithInt: aCurrentUnit];
-			NSNumber* chnlObj = [NSNumber numberWithInt: aCurrentChnl];
-		
-			NSMutableDictionary* commandObj = [NSMutableDictionary dictionaryWithCapacity: 4];
-		
-			[commandObj setObject: cmdId forKey: UVkCmdId];
-			[commandObj setObject: unitObj forKey: UVkSlot];
-			[commandObj setObject: chnlObj forKey: UVkChnl];
-			[commandObj setObject: aCommand forKey: UVkCommand];
-
-			mCmdsToProcess--;
-			mRetsToProcess++;
-			[mCmdQueue enqueue: commandObj];
+		if ( !mCmdQueueBlocked ) {
+			// see if all commands have been downloaded.
+			if ( aTotalCmds > aCmdId )	{
 			
-			NSLog( @"Queue cmd with id: %d - %@\n", aCmdId, aCommand );
-//			} 
-		}
+				// Have first command - set up parameters
+				if ( aCmdId == 0 ) {
+					mCmdsToProcess = aTotalCmds;
+//					mRetsToProcess = aTotalCmds;
+					mTotalCmds = aTotalCmds;
+				}
 		
-		// Queue has been filled so dequeue a single command.
-		if ( mCmdsToProcess == 0 && mTotalCmds == mRetsToProcess )
-		{
-			[self sendCommandBasic];
-		}	
+				if ( mCmdCmdQueue == nil ) {
+					mCmdCmdQueue = [[ORQueue alloc] init];
+					[mCmdCmdQueue retain];
+//					mCmdRetQueue = [[ORQueue alloc] init];
+//					[mCmdRetQueue retain];
+				}
 		
+				// Create command dictionary object
+				NSNumber* cmdId = [NSNumber numberWithInt: aCmdId];
+				NSNumber* unitObj = [NSNumber numberWithInt: aCurrentUnit];
+				NSNumber* chnlObj = [NSNumber numberWithInt: aCurrentChnl];
+		
+				NSMutableDictionary* commandObj = [NSMutableDictionary dictionaryWithCapacity: 4];
+		
+				[commandObj setObject: cmdId forKey: UVkCmdId];
+				[commandObj setObject: unitObj forKey: UVkSlot];
+				[commandObj setObject: chnlObj forKey: UVkChnl];
+				[commandObj setObject: aCommand forKey: UVkCommand];
+
+				mCmdsToProcess--;
+				mRetsToProcess++;
+				[mCmdCmdQueue enqueue: commandObj]; // Used to send out commands in order they were queued.
+			
+			    NSLog( @"Queue cmd with id: %d - %@\n", aCmdId, aCommand );
+				queuedCmd = YES;
+		    }
+		
+		    // Queue has been filled so dequeue a single command.
+		    if ( mCmdsToProcess == 0 && mTotalCmds == mRetsToProcess ) {
+			   mCmdQueueBlocked = YES;  // Only block queue once all commands are issued.
+			   [self sendCommandBasic];
+		    }
+		
+			// return to calling routine so that it can queue up more commands.
+		    else { 
+				return( queuedCmd );
+			}	// End of if related to whether we are sending a single command 
+		}		// End of if determining whether we have processed all commands.
 	}	
 	
 	@catch (NSException *exception) {
@@ -321,11 +388,13 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	@finally
 	{
 	}
+	
+	return( queuedCmd );
 }
 
 /*- (void) sendCommandFromQueue
 {
-	NSDictionary* cmdDictObj = [mCmdQueue dequeue];
+	NSDictionary* cmdDictObj = [mCmdCmdQueue dequeue];
 	
 	[self sendCommandBasic: cmdDictObj];
 }
@@ -343,19 +412,20 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 #pragma mark •••Notifications
 //------------------------------------------------------------------------------------------------
-// Sends used to respond to data returns from HV crate.  Called by delegate method netSocket::
+// Used to respond to data returns from HV crate.  Called by delegate method netSocket::
 // dataAvailable. 
 //
-// This routine processes the returned data and places it on an output queue.  It sends all the
-// appropriate notifications once all commands have been processed.  In the meantime it stores
-// all the returned data in a retQueue.  See sendCommand method for more details.  Only HVUnit
-// needs to send multiple commands so only returns from the HVUnit are stored in Queue.
+// This routine processes the returned data and places it on an output queue.  It calls the
+// dequeAllRoutine which sends the appropriate notifications once all commands have been processed.  
+// See sendCommand method for more details.  Only HVUnit
+// needs to send multiple commands so only returns from the HVUnit are stored in retQueue.
 //  
 //------------------------------------------------------------------------------------------------
 - (void) handleDataReturn: (NSData*) aSomeData
 {
 	NSString*	retSlotChnl;
 	NSString*	returnFromSocket;
+	NSString*	storedCmdStr;
 	NSNumber*   retSlot;
 	NSNumber*   retChnl;
 	int			returnCode;
@@ -367,14 +437,21 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	int			i;
 
 	@try {		
-		// Get oldest command
-		NSDictionary* queuedCommand = [mCmdQueue dequeue];
 	
+		
 		// Check Get data from Queued dictionary entry.
-		NSString* queuedCommandStr = [queuedCommand objectForKey: UVkCommand];
-		NSNumber* cmdId = [queuedCommand objectForKey: UVkCmdId];
-//		NSNumber* queuedSlot = [queuedCommand objectForKey: UVkSlot];
-		NSNumber* queuedChnl = [queuedCommand objectForKey: UVkChnl];
+		NSString* queuedCommandStr = [mLastCmdIssued objectForKey: UVkCommand];
+		NSArray* cmdTokens = [queuedCommandStr componentsSeparatedByString: @" "];
+		if ( [cmdTokens count] > 1 ) {
+			storedCmdStr = (NSString *) [cmdTokens objectAtIndex: 0];
+		}
+		else {
+			storedCmdStr = queuedCommandStr;
+		}
+		
+		NSNumber* cmdId = [mLastCmdIssued objectForKey: UVkCmdId];
+//		NSNumber* queuedSlot = [mLastCmdIssued objectForKey: UVkSlot];
+		NSNumber* queuedChnl = [mLastCmdIssued objectForKey: UVkChnl];
 	
 		// Parse the returned data.
 		returnFromSocket = [[self interpretDataFromSocket: aSomeData returnCode: &returnCode] retain];
@@ -382,15 +459,17 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
  
 		
-		// Make sure we have data returned from HV Crate.
+		// 1) Make sure we have data returned from HV Crate.
 		if ( [tokens count] > 0 )
 		{
 			NSString* retCommand = [tokens objectAtIndex: 0];
 		
-			// Get slot and channel
+			// 2) if chnl > -1 then have a unit return rather than crate return
 			i = 0;
-			if ( [queuedChnl intValue] > 0 )
+			if ( [queuedChnl intValue] > -1 )
 			{
+			
+				// Get slot and channel of return data
 				while ( f_NotFound && i < [tokens count] )
 				{
 					retSlotChnl = [tokens objectAtIndex: 1];
@@ -407,77 +486,50 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 						retChnl = [NSNumber numberWithInt: retChnlNum];
 						f_NotFound = NO;
 					} // End parsing address.
-				i++;
-				}	// End looking for address
+					i++;
+					
+				}	// End looking for address token
 			}
 		
-	
-//	NSArray* tokens = [self returnedTokens];
-
+			// 3) Verify that last command issued corresponds to data return.
 			NSLog( @"Returned command '%@', recent command '%@'.", retCommand, queuedCommandStr );
-			if ( [retCommand isEqualTo: queuedCommandStr]  )
+			if ( [retCommand isEqualTo: storedCmdStr]  )
 			{
-				// Debug only.
-				for ( j = 0;  j < [tokens count]; j++ )
-				{
+				// Debug only. Print list of tokens.
+				for ( j = 0;  j < [tokens count]; j++ ) {
 					NSString* object = [tokens objectAtIndex: j];
 					NSLog( @"Token ( %d ) string: %@\n", j, object );
 				}
-	
-//			NSLog( @"Queue command %@, return command %@", queuedCommandStr, [tokens objectAtIndex: 0] );
-	
-//			if ( [channelNum intValue] < 0 ) { // crate command
-		
-				// crate only returns.
-				if ( [retCommand isEqualTo: ORHVkCrateHVStatus] || [retCommand isEqualTo: ORHVkCrateHVOn]
-				      || [retCommand isEqualTo:  ORHVkCrateHVOff] || [retCommand isEqualTo: ORHVkCrateHVPanic] )
-				{
-					NSNumber* slotForCrate = [NSNumber numberWithInt: -1];
-					NSNumber* chnlForCrate = [NSNumber numberWithInt: -1];
-					[self setupReturnDict: slotForCrate channel: chnlForCrate command: retCommand  returnString: tokens];
-
-					if ( mMostRecentHVStatus != nil ) [mMostRecentHVStatus release];
-					mMostRecentHVStatus = [[NSString stringWithString: returnFromSocket] retain];
-					[self setupReturnDict: retSlot channel: retChnl command: retCommand  returnString: tokens];
-					
-					NSLog( @"Send notification about HVStatus change.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
-				}
-				
-				else if ( [retCommand isEqualTo: ORHVkCrateConfig] )
-				{
-					NSNumber* slotForCrate = [NSNumber numberWithInt: -1];
-					NSNumber* chnlForCrate = [NSNumber numberWithInt: -1];
-					[self setupReturnDict: slotForCrate channel: chnlForCrate command: retCommand  returnString: tokens];
-					if ( mMostRecentConfig != nil ) [mMostRecentConfig release];
-					mMostRecentConfig = [[NSString stringWithString: returnFromSocket] retain];
-					NSLog( @"Send notification about Config.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
-				}
-		
-				else if ( [retCommand isEqualTo: ORHVkCrateEnet] )
-				{
-					NSNumber* slotForCrate = [NSNumber numberWithInt: -1];
-					NSNumber* chnlForCrate = [NSNumber numberWithInt: -1];
-					[self setupReturnDict: slotForCrate channel: chnlForCrate command: retCommand  returnString: tokens];
-					if ( mMostRecentEnetConfig != nil ) [mMostRecentEnetConfig release];
-					mMostRecentEnetConfig = [[NSString stringWithString: returnFromSocket] retain];
-					NSLog( @"Send notification about Enet Config.");
-					[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateEnetAvailableNotification object: self];
-				}
-				
 			
-				// Handle return to HV unit.
-				else
+				// 4) Crate only returns.
+				if ( [queuedChnl intValue] == -1 )
+					[self handleCrateReturn: retCommand retString: returnFromSocket retTokens: tokens];
+					
+				// 5) Handle return to HV unit.
+				else if ( [retChnl intValue] > -1 )
 				{
 					[self handleUnitReturn: cmdId slot: retSlot channel: retChnl command: retCommand retTokens: tokens];
-				}			// End if looking if returned command equals queued command.
+				}  // End if processing crate and Unit returns.
+			}      // End if looking if returned command equals queued command.
+			
+			// 6) No more returns expected so deque all the data.
+			if ( mRetsToProcess == 0 )
+			{
+				[self dequeueAllReturns];
 			}
-		}
+			
+			// 7) Expect more returns so issue next command.
+			else 
+			{
+				[self sendCommandBasic];
+			}
+		}		       // End if verifying that we actually have data.
 	}
+	
 	@catch (NSException * e) {
 		NSLog( @"Caught exception '%@'.", [e reason] );
 	}
+	
 	@finally {	
 		if ( returnFromSocket != nil )
 		[returnFromSocket release];
@@ -485,62 +537,71 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	return;
 }
 
+//------------------------------------------------------------------------------------------------
+// Handles crate return.
+//------------------------------------------------------------------------------------------------
+- (void) handleCrateReturn: (NSString*) aCrateCmd retString: aRetString retTokens: aRetTokens
+{
+	NSNumber* slotForCrate = [NSNumber numberWithInt: -1];
+	NSNumber* chnlForCrate = [NSNumber numberWithInt: -1];
+	[self setupReturnDict: slotForCrate channel: chnlForCrate command: aCrateCmd  returnString: aRetTokens];
 
+	if ( [aCrateCmd isEqualTo: ORHVkCrateHVStatus] || [aCrateCmd isEqualTo: ORHVkCrateHVOn]
+			|| [aCrateCmd isEqualTo:  ORHVkCrateHVOff] || [aCrateCmd isEqualTo: ORHVkCrateHVPanic] ) {
+
+		if ( mMostRecentHVStatus != nil ) [mMostRecentHVStatus release];
+		mMostRecentHVStatus = [[NSString stringWithString: aRetString] retain];					
+		NSLog( @"Send notification about HVStatus change.");
+		[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateHVStatusAvailableNotification object: self];
+	}
+				
+	else if ( [aCrateCmd isEqualTo: ORHVkCrateConfig] ) {
+		if ( mMostRecentConfig != nil ) [mMostRecentConfig release];
+			mMostRecentConfig = [[NSString stringWithString: aRetString] retain];
+			NSLog( @"Send notification about Config.");
+			[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateConfigAvailableNotification object: self];
+	}
+		
+	else if ( [aCrateCmd isEqualTo: ORHVkCrateEnet] ) {
+		if ( mMostRecentEnetConfig != nil ) [mMostRecentEnetConfig release];
+			mMostRecentEnetConfig = [[NSString stringWithString: aRetString] retain];
+			NSLog( @"Send notification about Enet Config.");
+			[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateEnetAvailableNotification object: self];
+	} // end if statement about which command is applicable
+}
+
+//---------------------------------------------------------------------------------------------------
+// Places return data onto queue for HV Unit.
+//---------------------------------------------------------------------------------------------------
 - (void) handleUnitReturn: (NSNumber *) aCmdId
 				     slot: (NSNumber *) aRetSlot 
                   channel: (NSNumber *) aRetChnl 
 				  command: (NSString *) aCommand 
-				retTokens: (NSArray *) aTokens
+				retTokens: (NSArray *) aRetTokens
 {
 	// Create return dictionary.
-	if ( mRetQueue == nil )
-	{
+	if ( mRetQueue == nil ) {
 		mRetQueue = [[ORQueue alloc] init];
 		[mRetQueue retain];
 	}
 	
-	// send notification for one queued return.
-	if ( mRetsToProcess > 0 )
-	{
-		NSDictionary* returnDict = [mRetQueue dequeue];
-		mRetsToProcess--;
-		NSLog( @"dequeue data grom return queue for HV Unit - cmdId: %d, slot: %d, chnl: %d, command '%@'\n", 
-				[aCmdId intValue], [aRetSlot intValue], [aRetChnl intValue], aCommand );
+	// queue return.
+	if ( mRetsToProcess > 0 ) {
+		NSDictionary* retDictObj = [self setupReturnDict: aRetSlot 
+		                                         channel: aRetChnl 
+												 command: aCommand 
+											returnString: aRetTokens];
 
-		[[NSNotificationCenter defaultCenter] postNotificationName: HVUnitInfoAvailableNotification object: self userInfo: returnDict];
-		if ( mRetsToProcess	> 0 ) 
-		{
-			// Call sendCommand to issue the remainder of the commands.
-		   [self sendCommandBasic];
-		}
-	}
-	
-	// Queue a return
-	else
-	{
-		NSLog( @"Store  data into return queue for HV Unit - cmdId: %d, slot: %d, chnl: %d\n", 
-				[aCmdId intValue], [aRetSlot intValue], [aRetChnl intValue] );
-		NSArray *keys = [NSArray arrayWithObjects: UVkCmdId, UVkSlot, UVkChnl, UVkCommand, UVkReturn, nil];
-		NSArray *data = [NSArray arrayWithObjects:  aCmdId, aRetSlot, aRetChnl, aCommand, aTokens, nil];
-		NSDictionary* retObj = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
-		
-		[mRetQueue enqueue: retObj];
-	}
-		// notify HV unit about return from command.
-/*		mReturnToUnit = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
-						[[NSNotificationCenter defaultCenter] postNotificationName: HVCrateEnetAvailableNotification object: self userInfo: mReturnToUnit];
-
-						NSLog( @"Writing command '%@' for return dictionary.", [mReturnToUnit objectForKey: UVkCommand] );
-//					[mReturnToUnit retain];  // ***When Using notification will have to be changed.
-					}  // End if looking for returned command.
-*/
+		// Place return on return queue.		
+		[mRetQueue enqueue: retDictObj];
+	}		
 }
 
 - (void) obtainConfig
 {	
 	@try
 	{
-		[self queueCommand: 1 totalCmds: 1 slot: -1 channel: -1 command: ORHVkCrateConfig];
+		[self sendCrateCommand: ORHVkCrateConfig];
 	}
 	
 	@catch (NSException *exception) {
@@ -569,7 +630,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	}
 	@catch (NSException *exception) {
 
-			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
+		NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
 	} 
 	
 	@finally
@@ -608,9 +669,33 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 }
 
 
+#pragma mark •••Utilities
+//------------------------------------------------------------------------------------------
+// Dequeues all data returns sending notifications out.  These returns are queued up in
+// handleDataReturn as data comes in from HV crate. 
+//------------------------------------------------------------------------------------------
+- (void) dequeueAllReturns
+{	
+	if ( mRetQueue != nil )
+	{
+		while ( ![mRetQueue isEmpty] )
+		{
+			NSDictionary* retDictObj = [mRetQueue dequeue];
+			NSNumber* slotObj = [retDictObj objectForKey: UVkSlot];
+			NSNumber* chnlObj = [retDictObj objectForKey: UVkChnl];
+			NSString* command = [retDictObj objectForKey: UVkCommand];
 
+			NSLog( @"Send return data notification about slot: %d, chnl: %d, command '%@'\n", 
+		       [slotObj intValue], [chnlObj intValue], command );
+			[[NSNotificationCenter defaultCenter] postNotificationName: HVUnitInfoAvailableNotification object: self userInfo: retDictObj];
+		}
+	}
+	
+	// unblock cmd queue since all cmds processed.
+	mTotalCmds = 0;
+	mCmdQueueBlocked = NO;
+}
 
-#pragma mark ***Utilities
 //------------------------------------------------------------------------------------------
 // \note:	Data is returned as follows:
 //			012345678901234567890123456789012345678901234567890
@@ -760,36 +845,44 @@ NSString* UVkErrorMsg = @"ErrorMsg";
     [[NSNotificationCenter defaultCenter] postNotificationName: HVCrateIsConnectedChangedNotification object: self];
 }
 
-- (void) setupReturnDict: (NSNumber*) aSlotNum 
-                 channel: (NSNumber*) aChnlNum 
-				 command: (NSString*) aCommand 
-			returnString: (NSArray*) aRetTokens
+- (NSDictionary*) setupReturnDict: (NSNumber*) aSlotNum 
+                          channel: (NSNumber*) aChnlNum 
+				          command: (NSString*) aCommand 
+			         returnString: (NSArray*) aRetTokens
 {
 	NSLog( @"Send notification data return - slot: %d, chnl: %d\n", [aSlotNum intValue], [aChnlNum intValue]);
 	NSArray *keys = [NSArray arrayWithObjects: UVkSlot, UVkChnl, UVkCommand, UVkReturn, nil];
 	NSArray *data = [NSArray arrayWithObjects:  aSlotNum, aChnlNum, aCommand, aRetTokens, nil];
-	if ( mReturnToCrate != nil )
-	{
-		[mReturnToCrate release];
-	}
-				
-	// notify HV unit about return from command.
-	mReturnToCrate = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
+	NSDictionary* retDictObj = [[NSDictionary alloc] initWithObjects: data forKeys: keys];
+	[retDictObj autorelease];
+	
+	// Decrement counter indicating how many commands one still has to process before dequeuing data.
+	mRetsToProcess--;
+	
+	return( retDictObj);
 }
 
 // Actually takes command off of queue and sends it to the HV Crate.
-
 - (void) sendCommandBasic
 {
 	NSString* fullCommand = nil;
 	NSDictionary* cmdDictObj = 0;
-	if ( [mCmdQueue isEmpty] && mCmdsToProcess > 0)
+	if ( [mCmdCmdQueue isEmpty] && mCmdsToProcess > 0)
 	{
-		NSLog( @"Error  - sendCommandBasic has empty cmd queue even though there should still be %d cmds to process.\n" );
+		NSLog( @"Error  - sendCommandBasic has empty cmd queue even though there should still be %d cmds to process.\n",
+			mCmdsToProcess );
 	}
+	
+	// Pop command off of queue and store it in mLastCmdIssued variable.
 	else
 	{	
-		cmdDictObj = [mCmdQueue dequeue];
+		cmdDictObj = [mCmdCmdQueue dequeue];
+		if ( mLastCmdIssued != nil )
+		{
+			[mLastCmdIssued release];
+		}
+		mLastCmdIssued = cmdDictObj;
+		[mLastCmdIssued retain];
 	}
 	
 	if ( cmdDictObj != nil )

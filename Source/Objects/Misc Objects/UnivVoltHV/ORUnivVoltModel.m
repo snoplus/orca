@@ -236,7 +236,6 @@ NSString* UVkString = @"string";
 	{
 		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, i];
 		[[self crate] queueCommand: i totalCmds: UVkNumChannels slot: slot channel: i command: command];
-
 	}
 }
 
