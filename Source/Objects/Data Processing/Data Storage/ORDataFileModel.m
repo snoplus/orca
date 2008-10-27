@@ -41,6 +41,10 @@ NSString* ORDataFileLock							= @"ORDataFileLock";
 #pragma mark ¥¥¥Definitions
 static NSString *ORDataFileConnection 		= @"Data File Input Connector";
 
+@interface ORDataFileModel (private)
+- (NSString*) formRunName:(ORDataPacket*)aDataPacket;
+@end
+
 @implementation ORDataFileModel
 
 #pragma mark ¥¥¥Initialization
@@ -402,6 +406,7 @@ static const int currentVersion = 1;           // Current version
     }
 }
 
+
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     if(!dataBuffer)dataBuffer = [[NSMutableData dataWithCapacity:20*1024] retain];
@@ -418,15 +423,8 @@ static const int currentVersion = 1;           // Current version
     if([[ORGlobal sharedInstance] runMode] == kNormalRun){
         //open file and write headers
 		if(filePrefix)[aDataPacket setFilePrefix:filePrefix];
-		NSString* s;
-        if([aDataPacket filePrefix]!=nil)	s = [NSString stringWithFormat:@"%@%d",[aDataPacket filePrefix],[aDataPacket runNumber]];
-        else								s = [NSString stringWithFormat:@"Run%d",[aDataPacket runNumber]];
-		if(useDatedFileNames){
-			NSCalendarDate* theDate = [NSCalendarDate date];
-			s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];
-		}
-		
-        [self setFileName:s];
+
+        [self setFileName:[self formRunName:aDataPacket]];
 		
         if(fileName){
 			NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
@@ -436,7 +434,6 @@ static const int currentVersion = 1;           // Current version
 			NSFileHandle* fp = [NSFileHandle fileHandleForWritingAtPath:fullFileName];
 			[fp seekToEndOfFile];
             [self setFilePointer:fp];
-			
         }
         
         [[NSNotificationCenter defaultCenter]
@@ -516,7 +513,7 @@ static const int currentVersion = 1;           // Current version
     
     if([[ORGlobal sharedInstance] runMode] == kNormalRun){
 	    //start a copy of the Status File
-	    statusFileName = [[NSString stringWithFormat:@"%@%d.log",[self filePrefix],[aDataPacket runNumber]] retain];
+	    statusFileName = [[NSString stringWithFormat:@"%@.log",[self formRunName:aDataPacket]] retain];
         
         [statusFolder ensureExists:[statusFolder finalDirectoryName]];
         NSString* fullStatusFileName = [[[statusFolder finalDirectoryName]stringByExpandingTildeInPath] stringByAppendingPathComponent:statusFileName];
@@ -695,4 +692,23 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 
 @end
 
+@implementation ORDataFileModel (private)
+
+- (NSString*) formRunName:(ORDataPacket*)aDataPacket
+{
+	NSString* s;
+	if([aDataPacket filePrefix]!=nil){
+		if([[aDataPacket filePrefix] rangeOfString:@"Run"].location != NSNotFound){
+			s = [NSString stringWithFormat:@"%@%d",[aDataPacket filePrefix],[aDataPacket runNumber]];
+		}
+		else s = [NSString stringWithFormat:@"%@%@Run%d",[aDataPacket filePrefix],[[aDataPacket filePrefix] length]?@"_":@"",[aDataPacket runNumber]];
+	}
+	else s = [NSString stringWithFormat:@"Run%d",[aDataPacket runNumber]];
+	if(useDatedFileNames){
+		NSCalendarDate* theDate = [NSCalendarDate date];
+		s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];
+	}
+	return s;
+}
+@end
 
