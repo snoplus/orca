@@ -555,18 +555,21 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 		NSFileHandle* fp = [NSFileHandle fileHandleForReadingAtPath:aFile];
 
 		[fileAsDataPacket clearData];
+		BOOL fileOK = NO;
+		NSString* problemReason;
 		if(fp){
 		
 			unsigned long runStart  = 0;
 			unsigned long runEnd    = 0;
 			unsigned long runNumber = 0;
-			
 			if([fileAsDataPacket readHeaderReturnRunLength:fp runStart:&runStart runEnd:&runEnd runNumber:&runNumber]){
 				if(runStart!=0 && runEnd!=0){
+				
 					if(runStart < minRunStartTime) minRunStartTime = runStart;
 					if(runEnd > maxRunEndTime)     maxRunEndTime   = runEnd;
 					[fp seekToEndOfFile];
 					
+					fileOK = YES;
 					NSMutableDictionary* runDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 							[NSNumber numberWithUnsignedLong:runStart],				  @"RunStart",
 							[NSNumber numberWithUnsignedLong:runEnd],				  @"RunEnd",
@@ -577,14 +580,29 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 							nil];
 							
 					[runArray addObject:runDictionary];
-					
 					[self fileFinished];
 				}
-				else NSLogColor([NSColor redColor],@"Problem reading <%@> for exploring.\n",[aFile stringByAbbreviatingWithTildeInPath]);
+				else {
+					problemReason = [NSString stringWithFormat:@"Problem reading <%@> for exploring.\n",[aFile stringByAbbreviatingWithTildeInPath]];
+					NSLogColor([NSColor redColor],@"%s",problemReason);
+				}
 			}
-			else NSLogColor([NSColor redColor],@" <%@> doesn't appear to be a legal ORCA data file.\n",[aFile stringByAbbreviatingWithTildeInPath]);
+			else {
+				problemReason = [NSString stringWithFormat:@" <%@> doesn't appear to be a legal ORCA data file.\n",[aFile stringByAbbreviatingWithTildeInPath]];
+				NSLogColor([NSColor redColor],@"%s",problemReason);
+			}
 		}
-		else NSLogColor([NSColor redColor],@"Could NOT Open <%@> for exploring.\n",[aFile stringByAbbreviatingWithTildeInPath]);
+		else {
+			problemReason = [NSString stringWithFormat:@" Could not open: <%@>\n",[aFile stringByAbbreviatingWithTildeInPath]];
+			NSLogColor([NSColor redColor],@"%s",problemReason);
+		}
+		if(!fileOK){
+			NSMutableDictionary* runDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+					problemReason,						 @"Failed",
+					@"No Header",						 @"FileHeader",
+					nil];
+					[runArray addObject:runDictionary];
+		}
 		currentFileIndex++;
 		[self performSelector:@selector(readNextFile) withObject:nil afterDelay:0];
 	}

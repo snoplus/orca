@@ -497,12 +497,17 @@
 				fileSize /=1000.;
 				units = @"KBytes";
 			}
-			NSString* s = [NSString stringWithFormat:@"Run Summary\nRun Number: %@\n",[runDictionary objectForKey:@"RunNumber"]];
-			NSCalendarDate* startTime = [NSCalendarDate dateWithTimeIntervalSince1970:[[runDictionary objectForKey:@"RunStart"] unsignedLongValue]];
-			s = [s stringByAppendingFormat:@"Started   : %@\n",startTime];
-			s = [s stringByAppendingFormat:@"Run Length: %@ sec\n",[runDictionary objectForKey:@"RunLength"]];
-			s = [s stringByAppendingFormat:@"File Size : %.2f %@",fileSize,units];
-			[runSummaryTextView setString:s];
+			NSString* problem = [runDictionary objectForKey:@"Failed"];
+			NSString* s;
+			if(!problem){
+				s = [NSString stringWithFormat:@"Run Summary\nRun Number: %@\n",[runDictionary objectForKey:@"RunNumber"]];
+				NSCalendarDate* startTime = [NSCalendarDate dateWithTimeIntervalSince1970:[[runDictionary objectForKey:@"RunStart"] unsignedLongValue]];
+				s = [s stringByAppendingFormat:@"Started   : %@\n",startTime];
+				s = [s stringByAppendingFormat:@"Run Length: %@ sec\n",[runDictionary objectForKey:@"RunLength"]];
+				s = [s stringByAppendingFormat:@"File Size : %.2f %@",fileSize,units];
+				[runSummaryTextView setString:s];
+			}
+			else [runSummaryTextView setString:problem];
 						
 			[fileListView selectRowIndexes:[NSIndexSet indexSetWithIndex: [model selectedRunIndex]] byExtendingSelection:NO] ;
 		}
