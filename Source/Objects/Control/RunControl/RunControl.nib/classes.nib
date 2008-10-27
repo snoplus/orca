@@ -5,17 +5,12 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
-			<string>NSObject</string>
+			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -40,6 +35,57 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>StopLightView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -162,42 +208,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>StopLightView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>copy</key>
-				<string>id</string>
-				<key>decDialog</key>
-				<string>id</string>
-				<key>incDialog</key>
-				<string>id</string>
-				<key>saveDocument</key>
-				<string>id</string>
-				<key>saveDocumentAs</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>OrcaObjectController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>model</key>
-				<string>id</string>
-				<key>warningField</key>
-				<string>ORTimedTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>
