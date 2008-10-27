@@ -30,7 +30,7 @@
 
 //NSString* ORUVChnlSlotChanged				= @"ORUVChnlSlotChanged";
 
-// HV Unit parameters
+// HV Unit parameters by symbol.
 NSString* HVkChannelEnabled = @"CE";
 NSString* HVkMeasuredCurrent = @"MC";
 NSString* HVkMeasuredHV = @"MV";
@@ -42,20 +42,39 @@ NSString* HVkStatus = @"ST";
 NSString* HVkMVDZ = @"MVDZ";
 NSString* HVkMCDZ = @"MCDZ";
 NSString* HVkHVLimit = @"HVL";
+NSString* HVkCurChnl = @"HVCurChnl";
+
+// Order in which data is returned from DMP command.  Index in token array.
+const int HVkCommandIndx = 0;
+const int HVKSlot_ChnlIndx = 1;
+const int HVkMeasuredCurrentIndx = 2;
+const int HVkMeasuredHVIndx = 3;
+const int HVkDemandHVIndx = 4;
+const int HVkRampUpRateIndx = 5;
+const int HVkRampDownRateIndx = 6;
+const int HVkTripCurrentIndx = 7;
+const int HVkChannelEnabledIndx = 8;
+const int HVkStatusIndx = 9;
+const int HVkMVDZIndx = 10;
+const int HVkMCDZIndx = 11;
+const int HVkHVLimitIndx = 12;
 
 // Notifications
+NSString* UVChnlChanged					= @"ChnlChanged";
 NSString* UVChnlEnabledChanged			= @"ChnlChannelEnabledChanged";
-NSString* UVChnlDemandHVChanged			= @"ChnlDemandHVChanged";
-NSString* UVChnlMeasuredHVChanged		= @"ChnlMeasuredChanged";
 NSString* UVChnlMeasuredCurrentChanged	= @"ChnlMeasuredCurrentChanged";
+NSString* UVChnlMeasuredHVChanged		= @"ChnlMeasuredChanged";
+NSString* UVChnlDemandHVChanged			= @"ChnlDemandHVChanged";
 //NSString* UVChnlSlotChanged				= @"UnitSlotChanged";
-NSString* UVChnlTripCurrentChanged		= @"ChnlTripCurrentChanged";
 NSString* UVChnlRampUpRateChanged		= @"ChnlRampUpRateChanged";
 NSString* UVChnlRampDownRateChanged		= @"ChnlRampDownRateChanged";
+NSString* UVChnlTripCurrentChanged		= @"ChnlTripCurrentChanged";
+NSString* UVChnlStatusChanged			= @"ChnlStatusChanged";
 NSString* UVChnlMVDZChanged				= @"ChnlMVDZChanged";
 NSString* UVChnlMCDZChanged				= @"ChnlMCDZChanged";
 NSString* UVChnlHVLimitChanged			= @"ChnlHVLimitChanged";
 
+NSString* UVChnlHVValuesChanged			= @"ChnlHVValuesChanged";
 
 // Commands possible from HV Unit.
 NSString* HVkModuleDMP	= @"DMP";
@@ -502,7 +521,7 @@ NSString* UVkString = @"string";
 //		NSDictionary* returnData = [[self crate] returnDataToHVUnit];
 		NSLog ( @"Command from dictionary '%@'", [returnData objectForKey: UVkCommand]);
 		[returnData retain];
-	
+			
 		NSNumber* slotNum = [returnData objectForKey: UVkSlot];
 		slotThisUnit = [self slot];
 		if ( [slotNum intValue] == slotThisUnit )
@@ -510,9 +529,20 @@ NSString* UVkString = @"string";
 			NSString* retCmd = [returnData objectForKey: UVkCommand];
 			if ( [retCmd isEqualTo: HVkModuleDMP] )
 			{
-				[self interpretDMPReturn: returnData];
+				NSNumber* curChnlNum = [returnData objectForKey: UVkChnl];
+				int curChnl = [curChnlNum intValue];
+				
+				[self interpretDMPReturn: returnData channel: curChnl];
+
+//				NSMutableDictionary* chnl = [mChannelArray objectAtIndex: curChnl];
+
+	
+				NSDictionary* chnlDictObj = [NSDictionary dictionaryWithObject: curChnlNum forKey: HVkCurChnl];
+				[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlHVValuesChanged 
+				                                                    object: self
+																  userInfo: chnlDictObj];
 			}
-		}
+		}				
 	}
 	@catch (NSException * e) {
 		NSLog( @"Caught exception '%@'.", [e reason] );
@@ -522,70 +552,53 @@ NSString* UVkString = @"string";
 	}
 }
 
-- (void) interpretDMPReturn: (NSDictionary*) aReturnData
+- (void) interpretDMPReturn: (NSDictionary*) aReturnData channel: (int) aCurChnl
 {
-// HV Unit parameters
-//	NSString* HVkChannel = @"Chnl";
-	NSString* HVkChannelEnabled = @"CE";
-	NSString* HVkMeasuredCurrent = @"MC";
-	NSString* HVkMeasuredHV = @"MV";
-	NSString* HVkDemandHV = @"DV";
-	NSString* HVkRampUpRate = @"RUP";
-	NSString* HVkRampDownRate = @"RDN";
-	NSString* HVkTripCurrent = @"TC";
-	NSString* HVkStatus = @"ST";
-	NSString* HVkMVDZ = @"MVDZ";
-	NSString* HVkMCDZ = @"MCDZ";
-	NSString* HVkHVLimit = @"HVL";
-	
 // Order of return from DMP command
-//	const int HVkCommandIndx = 0;
-//	const int ORHvKSlot_ChnlIndx = 1;
-	const int HVkMeasuredCurrentIndx = 2;
-	const int HVkMeasuredHVIndx = 3;
-	const int HVkDemandHVIndx = 4;
-	const int HVkRampUpRateIndx = 5;
-	const int HVkRampDownRateIndx = 6;
-	const int HVkTripCurrentIndx = 7;
-	const int HVkChannelEnabledIndx = 8;
-	const int HVkStatusIndx = 9;
-	const int HVkMVDZIndx = 10;
-	const int HVkMCDZIndx = 11;
-	const int HVkHVLimitIndx = 12;
-
 	NSString*			statusStr;
 	int					status;
 	
-	int curChnl = [[aReturnData objectForKey: UVkChnl] intValue];
-	NSMutableDictionary* chnl = [mChannelArray objectAtIndex: curChnl];
-	NSArray* tokens = [aReturnData objectForKey: UVkReturn];
+	// Get chnl object from mChannelArray.  This object will be changed with new values from return.
+	NSMutableDictionary* chnlDictObj = [mChannelArray objectAtIndex: aCurChnl];
+     
 	
+	NSArray* tokens = [aReturnData objectForKey: UVkReturn];
+		
+	// Place new values into mChannelArray for channel aCurChnl
 	NSNumber* measuredCurrent = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkMeasuredCurrentIndx] floatValue]];
-	[chnl setObject: measuredCurrent forKey: HVkMeasuredCurrent];
+	[chnlDictObj setObject: measuredCurrent forKey: HVkMeasuredCurrent];
+//	[notifyCenter postNotificationName: UVChnlMeasuredCurrentChanged object: self userInfo: chnlDictObj];
 	
 	NSNumber* measuredHV = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkMeasuredHVIndx] floatValue]];
-	[chnl setObject: measuredHV forKey: HVkMeasuredHV];
+	[chnlDictObj setObject: measuredHV forKey: HVkMeasuredHV];
+//	[notifyCenter postNotificationName: UVChnlMeasuredHVChanged object: self userInfo: chnlDictObj];
 	
 	NSNumber* demandHV = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkDemandHVIndx] floatValue]];
-	[chnl setObject: demandHV forKey: HVkDemandHV];
+	[chnlDictObj setObject: demandHV forKey: HVkDemandHV];
+//	[notifyCenter postNotificationName: UVChnlDemandHVChanged object: self userInfo: chnlDictObj];
 	
 	NSNumber* rampUpRate = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkRampUpRateIndx] floatValue]];
-	[chnl setObject: rampUpRate forKey: HVkRampUpRate];
+	[chnlDictObj setObject: rampUpRate forKey: HVkRampUpRate];
+//	[notifyCenter postNotificationName: UVChnlRampUpRateChanged object: self userInfo: chnlDictObj];
 	
 	NSNumber* rampDownRate = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkRampDownRateIndx] floatValue]];
-	[chnl setObject: rampDownRate forKey: HVkRampDownRate];
+	[chnlDictObj setObject: rampDownRate forKey: HVkRampDownRate];
+//	[notifyCenter postNotificationName: UVChnlRampDownRateChanged object: self userInfo: chnlDictObj];
 
 	NSNumber* tripCurrent = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkTripCurrentIndx] floatValue]];
-	[chnl setObject: tripCurrent forKey: HVkTripCurrent];
+	[chnlDictObj setObject: tripCurrent forKey: HVkTripCurrent];
+//	[notifyCenter postNotificationName: UVChnlTripCurrentChanged object: self userInfo: chnlDictObj];
 	
 	NSNumber* channelEnabled = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkChannelEnabledIndx] intValue]];
-	[chnl setObject: channelEnabled forKey: HVkChannelEnabled];
+	[chnlDictObj setObject: channelEnabled forKey: HVkChannelEnabled];
+//	[notifyCenter postNotificationName: UVChnlMeasuredCurrentChanged object: self userInfo: chnlDictObj];
 
-	// Interpret status
 	NSNumber* statusNum = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkStatusIndx] intValue]];
 	status = [statusNum intValue];
+//	[notifyCenter postNotificationName: UVChnlEnabledChanged object: self userInfo: chnlDictObj];
 	
-		// status case statement
+	// Interpret status
+	// status case statement
 	switch ( status ) {
 		case eHVUEnabled:
 			statusStr = [NSString stringWithString: @"Enabled"];
@@ -618,16 +631,20 @@ NSString* UVkString = @"string";
 			statusStr = [NSString stringWithString: @"Undefined"];
 			break;
 	}
-	[chnl setObject: statusStr forKey: HVkStatus];
+	[chnlDictObj setObject: statusStr forKey: HVkStatus];
+//	[notifyCenter postNotificationName: UVChnlStatusChanged object: self userInfo: chnlDictObj];
 
 	NSNumber* MVDZ = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkMVDZIndx] floatValue]];
-	[chnl setObject: MVDZ forKey: HVkMVDZ];
+	[chnlDictObj setObject: MVDZ forKey: HVkMVDZ];
+//	[notifyCenter postNotificationName: UVChnlMVDZChanged object: self userInfo: chnlDictObj];
 	
 	NSNumber* MCDZ = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkMCDZIndx] floatValue]];
-	[chnl setObject: MCDZ forKey: HVkMCDZ];
+	[chnlDictObj setObject: MCDZ forKey: HVkMCDZ];
+//	[notifyCenter postNotificationName: UVChnlMCDZChanged object: self userInfo: chnlDictObj];
 	
 	NSNumber* hvLimit = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkHVLimitIndx] floatValue]];
-	[chnl setObject: hvLimit forKey: HVkHVLimit];
+	[chnlDictObj setObject: hvLimit forKey: HVkHVLimit];
+//	[notifyCenter postNotificationName: UVChnlHVLimitChanged object: self userInfo: chnlDictObj];
 }
 
 
@@ -782,7 +799,11 @@ NSString* UVkString = @"string";
 	}
 	
 	[mChannelArray retain];
-    [[self undoManager] enableUndoRegistration];    
+    [[self undoManager] enableUndoRegistration]; 
+	
+	// Model does not automatically call registerNotificationObservers so we do it here where object is restored
+	// or initialized for first time.
+	[self registerNotificationObservers];   
 	
     return self;
 }

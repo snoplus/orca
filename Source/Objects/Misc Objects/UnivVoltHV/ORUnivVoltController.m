@@ -38,37 +38,38 @@
 	  [super registerNotificationObservers];
 
     
-/*    [notifyCenter addObserver : self
-                     selector : @selector( slotChanged: )
-                         name : ORHVSlotChanged
+   [notifyCenter addObserver : self
+                     selector : @selector( channelChanged: )
+                         name : UVChnlChanged
 						object: model];
-*/
 
     [notifyCenter addObserver : self
                      selector : @selector( channelEnabledChanged:)
                          name : UVChnlEnabledChanged
 						object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector( demandHVChanged:)
-                         name : UVChnlDemandHVChanged
+   [notifyCenter addObserver : self
+                     selector : @selector( measuredCurrentChanged:)
+                         name : UVChnlMeasuredCurrentChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector( measuredHVChanged:)
                          name : UVChnlMeasuredHVChanged
 						object: model];
+						    
+	[notifyCenter addObserver : self
+                     selector : @selector( demandHVChanged:)
+                         name : UVChnlDemandHVChanged
+						object: model];
+
 						
 	[notifyCenter  addObserver: self
 	                  selector: @selector( writeErrorMsg: )
 					     name : HVSocketNotConnectedNotification
 					   object : nil];
 
-/*
-    [notifyCenter addObserver : self
-                     selector : @selector( measuredCurrentChanged: )
-                         name : ORHVMeasuredCurrentChanged
-*/
+
    [notifyCenter addObserver : self
                      selector : @selector( rampUpRateChanged:)
                          name : UVChnlRampUpRateChanged
@@ -105,6 +106,11 @@
 						object: model];						
 
 	[notifyCenter  addObserver: self
+	                  selector: @selector( setValues: )
+					     name : UVChnlHVValuesChanged
+					   object : model];
+
+	[notifyCenter  addObserver: self
 	                  selector: @selector( writeErrorMsg: )
 					     name : HVSocketNotConnectedNotification
 					   object : nil];
@@ -119,8 +125,19 @@
 	mCurrentChnl = 0;
 	[mChannelStepperField setIntValue: mCurrentChnl];
 	[mChannelNumberField setIntValue: mCurrentChnl];
+	
+	[mChnlTable reloadData];
 }
 
+
+- (void) setValues: (NSNotification *) aNote
+{
+	NSDictionary* curChnlDict = [aNote userInfo];
+	mCurrentChnl = [[curChnlDict objectForKey: HVkCurChnl] intValue];
+	[self setChnlValues: mCurrentChnl];
+
+	[mChnlTable reloadData];
+}
 
 - (void) updateWindow
 {
@@ -139,59 +156,76 @@
 	[mChnlTable reloadData];	
 }
 
+- (void) channelChanged: (NSNotification*) aNote
+{
+	[self setCurrentChnl: (NSNotification *) aNote ];  
+
+}
+
 - (void) channelEnabledChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mChnlEnabled setIntValue: [model chnlEnabled: mCurrentChnl]];
 }
 
 - (void) measuredCurrentChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mMeasuredCurrent setFloatValue: [model measuredCurrent: mCurrentChnl]];
 	NSLog( @"Measured current: %g, for chnl: %d", [model measuredCurrent: mCurrentChnl], mCurrentChnl );
 }
 
 - (void) demandHVChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mDemandHV setFloatValue: [model demandHV: mCurrentChnl]];
 }
 
 - (void) measuredHVChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mMeasuredHV setFloatValue: [model measuredHV: mCurrentChnl]];
 }
 
 - (void) tripCurrentChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mTripCurrent setFloatValue: [model tripCurrent: mCurrentChnl]];
 }
 
 - (void) rampUpRateChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mRampUpRate setFloatValue: [model rampUpRate: mCurrentChnl]];
 }
 
 -(void) statusChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mStatus setStringValue: [model status: mCurrentChnl]];
 }
 
 - (void) rampDownRateChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mRampDownRate setFloatValue: [model rampDownRate: mCurrentChnl]];
 }
 
 - (void) MVDZChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mMVDZ setFloatValue: [model MVDZ: mCurrentChnl]];
 }
 
 - (void) MCDZChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mMCDZ setFloatValue: [model MCDZ: mCurrentChnl]];
 }
 
 - (void) hvLimitChanged: (NSNotification*) aNote
 {
+	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mHVLimit setFloatValue: [model HVLimit: mCurrentChnl]];
 }
 
@@ -371,6 +405,12 @@
 }
 
 #pragma mark •••Utilities
+- (void) setCurrentChnl: (NSNotification *) aNote
+{
+	NSDictionary* chnlDict = [aNote userInfo];
+	mCurrentChnl = [[chnlDict objectForKey: HVkCurChnl] intValue];
+}
+
 - (void) setChnlValues: (int) aCurrentChannel
 {
 	NSDictionary*	tmpChnl = [model channelDictionary: aCurrentChannel];

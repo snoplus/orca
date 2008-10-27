@@ -41,7 +41,10 @@ typedef enum hveStatus hveStatus;
 	NSMutableArray*			mCommands;  //Crate commands for HV Unit
 }
 
-#pragma mark •••Send Commands
+#pragma mark ••• Notifications
+- (void) registerNotificationObservers;
+
+#pragma mark ••• Send Commands
 - (void)  getValues;
 - (void)  loadValues;
 
@@ -71,7 +74,7 @@ typedef enum hveStatus hveStatus;
 
 #pragma mark •••Interpret data
 - (void) interpretDataReturn: (NSNotification*) aNote;
-- (void) interpretDMPReturn: (NSDictionary*) aReturnData;
+- (void) interpretDMPReturn: (NSDictionary*) aReturnData channel: (int) aCurChnl;
 
 #pragma mark •••Utilities
 - (void) printDictionary: (int) aCurrentChnl;
@@ -86,12 +89,16 @@ extern NSString* UVChnlDemandHVChanged;
 extern NSString* UVChnlMeasuredHVChanged;
 extern NSString* UVChnlMeasuredCurrentChanged;
 extern NSString* UVChnlSlotChanged;
-extern NSString* UVChnlTripCurrentChanged;
 extern NSString* UVChnlRampUpRateChanged;
 extern NSString* UVChnlRampDownRateChanged;
+extern NSString* UVChnlTripCurrentChanged;
+extern NSString* UVChnlStatusChanged;
 extern NSString* UVChnlMVDZChanged;
 extern NSString* UVChnlMCDZChanged;
 extern NSString* UVChnlHVLimitChanged;
+extern NSString* UVChnlChanged;
+
+extern NSString* UVChnlHVValuesChanged;
 
 // HV unit Parameters
 extern NSString* HVkChnlEnabled;		//1
@@ -105,6 +112,8 @@ extern NSString* HVkStatus;				//8
 extern NSString* HVkMVDZ;				//9
 extern NSString* HVkMCDZ;				//10
 extern NSString* HVkHVLimit;			//11
+
+extern NSString* HVkCurChnl;
 
 
 //extern NSString* ORUnivVoltLock;

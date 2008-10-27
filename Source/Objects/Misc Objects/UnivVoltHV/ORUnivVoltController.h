@@ -94,6 +94,7 @@
 #pragma mark ***Accessors
 
 #pragma mark ***Utilities
+- (void) setCurrentChnl: (NSNotification *) aNote;      // Helper function
 - (void) setChnlValues: (int) aCurrentChannel;
 
 @end
