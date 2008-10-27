@@ -47,9 +47,18 @@
 	
 	NSDictionary* infoDictionary = [[NSBundle mainBundle] infoDictionary];
 
+	NSMutableString* svnVersion = @"";
+	NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
+	if([svnVersion hasSuffix:@"\n"]){
+		[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
+	}
+
+
 	NSString* versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
-	[versionField setStringValue:[NSString stringWithFormat:@"Version %@",
-		versionString]];
+	[versionField setStringValue:[NSString stringWithFormat:@"Version %@%@%@",
+		versionString,[svnVersion length]?@":":@"",[svnVersion length]?svnVersion:@""]];
 
 	[infoField setStringValue:@"Starting..."];
 

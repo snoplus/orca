@@ -9230,6 +9230,7 @@
 				8493CC870C99FA6D00B46CD4 /* cPCI_Code Copy */,
 				8493CC890C99FA9B00B46CD4 /* VME_Copy */,
 				842241B00D85EA7F0048D331 /* SLTv4_Copy */,
+				8491DD760EB616630084BAD6 /* ShellScript */,
 			);
 			buildRules = (
 				9C2595AC0D5171B90039C5DF /* PBXBuildRule */,
@@ -9794,6 +9795,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/usr/bin/ranlib Libraries/libUniversal/libmysqlclient.a";
+		};
+		8491DD760EB616630084BAD6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "rm $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion\nsvnversion > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion";
 		};
 /* End PBXShellScriptBuildPhase section */
 

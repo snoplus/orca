@@ -296,12 +296,20 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     
 	[self showStatusLog:self];
 
-	
+	NSFileManager* fm = [NSFileManager defaultManager];
+	NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
+	NSMutableString* svnVersion = @"";
+	if([fm fileExistsAtPath:svnVersionPath]){
+		svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
+		if([svnVersion hasSuffix:@"\n"]){
+			[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
+		}
+	}
     NSLog(@"-------------------------------------------------\n");
-    NSLog(@"            Orca (v%@) Has Started               \n",versionString);
+    NSLog(@"   Orca (v%@%@%@) Has Started                    \n",versionString,[svnVersion length]?@":":@"",[svnVersion length]?svnVersion:@"");
     NSNumber* shutdownFlag = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag]; 
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
-        NSLog(@"   (After crash or hard debugger stop)       \n");
+		NSLog(@"   (After crash or hard debugger stop)           \n");
     }
     NSLog(@"-------------------------------------------------\n");
 	unsigned major, minor, bugFix;

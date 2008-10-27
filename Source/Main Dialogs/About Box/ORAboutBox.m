@@ -64,8 +64,17 @@
         [theWindow setTitle:[NSString stringWithFormat:@"About %@", appName]];
                 // Setup the version field
         versionString = [infoDictionary objectForKey:@"CFBundleVersion"];
-        [versionField setStringValue:[NSString stringWithFormat:@"Version %@",
-            versionString]];
+		
+		NSFileManager* fm = [NSFileManager defaultManager];
+		NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
+		NSMutableString* svnVersion = @"";
+		if([fm fileExistsAtPath:svnVersionPath])svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
+		if([svnVersion hasSuffix:@"\n"]){
+			[svnVersion replaceCharactersInRange:NSMakeRange([svnVersion length]-1, 1) withString:@""];
+		}
+
+        [versionField setStringValue:[NSString stringWithFormat:@"Version %@%@%@",
+            versionString,[svnVersion length]?@":":@"",[svnVersion length]?svnVersion:@""]];
 
         // Setup our credits
         creditsPath = [[NSBundle mainBundle] pathForResource:@"Credits"
@@ -87,6 +96,7 @@
         [theWindow setMenu:nil];
         [theWindow center];
         [creditsString release];
+		
     }
 
     if (![[appNameField window] isVisible]){
