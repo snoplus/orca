@@ -9807,7 +9807,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "rm $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion\nsvnversion > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion";
+			shellScript = "svnversion > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion";
 		};
 /* End PBXShellScriptBuildPhase section */
 
