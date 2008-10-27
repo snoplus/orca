@@ -30,33 +30,36 @@
 @interface ORDataFileModel :  ORDataChainObject
 {
     @private
-        NSFileHandle*  filePointer;
-        NSTimer*	 fileSizeTimer;
-        unsigned long dataFileSize;
-        NSString*	fileName;
-        NSString*	statusFileName;
+        NSFileHandle*	filePointer;
+        NSTimer*		fileSizeTimer;
+        unsigned long	dataFileSize;
+        NSString*		fileName;
+        NSString*		statusFileName;
 
-        int		    statusStart;
-        BOOL		saveConfiguration;
-        BOOL		ignoreMode;
-        BOOL        processedRunStart;
-        BOOL        processedCloseRun;
+        int				statusStart;
+        BOOL			saveConfiguration;
+        BOOL			ignoreMode;
+        BOOL			processedRunStart;
+        BOOL			processedCloseRun;
 
-        ORSmartFolder*	    dataFolder;
-        ORSmartFolder*	    statusFolder;
-        ORSmartFolder*	    configFolder;
+        ORSmartFolder*	dataFolder;
+        ORSmartFolder*	statusFolder;
+        ORSmartFolder*	configFolder;
         
-        NSMutableData*     dataBuffer;
-        NSTimeInterval     lastTime;
-		BOOL		limitSize;
-		float		maxFileSize;
-		int			fileSegment;
-		BOOL		fileLimitExceeded;
-		NSString* filePrefix;
-		BOOL useFolderStructure;
+        NSMutableData*	dataBuffer;
+        NSTimeInterval	lastTime;
+		BOOL			limitSize;
+		float			maxFileSize;
+		int				fileSegment;
+		BOOL			fileLimitExceeded;
+		NSString*		filePrefix;
+		BOOL			useFolderStructure;
+		BOOL			useDatedFileNames;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) useDatedFileNames;
+- (void) setUseDatedFileNames:(BOOL)aUseDatedFileNames;
 - (BOOL) useFolderStructure;
 - (void) setUseFolderStructure:(BOOL)aUseFolderStructure;
 - (NSString*) filePrefix;
@@ -107,6 +110,7 @@
 
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORDataFileModelUseDatedFileNamesChanged;
 extern NSString* ORDataFileModelUseFolderStructureChanged;
 extern NSString* ORDataFileModelFilePrefixChanged;
 extern NSString* ORDataFileModelFileSegmentChanged;

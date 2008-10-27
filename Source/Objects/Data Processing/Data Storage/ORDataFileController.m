@@ -70,6 +70,11 @@ enum {
 
 #pragma  mark ¥¥¥Actions
 
+- (void) useDatedFileNamesAction:(id)sender
+{
+	[model setUseDatedFileNames:[sender intValue]];	
+}
+
 - (IBAction) useFolderStructureAction:(id)sender
 {
 	[model setUseFolderStructure:[sender intValue]];	
@@ -128,6 +133,11 @@ enum {
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) useDatedFileNamesChanged:(NSNotification*)aNote
+{
+	[useDatedFileNamesCB setIntValue: [model useDatedFileNames]];
+}
 
 - (void) useFolderStructureChanged:(NSNotification*)aNote
 {
@@ -243,6 +253,11 @@ enum {
                          name : ORDataFileModelUseFolderStructureChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(useDatedFileNamesChanged:)
+                         name : ORDataFileModelUseDatedFileNamesChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -260,6 +275,7 @@ enum {
 	[self maxFileSizeChanged:nil];
 	[self filePrefixChanged:nil];
 	[self useFolderStructureChanged:nil];
+	[self useDatedFileNamesChanged:nil];
 }
 
 

@@ -26,16 +26,17 @@
 #import "ORSmartFolder.h"
 
 #pragma mark ¥¥¥Notification Strings
-NSString* ORDataFileModelUseFolderStructureChanged = @"ORDataFileModelUseFolderStructureChanged";
-NSString* ORDataFileModelFilePrefixChanged = @"ORDataFileModelFilePrefixChanged";
-NSString* ORDataFileModelFileSegmentChanged = @"ORDataFileModelFileSegmentChanged";
-NSString* ORDataFileModelMaxFileSizeChanged = @"ORDataFileModelMaxFileSizeChanged";
-NSString* ORDataFileModelLimitSizeChanged = @"ORDataFileModelLimitSizeChanged";
-NSString* ORDataFileChangedNotification                 = @"The DataFile File Has Changed";
+NSString* ORDataFileModelUseDatedFileNamesChanged	= @"ORDataFileModelUseDatedFileNamesChanged";
+NSString* ORDataFileModelUseFolderStructureChanged	= @"ORDataFileModelUseFolderStructureChanged";
+NSString* ORDataFileModelFilePrefixChanged			= @"ORDataFileModelFilePrefixChanged";
+NSString* ORDataFileModelFileSegmentChanged			= @"ORDataFileModelFileSegmentChanged";
+NSString* ORDataFileModelMaxFileSizeChanged			= @"ORDataFileModelMaxFileSizeChanged";
+NSString* ORDataFileModelLimitSizeChanged			= @"ORDataFileModelLimitSizeChanged";
+NSString* ORDataFileChangedNotification             = @"The DataFile File Has Changed";
 NSString* ORDataFileStatusChangedNotification 		= @"The DataFile Status Has Changed";
 NSString* ORDataFileSizeChangedNotification 		= @"The DataFile Size Has Changed";
 NSString* ORDataSaveConfigurationChangedNotification    = @"ORDataSaveConfigurationChangedNotification";
-NSString* ORDataFileLock				= @"ORDataFileLock";
+NSString* ORDataFileLock							= @"ORDataFileLock";
 
 #pragma mark ¥¥¥Definitions
 static NSString *ORDataFileConnection 		= @"Data File Input Connector";
@@ -177,6 +178,20 @@ static const int currentVersion = 1;           // Current version
 
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) useDatedFileNames
+{
+    return useDatedFileNames;
+}
+
+- (void) setUseDatedFileNames:(BOOL)aUseDatedFileNames
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseDatedFileNames:useDatedFileNames];
+    
+    useDatedFileNames = aUseDatedFileNames;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelUseDatedFileNamesChanged object:self];
+}
 
 - (BOOL) useFolderStructure
 {
@@ -403,12 +418,16 @@ static const int currentVersion = 1;           // Current version
     if([[ORGlobal sharedInstance] runMode] == kNormalRun){
         //open file and write headers
 		if(filePrefix)[aDataPacket setFilePrefix:filePrefix];
-        if([aDataPacket filePrefix]!=nil){
-            [self setFileName:[NSString stringWithFormat:@"%@%d",[aDataPacket filePrefix],[aDataPacket runNumber]]];
-        }
-        else [self setFileName:[NSString stringWithFormat:@"Run%d",[aDataPacket runNumber]]];
+		NSString* s;
+        if([aDataPacket filePrefix]!=nil)	s = [NSString stringWithFormat:@"%@%d",[aDataPacket filePrefix],[aDataPacket runNumber]];
+        else								s = [NSString stringWithFormat:@"Run%d",[aDataPacket runNumber]];
+		if(useDatedFileNames){
+			NSCalendarDate* theDate = [NSCalendarDate date];
+			s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];
+		}
 		
-        
+        [self setFileName:s];
+		
         if(fileName){
 			NSString* fullFileName = [[self tempDir] stringByAppendingPathComponent:[self fileName]];
 			NSLog(@"Opening dataFile: %@\n",[fullFileName stringByAbbreviatingWithTildeInPath]);
@@ -598,9 +617,10 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setMaxFileSize:[decoder decodeFloatForKey:@"ORDataFileModelMaxFileSize"]];
-    [self setLimitSize:[decoder decodeBoolForKey:@"ORDataFileModelLimitSize"]];
-    int  version = [decoder decodeIntForKey:ORDataVersion];
+    [self setUseDatedFileNames:	[decoder decodeBoolForKey:@"ORDataFileModelUseDatedFileNames"]];
+    [self setMaxFileSize:		[decoder decodeFloatForKey:@"ORDataFileModelMaxFileSize"]];
+    [self setLimitSize:			[decoder decodeBoolForKey:@"ORDataFileModelLimitSize"]];
+    int  version =				[decoder decodeIntForKey:ORDataVersion];
     
     //-------------------------------------------------------------------------------
     //version 0 stuff
@@ -648,14 +668,15 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:useFolderStructure forKey:@"ORDataFileModelUseFolderStructure"];
-    [encoder encodeObject:filePrefix forKey:@"ORDataFileModelFilePrefix"];
-    [encoder encodeFloat:maxFileSize forKey:@"ORDataFileModelMaxFileSize"];
-    [encoder encodeBool:limitSize forKey:@"ORDataFileModelLimitSize"];
-    [encoder encodeInt:currentVersion forKey:ORDataVersion];
-    [encoder encodeObject:dataFolder forKey:ORDataDataFolderName];
-    [encoder encodeObject:statusFolder forKey:ORDataStatusFolderName];
-    [encoder encodeObject:configFolder forKey:ORDataConfigFolderName];
+    [encoder encodeBool:useDatedFileNames	forKey:@"ORDataFileModelUseDatedFileNames"];
+    [encoder encodeBool:useFolderStructure	forKey:@"ORDataFileModelUseFolderStructure"];
+    [encoder encodeObject:filePrefix		forKey:@"ORDataFileModelFilePrefix"];
+    [encoder encodeFloat:maxFileSize		forKey:@"ORDataFileModelMaxFileSize"];
+    [encoder encodeBool:limitSize			forKey:@"ORDataFileModelLimitSize"];
+    [encoder encodeInt:currentVersion		forKey:ORDataVersion];
+    [encoder encodeObject:dataFolder		forKey:ORDataDataFolderName];
+    [encoder encodeObject:statusFolder		forKey:ORDataStatusFolderName];
+    [encoder encodeObject:configFolder		forKey:ORDataConfigFolderName];
     [encoder encodeBool:[self saveConfiguration] forKey:ORDataSaveConfiguration];
 }
 
@@ -668,11 +689,9 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     [objDictionary setObject:[NSNumber numberWithInt:saveConfiguration] forKey:@"SaveConfiguration"];
    
     [dictionary setObject:objDictionary forKey:@"Data File"];
-    
-    
+
     return objDictionary;
 }
-
 
 @end
 
