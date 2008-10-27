@@ -453,7 +453,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     while (buffer<endPtr) {
 		NSAutoreleasePool* outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
 		unsigned long* lptr = (unsigned long*)buffer;
-        unsigned long recordHeader = *lptr;
 		
 		if(expectingHeader){
 			//this could be a header. Check it and see if we have to swap or not
@@ -467,7 +466,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 						//the dataID for the header is always zero the length of the record is always non-zero -- this
 						//gives us a way to determine endian-ness 
 						[dataPacket setNeedToSwap:YES];
-						recordHeader = CFSwapInt32(*lptr);			//swap the record header
+						CFSwapInt32(*lptr);			//swap the record header
 						CFSwapInt32(*(lptr+1));		//swap the header byte length
 					}
 				}
@@ -478,7 +477,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 			}
 		}
 		
-		
+		unsigned long recordHeader = *lptr;
 		unsigned long dataId = ExtractDataId(recordHeader);
 		if(dataId == 0x00000000){
 			//new style headers always have a id of zero.
