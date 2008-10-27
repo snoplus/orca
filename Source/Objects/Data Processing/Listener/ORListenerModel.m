@@ -116,6 +116,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     
 }
 
+
 - (void) documentLoaded:(NSNotification*)aNotification
 {
     if([self objectConnectedTo:ORListenerConnector] && connectAtStart){
@@ -301,11 +302,11 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 - (void) connectSocket:(BOOL)state
 {
     if(state){
-		checkedForSwap = NO;
+		expectingHeader = YES;
         [self setSocket:[NetSocket netsocketConnectedToHost:remoteHost port:remotePort]];
     }
     else {
-		checkedForSwap = NO;
+		expectingHeader = NO;
         [socket close];
         [self stopProcessing];
         [self setIsConnected:[socket isConnected]];
@@ -449,17 +450,36 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 {
     char* buffer = (char*)[dataChunk bytes];
     char* endPtr = buffer + [dataChunk length];
-    
     while (buffer<endPtr) {
 		NSAutoreleasePool* outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
 		unsigned long* lptr = (unsigned long*)buffer;
         unsigned long recordHeader = *lptr;
-		unsigned long dataId = ExtractDataId(recordHeader);
-		if(!checkedForSwap){
-			//first record to process is always a header
-			[dataPacket legalHeaderPtr:lptr];
-			checkedForSwap = YES;
+		
+		if(expectingHeader){
+			//this could be a header. Check it and see if we have to swap or not
+			//the only way to do it effectively is to check for the <?xml string
+			if([dataChunk length] >= 32){
+				char* cptr = (char*)lptr;
+				if(!strncmp(cptr+8,"<?xml ve",8)){
+					expectingHeader = NO;
+					//OK, we know this is a header.
+					if((*lptr & 0xffff0000) != 0x0000){
+						//the dataID for the header is always zero the length of the record is always non-zero -- this
+						//gives us a way to determine endian-ness 
+						[dataPacket setNeedToSwap:YES];
+						recordHeader = CFSwapInt32(*lptr);			//swap the record header
+						CFSwapInt32(*(lptr+1));		//swap the header byte length
+					}
+				}
+			}
+			else {
+				[outerPool release];
+				break;
+			}
 		}
+		
+		
+		unsigned long dataId = ExtractDataId(recordHeader);
 		if(dataId == 0x00000000){
 			//new style headers always have a id of zero.
 			unsigned long length = ExtractLength(recordHeader)*4; //bytes
@@ -512,6 +532,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 						[dataPacket clearData];
 						[self performSelectorOnMainThread:@selector(sendCloseOutRun:)    withObject:dataPacket waitUntilDone:YES];
 						[self performSelectorOnMainThread:@selector(clearByteCount)      withObject:nil        waitUntilDone:YES];
+						expectingHeader = YES;
 					}
 					[dataPacket clearData];
 					buffer += length;

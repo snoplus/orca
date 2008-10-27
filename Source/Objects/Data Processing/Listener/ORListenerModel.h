@@ -46,7 +46,7 @@
     BOOL docLoaded;
 	BOOL autoReconnect;
 	BOOL connectAtStart;
-	BOOL checkedForSwap;
+	BOOL expectingHeader;
 }
 
 #pragma mark ***Initialization
