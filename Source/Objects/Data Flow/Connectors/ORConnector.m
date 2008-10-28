@@ -547,8 +547,9 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 {
     
     self = [super init];
-	
-    [self setLocalFrame:[[decoder decodeObjectForKey:@"ORConnector Frame"] rectValue]];
+	int newVersion = [decoder decodeIntForKey:@"newVersion"];
+	if(newVersion)	[self setLocalFrame:[decoder decodeRectForKey:@"LocalFrame"]];
+	else			[self setLocalFrame:[[decoder decodeObjectForKey:@"ORConnector Frame"] rectValue]];
     [self setGuardian:[decoder decodeObjectForKey:@"ORConnector Parent"]];
     [[guardian undoManager] disableUndoRegistration];
     [self setOnColor:[decoder decodeObjectForKey:@"ORConnectorOnColor"]];
@@ -575,9 +576,10 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
+	[encoder encodeInt:1 forKey:@"newVersion"];
     [encoder encodeObject:onColor forKey:@"ORConnectorOnColor"];
     [encoder encodeObject:offColor forKey:@"ORConnectorOffColor"];
-    [encoder encodeObject:[NSData dataWithNSRect:[self localFrame]] forKey:@"ORConnector Frame"];
+    [encoder encodeRect:[self localFrame] forKey:@"LocalFrame"];
     [encoder encodeConditionalObject:guardian forKey:@"ORConnector Parent"];
     [encoder encodeConditionalObject:objectLink forKey:@"ORConnector ObjectLink"];
     [encoder encodeConditionalObject:connector forKey:@"ORConnector Connection"];

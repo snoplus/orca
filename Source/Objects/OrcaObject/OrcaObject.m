@@ -389,22 +389,6 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 }
 
 
-
-
-#pragma mark ¥¥¥Positioning
-- (void) offsetFrameFromPoint:(NSData*)pointData
-{
-    NSPoint aPoint = [pointData pointValue];
-    [self  setFrameOrigin:NSMakePoint(aPoint.x + [self offset].x,aPoint.y + [self offset].y) ];
-}
-
-- (void) offsetFrameBy:(NSPoint)aPoint
-{
-    [self setOffset:NSMakePoint(aPoint.x + [self offset].x,aPoint.y + [self offset].y) ];
-    frame.origin = [self offset];
-}
-
-
 #pragma mark ¥¥¥Drawing
 
 - (void) drawSelf:(NSRect)aRect
@@ -552,10 +536,20 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     self = [super init];
     
     [[self undoManager] disableUndoRegistration];
-    
-    [self setFrame:[[decoder decodeObjectForKey:OROrcaObjectFrame] rectValue]];
-    [self setOffset:[[decoder decodeObjectForKey:OROrcaObjectOffset] pointValue]];
-    [self setBounds:[[decoder decodeObjectForKey:OROrcaObjectBounds] rectValue]];
+ 
+	int newVersion = [decoder decodeIntForKey:@"newVersion"];
+	if(newVersion)	{
+		[self setFrame:[decoder decodeRectForKey:@"localFrame"]];
+		[self setOffset:[decoder decodePointForKey:@"offset"]];
+		[self setBounds:[decoder decodeRectForKey:@"bounds"]];
+	}
+	else {
+		[self setFrame:[[decoder decodeObjectForKey:OROrcaObjectFrame] rectValue]];
+		[self setOffset:[[decoder decodeObjectForKey:OROrcaObjectOffset] pointValue]];
+		[self setBounds:[[decoder decodeObjectForKey:OROrcaObjectBounds] rectValue]];
+	}
+	      
+
     [self setConnectors:[decoder decodeObjectForKey:OROrcaObjectConnectors]];
     [self setTag:[decoder decodeIntForKey:OROrcaObjectTag]];
     [self setUniqueIdNumber:[decoder decodeInt32ForKey:OROrcaObjectUniqueIDNumber]];
@@ -567,9 +561,11 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeObject:[NSData dataWithNSRect:[self frame]] forKey:OROrcaObjectFrame];
-    [encoder encodeObject:[NSData dataWithNSPoint:[self offset]] forKey:OROrcaObjectOffset];
-    [encoder encodeObject:[NSData dataWithNSRect:[self bounds]] forKey:OROrcaObjectBounds];
+	[encoder encodeInt:1 forKey:@"newVersion"];
+
+    [encoder encodeRect:[self frame] forKey:@"localFrame"];
+    [encoder encodePoint:[self offset] forKey:@"offset"];
+    [encoder encodeRect:[self bounds] forKey:@"bounds"];
     [encoder encodeObject:connectors forKey:OROrcaObjectConnectors];
     [encoder encodeInt:[self tag] forKey:OROrcaObjectTag];
     [encoder encodeInt32:uniqueIdNumber forKey:OROrcaObjectUniqueIDNumber];

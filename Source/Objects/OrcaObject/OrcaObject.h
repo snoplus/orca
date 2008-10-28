@@ -90,8 +90,6 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) 		setInsideSelectionRect:(BOOL)state;
 - (void) 		setImage:(NSImage*)anImage;
 - (NSImage*)		image;
-- (void) 		offsetFrameFromPoint:(NSData*)pointData;
-- (void) 		offsetFrameBy:(NSPoint)aPoint;
 - (BOOL) 		acceptsGuardian: (OrcaObject*)aGuardian;
 - (BOOL) 		skipConnectionDraw;
 - (void)		setSkipConnectionDraw:(BOOL)state;
