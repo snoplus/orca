@@ -202,7 +202,7 @@
     [super setModel:aModel];
     if([aModel fullName]){
         [[self window] setTitle:[aModel fullName]];
-        [titleField setStringValue:[aModel fullName]];
+        [titleField setStringValue:[aModel fullNameWithRunNumber]];
     }
 }
 

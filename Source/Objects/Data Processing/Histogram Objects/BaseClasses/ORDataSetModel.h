@@ -55,6 +55,8 @@
 - (void) runTaskStopped;
 - (void) runTaskBoundary;
 - (void) processResponse:(NSDictionary*)aResponse;
+- (NSString*) runNumberString;
+- (NSString*) fullNameWithRunNumber;
 
 #pragma mark ¥¥¥Data Source Methods
 - (unsigned)  numberOfChildren;
@@ -66,6 +68,7 @@
 @interface NSObject (ORDatasSetModel_Cat)
 - (void)  clear;
 - (void)  runTaskStopped;
+- (long)  runNumber;
 @end
 
 

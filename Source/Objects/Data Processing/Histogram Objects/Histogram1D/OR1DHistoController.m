@@ -93,7 +93,7 @@
 	[rebinNumberTextField setIntValue:[model rebinNumber]];
 	if([model fullName]){
         [[self window] setTitle:[model fullName]];
-        [titleField setStringValue:[model fullName]];
+        [titleField setStringValue:[model fullNameWithRunNumber]];
     }
 
     [plotter setNeedsDisplay:YES];
@@ -104,7 +104,7 @@
 	[rebinCB setIntValue:[model rebin]];
 	if([model fullName]){
         [[self window] setTitle:[model fullName]];
-        [titleField setStringValue:[model fullName]];
+        [titleField setStringValue:[model fullNameWithRunNumber]];
     }
     [plotter setNeedsDisplay:YES];
 }

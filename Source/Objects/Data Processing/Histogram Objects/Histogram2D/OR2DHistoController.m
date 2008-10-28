@@ -52,6 +52,13 @@
     minSize.width = 335;
     minSize.height = 335;
     [[self window] setMinSize:minSize];
+	[titleField setStringValue:[model fullNameWithRunNumber]];
+}
+
+- (void) dataSetChanged:(NSNotification*)aNotification
+{
+	[titleField setStringValue:[model fullNameWithRunNumber]];
+	[super dataSetChanged:aNotification];
 }
 
 - (IBAction)logLin:(NSToolbarItem*)item 

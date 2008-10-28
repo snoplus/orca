@@ -30,6 +30,7 @@
     id                      data;		//data will be nil unless this is a leaf node.	
     unsigned long			totalCounts;
 	NSLock*					dataSetLock;
+	long					runNumber;
 }
 
 #pragma mark •••Initialization
@@ -37,6 +38,8 @@
 - (void) dealloc;
 
 #pragma mark •••Accessors
+- (long) runNumber;
+- (void) setRunNumber:(long)aRunNumber;
 - (id) objectForKeyArray:(NSMutableArray*)anArray;
 - (ORDataSet*) dataSetWithName:(NSString*)aName;
 - (void) setKey:(NSString*)aKey;

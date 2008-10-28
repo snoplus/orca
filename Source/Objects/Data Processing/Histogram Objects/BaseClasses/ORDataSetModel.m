@@ -141,6 +141,17 @@ NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
 	return temp;
 }
 
+- (NSString*) fullNameWithRunNumber
+{
+	return [NSString stringWithFormat:@"%@%@%@",[self runNumberString],[[self runNumberString] length]>0?@",":@"",[self fullName]];
+}
+
+- (NSString*) runNumberString
+{
+	long runNumber = [dataSet runNumber];
+	if(runNumber > 0) return [NSString stringWithFormat:@"Run %d",runNumber];
+	else return @"";
+}
 
 -(unsigned long) totalCounts
 {
@@ -237,7 +248,7 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
     [self setKey:[decoder decodeObjectForKey:ORDataSetModelKey]];
     [self setFullName:[decoder decodeObjectForKey:ORDataSetModelFullName]];
 	[self setCalibration:[decoder decodeObjectForKey:@"calibration"]];
-	
+	[self setDataSet:[decoder decodeObjectForKey:@"dataSet"]];
     
     [[self undoManager] enableUndoRegistration];
     
@@ -251,6 +262,7 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
     [encoder encodeObject:key forKey:ORDataSetModelKey];
     [encoder encodeObject:fullName forKey:ORDataSetModelFullName];
     [encoder encodeObject:calibration forKey:@"calibration"];
+    [encoder encodeObject:dataSet forKey:@"dataSet"];
 }
 
 - (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray
@@ -263,6 +275,5 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
     //default is no... subclasses can override
     return NO;
 }
-
 
 @end

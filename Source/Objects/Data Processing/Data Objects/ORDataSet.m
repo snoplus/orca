@@ -119,6 +119,16 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     return result;
 }
 
+- (long) runNumber
+{
+	return runNumber;
+}
+
+- (void) setRunNumber:(long)aRunNumber
+{
+	runNumber = aRunNumber;
+}
+
 - (void) runTaskBoundary
 {
     NSEnumerator* e = [realDictionary  objectEnumerator];
@@ -742,7 +752,8 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
         [histo setNumberBinsPerSide:numBins];
         [nextLevel setData:histo];
-        [histo histogramX:xValue y:yValue];  
+ 		[histo setDataSet:self];
+		[histo histogramX:xValue y:yValue];  
         [histo release];
         [[NSNotificationCenter defaultCenter]
                 postNotificationName:ORDataSetAdded
@@ -789,7 +800,8 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
         [histo setNumberBinsPerSide:(unsigned int)pow((float)numBins,.5)];
         [nextLevel setData:histo];
-        [histo mergeHistogram:ptr numValues:numBins];
+  		[histo setDataSet:self];
+		[histo mergeHistogram:ptr numValues:numBins];
         [histo release];
         [[NSNotificationCenter defaultCenter]
                 postNotificationName:ORDataSetAdded
@@ -833,6 +845,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
         [histo setNumberBinsPerSide:numBins];
         [nextLevel setData:histo];
+ 		[histo setDataSet:self];
         [histo loadX:xValue y:yValue z:zValue];  
         [histo release];
         [[NSNotificationCenter defaultCenter]
@@ -924,7 +937,6 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     }
     
     else {
-		[waveform setDataSet:self];
 		[waveform setWaveform:aWaveForm];
     }
     va_end(myArgs);
@@ -1010,7 +1022,6 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     }
     
     else {
-		[waveform setDataSet:self];
 		[waveform setWaveform:aWaveForm];
     }
     va_end(myArgs);

@@ -301,6 +301,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [dataSet appendDataDescription:aDataPacket userInfo:userInfo];
+
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -309,9 +310,20 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     if(!dataSet){
         [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease] ];
     }
-    
+	  
+	long runNumber = -1;
+	if(userInfo){
+		//normally we'd get the runnumber from the dataPacket, but that doesn't work for replay objects
+		runNumber = [[userInfo objectForKey:@"RunNumber"] longValue];
+	}
+	else {
+		NSArray* dataChainObjects = [[aDataPacket fileHeader] objectForNestedKey:@"ObjectInfo,DataChain"];
+		NSDictionary* runControlEntry = [[dataChainObjects objectAtIndex:0] objectForKey:@"Run Control"];
+		runNumber = [[runControlEntry objectForKey:@"RunNumber"] longValue];
+	}	  
+	[dataSet setRunNumber:runNumber];
     [dataSet clear];
-    
+
     [[self objectConnectedTo:ORHistoDataOutConnection] runTaskStarted:aDataPacket userInfo:userInfo];
     [[self objectConnectedTo:ORHistoPassThruConnection] runTaskStarted:aDataPacket userInfo:userInfo];
 }
