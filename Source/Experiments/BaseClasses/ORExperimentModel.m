@@ -73,6 +73,13 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
     [super dealloc];
 }
 
+
+- (void) wakeUp
+{
+    if([self aWake])return;
+    [super wakeUp];
+}
+
 - (void) sleep
 {
     [super sleep];
@@ -200,6 +207,9 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
+					   
+	[self registerForRates];
+	[self collectRates];
  }
 
 - (void) runStatusChanged:(NSNotification*)aNote

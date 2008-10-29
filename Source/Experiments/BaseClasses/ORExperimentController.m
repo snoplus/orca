@@ -296,8 +296,13 @@
 - (void) findRunControl:(NSNotification*)aNote
 {
 	runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRunModel,1"];
+	if(!runControl){
+		runControl = [[[NSApp delegate] document] findObjectWithFullID:@"ORRemoteRunModel,1"];	
+	}
 	[self updateRunInfo:nil];
 	[startRunButton setEnabled:runControl!=nil];
+	[timedRunCB setEnabled:runControl!=nil];
+	[runModeMatrix setEnabled:runControl!=nil];
 }
 
 - (void) timedRunChangted:(NSNotification*)aNote
