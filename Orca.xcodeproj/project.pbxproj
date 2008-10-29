@@ -1207,6 +1207,7 @@
 		849191800725B43500F454F1 /* ORToolbarFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491917E0725B43500F454F1 /* ORToolbarFactory.h */; };
 		849191C70725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */; };
 		849194460725CB6C00F454F1 /* edu.washington.npl.orca.Waveform.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849194450725CB6C00F454F1 /* edu.washington.npl.orca.Waveform.plist */; };
+		8491E44F0EB89DF50084BAD6 /* vxi11.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8491E44E0EB89DF50084BAD6 /* vxi11.txt */; };
 		8492D7130B7A80770065F3DE /* ORGretinaModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8492D70F0B7A80770065F3DE /* ORGretinaModel.h */; };
 		8492D7140B7A80770065F3DE /* ORGretinaModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8492D7100B7A80770065F3DE /* ORGretinaModel.m */; };
 		8492D7150B7A80770065F3DE /* ORGretinaController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8492D7110B7A80770065F3DE /* ORGretinaController.h */; };
@@ -2972,6 +2973,7 @@
 		8491917E0725B43500F454F1 /* ORToolbarFactory.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORToolbarFactory.h; path = Source/Misc/ORToolbarFactory.h; sourceTree = SOURCE_ROOT; };
 		849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = edu.washington.npl.orca.Document.plist; path = "Source/Main Document/edu.washington.npl.orca.Document.plist"; sourceTree = SOURCE_ROOT; };
 		849194450725CB6C00F454F1 /* edu.washington.npl.orca.Waveform.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = edu.washington.npl.orca.Waveform.plist; path = "Source/Objects/Data Processing/Histogram Objects/Waveform/edu.washington.npl.orca.Waveform.plist"; sourceTree = SOURCE_ROOT; };
+		8491E44E0EB89DF50084BAD6 /* vxi11.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = vxi11.txt; path = Source/Objects/Hardware/GPIB/vxi11/vxi11.txt; sourceTree = SOURCE_ROOT; };
 		84929E8204439586005F64B1 /* ORTriggerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTriggerController.h; sourceTree = "<group>"; };
 		84929E8304439586005F64B1 /* ORTriggerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORTriggerController.m; sourceTree = "<group>"; };
 		84929E8604439586005F64B1 /* ORTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTriggerModel.h; sourceTree = "<group>"; };
@@ -5835,6 +5837,7 @@
 		846B8F160E15973500C41F9D /* vxi11 */ = {
 			isa = PBXGroup;
 			children = (
+				8491E44E0EB89DF50084BAD6 /* vxi11.txt */,
 				846B8F170E15973500C41F9D /* vxi11.h */,
 				846B8F180E15973500C41F9D /* vxi11_clnt.m */,
 				846B8F1B0E15973500C41F9D /* vxi11_xdr.m */,
@@ -9777,6 +9780,7 @@
 				84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */,
 				84CEA6E70EA623A50060076A /* FecDaughterCard.gif in Resources */,
 				84CEA6E80EA623A50060076A /* FecDaughterCard.nib in Resources */,
+				8491E44F0EB89DF50084BAD6 /* vxi11.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
