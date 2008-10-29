@@ -5,6 +5,19 @@
 //  Created by Mark Howe on 10/16/08.
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
 
 #import "ORFecPmtsView.h"
 #import "OrcaObjectController.h"
@@ -66,19 +79,17 @@
 	ORCard* aCard;
 	NSEnumerator* e = [daughterCards objectEnumerator];
 	BOOL cardPresent[4] = {0,0,0,0};
-	
 	while(aCard = [e nextObject]){
 		cardPresent[[aCard slot]] = YES;
 	}
 	
 	if(cardPresent[0])for(i=0;i<8;i++){	
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(x1,y1) toPoint:NSMakePoint(x2,y2)];
-		[self drawPMTSwitch:7-i at:NSMakePoint(x2,y2) direction:90];
+		[self drawSwitch:7-i at:NSMakePoint(x2,y2) direction:90];
 		[self drawPMT:7-i at:NSMakePoint(x2,y2-18) direction:90];
 		x1 += deltaX1;
 		x2 += deltaX2;
 	}
-	
 	
 	//8 - 15 (bottom left)
 	x1 = anchorFrame.origin.x;
@@ -89,7 +100,7 @@
 	deltaY2 = (dc_height*4.6)/8.;
 	if(cardPresent[1])for(i=0;i<8;i++){	
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(x1,y1) toPoint:NSMakePoint(x2,y2)];
-		[self drawPMTSwitch:8+i at:NSMakePoint(x2,y2) direction:0];
+		[self drawSwitch:8+i at:NSMakePoint(x2,y2) direction:0];
 		[self drawPMT:8+i at:NSMakePoint(x2-18,y2) direction:0];
 		y1 += deltaY1;
 		y2 += deltaY2;
@@ -102,7 +113,7 @@
 	y2 = y1 + dc_height/2 + separation;
 	if(cardPresent[2])	for(i=0;i<8;i++){	
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(x1,y1) toPoint:NSMakePoint(x2,y2)];
-		[self drawPMTSwitch:23-i at:NSMakePoint(x2,y2) direction:0];
+		[self drawSwitch:23-i at:NSMakePoint(x2,y2) direction:0];
 		[self drawPMT:23-i at:NSMakePoint(x2-18,y2) direction:0];
 		y1 -= deltaY1;
 		y2 -= deltaY2;
@@ -114,7 +125,7 @@
 	x2 = anchorFrame.origin.x-20;
 	y2 = y1 + separation;
 	if(cardPresent[3])for(i=0;i<8;i++){	
-		[self drawPMTSwitch:24+i at:NSMakePoint(x2,y2) direction:-90];
+		[self drawSwitch:24+i at:NSMakePoint(x2,y2) direction:-90];
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(x1,y1) toPoint:NSMakePoint(x2,y2)];
 		[self drawPMT:24+i at:NSMakePoint(x2,y2+18) direction:-90];
 		x1 += deltaX1;
@@ -123,7 +134,7 @@
 	
 }
 
-- (void) drawPMTSwitch:(int)index at:(NSPoint)switchPoint direction:(float)angle
+- (void) drawSwitch:(int)index at:(NSPoint)switchPoint direction:(float)angle
 {
 	NSPoint switchClosedPoints[2] = {
 		{0,0},
@@ -174,7 +185,6 @@
 
 - (void) drawPMT:(int)index at:(NSPoint)neckPoint direction:(float)angle
 {
-	NSLog(@"pmt %d\n",index);
 	NSPoint pmtBody[6] = {
 		{-15,-10},
 		{-5,-3},
@@ -225,7 +235,7 @@
 
 	int i;
 	for(i=0;i<32;i++){
-		if([clickPath[i] containsPoint:aPoint]){
+		if(/*cardPresent[i/8] &&*/ [clickPath[i] containsPoint:aPoint]){
 			NSLog(@"got it on %d\n",i);
 			//TBD -- pass an action back to controller that pmt switch is hit.
 			break;
