@@ -39,7 +39,7 @@
 
 -(void)awakeFromNib
 {
-    [[self window] setBackgroundColor:[NSColor colorWithDeviceRed:240/255. green:235/255. blue:191/255. alpha:1]];
+   // [[self window] setBackgroundColor:[NSColor colorWithDeviceRed:240/255. green:235/255. blue:191/255. alpha:1]];
     [runProgress setStyle:NSProgressIndicatorSpinningStyle];
     [runBar setIndeterminate:NO];
     [super awakeFromNib];
