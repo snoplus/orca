@@ -127,18 +127,45 @@
 			<string>ObjC</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cmosAction</key>
+				<string>id</string>
+				<key>commentsTextFieldAction</key>
+				<string>id</string>
+				<key>hvRefAction</key>
+				<string>id</string>
+				<key>lockAction</key>
+				<string>id</string>
+				<key>showVoltsAction</key>
+				<string>id</string>
+				<key>vResAction</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>ORFec32Controller</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>cmosMatrix</key>
+				<string>NSMatrix</string>
+				<key>commentsTextField</key>
+				<string>NSTextField</string>
 				<key>groupView</key>
 				<string>ORFec32View</string>
+				<key>hvRefField</key>
+				<string>NSTextField</string>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>lockDocField</key>
+				<string>NSTextField</string>
 				<key>pmtView</key>
 				<string>ORFecPmtsView</string>
-				<key>testButton</key>
+				<key>showVoltsCB</key>
 				<string>NSButton</string>
+				<key>vResField</key>
+				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>

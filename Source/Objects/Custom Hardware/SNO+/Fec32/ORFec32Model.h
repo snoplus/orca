@@ -21,11 +21,66 @@
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
 
+#define kISetA1 0
+#define kISetA0	1
+#define kISetM1	2
+#define kISetM0	3
+#define kTACRef	4
+#define kVMax	5
+
+#define kCmosMin		0.0
+#define kCmosMax		5.0
+#define kCmosStep 		((kCmosMax-kCmosMin)/255.0)
+
+#define kVResMin		0.0
+#define kVResMax		5.0
+#define kVResStep 		((kVResMax-kVResMin)/255.0)
+
+#define kHVRefMin		0.0
+#define kHVRefMax		5.0
+#define kHVResStep 		((kHVRefMax-kHVRefMin)/255.0)
+
 @interface ORFec32Model :  ORSNOCard
 {
+	unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
+	unsigned char	vRes;	//VRES for bipolar chip
+	unsigned char	hVRef;	//HVREF for high voltage
+    NSString*		comments;
+    BOOL			showVolts;
 }
 - (void) setUpImage;
 - (void) makeMainController;
 
+#pragma mark •••Accessors
+- (BOOL)	showVolts;
+- (void)	setShowVolts:(BOOL)aShowVolts;
+- (NSString*)	comments;
+- (void)		setComments:(NSString*)aComments;
+- (unsigned char)  cmos:(short)anIndex;
+- (void)	setCmos:(short)anIndex withValue:(unsigned char)aValue;
+- (float)	vRes;
+- (void)	setVRes:(float)aValue;
+- (float)	hVRef;
+- (void)	setHVRef:(float)aValue;
+
+#pragma mark Converted Data Methods
+- (void)	setCmosVoltage:(short)anIndex withValue:(float) value;
+- (float)	cmosVoltage:(short) n;
+- (void)	setVResVoltage:(float) value;
+- (float)	VRES_Voltage;
+- (void)	setHVRefVoltage:(float) value;
+- (float)	hVRefVoltage;
+
+#pragma mark •••Archival
+- (id)initWithCoder:(NSCoder*)decoder;
+- (void)encodeWithCoder:(NSCoder*)encoder;
 @end
+
+extern NSString* ORFec32ModelShowVoltsChanged;
+extern NSString* ORFec32ModelCommentsChanged;
+extern NSString* ORFecCmosChanged;
+extern NSString* ORFecVResChanged;
+extern NSString* ORFecHVRefChanged;
+
+extern NSString* ORFecLock;
 

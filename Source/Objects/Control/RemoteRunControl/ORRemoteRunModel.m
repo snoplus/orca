@@ -372,6 +372,20 @@ NSString* ORRemoteRunLock                    = @"ORRemoteRunLock";
     }
 }
 
+- (NSString*) shortStatus
+{
+	if(runningState == eRunInProgress){
+		return @"Running";
+	}
+	else if(runningState == eRunStopped){
+		return @"Stopped";
+	}
+	else if(runningState == eRunStarting || runningState == eRunStopping){
+		if(runningState == eRunStarting)return @"Starting..";
+		else return @"Stopping..";
+	}
+	else return @"?";
+}
 
 #pragma mark ¥¥¥Run Modifiers
 

@@ -54,6 +54,7 @@
 #pragma mark ¥¥¥Initialization
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) shortStatus;
 - (BOOL) offline;
 - (void) setOffline:(BOOL)aOffline;
 - (BOOL) isConnected;

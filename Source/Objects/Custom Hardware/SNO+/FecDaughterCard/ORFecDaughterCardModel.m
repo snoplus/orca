@@ -21,6 +21,18 @@
 #pragma mark •••Imported Files
 #import "ORFecDaughterCardModel.h"
 
+NSString* ORFec32ModelRp1Changed				= @"ORFec32ModelRp1Changed";
+NSString* ORFec32ModelRp2Changed				= @"ORFec32ModelRp2Changed";
+NSString* ORFec32ModelVliChanged				= @"ORFec32ModelVliChanged";
+NSString* ORFec32ModelVsiChanged				= @"ORFec32ModelVsiChanged";
+NSString* ORFec32ModelVtChanged					= @"ORFec32ModelVtChanged";
+NSString* ORFec32ModelVbChanged					= @"ORFec32ModelVbChanged";
+NSString* ORFec32ModelNs100widthChanged			= @"ORFec32ModelNs100widthChanged";
+NSString* ORFec32ModelNs20widthChanged			= @"ORFec32ModelNs20widthChanged";
+NSString* ORFec32ModelNs20delayChanged			= @"ORFec32ModelNs20delayChanged";
+NSString* ORFec32ModelTac0trimChanged			= @"ORFec32ModelTac0trimChanged";
+NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
+
 @implementation ORFecDaughterCardModel
 
 #pragma mark •••Initialization
@@ -52,19 +64,187 @@
 	return NSClassFromString(@"ORFec32Model");
 }
 
+#pragma mark •••Accessors
+- (unsigned char) rp1:(short)anIndex
+{
+	return rp1[anIndex];
+}
+
+- (void) setRp1:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRp1:anIndex withValue:rp1[anIndex]];
+    rp1[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelRp1Changed object:self];
+}
+
+- (unsigned char) rp2:(short)anIndex
+{
+	return rp2[anIndex];
+}
+
+- (void) setRp2:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRp2:anIndex withValue:rp2[anIndex]];
+    rp2[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelRp2Changed object:self];
+}
+
+- (unsigned char) vli:(short)anIndex
+{
+	return vli[anIndex];
+}
+
+- (void) setVli:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVli:anIndex withValue:vli[anIndex]];
+    vli[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVliChanged object:self];
+}
+
+- (unsigned char) vsi:(short)anIndex
+{
+	return vsi[anIndex];
+}
+
+- (void) setVsi:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVsi:anIndex withValue:vsi[anIndex]];
+    vsi[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVsiChanged object:self];
+}
+
+- (unsigned char) vt:(short)anIndex
+{
+	return vt[anIndex];
+}
+
+- (void) setVt:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVt:anIndex withValue:vt[anIndex]];
+    vt[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVtChanged object:self];
+}
+
+- (unsigned char) vb:(short)anIndex
+{
+	return vb[anIndex];
+}
+
+- (void) setVb:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVb:anIndex withValue:vb[anIndex]];
+    vb[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVbChanged object:self];
+}
+
+- (unsigned char) ns100width:(short)anIndex
+{
+	return ns100width[anIndex];
+}
+
+- (void) setNs100width:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNs100width:anIndex withValue:ns100width[anIndex]];
+    ns100width[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelNs100widthChanged object:self];
+}
+
+- (unsigned char) ns20width:(short)anIndex
+{
+	return ns20width[anIndex];
+}
+
+- (void) setNs20width:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNs20width:anIndex withValue:ns20width[anIndex]];
+    ns20width[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelNs20widthChanged object:self];
+}
+
+- (unsigned char) ns20delay:(short)anIndex
+{
+	return ns20delay[anIndex];
+}
+- (void) setNs20delay:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setNs20delay:anIndex withValue:ns20delay[anIndex]];
+    ns20delay[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelNs20delayChanged object:self];
+}
+
+- (unsigned char) tac0trim:(short)anIndex
+{
+	return tac0trim[anIndex];
+}
+
+- (void) setTac0trim:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTac0trim:anIndex withValue:tac0trim[anIndex]];
+    tac0trim[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelTac0trimChanged object:self];
+}
+
+- (unsigned char) tac1trim:(short)anIndex
+{
+	return tac1trim[anIndex];
+}
+- (void) setTac1trim:(short)anIndex withValue:(unsigned char)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setTac1trim:anIndex withValue:tac1trim[anIndex]];
+    tac1trim[anIndex] = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelTac1trimChanged object:self];
+}
+
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [[self undoManager] enableUndoRegistration];
+	int i;
+	for(i=0;i<2;i++){
+		[self setRp1:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"rp1_%d",i]]];
+		[self setRp2:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"rp2_%d",i]]];
+		[self setVli:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vli_%d",i]]];
+		[self setVsi:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vsi_%d",i]]];
+	}
+ 	for(i=0;i<8;i++){
+		[self setVt:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_%d",i]]];
+		[self setNs100width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"select100nsTrigger_%d",i]]];
+		[self setNs100width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns100width_%d",i]]];
+		[self setNs20width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns20width_%d",i]]];
+		[self setNs20delay:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns20delay_%d",i]]];
+		[self setTac0trim:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"tac0trim_%d",i]]];
+		[self setTac1trim:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"tac1trim_%d",i]]];
+	}
+ 	for(i=0;i<16;i++){
+		[self setVb:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vb_%d",i]]];
+	}
+	[[self undoManager] enableUndoRegistration];
     return self;
 }
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	int i;
+	for(i=0;i<2;i++){
+		[encoder encodeInt:rp1[i] forKey:[NSString stringWithFormat:@"rp1_%d",i]];
+		[encoder encodeInt:rp2[i] forKey:[NSString stringWithFormat:@"rp2_%d",i]];
+		[encoder encodeInt:vli[i] forKey:[NSString stringWithFormat:@"vli_%d",i]];
+		[encoder encodeInt:vsi[i] forKey:[NSString stringWithFormat:@"vsi_%d",i]];
+	}
+ 	for(i=0;i<8;i++){
+		[encoder encodeInt:vt[i] forKey:[NSString stringWithFormat:@"vt_%d",i]];
+		[encoder encodeInt:ns100width[i] forKey:[NSString stringWithFormat:@"ns100width_%d",i]];
+		[encoder encodeInt:ns20width[i] forKey:[NSString stringWithFormat:@"ns20width_%d",i]];
+		[encoder encodeInt:ns20delay[i] forKey:[NSString stringWithFormat:@"ns20delay_%d",i]];
+		[encoder encodeInt:tac0trim[i] forKey:[NSString stringWithFormat:@"tac0trim_%d",i]];
+		[encoder encodeInt:tac1trim[i] forKey:[NSString stringWithFormat:@"tac1trim_%d",i]];
+	}
+ 	for(i=0;i<16;i++){
+		[encoder encodeInt:vb[i] forKey:[NSString stringWithFormat:@"vb_%d",i]];
+	}
  }
  @end
 

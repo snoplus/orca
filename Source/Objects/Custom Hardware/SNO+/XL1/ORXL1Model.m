@@ -25,10 +25,18 @@
 #import "ORCrate.h"
 #import "ORSNOCard.h"
 
+NSString* ORXilinxFileChanged			= @"ORXilinxFileChanged";
+NSString* ORFecAdcClockChanged			= @"ORFecAdcClockChanged";
+NSString* ORFecSequencerClockChanged	= @"ORFecSequencerClockChanged";
+NSString* ORFecMemoryClockChanged		= @"ORFecMemoryClockChanged";
+NSString* ORFecAlowedErrorsChanged		= @"ORFecAlowedErrorsChanged";
+NSString* ORXL1Lock						= @"ORXL1Lock";
+
 @implementation ORXL1Model
 
 #pragma mark •••Initialization
--(void)dealloc
+
+- (void) dealloc
 {
     [connectorName release];
     [connector release];
@@ -38,6 +46,11 @@
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"XL1Card"]];
+}
+
+- (void) makeMainController
+{
+    [self linkToController:@"ORXL1Controller"];
 }
 
 - (BOOL) solitaryInViewObject
@@ -139,6 +152,84 @@
 {
     [aGuardian assumeDisplayOf:connector];
 }
+ 
+- (void) awakeAfterDocumentLoaded
+{
+	int i;
+	for(i=0;i<kNumFecMonitorAdcs; i++){
+		adcAllowedError[i] = kAllowedFecMonitorError;
+	}
+}
+
+- (NSString*) xilinxFile 
+{
+	return xilinxFile;
+}
+- (void)setXilinxFile:(NSString*)aFilePath;
+{
+	if(!aFilePath)aFilePath = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setXilinxFile:xilinxFile];
+	
+	[aFilePath retain];
+	[xilinxFile release];
+	xilinxFile = aFilePath;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXilinxFileChanged object:self];
+}
+
+- (float) adcClock
+{
+	return adcClock;
+}
+- (void) setAdcClock:(float)aValue;
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcClock:adcClock];
+	
+	adcClock = aValue;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecAdcClockChanged object:self];
+}
+
+- (float) sequencerClock
+{
+	return sequencerClock;
+}
+- (void) setSequencerClock:(float)aValue;
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSequencerClock:sequencerClock];
+	
+	sequencerClock = aValue;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSequencerClockChanged object:self];
+}
+
+- (float) memoryClock
+{
+	return memoryClock;
+}
+- (void) setMemoryClock:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMemoryClock:memoryClock];
+	
+	memoryClock = aValue;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecMemoryClockChanged object:self];
+}
+
+- (float) adcAllowedError:(short)anIndex
+{
+	return adcAllowedError[anIndex];
+}
+
+- (void) setAdcAllowedError:(short)anIndex withValue:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAdcAllowedError:anIndex withValue:adcAllowedError[anIndex]];
+	
+	adcAllowedError[anIndex] = aValue;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecAlowedErrorsChanged object:self];
+}
+
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -147,9 +238,17 @@
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setConnectorName:[decoder decodeObjectForKey:@"connectorName"]];
-    [self setConnector:[decoder decodeObjectForKey:@"connector"]];
-	[self setSlot:[decoder decodeIntForKey:@"slot"]];
+    [self setConnectorName:	[decoder decodeObjectForKey:@"connectorName"]];
+    [self setConnector:		[decoder decodeObjectForKey:@"connector"]];
+	[self setSlot:			[decoder decodeIntForKey:@"slot"]];
+	[self setXilinxFile:	[decoder decodeObjectForKey: @"xilinxFile"]];
+    [self setAdcClock:		[decoder decodeFloatForKey: @"adcClock"]];
+    [self setSequencerClock:[decoder decodeFloatForKey: @"sequencerClock"]];
+    [self setMemoryClock:	[decoder decodeFloatForKey: @"memoryClock"]];
+	int i;
+	for(i=0;i<kNumFecMonitorAdcs;i++){
+		[self setAdcAllowedError:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"adcAllowedError%d",i]]];
+	}	
     
     [[self undoManager] enableUndoRegistration];
     
@@ -159,9 +258,16 @@
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:[self connectorName] forKey:@"connectorName"];
-    [encoder encodeObject:[self connector] forKey:@"connector"];
-    [encoder encodeInt:[self slot] forKey:@"slot"];
+    [encoder encodeObject:[self connectorName]	forKey:@"connectorName"];
+    [encoder encodeObject:[self connector]		forKey:@"connector"];
+    [encoder encodeInt:[self slot]				forKey:@"slot"];
+	[encoder encodeObject:xilinxFile			forKey:@"xilinxFile"];
+	[encoder encodeFloat:adcClock				forKey:@"adcClock"];
+	[encoder encodeFloat:sequencerClock			forKey:@"sequencerClock"];
+	int i;
+	for(i=0;i<kNumFecMonitorAdcs;i++){
+		[encoder encodeFloat:adcAllowedError[i] forKey:[NSString stringWithFormat:@"adcAllowedError%d",i]];
+	}	
 }
 
 @end

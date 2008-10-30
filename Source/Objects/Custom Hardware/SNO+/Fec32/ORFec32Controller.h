@@ -27,10 +27,18 @@
 @class ORFecPmtsView;
 
 @interface ORFec32Controller : OrcaObjectController  {
-    IBOutlet ORFec32View* groupView;
+    IBOutlet ORFec32View*	groupView;
+	IBOutlet NSButton*		showVoltsCB;
+	IBOutlet NSTextField*	commentsTextField;
     IBOutlet ORFecPmtsView* pmtView;
-	IBOutlet NSButton*	 testButton;
- }
+    IBOutlet NSTextField*	vResField;
+    IBOutlet NSTextField*	hvRefField;
+    IBOutlet NSMatrix*		cmosMatrix;
+    IBOutlet NSButton*		lockButton;
+	IBOutlet NSTextField*   lockDocField;
+	
+	NSNumberFormatter*		cmosFormatter;
+}
 
 #pragma mark •••Accessors
 - (ORFec32View *)groupView;
@@ -39,10 +47,22 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) showVoltsChanged:(NSNotification*)aNote;
+- (void) commentsChanged:(NSNotification*)aNote;
+- (void) updateButtons;
+- (void) lockChanged:(NSNotification*)note;
 - (void) groupChanged:(NSNotification*)note;
-- (void) runStatusChanged:(NSNotification*)aNotification;
-- (void) slotChanged:(NSNotification*)aNotification;
+- (void) runStatusChanged:(NSNotification*)aNote;
+- (void) slotChanged:(NSNotification*)aNote;
+- (void) vResChanged:(NSNotification*)aNote;
+- (void) hvRefChanged:(NSNotification*)aNote;
+- (void) cmosChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-
+- (IBAction) showVoltsAction:(id)sender;
+- (IBAction) commentsTextFieldAction:(id)sender;
+- (IBAction) lockAction:(id) sender;
+- (IBAction) vResAction:(id)sender;
+- (IBAction) hvRefAction:(id)sender;
+- (IBAction) cmosAction:(id)sender;
 @end

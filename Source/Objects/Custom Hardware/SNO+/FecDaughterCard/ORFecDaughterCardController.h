@@ -24,14 +24,47 @@
 
 @interface ORFecDaughterCardController : OrcaObjectController  {
 	@private
+		IBOutlet NSMatrix* rp1Matrix;
+		IBOutlet NSMatrix* rp2Matrix;
+		IBOutlet NSMatrix* vliMatrix;
+		IBOutlet NSMatrix* vsiMatrix;
+		IBOutlet NSMatrix* vtMatrix;
+		IBOutlet NSMatrix* vbMatrix;
+		IBOutlet NSMatrix* ns100widthMatrix;			   
+		IBOutlet NSMatrix* ns20widthMatrix; 
+		IBOutlet NSMatrix* ns20delayMatrix;
+		IBOutlet NSMatrix* tac0trimMatrix; 	   
+		IBOutlet NSMatrix* tac1trimMatrix;
 }
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (void) slotChanged:(NSNotification*)aNotification;
 
 #pragma mark •••Interface Management
+- (void) slotChanged:(NSNotification*)aNote;
+- (void) rp1Changed:(NSNotification*)aNote;
+- (void) rp2Changed:(NSNotification*)aNote; 
+- (void) vliChanged:(NSNotification*)aNote; 
+- (void) vsiChanged:(NSNotification*)aNote; 
+- (void) vtChanged:(NSNotification*)aNote; 
+- (void) vbChanged:(NSNotification*)aNote; 	   
+- (void) ns100widthChanged:(NSNotification*)aNote; 			   
+- (void) ns20widthChanged:(NSNotification*)aNote; 
+- (void) ns20delayChanged:(NSNotification*)aNote; 
+- (void) tac0trimChanged:(NSNotification*)aNote; 	   
+- (void) tac1trimChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (void) rp1Action:(id)sender;
+- (void) rp2Action:(id)sender; 
+- (void) vliAction:(id)sender; 
+- (void) vsiAction:(id)sender; 
+- (void) vtAction:(id)sender; 
+- (void) vbAction:(id)sender; 	   
+- (void) ns100widthAction:(id)sender; 			   
+- (void) ns20widthAction:(id)sender; 
+- (void) ns20delayAction:(id)sender; 
+- (void) tac0trimAction:(id)sender; 	   
+- (void) tac1trimAction:(id)sender;
 
 @end

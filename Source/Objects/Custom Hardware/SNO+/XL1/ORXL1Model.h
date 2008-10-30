@@ -22,11 +22,22 @@
 #pragma mark •••Imported Files
 #import "ORVmeCard.h"
 
+#define kNumFecMonitorAdcs		21
+#define kAllowedFecMonitorError	0.1
+
 @interface ORXL1Model :  ORVmeCard 
 {
-	NSString* connectorName;
-	ORConnector*  connector; //we won't draw this connector.
+	@private
+		NSString*		connectorName;
+		ORConnector*	connector; //we won't draw this connector.
+		NSString*		xilinxFile;
+		float			adcClock;
+		float			sequencerClock;
+		float			memoryClock;
+		float			adcAllowedError[kNumFecMonitorAdcs];
 }
+
+#pragma mark •••Connection Stuff
 - (void) positionConnector:(ORConnector*)aConnector;
 - (NSString*) connectorName;
 - (void) setConnectorName:(NSString*)aName;
@@ -42,6 +53,24 @@
 - (void) setCrateNumbers;
 - (id)   getXL1;
 
+#pragma mark •••Accessors
+- (NSString*)	xilinxFile;
+- (void)		setXilinxFile:(NSString*)aFilePath;
+- (float)		adcClock;
+- (void)		setAdcClock:(float)aValue;
+- (float)		sequencerClock;
+- (void)		setSequencerClock:(float)aValue;
+- (float)		memoryClock;
+- (void)		setMemoryClock:(float)aValue;
+- (float)		adcAllowedError:(short)anIndex;
+- (void)		setAdcAllowedError:(short)anIndex withValue:(float)aValue;
 @end
+
+extern NSString* ORXilinxFileChanged;
+extern NSString* ORFecAdcClockChanged;
+extern NSString* ORFecSequencerClockChanged;
+extern NSString* ORFecMemoryClockChanged;
+extern NSString* ORFecAlowedErrorsChanged;
+extern NSString* ORXL1Lock;
 
 

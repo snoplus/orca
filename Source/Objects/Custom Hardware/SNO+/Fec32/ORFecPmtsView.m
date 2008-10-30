@@ -60,7 +60,6 @@
 
 - (void)drawRect:(NSRect)rect 
 {
-	[NSBezierPath strokeRect:[self frame]];
 	NSRect anchorFrame = [anchorView frame];
 	float dc_height = 39;
 	float separation = 80; 

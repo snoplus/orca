@@ -211,6 +211,8 @@
 	[nextXL2 setCrateNumber:crateNumber+1];
 }
 
+
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -223,7 +225,7 @@
     [self setOutputConnectorName:	[decoder decodeObjectForKey:@"outputConnectorName"]];
     [self setOutputConnector:		[decoder decodeObjectForKey:@"outputConnector"]];
 	[self setSlot:					[decoder decodeIntForKey:   @"slot"]];
-    
+   
     [[self undoManager] enableUndoRegistration];
     
     return self;

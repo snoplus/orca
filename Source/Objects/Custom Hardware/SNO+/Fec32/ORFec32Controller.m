@@ -28,18 +28,27 @@
 @implementation ORFec32Controller
 
 #pragma mark •••Initialization
--(id)init
+- (id) init
 {
     self = [super initWithWindowNibName:@"Fec32"];
-    
     return self;
+}
+
+- (void) dealloc
+{
+	[cmosFormatter release];
+	[super dealloc];
 }
 
 - (void) awakeFromNib
 {
     [groupView setGroup:model];
-	[testButton setEnabled:YES];
-    [super awakeFromNib];
+	cmosFormatter = [[NSNumberFormatter alloc] init];
+	int i;
+	for(i=0;i<6;i++){
+		[[cmosMatrix cellWithTag:i] setFormatter:cmosFormatter];
+	}
+	[super awakeFromNib];
 }
 
 #pragma mark •••Notifications
@@ -77,8 +86,55 @@
                          name : ORSNOCardSlotChanged
                        object : nil];
 
+   [notifyCenter addObserver : self
+                     selector : @selector(hvRefChanged:)
+                         name : ORFecHVRefChanged
+                       object : model];
+
+   [notifyCenter addObserver : self
+                     selector : @selector(cmosChanged:)
+                         name : ORFecCmosChanged
+                       object : model];
+
+   [notifyCenter addObserver : self
+                     selector : @selector(vResChanged:)
+                         name : ORFecVResChanged
+                       object : model];
+					   
+	[notifyCenter addObserver : self
+					 selector : @selector(lockChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(lockChanged:)
+						 name : ORFecLock
+						object: nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(commentsChanged:)
+                         name : ORFec32ModelCommentsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(showVoltsChanged:)
+                         name : ORFec32ModelShowVoltsChanged
+						object: model];
+
 }
 
+- (void) updateWindow
+{
+	[super updateWindow];
+	[self showVoltsChanged:nil];
+    [self runStatusChanged:nil];
+    [self lockChanged:nil];
+    [self slotChanged:nil];
+	[self vResChanged:nil];
+	[self hvRefChanged:nil];
+	[self cmosChanged:nil];
+    [groupView setNeedsDisplay:YES];
+	[self commentsChanged:nil];
+}
 
 #pragma mark •••Accessors
 - (ORFec32View *)groupView
@@ -95,11 +151,46 @@
 
 #pragma mark •••Interface Management
 
-- (void) updateWindow
+- (void) showVoltsChanged:(NSNotification*)aNote
 {
-    [self runStatusChanged:nil];
-    [self slotChanged:nil];
-    [groupView setNeedsDisplay:YES];
+	[showVoltsCB setIntValue: [model showVolts]];
+	if([model showVolts]) [cmosFormatter setFormat:@"#0.00;0;#0.00"];
+	else [cmosFormatter setFormat:@"#0;0;#0"];
+	[self cmosChanged:aNote];
+}
+
+- (void) commentsChanged:(NSNotification*)aNote
+{
+	[commentsTextField setStringValue: [model comments]];
+}
+
+- (void) checkGlobalSecurity
+{
+    BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
+    [gSecurity setLock:ORFecLock to:secure];
+    [lockButton setEnabled:secure];
+ 	[self updateButtons];
+}
+
+- (void) updateButtons
+{
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORFecLock];
+	[vResField		setEnabled: !lockedOrRunningMaintenance];
+	[hvRefField		setEnabled: !lockedOrRunningMaintenance];
+	[cmosMatrix		setEnabled: !lockedOrRunningMaintenance];
+}
+
+- (void) lockChanged:(NSNotification*)aNotification
+{
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    BOOL locked = [gSecurity isLocked:ORFecLock];
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORFecLock];
+    [lockButton setState: locked];	
+    NSString* s = @"";
+    if(lockedOrRunningMaintenance){
+		if(runInProgress && ![gSecurity isLocked:ORFecLock])s = @"Not in Maintenance Run.";
+    }
+    [lockDocField setStringValue:s];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -118,8 +209,65 @@
 	[pmtView setNeedsDisplay:YES];
 }
 
+- (void) vResChanged:(NSNotification*)aNote
+{
+	[vResField setIntValue:[model vRes]];
+}
+
+- (void) hvRefChanged:(NSNotification*)aNote
+{
+	[hvRefField setIntValue:[model hVRef]];
+}
+
+- (void) cmosChanged:(NSNotification*)aNote
+{
+	int index;
+	for(index=0;index<6;index++){
+		if([model showVolts]){
+			[[cmosMatrix cellWithTag:index] setFloatValue:[model cmosVoltage:index]];
+		}
+		else {
+			[[cmosMatrix cellWithTag:index] setIntValue:[model cmos:index]];
+		}
+	}
+}
 
 #pragma mark •••Actions
+
+- (void) showVoltsAction:(id)sender
+{
+	[model setShowVolts:[sender intValue]];	
+}
+
+- (void) commentsTextFieldAction:(id)sender
+{
+	[model setComments:[sender stringValue]];	
+}
+- (IBAction) lockAction:(id) sender
+{
+    [gSecurity tryToSetLock:ORFecLock to:[sender intValue] forWindow:[self window]];
+}
+
+- (IBAction) vResAction:(id)sender
+{
+	[model setVRes:[sender intValue]];
+}
+
+- (IBAction) hvRefAction:(id)sender
+{
+	[model setHVRef:[sender intValue]];
+}
+
+- (IBAction) cmosAction:(id)sender
+{
+	int i = [[cmosMatrix selectedCell] tag];
+	if([model showVolts]){
+		[model setCmosVoltage:i withValue:[sender floatValue]];
+	}
+	else {
+		[model setCmos:i withValue:[sender intValue]];
+	}
+}
 
 
 

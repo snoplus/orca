@@ -22,6 +22,7 @@
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
 
+
 @interface ORXL2Model :  ORSNOCard 
 {
 	@protected
@@ -31,6 +32,7 @@
         ORConnector*	outputConnector;	//we won't draw this connector.
 }
 
+#pragma mark •••Connection Stuff
 - (ORConnector*) inputConnector;
 - (void)         setInputConnector:(ORConnector*)aConnector;
 - (NSString*)    inputConnectorName;
@@ -43,7 +45,13 @@
 - (void)         guardianRemovingDisplayOfConnectors:(id)aGuardian;
 - (void)         guardianAssumingDisplayOfConnectors:(id)aGuardian;
 - (void)		 setCrateNumber:(int)crateNumber;
-- (id)			getXL1;
+- (id)			 getXL1;
+
+
+#pragma mark •••Archival
+- (id)initWithCoder:(NSCoder*)decoder;
+- (void)encodeWithCoder:(NSCoder*)encoder;
+
 
 @end
 
