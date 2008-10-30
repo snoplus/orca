@@ -26,8 +26,8 @@
 #define UVkNumChannels 12
 #define UVkChnlNumParameters 11 //see below for list.
 
-enum hveStatus {eHVUEnabled = 0, eHVURampingUp, eHVURampingDown, evHVUTripForSupplyLimits = 4,
-                eHVUTripForUserCurrent, eHVUTripForHVError, eHVUTripForHVLimit};
+enum hveStatus {eHVUEnabled = 1, eHVURampingUp = 2, eHVURampingDown = 4, evHVUTripForSupplyLimits = 16,
+                eHVUTripForUserCurrent = 32, eHVUTripForHVError = 64, eHVUTripForHVLimit= 128};
 typedef enum hveStatus hveStatus;
 
 

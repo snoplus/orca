@@ -205,11 +205,12 @@ NSString* UVkString = @"string";
 		[mParams retain];
 		
 		// Debug code - normally commented out.
-			//Debug code - 
-	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
-	NSLog( @"command: %@,  type: %@,  R/W: %@\n", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
-	                                            [[dictObjDeb objectForKey: UVkType] stringValue],
-												[[dictObjDeb objectForKey: UVkRW] stringValue] );
+			//Debug code - Print out parameters and their attributes.
+/*	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
+//	NSLog( @"command: %@,  type: %@,  R/W: %@\n", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
+//	                                            [[dictObjDeb objectForKey: UVkType] stringValue],
+    											[[dictObjDeb objectForKey: UVkRW] stringValue] );
+
 	NSArray*	allKeys = [mParams allKeys];
 	int j;
 	for ( j = 0; j < [mParams count]; j++ )
@@ -218,10 +219,10 @@ NSString* UVkString = @"string";
 		NSString*	commandDict = [dictObj objectForKey: UVkCommand];		
 		NSString*	writableDict = [dictObj objectForKey: UVkRW];
 		NSString*   typeDict = [dictObj objectForKey: UVkType ];
-//		int			i;
 		
 		NSLog( @" Command '%@', R/W :%@, Type: %@\n", commandDict, writableDict, typeDict );
 	}
+	*/
 		
 //	NS_HANDLER
 //	NS_ENDHANDLER
@@ -254,7 +255,7 @@ NSString* UVkString = @"string";
 	for ( i = 0; i < UVkNumChannels; i++ )
 	{
 		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, i];
-		[[self crate] queueCommand: i totalCmds: UVkNumChannels slot: slot channel: i command: command];
+		[[self crate] queueCommand: i totalCmds: UVkNumChannels slot: [self slot] channel: i command: command];
 	}
 }
 
@@ -266,21 +267,25 @@ NSString* UVkString = @"string";
 	NSString*	command;
 	
 	//Debug code - 
-	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
+/*	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
 	NSLog( @"command: %@,  type: %@,  R/W: %@", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
 	                                            [[dictObjDeb objectForKey: UVkType] stringValue],
 												[[dictObjDeb objectForKey: UVkRW] stringValue] );
+*/
+	// Loop through all parameters to load the values into the hardware.
 	NSArray*	allKeys = [mParams allKeys];
 	
 	for ( j = 0; j < [mParams count]; j++ )
 	{
+		int			i;
 		NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
 		NSString*	commandDict = [dictObj objectForKey: UVkCommand];		
 		NSString*	writableDict = [dictObj objectForKey: UVkRW];
-		NSString*   typeDict = [dictObj objectForKey: UVkType ];
-		int			i;
 		
+/*		
+		NSString*   typeDict = [dictObj objectForKey: UVkType ];  // Debug only
 		NSLog( @" Command '%@', R/W :%@, Type: %@", commandDict, writableDict, typeDict );
+*/
 		
 		if ( [writableDict isEqualTo: UVkWrite] )
 		
@@ -304,7 +309,7 @@ NSString* UVkString = @"string";
 				
 			}
 			
-			[[ self crate] queueCommand: i totalCmds: HVkNumChannels slot: [self slot] channel: i command: command];
+			[[ self crate] queueCommand: j totalCmds: [mParams count] slot: [self slot] channel: i command: command];
 		}
 	}
 }
@@ -519,7 +524,7 @@ NSString* UVkString = @"string";
 		
 		// Get data for this channel from crate - in ORCA place data in NOTIFICATION Object.
 //		NSDictionary* returnData = [[self crate] returnDataToHVUnit];
-		NSLog ( @"Command from dictionary '%@'", [returnData objectForKey: UVkCommand]);
+		NSLog ( @"Command from dictionary '%@'\n", [returnData objectForKey: UVkCommand]);
 		[returnData retain];
 			
 		NSNumber* slotNum = [returnData objectForKey: UVkSlot];
@@ -598,6 +603,8 @@ NSString* UVkString = @"string";
 //	[notifyCenter postNotificationName: UVChnlEnabledChanged object: self userInfo: chnlDictObj];
 	
 	// Interpret status
+	
+	NSLog( @"interpretDMPReturn - Status: %d\n", status );
 	// status case statement
 	switch ( status ) {
 		case eHVUEnabled:

@@ -315,11 +315,13 @@
 
 - (IBAction) hardwareValues: (id) aSender
 {
+	NSLog( @"Get hardware values\n" );
 	[model getValues];
 }
 
 - (IBAction) setHardwareValues: (id) aSender
 {
+	NSLog( @"Download hardware values\n" );
 	[model loadValues];
 }
 

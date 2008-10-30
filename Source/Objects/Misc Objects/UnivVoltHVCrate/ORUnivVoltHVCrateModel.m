@@ -363,7 +363,10 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 				mRetsToProcess++;
 				[mCmdCmdQueue enqueue: commandObj]; // Used to send out commands in order they were queued.
 			
+				// Debug line
+				/*
 			    NSLog( @"Queue cmd with id: %d - %@\n", aCmdId, aCommand );
+				*/
 				queuedCmd = YES;
 		    }
 		
@@ -681,12 +684,14 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		while ( ![mRetQueue isEmpty] )
 		{
 			NSDictionary* retDictObj = [mRetQueue dequeue];
+			// For debugging
+	/*
 			NSNumber* slotObj = [retDictObj objectForKey: UVkSlot];
 			NSNumber* chnlObj = [retDictObj objectForKey: UVkChnl];
 			NSString* command = [retDictObj objectForKey: UVkCommand];
-
 			NSLog( @"Send return data notification about slot: %d, chnl: %d, command '%@'\n", 
 		       [slotObj intValue], [chnlObj intValue], command );
+*/
 			[[NSNotificationCenter defaultCenter] postNotificationName: HVUnitInfoAvailableNotification object: self userInfo: retDictObj];
 		}
 	}
