@@ -21,17 +21,21 @@
 #pragma mark •••Imported Files
 #import "ORFecDaughterCardModel.h"
 
-NSString* ORFec32ModelRp1Changed				= @"ORFec32ModelRp1Changed";
-NSString* ORFec32ModelRp2Changed				= @"ORFec32ModelRp2Changed";
-NSString* ORFec32ModelVliChanged				= @"ORFec32ModelVliChanged";
-NSString* ORFec32ModelVsiChanged				= @"ORFec32ModelVsiChanged";
-NSString* ORFec32ModelVtChanged					= @"ORFec32ModelVtChanged";
-NSString* ORFec32ModelVbChanged					= @"ORFec32ModelVbChanged";
-NSString* ORFec32ModelNs100widthChanged			= @"ORFec32ModelNs100widthChanged";
-NSString* ORFec32ModelNs20widthChanged			= @"ORFec32ModelNs20widthChanged";
-NSString* ORFec32ModelNs20delayChanged			= @"ORFec32ModelNs20delayChanged";
-NSString* ORFec32ModelTac0trimChanged			= @"ORFec32ModelTac0trimChanged";
-NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
+NSString* ORDCModelCommentsChanged			= @"ORDCModelCommentsChanged";
+NSString* ORDCModelShowVoltsChanged			= @"ORDCModelShowVoltsChanged";
+NSString* ORDCModelSetAllCmosChanged		= @"ORDCModelSetAllCmosChanged";
+NSString* ORDCModelCmosRegShownChanged		= @"ORDCModelCmosRegShownChanged";
+NSString* ORDCModelRp1Changed				= @"ORDCModelRp1Changed";
+NSString* ORDCModelRp2Changed				= @"ORDCModelRp2Changed";
+NSString* ORDCModelVliChanged				= @"ORDCModelVliChanged";
+NSString* ORDCModelVsiChanged				= @"ORDCModelVsiChanged";
+NSString* ORDCModelVtChanged				= @"ORDCModelVtChanged";
+NSString* ORDCModelVbChanged				= @"ORDCModelVbChanged";
+NSString* ORDCModelNs100widthChanged		= @"ORDCModelNs100widthChanged";
+NSString* ORDCModelNs20widthChanged			= @"ORDCModelNs20widthChanged";
+NSString* ORDCModelNs20delayChanged			= @"ORDCModelNs20delayChanged";
+NSString* ORDCModelTac0trimChanged			= @"ORDCModelTac0trimChanged";
+NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 
 @implementation ORFecDaughterCardModel
 
@@ -40,12 +44,14 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     self = [super init];
     [[self undoManager] disableUndoRegistration];
+	[self loadDefaultValues];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
 -(void)dealloc
 {
+    [comments release];
     [super dealloc];
 }
 
@@ -65,6 +71,67 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 }
 
 #pragma mark •••Accessors
+- (NSString*) comments
+{
+    return comments;
+}
+
+- (void) setComments:(NSString*)aComments
+{
+	if(!aComments) aComments = @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setComments:comments];
+    
+    [comments autorelease];
+    comments = [aComments copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelCommentsChanged object:self];
+}
+
+- (BOOL) showVolts
+{
+    return showVolts;
+}
+
+- (void) setShowVolts:(BOOL)aShowVolts
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowVolts:showVolts];
+    
+    showVolts = aShowVolts;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelShowVoltsChanged object:self];
+}
+
+- (BOOL) setAllCmos
+{
+    return setAllCmos;
+}
+
+- (void) setSetAllCmos:(BOOL)aSetAllCmos
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSetAllCmos:setAllCmos];
+    
+    setAllCmos = aSetAllCmos;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelSetAllCmosChanged object:self];
+}
+
+- (short) cmosRegShown
+{
+    return cmosRegShown;
+}
+
+- (void) setCmosRegShown:(short)aCmosRegShown
+{
+	if(aCmosRegShown<0)aCmosRegShown = 7;
+	if(aCmosRegShown>7)aCmosRegShown = 0;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setCmosRegShown:cmosRegShown];
+    
+    cmosRegShown = aCmosRegShown;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelCmosRegShownChanged object:self];
+}
+
 - (unsigned char) rp1:(short)anIndex
 {
 	return rp1[anIndex];
@@ -74,7 +141,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRp1:anIndex withValue:rp1[anIndex]];
     rp1[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelRp1Changed object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelRp1Changed object:self];
 }
 
 - (unsigned char) rp2:(short)anIndex
@@ -86,7 +153,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRp2:anIndex withValue:rp2[anIndex]];
     rp2[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelRp2Changed object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelRp2Changed object:self];
 }
 
 - (unsigned char) vli:(short)anIndex
@@ -98,7 +165,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVli:anIndex withValue:vli[anIndex]];
     vli[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVliChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVliChanged object:self];
 }
 
 - (unsigned char) vsi:(short)anIndex
@@ -110,7 +177,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVsi:anIndex withValue:vsi[anIndex]];
     vsi[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVsiChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVsiChanged object:self];
 }
 
 - (unsigned char) vt:(short)anIndex
@@ -122,7 +189,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVt:anIndex withValue:vt[anIndex]];
     vt[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVtChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVtChanged object:self];
 }
 
 - (unsigned char) vb:(short)anIndex
@@ -134,7 +201,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVb:anIndex withValue:vb[anIndex]];
     vb[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelVbChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelVbChanged object:self];
 }
 
 - (unsigned char) ns100width:(short)anIndex
@@ -146,7 +213,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNs100width:anIndex withValue:ns100width[anIndex]];
     ns100width[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelNs100widthChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelNs100widthChanged object:self];
 }
 
 - (unsigned char) ns20width:(short)anIndex
@@ -158,7 +225,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNs20width:anIndex withValue:ns20width[anIndex]];
     ns20width[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelNs20widthChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelNs20widthChanged object:self];
 }
 
 - (unsigned char) ns20delay:(short)anIndex
@@ -169,7 +236,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNs20delay:anIndex withValue:ns20delay[anIndex]];
     ns20delay[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelNs20delayChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelNs20delayChanged object:self];
 }
 
 - (unsigned char) tac0trim:(short)anIndex
@@ -181,7 +248,7 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTac0trim:anIndex withValue:tac0trim[anIndex]];
     tac0trim[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelTac0trimChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelTac0trimChanged object:self];
 }
 
 - (unsigned char) tac1trim:(short)anIndex
@@ -192,15 +259,105 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTac1trim:anIndex withValue:tac1trim[anIndex]];
     tac1trim[anIndex] = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelTac1trimChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelTac1trimChanged object:self];
 }
 
+#pragma mark ====Converter Methods
+- (void) setRp1Voltage:(short)n withValue:(float)value
+{
+	[self setRp1:n withValue:255.0*(value-kRp1Min)/(kRp1Max-kRp1Min)+0.5];
+}
+
+- (float) rp1Voltage:(short) n
+{
+	return ((kRp1Max-kRp1Min)/255.0)*rp1[n]+kRp1Min;
+}
+
+- (void) setRp2Voltage:(short)n withValue:(float)value
+{
+	[self setRp2:n withValue:255.0*(value-kRp2Min)/(kRp2Max-kRp2Min)+0.5];
+}
+
+- (float) rp2Voltage:(short) n
+{
+	return ((kRp2Max-kRp2Min)/255.0)*rp2[n]+kRp2Min;
+}
+
+- (void) setVliVoltage:(short)n withValue:(float)value
+{
+	[self setVli:n withValue:255.0*(value-kVliMin)/(kVliMax-kVliMin)+0.5];
+}
+
+- (float) vliVoltage:(short) n
+{
+	return ((kVliMax-kVliMin)/255.0)*vli[n]+kVliMin;
+}
+
+- (void) setVsiVoltage:(short)n withValue:(float)value
+{
+	[self setVsi:n withValue:255.0*(value-kVsiMin)/(kVsiMax-kVsiMin)+0.5];
+}
+
+- (float) vsiVoltage:(short) n
+{
+	return ((kVsiMax-kVsiMin)/255.0)*vsi[n]+kVsiMin;
+}
+
+- (void) setVtVoltage:(short)n withValue:(float)value
+{
+	[self setVt:n withValue:255.0*(value-kVtMin)/(kVtMax-kVtMin)+0.5];
+}
+
+- (float) vtVoltage:(short) n
+{
+	return ((kVtMax-kVtMin)/255.0)*vt[n]+kVtMin;
+}
+
+- (void) setVbVoltage:(short)n withValue:(float)value
+{
+	[self setVb:n withValue:255.0*(value-kVbMin)/(kVbMax-kVbMin)+0.5];
+}
+
+- (float) vbVoltage:(short) n
+{
+	return ((kVbMax-kVbMin)/255.0)*vb[n]+kVbMin;
+}
+
+
+- (void) loadDefaultValues
+{
+	int i;
+	for(i=0;i<2;i++){
+		[self setRp1:i withValue:115];
+		[self setRp2:i withValue:135];
+		[self setVli:i withValue:120];
+		[self setVsi:i withValue:120];
+	}
+	for(i=0;i<8;i++){
+		[self setVt:i withValue:255];
+	}
+	for(i=0;i<16;i++){
+		[self setVb:i withValue:160]; 
+	}
+
+	for(i=0;i<8;i++){
+		[self setNs100width:i withValue:126]; 
+		[self setNs20width:i withValue:32]; 
+		[self setNs20delay:i withValue:2]; 
+		[self setTac0trim:i withValue:0]; 
+		[self setTac1trim:i withValue:0]; 
+	}
+}
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
+    [self setComments:		[decoder decodeObjectForKey:@"comments"]];
+    [self setShowVolts:		[decoder decodeBoolForKey:@"showVolts"]];
+	[self setSetAllCmos:	[decoder decodeBoolForKey:@"setAllCmos"]];
+	[self setCmosRegShown:	[decoder decodeIntForKey:@"cmosRegShown"]];
 	int i;
 	for(i=0;i<2;i++){
 		[self setRp1:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"rp1_%d",i]]];
@@ -227,6 +384,10 @@ NSString* ORFec32ModelTac1trimChanged			= @"ORFec32ModelTac1trimChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+	[encoder encodeObject:comments	forKey:@"comments"];
+	[encoder encodeBool:showVolts	forKey:@"showVolts"];
+	[encoder encodeBool:setAllCmos	forKey:@"setAllCmos"];
+	[encoder encodeInt:cmosRegShown forKey:@"cmosRegShown"];
 	int i;
 	for(i=0;i<2;i++){
 		[encoder encodeInt:rp1[i] forKey:[NSString stringWithFormat:@"rp1_%d",i]];

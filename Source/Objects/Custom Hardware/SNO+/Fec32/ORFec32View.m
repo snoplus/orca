@@ -139,5 +139,24 @@
 	}
 }
 
-
+- (void)drawRect:(NSRect)rect
+{
+	int i;
+	float w = [self frame].size.width;
+	float h = [self frame].size.height;
+	float cw = [self cardWidth];
+	[[NSColor lightGrayColor] set];
+	float y = 0;
+	float oldLineWidth = [NSBezierPath defaultLineWidth];
+	[NSBezierPath setDefaultLineWidth:1.5];
+	for(i=0;i<4;i++){
+		NSRect r = NSMakeRect(0,y,w,cw);
+		r = NSInsetRect(r, -2, -2);
+		[NSBezierPath strokeRect:NSMakeRect(0,y,w,cw)];
+		y += cw;
+		if(i == 1) y = h - 2*cw;
+	}
+	[NSBezierPath setDefaultLineWidth:oldLineWidth];
+	[super drawRect:rect];
+}
 @end

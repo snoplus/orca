@@ -21,14 +21,38 @@
 #pragma mark •••Imported Files
 #import "ORCard.h"
 
+#define kRp1Min 	0.0
+#define kRp1Max 	5.0
+#define kRp1Step 	((kRp1Max-kRp1Min)/255.0)
+
+#define kRp2Min 	-3.3
+#define kRp2Max 	0.0
+#define kRp2Step 	((kRp2Max-kRp2Min)/255.0)
+
+#define kVliMin		-1.0
+#define kVliMax 	1.0
+#define kVliStep 	((kVliMax-kVliMin)/255.0)
+
+#define kVsiMin		-2.0
+#define kVsiMax 	0.0
+#define kVsiStep 	((kVsiMax-kVsiMin)/255.0)
+
+#define kVtMin		-1.0
+#define kVtMax 		1.0
+#define kVtStep 	((kVtMax-kVtMin)/255.0)
+
+#define kVbMin		-2.0
+#define kVbMax 		4.0
+#define kVbStep 	((kVbMax-kVbMin)/255.0)
+
 @interface ORFecDaughterCardModel :  ORCard 
 {
 	@private
 		unsigned char rp1[2];	//RMPUP --ramp voltage up 	(0V to +3.3V)
-		unsigned char rp2[2];	//RMP --ramp voltage down 	(-3.3V to 0V)
+		unsigned char rp2[2];	//RMP   --ramp voltage down (-3.3V to 0V)
 		unsigned char vli[2];	//VLI					   	(-1V to 1V)
 		unsigned char vsi[2];	//VSI						(-2V to 0V)
-		unsigned char vt[8];	//VTH--voltage threshold	(-1V to 1V) channel related
+		unsigned char vt[8];	//VTH  --voltage threshold	(-1V to 1V) channel related
 		unsigned char vb[16];	//VBAL --balance voltage	(-2V to 4V)
 		
 		//channel related
@@ -37,11 +61,24 @@
 		unsigned char ns20delay[8];
 		unsigned char tac0trim[8];
 		unsigned char tac1trim[8];
+		short	cmosRegShown;
+		BOOL	setAllCmos;
+		BOOL	showVolts;
+		NSString* comments;
+
 }
 
 #pragma mark •••Initialization
 
 #pragma mark •••Accessors
+- (NSString*)	comments;
+- (void)		setComments:(NSString*)aComments;
+- (BOOL) showVolts;
+- (void) setShowVolts:(BOOL)aShowVolts;
+- (BOOL) setAllCmos;
+- (void) setSetAllCmos:(BOOL)aSetAllCmos;
+- (short) cmosRegShown;
+- (void) setCmosRegShown:(short)aCmosRegShown;
 - (unsigned char) rp1:(short)anIndex;
 - (void) setRp1:(short)anIndex withValue:(unsigned char)aValue;
 - (unsigned char) rp2:(short)anIndex;
@@ -64,22 +101,45 @@
 - (void) setTac0trim:(short)anIndex withValue:(unsigned char)aValue;
 - (unsigned char) tac1trim:(short)anIndex;
 - (void) setTac1trim:(short)anIndex withValue:(unsigned char)aValue;
+- (void) loadDefaultValues;
+
+#pragma mark ====Converter Methods
+- (void) setRp1Voltage:(short)n withValue:(float)value;
+- (float) rp1Voltage:(short) n;
+- (void) setRp2Voltage:(short)n withValue:(float)value;
+- (float) rp2Voltage:(short) n;
+- (void) setVliVoltage:(short)n withValue:(float)value;
+- (float) vliVoltage:(short) n;
+- (void) setVsiVoltage:(short)n withValue:(float)value;
+- (float) vsiVoltage:(short) n;
+- (void) setVtVoltage:(short)n withValue:(float)value;
+- (float) vtVoltage:(short) n;
+- (void) setVbVoltage:(short)n withValue:(float)value;
+- (float) vbVoltage:(short) n;
 
 #pragma mark •••Hardware Access
 
+#pragma mark •••Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
+
 #pragma mark •••External String Definitions
-extern NSString* ORFec32ModelRp1Changed;
-extern NSString* ORFec32ModelRp2Changed;
-extern NSString* ORFec32ModelVliChanged;
-extern NSString* ORFec32ModelVsiChanged;
-extern NSString* ORFec32ModelVtChanged;
-extern NSString* ORFec32ModelVbChanged;
-extern NSString* ORFec32ModelNs100widthChanged;
-extern NSString* ORFec32ModelNs20widthChanged;
-extern NSString* ORFec32ModelNs20delayChanged;
-extern NSString* ORFec32ModelTac0trimChanged;
-extern NSString* ORFec32ModelTac1trimChanged;
+extern NSString* ORDCModelCommentsChanged;
+extern NSString* ORDCModelShowVoltsChanged;
+extern NSString* ORDCModelSetAllCmosChanged;
+extern NSString* ORDCModelCmosRegShownChanged;
+extern NSString* ORDCModelRp1Changed;
+extern NSString* ORDCModelRp2Changed;
+extern NSString* ORDCModelVliChanged;
+extern NSString* ORDCModelVsiChanged;
+extern NSString* ORDCModelVtChanged;
+extern NSString* ORDCModelVbChanged;
+extern NSString* ORDCModelNs100widthChanged;
+extern NSString* ORDCModelNs20widthChanged;
+extern NSString* ORDCModelNs20delayChanged;
+extern NSString* ORDCModelTac0trimChanged;
+extern NSString* ORDCModelTac1trimChanged;
 

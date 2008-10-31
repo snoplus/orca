@@ -67,7 +67,7 @@
 - (void)	setCmosVoltage:(short)anIndex withValue:(float) value;
 - (float)	cmosVoltage:(short) n;
 - (void)	setVResVoltage:(float) value;
-- (float)	VRES_Voltage;
+- (float)	vResVoltage;
 - (void)	setHVRefVoltage:(float) value;
 - (float)	hVRefVoltage;
 

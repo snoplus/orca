@@ -145,7 +145,7 @@ NSString* ORFecLock			= @"ORFecLock";
 	[self setVRes:255.0*(value-kVResMin)/(kVResMax-kVResMin)+0.5];
 }
 
-- (float) VRES_Voltage
+- (float) vResVoltage
 {
 	return ((kVResMax-kVResMin)/255.0)*vRes+kVResMin;
 }

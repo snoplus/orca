@@ -82,63 +82,81 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>read</key>
+				<key>commentsTextFieldAction</key>
 				<string>id</string>
-				<key>readMaskBitAction</key>
+				<key>decCmosRegAction</key>
 				<string>id</string>
-				<key>readMaskDecimalAction</key>
+				<key>incCmosRegAction</key>
 				<string>id</string>
-				<key>readMaskHexAction</key>
+				<key>ns100widthAction</key>
 				<string>id</string>
-				<key>write</key>
+				<key>ns20delayAction</key>
 				<string>id</string>
-				<key>writeMaskBitAction</key>
+				<key>ns20widthAction</key>
 				<string>id</string>
-				<key>writeMaskDecimalAction</key>
+				<key>rp1Action</key>
 				<string>id</string>
-				<key>writeMaskHexAction</key>
+				<key>rp2Action</key>
 				<string>id</string>
-				<key>writeValueBitAction</key>
+				<key>setAllCmosAction</key>
 				<string>id</string>
-				<key>writeValueDecimalAction</key>
+				<key>showVoltsAction</key>
 				<string>id</string>
-				<key>writeValueHexAction</key>
+				<key>tac0trimAction</key>
+				<string>id</string>
+				<key>tac1trimAction</key>
+				<string>id</string>
+				<key>vbAction</key>
+				<string>id</string>
+				<key>vliAction</key>
+				<string>id</string>
+				<key>vsiAction</key>
+				<string>id</string>
+				<key>vtAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
-			<string>ORIP408Controller</string>
+			<string>ORFecDaughterCardController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>readBitMatrix</key>
+				<key>cardLabelField</key>
+				<string>NSTextField</string>
+				<key>cardNumberField</key>
+				<string>NSTextField</string>
+				<key>cmosRegShownField</key>
+				<string>NSTextField</string>
+				<key>cmosRegShownField1</key>
+				<string>NSTextField</string>
+				<key>commentsTextField</key>
+				<string>NSTextField</string>
+				<key>ns100widthField</key>
+				<string>NSTextField</string>
+				<key>ns20delayField</key>
+				<string>NSTextField</string>
+				<key>ns20widthField</key>
+				<string>NSTextField</string>
+				<key>rp1Matrix</key>
 				<string>NSMatrix</string>
-				<key>readButton</key>
+				<key>rp2Matrix</key>
+				<string>NSMatrix</string>
+				<key>setAllCmosButton</key>
 				<string>NSButton</string>
-				<key>readDecimalField</key>
-				<string>NSTextField</string>
-				<key>readHexField</key>
-				<string>NSTextField</string>
-				<key>readMaskBitMatrix</key>
-				<string>NSMatrix</string>
-				<key>readMaskDecimalField</key>
-				<string>NSTextField</string>
-				<key>readMaskHexField</key>
-				<string>NSTextField</string>
-				<key>writeBitMatrix</key>
-				<string>NSMatrix</string>
-				<key>writeButton</key>
+				<key>showVoltsCB</key>
 				<string>NSButton</string>
-				<key>writeDecimalField</key>
+				<key>tac0trimField</key>
 				<string>NSTextField</string>
-				<key>writeHexField</key>
+				<key>tac1trimField</key>
 				<string>NSTextField</string>
-				<key>writeMaskBitMatrix</key>
+				<key>vbMatrix</key>
 				<string>NSMatrix</string>
-				<key>writeMaskDecimalField</key>
-				<string>NSTextField</string>
-				<key>writeMaskHexField</key>
-				<string>NSTextField</string>
+				<key>vliMatrix</key>
+				<string>NSMatrix</string>
+				<key>vsiMatrix</key>
+				<string>NSMatrix</string>
+				<key>vtMatrix</key>
+				<string>NSMatrix</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>

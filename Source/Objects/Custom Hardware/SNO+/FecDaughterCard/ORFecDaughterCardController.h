@@ -24,23 +24,36 @@
 
 @interface ORFecDaughterCardController : OrcaObjectController  {
 	@private
+		IBOutlet NSButton* setAllCmosButton;
 		IBOutlet NSMatrix* rp1Matrix;
 		IBOutlet NSMatrix* rp2Matrix;
 		IBOutlet NSMatrix* vliMatrix;
 		IBOutlet NSMatrix* vsiMatrix;
 		IBOutlet NSMatrix* vtMatrix;
 		IBOutlet NSMatrix* vbMatrix;
-		IBOutlet NSMatrix* ns100widthMatrix;			   
-		IBOutlet NSMatrix* ns20widthMatrix; 
-		IBOutlet NSMatrix* ns20delayMatrix;
-		IBOutlet NSMatrix* tac0trimMatrix; 	   
-		IBOutlet NSMatrix* tac1trimMatrix;
+		IBOutlet NSTextField* ns100widthField;			   
+		IBOutlet NSTextField* ns20widthField; 
+		IBOutlet NSTextField* ns20delayField;
+		IBOutlet NSTextField* tac0trimField; 	   
+		IBOutlet NSTextField* tac1trimField;
+		IBOutlet NSTextField* cardLabelField;
+		IBOutlet NSTextField* cardNumberField;
+		IBOutlet NSTextField* cmosRegShownField;
+		IBOutlet NSTextField* cmosRegShownField1;
+		IBOutlet NSButton*	  showVoltsCB;
+		IBOutlet NSTextField* commentsTextField;
+		
+		NSNumberFormatter*		valueFormatter;
 }
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) commentsChanged:(NSNotification*)aNote;
+- (void) showVoltsChanged:(NSNotification*)aNote;
+- (void) setAllCmosChanged:(NSNotification*)aNote;
+- (void) cmosRegShownChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) rp1Changed:(NSNotification*)aNote;
 - (void) rp2Changed:(NSNotification*)aNote; 
@@ -55,16 +68,21 @@
 - (void) tac1trimChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (void) rp1Action:(id)sender;
-- (void) rp2Action:(id)sender; 
-- (void) vliAction:(id)sender; 
-- (void) vsiAction:(id)sender; 
-- (void) vtAction:(id)sender; 
-- (void) vbAction:(id)sender; 	   
-- (void) ns100widthAction:(id)sender; 			   
-- (void) ns20widthAction:(id)sender; 
-- (void) ns20delayAction:(id)sender; 
-- (void) tac0trimAction:(id)sender; 	   
-- (void) tac1trimAction:(id)sender;
+- (IBAction) commentsTextFieldAction:(id)sender;
+- (IBAction) showVoltsAction:(id)sender;
+- (IBAction) setAllCmosAction:(id)sender;
+- (IBAction) incCmosRegAction:(id)sender;
+- (IBAction) decCmosRegAction:(id)sender;
+- (IBAction) rp1Action:(id)sender;
+- (IBAction) rp2Action:(id)sender; 
+- (IBAction) vliAction:(id)sender; 
+- (IBAction) vsiAction:(id)sender; 
+- (IBAction) vtAction:(id)sender; 
+- (IBAction) vbAction:(id)sender; 	   
+- (IBAction) ns100widthAction:(id)sender; 			   
+- (IBAction) ns20widthAction:(id)sender; 
+- (IBAction) ns20delayAction:(id)sender; 
+- (IBAction) tac0trimAction:(id)sender; 	   
+- (IBAction) tac1trimAction:(id)sender;
 
 @end

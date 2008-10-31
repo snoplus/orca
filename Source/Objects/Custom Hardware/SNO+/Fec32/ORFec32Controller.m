@@ -154,8 +154,8 @@
 - (void) showVoltsChanged:(NSNotification*)aNote
 {
 	[showVoltsCB setIntValue: [model showVolts]];
-	if([model showVolts]) [cmosFormatter setFormat:@"#0.00;0;#0.00"];
-	else [cmosFormatter setFormat:@"#0;0;#0"];
+	if([model showVolts]) [cmosFormatter setFormat:@"#0.00;0;-#0.00"];
+	else [cmosFormatter setFormat:@"#0;0;-#0"];
 	[self cmosChanged:aNote];
 }
 
@@ -234,15 +234,16 @@
 
 #pragma mark •••Actions
 
-- (void) showVoltsAction:(id)sender
+- (IBAction) showVoltsAction:(id)sender
 {
 	[model setShowVolts:[sender intValue]];	
 }
 
-- (void) commentsTextFieldAction:(id)sender
+- (IBAction) commentsTextFieldAction:(id)sender
 {
 	[model setComments:[sender stringValue]];	
 }
+
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORFecLock to:[sender intValue] forWindow:[self window]];

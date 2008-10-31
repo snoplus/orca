@@ -35,7 +35,30 @@
     return self;
 }
 
+- (void) dealloc
+{
+	[valueFormatter release];
+	[super dealloc];
+}
 
+- (void) awakeFromNib
+{
+	valueFormatter = [[NSNumberFormatter alloc] init];
+	int i;
+	for(i=0;i<2;i++){
+		[[rp1Matrix cellWithTag:i] setFormatter:valueFormatter];
+		[[rp2Matrix cellWithTag:i] setFormatter:valueFormatter];
+		[[vliMatrix cellWithTag:i] setFormatter:valueFormatter];
+		[[vsiMatrix cellWithTag:i] setFormatter:valueFormatter];
+	}
+	for(i=0;i<8;i++){
+		[[vtMatrix cellWithTag:i] setFormatter:valueFormatter];
+	}
+	for(i=0;i<16;i++){
+		[[vbMatrix cellWithTag:i] setFormatter:valueFormatter];
+	}
+	[super awakeFromNib];
+}
 
 #pragma mark •••Notifications
 -(void)registerNotificationObservers
@@ -49,64 +72,86 @@
 	
     [notifyCenter addObserver : self
 					 selector : @selector(rp1Changed:)
-						 name : ORFec32ModelRp1Changed
+						 name : ORDCModelRp1Changed
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(rp2Changed:)
-						 name : ORFec32ModelRp2Changed
+						 name : ORDCModelRp2Changed
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(vliChanged:)
-						 name : ORFec32ModelVliChanged
+						 name : ORDCModelVliChanged
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(vsiChanged:)
-						 name : ORFec32ModelVsiChanged
+						 name : ORDCModelVsiChanged
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(vtChanged:)
-						 name : ORFec32ModelVtChanged
+						 name : ORDCModelVtChanged
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(vbChanged:)
-						 name : ORFec32ModelVbChanged
+						 name : ORDCModelVbChanged
 					   object : model];
 					   					   
     [notifyCenter addObserver : self
 					 selector : @selector(ns100widthChanged:)
-						 name : ORFec32ModelNs100widthChanged
+						 name : ORDCModelNs100widthChanged
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(ns20widthChanged:)
-						 name : ORFec32ModelNs20widthChanged
+						 name : ORDCModelNs20widthChanged
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(ns20delayChanged:)
-						 name : ORFec32ModelNs20delayChanged
+						 name : ORDCModelNs20delayChanged
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(tac0trimChanged:)
-						 name : ORFec32ModelTac0trimChanged
+						 name : ORDCModelTac0trimChanged
 					   object : model];
 					   
     [notifyCenter addObserver : self
 					 selector : @selector(tac1trimChanged:)
-						 name : ORFec32ModelTac1trimChanged
+						 name : ORDCModelTac1trimChanged
 					   object : model];					      
- }
+ 
+     [notifyCenter addObserver : self
+					 selector : @selector(cmosRegShownChanged:)
+						 name : ORDCModelCmosRegShownChanged
+					   object : model];					      
+
+      [notifyCenter addObserver : self
+					 selector : @selector(setAllCmosChanged:)
+						 name : ORDCModelSetAllCmosChanged
+					   object : model];		
+					   			      
+      [notifyCenter addObserver : self
+					 selector : @selector(showVoltsChanged:)
+						 name : ORDCModelShowVoltsChanged
+					   object : model];	
+					   				      
+    [notifyCenter addObserver : self
+                     selector : @selector(commentsChanged:)
+                         name : ORDCModelCommentsChanged
+						object: model];
+
+}
 
 #pragma mark •••Interface Management
 -(void)updateWindow
 {
 	[super updateWindow];
+	[self showVoltsChanged:nil];
 	[self slotChanged:nil];
 	[self rp1Changed:nil];
 	[self rp2Changed:nil];
@@ -114,11 +159,28 @@
 	[self vsiChanged:nil];
 	[self vtChanged:nil];
 	[self vbChanged:nil];	   
-	[self ns100widthChanged:nil];			   
-	[self ns20widthChanged:nil];   
-	[self ns20delayChanged:nil];			   
-	[self tac0trimChanged:nil];		   
-	[self tac1trimChanged:nil];
+	[self setAllCmosChanged:nil];	   
+	[self commentsChanged:nil];
+
+	[self cmosRegShownChanged:nil];
+}
+
+- (void) showVoltsChanged:(NSNotification*)aNote
+{
+	[showVoltsCB setIntValue: [model showVolts]];
+	if([model showVolts])	[valueFormatter setFormat:@"#0.00;0;-#0.00"];
+	else					[valueFormatter setFormat:@"#0;0;-#0"];
+	[self rp1Changed:nil];
+	[self rp2Changed:nil];
+	[self vliChanged:nil];
+	[self vsiChanged:nil];
+	[self vtChanged:nil];
+	[self vbChanged:nil];	   
+}
+
+- (void) commentsChanged:(NSNotification*)aNote
+{
+	[commentsTextField setStringValue: [model comments]];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -126,138 +188,229 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"FecDaughterCard (%@)",[model identifier]]];
 }
 
+- (void) setAllCmosChanged:(NSNotification*)aNote
+{
+	[setAllCmosButton setIntValue:[model setAllCmos]];
+}
+
+- (void) cmosRegShownChanged:(NSNotification*)aNote 
+{
+	[cmosRegShownField setIntValue:[model cmosRegShown]];
+	[cmosRegShownField1 setIntValue:[model cmosRegShown]];
+	[self ns20widthChanged:nil];
+	[self ns20delayChanged:nil];
+	[self ns100widthChanged:nil];
+	[self tac0trimChanged:nil];		   
+	[self tac1trimChanged:nil];
+}
+
 - (void) rp1Changed:(NSNotification*)aNote 
 {
 	int i;
-	for(i=0;i<2;i++) [[rp1Matrix cellWithTag:i] setIntValue:[model rp1:i]];
+	for(i=0;i<2;i++) {
+		if([model showVolts])[[rp1Matrix cellWithTag:i] setFloatValue:[model rp1Voltage:i]];
+		else				 [[rp1Matrix cellWithTag:i] setIntValue:[model rp1:i]];
+	}
 }
 
 - (void) rp2Changed:(NSNotification*)aNote 
 {
 	int i;
-	for(i=0;i<2;i++) [[rp2Matrix cellWithTag:i] setIntValue:[model rp2:i]];
+	for(i=0;i<2;i++){
+		if([model showVolts])	[[rp2Matrix cellWithTag:i] setFloatValue:[model rp2Voltage:i]];
+		else					[[rp2Matrix cellWithTag:i] setIntValue:[model rp2:i]];
+	}
 }
 
 - (void) vliChanged:(NSNotification*)aNote 
 {
 	int i;
-	for(i=0;i<2;i++) [[vliMatrix cellWithTag:i] setIntValue:[model vli:i]];
+	for(i=0;i<2;i++){
+		if([model showVolts])	[[vliMatrix cellWithTag:i] setFloatValue:[model vliVoltage:i]];
+		else					[[vliMatrix cellWithTag:i] setIntValue:[model vli:i]];
+	}
 }
 
 - (void) vsiChanged:(NSNotification*)aNote 
 {
 	int i;
-	for(i=0;i<2;i++) [[vsiMatrix cellWithTag:i] setIntValue:[model vsi:i]];
+	for(i=0;i<2;i++){
+		if([model showVolts])	[[vsiMatrix cellWithTag:i] setFloatValue:[model vsiVoltage:i]];
+		else					[[vsiMatrix cellWithTag:i] setIntValue:[model vsi:i]];
+	}
 }
 
 - (void) vtChanged:(NSNotification*)aNote 
 {
 	int i;
-	for(i=0;i<8;i++) [[vtMatrix cellWithTag:i] setIntValue:[model vt:i]];
+	for(i=0;i<8;i++){
+		if([model showVolts])	[[vtMatrix cellWithTag:i] setFloatValue:[model vtVoltage:i]];
+		else					[[vtMatrix cellWithTag:i] setIntValue:[model vt:i]];
+	}
 }
 
 - (void) vbChanged:(NSNotification*)aNote 
 {
 	int i;
-	for(i=0;i<16;i++) [[vbMatrix cellWithTag:i] setIntValue:[model vb:i]];
+	for(i=0;i<16;i++) {
+		if([model showVolts])	[[vbMatrix cellWithTag:i] setFloatValue:[model vbVoltage:i]];
+		else					[[vbMatrix cellWithTag:i] setIntValue:[model vb:i]];
+	}
 }
 	   
 - (void) ns100widthChanged:(NSNotification*)aNote 
 {
-	int i;
-	for(i=0;i<8;i++) [[ns100widthMatrix cellWithTag:i] setIntValue:[model ns100width:i]];
+	int i = [model cmosRegShown];
+	[ns100widthField setIntValue:[model ns100width:i]];
 }
 			   
 - (void) ns20widthChanged:(NSNotification*)aNote 
 {
-	int i;
-	for(i=0;i<8;i++) [[ns20widthMatrix cellWithTag:i] setIntValue:[model ns20width:i]];
+	int i = [model cmosRegShown];
+	[ns20widthField setIntValue:[model ns20width:i]];
 } 
   
 - (void) ns20delayChanged:(NSNotification*)aNote 
 {
-	int i;
-	for(i=0;i<8;i++) [[ns20delayMatrix cellWithTag:i] setIntValue:[model ns20delay:i]];
-
+	int i = [model cmosRegShown];
+	[ns20delayField setIntValue:[model ns20delay:i]];
 }
 			   
 - (void) tac0trimChanged:(NSNotification*)aNote 
 {
-	int i;
-	for(i=0;i<8;i++) [[tac0trimMatrix cellWithTag:i] setIntValue:[model tac0trim:i]];
+	int i = [model cmosRegShown];
+	[tac0trimField setIntValue:[model tac0trim:i]];
 }
 		   
 - (void) tac1trimChanged:(NSNotification*)aNote 
 {
-	int i;
-	for(i=0;i<8;i++) [[tac1trimMatrix cellWithTag:i] setIntValue:[model tac1trim:i]];
+	int i = [model cmosRegShown];
+	[tac1trimField setIntValue:[model tac1trim:i]];
 }
 
 #pragma mark •••Actions
-- (void) rp1Action:(id)sender
+- (IBAction) commentsTextFieldAction:(id)sender
+{
+	[model setComments:[sender stringValue]];	
+}
+
+- (void) showVoltsAction:(id)sender
+{
+	[model setShowVolts:[sender intValue]];	
+}
+
+- (IBAction) setAllCmosAction:(id)sender
+{
+	[model setSetAllCmos:[sender intValue]];
+}
+
+- (IBAction) incCmosRegAction:(id)sender
+{
+	[self endEditing];
+	[model setCmosRegShown:[model cmosRegShown]+1];
+}
+
+- (IBAction) decCmosRegAction:(id)sender
+{
+	[self endEditing];
+	[model setCmosRegShown:[model cmosRegShown]-1];
+}
+
+- (IBAction) rp1Action:(id)sender
 {
 	int i = [[rp1Matrix selectedCell] tag];
-	[model setRp1:i withValue:[sender intValue]];
+	if([model showVolts])	[model setRp1Voltage:i withValue:[sender floatValue]];
+	else					[model setRp1:i withValue:[sender intValue]];
 }
 
-- (void) rp2Action:(id)sender
+- (IBAction) rp2Action:(id)sender
 {
 	int i = [[rp2Matrix selectedCell] tag];
-	[model setRp2:i withValue:[sender intValue]];
+	if([model showVolts])	[model setRp2Voltage:i withValue:[sender floatValue]];
+	else					[model setRp2:i withValue:[sender intValue]];
 }
  
-- (void) vliAction:(id)sender
+- (IBAction) vliAction:(id)sender
 {
 	int i = [[vliMatrix selectedCell] tag];
-	[model setVli:i withValue:[sender intValue]];
+	if([model showVolts])	[model setVliVoltage:i withValue:[sender floatValue]];
+	else					[model setVli:i withValue:[sender intValue]];
 }
  
-- (void) vsiAction:(id)sender
+- (IBAction) vsiAction:(id)sender
 {
 	int i = [[vsiMatrix selectedCell] tag];
-	[model setVsi:i withValue:[sender intValue]];
+	if([model showVolts])	[model setVsiVoltage:i withValue:[sender floatValue]];
+	else					[model setVsi:i withValue:[sender intValue]];
 }
  
-- (void) vtAction:(id)sender
+- (IBAction) vtAction:(id)sender
 {
 	int i = [[vtMatrix selectedCell] tag];
-	[model setVt:i withValue:[sender intValue]];
+	if([model showVolts])	[model setVtVoltage:i withValue:[sender floatValue]];
+	else					[model setVt:i withValue:[sender intValue]];
 }
  
-- (void) vbAction:(id)sender
+- (IBAction) vbAction:(id)sender
 {
 	int i = [[vbMatrix selectedCell] tag];
-	[model setVb:i withValue:[sender intValue]];
+	if([model showVolts])	[model setVbVoltage:i withValue:[sender floatValue]];
+	else					[model setVb:i withValue:[sender intValue]];
 } 
 	   
-- (void) ns100widthAction:(id)sender
+- (IBAction) ns100widthAction:(id)sender
 {
-	int i = [[ns100widthMatrix selectedCell] tag];
-	[model setNs100width:i withValue:[sender intValue]];
+	if([model setAllCmos]) {
+		int i;
+		for(i=0;i<8;i++){
+			[model setNs100width:i withValue:[sender intValue]];
+		}
+	}
+	else [model setNs100width:[model cmosRegShown] withValue:[sender intValue]];
 }
 			   
-- (void) ns20widthAction:(id)sender
+- (IBAction) ns20widthAction:(id)sender
 {
-	int i = [[ns20widthMatrix selectedCell] tag];
-	[model setNs20width:i withValue:[sender intValue]];
+	if([model setAllCmos]) {
+		int i;
+		for(i=0;i<8;i++){
+			[model setNs20width:i withValue:[sender intValue]];
+		}
+	}
+	else [model setNs20width:[model cmosRegShown] withValue:[sender intValue]];
 }
  
-- (void) ns20delayAction:(id)sender
+- (IBAction) ns20delayAction:(id)sender
 {
-	int i = [[ns20delayMatrix selectedCell] tag];
-	[model setNs20delay:i withValue:[sender intValue]];
+	if([model setAllCmos]) {
+		int i;
+		for(i=0;i<8;i++){
+			[model setNs20delay:i withValue:[sender intValue]];
+		}
+	}
+	else [model setNs20delay:[model cmosRegShown] withValue:[sender intValue]];
 }
 
-- (void) tac0trimAction:(id)sender
+- (IBAction) tac0trimAction:(id)sender
 {
-	int i = [[tac0trimMatrix selectedCell] tag];
-	[model setTac0trim:i withValue:[sender intValue]];
+	if([model setAllCmos]) {
+		int i;
+		for(i=0;i<8;i++){
+			[model setTac0trim:i withValue:[sender intValue]];
+		}
+	}
+	else [model setTac0trim:[model cmosRegShown] withValue:[sender intValue]];
 }
  	   
-- (void) tac1trimAction:(id)sender
+- (IBAction) tac1trimAction:(id)sender
 {
-	int i = [[tac0trimMatrix selectedCell] tag];
-	[model setTac1trim:i withValue:[sender intValue]];
+	if([model setAllCmos]) {
+		int i;
+		for(i=0;i<8;i++){
+			[model setTac1trim:i withValue:[sender intValue]];
+		}
+	}
+	else [model setTac1trim:[model cmosRegShown] withValue:[sender intValue]];
 }
 
 @end
