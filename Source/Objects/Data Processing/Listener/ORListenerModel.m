@@ -409,7 +409,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     }
     
     [processLock lock];
-	[NSThread setThreadPriority:1.0];
 	BOOL flushMessagePrintedOnce = NO;
     BOOL timeToQuit              = NO;
     threadRunning                = YES;
@@ -417,10 +416,13 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
         [[NSRunLoop currentRunLoop] run];
         queueCount = [transferQueue count];
-        if(queueCount){
+		if(!queueCount) [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.001]];
+
+        else {
 			[dataToProcess appendData:[transferQueue dequeue]];
             [self process:dataToProcess];
         }
+
         if([timeToStopProcessThread condition]){
             queueCount = [transferQueue count];
             if(!flushMessagePrintedOnce){
@@ -498,7 +500,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 			}
 		}
 		else {
-			BOOL endOfRun = NO;
+			BOOL endOfRun   = NO;
+			BOOL startOfRun = NO;
 		    while (buffer<endPtr) {
 				NSAutoreleasePool* innerPool = [[NSAutoreleasePool allocWithZone:nil] init];
 
@@ -514,6 +517,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 						if(!(firstWord & 0x8)){
 							if(firstWord & 0x1){
 								NSLog(@"Listener: Run Start on Host: %@\n",remoteHost);
+								startOfRun = YES;
 							}
 							else {
 								//it's an end of run record --  we have some end of run cleanup to handle
@@ -526,12 +530,17 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 					[dataPacket addData:[NSMutableData dataWithBytes:buffer length:length]];
 					
 					[theNextObject processData:dataPacket userInfo:nil];
+					if(startOfRun){
+						[self performSelectorOnMainThread:@selector(sendRunTaskStarted:) withObject:dataPacket waitUntilDone:YES];
+						startOfRun = NO;
+					}
 					if(endOfRun){
 						[self performSelectorOnMainThread:@selector(sendRunTaskStopped:) withObject:dataPacket waitUntilDone:YES];
 						[dataPacket clearData];
 						[self performSelectorOnMainThread:@selector(sendCloseOutRun:)    withObject:dataPacket waitUntilDone:YES];
 						[self performSelectorOnMainThread:@selector(clearByteCount)      withObject:nil        waitUntilDone:YES];
 						expectingHeader = YES;
+						endOfRun = NO;
 					}
 					[dataPacket clearData];
 					buffer += length;

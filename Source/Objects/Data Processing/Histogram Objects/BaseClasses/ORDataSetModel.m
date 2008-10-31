@@ -44,7 +44,7 @@ NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
 						userInfo: nil];
 	
     
-	
+	[dataSetLock release];
     [key release];
     [fullName release];
     [shortName release];	
@@ -185,8 +185,9 @@ NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
 
 - (void) scheduleUpdateOnMainThread
 {
-	scheduledForUpdate = YES;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postUpdate) object:nil];;
 	[self performSelector:@selector(postUpdate) withObject:nil afterDelay:1.0];
+	scheduledForUpdate = YES;
 }
 
 - (void) postUpdate
@@ -251,6 +252,7 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
 	[self setDataSet:[decoder decodeObjectForKey:@"dataSet"]];
     
     [[self undoManager] enableUndoRegistration];
+	scheduledForUpdate = NO;
     
     
     return self;

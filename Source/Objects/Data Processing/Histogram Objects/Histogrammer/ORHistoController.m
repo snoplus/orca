@@ -44,6 +44,7 @@
     
     [self updateWindow];
     [plotGroupButton setEnabled:NO];    
+	scheduledToUpdate = NO;
 }
 
 - (void) dealloc
@@ -160,10 +161,11 @@
 - (void) modelChanged:(NSNotification*)aNotification
 {
     if(!aNotification || [aNotification object] == self){
-        //[outlineView reloadItem:[model dataSet] reloadChildren:YES];
-        [outlineView reloadData];
-        [multiPlotView reloadData];
-    }
+		//[outlineView reloadItem:[model dataSet] reloadChildren:YES];
+		scheduledToUpdate = NO;
+		[outlineView reloadData];
+		[multiPlotView reloadData];
+	}
 }
 
 - (void) dataChanged:(NSNotification*)aNotification
