@@ -761,7 +761,7 @@ NSString* UVkString = @"string";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-	[self setChannelArray: [decoder decodeObjectForKey: @"channelArray"]];
+	[self setChannelArray: [decoder decodeObjectForKey: @"mChannelArray"]];
 	
 	if( !mChannelArray ){
 		//first time.... set up the structure....
@@ -771,6 +771,7 @@ NSString* UVkString = @"string";
 		// Put in dummy values for testing.
 		for(i = 0 ; i < UVkNumChannels; i++ )
 		{
+
 			NSNumber* chnl = [NSNumber numberWithInt: i];
 			NSNumber* measuredCurrent = [NSNumber numberWithFloat: ((float)i * 1.0)];
 			NSNumber* measuredHV = [NSNumber numberWithFloat: (1000.0 + 10.0 * (float)i)];
@@ -818,7 +819,7 @@ NSString* UVkString = @"string";
 - (void) encodeWithCoder: (NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeObject: @"mChannelArray"];
+	[encoder encodeObject: mChannelArray forKey: @"mChannelArray"];
 }
 
 #pragma mark •••Utilities
