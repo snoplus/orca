@@ -104,7 +104,7 @@ typedef enum hveCommands hveCommands;
 				  command: (NSString *) aCommand 
 				retTokens: (NSArray *) aTokens;
 				
-- (void) sendCommandBasic;
+- (void) sendSingleCommand;
 				
 #pragma mark ***Archival
 - (id)   initWithCoder: (NSCoder*) aDecoder;

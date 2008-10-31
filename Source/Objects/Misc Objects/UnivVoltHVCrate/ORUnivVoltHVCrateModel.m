@@ -23,37 +23,39 @@
 //
 //			Structures:
 //			  mCmdCmdQueue - Holds queued up commands and is used  
-//					by sendCommandBasic to dequeue appropriate
+//					by sendSingleCommand to dequeue appropriate
 //					command.
 //
-//			Notes:
-//			  Need two identical queues because one is dequeued
-//			  in sendCommandBasic while other is dequeued in
-//			  handleDataReturn.
-//
 //		Logic: when mRetsToProcess == mTotalCmds routine calls
-//				sendCommandBasic to send out one command.
-// 3) Method sendCommandBasic deques a single command from 
+//				sendSingleCommand to send out one command.
+
+// 3) Method sendSingleCommand deques a single command from 
 //		command queue and sends it to the HV crate.
 //			Structures:
 //			  mLastCmdIssued - Holds last command issued by this
 //				routine.
 
-// 4) method handleDataReturn is called by netsocket method
-//    dataAvailable.  This methods processes data returned
-//	  by HV crate.  If command is crate command, then one only
-//	  expects one data return.  For HV unit usually issue multiple
-//	  commands and thus expect multiple returns.
+// 4) method handleDataReturn is called by netsocket delegate method
+//    dataAvailable.  This method processes data returned
+//	  by HV crate.  (It uses the helper functions crateReturn and
+//	  unitReturn to interpret the data from the crate and to place
+//	  the return data for the unit onto the return queue.
+//	  If command is a crate command, then only one data return
+//	  is expected and data is not placed on queue.  For HV unit issue 
+//	  multiple commands and thus expect multiple returns.  Commands are 
+//    issued one at a time. When data returns stores it on return data
+//	  queue and if any commands still need to be processed calls 
+//    sendSingleCommand.
 //
-//	  Dequeues command from cmd mCmdRetQueue, which is a 
-//    duplicate of mCmdCmdQueue.  Compares it to data returned
-//	  by HV crate to ensure data return matches what we sent.
+//	  dequeueAllReturns dequeues all returns stored on mReturnQueue.
+//	  Sends out notification that new data is available which is handled
+//	  by UNUnitVoltModel.m shortly after all notifications sent out.
 //	
 //			flags:
 //			  mRetsToProcess - Number of returns that have not 
 //				yet been processed.  Decremented by one each
 //				time a new return is received.  (Check routine
-//				setupReturnDict where decrement actually occurs.
+//				setupReturnDict where decrement actually occurs.)
 //
 //			 Structures:
 //			  mCmdRetQueue - Holds queued up commands and is used
@@ -68,7 +70,7 @@
 //
 //			LOOPING:
 //			  If all expected returns not yet received, calls
-//			  sendCommandBasic which dequeues next command from
+//			  sendSingleCommand which dequeues next command from
 //			  mCmdCmdQueue. Handles return when it comes and
 //			  queues it up.  After last cmd-return data pair
 //			  are issued callls routine dequeueAllReturns which
@@ -307,8 +309,9 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 //------------------------------------------------------------------------------------------------
 // Queues commands onto mCmdCmdQueue.  If only one command is to be executed this routine calls
-// sendCommandBasic to have it executed.
-// For multiple commands returns after each command is queued up until all commands are in queue.
+// sendSingleCommand to have it executed.
+// For multiple commands queueCommands returns after each command is queued up until all commands
+// are in queue.
 // Note that commands that are sent to entire crate do not have slot and channel number set.  
 // If command is only for slot then Sx is the form of the command where x is the slot number.  
 // If command is directed at specific channel then command is of the form Sx.y where y is the 
@@ -373,7 +376,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		    // Queue has been filled so dequeue a single command.
 		    if ( mCmdsToProcess == 0 && mTotalCmds == mRetsToProcess ) {
 			   mCmdQueueBlocked = YES;  // Only block queue once all commands are issued.
-			   [self sendCommandBasic];
+			   [self sendSingleCommand];
 		    }
 		
 			// return to calling routine so that it can queue up more commands.
@@ -399,7 +402,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 {
 	NSDictionary* cmdDictObj = [mCmdCmdQueue dequeue];
 	
-	[self sendCommandBasic: cmdDictObj];
+	[self sendSingleCommand: cmdDictObj];
 }
 */
 
@@ -498,6 +501,8 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 			NSLog( @"Returned command '%@', recent command '%@'.", retCommand, queuedCommandStr );
 			if ( [retCommand isEqualTo: storedCmdStr]  )
 			{
+				// Decrement returns to process.
+				mRetsToProcess--;
 				// Debug only. Print list of tokens.
 				for ( j = 0;  j < [tokens count]; j++ ) {
 					NSString* object = [tokens objectAtIndex: j];
@@ -524,7 +529,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 			// 7) Expect more returns so issue next command.
 			else 
 			{
-				[self sendCommandBasic];
+				[self sendSingleCommand];
 			}
 		}		       // End if verifying that we actually have data.
 	}
@@ -862,19 +867,19 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	[retDictObj autorelease];
 	
 	// Decrement counter indicating how many commands one still has to process before dequeuing data.
-	mRetsToProcess--;
+//	mRetsToProcess--;
 	
 	return( retDictObj);
 }
 
 // Actually takes command off of queue and sends it to the HV Crate.
-- (void) sendCommandBasic
+- (void) sendSingleCommand
 {
 	NSString* fullCommand = nil;
 	NSDictionary* cmdDictObj = 0;
 	if ( [mCmdCmdQueue isEmpty] && mCmdsToProcess > 0)
 	{
-		NSLog( @"Error  - sendCommandBasic has empty cmd queue even though there should still be %d cmds to process.\n",
+		NSLog( @"Error  - sendSingleCommand has empty cmd queue even though there should still be %d cmds to process.\n",
 			mCmdsToProcess );
 	}
 	

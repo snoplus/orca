@@ -297,7 +297,9 @@ NSString* UVkString = @"string";
 			
 				if ( i == 0 )
 				{
-					command = [NSString stringWithFormat: @"LD S%d.%d %@", [self slot], i, commandDict];
+					// LD command handles all channels at once so unit identifier is Sx followed by parameter followed
+					// by values for all 12 channels.
+					command = [NSString stringWithFormat: @"LD S%d %@", [self slot], i, commandDict];
 				}
 			
 				if ( [[dictObj objectForKey: UVkType] isEqualTo: UVkINT] )
@@ -309,6 +311,7 @@ NSString* UVkString = @"string";
 				
 			}
 			
+			// Single command has been assembled - now queue it.
 			[[ self crate] queueCommand: j totalCmds: [mParams count] slot: [self slot] channel: i command: command];
 		}
 	}
