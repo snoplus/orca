@@ -169,6 +169,30 @@ NSString* UVkErrorMsg = @"ErrorMsg";
                 postNotificationName:OROrcaObjectImageChanged
                               object:self];
 		
+
+//	NS_DURING		
+
+}
+
+//---------------------------------------------------------------------------------------------------
+- (void) awakeAfterDocumentLoaded
+{
+	@try {
+		if ( [ipAddress length] == 0 ) {
+			NSString* tmpIPAddress = [NSString stringWithCString: kUnivVoltHVAddress encoding: NSASCIIStringEncoding ];
+			[self setIpAddress: tmpIPAddress];
+		}
+		[self connect];
+	}
+	@catch (NSException *exception) {
+
+		NSLog(@"awakeAfterDocumentLoaded: Caught %@: %@", [exception name], [exception  reason]);
+	}
+	@finally
+	{
+	}
+
+
 }
 
 //---------------------------------------------------------------------------------------------------
@@ -201,17 +225,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 }
 
 #pragma mark •••Accessors
-//---------------------------------------------------------------------------------------------------
-- (void) setIpAddress: (NSString *) anIpAddress
-{
-	if (!anIpAddress) anIpAddress = @"";
-    [[[self undoManager] prepareWithInvocationTarget: self] setIpAddress: anIpAddress];
-    
-    [ipAddress autorelease];
-    ipAddress = [anIpAddress copy];    
-
-    [[NSNotificationCenter defaultCenter] postNotificationName: HVCrateIpAddressChangedNotification object: self];
-}
 
 //---------------------------------------------------------------------------------------------------
 - (NSString*) hvStatus
@@ -255,6 +268,18 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 }
 
 //---------------------------------------------------------------------------------------------------
+- (void) setIpAddress: (NSString *) anIpAddress
+{
+	if (!anIpAddress) anIpAddress = @"";
+    [[[self undoManager] prepareWithInvocationTarget: self] setIpAddress: anIpAddress];
+    
+    [ipAddress autorelease];
+    ipAddress = [anIpAddress copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: HVCrateIpAddressChangedNotification object: self];
+}
+//---------------------------------------------------------------------------------------------------
+
 - (NetSocket*) socket
 {
 	return mSocket;
@@ -388,7 +413,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	
 	@catch (NSException *exception) {
 
-			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
+			NSLog(@"queueCommand: Caught %@: %@", [exception name], [exception  reason]);
 	} 
 	
 	@finally
@@ -456,7 +481,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		}
 		
 		NSNumber* cmdId = [mLastCmdIssued objectForKey: UVkCmdId];
-//		NSNumber* queuedSlot = [mLastCmdIssued objectForKey: UVkSlot];
+		NSNumber* queuedSlot = [mLastCmdIssued objectForKey: UVkSlot];
 		NSNumber* queuedChnl = [mLastCmdIssued objectForKey: UVkChnl];
 	
 		// Parse the returned data.
@@ -472,10 +497,10 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		
 			// 2) if chnl > -1 then have a unit return rather than crate return
 			i = 0;
-			if ( [queuedChnl intValue] > -1 )
+			if ( [queuedSlot intValue] > -1 )
 			{
 			
-				// Get slot and channel of return data
+				// Get slot and possibly channel of return data
 				while ( f_NotFound && i < [tokens count] )
 				{
 					retSlotChnl = [tokens objectAtIndex: 1];
@@ -501,8 +526,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 			NSLog( @"Returned command '%@', recent command '%@'.", retCommand, queuedCommandStr );
 			if ( [retCommand isEqualTo: storedCmdStr]  )
 			{
-				// Decrement returns to process.
-				mRetsToProcess--;
 				// Debug only. Print list of tokens.
 				for ( j = 0;  j < [tokens count]; j++ ) {
 					NSString* object = [tokens objectAtIndex: j];
@@ -518,6 +541,10 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 				{
 					[self handleUnitReturn: cmdId slot: retSlot channel: retChnl command: retCommand retTokens: tokens];
 				}  // End if processing crate and Unit returns.
+				
+				// Decrement returns to process.
+				mRetsToProcess--;
+
 			}      // End if looking if returned command equals queued command.
 			
 			// 6) No more returns expected so deque all the data.
@@ -534,8 +561,9 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		}		       // End if verifying that we actually have data.
 	}
 	
-	@catch (NSException * e) {
-		NSLog( @"Caught exception '%@'.", [e reason] );
+	@catch (NSException *exception) {
+
+			NSLog(@"handleDataReturn: Caught %@: %@", [exception name], [exception  reason]);
 	}
 	
 	@finally {	
@@ -614,7 +642,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	
 	@catch (NSException *exception) {
 
-			NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
+			NSLog(@"obtainConfig: Caught %@: %@", [exception name], [exception  reason]);
 	} 
 	
 	@finally
@@ -638,7 +666,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	}
 	@catch (NSException *exception) {
 
-		NSLog(@"Tests: Caught %@: %@", [exception name], [exception  reason]);
+		NSLog(@"obtainEthernetConfig: Caught %@: %@", [exception name], [exception  reason]);
 	} 
 	
 	@finally
@@ -649,23 +677,20 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 - (void) connect
 {
+	@try {
 	
-	if (!mIsConnected)
-	{
-		// setSocket method will send out notification.
-		[self setSocket: [NetSocket netsocketConnectedToHost: ipAddress port: kUnivVoltHVCratePort]];	
-//        [self setIsConnected: [mSocket isConnected]];  // setIsConnected sends out notification.
-//		if ( isConnected )
-//		{
-//			NSLog( @"Connected to %@", ipAddress );
-//			[mSocket read: &retBuffer amount: 256];
-//			NSLog( @"Return from connect %s", retBuffer);
-//		}
-//		else
-//		{
-//			NSLog( @"Disconnected from %@", ipAddress );
-//		}
+		if (!mIsConnected) {
+		
+			// setSocket method will send out notification.
+			[self setSocket: [NetSocket netsocketConnectedToHost: ipAddress port: kUnivVoltHVCratePort]];	
+		}
 	}
+	@catch (NSException *exception) {
+
+			NSLog(@"connect: Caught %@: %@", [exception name], [exception  reason]);
+	}
+	@finally{
+	} 
 }
 
 
@@ -832,13 +857,13 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	
 	@catch (NSException *exception) {
 
-		NSLog(@"handleDataReturn: Caught %@: %@\n", [exception name], [exception  reason]);
+		NSLog(@"interpretDataFromSocket: Caught %@: %@\n", [exception name], [exception  reason]);
 	} 
 	
 	@finally{
+//		[returnCodeAsString release];
 	}
 	
-	[returnCodeAsString release];
 	return ( returnStringFromSocket );
 }
 
@@ -910,6 +935,8 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 			NSString* errorMsg = [NSString stringWithFormat: @"Socket not connected to Crate.\n"];
 			NSDictionary* errorMsgDict = [NSDictionary dictionaryWithObject: errorMsg forKey: UVkErrorMsg];
 			[[NSNotificationCenter defaultCenter] postNotificationName: HVSocketNotConnectedNotification object: self userInfo: errorMsgDict];
+			mRetsToProcess = 0;
+			mCmdsToProcess = 0;
 		}
 	}
 }
@@ -917,27 +944,58 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 #pragma mark •••Delegate Methods
 - (void) netsocketConnected: (NetSocket*) inNetSocket
 {
-    if(inNetSocket == mSocket){
-        [self setIsConnected: [mSocket isConnected]];
-    }
+	@try
+	{
+		if(inNetSocket == mSocket){
+			[self setIsConnected: [mSocket isConnected]];
+		}
+	}
+	@catch (NSException *exception) {
+
+		NSLog(@"netsocketConnected: Caught %@: %@", [exception name], [exception  reason]);
+	}
+	@finally
+	{
+	}
+
 }
 
 - (void) netsocketDisconnected: (NetSocket*) inNetSocket
 {
-    if (inNetSocket == mSocket)
+	@try {
+		if (inNetSocket == mSocket) {
+
+			[self setIsConnected: NO];
+			[mSocket autorelease];
+			mSocket = nil;
+		}
+	}
+	@catch (NSException *exception) {
+
+		NSLog(@"netsocketConnected: Caught %@: %@", [exception name], [exception  reason]);
+	}
+	@finally
 	{
-        [self setIsConnected: NO];
-		[mSocket autorelease];
-		mSocket = nil;
-    }
+	}
+
 }
 
 
 - (void) netsocket: (NetSocket*) anInNetSocket dataAvailable: (unsigned) anInAmount
 {
-    if (anInNetSocket == mSocket) {
-		[self handleDataReturn: [anInNetSocket readData]];
+    @try {
+		if (anInNetSocket == mSocket) {
+			[self handleDataReturn: [anInNetSocket readData]];
+		}
 	}
+	@catch (NSException *exception) {
+
+		NSLog(@"netsocketConnected: Caught %@: %@", [exception name], [exception  reason]);
+	}
+	@finally
+	{
+	}
+
 }
 
 

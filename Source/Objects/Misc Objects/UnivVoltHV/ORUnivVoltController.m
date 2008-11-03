@@ -313,16 +313,27 @@
 	[mChnlTable reloadData];	
 }
 
+- (IBAction) hardwareValuesOneChannel: (id) aSender
+{
+	[model getValues: mCurrentChnl];
+}
+
 - (IBAction) hardwareValues: (id) aSender
 {
 	NSLog( @"Get hardware values\n" );
-	[model getValues];
+	[model getValues: -1];
+}
+
+- (IBAction) setHardwareValesOneChannel: (id ) aSender;
+{
+	NSLog( @"Download params for chnl %d\n", mCurrentChnl );
+	[model loadValues: mCurrentChnl];
 }
 
 - (IBAction) setHardwareValues: (id) aSender
 {
 	NSLog( @"Download hardware values\n" );
-	[model loadValues];
+	[model loadValues: -1];
 }
 
 

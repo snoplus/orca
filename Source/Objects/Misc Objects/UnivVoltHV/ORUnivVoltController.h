@@ -68,7 +68,9 @@
 - (IBAction) setRampDownRate: (id) aSender;
 - (IBAction) setMVDZ: (id) aSender;
 - (IBAction) setMCDZ: (id) aSender;
+- (IBAction) setHardwareValesOneChannel: (id ) aSender;
 - (IBAction) setHardwareValues: (id) aSender;
+- (IBAction) hardwareValuesOneChannel: (id ) aSender;
 - (IBAction) hardwareValues: (id) aSender;
 //- (IBAction) updateTable: (id) aSender;
 

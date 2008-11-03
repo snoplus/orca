@@ -31,6 +31,7 @@
 //NSString* ORUVChnlSlotChanged				= @"ORUVChnlSlotChanged";
 
 // HV Unit parameters by symbol.
+NSString* HVkParam = @"Params";
 NSString* HVkChannelEnabled = @"CE";
 NSString* HVkMeasuredCurrent = @"MC";
 NSString* HVkMeasuredHV = @"MV";
@@ -78,6 +79,7 @@ NSString* UVChnlHVValuesChanged			= @"ChnlHVValuesChanged";
 
 // Commands possible from HV Unit.
 NSString* HVkModuleDMP	= @"DMP";
+NSString* HVkModuleLD = @"LD";
 
 // Dictionary keys for data return dictionary
 //NSString* UVkSlot	 = @"Slot";
@@ -104,9 +106,9 @@ NSString* UVkType = @"TYPE";
 NSString* UVkRead = @"R";
 NSString* UVkWrite = @"W";
 
-NSString* UVkInt = @"int";
-NSString* UVkFloat = @"float";
-NSString* UVkString = @"string";
+//NSString* UVkInt = @"int";
+//NSString* UVkFloat = @"float";
+//NSString* UVkString = @"string";
 
 
 @implementation ORUnivVoltModel
@@ -134,98 +136,102 @@ NSString* UVkString = @"string";
 
 - (void) awakeAfterDocumentLoaded
 {
-//	NS_DURING
-		mParams = [NSMutableDictionary dictionaryWithCapacity: UVkChnlNumParameters];
+		@try {
+			mParams = [NSMutableDictionary dictionaryWithCapacity: UVkChnlNumParameters];
 
-		// ---- Load dictionary with commands supported for this unit ----
-		NSArray* keysCmd = [NSArray arrayWithObjects: UVkCommand, @"SLOT", @"CHNL", nil];
+			// ---- Load dictionary with commands supported for this unit ----
+			NSArray* keysCmd = [NSArray arrayWithObjects: UVkCommand, @"SLOT", @"CHNL", nil];
 		
-		NSArray* objectsCmd0 = [NSArray arrayWithObjects: @"DMP", @"YES", @"YES", nil];
-		NSDictionary* tmpCmd0 = [NSDictionary dictionaryWithObjects: objectsCmd0 forKeys: keysCmd];
-		[mCommands insertObject: tmpCmd0 atIndex: 0];
+			NSArray* objectsCmd0 = [NSArray arrayWithObjects: @"DMP", @"YES", @"YES", nil];
+			NSDictionary* tmpCmd0 = [NSDictionary dictionaryWithObjects: objectsCmd0 forKeys: keysCmd];
+			[mCommands insertObject: tmpCmd0 atIndex: 0];
 		
-		NSArray* objectsCmd1 = [NSArray arrayWithObjects: @"LD", @"YES", @"YES", nil];
-		NSDictionary* tmpCmd1 = [NSDictionary dictionaryWithObjects: objectsCmd1 forKeys: keysCmd];
-		[mCommands insertObject: tmpCmd1 atIndex: 1];
+			NSArray* objectsCmd1 = [NSArray arrayWithObjects: @"LD", @"YES", @"YES", nil];
+			NSDictionary* tmpCmd1 = [NSDictionary dictionaryWithObjects: objectsCmd1 forKeys: keysCmd];
+			[mCommands insertObject: tmpCmd1 atIndex: 1];
 		
 
-		// --- load array with dictionary values for parameters - Store name, R/W, and type.
-		NSArray* keys = [NSArray arrayWithObjects: UVkCommand, UVkReadWrite, UVkType, nil];
+			// --- load array with dictionary values for parameters - Store name, R/W, and type.
+			NSArray* keys = [NSArray arrayWithObjects: HVkParam, UVkReadWrite, UVkType, nil];
 				
 		
-		NSArray* objects0 = [NSArray arrayWithObjects: @"Chnl", UVkRead, @"int", nil];
-		NSDictionary* tmpParam0 = [NSDictionary dictionaryWithObjects: objects0 forKeys: keys];
-		[mParams setObject: tmpParam0 forKey: @"Chnl"];
+			NSArray* objects0 = [NSArray arrayWithObjects: @"Chnl", UVkRead, @"int", nil];
+			NSDictionary* tmpParam0 = [NSDictionary dictionaryWithObjects: objects0 forKeys: keys];
+			[mParams setObject: tmpParam0 forKey: @"Chnl"];
 
-		NSArray* objects1 = [NSArray arrayWithObjects: HVkMeasuredCurrent, UVkRead, UVkFloat, nil];
-		NSDictionary* tmpParam1 = [NSDictionary dictionaryWithObjects: objects1 forKeys: keys];
-		[mParams setObject: tmpParam1 forKey: HVkMeasuredCurrent];
+			NSArray* objects1 = [NSArray arrayWithObjects: HVkMeasuredCurrent, UVkRead, UVkFLOAT, nil];
+			NSDictionary* tmpParam1 = [NSDictionary dictionaryWithObjects: objects1 forKeys: keys];
+			[mParams setObject: tmpParam1 forKey: HVkMeasuredCurrent];
 
-		NSArray* objects2 = [NSArray arrayWithObjects: HVkMeasuredHV, UVkRead, UVkFloat, nil];
-		NSDictionary* tmpParam2 = [NSDictionary dictionaryWithObjects: objects2 forKeys: keys];
-		[mParams setObject: tmpParam2 forKey: HVkMeasuredHV];
+			NSArray* objects2 = [NSArray arrayWithObjects: HVkMeasuredHV, UVkRead, UVkFLOAT, nil];
+			NSDictionary* tmpParam2 = [NSDictionary dictionaryWithObjects: objects2 forKeys: keys];
+			[mParams setObject: tmpParam2 forKey: HVkMeasuredHV];
 
-		NSArray* objects5 = [NSArray arrayWithObjects:HVkDemandHV, UVkWrite, UVkFloat, nil];
-		NSDictionary* tmpParam5 = [NSDictionary dictionaryWithObjects: objects5 forKeys: keys];
-		[mParams setObject: tmpParam5 forKey: HVkDemandHV];
+			NSArray* objects5 = [NSArray arrayWithObjects:HVkDemandHV, UVkWrite, UVkFLOAT, nil];
+			NSDictionary* tmpParam5 = [NSDictionary dictionaryWithObjects: objects5 forKeys: keys];
+			[mParams setObject: tmpParam5 forKey: HVkDemandHV];
 
-		NSArray* objects6 = [NSArray arrayWithObjects: HVkRampUpRate, UVkWrite, UVkFloat, nil];
-		NSDictionary* tmpParam6 = [NSDictionary dictionaryWithObjects: objects6 forKeys: keys];
-		[mParams setObject: tmpParam6 forKey: HVkRampUpRate];
+			NSArray* objects6 = [NSArray arrayWithObjects: HVkRampUpRate, UVkWrite, UVkFLOAT, nil];
+			NSDictionary* tmpParam6 = [NSDictionary dictionaryWithObjects: objects6 forKeys: keys];
+			[mParams setObject: tmpParam6 forKey: HVkRampUpRate];
 
-		NSArray* objects7 = [NSArray arrayWithObjects: HVkRampDownRate, UVkWrite, UVkFloat, nil];
-		NSDictionary* tmpParam7 = [NSDictionary dictionaryWithObjects: objects7 forKeys: keys];
-		[mParams setObject: tmpParam7 forKey: HVkRampDownRate];
+			NSArray* objects7 = [NSArray arrayWithObjects: HVkRampDownRate, UVkWrite, UVkFLOAT, nil];
+			NSDictionary* tmpParam7 = [NSDictionary dictionaryWithObjects: objects7 forKeys: keys];
+			[mParams setObject: tmpParam7 forKey: HVkRampDownRate];
 
-		NSArray* objects8 = [NSArray arrayWithObjects: HVkTripCurrent, UVkWrite, UVkFloat, nil];
-		NSDictionary* tmpParam8 = [NSDictionary dictionaryWithObjects: objects8 forKeys: keys];
-		[mParams setObject: tmpParam8 forKey: HVkTripCurrent];
+			NSArray* objects8 = [NSArray arrayWithObjects: HVkTripCurrent, UVkWrite, UVkFLOAT, nil];
+			NSDictionary* tmpParam8 = [NSDictionary dictionaryWithObjects: objects8 forKeys: keys];
+			[mParams setObject: tmpParam8 forKey: HVkTripCurrent];
 		
-		NSArray* objects4 = [NSArray arrayWithObjects: HVkChannelEnabled, UVkWrite, UVkInt, nil];
-		NSDictionary* tmpParam4 = [NSDictionary dictionaryWithObjects: objects4 forKeys: keys];
-		[mParams setObject: tmpParam4 forKey: HVkChannelEnabled];
+			NSArray* objects4 = [NSArray arrayWithObjects: HVkChannelEnabled, UVkWrite, UVkINT, nil];
+			NSDictionary* tmpParam4 = [NSDictionary dictionaryWithObjects: objects4 forKeys: keys];
+			[mParams setObject: tmpParam4 forKey: HVkChannelEnabled];
 
-		NSArray* objects3 = [NSArray arrayWithObjects: HVkStatus, UVkRead, UVkInt, nil];
-		NSDictionary* tmpParam3 = [NSDictionary dictionaryWithObjects: objects3 forKeys: keys];
-		[mParams setObject: tmpParam3 forKey: HVkStatus];
+			NSArray* objects3 = [NSArray arrayWithObjects: HVkStatus, UVkRead, UVkINT, nil];
+			NSDictionary* tmpParam3 = [NSDictionary dictionaryWithObjects: objects3 forKeys: keys];
+			[mParams setObject: tmpParam3 forKey: HVkStatus];
 
-		NSArray* objects10 = [NSArray arrayWithObjects: HVkMVDZ, UVkWrite, UVkFloat, nil];
-		NSDictionary* tmpParam10 = [NSDictionary dictionaryWithObjects: objects10 forKeys: keys];
-		[mParams setObject: tmpParam10 forKey: HVkMVDZ];
+			NSArray* objects10 = [NSArray arrayWithObjects: HVkMVDZ, UVkWrite, UVkFLOAT, nil];
+			NSDictionary* tmpParam10 = [NSDictionary dictionaryWithObjects: objects10 forKeys: keys];
+			[mParams setObject: tmpParam10 forKey: HVkMVDZ];
 		
-		NSArray* objects11 = [NSArray arrayWithObjects: HVkMCDZ, UVkWrite, UVkFloat, nil];
-		NSDictionary* tmpParam11 = [NSDictionary dictionaryWithObjects: objects11 forKeys: keys];
-		[mParams setObject: tmpParam11 forKey: HVkMCDZ];
+			NSArray* objects11 = [NSArray arrayWithObjects: HVkMCDZ, UVkWrite, UVkFLOAT, nil];
+			NSDictionary* tmpParam11 = [NSDictionary dictionaryWithObjects: objects11 forKeys: keys];
+			[mParams setObject: tmpParam11 forKey: HVkMCDZ];
 		
-		NSArray* objects12 = [NSArray arrayWithObjects: HVkHVLimit, UVkRead, UVkInt, nil];
-		NSDictionary* tmpParam12 = [NSDictionary dictionaryWithObjects: objects12 forKeys: keys];
-		[mParams setObject: tmpParam12 forKey: HVkHVLimit];
+			NSArray* objects12 = [NSArray arrayWithObjects: HVkHVLimit, UVkRead, UVkINT, nil];
+			NSDictionary* tmpParam12 = [NSDictionary dictionaryWithObjects: objects12 forKeys: keys];
+			[mParams setObject: tmpParam12 forKey: HVkHVLimit];
 
 
-		[mParams retain];
+			[mParams retain];
 		
-		// Debug code - normally commented out.
 			//Debug code - Print out parameters and their attributes.
-/*	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
-//	NSLog( @"command: %@,  type: %@,  R/W: %@\n", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
-//	                                            [[dictObjDeb objectForKey: UVkType] stringValue],
+	
+			NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
+			NSLog( @"command: %@,  type: %@,  R/W: %@\n", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
+	                                            [[dictObjDeb objectForKey: UVkType] stringValue],
     											[[dictObjDeb objectForKey: UVkRW] stringValue] );
 
-	NSArray*	allKeys = [mParams allKeys];
-	int j;
-	for ( j = 0; j < [mParams count]; j++ )
-	{
-		NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
-		NSString*	commandDict = [dictObj objectForKey: UVkCommand];		
-		NSString*	writableDict = [dictObj objectForKey: UVkRW];
-		NSString*   typeDict = [dictObj objectForKey: UVkType ];
+			NSArray*	allKeys = [mParams allKeys];
+			int j;
+			for ( j = 0; j < [mParams count]; j++ )
+			{
+				NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
+				NSString*	commandDict = [dictObj objectForKey: UVkCommand];		
+				NSString*	writableDict = [dictObj objectForKey: UVkRW];
+				NSString*   typeDict = [dictObj objectForKey: UVkType ];
 		
-		NSLog( @" Command '%@', R/W :%@, Type: %@\n", commandDict, writableDict, typeDict );
+				NSLog( @" Command '%@', R/W :%@, Type: %@\n", commandDict, writableDict, typeDict );
+			}
+		/* */
+	}	
+	@catch (NSException *exception) {
+		NSLog(@"awakeFromNib: Caught %@: %@", [exception name], [exception  reason]);
 	}
-	*/
-		
-//	NS_HANDLER
-//	NS_ENDHANDLER
+	@finally
+	{
+	}
 }
 
 - (void) setUpImage
@@ -245,27 +251,36 @@ NSString* UVkString = @"string";
 }
 
 
+//------------------------------------------------------------------------------------------
 #pragma mark •••sendCommands
-- (void) getValues
+//------------------------------------------------------------------------------------------
+- (void) getValues: (int) aCurrentChnl
 {
 	int		i;	
 	int		slot;
 	
 	slot = [self slot];
-	for ( i = 0; i < UVkNumChannels; i++ )
+	if ( aCurrentChnl > -1 )
 	{
-		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, i];
-		[[self crate] queueCommand: i totalCmds: UVkNumChannels slot: [self slot] channel: i command: command];
+		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, aCurrentChnl];
+		[[self crate] queueCommand: 0 totalCmds: 1 slot: [self slot] channel: aCurrentChnl command: command];
+	}
+	else 
+	{
+		for ( i = 0; i < UVkNumChannels; i++ )
+		{
+			NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, i];
+			[[self crate] queueCommand: i totalCmds: UVkNumChannels slot: [self slot] channel: i command: command];
+		}
 	}
 }
 
-- (void) loadValues
+//------------------------------------------------------------------------------------------
+- (void) loadValues: (int) aCurrentChnl
 {
 //	int			i;
-	int			j;
-//	float		value;
-	NSString*	command;
-	
+	int			jParam;
+//	float		value;	
 	//Debug code - 
 /*	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
 	NSLog( @"command: %@,  type: %@,  R/W: %@", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
@@ -275,48 +290,85 @@ NSString* UVkString = @"string";
 	// Loop through all parameters to load the values into the hardware.
 	NSArray*	allKeys = [mParams allKeys];
 	
-	for ( j = 0; j < [mParams count]; j++ )
+	// loop through parameters since we load all twelve channels at once on a normal basis.
+//	for ( jParam = 0; jParam < [allKeys count]; jParam++ )
+	for ( jParam = 0; jParam < 1; jParam++ )
 	{
-		int			i;
-		NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
-		NSString*	commandDict = [dictObj objectForKey: UVkCommand];		
-		NSString*	writableDict = [dictObj objectForKey: UVkRW];
+		int				iChnl;
+		NSString*		command = [NSString stringWithFormat: @""];
+		NSDictionary*	dictParamObj = [mParams objectForKey: [allKeys objectAtIndex: jParam]];				// Get static dictionary for this chnl describing the parameters.
+//		NSString*		commandDict = [dictParamObj objectForKey: UVkCommand];								// Get command from dictionary
+		NSString*		writableDict = [dictParamObj objectForKey: UVkRW];									// Get whether command is read only or writable.
 		
 /*		
 		NSString*   typeDict = [dictObj objectForKey: UVkType ];  // Debug only
 		NSLog( @" Command '%@', R/W :%@, Type: %@", commandDict, writableDict, typeDict );
 */
 		
-		if ( [writableDict isEqualTo: UVkWrite] )
-		
+		if ( [writableDict isEqualTo: UVkWrite] )		
 		{
-			for ( i = 0; i < HVkNumChannels; i++ )
+			
+			if ( aCurrentChnl > -1 )
 			{
-				NSMutableDictionary* chnlDict = [mChannelArray objectAtIndex: i]; // Get values we want to set for channel.
-				NSNumber* valueObj = [chnlDict objectForKey: commandDict];
-			
-				if ( i == 0 )
-				{
-					// LD command handles all channels at once so unit identifier is Sx followed by parameter followed
-					// by values for all 12 channels.
-					command = [NSString stringWithFormat: @"LD S%d %@", [self slot], i, commandDict];
-				}
-			
-				if ( [[dictObj objectForKey: UVkType] isEqualTo: UVkINT] )
-					command = [command stringByAppendingFormat: @" %d", [valueObj intValue]];
-				else if ([[dictObj objectForKey: UVkType] isEqualTo: UVkFLOAT])
-					command = [command stringByAppendingFormat: @" %g", [valueObj floatValue]];
-				else if ([[dictObj objectForKey: UVkType] isEqualTo: UVkSTRING])
-					command = [command stringByAppendingFormat: @" %@", [valueObj stringValue]];
-				
+				command = [self createCommand: aCurrentChnl          
+								 dictParamObj: dictParamObj
+								      command: command];
+				[command retain];
+				[[ self crate] queueCommand: jParam totalCmds: 1 slot: [self slot] channel: aCurrentChnl command: command];
+//				[[ self crate] queueCommand: jParam totalCmds: [mParams count] slot: [self slot] channel: aCurrentChnl command: command];
+				[command release];
 			}
 			
-			// Single command has been assembled - now queue it.
-			[[ self crate] queueCommand: j totalCmds: [mParams count] slot: [self slot] channel: i command: command];
-		}
-	}
+			else
+			{
+				// Loop through all channels to load all values for specified parameter for all channels with one command.
+				for ( iChnl = 0; iChnl < HVkNumChannels; iChnl++ )
+				{					
+					command = [self createCommand: iChnl 
+									 dictParamObj: dictParamObj
+									      command: command];
+				
+				    [command retain];
+					// Single command has been assembled for one param - now queue it.
+				    [[ self crate] queueCommand: jParam totalCmds: [mParams count] slot: [self slot] channel: iChnl command: command];
+					[command release];
+
+				} // Loop through channels
+			}     // Determine if one should process one or all channels
+		}			  // Determine if parameter is writeable.
+	}				  // Loop through all parameters.
 }
 
+//------------------------------------------------------------------------------------------
+- (NSString *) createCommand: (int) aCurChnl
+                dictParamObj: (NSDictionary *) aDictParamObj
+				     command: (NSString *) aCommand
+{
+	
+	// Get value to set parameter to.
+	NSMutableDictionary* chnlDict = [mChannelArray objectAtIndex: aCurChnl]; // Get values we want to set for channel.
+	NSString* param = [aDictParamObj objectForKey: HVkParam];
+	NSNumber* valueObj = [chnlDict objectForKey: param];
+	
+	// Get static dictionary for chnl describing the parameter.
+	
+
+	if ( [aCommand length] == 0 )
+	{
+		// LD command handles all channels at once so unit identifier is Sx followed by parameter followed
+		// by values for all 12 channels.
+		aCommand = [NSString stringWithFormat: @"LD S%d.%d %@", [self slot], aCurChnl, param];
+	}
+			
+	if ( [[aDictParamObj objectForKey: UVkType] isEqualTo: UVkINT] )
+		aCommand = [aCommand stringByAppendingFormat: @" %d", [valueObj intValue]];
+	else if ([[aDictParamObj objectForKey: UVkType] isEqualTo: UVkFLOAT])
+		aCommand = [aCommand stringByAppendingFormat: @" %g", [valueObj floatValue]];
+	else if ([[aDictParamObj objectForKey: UVkType] isEqualTo: UVkSTRING])
+		aCommand = [aCommand stringByAppendingFormat: @" %@", [valueObj stringValue]];
+		
+	return( aCommand );
+}
 
 
 #pragma mark •••Accessors

@@ -23,7 +23,7 @@
 
 #import "ORCrate.h"
 #define kUnivVoltHVCratePort 1090
-#define kUnivVoltHVAddress "192.168.1.10"
+#define kUnivVoltHVAddress "192.168.1.10\0"
 
 // Commands
 enum hveCommands {eUVNoCommand = 0, eHVStatus, eUVConfig, eUVEnet};
@@ -112,7 +112,7 @@ typedef enum hveCommands hveCommands;
 
 @end
 
-#pragma mark ***Notification string definitions.
+#pragma mark •••Notification string definitions.
 extern NSString* HVCrateIsConnectedChangedNotification;
 extern NSString* HVCrateIpAddressChangedNotification;
 //extern NSString* ORUnivVoltHVCrateHVStatusChangedNotification;

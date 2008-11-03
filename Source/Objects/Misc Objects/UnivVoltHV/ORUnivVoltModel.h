@@ -34,7 +34,7 @@ typedef enum hveStatus hveStatus;
 @interface ORUnivVoltModel : ORCard 
 {
 	id						adapter;
-	NSMutableArray*			mChannelArray;
+	NSMutableArray*			mChannelArray;	// Stores dictionary objects (one for each channel) of the parameter values for that channel.
 //	NSArray*				mSetCommands;
 //	NSArray*				mAllCommands;
 	NSMutableDictionary*	mParams;	//Dictionary of HV unit parameters indicating type of parameter and whether it is R or R/W. 
@@ -45,8 +45,11 @@ typedef enum hveStatus hveStatus;
 - (void) registerNotificationObservers;
 
 #pragma mark ••• Send Commands
-- (void)  getValues;
-- (void)  loadValues;
+- (void) getValues: (int) aCurrentChnl;
+- (void)  loadValues: (int) aCurrentChnl;
+- (NSString *) createCommand: (int) aCurChnl 
+                dictParamObj: (NSDictionary *) aDictParamObj
+				     command: (NSString *) aCommand;
 
 #pragma mark •••Accessors
 - (NSMutableArray*) channelArray;
@@ -101,6 +104,8 @@ extern NSString* UVChnlChanged;
 extern NSString* UVChnlHVValuesChanged;
 
 // HV unit Parameters
+// Data is stored as dictionary objects in mChannelArray.
+extern NSString* HVkParam;			// The parameters
 extern NSString* HVkChnlEnabled;		//1
 extern NSString* HVkMeasuredCurrent;	//2
 extern NSString* HVkMeasuredHV;			//3
