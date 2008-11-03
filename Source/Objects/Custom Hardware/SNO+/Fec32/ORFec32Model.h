@@ -52,6 +52,8 @@
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (int)     globalCardNumber;
+- (NSComparisonResult) globalCardNumberCompare:(id)aCard;
 - (BOOL)	showVolts;
 - (void)	setShowVolts:(BOOL)aShowVolts;
 - (NSString*)	comments;

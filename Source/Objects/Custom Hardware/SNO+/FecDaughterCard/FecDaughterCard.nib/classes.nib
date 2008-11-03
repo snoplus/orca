@@ -84,7 +84,11 @@
 			<dict>
 				<key>commentsTextFieldAction</key>
 				<string>id</string>
+				<key>decCardAction</key>
+				<string>id</string>
 				<key>decCmosRegAction</key>
+				<string>id</string>
+				<key>incCardAction</key>
 				<string>id</string>
 				<key>incCmosRegAction</key>
 				<string>id</string>

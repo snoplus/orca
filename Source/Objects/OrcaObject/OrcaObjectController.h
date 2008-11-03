@@ -54,6 +54,8 @@
 - (void)updateSlider:(NSSlider *)control setting:(int)inValue;
 - (void)updateStepper:(NSStepper *)control setting:(int)inValue;
 - (void)updateIntText:(NSTextField *)control setting:(int)inValue;
+- (void) incModelSortedBy:(SEL)aSelector;
+- (void) decModelSortedBy:(SEL)aSelector;
 
 #pragma mark ¥¥¥Notifications
 - (void) checkGlobalSecurity;

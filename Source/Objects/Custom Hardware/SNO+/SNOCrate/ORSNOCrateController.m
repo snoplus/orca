@@ -72,11 +72,29 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+	[memBaseAddressField setIntValue:[model memoryAddress]];
+	[regBaseAddressField setIntValue:[model registerAddress]];
+	[crateNumberField setIntValue:[model crateNumber]];
 }
 
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+	[memBaseAddressField setIntValue:[model memoryAddress]];
+	[regBaseAddressField setIntValue:[model registerAddress]];
+	[crateNumberField setIntValue:[model crateNumber]];
 }
+
+#pragma mark •••Actions
+- (IBAction) incCrateAction:(id)sender
+{
+	[self incModelSortedBy:@selector(crateNumberCompare:)];
+}
+
+- (IBAction) decCrateAction:(id)sender
+{
+	[self decModelSortedBy:@selector(crateNumberCompare:)];
+}
+
 @end

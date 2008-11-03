@@ -202,6 +202,28 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 #pragma mark INTERFACE MANAGEMENT - Generic updaters
 
+- (void) incModelSortedBy:(SEL)aSelector
+{
+	[self endEditing];
+	NSMutableArray* allModels = [[[[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
+	[allModels sortUsingSelector:aSelector];
+	int index = [allModels indexOfObject:model] + 1;
+	if(index>[allModels count]-1) index = 0;
+	[self setModel:[allModels objectAtIndex:index]];
+ 	[allModels release];
+}
+
+- (void) decModelSortedBy:(SEL)aSelector
+{
+	[self endEditing];
+	NSMutableArray* allModels = [[[[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
+	[allModels sortUsingSelector:aSelector];
+	int index = [allModels indexOfObject:model] - 1;
+	if(index<0) index = [allModels count]-1;
+	[self setModel:[allModels objectAtIndex:index]];
+ 	[allModels release];
+}
+
 - (void)updateTwoStateCheckbox:(NSButton *)control setting:(BOOL)value
 { 
     if (value != [control state]) {
@@ -356,6 +378,8 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
 		}
 	}
 }
+
+
 
 - (IBAction) saveDocument:(id)sender
 {

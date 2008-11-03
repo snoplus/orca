@@ -17,13 +17,8 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-
 #pragma mark •••Imported Files
-
 #import "ORCrate.h"
-
-#pragma mark •••Forward Declarations
 
 @interface ORSNOCrateModel : ORCrate  {
 	int slot;
@@ -36,7 +31,7 @@
 - (Class) guardianClass;
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian;
 - (void) setSlot:(int)aSlot;
-- (int) slot;
+- (int)  slot;
 
 #pragma mark •••Accessors
 - (unsigned long) memoryAddress;

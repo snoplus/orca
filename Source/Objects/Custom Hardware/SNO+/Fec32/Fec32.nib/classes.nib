@@ -133,7 +133,11 @@
 				<string>id</string>
 				<key>commentsTextFieldAction</key>
 				<string>id</string>
+				<key>decCardAction</key>
+				<string>id</string>
 				<key>hvRefAction</key>
+				<string>id</string>
+				<key>incCardAction</key>
 				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
@@ -148,6 +152,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>cardNumberField</key>
+				<string>NSTextField</string>
 				<key>cmosMatrix</key>
 				<string>NSMatrix</string>
 				<key>commentsTextField</key>

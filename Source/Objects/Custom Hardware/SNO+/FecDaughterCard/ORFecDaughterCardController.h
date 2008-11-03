@@ -73,6 +73,8 @@
 - (IBAction) setAllCmosAction:(id)sender;
 - (IBAction) incCmosRegAction:(id)sender;
 - (IBAction) decCmosRegAction:(id)sender;
+- (IBAction) incCardAction:(id)sender;
+- (IBAction) decCardAction:(id)sender;
 - (IBAction) rp1Action:(id)sender;
 - (IBAction) rp2Action:(id)sender; 
 - (IBAction) vliAction:(id)sender; 

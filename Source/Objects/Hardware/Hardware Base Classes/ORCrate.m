@@ -246,6 +246,10 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 
 }
 
+- (NSComparisonResult) crateNumberCompare:(id)aCard
+{
+	return [self crateNumber] - [aCard crateNumber];
+}
 
 - (void) sortCards
 {

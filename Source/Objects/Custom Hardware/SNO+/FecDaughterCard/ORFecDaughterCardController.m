@@ -165,6 +165,12 @@
 	[self cmosRegShownChanged:nil];
 }
 
+- (void) setModel:(OrcaObject*)aModel
+{
+    [super setModel:aModel];
+	[cardNumberField setIntValue:[model slot]];
+}
+
 - (void) showVoltsChanged:(NSNotification*)aNote
 {
 	[showVoltsCB setIntValue: [model showVolts]];
@@ -186,6 +192,7 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"FecDaughterCard (%@)",[model identifier]]];
+	[cardNumberField setIntValue:[model slot]];
 }
 
 - (void) setAllCmosChanged:(NSNotification*)aNote
@@ -314,6 +321,16 @@
 {
 	[self endEditing];
 	[model setCmosRegShown:[model cmosRegShown]-1];
+}
+
+- (IBAction) incCardAction:(id)sender
+{
+	[self incModelSortedBy:@selector(globalCardNumberCompare:)];
+}
+
+- (IBAction) decCardAction:(id)sender
+{
+	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
 }
 
 - (IBAction) rp1Action:(id)sender

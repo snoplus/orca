@@ -24,6 +24,9 @@
 
 @interface ORSNOCrateController : ORCrateController
 {
+	IBOutlet NSTextField* memBaseAddressField;
+	IBOutlet NSTextField* regBaseAddressField;
+    IBOutlet NSTextField* crateNumberField;
 }
 
 #pragma mark •••Initializations
@@ -37,5 +40,9 @@
 #pragma mark •••Interface Management
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) setModel:(id)aModel;
+
+#pragma mark •••Actions
+- (IBAction) incCrateAction:(id)sender;
+- (IBAction) decCrateAction:(id)sender;
 
 @end

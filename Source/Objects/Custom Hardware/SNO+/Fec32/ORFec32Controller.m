@@ -147,6 +147,7 @@
 {
     [super setModel:aModel];
     [groupView setGroup:(ORGroup*)model];
+	[cardNumberField setIntValue:[model slot]];
 }
 
 #pragma mark •••Interface Management
@@ -196,6 +197,7 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"Fec32 (Slot %d)",[model slot]]];
+	[cardNumberField setIntValue:[model slot]];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -270,6 +272,15 @@
 	}
 }
 
+- (IBAction) incCardAction:(id)sender
+{
+	[self incModelSortedBy:@selector(globalCardNumberCompare:)];
+}
+
+- (IBAction) decCardAction:(id)sender
+{
+	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
+}
 
 
 

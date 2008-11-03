@@ -36,6 +36,7 @@
     IBOutlet NSMatrix*		cmosMatrix;
     IBOutlet NSButton*		lockButton;
 	IBOutlet NSTextField*   lockDocField;
+	IBOutlet NSTextField*   cardNumberField;
 	
 	NSNumberFormatter*		cmosFormatter;
 }
@@ -59,6 +60,8 @@
 - (void) cmosChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) incCardAction:(id)sender;
+- (IBAction) decCardAction:(id)sender;
 - (IBAction) showVoltsAction:(id)sender;
 - (IBAction) commentsTextFieldAction:(id)sender;
 - (IBAction) lockAction:(id) sender;

@@ -48,6 +48,7 @@
 - (BOOL) showLabels;
 - (void) setShowLabels:(BOOL)aState;
 - (NSComparisonResult)sortCompare:(OrcaObject*)anObj;
+- (NSComparisonResult) crateNumberCompare:(id)aCard;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

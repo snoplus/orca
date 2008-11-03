@@ -48,6 +48,15 @@ NSString* ORFecLock			= @"ORFecLock";
 }
 
 #pragma mark ***Accessors
+- (int) globalCardNumber
+{
+	return ([guardian crateNumber] * 16) + [self slot];
+}
+
+- (NSComparisonResult) globalCardNumberCompare:(id)aCard
+{
+	return [self globalCardNumber] - [aCard globalCardNumber];
+}
 
 - (BOOL) showVolts
 {

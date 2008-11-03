@@ -71,6 +71,16 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 }
 
 #pragma mark •••Accessors
+- (int) globalCardNumber
+{
+	return ([[guardian guardian ] crateNumber] * 16) + ([guardian slot] * 4) + [self slot];	
+}
+
+- (NSComparisonResult) globalCardNumberCompare:(id)aCard
+{
+	return [self globalCardNumber] - [aCard globalCardNumber];
+}
+
 - (NSString*) comments
 {
     return comments;
