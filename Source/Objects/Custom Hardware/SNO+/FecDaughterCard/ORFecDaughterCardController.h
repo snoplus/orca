@@ -36,12 +36,14 @@
 		IBOutlet NSTextField* ns20delayField;
 		IBOutlet NSTextField* tac0trimField; 	   
 		IBOutlet NSTextField* tac1trimField;
-		IBOutlet NSTextField* cardLabelField;
-		IBOutlet NSTextField* cardNumberField;
 		IBOutlet NSTextField* cmosRegShownField;
 		IBOutlet NSTextField* cmosRegShownField1;
 		IBOutlet NSButton*	  showVoltsCB;
 		IBOutlet NSTextField* commentsTextField;
+		IBOutlet NSTextField* cardLabelField;
+		IBOutlet NSTextField* dcNumberField;
+		IBOutlet NSTextField* fecNumberField;
+		IBOutlet NSTextField* crateNumberField;
 		
 		NSNumberFormatter*		valueFormatter;
 }

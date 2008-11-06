@@ -36,9 +36,22 @@
     IBOutlet NSMatrix*		cmosMatrix;
     IBOutlet NSButton*		lockButton;
 	IBOutlet NSTextField*   lockDocField;
-	IBOutlet NSTextField*   cardNumberField;
-	
+	IBOutlet NSTextField*	crateNumberField;
+	IBOutlet NSTextField*   fecNumberField;
+	IBOutlet NSMatrix*		pmtImages0;
+	IBOutlet NSMatrix*		onlineSwitches0;
+	IBOutlet NSMatrix*		onlineSwitches1;
+	IBOutlet NSMatrix*		onlineSwitches2;
+	IBOutlet NSMatrix*		onlineSwitches3;
+	IBOutlet NSMatrix*		pmtImages1;
+	IBOutlet NSMatrix*		pmtImages2;
+	IBOutlet NSMatrix*		pmtImages3;
 	NSNumberFormatter*		cmosFormatter;
+	
+	//cache some stuff to make things easier
+	NSMatrix* onlineSwitches[4];
+	NSMatrix* pmtImages[4];
+	NSImage* onlineStateImage[4][2];
 }
 
 #pragma mark •••Accessors
@@ -48,6 +61,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) enablePmtGroup:(short)enabled groupNumber:(short)group;
+- (void) onlineMaskChanged:(NSNotification*)aNote;
 - (void) showVoltsChanged:(NSNotification*)aNote;
 - (void) commentsChanged:(NSNotification*)aNote;
 - (void) updateButtons;
@@ -60,6 +75,7 @@
 - (void) cmosChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) onlineMaskAction:(id)sender;
 - (IBAction) incCardAction:(id)sender;
 - (IBAction) decCardAction:(id)sender;
 - (IBAction) showVoltsAction:(id)sender;

@@ -168,7 +168,9 @@
 - (void) setModel:(OrcaObject*)aModel
 {
     [super setModel:aModel];
-	[cardNumberField setIntValue:[model slot]];
+	[dcNumberField setIntValue:[model slot]];
+	[fecNumberField setIntValue:[[model guardian] slot]];
+	[crateNumberField setIntValue:[[[model guardian] guardian] crateNumber]];
 }
 
 - (void) showVoltsChanged:(NSNotification*)aNote
@@ -192,7 +194,9 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"FecDaughterCard (%@)",[model identifier]]];
-	[cardNumberField setIntValue:[model slot]];
+	[dcNumberField setIntValue:[model slot]];
+	[fecNumberField setIntValue:[[model guardian] slot]];
+	[crateNumberField setIntValue:[[[model guardian] guardian] crateNumber]];
 }
 
 - (void) setAllCmosChanged:(NSNotification*)aNote
@@ -377,57 +381,62 @@
 	   
 - (IBAction) ns100widthAction:(id)sender
 {
+	int theValue = [sender intValue];
 	if([model setAllCmos]) {
 		int i;
 		for(i=0;i<8;i++){
-			[model setNs100width:i withValue:[sender intValue]];
+			[model setNs100width:i withValue:theValue];
 		}
 	}
-	else [model setNs100width:[model cmosRegShown] withValue:[sender intValue]];
+	else [model setNs100width:[model cmosRegShown] withValue:theValue];
 }
 			   
 - (IBAction) ns20widthAction:(id)sender
 {
+	int theValue = [sender intValue];
 	if([model setAllCmos]) {
 		int i;
 		for(i=0;i<8;i++){
-			[model setNs20width:i withValue:[sender intValue]];
+			[model setNs20width:i withValue:theValue];
 		}
 	}
-	else [model setNs20width:[model cmosRegShown] withValue:[sender intValue]];
+	else [model setNs20width:[model cmosRegShown] withValue:theValue];
 }
  
 - (IBAction) ns20delayAction:(id)sender
 {
+	int theValue = [sender intValue];
 	if([model setAllCmos]) {
 		int i;
 		for(i=0;i<8;i++){
-			[model setNs20delay:i withValue:[sender intValue]];
+			[model setNs20delay:i withValue:theValue];
 		}
 	}
-	else [model setNs20delay:[model cmosRegShown] withValue:[sender intValue]];
+	else [model setNs20delay:[model cmosRegShown] withValue:theValue];
 }
 
 - (IBAction) tac0trimAction:(id)sender
 {
+	int theValue = [sender intValue];
 	if([model setAllCmos]) {
 		int i;
 		for(i=0;i<8;i++){
-			[model setTac0trim:i withValue:[sender intValue]];
+			[model setTac0trim:i withValue:theValue];
 		}
 	}
-	else [model setTac0trim:[model cmosRegShown] withValue:[sender intValue]];
+	else [model setTac0trim:[model cmosRegShown] withValue:theValue];
 }
  	   
 - (IBAction) tac1trimAction:(id)sender
 {
+	int theValue = [sender intValue];
 	if([model setAllCmos]) {
 		int i;
 		for(i=0;i<8;i++){
-			[model setTac1trim:i withValue:[sender intValue]];
+			[model setTac1trim:i withValue:theValue];
 		}
 	}
-	else [model setTac1trim:[model cmosRegShown] withValue:[sender intValue]];
+	else [model setTac1trim:[model cmosRegShown] withValue:theValue];
 }
 
 @end

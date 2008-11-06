@@ -24,6 +24,9 @@
 #import "ORFec32Model.h"
 #import "ORFec32View.h"
 #import "ORFecPmtsView.h"
+#import "ORPmtImage.h"
+#import "ORSwitchImage.h"
+#import "ORFecDaughterCardModel.h";
 
 @implementation ORFec32Controller
 
@@ -37,6 +40,13 @@
 - (void) dealloc
 {
 	[cmosFormatter release];
+	int i;
+	int j;
+	for(i=0;i<4;i++){
+		for(j=0;j<2;j++){
+			[onlineStateImage[i][j] release];
+		}
+	}
 	[super dealloc];
 }
 
@@ -48,6 +58,41 @@
 	for(i=0;i<6;i++){
 		[[cmosMatrix cellWithTag:i] setFormatter:cmosFormatter];
 	}
+	//cache these into arrays for easy access later
+	onlineSwitches[0] = onlineSwitches0;
+	onlineSwitches[1] = onlineSwitches1;
+	onlineSwitches[2] = onlineSwitches2;
+	onlineSwitches[3] = onlineSwitches3;
+	pmtImages[0] = pmtImages0;
+	pmtImages[1] = pmtImages1;
+	pmtImages[2] = pmtImages2;
+	pmtImages[3] = pmtImages3;
+
+	//set up the switch images and the pmt images
+	for(i=0;i<8;i++){
+		[[pmtImages0 cellAtRow:0 column:i] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:180]];
+		[[onlineSwitches0 cellAtRow:0 column:i] setTag:7-i];
+
+		[[pmtImages1 cellAtRow:i column:0] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:90]];
+		[[onlineSwitches1 cellAtRow:i column:0] setTag:15-i];
+
+		[[pmtImages2 cellAtRow:i column:0] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:90]];
+		[[onlineSwitches2 cellAtRow:i column:0] setTag:23-i];
+
+		[[pmtImages3 cellAtRow:0 column:i] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:0]];
+		[[onlineSwitches3 cellAtRow:0 column:i] setTag:24+i];
+	}
+	
+	//cache some switch images
+	onlineStateImage[0][1]	= [[ORSwitchImage closedSwitchWithAngle:90] retain];
+	onlineStateImage[0][0]	= [[ORSwitchImage openSwitchWithAngle:90] retain];
+	onlineStateImage[1][1]	= [[ORSwitchImage closedSwitchWithAngle:0] retain];
+	onlineStateImage[1][0]	= [[ORSwitchImage openSwitchWithAngle:0] retain];
+	onlineStateImage[2][1]	= [[ORSwitchImage closedSwitchWithAngle:0] retain];
+	onlineStateImage[2][0]	= [[ORSwitchImage openSwitchWithAngle:0] retain];
+	onlineStateImage[3][1]	= [[ORSwitchImage closedSwitchWithAngle:-90] retain];
+	onlineStateImage[3][0]	= [[ORSwitchImage openSwitchWithAngle:-90] retain];
+	
 	[super awakeFromNib];
 }
 
@@ -110,14 +155,20 @@
 					 selector : @selector(lockChanged:)
 						 name : ORFecLock
 						object: nil];
+						
     [notifyCenter addObserver : self
                      selector : @selector(commentsChanged:)
-                         name : ORFec32ModelCommentsChanged
+                         name : ORFecCommentsChanged
 						object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(showVoltsChanged:)
-                         name : ORFec32ModelShowVoltsChanged
+                         name : ORFecShowVoltsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(onlineMaskChanged:)
+                         name : ORFecOnlineMaskChanged
 						object: model];
 
 }
@@ -125,6 +176,7 @@
 - (void) updateWindow
 {
 	[super updateWindow];
+	[self onlineMaskChanged:nil];
 	[self showVoltsChanged:nil];
     [self runStatusChanged:nil];
     [self lockChanged:nil];
@@ -134,6 +186,7 @@
 	[self cmosChanged:nil];
     [groupView setNeedsDisplay:YES];
 	[self commentsChanged:nil];
+	[pmtView setNeedsDisplay:YES];
 }
 
 #pragma mark •••Accessors
@@ -142,15 +195,33 @@
     return [self groupView];
 }
 
-
 - (void) setModel:(OrcaObject*)aModel
 {
     [super setModel:aModel];
     [groupView setGroup:(ORGroup*)model];
-	[cardNumberField setIntValue:[model slot]];
+	[fecNumberField setIntValue:[model slot]];
+	[crateNumberField setIntValue:[[model guardian] crateNumber]];
+	[pmtView setNeedsDisplay:YES];
+ 	[self updateButtons];
 }
 
 #pragma mark •••Interface Management
+- (void) enablePmtGroup:(short)enabled groupNumber:(short)group
+{
+	[onlineSwitches[group] setEnabled:enabled];
+ 	[self updateButtons];
+}
+
+- (void) onlineMaskChanged:(NSNotification*)aNote
+{
+	int i;
+	unsigned long aMask = [model onlineMask];
+	for(i=0;i<32;i++){
+		int pmtGroup = i/8;
+		int state = (aMask & (1L<<i))!=0;
+		[[onlineSwitches[pmtGroup] cellWithTag:i] setImage:onlineStateImage[pmtGroup][state]];
+	}
+}
 
 - (void) showVoltsChanged:(NSNotification*)aNote
 {
@@ -179,6 +250,10 @@
 	[vResField		setEnabled: !lockedOrRunningMaintenance];
 	[hvRefField		setEnabled: !lockedOrRunningMaintenance];
 	[cmosMatrix		setEnabled: !lockedOrRunningMaintenance];
+	int i;
+	for(i=0;i<4;i++){
+		[onlineSwitches[i] setEnabled:[model dcPresent:i] && !lockedOrRunningMaintenance];
+	}
 }
 
 - (void) lockChanged:(NSNotification*)aNotification
@@ -196,8 +271,10 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"Fec32 (Slot %d)",[model slot]]];
-	[cardNumberField setIntValue:[model slot]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Fec32 (%d,%d)",[[model guardian] crateNumber],[model slot]]];
+	[fecNumberField setIntValue:[model slot]];
+	[crateNumberField setIntValue:[[model guardian] crateNumber]];
+	[pmtView setNeedsDisplay:YES];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -235,6 +312,13 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) onlineMaskAction:(id)sender
+{
+	int tag = [[sender selectedCell] tag];
+	unsigned long mask = [model onlineMask];
+	mask ^= (1L<<tag);
+	[model setOnlineMask:mask];
+}
 
 - (IBAction) showVoltsAction:(id)sender
 {

@@ -46,12 +46,17 @@
 	unsigned char	vRes;	//VRES for bipolar chip
 	unsigned char	hVRef;	//HVREF for high voltage
     NSString*		comments;
-    BOOL			showVolts;
+    BOOL			showVolts;	
+	unsigned long   onlineMask;
+	BOOL			dcPresent[4];
 }
 - (void) setUpImage;
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (BOOL) dcPresent:(unsigned short)index;
+- (unsigned long) onlineMask;
+- (void) setOnlineMask:(unsigned long) aMask;
 - (int)     globalCardNumber;
 - (NSComparisonResult) globalCardNumberCompare:(id)aCard;
 - (BOOL)	showVolts;
@@ -78,11 +83,12 @@
 - (void)encodeWithCoder:(NSCoder*)encoder;
 @end
 
-extern NSString* ORFec32ModelShowVoltsChanged;
-extern NSString* ORFec32ModelCommentsChanged;
+extern NSString* ORFecShowVoltsChanged;
+extern NSString* ORFecCommentsChanged;
 extern NSString* ORFecCmosChanged;
 extern NSString* ORFecVResChanged;
 extern NSString* ORFecHVRefChanged;
+extern NSString* ORFecOnlineMaskChanged;
 
 extern NSString* ORFecLock;
 

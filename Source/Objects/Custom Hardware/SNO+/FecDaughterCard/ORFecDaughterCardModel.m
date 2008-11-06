@@ -21,6 +21,7 @@
 #pragma mark •••Imported Files
 #import "ORFecDaughterCardModel.h"
 
+
 NSString* ORDCModelCommentsChanged			= @"ORDCModelCommentsChanged";
 NSString* ORDCModelShowVoltsChanged			= @"ORDCModelShowVoltsChanged";
 NSString* ORDCModelSetAllCmosChanged		= @"ORDCModelSetAllCmosChanged";
@@ -105,9 +106,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 - (void) setShowVolts:(BOOL)aShowVolts
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setShowVolts:showVolts];
-    
     showVolts = aShowVolts;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelShowVoltsChanged object:self];
 }
 
@@ -119,9 +118,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 - (void) setSetAllCmos:(BOOL)aSetAllCmos
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSetAllCmos:setAllCmos];
-    
     setAllCmos = aSetAllCmos;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelSetAllCmosChanged object:self];
 }
 
@@ -136,9 +133,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 	if(aCmosRegShown>7)aCmosRegShown = 0;
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setCmosRegShown:cmosRegShown];
-    
     cmosRegShown = aCmosRegShown;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelCmosRegShownChanged object:self];
 }
 

@@ -65,7 +65,6 @@
 		BOOL	setAllCmos;
 		BOOL	showVolts;
 		NSString* comments;
-
 }
 
 #pragma mark •••Initialization

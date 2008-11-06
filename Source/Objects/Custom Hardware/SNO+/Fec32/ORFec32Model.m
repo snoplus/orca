@@ -20,14 +20,16 @@
 
 #pragma mark •••Imported Files
 #import "ORFec32Model.h"
+#import "ORFecDaughterCardModel.h"
 
-NSString* ORFec32ModelShowVoltsChanged = @"ORFec32ModelShowVoltsChanged";
-NSString* ORFec32ModelCommentsChanged = @"ORFec32ModelCommentsChanged";
-NSString* ORFecCmosChanged	= @"ORFecCmosChanged";
-NSString* ORFecVResChanged	= @"ORFecVResChanged";
-NSString* ORFecHVRefChanged = @"ORFecHVRefChanged";
-NSString* ORFecLock			= @"ORFecLock";
-	
+NSString* ORFecShowVoltsChanged	= @"ORFecShowVoltsChanged";
+NSString* ORFecCommentsChanged	= @"ORFecCommentsChanged";
+NSString* ORFecCmosChanged		= @"ORFecCmosChanged";
+NSString* ORFecVResChanged		= @"ORFecVResChanged";
+NSString* ORFecHVRefChanged		= @"ORFecHVRefChanged";
+NSString* ORFecLock				= @"ORFecLock";
+NSString* ORFecOnlineMaskChanged= @"ORFecOnlineMaskChanged";
+
 @implementation ORFec32Model
 
 #pragma mark •••Initialization
@@ -36,7 +38,6 @@ NSString* ORFecLock			= @"ORFecLock";
     self = [super init];
     
     [[self undoManager] disableUndoRegistration];
-
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -47,7 +48,40 @@ NSString* ORFecLock			= @"ORFecLock";
     [super dealloc];
 }
 
+- (void) objectCountChanged
+{
+	int i;
+	for(i=0;i<4;i++)dcPresent[i] =  NO;
+	
+	id aCard;
+	NSEnumerator* e = [self objectEnumerator];
+	while(aCard = [e nextObject]){
+		if([aCard isKindOfClass:[ORFecDaughterCardModel class]]){
+			dcPresent[[(ORFecDaughterCardModel*)aCard slot]] = YES;
+		}
+	}
+}
+
 #pragma mark ***Accessors
+- (BOOL) dcPresent:(unsigned short)index
+{
+	if(index<4)return dcPresent[index];
+	else return NO;
+}
+
+- (unsigned long) onlineMask
+{
+	return onlineMask;
+}
+
+- (void) setOnlineMask:(unsigned long) aMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:onlineMask];
+    onlineMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecOnlineMaskChanged object:self];
+	
+}
+
 - (int) globalCardNumber
 {
 	return ([guardian crateNumber] * 16) + [self slot];
@@ -57,6 +91,7 @@ NSString* ORFecLock			= @"ORFecLock";
 {
 	return [self globalCardNumber] - [aCard globalCardNumber];
 }
+
 
 - (BOOL) showVolts
 {
@@ -69,7 +104,7 @@ NSString* ORFecLock			= @"ORFecLock";
     
     showVolts = aShowVolts;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelShowVoltsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecShowVoltsChanged object:self];
 }
 
 - (NSString*) comments
@@ -85,7 +120,7 @@ NSString* ORFecLock			= @"ORFecLock";
     [comments autorelease];
     comments = [aComments copy];    
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCommentsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCommentsChanged object:self];
 }
 
 - (void) setUpImage
@@ -182,6 +217,7 @@ NSString* ORFecLock			= @"ORFecLock";
     [self setComments:	[decoder decodeObjectForKey:@"comments"]];
     [self setVRes:		[decoder decodeFloatForKey: @"vRes"]];
     [self setHVRef:		[decoder decodeFloatForKey: @"hVRef"]];
+	[self setOnlineMask:[decoder decodeInt32ForKey:@"onlineMask"]];
 	int i;
 	for(i=0;i<6;i++){
 		[self setCmos:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"cmos%d",i]]];
@@ -200,6 +236,7 @@ NSString* ORFecLock			= @"ORFecLock";
 	[encoder encodeObject:comments	forKey:@"comments"];
 	[encoder encodeFloat:vRes		forKey:@"vRes"];
 	[encoder encodeFloat:hVRef		forKey:@"hVRef"];
+	[encoder encodeInt32:onlineMask forKey:@"onlineMask"];
 	int i;
 	for(i=0;i<6;i++){
 		[encoder encodeFloat:cmos[i] forKey:[NSString stringWithFormat:@"cmos%d",i]];

@@ -22,12 +22,6 @@
 @interface ORFecPmtsView : NSView {
 	IBOutlet id controller;
 	IBOutlet id anchorView; //view to draw pmt lines to/from
-	NSBezierPath* topPath[32];
-	NSBezierPath* bodyPath[32];	
-	NSBezierPath* clickPath[32];
-
 }
-- (void) drawPMT:(int)index at:(NSPoint)neckPoint direction:(float)angle ;
-- (void) drawSwitch:(int)index at:(NSPoint)switchPoint direction:(float)angle;
 
 @end
