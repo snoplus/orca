@@ -141,6 +141,8 @@
 				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
+				<key>onlineMaskAction</key>
+				<string>id</string>
 				<key>showVoltsAction</key>
 				<string>id</string>
 				<key>vResAction</key>
@@ -152,11 +154,13 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>cardNumberField</key>
-				<string>NSTextField</string>
 				<key>cmosMatrix</key>
 				<string>NSMatrix</string>
 				<key>commentsTextField</key>
+				<string>NSTextField</string>
+				<key>crateNumberField</key>
+				<string>NSTextField</string>
+				<key>fecNumberField</key>
 				<string>NSTextField</string>
 				<key>groupView</key>
 				<string>ORFec32View</string>
@@ -166,6 +170,22 @@
 				<string>NSButton</string>
 				<key>lockDocField</key>
 				<string>NSTextField</string>
+				<key>onlineSwitches0</key>
+				<string>NSMatrix</string>
+				<key>onlineSwitches1</key>
+				<string>NSMatrix</string>
+				<key>onlineSwitches2</key>
+				<string>NSMatrix</string>
+				<key>onlineSwitches3</key>
+				<string>NSMatrix</string>
+				<key>pmtImages0</key>
+				<string>NSMatrix</string>
+				<key>pmtImages1</key>
+				<string>NSMatrix</string>
+				<key>pmtImages2</key>
+				<string>NSMatrix</string>
+				<key>pmtImages3</key>
+				<string>NSMatrix</string>
 				<key>pmtView</key>
 				<string>ORFecPmtsView</string>
 				<key>showVoltsCB</key>

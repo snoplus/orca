@@ -127,13 +127,17 @@
 			<dict>
 				<key>cardLabelField</key>
 				<string>NSTextField</string>
-				<key>cardNumberField</key>
-				<string>NSTextField</string>
 				<key>cmosRegShownField</key>
 				<string>NSTextField</string>
 				<key>cmosRegShownField1</key>
 				<string>NSTextField</string>
 				<key>commentsTextField</key>
+				<string>NSTextField</string>
+				<key>crateNumberField</key>
+				<string>NSTextField</string>
+				<key>dcNumberField</key>
+				<string>NSTextField</string>
+				<key>fecNumberField</key>
 				<string>NSTextField</string>
 				<key>ns100widthField</key>
 				<string>NSTextField</string>
