@@ -10,11 +10,17 @@ OBJECTS = $(SOURCES:.c=.o)
 
 #----add in flags for your driver libraries and include files
 #UCFLAGS =  -g -Wall -gstabs+ -D_LINUX -fexceptions 
-UCFLAGS =  -g -Wall  -gstabs+
+# ===> use this -tb- !!!!   UCFLAGS =  -g -Wall  -gstabs+
+UCFLAGS =  -g -Wall  -gstabs+ -I/home/bergmann/pbusaccess/ 
 #LFLAGS  = -fexceptions -lpbusaccess -lPbus1394 -lakutil -lpthread -lstdc++ \
 #                                /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation \
 #                                /System/Library/Frameworks/IOKit.framework/IOKit 
-LFLAGS  =  -fexceptions -lpbusaccess -lPbusSim -lHw -lPbusSim -lakutil -lpthread -lstdc++ 
+
+#-tb- Use this for Pbus  simulation mode (yes, -lPbusSim is needed two times!):
+LFLAGS  =  -fexceptions -lpbusaccess -lPbusSim -lHw -lPbusSim  -lakutil -lpthread -lstdc++ 
+
+#-tb- Use this for V4 SLT PbusPCI lib (Linux only!):
+#LFLAGS  =  -fexceptions -lpbusaccess -lPbusPCI -lHw -lPbusPCI  -lakutil -lpthread -lstdc++ 
  
 
 LIBs    = 

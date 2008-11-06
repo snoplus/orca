@@ -45,17 +45,19 @@
 
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket];	//write the packet
+        NSLog(@"-tb- Sending a packet, waiting for response ...\n");
 		[self read:socketfd buffer:&aPacket];		//read the response
+        NSLog(@"-tb- Got the response ...\n");
 				
 		SBC_IPEv4ReadBlockStruct* rp = (SBC_IPEv4ReadBlockStruct*)aPacket.payload;
-        //NSLog(@"Addr = %08x, n=%d (err=%d)\n", rp->address, rp->numItems, rp->errorCode);
+        NSLog(@"Addr = %08x, n=%d (err=%d)\n", rp->address, rp->numItems, rp->errorCode);
 
 		if(!rp->errorCode){		
 			int num = rp->numItems;
 
 			rp++;
 			memcpy(buffer,rp,num*sizeof(long));
-            //NSLog(@"n=%d: %08x\n", num, buffer[0]);
+            NSLog(@"n=%d: %08x\n", num, buffer[0]);
 		}
 		else [self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section

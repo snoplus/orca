@@ -188,6 +188,26 @@ static IpeRegisterNamesStruct reg[kSLTNumRegs] = {
 #define SLT_NHIT_THRESHOLD_MASK  0x7f
 
 
+//IPE V4 electronic definitions
+
+enum IpeV4Enum{
+	kSLTV4ControlReg,
+	kSLTV4StatusReg,
+	kSLTV4CommandReg,
+	kSLTV4HWRevision,
+	kSLTV4NumRegs //must be last
+};
+
+static IpeRegisterNamesStruct regV4[kSLTV4NumRegs] = {
+    //2nd column is PCI register address shifted 2 bits to right (the two rightmost bits are always zero) -tb-
+	{@"Control",			0xa80000>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"Status",				0xa80004>>2,		-1,				kIpeRegReadable},
+	{@"Command",			0xa80008>>2,		-1,				kIpeRegReadable | kIpeRegWriteable},
+	{@"HWRevision",			0xa80020>>2,		-1,				kIpeRegReadable},
+};
+
+
+
 #pragma mark ***External Strings
 NSString* ORIpeV4SLTModelPatternFilePathChanged		= @"ORIpeV4SLTModelPatternFilePathChanged";
 NSString* ORIpeV4SLTModelInterruptMaskChanged		= @"ORIpeV4SLTModelInterruptMaskChanged";
@@ -211,7 +231,10 @@ NSString* ORIpeV4SLTModelDisplayTriggerChanged		= @"ORIpeV4SLTModelDisplayTriger
 NSString* ORIpeV4SLTModelDisplayEventLoopChanged	= @"ORIpeV4SLTModelDisplayEventLoopChanged";
 NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
+NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChanged";
+
 @implementation ORIpeV4SLTModel
+
 
 - (id) init
 {
@@ -220,6 +243,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	[self setReadOutGroup:readList];
     [self makePoller:0];
 	[readList release];
+    IpeCrateVersion=4;//the default -tb-
     return self;
 }
 
@@ -277,6 +301,22 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 {
 	return NSClassFromString(@"ORIpeV4CrateModel");
 }
+
+- (void) setGuardian:(id)aGuardian //-tb-
+{
+	if(aGuardian){
+		if([aGuardian adapter] == nil){
+			[aGuardian setAdapter:self];			
+		}
+		//[self findInterface];
+	}
+	else {
+		//[self setFireWireInterface:nil];
+		[[self guardian] setAdapter:nil];
+	}
+	[super setGuardian:aGuardian];
+}
+
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -605,11 +645,15 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (short) getNumberRegisters			
 { 
+    if(IpeCrateVersion==4) return kSLTV4NumRegs; 
+    else //IpeCrateVersion==3
 	return kSLTNumRegs; 
 }
 
 - (NSString*) getRegisterName: (short) anIndex
 {
+    if(IpeCrateVersion==4) return regV4[anIndex].regName;
+    else // V3
 	return reg[anIndex].regName;
 }
 
@@ -899,7 +943,18 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 	
 }  
 
+- (int) IpeCrateVersion
+{
+    return IpeCrateVersion;
+}
 
+- (int) setIpeCrateVersion:(int) aValue
+{
+    IpeCrateVersion = aValue;
+    NSLog(@"setIpeCrateVersion: %i\n",aValue);
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4SLTIpeCrateVersionChanged object:self];
+    return IpeCrateVersion;
+}
 
 #pragma mark ***HW Access
 - (void) checkPresence
@@ -1014,12 +1069,20 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (void) writeReg:(unsigned short)index value:(unsigned long)aValue
 {
-	[self write:SLT_REG_ADDRESS(index) value:aValue];
+    if(IpeCrateVersion==4){
+	    [self write: regV4[index].addressOffset value:aValue];
+    }else{
+    	[self write: SLT_REG_ADDRESS(index) value:aValue];
+    }
 }
 
 - (unsigned long) readReg:(unsigned short) index
 {
-	return [self read:SLT_REG_ADDRESS(index)];
+    if(IpeCrateVersion==4){
+        return [self read: regV4[index].addressOffset];
+    }else{
+        return [self read: SLT_REG_ADDRESS(index)];
+    }
 }
 
 - (void) readAllStatus
@@ -1184,8 +1247,24 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 - (float) readVersion
 {
-	[self setFpgaVersion: [self readReg:kSLTVersion]/10.];
-    NSLog(@"IPE-DAQ interface version %@ (build %s %s)\n", ORIPE_VERSION, __DATE__, __TIME__);							  
+	if(IpeCrateVersion==3){
+        [self setFpgaVersion: [self readReg:kSLTVersion]/10.];
+        NSLog(@"IPE-DAQ interface version %@ (build %s %s, fpga version %f)\n", ORIPE_VERSION, __DATE__, __TIME__, fpgaVersion);	
+    }
+    
+    //pbusPCI interface test -tb- 2008-09-04 BEGIN	
+    if(IpeCrateVersion==4){
+        NSLog(@"V4: IPE-V4-SLT ; crate is %p\n",  [self crate]);	
+        unsigned long value = 23;
+        unsigned long address;
+        //address = 0xfd000000 + 0xa80020; NO! omit offset  -tb-
+        address =  0xa80020;
+        [self write: address value: value];	// a test for PbusSim -tb-				  
+        value = [self read: address];					  
+        NSLog(@"V4: IPE-V4-SLT HW revision 0x%08x = %i (from register address 0x%x)\n", value,value,address);	
+        [self setFpgaVersion: (((double)value)/10.)];
+    }
+    //pbusPCI interface test -tb- 2008-09-04 END						  
 	return fpgaVersion;
 }
 
@@ -1377,7 +1456,10 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [self setPageSize:				[decoder decodeIntForKey:@"ORIpeV4SLTPageSize"]]; // ak, 9.12.07
     [self setDisplayTrigger:		[decoder decodeBoolForKey:@"ORIpeV4SLTDisplayTrigger"]];
     [self setDisplayEventLoop:		[decoder decodeBoolForKey:@"ORIpeV4SLTDisplayEventLoop"]];
-
+    
+    //V3/V4 handling
+    [self setIpeCrateVersion:		[decoder decodeIntForKey:@"ORIpeCrateVersion"]];
+    if(IpeCrateVersion==0) IpeCrateVersion=4; //not saved, set the default -tb-
 
     if (!poller)[self makePoller:0];
 
@@ -1434,6 +1516,9 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
     [encoder encodeInt:pageSize         forKey:@"ORIpeV4SLTPageSize"]; // ak, 9.12.07
     [encoder encodeBool:displayTrigger   forKey:@"ORIpeV4SLTDisplayTrigger"];
     [encoder encodeBool:displayEventLoop forKey:@"ORIpeV4SLTDisplayEventLoop"];
+
+    //V3/V4 handling
+    [encoder encodeInt:IpeCrateVersion  forKey:@"ORIpeCrateVersion"];
 
 }
 
@@ -1712,6 +1797,7 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 
 
 #pragma mark •••SBC_Linking protocol
+
 - (NSString*) cpuName
 {
 	return [NSString stringWithFormat:@"SLT (Crate %d)",[self crateNumber]];

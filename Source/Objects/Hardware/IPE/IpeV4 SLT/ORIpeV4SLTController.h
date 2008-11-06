@@ -100,6 +100,9 @@
 		NSSize					cpuManagementSize;
 		NSSize					cpuTestsSize;
 
+        //V3/V4 handling
+        IBOutlet NSPopUpButton*	crateVersionPopup;
+
 
 };
 
@@ -137,6 +140,8 @@
 - (void) pulserAmpChanged:(NSNotification*) aNote;
 - (void) pulserDelayChanged:(NSNotification*) aNote;
 - (void) pageStatusChanged:(NSNotification*)aNote;
+//V3/V4 handling
+- (void) crateVersionChanged:(NSNotification*)aNote;
 
 - (void) enableRegControls;
 
@@ -180,5 +185,7 @@
 - (IBAction) loadPatternFile:(id)sender;
 - (IBAction) forceTrigger:(id)sender;
 - (IBAction) calibrateAction:(id)sender;
+//V3/V4 handling
+- (IBAction) crateVersionAction:(id)sender;
 
 @end

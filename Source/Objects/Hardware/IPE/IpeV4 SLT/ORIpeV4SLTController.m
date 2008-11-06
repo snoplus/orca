@@ -191,6 +191,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                          name : ORIpeV4SLTModelReadAllChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(crateVersionChanged:)
+                         name : ORIpeV4SLTIpeCrateVersionChanged
+						object: model];
+
 
 }
 
@@ -315,6 +320,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [self pollRunningChanged:nil];
 	[self patternFilePathChanged:nil];
 	[self readAllChanged:nil];
+	[self crateVersionChanged:nil];
+    
 }
 
 
@@ -449,6 +456,11 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 	[actualPageField setIntValue:[model actualPage]+1];
 	[nextPageField setIntValue:  [model nextPage]+1];
 	
+}
+
+- (void) crateVersionChanged:(NSNotification*)aNote
+{
+    [crateVersionPopup  selectItemWithTag: [model IpeCrateVersion]];
 }
 
 - (void) controlRegChanged:(NSNotification*)aNote
@@ -898,6 +910,15 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
                       nil,
                       nil,@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards.");
 }
+
+
+
+- (IBAction) crateVersionAction:(id)sender
+{
+    [model setIpeCrateVersion: [crateVersionPopup selectedTag]];
+}
+
+
 
 @end
 

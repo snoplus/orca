@@ -116,7 +116,7 @@
 - (void) adapterChanged:(NSNotification*)aNote
 {
 	if([aNote object] == self){
-		[[self adapter] findInterface];
+		[[self adapter] findInterface]; //TODO: this needs to be implemented -tb- 2008-09-19
 	}
 }
 
@@ -133,6 +133,8 @@
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
+    //TODO: FIXED this resets the adapter to 0x0 after setting it in [super super  initWithCoder ...], see ORCrate.m!!! -tb-
+
     
 	[[self undoManager] disableUndoRegistration];
         

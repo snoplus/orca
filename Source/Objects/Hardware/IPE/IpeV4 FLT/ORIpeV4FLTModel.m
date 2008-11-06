@@ -19,7 +19,8 @@
 //-------------------------------------------------------------
 
 #import "ORIpeV4FLTModel.h"
-#import "ORIpeSLTModel.h"
+//#import "ORIpeSLTModel.h"
+#import "ORIpeV4SLTModel.h"
 #import "ORIpeCrateModel.h"
 #import "ORIpeFireWireCard.h"
 #import "ORHWWizParam.h"
@@ -78,12 +79,14 @@ enum {
 	kFLTSumX2Reg,
 	kFLTChannelOnOffReg,
 	kFLTAdcMemory,
+	kFLTNumRegs //must be last
 };
 
-struct ipeV4Reg {
+struct ipeV4Reg {// not elegant, maybe move definition of struct to header file -tb-
 	unsigned long address;
 	unsigned long space;
-}ipeV4Reg[kNumFLTChannels] = {
+};
+struct ipeV4Reg ipeV3Reg[kNumFLTChannels] = {
 	{0x0L, 0x0L},	//kFLTControlReg
 	{0x1L, 0x0L},	//kFLTPixelStatus1Reg
 	{0x2L, 0x0L},	//kFLTPixelStatus2Reg
@@ -102,6 +105,53 @@ struct ipeV4Reg {
 	{0x5L, 0x1L},	//kFLTSumX2Reg
 	{0x6L, 0x1L},	//kFLTChannelOnOffReg
 	{0x0L, 0x2L}	//kFLTAdcMemory
+};
+
+enum IpeV4FLTEnum {
+	kFLTV4ControlReg,
+	kFLTV4PixelStatus1Reg,
+	kFLTV4PixelStatus2Reg,
+	kFLTV4PixelStatus3Reg,
+	kFLTV4DisOnCntrlReg,
+	kFLTV4MarginsLReg,
+	kFLTV4MarginsHReg,
+	kFLTV4CheckSumDReg,
+	kFLTV4TestPulsMemReg,
+	kFLTV4HitRateMemReg,
+	kFLTV4GainReg,
+	kFLTV4PeriphStatusReg,
+	kFLTV4StaticSetReg,
+	kFLTV4ThresholdReg,
+	kFLTV4SumXReg,
+	kFLTV4SumX2Reg,
+	kFLTV4ChannelOnOffReg,
+	kFLTV4AdcMemory,
+	kFLTV4CFPGAVersion,
+	kFLTV4FPGA8Version,
+	kFLTV4NumRegs //must be last
+};
+
+struct ipeV4Reg ipeV4Reg[kFLTV4NumRegs] = {
+	{0x0L, 0x0L},	//kFLTV4ControlReg
+	{0x1L, 0x0L},	//kFLTV4PixelStatus1Reg
+	{0x2L, 0x0L},	//kFLTV4PixelStatus2Reg
+	{0x3L, 0x0L},	//kFLTV4PixelStatus3Reg
+	{0x4L, 0x0L},	//kFLTV4DisOnCntrlReg
+	{0x5L, 0x0L},	//kFLTV4MarginsLReg
+	{0x6L, 0x0L},	//kFLTV4MarginsHReg
+	{0x7L, 0x0L},	//kFLTV4CheckSumDReg
+	{0x8L, 0x0L},	//kFLTV4TestPulsMemReg
+	{0x8L, 0x1L},	//kFLTV4HitRateMemReg
+	{0x9L, 0x1L},	//kFLTV4GainReg
+	{0x0L, 0x1L},	//kFLTV4PeriphStatusReg
+	{0x1L, 0x1L},	//kFLTV4StaticSetReg
+	{0x2L, 0x1L},	//kFLTV4ThresholdReg
+	{0x3L, 0x1L},	//kFLTV4SumXReg
+	{0x5L, 0x1L},	//kFLTV4SumX2Reg
+	{0x6L, 0x1L},	//kFLTV4ChannelOnOffReg
+	{0x0L, 0x2L},	//kFLTV4AdcMemory
+	{0x0cL, 0x0L},	//kFLTV4CFPGAVersion, 0x0c or 0x3
+	{0x10L, 0x0L}	//kFLTV4FPGA8Version, 0x10 or 0x4
 };
 
 static int trigChanConvFLT[4][6]={
@@ -695,12 +745,18 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 	NS_HANDLER
 		[self setPresent:NO];
 	NS_ENDHANDLER
-}
+} 
 
 - (int)  readVersion
 {	
-	unsigned long data = [self readControlStatus];
-	return (data >> kIpeFlt_Cntl_Version_Shift) & kIpeFlt_Cntl_Version_Mask;
+	unsigned long data = 0;
+    if([[[self crate] adapter] IpeCrateVersion]==3){
+        data = [self readControlStatus];
+	    return (data >> kIpeFlt_Cntl_Version_Shift) & kIpeFlt_Cntl_Version_Mask;
+    }
+    data = [self readReg:kFLTV4CFPGAVersion];
+    //data = [self readReg:kFLTV4FPGA8Version];
+	return data;
 }
 
 - (int)  readCardId
@@ -800,8 +856,14 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 
 - (unsigned long) readControlStatus
 {
-	unsigned long value =   [self readReg: kFLTControlReg ];
-	[self setLedOff: ((value & kIpeFlt_Cntl_LedOff_Mask) >> kIpeFlt_Cntl_LedOff_Shift)];
+    unsigned long value=0;
+    if([[[self crate] adapter] IpeCrateVersion]==3){
+	    value =   [self readReg: kFLTControlReg ];
+    	[self setLedOff: ((value & kIpeFlt_Cntl_LedOff_Mask) >> kIpeFlt_Cntl_LedOff_Shift)];
+    }else{
+	    //unsigned long value =   [self readReg: kFLTV4ControlReg ];
+	    value =   [self read: kFLTV4ControlReg ];
+    }
 	return value;
 }
 
@@ -918,12 +980,23 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel
 {
-	return ([self slot] << 24) | (ipeV4Reg[aReg].space << kIpeFlt_AddressSpace) | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress) | ipeV4Reg[aReg].address;
+    if([[[self crate] adapter] IpeCrateVersion]==3)
+	    return ([self slot] << 24) | (ipeV3Reg[aReg].space << kIpeFlt_AddressSpace) | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress) | ipeV3Reg[aReg].address;
+	return ([self slot] << 17)   | ipeV4Reg[aReg].address; //TODO: the channel ... -tb-   | ((aChannel&0x01f)<<kIpeFlt_ChannelAddress)
 }
 
+/** Detection of IPE electronic V3 or V4 is done automatically.
+  */ //-tb-
 - (unsigned long) regAddress:(int)aReg
 {
-	return ([self slot] << 24) | (ipeV4Reg[aReg].space << kIpeFlt_AddressSpace)  | ipeV4Reg[aReg].address;
+	id slt = [[self crate] adapter];
+    int version = [slt IpeCrateVersion];
+    if(version==3)
+	    return ([self slot] << 24) | (ipeV3Reg[aReg].space << kIpeFlt_AddressSpace)  | ipeV3Reg[aReg].address;
+    if(version==4)
+	    //return ([self slot] << 19) |  ipeV4Reg[aReg].address; //TODO: NEED <<17 !!! -tb-
+	    return ([self stationNumber] << 19) |  ipeV4Reg[aReg].address; //TODO: NEED <<17 !!! -tb-
+    return 0;
 }
 
 - (unsigned long) adcMemoryChannel:(int)aChannel page:(int)aPage
@@ -933,7 +1006,49 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 
 - (unsigned long) readReg:(int)aReg
 {
+//	ORIpeV4SLTModel slt = [[self crate] adapter];
+	id slt = [[self crate] adapter];
+    int version = [slt IpeCrateVersion];
+    NSLog(@"V4FLT:readReg started: crate %p, slt is %p, version is %i\n",[self crate],slt,version);
+    if(version==3)
 	return [self read:[self regAddress:aReg]];
+    if(version==4 || version==0){
+        NSLog(@"V4-FLT:readReg: detected V4 version\n");
+        //test: loop over crate group -tb-
+        id obj,crate;
+        crate=[self crate];
+        if(crate){
+            int i,n=[crate count];
+            NSString *className;
+            NSLog(@"V4-FLT:loop over %i crate objects\n",n);
+            for(i=0;i<n;i++){
+                obj=[crate objectAtIndex:i];
+                NSLog(@"   object %i: %p\n",i,obj);
+                className=@"OrcaObject";
+                if ( [obj isKindOfClass:NSClassFromString(className)] ) NSLog(@"   object %i is a %@\n",i,className);
+                className=@"ORIpeCard";
+                if ( [obj isKindOfClass:NSClassFromString(className)] ) NSLog(@"   object %i is a %@\n",i,className);
+                className=@"ORIpeV4FLTModel";
+                if ( [obj isKindOfClass:NSClassFromString(className)] ) NSLog(@"   object %i is a %@\n",i,className);
+                className=@"ORIpeV4SLTModel";
+                if ( [obj isKindOfClass:NSClassFromString(className)] ) NSLog(@"   object %i is a %@\n",i,className);
+	            if([obj guardian]){
+                    NSLog(@"   object %i has a guardian %p\n",i,[obj guardian]);
+                }
+	            if([obj crate]){
+                    NSLog(@"   object %i has crate %p\n",i,[obj crate]);
+                }
+
+            }
+        }
+        return [self read:[self regAddress:aReg]];
+	    //return [self read:0x480010];
+	    //return [self read:0x120003];
+	    //return [self read:[self regAddress:aReg]];
+        
+        //return [self read:[self regAddress: kFLTV4CFPGAVersion]]; // this read goes via SLT! -tb-
+    }
+    return 0;
 }
 
 - (unsigned long) readReg:(int)aReg channel:(int)aChannel
@@ -1336,7 +1451,7 @@ static NSString* fltTestName[kNumIpeV4FLTTests]= {
 	//cache some addresses for speed in the dataTaking loop.
 	unsigned long theSlotPart = [self slot]<<24;
 	statusAddress			  = theSlotPart;
-	memoryAddress			  = theSlotPart | (ipeV4Reg[kFLTAdcMemory].space << kIpeFlt_AddressSpace); 
+	memoryAddress			  = theSlotPart | (ipeV3Reg[kFLTAdcMemory].space << kIpeFlt_AddressSpace); //TODO: V4 handling ... -tb-
 	fireWireCard			  = [[self crate] adapter];
 	locationWord			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
   	usingPBusSimulation		  = [fireWireCard pBusSim];

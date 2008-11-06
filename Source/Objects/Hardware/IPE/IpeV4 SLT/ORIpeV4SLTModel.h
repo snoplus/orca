@@ -144,6 +144,9 @@ enum {
 		unsigned long   pageSize; //< Length of the ADC data (0..100us)
 
 		Pbus_Link*		pbusLink;
+        
+        //V3/V4 handling -tb-
+        int IpeCrateVersion; // up to now we have version 3 and 4 -tb- 2008-09-10
 }
 
 #pragma mark •••Initialization
@@ -151,6 +154,7 @@ enum {
 - (void) dealloc;
 - (void) setUpImage;
 - (void) makeMainController;
+- (void) setGuardian:(id)aGuardian;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
@@ -237,6 +241,9 @@ enum {
 - (void) releaseSwInhibit;
 - (void) setSwInhibit;
 - (BOOL) usingNHitTriggerVersion;
+// V3/V4 handling -tb-
+- (int) IpeCrateVersion;
+- (int) setIpeCrateVersion:(int) aValue;
 
 #pragma mark ***Polling
 - (TimedWorker *) poller;
@@ -370,3 +377,4 @@ extern NSString* ORIpeV4SLTModelReadAllChanged;
 
 extern NSString* ORSLTV4cpuLock;	
 
+extern NSString* ORIpeV4SLTIpeCrateVersionChanged;
