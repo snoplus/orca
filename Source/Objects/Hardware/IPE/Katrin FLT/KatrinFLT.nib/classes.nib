@@ -232,6 +232,8 @@
 				<string>NSPopUpButton</string>
 				<key>energyDaqModeMenuItem</key>
 				<string>NSMenuItem</string>
+				<key>filterGapBinsField</key>
+				<string>NSTextField</string>
 				<key>filterGapPopup</key>
 				<string>NSPopUpButton</string>
 				<key>firstBinField</key>
@@ -326,6 +328,14 @@
 				<string>NSButton</string>
 				<key>settingLockButton</key>
 				<string>NSButton</string>
+				<key>shapingTimeEffField0</key>
+				<string>NSTextField</string>
+				<key>shapingTimeEffField1</key>
+				<string>NSTextField</string>
+				<key>shapingTimeEffField2</key>
+				<string>NSTextField</string>
+				<key>shapingTimeEffField3</key>
+				<string>NSTextField</string>
 				<key>shapingTimePU0</key>
 				<string>NSPopUpButton</string>
 				<key>shapingTimePU1</key>
@@ -463,6 +473,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>

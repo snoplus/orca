@@ -94,7 +94,8 @@
 	float			hitRateTotal;	//!< Sum trigger rate of all channels 
 	unsigned short  readoutPages;	//!< Number of pages to read in debug mode
     int             energyShift[kNumFLTChannels];    //!< Shift to get constant energy values independend from the shaping time 
-    int             filterGap;  //!< Size of the HW filter gap.
+    int             filterGap;      //!< Value of the HW filter gap register/filter gap popup.
+    int             filterGapBins;  //!< Size of the HW filter gap.
 	
 	// Parameters for event triggered readout mode
     BOOL			broadcastTime;
@@ -310,6 +311,9 @@
 - (void) setShapingTime:(unsigned short) aGroup withValue:(unsigned short)aShapingTime;
 - (int) filterGap;
 - (void) setFilterGap:(int) aValue;
+- (int) filterGapBins;
+- (void) setFilterGapBins:(int) aValue;
+- (int) updateFilterGapBins;
 
 - (int) fltRunMode;
 - (void) setFltRunMode:(int)aMode;
@@ -592,6 +596,7 @@ extern NSString* ORKatrinFLTModelGainsChanged;
 extern NSString* ORKatrinFLTModelTestPatternsChanged;
 extern NSString* ORKatrinFLTModelThresholdsChanged;
 extern NSString* ORKatrinFLTModelFilterGapChanged;
+extern NSString* ORKatrinFLTModelFilterGapBinsChanged;
 extern NSString* ORKatrinFLTModelFltRunModeChanged;
 extern NSString* ORKatrinFLTModelDaqRunModeChanged;
 extern NSString* ORKatrinFLTSettingsLock;

@@ -60,7 +60,12 @@
 		IBOutlet NSPopUpButton* shapingTimePU1;
 		IBOutlet NSPopUpButton* shapingTimePU2;
 		IBOutlet NSPopUpButton* shapingTimePU3;
+		IBOutlet NSTextField*	shapingTimeEffField0;
+		IBOutlet NSTextField*	shapingTimeEffField1;
+		IBOutlet NSTextField*	shapingTimeEffField2;
+		IBOutlet NSTextField*	shapingTimeEffField3;
 		IBOutlet NSPopUpButton* filterGapPopup;
+		IBOutlet NSTextField*	filterGapBinsField;
 		IBOutlet NSTextField*	maxEnergyField0;
 		IBOutlet NSTextField*	hitRateLengthField;
 		IBOutlet NSButton*		hitRateAllButton;
@@ -177,6 +182,7 @@
 - (void) shapingTimesArrayChanged:(NSNotification*)aNote;
 - (void) shapingTimeChanged:(NSNotification*)aNote;
 - (void) filterGapChanged:(NSNotification*)aNote;
+- (void) filterGapBinsChanged:(NSNotification*)aNote;
 - (void) hitRateLengthChanged:(NSNotification*)aNote;
 - (void) hitRateChanged:(NSNotification*)aNote;
 - (void) scaleAction:(NSNotification*)aNote;

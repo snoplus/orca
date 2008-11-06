@@ -53,7 +53,7 @@
     
     settingSize     = NSMakeSize(560,680);
     histogramSize   = NSMakeSize(555,680);  // new -tb- 2008-01
-    rateSize	    = NSMakeSize(435,615);
+    rateSize	    = NSMakeSize(480,680);  // was 435,615
     testSize	    = NSMakeSize(405,640);  // renamed to low-level -tb- 2008-04
 
 	rateFormatter = [[NSNumberFormatter alloc] init];
@@ -209,6 +209,11 @@
     [notifyCenter addObserver : self
 					 selector : @selector(filterGapChanged:)
 						 name : ORKatrinFLTModelFilterGapChanged
+					   object : model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(filterGapBinsChanged:)
+						 name : ORKatrinFLTModelFilterGapBinsChanged
 					   object : model];
 
     [notifyCenter addObserver : self
@@ -413,6 +418,7 @@
 	[self hitRatesEnabledArrayChanged:nil];
 	[self shapingTimesArrayChanged:nil];
     [self filterGapChanged:nil];
+    [self filterGapBinsChanged:nil];
 	[self hitRateLengthChanged:nil];
 	[self hitRateChanged:nil];
     [self updateTimePlot:nil];
@@ -763,6 +769,17 @@
 		case 3: [shapingTimePU3 selectItemAtIndex: [model shapingTime:3]]; break;
 		default: break;
 	}	
+    //NSLog(@"Shap %i   Gap %i\n",[model shapingTime:0],[model filterGap]);
+    // TODO: call - (void) filterGapChanged:(NSNotification*)aNotification instead ??? -tb-
+    int val=[model filterGap];
+    if(![model filterGapFeatureIsAvailable]) val = 0;
+	switch(group){
+		case 0: [shapingTimeEffField0 setIntValue: ((0x1<<[model shapingTime:0])-val)]; break;
+		case 1: [shapingTimeEffField1 setIntValue: ((0x1<<[model shapingTime:1])-val)]; break;
+		case 2: [shapingTimeEffField2 setIntValue: ((0x1<<[model shapingTime:2])-val)]; break;
+		case 3: [shapingTimeEffField3 setIntValue: ((0x1<<[model shapingTime:3])-val)]; break;
+		default: break;
+	}	
     //show max. energy -tb-
     int max=((0x1 << [model shapingTime:0]) * 4096) /8;
     //NSLog(@"Shap time is %i, shift %i,  max %i \n",[model shapingTime:0],(0x1 << [model shapingTime:0]) ,max);
@@ -857,6 +874,19 @@
 {
     //NSLog(@"ORKatrinFLTController::filterGapChanged: %i\n",[model filterGap]);
     [filterGapPopup  selectItemAtIndex: [model filterGap]];
+    int val=[model filterGap];
+    if(![model filterGapFeatureIsAvailable]) val = 0;
+    //NSLog(@"filterGapChanged: value %i \n", val);
+    //set the L_eff field
+	[shapingTimeEffField0 setIntValue: ((0x1<<[model shapingTime:0])-val)]; 
+	[shapingTimeEffField1 setIntValue: ((0x1<<[model shapingTime:1])-val)]; 
+	[shapingTimeEffField2 setIntValue: ((0x1<<[model shapingTime:2])-val)]; 
+	[shapingTimeEffField3 setIntValue: ((0x1<<[model shapingTime:3])-val)]; 
+}
+
+- (void) filterGapBinsChanged:(NSNotification*)aNotification
+{
+    [filterGapBinsField setIntValue:[model filterGapBins]];
 }
 
 /** The FLT mode register value.
@@ -882,8 +912,8 @@
 	[daqRunModeButton selectItemWithTag: daqRunMode];//-tb-
     switch(daqRunMode){
         case 0: //debug mode (kKatrinFlt_DaqEnergyTrace_Mode)
-            [daqRunModeInfoField setStringValue:@"Info: Debug mode. Data: ADC traces and energy."
-                                                 "\nFor investigating waveforms."];
+            [daqRunModeInfoField setStringValue:@"Info: Debug mode. Data: ADC traces (waveform) and energy."
+                                                 " For investigating waveforms at low rates."];
             break;
         case 1: //run mode
             [daqRunModeInfoField setStringValue:@"Info: Run mode. Data: single ADC energy events. Standard mode."];
@@ -897,8 +927,8 @@
         case 4: //threshold scan mode kKatrinFlt_DaqThresholdScan_Mode
             [daqRunModeInfoField setStringValue:@"Info: Run mode. Scans several values for the threshold."];
             break;
-        case 5: //threshold scan mode kKatrinFlt_DaqHistogram_Mode
-            [daqRunModeInfoField setStringValue:@"Info: Run mode. Data: energy histogram. For high hitrates."];
+        case 5: //HW histogram mode kKatrinFlt_DaqHistogram_Mode
+            [daqRunModeInfoField setStringValue:@"Info: Run mode with histogram feature. Data: energy histogram. For high rates."];
             break;
         case 6: //threshold scan mode kKatrinFlt_DaqVeto_Mode
             [daqRunModeInfoField setStringValue:@"Info: Run mode with Veto feature. Dedicated for veto detector."];
@@ -963,7 +993,8 @@
 
 - (void) histoBinWidthChanged:(NSNotification*)aNote
 {
-    [eSamplePopUpButton selectItemAtIndex:[model histoBinWidth]];
+    //[eSamplePopUpButton selectItemAtIndex:[model histoBinWidth]];
+    [eSamplePopUpButton selectItemWithTag:[model histoBinWidth]];
 }
 - (void) histoMinEnergyChanged:(NSNotification*)aNote
 {
@@ -1441,16 +1472,20 @@
 
 - (IBAction) shapingTimeAction: (id) sender
 {
-	if([sender intValue] != [model shapingTime:[[sender selectedCell] tag]]){// bug: was gain instead of shapingTime -tb-
+    int tag=[sender  tag];// now tag is the group
+    int selectedCellTag = [[sender selectedCell] tag];
+    //NSLog(@"shapingTimeAction: sender intValue %i and tag %i; selectedCell-tag %i,  [model shapingTime:tag] %i \n",
+      //  [sender intValue], tag,selectedCellTag,[model shapingTime:tag]);
+	if(selectedCellTag != [model shapingTime:tag]){// bug: was intValue instead of tag and gain instead of shapingTime -tb-
 		[[self undoManager] setActionName: @"Set ShapingTime"]; 
-		[model setShapingTime:[sender tag] withValue:[sender indexOfSelectedItem]];
+		[model setShapingTime:tag  withValue:selectedCellTag];
 	}
 }
 
 - (IBAction) filterGapAction: (id) sender
 {
 	//if([sender intValue] != [model shapingTime:[[sender selectedCell] tag]]){// bug: was gain instead of shapingTime -tb-
-    //NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag]);
+NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag]);
     //[model setFilterGap:[sender tag]];
     int val=[[[filterGapPopup selectedItem] title ] intValue];
     NSLog(@"filterGapAction: value %i \n", val);
@@ -1599,7 +1634,8 @@
 - (IBAction) changedBinWidthPopupButtonAction:(id)sender;
 {
     //NSLog(@"This is    changedESamplePopupButtonAction: selected %i\n",[sender indexOfSelectedItem]);
-    [model setHistoBinWidth:[sender indexOfSelectedItem]];
+    //[model setHistoBinWidth:[sender indexOfSelectedItem]];
+    [model setHistoBinWidth:[[sender selectedItem] tag]];
 }
 - (IBAction) changedHistoMinEnergyAction:(id)sender
 {    [model setHistoMinEnergy:[sender intValue]];  }
@@ -1612,9 +1648,11 @@
 
 - (IBAction) changedHistoLastBinAction:(id)sender
 {    [model setHistoLastBin:[sender indexOfSelectedItem]];  }
+
 - (IBAction) changedHistoRunTimeAction:(id)sender
 {    [model setHistoRunTime:[sender intValue]];  }
-- (IBAction) changedHistoRecordingTimeAction:(id)sender
+
+- (IBAction) changedHistoRecordingTimeAction:(id)sender//TODO: unused, remove it -tb-
 {    [model setHistoRecordingTime:[sender indexOfSelectedItem]];  }
     
     
