@@ -215,10 +215,9 @@
 - (void) onlineMaskChanged:(NSNotification*)aNote
 {
 	int i;
-	unsigned long aMask = [model onlineMask];
 	for(i=0;i<32;i++){
 		int pmtGroup = i/8;
-		int state = (aMask & (1L<<i))!=0;
+		int state = [model pmtOnline:i];
 		[[onlineSwitches[pmtGroup] cellWithTag:i] setImage:onlineStateImage[pmtGroup][state]];
 	}
 }

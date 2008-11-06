@@ -69,6 +69,12 @@ NSString* ORFecOnlineMaskChanged= @"ORFecOnlineMaskChanged";
 	else return NO;
 }
 
+- (BOOL) pmtOnline:(unsigned short)index
+{
+	if(index<32) return [self dcPresent:index/8] & (onlineMask & (1L<<index));
+	else return NO;
+}
+
 - (unsigned long) onlineMask
 {
 	return onlineMask;

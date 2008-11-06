@@ -52,7 +52,7 @@
 	return NO;
 }
 
-- (void)drawRect:(NSRect)rect 
+- (void) drawRect:(NSRect)rect 
 {
 	ORFec32Model* model		 = [controller model];
 	
@@ -73,8 +73,6 @@
 	y2 = 0;
 	deltaX1 = (anchorFrame.size.width)/8.;
 	deltaX2 = 20 + 18;
-	if(![model dcPresent:1])[[NSColor lightGrayColor] set];		
-	else [[NSColor blackColor] set];		
 	for(i=0;i<8;i++){	
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(x1,y1) toPoint:NSMakePoint(x2,y2)];
 		x1 -= deltaX1;
