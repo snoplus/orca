@@ -148,7 +148,10 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:someObjects forKey: ORGroupObjectList];
     
-    [[NSNotificationCenter defaultCenter]
+	[self objectCountChanged];
+
+ 
+	[[NSNotificationCenter defaultCenter]
                         postNotificationName:ORGroupObjectsAdded
                                       object:self
                                     userInfo: userInfo];
@@ -166,11 +169,17 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:someObjects forKey: ORGroupObjectList];
     
-    [[NSNotificationCenter defaultCenter]
+ 	[self objectCountChanged];
+	
+	[[NSNotificationCenter defaultCenter]
                         postNotificationName:ORGroupObjectsRemoved
                                       object:self
                                     userInfo: userInfo];
-    
+}
+
+- (void) objectCountChanged
+{
+	//we don't do anything with this info, but subclasses can override
 }
 
 #pragma mark ¥¥¥Group Methods

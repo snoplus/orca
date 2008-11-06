@@ -42,6 +42,7 @@
 #pragma mark ¥¥¥Undoable Actions
 - (void) addObjects:(NSArray*)someObjects;
 - (void) removeObjects:(NSArray*)someObjects;
+- (void) objectCountChanged;
 
 #pragma mark ¥¥¥Group Methods
 - (BOOL)    changesAllowed;
