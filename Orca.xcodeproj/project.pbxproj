@@ -1210,6 +1210,15 @@
 		8491E6C60EB9DFD30084BAD6 /* XL1.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8491E6C50EB9DFD30084BAD6 /* XL1.nib */; };
 		8491E6CA0EB9E1900084BAD6 /* ORXL1Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491E6C80EB9E1900084BAD6 /* ORXL1Controller.h */; };
 		8491E6CB0EB9E1900084BAD6 /* ORXL1Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491E6C90EB9E1900084BAD6 /* ORXL1Controller.m */; };
+		8491F4760EC0CDEF0084BAD6 /* ORPmtImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491F4740EC0CDEF0084BAD6 /* ORPmtImage.h */; };
+		8491F47F0EC0CECB0084BAD6 /* ORPmtImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491F47E0EC0CECB0084BAD6 /* ORPmtImage.m */; };
+		8491F6720EC0D3C40084BAD6 /* pmtShadow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8491F66F0EC0D3C40084BAD6 /* pmtShadow.gif */; };
+		8491F6730EC0D3C40084BAD6 /* pmtColorMask.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8491F6700EC0D3C40084BAD6 /* pmtColorMask.gif */; };
+		8491F6740EC0D3C40084BAD6 /* pmt.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8491F6710EC0D3C40084BAD6 /* pmt.gif */; };
+		8491FE430EC1DD270084BAD6 /* NSImage+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491FE410EC1DD270084BAD6 /* NSImage+Extensions.m */; };
+		8491FE440EC1DD270084BAD6 /* NSImage+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491FE420EC1DD270084BAD6 /* NSImage+Extensions.h */; };
+		8491FE8B0EC1DF780084BAD6 /* ORSwitchImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 8491FE890EC1DF780084BAD6 /* ORSwitchImage.h */; };
+		8491FE8C0EC1DF780084BAD6 /* ORSwitchImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 8491FE8A0EC1DF780084BAD6 /* ORSwitchImage.m */; };
 		8492D7130B7A80770065F3DE /* ORGretinaModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8492D70F0B7A80770065F3DE /* ORGretinaModel.h */; };
 		8492D7140B7A80770065F3DE /* ORGretinaModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8492D7100B7A80770065F3DE /* ORGretinaModel.m */; };
 		8492D7150B7A80770065F3DE /* ORGretinaController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8492D7110B7A80770065F3DE /* ORGretinaController.h */; };
@@ -2978,6 +2987,15 @@
 		8491E6C50EB9DFD30084BAD6 /* XL1.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XL1.nib; path = "Source/Objects/Custom Hardware/SNO+/XL1/XL1.nib"; sourceTree = SOURCE_ROOT; };
 		8491E6C80EB9E1900084BAD6 /* ORXL1Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL1Controller.h; sourceTree = "<group>"; };
 		8491E6C90EB9E1900084BAD6 /* ORXL1Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORXL1Controller.m; sourceTree = "<group>"; };
+		8491F4740EC0CDEF0084BAD6 /* ORPmtImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPmtImage.h; path = "Source/Objects/Misc Objects/Views/pmtImage/ORPmtImage.h"; sourceTree = SOURCE_ROOT; };
+		8491F47E0EC0CECB0084BAD6 /* ORPmtImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPmtImage.m; path = "Source/Objects/Misc Objects/Views/pmtImage/ORPmtImage.m"; sourceTree = SOURCE_ROOT; };
+		8491F66F0EC0D3C40084BAD6 /* pmtShadow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = pmtShadow.gif; path = "Source/Objects/Misc Objects/Views/pmtImage/pmtShadow.gif"; sourceTree = SOURCE_ROOT; };
+		8491F6700EC0D3C40084BAD6 /* pmtColorMask.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = pmtColorMask.gif; path = "Source/Objects/Misc Objects/Views/pmtImage/pmtColorMask.gif"; sourceTree = SOURCE_ROOT; };
+		8491F6710EC0D3C40084BAD6 /* pmt.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = pmt.gif; path = "Source/Objects/Misc Objects/Views/pmtImage/pmt.gif"; sourceTree = SOURCE_ROOT; };
+		8491FE410EC1DD270084BAD6 /* NSImage+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSImage+Extensions.m"; path = "Source/Cocoa Extensions/NSImage+Extensions.m"; sourceTree = SOURCE_ROOT; };
+		8491FE420EC1DD270084BAD6 /* NSImage+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+Extensions.h"; path = "Source/Cocoa Extensions/NSImage+Extensions.h"; sourceTree = SOURCE_ROOT; };
+		8491FE890EC1DF780084BAD6 /* ORSwitchImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSwitchImage.h; path = "Source/Objects/Misc Objects/Views/switchImage/ORSwitchImage.h"; sourceTree = SOURCE_ROOT; };
+		8491FE8A0EC1DF780084BAD6 /* ORSwitchImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSwitchImage.m; path = "Source/Objects/Misc Objects/Views/switchImage/ORSwitchImage.m"; sourceTree = SOURCE_ROOT; };
 		84929E8204439586005F64B1 /* ORTriggerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTriggerController.h; sourceTree = "<group>"; };
 		84929E8304439586005F64B1 /* ORTriggerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORTriggerController.m; sourceTree = "<group>"; };
 		84929E8604439586005F64B1 /* ORTriggerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTriggerModel.h; sourceTree = "<group>"; };
@@ -6247,6 +6265,29 @@
 			path = "Source/Main Dialogs/MailCenter";
 			sourceTree = SOURCE_ROOT;
 		};
+		8491F4730EC0CDEF0084BAD6 /* pmtImage */ = {
+			isa = PBXGroup;
+			children = (
+				8491F4740EC0CDEF0084BAD6 /* ORPmtImage.h */,
+				8491F47E0EC0CECB0084BAD6 /* ORPmtImage.m */,
+				8491F66F0EC0D3C40084BAD6 /* pmtShadow.gif */,
+				8491F6700EC0D3C40084BAD6 /* pmtColorMask.gif */,
+				8491F6710EC0D3C40084BAD6 /* pmt.gif */,
+			);
+			name = pmtImage;
+			path = "Source/Objects/Misc Objects/Views/pmtImage";
+			sourceTree = SOURCE_ROOT;
+		};
+		8491FE880EC1DF780084BAD6 /* switchImage */ = {
+			isa = PBXGroup;
+			children = (
+				8491FE890EC1DF780084BAD6 /* ORSwitchImage.h */,
+				8491FE8A0EC1DF780084BAD6 /* ORSwitchImage.m */,
+			);
+			name = switchImage;
+			path = "Source/Objects/Misc Objects/Views/switchImage";
+			sourceTree = SOURCE_ROOT;
+		};
 		84929E8104439586005F64B1 /* Trigger */ = {
 			isa = PBXGroup;
 			children = (
@@ -7542,6 +7583,8 @@
 		84CF3B3A05E6BF0700C5C320 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				8491F4730EC0CDEF0084BAD6 /* pmtImage */,
+				8491FE880EC1DF780084BAD6 /* switchImage */,
 				8443573C0B5AC9DA0033B918 /* ScriptView */,
 				84F5E10A0A151D9300707A0F /* OpenGLView */,
 				2A178EAB08DB3E1A001D78BC /* CardContainerView */,
@@ -8200,6 +8243,8 @@
 				8465BE5905DBCEFC00870151 /* NSInvocation+Extensions.m */,
 				840B207A0B4D79400021220C /* NSScanner+Extensions.h */,
 				840B207B0B4D79400021220C /* NSScanner+Extensions.m */,
+				8491FE410EC1DD270084BAD6 /* NSImage+Extensions.m */,
+				8491FE420EC1DD270084BAD6 /* NSImage+Extensions.h */,
 				8400D90109B36E34000C1DA4 /* IconBadge */,
 				844514940674E10D00A19654 /* ZFlowLayout */,
 			);
@@ -9220,6 +9265,9 @@
 				84CEA6EB0EA623A50060076A /* ORFecDaughterCardModel.h in Headers */,
 				8473B9E40EA7BB6A00B89FF0 /* ORFecPmtsView.h in Headers */,
 				8491E6CA0EB9E1900084BAD6 /* ORXL1Controller.h in Headers */,
+				8491F4760EC0CDEF0084BAD6 /* ORPmtImage.h in Headers */,
+				8491FE440EC1DD270084BAD6 /* NSImage+Extensions.h in Headers */,
+				8491FE8B0EC1DF780084BAD6 /* ORSwitchImage.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9788,6 +9836,9 @@
 				84CEA6E70EA623A50060076A /* FecDaughterCard.gif in Resources */,
 				84CEA6E80EA623A50060076A /* FecDaughterCard.nib in Resources */,
 				8491E6C60EB9DFD30084BAD6 /* XL1.nib in Resources */,
+				8491F6720EC0D3C40084BAD6 /* pmtShadow.gif in Resources */,
+				8491F6730EC0D3C40084BAD6 /* pmtColorMask.gif in Resources */,
+				8491F6740EC0D3C40084BAD6 /* pmt.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10469,6 +10520,9 @@
 				84CEA6EC0EA623A50060076A /* ORFecDaughterCardModel.m in Sources */,
 				8473B9E50EA7BB6A00B89FF0 /* ORFecPmtsView.m in Sources */,
 				8491E6CB0EB9E1900084BAD6 /* ORXL1Controller.m in Sources */,
+				8491F47F0EC0CECB0084BAD6 /* ORPmtImage.m in Sources */,
+				8491FE430EC1DD270084BAD6 /* NSImage+Extensions.m in Sources */,
+				8491FE8C0EC1DF780084BAD6 /* ORSwitchImage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
