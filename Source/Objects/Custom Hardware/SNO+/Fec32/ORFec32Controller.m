@@ -253,6 +253,7 @@
 	int i;
 	for(i=0;i<4;i++){
 		[onlineSwitches[i] setEnabled:[model dcPresent:i] && !lockedOrRunningMaintenance];
+		[pmtImages[i] setEnabled:[model dcPresent:i]];
 	}
 }
 
