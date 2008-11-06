@@ -26,6 +26,7 @@
 #import "NSOutlineView+Extensions.h"
 #import "NSInvocation+Extensions.h"
 #import "NSScanner+Extensions.h"
+#import "NSImage+Extensions.h"
 #import "Utilities.h"
 
 #import "OrcaObject.h"
