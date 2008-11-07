@@ -21,6 +21,7 @@
 
 #import "ORUSB.h"
 #import "ORUSBInterface.h"
+#import "SupportedUSBDevices.h"
 
 NSString* ORUSBDevicesAdded		= @"ORUSBDevicesAdded";
 NSString* ORUSBDevicesRemoved	= @"ORUSBDevicesRemoved";
@@ -41,6 +42,12 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 @implementation ORUSB
 
 #pragma mark ¥¥¥initialization
+- (id) init
+{
+	self = [super init];
+	
+	return self;
+}
 
 - (void) dealloc
 {
@@ -273,7 +280,6 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 		IOUSBDeviceInterface182**	deviceInterface;
 		ORUSBInterface*			usbCallbackData = 0;
 
-
 		NS_DURING
 			
 			// Get the USB device's name.
@@ -287,49 +293,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			usbCallbackData = [[ORUSBInterface alloc] init];
 			
 			deviceNameAsString = [NSString stringWithCString:deviceName];
-			//NSLog(@"AddedUsbDevice %@ \n", deviceNameAsString);
-						
-			if([deviceNameAsString rangeOfString:@"Mouse"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			if([deviceNameAsString rangeOfString:@"Storage"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			if([deviceNameAsString rangeOfString:@"Hub"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			if([deviceNameAsString rangeOfString:@"Keyboard"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			if([deviceNameAsString rangeOfString:@"Display"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			if([deviceNameAsString rangeOfString:@"LaserJet"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			// Remove default serial device in MacBook Pro, ak 6.11.08
-			if([deviceNameAsString rangeOfString:@"iSight"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			if([deviceNameAsString rangeOfString:@"IR Receiver"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			if([deviceNameAsString rangeOfString:@"Host Controller"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			if([deviceNameAsString rangeOfString:@"BCM2045B2"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-			// Remove USB serial converter, ak 6.11.08
-			if([deviceNameAsString rangeOfString:@"serial converter"].location != NSNotFound){
-				[NSException raise: @"USB Exception" format:@"Skipping device"];
-			} 
-
-
-
-			// Save the device's name to our private data.        
-			[ usbCallbackData setDeviceName:deviceNameAsString];
-													
+																																			
 			// Now, get the locationID of this device. In order to do this, we need to create an IOUSBDeviceInterface182 
 			// for our device. This will create the necessary connections between our userland application and the 
 			// kernel object for the USB Device.
@@ -358,12 +322,31 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			if (KERN_SUCCESS != kr) {
 				[NSException raise: @"USB Exception" format:@"Unable to get USB device location"];
 			}
-			NSLog(@"location: %u\n",locationID);
 
 			
 			kr = (*deviceInterface)->GetDeviceVendor(deviceInterface, &vendor);
 			kr = (*deviceInterface)->GetDeviceProduct(deviceInterface, &product);
 			kr = (*deviceInterface)->GetDeviceReleaseNumber(deviceInterface, &release);
+			
+			BOOL supported = NO;
+			int i;
+			for(i=0;i<kNumberSupportedDevices;i++){
+				if(	vendor  == supportedUSBDevice[i].vendorID &&
+					product == supportedUSBDevice[i].productID   ){
+						supported = YES;
+						break;
+				}
+			}
+			if(!supported) {
+				[NSException raise: @"USB Exception" format:@"Skipping device -- Not supported"];
+			}
+			
+			
+			NSLog(@"%@ added\n",deviceNameAsString);
+			NSLog(@"location: 0x%0x\n",locationID);
+			// Save the device's name to our private data.        
+			[ usbCallbackData setDeviceName:deviceNameAsString];
+			
 			unsigned char theSpeed;
 			kr = (*deviceInterface)->GetDeviceSpeed(deviceInterface, &theSpeed);
 			if(kr == KERN_SUCCESS)NSLog(@"Device Speed: %d\n",theSpeed);
@@ -447,7 +430,6 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			
 			// Done with this USB device; release the reference added by IOIteratorNext
 			IOObjectRelease(usbDevice);
-			NSLog(@"%@ added\n",deviceNameAsString);
 
 		NS_HANDLER
 			if(plugInInterface)	(*plugInInterface)->Release(plugInInterface);
