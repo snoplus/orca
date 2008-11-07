@@ -287,7 +287,8 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			usbCallbackData = [[ORUSBInterface alloc] init];
 			
 			deviceNameAsString = [NSString stringWithCString:deviceName];
-			
+			//NSLog(@"AddedUsbDevice %@ \n", deviceNameAsString);
+						
 			if([deviceNameAsString rangeOfString:@"Mouse"].location != NSNotFound){
 				[NSException raise: @"USB Exception" format:@"Skipping device"];
 			} 
@@ -304,6 +305,23 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 				[NSException raise: @"USB Exception" format:@"Skipping device"];
 			} 
 			if([deviceNameAsString rangeOfString:@"LaserJet"].location != NSNotFound){
+				[NSException raise: @"USB Exception" format:@"Skipping device"];
+			} 
+			// Remove default serial device in MacBook Pro, ak 6.11.08
+			if([deviceNameAsString rangeOfString:@"iSight"].location != NSNotFound){
+				[NSException raise: @"USB Exception" format:@"Skipping device"];
+			} 
+			if([deviceNameAsString rangeOfString:@"IR Receiver"].location != NSNotFound){
+				[NSException raise: @"USB Exception" format:@"Skipping device"];
+			} 
+			if([deviceNameAsString rangeOfString:@"Host Controller"].location != NSNotFound){
+				[NSException raise: @"USB Exception" format:@"Skipping device"];
+			} 
+			if([deviceNameAsString rangeOfString:@"BCM2045B2"].location != NSNotFound){
+				[NSException raise: @"USB Exception" format:@"Skipping device"];
+			} 
+			// Remove USB serial converter, ak 6.11.08
+			if([deviceNameAsString rangeOfString:@"serial converter"].location != NSNotFound){
 				[NSException raise: @"USB Exception" format:@"Skipping device"];
 			} 
 
