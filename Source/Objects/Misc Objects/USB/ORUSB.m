@@ -443,15 +443,17 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 
 - (void) listSupportedDevices
 {
-	NSLog(@"-------------------------\n");
-	NSFont* aFont = [NSFont fontWithName:@"Monaco" size:10];
-	NSLogFont(aFont,@"Supported USB devices:\n");
-	NSLogFont(aFont,@"VendorID    ProductID  Object\n");
+	NSFont* aFont = [NSFont fontWithName:@"Monaco" size:11];
+	NSLogFont(aFont,@"--------------------------------------------\n");
+	NSLogFont(aFont,@"         Supported USB devices\n");
+	NSLogFont(aFont,@"--------------------------------------------\n");
+	NSLogFont(aFont,@" VendorID  |  ProductID |    Object\n");
+	NSLogFont(aFont,@"--------------------------------------------\n");
 	int i;
 	for(i=0;i<kNumberSupportedDevices;i++){
-		NSLogFont(aFont,@"0x%08x  0x%08x %@\n",supportedUSBDevice[i].vendorID,supportedUSBDevice[i].productID,supportedUSBDevice[i].modelName);
+		NSLogFont(aFont,@"0x%08x | 0x%08x | %@\n",supportedUSBDevice[i].vendorID,supportedUSBDevice[i].productID,supportedUSBDevice[i].modelName);
 	}
-	NSLog(@"-------------------------\n");
+	NSLogFont(aFont,@"--------------------------------------------\n");
 }
 
 - (void) deviceNotification:(void*)refCon
