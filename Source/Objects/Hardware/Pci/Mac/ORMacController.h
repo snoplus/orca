@@ -65,6 +65,7 @@
 - (void) tableViewSelectionDidChange:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) listSupportedUSBDevices:(id)sender;
 - (IBAction) eolTypeAction:(id)sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) optionAction:(id)sender;

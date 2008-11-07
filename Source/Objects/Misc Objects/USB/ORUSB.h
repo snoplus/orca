@@ -80,6 +80,7 @@ typedef  struct  {
 - (ORUSBInterface*) getUSBInterfaceWithSerialNumber:(NSString*)aSerialNumber;
 - (void) objectsAdded:(NSArray*)newObjects;
 - (void) objectsRemoved:(NSArray*)deletedObjects;
+- (void) listSupportedDevices;
 
 @end
 

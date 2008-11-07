@@ -441,6 +441,18 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
     }
 }
 
+- (void) listSupportedDevices
+{
+	NSLog(@"-------------------------\n");
+	NSFont* aFont = [NSFont fontWithName:@"Monaco" size:10];
+	NSLogFont(aFont,@"Supported USB devices:\n");
+	NSLogFont(aFont,@"VendorID    ProductID  Object\n");
+	int i;
+	for(i=0;i<kNumberSupportedDevices;i++){
+		NSLogFont(aFont,@"0x%08x  0x%08x %@\n",supportedUSBDevice[i].vendorID,supportedUSBDevice[i].productID,supportedUSBDevice[i].modelName);
+	}
+	NSLog(@"-------------------------\n");
+}
 
 - (void) deviceNotification:(void*)refCon
 					service:(io_service_t) service

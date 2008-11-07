@@ -288,8 +288,12 @@
 
 
 #pragma mark ¥¥¥Actions
+- (IBAction) listSupportedUSBDevices:(id)sender
+{
+	[[model getUSBController] listSupportedDevices];
+}
 
-- (void) eolTypeAction:(id)sender
+- (IBAction) eolTypeAction:(id)sender
 {
 	[model setEolType:[[sender selectedCell] tag]];	
 }
