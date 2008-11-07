@@ -17,7 +17,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
+#import "NSDictionary+Extensions.h"
 
 @implementation NSDictionary (OrcaExtensions)
 
