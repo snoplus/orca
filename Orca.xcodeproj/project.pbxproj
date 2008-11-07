@@ -298,6 +298,7 @@
 		84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84178D4E0923C4B100C15D2B /* ORSocketClient.h */; };
 		84178D510923C4B100C15D2B /* ORSocketClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 84178D4F0923C4B100C15D2B /* ORSocketClient.m */; };
 		84178E0C0923F60F00C15D2B /* ORCommandClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434A3E4055C223A002D3102 /* ORCommandClient.m */; };
+		841B061B0EC4837000B6F77C /* SupportedUSBDevices.h in Headers */ = {isa = PBXBuildFile; fileRef = 841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */; };
 		841BBACE0572DC4800735A3A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8434A363055B3288002D3102 /* Info.plist */; };
 		841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */; };
 		841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */; };
@@ -2311,6 +2312,7 @@
 		8418DC520531EF7A005F64B1 /* ORPulserDistribModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulserDistribModel.h; sourceTree = "<group>"; };
 		8418DC530531EF7A005F64B1 /* ORPulserDistribModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulserDistribModel.m; sourceTree = "<group>"; };
 		8418DC540531EF7A005F64B1 /* PulserDistrib.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PulserDistrib.nib; sourceTree = "<group>"; };
+		841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedUSBDevices.h; sourceTree = "<group>"; };
 		841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Controller.m; sourceTree = SOURCE_ROOT; };
 		841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Model.m; sourceTree = SOURCE_ROOT; };
 		841C842407EB418A0028BEED /* Motor.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Motor.nib; sourceTree = "<group>"; };
@@ -5352,6 +5354,7 @@
 		843A48510A0AC2F4003DF248 /* USB */ = {
 			isa = PBXGroup;
 			children = (
+				841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */,
 				843A48520A0AC2F4003DF248 /* NoUSBServiceHelp.plist */,
 				843A48530A0AC2F4003DF248 /* ORUSB.h */,
 				843A48540A0AC2F4003DF248 /* ORUSB.m */,
@@ -9268,6 +9271,7 @@
 				8491F4760EC0CDEF0084BAD6 /* ORPmtImage.h in Headers */,
 				8491FE440EC1DD270084BAD6 /* NSImage+Extensions.h in Headers */,
 				8491FE8B0EC1DF780084BAD6 /* ORSwitchImage.h in Headers */,
+				841B061B0EC4837000B6F77C /* SupportedUSBDevices.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
