@@ -223,7 +223,7 @@ HP3458aNamesStruct aciNames[aciCount] = {
 		case 6: return dciNames[maxInput].fullScale;
 		case 7: return aciNames[maxInput].fullScale;
 		
-		default : return nil;
+		default : return 0;
 	}
 }
 
