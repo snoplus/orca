@@ -13,9 +13,12 @@
 //-------------------------------------------------------------
 
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
 #import <objc/objc-class.h>
 #import <objc/Protocol.h>
-
+#else
+#import "objc/runtime.h"
+#endif
 //-----------------------------------------------------------------------------
 /*!\func	convertTimeCharToLong
  * \brief	Converts a date/time string in standard format to a long.
@@ -124,7 +127,9 @@ NSString* listMethods(Class aClass)
 
 NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass)
 {
-	NSMutableString* resultString = [NSMutableString stringWithString:@""];
+NSMutableString* resultString = [NSMutableString stringWithString:@""];
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
     struct objc_class *class = aClass;
 	if(!aClass)return @"Class Not Found!\n";
     const char *name = class->name;
@@ -159,5 +164,33 @@ NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass)
 			[resultString appendString: listMethodWithOptions( class->super_class,verbose,showSuperClass)];
 		}
 	 }
+#else
+	const char *name = class_getName(aClass);
+	if(!name)return @"Class Not Found!\n";
+	unsigned int methodCount=0;
+	Method* methods = class_copyMethodList(aClass, &methodCount);
+	int i;
+	NSMutableArray* methodNames = [NSMutableArray array];
+	for(i=0;i<methodCount;i++){
+		[methodNames addObject:NSStringFromSelector(method_getName(methods[i]))];
+	}
+	free(methods);
+	[methodNames sortUsingSelector:@selector(caseInsensitiveCompare:)];
+	[resultString appendString:[methodNames componentsJoinedByString:@"\n"]];
+	if(showSuperClass){
+		Class superClass = class_getSuperclass(aClass);
+		NSString* superClassName = [NSString stringWithUTF8String:class_getName(superClass)];
+		if (superClass == nil && verbose) {
+			[resultString appendFormat: @"%s has no superclass\n", name];
+		}
+		else {
+			if(![superClassName hasPrefix:@"NS"]){
+				if(verbose)[resultString appendFormat: @"\n-------------------\n%s superclass: %@\n", name, superClassName];
+					[resultString appendString: listMethodWithOptions( superClass,verbose,showSuperClass)];
+				}
+		}
+	 }
+
+#endif
 	return resultString;
 }

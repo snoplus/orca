@@ -6,7 +6,9 @@
 #ifndef _VXI11_H_RPCGEN
 #define _VXI11_H_RPCGEN
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
 #define rpc_uint unsigned long
+#endif
 
 #define RPCGEN_VERSION	199506
 

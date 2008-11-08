@@ -311,7 +311,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	[self sendCrateCommand: ORHVkCrateHVStatus];
 }
  
-
 - (void) hvPanic
 {
 	[self sendCrateCommand: ORHVkCrateHVPanic];
