@@ -50,30 +50,43 @@
 	ptr++; //first word of the actual card packet
 	int channel		 = *ptr&0xF;
 	int packetLength = ((*ptr & kGretina4NumberWordsMask) >>16) - 7;
-	
-/*	ptr++; //point to led0-15 && 16-31
-	unsigned short led1 = *ptr & 0xffff;
-	unsigned short led2 = (*ptr & 0xffff0000)>>8;
- 
-	ptr++;
-	unsigned short led3 = *ptr & 0xffff;
-
-	NSLog(@"0x%08x 0x%08x 0x%08x\n",led3,led2,led1);
-*/	
 	ptr += 2; //point to Energy low word
 	unsigned long energy = *ptr >> 16;
 	ptr++;	  //point to Energy second word
 	energy += (*ptr & 0x000001ff) << 16;
 	
 	// energy is in 2's complement, taking abs value if necessary
-    //if((energy >> 22) & 0x1) energy = (~energy + 1) & 0x7fffff;
+	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
+	double energyDouble = (double)energy;
 
 	NSString* crateKey = [self getCrateKey: crate];
 	NSString* cardKey = [self getCardKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
 
 
-    [aDataSet histogram:(energy & 0x3FFF) numBins:32768 sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
+	//get the actual object
+
+	NSString* aKey = [crateKey stringByAppendingString:cardKey];
+	if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
+	ORGretina4Model* obj = [actualGretinaCards objectForKey:aKey];
+	if(!obj){
+		NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4Model")];
+		NSEnumerator* e = [listOfCards objectEnumerator];
+		ORGretina4Model* aCard;
+		while(aCard = [e nextObject]){
+			if([aCard slot] == card){
+				[actualGretinaCards setObject:aCard forKey:aKey];
+				obj = aCard;
+				break;
+			}
+		}
+	}
+	if(getRatesFromDecodeStage){
+		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+	}
+	energyDouble /= [obj integrationTime];
+	
+    [aDataSet histogram:energyDouble numBins:0x1fff sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	
 	ptr += 4; //point to the data
 
@@ -85,42 +98,17 @@
 	unsigned short* dPtr = (unsigned short*)[tmpData bytes];
 	int i;
 	int wordCount = 0;
-	//for(i=0;i<packetLength;i++){
-	//	dPtr[wordCount++] =	0x00003fff & *ptr;		
-	//	dPtr[wordCount++] =	(0x3fff0000 & *ptr) >> 16;		
-	//	ptr++;
-	//}
 	//data is actually 2's complement. detwiler 08/26/08
 	for(i=0;i<packetLength;i++){
-     dPtr[wordCount++] =    (0x00003fff & *ptr) | (((0x00002000 & *ptr)>0)*0x0000e000);
-     dPtr[wordCount++] =    ((0x3fff0000 & *ptr) | (((0x20000000 & *ptr)>0)*0xe0000000)) >> 16;
-     ptr++;
- }
+		dPtr[wordCount++] =    (0x0000ffff & *ptr);
+		dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
+		ptr++;
+	}
     [aDataSet loadWaveform:tmpData 
 					offset:0 //bytes!
 				  unitSize:2 //unit size in bytes!
 					sender:self  
 				  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
-
-	//get the actual object
-	if(getRatesFromDecodeStage){
-		NSString* aKey = [crateKey stringByAppendingString:cardKey];
-		if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
-		ORGretina4Model* obj = [actualGretinaCards objectForKey:aKey];
-		if(!obj){
-			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4Model")];
-			NSEnumerator* e = [listOfCards objectEnumerator];
-			ORGretina4Model* aCard;
-			while(aCard = [e nextObject]){
-				if([aCard slot] == card){
-					[actualGretinaCards setObject:aCard forKey:aKey];
-					obj = aCard;
-					break;
-				}
-			}
-		}
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
-	}
 	 
     return length; //must return number of longs
 }
@@ -138,10 +126,10 @@
 	ptr+=2;
 	unsigned long energy = *ptr >> 16;
 	ptr++;	  //point to Energy second word
-	energy += (*ptr & 0x0000007f) << 16;
+	energy += (*ptr & 0x0000001ff) << 16;
 	
 	// energy is in 2's complement, taking abs value if necessary
-    if((energy >> 22) & 0x1) energy = (~energy + 1) & 0x7fffff;
+	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
 	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %d\n",energy];
     return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,energyStr];               
 }
