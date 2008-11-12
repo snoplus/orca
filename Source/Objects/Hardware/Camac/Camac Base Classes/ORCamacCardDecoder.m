@@ -72,7 +72,9 @@ static NSString* kCrateKey[16] = {
 {
 	if(aStation<32) return kStationKey[aStation];
 	else return [NSString stringWithFormat:@"Station %2d",aStation];		
-	
 }
-
+- (NSString*) getCardKey:(unsigned short)aCard
+{
+	return [self getStationKey:aCard];
+}
 @end

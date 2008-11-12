@@ -29,5 +29,6 @@
 - (NSString*) getChannelKey:(unsigned short)aChan;
 - (NSString*) getCrateKey:(unsigned short)aCrate;
 - (NSString*) getStationKey:(unsigned short)aStation;
+- (NSString*) getCardKey:(unsigned short)aCard;
 
 @end
