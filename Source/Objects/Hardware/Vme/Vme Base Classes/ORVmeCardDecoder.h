@@ -26,7 +26,6 @@
 
 }
 
-- (NSString*) getCardKey:(unsigned short)aCard;
 - (NSString*) getMModuleKey:(unsigned short)aModule;
 
 @end

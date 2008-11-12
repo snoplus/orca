@@ -23,17 +23,6 @@
 
 #pragma mark •••Static Definitions
 
-static NSString* kCardKey[32] = {
-	//pre-make some keys for speed.
-	@"Card  0", @"Card  1", @"Card  2", @"Card  3",
-	@"Card  4", @"Card  5", @"Card  6", @"Card  7",
-	@"Card  8", @"Card  9", @"Card 10", @"Card 11",
-	@"Card 12", @"Card 13", @"Card 14", @"Card 15",
-	@"Card 16", @"Card 17", @"Card 18", @"Card 19",
-	@"Card 20", @"Card 21", @"Card 22", @"Card 23",
-	@"Card 24", @"Card 25", @"Card 26", @"Card 27",
-	@"Card 28", @"Card 29", @"Card 30", @"Card 31"
-};
 
 static NSString* kMModuleKey[16] = {
 	//pre-make some keys for speed.
@@ -42,13 +31,6 @@ static NSString* kMModuleKey[16] = {
 
 
 @implementation ORVmeCardDecoder
-
-- (NSString*) getCardKey:(unsigned short)aCard
-{
-	if(aCard<16) return kCardKey[aCard];
-	else return [NSString stringWithFormat:@"Card %2d",aCard];		
-	
-}
 
 - (NSString*) getMModuleKey:(unsigned short)aModule
 {
