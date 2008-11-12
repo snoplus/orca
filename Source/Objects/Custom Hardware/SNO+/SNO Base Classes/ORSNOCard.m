@@ -22,7 +22,8 @@
 #import "ORSNOCard.h"
 
 #pragma mark •••Notification Strings
-NSString* ORSNOCardSlotChanged 	= @"ORSNOCardSlotChanged";
+NSString* ORSNOCardSlotChanged		= @"ORSNOCardSlotChanged";
+NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 
 @implementation ORSNOCard
 
@@ -36,9 +37,10 @@ NSString* ORSNOCardSlotChanged 	= @"ORSNOCardSlotChanged";
 {
     return ORSNOCardSlotChanged;
 }
+
 - (int) tagBase
 {
-    return 1;
+    return 0;
 }
 
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
@@ -56,6 +58,35 @@ NSString* ORSNOCardSlotChanged 	= @"ORSNOCardSlotChanged";
 - (void) positionConnector:(ORConnector*)aConnector
 {
 }
+#pragma mark •••Accessors
+- (NSString*) boardID
+{
+	return boardID;
+}
 
+- (void) setBoardID:(NSString*)anId
+{
+	[boardID autorelease];
+    boardID = [anId copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOCardBoardIDChanged object:self];
+	
+}
+
+#pragma mark •••Archival
+- (id) initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    [[self undoManager] disableUndoRegistration];
+    [self setBoardID:	[decoder decodeObjectForKey:  @"boardID"]];
+    [[self undoManager] enableUndoRegistration];
+    return self;
+}
+
+- (void) encodeWithCoder:(NSCoder*)encoder
+{
+	[super encodeWithCoder:encoder];
+	[encoder encodeObject:boardID forKey:@"boardID"];
+}
 
 @end

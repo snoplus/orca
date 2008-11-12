@@ -20,6 +20,7 @@
 
 #pragma mark •••Imported Files
 #import "ORFecDaughterCardModel.h"
+#import "ORFec32Model.h"
 
 
 NSString* ORDCModelCommentsChanged			= @"ORDCModelCommentsChanged";
@@ -74,7 +75,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 #pragma mark •••Accessors
 - (int) globalCardNumber
 {
-	return ([[guardian guardian ] crateNumber] * 16) + ([guardian slot] * 4) + [self slot];	
+	return ([[guardian guardian ] crateNumber] * 16) + ([guardian stationNumber] * 4) + [self slot];	
 }
 
 - (NSComparisonResult) globalCardNumberCompare:(id)aCard
@@ -200,6 +201,11 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 - (unsigned char) vb:(short)anIndex
 {
 	return vb[anIndex];
+}
+
+- (unsigned char) vb:(short)ch egain:(short)gain
+{
+	return vb[ch + (gain?8:0)];
 }
 
 - (void) setVb:(short)anIndex withValue:(unsigned char)aValue
@@ -412,6 +418,12 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 		[encoder encodeInt:vb[i] forKey:[NSString stringWithFormat:@"vb_%d",i]];
 	}
  }
+ 
+ - (void) readBoardIds
+ {
+	[self setBoardID:[[self guardian] performBoardIDRead:DC_BOARD0_ID_INDEX + [self slot]]];
+ }
+ 
  @end
 
 

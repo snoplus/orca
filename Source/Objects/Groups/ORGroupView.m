@@ -470,7 +470,7 @@
 		return changesAllowed;
 	}
     
-    return [self validateLayoutItems:menuItem];
+    return [self validateLayoutItems:menuItem] || [[NSApp delegate] validateMenuItem:menuItem];
 }
 
 - (BOOL) validateLayoutItems:(NSMenuItem*)menuItem

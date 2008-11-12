@@ -72,8 +72,8 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
-	[memBaseAddressField setIntValue:[model memoryAddress]];
-	[regBaseAddressField setIntValue:[model registerAddress]];
+	[memBaseAddressField setIntValue:[model memoryBaseAddress]];
+	[regBaseAddressField setIntValue:[model registerBaseAddress]];
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 
@@ -81,8 +81,8 @@
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
-	[memBaseAddressField setIntValue:[model memoryAddress]];
-	[regBaseAddressField setIntValue:[model registerAddress]];
+	[memBaseAddressField setIntValue:[model memoryBaseAddress]];
+	[regBaseAddressField setIntValue:[model registerBaseAddress]];
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 

@@ -75,6 +75,7 @@
 - (void) cmosChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) probeAction:(id)sender;
 - (IBAction) onlineMaskAction:(id)sender;
 - (IBAction) incCardAction:(id)sender;
 - (IBAction) decCardAction:(id)sender;
@@ -84,4 +85,5 @@
 - (IBAction) vResAction:(id)sender;
 - (IBAction) hvRefAction:(id)sender;
 - (IBAction) cmosAction:(id)sender;
+
 @end

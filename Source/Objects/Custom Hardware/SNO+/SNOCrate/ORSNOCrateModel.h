@@ -34,8 +34,8 @@
 - (int)  slot;
 
 #pragma mark •••Accessors
-- (unsigned long) memoryAddress;
-- (unsigned long) registerAddress;
+- (unsigned long) memoryBaseAddress;
+- (unsigned long) registerBaseAddress;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;

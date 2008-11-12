@@ -26,4 +26,6 @@
 }
 - (int) maxNumberOfCards;
 - (int) cardWidth;
+- (NSPoint) suggestPasteLocationForSNO:(id)aCard;
+
 @end

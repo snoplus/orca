@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
-#import "ORCard.h"
+#import "ORSNOCard.h"
 
 #define kRp1Min 	0.0
 #define kRp1Max 	5.0
@@ -45,7 +45,12 @@
 #define kVbMax 		4.0
 #define kVbStep 	((kVbMax-kVbMin)/255.0)
 
-@interface ORFecDaughterCardModel :  ORCard 
+#define DC_BOARD0_ID_INDEX		2
+#define DC_BOARD1_ID_INDEX		3
+#define DC_BOARD2_ID_INDEX		4
+#define DC_BOARD3_ID_INDEX		5
+
+@interface ORFecDaughterCardModel :  ORSNOCard 
 {
 	@private
 		unsigned char rp1[2];	//RMPUP --ramp voltage up 	(0V to +3.3V)
@@ -115,8 +120,10 @@
 - (float) vtVoltage:(short) n;
 - (void) setVbVoltage:(short)n withValue:(float)value;
 - (float) vbVoltage:(short) n;
+- (unsigned char) vb:(short)ch egain:(short)gain;
 
 #pragma mark •••Hardware Access
+ - (void) readBoardIds;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

@@ -64,6 +64,11 @@
 - (void)		setMemoryClock:(float)aValue;
 - (float)		adcAllowedError:(short)anIndex;
 - (void)		setAdcAllowedError:(short)anIndex withValue:(float)aValue;
+
+#pragma mark •••Hardware Access
+- (void) writeHardwareRegister:(unsigned long) regAddress value:(unsigned long) aValue;
+- (unsigned long) readHardwareRegister:(unsigned long) regAddress;
+
 @end
 
 extern NSString* ORXilinxFileChanged;

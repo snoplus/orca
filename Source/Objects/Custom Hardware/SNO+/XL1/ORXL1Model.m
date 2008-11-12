@@ -21,8 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORXL1Model.h"
-#import "ORXL2Model.h"
-#import "ORCrate.h"
+#import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
 
 NSString* ORXilinxFileChanged			= @"ORXilinxFileChanged";
@@ -88,7 +87,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 - (void) setCrateNumbers
 {
 	//we'll drop in here if any of the XL1/2 connections change -- this is initiated from the XL2s only or we'll get an infinite loop
-	ORXL2Model* nextXL2 = [connector connectedObject];
+	id nextXL2 = [connector connectedObject];
 	[nextXL2 setCrateNumber:0];
 }
 
@@ -136,6 +135,16 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
     
     [aGuardian assumeDisplayOf:connector];
     [self guardian:aGuardian positionConnectorsForCard:self];
+}
+
+- (id) adapter
+{
+	id anAdapter = [[self guardian] adapter];
+	if(anAdapter)return anAdapter;
+	else [NSException raise:@"No PCI/VME adapter" format:@"Check a PCI/VME adapter is in place and connected to the Mac.\n"];
+	return nil;
+
+	return [[self guardian] adapter];
 }
 
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
@@ -270,4 +279,26 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	}	
 }
 
+#pragma mark •••Hardware Access
+
+- (void) writeHardwareRegister:(unsigned long) regAddress value:(unsigned long) aValue
+{
+	[[self adapter] writeLongBlock:&aValue
+              atAddress:regAddress
+             numToWrite:1
+             withAddMod:0x29
+          usingAddSpace:0x01];
+}
+
+- (unsigned long) readHardwareRegister:(unsigned long) regAddress
+{
+	unsigned long aValue = 0;
+	[[self adapter] readLongBlock:&aValue
+              atAddress:regAddress
+             numToRead:1
+             withAddMod:0x29
+          usingAddSpace:0x01];
+	
+	return aValue;
+}
 @end

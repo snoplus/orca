@@ -709,6 +709,7 @@ struct {
         
         *data = *address;
     }
+	else *data = 0;
     return kIOReturnSuccess;
     
 }
@@ -893,6 +894,7 @@ struct {
  			if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
             
         }
+		else *readAddress = 0;
         [theHWLock unlock];   //-----end critical section
         
         
@@ -942,6 +944,8 @@ struct {
  			if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
             
         }
+		else *readAddress = 0;
+
         [theHWLock unlock];   //-----end critical section
         
     NS_HANDLER
@@ -1031,6 +1035,8 @@ struct {
 			if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
             
         }
+		else *readAddress = 0;
+
         [theHWLock unlock];   //-----end critical section
         
     NS_HANDLER
@@ -1128,6 +1134,8 @@ struct {
 			if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
             
         }
+		else *readAddress = 0;
+
         [theHWLock unlock];   //-----end critical section
         
     NS_HANDLER

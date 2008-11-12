@@ -199,7 +199,7 @@
 {
     [super setModel:aModel];
     [groupView setGroup:(ORGroup*)model];
-	[fecNumberField setIntValue:[model slot]];
+	[fecNumberField setIntValue:[model stationNumber]];
 	[crateNumberField setIntValue:[[model guardian] crateNumber]];
 	[pmtView setNeedsDisplay:YES];
  	[self updateButtons];
@@ -271,8 +271,8 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"Fec32 (%d,%d)",[[model guardian] crateNumber],[model slot]]];
-	[fecNumberField setIntValue:[model slot]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Fec32 (%d,%d)",[[model guardian] crateNumber],[model stationNumber]]];
+	[fecNumberField setIntValue:[model stationNumber]];
 	[crateNumberField setIntValue:[[model guardian] crateNumber]];
 	[pmtView setNeedsDisplay:YES];
 }
@@ -325,6 +325,18 @@
 	[model setShowVolts:[sender intValue]];	
 }
 
+- (IBAction) probeAction:(id)sender
+{
+	NS_DURING
+		NSLog(@"%@\n",[model probeFEC32]);
+	NS_HANDLER
+        NSLog(@"Probe of Fec32 FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\n\nFailed Fec32 Probe.", @"OK", nil, nil,
+                        localException);
+	
+	NS_ENDHANDLER
+}
+
 - (IBAction) commentsTextFieldAction:(id)sender
 {
 	[model setComments:[sender stringValue]];	
@@ -365,7 +377,6 @@
 {
 	[self decModelSortedBy:@selector(globalCardNumberCompare:)];
 }
-
 
 
 @end

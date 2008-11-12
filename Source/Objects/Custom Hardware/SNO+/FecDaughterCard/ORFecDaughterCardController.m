@@ -21,7 +21,7 @@
 #pragma mark •••Imported Files
 #import "ORFecDaughterCardController.h"
 #import "ORFecDaughterCardModel.h"
-#import "ORSNOCard.h"
+#import "ORFec32Model.h"
 
 #pragma mark •••Definitions
 
@@ -169,7 +169,7 @@
 {
     [super setModel:aModel];
 	[dcNumberField setIntValue:[model slot]];
-	[fecNumberField setIntValue:[[model guardian] slot]];
+	[fecNumberField setIntValue:[[model guardian] stationNumber]];
 	[crateNumberField setIntValue:[[[model guardian] guardian] crateNumber]];
 }
 
@@ -193,9 +193,9 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"FecDaughterCard (%@)",[model identifier]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"FecDaughterCard (%d,%d,%d)",[[[model guardian] guardian] crateNumber],[[model guardian] stationNumber],[model slot]]];
 	[dcNumberField setIntValue:[model slot]];
-	[fecNumberField setIntValue:[[model guardian] slot]];
+	[fecNumberField setIntValue:[[model guardian] stationNumber]];
 	[crateNumberField setIntValue:[[[model guardian] guardian] crateNumber]];
 }
 

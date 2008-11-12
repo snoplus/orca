@@ -151,7 +151,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 }
 
 #pragma mark •••Accessors
-- (unsigned long) memoryAddress
+- (unsigned long) memoryBaseAddress
 {
 	int index =  [self crateNumber];
 	if(index>=0 && index<=kMaxSNOCrates) return kSnoCrateBaseAddress[index].Memory;
@@ -161,7 +161,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	}
 }
 
-- (unsigned long) registerAddress
+- (unsigned long) registerBaseAddress
 {
 	int index =  [self crateNumber];
 	if(index>=0 && index<=kMaxSNOCrates) return kSnoCrateBaseAddress[index].Register;

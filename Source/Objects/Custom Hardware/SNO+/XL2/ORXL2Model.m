@@ -21,7 +21,7 @@
 #pragma mark •••Imported Files
 #import "ORXL2Model.h"
 #import "ORXL1Model.h"
-#import "ORCrate.h"
+#import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
 
 @implementation ORXL2Model
@@ -36,8 +36,6 @@
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [inputConnectorName release];
-    [outputConnectorName release];
     [inputConnector release];
     [outputConnector release];
     [super dealloc];
@@ -89,17 +87,6 @@
 }
 
 #pragma mark •••Accessors
-- (NSString*) inputConnectorName
-{
-    return inputConnectorName;
-}
-- (void) setInputConnectorName:(NSString*)aName
-{
-    [aName retain];
-    [inputConnectorName release];
-    inputConnectorName = aName;
-    
-}
 
 - (ORConnector*) inputConnector
 {
@@ -113,17 +100,6 @@
     inputConnector = aConnector;
 }
 
-- (NSString*) outputConnectorName
-{
-    return outputConnectorName;
-}
-
-- (void) setOutputConnectorName:(NSString*)aName
-{
-    [aName retain];
-    [outputConnectorName release];
-    outputConnectorName = aName;
-}
 
 - (ORConnector*) outputConnector
 {
@@ -158,22 +134,24 @@
     return [guardian crateNumber];
 }
 
+
 - (void) setGuardian:(id)aGuardian
 {
-    
     id oldGuardian = guardian;
-    [super setGuardian:aGuardian];
-    
+
+	[super setGuardian:aGuardian];
+      
     if(oldGuardian != aGuardian){
+		[oldGuardian setAdapter:nil];	//old crate can't use this card any more
         [oldGuardian removeDisplayOf:[self inputConnector]];
         [oldGuardian removeDisplayOf:[self outputConnector]];
     }
-    
+    [aGuardian setAdapter:self];		//our new crate will use this card for hardware access
+	
     [aGuardian assumeDisplayOf:[self inputConnector]];
     [aGuardian assumeDisplayOf:[self outputConnector]];
     [self guardian:aGuardian positionConnectorsForCard:self];
 }
-
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
 {
     [aGuardian positionConnector:[self inputConnector] forCard:self];
@@ -192,6 +170,15 @@
     [aGuardian assumeDisplayOf:[self outputConnector]];
 }
 
+- (id) adapter
+{
+	id anAdapter = [self getXL1]; //should chain all the way back to the IC XL1
+	if(anAdapter)return anAdapter;
+	else [NSException raise:@"No XL1" format:@"Check that connections are made all the way back to an XL1.\n"];
+	return nil;
+}
+
+
 - (id) getXL1
 {
 	id obj = [inputConnector connectedObject];
@@ -207,7 +194,7 @@
 - (void) setCrateNumber:(int)crateNumber
 {
 	[[self guardian] setCrateNumber:crateNumber];
-	ORXL2Model* nextXL2 = [outputConnector connectedObject];
+	id nextXL2 = [outputConnector connectedObject];
 	[nextXL2 setCrateNumber:crateNumber+1];
 }
 
@@ -220,9 +207,7 @@
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setInputConnectorName:	[decoder decodeObjectForKey:@"inputConnectorName"]];
     [self setInputConnector:		[decoder decodeObjectForKey:@"inputConnector"]];
-    [self setOutputConnectorName:	[decoder decodeObjectForKey:@"outputConnectorName"]];
     [self setOutputConnector:		[decoder decodeObjectForKey:@"outputConnector"]];
 	[self setSlot:					[decoder decodeIntForKey:   @"slot"]];
    
@@ -234,11 +219,62 @@
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:[self inputConnectorName]	 forKey:@"inputConnectorName"];
     [encoder encodeObject:[self inputConnector]		 forKey:@"inputConnector"];
-    [encoder encodeObject:[self outputConnectorName] forKey:@"outputConnectorName"];
     [encoder encodeObject:[self outputConnector]	 forKey:@"outputConnector"];
     [encoder encodeInt:	  [self slot]			     forKey:@"slot"];
 }
+
+#pragma mark •••Hardware Access
+- (void) selectCards:(unsigned long) selectBits
+{
+	[self writeToXL2Register:XL2_SELECT_REG value: selectBits]; // select the cards by writing to the XL2 REG 0 
+}
+
+- (void) deselectCards
+{
+	[self writeToXL2Register:XL2_SELECT_REG value:0UL];	//deselect the cards by writing to the XL2 REG 0
+}
+
+- (void) select:(ORSNOCard*) aCard
+{
+	unsigned long selectBits = (1L<<[aCard stationNumber]);
+	[self writeToXL2Register:XL2_SELECT_REG value: selectBits]; // select the cards by writing to the XL2 REG 0 
+}
+
+- (void) writeToXL2Register:(unsigned long) aRegister value:(unsigned long) aValue
+{
+	if (aRegister > XL2_MASK_REG) {   //Higer registers require that bit 17 be set in the XL2 select register
+		[[self adapter] writeHardwareRegister:[self xl2RegAddress:XL2_SELECT_REG] value:0x20000];
+	}
+	[[self adapter] writeHardwareRegister:[self xl2RegAddress:aRegister] value:aValue]; 		//Now write the value	
+}
+
+- (unsigned long) xl2RegAddress:(unsigned long)aRegOffset
+{
+	return [[self guardian] registerBaseAddress] + xl2_register_offsets[aRegOffset];
+}
+
+// read bit pattern from specified register on XL2
+- (unsigned long) readFromXL2Register:(unsigned long) aRegister
+{
+	if (aRegister > XL2_MASK_REG){   //Higer registers require that bit 17 be set in the XL2 select register
+		[self writeHardwareRegister:[self xl2RegAddress:XL2_SELECT_REG] value:0x20000];
+	}
+
+	// Now read the value
+	return  [self  readHardwareRegister:[self xl2RegAddress:aRegister]]; 	
+}
+
+//call thrus for the Fec hardware access
+- (void) writeHardwareRegister:(unsigned long) anAddress value:(unsigned long) aValue
+{
+	[[self adapter] writeHardwareRegister:anAddress value:aValue];
+}
+
+- (unsigned long) readHardwareRegister:(unsigned long) regAddress
+{
+	return [[self adapter] readHardwareRegister:regAddress];
+}
+
 
 @end

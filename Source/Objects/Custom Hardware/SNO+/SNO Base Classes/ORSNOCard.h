@@ -17,19 +17,28 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 
-#import "ORCard.h"
+#import "ORVmeIOCard.h"
 
-@interface ORSNOCard : ORCard {
+@interface ORSNOCard : ORVmeIOCard {
+	@protected
+		NSString* boardID;
 }
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 - (NSString*) cardSlotChangedNotification;
 - (Class)	guardianClass;
 - (int) tagBase;
+- (NSString*) boardID;
+- (void) setBoardID:(NSString*)anId;
+
+#pragma mark â€¢â€¢â€¢Archival
+- (id) initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
 
-#pragma mark ¥¥¥Extern Definitions
+#pragma mark â€¢â€¢â€¢Extern Definitions
 extern NSString* ORSNOCardSlotChanged;
+extern NSString* ORSNOCardBoardIDChanged;
