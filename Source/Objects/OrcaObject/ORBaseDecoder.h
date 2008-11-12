@@ -18,8 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
 #import "ORDataTypeAssigner.h"
 
 @class ORDataSet;
@@ -27,11 +25,13 @@
 
 @interface ORBaseDecoder : NSObject {
     @protected 
-        BOOL gatesInstalled; //at least one gate installed.
+        BOOL gatesInstalled;				//at least one gate installed.
         NSMutableArray* gates;
+		NSMutableDictionary* cachedObjects;	//decoder can cache info here
 }
 
 - (NSString*) getChannelKey:(unsigned short)aChan;
+- (NSString*) getCardKey:(unsigned short)aChan;
 - (NSString*) getCrateKey:(unsigned short)aCrate;
 
 - (void) addGate: (ORGateElement *) aGate;
@@ -43,5 +43,14 @@
                   value:(unsigned long)aValue;
 
 - (void) swapData:(void*)someData;
+
+- (void) registerNotifications;
+- (void) runStarted:(NSNotification*)aNote;
+- (void) runStopped:(NSNotification*)aNote;
+- (id)   objectForNestedKey:(id)firstKey,...;				//nil terminated list of keys
+- (void) setObject:(id)obj forNestedKey:(id)firstKey,...; //nil terminated list of keys
+- (BOOL) cacheSetUp;
+- (void) setUpCacheUsingHeader:(NSDictionary*)aHeader;
+- (void) cacheCardLevelObject:(id)aKey fromHeader:(NSDictionary*)aHeader;
 
 @end

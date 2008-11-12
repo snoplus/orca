@@ -22,6 +22,7 @@
 #import "ORBaseDecoder.h"
 #import "ORDataSet.h"
 #import "ORGateElement.h"
+#import "ORGlobal.h"
 
 static NSString* kChanKey[32] = {
 	//pre-make some keys for speed.
@@ -35,6 +36,18 @@ static NSString* kChanKey[32] = {
 	@"Channel 28", @"Channel 29", @"Channel 30", @"Channel 31"
 };
 
+static NSString* kCardKey[32] = {
+	//pre-make some keys for speed.
+	@"Card  0", @"Card  1", @"Card  2", @"Card  3",
+	@"Card  4", @"Card  5", @"Card  6", @"Card  7",
+	@"Card  8", @"Card  9", @"Card 10", @"Card 11",
+	@"Card 12", @"Card 13", @"Card 14", @"Card 15",
+	@"Card 16", @"Card 17", @"Card 18", @"Card 19",
+	@"Card 20", @"Card 21", @"Card 22", @"Card 23",
+	@"Card 24", @"Card 25", @"Card 26", @"Card 27",
+	@"Card 28", @"Card 29", @"Card 30", @"Card 31"
+};
+
 static NSString* kCrateKey[16] = {
 	//pre-make some keys for speed.
 	@"Crate  0", @"Crate  1", @"Crate  2", @"Crate  3",
@@ -44,12 +57,39 @@ static NSString* kCrateKey[16] = {
 };
 
 @implementation ORBaseDecoder
+- (id) init
+{
+	self = [super init];
+	[self registerNotifications];
+	return self;
+}
 
 - (void) dealloc
 {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [gates release];
+	[cachedObjects release];
     [super dealloc];
 }
+
+- (void) registerNotifications
+{
+	NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+	[nc removeObserver:self];//just in case
+	[nc addObserver:self selector:@selector(runStarted:) name:ORRunStartedNotification object:nil];
+	[nc addObserver:self selector:@selector(runStopped:) name:ORRunStoppedNotification object:nil];
+}
+
+- (void) runStarted:(NSNotification*)aNote
+{
+	[cachedObjects release];
+	cachedObjects = nil;
+}
+
+- (void) runStopped:(NSNotification*)aNote
+{
+}
+
 
 - (NSString*) getChannelKey:(unsigned short)aChan
 {
@@ -57,6 +97,12 @@ static NSString* kCrateKey[16] = {
 	else return [NSString stringWithFormat:@"Channel %2d",aChan];	
 }
 
+- (NSString*) getCardKey:(unsigned short)aCard
+{
+	if(aCard<16) return kCardKey[aCard];
+	else return [NSString stringWithFormat:@"Card %2d",aCard];		
+	
+}
 - (NSString*) getCrateKey:(unsigned short)aCrate
 {
 	if(aCrate<16) return kCrateKey[aCrate];
@@ -95,6 +141,109 @@ static NSString* kCrateKey[16] = {
 	unsigned long i;
 	for(i=1;i<length;i++){
 		ptr[i] = CFSwapInt32(ptr[i]);
+	}
+}
+
+- (id) objectForNestedKey:(id)firstKey,...
+{
+	return [cachedObjects nestedObjectForKey:firstKey];
+}
+
+- (void) setUpCacheUsingHeader:(NSDictionary*)aHeader;
+{
+	//each decoder can initialize it's object cache....
+}
+
+- (NSArray*) extractArrayFromHeader:(NSDictionary*)aHeader forKey:(id)aKey
+{
+	return [aHeader objectForKey:aKey];
+}
+
+- (void) setObject:(id)obj forNestedKey:(id)firstKey,...
+{
+	if(!cachedObjects)cachedObjects = [[NSMutableDictionary dictionary] retain];
+    va_list myArgs;
+
+	//count the args
+	int count = 0;
+	va_start(myArgs,firstKey);
+	
+	NSString* s = firstKey;
+	while(s = va_arg(myArgs, NSString *)) count++;
+
+
+	//now loop over the args. The last one is special....
+	int argIndex = 0;
+    va_start(myArgs,firstKey);
+	s = firstKey;
+	if(count>1){
+		NSString* lastKey = s;
+		NSMutableDictionary* lastDictionary = [cachedObjects objectForKey:s];
+		if(!lastDictionary) {
+			lastDictionary = [NSMutableDictionary dictionary];
+			[cachedObjects setObject:lastDictionary forKey:s];
+		}
+		while(s = va_arg(myArgs, NSString *)) {
+			argIndex++;
+			if(argIndex>=count){
+				[lastDictionary setObject: obj forKey:s];
+			}
+			else {
+				NSMutableDictionary* aDictionary = [lastDictionary objectForKey:s];
+				if(!aDictionary) {
+					aDictionary = [NSMutableDictionary dictionary];
+					[lastDictionary setObject:aDictionary forKey:s];
+				}
+				lastDictionary = aDictionary;
+				lastKey = s;	//maybe this is the last one.
+			}
+		}
+	}
+	else [cachedObjects setObject: obj forKey:firstKey];
+	
+    va_end(myArgs);
+	
+}
+
+- (BOOL) cacheSetUp
+{
+	return cachedObjects!=nil;
+}
+
+- (void) cacheCardLevelObject:(id)aKey fromHeader:(NSDictionary*)aHeader
+{
+	if(!cachedObjects)cachedObjects = [[NSMutableDictionary dictionary] retain];
+	
+	//set up the crate cache
+	NSArray* crates = [aHeader nestedObjectForKey:@"ObjectInfo",@"Crates",nil];
+	int crateIndex;
+	for(crateIndex=0;crateIndex<[crates count];crateIndex++){
+	
+		NSDictionary* headerCrateDictionary = [crates objectAtIndex:crateIndex];
+		id crateKey = [self getCrateKey:[[headerCrateDictionary objectForKey:@"CrateNumber"] intValue]];
+		
+		NSMutableDictionary* cachedCrateDictionary = [cachedObjects objectForKey:crateKey]; //use existing one if possible
+		if(!cachedCrateDictionary) {														//otherwise
+			cachedCrateDictionary = [NSMutableDictionary dictionary];						//create one
+			[cachedObjects setObject:cachedCrateDictionary forKey:crateKey];
+		}
+		
+		//set up the card cache
+		NSArray* cards = [headerCrateDictionary objectForKey:@"Cards"];
+		int cardIndex;
+		for(cardIndex=0;cardIndex<[cards count];cardIndex++){
+			NSDictionary* headerCardDictionary = [cards objectAtIndex:cardIndex];
+			id cardKey = [self getCardKey:[[headerCrateDictionary objectForKey:@"Card"] intValue]];
+			
+			NSMutableDictionary* cachedCardDictionary = [cachedObjects objectForKey:cardKey];	//use existing one if possible
+			if(!cachedCardDictionary){															//otherwise
+				cachedCardDictionary= [NSMutableDictionary dictionary];							//create one
+				[cachedCrateDictionary setObject:cachedCardDictionary forKey:cardKey];
+			}
+			
+			id objectToCache = [headerCardDictionary objectForKey:aKey];
+			if(objectToCache)[cachedCardDictionary setObject:objectToCache  forKey:aKey];
+		}
 	}
 }
 
