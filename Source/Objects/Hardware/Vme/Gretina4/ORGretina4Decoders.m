@@ -25,6 +25,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORGretina4Model.h"
 
+#define kIntegrationTimeKey @"Integration Time"
+
 @implementation ORGretina4WaveformDecoder
 - (id) init
 {
@@ -38,9 +40,28 @@
 	[actualGretinaCards release];
     [super dealloc];
 }
+- (void) registerNotifications
+{
+	[super registerNotifications];
+	NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+	[nc addObserver:self selector:@selector(integrationTimeChanged:) name:ORGretina4CardInited object:nil];
+}
+
+- (void) integrationTimeChanged:(NSNotification*)aNote
+{
+	ORGretina4Model* theCard	= [aNote object];
+	NSString* crateKey			= [self getCrateKey: [theCard crateNumber]];
+	NSString* cardKey			= [self getCardKey: [theCard slot]];
+	[self setObject:[NSNumber numberWithInt:[theCard integrationTime]] forNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil];
+}
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
+
+	if(![self cacheSetUp]){
+		[self cacheCardLevelObject:kIntegrationTimeKey fromHeader:[aDataPacket fileHeader]];
+	}
+	
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long length = ExtractLength(*ptr);
 	ptr++; //point to location info
@@ -57,15 +78,12 @@
 	
 	// energy is in 2's complement, taking abs value if necessary
 	if (energy & 0x1000000) energy = (~energy & 0x1ffffff) + 1;
-	double energyDouble = (double)energy;
 
-	NSString* crateKey = [self getCrateKey: crate];
-	NSString* cardKey = [self getCardKey: card];
+	NSString* crateKey	 = [self getCrateKey: crate];
+	NSString* cardKey	 = [self getCardKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
 
-
 	//get the actual object
-
 	NSString* aKey = [crateKey stringByAppendingString:cardKey];
 	if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
 	ORGretina4Model* obj = [actualGretinaCards objectForKey:aKey];
@@ -84,9 +102,11 @@
 	if(getRatesFromDecodeStage){
 		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
 	}
-	energyDouble /= [obj integrationTime];
 	
-    [aDataSet histogram:energyDouble numBins:0x1fff sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
+	int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
+	if(integrationTime) energy /= [obj integrationTime];
+	
+    [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	
 	ptr += 4; //point to the data
 

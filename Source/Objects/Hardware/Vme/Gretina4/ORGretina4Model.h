@@ -354,3 +354,4 @@ extern NSString* ORGretina4CardInfoUpdated;
 extern NSString* ORGretina4RateGroupChangedNotification;
 extern NSString* ORGretina4NoiseFloorChanged;
 extern NSString* ORGretina4ModelFIFOCheckChanged;
+extern NSString* ORGretina4CardInited;

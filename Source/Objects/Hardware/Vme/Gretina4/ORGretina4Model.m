@@ -54,6 +54,7 @@ NSString* ORGretina4ModelCFDThresholdChanged	= @"ORGretina4ModelCFDThresholdChan
 NSString* ORGretina4ModelDataDelayChanged		= @"ORGretina4ModelDataDelayChanged";
 NSString* ORGretina4ModelDataLengthChanged		= @"ORGretina4ModelDataLengthChanged";
 NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged		= @"ORGretina4ModelMainFPGADownLoadInProgressChanged";
+NSString* ORGretina4CardInited					= @"ORGretina4CardInited";
 
 @interface ORGretina4Model (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -670,7 +671,7 @@ static struct {
         [self writeRawDataSlidingLength:i];
         [self writeRawDataWindowLength:i];
     }
-    
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4CardInited object:self];
 }
 
 - (unsigned long) readControlReg:(int)channel
@@ -861,7 +862,6 @@ static struct {
     /* Somehow the FIFO got corrupted and is no longer aligned along event boundaries.           *
      * This function will read through to the next boundary and read out the next full event,    *
      * leaving the FIFO aligned along an event.  The function returns the number of events lost. */
-     
     unsigned long val;
     //read the fifo state, sanity check to make sure there is actually another event.
     while (1) {
@@ -904,6 +904,7 @@ static struct {
             
             /* If we've gotten here, it means we have to continue some more. */
         } 
+
     }
 }
 
