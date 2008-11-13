@@ -36,21 +36,6 @@
 #define XL2_HV_VOLTAGE_READ_REG					10
 #define XL2_HV_CURRENT_READ_REG					11
 
-static unsigned long xl2_register_offsets[] =
-{	0,				// [ 0]  Select Register
-	4,				// [ 1]  Data Available Register
-	8,				// [ 2]  XL2 Control Status Register
-	12,				// [ 3]  Mask Register
-	16,				// [ 4]  Clock CSR
-	20,				// [ 5]  HV Relay Control
-	24,				// [ 6]  Xilinx User Control
-	28, 			// [ 7]  General R/W display test register
-	32,				// [ 8]  HV CSR
-	36,				// [ 9]  HV Setpoints
-	40,				// [10]  HV Voltage Readback
-	44,				// [11]  HV Current Readback
-};
-
 @interface ORXL2Model :  ORSNOCard 
 {
 	@protected

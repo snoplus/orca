@@ -485,9 +485,18 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	
 		// Parse the returned data.
 		returnFromSocket = [[self interpretDataFromSocket: aSomeData returnCode: &returnCode] retain];
+		NSArray* tokens;
+		
+//added the following to get rid of a 10.4 compiler warning.   MAH 11/13/08 
+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
+		tokens = [returnFromSocket componentsSeparatedByString: @"\n"]; 
+		NSString* temp = [tokens componentsJoinedByString:@" "];
+		tokens = [temp componentsSeparatedByString: @" "]; 
+#else
 		NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
-		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
- 
+		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
+#endif
+
 		
 		// 1) Make sure we have data returned from HV Crate.
 		if ( [tokens count] > 0 )
