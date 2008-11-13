@@ -82,12 +82,13 @@ static NSString* kCrateKey[16] = {
 
 - (void) runStarted:(NSNotification*)aNote
 {
-	[cachedObjects release];
-	cachedObjects = nil;
+
 }
 
 - (void) runStopped:(NSNotification*)aNote
 {
+	[cachedObjects release];
+	cachedObjects = nil;
 }
 
 
@@ -161,7 +162,7 @@ static NSString* kCrateKey[16] = {
 
 - (void) setObject:(id)obj forNestedKey:(id)firstKey,...
 {
-	if(!cachedObjects)cachedObjects = [[NSMutableDictionary dictionary] retain];
+		if(!cachedObjects)cachedObjects = [[NSMutableDictionary dictionary] retain];
     va_list myArgs;
 
 	//count the args
@@ -233,9 +234,9 @@ static NSString* kCrateKey[16] = {
 		int cardIndex;
 		for(cardIndex=0;cardIndex<[cards count];cardIndex++){
 			NSDictionary* headerCardDictionary = [cards objectAtIndex:cardIndex];
-			id cardKey = [self getCardKey:[[headerCrateDictionary objectForKey:@"Card"] intValue]];
+			id cardKey = [self getCardKey:[[headerCardDictionary objectForKey:@"Card"] intValue]];
 			
-			NSMutableDictionary* cachedCardDictionary = [cachedObjects objectForKey:cardKey];	//use existing one if possible
+			NSMutableDictionary* cachedCardDictionary = [cachedCrateDictionary objectForKey:cardKey];	//use existing one if possible
 			if(!cachedCardDictionary){															//otherwise
 				cachedCardDictionary= [NSMutableDictionary dictionary];							//create one
 				[cachedCrateDictionary setObject:cachedCardDictionary forKey:cardKey];
