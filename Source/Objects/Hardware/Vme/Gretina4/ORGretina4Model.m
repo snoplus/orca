@@ -1564,6 +1564,8 @@ static struct {
 	[self addCurrentState:objDictionary cArray:cfdThreshold forKey:@"CFD Threshold"];
 	[self addCurrentState:objDictionary cArray:dataDelay forKey:@"Data Delay"];
 	[self addCurrentState:objDictionary cArray:dataLength forKey:@"Data Length"];
+	[self addCurrentState:objDictionary cArray:cfdEnabled forKey:@"CFD Enabled"];
+	[self addCurrentState:objDictionary cArray:poleZeroEnabled forKey:@"Pole Zero Enabled"];
     
     NSMutableArray* ar = [NSMutableArray array];
 	for(i=0;i<kNumGretina4Channels;i++){
