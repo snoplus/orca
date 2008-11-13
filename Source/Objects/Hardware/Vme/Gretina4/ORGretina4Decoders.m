@@ -83,28 +83,9 @@
 	NSString* cardKey	 = [self getCardKey: card];
 	NSString* channelKey = [self getChannelKey: channel];
 
-	//get the actual object
-	NSString* aKey = [crateKey stringByAppendingString:cardKey];
-	if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
-	ORGretina4Model* obj = [actualGretinaCards objectForKey:aKey];
-	if(!obj){
-		NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4Model")];
-		NSEnumerator* e = [listOfCards objectEnumerator];
-		ORGretina4Model* aCard;
-		while(aCard = [e nextObject]){
-			if([aCard slot] == card){
-				[actualGretinaCards setObject:aCard forKey:aKey];
-				obj = aCard;
-				break;
-			}
-		}
-	}
-	if(getRatesFromDecodeStage){
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
-	}
 	
 	int integrationTime = [[self objectForNestedKey:crateKey,cardKey,kIntegrationTimeKey,nil] intValue];
-	if(integrationTime) energy /= [obj integrationTime];
+	if(integrationTime) energy /= integrationTime;
 	
     [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	
@@ -129,6 +110,26 @@
 				  unitSize:2 //unit size in bytes!
 					sender:self  
 				  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
+
+	if(getRatesFromDecodeStage){
+		//get the actual object
+		NSString* aKey = [crateKey stringByAppendingString:cardKey];
+		if(!actualGretinaCards)actualGretinaCards = [[NSMutableDictionary alloc] init];
+		ORGretina4Model* obj = [actualGretinaCards objectForKey:aKey];
+		if(!obj){
+			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORGretina4Model")];
+			NSEnumerator* e = [listOfCards objectEnumerator];
+			ORGretina4Model* aCard;
+			while(aCard = [e nextObject]){
+				if([aCard slot] == card){
+					[actualGretinaCards setObject:aCard forKey:aKey];
+					obj = aCard;
+					break;
+				}
+			}
+		}
+		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+	}
 	 
     return length; //must return number of longs
 }
