@@ -591,7 +591,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
         reply[0]='\0';
         long n = [self writeReadGPIBDevice:@"*IDN?" data:reply maxLength:1024];
         if(n>0)reply[n-1]='\0';
-        return [NSString stringWithCString:reply];
+        NSMutableString* rs =  [NSMutableString stringWithCString:reply];
+		if(rs)[rs replaceOccurrencesOfString:@"\n" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [rs length])];
+		return rs;
     }
     else {
         return @"Not Connected";
