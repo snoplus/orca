@@ -42,6 +42,7 @@ NSString* ORTaskStateName[] = {
 NSString* ORQueueRecordForShippingNotification  = @"ORQueueRecordForShippingNotification";
 
 
+NSString* ORNeedMoreTimeToStopRun			= @"Extend Time to stop run";
 NSString* ORRunAboutToStartNotification     = @"Run is about to start";
 NSString* ORRunStartedNotification          = @"Run started";
 NSString* ORRunAboutToStopNotification      = @"Run is about to stop";

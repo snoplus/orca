@@ -84,6 +84,6 @@ table view controller.
 
 @end
 
-extern NSString* ORActionControllerActionChangedNotification;
-extern NSString* ORActionControllerParameterValueChangedNotification;
+extern NSString* ORActionControllerActionChanged;
+extern NSString* ORActionControllerParameterValueChanged;
 

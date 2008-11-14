@@ -1289,6 +1289,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		It will be reset when the run starts.                                           */
 		throttle = 0;
 		if(runInfo.amountInBuffer > 0){
+			lastAmountInBuffer = runInfo.amountInBuffer;
 			NSLog(@"%@ %d %d reading out last %d bytes in CB\nm",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
 		}
 	NS_HANDLER
@@ -1301,6 +1302,13 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	//the remote client has  been told to stop taking data, but there is probably still
 	//data in the CB. The run will not actually stop until we return YES from this method.
 	[self getRunInfoBlock];
+	
+	if(lastAmountInBuffer != runInfo.amountInBuffer){
+		//as long as the amount in the buffer is changing, we'll ask for more time.
+		[[NSNotificationCenter defaultCenter] postNotificationName: ORNeedMoreTimeToStopRun object:self];
+		lastAmountInBuffer = runInfo.amountInBuffer;
+	}
+	
 	return (runInfo.amountInBuffer == 0) && !irqThreadRunning;
 }
 

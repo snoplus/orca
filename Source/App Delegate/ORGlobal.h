@@ -98,6 +98,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 @end
 
 #pragma mark •••External Definitions
+extern NSString* ORNeedMoreTimeToStopRun;
 extern NSString* ORRunStoppedNotification;
 extern NSString* ORRunStatusChangedNotification;
 extern NSString* ORRunStatusValue;

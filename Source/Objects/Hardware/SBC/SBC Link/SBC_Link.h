@@ -122,6 +122,7 @@ typedef enum eSBC_ThrottleConsts{
 	float			productionSpeed;
 	NSPoint         cbPoints[100];
 	int				recordSizeHisto[1000];
+	unsigned long	lastAmountInBuffer;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -129,7 +130,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) wakeUp; 
 - (void) sleep ;	
 
-#pragma mark â€¢â€¢â€¢Accessors
+#pragma mark ¥¥¥Accessors
 - (int) slot;
 - (NSUndoManager*) undoManager;
 - (int) numTestPoints;
@@ -297,10 +298,10 @@ typedef enum eSBC_ThrottleConsts{
 - (BOOL) productionSpeedValueValid;
 - (float) productionSpeed;
 
-#pragma mark â€¢â€¢â€¢DataSource
+#pragma mark ¥¥¥DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 
-#pragma mark â€¢â€¢â€¢Archival
+#pragma mark ¥¥¥Archival
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 

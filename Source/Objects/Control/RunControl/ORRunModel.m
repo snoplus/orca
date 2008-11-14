@@ -682,7 +682,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [[ORGlobal sharedInstance] checkRunMode];
         
         [self setRunningState:eRunInProgress];
-        
+		
         _ignoreRunTimeout = NO;
         
     NS_HANDLER
@@ -766,6 +766,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	totalWaitTime = 0;
 	[self waitForRunToStop];
 	
+}
+
+- (void) needMoreTimeToStopRun:(NSNotification*)aNote
+{
+	totalWaitTime = 0;	
 }
 
 - (void) waitForRunToStop
@@ -1139,6 +1144,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                      selector: @selector(vetosChanged:)
                          name: ORRunVetosChanged
                        object: nil];    
+
+	[notifyCenter addObserver:self 
+					 selector:@selector(needMoreTimeToStopRun:) 
+						 name:ORNeedMoreTimeToStopRun 
+					   object:nil];
+	
 }
 
 - (void) vetosChanged:(NSNotification*)aNotification

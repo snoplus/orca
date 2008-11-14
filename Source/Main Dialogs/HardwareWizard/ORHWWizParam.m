@@ -213,12 +213,13 @@
     enabledWhileRunning = state;
 }
 
-- (unsigned short)actionMask {
-
+- (unsigned short)actionMask 
+{
     return actionMask;
 }
 
-- (void)setActionMask:(unsigned short)anActionMask {
+- (void)setActionMask:(unsigned short)anActionMask 
+{
     actionMask = anActionMask;
 }
 

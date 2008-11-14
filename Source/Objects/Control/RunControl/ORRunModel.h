@@ -155,6 +155,7 @@
 - (void) incrementTime:(NSTimer*)aTimer;
 - (void) sendHeartBeat:(NSTimer*)aTimer;
 
+- (void) needMoreTimeToStopRun:(NSNotification*)aNotification;
 - (void) vetosChanged:(NSNotification*)aNotification;
 - (void) runModeChanged:(NSNotification*)aNotification;
 - (void) vmePowerFailed:(NSNotification*)aNotification;

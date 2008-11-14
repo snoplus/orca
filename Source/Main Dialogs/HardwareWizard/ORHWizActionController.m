@@ -23,8 +23,8 @@
 #import "ORHWWizParam.h"
 
 #pragma mark ***External Strings
-NSString* ORActionControllerActionChangedNotification = @"ORActionControllerActionChangedNotification";
-NSString* ORActionControllerParameterValueChangedNotification = @"ORActionControllerParameterValueChangedNotification";
+NSString* ORActionControllerActionChanged = @"ORActionControllerActionChanged";
+NSString* ORActionControllerParameterValueChanged = @"ORActionControllerParameterValueChanged";
 
 
 static NSString* valueChangeString[kNumActions] = {
@@ -89,7 +89,7 @@ static NSString* valueChangeString[kNumActions] = {
     actionTag = aNewActionTag;
     
     [[NSNotificationCenter defaultCenter] 
-		    postNotificationName:ORActionControllerActionChangedNotification 
+		    postNotificationName:ORActionControllerActionChanged 
                           object: self];
 }
 
@@ -104,7 +104,7 @@ static NSString* valueChangeString[kNumActions] = {
     parameterTag = aNewParameterTag;
     
     [[NSNotificationCenter defaultCenter] 
-		    postNotificationName:ORActionControllerActionChangedNotification 
+		    postNotificationName:ORActionControllerActionChanged 
                           object: self];
 }
 
@@ -120,7 +120,7 @@ static NSString* valueChangeString[kNumActions] = {
     parameterValue = [aNewParameterValue copy];
     
     [[NSNotificationCenter defaultCenter] 
-		    postNotificationName:ORActionControllerParameterValueChangedNotification 
+		    postNotificationName:ORActionControllerParameterValueChanged 
                           object: self];
 }
 
@@ -144,18 +144,18 @@ static NSString* valueChangeString[kNumActions] = {
     
     [notifyCenter addObserver : self
                       selector: @selector(actionChanged:)
-                          name: ORActionControllerActionChangedNotification
+                          name: ORActionControllerActionChanged
                        object : self];
     
     [notifyCenter addObserver : self
                       selector: @selector(parameterValueChanged:)
-                          name: ORActionControllerActionChangedNotification
+                          name: ORActionControllerActionChanged
                        object : self];
     
     
     [notifyCenter addObserver : self
                       selector: @selector(parameterValueChanged:)
-                          name: ORActionControllerParameterValueChangedNotification
+                          name: ORActionControllerParameterValueChanged
                        object : self];
     
 }
@@ -258,28 +258,14 @@ static NSString* valueChangeString[kNumActions] = {
 			          
         //enable/disable things
         BOOL useValue = [param useValue] && (actionTag!=kAction_Restore) && (actionTag!=kAction_Restore_All);
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_3
 		[actionPopupButton setHidden:![param useValue]];
         [parameterValueStepper setHidden:!useValue];
         [parameterValueTextField setHidden:!useValue];
         [valueChangeField setHidden:!useValue];
         [unitsField setHidden:!useValue];
-#else
-        [actionPopupButton setEnabled:[param useValue]];
-        [parameterValueStepper setEnabled:useValue];
-        [parameterValueTextField setEnabled:useValue];
-        [valueChangeField setEditable:useValue];
-        [unitsField setSelectable:useValue];
-		[parameterValueTextField setSelectable:useValue];
-
-#endif
 
         BOOL useParameter = (actionTag!=kAction_Restore_All);
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_3
 		[parameterPopupButton setHidden:!useParameter];
-#else
-        [parameterPopupButton setEnabled:useParameter];
-#endif
 
         
         //refresh

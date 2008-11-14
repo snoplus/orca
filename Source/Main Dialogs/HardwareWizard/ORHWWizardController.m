@@ -347,12 +347,10 @@ static ORHWWizardController *sharedInstance = nil;
                          name : ORHWWizCountsChangedNotification
                        object : nil];
     
-    
     [notifyCenter addObserver : self
                      selector : @selector(statusTextChanged:)
                          name : ORStatusTextChangedNotification
                        object : nil];
-    
     
     [notifyCenter addObserver : self
                      selector : @selector(wizardLockChanged:)
@@ -366,7 +364,7 @@ static ORHWWizardController *sharedInstance = nil;
     
     [notifyCenter addObserver : self
                       selector: @selector(actionChanged:)
-                          name: ORActionControllerActionChangedNotification
+                          name: ORActionControllerActionChanged
                        object : nil];
     
     [notifyCenter addObserver : self
@@ -378,8 +376,6 @@ static ORHWWizardController *sharedInstance = nil;
                      selector : @selector(documentClosed:)
                          name : ORDocumentClosedNotification
                        object : nil];
-    
-    
 }
 
 - (void) securityStateChanged:(NSNotification*)aNotification
@@ -498,7 +494,6 @@ static ORHWWizardController *sharedInstance = nil;
         if(selectedItem != -1)[marksPU selectItemAtIndex:selectedItem];
         else [marksPU selectItemAtIndex:0];
     }
-    
 }
 
 - (void) countChanged:(NSNotification*)aNote
@@ -570,7 +565,6 @@ static ORHWWizardController *sharedInstance = nil;
 		[self selectObject:nil];
 	}
 	[self wizardLockChanged:aNote];
-	
 }
 
 
@@ -582,7 +576,6 @@ static ORHWWizardController *sharedInstance = nil;
     [self adjustActionSize:1];
     
     [[[self undoManager] prepareWithInvocationTarget:self] removeActionControllerAtIndex:index+1];
-    
 }
 
 - (void) removeActionControllerAtIndex:(int) index
@@ -602,7 +595,6 @@ static ORHWWizardController *sharedInstance = nil;
     [selectionViewController reloadTableView];
     [self adjustSelectionSize:1];
     [[[self undoManager] prepareWithInvocationTarget:self] removeSelectionControllerAtIndex:index+1];
-    
 }
 
 - (void) removeSelectionControllerAtIndex:(int) index
@@ -613,9 +605,6 @@ static ORHWWizardController *sharedInstance = nil;
     [selectionViewController reloadTableView];
     [self adjustSelectionSize:-1];
 }
-
-
-
 
 - (void) adjustActionSize:(int)amount
 {
@@ -629,7 +618,6 @@ static ORHWWizardController *sharedInstance = nil;
     windowFrame.origin.y -= delta;
     [[self window] setFrame:windowFrame display:YES];
 }
-
 
 - (void) adjustSelectionSize:(int)amount
 {
@@ -901,7 +889,6 @@ static ORHWWizardController *sharedInstance = nil;
             [cell setTag:row];
         }
     }
-    
 }
 
 // Methods from NSTableDataSource protocol
@@ -949,7 +936,8 @@ static ORHWWizardController *sharedInstance = nil;
     if([[objects allKeys]count]){
         //create a temp proxy of an obj that conforms to the ORWWizard protocol.
         NSObject<ORHWWizard>* obj = [[[NSClassFromString([[objectPU selectedItem] title]) alloc]init] autorelease];
-        return [obj wizardParameters];
+		if(!obj) return [self defaultEmptyParameterArray];
+        else return [obj wizardParameters];
     }
     else return [self defaultEmptyParameterArray];
 }
@@ -1086,7 +1074,6 @@ static ORHWWizardController *sharedInstance = nil;
             return selection;
         }
     }
-    
     return nil;
 }
 
@@ -1317,9 +1304,6 @@ static ORHWWizardController *sharedInstance = nil;
     }
 }
 
-
-
-
 - (void) executeControlStruct
 {
     
@@ -1348,7 +1332,6 @@ static ORHWWizardController *sharedInstance = nil;
 
 - (void) doAction:(eAction)actionSelection target:(id)target parameter:(ORHWWizParam*)paramObj channel:(int)chan value:(NSNumber*)aValue 
 {
-    
     BOOL skip = NO;
     NSDecimalNumber* returnValue = nil;
     //convert aValue to a NSDecimalNumber
@@ -1446,33 +1429,32 @@ static ORHWWizardController *sharedInstance = nil;
 					
 					break;
 					
-					case kAction_Restore_All:
-					{
-						ORHWWizParam* aParam;
-						NSEnumerator* e = [[self selectedObjectsParameters] objectEnumerator];
-						while(aParam = [e nextObject]){
-							int numSetArgs = [[target methodSignatureForSelector:[aParam setMethodSelector]] numberOfArguments]-2;
-							if(numSetArgs>0){
-								[self doAction:kAction_Restore target:target parameter:aParam channel:chan value:aValue];
-							}
-						}
-						skip = YES; //don't want to do the invocation again at the end
+			case kAction_Restore_All:
+			{
+				ORHWWizParam* aParam;
+				NSEnumerator* e = [[self selectedObjectsParameters] objectEnumerator];
+				while(aParam = [e nextObject]){
+					int numSetArgs = [[target methodSignatureForSelector:[aParam setMethodSelector]] numberOfArguments]-2;
+					if(numSetArgs>0){
+						[self doAction:kAction_Restore target:target parameter:aParam channel:chan value:aValue];
 					}
-						break;
-						
-					default:
-						break;
+				}
+				skip = YES; //don't want to do the invocation again at the end
 			}
-                    
-			if(!skip){
-				[invocationForSetter invoke];        
-				[[self hwUndoManager] addToUndo:invocationForUndo withRedo:invocationForSetter];
-			}
-					
+				break;
+				
+			default: break;
 		}
-		[undoButton setEnabled:[hwUndoManager canUndo]];
-		[redoButton setEnabled:[hwUndoManager canRedo]];
-		[clearUndoButton setEnabled:[redoButton isEnabled] || [undoButton isEnabled]];
+				
+		if(!skip){
+			[invocationForSetter invoke];        
+			[[self hwUndoManager] addToUndo:invocationForUndo withRedo:invocationForSetter];
+		}
+				
+	}
+	[undoButton setEnabled:[hwUndoManager canUndo]];
+	[redoButton setEnabled:[hwUndoManager canRedo]];
+	[clearUndoButton setEnabled:[redoButton isEnabled] || [undoButton isEnabled]];
 }
 
 - (IBAction) restoreAllAction:(id) sender
@@ -1526,7 +1508,6 @@ static ORHWWizardController *sharedInstance = nil;
 					NSLog(@"HW Wizard selection <%@> can not be executed while running. It was skipped.\n",[paramObj name]);
 					continue;
 				}
-				
 				
 				if(numberOfSettableArguments <=1){
 					//no channels to deal with, just do the action
@@ -1699,13 +1680,9 @@ static ORHWWizardController *sharedInstance = nil;
         [self executeControlStruct];   
     }
 }
-
-
 @end
 
 //-------------------------------------------
-
-
 @implementation ORHWWizObj
 
 + (id) hwWizObject:(id<ORHWWizard>)obj
@@ -1720,7 +1697,6 @@ static ORHWWizardController *sharedInstance = nil;
     target = obj;
     return self;
 }
-
 
 - (id) target
 {
