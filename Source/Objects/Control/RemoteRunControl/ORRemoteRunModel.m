@@ -532,7 +532,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [objDictionary setObject:[NSNumber numberWithBool:offline]			forKey:@"offline"];
     [objDictionary setObject:[NSNumber numberWithLong:[self runNumber]] forKey:@"RunNumber"];
     
-    [dictionary setObject:objDictionary forKey:@"Run Control"];
+    [dictionary setObject:objDictionary forKey:@"Remote Run Control"];
     
     
     return objDictionary;
