@@ -488,7 +488,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		NSArray* tokens;
 		
 //added the following to get rid of a 10.4 compiler warning.   MAH 11/13/08 
-#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
 		tokens = [returnFromSocket componentsSeparatedByString: @"\n"]; 
 		NSString* temp = [tokens componentsJoinedByString:@" "];
 		tokens = [temp componentsSeparatedByString: @" "]; 
