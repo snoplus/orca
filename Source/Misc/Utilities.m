@@ -13,12 +13,13 @@
 //-------------------------------------------------------------
 
 
-//#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
 #import <objc/objc-class.h>
 #import <objc/Protocol.h>
-//#else
-//#import "objc/runtime.h"
-//#endif
+#else
+#import "objc/runtime.h"
+#endif
+
 //-----------------------------------------------------------------------------
 /*!\func	convertTimeCharToLong
  * \brief	Converts a date/time string in standard format to a long.
@@ -129,7 +130,7 @@ NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL showSuperClass)
 {
 NSMutableString* resultString = [NSMutableString stringWithString:@""];
 
-//#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
     struct objc_class *class = aClass;
 	if(!aClass)return @"Class Not Found!\n";
     const char *name = class->name;
@@ -164,7 +165,7 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
 			[resultString appendString: listMethodWithOptions( class->super_class,verbose,showSuperClass)];
 		}
 	 }
-/*
+
  #else
 	const char *name = class_getName(aClass);
 	if(!name)return @"Class Not Found!\n";
@@ -193,6 +194,11 @@ NSMutableString* resultString = [NSMutableString stringWithString:@""];
 	 }
 
 #endif
-*/
+
 	return resultString;
+}
+
+NSString* hexToString(unsigned long aHexValue)
+{
+	return [NSString stringWithFormat:@"%x",aHexValue];
 }
