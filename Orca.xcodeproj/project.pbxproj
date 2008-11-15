@@ -10835,7 +10835,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Deployment;
 		};
@@ -10846,7 +10846,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Default;
 		};
