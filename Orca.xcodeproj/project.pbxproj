@@ -1902,7 +1902,7 @@
 		9C2595AC0D5171B90039C5DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
-			fileType = sourcecode.lex;
+			fileType = pattern.proxy;
 			isEditable = 1;
 			outputFiles = (
 				"lex.${INPUT_FILE_BASE}.m",
@@ -2101,7 +2101,7 @@
 		2ACEE0DF0612266000CAD497 /* ThresholdCalibrationChannel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationChannel.m; sourceTree = "<group>"; };
 		2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ThresholdCalibrationTask.h; sourceTree = "<group>"; };
 		2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationTask.m; sourceTree = "<group>"; };
-		2AE87BDD0D6E486900A839FC /* libmysqlclient.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmysqlclient.a; sourceTree = "<group>"; };
+		2AE87BDD0D6E486900A839FC /* libmysqlclient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmysqlclient.a; sourceTree = "<group>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
 		546D9DA90874BDD60072A274 /* OR2228AController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2228AController.h; path = Source/Objects/Hardware/Camac/TDC2228A/OR2228AController.h; sourceTree = SOURCE_ROOT; };
@@ -8341,8 +8341,8 @@
 				84AD1EE003C2476F005F64B1 /* Data Processing */,
 				842F19A603B8EAF3005F64B1 /* Control */,
 				840EFFA30944B28F00049827 /* ProcessLogic */,
-				F51E698503AE4775015F64B1 /* Hardware */,
 				84C4948A0405A0C0005F64B1 /* Custom Hardware */,
+				F51E698503AE4775015F64B1 /* Hardware */,
 			);
 			name = Objects;
 			path = Source/Objects;
@@ -9850,6 +9850,7 @@
 		8429B1C80B03B5140096045E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
+			comments = "ranlib is needed to be run to make sure the archive ";
 			files = (
 			);
 			inputPaths = (
@@ -9858,7 +9859,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/bin/ranlib Libraries/libUniversal/libmysqlclient.a";
+			shellScript = "cp Libraries/libUniversal/libmysqlclientRepo.a Libraries/libUniversal/libmysqlclient.a\n/usr/bin/ranlib Libraries/libUniversal/libmysqlclient.a";
 		};
 		8491DD760EB616630084BAD6 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
