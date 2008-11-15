@@ -557,7 +557,7 @@ struct {
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result = IOConnectMethodScalarIScalarO(dataPort,		// service
                                                kBit3GetPCIBusNumber,	// method index
@@ -591,7 +591,7 @@ struct {
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
 												kBit3GetPCIDeviceNumber,	// method index
@@ -624,7 +624,7 @@ struct {
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result =   IOConnectMethodScalarIScalarO(dataPort,		// service
 												 kBit3GetPCIFunctionNumber,	// method index
@@ -658,7 +658,7 @@ struct {
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
 												kBit3ReadPCIConfig,	// method index
@@ -697,7 +697,7 @@ struct {
 
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result = IOConnectMethodScalarIStructureO(
 												  dataPort,		// service
@@ -1291,7 +1291,7 @@ struct {
 
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//10.4
 	kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
 											   kBit3UserClientOpen,	// method index
@@ -1317,7 +1317,7 @@ struct {
 {
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//10.4
 	kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
 											   kBit3UserClientClose,	// method index

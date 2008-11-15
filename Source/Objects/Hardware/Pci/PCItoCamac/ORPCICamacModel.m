@@ -260,7 +260,7 @@ static UInt32 *fVPCICamacMem;
 {
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//for 10.4
 	kernResult =  IOConnectMethodScalarIScalarO( aDataPort,		// service
 												kPCICAMACUserClientOpen,	// method index
@@ -286,7 +286,7 @@ static UInt32 *fVPCICamacMem;
 {
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//10.4
 	kernResult =  IOConnectMethodScalarIScalarO( aDataPort,		// service
 												kPCICAMACUserClientClose,	// method index
@@ -391,7 +391,7 @@ static UInt32 *fVPCICamacMem;
 {
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4	
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4	
 	//10.4
 	kernResult = IOConnectMethodScalarIScalarO(
 											   dataPort,		// service
@@ -428,7 +428,7 @@ static UInt32 *fVPCICamacMem;
     size_t pciDataSize = sizeof(PCIConfigStruct);
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//10.4
 	kernResult = IOConnectMethodScalarIStructureO(  dataPort,		// service
 												  kPCICAMACGetPCIConfig,	// method index
@@ -741,7 +741,7 @@ static UInt32 *fVPCICamacMem;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
 												kPCICAMACGetPCIBusNumber,	// method index
@@ -774,7 +774,7 @@ static UInt32 *fVPCICamacMem;
     kern_return_t result=0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result =   IOConnectMethodScalarIScalarO(dataPort,		// service
 												 kPCICAMACGetPCIDeviceNumber,	// method index
@@ -807,7 +807,7 @@ static UInt32 *fVPCICamacMem;
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
 												kPCICAMACGetPCIFunctionNumber,	// method index
