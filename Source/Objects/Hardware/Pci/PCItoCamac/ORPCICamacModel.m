@@ -258,29 +258,24 @@ static UInt32 *fVPCICamacMem;
 // call Open method in user client
 - (kern_return_t)  _openUserClient:(io_service_t) serviceObject port:(io_connect_t) aDataPort
 {
-
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	if(IOConnectCallScalarMethod != NULL ) {
-#endif
-		kernResult= IOConnectCallScalarMethod(aDataPort,		// connection
-											  kPCICAMACUserClientOpen,	// selector
-											  0,			// input values
-											  0,			// number of scalar input values														
-											  0,			// output values
-											  0			// number of scalar output values
-											  );
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	} else {
-		kernResult =  IOConnectMethodScalarIScalarO( aDataPort,		// service
-													 kPCICAMACUserClientOpen,	// method index
-													 0,			// number of scalar input values
-													 0			// number of scalar output values
-													 );
-	}
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	//for 10.4
+	kernResult =  IOConnectMethodScalarIScalarO( aDataPort,		// service
+												kPCICAMACUserClientOpen,	// method index
+												0,			// number of scalar input values
+												0			// number of scalar output values
+												);
+#else
+	//for 10.5
+	kernResult = IOConnectCallScalarMethod(aDataPort,		// connection
+										  kPCICAMACUserClientOpen,	// selector
+										  0,			// input values
+										  0,			// number of scalar input values														
+										  0,			// output values
+										  0			// number of scalar output values
+										  );
 #endif
 	return kernResult;
 }
@@ -291,27 +286,22 @@ static UInt32 *fVPCICamacMem;
 {
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	if(IOConnectCallScalarMethod != NULL ) {
-#endif
-
-		kernResult =  IOConnectCallScalarMethod( aDataPort,		// connection
-												 kPCICAMACUserClientClose,	// selector
-												 0,			// input values
-												 0,			// number of scalar input values														
-												 0,			// output values
-												 0			// number of scalar output values
-												 );
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	} else {
-		kernResult =  IOConnectMethodScalarIScalarO( aDataPort,		// service
-													 kPCICAMACUserClientClose,	// method index
-													 0,			// number of scalar input values
-													 0			// number of scalar output values
-													 );
-	}
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	//10.4
+	kernResult =  IOConnectMethodScalarIScalarO( aDataPort,		// service
+												kPCICAMACUserClientClose,	// method index
+												0,			// number of scalar input values
+												0			// number of scalar output values
+												);
+#else
+	//10.5
+	kernResult =  IOConnectCallScalarMethod( aDataPort,		// connection
+											 kPCICAMACUserClientClose,	// selector
+											 0,			// input values
+											 0,			// number of scalar input values														
+											 0,			// output values
+											 0			// number of scalar output values
+											 );
 #endif
 	return kernResult;
 }
@@ -332,25 +322,20 @@ static UInt32 *fVPCICamacMem;
     // create Master Mach Port which is used to initiate
     // communication with IOKit
     kern_return_t ret = IOMasterPort(MACH_PORT_NULL, &masterPort);
-    if( ret != KERN_SUCCESS ) {
-        return NO;
-    }
+    if( ret != KERN_SUCCESS ) return NO;
     
     // create a property list dictionary for matching driver class,
     // input string is used as the value for the IOProviderClass object
     camacMatch = IOServiceMatching(kPCICAMACServiceClassName);
-    if( camacMatch == NULL ) {
-        return NO;
-    }        
+    if( camacMatch == NULL ) return NO;
     
     // create iterator of all instances of the driver class that exist
     // in the IORegistry - note that IOServiceGetMatchingServices is
     // documented as consuming a reference on the matching dictionary
     // so it is not necessary to release it here - very odd!!!!
     ret = IOServiceGetMatchingServices(masterPort, camacMatch, &iter);
-    if( ret != KERN_SUCCESS ) {
-        return NO;
-    }        
+    if( ret != KERN_SUCCESS ) return NO;
+    
     camacMatch = 0;		// finish dictionary handoff
     
     // iterate over all matching drivers in the registry to find a device
@@ -364,44 +349,36 @@ static UInt32 *fVPCICamacMem;
     }
     IOObjectRelease(iter);	// release iterator since no longer needed
     iter = 0;
-    if( !camacDevice ) {
-        return NO;
-    }
+    if( !camacDevice ) return NO;
     
     // create an instance of the user client object
     dataService = camacDevice;
     ret = IOServiceOpen(dataService, mach_task_self(), 0,
                         &dataPort);
-    if( ret != KERN_SUCCESS ) {
-        return NO;
-    }
+    if( ret != KERN_SUCCESS ) return NO;
     
     // now have a connection to the user client in the driver
     // call Open method in user client
     ret = [self _openUserClient:dataService port:dataPort];
     IOObjectRelease(dataService);	// release service since no longer needed
     dataService = 0;
-    if( ret != KERN_SUCCESS ) {
-        return NO;
-    }
+    if( ret != KERN_SUCCESS ) return NO;
     
     // now can call methods to communicate with user client and rest of driver
     // call clientMemoryFortype() in driver user client to map PCIADA address spaces
     // map PCIADA LC register address space
     ret = IOConnectMapMemory(dataPort, 0, mach_task_self(), &mapLCRegisterAddress,
                              &mapLCRegisterLength, kIOMapAnywhere);
-    if( ret != KERN_SUCCESS ) {
-        return NO;
-    }
+    if( ret != KERN_SUCCESS ) return NO;
+    
     fVLCReg = (UInt32 *)mapLCRegisterAddress;
     
     
     // map PCICamac memory address space
     ret = IOConnectMapMemory(dataPort, 3, mach_task_self(), &mapPCICamacMemoryAddress,
                              &mapPCICamacMemoryLength, kIOMapAnywhere);
-    if( ret != KERN_SUCCESS ) {
-        return NO;
-    }        
+    if( ret != KERN_SUCCESS ) return NO;
+    
     fVPCICamacMem = (UInt32 *)mapPCICamacMemoryAddress;
     
     return YES;
@@ -414,34 +391,31 @@ static UInt32 *fVPCICamacMem;
 {
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	if(IOConnectCallScalarMethod != NULL ) {
-#endif
-		uint64_t input = address;
-		uint64_t output_64;
-		uint32_t outputCount = 1;
-
-		kernResult = IOConnectCallScalarMethod(dataPort,					// connection
-											   kPCICAMACReadPCIConfig,	// selector
-											   &input,					// input values
-											   1,							// number of scalar input values														
-											   &output_64,					// output values
-											   &outputCount				// number of scalar output values
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4	
+	//10.4
+	kernResult = IOConnectMethodScalarIScalarO(
+											   dataPort,		// service
+											   kPCICAMACReadPCIConfig,	// method index
+											   1,			// number of scalar input values
+											   1,			// number of scalar output values
+											   address,		// scalar input value
+											   data		// scalar output value
 											   );
-		*data = (uint32_t) output_64;
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-    } else {
-        // Otherwise fall back to older API.
-		kernResult = IOConnectMethodScalarIScalarO(
-											 dataPort,		// service
-											 kPCICAMACReadPCIConfig,	// method index
-											 1,			// number of scalar input values
-											 1,			// number of scalar output values
-											 address,		// scalar input value
-											 data		// scalar output value
-											 );
-	}
+
+#else
+	//10.5
+	uint64_t input = address;
+	uint64_t output_64;
+	uint32_t outputCount = 1;
+	
+	kernResult = IOConnectCallScalarMethod(dataPort,					// connection
+										   kPCICAMACReadPCIConfig,	// selector
+										   &input,					// input values
+										   1,							// number of scalar input values														
+										   &output_64,					// output values
+										   &outputCount				// number of scalar output values
+										   );
+	*data = (uint32_t) output_64;
 #endif
 
 	return kernResult;
@@ -454,35 +428,30 @@ static UInt32 *fVPCICamacMem;
     size_t pciDataSize = sizeof(PCIConfigStruct);
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	if(IOConnectCallMethod != NULL ) {
-#endif
-		uint64_t scalarI = maxAddress;
-		kernResult = IOConnectCallMethod(  dataPort,					// connection
-										   kPCICAMACGetPCIConfig,		// selector
-										   &scalarI,					// input values
-										   1,							// number of scalar input values
-										   NULL,						// Pointer to input struct
-										   0,							// Size of input struct
-										   NULL,						// output scalar array
-										   NULL,						// pointer to number of scalar output
-										   pciData,						// pointer to struct output
-										   &pciDataSize					// pointer to size of struct output
-										   );
-		
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-    } else {
-        // Otherwise fall back to older API.
-		
-		kernResult = IOConnectMethodScalarIStructureO(  dataPort,		// service
-														kPCICAMACGetPCIConfig,	// method index
-														1,			// number of scalar input values
-														&pciDataSize,		// byte size of output structure
-														maxAddress,		// scalar input values
-														pciData			// output structure
-														);
-	}
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	//10.4
+	kernResult = IOConnectMethodScalarIStructureO(  dataPort,		// service
+												  kPCICAMACGetPCIConfig,	// method index
+												  1,			// number of scalar input values
+												  &pciDataSize,		// byte size of output structure
+												  maxAddress,		// scalar input values
+												  pciData			// output structure
+												  );
+#else
+	//10.5
+	uint64_t scalarI = maxAddress;
+	kernResult = IOConnectCallMethod(  dataPort,					// connection
+									   kPCICAMACGetPCIConfig,		// selector
+									   &scalarI,					// input values
+									   1,							// number of scalar input values
+									   NULL,						// Pointer to input struct
+									   0,							// Size of input struct
+									   NULL,						// output scalar array
+									   NULL,						// pointer to number of scalar output
+									   pciData,						// pointer to struct output
+									   &pciDataSize					// pointer to size of struct output
+									   );
+				
 #endif
 	return kernResult;
 }
@@ -772,32 +741,28 @@ static UInt32 *fVPCICamacMem;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		// Check to see if the 10.5 API is available
-		if(IOConnectCallScalarMethod != NULL ) {
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+		//10.4
+		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
+												kPCICAMACGetPCIBusNumber,	// method index
+												0,			// number of scalar input values
+												1,			// number of scalar output values
+												data		// scalar output value
+												);
+#else 
+		//10.5
+		uint64_t output_64;
+		uint32_t outputCount = 1;
+		result = IOConnectCallScalarMethod(dataPort,					// connection
+										   kPCICAMACGetPCIBusNumber,	// selector
+										   NULL,					// input values
+										   0,							// number of scalar input values														
+										   &output_64,					// output values
+										   &outputCount				// number of scalar output values
+										   );
+		*data = (char) output_64;
 #endif
-			uint64_t output_64;
-			uint32_t outputCount = 1;
-			result = IOConnectCallScalarMethod(dataPort,					// connection
-											   kPCICAMACGetPCIBusNumber,	// selector
-											   NULL,					// input values
-											   0,							// number of scalar input values														
-											   &output_64,					// output values
-											   &outputCount				// number of scalar output values
-											   );
-			*data = (char) output_64;
-		
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		} else {
-			result =  IOConnectMethodScalarIScalarO(dataPort,		// service
-													kPCICAMACGetPCIBusNumber,	// method index
-													0,			// number of scalar input values
-													1,			// number of scalar output values
-													data		// scalar output value
-													);
-		}
-#endif
-    }
+	}
     [theHWLock unlock];   //-----end critical section
     return result;
 }
@@ -809,29 +774,26 @@ static UInt32 *fVPCICamacMem;
     kern_return_t result=0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		// Check to see if the 10.5 API is available
-		if(IOConnectCallScalarMethod != NULL ) {
-#endif
-			uint64_t output_64;
-			uint32_t outputCount = 1;
-			result = IOConnectCallScalarMethod(dataPort,					// connection
-											   kPCICAMACGetPCIDeviceNumber,	// selector
-											   NULL,						// input values
-											   0,							// number of scalar input values														
-											   &output_64,					// output values
-											   &outputCount					// number of scalar output values
-											   );
-			*data = (char) output_64;
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		} else {
-			result =   IOConnectMethodScalarIScalarO(dataPort,		// service
-													 kPCICAMACGetPCIDeviceNumber,	// method index
-													 0,			// number of scalar input values
-													 1,			// number of scalar output values
-													 data		// scalar output value
-													 );
-		}
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+		//10.4
+		result =   IOConnectMethodScalarIScalarO(dataPort,		// service
+												 kPCICAMACGetPCIDeviceNumber,	// method index
+												 0,			// number of scalar input values
+												 1,			// number of scalar output values
+												 data		// scalar output value
+												 );
+#else 
+		//10.5
+		uint64_t output_64;
+		uint32_t outputCount = 1;
+		result = IOConnectCallScalarMethod(dataPort,					// connection
+										   kPCICAMACGetPCIDeviceNumber,	// selector
+										   NULL,						// input values
+										   0,							// number of scalar input values														
+										   &output_64,					// output values
+										   &outputCount					// number of scalar output values
+										   );
+		*data = (char) output_64;
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -845,30 +807,26 @@ static UInt32 *fVPCICamacMem;
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		// Check to see if the 10.5 API is available
-		if(IOConnectCallScalarMethod != NULL ) {
-#endif
-			uint64_t output_64;
-			uint32_t outputCount = 1;
-			result = IOConnectCallScalarMethod(dataPort,					// connection
-											   kPCICAMACGetPCIFunctionNumber,	// selector
-											   NULL,						// input values
-											   0,							// number of scalar input values														
-											   &output_64,					// output values
-											   &outputCount					// number of scalar output values
-											   );
-			*data = (char) output_64;
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		} else {
-
-			result =  IOConnectMethodScalarIScalarO(dataPort,		// service
-													kPCICAMACGetPCIFunctionNumber,	// method index
-													0,			// number of scalar input values
-													1,			// number of scalar output values
-													data		// scalar output value
-													);
-		}
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+		//10.4
+		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
+												kPCICAMACGetPCIFunctionNumber,	// method index
+												0,			// number of scalar input values
+												1,			// number of scalar output values
+												data		// scalar output value
+												);
+#else
+		//10.5
+		uint64_t output_64;
+		uint32_t outputCount = 1;
+		result = IOConnectCallScalarMethod(dataPort,					// connection
+										   kPCICAMACGetPCIFunctionNumber,	// selector
+										   NULL,						// input values
+										   0,							// number of scalar input values														
+										   &output_64,					// output values
+										   &outputCount					// number of scalar output values
+										   );
+		*data = (char) output_64;
 #endif
     }
     [theHWLock unlock];   //-----end critical section

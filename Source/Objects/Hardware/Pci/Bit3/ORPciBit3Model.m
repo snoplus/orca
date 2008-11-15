@@ -557,30 +557,27 @@ struct {
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		// Check to see if the 10.5 API is available
-		if(IOConnectCallScalarMethod != NULL ) {
-#endif
-			uint64_t output_64;
-			uint32_t outputCount = 1;
-			result = IOConnectCallScalarMethod(dataPort,				// connection
-											   kBit3GetPCIBusNumber,	// selector
-											   NULL,					// input values
-											   0,						// number of scalar input values														
-											   &output_64,				// output values
-											   &outputCount				// number of scalar output values
-											   );
-			*data = (char) output_64;
-		
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		} else {
-			result = IOConnectMethodScalarIScalarO(dataPort,		// service
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+		//10.4
+		result = IOConnectMethodScalarIScalarO(dataPort,		// service
                                                kBit3GetPCIBusNumber,	// method index
                                                0,			// number of scalar input values
                                                1,			// number of scalar output values
                                                data		// scalar output value
                                                );
-		}
+#else
+		//10.5
+		uint64_t output_64;
+		uint32_t outputCount = 1;
+		result = IOConnectCallScalarMethod(dataPort,				// connection
+										   kBit3GetPCIBusNumber,	// selector
+										   NULL,					// input values
+										   0,						// number of scalar input values														
+										   &output_64,				// output values
+										   &outputCount				// number of scalar output values
+										   );
+		*data = (char) output_64;
+
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -594,29 +591,26 @@ struct {
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		// Check to see if the 10.5 API is available
-		if(IOConnectCallScalarMethod != NULL ) {
-#endif
-			uint64_t output_64;
-			uint32_t outputCount = 1;
-			result = IOConnectCallScalarMethod(dataPort,					// connection
-											   kBit3GetPCIDeviceNumber,	// selector
-											   NULL,						// input values
-											   0,							// number of scalar input values														
-											   &output_64,					// output values
-											   &outputCount					// number of scalar output values
-											   );
-			*data = (char) output_64;
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		} else {
-			result =  IOConnectMethodScalarIScalarO(dataPort,		// service
-													kBit3GetPCIDeviceNumber,	// method index
-													0,			// number of scalar input values
-													1,			// number of scalar output values
-													data		// scalar output value
-													);
-		}
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+		//10.4
+		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
+												kBit3GetPCIDeviceNumber,	// method index
+												0,			// number of scalar input values
+												1,			// number of scalar output values
+												data		// scalar output value
+												);
+#else
+		//10.5
+		uint64_t output_64;
+		uint32_t outputCount = 1;
+		result = IOConnectCallScalarMethod(dataPort,					// connection
+										   kBit3GetPCIDeviceNumber,	// selector
+										   NULL,						// input values
+										   0,							// number of scalar input values														
+										   &output_64,					// output values
+										   &outputCount					// number of scalar output values
+										   );
+		*data = (char) output_64;
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -630,30 +624,27 @@ struct {
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		// Check to see if the 10.5 API is available
-		if(IOConnectCallScalarMethod != NULL ) {
-#endif
-			uint64_t output_64;
-			uint32_t outputCount = 1;
-			result = IOConnectCallScalarMethod(dataPort,					// connection
-											   kBit3GetPCIFunctionNumber,	// selector
-											   NULL,						// input values
-											   0,							// number of scalar input values														
-											   &output_64,					// output values
-											   &outputCount					// number of scalar output values
-											   );
-			*data = (char) output_64;
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		} else {
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+		//10.4
+		result =   IOConnectMethodScalarIScalarO(dataPort,		// service
+												 kBit3GetPCIFunctionNumber,	// method index
+												 0,			// number of scalar input values
+												 1,			// number of scalar output values
+												 data		// scalar output value
+												 );
+#else
+		//10.5
+		uint64_t output_64;
+		uint32_t outputCount = 1;
+		result = IOConnectCallScalarMethod(dataPort,					// connection
+										   kBit3GetPCIFunctionNumber,	// selector
+										   NULL,						// input values
+										   0,							// number of scalar input values														
+										   &output_64,					// output values
+										   &outputCount					// number of scalar output values
+										   );
+		*data = (char) output_64;
 
-			result =   IOConnectMethodScalarIScalarO(dataPort,		// service
-													 kBit3GetPCIFunctionNumber,	// method index
-													 0,			// number of scalar input values
-													 1,			// number of scalar output values
-													 data		// scalar output value
-													 );
-		}
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -667,32 +658,29 @@ struct {
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-		if(IOConnectCallScalarMethod != NULL ) {
-#endif
-			uint64_t input = address;
-			uint64_t output_64;
-			uint32_t outputCount = 1;
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+		//10.4
+		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
+												kBit3ReadPCIConfig,	// method index
+												1,			// number of scalar input values
+												1,			// number of scalar output values
+												address,		// scalar input value
+												data		// scalar output value
+												);
+#else
+		//10.5
+		uint64_t input = address;
+		uint64_t output_64;
+		uint32_t outputCount = 1;
 
-			result = IOConnectCallScalarMethod(dataPort,					// connection
-											   kBit3ReadPCIConfig,	// selector
-											   &input,					// input values
-											   1,							// number of scalar input values														
-											   &output_64,					// output values
-											   &outputCount				// number of scalar output values
-											   );
-			*data = (uint32_t) output_64;
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		} else {
-			result =  IOConnectMethodScalarIScalarO(dataPort,		// service
-													kBit3ReadPCIConfig,	// method index
-													1,			// number of scalar input values
-													1,			// number of scalar output values
-													address,		// scalar input value
-													data		// scalar output value
-													);
-		}
+		result = IOConnectCallScalarMethod(dataPort,					// connection
+										   kBit3ReadPCIConfig,	// selector
+										   &input,					// input values
+										   1,							// number of scalar input values														
+										   &output_64,					// output values
+										   &outputCount				// number of scalar output values
+										   );
+		*data = (uint32_t) output_64;
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -709,36 +697,30 @@ struct {
 
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		// Check to see if the 10.5 API is available
-		if(IOConnectCallMethod != NULL ) {
-#endif
-			uint64_t scalarI = maxAddress;
-			result = IOConnectCallMethod(  dataPort,					// connection
-											   kBit3GetPCIConfig,			// selector
-											   &scalarI,					// input values
-											   1,							// number of scalar input values
-											   NULL,						// Pointer to input struct
-											   0,							// Size of input struct
-											   NULL,						// output scalar array
-											   NULL,						// pointer to number of scalar output
-											   pciData,						// pointer to struct output
-											   &pciDataSize					// pointer to size of struct output
-											   );
-			
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-		} else {
-			// Otherwise fall back to older API.
-		
-			result = IOConnectMethodScalarIStructureO(
-													  dataPort,		// service
-													  kBit3GetPCIConfig,	// method index
-													  1,			// number of scalar input values
-													  &pciDataSize,		// byte size of output structure
-													  maxAddress,		// scalar input values
-													  pciData			// output structure
-													  );
-		}
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+		//10.4
+		result = IOConnectMethodScalarIStructureO(
+												  dataPort,		// service
+												  kBit3GetPCIConfig,	// method index
+												  1,			// number of scalar input values
+												  &pciDataSize,		// byte size of output structure
+												  maxAddress,		// scalar input values
+												  pciData			// output structure
+												  );
+#else
+		//10.5
+		uint64_t scalarI = maxAddress;
+		result = IOConnectCallMethod(  dataPort,					// connection
+										   kBit3GetPCIConfig,			// selector
+										   &scalarI,					// input values
+										   1,							// number of scalar input values
+										   NULL,						// Pointer to input struct
+										   0,							// Size of input struct
+										   NULL,						// output scalar array
+										   NULL,						// pointer to number of scalar output
+										   pciData,						// pointer to struct output
+										   &pciDataSize					// pointer to size of struct output
+										   );
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -1309,26 +1291,22 @@ struct {
 
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	if(IOConnectCallScalarMethod != NULL ) {
-#endif
-		kernResult= IOConnectCallScalarMethod(aDataPort,		// connection
-											  kBit3UserClientOpen,	// selector
-											  0,			// input values
-											  0,			// number of scalar input values														
-											  0,			// output values
-											  0			// number of scalar output values
-											  );
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	} else {
-		kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
-											 kBit3UserClientOpen,	// method index
-											 0,			// number of scalar input values
-											 0			// number of scalar output values
-											 );
-	}
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	//10.4
+	kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
+											   kBit3UserClientOpen,	// method index
+											   0,			// number of scalar input values
+											   0			// number of scalar output values
+											   );
+#else
+	//10.5
+	kernResult= IOConnectCallScalarMethod(aDataPort,		// connection
+										  kBit3UserClientOpen,	// selector
+										  0,			// input values
+										  0,			// number of scalar input values														
+										  0,			// output values
+										  0			// number of scalar output values
+										  );
 #endif
 	return kernResult;
 }
@@ -1339,28 +1317,22 @@ struct {
 {
 	kern_return_t kernResult;
 
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	if(IOConnectCallScalarMethod != NULL ) {
-#endif
-
-		kernResult =  IOConnectCallScalarMethod( aDataPort,		// connection
-												 kBit3UserClientClose,	// selector
-												 0,			// input values
-												 0,			// number of scalar input values														
-												 0,			// output values
-												 0			// number of scalar output values
-												 );
-#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-	// Check to see if the 10.5 API is available
-	} else {
-
-		kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
-											 kBit3UserClientClose,	// method index
-											 0,			// number of scalar input values
+#if !defined(__LP64__) && MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	//10.4
+	kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
+											   kBit3UserClientClose,	// method index
+											   0,			// number of scalar input values
+											   0			// number of scalar output values
+											   );
+#else
+	//10.5
+	kernResult =  IOConnectCallScalarMethod( aDataPort,		// connection
+											 kBit3UserClientClose,	// selector
+											 0,			// input values
+											 0,			// number of scalar input values														
+											 0,			// output values
 											 0			// number of scalar output values
 											 );
-	}
 #endif
 	return kernResult;
 }
