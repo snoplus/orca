@@ -1902,7 +1902,7 @@
 		9C2595AC0D5171B90039C5DF /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
 			compilerSpec = com.apple.compilers.proxy.script;
-			fileType = pattern.proxy;
+			fileType = sourcecode.lex;
 			isEditable = 1;
 			outputFiles = (
 				"lex.${INPUT_FILE_BASE}.m",
@@ -10816,6 +10816,7 @@
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
