@@ -631,7 +631,7 @@ static struct {
                         withAddMod:[self addressModifier]
                         usingAddSpace:0x01];
 
-    
+    NSDate* startDate = [NSDate date];
     while(1) {
         /* Wait for the SD and DCM to lock */
         [[self adapter] readLongBlock:&theValue
@@ -641,6 +641,10 @@ static struct {
                             usingAddSpace:0x01];
                     
         if ((theValue & 0x7) == 0x7) break;
+		if([[NSDate date] timeIntervalSinceDate:startDate] > 2) {
+			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
+			return;
+		}
     }
     theValue = 0x02;
     [[self adapter] writeLongBlock:&theValue
@@ -778,7 +782,7 @@ static struct {
     fifoAddress       = [self baseAddress] + 0x1000;
 	theController     = [self adapter];
 	unsigned long  dataDump[0xffff];
-	//BOOL error		  = NO;
+	BOOL errorFound		  = NO;
 	//NSDate* startDate = [NSDate date];
     
     short boardStateEnabled[kNumGretina4Channels];
@@ -793,7 +797,7 @@ static struct {
     }
     
     while(1){
-		unsigned long val;
+		unsigned long val = 0;
 		//read the fifo state
 		[theController readLongBlock:&val
 						   atAddress:fifoStateAddress
@@ -824,29 +828,21 @@ static struct {
 						  usingAddSpace:0x01];
 				count++;
 			} else {
+				if (errorFound) {
+					NSLog(@"Clearing FIFO: lost place in the FIFO twice, is the FIFO corrupted? (slot %d). \n",[self slot]);
+					break;
+				}
                 NSLog(@"Clearing FIFO: FIFO corrupted on Gretina4 card (slot %d), searching for next event... \n",[self slot]);
                 count += [self findNextEventInTheFIFO];
                 NSLog(@"Clearing FIFO: Next event found on Gretina4 card (slot %d), continuing to clear FIFO. \n",[self slot]);
+				errorFound = YES;
 			}
 		} else { 
             /* The FIFO has been cleared. */
             break;
         }
 
-        /* Do we need the following anymore? */
-        /*
-		if([[NSDate date] timeIntervalSinceDate:startDate] > 10){
-			error = YES;
-			break;
-		}*/
     }
-
-    /*
-	if(error){
-		NSLog(@"Unable to clear FIFO on Gretina4 card (slot %d)\n",[self slot]);
-		[NSException raise:@"Gretina card Error" format:@"unable to clear FIFO on Gretina4 card (slot %d)",[self slot]];
-	}
-    */
 
     for(i=0;i<kNumGretina4Channels;i++) {
         /* Now reenable all the channels that were enabled before (on the *BOARD*). */
