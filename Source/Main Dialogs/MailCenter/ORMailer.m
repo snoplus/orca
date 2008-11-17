@@ -30,6 +30,7 @@
 - (BOOL) addressOK;
 - (BOOL) subjectOK;
 - (void) sendit;
+- (void) taskDataAvailable:(NSNotification*)aNotification;
 @end
 
 @implementation ORMailer
@@ -61,6 +62,7 @@
 	[subject release];
 	[body release];
 	[from release];
+	[allOutput release];
 	[super dealloc];
 }
 
@@ -142,7 +144,6 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[mailTask release];
 	mailTask = nil;
-	NSLog( @"e-mail may have been sent to %@\n",to);
 	if([delegate respondsToSelector:@selector(mailSent)]){
 		[delegate performSelector:@selector(mailSent) withObject:nil afterDelay:0];
 	}
@@ -262,9 +263,28 @@
 		
 		[fm createFileAtPath:tempFilePath contents:[script dataUsingEncoding:NSASCIIStringEncoding] attributes:nil];
 		mailTask = [[NSTask alloc] init];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mailDone:) name:NSTaskDidTerminateNotification object:mailTask];
+		
+		NSPipe *newPipe = [NSPipe pipe];
+		NSFileHandle *readHandle = [newPipe fileHandleForReading];
+		
+		NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
+		
+		[nc addObserver:self 
+			   selector:@selector(taskDataAvailable:) 
+				   name:NSFileHandleReadCompletionNotification 
+				 object:readHandle];
+		
+		[nc addObserver:self 
+			   selector:@selector(mailDone:) 
+				   name:NSTaskDidTerminateNotification 
+				 object:mailTask];
+		
+		[readHandle readInBackgroundAndNotify];
+		
 		[mailTask setLaunchPath:@"/usr/bin/osascript"];
 		[mailTask setArguments:[NSArray arrayWithObject:tempFilePath]];
+		[mailTask setStandardOutput:newPipe];
+		[mailTask setStandardError:newPipe];
 		[mailTask launch];
 		[recipents release];
 		[ccrecipents release];
@@ -273,4 +293,29 @@
 		
 	}
 }
+
+- (void) taskDataAvailable:(NSNotification*)aNotification
+{
+	if(!allOutput)allOutput = [[NSMutableString stringWithCapacity:512] retain];
+    NSData *incomingData = [[aNotification userInfo] objectForKey:NSFileHandleNotificationDataItem];
+    if (incomingData && [incomingData length]) {
+        // Note:  if incomingData is nil, the filehandle is closed.
+        NSString *incomingText = [[NSString alloc] initWithData:incomingData encoding:NSASCIIStringEncoding];
+		
+        [allOutput appendString:incomingText];
+        		
+        [[aNotification object] readInBackgroundAndNotify];  // go back for more.
+        [incomingText release];
+    }  
+	else {
+		if([allOutput rangeOfString:@"true"].location != NSNotFound){
+			NSLog( @"e-mail was sent to %@\n",to);
+		}
+		else {
+			NSLog( @"Possible problems with sending e-mail to %@\n",to);
+			NSLog(@"%@\n",allOutput);
+		}
+	}
+}
+
 @end

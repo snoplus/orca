@@ -28,6 +28,7 @@
 	id delegate;
 	NSTask* mailTask;
 	NSString* tempFilePath;
+	NSMutableString* allOutput;
 }
 
 + (ORMailer *)mailer;
