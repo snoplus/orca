@@ -17,12 +17,8 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-extern NSString *ORMailerUrlType;
-extern NSString *ORMailerMailType;
-
 @interface ORMailer : NSObject {
 	
-	NSString *type;
 	NSString *to;
 	NSString *cc;
 	NSString *subject;
@@ -30,15 +26,13 @@ extern NSString *ORMailerMailType;
 	NSString *from;
 	NSModalSession session;
 	id delegate;
+	NSTask* mailTask;
+	NSString* tempFilePath;
 }
 
 + (ORMailer *)mailer;
 
 // accessors
-
-- (NSString *)type;
-- (void)setType:(NSString *)value;
-
 - (NSString *)to;
 - (void)setTo:(NSString *)value;
 
@@ -56,6 +50,7 @@ extern NSString *ORMailerMailType;
 - (void)setFrom:(NSString *)value;
 
 - (void) send:(id)aDelegate;
+- (void) mailDone:(NSNotification*)aNote;
 
 @end
 

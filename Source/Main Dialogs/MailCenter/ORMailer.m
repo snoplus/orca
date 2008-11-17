@@ -24,7 +24,6 @@
 #endif
 
 @interface ORMailer (private)
-- (void) sendUrlEmail;
 - (void) sendMailEmail;
 - (void) noSubjectSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) noAddressSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -34,9 +33,6 @@
 @end
 
 @implementation ORMailer
-
-NSString *ORMailerUrlType  = @"ORMailerURLType";
-NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 
 + (ORMailer *) mailer {
 	return [[[ORMailer alloc] init] autorelease];
@@ -50,13 +46,16 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 	[self setSubject:@""];
 	[self setFrom:@""];
 	[self setBody:[[[NSAttributedString alloc] initWithString:@""] autorelease]];
-	[self setType: ORMailerMailType];
+	[self retain];
 	return self;
 }
 
 - (void)dealloc 
 {
-	[type release];
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if([fm fileExistsAtPath:tempFilePath])[fm removeFileAtPath:tempFilePath handler:nil];
+
+	[tempFilePath release];
 	[to release];
 	[cc release];
 	[subject release];
@@ -66,16 +65,7 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 }
 
 // accessors
-- (NSString *)type 
-{
-	return type;
-}
 
-- (void) setType:(NSString *)value 
-{
-    [type release];
-    type = [value copy];
-}
 
 - (NSString *)to 
 {
@@ -140,38 +130,27 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 - (void) send:(id)aDelegate
 {
 	delegate = aDelegate;
-	if ([type isEqualToString:ORMailerUrlType]) {
-		[self sendUrlEmail];
-	}
-	if ([type isEqualToString:ORMailerMailType]) {
-		[self sendMailEmail];
-	}
-	// better not get here
+	[self sendMailEmail];
 }
 
 - (NSArray *)ccArray {
 	NSArray *array = [[self cc] componentsSeparatedByString:@","];
 	return array;
 }
+- (void) mailDone:(NSNotification*)aNote
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[mailTask release];
+	mailTask = nil;
+	NSLog( @"e-mail may have been sent to %@\n",to);
+	if([delegate respondsToSelector:@selector(mailSent)]){
+		[delegate performSelector:@selector(mailSent) withObject:nil afterDelay:0];
+	}
+	[self autorelease];
+}
 @end
 
 @implementation ORMailer (private)
-
-- (void) sendUrlEmail
-{
-	NSString *encodedSubject	= [NSString stringWithFormat:@"SUBJECT=%@",[subject stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
-	NSString *encodedBody		= [NSString stringWithFormat:@"BODY=%@",[[self bodyString] stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
-	NSString *encodedTo			= [to stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
-	NSString *encodedURLString	= [NSString stringWithFormat:@"mailto:%@?%@&%@", encodedTo, encodedSubject, encodedBody];
-	NSURL *mailtoURL			= [NSURL URLWithString:encodedURLString];
-	@synchronized([NSApp delegate]){
-		[[NSWorkspace sharedWorkspace] openURL:mailtoURL];
-		if([delegate respondsToSelector:@selector(mailSent)]){
-			[delegate performSelector:@selector(mailSent) withObject:nil afterDelay:0];
-		}
-	}
-}
-
 - (BOOL) addressOK
 {
 	return [to length]!=0 && [to rangeOfString:@"@"].location != NSNotFound;
@@ -242,6 +221,7 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 			NSLog(@"email sent to: %@\n",to);
 			if([delegate respondsToSelector:@selector(mailSent)]){
 				[delegate performSelector:@selector(mailSent) withObject:nil afterDelay:0];
+				[self autorelease];
 			}
 			
 		}
@@ -264,16 +244,24 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 		[script replaceOccurrencesOfString:@"</subject/>" withString:subject options:NSLiteralSearch range:NSMakeRange(0,[script length])];
 		[script replaceOccurrencesOfString:@"</body/>" withString:[body string] options:NSLiteralSearch range:NSMakeRange(0,[script length])];
 		[script replaceOccurrencesOfString:@"</address/>" withString:to options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+		//if([cc length])[script replaceOccurrencesOfString:@"</cc/>" withString:cc options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+		//else [script replaceOccurrencesOfString:@"</cc/>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[script length])];
 		NSFileManager* fm = [NSFileManager defaultManager];
-		NSString* tempFile = [@"~/aMailScript" stringByExpandingTildeInPath];
-		if([fm fileExistsAtPath:tempFile])[fm removeFileAtPath:tempFile handler:nil];
-		[fm createFileAtPath:tempFile contents:[script dataUsingEncoding:NSASCIIStringEncoding] attributes:nil];
-		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/osascript" arguments:[NSArray arrayWithObject:tempFile]];
-		NSLog( @"e-mail may have been sent to %@\n",to);
-
+		
+		char* tmpName = tempnam([[@"~" stringByExpandingTildeInPath]cStringUsingEncoding:NSASCIIStringEncoding] ,"aMailScriptXXX");
+		tempFilePath = [[NSString stringWithCString:tmpName] retain];
+		free(tmpName);
+		
+		
+		[fm createFileAtPath:tempFilePath contents:[script dataUsingEncoding:NSASCIIStringEncoding] attributes:nil];
+		mailTask = [[NSTask alloc] init];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mailDone:) name:NSTaskDidTerminateNotification object:mailTask];
+		[mailTask setLaunchPath:@"/usr/bin/osascript"];
+		[mailTask setArguments:[NSArray arrayWithObject:tempFilePath]];
+		[mailTask launch];
+		
 #endif
 		
 	}
 }
-
 @end
