@@ -269,6 +269,7 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 		if([fm fileExistsAtPath:tempFile])[fm removeFileAtPath:tempFile handler:nil];
 		[fm createFileAtPath:tempFile contents:[script dataUsingEncoding:NSASCIIStringEncoding] attributes:nil];
 		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/osascript" arguments:[NSArray arrayWithObject:tempFile]];
+		NSLog( @"e-mail may have been sent to %@\n",to);
 
 #endif
 		
