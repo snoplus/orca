@@ -18,7 +18,10 @@
 //-------------------------------------------------------------
 
 #import "ORMailer.h"
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 #import <Message/NSMailDelivery.h>
+#endif
 
 @interface ORMailer (private)
 - (void) sendUrlEmail;
@@ -225,6 +228,7 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 - (void) sendit
 {
 	@synchronized([NSApp delegate]){
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		BOOL configured = [NSMailDelivery hasDeliveryClassBeenConfigured];
 		if(configured){
 			NSMutableDictionary *headersDict = [NSMutableDictionary dictionary];
@@ -253,7 +257,21 @@ NSString *ORMailerMailType = @"ORMailerNSMailDeliveryType";
 					  nil,@"e-mail could NOT be sent because eMail delivery has not been configured in Mail.app");
 
 			NSLogColor([NSColor redColor], @"e-mail could NOT be sent because eMail delivery has not been configured in Mail.app\n");
-		}	
+		}
+#else
+		NSString*   mailScriptPath = [[NSBundle mainBundle] pathForResource: @"MailScript" ofType: @"txt"];
+		NSMutableString* script = [NSMutableString stringWithContentsOfFile:mailScriptPath];
+		[script replaceOccurrencesOfString:@"</subject/>" withString:subject options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+		[script replaceOccurrencesOfString:@"</body/>" withString:[body string] options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+		[script replaceOccurrencesOfString:@"</address/>" withString:to options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+		NSFileManager* fm = [NSFileManager defaultManager];
+		NSString* tempFile = [@"~/aMailScript" stringByExpandingTildeInPath];
+		if([fm fileExistsAtPath:tempFile])[fm removeFileAtPath:tempFile handler:nil];
+		[fm createFileAtPath:tempFile contents:[script dataUsingEncoding:NSASCIIStringEncoding] attributes:nil];
+		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/osascript" arguments:[NSArray arrayWithObject:tempFile]];
+
+#endif
+		
 	}
 }
 

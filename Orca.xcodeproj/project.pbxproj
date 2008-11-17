@@ -1863,6 +1863,7 @@
 		9C88468A0E2D8D960099B98E /* ORHP4405AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C8846820E2D8D960099B98E /* ORHP4405AModel.h */; };
 		9C88468B0E2D8D960099B98E /* ORHP4405AModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8846830E2D8D960099B98E /* ORHP4405AModel.m */; };
 		9C8846A60E2D90ED0099B98E /* HP4405A.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9C8846A50E2D90ED0099B98E /* HP4405A.gif */; };
+		9C9861580ED10DC900E18ED7 /* MailScript.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9C9861570ED10DC900E18ED7 /* MailScript.txt */; };
 		9CB167790C5BC9580053CFAD /* xAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167770C5BC9580053CFAD /* xAxisMarker.gif */; };
 		9CB1677A0C5BC9580053CFAD /* yAxisMarker.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167780C5BC9580053CFAD /* yAxisMarker.gif */; };
 		9CB167FC0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif in Resources */ = {isa = PBXBuildFile; fileRef = 9CB167FA0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif */; };
@@ -3782,6 +3783,7 @@
 		9C8846820E2D8D960099B98E /* ORHP4405AModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AModel.h; sourceTree = "<group>"; };
 		9C8846830E2D8D960099B98E /* ORHP4405AModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AModel.m; sourceTree = "<group>"; };
 		9C8846A50E2D90ED0099B98E /* HP4405A.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = HP4405A.gif; sourceTree = "<group>"; };
+		9C9861570ED10DC900E18ED7 /* MailScript.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MailScript.txt; sourceTree = "<group>"; };
 		9CB167770C5BC9580053CFAD /* xAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = xAxisMarker.gif; path = Source/Widgets/Plotting/xAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		9CB167780C5BC9580053CFAD /* yAxisMarker.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = yAxisMarker.gif; path = Source/Widgets/Plotting/yAxisMarker.gif; sourceTree = SOURCE_ROOT; };
 		9CB167FA0C5BD3CE0053CFAD /* xAxisMarkerOpposite.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = xAxisMarkerOpposite.gif; path = Source/Widgets/Plotting/xAxisMarkerOpposite.gif; sourceTree = SOURCE_ROOT; };
@@ -6257,6 +6259,7 @@
 		848E3BC509DB0B3E0003F7A2 /* MailCenter */ = {
 			isa = PBXGroup;
 			children = (
+				9C9861570ED10DC900E18ED7 /* MailScript.txt */,
 				84E743420DAD5EEF0099CAEE /* ORMailer.h */,
 				84E743430DAD5EEF0099CAEE /* ORMailer.m */,
 				848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */,
@@ -9841,6 +9844,7 @@
 				8491F6720EC0D3C40084BAD6 /* pmtShadow.gif in Resources */,
 				8491F6730EC0D3C40084BAD6 /* pmtColorMask.gif in Resources */,
 				8491F6740EC0D3C40084BAD6 /* pmt.gif in Resources */,
+				9C9861580ED10DC900E18ED7 /* MailScript.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
