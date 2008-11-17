@@ -239,13 +239,20 @@
 			NSLogColor([NSColor redColor], @"e-mail could NOT be sent because eMail delivery has not been configured in Mail.app\n");
 		}
 #else
-		NSString*   mailScriptPath = [[NSBundle mainBundle] pathForResource: @"MailScript" ofType: @"txt"];
+		NSMutableString* recipents   = [@"make new to recipient at end of to recipients with properties {address:\"</address/>\"}" mutableCopy];
+		NSMutableString* ccrecipents = [@"make new to recipient at end of cc recipients with properties {address:\"</cc/>\"}" mutableCopy];
+		NSString* mailScriptPath = [[NSBundle mainBundle] pathForResource: @"MailScript" ofType: @"txt"];
 		NSMutableString* script = [NSMutableString stringWithContentsOfFile:mailScriptPath];
 		[script replaceOccurrencesOfString:@"</subject/>" withString:subject options:NSLiteralSearch range:NSMakeRange(0,[script length])];
 		[script replaceOccurrencesOfString:@"</body/>" withString:[body string] options:NSLiteralSearch range:NSMakeRange(0,[script length])];
-		[script replaceOccurrencesOfString:@"</address/>" withString:to options:NSLiteralSearch range:NSMakeRange(0,[script length])];
-		//if([cc length])[script replaceOccurrencesOfString:@"</cc/>" withString:cc options:NSLiteralSearch range:NSMakeRange(0,[script length])];
-		//else [script replaceOccurrencesOfString:@"</cc/>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+		[recipents replaceOccurrencesOfString:@"</address/>" withString:to options:NSLiteralSearch range:NSMakeRange(0,[recipents length])];
+		[script replaceOccurrencesOfString:@"</addressLine/>" withString:recipents options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+		
+		 if([cc length]){
+			[ccrecipents replaceOccurrencesOfString:@"</cc/>" withString:cc options:NSLiteralSearch range:NSMakeRange(0,[ccrecipents length])];
+			[script replaceOccurrencesOfString:@"</ccLine/>" withString:ccrecipents options:NSLiteralSearch range:NSMakeRange(0,[script length])];
+		}
+		else [script replaceOccurrencesOfString:@"</ccLine/>" withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[script length])];
 		NSFileManager* fm = [NSFileManager defaultManager];
 		
 		char* tmpName = tempnam([[@"~" stringByExpandingTildeInPath]cStringUsingEncoding:NSASCIIStringEncoding] ,"aMailScriptXXX");
@@ -259,6 +266,8 @@
 		[mailTask setLaunchPath:@"/usr/bin/osascript"];
 		[mailTask setArguments:[NSArray arrayWithObject:tempFilePath]];
 		[mailTask launch];
+		[recipents release];
+		[ccrecipents release];
 		
 #endif
 		

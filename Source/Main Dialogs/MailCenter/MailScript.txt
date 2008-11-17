@@ -1,7 +1,8 @@
 tell application "Mail"
 	set theNewMessage to make new outgoing message with properties {subject:"</subject/>", content:"</body/>", visible:false}
 	tell theNewMessage
-		make new to recipient at end of to recipients with properties {address:"</address/>"}
+		</addressLine/>
+		</ccLine/>
 		send
 	end tell
 end tell
