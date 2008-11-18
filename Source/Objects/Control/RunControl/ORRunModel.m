@@ -575,6 +575,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 -(void)remoteStartRun:(unsigned long)aRunNumber
 {
+	if([[self document] isDocumentEdited])return;
+
 	[self setRemoteInterface:NO];
     [self setNextRunWillQuickStart:NO];
     if(aRunNumber==0xffffffff){
@@ -954,6 +956,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 -(void)runStarted:(BOOL)doInit
 {
+	
     [heartBeatTimer invalidate];
     [heartBeatTimer release];
     heartBeatTimer = nil;
@@ -1016,11 +1019,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [dataPacket addData:[NSData dataWithBytes:data length:4*sizeof(long)]];
     
     lastRunNumberShipped = data[2];
-    
-    if([[self document] isDocumentEdited]){
-        [[self document] saveDocument:[self document]];
-    }
-    
+        
     //pack up some info about the run.
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithLong:runNumber],@"RunNumber",
