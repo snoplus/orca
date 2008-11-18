@@ -41,8 +41,10 @@
         NSString*	    statusText;
         //NKDPostgreSQLConnection* dbConnection;
         NSMutableArray* orcaControllers;
-        int		    scaleFactor;
-        ORGateGroup* gateGroup;
+        int				scaleFactor;
+        ORGateGroup*	gateGroup;
+		SEL				afterSaveSelector;
+		id				afterSaveTarget;
 }
 
 #pragma mark ¥¥¥Initializations
@@ -87,7 +89,8 @@
 - (void)    saveDefaultFileName;
 - (void)    windowMovedToFront:(NSWindowController*)aController;
 - (void)    checkControllers;
-- (void)	printSaved;
+- (void)	saveFinished;
+- (void)	afterSaveDo:(SEL)aSelector withTarget:(id)aTarget;
 
 @end
 

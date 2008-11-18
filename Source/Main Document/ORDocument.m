@@ -381,18 +381,29 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[[self undoManager] removeAllActions];
 		
-		[self performSelector:@selector(printSaved) withObject:nil afterDelay:0];
-		
+		[self performSelector:@selector(saveFinished) withObject:nil afterDelay:0];
+
 		return data;
 	}
     
     return nil;
 }
 
-- (void) printSaved
+- (void) saveFinished
 {
 	NSLog(@"Saved Configuration: %@\n",[self fileName]);
+	NS_DURING
+	[afterSaveTarget performSelector:afterSaveSelector];
+	NS_HANDLER
+	NS_ENDHANDLER
+	afterSaveTarget = nil;
 }
+- (void) afterSaveDo:(SEL)aSelector withTarget:(id)aTarget
+{
+	afterSaveTarget = aTarget;
+	afterSaveSelector = aSelector;
+}
+
 
 - (BOOL)loadDataRepresentation:(NSData *)data ofType:(NSString *)type
 {
