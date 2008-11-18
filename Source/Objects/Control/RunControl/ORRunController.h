@@ -113,5 +113,7 @@
 
 - (void) updateWithCurrentRunNumber;
 - (void) setupRunTypeNames;
+- (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) startRun;
 
 @end

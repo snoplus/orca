@@ -418,12 +418,33 @@
 #pragma  mark ¥¥¥Actions
 -(IBAction)startRunAction:(id)sender
 {
-    [self endEditing];
-    [statusField setStringValue:@"Starting..."];
-    [startRunButton setEnabled:NO];
-    [restartRunButton setEnabled:NO];
-    [stopRunButton setEnabled:NO];
-    [model performSelector:@selector(startRun)withObject:nil afterDelay:.1];
+	if([[model document] isDocumentEdited]){
+		NSBeginAlertSheet(@"Configuration Not Saved",@"Cancel",@"Just Save",
+						  @"Save, Then Run",[self window],self,@selector(sheetDidEnd:returnCode:contextInfo:),
+						  nil,nil, @"Run can not be started until the configuration is saved!\nWhat would you like to do?");
+    }
+	else [self startRun];
+}
+
+- (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+        [[model document] saveDocument:[self document]];
+	}
+    else if(returnCode == NSAlertOtherReturn){
+		[[model document] afterSaveDo:@selector(startRun) withTarget:self];
+        [[model document] saveDocument:[self document]];
+	}
+}
+
+- (void) startRun
+{
+	[self endEditing];
+	[statusField setStringValue:@"Starting..."];
+	[startRunButton setEnabled:NO];
+	[restartRunButton setEnabled:NO];
+	[stopRunButton setEnabled:NO];
+	[model performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
 
 -(IBAction)newRunAction:(id)sender
