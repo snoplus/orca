@@ -362,7 +362,9 @@ static struct {
 - (id) rawCardValue:(int)index value:(id)aValue 
 {	
     float theValue = [aValue floatValue];
+	if (theValue < 0) theValue = 0;
     unsigned short theRawValue = theValue / cardConstants[index].ratio;
+	if (theRawValue > cardConstants[index].mask) theRawValue = cardConstants[index].mask;
     return [NSNumber numberWithInt: theRawValue & cardConstants[index].mask];
 }
 
