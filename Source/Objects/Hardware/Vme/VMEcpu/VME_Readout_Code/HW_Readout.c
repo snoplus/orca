@@ -104,8 +104,6 @@ void FindHardware(void)
   
     /* The following is particular to the concurrent boards. */
     set_hw_byte_swap(true);
-    set_ds_negation_speed(0);
-    set_ds_high_time_blts(0);
 }
 
 void ReleaseHardware(void)
