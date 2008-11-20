@@ -50,6 +50,8 @@
 				<string>id</string>
 				<key>easyTimerStartAction</key>
 				<string>id</string>
+				<key>emitModeAction</key>
+				<string>id</string>
 				<key>modePUAction</key>
 				<string>id</string>
 				<key>periodAction</key>
@@ -115,6 +117,8 @@
 				<string>NSPopUpButton</string>
 				<key>easyTimerStartButton</key>
 				<string>NSButton</string>
+				<key>emitModeButton</key>
+				<string>NSButton</string>
 				<key>modeField</key>
 				<string>NSTextField</string>
 				<key>modePU</key>
@@ -172,6 +176,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
