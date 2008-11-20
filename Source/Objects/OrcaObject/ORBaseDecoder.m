@@ -23,6 +23,7 @@
 #import "ORDataSet.h"
 #import "ORGateElement.h"
 #import "ORGlobal.h"
+#import <stdarg.h>
 
 static NSString* kChanKey[32] = {
 	//pre-make some keys for speed.
@@ -147,7 +148,11 @@ static NSString* kCrateKey[16] = {
 
 - (id) objectForNestedKey:(id)firstKey,...
 {
-	return [cachedObjects nestedObjectForKey:firstKey];
+	va_list args;
+	va_start(args, firstKey);
+	id objectToReturn = [cachedObjects nestedObjectForKeyList:firstKey withvaList:args];
+	va_end(args);
+	return objectToReturn;
 }
 
 - (void) setUpCacheUsingHeader:(NSDictionary*)aHeader;

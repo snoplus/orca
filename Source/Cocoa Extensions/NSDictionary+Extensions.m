@@ -58,6 +58,16 @@
     }
 }
 
+- (id) nestedObjectForKeyList:(id)firstKey withvaList:(va_list)keyList
+{
+	NSString* s = firstKey;
+	id result = [self objectForKey:s];
+	while(s = va_arg(keyList, NSString *)) {
+		result = [result objectForKey:s];
+    }
+	return result;
+}
+
 - (id) nestedObjectForKey:(id)firstKey,...
 {
     va_list myArgs;
