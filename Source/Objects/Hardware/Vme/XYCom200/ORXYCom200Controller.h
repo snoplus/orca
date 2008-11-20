@@ -50,6 +50,14 @@
 	
 	NSMutableArray*			subControllers;
 	BOOL					viewsSetup;
+
+	//Easy Setup Timer
+	IBOutlet   NSTextField* preloadLowField;
+	IBOutlet   NSTextField* preloadMiddleField;
+	IBOutlet   NSTextField* preloadHighField;
+	IBOutlet   NSTextField* timerControlField;
+	IBOutlet   NSTextField* periodField;
+
 }
 
 - (id)   init;
@@ -108,6 +116,7 @@
 	IBOutlet NSMatrix*		portADirectionMatrix;
 	IBOutlet NSTextField*   portADataField;
 	IBOutlet NSPopUpButton* portATransceiverDirPU;
+	IBOutlet NSButton*		emitModeButton;
 	
 	//Port B
 	IBOutlet NSPopUpButton* portBSubModePU;
@@ -206,6 +215,7 @@
 - (IBAction) portATransceiverDirPUAction:(id)sender;
 - (IBAction) portADirectionMatrixAction:(id)sender;
 - (IBAction) portADataAction:(id)sender;
+- (IBAction) emitModeAction:(id)sender;
 
 //Port B
 - (IBAction) portBSubModePUAction:(id)sender;

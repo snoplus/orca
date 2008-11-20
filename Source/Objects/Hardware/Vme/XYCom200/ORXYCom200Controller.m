@@ -599,6 +599,7 @@
     [portATransceiverDirPU setEnabled: !lockedOrRunningMaintenance];
 	[portADataField  setEnabled: !lockedOrRunningMaintenance];
     [portADirectionMatrix setEnabled: !lockedOrRunningMaintenance];
+    [emitModeButton setEnabled: !lockedOrRunningMaintenance];
 
 	//Port B
  	[portBSubModePU setEnabled: !lockedOrRunningMaintenance];
@@ -956,6 +957,11 @@
 - (IBAction) periodAction:(id)sender
 {
 	[model setPeriod:[sender intValue]];	
+}
+
+- (IBAction) emitModeAction:(id)sender
+{
+	[owner  initSquareWave:0];	
 }
 
 - (IBAction) easyTimerStartAction:(id)sender

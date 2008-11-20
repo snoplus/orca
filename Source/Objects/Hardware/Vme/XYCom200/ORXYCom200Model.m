@@ -515,7 +515,10 @@ NSString* mIOXY200SubModeName[4][3] = {
 	ORPISlashTChip* chip = [chips objectAtIndex:i];	
 	int period = [chip period];
 	
-	[self initOutA:i];
+	NS_DURING
+		[self initOutA:i];
+	NS_HANDLER
+	NS_ENDHANDLER
 	
 	// convert time to upper and lower ticks
 	const double kTICKConv = 48.828125;
@@ -855,6 +858,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
 
 - (void) setPeriod:(int)aPeriod
 {
+	if(aPeriod==0)aPeriod = 1;
     [[[self undoManager] prepareWithInvocationTarget:self] setPeriod:period];
     period = aPeriod;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPISlashTChipPeriodChanged object:self];
