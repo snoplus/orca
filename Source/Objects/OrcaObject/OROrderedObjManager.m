@@ -1,9 +1,9 @@
 //
-//  OROrderedObjManager.m
+//  ORSlotManager.m
 //  Orca
 //
 //  Created by Mark Howe on 11/19/08.
-//  Copyright 2008 __MyCompanyName__. All rights reserved.
+//  Copyright 2008 University of North Carolina. All rights reserved.
 //
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
@@ -19,7 +19,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "OROrderedObjManager.h"
-#import "ORCard.h"
 
 @implementation OROrderedObjManager
 
@@ -35,13 +34,13 @@
 	return self;
 }
 
-- (NSPoint) suggestLocationFor:(id)aCard
+- (NSPoint) suggestLocationFor:(id)anObj
 {	
     int slot;
-	NSRange legalRange = [containerObj legalSlotsForCard:aCard];
-    for(slot=0;slot<=[containerObj maxNumberOfCards];slot++){
-		if([containerObj slot:slot excludedFor:aCard])continue;
-		NSRange testRange = NSMakeRange(slot,[aCard numberSlotsUsed]);
+	NSRange legalRange = [containerObj legalSlotsForObj:anObj];
+    for(slot=0;slot<=[containerObj maxNumberOfObjects];slot++){
+		if([containerObj slot:slot excludedFor:anObj])continue;
+		NSRange testRange = NSMakeRange(slot,[anObj numberSlotsUsed]);
         if([self slotRangeEmpty:testRange] && NSUnionRange(testRange, legalRange).length <= legalRange.length){
             return [containerObj pointForSlot:slot];
         }
@@ -58,13 +57,13 @@
 - (void) moveObject:(id)obj to:(NSPoint)aPoint
 {
 	int aSlot = [containerObj slotAtPoint:aPoint];
-	if(aSlot >=0 && aSlot < [containerObj maxNumberOfCards]){
+	if(aSlot >=0 && aSlot < [containerObj maxNumberOfObjects]){
 		[containerObj place:obj intoSlot:aSlot];
 	}
 }
 
 
-- (id) cardInSlot:(int)aSlot
+- (id) objectInSlot:(int)aSlot
 {
     NSEnumerator* e = [containerObj  objectEnumerator];
     id anObj;
@@ -77,8 +76,8 @@
 - (BOOL) slotRangeEmpty:(NSRange)slotRange
 {
 	if(slotRange.location < 0)return NO;
-	if(slotRange.location > [containerObj maxNumberOfCards])return NO;
-	if(slotRange.location+slotRange.length > [containerObj maxNumberOfCards])return NO;
+	if(slotRange.location > [containerObj maxNumberOfObjects])return NO;
+	if(slotRange.location+slotRange.length > [containerObj maxNumberOfObjects])return NO;
 	
     NSEnumerator* e = [containerObj objectEnumerator];
     id anObj;
@@ -91,7 +90,7 @@
 - (BOOL) canAddObject:(id)obj atPoint:(NSPoint)aPoint
 {
 	int aSlot = [containerObj slotAtPoint:aPoint];	
-	if(aSlot > [containerObj maxNumberOfCards]-1 || aSlot<0){
+	if(aSlot > [containerObj maxNumberOfObjects]-1 || aSlot<0){
 		NSBeep();
 		NSLog(@"Rejected attempt to place card out of bounds\n");
 		return NO;
@@ -99,7 +98,7 @@
 	else {
 		if([containerObj slot:aSlot excludedFor:obj])return NO;
 		NSRange testRange = NSMakeRange(aSlot,[obj numberSlotsUsed]);
-		NSRange legalRange = [containerObj legalSlotsForCard:obj];
+		NSRange legalRange = [containerObj legalSlotsForObj:obj];
 		if(NSIntersectionRange(legalRange,testRange).length!=[obj numberSlotsUsed]){
 			NSLog(@"Slot %d is illegal for that card\n",[containerObj stationForSlot:aSlot]);
 			return NO;
@@ -129,7 +128,13 @@
 			moveOK = NO;
 			break;
 		}
-		if(!([self slotRangeEmpty:NSMakeRange(testSlot,1)] || [[self cardInSlot:testSlot] highlighted])){
+		NSRange testRange = NSMakeRange(testSlot,[obj numberSlotsUsed]);
+		NSRange legalRange = [containerObj legalSlotsForObj:obj];
+		if(NSIntersectionRange(legalRange,testRange).length!=[obj numberSlotsUsed]){
+			moveOK = NO;
+			break;
+		}
+		if(!([self slotRangeEmpty:NSMakeRange(testSlot,1)] || [[self objectInSlot:testSlot] highlighted])){
 			moveOK = NO;
 			break;
 		}

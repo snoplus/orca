@@ -145,14 +145,6 @@
 			<key>SUPERCLASS</key>
 			<string>ORGroupView</string>
 		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORSNORackView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORCardContainerView</string>
-		</dict>
 	</array>
 	<key>IBVersion</key>
 	<string>1</string>

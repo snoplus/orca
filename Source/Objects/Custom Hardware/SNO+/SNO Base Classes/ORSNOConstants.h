@@ -1,9 +1,11 @@
-//
-//  ORIPCarrierView.h
-//  Orca
-//
-//  Created by Mark Howe on Mon Dec 09 2002.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+/*
+ *  ORSNOConstants.h
+ *  Orca
+ *
+ *  Created by Mark Howe on 11/17/08.
+ *  Copyright 2008 University of North Carolina. All rights reserved.
+ *
+ */
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -18,14 +20,13 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ¥¥¥Imported Files
-#import "ORCardContainerView.h"
+#define kMaxSNOCrates		20
+#define kNumSNOCards		16
+#define kNumSNOCrateSlots	18
 
-@interface ORIPCarrierView : ORCardContainerView {
-
-}
-- (int) maxNumberOfCards;
-- (int) cardWidth;
-- (NSPoint) constrainLocation:(NSPoint)aPoint;
-
-@end
+// Board Id Register Definitions
+#define MC_BOARD_ID_INDEX		1
+#define DC_BOARD0_ID_INDEX		2
+#define DC_BOARD1_ID_INDEX		3
+#define DC_BOARD2_ID_INDEX		4
+#define DC_BOARD3_ID_INDEX		5

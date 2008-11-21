@@ -129,3 +129,19 @@
 }
 
 @end
+
+@implementation ORcPCICrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects	{ return 8; }
+- (int) objWidth			{ return 12; }
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if( [anObj isKindOfClass:NSClassFromString(@"ORcPCIControllerCard")]){
+		return NSMakeRange(0,1);
+	}
+	else {
+		return  NSMakeRange(1,[self maxNumberOfObjects]);
+	}
+}
+
+@end
+

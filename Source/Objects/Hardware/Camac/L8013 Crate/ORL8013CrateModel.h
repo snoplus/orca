@@ -24,5 +24,8 @@
 
 @interface ORL8013CrateModel : ORCamacCrateModel  {
 }
+@end
 
+@interface ORL8013CrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
 @end

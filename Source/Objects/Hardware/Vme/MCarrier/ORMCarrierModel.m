@@ -72,3 +72,10 @@
 }
 
 @end
+
+@implementation ORMCarrierModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects { return 4;  }
+- (int) objWidth		 { return 60; }
+- (int) groupSeparation	 { return 0; }
+@end
+

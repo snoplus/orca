@@ -3,7 +3,7 @@
 //  test
 //
 //  Created by Mark Howe on 1/11/07.
-//  Copyright 2007 __MyCompanyName__. All rights reserved.
+//  Copyright 2007 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -19,8 +19,9 @@
 //-------------------------------------------------------------
 
 #import "ORCrateLabelView.h"
-#import "ORCardContainerView.h"
 #import "ORCard.h"
+#import "ORCrate.h"
+#import "OROrderedObjManager.h"
 
 @implementation ORCrateLabelView
 
@@ -95,7 +96,7 @@
 - (void) drawRect:(NSRect)rect
 {
 	if(!ciImage){
-		int numSlots = [crateView maxNumberOfCards];
+		int numSlots = [[self crate] maxNumberOfObjects];
 		NSRect newRect = NSMakeRect(0,0,[self frame].size.height,[self frame].size.width);
 		NSImage*  contentImage = [[NSImage alloc] initWithSize:newRect.size];
 
@@ -113,7 +114,7 @@
 			float slotWidth  = [self frame].size.width/(float)numSlots; 
 			int i;
 			for(i=0;i<numSlots;i++){
-				id card = [crateView cardInSlot:numSlots-i-1];
+				id card = [[OROrderedObjManager for:[self crate]] objectInSlot:numSlots-i-1];
 				if(card){
 					int numSlotsUsed = [card numberSlotsUsed];
 					NSString* shortName = [card shortName];
@@ -158,6 +159,13 @@
 		[context drawImage: [filter valueForKey: @"outputImage"]
 			atPoint: cg.origin  fromRect: cg];
 	}
+}
+
+- (ORCrate*) crate
+{
+	id group = [crateView group];
+	if([group isKindOfClass:[ORCrate class]])return (ORCrate*)group;
+	else return nil;
 }
 
 @end

@@ -153,6 +153,11 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 }
 
+- (void) isNowKeyWindow:(NSNotification*)aNotification
+{
+	[[self window] makeFirstResponder:(NSResponder*)groupView];
+}
+
 //---------------------------------------------------------------
 //these last actions are here only to work around a strange 
 //first responder problem that occurs after cut followed by undo

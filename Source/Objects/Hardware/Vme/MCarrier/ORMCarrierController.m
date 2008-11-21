@@ -22,7 +22,6 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORMCarrierController.h"
 #import "ORMCarrierModel.h"
-#import "ORMCarrierView.h"
 
 
 @implementation ORMCarrierController
@@ -105,6 +104,11 @@
     [self runStatusChanged:nil];
     [self slotChanged:nil];
     [groupView setNeedsDisplay:YES];
+}
+
+- (void) isNowKeyWindow:(NSNotification*)aNotification
+{
+	[[self window] makeFirstResponder:(NSResponder*)groupView];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification

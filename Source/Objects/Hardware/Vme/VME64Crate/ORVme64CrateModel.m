@@ -74,5 +74,11 @@
 {
     [self linkToController:@"ORVme64CrateController"];
 }
+@end
 
+@implementation ORVme64CrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects
+{
+    return 21;
+}
 @end

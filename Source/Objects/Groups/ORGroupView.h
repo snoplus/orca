@@ -25,7 +25,7 @@
     id mouseTask;
     BOOL dragSessionInProgress;
     BOOL goodObjectsInDrag;
-    ORGroup* group;
+    id group;
     NSColor* backgroundColor;
     NSArray* draggedObjects;
     NSArray* savedObjects;
@@ -35,8 +35,8 @@
 #pragma mark ¥¥¥Accessors
 - (NSArray*)draggedNodes;
 - (void) dragDone;
-- (void) setGroup:(ORGroup*)aModel;
-- (ORGroup*) group;
+- (void) setGroup:(id)aModel;
+- (id) group;
 - (NSColor*) backgroundColor;
 - (void) setBackgroundColor:(NSColor*)aColor;
 - (NSEnumerator*) objectEnumerator;
@@ -77,7 +77,6 @@
 - (IBAction) alignLeft:(id)sender;
 
 #pragma mark ¥¥¥Drag and Drop
-- (NSPoint) constrainLocation:(NSPoint)aPoint;
 - (NSPoint) suggestPasteLocationFor:(id)anObject;
 - (BOOL) dropPositionOK:(NSPoint)aPoint;
 - (NSDragOperation) draggingSourceOperationMaskForLocal:(BOOL)flag;

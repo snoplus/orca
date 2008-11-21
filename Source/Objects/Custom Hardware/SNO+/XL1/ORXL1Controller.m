@@ -3,7 +3,7 @@
 //  Orca
 //
 //  Created by Mark Howe on 10/30/08.
-//  Copyright 2008 __MyCompanyName__. All rights reserved.
+//  Copyright 2008 University of North Carolina. All rights reserved.
 //
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 

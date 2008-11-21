@@ -3,7 +3,7 @@
 //  test
 //
 //  Created by Mark Howe on 1/11/07.
-//  Copyright 2007 __MyCompanyName__. All rights reserved.
+//  Copyright 2007 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -19,7 +19,7 @@
 //-------------------------------------------------------------
 
 #import <QuartzCore/QuartzCore.h>
-
+@class ORCrate;
 
 @interface ORCrateLabelView : NSView {
 	IBOutlet id crateView;
@@ -31,5 +31,6 @@
 - (void) setShowLabels:(BOOL)aState;
 - (void) forceRedraw;
 - (void) removeImage;
+- (ORCrate*) crate;
 
 @end

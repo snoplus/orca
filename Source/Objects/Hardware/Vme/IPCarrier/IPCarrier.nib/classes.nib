@@ -13,19 +13,6 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
 			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
@@ -56,14 +43,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORCardContainerView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORGroupView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -122,6 +101,10 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>alignLeft</key>
+				<string>id</string>
+				<key>arrangeInCircle</key>
+				<string>id</string>
 				<key>concludeDragOperation</key>
 				<string>id</string>
 				<key>copy</key>
@@ -146,6 +129,29 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORCardContainerView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORGroupView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

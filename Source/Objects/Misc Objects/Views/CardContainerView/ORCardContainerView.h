@@ -18,24 +18,11 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 @interface ORCardContainerView : ORGroupView {
 }
-
-- (int) maxNumberOfCards;
-- (int) cardWidth;
-- (BOOL) isHorizontalView;
-- (id) cardInSlot:(int)aSlot;
-
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender;
-- (NSPoint) suggestPasteLocationFor:(id)anObject;
-- (BOOL) slotRangeEmpty:(NSRange)slotRange;
-- (NSPoint) constrainLocation:(NSPoint)aPoint;
 - (void) drawBackground:(NSRect)aRect;
-- (int) slotAtPoint:(NSPoint)aPoint;
-- (void) moveObject:(id)obj to:(NSPoint)aPoint;
-- (BOOL) canAddObject:(id)obj atPoint:(NSPoint)aPoint;
 - (void) contentSizeChanged:(NSNotification*)note;
-- (void) moveSelectedObjects:(NSPoint)delta;
-- (BOOL) slot:(int) aSlot legalForCard:(id)aCard;
+- (BOOL) canAddObject:(id) obj atPoint:(NSPoint)aPoint;
+- (void) moveObject:(id)obj to:(NSPoint)aPoint;
 @end

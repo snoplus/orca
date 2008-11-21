@@ -21,6 +21,7 @@
 #pragma mark •••Imported Files
 #import "ORFecDaughterCardModel.h"
 #import "ORFec32Model.h"
+#import "ORSNOConstants.h"
 
 
 NSString* ORDCModelCommentsChanged			= @"ORDCModelCommentsChanged";
@@ -97,6 +98,12 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
     comments = [aComments copy];    
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelCommentsChanged object:self];
+}
+
+- (void) setSlot:(int)aSlot
+{
+	[super setSlot:aSlot];
+	[[self guardian] objectCountChanged];
 }
 
 - (BOOL) showVolts
@@ -421,7 +428,11 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
  
  - (void) readBoardIds
  {
-	[self setBoardID:[[self guardian] performBoardIDRead:DC_BOARD0_ID_INDEX + [self slot]]];
+	 NS_DURING
+		[self setBoardID:[[self guardian] performBoardIDRead:DC_BOARD0_ID_INDEX + [self slot]]];
+	 NS_HANDLER
+		[self setBoardID:@"0000"];
+	 NS_ENDHANDLER
  }
  
  @end

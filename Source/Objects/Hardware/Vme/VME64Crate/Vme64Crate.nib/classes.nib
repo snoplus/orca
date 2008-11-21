@@ -5,23 +5,25 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORVmeCrateView</string>
+			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>ORCardContainerView</string>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORCrateLabelView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>crateView</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -46,47 +48,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORVme64CrateController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORVmeCrateController</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORCardContainerView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORGroupView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORVmeCrateController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>groupView</key>
-				<string>ORGroupView</string>
-				<key>lockDocField</key>
-				<string>NSTextField</string>
-				<key>powerField</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>OrcaObjectController</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORVme64CrateView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORVmeCrateView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -119,6 +80,10 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>alignLeft</key>
+				<string>id</string>
+				<key>arrangeInCircle</key>
+				<string>id</string>
 				<key>concludeDragOperation</key>
 				<string>id</string>
 				<key>copy</key>
@@ -138,11 +103,87 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>group</key>
+				<string>id</string>
 				<key>mouseTask</key>
 				<string>id</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>showLabelsAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORCrateController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>groupView</key>
+				<string>ORGroupView</string>
+				<key>labelView</key>
+				<string>ORCrateLabelView</string>
+				<key>lockDocField</key>
+				<string>NSTextField</string>
+				<key>powerField</key>
+				<string>NSTextField</string>
+				<key>showLabelsButton</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORVme64CrateController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORVmeCrateController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORCardContainerView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORGroupView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORVmeCrateController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>groupView</key>
+				<string>ORGroupView</string>
+				<key>lockDocField</key>
+				<string>NSTextField</string>
+				<key>powerField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>ORCrateController</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

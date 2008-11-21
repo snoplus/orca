@@ -125,6 +125,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>boardIdField</key>
+				<string>NSTextField</string>
 				<key>cardLabelField</key>
 				<string>NSTextField</string>
 				<key>cmosRegShownField</key>

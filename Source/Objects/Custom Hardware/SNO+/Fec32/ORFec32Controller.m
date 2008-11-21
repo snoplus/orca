@@ -22,7 +22,6 @@
 #pragma mark •••Imported Files
 #import "ORFec32Controller.h"
 #import "ORFec32Model.h"
-#import "ORFec32View.h"
 #import "ORFecPmtsView.h"
 #import "ORPmtImage.h"
 #import "ORSwitchImage.h"
@@ -170,7 +169,12 @@
                      selector : @selector(onlineMaskChanged:)
                          name : ORFecOnlineMaskChanged
 						object: model];
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(boardIdChanged:)
+                         name : ORSNOCardBoardIDChanged
+						object: model];
+	
 }
 
 - (void) updateWindow
@@ -184,6 +188,7 @@
 	[self vResChanged:nil];
 	[self hvRefChanged:nil];
 	[self cmosChanged:nil];
+	[self boardIdChanged:nil];
     [groupView setNeedsDisplay:YES];
 	[self commentsChanged:nil];
 	[pmtView setNeedsDisplay:YES];
@@ -206,6 +211,11 @@
 }
 
 #pragma mark •••Interface Management
+- (void) isNowKeyWindow:(NSNotification*)aNotification
+{
+	[[self window] makeFirstResponder:(NSResponder*)groupView];
+}
+
 - (void) enablePmtGroup:(short)enabled groupNumber:(short)group
 {
 	[onlineSwitches[group] setEnabled:enabled];
@@ -298,6 +308,11 @@
 	[hvRefField setIntValue:[model hVRef]];
 }
 
+- (void) boardIdChanged:(NSNotification*)aNote
+{
+	[boardIdField setStringValue:[model boardID]];
+}
+
 - (void) cmosChanged:(NSNotification*)aNote
 {
 	int index;
@@ -328,7 +343,7 @@
 - (IBAction) probeAction:(id)sender
 {
 	NS_DURING
-		NSLog(@"%@\n",[model probeFEC32]);
+		[model readBoardIds];
 	NS_HANDLER
         NSLog(@"Probe of Fec32 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\n\nFailed Fec32 Probe.", @"OK", nil, nil,

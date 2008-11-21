@@ -32,6 +32,7 @@
 - (BOOL) acceptsGuardian: (OrcaObject *)aGuardian;
 - (void) setSlot:(int)aSlot;
 - (int)  slot;
+- (id) xl2;
 
 #pragma mark •••Accessors
 - (unsigned long) memoryBaseAddress;
@@ -39,6 +40,16 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+
+- (void) scan;
+- (short) numberSlotsUsed;
+
+@end
+
+@interface ORSNOCrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (NSRange) legalSlotsForObj:(id)anObj;
 @end
 
 extern NSString* ORSNOCrateSlotChanged;

@@ -109,6 +109,12 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 
 #pragma mark ¥¥¥Interface Management
 
+- (void) isNowKeyWindow:(NSNotification*)aNotification
+{
+	//do nothing... subclassed can override
+}
+
+
 - (void) endAllEditing:(NSNotification*)aNotification
 {
 	[self endEditing];
@@ -144,6 +150,12 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
                        object : [self window]];
 
     [notifyCenter addObserver : self
+                     selector : @selector(isNowKeyWindow:)
+                         name : NSWindowDidBecomeKeyNotification
+                       object : [self window]];
+	
+	
+    [notifyCenter addObserver : self
                      selector : @selector(uniqueIDChanged:)
                          name : ORIDChangedNotification
                        object : model];
@@ -152,6 +164,8 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 					 selector : @selector(warningPosted:)
 						 name : ORWarningPosted
 					   object : model];
+
+
 }
 
 

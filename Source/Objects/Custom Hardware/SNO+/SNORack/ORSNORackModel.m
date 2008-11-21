@@ -109,4 +109,44 @@
 {
     return [self uniqueIdNumber] - [anObj uniqueIdNumber];
 }
+
+#pragma mark •••CardHolding Protocol
+- (int) maxNumberOfObjects	{ return 2; }	//default
+- (int) objWidth			{ return 56; }	//default
+- (int) groupSeparation		{ return 18; }	//default
+- (int) stationForSlot:(int)aSlot		{ return aSlot; }	//default
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	return NSMakeRange(0,[self maxNumberOfObjects]);
+}
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
+
+- (int)slotAtPoint:(NSPoint)aPoint 
+{
+	//what really screws us up is the space in the middle
+	float y = aPoint.y;
+	int objWidth = [self objWidth];
+	float w = objWidth * [self maxNumberOfObjects] + [self groupSeparation];
+	
+	if(y>=0 && y<objWidth)						return 0;
+	else if(y>=w-objWidth && y<w)				return 1;
+	else										return -1;
+}
+
+- (NSPoint) pointForSlot:(int)aSlot 
+{
+	int objWidth = [self objWidth];
+	float w = objWidth * [self maxNumberOfObjects] + [self groupSeparation];
+	if(aSlot == 0)		return NSMakePoint(0,0);
+	else return NSMakePoint(0,w-[self objWidth]);
+}
+
+- (void) place:(id)aCard intoSlot:(int)aSlot
+{
+	[aCard setSlot: aSlot];
+	[aCard moveTo:[self pointForSlot:aSlot]];
+}
+
 @end
+

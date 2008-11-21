@@ -25,7 +25,7 @@
 
 #pragma mark ¥¥¥Forward Declarations
 
-@interface ORVmeCrateModel : ORCrate  {
+@interface ORVmeCrateModel : ORCrate   {
 }
 
 - (void) makeConnectors;
@@ -42,6 +42,11 @@
 - (void) registerNotificationObservers;
 - (void) powerFailed:(NSNotification*)aNotification;
 - (void) powerRestored:(NSNotification*)aNotification;
-
-
 @end
+
+@interface ORVmeCrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+@end
+
+

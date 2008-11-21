@@ -46,6 +46,7 @@
 	IBOutlet NSMatrix*		pmtImages1;
 	IBOutlet NSMatrix*		pmtImages2;
 	IBOutlet NSMatrix*		pmtImages3;
+	IBOutlet NSTextField*	boardIdField;
 	NSNumberFormatter*		cmosFormatter;
 	
 	//cache some stuff to make things easier
@@ -73,6 +74,7 @@
 - (void) vResChanged:(NSNotification*)aNote;
 - (void) hvRefChanged:(NSNotification*)aNote;
 - (void) cmosChanged:(NSNotification*)aNote;
+- (void) boardIdChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) probeAction:(id)sender;

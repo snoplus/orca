@@ -101,6 +101,11 @@
 
 }
 
+- (void) isNowKeyWindow:(NSNotification*)aNotification
+{
+	[[self window] makeFirstResponder:(NSResponder*)groupView];
+}
+
 - (void) crateNumberChanged:(NSNotification*)aNote
 {
 	[self setCrateTitle];

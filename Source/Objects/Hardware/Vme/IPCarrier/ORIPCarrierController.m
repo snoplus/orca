@@ -22,7 +22,6 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORIPCarrierController.h"
 #import "ORIPCarrierModel.h"
-#import "ORIPCarrierView.h"
 
 
 @implementation ORIPCarrierController
@@ -106,6 +105,12 @@
     [self slotChanged:nil];
     [groupView setNeedsDisplay:YES];
 }
+
+- (void) isNowKeyWindow:(NSNotification*)aNotification
+{
+	[[self window] makeFirstResponder:(NSResponder*)groupView];
+}
+
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"IP Carrier (Slot %d)",[model slot]]];

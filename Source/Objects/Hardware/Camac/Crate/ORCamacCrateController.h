@@ -23,10 +23,6 @@
 
 #import "ORCrateController.h"
 
-#pragma mark ¥¥¥Forward Declarations
-@class ORGroup;
-@class ORGroupView;
-
 @interface ORCamacCrateController : ORCrateController
 {
     IBOutlet NSButton*      showHideButton;

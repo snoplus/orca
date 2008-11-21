@@ -144,7 +144,12 @@
                      selector : @selector(commentsChanged:)
                          name : ORDCModelCommentsChanged
 						object: model];
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(boardIdChanged:)
+                         name : ORSNOCardBoardIDChanged
+						object: model];
+	
 }
 
 #pragma mark •••Interface Management
@@ -161,6 +166,7 @@
 	[self vbChanged:nil];	   
 	[self setAllCmosChanged:nil];	   
 	[self commentsChanged:nil];
+	[self boardIdChanged:nil];
 
 	[self cmosRegShownChanged:nil];
 }
@@ -171,6 +177,11 @@
 	[dcNumberField setIntValue:[model slot]];
 	[fecNumberField setIntValue:[[model guardian] stationNumber]];
 	[crateNumberField setIntValue:[[[model guardian] guardian] crateNumber]];
+}
+
+- (void) boardIdChanged:(NSNotification*)aNote
+{
+	[boardIdField setStringValue:[model boardID]];
 }
 
 - (void) showVoltsChanged:(NSNotification*)aNote

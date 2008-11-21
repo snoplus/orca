@@ -40,4 +40,8 @@
 - (id) getFireWireInterface:(unsigned long)aVenderID;
 - (void) adapterChanged:(NSNotification*)aNote;
 
+#pragma mark ¥¥¥OROrderedObjHolding
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (NSRange) legalSlotsForObj:(id)anObj;
 @end

@@ -111,5 +111,11 @@
 		NS_ENDHANDLER
 	}
 }
-
 @end
+
+@implementation ORIPCarrierModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects { return 4;  }
+- (int) objWidth		 { return 58; }
+- (int) groupSeparation	 { return 50; }
+@end
+

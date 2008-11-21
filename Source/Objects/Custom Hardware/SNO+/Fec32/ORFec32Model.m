@@ -23,6 +23,7 @@
 #import "ORXL2Model.h"
 #import "ORSNOCrateModel.h"
 #import "ORFecDaughterCardModel.h"
+#import "ORSNOConstants.h"
 
 #define VERIFY_CMOS_SHIFT_REGISTER	// uncomment this to verify CMOS shift register loads - PH 09/17/99
 
@@ -117,7 +118,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 
 - (int) stationNumber
 {
-	return 16-[self slot];
+	return [[self crate] maxNumberOfObjects] - [self slot] - 1;
 }
 
 #pragma mark ***Accessors
@@ -410,11 +411,6 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	return nil;
 }
 
-- (NSString*) probeFEC32
-{
-	return [self performBoardIDRead:MC_BOARD_ID_INDEX];	
-}
-
 - (void) readBoardIds
 {
 	id xl2 = [self xl2];
@@ -434,11 +430,14 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		//PerformBoardIDRead(HV_BOARD_ID_INDEX,&dataValue);
 
 		//read the Mother Card for its id
-		[self performBoardIDRead:MC_BOARD_ID_INDEX];
-		
+		NS_DURING
+			[self setBoardID:[self performBoardIDRead:MC_BOARD_ID_INDEX]];
+		NS_HANDLER
+			[self setBoardID:@"0000"];	
+		NS_ENDHANDLER
+	
 		[xl2 deselectCards];
 	    
-	
 	NS_HANDLER
 		[xl2 deselectCards];
 	
@@ -450,7 +449,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	unsigned long 	readValue;
 	unsigned short 	dataValue = 0;
 	unsigned long	writeValue = 0UL;
-	unsigned long	theRegister = BOARD_ID_REG_NUMBER;;
+	unsigned long	theRegister = BOARD_ID_REG_NUMBER;
 	
 	// first select the board
 	unsigned long boardSelectVal = 0;
@@ -476,7 +475,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:0UL];							// Now de-select all and clock
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:BOARD_ID_SK];					// now clock in value
 	
-	return [NSString stringWithCharacters:&dataValue length:4];
+	return hexToString(dataValue);
 }
 
 - (unsigned long) fec32RegAddress:(unsigned long)aRegOffset
@@ -534,7 +533,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	NS_DURING
 
 		[self readBoardIds];	//Find out if the HW is there...
-		if(![boardID isEqualToString:@"FFFF"]  && ![boardID isEqualToString:@"FFFF"]){
+		if(![boardID isEqualToString:@"0000"]  && ![boardID isEqualToString:@"FFFF"]){
 			[self setOnlineMask:0xFFFFFFFF];
 		}
 		
@@ -819,6 +818,50 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		NSLog(@"Error during taking channel(s) off-line on  FEC32 Crate %d Slot %d!", [self crateNumber], [self stationNumber]);	 		
 	NS_ENDHANDLER
 }
+
+#pragma mark •••OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects	{ return 4; }
+- (int) objWidth			{ return 39; }
+- (int) groupSeparation		{ return 37; }
+- (int) stationForSlot:(int)aSlot {return aSlot;}
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj {return NO;}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	return NSMakeRange(0,[self maxNumberOfObjects]);
+}
+
+- (int)slotAtPoint:(NSPoint)aPoint 
+{
+	//what really screws us up is the space in the middle
+	float y = aPoint.y;
+	int objWidth = [self objWidth];
+	float w = objWidth * [self maxNumberOfObjects] + [self groupSeparation];
+	
+	if(y>=0 && y<objWidth)						return 0;
+	else if(y>objWidth && y<objWidth*2)		return 1;
+	else if(y>=w-objWidth*2 && y<w-objWidth)	return 2;
+	else if(y>=w-objWidth && y<w)				return 3;
+	else										return -1;
+}
+
+- (NSPoint) pointForSlot:(int)aSlot 
+{
+	int objWidth = [self objWidth];
+	float w = objWidth * [self maxNumberOfObjects] + [self groupSeparation];
+	if(aSlot == 0)		return NSMakePoint(0,0);
+	else if(aSlot == 1)	return NSMakePoint(0,objWidth+1);
+	else if(aSlot == 2) return NSMakePoint(0,w-2*objWidth+1);
+	else return NSMakePoint(0,w-objWidth+1);
+}
+
+
+- (void) place:(id)aCard intoSlot:(int)aSlot
+{
+	[aCard setSlot: aSlot];
+	[aCard moveTo:[self pointForSlot:aSlot]];
+}
+
 @end
 
 @implementation ORFec32Model (private)
@@ -1069,5 +1112,5 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 
 	}		
 }
-
 @end
+

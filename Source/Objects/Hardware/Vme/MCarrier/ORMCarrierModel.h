@@ -25,3 +25,8 @@
 - (void) probe;
 @end
 
+@interface ORMCarrierModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+@end

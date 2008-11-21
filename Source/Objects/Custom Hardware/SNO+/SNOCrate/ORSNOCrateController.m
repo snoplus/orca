@@ -97,4 +97,10 @@
 	[self decModelSortedBy:@selector(crateNumberCompare:)];
 }
 
+- (IBAction) scan:(id)sender
+{
+	[model scan];
+}
+
+
 @end

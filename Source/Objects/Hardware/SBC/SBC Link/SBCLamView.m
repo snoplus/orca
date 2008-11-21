@@ -31,12 +31,12 @@
 	[super dealloc];
 }
 
-- (int) maxNumberOfCards
+- (int) maxNumberOfObjects
 {
     return 7;
 }
 
-- (int) cardWidth
+- (int) objWidth
 {
     return 48;
 }
@@ -52,8 +52,8 @@
 	
 	float y1 = [self bounds].origin.y;
     float y2 = y1+[self bounds].size.height;
-    float x = [self bounds].origin.x + [self cardWidth];
-    for(;x<[self bounds].size.width;x+=[self cardWidth]){
+    float x = [self bounds].origin.x + [self objWidth];
+    for(;x<[self bounds].size.width;x+=[self objWidth]){
         [NSBezierPath strokeLineFromPoint:NSMakePoint(x,y1) toPoint:NSMakePoint(x,y2)];
     }
 	

@@ -3,7 +3,7 @@
 //  Orca
 //
 //  Created by Mark Howe on 11/27/07.
-//  Copyright 2007 __MyCompanyName__. All rights reserved.
+//  Copyright 2007 University of North Carolina. All rights reserved.
 //
 
 @interface ORObjectProxy : NSObject {

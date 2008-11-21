@@ -22,10 +22,12 @@
 #pragma mark •••Imported Files
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
+#import "ORSNOConstants.h"
 #import "ORXL1Model.h"
+#import "ORXL2Model.h"
+#import "ORFec32Model.h"
 
 
-#define kMaxSNOCrates 20
 const struct {
 	unsigned long Register;
 	unsigned long Memory;
@@ -229,6 +231,39 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     return [NSString stringWithFormat:@"SNO Crate %d",[self crateNumber]];
 }
 
+- (id) xl2 
+{
+	return [self adapter];
+}
+
+- (void) scan
+{
+	NSLog(@"scanning crate %d for FEC32 cards\n",[self crateNumber]);
+	int card;
+	ORFec32Model* proxyFec32 = [[ORFec32Model alloc] init];
+	[proxyFec32 setGuardian:self];
+	for(card=0;card<kNumSNOCards;card++){
+		[[self xl2] selectCards:1L<<card];	
+		NS_DURING
+			[proxyFec32 setSlot:card];
+			NSString* boardID = [proxyFec32 performBoardIDRead:MC_BOARD_ID_INDEX];
+			if(![boardID isEqual: @"0000"]){
+				NSLog(@"Slot: %d BoardID: %@\n",card,boardID);
+				ORFec32Model* aFec32 = [[ORFec32Model alloc] init];
+				[aFec32 setUpImage];
+				[aFec32 setGuardian:self];
+				[self addObjects:[NSArray arrayWithObject:aFec32]];
+				[aFec32 setSlot:card];
+				[aFec32 release];
+			}
+			else NSLog(@"BadID (%@)\n",boardID);
+		NS_HANDLER
+			NSLog(@"Slot: %d BoardID: ----\n",card);
+		NS_ENDHANDLER
+	}
+	[proxyFec32 release];
+	[[self xl2] deselectCards];	
+}
 
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -247,5 +282,38 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     [super encodeWithCoder:encoder];
 	[encoder encodeInt:[self slot] forKey:@"slot"];
 }
+- (short) numberSlotsUsed
+{
+	return 1;
+}
+
+@end
+
+@implementation ORSNOCrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects
+{
+    return kNumSNOCrateSlots;
+}
+
+- (int) objWidth
+{
+    return 12;
+}
+
+- (int) stationForSlot:(int)aSlot
+{
+	return 17-aSlot;
+}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if( [anObj isKindOfClass:NSClassFromString(@"ORXL2Model")]){
+		return NSMakeRange(17,1);
+	}
+	else {
+		return  NSMakeRange(1,[self maxNumberOfObjects]-2);
+	}
+}
+
 
 @end

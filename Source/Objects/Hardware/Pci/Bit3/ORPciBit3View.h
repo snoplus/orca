@@ -22,14 +22,6 @@
 #import "ORCardContainerView.h"
 
 @interface ORPciBit3View : ORCardContainerView {
-
 }
-- (int) maxNumberOfCards;
-- (int) cardWidth;
-- (BOOL) isHorizontalView;
 - (void)drawRect:(NSRect)rect;
-- (int)slotAtPoint:(NSPoint)aPoint;
-- (BOOL) mouseDownCanMoveWindow;
-- (NSPoint) suggestPasteLocationFor:(id)aCard;
-- (int)slotAtPoint:(NSPoint)aPoint;
 @end

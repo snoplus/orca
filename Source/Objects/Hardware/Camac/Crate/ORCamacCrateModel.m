@@ -55,7 +55,7 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
         [transform translateXBy:20 yBy:40];
         [transform scaleXBy:.62 yBy:.62];
         [transform concat];
-        NSEnumerator* e  = [[self orcaObjects] objectEnumerator];
+        NSEnumerator* e  = [self objectEnumerator];
         OrcaObject* anObject;
         while(anObject = [e nextObject]){
             BOOL oldHighlightState = [anObject highlighted];
@@ -242,4 +242,23 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
 	[super doNoPowerAlert:exception action:message];
 }
 
+@end
+
+@implementation ORCamacCrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects	{ return 25; }
+- (int) objWidth			{ return 16; }
+- (int) stationForSlot:(int)aSlot
+{
+	return aSlot+1;
+}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if( [anObj isKindOfClass:NSClassFromString(@"ORCamacControllerCard")]){
+		return NSMakeRange([self maxNumberOfObjects]-2,2);
+	}
+	else {
+		return  NSMakeRange(0,[self maxNumberOfObjects]-2);
+	}
+}
 @end

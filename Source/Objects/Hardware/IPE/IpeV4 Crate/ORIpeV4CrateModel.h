@@ -23,7 +23,7 @@
 
 #import "ORCrate.h"
 
-@interface ORIpeV4CrateModel : ORCrate  {
+@interface ORIpeV4CrateModel : ORCrate   {
 }
 
 #pragma mark •••initialization
@@ -38,4 +38,9 @@
 - (void) registerNotificationObservers;
 - (void) adapterChanged:(NSNotification*)aNote;
 
+#pragma mark •••OROrderedObjHolding
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
 @end

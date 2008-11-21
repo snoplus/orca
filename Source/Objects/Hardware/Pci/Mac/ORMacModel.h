@@ -17,7 +17,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
+#import "OROrderedObjHolding.h"
 
 #pragma mark ¥¥¥Imported Files
 
@@ -26,7 +26,7 @@
 @class ORFireWireBus;
 @class ORUSB;
 
-@interface ORMacModel : ORGroup  {
+@interface ORMacModel : ORGroup <OROrderedObjHolding> {
     NSMutableArray* serialPorts;
 	BOOL			mStarted;
 	ORFireWireBus*	fwBus;
@@ -61,6 +61,15 @@
 - (id)		 getUSBController;
 - (id)		 initWithCoder:(NSCoder*)decoder;
 - (void)	 encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark ¥¥¥OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) slotAtPoint:(NSPoint)aPoint; 
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
 @end
 
 

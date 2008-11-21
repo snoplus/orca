@@ -115,6 +115,11 @@
 					     name : HVSocketNotConnectedNotification
 					   object : nil];
 
+    [notifyCenter addObserver : self
+					 selector : @selector(slotChanged:)
+						 name : UVCardSlotChanged
+					   object : model];
+	
 }
 
 
@@ -129,6 +134,16 @@
 	[mChnlTable reloadData];
 }
 
+- (void) slotChanged:(NSNotification*)aNotification
+{
+	[[self window] setTitle:[NSString stringWithFormat:@"Univ Volt Card (Slot %d)",[model station]]];
+}
+
+- (void) setModel:(id)aModel
+{
+	[super setModel:aModel];
+	[[self window] setTitle:[NSString stringWithFormat:@"Univ Volt Card (Slot %d)",[model station]]];
+}
 
 - (void) setValues: (NSNotification *) aNote
 {
@@ -152,6 +167,7 @@
 	[self MVDZChanged: nil];
 	[self MCDZChanged: nil];
 	[self hvLimitChanged: nil];
+	[self slotChanged: nil];
 	
 	[mChnlTable reloadData];	
 }

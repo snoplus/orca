@@ -26,7 +26,8 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORConnector;
 
-@interface ORCamacCrateModel : ORCrate  {
+@interface ORCamacCrateModel : ORCrate
+ {
 	BOOL usingUSB;
 }
 
@@ -43,6 +44,10 @@
 - (void) powerFailed:(NSNotification*)aNotification;
 - (void) powerRestored:(NSNotification*)aNotification;
 - (void) doNoPowerAlert:(NSException*)exception action:(NSString*)message;
+@end
 
-
+@interface ORCamacCrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (NSRange) legalSlotsForObj:(id)anObj;
 @end

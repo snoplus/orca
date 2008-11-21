@@ -25,3 +25,7 @@
 
 @end
 
+@interface ORIPCarrierModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+@end

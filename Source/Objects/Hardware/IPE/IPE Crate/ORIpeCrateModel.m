@@ -172,4 +172,18 @@ static NSString* ORIpeCrateFireWireOut 	= @"ORIpeCrateFireWireOut";
 {
     [super encodeWithCoder:encoder];
 }
+
+#pragma mark ¥¥¥OROrderedObjHolding
+- (int) maxNumberOfObjects {return 21;}
+- (int) objWidth {return 12;}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if( [anObj isKindOfClass:NSClassFromString(@"ORIpeFireWireCard")]){
+		return NSMakeRange(0,1);
+	}
+	else {
+		return  NSMakeRange(1,[self maxNumberOfObjects]);
+	}
+}
 @end

@@ -18,8 +18,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import "OROrderedObjHolding.h"
 
-@interface ORCrate : ORGroup  {
+@interface ORCrate : ORGroup <OROrderedObjHolding>  {
 	NSMutableDictionary* cardRates;
     unsigned int	crateNumber;
     BOOL			powerOff;
@@ -74,7 +75,15 @@
 - (void)encodeWithCoder:(NSCoder*)encoder;
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray;
 
-
+#pragma mark ¥¥¥OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) stationForSlot:(int)aSlot;
+- (int) slotAtPoint:(NSPoint)aPoint;
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
 @end
 
 @interface NSObject (ORCrateModel)

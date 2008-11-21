@@ -44,6 +44,7 @@
 		IBOutlet NSTextField* dcNumberField;
 		IBOutlet NSTextField* fecNumberField;
 		IBOutlet NSTextField* crateNumberField;
+		IBOutlet NSTextField* boardIdField;
 		
 		NSNumberFormatter*		valueFormatter;
 }
@@ -68,6 +69,7 @@
 - (void) ns20delayChanged:(NSNotification*)aNote; 
 - (void) tac0trimChanged:(NSNotification*)aNote; 	   
 - (void) tac1trimChanged:(NSNotification*)aNote;
+- (void) boardIdChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) commentsTextFieldAction:(id)sender;

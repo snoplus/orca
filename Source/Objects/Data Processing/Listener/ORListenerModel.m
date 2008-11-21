@@ -116,7 +116,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     
 }
 
-
 - (void) documentLoaded:(NSNotification*)aNotification
 {
     if([self objectConnectedTo:ORListenerConnector] && connectAtStart){
@@ -153,8 +152,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	connectAtStart = aConnectAtStart;
     
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORListenerConnectAtStartChangedNotification
-                      object:self];
+	 postNotificationName:ORListenerConnectAtStartChangedNotification
+	 object:self];
 }
 - (BOOL) autoReconnect
 {
@@ -167,8 +166,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	autoReconnect = aAutoReconnect;
     
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORListenerAutoReconnectChangedNotification
-                      object:self];
+	 postNotificationName:ORListenerAutoReconnectChangedNotification
+	 object:self];
 }
 
 - (ORSafeQueue*) transferQueue
@@ -192,8 +191,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	queueCount = aQueueCount;
     
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORListenerQueueCountChangedNotification
-                      object:self];
+	 postNotificationName:ORListenerQueueCountChangedNotification
+	 object:self];
 }
 - (ORDataPacket*) dataPacket
 {
@@ -230,8 +229,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	remotePort = aNewRemotePort;
     
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORListenerRemotePortChangedNotification 
-                          object: self];
+	 postNotificationName:ORListenerRemotePortChangedNotification 
+	 object: self];
 }
 
 - (NSString*) remoteHost
@@ -257,8 +256,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	remoteHost = [aNewRemoteHost copy];
     
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORListenerRemoteHostChangedNotification 
-                          object: self ];
+	 postNotificationName:ORListenerRemoteHostChangedNotification 
+	 object: self ];
 }
 
 - (BOOL) isConnected
@@ -270,8 +269,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	isConnected = aNewIsConnected;
     
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORListenerIsConnectedChangedNotification 
-                          object: self ];
+	 postNotificationName:ORListenerIsConnectedChangedNotification 
+	 object: self ];
     
 }
 
@@ -284,8 +283,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	byteCount = aNewByteCount;
     
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORListenerByteCountChangedNotification 
-                          object: self ];
+	 postNotificationName:ORListenerByteCountChangedNotification 
+	 object: self ];
 }
 
 - (void) clearByteCount
@@ -302,11 +301,9 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 - (void) connectSocket:(BOOL)state
 {
     if(state){
-		expectingHeader = YES;
         [self setSocket:[NetSocket netsocketConnectedToHost:remoteHost port:remotePort]];
     }
     else {
-		expectingHeader = NO;
         [socket close];
         [self stopProcessing];
         [self setIsConnected:[socket isConnected]];
@@ -409,6 +406,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     }
     
     [processLock lock];
+	[NSThread setThreadPriority:1.0];
 	BOOL flushMessagePrintedOnce = NO;
     BOOL timeToQuit              = NO;
     threadRunning                = YES;
@@ -416,13 +414,10 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
         [[NSRunLoop currentRunLoop] run];
         queueCount = [transferQueue count];
-		if(!queueCount) [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.001]];
-
-        else {
+        if(queueCount){
 			[dataToProcess appendData:[transferQueue dequeue]];
             [self process:dataToProcess];
         }
-
         if([timeToStopProcessThread condition]){
             queueCount = [transferQueue count];
             if(!flushMessagePrintedOnce){
@@ -452,35 +447,13 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 {
     char* buffer = (char*)[dataChunk bytes];
     char* endPtr = buffer + [dataChunk length];
+    
     while (buffer<endPtr) {
 		NSAutoreleasePool* outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
 		unsigned long* lptr = (unsigned long*)buffer;
-		
-		if(expectingHeader){
-			//this could be a header. Check it and see if we have to swap or not
-			//the only way to do it effectively is to check for the <?xml string
-			if([dataChunk length] >= 32){
-				char* cptr = (char*)lptr;
-				if(!strncmp(cptr+8,"<?xml ve",8)){
-					expectingHeader = NO;
-					//OK, we know this is a header.
-					if((*lptr & 0xffff0000) != 0x0000){
-						//the dataID for the header is always zero the length of the record is always non-zero -- this
-						//gives us a way to determine endian-ness 
-						[dataPacket setNeedToSwap:YES];
-						CFSwapInt32(*lptr);			//swap the record header
-						CFSwapInt32(*(lptr+1));		//swap the header byte length
-					}
-				}
-			}
-			else {
-				[outerPool release];
-				break;
-			}
-		}
-		
-		unsigned long recordHeader = *lptr;
+        unsigned long recordHeader = *lptr;
 		unsigned long dataId = ExtractDataId(recordHeader);
+		
 		if(dataId == 0x00000000){
 			//new style headers always have a id of zero.
 			unsigned long length = ExtractLength(recordHeader)*4; //bytes
@@ -489,7 +462,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 				unsigned long headerLength = *((unsigned long*)buffer); //bytes
 				//we have the whole header, extract it for use
 				buffer+=4;	 //point to header itself
-
+				
 				NSString* theHeader = [[NSString alloc] initWithBytes:buffer length:headerLength encoding:NSASCIIStringEncoding];
 				[dataPacket setFileHeader:[theHeader propertyList]]; 
 				[theHeader release];
@@ -500,11 +473,10 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 			}
 		}
 		else {
-			BOOL endOfRun   = NO;
-			BOOL startOfRun = NO;
+			BOOL endOfRun = NO;
 		    while (buffer<endPtr) {
 				NSAutoreleasePool* innerPool = [[NSAutoreleasePool allocWithZone:nil] init];
-
+				
 				//OK, regular record
 				lptr = (unsigned long*)buffer;
 				recordHeader = *lptr;
@@ -517,7 +489,6 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 						if(!(firstWord & 0x8)){
 							if(firstWord & 0x1){
 								NSLog(@"Listener: Run Start on Host: %@\n",remoteHost);
-								startOfRun = YES;
 							}
 							else {
 								//it's an end of run record --  we have some end of run cleanup to handle
@@ -530,17 +501,11 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 					[dataPacket addData:[NSMutableData dataWithBytes:buffer length:length]];
 					
 					[theNextObject processData:dataPacket userInfo:nil];
-					if(startOfRun){
-						[self performSelectorOnMainThread:@selector(sendRunTaskStarted:) withObject:dataPacket waitUntilDone:YES];
-						startOfRun = NO;
-					}
 					if(endOfRun){
 						[self performSelectorOnMainThread:@selector(sendRunTaskStopped:) withObject:dataPacket waitUntilDone:YES];
 						[dataPacket clearData];
 						[self performSelectorOnMainThread:@selector(sendCloseOutRun:)    withObject:dataPacket waitUntilDone:YES];
 						[self performSelectorOnMainThread:@selector(clearByteCount)      withObject:nil        waitUntilDone:YES];
-						expectingHeader = YES;
-						endOfRun = NO;
 					}
 					[dataPacket clearData];
 					buffer += length;
@@ -574,7 +539,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
         //set up the process thread control lock
         if( timeToStopProcessThread ) [ timeToStopProcessThread release ];
         timeToStopProcessThread  = [[ NSConditionLock alloc ] initWithCondition: NO ];
-        [timeToStopProcessThread lockWhenCondition:NO];
+        
         [NSThread detachNewThreadSelector:@selector(processDataFromQueue) toTarget:self withObject:nil];
     }        
 }

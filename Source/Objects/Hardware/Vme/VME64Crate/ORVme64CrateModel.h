@@ -25,8 +25,10 @@
 
 @interface ORVme64CrateModel : ORVmeCrateModel  {
 }
-
 - (void) setUpImage;
 - (void) makeMainController;
+@end
 
+@interface ORVme64CrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
 @end

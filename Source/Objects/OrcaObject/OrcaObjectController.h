@@ -34,6 +34,7 @@
 
 #pragma mark ¥¥¥Interface Management
 - (void) close;
+- (void) isNowKeyWindow:(NSNotification*)aNotification;
 - (void) endEditing;
 - (void) endAllEditing:(NSNotification*)aNotification;
 - (void) registerNotificationObservers;

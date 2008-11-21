@@ -67,10 +67,16 @@
                               object:self];
 }
 
-
 - (void) makeMainController
 {
     [self linkToController:@"ORL8013CrateController"];
+}
+@end
+
+@implementation ORL8013CrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects
+{
+    return 13;
 }
 
 @end

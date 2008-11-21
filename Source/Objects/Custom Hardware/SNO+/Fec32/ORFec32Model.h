@@ -20,6 +20,8 @@
 
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
+#import "OROrderedObjHolding.h"
+
 @class ORFecDaughterCardModel;
 
 #define kISetA1 0
@@ -155,9 +157,6 @@
 #define NS100_MASK	5
 #define NS100_DELAY	6
 
-// Board Id Register Definitions
-#define MC_BOARD_ID_INDEX		1
-
 // Board ID Masks
 #define	BOARD_ID_WDS		0x00000100 			// 100 00 xxxx
 #define	BOARD_ID_WEN		0x00000130 			// 100 11 xxxx
@@ -179,7 +178,7 @@ typedef struct Fec32CmosShiftReg{
 	unsigned short	cmos_shift_item[7];
 } aFec32CmosShiftReg;
 
-@interface ORFec32Model :  ORSNOCard
+@interface ORFec32Model :  ORSNOCard <OROrderedObjHolding>
 {
 	unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
 	unsigned char	vRes;	//VRES for bipolar chip
@@ -250,13 +249,13 @@ typedef struct Fec32CmosShiftReg{
 
 #pragma mark •••Hardware Access
 - (unsigned long) fec32RegAddress:(unsigned long)aRegOffset;
-- (NSString*) probeFEC32;
 - (NSString*) performBoardIDRead:(short) boardIndex;
 - (void) writeToFec32Register:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (void) setFec32RegisterBits:(unsigned long) aRegister bitMask:(unsigned long) bits_to_set;
 - (void) clearFec32RegisterBits:(unsigned long) aRegister bitMask:(unsigned long) bits_to_clear;
 
 - (unsigned long) readFromFec32Register:(unsigned long) Register;
+- (void) readBoardIds;
 - (void) boardIDOperation:(unsigned long)theDataValue boardSelectValue:(unsigned long) boardSelectVal beginIndex:(short) beginIndex;
 - (void) autoInitThisCard;
 - (void) fullResetOfCard;
@@ -265,7 +264,17 @@ typedef struct Fec32CmosShiftReg{
 - (void) setPedestals;
 -(void) performPMTSetup:(BOOL) aTriggersDisabled;
 
+#pragma mark •••OROrderedObjHolding Protocal
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (int)slotAtPoint:(NSPoint)aPoint; 
+- (NSPoint) pointForSlot:(int)aSlot; 
+- (void) place:(id)aCard intoSlot:(int)aSlot;
 @end
+
 
 extern NSString* ORFecShowVoltsChanged;
 extern NSString* ORFecCommentsChanged;

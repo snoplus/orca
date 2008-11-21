@@ -2153,5 +2153,34 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
     NS_ENDHANDLER
 }
 
+#pragma mark ¥¥¥NSOrderedObjHolding Protocol
+- (int) maxNumberOfObjects			{ return 10; }
+- (int) objWidth					{ return 16; }
+- (int) groupSeparation				{ return 0; }
+- (int) stationForSlot:(int)aSlot	{ return aSlot; }
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	return NSMakeRange(0,[self maxNumberOfObjects]);
+}
+
+- (int) slotAtPoint:(NSPoint)aPoint 
+{
+	return floor(((int)aPoint.y)/[self objWidth]);
+}
+
+- (NSPoint) pointForSlot:(int)aSlot 
+{
+	return NSMakePoint(0,aSlot*[self objWidth]);
+}
+
+- (void) place:(id)anObj intoSlot:(int)aSlot
+{
+	[anObj setSlot: aSlot];
+	[anObj moveTo:[self pointForSlot:aSlot]];
+}
+
 
 @end
+

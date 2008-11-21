@@ -17,7 +17,10 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
+//Changes
+//MAH 11/18/08 : Changed 'slot' calls to station calls. This was to be consistent with the rest of ORCA where slots run from 0-n.
+//				 If a different mapping is needed for some other reason, the station method is used. Needed to do this to get rid
+//				 all of the xxxCrateView objects by moving functionality into the Crate objects themselves.
 
 #pragma mark •••Imported Files
 #import "ORUnivVoltModel.h"
@@ -74,6 +77,7 @@ NSString* UVChnlStatusChanged			= @"ChnlStatusChanged";
 NSString* UVChnlMVDZChanged				= @"ChnlMVDZChanged";
 NSString* UVChnlMCDZChanged				= @"ChnlMCDZChanged";
 NSString* UVChnlHVLimitChanged			= @"ChnlHVLimitChanged";
+NSString* UVCardSlotChanged				= @"UVCardSlotChanged";
 
 NSString* UVChnlHVValuesChanged			= @"ChnlHVValuesChanged";
 
@@ -259,18 +263,18 @@ NSString* UVkWrite = @"W";
 	int		i;	
 	int		slot;
 	
-	slot = [self slot];
+	slot = [self station];
 	if ( aCurrentChnl > -1 )
 	{
 		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, aCurrentChnl];
-		[[self crate] queueCommand: 0 totalCmds: 1 slot: [self slot] channel: aCurrentChnl command: command];
+		[[self crate] queueCommand: 0 totalCmds: 1 slot: [self station] channel: aCurrentChnl command: command];
 	}
 	else 
 	{
 		for ( i = 0; i < UVkNumChannels; i++ )
 		{
 			NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, i];
-			[[self crate] queueCommand: i totalCmds: UVkNumChannels slot: [self slot] channel: i command: command];
+			[[self crate] queueCommand: i totalCmds: UVkNumChannels slot: [self station] channel: i command: command];
 		}
 	}
 }
@@ -314,8 +318,8 @@ NSString* UVkWrite = @"W";
 								 dictParamObj: dictParamObj
 								      command: command];
 				[command retain];
-				[[ self crate] queueCommand: jParam totalCmds: 1 slot: [self slot] channel: aCurrentChnl command: command];
-//				[[ self crate] queueCommand: jParam totalCmds: [mParams count] slot: [self slot] channel: aCurrentChnl command: command];
+				[[ self crate] queueCommand: jParam totalCmds: 1 slot: [self station] channel: aCurrentChnl command: command];
+//				[[ self crate] queueCommand: jParam totalCmds: [mParams count] slot: [self station] channel: aCurrentChnl command: command];
 				[command release];
 			}
 			
@@ -330,7 +334,7 @@ NSString* UVkWrite = @"W";
 				
 				    [command retain];
 					// Single command has been assembled for one param - now queue it.
-				    [[ self crate] queueCommand: jParam totalCmds: [mParams count] slot: [self slot] channel: iChnl command: command];
+				    [[ self crate] queueCommand: jParam totalCmds: [mParams count] slot: [self station] channel: iChnl command: command];
 					[command release];
 
 				} // Loop through channels
@@ -357,7 +361,7 @@ NSString* UVkWrite = @"W";
 	{
 		// LD command handles all channels at once so unit identifier is Sx followed by parameter followed
 		// by values for all 12 channels.
-		aCommand = [NSString stringWithFormat: @"LD S%d.%d %@", [self slot], aCurChnl, param];
+		aCommand = [NSString stringWithFormat: @"LD S%d.%d %@", [self station], aCurChnl, param];
 	}
 			
 	if ( [[aDictParamObj objectForKey: UVkType] isEqualTo: UVkINT] )
@@ -583,7 +587,7 @@ NSString* UVkWrite = @"W";
 		[returnData retain];
 			
 		NSNumber* slotNum = [returnData objectForKey: UVkSlot];
-		slotThisUnit = [self slot];
+		slotThisUnit = [self station];
 		if ( [slotNum intValue] == slotThisUnit )
 		{
 			NSString* retCmd = [returnData objectForKey: UVkCommand];
@@ -927,5 +931,14 @@ NSString* UVkWrite = @"W";
 	NSLog( @"HV limit: %f\n", [[tmpChnl objectForKey: HVkHVLimit] floatValue] );	
 }
 
+//Added the following during a sweep to put the CrateView functionality into the Crate  objects MAH 11/18/08
+- (int) station
+{
+	return [[self crate] maxNumberOfObjects] - [self slot] - 1;
+}
 
+- (NSString*) cardSlotChangedNotification
+{
+    return UVCardSlotChanged;
+}
 @end

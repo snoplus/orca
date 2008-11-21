@@ -73,7 +73,7 @@ typedef enum hveStatus hveStatus;
 - (float) MCDZ: (int) aCurrentChnl;
 - (void)  setMCDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
 - (float)  HVLimit: (int) aCurrentChnl;
-
+- (int) station;
 
 #pragma mark •••Interpret data
 - (void) interpretDataReturn: (NSNotification*) aNote;
@@ -100,6 +100,7 @@ extern NSString* UVChnlMVDZChanged;
 extern NSString* UVChnlMCDZChanged;
 extern NSString* UVChnlHVLimitChanged;
 extern NSString* UVChnlChanged;
+extern NSString* UVCardSlotChanged;
 
 extern NSString* UVChnlHVValuesChanged;
 
@@ -119,6 +120,5 @@ extern NSString* HVkMCDZ;				//10
 extern NSString* HVkHVLimit;			//11
 
 extern NSString* HVkCurChnl;
-
 
 //extern NSString* ORUnivVoltLock;

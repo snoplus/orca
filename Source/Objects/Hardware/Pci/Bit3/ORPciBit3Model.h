@@ -69,6 +69,7 @@ this situation will improve.
 #import <ApplicationServices/ApplicationServices.h>
 #import "ORPciCard.h"
 #import "ORLAMhosting.h"
+#import "OROrderedObjHolding.h"
 
 @class ORAlarm;
 
@@ -145,7 +146,7 @@ enum {
 @class ORRateGroup;
 
 // class definition
-@interface ORPciBit3Model : ORPciCard <ORLAMhosting>
+@interface ORPciBit3Model : ORPciCard <ORLAMhosting,OROrderedObjHolding>
 {
     @private
         NSLock *theHWLock;
@@ -353,6 +354,17 @@ enum {
 - (void) checkStatusErrors;
 - (void) checkStatusWord:(unsigned char)dataWord;
 //----------------------------------------------------------------
+
+#pragma mark ¥¥¥OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+- (int) stationForSlot:(int)aSlot;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) slotAtPoint:(NSPoint)aPoint ;
+- (NSPoint) pointForSlot:(int)aSlot; 
+- (void) place:(id)anObj intoSlot:(int)aSlot;
 
 @end
 

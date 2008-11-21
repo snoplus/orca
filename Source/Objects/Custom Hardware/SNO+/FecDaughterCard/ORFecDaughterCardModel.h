@@ -45,11 +45,6 @@
 #define kVbMax 		4.0
 #define kVbStep 	((kVbMax-kVbMin)/255.0)
 
-#define DC_BOARD0_ID_INDEX		2
-#define DC_BOARD1_ID_INDEX		3
-#define DC_BOARD2_ID_INDEX		4
-#define DC_BOARD3_ID_INDEX		5
-
 @interface ORFecDaughterCardModel :  ORSNOCard 
 {
 	@private

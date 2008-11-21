@@ -192,6 +192,11 @@
 
 #pragma mark ¥¥¥Interface Management
 
+- (void) isNowKeyWindow:(NSNotification*)aNotification
+{
+	[[self window] makeFirstResponder:(NSResponder*)groupView];
+}
+
 - (void) rangeChanged:(NSNotification*)aNote
 {
 	[rangeTextField setIntValue: [model range]];

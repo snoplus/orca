@@ -1171,6 +1171,9 @@ static NSString*	ORUnivVoltHVCrateIPAddress		= @"ORUnivVoltHVCrateIPAddress";
 	return;
 	*/
 
+@end
 
-
+@implementation ORUnivVoltHVCrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects { return 16; }
+- (int) objWidth		 { return 20; }
 @end

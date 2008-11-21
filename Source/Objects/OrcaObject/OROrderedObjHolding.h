@@ -1,9 +1,11 @@
-//
-//  ORVmeCrateView.m
-//  Orca
-//
-//  Created by Mark Howe on Mon Dec 09 2002.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+/*
+ *  OROrderedObjHolding.h
+ *  Orca
+ *
+ *  Created by Mark Howe on 11/19/08.
+ *  Copyright 2008 University of North Carolina. All rights reserved.
+ *
+ */
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -18,23 +20,20 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@protocol OROrderedObjHolding
 
-#import "ORVmeCrateView.h"
-#import "ORCard.h"
-
-#define kNumVmeCrateSlots 12
-
-
-@implementation ORVmeCrateView
-
-- (int) maxNumberOfCards
-{
-    return kNumVmeCrateSlots;
-}
-
-- (int) cardWidth
-{
-    return 16;
-}
-
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (int) stationForSlot:(int)aSlot;
+- (int) slotAtPoint:(NSPoint)aPoint;
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (NSArray*)selectedObjects;
+- (NSEnumerator*) objectEnumerator;
 @end
+
+

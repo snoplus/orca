@@ -149,4 +149,26 @@
 {
     [super encodeWithCoder:encoder];
 }
+
+#pragma mark •••OROrderedObjHolding
+- (int) maxNumberOfObjects {return 21;}
+- (int) objWidth		 {return 12;}
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	if( [anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]){
+		return NSMakeRange(10,1);
+	}
+	else {
+		return  NSMakeRange(0,[self maxNumberOfObjects]);
+	}
+}
+
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj 
+{ 
+	if(![anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")] && (aSlot==10)){
+		return YES;
+	}
+	else return NO;
+}
+
 @end

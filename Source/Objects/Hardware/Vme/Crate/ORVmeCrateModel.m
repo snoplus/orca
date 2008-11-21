@@ -157,5 +157,10 @@
 		cratePowerAlarm = nil;
     }
 }
+@end
 
+
+@implementation ORVmeCrateModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects	{ return 12; }
+- (int) objWidth			{ return 16; }
 @end

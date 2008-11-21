@@ -204,4 +204,46 @@
 	[[self orcaObjects] makeObjectsPerformSelector:@selector(disconnected)];
 }
 
+#pragma mark •••CardHolding Protocol
+- (int) maxNumberOfObjects	{ return 4; }	//default
+- (int) objWidth			{ return 58; }	//default
+- (int) groupSeparation		{ return 50; }	//default
+- (int) stationForSlot:(int)aSlot {return aSlot;}
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	return NSMakeRange(0,[self maxNumberOfObjects]);
+}
+
+- (int)slotAtPoint:(NSPoint)aPoint 
+{
+	//what really screws us up is the space in the middle
+	float x = aPoint.x;
+	int objWidth = [self objWidth];
+	float w = objWidth * [self maxNumberOfObjects] + [self groupSeparation];
+	
+	if(x>=0 && x<objWidth)						return 0;
+	else if(x>objWidth && x<objWidth*2)		return 1;
+	else if(x>=w-objWidth*2 && x<w-objWidth)	return 2;
+	else if(x>=w-objWidth && x<w)				return 3;
+	else										return -1;
+}
+
+- (NSPoint) pointForSlot:(int)aSlot 
+{
+	int objWidth = [self objWidth];
+	float w = objWidth * [self maxNumberOfObjects] + [self groupSeparation];
+	if(aSlot == 0)		return NSMakePoint(0,0);
+	else if(aSlot == 1)	return NSMakePoint(objWidth+1,0);
+	else if(aSlot == 2) return NSMakePoint(w-2*objWidth+1,0);
+	else return NSMakePoint(w-objWidth+1,0);
+}
+
+- (void) place:(id)aCard intoSlot:(int)aSlot
+{
+	[aCard setSlot: aSlot];
+	[aCard moveTo:[self pointForSlot:aSlot]];
+}
+
 @end

@@ -5,17 +5,12 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
-			<string>NSObject</string>
+			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -40,14 +35,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ORIpeV4CrateView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORCardContainerView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>ORTimedTextField</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -61,14 +48,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORCardContainerView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORGroupView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -99,16 +78,12 @@
 			<string>NSWindowController</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>ORIpeV4CrateController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORCrateController</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>alignLeft</key>
+				<string>id</string>
+				<key>arrangeInCircle</key>
+				<string>id</string>
 				<key>concludeDragOperation</key>
 				<string>id</string>
 				<key>copy</key>
@@ -159,6 +134,37 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORCardContainerView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORGroupView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORIpeV4CrateController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORCrateController</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

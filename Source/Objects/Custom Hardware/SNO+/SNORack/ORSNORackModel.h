@@ -20,8 +20,9 @@
 
 #pragma mark •••Imported Files
 #import "OrcaObject.h"
+#import "OROrderedObjHolding.h"
 
-@interface ORSNORackModel : ORGroup  {
+@interface ORSNORackModel : ORGroup <OROrderedObjHolding> {
 }
 - (void) setUpImage;
 - (void) makeMainController;
@@ -29,4 +30,14 @@
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+
+#pragma mark •••OROrderedObjHolding Protocol
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+- (int) stationForSlot:(int)aSlot;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) slotAtPoint:(NSPoint)aPoint;
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
 @end

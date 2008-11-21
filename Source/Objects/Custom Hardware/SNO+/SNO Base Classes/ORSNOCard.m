@@ -20,6 +20,7 @@
 
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
+#import "ORSNOCrateModel.h"
 
 #pragma mark •••Notification Strings
 NSString* ORSNOCardSlotChanged		= @"ORSNOCardSlotChanged";
@@ -58,6 +59,7 @@ NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 - (void) positionConnector:(ORConnector*)aConnector
 {
 }
+
 #pragma mark •••Accessors
 - (NSString*) boardID
 {
@@ -66,6 +68,7 @@ NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 
 - (void) setBoardID:(NSString*)anId
 {
+	if(!boardID)anId = @"0000";
 	[boardID autorelease];
     boardID = [anId copy];    
 
@@ -89,4 +92,12 @@ NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 	[encoder encodeObject:boardID forKey:@"boardID"];
 }
 
+//Added the following during a sweep to put the CrateView functionality into the Crate  objects MAH 11/18/08
+- (int) station
+{
+	return [[self crate] maxNumberOfObjects] - [self slot] - 1;
+}
+
+
 @end
+

@@ -56,6 +56,8 @@
 				<string>id</string>
 				<key>incCrateAction</key>
 				<string>id</string>
+				<key>scan</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORSNOCrateController</string>
@@ -181,14 +183,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>ORGroupView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORSNOCrateView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORCardContainerView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

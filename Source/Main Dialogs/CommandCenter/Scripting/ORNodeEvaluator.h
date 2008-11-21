@@ -3,7 +3,7 @@
 //  Orca
 //
 //  Created by Mark Howe on 12/29/06.
-//  Copyright 2006 __MyCompanyName__. All rights reserved.
+//  Copyright 2006 University of North Carolina. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 

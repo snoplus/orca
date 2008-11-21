@@ -21,9 +21,9 @@
 
 
 #import "ORVmeIOCard.h"
+#import "OROrderedObjHolding.h"
 
-
-@interface ORVmeCarrierCard : ORVmeIOCard {
+@interface ORVmeCarrierCard : ORVmeIOCard <OROrderedObjHolding> {
 
 }
 
@@ -34,7 +34,16 @@
 //- (void) positionConnector:(ORConnector*)aConnector forSlot:(int)aSlot;
 - (void) connector:(ORConnector*)aConnector tweakPositionByX:(float)x byY:(float)y;
 
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+- (int) groupSeparation;
+- (int) stationForSlot:(int)aSlot;
+- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) slotAtPoint:(NSPoint)aPoint;
+- (NSPoint) pointForSlot:(int)aSlot;
+- (void) place:(id)anObj intoSlot:(int)aSlot;
 @end
+
 
 @interface NSObject (ORVmeDaughterCard)
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard;

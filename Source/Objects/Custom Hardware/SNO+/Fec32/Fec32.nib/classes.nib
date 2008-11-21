@@ -158,6 +158,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>boardIdField</key>
+				<string>NSTextField</string>
 				<key>cmosMatrix</key>
 				<string>NSMatrix</string>
 				<key>commentsTextField</key>

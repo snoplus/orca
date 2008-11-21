@@ -3,7 +3,7 @@
 //  OrcaIntel
 //
 //  Created by Mark Howe on 12/26/07.
-//  Copyright 2007 __MyCompanyName__. All rights reserved.
+//  Copyright 2007 University of North Carolina. All rights reserved.
 //
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 

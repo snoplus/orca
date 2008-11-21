@@ -44,5 +44,6 @@
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender;
 - (IBAction) decCrateAction:(id)sender;
+- (IBAction) scan:(id)sender;
 
 @end

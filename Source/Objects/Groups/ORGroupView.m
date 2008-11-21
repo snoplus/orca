@@ -103,12 +103,12 @@
 }
 
 #pragma mark ¥¥¥Accessors
-- (void) setGroup:(ORGroup*)aModel
+- (void) setGroup:(id)aModel
 {
     group = aModel;
 }
 
-- (ORGroup*) group
+- (id) group
 {
     return group;
 }
@@ -644,17 +644,12 @@
 }
 
 #pragma mark ¥¥¥Drap and Drop
-- (NSPoint) constrainLocation:(NSPoint)aPoint
-{
-    return aPoint;
-}
 
 - (NSPoint) suggestPasteLocationFor:(id)anObject
 {
     NSPoint aPoint = [anObject frame].origin;
     aPoint.x += 5;
     aPoint.y += 5;
-    [self constrainLocation:aPoint];
     return aPoint;
 }
 
@@ -777,7 +772,6 @@
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
     NSPoint localImagePoint = [self convertPoint:[sender draggedImageLocation] fromView:nil];
-    localImagePoint = [self constrainLocation:localImagePoint];
     if([sender draggingSourceOperationMask] == NSDragOperationCopy){
         return [self _doDragOp:@"drop" atPoint:localImagePoint];
     }
@@ -1039,8 +1033,6 @@
                     }
                 } 
 
-				
-							   
 				if([self canAddObject:anObject atPoint:newPoint] && okToDrop){
                     OrcaObject* newObject = [anObject copy];
                     [self moveObject:newObject to:newPoint];

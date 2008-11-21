@@ -1,9 +1,10 @@
 //
-//  ORL8013CrateView.h
+//  OROrderedObjManager.h
 //  Orca
 //
-//  Created by Mark Howe on Mon Dec 09 2002.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on 11/19/08.
+//  Copyright 2008 University of North Carolina. All rights reserved.
+//
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -17,12 +18,24 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "OROrderedObjHolding.h"
 
-
-#pragma mark ¥¥¥Imported Files
-#import "ORCamacCrateView.h"
-
-@interface ORL8013CrateView : ORCamacCrateView {
+@interface OROrderedObjManager : NSObject {
+	id<OROrderedObjHolding> containerObj;
 }
-- (int) maxNumberOfCards;
++ (id) for:(id<OROrderedObjHolding>)aContainerObj;
+
+- (id) initForContainer:(id<OROrderedObjHolding>)aContainerObj;
+- (NSPoint) suggestLocationFor:(id)anObj;
+- (BOOL) dropPositionOK:(NSPoint)aPoint;
+- (void) moveObject:(id)obj to:(NSPoint)aPoint;
+- (id) objectInSlot:(int)aSlot;
+- (BOOL) slotRangeEmpty:(NSRange)slotRange;
+- (BOOL) canAddObject:(id)obj atPoint:(NSPoint)aPoint;
+- (void) moveSelectedObjects:(NSPoint)delta;
 @end
+
+@interface NSObject (OROrderedObjManager)
+- (int) slot;
+@end
+
