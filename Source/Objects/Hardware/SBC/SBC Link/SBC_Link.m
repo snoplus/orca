@@ -1390,7 +1390,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 {
 	if([self cbTestRunning]){
 		exitCBTest = YES;
-		[[ORGlobal sharedInstance] removeRunVeto:@"CBTest"];
+		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTest"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
 	}
 	if(socketfd){
@@ -1496,10 +1496,10 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 {
 	if([self cbTestRunning]){
 		exitCBTest = YES;
-		[[ORGlobal sharedInstance] removeRunVeto:@"CBTest"];
+		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTest"];
 	}
 	else if(![gOrcaGlobals runInProgress]){
-		[[ORGlobal sharedInstance] addRunVeto:@"CBTestInProgress" comment:@"CB Test In Progress"];
+		[[ORGlobal sharedGlobal] addRunVeto:@"CBTestInProgress" comment:@"CB Test In Progress"];
 		exitCBTest = NO;
 		cbTestCount = 0;
 		totalRecordsChecked = 0;
@@ -1981,7 +1981,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		}
 		else {
 			exitCBTest = YES;
-			[[ORGlobal sharedInstance] removeRunVeto:@"CBTestInProgress"];
+			[[ORGlobal sharedGlobal] removeRunVeto:@"CBTestInProgress"];
 
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
 			return;

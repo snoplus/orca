@@ -21,8 +21,7 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORWindowListController.h"
-
-static ORWindowListController* sharedInstance = nil;
+#import "SynthesizeSingleton.h"
 
 //aux function for sorting window names
 int windowNameSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 title]]; }
@@ -30,14 +29,7 @@ int windowNameSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1
 @implementation ORWindowListController
 
 #pragma mark ¥¥¥Initialization
-
-+ (id) sharedWindowListController
-{
-	if(!sharedInstance){
-		sharedInstance = [[ORWindowListController alloc] init];
-	}
-    return sharedInstance;
-}
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(WindowListController);
 
 -(id)init
 {
@@ -48,7 +40,6 @@ int windowNameSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1
 
 - (void) dealloc
 {
-    sharedInstance = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }

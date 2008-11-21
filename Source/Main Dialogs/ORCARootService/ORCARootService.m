@@ -24,6 +24,7 @@
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
 #import "ORCARootServiceDefs.h"
+#import "SynthesizeSingleton.h"
 
 NSString* ORCARootServicePortChanged			= @"ORCARootServicePortChanged";
 NSString* ORCARootServiceTimeConnectedChanged	= @"ORCARootServiceTimeConnectedChanged";
@@ -32,16 +33,9 @@ NSString* ORCARootServiceConnectAtStartChanged	= @"ORCARootServiceConnectAtStart
 NSString* ORCARootServiceAutoReconnectChanged	= @"ORCARootServiceAutoReconnectChanged";
 NSString* ORORCARootServiceLock					= @"ORORCARootServiceLock";
 
-static ORCARootService *instance = nil;
-
 @implementation ORCARootService
 
-+ (id) sharedInstance
-{
-    if ( instance == nil ) instance = [[self alloc] init];
-    return instance;
-}
-
+SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 
 - (id) init
 {
@@ -72,7 +66,6 @@ static ORCARootService *instance = nil;
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    instance = nil;
 	[waitingObjects release];
     [socket release];
 	[socket setDelegate:nil];

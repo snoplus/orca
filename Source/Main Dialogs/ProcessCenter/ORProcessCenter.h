@@ -33,7 +33,7 @@
     BOOL _sortIsDescending;
 	int processMode;
 }
-+ (id) sharedProcessCenter;
++ (ORProcessCenter*) sharedProcessCenter;
 
 - (id) init;
 - (void) dealloc;

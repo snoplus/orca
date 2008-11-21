@@ -52,7 +52,7 @@
 }
 
 #pragma mark •••Initialization
-+ (id) sharedCommandCenterController;
++ (ORCommandCenterController*) sharedCommandCenterController;
 - (void) registerNotificationObservers;
 - (void) awakeFromNib;
 - (void) updateWindow;

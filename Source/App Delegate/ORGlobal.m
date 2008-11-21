@@ -19,6 +19,7 @@
 //-------------------------------------------------------------
 
 #import "ORStatusController.h"
+#import "SynthesizeSingleton.h"
 
 //--------------------------------------------------------
 NSString* runState[kNumRunStates] ={
@@ -35,7 +36,6 @@ NSString* ORTaskStateName[] = {
     @"Waiting"
 };
 //--------------------------------------------------------
-
 
 #pragma mark •••External Strings
 
@@ -64,26 +64,17 @@ NSString* ORHardwareEnvironmentQuiet = @"ORHardwareEnvironmentQuiet";
 
 
 ORGlobal* gOrcaGlobals = nil;
-static ORGlobal* sharedInstance = nil;
 
 
 @implementation ORGlobal
 
-
-+ (id) sharedInstance
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORGlobal alloc] init];
-        gOrcaGlobals = sharedInstance;
-    }
-    return sharedInstance;
-}
-
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 //don't call this, use +sharedInstance instead
 -(id)init
 {
     self = [super init];
+	gOrcaGlobals = sharedGlobal;
     [self registerNotificationObservers];
     return self;
 }

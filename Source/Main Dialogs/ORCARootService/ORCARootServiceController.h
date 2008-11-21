@@ -39,7 +39,7 @@
 }
 
 #pragma mark ¥¥¥Initialization
-+ (id) sharedORCARootServiceController;
++ (ORCARootServiceController*) sharedORCARootServiceController;
 - (void) registerNotificationObservers;
 - (void) awakeFromNib;
 - (void) updateWindow;

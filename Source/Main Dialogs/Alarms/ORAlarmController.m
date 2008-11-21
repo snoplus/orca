@@ -21,21 +21,13 @@
 
 #pragma mark •••Imported Files
 #import "ORAlarmController.h"
-
-static ORAlarmController* sharedInstance = nil;
-
+#import "SynthesizeSingleton.h"
 
 @implementation ORAlarmController
 
 #pragma mark •••Inialization
 
-+ (id) sharedAlarmController
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORAlarmController alloc] init];
-    }
-    return sharedInstance;
-}
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 -(id)init
 {

@@ -23,5 +23,5 @@
 
 @interface ORCatalogController : NSWindowController {
 }
-+ (id) sharedCatalogController;
++ (ORCatalogController*) sharedCatalogController;
 @end

@@ -25,13 +25,12 @@
 #import "ORHWWizSelection.h"
 #import "ORHWUndoManager.h"
 #import "ORDataPacket.h"
+#import "SynthesizeSingleton.h"
 
 NSString* ORHWWizCountsChangedNotification  = @"ORHWWizCountsChangedNotification";
 NSString* ORHWWizardLock					= @"ORHWWizardLock";
 
 #define kRestoreFailed @"Restore Failed"
-
-static ORHWWizardController *sharedInstance = nil;
 
 @interface ORHWWizardController (private)
 - (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
@@ -50,17 +49,11 @@ static ORHWWizardController *sharedInstance = nil;
 
 @implementation ORHWWizardController
 
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
+
 + (BOOL) exists
 {
-    return sharedInstance != nil;
-}
-
-+ (id) sharedInstance
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORHWWizardController alloc] init];
-    }
-    return sharedInstance;
+    return sharedHWWizardController != nil;
 }
 
 - (id) init
@@ -74,7 +67,6 @@ static ORHWWizardController *sharedInstance = nil;
 }
 - (void) dealloc
 {
-	sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [selectionViewController release];
@@ -1504,7 +1496,7 @@ static ORHWWizardController *sharedInstance = nil;
 				int numberOfSettableArguments = 0;
 				if(methodSel) numberOfSettableArguments = [[target methodSignatureForSelector:methodSel] numberOfArguments]-2;
 				
-				if(![paramObj enabledWhileRunning] && [[ORGlobal sharedInstance] runInProgress]){
+				if(![paramObj enabledWhileRunning] && [[ORGlobal sharedGlobal] runInProgress]){
 					NSLog(@"HW Wizard selection <%@> can not be executed while running. It was skipped.\n",[paramObj name]);
 					continue;
 				}

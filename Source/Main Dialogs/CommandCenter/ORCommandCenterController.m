@@ -24,6 +24,7 @@
 #import "ORScriptRunner.h"
 #import "ORScriptView.h"
 #import "Utilities.h"
+#import "SynthesizeSingleton.h"
 
 @interface ORCommandCenterController (private)
 - (void)_processFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -31,19 +32,9 @@
 - (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
 
-static ORCommandCenterController* sharedInstance = nil;
-
-
 @implementation ORCommandCenterController
 
-+ (id) sharedCommandCenterController
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORCommandCenterController alloc] init];
-    }
-    return sharedInstance;
-}
-
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
 
 -(id)init
 {
@@ -54,7 +45,6 @@ static ORCommandCenterController* sharedInstance = nil;
 
 - (void) dealloc
 {
-    sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
@@ -79,7 +69,7 @@ static ORCommandCenterController* sharedInstance = nil;
 #pragma mark •••Accessors
 - (ORCommandCenter*) commandCenter
 {
-    return [ORCommandCenter sharedInstance];
+    return [ORCommandCenter sharedCommandCenter];
 }
 
 - (NSString *)lastPath {

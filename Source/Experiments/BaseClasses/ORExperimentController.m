@@ -314,7 +314,7 @@
 
 - (void) runModeChanged:(NSNotification*)aNote
 {
-	[runModeMatrix selectCellWithTag: [[ORGlobal sharedInstance] runMode]];
+	[runModeMatrix selectCellWithTag: [[ORGlobal sharedGlobal] runMode]];
 }
 
 - (void) runTimeLimitChanged:(NSNotification*)aNote
@@ -424,8 +424,8 @@
 {
 	[self endEditing];
     int tag = [[runModeMatrix selectedCell] tag];
-    if(tag != [[ORGlobal sharedInstance] runMode]){
-        [[ORGlobal sharedInstance] setRunMode:tag];
+    if(tag != [[ORGlobal sharedGlobal] runMode]){
+        [[ORGlobal sharedGlobal] setRunMode:tag];
     }
 }
 

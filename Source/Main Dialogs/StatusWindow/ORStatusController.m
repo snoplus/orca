@@ -23,12 +23,12 @@
 #import "ORDataSet.h"
 #import "ORRunModel.h"
 #import "ORMailCenter.h"
+#import "SynthesizeSingleton.h"
 
 NSString* ORStatusFlushedNotification = @"ORStatusFlushedNotification";
 NSString* ORStatusFlushSize	      = @"ORStatusFlushSize";
 
 ORStatusController* theLogger = nil;
-static ORStatusController* sharedInstance = nil;
 
 @interface ORStatusController (private)
 - (void) loadLogBookPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -42,13 +42,7 @@ static ORStatusController* sharedInstance = nil;
 
 #pragma mark ¥¥¥Initialization
 
-+ (id) sharedStatusController
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORStatusController alloc] init];
-    }
-    return sharedInstance;
-}
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (id)init
 {
@@ -66,7 +60,6 @@ static ORStatusController* sharedInstance = nil;
 - (void) dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [dataSet release];
     [super dealloc];
@@ -593,15 +586,15 @@ void _nsLog(NSString* s,...)
         va_end(myArgs);
         
         NSInvocation *invocation;
-        invocation = [NSInvocation invocationWithMethodSignature:[sharedInstance methodSignatureForSelector:@selector(printString:withColor:)]];
+        invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(printString:withColor:)]];
         
-        [invocation setTarget:sharedInstance];
+        [invocation setTarget:sharedStatusController];
         [invocation setSelector:@selector(printString:withColor:)];
         [invocation setArgument:&s1 atIndex:2];
         [invocation setArgument:&aColor atIndex:3];
         [invocation retainArguments];
         
-        [sharedInstance performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
+        [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
         
     NS_HANDLER
@@ -631,15 +624,15 @@ void NSLogColor(NSColor* aColor,NSString* s,...)
         va_end(myArgs);
         
         NSInvocation *invocation;
-        invocation = [NSInvocation invocationWithMethodSignature:[sharedInstance methodSignatureForSelector:@selector(printString:withColor:)]];
+        invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(printString:withColor:)]];
         
-        [invocation setTarget:sharedInstance];
+        [invocation setTarget:sharedStatusController];
         [invocation setSelector:@selector(printString:withColor:)];
         [invocation setArgument:&s1 atIndex:2];
         [invocation setArgument:&aColor atIndex:3];
         [invocation retainArguments];
         
-        [sharedInstance performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
+        [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
         
     NS_HANDLER
@@ -667,15 +660,15 @@ void NSLogFont(NSFont* aFont,NSString* s,...)
         va_end(myArgs);
         
         NSInvocation *invocation;
-        invocation = [NSInvocation invocationWithMethodSignature:[sharedInstance methodSignatureForSelector:@selector(printString:withFont:)]];
+        invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(printString:withFont:)]];
         
-        [invocation setTarget:sharedInstance];
+        [invocation setTarget:sharedStatusController];
         [invocation setSelector:@selector(printString:withFont:)];
         [invocation setArgument:&s1 atIndex:2];
         [invocation setArgument:&aFont atIndex:3];
         [invocation retainArguments];
         
-        [sharedInstance performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
+        [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
         
     NS_HANDLER
@@ -707,15 +700,15 @@ void NSLogError(NSString* aString,...)
         }
         va_end(myArgs);
         
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[sharedInstance methodSignatureForSelector:@selector(logError:usingKeyArray:)]];
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[sharedStatusController methodSignatureForSelector:@selector(logError:usingKeyArray:)]];
         
-        [invocation setTarget:sharedInstance];
+        [invocation setTarget:sharedStatusController];
         [invocation setSelector:@selector(logError:usingKeyArray:)];
         [invocation setArgument:&s1 atIndex:2];
         [invocation setArgument:&theArgs atIndex:3];
         [invocation retainArguments];
         
-        [sharedInstance performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
+        [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
     NS_HANDLER
         NS_ENDHANDLER

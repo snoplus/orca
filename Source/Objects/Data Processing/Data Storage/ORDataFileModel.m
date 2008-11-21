@@ -111,7 +111,7 @@ static const int currentVersion = 1;           // Current version
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
     
-    if([[ORGlobal sharedInstance] runMode] == kOfflineRun && !ignoreMode){
+    if([[ORGlobal sharedGlobal] runMode] == kOfflineRun && !ignoreMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
         [aNoticeImage compositeToPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) operation:NSCompositeSourceOver];
     }
@@ -379,7 +379,7 @@ static const int currentVersion = 1;           // Current version
 
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
-    if(filePointer && [[ORGlobal sharedInstance] runMode] == kNormalRun){
+    if(filePointer && [[ORGlobal sharedGlobal] runMode] == kNormalRun){
         //[aDataPacket writeData:filePointer];
         //write the data itself
         int i;
@@ -420,7 +420,7 @@ static const int currentVersion = 1;           // Current version
         processedCloseRun = NO;
     }
     
-    if([[ORGlobal sharedInstance] runMode] == kNormalRun){
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         //open file and write headers
 		if(filePrefix)[aDataPacket setFilePrefix:filePrefix];
 
@@ -461,7 +461,7 @@ static const int currentVersion = 1;           // Current version
         processedRunStart = NO;
     }
     
-    if(filePointer && [[ORGlobal sharedInstance] runMode] == kNormalRun){
+    if(filePointer && [[ORGlobal sharedGlobal] runMode] == kNormalRun){
         [self getDataFileSize:nil];
         [self setFileSizeTimer:nil];
         
@@ -511,7 +511,7 @@ static const int currentVersion = 1;           // Current version
     
     int statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
     
-    if([[ORGlobal sharedInstance] runMode] == kNormalRun){
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
 	    //start a copy of the Status File
 	    statusFileName = [[NSString stringWithFormat:@"%@.log",[self formRunName:aDataPacket]] retain];
         

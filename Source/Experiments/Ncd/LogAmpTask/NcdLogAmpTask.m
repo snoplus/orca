@@ -58,7 +58,7 @@
 
 - (BOOL) okToRun
 {
-    return [[ORGlobal sharedInstance] runInProgress];
+    return [[ORGlobal sharedGlobal] runInProgress];
 }
 
 #pragma mark ¥¥¥Actions

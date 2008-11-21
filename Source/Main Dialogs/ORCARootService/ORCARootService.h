@@ -47,7 +47,7 @@
 	BOOL			connectAtStart;
 }
 
-+ (id) sharedInstance;
++ (ORCARootService*) sharedORCARootService;
 
 - (NSUndoManager *)undoManager;
 - (void) connectAtStartUp;

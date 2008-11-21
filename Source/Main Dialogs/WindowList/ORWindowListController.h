@@ -26,7 +26,7 @@
 }
 
 #pragma mark ¥¥¥Initialization
-+ (id) sharedWindowListController;
++ (ORWindowListController*) sharedWindowListController;
 - (id) init;
 - (NSButton*) addButtonForWindow:(NSWindow*)aWindow  index:(int)index;
 - (void) setUpControls;

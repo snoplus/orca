@@ -54,8 +54,8 @@
 	NSString* vetoComment = [self comment];
 	if([vetoComment length] == 0)vetoComment = @"No reason given.";
 	
-	if([self state]) [[ORGlobal sharedInstance] addRunVeto:vetoName comment:vetoComment]; 
-	else			 [[ORGlobal sharedInstance] removeRunVeto:vetoName]; 
+	if([self state]) [[ORGlobal sharedGlobal] addRunVeto:vetoName comment:vetoComment]; 
+	else			 [[ORGlobal sharedGlobal] removeRunVeto:vetoName]; 
 }
 
 - (void) setUpImage

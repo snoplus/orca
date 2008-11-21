@@ -55,7 +55,7 @@
 
 - (BOOL) okToRun
 {
-    return [[ORGlobal sharedInstance] runInProgress];
+    return [[ORGlobal sharedGlobal] runInProgress];
 }
 
 - (int) selectedWaveform

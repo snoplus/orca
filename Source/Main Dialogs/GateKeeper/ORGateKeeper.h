@@ -50,7 +50,7 @@
 }
 
 #pragma mark ***Initialization
-+ (id) sharedGateKeeper;
++ (ORGateKeeper*) sharedGateKeeper;
 - (void) registerNotificationObservers;
 - (void) awakeFromNib;
 - (void) updateWindow;

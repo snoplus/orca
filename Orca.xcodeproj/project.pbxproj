@@ -1655,6 +1655,7 @@
 		84EC2C38079D95D800188ED3 /* No620DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC2C37079D95D800188ED3 /* No620DriverHelp.plist */; };
 		84EC3461079D973300188ED3 /* No617DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3460079D973300188ED3 /* No617DriverHelp.plist */; };
 		84EC3475079D991000188ED3 /* NoBit3DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */; };
+		84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */; };
 		84ED49CA07BD244B00B1B9B1 /* 4ChanTrigger.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */; };
 		84F03CDA059A145E00275624 /* ORGlobal.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F03CD8059A145E00275624 /* ORGlobal.h */; };
 		84F03CDB059A145E00275624 /* ORGlobal.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F03CD9059A145E00275624 /* ORGlobal.m */; };
@@ -3508,6 +3509,7 @@
 		84EC2C37079D95D800188ED3 /* No620DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = No620DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/No620DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC3460079D973300188ED3 /* No617DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = No617DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/No617DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoBit3DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoBit3DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
+		84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SynthesizeSingleton.h; path = Source/Misc/SynthesizeSingleton.h; sourceTree = SOURCE_ROOT; };
 		84ED49C907BD244B00B1B9B1 /* 4ChanTrigger.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 4ChanTrigger.nib; path = Source/Objects/Hardware/Vme/4ChanTrigger/4ChanTrigger.nib; sourceTree = SOURCE_ROOT; };
 		84F03CD8059A145E00275624 /* ORGlobal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORGlobal.h; sourceTree = "<group>"; };
 		84F03CD9059A145E00275624 /* ORGlobal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORGlobal.m; sourceTree = "<group>"; };
@@ -7316,6 +7318,7 @@
 			children = (
 				8403F4A50508F1BE005F64B1 /* ORGenericView.h */,
 				8403F4A60508F1BE005F64B1 /* ORGenericView.m */,
+				84EC7CCE0ED718570057C5D8 /* SynthesizeSingleton.h */,
 				84CDDA48047170B5005F64B1 /* Utilities.h */,
 				84CDDA4604717079005F64B1 /* Utilities.m */,
 				8491917D0725B43400F454F1 /* ORToolbarFactory.m */,
@@ -9039,6 +9042,7 @@
 				842360B70ED1F4D800BECB64 /* ORSNOConstants.h in Headers */,
 				842376910ED46B7A00BECB64 /* OROrderedObjManager.h in Headers */,
 				8423770A0ED4710700BECB64 /* OROrderedObjHolding.h in Headers */,
+				84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

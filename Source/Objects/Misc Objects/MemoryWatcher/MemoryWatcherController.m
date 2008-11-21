@@ -18,23 +18,15 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "MemoryWatcherController.h"
 #import "MemoryWatcher.h"
 #import "ORPlotter1D.h"
 #import "ORAxis.h"
-
-static MemoryWatcherController *sharedInstance = nil;
+#import "SynthesizeSingleton.h"
 
 @implementation MemoryWatcherController
 
-+ (id) sharedMemoryWatcherController
-{
-	if(!sharedInstance){
-		sharedInstance = [[MemoryWatcherController alloc] init];
-	}
-    return sharedInstance;
-}
+SYNTHESIZE_SINGLETON_FOR_CLASS(MemoryWatcherController);
 
 
 - (id) init

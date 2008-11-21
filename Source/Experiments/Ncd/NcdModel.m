@@ -371,7 +371,7 @@ enum {
     [theDetector collectTotalMuxRate];
     [self performSelector:@selector(collectRates) withObject:nil afterDelay:5.0];
     //tell anybody connected what our rates are.
-    [[ORCommandCenter sharedInstance] sendCmd:@"OrcaRates" withString:[NSString stringWithFormat:@"%f %f",[theDetector shaperRate],[theDetector muxRate]]];
+    [[ORCommandCenter sharedCommandCenter] sendCmd:@"OrcaRates" withString:[NSString stringWithFormat:@"%f %f",[theDetector shaperRate],[theDetector muxRate]]];
 }
 
 

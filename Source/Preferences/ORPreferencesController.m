@@ -21,12 +21,10 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORPreferencesController.h"
-
+#import "SynthesizeSingleton.h"
 
 #define kLocked 1
 #define kUnlocked 0
-
-static ORPreferencesController* sharedInstance = nil;
 
 @interface ORPreferencesController (private)
 - (void) _openValidatePassWordPanel;
@@ -36,20 +34,13 @@ static ORPreferencesController* sharedInstance = nil;
 - (void) _setNewPasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _shakeIt;
 - (void) _setPassWordButtonText;
-
 @end;
 
 @implementation ORPreferencesController
 
 #pragma mark ¥¥¥Initialization
 
-+ (id) sharedPreferencesController
-{
-	if(!sharedInstance){
-		sharedInstance = [[ORPreferencesController alloc] init];
-	}
-    return sharedInstance;
-}
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 
 -(id)init
 {
@@ -58,12 +49,6 @@ static ORPreferencesController* sharedInstance = nil;
         [self setWindowFrameAutosaveName:@"ORPreferences"];
     }	
 	return self;
-}
-
-- (void) dealloc
-{
-    sharedInstance = nil;
-    [super dealloc];
 }
 
 #pragma mark ¥¥¥Window Management

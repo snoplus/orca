@@ -178,7 +178,7 @@
 
 -(void)updateButtons
 {
-	BOOL anyVetos = [[ORGlobal sharedInstance] anyVetosInPlace];
+	BOOL anyVetos = [[ORGlobal sharedGlobal] anyVetosInPlace];
 	
     if([model remoteControl]){
         [startRunButton setEnabled:NO];
@@ -233,7 +233,7 @@
 {
 	if([model runningState] == eRunInProgress){
 		[runProgress startAnimation:self];
-		if(![model runPaused])[statusField setStringValue:[[ORGlobal sharedInstance] runModeString]];
+		if(![model runPaused])[statusField setStringValue:[[ORGlobal sharedGlobal] runModeString]];
 		else [statusField setStringValue:@"Paused"];
 		[runBar setIndeterminate:!([model timedRun] && ![model remoteControl])];
 		[runBar setDoubleValue:0];
@@ -261,7 +261,7 @@
 
 - (void) vetosChanged:(NSNotification*)aNotification
 {
-	int vetoCount = [[ORGlobal sharedInstance] vetoCount];
+	int vetoCount = [[ORGlobal sharedGlobal] vetoCount];
 	[vetoCountField setIntValue: vetoCount]; 
 	[listVetosButton setHidden:vetoCount==0];
 	[vetoedTextField setStringValue:vetoCount?@"Vetoed":@""];
@@ -288,7 +288,7 @@
 	[runNumberField setIntValue:[model runNumber]];
 	[runNumberText setIntValue:[model runNumber]];
 	[runNumberStepper setIntValue:[model runNumber]];
-	if([[ORGlobal sharedInstance] runMode] == kNormalRun){
+	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
 		[runNumberField setIntValue: [model runNumber]];
 	}
 	else {
@@ -345,8 +345,8 @@
 
 -(void)runModeChanged:(NSNotification *)notification
 {
-    [runModeMatrix selectCellWithTag: [[ORGlobal sharedInstance] runMode]];
-    if([[ORGlobal sharedInstance] runMode] == kNormalRun){
+    [runModeMatrix selectCellWithTag: [[ORGlobal sharedGlobal] runMode]];
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         [runModeNoticeView selectTabViewItemAtIndex:1];
     }
     else {
@@ -528,9 +528,9 @@
 -(IBAction)runModeAction:(id)sender
 {
     int tag = [[runModeMatrix selectedCell] tag];
-    if(tag != [[ORGlobal sharedInstance] runMode]){
+    if(tag != [[ORGlobal sharedGlobal] runMode]){
         [[self undoManager] setActionName: @"Set Run Mode"];
-        [[ORGlobal sharedInstance] setRunMode:tag];
+        [[ORGlobal sharedGlobal] setRunMode:tag];
     }
 }
 
@@ -636,7 +636,7 @@
 
 -(IBAction)listVetoAction:(id)sender
 {
-	[[ORGlobal sharedInstance] listVetoReasons];
+	[[ORGlobal sharedGlobal] listVetoReasons];
 }
 
 

@@ -21,19 +21,11 @@
 
 #import "ORTaskMaster.h"
 #import "ORTask.h"
-
-static ORTaskMaster *sharedInstance = nil;
+#import "SynthesizeSingleton.h"
 
 @implementation ORTaskMaster
 
-+ (id) sharedTaskMaster
-{
-	if(!sharedInstance){
-		sharedInstance = [[ORTaskMaster alloc] init];
-	}
-    return sharedInstance;
-}
-
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(TaskMaster);
 
 - (id) init
 {
@@ -46,7 +38,7 @@ static ORTaskMaster *sharedInstance = nil;
 
 - (void) dealloc
 {
-	sharedInstance = nil;
+	sharedTaskMaster = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
@@ -185,6 +177,7 @@ static ORTaskMaster *sharedInstance = nil;
 {
     return [[[NSApp delegate]document]  undoManager];
 }
+
 
 #pragma mark ¥¥¥Archival
 //static NSString *ORCmdCenterDestinationObjs 	= @"ORCmdCenterDestinationObjs";

@@ -23,7 +23,7 @@
 - (void)netsocket:(NetSocket*)insocket dataAvailable:(unsigned)inAmount
 {
     if(insocket == socket){
-        [[ORCommandCenter sharedInstance] handleCommand:[socket readString:NSASCIIStringEncoding amount:inAmount] fromClient:self];
+        [[ORCommandCenter sharedCommandCenter] handleCommand:[socket readString:NSASCIIStringEncoding amount:inAmount] fromClient:self];
     }
 }
 

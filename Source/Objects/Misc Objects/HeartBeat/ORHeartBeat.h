@@ -26,7 +26,7 @@
 @interface ORHeartBeat : NSObject {
     NSMutableDictionary* clients;
 }
-+ (id) sharedInstance;
++ (ORHeartBeat*) sharedHeartBeat;
 - (void)dealloc;
 - (NSMutableDictionary *)clients;
 - (void)setClients:(NSMutableDictionary *)aClients;

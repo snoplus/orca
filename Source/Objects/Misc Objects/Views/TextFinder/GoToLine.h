@@ -26,7 +26,7 @@
 }
 
 /* Common way to get a text finder. One instance of GoToLine per app is good enough. */
-+ (id) sharedInstance;
++ (GoToLine*) sharedGoToLine;
 
 - (NSPanel*) goToPanel;
 - (NSTextView*)textObjectToSearchIn;

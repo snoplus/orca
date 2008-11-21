@@ -34,7 +34,7 @@
     BOOL			emailEnabled;
 }
 
-+ (id) sharedInstance;
++ (ORAlarmCollection*) sharedAlarmCollection;
 
 #pragma mark •••Accessors
 - (BOOL) emailEnabled;

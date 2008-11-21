@@ -38,7 +38,7 @@
 }
 
 #pragma mark •••Inialization
-+ (id) sharedAlarmController;
++ (ORAlarmController*) sharedAlarmController;
 
 #pragma mark •••Accessors
 - (NSButton*) acknowledgeButton;

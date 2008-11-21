@@ -22,19 +22,13 @@
 #import "ORProcessThread.h"
 #import "ORProcessEndNode.h"
 #import "ORProcessModel.h"
-
-static ORProcessThread* sharedInstance = nil;
+#import "SynthesizeSingleton.h"
 
 @implementation ORProcessThread
 
 #pragma mark ¥¥¥Inialization
-+ (id) sharedProcessThread
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORProcessThread alloc] init];
-    }
-    return sharedInstance;
-}
+
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 
 + (BOOL) isRunning
 {

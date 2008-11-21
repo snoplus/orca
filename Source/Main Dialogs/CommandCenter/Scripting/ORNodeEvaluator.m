@@ -990,7 +990,7 @@
 {
 	id s = NodeValue(0);
 	if([s isKindOfClass:[NSString class]]){
-		[[ORAlarmCollection sharedInstance] performSelectorOnMainThread:@selector(removeAlarmWithName:) withObject:s waitUntilDone:YES];
+		[[ORAlarmCollection sharedAlarmCollection] performSelectorOnMainThread:@selector(removeAlarmWithName:) withObject:s waitUntilDone:YES];
 	}
 	return nil;
 }

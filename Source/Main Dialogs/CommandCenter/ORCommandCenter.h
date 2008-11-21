@@ -47,7 +47,7 @@
 	NSMutableArray*			history;
 }
 
-+ (id) sharedInstance;
++ (ORCommandCenter*) sharedCommandCenter;
 
 - (void) registerNotificationObservers;
 - (void) serve;

@@ -21,21 +21,13 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORCatalogController.h"
-
-static ORCatalogController* sharedInstance = nil;
+#import "SynthesizeSingleton.h"
 
 @implementation ORCatalogController
 
 #pragma mark ¥¥¥Inialization
 
-+ (id) sharedCatalogController
-{
-	if(!sharedInstance){
-		sharedInstance = [[ORCatalogController alloc] init];
-	}
-    return sharedInstance;
-}
-
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(CatalogController);
 
 -(id)init
 {
@@ -44,12 +36,6 @@ static ORCatalogController* sharedInstance = nil;
         [self setWindowFrameAutosaveName:@"Catalog"];
     }
     return self;
-}
-
-- (void) dealloc
-{
-    sharedInstance = nil;
-	[super dealloc];
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window

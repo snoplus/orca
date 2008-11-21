@@ -62,7 +62,7 @@
 }
 
 #pragma mark ¥¥¥Initialization
-+ (id) sharedPreferencesController;
++ (ORPreferencesController*) sharedPreferencesController;
 - (id) init;
 
 #pragma mark ¥¥¥Accessors

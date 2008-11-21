@@ -197,7 +197,7 @@
 
 - (IBAction) openHWWizard:(NSToolbarItem*)item 
 {
-    [[ORHWWizardController sharedInstance] showWindow:self];
+    [[ORHWWizardController sharedHWWizardController] showWindow:self];
 }
 
 - (IBAction) openCommandCenter:(NSToolbarItem*)item 

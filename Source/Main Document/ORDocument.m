@@ -70,7 +70,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
                            object : nil];
         
         
-        [ORCommandCenter sharedInstance];
+        [ORCommandCenter sharedCommandCenter];
     }
     return self;
 }
@@ -355,7 +355,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		NSMutableData *data = [NSMutableData data];
 		NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
 		
-		[[ORGlobal sharedInstance] saveParams:archiver];
+		[[ORGlobal sharedGlobal] saveParams:archiver];
 		
 		[archiver setOutputFormat:NSPropertyListXMLFormat_v1_0];
 		
@@ -371,7 +371,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
         
         [archiver encodeObject: gateGroup forKey: ORGateGroupKey];
 		
-		[[ORAlarmCollection sharedInstance] encodeEMailList:archiver];
+		[[ORAlarmCollection sharedAlarmCollection] encodeEMailList:archiver];
 		[[ORStatusController sharedStatusController] encode:archiver];
 		[[ORStatusController sharedStatusController] saveLogBook:nil];
 		
@@ -419,10 +419,10 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
 		
 		[self setGroup:[unarchiver decodeObjectForKey:ORGroupKey]];	    
-		[[ORGlobal sharedInstance] loadParams:unarchiver];
+		[[ORGlobal sharedGlobal] loadParams:unarchiver];
 		[self setGateGroup:[unarchiver decodeObjectForKey: ORGateGroupKey]];
 		
-		[[ORAlarmCollection sharedInstance] decodeEMailList:unarchiver];
+		[[ORAlarmCollection sharedAlarmCollection] decodeEMailList:unarchiver];
 		[[ORStatusController sharedStatusController] decode:unarchiver];
 		
 		NS_DURING
@@ -657,7 +657,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
 - (BOOL)shouldCloseWindowController:(NSWindowController *)windowController 
 {
-    if([[ORGlobal sharedInstance] runInProgress]){
+    if([[ORGlobal sharedGlobal] runInProgress]){
         NSRunAlertPanel(@"Run In Progess", @"Experiment can NOT be closed.", nil, nil,nil);
         return NO;
     }

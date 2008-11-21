@@ -91,7 +91,7 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
 
 - (void) runStatusChanged:(NSNotification*)aNote
 {
-    if([[ORGlobal sharedInstance] runRunning]){
+    if([[ORGlobal sharedGlobal] runRunning]){
         [self shipPDSRecord:patternArray];
     }
 }
@@ -421,7 +421,7 @@ static NSString *ORPulserDisableForPulser    = @"ORPulserDisableForPulser";
 
 - (void) shipPDSRecord:(NSArray*)aPatternArray
 {
-    if([[ORGlobal sharedInstance] runInProgress]){
+    if([[ORGlobal sharedGlobal] runInProgress]){
         unsigned long dataWord[4]; 
         dataWord[0] = dataId | 4; //lengh is 4 long words
         ORIP408Model* the408 = [self objectConnectedTo:ORPulserDistrib408Connector];

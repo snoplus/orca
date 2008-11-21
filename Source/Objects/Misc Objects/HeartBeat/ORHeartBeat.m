@@ -18,18 +18,12 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORHeartBeat.h"
-
-static ORHeartBeat *instance = nil;
+#import "SynthesizeSingleton.h"
 
 @implementation ORHeartBeat
 
-+ (id) sharedInstance
-{
-    if ( instance == nil ) instance = [[self alloc] init];
-    return instance;
-}
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(HeartBeat);
 
 // ===========================================================
 //  - dealloc:
@@ -179,7 +173,7 @@ static ORHeartBeat *instance = nil;
 
 - (void) timeOut:(NSTimer*)aTimer
 {
-    if(!timeOutAlarm && [[ORGlobal sharedInstance] runInProgress]){
+    if(!timeOutAlarm && [[ORGlobal sharedGlobal] runInProgress]){
 	timeOutAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"%@ dead!",name] severity:kInformationAlarm];
 	[timeOutAlarm setSticky:YES];
 	[timeOutAlarm setAcknowledged:NO];
@@ -202,7 +196,7 @@ static ORHeartBeat *instance = nil;
 
 - (void) runStatusChanged:(NSNotification*)aNotification
 {
-    if(![[ORGlobal sharedInstance] runInProgress]){
+    if(![[ORGlobal sharedGlobal] runInProgress]){
 	[watchTimer invalidate];
 	[watchTimer release];
 	watchTimer = nil;

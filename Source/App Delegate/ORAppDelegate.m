@@ -38,11 +38,12 @@
 #import "ORWindowListController.h"
 #import "ORCARootService.h"
 #import "ORCARootServiceController.h"
+#import "ORMailer.h"
 
 NSString* kCrashLogLocation     = @"~/Library/Logs/CrashReporter/Orca.crash.log";
 NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 
-#define kORSplashScreenDelay 1.3
+#define kORSplashScreenDelay 1
 
 @implementation ORAppDelegate
 + (BOOL)isMacOSX10_5
@@ -93,8 +94,8 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
         initialized = YES;
         
         //make some globals
-        [ORGlobal sharedInstance]; 
-        [ORSecurity sharedInstance];
+        [ORGlobal sharedGlobal]; 
+        [ORSecurity sharedSecurity];
     }
 }
 
@@ -209,7 +210,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 
 - (IBAction) showHardwareWizard:(id)sender
 {
-    [[[ORHWWizardController sharedInstance] window] orderFront:nil];
+    [[[ORHWWizardController sharedHWWizardController] window] orderFront:nil];
 }
 
 - (IBAction) showAlarms:(id)sender
@@ -265,7 +266,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-	return ![[ORGlobal sharedInstance] runInProgress];
+	return ![[ORGlobal sharedGlobal] runInProgress];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -320,10 +321,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
         [self mailCrashLog];
     }
-    else {
-        [self deleteCrashLog];
-    }
-    
+     
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];    
     
     
@@ -359,10 +357,10 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 														object:self
 													  userInfo:[NSDictionary dictionaryWithObject:@"Finishing..." forKey:@"Message"]];
     //make and register the heart beat monitor.
-    [[ORCommandCenter sharedInstance] addDestination:[ORHeartBeat sharedInstance]];  
+    [[ORCommandCenter sharedCommandCenter] addDestination:[ORHeartBeat sharedHeartBeat]];  
 	
 	//create an instance of the ORCARoot service and possibly connect    
-    [[ORCARootService sharedInstance] connectAtStartUp];    
+    [[ORCARootService sharedORCARootService] connectAtStartUp];    
 
 	[self performSelector:@selector(closeAboutBox) withObject:self afterDelay:kORSplashScreenDelay];
 	
@@ -390,10 +388,10 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     BOOL documentIsOpen = [[NSApp orderedDocuments] count]>0;
     SEL theAction = [menuItem action];
     if(theAction == @selector(terminate:)){
-        return ![[ORGlobal sharedInstance] runInProgress];
+        return ![[ORGlobal sharedGlobal] runInProgress];
     }
     if(theAction == @selector(performClose:)){
-        return ![[ORGlobal sharedInstance] runInProgress];
+        return ![[ORGlobal sharedGlobal] runInProgress];
     }
     if(theAction == @selector(newDocument:)){
         return documentIsOpen ? NO : YES;
@@ -415,27 +413,31 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
         NSString* address = [[NSUserDefaults standardUserDefaults] objectForKey: ORMailBugReportEMail];
         if(address){
             NSString* crashLogPath = [kCrashLogLocation stringByExpandingTildeInPath]; 
-            NSString* crashLog = [NSString stringWithContentsOfFile:crashLogPath];
+            NSAttributedString* crashLog = [[NSAttributedString alloc] initWithString:[NSString stringWithContentsOfFile:crashLogPath]];
             if([crashLog length]){
-                address =[[address componentsSeparatedByString:@","] componentsJoinedByString:@"\n"];
-                NSArray *addressList = [address componentsSeparatedByString:@"\n"];
-                NSEnumerator* e = [addressList objectEnumerator];
-                NSString* aName;
-                while(aName = [e nextObject]){
-                    aName = [aName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-                    if([aName length]){
-						@synchronized(self){
-							[NSMailDelivery deliverMessage:crashLog 
-												   subject:@"Orca crashLog"
-                                                        to: aName];
-						}
-                        NSLog(@"Crash report mailed to: %@\n",aName);
-                    }
-                }
-                [self deleteCrashLog];
-            }
+				//the address may be a list... if so it must be a comma separated list... try to make it so...
+				NSMutableString* finalAddressList = [[[[address componentsSeparatedByString:@"\n"] componentsJoinedByString:@","] mutableCopy] autorelease];
+				[finalAddressList replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[address length])];
+				[finalAddressList replaceOccurrencesOfString:@",," withString:@"," options:NSLiteralSearch range:NSMakeRange(0,[address length])];
+				ORMailer* mailer = [ORMailer mailer];
+				[mailer setTo:finalAddressList];
+				[mailer setSubject:@"ORCA Crash Log"];
+				[mailer setBody:crashLog];
+				[mailer send:self];
+			}
+			[crashLog release];
         }
     }
+}
+
+- (void) mailSent
+{
+	[self deleteCrashLog];
+	NSString* address = [[NSUserDefaults standardUserDefaults] objectForKey: ORMailBugReportEMail];
+	NSMutableString* finalAddressList = [[[[address componentsSeparatedByString:@"\n"] componentsJoinedByString:@","] mutableCopy] autorelease];
+	[finalAddressList replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[address length])];
+	[finalAddressList replaceOccurrencesOfString:@",," withString:@"," options:NSLiteralSearch range:NSMakeRange(0,[address length])];
+	NSLog(@"The last ORCA crash log was sent to:\n%@",[finalAddressList componentsSeparatedByString:@","]);
 }
 
 - (void) deleteCrashLog
@@ -445,9 +447,9 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     NSString* lastCrashLogPath = [kLastCrashLogLocation stringByExpandingTildeInPath]; 
     if([fm fileExistsAtPath:lastCrashLogPath]){
         [fm removeFileAtPath:lastCrashLogPath handler:nil];
-        [fm copyPath:crashLogPath toPath:lastCrashLogPath handler:nil];
-        NSLog(@"Crash report copied to: %@\n",lastCrashLogPath);
     }
+	[fm copyPath:crashLogPath toPath:lastCrashLogPath handler:nil];
+	NSLog(@"Crash report copied to: %@\n",lastCrashLogPath);
     [fm removeFileAtPath:crashLogPath handler:nil];
 }
 @end

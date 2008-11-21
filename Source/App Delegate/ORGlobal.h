@@ -67,7 +67,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 	NSMutableDictionary* runVetos;
 }
 
-+ (id) sharedInstance;
++ (ORGlobal*) sharedGlobal;
 - (id) init;
 - (BOOL) runInProgress;
 - (BOOL) runStopped;

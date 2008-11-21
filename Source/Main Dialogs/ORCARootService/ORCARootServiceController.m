@@ -22,19 +22,11 @@
 #import "ORCARootServiceController.h"
 #import "ORCARootService.h"
 #import "ORCARootServiceDefs.h"
-
-static ORCARootServiceController* sharedInstance = nil;
+#import "SynthesizeSingleton.h"
 
 @implementation ORCARootServiceController
 
-+ (id) sharedORCARootServiceController
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORCARootServiceController alloc] init];
-    }
-    return sharedInstance;
-}
-
+SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 
 -(id)init
 {
@@ -50,7 +42,6 @@ static ORCARootServiceController* sharedInstance = nil;
 
 - (void) dealloc
 {
-    sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
@@ -69,7 +60,7 @@ static ORCARootServiceController* sharedInstance = nil;
 #pragma mark ¥¥¥Accessors
 - (ORCARootService*) orcaRootService
 {
-    return [ORCARootService sharedInstance];
+    return [ORCARootService sharedORCARootService];
 }
 
 #pragma mark ¥¥¥Notifications

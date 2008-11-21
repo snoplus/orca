@@ -148,7 +148,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 
 - (void) shipLevelValues
 {
-    if([[ORGlobal sharedInstance] runInProgress]){
+    if([[ORGlobal sharedGlobal] runInProgress]){
 		
 		unsigned long data[8];
 		data[0] = dataId | 8;

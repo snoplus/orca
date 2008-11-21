@@ -26,8 +26,7 @@
 #define __CARBONSOUND__ 
 #import <Carbon/Carbon.h>
 #import <Message/NSMailDelivery.h>
-
-static ORAlarmCollection *instance = nil;
+#import "SynthesizeSingleton.h"
 
 NSString* ORAlarmCollectionEmailEnabledChanged = @"ORAlarmCollectionEmailEnabledChanged";
 
@@ -35,18 +34,13 @@ NSString* ORAlarmCollectionEmailEnabledChanged = @"ORAlarmCollectionEmailEnabled
 
 #pragma mark •••Inialization
 
-+ (id) sharedInstance
-{
-    if ( instance == nil ) instance = [[self alloc] init];
-    return instance;
-}
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 
 - (id) init
 {
     self = [super init];
     
     [self registerNotificationObservers];
-    instance = self;
 	myBadge = [[CTBadge alloc] init];
     return self;
 }
@@ -55,7 +49,6 @@ NSString* ORAlarmCollectionEmailEnabledChanged = @"ORAlarmCollectionEmailEnabled
 - (void) dealloc
 {
     [eMailList release];
-    instance = nil;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[self beepTimer] invalidate];
     [beepTimer release];
@@ -301,8 +294,8 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 	[self setMailAddress:@"<eMail>"];
 	
 	if(alarms)[alarms release];
-	alarms = [[NSMutableArray arrayWithArray:[[ORAlarmCollection sharedInstance] alarms]] retain];
-	if([alarms count] && [[ORAlarmCollection sharedInstance] emailEnabled]){
+	alarms = [[NSMutableArray arrayWithArray:[[ORAlarmCollection sharedAlarmCollection] alarms]] retain];
+	if([alarms count] && [[ORAlarmCollection sharedAlarmCollection] emailEnabled]){
 		[NSThread detachNewThreadSelector:@selector(eMailThread) toTarget:self withObject:nil];
 	}
 	
@@ -380,8 +373,8 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
     [[[NSApp delegate] undoManager] enableUndoRegistration];
 	
 	if(alarms)[alarms release];
-	alarms = [[NSMutableArray arrayWithArray:[[ORAlarmCollection sharedInstance] alarms]] retain];
-	if([alarms count] && [[ORAlarmCollection sharedInstance] emailEnabled]){
+	alarms = [[NSMutableArray arrayWithArray:[[ORAlarmCollection sharedAlarmCollection] alarms]] retain];
+	if([alarms count] && [[ORAlarmCollection sharedAlarmCollection] emailEnabled]){
 		[NSThread detachNewThreadSelector:@selector(eMailThread) toTarget:self withObject:nil];
 	}
 	
@@ -420,7 +413,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
     if([self wantsAlarmSeverity:[theAlarm severity]] && ![alarms containsObject:theAlarm]){
 		if(!alarms)	[self setAlarms:[NSMutableArray array]];
 		[alarms addObject:theAlarm];
-		if([[ORAlarmCollection sharedInstance] emailEnabled]){
+		if([[ORAlarmCollection sharedAlarmCollection] emailEnabled]){
 			[NSThread detachNewThreadSelector:@selector(eMailThread) toTarget:self withObject:nil];
 		}
 	}
@@ -458,7 +451,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 			if(!mailAddress ||
 			  [mailAddress length] == 0 ||
 			  [mailAddress isEqualToString:@"<eMail>"] ||
-			  ![[ORAlarmCollection sharedInstance] emailEnabled] ||
+			  ![[ORAlarmCollection sharedAlarmCollection] emailEnabled] ||
 			  !eMailThreadRunning || 
 			  ![alarms count]){
 			   
@@ -539,7 +532,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 	else {
 		NSLogColor([NSColor redColor], @"Alarm e-mail could NOT be sent because eMail delivery has not been configured in Mail.app\n");
 		NSLogColor([NSColor redColor], @"Alarm e-mails disabled\n");
-		[[ORAlarmCollection sharedInstance] setEmailEnabled:NO];
+		[[ORAlarmCollection sharedAlarmCollection] setEmailEnabled:NO];
 	}
 	[xpool release];
 		

@@ -137,7 +137,7 @@ NSString* ORBocTIC3Lock = @"ORBocTIC3Lock";
 
 - (void) shipPressureValues
 {
-    if([[ORGlobal sharedInstance] runInProgress]){
+    if([[ORGlobal sharedGlobal] runInProgress]){
 		
 		unsigned long data[8];
 		data[0] = dataId | 8;

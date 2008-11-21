@@ -99,7 +99,7 @@ enum {
 
 - (BOOL) okToRun
 {
-    return [[ORGlobal sharedInstance] runInProgress];
+    return [[ORGlobal sharedGlobal] runInProgress];
 }
 
 - (NSArray *) currentScopes

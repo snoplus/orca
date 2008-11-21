@@ -38,7 +38,7 @@
 }
 
 #pragma mark ¥¥¥Inialization
-+ (id) sharedProcessThread;
++ (ORProcessThread*) sharedProcessThread;
 + (void) registerInputObject:(id)anObject;
 + (void) registerOutputObject:(id)anObject;
 + (void) setCR:(int)aBit value:(BOOL)aValue;

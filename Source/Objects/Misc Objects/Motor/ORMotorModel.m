@@ -944,7 +944,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 
 - (void) shipMotorState:(id)aWorker
 {
-    if([[ORGlobal sharedInstance] runInProgress]){
+    if([[ORGlobal sharedGlobal] runInProgress]){
         if([self optionSet:kShipPositionOption]){
             //get the time(UT!)
             time_t	theTime;

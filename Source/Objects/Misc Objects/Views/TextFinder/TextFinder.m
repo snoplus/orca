@@ -21,8 +21,8 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#import <Cocoa/Cocoa.h>
 #import "TextFinder.h"
+#import "SynthesizeSingleton.h"
 
 @interface NSString (NSStringTextFinding)
 
@@ -32,23 +32,10 @@
 
 @implementation TextFinder
 
-static id sharedFindObject = nil;
-
-+ (id) sharedInstance 
-{
-    if (!sharedFindObject) {
-        [[self allocWithZone:[[NSApplication sharedApplication] zone]] init];
-    }
-    return sharedFindObject;
-}
+SYNTHESIZE_SINGLETON_FOR_CLASS(TextFinder);
 
 - (id) init 
 {
-    if (sharedFindObject) {
-        [super dealloc];
-        return sharedFindObject;
-    }
-
     if (!(self = [super init])) return nil;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidActivate:) name:NSApplicationDidBecomeActiveNotification object:[NSApplication sharedApplication]];
@@ -56,7 +43,6 @@ static id sharedFindObject = nil;
     [self setFindString:@"" writeToPasteboard:NO];
     [self loadFindStringFromPasteboard];
 
-    sharedFindObject = self;
     return self;
 }
 
@@ -89,14 +75,14 @@ static id sharedFindObject = nil;
             NSLog(@"Failed to load FindPanel.nib");
             NSBeep();
         }
-		if (self == sharedFindObject) [[findTextField window] setFrameAutosaveName:@"Find"];
+		if (self == sharedTextFinder) [[findTextField window] setFrameAutosaveName:@"Find"];
     }
     [findTextField setStringValue:[self findString]];
 }
 
 - (void) dealloc 
 {
-    if (self != sharedFindObject) {
+    if (self != sharedTextFinder) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [findString release];
         [super dealloc];

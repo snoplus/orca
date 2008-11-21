@@ -96,7 +96,7 @@
 }
 
 + (BOOL) exists;
-+ (id) sharedInstance;
++ (ORHWWizardController*) sharedHWWizardController;
 
 - (SubviewTableViewController *)actionViewController;
 - (void)setActionViewController:(SubviewTableViewController *)anActionViewController;

@@ -33,7 +33,7 @@
 }
 
 /* Common way to get a text finder. One instance of TextFinder per app is good enough. */
-+ (id) sharedInstance;
++ (TextFinder*) sharedTextFinder;
 
 /* Main method for external users; does a find in the first responder. Selects found range or beeps. */
 - (BOOL) find:(BOOL)direction;

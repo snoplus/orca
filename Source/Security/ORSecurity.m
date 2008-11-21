@@ -20,31 +20,25 @@
 
 
 #import "ORValidatePassword.h"
+#import "SynthesizeSingleton.h"
 
 NSString*   ORSecurityNumberLockPagesChanged = @"ORSecurityNumberLockPagesChanged";
 
 ORSecurity* gSecurity = nil;
-static ORSecurity* sharedInstance = nil;
 
 @interface ORSecurity (private)
 - (void) _validatePWDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 @implementation ORSecurity
-+ (id) sharedInstance
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORSecurity alloc] init];
-        gSecurity = sharedInstance;
-    }
-    return sharedInstance;
-}
 
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(Security);
 
 //don't call this unless you're using this class in a special, non-global way.
 -(id)init
 {
     self = [super init];
+	gSecurity = self;
     return self;
 }
 

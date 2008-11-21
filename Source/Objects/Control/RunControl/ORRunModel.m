@@ -125,7 +125,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     //---------------------------------------------------------------------------------------------------
     
     NSImage* aCachedImage;
-	if(![[ORGlobal sharedInstance] anyVetosInPlace]){
+	if(![[ORGlobal sharedGlobal] anyVetosInPlace]){
 		aCachedImage = [NSImage imageNamed:@"RunControl"];
 	}
 	else {
@@ -147,7 +147,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     }
     [aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
     
-    if([[ORGlobal sharedInstance] runMode] == kOfflineRun && !_ignoreMode){
+    if([[ORGlobal sharedGlobal] runMode] == kOfflineRun && !_ignoreMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
         [aNoticeImage compositeToPoint:NSMakePoint(theOffset.x/2.+[i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2)operation:NSCompositeSourceOver];
     }
@@ -638,7 +638,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	//movedfrom startrun1 06/29/05 MAH to test remote run stuff
 	[self getCurrentRunNumber];
 	
-	if([[ORGlobal sharedInstance] runMode] == kNormalRun && (!remoteControl || remoteInterface)){
+	if([[ORGlobal sharedGlobal] runMode] == kNormalRun && (!remoteControl || remoteInterface)){
 		[self setRunNumber:[self runNumber]+1];
 	}
 
@@ -679,9 +679,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         timer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(incrementTime:)userInfo:nil repeats:YES] retain];
         
         
-        [[self document] setStatusText:[[ORGlobal sharedInstance] runModeString]];
+        [[self document] setStatusText:[[ORGlobal sharedGlobal] runModeString]];
         
-        [[ORGlobal sharedInstance] checkRunMode];
+        [[ORGlobal sharedGlobal] checkRunMode];
         
         [self setRunningState:eRunInProgress];
 		
@@ -707,12 +707,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) setOfflineRun:(BOOL)offline
 {
-        [[ORGlobal sharedInstance] setRunMode:offline]; //0 = NormalRun, 1= offlineRun
+        [[ORGlobal sharedGlobal] setRunMode:offline]; //0 = NormalRun, 1= offlineRun
 }
 
 - (BOOL) offlineRun
 {
-	return [[ORGlobal sharedInstance] runMode];
+	return [[ORGlobal sharedGlobal] runMode];
 }
 
 - (void) remoteHaltRun
@@ -847,7 +847,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	//closeout run will wait until the processing thread is done.
 	[nextObject closeOutRun:dataPacket userInfo:nil];
 	   
-	if([[ORGlobal sharedInstance] runMode] == kNormalRun){
+	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
 		NSLog(@"Run %d stopped.\n",_currentRun);
 	}
 	else {
@@ -1042,7 +1042,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
 	NSLog(@"---------------------------------------\n");
     
-    if([[ORGlobal sharedInstance] runMode] == kNormalRun){
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         if(!forceFullInit)NSLog(@"Run %d started(%@).\n",[self runNumber],doInit?@"cold start":@"quick start");
 		else NSLog(@"Run %d started(%@).\n",[self runNumber],@"Full Init because of Pwr Failure");
     }
@@ -1154,10 +1154,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) vetosChanged:(NSNotification*)aNotification
 {
 	[self setUpImage];
-	if([[ORGlobal sharedInstance] anyVetosInPlace] && [self isRunning]){
+	if([[ORGlobal sharedGlobal] anyVetosInPlace] && [self isRunning]){
 		NSLogColor([NSColor redColor],@"====================================\n");
 		NSLogColor([NSColor redColor],@"Run is being stopped by veto system.\n");
-		[[ORGlobal sharedInstance] listVetoReasons];
+		[[ORGlobal sharedGlobal] listVetoReasons];
 		NSLogColor([NSColor redColor],@"====================================\n");
 		[self haltRun];
 		if(!runStoppedByVetoAlarm){

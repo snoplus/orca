@@ -131,8 +131,10 @@
 
 - (void) send:(id)aDelegate
 {
-	delegate = aDelegate;
-	[self sendMailEmail];
+	@synchronized([NSApp delegate]){
+		delegate = aDelegate;
+		[self sendMailEmail];
+	}
 }
 
 - (NSArray *)ccArray {

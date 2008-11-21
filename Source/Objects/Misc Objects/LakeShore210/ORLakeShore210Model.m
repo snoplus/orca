@@ -141,7 +141,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 
 - (void) shipTemps
 {
-    if([[ORGlobal sharedInstance] runInProgress]){
+    if([[ORGlobal sharedGlobal] runInProgress]){
 		
 		unsigned long data[18];
 		data[0] = dataId | 18;

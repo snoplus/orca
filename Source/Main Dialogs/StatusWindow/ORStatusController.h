@@ -44,7 +44,7 @@
 }
 
 #pragma mark ¥¥¥Accessors
-+ (id) sharedStatusController;
++ (ORStatusController*) sharedStatusController;
 - (int) statusTextlength;
 - (NSString*) text;
 - (void) setDataSet: (ORDataSet *) aDataSet;

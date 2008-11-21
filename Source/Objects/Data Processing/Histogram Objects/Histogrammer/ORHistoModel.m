@@ -348,7 +348,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
                               object: self ];
     
     
-    if([self writeFile] && ([[ORGlobal sharedInstance] runMode] == kNormalRun)){
+    if([self writeFile] && ([[ORGlobal sharedGlobal] runMode] == kNormalRun)){
         
         [self setFileName:[NSString stringWithFormat:@"HistogramsRun%d",[aDataPacket runNumber]]];
         NSString* fullFileName = [[directoryName stringByExpandingTildeInPath] stringByAppendingPathComponent:fileName];

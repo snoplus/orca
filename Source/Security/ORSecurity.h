@@ -26,7 +26,7 @@
     NSMutableDictionary* locks;
 	id					 passWordPanel;
 }
-+ (id) sharedInstance;
++ (ORSecurity*) sharedSecurity;
 
 - (NSDictionary*)locks;
 - (int) numberItemsUnlocked;

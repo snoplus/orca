@@ -33,7 +33,7 @@
     IBOutlet ORAxis* yScale;
 }
 
-+ (id) sharedMemoryWatcherController;
++ (MemoryWatcherController*) sharedMemoryWatcherController;
 - (void) registerNotificationObservers;
 - (void) memoryStatsChanged:(NSNotification*)aNote;
 - (void) upTimeChanged:(NSNotification*)aNote;

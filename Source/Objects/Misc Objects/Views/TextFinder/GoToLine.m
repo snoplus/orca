@@ -20,37 +20,15 @@
 
 #import <Cocoa/Cocoa.h>
 #import "GoToLine.h"
+#import "SynthesizeSingleton.h"
 
 @interface NSString (NSStringTextFinding)
-
 - (NSRange)findString:(NSString *)string selectedRange:(NSRange)selectedRange options:(unsigned)mask wrap:(BOOL)wrapFlag;
-
 @end
 
 @implementation GoToLine
 
-static id sharedFindObject = nil;
-
-+ (id) sharedInstance 
-{
-    if (!sharedFindObject) {
-        [[self allocWithZone:[[NSApplication sharedApplication] zone]] init];
-    }
-    return sharedFindObject;
-}
-
-- (id) init 
-{
-    if (sharedFindObject) {
-        [super dealloc];
-        return sharedFindObject;
-    }
-
-    if (!(self = [super init])) return nil;
-
-    sharedFindObject = self;
-    return self;
-}
+SYNTHESIZE_SINGLETON_FOR_CLASS(GoToLine);
 
 - (void) loadUI 
 {
@@ -59,13 +37,13 @@ static id sharedFindObject = nil;
             NSLog(@"Failed to load GoToLine.nib");
             NSBeep();
         }
-		if (self == sharedFindObject) [[lineNumberField window] setFrameAutosaveName:@"Find"];
+		if (self == sharedGoToLine) [[lineNumberField window] setFrameAutosaveName:@"Find"];
     }
 }
 
 - (void) dealloc 
 {
-    if (self != sharedFindObject) {
+    if (self != sharedGoToLine) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [super dealloc];
     }

@@ -26,6 +26,7 @@
 #import "ORAlarmCollection.h"
 #import "ORTaskMaster.h"
 #import "ORScriptRunner.h"
+#import "SynthesizeSingleton.h"
 
 NSString* ORCommandPortChangedNotification		= @"ORCommandPortChangedNotification";
 NSString* ORCommandClientsChangedNotification	= @"ORCommandClientsChangedNotification";
@@ -34,16 +35,9 @@ NSString* ORCommandArgsChanged					= @"ORCommandArgsChanged";
 NSString* ORCommandCommandChangedNotification	= @"ORCommandCommandChangedNotification";
 NSString* ORCommandLastFileChangedNotification	= @"ORCommandLastFileChangedNotification";
 
-static ORCommandCenter *instance = nil;
-
 @implementation ORCommandCenter
 
-+ (id) sharedInstance
-{
-    if ( instance == nil ) instance = [[ORCommandCenter alloc] init];
-    return instance;
-}
-
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 
 - (id) init
 {
@@ -82,7 +76,7 @@ static ORCommandCenter *instance = nil;
 
 - (void) dealloc
 {
-    instance = nil;
+	//should never get here ... we are a singleton!
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [heartBeatTimer invalidate];
@@ -543,7 +537,7 @@ static ORCommandCenter *instance = nil;
 #pragma mark •••Update Methods
 - (void) sendCurrentAlarms:(ORCommandClient*)client
 {
-    NSEnumerator* e = [[ORAlarmCollection sharedInstance] alarmEnumerator];
+    NSEnumerator* e = [[ORAlarmCollection sharedAlarmCollection] alarmEnumerator];
     id anAlarm;
     while (anAlarm = [e nextObject]){
         [client sendCmd:@"postAlarm" withString:[anAlarm name]];

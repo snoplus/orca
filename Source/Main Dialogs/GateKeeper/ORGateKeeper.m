@@ -24,20 +24,13 @@
 #import "ORGateGroup.h"
 #import "ORGateKeyController.h"
 #import "ORGatedValueController.h"
-
-static ORGateKeeper* sharedInstance = nil;
+#import "SynthesizeSingleton.h"
 
 NSString* ORGateKeeperSettingsLock = @"ORGateKeeperSettingsLock";
 
 @implementation ORGateKeeper
 
-+ (id) sharedGateKeeper
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORGateKeeper alloc] init];
-    }
-    return sharedInstance;
-}
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(GateKeeper);
 
 -(id)init
 {
@@ -49,7 +42,7 @@ NSString* ORGateKeeperSettingsLock = @"ORGateKeeperSettingsLock";
 
 - (void) dealloc
 {
-    sharedInstance = nil;
+	//should never get here... we are a signleton!
     [self setSelectedGate: nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];

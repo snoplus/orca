@@ -34,7 +34,7 @@
 	NSMutableArray*	 runningTasks;
 }
 
-+ (id) sharedTaskMaster;
++ (ORTaskMaster*) sharedTaskMaster;
 
 - (void) registerNotificationObservers;
 - (void) documentClosed:(NSNotification*)aNote;

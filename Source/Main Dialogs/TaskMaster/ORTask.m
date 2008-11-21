@@ -29,7 +29,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 
 @implementation ORTask
 
-#pragma mark ¥¥¥Initializers
+#pragma mark â€¢â€¢â€¢Initializers
 
 -(void)	sleep
 {     
@@ -91,7 +91,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     
 }
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 -(NSView*) view
 {
     return view;
@@ -327,7 +327,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     }
 }
 
-#pragma mark ¥¥¥Actions
+#pragma mark â€¢â€¢â€¢Actions
 -(IBAction) detailsAction:(id)sender 
 {
     if([sender state] == NSOnState){
@@ -483,7 +483,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     }
 }
 
-#pragma mark ¥¥¥Notifications
+#pragma mark â€¢â€¢â€¢Notifications
 - (void) updateButtons
 {
     if(taskState == eTaskRunning || taskState == eTaskWaiting){
@@ -509,7 +509,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     else [startButton setEnabled:[self okToRun]];
 }
 
-#pragma mark ¥¥¥Archival
+#pragma mark â€¢â€¢â€¢Archival
 static NSString* ORTaskTimeDelay  	= @"ORTaskTimeDelay";
 static NSString* ORTaskTimeInterval  	= @"ORTaskTimeInterval";
 static NSString* ORTaskStartDelayed  	= @"ORTaskStartDelayed";

@@ -74,7 +74,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	[i lockFocus];
 	[aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
     
-    if([[ORGlobal sharedInstance] runMode] == kOfflineRun && !_ignoreMode){
+    if([[ORGlobal sharedGlobal] runMode] == kOfflineRun && !_ignoreMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
         [aNoticeImage compositeToPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) operation:NSCompositeSourceOver];
     }
@@ -285,7 +285,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
             
             [client setTimeConnected:[NSDate date]];
             
-            if([[ORGlobal sharedInstance] runInProgress]){
+            if([[ORGlobal sharedGlobal] runInProgress]){
 				if(dataHeader){
 					[[client socket] writeData:dataHeader];
 				}
@@ -391,7 +391,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 #pragma mark ¥¥¥Data Handling
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
-	if([[ORGlobal sharedInstance] runMode] == kNormalRun){
+	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
 		NSArray* dataArray = [aDataPacket dataArray];
 		int i;
 		int n = [dataArray count];

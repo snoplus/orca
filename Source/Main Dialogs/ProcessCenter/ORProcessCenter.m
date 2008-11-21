@@ -23,24 +23,16 @@
 #import "ORProcessModel.h"
 #import "ORProcessElementModel.h"
 #import "ORProcessCenter.h"
+#import "SynthesizeSingleton.h"
 
 int sortUpFunc(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
 int sortDnFunc(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
-
-static ORProcessCenter* sharedInstance = nil;
 
 @implementation ORProcessCenter
 
 #pragma mark ¥¥¥Inialization
 
-+ (id) sharedProcessCenter
-{
-    if(!sharedInstance){
-        sharedInstance = [[ORProcessCenter alloc] init];
-    }
-    return sharedInstance;
-}
-
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 -(id)init
 {
@@ -55,7 +47,6 @@ static ORProcessCenter* sharedInstance = nil;
 	[descendingSortingImage release];
     [processorList release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    sharedInstance = nil;
     [super dealloc];
 }
 

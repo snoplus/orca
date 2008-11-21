@@ -173,7 +173,7 @@ NSString* ORVXMLock = @"ORVXMLock";
 
 - (void) shipMotorState:(BOOL)running
 {
-    if([[ORGlobal sharedInstance] runInProgress]){
+    if([[ORGlobal sharedGlobal] runInProgress]){
         if([self optionSet:kXYShipPositionOption]){
             //get the time(UT!)
             time_t	theTime;
