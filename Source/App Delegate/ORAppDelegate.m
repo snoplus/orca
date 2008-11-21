@@ -326,45 +326,55 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];    
     
     
-    if(![[NSApp orderedDocuments] count] && ![self applicationShouldOpenUntitledFile:NSApp]){
-        NSString* lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
-        if([[NSDocumentController sharedDocumentController] openDocumentWithContentsOfFile: lastFile display:YES] == nil){
-			NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
-			NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
-			[theSplashController close];
-			[theSplashController release];
-			theSplashController = nil;
-			NSRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
-        }
-        else {
-            NSLog(@"Opened Configuration: %@\n",lastFile);
-        }
-        if([[[NSUserDefaults standardUserDefaults] objectForKey: OROrcaSecurityEnabled] boolValue]){
-            NSLog(@"Orca global security is enabled.\n");
-        }
-        else {
-            NSLog(@"Orca global security is disabled.\n");
-        }
-        
-    }
+	NS_DURING
+		if(![[NSApp orderedDocuments] count] && ![self applicationShouldOpenUntitledFile:NSApp]){
+			NSString* lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
+			if([[NSDocumentController sharedDocumentController] openDocumentWithContentsOfFile: lastFile display:YES] == nil){
+				NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
+				NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
+				NSRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
+			}
+			else {
+				NSLog(@"Opened Configuration: %@\n",lastFile);
+			}
+			if([[[NSUserDefaults standardUserDefaults] objectForKey: OROrcaSecurityEnabled] boolValue]){
+				NSLog(@"Orca global security is enabled.\n");
+			}
+			else {
+				NSLog(@"Orca global security is disabled.\n");
+			}
+			
+		}
+	NS_HANDLER
+		NSLogColor([NSColor redColor],@"There was an exception thrown during load... configuration may not be complete!\n");
+	NS_ENDHANDLER
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
 															object:self
 															userInfo:[NSDictionary dictionaryWithObject:@"Loading LogBook..." forKey:@"Message"]];
 	[[ORStatusController sharedStatusController] loadCurrentLogBook];
 	
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
+														object:self
+													  userInfo:[NSDictionary dictionaryWithObject:@"Finishing..." forKey:@"Message"]];
     //make and register the heart beat monitor.
     [[ORCommandCenter sharedInstance] addDestination:[ORHeartBeat sharedInstance]];  
 	
 	//create an instance of the ORCARoot service and possibly connect    
     [[ORCARootService sharedInstance] connectAtStartUp];    
 
+	[self performSelector:@selector(closeAboutBox) withObject:self afterDelay:2];
+	
+	[[self undoManager] removeAllActions];
+
+}
+
+- (void) closeAboutBox
+{
 	[theSplashController close];
 	[theSplashController release];
 	theSplashController = nil;	
 	
-	[[self undoManager] removeAllActions];
-
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
