@@ -321,7 +321,10 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
         [self mailCrashLog];
     }
-     
+	else {
+        [self deleteCrashLog];
+    }
+    
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];    
     
     
@@ -449,7 +452,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
         [fm removeFileAtPath:lastCrashLogPath handler:nil];
     }
 	[fm copyPath:crashLogPath toPath:lastCrashLogPath handler:nil];
-	NSLog(@"Crash report copied to: %@\n",lastCrashLogPath);
+	NSLog(@"Old crash report copied to: %@\n",lastCrashLogPath);
     [fm removeFileAtPath:crashLogPath handler:nil];
 }
 @end
