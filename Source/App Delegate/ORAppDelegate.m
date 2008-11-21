@@ -42,6 +42,7 @@
 NSString* kCrashLogLocation     = @"~/Library/Logs/CrashReporter/Orca.crash.log";
 NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 
+#define kORSplashScreenDelay 1.3
 
 @implementation ORAppDelegate
 + (BOOL)isMacOSX10_5
@@ -363,7 +364,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	//create an instance of the ORCARoot service and possibly connect    
     [[ORCARootService sharedInstance] connectAtStartUp];    
 
-	[self performSelector:@selector(closeAboutBox) withObject:self afterDelay:2];
+	[self performSelector:@selector(closeAboutBox) withObject:self afterDelay:kORSplashScreenDelay];
 	
 	[[self undoManager] removeAllActions];
 
