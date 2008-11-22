@@ -35,7 +35,3 @@
 - (void) moveSelectedObjects:(NSPoint)delta;
 @end
 
-@interface NSObject (OROrderedObjManager)
-- (int) slot;
-@end
-

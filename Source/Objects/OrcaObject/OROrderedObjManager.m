@@ -40,7 +40,7 @@
 	NSRange legalRange = [containerObj legalSlotsForObj:anObj];
     for(slot=0;slot<=[containerObj maxNumberOfObjects];slot++){
 		if([containerObj slot:slot excludedFor:anObj])continue;
-		NSRange testRange = NSMakeRange(slot,[anObj numberSlotsUsed]);
+		NSRange testRange = NSMakeRange(slot,[containerObj numberSlotsNeededFor:anObj]);
         if([self slotRangeEmpty:testRange] && NSUnionRange(testRange, legalRange).length <= legalRange.length){
             return [containerObj pointForSlot:slot];
         }
@@ -67,7 +67,7 @@
     NSEnumerator* e = [containerObj  objectEnumerator];
     id anObj;
     while(anObj = [e nextObject]){
-		if(NSIntersectionRange(NSMakeRange([anObj slot],[anObj numberSlotsUsed]),NSMakeRange(aSlot,1)).length) return anObj;
+		if(NSIntersectionRange(NSMakeRange([containerObj slotForObj:anObj],[containerObj numberSlotsNeededFor:anObj]),NSMakeRange(aSlot,1)).length) return anObj;
 	}
 	return nil;
 }
@@ -81,8 +81,8 @@
     NSEnumerator* e = [containerObj objectEnumerator];
     id anObj;
     while(anObj = [e nextObject]){
-		if(NSIntersectionRange(slotRange,NSMakeRange([anObj slot],[anObj numberSlotsUsed])).length != 0){
-			NSLog(@"Rejected attempt to place multiple objects in %@\n",[containerObj slotName:[anObj slot]]);
+		if(NSIntersectionRange(slotRange,NSMakeRange([containerObj slotForObj:anObj],[containerObj numberSlotsNeededFor:anObj])).length != 0){
+			NSLog(@"Rejected attempt to place multiple objects in %@\n",[containerObj nameForSlot:[containerObj slotForObj:anObj]]);
 			return NO;
 		}
     }
@@ -99,17 +99,17 @@
 	}
 	else {
 		if([containerObj slot:aSlot excludedFor:obj]){
-			NSLog(@"%@ is illegal for that object\n",[containerObj slotName:aSlot]);
+			NSLog(@"%@ is illegal for that object\n",[containerObj nameForSlot:aSlot]);
 			return NO;
 		}
 		NSRange testRange = NSMakeRange(aSlot,[obj numberSlotsUsed]);
 		NSRange legalRange = [containerObj legalSlotsForObj:obj];
 		if(NSIntersectionRange(legalRange,testRange).length!=[obj numberSlotsUsed]){
-			NSLog(@"%@ is illegal for that object\n",[containerObj slotName:aSlot]);
+			NSLog(@"%@ is illegal for that object\n",[containerObj nameForSlot:aSlot]);
 			return NO;
 		}
         if(![self slotRangeEmpty:testRange]) {
-			NSLog(@"Rejected attempt to place multiple objects in %@\n",[containerObj slotName:aSlot]);
+			NSLog(@"Rejected attempt to place multiple objects in %@\n",[containerObj nameForSlot:aSlot]);
 			return NO;
 		}
 	}
@@ -120,22 +120,22 @@
 {
 	int deltaSlot = ((delta.x > 0) || (delta.y >0))  ? 1 : -1;
 	NSArray* sortedSelection = [[containerObj selectedObjects] sortedArrayUsingSelector:@selector(sortCompare:)];
-	id obj;
+	id anObj;
 	NSEnumerator* e;
 	//First, can they -all- be moved?
 	BOOL moveOK = YES;
 	if(deltaSlot<0) e = [sortedSelection objectEnumerator];
 	else			e = [sortedSelection reverseObjectEnumerator];
-	while(obj = [e nextObject]){
+	while(anObj = [e nextObject]){
 		int testSlot;
-		testSlot = [obj slot] + deltaSlot;
-		if([containerObj slot:testSlot excludedFor:obj]){
+		testSlot = [containerObj slotForObj:anObj] + deltaSlot;
+		if([containerObj slot:testSlot excludedFor:anObj]){
 			moveOK = NO;
 			break;
 		}
-		NSRange testRange = NSMakeRange(testSlot,[obj numberSlotsUsed]);
-		NSRange legalRange = [containerObj legalSlotsForObj:obj];
-		if(NSIntersectionRange(legalRange,testRange).length!=[obj numberSlotsUsed]){
+		NSRange testRange = NSMakeRange(testSlot,[containerObj numberSlotsNeededFor:anObj]);
+		NSRange legalRange = [containerObj legalSlotsForObj:anObj];
+		if(NSIntersectionRange(legalRange,testRange).length!=[containerObj numberSlotsNeededFor:anObj]){
 			moveOK = NO;
 			break;
 		}
@@ -147,8 +147,8 @@
 	
 	if(moveOK){		
 		e = [sortedSelection objectEnumerator];
-		while(obj = [e nextObject]){
-			[containerObj place:obj intoSlot:[obj slot]+deltaSlot];
+		while(anObj = [e nextObject]){
+			[containerObj place:anObj intoSlot:[containerObj slotForObj:anObj]+deltaSlot];
 		}		
 	}
 }

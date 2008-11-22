@@ -79,11 +79,13 @@
 - (int) maxNumberOfObjects;
 - (int) objWidth;
 - (NSRange) legalSlotsForObj:(id)anObj;
-- (NSString*) slotName:(int)aSlot;
+- (NSString*) nameForSlot:(int)aSlot;
 - (int) slotAtPoint:(NSPoint)aPoint;
 - (NSPoint) pointForSlot:(int)aSlot;
 - (void) place:(id)anObj intoSlot:(int)aSlot;
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
 @end
 
 @interface NSObject (ORCrateModel)

@@ -273,7 +273,9 @@ typedef struct Fec32CmosShiftReg{
 - (int)slotAtPoint:(NSPoint)aPoint; 
 - (NSPoint) pointForSlot:(int)aSlot; 
 - (void) place:(id)aCard intoSlot:(int)aSlot;
-- (NSString*) slotName:(int)aSlot;
+- (NSString*) nameForSlot:(int)aSlot;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
 @end
 
 

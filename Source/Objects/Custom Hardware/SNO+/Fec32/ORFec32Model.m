@@ -823,7 +823,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 - (int) maxNumberOfObjects	{ return 4; }
 - (int) objWidth			{ return 39; }
 - (int) groupSeparation		{ return 37; }
-- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"Slot %d",aSlot]; }
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"Slot %d",aSlot]; }
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj {return NO;}
 
 - (NSRange) legalSlotsForObj:(id)anObj
@@ -861,7 +861,14 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	[aCard setSlot: aSlot];
 	[aCard moveTo:[self pointForSlot:aSlot]];
 }
-
+- (int) slotForObj:(id)anObj
+{
+	return [anObj slot];
+}
+- (int) numberSlotsNeededFor:(id)anObj
+{
+	return [anObj numberSlotsUsed];
+}
 @end
 
 @implementation ORFec32Model (private)

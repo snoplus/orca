@@ -37,12 +37,15 @@
 - (int) maxNumberOfObjects;
 - (int) objWidth;
 - (int) groupSeparation;
-- (NSString*) slotName:(int)aSlot;
+- (NSString*) nameForSlot:(int)aSlot;
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (int) slotAtPoint:(NSPoint)aPoint;
 - (NSPoint) pointForSlot:(int)aSlot;
 - (void) place:(id)anObj intoSlot:(int)aSlot;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
 @end
+
 
 
 @interface NSObject (ORVmeDaughterCard)

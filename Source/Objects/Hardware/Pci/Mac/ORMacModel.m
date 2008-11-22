@@ -297,7 +297,7 @@ void registryChanged(
 - (int) maxNumberOfObjects	{ return 4; }
 - (int) objWidth			{ return 20; }
 - (int) groupSeparation		{ return 0; }
-- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"PCI Slot %d",aSlot]; }
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"PCI Slot %d",aSlot]; }
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
 
@@ -321,6 +321,14 @@ void registryChanged(
 	[anObj setSlot: aSlot];
 	[anObj moveTo:[self pointForSlot:aSlot]];
 }
+- (int) slotForObj:(id)anObj
+{
+	return [anObj slot];
+}
 
+- (int) numberSlotsNeededFor:(id)anObj
+{
+	return [anObj numberSlotsUsed];
+}
 @end
 

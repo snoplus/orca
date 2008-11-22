@@ -379,7 +379,7 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 - (int) maxNumberOfObjects	{ return 12; }
 - (int) objWidth			{ return 16; }
 - (int) groupSeparation		{ return 0; }
-- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"Slot %d",aSlot]; }
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"Slot %d",aSlot]; }
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
 
@@ -401,5 +401,12 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 	[anObj setSlot: aSlot];
 	[anObj moveTo:[self pointForSlot:aSlot]];
 }
-
+- (int) slotForObj:(id)anObj
+{
+	return [anObj slot];
+}
+- (int) numberSlotsNeededFor:(id)anObj
+{	
+	return [anObj numberSlotsUsed];
+}
 @end

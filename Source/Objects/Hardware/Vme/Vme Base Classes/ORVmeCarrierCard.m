@@ -208,8 +208,12 @@
 - (int) maxNumberOfObjects	{ return 4; }	//default
 - (int) objWidth			{ return 58; }	//default
 - (int) groupSeparation		{ return 50; }	//default
-- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"position %d",aSlot]; }
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"position %d",aSlot]; }
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
+- (int) slotForObj:(id)anObj
+{
+	return [anObj slot];
+}
 
 - (NSRange) legalSlotsForObj:(id)anObj
 {
@@ -244,6 +248,10 @@
 {
 	[aCard setSlot: aSlot];
 	[aCard moveTo:[self pointForSlot:aSlot]];
+}
+- (int) numberSlotsNeededFor:(id)anObj
+{
+	return [anObj numberSlotsUsed];
 }
 
 @end

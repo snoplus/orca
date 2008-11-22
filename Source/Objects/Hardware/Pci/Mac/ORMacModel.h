@@ -66,11 +66,13 @@
 - (int) maxNumberOfObjects;
 - (int) objWidth;
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
-- (NSString*) slotName:(int)aSlot;
+- (NSString*) nameForSlot:(int)aSlot;
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (int) slotAtPoint:(NSPoint)aPoint; 
 - (NSPoint) pointForSlot:(int)aSlot;
 - (void) place:(id)anObj intoSlot:(int)aSlot;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
 @end
 
 

@@ -247,7 +247,7 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
 @implementation ORCamacCrateModel (OROrderedObjHolding)
 - (int) maxNumberOfObjects	{ return 25; }
 - (int) objWidth			{ return 16; }
-- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"Station %d",aSlot+1]; }
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"Station %d",aSlot+1]; }
 
 - (NSRange) legalSlotsForObj:(id)anObj
 {

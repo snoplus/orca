@@ -2157,7 +2157,7 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
 - (int) maxNumberOfObjects			{ return 10; }
 - (int) objWidth					{ return 16; }
 - (int) groupSeparation				{ return 0; }
-- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"LAM Slot %d",aSlot]; }
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"LAM Slot %d",aSlot]; }
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
 
 - (NSRange) legalSlotsForObj:(id)anObj
@@ -2170,6 +2170,11 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
 	return floor(((int)aPoint.y)/[self objWidth]);
 }
 
+- (int) slotForObject:(id)anObj
+{
+	return [anObj slot];
+}
+
 - (NSPoint) pointForSlot:(int)aSlot 
 {
 	return NSMakePoint(0,aSlot*[self objWidth]);
@@ -2180,7 +2185,14 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
 	[anObj setSlot: aSlot];
 	[anObj moveTo:[self pointForSlot:aSlot]];
 }
-
+- (int) slotForObj:(id)anObj
+{
+	return [anObj slot];
+}
+- (int) numberSlotsNeededFor:(id)anObj
+{
+	return [anObj numberSlotsUsed];
+}
 
 @end
 

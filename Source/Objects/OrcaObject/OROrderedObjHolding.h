@@ -27,13 +27,15 @@
 - (int) groupSeparation;
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
-- (NSString*) slotName:(int)aSlot;
+- (NSString*) nameForSlot:(int)aSlot;
 - (int) slotAtPoint:(NSPoint)aPoint;
 - (NSPoint) pointForSlot:(int)aSlot;
 - (void) place:(id)anObj intoSlot:(int)aSlot;
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
 - (NSArray*)selectedObjects;
 - (NSEnumerator*) objectEnumerator;
+- (int) slotForObj:(id)anObj;
+- (int) numberSlotsNeededFor:(id)anObj;
 @end
 
 
