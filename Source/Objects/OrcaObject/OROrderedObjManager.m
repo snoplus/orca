@@ -62,7 +62,6 @@
 	}
 }
 
-
 - (id) objectInSlot:(int)aSlot
 {
     NSEnumerator* e = [containerObj  objectEnumerator];
@@ -82,7 +81,10 @@
     NSEnumerator* e = [containerObj objectEnumerator];
     id anObj;
     while(anObj = [e nextObject]){
-		if(NSIntersectionRange(slotRange,NSMakeRange([anObj slot],[anObj numberSlotsUsed])).length != 0)return NO;
+		if(NSIntersectionRange(slotRange,NSMakeRange([anObj slot],[anObj numberSlotsUsed])).length != 0){
+			NSLog(@"Rejected attempt to place multiple objects in %@\n",[containerObj slotName:[anObj slot]]);
+			return NO;
+		}
     }
     return YES;
 }
@@ -96,15 +98,18 @@
 		return NO;
 	}
 	else {
-		if([containerObj slot:aSlot excludedFor:obj])return NO;
+		if([containerObj slot:aSlot excludedFor:obj]){
+			NSLog(@"%@ is illegal for that object\n",[containerObj slotName:aSlot]);
+			return NO;
+		}
 		NSRange testRange = NSMakeRange(aSlot,[obj numberSlotsUsed]);
 		NSRange legalRange = [containerObj legalSlotsForObj:obj];
 		if(NSIntersectionRange(legalRange,testRange).length!=[obj numberSlotsUsed]){
-			NSLog(@"Slot %d is illegal for that card\n",[containerObj stationForSlot:aSlot]);
+			NSLog(@"%@ is illegal for that object\n",[containerObj slotName:aSlot]);
 			return NO;
 		}
         if(![self slotRangeEmpty:testRange]) {
-			NSLog(@"Rejected attempt to place multiple cards in slot %d\n",[containerObj stationForSlot:aSlot]);
+			NSLog(@"Rejected attempt to place multiple objects in %@\n",[containerObj slotName:aSlot]);
 			return NO;
 		}
 	}

@@ -359,7 +359,7 @@ enum {
 - (int) maxNumberOfObjects;
 - (int) objWidth;
 - (int) groupSeparation;
-- (int) stationForSlot:(int)aSlot;
+- (NSString*) slotName:(int)aSlot;
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (int) slotAtPoint:(NSPoint)aPoint ;

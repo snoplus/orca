@@ -297,7 +297,7 @@ void registryChanged(
 - (int) maxNumberOfObjects	{ return 4; }
 - (int) objWidth			{ return 20; }
 - (int) groupSeparation		{ return 0; }
-- (int) stationForSlot:(int)aSlot { return aSlot; }
+- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"PCI Slot %d",aSlot]; }
 
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
 

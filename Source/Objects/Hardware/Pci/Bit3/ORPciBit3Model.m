@@ -2157,7 +2157,7 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
 - (int) maxNumberOfObjects			{ return 10; }
 - (int) objWidth					{ return 16; }
 - (int) groupSeparation				{ return 0; }
-- (int) stationForSlot:(int)aSlot	{ return aSlot; }
+- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"LAM Slot %d",aSlot]; }
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
 
 - (NSRange) legalSlotsForObj:(id)anObj

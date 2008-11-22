@@ -153,6 +153,7 @@
 #pragma mark •••OROrderedObjHolding
 - (int) maxNumberOfObjects {return 21;}
 - (int) objWidth		 {return 12;}
+- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"Station %d",aSlot+1]; }
 - (NSRange) legalSlotsForObj:(id)anObj
 {
 	if( [anObj isKindOfClass:NSClassFromString(@"ORIpeV4SLTModel")]){

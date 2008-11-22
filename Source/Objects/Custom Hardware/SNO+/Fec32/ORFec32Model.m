@@ -823,7 +823,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 - (int) maxNumberOfObjects	{ return 4; }
 - (int) objWidth			{ return 39; }
 - (int) groupSeparation		{ return 37; }
-- (int) stationForSlot:(int)aSlot {return aSlot;}
+- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"Slot %d",aSlot]; }
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj {return NO;}
 
 - (NSRange) legalSlotsForObj:(id)anObj

@@ -73,7 +73,7 @@ typedef enum hveStatus hveStatus;
 - (float) MCDZ: (int) aCurrentChnl;
 - (void)  setMCDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
 - (float)  HVLimit: (int) aCurrentChnl;
-- (int) station;
+- (int) stationNumber;
 
 #pragma mark •••Interpret data
 - (void) interpretDataReturn: (NSNotification*) aNote;

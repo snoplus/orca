@@ -79,7 +79,7 @@
 - (int) maxNumberOfObjects;
 - (int) objWidth;
 - (NSRange) legalSlotsForObj:(id)anObj;
-- (int) stationForSlot:(int)aSlot;
+- (NSString*) slotName:(int)aSlot;
 - (int) slotAtPoint:(NSPoint)aPoint;
 - (NSPoint) pointForSlot:(int)aSlot;
 - (void) place:(id)anObj intoSlot:(int)aSlot;

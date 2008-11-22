@@ -37,7 +37,7 @@
 - (int) maxNumberOfObjects;
 - (int) objWidth;
 - (int) groupSeparation;
-- (int) stationForSlot:(int)aSlot;
+- (NSString*) slotName:(int)aSlot;
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (int) slotAtPoint:(NSPoint)aPoint;
 - (NSPoint) pointForSlot:(int)aSlot;

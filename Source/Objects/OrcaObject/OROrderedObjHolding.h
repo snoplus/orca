@@ -27,7 +27,7 @@
 - (int) groupSeparation;
 - (NSRange) legalSlotsForObj:(id)anObj;
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
-- (int) stationForSlot:(int)aSlot;
+- (NSString*) slotName:(int)aSlot;
 - (int) slotAtPoint:(NSPoint)aPoint;
 - (NSPoint) pointForSlot:(int)aSlot;
 - (void) place:(id)anObj intoSlot:(int)aSlot;

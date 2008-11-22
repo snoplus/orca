@@ -208,7 +208,7 @@
 - (int) maxNumberOfObjects	{ return 4; }	//default
 - (int) objWidth			{ return 58; }	//default
 - (int) groupSeparation		{ return 50; }	//default
-- (int) stationForSlot:(int)aSlot {return aSlot;}
+- (NSString*) slotName:(int)aSlot	{ return [NSString stringWithFormat:@"position %d",aSlot]; }
 - (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
 
 - (NSRange) legalSlotsForObj:(id)anObj
