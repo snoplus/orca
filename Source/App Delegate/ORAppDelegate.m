@@ -415,9 +415,10 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     if([[[NSUserDefaults standardUserDefaults] objectForKey: ORMailBugReportFlag] boolValue]){
         NSString* address = [[NSUserDefaults standardUserDefaults] objectForKey: ORMailBugReportEMail];
         if(address){
-            NSString* crashLogPath = [kCrashLogLocation stringByExpandingTildeInPath]; 
-            NSAttributedString* crashLog = [[NSAttributedString alloc] initWithString:[NSString stringWithContentsOfFile:crashLogPath]];
-            if([crashLog length]){
+            NSString* crashLogPath = [kCrashLogLocation stringByExpandingTildeInPath];
+			NSString* contents = [NSString stringWithContentsOfFile:crashLogPath];
+			if(contents){
+				NSAttributedString* crashLog = [[NSAttributedString alloc] initWithString:contents];
 				//the address may be a list... if so it must be a comma separated list... try to make it so...
 				NSMutableString* finalAddressList = [[[[address componentsSeparatedByString:@"\n"] componentsJoinedByString:@","] mutableCopy] autorelease];
 				[finalAddressList replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[address length])];
@@ -427,8 +428,9 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 				[mailer setSubject:@"ORCA Crash Log"];
 				[mailer setBody:crashLog];
 				[mailer send:self];
+				[crashLog release];
 			}
-			[crashLog release];
+			
         }
     }
 }
