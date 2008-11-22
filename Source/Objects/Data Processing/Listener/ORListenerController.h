@@ -23,6 +23,7 @@
 	IBOutlet NSTextField*   remoteHostField;
 	IBOutlet NSTextField*   connectionStatusField;
 	IBOutlet NSTextField*   byteRecievedField;
+	IBOutlet NSButton*      swapAllButton;
 	IBOutlet NSButton*      connectButton;
     IBOutlet NSButton*      lockButton;
 	IBOutlet NSButton*      connectAtStartButton;
@@ -37,6 +38,7 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) swapAllChanged:(NSNotification*)note;
 - (void) remotePortChanged:(NSNotification*)note;
 - (void) remoteHostChanged:(NSNotification*)note;
 - (void) isConnectedChanged:(NSNotification*)note;
@@ -52,6 +54,7 @@
 - (IBAction) remotePortFieldAction:(id)sender;
 - (IBAction) remoteHostFieldAction:(id)sender;
 - (IBAction) connectButtonAction:(id)sender;
+- (IBAction) swapAllButtonAction:(id)sender;
 - (IBAction) connectAtStartAction:(id)sender;
 - (IBAction) autoReconnectAction:(id)sender;
 @end

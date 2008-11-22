@@ -57,39 +57,45 @@
     
 	[notifyCenter addObserver : self
                       selector: @selector(remotePortChanged:)
-                          name: ORListenerRemotePortChangedNotification
+                          name: ORListenerRemotePortChanged
                        object : model];
     
 	[notifyCenter addObserver : self
                       selector: @selector(remoteHostChanged:)
-                          name: ORListenerRemoteHostChangedNotification
+                          name: ORListenerRemoteHostChanged
                        object : model];
     
 	[notifyCenter addObserver : self
                       selector: @selector(isConnectedChanged:)
-                          name: ORListenerIsConnectedChangedNotification
+                          name: ORListenerIsConnectedChanged
                        object : model];
     
 	[notifyCenter addObserver : self
                       selector: @selector(byteCountChanged:)
-                          name: ORListenerByteCountChangedNotification
+                          name: ORListenerByteCountChanged
                        object : model];
     
 	[notifyCenter addObserver : self
                       selector: @selector(connectAtStartChanged:)
-                          name: ORListenerConnectAtStartChangedNotification
+                          name: ORListenerConnectAtStartChanged
                        object : [self model]];
     
 	[notifyCenter addObserver : self
                       selector: @selector(autoReconnectChanged:)
-                          name: ORListenerAutoReconnectChangedNotification
+                          name: ORListenerAutoReconnectChanged
                        object : [self model]];
-    
+
+	[notifyCenter addObserver : self
+                      selector: @selector(swapAllChanged:)
+                          name: ORListenerSwapAllChanged
+                       object : [self model]];
+	
 }
 
 - (void) updateWindow
 {
     [super updateWindow];
+	[self swapAllChanged:nil];
 	[self remotePortChanged:nil];
 	[self remoteHostChanged:nil];
 	[self isConnectedChanged:nil];
@@ -98,6 +104,12 @@
 	[self autoReconnectChanged:nil];
 	
 }
+
+- (void) swapAllChanged:(NSNotification*)aNote
+{
+	[swapAllButton setState:[model swapAll]];
+}
+
 
 - (void) connectAtStartChanged:(NSNotification*)aNote
 {
@@ -139,6 +151,7 @@
     [remotePortField setEnabled:!locked];
     [remoteHostField setEnabled:!locked];
     [connectAtStartButton setEnabled:!locked];
+    [swapAllButton setEnabled:!locked];
     [autoReconnectButton setEnabled:!locked];
 }
 
@@ -182,6 +195,11 @@
 - (IBAction) connectAtStartAction:(id)sender
 {
 	[[self model] setConnectAtStart:[sender state]];
+}
+
+- (IBAction) swapAllButtonAction:(id)sender
+{
+	[[self model] setSwapAll:[sender state]];
 }
 
 - (IBAction) autoReconnectAction:(id)sender

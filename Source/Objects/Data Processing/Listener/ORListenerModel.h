@@ -46,7 +46,7 @@
     BOOL docLoaded;
 	BOOL autoReconnect;
 	BOOL connectAtStart;
-	BOOL expectingHeader;
+	BOOL swapAll;
 }
 
 #pragma mark ***Initialization
@@ -82,7 +82,8 @@
 - (void) setByteCount:(unsigned long)aNewByteCount;
 - (void) incByteCount:(unsigned long)anAmount;
 - (void) clearByteCount;
-
+- (void) setSwapAll:(BOOL)state;
+- (BOOL) swapAll;
 - (void) connectSocket:(BOOL)state;
 
 #pragma mark ***Delegate Methods
@@ -92,11 +93,12 @@
 
 @end
 
-extern NSString* ORListenerRemotePortChangedNotification;
-extern NSString* ORListenerRemoteHostChangedNotification;
-extern NSString* ORListenerIsConnectedChangedNotification;
-extern NSString* ORListenerByteCountChangedNotification;
+extern NSString* ORListenerSwapAllChanged;
+extern NSString* ORListenerRemotePortChanged;
+extern NSString* ORListenerRemoteHostChanged;
+extern NSString* ORListenerIsConnectedChanged;
+extern NSString* ORListenerByteCountChanged;
 extern NSString* ORListenerLock;
-extern NSString* ORListenerQueueCountChangedNotification;
-extern NSString* ORListenerAutoReconnectChangedNotification;
-extern NSString* ORListenerConnectAtStartChangedNotification;
+extern NSString* ORListenerQueueCountChanged;
+extern NSString* ORListenerAutoReconnectChanged;
+extern NSString* ORListenerConnectAtStartChanged;

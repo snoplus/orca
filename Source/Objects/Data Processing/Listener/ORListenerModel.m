@@ -28,14 +28,15 @@
 #import "ORDataTypeAssigner.h"
 
 #pragma mark ***External Strings
-NSString* ORListenerConnectAtStartChangedNotification = @"ORListenerConnectAtStartChangedNotification";
-NSString* ORListenerAutoReconnectChangedNotification = @"ORListenerAutoReconnectChangedNotification";
-NSString* ORListenerQueueCountChangedNotification = @"ORListenerQueueCountChangedNotification";
-NSString* ORListenerRemotePortChangedNotification  = @"ORListenerRemotePortChangedNotification";
-NSString* ORListenerRemoteHostChangedNotification  = @"ORListenerRemoteHostChangedNotification";
-NSString* ORListenerIsConnectedChangedNotification = @"ORListenerIsConnectedChangedNotification";
-NSString* ORListenerByteCountChangedNotification   = @"ORListenerByteCountChangedNotification";
-NSString* ORListenerLock                           = @"ORListenerLock";
+NSString* ORListenerSwapAllChanged			= @"ORListenerSwapAllChanged";
+NSString* ORListenerConnectAtStartChanged	= @"ORListenerConnectAtStartChanged";
+NSString* ORListenerAutoReconnectChanged	= @"ORListenerAutoReconnectChanged";
+NSString* ORListenerQueueCountChanged		= @"ORListenerQueueCountChanged";
+NSString* ORListenerRemotePortChanged		= @"ORListenerRemotePortChanged";
+NSString* ORListenerRemoteHostChanged		= @"ORListenerRemoteHostChanged";
+NSString* ORListenerIsConnectedChanged		= @"ORListenerIsConnectedChanged";
+NSString* ORListenerByteCountChanged		= @"ORListenerByteCountChanged";
+NSString* ORListenerLock                    = @"ORListenerLock";
 
 static NSString* ORListenerConnector = @"ORListenerConnector";
 
@@ -141,6 +142,20 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 }
 
 #pragma mark ***Accessors
+- (void) setSwapAll:(BOOL)state
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setSwapAll:swapAll];
+	swapAll = state;
+	[[NSNotificationCenter defaultCenter]
+		postNotificationName:ORListenerSwapAllChanged
+		object:self];
+}
+
+- (BOOL) swapAll
+{
+	return swapAll;
+}
+
 - (BOOL) connectAtStart
 {
 	return connectAtStart;
@@ -152,7 +167,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	connectAtStart = aConnectAtStart;
     
 	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORListenerConnectAtStartChangedNotification
+	 postNotificationName:ORListenerConnectAtStartChanged
 	 object:self];
 }
 - (BOOL) autoReconnect
@@ -166,7 +181,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	autoReconnect = aAutoReconnect;
     
 	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORListenerAutoReconnectChangedNotification
+	 postNotificationName:ORListenerAutoReconnectChanged
 	 object:self];
 }
 
@@ -191,7 +206,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	queueCount = aQueueCount;
     
 	[[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORListenerQueueCountChangedNotification
+	 postNotificationName:ORListenerQueueCountChanged
 	 object:self];
 }
 - (ORDataPacket*) dataPacket
@@ -229,7 +244,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	remotePort = aNewRemotePort;
     
 	[[NSNotificationCenter defaultCenter] 
-	 postNotificationName:ORListenerRemotePortChangedNotification 
+	 postNotificationName:ORListenerRemotePortChanged 
 	 object: self];
 }
 
@@ -256,7 +271,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	remoteHost = [aNewRemoteHost copy];
     
 	[[NSNotificationCenter defaultCenter] 
-	 postNotificationName:ORListenerRemoteHostChangedNotification 
+	 postNotificationName:ORListenerRemoteHostChanged 
 	 object: self ];
 }
 
@@ -269,7 +284,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	isConnected = aNewIsConnected;
     
 	[[NSNotificationCenter defaultCenter] 
-	 postNotificationName:ORListenerIsConnectedChangedNotification 
+	 postNotificationName:ORListenerIsConnectedChanged 
 	 object: self ];
     
 }
@@ -283,7 +298,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	byteCount = aNewByteCount;
     
 	[[NSNotificationCenter defaultCenter] 
-	 postNotificationName:ORListenerByteCountChangedNotification 
+	 postNotificationName:ORListenerByteCountChanged 
 	 object: self ];
 }
 
@@ -355,6 +370,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 	[self setRemoteHost:[decoder decodeObjectForKey:@"ORListenerRemoteHost"]];
     [self setConnectAtStart:[decoder decodeBoolForKey:@"ConnectAtStart"]];
     [self setAutoReconnect:[decoder decodeBoolForKey:@"AutoReconnect"]];
+    [self setSwapAll:[decoder decodeBoolForKey:@"swapAll"]];
 	[self setRemotePort:[decoder decodeIntForKey:@"ORListenerRemotePort"]];
     
 	[[self undoManager] enableUndoRegistration];
@@ -371,6 +387,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     [super encodeWithCoder:encoder];
 	[encoder encodeObject:remoteHost forKey:@"ORListenerRemoteHost"];
     [encoder encodeBool:connectAtStart forKey:@"ConnectAtStart"];
+    [encoder encodeBool:swapAll forKey:@"swapAll"];
     [encoder encodeBool:autoReconnect forKey:@"AutoReconnect"];
 	[encoder encodeInt:remotePort forKey:@"ORListenerRemotePort"];
 }
@@ -381,6 +398,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     if(remoteHost)[objDictionary setObject:remoteHost forKey:@"RemoteHost"];
     [objDictionary setObject:[NSNumber numberWithInt:connectAtStart] forKey:@"ConnectAtStart"];
     [objDictionary setObject:[NSNumber numberWithInt:autoReconnect] forKey:@"AutoReconnect"];
+    [objDictionary setObject:[NSNumber numberWithInt:swapAll] forKey:@"swapAll"];
     [objDictionary setObject:[NSNumber numberWithInt:remotePort] forKey:@"RemotePort"];
     [dictionary setObject:objDictionary forKey:@"Listener"];
     
@@ -452,6 +470,8 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 		NSAutoreleasePool* outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
 		unsigned long* lptr = (unsigned long*)buffer;
         unsigned long recordHeader = *lptr;
+		if(swapAll)	recordHeader = CFSwapInt32(recordHeader);			
+
 		unsigned long dataId = ExtractDataId(recordHeader);
 		
 		if(dataId == 0x00000000){
@@ -460,6 +480,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 			if(buffer + length <= endPtr){
 				buffer+=4;	 //point to header length
 				unsigned long headerLength = *((unsigned long*)buffer); //bytes
+				if(swapAll)	headerLength = CFSwapInt32(headerLength);			
 				//we have the whole header, extract it for use
 				buffer+=4;	 //point to header itself
 				
@@ -467,9 +488,13 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 				[dataPacket setFileHeader:[theHeader propertyList]]; 
 				[theHeader release];
                 [dataPacket generateObjectLookup];
+				[dataPacket setNeedToSwap:swapAll];
 				buffer += length-4-4;
 				runDataID = [[dataPacket headerObject:@"dataDescription",@"ORRunModel",@"Run",@"dataId",nil] longValue];
 				
+			}
+			else {
+				break;
 			}
 		}
 		else {
@@ -480,9 +505,11 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
 				//OK, regular record
 				lptr = (unsigned long*)buffer;
 				recordHeader = *lptr;
+				if(swapAll)	recordHeader = CFSwapInt32(recordHeader);			
 				dataId = ExtractDataId(recordHeader);
 				unsigned long length = ExtractLength(recordHeader)*4; //bytes
 				if(buffer + length <= endPtr){
+					if(swapAll) [dataPacket byteSwapData:lptr forKey:[NSNumber numberWithLong:dataId]];
 					if(dataId == runDataID){
 						lptr++;
 						unsigned long firstWord = *lptr;
@@ -578,6 +605,98 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     [self connectSocket:YES];
 }
 
+- (void) swapAndProcessRecords:(NSMutableData*)dataChunk
+{
+    char* buffer = (char*)[dataChunk bytes];
+    char* endPtr = buffer + [dataChunk length];
+    
+    while (buffer<endPtr) {
+		NSAutoreleasePool* outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
+		unsigned long* lptr = (unsigned long*)buffer;
+		
+        unsigned long recordHeader = CFSwapInt32(*lptr); //have to swap the first word -- but just locally
+		
+		unsigned long dataId = ExtractDataId(recordHeader);
+		
+		if(dataId == 0x00000000){
+			//header is special -- we have to process it here and we don't pass it on.
+			//new style headers always have a id of zero.
+			unsigned long length = ExtractLength(recordHeader)*4; //bytes
+			if(buffer + length <= endPtr){
+				buffer+=4;	 //point to header length
+				unsigned long headerLength = *((unsigned long*)buffer); //bytes
+				headerLength = CFSwapInt32(headerLength);
+				//we have the whole header, extract it for use
+				buffer+=4;	 //point to header itself
+				
+				NSString* theHeader = [[NSString alloc] initWithBytes:buffer length:headerLength encoding:NSASCIIStringEncoding];
+				[dataPacket setFileHeader:[theHeader propertyList]]; 
+				[theHeader release];
+                [dataPacket generateObjectLookup];
+				buffer += length-4-4;
+				runDataID = [[dataPacket headerObject:@"dataDescription",@"ORRunModel",@"Run",@"dataId",nil] longValue];
+				
+			}
+		}
+		else {
+			BOOL endOfRun = NO;
+		    while (buffer<endPtr) {
+				NSAutoreleasePool* innerPool = [[NSAutoreleasePool allocWithZone:nil] init];
+				
+				//OK, regular record
+				lptr = (unsigned long*)buffer;
+				recordHeader = *lptr;
+				recordHeader = CFSwapInt32(recordHeader);
+				dataId = ExtractDataId(recordHeader);
+				unsigned long length = ExtractLength(recordHeader)*4; //bytes
+
+				if(buffer + length <= endPtr){
+					
+					[dataPacket byteSwapData:lptr forKey:[NSNumber numberWithLong:dataId]];
+
+					if(dataId == runDataID){
+						lptr++;
+						unsigned long firstWord = *lptr;
+						if(!(firstWord & 0x8)){
+							if(firstWord & 0x1){
+								NSLog(@"Listener: Run Start on Host: %@\n",remoteHost);
+							}
+							else {
+								//it's an end of run record --  we have some end of run cleanup to handle
+								NSLog(@"Listener: Run Ended on Host: %@\n",remoteHost);
+								//OK end of run received
+								endOfRun = YES;
+							}
+						}
+					}
+					[dataPacket addData:[NSMutableData dataWithBytes:buffer length:length]];
+					
+					[theNextObject processData:dataPacket userInfo:nil];
+					if(endOfRun){
+						[self performSelectorOnMainThread:@selector(sendRunTaskStopped:) withObject:dataPacket waitUntilDone:YES];
+						[dataPacket clearData];
+						[self performSelectorOnMainThread:@selector(sendCloseOutRun:)    withObject:dataPacket waitUntilDone:YES];
+						[self performSelectorOnMainThread:@selector(clearByteCount)      withObject:nil        waitUntilDone:YES];
+					}
+					[dataPacket clearData];
+					buffer += length;
+				}
+				else {
+					[innerPool release];
+					break;
+				}
+				[innerPool release];
+			}
+			
+			//remove processed data
+			unsigned long newLength = endPtr - buffer;
+			[dataToProcess replaceBytesInRange:NSMakeRange(0,(unsigned long)(endPtr-buffer)) withBytes:buffer];
+			[dataToProcess setLength:newLength];
+			break;
+		}
+		[outerPool release];
+	}
+}
 
 @end
 

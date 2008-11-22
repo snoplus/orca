@@ -94,6 +94,8 @@
 				<string>id</string>
 				<key>remotePortFieldAction</key>
 				<string>id</string>
+				<key>swapAllButtonAction</key>
+				<string>id</string>
 			</dict>
 			<key>CLASS</key>
 			<string>ORListenerController</string>
@@ -117,6 +119,8 @@
 				<string>NSTextField</string>
 				<key>remotePortField</key>
 				<string>NSTextField</string>
+				<key>swapAllButton</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
