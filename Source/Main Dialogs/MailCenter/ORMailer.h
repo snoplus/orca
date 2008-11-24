@@ -56,5 +56,5 @@
 @end
 
 @interface NSObject (ORMailer)
-- (void) mailSent;
+- (void) mailSent:(NSString*)to;
 @end

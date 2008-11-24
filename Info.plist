@@ -64,6 +64,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>ReportBugsTo</key>
-	<string>howe@npl.washington.edu</string>
+	<string>mhowe@physics.unc.edu</string>
 </dict>
 </plist>

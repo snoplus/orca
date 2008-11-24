@@ -24,8 +24,7 @@
 #import "ORProcessModel.h"
 #import "ORProcessThread.h"
 #import "ORAdcProcessing.h"
-
-#import <Message/NSMailDelivery.h>
+#import "ORMailer.h"
 
 NSString* ORRangeTimerModelEnableMailChanged = @"ORRangeTimerModelEnableMailChanged";
 NSString* ORRangeTimerModelDirectionChanged  = @"ORRangeTimerModelDirectionChanged";
@@ -400,50 +399,44 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
     [encoder encodeInt:		deadband forKey:	@"ORRangeTimerModelDeadband"];
 }
 
+- (void) mailSent:(NSString*)address
+{
+	NSLog(@"ORCA Range Timer report was sent to:\n%@",address);
+}
+
 @end
 
 @implementation ORRangeTimerModel (private)
 - (void) eMailThread:(id)userInfo
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	BOOL configured;
-	@synchronized([NSApp delegate]){
-		configured = [NSMailDelivery hasDeliveryClassBeenConfigured];
-	}
-	if(configured){
-		NSString* address =  [userInfo objectForKey:@"Address"];
-		NSString* theContent = [userInfo objectForKey:@"Message"];
-		NSString* emailHeader = [NSString string];
-		NSString* hostAddress = @"<Unable to get host address>";
-		NSArray* names =  [[NSHost currentHost] addresses];
-		NSEnumerator* e = [names objectEnumerator];
-		id aName;
-		while(aName = [e nextObject]){
-			if([aName rangeOfString:@"::"].location == NSNotFound){
-				if([aName rangeOfString:@".0.0."].location == NSNotFound){
-					hostAddress = aName;
-					break;
-				}
+	NSString* address =  [userInfo objectForKey:@"Address"];
+	NSString* content = [NSString string];
+	NSString* hostAddress = @"<Unable to get host address>";
+	NSArray* names =  [[NSHost currentHost] addresses];
+	NSEnumerator* e = [names objectEnumerator];
+	id aName;
+	while(aName = [e nextObject]){
+		if([aName rangeOfString:@"::"].location == NSNotFound){
+			if([aName rangeOfString:@".0.0."].location == NSNotFound){
+				hostAddress = aName;
+				break;
 			}
 		}
-		emailHeader = [emailHeader stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
-		emailHeader = [emailHeader stringByAppendingFormat:@"ORCA Message From Host: %@\n",hostAddress];
-		emailHeader = [emailHeader stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"];
-		
-			
-		BOOL result = NO;
-		@synchronized([NSApp delegate]){
-			result = [NSMailDelivery deliverMessage:[emailHeader stringByAppendingString:theContent] 
-											subject:@"Orca Message"
-												 to: address];
-		}
-		if(result)NSLog(@"Message mailed to: %@\n",address);
-		else	  NSLogColor([NSColor redColor], @"Message FAILED to be mailed to: %@\n",address);
 	}
-	else {
-		NSLogColor([NSColor redColor], @"Message e-mail could NOT be sent because eMail delivery has not been configured in Mail.app\n");
-		NSLogColor([NSColor redColor], @"Message e-mails disabled\n");
-		[self performSelectorOnMainThread:@selector(disableEMail) withObject:nil waitUntilDone:NO];
+	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
+	content = [content stringByAppendingFormat:@"ORCA Message From Host: %@\n",hostAddress];
+	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"];
+	
+	@synchronized([NSApp delegate]){
+
+		NSAttributedString* theContent = [[NSAttributedString alloc] initWithString:content];
+		ORMailer* mailer = [ORMailer mailer];
+		[mailer setTo:address];
+		[mailer setSubject:@"Orca Message"];
+		[mailer setBody:theContent];
+		[mailer send:self];
+		
 	}
 
 	[pool release];

@@ -107,6 +107,7 @@ extern NSString* ORAlarmCollectionEmailEnabledChanged;
 - (void) alarmWasPosted:(NSNotification*)aNotification;
 - (void) alarmWasCleared:(NSNotification*)aNotification;
 - (void) eMailThread;
+- (void) mailSent:(NSString*)address;
 
 @end
 

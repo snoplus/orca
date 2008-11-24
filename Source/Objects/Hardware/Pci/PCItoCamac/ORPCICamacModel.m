@@ -216,6 +216,10 @@ static UInt32 *fVPCICamacMem;
     [noHardwareAlarm clearAlarm];
     [noHardwareAlarm release];
     noHardwareAlarm = nil;
+	[noDriverAlarm clearAlarm];
+    [noDriverAlarm release];
+    noDriverAlarm = nil;
+	
     // unmap pciadr address spaces
     IOConnectUnmapMemory(dataPort, 0, mach_task_self(), mapLCRegisterAddress);
     IOConnectUnmapMemory(dataPort, 3, mach_task_self(), mapPCICamacMemoryAddress);

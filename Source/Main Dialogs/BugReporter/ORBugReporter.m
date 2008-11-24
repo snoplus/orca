@@ -31,12 +31,6 @@
     return self;
 }
 
-- (void) dealloc
-{
-	[mailer release];
-	[super dealloc];
-}
-
 - (void) awakeFromNib
 {
 
@@ -123,8 +117,7 @@
 	NSDictionary* attrib;
 	NSMutableAttributedString* theContent = [[NSMutableAttributedString alloc] initWithRTFD:theRTFDData documentAttributes:&attrib];
 	
-	if(mailer)[mailer release];
-	mailer = [[ORMailer mailer] retain];
+	ORMailer* mailer = [ORMailer mailer];
 	[mailer setTo:		[[mailForm cellWithTag:0] stringValue]];
 	[mailer setCc:		[[mailForm cellWithTag:1] stringValue]];
 	[mailer setSubject:	[[mailForm cellWithTag:2] stringValue]];
@@ -138,10 +131,9 @@
 
 }
 
-- (void) mailSent
+- (void) mailSent:(NSString*)to
 {
-	[mailer release];
-	mailer = nil;
+	NSLog(@"Bug report sent to: %@\n",to);
 	[[self window] performClose:self];
 }
 

@@ -13,7 +13,6 @@
 //-------------------------------------------------------------
 
 #import <Cocoa/Cocoa.h>
-#import <Message/NSMailDelivery.h>
 #include <IOKit/IOMessage.h>
 #import "ORGroupView.h"
 #import "NSData+Extensions.h"

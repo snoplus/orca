@@ -42,6 +42,6 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) send:(id)sender;
-- (void) mailSent;
+- (void) mailSent:(NSString*)to;
 
 @end

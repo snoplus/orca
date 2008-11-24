@@ -105,7 +105,7 @@
 	
 }
 
-- (void) mailSent
+- (void) mailSent:(NSString*)to
 {
 	[[self window] performClose:self];
 }

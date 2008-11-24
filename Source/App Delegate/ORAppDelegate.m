@@ -435,14 +435,10 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     }
 }
 
-- (void) mailSent
+- (void) mailSent:(NSString*)address
 {
 	[self deleteCrashLog];
-	NSString* address = [[NSUserDefaults standardUserDefaults] objectForKey: ORMailBugReportEMail];
-	NSMutableString* finalAddressList = [[[[address componentsSeparatedByString:@"\n"] componentsJoinedByString:@","] mutableCopy] autorelease];
-	[finalAddressList replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[address length])];
-	[finalAddressList replaceOccurrencesOfString:@",," withString:@"," options:NSLiteralSearch range:NSMakeRange(0,[address length])];
-	NSLog(@"The last ORCA crash log was sent to:\n%@",[finalAddressList componentsSeparatedByString:@","]);
+	NSLog(@"The last ORCA crash log was sent to: %@",address);
 }
 
 - (void) deleteCrashLog

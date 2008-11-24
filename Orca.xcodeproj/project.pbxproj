@@ -1608,7 +1608,6 @@
 		84D9809D0795C5AC0074A035 /* ORAD811Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D980970795C5AC0074A035 /* ORAD811Model.h */; };
 		84D980F60795DCC80074A035 /* ORAD811Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D980F40795DCC80074A035 /* ORAD811Decoders.m */; };
 		84D980F70795DCC80074A035 /* ORAD811Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D980F50795DCC80074A035 /* ORAD811Decoders.h */; };
-		84D981B20795F78E0074A035 /* ORUnivVoltCrateHVExceptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D981B10795F78E0074A035 /* ORUnivVoltCrateHVExceptions.h */; };
 		84D98264079605CD0074A035 /* ORL2551Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D9825C079605CD0074A035 /* ORL2551Model.m */; };
 		84D98265079605CD0074A035 /* ORL2551Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D9825D079605CD0074A035 /* ORL2551Controller.h */; };
 		84D98266079605CD0074A035 /* ORL2551Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D9825E079605CD0074A035 /* ORL2551Decoders.m */; };
@@ -3428,7 +3427,6 @@
 		84D980970795C5AC0074A035 /* ORAD811Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAD811Model.h; sourceTree = "<group>"; };
 		84D980F40795DCC80074A035 /* ORAD811Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAD811Decoders.m; path = Source/Objects/Hardware/Camac/AD811/ORAD811Decoders.m; sourceTree = SOURCE_ROOT; };
 		84D980F50795DCC80074A035 /* ORAD811Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAD811Decoders.h; path = Source/Objects/Hardware/Camac/AD811/ORAD811Decoders.h; sourceTree = SOURCE_ROOT; };
-		84D981B10795F78E0074A035 /* ORUnivVoltCrateHVExceptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltCrateHVExceptions.h; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltCrateHVExceptions.h"; sourceTree = SOURCE_ROOT; };
 		84D9825C079605CD0074A035 /* ORL2551Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL2551Model.m; path = Source/Objects/Hardware/Camac/L2551/ORL2551Model.m; sourceTree = SOURCE_ROOT; };
 		84D9825D079605CD0074A035 /* ORL2551Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL2551Controller.h; path = Source/Objects/Hardware/Camac/L2551/ORL2551Controller.h; sourceTree = SOURCE_ROOT; };
 		84D9825E079605CD0074A035 /* ORL2551Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL2551Decoders.m; path = Source/Objects/Hardware/Camac/L2551/ORL2551Decoders.m; sourceTree = SOURCE_ROOT; };
@@ -7560,7 +7558,6 @@
 				84E5840404DB1772005F64B1 /* ORPCICamacModel.m */,
 				84E583FF04DB1772005F64B1 /* ORPCICamacController.h */,
 				84E5840004DB1772005F64B1 /* ORPCICamacController.m */,
-				84D981B10795F78E0074A035 /* ORUnivVoltCrateHVExceptions.h */,
 				84E583FC04DB1772005F64B1 /* PCICamacCard.gif */,
 				84E583FB04DB1772005F64B1 /* PCICamac.nib */,
 			);
@@ -8599,7 +8596,6 @@
 				84D9809B0795C5AC0074A035 /* ORAD811Controller.h in Headers */,
 				84D9809D0795C5AC0074A035 /* ORAD811Model.h in Headers */,
 				84D980F70795DCC80074A035 /* ORAD811Decoders.h in Headers */,
-				84D981B20795F78E0074A035 /* ORUnivVoltCrateHVExceptions.h in Headers */,
 				84D98265079605CD0074A035 /* ORL2551Controller.h in Headers */,
 				84D9826A079605CD0074A035 /* ORL2551Decoders.h in Headers */,
 				84D9826B079605CD0074A035 /* ORL2551Model.h in Headers */,

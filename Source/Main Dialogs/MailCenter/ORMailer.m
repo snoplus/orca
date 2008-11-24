@@ -133,7 +133,7 @@
 {
 	@synchronized([NSApp delegate]){
 		delegate = aDelegate;
-		[self sendMailEmail];
+		[self performSelectorOnMainThread:@selector(sendMailEmail) withObject:nil waitUntilDone:NO];
 	}
 }
 
@@ -141,13 +141,14 @@
 	NSArray *array = [[self cc] componentsSeparatedByString:@","];
 	return array;
 }
+
 - (void) mailDone:(NSNotification*)aNote
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[mailTask release];
 	mailTask = nil;
-	if([delegate respondsToSelector:@selector(mailSent)]){
-		[delegate performSelector:@selector(mailSent) withObject:nil afterDelay:0];
+	if([delegate respondsToSelector:@selector(mailSent:)]){
+		[delegate mailSent:to];
 	}
 	[self autorelease];
 }
@@ -222,8 +223,8 @@
 										format:NSMIMEMailFormat
 									protocol:nil];
 			NSLog(@"email sent to: %@\n",to);
-			if([delegate respondsToSelector:@selector(mailSent)]){
-				[delegate performSelector:@selector(mailSent) withObject:nil afterDelay:0];
+			if([delegate respondsToSelector:@selector(mailSent:)]){
+				[delegate mailSent:to];
 				[self autorelease];
 			}
 			
@@ -310,10 +311,7 @@
         [incomingText release];
     }  
 	else {
-		if([allOutput rangeOfString:@"true"].location != NSNotFound){
-			NSLog( @"e-mail was sent to %@\n",to);
-		}
-		else {
+		if([allOutput rangeOfString:@"true"].location == NSNotFound){
 			NSLog( @"Possible problems with sending e-mail to %@\n",to);
 			NSLog(@"%@\n",allOutput);
 		}
