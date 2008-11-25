@@ -1,4 +1,5 @@
 //----Taken from the web ... 11/21/08 MAH
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4 \
 
 #define SYNTHESIZE_SINGLETON_FOR_ORCLASS(classname) \
 \
@@ -37,9 +38,9 @@ static OR##classname* shared##classname = nil; \
 	return self; \
 } \
  \
-- (NSUInteger)retainCount \
+- (unsigned long)retainCount \
 { \
-	return NSUIntegerMax; \
+	return 0xffffffff; \
 } \
  \
 - (void)release \
@@ -49,6 +50,108 @@ static OR##classname* shared##classname = nil; \
 - (id)autorelease \
 { \
 	return self; \
+}
+
+#define SYNTHESIZE_SINGLETON_FOR_CLASS(classname) \
+\
+static classname* shared##classname = nil; \
+\
++ (classname*) shared##classname \
+{ \
+@synchronized(self) { \
+if (shared##classname == nil) { \
+[[self alloc] init]; \
+} \
+} \
+\
+return shared##classname; \
+} \
+\
++ (id)allocWithZone:(NSZone *)zone \
+{ \
+@synchronized(self) { \
+if (shared##classname == nil) { \
+shared##classname = [super allocWithZone:zone]; \
+return shared##classname; \
+} \
+} \
+\
+return nil; \
+} \
+\
+- (id)copyWithZone:(NSZone *)zone \
+{ \
+return self; \
+} \
+\
+- (id)retain \
+{ \
+return self; \
+} \
+\
+- (unsigned long)retainCount \
+{ \
+return 0xffffffff; \
+} \
+\
+- (void)release \
+{ \
+} \
+\
+- (id)autorelease \
+{ \
+return self; \
+}
+#else
+#define SYNTHESIZE_SINGLETON_FOR_ORCLASS(classname) \
+\
+static OR##classname* shared##classname = nil; \
+\
++ (OR##classname*) shared##classname \
+{ \
+@synchronized(self) { \
+if (shared##classname == nil) { \
+[[self alloc] init]; \
+} \
+} \
+\
+return shared##classname; \
+} \
+\
++ (id)allocWithZone:(NSZone *)zone \
+{ \
+@synchronized(self) { \
+if (shared##classname == nil) { \
+shared##classname = [super allocWithZone:zone]; \
+return shared##classname; \
+} \
+} \
+\
+return nil; \
+} \
+\
+- (id)copyWithZone:(NSZone *)zone \
+{ \
+return self; \
+} \
+\
+- (id)retain \
+{ \
+return self; \
+} \
+\
+- (NSUInteger)retainCount \
+{ \
+return NSUIntegerMax; \
+} \
+\
+- (void)release \
+{ \
+} \
+\
+- (id)autorelease \
+{ \
+return self; \
 }
 
 #define SYNTHESIZE_SINGLETON_FOR_CLASS(classname) \
@@ -101,4 +204,4 @@ return NSUIntegerMax; \
 { \
 return self; \
 }
-
+#endif
