@@ -1988,7 +1988,7 @@ int mtcDacIndexes[14]=
 		SNOMtc_XilinxLoadStruct *responsePtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
 		errorCode = responsePtr->errorCode;
 		if(errorCode){
-			NSLog(@"%s\n",aPacket.message);
+			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
 			[NSException raise:@"Xilinx load failed" format:@""];
 		}
 		else {
@@ -1996,6 +1996,7 @@ int mtcDacIndexes[14]=
 		}
 	NS_HANDLER
 		NSLog(@"Xilinx load failed for the MTC/D.\n");
+		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
 	NS_ENDHANDLER
 }

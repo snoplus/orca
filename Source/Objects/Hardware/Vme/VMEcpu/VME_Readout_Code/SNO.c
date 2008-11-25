@@ -91,7 +91,7 @@ void loadMtcXilinx(SBC_Packet* aPacket)
 		if(result == 4){
 			aValue = 0x00000002;			// set  all bits, except bit 1[CCLK], low				
 			result = write_device(device, (char*)(&aValue), 4, programReg);
-			usleep(100000);					// 100 msec delay
+			usleep(10000);					// 100 msec delay
 		}
 		
 		if(result != 4){
@@ -161,7 +161,7 @@ void loadMtcXilinx(SBC_Packet* aPacket)
 		
 		if(!errorFlag){
 			
-			usleep(100000); // 10 msec delay
+			usleep(10000); // 10 msec delay
 			// check to see if the Xilinx was loaded properly 
 			// read the bit 2, this should be high if the Xilinx was loaded
 			result = read_device(device,(char*)(&readValue),4,programReg);
@@ -318,7 +318,6 @@ void loadXL2Clocks(SBC_Packet* aPacket)
 		strcpy(errorMessage,"Unable to get device.");		
 	}
 	
-	
 	/* echo the structure back with the error code*/
 	/* 0 == no Error*/
 	/* non-0 means an error*/
@@ -339,6 +338,7 @@ void loadXL2Clocks(SBC_Packet* aPacket)
 	close_device(device);
 	
 }
+
 #define FATAL_ERROR(n,message) {strncpy(errorMessage,message,80);	errorFlag = n;	goto earlyExit;}
 
 void loadXL2Xilinx(SBC_Packet* aPacket)
@@ -390,7 +390,7 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		uint8_t  firstPass		= 1;
 		uint32_t index			= length; 
 		uint32_t result;
-		
+
 		//select the cards that will be inited
 		result = write_device(device, (char*)(&selectBits), 4, xl2_select_reg);
 		if(result!=4) FATAL_ERROR(3,"Write Error: select xl2");	
@@ -399,7 +399,7 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		result = write_device(device, (char*)(&xl2_control_bit11), 4, xl2_control_status_reg);
 		if(result!=4) FATAL_ERROR(3,"Write Error: Setting DP bit");	
 		
-		usleep(200000);	//200 ms
+		usleep(20000);	//200 ms
 		
 		// now toggle this on the MB and turn on the XL2 xilinx load permission bit
 		// DO NOT USE CXL2_Secondary_Reg_Access here unless you retain the state
@@ -408,7 +408,7 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		result = write_device(device, (char*)(&writeValue), 4, xl2_xilinx_user_control);
 		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_xlpermit | xl2_enable_dp");	
 		
-		usleep(200000);	//200 ms
+		usleep(20000);	//200 ms
 		
 		// turn off the DP bit but keep 
 		writeValue = xl2_xlpermit | xl2_disable_dp;
@@ -420,7 +420,7 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		result = write_device(device, (char*)(&writeValue), 4, xl2_control_status_reg);
 		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_control_bit11 | xl2_control_clock");	
 		
-		usleep(200000);	//200 ms
+		usleep(20000);	//200 ms
 			
 		uint32_t i;
 		for (i = 1;i < index;i++){
@@ -460,7 +460,7 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 			}
 		}
 
-		usleep(200000);	//200 ms
+		usleep(20000);	//200 ms
 		// QRA :5/31/97 -- do this before reading the DON_PROG bit. Xilinx Load on our
 		// system now works. Why this should make any diferrence is a puzzle. 
 		// More Changes, RGV, PW : turn off XLPERMIT & clear this register
@@ -468,7 +468,7 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		result = write_device(device, (char*)(&writeValue), 4, xl2_xilinx_user_control);
 		if(result!=4)FATAL_ERROR(5,"Write Error: xl2_xilinx_user_control");
 			
-		usleep(200000);	//200 ms
+		usleep(20000);	//200 ms
 		
 		//check that the load was OK
 		result = write_device(device, (char*)(&xl2_control_done_prog), 4, xl2_control_status_reg);	
@@ -483,7 +483,7 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		if(result!=4)FATAL_ERROR(9,"Write Error: xl2_control_status_reg");
 							   
 		if (!(readValue & xl2_control_done_prog)){	
-			usleep(100000);
+			usleep(10000);
 			result = read_device(device,(char*)(&readValue),4,xl2_control_status_reg);
 			if(result!=4)FATAL_ERROR(10,"Write Error: Checking Prog Done");
 			if (!(readValue & xl2_control_done_prog)){	
