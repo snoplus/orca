@@ -23,6 +23,8 @@
 #import "ORXL1Model.h"
 
 @interface ORXL1Controller (private)
+- (void) setClockFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
 
 
@@ -43,27 +45,32 @@
 	
     [notifyCenter addObserver : self
 					 selector : @selector(xlinixFileChanged:)
-						 name : ORXilinxFileChanged
+						 name : ORXL1XilinxFileChanged
 					   object : model];
-
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(clockFileChanged:)
+                         name : ORXL1ClockFileChanged
+						object: model];
+	
     [notifyCenter addObserver : self
 					 selector : @selector(adcClockChanged:)
-						 name : ORFecAdcClockChanged
+						 name : ORXL1AdcClockChanged
 					   object : model];
 
     [notifyCenter addObserver : self
 					 selector : @selector(sequencerClockChanged:)
-						 name : ORFecSequencerClockChanged
+						 name : ORXL1SequencerClockChanged
 					   object : model];
 
     [notifyCenter addObserver : self
 					 selector : @selector(memoryClockChanged:)
-						 name : ORFecMemoryClockChanged
+						 name : ORXL1MemoryClockChanged
 					   object : model];
 
     [notifyCenter addObserver : self
 					 selector : @selector(memoryClockChanged:)
-						 name : ORFecAlowedErrorsChanged
+						 name : ORXL1AlowedErrorsChanged
 					   object : model];
 
 	[notifyCenter addObserver : self
@@ -76,16 +83,23 @@
 						 name : ORXL1Lock
 						object: nil];
 
+
 }
 - (void) updateWindow
 {
     [super updateWindow];
     [self lockChanged:nil];
-	[self xlinixFileChanged:nil];
 	[self adcClockChanged:nil];
 	[self sequencerClockChanged:nil];
 	[self memoryClockChanged:nil];
+	[self xlinixFileChanged:nil];
+	[self clockFileChanged:nil];
 	[self updateButtons];
+}
+
+- (void) clockFileChanged:(NSNotification*)aNote
+{
+	[clockFileTextField setStringValue: [[model clockFile] stringByAbbreviatingWithTildeInPath]];
 }
 
 - (void) checkGlobalSecurity
@@ -106,7 +120,7 @@
 {
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL1Lock];
 	[xlinixSelectFileButton	setEnabled: !lockedOrRunningMaintenance];
-	[xlinixFileField		setEnabled: !lockedOrRunningMaintenance];
+	[clockSelectFileButton	setEnabled: !lockedOrRunningMaintenance];
 	[adcClockField			setEnabled: !lockedOrRunningMaintenance];
 	[adcClockStepper		setEnabled: !lockedOrRunningMaintenance];
 	[sequencerClockField	setEnabled: !lockedOrRunningMaintenance];
@@ -139,6 +153,7 @@
 }
 
 #pragma mark •••Actions
+
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORXL1Lock to:[sender intValue] forWindow:[self window]];
@@ -166,6 +181,29 @@
                           contextInfo:NULL];
 }
 
+- (IBAction) clockFileAction:(id) sender
+{
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+	
+	NSString* fullPath = [[model clockFile] stringByExpandingTildeInPath];
+    if(fullPath)	startingDir = [[model clockFile] stringByDeletingLastPathComponent];
+    else			startingDir = NSHomeDirectory();
+	
+    [openPanel beginSheetForDirectory:startingDir
+                                 file:nil
+                                types:nil
+                       modalForWindow:[self window]
+                        modalDelegate:self
+                       didEndSelector:@selector(setClockFileDidEnd:returnCode:contextInfo:)
+                          contextInfo:NULL];
+}
+
+
 - (IBAction) adcClockAction:(id) sender
 {
 	[model setAdcClock:[sender floatValue]];
@@ -190,4 +228,12 @@
         [model setXilinxFile:[[sheet filenames] objectAtIndex:0]];
 		NSLog(@"FEC Xilinx default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
     }
-}@end
+}
+- (void) setClockFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+    if(returnCode){
+        [model setClockFile:[[sheet filenames] objectAtIndex:0]];
+		NSLog(@"FEC Clock default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+    }
+}
+@end

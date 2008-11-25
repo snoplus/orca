@@ -1,8 +1,11 @@
-//-----------------------------------------------------------
-//  SNOMtcCmds.h
-//  Orca
-//  Created by Mark Howe on 9/29/08
-//  Copyright 2008 CENPA, University of Washington. All rights reserved.
+/*
+ *  SNO.h
+ *  Orca
+ *
+ *  Created by Mark Howe on 9/29/08.
+ *  Copyright 2008 CENPA, University of Washington. All rights reserved.
+ *
+ */
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -17,24 +20,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#ifndef _H_SNOMTCCMDS_
-#define _H_SNOMTCCMDS_
-
-#include <sys/types.h>
-#include <stdint.h>
 #include "SBC_Cmds.h"
 
-#define kSNOMtcLoadXilinx  0x01
-
-typedef 
-	struct {
-		int32_t baseAddress;
-		int32_t addressModifier;
-		int32_t programRegOffset;
-        uint32_t errorCode;		/*filled on return*/
-		int32_t fileSize;		/*zero on return*/
-		//raw file data will follow
-	}
-SNOMtc_XilinxLoadStruct;
-
-#endif
+void loadMtcXilinx(SBC_Packet* aPacket);
+void loadXL2Clocks(SBC_Packet* aPacket);
+void loadXL2Xilinx(SBC_Packet* aPacket);
+void processSNOCommand(SBC_Packet* aPacket);

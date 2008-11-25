@@ -1501,11 +1501,11 @@
 		84B7F8D80820551F00721869 /* bigdotshadow.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7F8D50820551F00721869 /* bigdotshadow.tif */; };
 		84B7FBDD0993CF7300255787 /* ORScaleTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B7FBDB0993CF7300255787 /* ORScaleTask.h */; };
 		84B7FBDE0993CF7300255787 /* ORScaleTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7FBDC0993CF7300255787 /* ORScaleTask.m */; };
-		84BA98FD0E91260600E19946 /* SNOMtc.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA98FB0E91260500E19946 /* SNOMtc.h */; };
-		84BA99010E91279000E19946 /* SNOMtcCmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOMtcCmds.h */; };
-		84BA99050E91288800E19946 /* SNOMtcCmds.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOMtcCmds.h */; };
-		84BA99060E91288800E19946 /* SNOMtc.c in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA98FA0E91260500E19946 /* SNOMtc.c */; };
-		84BA99070E91288800E19946 /* SNOMtc.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA98FB0E91260500E19946 /* SNOMtc.h */; };
+		84BA98FD0E91260600E19946 /* SNO.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA98FB0E91260500E19946 /* SNO.h */; };
+		84BA99010E91279000E19946 /* SNOCmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOCmds.h */; };
+		84BA99050E91288800E19946 /* SNOCmds.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOCmds.h */; };
+		84BA99060E91288800E19946 /* SNO.c in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA98FA0E91260500E19946 /* SNO.c */; };
+		84BA99070E91288800E19946 /* SNO.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA98FB0E91260500E19946 /* SNO.h */; };
 		84BAA2A30E92A81A00E19946 /* ORSIS3300Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BAA29B0E92A81A00E19946 /* ORSIS3300Controller.h */; };
 		84BAA2A40E92A81A00E19946 /* ORSIS3300Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BAA29C0E92A81A00E19946 /* ORSIS3300Controller.m */; };
 		84BAA2A50E92A81A00E19946 /* ORSIS3300Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BAA29D0E92A81A00E19946 /* ORSIS3300Decoders.h */; };
@@ -1911,9 +1911,9 @@
 				8493CC8D0C99FAB400B46CD4 /* HW_Readout.h in VME_Copy */,
 				84A8B1540D35705700263D31 /* VME_Trigger32.c in VME_Copy */,
 				84A8B1550D35705700263D31 /* VME_Trigger32.h in VME_Copy */,
-				84BA99050E91288800E19946 /* SNOMtcCmds.h in VME_Copy */,
-				84BA99060E91288800E19946 /* SNOMtc.c in VME_Copy */,
-				84BA99070E91288800E19946 /* SNOMtc.h in VME_Copy */,
+				84BA99050E91288800E19946 /* SNOCmds.h in VME_Copy */,
+				84BA99060E91288800E19946 /* SNO.c in VME_Copy */,
+				84BA99070E91288800E19946 /* SNO.h in VME_Copy */,
 			);
 			name = VME_Copy;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3267,9 +3267,9 @@
 		84B8B99D04DB33F8005F64B1 /* NcdModel.m */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.objc; fileEncoding = 30; name = NcdModel.m; path = Source/Experiments/Ncd/NcdModel.m; sourceTree = SOURCE_ROOT; };
 		84B8E47604158398005F64B1 /* ORFileIOHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileIOHelpers.h; sourceTree = "<group>"; };
 		84B8E47704158398005F64B1 /* ORFileIOHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileIOHelpers.m; sourceTree = "<group>"; };
-		84BA98FA0E91260500E19946 /* SNOMtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SNOMtc.c; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/SNOMtc.c; sourceTree = SOURCE_ROOT; };
-		84BA98FB0E91260500E19946 /* SNOMtc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SNOMtc.h; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/SNOMtc.h; sourceTree = SOURCE_ROOT; };
-		84BA99000E91279000E19946 /* SNOMtcCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SNOMtcCmds.h; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/SNOMtcCmds.h; sourceTree = SOURCE_ROOT; };
+		84BA98FA0E91260500E19946 /* SNO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SNO.c; sourceTree = "<group>"; };
+		84BA98FB0E91260500E19946 /* SNO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNO.h; sourceTree = "<group>"; };
+		84BA99000E91279000E19946 /* SNOCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCmds.h; sourceTree = "<group>"; };
 		84BAA29B0E92A81A00E19946 /* ORSIS3300Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3300Controller.h; path = Source/Objects/Hardware/Vme/SIS3300/ORSIS3300Controller.h; sourceTree = SOURCE_ROOT; };
 		84BAA29C0E92A81A00E19946 /* ORSIS3300Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSIS3300Controller.m; path = Source/Objects/Hardware/Vme/SIS3300/ORSIS3300Controller.m; sourceTree = SOURCE_ROOT; };
 		84BAA29D0E92A81A00E19946 /* ORSIS3300Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSIS3300Decoders.h; path = Source/Objects/Hardware/Vme/SIS3300/ORSIS3300Decoders.h; sourceTree = SOURCE_ROOT; };
@@ -6221,9 +6221,9 @@
 				8493CC800C99FA4B00B46CD4 /* HW_Readout.h */,
 				84A8B1500D35704900263D31 /* VME_Trigger32.c */,
 				84A8B1510D35704900263D31 /* VME_Trigger32.h */,
-				84BA99000E91279000E19946 /* SNOMtcCmds.h */,
-				84BA98FA0E91260500E19946 /* SNOMtc.c */,
-				84BA98FB0E91260500E19946 /* SNOMtc.h */,
+				84BA99000E91279000E19946 /* SNOCmds.h */,
+				84BA98FA0E91260500E19946 /* SNO.c */,
+				84BA98FB0E91260500E19946 /* SNO.h */,
 			);
 			name = VME_Readout_Code;
 			path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code;
@@ -9019,8 +9019,8 @@
 				8444457E0E81311500A1440D /* ORIpeV4FLTModel.h in Headers */,
 				844446070E815C0D00A1440D /* ORXYCom200Controller.h in Headers */,
 				8444460B0E815C0D00A1440D /* ORXYCom200Model.h in Headers */,
-				84BA98FD0E91260600E19946 /* SNOMtc.h in Headers */,
-				84BA99010E91279000E19946 /* SNOMtcCmds.h in Headers */,
+				84BA98FD0E91260600E19946 /* SNO.h in Headers */,
+				84BA99010E91279000E19946 /* SNOCmds.h in Headers */,
 				84BAA2A30E92A81A00E19946 /* ORSIS3300Controller.h in Headers */,
 				84BAA2A50E92A81A00E19946 /* ORSIS3300Decoders.h in Headers */,
 				84BAA2A70E92A81A00E19946 /* ORSIS3300Model.h in Headers */,

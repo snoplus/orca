@@ -102,5 +102,9 @@
 	[model scan];
 }
 
+- (IBAction) doCrateLevelInit:(id)sender
+{
+	[model initCrate:YES];
+}
 
 @end

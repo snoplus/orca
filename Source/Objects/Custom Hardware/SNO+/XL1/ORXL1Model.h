@@ -35,6 +35,7 @@
 		float			sequencerClock;
 		float			memoryClock;
 		float			adcAllowedError[kNumFecMonitorAdcs];
+    NSString* clockFile;
 }
 
 #pragma mark •••Connection Stuff
@@ -54,6 +55,8 @@
 - (id)   getXL1;
 
 #pragma mark •••Accessors
+- (NSString*) clockFile;
+- (void) setClockFile:(NSString*)aClockFile;
 - (NSString*)	xilinxFile;
 - (void)		setXilinxFile:(NSString*)aFilePath;
 - (float)		adcClock;
@@ -64,6 +67,12 @@
 - (void)		setMemoryClock:(float)aValue;
 - (float)		adcAllowedError:(short)anIndex;
 - (void)		setAdcAllowedError:(short)anIndex withValue:(float)aValue;
+- (NSData*)		clockFileData;
+- (NSData*)		xilinxFileData;
+
+#pragma mark •••Archival
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Hardware Access
 - (void) writeHardwareRegister:(unsigned long) regAddress value:(unsigned long) aValue;
@@ -71,11 +80,13 @@
 
 @end
 
-extern NSString* ORXilinxFileChanged;
-extern NSString* ORFecAdcClockChanged;
-extern NSString* ORFecSequencerClockChanged;
-extern NSString* ORFecMemoryClockChanged;
-extern NSString* ORFecAlowedErrorsChanged;
+
+extern NSString* ORXL1ClockFileChanged;
+extern NSString* ORXL1XilinxFileChanged;
+extern NSString* ORXL1AdcClockChanged;
+extern NSString* ORXL1SequencerClockChanged;
+extern NSString* ORXL1MemoryClockChanged;
+extern NSString* ORXL1AlowedErrorsChanged;
 extern NSString* ORXL1Lock;
 
 

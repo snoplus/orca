@@ -673,7 +673,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	//this loads an entire copy of the client code onto the remote server and does a make.
 	//it does NOT start the code
     if(portNumber){
-		[self stopCrate];
+		NS_DURING
+			[self stopCrate];
+		NS_HANDLER
+			NSLog(@"Could not stop crate ... Probably already stopped\n");
+		NS_ENDHANDLER
 		NSLog(@"Core code for crate reload starting\n");
 		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
@@ -1790,7 +1794,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	//Note there are NO locks on this method, but it is private and can only be called from this object. Care must
 	//be taken that thread locks are provided at a higher level.
 	aPacket->message[0] = '\0';
-	if(!aSocket)	return;
+	if(!aSocket)	[NSException raise:@"Write Error" format:@"Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
+
     	// set up the file descriptor set
 	fd_set write_fds;
 	FD_ZERO(&write_fds);
@@ -1835,7 +1840,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 {	
 	//Note that there are NO locks on this method, but it is private and can only be called from this object. 
 	//Care must be taken that thread locks are provided at a higher level in this object
-	if(!aSocket)return;
+	if(!aSocket)	[NSException raise:@"Read Error" format:@"Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
+
 	
 	// set up the file descriptor set
 	fd_set fds;

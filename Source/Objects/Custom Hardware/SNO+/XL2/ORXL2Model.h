@@ -36,6 +36,26 @@
 #define XL2_HV_VOLTAGE_READ_REG					10
 #define XL2_HV_CURRENT_READ_REG					11
 
+// XL2 bit masks
+#define XL2_CONTROL_CRATE_RESET			0x00000080
+
+#define XL2_CONTROL_DONE_PROG			0x00000100
+#define XL2_CONTROL_DATA				0x00000200
+#define XL2_CONTROL_CLOCK				0x00000400
+#define XL2_CONTROL_BIT11				0x00000800
+
+#define XL2_SELECT_XL2					0x00020000
+#define XL2_DESELECT_XL2				0x00000000
+
+#define XL2_MASTER_CLK_EN				0x00008000
+#define XL2_MEMORY_CLK_EN				0x00000400
+#define XL2_SEQUENCER_CLK_EN			0x00000040
+#define XL2_ADC_CLK_EN					0x00000004
+
+#define XL2_XLPERMIT					0x000000A0 // Permit Xilinx Loading
+#define XL2_ENABLE_DP					0x00000008 // Enable DP on FEC32/DB 
+#define XL2_DISABLE_DP					0x000000A4 // Disable DP on FEC32/DB
+
 @interface ORXL2Model :  ORSNOCard 
 {
 	@protected
@@ -59,6 +79,7 @@
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark •••Hardware Access
+- (BOOL) adapterIsSBC;
 - (unsigned long) xl2RegAddress:(unsigned long)aRegOffset;
 - (void) selectCards:(unsigned long) selectBits;
 - (void) deselectCards;
@@ -67,9 +88,11 @@
 - (unsigned long) readFromXL2Register:(unsigned long) aRegister;
 - (void) writeHardwareRegister:(unsigned long) anAddress value:(unsigned long) aValue;
 - (unsigned long) readHardwareRegister:(unsigned long) regAddress;
+- (void) reset;
+- (void) loadTheClocks;
+- (void) loadTheXilinx;
+- (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask;
 
 @end
 
-@interface NSObject (ORXL2Model)
-- (int) stationNumber;
-@end
+

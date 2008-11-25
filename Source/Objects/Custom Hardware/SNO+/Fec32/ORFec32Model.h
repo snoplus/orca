@@ -233,7 +233,6 @@ typedef struct Fec32CmosShiftReg{
 - (float)	hVRef;
 - (void)	setHVRef:(float)aValue;
 - (BOOL)	pmtOnline:(unsigned short)index;
-- (int)		stationNumber;
 
 #pragma mark Converted Data Methods
 - (void)	setCmosVoltage:(short)anIndex withValue:(float) value;

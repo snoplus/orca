@@ -151,6 +151,7 @@
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••HW Access
+- (BOOL) adapterIsSBC;
 - (short) getNumberRegisters;
 - (NSString*) getRegisterName:(short) anIndex;
 - (unsigned long) read:(int)aReg;
@@ -218,8 +219,9 @@
 #pragma mark •••Settings
 - (void) saveSet:(NSString*)filePath;
 - (void) loadSet:(NSString*)filePath;
-
 @end
+
+
 
 extern NSString* ORMTCModelESumViewTypeChanged;
 extern NSString* ORMTCModelNHitViewTypeChanged;

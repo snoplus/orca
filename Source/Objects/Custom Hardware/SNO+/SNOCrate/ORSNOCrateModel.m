@@ -243,7 +243,15 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	ORFec32Model* proxyFec32 = [[ORFec32Model alloc] init];
 	[proxyFec32 setGuardian:self];
 	for(card=0;card<kNumSNOCards;card++){
-		[[self xl2] selectCards:1L<<card];	
+		BOOL xl2OK = YES;
+		NS_DURING
+			[[self xl2] selectCards:1L<<card];	
+		NS_HANDLER
+		xl2OK = NO;
+			NSLog(@"Unable to reach XL2 in crate: %d (Not inited?)\n",[self crateNumber]);
+		NS_ENDHANDLER
+		if(!xl2OK)break;
+		
 		NS_DURING
 			[proxyFec32 setSlot:card];
 			NSString* boardID = [proxyFec32 performBoardIDRead:MC_BOARD_ID_INDEX];
@@ -286,6 +294,35 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 {
 	return 1;
 }
+
+- (void) initCrate:(BOOL) loadTheFEC32XilinxFile
+{
+	
+	NS_DURING
+		// Now perfom a crate level initialization
+		[[self xl2] reset];			// STEP 1
+		[[self xl2] loadTheClocks]; // STEP 2
+		
+		// STEP 3 - don't load Xilinx if this crate is supplying HV
+		if(loadTheFEC32XilinxFile){
+			//MAH TBC implement this check somehow
+//			if( theHVStatus.IsThisSNOCrateSupplyingHV(its_SC_Number) ) {
+//				SetStatustoWarningStyle();
+//				StatusPrintf("Can not load Xilinx on crate %d",its_SC_Number);
+//				StatusPrintf("As the crate is supplying HV!!");
+//				StatusPrintf("Xilinx load skipped for crate %d",its_SC_Number);
+//				RestoreStatusStyle();
+//			}
+//			else {
+				[[self xl2] loadTheXilinx];
+//			}
+		}
+
+	NS_HANDLER		
+		NSLog(@"Crate %d init failed\n",[self crateNumber]);
+	NS_ENDHANDLER
+}
+
 
 @end
 

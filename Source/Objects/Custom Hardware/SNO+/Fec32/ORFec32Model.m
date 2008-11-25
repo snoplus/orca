@@ -116,11 +116,6 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	}
 }
 
-- (int) stationNumber
-{
-	return [[self crate] maxNumberOfObjects] - [self slot] - 1;
-}
-
 #pragma mark ***Accessors
 - (BOOL) dcPresent:(unsigned short)index
 {
@@ -861,10 +856,12 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	[aCard setSlot: aSlot];
 	[aCard moveTo:[self pointForSlot:aSlot]];
 }
+
 - (int) slotForObj:(id)anObj
 {
 	return [anObj slot];
 }
+
 - (int) numberSlotsNeededFor:(id)anObj
 {
 	return [anObj numberSlotsUsed];

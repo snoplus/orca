@@ -1,5 +1,5 @@
 TARGET  = OrcaReadout
-SOURCES = SBC_Readout.c CircularBuffer.c HW_Readout.c VME_Trigger32.c SNOMtc.c
+SOURCES = SBC_Readout.c CircularBuffer.c HW_Readout.c VME_Trigger32.c SNO.c
 
 
 OBJECTS = $(SOURCES:.c=.o)

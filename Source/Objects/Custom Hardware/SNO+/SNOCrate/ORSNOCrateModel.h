@@ -43,6 +43,7 @@
 
 - (void) scan;
 - (short) numberSlotsUsed;
+- (void) initCrate:(BOOL) loadTheFEC32XilinxFile;
 
 @end
 

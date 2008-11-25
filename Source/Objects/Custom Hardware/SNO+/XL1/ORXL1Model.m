@@ -24,11 +24,12 @@
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
 
-NSString* ORXilinxFileChanged			= @"ORXilinxFileChanged";
-NSString* ORFecAdcClockChanged			= @"ORFecAdcClockChanged";
-NSString* ORFecSequencerClockChanged	= @"ORFecSequencerClockChanged";
-NSString* ORFecMemoryClockChanged		= @"ORFecMemoryClockChanged";
-NSString* ORFecAlowedErrorsChanged		= @"ORFecAlowedErrorsChanged";
+NSString* ORXL1ClockFileChanged			= @"ORXL1ClockFileChanged";
+NSString* ORXL1XilinxFileChanged		= @"ORXL1XilinxFileChanged";
+NSString* ORXL1AdcClockChanged			= @"ORXL1AdcClockChanged";
+NSString* ORXL1SequencerClockChanged	= @"ORXL1SequencerClockChanged";
+NSString* ORXL1MemoryClockChanged		= @"ORXL1MemoryClockChanged";
+NSString* ORXL1AlowedErrorsChanged		= @"ORXL1AlowedErrorsChanged";
 NSString* ORXL1Lock						= @"ORXL1Lock";
 
 @implementation ORXL1Model
@@ -37,9 +38,27 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 
 - (void) dealloc
 {
+    [clockFile release];
     [connectorName release];
     [connector release];
     [super dealloc];
+}
+
+#pragma mark ***Accessors
+
+- (NSString*) clockFile
+{
+    return clockFile;
+}
+
+- (void) setClockFile:(NSString*)aClockFile
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setClockFile:clockFile];
+    
+    [clockFile autorelease];
+    clockFile = [aClockFile copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL1ClockFileChanged object:self];
 }
 
 - (void) setUpImage
@@ -183,7 +202,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	[xilinxFile release];
 	xilinxFile = aFilePath;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORXilinxFileChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL1XilinxFileChanged object:self];
 }
 
 - (float) adcClock
@@ -196,7 +215,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	
 	adcClock = aValue;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecAdcClockChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL1AdcClockChanged object:self];
 }
 
 - (float) sequencerClock
@@ -209,7 +228,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	
 	sequencerClock = aValue;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSequencerClockChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL1SequencerClockChanged object:self];
 }
 
 - (float) memoryClock
@@ -222,7 +241,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	
 	memoryClock = aValue;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecMemoryClockChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL1MemoryClockChanged object:self];
 }
 
 - (float) adcAllowedError:(short)anIndex
@@ -236,7 +255,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	
 	adcAllowedError[anIndex] = aValue;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORFecAlowedErrorsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORXL1AlowedErrorsChanged object:self];
 }
 
 
@@ -247,6 +266,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setClockFile:		[decoder decodeObjectForKey:@"clockFile"]];
     [self setConnectorName:	[decoder decodeObjectForKey:@"connectorName"]];
     [self setConnector:		[decoder decodeObjectForKey:@"connector"]];
 	[self setSlot:			[decoder decodeIntForKey:@"slot"]];
@@ -267,16 +287,37 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:[self connectorName]	forKey:@"connectorName"];
-    [encoder encodeObject:[self connector]		forKey:@"connector"];
-    [encoder encodeInt:[self slot]				forKey:@"slot"];
-	[encoder encodeObject:xilinxFile			forKey:@"xilinxFile"];
-	[encoder encodeFloat:adcClock				forKey:@"adcClock"];
-	[encoder encodeFloat:sequencerClock			forKey:@"sequencerClock"];
+    [encoder encodeObject:clockFile			forKey:@"clockFile"];
+    [encoder encodeObject:connectorName		forKey:@"connectorName"];
+    [encoder encodeObject:connector			forKey:@"connector"];
+    [encoder encodeInt:[self slot]			forKey:@"slot"];
+	[encoder encodeObject:xilinxFile		forKey:@"xilinxFile"];
+	[encoder encodeFloat:adcClock			forKey:@"adcClock"];
+	[encoder encodeFloat:sequencerClock		forKey:@"sequencerClock"];
 	int i;
 	for(i=0;i<kNumFecMonitorAdcs;i++){
 		[encoder encodeFloat:adcAllowedError[i] forKey:[NSString stringWithFormat:@"adcAllowedError%d",i]];
 	}	
+}
+
+- (NSData*) clockFileData
+{
+	NSData* theData = [NSData dataWithContentsOfFile:clockFile];
+	if(![theData length]){
+		[NSException raise:@"No Clock Data" format:@"Couldn't open clockFile",[clockFile stringByAbbreviatingWithTildeInPath]];
+		return nil; //can't get here, but avoid the compiler warning
+	}
+	else return theData;
+}
+
+- (NSData*) xilinxFileData
+{
+	NSData* theData = [NSData dataWithContentsOfFile:xilinxFile];
+	if(![theData length]){
+		[NSException raise:@"No Xilinx Data" format:@"Couldn't open xilinxFile",[xilinxFile stringByAbbreviatingWithTildeInPath]];
+		return nil; //can't get here, but avoid the compiler warning
+	}
+	else return theData;
 }
 
 #pragma mark •••Hardware Access
@@ -301,4 +342,6 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	
 	return aValue;
 }
+
+
 @end

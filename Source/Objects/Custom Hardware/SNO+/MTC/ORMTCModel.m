@@ -29,7 +29,7 @@
 #import "ORReadOutList.h"
 #import "SBC_Config.h"
 #import "VME_HW_Definitions.h"
-#import "SNOMtcCmds.h"
+#import "SNOCmds.h"
 #import "SBC_Link.h"
 #import "ORSelectorSequence.h"
 
@@ -179,9 +179,14 @@ int mtcDacIndexes[14]=
 @interface ORMTCModel (private)
 - (void) doBasicOp;
 - (void) setupDefaults;
-- (void) loadXilinxUsingLocalAdapter:(NSData*) theData;
+@end
+
+@interface ORMTCModel (SBC)
 - (void) loadXilinxUsingSBC:(NSData*) theData;
-- (void) finishXilinxLoad;
+@end
+
+@interface ORMTCModel (LocalAdapter)
+- (void) loadXilinxUsingLocalAdapter:(NSData*) theData;
 @end
 
 @implementation ORMTCModel
@@ -914,15 +919,10 @@ int mtcDacIndexes[14]=
 - (void) initializeMtc:(BOOL) loadTheMTCXilinxFile load10MHzClock:(BOOL) loadThe10MHzClock
 {
 	NS_DURING		
-		NSLog(@"Starting MTC init process....\n");
+		NSLog(@"Starting MTC init process....(load Xilinx: %@) (10MHzClock: %@)\n",loadTheMTCXilinxFile?@"YES":@"NO",loadThe10MHzClock?@"YES":@"NO");
+	
 		ORSelectorSequence* seq = [ORSelectorSequence selectorSequenceWithDelegate:self];
-		if (loadTheMTCXilinxFile) {
-			if([[self adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")]){
-				NSLog(@"Sending Xilinx file to the SBC. (Can take a few seconds)\n");
-			}
-
-			[[seq forTarget:self] loadMTCXilinx];									// STEP 1 : Load the Xilinx
-		}
+		if (loadTheMTCXilinxFile) [[seq forTarget:self] loadMTCXilinx];				// STEP 1 : Load the Xilinx
 		[[seq forTarget:self] clearGlobalTriggerWordMask];							// STEP 2: Clear the GT Word Mask
 		[[seq forTarget:self] clearPedestalCrateMask];								// STEP 3: Clear the Pedestal Crate Mask
 		[[seq forTarget:self] clearGTCrateMask];									// STEP 4: Clear the GT Crate Mask
@@ -1687,21 +1687,20 @@ int mtcDacIndexes[14]=
 
 }
 
+- (BOOL) adapterIsSBC
+{
+	return [[self adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")];
+}
+
 - (void) loadMTCXilinx
 {
-	NSData* theData;
-	// setup the file name 		
-	//setup the file parameters for the xilinx load operation	
-	if([[NSFileManager defaultManager] fileExistsAtPath:[self xilinxFilePath]]){
-		xilinxFileHandle = [[NSFileHandle fileHandleForReadingAtPath:[self xilinxFilePath]] retain];
-		theData = [[xilinxFileHandle readDataToEndOfFile] retain];			// load the entire content of the file
-	}
-	else {
+	NSData* theData = [NSData dataWithContentsOfFile:[self xilinxFilePath]];
+	if(![theData length]){
 		NSLog(@"Couldn't open the MTC Xilinx file %@!\n",[self xilinxFilePath]);
 		[NSException raise:@"Couldn't open Xilinx File" format:	[self xilinxFilePath]];	
 	}
 	
-	if([[self adapter] isKindOfClass:NSClassFromString(@"ORVmecpuModel")]){
+	if([self adapterIsSBC]){
 		[self loadXilinxUsingSBC:theData];
 	}
 	else {
@@ -1793,19 +1792,19 @@ int mtcDacIndexes[14]=
 	NS_DURING
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doBasicOp) object:nil];
 		if(useMemory){
+			//TBD.....
+			if(doReadOp){
+			}
+			else {
+			}
+		}
+		else {
 			if(doReadOp){
 				NSLog(@"%@: 0x%08x\n",reg[selectedRegister].regName,[self read:selectedRegister]);
 			}
 			else {
 				[self write:selectedRegister value:writeValue];
 				NSLog(@"Wrote 0x%08x to %@\n",writeValue,reg[selectedRegister].regName);
-			}
-		}
-		else {
-			//TBD.....
-			if(doReadOp){
-			}
-			else {
 			}
 		}
 		if(++workingCount<repeatCount){
@@ -1815,6 +1814,7 @@ int mtcDacIndexes[14]=
 			[self setBasicOpsRunning:NO];
 		}
 	NS_HANDLER
+		[self setBasicOpsRunning:NO];
 		NSLog(@"Mtc basic op exception: %@\n",localException);
 		[localException raise];
 	NS_ENDHANDLER
@@ -1834,7 +1834,9 @@ int mtcDacIndexes[14]=
 	[self setMtcDataBase:aDictionary];
 
 }
+@end
 
+@implementation ORMTCModel (LocalAdapter)
 - (void) loadXilinxUsingLocalAdapter:(NSData*) theData
 {
 	//--------------------------- The file format as of 1/7/97 -------------------------------------
@@ -1886,9 +1888,6 @@ int mtcDacIndexes[14]=
 
 			if ( (firstPass) && (*charData != '/') ){
 				charData++;
-				[self finishXilinxLoad];
-				[theData release];
-				theData = nil;				
 				NSLog(@"Invalid first character in Xilinx file.\n");
 				[NSException raise:@"Xilinx load failed" format:@""];
 			}
@@ -1902,9 +1901,6 @@ int mtcDacIndexes[14]=
 
 					i++;
 					if ( i>index ){
-						[self finishXilinxLoad];				
-						[theData release];
-						theData = nil;				
 						NSLog(@"Comment block not delimited by a backslash.\n");	
 						[NSException raise:@"Xilinx load failed" format:@""];
 					}
@@ -1929,9 +1925,6 @@ int mtcDacIndexes[14]=
 					aValue = DATA_LOW_CLOCK_LOW;	// bit 0 low and bit 1 low
 				}
 				else {
-					[self finishXilinxLoad];				
-					[theData release];
-					theData = nil;				
 					NSLog(@"Invalid character in Xilinx file.\n");
 					[NSException raise:@"Xilinx load failed" format:@""];
 				}
@@ -1956,27 +1949,26 @@ int mtcDacIndexes[14]=
 		if (!(readValue & 0x000000010))	// bit 4, PROGRAM*, should be high for Xilinx success		
 			NSLog(@"Xilinx load failed for the MTC/D!\n");
 
-		[self finishXilinxLoad];
-		[theData release];
-		theData = nil;				
 		
 	NS_HANDLER
 	
-		[self finishXilinxLoad];
-		[theData release];
-		theData = nil;				
 		NSLog(@"Xilinx load failed for the MTC/D.\n");
 		[localException raise];
 	
 	NS_ENDHANDLER
 }
+@end
 
+@implementation ORMTCModel (SBC)
 - (void) loadXilinxUsingSBC:(NSData*) theData
 {	
+	
+	NSLog(@"Sending Xilinx file to the SBC. (Can take a few seconds)\n");
+	
 	long errorCode = 0;
 	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
 	SBC_Packet aPacket;
-	aPacket.cmdHeader.destination	= kSNOMtc;
+	aPacket.cmdHeader.destination	= kSNO;
 	aPacket.cmdHeader.cmdID			= kSNOMtcLoadXilinx;
 	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SNOMtc_XilinxLoadStruct) + numLongs*sizeof(long);
 	
@@ -1991,9 +1983,6 @@ int mtcDacIndexes[14]=
 	char* p = (char*)payloadPtr + sizeof(SNOMtc_XilinxLoadStruct);
 	strncpy(p, dataPtr, [theData length]);
 	
-	//we don't use the file locally, so just close the file 
-	[self finishXilinxLoad];
-
 	NS_DURING
 		[[[self adapter] sbcLink] send:&aPacket receive:&aPacket];
 		SNOMtc_XilinxLoadStruct *responsePtr = (SNOMtc_XilinxLoadStruct*)aPacket.payload;
@@ -2009,13 +1998,6 @@ int mtcDacIndexes[14]=
 		NSLog(@"Xilinx load failed for the MTC/D.\n");
 		[localException raise];
 	NS_ENDHANDLER
-}
-
-- (void) finishXilinxLoad
-{
-	[xilinxFileHandle closeFile];
-	[xilinxFileHandle release];
-	xilinxFileHandle = nil;
 }
 
 

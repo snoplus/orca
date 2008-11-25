@@ -45,5 +45,6 @@
 - (IBAction) incCrateAction:(id)sender;
 - (IBAction) decCrateAction:(id)sender;
 - (IBAction) scan:(id)sender;
+- (IBAction) doCrateLevelInit:(id)sender;
 
 @end

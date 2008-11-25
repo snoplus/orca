@@ -31,7 +31,7 @@
 #include "CircularBuffer.h"
 #include "VME_HW_Definitions.h"
 #include "VME_Trigger32.h"
-#include "SNOMtc.h"
+#include "SNO.h"
 #include "universe_api.h"
 
 #define kDMALowerLimit   0x100 //require 256 bytes
@@ -57,7 +57,7 @@ void processHWCommand(SBC_Packet* aPacket)
 	/*look at the first word to get the destination*/
 	int32_t destination = aPacket->cmdHeader.destination;
 	switch(destination){
-		case kSNOMtc:		processMTCCommand(aPacket); break;
+		case kSNO:		processSNOCommand(aPacket); break;
 		default:			break;
 	}
 }

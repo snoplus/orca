@@ -43,9 +43,6 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 
 - (void) dealloc
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORSequenceStopped 
-														object:delegate
-													  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:tag],@"tag",nil]];
 	[selectors release];
 	[nextSelector release];
 	[super dealloc];
@@ -108,11 +105,16 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 
 - (void) stopSequence
 {
+	if([delegate respondsToSelector:@selector(sequenceCompleted:)]) [delegate sequenceCompleted:self];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSequenceStopped 
+														object:delegate
+													  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:tag],@"tag",nil]];
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[selectors release];
 	selectors = nil;
 	[self autorelease];
-	[delegate sequenceCompleted:self];
 }
 
 @end
@@ -139,13 +141,12 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 
 		}
 		else {
-			if([delegate respondsToSelector:@selector(sequenceCompleted:)]) [delegate sequenceCompleted:self];
-			[self autorelease];
+			[self stopSequence];
 		}
 	
 	NS_HANDLER
 		NSLog(@"Task sequence aborted because of exception: %@\n",localException);
-		[self autorelease];
+		[self stopSequence];
 		[localException raise];
 	NS_ENDHANDLER
 }

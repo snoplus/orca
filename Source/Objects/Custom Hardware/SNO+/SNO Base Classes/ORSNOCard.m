@@ -44,6 +44,11 @@ NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
     return 0;
 }
 
+- (int) stationNumber
+{
+	return [[self crate] maxNumberOfObjects] - [self slot] - 1;
+}
+
 - (void) guardian:(id)aGuardian positionConnectorsForCard:(id)aCard
 {
 }

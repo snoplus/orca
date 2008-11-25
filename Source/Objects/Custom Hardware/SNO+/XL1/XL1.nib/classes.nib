@@ -5,8 +5,56 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>adcClockAction</key>
+				<string>id</string>
+				<key>clockFileAction</key>
+				<string>id</string>
+				<key>lockAction</key>
+				<string>id</string>
+				<key>memoryClockAction</key>
+				<string>id</string>
+				<key>sequencerClockAction</key>
+				<string>id</string>
+				<key>xlinixFileAction</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
-			<string>NSApplication</string>
+			<string>ORXL1Controller</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>adcClockField</key>
+				<string>NSTextField</string>
+				<key>adcClockStepper</key>
+				<string>NSStepper</string>
+				<key>clockFileTextField</key>
+				<string>NSTextField</string>
+				<key>clockSelectFileButton</key>
+				<string>NSButton</string>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>memoryClockField</key>
+				<string>NSTextField</string>
+				<key>memoryClockStepper</key>
+				<string>NSStepper</string>
+				<key>sequencerClockField</key>
+				<string>NSTextField</string>
+				<key>sequencerClockStepper</key>
+				<string>NSStepper</string>
+				<key>xlinixFileField</key>
+				<string>NSTextField</string>
+				<key>xlinixSelectFileButton</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
@@ -14,7 +62,7 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>NSView</string>
+			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
@@ -39,44 +87,17 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>adcClockAction</key>
+				<key>sequenceCompleted</key>
 				<string>id</string>
-				<key>lockAction</key>
+				<key>taskFinished</key>
 				<string>id</string>
-				<key>memoryClockAction</key>
-				<string>id</string>
-				<key>sequencerClockAction</key>
-				<string>id</string>
-				<key>xlinixFileAction</key>
+				<key>tasksCompleted</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
-			<string>ORXL1Controller</string>
+			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>adcClockField</key>
-				<string>NSTextField</string>
-				<key>adcClockStepper</key>
-				<string>NSStepper</string>
-				<key>lockButton</key>
-				<string>NSButton</string>
-				<key>memoryClockField</key>
-				<string>NSTextField</string>
-				<key>memoryClockStepper</key>
-				<string>NSStepper</string>
-				<key>sequencerClockField</key>
-				<string>NSTextField</string>
-				<key>sequencerClockStepper</key>
-				<string>NSStepper</string>
-				<key>xlinixFileField</key>
-				<string>NSTextField</string>
-				<key>xlinixSelectFileButton</key>
-				<string>NSButton</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>OrcaObjectController</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -105,21 +126,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>sequenceCompleted</key>
-				<string>id</string>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

@@ -32,6 +32,7 @@
 - (int) tagBase;
 - (NSString*) boardID;
 - (void) setBoardID:(NSString*)anId;
+- (int) stationNumber;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;
