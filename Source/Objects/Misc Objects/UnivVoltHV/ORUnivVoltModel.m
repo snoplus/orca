@@ -383,7 +383,7 @@ NSString* UVkWrite = @"W";
 	{
 		// LD command handles all channels at once so unit identifier is Sx followed by parameter followed
 		// by values for all 12 channels.
-		command = [NSString stringWithFormat: @"LD S%d.%d %@", [self stationNumber], aCurChnl, param];
+		aCommand = [NSString stringWithFormat: @"LD S%d.%d %@", [self stationNumber], aCurChnl, param];
 	}
 			
 	if ( [[aDictParamObj objectForKey: UVkType] isEqualTo: UVkINT] )

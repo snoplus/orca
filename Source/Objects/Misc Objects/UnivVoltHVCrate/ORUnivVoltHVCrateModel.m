@@ -494,7 +494,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
 		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
  		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
-		NSArray* tokens;
 		
 //added the following to get rid of a 10.4 compiler warning.   MAH 11/13/08 
 #if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
@@ -502,7 +501,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		NSString* temp = [tokens componentsJoinedByString:@" "];
 		tokens = [temp componentsSeparatedByString: @" "]; 
 #else
-		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
+		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
  		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
 		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
 #endif
