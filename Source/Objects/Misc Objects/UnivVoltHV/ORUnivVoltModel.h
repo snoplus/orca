@@ -39,6 +39,9 @@ typedef enum hveStatus hveStatus;
 //	NSArray*				mAllCommands;
 	NSMutableDictionary*	mParams;	//Dictionary of HV unit parameters indicating type of parameter and whether it is R or R/W. 
 	NSMutableArray*			mCommands;  //Crate commands for HV Unit
+	NSNumber*				mPollTimeMinutes; 
+	int						mWParams;
+	bool					mPollTaskIsRunning;
 }
 
 #pragma mark ••• Notifications
@@ -50,6 +53,14 @@ typedef enum hveStatus hveStatus;
 - (NSString *) createCommand: (int) aCurChnl 
                 dictParamObj: (NSDictionary *) aDictParamObj
 				     command: (NSString *) aCommand;
+
+#pragma mark ••• Polling
+- (float) pollTimeMinutes;
+- (void) setPollTimeMinutes: (float) aPollTimeMinutes;
+- (void) startPolling;
+- (void) stopPolling;
+- (void) pollTask;
+- (bool) isPollingTaskRunning;
 
 #pragma mark •••Accessors
 - (NSMutableArray*) channelArray;
@@ -103,6 +114,9 @@ extern NSString* UVChnlChanged;
 extern NSString* UVCardSlotChanged;
 
 extern NSString* UVChnlHVValuesChanged;
+
+extern NSString* UVPollTimeMinutesChanged;
+extern NSString* UVStatusPollTaskChanged;
 
 // HV unit Parameters
 // Data is stored as dictionary objects in mChannelArray.

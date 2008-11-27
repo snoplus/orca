@@ -110,16 +110,21 @@
 					     name : UVChnlHVValuesChanged
 					   object : model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector( pollingTimeChanged:)
+                         name : UVPollTimeMinutesChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector( pollingStatusChanged:)
+                         name : UVStatusPollTaskChanged
+						object: model];
+
 	[notifyCenter  addObserver: self
 	                  selector: @selector( writeErrorMsg: )
 					     name : HVSocketNotConnectedNotification
 					   object : nil];
 
-    [notifyCenter addObserver : self
-					 selector : @selector(slotChanged:)
-						 name : UVCardSlotChanged
-					   object : model];
-	
 }
 
 
@@ -134,6 +139,15 @@
 	[mChnlTable reloadData];
 }
 
+- (void) setValues: (NSNotification *) aNote
+{
+	NSDictionary* curChnlDict = [aNote userInfo];
+	mCurrentChnl = [[curChnlDict objectForKey: HVkCurChnl] intValue];
+	[self setChnlValues: mCurrentChnl];
+
+	[mChnlTable reloadData];
+}
+
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	[[self window] setTitle:[NSString stringWithFormat:@"Univ Volt Card (Slot %d)",[model stationNumber]]];
@@ -143,15 +157,6 @@
 {
 	[super setModel:aModel];
 	[[self window] setTitle:[NSString stringWithFormat:@"Univ Volt Card (Slot %d)",[model stationNumber]]];
-}
-
-- (void) setValues: (NSNotification *) aNote
-{
-	NSDictionary* curChnlDict = [aNote userInfo];
-	mCurrentChnl = [[curChnlDict objectForKey: HVkCurChnl] intValue];
-	[self setChnlValues: mCurrentChnl];
-
-	[mChnlTable reloadData];
 }
 
 - (void) updateWindow
@@ -167,11 +172,12 @@
 	[self MVDZChanged: nil];
 	[self MCDZChanged: nil];
 	[self hvLimitChanged: nil];
-	[self slotChanged: nil];
+	[self pollingTimeChanged: nil];
 	
 	[mChnlTable reloadData];	
 }
 
+#pragma mark •••Notification - Responses•••
 - (void) channelChanged: (NSNotification*) aNote
 {
 	[self setCurrentChnl: (NSNotification *) aNote ];  
@@ -245,6 +251,18 @@
 	[mHVLimit setFloatValue: [model HVLimit: mCurrentChnl]];
 }
 
+- (void) pollingTimeChanged: (NSNotification *) aNote
+{
+	[mPollingTimeMinsField setIntValue: [model pollTimeMinutes]];
+}
+
+- (void) pollingStatusChanged: (NSNotification *) aNote
+{
+	bool ifPoll = [model isPollingTaskRunning];;
+	[mStartStopPolling setTitle: ( ifPoll ? @"Stop" : @"Start" ) ];
+//		[mStartStopPolling setText
+}
+
 - (void) writeErrorMsg: (NSNotification*) aNote
 {
 	NSDictionary* errorDict = [aNote userInfo];
@@ -297,31 +315,30 @@
 
 - (IBAction) setDemandHV: (id) aSender
 {	
-	[model setDemandHV: [mDemandHV stringValue]];
-}
+	[model setDemandHV: [mDemandHV floatValue] chnl: mCurrentChnl];}
 - (IBAction) setTripCurrent: (id) aSender
 {
-	[model setTripCurrent: [mTripCurrent stringValue]];	
+	[model setTripCurrent: [mTripCurrent floatValue] chnl: mCurrentChnl];	
 }
 
 - (IBAction) setRampUpRate: (id) aSender
 {
-	[model setRampUpRate: [mRampUpRate stringValue]];
+	[model setRampUpRate: [mRampUpRate floatValue] chnl: mCurrentChnl];
 }
 
 - (IBAction) setRampDownRate: (id) aSender
 {
-	[model setRampDownRate: [mRampDownRate stringValue]];
+	[model setRampDownRate: [mRampDownRate floatValue] chnl: mCurrentChnl];
 }
 
 - (IBAction) setMVDZ: (id) aSender
 {
-	[model setMVDZ: [mMVDZ stringValue]];
+	[model setMVDZ: [mMVDZ floatValue] chnl: mCurrentChnl];
 }
 
 - (IBAction) setMCDZ: (id) aSender
 {
-	[model setMCDZ: [mMCDZ stringValue]];
+	[model setMCDZ: [mMCDZ floatValue] chnl: mCurrentChnl];
 }
 
 - (IBAction) updateTable: (id) aSender
@@ -350,6 +367,22 @@
 {
 	NSLog( @"Download hardware values\n" );
 	[model loadValues: -1];
+}
+
+- (IBAction) pollTimeAction: (id) aSender
+{
+	[model setPollTimeMinutes: [mPollingTimeMinsField floatValue]];
+}
+
+- (IBAction) startStopPolling: (id) aSender
+{
+	if ( [model isPollingTaskRunning] ) {
+		[model stopPolling];
+	} else {
+		int pollingTimeMins = [mPollingTimeMinsField intValue];
+		[model setPollTimeMinutes: pollingTimeMins] ;
+		[model startPolling];
+	}
 }
 
 

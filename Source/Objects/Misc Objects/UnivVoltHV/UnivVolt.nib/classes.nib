@@ -17,6 +17,10 @@
 			<dict>
 				<key>hardwareValues</key>
 				<string>id</string>
+				<key>hardwareValuesOneChannel</key>
+				<string>id</string>
+				<key>pollTimeAction</key>
+				<string>id</string>
 				<key>setChannelNumberField</key>
 				<string>id</string>
 				<key>setChannelNumberStepper</key>
@@ -24,6 +28,8 @@
 				<key>setChnlEnabled</key>
 				<string>id</string>
 				<key>setDemandHV</key>
+				<string>id</string>
+				<key>setHardwareValesOneChannel</key>
 				<string>id</string>
 				<key>setHardwareValues</key>
 				<string>id</string>
@@ -36,6 +42,8 @@
 				<key>setRampUpRate</key>
 				<string>id</string>
 				<key>setTripCurrent</key>
+				<string>id</string>
+				<key>startStopPolling</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -58,6 +66,8 @@
 				<string>NSTextField</string>
 				<key>mHVLimit</key>
 				<string>NSTextField</string>
+				<key>mLastPoll</key>
+				<string>NSTextField</string>
 				<key>mMCDZ</key>
 				<string>NSTextField</string>
 				<key>mMVDZ</key>
@@ -66,10 +76,14 @@
 				<string>NSTextField</string>
 				<key>mMeasuredHV</key>
 				<string>NSTextField</string>
+				<key>mPollingTimeMinsField</key>
+				<string>NSTextField</string>
 				<key>mRampDownRate</key>
 				<string>NSTextField</string>
 				<key>mRampUpRate</key>
 				<string>NSTextField</string>
+				<key>mStartStopPolling</key>
+				<string>NSButton</string>
 				<key>mStatus</key>
 				<string>NSTextField</string>
 				<key>mTripCurrent</key>
@@ -133,6 +147,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>

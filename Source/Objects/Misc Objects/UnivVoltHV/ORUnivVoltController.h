@@ -38,6 +38,9 @@
 	IBOutlet NSTextField*			mMCDZ;				// measured current dead zone.  "
 	IBOutlet NSTextField*			mHVLimit;
 	IBOutlet NSTextField*			mCmdStatus;			// Status of executed command.
+	IBOutlet NSTextField*			mPollingTimeMinsField;	// Number of minutes between refresh of data.
+	IBOutlet NSTextField*			mLastPoll;			// Time when last poll conducted.
+	IBOutlet NSButton*				mStartStopPolling;  // Button that can start and stop the polling.
 	char							mStatusByte;
 	int								mCurrentChnl;		// Current channel visible in display.
 }
@@ -56,6 +59,8 @@
 - (void) MCDZChanged: (NSNotification*) aNote;
 - (void) hvLimitChanged: (NSNotification*) aNote;
 - (void) writeErrorMsg: (NSNotification*) aNote;
+- (void) pollingTimeChanged: (NSNotification*) aNote;
+- (void) pollingStatusChanged: (NSNotification*) aNote;
 //- (void) settingsLockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
@@ -72,6 +77,8 @@
 - (IBAction) setHardwareValues: (id) aSender;
 - (IBAction) hardwareValuesOneChannel: (id ) aSender;
 - (IBAction) hardwareValues: (id) aSender;
+- (IBAction) pollTimeAction: (id) aSender;
+- (IBAction) startStopPolling: (id ) aSender;
 //- (IBAction) updateTable: (id) aSender;
 
 #pragma mark ***Getters

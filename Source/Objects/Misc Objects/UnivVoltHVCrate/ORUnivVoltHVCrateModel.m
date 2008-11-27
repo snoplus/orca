@@ -94,6 +94,8 @@ NSString* HVCrateEnetAvailableNotification				= @"HVCrateEnetAvailableNotificati
 NSString* HVUnitInfoAvailableNotification				= @"HVUnitInfoAvailableNotification";
 NSString* HVSocketNotConnectedNotification				= @"HVSocketNotConnectedNotification";
 
+NSString* HVCratePollTimeChanged						= @"HVCratePollTimeChanged";
+
 // HV crate commands
 NSString* ORHVkCrateHVStatus							= @"HVSTATUS";
 NSString* ORHVkCrateConfig							    = @"CONFIG";
@@ -178,6 +180,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 - (void) awakeAfterDocumentLoaded
 {
 	@try {
+		[super awakeAfterDocumentLoaded];
 		if ( [ipAddress length] == 0 ) {
 			NSString* tmpIPAddress = [NSString stringWithCString: kUnivVoltHVAddress encoding: NSASCIIStringEncoding ];
 			[self setIpAddress: tmpIPAddress];
@@ -191,9 +194,9 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	@finally
 	{
 	}
-
-
+	NSLog( @"awakeAfterDocumentLoaded - OUnivVoltHVCrateModel." );
 }
+
 
 //---------------------------------------------------------------------------------------------------
 - (void) dealloc
@@ -278,8 +281,8 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
     [[NSNotificationCenter defaultCenter] postNotificationName: HVCrateIpAddressChangedNotification object: self];
 }
-//---------------------------------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------------------------------
 - (NetSocket*) socket
 {
 	return mSocket;
@@ -311,6 +314,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	[self sendCrateCommand: ORHVkCrateHVStatus];
 }
  
+
 - (void) hvPanic
 {
 	[self sendCrateCommand: ORHVkCrateHVPanic];
@@ -344,10 +348,10 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 // (See top of this file for additional details.)
 //------------------------------------------------------------------------------------------------
 - (BOOL) queueCommand: (int) aCmdId			// 0 based.
-		     totalCmds: (int) aTotalCmds
-                  slot: (int) aCurrentUnit 
-			   channel: (int) aCurrentChnl 
-			   command: (NSString*) aCommand 
+			totalCmds: (int) aTotalCmds
+				 slot: (int) aCurrentUnit 
+			  channel: (int) aCurrentChnl 
+			  command: (NSString*) aCommand 
 {
 	BOOL	queuedCmd = NO;
 	
@@ -395,6 +399,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 			    NSLog( @"Queue cmd with id: %d - %@\n", aCmdId, aCommand );
 				*/
 				queuedCmd = YES;
+				NSLog( @"Queue cmd: %@ for channel: %d\n", aCommand, aCurrentChnl );
 		    }
 		
 		    // Queue has been filled so dequeue a single command.
@@ -463,7 +468,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	int			retSlotNum;
 	int			retChnlNum;
 	int			scanLoc;
-	int			j;
+//	int			j;
 	int			i;
 
 	@try {		
@@ -485,6 +490,10 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	
 		// Parse the returned data.
 		returnFromSocket = [[self interpretDataFromSocket: aSomeData returnCode: &returnCode] retain];
+		NSLog( @"return from socket %@\n", returnFromSocket );
+		NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
+		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
+ 		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
 		NSArray* tokens;
 		
 //added the following to get rid of a 10.4 compiler warning.   MAH 11/13/08 
@@ -493,9 +502,11 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		NSString* temp = [tokens componentsJoinedByString:@" "];
 		tokens = [temp componentsSeparatedByString: @" "]; 
 #else
-		NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
+		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
+ 		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
 		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
 #endif
+
 
 		
 		// 1) Make sure we have data returned from HV Crate.
@@ -535,11 +546,13 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 			if ( [retCommand isEqualTo: storedCmdStr]  )
 			{
 				// Debug only. Print list of tokens.
-				for ( j = 0;  j < [tokens count]; j++ ) {
+/*				
+					int j;
+					for ( j = 0;  j < [tokens count]; j++ ) {
 					NSString* object = [tokens objectAtIndex: j];
 					NSLog( @"Token ( %d ) string: %@\n", j, object );
 				}
-			
+*/			
 				// 4) Crate only returns.
 				if ( [queuedChnl intValue] == -1 )
 					[self handleCrateReturn: retCommand retString: returnFromSocket retTokens: tokens];
@@ -1171,7 +1184,10 @@ static NSString*	ORUnivVoltHVCrateIPAddress		= @"ORUnivVoltHVCrateIPAddress";
 	return;
 	*/
 
+
+
 @end
+
 
 @implementation ORUnivVoltHVCrateModel (OROrderedObjHolding)
 - (int) maxNumberOfObjects { return 16; }

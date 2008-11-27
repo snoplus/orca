@@ -22,6 +22,7 @@
 //				 If a different mapping is needed for some other reason, the stationNumber method is used. Needed to do this to get rid
 //				 all of the xxxCrateView objects by moving functionality into the Crate objects themselves.
 
+
 #pragma mark •••Imported Files
 #import "ORUnivVoltModel.h"
 #import "ORUnivVoltHVCrateModel.h"
@@ -47,6 +48,8 @@ NSString* HVkMVDZ = @"MVDZ";
 NSString* HVkMCDZ = @"MCDZ";
 NSString* HVkHVLimit = @"HVL";
 NSString* HVkCurChnl = @"HVCurChnl";
+
+NSString* HVkPollTimeMinutes = @"mPollTimeMinutes";
 
 // Order in which data is returned from DMP command.  Index in token array.
 const int HVkCommandIndx = 0;
@@ -78,6 +81,9 @@ NSString* UVChnlMVDZChanged				= @"ChnlMVDZChanged";
 NSString* UVChnlMCDZChanged				= @"ChnlMCDZChanged";
 NSString* UVChnlHVLimitChanged			= @"ChnlHVLimitChanged";
 NSString* UVCardSlotChanged				= @"UVCardSlotChanged";
+
+NSString* UVPollTimeMinutesChanged		= @"UVPollTimeMinutesChanged";
+NSString* UVStatusPollTaskChanged		= @"UVStatusPollTaskChanged";
 
 NSString* UVChnlHVValuesChanged			= @"ChnlHVValuesChanged";
 
@@ -134,12 +140,14 @@ NSString* UVkWrite = @"W";
 
 - (void) dealloc
 {
-		
+	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];		
     [super dealloc];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
+
+	NSLog( @"awakeAfterDocumentLoaded - ORUnivVoltModel.m" );
 		@try {
 			mParams = [NSMutableDictionary dictionaryWithCapacity: UVkChnlNumParameters];
 
@@ -159,6 +167,7 @@ NSString* UVkWrite = @"W";
 			NSArray* keys = [NSArray arrayWithObjects: HVkParam, UVkReadWrite, UVkType, nil];
 				
 		
+			mWParams = 0;
 			NSArray* objects0 = [NSArray arrayWithObjects: @"Chnl", UVkRead, @"int", nil];
 			NSDictionary* tmpParam0 = [NSDictionary dictionaryWithObjects: objects0 forKeys: keys];
 			[mParams setObject: tmpParam0 forKey: @"Chnl"];
@@ -171,22 +180,27 @@ NSString* UVkWrite = @"W";
 			NSDictionary* tmpParam2 = [NSDictionary dictionaryWithObjects: objects2 forKeys: keys];
 			[mParams setObject: tmpParam2 forKey: HVkMeasuredHV];
 
+			mWParams++;
 			NSArray* objects5 = [NSArray arrayWithObjects:HVkDemandHV, UVkWrite, UVkFLOAT, nil];
 			NSDictionary* tmpParam5 = [NSDictionary dictionaryWithObjects: objects5 forKeys: keys];
 			[mParams setObject: tmpParam5 forKey: HVkDemandHV];
 
+			mWParams++;
 			NSArray* objects6 = [NSArray arrayWithObjects: HVkRampUpRate, UVkWrite, UVkFLOAT, nil];
 			NSDictionary* tmpParam6 = [NSDictionary dictionaryWithObjects: objects6 forKeys: keys];
 			[mParams setObject: tmpParam6 forKey: HVkRampUpRate];
 
+			mWParams++;
 			NSArray* objects7 = [NSArray arrayWithObjects: HVkRampDownRate, UVkWrite, UVkFLOAT, nil];
 			NSDictionary* tmpParam7 = [NSDictionary dictionaryWithObjects: objects7 forKeys: keys];
 			[mParams setObject: tmpParam7 forKey: HVkRampDownRate];
 
+			mWParams++;
 			NSArray* objects8 = [NSArray arrayWithObjects: HVkTripCurrent, UVkWrite, UVkFLOAT, nil];
 			NSDictionary* tmpParam8 = [NSDictionary dictionaryWithObjects: objects8 forKeys: keys];
 			[mParams setObject: tmpParam8 forKey: HVkTripCurrent];
 		
+			mWParams++;
 			NSArray* objects4 = [NSArray arrayWithObjects: HVkChannelEnabled, UVkWrite, UVkINT, nil];
 			NSDictionary* tmpParam4 = [NSDictionary dictionaryWithObjects: objects4 forKeys: keys];
 			[mParams setObject: tmpParam4 forKey: HVkChannelEnabled];
@@ -199,6 +213,7 @@ NSString* UVkWrite = @"W";
 			NSDictionary* tmpParam10 = [NSDictionary dictionaryWithObjects: objects10 forKeys: keys];
 			[mParams setObject: tmpParam10 forKey: HVkMVDZ];
 		
+			mWParams++;
 			NSArray* objects11 = [NSArray arrayWithObjects: HVkMCDZ, UVkWrite, UVkFLOAT, nil];
 			NSDictionary* tmpParam11 = [NSDictionary dictionaryWithObjects: objects11 forKeys: keys];
 			[mParams setObject: tmpParam11 forKey: HVkMCDZ];
@@ -222,12 +237,15 @@ NSString* UVkWrite = @"W";
 			for ( j = 0; j < [mParams count]; j++ )
 			{
 				NSDictionary* dictObj = [mParams objectForKey: [allKeys objectAtIndex: j]];				// Get static dictionary for this chnl describing the parameters.
-				NSString*	commandDict = [dictObj objectForKey: UVkCommand];		
+				NSString*	commandDict = [dictObj objectForKey: HVkParam];		
 				NSString*	writableDict = [dictObj objectForKey: UVkRW];
 				NSString*   typeDict = [dictObj objectForKey: UVkType ];
 		
-				NSLog( @" Command '%@', R/W :%@, Type: %@\n", commandDict, writableDict, typeDict );
+				NSLog( @" Param '%@', R/W :%@, Type: %@\n", commandDict, writableDict, typeDict );
 			}
+			
+			// Set polltask to false
+			mPollTaskIsRunning = FALSE;
 		/* */
 	}	
 	@catch (NSException *exception) {
@@ -264,7 +282,7 @@ NSString* UVkWrite = @"W";
 	int		slot;
 	
 	slot = [self stationNumber];
-	if ( aCurrentChnl > -1 )
+    if ( aCurrentChnl > -1 )
 	{
 		NSString* command = [NSString stringWithFormat: @"DMP S%d.%d", slot, aCurrentChnl];
 		[[self crate] queueCommand: 0 totalCmds: 1 slot: [self stationNumber] channel: aCurrentChnl command: command];
@@ -284,6 +302,8 @@ NSString* UVkWrite = @"W";
 {
 //	int			i;
 	int			jParam;
+	int			writeCmdCtr = 0;
+//	int			nParams;
 //	float		value;	
 	//Debug code - 
 /*	NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
@@ -296,7 +316,7 @@ NSString* UVkWrite = @"W";
 	
 	// loop through parameters since we load all twelve channels at once on a normal basis.
 //	for ( jParam = 0; jParam < [allKeys count]; jParam++ )
-	for ( jParam = 0; jParam < 1; jParam++ )
+	for ( jParam = 0; jParam < [allKeys count]; jParam++ )
 	{
 		int				iChnl;
 		NSString*		command = [NSString stringWithFormat: @""];
@@ -318,8 +338,9 @@ NSString* UVkWrite = @"W";
 								 dictParamObj: dictParamObj
 								      command: command];
 				[command retain];
-				[[ self crate] queueCommand: jParam totalCmds: 1 slot: [self stationNumber] channel: aCurrentChnl command: command];
-//				[[ self crate] queueCommand: jParam totalCmds: [mParams count] slot: [self stationNumber] channel: aCurrentChnl command: command];
+//				[[ self crate] queueCommand: jParam totalCmds: 1 slot: [self slot] channel: aCurrentChnl command: command];
+				[[ self crate] queueCommand: writeCmdCtr totalCmds: mWParams slot: [self slot] channel: aCurrentChnl command: command];
+				writeCmdCtr++;
 				[command release];
 			}
 			
@@ -334,7 +355,8 @@ NSString* UVkWrite = @"W";
 				
 				    [command retain];
 					// Single command has been assembled for one param - now queue it.
-				    [[ self crate] queueCommand: jParam totalCmds: [mParams count] slot: [self stationNumber] channel: iChnl command: command];
+				    [[ self crate] queueCommand: writeCmdCtr totalCmds: mWParams slot: [self slot] channel: iChnl command: command];
+					writeCmdCtr++;
 					[command release];
 
 				} // Loop through channels
@@ -361,7 +383,7 @@ NSString* UVkWrite = @"W";
 	{
 		// LD command handles all channels at once so unit identifier is Sx followed by parameter followed
 		// by values for all 12 channels.
-		aCommand = [NSString stringWithFormat: @"LD S%d.%d %@", [self stationNumber], aCurChnl, param];
+		command = [NSString stringWithFormat: @"LD S%d.%d %@", [self stationNumber], aCurChnl, param];
 	}
 			
 	if ( [[aDictParamObj objectForKey: UVkType] isEqualTo: UVkINT] )
@@ -374,6 +396,65 @@ NSString* UVkWrite = @"W";
 	return( aCommand );
 }
 
+#pragma mark •••Polling
+- (float) pollTimeMinutes
+{
+	return( [mPollTimeMinutes floatValue] );
+}
+
+- (void) setPollTimeMinutes: (float) aPollTimeMinutes
+{
+//    [[[self undoManager] prepareWithInvocationTarget: self] setPollTimeMinutes: aPollTimeMinutes];
+	[mPollTimeMinutes release];
+    mPollTimeMinutes = [NSNumber numberWithFloat: aPollTimeMinutes];
+	[mPollTimeMinutes retain];
+	NSLog( @"Set polling time to %f\n", [mPollTimeMinutes floatValue]);
+    [[NSNotificationCenter defaultCenter] postNotificationName: UVPollTimeMinutesChanged object: self];
+}
+
+
+- (void) startPolling
+{    
+	mPollTaskIsRunning = FALSE;
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
+	
+	if ( [mPollTimeMinutes floatValue] > 0 ) {
+		[self performSelector: @selector (loadValues ) withObject: nil afterDelay: [mPollTimeMinutes floatValue]];
+//		[self performSelector: @selector (loadValues ) withObject: nil afterDelay: 0.2];
+		mPollTaskIsRunning = TRUE;
+		NSLog( @"Started poll task with interval: %f\n", [mPollTimeMinutes floatValue]);
+		[[NSNotificationCenter defaultCenter] postNotificationName: UVStatusPollTaskChanged object: self];
+	}
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
+	}
+}
+
+- (void) stopPolling
+{	
+	NSLog( @"Stopped poll task with interval: %f\n", [mPollTimeMinutes floatValue]);
+	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVStatusPollTaskChanged object: self];
+	mPollTaskIsRunning = FALSE;
+}
+
+- (void) pollTask;
+{
+//	float pollTimeSecs = mPollTimeMinutes * 60;
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
+//	[self getValues: -1];
+	NSDate *now = [NSDate date]; 
+	NSLog( @"Polling task called %@\n", [now description] );
+	[self performSelector: @selector( pollTask) withObject: nil afterDelay: [mPollTimeMinutes floatValue]];
+	mPollTaskIsRunning = TRUE;
+}
+
+- (bool) isPollingTaskRunning
+{
+	return mPollTaskIsRunning;
+}
 
 #pragma mark •••Accessors
 - (NSMutableArray*) channelArray
@@ -437,8 +518,6 @@ NSString* UVkWrite = @"W";
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
 	return( [[tmpChnl objectForKey: HVkMeasuredCurrent] floatValue] );
 }
-
-
 
 - (float) measuredHV: (int) aChnl
 {
@@ -571,7 +650,6 @@ NSString* UVkWrite = @"W";
 	return( [[tmpChnl objectForKey: HVkHVLimit] floatValue] );
 }
 
-
 #pragma mark •••Interpret Data
 - (void) interpretDataReturn: (NSNotification*) aNote
 {
@@ -583,7 +661,7 @@ NSString* UVkWrite = @"W";
 		
 		// Get data for this channel from crate - in ORCA place data in NOTIFICATION Object.
 //		NSDictionary* returnData = [[self crate] returnDataToHVUnit];
-		NSLog ( @"Command from dictionary '%@'\n", [returnData objectForKey: UVkCommand]);
+//		NSLog ( @" '%@'\n", [returnData objectForKey: UVkCommand]);
 		[returnData retain];
 			
 		NSNumber* slotNum = [returnData objectForKey: UVkSlot];
@@ -821,12 +899,13 @@ NSString* UVkWrite = @"W";
     
     [[self undoManager] disableUndoRegistration];
 	[self setChannelArray: [decoder decodeObjectForKey: @"mChannelArray"]];
-	
+	mPollTimeMinutes = [decoder decodeObjectForKey: HVkPollTimeMinutes];
 	if( !mChannelArray ){
 		//first time.... set up the structure....
 		[self setChannelArray: [NSMutableArray array]];
 		int i;
 		
+		mPollTimeMinutes = [NSNumber numberWithFloat: 1.0];
 		// Put in dummy values for testing.
 		for(i = 0 ; i < UVkNumChannels; i++ )
 		{
@@ -863,9 +942,11 @@ NSString* UVkWrite = @"W";
 			
 			[mChannelArray insertObject: tmpChnl atIndex: i];
 		}
+		
 	}
 	
 	[mChannelArray retain];
+	[mPollTimeMinutes retain];
     [[self undoManager] enableUndoRegistration]; 
 	
 	// Model does not automatically call registerNotificationObservers so we do it here where object is restored
@@ -879,6 +960,8 @@ NSString* UVkWrite = @"W";
 {
     [super encodeWithCoder:encoder];
 	[encoder encodeObject: mChannelArray forKey: @"mChannelArray"];
+//	NSNumber* pollingTime = [NSNumber numberWithFloat: mPollTimeMinutes];
+	[encoder encodeObject: mPollTimeMinutes forKey: HVkPollTimeMinutes];
 }
 
 #pragma mark •••Utilities
@@ -941,4 +1024,5 @@ NSString* UVkWrite = @"W";
 {
     return UVCardSlotChanged;
 }
+
 @end

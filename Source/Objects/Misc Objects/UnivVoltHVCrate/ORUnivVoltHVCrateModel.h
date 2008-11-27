@@ -117,6 +117,7 @@ typedef enum hveCommands hveCommands;
 - (int) objWidth;
 @end
 
+
 #pragma mark •••Notification string definitions.
 extern NSString* HVCrateIsConnectedChangedNotification;
 extern NSString* HVCrateIpAddressChangedNotification;
