@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark •••Imported Files
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
 
 #import "SBC_Link.h"
 #import "SBC_Linking.h"
@@ -47,7 +47,7 @@
 
 #define kSBCRateIntegrationTime 1.5
 
-#pragma mark •••External Strings
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢External Strings
 NSString* SBC_LinkLoadModeChanged			= @"SBC_LinkLoadModeChanged";
 NSString* SBC_LinkInitAfterConnectChanged	= @"SBC_LinkInitAfterConnectChanged";
 NSString* SBC_LinkReloadingChanged			= @"SBC_LinkReloadingChanged";
@@ -139,7 +139,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
 }
 
-#pragma mark •••Accessors
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
 - (int) slot
 {
 	return [delegate slot];
@@ -265,7 +265,6 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkForceReloadChanged object:self];
 }
 
-
 - (BOOL) reloading
 {
     return reloading;
@@ -277,6 +276,16 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkReloadingChanged object:self];
 }
+
+- (BOOL) goScriptFailed
+{
+    return goScriptFailed;
+}
+
+- (void) setGoScriptFailed:(BOOL)aGoScriptFailed
+{
+    goScriptFailed = aGoScriptFailed;
+}	
 
 - (void) setCompilerErrors:(int)aValue
 {
@@ -548,7 +557,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 }
 
 
-#pragma mark •••Archival
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super init];
@@ -773,6 +782,10 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[self setCompilerWarnings:compilerWarnings+1];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
+	else if([text rangeOfString:@"goScript:"].location != NSNotFound){
+		[self setGoScriptFailed:YES];
+		NSLogColor([NSColor redColor], @"%@\n",text);
+	}
 	else if([text rangeOfString:@"min/avg/max/stddev"].location!=NSNotFound){
 		NSScanner* scanner = [NSScanner scannerWithString:text];
 		[scanner scanUpToString:@"min/avg/max/stddev" intoString:nil];
@@ -829,6 +842,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (void) startCrateCode
 {
+	[self setGoScriptFailed:NO];
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
@@ -1334,7 +1348,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	[self write:socketfd buffer:&aPacket];	
 }
 
-#pragma mark •••DataSource
+#pragma mark ‚Ä¢‚Ä¢‚Ä¢DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
 {
 	*aMinValue  = 0;
@@ -1674,6 +1688,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		
 		case kWaitingForStart:
 			if(isConnected)startCrateState = kDone;
+			else if (goScriptFailed) startCrateState = kDone;
 			else {
 				NS_DURING
 					[self connect];

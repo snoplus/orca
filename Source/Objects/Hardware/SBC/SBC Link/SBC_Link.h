@@ -70,6 +70,7 @@ typedef enum eSBC_ThrottleConsts{
 	SBC_info_struct runInfo;
 	NSDate*			lastQueUpdate;
     BOOL			reloading;
+	BOOL			goScriptFailed;
 	NSData*			leftOverData;
 	BOOL			isConnected;
     NSCalendarDate*	timeConnected;
@@ -151,6 +152,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) setForceReload:(BOOL)flag;
 - (BOOL) reloading;
 - (void) setReloading:(BOOL)aReloading;
+- (BOOL) goScriptFailed;
+- (void) setGoScriptFailed:(BOOL)aGoScriptFailed;
 - (void) setCompilerErrors:(int)aValue;
 - (int) compilerErrors;
 - (void) setCompilerWarnings:(int)aValue;

@@ -1,2 +1,3 @@
 #!/bin/bash
-ps ax | grep <serverName> | awk '{print $1}' | xargs -i kill {} 2&>/dev/null
+#ps ax | grep <serverName> | awk '{print $1}' | xargs -i kill {} 2&>/dev/null
+killall -9 <serverName> 2&> /dev/null
