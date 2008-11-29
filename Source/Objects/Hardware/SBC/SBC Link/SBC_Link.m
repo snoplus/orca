@@ -782,7 +782,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[self setCompilerWarnings:compilerWarnings+1];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}
-	else if([text rangeOfString:@"goScript:"].location != NSNotFound){
+	else if([text rangeOfString:@"goscript:"].location != NSNotFound){
 		[self setGoScriptFailed:YES];
 		NSLogColor([NSColor redColor], @"%@\n",text);
 	}

@@ -5,10 +5,10 @@ STATUS_FILE=${HOME}/ORCA/stat.txt
 if [ "$(pidof -s <serverName>)" ]
 then
 	#Orca loop running
-	#output is logged if it includes "goScript:"
+	#output is logged if it includes "goscript:"
 	#any output is logged if the verbose flag is checked in the gui
 	#"error:" and/or "warning" and/or "min/avg/max/stddev" not allowed in any output
-	echo "goScript: Can not start the crate, the crate is running already."
+	echo "goscript: Can not start the crate, the crate is running already."
 
 	if [ -r $STATUS_FILE ]
 	then
@@ -20,12 +20,12 @@ then
 			START="$line"
 		done < $STATUS_FILE
 		START="$((($(date +%s) - $START) / 60))"
-		echo "goScript: The crate was started by $ORCA_USER $START minutes ago."
+		echo "goscript: The crate was started by $ORCA_USER $START minutes ago."
 	else
-		echo "goScript: Status file not found."
+		echo "goscript: Status file not found."
 	fi
 
-	echo "goScript: You may force start or kill the crate."
+	echo "goscript: You may kill the crate."
 else
 	#no Orca loop running
 	#any output is logged if the verbose flag is checked in the gui
