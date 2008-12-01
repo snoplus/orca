@@ -79,14 +79,14 @@
 - (NSArray*) dequeueArray
 {
     NSMutableArray* theDataArray = nil;
+	[queueLock lock];
     if([self count]){
-        [queueLock lock];
         theDataArray = [NSMutableArray array];
         while([super count]){
             [theDataArray addObject:[super dequeue]];
         }
-        [queueLock unlock];
     }
+	[queueLock unlock];
     return theDataArray;
 }
 
