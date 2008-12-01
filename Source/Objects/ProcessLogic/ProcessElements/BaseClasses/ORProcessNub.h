@@ -35,4 +35,5 @@
 - (BOOL) highlighted;
 - (int) state;
 - (int) evaluatedState;
+- (void) connectionChanged;
 @end

@@ -71,4 +71,8 @@
     return [guardian description:prefix];
 }
 
+- (void) connectionChanged
+{
+	//nothing to do.... prevents a run-time error
+}
 @end
