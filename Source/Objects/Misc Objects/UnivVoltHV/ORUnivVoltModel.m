@@ -66,6 +66,8 @@ const int HVkMVDZIndx = 10;
 const int HVkMCDZIndx = 11;
 const int HVkHVLimitIndx = 12;
 
+const float kMinutesToSecs = 60.0;
+
 // Notifications
 NSString* UVChnlChanged					= @"ChnlChanged";
 NSString* UVChnlEnabledChanged			= @"ChnlChannelEnabledChanged";
@@ -408,7 +410,7 @@ NSString* UVkWrite = @"W";
 	[mPollTimeMinutes release];
     mPollTimeMinutes = [NSNumber numberWithFloat: aPollTimeMinutes];
 	[mPollTimeMinutes retain];
-	NSLog( @"Set polling time to %f\n", [mPollTimeMinutes floatValue]);
+	NSLog( @"UnivVoltModel - Set polling time to %f\n", [mPollTimeMinutes floatValue]);
     [[NSNotificationCenter defaultCenter] postNotificationName: UVPollTimeMinutesChanged object: self];
 }
 
@@ -417,13 +419,14 @@ NSString* UVkWrite = @"W";
 {    
 	mPollTaskIsRunning = FALSE;
 	
+	float pollTimeSecs = kMinutesToSecs * [mPollTimeMinutes floatValue];
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 	
 	if ( [mPollTimeMinutes floatValue] > 0 ) {
-		[self performSelector: @selector (loadValues ) withObject: nil afterDelay: [mPollTimeMinutes floatValue]];
-//		[self performSelector: @selector (loadValues ) withObject: nil afterDelay: 0.2];
+		[self performSelector: @selector( pollTask ) withObject: nil afterDelay: pollTimeSecs];
 		mPollTaskIsRunning = TRUE;
-		NSLog( @"Started poll task with interval: %f\n", [mPollTimeMinutes floatValue]);
+		NSLog( @"Started poll task with interval: %f\n", pollTimeSecs);
 		[[NSNotificationCenter defaultCenter] postNotificationName: UVStatusPollTaskChanged object: self];
 	}
 	else {
@@ -441,13 +444,14 @@ NSString* UVkWrite = @"W";
 
 - (void) pollTask;
 {
-//	float pollTimeSecs = mPollTimeMinutes * 60;
+	float pollTimeSecs = kMinutesToSecs * [mPollTimeMinutes floatValue];
+
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 //	[self getValues: -1];
 	NSDate *now = [NSDate date]; 
 	NSLog( @"Polling task called %@\n", [now description] );
-	[self performSelector: @selector( pollTask) withObject: nil afterDelay: [mPollTimeMinutes floatValue]];
+	[self performSelector: @selector( pollTask) withObject: nil afterDelay: pollTimeSecs];
 	mPollTaskIsRunning = TRUE;
 }
 

@@ -253,7 +253,8 @@
 
 - (void) pollingTimeChanged: (NSNotification *) aNote
 {
-	[mPollingTimeMinsField setIntValue: [model pollTimeMinutes]];
+	[mPollingTimeMinsField setFloatValue: [model pollTimeMinutes]];
+	NSLog( @"Controller - notified of polling time change: %f\n", [mPollingTimeMinsField floatValue]);
 }
 
 - (void) pollingStatusChanged: (NSNotification *) aNote
@@ -379,7 +380,7 @@
 	if ( [model isPollingTaskRunning] ) {
 		[model stopPolling];
 	} else {
-		int pollingTimeMins = [mPollingTimeMinsField intValue];
+		float pollingTimeMins = [mPollingTimeMinsField floatValue];
 		[model setPollTimeMinutes: pollingTimeMins] ;
 		[model startPolling];
 	}
