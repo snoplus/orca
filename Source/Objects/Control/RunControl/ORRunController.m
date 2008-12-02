@@ -235,6 +235,8 @@
         [timeLimitStepper setEnabled:NO];
         [runModeMatrix setEnabled:NO];
 		[quickStartCB setEnabled:NO];
+		[startUpScripts setEnabled:NO];
+		[shutDownScripts setEnabled:NO];
     }
     else {
 	
@@ -249,6 +251,8 @@
             [timeLimitStepper setEnabled:NO];
             [runModeMatrix setEnabled:NO];
             [repeatRunCB setEnabled:[model timedRun]];
+			[startUpScripts setEnabled:NO];
+			[shutDownScripts setEnabled:NO];
         }
         else if([model runningState] == eRunStopped){
             [startRunButton setEnabled:anyVetos?NO:YES];
@@ -259,6 +263,8 @@
             [timeLimitStepper setEnabled:[model timedRun]];
             [runModeMatrix setEnabled:YES];
             [repeatRunCB setEnabled:[model timedRun]];
+			[startUpScripts setEnabled:YES];
+			[shutDownScripts setEnabled:YES];
         }
         else if([model runningState] == eRunStarting || [model runningState] == eRunStopping){
             [startRunButton setEnabled:NO];
@@ -269,6 +275,8 @@
             [timeLimitStepper setEnabled:NO];
             [runModeMatrix setEnabled:NO];
             [repeatRunCB setEnabled:NO];
+			[startUpScripts setEnabled:NO];
+			[shutDownScripts setEnabled:NO];
         }
     }
 }
