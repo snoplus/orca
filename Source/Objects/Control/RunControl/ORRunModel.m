@@ -26,9 +26,14 @@
 #import "ORDataTaker.h"
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
+#import "ORRunScriptModel.h";
 
 #pragma mark ¥¥¥Definitions
 
+NSString* ORRunModelShutDownScriptStateChanged	= @"ORRunModelShutDownScriptStateChanged";
+NSString* ORRunModelStartScriptStateChanged		= @"ORRunModelStartScriptStateChanged";
+NSString* ORRunModelShutDownScriptChanged		= @"ORRunModelShutDownScriptChanged";
+NSString* ORRunModelStartScriptChanged			= @"ORRunModelStartScriptChanged";
 NSString* ORRunRemoteInterfaceChangedNotification = @"ORRunRemoteInterfaceChangedNotification";
 NSString* ORRunTimedRunChangedNotification      = @"RunModel TimedRun? Changed";
 NSString* ORRunRepeatRunChangedNotification 	= @"RunModel RepeatRun? Changed";
@@ -78,6 +83,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 -(void)dealloc
 {
+    [shutDownScriptState release];
+    [startScriptState release];
+    [shutDownScript release];
+    [startScript release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [timer invalidate];
@@ -165,6 +174,68 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (NSString*) shutDownScriptState
+{
+	if(!shutDownScriptState)return @"---";
+	else  return shutDownScriptState;
+}
+
+- (void) setShutDownScriptState:(NSString*)aShutDownScriptState
+{
+	if(!aShutDownScriptState)aShutDownScriptState = @"---";
+    [shutDownScriptState autorelease];
+    shutDownScriptState = [aShutDownScriptState copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelShutDownScriptStateChanged object:self];
+}
+
+- (NSString*) startScriptState
+{
+	if(!startScriptState)return @"---";
+    return startScriptState;
+}
+
+- (void) setStartScriptState:(NSString*)aStartScriptState
+{
+	if(!aStartScriptState)aStartScriptState = @"---";
+    [startScriptState autorelease];
+    startScriptState = [aStartScriptState copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelStartScriptStateChanged object:self];
+}
+
+- (ORRunScriptModel*) shutDownScript
+{
+    return shutDownScript;
+}
+
+- (void) setShutDownScript:(ORRunScriptModel*)aShutDownScript
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShutDownScript:shutDownScript];
+    
+    [aShutDownScript retain];
+    [shutDownScript release];
+    shutDownScript = aShutDownScript;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelShutDownScriptChanged object:self];
+}
+
+- (ORRunScriptModel*) startScript
+{
+    return startScript;
+}
+
+- (void) setStartScript:(ORRunScriptModel*)aStartScript
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setStartScript:startScript];
+    
+    [aStartScript retain];
+    [startScript release];
+    startScript = aStartScript;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelStartScriptChanged object:self];
+}
 
 - (BOOL) runPaused
 {
@@ -551,7 +622,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 #pragma mark ¥¥¥Run Modifiers
 
--(void)startRun
+- (void) startRun
 {
     
     [self setNextRunWillQuickStart:quickStart];
@@ -562,7 +633,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     else [self startRun:!quickStart];
 }
 
--(void)restartRun
+- (void) restartRun
 {
     [self setNextRunWillQuickStart:YES];
     if([self isRunning]){
@@ -573,7 +644,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(void)remoteStartRun:(unsigned long)aRunNumber
+- (void) remoteStartRun:(unsigned long)aRunNumber
 {
 	if([[self document] isDocumentEdited])return;
 
@@ -598,7 +669,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     }
 }
 
--(void)remoteRestartRun:(unsigned long)aRunNumber
+- (void) remoteRestartRun:(unsigned long)aRunNumber
 {
 	[self setRemoteInterface:NO];
     if(aRunNumber==0xffffffff){
@@ -624,7 +695,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(void)startRun:(BOOL)doInit
+- (void) startRun:(BOOL)doInit
 {
     
     _forceRestart = NO;
@@ -644,11 +715,21 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 	[self setRunningState:eRunStarting];
 	//pass off to the next event cycle so the run starting state can be drawn on the screen
-	[self performSelector:@selector(startRun1:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
+	if(startScript){
+		[startScript setSelectorOK:@selector(startRun1:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInit] target:self];
+		[self setStartScriptState:@"Running"];
+		[startScript runScript];
+	}
+	else [self performSelector:@selector(startRun1:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
 }
 	
 - (void) startRun1:(NSNumber*)doInitBool
 {
+	if(startScript){
+		[self setShutDownScriptState:@"---"];
+		[self setStartScriptState:@"Done"];
+	}
+	
 	BOOL doInit = [doInitBool boolValue];
     NS_DURING
         [runFailedAlarm clearAlarm];
@@ -734,18 +815,27 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     }
 }
 
--(void)haltRun
+- (void) runAbortFromScript
+{
+	NSLogColor([NSColor redColor], @"Run startup aborted by script!\n");
+	[self haltRun];
+}
+
+- (void) haltRun
 {
     ignoreRepeat = YES;
     [self stopRun];
 }
 
 
--(void)stopRun
+- (void) stopRun
 {
+	[self setShutDownScriptState:@"---"];
+	[self setStartScriptState:@"---"];
+	
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     
-    if(!dataTakingThreadRunning){
+    if(!dataTakingThreadRunning && !startScript){
         NSLog(@"Stop Run message received and ignored because no run in progress.\n");
         return;
     }
@@ -789,12 +879,20 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		}
 		[self performSelector:@selector(waitForRunToStop) withObject:nil afterDelay:.1];
 	}
-	else [self finishRunStop];
-
+	else {
+		if(shutDownScript){
+			[self setShutDownScriptState:@"Running"];
+			[shutDownScript setSelectorOK:@selector(finishRunStop) bad:nil withObject:nil target:self];
+			[shutDownScript runScript];
+		}
+		else [self finishRunStop];
+	}
 }
 
 - (void) finishRunStop
 {
+	[self setStartScriptState:@"---"];
+	[self setShutDownScriptState:@"---"];
 	[dataTypeAssigner release];
 	dataTypeAssigner = nil;
     
@@ -954,7 +1052,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return dataDictionary;
 }
 
--(void)runStarted:(BOOL)doInit
+- (void) runStarted:(BOOL)doInit
 {
 	
     [heartBeatTimer invalidate];
@@ -1096,7 +1194,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[client runIsStopping:dataPacket userInfo:nil];
 	
 	BOOL allDone = NO;
-	do {
+	if(client) do {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
 		[client takeData:dataPacket userInfo:nil];
 		allDone = [client doneTakingData];
@@ -1237,7 +1335,7 @@ static NSString *ORRunTimedRun		= @"Run Is Timed";
 static NSString *ORRunRepeatRun		= @"Run Will Repeat";
 static NSString *ORRunNumberDir		= @"Run Number Dir";
 static NSString *ORRunType_Mask		= @"ORRunTypeMask";
-static NSString *ORRunRemoteControl 	= @"ORRunRemoteControl";
+static NSString *ORRunRemoteControl = @"ORRunRemoteControl";
 static NSString *ORRunQuickStart 	= @"ORRunQuickStart";
 static NSString *ORRunDefinitions 	= @"ORRunDefinitions";
 static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
@@ -1248,6 +1346,8 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setShutDownScript:[decoder decodeObjectForKey:@"shutDownScript"]];
+    [self setStartScript:[decoder decodeObjectForKey:@"startScript"]];
     [self setTimeLimit:[decoder decodeInt32ForKey:ORRunTimeLimit]];
     [self setRunType:[decoder decodeInt32ForKey:ORRunType_Mask]];
     [self setTimedRun:[decoder decodeBoolForKey:ORRunTimedRun]];
@@ -1271,6 +1371,8 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 -(void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeObject:shutDownScript forKey:@"shutDownScript"];
+    [encoder encodeObject:startScript forKey:@"startScript"];
     [encoder encodeInt32:[self timeLimit] forKey:ORRunTimeLimit];
     [encoder encodeInt32:[self runType] forKey:ORRunType_Mask];
     [encoder encodeBool:[self timedRun] forKey:ORRunTimedRun];

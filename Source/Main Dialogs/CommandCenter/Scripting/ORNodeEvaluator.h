@@ -23,7 +23,6 @@
 	NSMutableDictionary* symbolTable;
 	NSMutableDictionary* argValueDicionary;
 	NSArray*			 parsedNodes;
-	NSArray*			 args;
 	NSDecimalNumber*	 _one;
 	NSDecimalNumber*	 _zero;
 	NSString*			 scriptName;
@@ -50,7 +49,7 @@
 #pragma mark •••Symbol Table Routines
 - (NSDictionary*) makeSymbolTableFor:(NSString*)functionName args:(id)argObject;
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable;
-- (void) setArgs:(NSArray*)someArgs;
+- (void) setArgs:(id)someArgs;
 - (id) valueForSymbol:(NSString*) aSymbol;
 - (id) setValue:(id)aValue forSymbol:(id) aSymbol;
 - (void) setUpSysCallTable;

@@ -1723,6 +1723,12 @@
 		84F7FB620AE5566D00A5AA4C /* mysql_com.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */; };
 		84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB630AE5569100A5AA4C /* my_alloc.h */; };
 		84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */; };
+		84FAD2B10EE46AF500746B91 /* ORRunScriptController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FAD2AB0EE46AF500746B91 /* ORRunScriptController.h */; };
+		84FAD2B20EE46AF500746B91 /* ORRunScriptController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FAD2AC0EE46AF500746B91 /* ORRunScriptController.m */; };
+		84FAD2B30EE46AF500746B91 /* ORRunScriptModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FAD2AD0EE46AF500746B91 /* ORRunScriptModel.h */; };
+		84FAD2B40EE46AF500746B91 /* ORRunScriptModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */; };
+		84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FAD2AF0EE46AF500746B91 /* RunScript.gif */; };
+		84FAD2B60EE46AF500746B91 /* RunScript.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FAD2B00EE46AF500746B91 /* RunScript.nib */; };
 		84FB4E010D91E1D90055813E /* ORAnalysisPanel2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */; };
 		84FB4E020D91E1D90055813E /* ORAnalysisPanel2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */; };
 		84FB4E220D92F7560055813E /* BugReporter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FB4E1F0D92F7560055813E /* BugReporter.nib */; };
@@ -3587,6 +3593,12 @@
 		84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql_com.h; path = Libraries/mysql_com.h; sourceTree = SOURCE_ROOT; };
 		84F7FB630AE5569100A5AA4C /* my_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_alloc.h; path = Libraries/my_alloc.h; sourceTree = SOURCE_ROOT; };
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
+		84FAD2AB0EE46AF500746B91 /* ORRunScriptController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunScriptController.h; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptController.h; sourceTree = SOURCE_ROOT; };
+		84FAD2AC0EE46AF500746B91 /* ORRunScriptController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunScriptController.m; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptController.m; sourceTree = SOURCE_ROOT; };
+		84FAD2AD0EE46AF500746B91 /* ORRunScriptModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunScriptModel.h; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptModel.h; sourceTree = SOURCE_ROOT; };
+		84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunScriptModel.m; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptModel.m; sourceTree = SOURCE_ROOT; };
+		84FAD2AF0EE46AF500746B91 /* RunScript.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = RunScript.gif; path = Source/Objects/Control/RunControl/RunScripts/RunScript.gif; sourceTree = SOURCE_ROOT; };
+		84FAD2B00EE46AF500746B91 /* RunScript.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RunScript.nib; path = Source/Objects/Control/RunControl/RunScripts/RunScript.nib; sourceTree = SOURCE_ROOT; };
 		84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAnalysisPanel2D.m; path = Source/Widgets/Plotting/ORAnalysisPanel2D.m; sourceTree = SOURCE_ROOT; };
 		84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAnalysisPanel2D.h; path = Source/Widgets/Plotting/ORAnalysisPanel2D.h; sourceTree = SOURCE_ROOT; };
 		84FB4E1F0D92F7560055813E /* BugReporter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BugReporter.nib; path = "Source/Main Dialogs/BugReporter/BugReporter.nib"; sourceTree = SOURCE_ROOT; };
@@ -5068,6 +5080,7 @@
 				84E099600CC934CB00EFBC8F /* play.tiff */,
 				84E099610CC934CB00EFBC8F /* stop.tiff */,
 				84FD0DF9079462FB004A0E46 /* RunFailedHelp.plist */,
+				84FAD2AA0EE46AF500746B91 /* RunScripts */,
 			);
 			path = RunControl;
 			sourceTree = "<group>";
@@ -7791,6 +7804,20 @@
 			path = "Source/Objects/Misc Objects/Workers";
 			sourceTree = SOURCE_ROOT;
 		};
+		84FAD2AA0EE46AF500746B91 /* RunScripts */ = {
+			isa = PBXGroup;
+			children = (
+				84FAD2AB0EE46AF500746B91 /* ORRunScriptController.h */,
+				84FAD2AC0EE46AF500746B91 /* ORRunScriptController.m */,
+				84FAD2AD0EE46AF500746B91 /* ORRunScriptModel.h */,
+				84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */,
+				84FAD2AF0EE46AF500746B91 /* RunScript.gif */,
+				84FAD2B00EE46AF500746B91 /* RunScript.nib */,
+			);
+			name = RunScripts;
+			path = Source/Objects/Control/RunControl/RunScripts;
+			sourceTree = SOURCE_ROOT;
+		};
 		84FB4E1E0D92F7560055813E /* BugReporter */ = {
 			isa = PBXGroup;
 			children = (
@@ -9039,6 +9066,8 @@
 				842376910ED46B7A00BECB64 /* OROrderedObjManager.h in Headers */,
 				8423770A0ED4710700BECB64 /* OROrderedObjHolding.h in Headers */,
 				84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */,
+				84FAD2B10EE46AF500746B91 /* ORRunScriptController.h in Headers */,
+				84FAD2B30EE46AF500746B91 /* ORRunScriptModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9604,6 +9633,8 @@
 				8491F6730EC0D3C40084BAD6 /* pmtColorMask.gif in Resources */,
 				8491F6740EC0D3C40084BAD6 /* pmt.gif in Resources */,
 				9C9861580ED10DC900E18ED7 /* MailScript.txt in Resources */,
+				84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */,
+				84FAD2B60EE46AF500746B91 /* RunScript.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10265,6 +10296,8 @@
 				8491FE430EC1DD270084BAD6 /* NSImage+Extensions.m in Sources */,
 				8491FE8C0EC1DF780084BAD6 /* ORSwitchImage.m in Sources */,
 				842376920ED46B7A00BECB64 /* OROrderedObjManager.m in Sources */,
+				84FAD2B20EE46AF500746B91 /* ORRunScriptController.m in Sources */,
+				84FAD2B40EE46AF500746B91 /* ORRunScriptModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

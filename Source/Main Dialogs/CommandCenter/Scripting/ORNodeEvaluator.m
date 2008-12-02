@@ -89,7 +89,6 @@
 {
 	[logFileHandle release];
 	[functionTable release];
-	[args release];
 	[symbolTable release];
 	[_one release];
 	[_zero release];
@@ -144,22 +143,21 @@
 	[sysCallTable setObject: [ORSysCall sysCall:&log10f	name:@"log10"	numArgs:1] forKey:@"log10"];
 }
 
-- (void) setArgs:(NSArray*)someArgs
-{
-
-	[someArgs retain];
-	[args release];
-	args = someArgs;
-	
+- (void) setArgs:(id)someArgs
+{	
 	int i=0;
-	id value;
-	NSEnumerator* e = [args objectEnumerator];
-	while(value = [e nextObject]){
-		[self setValue:value forSymbol:[NSString stringWithFormat:@"$%d",i]];
-		i++;
+	id anItem;
+	NSEnumerator* e = [someArgs objectEnumerator];
+	while(anItem = [e nextObject]){	
+		if([anItem isKindOfClass:[NSDictionary class]]){
+			[self setValue:[anItem objectForKey:@"iValue"] forSymbol:[anItem objectForKey:@"name"]];
+		}
+		else {
+			[self setValue:anItem forSymbol:[NSString stringWithFormat:@"$%d",i]];
+			i++;
+		}
 	}
 }
-
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable
 {
 	if(!aSymbolTable)return;

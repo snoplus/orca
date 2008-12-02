@@ -170,7 +170,6 @@ extern NSString* ORFilterModelPluginPathChanged;
 extern NSString* ORFilterLock;
 extern NSString* ORFilterLastFileChanged;
 extern NSString* ORFilterNameChanged;
-extern NSString* ORFilterArgsChanged;
 extern NSString* ORFilterLastFileChangedChanged;
 extern NSString* ORFilterScriptChanged;
 extern NSString* ORFilterDisplayValuesChanged;

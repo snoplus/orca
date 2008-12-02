@@ -38,7 +38,6 @@ static NSString* ORFilterFilteredConnector  = @"Filtered Out Connector";
 
 NSString* ORFilterLastFileChanged			= @"ORFilterLastFileChanged";
 NSString* ORFilterNameChanged				= @"ORFilterNameChanged";
-NSString* ORFilterArgsChanged				= @"ORFilterArgsChanged";
 NSString* ORFilterDisplayValuesChanged		= @"ORFilterDisplayValuesChanged";
 NSString* ORFilterBreakChainChanged			= @"ORFilterBreakChainChanged";
 NSString* ORFilterLastFileChangedChanged	= @"ORFilterLastFileChangedChanged";

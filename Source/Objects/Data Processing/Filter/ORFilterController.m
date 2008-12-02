@@ -76,11 +76,6 @@
 						object: model];	
 
     [notifyCenter addObserver : self
-                     selector : @selector(argsChanged:)
-                         name : ORFilterArgsChanged
-						object: model];	
-
-    [notifyCenter addObserver : self
                      selector : @selector(textDidChange:)
                          name : NSTextDidChangeNotification
 						object: scriptView];	

@@ -23,6 +23,11 @@
 #import "ORRunController.h"
 #import "ORRunModel.h"
 #import "StopLightView.h"
+#import "ORRunScriptModel.h"
+
+@interface ORRunController (private)
+- (void) populatePopups;
+@end
 
 @implementation ORRunController
 
@@ -32,27 +37,28 @@
     self = [super initWithWindowNibName:@"RunControl"];
     return self;
 }
--(void)dealloc
+- (void) dealloc
 {
     if(retainingRunNotice)[runModeNoticeView release];
     [super dealloc];
 }
 
 
--(void)awakeFromNib
+- (void) awakeFromNib
 {
     [runProgress setStyle:NSProgressIndicatorSpinningStyle];
     [runBar setIndeterminate:NO];
     [super awakeFromNib];
     [self performSelector:@selector(updateWithCurrentRunNumber)withObject:self afterDelay:0];
     [self updateButtons];
+	[self populatePopups];
 }
 
 #pragma mark ¥¥¥Accessors
 
 
 #pragma mark ¥¥¥Interface Management
--(void)registerNotificationObservers
+- (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [super registerNotificationObservers];
@@ -86,25 +92,21 @@
                      selector: @selector(timeToGoChanged:)
                          name: ORRunTimeToGoChangedNotification
                        object: model];
-    
-    
+
     [notifyCenter addObserver: self
                      selector: @selector(runStatusChanged:)
                          name: ORRunStatusChangedNotification
                        object: model];
-    
     
     [notifyCenter addObserver: self
                      selector: @selector(runNumberChanged:)
                          name: ORRunNumberChangedNotification
                        object: model];
     
-    
     [notifyCenter addObserver: self
                      selector: @selector(runNumberDirChanged:)
                          name: ORRunNumberDirChangedNotification
                        object: model];
-    
     
     [notifyCenter addObserver: self
                      selector: @selector(runModeChanged:)
@@ -131,12 +133,10 @@
                          name: ORRunTypeLock
                        object: nil];
     
-    
     [notifyCenter addObserver: self
                      selector: @selector(quickStartChanged:)
                          name: ORRunQuickStartChangedNotification
                        object: model];
-    
     
     [notifyCenter addObserver: self
                      selector: @selector(definitionsFileChanged:)
@@ -148,14 +148,48 @@
                          name: ORRunVetosChanged
                        object: nil];
 
+    [notifyCenter addObserver: self
+                     selector: @selector(populatePopups)
+                         name: ORGroupObjectsAdded
+                       object: nil];
+	
+    [notifyCenter addObserver: self
+                     selector: @selector(populatePopups)
+                         name: ORGroupObjectsRemoved
+                       object: nil];
 
+    [notifyCenter addObserver: self
+                     selector: @selector(populatePopups)
+                         name: ORRunScriptNameChanged
+                       object: nil];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(startUpScriptStateChanged:)
+                         name: ORRunModelStartScriptStateChanged
+                       object: nil];
+	
+    [notifyCenter addObserver: self
+                     selector: @selector(shutDownScriptStateChanged:)
+                         name: ORRunModelShutDownScriptStateChanged
+                       object: nil];
+
+    [notifyCenter addObserver: self
+                     selector: @selector(startUpScriptChanged:)
+                         name: ORRunModelStartScriptChanged
+                       object: nil];
+	
+    [notifyCenter addObserver: self
+                     selector: @selector(shutDownScriptChanged:)
+                         name: ORRunModelShutDownScriptChanged
+                       object: nil];	
 }
 
 
 
--(void)updateWindow
+- (void) updateWindow
 {
     [super updateWindow];
+	[self populatePopups];
     [self runStatusChanged:nil];
     [self timeLimitStepperChanged:nil];
     [self timedRunChanged:nil];
@@ -171,14 +205,25 @@
     [self runTypeLockChanged:nil];
     [self quickStartChanged:nil];
     [self definitionsFileChanged:nil];
+	[self startUpScriptStateChanged:nil];
+	[self shutDownScriptStateChanged:nil];
+	[self startUpScriptChanged:nil];
+	[self shutDownScriptChanged:nil];
 	[self vetosChanged:nil];
 }
 
 
 
--(void)updateButtons
+- (void) updateButtons
 {
 	BOOL anyVetos = [[ORGlobal sharedGlobal] anyVetosInPlace];
+    BOOL locked   = [gSecurity isLocked:ORRunNumberLock];
+	BOOL running  = ([model runningState] == eRunInProgress);
+	
+	[startUpScripts setEnabled:!locked && !running];
+	[shutDownScripts setEnabled:!locked && !running];
+	[openStartScriptButton setEnabled:!locked && [model startScript]]; 
+	[openShutDownScriptButton setEnabled:!locked && [model shutDownScript]]; 
 	
     if([model remoteControl]){
         [startRunButton setEnabled:NO];
@@ -228,8 +273,36 @@
     }
 }
 
+- (void) startUpScriptChanged:(NSNotification*)aNotification
+{
+	NSString* selectedItemName = [[model startScript] identifier];
+	if(!selectedItemName || ![startUpScripts itemWithTitle:selectedItemName])selectedItemName = @"---";
+	[startUpScripts selectItemWithTitle:selectedItemName]; 
+	[self updateButtons];
+}
 
--(void)runStatusChanged:(NSNotification*)aNotification
+- (void) shutDownScriptChanged:(NSNotification*)aNotification
+{
+	NSString* selectedItemName = [[model shutDownScript] identifier];
+	if(!selectedItemName || ![shutDownScripts itemWithTitle:selectedItemName])selectedItemName = @"---";
+	[shutDownScripts selectItemWithTitle:selectedItemName]; 
+	[self updateButtons];
+}
+
+- (void) startUpScriptStateChanged:(NSNotification*)aNotification
+{
+	[startUpScriptStateField setStringValue:[model startScriptState]];
+	[self updateButtons];
+}
+
+- (void) shutDownScriptStateChanged:(NSNotification*)aNotification
+{
+	[shutDownScriptStateField setStringValue:[model shutDownScriptState]];
+	[self updateButtons];
+}
+
+
+- (void) runStatusChanged:(NSNotification*)aNotification
 {
 	if([model runningState] == eRunInProgress){
 		[runProgress startAnimation:self];
@@ -296,26 +369,26 @@
 	}
 }
 
--(void)runNumberDirChanged:(NSNotification*)aNotification
+- (void) runNumberDirChanged:(NSNotification*)aNotification
 {
 	if([model dirName]!=nil)[runNumberDirField setStringValue: [model dirName]];
 }
 
--(void)timeLimitStepperChanged:(NSNotification*)aNotification
+- (void) timeLimitStepperChanged:(NSNotification*)aNotification
 {
 	[self updateStepper:timeLimitStepper setting:[model timeLimit]];
 	[self updateIntText:timeLimitField setting:[model timeLimit]];
 }
 
 
--(void)repeatRunChanged:(NSNotification*)aNotification
+- (void) repeatRunChanged:(NSNotification*)aNotification
 {
 	[self updateTwoStateCheckbox:repeatRunCB setting:[model repeatRun]];
 }
 
 
 
--(void)timedRunChanged:(NSNotification*)aNotification
+- (void) timedRunChanged:(NSNotification*)aNotification
 {
 	[self updateTwoStateCheckbox:timedRunCB setting:[model timedRun]];
 	[repeatRunCB setEnabled: [model timedRun]];
@@ -324,7 +397,7 @@
 }
 
 
--(void)elapsedTimeChanged:(NSNotification*)aNotification
+- (void) elapsedTimeChanged:(NSNotification*)aNotification
 {
 
 	[elapsedTimeField setStringValue:[model elapsedTimeString]];
@@ -336,14 +409,12 @@
 	}
 }
 
--(void)startTimeChanged:(NSNotification*)aNotification
+- (void) startTimeChanged:(NSNotification*)aNotification
 {
 	[timeStartedField setObjectValue:[model startTime]];
 }
 
-
-
--(void)runModeChanged:(NSNotification *)notification
+- (void) runModeChanged:(NSNotification *)notification
 {
     [runModeMatrix selectCellWithTag: [[ORGlobal sharedGlobal] runMode]];
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
@@ -356,7 +427,7 @@
     
 }
 
--(void)runTypeChanged:(NSNotification *)notification
+- (void) runTypeChanged:(NSNotification *)notification
 {
 	unsigned long runType = [model runType];
 	int i;
@@ -365,19 +436,19 @@
 	}
 }
 
--(void)remoteControlChanged:(NSNotification *)notification
+- (void) remoteControlChanged:(NSNotification *)notification
 {
 	[self updateTwoStateCheckbox:remoteControlCB setting:[model remoteControl]];
 	[self updateButtons];
 }
 
--(void)quickStartChanged:(NSNotification *)notification
+- (void) quickStartChanged:(NSNotification *)notification
 {
 	[self updateTwoStateCheckbox:quickStartCB setting:[model quickStart]];
 	[self updateButtons];
 }
 
--(void)definitionsFileChanged:(NSNotification *)notification
+- (void) definitionsFileChanged:(NSNotification *)notification
 {
 	NSString* path = [[model definitionsFilePath]stringByAbbreviatingWithTildeInPath];
 	if(path == nil){
@@ -388,7 +459,7 @@
 	[self setupRunTypeNames];
 }
 
--(void)checkGlobalSecurity
+- (void) checkGlobalSecurity
 {
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:ORRunNumberLock to:secure];
@@ -397,7 +468,7 @@
     [runTypeLockButton setEnabled:secure];
 }
 
--(void)runNumberLockChanged:(NSNotification*)aNotification
+- (void) runNumberLockChanged:(NSNotification*)aNotification
 {
     BOOL locked = [gSecurity isLocked:ORRunNumberLock];
     [runNumberLockButton setState: locked];
@@ -406,7 +477,7 @@
     [runNumberDirButton setEnabled: !locked];
 }
 
--(void)runTypeLockChanged:(NSNotification*)aNotification
+- (void) runTypeLockChanged:(NSNotification*)aNotification
 {
     BOOL locked = [gSecurity isLocked:ORRunTypeLock];
     [runTypeLockButton setState: locked];
@@ -416,7 +487,19 @@
 }
 
 #pragma  mark ¥¥¥Actions
--(IBAction)startRunAction:(id)sender
+
+- (IBAction) openStartScript:(id)sender
+{
+	[[model startScript] makeMainController];
+}
+
+- (IBAction) openShutDownScript:(id)sender
+{
+	[[model shutDownScript] makeMainController];
+}
+
+
+- (IBAction) startRunAction:(id)sender
 {
 	if([[model document] isDocumentEdited]){
 		NSBeginAlertSheet(@"Configuration Not Saved",@"Cancel",@"Just Save",
@@ -447,7 +530,7 @@
 	[model performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
 
--(IBAction)newRunAction:(id)sender
+- (IBAction) newRunAction:(id)sender
 {
     [self endEditing];
     [statusField setStringValue:@"Restart..."];
@@ -458,14 +541,14 @@
     [model performSelector:@selector(stopRun)withObject:nil afterDelay:0];
 }
 
--(IBAction)stopRunAction:(id)sender
+- (IBAction) stopRunAction:(id)sender
 {
     [self endEditing];
     [statusField setStringValue:@"Stopping..."];
     [model performSelector:@selector(haltRun)withObject:nil afterDelay:.1];
 }
 
--(IBAction)remoteControlAction:(id)sender
+- (IBAction) remoteControlAction:(id)sender
 {
     if([model remoteControl] != [sender intValue]){
         [[self undoManager] setActionName: @"Set Run Remote Control"];
@@ -475,7 +558,7 @@
         }
     }
 }
--(IBAction)quickStartCBAction:(id)sender
+- (IBAction) quickStartCBAction:(id)sender
 {
     if([model quickStart] != [sender intValue]){
         [[self undoManager] setActionName: @"Set Quick Start"];
@@ -484,7 +567,7 @@
 }
 
 
--(IBAction)timeLimitStepperAction:(id)sender
+- (IBAction) timeLimitStepperAction:(id)sender
 {
     if([model timeLimit] != [sender intValue]){
         [[self undoManager] setActionName: @"Set Run Time Limit"];
@@ -492,7 +575,7 @@
     }
 }
 
--(IBAction)timeLimitTextAction:(id)sender
+- (IBAction) timeLimitTextAction:(id)sender
 {
     if([model timeLimit] != [sender intValue]){
         [[self undoManager] setActionName: @"Set Run Time Limit"];
@@ -501,7 +584,7 @@
 }
 
 
--(IBAction)timedRunCBAction:(id)sender
+- (IBAction) timedRunCBAction:(id)sender
 {
     if([model timedRun] != [sender intValue]){
         [[self undoManager] setActionName: @"Set Timed Run"];
@@ -509,7 +592,7 @@
     }
 }
 
--(IBAction)repeatRunCBAction:(id)sender
+- (IBAction) repeatRunCBAction:(id)sender
 {
     if([model repeatRun] != [sender intValue]){
         [[self undoManager] setActionName: @"Set Repeat Run"];
@@ -517,7 +600,7 @@
     }
 }
 
--(IBAction)runNumberAction:(id)sender
+- (IBAction) runNumberAction:(id)sender
 {
     if([sender intValue] != [model runNumber]){
         [[self undoManager] setActionName: @"Set Run Number"];
@@ -525,7 +608,7 @@
     }
 }
 
--(IBAction)runModeAction:(id)sender
+- (IBAction) runModeAction:(id)sender
 {
     int tag = [[runModeMatrix selectedCell] tag];
     if(tag != [[ORGlobal sharedGlobal] runMode]){
@@ -534,7 +617,7 @@
     }
 }
 
--(IBAction)chooseDir:(id)sender
+- (IBAction) chooseDir:(id)sender
 {
 
     NSString* startDir = NSHomeDirectory(); //default to home
@@ -557,7 +640,7 @@
                        didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 }
--(void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         NSString* dirName = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
@@ -592,7 +675,7 @@
 }
 
 
--(void)definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void) definitionsPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         [model setDefinitionsFilePath:[[sheet filenames] objectAtIndex:0]];
@@ -608,7 +691,7 @@
 }
 
 
--(IBAction)runTypeAction:(id)sender
+- (IBAction) runTypeAction:(id)sender
 {
     short i = [[sender selectedCell] tag];
     BOOL state  = [[sender selectedCell] state];
@@ -619,40 +702,71 @@
     [model setRunType:currentRunMask];
 }
 
--(IBAction)clearRunTypeAction:(id)sender
+- (IBAction) clearRunTypeAction:(id)sender
 {
     [model setRunType:0L];
 }
 
--(IBAction)runNumberLockAction:(id)sender
+- (IBAction) runNumberLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORRunNumberLock to:[sender intValue] forWindow:[runNumberDrawer parentWindow]];
 }
 
--(IBAction)runTypeLockAction:(id)sender
+- (IBAction) runTypeLockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORRunTypeLock to:[sender intValue] forWindow:[runTypeDrawer parentWindow]];
 }
 
--(IBAction)listVetoAction:(id)sender
+- (IBAction) listVetoAction:(id)sender
 {
 	[[ORGlobal sharedGlobal] listVetoReasons];
 }
 
+- (IBAction) selectStartUpScript:(id)sender
+{
+	NSString* name = [sender titleOfSelectedItem];
+	NSArray* runScripts = [[model document] collectObjectsOfClass:[ORRunScriptModel class]];
+	ORRunScriptModel* obj;
+	NSEnumerator* e = [runScripts objectEnumerator];
+	ORRunScriptModel* selectedObj = nil;
+	while(obj = [e nextObject]){
+		if([name isEqualToString:[obj identifier]]){
+			selectedObj = obj;
+			break;
+		}
+	}
+	[model setStartScript:selectedObj];
+}
 
--(void)updateWithCurrentRunNumber
+- (IBAction) selectShutDownScript:(id)sender
+{
+	NSString* name = [sender titleOfSelectedItem];
+	NSArray* runScripts = [[model document] collectObjectsOfClass:[ORRunScriptModel class]];
+	ORRunScriptModel* obj;
+	NSEnumerator* e = [runScripts objectEnumerator];
+	ORRunScriptModel* selectedObj = nil;
+	while(obj = [e nextObject]){
+		if([name isEqualToString:[obj identifier]]){
+			selectedObj = obj;
+			break;
+		}
+	}
+	[model setShutDownScript:selectedObj];
+}
+
+- (void) updateWithCurrentRunNumber
 {
     [model getCurrentRunNumber];
     [self updateWindow];
 }
 
--(void)drawerWillOpen:(NSNotification *)notification
+- (void) drawerWillOpen:(NSNotification *)notification
 {
     [model getCurrentRunNumber];
     [self updateWindow];
 }
 
--(void)drawerDidOpen:(NSNotification *)notification
+- (void) drawerDidOpen:(NSNotification *)notification
 {
     if([notification object] == runNumberDrawer){
         [runNumberButton setTitle:@"Close"];
@@ -664,7 +778,7 @@
     }
 }
 
--(void)drawerDidClose:(NSNotification *)notification
+- (void) drawerDidClose:(NSNotification *)notification
 {
     if([notification object] == runNumberDrawer){
         [runNumberButton setTitle:@"Run Number..."];
@@ -689,6 +803,34 @@
             [[runTypeMatrix cellWithTag:i] setTitle:[NSString stringWithFormat:@"Bit %d",i]];
         }
     }
+}
+@end
+
+@implementation ORRunController (private)
+- (void) populatePopups
+{
+	[startUpScripts removeAllItems];
+	[shutDownScripts removeAllItems];
+	[startUpScripts addItemWithTitle:@"---"];
+	[shutDownScripts addItemWithTitle:@"---"];
+	NSArray* runScripts = [[model document] collectObjectsOfClass:[ORRunScriptModel class]];
+	ORRunScriptModel* obj;
+	NSEnumerator* e = [runScripts objectEnumerator];
+	while(obj = [e nextObject]){
+		[startUpScripts addItemWithTitle:[obj identifier]]; 
+		[shutDownScripts addItemWithTitle:[obj identifier]]; 
+	}
+	
+	NSString* selectedItemName = [[model startScript] identifier];
+	if(!selectedItemName || ![startUpScripts itemWithTitle:selectedItemName])selectedItemName = @"---";
+	[startUpScripts selectItemWithTitle:selectedItemName]; 
+	[self selectStartUpScript:startUpScripts];
+	
+	selectedItemName = [[model shutDownScript] identifier];
+	if(!selectedItemName || ![shutDownScripts itemWithTitle:selectedItemName])selectedItemName = @"---";
+	[shutDownScripts selectItemWithTitle:selectedItemName]; 
+	[self selectShutDownScript:shutDownScripts];
+
 }
 
 @end

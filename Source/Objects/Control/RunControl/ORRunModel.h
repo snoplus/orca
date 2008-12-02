@@ -26,7 +26,9 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataPacket;
 @class ORDataSet;
+@class ORRunScript;
 @class ORDataTypeAssigner;
+@class ORRunScriptModel;
 
 @interface ORRunModel :  ORDataChainObject {
     @private
@@ -49,22 +51,19 @@
         unsigned long   dataId;
        
         NSString*		definitionsFilePath;
-        //run number variables
         NSString* 		dirName;
         id              client;
         unsigned long	exceptionCount;
 
-        BOOL		_forceRestart;
-        BOOL		_ignoreMode;
-        BOOL		_wasQuickStart;
-        BOOL        _nextRunWillQuickStart;
-        BOOL		_ignoreRunTimeout;
-        BOOL        forceFullInit;
-        unsigned long _currentRun;
-        int	 runningState;
+        BOOL			forceFullInit;
+		BOOL			_forceRestart;
+		BOOL			_ignoreMode;
+		BOOL			_wasQuickStart;
+		BOOL			_nextRunWillQuickStart;
+		BOOL			_ignoreRunTimeout;
+		unsigned long	_currentRun;
+        int				runningState;
         ORDataTypeAssigner* dataTypeAssigner;
-        ORAlarm*    runFailedAlarm;
-        ORAlarm*    runStoppedByVetoAlarm;
         unsigned long lastRunNumberShipped;
         NSMutableArray* runTypeNames;
         BOOL        remoteInterface;
@@ -75,6 +74,14 @@
 		BOOL		dataTakingThreadRunning;
 		float		totalWaitTime;
 
+		ORAlarm*    runFailedAlarm;
+		ORAlarm*    runStoppedByVetoAlarm;
+	
+		ORRunScriptModel* startScript;
+		ORRunScriptModel* shutDownScript;
+
+		NSString* startScriptState;
+		NSString* shutDownScriptState;
 }
 
 
@@ -82,6 +89,14 @@
 - (void) makeConnectors;
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) shutDownScriptState;
+- (void) setShutDownScriptState:(NSString*)aShutDownScriptState;
+- (NSString*) startScriptState;
+- (void) setStartScriptState:(NSString*)aStartScriptState;
+- (ORRunScriptModel*) shutDownScript;
+- (void) setShutDownScript:(ORRunScriptModel*)aShutDownScript;
+- (ORRunScriptModel*) startScript;
+- (void) setStartScript:(ORRunScriptModel*)aStartScript;
 - (BOOL) isRunning;
 - (BOOL) runPaused;
 - (void) setRunPaused:(BOOL)aFlag;
@@ -140,6 +155,7 @@
 - (void) remoteHaltRun;
 - (void) remoteStopRun:(BOOL)nextRunState;
 - (void) forceHalt;
+- (void) runAbortFromScript;
 
 - (void) startRun:(BOOL)doInit;
 - (void) startRun;
@@ -167,8 +183,11 @@
 - (BOOL) readRunTypeNames;
 - (NSString*) shortStatus;
 
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
+
 
 @interface ORRunDecoderForRun : ORBaseDecoder
 {}
@@ -181,6 +200,10 @@
 - (BOOL) doneTakingData;
 @end
 
+extern NSString* ORRunModelShutDownScriptStateChanged;
+extern NSString* ORRunModelStartScriptStateChanged;
+extern NSString* ORRunModelShutDownScriptChanged;
+extern NSString* ORRunModelStartScriptChanged;
 extern NSString* ORRunTimedRunChangedNotification;
 extern NSString* ORRunRepeatRunChangedNotification;
 extern NSString* ORRunTimeLimitChangedNotification;

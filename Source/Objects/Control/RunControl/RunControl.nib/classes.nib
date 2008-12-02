@@ -100,6 +100,10 @@
 				<string>id</string>
 				<key>newRunAction</key>
 				<string>id</string>
+				<key>openShutDownScript</key>
+				<string>id</string>
+				<key>openStartScript</key>
+				<string>id</string>
 				<key>quickStartCBAction</key>
 				<string>id</string>
 				<key>remoteControlAction</key>
@@ -115,6 +119,10 @@
 				<key>runTypeAction</key>
 				<string>id</string>
 				<key>runTypeLockAction</key>
+				<string>id</string>
+				<key>selectShutDownScript</key>
+				<string>id</string>
+				<key>selectStartUpScript</key>
 				<string>id</string>
 				<key>startRunAction</key>
 				<string>id</string>
@@ -142,6 +150,10 @@
 				<key>lightBoardView</key>
 				<string>StopLightView</string>
 				<key>listVetosButton</key>
+				<string>NSButton</string>
+				<key>openShutDownScriptButton</key>
+				<string>NSButton</string>
+				<key>openStartScriptButton</key>
 				<string>NSButton</string>
 				<key>quickStartCB</key>
 				<string>NSButton</string>
@@ -185,8 +197,16 @@
 				<string>NSButton</string>
 				<key>runTypeMatrix</key>
 				<string>NSMatrix</string>
+				<key>shutDownScriptStateField</key>
+				<string>NSTextField</string>
+				<key>shutDownScripts</key>
+				<string>NSPopUpButton</string>
 				<key>startRunButton</key>
 				<string>NSButton</string>
+				<key>startUpScriptStateField</key>
+				<string>NSTextField</string>
+				<key>startUpScripts</key>
+				<string>NSPopUpButton</string>
 				<key>statusField</key>
 				<string>NSTextField</string>
 				<key>stopRunButton</key>

@@ -65,6 +65,13 @@
     IBOutlet NSButton*      runTypeLockButton;
     IBOutlet StopLightView* lightBoardView;
     
+    IBOutlet NSButton*      openStartScriptButton;
+    IBOutlet NSButton*      openShutDownScriptButton;
+	IBOutlet NSPopUpButton* startUpScripts;
+	IBOutlet NSPopUpButton* shutDownScripts;
+    IBOutlet NSTextField*   startUpScriptStateField;
+    IBOutlet NSTextField*   shutDownScriptStateField;
+	
     BOOL retainingRunNotice;
     
 }
@@ -88,28 +95,37 @@
 - (IBAction) runTypeLockAction:(id)sender;
 - (IBAction) definitionsFileAction:(id)sender;
 - (IBAction) listVetoAction:(id)sender;
+- (IBAction) selectStartUpScript:(id)sender;
+- (IBAction) selectShutDownScript:(id)sender;
+- (IBAction) openStartScript:(id)sender;
+- (IBAction) openShutDownScript:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
 - (void) updateButtons;
 - (void) registerNotificationObservers;
-- (void) runStatusChanged:(NSNotification*)aNotification;
-- (void) timeLimitStepperChanged:(NSNotification*)aNotification;
-- (void) timedRunChanged:(NSNotification*)aNotification;
-- (void) repeatRunChanged:(NSNotification*)aNotification;
-- (void) elapsedTimeChanged:(NSNotification*)aNotification;
-- (void) startTimeChanged:(NSNotification*)aNotification;
-- (void) timeToGoChanged:(NSNotification*)aNotification;
-- (void) runNumberChanged:(NSNotification*)aNotification;
-- (void) runNumberDirChanged:(NSNotification*)aNotification;
-- (void) runModeChanged:(NSNotification *)notification;
-- (void) drawerWillOpen:(NSNotification *)notification;
-- (void) runTypeChanged:(NSNotification *)notification;
-- (void) remoteControlChanged:(NSNotification *)notification;
-- (void) runNumberLockChanged:(NSNotification *)notification;
-- (void) runTypeLockChanged:(NSNotification *)notification;
-- (void) quickStartChanged:(NSNotification *)notification;
-- (void) definitionsFileChanged:(NSNotification *)notification;
-- (void) vetosChanged:(NSNotification*)aNotification;
+- (void) startUpScriptStateChanged:(NSNotification*)aNote;
+- (void) shutDownScriptStateChanged:(NSNotification*)aNote;
+- (void) runStatusChanged:(NSNotification*)aNote;
+- (void) timeLimitStepperChanged:(NSNotification*)aNote;
+- (void) timedRunChanged:(NSNotification*)aNote;
+- (void) repeatRunChanged:(NSNotification*)aNote;
+- (void) elapsedTimeChanged:(NSNotification*)aNote;
+- (void) startTimeChanged:(NSNotification*)aNote;
+- (void) timeToGoChanged:(NSNotification*)aNote;
+- (void) runNumberChanged:(NSNotification*)aNote;
+- (void) runNumberDirChanged:(NSNotification*)aNote;
+- (void) runModeChanged:(NSNotification *)aNote;
+- (void) drawerWillOpen:(NSNotification *)aNote;
+- (void) runTypeChanged:(NSNotification *)aNote;
+- (void) remoteControlChanged:(NSNotification *)aNote;
+- (void) runNumberLockChanged:(NSNotification *)aNote;
+- (void) runTypeLockChanged:(NSNotification *)aNote;
+- (void) quickStartChanged:(NSNotification *)aNote;
+- (void) definitionsFileChanged:(NSNotification *)aNote;
+- (void) vetosChanged:(NSNotification*)aNote;
+- (void) startUpScriptChanged:(NSNotification*)aNote;
+- (void) shutDownScriptChanged:(NSNotification*)aNote;
+
 
 - (void) updateWithCurrentRunNumber;
 - (void) setupRunTypeNames;

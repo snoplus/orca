@@ -53,7 +53,7 @@
 
 #pragma mark ¥¥¥Run Methods
 - (BOOL) running;
-- (void) run:(NSArray*) someArgs  sender:(id)aSender;
+- (void) run:(id) someArgs  sender:(id)aSender;
 - (void) stop;
 - (void) setFinishCallBack:(id)aTarget selector:(SEL)aSelector;
 
@@ -62,7 +62,7 @@
 - (id)		 parse:(NSString*) theString;
 
 #pragma mark ¥¥¥Group Evaluators
-- (void)	evaluateAll:(NSArray*) args sender:(id)aSender;
+- (void)	evaluateAll:(id) args sender:(id)aSender;
 - (void)	printAll;
 
 #pragma mark ¥¥¥Yacc Input

@@ -122,7 +122,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	return running;
 }
 
-- (void) run:(NSArray*)someArgs sender:(id)aSender
+- (void) run:(id)someArgs sender:(id)aSender
 {
 	if(!running)[self evaluateAll:someArgs sender:aSender];
 }
@@ -214,7 +214,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	[eval setArgs:someArgs];
 }
 
-- (void) evaluateAll:(NSArray*)someArgs sender:(id)aSender;
+- (void) evaluateAll:(id)someArgs sender:(id)aSender;
 {
 	if(!running){
 		exitNow	   = NO;
@@ -296,7 +296,13 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 			}
 		NS_ENDHANDLER
 		[innerPool release];
-		if(stopThread || failed)break;
+		if(stopThread || failed){
+			if(stopThread){
+				NSLogColor([NSColor redColor],@"Script manually stopped\n");
+				[self reportResult:[NSDecimalNumber numberWithInt:0]];
+			}
+			break;
+		}
 	}	
 	if(failed){
 		NSLogColor([NSColor redColor],@"Run Time Error....Abnormal Exit\n");
