@@ -72,6 +72,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
@@ -134,12 +136,20 @@
 				<string>NSView</string>
 				<key>initBoardButton</key>
 				<string>NSButton</string>
+				<key>periodField</key>
+				<string>NSTextField</string>
 				<key>portADirectionMatrix</key>
 				<string>NSMatrix</string>
 				<key>portBDirectionMatrix</key>
 				<string>NSMatrix</string>
 				<key>portCDirectionMatrix</key>
 				<string>NSMatrix</string>
+				<key>preloadHighField</key>
+				<string>NSTextField</string>
+				<key>preloadLowField</key>
+				<string>NSTextField</string>
+				<key>preloadMiddleField</key>
+				<string>NSTextField</string>
 				<key>regNameField</key>
 				<string>NSTextField</string>
 				<key>registerAddressPopUp</key>
@@ -153,6 +163,8 @@
 				<key>settingLockButton</key>
 				<string>NSButton</string>
 				<key>slotField</key>
+				<string>NSTextField</string>
+				<key>timerControlField</key>
 				<string>NSTextField</string>
 				<key>writeValueStepper</key>
 				<string>NSStepper</string>

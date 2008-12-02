@@ -164,13 +164,13 @@ NSString* mIOXY200SubModeName[4][3] = {
 {
 	//read hw based on the dialog settings
     short theRegIndex 		= [self selectedRegIndex];
-    short theValue;
+    unsigned char theValue;
 	
     NS_DURING
         
 		[self read:theRegIndex returnValue:&theValue chip:selectedPLT];
 			
-		NSLog(@"CAEN reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
+		NSLog(@"CAEN reg [%@]:0x%02x\n", [self getRegisterName:theRegIndex], theValue);
         
 	NS_HANDLER
 		NSLog(@"Can't Read [%@] on the %@.\n",
@@ -189,9 +189,9 @@ NSString* mIOXY200SubModeName[4][3] = {
     NS_DURING
         
         NSLog(@"Register is:%d\n", theRegIndex);
-        NSLog(@"Value is   :0x%04x\n", theValue);
+        NSLog(@"Value is   :0x%02x\n", theValue);
         
-		[self write:theRegIndex sendValue:(short) theValue chip:selectedPLT];
+		[self write:theRegIndex sendValue:(char) theValue chip:selectedPLT];
         
 	NS_HANDLER
 		NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
@@ -254,10 +254,10 @@ NSString* mIOXY200SubModeName[4][3] = {
 		NSLogFont(monoSpacedFont,@"H1 Control  : Interrupt %@\n", ((aValue>>1) & 0x1)?@"enabled":@"enabled");
 	
 		[self read:kADataDirection returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Data Dir    : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Data Dir    : 0x%02x\n", aValue);
 	
 		[self read:kAData returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Data Value  : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Data Value  : 0x%02x\n", aValue);
 
 		NSLog(@"Port B\n");
 
@@ -276,35 +276,35 @@ NSString* mIOXY200SubModeName[4][3] = {
 		NSLogFont(monoSpacedFont,@"H1 Control  : Interrupt %@\n", ((aValue>>1) & 0x1)?@"enabled":@"enabled");
 
 		[self read:kBDataDirection returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Data Dir    : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Data Dir    : 0x%02x\n", aValue);
 	
 		[self read:kBData returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Data Value  : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Data Value  : 0x%02x\n", aValue);
 
 		NSLog(@"Port C\n");
 		[self read:kCDataDirection returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Data Dir    : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Data Dir    : 0x%02x\n", aValue);
 	
 		[self read:kCData returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Data Value  : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Data Value  : 0x%02x\n", aValue);
 		
-		NSLog(@"Timer\n");
+		NSLog(@"------Timer %d------\n",i);
 		[self read:kTimerControl returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Control Value  : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Control Value  : 0x%02x\n", aValue);
 		[self read:kTimerStatus returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Status         : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Status         : 0x%02x\n", aValue);
 		[self read:kCounterPreloadHigh returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"PreLoad High   : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"PreLoad High   : 0x%02x\n", aValue);
 		[self read:kCounterPreloadMid returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"PreLoad Middle : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"PreLoad Middle : 0x%02x\n", aValue);
 		[self read:kCounterPreloadLow returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"PreLoad Low    : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"PreLoad Low    : 0x%02x\n", aValue);
 		[self read:kCountHigh returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Count High     : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Count High     : 0x%02x\n", aValue);
 		[self read:kCountMid returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Count Middle   : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Count Middle   : 0x%02x\n", aValue);
 		[self read:kCountLow returnValue:&aValue chip:i];
-		NSLogFont(monoSpacedFont,@"Count Low      : %0x02x\n", aValue);
+		NSLogFont(monoSpacedFont,@"Count Low      : 0x%02x\n", aValue);
 }}
 
 - (void) read:(unsigned short) pReg returnValue:(void*) pValue chip:(int)chipIndex
@@ -322,7 +322,7 @@ NSString* mIOXY200SubModeName[4][3] = {
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
 					
-	*((unsigned short*)pValue) = aValue;
+	*((unsigned char*)pValue) = aValue;
 }
 
 - (void) write:(unsigned short) pReg sendValue:(unsigned char) pValue chip:(int)chipIndex
@@ -344,7 +344,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 - (void) writeGeneralCR:(int)anIndex
 {
 	ORPISlashTChip* chip = [chips objectAtIndex:anIndex];
-	unsigned short aValue = 0;
+	unsigned char aValue = 0;
 	aValue |= (([chip H1Sense]   & 0x1)<<0);	//H1 Sense
 	aValue |= (([chip H2Sense]   & 0x1)<<1);	//H2 Sense
 	aValue |= (([chip H3Sense]   & 0x1)<<2);	//H3 Sense
@@ -364,7 +364,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 - (void) writePortACR:(int)anIndex
 {
 	ORPISlashTChip* chip = [chips objectAtIndex:anIndex];
-	unsigned short aValue = 0;
+	unsigned char aValue = 0;
 	
 	//special case for H1 Control
 	unsigned char h1Control;
@@ -396,7 +396,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 - (void) writePortBCR:(int)anIndex
 {
 	ORPISlashTChip* chip = [chips objectAtIndex:anIndex];
-	unsigned short aValue = 0;
+	unsigned char aValue = 0;
 	
 	//special case for H1 Control
 	unsigned char h1Control;
@@ -523,7 +523,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 	// convert time to upper and lower ticks
 	const double kTICKConv = 48.828125;
 	double d_ticks = (double) period * kTICKConv + 0.5;
-	unsigned short CounterLoadVal = (unsigned short) d_ticks;
+	unsigned char CounterLoadVal = (unsigned char) d_ticks;
 	unsigned char CounterValHigh = ((0xff00 & CounterLoadVal) >> 8);
 	unsigned char CounterValMid = CounterLoadVal;
 
