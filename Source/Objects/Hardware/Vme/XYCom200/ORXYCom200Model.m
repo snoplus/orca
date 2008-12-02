@@ -170,7 +170,7 @@ NSString* mIOXY200SubModeName[4][3] = {
         
 		[self read:theRegIndex returnValue:&theValue chip:selectedPLT];
 			
-		NSLog(@"CAEN reg [%@]:0x%02x\n", [self getRegisterName:theRegIndex], theValue);
+		NSLog(@"XYCom reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
         
 	NS_HANDLER
 		NSLog(@"Can't Read [%@] on the %@.\n",
