@@ -187,6 +187,14 @@
 			<key>SUPERCLASS</key>
 			<string>NSTextView</string>
 		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
+		</dict>
 	</array>
 	<key>IBVersion</key>
 	<string>1</string>
