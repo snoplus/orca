@@ -217,13 +217,12 @@
 - (void) updateButtons
 {
 	BOOL anyVetos = [[ORGlobal sharedGlobal] anyVetosInPlace];
-    BOOL locked   = [gSecurity isLocked:ORRunNumberLock];
 	BOOL running  = ([model runningState] == eRunInProgress);
 	
-	[startUpScripts setEnabled:!locked && !running];
-	[shutDownScripts setEnabled:!locked && !running];
-	[openStartScriptButton setEnabled:!locked && [model startScript]]; 
-	[openShutDownScriptButton setEnabled:!locked && [model shutDownScript]]; 
+	[startUpScripts setEnabled:!running];
+	[shutDownScripts setEnabled:!running];
+	[openStartScriptButton setEnabled:[model startScript]]; 
+	[openShutDownScriptButton setEnabled:[model shutDownScript]]; 
 	
     if([model remoteControl]){
         [startRunButton setEnabled:NO];
