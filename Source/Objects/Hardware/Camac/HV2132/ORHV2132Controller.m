@@ -49,7 +49,7 @@
 #	else
 	[warningField setStringValue:@""];
 #	endif
-
+	
     [super awakeFromNib];
 }
 
@@ -60,7 +60,7 @@
 	int i;
 	for(i=0;i<32;i++){
 		[channelPU insertItemWithTitle:[NSString stringWithFormat:@"%d",i] atIndex:i+1];
-
+		
 	}
 }
 
@@ -71,7 +71,7 @@
 	int i;
 	for(i=0;i<16;i++){
 		[mainFramePU insertItemWithTitle:[NSString stringWithFormat:@"%d",i] atIndex:i+1];
-
+		
 	}
 }
 
@@ -102,22 +102,22 @@
                      selector : @selector(hvValueChanged:)
                          name : ORHV2132ModelHvValueChanged
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(mainFrameChanged:)
                          name : ORHV2132ModelMainFrameChanged
                         object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(channelChanged:)
                          name : ORHV2132ModelChannelChanged
                         object: nil];	
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(dirChanged:)
                          name : ORHV2132StateFileDirChanged
 						object: model];
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -185,15 +185,15 @@
     BOOL locked = [gSecurity isLocked:ORHV2132SettingsLock];
     
     [settingLockButton setState: locked];
-
-
+	
+	
     [onButton setEnabled:!lockedOrRunningMaintenance];
     [offButton setEnabled:!lockedOrRunningMaintenance];
     [setButton setEnabled:!lockedOrRunningMaintenance];
     [readButton setEnabled:!lockedOrRunningMaintenance];
     [hvValueStepper setEnabled:!lockedOrRunningMaintenance];
     [hvValueTextField setEnabled:!lockedOrRunningMaintenance];
-
+	
     [statusButton setEnabled:!lockedOrRunningMaintenance];
     [enableL1L2Button setEnabled:!lockedOrRunningMaintenance];
     [disableL1L2Button setEnabled:!lockedOrRunningMaintenance];
@@ -201,7 +201,7 @@
     [mainFramePU setEnabled:!lockedOrRunningMaintenance];
     [channelPU setEnabled:!lockedOrRunningMaintenance];
 	
-        
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORHV2132SettingsLock])s = @"Not in Maintenance Run.";
@@ -240,47 +240,51 @@
 
 - (IBAction) onAction:(id) sender
 {
-    NS_DURING
+    @try {
 		[model setHV:YES mainFrame:[model mainFrame]];
         NSLog(@"HV2132 Station %d MainFrame %d Channel %d ON\n",[model stationNumber],[model mainFrame],[model channel]);
-    NS_HANDLER
-	
+    }
+	@catch(NSException* localException) {
+		
         [self showError:localException name:@"HV On Error"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) offAction:(id) sender
 {
-    NS_DURING
+    @try {
 		[model setHV:NO mainFrame:[model mainFrame]];
         NSLog(@"HV2132 Station %d MainFrame %d Channel %d OFF\n",[model stationNumber],[model mainFrame],[model channel]);
-    NS_HANDLER
-	
+    }
+	@catch(NSException* localException) {
+		
         [self showError:localException name:@"HV Off Error"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) setAction:(id) sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
 		[model setVoltage:[model hvValue] mainFrame:[model mainFrame] channel:[model channel]];
         NSLog(@"HV2132 Station %d MainFrame %d Channel %d SetTo: %d\n",[model stationNumber],[model mainFrame],[model channel],[model hvValue]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"HV Set Error"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readAction:(id) sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
 		int value;
 		[model readVoltage:&value mainFrame:[model mainFrame] channel:[model channel]];
         NSLog(@"HV2132 Station %d MainFrame %d Channel %d Voltage: %d\n",[model stationNumber],[model mainFrame],[model channel],value);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"HV Read Error"];
-    NS_ENDHANDLER
+    }
 }
 
 
@@ -304,38 +308,41 @@
 
 - (IBAction) enableL1L2Action:(id) sender
 {
-    NS_DURING
+    @try {
 		[model enableL1L2:YES];
         NSLog(@"HV2132 Station %d L1 L2 enabled\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"L1, L2 enable failed"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) disableL1L2Action:(id) sender
 {
-   NS_DURING
+	@try {
 		[model enableL1L2:YES];
         NSLog(@"HV2132 Station %d L1 L2 disabled\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"L1, L2 disable failed"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) clearBufferAction:(id) sender
 {
-   NS_DURING
+	@try {
 		[model clearBuffer];
         NSLog(@"HV2132 Station %d MainFrame %d buffer cleared\n",[model stationNumber],[model mainFrame]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Buffer Clear Error"];
-    NS_ENDHANDLER
+    }
 	
 }
 
 - (IBAction) statusAction:(id) sender
 {
-   NS_DURING
+	@try {
 		int aValue;
 		unsigned short failed;
 		
@@ -345,9 +352,10 @@
 		if(failed){
 			NSLog(@"MainFrame %d Failed Mask: 0x%016x\n",[model mainFrame],failed);
 		}
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Status Error"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) chooseDir:(id)sender

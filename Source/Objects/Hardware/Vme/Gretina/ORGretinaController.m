@@ -47,13 +47,13 @@
 
 - (void) awakeFromNib
 {
-
+	
     settingSize     = NSMakeSize(790,460);
     rateSize		= NSMakeSize(790,300);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-
+	
 	polarityPU[0] = polarityPU0;
 	polarityPU[1] = polarityPU1;
 	polarityPU[2] = polarityPU2;
@@ -62,7 +62,7 @@
 	polarityPU[5] = polarityPU5;
 	polarityPU[6] = polarityPU6;
 	polarityPU[7] = polarityPU7;
-
+	
 	triggerModePU[0] = triggerModePU0;
 	triggerModePU[1] = triggerModePU1;
 	triggerModePU[2] = triggerModePU2;
@@ -71,14 +71,14 @@
 	triggerModePU[5] = triggerModePU5;
 	triggerModePU[6] = triggerModePU6;
 	triggerModePU[7] = triggerModePU7;
-
+	
     NSString* key = [NSString stringWithFormat: @"orca.Gretina%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-
+	
 	[super awakeFromNib];
-
+	
 }
 
 #pragma mark ¥¥¥Notifications
@@ -86,12 +86,12 @@
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [super registerNotificationObservers];
-        
+	
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORVmeCardSlotChangedNotification
 					   object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(baseAddressChanged:)
                          name : ORVmeIOCardBaseAddressChangedNotification
@@ -115,18 +115,18 @@
                      selector : @selector(rateGroupChanged:)
                          name : ORGretinaRateGroupChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(totalRateChanged:)
 						 name : ORRateGroupTotalRateChangedNotification
 					   object : nil];
-					   
+	
     //a fake action for the scale objects
     [notifyCenter addObserver : self
                      selector : @selector(scaleAction:)
                          name : ORAxisRangeChangedNotification
                        object : nil];
-                       
+	
     [notifyCenter addObserver : self
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
@@ -141,67 +141,67 @@
                      selector : @selector(integrationChanged:)
                          name : ORRateGroupIntegrationChangedNotification
                        object : nil];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(noiseFloorChanged:)
                          name : ORGretinaNoiseFloorChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(noiseFloorOffsetChanged:)
                          name : ORGretinaModelNoiseFloorOffsetChanged
                        object : model];
-                       
+	
     [notifyCenter addObserver : self
                      selector : @selector(setFifoStateLabel)
                          name : ORGretinaModelFIFOCheckChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(noiseFloorIntegrationChanged:)
                          name : ORGretinaModelNoiseFloorIntegrationTimeChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(enabledChanged:)
                          name : ORGretinaModelEnabledChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(debugChanged:)
                          name : ORGretinaModelDebugChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pileUpChanged:)
                          name : ORGretinaModelPileUpChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(polarityChanged:)
                          name : ORGretinaModelPolarityChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(triggerModeChanged:)
                          name : ORGretinaModelTriggerModeChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(ledThresholdChanged:)
                          name : ORGretinaModelLEDThresholdChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(cfdDelayChanged:)
                          name : ORGretinaModelCFDDelayChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(cfdFractionChanged:)
                          name : ORGretinaModelCFDFractionChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(cfdThresholdChanged:)
                          name : ORGretinaModelCFDThresholdChanged
@@ -214,7 +214,7 @@
                      selector : @selector(dataLengthChanged:)
                          name : ORGretinaModelDataLengthChanged
                        object : model];
-
+	
     [self registerRates];
 }
 
@@ -227,9 +227,9 @@
     NSEnumerator* e = [[[model waveFormRateGroup] rates] objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
-    
+		
         [notifyCenter removeObserver:self name:ORRateChangedNotification object:obj];
-
+		
         [notifyCenter addObserver : self
                          selector : @selector(waveFormRateChanged:)
                              name : ORRateChangedNotification
@@ -256,7 +256,7 @@
 	[self cfdThresholdChanged:nil];
 	[self dataDelayChanged:nil];
 	[self dataLengthChanged:nil];
-
+	
     [self rateGroupChanged:nil];
     [self integrationChanged:nil];
     [self miscAttributesChanged:nil];
@@ -266,8 +266,8 @@
 	[self noiseFloorChanged:nil];
 	[self noiseFloorIntegrationChanged:nil];
 	[self noiseFloorOffsetChanged:nil];
-
-
+	
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -678,28 +678,30 @@
 
 -(IBAction)initBoard:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model initBoard];		//initialize and load hardward
         NSLog(@"Initialized Gretina (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset and Init of Gretina FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Gretina Reset and Init", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) clearFIFO:(id)sender
 {
-    NS_DURING  
+    @try {  
         [model clearFIFO];
         NSLog(@"Gretina (Slot %d <%p>) FIFO cleared\n",[model slot],[model baseAddress]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Clear of Gretina FIFO FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Gretina FIFO Clear", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 
@@ -722,16 +724,17 @@
 -(IBAction)probeBoard:(id)sender
 {
     [self endEditing];
-    NS_DURING
+    @try {
         unsigned short theID = [model readBoardID];
         NSLog(@"Getina BoardID (slot %d): 0x%x\n",[model slot],theID);
         if(theID == ([model baseAddress]>>5))NSLog(@"Getina BoardID looks correct\n");
         else NSLogColor([NSColor redColor],@"Getina BoardID doesn't match dip settings\n");
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Probe Gretina Board FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) openNoiseFloorPanel:(id)sender
@@ -750,20 +753,21 @@
 - (IBAction) findNoiseFloors:(id)sender
 {
 	[noiseFloorPanel endEditingFor:nil];		
-    NS_DURING
+    @try {
         NSLog(@"Getina (slot %d) Finding LED Thresholds \n",[model slot]);
 		[model findNoiseFloors];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"LED Threshold Finder for Gretina Board FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed LED Threshold finder", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 -(IBAction)readStatus:(id)sender
 {    
     [self endEditing];
-    NS_DURING
+    @try {
         NSLog(@"Getina BoardID (slot %d): [0x%x] ID = 0x%x\n",[model slot],[model baseAddress],[model readBoardID]);
         int chan;
         for(chan = 0;chan<kNumGretinaChannels;chan++){
@@ -782,11 +786,12 @@
         else if(fifoStatus == kAlmostEmpty)	NSLog(@"FIFO = Almost Empty\n");
         else if(fifoStatus == kSome)		NSLog(@"FIFO = Not Empty\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Probe Gretina Board FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem

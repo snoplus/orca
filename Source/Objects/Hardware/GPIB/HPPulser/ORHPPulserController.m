@@ -53,7 +53,7 @@
                      selector : @selector(triggerModeChanged:)
                          name : ORHPPulserTriggerModeChangedNotification
                        object : model];
-  
+	
     [notifyCenter addObserver : self
                      selector : @selector(frequencyChanged:)
                          name : ORHPPulserFrequencyChangedNotification
@@ -73,7 +73,7 @@
                      selector : @selector(voltageChanged:)
                          name : ORHPPulserVoltageChangedNotification
                        object : model];
-					   
+	
 	[notifyCenter addObserver : self
                      selector : @selector(voltageOffsetChanged:)
                          name : ORHPPulserVoltageOffsetChangedNotification
@@ -84,10 +84,10 @@
                          name : ORHPPulserBurstRateChangedNotification
                        object : model];
     
-/*    [notifyCenter addObserver : self
-                     selector : @selector(totalWidthChanged:)
-                         name : ORHPPulserTotalWidthChangedNotification
-                       object : model];*/
+	/*    [notifyCenter addObserver : self
+	 selector : @selector(totalWidthChanged:)
+	 name : ORHPPulserTotalWidthChangedNotification
+	 object : model];*/
     
     
     [notifyCenter addObserver : self
@@ -99,22 +99,22 @@
                      selector : @selector(loadConstantsChanged:)
                          name : ORHPPulserFrequencyChangedNotification
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(loadConstantsChanged:)
                          name : ORHPPulserBurstCyclesChangedNotification
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(loadConstantsChanged:)
                          name : ORHPPulserBurstPhaseChangedNotification
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(loadConstantsChanged:)
                          name : ORHPPulserVoltageChangedNotification
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(loadConstantsChanged:)
                          name : ORHPPulserVoltageOffsetChangedNotification
@@ -125,10 +125,10 @@
                          name : ORHPPulserBurstRateChangedNotification
                        object : model];
     
-/*    [notifyCenter addObserver : self
-                     selector : @selector(loadConstantsChanged:)
-                         name : ORHPPulserTotalWidthChangedNotification
-                       object : model];*/
+	/*    [notifyCenter addObserver : self
+	 selector : @selector(loadConstantsChanged:)
+	 name : ORHPPulserTotalWidthChangedNotification
+	 object : model];*/
     
     
     [notifyCenter addObserver : self
@@ -198,13 +198,13 @@
 					  selector: @selector(lockChanged:)
 						  name: ORHPPulserModelLockGUIChanged
 					   object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(negativePulseChanged:)
                          name : ORHPPulserModelNegativePulseChanged
 						object: model];
-
+	
 }
 
 - (void) updateWindow
@@ -217,7 +217,7 @@
     [self burstRateChanged:nil];
     [self burstPhaseChanged:nil];
     [self burstCyclesChanged:nil];
-//    [self totalWidthChanged:nil];
+	//    [self totalWidthChanged:nil];
     [self selectedWaveformChanged:nil];
     [self loadConstantsChanged:nil];
     [self lockChanged:nil];
@@ -245,7 +245,7 @@
 
 - (IBAction) sendCommandAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		NSString* cmd = [commandField stringValue];
 		if(cmd){
@@ -259,15 +259,16 @@
 				[model writeToGPIBDevice:[commandField stringValue]];
 			}
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
-
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
+	
 }
 
 - (IBAction) clearMemory:(id)sender
@@ -288,46 +289,49 @@
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
-		NS_DURING
+		@try {
 			[model emptyVolatileMemory];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLog( [ localException reason ] );
 			NSRunAlertPanel( [ localException name ], 	// Name of panel
-							 [ localException reason ],	// Reason for error
-							 @"OK",				// Okay button
-							 nil,				// alternate button
-							 nil );				// other button
-		NS_ENDHANDLER
+							[ localException reason ],	// Reason for error
+							@"OK",				// Okay button
+							nil,				// alternate button
+							nil );				// other button
+		}
     }
 }
 
 -(IBAction) readIdAction:(id)sender
 {
-	NS_DURING
+	@try {
 		NSLog(@"Pulser Id: %@\n",[model readIDString]);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 -(IBAction) resetAction:(id)sender
 {
-	NS_DURING
+	@try {
 	    [model resetAndClear];
 	    NSLog(@"HPPulser Reset and Clear successful.\n");
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 -(IBAction) testAction:(id)sender
@@ -338,31 +342,33 @@
 
 - (void) systemTest
 {
-	NS_DURING
+	@try {
 	    [model systemTest];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 -(IBAction) loadParamsAction:(id)sender
 {
     [self endEditing];
-	NS_DURING
+	@try {
 		[model outputWaveformParams];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 
@@ -383,14 +389,14 @@
                               contextInfo:NULL];
     }
     else {
-			[self downloadWaveform];
-			NSLog(@"Downloading Waveform: %@\n",[selectionPopUpButton titleOfSelectedItem]);
+		[self downloadWaveform];
+		NSLog(@"Downloading Waveform: %@\n",[selectionPopUpButton titleOfSelectedItem]);
     }
 }
 
 -(void) downloadWaveform
 {
-    NS_DURING
+    @try {
         [self endEditing];
         
         if(![model loading]){
@@ -404,14 +410,15 @@
             [progress setDoubleValue:0];
         }
         
-        NS_HANDLER
-            NSLog( [ localException reason ] );
-            NSRunAlertPanel( [ localException name ], 	// Name of panel
-                             [ localException reason ],	// Reason for error
-                             @"OK",				// Okay button
-                             nil,				// alternate button
-                             nil );				// other button
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog( [ localException reason ] );
+		NSRunAlertPanel( [ localException name ], 	// Name of panel
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
@@ -421,42 +428,44 @@
         [model setFileName:fileName];
         [self performSelector:@selector(downloadWaveform) withObject:self afterDelay:0.1];
 		NSLog(@"Downloading Waveform: %@\n",fileName);
-
+		
     }
 }
 
 
 -(IBAction) triggerModeAction:(id)sender
 {
-	NS_DURING
+	@try {
 		if([[sender selectedCell]tag] != [model triggerSource]){
 			[[self undoManager] setActionName: @"Set TriggerMode"];
 			[model setTriggerSource:[[sender selectedCell]tag]];	
 			[model writeTriggerSource:[model triggerSource]];    
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog( [ localException reason ] );
 		NSRunAlertPanel( [ localException name ], 	// Name of panel
-						 [ localException reason ],	// Reason for error
-						 @"OK",				// Okay button
-						 nil,				// alternate button
-						 nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 	
 }
 
 - (IBAction) triggerAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model trigger];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog( [ localException reason ] );
 		NSRunAlertPanel( [ localException name ], 	// Name of panel
-						 [ localException reason ],	// Reason for error
-						 @"OK",				// Okay button
-						 nil,				// alternate button
-						 nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 -(IBAction) setFrequencyAction:(id)sender
@@ -511,12 +520,12 @@
 }
 
 /*-(IBAction) setTotalWidthAction:(id)sender
-{
-    if([sender floatValue] != [model totalWidth]){
-        [[self undoManager] setActionName: @"Set Total Width"];
-        [model setTotalWidth:[sender floatValue]];		
-    }
-}*/
+ {
+ if([sender floatValue] != [model totalWidth]){
+ [[self undoManager] setActionName: @"Set Total Width"];
+ [model setTotalWidth:[sender floatValue]];		
+ }
+ }*/
 
 -(IBAction) selectWaveformAction:(id)sender;
 {
@@ -560,7 +569,7 @@
 - (void) lockChanged: (NSNotification*) aNotification
 {
 	[self setButtonStates];
-
+	
 }
 
 - (void) primaryAddressChanged:(NSNotification*)aNotification
@@ -620,10 +629,10 @@
 }
 
 /*- (void) totalWidthChanged:(NSNotification*)aNotification
-{
-	[self updateStepper:totalWidthStepper setting:[model totalWidth]];
-	[totalWidthField setFloatValue: [model totalWidth]];
-}*/
+ {
+ [self updateStepper:totalWidthStepper setting:[model totalWidth]];
+ [totalWidthField setFloatValue: [model totalWidth]];
+ }*/
 
 - (void) selectedWaveformChanged:(NSNotification*)aNotification
 {
@@ -713,7 +722,7 @@
 	[downloadButton setEnabled:![model loading] && ![model lockGUI]];
 	
 	[downloadTypeField setStringValue:@""];
-
+	
 	[progress stopAnimation:self];
 	[progress setIndeterminate:NO];
 	[progress setDoubleValue:0]; 
@@ -747,9 +756,9 @@
     }
 	BOOL locked		= [gSecurity isLocked:[model dialogLock]];
     BOOL triggerModeIsSoftware = [model triggerSource] == kSoftwareTrigger;
-   
+	
 	locked |= [model lockGUI];
-   
+	
     [enableRandomButton setEnabled: !locked && triggerModeIsSoftware];	
     [minTimeField setEnabled: !locked && triggerModeIsSoftware];	
     [maxTimeField setEnabled: !locked && triggerModeIsSoftware];	
@@ -776,8 +785,8 @@
     [burstCyclesStepper setEnabled:!loading && !locked];
     [burstPhaseField setEnabled:!loading && !locked];
     [burstPhaseStepper setEnabled:!loading && !locked];
-//    [totalWidthField setEnabled:!loading && !locked];
-//    [totalWidthStepper setEnabled:!loading && !locked];
+	//    [totalWidthField setEnabled:!loading && !locked];
+	//    [totalWidthStepper setEnabled:!loading && !locked];
     [triggerModeMatrix setEnabled:!locked && !loading];
     [triggerButton setEnabled:!locked && !loading && triggerModeIsSoftware];
     [loadParamsButton setEnabled:!locked && !loading];
@@ -791,7 +800,7 @@
         if(runInProgress && ![gSecurity isLocked:[model dialogLock]])s = @"Not in Maintenance Run.";
     }
     [lockDocField setStringValue:s];
-
+	
 }
 
 @end

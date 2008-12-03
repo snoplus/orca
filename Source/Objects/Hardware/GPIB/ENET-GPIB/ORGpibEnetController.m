@@ -45,24 +45,24 @@
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
+	
     [ super registerNotificationObservers ];
- 
+	
     [ notifyCenter addObserver: self
 	                  selector: @selector( testLockChanged: )
 	                      name: ORRunStatusChangedNotification
 	                    object: nil ];
-
+	
     [ notifyCenter addObserver: self
 	                  selector: @selector( testLockChanged: )
 	                      name: ORGpibEnetTestLock
 	                    object: nil ];
-						
+	
     [ notifyCenter addObserver: self
 	                  selector: @selector( writeToMonitor: )
 	                      name: ORGpibMonitorNotification
 	                    object: nil ];
-
+	
     [ notifyCenter addObserver: self
 	                  selector: @selector( boardIndexChange: )
 	                      name: ORGPIBBoardChangedNotification
@@ -118,17 +118,18 @@
 - (void) writeToMonitor: (NSNotification*) aNotification
 {
     unsigned long maxTextSize = 100000;
-	NS_DURING
+	@try {
 		NSString* command = [[ aNotification userInfo ] objectForKey: ORGpibMonitor ];
 		[monitorView replaceCharactersInRange:NSMakeRange([[monitorView textStorage] length], 0) withString:command];
 		if([[monitorView textStorage] length] > maxTextSize){
 			[[monitorView textStorage] deleteCharactersInRange:NSMakeRange(0,maxTextSize/3)];
 		}
 		[monitorView scrollRangeToVisible: NSMakeRange([[monitorView textStorage] length], 0)];
-
-	NS_HANDLER
-	NS_ENDHANDLER
-
+		
+	}
+	@catch(NSException* localException) {
+	}
+	
 }
 
 
@@ -151,24 +152,25 @@
     long	returnLen;
     long	maxLength = sizeof( data ) - 1;
     
-    NS_DURING
+    @try {
         returnLen =  [[ self model ] writeReadDevice:[ mPrimaryAddress indexOfSelectedItem ] 
                                              command:[ mCommand stringValue ]
                                                 data:&data[0]
                                            maxLength:maxLength];
-   
+		
         if ( returnLen > 0 ){
             data[ returnLen ] = '\0';
             [ mResult insertText: [ NSString stringWithCString: data ] ];
         }
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"%@\n",[localException reason]);
         NSRunAlertPanel( [localException name ], 	// Name of panel
                         [localException reason ],	// Reason for error
                         @"OK",				// Okay button
                         nil,				// alternate button
                         nil );				// other button
-    NS_ENDHANDLER
+    }
 }
 
 
@@ -177,39 +179,41 @@
     char	data[ 2048 ];
     long	returnLen;
     
-    NS_DURING
+    @try {
         returnLen = [[ self model ] readFromDevice: [ mPrimaryAddress indexOfSelectedItem ]
                                               data: &data[ 0 ]
                                          maxLength: sizeof( data ) - 1 ];
-                                     
+		
         if ( returnLen > 0 )
             [ mResult insertText: [ NSString stringWithCString: data ]];
-            
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"%@\n",[localException reason]);
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
+						[ localException reason ],	// Reason for error
                         @"OK", 						// Okay button
                         nil, 						// alternate button
                         nil );						// other button
-    NS_ENDHANDLER
+    }
 }
 
 
 - (IBAction) write: (id) aSender
 {
-    NS_DURING
+    @try {
         [[ self model ] writeToDevice: [ mPrimaryAddress indexOfSelectedItem ]
                               command: [ mCommand stringValue ]];
-    
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"%@\n",[localException reason]);
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",						// Okay button
-                         nil, 						// alternate button
-                         nil );						// other button
-    NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",						// Okay button
+						nil, 						// alternate button
+						nil );						// other button
+    }
 }
 
 
@@ -217,7 +221,7 @@
 {
     short primaryAddress;
     
-    NS_DURING
+    @try {
         primaryAddress = [mPrimaryAddress indexOfSelectedItem];
         if ( primaryAddress  > -1 && primaryAddress < kMaxGpibAddresses )
         {
@@ -225,26 +229,27 @@
                 [[self model] deactivateAddress:primaryAddress];
             
             [[self model] setupDevice:primaryAddress secondaryAddress:
-                                                [[mSecondaryAddress stringValue] intValue]];
+			 [[mSecondaryAddress stringValue] intValue]];
             [mConfigured setStringValue:[NSString stringWithFormat:
-                                                @"Configured:%d\n", primaryAddress]];
+										 @"Configured:%d\n", primaryAddress]];
             [self setTestButtonsEnabled:true];
         }
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"%@\n",[localException reason]);
         NSRunAlertPanel( [localException name], 	// Name of panel
                         [localException reason],	// Reason for error
                         @"OK", 						// Okay button
                         nil, 						// alternate button
                         nil );						// other button
-    NS_ENDHANDLER
+    }
     
     [self changeIbstaStatus:[[self model] ibsta]];
     [self changeStatusSummary:[[self model] ibsta] 
-                         error:[[self model] iberr] 
-                         count:[[self model] ibcntl]];
-
+						error:[[self model] iberr] 
+						count:[[self model] ibcntl]];
+	
 }
 
 
@@ -257,30 +262,30 @@
 //--------------------------------------------------------------------------------
 - (IBAction) changePrimaryAddress: (id) aSender
 {
-// Make sure that value has changed.
+	// Make sure that value has changed.
     if ( [ aSender indexOfSelectedItem ] != mPrimaryAddressValue )
     {
-
-// Get the users new selection
+		
+		// Get the users new selection
         mPrimaryAddressValue = [ aSender indexOfSelectedItem ];
-//        [self updatePopUpButton:mPrimaryAddress setting:mPrimaryAddressValue];
+		//        [self updatePopUpButton:mPrimaryAddress setting:mPrimaryAddressValue];
         [ mPrimaryAddress selectItemAtIndex: mPrimaryAddressValue ];
         
         NSLog ( [ NSString stringWithFormat: @"New Address %d\n", mPrimaryAddressValue ] );
         
-// Check if address is configured.
+		// Check if address is configured.
         if ( [[self model] checkAddress:mPrimaryAddressValue] )
         {
             NSLog ( @"Configured\n" );
             [ mConfigured setStringValue:[ NSString stringWithFormat:
-                                                @"Configured:%d\n", mPrimaryAddressValue ]];
+										  @"Configured:%d\n", mPrimaryAddressValue ]];
             [ self setTestButtonsEnabled: true ];
         }
         else
         {
             NSLog ( @"Not Configured\n" );
             [ mConfigured setStringValue: [ NSString stringWithFormat:
-                                                @"Not configured:%d", mPrimaryAddressValue ]];
+										   @"Not configured:%d", mPrimaryAddressValue ]];
             [ self setTestButtonsEnabled: false ];
         }
     }
@@ -325,15 +330,15 @@
     static	short ibstaLoc[kNumIbstaBits] = { 15, 14, 13, 12, 11, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
     NSTextFieldCell	*tmpObject;
     
-//    printf( "ibsta %d\n", aStatus );
-        
+	//    printf( "ibsta %d\n", aStatus );
+	
     for ( i = 0; i < kNumIbstaBits; i++ )
     {
         tmpObject = [mIbstaErrors cellAtRow:i column:0];
         
         if ( aStatus & ( 1 << ibstaLoc[i] ) )
             [tmpObject setTextColor:[NSColor blackColor]];
-
+		
         else
             [tmpObject setTextColor:[NSColor grayColor]];
     }    
@@ -368,24 +373,24 @@
 {
     short	i;
     
-// Remove all items from popup menus
+	// Remove all items from popup menus
     [mGpibBoard removeAllItems];        
     [mPrimaryAddress removeAllItems];
     
-// Repopulate GPIB Board address
+	// Repopulate GPIB Board address
     for ( i = 0; i < kNumBoards; i++ )
     {
         [mGpibBoard insertItemWithTitle:[[self model] boardNames:i] atIndex:i];
     }
     
-// Repopulate Primary GPIB address
+	// Repopulate Primary GPIB address
     for ( i = 0; i <  kMaxGpibAddresses; i++ ) {
         [mPrimaryAddress insertItemWithTitle:[NSString stringWithFormat:@"%d", i]
-                                      atIndex:i];
+									 atIndex:i];
     } 
     
     mPrimaryAddressValue = -1;
-   [ self changePrimaryAddress:nil];
+	[ self changePrimaryAddress:nil];
 }
 
 //--------------------------------------------------------------------------------
@@ -427,8 +432,8 @@
     [ mQuery setEnabled:NO ];
     [ mWrite setEnabled:NO ];
     [ mRead setEnabled:NO ];
-
-
+	
+	
 }
-    
+
 @end

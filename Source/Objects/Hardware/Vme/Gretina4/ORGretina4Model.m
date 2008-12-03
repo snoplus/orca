@@ -66,7 +66,7 @@ NSString* ORGretina4CardInited					= @"ORGretina4CardInited";
 - (void) blockEraseFlashAtBlock:(unsigned long)blockNumber;
 - (void) programFlashBufferAtAddress:(const void*)theData 
 						startAddress:(unsigned long)anAddress 
-						numberOfBytesToWrite:(unsigned long)aNumber;
+				numberOfBytesToWrite:(unsigned long)aNumber;
 - (void) blockEraseFlash;					   
 - (void) programFlashBuffer:(NSData*)theData;
 - (BOOL) verifyFlashBuffer:(NSData*)theData;
@@ -81,64 +81,64 @@ NSString* ORGretina4CardInited					= @"ORGretina4CardInited";
 #pragma mark ¥¥¥Static Declarations
 //offsets from the base address
 static unsigned long register_offsets[kNumberOfGretina4Registers] = {
-    0x00,  //[0] board ID
-    0x04,  //[1] Programming done
-    0x08,  //[2] External Window
-    0x0C,  //[3] Pileup Window
-    0x10,  //[4] Noise Window
-    0x14,  //[5] Extrn trigger sliding length
-    0x18,  //[6] Collection time
-    0x1C,  //[7] Integration time
-    0x20,  //[8] Hardware Status
-    0x40,  //[9] Control/Status
-    0x80,  //[10] LED Threshold
-    0xC0,  //[11] CFD Parameters
-    0x100, //[12] Raw data sliding length
-    0x140, //[13] Raw data window length
-    0x400, //[14] DAC
-	0x480, //[15] Slave Front bus status
-    0x484, //[16] Channel Zero time stamp LSB
-    0x488, //[17] Channel Zero time stamp MSB
-    0x48C, //[18] Slave Front Bus Send Box 18 - 1
-    0x4D4, //[19] Slave Front bus register 0 - 10
-    0x500, //[20] Master Logic Status
-    0x504, //[21] SlowData CCLED timers
-    0x508, //[22] DeltaT155_DeltaT255 (3)
-    0x514, //[23] SnapShot 
-    0x518, //[24] XTAL ID 
-    0x51C, //[25] Length of Time to get Hit Pattern 
-    0x520, //[26] Front Side Bus Register
-    0x524, //[27] FrontBus Registers 0-10
-	0x780, //[28] Debug data buffer address
-	0x784, //[29] Debug data buffer data
-	0x788, //[30] LED flag window
-	0x800, //[31] Aux io read
-	0x804, //[32] Aux io write
-	0x808, //[33] Aux io config
-	0x820, //[34] FB_Read
-	0x824, //[35] FB_Write
-	0x828, //[36] FB_Config
-	0x840, //[37] SD_Read
-	0x844, //[38] SD_Write
-	0x848, //[39] SD_Config
-	0x84C, //[40] Adc config
-	0x860, //[41] self trigger enable
-	0x864, //[42] self trigger period
-	0x868  //[43] self trigger count
+0x00,  //[0] board ID
+0x04,  //[1] Programming done
+0x08,  //[2] External Window
+0x0C,  //[3] Pileup Window
+0x10,  //[4] Noise Window
+0x14,  //[5] Extrn trigger sliding length
+0x18,  //[6] Collection time
+0x1C,  //[7] Integration time
+0x20,  //[8] Hardware Status
+0x40,  //[9] Control/Status
+0x80,  //[10] LED Threshold
+0xC0,  //[11] CFD Parameters
+0x100, //[12] Raw data sliding length
+0x140, //[13] Raw data window length
+0x400, //[14] DAC
+0x480, //[15] Slave Front bus status
+0x484, //[16] Channel Zero time stamp LSB
+0x488, //[17] Channel Zero time stamp MSB
+0x48C, //[18] Slave Front Bus Send Box 18 - 1
+0x4D4, //[19] Slave Front bus register 0 - 10
+0x500, //[20] Master Logic Status
+0x504, //[21] SlowData CCLED timers
+0x508, //[22] DeltaT155_DeltaT255 (3)
+0x514, //[23] SnapShot 
+0x518, //[24] XTAL ID 
+0x51C, //[25] Length of Time to get Hit Pattern 
+0x520, //[26] Front Side Bus Register
+0x524, //[27] FrontBus Registers 0-10
+0x780, //[28] Debug data buffer address
+0x784, //[29] Debug data buffer data
+0x788, //[30] LED flag window
+0x800, //[31] Aux io read
+0x804, //[32] Aux io write
+0x808, //[33] Aux io config
+0x820, //[34] FB_Read
+0x824, //[35] FB_Write
+0x828, //[36] FB_Config
+0x840, //[37] SD_Read
+0x844, //[38] SD_Write
+0x848, //[39] SD_Config
+0x84C, //[40] Adc config
+0x860, //[41] self trigger enable
+0x864, //[42] self trigger period
+0x868  //[43] self trigger count
 };
 
 static unsigned long fpga_register_offsets[kNumberOfFPGARegisters] = {
-	0x900,	//[0] Main Digitizer FPGA configuration register
-	0x904,	//[1] Main Digitizer FPGA status register
-	0x908,	//[2] Voltage and Temperature Status
-	0x910,	//[3] General Purpose VME Control Settings
-	0x914,	//[4] VME Timeout Value Register
-	0x920,	//[5] VME Version/Status
-	0x930,	//[6] VME FPGA Sandbox Register Block
-	0x980,	//[7] Flash Address
-	0x984,	//[8] Flash Data with Auto-increment address
-	0x988,	//[9] Flash Data
-	0x98C	//[10] FlashCommandRegister
+0x900,	//[0] Main Digitizer FPGA configuration register
+0x904,	//[1] Main Digitizer FPGA status register
+0x908,	//[2] Voltage and Temperature Status
+0x910,	//[3] General Purpose VME Control Settings
+0x914,	//[4] VME Timeout Value Register
+0x920,	//[5] VME Version/Status
+0x930,	//[6] VME FPGA Sandbox Register Block
+0x980,	//[7] Flash Address
+0x984,	//[8] Flash Data with Auto-increment address
+0x988,	//[9] Flash Data
+0x98C	//[10] FlashCommandRegister
 };
 
 enum {
@@ -158,12 +158,12 @@ static struct {
     unsigned short	initialValue;
     float		ratio; //conversion constants
 } cardConstants[kNumGretina4CardParams] = {
-    {@"External Window",	@"us",	0x08,	0x7FF,	0x190, 4./(float)0x190},
-    {@"Pileup Window",		@"us",	0x0C,	0x7FF,	0x0400,	10./(float)0x400},
-    {@"Noise Window",		@"ns",	0x10,	0x07F,	0x0040,	640./(float)0x40},
-    {@"Ext Trigger Length", @"us",	0x14,	0x7FF,	0x0190,	4.0/(float)0x190},
-    {@"Collection Time",	@"us",	0x18,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
-    {@"Integration Time",	@"us",	0x1C,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
+{@"External Window",	@"us",	0x08,	0x7FF,	0x190, 4./(float)0x190},
+{@"Pileup Window",		@"us",	0x0C,	0x7FF,	0x0400,	10./(float)0x400},
+{@"Noise Window",		@"ns",	0x10,	0x07F,	0x0040,	640./(float)0x40},
+{@"Ext Trigger Length", @"us",	0x14,	0x7FF,	0x0190,	4.0/(float)0x190},
+{@"Collection Time",	@"us",	0x18,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
+{@"Integration Time",	@"us",	0x1C,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
 };
 
 
@@ -237,7 +237,7 @@ static struct {
 	if(!aMainFPGADownLoadState) aMainFPGADownLoadState = @"--";
     [mainFPGADownLoadState autorelease];
     mainFPGADownLoadState = [aMainFPGADownLoadState copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelMainFPGADownLoadStateChanged object:self];
 }
 
@@ -251,7 +251,7 @@ static struct {
 	if(!aFpgaFilePath)aFpgaFilePath = @"";
     [fpgaFilePath autorelease];
     fpgaFilePath = [aFpgaFilePath copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelFpgaFilePathChanged object:self];
 }
 
@@ -263,12 +263,12 @@ static struct {
 - (void) setNoiseFloorIntegrationTime:(float)aNoiseFloorIntegrationTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNoiseFloorIntegrationTime:noiseFloorIntegrationTime];
-
+	
     if(aNoiseFloorIntegrationTime<.01)aNoiseFloorIntegrationTime = .01;
 	else if(aNoiseFloorIntegrationTime>5)aNoiseFloorIntegrationTime = 5;
 	
     noiseFloorIntegrationTime = aNoiseFloorIntegrationTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelNoiseFloorIntegrationTimeChanged object:self];
 }
 
@@ -292,7 +292,7 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setNoiseFloorOffset:noiseFloorOffset];
     
     noiseFloorOffset = aNoiseFloorOffset;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelNoiseFloorOffsetChanged object:self];
 }
 
@@ -307,8 +307,8 @@ static struct {
     waveFormRateGroup = newRateGroup;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORGretina4RateGroupChangedNotification
-                      object:self];    
+	 postNotificationName:ORGretina4RateGroupChangedNotification
+	 object:self];    
 }
 
 - (BOOL) noiseFloorRunning
@@ -323,7 +323,7 @@ static struct {
 
 - (void) initParams
 {
-
+	
 	int i;
 	for(i=0;i<kNumGretina4Channels;i++){
 		enabled[i]			= YES;
@@ -546,7 +546,7 @@ static struct {
 {
 	[self setCFDDelay:chan withValue:aValue*0x3F/630.];		//ns -> raw
 }
-	
+
 - (void) setCFDThresholdConverted:(short)chan withValue:(float)aValue
 {
 	[self setCFDThreshold:chan withValue:aValue*0x10/160.];		//kev -> raw
@@ -556,7 +556,7 @@ static struct {
 {
 	[self setDataDelay:chan withValue:aValue*0x01C2/4.5];		//Âµs -> raw
 } 
- 
+
 - (void) setDataLengthConverted:(short)chan withValue:(float)aValue
 {
 	[self setDataLength:chan withValue:aValue/10.0];		//ns -> raw
@@ -574,8 +574,8 @@ static struct {
     [[self adapter] readLongBlock:&theValue
                         atAddress:[self baseAddress] + register_offsets[kBoardID]
                         numToRead:1
-                        withAddMod:[self addressModifier]
-                        usingAddSpace:0x01];
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
     return theValue & 0xffff;
 }
 
@@ -585,29 +585,29 @@ static struct {
     [[self adapter] readLongBlock:&theValue
                         atAddress:[self baseAddress] + register_offsets[kSDConfig]
                         numToRead:1
-                        withAddMod:[self addressModifier]
-                        usingAddSpace:0x01];
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
     
     /* To reset the DCM, assert bit 9 of this register. */
     theValue |= 0x200;
     
     [[self adapter] writeLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kSDConfig]
+						 atAddress:[self baseAddress] + register_offsets[kSDConfig]
                         numToWrite:1
                         withAddMod:[self addressModifier]
-                        usingAddSpace:0x01];
+					 usingAddSpace:0x01];
     /* OK, that should do it. */
 }
 
 - (void) resetBoard
 {
     /* First disable all channels. This does not affect the model state,
-       just the board state. */
+	 just the board state. */
     int i;
     for(i=0;i<kNumGretina4Channels;i++){
         [self writeControlReg:i enabled:NO];
     }
-
+	
     /* Then reset the DCM clock. (This will also reset the serdes.) */
     [self resetDCM];
     
@@ -621,27 +621,27 @@ static struct {
     [[self adapter] readLongBlock:&theValue
                         atAddress:[self baseAddress] + register_offsets[kHardwareStatus]
                         numToRead:1
-                        withAddMod:[self addressModifier]
-                        usingAddSpace:0x01];
-                        
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	
     if ((theValue & 0x7) == 0x7) return;
     theValue = 0x22;
     /* First we set to loop back mode so the SD can lock. */
     [[self adapter] writeLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kSDConfig]
+						 atAddress:[self baseAddress] + register_offsets[kSDConfig]
                         numToWrite:1
                         withAddMod:[self addressModifier]
-                        usingAddSpace:0x01];
-
+					 usingAddSpace:0x01];
+	
     NSDate* startDate = [NSDate date];
     while(1) {
         /* Wait for the SD and DCM to lock */
         [[self adapter] readLongBlock:&theValue
                             atAddress:[self baseAddress] + register_offsets[kHardwareStatus]
                             numToRead:1
-                            withAddMod:[self addressModifier]
-                            usingAddSpace:0x01];
-                    
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+		
         if ((theValue & 0x7) == 0x7) break;
 		if([[NSDate date] timeIntervalSinceDate:startDate] > 2) {
 			NSLog(@"Initializing SERDES timed out (slot %d). \n",[self slot]);
@@ -650,10 +650,10 @@ static struct {
     }
     theValue = 0x02;
     [[self adapter] writeLongBlock:&theValue
-                            atAddress:[self baseAddress] + register_offsets[kSDConfig]
-                            numToWrite:1
-                            withAddMod:[self addressModifier]
-                            usingAddSpace:0x01];    
+						 atAddress:[self baseAddress] + register_offsets[kSDConfig]
+						numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];    
 }
 
 - (void) initBoard
@@ -697,13 +697,13 @@ static struct {
     /* writeControlReg writes the current model state to the board.  If forceEnable is NO, *
      * then all the channels are disabled.  Otherwise, the channels are enabled according  *
      * to the model state.                                                                 */
-     
+	
     BOOL startStop;
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
 	
     unsigned long theValue = (poleZeroEnabled[chan] << 13) | (cfdEnabled[chan] << 12) | (polarity[chan] << 10) 
-        | (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
+	| (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
     [[self adapter] writeLongBlock:&theValue
                          atAddress:[self baseAddress] + register_offsets[kControlStatus] + 4*chan
                         numToWrite:1
@@ -822,12 +822,12 @@ static struct {
 								   numToRead:1 
 								  withAddMod:[self addressModifier] 
 							   usingAddSpace:0x01];
-																		
+				
 				[theController readLongBlock:dataDump 
-							  atAddress:fifoAddress 
-							numToRead:((theValue & kGretina4NumberWordsMask)>>16)-1  //number longs left to read
-							 withAddMod:[self addressModifier] 
-						  usingAddSpace:0x01];
+								   atAddress:fifoAddress 
+								   numToRead:((theValue & kGretina4NumberWordsMask)>>16)-1  //number longs left to read
+								  withAddMod:[self addressModifier] 
+							   usingAddSpace:0x01];
 				count++;
 			} else {
 				if (errorFound) {
@@ -843,9 +843,9 @@ static struct {
             /* The FIFO has been cleared. */
             break;
         }
-
+		
     }
-
+	
     for(i=0;i<kNumGretina4Channels;i++) {
         /* Now reenable all the channels that were enabled before (on the *BOARD*). */
         [self setEnabled:i withValue:boardStateEnabled[i]];
@@ -892,17 +892,17 @@ static struct {
                 unsigned long numberLeftToRead = ((theValue & kGretina4NumberWordsMask)>>16)-1;
                 unsigned long* dataDump = malloc(sizeof(unsigned long)*numberLeftToRead);
                 [theController readLongBlock:dataDump 
-                              atAddress:fifoAddress 
-                            numToRead:  numberLeftToRead //number longs left to read
-                             withAddMod:[self addressModifier] 
-                          usingAddSpace:0x01];
+								   atAddress:fifoAddress 
+								   numToRead:  numberLeftToRead //number longs left to read
+								  withAddMod:[self addressModifier] 
+							   usingAddSpace:0x01];
                 free(dataDump);
                 return 2; // We have lost two events
             }
             
             /* If we've gotten here, it means we have to continue some more. */
         } 
-
+		
     }
 }
 
@@ -922,10 +922,10 @@ static struct {
 - (void) stepNoiseFloor
 {
 	[[self undoManager] disableUndoRegistration];
-  
-    NS_DURING
+	
+    @try {
 		unsigned long val;
-
+		
 		switch(noiseFloorState){
 			case 0: //init
 				//disable all channels
@@ -961,8 +961,8 @@ static struct {
 				else {
 					noiseFloorState = 2; //nothing to do
 				}
-			break;
-			
+				break;
+				
 			case 1:
 				if(noiseFloorLow <= noiseFloorHigh) {
 					[self setLEDThreshold:noiseFloorWorkingChannel withValue:noiseFloorTestValue];
@@ -977,16 +977,16 @@ static struct {
 					[self writeLEDThreshold:noiseFloorWorkingChannel];
 					noiseFloorState = 3;	//done with this channel
 				}
-			break;
-			
+				break;
+				
 			case 2:
 				//read the fifo state
 				[[self adapter] readLongBlock:&val
-									   atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
-									   numToRead:1
-									  withAddMod:[self addressModifier]
-								   usingAddSpace:0x01];
-
+									atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
+									numToRead:1
+								   withAddMod:[self addressModifier]
+								usingAddSpace:0x01];
+				
 				if((val & kGretina4FIFOEmpty) == 0){
 					//there's some data in fifo so we're too low with the threshold
 					[self setLEDThreshold:noiseFloorWorkingChannel withValue:0x7fff];
@@ -997,8 +997,8 @@ static struct {
 				else noiseFloorHigh = noiseFloorTestValue - 1;										//no data so continue lowering threshold
 				noiseFloorTestValue = noiseFloorLow+((noiseFloorHigh-noiseFloorLow)/2);     //Next probe position.
 				noiseFloorState = 1;	//continue with this channel
-			break;
-			
+				break;
+				
 			case 3:
 				//go to next channel
 				noiseFloorLow		= 0;
@@ -1021,8 +1021,8 @@ static struct {
 				else {
 					noiseFloorState = 4;
 				}
-			break;
-							
+				break;
+				
 			case 4: //finish up	
 				//load new results
 				for(i=0;i<kNumGretina4Channels;i++){
@@ -1031,7 +1031,7 @@ static struct {
 				}
 				[self initBoard];
 				noiseFloorRunning = NO;
-			break;
+				break;
 		}
 		if(noiseFloorRunning){
 			[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:noiseFloorIntegrationTime];
@@ -1039,14 +1039,15 @@ static struct {
 		else {
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4NoiseFloorChanged object:self];
 		}
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         int i;
         for(i=0;i<kNumGretina4Channels;i++){
             [self setEnabled:i withValue:oldEnabled[i]];
             [self setLEDThreshold:i withValue:oldLEDThreshold[i]];
         }
 		NSLog(@"Gretina4 LED threshold finder quit because of exception\n");
-    NS_ENDHANDLER
+    }
 	[[self undoManager] enableUndoRegistration];
 }
 
@@ -1054,16 +1055,16 @@ static struct {
 {
 	if(!progressLock)progressLock = [[NSLock alloc] init];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelFpgaDownProgressChanged object:self];
-
+	
 	stopDownLoadingMainFPGA = NO;
 	NSData* dataFromFile = [NSData dataWithContentsOfFile:fpgaFilePath];
-
+	
 	//to minimize disruptions to the download thread we'll check and update the progress from the main thread via a timer.
 	fpgaDownProgress = 0;
-
+	
 	[self setDownLoadMainFPGAInProgress: YES];
 	[self updateDownLoadProgress];
-
+	
 	[NSThread detachNewThreadSelector:@selector(fpgaDownLoadThread:) toTarget:self withObject:dataFromFile];
 }
 
@@ -1095,11 +1096,11 @@ static struct {
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORGretina4WaveformDecoder",             @"decoder",
-        [NSNumber numberWithLong:dataId],        @"dataId",
-        [NSNumber numberWithBool:YES],           @"variable",
-        [NSNumber numberWithLong:-1],			 @"length",
-        nil];
+								 @"ORGretina4WaveformDecoder",             @"decoder",
+								 [NSNumber numberWithLong:dataId],        @"dataId",
+								 [NSNumber numberWithBool:YES],           @"variable",
+								 [NSNumber numberWithLong:-1],			 @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Gretina4"];
     
     return dataDictionary;
@@ -1299,7 +1300,7 @@ static struct {
 {
     isRunning = YES;
     NSString* errorLocation = @"";
-    NS_DURING
+    @try {
         unsigned long val;
         //read the fifo state
         [theController readLongBlock:&val
@@ -1341,7 +1342,7 @@ static struct {
                             timesToRead:numLongsLeft 
                              withAddMod:[self addressModifier] 
                           usingAddSpace:0x01];
-                          
+				
                 long totalNumLongs = (numLongs + numLongsLeft);
                 dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
                 [aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
@@ -1352,12 +1353,13 @@ static struct {
                 NSLogError(@"Gretina4",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- Next event found",nil);
             }
         }
-    
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLogError(@"",@"Gretina4 Card Error",errorLocation,nil);
         [self incExceptionCount];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1381,7 +1383,7 @@ static struct {
     free(dataBuffer);
     if ( fifoLostEvents != 0 ) {
         NSLogError( @"Gretina4 ",[NSString stringWithFormat:@"(slot %d):",[self slot]],
-                    [NSString stringWithFormat:@" lost events due to buffer corruption: %d",fifoLostEvents],nil);
+				   [NSString stringWithFormat:@" lost events due to buffer corruption: %d",fifoLostEvents],nil);
     }
 }
 
@@ -1450,7 +1452,7 @@ static struct {
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-
+	
     /* The current hardware specific data is:               *
      *                                                      *
      * 0: FIFO state address                                *
@@ -1514,7 +1516,7 @@ static struct {
 		[self setDataDelay:i	withValue:[decoder decodeIntForKey:[@"dataDelay"	stringByAppendingFormat:@"%d",i]]];
 		[self setDataLength:i	withValue:[decoder decodeIntForKey:[@"dataLength"	stringByAppendingFormat:@"%d",i]]];
 	}
-	      
+	
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -1542,8 +1544,8 @@ static struct {
 		[encoder encodeInt:dataDelay[i]		forKey:[@"dataDelay"	stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:dataLength[i]	forKey:[@"dataLength"	stringByAppendingFormat:@"%d",i]];
 	}
-
- }
+	
+}
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
@@ -1615,7 +1617,7 @@ static struct {
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
-	NS_DURING
+	@try {
 		[self setProgressStateOnMainThread:@"Block Erase"];
 		if(!stopDownLoadingMainFPGA) [self blockEraseFlash];
 		[self setProgressStateOnMainThread:@"Programming"];
@@ -1631,9 +1633,10 @@ static struct {
 		[self setProgressStateOnMainThread:@"--"];
 		//[self setBuffer:(const unsigned short*)[dataFromFile bytes] length:[dataFromFile length]/2];		
 		//[self performSelector:@selector(programFlashBuffer) withObject:self afterDelay:0.1];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self setProgressStateOnMainThread:@"Exception"];
-	NS_ENDHANDLER
+	}
 	[self performSelectorOnMainThread:@selector(downloadingMainFPGADone) withObject:nil waitUntilDone:NO];
 	[pool release];
 }
@@ -1645,21 +1648,22 @@ static struct {
 	long totalSize = [theData length];
 	[self setFpgaDownProgress:0.];
 	while (address < totalSize ) {
-		NS_DURING
+		@try {
 			[ self programFlashBufferAtAddress:([theData bytes] + address)
-					startAddress:address
-					numberOfBytesToWrite:( ( ([theData length]-address) > kGretina4FlashBufferBytes) 
-									? kGretina4FlashBufferBytes : ([theData length]-address) )];
+								  startAddress:address
+						  numberOfBytesToWrite:( ( ([theData length]-address) > kGretina4FlashBufferBytes) 
+												? kGretina4FlashBufferBytes : ([theData length]-address) )];
 			address += kGretina4FlashBufferBytes;
 			if(stopDownLoadingMainFPGA)break;
-		
+			
 			if(address%(totalSize/1000) == 0){
 				[self setFpgaDownProgress: 100. * address/(float)totalSize];
 			}
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLog(@"Gretina4 exception programming flash.\n");
 			break;
-		NS_ENDHANDLER
+		}
 	}
 	//if(!stopDownLoadingMainFPGA) 
 	[self disableFlashEraseAndProg];
@@ -1677,12 +1681,13 @@ static struct {
 	unsigned int i;
 	[self setFpgaDownProgress:0.];
 	for (i=0; i<kGretina4UsedFlashBlocks; i++ ) {
-		NS_DURING
+		@try {
 			[self blockEraseFlashAtBlock:i];
 			[self setFpgaDownProgress: 100. * (i+1)/(float)kGretina4UsedFlashBlocks];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLog(@"Gretina4 exception erasing flash.\n");
-		NS_ENDHANDLER
+		}
 	}
 	[self disableFlashEraseAndProg];
 	
@@ -1700,7 +1705,7 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-					 
+	
 	tempToWrite = kGretina4FlashReadArrayCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
 						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
@@ -1735,13 +1740,13 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-					 
+	
 	isFlashWriteEnabled = NO;
 }
 
 - (void) programFlashBufferAtAddress:(const void*)theData 
 						startAddress:(unsigned long)anAddress 
-						numberOfBytesToWrite:(unsigned long)aNumber
+				numberOfBytesToWrite:(unsigned long)aNumber
 {
 	static char bufferToWrite[kGretina4FlashBufferBytes];
 	if ( aNumber > kGretina4FlashBufferBytes ) {
@@ -1751,7 +1756,7 @@ static struct {
 		[NSException raise:@"Gretina4 Exception" format:@"Programming flash is not enabled."];
 	}
 	/* Load the words into the bufferToWrite */
-
+	
 	memcpy(bufferToWrite, theData, aNumber);
 	
 	if ( aNumber < kGretina4FlashBufferBytes ) {
@@ -1766,7 +1771,7 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-					 
+	
 	tempToWrite = kGretina4FlashWriteCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
 						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
@@ -1778,10 +1783,10 @@ static struct {
 		// Checking status to make sure that flash is ready
 		/* This is slightly different since we give another command if the status hasn't updated. */
 		[[self adapter] readLongBlock:&tempToWrite
-							 atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
+							atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
 							numToRead:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];		
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];		
 		if ( (tempToWrite & kGretina4FlashReady)  == 0 ) {
 			tempToWrite = kGretina4FlashWriteCmd;
 			[[self adapter] writeLongBlock:&tempToWrite
@@ -1799,21 +1804,21 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-
+	
 	// Loading all the words in
 	unsigned long i;
 	for ( i=0; i<aNumber; i+=4 ) {
 		tempToWrite =   (((unsigned long)bufferToWrite[i]) & 0xFF) |    
-						(((unsigned long)(bufferToWrite[i+1]) <<  8) & 0xFF00) |    
-						(((unsigned long)(bufferToWrite[i+2]) << 16) & 0xFF0000)|    
-						(((unsigned long)(bufferToWrite[i+3]) << 24) & 0xFF000000);
+		(((unsigned long)(bufferToWrite[i+1]) <<  8) & 0xFF00) |    
+		(((unsigned long)(bufferToWrite[i+2]) << 16) & 0xFF0000)|    
+		(((unsigned long)(bufferToWrite[i+3]) << 24) & 0xFF000000);
 		[[self adapter] writeLongBlock:&tempToWrite
 							 atAddress:[self baseAddress] + fpga_register_offsets[kFlashDataWithAddrIncr]
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];	
 	}
-
+	
 	// Finishing the write
 	tempToWrite = kGretina4FlashConfirmCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
@@ -1821,7 +1826,7 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-					 
+	
 	[self testFlashStatusRegisterWithNoFlashCmd];
 }
 
@@ -1831,9 +1836,9 @@ static struct {
 	while(1) {
 		// Checking status to make sure that flash is ready
 		[[self adapter] readLongBlock:&tempToRead
-						atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
-						numToRead:1
-						withAddMod:[self addressModifier]
+							atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
+							numToRead:1
+						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];		
 		if ( (tempToRead & kGretina4FlashReady) != 0 ) break;
 	}
@@ -1853,7 +1858,7 @@ static struct {
 
 - (void) blockEraseFlashAtBlock:(unsigned long)blockNumber
 {
-
+	
 	/* First setup the block erase */
 	if (!isFlashWriteEnabled) {
 		[NSException raise:@"Gretina4 Exception" format:@"Erasing flash is not enabled."];
@@ -1865,14 +1870,14 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-					 
+	
 	tempToWrite = kGretina4FlashBlockEraseCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
 						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-
+	
 	/* Now denote which block we're going to do. */
 	tempToWrite = blockNumber*kGretina4FlashBlockSize;
 	[[self adapter] writeLongBlock:&tempToWrite
@@ -1880,7 +1885,7 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-					 
+	
 	/* And confirm. */
 	tempToWrite = kGretina4FlashConfirmCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
@@ -1888,9 +1893,9 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];					 
-
+	
 	/* Now make sure that it finishes correctly. We don't need to issue the flash command to
-	   read the status register because the confirm command already sets that.  */
+	 read the status register because the confirm command already sets that.  */
 	[self testFlashStatusRegisterWithNoFlashCmd];
 	
 }
@@ -1906,16 +1911,16 @@ static struct {
 	[self setFpgaDownProgress:0.];
 	while ( position < [theData length] ) {
 		[[self adapter] readLongBlock:&tempToRead
-							 atAddress:[self baseAddress] + fpga_register_offsets[kFlashDataWithAddrIncr]
+							atAddress:[self baseAddress] + fpga_register_offsets[kFlashDataWithAddrIncr]
 							numToRead:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];	
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];	
 		/* Now check with */
 		if ( position + 3 < [theData length] ) {
 			tempToCompare = (((unsigned long)dataPtr[position]) & 0xFF) |    
-						(((unsigned long)(dataPtr[position+1]) <<  8) & 0xFF00) |    
-						(((unsigned long)(dataPtr[position+2]) << 16) & 0xFF0000)|    
-						(((unsigned long)(dataPtr[position+3]) << 24) & 0xFF000000);
+			(((unsigned long)(dataPtr[position+1]) <<  8) & 0xFF00) |    
+			(((unsigned long)(dataPtr[position+2]) << 16) & 0xFF0000)|    
+			(((unsigned long)(dataPtr[position+3]) << 24) & 0xFF000000);
 		} else {
 			unsigned int numBytes = [theData length] - position - 1;
 			tempToCompare = 0;
@@ -1947,7 +1952,7 @@ static struct {
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
-					 
+	
 	tempToWrite = kGretina4ReloadMainFPGACmd;
 	[[self adapter] writeLongBlock:&tempToWrite
 						 atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAControl]
@@ -1957,17 +1962,17 @@ static struct {
 	
 	/* Now check if it is done reloading before releasing. */
 	[[self adapter] readLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAStatus]
+						atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAStatus]
 						numToRead:1
-						withAddMod:[self addressModifier]
-					 usingAddSpace:0x01];
-					 
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	
 	while ( ( tempToWrite & kGretina4MainFPGAIsLoaded ) != kGretina4MainFPGAIsLoaded ) {
 		[[self adapter] readLongBlock:&tempToWrite
-							 atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAStatus]
+							atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAStatus]
 							numToRead:1
-							withAddMod:[self addressModifier]
-						 usingAddSpace:0x01];
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
 	}
 }
 
@@ -1976,7 +1981,7 @@ static struct {
 	if(!stopDownLoadingMainFPGA) NSLog(@"Programming Complete.\n");
 	else						 NSLog(@"Programming manually stopped before done\n");
 	[self setDownLoadMainFPGAInProgress: NO];
-
+	
 }
 
 @end

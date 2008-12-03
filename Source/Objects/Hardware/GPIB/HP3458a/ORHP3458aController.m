@@ -46,38 +46,38 @@
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
     [ super registerNotificationObservers ];
     
-      
+	
     [ notifyCenter addObserver: self
                       selector: @selector( lockChanged: )
                           name: ORRunStatusChangedNotification
                         object: nil];
     
-     [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORHP3458aLock
                         object: model];
-    	
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(lockChanged:)
 						  name: ORHP3458aModelLockGUIChanged
 					   object : model];
-
-
+	
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(lockChanged:)
 						  name: ORHP3458aModelLockGUIChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(functionDefChanged:)
                          name : ORHP3458aModelFunctionDefChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(maxInputChanged:)
                          name : ORHP3458aModelMaxInputChanged
 						object: model];
-
+	
 }
 
 - (void) updateWindow
@@ -131,11 +131,11 @@
 	BOOL runInProgress  = [gOrcaGlobals runInProgress];
 	
 	//BOOL locked		= [gSecurity isLocked:ORHP3458aLock];
-      
+	
 	[sendCommandButton setEnabled:!lockedOrRunningMaintenance];
 	[commandField setEnabled:!lockedOrRunningMaintenance];
 	
-
+	
 	[sendToHWButton setEnabled:!lockedOrRunningMaintenance];
 	[readFromHWButton setEnabled:!lockedOrRunningMaintenance];
 	
@@ -159,7 +159,7 @@
 
 - (IBAction) sendCommandAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		NSString* cmd = [commandField stringValue];
 		if(cmd){
@@ -173,15 +173,16 @@
 				[model writeToGPIBDevice:[commandField stringValue]];
 			}
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
-
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
+	
 }
 
 
@@ -192,89 +193,94 @@
 
 - (IBAction) idAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model readIDString];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 - (IBAction) testAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doSelfTest];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) sendToHWAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model sendAllToHW];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) readHWAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model readAllHW];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) resetAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model resetHW];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 	
 }
 
 - (void) populatePullDown
 {
     short	i;
-        
+	
     [maxInputPU removeAllItems];
     
     for (i = 0; i < [model getNumberItemsForMaxInput]; i++) {
         [maxInputPU insertItemWithTitle:[model getMaxInputName:i] atIndex:i];
     }
-     
+	
     [self maxInputChanged:nil];
-
+	
 }
 
 

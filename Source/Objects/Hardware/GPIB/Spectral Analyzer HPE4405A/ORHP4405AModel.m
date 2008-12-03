@@ -38,13 +38,13 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 - (id) init
 {
     self = [ super init ];
-
+	
 	[[self undoManager] disableUndoRegistration];
-
+	
     mRunInProgress = false;
-
+	
 	[[self undoManager] enableUndoRegistration];
-
+	
     return self;
 }
 
@@ -60,7 +60,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
     for ( i = 0; i < kMaxOscChnls; i++ ){
         [ mDataObj[ i ] release ];
     } 	
-
+	
     [ super dealloc ];
 }
 
@@ -100,9 +100,9 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 - (short) oscScopeId
 {
     mScopeVersion = 0;
-
+	
     [ self getID ];
-
+	
     if ( [ mIdentifier rangeOfString: @"4405" ].location != NSNotFound )
     {
         mID = ORHP4405A;
@@ -128,7 +128,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 //--------------------------------------------------------------------------------
 - (void) doNothing
 {
-//inserted to get rid of compiler warnings MAH -8/06/08
+	//inserted to get rid of compiler warnings MAH -8/06/08
 }
 - (long)	oscGetDateTime
 {
@@ -146,13 +146,13 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 {
 	long	inr;
     char	theDataOsc[ 8 ];
-    						
+	
     // Write the command.
     long lengthReturn = [ mController writeReadDevice: mPrimaryAddress 
-                                         command: @"OPC?"
-                                            data: theDataOsc
-                                       maxLength: 6 ];
-                                   
+											  command: @"OPC?"
+												 data: theDataOsc
+											maxLength: 6 ];
+	
     // Check the return value. If first bit is set in INR then have data from acquisition.
     if ( lengthReturn > 0 ) 
 	{
@@ -161,12 +161,12 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 			return false;
 		else
 			return true;
-//        if ( !strncmp( theDataOsc, "1", 1 ) ) 
-//			return true;
-//        else if ( !strncmp( theDataOsc, "0", 1 ) ) 
-//			return false;
-//        else 
-//			return true;
+		//        if ( !strncmp( theDataOsc, "1", 1 ) ) 
+		//			return true;
+		//        else if ( !strncmp( theDataOsc, "0", 1 ) ) 
+		//			return false;
+		//        else 
+		//			return true;
     }
     else 
 		return true;
@@ -206,18 +206,18 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 - (void) oscSetDateTime: (time_t) aDateTime
 {
 	char				sDateTime[ 30 ];
-//	NSMutableString*	dateString;
-//	NSMutableString*	timeString;
-		
-// Convert time to struct tm format.
+	//	NSMutableString*	dateString;
+	//	NSMutableString*	timeString;
+	
+	// Convert time to struct tm format.
 	struct tm* timeStruct = localtime( &aDateTime );
 	
-// Build the time string
+	// Build the time string
 	sprintf( sDateTime, "%d,%d,%d,%d,%d,%d", timeStruct->tm_mday, timeStruct->tm_mon,
-	         (timeStruct->tm_year + 1900), 
-			 timeStruct->tm_hour, timeStruct->tm_min, timeStruct->tm_sec );	
-	        
-// Set date and time
+			(timeStruct->tm_year + 1900), 
+			timeStruct->tm_hour, timeStruct->tm_min, timeStruct->tm_sec );	
+	
+	// Set date and time
     [ self writeToGPIBDevice: [ NSString stringWithFormat: @"SYST:DATE \"%s\"", sDateTime ]];
 }
 
@@ -231,17 +231,17 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscLockPanel: (bool) aFlag
 {
-//    NSString*	command;
+	//    NSString*	command;
     
     if ( aFlag )
     {
-//        command = @"DISPLAY OFF";
+		//        command = @"DISPLAY OFF";
     }
     else{
-//        command = @"DISPLAY ON";
+		//        command = @"DISPLAY ON";
     }
     
-//    [ self writeToGPIBDevice: command ];
+	//    [ self writeToGPIBDevice: command ];
 }
 
 //-----------------------------------------------------------------------------
@@ -270,24 +270,24 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 -(void) oscSetQueryFormat: (short) aFormat
 {
     switch ( aFormat){
-    
+			
         case kNoLabel:
             [ self writeToGPIBDevice: @"COMM_HEADER OFF" ];
-        break;
-        
+			break;
+			
         case kShortLabel:
             [ self writeToGPIBDevice: @"FORM:DATA: INT,32" ];
-        break;
-    
+			break;
+			
         case kLongLabel:
             [ self writeToGPIBDevice: @"FORM:DATA: REAL,32" ];
-        break;
-
+			break;
+			
         default:
             [ self writeToGPIBDevice: @"FORM:DATA: REAL,32" ];
-        break;
+			break;
     }
-
+	
     NSLog( @"Agilent: Data query format sent to Agilent.\n" );
 }
 
@@ -306,7 +306,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 		command = @"DISP:ENAB 1";
     else 		
 		command = @"DISP:ENAB 0";
-		
+	
     [ self writeToGPIBDevice: command ];
 }
 
@@ -324,7 +324,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 	NSString*   acquireOn;
     long		returnLength;		// Length of string returned by oscilloscope.
     
-// Make sure that channel is valid
+	// Make sure that channel is valid
 	if ( [ self checkChnlNum: aChnl ] )
 	{
 		returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d?", aChnl + 1 ]
@@ -332,7 +332,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
         
 		acquireOn = [ NSString stringWithCString: mReturnData ];
 		if ( [ acquireOn rangeOfString: @"ON" 
-								 options: NSBackwardsSearch ].location != NSNotFound )
+							   options: NSBackwardsSearch ].location != NSNotFound )
         {
             [ self setChnlAcquire: aChnl setting: true ];
         }
@@ -360,7 +360,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 		{
             if ( [ self chnlAcquire: i ] )
 			{
-                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d ON", i + 1 ]];
+				[ self writeToGPIBDevice: [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d ON", i + 1 ]];
             }
             else {
                 [ self writeToGPIBDevice: [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d OFF", i + 1 ]];
@@ -396,20 +396,20 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 	NSString*   waveformParams;
 	NSString*   recordLengthStr;
     long		returnLength;
-   
+	
     returnLength = [ self writeReadGPIBDevice: @"WAVEFORM_SETUP?"
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
-									
-// Have to parse the return
+	
+	// Have to parse the return
     if ( returnLength > 0 )
 	{
 		waveformParams = [ NSString stringWithCString: &mReturnData[ 0 ] ];
 		NSArray* waveformValues = [ waveformParams componentsSeparatedByString: @"," ];
-				
+		
 		recordLengthStr = [ waveformValues objectAtIndex: 3 ];		
 		strcpy( &mReturnData[ 0 ], [ recordLengthStr cStringUsingEncoding:NSASCIIStringEncoding ] );
-
+		
 		[ self setWaveformLength: [ self convertStringToLong: mReturnData withLength: returnLength ]];;
 	}
 }
@@ -426,19 +426,19 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscSetWaveformRecordLength
 {
-//	float captureInt;
-//	float memoryUsed;
+	//	float captureInt;
+	//	float memoryUsed;
 	long waveformLength;
 	waveformLength = [ self waveformLength ];
-//	captureInt = 10 * [ self horizontalScale ];
-//	memoryUsed = captureInt / 1.25e-10 + 0.5;
-//	printf( "Rec size 1 %f\n", memoryUsed );
-//	if ( memoryUsed > ORLCMaxRecSize ) memoryUsed = ORLCMaxRecSize;
-//	printf( "Rec size 2 %f\n", memoryUsed );
-//	long sparsing = memoryUsed / [ self waveformLength ];
+	//	captureInt = 10 * [ self horizontalScale ];
+	//	memoryUsed = captureInt / 1.25e-10 + 0.5;
+	//	printf( "Rec size 1 %f\n", memoryUsed );
+	//	if ( memoryUsed > ORLCMaxRecSize ) memoryUsed = ORLCMaxRecSize;
+	//	printf( "Rec size 2 %f\n", memoryUsed );
+	//	long sparsing = memoryUsed / [ self waveformLength ];
 	long sparsing = 1;
 	
-
+	
 	NSLog(@"Record length: %d Sparsing factor: %d  scale factor: %e\n", waveformLength, sparsing, [ self horizontalScale ] );
 	[ self writeToGPIBDevice: [ NSString stringWithFormat: @"WAVEFORM_SETUP NP,%d,SP,%d", waveformLength, sparsing ]];
 	//if ( waveformLength == 15000 ) waveformLength = 25000;	
@@ -459,11 +459,11 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 {
 	static HP4405ADefHeaderStruct	headerInfo;
 	char						*theHeader;
-//	size_t						theLength;
+	//	size_t						theLength;
 	long						numBytes;
 	short						i;
-
-    NS_DURING
+	
+    @try {
         if( [ self isConnected ] )
         {
             for ( i = 0; i < kMaxOscChnls; i++)
@@ -471,30 +471,31 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
                 if ( mChannels[ i ].chnlAcquire )
                 {
                     theHeader = [ mDataObj[ i ] rawHeader ];
-
+					
                     // Send command to retrieve header information.
                     [ self writeToGPIBDevice:
-                    [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d?", i + 1 ]];
-
+					 [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d?", i + 1 ]];
+					
                     // Read header information
 					[ mController readFromDevice: mPrimaryAddress data: (char*)&headerInfo maxLength: sizeof( headerInfo ) ];
-                     numBytes = atoi( headerInfo.mDataLength );							// length of pulse in chnls	
-//					 printf( "Header length: %d\n", numBytes );
-					 					
+					numBytes = atoi( headerInfo.mDataLength );							// length of pulse in chnls	
+					//					 printf( "Header length: %d\n", numBytes );
+					
                     memset( theHeader, 0, sizeof( struct HP4405AHeader ) );
                     [ self readFromGPIBDevice: theHeader maxLength: sizeof( struct HP4405AHeader ) ];
-												
-//					printf( "Header: %s\n", theHeader );
-//					printf( "Channels: %d vGain %e\n", ((struct L950Header*)theHeader)->mWaveArrayCount,
-//					        ((struct L950Header*)theHeader)->mVerticalGain );
+					
+					//					printf( "Header: %s\n", theHeader );
+					//					printf( "Channels: %d vGain %e\n", ((struct L950Header*)theHeader)->mWaveArrayCount,
+					//					        ((struct L950Header*)theHeader)->mVerticalGain );
                 }
             }
         }
-                
-    NS_HANDLER
-    NS_ENDHANDLER
+		
+    }
+	@catch(NSException* localException) {
+    }
 }
-			
+
 
 //--------------------------------------------------------------------------------
 /*!\method  oscGetWaveform
@@ -516,56 +517,57 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 	static struct HP4405ADefHeader	headerInfo;
 	int								i;
 	long							numBytes;
-//	long							j, l;
-
-    NS_DURING
+	//	long							j, l;
+	
+    @try {
         if( [ self isConnected ] )
 		{
-                    
+			
             // Read in all the data at once.
             for ( i = 0; i < kMaxOscChnls; i++ ) 
 			{
                 if ( mChannels[ i ].chnlAcquire && ( aMask & ( 1 << i ) ) ) 
 				{
                     theData = [ mDataObj[ i ] createDataStorage ];
-
+					
 					// Issue command to read data for a single channel.
 					[ mController writeToDevice: mPrimaryAddress command: [ NSString stringWithFormat: @"TRAC:DATA? TRACE%d?", i + 1 ]];
 					
                     // Read header information
 					[ mController readFromDevice: mPrimaryAddress data: (char*)&headerInfo maxLength: sizeof( headerInfo ) ];
-                     numBytes = atoi( headerInfo.mDataLength );							// length of pulse in chnls	
-					 NSLog(@"Waveform points: %d\n", numBytes );					
-				
+					numBytes = atoi( headerInfo.mDataLength );							// length of pulse in chnls	
+					NSLog(@"Waveform points: %d\n", numBytes );					
+					
                     // read the actual data.
                     [ mDataObj[ i ] setActualWaveformSize: ( numBytes >= [ mDataObj[ i ] maxWaveformSize ] ) ? 
-                                       [ mDataObj[ i ] maxWaveformSize ] : numBytes ];  // Read in the smaller size
-                                       
+					 [ mDataObj[ i ] maxWaveformSize ] : numBytes ];  // Read in the smaller size
+					
                     [ mDataObj[ i ] setActualWaveformSize: [ mController readFromDevice: mPrimaryAddress 
                                                                                    data: theData 
                                                                               maxLength: [ mDataObj[ i ] actualWaveformSize ] ] ];
-																			  
-																			  
-//					for ( j = 0; j < numBytes; j += 10 )
-//					{
-//						printf( "\nWave: %d -", j );
-//						for ( l = 0; l < 10; l++ )
-//							printf( " %d", theData[ j + l ] );
-//					}
+					
+					
+					//					for ( j = 0; j < numBytes; j += 10 )
+					//					{
+					//						printf( "\nWave: %d -", j );
+					//						for ( l = 0; l < 10; l++ )
+					//							printf( " %d", theData[ j + l ] );
+					//					}
 				}
             }
         }
         
-// Bad connection so don't execute instruction
+		// Bad connection so don't execute instruction
         else
         {
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
             [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
         }
         
-    NS_HANDLER
-    NS_ENDHANDLER
-
+    }
+	@catch(NSException* localException) {
+    }
+	
 }
 
 //--------------------------------------------------------------------------------
@@ -581,12 +583,12 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 	char				timeRaw[ 64 ];
 	bool				fNoTime = true;
     
-// Initialize memory.
-//    memset( &theTimeStr[ 0 ], '\0', 128 );
+	// Initialize memory.
+	//    memset( &theTimeStr[ 0 ], '\0', 128 );
     
     theTimeData = [ mDataObj[ 0 ] createTimeStorage ];
-                                    
-// Get time from oscilloscope for last waveform.
+	
+	// Get time from oscilloscope for last waveform.
     if ( mID == ORHP4405A )
     {
 		unsigned short i = 0;
@@ -598,14 +600,14 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
                                       command: [ NSString stringWithFormat: @"C%d:INSPECT? 'TRIGGER_TIME'", i + 1 ]
                                          data: timeRaw
 									maxLength: sizeof( timeRaw ) ];
-        
+				
 				fNoTime = false; 
 			}
 			i++;
 		}
     }
-                                                                
-// Convert the time
+	
+	// Convert the time
     [ self oscHP4405AConvertTime: &timeInSecs timeToConvert: &timeRaw[ 0 ] ];
     memcpy( theTimeData, &timeInSecs, 2*sizeof(long) );
 }
@@ -621,27 +623,27 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 //--------------------------------------------------------------------------------
 - (void) oscRunOsc: (NSString*) aStartMsg
 {
-//    NSRange		range = { NSNotFound, 0 };
+	//    NSRange		range = { NSNotFound, 0 };
     
-// Get scope ready.
+	// Get scope ready.
     [ self clearStatusReg ];
     [ self oscScopeId ];
     
-// Acquire data.  Places scope in single waveform acquisition mode.
+	// Acquire data.  Places scope in single waveform acquisition mode.
 	if ( mRunInProgress ){
-	   // time_t	theTime;
-	  //  struct tm	*theTimeGMTAsStruct;
-	  //  time( &theTime );
-	  //  theTimeGMTAsStruct = gmtime( &theTime );
-	   // [ self oscSetDateTime: mktime( theTimeGMTAsStruct ) ];
+		// time_t	theTime;
+		//  struct tm	*theTimeGMTAsStruct;
+		//  time( &theTime );
+		//  theTimeGMTAsStruct = gmtime( &theTime );
+		// [ self oscSetDateTime: mktime( theTimeGMTAsStruct ) ];
 	    [ self oscInitializeForDataTaking: aStartMsg ];
 	    [ self oscArmScope ];
 	}
-
-// Place oscilloscope in free running mode.
+	
+	// Place oscilloscope in free running mode.
 	else{
 	    [ self oscSetAcqMode: kNormalTrigger ];
-//	    [ self writeToGPIBDevice: @"ACQUIRE:STATE RUN"];
+		//	    [ self writeToGPIBDevice: @"ACQUIRE:STATE RUN"];
 	    [ self oscLockPanel: false ];
 	}
 }
@@ -662,19 +664,19 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 	{
 		case kNormalTrigger:
 			[ self setTriggerMode: kTriggerNormal ];
-//			command = @"TRIG_MODE NORM";
+			//			command = @"TRIG_MODE NORM";
 			break;
 		case kSingleWaveform:
 			[ self setTriggerMode: kTriggerSingle ];
-//			command = @"TRIG_MODE SINGLE";
+			//			command = @"TRIG_MODE SINGLE";
 			break;
 	 	default:
 			[ self setTriggerMode: kTriggerNormal ];
-//			command = @"TRIG_MODE NORM";
+			//			command = @"TRIG_MODE NORM";
 	}
 	
 	[ self oscSetTriggerMode ];
-//	[ self writeToGPIBDevice: command ];
+	//	[ self writeToGPIBDevice: command ];
 }
 
 //--------------------------------------------------------------------------------
@@ -698,7 +700,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
     [ self writeToGPIBDevice: @"ABOR"];
     NSLog( @"HP4405A: Data acquisition stopped.\n" );
 }
-		
+
 
 
 #pragma mark ***DataTaker
@@ -707,29 +709,29 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORHP4405ADecoderForScopeData",             @"decoder",
-        [NSNumber numberWithLong:dataId],           @"dataId",
-        [NSNumber numberWithBool:YES],              @"variable",
-        [NSNumber numberWithLong:-1],               @"length",
-        nil];
+								 @"ORHP4405ADecoderForScopeData",             @"decoder",
+								 [NSNumber numberWithLong:dataId],           @"dataId",
+								 [NSNumber numberWithBool:YES],              @"variable",
+								 [NSNumber numberWithLong:-1],               @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"ScopeData"];
-
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORHP4405ADecoderForScopeGTID",             @"decoder",
-        [NSNumber numberWithLong:gtidDataId],       @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:IsShortForm(gtidDataId)?1:2],   @"length",
-        nil];
+				   @"ORHP4405ADecoderForScopeGTID",             @"decoder",
+				   [NSNumber numberWithLong:gtidDataId],       @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:IsShortForm(gtidDataId)?1:2],   @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"ScopeGTID"];
-
-   aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORHP4405ADecoderForScopeTime",             @"decoder",
-        [NSNumber numberWithLong:clockDataId],      @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],   @"length",
-        nil];
+	
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORHP4405ADecoderForScopeTime",             @"decoder",
+				   [NSNumber numberWithLong:clockDataId],      @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:3],   @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"ScopeTime"];
-
+	
     return dataDictionary;
 }
 
@@ -746,11 +748,11 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 {
     short		i;
     bool		bRetVal = false;
-
-// Call base class method that initializes _cancelled conditional lock.
+	
+	// Call base class method that initializes _cancelled conditional lock.
     [ super runTaskStarted: aDataPacket userInfo: anUserInfo ];
     
-// Handle case where device is not connected.
+	// Handle case where device is not connected.
     if( ![ self isConnected ] ){
 	    [ NSException raise: @"Not Connected" format: @"You must connect to a GPIB Controller." ];
     }
@@ -758,31 +760,31 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORHP4405AModel"]; 
-
-
-                                                                                
-// Get the controller so that it is cached
+	
+	
+	
+	// Get the controller so that it is cached
     bRetVal = [ self cacheTheController ];
     if ( !bRetVal )
     {
         [ NSException raise: @"Not connected" format: @"Could not cache the controller." ];
     }
     
-// Initialize the scope correctly.
+	// Initialize the scope correctly.
     firstEvent = YES;
     
-// Set up memory structures for data
+	// Set up memory structures for data
     for ( i = 0; i < kMaxOscChnls; i++ )
     {
         mDataObj[ i ] = [[ ORHP4405AData alloc ] initWithWaveformModel: self channel: i ];
     } 
     
-// Start the oscilloscope
+	// Start the oscilloscope
     NSNumber* initValue = [ anUserInfo objectForKey: @"doinit" ];
     if ( initValue ) [ self setDoFullInit: [ initValue intValue ]];
     else [ self setDoFullInit: YES ];
-
-// Initialize the oscilloscope settings and start acquisition using a run configuration.
+	
+	// Initialize the oscilloscope settings and start acquisition using a run configuration.
     mRunInProgress = true;
 	[ self oscSetStandardSettings ];	
 }
@@ -813,18 +815,18 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
         mDataThreadRunning = YES;
         
 		[_okToGo lockWhenCondition:YES];
-    
+		
 		// -- Do some basic initialization prior to acquiring data ------------------
 		// Threads are responsible to manage their own autorelease pools
 		NSAutoreleasePool *thePool = [[ NSAutoreleasePool alloc ] init ];
 		
 		BOOL processedAnEvent = NO;
 		BOOL readOutError      = NO;
-
+		
 		//extract the data packet to use.
 		if(aDataPacket)[aDataPacket release];
 		aDataPacket 	= [ threadParams objectForKey: @"ThreadData" ];
-
+		
 		// Set which channels to read based on the mask - If not available read all channels.
 		unsigned char mask;
 		NSNumber* theMask = [ threadParams objectForKey: @"ChannelMask" ];
@@ -832,13 +834,13 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 			mask  = [ theMask charValue ];
 		else 
 			mask = 0xff;
-
+		
 		// Get the GTID
 		NSNumber* gtidNumber    = [ threadParams objectForKey: @"GTID" ];
 		NSTimeInterval t0       = [ NSDate timeIntervalSinceReferenceDate ];
 		NSString* errorLocation = @"?"; // Used to determine at what point code stops if it stops.
 		
-	// -- Basic loop that reads the data -----------------------------------
+		// -- Basic loop that reads the data -----------------------------------
 		while ( ![self cancelled])
 		{   
 			// If we are not in standalone mode then gtid will be set.
@@ -846,26 +848,26 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 			if( gtidNumber && ( [ NSDate timeIntervalSinceReferenceDate ] - t0 > 1.0 ) )
 			{
 				NSLogError( @"", @"Scope Error", [ NSString stringWithFormat: @"Thread timeout, no data for scope (%d)", 
-							[ self primaryAddress ]], nil );
-					readOutError = YES;
+												  [ self primaryAddress ]], nil );
+				readOutError = YES;
 				break;
 			}
-		
+			
 			// Start section that reads data.
-			NS_DURING
+			@try {
 				short i;
 				
 				// Scope is not busy so read it out
 				errorLocation = @"oscBusy";
-			   if ( ![ self oscBusy ] )
-			   {
-
+				if ( ![ self oscBusy ] )
+				{
+					
 					// Read the header only for the first event.  We assume that scope settings will not change.
 					if ( firstEvent ) 
 					{
 						//set the channel mask temporarily to read the headers for all channels.
-	//                    errorLocation = @"oscSetWaveformAcq";
-	//                    [ self oscSetWaveformAcq: 0xff ];
+						//                    errorLocation = @"oscSetWaveformAcq";
+						//                    [ self oscSetWaveformAcq: 0xff ];
 						errorLocation = @"oscGetHeader";
 						[ self oscGetHeader ];
 						
@@ -873,7 +875,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 							if ( mChannels[ i ].chnlAcquire ) [ mDataObj[ i ] convertHeader ];
 						}
 					}
-							
+					
 					// Get data
 					errorLocation = @"oscGetWaveform";
 					[ self oscGetWaveform: mask ];			// Get the actual waveform data.
@@ -881,21 +883,21 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 					errorLocation = @"oscGetWaveformTime";
 					[ self oscGetWaveformTime: mask ];		// Get the time.
 					
-				   // Rearm the oscilloscope.
-				   // [self clearStatusReg];
+					// Rearm the oscilloscope.
+					// [self clearStatusReg];
 					errorLocation = @"oscArmScope";
 					[ self oscArmScope ];   
-				   
+					
 					// Place data in array where other parts of ORCA can grab it.
 					for ( i = 0; i < kMaxOscChnls; i++ )
 					{
 						if ( mChannels[ i ].chnlAcquire && ( mask & ( 1 << i ) ))
 						{
 							[ mDataObj[ i ] setGtid: gtidNumber ? [ gtidNumber longValue ] : 0 ];
-				
+							
 							//Note only mDataObj[ 0 ] has the timeData.
 							NSData* theTimeData = [ mDataObj[ 0 ] timePacketData: aDataPacket channel: i ];
-										
+							
 							//note that the gtid is shipped only with the first data set.
 							[ mDataObj[ i ] setDataPacketData: aDataPacket timeData: theTimeData includeGTID: !processedAnEvent ];
 							processedAnEvent = YES;                    
@@ -910,36 +912,38 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 					NSTimeInterval t1 = [ NSDate timeIntervalSinceReferenceDate ];
 					while([ NSDate timeIntervalSinceReferenceDate ] - t1 < .1 );
 				}
-			
-			NS_HANDLER
+				
+			}
+			@catch(NSException* localException) {
 				readOutError = YES;
-			NS_ENDHANDLER
+			}
 			
 			// Indicate that we have processed our first event.
 			if( processedAnEvent )
 				firstEvent = NO;
-		
+			
 			// If we have the data or encountered an error break out of while.
 			if( processedAnEvent || readOutError )
 				break;
 		}
-
-	// -- Handle any errors encountered during read -------------------------------
+		
+		// -- Handle any errors encountered during read -------------------------------
 		if( readOutError )
 		{
 			NSLogError( @"", @"Scope Error", [ NSString stringWithFormat: @"Exception: %@ (%d)", 
-											   errorLocation, [ self primaryAddress ] ], nil );
-
+											  errorLocation, [ self primaryAddress ] ], nil );
+			
 			//we must rearm the scope. Since there was an error we will try a rearm again just to be sure.
 			int errorCount = 0;
 			while( 1 )
 			{
-				NS_DURING
+				@try {
 					[ self clearStatusReg ];
 					[ self oscArmScope ];
-				NS_HANDLER
+				}
+				@catch(NSException* localException) {
 					errorCount++;
-				NS_ENDHANDLER
+				}
 				
 				if( errorCount == 0 ) 
 					break;
@@ -949,7 +953,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 				}
 			}
 		}
-
+		
 		if(aDataPacket)[aDataPacket release];
 		aDataPacket = nil;
 		
@@ -989,15 +993,15 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 {
     short i;
     
-// Cancel the task.
+	// Cancel the task.
     [ super runTaskStopped: aDataPacket userInfo: anUserInfo ];
-        	   
-// Stop running and place oscilloscope in free running mode.
+	
+	// Stop running and place oscilloscope in free running mode.
     mRunInProgress = false;
     [ self oscRunOsc: nil ];
     
     
-// Release memory structures used for data taking
+	// Release memory structures used for data taking
     for ( i = 0; i < kMaxOscChnls; i++ )
     {
         [ mDataObj[ i ] release ];
@@ -1016,7 +1020,7 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 - (id) initWithCoder: (NSCoder*) aDecoder
 {
     self = [ super initWithCoder: aDecoder ];
-
+	
     [[ self undoManager ] disableUndoRegistration ];
     
     [[ self undoManager ] enableUndoRegistration];
@@ -1051,27 +1055,27 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 - (void) oscHP4405AConvertTime: (unsigned long long*) a10MHzTime timeToConvert: (char*) aCharTime
 {
     const char*					stdMonths[] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", 
-                                                "OCT", "NOV", "DEC" };
+	"OCT", "NOV", "DEC" };
     struct tm					unixTime;
-//    struct tm*					tmpStruct;
+	//    struct tm*					tmpStruct;
     unsigned long				baseTime;
 	unsigned long long			fracSecs;
     const unsigned long long	mult = 10000000;
 	const unsigned long long	mult1 = 1000;
-//    char*						dateString;
+	//    char*						dateString;
 	short						i;
 	
 	NSCharacterSet* equalSet = [ NSCharacterSet characterSetWithCharactersInString: @"=" ];
 	NSCharacterSet* spaceSet = [ NSCharacterSet characterSetWithCharactersInString: @" " ];
 	NSCharacterSet* commaSet = [ NSCharacterSet characterSetWithCharactersInString: @"," ];
 	
-// Set date/time reference to Greenwich time zone - no daylight savings time.
+	// Set date/time reference to Greenwich time zone - no daylight savings time.
     unixTime.tm_isdst = 0;
     unixTime.tm_gmtoff = 0;
 	
-//	printf( "Raw time: %s\n", aCharTime );
-
-// Get the month
+	//	printf( "Raw time: %s\n", aCharTime );
+	
+	// Get the month
 	for ( i = 0; i < 12; i++ )
     {
         if ( strstr( aCharTime, stdMonths[ i ] ) )
@@ -1080,11 +1084,11 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
             break;
         }
     }
-
+	
     NSString* dateAsString = [ NSString stringWithFormat: @"%s", aCharTime ];
 	NSScanner* scanner = [ NSScanner scannerWithString: dateAsString ];
-
-// Get date
+	
+	// Get date
 	NSString*   tmpString;
 	[ scanner scanUpToCharactersFromSet: equalSet intoString: nil ]; // find =
 	[ scanner setScanLocation: [ scanner scanLocation ] +2 ];		
@@ -1095,16 +1099,16 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 		unixTime.tm_mday = [ tmpString intValue ];
 	}
 	
-// Get year
+	// Get year
 	[ scanner setScanLocation: [ scanner scanLocation ] +2 ];
 	[ scanner scanInt: &(unixTime.tm_year) ];
 	unixTime.tm_year -= 1900;
 	
-// Get time
+	// Get time
 	[ scanner scanUpToCharactersFromSet: equalSet intoString: nil ]; // find =
 	[ scanner setScanLocation: [ scanner scanLocation ] +2 ];	
 	[ scanner scanInt: &(unixTime.tm_hour) ];	
-
+	
 	[ scanner setScanLocation: [ scanner scanLocation ] +1 ];		
 	[ scanner scanInt: &(unixTime.tm_min) ];	
 	
@@ -1115,20 +1119,20 @@ NSString* ORHP4405AGpibLock  = @"ORHP4405AGpibLock";
 	int fracSecsInt;
 	[ scanner scanInt: &fracSecsInt ];
 	
-// convert fractions seconds to MHz.
+	// convert fractions seconds to MHz.
 	fracSecs = ( unsigned long long )(fracSecsInt * mult1);
 	
-//	printf( "Fraction: %d\n", fracSecsInt );	
-//	printf( "Year: %d, mon: %d, day %d\n", unixTime.tm_year, unixTime.tm_mon, unixTime.tm_mday );
-//	printf( "Hour: %d, min: %d, sec %d\n", unixTime.tm_hour, unixTime.tm_min, unixTime.tm_sec );
-	    
-// Get base time in seconds
+	//	printf( "Fraction: %d\n", fracSecsInt );	
+	//	printf( "Year: %d, mon: %d, day %d\n", unixTime.tm_year, unixTime.tm_mon, unixTime.tm_mday );
+	//	printf( "Hour: %d, min: %d, sec %d\n", unixTime.tm_hour, unixTime.tm_min, unixTime.tm_sec );
+	
+	// Get base time in seconds
     baseTime = timegm( &unixTime ); // Have to use timegm because mktime forces the time to
-                                    // local time and then does conversion to gmtime    
-                          
-// Convert to 10 Mhz Clock
+	// local time and then does conversion to gmtime    
+	
+	// Convert to 10 Mhz Clock
     *a10MHzTime = (unsigned long long)baseTime * mult + fracSecs;
-//	printf( "HP4405A - converted: %lld\n", *a10MHzTime );	
+	//	printf( "HP4405A - converted: %lld\n", *a10MHzTime );	
 }
 @end
 

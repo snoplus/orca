@@ -54,21 +54,21 @@ NSString* ORGretinaModelDataLengthChanged		= @"ORGretinaModelDataLengthChanged";
 #pragma mark ¥¥¥Static Declarations
 //offsets from the base address
 static unsigned long register_offsets[kNumberOfGretinaRegisters] = {
-    0x00, //[0] board ID
-    0x02, //[1] Programming done
-    0x04, //[2] External Window
-    0x06, //[3] Pileup Window
-    0x08, //[4] Noise Window
-    0x0a, //[5] Extrn trigger sliding length
-    0x0c, //[6] Collection time
-    0x0e, //[7] Integration time
-    0x10, //[8] Control/Status
-    0x20, //[9] LED Threshold
-    0x30, //[10] CFD Parameters
-    0x40, //[11] Raw data sliding length
-    0x50, //[28] Raw data window length
-    0x60, //[30] Debug data buffer address
-    0x62  //[31] Dbug data buffer data
+0x00, //[0] board ID
+0x02, //[1] Programming done
+0x04, //[2] External Window
+0x06, //[3] Pileup Window
+0x08, //[4] Noise Window
+0x0a, //[5] Extrn trigger sliding length
+0x0c, //[6] Collection time
+0x0e, //[7] Integration time
+0x10, //[8] Control/Status
+0x20, //[9] LED Threshold
+0x30, //[10] CFD Parameters
+0x40, //[11] Raw data sliding length
+0x50, //[28] Raw data window length
+0x60, //[30] Debug data buffer address
+0x62  //[31] Dbug data buffer data
 };
 
 enum {
@@ -88,12 +88,12 @@ static struct {
     short		initialValue;
     float		ratio; //conversion constants
 } cardConstants[kNumGretinaCardParams] = {
-    {@"External Window",	@"",	0x04,	0x7FF,	0x07FF, 1.},
-    {@"Pileup Window",		@"us",	0x06,	0x7FF,	0x0400,	10./(float)0x400},
-    {@"Noise Window",		@"ns",	0x08,	0x07F,	0x0040,	640./(float)0x40},
-    {@"Ext Trigger Length", @"us",	0x0a,	0x7FF,	0x01C2,	4.5/(float)0x1C2},
-    {@"Collection Time",	@"us",	0x0c,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
-    {@"Integration Time",	@"us",	0x0e,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
+{@"External Window",	@"",	0x04,	0x7FF,	0x07FF, 1.},
+{@"Pileup Window",		@"us",	0x06,	0x7FF,	0x0400,	10./(float)0x400},
+{@"Noise Window",		@"ns",	0x08,	0x07F,	0x0040,	640./(float)0x40},
+{@"Ext Trigger Length", @"us",	0x0a,	0x7FF,	0x01C2,	4.5/(float)0x1C2},
+{@"Collection Time",	@"us",	0x0c,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
+{@"Integration Time",	@"us",	0x0e,	0x01FF,	0x01C2,	4.5/(float)0x1C2},
 };
 
 
@@ -137,12 +137,12 @@ static struct {
 - (void) setNoiseFloorIntegrationTime:(float)aNoiseFloorIntegrationTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setNoiseFloorIntegrationTime:noiseFloorIntegrationTime];
-
+	
     if(aNoiseFloorIntegrationTime<.01)aNoiseFloorIntegrationTime = .01;
 	else if(aNoiseFloorIntegrationTime>5)aNoiseFloorIntegrationTime = 5;
 	
     noiseFloorIntegrationTime = aNoiseFloorIntegrationTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaModelNoiseFloorIntegrationTimeChanged object:self];
 }
 
@@ -166,7 +166,7 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setNoiseFloorOffset:noiseFloorOffset];
     
     noiseFloorOffset = aNoiseFloorOffset;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaModelNoiseFloorOffsetChanged object:self];
 }
 
@@ -181,8 +181,8 @@ static struct {
     waveFormRateGroup = newRateGroup;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORGretinaRateGroupChangedNotification
-                      object:self];    
+	 postNotificationName:ORGretinaRateGroupChangedNotification
+	 object:self];    
 }
 
 - (BOOL) noiseFloorRunning
@@ -197,7 +197,7 @@ static struct {
 
 - (void) initParams
 {
-
+	
 	int i;
 	for(i=0;i<kNumGretinaChannels;i++){
 		enabled[i]			= YES;
@@ -398,7 +398,7 @@ static struct {
 {
 	[self setCFDDelay:chan withValue:aValue*0x3F/630.];		//ns -> raw
 }
-	
+
 - (void) setCFDThresholdConverted:(short)chan withValue:(float)aValue
 {
 	[self setCFDThreshold:chan withValue:aValue*0x10/160.];		//kev -> raw
@@ -408,7 +408,7 @@ static struct {
 {
 	[self setDataDelay:chan withValue:aValue*0x01C2/4.5];		//µs -> raw
 } 
- 
+
 - (void) setDataLengthConverted:(short)chan withValue:(float)aValue
 {
 	[self setDataLength:chan withValue:aValue];		//ns -> raw
@@ -464,7 +464,7 @@ static struct {
 
 - (void) writeControlReg:(int)chan enabled:(BOOL)forceEnable
 {
- 
+	
     BOOL startStop;
     if(forceEnable)	startStop= enabled[chan];
     else			startStop = NO;
@@ -476,10 +476,10 @@ static struct {
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	/*
-    unsigned short readBackValue = [self readControlReg:chan];
-    if((readBackValue & 0x0c1f) != theValue){
-        NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xc1f,theValue & 0xc1f);
-    }*/
+	 unsigned short readBackValue = [self readControlReg:chan];
+	 if((readBackValue & 0x0c1f) != theValue){
+	 NSLogColor([NSColor redColor],@"Channel %d status reg readback != writeValue (0x%x != 0x%x)\n",chan,readBackValue & 0xc1f,theValue & 0xc1f);
+	 }*/
 }
 
 - (void) writeLEDThreshold:(int)channel
@@ -596,7 +596,7 @@ static struct {
 								   numToRead:1 
 								  withAddMod:0x39 
 							   usingAddSpace:0x01];
-																		
+				
 				[theController readLong:dataDump 
 							  atAddress:fifoAddress 
 							timesToRead:((theValue & 0xffff0000)>>16)-1  //number longs left to read
@@ -610,14 +610,14 @@ static struct {
 			}
 		}
 		else break;
-
+		
 		if([[NSDate date] timeIntervalSinceDate:startDate] > 10){
             NSLog(@"That took a long time but seems to have been successful (slot %d)\n",[self slot]);
 			//error = YES;
 			break;
 		}
     }
-
+	
 	if(error){
 		NSLog(@"unable to clear FIFO on Gretina card (slot %d)\n",[self slot]);
 		[NSException raise:@"Gretina card Error" format:@"unable to clear FIFO on Gretina card (slot %d)",[self slot]];
@@ -642,10 +642,10 @@ static struct {
 - (void) stepNoiseFloor
 {
 	[[self undoManager] disableUndoRegistration];
-  
-    NS_DURING
+	
+    @try {
 		unsigned short val;
-
+		
 		switch(noiseFloorState){
 			case 0: //init
 				//disable all channels
@@ -681,8 +681,8 @@ static struct {
 				else {
 					noiseFloorState = 2; //nothing to do
 				}
-			break;
-			
+				break;
+				
 			case 1:
 				if(noiseFloorLow <= noiseFloorHigh) {
 					[self setLEDThreshold:noiseFloorWorkingChannel withValue:noiseFloorTestValue];
@@ -697,16 +697,16 @@ static struct {
 					[self writeLEDThreshold:noiseFloorWorkingChannel];
 					noiseFloorState = 3;	//done with this channel
 				}
-			break;
-			
+				break;
+				
 			case 2:
 				//read the fifo state
 				[[self adapter] readWordBlock:&val
-									   atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
-									   numToRead:1
-									  withAddMod:0x29
-								   usingAddSpace:0x01];
-
+									atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
+									numToRead:1
+								   withAddMod:0x29
+								usingAddSpace:0x01];
+				
 				if((val & kGretinaFIFOEmpty) != 0){
 					//there's some data in fifo so we're too low with the threshold
 					[self setLEDThreshold:noiseFloorWorkingChannel withValue:0x7fff];
@@ -717,8 +717,8 @@ static struct {
 				else noiseFloorHigh = noiseFloorTestValue - 1;										//no data so continue lowering threshold
 				noiseFloorTestValue = noiseFloorLow+((noiseFloorHigh-noiseFloorLow)/2);     //Next probe position.
 				noiseFloorState = 1;	//continue with this channel
-			break;
-			
+				break;
+				
 			case 3:
 				//go to next channel
 				noiseFloorLow		= 0;
@@ -741,8 +741,8 @@ static struct {
 				else {
 					noiseFloorState = 4;
 				}
-			break;
-							
+				break;
+				
 			case 4: //finish up	
 				//load new results
 				for(i=0;i<kNumGretinaChannels;i++){
@@ -751,7 +751,7 @@ static struct {
 				}
 				[self initBoard];
 				noiseFloorRunning = NO;
-			break;
+				break;
 		}
 		if(noiseFloorRunning){
 			[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:noiseFloorIntegrationTime];
@@ -759,14 +759,15 @@ static struct {
 		else {
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORGretinaNoiseFloorChanged object:self];
 		}
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         int i;
         for(i=0;i<kNumGretinaChannels;i++){
             [self setEnabled:i withValue:oldEnabled[i]];
             [self setLEDThreshold:i withValue:oldLEDThreshold[i]];
         }
 		NSLog(@"Gretina LED threshold finder quit because of exception\n");
-    NS_ENDHANDLER
+    }
 	[[self undoManager] enableUndoRegistration];
 }
 
@@ -791,11 +792,11 @@ static struct {
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORGretina4WaveformDecoder",            @"decoder",
-        [NSNumber numberWithLong:dataId],        @"dataId",
-        [NSNumber numberWithBool:YES],           @"variable",
-        [NSNumber numberWithLong:-1],			 @"length",
-        nil];
+								 @"ORGretina4WaveformDecoder",            @"decoder",
+								 [NSNumber numberWithLong:dataId],        @"dataId",
+								 [NSNumber numberWithBool:YES],           @"variable",
+								 [NSNumber numberWithLong:-1],			 @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Gretina"];
     
     return dataDictionary;
@@ -995,7 +996,7 @@ static struct {
 {
     isRunning = YES; 
     NSString* errorLocation = @"";
-    NS_DURING
+    @try {
 		unsigned short val;
 		//read the fifo state
 		[theController readWordBlock:&val
@@ -1037,7 +1038,7 @@ static struct {
 							timesToRead:numLongsLeft 
 							 withAddMod:0x39 
 						  usingAddSpace:0x01];
-						  
+				
 				long totalNumLongs = (numLongs + numLongsLeft);
 				dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
 				[aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
@@ -1048,11 +1049,12 @@ static struct {
 				NSLogError(@"Gretina",[NSString stringWithFormat:@"slot %d",[self slot]],@"Packet Sequence Error -- FIFO flushed",nil);
 			}
 		} 
-        NS_HANDLER
-            NSLogError(@"",@"Gretina Card Error",errorLocation,nil);
-            [self incExceptionCount];
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"Gretina Card Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1071,7 +1073,7 @@ static struct {
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-
+	
     /* The current hardware specific data is:               *
      *                                                      *
      * 0: FIFO state address                                *
@@ -1201,7 +1203,7 @@ static struct {
 		[self setDataDelay:i withValue:[decoder decodeIntForKey:[@"dataDelay" stringByAppendingFormat:@"%d",i]]];
 		[self setDataLength:i withValue:[decoder decodeIntForKey:[@"dataLength" stringByAppendingFormat:@"%d",i]]];
 	}
-	      
+	
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -1228,8 +1230,8 @@ static struct {
 		[encoder encodeInt:dataDelay[i] forKey:[@"dataDelay" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt:dataLength[i] forKey:[@"dataLength" stringByAppendingFormat:@"%d",i]];
 	}
-
- }
+	
+}
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {

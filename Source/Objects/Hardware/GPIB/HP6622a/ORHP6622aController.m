@@ -43,59 +43,59 @@
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
     [ super registerNotificationObservers ];
     
-      
+	
     [ notifyCenter addObserver: self
                       selector: @selector( lockChanged: )
                           name: ORRunStatusChangedNotification
                         object: nil];
     
-     [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORHP6622aLock
                         object: model];
-    	
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(lockChanged:)
 						  name: ORHP6622aModelLockGUIChanged
 					   object : model];
-
-
+	
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(lockChanged:)
 						  name: ORHP6622aModelLockGUIChanged
 					   object : model];
-
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(outputOnChanged:)
 						  name: ORHP6622aOutputOnChanged
 					   object : model];
-
-
+	
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(ocProtectionOnChanged:)
 						  name: ORHP6622aOcProtectionOnChanged
 					   object : model];
-
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(setVoltageChanged:)
 						  name: ORHP6622aSetVolageChanged
 					   object : model];
-
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(actVoltageChanged:)
 						  name: ORHP6622aActVolageChanged
 					   object : model];
-
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(overVoltageChanged:)
 						  name: ORHP6622aOverVolageChanged
 					   object : model];
-
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(setCurrentChanged:)
 						  name: ORHP6622aSetCurrentChanged
 					   object : model];
-
+	
 	[notifyCenter addObserver : self
 					  selector: @selector(actCurrentChanged:)
 						  name: ORHP6622aActCurrentChanged
@@ -125,7 +125,7 @@
 - (void) lockChanged: (NSNotification*) aNotification
 {
 	[self setButtonStates];
-
+	
 }
 
 - (void) primaryAddressChanged:(NSNotification*)aNotification
@@ -146,7 +146,7 @@
 	BOOL runInProgress  = [gOrcaGlobals runInProgress];
 	
 	//BOOL locked		= [gSecurity isLocked:ORHP6622aLock];
-      
+	
 	[sendCommandButton setEnabled:!lockedOrRunningMaintenance];
 	[commandField setEnabled:!lockedOrRunningMaintenance];
 	
@@ -228,20 +228,21 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) sendCommandAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		if([commandField stringValue]){
 			[model writeToGPIBDevice:[commandField stringValue]];
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
-
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
+	
 }
 
 
@@ -252,172 +253,184 @@
 
 - (IBAction) idAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model readIDString];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 - (IBAction) testAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doSelfTest];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) sendToHWAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model sendAllToHW];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) readHWAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model readAllHW];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) outputOnAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model setOutputOn:[[sender selectedCell] tag] withValue:[[sender selectedCell] intValue]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) ocProtectionOnAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model setOcProtectionOn:[[sender selectedCell] tag] withValue:[[sender selectedCell] intValue]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) setVoltageAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model setSetVoltage:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) setCurrentAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model setSetCurrent:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) setOverVoltageAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model setOverVoltage:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) resetOverVoltageAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model resetOverVoltage:[[sender selectedCell] tag]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) resetOcProtectionAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model resetOcProtection:[[sender selectedCell] tag]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) setClearAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model sendClear];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 

@@ -40,10 +40,10 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 #pragma mark ¥¥¥Initalization
 //--------------------------------------------------------------------------------
 /*!\method  init
-* \brief	Called first time class is initialized.  Used to set basic
-*			default values first time object is created.
-* \note	
-*/
+ * \brief	Called first time class is initialized.  Used to set basic
+ *			default values first time object is created.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (id) init
 {
@@ -64,18 +64,18 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  makeConnectors
-* \brief	Makes connection object to which device can be connected to controller.
-* \note	
-*/
+ * \brief	Makes connection object to which device can be connected to controller.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) makeConnectors
 {
 	if(![[ self connectors ] objectForKey:ORGpibConnection]){
-
+		
 		// make the first connect object.
 		ORConnector* connectorObj1 = [[ ORConnector alloc ] 
-									initAt: NSMakePoint( 2, 2 )
-								withGuardian: self];
+									  initAt: NSMakePoint( 2, 2 )
+									  withGuardian: self];
 		[[ self connectors ] setObject: connectorObj1 forKey: ORGpibConnection ];
 		[ connectorObj1 setConnectorType: 'GPI1' ];
 		[ connectorObj1 addRestrictedConnectionType: 'GPI2' ]; //can only connect to gpib outputs
@@ -85,8 +85,8 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 	if(![[ self connectors ] objectForKey:ORGpibConnectionToNextDevice]){
 		// Make the second connector object.
 		ORConnector* connectorObj2 = [[ ORConnector alloc ] 
-									initAt: NSMakePoint( [self frame].size.width-kConnectorSize-2, 2 )
-								withGuardian: self];
+									  initAt: NSMakePoint( [self frame].size.width-kConnectorSize-2, 2 )
+									  withGuardian: self];
 		[[ self connectors ] setObject: connectorObj2 forKey: ORGpibConnectionToNextDevice ];
 		[ connectorObj2 setConnectorType: 'GPI2' ];
 		[ connectorObj2 addRestrictedConnectionType: 'GPI1' ]; //can only connect to gpib inputs
@@ -97,9 +97,9 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  dealloc
-* \brief	Unregister notifications and do general cleanup.
-* \note	
-*/
+ * \brief	Unregister notifications and do general cleanup.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) dealloc
 {
@@ -117,10 +117,10 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method 	gpibIdentifier
-* \brief	Return string with self identification of GPIB device.
-* \return	The identifier.
-* \note	
-*/
+ * \brief	Return string with self identification of GPIB device.
+ * \return	The identifier.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (NSString *) gpibIdentifier
 {
@@ -129,10 +129,10 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method 	isConnected
-* \brief	Determine if device is connected to GPIB.  If not connect the device.
-* \return	True - if connected, false - if not connected.
-* \note	
-*/
+ * \brief	Determine if device is connected to GPIB.  If not connect the device.
+ * \return	True - if connected, false - if not connected.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (BOOL) isConnected
 {
@@ -147,10 +147,10 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method 	connected
-* \brief	Determine if device is connected to GPIB. 
-* \return	True - if connected, false - if not connected.
-* \note	
-*/
+ * \brief	Determine if device is connected to GPIB. 
+ * \return	True - if connected, false - if not connected.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (BOOL) connected
 {
@@ -170,40 +170,40 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  setPrimaryAddress  
-* \brief	Set the primary address for the GPIB device.  Send notification of change.
-* \param	aPrimaryAddress			- The new primary address.
-* \note	
-*/
+ * \brief	Set the primary address for the GPIB device.  Send notification of change.
+ * \param	aPrimaryAddress			- The new primary address.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) setPrimaryAddress: (short) aPrimaryAddress
 {
     [[[ self undoManager ] prepareWithInvocationTarget: self ] 
-                                         setPrimaryAddress: [ self primaryAddress ]];                         
+	 setPrimaryAddress: [ self primaryAddress ]];                         
     
     mPrimaryAddress = aPrimaryAddress;
     
     [[ NSNotificationCenter defaultCenter ]
-         postNotificationName: ORGpibPrimaryAddressChangedNotification
-                       object: self];
+	 postNotificationName: ORGpibPrimaryAddressChangedNotification
+	 object: self];
     
 }
 
 //--------------------------------------------------------------------------------
 /*!\method  setSecondaryAddress  
-* \brief	Set the secondary address for the GPIB device.  Send notification of change.
-* \param	aPrimaryAddress			- The new primary address.
-* \note	
-*/
+ * \brief	Set the secondary address for the GPIB device.  Send notification of change.
+ * \param	aPrimaryAddress			- The new primary address.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) setSecondaryAddress: (short) aSecondaryAddress
 {
     [[[ self undoManager ] prepareWithInvocationTarget: self ] 
-                                         setSecondaryAddress: [ self secondaryAddress ]];                         
+	 setSecondaryAddress: [ self secondaryAddress ]];                         
     
     mSecondaryAddress = aSecondaryAddress;
     [[ NSNotificationCenter defaultCenter ]
-         postNotificationName: ORGpibSecondaryAddressChangedNotification
-                       object: self];
+	 postNotificationName: ORGpibSecondaryAddressChangedNotification
+	 object: self];
     
     
 }
@@ -211,9 +211,9 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 #pragma mark ¥¥¥Actions
 //--------------------------------------------------------------------------------
 /*!\method  clearStatusReg
-* \brief	Clears the status register of the device.
-* \note	
-*/
+ * \brief	Clears the status register of the device.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) clearStatusReg
 {
@@ -223,15 +223,15 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  connect  
-* \brief	Attempt to connect to the actual hardware device.
-* \note
-* \history	2003-10-16 (jmw) - Added getting of device name immediately after 
-*								connection.	
-*/
+ * \brief	Attempt to connect to the actual hardware device.
+ * \note
+ * \history	2003-10-16 (jmw) - Added getting of device name immediately after 
+ *								connection.	
+ */
 //--------------------------------------------------------------------------------
 - (void) connect
 {
-    NS_DURING
+    @try {
         [[ self getGpibController ] setupDevice: mPrimaryAddress 
                                secondaryAddress: mSecondaryAddress ];
         mConnected = true;
@@ -245,15 +245,16 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
         // Send out notification that the value has changed.  The dictionary object just created is sent
         // so that objects receiving the notification know what has happened.
         [[ NSNotificationCenter defaultCenter ]
-            postNotificationName: ORGpibDeviceConnectedNotification
-                          object: self
-                        userInfo: userInfo ];
+		 postNotificationName: ORGpibDeviceConnectedNotification
+		 object: self
+		 userInfo: userInfo ];
         
         // Get the device name
         //[ self getID ];
         
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         mConnected = false;
         
         // Send notification that GPIB connection failed.
@@ -265,22 +266,22 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
         // Send out notification that the value has changed.  The dictionary object just created is sent
         // so that objects receiving the notification know what has happened.
         [[ NSNotificationCenter defaultCenter ]
-            postNotificationName: ORGpibDeviceConnectedNotification
-                          object: self
-                        userInfo: userInfo ];
+		 postNotificationName: ORGpibDeviceConnectedNotification
+		 object: self
+		 userInfo: userInfo ];
         
         // Raise an exception.
         [ localException raise ];
-    NS_ENDHANDLER
+    }
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  getID 
-* \brief	Gets the identification of the device in device specific format. 
-* \return	Return NSString with identification information.
-* \note	
-*/
+ * \brief	Gets the identification of the device in device specific format. 
+ * \return	Return NSString with identification information.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) getID
 {
@@ -300,17 +301,17 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  readFromGPIBDevice 
-* \brief	Attempt to write command to GPIB device. 
-* \param	aCommand		- The command to issue.
-* \return	Length of string returned from GPIB device.
-* \note	
-*/
+ * \brief	Attempt to write command to GPIB device. 
+ * \param	aCommand		- The command to issue.
+ * \return	Length of string returned from GPIB device.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (long) readFromGPIBDevice: (char*) aData maxLength: (long) aMaxLength
 {
     long		returnLength = 0;
     
-    NS_DURING
+    @try {
         if ( [ self isConnected ] )
         {            
             returnLength = [[self getGpibController] readFromDevice: mPrimaryAddress
@@ -322,23 +323,24 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
             NSString *errorMsg = @"Must establish GPIB connection prior to reading from device.\n";
             [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
         }
-        NS_HANDLER
-            
-            NS_ENDHANDLER
-            
-            return( returnLength );
+	}
+	@catch(NSException* localException) {
+		
+	}
+	
+	return( returnLength );
 }
 
 //--------------------------------------------------------------------------------
 /*!\method  writeToGPIBDevice 
-* \brief	Attempt to write command to GPIB device. 
-* \param	aCommand		- The command to issue.
-* \note	
-*/
+ * \brief	Attempt to write command to GPIB device. 
+ * \param	aCommand		- The command to issue.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) writeToGPIBDevice: (NSString*) aCommand
 {
-    NS_DURING
+    @try {
         if( [ self isConnected ] )
         {
             [[ self getGpibController ] writeToDevice: mPrimaryAddress
@@ -349,19 +351,20 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
             [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
         }
-        NS_HANDLER
-            [ localException raise ];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		[ localException raise ];
+	}
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  writeReadGPIBDevice 
-* \brief	Attempt to write command to GPIB device and then read response
-* \param	aCommand		- The command to issue.
-* \return	Number of bytes read in.  -1 indicates that nothing was r
-* \note	
-*/
+ * \brief	Attempt to write command to GPIB device and then read response
+ * \param	aCommand		- The command to issue.
+ * \return	Number of bytes read in.  -1 indicates that nothing was r
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (long) writeReadGPIBDevice: (NSString*) aCommand data: (char*) aData
                    maxLength: (long) aMaxLength
@@ -372,14 +375,14 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  enableEOT 
-* \brief	Attempt to set the state of the device EOT. 
-* \param	state		- The new state of the EOT.
-* \note	
-*/
+ * \brief	Attempt to set the state of the device EOT. 
+ * \param	state		- The new state of the EOT.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) enableEOT: (BOOL) state
 {
-    NS_DURING
+    @try {
         if( mConnected )
         {
             [[ self getGpibController ] enableEOT: mPrimaryAddress
@@ -390,9 +393,10 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
             [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
         }
-        NS_HANDLER
-            [ localException raise ];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		[ localException raise ];
+	}
 }
 
 
@@ -401,10 +405,10 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 #pragma mark ¥¥¥Support functions
 //--------------------------------------------------------------------------------
 /*!\method  cacheTheController 
-* \brief	Cache link to controller.  This cache is used to speed up acquisition.
-* \return	True - caching successful.
-* \note	
-*/
+ * \brief	Cache link to controller.  This cache is used to speed up acquisition.
+ * \return	True - caching successful.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (bool) cacheTheController
 {    
@@ -414,10 +418,10 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  getGpibController 
-* \brief	This method searchs back up the connector chain and returns a gpib controller
-* \return	The gpib controller if found, else returns nil.
-* \note	
-*/
+ * \brief	This method searchs back up the connector chain and returns a gpib controller
+ * \return	The gpib controller if found, else returns nil.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (id) getGpibController
 {
@@ -429,12 +433,12 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  convertStringToDouble 
-* \brief	This converts a number at the end of a returned string to a double.
-* \param	aString		- The string to search.
-* \param	aLength		- The length of the string.
-* \return	The number.
-* \note	
-*/
+ * \brief	This converts a number at the end of a returned string to a double.
+ * \param	aString		- The string to search.
+ * \param	aLength		- The length of the string.
+ * \return	The number.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (double) convertStringToDouble: (char*) aString withLength: (long) aLength
 {
@@ -451,12 +455,12 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  convertStringToFloat
-* \brief	This converts a number at the end of a returned string to a float.
-* \param	aString		- The string to search.
-* \param	aLength		- The length of the string.
-* \return	The number.
-* \note	
-*/
+ * \brief	This converts a number at the end of a returned string to a float.
+ * \param	aString		- The string to search.
+ * \param	aLength		- The length of the string.
+ * \return	The number.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (float) convertStringToFloat: (char*) aString withLength: (long) aLength
 {
@@ -473,12 +477,12 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  convertStringToLong 
-* \brief	This converts a number at the end of a returned string to a long.
-* \param	aString		- The string to search.
-* \param	aLength		- The length of the string.
-* \return	The number.
-* \note	
-*/
+ * \brief	This converts a number at the end of a returned string to a long.
+ * \param	aString		- The string to search.
+ * \param	aLength		- The length of the string.
+ * \return	The number.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (long) convertStringToLong: (char*) aString withLength: (long) aLength
 {
@@ -495,13 +499,13 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  findNumber 
-* \brief	This routine searches for the number in a returned string from a GPIB
-*			device.
-* \param	aString		- The string to search.
-* \param	aLength		- The length of the string.
-* \return	Returns a pointer to the character in aString where number starts.
-* \note	This routine can handle a full return or just a number return.
-*/
+ * \brief	This routine searches for the number in a returned string from a GPIB
+ *			device.
+ * \param	aString		- The string to search.
+ * \param	aLength		- The length of the string.
+ * \return	Returns a pointer to the character in aString where number starts.
+ * \note	This routine can handle a full return or just a number return.
+ */
 //--------------------------------------------------------------------------------
 - (char*) findNumber: (char*) aString withLength: (long) aLength
 {
@@ -520,7 +524,7 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 		for ( j = i; i < aLength; j++ )
 		{
 			if ( isdigit( aString[ j ] ) || aString[ j ] == '-' || aString[ j ] == '+' 
-                 || aString[ j ] == '.' ) break;
+				|| aString[ j ] == '.' ) break;
 		}
 	}
     
@@ -534,11 +538,11 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  identifier  
-* \brief	Returns a string that denotes an indentifier that can be used in some
-*			types of table displays.
-* \return	A string that contains the primary address.
-* \note	
-*/
+ * \brief	Returns a string that denotes an indentifier that can be used in some
+ *			types of table displays.
+ * \return	A string that contains the primary address.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (NSString*) identifier
 {
@@ -550,10 +554,10 @@ static NSString *ORGpibSecondaryAddress			= @"ORGpib Secondary Address";
 
 //--------------------------------------------------------------------------------
 /*!\method  initWithCoder  
-* \brief	Initialize object using archived settings.
-* \param	aDecoder			- Object used for getting archived internal parameters.
-* \note	
-*/
+ * \brief	Initialize object using archived settings.
+ * \param	aDecoder			- Object used for getting archived internal parameters.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (id) initWithCoder: (NSCoder*) aDecoder
 {
@@ -574,10 +578,10 @@ static NSString *ORGpibSecondaryAddress			= @"ORGpib Secondary Address";
 
 //--------------------------------------------------------------------------------
 /*!\method  encodeWithCoder  
-* \brief	Save the internal settings to the archive.
-* \param	anEncoder			- Object used for encoding.
-* \note	
-*/
+ * \brief	Save the internal settings to the archive.
+ * \param	anEncoder			- Object used for encoding.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) encodeWithCoder: (NSCoder*) anEncoder
 {

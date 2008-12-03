@@ -27,8 +27,8 @@
 
 #pragma mark ***Defines
 static NSString *mBoardNames[ kNumBoards ] = {
-    @"GPIB0",
-    @"GPIB1"
+@"GPIB0",
+@"GPIB1"
 };
 
 static NSString*	ORGpibEnetConnection		= @"GPIB Enet Connector";
@@ -42,11 +42,11 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 #pragma mark ***Initialization
 //--------------------------------------------------------------------------------
 /*! \method		commonInit
-*  \brief		Initializes error message with blank string.  Sets all devices
-*				to not initialized.
-*	\note		This class uses two arrays to keep track of which GPIB devices
-*				are initialized.
-*/
+ *  \brief		Initializes error message with blank string.  Sets all devices
+ *				to not initialized.
+ *	\note		This class uses two arrays to keep track of which GPIB devices
+ *				are initialized.
+ */
 //--------------------------------------------------------------------------------
 - (void) commonInit
 {
@@ -66,7 +66,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     NSString* plugInDirectory = [[NSBundle mainBundle] builtInPlugInsPath];
     /* Now find the GPIB-ENET bundle. */
     NSBundle* gpibEnetBundle = [NSBundle bundleWithPath:
-                                    [NSString stringWithFormat:@"%@/%@",plugInDirectory,[ self pluginName ]]];
+								[NSString stringWithFormat:@"%@/%@",plugInDirectory,[ self pluginName ]]];
     
     Class gpibEnetClass;
     
@@ -82,7 +82,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [noDriverAlarm setAcknowledged:NO];
             [noDriverAlarm postAlarm];
             [noDriverAlarm setHelpStringFromFile:@"NoNI488DriversHelp"];
-
+			
         }
     } 
 	else {
@@ -93,17 +93,17 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         [noPluginAlarm setAcknowledged:NO];
         [noPluginAlarm postAlarm];
         [noPluginAlarm setHelpStringFromFile:@"NoNI488PluginHelp"];
-
+		
         gpibEnetInstance = nil;
     }
-
+	
     
 }
 
 //--------------------------------------------------------------------------------
 /*! \method		init
-*	\note		
-*/
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (id) init
 {
@@ -117,9 +117,9 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		dealloc
-*  \brief		Deallocs the error message string.
-*	\note		
-*/
+ *  \brief		Deallocs the error message string.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) dealloc
 {
@@ -141,9 +141,9 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		setUpImage
-*  \brief		Draws image on screen for this object.
-*	\note		
-*/
+ *  \brief		Draws image on screen for this object.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) setUpImage
 {
@@ -169,17 +169,17 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		makeConnectors
-*  \brief		Draws the connectors for the object so that one can connect
-*				GPIB objects to the controller.
-*	\note		
-*/
+ *  \brief		Draws the connectors for the object so that one can connect
+ *				GPIB objects to the controller.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) makeConnectors
 {
 	ORConnector* connectorObj = [[ ORConnector alloc ] 
-                                initAt: NSMakePoint( [ self x ] + [ self frame ].size.width 
+								 initAt: NSMakePoint( [ self x ] + [ self frame ].size.width 
                                                      - kConnectorSize, [ self y ] )
-                            withGuardian: self];
+								 withGuardian: self];
 	[ connectorObj setConnectorType: 'GPI2' ];
 	[ connectorObj addRestrictedConnectionType: 'GPI1' ]; //can only connect to gpib inputs
 	[[ self connectors ] setObject: connectorObj forKey: ORGpibEnetConnection ];
@@ -188,10 +188,10 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		makeMainController
-*  \brief		Makes the controller object used to control this object from
-*				the user interface.
-*	\note		
-*/
+ *  \brief		Makes the controller object used to control this object from
+ *				the user interface.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) makeMainController
 {
@@ -216,17 +216,17 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		setBoardIndex
-*  \brief		Sets the board index and sends notification about change.
-*	\note		
-*/
+ *  \brief		Sets the board index and sends notification about change.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) setBoardIndex: (short) anIndex
 {
     mBoardIndex = anIndex;
 	
 	[[ NSNotificationCenter defaultCenter ]
-		postNotificationName: ORGPIBBoardChangedNotification
-		              object: self];
+	 postNotificationName: ORGPIBBoardChangedNotification
+	 object: self];
 }
 
 
@@ -263,24 +263,24 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 #pragma mark ***Basic commands
 //--------------------------------------------------------------------------------
 /*! \method		changePrimaryAddress
-*  \brief		Change the primary GPIB address of the device.
-*  \param		anOldPrimaryAddress		- The original primary address of the device.
-*	\param		aNewPrimaryAddress		- The new primary address
-*	\return		True if reset of address is successful.
-*	\note		
-*/
+ *  \brief		Change the primary GPIB address of the device.
+ *  \param		anOldPrimaryAddress		- The original primary address of the device.
+ *	\param		aNewPrimaryAddress		- The new primary address
+ *	\return		True if reset of address is successful.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) changePrimaryAddress: (short) anOldPrimaryAddress newAddress: (short) aNewPrimaryAddress
 {
     // Make sure that device is initialized and that new address is valid.
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         [ self checkDeviceThrow: anOldPrimaryAddress ];
         [ self checkDeviceThrow: aNewPrimaryAddress checkSetup: false ];
         
         [ gpibEnetInstance ibpad:mDeviceUnit[ anOldPrimaryAddress ] v:aNewPrimaryAddress ];
-
+		
         if ( (int) [gpibEnetInstance ibsta] & (unsigned short) [gpibEnetInstance err] ) {
             [ mErrorMsg setString: @"***Error: ibpad" ];
             [ self GpibError: mErrorMsg ];
@@ -288,24 +288,25 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
         }
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 
 - (void) changeState: (short) aPrimaryAddress online: (BOOL) aState
-    //--------------------------------------------------------------------------------
-    /*" Places the device either on or offline.
-    _{#aPrimaryAddress	- The primary address for the GPIB device.}
-    _{#aState			- True - place board online otherwise place it offline.}
-    _{#Error			- Raises exception if low level call fails.}
-    "*/
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+/*" Places the device either on or offline.
+ _{#aPrimaryAddress	- The primary address for the GPIB device.}
+ _{#aState			- True - place board online otherwise place it offline.}
+ _{#Error			- Raises exception if low level call fails.}
+ "*/
+//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         short deviceState = 0;
         
@@ -322,26 +323,27 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
         }
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
 
 //--------------------------------------------------------------------------------
 /*! \method		checkAddress
-*  \brief		Returns true if device at specified address is initialized.
-*	\param		aPrimaryAddress		- Primary address of the device.
-*	\note		
-*/
+ *  \brief		Returns true if device at specified address is initialized.
+ *	\param		aPrimaryAddress		- Primary address of the device.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (BOOL) checkAddress: (short) aPrimaryAddress
 {
     BOOL  bRetVal = false;
     if ( ! [ self isEnabled ]) return bRetVal;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         
         // Make sure that device is initialized.
@@ -352,10 +354,11 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             bRetVal = true;
         }
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
     return( bRetVal );    
 }
@@ -363,17 +366,17 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		deactivateAddress
-*  \brief		Deactivates the device.
-*	\param		aPrimaryAddress		- Primary address of the device.
-*	\note		
-*/
+ *  \brief		Deactivates the device.
+ *	\param		aPrimaryAddress		- Primary address of the device.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) deactivateAddress: (short) aPrimaryAddress
 {
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         [ theHWLock lock ];   //-----begin critical section
-                              // Make sure that device is initialized.
+		// Make sure that device is initialized.
         [ self checkDeviceThrow: aPrimaryAddress ];
         
         // Deactivate the device
@@ -385,10 +388,11 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
         }    
         [ theHWLock unlock ];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [ theHWLock unlock ];   //-----end critical section
         [ localException raise ];
-    NS_ENDHANDLER
+    }
     
 }
 
@@ -396,7 +400,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 {
     if ( ! [ self isEnabled ]) return;
     // Make sure that device is initialized.
-    NS_DURING
+    @try {
         [ theHWLock lock ];   //-----begin critical section
         [ self checkDeviceThrow: aPrimaryAddress ];
         
@@ -407,24 +411,25 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
         } 
         [ theHWLock unlock ];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [ theHWLock unlock ];   //-----end critical section
         [ localException raise ];
-    NS_ENDHANDLER
+    }
     
 }
 
 
 
 - (void) resetDevice: (short) aPrimaryAddress
-    //--------------------------------------------------------------------------------
-    /*" Reset the device to start receiving data.
-    _{#aPrimaryAddress	- The primary address for the GPIB device.}
-    "*/
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+/*" Reset the device to start receiving data.
+ _{#aPrimaryAddress	- The primary address for the GPIB device.}
+ "*/
+//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         [ self checkDeviceThrow: aPrimaryAddress ];
         
@@ -436,19 +441,20 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
         }
         [ theHWLock unlock ];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [ theHWLock unlock ];   //-----end critical section
         [ localException raise ];
-    NS_ENDHANDLER
+    }
     
 }
 
 //--------------------------------------------------------------------------------
 /*!\method: setGPIBMonitorRead
-* \brief   Turn on and off monitoring of GPIB commands.
-* \param   aMonitor			- True - turn on monitor.
-*								  False - turn off monitor.
-*/
+ * \brief   Turn on and off monitoring of GPIB commands.
+ * \param   aMonitor			- True - turn on monitor.
+ *								  False - turn off monitor.
+ */
 //--------------------------------------------------------------------------------
 - (void) setGPIBMonitorRead: (bool) aMonitorRead
 {
@@ -456,10 +462,10 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 //--------------------------------------------------------------------------------
 /*!\method: setGPIBMonitorWrite
-* \brief   Turn on and off monitoring of read data.
-* \param   aMonitor			- True - turn on monitor.
-*								  False - turn off monitor.
-*/
+ * \brief   Turn on and off monitoring of read data.
+ * \param   aMonitor			- True - turn on monitor.
+ *								  False - turn off monitor.
+ */
 //--------------------------------------------------------------------------------
 - (void) setGPIBMonitorWrite: (bool) aMonitorWrite
 {
@@ -467,15 +473,15 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 - (void) setupDevice: (short) aPrimaryAddress secondaryAddress: (short) aSecondaryAddress
-    //--------------------------------------------------------------------------------
-    /*" Sets up communication with the GPIB device. 
-    _{#aPrimaryAddress	- The primary address for the GPIB device.}
-    _{#aSecondaryAddress - Normally not used.  Set to 0 if not used.}
-    "*/
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+/*" Sets up communication with the GPIB device. 
+ _{#aPrimaryAddress	- The primary address for the GPIB device.}
+ _{#aSecondaryAddress - Normally not used.  Set to 0 if not used.}
+ "*/
+//--------------------------------------------------------------------------------
 {  
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         // Check device number.
         [theHWLock lock];   //-----begin critical section
         [ self checkDeviceThrow: aPrimaryAddress checkSetup: false ];
@@ -484,11 +490,11 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 	    
         // Perform the initialization.
         mDeviceUnit[ aPrimaryAddress ] = [gpibEnetInstance ibdev:mBoardIndex 		// (GPIB0, GPIB1, ... )
-                                                pad:aPrimaryAddress 
-                                                sad:aSecondaryAddress
-                                                tmo:[gpibEnetInstance t3s]   	// Timeout setting (Txs = x secs)
-                                                eot:1			// Assert EOI line at end of write.
-                                                eos:0];			// EOS termination mode.
+															 pad:aPrimaryAddress 
+															 sad:aSecondaryAddress
+															 tmo:[gpibEnetInstance t3s]   	// Timeout setting (Txs = x secs)
+															 eot:1			// Assert EOI line at end of write.
+															 eos:0];			// EOS termination mode.
         
         // Check for an error
         if ( [gpibEnetInstance ibsta] &  [gpibEnetInstance err] ) {
@@ -503,29 +509,30 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         // Clear the device.
         [ self resetDevice: aPrimaryAddress ];
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
 
 - (long) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (long) aMaxLength
-    //--------------------------------------------------------------------------------
-    /*" Write to a gpib device 
-    _{#aPrimaryAddress	- The GPIB primary address of the device.}
-    _{#aData			- Pointer to array that can receive data.}
-    _{#aMaxLength		- Maximum amount of data that can be returned.  aData must be
-    aMaxLength + 1 to contain the "\0". }
-    _{#Return - Number of bytes read in.  -1 if read failed.}
-    "*/
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+/*" Write to a gpib device 
+ _{#aPrimaryAddress	- The GPIB primary address of the device.}
+ _{#aData			- Pointer to array that can receive data.}
+ _{#aMaxLength		- Maximum amount of data that can be returned.  aData must be
+ aMaxLength + 1 to contain the "\0". }
+ _{#Return - Number of bytes read in.  -1 if read failed.}
+ "*/
+//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return -1;
     long	nReadBytes = -1;
     
-    NS_DURING
+    @try {
         // Make sure that device is initialized.
         [ theHWLock lock ];   //-----begin critical section
         [ self checkDeviceThrow: aPrimaryAddress ];
@@ -535,8 +542,8 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         
         // Perform the read.
         [ gpibEnetInstance ibrd:mDeviceUnit[ aPrimaryAddress ] 
-                buf:aData
-                cnt:aMaxLength ];
+							buf:aData
+							cnt:aMaxLength ];
         if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibrd" ];
             [ self GpibError: mErrorMsg ]; 
@@ -554,22 +561,23 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
                 NSMutableDictionary* userInfo = [ NSMutableDictionary dictionary ];			
                 NSString* dataStr = [[ NSString alloc ] initWithBytes: aData length: nReadBytes encoding: NSASCIIStringEncoding ];
                 [ userInfo setObject: [ NSString stringWithFormat: @"Read - Address: %d length: %d data: %@\n", 
-                    aPrimaryAddress, nReadBytes, dataStr ] 
+									   aPrimaryAddress, nReadBytes, dataStr ] 
                               forKey: ORGpibMonitor ]; 
                 
                 [[ NSNotificationCenter defaultCenter ]
-				postNotificationName: ORGpibMonitorNotification
-			                  object: self
-					        userInfo: userInfo ];
+				 postNotificationName: ORGpibMonitorNotification
+				 object: self
+				 userInfo: userInfo ];
                 [ dataStr release ];
             }
             
         }
         [ theHWLock unlock ];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [ theHWLock unlock ];   //-----end critical section
         [ localException raise ];
-    NS_ENDHANDLER
+    }
     
     return( nReadBytes );
 }
@@ -578,18 +586,18 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		writeToDevice
-*  \brief		Writes single command line to GPIB device.
-*  \param		aPrimaryAddress			- The primary address of the device.
-*	\param		aCommand				- The command string to write.
-*	\note		Commands that can be written will depend on each GPIB device.
-*/
+ *  \brief		Writes single command line to GPIB device.
+ *  \param		aPrimaryAddress			- The primary address of the device.
+ *	\param		aCommand				- The command string to write.
+ *	\note		Commands that can be written will depend on each GPIB device.
+ */
 //--------------------------------------------------------------------------------
 - (void) writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand
 {
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         [ theHWLock lock ];   //-----begin critical section
-                              // Make sure that device is initialized.
+		// Make sure that device is initialized.
         [ self checkDeviceThrow: aPrimaryAddress ];
         
         // Allow monitoring of commands.
@@ -600,76 +608,78 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
                           forKey: ORGpibMonitor ]; 
             
             [[ NSNotificationCenter defaultCenter ]
-		    postNotificationName: ORGpibMonitorNotification
-			              object: self
-					    userInfo: userInfo ];
+			 postNotificationName: ORGpibMonitorNotification
+			 object: self
+			 userInfo: userInfo ];
         }
         
         //	printf( "Command %s\n", [ aCommand cString ] );
         
         // Write to device.
         [ gpibEnetInstance ibwrt:mDeviceUnit[ aPrimaryAddress ]
-                buf:(char *)[ aCommand cStringUsingEncoding:NSASCIIStringEncoding ]
-                cnt:[ aCommand length ] ];
+							 buf:(char *)[ aCommand cStringUsingEncoding:NSASCIIStringEncoding ]
+							 cnt:[ aCommand length ] ];
         if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibwrt" ];
             [ self GpibError: mErrorMsg ]; 
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
         }  
         [ theHWLock unlock ];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [ theHWLock unlock ];   //-----end critical section
         [ localException raise ];
-    NS_ENDHANDLER  
+    }  
 }
 
 
 - (long) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
                maxLength: (long) aMaxLength
-    //--------------------------------------------------------------------------------
-    /*" Write to gpib device and then read results
-    _{#aPrimaryAddress	- The GPIB primary address of the device.}
-    _{#aCommand			- The command to write to the device.}
-    _{#aData			- Pointer to array that can receive data.}
-    _{#aMaxLength		- Maximum amount of data that can be returned.  aData must be
-    aMaxLength + 1 to contain the "\0". }
-    _{#Return - Number of bytes read in.  -1 if read failed.}
-    "*/
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+/*" Write to gpib device and then read results
+ _{#aPrimaryAddress	- The GPIB primary address of the device.}
+ _{#aCommand			- The command to write to the device.}
+ _{#aData			- Pointer to array that can receive data.}
+ _{#aMaxLength		- Maximum amount of data that can be returned.  aData must be
+ aMaxLength + 1 to contain the "\0". }
+ _{#Return - Number of bytes read in.  -1 if read failed.}
+ "*/
+//--------------------------------------------------------------------------------
 {
     long retVal = 0;
     if ( ! [ self isEnabled ]) return -1;
-    NS_DURING
+    @try {
         
         [theHWLock lock];   //-----begin critical section
         [ self writeToDevice: aPrimaryAddress command: aCommand ];
         retVal = [ self readFromDevice: aPrimaryAddress data: aData maxLength: aMaxLength ];
         
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
     return( retVal );
 }
 
 - (void) wait: (short) aPrimaryAddress mask: (short) aWaitMask
-    //--------------------------------------------------------------------------------
-    /*" Set the address for the GPIB device.  Send notification of change. 
-    _{#aPrimaryAddress	- The GPIB primary address of the device.}
-    _{#aWaitMask		- The following bits can be set for device:
-        TIMO - Wait for time out
-        END - Wait for END or EOS
-        RQS - Device requested service
-        CMPL - I/O is completed.  
-        "*/
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+/*" Set the address for the GPIB device.  Send notification of change. 
+ _{#aPrimaryAddress	- The GPIB primary address of the device.}
+ _{#aWaitMask		- The following bits can be set for device:
+ TIMO - Wait for time out
+ END - Wait for END or EOS
+ RQS - Device requested service
+ CMPL - I/O is completed.  
+ "*/
+//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
-                            // Make sure that device is initialized.
+		// Make sure that device is initialized.
         [ self checkDeviceThrow: aPrimaryAddress ];
         
         // Wait for specified events.
@@ -680,10 +690,11 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             [ NSException raise: OExceptionGpibError format: mErrorMsg ];
         }
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
@@ -700,11 +711,11 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		checkDeviceThrow
-*  \brief		Checks if device address is valid and whether it really is present.
-*  \param		aPrimaryAddress			- The primary address of the device.
-*	\error		Throws error if check fails.
-*	\note		
-*/
+ *  \brief		Checks if device address is valid and whether it really is present.
+ *  \param		aPrimaryAddress			- The primary address of the device.
+ *	\error		Throws error if check fails.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) checkDeviceThrow: (short) aPrimaryAddress
 {
@@ -714,18 +725,18 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 //--------------------------------------------------------------------------------
 /*! \method		checkDeviceThrow
-*  \brief		Checks if device address is valid and optionally whether it
-*				has been initialized.
-*  \param		aPrimaryAddress			- The primary address of the device.
-*	\param		aState					- True - Check if device is initialized.
-*	\error		Throws error if check fails.
-*	\note		
-*/
+ *  \brief		Checks if device address is valid and optionally whether it
+ *				has been initialized.
+ *  \param		aPrimaryAddress			- The primary address of the device.
+ *	\param		aState					- True - Check if device is initialized.
+ *	\error		Throws error if check fails.
+ *	\note		
+ */
 //--------------------------------------------------------------------------------
 - (void) checkDeviceThrow: (short) aPrimaryAddress checkSetup: (BOOL) aState
 {
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         if ( aPrimaryAddress < 0 || aPrimaryAddress > kMaxGpibAddresses ){
             [ mErrorMsg setString: [ NSString stringWithFormat: @"***Error: Bad GPIB Address %d\n", aPrimaryAddress ]];
@@ -734,7 +745,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         else if ( aState ){
             if ( mDeviceUnit[ aPrimaryAddress ] == kNotInitialized ){
                 [ mErrorMsg setString: [ NSString stringWithFormat: 
-                                                        @"***Error: Device at address %d not found.\n", aPrimaryAddress ]];
+										@"***Error: Device at address %d not found.\n", aPrimaryAddress ]];
                 [ NSException raise: OExceptionGpibError format: mErrorMsg ];
             }
             
@@ -743,33 +754,34 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
                 short		listen;
                 
                 [ gpibEnetInstance ibln:mDeviceUnit[ aPrimaryAddress ] 
-                        pad:aPrimaryAddress 
-                        sad:mDeviceSecondaryAddress[ aPrimaryAddress ] 
-                        listen:&listen ];
+									pad:aPrimaryAddress 
+									sad:mDeviceSecondaryAddress[ aPrimaryAddress ] 
+								 listen:&listen ];
                 
                 // Deviced is not present so throw error.
                 if ( !listen ) {
                     [ mErrorMsg setString: [ NSString stringWithFormat:
-                                                            @"***Error: No device present at address %d\n", aPrimaryAddress ]];
+											@"***Error: No device present at address %d\n", aPrimaryAddress ]];
                     [ NSException raise: OExceptionGpibError format: mErrorMsg ];
                 }
             }
         }
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  getGpibController 
-* \brief	Called by objects looking for a gpib controller
-* \return	self
-* \note	
-*/
+ * \brief	Called by objects looking for a gpib controller
+ * \return	self
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (id) getGpibController
 {
@@ -778,15 +790,15 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 
 - (void) GpibError: (NSMutableString*) aMsg
-    //--------------------------------------------------------------------------------
-    /*" Set the address for the GPIB device.  Send notification of change. 
-    _{#aMsg	- Message passed from calling routine as to what initiated the failure.}
--{#Return - The full message about what failed.}
-    "*/
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+/*" Set the address for the GPIB device.  Send notification of change. 
+ _{#aMsg	- Message passed from calling routine as to what initiated the failure.}
+ -{#Return - The full message about what failed.}
+ "*/
+//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return;
-    NS_DURING
+    @try {
         // Handle the master error register and extract error.
         [theHWLock lock];   //-----begin critical section
         [ aMsg appendString: [ NSString stringWithFormat:  @" ibsta = 0x%x < ", [ gpibEnetInstance ibsta ] ]];
@@ -841,13 +853,14 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         [ aMsg appendString: [ NSString stringWithFormat: @"ibcntl = %ld\n", [ gpibEnetInstance ibcntl ]]];
         
         [theHWLock unlock];   //-----end critical section
-                              // Call ibonl to take the device and interface offline
-                              //    ibonl( Device, 0 );
-                              //    ibonl( BoardIndex, 0 );
-    NS_HANDLER
+		// Call ibonl to take the device and interface offline
+		//    ibonl( Device, 0 );
+		//    ibonl( BoardIndex, 0 );
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 

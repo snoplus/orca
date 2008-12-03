@@ -51,17 +51,17 @@
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
     [ super registerNotificationObservers ];
-          
+	
     [ notifyCenter addObserver: self
                       selector: @selector( lockChanged: )
                           name: ORRunStatusChangedNotification
                         object: nil];
     
-     [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORHP4405ALock
                         object: model];
-
+	
 }
 
 #pragma mark ***Interface Management
@@ -101,452 +101,482 @@
 
 - (IBAction)attenutation:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)burstType:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)calWideband:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)centerFreq:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)channelTCS:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)delay:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)detFormat:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)freqUnit:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)iqInvert:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)measType:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)modeType:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)opt10MHz:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)optFreq:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)refFilter:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)refLevel:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)refUnit:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)scaleLevel:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)scaleUnit:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)searchLengthUnit:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)searchLengthValue:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)searchThreshUnit:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)searchThreshValue:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)startFreq:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)stopFreq:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)symbolRate:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)symbolUnit:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)timeSlot:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)traceMode:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)triggerPolarity:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction)triggerType:(id)sender
 {
-	NS_DURING
+	@try {
 		[model doNothing];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 @end

@@ -61,24 +61,24 @@ NSString* ORHPPulserMaxTimeChangedNotification		= @"ORHPPulserMaxTimeChangedNoti
 NSString* ORHPPulserRandomCountChangedNotification	= @"ORHPPulserRandomCountChangedNotification";
 
 static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
-    { @"Sinc Wave",         @"SINC",      NO },
-	{ @"Negative Ramp",     @"NEG_RAMP",  NO },
-	{ @"Exponential Rise",  @"EXP_RISE",  NO },
-	{ @"Exponential Fall",  @"EXP_FALL",  NO },
-	{ @"Cardiac Wave",      @"CARDIAC",   NO },
-    { @"Square Wave 1",     @"",          NO },
-    { @"Single Sin 1",      @"SGLSIN",    YES },
-    { @"Single Sin 2",      @"SGLSI2",    YES },
-    { @"Square Wave 2",     @"SQW2",      YES },
-    { @"Double Sin Wave",   @"DBLSIN",    YES },
-    { @"LogAmp Calib",      @"CALIB",     YES },
-    { @"LogAmp Calib/2",    @"CALI1",     NO },
-    { @"LogAmp Calib/4",    @"CALI2",     NO },
-    { @"Double LogAmp",     @"DBLLOG",    YES },
-    { @"Triple LogAmp",     @"TRPLOG",    YES },
-    { @"LogAmp Adj",        @"AMPADJ",    YES },
-    { @"Gaussian",          @"GSSIAN",    NO },
-    { @"From File",         @"",          NO },
+{ @"Sinc Wave",         @"SINC",      NO },
+{ @"Negative Ramp",     @"NEG_RAMP",  NO },
+{ @"Exponential Rise",  @"EXP_RISE",  NO },
+{ @"Exponential Fall",  @"EXP_FALL",  NO },
+{ @"Cardiac Wave",      @"CARDIAC",   NO },
+{ @"Square Wave 1",     @"",          NO },
+{ @"Single Sin 1",      @"SGLSIN",    YES },
+{ @"Single Sin 2",      @"SGLSI2",    YES },
+{ @"Square Wave 2",     @"SQW2",      YES },
+{ @"Double Sin Wave",   @"DBLSIN",    YES },
+{ @"LogAmp Calib",      @"CALIB",     YES },
+{ @"LogAmp Calib/2",    @"CALI1",     NO },
+{ @"LogAmp Calib/4",    @"CALI2",     NO },
+{ @"Double LogAmp",     @"DBLLOG",    YES },
+{ @"Triple LogAmp",     @"TRPLOG",    YES },
+{ @"LogAmp Adj",        @"AMPADJ",    YES },
+{ @"Gaussian",          @"GSSIAN",    NO },
+{ @"From File",         @"",          NO },
 };
 
 
@@ -92,10 +92,10 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 #pragma mark ***Initialization
 //--------------------------------------------------------------------------------
 /*!\method  init
-* \brief	Called first time class is initialized.  Used to set basic
-*			default values first time object is created.
-* \note
-*/
+ * \brief	Called first time class is initialized.  Used to set basic
+ *			default values first time object is created.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (id) init
 {
@@ -105,7 +105,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     
     [self setVoltage:kLogAmpVoltage];
     [self setBurstRate:kLogAmpBurstRate];
-//    [self setTotalWidth:kLogAmpPulseWidth];
+	//    [self setTotalWidth:kLogAmpPulseWidth];
     [self setVoltageOffset:0];
     [self setFrequency:1000.0];
     [self setBurstCycles:1];
@@ -118,9 +118,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 //--------------------------------------------------------------------------------
 /*!\method  dealloc
-* \brief	Deletes anything on the heap.
-* \note
-*/
+ * \brief	Deletes anything on the heap.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) dealloc
 {
@@ -132,9 +132,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 //--------------------------------------------------------------------------------
 /*!\method  setUpImage
-* \brief	Sets the image used by this device.
-* \note
-*/
+ * \brief	Sets the image used by this device.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) setUpImage
 {
@@ -224,7 +224,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setNegativePulse:negativePulse];
     
     negativePulse = aNegativePulse;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHPPulserModelNegativePulseChanged object:self];
 }
 
@@ -236,7 +236,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) setLockGUI:(BOOL)aLockGUI
 {
     lockGUI = aLockGUI;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHPPulserModelLockGUIChanged object:self];
 }
 
@@ -251,8 +251,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	enableRandom = aNewEnableRandom;
     
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORHPPulserEnableRandomChangedNotification 
-                          object: self ];
+	 postNotificationName:ORHPPulserEnableRandomChangedNotification 
+	 object: self ];
 }
 
 - (float) minTime
@@ -266,8 +266,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	minTime = aNewMinTime;
     
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORHPPulserMinTimeChangedNotification 
-                          object: self ];
+	 postNotificationName:ORHPPulserMinTimeChangedNotification 
+	 object: self ];
 }
 
 - (float) maxTime
@@ -281,8 +281,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	maxTime = aNewMaxTime;
     
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORHPPulserMaxTimeChangedNotification 
-                          object: self ];
+	 postNotificationName:ORHPPulserMaxTimeChangedNotification 
+	 object: self ];
 }
 - (unsigned long) randomCount
 {
@@ -293,8 +293,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	randomCount = aNewRandomCount;
     
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORHPPulserRandomCountChangedNotification 
-                          object: self ];
+	 postNotificationName:ORHPPulserRandomCountChangedNotification 
+	 object: self ];
 }
 
 - (int) burstCycles
@@ -305,12 +305,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) setBurstCycles:(int)newCycles
 {
     [[[self undoManager] prepareWithInvocationTarget: self]
-    setBurstCycles: [self burstCycles]];
+	 setBurstCycles: [self burstCycles]];
     burstCycles = newCycles;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserBurstCyclesChangedNotification
-                      object: self];
+	 postNotificationName: ORHPPulserBurstCyclesChangedNotification
+	 object: self];
 }
 
 - (int) burstPhase
@@ -321,12 +321,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) setBurstPhase:(int)newPhase
 {
     [[[self undoManager] prepareWithInvocationTarget: self]
-    setBurstPhase: [self burstPhase]];
+	 setBurstPhase: [self burstPhase]];
     burstPhase = newPhase;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserBurstPhaseChangedNotification
-                      object: self];
+	 postNotificationName: ORHPPulserBurstPhaseChangedNotification
+	 object: self];
 }
 
 - (float) frequency
@@ -337,12 +337,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) setFrequency:(float)newFrequency
 {
     [[[self undoManager] prepareWithInvocationTarget: self]
-    setFrequency: [self frequency]];
+	 setFrequency: [self frequency]];
     frequency = newFrequency;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserFrequencyChangedNotification
-                      object: self];
+	 postNotificationName: ORHPPulserFrequencyChangedNotification
+	 object: self];
 }
 
 - (float)	voltage
@@ -353,12 +353,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) setVoltage:(float)newVoltage
 {
     [[[self undoManager] prepareWithInvocationTarget: self]
-    setVoltage: [self voltage]];
+	 setVoltage: [self voltage]];
     voltage = newVoltage;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserVoltageChangedNotification
-                      object: self];
+	 postNotificationName: ORHPPulserVoltageChangedNotification
+	 object: self];
 }
 
 - (float)	voltageOffset
@@ -369,12 +369,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) setVoltageOffset:(float)newVoltageOffset
 {
     [[[self undoManager] prepareWithInvocationTarget: self]
-    setVoltageOffset: [self voltageOffset]];
+	 setVoltageOffset: [self voltageOffset]];
     voltageOffset = newVoltageOffset;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserVoltageOffsetChangedNotification
-                      object: self];
+	 postNotificationName: ORHPPulserVoltageOffsetChangedNotification
+	 object: self];
 }
 
 
@@ -386,12 +386,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) setBurstRate:(float)newBurstRate
 {
     [[[self undoManager] prepareWithInvocationTarget: self]
-        setBurstRate: [self burstRate]];
+	 setBurstRate: [self burstRate]];
     burstRate = newBurstRate;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserBurstRateChangedNotification
-                      object: self];
+	 postNotificationName: ORHPPulserBurstRateChangedNotification
+	 object: self];
 }
 
 - (float) totalWidth
@@ -418,12 +418,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) setTriggerSource:(short)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget: self]
-        setTriggerSource: [self triggerSource]];
+	 setTriggerSource: [self triggerSource]];
     triggerSource = aValue;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserTriggerModeChangedNotification
-                      object: self];
+	 postNotificationName: ORHPPulserTriggerModeChangedNotification
+	 object: self];
 }
 
 - (void) trigger
@@ -444,12 +444,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     else if(newSelectedWaveform>=kNumWaveforms)newSelectedWaveform = kNumWaveforms-1;
     
     [[[self undoManager] prepareWithInvocationTarget: self]
-        setSelectedWaveform: [self selectedWaveform]];
+	 setSelectedWaveform: [self selectedWaveform]];
     selectedWaveform = newSelectedWaveform;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName: ORHPPulserSelectedWaveformChangedNotification
-                      object: self];
+	 postNotificationName: ORHPPulserSelectedWaveformChangedNotification
+	 object: self];
 }
 
 
@@ -686,30 +686,30 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 }
 
 /*
-- (void) writeTotalWidth:(float)width
-{
-    
-    //each Predefined pulse may have a different number of total points and non-zero points
-    //thereby needing a different frequency in order to generate a similar pulse width
-    float theFreq = 0;
-    if(width !=0){
-        //theFreq =  1/(width*1e-6);
-		theFreq = [self calculateFreq:width*1e-6];
-        //Note that since the Number of Bursts per cycle is hardcoded in SetBurstRate to be 1, theFreq
-        //must be less than 1 MHz and greater than 10 mHz
-        if(theFreq>10e-3 && theFreq<1e+6){
-            [self writeToGPIBDevice:[NSString stringWithFormat:@"FREQ %10.4f",theFreq]];
-            [self logSystemResponse];
-            NSLog(@"HP Pulser Total Width set to %f (Freg: %f)\n",width,theFreq);
-        }
-        else {
-            NSBeep();
-            NSLog(@"Your Requested Pulse width requires a Frequency not between 10 mHz and 1 MHz (Pulser limitation)\n");
-        }
-    }
-    else NSLog(@"HP Pulser: Can't set width to zero!\n");
-    
-}*/
+ - (void) writeTotalWidth:(float)width
+ {
+ 
+ //each Predefined pulse may have a different number of total points and non-zero points
+ //thereby needing a different frequency in order to generate a similar pulse width
+ float theFreq = 0;
+ if(width !=0){
+ //theFreq =  1/(width*1e-6);
+ theFreq = [self calculateFreq:width*1e-6];
+ //Note that since the Number of Bursts per cycle is hardcoded in SetBurstRate to be 1, theFreq
+ //must be less than 1 MHz and greater than 10 mHz
+ if(theFreq>10e-3 && theFreq<1e+6){
+ [self writeToGPIBDevice:[NSString stringWithFormat:@"FREQ %10.4f",theFreq]];
+ [self logSystemResponse];
+ NSLog(@"HP Pulser Total Width set to %f (Freg: %f)\n",width,theFreq);
+ }
+ else {
+ NSBeep();
+ NSLog(@"Your Requested Pulse width requires a Frequency not between 10 mHz and 1 MHz (Pulser limitation)\n");
+ }
+ }
+ else NSLog(@"HP Pulser: Can't set width to zero!\n");
+ 
+ }*/
 
 - (void) logSystemResponse
 {
@@ -736,7 +736,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
 	if ([self inBuiltInList:waveformData[selectedWaveform].storageName]) return YES;
     BOOL result = NO;
-    NS_DURING
+    @try {
         NSArray* allInMemory = [self getLoadedWaveforms];
         NSEnumerator* e = [allInMemory objectEnumerator];
         NSString* aName;
@@ -748,10 +748,11 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             }
         }
         
-        NS_HANDLER
-            result = NO;
-        NS_ENDHANDLER
-        return  result;
+	}
+	@catch(NSException* localException) {
+		result = NO;
+	}
+	return  result;
 }
 
 - (NSArray*) getLoadedWaveforms
@@ -768,7 +769,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 
 - (void) emptyVolatileMemory
 {
-    NS_DURING
+    @try {
         NSArray* allInMemory = [self getLoadedWaveforms];
         NSEnumerator* e = [allInMemory objectEnumerator];
         NSString* aName; 
@@ -778,8 +779,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             }
         }
         
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (BOOL) inCustomList:(NSString*)aName
@@ -808,22 +810,23 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init]; //threads must have their own pool
     
-    NS_DURING
+    @try {
         [self loadFromNonVolativeMemory];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         //[localException raise]; //reraise the exception
-        NS_ENDHANDLER
-        
-		[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:NO];
-        
-        [pool release];
+	}
+	
+	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:NO];
+	
+	[pool release];
 }
 
 - (void) downloadWaveformWorker
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init]; //threads must have their own pool
     
-    NS_DURING
+    @try {
         [self enableEOT:NO];
         [self writeToGPIBDevice:@"DATA VOLATILE,"];
         
@@ -841,30 +844,31 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             [self logSystemResponse];
             [self loadFromVolativeMemory];
         }
-        NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		//[localException raise]; //reraise the exception
-		NS_ENDHANDLER
-		
-		downloadIndex = [self numPoints];
-		
-		[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:NO];
-		
-		[pool release];
+	}
+	
+	downloadIndex = [self numPoints];
+	
+	[self performSelectorOnMainThread:@selector(waveFormWasSent) withObject:nil waitUntilDone:NO];
+	
+	[pool release];
 }
 
 - (void) updateLoadProgress
 {
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName: ORHPPulserWaveformLoadProgressingNotification
-					  object: self];
+	 postNotificationName: ORHPPulserWaveformLoadProgressingNotification
+	 object: self];
 }
 
 - (void) waveFormWasSent
 {
 	loading = NO;
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName: ORHPPulserWaveformLoadFinishedNotification
-						  object: self];
+	 postNotificationName: ORHPPulserWaveformLoadFinishedNotification
+	 object: self];
 }
 
 - (void) stopDownload
@@ -888,10 +892,11 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     if([self isConnected]){
         if(waveformData[selectedWaveform].tryToStore){
-            NS_DURING
+            @try {
                 [self writeToGPIBDevice:[NSString stringWithFormat:@"DATA:COPY %@",waveformData[selectedWaveform].storageName]];
-            NS_HANDLER
-                NS_ENDHANDLER
+            }
+			@catch(NSException* localException) {
+			}
         }
 		[self writeToGPIBDevice:@"FUNC:USER VOLATILE;*WAI"];
 		[self logSystemResponse];
@@ -924,8 +929,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             [self writeVoltageOffset:[self voltageOffset]];
             [self logSystemResponse];
             //if (selectedWaveform <= kNumBuiltInTypes) {
-                [self writeFrequency:[self frequency]];
-                [self logSystemResponse];
+			[self writeFrequency:[self frequency]];
+			[self logSystemResponse];
             //}
             [self writeBurstCycles:[self burstCycles]];
             [self logSystemResponse];
@@ -933,7 +938,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             [self logSystemResponse];
         }
         
-
+		
         [self writeBurstPhase:[self burstPhase]];
         [self logSystemResponse];
         [self writeTriggerSource:[self triggerSource]];
@@ -950,7 +955,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (float) calculateFreq:(float)width
 {
 	float theFreq = (float)(([self numPoints] - kPadSize)/(float)[self numPoints]) * 1/width;
-
+	
 	return theFreq;
 }
 
@@ -1003,8 +1008,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             break;
             
         case kLogCalibrationWaveform:  //this waveform should be defined by 10,000 points + the padsize.
-                                       //this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
-                                       //is 998.4ns wide
+			//this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
+			//is 998.4ns wide
             [self insert:kPadSize/2 value:0];
             [self insert:100 value:theMin*inverter];  //was 300 points
 			[self insert:3450+200+1280+3690 value:0]; //8620
@@ -1014,8 +1019,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             break;
             
 		case kLogCalibWave2:  //this waveform should be defined by 10,000 points + the padsize.
-                              //this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
-                              //is 499.22ns wide
+			//this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
+			//is 499.22ns wide
 			[self insert:kPadSize/2 value:0];
             [self insert:100 value:theMin*inverter];  //was 300 points
             [self insert:3450+200+1280+3690 value:0];
@@ -1026,8 +1031,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             break;
             
 		case kLogCalibWave4:  //this waveform should be defined by 10,000 points + the padsize.
-                              //this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
-                              //is 249.6ns wide
+			//this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
+			//is 249.6ns wide
             [self insert:kPadSize/2 value:0];
             [self insert:100 value:theMin*inverter];  //was 300 points
             [self insert:3450+200+1280+3690 value:0];
@@ -1040,8 +1045,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             break;
 			
 		case kDoubleLogamp:  //this waveform should be defined by 10,000 points + the padsize.
-                             //this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
-                             //is 998.4ns wide
+			//this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
+			//is 998.4ns wide
 			[self insert:kPadSize/2 value:0];
             [self insert:100 value:theMin*inverter];  //was 300 points
             [self insert:3450+200+3690 value:0];
@@ -1052,8 +1057,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             break;
 			
 		case kTripleLogamp:  //this waveform should be defined by 10,000 points + the padsize.
-                             //this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
-                             //is 998.4ns wide
+			//this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
+			//is 998.4ns wide
 			[self insert:kPadSize/2 value:0];
             [self insert:100 value:theMin*inverter];  //was 300 points
             [self insert:3450+200+3690-1280 value:0];
@@ -1065,9 +1070,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             break;
             
 		case kLogCalibWaveAdjust:  //this waveform should be defined by 10,000 points + the padsize.
-                                   //this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
-                                   //is 998.4ns wide.  this waveform is not the default logamp wave (although it is programmed 
-                                   //the same) so that the amplitude and widths can be adjusted.
+			//this gaurantees that each data point is 0.78000ns wide and that the sine wave portion
+			//is 998.4ns wide.  this waveform is not the default logamp wave (although it is programmed 
+			//the same) so that the amplitude and widths can be adjusted.
             [self insert:kPadSize/2 value:0];
             [self insert:100 value:theMin*inverter];  //was 300 points
             [self insert:3450+200+1280+3690 value:0];
@@ -1080,7 +1085,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             [self insertGaussian:1280 amplitude:theMax];
             [self insert:kPadSize/2 value:0];
             break;
-
+			
 		case kPinDiode:
             [self insert:1000 value:0];
             [self insertPinDiode:4000 amplitude:theMax];
@@ -1103,9 +1108,9 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
             }
 			[self insert:kPadSize/2 value:0];
 			[self normalizeWaveform];
-
+			
         }
-		break;
+			break;
             
     }
     
@@ -1154,7 +1159,7 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
     [self setBurstRate: [aDecoder decodeFloatForKey: HPBurstRate]];
     [self setBurstPhase: [aDecoder decodeIntForKey: HPBurstPhase]];
     [self setBurstCycles: [aDecoder decodeIntForKey: HPBurstCycles]];
-//    [self setTotalWidth: [aDecoder decodeFloatForKey: HPTotalWidth]];
+	//    [self setTotalWidth: [aDecoder decodeFloatForKey: HPTotalWidth]];
     [self setSelectedWaveform: [aDecoder decodeIntForKey: HPSelectedWaveform]];
 	[self setEnableRandom:[aDecoder decodeBoolForKey:ORHPPulserEnableRandom]];
 	[self setMinTime:[aDecoder decodeFloatForKey:ORHPPulserMinTime]];
@@ -1173,7 +1178,7 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
     [anEncoder encodeFloat: [self frequency] forKey: HPFrequency];
     [anEncoder encodeInt: [self burstCycles] forKey: HPBurstCycles];
     [anEncoder encodeInt: [self burstPhase] forKey: HPBurstPhase];
-//    [anEncoder encodeFloat: [self totalWidth] forKey: HPTotalWidth];
+	//    [anEncoder encodeFloat: [self totalWidth] forKey: HPTotalWidth];
     [anEncoder encodeInt: [self selectedWaveform] forKey: HPSelectedWaveform];
 	[anEncoder encodeBool:enableRandom forKey:ORHPPulserEnableRandom];
 	[anEncoder encodeFloat:minTime forKey:ORHPPulserMinTime];
@@ -1191,7 +1196,7 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
     [objDictionary setObject:[NSNumber numberWithFloat:burstRate] forKey:@"burstRate"];
     [objDictionary setObject:[NSNumber numberWithInt:burstCycles] forKey:@"burstCycles"];
     [objDictionary setObject:[NSNumber numberWithInt:burstPhase] forKey:@"burstPhase"];
-//    [objDictionary setObject:[NSNumber numberWithFloat:totalWidth] forKey:@"totalWidth"];
+	//    [objDictionary setObject:[NSNumber numberWithFloat:totalWidth] forKey:@"totalWidth"];
     [objDictionary setObject:[NSNumber numberWithInt:selectedWaveform] forKey:@"selectedWaveform"];
     [objDictionary setObject:[NSNumber numberWithBool:enableRandom] forKey:@"enableRandom"];
     [objDictionary setObject:[NSNumber numberWithFloat:minTime] forKey:@"minTime"];
@@ -1227,11 +1232,11 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORHPPulserDecoderForPulserSettings",      @"decoder",
-        [NSNumber numberWithLong:pulserDataId],     @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:5],                @"length",
-        nil];
+								 @"ORHPPulserDecoderForPulserSettings",      @"decoder",
+								 [NSNumber numberWithLong:pulserDataId],     @"dataId",
+								 [NSNumber numberWithBool:NO],               @"variable",
+								 [NSNumber numberWithLong:5],                @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"PulserSettings"];
     return dataDictionary;
 }
@@ -1252,14 +1257,15 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 @implementation ORHPPulserModel (private)
 - (void) firePulserRandom
 {
-	NS_DURING
+	@try {
 		[self trigger];
-	NS_HANDLER
-        NS_ENDHANDLER
-        
-        [self setRandomCount:++randomCount];
-        float deltaTime = random_range((int)(minTime*10),(int)(maxTime*10))/10000.;
-        [self performSelector:@selector(firePulserRandom) withObject:nil afterDelay:deltaTime];
+	}
+	@catch(NSException* localException) {
+	}
+	
+	[self setRandomCount:++randomCount];
+	float deltaTime = random_range((int)(minTime*10),(int)(maxTime*10))/10000.;
+	[self performSelector:@selector(firePulserRandom) withObject:nil afterDelay:deltaTime];
 }
 
 - (void) startDownloadThread
@@ -1269,19 +1275,19 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 	[self buildWave];
 	
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName: ORHPPulserWaveformLoadStartedNotification
-					  object: self];
+	 postNotificationName: ORHPPulserWaveformLoadStartedNotification
+	 object: self];
 	if([self isWaveformInNonVolatileMemory]){
 		[[NSNotificationCenter defaultCenter]
-			postNotificationName: ORHPPulserWaveformLoadingNonVoltileNotification
-						  object: self];
+		 postNotificationName: ORHPPulserWaveformLoadingNonVoltileNotification
+		 object: self];
 		[NSThread detachNewThreadSelector: @selector( copyWaveformWorker ) toTarget:self withObject: nil];
 	}
 	else {
 		//not in volatile memory so spawn off a thread, since the load can take awhile
 		[[NSNotificationCenter defaultCenter]
-			postNotificationName: ORHPPulserWaveformLoadingVoltileNotification
-						  object: self];
+		 postNotificationName: ORHPPulserWaveformLoadingVoltileNotification
+		 object: self];
 		[NSThread detachNewThreadSelector: @selector( downloadWaveformWorker ) toTarget:self withObject: nil];
 	}
 }
