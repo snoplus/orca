@@ -113,7 +113,10 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (void) dealloc
 {
-	[self stopCrate];
+	NS_DURING
+		[self stopCrate];
+	NS_HANDLER
+	NS_ENDHANDLER
 	[socketLock release];
 	[eCpuDeadAlarm clearAlarm];
 	[eCpuDeadAlarm release];
