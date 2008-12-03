@@ -55,18 +55,18 @@
     histogramSize   = NSMakeSize(555,680);  // new -tb- 2008-01
     rateSize	    = NSMakeSize(480,680);  // was 435,615
     testSize	    = NSMakeSize(405,640);  // renamed to low-level -tb- 2008-04
-
+	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
 	[totalHitRateField setFormatter:rateFormatter];
-
+	
     blankView = [[NSView alloc] init];
     
     NSString* key = [NSString stringWithFormat: @"orca.ORKatrinFLT%d.selectedtab",[model stationNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-
+	
 	ORValueBar* bar = rate0;
 	do {
 		[bar setBackgroundColor:[NSColor whiteColor]];
@@ -76,7 +76,7 @@
 	
 	[totalRate setBackgroundColor:[NSColor whiteColor]];
 	[totalRate setBarColor:[NSColor greenColor]];
-
+	
     //setup the histogramming stuff
     //NSArray histogramData;    //TODO: store the histogram somewhere -tb-
     //double *histogramData=new double [1024];
@@ -86,8 +86,8 @@
     //NSLog(@"Awaking from NIB ...[[histogramPlotterId  yScale] setInteger:NO] %i\n",histogramPlotterId);
     //[[histogramPlotterId  yScale] setInteger:YES];//TODO : what is it? -tb- I think e.g. values smaller 1 ...
     [[histogramPlotterId  yScale] setMaxLimit:1e32]; //TODO: I think I am still limited (to 72 M?) -tb-
-
-    #if 0
+	
+#if 0
     [eSamplePopUpButton insertItemWithTitle: @"0 (1)" atIndex: 0];
     [eSamplePopUpButton insertItemWithTitle: @"1 (2)" atIndex: 1];
     [eSamplePopUpButton insertItemWithTitle: @"2 (4)" atIndex: 2];
@@ -99,8 +99,8 @@
     [eSamplePopUpButton insertItemWithTitle: @"8 (256)" atIndex: 8];
     [eSamplePopUpButton selectItemAtIndex: 2];//TODO: get it from config file -tb-
     NSLog(@"Awaking from NIB ...\n");
-    #endif
-
+#endif
+	
     [self updateWindow];
 }
 
@@ -123,38 +123,38 @@
                      selector : @selector(updateGUI:)
                          name : ORKatrinFLTSettingsLock
                         object: nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(updateGUI:)
 						 name : ORKatrinFLTModelAvailableFeaturesChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORIpeCardSlotChangedNotification
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(versionRevisionChanged:)
 						 name : ORKatrinFLTModelVersionRevisionChanged
 					   object : model];
-
-
+	
+	
     [notifyCenter addObserver : self 
                      selector : @selector(fltRunModeChanged:)
                          name : ORKatrinFLTModelFltRunModeChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(daqRunModeChanged:)
                          name : ORKatrinFLTModelDaqRunModeChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(postTriggerTimeChanged:)
                          name : ORKatrinFLTModelPostTriggerTimeChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
 					 selector : @selector(thresholdChanged:)
 						 name : ORKatrinFLTModelThresholdChanged
@@ -164,233 +164,233 @@
 					 selector : @selector(gainChanged:)
 						 name : ORKatrinFLTModelGainChanged
 					   object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(triggerEnabledChanged:)
 						 name : ORKatrinFLTModelTriggerEnabledChanged
 					   object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(hitRateEnabledChanged:)
 						 name : ORKatrinFLTModelHitRateEnabledChanged
 					   object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(triggersEnabledArrayChanged:)
 						 name : ORKatrinFLTModelTriggersEnabledChanged
 					   object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(hitRatesEnabledArrayChanged:)
 						 name : ORKatrinFLTModelHitRatesArrayChanged
 					   object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
 					 selector : @selector(gainArrayChanged:)
 						 name : ORKatrinFLTModelGainsChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(thresholdArrayChanged:)
 						 name : ORKatrinFLTModelThresholdsChanged
 					   object : model];
-					   
+	
     [notifyCenter addObserver : self
 					 selector : @selector(shapingTimesArrayChanged:)
 						 name : ORKatrinFLTModelShapingTimesChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(shapingTimeChanged:)
 						 name : ORKatrinFLTModelShapingTimeChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(filterGapChanged:)
 						 name : ORKatrinFLTModelFilterGapChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(filterGapBinsChanged:)
 						 name : ORKatrinFLTModelFilterGapBinsChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(hitRateLengthChanged:)
 						 name : ORKatrinFLTModelHitRateLengthChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(hitRateChanged:)
 						 name : ORKatrinFLTModelHitRateChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(scaleAction:)
 						 name : ORAxisRangeChangedNotification
 					   object : nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(totalRateChanged:)
 						 name : ORRateAverageChangedNotification
 					   object : [model totalRate]];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(broadcastTimeChanged:)
 						 name : ORKatrinFLTModelBroadcastTimeChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(testEnabledArrayChanged:)
                          name : ORKatrinFLTModelTestEnabledArrayChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(testStatusArrayChanged:)
                          name : ORKatrinFLTModelTestStatusArrayChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(updateWindow)
                          name : ORKatrinFLTModelTestsRunningChanged
                        object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(testParamChanged:)
                          name : ORKatrinFLTModelTestParamChanged
                        object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(patternChanged:)
                          name : ORKatrinFLTModelTestPatternsChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(tModeChanged:)
                          name : ORKatrinFLTModelTModeChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(numTestPattersChanged:)
                          name : ORKatrinFLTModelTestPatternCountChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
 					 selector : @selector(readoutPagesChanged:)
 						 name : ORKatrinFLTModelReadoutPagesChanged
 					   object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(checkWaveFormEnabledChanged:)
                          name : ORKatrinFLTModelCheckWaveFormEnabledChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(checkEnergyEnabledChanged:)
                          name : ORKatrinFLTModelCheckEnergyEnabledChanged
 						object: model];
-
+	
     //hardware histogramming -tb- 2008-02-08
     [notifyCenter addObserver : self
                      selector : @selector(histoBinWidthChanged:)
                          name : ORKatrinFLTModelHistoBinWidthChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoMinEnergyChanged:)
                          name : ORKatrinFLTModelHistoMinEnergyChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoMaxEnergyChanged:)
                          name : ORKatrinFLTModelHistoMaxEnergyChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoFirstBinChanged:)
                          name : ORKatrinFLTModelHistoFirstBinChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoLastBinChanged:)
                          name : ORKatrinFLTModelHistoLastBinChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoRunTimeChanged:)
                          name : ORKatrinFLTModelHistoRunTimeChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoRecordingTimeChanged:)
                          name : ORKatrinFLTModelHistoRecordingTimeChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoCalibrationValuesChanged:)
                          name : ORKatrinFLTModelHistoCalibrationValuesChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoCalibrationPlotterChanged:)
                          name : ORKatrinFLTModelHistoCalibrationPlotterChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoCalibrationChanChanged:)
                          name : ORKatrinFLTModelHistoCalibrationChanChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoPageNumChanged:)
                          name : ORKatrinFLTModelHistoPageNumChanged
                        object : model];
-                       
+	
     [notifyCenter addObserver : self
                      selector : @selector(showHitratesDuringHistoCalibrationChanged:)
                          name : ORKatrinFLTModelShowHitratesDuringHistoCalibrationChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoClearAtStartChanged:)
                          name : ORKatrinFLTModelHistoClearAtStartChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoClearAfterReadoutChanged:)
                          name : ORKatrinFLTModelHistoClearAfterReadoutChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoStopIfNotClearedChanged:)
                          name : ORKatrinFLTModelHistoStopIfNotClearedChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(histoSelfCalibrationPercentChanged:)
                          name : ORKatrinFLTModelHistoSelfCalibrationPercentChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(readWriteRegisterChanChanged:)
                          name : ORKatrinFLTModelReadWriteRegisterChanChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(readWriteRegisterNameChanged:)
                          name : ORKatrinFLTModelReadWriteRegisterNameChanged
                        object : model];
-					   
-
+	
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -449,7 +449,7 @@
 	[self histoClearAfterReadoutChanged: nil];    
 	[self histoStopIfNotClearedChanged: nil];
 	[self histoSelfCalibrationPercentChanged: nil];
-
+	
     //-tb-
     [self versionRevisionChanged: nil];
     [self readWriteRegisterChanChanged: nil];
@@ -460,8 +460,8 @@
 - (void) checkGlobalSecurity
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-
-
+	
+	
     [gSecurity setLock:ORKatrinFLTSettingsLock to:secure];
     [settingLockButton setEnabled:secure];
 	
@@ -489,11 +489,11 @@
     [loadTimeButton setEnabled:!locked];
     [readTimeButton setEnabled:!locked];
     [broadcastTimeCB setEnabled:!lockedOrRunningMaintenance];
-
+	
 	[versionButton setEnabled:!isRunning];
 	[testButton setEnabled:!isRunning];
 	[statusButton setEnabled:!isRunning];
-
+	
     [hitRateLengthField setEnabled:!lockedOrRunningMaintenance];
     [hitRateAllButton setEnabled:!lockedOrRunningMaintenance];
     [hitRateNoneButton setEnabled:!lockedOrRunningMaintenance];
@@ -508,13 +508,13 @@
     //[writePostTriggerTimeButton setEnabled:(!lockedOrRunningMaintenance) && ([model versionRegHWVersionHex] >= 0x30)]; 
 	//[checkWaveFormEnabledButton setEnabled:!lockedOrRunningMaintenance && ([model daqRunMode] == kKatrinFlt_DaqEnergyTrace_Mode)];
 	//[checkEnergyEnabledButton   setEnabled:!lockedOrRunningMaintenance && ([model daqRunMode] == kKatrinFlt_DaqEnergy_Mode)];
-
+	
     [postTriggTimeField         setEnabled:(!lockedOrRunningMaintenance)];
     [writePostTriggerTimeButton setEnabled:(!lockedOrRunningMaintenance)]; 
-
+	
 	[checkWaveFormEnabledButton setEnabled:!lockedOrRunningMaintenance];
 	[checkEnergyEnabledButton   setEnabled:!lockedOrRunningMaintenance];
-
+	
 	if(testsAreRunning){
 		[testButton setEnabled: YES];
 		[testButton setTitle: @"Stop"];
@@ -523,14 +523,14 @@
 		[testButton setEnabled: !runInProgress];	
 		[testButton setTitle: @"Test"];
 	}
-
+	
 	[patternTable setEnabled:!locked];
 	[numTestPatternsField setEnabled:!locked];
 	[numTestPatternsStepper setEnabled:!locked];
-
+	
 	[tModeMatrix setEnabled:!locked];
 	[initTPButton setEnabled:!locked];
-
+	
     //HW histogramming GUI -tb- 2008
     [eMinField setEnabled:!lockedOrRunningMaintenance];
     [tRunField setEnabled:!lockedOrRunningMaintenance];
@@ -540,19 +540,19 @@
     //[readCalibrationHistogramDataButton  setEnabled:!lockedOrRunningMaintenance && [model histoFeatureIsAvailable]];
     [startSelfCalibrationHistogramButton setEnabled:!lockedOrRunningMaintenance && [model histoFeatureIsAvailable]];
     [readHistogramStatusRegButton setEnabled:!lockedOrRunningMaintenance && [model histoFeatureIsAvailable]];
-
+	
     //veto GUI -tb- 2008
     [vetoEnableButton       setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
     [readEnableVetoButton   setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
     [writeEnableVetoButton  setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
     [readVetoDataButton     setEnabled:!lockedOrRunningMaintenance && [model vetoFeatureIsAvailable]];
-
+	
     //set the checkmarks
     [versionStdCheckButton   setIntValue: [model stdFeatureIsAvailable]];
     [versionHistoCheckButton setIntValue: [model histoFeatureIsAvailable]];
     [versionVetoCheckButton  setIntValue: [model vetoFeatureIsAvailable]];
     [versionFilterGapCheckButton  setIntValue: [model filterGapFeatureIsAvailable]];
-
+	
     //[daqRunModeButton setAutoenablesItems:YES];
     [daqRunModeButton setAutoenablesItems:NO];  // needed only once ? -tb- 
     
@@ -562,7 +562,7 @@
     //    if(currSelection == histogramDaqModeMenuItem) NSLog(@"currSelection == histogramDaqModeMenuItem\n");
     //    if(currSelection == vetoDaqModeMenuItem) NSLog(@"currSelection == vetoDaqModeMenuItem\n");
     //    if(currSelection == energyDaqModeMenuItem) NSLog(@"currSelection == energyDaqModeMenuItem\n");
-
+	
     // check std and energy item
     if(![model histoFeatureIsAvailable] && ![model vetoFeatureIsAvailable]){
     	[energyDaqModeMenuItem setEnabled:TRUE]; // in histogram mode we have no energy mode -tb-
@@ -606,7 +606,7 @@
         [vetoDaqModeMenuItem setEnabled:TRUE];
     	[energyDaqModeMenuItem setEnabled:FALSE]; // in histogram mode we have no energy mode -tb-
     }
-
+	
     //disable or grey out the unavailable channels
 	BOOL availiable;
 	if([model histoFeatureIsAvailable]){//we have only channels 0,1,12,13 -tb-
@@ -626,7 +626,7 @@
 		for(chan=0; chan < kNumFLTChannels; chan++){
 			if(chan == 10 || chan == 11) availiable = NO;
 			else					     availiable = !lockedOrRunningMaintenance;
-			 
+			
 			[[gainTextFields  cellWithTag:chan]		  setEnabled: availiable];
 			[[thresholdTextFields  cellWithTag:chan]  setEnabled: availiable];
 			[[triggerEnabledCBs  cellWithTag:chan]	  setEnabled: availiable];
@@ -827,7 +827,7 @@
 	short chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
 		[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
-
+		
 	}	
 }
 
@@ -844,7 +844,7 @@
 	short chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
 		[[triggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
-
+		
 	}
 }
 
@@ -853,7 +853,7 @@
 	short chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
 		[[hitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
-
+		
 	}
 }
 
@@ -890,7 +890,7 @@
 }
 
 /** The FLT mode register value.
-  */
+ */
 - (void) fltRunModeChanged:(NSNotification*)aNote
 {
     //TODO: this is OBSOLETE, use DaqRunMode instead -tb- 2008-07-22
@@ -902,7 +902,7 @@
 }
 
 /** The DAQ run mode popup value.
-  */
+ */
 - (void) daqRunModeChanged:(NSNotification*)aNote
 {
     //debug output -tb- NSLog(@"Received notification  -daqRunModeChanged- ... new is %i\n", [model daqRunMode]);
@@ -913,7 +913,7 @@
     switch(daqRunMode){
         case 0: //debug mode (kKatrinFlt_DaqEnergyTrace_Mode)
             [daqRunModeInfoField setStringValue:@"Info: Debug mode. Data: ADC traces (waveform) and energy."
-                                                 " For investigating waveforms at low rates."];
+			 " For investigating waveforms at low rates."];
             break;
         case 1: //run mode
             [daqRunModeInfoField setStringValue:@"Info: Run mode. Data: single ADC energy events. Standard mode."];
@@ -941,7 +941,7 @@
 }
 
 /** Post trigger time is available since FLT version 0x60, HW version 0x30.
-  */ //-tb-
+ */ //-tb-
 - (void) postTriggerTimeChanged:(NSNotification*)aNote
 {
 	[postTriggTimeField setIntValue:[model postTriggerTime]];
@@ -1022,28 +1022,28 @@
 }
 - (void) histoCalibrationValuesChanged:(NSNotification*)aNote
 {
-		//debug -tb- NSLog(@"histoCalibrationValuesChanged called\n");
-        // update time, adjust progress circle, ... -tb-
-        //set the state of progress indicator
-        if([model histoCalibrationIsRunning]){
-            [histoProgressIndicator startAnimation:nil];
-            //[histoCalibrationChanNumPopUpButton setEnabled:FALSE];
-            [eSamplePopUpButton setEnabled:FALSE];
-            [startCalibrationHistogramButton setEnabled:FALSE];
-            [startSelfCalibrationHistogramButton setEnabled:FALSE];
-        }else{
-            [histoProgressIndicator stopAnimation:nil];
-            //[histoCalibrationChanNumPopUpButton setEnabled:TRUE];
-            [eSamplePopUpButton setEnabled:TRUE];
-            [startCalibrationHistogramButton setEnabled:TRUE];
-            [startSelfCalibrationHistogramButton setEnabled:TRUE];
-        }
-        // update the timer
-        //char s[256];
-        //sprintf(s, "%6.2f",[model histoTestElapsedTime]);
-        //NSString *str=s;
-        //[histoElapsedTimeField setStringValue: str];
-        [histoElapsedTimeField setDoubleValue: [model histoCalibrationElapsedTime]];
+	//debug -tb- NSLog(@"histoCalibrationValuesChanged called\n");
+	// update time, adjust progress circle, ... -tb-
+	//set the state of progress indicator
+	if([model histoCalibrationIsRunning]){
+		[histoProgressIndicator startAnimation:nil];
+		//[histoCalibrationChanNumPopUpButton setEnabled:FALSE];
+		[eSamplePopUpButton setEnabled:FALSE];
+		[startCalibrationHistogramButton setEnabled:FALSE];
+		[startSelfCalibrationHistogramButton setEnabled:FALSE];
+	}else{
+		[histoProgressIndicator stopAnimation:nil];
+		//[histoCalibrationChanNumPopUpButton setEnabled:TRUE];
+		[eSamplePopUpButton setEnabled:TRUE];
+		[startCalibrationHistogramButton setEnabled:TRUE];
+		[startSelfCalibrationHistogramButton setEnabled:TRUE];
+	}
+	// update the timer
+	//char s[256];
+	//sprintf(s, "%6.2f",[model histoTestElapsedTime]);
+	//NSString *str=s;
+	//[histoElapsedTimeField setStringValue: str];
+	[histoElapsedTimeField setDoubleValue: [model histoCalibrationElapsedTime]];
 }
 
 - (void) histoCalibrationChanChanged:(NSNotification*)aNote
@@ -1103,7 +1103,7 @@
 		default: [self resizeWindowToSize:testSize];	    break;
     }
     [[self window] setContentView:totalView];
-            
+	
     NSString* key = [NSString stringWithFormat: @"orca.ORKatrinFLT%d.selectedtab",[model stationNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
@@ -1140,17 +1140,17 @@
 
 
 /** @todo FPGA-Bug
-  * In FLT settings click on "read" for thresholds and gains. From time to time (between
-  * 4 to 30 times) there are wrong values for the gains: very oftenly the last value is wrong (127
-  * or 96 instead of 100), sometimes the second value (instead of 1 it is 0 or 100).
-  * (FPGA version is the first "histogramming version".)
-  * (This bug report is in ORKatrinFLTController.m  -tb- 2008-02-29 )
-  *
-  * NOT FIXED: This happens in the disabled channels. Their values are undefined. (-tb- 2008-05-14)
-  */ //-tb- 2008-02-29
+ * In FLT settings click on "read" for thresholds and gains. From time to time (between
+ * 4 to 30 times) there are wrong values for the gains: very oftenly the last value is wrong (127
+ * or 96 instead of 100), sometimes the second value (instead of 1 it is 0 or 100).
+ * (FPGA version is the first "histogramming version".)
+ * (This bug report is in ORKatrinFLTController.m  -tb- 2008-02-29 )
+ *
+ * NOT FIXED: This happens in the disabled channels. Their values are undefined. (-tb- 2008-05-14)
+ */ //-tb- 2008-02-29
 - (IBAction) readThresholdsGains:(id)sender
 {
-	NS_DURING
+	@try {
 		int i;
         NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 		NSLog(@"FLT (station %d)\n",[model stationNumber]);
@@ -1161,7 +1161,7 @@
 		}
         if([model histoFeatureIsAvailable]) 
             NSLog(@"Warning: Histogramming FPGA version active: maybe not all channels are valid!\n");
-            
+		
         //TODO: could read shaping times from hardware -tb-
 		NSLog(@"Shaping times (software): \n");//-tb- this is not from hardware -tb-
 		for(i=0;i<4;i++){
@@ -1169,23 +1169,25 @@
 			NSLog(@"Group %d: %d \n",i,[model shapingTime:i]);
 			//NSLog(@"%d: %d\n",i,[model readGain:i]);
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT gains and thresholds\n");
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) writeThresholdsGains:(id)sender
 {
 	[self endEditing];
-	NS_DURING
+	@try {
 		[model loadThresholdsAndGains];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLT gains and thresholds\n");
         NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) gainAction:(id)sender
@@ -1221,27 +1223,29 @@
 - (IBAction) readFltModeButtonAction:(id)sender
 {
 	[self endEditing];
-	NS_DURING
+	@try {
 	    int value = [model readMode];
         NSLog(@"readFltMode: hw=%d, daq=%d \n",value);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT status\n");
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
-
+	}
+	
 }
 
 - (IBAction) writeFltModeButtonAction:(id)sender
 {
 	[self endEditing];
-	NS_DURING
+	@try {
 		[model writeMode:[model fltRunMode]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLT status\n");
         NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) settingLockAction:(id) sender
@@ -1263,29 +1267,30 @@
     if([model versionRegHWVersion] >= 0x3){
         [model showVersionRevision];
     }else{
-	NS_DURING
-		NSLog(@"FLT %d Revision: %d\n",[model stationNumber],[model readVersion]);
-		int fpga;
-		for (fpga=0;fpga<4;fpga++) {
-			int version = [model readFPGAVersion:fpga];
-			NSLog(@"FLT %d peripherial FPGA%d version 0x%02x\n",[model stationNumber], fpga, version);
+		@try {
+			NSLog(@"FLT %d Revision: %d\n",[model stationNumber],[model readVersion]);
+			int fpga;
+			for (fpga=0;fpga<4;fpga++) {
+				int version = [model readFPGAVersion:fpga];
+				NSLog(@"FLT %d peripherial FPGA%d version 0x%02x\n",[model stationNumber], fpga, version);
+			}
+			//[model readVersionRevision];//TODO: output format needs improvement -tb- 2008-03-11
 		}
-        //[model readVersionRevision];//TODO: output format needs improvement -tb- 2008-03-11
-	NS_HANDLER
-		NSLog(@"Exception reading FLT HW Model Version\n");
-        NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
-                        localException,[model stationNumber]);
-	NS_ENDHANDLER
+		@catch(NSException* localException) {
+			NSLog(@"Exception reading FLT HW Model Version\n");
+			NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
+							localException,[model stationNumber]);
+		}
     }
 }
 
 /** Responds to all feature/application check buttons (std, histo, veto).
-  *
-  */ //-tb- 2008-03-14
+ *
+ */ //-tb- 2008-03-14
 - (IBAction) versionFeatureCheckButtonAction: (id) sender
 {
     //NSLog(@"FLTController versionFeatureCheckButton \n");
-
+	
     if(sender == versionStdCheckButton){
         //NSLog(@"FLTController versionFeatureCheckButton: versionStdCheckButton\n");
         [model setStdFeatureIsAvailable:[versionStdCheckButton state]== NSOnState];
@@ -1302,7 +1307,7 @@
         //NSLog(@"FLTController versionFeatureCheckButton: versionFilterGapCheckButton\n");
         [model setFilterGapFeatureIsAvailable:[versionFilterGapCheckButton state]== NSOnState];
     }
-
+	
 }
 
 
@@ -1343,7 +1348,7 @@
 - (void) readWriteRegisterChanChanged:(NSNotification*)aNote
 {
     [readWriteRegisterChanPopUpButton selectItemAtIndex:[model readWriteRegisterChan]];
-
+	
 }
 
 - (void) readWriteRegisterNameChanged:(NSNotification*)aNote;
@@ -1366,7 +1371,7 @@
 {
     unsigned long adress = [model registerAdressWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
     NSLog(@"Address for Register %@ for chan/group %i is %i (0x%08x)\n",
-        [model readWriteRegisterName],[model readWriteRegisterChan],adress,adress);
+		  [model readWriteRegisterName],[model readWriteRegisterChan],adress,adress);
 }
 
 - (IBAction) readRegisterButtonAction:(id)sender
@@ -1374,7 +1379,7 @@
     unsigned long val = [model readRegisterWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
     //unsigned long adress = [model registerAdressWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
     NSLog(@"Value of Register  %@ for chan/group %i is %i (0x%08x)\n",
-    [model readWriteRegisterName],[model readWriteRegisterChan],val,val);
+		  [model readWriteRegisterName],[model readWriteRegisterChan],val,val);
 }
 
 - (IBAction) writeRegisterButtonAction:(id)sender
@@ -1413,61 +1418,66 @@
 
 - (IBAction) testAction: (id) sender
 {
-	NS_DURING
+	@try {
 		[model runTests];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Test\n");
         NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 
 - (IBAction) resetAction: (id) sender
 {
-	NS_DURING
+	@try {
 		[model reset];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT reset\n");
         NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) triggerAction: (id) sender
 {
-	NS_DURING
+	@try {
 		[model trigger];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT trigger\n");
         NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 
 - (IBAction) loadTimeAction: (id) sender
 {
-	NS_DURING
+	@try {
 		[model loadTime];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT load time\n");
         NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 	
 }
 
 - (IBAction) readTimeAction: (id) sender
 {
-	NS_DURING
+	@try {
 		unsigned long timeLoaded = [model readTime];
 		NSLog(@"FLT %d time:%d = %@\n",[model stationNumber],timeLoaded,[NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)timeLoaded]);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read time\n");
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) shapingTimeAction: (id) sender
@@ -1475,7 +1485,7 @@
     int tag=[sender  tag];// now tag is the group
     int selectedCellTag = [[sender selectedCell] tag];
     //NSLog(@"shapingTimeAction: sender intValue %i and tag %i; selectedCell-tag %i,  [model shapingTime:tag] %i \n",
-      //  [sender intValue], tag,selectedCellTag,[model shapingTime:tag]);
+	//  [sender intValue], tag,selectedCellTag,[model shapingTime:tag]);
 	if(selectedCellTag != [model shapingTime:tag]){// bug: was intValue instead of tag and gain instead of shapingTime -tb-
 		[[self undoManager] setActionName: @"Set ShapingTime"]; 
 		[model setShapingTime:tag  withValue:selectedCellTag];
@@ -1485,7 +1495,7 @@
 - (IBAction) filterGapAction: (id) sender
 {
 	//if([sender intValue] != [model shapingTime:[[sender selectedCell] tag]]){// bug: was gain instead of shapingTime -tb-
-NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag]);
+	NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag]);
     //[model setFilterGap:[sender tag]];
     int val=[[[filterGapPopup selectedItem] title ] intValue];
     NSLog(@"filterGapAction: value %i \n", val);
@@ -1528,13 +1538,14 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
 
 - (IBAction) statusAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model printStatusReg];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read status\n");
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) tModeAction: (id) sender
@@ -1552,13 +1563,14 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
 
 - (IBAction) initTPAction: (id) sender
 {
-	NS_DURING
+	@try {
 		[model writeTestPatterns];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT init test Pattern\n");
         NSRunAlertPanel([localException name], @"%@\nTest Pattern Init FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -1654,12 +1666,12 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
 
 - (IBAction) changedHistoRecordingTimeAction:(id)sender//TODO: unused, remove it -tb-
 {    [model setHistoRecordingTime:[sender indexOfSelectedItem]];  }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 
 - (IBAction) histoSetStandardButtonAction:(id)sender
 {
@@ -1694,7 +1706,7 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
     //[histogramPlotterId forcedUpdate:nil];
     //[histogramPlotterId setNeedsDisplay:YES]; //TODO: make notification and let respond it to it -tb-
     //[histogramPlotterId display]; //moved to histoCalibrationPlotterChanged
-
+	
 }
 
 - (IBAction) histoSelfCalibrationButtonAction:(id)sender
@@ -1722,13 +1734,13 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
     [model setHistoLastBin:last];
     
     int thepage = [model readCurrentHistogramPageNum];
-
+	
     //perform the readout
     [model readHistogramDataForChan: chan];
     
     NSLogFont(aFont,@"(Chan  %u ( page %i):  range %u ... %u \n",
-        chan, thepage, first  , last ); 
-
+			  chan, thepage, first  , last ); 
+	
     int i,sum=0,currVal;
     for(i=first; i<=last; i++){
         currVal=[model getHistogramData: i forChan: chan];
@@ -1744,11 +1756,12 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
 {
     //TODO : CATCH EXCEPTIONS ? NO -tb-
     //NSLog(@"This is  readCurrentStatusButtonAction\n");
-    NS_DURING
-    [model readCurrentStatusOfPixel:[model histoCalibrationChan]];  //TODO: testing for pixel 0 -tb-
-    NS_HANDLER
-    NSLog(@"Cannot read status from hardware.\n");
-    NS_ENDHANDLER
+    @try {
+		[model readCurrentStatusOfPixel:[model histoCalibrationChan]];  //TODO: testing for pixel 0 -tb-
+    }
+	@catch(NSException* localException) {
+		NSLog(@"Cannot read status from hardware.\n");
+    }
 }
 
 - (IBAction) changedHistoCalibrationChanPopupButtonAction:(id)sender
@@ -1799,7 +1812,7 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
 
 - (IBAction) readVetoStateButtonAction:(id)sender
 {
-// -tb- unused
+	// -tb- unused
     NSLog(@"Veto state is  %8x\n",[model readVetoState]);
 }
 
@@ -1816,9 +1829,9 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
 {
     NSLog(@"Write Veto state   %8x\n",[vetoEnableButton state]);
     if([vetoEnableButton state]==NSOnState)
-      [model setVetoEnable: 1];  //TODO: testing for pixel 0 -tb-
+		[model setVetoEnable: 1];  //TODO: testing for pixel 0 -tb-
     else
-      [model setVetoEnable: 0];  //TODO: testing for pixel 0 -tb-
+		[model setVetoEnable: 0];  //TODO: testing for pixel 0 -tb-
 }
 
 - (IBAction) readVetoDataButtonAction:(id)sender
@@ -1847,7 +1860,7 @@ NSLog(@"filterGapAction: intValue %i, tag %i\n",[sender intValue], [sender tag])
     }else{
 	    //NSLog(@"    DEBUG:   Testing: NO, it is not the histo plotter\n" );
     }
-
+	
     //the default is "hitrate plotter" / "RatesPlotter1D" -tb-
 	return [[model  totalRate]count];
 }

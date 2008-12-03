@@ -44,13 +44,13 @@
 	[super registerNotificationObservers];
 	
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
-
+	
+	
 	[notifyCenter addObserver : self
                      selector : @selector(fourPhaseChanged:)
                          name : ORM321FourPhaseChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORVmeCardSlotChangedNotification
@@ -100,29 +100,32 @@
 
 - (IBAction) statusAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model status];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Exception on M321 Status: %@\n",localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) probeAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model probe];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Exception on M321 Probe: %@\n",localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) syncAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model sync];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Exception on M321 Sync: %@\n",localException);
-    NS_ENDHANDLER
+    }
 }
 
 @end

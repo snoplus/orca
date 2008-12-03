@@ -45,7 +45,7 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-
+	
     [[rate0 xScale] setRngLimitsLow:0 withHigh:100000000 withMinRng:50];
 }
 
@@ -80,35 +80,35 @@
                      selector : @selector(pollRateChanged:)
                          name : TimedWorkerTimeIntervalChangedNotification
                        object : [model poller]];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(pollRunningChanged:)
                          name : TimedWorkerIsRunningChangedNotification
                        object : [model poller]];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(scalerCountChanged:)
                          name : ORL2551ScalerCountChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(scalerRateChanged:)
                          name : ORL2551RateChangedNotification
                        object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(shipScalersChanged:)
                          name : ORL2551ShipScalersChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(clearOnStartChanged:)
                          name : ORL2551ClearOnStartChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pollWhenRunningChanged:)
                          name : ORL2551PollWhenRunningChangedNotification
@@ -153,7 +153,7 @@
     
     [settingLockButton setState: locked];
     [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
-
+	
     [readNoResetButton setEnabled:!lockedOrRunningMaintenance];
     [readResetButton setEnabled:!lockedOrRunningMaintenance]; 
     [testLAMButton setEnabled:!lockedOrRunningMaintenance];
@@ -214,34 +214,34 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-		[[self window] setTitle:[NSString stringWithFormat:@"L2551 Scaler (Station %d)",[model stationNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"L2551 Scaler (Station %d)",[model stationNumber]]];
 }
 
 - (void) shipScalersChanged:(NSNotification*)aNotification
 {
-        [shipButton setState:[model doNotShipScalers]];
+	[shipButton setState:[model doNotShipScalers]];
 }
 
 - (void) clearOnStartChanged:(NSNotification*)aNotification
 {
-        [clearOnStartButton setState:![model clearOnStart]];
+	[clearOnStartButton setState:![model clearOnStart]];
 }
 
 - (void) pollWhenRunningChanged:(NSNotification*)aNotification
 {
-        [pollWhenRunningButton setState:[model pollWhenRunning]];
+	[pollWhenRunningButton setState:[model pollWhenRunning]];
 }
 
 
 - (void) onlineMaskChanged:(NSNotification*)aNotification
 {
-		short i;        
-		for(i=0;i<12;i++){
-			BOOL bitSet = [model onlineMaskBit:i];
-			if(bitSet != [[onlineMaskMatrix cellWithTag:i] intValue]){
-				[[onlineMaskMatrix cellWithTag:i] setState:bitSet];
-			}			
-		}
+	short i;        
+	for(i=0;i<12;i++){
+		BOOL bitSet = [model onlineMaskBit:i];
+		if(bitSet != [[onlineMaskMatrix cellWithTag:i] intValue]){
+			[[onlineMaskMatrix cellWithTag:i] setState:bitSet];
+		}			
+	}
 }
 
 
@@ -261,78 +261,85 @@
 
 - (IBAction) readNoResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readAllScalers];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/No Reset" fCode:0];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readReset];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/Reset" fCode:0];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testLAM];
         NSLog(@"L2551 Test LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM" fCode:8];
-    NS_ENDHANDLER
+    }
 }
 
 
 - (IBAction) clearAllAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model clearAll];
         NSLog(@"L2551 clear all for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Clear All" fCode:11];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) disableLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model disableLAM];
         NSLog(@"L2551 Disable LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Disable LAM" fCode:24];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) enableLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model enableLAM];
         NSLog(@"L2551 Enable LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Enable LAM" fCode:26];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) incAllAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model incAll];
         NSLog(@"L2551 increment all channels for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Increment All Channels" fCode:25];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) showError:(NSException*)anException name:(NSString*)name fCode:(int)i
@@ -373,7 +380,7 @@
 - (IBAction) showHideTestAction:(id)sender
 {
     NSRect aFrame = [NSWindow contentRectForFrameRect:[[self window] frame] 
-                styleMask:[[self window] styleMask]];
+											styleMask:[[self window] styleMask]];
     if([showHideTestButton state] == NSOnState)aFrame.size.height = 453;
     else aFrame.size.height = 370;
     [self resizeWindowToSize:aFrame.size];

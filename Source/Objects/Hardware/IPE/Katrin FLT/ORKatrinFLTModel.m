@@ -35,26 +35,26 @@
 #import "ORTest.h"
 
 /** The hardware returns the product energy times filter length
-  * Using the define energy shift will remove the filter length dependancy.
-  * For a filter lenght shorter than 128 (maximum) the histogram will 
-  * have whole as with a shorter filter length the resotution goes down. 
-  * The mode might be useful for experiemts that need to change the filter lenght
-  * and want to have the energy pulse and thresholds in the same range.  
-  */
-  
-  
+ * Using the define energy shift will remove the filter length dependancy.
+ * For a filter lenght shorter than 128 (maximum) the histogram will 
+ * have whole as with a shorter filter length the resotution goes down. 
+ * The mode might be useful for experiemts that need to change the filter lenght
+ * and want to have the energy pulse and thresholds in the same range.  
+ */
+
+
 //#define USE_ENERGY_SHIFT
 
 // -tb-
 #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
-    #define USE_TILLS_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
-    #ifdef USE_TILLS_DEBUG_MACRO
-      #define    DebugTB(x) x
-    #else
-      #define    DebugTB(x) 
-    #endif
+#define USE_TILLS_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
+#ifdef USE_TILLS_DEBUG_MACRO
+#define    DebugTB(x) x
 #else
-    #define    DebugTB(x) 
+#define    DebugTB(x) 
+#endif
+#else
+#define    DebugTB(x) 
 #endif
 
 NSString* ORKatrinFLTModelVersionRevisionChanged     = @"ORKatrinFLTModelVersionRevisionChanged";
@@ -127,20 +127,20 @@ enum {
 };
 
 static int trigChanConvFLT[4][6]={
-	{ 0,  2,  4,  6,  8, 10},	//FPG6-A
-	{ 1,  3,  5,  7,  9, 11},	//FPG6-B
-	{12, 14, 16, 18, 20, -1},	//FPG6-C
-	{13, 15, 17, 19, 21, -1},	//FPG6-D
+{ 0,  2,  4,  6,  8, 10},	//FPG6-A
+{ 1,  3,  5,  7,  9, 11},	//FPG6-B
+{12, 14, 16, 18, 20, -1},	//FPG6-C
+{13, 15, 17, 19, 21, -1},	//FPG6-D
 };
 
 static NSString* fltTestName[kNumKatrinFLTTests]= {
-	@"Run Mode",
-	@"Ram",
-	@"Pattern",
-	@"Broadcast",
-	@"Threshold/Gain",
-	@"Speed",
-	@"Event",
+@"Run Mode",
+@"Ram",
+@"Pattern",
+@"Broadcast",
+@"Threshold/Gain",
+@"Speed",
+@"Event",
 };
 
 @interface ORKatrinFLTModel (private)
@@ -153,10 +153,10 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 @implementation ORKatrinFLTModel
 
 /** Read the flt "VersionRevision" register and set version and feature vars and flags.
-  * 
-  * If no version can be detected, version 2 is emulated.
-  * Old versions (before 2008) usually can be recognized and are versioned with ver 1.
-  */
+ * 
+ * If no version can be detected, version 2 is emulated.
+ * Old versions (before 2008) usually can be recognized and are versioned with ver 1.
+ */
 - (void)	initVersionRevision;
 {
     sltmodel = [[self crate] adapter];
@@ -167,7 +167,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     unsigned long oldVersionRegister = versionRegister;
     //NSLog(@"FLT %i: read Version+Revision Register\n",[self slot]+1 );
     //NSLog(@"   (Current value: 0x%08x)\n",[self versionRegister] );
-    NS_DURING
+    @try {
         versionRegister = 	[self readVersionRevision];
         if(versionRegister==0){// probably no firewire
             NSLog(@"FLT %i:  Version+Revision Register is 0 - probably firewire not yet established!\n",[self slot]+1 );
@@ -178,7 +178,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
         //check for old versions
         unsigned long test = 0xa0 | [self slot];
         if(     ((versionRegister >> 24)         == test) 
-            && (((versionRegister >> 20) & 0x0f) != 0x3 )   ){
+		   && (((versionRegister >> 20) & 0x0f) != 0x3 )   ){
             // probably old version (no posttrigger and no status bits in ContStatReg)
             // in this case [self readVersionRevision] returns the ControlStatusRegister
             // (reason: has the same Func number in bits 23..21 "Denis")
@@ -188,12 +188,13 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
             NSLog(@"    You should set posttrigger time to 511 manually!\n");
             versionRegister = 0x00100000;
         }
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         versionRegister = 0x00200000;//  in simulation mode this will emulate version 3.x -tb- 2008-04-21
         NSLog(@"FLT %i: reading Version+Revision Register failed - emulate ver. %i\n",[self stationNumber]/*[self slot]+1*/,[self versionRegHWVersion] );
 		versionRegisterIsUptodate=FALSE;
         //versionRegister = 0;
-	NS_ENDHANDLER
+	}
     
     if([self slot]==0){// a new created FLT - not yet dropped into a slot
         versionRegisterIsUptodate=FALSE;
@@ -206,9 +207,9 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     
     if([self versionRegHWVersionHex] >= 0x30){// in v3: "histo version" has no "standard version"!
         if(([self versionRegApplicationID] & 0x2))
-           [self setStdFeatureIsAvailable:   FALSE];// std is always available (maybe for reduced number of channels)
+			[self setStdFeatureIsAvailable:   FALSE];// std is always available (maybe for reduced number of channels)
         else                                        // NO, this is not true any more ... -tb- 2008-05 (e.g. energy mode=standard is not available in histogramming)
-           [self setStdFeatureIsAvailable:   TRUE];// std is always available (maybe for reduced number of channels)
+			[self setStdFeatureIsAvailable:   TRUE];// std is always available (maybe for reduced number of channels)
     }
     
     if([self versionRegHWVersion]>=0x3){
@@ -284,16 +285,16 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 
 - (void) showVersionRevision
 {
-        //NSLog(@"Version: VersionRevisionReg (raw) 0x%x\n",versionRegister );
-        //NSLog(@"Version 0x%x, Revision 0x%x (%u=0x%x)\n",(versionRegister & 0xffff0000) >>16,(versionRegister & 0x0000ffff),versionRegister,versionRegister );
-        //NSLog(@"Version %i, Revision %i (%u=0x%x)\n",(versionRegister & 0xffff0000) >>16,(versionRegister & 0x0000ffff),versionRegister,versionRegister );
-        NSLog(@"Version+Revision Register of FLT %i: 0x%08x \n",[self stationNumber],[self  versionRegister] );
-        NSLog(@"    Version: FPGA firmware version   0x%02x  (major %i, minor %i)\n", [self versionRegHWVersionHex], [self versionRegHWVersion], [self versionRegHWSubVersion]);
-        #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
-        NSLog(@"    Version: application/feature ID 0x%x\n", [self versionRegApplicationID]);
-        NSLog(@"    Version: CFPGA version 0x%02x\n", [self versionRegCFPGAVersion]);
-        NSLog(@"    Version: FPGA6 version 0x%02x\n", [self versionRegFPGA6Version]);
-        #endif
+	//NSLog(@"Version: VersionRevisionReg (raw) 0x%x\n",versionRegister );
+	//NSLog(@"Version 0x%x, Revision 0x%x (%u=0x%x)\n",(versionRegister & 0xffff0000) >>16,(versionRegister & 0x0000ffff),versionRegister,versionRegister );
+	//NSLog(@"Version %i, Revision %i (%u=0x%x)\n",(versionRegister & 0xffff0000) >>16,(versionRegister & 0x0000ffff),versionRegister,versionRegister );
+	NSLog(@"Version+Revision Register of FLT %i: 0x%08x \n",[self stationNumber],[self  versionRegister] );
+	NSLog(@"    Version: FPGA firmware version   0x%02x  (major %i, minor %i)\n", [self versionRegHWVersionHex], [self versionRegHWVersion], [self versionRegHWSubVersion]);
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+	NSLog(@"    Version: application/feature ID 0x%x\n", [self versionRegApplicationID]);
+	NSLog(@"    Version: CFPGA version 0x%02x\n", [self versionRegCFPGAVersion]);
+	NSLog(@"    Version: FPGA6 version 0x%02x\n", [self versionRegFPGA6Version]);
+#endif
 }
 
 - (unsigned long) versionRegister
@@ -326,8 +327,8 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 }
 
 /** For version 3 veto and histogram feature are not available at the same time.
-  * As this is not critical I don't care about this. See: @setHistoFeatureIsAvailable:
-  */
+ * As this is not critical I don't care about this. See: @setHistoFeatureIsAvailable:
+ */
 - (void) setVetoFeatureIsAvailable:(BOOL)aBool
 {
     vetoFeatureIsAvailable=aBool;
@@ -352,11 +353,11 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 - (id) init
 {
     //NSLog(@"ORKatrinFLTModel::init\n" ); //TODO : WHEN IS THIS METHOD CALLED ? -tb- 2008-03-13
-                                           //answer: at least when dragging a new card from catalog to the crate -tb-
-                                           // - so we reallay need to init the most important settings e.g. strings -tb-
+	//answer: at least when dragging a new card from catalog to the crate -tb-
+	// - so we reallay need to init the most important settings e.g. strings -tb-
     self = [super init];
     
-    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
     {//in init: and initWithCoder:
         static bool firstTimeCalled=TRUE;
         if(firstTimeCalled){
@@ -366,20 +367,20 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
             NSLog(@"    (In XCode, we recommend to switch the Active Build Configuration to 'Deployment Configuration' and recompile Orca.)\n" );
         }
     }
-    #endif
+#endif
     
     //init: read version register of flt and itentify the available applications:
     versionRegisterIsUptodate=FALSE;
     //[self initVersionRevision];//if called here, usually firewire is not yest available  (see initWithCoder) -tb-
     postTriggerTime=511;//TODO : initialization; is this the right place? -tb- 2008-03-07 --- yes! see comment above -tb-
     readWriteRegisterName=@"ControlStatus";
-    #if 0
+#if 0
     [self histoSetStandard];
-    #else
+#else
 	histoClearAtStart = YES ; 
     histoClearAfterReadout = YES  ; 
     histoStopIfNotCleared  = NO ; 
-    #endif
+#endif
     [self setHistoBinWidth:1];
     [self setHistoRunTime:5]; //histoRunTime = 5; //the HW histogramming refresh time
     return self;
@@ -416,7 +417,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-            
+	
     [notifyCenter addObserver : self
                      selector : @selector(serviceChanged:)
                          name : @"ORFireWireInterfaceServiceAliveChanged" //copied from ORKatrinSLTModel.m -tb- 2008-03-13
@@ -427,15 +428,15 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
                          name : @"ORIpeSLTModelHW_ResetChanged" //copied from ORKatrinSLTModel.m -tb- 2008-03-13
                        object : [[self crate] adapter] ];//SLT is [[self crate] adapter] -tb-
     
-    #if 0
+#if 0
     //notify this to check for the fpga configuration after slot change -tb-
     //  instead I overwrite setSlot:(int)aSlot - there I can access the old slot number -tb-
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORIpeCardSlotChangedNotification
 					   object : self];
-    #endif
-
+#endif
+	
 }
 
 - (void) serviceChanged:(NSNotification*)aNote
@@ -451,14 +452,14 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 }
 
 /** OBSOLETE: 
-  * The FLT waits for this notification 'cause inserting a new FLT card into the crate will assign
-  * slot number 0 first and then change to the selected slot - this way we can detect when a new FLT was
-  * created and can read the FPGA configuration.
-  * (Instead of waiting for the notification we could overwrite the method and call [super setSlot:...] of ORCard?) -tb-
-  *
-  * Also moving a FLT icon into a slot without real FLT counterpart will result in a change of the detected
-  * configuration.
-  */
+ * The FLT waits for this notification 'cause inserting a new FLT card into the crate will assign
+ * slot number 0 first and then change to the selected slot - this way we can detect when a new FLT was
+ * created and can read the FPGA configuration.
+ * (Instead of waiting for the notification we could overwrite the method and call [super setSlot:...] of ORCard?) -tb-
+ *
+ * Also moving a FLT icon into a slot without real FLT counterpart will result in a change of the detected
+ * configuration.
+ */
 - (void) slotChanged:(NSNotification*)aNote
 {
     NSLog(@"ORKatrinFLTModel::Received Notification slotChanged <--- new slot is %i (this is OBSOLETE)\n",[self slot]);
@@ -470,16 +471,16 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 }
 
 /** The FLT waits for this notification 'cause inserting a new FLT card into the crate will assign
-  * slot number 0 first and then change to the selected slot - this way we can detect when a new FLT was
-  * created and can read the FPGA configuration.
-  * (Instead of waiting for the notification we could overwrite the method and call [super setSlot:...] of ORCard?) -tb-
-  *
-  * Also moving a FLT icon into a slot without real FLT counterpart will result in a change of the detected
-  * configuration.
-  *
-  * Overwritten from ORCard.
-
-  */
+ * slot number 0 first and then change to the selected slot - this way we can detect when a new FLT was
+ * created and can read the FPGA configuration.
+ * (Instead of waiting for the notification we could overwrite the method and call [super setSlot:...] of ORCard?) -tb-
+ *
+ * Also moving a FLT icon into a slot without real FLT counterpart will result in a change of the detected
+ * configuration.
+ *
+ * Overwritten from ORCard.
+ 
+ */
 - (void) 	setSlot:(int)aSlot
 {
     int oldSlot = [self slot];
@@ -488,7 +489,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     if(oldSlot != [self slot]){
         //NSLog(@"This is FLT %i: the slot really changed!\n",[self slot]+1  );
         [self initVersionRevision]; // -tb- 2008-03-13
-  }
+	}
 }
 
 
@@ -504,7 +505,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setCheckWaveFormEnabled:checkWaveFormEnabled];
     
     checkWaveFormEnabled = aCheckWaveFormEnabled;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelCheckWaveFormEnabledChanged object:self];
 }
 
@@ -518,7 +519,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setCheckEnergyEnabled:checkEnergyEnabled];
     
     checkEnergyEnabled = aCheck;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelCheckEnergyEnabledChanged object:self];
 }
 
@@ -535,7 +536,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setTestPatternCount:testPatternCount];
     
     testPatternCount = aTestPatternCount;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTestPatternCountChanged object:self];
 }
 
@@ -551,7 +552,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setTMode:tMode];
     
     tMode = aTMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTModeChanged object:self];
 }
 
@@ -565,7 +566,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setPage:page];
     
     page = aPage;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTestParamChanged object:self];
 }
 
@@ -579,7 +580,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setIterations:iterations];
     
     iterations = aIterations;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTestParamChanged object:self];
 }
 
@@ -596,7 +597,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setEndChan:endChan];
     
     endChan = aEndChan;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTestParamChanged object:self];
 }
 
@@ -612,7 +613,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setStartChan:startChan];
     
     startChan = aStartChan;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTestParamChanged object:self];
 }
 
@@ -626,7 +627,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setBroadcastTime:broadcastTime];
     
     broadcastTime = aBroadcastTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelBroadcastTimeChanged object:self];
 }
 
@@ -702,7 +703,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 
 
 - (unsigned long) hitRateId {
-return hitRateId; 
+	return hitRateId; 
 }
 - (void) setHitRateId: (unsigned long) aHitRateId
 {
@@ -728,10 +729,10 @@ return hitRateId;
 }
 
 /*! Assign the data IDs which are needed to identify the type of encoded data sets.
-    They are needed in:
-    the takeData methods
-    - (NSDictionary*) dataRecordDescription
-*/ //-tb- 2008-02-6
+ They are needed in:
+ the takeData methods
+ - (NSDictionary*) dataRecordDescription
+ */ //-tb- 2008-02-6
 - (void) setDataIds:(id)assigner
 {
     dataId            = [assigner assignDataIds:kLongForm];
@@ -816,10 +817,10 @@ return hitRateId;
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORKatrinFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORKatrinFLTModelThresholdChanged
-						  object:self
-						userInfo: userInfo];
-						
+	 postNotificationName:ORKatrinFLTModelThresholdChanged
+	 object:self
+	 userInfo: userInfo];
+	
 	//ORAdcInfoProviding protocol requirement
 	[self postAdcInfoProvidingValueChanged];
 }
@@ -845,9 +846,9 @@ return hitRateId;
 		[userInfo setObject:[NSNumber numberWithInt:aGroup] forKey: ORKatrinFLTChan];
 		
 		[[NSNotificationCenter defaultCenter]
-				postNotificationName:ORKatrinFLTModelShapingTimeChanged
-							  object:self
-							userInfo: userInfo];
+		 postNotificationName:ORKatrinFLTModelShapingTimeChanged
+		 object:self
+		 userInfo: userInfo];
 	}
 }
 
@@ -862,16 +863,16 @@ return hitRateId;
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORKatrinFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORKatrinFLTModelGainChanged
-						  object:self
-						userInfo: userInfo];
- 
+	 postNotificationName:ORKatrinFLTModelGainChanged
+	 object:self
+	 userInfo: userInfo];
+	
 	//ORAdcInfoProviding protocol requirement
 	[self postAdcInfoProvidingValueChanged];
 }
 
 /** This is the filter gap FLT register setting.
-  */ //-tb-
+ */ //-tb-
 - (int) filterGap
 { return filterGap; }
 
@@ -884,8 +885,8 @@ return hitRateId;
 }
 
 /** Recomputes the value of #filterGapBins, which depends on #filterGap and #filterGapFeatureIsAvailable.
-    Returns the new value of #filterGapBins.
-  */ //-tb-
+ Returns the new value of #filterGapBins.
+ */ //-tb-
 - (int) updateFilterGapBins
 {   
     if(filterGapFeatureIsAvailable){
@@ -915,9 +916,9 @@ return hitRateId;
 - (void) postAdcInfoProvidingValueChanged
 {
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORAdcInfoProvidingValueChanged
-						  object:self
-						userInfo: nil];
+	 postNotificationName:ORAdcInfoProvidingValueChanged
+	 object:self
+	 userInfo: nil];
 }
 
 
@@ -932,11 +933,11 @@ return hitRateId;
 	[aPattern retain];
 	[testPatterns release];
 	testPatterns = aPattern;
-		
+	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORKatrinFLTModelTestPatternsChanged
-						  object:self
-						userInfo: nil];
+	 postNotificationName:ORKatrinFLTModelTestPatternsChanged
+	 object:self
+	 userInfo: nil];
 }
 
 
@@ -962,9 +963,9 @@ return hitRateId;
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORKatrinFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORKatrinFLTModelTriggerEnabledChanged
-						  object:self
-						userInfo: userInfo];
+	 postNotificationName:ORKatrinFLTModelTriggerEnabledChanged
+	 object:self
+	 userInfo: userInfo];
 }
 
 - (BOOL) hitRateEnabled:(unsigned short) aChan
@@ -982,9 +983,9 @@ return hitRateId;
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORKatrinFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORKatrinFLTModelHitRateEnabledChanged
-						  object:self
-						userInfo: userInfo];
+	 postNotificationName:ORKatrinFLTModelHitRateEnabledChanged
+	 object:self
+	 userInfo: userInfo];
 }
 
 
@@ -1012,14 +1013,14 @@ return hitRateId;
 	
     // daq mode --> hw mode
     switch(aMode){
-      //TODO: replace by names -tb- 2008-02-04
-      case kKatrinFlt_DaqEnergyTrace_Mode:    [self setFltRunMode:kKatrinFlt_Debug_Mode];  break;
-      case kKatrinFlt_DaqEnergy_Mode:         [self setFltRunMode:kKatrinFlt_Run_Mode];  break;
-      case kKatrinFlt_DaqHitrate_Mode:
-      case kKatrinFlt_DaqThresholdScan_Mode:  [self setFltRunMode:kKatrinFlt_Measure_Mode];  break;
-      case kKatrinFlt_DaqTest_Mode:           [self setFltRunMode:kKatrinFlt_Test_Mode];  break;
-      case kKatrinFlt_DaqHistogram_Mode:      [self setFltRunMode:kKatrinFlt_Run_Mode];  break;
-      //TODO: for VETO ... -tb- case kKatrinFlt_DaqVeto_Mode:           [self setFltRunMode:kKatrinFlt_Run_Mode];  break;
+			//TODO: replace by names -tb- 2008-02-04
+		case kKatrinFlt_DaqEnergyTrace_Mode:    [self setFltRunMode:kKatrinFlt_Debug_Mode];  break;
+		case kKatrinFlt_DaqEnergy_Mode:         [self setFltRunMode:kKatrinFlt_Run_Mode];  break;
+		case kKatrinFlt_DaqHitrate_Mode:
+		case kKatrinFlt_DaqThresholdScan_Mode:  [self setFltRunMode:kKatrinFlt_Measure_Mode];  break;
+		case kKatrinFlt_DaqTest_Mode:           [self setFltRunMode:kKatrinFlt_Test_Mode];  break;
+		case kKatrinFlt_DaqHistogram_Mode:      [self setFltRunMode:kKatrinFlt_Run_Mode];  break;
+			//TODO: for VETO ... -tb- case kKatrinFlt_DaqVeto_Mode:           [self setFltRunMode:kKatrinFlt_Run_Mode];  break;
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelDaqRunModeChanged  object:self];
@@ -1116,9 +1117,9 @@ return hitRateId;
     unsigned int Pixel = 0; // we assume that all pixels have the same E_min, E_max, ...
     // debug output -tb- NSLog(@"writeEMax: Pbus register is 0x%x, TRun is %i\n",
     // debug output -tb-    [self read:([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)], TRun  ); 	
-
+	
 	[self write:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0) value: postTriggerTime];
-//	[self write: 0x09c02000 value: EMin];
+	//	[self write: 0x09c02000 value: EMin];
     Pixel = 1;
 	[self write:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0) value: postTriggerTime];
     Pixel = 2;
@@ -1132,17 +1133,17 @@ return hitRateId;
 {
     //TODO: write a function with channel as parameter -tb-
     int val;
-
+	
     unsigned int func  = 0x2; // = b010
     unsigned int LAddr0 = 0x01; // UNUSED   0x01 is postTrigg
     unsigned int Pixel = 0; // we assume that all pixels have the same E_min, E_max, ...
     // debug output -tb- NSLog(@"writeEMax: Pbus register is 0x%x, TRun is %i\n",
     // debug output -tb-    [self read:([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)], TRun  ); 	
-
+	
 	val = [self read:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0)];
     NSLog(@"reading in HW  postTriggTime  FPGA %i is %i\n",Pixel,val);
-
-//	[self write: 0x09c02000 value: EMin];
+	
+	//	[self write: 0x09c02000 value: EMin];
     Pixel = 1;
 	val = [self read:   ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr0)];
     NSLog(@"reading in HW  postTriggTime  FPGA %i is %i\n",Pixel,val);
@@ -1156,12 +1157,12 @@ return hitRateId;
 
 
 /** Read out the filter gap of fpga 0 (they all should be the same).
-  * There is no function '- (void) writeFilterGap:(int)aValue'
-  * as it is part of the trigger control register which is set by the
-  * writeTriggerControl function.
-  *
-  * New since fpga6 version 4 (2008-07-11).
-  */ //-tb-
+ * There is no function '- (void) writeFilterGap:(int)aValue'
+ * as it is part of the trigger control register which is set by the
+ * writeTriggerControl function.
+ *
+ * New since fpga6 version 4 (2008-07-11).
+ */ //-tb-
 - (void) readFilterGap
 {
     unsigned long triggControlReg;
@@ -1176,12 +1177,13 @@ return hitRateId;
 
 - (void) checkPresence
 {
-	NS_DURING
+	@try {
 		[self readCardId];
 		[self setPresent:YES];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self setPresent:NO];
-	NS_ENDHANDLER
+	}
 }
 
 //*! The revision bits in the Status Control Register are obsolete since FPGA firmware versions 3.xx (since begin of 2008).
@@ -1196,7 +1198,7 @@ return hitRateId;
 {	
     unsigned int func  = 0x0; // = b000
     unsigned int LAddr0 = 0x01; // 0x01 is version.revision register
-
+	
 	unsigned long data = [self read:   ([self slot] << 24) | (func << 21) |  (LAddr0)];
     //NSLog(@"Version 0x%x, Revision 0x%x (%u=0x%x)\n",(data & 0xffff0000) >>16,(data & 0x0000ffff),data,data );
     //NSLog(@"Version %i, Revision %i (%u=0x%x)\n",(data & 0xffff0000) >>16,(data & 0x0000ffff),data,data );
@@ -1270,27 +1272,27 @@ return hitRateId;
 
 
 /** This is a test:
-  * using 2 doxygen comments for the same method. It works! -tb-*/
+ * using 2 doxygen comments for the same method. It works! -tb-*/
 - (void)  trigger
 {
     //unsigned long addr;
 	
 	NSLog(@"Generating software trigger\n" );		
-
+	
     generateTrigger = 1;
    	
 	// Generate a software trigger
 	//addr =  (21 << 24) | (0x1 << 18) | 0x0f12; // Slt Generate Software Trigger
     //[self write:addr value:0];
 	
-
+	
 }
 
 
 /** Write the selected thresholds and gains from Orca to the hardware/FLT.
-  * For the histogramming FPGA versions we write the allowed thresholds and gains
-  * in a own loop.
-  */
+ * For the histogramming FPGA versions we write the allowed thresholds and gains
+ * in a own loop.
+ */
 - (void) loadThresholdsAndGains
 {
 	int i;
@@ -1348,11 +1350,11 @@ return hitRateId;
     // Calculate the energy shift due to the shapingTime
 	int fpga = i%2 + 2 * (i/12);
     energyShift[i] = 7 - [[shapingTimes objectAtIndex:fpga] intValue] & 0x7;
-
+	
 	//[self write:([self slot] << 24) | (kFLTThresholdCode << FLT_ADDRSP) | ((i&0x01f)<<FLT_CHADDR) value:(aValue>>energyShift[i])]; // E : T = 1
 	[self write:([self slot] << 24) | (kFLTThresholdCode << kKatrinFlt_AddressSpace) | ((i&0x01f)<<kKatrinFlt_ChannelAddress) value:(aValue>>energyShift[i])]; // E : T = 1
 #else
-
+	
     // Take ration between threshold and energy into account.
 	// Changed to 1, ak 21.9.07
 	//[self write:([self slot] << 24) | (kFLTThresholdCode << FLT_ADDRSP) | ((i&0x01f)<<FLT_CHADDR) value:(aValue>>1)];  // E : T = 2
@@ -1367,7 +1369,7 @@ return hitRateId;
 #ifdef USE_ENERGY_SHIFT											
 	int fpga = i%2 + 2 * (i/12);
     energyShift[i] = 7 - [[shapingTimes objectAtIndex:fpga] intValue] & 0x7;
-
+	
 	//return [self read:([self slot] << 24) | (kFLTThresholdCode << FLT_ADDRSP) | ((i&0x01f)<<FLT_CHADDR)] << energyShift[i];	// E : T = 1
 	return [self read:([self slot] << 24) | (kFLTThresholdCode << kKatrinFlt_AddressSpace) | ((i&0x01f)<<kKatrinFlt_ChannelAddress)] << energyShift[i];
 #else
@@ -1382,17 +1384,17 @@ return hitRateId;
 
 - (void) writeGain:(int)i value:(unsigned short)aValue
 {
-     // invert the gain scale, ak 20.7.07
+	// invert the gain scale, ak 20.7.07
 	[self write:([self slot] << 24) | (kFLTGainCode << kKatrinFlt_AddressSpace) | ((i&0x01f)<<kKatrinFlt_ChannelAddress) | 0x1 value:(255-aValue)]; 
 }
 
 - (void) clear:(int)aChan page:(int)aPage value:(unsigned short)aValue
 {
 	unsigned long aPattern;
-
+	
 	aPattern =  aValue;
 	aPattern = ( aPattern << 16 ) + aValue;
-
+	
 	// While emulating the block transfer by a loop of single transfers
 	// it is nec. to increment the address pointer by 2
 	[self clearBlock:([self slot] << 24) | (kFLTAdcDataCode << kKatrinFlt_AddressSpace) | (aChan << kKatrinFlt_ChannelAddress)	| (aPage << kKatrinFlt_PageNumber) 
@@ -1418,19 +1420,19 @@ return hitRateId;
 
 - (void) writeMemoryChan:(int)aChan page:(int)aPage pageBuffer:(unsigned short*)aPageBuffer
 {
-		[self writeBlock: ([self slot] << 24) | (kFLTAdcDataCode << kKatrinFlt_AddressSpace) | (aChan << kKatrinFlt_ChannelAddress)	| (aPage << kKatrinFlt_PageNumber) 
-			 dataBuffer: (unsigned long*)aPageBuffer
-				 length: kKatrinFlt_Page_Size/2
-			  increment: 2];
+	[self writeBlock: ([self slot] << 24) | (kFLTAdcDataCode << kKatrinFlt_AddressSpace) | (aChan << kKatrinFlt_ChannelAddress)	| (aPage << kKatrinFlt_PageNumber) 
+		  dataBuffer: (unsigned long*)aPageBuffer
+			  length: kKatrinFlt_Page_Size/2
+		   increment: 2];
 }
 
 - (void) readMemoryChan:(int)aChan page:(int)aPage pageBuffer:(unsigned short*)aPageBuffer
 {
-
-		[self readBlock: ([self slot] << 24) |(kFLTAdcDataCode << kKatrinFlt_AddressSpace) | (aChan << kKatrinFlt_ChannelAddress) | (aPage << kKatrinFlt_PageNumber) 
-			 dataBuffer: (unsigned long*)aPageBuffer
-				 length: kKatrinFlt_Page_Size/2
-			  increment: 2];
+	
+	[self readBlock: ([self slot] << 24) |(kFLTAdcDataCode << kKatrinFlt_AddressSpace) | (aChan << kKatrinFlt_ChannelAddress) | (aPage << kKatrinFlt_PageNumber) 
+		 dataBuffer: (unsigned long*)aPageBuffer
+			 length: kKatrinFlt_Page_Size/2
+		  increment: 2];
 }
 
 - (unsigned long) readMemoryChan:(int)aChan page:(int)aPage
@@ -1477,7 +1479,7 @@ return hitRateId;
 				}
 			}
 		}
-
+		
         // set the filter gap
         if(filterGapFeatureIsAvailable){
             aValue &=  0xffffffcf;//clear bit 4-5
@@ -1486,14 +1488,14 @@ return hitRateId;
 		
 		[self write:([self slot] << 24) | (kFLTTriggerControlCode << kKatrinFlt_AddressSpace) | (trigChanConvFLT[fpga][0]<<kKatrinFlt_ChannelAddress)  value:aValue];
 		unsigned long checkValue = [self read:([self slot] << 24) | (kFLTTriggerControlCode << kKatrinFlt_AddressSpace) | (trigChanConvFLT[fpga][0]<<kKatrinFlt_ChannelAddress)];
-			
+		
 		aValue	   &= 0x3f07;
 		checkValue &= 0x3f07;
 		
         if (!usingPBusSimulation){	
-		  if(aValue != checkValue)
-		    NSLog(@"FLT %d FPGA %d Trigger control write/read mismatch <0x%08x:0x%08x>\n",
-		          [self stationNumber],fpga,aValue,checkValue);
+			if(aValue != checkValue)
+				NSLog(@"FLT %d FPGA %d Trigger control write/read mismatch <0x%08x:0x%08x>\n",
+					  [self stationNumber],fpga,aValue,checkValue);
         }				  
 	}
 	
@@ -1536,32 +1538,32 @@ return hitRateId;
 - (unsigned long) readTime
 {
     if (usingPBusSimulation){
-      return( (unsigned long)[NSDate timeIntervalSinceReferenceDate]);
+		return( (unsigned long)[NSDate timeIntervalSinceReferenceDate]);
     } 
 	else {
-	  return [self read:([self slot] << 24) | (kFLTTimeCounterCode << kKatrinFlt_AddressSpace)];
+		return [self read:([self slot] << 24) | (kFLTTimeCounterCode << kKatrinFlt_AddressSpace)];
     }	
 }
 
 - (unsigned long) readTimeSubSec
 {
-   unsigned long addr;
-   unsigned long raw;
-   
-   
-   // TODO: Use Slt implementation [firewirecard readSubSecond]
-   // ak 31.7.07
-   addr = (21 << 24) | (0x1 << 18) | 0x0502; // Slt SubSecCounter 
-   raw = [self read:addr];
-   
-   // Calculate the KATRIN subsecton counter from the auger one
-   return (((raw >> 11) & 0x3fff) * 2000 + (raw & 0x7ff)) / 2;
-   
+	unsigned long addr;
+	unsigned long raw;
+	
+	
+	// TODO: Use Slt implementation [firewirecard readSubSecond]
+	// ak 31.7.07
+	addr = (21 << 24) | (0x1 << 18) | 0x0502; // Slt SubSecCounter 
+	raw = [self read:addr];
+	
+	// Calculate the KATRIN subsecton counter from the auger one
+	return (((raw >> 11) & 0x3fff) * 2000 + (raw & 0x7ff)) / 2;
+	
 }
 
 - (void) readHitRates
 {
-	NS_DURING
+	@try {
 		unsigned long aValue;
 		float measurementAge;
 		
@@ -1574,9 +1576,9 @@ return hitRateId;
 			measurementAge = (aValue >> 28) & 0xf;
 			aValue = aValue & 0x3fffff;
 			hitRateOverFlow[chan] = (aValue >> 23) & 0x1;
-
+			
 			if(aValue != hitRate[chan]){
-
+				
 				// The hitrate counter has to be scaled by the counting time 
 				// ak, 15.6.07
 				if (hitRateLength!=0){  
@@ -1595,16 +1597,17 @@ return hitRateId;
 				newTotal += hitRate[chan];
 			}
 		}
-				
+		
 		[self setHitRateTotal:newTotal];
 		
 		if(oneChanged){
 		    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHitRateChanged object:self];
 		}
-		NS_HANDLER
-		NS_ENDHANDLER
-		
-		[self performSelector:@selector(readHitRates) withObject:nil afterDelay:[self hitRateLength]];
+	}
+	@catch(NSException* localException) {
+	}
+	
+	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:[self hitRateLength]];
 }
 
 - (NSString*) rateNotification
@@ -1651,36 +1654,36 @@ return hitRateId;
 {
 	[self write:([self slot] << 24) | (kFLTTestPatternCode << kKatrinFlt_AddressSpace) | 0x2 
 		  value:kKatrinFlt_TP_Control | 
-				kKatrinFlt_TestPattern_Reset | 
-				(tMode & 0x3)];
+	 kKatrinFlt_TestPattern_Reset | 
+	 (tMode & 0x3)];
 }
 
 - (void) writeTestPatterns
 {
 	[self rewindTP];
-
+	
 	[self write:([self slot] << 24) | (kFLTTestPatternCode << kKatrinFlt_AddressSpace) | 0x2 
 		  value:kKatrinFlt_TP_Control | kKatrinFlt_Ec2 | kKatrinFlt_Ec1 |(tMode & 0x3)];
-
+	
 	//write the mode and reset the r/w pointers
 	[self write:([self slot] << 24) | (kFLTTestPatternCode << kKatrinFlt_AddressSpace) | 0x2 
 		  value:kKatrinFlt_TP_Control | 
-				kKatrinFlt_TestPattern_Reset | 
-				(tMode & 0x3)];
-				
+	 kKatrinFlt_TestPattern_Reset | 
+	 (tMode & 0x3)];
+	
 	
 	NSLog(@"Writing Test Patterns\n");
 	int i;
 	for(i= 0;i<testPatternCount;i++){
 		int theValue = kKatrinFlt_PatternMask &  [[testPatterns objectAtIndex:i] intValue];
 		if(i == testPatternCount-1)theValue |= kKatrinFlt_TP_End;
-
+		
 		[self write:([self slot] << 24) | (kFLTTestPatternCode << kKatrinFlt_AddressSpace) | ((i&0x01f)<<kKatrinFlt_ChannelAddress) | 0x2 
 			  value:theValue];
 		NSLog(@"%2d: 0x%x\n",i,theValue);
 		if(i == testPatternCount-1)break;
 	}
-		
+	
 	[self rewindTP];
 	
 }
@@ -1690,14 +1693,14 @@ return hitRateId;
 - (void) restartRun
 {	
     // TODO: Read ADC traces starting from Reset Time Stamp
-
+	
 	// Disable trigger for the recording time
 	// Q: Is the recording still active?
 	[self disableTrigger]; 
 	
 	// Reset access pointers
 	[self reset];
-				  
+	
 	nextEventPage = 0;
 	
 	// Sleep for the recording interval
@@ -1715,83 +1718,83 @@ return hitRateId;
 // this is for testing and debugging the hardware histogramming (espec. timing) -tb- 2008-04-11
 #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
 
-    #define USE_TILLS_HISTO_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
-    #ifdef USE_TILLS_HISTO_DEBUG_MACRO
-      #define    DebugHistoTB(x) x
-    #else
-      #define    DebugHistoTB(x) 
-    #endif
+#define USE_TILLS_HISTO_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
+#ifdef USE_TILLS_HISTO_DEBUG_MACRO
+#define    DebugHistoTB(x) x
+#else
+#define    DebugHistoTB(x) 
+#endif
 
 #else
-  #define    DebugHistoTB(x) 
+#define    DebugHistoTB(x) 
 #endif
 /** In the v3 crate version we have histogramming for the first channel of a group 
-  * (ch 0,1,12,13= group 0,1,2,3)(ch 2,3,14,15= group 0,1,2,3).
-  * This method translates channel number to group number. If the channel is not available,
-  * -1 is returned.
-  *
-  * This is only used to check for the available channels - the registers need the full channel names.
-  */ //-tb-
+ * (ch 0,1,12,13= group 0,1,2,3)(ch 2,3,14,15= group 0,1,2,3).
+ * This method translates channel number to group number. If the channel is not available,
+ * -1 is returned.
+ *
+ * This is only used to check for the available channels - the registers need the full channel names.
+ */ //-tb-
 - (int) histoChanToGroupMap:(int)aChannel
 {
     switch(aChannel){
-    case   31:  return 31; //the broadcast to all channels/groups
-    case   0:  return 0;
-//case   2:  return 2;//TODO: remove - test -tb-
-//case   3:  return 3;
-    case   1:  return 1;
-    case  12:  return 2;
-    case  13:  return 3;
-    #if 0
-    // we use the 4 "true" channels
-    case   0: case 2: return 0;
-    case   1: case 3: return 1;
-    case 12: case 14: return 2;
-    case 13: case 15: return 3;
-    #endif
-    default: return -1;
+		case   31:  return 31; //the broadcast to all channels/groups
+		case   0:  return 0;
+			//case   2:  return 2;//TODO: remove - test -tb-
+			//case   3:  return 3;
+		case   1:  return 1;
+		case  12:  return 2;
+		case  13:  return 3;
+#if 0
+			// we use the 4 "true" channels
+		case   0: case 2: return 0;
+		case   1: case 3: return 1;
+		case 12: case 14: return 2;
+		case 13: case 15: return 3;
+#endif
+		default: return -1;
     }
 }
 
 //hardware histogramming -tb- 2008-02-08
 /** This is the setter for ORKatrinFLTModel::histoBinWidth.
-  *
-  * It serves as example of the general task of inserting new configuration variables to the model. <br>
-  * Following steps are needed: 
-  * - a new attribute in the class definition (interface)  in the model.h file
-  * - a setter in the model (preparing the undo manager AND posting the notification with the according notification name string)
-  * - a getter in the model
-  * - a notification name string declaration in the model.h file
-  * - the notification name string definition in the model.m file
-  * - an entry in - (id)initWithCoder:(NSCoder*)decoder (for RW attributes only) (reading/writing to the .Orca file)
-  * - an entry in  - (void)encodeWithCoder:(NSCoder*)encoder (for RW attributes only) (reading/writing to the .Orca file)
-  * - a setter (changer) in controller.m/.h getting the current value from the model
-  * - an entry in  - (void) registerNotificationObservers in controller.m
-  * - an entry in - (void) updateWindow in controller.m (for the startup!)
-  * - and the usual IBActions and outlets in the controller
-  * - and the necessary connections in the interface builder
-  * - finally RO attributs need a init section (in initWithCoder?)
-  * - for the hardware wizard entries add  a section in - (NSArray*) ORKatrinFLTModel::wizardParameters
-  * - for loading header parameters add a section in - (NSNumber*) ORKatrinFLTModel::extractParam:from:forChannel: 
-  * - for writing the variable to the XML header of the Orca data file add it to - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
-  * - ...
-***/
+ *
+ * It serves as example of the general task of inserting new configuration variables to the model. <br>
+ * Following steps are needed: 
+ * - a new attribute in the class definition (interface)  in the model.h file
+ * - a setter in the model (preparing the undo manager AND posting the notification with the according notification name string)
+ * - a getter in the model
+ * - a notification name string declaration in the model.h file
+ * - the notification name string definition in the model.m file
+ * - an entry in - (id)initWithCoder:(NSCoder*)decoder (for RW attributes only) (reading/writing to the .Orca file)
+ * - an entry in  - (void)encodeWithCoder:(NSCoder*)encoder (for RW attributes only) (reading/writing to the .Orca file)
+ * - a setter (changer) in controller.m/.h getting the current value from the model
+ * - an entry in  - (void) registerNotificationObservers in controller.m
+ * - an entry in - (void) updateWindow in controller.m (for the startup!)
+ * - and the usual IBActions and outlets in the controller
+ * - and the necessary connections in the interface builder
+ * - finally RO attributs need a init section (in initWithCoder?)
+ * - for the hardware wizard entries add  a section in - (NSArray*) ORKatrinFLTModel::wizardParameters
+ * - for loading header parameters add a section in - (NSNumber*) ORKatrinFLTModel::extractParam:from:forChannel: 
+ * - for writing the variable to the XML header of the Orca data file add it to - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+ * - ...
+ ***/
 - (int) histoBinWidth
 {
     return histoBinWidth;
 }
 
 /**  The getter for ORKatrinFLTModel::histoBinWidth (see ORKatrinFLTModel::histoBinWidth).
-  */
+ */
 - (void) setHistoBinWidth:(int)aHistoBinWidth
 {
     //debug -tb- NSLog(@"Calling setHistoBinWidth %i ...\n",aHistoBinWidth);
     [[[self undoManager] prepareWithInvocationTarget:self] setHistoBinWidth:histoBinWidth];
     histoBinWidth = aHistoBinWidth;
-
+	
     //debug -tb- NSLog(@"Sending notification ...\n");
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoBinWidthChanged object:self];
-
+	
     //adjust max histo energy
     [self recalcHistoMaxEnergy];
 }
@@ -1808,7 +1811,7 @@ return hitRateId;
         histoMinEnergy = aValue;
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoMinEnergyChanged object:self];
-
+	
     //adjust max histo energy
     [self recalcHistoMaxEnergy];
 }
@@ -1828,7 +1831,7 @@ return hitRateId;
 }
 
 /** Recalculate Emax by the current values of Emin (the offset) and bin size.
-  */
+ */
 - (void) recalcHistoMaxEnergy
 {
     // compute max possible energy in histogram
@@ -1865,14 +1868,14 @@ return hitRateId;
 }
 
 /** The Histgrm:T_Run FLT register (RefreshTime in the GUI).
-  *  
-  */
+ *  
+ */
 - (unsigned int) histoRunTime
 {    return histoRunTime;    }
 
 /** Sets the Histgrm:T_Rec FLT register (RefreshTime in the GUI).
-  * Values:  minimum 2 (recommended), maximum 16 bit or 32 bit?
-  */
+ * Values:  minimum 2 (recommended), maximum 16 bit or 32 bit?
+ */
 - (void) setHistoRunTime:(unsigned int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHistoRunTime:histoRunTime];
@@ -1969,7 +1972,7 @@ return hitRateId;
 }
 
 /** This is the 'Set Standard' button in the 'Histogram' tab.
-  */
+ */
 - (void) histoSetStandard
 {
     [self setHistoClearAtStart: YES];
@@ -2047,17 +2050,17 @@ return hitRateId;
 - (unsigned long) readEMinForChan:(int)aChan
 {
     int group = [self histoChanToGroupMap:aChan];
-     // we assume that all pixels have the same E_min, E_max, ... during a run
+	// we assume that all pixels have the same E_min, E_max, ... during a run
     // debug output NSLog(@"readEMin: Pbus register is 0x%x\n", [self read:([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)]  ); 	
     if(group==-1 || aChan<0 || aChan>kNumFLTChannels-1) return 0xffffffff; //aChan unguilty
-
+	
     unsigned int func  = 0x6; // = b110
     unsigned int LAddr12 = 0x2; //0x2 is E_min
 	return [self read: ([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12)];
-
-
-
-   // return [self readEMinForGroup: aChan];
+	
+	
+	
+	// return [self readEMinForGroup: aChan];
 }
 
 
@@ -2093,13 +2096,13 @@ return hitRateId;
 /** OBSOLETE. Write the EMax to all allowed channels. Calls #writeEMax:forGroup: 31*/
 - (void) writeEMax:(int)EMax
 {
-        [self writeEMax:EMax forChan:31];// BROADCAST to all channels
+	[self writeEMax:EMax forChan:31];// BROADCAST to all channels
 }
 
 /** OBSOLETE. */
 - (void) writeEMax:(int)EMax forChan:(int)aChan
 {
-        NSLog(@"WARNING: you called writeEMax; this method is obsolete -tb-\n");
+	NSLog(@"WARNING: you called writeEMax; this method is obsolete -tb-\n");
     unsigned int func  = 0x6; // = b110
     unsigned int LAddr12 = 0x3; //0x3 is E_max
 	[self write:   ([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12) value: EMax];
@@ -2135,11 +2138,11 @@ return hitRateId;
 
 
 /** Set the bin width and the start bit for hardware histogramming (all pixels).
-  * Calls #writeStartHistogram:forGroup:
-  * Groups are: 0 = chan 0,1,12,13,  1 = chan 2,3,14,15
-  *
-  * For FPGA version <3.x
-  */  //-tb-
+ * Calls #writeStartHistogram:forGroup:
+ * Groups are: 0 = chan 0,1,12,13,  1 = chan 2,3,14,15
+ *
+ * For FPGA version <3.x
+ */  //-tb-
 - (void) writeStartHistogram:(unsigned int)aHistoBinWidth
 {
     int chan,group;
@@ -2157,12 +2160,12 @@ return hitRateId;
     unsigned int LAddr12 = 0x1; //0x1 is Histogrm:ControlReg
     unsigned int numBins = 0x3ff;         // N of Bins: 10 bit value, all to 1 => 0x3ff = 1023
     unsigned int eSample = aHistoBinWidth; // BW = E_Sample (observed energy is shifted by E_Sample:
-                                          //                obsEnergy >> E_Sample, possible val. 0...8)
+	//                obsEnergy >> E_Sample, possible val. 0...8)
     unsigned int startBit = 0x1;
     unsigned int numBit = 0x0;
     switch(aChan){
-    case 0: case 1: case 12: case 13: numBit = 0x0; break;
-    case 3: case 4: case 14: case 15: numBit = 0x1; break;
+		case 0: case 1: case 12: case 13: numBit = 0x0; break;
+		case 3: case 4: case 14: case 15: numBit = 0x1; break;
     }
     
     unsigned int regVal= (numBins << 6) | (eSample << 2) | (numBit << 1) | (startBit);
@@ -2173,9 +2176,9 @@ return hitRateId;
 
 
 /** This version is dedicated for FPGA version >=3.x. Since then the HistoControlRegister
-  * contains only CLR bit and start/stop bit (and the unused 'select #-channels' bit).
-  * Standard is: use the CLEAR bit.
-  */
+ * contains only CLR bit and start/stop bit (and the unused 'select #-channels' bit).
+ * Standard is: use the CLEAR bit.
+ */
 - (void) writeStartHistogramForChan:(int)aChan withClear:(BOOL)clear
 {
     //HistControlReg
@@ -2185,8 +2188,8 @@ return hitRateId;
     unsigned int startBit = 0x1;
     unsigned int numBit = 0x0;
     switch(aChan){
-    case 0: case 1: case 12: case 13:  case 31: numBit = 0x0; break;
-    case 3: case 4: case 14: case 15:           numBit = 0x1; break;// this is obsolete/unused -tb-
+		case 0: case 1: case 12: case 13:  case 31: numBit = 0x0; break;
+		case 3: case 4: case 14: case 15:           numBit = 0x1; break;// this is obsolete/unused -tb-
     }
     if(clear) CLRBit = 0x1;
     
@@ -2196,18 +2199,18 @@ return hitRateId;
 }
 
 /** This version is dedicated for FPGA version >=3.x. Since then we have the HistoSettingsRegister
-  * containing bin width and mode.
-  @param aMode '0' = continous, '1' = stop if not cleared before
-  */
+ * containing bin width and mode.
+ @param aMode '0' = continous, '1' = stop if not cleared before
+ */
 - (void) writeHistogramSettingsForChan:(int)aChan mode:(unsigned int)aMode binWidth:(unsigned int)aHistoBinWidth
 {
     //HistControlReg
     unsigned int func  = 0x6; // = b110
     unsigned int LAddr12 = 0x3; //0x3 is Histogrm:H_Param = HistoSettingsReg
     unsigned int eSample = aHistoBinWidth; // BW = E_Sample (observed energy is shifted by E_Sample:
-                                          //                obsEnergy >> E_Sample, possible val. 0...8)
+	//                obsEnergy >> E_Sample, possible val. 0...8)
     unsigned int modeBit = (aMode ? 0x1 : 0x0);
-
+	
     unsigned long regVal=   (modeBit << 8) | eSample ;
     //NSLog(@"readLastBinForChan:%i Pbus register is %x\n",aGroup, ([self slot] << 24) | (func << 21) | (aGroup << 16) | (LAddr12 <<12)  ); 	
 	[self write:   ([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12) value: regVal];
@@ -2216,7 +2219,7 @@ return hitRateId;
 
 
 /** Calls #writeStopHistogramForGroup for all allowed channels.
-  */  //-tb-
+ */  //-tb-
 - (void) writeStopHistogram
 {
     //or use broadcast:  ...writeStopHistogramForChan:31... -tb-
@@ -2228,9 +2231,9 @@ return hitRateId;
 }
 
 /** Write the stop bit for hardware histogramming (all pixels). Reads the current register contents,
-  * flips the stop bit and write it back (so all other settings stay unchanged).
-  * For old FPGA versions AND for versions >= 3.x.
-  */  //-tb-
+ * flips the stop bit and write it back (so all other settings stay unchanged).
+ * For old FPGA versions AND for versions >= 3.x.
+ */  //-tb-
 - (void) writeStopHistogramForChan:(int)aChan
 {
     //stop histogramming
@@ -2240,8 +2243,8 @@ return hitRateId;
     unsigned int regVal;
     unsigned int numBit = 0x0;
     switch(aChan){
-    case 0: case 1: case 12: case 13: numBit = 0x0; break;
-    case 3: case 4: case 14: case 15: numBit = 0x1; break;
+		case 0: case 1: case 12: case 13: numBit = 0x0; break;
+		case 3: case 4: case 14: case 15: numBit = 0x1; break;
     }
     
     adress  = ([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12);
@@ -2282,7 +2285,7 @@ return hitRateId;
     unsigned int LAddr12 = 0x6; //0x6 is FirstBin
     // debug output -tb- NSLog(@"readTRec: Pbus register is 0x%x\n", [self read:([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12)  ]); 	
 	return [self read: ([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12)];
-
+	
 }
 
 
@@ -2297,9 +2300,9 @@ return hitRateId;
 
 
 /** Returns the histogram bin the given energy falls in for the given offset emin and bin size bs.
-  * energy will be in "EnergyMode" units, emin and bs in "user interface" units.
-  energy is double as for the binsize 1/2 the energy can be given in 1/5 steps/units.
-  */ //-tb-
+ * energy will be in "EnergyMode" units, emin and bs in "user interface" units.
+ energy is double as for the binsize 1/2 the energy can be given in 1/5 steps/units.
+ */ //-tb-
 - (int) getHistoBinOfEnergy:(double) energy withOffsetEMin:(int) emin binSize:(int) bs
 {
     int ienergy = (energy-emin)*2;
@@ -2308,9 +2311,9 @@ return hitRateId;
 }
 
 /** Returns the energy (at left end of the bin)  the given histogram bin contains for the given offset emin and bin size bs.
-  * energy will be in "EnergyMode" units, emin and bs in "user interface" units.
-  * For bs == 0 (i.e. binsize 1/2) the energy will be rounded down (to be a int value).
-  */ //-tb-
+ * energy will be in "EnergyMode" units, emin and bs in "user interface" units.
+ * For bs == 0 (i.e. binsize 1/2) the energy will be rounded down (to be a int value).
+ */ //-tb-
 - (int) getHistoEnergyOfBin:(int) bin  withOffsetEMin:(int) emin binSize:(int) bs
 {
     return ( ((bin) << (bs))/2 )   + emin;
@@ -2318,17 +2321,17 @@ return hitRateId;
 }
 
 /** Write some data to the histogram buffer of the given channel (for simulation mode).
-  */ //-tb-
+ */ //-tb-
 - (void) histoSimulateReadHistogramDataForChan:(int)aChan
 {
     //DebugHistoTB(  NSLog(@"   histoSimulateReadHistogramDataForChan: chan %i\n",aChan);  )
     int val=aChan+1;
     int i,energy,bin,sum=0,firstBin=511, lastBin=0;
     if([self histoClearAfterReadout])
-    for(i=0;i<1024;i++){//TODO: use something like bufferMaxIndex ... -tb-
-        [self setHistogramData: i forChan:aChan value: 0];
-    }
-
+		for(i=0;i<1024;i++){//TODO: use something like bufferMaxIndex ... -tb-
+			[self setHistogramData: i forChan:aChan value: 0];
+		}
+	
     for(i=0;i<200*val;i++){
         energy=val*400+i;
         bin=[self getHistoBinOfEnergy: (0.5*energy) withOffsetEMin:histoMinEnergy binSize:histoBinWidth];
@@ -2340,37 +2343,37 @@ return hitRateId;
         //DebugHistoTB(  NSLog(@"   SIM: writing: bin %i (energy %f) chan %i value %i\n",bin,(0.5*energy), aChan, val);  )
         sum += val;
     }
-        // buffer all data for later readout and display
+	// buffer all data for later readout and display
     histogramDataFirstBin[aChan]=firstBin;
     histogramDataLastBin[aChan]=lastBin;
     histogramDataSum[aChan]=sum;
     histogramDataRecTimeSec[aChan]=histoRecordingTime;
-
+	
 }
 
 
 /** Start hardware histogramming test run ... usually called from GUI.
-  *
-  * We call the manually started histogramming run 'calibration run' or 'calibration histogram'.
-  * The according methods have similar names: #startCalibrationHistogramOfChan,
-  * #checkCalibrationHistogram, #stopCalibrationHistogram.
-  */ //-tb-
+ *
+ * We call the manually started histogramming run 'calibration run' or 'calibration histogram'.
+ * The according methods have similar names: #startCalibrationHistogramOfChan,
+ * #checkCalibrationHistogram, #stopCalibrationHistogram.
+ */ //-tb-
 - (void) startCalibrationHistogramOfChan:(int)aPixel
 {
 	fireWireCard			  = [[self crate] adapter];
   	usingPBusSimulation		  = [fireWireCard pBusSim];
     //BEGIN -  - of (pbus) simulatin mode -tb- 2008-04-06
     if(usingPBusSimulation){
-            histoLastPageToggleSec=0;  // in simulation mode used for counting to TRun/RefreshTime
-            [self setHistoCalibrationIsRunning:TRUE];
-            [self setHistoRecordingTime:0];
-            histoStartTimeSec = [self readTime]; 
-            [self setHistoCalibrationElapsedTime: 0];
-            [self performSelector:@selector(checkCalibrationHistogram) withObject:nil afterDelay:0.1 /*0.1 sec*/];
-            return;
+		histoLastPageToggleSec=0;  // in simulation mode used for counting to TRun/RefreshTime
+		[self setHistoCalibrationIsRunning:TRUE];
+		[self setHistoRecordingTime:0];
+		histoStartTimeSec = [self readTime]; 
+		[self setHistoCalibrationElapsedTime: 0];
+		[self performSelector:@selector(checkCalibrationHistogram) withObject:nil afterDelay:0.1 /*0.1 sec*/];
+		return;
     }
     //END   - of (pbus) simulatin mode -tb- 2008-04-06
-
+	
     if([self versionRegHWVersion]>=0x3){
         //this is for FPGA version >= 3 (since April 2008), with new feature "paging" etc. -tb-
         int grouptest = 0;
@@ -2477,7 +2480,7 @@ return hitRateId;
         //[self writeHistogramSettingsForChan:aPixel mode: histoStopIfNotCleared  binWidth: histoBinWidth ];
         //broadcast
         [self writeHistogramSettingsForChan:31 mode: histoStopIfNotCleared  binWidth: histoBinWidth ];
-
+		
         //  start procedure: (needs carefull timing)
         struct timeval t;
         //wait after second strobe to give FPGA time to clear the histogram, so it has at least 1 sec until next page toggle
@@ -2495,7 +2498,7 @@ return hitRateId;
             gettimeofday(&t,NULL);
         }while(sec==lastSecStrobe);
         DebugHistoTB(  NSLog(@"sec is %i \n",sec);  )
-
+		
         //starting - write HistControlReg
         //[self writeStartHistogramForChan:aPixel withClear: histoClearAtStart];
         // broadcast
@@ -2512,7 +2515,7 @@ return hitRateId;
             gettimeofday(&t,NULL);
         }while(sec==lastSecStrobe);
         DebugHistoTB(  NSLog(@"sec is %i\n",sec);  )
-
+		
         //remember active page
         histoLastActivePage = [self readCurrentHistogramPageNum];
         //set vars
@@ -2535,12 +2538,12 @@ return hitRateId;
         [self performSelector:@selector(checkCalibrationHistogram) withObject:nil afterDelay:0.1 /*sec*/];
         return;
     }
-
-
+	
+	
     //BEGIN - this is obsolete but left for downward compatibility for older FPGA configurations -tb- 2008-04-06
     //this is for old versions < 3 (between Nov 2007 and April 2008), first test versions -tb-
     if([self versionRegHWVersion]<0x3){
-      //I keep the code for testing -tb-
+		//I keep the code for testing -tb-
         int groupt = 0;
         groupt = [self histoChanToGroupMap:aPixel];
         //aPixel should be == histoCalibrationChan
@@ -2630,10 +2633,10 @@ return hitRateId;
 
 
 /** This implements the histogramming "test run loop".
-  * Updates the GUI with the current histogramming parameters.
-  * Check whether hardware histogramming still runs (histoTestIsRunning is TRUE)  ... if yes restart itself ...
-  *
-  */ //-tb-
+ * Updates the GUI with the current histogramming parameters.
+ * Check whether hardware histogramming still runs (histoTestIsRunning is TRUE)  ... if yes restart itself ...
+ *
+ */ //-tb-
 - (void) checkCalibrationHistogram
 {
   	//usingPBusSimulation		  = [fireWireCard pBusSim];
@@ -2686,9 +2689,9 @@ return hitRateId;
         return;
     }
     //END   - of (pbus) simulatin mode -tb- 2008-04-06
-
+	
     if([self versionRegHWVersion]>=0x3){
-    
+		
         //check that we can actually run  TODO : do I need it here ? -tb- I think yes, to be safe -tb-
         if(![[[self crate] adapter] serviceIsAlive]){
             [self setHistoCalibrationIsRunning:FALSE];
@@ -2707,13 +2710,13 @@ return hitRateId;
         currentSec = t.tv_sec;  
         currentUSec = t.tv_usec;  
         double diffTime = (double)(currentSec  - histoLastPageToggleSec) +
-                         ((double)(currentUSec - histoLastPageToggleUSec)) * 0.000001;
-                         
+		((double)(currentUSec - histoLastPageToggleUSec)) * 0.000001;
+		
         DebugHistoTB(
-            histoCurrentActivePage = [self readCurrentHistogramPageNum]; 
-            NSLog(@"Time since last paging; %f     (page %i,TRec %i, status %i)\n",
-                diffTime,histoCurrentActivePage,[self histoRecordingTime],[self readHistogramControlRegisterOfPixel:aPixel]);
-        )
+					 histoCurrentActivePage = [self readCurrentHistogramPageNum]; 
+					 NSLog(@"Time since last paging; %f     (page %i,TRec %i, status %i)\n",
+						   diffTime,histoCurrentActivePage,[self histoRecordingTime],[self readHistogramControlRegisterOfPixel:aPixel]);
+					 )
         
         //TEST, IF HISTOGRAMMING IS STILL RUNNING: (check before histoLastActivePage = histoCurrentActivePage;)
         //if TRun was set, maybe the run already stopped ... or we are in "stop if not cleared" mode ...
@@ -2739,8 +2742,8 @@ return hitRateId;
         }
         //TODO: test the time
         //if  ((double)[self histoRunTime]) - diffTime < 0 ) then: something wrong with toggle bit
-            // if(TRec == 0) restart anyway
-            // ...
+		// if(TRec == 0) restart anyway
+		// ...
         //waiting for toggle to readout the histogram
         gettimeofday(&t,NULL);
         if(histoStartWaitingForPageToggle){
@@ -2766,7 +2769,7 @@ return hitRateId;
                     [self histoAnalyseSelfCalibrationRun];
                     return;
                 }
-
+				
                 //CLEAR
                 if([self histoClearAfterReadout]){
                     DebugHistoTB(  NSLog(@"CLEAR HISTOGRAM\n");  )
@@ -2779,7 +2782,7 @@ return hitRateId;
                 histoLastActivePage = histoCurrentActivePage;
                 histoLastPageToggleSec = histoPreToggleSec;   //used for timing of page toggle.
                 histoLastPageToggleUSec= histoPreToggleUSec;  //  ''
-                                                              //maybe the time from last call would be better
+				//maybe the time from last call would be better
             } // else continue ... waiting for toggle ...
         }
         //remember for next call
@@ -2804,8 +2807,8 @@ return hitRateId;
         
         // recording time etc. from FLT
         [self setHistoRecordingTime:[self readTRec]];//TODO: which one for multiple pixel ? -tb-
-                                                     //TODO: use ch 0 and use broadcasts
-                                                     //TODO:  broadcasts
+		//TODO: use ch 0 and use broadcasts
+		//TODO:  broadcasts
         //[self setHistoFirstBin:[self readFirstBinForChan:aPixel]];
         //[self setHistoLastBin: [self readLastBinForChan:aPixel]];
         
@@ -2881,13 +2884,13 @@ return hitRateId;
     }
     //END - this is obsolete but left for downward compatibility for older FPGA configurations -tb- 2008-04-06
     
-
+	
 }
 
 
 /** Stop hardware histogramming test run, which was started by #startCalibrationHistogramOfPixel  ...
-  *
-  */ //-tb-
+ *
+ */ //-tb-
 - (void) stopCalibrationHistogram
 {
   	//usingPBusSimulation		  = [fireWireCard pBusSim];
@@ -2903,10 +2906,10 @@ return hitRateId;
         return;
     }
     //END   - of (pbus) simulatin mode -tb- 2008-04-06
-
+	
     if([self versionRegHWVersion]>=0x3){
         //this is for FPGA version >= 3 (since April 2008), with new feature "paging" etc. -tb-
-
+		
         //to update the GUI
         [self setHistoRecordingTime:[self readTRec]];
         //first/last bin is updated after page toggle, see below
@@ -2916,14 +2919,14 @@ return hitRateId;
         histoStartWaitingForPageToggle = FALSE;
         // to be safe ... cancel delayed timer ...
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkCalibrationHistogram) object:nil];
-
+		
         unsigned int Pixel = [self histoCalibrationChan];        //this is for FPGA version >= 3 (since April 2008), with new feature "paging" etc. -tb-
         
         //stop histogramming
         //[self writeStopHistogramForChan:Pixel];
-    //TODO: broadcast
+		//TODO: broadcast
         [self writeStopHistogramForChan:31];
-
+		
         //stop hitrate display  ... copied from runTaskStarted ... -tb-      
         if([self showHitratesDuringHistoCalibration]) 
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
@@ -2965,7 +2968,7 @@ return hitRateId;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoPageNumChanged object:self];
         [self setHistoFirstBin:[self readFirstBinForChan:Pixel]];
         [self setHistoLastBin:[self readLastBinForChan:Pixel]];
-
+		
         if(savedDaqRunMode != -1){
             [self setDaqRunMode: savedDaqRunMode];
             savedDaqRunMode = -1;
@@ -3006,15 +3009,15 @@ return hitRateId;
         sltmodel = [[self crate] adapter];
         [sltmodel setSwInhibit];
         //wait one second (HW histogramming is every second strobe) then display histogram ...
-        #if 0
+#if 0
         [self performSelector:@selector(oneSecAfterStopHistogramOfPixel) withObject:nil afterDelay:1.01 /*sec*/];
-        #else
+#else
         usleep(1000011);
         [self checkCalibrationHistogram];
         [self readHistogramDataForChan:Pixel];
         // send notification to GUI
         [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationPlotterChanged object:self];
-        #endif
+#endif
         if(savedDaqRunMode != -1){
             [self setDaqRunMode: savedDaqRunMode];
             savedDaqRunMode = -1;
@@ -3028,22 +3031,22 @@ return hitRateId;
 
 
 /** Self calibration of histogramming settings.
-  * This is done in the following steps:
-  * - set E_Min =0
-  * - Bin Size = fit according to the shaping time (so that the full range fits into hw histogram)
-  * - calibration run starten (TRun Ÿbernehmen, wenn TRun != 0, sonst TRun = 10)
-  * - cut given percentage of hits (from left and right) and  adjust EMin and BinSize, so that remaining counts fit into hw histogram
-  */  //-tb-
+ * This is done in the following steps:
+ * - set E_Min =0
+ * - Bin Size = fit according to the shaping time (so that the full range fits into hw histogram)
+ * - calibration run starten (TRun Ÿbernehmen, wenn TRun != 0, sonst TRun = 10)
+ * - cut given percentage of hits (from left and right) and  adjust EMin and BinSize, so that remaining counts fit into hw histogram
+ */  //-tb-
 - (void) histoRunSelfCalibration
 {
     NSLog(@"Self Calibration is still under construction!\n");
     // 0. Set Standard settings
-   [self histoSetStandard];
+	[self histoSetStandard];
     // 1. Emin=0
     [self setHistoMinEnergy:0];
     // 2. adjust bin size according to shaping time (1.+2. is to assure all energies will fit into histogram)
     int shapingT = [self shapingTime: [self histoChanToGroupMap:histoCalibrationChan]];
-        //NSLog(@"histoRunSelfCalibration: shapingTime is %i (of ch %i)\n",shapingT,histoCalibrationChan);
+	//NSLog(@"histoRunSelfCalibration: shapingTime is %i (of ch %i)\n",shapingT,histoCalibrationChan);
     int max=((0x1 << shapingT) * 4096) /8;  // this is the max energy in energy mode
     int maxhisto;
     int numbinsize=16;
@@ -3066,8 +3069,8 @@ return hitRateId;
 }
 
 /** "Cut" histoSelfCalibrationPercent*0.5 from left and right, fit the remaining histogram into the 512 bins.
-  *
-  */
+ *
+ */
 - (void) histoAnalyseSelfCalibrationRun
 {
     DebugHistoTB(    NSLog(@"histoAnalyseSelfCalibrationRun: analyse results of run!\n" );   )
@@ -3088,14 +3091,14 @@ return hitRateId;
     for(i=0;i< num ;i++){
         left=i;
         sum += dataPtr[i];
-    DebugHistoTB(  if(i<3 || sum>0)  NSLog(@"histoAnalyseSelfCalibrationRun: indices: left %i right %i sum %i p2 %f \n",left, right,sum ,p2);   )
+		DebugHistoTB(  if(i<3 || sum>0)  NSLog(@"histoAnalyseSelfCalibrationRun: indices: left %i right %i sum %i p2 %f \n",left, right,sum ,p2);   )
         if(sum>p2) break;
     }
     sum=0;
     for(i=num-1;i>=0 ;i--){
         right=i;
         sum += dataPtr[i];
-    DebugHistoTB(   if((i>num-4) || sum>0)   NSLog(@"histoAnalyseSelfCalibrationRun: indices: left %i right %i sum %i p2 %f \n",left, right,sum ,p2);   )
+		DebugHistoTB(   if((i>num-4) || sum>0)   NSLog(@"histoAnalyseSelfCalibrationRun: indices: left %i right %i sum %i p2 %f \n",left, right,sum ,p2);   )
         if(sum>p2) break;
     }
     DebugHistoTB(    NSLog(@"histoAnalyseSelfCalibrationRun: indices: left %i right %i\n",left, right );   )
@@ -3129,17 +3132,17 @@ return hitRateId;
         [self setHistoMinEnergy:leftenergy];
     }
     
-    clean_up_mark:
+clean_up_mark:
     //clean up
     histoSelfCalibrationCounter=0;
 }
 
 
 /** Returns the histogram data  address for the read access to the crate.
-  * @param aBin the bin; if aBin==0 the base address (=address of bin 0) is returned.
-  * This adress is ORed with the bin number to get the value of the according bin.
-  * @param aGroup there is no range check! 
-  */
+ * @param aBin the bin; if aBin==0 the base address (=address of bin 0) is returned.
+ * This adress is ORed with the bin number to get the value of the according bin.
+ * @param aGroup there is no range check! 
+ */
 - (unsigned int) histogramDataAdress:(int)aBin forChan:(int)aChan;
 {
     unsigned int func  = 0x6; // = b110
@@ -3148,9 +3151,9 @@ return hitRateId;
 }
 
 /** This will read the histogram from the hardware and store all data in a buffer (data, firstBin, lastBin).
-  * This is called at the end of a histogramming calibration run, when pressing the button
-  * "Read Histogram Data". Or after a histogram page toggle (in continous run or at run stop)
-  */
+ * This is called at the end of a histogramming calibration run, when pressing the button
+ * "Read Histogram Data". Or after a histogram page toggle (in continous run or at run stop)
+ */
 - (void) readHistogramDataForChan:(unsigned int)aPixel 
 {
     unsigned int i,firstBin, lastBin, currVal, sum;
@@ -3158,11 +3161,11 @@ return hitRateId;
     firstBin = [self readFirstBinForChan:aPixel];
     lastBin  = [self readLastBinForChan:aPixel];
     DebugHistoTB(
-        int thepage = [self readCurrentHistogramPageNum];
-        NSLog(@"readHistogramDataForChan  %u ( page %i): has range %u ... %u \n",
-        aPixel, thepage, firstBin , lastBin); 
-    )
-
+				 int thepage = [self readCurrentHistogramPageNum];
+				 NSLog(@"readHistogramDataForChan  %u ( page %i): has range %u ... %u \n",
+					   aPixel, thepage, firstBin , lastBin); 
+				 )
+	
     unsigned int adress  = [self histogramDataAdress:0 forChan: aPixel];
     unsigned int *dataPtr=0; //place where to store the data
     //clear memory
@@ -3175,22 +3178,22 @@ return hitRateId;
             dataPtr[i]= 0;
         }
     }
-    #if 0 //TODO: OBSOLETE - REMOVE IT -tb-
+#if 0 //TODO: OBSOLETE - REMOVE IT -tb-
     if(histogramDataUI)//first version
         for(i=0; i<1024; i++){
             histogramDataUI[i]= 0;
         }
     if(histogramMutableData){//2nd/test version
-       unsigned int * p =(unsigned int *)[histogramMutableData  mutableBytes];
-       int j;
-       for(j=0;j<1024;j++){ p[j]=0; }
+		unsigned int * p =(unsigned int *)[histogramMutableData  mutableBytes];
+		int j;
+		for(j=0;j<1024;j++){ p[j]=0; }
     }
-    #endif
+#endif
     sum = 0;
     
     DebugHistoTB(  NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];   )
 	DebugHistoTB(  NSLogFont(aFont,@"-----------------------\n");          )
-
+	
     //TODO: could read in one block from first bin to last bin
     for(i=firstBin; i<=lastBin; i++){
         currVal =  [self read: adress | i];
@@ -3214,7 +3217,7 @@ return hitRateId;
 }
 
 /** Reads the histogram data for a single bin  aBin from hardware.
-  */
+ */
 - (unsigned int) readHistogramDataOfPixel:(unsigned int)aPixel atBin:(unsigned int)aBin 
 {
     unsigned int currVal;
@@ -3224,7 +3227,7 @@ return hitRateId;
 }
 
 /** New for FPGA version 3.x (histogramming with paging)
-  */
+ */
 - (int)  readCurrentHistogramPageNum
 {
     //NSLog(@" [self versionRegHWVersion] %i  \n",[self versionRegHWVersion] ); 
@@ -3238,8 +3241,8 @@ return hitRateId;
 }
 
 /** New for FPGA version 3.x (histogramming with paging). 
-  * Reads register, toggles stop bit, writes value back.
-  */
+ * Reads register, toggles stop bit, writes value back.
+ */
 - (void) clearCurrentHistogramPageForChan:(unsigned int)aChan
 {
     DebugHistoTB( NSLog(@"Clearing Current Histogramming Page %i \n",[self readCurrentHistogramPageNum] ); )
@@ -3255,7 +3258,7 @@ return hitRateId;
 }
 
 /** Read out the current status and display it on Log Window.
-  */
+ */
 - (void) readCurrentStatusOfPixel:(unsigned int)aPixel  //TODO: rename to histogrammingIsRunning and return a BOOL? -tb- 2008-02-27
 {
     NSLog(@"Current Status Of Histogramming Calibration Run: histoCalibrationIsRunning = %i \n",histoCalibrationIsRunning ); 
@@ -3274,7 +3277,7 @@ return hitRateId;
     int group = [self histoChanToGroupMap:aPixel];
     if(group==-1) return 0xffffffff;
     unsigned int adress  = ([self slot] << 24) | (func << 21) | (group << 16) | (LAddr12 <<12);
-
+	
     // read  HistTriggControlReg
     unsigned long regVal;
     regVal = [self read: adress];
@@ -3282,13 +3285,13 @@ return hitRateId;
 }
 
 /** SLT needs this for a broadcast. TOD: could/should be a static function -tb-
-  */
+ */
 - (void) writeHistogramControlRegisterForSlot:(int)aSlot chan:(int)aChan value:(unsigned long)aValue
 {
     unsigned int func  = 0x6; // = b110
     unsigned int LAddr12 = 0x1; //0x1 is Histogrm:ControlReg
     unsigned int adress  = ( aSlot  << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12);
-
+	
     // write  HistTriggControlReg
     [self write: adress value: aValue];
 }
@@ -3303,14 +3306,14 @@ return hitRateId;
         return  ;
     }
     unsigned int adress  = ([self slot] << 24) | (func << 21) | (aPixel << 16) | (LAddr12 <<12);
-
+	
     // write  HistTriggControlReg
     [self write: adress value: aValue];
 }
 
 /**
-  *
-  */
+ *
+ */
 - (unsigned long) readHistogramSettingsRegisterOfPixel:(unsigned int)aPixel;
 {
     unsigned int func  = 0x6; // = b110
@@ -3318,7 +3321,7 @@ return hitRateId;
     int group = [self histoChanToGroupMap:aPixel];
     if(group==-1) return 0xffffffff;
     unsigned int adress  = ([self slot] << 24) | (func << 21) | (group << 16) | (LAddr12 <<12);
-
+	
     // read  HistTriggControlReg
     unsigned long regVal;
     regVal = [self read: adress];
@@ -3326,8 +3329,8 @@ return hitRateId;
 }
 
 /**
-  *
-  */
+ *
+ */
 - (void) writeHistogramSettingsRegisterOfPixel:(unsigned int)aPixel value:(unsigned long)aValue;
 {
     unsigned int func  = 0x6; // = b110
@@ -3338,7 +3341,7 @@ return hitRateId;
         return  ;
     }
     unsigned int adress  = ([self slot] << 24) | (func << 21) | (group << 16) | (LAddr12 <<12);
-
+	
     // write  HistTriggControlReg
     [self write: adress value: aValue];
 }
@@ -3377,9 +3380,9 @@ return hitRateId;
     
     //NSLog(@"readLastBinForChan:%i Pbus register is %x\n",aPixel, ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)  ); 	
     NSLog(@"  setVetoEnable: address %8x, state %8x\n",adress,regVal  ); 	
-
+	
 	[self write:   adress value: regVal];
-
+	
 }
 
 - (int) readVetoState
@@ -3399,11 +3402,11 @@ return hitRateId;
     
     
     //NSLog(@"readLastBinForChan:%i Pbus register is %x\n",aPixel, ([self slot] << 24) | (func << 21) | (Pixel << 16) | (LAddr12 <<12)  ); 	
-
+	
 	regVal = [self read:   adress ];
     NSLog(@"  vetoState: adress %8x, state %8x\n",adress,regVal  ); 	
     return regVal;
-
+	
 }
 
 - (void) readVetoDataFrom:(int)fromIndex to:(int)toIndex
@@ -3428,7 +3431,7 @@ return hitRateId;
         NSLog(@"    adresses: %10x, %10x, %10x\n", adress , adress |1, adress|2);
         NSLog(@"    values  : %10x, %10x, %10x\n", word00 , word01, word10);
         NSLog(@"  eventID %8i, channelmap %8x, sec:sub %8i:%8i\n",word00 & 0x3ff,word00 >>10,word10,word01  ); 	
-
+		
     }
 }
 
@@ -3440,7 +3443,7 @@ return hitRateId;
 {
     readWriteRegisterChan= aChan;   
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelReadWriteRegisterChanChanged object:self];
-
+	
 }
 
 -(NSString *) readWriteRegisterName
@@ -3454,8 +3457,8 @@ return hitRateId;
 }
 
 /** Returns the adress of the FLT register with name aName. If the name is unknown, 0xffffffff
-  * is returned.
-  */
+ * is returned.
+ */
 - (unsigned long) registerAdressWithName:(NSString *)aName  forChan:(int)aChan
 {
     unsigned int func  = 0x0; // = b110
@@ -3482,24 +3485,24 @@ return hitRateId;
     if(b) adress =   ([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12) | (LAddr0);
     // debug output -tb- NSLog(@"registerAdressWithName: adress is 0x%x\n", adress); 	
 	return adress;
-
+	
 }
 
 /** Returns the register content of the FLT register with name aName and channel aChan. If the name is unknown, the ControlStatus
-  * is returned (as default).
-  */
+ * is returned (as default).
+ */
 - (unsigned long) readRegisterWithName:(NSString *)aName  forChan:(int)aChan
 {
     unsigned long adress =  [self registerAdressWithName:aName forChan: aChan];
     unsigned long val =  [self read: adress];
 	return val;
-
+	
 }
 
 /** Writes aValue to the  FLT register given by name aName and channel aChan. 
-  * Returns the register adress (for contol purposes;
-  * if the name was not found, this will result in the return value of 0xffffffff).
-  */
+ * Returns the register adress (for contol purposes;
+ * if the name was not found, this will result in the return value of 0xffffffff).
+ */
 - (unsigned long) writeRegisterWithName:(NSString *)aName  forChan:(int)aChan value:(unsigned long) aValue
 {
     unsigned long adress =  [self registerAdressWithName:aName forChan: aChan];
@@ -3512,15 +3515,15 @@ return hitRateId;
 
 #pragma mark ¥¥¥Archival
 /** Define here what to read from the .Orca file. These are e.g. state of check boxes, content of text fields (gains,
-  * thresholds,...), internal state values (daqRunMode, ...),  etc. 
-  *
-  * This is called at creation time of this object (rather than -(void) #init).
-  */ //-tb-
+ * thresholds,...), internal state values (daqRunMode, ...),  etc. 
+ *
+ * This is called at creation time of this object (rather than -(void) #init).
+ */ //-tb-
 - (id)initWithCoder:(NSCoder*)decoder
 {
     //NSLog(@"Katrin FLT Card (%i) initWithCoder <---- decoder %p\n",[self slot], decoder);
     
-    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
     {//in init: and initWithCoder:
         static bool firstTimeCalled=TRUE;
         if(firstTimeCalled){
@@ -3530,8 +3533,8 @@ return hitRateId;
             NSLog(@"    (In XCode, we recommend to switch the Active Build Configuration to 'Deployment Configuration' and recompile Orca.)\n" );
         }
     }
-    #endif
-
+#endif
+	
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
@@ -3617,22 +3620,22 @@ return hitRateId;
 		[self setThresholds: [NSMutableArray array]];
 		for(i=0;i<kNumFLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
 	}
-
+	
 	if(!gains){
 		[self setGains: [NSMutableArray array]];
 		for(i=0;i<kNumFLTChannels;i++) [gains addObject:[NSNumber numberWithInt:100]];
 	}
-
+	
 	if(!testStatusArray){
 		[self setTestStatusArray: [NSMutableArray array]];
 		for(i=0;i<kNumKatrinFLTTests;i++) [testStatusArray addObject:@"--"];
 	}
-
+	
 	if(!testPatterns){
 		[self setTestPatterns: [NSMutableArray array]];
 		for(i=0;i<24;i++) [testPatterns addObject:[NSNumber numberWithInt:0]];
 	}
-
+	
 	if(!testEnabledArray){
 		[self setTestEnabledArray: [NSMutableArray array]];
 		for(i=0;i<kNumKatrinFLTTests;i++) [testEnabledArray addObject:[NSNumber numberWithBool:YES]];
@@ -3652,7 +3655,7 @@ return hitRateId;
         histogramData = [[NSMutableArray allocWithZone:nil] initWithCapacity:kNumFLTChannels];//one array per channel
         // NSLog(@"Histogramm data alloc sizeof(short): %i sizeof(int): %i  (unsigned long): %i  (long): %i (longlong): %i\n",
         //  sizeof(short),sizeof(int),sizeof(unsigned long) ,sizeof( long),sizeof( long long) );
-
+		
 		for(i=0;i<kNumFLTChannels;i++){
             //TODO : could omit the unavailable channels ... -tb-
             //[histogramData addObject:[NSMutableData dataWithLength:1024]]; <- this did not work -tb-
@@ -3679,31 +3682,32 @@ return hitRateId;
     [self setFilterGap: [decoder decodeIntForKey:@"filterGapSetting"]];
 	
 	/*
-    //version control - at this time firewire is (sometimes) not available -tb- 2008-03-13
-    NS_DURING
-		//NSLog(@"--- initWithCoder::Read from register initVersionRevision---\n");
-		[self initVersionRevision];
-    NS_HANDLER
-		versionRegisterIsUptodate=FALSE;
-		{  //set default
-			[self setStdFeatureIsAvailable:   YES];
-			[self setVetoFeatureIsAvailable:  YES];
-			[self setHistoFeatureIsAvailable: YES];
-		}
-		NSLog(@"initWithCoder::Read from register initVersionRevision FAILED\n");
-    NS_ENDHANDLER
-	*/	
+	 //version control - at this time firewire is (sometimes) not available -tb- 2008-03-13
+	 @try {
+	 //NSLog(@"--- initWithCoder::Read from register initVersionRevision---\n");
+	 [self initVersionRevision];
+	 }
+	 @catch(NSException* localException) {
+	 versionRegisterIsUptodate=FALSE;
+	 {  //set default
+	 [self setStdFeatureIsAvailable:   YES];
+	 [self setVetoFeatureIsAvailable:  YES];
+	 [self setHistoFeatureIsAvailable: YES];
+	 }
+	 NSLog(@"initWithCoder::Read from register initVersionRevision FAILED\n");
+	 }
+	 */	
 	//------------------------------------------------------------------------------------------
-
+	
     [[self undoManager] enableUndoRegistration];
 	
     [self registerNotificationObservers];
-
+	
     return self;
 }
 
 /** Define here what to write to the .Orca file.
-  */ //-tb-
+ */ //-tb-
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
@@ -3747,88 +3751,88 @@ return hitRateId;
     [encoder encodeInt:histoClearAfterReadout      forKey:@"ORKatrinFLTModelHistoClearAfterReadout"];	
     [encoder encodeInt:histoStopIfNotCleared       forKey:@"ORKatrinFLTModelHistoStopIfNotCleared"];	
     [encoder encodeInt:histoSelfCalibrationPercent forKey:@"ORKatrinFLTModelHistoSelfCalibrationPercent"];	
-
+	
     [encoder encodeBool:stdFeatureIsAvailable  forKey:@"stdFeatureIsAvailable"];	
     [encoder encodeBool:vetoFeatureIsAvailable forKey:@"vetoFeatureIsAvailable"];	
     [encoder encodeBool:histoFeatureIsAvailable forKey:@"histoFeatureIsAvailable"];	
     [encoder encodeBool:filterGapFeatureIsAvailable forKey:@"filterGapFeatureIsAvailable"];	
     [encoder encodeInt:versionRegister forKey:@"versionRegister"];	
-
+	
     [encoder encodeInt:filterGap forKey:@"filterGapSetting"];	
-
+	
 }
 
 
 
 /** Define here all types of data records. Define the decoder selector with \@"decoder".
-  * The "dataID" is assigned by the assigner, see setDataIds or - (void) setDataIds:(id)assigner.
-  * The decoders are defined in \file ORKatrinFLTDecoder.m
-  *  
-  * This will go to the XML header of the data file.
-  */ //-tb- 2008-02-6
+ * The "dataID" is assigned by the assigner, see setDataIds or - (void) setDataIds:(id)assigner.
+ * The decoders are defined in \file ORKatrinFLTDecoder.m
+ *  
+ * This will go to the XML header of the data file.
+ */ //-tb- 2008-02-6
 - (NSDictionary*) dataRecordDescription
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORKatrinFLTDecoderForEnergy",      @"decoder",
-        [NSNumber numberWithLong:dataId],   @"dataId",
-        [NSNumber numberWithBool:YES],      @"variable",
-        [NSNumber numberWithLong:-1],		@"length",
-        nil];
-
+								 @"ORKatrinFLTDecoderForEnergy",      @"decoder",
+								 [NSNumber numberWithLong:dataId],   @"dataId",
+								 [NSNumber numberWithBool:YES],      @"variable",
+								 [NSNumber numberWithLong:-1],		@"length",
+								 nil];
+	
     [dataDictionary setObject:aDictionary forKey:@"KatrinFLT"];//TODO: rename to KatrinFLTEnergy? -tb-
 	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORKatrinFLTDecoderForWaveForm",		@"decoder",
-        [NSNumber numberWithLong:waveFormId],   @"dataId",
-        [NSNumber numberWithBool:YES],			@"variable",
-        [NSNumber numberWithLong:-1],			@"length",
-        nil];
-
+				   @"ORKatrinFLTDecoderForWaveForm",		@"decoder",
+				   [NSNumber numberWithLong:waveFormId],   @"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
     //debug output NSLog(@"waveFormID (KatrinFLTWaveForm) is %i\n",waveFormId); //TODO: remove it -tb-
     [dataDictionary setObject:aDictionary forKey:@"KatrinFLTWaveForm"];
 	
     // -tb- 2008-02-01
     //daqRunMode = TODO: fill in the mode -tb-
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORKatrinFLTDecoderForHitRate",  		@"decoder",  //in ORKatrinFLTDecoder.h/.m
-        [NSNumber numberWithLong:hitRateId],    @"dataId",
-        [NSNumber numberWithBool:YES],			@"variable",
-        [NSNumber numberWithLong:-1],			@"length",
-        nil];
-
+				   @"ORKatrinFLTDecoderForHitRate",  		@"decoder",  //in ORKatrinFLTDecoder.h/.m
+				   [NSNumber numberWithLong:hitRateId],    @"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
     [dataDictionary setObject:aDictionary forKey:@"KatrinFLTHitRate"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORKatrinFLTDecoderForThresholdScan",  @"decoder",  //renamed from ORKatrinFLTDecoderForHitRate-tb-
-        [NSNumber numberWithLong:thresholdScanId],    @"dataId",
-        [NSNumber numberWithBool:YES],			@"variable",
-        [NSNumber numberWithLong:-1],			@"length",
-        nil];
-
+				   @"ORKatrinFLTDecoderForThresholdScan",  @"decoder",  //renamed from ORKatrinFLTDecoderForHitRate-tb-
+				   [NSNumber numberWithLong:thresholdScanId],    @"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
     [dataDictionary setObject:aDictionary forKey:@"KatrinFLTThresholdScan"];
     
     // for the hardware histogram
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORKatrinFLTDecoderForHistogram",  	@"decoder",
-        [NSNumber numberWithLong:histogramId],  @"dataId",
-        [NSNumber numberWithBool:YES],			@"variable",
-        [NSNumber numberWithLong:-1],			@"length",
-        nil];
-
+				   @"ORKatrinFLTDecoderForHistogram",  	@"decoder",
+				   [NSNumber numberWithLong:histogramId],  @"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
     [dataDictionary setObject:aDictionary forKey:@"KatrinFLTHistogram"];
     
     // for the veto data
-    #if 0
+#if 0
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORKatrinFLTDecoderForVeto",  		    @"decoder",  //TODO:  will be needed for VETO  -tb-
-        [NSNumber numberWithLong:vetoId],       @"dataId",
-        [NSNumber numberWithBool:YES],			@"variable",
-        [NSNumber numberWithLong:-1],			@"length",
-        nil];
-
+				   @"ORKatrinFLTDecoderForVeto",  		    @"decoder",  //TODO:  will be needed for VETO  -tb-
+				   [NSNumber numberWithLong:vetoId],       @"dataId",
+				   [NSNumber numberWithBool:YES],			@"variable",
+				   [NSNumber numberWithLong:-1],			@"length",
+				   nil];
+	
     [dataDictionary setObject:aDictionary forKey:@"KatrinFLTVeto"];
-    #endif
+#endif
     
     return dataDictionary;
 }
@@ -3837,15 +3841,15 @@ return hitRateId;
 {
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithLong:dataId],				@"dataId",
-		[NSNumber numberWithLong:kNumFLTChannels],		@"maxChannels",
-								nil];
+				   [NSNumber numberWithLong:dataId],				@"dataId",
+				   [NSNumber numberWithLong:kNumFLTChannels],		@"maxChannels",
+				   nil];
 	
 	[anEventDictionary setObject:aDictionary forKey:@"KatrinFLT"];
 }
 
 /** This will go to the XML header of the data file.
-  */ //-tb- 2008-02-6
+ */ //-tb- 2008-02-6
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     
@@ -3865,15 +3869,15 @@ return hitRateId;
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
     //NSLog(@"---- ORKatrinFLTModel::runTaskStarted (%i)----\n", [self slot]);
-    #endif
-
+#endif
+	
 	firstTime = YES;
     nLoops = 0; // Counter for the readout loops
     nEvents = 0;
-
-
+	
+	
     [self clearExceptionCount];
 	
 	//check that we can actually run
@@ -3881,7 +3885,7 @@ return hitRateId;
 		[NSException raise:@"No FireWire Service" format:@"Check Crate Power and FireWire Cable."];
         //return;  //TODO: ??? -tb-
     }
-
+	
     // Don't start run, if histogramming test is active
     // TODO: SLT resets the hardware in ["SLT runIsAboutToStart ..."], so if we come here, histogramming already has been terminated by SLT -tb-
     // TODO: how should we handle this? -tb-
@@ -3890,8 +3894,8 @@ return hitRateId;
 		[NSException raise:@"Histogramming calibration is running" format:@"Stop calibration run and select proper histogramming parameters"]; 
         return; 
     }
-
-
+	
+	
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORKatrinFLTModel"];    
@@ -3906,15 +3910,15 @@ return hitRateId;
 			break;
 		}
 	}
-		
+	
     //TODO: runTaskStarted:
     /** @todo  following code commented out since last update (r694) - needs to be checked -tb- 
-      * @code
-      * if([[userInfo objectForKey:@"doinit"]intValue]){
-	  *	[self initBoard];					
-	  *  }
-      * @endcode
-      */
+	 * @code
+	 * if([[userInfo objectForKey:@"doinit"]intValue]){
+	 *	[self initBoard];					
+	 *  }
+	 * @endcode
+	 */
     //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //if([[userInfo objectForKey:@"doinit"]intValue]){
 	//	[self initBoard];					
@@ -3933,7 +3937,7 @@ return hitRateId;
     if([self versionRegHWVersionHex] >= 0x30)
         [self writePostTriggerTime:postTriggerTime];
 	[self writeTriggerControl]; //TODO: I set it here again - could be corrupted by writing the postTrigger
-                                //TODO: Denis should fix this -tb-
+	//TODO: Denis should fix this -tb-
     /*!@todo TODO: at Run Start the postTriggTime gets resetted somewhere to the default, should be checked somewhen -tb-
      * <br>... could be software (SLT?) or hardware; Denis already tried to find it in hardware, I tried to find it in software ...
      * <br> ... quite sure that it is in SLT ... -tb-2008-03-14
@@ -3941,13 +3945,13 @@ return hitRateId;
     //debug output -tb- NSLog(@"1\n");[self readPostTriggerTime];//TODO: debugging - remove it -tb-
 	
     //the filter gap setting will be written to FLT by [self writeTriggerControl], test it ... -tb-
-    #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
     // set the filter gap
     if(filterGapFeatureIsAvailable){
         [self readFilterGap];
     }
-    #endif
-
+#endif
+	
     
 	if(ratesEnabled){
 		[self performSelector:@selector(readHitRates) 
@@ -3963,58 +3967,59 @@ return hitRateId;
 	fireWireCard			  = [[self crate] adapter];
 	locationWord			  = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
   	usingPBusSimulation		  = [fireWireCard pBusSim];
-
+	
     // Class member to store the last handled page, ak 15.6.07
 	nextEventPage = 0; // Start with page 0
 	lastEventId = 8888; // Unknown
-
+	
 	generateTrigger = 0;
 	nMissingEvents = 0;
 	nSkippedEvents = 0;
 	overflowDetected = false;
 	overflowDetectedCounter = 0;
 	nBuffer = 0;
-
+	
 	// Information for measurement mode
     lastSec = 0; 
 	activeChMap = 0;
 	for (i=0;i<22;i++){
-	  if([self hitRateEnabled:i] && [self triggerEnabled:i]) 
-	    activeChMap = activeChMap | (0x1 << i);
-	 
-	  // Set initial thresholds
-	  actualThreshold[i] = [self threshold:i]; 
-	  savedThreshold[i]  = [self threshold:i]; 
-	  lastThreshold[i]   = [self threshold:i]; 
-	  stepThreshold[i]   = 2;
-	  
-	  maxHitrate[i]  = 0;
-	  lastHitrate[i] = 0;
-	  nNoChanges[i]  = 0;
+		if([self hitRateEnabled:i] && [self triggerEnabled:i]) 
+			activeChMap = activeChMap | (0x1 << i);
+		
+		// Set initial thresholds
+		actualThreshold[i] = [self threshold:i]; 
+		savedThreshold[i]  = [self threshold:i]; 
+		lastThreshold[i]   = [self threshold:i]; 
+		stepThreshold[i]   = 2;
+		
+		maxHitrate[i]  = 0;
+		lastHitrate[i] = 0;
+		nNoChanges[i]  = 0;
 	}
 	
 	if(fltRunMode == kKatrinFlt_Measure_Mode){	
-	   // TODO: Set hitrate length always to one
+		// TODO: Set hitrate length always to one
 	}
-
+	
     if(usingPBusSimulation){
-      activeChMap = 0x25; // Three testing channels
+		activeChMap = 0x25; // Three testing channels
 	} 
-	 
+	
  	//[self writeControlStatus:kKatrinFlt_Intack];
-
+	
     // TODO: Check if reset counters are availabe
 	//set to false for now so we can use ORCARoot MAH 7/20/07
 	useResetTimestamp = true;
 	//----------------
-
-    NS_DURING
+	
+    @try {
 		resetSec = [self read:([self slot] << 24) | (kFLTTimeCounterCode << kKatrinFlt_AddressSpace) | 0x01 ] ;		
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		useResetTimestamp = NO;
 		NSLog(@"Warning: Old design - reset timestamps not available");
-	NS_ENDHANDLER	
-        
+	}	
+	
     //THE HARDWARE HISTOGRAMMING PART
     // write the options for hardware histogramming and activate histogramming -tb- 2008-03-05
     if(daqRunMode == kKatrinFlt_DaqHistogram_Mode){	
@@ -4030,7 +4035,7 @@ return hitRateId;
         }
         //this is for new FPGA versions >= 3.x (between Nov 2007 and April 2008), first test versions -tb-
         if([self versionRegHWVersion]>=0x3){
-            #if 0  //MOVED TO SLT -tb-
+#if 0  //MOVED TO SLT -tb-
             //stop histogramming (maybe histogramming is still running by some reason)
             if([self histogrammingIsActiveForChan:0]){// I test the first pixel (0), could test any -tb-
                 NSLog(@"Histogramming is still running: cold restart!\n");
@@ -4038,12 +4043,12 @@ return hitRateId;
                 //version <3.x ... [self writeHistogramControlRegisterOfPixel:aPixel value:([self readHistogramControlRegisterOfPixel:aPixel]&0xfffffffe)];
                 usleep(1000000);
             }
-            #endif
+#endif
             
             //BEGIN INIT (this should have be done before, but of some reasons trigger control is necessary here  -tb-)
             {
                 //write configuration:
-                #if 0
+#if 0
                 //set gains, thresholds, shaping
                 [self loadThresholdsAndGains];
                 //set to energy mode (fltRunMode = 1)
@@ -4052,16 +4057,16 @@ return hitRateId;
                 //SLT: release SW inhibit
                 sltmodel = [[self crate] adapter];
                 [sltmodel releaseSwInhibit];
-                #endif
+#endif
                 { // write trigger settings, give warning message -tb-
                     //enable trigger - see - (void) writeTriggerControl
-//>>>> TODO: check this -tb-
+					//>>>> TODO: check this -tb-
                     [self writeTriggerControl];
                 }
             }
             //END   INIT  
             
-            #if 0  //MOVED TO SLT -tb-
+#if 0  //MOVED TO SLT -tb-
             // write TRun, EMin, BinWidth
             histoStartWaitingForPageToggle = FALSE;
             //histogramming registers (now I use a broadcast)
@@ -4072,8 +4077,8 @@ return hitRateId;
             //    moved to SLT ... -tb-
             //  write HistSettingsReg
             [self writeHistogramSettingsForChan:31 mode: histoStopIfNotCleared  binWidth: histoBinWidth ];
-            #endif
-
+#endif
+			
             //  start procedure: (needs carefull timing)
             struct timeval t;
             //wait after second strobe to give FPGA time to clear the histogram, so it has at least 1 sec until next page toggle
@@ -4081,7 +4086,7 @@ return hitRateId;
             gettimeofday(&t,NULL);
             histoLastSecStrobeSec = t.tv_sec;  
             histoLastSecStrobeUSec = t.tv_usec;  
-            #if 0 //MOVED TO SLT -tb-
+#if 0 //MOVED TO SLT -tb-
             int lastSecStrobe = [self readTime];
             DebugHistoTB(  NSLog(@"lastSecStrobe is %i\n",lastSecStrobe);  )
             int sec = lastSecStrobe;
@@ -4110,40 +4115,40 @@ return hitRateId;
                 gettimeofday(&t,NULL);
             }while(sec==lastSecStrobe);
             DebugHistoTB(  NSLog(@"sec is %i\n",sec);  )
-            #endif
+#endif
             
-        //remember active page
-        histoLastActivePage = [self readCurrentHistogramPageNum];//now in SLT -tb-???
-        lastDiffTime = 0.0;
-        //set vars
-        [self setHistoCalibrationElapsedTime: 0.0];
-        [self setHistoCalibrationIsRunning:TRUE];
-        
-        
-        #if 0  //MOVED TO SLT -tb-
-        histoStartWaitingForPageToggle = FALSE;
-        histoLastPageToggleSec = histoLastSecStrobeSec;   //used for timing of page toggle.
-        histoLastPageToggleUSec= histoLastSecStrobeUSec;  //  ''
-        histoPreToggleSec      = histoLastSecStrobeSec; 
-        histoPreToggleUSec     = histoLastSecStrobeUSec; 
-        #endif
-        
-        //remember the start time (for display in GUI) TODO: work in progress -tb- 2008-02-18
-        // there are (Auger) methods readTime and readTimeSubSec (from self), do they work for Katrin? -tb-
-        //struct timeval t;//    struct timezone tz; is obsolete ... -tb-
-        gettimeofday(&t,NULL);
-        histoStartTimeSec = t.tv_sec;  
-        histoStartTimeUSec = t.tv_usec;  
-        lastDelayTime = 0;//I use this to call takeDataHistogramMode only every 0.1 sec (see takeDataHistogramMode) -tb-
-        
-        // start delayed timing ... stuff from checkCalibrationHistogram is in takeDataHistogramMode
-        //[self performSelector:@selector(checkCalibrationHistogram) withObject:nil afterDelay:0.1 /*sec*/];
-        //return;
-        
-        // send notification to GUI
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationValuesChanged object:self];
-        
-        
+			//remember active page
+			histoLastActivePage = [self readCurrentHistogramPageNum];//now in SLT -tb-???
+			lastDiffTime = 0.0;
+			//set vars
+			[self setHistoCalibrationElapsedTime: 0.0];
+			[self setHistoCalibrationIsRunning:TRUE];
+			
+			
+#if 0  //MOVED TO SLT -tb-
+			histoStartWaitingForPageToggle = FALSE;
+			histoLastPageToggleSec = histoLastSecStrobeSec;   //used for timing of page toggle.
+			histoLastPageToggleUSec= histoLastSecStrobeUSec;  //  ''
+			histoPreToggleSec      = histoLastSecStrobeSec; 
+			histoPreToggleUSec     = histoLastSecStrobeUSec; 
+#endif
+			
+			//remember the start time (for display in GUI) TODO: work in progress -tb- 2008-02-18
+			// there are (Auger) methods readTime and readTimeSubSec (from self), do they work for Katrin? -tb-
+			//struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+			gettimeofday(&t,NULL);
+			histoStartTimeSec = t.tv_sec;  
+			histoStartTimeUSec = t.tv_usec;  
+			lastDelayTime = 0;//I use this to call takeDataHistogramMode only every 0.1 sec (see takeDataHistogramMode) -tb-
+			
+			// start delayed timing ... stuff from checkCalibrationHistogram is in takeDataHistogramMode
+			//[self performSelector:@selector(checkCalibrationHistogram) withObject:nil afterDelay:0.1 /*sec*/];
+			//return;
+			
+			// send notification to GUI
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationValuesChanged object:self];
+			
+			
 #if 0
             //write configuration:
             //set gains, thresholds, shaping
@@ -4191,85 +4196,86 @@ return hitRateId;
 //****************************g**********************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
-    NS_DURING	
+    @try {	
 	   	
-	if(!firstTime){
-		if (generateTrigger > 0){
-			/*			   
-			// Set inhibit before generating the trigger
-			// wait and release
-			// Test of inhibit feature for Monitor Detector, ak 16.7.07
-			addr =  (21 << 24) | (0x1 << 18) | 0x0f13;
+		if(!firstTime){
+			if (generateTrigger > 0){
+				/*			   
+				 // Set inhibit before generating the trigger
+				 // wait and release
+				 // Test of inhibit feature for Monitor Detector, ak 16.7.07
+				 addr =  (21 << 24) | (0x1 << 18) | 0x0f13;
+				 [self write:addr value:0];
+				 
+				 usleep(100); // Inhibit for 100us ?!
+				 addr =  (21 << 24) | (0x1 << 18) | 0x0f14;
+				 [self write:addr value:0];
+				 */			
+				
+				int i;
+				unsigned long addr =  (21 << 24) | (0x1 << 18) | 0x0105; // Set pages free
+				for (i=0;i<63;i++) [self write:addr value:i];
+				
+				addr =  (21 << 24) | (0x1 << 18) | 0x0f12; // Slt Generate Software Trigger
+				[self write:addr value:0];
+				
+				generateTrigger = 0;
+			}
+			
+			switch(daqRunMode){ //was fltMode  -tb- 2008-02-12
+				case kKatrinFlt_DaqHitrate_Mode: // new -tb-
+					[self takeDataHitrateMode: aDataPacket];
+					break;
+				case kKatrinFlt_DaqThresholdScan_Mode: // was kKatrinFlt_Measure_Mode -tb-
+					[self takeDataMeasureMode: aDataPacket];
+					break;
+					
+				case kKatrinFlt_DaqEnergy_Mode: // was kKatrinFlt_Run_Mode or kKatrinFlt_Debug_Mode
+				case kKatrinFlt_DaqEnergyTrace_Mode:	
+					[self takeDataRunOrDebugMode: aDataPacket]; 
+					break;
+				case kKatrinFlt_DaqHistogram_Mode:  //new mode 2008-02-26 -tb-
+					[self takeDataHistogramMode: aDataPacket];
+					break;
+				case kKatrinFlt_DaqVeto_Mode:  //new mode 2008-02-26 -tb-
+					[self takeDataVetoMode: aDataPacket];
+					break;
+			}
+		}
+		else {
+			
+			firstTime = NO;
+			
+			// Read first second counter
+			// The first hitrate will be taken from the first completely measured interval
+			lastSec = [self readTime] + 1;  
+			
+			
+			// Start dead time counting	
+			unsigned long addr =  (21 << 24) | (0x1 << 18) | 0x0f11; // ResetDeadTimeCounters
+			[self write:addr value:0];			
+			
+			// Release inhibit when DAq has started!
+			addr =  (21 << 24) | (0x1 << 18) | 0x0f14; // SwRelInhibit
 			[self write:addr value:0];
-			
-			usleep(100); // Inhibit for 100us ?!
-			addr =  (21 << 24) | (0x1 << 18) | 0x0f14;
-			[self write:addr value:0];
-			*/			
-			
-			int i;
-			unsigned long addr =  (21 << 24) | (0x1 << 18) | 0x0105; // Set pages free
-			for (i=0;i<63;i++) [self write:addr value:i];
-			
-			addr =  (21 << 24) | (0x1 << 18) | 0x0f12; // Slt Generate Software Trigger
-			[self write:addr value:0];
-			
-			generateTrigger = 0;
 		}
 		
-		switch(daqRunMode){ //was fltMode  -tb- 2008-02-12
-			case kKatrinFlt_DaqHitrate_Mode: // new -tb-
-				[self takeDataHitrateMode: aDataPacket];
-			break;
-			case kKatrinFlt_DaqThresholdScan_Mode: // was kKatrinFlt_Measure_Mode -tb-
-				[self takeDataMeasureMode: aDataPacket];
-			break;
-			
-			case kKatrinFlt_DaqEnergy_Mode: // was kKatrinFlt_Run_Mode or kKatrinFlt_Debug_Mode
-			case kKatrinFlt_DaqEnergyTrace_Mode:	
-				[self takeDataRunOrDebugMode: aDataPacket]; 
-			break;
-			case kKatrinFlt_DaqHistogram_Mode:  //new mode 2008-02-26 -tb-
-				[self takeDataHistogramMode: aDataPacket];
-			break;
-			case kKatrinFlt_DaqVeto_Mode:  //new mode 2008-02-26 -tb-
-				[self takeDataVetoMode: aDataPacket];
-			break;
-		}
 	}
-	else {
-	
-		firstTime = NO;
+	@catch(NSException* localException) {
 		
-		// Read first second counter
-		// The first hitrate will be taken from the first completely measured interval
-		lastSec = [self readTime] + 1;  
-
-		
-		// Start dead time counting	
-		unsigned long addr =  (21 << 24) | (0x1 << 18) | 0x0f11; // ResetDeadTimeCounters
-		[self write:addr value:0];			
-		
-		// Release inhibit when DAq has started!
-		addr =  (21 << 24) | (0x1 << 18) | 0x0f14; // SwRelInhibit
-		[self write:addr value:0];
-	}
-	
-	NS_HANDLER
-	
         //TODO: CRASH: in case of exceptions and in trace mode we should stop the run (?) -tb- 2008-02-27
 		NSLogError(@"",@"Katrin FLT Card Error",[NSString stringWithFormat:@"Card%d",[self stationNumber]],@"Data Readout",nil);
 		[self incExceptionCount];
 		[localException raise];
 		
-	NS_ENDHANDLER
+	}
 }
 
 
 
 /** Called in Energy+Trace and in Energy mode (former/hardware names: Debug and Run mode).
-  * For event based data taking
-  */
+ * For event based data taking
+ */
 - (void) takeDataRunOrDebugMode:(ORDataPacket*) aDataPacket
 {
 	nLoops++;
@@ -4282,16 +4288,16 @@ return hitRateId;
     // check the hardware: TODO: in pBusSimulation mode ??? --> Andreas -tb- 2008-03-12
     if(usingPBusSimulation){ //do nothing
     }else
-    if([self versionRegHWVersion]>= 0x3){//dataAquisitionStopped flag available since v0x3 -tb-
-        if((fltRunMode ==  kKatrinFlt_Debug_Mode) && (!dataAquisitionStopped)){
-            //NSLog(@"Skipped readout, HW still busy (flag dataAquisitionStopped = %i) (status 0x%x)\n",dataAquisitionStopped,statusWord);
-            //usleep(10000);//for debugging: to not overfill the log window -tb-
-            return;	//post trigger readout is still busy
-        }
-    }
+		if([self versionRegHWVersion]>= 0x3){//dataAquisitionStopped flag available since v0x3 -tb-
+			if((fltRunMode ==  kKatrinFlt_Debug_Mode) && (!dataAquisitionStopped)){
+				//NSLog(@"Skipped readout, HW still busy (flag dataAquisitionStopped = %i) (status 0x%x)\n",dataAquisitionStopped,statusWord);
+				//usleep(10000);//for debugging: to not overfill the log window -tb-
+				return;	//post trigger readout is still busy
+			}
+		}
     //NSLog(@"takeDataRunOrDebugMode:READOUT (flag dataAquisitionStopped = %i) (status 0x%x)\n",dataAquisitionStopped,statusWord);
     
-
+	
 	// Determine the pages to be read
 	// The eventlop (this class) stores the next page to be read in the
 	// variable nextEventPage. The page number actually written is read from 
@@ -4299,7 +4305,7 @@ return hitRateId;
 	// ak 15.6.07
 	int page0 = nextEventPage; // Next page to be read
 	int page1 = (statusWord >> 11) & 0x1ff;	// Get write page pointer
-
+	
 	if(usingPBusSimulation){
 		// In simulation mode generate a trigger from time to time...
 		// ak 11.7.07
@@ -4342,8 +4348,8 @@ return hitRateId;
         
         // Maximal block size is 128 x 4 = 512 (by Firewire) ak 2008-08-01
         if (nPages > 128) {
-          page1 = (512 + page1 - (nPages - 128)) %512;
-          nPages = 128;
+			page1 = (512 + page1 - (nPages - 128)) %512;
+			nPages = 128;
         }
         
         // check the nPages ... -tb-
@@ -4355,7 +4361,7 @@ return hitRateId;
 		unsigned long pageAddress = triggerMemAddress + (page0<<2);				
 		data = dataBuffer;
         [fireWireCard read:pageAddress data:data size:nPages*4*sizeof(long)];
-	
+		
 	    // Determine the readout address for all ADC traces
 		// The first trigger stops the recording of the ADC traces
 		// 		
@@ -4373,13 +4379,13 @@ return hitRateId;
 		
 		
 		if( (fltRunMode == kKatrinFlt_Debug_Mode) && checkWaveFormEnabled){
-		  if (nPages > 1) 
-		    NSLog(@"nEvents=%8d (%12d,%8d) nPages=%3d\n", nEvents+1, data[2], data[1], nPages);//TODO: REMOVE IT -tb-
+			if (nPages > 1) 
+				NSLog(@"nEvents=%8d (%12d,%8d) nPages=%3d\n", nEvents+1, data[2], data[1], nPages);//TODO: REMOVE IT -tb-
 		}
 		
         int nPagesHandled = 0; 
 		while(page0 != page1){    // TODO: avoid multiple trigger readout - should be improved -tb- 2008-03-12
-		//if(page0 != page1){
+			//if(page0 != page1){
 			katrinDebugDataStruct theDebugEvent;
 			
 			nEvents++;
@@ -4408,7 +4414,7 @@ return hitRateId;
 				int diffId = (1024 + eventId - lastEventId) % 1024; 
 				if (diffId > 1){
 					nMissingEvents = nMissingEvents + diffId - 1; // -1 is a small correction for the current ID: the ID is other than expected, 
-                                                                  // but from here we will read out again correctly -tb-
+					// but from here we will read out again correctly -tb-
 					if (!overflowDetected){
 						//NSLogError(@"",@"Katrin FLT Card Error",[NSString stringWithFormat:@"Card%d",[self stationNumber]],@"OverFlow",nil);
 						//NSLog(@"Event %d  -  EventId check failed: %d - %d = %d\n", nEvents, eventId, lastEventId, diffId);
@@ -4427,7 +4433,7 @@ return hitRateId;
                 overflowDetected = true;
                 overflowDetectedCounter++;
             }
-						
+			
 			if(usingPBusSimulation){	
 				// Test: Read a few channel?!		
 				channelMap = 0x25;
@@ -4447,13 +4453,13 @@ return hitRateId;
 						
 						if(fltRunMode == kKatrinFlt_Run_Mode){
 							//the event energy address is computed from the subSec part of the trigger data
-						    #if 1
+#if 1
                             //DEBUG INFO: this is the original code -tb- 2008-03-18:
                         	readAddress = memoryAddress | (aChan << kKatrinFlt_ChannelAddress) | (theEvent.subSec & 0xffff);
-                            #else
+#else
                             //DEBUG INFO: DISABLE THIS - debugging (reads energy from energy register)!!! ((keep it for debugging)) -tb-
 							readAddress = statusAddress | (kFLTTriggerEnergyCode << kKatrinFlt_AddressSpace) | (aChan << kKatrinFlt_ChannelAddress);
-                            #endif
+#endif
 						} 
 						else if (fltRunMode == kKatrinFlt_Debug_Mode){		
 							// Read the energy from TriggerEnergy register
@@ -4477,7 +4483,7 @@ return hitRateId;
 								// Recording time
 								// t_ev - t_reset > readoutPages * 1024 * 100ns										
 								long recTime = (theEvent.sec - theDebugEvent.resetSec) * 10000000 +
-									(theEvent.subSec - theDebugEvent.resetSubSec);		// 100ns bins
+								(theEvent.subSec - theDebugEvent.resetSubSec);		// 100ns bins
 								if (recTime < 1024 * 	readoutPages) {
 									//NSLog(@"Event %d: The reording time is short than readout windows\n", nEvents);
 									//NSLog(@"Recording time %d x 100ns <  %d x 100us\n", recTime, readoutPages);
@@ -4498,47 +4504,47 @@ return hitRateId;
 #else				
 						theEvent.energy	= ([fireWireCard read:readAddress] & 0xffff);
 #endif
-
+						
 #if 1
-             #if 0 // old check -tb-
-             if(checkEnergyEnabled){//check the "trigger enabled"
-                 static BOOL triggEnabled=TRUE;
-                 unsigned short triggEnabledChan0 = ([self readTriggerControl:0 /* fpga 0 */] >> 8) &0x1;
-                 unsigned short triggEnabledChan1 = ([self readTriggerControl:1 /* fpga 1 */] >> 8) &0x1;
-                   if( (((nLoops/100)*100) % 2000) == 0)
-                   {// show the flags every 1000 events
-                       //NSLog(@"nLoops is %i, mod %i\n",   nLoops,nLoops % 1000);
-                       NSLog(@"nLoops is %i: trigg-flags: flag0 %i flag1 %i \n",   nLoops,triggEnabledChan0,triggEnabledChan1 );
-                   }
-                 if(triggEnabled && !triggEnabledChan0){
-                     triggEnabled=FALSE;
-                     NSLog(@"TriggerEnableBit (ch0) was set to FALSE; sec %i subsec %i\n",
-                                 theEvent.sec, theEvent.subSec);
-                 }
-             }
-             #endif
-             if(checkEnergyEnabled)
-             {// TODO: debugging - REMOVE or make "Additional energy test ..." flag -tb- ... OK, done -tb-
-              // 1.read energy from energy register
-              // 2.read status register, extract write pointer
-              // 3.if write pointer did not change, the energy value from energy memory and from
-              //   energy register should be the same ...
-	         unsigned long statusWord3 = [fireWireCard read:statusAddress];		//is there any data?
-             int page3 = (statusWord3 >> 11) & 0x1ff;	// Get write page pointer
-             // DEBUG INFO: REMOVE or comment out this: for debugging (reads energy from energy register)!!!
-			 long readAddress3 = statusAddress | (kFLTTriggerEnergyCode << kKatrinFlt_AddressSpace) | (aChan << kKatrinFlt_ChannelAddress);
-             unsigned long energy3	= ([fireWireCard read:readAddress3] & 0xffff);
- //NSLog(@"TESTING: page3 (%i) nextEventPage (%i), Ereg (%i) Emem (%i), sec %i subsec %i\n",
-   //                             page3,nextEventPage,energy3,theEvent.energy, theEvent.sec, theEvent.subSec);
-             if(page3==nextEventPage){
-                 if(energy3!=theEvent.energy){
-                    NSLog(@"ENERGY register (%i) and ENERGY memory are different (%i), sec %i subsec %i\n",
-                                energy3,theEvent.energy, theEvent.sec, theEvent.subSec);
-                 }
-
-             }//else{there was another write access}
-
-             }//END OF DEBUGGING PART
+#if 0 // old check -tb-
+						if(checkEnergyEnabled){//check the "trigger enabled"
+							static BOOL triggEnabled=TRUE;
+							unsigned short triggEnabledChan0 = ([self readTriggerControl:0 /* fpga 0 */] >> 8) &0x1;
+							unsigned short triggEnabledChan1 = ([self readTriggerControl:1 /* fpga 1 */] >> 8) &0x1;
+							if( (((nLoops/100)*100) % 2000) == 0)
+							{// show the flags every 1000 events
+								//NSLog(@"nLoops is %i, mod %i\n",   nLoops,nLoops % 1000);
+								NSLog(@"nLoops is %i: trigg-flags: flag0 %i flag1 %i \n",   nLoops,triggEnabledChan0,triggEnabledChan1 );
+							}
+							if(triggEnabled && !triggEnabledChan0){
+								triggEnabled=FALSE;
+								NSLog(@"TriggerEnableBit (ch0) was set to FALSE; sec %i subsec %i\n",
+									  theEvent.sec, theEvent.subSec);
+							}
+						}
+#endif
+						if(checkEnergyEnabled)
+						{// TODO: debugging - REMOVE or make "Additional energy test ..." flag -tb- ... OK, done -tb-
+							// 1.read energy from energy register
+							// 2.read status register, extract write pointer
+							// 3.if write pointer did not change, the energy value from energy memory and from
+							//   energy register should be the same ...
+							unsigned long statusWord3 = [fireWireCard read:statusAddress];		//is there any data?
+							int page3 = (statusWord3 >> 11) & 0x1ff;	// Get write page pointer
+							// DEBUG INFO: REMOVE or comment out this: for debugging (reads energy from energy register)!!!
+							long readAddress3 = statusAddress | (kFLTTriggerEnergyCode << kKatrinFlt_AddressSpace) | (aChan << kKatrinFlt_ChannelAddress);
+							unsigned long energy3	= ([fireWireCard read:readAddress3] & 0xffff);
+							//NSLog(@"TESTING: page3 (%i) nextEventPage (%i), Ereg (%i) Emem (%i), sec %i subsec %i\n",
+							//                             page3,nextEventPage,energy3,theEvent.energy, theEvent.sec, theEvent.subSec);
+							if(page3==nextEventPage){
+								if(energy3!=theEvent.energy){
+									NSLog(@"ENERGY register (%i) and ENERGY memory are different (%i), sec %i subsec %i\n",
+										  energy3,theEvent.energy, theEvent.sec, theEvent.subSec);
+								}
+								
+							}//else{there was another write access}
+							
+						}//END OF DEBUGGING PART
 #endif
 						if((fltRunMode == kKatrinFlt_Run_Mode)){
 							unsigned long totalLength = 2 + (sizeof(katrinEventDataStruct)/sizeof(long));
@@ -4549,7 +4555,7 @@ return hitRateId;
 							[theEnergyData appendBytes:&locationWord length:4];						//which crate, which card info
 							[theEnergyData appendBytes:&theEvent length:sizeof(katrinEventDataStruct)];
 							[aDataPacket addData:theEnergyData];									//ship the energy record
-                            #if 0
+#if 0
                             //DEBUGGING PART >>>>>>>>>>>>>>>
                             if([self checkEnergyEnabled])
                             {//for debugging ... REMOVE IT in release version -tb- 2008-03-17
@@ -4563,7 +4569,7 @@ return hitRateId;
                                 }
                             }
                             //DEBUGGING PART <<<<<<<<<<<<<<<<<<
-                            #endif
+#endif
 						}
 						
 						// Readout of ADC-Traces available only in debug-mode
@@ -4581,18 +4587,18 @@ return hitRateId;
 							[theWaveFormData appendBytes:&theEvent length:sizeof(katrinEventDataStruct)];
 							[theWaveFormData appendBytes:&theDebugEvent length:sizeof(katrinDebugDataStruct)];									
 							
-														
+							
 							// Use block read mode.
 							// With every 32bit (long word) two 12bit ADC values are transmitted
 							// ak 19.6.07
 							[theWaveFormData setLength:totalLength*sizeof(long)]; //we're going to dump directly into the NSData object so
-																				  //we have to set the total size first. (Note: different than 'Capacity')
+							//we have to set the total size first. (Note: different than 'Capacity')
 							int j;
 							unsigned long addr =  (startBin & 0xffff);
 							short* waveFormPtr = ((short*)[theWaveFormData bytes]) + (4*sizeof(short))
-								+ (sizeof(katrinEventDataStruct)/sizeof(short))
-								+ (sizeof(katrinDebugDataStruct)/sizeof(short)); //point to start of waveform
-								
+							+ (sizeof(katrinEventDataStruct)/sizeof(short))
+							+ (sizeof(katrinDebugDataStruct)/sizeof(short)); //point to start of waveform
+							
 							unsigned long *lPtr = (unsigned long *) waveFormPtr;
  							for (j=0;j<readoutPages;j++){
 								
@@ -4611,7 +4617,7 @@ return hitRateId;
 							if(checkWaveFormEnabled){
 								[self checkWaveform:waveFormPtr];
 							}
-														
+							
 							// Check if the data is completely in the buffer
 							// In case of a second strobe the recording is not continuos at the 
 							// end of the buffer.
@@ -4630,7 +4636,7 @@ return hitRateId;
 				} // end of loop over all channel
 				
 			}
-		
+			
 		    nPagesHandled +=1;
 		} // end of while	
 		
@@ -4649,11 +4655,11 @@ return hitRateId;
 }
 
 /*!Read the  data and add it to the Orca data stream (i.e. to aDataPacket) in binary format.
-   \param aDataPacket is passed from Orca data taking main loop.
-   
-   The kind and size of the added data packet is encoded in the first 4 bytes (the header).
-   The data IDs (e.g. hitRateId, waveFormId, ...) are assigned in: - (void) setDataIds:(id)assigner
-*/  //-tb- 2008-02-6
+ \param aDataPacket is passed from Orca data taking main loop.
+ 
+ The kind and size of the added data packet is encoded in the first 4 bytes (the header).
+ The data IDs (e.g. hitRateId, waveFormId, ...) are assigned in: - (void) setDataIds:(id)assigner
+ */  //-tb- 2008-02-6
 - (void) takeDataHitrateMode:(ORDataPacket*)aDataPacket;
 {
     struct timeval t;
@@ -4661,10 +4667,10 @@ return hitRateId;
     unsigned long data;
 	unsigned long hitrate[22];
     unsigned long threshold;
-
+	
     threshold = 50;
-
-
+	
+	
 	// Wait for the second strobe
 	unsigned long sec = [self readTime];
 	if (sec > lastSec) {
@@ -4685,42 +4691,42 @@ return hitRateId;
 			        hitrate[i] = 8256+i;					
 				}   
 				//NSLog(@"%2d: %04x, age=%d, len=%d\n", i, hitrate[i], (data >> 24) & 0xf, data >> 28);
-       
-     
+				
+				
  				// Save threshold and hitrate data
-
-					// Save the data set
-					// The saved thresholds are always in ascending order
-					//  The intervals are not equally spaced but depend on the hitrate change
-					// 
-					katrinHitRateDataStruct theRates;
-                    gettimeofday(&t,&tz);
-					//theRates.sec = t.tv_sec;  
-                    theRates.sec = sec;  
-					theRates.hitrate = hitrate[i];	
-                    if(hitrate[i]<=0) continue;
-			
-	    			DebugTB( NSLog(@"takeDataHitrateMode: ch/sec/h = rate%2d: %12d %04x\n", i, theRates.sec, theRates.hitrate);  ) //TODO : remove it -tb-
-                    		
-					locationWord &= 0xffff0000;
-					locationWord |= (i&0xff)<<8; // New: There is a place for the channel in the header?!
-					
-					unsigned long totalLength = 2 + (sizeof(katrinHitRateDataStruct)/sizeof(long));
-					NSMutableData* thekatrinHitRateDataStruct = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
-					unsigned long header = hitRateId | totalLength;	//total event size + the two ORCA header words (in longs!).
-					
-					[thekatrinHitRateDataStruct appendBytes:&header length:4];		//ORCA header word
-					[thekatrinHitRateDataStruct appendBytes:&locationWord length:4];	//which crate, which card info
-					[thekatrinHitRateDataStruct appendBytes:&theRates length:sizeof(katrinHitRateDataStruct)];
-					
-					[aDataPacket addData:thekatrinHitRateDataStruct];	//ship the hitrate record
-                    
+				
+				// Save the data set
+				// The saved thresholds are always in ascending order
+				//  The intervals are not equally spaced but depend on the hitrate change
+				// 
+				katrinHitRateDataStruct theRates;
+				gettimeofday(&t,&tz);
+				//theRates.sec = t.tv_sec;  
+				theRates.sec = sec;  
+				theRates.hitrate = hitrate[i];	
+				if(hitrate[i]<=0) continue;
+				
+				DebugTB( NSLog(@"takeDataHitrateMode: ch/sec/h = rate%2d: %12d %04x\n", i, theRates.sec, theRates.hitrate);  ) //TODO : remove it -tb-
+				
+				locationWord &= 0xffff0000;
+				locationWord |= (i&0xff)<<8; // New: There is a place for the channel in the header?!
+				
+				unsigned long totalLength = 2 + (sizeof(katrinHitRateDataStruct)/sizeof(long));
+				NSMutableData* thekatrinHitRateDataStruct = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
+				unsigned long header = hitRateId | totalLength;	//total event size + the two ORCA header words (in longs!).
+				
+				[thekatrinHitRateDataStruct appendBytes:&header length:4];		//ORCA header word
+				[thekatrinHitRateDataStruct appendBytes:&locationWord length:4];	//which crate, which card info
+				[thekatrinHitRateDataStruct appendBytes:&theRates length:sizeof(katrinHitRateDataStruct)];
+				
+				[aDataPacket addData:thekatrinHitRateDataStruct];	//ship the hitrate record
+				
             }
         }
     }
-		
-
-
+	
+	
+	
 }
 
 
@@ -4802,10 +4808,10 @@ return hitRateId;
 					// Don't save this sample
 					saveData = false;					   
 				}
-
+				
 				// Save threshold and hitrate data
 				if (saveData) {
-
+					
 					// Save the data set
 					// The saved thresholds are always in ascending order
 					//  The intervals are not equally spaced but depend on the hitrate change
@@ -4854,18 +4860,18 @@ return hitRateId;
 }
 
 /** @todo FPGA-Bug
-  * In histogram mode: if TRun is set to a non zero value the run stops after that time (as it is supposed to do)
-  * but the firstBin, lastBin and histogram data are reset to zero immediatly.
-  * (This bug report is in ORKatrinFLTModel.m  -tb- 2008-02-29 )
-  */ //-tb- 2008-02-29
+ * In histogram mode: if TRun is set to a non zero value the run stops after that time (as it is supposed to do)
+ * but the firstBin, lastBin and histogram data are reset to zero immediatly.
+ * (This bug report is in ORKatrinFLTModel.m  -tb- 2008-02-29 )
+ */ //-tb- 2008-02-29
 
 
 /*!Read the FLT hardware histogram data and add it to the Orca data stream (i.e. to aDataPacket) in binary format.
-   \param aDataPacket is passed from Orca data taking main loop.
-   
-   The kind and size of the added data packet is encoded in the first 4 bytes (the header).
-   The data IDs (e.g. hitRateId, waveFormId, ...) are assigned in: - (void) setDataIds:(id)assigner
-*/  //-tb- 2008-02-26
+ \param aDataPacket is passed from Orca data taking main loop.
+ 
+ The kind and size of the added data packet is encoded in the first 4 bytes (the header).
+ The data IDs (e.g. hitRateId, waveFormId, ...) are assigned in: - (void) setDataIds:(id)assigner
+ */  //-tb- 2008-02-26
 - (void) takeDataHistogramMode:(ORDataPacket*)aDataPacket;
 {
     //BEGIN -  - of (pbus) simulatin mode -tb- 2008-04-06
@@ -4908,9 +4914,9 @@ return hitRateId;
         return;
     }
     //END   - of (pbus) simulatin mode -tb- 2008-04-06
-
-
-
+	
+	
+	
     //this is for FPGA version >= 3 (since April 2008), with new feature "paging" etc. -tb-
     if([self versionRegHWVersion]>=0x3){
         //vars
@@ -4925,10 +4931,10 @@ return hitRateId;
         currentSec = t.tv_sec;  
         currentUSec = t.tv_usec;  
         double diffTime = (double)(currentSec  - histoLastPageToggleSec) +
-                         ((double)(currentUSec - histoLastPageToggleUSec)) * 0.000001;
+		((double)(currentUSec - histoLastPageToggleUSec)) * 0.000001;
         //I want run this method only every 0.1 sec (=delayTime) or less -tb-
         currentDelayTime =10*               (currentSec  - histoStartTimeSec) +
-                          (int)(    ((double)(currentUSec - histoStartTimeUSec)) * 0.00001  );// in fact we compute (...)/delayTime!
+		(int)(    ((double)(currentUSec - histoStartTimeUSec)) * 0.00001  );// in fact we compute (...)/delayTime!
         if(currentDelayTime <= lastDelayTime){//I could also check histoStartWaitingForPageToggle -tb-
             return ;//wait longer time
         }else{
@@ -4939,12 +4945,12 @@ return hitRateId;
                 [NSException raise:@"No FireWire Service" format:@"takeDataHistogramMode: Check Crate Power and FireWire Cable."]; 
             }
         }
-                         
+		
         DebugHistoTB(
-            histoCurrentActivePage = [self readCurrentHistogramPageNum]; 
-            NSLog(@"Time since last paging; %f     (page %i,TRec %i, status %i)\n",
-                diffTime,histoCurrentActivePage,[self histoRecordingTime],[self readHistogramControlRegisterOfPixel:aPixel]);
-        )
+					 histoCurrentActivePage = [self readCurrentHistogramPageNum]; 
+					 NSLog(@"Time since last paging; %f     (page %i,TRec %i, status %i)\n",
+						   diffTime,histoCurrentActivePage,[self histoRecordingTime],[self readHistogramControlRegisterOfPixel:aPixel]);
+					 )
         
         //TEST, IF HISTOGRAMMING IS STILL RUNNING: (check before histoLastActivePage = histoCurrentActivePage;)
         //if TRun was set, maybe the run already stopped ... or we are in "stop if not cleared" mode ...
@@ -4955,8 +4961,8 @@ return hitRateId;
             int flag= [self readHistogramControlRegisterOfPixel:aPixel] &0x1;
             if(flag==0){
                 DebugHistoTB(
-                    NSLog(@"HISTOGRAMMING was terminated by unknown reason.\n");
-                )
+							 NSLog(@"HISTOGRAMMING was terminated by unknown reason.\n");
+							 )
                 //[self stopCalibrationHistogram];
                 // histogramming was terminated by some reason (probably "stop after no clear") -tb-
                 // -> wait for page toggle (max. TRun sec), read out, then do nothing (maybe warning)
@@ -4987,8 +4993,8 @@ return hitRateId;
         }
         //TODO: test the time
         //if  ((double)[self histoRunTime]) - diffTime < 0 ) then: something wrong with toggle bit
-            // if(TRec == 0) restart anyway
-            // ...
+		// if(TRec == 0) restart anyway
+		// ...
         //waiting for toggle to readout the histogram
         gettimeofday(&t,NULL);
         if(histoStartWaitingForPageToggle){
@@ -4997,14 +5003,14 @@ return hitRateId;
                 // yes, there was the toggle, read out the page/histogram
                 //READOUT DATA AND SHIP TO ORCA DATA STREAM
                 [self readOutHistogramDataV3:aDataPacket userInfo:nil];
-            
+				
                 DebugHistoTB(  NSLog(@"READ HISTOGRAM\n");  )
                 aPixel = [self histoCalibrationChan]; //the selected chan of the GUI
                 //[self readHistogramDataForChan:aPixel];  already done in readOutHistogramDataV3
-       //[self readHistogramDataForChan:0];//should  already done in readOutHistogramDataV3
-       //[self readHistogramDataForChan:1];//should  already done in readOutHistogramDataV3
-       //[self readHistogramDataForChan:12];//should  already done in readOutHistogramDataV3
-       //[self readHistogramDataForChan:13];//should  already done in readOutHistogramDataV3
+				//[self readHistogramDataForChan:0];//should  already done in readOutHistogramDataV3
+				//[self readHistogramDataForChan:1];//should  already done in readOutHistogramDataV3
+				//[self readHistogramDataForChan:12];//should  already done in readOutHistogramDataV3
+				//[self readHistogramDataForChan:13];//should  already done in readOutHistogramDataV3
                 //now display it, care not to clear the display in the next lines ...
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationPlotterChanged object:self];
                 //first bin/last bin needs display now, they will be cleared afterwards
@@ -5024,7 +5030,7 @@ return hitRateId;
                 histoLastActivePage = histoCurrentActivePage;
                 histoLastPageToggleSec = histoPreToggleSec;   //used for timing of page toggle.
                 histoLastPageToggleUSec= histoPreToggleUSec;  //  ''
-                                                       //maybe the time from last call would be better
+				//maybe the time from last call would be better
             } // else continue ... waiting for toggle ...
         }
         //remember for next call
@@ -5056,17 +5062,17 @@ return hitRateId;
         // update page textfield TODO: make more elegant? -tb- (write setter/getter etc...)
         [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoPageNumChanged object:self];
         
-        #if 0
+#if 0
         if(histoCalibrationIsRunning){
             //restart timing ...
             [self performSelector:@selector(checkCalibrationHistogram) withObject:nil afterDelay:delayTime /*0.1 sec*/];
         }
-        #endif
+#endif
         return;
     }
-
-
-
+	
+	
+	
     //BEGIN - this is obsolete but left for downward compatibility for older FPGA configurations -tb- 2008-04-06
     //this is for old versions < 3 (between Nov 2007 and April 2008), first test versions -tb-
     if([self versionRegHWVersion]<0x3){
@@ -5105,15 +5111,15 @@ return hitRateId;
     }
     //END   - this is obsolete but left for downward compatibility for older FPGA configurations -tb- 2008-04-06
     
-
-// next: loop over all available channels (check for "trigger enabled")
+	
+	// next: loop over all available channels (check for "trigger enabled")
 #if 0    
     struct timeval t;
     struct timezone tz;
     unsigned long data;
 	unsigned long hitrate[22];
     unsigned long threshold;
-
+	
     threshold = 50;
 #endif
 #if 0    
@@ -5151,7 +5157,7 @@ return hitRateId;
 		//NSLog(@"Time %d\n", sec);
         
         
-        #if 0
+#if 0
  		// 
 		int i;
 		for (i=0;i<22;i++){
@@ -5164,53 +5170,53 @@ return hitRateId;
 			        hitrate[i] = 8256+i;					
 				}   
 				//NSLog(@"%2d: %04x, age=%d, len=%d\n", i, hitrate[i], (data >> 24) & 0xf, data >> 28);
-       
-     
+				
+				
  				// Save threshold and hitrate data
-
-					// Save the data set
-					// The saved thresholds are always in ascending order
-					//  The intervals are not equally spaced but depend on the hitrate change
-					// 
-					katrinHitRateDataStruct theRates;
-                    gettimeofday(&t,&tz);
-					//theRates.sec = t.tv_sec;  
-                    theRates.sec = sec;  
-					theRates.hitrate = hitrate[i];	
-                    if(hitrate[i]<=0) continue;
-			
-	    			NSLog(@"takeDataHitrateMode: ch/sec/h = rate%2d: %12d %04x\n", i, theRates.sec, theRates.hitrate);//TODO: remove it -tb-
-                    		
-					locationWord &= 0xffff0000;
-					locationWord |= (i&0xff)<<8; // New: There is a place for the channel in the header?!
-					
-					unsigned long totalLength = 2 + (sizeof(katrinHitRateDataStruct)/sizeof(long));
-					NSMutableData* thekatrinHitRateDataStruct = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
-					unsigned long header = hitRateId | totalLength;	//total event size + the two ORCA header words (in longs!).
-					
-					[thekatrinHitRateDataStruct appendBytes:&header length:4];		//ORCA header word
-					[thekatrinHitRateDataStruct appendBytes:&locationWord length:4];	//which crate, which card info
-					[thekatrinHitRateDataStruct appendBytes:&theRates length:sizeof(katrinHitRateDataStruct)];
-					
-					[aDataPacket addData:thekatrinHitRateDataStruct];	//ship the hitrate record
-                    
+				
+				// Save the data set
+				// The saved thresholds are always in ascending order
+				//  The intervals are not equally spaced but depend on the hitrate change
+				// 
+				katrinHitRateDataStruct theRates;
+				gettimeofday(&t,&tz);
+				//theRates.sec = t.tv_sec;  
+				theRates.sec = sec;  
+				theRates.hitrate = hitrate[i];	
+				if(hitrate[i]<=0) continue;
+				
+				NSLog(@"takeDataHitrateMode: ch/sec/h = rate%2d: %12d %04x\n", i, theRates.sec, theRates.hitrate);//TODO: remove it -tb-
+				
+				locationWord &= 0xffff0000;
+				locationWord |= (i&0xff)<<8; // New: There is a place for the channel in the header?!
+				
+				unsigned long totalLength = 2 + (sizeof(katrinHitRateDataStruct)/sizeof(long));
+				NSMutableData* thekatrinHitRateDataStruct = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
+				unsigned long header = hitRateId | totalLength;	//total event size + the two ORCA header words (in longs!).
+				
+				[thekatrinHitRateDataStruct appendBytes:&header length:4];		//ORCA header word
+				[thekatrinHitRateDataStruct appendBytes:&locationWord length:4];	//which crate, which card info
+				[thekatrinHitRateDataStruct appendBytes:&theRates length:sizeof(katrinHitRateDataStruct)];
+				
+				[aDataPacket addData:thekatrinHitRateDataStruct];	//ship the hitrate record
+				
             }
         }
-        #endif
-    }
-		
 #endif
-
+    }
+	
+#endif
+	
 }
 
 
 /** Stop histogramming, read histogram from hardware and write it into Orca data stream.
-  *
-  * For old FPGA version(s) < 0x3
-  */ //-tb- 2008-03-05
+ *
+ * For old FPGA version(s) < 0x3
+ */ //-tb- 2008-03-05
 - (void) pauseHistogrammingAndReadOutData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
+	
     //THE FOLLOWING PART WAS FOR FPGAversion <3
     NSLog(@"pauseHistogrammingAndReadOutData\n");
     katrinHistogramDataStruct theEventData;
@@ -5225,7 +5231,7 @@ return hitRateId;
         sec = [self readTime];
         //NSLog(@"pauseHistogrammingAndReadOutData usleep 100   stopsec %i sec %i\n",stopsec,sec);
     }
-       //usleep(1000001);
+	//usleep(1000001);
     //TODO : was still under construction, now obsolete ...  - for testing: read the first channel -tb-
     // now read out the histogram and write it to the Orca data stream
     theEventData.readoutSec = stopsec;
@@ -5243,15 +5249,15 @@ return hitRateId;
     int aPixel =0;
 	locationWord &= 0xffff0000;
 	locationWord |= (aPixel & 0xff)<<8; // New: There is a place for the channel in the header?!
-
+	
     unsigned long totalLength = 2 + (sizeof(katrinHistogramDataStruct)/sizeof(long)) + theEventData.histogramLength;// 2 = header + locationWord
 	NSMutableData* theData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
 	unsigned long header = histogramId | totalLength;	//total event size + the two ORCA header words (in longs!).
-
+	
 	[theData appendBytes:&header length:4];		//ORCA header word
 	[theData appendBytes:&locationWord length:4];	//which crate, which card info
 	[theData appendBytes:&theEventData length:sizeof(katrinHistogramDataStruct)];
-
+	
     //this is mainly  from readHistogramDataOfPixel
     //unsigned int i,firstBin, lastBin, currVal, sum;
     if(theEventData.histogramLength>0){
@@ -5272,19 +5278,19 @@ return hitRateId;
             //[[histogramData objectAtIndex:i] setIntValue:currVal];
             //histogramDataUI[i]= currVal;
             [theData appendBytes:&currVal length:4];		//ORCA header word
-
+			
         }
         NSLog(@"sum: %4u \n",sum); 	
     }
 	[aDataPacket addData:theData];	//ship the histogram record
-
+	
 }
 
 /** Read histogram from hardware and write it into Orca data stream. Then lets Orca go on.
-  * Requires that we can read (does NOT care about the correct page toggle bit)!!!
-  *
-  * For NEW FPGA version(s) >= 0x3 ([self versionRegHWVersion]>=0x3)
-  */ //-tb- 2008-03-05
+ * Requires that we can read (does NOT care about the correct page toggle bit)!!!
+ *
+ * For NEW FPGA version(s) >= 0x3 ([self versionRegHWVersion]>=0x3)
+ */ //-tb- 2008-03-05
 - (void) readOutHistogramDataV3:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     DebugHistoTB(  NSLog(@"READ HISTOGRAMS\n");  )
@@ -5317,8 +5323,8 @@ return hitRateId;
         theEventData.maxHistogramLength = 512; // needed here? is already in the header! yes, the decoder needs it for calibration of the plot -tb-
         theEventData.binSize    = histoBinWidth;        
         theEventData.offsetEMin = histoMinEnergy;
-
-     
+		
+		
         // the standard header
         locationWord &= 0xffff0000;
         locationWord |= (chan & 0xff)<<8; // New: There is a place for the channel in the header?!
@@ -5356,7 +5362,7 @@ return hitRateId;
             }
         }
         
-        #if 0
+#if 0
         //unsigned int i,firstBin, lastBin, currVal, sum;
         if(theEventData.histogramLength>0){
             int sum=0;
@@ -5375,7 +5381,7 @@ return hitRateId;
             NSLog(@"sum: %4u \n",sum); 	
         }
         //readHistogramDataOfPixel
-        #endif
+#endif
         
         //if (usingPBusSimulation){
         //	 do something;				  //TODO: usingPBusSimulation for histogramming -tb-	
@@ -5386,24 +5392,24 @@ return hitRateId;
 
 
 /*!Read the data when in FLT veto mode and add it to the Orca data stream (i.e. to aDataPacket) in binary format.
-   \param aDataPacket is passed from Orca data taking main loop.
-   
-   The kind and size of the added data packet is encoded in the first 4 bytes (the header).
-   The data IDs (e.g. hitRateId, waveFormId, ...) are assigned in: - (void) setDataIds:(id)assigner
-*/  //-tb- 2008-02-26
+ \param aDataPacket is passed from Orca data taking main loop.
+ 
+ The kind and size of the added data packet is encoded in the first 4 bytes (the header).
+ The data IDs (e.g. hitRateId, waveFormId, ...) are assigned in: - (void) setDataIds:(id)assigner
+ */  //-tb- 2008-02-26
 - (void) takeDataVetoMode:(ORDataPacket*)aDataPacket;
 {
-NSLog(@"This is   takeDataVetoMode\n");
+	NSLog(@"This is   takeDataVetoMode\n");
 #if 0
     struct timeval t;
     struct timezone tz;
     unsigned long data;
 	unsigned long hitrate[22];
     unsigned long threshold;
-
+	
     threshold = 50;
-
-
+	
+	
 	// Wait for the second strobe
 	unsigned long sec = [self readTime];   //TODO: QUESTION is this the crate time? format? -tb- 2008-02-26
 	if (sec > lastSec) {
@@ -5424,41 +5430,41 @@ NSLog(@"This is   takeDataVetoMode\n");
 			        hitrate[i] = 8256+i;					
 				}   
 				//NSLog(@"%2d: %04x, age=%d, len=%d\n", i, hitrate[i], (data >> 24) & 0xf, data >> 28);
-       
-     
+				
+				
  				// Save threshold and hitrate data
-
-					// Save the data set
-					// The saved thresholds are always in ascending order
-					//  The intervals are not equally spaced but depend on the hitrate change
-					// 
-					katrinHitRateDataStruct theRates;
-                    gettimeofday(&t,&tz);
-					//theRates.sec = t.tv_sec;  
-                    theRates.sec = sec;  
-					theRates.hitrate = hitrate[i];	
-                    if(hitrate[i]<=0) continue;
-			
-	    			NSLog(@"takeDataHitrateMode: ch/sec/h = rate%2d: %12d %04x\n", i, theRates.sec, theRates.hitrate);//TODO: remove it -tb-
-                    		
-					locationWord &= 0xffff0000;
-					locationWord |= (i&0xff)<<8; // New: There is a place for the channel in the header?!
-					
-					unsigned long totalLength = 2 + (sizeof(katrinHitRateDataStruct)/sizeof(long));
-					NSMutableData* thekatrinHitRateDataStruct = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
-					unsigned long header = hitRateId | totalLength;	//total event size + the two ORCA header words (in longs!).
-					
-					[thekatrinHitRateDataStruct appendBytes:&header length:4];		//ORCA header word
-					[thekatrinHitRateDataStruct appendBytes:&locationWord length:4];	//which crate, which card info
-					[thekatrinHitRateDataStruct appendBytes:&theRates length:sizeof(katrinHitRateDataStruct)];
-					
-					[aDataPacket addData:thekatrinHitRateDataStruct];	//ship the hitrate record
-                    
+				
+				// Save the data set
+				// The saved thresholds are always in ascending order
+				//  The intervals are not equally spaced but depend on the hitrate change
+				// 
+				katrinHitRateDataStruct theRates;
+				gettimeofday(&t,&tz);
+				//theRates.sec = t.tv_sec;  
+				theRates.sec = sec;  
+				theRates.hitrate = hitrate[i];	
+				if(hitrate[i]<=0) continue;
+				
+				NSLog(@"takeDataHitrateMode: ch/sec/h = rate%2d: %12d %04x\n", i, theRates.sec, theRates.hitrate);//TODO: remove it -tb-
+				
+				locationWord &= 0xffff0000;
+				locationWord |= (i&0xff)<<8; // New: There is a place for the channel in the header?!
+				
+				unsigned long totalLength = 2 + (sizeof(katrinHitRateDataStruct)/sizeof(long));
+				NSMutableData* thekatrinHitRateDataStruct = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
+				unsigned long header = hitRateId | totalLength;	//total event size + the two ORCA header words (in longs!).
+				
+				[thekatrinHitRateDataStruct appendBytes:&header length:4];		//ORCA header word
+				[thekatrinHitRateDataStruct appendBytes:&locationWord length:4];	//which crate, which card info
+				[thekatrinHitRateDataStruct appendBytes:&theRates length:sizeof(katrinHitRateDataStruct)];
+				
+				[aDataPacket addData:thekatrinHitRateDataStruct];	//ship the hitrate record
+				
             }
         }
     }
-		
-
+	
+	
 #endif
 }
 
@@ -5482,12 +5488,12 @@ NSLog(@"This is   takeDataVetoMode\n");
             return;
         }
         //END -  - of (pbus) simulatin mode -tb- 2008-04-06
-
+		
         histoStartWaitingForPageToggle = FALSE;
         //this is for FPGA version >= 3 (since April 2008), with new feature "paging" etc. -tb-
         if([self versionRegHWVersion]>=0x3){
-        int chan=0; //TODO: LOOP OVER ALL CHANNELS -tb-
-            #if 0 //MOVED TO SLT -tb-
+			int chan=0; //TODO: LOOP OVER ALL CHANNELS -tb-
+#if 0 //MOVED TO SLT -tb-
             //to update the GUI
             [self setHistoRecordingTime:[self readTRec]];
             //first/last bin is updated after page toggle, see below ...
@@ -5505,7 +5511,7 @@ NSLog(@"This is   takeDataVetoMode\n");
             }
             DebugHistoTB(  NSLog(@"Waited until i=%i (x 100 usecs) for page toggle\n",i);  )
             //usleep(1000011);
-            #endif
+#endif
             
             //Update GUI:
             //[self checkCalibrationHistogram]; // NO! TRec is 0 after stop, see above -tb-
@@ -5517,7 +5523,7 @@ NSLog(@"This is   takeDataVetoMode\n");
             [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoCalibrationValuesChanged object:self];
             // update page textfield TODO: make more elegant? -tb- (write setter/getter etc...)
             [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHistoPageNumChanged object:self];
-         
+			
             //READOUT DATA AND SHIP TO ORCA DATA STREAM
             [self readOutHistogramDataV3:aDataPacket userInfo:userInfo];
             
@@ -5539,17 +5545,17 @@ NSLog(@"This is   takeDataVetoMode\n");
             [self pauseHistogrammingAndReadOutData:aDataPacket userInfo:userInfo];
         }
     }
-
+	
     // Restore the saved threshold
 	int i;
 	
 	if(fltRunMode == kKatrinFlt_Measure_Mode){	//TODO: better check for daqRunMode in thresholdScanMode -tb-
-       //this is from threshold scan ... ? -tb-
-	  for (i=0;i<22;i++){
-		[self setThreshold:i withValue:savedThreshold[i]];
-      }
+		//this is from threshold scan ... ? -tb-
+		for (i=0;i<22;i++){
+			[self setThreshold:i withValue:savedThreshold[i]];
+		}
     }
-
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	int chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
@@ -5584,7 +5590,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 }
 
 /** Here all attributes are defined which are accessible via the hardware wizard.
-  */ //-tb-
+ */ //-tb-
 - (NSArray*) wizardParameters
 {
     NSMutableArray* a = [NSMutableArray array];
@@ -5621,7 +5627,7 @@ NSLog(@"This is   takeDataVetoMode\n");
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setHitRateEnabled:withValue:) getMethod:@selector(hitRateEnabled:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Check Waveform"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
@@ -5641,13 +5647,13 @@ NSLog(@"This is   takeDataVetoMode\n");
     [p setFormat:@"##0" upperLimit:64 lowerLimit:1 stepSize:1 units:@"raw"];
     [p setSetMethod:@selector(setReadoutPages:) getMethod:@selector(readoutPages)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease]; //-tb-
     [p setName:@"PostTriggerTime"];
     [p setFormat:@"##0" upperLimit:65535 lowerLimit:0 stepSize:1 units:@"raw"];
     [p setSetMethod:@selector(setPostTriggerTime:) getMethod:@selector(postTriggerTime)];
     [a addObject:p];
-
+	
     //histogramming parameters -tb-
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Histo: EnergyOffset (E_Min)"];
@@ -5667,7 +5673,7 @@ NSLog(@"This is   takeDataVetoMode\n");
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@"raw"];
     [p setSetMethod:@selector(setHistoRunTime:) getMethod:@selector(histoRunTime)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Histo: Set Standard"];
@@ -5725,7 +5731,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 - (void) setTestsRunning:(BOOL)aTestsRunning
 {
     testsRunning = aTestsRunning;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTestsRunningChanged object:self];
 }
 
@@ -5741,7 +5747,7 @@ NSLog(@"This is   takeDataVetoMode\n");
     [aTestEnabledArray retain];
     [testEnabledArray release];
     testEnabledArray = aTestEnabledArray;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTestEnabledArrayChanged object:self];
 }
 
@@ -5755,7 +5761,7 @@ NSLog(@"This is   takeDataVetoMode\n");
     [aTestStatusArray retain];
     [testStatusArray release];
     testStatusArray = aTestStatusArray;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelTestStatusArrayChanged object:self];
 }
 
@@ -5774,10 +5780,10 @@ NSLog(@"This is   takeDataVetoMode\n");
 - (void) runTests
 {
 	if(!testsRunning){
-		NS_DURING
+		@try {
 			[self setTestsRunning:YES];
 			NSLog(@"Starting tests for FLT station %d\n",[self stationNumber]);
-
+			
 			//clear the status text array
 			int i;
 			for(i=0;i<kNumKatrinFLTTests;i++){
@@ -5794,10 +5800,11 @@ NSLog(@"This is   takeDataVetoMode\n");
 			if([self testEnabled:4]) [testSuit addTest:[ORTest testSelector:@selector(thresholdGainTest) tag:4]];
 			if([self testEnabled:5]) [testSuit addTest:[ORTest testSelector:@selector(speedTest) tag:5]];
 			if([self testEnabled:6]) [testSuit addTest:[ORTest testSelector:@selector(eventTest) tag:6]];
-
+			
 			[testSuit runForObject:self];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 	}
 	else {
 		NSLog(@"Tests for FLT (station: %d) stopped manually\n",[self stationNumber]);
@@ -5820,9 +5827,9 @@ NSLog(@"This is   takeDataVetoMode\n");
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
+	
 	savedMode = fltRunMode;
-	NS_DURING
+	@try {
 		BOOL passed = YES;
 		int i;
 		for(i=0;i<4;i++){
@@ -5843,9 +5850,10 @@ NSLog(@"This is   takeDataVetoMode\n");
 		if(passed){
 			[self test:testNumber result:@"Passed" color:[NSColor passedColor]];
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-	NS_ENDHANDLER
+	}
 	
 	[testSuit runForObject:self]; //do next test
 }
@@ -5858,12 +5866,12 @@ NSLog(@"This is   takeDataVetoMode\n");
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
+	
 	unsigned short pat1[kKatrinFlt_Page_Size],buf[kKatrinFlt_Page_Size];
 	int i,chan;
 	for(i=0;i<kKatrinFlt_Page_Size;i++)pat1[i]=i;
-
-	NS_DURING
+	
+	@try {
 		[self enterTestMode];
 		int aPage;
 		// broadcast the test pattern to all channels + pages
@@ -5875,7 +5883,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 		for (chan=startChan;chan<=endChan;chan++) {
 			for(aPage=0;aPage<32;aPage++) {
 				[self readMemoryChan:chan page:aPage pageBuffer:buf];
-								
+				
 				if ([self compareData:buf pattern:pat1 shift:0 n:kKatrinFlt_Page_Size] != kKatrinFlt_Page_Size) n_error++;
 			}
 		}
@@ -5888,14 +5896,15 @@ NSLog(@"This is   takeDataVetoMode\n");
 		}
 		
 		[self leaveTestMode];
-
-	
-	NS_HANDLER
-		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-	NS_ENDHANDLER		
-
-	[testSuit runForObject:self]; //do next test
 		
+		
+	}
+	@catch(NSException* localException) {
+		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
+	}		
+	
+	[testSuit runForObject:self]; //do next test
+	
 }
 
 - (void) patternWriteTest
@@ -5905,10 +5914,10 @@ NSLog(@"This is   takeDataVetoMode\n");
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
+	
 	unsigned short pat1[kKatrinFlt_Page_Size],buf[kKatrinFlt_Page_Size];
-
-	NS_DURING
+	
+	@try {
 		[self enterTestMode];
 		BOOL passed = YES;
 		unsigned long patterns[4] = {0x1010,0x0101,0x1111,0x0000};
@@ -5930,13 +5939,14 @@ NSLog(@"This is   takeDataVetoMode\n");
 		}
 		
 		[self leaveTestMode];
-
-	NS_HANDLER
-		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-	NS_ENDHANDLER		
-
-	[testSuit runForObject:self]; //do next test
 		
+	}
+	@catch(NSException* localException) {
+		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
+	}		
+	
+	[testSuit runForObject:self]; //do next test
+	
 }
 
 - (void) broadcastTest
@@ -5946,10 +5956,10 @@ NSLog(@"This is   takeDataVetoMode\n");
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
+	
 	unsigned short pat1[kKatrinFlt_Page_Size],buf[kKatrinFlt_Page_Size];
-
-	NS_DURING
+	
+	@try {
 		[self enterTestMode];
 		unsigned long pattern = 0x1010;
 		int i,chan;
@@ -5970,13 +5980,14 @@ NSLog(@"This is   takeDataVetoMode\n");
 		}
 		
 		[self leaveTestMode];
-
-	NS_HANDLER
-		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-	NS_ENDHANDLER		
-
-	[testSuit runForObject:self]; //do next test
 		
+	}
+	@catch(NSException* localException) {
+		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
+	}		
+	
+	[testSuit runForObject:self]; //do next test
+	
 }
 
 - (void) thresholdGainTest
@@ -5986,8 +5997,8 @@ NSLog(@"This is   takeDataVetoMode\n");
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
-	NS_DURING
+	
+	@try {
 		[self enterTestMode];
 		unsigned long aPattern[4] = {0x3fff,0x0,0x2aaa,0x1555};
 		int chan;
@@ -6011,7 +6022,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 		}
 		if(passed){		
 			unsigned long gainPattern[4] = {0xff,0x0,0xaa,0x55};
-
+			
 			//now gains
 			for(testIndex = 0;testIndex<4;testIndex++){
 				unsigned short thePattern = gainPattern[testIndex];
@@ -6036,13 +6047,14 @@ NSLog(@"This is   takeDataVetoMode\n");
 		[self loadThresholdsAndGains];
 		
 		[self leaveTestMode];
-
-	NS_HANDLER
-		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-	NS_ENDHANDLER		
-
-	[testSuit runForObject:self]; //do next test
 		
+	}
+	@catch(NSException* localException) {
+		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
+	}		
+	
+	[testSuit runForObject:self]; //do next test
+	
 }
 
 
@@ -6053,12 +6065,12 @@ NSLog(@"This is   takeDataVetoMode\n");
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
+	
 	unsigned short buf[kKatrinFlt_Page_Size];
 	ORTimer* timer = [[ORTimer alloc] init];
 	[timer reset];
 	
-	NS_DURING
+	@try {
 		[self enterTestMode];		
 		[timer start];
 		[self readMemoryChan:startChan page:page pageBuffer:buf];
@@ -6074,16 +6086,17 @@ NSLog(@"This is   takeDataVetoMode\n");
 		
 		
 		[self runningTest:testNumber status:@"See StatusLog"];
-
+		
 		[self leaveTestMode];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-
-	NS_ENDHANDLER		
+		
+	}		
 	[timer release];
 	
 	[testSuit runForObject:self]; //do next test
-		
+	
 }
 
 - (void) eventTest
@@ -6094,7 +6107,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 		return;
 	}
 	
-	NS_DURING
+	@try {
 		//cache some addresses.
 		unsigned long theSlotPart = [self slot]<<24;
 		statusAddress		= theSlotPart;
@@ -6115,7 +6128,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 		
 		//[[[self crate] adapter] hw_configure];		
 		[[[self crate] adapter] hw_config];
-
+		
 		
 		//[[[self crate] adapter] runIsAboutToStart:nil];
 		
@@ -6128,11 +6141,11 @@ NSLog(@"This is   takeDataVetoMode\n");
 		int page1 = (statusWord >> 11) & 0x1ff;	//write page
 		
 		if(page0 != page1){
-
+			
 			NSLog(@"---Event Data---\n");
-		
+			
 			unsigned long pageAddress = triggerMemAddress + (page0<<2);	
-					
+			
 			//read the event from the trigger memory and format into an event structure
 			katrinEventDataStruct theEvent;
 			unsigned long data	= [self read:pageAddress | 0x0];
@@ -6140,7 +6153,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 			theEvent.eventID	= data & 0x3fff;
 			theEvent.subSec		= [self read:pageAddress | 0x1];
 			theEvent.sec		= [self read:pageAddress | 0x2];
-
+			
 			//the event energy address is computed from the subSec part of the trigger data
 			unsigned long energyAddress = memoryAddress | (theEvent.subSec % 65536);
 			if (energyAddress % 2 == 0 ) {  // even address
@@ -6149,14 +6162,14 @@ NSLog(@"This is   takeDataVetoMode\n");
 			else {
 				theEvent.energy	= ([self read:energyAddress-1]>>16) & 0x7fff;	//15bits??
 			}			
-
+			
 			NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)theEvent.sec];
-
+			
 			NSLog(@"ChannelMap: 0x%0x\n",channelMap);
 			NSLog(@"EventID   : 0x%0x\n",theEvent.eventID);
 			NSLog(@"Time      : %@.%d\n",[theDate descriptionWithCalendarFormat:@"%m:%d:%y %H:%M:%S"],theEvent.subSec);
 			NSLog(@"Energy    : %d\n",theEvent.energy);
-
+			
 		}
 		else NSLog(@"No Data\n");
 		
@@ -6164,42 +6177,43 @@ NSLog(@"This is   takeDataVetoMode\n");
 		
 		
 		[self runningTest:testNumber status:@"See StatusLog"];
-
+		
 		[self setFltRunMode:savedMode];
 		[self writeMode:savedMode];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-
-	NS_ENDHANDLER		
+		
+	}		
 	
 	[testSuit runForObject:self]; //do next test
-		
+	
 }
 
 
 
 
 - (int) compareData:(unsigned short*) data
-                     pattern:(unsigned short*) pattern
-					 shift:(int) shift
-					 n:(int) n 
+			pattern:(unsigned short*) pattern
+			  shift:(int) shift
+				  n:(int) n 
 {
-   int i, j;
-
-   // Check for errors
-   for (i=0;i<n;i++) {
-     if (data[i]!=pattern[(i+shift)%n]) {
-         for (j=(i/4);(j<i/4+3) && (j < n/4);j++){
-			NSLog(@"%04x: %04x %04x %04x %04x - %04x %04x %04x %04x \n",j*4,
-              data[j*4],data[j*4+1],data[j*4+2],data[j*4+3],
-              pattern[(j*4+shift)%n],  pattern[(j*4+1+shift)%n],
-              pattern[(j*4+2+shift)%n],pattern[(j*4+3+shift)%n]  );
-			return i; // check only for one error in every page!
+	int i, j;
+	
+	// Check for errors
+	for (i=0;i<n;i++) {
+		if (data[i]!=pattern[(i+shift)%n]) {
+			for (j=(i/4);(j<i/4+3) && (j < n/4);j++){
+				NSLog(@"%04x: %04x %04x %04x %04x - %04x %04x %04x %04x \n",j*4,
+					  data[j*4],data[j*4+1],data[j*4+2],data[j*4+3],
+					  pattern[(j*4+shift)%n],  pattern[(j*4+1+shift)%n],
+					  pattern[(j*4+2+shift)%n],pattern[(j*4+3+shift)%n]  );
+				return i; // check only for one error in every page!
+			}
 		}
-     }
-   }
-
-   return n;
+	}
+	
+	return n;
 }
 
 @end
@@ -6246,8 +6260,8 @@ NSLog(@"This is   takeDataVetoMode\n");
 {
 	NSLogColor(aColor,@"%@ test %@\n",fltTestName[testIndex],result);
 	id theString = [[NSAttributedString alloc] initWithString:result 
-														attributes:[NSDictionary dictionaryWithObject: aColor forKey:NSForegroundColorAttributeName]];
-
+												   attributes:[NSDictionary dictionaryWithObject: aColor forKey:NSForegroundColorAttributeName]];
+	
 	[self runningTest:testIndex status:theString];
 	return [theString autorelease];
 }
@@ -6265,7 +6279,7 @@ NSLog(@"This is   takeDataVetoMode\n");
 
 - (void) leaveTestMode
 {
-		[self writeMode:savedMode];
+	[self writeMode:savedMode];
 }
 @end
 

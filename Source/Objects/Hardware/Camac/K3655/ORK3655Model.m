@@ -262,7 +262,7 @@ NSString* ORK3655Chan							= @"ORK3655Chan";
 - (void) initBoard
 {
 
-	NS_DURING
+	@try {
 		
 		int i;
 		for(i=0;i<8;i++){
@@ -299,16 +299,17 @@ NSString* ORK3655Chan							= @"ORK3655Chan";
 		//executes start of counting cycle (clears and enables counter)
 		[[self adapter] camacShortNAF:[self stationNumber] a:0 f:25];
 
-	NS_HANDLER
+	}
+@catch(NSException* localException) {
 		NSLogError(@"Init Error",@"K3655",[NSString stringWithFormat:@"Station %d",[self stationNumber]],nil);
         [localException raise];
-	NS_ENDHANDLER
+}
 
 }
 
 - (void) readSetPoints
 {
-	NS_DURING
+	@try {
 		int i;
 		unsigned short value;
 		NSLog(@"Set Points for K3655 station %d:\n",[self stationNumber]);
@@ -316,9 +317,10 @@ NSString* ORK3655Chan							= @"ORK3655Chan";
 			[[self adapter] camacShortNAF:[self stationNumber] a:i f:0 data:&value];
 			NSLog(@"%d: %d\n",[self stationNumber],value);
 		}
-	NS_HANDLER
+	}
+@catch(NSException* localException) {
 		NSLog(@"Error during read\n");
-	NS_ENDHANDLER
+	}
 }
 
 - (void) testLAM;

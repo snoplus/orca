@@ -177,8 +177,8 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
     onlineMask = anOnlineMask;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORL2551OnlineMaskChangedNotification
-							  object:self];
+	 postNotificationName:ORL2551OnlineMaskChangedNotification
+	 object:self];
     
 }
 
@@ -208,8 +208,8 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
 	rateAttributes=[newRateAttributes retain];
 	
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORL2551RateChangedNotification
-					  object:self];    
+	 postNotificationName:ORL2551RateChangedNotification
+	 object:self];    
 }
 
 - (void) setScalerCount:(unsigned short)chan value:(unsigned long)aValue
@@ -218,9 +218,9 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
     if(aValue != scalerCount[chan]){
         scalerCount[chan] = aValue;
         [[NSNotificationCenter defaultCenter]
-            postNotificationName:ORL2551ScalerCountChangedNotification
-                          object:self
-                        userInfo: [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"]];    
+		 postNotificationName:ORL2551ScalerCountChangedNotification
+		 object:self
+		 userInfo: [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"]];    
     }
 }
 
@@ -236,9 +236,9 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
     if(aValue != scalerRate[chan]){
         scalerRate[chan] = aValue;
         [[NSNotificationCenter defaultCenter]
-            postNotificationName:ORL2551RateChangedNotification
-                          object:self
-                        userInfo: [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"]];    
+		 postNotificationName:ORL2551RateChangedNotification
+		 object:self
+		 userInfo: [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"]];    
     }
 }
 
@@ -272,8 +272,8 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
     clearOnStart = flag;
 	
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORL2551ClearOnStartChangedNotification
-					  object:self];    
+	 postNotificationName:ORL2551ClearOnStartChangedNotification
+	 object:self];    
 }
 
 - (BOOL) doNotShipScalers
@@ -286,8 +286,8 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
     [[[self undoManager] prepareWithInvocationTarget:self] setDoNotShipScalers:doNotShipScalers];
     doNotShipScalers = flag;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORL2551ShipScalersChangedNotification
-					  object:self];    
+	 postNotificationName:ORL2551ShipScalersChangedNotification
+	 object:self];    
 }
 
 - (BOOL) pollWhenRunning
@@ -303,8 +303,8 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
     if(pollWhenRunning)[poller stop];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORL2551PollWhenRunningChangedNotification
-					  object:self];    
+	 postNotificationName:ORL2551PollWhenRunningChangedNotification
+	 object:self];    
 }
 
 #pragma mark ¥¥¥DataTaker
@@ -323,11 +323,11 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORL2551DecoderForScalers",         @"decoder",
-        [NSNumber numberWithLong:dataId],    @"dataId",
-        [NSNumber numberWithBool:NO],        @"variable",
-        [NSNumber numberWithLong:2],         @"length",
-        nil];
+								 @"ORL2551DecoderForScalers",         @"decoder",
+								 [NSNumber numberWithLong:dataId],    @"dataId",
+								 [NSNumber numberWithBool:NO],        @"variable",
+								 [NSNumber numberWithLong:2],         @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Scalers"];
     return dataDictionary;
 }
@@ -354,7 +354,7 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
 
 - (void) readAllScalers
 {
-    NS_DURING
+    @try {
         if(onlineMask){
             int i;
             for(i=0;i<12;i++){
@@ -369,8 +369,9 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
             }
             [self calcRates];
         }
-        NS_HANDLER
-            NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) calcRates
@@ -450,8 +451,8 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
 - (void) clearAll
 {
 	[self readReset];
-//    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:9 data:nil];
-//    [self readAllScalers];
+	//    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:9 data:nil];
+	//    [self readAllScalers];
 }
 
 - (void) disableLAM

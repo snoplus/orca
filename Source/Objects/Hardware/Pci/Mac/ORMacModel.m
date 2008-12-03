@@ -39,10 +39,10 @@ static NSString *ORMacUSBConnection		 = @"ORMacUSBConnection";
 
 
 void registryChanged(
-	id	sender,
-	io_service_t			service,
-	natural_t				messageType,
-	void *					messageArgument )
+					 id	sender,
+					 io_service_t			service,
+					 natural_t				messageType,
+					 void *					messageArgument )
 {
 	// only update when root goes not busy
 	//if(messageArgument == 0)[(NSNotificationCenter*)[ NSNotificationCenter defaultCenter ] postNotificationName:@"test" object:sender ];
@@ -68,25 +68,26 @@ void registryChanged(
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		id anObj = [[[self connectors] objectForKey:ORMacFireWireConnection] connectedObject];
 		[anObj setCrateNumber:0];
-
+		
 		[[NSNotificationCenter defaultCenter] addObserver : self
-						 selector : @selector(objectsAdded:)
-							 name : ORGroupObjectsAdded
-						   object : nil];
-
+												 selector : @selector(objectsAdded:)
+													 name : ORGroupObjectsAdded
+												   object : nil];
+		
 		[[NSNotificationCenter defaultCenter] addObserver : self
-						 selector : @selector(objectsRemoved:)
-							 name : ORGroupObjectsRemoved
-						   object : nil];
-
+												 selector : @selector(objectsRemoved:)
+													 name : ORGroupObjectsRemoved
+												   object : nil];
+		
 		usb = [[ORUSB alloc] init];
 		[usb awakeAfterDocumentLoaded];
-	NS_HANDLER
-	NS_ENDHANDLER
-
+	}
+	@catch(NSException* localException) {
+	}
+	
 }
 
 - (int) crateNumber
@@ -118,7 +119,7 @@ void registryChanged(
     [aConnector setConnectorType:'FWrO'];
 	[ aConnector addRestrictedConnectionType: 'FWrI' ]; //can only connect to FireWire Inputs
     [aConnector release];
-
+	
     aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize - 2, kConnectorSize+1) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORMacUSBConnection];
     [aConnector setOffColor:[NSColor yellowColor]];
@@ -153,7 +154,7 @@ void registryChanged(
     [[[self undoManager] prepareWithInvocationTarget:self] setEolType:eolType];
     
     eolType = aEolType;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMacModelEolTypeChanged object:self];
 }
 
@@ -170,7 +171,7 @@ void registryChanged(
     [somePorts retain];
     [serialPorts release];
     serialPorts = somePorts;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMacModelSerialPortsChanged object:self];
 }
 

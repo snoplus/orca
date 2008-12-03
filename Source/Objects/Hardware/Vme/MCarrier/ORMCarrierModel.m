@@ -63,11 +63,12 @@
     NSEnumerator* e = [[self orcaObjects] objectEnumerator];
     ORVmeMCard* aCard;
     while(aCard = [e nextObject]){
-        NS_DURING
+        @try {
             [aCard probe];
-        NS_HANDLER
+        }
+		@catch(NSException* localException) {
             NSLog(@"Exception: %@\n",localException);
-        NS_ENDHANDLER
+        }
     }
 }
 

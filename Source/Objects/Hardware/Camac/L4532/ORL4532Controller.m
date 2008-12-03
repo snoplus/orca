@@ -58,7 +58,7 @@
                      selector : @selector(includeTimingChanged:)
                          name : ORL4532ModelIncludeTimingChanged
 						object: model];
-
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(settingsLockChanged:)
 						 name : ORRunStatusChangedNotification
@@ -68,27 +68,27 @@
 					 selector : @selector(settingsLockChanged:)
 						 name : ORL4532SettingsLock
 						object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(numberTriggersChanged:)
                          name : ORL4532ModelNumberTriggersChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(delayEnableMaskChanged:)
                          name : ORL4532ModelDelayEnableMaskChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(triggerNamesChanged:)
                          name : ORL4532ModelTriggerNamesChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(delaysChanged:)
                          name : ORL4532ModelDelaysChanged
 						object: model];
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -191,13 +191,13 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORL4532SettingsLock];
     BOOL locked = [gSecurity isLocked:ORL4532SettingsLock];
-
+	
     [settingLockButton setState: locked];
-
+	
     [includeTimingButton setEnabled:!lockedOrRunningMaintenance];
     [statusButton setEnabled:!lockedOrRunningMaintenance];
     [readInputsButton setEnabled:!lockedOrRunningMaintenance];
@@ -206,23 +206,23 @@
     [readInputsClearButton setEnabled:!lockedOrRunningMaintenance];
     [clearMemLAMButton setEnabled:!lockedOrRunningMaintenance];
     [numberTriggersTextField setEnabled:!lockedOrRunningMaintenance];
-
+	
 	[triggerNames0_15 setEnabled:!lockedOrRunningMaintenance];
 	[triggerNames16_31 setEnabled:!lockedOrRunningMaintenance];
 	[delayEnableMask0_15 setEnabled:!lockedOrRunningMaintenance];
 	[delayEnableMask16_31 setEnabled:!lockedOrRunningMaintenance];
 	[delays0_15 setEnabled:!lockedOrRunningMaintenance];
 	[delays16_31 setEnabled:!lockedOrRunningMaintenance];
-
+	
 	[[triggerNames0_15 cellWithTag:13] setEnabled:NO];
-
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORL4532SettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingLockDocField setStringValue:s];
 	if(!lockedOrRunningMaintenance)[self enableMatrices];
-
+	
 }
 
 
@@ -274,62 +274,67 @@
 
 - (IBAction) readInputsAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         unsigned long pattern = [model readInputPattern];
 		NSLog(@"L4532 (Station %d) Input Pattern = 0x%08x\n",[model stationNumber],pattern);		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Input Pattern"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readInputsAndClearAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         unsigned long pattern = [model readInputPatternClearMemoryAndLAM];
 		NSLog(@"L4532 (Station %d) Input Pattern = 0x%08x\n",[model stationNumber],pattern);		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Input Pattern and Clear"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testLAM:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         BOOL state = [model testLAM];
 		NSLog(@"L4532 (Station %d) LAM is %@\n",[model stationNumber],state?@"Set":@"NOT Set");		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testClearLAM:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         BOOL state = [model testAndClearLAM];
 		NSLog(@"L4532 (Station %d) LAM is %@\n",[model stationNumber],state?@"Set":@"NOT Set");		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM and Clear"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) clearMemoryAndLAM:(id)sender
 {
-    NS_DURING
+    @try {
 		[model checkCratePower];
 		[model clearMemoryAndLAM];
 		NSLog(@"L4532 (Station %d) Clear Memory and LAM\n",[model stationNumber]);		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Clear Memory and LAM"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readStatusRegisterAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         unsigned short status = [model readStatusRegister];
 		NSLog(@"L4532 (Station %d) Status Register = 0x%04x\n",[model stationNumber],status);
@@ -338,15 +343,16 @@
 		NSLog(@"MEM Enabled : %@\n",status&0x4?@"ON":@"OFF");
 		NSLog(@"CLUSTER     : %@\n",status&0x8?@"ON":@"OFF");
 		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Status Register"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) showHideAction:(id)sender
 {
     NSRect aFrame = [NSWindow contentRectForFrameRect:[[self window] frame] 
-                styleMask:[[self window] styleMask]];
+											styleMask:[[self window] styleMask]];
     if([showHideButton state] == NSOnState)aFrame.size.height = 680;
     else aFrame.size.height = 216;
     [self resizeWindowToSize:aFrame.size];

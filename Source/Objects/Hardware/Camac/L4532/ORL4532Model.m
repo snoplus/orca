@@ -107,8 +107,8 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
     delayEnableMask = anEnableMask;
 	
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORL4532ModelDelayEnableMaskChanged
-							  object:self];    
+	 postNotificationName:ORL4532ModelDelayEnableMaskChanged
+	 object:self];    
 }
 
 - (NSArray*) delays
@@ -133,9 +133,9 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigger:index withName:[triggerNames objectAtIndex:index]];
 	[triggerNames replaceObjectAtIndex:index withObject:aName];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORL4532ModelTriggerNamesChanged object:self];
-
+	
     [triggerGroup[index] setIdentifier:aName];
-
+	
 }
 
 - (void) setDelayEnabledMaskBit:(int)bit withValue:(BOOL)aValue
@@ -168,7 +168,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
     [[[self undoManager] prepareWithInvocationTarget:self] setNumberTriggers:numberTriggers];
     
     numberTriggers = aNumberTriggers;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORL4532ModelNumberTriggersChanged object:self];
 	//also post the following to force a redraw of any lists that are displaying our info
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGroupObjectsAdded object:self];
@@ -184,7 +184,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
     [[[self undoManager] prepareWithInvocationTarget:self] setIncludeTiming:includeTiming];
     
     includeTiming = aIncludeTiming;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORL4532ModelIncludeTimingChanged object:self];
 }
 
@@ -274,15 +274,15 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 			[delays addObject:[NSNumber numberWithInt:0]];
 		}
 	}
-
+	
 	if(!triggerNames){
 		[self setTriggerNames:[NSMutableArray array]];
 		for(i=0;i<32;i++){
 			[triggerNames addObject:[NSString stringWithFormat:@"Trigger %d",i]];
 		}
 	}
-
-
+	
+	
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -346,19 +346,19 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORL4532DecoderForTrigger",		@"decoder",
-        [NSNumber numberWithLong:triggerId],@"dataId",
-        [NSNumber numberWithBool:YES],		@"variable",
-        [NSNumber numberWithLong:-1],		@"length",
-        nil];
+								 @"ORL4532DecoderForTrigger",		@"decoder",
+								 [NSNumber numberWithLong:triggerId],@"dataId",
+								 [NSNumber numberWithBool:YES],		@"variable",
+								 [NSNumber numberWithLong:-1],		@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"mainTrigger"];
-
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORL4532DecoderForChannelTrigger",			@"decoder",
-        [NSNumber numberWithLong:channelTriggerId],	@"dataId",
-        [NSNumber numberWithBool:NO],				@"variable",
-        [NSNumber numberWithLong:3],				@"length",
-        nil];
+				   @"ORL4532DecoderForChannelTrigger",			@"decoder",
+				   [NSNumber numberWithLong:channelTriggerId],	@"dataId",
+				   [NSNumber numberWithBool:NO],				@"variable",
+				   [NSNumber numberWithLong:3],				@"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"channelTrigger"];
     return dataDictionary;
 }
@@ -436,8 +436,8 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		NSTimeInterval asTimeInterval;
 		unsigned long asLongs[2];
 	}theTimeRef;
-
-    NS_DURING
+	
+    @try {
         
 		if(!firstTime){
             //test if data ready to be read out
@@ -492,11 +492,12 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 			[self readInputPatternClearMemoryAndLAM];
 			firstTime = NO;
 		}
-		NS_HANDLER
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
-		
+	}
+	@catch(NSException* localException) {
+		[self incExceptionCount];
+		[localException raise];
+	}
+	
 }
 
 
@@ -515,4 +516,3 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 }
 
 @end
-     

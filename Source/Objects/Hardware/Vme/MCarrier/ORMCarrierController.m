@@ -69,17 +69,17 @@
                      selector : @selector(baseAddressChanged:)
                          name : ORVmeIOCardBaseAddressChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(updateWindow)
                          name : ORVmeCardSlotChangedNotification
                        object : nil];
-
+	
 }
 
 
@@ -145,11 +145,12 @@
 
 - (IBAction) probeAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model probe];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Exception on M321 Probe: %@\n",localException);
-    NS_ENDHANDLER
+    }
 }
 
 

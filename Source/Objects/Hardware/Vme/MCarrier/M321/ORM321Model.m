@@ -131,7 +131,7 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
 - (void) calcBaseAddress
 {
 	[self setBaseAddress: [[self guardian] baseAddress]+ [self slot] * 0x200];
-
+	
 }
 
 #pragma mark ¥¥¥Notifications
@@ -159,41 +159,43 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     m321Cmd theCmd;
     theCmd.cmd = kM361_Version;
     
-    NS_DURING
+    @try {
         [self sendCmd:&theCmd result:&theCmd numInArgs:0 numOutArgs:3];
         [self setFourPhase:theCmd.paramList[2]];
         
         
-    NS_HANDLER
-        NS_ENDHANDLER
-        
-        [hwLock unlock];
-        
-        NS_DURING    
-            id motorA = [connector connectedObject];
-            id motorB = [connector2 connectedObject];
-            [self readMotor:motorA];
-            
-            if(!fourPhase){
-                [self readMotor:motorB];
-                if(![self connector2]){
-                    [self makeConnector2];
-                    [[guardian guardian] assumeDisplayOf:[self connector2]];
-					[self setGuardian:guardian];
-                    
-                }
-            }
-            else {
-                [[self undoManager] disableUndoRegistration];
-                [motorB disconnectOtherMotors];
-                [[[self guardian] guardian] removeDisplayOf:[self connector2]];
-                [[self connector2] disconnect];
-                [self setConnector2:nil];
-                [[self undoManager] enableUndoRegistration];
-            }
-            NS_HANDLER
-                NS_ENDHANDLER
-                
+    }
+	@catch(NSException* localException) {
+	}
+	
+	[hwLock unlock];
+	
+	@try {    
+		id motorA = [connector connectedObject];
+		id motorB = [connector2 connectedObject];
+		[self readMotor:motorA];
+		
+		if(!fourPhase){
+			[self readMotor:motorB];
+			if(![self connector2]){
+				[self makeConnector2];
+				[[guardian guardian] assumeDisplayOf:[self connector2]];
+				[self setGuardian:guardian];
+				
+			}
+		}
+		else {
+			[[self undoManager] disableUndoRegistration];
+			[motorB disconnectOtherMotors];
+			[[[self guardian] guardian] removeDisplayOf:[self connector2]];
+			[[self connector2] disconnect];
+			[self setConnector2:nil];
+			[[self undoManager] enableUndoRegistration];
+		}
+	}
+	@catch(NSException* localException) {
+	}
+	
 }
 
 #pragma mark ¥¥¥Accessors
@@ -206,22 +208,22 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     fourPhase = flag;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORM321FourPhaseChangedNotification
-                      object:self];
+	 postNotificationName:ORM321FourPhaseChangedNotification
+	 object:self];
 }
 
 #pragma mark ¥¥¥Hardware Access
 - (void) status
 {
     
-    NS_DURING
+    @try {
         [hwLock lock];
         unsigned short aValue;
         [[guardian adapter] readWordBlock:&aValue
-                                     atAddress:[self baseAddress] + kM361_ControlRegister
-                                     numToRead:1
-                                    withAddMod:[guardian addressModifier]
-                                 usingAddSpace:kAccessRemoteIO];
+								atAddress:[self baseAddress] + kM361_ControlRegister
+								numToRead:1
+							   withAddMod:[guardian addressModifier]
+							usingAddSpace:kAccessRemoteIO];
         
         
         NSLog(@"M361 %@ Status: 0x%0x\n",[self identifier],aValue&0xf);
@@ -237,15 +239,16 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         if(irq & kM361_IrqHomeB)	 NSLog(@"IRQ: Home Dectected Motor B\n");
         if(irq & kM361_IrqException) NSLog(@"IRQ: Internal Exception Error\n");
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) probe
 {
-    NS_DURING
+    @try {
         [hwLock lock];
         NSLog(@"Probing M Carrier Board %@ at <0x%08x>\n",[self identifier],[self baseAddress]);
         m321Cmd theCmd;
@@ -258,15 +261,16 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         
         [self setFourPhase:theCmd.paramList[2]];
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) sync
 {
-    NS_DURING
+    @try {
         [hwLock lock];
         m321Cmd theCmd;
         theCmd.cmd = kM361_Sync;
@@ -274,17 +278,18 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         [self sendCmd:&theCmd result:&theCmd numInArgs:0 numOutArgs:1];
         NSLog(@"%@ (M361) Appears Alive\n",[self identifier]);
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
 - (void) loadBreakPoint:(int)amount absolute:(BOOL)useAbs motor:(id)aMotor
 {
     
-    NS_DURING
+    @try {
         [hwLock lock];
         m321Cmd theCmd;
         if([aMotor tag] == kMotorA){
@@ -298,16 +303,17 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         
         [self sendCmd:&theCmd result:&theCmd numInArgs:2 numOutArgs:0];
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 
 - (void) loadStepCount:(long)amount motor:(id)aMotor
 {
-    NS_DURING
+    @try {
         [hwLock lock];
         m321Cmd theCmd;
         theCmd.cmd =  ([aMotor tag] ? kM361_SetPosB : kM361_SetPosA);
@@ -316,25 +322,27 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         
         [self sendCmd:&theCmd result:&theCmd numInArgs:2 numOutArgs:0];
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) readMotor:(id)aMotor
 {
-    NS_DURING
+    @try {
         [hwLock lock];
         m321Cmd theCmd;
         theCmd.cmd =  ([aMotor tag] ? kM361_GetPosB : kM361_GetPosA);
         [self sendCmd:&theCmd result:&theCmd numInArgs:0 numOutArgs:2];
         [aMotor setMotorPosition: (unsigned long)theCmd.paramList[0]<<16 | theCmd.paramList[1]];
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (BOOL) isMotorMoving:(id)aMotor
@@ -374,7 +382,7 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     [self loadHoldCurrent:[aMotor holdCurrent] motor:aMotor];
     [self loadBreakPoint:[aMotor breakPoint] absolute:[aMotor absoluteBrkPt] motor:aMotor];
     
-    NS_DURING
+    @try {
         [hwLock lock];
         m321Cmd theCmd;
         theCmd.cmd  = ([aMotor tag] ? kM361_SeekHomeB : kM361_SeekHomeA);
@@ -401,15 +409,16 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         [hwLock unlock];
         
         [self motorStarted:aMotor];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void)  readHome:(id)aMotor
 {
-    NS_DURING
+    @try {
         [hwLock lock];
         m321Cmd theCmd;
         
@@ -417,10 +426,11 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         [self sendCmd:&theCmd result:&theCmd numInArgs:0 numOutArgs:1];
         [aMotor setHomeDetected:theCmd.paramList[1]];
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) stopMotor:(id)aMotor
@@ -428,16 +438,17 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     [aMotor motorStopped];	
     [self resetIRQ:aMotor];
     
-    NS_DURING
+    @try {
         [hwLock lock];
         m321Cmd theCmd;
         theCmd.cmd  = ([aMotor tag]? kM361_AbortB : kM361_AbortA);
         [self sendCmd:&theCmd result:&theCmd numInArgs:0 numOutArgs:0];
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
@@ -482,7 +493,7 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     [self loadHoldCurrent:[aMotor holdCurrent] motor:aMotor];
     [self loadBreakPoint:[aMotor breakPoint] absolute:[aMotor absoluteBrkPt] motor:aMotor];
     
-    NS_DURING
+    @try {
         [hwLock lock];
         ulValue = theRiseFreq;
         theCmd.paramList[0] = (ulValue & 0xFFFF0000) >> 16; //MSB part
@@ -505,15 +516,16 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         
         [self motorStarted:aMotor];
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) loadHoldCurrent:(long)amount motor:(id)aMotor;
 {
-    NS_DURING
+    @try {
         [hwLock lock];
         
         m321Cmd theCmd;
@@ -522,15 +534,16 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         
         [self sendCmd:&theCmd result:&theCmd numInArgs:1 numOutArgs:0];
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) loadStepMode:(int)mode motor:(id)aMotor;
 {
-    NS_DURING
+    @try {
         [hwLock lock];
         m321Cmd theCmd;
         theCmd.cmd  = ([aMotor tag] ? kM361_SetModeB : kM361_SetModeA);
@@ -538,10 +551,11 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         
         [self sendCmd:&theCmd result:&theCmd numInArgs:1 numOutArgs:0];
         [hwLock unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [hwLock unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void)resetIRQ:(id)aMotor
@@ -557,20 +571,20 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     }
     irqValue &= ~mask;
     [[guardian adapter] writeWordBlock:&irqValue
-                                  atAddress:[self baseAddress] + kM361_IrqOffset
-                                 numToWrite:1
-                                 withAddMod:[guardian addressModifier]
-                              usingAddSpace:kAccessRemoteIO];
+							 atAddress:[self baseAddress] + kM361_IrqOffset
+							numToWrite:1
+							withAddMod:[guardian addressModifier]
+						 usingAddSpace:kAccessRemoteIO];
 }
 
 - (unsigned short) readIRQ
 {
     unsigned short aValue = 0;
     [[guardian adapter] readWordBlock:&aValue
-                                 atAddress:[self baseAddress] + kM361_IrqOffset
-                                 numToRead:1
-                                withAddMod:[guardian addressModifier]
-                             usingAddSpace:kAccessRemoteIO];
+							atAddress:[self baseAddress] + kM361_IrqOffset
+							numToRead:1
+						   withAddMod:[guardian addressModifier]
+						usingAddSpace:kAccessRemoteIO];
     
     return aValue & 0x00ff;
 }
@@ -630,50 +644,50 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     //write '1' to polling bit in Control Reg to clear polling bit.
     aValue = kM361_PollBit;
     [[guardian adapter] writeWordBlock:&aValue
-                                  atAddress:[self baseAddress] + kM361_ControlRegister
-                                 numToWrite:1L
-                                 withAddMod:[guardian addressModifier]
-                              usingAddSpace:kAccessRemoteIO];
+							 atAddress:[self baseAddress] + kM361_ControlRegister
+							numToWrite:1L
+							withAddMod:[guardian addressModifier]
+						 usingAddSpace:kAccessRemoteIO];
     
     //then set the DPM window to the cmd page.
     aValue = kM361_CmdPage;
     [[guardian adapter] writeWordBlock:&aValue
-                                  atAddress:[self baseAddress] + kM321PageRegOffset
-                                 numToWrite:1L
-                                 withAddMod:[guardian addressModifier]
-                              usingAddSpace:kAccessRemoteIO];
+							 atAddress:[self baseAddress] + kM321PageRegOffset
+							numToWrite:1L
+							withAddMod:[guardian addressModifier]
+						 usingAddSpace:kAccessRemoteIO];
     
     if(numInputs){
         //write the params first
         [[guardian adapter] writeWordBlock:&aCmd->paramList[0]
-                                      atAddress:[self baseAddress] + kM361_ParamListOffset 
-                                     numToWrite:numInputs
-                                     withAddMod:[guardian addressModifier]
-                                  usingAddSpace:kAccessRemoteIO];
+								 atAddress:[self baseAddress] + kM361_ParamListOffset 
+								numToWrite:numInputs
+								withAddMod:[guardian addressModifier]
+							 usingAddSpace:kAccessRemoteIO];
     }
     
     //write the cmd last
     [[guardian adapter] writeWordBlock:&aCmd->cmd
-                                  atAddress:[self baseAddress] + kM361_CmdOffset
-                                 numToWrite:1
-                                 withAddMod:[guardian addressModifier]
-                              usingAddSpace:kAccessRemoteIO];
+							 atAddress:[self baseAddress] + kM361_CmdOffset
+							numToWrite:1
+							withAddMod:[guardian addressModifier]
+						 usingAddSpace:kAccessRemoteIO];
     
     if([self waitForCmdToFinish]){
         
         result->cmd = aCmd->cmd;
         //OK the command is done. get the result
         [[guardian adapter] readWordBlock:&result->result
-                                     atAddress:[self baseAddress] + kM361_ResultOffset
-                                     numToRead:1
-                                    withAddMod:[guardian addressModifier]
-                                 usingAddSpace:kAccessRemoteIO];
+								atAddress:[self baseAddress] + kM361_ResultOffset
+								numToRead:1
+							   withAddMod:[guardian addressModifier]
+							usingAddSpace:kAccessRemoteIO];
         
         [[guardian adapter] readWordBlock:&result->irqstat
-                                     atAddress:[self baseAddress] + kM361_IrqOffset
-                                     numToRead:1
-                                    withAddMod:[guardian addressModifier]
-                                 usingAddSpace:kAccessRemoteIO];
+								atAddress:[self baseAddress] + kM361_IrqOffset
+								numToRead:1
+							   withAddMod:[guardian addressModifier]
+							usingAddSpace:kAccessRemoteIO];
         
         
         if(result->result != kM361_NoError){
@@ -682,10 +696,10 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
         else if(numOutputs){
             //grab the result output
             [[guardian adapter] readWordBlock:&result->paramList[0]
-                                         atAddress:[self baseAddress] + kM361_ParamListOffset 
-                                         numToRead:numOutputs
-                                        withAddMod:[guardian addressModifier]
-                                     usingAddSpace:kAccessRemoteIO];
+									atAddress:[self baseAddress] + kM361_ParamListOffset 
+									numToRead:numOutputs
+								   withAddMod:[guardian addressModifier]
+								usingAddSpace:kAccessRemoteIO];
         }
     }
     else {
@@ -702,10 +716,10 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     do {
         unsigned short aValue;
         [[guardian adapter] readWordBlock:&aValue
-                                     atAddress:[self baseAddress] + kM361_ControlRegister
-                                     numToRead:1
-                                    withAddMod:[guardian addressModifier]
-                                 usingAddSpace:kAccessRemoteIO];
+								atAddress:[self baseAddress] + kM361_ControlRegister
+								numToRead:1
+							   withAddMod:[guardian addressModifier]
+							usingAddSpace:kAccessRemoteIO];
         
         if(aValue & kM361_PollBit){
             completed = YES;
@@ -741,53 +755,54 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
 - (void) pollMotorStatus
 {
     unsigned short irq = 0;
-    NS_DURING
+    @try {
         irq = [self readIRQ];
-    NS_HANDLER
-        NS_ENDHANDLER
-        
-        id motorA = [connector connectedObject];
-        id motorB = [connector2 connectedObject];
-        
-        BOOL timeToGetPosition = ([NSDate timeIntervalSinceReferenceDate] - lastPollTime) > 1.0;
-        if([motorA motorRunning]){
-            if(irq & kM361_IrqBreakPtA){
-                [motorA stopMotor];
-                [motorA postBreakPointAlarm];
-            }
-            if(irq & kM361_IrqTrajA){
-                [self motorStopped:motorA];
-            }
-            if(irq & kM361_IrqHomeA){
-                [motorA setHomeDetected:YES];
-            }
-            
-            if(timeToGetPosition)[self readMotor:motorA];
-        }
-        if([motorB motorRunning]){
-            if(irq & kM361_IrqBreakPtB){
-                [self stopMotor:motorB];
-                [motorB postBreakPointAlarm];
-            }
-            if(irq & kM361_IrqTrajB){
-                [self motorStopped:motorB];
-            } 
-            if(irq & kM361_IrqHomeB){
-                [motorB setHomeDetected:YES];
-            }
-            if(timeToGetPosition)[self readMotor:motorB];
-        }
-        
-        if([motorA motorRunning] || [motorB motorRunning]){
-            if(timeToGetPosition){
-                lastPollTime = [NSDate timeIntervalSinceReferenceDate];
-            }
-            [self performSelector:@selector(pollMotorStatus) withObject:nil afterDelay:.1];
-        }
-        else {
-            lastPollTime = 0;
-        }
-        
+    }
+	@catch(NSException* localException) {
+	}
+	
+	id motorA = [connector connectedObject];
+	id motorB = [connector2 connectedObject];
+	
+	BOOL timeToGetPosition = ([NSDate timeIntervalSinceReferenceDate] - lastPollTime) > 1.0;
+	if([motorA motorRunning]){
+		if(irq & kM361_IrqBreakPtA){
+			[motorA stopMotor];
+			[motorA postBreakPointAlarm];
+		}
+		if(irq & kM361_IrqTrajA){
+			[self motorStopped:motorA];
+		}
+		if(irq & kM361_IrqHomeA){
+			[motorA setHomeDetected:YES];
+		}
+		
+		if(timeToGetPosition)[self readMotor:motorA];
+	}
+	if([motorB motorRunning]){
+		if(irq & kM361_IrqBreakPtB){
+			[self stopMotor:motorB];
+			[motorB postBreakPointAlarm];
+		}
+		if(irq & kM361_IrqTrajB){
+			[self motorStopped:motorB];
+		} 
+		if(irq & kM361_IrqHomeB){
+			[motorB setHomeDetected:YES];
+		}
+		if(timeToGetPosition)[self readMotor:motorB];
+	}
+	
+	if([motorA motorRunning] || [motorB motorRunning]){
+		if(timeToGetPosition){
+			lastPollTime = [NSDate timeIntervalSinceReferenceDate];
+		}
+		[self performSelector:@selector(pollMotorStatus) withObject:nil afterDelay:.1];
+	}
+	else {
+		lastPollTime = 0;
+	}
+	
 }
 
 
