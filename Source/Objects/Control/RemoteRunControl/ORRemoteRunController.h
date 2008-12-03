@@ -50,6 +50,9 @@
 	IBOutlet NSButton*      connectAtStartButton;
 	IBOutlet NSButton*      autoReconnectButton;
     IBOutlet NSButton*      lockButton;
+	
+	IBOutlet NSPopUpButton* startUpScripts;
+	IBOutlet NSPopUpButton* shutDownScripts;
              
     BOOL retainingRunNotice;
 }
@@ -72,10 +75,13 @@
 - (IBAction) connectAction:(id)sender;
 - (IBAction) connectAtStartAction:(id)sender;
 - (IBAction) autoReconnectAction:(id)sender;
-- (void) isConnectedChanged:(NSNotification*)note;
+- (IBAction) selectStartUpScript:(id)sender;
+- (IBAction) selectShutDownScript:(id)sender;
+- (IBAction) resynce:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
 - (void) updateButtons;
+- (void) isConnectedChanged:(NSNotification*)note;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) registerNotificationObservers;
 - (void) remoteHostChanged:(NSNotification*)aNotification;
@@ -92,5 +98,8 @@
 - (void) offlineChanged:(NSNotification *)notification;
 - (void) connectAtStartChanged:(NSNotification*)note;
 - (void) autoReconnectChanged:(NSNotification*)note;
+- (void) scriptNamesChanged:(NSNotification*)aNote;
+- (void) startScriptNameChanged:(NSNotification*)aNote;
+- (void) shutDownScriptNameChanged:(NSNotification*)aNote;
 
 @end

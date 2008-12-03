@@ -41,6 +41,7 @@
 {
    // [[self window] setBackgroundColor:[NSColor colorWithDeviceRed:240/255. green:235/255. blue:191/255. alpha:1]];
     [runProgress setStyle:NSProgressIndicatorSpinningStyle];
+	[runProgress setControlSize:NSSmallControlSize];
     [runBar setIndeterminate:NO];
     [super awakeFromNib];
     [self updateButtons];
@@ -142,6 +143,20 @@
                           name: ORRemoteRunIsConnectedChanged
                        object : model];
 
+	[notifyCenter addObserver : self
+                      selector: @selector(scriptNamesChanged:)
+                          name: ORRemoteRunModelScriptNamesChanged
+                       object : model];
+	
+	[notifyCenter addObserver : self
+                      selector: @selector(startScriptNameChanged:)
+                          name: ORRemoteRunStartScriptNameChanged
+                       object : model];
+	
+	[notifyCenter addObserver : self
+                      selector: @selector(shutDownScriptNameChanged:)
+                          name: ORRemoteRunShutDownScriptNameChanged
+                       object : model];
 }
 
 
@@ -163,6 +178,9 @@
 	[self connectAtStartChanged:nil];
 	[self autoReconnectChanged:nil];
 	[self isConnectedChanged:nil];
+	[self scriptNamesChanged:nil];
+	[self startScriptNameChanged:nil];
+	[self shutDownScriptNameChanged:nil];
 }
 
 
@@ -218,6 +236,34 @@
     [remoteHostField setEnabled:!locked];
     [connectAtStartButton setEnabled:!locked];
     [autoReconnectButton setEnabled:!locked];
+}
+
+- (void) scriptNamesChanged:(NSNotification*)aNote
+{
+	[startUpScripts removeAllItems];
+	[shutDownScripts removeAllItems];
+	[startUpScripts addItemWithTitle:@"---"];
+	[shutDownScripts addItemWithTitle:@"---"];
+	NSEnumerator* e = [[model scriptNames] objectEnumerator];
+	NSString* aScriptName;
+	while(aScriptName = [e nextObject]){
+		[startUpScripts addItemWithTitle:aScriptName]; 
+		[shutDownScripts addItemWithTitle:aScriptName]; 
+	}
+}
+
+- (void) startScriptNameChanged:(NSNotification*)aNote
+{
+	NSString* aName = [model selectedStartScriptName];
+	if(!aName)[startUpScripts selectItemAtIndex:0];
+	else [startUpScripts selectItemWithTitle:aName];
+}
+
+- (void) shutDownScriptNameChanged:(NSNotification*)aNote
+{
+	NSString* aName = [model selectedShutDownScriptName];
+	if(!aName)[shutDownScripts selectItemAtIndex:0];
+	else [shutDownScripts selectItemWithTitle:aName];
 }
 
 - (void) isConnectedChanged:(NSNotification*)aNote
@@ -415,7 +461,7 @@
 
 -(IBAction)offlineCBAction:(id)sender
 {
-    if([model quickStart] != [sender intValue]){
+    if([model offline] != [sender intValue]){
         [[self undoManager] setActionName: @"Set Offline"];
         [model setOffline:[sender intValue]];
     }
@@ -475,6 +521,20 @@
 	[[self model] setAutoReconnect:[sender state]];
 }
 
+- (IBAction) selectStartUpScript:(id)sender
+{
+	[model setSelectedStartScriptName:[sender titleOfSelectedItem]];
+}
+
+- (IBAction) selectShutDownScript:(id)sender
+{
+	[model setSelectedShutDownScriptName:[sender titleOfSelectedItem]];
+}
+
+- (IBAction) resynce:(id)sender
+{
+	[model fullUpdate];
+}
 
 @end
 

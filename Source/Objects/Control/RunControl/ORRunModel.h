@@ -186,6 +186,13 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
+#pragma mark ¥¥¥Remote Run Control Helpers
+- (NSArray*) runScriptList;
+- (NSString*) selectedStartScriptName;
+- (NSString*) selectedShutDownScriptName;
+- (void) setStartScriptName:(NSString*)aName;
+- (void) setShutDownScriptName:(NSString*)aName;
+
 @end
 
 

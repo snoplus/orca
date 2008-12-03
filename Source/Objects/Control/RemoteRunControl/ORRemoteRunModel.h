@@ -48,12 +48,22 @@
         BOOL        isConnected;
 		NSTimeInterval timeHalted;
 		BOOL		offline;
+		NSArray*	scriptNames;
+		NSString*	selectedStartScriptName;
+		NSString*	selectedShutDownScriptName;
+	
 }
 
 
 #pragma mark ¥¥¥Initialization
 
 #pragma mark ¥¥¥Accessors
+- (NSArray*) scriptNames;
+- (void) setScriptNames:(NSArray*)someNames;
+- (NSString*) selectedStartScriptName;
+- (NSString*) selectedShutDownScriptName;
+- (void) setSelectedStartScriptName:(NSString*)aName;
+- (void) setSelectedShutDownScriptName:(NSString*)aName;
 - (NSString*) shortStatus;
 - (BOOL) offline;
 - (void) setOffline:(BOOL)aOffline;
@@ -107,6 +117,7 @@
 - (void) runStarted:(BOOL)doInit;
 - (void) incrementTime;
 - (void) parseString:(NSString*)inString;
+- (int) processScripts:(NSArray*)lines index:(int)i;
 
 - (void) fullUpdate;
 - (void) sendSetup;
@@ -126,6 +137,7 @@
 
 
 
+extern NSString* ORRemoteRunModelScriptNamesChanged;
 extern NSString* ORRemoteRunModelOfflineChanged;
 extern NSString* ORRemoteRunTimedRunChanged;
 extern NSString* ORRemoteRunRepeatRunChanged;
@@ -141,4 +153,7 @@ extern NSString* ORRemoteRunStatusChanged;
 extern NSString* ORRemoteRunConnectAtStartChanged;
 extern NSString* ORRemoteRunAutoReconnectChanged;
 extern NSString* ORRemoteRunIsConnectedChanged;
+extern NSString* ORRemoteRunStartScriptNameChanged;
+extern NSString* ORRemoteRunShutDownScriptNameChanged;
+
 extern NSString* ORRemoteRunLock;

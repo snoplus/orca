@@ -65,7 +65,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 @implementation ORRunModel
 
 #pragma mark ¥¥¥Initialization
--(id)init //designated initializer
+- (id)init //designated initializer
 {
     self = [super init];
     
@@ -81,7 +81,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return self;
 }
 
--(void)dealloc
+- (void) dealloc
 {
     [shutDownScriptState release];
     [startScriptState release];
@@ -112,7 +112,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(void)makeConnectors
+- (void) makeConnectors
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x]+[self frame].size.width - kConnectorSize,[self y]) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORRunModelRunControlConnection];
@@ -121,12 +121,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [aConnector release];
 }
 
--(void)makeMainController
+- (void) makeMainController
 {
     [self linkToController:@"ORRunController"];
 }
 
--(void)setUpImage
+- (void) setUpImage
 {
     //---------------------------------------------------------------------------------------------------
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
@@ -281,7 +281,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     runTypeNames = aRunTypeNames;
 }
 
--(unsigned long)getCurrentRunNumber
+- (unsigned long)getCurrentRunNumber
 {
     if(!remoteControl || remoteInterface){
         NSString* fullFileName = [[[self dirName]stringByExpandingTildeInPath] stringByAppendingPathComponent:@"RunNumber"];
@@ -292,12 +292,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return runNumber;
 }
 
--(unsigned long)runNumber
+- (unsigned long)runNumber
 {
     return runNumber;
 }
 
--(void)setRunNumber:(unsigned long)aRunNumber
+- (void) setRunNumber:(unsigned long)aRunNumber
 {
     runNumber = aRunNumber;
     
@@ -323,7 +323,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                       object: self];
 }
 
--(BOOL)isRunning
+- (BOOL)isRunning
 {
 	return [self runningState] != eRunStopped;
 }
@@ -333,12 +333,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return [startTime description];
 }
 
--(NSCalendarDate*)startTime
+- (NSCalendarDate*)startTime
 {
     return startTime;
 }
 
--(void)setStartTime:(NSCalendarDate*)aDate
+- (void) setStartTime:(NSCalendarDate*)aDate
 {
     [aDate retain];
     [startTime release];
@@ -360,12 +360,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	else return @"---";
 }
 
--(NSTimeInterval) elapsedTime
+- (NSTimeInterval) elapsedTime
 {
     return elapsedTime;
 }
 
--(void) setElapsedTime:(NSTimeInterval)aValue
+- (void) setElapsedTime:(NSTimeInterval)aValue
 {
     elapsedTime = aValue;
     [[NSNotificationCenter defaultCenter]
@@ -373,12 +373,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                       object: self];
 }
 
--(NSTimeInterval) timeToGo
+- (NSTimeInterval) timeToGo
 {
     return timeToGo;
 }
 
--(void)setTimeToGo:(NSTimeInterval)aValue
+- (void) setTimeToGo:(NSTimeInterval)aValue
 {
     timeToGo = aValue;
     [[NSNotificationCenter defaultCenter]
@@ -386,12 +386,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                       object: self];
 }
 
--(BOOL)timedRun
+- (BOOL)timedRun
 {
     return timedRun;
 }
 
--(void)setTimedRun:(BOOL)aValue
+- (void) setTimedRun:(BOOL)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTimedRun:[self timedRun]];
     timedRun = aValue;
@@ -400,12 +400,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                       object: self];
 }
 
--(BOOL)repeatRun
+- (BOOL)repeatRun
 {
     return repeatRun;
 }
 
--(void)setRepeatRun:(BOOL)aValue
+- (void) setRepeatRun:(BOOL)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRepeatRun:[self repeatRun]];
     repeatRun = aValue;
@@ -414,12 +414,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                       object: self];
 }
 
--(NSTimeInterval) timeLimit
+- (NSTimeInterval) timeLimit
 {
     return timeLimit;
 }
 
--(void)setTimeLimit:(NSTimeInterval)aValue
+- (void) setTimeLimit:(NSTimeInterval)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTimeLimit:[self timeLimit]];
     timeLimit = aValue;
@@ -429,12 +429,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(ORDataPacket*)dataPacket
+- (ORDataPacket*)dataPacket
 {
     return dataPacket;
 }
 
--(void)setDataPacket:(ORDataPacket*)aDataPacket
+- (void) setDataPacket:(ORDataPacket*)aDataPacket
 {
     [aDataPacket retain];
     [dataPacket release];
@@ -442,7 +442,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(void)setDirName:(NSString*)aDirName
+- (void) setDirName:(NSString*)aDirName
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDirName:[self dirName]];
     
@@ -455,17 +455,17 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
 }
 
--(NSString*)dirName
+- (NSString*)dirName
 {
     return dirName;
 }
 
--(unsigned long)	runType
+- (unsigned long)	runType
 {
     return runType;
 }
 
--(void)setRunType:(unsigned long)aMask
+- (void) setRunType:(unsigned long)aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRunType:runType];
     runType = aMask;
@@ -475,11 +475,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
 }
 
--(BOOL)remoteControl
+- (BOOL)remoteControl
 {
     return remoteControl;
 }
--(void)setRemoteControl:(BOOL)aState
+- (void) setRemoteControl:(BOOL)aState
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRemoteControl:remoteControl];
     remoteControl = aState;
@@ -496,12 +496,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(BOOL)quickStart
+- (BOOL) quickStart
 {
     return quickStart;
 }
 
--(void)setQuickStart:(BOOL)flag
+- (void) setQuickStart:(BOOL)flag
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setQuickStart:quickStart];
     quickStart = flag;
@@ -512,12 +512,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(unsigned long)  exceptionCount
+- (unsigned long)  exceptionCount
 {
     return exceptionCount;
 }
 
--(void)clearExceptionCount
+- (void) clearExceptionCount
 {
     exceptionCount = 0;
     
@@ -527,7 +527,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
 }
 
--(void)incExceptionCount
+- (void) incExceptionCount
 {
     ++exceptionCount;
     
@@ -537,22 +537,22 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(BOOL)nextRunWillQuickStart
+- (BOOL)nextRunWillQuickStart
 {
     return _nextRunWillQuickStart;
 }
 
--(void)setNextRunWillQuickStart:(BOOL)state
+- (void) setNextRunWillQuickStart:(BOOL)state
 {
     _nextRunWillQuickStart = state;
 }
 
--(int)runningState
+- (int)runningState
 {
     return runningState;
 }
 
--(void)setRunningState:(int)aRunningState
+- (void) setRunningState:(int)aRunningState
 {
     runningState = aRunningState;
     
@@ -567,18 +567,18 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                     userInfo: userInfo];
 }
 
--(void)setForceRestart:(BOOL)aState
+- (void) setForceRestart:(BOOL)aState
 {
     [self setNextRunWillQuickStart:YES];
     _forceRestart = aState;
 }
 
--(NSString *)definitionsFilePath
+- (NSString *)definitionsFilePath
 {
     return definitionsFilePath;
 }
 
--(void)setDefinitionsFilePath:(NSString *)aDefinitionsFilePath
+- (void) setDefinitionsFilePath:(NSString *)aDefinitionsFilePath
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDefinitionsFilePath:definitionsFilePath];
     
@@ -977,7 +977,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
        
 }
 
--(void)sendHeartBeat:(NSTimer*)aTimer
+- (void) sendHeartBeat:(NSTimer*)aTimer
 {
     unsigned long dataHeartBeat[4];
     
@@ -998,7 +998,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 }
 
--(void)incrementTime:(NSTimer*)aTimer
+- (void) incrementTime:(NSTimer*)aTimer
 {
     if([self isRunning]){
         NSTimeInterval deltaTime = -[startTime timeIntervalSinceNow];
@@ -1162,7 +1162,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 //takeData runs in the data Taking thread. It should not be called from anywhere else.
 //and it should not call anything that is not thread safe.
--(void)takeData
+- (void) takeData
 {
 	NSAutoreleasePool *outerpool = [[NSAutoreleasePool allocWithZone:nil] init];
 	NSLog(@"DataTaking Thread Started\n");
@@ -1207,7 +1207,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Notifications
--(void)registerNotificationObservers
+- (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
@@ -1269,7 +1269,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 
--(void)vmePowerFailed:(NSNotification*)aNotification
+- (void) vmePowerFailed:(NSNotification*)aNotification
 {
 	if(!forceFullInit){
 		NSLog(@"Run Control: Full init will be forced on next run because of Vme power failure.\n");
@@ -1278,17 +1278,17 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	}
 	forceFullInit = YES;
 }
--(void)gotRequestedRunHaltNotification:(NSNotification*)aNotification
+- (void) gotRequestedRunHaltNotification:(NSNotification*)aNotification
 {
 	[self performSelectorOnMainThread:@selector(requestedRunHalt:) withObject:[aNotification userInfo] waitUntilDone:NO];
 }
 
--(void)gotForceRunStopNotification:(NSNotification*)aNotification
+- (void) gotForceRunStopNotification:(NSNotification*)aNotification
 {
 	[self performSelectorOnMainThread:@selector(forceHalt) withObject:nil waitUntilDone:NO];
 }
 
--(void)gotRequestedRunStopNotification:(NSNotification*)aNotification
+- (void) gotRequestedRunStopNotification:(NSNotification*)aNotification
 {
 	[self performSelectorOnMainThread:@selector(requestedRunStop:) withObject:[aNotification userInfo] waitUntilDone:NO];
 }
@@ -1323,7 +1323,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	}
 }
 
--(void)runModeChanged:(NSNotification*)aNotification
+- (void) runModeChanged:(NSNotification*)aNotification
 {
     [self setUpImage];
 }
@@ -1340,7 +1340,7 @@ static NSString *ORRunQuickStart 	= @"ORRunQuickStart";
 static NSString *ORRunDefinitions 	= @"ORRunDefinitions";
 static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 
--(id)initWithCoder:(NSCoder*)decoder
+- (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
@@ -1368,7 +1368,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
     return self;
 }
 
--(void)encodeWithCoder:(NSCoder*)encoder
+- (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:shutDownScript forKey:@"shutDownScript"];
@@ -1385,7 +1385,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
     [encoder encodeBool:remoteInterface forKey:@"RemoteInterface"];
 }
 
--(NSString*)commandID
+- (NSString*)commandID
 {
     return @"RunControl";
 }
@@ -1451,11 +1451,83 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 	else return @"?";
 }
 
+#pragma mark ¥¥¥Remote Run Control Helpers
+- (NSArray*) runScriptList
+{
+	NSArray* theScripts = [[self document] collectObjectsOfClass:[ORRunScriptModel class]];
+	ORRunScriptModel* aScript;
+	NSMutableArray* theNameList = [NSMutableArray array];
+	NSEnumerator* e = [theScripts objectEnumerator];
+	while(aScript = [e nextObject]){
+		[theNameList addObject: [aScript identifier]];
+	}
+	return theNameList;
+}
+
+- (NSString*) selectedStartScriptName
+{
+	if(!startScript)return 0;
+	else return [startScript identifier];
+}
+
+- (NSString*) selectedShutDownScriptName
+{
+	if(!shutDownScript)return 0;
+	else return [shutDownScript identifier];
+}
+
+- (void) setStartScriptName:(NSString*)aName
+{
+	[[self undoManager] disableUndoRegistration];
+ 
+	if([aName isEqualToString:@"---"])[self setStartScript:nil];
+	else {
+		NSArray* theScripts = [[self document] collectObjectsOfClass:[ORRunScriptModel class]];
+		ORRunScriptModel* aScript;
+		NSEnumerator* e = [theScripts objectEnumerator];
+		BOOL foundIt = NO;
+		while(aScript = [e nextObject]){
+			if([aName isEqualToString:[aScript identifier]]){
+				[self setStartScript:aScript];
+				NSLog(@"startup: %@\n",[aScript identifier]);
+				foundIt	 = YES;
+				break;
+			}
+		}
+		if(!foundIt)[self setStartScript:nil];
+	}
+	[[self undoManager] enableUndoRegistration];
+
+}
+
+- (void) setShutDownScriptName:(NSString*)aName
+{
+	[[self undoManager] disableUndoRegistration];
+	if([aName isEqualToString:@"---"])[self setShutDownScript:nil];
+	else {
+		NSArray* theScripts = [[self document] collectObjectsOfClass:[ORRunScriptModel class]];
+		ORRunScriptModel* aScript;
+		NSEnumerator* e = [theScripts objectEnumerator];
+		BOOL foundIt = NO;
+		while(aScript = [e nextObject]){
+			if([aName isEqualToString:[aScript identifier]]){
+				[self setShutDownScript:aScript];
+				NSLog(@"shutDown: %@\n",[aScript identifier]);
+				foundIt	 = YES;
+				break;
+			}
+		}
+		if(!foundIt)[self setShutDownScript:nil];
+	}
+	[[self undoManager] enableUndoRegistration];
+}
+
+
 @end
 
 
 @implementation ORRunDecoderForRun
--(unsigned long)decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+- (unsigned long)decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
 	return 4; //must return number of longs processed.
 }

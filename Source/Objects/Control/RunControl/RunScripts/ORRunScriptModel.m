@@ -257,9 +257,15 @@ NSString* ORRunScriptLock					= @"ORRunScriptLock";
 {
 	return scriptRunner;
 }
+
 - (BOOL) parsedOK
 {
 	return parsedOK;
+}
+
+- (BOOL) scriptExists
+{
+	return scriptExists;
 }
 
 - (void) parseScript
@@ -270,6 +276,7 @@ NSString* ORRunScriptLock					= @"ORRunScriptLock";
 		[scriptRunner setScriptName:scriptName];
 		[scriptRunner parse:script];
 		parsedOK = [scriptRunner parsedOK];
+		scriptExists = [scriptRunner scriptExists];
 		if(([[NSApp currentEvent] modifierFlags] & 0x80000)>0){
 			//option key is down
 			[scriptRunner printAll];
@@ -288,8 +295,13 @@ NSString* ORRunScriptLock					= @"ORRunScriptLock";
 		[scriptRunner parse:script];
 		parsedOK = [scriptRunner parsedOK];
 		if(parsedOK){
-			[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
-			[scriptRunner run:inputValues sender:self];
+			if([scriptRunner parsedOK]){
+				[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
+				[scriptRunner run:inputValues sender:self];
+			}
+			else {
+				[self scriptRunnerDidFinish:YES returnValue:[NSNumber numberWithInt:1]];
+			}
 		}
 	}
 	else {

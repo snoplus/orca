@@ -102,6 +102,12 @@
 				<string>id</string>
 				<key>repeatRunCBAction</key>
 				<string>id</string>
+				<key>resynce</key>
+				<string>id</string>
+				<key>selectShutDownScript</key>
+				<string>id</string>
+				<key>selectStartUpScript</key>
+				<string>id</string>
 				<key>startRunAction</key>
 				<string>id</string>
 				<key>stopRunAction</key>
@@ -149,8 +155,12 @@
 				<string>NSTextField</string>
 				<key>runProgress</key>
 				<string>NSProgressIndicator</string>
+				<key>shutDownScripts</key>
+				<string>NSPopUpButton</string>
 				<key>startRunButton</key>
 				<string>NSButton</string>
+				<key>startUpScripts</key>
+				<string>NSPopUpButton</string>
 				<key>statusField</key>
 				<string>NSTextField</string>
 				<key>stopRunButton</key>

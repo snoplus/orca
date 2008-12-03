@@ -36,6 +36,7 @@
 	ORScriptRunner*			scriptRunner;
 	NSString*				scriptName;
 	BOOL					parsedOK;
+	BOOL					scriptExists;
 	NSString*				lastFile;
 	unsigned long		    dataId;
     BOOL					showSuperClass;
@@ -66,6 +67,7 @@
 - (NSString*) scriptName;
 - (void) setScriptName:(NSString*)aString;
 - (BOOL) parsedOK;
+- (BOOL) scriptExists;
 - (ORScriptRunner*) scriptRunner;
 - (NSMutableArray*) inputValues;
 - (void) addInputValue;

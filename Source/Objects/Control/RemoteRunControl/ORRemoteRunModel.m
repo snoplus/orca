@@ -43,6 +43,9 @@ NSString* ORRemoteRunNumberChanged          = @"ORRemoteRunRunNumberChanged";
 NSString* ORRemoteRunQuickStartChanged      = @"ORRemoteRunQuickStartChanged";
 NSString* ORRemoteRunStatusChanged          = @"ORRemoteRunStatusChanged";
 NSString* ORRemoteRunLock                    = @"ORRemoteRunLock";
+NSString* ORRemoteRunModelScriptNamesChanged = @"ORRemoteRunModelScriptNamesChanged";
+NSString* ORRemoteRunStartScriptNameChanged = @"ORRemoteRunStartScriptNameChanged";
+NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptNameChanged";
 
 
 @interface ORRemoteRunModel (private)
@@ -74,8 +77,9 @@ NSString* ORRemoteRunLock                    = @"ORRemoteRunLock";
     [startTime release];
     
     [remoteHost release];
-    [remoteHost release];
-    
+    [scriptNames release];
+	[selectedStartScriptName release];
+	[selectedShutDownScriptName release];
     [socket close];
     [socket release];
     
@@ -120,6 +124,19 @@ NSString* ORRemoteRunLock                    = @"ORRemoteRunLock";
 
 
 #pragma mark ¥¥¥Accessors
+- (NSArray*) scriptNames
+{
+	return scriptNames;
+}
+
+- (void) setScriptNames:(NSArray*)someNames
+{
+	[someNames retain];
+	[scriptNames release];
+	scriptNames = someNames;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRemoteRunModelScriptNamesChanged object:self];
+
+}
 
 - (BOOL) offline
 {
@@ -176,6 +193,29 @@ NSString* ORRemoteRunLock                    = @"ORRemoteRunLock";
                       object:self];
 }
 
+- (NSString*) selectedStartScriptName
+{
+	return selectedStartScriptName;
+}
+
+- (NSString*) selectedShutDownScriptName
+{
+	return selectedShutDownScriptName;
+}
+
+- (void) setSelectedStartScriptName:(NSString*)aName
+{
+	[selectedStartScriptName autorelease];
+    selectedStartScriptName = [aName copy];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRemoteRunStartScriptNameChanged object:self];
+}
+
+- (void) setSelectedShutDownScriptName:(NSString*)aName
+{
+	[selectedShutDownScriptName autorelease];
+    selectedShutDownScriptName = [aName copy];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRemoteRunShutDownScriptNameChanged object:self];
+}
 
 - (NetSocket*) socket
 {
@@ -567,7 +607,10 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
         if(firstColonRange.location != NSNotFound){
             NSString* key = [aLine substringToIndex:firstColonRange.location];
             id value      = [aLine substringFromIndex:firstColonRange.location+1];
-            if([key isEqualToString:@"startTime"]){
+			if([key isEqualToString:@"scripts"]){
+				i=[self processScripts:lines index:i+1];
+			}
+            else if([key isEqualToString:@"startTime"]){
                 [self setStartTime:value];            
             }
             else {
@@ -583,6 +626,27 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
             
     }
         [[self undoManager] enableUndoRegistration];
+}
+
+- (int) processScripts:(NSArray*)lines index:(int)i
+{
+	NSMutableArray* theRemoteScriptNames = [NSMutableArray array];
+	NSString* aScript;
+	do {
+		NSString* aLine = [lines objectAtIndex:i];
+		if([aLine rangeOfString:@")"].location != NSNotFound)break;
+		NSScanner* scanner = [NSScanner scannerWithString:aLine];
+		[scanner scanUpToString:@"\"" intoString:nil];
+		[scanner scanString:@"\"" intoString:nil];
+		if([scanner scanUpToString:@"\"" intoString:&aScript]){
+			[theRemoteScriptNames addObject:aScript];
+			i++;
+			if(i>=[lines count])break;
+		}
+		if([scanner isAtEnd])break;
+	} while(1);
+	[self setScriptNames:theRemoteScriptNames];
+	return i;
 }
 
 - (void) connectSocket:(BOOL)state
@@ -611,6 +675,9 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [self sendCmd:@"offline = [RunControl offlineRun];"];
     [self sendCmd:@"runningState = [RunControl runningState];"];
     [self sendCmd:@"startTime = [RunControl startTimeAsString];"];
+    [self sendCmd:@"scripts = [RunControl runScriptList];"];
+    [self sendCmd:@"selectedStartScriptName = [RunControl selectedStartScriptName];"];
+    [self sendCmd:@"selectedShutDownScriptName = [RunControl selectedShutDownScriptName];"];
 }
 
 - (void) sendSetup
@@ -620,6 +687,8 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setTimedRun:%d];"  ,timedRun]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setQuickStart:%d];",quickStart]];
     [self sendCmd:[NSString stringWithFormat:@"[RunControl setOfflineRun:%d];",offline]];
+    [self sendCmd:[NSString stringWithFormat:@"[RunControl setStartScriptName:@\"%@\"];",selectedStartScriptName]];
+    [self sendCmd:[NSString stringWithFormat:@"[RunControl setShutDownScriptName:@\"%@\"];",selectedShutDownScriptName]];
 }
 
 #pragma mark ***Delegate Methods

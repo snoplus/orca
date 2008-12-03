@@ -152,44 +152,57 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	return parsedOK;
 }
 
+- (BOOL) scriptExists
+{
+	return scriptExists;
+}
+
 -(id) parse:(NSString* )theString 
 {  
 	// yacc has a number of global variables so it is NOT thread safe
 	// Acquire the lock to ensure one parse processing at a time
 	@synchronized([NSApp delegate]){
-		parsedOK = NO;
-		NS_DURING {
-			
-			yyreset_state();
-			OrcaScriptrestart(NULL);
-			
-			theScriptRunner = self;
-			[self setString:theString];
-			
-			// Call the parser    
-			OrcaScriptparse();
-			if(functionList) {
-				NSLog(@"%d Lines Parsed Successfully\n",num_lines);
-				parsedOK = YES;
+		if([theString length]){
+			parsedOK = NO;
+			scriptExists = YES;
+
+			NS_DURING {
+				
+				yyreset_state();
+				OrcaScriptrestart(NULL);
+				
+				theScriptRunner = self;
+				[self setString:theString];
+				
+				// Call the parser    
+				OrcaScriptparse();
+				if(functionList) {
+					NSLog(@"%d Lines Parsed Successfully\n",num_lines);
+					parsedOK = YES;
+				}
+				else  {
+					NSLog(@"line %d: %@\n",num_lines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:num_lines]);
+					[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
+																		object:self 
+																	  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
+				}
 			}
-			else  {
+			NS_HANDLER {
 				NSLog(@"line %d: %@\n",num_lines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:num_lines]);
 				[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
-																	object:self 
-																  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
+																		object:self 
+																	  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
+				NSLog(@"Caught %@: %@\n",[localException name],[localException reason]);
+				[functionList release];
+				functionList = nil;
 			}
+			NS_ENDHANDLER
 		}
-		NS_HANDLER {
-			NSLog(@"line %d: %@\n",num_lines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:num_lines]);
-			[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
-																	object:self 
-																  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
-			NSLog(@"Caught %@: %@\n",[localException name],[localException reason]);
-			[functionList release];
-			functionList = nil;
+		else {
+			//no script... 
+			parsedOK = YES;
+			scriptExists = NO;
 		}
-		NS_ENDHANDLER
-		
 		theScriptRunner = nil;
 		[self setFunctionTable:functionList];
 		[eval release];

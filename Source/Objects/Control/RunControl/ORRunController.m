@@ -221,8 +221,8 @@
 	
 	[startUpScripts setEnabled:!running];
 	[shutDownScripts setEnabled:!running];
-	[openStartScriptButton setEnabled:[model startScript]]; 
-	[openShutDownScriptButton setEnabled:[model shutDownScript]]; 
+	[openStartScriptButton setEnabled:[model startScript]!=nil]; 
+	[openShutDownScriptButton setEnabled:[model shutDownScript]!=nil]; 
 	
     if([model remoteControl]){
         [startRunButton setEnabled:NO];
@@ -620,7 +620,7 @@
     int tag = [[runModeMatrix selectedCell] tag];
     if(tag != [[ORGlobal sharedGlobal] runMode]){
         [[self undoManager] setActionName: @"Set Run Mode"];
-        [[ORGlobal sharedGlobal] setRunMode:tag];
+		[model setOfflineRun:tag];
     }
 }
 

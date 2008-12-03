@@ -37,6 +37,8 @@
 		ORNodeEvaluator*	eval;
 		id					inputValue;
 		BOOL				exitNow;
+		BOOL				scriptExists;
+
 } 
 
 #pragma mark ¥¥¥Accessors
@@ -49,6 +51,7 @@
 - (NSString*) scriptName;
 - (void)	 setScriptName:(NSString*)aString;
 - (BOOL)	 parsedOK;
+- (BOOL)	 scriptExists;
 - (void)	 setArgs:(NSArray*)args;
 
 #pragma mark ¥¥¥Run Methods
