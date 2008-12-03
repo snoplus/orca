@@ -610,21 +610,22 @@
 
 -(IBAction)initBoard:(id)sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
         [model reset];		//initialize and load hardward
 		NSLog(@"Initialized Shaper (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset and Init of Shaper FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Shaper Reset and Init", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) report:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		short chan;
         NSLog(@"%@\n",[model boardIdString]);
@@ -632,17 +633,18 @@
 			short gain = [model readGain:chan];
 			NSLog(@"gain %d value: %d\n",chan,gain);
 		}
-		NS_HANDLER
-			NSLog(@"Read Gain of Shaper FAILED.\n");
-			NSRunAlertPanel([localException name], @"%@\nFailed Read Gains", @"OK", nil, nil,
-							localException);
-		NS_ENDHANDLER
-		
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Read Gain of Shaper FAILED.\n");
+		NSRunAlertPanel([localException name], @"%@\nFailed Read Gains", @"OK", nil, nil,
+						localException);
+	}
+	
 }
 
 - (IBAction) readScalers:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		short chan;
 		NSLog(@"Scalers for Shaper in Slot %d  <0x%x> enabled: %@\n",[model slot],[model baseAddress],[model scalersEnabled]?@"YES":@"NO");
@@ -660,11 +662,12 @@
 			else NSLog(@"Scaler Mask is zero. No Scalers read.\n");
 		}
 		//NSLog(@"global scaler:  %d  %d\n",[model readCounter2],[model readCounter1]);
-		NS_HANDLER
-			NSLog(@"Read Scalers of Shaper FAILED.\n");
-			NSRunAlertPanel([localException name], @"%@\nFailed Read Scalers", @"OK", nil, nil,
-							localException);
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Read Scalers of Shaper FAILED.\n");
+		NSRunAlertPanel([localException name], @"%@\nFailed Read Scalers", @"OK", nil, nil,
+						localException);
+	}
 }
 
 - (IBAction) scanStartAction:(id)sender
@@ -720,13 +723,14 @@
 	[self endEditing];
     [model setBaseAddress:[addressStepper intValue]];
     
-	NS_DURING
+	@try {
         NSLog(@"%@\n",[model boardIdString]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Probe Shaper Board FAILED.\n");
 		NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
 						localException);
-    NS_ENDHANDLER
+    }
 }
 
 

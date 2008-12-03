@@ -73,7 +73,7 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
 {
 	id target = [nextSelector objectForKey:@"target"];
-		
+	
 	if(target && ![self respondsToSelector:aSelector]){
 		return [target methodSignatureForSelector:aSelector];
 	}
@@ -123,31 +123,32 @@ NSString* ORSequenceStopped  = @"ORSequenceStopped";
 - (void) doOneItem
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	NS_DURING
+	@try {
 		if([selectors count]){
 			NSMutableDictionary* theTask = [selectors objectAtIndex:0];
 			
 			id target					 = [theTask objectForKey:@"target"];
 			NSInvocation* theInvocation  = [theTask objectForKey:@"invocation"];
-		
+			
 			[theInvocation invokeWithTarget:target];
 			[selectors removeObject:theTask];
 			float progress = 100. - 100.*[selectors count]/(float)startCount;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORSequenceProgress 
 																object:delegate
-																userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:progress],@"progress",[NSNumber numberWithInt:tag],@"tag",nil]];
+															  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:progress],@"progress",[NSNumber numberWithInt:tag],@"tag",nil]];
 			
 			[self performSelector:@selector(doOneItem) withObject:nil afterDelay:0];
-
+			
 		}
 		else {
 			[self stopSequence];
 		}
-	
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Task sequence aborted because of exception: %@\n",localException);
 		[self stopSequence];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 @end

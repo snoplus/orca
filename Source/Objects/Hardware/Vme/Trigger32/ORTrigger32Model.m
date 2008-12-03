@@ -142,7 +142,7 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
     [[[self undoManager] prepareWithInvocationTarget:self] setRestartClkAtRunStart:restartClkAtRunStart];
     
     restartClkAtRunStart = aRestartClkAtRunStart;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTrigger32ModelRestartClkAtRunStartChanged object:self];
 }
 - (BOOL) liveTimeCalcRunning
@@ -155,8 +155,8 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
     liveTimeCalcRunning = flag;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORTrigger32LiveTimeCalcRunningChangedNotification
-                      object:self];
+	 postNotificationName:ORTrigger32LiveTimeCalcRunningChangedNotification
+	 object:self];
 }
 
 - (unsigned long) clockDataId { return clockDataId; }
@@ -213,8 +213,8 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
     mSamPrescale = aValue;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORTrigger32MSamPrescaleChangedNotification
-                      object:self];
+	 postNotificationName:ORTrigger32MSamPrescaleChangedNotification
+	 object:self];
     
 }
 
@@ -656,7 +656,7 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
 - (void) initBoardPart1
 {
     NSString* errorLocation = @"";
-    NS_DURING
+    @try {
         errorLocation = @"reset";
         [self reset];
         
@@ -680,26 +680,28 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
         [self resetTrigger2GTStatusBit];
         
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Trigger card init sequence FAILED at step: <%@>.\n",errorLocation);
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) initBoardPart2
 {
     NSString* errorLocation = @"";
-    NS_DURING
+    @try {
         errorLocation = [NSString stringWithFormat:@"setting %@ event input enable",trigger2Name];
         [self enableTrigger2EventInput:trigger2EventInputEnable];
         
         errorLocation = [NSString stringWithFormat:@"setting %@ BUSY output enable",trigger2Name];
         [self enableBusyOutput:trigger2BusyEnabled];
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Trigger card init sequence FAILED at step: <%@>.\n",errorLocation);
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 
@@ -1098,7 +1100,7 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
 //{
 //	return aVal & kClockEnabledMask;
 //}
-	
+
 
 - (NSMutableArray*) children {
     //methods exists to give common interface across all objects for display in lists
@@ -1298,36 +1300,36 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTrigger32DecoderFor10MHzClockRecord",  @"decoder",
-        [NSNumber numberWithLong:clockDataId],      @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+								 @"ORTrigger32DecoderFor10MHzClockRecord",  @"decoder",
+								 [NSNumber numberWithLong:clockDataId],      @"dataId",
+								 [NSNumber numberWithBool:NO],               @"variable",
+								 [NSNumber numberWithLong:3],                @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"10MHz Clock Record"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTrigger32DecoderForGTID1Record",                  @"decoder",
-        [NSNumber numberWithLong:gtid1DataId],               @"dataId",
-        [NSNumber numberWithBool:NO],                        @"variable",
-        [NSNumber numberWithLong:IsShortForm(gtid1DataId)?1:2],@"length",
-        nil];
+				   @"ORTrigger32DecoderForGTID1Record",                  @"decoder",
+				   [NSNumber numberWithLong:gtid1DataId],               @"dataId",
+				   [NSNumber numberWithBool:NO],                        @"variable",
+				   [NSNumber numberWithLong:IsShortForm(gtid1DataId)?1:2],@"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"GTID1 Record"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTrigger32DecoderForGTID2Record",               @"decoder",
-        [NSNumber numberWithLong:gtid2DataId],               @"dataId",
-        [NSNumber numberWithBool:NO],                        @"variable",
-        [NSNumber numberWithLong:IsShortForm(gtid2DataId)?1:2],@"length",
-        nil];
+				   @"ORTrigger32DecoderForGTID2Record",               @"decoder",
+				   [NSNumber numberWithLong:gtid2DataId],               @"dataId",
+				   [NSNumber numberWithBool:NO],                        @"variable",
+				   [NSNumber numberWithLong:IsShortForm(gtid2DataId)?1:2],@"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"GTID2 Record"];
     
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTrigger32DecoderForLiveTime",           @"decoder",
-        [NSNumber numberWithLong:liveTimeDataId],   @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:8],                @"length",
-        nil];
+				   @"ORTrigger32DecoderForLiveTime",           @"decoder",
+				   [NSNumber numberWithLong:liveTimeDataId],   @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:8],                @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"LiveTime"];
     return dataDictionary;
 }
@@ -1338,19 +1340,19 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 	NSMutableArray* eventGroup1 = [NSMutableArray array];
 	if([trigger1Group count]){
 		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								@"GTID Record",					@"name",
-								[NSNumber numberWithLong:gtid1DataId],    @"dataId",
-								nil];
+					   @"GTID Record",					@"name",
+					   [NSNumber numberWithLong:gtid1DataId],    @"dataId",
+					   nil];
 		[eventGroup1 addObject:aDictionary];
-				if([self shipEvt1Clk]){
+		if([self shipEvt1Clk]){
 			aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								@"100MHz Clock Record",					@"name",
-								[NSNumber numberWithLong:clockDataId],  @"dataId",
-								[NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
-								[NSNumber numberWithLong:1],		@"value",
-								[NSNumber numberWithLong:0x3L<<24], @"mask",
-								[NSNumber numberWithLong:24],		@"shift",
-									nil];
+						   @"100MHz Clock Record",					@"name",
+						   [NSNumber numberWithLong:clockDataId],  @"dataId",
+						   [NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
+						   [NSNumber numberWithLong:1],		@"value",
+						   [NSNumber numberWithLong:0x3L<<24], @"mask",
+						   [NSNumber numberWithLong:24],		@"shift",
+						   nil];
 			[eventGroup1 addObject:aDictionary];
 		}
 		
@@ -1364,23 +1366,23 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 	NSMutableArray* eventGroup2 = [NSMutableArray array];
 	if([trigger2Group count]){
 		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								@"GTID",								@"name",
-								[NSNumber numberWithLong:gtid2DataId],    @"dataId",
-								nil];
+					   @"GTID",								@"name",
+					   [NSNumber numberWithLong:gtid2DataId],    @"dataId",
+					   nil];
 		[eventGroup2 addObject:aDictionary];
-
+		
 		if([self shipEvt2Clk]){
 			aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								@"100MHz Clock Record",					@"name",
-								[NSNumber numberWithLong:clockDataId],   @"dataId",
-								[NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
-								[NSNumber numberWithLong:2],		@"value",
-								[NSNumber numberWithLong:0x3L<<24], @"mask",
-								[NSNumber numberWithLong:24],		@"shift",
-									nil];
+						   @"100MHz Clock Record",					@"name",
+						   [NSNumber numberWithLong:clockDataId],   @"dataId",
+						   [NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
+						   [NSNumber numberWithLong:2],		@"value",
+						   [NSNumber numberWithLong:0x3L<<24], @"mask",
+						   [NSNumber numberWithLong:24],		@"shift",
+						   nil];
 			[eventGroup2 addObject:aDictionary];
 		}
-
+		
 		NSMutableDictionary* aDictionary = [NSMutableDictionary dictionary];
 		[trigger2Group appendEventDictionary:aDictionary topLevel:topLevel];
 		if([aDictionary count])[eventGroup2 addObject:aDictionary];
@@ -1418,7 +1420,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 {
     isRunning = NO;
 	noDataCount = 0;
-        
+	
     if(![[self adapter] controllerCard]){
 		[NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     }
@@ -1485,7 +1487,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
     unsigned short statusReg;
     BOOL isMSAMEvent = NO;
     isRunning = YES;
-    NS_DURING
+    @try {
 		// read the status register to check for an event and save the value since
 		// we will reset the event when the gtid register is read.
 		// Note that we force events if in the nohardware mode.
@@ -1721,7 +1723,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 							[self resetTrigger2GTStatusBit];
 						}
 					}
-
+					
 					noDataCount++;
 					totalDataCount++;
 					[aDataPacket removeReservedLongsFromFrameBuffer:NSMakeRange(eventPlaceHolder2,IsShortForm(gtid2DataId)?1:2)];
@@ -1734,11 +1736,12 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
 				if(shipEvt2Clk)[aDataPacket removeReservedLongsFromFrameBuffer:NSMakeRange(timePlaceHolder2,3)];
 			}
 		}
-		NS_HANDLER
-			NSLogError(@"",@"Trigger Card Error",errorLocation,nil);
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"Trigger Card Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1763,7 +1766,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
     timer = nil;
 	[self shipLiveTimeRecords:0];
     isRunning = NO;
-
+	
 	if(totalDataCount){
 		NSLog(@"Trigger32Model noData Count this run: %d\n", noDataCount);
 	}
@@ -1997,7 +2000,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
         data[0] = clockDataId | 3;
         data[1] = (unsigned long)(doeTime>>32);
         data[2] = (unsigned long)(doeTime&0x00000000ffffffff);\
-            if(trigger == 1)data[1] |= (1<<24);
+		if(trigger == 1)data[1] |= (1<<24);
         else data[1] |= (1<<25);
     }
 }
@@ -2013,7 +2016,7 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
     
     if(!liveTimeEnabled)return;
     
-	NS_DURING
+	@try {
         unsigned long gtid = [[self crate] requestGTID];
 		[self latchLiveTime];
         
@@ -2073,8 +2076,9 @@ static NSString *ORTriggerEnableLiveTime		= @"ORTriggerEnableLiveTime";
         
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                             object:[NSData dataWithBytes:liveTimeData length:8*sizeof(long)]];
-	NS_HANDLER
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) _calculateLiveTime

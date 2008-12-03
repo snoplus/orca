@@ -349,7 +349,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 -(IBAction) startAction:(id)sender
 {
     [[self undoManager] disableUndoRegistration];
-	NS_DURING
+	@try {
 		if(![[view window] makeFirstResponder:[view window]]){
 			[[view window] endEditingFor:nil];		
 		}
@@ -372,8 +372,9 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 		else {
 			[self stopTask];
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
     [[self undoManager] enableUndoRegistration];
 }
 
@@ -433,7 +434,7 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 	if([self taskState] == eTaskStopped)return;
 	
     [[self undoManager] disableUndoRegistration];
-	NS_DURING
+	@try {
 		[self setIsSlave:NO];
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(continueTask) object:nil];
 		if([self taskState] == eTaskRunning)NSLog(@"Task Stopped: %@\n",[titleField stringValue]);
@@ -442,8 +443,9 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 		[self finishUp];
 		[nextRunTimeField setStringValue:@"Not Scheduled"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORTaskDidFinishNotification object:self];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
     [[self undoManager] enableUndoRegistration];
 }
 
@@ -580,7 +582,7 @@ static NSString* ORTaskExpanded		= @"ORTaskExpanded";
 
 - (void) prepare
 {
-
+	
     doingFinishUpWork = NO;
     
     if(![[view window] makeFirstResponder:[view window]]){

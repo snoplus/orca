@@ -49,7 +49,7 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [super registerNotificationObservers];
-        
+	
     [notifyCenter addObserver : self
                      selector : @selector(slotChanged:)
                          name : ORVmeCardSlotChangedNotification
@@ -104,7 +104,7 @@
                          name : ORTrigger32UseNoHardwareChangedNotification
                        object : model];
     
-        
+	
     [notifyCenter addObserver : self
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
@@ -144,7 +144,7 @@
                      selector : @selector(useMSAMChanged:)
                          name : ORTrigger32MSAMChangedNotification
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(trigger1GTXorChanged:)
                          name : ORTrigger32Trigger1GTXorChangedNotification
@@ -159,17 +159,17 @@
                      selector : @selector(clockEnabledChanged:)
                          name : ORTrigger32ClockEnabledChangedNotification
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(liveTimeEnabledChanged:)
                          name : ORTrigger32LiveTimeEnabledChangedNotification
                         object: nil];
-
-
+	
+	
     [notifyCenter addObserver : self
-                        selector : @selector(timeClockLowerChanged:)
-                            name : ORTrigger32LowerTimeValueChangedNotification
-                          object : model];
+					 selector : @selector(timeClockLowerChanged:)
+						 name : ORTrigger32LowerTimeValueChangedNotification
+					   object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(timeClockUpperChanged:)
@@ -185,19 +185,19 @@
                      selector : @selector(prescaleChanged:)
                          name : ORTrigger32MSamPrescaleChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(specialLockChanged:)
                          name : ORTrigger32LiveTimeCalcRunningChangedNotification
                        object : model];
-
-
-
+	
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(restartClkAtRunStartChanged:)
                          name : ORTrigger32ModelRestartClkAtRunStartChanged
 						object: model];
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -281,11 +281,11 @@
     [trigger1GTXorCB setEnabled:!locked && !lockedOrRunningMaintenance];
     [trigger2GTXorCB setEnabled:!locked && !lockedOrRunningMaintenance];
     [enableTimeClockCB setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [initButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [enableLiveTimeCB setEnabled:!locked];
-
+	
     [useSoftwareGtIdCB setEnabled:!locked && !lockedOrRunningMaintenance];
     [useNoHardwareCB setEnabled:!locked && !lockedOrRunningMaintenance];
     
@@ -308,13 +308,13 @@
     [specialLockButton setState: locked];
     
     [getStatusButton2 setEnabled:!locked && !lockedOrRunningMaintenance];
- 
+	
     [gtIdValueText setEnabled:!locked && !lockedOrRunningMaintenance];
     [gtIdValueStepper setEnabled:!locked && !lockedOrRunningMaintenance];
     [loadGTIDButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [readGTID1Button setEnabled:!locked && !lockedOrRunningMaintenance];
     [readGTID2Button setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [timeClockLowerText setEnabled:!locked && !lockedOrRunningMaintenance];
     [timeClockLowerStepper setEnabled:!locked && !lockedOrRunningMaintenance];
     [timeClockUpperText setEnabled:!locked && !lockedOrRunningMaintenance];
@@ -323,14 +323,14 @@
     [loadLowerTimerCounterButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [readTimerCounter1Button setEnabled:!locked && !lockedOrRunningMaintenance];
     [readTimerCounter2Button setEnabled:!locked && !lockedOrRunningMaintenance];
-
-
+	
+	
     [testRegText setEnabled:!locked && !lockedOrRunningMaintenance];
     [testRegStepper setEnabled:!locked && !lockedOrRunningMaintenance];
     [loadTestRegButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [readTestRegButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
-
+	
+	
     [softGTButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [syncClrButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [gtSyncClrButton setEnabled:!locked && !lockedOrRunningMaintenance];
@@ -338,15 +338,15 @@
     [requestSGTIDButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [readSGTIDButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [pollEventButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
-
+	
+	
     [latchGTID1Button setEnabled:!locked && !lockedOrRunningMaintenance];
     [latchGTID2Button setEnabled:!locked && !lockedOrRunningMaintenance];
     [latchClock1Button setEnabled:!locked && !lockedOrRunningMaintenance];
     [latchClock2Button setEnabled:!locked && !lockedOrRunningMaintenance];
     [latchLiveTimeButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
-
+	
+	
     [resetAlteraButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [resetClockButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [resetErrorButton setEnabled:!locked && !lockedOrRunningMaintenance];
@@ -354,9 +354,9 @@
     [resetGT2Button setEnabled:!locked && !lockedOrRunningMaintenance];
     [resetMSAMButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [resetLiveTimeButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [dumpLiveTimeButton setEnabled:!locked && !lockedOrRunningMaintenance && ![model liveTimeCalcRunning]];
-
+	
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -555,19 +555,20 @@
 
 - (IBAction) boardIDAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"%@\n",[model boardIdString]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board ID FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nRead of Trigger Card Board ID FAILED", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) readStatusAction:(id)sender
 {
-    NS_DURING
+    @try {
         unsigned short status = [model readStatus];
         NSLog(@"---Trigger Board Status---\n");
         NSLog(@"Status Register : 0x%04x\n",status);
@@ -580,130 +581,140 @@
         NSLog(@"--------------------------\n");
         
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board Status FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nRead of Trigger Board Status FAILED", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) resetAlteraAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model reset];
         NSLog(@"Trigger Board Reset\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board FAILED", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) resetGT1Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model resetTrigger1GTStatusBit];
         NSLog(@"Reset Trigger Board %@ Event\n",[model trigger1Name]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board %@ Event FAILED.\n",[model trigger1Name]);
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board %@ Event FAILED", @"OK", nil, nil,
-            localException,[model trigger1Name]);
-    NS_ENDHANDLER
+						localException,[model trigger1Name]);
+    }
 }
 
 - (IBAction) resetGT2Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model resetTrigger2GTStatusBit];
         NSLog(@"Reset Trigger Board %@ Event\n",[model trigger2Name]);
         
-    NS_HANDLER
-         NSLog(@"Reset of Trigger Board %@ Event FAILED.\n",[model trigger2Name]);
+    }
+	@catch(NSException* localException) {
+		NSLog(@"Reset of Trigger Board %@ Event FAILED.\n",[model trigger2Name]);
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board %@ Event FAILED", @"OK", nil, nil,
-            localException,[model trigger2Name]);
-    NS_ENDHANDLER
+						localException,[model trigger2Name]);
+    }
 }
 
 
 - (IBAction) resetClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model resetClock];
         NSLog(@"Trigger Board Clock Reset\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board Clock FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Clock FAILED", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) resetErrorCountAction:(id)sender;
 {
-    NS_DURING
+    @try {
         [model resetCountError];
         NSLog(@"Trigger Board Error Count Bit Reset\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Error Count Bit FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Error Count Bit FAILED", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) resetMSAMAction:(id)sender;
 {
-    NS_DURING
+    @try {
         [model clearMSAM];
         NSLog(@"Trigger Board MSAM bit Reset\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger MSAM bit FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board MSAM bit FAILED", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 
 - (IBAction) loadGtIdAction:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model loadGTID:[model gtIdValue]];
         NSLog(@"Loaded Trigger Lower GTID: 0x%08x\n",[model gtIdValue]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to load Trigger Lower GTID: 0x%08x\n",[model gtIdValue]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower GTID: 0x%08x", @"OK", nil, nil,
-            localException,[model gtIdValue]);
-    NS_ENDHANDLER
+						localException,[model gtIdValue]);
+    }
 }
 
 - (IBAction) readGtId1Action:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Read Trigger %@ GTID: 0x%04x\n",[model trigger1Name],[model readTrigger1GTID]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to load Trigger Lower %@ GTID: 0x%04x\n",[model trigger1Name],[model gtIdValue]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 1\n", @"OK", nil, nil,
-            localException,[model trigger1Name]);
-    NS_ENDHANDLER
+						localException,[model trigger1Name]);
+    }
 }
 
 
 - (IBAction) readGtId2Action:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Read Trigger Lower %@ GTID: 0x%04x\n",[model trigger2Name],[model readTrigger2GTID]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to load Trigger %@ GTID: 0x%04x\n",[model trigger2Name],[model gtIdValue]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 2\n", @"OK", nil, nil,
-            localException,[model trigger2Name]);
-    NS_ENDHANDLER
+						localException,[model trigger2Name]);
+    }
 }
 
 
@@ -718,28 +729,30 @@
 
 - (IBAction) loadTestRegAction:(id)sender
 {
-    NS_DURING        
-	[self endEditing];
+    @try {        
+		[self endEditing];
         [model loadTestRegister:[model testRegisterValue]];
         NSLog(@"Loaded Trigger test register: 0x%04x\n",[model testRegisterValue]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to load Trigger test register\n");
         NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger test register\n", @"OK", nil, nil,
-            localException,[model trigger2Name]);
-    NS_ENDHANDLER
+						localException,[model trigger2Name]);
+    }
 }
 
 - (IBAction) readTestRegAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Read Trigger test register: 0x%04x\n",[model readTestRegister]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to read Trigger test register\n");
         NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger test register\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 
@@ -758,80 +771,86 @@
 
 - (IBAction) loadLowerClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model loadLowerTimerCounter:[model lowerTimeValue]];
         NSLog(@"Loaded trigger lower clock 0x%04x\n",[model lowerTimeValue]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to load trigger lower clock: 0x%04x\n",[model lowerTimeValue]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger lower clock: 0x%04x", @"OK", nil, nil,
-            localException,[model lowerTimeValue]);
-    NS_ENDHANDLER
+						localException,[model lowerTimeValue]);
+    }
     
 }
 
 - (IBAction) loadUpperClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model loadUpperTimerCounter:[model upperTimeValue]];
         NSLog(@"Loaded trigger upper clock 0x%04x\n",[model upperTimeValue]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to load trigger upper clock: 0x%04x\n",[model upperTimeValue]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to load trigger upper clock: 0x%04x", @"OK", nil, nil,
-            localException,[model upperTimeValue]);
-    NS_ENDHANDLER
+						localException,[model upperTimeValue]);
+    }
 }
 
 - (IBAction) readLowerTrigger1ClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Read trigger %@ lower clock: 0x%04x\n",[model trigger1Name],[model readLowerTrigger1Time]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to read trigger %@ lower clock\n",[model trigger1Name]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger %@ lower clock", @"OK", nil, nil,
-            localException,[model trigger1Name]);
-    NS_ENDHANDLER
+						localException,[model trigger1Name]);
+    }
 }
 
 - (IBAction) readUpperTrigger1ClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Read Trigger %@ Upper clock: 0x%04x\n",[model trigger1Name],[model readUpperTrigger1Time]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to read trigger %@ upper clock\n",[model trigger1Name]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger %@ pper clock", @"OK", nil, nil,
-            localException,[model trigger1Name]);
-    NS_ENDHANDLER
+						localException,[model trigger1Name]);
+    }
 }
 
 
 - (IBAction) readLowerTrigger2ClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Read trigger %@ lower clock: 0x%04x\n",[model trigger2Name],[model readLowerTrigger2Time]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to read trigger %@ lower clock\n",[model trigger2Name]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger %@ lower clock", @"OK", nil, nil,
-            localException,[model trigger2Name]);
-    NS_ENDHANDLER
+						localException,[model trigger2Name]);
+    }
 }
 
 - (IBAction) readUpperTrigger2ClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Read Trigger %@ Upper clock: 0x%04x\n",[model trigger2Name],[model readUpperTrigger2Time]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to read trigger %@  clock\n",[model trigger2Name]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger %@ clock", @"OK", nil, nil,
-            localException,[model trigger2Name]);
-    NS_ENDHANDLER
+						localException,[model trigger2Name]);
+    }
 }
 
 - (IBAction) readTrigger1ClockAction:(id)sender
@@ -849,27 +868,29 @@
 
 - (IBAction) latchTrigger1ClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Test Latch Trigger %@ clock: 0x%04x\n",[model trigger1Name]);
         [model testLatchTrigger1Time];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to test latch trigger %@ clock\n",[model trigger1Name]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to test latch Trigger %@ clock", @"OK", nil, nil,
-            localException,[model trigger1Name]);
-    NS_ENDHANDLER
+						localException,[model trigger1Name]);
+    }
 }
 
 - (IBAction) latchTrigger2ClockAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Test Latch Trigger %@ clock: 0x%04x\n",[model trigger2Name]);
         [model testLatchTrigger2Time];
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to test latch trigger %@ clock\n",[model trigger2Name]);
         NSRunAlertPanel([localException name], @"%@\nFAILED to test latch Trigger %@ clock", @"OK", nil, nil,
-            localException,[model trigger2Name]);
-    NS_ENDHANDLER
+						localException,[model trigger2Name]);
+    }
 }
 
 - (IBAction) useMSAMAction:(id)sender
@@ -925,140 +946,150 @@
 
 - (IBAction) softGtAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model softGT];
         NSLog(@"Trigger card soft gt.\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to send soft GT to trigger card.\n");
         NSRunAlertPanel([localException name], @"%@\nSoft GT FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) gtSyncClrAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model softGTSyncClear];
         NSLog(@"Trigger card soft GT sync clear.\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to GT sync clear trigger card.\n");
         NSRunAlertPanel([localException name], @"%@\nGT Sync Clear FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) syncClrAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model syncClear];
         NSLog(@"Trigger card sync clear.\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to sync clear trigger card.\n");
         NSRunAlertPanel([localException name], @"%@\nSync Clear FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) latchGtid1Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model testLatchTrigger1GTID];
         NSLog(@"Trigger Card Latch %@ GTID.\n",[model trigger1Name]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to latch trigger card %@ GTID.\n",[model trigger1Name]);
         NSRunAlertPanel([localException name], @"%@\n%@ GTID Latch FAILED\n", @"OK", nil, nil,
-            localException,[model trigger1Name]);
-    NS_ENDHANDLER
+						localException,[model trigger1Name]);
+    }
 }
 
 - (IBAction) latchGtid2Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model testLatchTrigger2GTID];
         NSLog(@"Trigger Card Latch %@ GTID.\n",[model trigger2Name]);
         
-    NS_HANDLER
-       NSLog(@"FAILED to latch trigger card %@ GTID.\n",[model trigger2Name]);
+    }
+	@catch(NSException* localException) {
+		NSLog(@"FAILED to latch trigger card %@ GTID.\n",[model trigger2Name]);
         NSRunAlertPanel([localException name], @"%@\n%@ GTID Latch FAILED\n", @"OK", nil, nil,
-            localException,[model trigger2Name]);
-    NS_ENDHANDLER
+						localException,[model trigger2Name]);
+    }
 }
 
 - (IBAction) syncClr24Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model syncClear24];
         NSLog(@"Trigger Card Sync Clear 24.\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to sync clear 24 trigger card.\n");
         NSRunAlertPanel([localException name], @"%@\nSync Clear 24 FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 /*
-- (IBAction) latchClkAction:(id)sender
-{
-    NS_DURING
-        [model testLatchVmeClockCount];
-        NSLog(@"Trigger Card Latch Clock.\n");
-        
-    NS_HANDLER
-        NSLog(@"FAILED to latch clock on trigger card.\n");
-        NSRunAlertPanel([localException name], @"%@\nLatch Clock FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
-    
-}
-*/
+ - (IBAction) latchClkAction:(id)sender
+ {
+ @try {
+ [model testLatchVmeClockCount];
+ NSLog(@"Trigger Card Latch Clock.\n");
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"FAILED to latch clock on trigger card.\n");
+ NSRunAlertPanel([localException name], @"%@\nLatch Clock FAILED\n", @"OK", nil, nil,
+ localException);
+ }
+ 
+ }
+ */
 
 - (IBAction) initAction:(id)sender
 {
-    NS_DURING
-	[self endEditing];
-	[model initBoard];
-    NS_HANDLER
+    @try {
+		[self endEditing];
+		[model initBoard];
+    }
+	@catch(NSException* localException) {
         NSLog(@"Trigger card init sequence FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nTrigger Card Init FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER 
+						localException);
+    } 
 }
 
 - (IBAction) requestSGTIDAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model requestSoftGTID];
         NSLog(@"Trigger 32 Request Soft GTID.\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED Trigger 32 Card Request Soft GTID.\n");
         NSRunAlertPanel([localException name], @"%@\nRequest Soft GTID FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 
 - (IBAction) readSGTIDAction:(id)sender
 {
-    NS_DURING
+    @try {
         NSLog(@"Trigger 32 Soft GTID Register: 0x%08x\n",[model readSoftGTIDRegister]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED Trigger Card Read Soft GTID.\n");
         NSRunAlertPanel([localException name], @"%@\nRead Soft GTID FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 
 - (IBAction) testPollSeqAction:(id)sender
 {
-    NS_DURING
+    @try {
         unsigned short statusReg = [model readStatus];
         if([model eventBit1Set:statusReg] || [model eventBit2Set:statusReg]){
             NSLog(@"********************************\n");
@@ -1068,30 +1099,31 @@
             NSLog(@"SoftGT\n");
             statusReg = [model readStatus];
             if([model validEvent1GtBitSet:statusReg]){
-		NSLog(@"----%@----\n",[model trigger1Name]);
-		NSLog(@"GTID       : 0x%0x\n",	[model readTrigger1GTID]);
+				NSLog(@"----%@----\n",[model trigger1Name]);
+				NSLog(@"GTID       : 0x%0x\n",	[model readTrigger1GTID]);
                 NSLog(@"Lower Clock: 0x%0x\n",	[model readLowerTrigger1Time]);
                 NSLog(@"Upper Clock: 0x%0x\n",	[model readUpperTrigger1Time]);
                 [model resetTrigger1GTStatusBit];
                 NSLog(@"Reset %@ GtEvent\n",[model trigger1Name]);
             }
             if([model validEvent2GtBitSet:statusReg]){
-		NSLog(@"----%@----\n",[model trigger2Name]);
-		NSLog(@"GTID       : 0x%0x\n",	[model readTrigger2GTID]);
-		NSLog(@"Lower Clock: 0x%0x\n",	[model readLowerTrigger2Time]);
+				NSLog(@"----%@----\n",[model trigger2Name]);
+				NSLog(@"GTID       : 0x%0x\n",	[model readTrigger2GTID]);
+				NSLog(@"Lower Clock: 0x%0x\n",	[model readLowerTrigger2Time]);
                 NSLog(@"Upper Clock: 0x%0x\n",	[model readUpperTrigger2Time]);
-		[model resetTrigger2GTStatusBit];
+				[model resetTrigger2GTStatusBit];
                 NSLog(@"Reset %@ GtEvent\n",[model trigger2Name]);
             }
             NSLog(@"********************************\n");
         }
         else NSLog(@"no event\n");
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Test Poll sequence FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nTest Poll FAILED\n", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
     
 }
 

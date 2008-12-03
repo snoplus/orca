@@ -45,57 +45,57 @@
 #pragma mark ¥¥¥Static Declarations
 //offsets from the base address (kDefaultBaseAddress)
 static unsigned long register_offsets[kNumberOfADCSRegisters] = {
-    0x1f,		// [0]  kConversionStatusRegister
-    0x1d,		// [1]	kModeSelectRegister
-    0x1b,		// [2]  kThresholdAddressRegister
-    0x13,		// [3]  kGain1Register
-    0x19,		// [4]  kThresholdReadRegister
-    0x03,		// [5]  kFastClearRegister
-    0x01,		// [6]	kResetRegister
-    0x09,		// [7]  kScalerEnableRegister
-    0x0f,		// [8]	kScalerSelectionRegister
-    0x0b,		// [9]	kScalarClearRegister
-    0x0d,		// [10]	kDiscrimOutputEnableRegister
-    0x1f,		// [11]	kMiscRegister
-    0x00,		// [12]	kADC1OutputRegister
-    0x02,		// [13]	kADC2OutputRegister
-    0x04,		// [14]	kADC3OutputRegister
-    0x06,		// [15]	kADC4OutputRegister
-    0x08,		// [16]	kADC5OutputRegister
-    0x0a,		// [17]	kADC6OutputRegister
-    0x0c,		// [18]	kADC7OutputRegister
-    0x0e,		// [19]	kADC8OutputRegister
-    0x15,		// [20]	kGainWriteRegister
-    0x31,		// [21] kGainReadRegister
-    0x07,		// [22] kThreshold_1_4_Register
-    0x05,		// [23] kThreshold_5_8_Register
-    0x33,		// [24] kThresholdConversionRegister
-    0x12,		// [25] kOverAllCounter1
-    0x14,		// [26] kOverAllCounter2
-    0x20,		// [27] kScaler1
-    0x22,		// [28] kScaler2
-    0x24,		// [29] kScaler3
-    0x26,		// [30] kScaler4
-    0x28,		// [31] kScaler5
-    0x2a,		// [32] kScaler6
-    0x2c,		// [33] kScaler7
-    0x2e,		// [34] kScaler8
-    0x10,		// [35]	kBoardIdRegister
-    0x1b,		// [36] kDacAddressMonitor
-    0x16,		// [37] kFloatingCounterMonitor
+0x1f,		// [0]  kConversionStatusRegister
+0x1d,		// [1]	kModeSelectRegister
+0x1b,		// [2]  kThresholdAddressRegister
+0x13,		// [3]  kGain1Register
+0x19,		// [4]  kThresholdReadRegister
+0x03,		// [5]  kFastClearRegister
+0x01,		// [6]	kResetRegister
+0x09,		// [7]  kScalerEnableRegister
+0x0f,		// [8]	kScalerSelectionRegister
+0x0b,		// [9]	kScalarClearRegister
+0x0d,		// [10]	kDiscrimOutputEnableRegister
+0x1f,		// [11]	kMiscRegister
+0x00,		// [12]	kADC1OutputRegister
+0x02,		// [13]	kADC2OutputRegister
+0x04,		// [14]	kADC3OutputRegister
+0x06,		// [15]	kADC4OutputRegister
+0x08,		// [16]	kADC5OutputRegister
+0x0a,		// [17]	kADC6OutputRegister
+0x0c,		// [18]	kADC7OutputRegister
+0x0e,		// [19]	kADC8OutputRegister
+0x15,		// [20]	kGainWriteRegister
+0x31,		// [21] kGainReadRegister
+0x07,		// [22] kThreshold_1_4_Register
+0x05,		// [23] kThreshold_5_8_Register
+0x33,		// [24] kThresholdConversionRegister
+0x12,		// [25] kOverAllCounter1
+0x14,		// [26] kOverAllCounter2
+0x20,		// [27] kScaler1
+0x22,		// [28] kScaler2
+0x24,		// [29] kScaler3
+0x26,		// [30] kScaler4
+0x28,		// [31] kScaler5
+0x2a,		// [32] kScaler6
+0x2c,		// [33] kScaler7
+0x2e,		// [34] kScaler8
+0x10,		// [35]	kBoardIdRegister
+0x1b,		// [36] kDacAddressMonitor
+0x16,		// [37] kFloatingCounterMonitor
 };
 
 
 //all reg defs should come from ADCS
 static unsigned short kThreshWriteSelectionBits[8]={
-    0x00,	//sel VT1
-    0x01,	//sel VT2
-    0x02,	//sel VT3
-    0x03,	//sel VT4
-    0x00,	//sel VT5
-    0x04,	//sel VT6
-    0x08,	//sel VT7
-    0x0C	//sel VT8
+0x00,	//sel VT1
+0x01,	//sel VT2
+0x02,	//sel VT3
+0x03,	//sel VT4
+0x00,	//sel VT5
+0x04,	//sel VT6
+0x08,	//sel VT7
+0x0C	//sel VT8
 };
 
 
@@ -146,13 +146,13 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [self setBaseAddress:kDefaultBaseAddress];
     [self setAddressModifier:kDefaultAddressModifier];
 	[self setOnlineMask:0xff];
-
+	
 	[self setAdcRateGroup:[[[ORRateGroup alloc] initGroup:kNumShaperChannels groupTag:0] autorelease]];
 	[self setScalerRateGroup:[[[ORRateGroup alloc] initGroup:kNumShaperChannels groupTag:1] autorelease]];
 	
 	[adcRateGroup setIntegrationTime:5];
 	[scalerRateGroup setIntegrationTime:5];
-		
+	
 	
     [[self undoManager] enableUndoRegistration];
 	
@@ -198,8 +198,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [i release];
 	
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:OROrcaObjectImageChanged
-							  object:self];
+	 postNotificationName:OROrcaObjectImageChanged
+	 object:self];
 	
 }
 
@@ -225,8 +225,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     thresholds = someThresholds;
 	
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORShaperThresholdArrayChangedNotification
-					  object:self];
+	 postNotificationName:ORShaperThresholdArrayChangedNotification
+	 object:self];
 }
 
 - (NSMutableArray*) thresholdAdcs
@@ -243,8 +243,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     thresholdAdcs = someThresholdAdcs;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORShaperThresholdAdcArrayChangedNotification
-					  object:self];
+	 postNotificationName:ORShaperThresholdAdcArrayChangedNotification
+	 object:self];
 }
 
 - (NSMutableArray*) gains
@@ -261,8 +261,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     gains = someGains;
 	
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORShaperGainArrayChangedNotification
-					  object:self];
+	 postNotificationName:ORShaperGainArrayChangedNotification
+	 object:self];
 }
 
 -(unsigned short)threshold:(unsigned short) aChan
@@ -290,21 +290,21 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORShaperChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORShaperThresholdChangedNotification
-						  object:self
-						userInfo: userInfo];
-
+	 postNotificationName:ORShaperThresholdChangedNotification
+	 object:self
+	 userInfo: userInfo];
+	
 	
 	[self postAdcInfoProvidingValueChanged];
-						
+	
 }
 
 - (void) postAdcInfoProvidingValueChanged
 {
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORAdcInfoProvidingValueChanged
-						  object:self
-						userInfo: nil];
+	 postNotificationName:ORAdcInfoProvidingValueChanged
+	 object:self
+	 userInfo: nil];
 }
 
 
@@ -317,9 +317,9 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORShaperChan];
     
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORShaperThresholdAdcChangedNotification
-						  object:self
-						userInfo: userInfo];
+	 postNotificationName:ORShaperThresholdAdcChangedNotification
+	 object:self
+	 userInfo: userInfo];
 }
 
 
@@ -333,10 +333,10 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORShaperChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORShaperGainChangedNotification
-						  object:self
-						userInfo: userInfo];
-						
+	 postNotificationName:ORShaperGainChangedNotification
+	 object:self
+	 userInfo: userInfo];
+	
 	//ORAdcInfoProviding protocol requirement
 	[self postAdcInfoProvidingValueChanged];
 }
@@ -351,8 +351,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setContinous:[self continous]];
     continous = aValue;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORShaperContinousChangedNotification
-					  object:self];
+	 postNotificationName:ORShaperContinousChangedNotification
+	 object:self];
 }
 
 - (BOOL) scalersEnabled
@@ -366,8 +366,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setScalersEnabled:[self scalersEnabled]];
     scalersEnabled = aValue;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORShaperScalersEnabledChangedNotification
-					  object:self];
+	 postNotificationName:ORShaperScalersEnabledChangedNotification
+	 object:self];
 }
 
 - (BOOL) multiBoardEnabled
@@ -381,8 +381,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setMultiBoardEnabled:[self multiBoardEnabled]];
     multiBoardEnabled = aValue;
     [[NSNotificationCenter defaultCenter]
-	    postNotificationName:ORShaperMultiBoardEnabledChangedNotification
-					  object:self];
+	 postNotificationName:ORShaperMultiBoardEnabledChangedNotification
+	 object:self];
 	
 }
 
@@ -420,8 +420,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setScalerMask:[self scalerMask]];
     scalerMask = aScalerMask;
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORShaperScalerMaskChangedNotification
-							  object:self];
+	 postNotificationName:ORShaperScalerMaskChangedNotification
+	 object:self];
 }
 
 - (unsigned char)onlineMask {
@@ -437,8 +437,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [self setUpImage];
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORShaperOnlineMaskChangedNotification
-							  object:self];
+	 postNotificationName:ORShaperOnlineMaskChangedNotification
+	 object:self];
 	
 }
 
@@ -468,8 +468,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 	[[[self undoManager] prepareWithInvocationTarget:self] setScanStart:[self scanStart]];
     scanStart = value;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORShaperScanStartChangedNotification
-					  object:self];
+	 postNotificationName:ORShaperScanStartChangedNotification
+	 object:self];
 }
 
 - (unsigned long) scanDelta
@@ -482,8 +482,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 	[[[self undoManager] prepareWithInvocationTarget:self] setScanDelta:[self scanDelta]];
     scanDelta = value;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORShaperScanDeltaChangedNotification
-					  object:self];
+	 postNotificationName:ORShaperScanDeltaChangedNotification
+	 object:self];
 }
 
 - (unsigned short) scanNumber
@@ -498,8 +498,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setScanNumber:[self scanNumber]];
     scanNumber = value;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORShaperScanNumChangedNotification
-					  object:self];    
+	 postNotificationName:ORShaperScanNumChangedNotification
+	 object:self];    
 }
 
 - (id) rateObject:(int)channel
@@ -518,8 +518,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 	adcRateGroup = newAdcRateGroup;
 	
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORShaperRateGroupChangedNotification
-					  object:self];    
+	 postNotificationName:ORShaperRateGroupChangedNotification
+	 object:self];    
 }
 
 
@@ -534,8 +534,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 	scalerRateGroup=newScalerRateGroup;
 	
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORShaperScalerGroupChangedNotification
-					  object:self];    
+	 postNotificationName:ORShaperScalerGroupChangedNotification
+	 object:self];    
 }
 
 
@@ -557,8 +557,8 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setDisplayRaw:displayRaw];
 	displayRaw=newDisplayRaw;
 	[[NSNotificationCenter defaultCenter]
-        postNotificationName:ORShaperDisplayRawChangedNotification
-					  object:self];    
+	 postNotificationName:ORShaperDisplayRawChangedNotification
+	 object:self];    
 }
 
 - (unsigned long) dataId { return dataId; }
@@ -1065,19 +1065,19 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORShaperDecoderForShaper",                    @"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:NO],                   @"variable",
-        [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
-        nil];
+								 @"ORShaperDecoderForShaper",                    @"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:NO],                   @"variable",
+								 [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Shaper"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORShaperDecoderForScalers",			    @"decoder",
-        [NSNumber numberWithLong:scalerDataId],     @"dataId",
-        [NSNumber numberWithBool:YES],              @"variable",
-        [NSNumber numberWithLong:-1],               @"length",
-        nil];
+				   @"ORShaperDecoderForScalers",			    @"decoder",
+				   [NSNumber numberWithLong:scalerDataId],     @"dataId",
+				   [NSNumber numberWithBool:YES],              @"variable",
+				   [NSNumber numberWithLong:-1],               @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"Scaler"];
     return dataDictionary;
 }
@@ -1086,11 +1086,11 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 {
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"Adc",								@"name",
-							[NSNumber numberWithLong:dataId],   @"dataId",
-							[NSNumber numberWithLong:8],		@"maxChannels",
-								nil];
-		
+				   @"Adc",								@"name",
+				   [NSNumber numberWithLong:dataId],   @"dataId",
+				   [NSNumber numberWithLong:8],		@"maxChannels",
+				   nil];
+	
 	[anEventDictionary setObject:aDictionary forKey:@"Shaper"];
 }
 
@@ -1134,7 +1134,7 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 	isRunning = YES;
 	
     NSString* errorLocation = @"";
-    NS_DURING
+    @try {
 		unsigned char theConversionMask = 0;
 		errorLocation = @"Reading Conversion Mask";
 		[controller readByteBlock:&theConversionMask
@@ -1182,11 +1182,12 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
 				}
 			}
 		}
-		NS_HANDLER
-			NSLogError(@"",@"Shaper Card Error",errorLocation,nil);
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"Shaper Card Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 
@@ -1333,7 +1334,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 	
     [self setAdcRateGroup:[decoder decodeObjectForKey:ORShaperAdcRateGroup]];
     [self setDisplayRaw:[decoder decodeBoolForKey:ORShaperDisplayRaw]];
-		
+	
     if(!adcRateGroup){
 	    [self setAdcRateGroup:[[[ORRateGroup alloc] initGroup:kNumShaperChannels groupTag:0] autorelease]];
 	    [adcRateGroup setIntegrationTime:5];
@@ -1393,7 +1394,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
     [objDictionary setObject:[NSNumber numberWithBool:scalersEnabled] forKey:@"scalersEnabled"];
     [objDictionary setObject:[NSNumber numberWithBool:multiBoardEnabled] forKey:@"multiBoardEnabled"];
     
-    NS_DURING
+    @try {
         unsigned short aValue;
         [[self adapter] readWordBlock:&aValue
                             atAddress:[self baseAddress]+register_offsets[kBoardIdRegister]
@@ -1405,10 +1406,11 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
         [objDictionary setObject:[NSNumber numberWithInt:[self decodeBoardType:aValue]]  forKey:@"Type"];
         [objDictionary setObject:[NSNumber numberWithInt:[self decodeBoardRev:aValue]]   forKey:@"Rev"];
         
-    NS_HANDLER
-        NS_ENDHANDLER
-        
-        return objDictionary;
+    }
+	@catch(NSException* localException) {
+	}
+	
+	return objDictionary;
 }
 
 #pragma mark ¥¥¥Specialized storage methods
@@ -1429,11 +1431,12 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 		[self setGains:[unarchiver decodeObjectForKey:@"Shaper Gains"]];
 		[unarchiver finishDecoding];
 		[unarchiver release];
-		NS_DURING
+		@try {
 			[self initBoard];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLog(@"Restore of Shaper Gains FAILED.\n");
-		NS_ENDHANDLER
+		}
 	}
 }
 
@@ -1454,11 +1457,12 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 		[self setThresholds:[unarchiver decodeObjectForKey:@"Shaper Thresholds"]];
 		[unarchiver finishDecoding];
 		[unarchiver release];
-		NS_DURING
+		@try {
 			[self initBoard];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLog(@"Restore of Shaper Thresholds FAILED.\n");
-		NS_ENDHANDLER
+		}
 	}
 }
 
@@ -1468,7 +1472,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
     NSLog(@"Scanning for %d Shaper Boards starting @ 0x%04x inc of 0x%04x\n",scanNumber,scanStart,scanDelta);
     unsigned long anAddress;
     for(anAddress = scanStart;anAddress<scanStart+(scanDelta*scanNumber);anAddress+=scanDelta){
-        NS_DURING
+        @try {
 			unsigned short aValue = 0;
 			[[self adapter] readWordBlock:&aValue
 								atAddress:anAddress+register_offsets[kBoardIdRegister]
@@ -1483,9 +1487,10 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 			
 			NSLog(@"<0x%04x>  %@\n",anAddress,[NSString stringWithFormat:@"id:%d type:%d rev:%d name:%@",id,type,rev,name]);
 			
-        NS_HANDLER
+        }
+		@catch(NSException* localException) {
             NSLog(@"<0x%04x>  ----\n",anAddress);            
-        NS_ENDHANDLER
+        }
     }
 }
 
@@ -1613,7 +1618,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
     if([self scalersEnabled] && [self scalerMask]){
         unsigned long dataWord[16]; 
         int index;
-        NS_DURING
+        @try {
             //create the crate card info (used twice below)
             unsigned long crateAndCard 	= ([self crateNumber]&0x0000000f)<<25 | ([self slot]& 0x0000001f)<<20;
 			
@@ -1635,8 +1640,9 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
             dataWord[0] = scalerDataId | (index & kLongFormLengthMask);
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																object:[NSData dataWithBytes:dataWord length:index*sizeof(long)]];
-        NS_HANDLER
-            NS_ENDHANDLER
+        }
+		@catch(NSException* localException) {
+		}
     }
 }
 - (BOOL) partOfEvent:(unsigned short)aChannel

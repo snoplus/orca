@@ -27,7 +27,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"Trigger"];
-
+	
     return self;
 }
 
@@ -77,165 +77,165 @@
 }
 
 /*
-- (NSTextField*)  vmeClkLowerText
-{
-	return vmeClkLowerText;
-}
-
-- (NSStepper*)  vmeClkLowerStepper
-{
-	return vmeClkLowerStepper;
-}
-
-- (NSTextField*)  vmeClkMiddleText
-{
-	return vmeClkMiddleText;
-}
-
-- (NSStepper*)  vmeClkMiddleStepper
-{
-	return vmeClkMiddleStepper;
-}
-
-- (NSTextField*)  vmeClkUpperText
-{
-	return vmeClkUpperText;
-}
-
-- (NSStepper*)  vmeClkUpperStepper
-{
-	return vmeClkUpperStepper;
-}
-*/
+ - (NSTextField*)  vmeClkLowerText
+ {
+ return vmeClkLowerText;
+ }
+ 
+ - (NSStepper*)  vmeClkLowerStepper
+ {
+ return vmeClkLowerStepper;
+ }
+ 
+ - (NSTextField*)  vmeClkMiddleText
+ {
+ return vmeClkMiddleText;
+ }
+ 
+ - (NSStepper*)  vmeClkMiddleStepper
+ {
+ return vmeClkMiddleStepper;
+ }
+ 
+ - (NSTextField*)  vmeClkUpperText
+ {
+ return vmeClkUpperText;
+ }
+ 
+ - (NSStepper*)  vmeClkUpperStepper
+ {
+ return vmeClkUpperStepper;
+ }
+ */
 
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
+	
     [super registerNotificationObservers];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(slotChanged:)
-		    name : ORVmeCardSlotChangedNotification
-	    object : model];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(baseAddressChanged:)
-		    name : ORVmeIOCardBaseAddressChangedNotification
-	    object : model];
-
-
-    [notifyCenter addObserver : self
-	    selector : @selector(gtidLowerChanged:)
-		    name : ORTriggerGtidLowerChangedNotification
-	    object : model];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(gtidUpperChanged:)
-		    name : ORTriggerGtidUpperChangedNotification
-	    object : model];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(shipEvt1ClkChanged:)
-		    name : ORTriggerShipEvt1ClkChangedNotification
-	    object : model];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(shipEvt2ClkChanged:)
-		    name : ORTriggerShipEvt2ClkChangedNotification
-	    object : model];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(gtErrorCountChanged:)
-		    name : ORTriggerShipGtErrorCountChangedNotification
-	    object : model];
-
-
-    [notifyCenter addObserver : self
-	    selector : @selector(initMultiBoardChanged:)
-		    name : ORTriggerInitMultiBoardChangedNotification
-	    object : model];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(initTrig2Changed:)
-		    name : ORTriggerInitTrig2ChangedNotification
-	    object : model];
-
-
-    [notifyCenter addObserver : self
-	    selector : @selector(useSoftwareGtIdChanged:)
-		    name : ORTriggerUseSoftwareGtIdChangedNotification
-	    object : model];
-
-    [notifyCenter addObserver : self
-	      selector : @selector(useNoHardwareChanged:)
-		  name : ORTriggerUseNoHardwareChangedNotification
-		object : model];
-
-
-    [notifyCenter addObserver : self
-	    selector : @selector(softwareGtIdChanged:)
-		    name : ORTriggerSoftwareGtIdChangedNotification
-	    object : model];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(runStatusChanged:)
-		    name : ORRunStatusChangedNotification
-	    object : nil];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(trigger1NameChanged:)
-		    name : ORTrigger1NameChangedNotification
-	    object : nil];
-
-    [notifyCenter addObserver : self
-	    selector : @selector(trigger2NameChanged:)
-		    name : ORTrigger2NameChangedNotification
-	    object : nil];
-
-    [notifyCenter addObserver : self
-	selector : @selector(settingsLockChanged:)
-	name : ORRunStatusChangedNotification
-	object : nil];
-
-    [notifyCenter addObserver : self
-	selector : @selector(settingsLockChanged:)
-	name : ORTriggerSettingsLock
-	object: nil];
-
-    [notifyCenter addObserver : self
-	selector : @selector(specialLockChanged:)
-	name : ORRunStatusChangedNotification
-	object : nil];
-
-    [notifyCenter addObserver : self
-	selector : @selector(specialLockChanged:)
-	name : ORTriggerSpecialLock
-	object: nil];
 	
     [notifyCenter addObserver : self
-	selector : @selector(useMSAMChanged:)
-	name : ORTriggerMSAMChangedNotification
-	object: nil];
-        
-        
-/*	[notifyCenter addObserver : self
-                selector : @selector(vmeClkLowerChanged:)
-                    name : ORTriggerVmeClkLowerChangedNotification
-                object : model];
-        
-        [notifyCenter addObserver : self
-                selector : @selector(vmeClkMiddleChanged:)
-                        name : ORTriggerVmeClkMiddleChangedNotification
-                object : model];
-        
-        [notifyCenter addObserver : self
-                selector : @selector(vmeClkUpperChanged:)
-                        name : ORTriggerVmeClkUpperChangedNotification
-                object : model];
-        */	
+					 selector : @selector(slotChanged:)
+						 name : ORVmeCardSlotChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(baseAddressChanged:)
+						 name : ORVmeIOCardBaseAddressChangedNotification
+					   object : model];
+	
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(gtidLowerChanged:)
+						 name : ORTriggerGtidLowerChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(gtidUpperChanged:)
+						 name : ORTriggerGtidUpperChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(shipEvt1ClkChanged:)
+						 name : ORTriggerShipEvt1ClkChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(shipEvt2ClkChanged:)
+						 name : ORTriggerShipEvt2ClkChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(gtErrorCountChanged:)
+						 name : ORTriggerShipGtErrorCountChangedNotification
+					   object : model];
+	
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(initMultiBoardChanged:)
+						 name : ORTriggerInitMultiBoardChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(initTrig2Changed:)
+						 name : ORTriggerInitTrig2ChangedNotification
+					   object : model];
+	
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(useSoftwareGtIdChanged:)
+						 name : ORTriggerUseSoftwareGtIdChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(useNoHardwareChanged:)
+						 name : ORTriggerUseNoHardwareChangedNotification
+					   object : model];
+	
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(softwareGtIdChanged:)
+						 name : ORTriggerSoftwareGtIdChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(runStatusChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(trigger1NameChanged:)
+						 name : ORTrigger1NameChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(trigger2NameChanged:)
+						 name : ORTrigger2NameChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(settingsLockChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(settingsLockChanged:)
+						 name : ORTriggerSettingsLock
+						object: nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(specialLockChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(specialLockChanged:)
+						 name : ORTriggerSpecialLock
+						object: nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(useMSAMChanged:)
+						 name : ORTriggerMSAMChangedNotification
+						object: nil];
+	
+	
+	/*	[notifyCenter addObserver : self
+	 selector : @selector(vmeClkLowerChanged:)
+	 name : ORTriggerVmeClkLowerChangedNotification
+	 object : model];
+	 
+	 [notifyCenter addObserver : self
+	 selector : @selector(vmeClkMiddleChanged:)
+	 name : ORTriggerVmeClkMiddleChangedNotification
+	 object : model];
+	 
+	 [notifyCenter addObserver : self
+	 selector : @selector(vmeClkUpperChanged:)
+	 name : ORTriggerVmeClkUpperChangedNotification
+	 object : model];
+	 */	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -260,7 +260,7 @@
     [self settingsLockChanged:nil];
     [self specialLockChanged:nil];
     [self useMSAMChanged:nil];
-
+	
     //[self vmeClkLowerChanged:nil];
     //[self vmeClkMiddleChanged:nil];
     //[self vmeClkUpperChanged:nil];
@@ -281,28 +281,28 @@
     NSString* key = [NSString stringWithFormat: @"orca.ORTrigger%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-
+	
 }
 
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORTriggerSettingsLock];
     BOOL locked = [gSecurity isLocked:ORTriggerSettingsLock];
-
+	
     [settingLockButton setState: locked];
     [addressStepper setEnabled:!locked && !runInProgress];
     [addressText setEnabled:!locked && !runInProgress];
     [trigger1NameField setEnabled:!locked && !runInProgress];
     [trigger2NameField setEnabled:!locked && !runInProgress];
-
+	
     [initTrig2CB setEnabled:!locked && !lockedOrRunningMaintenance];
     [initMultiBoardCB setEnabled:!locked && !lockedOrRunningMaintenance];
     [shipEvt1ClkButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [shipEvt2ClkButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [alteraRegButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [gtid1Button setEnabled:!locked && !lockedOrRunningMaintenance];
     [gtid2Button setEnabled:!locked && !lockedOrRunningMaintenance];
@@ -312,32 +312,32 @@
     [disableMultiBoardButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [enableTrig2InhibButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [disableTrig2InhibButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [useMSAMCB setEnabled:!locked && !lockedOrRunningMaintenance];
-
-   
+	
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-	if(runInProgress && ![gSecurity isLocked:ORTriggerSettingsLock])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:ORTriggerSettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingLockDocField setStringValue:s];
-
+	
 }
 
 - (void) specialLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORTriggerSpecialLock];
     BOOL locked = [gSecurity isLocked:ORTriggerSpecialLock];
-
+	
     [specialLockButton setState: locked];
-
+	
     [gtidLowerText setEnabled:!locked && !lockedOrRunningMaintenance];
     [gtidLowerStepper setEnabled:!locked && !lockedOrRunningMaintenance];
     [gtidUpperText setEnabled:!locked && !lockedOrRunningMaintenance];
     [gtidUpperStepper setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [loadLowerGTIDButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [loadUpperGTIDButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [readLowerGTID1Button setEnabled:!locked && !lockedOrRunningMaintenance];
@@ -353,13 +353,13 @@
     [pollEventButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [useSoftwareGtIdCB setEnabled:!locked && !lockedOrRunningMaintenance];
     [useNoHardwareCB setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-	if(runInProgress && ![gSecurity isLocked:ORTriggerSettingsLock])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:ORTriggerSettingsLock])s = @"Not in Maintenance Run.";
     }
     [specialLockDocField setStringValue:s];
-
+	
 }
 
 - (void) gtErrorCountChanged:(NSNotification*)aNotification
@@ -455,23 +455,23 @@
 
 
 /*- (void) vmeClkLowerChanged:(NSNotification*)aNotification
-{
-	[[self vmeClkLowerText] setIntValue: [model vmeClkLower]];
-	[self updateStepper:[self vmeClkLowerStepper] setting:[model vmeClkLower]];
-}
-
-- (void) vmeClkMiddleChanged:(NSNotification*)aNotification
-{
-	[[self vmeClkMiddleText] setIntValue: [model vmeClkMiddle]];
-	[self updateStepper:[self vmeClkMiddleStepper] setting:[model vmeClkMiddle]];
-}
-
-- (void) vmeClkUpperChanged:(NSNotification*)aNotification
-{
-	[[self vmeClkUpperText] setIntValue: [model vmeClkUpper]];
-	[self updateStepper:[self vmeClkUpperStepper] setting:[model vmeClkUpper]];
-}
-*/
+ {
+ [[self vmeClkLowerText] setIntValue: [model vmeClkLower]];
+ [self updateStepper:[self vmeClkLowerStepper] setting:[model vmeClkLower]];
+ }
+ 
+ - (void) vmeClkMiddleChanged:(NSNotification*)aNotification
+ {
+ [[self vmeClkMiddleText] setIntValue: [model vmeClkMiddle]];
+ [self updateStepper:[self vmeClkMiddleStepper] setting:[model vmeClkMiddle]];
+ }
+ 
+ - (void) vmeClkUpperChanged:(NSNotification*)aNotification
+ {
+ [[self vmeClkUpperText] setIntValue: [model vmeClkUpper]];
+ [self updateStepper:[self vmeClkUpperStepper] setting:[model vmeClkUpper]];
+ }
+ */
 #pragma mark ¥¥¥Actions
 
 - (IBAction) settingLockAction:(id) sender
@@ -508,49 +508,50 @@
 	}
 }
 /*
-- (IBAction) vmeClkLowerAction:(id)sender
-{
-	if([sender intValue] != [model vmeClkLower]){
-		[[self undoManager] setActionName: @"Set Lower VME Clk"];
-		[model setVmeClkLower:[sender intValue]];
-	}	
-}
-
-- (IBAction) vmeClkMiddleAction:(id)sender
-{
-	if([sender intValue] != [model vmeClkMiddle]){
-		[[self undoManager] setActionName: @"Set Middle VME Clk"];
-		[model setVmeClkMiddle:[sender intValue]];
-	}
-}
-
-- (IBAction) vmeClkUpperAction:(id)sender
-{
-	if([sender intValue] != [model vmeClkUpper]){
-		[[self undoManager] setActionName: @"Set Upper VME Clk"];
-		[model setVmeClkUpper:[sender intValue]];
-	}
-}
-
-*/
+ - (IBAction) vmeClkLowerAction:(id)sender
+ {
+ if([sender intValue] != [model vmeClkLower]){
+ [[self undoManager] setActionName: @"Set Lower VME Clk"];
+ [model setVmeClkLower:[sender intValue]];
+ }	
+ }
+ 
+ - (IBAction) vmeClkMiddleAction:(id)sender
+ {
+ if([sender intValue] != [model vmeClkMiddle]){
+ [[self undoManager] setActionName: @"Set Middle VME Clk"];
+ [model setVmeClkMiddle:[sender intValue]];
+ }
+ }
+ 
+ - (IBAction) vmeClkUpperAction:(id)sender
+ {
+ if([sender intValue] != [model vmeClkUpper]){
+ [[self undoManager] setActionName: @"Set Upper VME Clk"];
+ [model setVmeClkUpper:[sender intValue]];
+ }
+ }
+ 
+ */
 
 
 
 - (IBAction) boardIDAction:(id)sender
 {
-    NS_DURING
+    @try {
 		NSLog(@"%@\n",[model boardIdString]);
 		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board ID FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nRead of Trigger Card Board ID FAILED", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER	
+    }	
 }
 
 - (IBAction) statusReadAction:(id)sender
 {
-	NS_DURING
+	@try {
         unsigned short status = [model readStatus];
 		NSLog(@"---Trigger Board Status---\n");
         NSLog(@"Status Register : 0x%04x\n",status);
@@ -561,143 +562,154 @@
 		NSLog(@"Count Error     : %s\n",[model countErrorBitSet:status]?"true":"false");
 		//NSLog(@"Clock Enabled   : %s\n",[model clockEnabledBitSet:status]?"true":"false");
 		NSLog(@"--------------------------\n");
-			
-				
-    NS_HANDLER
+		
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board Status FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nRead of Trigger Board Status FAILED", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER	
+    }	
 }
 
 - (IBAction) resetAlteraAction:(id)sender
 {
-	NS_DURING
+	@try {
         [model reset];
         NSLog(@"Trigger Board Reset\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board FAILED", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER	
+    }	
 }
 
 - (IBAction) resetEvent1:(id)sender
 {
-	NS_DURING
+	@try {
         [model resetGtEvent1];
         NSLog(@"Reset Trigger Board Event 1\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board Event 1 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Event 1 FAILED", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) resetEvent2:(id)sender
 {
-	NS_DURING
+	@try {
         [model resetGtEvent2];
         NSLog(@"Reset Trigger Board Event 2\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board Event 2 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Event 2 FAILED", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 
 /*- (IBAction) resetClockAction:(id)sender
-{
-	NS_DURING
-		[model resetClock];
-		NSLog(@"Trigger Board Clock Reset\n");
-
-    NS_HANDLER
-		NSLog(@"Reset of Trigger Board Clock FAILED.\n");
-		NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Clock FAILED", @"OK", nil, nil,
-					localException);
-    NS_ENDHANDLER
-}
-*/
+ {
+ @try {
+ [model resetClock];
+ NSLog(@"Trigger Board Clock Reset\n");
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"Reset of Trigger Board Clock FAILED.\n");
+ NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board Clock FAILED", @"OK", nil, nil,
+ localException);
+ }
+ }
+ */
 - (IBAction) loadLowerGtidAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model loadLowerGtId:[model gtidLower]];
 		NSLog(@"Loaded Trigger Lower GTID: 0x%04x\n",[model gtidLower]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower GTID: 0x%04x\n",[model gtidLower]);
 		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower GTID: 0x%04x", @"OK", nil, nil,
-				  localException,[model gtidLower]);
-    NS_ENDHANDLER
+						localException,[model gtidLower]);
+    }
 }
 
 - (IBAction) loadUpperGtidAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model loadUpperGtId:[model gtidUpper]];
 		NSLog(@"Loaded Trigger Upper GTID: 0x%04x\n",[model gtidUpper]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Upper GTID: 0x%04x\n",[model gtidUpper]);
 		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper GTID: 0x%04x", @"OK", nil, nil,
-				  localException,[model gtidUpper]);
-    NS_ENDHANDLER	
+						localException,[model gtidUpper]);
+    }	
 }
 
 - (IBAction) readLowerGtid1Action:(id)sender
 {
-	NS_DURING
+	@try {
 		NSLog(@"Read Trigger Lower GTID 1: 0x%04x\n",[model readLowerEvent1GtId]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower GTID 1: %d\n",[model gtidLower]);
 		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 1\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) readUpperGtid1Action:(id)sender
 {
-	NS_DURING
+	@try {
 		NSLog(@"Read Trigger Upper GTID 1: 0x%04x\n",[model readUpperEvent1GtId]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to read Trigger Upper GTID 1\n");
 		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper GTID 1", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 
 - (IBAction) readLowerGtid2Action:(id)sender
 {
-	NS_DURING
+	@try {
 		NSLog(@"Read Trigger Lower GTID 2: 0x%04x\n",[model readLowerEvent2GtId]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower GTID 2: %d\n",[model gtidLower]);
 		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower GTID 2\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) readUpperGtid2Action:(id)sender
 {
-    NS_DURING
+    @try {
 		NSLog(@"Read Trigger Upper GTID 2: 0x%04x\n",[model readUpperEvent2GtId]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to read Trigger Upper GTID 2\n");
 		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper GTID 2", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 
@@ -715,92 +727,98 @@
 
 
 /*- (IBAction) loadLowerClockAction:(id)sender
-{
-	NS_DURING
-		[self endEditing];
-		[model loadLowerVmeClock:[model vmeClkLower]];
-		NSLog(@"Loaded Trigger Lower VME Clock 0x%04x\n",[model vmeClkLower]);
-
-    NS_HANDLER
-		NSLog(@"FAILED to load Trigger Lower VME Clock: 0x%04x\n",[model vmeClkLower]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower VME clock: 0x%04x", @"OK", nil, nil,
-				  localException,[model vmeClkLower]);
-    NS_ENDHANDLER
-	
-}
-
-- (IBAction) loadMiddleClockAction:(id)sender
-{
-	NS_DURING
-		[self endEditing];
-		[model loadMiddleVmeClock:[model vmeClkMiddle]];
-		NSLog(@"Loaded Trigger Middle VME Clock 0x%04x\n",[model vmeClkMiddle]);
-
-    NS_HANDLER
-		NSLog(@"FAILED to load Trigger Middle VME Clock: 0x%04x\n",[model vmeClkMiddle]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Middle VME clock: 0x%04x", @"OK", nil, nil,
-				  localException,[model vmeClkMiddle]);
-    NS_ENDHANDLER
-}
-
-- (IBAction) loadUpperClockAction:(id)sender
-{
-	NS_DURING
-		[self endEditing];
-		[model loadUpperVmeClock:[model vmeClkUpper]];
-		NSLog(@"Loaded Trigger Upper VME Clock 0x%04x\n",[model vmeClkUpper]);
-
-    NS_HANDLER
-		NSLog(@"FAILED to load Trigger Upper VME Clock: 0x%04x\n",[model vmeClkUpper]);
-		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper VME clock: 0x%04x", @"OK", nil, nil,
-				  localException,[model vmeClkUpper]);
-    NS_ENDHANDLER
-}
-
-- (IBAction) readLowerClockAction:(id)sender
-{
-	NS_DURING
-		NSLog(@"Read Trigger Lower VME clock: 0x%04x\n",[model readLowerVmeClock]);
-
-    NS_HANDLER
-		NSLog(@"FAILED to read Trigger Lower VME clock\n");
-		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower VME clock: 0x%0x", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
-}
-- (IBAction) readMiddleClockAction:(id)sender
-{
-	NS_DURING
-		NSLog(@"Read Trigger Middle VME clock: 0x%04x\n",[model readMiddleVmeClock]);
-
-    NS_HANDLER
-		NSLog(@"FAILED to read Trigger Middle VME clock\n");
-		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Middle VME clock: 0x%0x", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
-}
-
-- (IBAction) readUpperClockAction:(id)sender
-{
-	NS_DURING
-		NSLog(@"Read Trigger Upper VME clock: 0x%04x\n",[model readUpperVmeClock]);
-
-    NS_HANDLER
-		NSLog(@"FAILED to read Trigger Upper VME clock\n");
-		NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper VME clock: 0x%0x", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
-}
-
-- (IBAction) enableClockAction:(id)sender
-{
-	[self enableClock:YES];
-}
-- (IBAction) disableClockAction:(id)sender
-{
-	[self enableClock:NO];
-}
-*/
+ {
+ @try {
+ [self endEditing];
+ [model loadLowerVmeClock:[model vmeClkLower]];
+ NSLog(@"Loaded Trigger Lower VME Clock 0x%04x\n",[model vmeClkLower]);
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"FAILED to load Trigger Lower VME Clock: 0x%04x\n",[model vmeClkLower]);
+ NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower VME clock: 0x%04x", @"OK", nil, nil,
+ localException,[model vmeClkLower]);
+ }
+ 
+ }
+ 
+ - (IBAction) loadMiddleClockAction:(id)sender
+ {
+ @try {
+ [self endEditing];
+ [model loadMiddleVmeClock:[model vmeClkMiddle]];
+ NSLog(@"Loaded Trigger Middle VME Clock 0x%04x\n",[model vmeClkMiddle]);
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"FAILED to load Trigger Middle VME Clock: 0x%04x\n",[model vmeClkMiddle]);
+ NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Middle VME clock: 0x%04x", @"OK", nil, nil,
+ localException,[model vmeClkMiddle]);
+ }
+ }
+ 
+ - (IBAction) loadUpperClockAction:(id)sender
+ {
+ @try {
+ [self endEditing];
+ [model loadUpperVmeClock:[model vmeClkUpper]];
+ NSLog(@"Loaded Trigger Upper VME Clock 0x%04x\n",[model vmeClkUpper]);
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"FAILED to load Trigger Upper VME Clock: 0x%04x\n",[model vmeClkUpper]);
+ NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper VME clock: 0x%04x", @"OK", nil, nil,
+ localException,[model vmeClkUpper]);
+ }
+ }
+ 
+ - (IBAction) readLowerClockAction:(id)sender
+ {
+ @try {
+ NSLog(@"Read Trigger Lower VME clock: 0x%04x\n",[model readLowerVmeClock]);
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"FAILED to read Trigger Lower VME clock\n");
+ NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Lower VME clock: 0x%0x", @"OK", nil, nil,
+ localException);
+ }
+ }
+ - (IBAction) readMiddleClockAction:(id)sender
+ {
+ @try {
+ NSLog(@"Read Trigger Middle VME clock: 0x%04x\n",[model readMiddleVmeClock]);
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"FAILED to read Trigger Middle VME clock\n");
+ NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Middle VME clock: 0x%0x", @"OK", nil, nil,
+ localException);
+ }
+ }
+ 
+ - (IBAction) readUpperClockAction:(id)sender
+ {
+ @try {
+ NSLog(@"Read Trigger Upper VME clock: 0x%04x\n",[model readUpperVmeClock]);
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"FAILED to read Trigger Upper VME clock\n");
+ NSRunAlertPanel([localException name], @"%@\nFAILED to read Trigger Upper VME clock: 0x%0x", @"OK", nil, nil,
+ localException);
+ }
+ }
+ 
+ - (IBAction) enableClockAction:(id)sender
+ {
+ [self enableClock:YES];
+ }
+ - (IBAction) disableClockAction:(id)sender
+ {
+ [self enableClock:NO];
+ }
+ */
 - (IBAction) enableMultiBoardAction:(id)sender
 {
 	[self enableMultiBoard:YES];	
@@ -827,100 +845,107 @@
 
 - (IBAction) softGtAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model softGT];
 		NSLog(@"Trigger card soft gt.\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to send soft GT to trigger card.\n");
 		NSRunAlertPanel([localException name], @"%@\nSoft GT FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER	
+						localException);
+    }	
 }
 
 - (IBAction) gtSyncClrAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model softGTSyncClear];
 		NSLog(@"Trigger card soft GT sync clear.\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to GT sync clear trigger card.\n");
 		NSRunAlertPanel([localException name], @"%@\nGT Sync Clear FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) syncClrAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model syncClear];
 		NSLog(@"Trigger card sync clear.\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to sync clear trigger card.\n");
 		NSRunAlertPanel([localException name], @"%@\nSync Clear FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) latchGtid1Action:(id)sender
 {
-	NS_DURING
+	@try {
 		[model testLatchGtId1];
 		NSLog(@"Trigger Card Latch GTID 1.\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to latch trigger card GTID 1.\n");
 		NSRunAlertPanel([localException name], @"%@\nGTID 1 Latch FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) latchGtid2Action:(id)sender
 {
-	NS_DURING
+	@try {
 		[model testLatchGtId2];
 		NSLog(@"Trigger Card Latch GTID 2.\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to latch trigger card GTID 2.\n");
 		NSRunAlertPanel([localException name], @"%@\nGTID 2 Latch FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) syncClr24Action:(id)sender
 {
-	NS_DURING
+	@try {
 		[model syncClear24];
 		NSLog(@"Trigger Card Sync Clear 24.\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to sync clear 24 trigger card.\n");
 		NSRunAlertPanel([localException name], @"%@\nSync Clear 24 FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 /*
-- (IBAction) latchClkAction:(id)sender
-{
-	NS_DURING
-		[model testLatchVmeClockCount];
-		NSLog(@"Trigger Card Latch Clock.\n");
-
-    NS_HANDLER
-		NSLog(@"FAILED to latch clock on trigger card.\n");
-		NSRunAlertPanel([localException name], @"%@\nLatch Clock FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
-	
-}
-*/
+ - (IBAction) latchClkAction:(id)sender
+ {
+ @try {
+ [model testLatchVmeClockCount];
+ NSLog(@"Trigger Card Latch Clock.\n");
+ 
+ }
+ @catch(NSException* localException) {
+ NSLog(@"FAILED to latch clock on trigger card.\n");
+ NSRunAlertPanel([localException name], @"%@\nLatch Clock FAILED\n", @"OK", nil, nil,
+ localException);
+ }
+ 
+ }
+ */
 - (IBAction) testPollSeqAction:(id)sender
 {
-	NS_DURING
+	@try {
 		unsigned short statusReg = [model readStatus];
 		if([model eventBit1Set:statusReg] || [model eventBit2Set:statusReg]){
 			NSLog(@"********************************\n");
@@ -950,12 +975,13 @@
 			NSLog(@"********************************\n");
 		}
 		else NSLog(@"no event\n");
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Test Poll sequence FAILED.\n");
 		NSRunAlertPanel([localException name], @"%@\nTest Poll FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 	
 }
 
@@ -993,41 +1019,44 @@
 #pragma mark ¥¥¥Helper Methods
 - (void) enableClock:(BOOL)enable
 {
-    NS_DURING
+    @try {
         [model enableClock:enable];
         NSLog(@"%@ Trigger Clock\n",enable?@"Enabled":@"Disabled");
-    
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to %@ Clock.\n",enable?@"enable":@"disable");
         NSRunAlertPanel([localException name], @"%@\nFAILED to %@ Clock.\n", @"OK", nil, nil,
-                            localException,enable?@"enable":@"disable");
-    NS_ENDHANDLER
+						localException,enable?@"enable":@"disable");
+    }
 }
-    
+
 - (void) enableMultiBoard:(BOOL)enable
 {
-    NS_DURING
+    @try {
         [model enableMultiBoardOutput:enable];
         NSLog(@"%@ Trigger MultiBoard output\n",enable?@"Enabled":@"Disabled");
-    
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to %@ trigger multiboard output.\n",enable?@"enable":@"disable");
         NSRunAlertPanel([localException name], @"%@\nFAILED to %@ multiboard output.\n", @"OK", nil, nil,
-                            localException,enable?@"enable":@"disable");
-    NS_ENDHANDLER
+						localException,enable?@"enable":@"disable");
+    }
 }
 
 - (void) enableBusy:(BOOL)enable
 {
-    NS_DURING
+    @try {
         [model enableBusyOutput:enable];
         NSLog(@"%@ Trigger Busy\n",enable?@"Enabled":@"Disabled");
-    
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"FAILED to %@ trigger Busy.\n",enable?@"enable":@"disable");
         NSRunAlertPanel([localException name], @"%@\nFAILED to %@ Busy.\n", @"OK", nil, nil,
-                            localException,enable?@"enable":@"disable");
-    NS_ENDHANDLER
+						localException,enable?@"enable":@"disable");
+    }
 }
 
 

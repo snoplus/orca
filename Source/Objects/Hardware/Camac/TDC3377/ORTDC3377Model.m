@@ -104,7 +104,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 - (void) setTestsRunning:(BOOL)aTestsRunning
 {
     testsRunning = aTestsRunning;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelTestsRunningChanged object:self];
 }
 
@@ -120,7 +120,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [aTestingEnabled retain];
     [testingEnabled release];
     testingEnabled = aTestingEnabled;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelTestingEnabledChanged object:self];
 }
 
@@ -142,7 +142,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [aTestingStatus retain];
     [testingStatus release];
     testingStatus = aTestingStatus;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelTestingStatusChanged object:self];
 }
 
@@ -169,7 +169,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setDataShift:dataShift];
     
     dataShift = aDataShift;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelDataShiftChanged object:self];
 }
 
@@ -183,7 +183,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setPulsesToGenerate:pulsesToGenerate];
     
     pulsesToGenerate = aPulsesToGenerate;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelPulsesToGenerateChanged object:self];
 }
 
@@ -197,7 +197,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setTestClock:testClock];
     
     testClock = aTestClock;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelTestClockChanged object:self];
 }
 
@@ -211,7 +211,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setTestEnabled:testEnabled];
     
     testEnabled = aTestEnabled;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelTestEnabledChanged object:self];
 }
 
@@ -225,7 +225,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setTimeout:timeout];
     
     timeout = aTimeout;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelTimeoutChanged object:self];
 }
 
@@ -239,7 +239,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setDataOffset:dataOffset];
     
     dataOffset = aOffset;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelDataOffsetChanged object:self];
 }
 
@@ -253,7 +253,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setRequestDelay:requestDelay];
     
     requestDelay = aRequestDelay;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelRequestDelayChanged object:self];
 }
 
@@ -267,7 +267,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setMaxFullScaleTime:maxFullScaleTime];
     
     maxFullScaleTime = aMaxFullScaleTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelMaxFullScaleTimeChanged object:self];
 }
 
@@ -281,7 +281,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setMaxHitsPerTDC:maxHitsPerTDC];
     
     maxHitsPerTDC = aMaxHitsPerTDC;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelMaxHitsPerTDCChanged object:self];
 }
 
@@ -295,7 +295,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setFastFeraMode:fastFeraMode];
     
     fastFeraMode = aFastFeraMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelFastFeraModeChanged object:self];
 }
 
@@ -309,7 +309,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setPauseInterval:pauseInterval];
     
     pauseInterval = aPauseInterval;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelPauseIntervalChanged object:self];
 }
 
@@ -323,7 +323,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setClockUnit:clockUnit];
     
     clockUnit = aClockUnit;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelClockUnitChanged object:self];
 }
 
@@ -337,7 +337,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setPulseDelay:pulseDelay];
     
     pulseDelay = aPulseDelay;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelPulseDelayChanged object:self];
 }
 
@@ -351,7 +351,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setPulseWidth:pulseWidth];
     
     pulseWidth = aPulseWidth;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelPulseWidthChanged object:self];
 }
 
@@ -365,7 +365,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setSkipHeader:skipHeader];
     
     skipHeader = aSkipHeader;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelSkipHeaderChanged object:self];
 }
 
@@ -379,7 +379,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setMultiEventBufferMode:multiEventBufferMode];
     
     multiEventBufferMode = aMultiEventBufferMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelMultiEventBufferModeChanged object:self];
 }
 
@@ -393,7 +393,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setFeraMode:feraMode];
     
     feraMode = aFeraMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelFeraModeChanged object:self];
 }
 
@@ -407,7 +407,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setBothEdges:bothEdges];
     
     bothEdges = aBothEdges;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelBothEdgesChanged object:self];
 }
 
@@ -421,7 +421,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg5:controlReg5];
     
     controlReg5 = aControlReg5;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelControlReg5Changed object:self];
 }
 
@@ -435,7 +435,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg4:controlReg4];
     
     controlReg4 = aControlReg4;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelControlReg4Changed object:self];
 }
 
@@ -449,7 +449,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg3:controlReg3];
     
     controlReg3 = aControlReg3;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelControlReg3Changed object:self];
 }
 
@@ -463,7 +463,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg2:controlReg2];
     
     controlReg2 = aControlReg2;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelControlReg2Changed object:self];
 }
 
@@ -477,7 +477,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg1:controlReg1];
     
     controlReg1 = aControlReg1;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelControlReg1Changed object:self];
 }
 
@@ -491,7 +491,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg0:controlReg0];
     
     controlReg0 = aControlReg0;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelControlReg0Changed object:self];
 }
 
@@ -505,7 +505,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setControlMode:controlMode];
     
     controlMode = aControlMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelRunModeChanged object:self];
 }
 
@@ -550,7 +550,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 	[self setControlReg1:[decoder decodeIntForKey:@"ORTDC3377ModelControlReg1"]];
 	[self setControlReg0:[decoder decodeIntForKey:@"ORTDC3377ModelControlReg0"]];
 	[self setControlMode:[decoder decodeIntForKey:      @"ORTDC3377ModelControlMode"]];
-
+	
 	if(!testingStatus){
 		NSMutableArray* aTestStatusArray = [NSMutableArray array];
 		int i;
@@ -559,7 +559,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		}
 		[self setTestingStatus:aTestStatusArray];
 	}
-
+	
 	if(!testingEnabled){
 		NSMutableArray* aTestEnabledArray = [NSMutableArray array];
 		int i;
@@ -568,7 +568,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		}
 		[self setTestingEnabled:aTestEnabledArray];
 	}
-
+	
 	
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -619,13 +619,13 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 - (NSArray*) wizardParameters
 {
     NSMutableArray* a = [NSMutableArray array];
-
+	
     ORHWWizParam* p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Data Shift"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@"index"];
     [p setSetMethod:@selector(setDataShift:) getMethod:@selector(dataShift)];
     [a addObject:p];
-
+	
     [a addObject:[ORHWWizParam boolParamWithName:@"Both Edges" setter:@selector(setBothEdges:) getter:@selector(bothEdges)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"Fera Mode"  setter:@selector(setFeraMode:)  getter:@selector(feraMode)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"MultiEvent Mode"  setter:@selector(setMultiEventBufferMode:)  getter:@selector(multiEventBufferMode)]];
@@ -636,13 +636,13 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [p setFormat:@"##0" upperLimit:15 lowerLimit:0 stepSize:1 units:@"Clks"];
     [p setSetMethod:@selector(setPulseWidth:) getMethod:@selector(pulseWidth)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Pulse Delay"];
     [p setFormat:@"##0" upperLimit:15 lowerLimit:0 stepSize:1 units:@"Clks"];
     [p setSetMethod:@selector(setPulseDelay:) getMethod:@selector(pulseDelay)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clock Units"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@"index"];
@@ -654,52 +654,52 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:1 units:@"index"];
     [p setSetMethod:@selector(setPauseInterval:) getMethod:@selector(pauseInterval)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Max Hits"];
     [p setFormat:@"##0" upperLimit:16 lowerLimit:1 stepSize:1 units:@"# hits"];
     [p setSetMethod:@selector(setMaxHitsPerTDC:) getMethod:@selector(maxHitsPerTDC)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Max Full Scale"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@"x8ns"];
     [p setSetMethod:@selector(setMaxFullScaleTime:) getMethod:@selector(maxFullScaleTime)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Request Delay"];
     [p setFormat:@"##0" upperLimit:30 lowerLimit:0 stepSize:2 units:@"x8ns"];
     [p setSetMethod:@selector(setRequestDelay:) getMethod:@selector(requestDelay)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Data Offset"];
     [p setFormat:@"##0" upperLimit:30 lowerLimit:0 stepSize:2 units:@"ns"];
     [p setSetMethod:@selector(setDataOffset:) getMethod:@selector(dataOffset)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Time Out"];
     [p setFormat:@"##0" upperLimit:0xfff lowerLimit:0 stepSize:2 units:@"x50ns"];
     [p setSetMethod:@selector(setTimeout:) getMethod:@selector(timeout)];
     [a addObject:p];
-
+	
     [a addObject:[ORHWWizParam boolParamWithName:@"Test Enabled"  setter:@selector(setTestEnabled:)  getter:@selector(testEnabled)]];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Text Clock"];
     [p setFormat:@"##0" upperLimit:3 lowerLimit:0 stepSize:0 units:@"index"];
     [p setSetMethod:@selector(setTestClock:) getMethod:@selector(testClock)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Num Test Pulses"];
     [p setFormat:@"##0" upperLimit:31 lowerLimit:0 stepSize:0 units:@""];
     [p setSetMethod:@selector(setPulsesToGenerate:) getMethod:@selector(pulsesToGenerate)];
     [a addObject:p];
-
-    	
+	
+	
     return a;
 }
 
@@ -738,14 +738,14 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-
+	
     [objDictionary setObject:[NSNumber numberWithBool:bothEdges] forKey:@"bothEdges"];
     [objDictionary setObject:[NSNumber numberWithBool:feraMode] forKey:@"feraMode"];
     [objDictionary setObject:[NSNumber numberWithBool:multiEventBufferMode] forKey:@"multiEventBufferMode"];
     [objDictionary setObject:[NSNumber numberWithBool:skipHeader] forKey:@"skipHeader"];
     [objDictionary setObject:[NSNumber numberWithBool:fastFeraMode] forKey:@"fastFeraMode"];
     [objDictionary setObject:[NSNumber numberWithBool:testEnabled] forKey:@"testEnabled"];
-
+	
     [objDictionary setObject:[NSNumber numberWithInt:pulseWidth] forKey:@"pulseWidth"];
     [objDictionary setObject:[NSNumber numberWithInt:pulseDelay] forKey:@"pulseDelay"];
     [objDictionary setObject:[NSNumber numberWithInt:clockUnit] forKey:@"clockUnit"];
@@ -758,7 +758,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [objDictionary setObject:[NSNumber numberWithInt:testClock] forKey:@"testClock"];
     [objDictionary setObject:[NSNumber numberWithInt: pulsesToGenerate] forKey:@"pulsesToGenerate"];
     [objDictionary setObject:[NSNumber numberWithInt:dataShift] forKey:@"dataShift"];
-
+	
     return objDictionary;
 }
 
@@ -768,7 +768,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 	cachedStation = [self stationNumber];
     unsigned short dummy;
     [[self adapter] camacShortNAF:cachedStation a:0 f:9 data:&dummy];  //clear all registers, etc...
-
+	
     [[self adapter] camacShortNAF:cachedStation a:0 f:30 data:&dummy]; //select program mode
     if(controlMode > 0) {
         [[self adapter] camacShortNAF:cachedStation a:0 f:21+controlMode-1 data:&dummy]; //select program mode
@@ -799,14 +799,14 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     controlReg3 = 0;
     controlReg4 = 0;
     controlReg5 = 0;
-
+	
     //common to all modes
     if(bothEdges)               controlReg0 |= 0x0001<<10;
     if(feraMode)                controlReg0 |= 0x0001<<11;
     if(multiEventBufferMode)    controlReg0 |= 0x0001<<12;
     if(skipHeader)              controlReg0 |= 0x0001<<13;
-
-
+	
+	
     //special cases
     switch(controlMode){
         case 0: //common stop single word
@@ -823,41 +823,41 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
             
             controlReg3 |= requestDelay&0xf;
             controlReg3 |= (dataOffset&0x0fff)<<4;
-        break;
- 
+			break;
+			
         case 1: //common start single word
             controlReg0 |= (dataShift&0x3)<<8;
-
+			
             controlReg1 |= (pauseInterval&0x3)<<10;
             if(fastFeraMode)controlReg1 |= 0x0001<<12;
-
+			
             controlReg2 |= maxHitsPerTDC&0xf;
-
+			
             controlReg3 |= requestDelay&0xf;
             controlReg3 |= (maxFullScaleTime&0xfff)<<4;
             
             controlReg4 |= (timeout&0x03FF);
-
+			
             controlReg5 |= (pulsesToGenerate&0x001F);
             controlReg5 |= (testClock&0x003)<<5;
             if(testEnabled)controlReg5 |= 0x0001<<8;
             
-        break;
-        
+			break;
+			
         case 2: //common stop double word
             controlReg1 |= pulseWidth&0xf;
             controlReg1 |= (pulseDelay&0xf)<<4;
             controlReg1 |= (clockUnit&0x3)<<8;
             controlReg1 |= (pauseInterval&0x3)<<10;
             if(fastFeraMode)controlReg1 |= 0x0001<<12;
-
+			
             controlReg2 |= maxHitsPerTDC&0xf;
             controlReg2 |= (maxHitsPerTDC&0x0FFF)<<4;
-
+			
             controlReg3 |= requestDelay&0xf;
-
-        break;
-        
+			
+			break;
+			
         case 3: //common start double word
             controlReg1 |= (pauseInterval&0x3)<<10;
             if(fastFeraMode )controlReg1 |= 0x0001<<12;
@@ -865,14 +865,14 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
             controlReg2 |= maxHitsPerTDC&0xf;
             
             controlReg3 |= requestDelay&0xf;
-
+			
             controlReg4 |= timeout&0x03FF;
-
+			
             controlReg5 |= (pulsesToGenerate&0x001F);
             controlReg5 |= (testClock&0x003)<<5;
             if(testEnabled)controlReg5 |= 0x0001<<8;
-
-        break;
+			
+			break;
     }
 }
 - (void) loadRegisters
@@ -966,7 +966,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 			}
 		}
 		else NSLog(@"Read TDC3377 Station %d control reg4: 0x%04x\n",cachedStation, dummy);
-	
+		
 		[[self adapter] camacShortNAF:cachedStation a:5 f:1 data:&dummy];
 		if(controlMode == 1) {
 			dummy &= ~0xfe00;
@@ -989,10 +989,10 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 - (void) runTests
 {
 	if(!testsRunning){
-		NS_DURING
+		@try {
 			[self setTestsRunning:YES];
 			NSLog(@"Starting tests for 3377TDC station %d\n",[self stationNumber]);
-
+			
 			//clear the status text array
 			int i;
 			for(i=0;i<kNum3377TDCTests;i++){
@@ -1005,10 +1005,11 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 			if([self testingIsEnabled:0]) [testSuit addTest:[ORTest testSelector:@selector(testCamacInterface) tag:0]];
 			if([self testingIsEnabled:1]) [testSuit addTest:[ORTest testSelector:@selector(fifoTest) tag:1]];
 			if([self testingIsEnabled:2]) [testSuit addTest:[ORTest testSelector:@selector(patternTest) tag:2]];
-
+			
 			[testSuit runForObject:self];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 	}
 	else {
 		NSLog(@"Tests for 3377TDC (station: %d) stopped manually\n",[self stationNumber]);
@@ -1054,11 +1055,11 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTDC3377DecoderForTDC",           @"decoder",
-        [NSNumber numberWithLong:dataId],    @"dataId",
-        [NSNumber numberWithBool:YES],       @"variable",
-        [NSNumber numberWithLong:-1],        @"length",
-        nil];
+								 @"ORTDC3377DecoderForTDC",           @"decoder",
+								 [NSNumber numberWithLong:dataId],    @"dataId",
+								 [NSNumber numberWithBool:YES],       @"variable",
+								 [NSNumber numberWithLong:-1],        @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"tdc"];
     return dataDictionary;
 }
@@ -1090,7 +1091,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 	long version = 1;
     unChangingDataPart   = version<<25 | (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
-
+	
 	cachedStation = [self stationNumber];
     [self clearExceptionCount];
     if([self loadTheMode]){
@@ -1116,9 +1117,9 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		NSTimeInterval asTimeInterval;
 		unsigned long asLongs[2];
 	}theTimeRef;
-
-
-    NS_DURING
+	
+	
+    @try {
         
 		if(!firstTime){
             //test if data ready to be read out
@@ -1179,12 +1180,13 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 			[self enableAcq];
 			firstTime = NO;
 		}
-		NS_HANDLER
-			NSLogError(@"",@"TDC3377 Card Error",errorLocation,nil);
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
-		
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"TDC3377 Card Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
+	
 }
 
 - (void) shipEvent:(ORDataPacket*)aDataPacket data:(NSMutableData*)eventBuffer numWords:(unsigned)dataWordCount
@@ -1201,7 +1203,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 			
 			ptr++;
 			*ptr |= dataWordCount;
-
+			
 			[aDataPacket addData:eventBuffer];          //ship the data
 		}
 		else {
@@ -1228,7 +1230,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		return;
 	}
 	
-	NS_DURING
+	@try {
 		unsigned short savedControlMode = controlMode;
 		controlMode = 0;
 		[self loadTheMode];
@@ -1258,12 +1260,13 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		}
 		controlMode = savedControlMode;
 		[self loadTheMode];
-
+		
 		[testSuit runForObject:self];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"CAMAC interface test for 3377TDC station %d FAILED due to exception.\n",cachedStation);	
 		[localException raise];
-	NS_ENDHANDLER
+	}
 	
 }
 
@@ -1275,7 +1278,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-	NS_DURING
+	@try {
 		unsigned short statusWord;
 		unsigned short savedControlMode = controlMode;
 		[self setControlMode:1];
@@ -1297,7 +1300,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 				eventValue = chan;
 				if(chan < 31)[[self adapter] camacShortNAF:cachedStation a:0 f:16 data:&eventValue];
 				else [[self adapter] camacShortNAF:cachedStation a:1 f:16 data:&eventValue]; //write end of event tag
-
+				
 			}
 		}
 		
@@ -1334,13 +1337,14 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		}
 		controlMode = savedControlMode;
 		[self loadTheMode];
-
+		
 		[testSuit runForObject:self];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		NSLog(@"CAMAC fifo load/unload test test for 3377TDC station %d FAILED due to exception.\n",cachedStation);	
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -1352,7 +1356,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		return;
 	}
 	
-	NS_DURING
+	@try {
 		if(testEnabled){
 			unsigned short statusWord;
 			unsigned short savedControlMode = controlMode;
@@ -1385,7 +1389,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 				breakoutCount++;
 				if(breakoutCount>1000)break;
 			}
-
+			
 			if(eventCount == 0)  {
 				NSLogColor([NSColor redColor],@"CAMAC pattern test for 3377TDC station %d FAILED.\n",cachedStation);
 				id result = [[NSAttributedString alloc] initWithString:@"FAILED" 
@@ -1407,11 +1411,12 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 		}
 		
 		[testSuit runForObject:self];
-
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		NSLog(@"CAMAC fifo load/unload test test for 3377TDC station %d FAILED due to exception.\n",cachedStation);	
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 

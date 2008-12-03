@@ -620,7 +620,7 @@ NSString* ORTriggerSpecialLock				= @"ORTriggerSpecialLock";
 //{
 //	return aVal & kClockEnabledMask;
 //}
-    
+
 
 - (NSMutableArray*) children {
     //methods exists to give common interface across all objects for display in lists
@@ -802,19 +802,19 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTriggerDecoderFor100MHzClockRecord",    @"decoder",
-        [NSNumber numberWithLong:clockDataId],      @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+								 @"ORTriggerDecoderFor100MHzClockRecord",    @"decoder",
+								 [NSNumber numberWithLong:clockDataId],      @"dataId",
+								 [NSNumber numberWithBool:NO],               @"variable",
+								 [NSNumber numberWithLong:3],                @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"100MHz Clock Record"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTriggerDecoderForGTIDRecord",                   @"decoder",
-        [NSNumber numberWithLong:gtidDataId],               @"dataId",
-        [NSNumber numberWithBool:NO],                       @"variable",
-        [NSNumber numberWithLong:IsShortForm(gtidDataId)?1:2],@"length",
-        nil];
+				   @"ORTriggerDecoderForGTIDRecord",                   @"decoder",
+				   [NSNumber numberWithLong:gtidDataId],               @"dataId",
+				   [NSNumber numberWithBool:NO],                       @"variable",
+				   [NSNumber numberWithLong:IsShortForm(gtidDataId)?1:2],@"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"GTID Record"];
     return dataDictionary;
 }
@@ -825,27 +825,27 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
 	NSMutableArray* eventGroup1 = [NSMutableArray array];
 	if([trigger1Group count]){
 		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								@"GTID",								@"name",
-								[NSNumber numberWithLong:gtidDataId],   @"dataId",
-								IsShortForm(gtidDataId)?[NSNumber numberWithLong:0]:[NSNumber numberWithLong:1], @"secondaryIdWordIndex",
-								[NSNumber numberWithLong:1],		@"value",
-								[NSNumber numberWithLong:0x3L<<24], @"mask",
-								[NSNumber numberWithLong:24],		@"shift",
-								nil];
+					   @"GTID",								@"name",
+					   [NSNumber numberWithLong:gtidDataId],   @"dataId",
+					   IsShortForm(gtidDataId)?[NSNumber numberWithLong:0]:[NSNumber numberWithLong:1], @"secondaryIdWordIndex",
+					   [NSNumber numberWithLong:1],		@"value",
+					   [NSNumber numberWithLong:0x3L<<24], @"mask",
+					   [NSNumber numberWithLong:24],		@"shift",
+					   nil];
 		[eventGroup1 addObject:aDictionary];
 		
 		if([self shipEvt1Clk]){
 			aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								@"100MHz Clock Record",					@"name",
-								[NSNumber numberWithLong:clockDataId],  @"dataId",
-								[NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
-								[NSNumber numberWithLong:1],		@"value",
-								[NSNumber numberWithLong:0x3L<<24], @"mask",
-								[NSNumber numberWithLong:24],		@"shift",
-									nil];
+						   @"100MHz Clock Record",					@"name",
+						   [NSNumber numberWithLong:clockDataId],  @"dataId",
+						   [NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
+						   [NSNumber numberWithLong:1],		@"value",
+						   [NSNumber numberWithLong:0x3L<<24], @"mask",
+						   [NSNumber numberWithLong:24],		@"shift",
+						   nil];
 			[eventGroup1 addObject:aDictionary];
 		}
-
+		
 		NSMutableDictionary* aDictionary = [NSMutableDictionary dictionary];
 		[trigger1Group appendEventDictionary:aDictionary topLevel:topLevel];
 		if([aDictionary count])[eventGroup1 addObject:aDictionary];
@@ -855,27 +855,27 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
 	NSMutableArray* eventGroup2 = [NSMutableArray array];
 	if([trigger2Group count]){
 		aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								@"GTID",								@"name",
-								[NSNumber numberWithLong:gtidDataId],    @"dataId",
-								IsShortForm(gtidDataId)?[NSNumber numberWithLong:0]:[NSNumber numberWithLong:1], @"secondaryIdWordIndex",
-								[NSNumber numberWithLong:2],		@"value",
-								[NSNumber numberWithLong:0x3L<<24], @"mask",
-								[NSNumber numberWithLong:24],		@"shift",
-								nil];
+					   @"GTID",								@"name",
+					   [NSNumber numberWithLong:gtidDataId],    @"dataId",
+					   IsShortForm(gtidDataId)?[NSNumber numberWithLong:0]:[NSNumber numberWithLong:1], @"secondaryIdWordIndex",
+					   [NSNumber numberWithLong:2],		@"value",
+					   [NSNumber numberWithLong:0x3L<<24], @"mask",
+					   [NSNumber numberWithLong:24],		@"shift",
+					   nil];
 		[eventGroup2 addObject:aDictionary];
 		
 		if([self shipEvt2Clk]){
 			aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								@"100MHz Clock Record",					@"name",
-								[NSNumber numberWithLong:clockDataId],   @"dataId",
-								[NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
-								[NSNumber numberWithLong:2],		@"value",
-								[NSNumber numberWithLong:0x3L<<24], @"mask",
-								[NSNumber numberWithLong:24],		@"shift",
-									nil];
+						   @"100MHz Clock Record",					@"name",
+						   [NSNumber numberWithLong:clockDataId],   @"dataId",
+						   [NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
+						   [NSNumber numberWithLong:2],		@"value",
+						   [NSNumber numberWithLong:0x3L<<24], @"mask",
+						   [NSNumber numberWithLong:24],		@"shift",
+						   nil];
 			[eventGroup2 addObject:aDictionary];
 		}
-
+		
 		NSMutableDictionary* aDictionary = [NSMutableDictionary dictionary];
 		[trigger2Group appendEventDictionary:aDictionary topLevel:topLevel];
 		if([aDictionary count])[eventGroup2 addObject:aDictionary];
@@ -970,7 +970,7 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
     
     unsigned short statusReg;
     BOOL isMSAMEvent = NO;
-    NS_DURING
+    @try {
         // read the status register to check for an event and save the value since
         // we will reset the event when the gtid register is read.
         // Note that we force events if in the nohardware mode.
@@ -1206,11 +1206,12 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
             }
         }
         
-        NS_HANDLER
-            NSLogError(@"",@"Trigger Card Error",errorLocation,nil);
-            [self incExceptionCount];
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"Trigger Card Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

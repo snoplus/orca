@@ -1,17 +1,17 @@
 /*
-    
-    File:		ORTRS1Controller.m
-    
-    Usage:		Test PCI Basic I/O Kit Kernel Extension (KEXT) Functions
-                                for the Camac TRS1 VME Bus Controller
-
-    Author:		FM
-    
-    Copyright:		Copyright 2001-2002 F. McGirt.  All rights reserved.
-    
-    Change History:	1/22/02, 2/2/02, 2/12/02
-                        2/13/02 MAH CENPA. converted to Objective-C
-*/
+ 
+ File:		ORTRS1Controller.m
+ 
+ Usage:		Test PCI Basic I/O Kit Kernel Extension (KEXT) Functions
+ for the Camac TRS1 VME Bus Controller
+ 
+ Author:		FM
+ 
+ Copyright:		Copyright 2001-2002 F. McGirt.  All rights reserved.
+ 
+ Change History:	1/22/02, 2/2/02, 2/12/02
+ 2/13/02 MAH CENPA. converted to Objective-C
+ */
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -37,7 +37,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"TRS1"];
-
+	
     return self;
 }
 
@@ -52,17 +52,17 @@
 					 selector : @selector(runStatusChanged:)
 						 name : ORRunStatusChangedNotification
 					   object : nil];
- 
+	
     [notifyCenter addObserver : self
                      selector : @selector(controlRegisterChanged:)
                          name : ORTRS1ModelControlRegisterChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(offsetRegisterChanged:)
                          name : ORTRS1ModelOffsetRegisterChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(slotChanged:)
                          name : ORCamacCardSlotChangedNotification
@@ -120,12 +120,13 @@
 
 - (IBAction) initAction:(id)sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
         [model checkCratePower];
         [model initBoard];
 		NSLog(@"8818A (station %d) Init\n",[model stationNumber]+1);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
 		NSLog(@"Failed Cmd: Init\n");
 		if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) {
 			[[model crate]  doNoPowerAlert:localException action:[NSString stringWithFormat:@"Init"]];
@@ -134,49 +135,53 @@
 			NSRunAlertPanel([localException name], @"%@\n", @"OK", nil, nil,
 							[localException name]);
 		}
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) moduleIDAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
 		NSLog(@"8818A (station %d) module ID: %d\n",[model stationNumber]+1, [model readModuleID]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read ModuleID" fCode:3];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         unsigned char state = [model testLAM];
 		NSLog(@"8818A (station %d) LAM %@ set.\n",[model stationNumber]+1,state?@"is":@"is NOT");
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read ModuleID" fCode:27];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) clearLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model clearLAM];
 		NSLog(@"8818A (station %d) LAM Cleared.\n",[model stationNumber]+1);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Clear LAM" fCode:10];
-    NS_ENDHANDLER
+    }
 }
 - (IBAction) triggerAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model internalTrigger];
 		NSLog(@"8818A (station %d) Triggered.\n",[model stationNumber]+1);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Internal Trigger" fCode:25];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) showError:(NSException*)anException name:(NSString*)name fCode:(int)i

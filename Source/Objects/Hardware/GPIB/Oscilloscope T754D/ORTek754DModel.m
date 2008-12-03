@@ -38,13 +38,13 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (id) init
 {
     self = [ super init ];
-
+	
 	[[self undoManager] disableUndoRegistration];
-
+	
     mRunInProgress = false;
-
+	
 	[[self undoManager] enableUndoRegistration];
-
+	
     return self;
 }
 
@@ -60,7 +60,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     for ( i = 0; i < kMaxOscChnls; i++ ){
         [ mDataObj[ i ] release ];
     } 	
-
+	
     [ super dealloc ];
 }
 
@@ -103,10 +103,10 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (short) oscScopeId
 {
     mScopeVersion = 0;
-
+	
     [ self getID ];
-//    range = [ mIdentifier rangeOfString: @"744" ];
-//    if ( range.location != NSNotFound )
+	//    range = [ mIdentifier rangeOfString: @"744" ];
+	//    if ( range.location != NSNotFound )
     if ( [ mIdentifier rangeOfString: @"744A" ].location != NSNotFound )
     {
         mID = ORTEKc744A;
@@ -146,13 +146,13 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (bool) oscBusy
 {
     char	theDataOsc[ 5 ];
-    						
+	
     // Write the command.
     long lengthReturn = [ mController writeReadDevice: mPrimaryAddress 
-                                         command: @"BUSY?"
-                                            data: theDataOsc
-                                       maxLength: 5 ];
-                                   
+											  command: @"BUSY?"
+												 data: theDataOsc
+											maxLength: 5 ];
+	
     // Check the return value.
     if ( lengthReturn > 0 ) 
 	{
@@ -186,17 +186,17 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 	bool		haveDate = false;
 	bool		haveTime = false;
 	
-// Get date and time from oscilloscope.
-// Get the channel coupling option.
+	// Get date and time from oscilloscope.
+	// Get the channel coupling option.
     returnLength = [ self writeReadGPIBDevice: @"DATE?; TIME?"
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
-
-// Translate the date/time
+	
+	// Translate the date/time
 	if ( returnLength > 0 )
 	{
-
-// Extract date and time components from returned values.
+		
+		// Extract date and time components from returned values.
 		while( ( !haveDate ) && ( !haveTime ) )
 		{
 			if ( isdigit( mReturnData[ i ] ) && !haveDate )
@@ -213,12 +213,12 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 			}
 		}
 		
-// Convert date time to long.
+		// Convert date time to long.
 		dateTime = [ dateStr stringByAppendingString: @" "];
         dateTime = [ dateTime stringByAppendingString: timeStr ];
         
 		[dateTime getCString:timeBuffer maxLength:50 encoding:NSASCIIStringEncoding];
-
+		
 		timeLong = convertTimeCharToLong( timeBuffer );		
 	}
     
@@ -263,14 +263,14 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 	
 	convertTimeLongToChar( aDateTime, sDateTime );
     
-// Have to separate the date and time plus modify format for oscilloscope.
+	// Have to separate the date and time plus modify format for oscilloscope.
 	dateString = [ NSMutableString stringWithCString: sDateTime length: 10 ];
 	timeString = [ NSMutableString stringWithCString: &sDateTime[ 11 ] length: 8 ];
-
+	
 	[ dateString replaceCharactersInRange: NSMakeRange( 4, 1 ) withString: @"-"];
     [ dateString replaceCharactersInRange: NSMakeRange( 7, 1 ) withString: @"-"];
     
-// Set date and time
+	// Set date and time
     [ self writeToGPIBDevice: [ NSString stringWithFormat: @"TIME \"%s\"", [ timeString cStringUsingEncoding:NSASCIIStringEncoding ]]];
     [ self writeToGPIBDevice: [ NSString stringWithFormat: @"DATE \"%s\"", [ dateString cStringUsingEncoding:NSASCIIStringEncoding ]]];    
 }
@@ -325,24 +325,24 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 -(void) oscSetQueryFormat: (short) aFormat
 {
     switch ( aFormat){
-    
+			
         case kNoLabel:
             [ self writeToGPIBDevice: @"HEADER OFF" ];
-        break;
-        
+			break;
+			
         case kShortLabel:
             [ self writeToGPIBDevice: @"HEADER ON;:VERB OFF" ];
-        break;
-    
+			break;
+			
         case kLongLabel:
             [ self writeToGPIBDevice: @"HEADER ON;:VERB ON" ];
-        break;
-
+			break;
+			
         default:
             [ self writeToGPIBDevice: @"HEADER ON;:VERB ON" ];
-        break;
+			break;
     }
-
+	
     NSLog( @"T754: Data query format sent to T754.\n" );
 }
 
@@ -361,7 +361,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 		command = @"MESSAGE:STATE ON";
     else 		
 		command = @"MESSAGE:STATE OFF";
-		
+	
     [ self writeToGPIBDevice: command ];
 }
 
@@ -378,7 +378,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     long		returnLength;		// Length of string returned by oscilloscope.
     
-// Make sure that channel is valid
+	// Make sure that channel is valid
 	if ( [ self checkChnlNum: aChnl ] )
 	{
 		returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"SELECT:CH%d?", aChnl + 1 ]
@@ -410,7 +410,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 	{
         if ( [ self checkChnlNum: i ] ){
             if ( [ self chnlAcquire: i ] ){
-                    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"SELECT:CH%d ON", i + 1 ]];
+				[ self writeToGPIBDevice: [ NSString stringWithFormat: @"SELECT:CH%d ON", i + 1 ]];
             }
             else {
                 [ self writeToGPIBDevice: [ NSString stringWithFormat: @"SELECT:CH%d OFF", i + 1 ]];
@@ -435,44 +435,44 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     NSString*	impedanceValue;
     NSString*	couplingValue;
 	long		returnLength = 0;
-
+	
 	if ( [ self checkChnlNum: aChnl ] )
 	{
-
-// Get the channel coupling option.
+		
+		// Get the channel coupling option.
 		returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"CH%d:COUPLING?", aChnl + 1 ]
                                              data: mReturnData
                                         maxLength: kMaxGPIBReturn ];
         if ( returnLength > 0 )
 		{
 			couplingValue = [ NSString stringWithCString: mReturnData ];
-             			
-// Now get the impedance.
+			
+			// Now get the impedance.
 			returnLength = [ self writeReadGPIBDevice: [ NSString stringWithFormat: @"CH%d:IMPEDANCE?", aChnl + 1 ]
                                                  data: mReturnData
                                             maxLength: kMaxGPIBReturn ];
 			
 			impedanceValue = [ NSString stringWithCString: mReturnData ];
 			
-// Based on coupling and impedance set the coupling option value appropriately.
+			// Based on coupling and impedance set the coupling option value appropriately.
             if( [ couplingValue rangeOfString: @"AC"
-                                       options: NSBackwardsSearch ].location  != NSNotFound )
-                 [ self setChnlCoupling: aChnl coupling: kChnlCouplingACIndex ];
-				
+									  options: NSBackwardsSearch ].location  != NSNotFound )
+				[ self setChnlCoupling: aChnl coupling: kChnlCouplingACIndex ];
+			
 			if ( [ couplingValue rangeOfString: @"DC" 
-                                        options: NSBackwardsSearch ].location != NSNotFound )
+									   options: NSBackwardsSearch ].location != NSNotFound )
 			{
 				if ( [ impedanceValue rangeOfString: @"MEG"
-                                       options: NSBackwardsSearch ].location != NSNotFound )
+											options: NSBackwardsSearch ].location != NSNotFound )
                     [ self setChnlCoupling: aChnl coupling: kChnlCouplingDCIndex ];
 				else
                     [ self setChnlCoupling: aChnl coupling: kChnlCouplingDC50Index ];
 			}
-				
+			
 			if ( [ couplingValue rangeOfString: @"GND"
-                                        options: NSBackwardsSearch ].location != NSNotFound )
+									   options: NSBackwardsSearch ].location != NSNotFound )
                 [ self setChnlCoupling: aChnl coupling: kChnlCouplingGNDIndex ];
-
+			
 		}
 	}
 }
@@ -495,19 +495,19 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
         switch ( [ self chnlCoupling: aChnl ] ){
             case kChnlCouplingACIndex:
                 command = [ NSString stringWithFormat: @"CH%d:COUPLING AC; IMPEDANCE MEG", aChnl + 1 ];
-            break;
-            
+				break;
+				
             case kChnlCouplingDCIndex:
                 command = [ NSString stringWithFormat: @"CH%d:COUPLING DC; IMPEDANCE MEG", aChnl + 1 ];
-            break;
-            
+				break;
+				
             case kChnlCouplingGNDIndex:
                 command = [ NSString stringWithFormat: @"CH%d:COUPLING GND; IMPEDANCE MEG", aChnl + 1 ];
-            break;
-            
+				break;
+				
             case kChnlCouplingDC50Index:
                 command = [ NSString stringWithFormat: @"CH%d:COUPLING DC; IMPEDANCE FIFTY", aChnl + 1 ];
-            break;
+				break;
         }
         
         // Write out the command
@@ -609,22 +609,22 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     
     if ( mID == ORTEKc754D )
     {
-	
-// Count
+		
+		// Count
         returnLength = [ self writeReadGPIBDevice: @"HORIZONTAL:FASTFRAME:COUNT?"
                                              data: mReturnData
                                         maxLength: kMaxGPIBReturn ];
         if ( returnLength > 0 )
             mFastframeCount = [ self convertStringToLong: mReturnData withLength: returnLength ];
         
-// Reference frame
+		// Reference frame
         returnLength = [ self writeReadGPIBDevice: @"HORIZONTAL:FASTFRAME:REF?"
                                              data: mReturnData
                                         maxLength: kMaxGPIBReturn ];
         if ( returnLength > 0 )
             mFastframeRef = [ self convertStringToLong: mReturnData withLength: returnLength ];
         
-// wavelength
+		// wavelength
         returnLength = [ self writeReadGPIBDevice: @"HORIZONTAL:FASTFRAME:LENGTH?" 
                                              data: mReturnData
                                         maxLength: kMaxGPIBReturn ];
@@ -647,18 +647,18 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     if ( mID == ORTEKc754D )
     {
-// Set the frame count.
+		// Set the frame count.
         [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:COUNT %d", 
-                                                               mFastframeCount ]];
-                                                           
-// Set the reference frame.
+								   mFastframeCount ]];
+		
+		// Set the reference frame.
         [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:REF %d", 
-                                                               mFastframeRef ]];
-                                                           
-// Set the length of each frame.
+								   mFastframeRef ]];
+		
+		// Set the length of each frame.
         mFastframeRecLength = mWaveformLength / mFastframeCount;
         [ self writeToGPIBDevice: [ NSString stringWithFormat: @"HORIZONTAL:FASTFRAME:LENGTH %d",
-                                                                mFastframeRecLength ]];
+								   mFastframeRecLength ]];
     }
 }
 
@@ -676,8 +676,8 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     
     if ( mID == ORTEKc754D )
     {
-	
-// Read the Fastframe state
+		
+		// Read the Fastframe state
         returnLength = [ self writeReadGPIBDevice: @"HORIZONTAL:FASTFRAME:STATE?" 
                                              data: mReturnData
                                         maxLength: kMaxGPIBReturn ];
@@ -691,7 +691,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
                 mFastframeState = true;
             }
         
-// Read the Fastframe:Timestamp state
+		// Read the Fastframe:Timestamp state
         returnLength = [ self writeReadGPIBDevice: @"HORIZONTAL:FASTFRAME:TIMESTAMP:STATE?"
                                              data: mReturnData
                                         maxLength: kMaxGPIBReturn ];
@@ -836,13 +836,13 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     NSString*	couplingValue;
 	long		returnLength = 0;
-
-// Get coupling value.
+	
+	// Get coupling value.
 	returnLength = [ self writeReadGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING?"
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
-
-// Convert coupling value to index
+	
+	// Convert coupling value to index
 	if ( returnLength > 0 )
 	{
         couplingValue = [ NSString stringWithCString: mReturnData ];
@@ -853,7 +853,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 			[ self setTriggerCoupling: kTriggerAC ];
         }
 		else if ( [ couplingValue rangeOfString: @"DC"
-                                     options: NSBackwardsSearch ].location != NSNotFound )
+										options: NSBackwardsSearch ].location != NSNotFound )
 		{
 			[ self setTriggerCoupling: kTriggerDC ];
 		}
@@ -886,28 +886,28 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     
 	switch ( [ self triggerCoupling ] ){
 		case kTriggerAC:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING AC" ];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING AC" ];
+			break;
+			
 		case kTriggerDC:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING DC" ];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING DC" ];
+			break;
+			
 		case kTriggerHFRej:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING HFREJ" ];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING HFREJ" ];
+			break;
+			
 		case kTriggerLFRej:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING LFREJ"];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING LFREJ"];
+			break;
+			
 		case kTriggerNOISERej:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING NOISEREJ"];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING NOISEREJ"];
+			break;
+			
 		default:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING AC"];
-                break;	
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:COUPLING AC"];
+			break;	
 	}
 	
 }
@@ -921,13 +921,13 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (void)	oscGetTriggerLevel
 {
 	long	returnLength = 0;
-
-// Get trigger level.
+	
+	// Get trigger level.
 	returnLength = [ self writeReadGPIBDevice: @"TRIGGER:MAIN:LEVEL?"
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
 	
-// Save the trigger level.
+	// Save the trigger level.
 	if ( returnLength > 0 )
 	{
 		[ self setTriggerLevel: [ self convertStringToFloat: mReturnData withLength: returnLength ]];		
@@ -956,24 +956,24 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     NSString*	triggerMode;
 	long		returnLength = 0;
-
-// Get trigger mode.
+	
+	// Get trigger mode.
 	returnLength = [ self writeReadGPIBDevice: @"TRIGGER:MAIN:Mode?"
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
-
-// Convert trigger mode to index
+	
+	// Convert trigger mode to index
 	if ( returnLength > 0 )
 	{
         triggerMode = [ NSString stringWithCString: mReturnData ];
         
         if ( [ triggerMode rangeOfString: @"AUTO" 
-                                   options: NSBackwardsSearch ].location != NSNotFound  )
+								 options: NSBackwardsSearch ].location != NSNotFound  )
 		{
 			[ self setTriggerMode: kTriggerAuto ];
 		} 
         else if ( [ triggerMode rangeOfString: @"NORM"
-                                   options: NSBackwardsSearch ].location != NSNotFound )
+									  options: NSBackwardsSearch ].location != NSNotFound )
         {
             [ self setTriggerMode: kTriggerNormal ];
         }
@@ -993,15 +993,15 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (void)	oscSetTriggerMode
 {
     switch ( [ self triggerMode ] ){
-    
+			
         case kTriggerAuto:
             [ self writeToGPIBDevice: @"TRIGGER:MAIN:MODE AUTO" ];
-        break;
-        
+			break;
+			
         case kTriggerNormal:
         default:
             [ self writeToGPIBDevice: @"TRIGGER:MAIN:MODE NORMAL" ];
-        break;						
+			break;						
     }
 }
 
@@ -1016,12 +1016,12 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     long		returnLength = 0;
     
-// Get value
+	// Get value
     returnLength = [ self writeReadGPIBDevice: @"HORIZONTAL:TRIGGER:POSITION?"
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
 	
-// Save the trigger position.
+	// Save the trigger position.
 	if ( returnLength > 0 )
 	{
 		[ self setTriggerPos: [ self convertStringToFloat: mReturnData withLength: returnLength ]];	
@@ -1051,22 +1051,22 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     NSString*	slope;
     long		returnLength = 0;
     
-// Get trigger slope.
+	// Get trigger slope.
 	returnLength = [ self writeReadGPIBDevice: @"TRIGGER:MAIN:EDGE:SLOPE?" 
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
-                                    
+	
 	if ( returnLength > 0 )
 	{
         slope = [ NSString stringWithCString: mReturnData ];
         
         if ( [ slope rangeOfString: @"FALL"
-                                   options: NSBackwardsSearch ].location != NSNotFound  )
+						   options: NSBackwardsSearch ].location != NSNotFound  )
 		{
 			[ self setTriggerSlopeIsPos: false ];
 		}
         else if ( [ slope rangeOfString: @"RIS"
-                                   options: NSBackwardsSearch ].location != NSNotFound  )
+								options: NSBackwardsSearch ].location != NSNotFound  )
         {
             [ self setTriggerSlopeIsPos: true ];
         }
@@ -1100,13 +1100,13 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     NSString*	triggerSource;
 	long		returnLength = 0;
-
-// Get trigger source.
+	
+	// Get trigger source.
 	returnLength = [ self writeReadGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE?"
                                          data: mReturnData
                                     maxLength: kMaxGPIBReturn ];
-
-// Convert response from oscilloscope to index.
+	
+	// Convert response from oscilloscope to index.
 	if ( returnLength > 0 )
 	{
         triggerSource = [ NSString stringWithCString: mReturnData ];
@@ -1117,27 +1117,27 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
             [ self setTriggerSource: kTriggerAuxilary ];
         }
         else if ( [ triggerSource rangeOfString: @"LINE"
-                                   options: NSBackwardsSearch ].location != NSNotFound  )
+										options: NSBackwardsSearch ].location != NSNotFound  )
         {
             [ self setTriggerSource: kTriggerLine ];
         }
         else if ( [ triggerSource rangeOfString: @"CH1"
-                                   options: NSBackwardsSearch ].location != NSNotFound  )
+										options: NSBackwardsSearch ].location != NSNotFound  )
         {
             [ self setTriggerSource: kTriggerCH1 ];
         }
         else if ( [ triggerSource rangeOfString: @"CH2"
-                                   options: NSBackwardsSearch ].location != NSNotFound  )
+										options: NSBackwardsSearch ].location != NSNotFound  )
         {
             [ self setTriggerSource: kTriggerCH2 ];
         }
         else if ( [ triggerSource rangeOfString: @"CH3"
-                                   options: NSBackwardsSearch ].location != NSNotFound  )
+										options: NSBackwardsSearch ].location != NSNotFound  )
         {
             [ self setTriggerSource: kTriggerCH3 ];
         }
         else if ( [ triggerSource rangeOfString: @"CH4"
-                                   options: NSBackwardsSearch ].location != NSNotFound  )
+										options: NSBackwardsSearch ].location != NSNotFound  )
         {
             [ self setTriggerSource: kTriggerCH4 ];
         }
@@ -1154,32 +1154,32 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
 	switch ( [ self triggerSource ] ){
 		case kTriggerAuxilary:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE AUX"];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE AUX"];
+			break;
+			
 		case kTriggerLine:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE LINE"];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE LINE"];
+			break;
+			
 		case kTriggerCH1:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH1"];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH1"];
+			break;
+			
 		case kTriggerCH2:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH2"];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH2"];
+			break;
+			
 		case kTriggerCH3:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH3"];
-                break;
-                
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH3"];
+			break;
+			
 		case kTriggerCH4:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH4"];
-                break;
-                    
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH4"];
+			break;
+			
 		default:
-                    [ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH1"];
-                break;			
+			[ self writeToGPIBDevice: @"TRIGGER:MAIN:EDGE:SOURCE CH1"];
+			break;			
 	}
 	
 }
@@ -1241,10 +1241,10 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (void) oscGetHeader
 {
 	char			*theHeader;
-//	size_t			theLength;
+	//	size_t			theLength;
 	int				i;
-
-    NS_DURING
+	
+    @try {
         if( [ self isConnected ] )
         {
             for ( i = 0; i < kMaxOscChnls; i++)
@@ -1252,22 +1252,23 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
                 if ( mChannels[ i ].chnlAcquire )
                 {
                     theHeader = [ mDataObj[ i ] rawHeader ];
-
+					
                     // Send command to retrieve header information.
                     [ self writeToGPIBDevice:
-                    [ NSString stringWithFormat: @"WFMPRE:CH%d:NR_PT?;YOFF?;YMULT?;XINCR?;PT_OFF?;XUNIT?;YUNIT?", i + 1 ]];
-
+					 [ NSString stringWithFormat: @"WFMPRE:CH%d:NR_PT?;YOFF?;YMULT?;XINCR?;PT_OFF?;XUNIT?;YUNIT?", i + 1 ]];
+					
                     // Read in header and place in data object
                     memset( theHeader, 0, kSize754Header );
                     [ self readFromGPIBDevice: theHeader maxLength: kSize754Header ];
                 }
             }
         }
-                
-    NS_HANDLER
-    NS_ENDHANDLER
+		
+    }
+	@catch(NSException* localException) {
+    }
 }
-			
+
 
 //--------------------------------------------------------------------------------
 /*!\method  oscGetWaveform
@@ -1290,8 +1291,8 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 	int				i;
 	long			numOfDataPoints;
 	unsigned short  acqMask;
-
-    NS_DURING
+	
+    @try {
         if( [ self isConnected ] ){
 			// Get the data.
 			acqMask = aMask & mChannelMask;
@@ -1302,7 +1303,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
             for ( i = 0; i < kMaxOscChnls; i++ ){
                 if ( mChannels[ i ].chnlAcquire && ( aMask & ( 1 << i ) )) {
                     theData = [ mDataObj[ i ] createDataStorage ];
-
+					
                     // Read header information
                     //[ mController readFromDevice: mPrimaryAddress data: theHeaderInfo maxLength: 1 ]; // skip the initial '#'
                     //[ mController readFromDevice: mPrimaryAddress data: theHeaderInfo maxLength: 1 ]; // <x> size of next element
@@ -1310,35 +1311,36 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
                     [ mController readFromDevice: mPrimaryAddress data: theHeaderInfo maxLength: 2 ]; // <x> size of next element
                     theHeaderInfo[ 2 ] = '\0';	
                     numOfDataPoints = atoi( &theHeaderInfo[1] );	// no characters in <yyy..> 
-
+					
                     [ mController readFromDevice: mPrimaryAddress data: theHeaderInfo maxLength: (short) numOfDataPoints ]; 
-                                                                            //<yyy...> number of chnls
+					//<yyy...> number of chnls
                     theHeaderInfo[ numOfDataPoints ] = '\0';
                     numOfDataPoints = atoi( theHeaderInfo );							// length of pulse in chnls						
-				
+					
                     // read the actual data.
                     [ mDataObj[ i ] setActualWaveformSize: ( numOfDataPoints >= [ mDataObj[ i ] maxWaveformSize ] ) ? 
-                                       [ mDataObj[ i ] maxWaveformSize ] : numOfDataPoints ];  // Read in the smaller size
-                                       
+					 [ mDataObj[ i ] maxWaveformSize ] : numOfDataPoints ];  // Read in the smaller size
+					
                     [ mDataObj[ i ] setActualWaveformSize: [ mController readFromDevice: mPrimaryAddress 
-                                                                                data: theData 
-                                                                           maxLength: [ mDataObj[ i ] actualWaveformSize ] ] ];
-																																			
+																				   data: theData 
+																			  maxLength: [ mDataObj[ i ] actualWaveformSize ] ] ];
+					
                     [ mController readFromDevice: mPrimaryAddress data: theHeaderInfo maxLength: 1 ];
                 }
             }
         }
         
-// Bad connection so don't execute instruction
+		// Bad connection so don't execute instruction
         else
         {
             NSString *errorMsg = @"Must establish GPIB connection prior to issuing command\n";
             [ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
         }
         
-    NS_HANDLER
-    NS_ENDHANDLER
-
+    }
+	@catch(NSException* localException) {
+    }
+	
 }
 
 //--------------------------------------------------------------------------------
@@ -1360,10 +1362,10 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 	char				theTimeStr[ 128 ];			// Temporary storage for time stamp.
     bool				fNoTime = true;
     
-// Initialize memory.
+	// Initialize memory.
     memset( &theTimeStr[ 0 ], '\0', 128 );
-                                        
-// Get time from 754D oscilloscope for last waveform.
+	
+	// Get time from 754D oscilloscope for last waveform.
     if ( mID == ORTEKc754D )
     {
         [ mController writeReadDevice: mPrimaryAddress 
@@ -1375,18 +1377,18 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
         if ( strstr( &theTimeStr[ 0 ], "timestamp" ) != 0 ) fNoTime = true;
     }
     
-// Use computer time for 744 oscilloscope.
+	// Use computer time for 744 oscilloscope.
     if ( fNoTime )
     {
         NSString*		timeString;
         struct timeval	timeValue;
         struct timezone	timeZone;
-//        time_t		compTime;
+		//        time_t		compTime;
         struct tm*		timeAsStruct;
         char		*month[ 12 ] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-                                "Sep", "Oct", "Nov", "Dec" };
+		"Sep", "Oct", "Nov", "Dec" };
         
-//        time( &compTime );
+		//        time( &compTime );
         gettimeofday( &timeValue, &timeZone );
         time_t tmpTime = timeValue.tv_sec;
         timeAsStruct = gmtime( &tmpTime );
@@ -1394,15 +1396,15 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
         long milliSecs = timeValue.tv_usec / 1000;
         long microSecs = timeValue.tv_usec - 1000 * milliSecs;
         
-// Construct time in format needed by remainder of program.        
+		// Construct time in format needed by remainder of program.        
         timeString = [ NSString stringWithFormat: @"%d %s %d %d:%d:%d.%03d %03d 000", 
-                        timeAsStruct->tm_mday, month[ timeAsStruct->tm_mon ], timeAsStruct->tm_year + 1900, 
-                        timeAsStruct->tm_hour, timeAsStruct->tm_min, timeAsStruct->tm_sec,
-                        milliSecs, microSecs ];
+					  timeAsStruct->tm_mday, month[ timeAsStruct->tm_mon ], timeAsStruct->tm_year + 1900, 
+					  timeAsStruct->tm_hour, timeAsStruct->tm_min, timeAsStruct->tm_sec,
+					  milliSecs, microSecs ];
 		[timeString getCString:theTimeStr maxLength:128 encoding:NSASCIIStringEncoding];
     }
-                                                            
-// Convert the time
+	
+	// Convert the time
     [ self osc754ConvertTime: &timeInSecs timeToConvert: &theTimeStr[ 0 ] ];
     [mDataObj[0] setTimeInSecs:timeInSecs];
 }
@@ -1418,24 +1420,24 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (void) oscRunOsc: (NSString*) aStartMsg
 {
     
-// Get scope ready.
+	// Get scope ready.
     [ self clearStatusReg ];
     [ self oscScopeId ];
     [ self oscLockPanel: true ];
     
-// Acquire data.  Places scope in single waveform acquisition mode.
+	// Acquire data.  Places scope in single waveform acquisition mode.
 	if ( mRunInProgress )
 	{
-	   // time_t	theTime;
-	  //  struct tm	*theTimeGMTAsStruct;
-	  //  time( &theTime );
-	  //  theTimeGMTAsStruct = gmtime( &theTime );
-	   // [ self oscSetDateTime: mktime( theTimeGMTAsStruct ) ];
+		// time_t	theTime;
+		//  struct tm	*theTimeGMTAsStruct;
+		//  time( &theTime );
+		//  theTimeGMTAsStruct = gmtime( &theTime );
+		// [ self oscSetDateTime: mktime( theTimeGMTAsStruct ) ];
 	    [ self oscInitializeForDataTaking: aStartMsg ];
 	    [ self oscArmScope ];
 	}
-
-// Place oscilloscope in free running mode.
+	
+	// Place oscilloscope in free running mode.
 	else
 	{
 	    [ self oscSetAcqMode: kNormalTrigger ];
@@ -1499,20 +1501,20 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     NSString *command = @"DATA:SOURCE ";
     int		i;
     int		j;
-
-// Tell oscilloscope which channels to return data from
+	
+	// Tell oscilloscope which channels to return data from
     j = 0;
     for ( i = 0; i < kMaxOscChnls; i++ ){   // Select channels for output
         if ( [ self chnlAcquire: i ]  && (aMask & (1<<i))){
             command = [ command stringByAppendingFormat: @"%@ CH%d", (j++ == 0) ? @"" : @",",i + 1 ];
-           // NSLog( @"%u \n",aMask );
+			// NSLog( @"%u \n",aMask );
         }
     }
 	
-//	printf( "%s\n", [ command cString ] );
+	//	printf( "%s\n", [ command cString ] );
     [ self writeToGPIBDevice: command ];   // Write channels for output to scope.
 }
-		
+
 //--------------------------------------------------------------------------------
 /*!\method  oscStopAcquisition
  * \brief	Stops the oscilloscope from taking data.
@@ -1524,7 +1526,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     [ self writeToGPIBDevice: @"ACQUIRE:STATE OFF"];
     NSLog( @"T754: Data acquisition stopped.\n" );
 }
-		
+
 
 #pragma mark ***DataTaker
 
@@ -1532,27 +1534,27 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTek754DDecoderForScopeData",            @"decoder",
-        [NSNumber numberWithLong:dataId],           @"dataId",
-        [NSNumber numberWithBool:YES],              @"variable",
-        [NSNumber numberWithLong:-1],               @"length",
-        nil];
+								 @"ORTek754DDecoderForScopeData",            @"decoder",
+								 [NSNumber numberWithLong:dataId],           @"dataId",
+								 [NSNumber numberWithBool:YES],              @"variable",
+								 [NSNumber numberWithLong:-1],               @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"ScopeData"];
-
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTek754DDecoderForScopeGTID",            @"decoder",
-        [NSNumber numberWithLong:gtidDataId],       @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:IsShortForm(gtidDataId)?1:2],   @"length",
-        nil];
+				   @"ORTek754DDecoderForScopeGTID",            @"decoder",
+				   [NSNumber numberWithLong:gtidDataId],       @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:IsShortForm(gtidDataId)?1:2],   @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"ScopeGTID"];
-
-   aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORTek754DDecoderForScopeTime",            @"decoder",
-        [NSNumber numberWithLong:clockDataId],      @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+	
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+				   @"ORTek754DDecoderForScopeTime",            @"decoder",
+				   [NSNumber numberWithLong:clockDataId],      @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:3],                @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"ScopeTime"];
     return dataDictionary;
 }
@@ -1561,27 +1563,27 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
 	NSDictionary* aDictionary;
     NSMutableArray* eventGroup = [NSMutableArray array];
-
+	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"ScopeGTID",							@"name",
-							[NSNumber numberWithLong:gtidDataId],	@"dataId",
-								nil];
+				   @"ScopeGTID",							@"name",
+				   [NSNumber numberWithLong:gtidDataId],	@"dataId",
+				   nil];
 	[eventGroup addObject:aDictionary];
-
-
+	
+	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"ScopeTime",							@"name",
-							[NSNumber numberWithLong:clockDataId],	@"dataId",
-								nil];
+				   @"ScopeTime",							@"name",
+				   [NSNumber numberWithLong:clockDataId],	@"dataId",
+				   nil];
 	[eventGroup addObject:aDictionary];
-
+	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"ScopeData",						@"name",
-							[NSNumber numberWithLong:dataId],	@"dataId",
-							[NSNumber numberWithLong:4],		@"maxChannels",
-								nil];
+				   @"ScopeData",						@"name",
+				   [NSNumber numberWithLong:dataId],	@"dataId",
+				   [NSNumber numberWithLong:4],		@"maxChannels",
+				   nil];
 	[eventGroup addObject:aDictionary];
-		
+	
 	[anEventDictionary setObject:eventGroup forKey:@"Tek754Scope"];
 	
 }
@@ -1600,31 +1602,31 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     short		i;
     bool		bRetVal = false;
-
-// Call base class method that initializes _cancelled conditional lock.
+	
+	// Call base class method that initializes _cancelled conditional lock.
     [ super runTaskStarted: aDataPacket userInfo: anUserInfo ];
     
-// Handle case where device is not connected.
+	// Handle case where device is not connected.
     if( ![ self isConnected ] ){
 	    [ NSException raise: @"Not Connected" format: @"You must connect to a GPIB Controller." ];
     }
-                                                                                
+	
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORTek754DModel"]; 
     
-          
-// Get the controller so that it is cached
+	
+	// Get the controller so that it is cached
     bRetVal = [ self cacheTheController ];
     if ( !bRetVal )
     {
         [ NSException raise: @"Not connected" format: @"Could not cache the controller." ];
     }
     
-// Initialize the scope correctly.
+	// Initialize the scope correctly.
     firstEvent = YES;
     
-// Set up memory structures for data and channel mask.
+	// Set up memory structures for data and channel mask.
 	mChannelMask = 0;
     for ( i = 0; i < kMaxOscChnls; i++ )
     {
@@ -1632,14 +1634,14 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
         mDataObj[ i ] = [[ ORTek754DData alloc ] initWithWaveformModel: self channel: i ];
     } 
     
-// Start the oscilloscope
+	// Start the oscilloscope
     NSNumber* initValue = [ anUserInfo objectForKey: @"doinit" ];
     if ( initValue ) 
 		[ self setDoFullInit: [ initValue intValue ]];
     else 
 		[ self setDoFullInit: YES ];
-
-// Initialize the oscilloscope settings and start acquisition using a run configuration.
+	
+	// Initialize the oscilloscope settings and start acquisition using a run configuration.
     mRunInProgress = true;
 	[ self oscSetStandardSettings ];
 	[ self oscRunOsc: nil ];
@@ -1666,7 +1668,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 //--------------------------------------------------------------------------------
 - (void) 	takeDataTask: (id) notUsed 
 {
-
+	
 	ORDataPacket* aDataPacket = nil;
     while(1) {
         
@@ -1680,11 +1682,11 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
         
         BOOL processedAnEvent = NO;
         BOOL readOutError      = NO;
-
+		
         //extract the data packet to use.
 		if(aDataPacket)[aDataPacket release];
         aDataPacket 	= [[ threadParams objectForKey: @"ThreadData" ] retain];
-
+		
         // Set which channels to read based on the mask - If not available read all channels.
         unsigned char mask;
         NSNumber* theMask = [ threadParams objectForKey: @"ChannelMask" ];
@@ -1701,25 +1703,25 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 		//NSLog(@"set t0: %f\n",t0);
         NSString* errorLocation = @"?"; // Used to determine at what point code stops if it stops.
         
-    // -- Basic loop that reads the data -----------------------------------
+		// -- Basic loop that reads the data -----------------------------------
         while ( ![ self cancelled ]) {   
             // If we are not in standalone mode then gtid will be set.
             // In that case break out of this loop in a reasonable amount of time.
             if( gtidNumber && ( [ NSDate timeIntervalSinceReferenceDate ] - t0 > 2.5 ) ){
                 NSLogError( @"", @"Scope Error", [ NSString stringWithFormat: @"Thread timeout, no data for scope (%d)", 
-                            [ self primaryAddress ]], nil );
+												  [ self primaryAddress ]], nil );
                 readOutError = YES;
                 break;
             }
-        
+			
             // Start section that reads data.
-            NS_DURING
+            @try {
                 short i;
                 
                 // Scope is not busy so read it out
                 errorLocation = @"oscBusy";
-               if ( ![ self oscBusy ] ) {
-
+				if ( ![ self oscBusy ] ) {
+					
                     // Read the header only for the first event.  We assume that scope settings will not change.
                     if ( firstEvent ) {
                         //set the channel mask temporarily to read the headers for all channels.
@@ -1732,7 +1734,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
                             if ( mChannels[ i ].chnlAcquire ) [ mDataObj[ i ] convertHeader ];
                         }
                     }
-            
+					
                     // Get data after setting the acquire mask.
                     
                     errorLocation = @"oscGetWaveform";
@@ -1741,19 +1743,19 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
                     errorLocation = @"oscGetWaveformTime";
                     [ self oscGetWaveformTime: mask ];				// Get the time.
                     
-                   // Rearm the oscilloscope.
-                   // [self clearStatusReg];
+					// Rearm the oscilloscope.
+					// [self clearStatusReg];
                     errorLocation = @"oscArmScope";
                     [ self oscArmScope ];   
-                   
+					
                     // Place data in array where other parts of ORCA can grab it.
                     for ( i = 0; i < kMaxOscChnls; i++ ) {
                         if ( mChannels[ i ].chnlAcquire && ( mask & ( 1 << i ) )) {
                             [ mDataObj[ i ] setGtid: gtidNumber ? [ gtidNumber longValue ] : 0 ];
-                
+							
                             //Note only mDataObj[ 0 ] has the timeData.
                             NSData* theTimeData = [ mDataObj[ 0 ] timePacketData: aDataPacket channel: i ];
-                                        
+							
                             //note that the gtid is shipped only with the first data set.
                             [ mDataObj[ i ] setDataPacketData: aDataPacket timeData: theTimeData includeGTID: !processedAnEvent ];
                             processedAnEvent = YES; 
@@ -1768,34 +1770,36 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
                     //NSTimeInterval t1 = [ NSDate timeIntervalSinceReferenceDate ];
                     //while([ NSDate timeIntervalSinceReferenceDate ] - t1 < .01 );
                 }
-            
-            NS_HANDLER
+				
+            }
+			@catch(NSException* localException) {
                 readOutError = YES;
-            NS_ENDHANDLER
+            }
             
             // Indicate that we have processed our first event.
             if( processedAnEvent )
                 firstEvent = NO;
-        
+			
             // If we have the data or encountered an error break out of while.
             if( processedAnEvent || readOutError )
                 break;
         }
-
-    // -- Handle any errors encountered during read -------------------------------
+		
+		// -- Handle any errors encountered during read -------------------------------
         if( readOutError ) {
             NSLogError( @"", @"Scope Error", [ NSString stringWithFormat: @"Exception: %@ (%d)", 
-                                               errorLocation, [ self primaryAddress ] ], nil );
-
+											  errorLocation, [ self primaryAddress ] ], nil );
+			
             //we must rearm the scope. Since there was an error we will try a rearm again just to be sure.
             int errorCount = 0;
             while( 1 ) {
-                NS_DURING
+                @try {
                     [ self clearStatusReg ];
                     [ self oscArmScope ];
-                NS_HANDLER
+                }
+				@catch(NSException* localException) {
                     errorCount++;
-                NS_ENDHANDLER
+                }
                 
                 if( errorCount == 0 ) 
                     break;
@@ -1811,13 +1815,13 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 			if(aDataPacket)[aDataPacket release];
 			mDataThreadRunning = NO;
 			[ thePool release ];
-
+			
 			break;
 		}
 		else [ thePool release ];
-
+		
     }
-
+	
 	
     // Exit this thread
     [ NSThread exit ];
@@ -1847,15 +1851,15 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo: (id) anUserInfo
 {
     short i;
-     
-// Cancel the task.
+	
+	// Cancel the task.
     [ super runTaskStopped: aDataPacket userInfo: anUserInfo ];
-        	   
-// Stop running and place oscilloscope in free running mode.
+	
+	// Stop running and place oscilloscope in free running mode.
     mRunInProgress = false;
     [ self oscRunOsc: nil ];
     
-// Release memory structures used for data taking
+	// Release memory structures used for data taking
     for ( i = 0; i < kMaxOscChnls; i++ )
     {
         [ mDataObj[ i ] release ];
@@ -1874,7 +1878,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (id) initWithCoder: (NSCoder*) aDecoder
 {
     self = [ super initWithCoder: aDecoder ];
-
+	
     [[ self undoManager ] disableUndoRegistration ];
     
     [[ self undoManager ] enableUndoRegistration];
@@ -1894,9 +1898,9 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 - (void) osc754ConvertTime: (unsigned long long*) a10MHzTime timeToConvert: (char*) aCharTime
 {
     struct tm					unixTime;
-//    struct tm*					tmpStruct;
+	//    struct tm*					tmpStruct;
     const char*					stdMonths[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
-                                                "Oct", "Nov", "Dec" };
+	"Oct", "Nov", "Dec" };
     time_t						baseTime;
     unsigned long				fracSecs = 0;
     const unsigned long long	mult = 10000000;
@@ -1906,17 +1910,17 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     char*						dateString;
 	char*						datePiece;
 	
-// Initialize time to zero in case we fail.
-//	printf( "T754: %s\n", aCharTime );	
-
+	// Initialize time to zero in case we fail.
+	//	printf( "T754: %s\n", aCharTime );	
+	
 	*a10MHzTime = 0;
     
-// Set date/time reference to Greenwich time zone - no daylight savings time.
+	// Set date/time reference to Greenwich time zone - no daylight savings time.
     unixTime.tm_isdst = 0;
     unixTime.tm_gmtoff = 0;
 	
     
-// Get past garbage at beginning of date/time string
+	// Get past garbage at beginning of date/time string
     f_Found = false;
     while ( !f_Found && iStart < 10 )
     {
@@ -1926,8 +1930,8 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 	
 	// No leading digit - return 0.
 	if ( !f_Found ) return;
-        
-// Get base time by breaking down Tektronix time into its parts.
+	
+	// Get base time by breaking down Tektronix time into its parts.
 	datePiece = strtok( &aCharTime[ iStart ], " " );
     unixTime.tm_mday = atoi( datePiece );
 	if ( !datePiece ) return;
@@ -1955,36 +1959,36 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 	datePiece = strtok( 0, ":" );
 	if ( !datePiece ) return;
     unixTime.tm_min = atoi( datePiece );
-
+	
 	datePiece = strtok( 0, "." );
 	if ( !datePiece ) return;
     unixTime.tm_sec = atoi( datePiece );
     
     dateString = asctime( &unixTime );
     
-// Get base time in seconds
+	// Get base time in seconds
     baseTime = timegm( &unixTime ); // Have to use timegm because mktime forces the time to
-                                    // local time and then does conversion to gmtime    
-//    tmpStruct = gmtime( &baseTime );
-//    dateString = asctime( tmpStruct );
+	// local time and then does conversion to gmtime    
+	//    tmpStruct = gmtime( &baseTime );
+	//    dateString = asctime( tmpStruct );
     
-// Get fractions of a second.
+	// Get fractions of a second.
 	datePiece = strtok( 0, " " );
 	if ( datePiece ) 
 		fracSecs = atoi( datePiece ) * 10000;
-		
+	
 	datePiece = strtok( 0, " " );
 	if ( datePiece )
 		fracSecs += atoi( datePiece ) * 10;
-		
+	
 	datePiece = strtok( 0, " " );
 	if ( datePiece )
 		fracSecs += atoi( datePiece ) / 100; 
-                      
-// Convert to 10 Mhz Clock
+	
+	// Convert to 10 Mhz Clock
     *a10MHzTime = (unsigned long long)baseTime * mult + fracSecs;
-//  printf( "T754 - converted: %lld\n", *a10MHzTime );	
-
+	//  printf( "T754 - converted: %lld\n", *a10MHzTime );	
+	
 }
 @end
 
@@ -2002,7 +2006,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
 {
     return [self dataGtIdDescription:ptr];
 }
- 
+
 @end
 
 @implementation ORTek754DDecoderForScopeTime

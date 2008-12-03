@@ -87,7 +87,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 - (void) setLogBookFile:(NSString*)aFilePath
 {
 	[[[[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setLogBookFile:logBookFile];
-
+	
 	if(!aFilePath)aFilePath = [@"~/OrcaLogBook.rtfd" stringByExpandingTildeInPath];
 	if(![[aFilePath pathExtension] isEqualToString:@"rtfd"]){
 		aFilePath = [[aFilePath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
@@ -96,7 +96,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     logBookFile = [aFilePath copy];
 	
 	[logBookPathField setStringValue:[logBookFile stringByAbbreviatingWithTildeInPath]];
-
+	
 	if([[NSFileManager defaultManager]  fileExistsAtPath:logBookFile]){
 		if(![logBookField readRTFDFromFile:logBookFile]){
 			NSLogColor([NSColor redColor],@"Couldn't open LogBook <%@>.\n",logBookFile);
@@ -135,10 +135,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
             extra = endOfLineRange.location;
         }
         [[NSNotificationCenter defaultCenter]
-	    postNotificationName:ORStatusFlushedNotification
-                      object:self
-                    userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
-                        [NSNumber numberWithInt:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
+		 postNotificationName:ORStatusFlushedNotification
+		 object:self
+		 userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
+					[NSNumber numberWithInt:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
     }
     [s1 release];
 }
@@ -149,7 +149,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [self printString:s1];
     int len = [s1 length];
  	[s1 release];
-   
+	
     [[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
                                       range:NSMakeRange([self statusTextlength]-len,16)];
     
@@ -165,7 +165,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [self printString:s1];
     int len = [s1 length];
  	[s1 release];
-   
+	
     [[statusView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
                                       range:NSMakeRange([self statusTextlength]-len,16)];
     
@@ -358,7 +358,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 {
 	if(!logBookFile)return;
 	if(logBookDirty)[[[NSApp delegate] document] updateChangeCount:NSChangeUndone];
-
+	
 	if([logBookFile isEqualToString:@"untitled.rtfd"]){
 		[self saveAsLogBook:nil];
 	}
@@ -367,7 +367,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 		logBookDirty = NO;
 		[saveLogBookButton setEnabled:NO];
 	}
-
+	
 }
 
 - (IBAction) saveAsLogBook:(id)sender
@@ -383,11 +383,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
         }
     }
     [savePanel beginSheetForDirectory:startDir
-        file:nil
-        modalForWindow:[self window]
-        modalDelegate:self
-        didEndSelector:@selector(saveAsLogBookDidEnd:returnCode:contextInfo:)
-        contextInfo:nil];
+								 file:nil
+					   modalForWindow:[self window]
+						modalDelegate:self
+					   didEndSelector:@selector(saveAsLogBookDidEnd:returnCode:contextInfo:)
+						  contextInfo:nil];
 }
 
 - (IBAction) loadLogBook:(id)sender
@@ -440,11 +440,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 - (NSString*) substringWithRange:(NSRange)aRange
 {
     NSString* text;
-    NS_DURING
+    @try {
         text = [[[[self text] substringWithRange:aRange]retain] autorelease];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         text = @"";
-    NS_ENDHANDLER
+    }
     return text;
 }
 
@@ -526,12 +527,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	NSRange textViewRange = NSMakeRange(0, 0);
 	
 	[printView replaceCharactersInRange: textViewRange 
-								withRTFD:textData];
+							   withRTFD:textData];
 	
     [printView setDrawsBackground:NO];
-
+	
 	NSPrintOperation* op = [NSPrintOperation printOperationWithView: printView printInfo: 
-		pInfo];
+							pInfo];
 	//[op setShowsProgressPanel: YES];
 	[op runOperationModalForWindow:[self window] delegate:nil didRunSelector:nil contextInfo:nil];
 	
@@ -570,10 +571,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 //----------------------------------------------------------------------------------------------------
 void _nsLog(NSString* s,...)
 {
-
+	
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     NSColor* aColor = [NSColor blackColor];
-    NS_DURING
+    @try {
         va_list myArgs;
         va_start(myArgs,s);
         
@@ -597,11 +598,12 @@ void _nsLog(NSString* s,...)
         [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
         
-    NS_HANDLER
-	NS_ENDHANDLER
-        
+	}
+	@catch(NSException* localException) {
+	}
+	
  	[pool release];
-       
+	
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -611,7 +613,7 @@ void _nsLog(NSString* s,...)
 void NSLogColor(NSColor* aColor,NSString* s,...)
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    NS_DURING
+    @try {
         va_list myArgs;
         va_start(myArgs,s);
         
@@ -635,8 +637,9 @@ void NSLogColor(NSColor* aColor,NSString* s,...)
         [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
         
-    NS_HANDLER
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	[pool release];
 }
 
@@ -647,7 +650,7 @@ void NSLogColor(NSColor* aColor,NSString* s,...)
 void NSLogFont(NSFont* aFont,NSString* s,...)
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    NS_DURING
+    @try {
         va_list myArgs;
         va_start(myArgs,s);
         
@@ -671,8 +674,9 @@ void NSLogFont(NSFont* aFont,NSString* s,...)
         [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
         
-    NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	[pool release];
 }
 
@@ -683,7 +687,7 @@ void NSLogFont(NSFont* aFont,NSString* s,...)
 void NSLogError(NSString* aString,...)
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    NS_DURING
+    @try {
         va_list myArgs;
         va_start(myArgs,aString);
         
@@ -710,8 +714,9 @@ void NSLogError(NSString* aString,...)
         
         [sharedStatusController performSelectorOnMainThread:@selector(handleInvocation:) withObject:invocation waitUntilDone:NO];
         
-    NS_HANDLER
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	[pool release];
 }
 
@@ -728,16 +733,16 @@ void NSLogError(NSString* aString,...)
 {
     if(returnCode){
         NSString* newPath = [[sheet filenames] objectAtIndex:0];
-
+		
 		if(![[newPath pathExtension] isEqualToString:@"rtfd"]){
 			newPath = [[newPath stringByDeletingPathExtension] stringByAppendingPathExtension:@"rtfd"];
 		}
 		[logBookField writeRTFDToFile:newPath atomically:YES];
         [self setLogBookFile:newPath];
-
+		
 		logBookDirty = NO;
 		[saveLogBookButton setEnabled:NO];
-
+		
     }
 }
 @end

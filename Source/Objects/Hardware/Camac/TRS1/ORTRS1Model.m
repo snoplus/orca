@@ -1,18 +1,18 @@
 /*
-    File:		ORTRS1Model.cpp
+ File:		ORTRS1Model.cpp
  
-    Description:	CAMAC LeCroy TR8818 Transient Recorder System
-                            with MM8106 memory Object Implementation
+ Description:	CAMAC LeCroy TR8818 Transient Recorder System
+ with MM8106 memory Object Implementation
  
-                        SUPERCLASS = CCamacIO
+ SUPERCLASS = CCamacIO
  
-    Author:		F. McGirt
-    
-    Copyright:		Copyright 2003 F. McGirt.  All rights reserved.
-    
-    Change History:	2/3/03, First Version
-                    12/27/04 Converted to ObjC for use in the ORCA project. MAH CENPA, University of Washington
-*/
+ Author:		F. McGirt
+ 
+ Copyright:		Copyright 2003 F. McGirt.  All rights reserved.
+ 
+ Change History:	2/3/03, First Version
+ 12/27/04 Converted to ObjC for use in the ORCA project. MAH CENPA, University of Washington
+ */
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -26,7 +26,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
- 
+
 #pragma mark ¥¥¥Imported Files
 #import "ORTRS1Model.h"
 #import "ORDataTypeAssigner.h"
@@ -91,7 +91,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
     [[[self undoManager] prepareWithInvocationTarget:self] setOffsetRegister:offsetRegister];
     
     offsetRegister = aOffsetRegister;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTRS1ModelOffsetRegisterChanged object:self];
 }
 
@@ -105,7 +105,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
     [[[self undoManager] prepareWithInvocationTarget:self] setControlRegister:controlRegister];
     
     controlRegister = aControlRegister;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTRS1ModelControlRegisterChanged object:self];
 }
 
@@ -126,7 +126,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 - (BOOL) digitizeWaveform:(unsigned short*)data dataSize:(unsigned int) dataSize
 {
     BOOL state = YES;
-    NS_DURING
+    @try {
         [self armTrigger];
         [self enableRead];
         
@@ -137,16 +137,17 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
         }
         // read data
         else [self readDigitizer:data maxLength:dataSize];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         state = NO;
-    NS_ENDHANDLER
+    }
     return state;
 }
 
 // write TR8818 control register
 - (void) writeControlRegister:(unsigned short) theControlRegister
 {
-     [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:16  data:&theControlRegister];    
+	[[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:16  data:&theControlRegister];    
 }
 
 // read TR8818 control register
@@ -229,7 +230,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 // disable TR8818 LAM
 - (void) disableLAM
 {
-     [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:24];
+	[[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:24];
 }
 
 // test TR8818 LAM (F27)
@@ -243,7 +244,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 // clear TR8818 LAM
 - (void) clearLAM
 {
-     [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:10];
+	[[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:10];
 }
 
 - (unsigned long) dataId { return dataId; }
@@ -274,11 +275,11 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 	
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"OR8818DecoderForWaveform",                    @"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:YES],                  @"variable",
-        [NSNumber numberWithLong:-1],					@"length",
-        nil];
+								 @"OR8818DecoderForWaveform",                    @"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:YES],                  @"variable",
+								 [NSNumber numberWithLong:-1],					@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Waveform"];
     return dataDictionary;
 }
@@ -301,10 +302,10 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 	cachedStation = [self stationNumber]+1;
     [self clearExceptionCount];
 	[self initBoard];
-
+	
 	// calculate max data size
 	expectedNumberDataBytes = 8L * 1024L * (((controlRegister >> 8) & 0xff) + 1);
-
+	
 	
     dataBuffer = (unsigned long*)malloc(RecodeSizeInLongs * sizeof(long));
 	firstTime = YES;
@@ -317,7 +318,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NS_DURING
+    @try {
         
 		if(!firstTime){
 			unsigned short status = [controller camacShortNAF:cachedStation a:0 f:27];
@@ -341,7 +342,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 						else break;
 					}
 				}
-
+				
 				if(actualByteCount <= expectedNumberDataBytes){
 					dataBuffer[2] = actualByteCount; 
 					[aDataPacket addLongsToFrameBuffer:dataBuffer length:RecodeSizeInLongs];
@@ -357,11 +358,12 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 			[self armTrigger];
 		}
   		
-		NS_HANDLER
-			NSLogError(@"",@"8818 Card Error",nil);
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"8818 Card Error",nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 
