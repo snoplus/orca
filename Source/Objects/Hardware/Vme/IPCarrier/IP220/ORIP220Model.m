@@ -38,7 +38,7 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
     
     [[self undoManager] disableUndoRegistration];
     hwLock = [[NSLock alloc] init];
-
+	
 	int i;
 	for(i=0;i<16;i++){
 		outputVoltage[i] = 0;
@@ -75,15 +75,15 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 {
 	if(index<16){
 		[[[self undoManager] prepareWithInvocationTarget:self] setOutputVoltage:index withValue:outputVoltage[index]];
-
+		
 		if(aValue< -10)aValue = -10;
 		else if(aValue>9.98)aValue = 9.98;
 		
 		outputVoltage[index] = aValue;
 		[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORIP220VoltageChanged
-					  object:self
-					  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
+		 postNotificationName:ORIP220VoltageChanged
+		 object:self
+		 userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Channel"]];
 	}
 }
 
@@ -92,8 +92,8 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 	[[[self undoManager] prepareWithInvocationTarget:self] setTransferMode:transferMode];
 	transferMode = flag;
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORIP220TransferModeChanged
-				  object:self];
+	 postNotificationName:ORIP220TransferModeChanged
+	 object:self];
 }
 
 - (BOOL) transferMode
@@ -105,24 +105,24 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 
 - (void) resetBoard
 {
-		//convert the Voltage values to raw values and load into the hw registers
-		id  theController = [guardian adapter];
-		unsigned short controlRegValue;
-		[theController readWordBlock:&controlRegValue						
-							atAddress:[self baseAddress] + 0x28
-						   numToRead:1L
-						   withAddMod:[guardian addressModifier]
-						usingAddSpace:kAccessRemoteIO];
-		controlRegValue |= 0x0080;
-		[theController writeWordBlock:&controlRegValue					
-							atAddress:[self baseAddress] + 0x28
-						   numToWrite:1L
-						   withAddMod:[guardian addressModifier]
-						usingAddSpace:kAccessRemoteIO];
-
-		int i;
-		for(i=0;i<16;i++)outputVoltage[i] = 0;
-		[self initBoard];
+	//convert the Voltage values to raw values and load into the hw registers
+	id  theController = [guardian adapter];
+	unsigned short controlRegValue;
+	[theController readWordBlock:&controlRegValue						
+					   atAddress:[self baseAddress] + 0x28
+					   numToRead:1L
+					  withAddMod:[guardian addressModifier]
+				   usingAddSpace:kAccessRemoteIO];
+	controlRegValue |= 0x0080;
+	[theController writeWordBlock:&controlRegValue					
+						atAddress:[self baseAddress] + 0x28
+					   numToWrite:1L
+					   withAddMod:[guardian addressModifier]
+					usingAddSpace:kAccessRemoteIO];
+	
+	int i;
+	for(i=0;i<16;i++)outputVoltage[i] = 0;
+	[self initBoard];
 }
 
 - (void) initBoard
@@ -133,18 +133,18 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 	unsigned short dummy = 1;
 	if(transferMode == kIP220SimultaneousMode){
 		[theController writeWordBlock:&dummy					//value doesn't matter
-						atAddress:[self baseAddress] + 0x24		//offset to the simultaneous write reg.
-					   numToWrite:1L
-					   withAddMod:[guardian addressModifier]
-					usingAddSpace:kAccessRemoteIO];
+							atAddress:[self baseAddress] + 0x24		//offset to the simultaneous write reg.
+						   numToWrite:1L
+						   withAddMod:[guardian addressModifier]
+						usingAddSpace:kAccessRemoteIO];
 	}
 	for(i=0;i<16;i++){
 		if(transferMode == kIP220TransparentMode){
 			[theController writeWordBlock:&dummy					//value doesn't matter
-						atAddress:[self baseAddress] + 0x20		//offset to the transparent write reg.
-					   numToWrite:1L
-					   withAddMod:[guardian addressModifier]
-					usingAddSpace:kAccessRemoteIO];
+								atAddress:[self baseAddress] + 0x20		//offset to the transparent write reg.
+							   numToWrite:1L
+							   withAddMod:[guardian addressModifier]
+							usingAddSpace:kAccessRemoteIO];
 		}
 		//the least significant bit of the raw data is bit 4, hence the shifth
 		unsigned short rawValue = (unsigned short)((204.8*outputVoltage[i]+2048))<<4;
@@ -157,10 +157,10 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 	}
 	if(transferMode == kIP220SimultaneousMode){
 		[theController writeWordBlock:&dummy					//value doesn't matter, the write triggers event
-						atAddress:[self baseAddress] + 0x24		//offset to the simultaneous write reg.
-					   numToWrite:1L
-					   withAddMod:[guardian addressModifier]
-					usingAddSpace:kAccessRemoteIO];
+							atAddress:[self baseAddress] + 0x24		//offset to the simultaneous write reg.
+						   numToWrite:1L
+						   withAddMod:[guardian addressModifier]
+						usingAddSpace:kAccessRemoteIO];
 	}
 	
 }
@@ -171,7 +171,7 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 	id  theController = [guardian adapter];
 	unsigned short rawValue;
 	for(i=0;i<16;i++){
-		NS_DURING
+		@try {
 			[theController readWordBlock:&rawValue
 							   atAddress:[self baseAddress] + (i*2)
 							   numToRead:1L
@@ -184,9 +184,10 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
 			[[self undoManager] disableUndoRegistration];
 			[self setOutputVoltage:i withValue:convertedValue];
 			[[self undoManager] enableUndoRegistration];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLogError(@"IP220",@"Read Exception",nil);
-		NS_ENDHANDLER
+		}
 	}
 }
 

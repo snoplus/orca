@@ -64,7 +64,7 @@
                          name : ORIP408ReadValueChangedNotification
                        object : model];
     
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORVmeCardSlotChangedNotification
@@ -119,7 +119,7 @@
 	for(i=0;i<[readMaskBitMatrix numberOfColumns];i++){
 		[[readMaskBitMatrix cellWithTag:i] setIntValue:(value & 1L<<i)];
 	}
-
+	
 }
 
 -(void)readValueChanged:(NSNotification*)aNotification
@@ -138,25 +138,27 @@
 #pragma mark ¥¥¥Actions
 -(IBAction)read:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         unsigned long value = [model getInputWithMask:[model readMask]];
         [model setReadValue:value];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 -(IBAction)write:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model setOutputWithMask:[model writeMask] value:[model writeValue]];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 

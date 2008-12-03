@@ -113,12 +113,12 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
                      selector: @selector(runStarted:)
                          name: ORRunAboutToStartNotification
                        object: nil];
-
+	
     [notifyCenter addObserver: self
                      selector: @selector(setMainFrameIDs:)
                          name: ORGroupObjectsRemoved
                        object: nil];
-
+	
     [notifyCenter addObserver: self
                      selector: @selector(setMainFrameIDs:)
                          name: ORGroupObjectsAdded
@@ -133,7 +133,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
                      selector : @selector(powerRestored:)
                          name : @"CamacPowerRestoredNotification"
                        object : nil];
-
+	
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -204,8 +204,8 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
     dirName = [aDirName copy];
     
 	[[NSNotificationCenter defaultCenter]
-                    postNotificationName:ORHV2132StateFileDirChanged
-                                  object: self];
+	 postNotificationName:ORHV2132StateFileDirChanged
+	 object: self];
     
 }
 
@@ -225,7 +225,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setHvValue:hvValue];
     
     hvValue = aHvValue;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHV2132ModelHvValueChanged object:self];
 }
 
@@ -239,7 +239,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setMainFrame:mainFrame];
     
     mainFrame = aMainFrame;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHV2132ModelMainFrameChanged object:self];
 }
 
@@ -253,7 +253,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setChannel:channel];
     
     channel = aChannel;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHV2132ModelChannelChanged object:self];
 }
 
@@ -275,8 +275,8 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
     [guardian positionConnector:connector forCard:self];
     
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORCamacCardSlotChangedNotification
-                          object: self];
+	 postNotificationName:ORCamacCardSlotChangedNotification
+	 object: self];
 }
 - (void) setGuardian:(id)aGuardian
 {
@@ -329,8 +329,8 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 
 - (void) setVoltage:(int) aValue mainFrame:(int) aMainFrame channel:(int) aChannel
 {
-	NS_DURING
-
+	@try {
+		
 		[commLock lock];
 		unsigned short dataWord;
 		
@@ -341,30 +341,31 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 		//send V-1 cmd (set Value)
 		dataWord = (aValue&0xfff)<<4 | 0x1;
 		[self sendCmd:dataWord label:@"set value"];
-	
+		
 		//load the hvrecord but only if mainframe is ON
 		if([self getHVRecordStatusMainFrame:aMainFrame]){
 			[self setHVRecordMainFrame: aMainFrame channel:aChannel voltage:aValue];
 			[[NSNotificationCenter defaultCenter]
-							postNotificationName:ORHV2132VoltageChanged
-										  object: self
-										  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
-													[NSNumber numberWithInt:aMainFrame],@"MainFrame",
-													[NSNumber numberWithInt:aChannel],@"Channel",
-													[NSNumber numberWithInt:aValue],@"Voltage",
-													nil]];
+			 postNotificationName:ORHV2132VoltageChanged
+			 object: self
+			 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+					   [NSNumber numberWithInt:aMainFrame],@"MainFrame",
+					   [NSNumber numberWithInt:aChannel],@"Channel",
+					   [NSNumber numberWithInt:aValue],@"Voltage",
+					   nil]];
 		}
 		[commLock unlock];
 		
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[commLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readVoltage:(int*) aValue mainFrame:(int) aMainFrame channel:(int) aChannel
 {
-	NS_DURING
+	@try {
 		[commLock lock];
 		
 #		ifdef HV2132ReadWorking
@@ -373,7 +374,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 		//send C-M-3 cmd (read one channel voltage)
 		dataWord = ((aMainFrame&0x3f)<<4) | ((aChannel&0x3f)<<10) | 3;
 		[self sendCmd:dataWord label:@"read voltage"];
-			[ORTimer delay:.8]; //temp
+		[ORTimer delay:.8]; //temp
 		//response should be T3
 		[self readData:&dataWord numWords:1];
 		if(((dataWord & 0xf) != 3) || (((dataWord>>4) & 0x3f) != aMainFrame)){
@@ -384,17 +385,18 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 #		else
 		*aValue = [self getHVRecordVoltageMainFrame: aMainFrame channel:aChannel];
 #		endif
-
+		
 		[commLock unlock];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[commLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readAllVoltages:(int*)aValues mainFrame:(int) aMainFrame
 {
-	NS_DURING
+	@try {
 		[commLock lock];
 		//response should be 32 T3s
 		unsigned short values[kHV2132NumberSupplies];
@@ -405,7 +407,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 		//send C-M-4 cmd (read all channel voltages)
 		dataWord = ((aMainFrame&0x3f)<<4) | 4;
 		[self sendCmd:dataWord label:@"read all voltages"];
-
+		
 		[self readData:values numWords:kHV2132NumberSupplies];
 		for(i=0;i<kHV2132NumberSupplies;i++){
 			if(((values[i] & 0xf) == 3) && (((dataWord>>4) & 0x3f) == aMainFrame)){
@@ -420,24 +422,25 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 			values[i] = [self getHVRecordVoltageMainFrame: aMainFrame channel:i];
 		}
 #		endif
-
+		
 		[commLock unlock];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[commLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readTarget:(int*) aValue mainFrame:(int) aMainFrame channel:(int) aChannel
 {
-	NS_DURING
+	@try {
 		[commLock lock];
 		unsigned short dataWord;
 		
 		//send C-M-8 cmd (read one channel target)
 		dataWord = ((aMainFrame&0x3f)<<4) | ((aChannel&0x3f)<<10) | 8;
 		[self sendCmd:dataWord label:@"read target"];
-			
+		
 		//response should be T8
 		[self readData:&dataWord numWords:1];
 		if(((dataWord & 0xf) != 8) || (((dataWord>>4) & 0x3f) != aMainFrame)){
@@ -445,23 +448,24 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 		}
 		else *aValue = dataWord>>4;
 		[commLock unlock];
-	
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		[commLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readAllTargets:(int*)aValues mainFrame:(int) aMainFrame
 {
-	NS_DURING
+	@try {
 		[commLock lock];
 		unsigned short dataWord;
 		
 		//send C-M-10 cmd (read all channel targets)
 		dataWord = ((aMainFrame&0x3f)<<4) | 10;
 		[self sendCmd:dataWord label:@"read all voltages"];
-			
+		
 		//response should be kHV2132NumberSupplies T8s
 		unsigned short values[kHV2132NumberSupplies];
 		[self readData:values numWords:kHV2132NumberSupplies];
@@ -475,26 +479,27 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 			}
 		}
 		[commLock unlock];
-	
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		[commLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readStatus:(int*) aValue failedMask:(unsigned short*)failed mainFrame:(int) aMainFrame
 {
-	NS_DURING
+	@try {
 		[commLock lock];
 #		ifdef HV2132ReadWorking
-
+		
 		unsigned short dataWord;
 		
 		//[self setEnableResponse:YES mainFrame:aMainFrame];
 		//send C-M-9 cmd (read one channel target)
 		dataWord = ((aMainFrame&0x3f)<<4) | 9;
 		[self sendCmd:dataWord label:@"read status"];
-
+		
 		//response should be T9 for each failed channel, followed by a  T5
 		*failed = 0x0;
 		unsigned short result[kHV2132NumberSupplies];
@@ -513,33 +518,34 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 				break;
 			}
 		}
-			
+		
 		if(!ok){
 			[NSException raise:@"HV cmd Error" format:@"HV2132 %d bad reponse: read status",[self stationNumber]];
 		}
 #		else
 		*aValue = [self getHVRecordStatusMainFrame:aMainFrame];
 #		endif
-
+		
 		[commLock unlock];
 		//[self setEnableResponse:NO mainFrame:aMainFrame];
-	
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		[commLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readPodComplement:(unsigned short*) typeMask mainFrame:(int) aMainFrame
 {
-	NS_DURING
+	@try {
 		[commLock lock];
 		unsigned short dataWord;
 		
 		//send C-M-15 cmd (get Pod Complement)
 		dataWord = ((aMainFrame&0x3f)<<4)  | 15;
 		[self sendCmd:dataWord label:@"read pod types"];
-			
+		
 		//response should be P10
 		[self readData:typeMask numWords:1];
 		if(((*typeMask & 0xf) != 10) || (((*typeMask>>4) & 0x3f) != aMainFrame)){
@@ -548,46 +554,48 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 		else *typeMask = *typeMask>>4;
 		//1 for 7KV and 0 3.3KV Bit2^7 is pod 0 Bit0 is pod 0
 		[commLock unlock];
-	
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		[commLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
 - (void) setHV:(BOOL)state mainFrame:(int)aMainFrame
 {
-	NS_DURING
+	@try {
 		[commLock lock];
 		//send S-M-5 cmd (HV ON/OFF switch)
 		unsigned short dataWord = ((state&0x1)<<10) | ((aMainFrame&0x3f)<<4) | 5;
 		[self sendCmd:dataWord label:@"Set HV State"];
-
+		
 		//load the hv record
 		[self setHVRecordMainFrame:aMainFrame  status:state];
-
+		
 		[commLock unlock];
-
+		
 		[[NSNotificationCenter defaultCenter]
-						postNotificationName:ORHV2132OnOffChanged
-									  object: self
-									  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
-													[NSNumber numberWithInt:aMainFrame],@"MainFrame",
-													[NSNumber numberWithInt:state],@"State",
-													nil]];
-
-	
-	NS_HANDLER
+		 postNotificationName:ORHV2132OnOffChanged
+		 object: self
+		 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+				   [NSNumber numberWithInt:aMainFrame],@"MainFrame",
+				   [NSNumber numberWithInt:state],@"State",
+				   nil]];
+		
+		
+	}
+	@catch(NSException* localException) {
 		[commLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) sendCmd:(unsigned short)aCmd label:(NSString*)aLabel
 {
 #	ifndef HV2132NoHardware
-
+	
 	unsigned short statusWord = [[self adapter] camacShortNAF:[self stationNumber] a:0 f:16 data:&aCmd];
 	if(!isQbitSet(statusWord)){
 		[NSException raise:@"HV cmd Error" format:@"HV2132 %d refused cmd: %@",[self stationNumber],aLabel];
@@ -610,8 +618,8 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 #	ifdef HV2132NoHardware
 	return;
 #	endif
-
-
+	
+	
 	if(num<=0)return;
 	
     unsigned short statusWord;
@@ -659,7 +667,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 	else if(wordCount != num){
 		[NSException raise:@"HV reponse Error" format:@"HV2132 %d Incorrect word count in response",[self stationNumber]];
 	}
-
+	
 }
 
 #pragma mark ¥¥¥Archival
@@ -672,17 +680,17 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
     [self setHvValue:		[decoder decodeIntForKey:@"hvValue"]];
     [self setMainFrame:		[decoder decodeIntForKey:@"mainFrame"]];
     [self setChannel:		[decoder decodeIntForKey:@"channel"]];
-
+	
     [self setConnectorName:	[decoder decodeObjectForKey:@"connectorName"]];
     [self setConnector:		[decoder decodeObjectForKey:@"connector"]];
     [self setDirName:		[decoder decodeObjectForKey:@"HVDirName"]];
-
+	
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 	commLock = [[NSLock alloc] init];
-
+	
 	[self loadHVParams];
-
+	
     return self;
 }
 
@@ -722,7 +730,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 	NSString* mainFrameKey	= [NSString stringWithFormat:@"HVMainFrame%d",aMainFrame];
 	NSString* timeKey		= [NSString stringWithFormat:@"SetTime%d",aChannel];
 	NSString* voltageKey	= [NSString stringWithFormat:@"HVVoltage%d",aChannel];
-
+	
 	if(!hvRecord)hvRecord = [[NSMutableDictionary dictionary] retain];
 	
 	NSMutableDictionary* mainFrameDictionary = [hvRecord objectForKey:mainFrameKey];
@@ -732,8 +740,8 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 	}
 	[mainFrameDictionary setObject:[NSNumber numberWithInt:aValue] forKey:voltageKey]; 
 	[mainFrameDictionary setObject:[NSDate date] forKey:timeKey]; 
-
-
+	
+	
 }
 
 - (void) setHVRecordMainFrame:(int)aMainFrame status:(BOOL)state
@@ -741,7 +749,7 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
 	//make the keys
 	NSString* mainFrameKey	= [NSString stringWithFormat:@"HVMainFrame%d",aMainFrame];
 	NSString* statusKey		= [NSString stringWithFormat:@"HVStatus"];
-
+	
 	if(!hvRecord)hvRecord = [[NSMutableDictionary dictionary] retain];
 	
 	NSMutableDictionary* mainFrameDictionary = [hvRecord objectForKey:mainFrameKey];

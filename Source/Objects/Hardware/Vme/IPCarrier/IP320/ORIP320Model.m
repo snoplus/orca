@@ -55,9 +55,9 @@ static struct {
     NSString* regName;
     unsigned long addressOffset;
 }reg[kNum320Registers]={
-	{@"Control Reg",  0x0000},
-	{@"Convert Cmd",  0x0010},
-	{@"ADC Data Reg", 0x0020},		
+{@"Control Reg",  0x0000},
+{@"Convert Cmd",  0x0010},
+{@"ADC Data Reg", 0x0020},		
 };
 
 @interface ORIP320Model (private)
@@ -135,7 +135,7 @@ static struct {
     [aCalibrationDate retain];
     [calibrationDate release];
     calibrationDate = aCalibrationDate;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelCalibrationDateChanged object:self];
 }
 
@@ -177,8 +177,8 @@ static struct {
     [multiPlots addObject:aMultiPlot];
     
     [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORIP320ModelMultiPlotsChangedNotification
-                              object: self ];
+	 postNotificationName:ORIP320ModelMultiPlotsChangedNotification
+	 object: self ];
 }
 
 - (void) removeMultiPlot:(id)aMultiPlot
@@ -188,8 +188,8 @@ static struct {
     [aMultiPlot removeFrom:multiPlots];
     
     [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORIP320ModelMultiPlotsChangedNotification
-                              object: self ];
+	 postNotificationName:ORIP320ModelMultiPlotsChangedNotification
+	 object: self ];
 }
 
 - (int) cardJumperSetting
@@ -202,7 +202,7 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setCardJumperSetting:cardJumperSetting];
     
     cardJumperSetting = aCardJumperSetting;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelCardJumperSettingChanged object:self];
 }
 
@@ -216,7 +216,7 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:shipRecords];
     
     shipRecords = aShipRecords;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelShipRecordsChanged object:self];
 }
 
@@ -228,10 +228,10 @@ static struct {
 - (void) setLogFile:(NSString*)aLogFile
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLogFile:logFile];
-				
+	
     [logFile autorelease];
     logFile = [aLogFile copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelLogFileChanged object:self];
 }
 
@@ -248,8 +248,8 @@ static struct {
 	
 	if(logToFile)[self performSelector:@selector(writeLogBufferToFile) withObject:nil afterDelay:60];
 	else [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(writeLogBufferToFile) object:nil];
-
-
+	
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelLogToFileChanged object:self];
 }
 
@@ -258,9 +258,9 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setMode:mode];
     
     mode = aMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelModeChanged object:self];
-
+	
 }
 
 - (int) mode
@@ -278,7 +278,7 @@ static struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setDisplayRaw:displayRaw];
     
     displayRaw = aDisplayRaw;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelDisplayRawChanged object:self];
 }
 
@@ -352,8 +352,8 @@ static struct {
     [self performSelector:@selector(_startPolling) withObject:nil afterDelay:0.5];
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORIP320PollingStateChangedNotification
-                      object: self];
+	 postNotificationName:ORIP320PollingStateChangedNotification
+	 object: self];
     
 }
 
@@ -400,26 +400,26 @@ static struct {
     aMask |= (aChannel%20 & kChan_mask);//bits 0-5
 	aMask |= [chanObj gain] << 6;       //bits 6-7
 	aMask |= [self mode] << 8;			//bits 8-9
-        
+	
 	[[guardian adapter] writeWordBlock:&aMask
-								 atAddress:[self getRegisterAddress:kControlReg]
-								numToWrite:1L
-								withAddMod:[guardian addressModifier]
-							 usingAddSpace:kAccessRemoteIO];
+							 atAddress:[self getRegisterAddress:kControlReg]
+							numToWrite:1L
+							withAddMod:[guardian addressModifier]
+						 usingAddSpace:kAccessRemoteIO];
 }
 
 - (void) loadConversionStart
 {
-			unsigned short modifier = [guardian addressModifier];
-			unsigned short dummyValue = 0xFFFF;
-			id cachedController = [guardian adapter];
-			[cachedController writeWordBlock:&dummyValue
-									 atAddress:[self getRegisterAddress:kConvertCmd]
-									numToWrite:1L
-									withAddMod:modifier
-								 usingAddSpace:kAccessRemoteIO];
-
-
+	unsigned short modifier = [guardian addressModifier];
+	unsigned short dummyValue = 0xFFFF;
+	id cachedController = [guardian adapter];
+	[cachedController writeWordBlock:&dummyValue
+						   atAddress:[self getRegisterAddress:kConvertCmd]
+						  numToWrite:1L
+						  withAddMod:modifier
+					   usingAddSpace:kAccessRemoteIO];
+	
+	
 }
 
 -(unsigned short) readDataBlock
@@ -428,22 +428,22 @@ static struct {
 	unsigned short modifier = [guardian addressModifier];
 	id cachedController = [guardian adapter];
 	[cachedController readWordBlock:(unsigned short*)&value
-									atAddress:[self getRegisterAddress:kControlReg]
-									numToRead:1L
-								   withAddMod:modifier
-								usingAddSpace:kAccessRemoteIO];
-
-
-			
-	 if((value & 0x8000) == 0x8000){
-			[cachedController readWordBlock:(unsigned short*)&value
-									atAddress:[self getRegisterAddress:kADCDataReg]
-									numToRead:1L
-								withAddMod:modifier
-								usingAddSpace:kAccessRemoteIO];
-			
-				//the value needs to be shifted by 4 bits after the read. That's how is comes off the card....
-			value=((value>>4) & 0x0fff);
+						  atAddress:[self getRegisterAddress:kControlReg]
+						  numToRead:1L
+						 withAddMod:modifier
+					  usingAddSpace:kAccessRemoteIO];
+	
+	
+	
+	if((value & 0x8000) == 0x8000){
+		[cachedController readWordBlock:(unsigned short*)&value
+							  atAddress:[self getRegisterAddress:kADCDataReg]
+							  numToRead:1L
+							 withAddMod:modifier
+						  usingAddSpace:kAccessRemoteIO];
+		
+		//the value needs to be shifted by 4 bits after the read. That's how is comes off the card....
+		value=((value>>4) & 0x0fff);
 	}
 	return value;
 }
@@ -456,32 +456,34 @@ static struct {
 	unsigned short corrected_value = 0;
 	@synchronized(self) {
 		NSString* errorLocation = @"";
-		NS_DURING
+		@try {
 			errorLocation = @"Control Reg Setup";
 			[self loadConstants:aChannel];
 			[ORTimer delay:KDelayTime];
-
+			
 			errorLocation = @"Converion Start";
 			[self loadConversionStart];
 			errorLocation = @"Adc Read";
 			value = [self readDataBlock];
 			corrected_value = [self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] countActual:value];
 			if([[chanObjs objectAtIndex:aChannel] setChannelValue:corrected_value time:aTime])changeCount++;
-						
-		NS_HANDLER
+			
+		}
+		@catch(NSException* localException) {
 			NSLogError(@"",[NSString stringWithFormat:@"IP320 %d,%@",[self slot],[self identifier]],errorLocation,nil);
 			[NSException raise:[NSString stringWithFormat:@"IP320 Read Adc Channel %d Failed",aChannel] format:@"Error Location: %@",errorLocation];
-		NS_ENDHANDLER
+		}
 		if(changeCount){
 			[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORIP320AdcValueChangedNotification object:self] waitUntilDone:NO];
 		}
 	}
-//	NSLog(@"the corected value is %d\n",[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] countActual:value]);
+	//	NSLog(@"the corected value is %d\n",[self calculateCorrectedCount:[[chanObjs objectAtIndex:aChannel] gain] countActual:value]);
 	return corrected_value;
 }
 
 //Calibration routines
-- (void) loadCALHIControReg:(unsigned short)gain{
+- (void) loadCALHIControReg:(unsigned short)gain
+{
 	unsigned short aMaskCALHI = 0x0000;
 	if((cardJumperSetting==kMinus5to5 && gain==0)||(cardJumperSetting==kMinus10to10&&gain<=1)||(cardJumperSetting==k0to10&&gain<=1)){
 		calibrationConstants[gain].kVoltCALHI=kCAL0_volt;
@@ -504,23 +506,23 @@ static struct {
 		aMaskCALHI|=(gain<<6);	
 	}
 	[[guardian adapter] writeWordBlock:&aMaskCALHI
-								atAddress:[self getRegisterAddress:kControlReg]
-								numToWrite:1L
-								withAddMod:[guardian addressModifier]
-								usingAddSpace:kAccessRemoteIO];
+							 atAddress:[self getRegisterAddress:kControlReg]
+							numToWrite:1L
+							withAddMod:[guardian addressModifier]
+						 usingAddSpace:kAccessRemoteIO];
 	
-
+	
 }
 
 - (void) loadCALLOControReg:(unsigned short)gain
 {
 	unsigned short aMaskCALLO = 0;
-
-//Find CountCALLO
+	
+	//Find CountCALLO
 	if(cardJumperSetting==k0to10){
-			calibrationConstants[gain].kVoltCALLO=kCAL3_volt;
-			aMaskCALLO|=kCAL3_mask;
-			aMaskCALLO|=(gain<<6);
+		calibrationConstants[gain].kVoltCALLO=kCAL3_volt;
+		aMaskCALLO|=kCAL3_mask;
+		aMaskCALLO|=(gain<<6);
 	}
 	else {
 		calibrationConstants[gain].kVoltCALLO=kAUTOZERO_volt;
@@ -529,10 +531,10 @@ static struct {
 		
 	}
 	[[guardian adapter] writeWordBlock:&aMaskCALLO
-								atAddress:[self getRegisterAddress:kControlReg]
-								numToWrite:1L
-								withAddMod:[guardian addressModifier]
-								usingAddSpace:kAccessRemoteIO];
+							 atAddress:[self getRegisterAddress:kControlReg]
+							numToWrite:1L
+							withAddMod:[guardian addressModifier]
+						 usingAddSpace:kAccessRemoteIO];
 }
 
 -(void) calculateCalibrationSlope:(unsigned short)gain
@@ -545,7 +547,7 @@ static struct {
 -(unsigned short) calculateCorrectedCount:(unsigned short)gain countActual:(unsigned short)countActual
 {
 	unsigned short corrected_count;
-
+	
 	if(cardJumperSetting==kUncalibrated) { corrected_count=countActual; }
 	else {
 		corrected_count=countActual;
@@ -569,8 +571,8 @@ static struct {
 			}
 			[self _callibrateIP320];
 			NSLog(@"Calibrated IP320 for -5 to 5 Voltage Range\n");
-		break;
-		
+			break;
+			
 		case(kMinus10to10):
 			for(countergain=0;countergain<kNumGainSettings;countergain++){
 				calibrationConstants[countergain].kIdeal_Volt_Span=20.000;
@@ -578,8 +580,8 @@ static struct {
 			}
 			[self _callibrateIP320];
 			NSLog(@"Calibrated IP320 for -10 to 10 Voltage Range\n");
-		break;
-		
+			break;
+			
 		case(k0to10):
 			for(countergain=0;countergain<kNumGainSettings;countergain++){
 				calibrationConstants[countergain].kIdeal_Volt_Span=10.000;
@@ -587,11 +589,11 @@ static struct {
 			}
 			[self _callibrateIP320];
 			NSLog(@"Calibrated IP320 for 0 to 10 Voltage Range\n");
-		break;
-		
+			break;
+			
 		case(kUncalibrated):
 			//NSLog(@"IP320 returns uncorrected value.\n");
-		break;
+			break;
 	}
 }
 
@@ -601,7 +603,7 @@ static struct {
 	unsigned short ReadNumber = 10;
 	@synchronized(self) {
 		NSString* errorLocation = @"";
-		NS_DURING
+		@try {
 			for(gain=0;gain<=3;gain++){
 				
 				errorLocation = @"CountCALHI Control Reg Setup";
@@ -621,7 +623,7 @@ static struct {
 				errorLocation = @"CountCALLO Control Reg Setup";
 				[self loadCALLOControReg:gain];
 				[ORTimer delay:KDelayTime];
-
+				
 				unsigned short CountCALLO=0;
 				for(i=0;i<ReadNumber;i++){
 					errorLocation = @"CountCALLO Converion Start";
@@ -637,12 +639,13 @@ static struct {
 			}
 			
 			
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLogError(@"",[NSString stringWithFormat:@"IP320 %d,%@",[self slot],[self identifier]],errorLocation,nil);
 			[NSException raise:[NSString stringWithFormat:@"IP320 Calibration Failed"] format:@"Error Location: %@",errorLocation];
-		NS_ENDHANDLER
+		}
 	}
-
+	
 }
 
 - (void) readAllAdcChannels
@@ -662,7 +665,7 @@ static struct {
 		if(logToFile) {
 			outputString = [NSString stringWithFormat:@"%u ",ut_time];
 		}
-
+		
 		short chan;
 		for(chan=0;chan<kNumIP320Channels;chan++){
 			if([[chanObjs objectAtIndex:chan] readEnabled]){
@@ -688,16 +691,17 @@ static struct {
 
 - (void) _pollAllChannels
 {
-    NS_DURING 
+    @try { 
         [self readAllAdcChannels]; 
 		if(shipRecords){
 			[self shipRawValues]; 
 			[self shipConvertedValues]; 
 		}
-    NS_HANDLER 
-	//catch this here to prevent it from falling thru, but nothing to do.
-	NS_ENDHANDLER
-        
+    }
+	@catch(NSException* localException) { 
+		//catch this here to prevent it from falling thru, but nothing to do.
+	}
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_pollAllChannels) object:nil];
 	if(pollingState!=0){
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];
@@ -735,7 +739,7 @@ static struct {
 
 - (void) _setUpPolling:(BOOL)verbose
 {
-
+	
 	if(pollRunning)return;
 	
     if(pollingState!=0){  
@@ -756,7 +760,7 @@ static struct {
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
-	    
+	
     [[self undoManager] disableUndoRegistration];
     [self setShipRecords:				[decoder decodeBoolForKey:@"ORIP320ModelShipRecords"]];
     [self setLogFile:					[decoder decodeObjectForKey:@"ORIP320ModelLogFile"]];
@@ -776,7 +780,7 @@ static struct {
     }
 	[chanObjs makeObjectsPerformSelector:@selector(setAdcCard:) withObject:self];
     [multiPlots makeObjectsPerformSelector:@selector(setDataSource:) withObject:dataSet];
-
+	
     [self setCalibrationDate:			[decoder decodeObjectForKey:@"calibrationDate"]];
     [self setCardJumperSetting:			[decoder decodeIntForKey:@"cardJumperSetting"]];
 	int gain;
@@ -789,14 +793,14 @@ static struct {
 		calibrationConstants[gain].kVoltCALHI		= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kVoltCALHI%d",gain]];
 		calibrationConstants[gain].kCountCALHI		= [decoder decodeIntForKey:  [NSString stringWithFormat:@"kCountCALHI%d",gain]];
 	}
-
+	
 	[[self undoManager] enableUndoRegistration];
-	   	
+	
 	[[NSNotificationCenter defaultCenter] addObserver : self
-                     selector : @selector(writeLogBufferToFile)
-                         name : ORRunStatusChangedNotification
-						object: nil]; 
-
+											 selector : @selector(writeLogBufferToFile)
+												 name : ORRunStatusChangedNotification
+												object: nil]; 
+	
     return self;
 }
 
@@ -841,22 +845,23 @@ static struct {
 - (void) startProcessCycle
 {
     if(!readOnce){
-        NS_DURING 
+        @try { 
             [self readAllAdcChannels]; 
             if(shipRecords){
                 [self shipRawValues]; 
                 [self shipConvertedValues]; 
             }
             readOnce = YES;
-        NS_HANDLER 
-        //catch this here to prevent it from falling thru, but nothing to do.
-        NS_ENDHANDLER
+        }
+		@catch(NSException* localException) { 
+			//catch this here to prevent it from falling thru, but nothing to do.
+        }
     }
 }
 
 - (void) endProcessCycle
 {
-   readOnce = NO;
+	readOnce = NO;
 }
 
 - (int) processValue:(int)channel
@@ -956,19 +961,19 @@ static struct {
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORIP320DecoderForAdc",						@"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:YES],                  @"variable",
-        [NSNumber numberWithLong:-1],					@"length",
-        nil];
+								 @"ORIP320DecoderForAdc",						@"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:YES],                  @"variable",
+								 [NSNumber numberWithLong:-1],					@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"IP320ADC"];
-
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORIP320DecoderForValue",						@"decoder",
-        [NSNumber numberWithLong:convertedDataId],      @"dataId",
-        [NSNumber numberWithBool:YES],                  @"variable",
-        [NSNumber numberWithLong:-1],					@"length",
-        nil];
+				   @"ORIP320DecoderForValue",						@"decoder",
+				   [NSNumber numberWithLong:convertedDataId],      @"dataId",
+				   [NSNumber numberWithBool:YES],                  @"variable",
+				   [NSNumber numberWithLong:-1],					@"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"IP320Value"];
 	
     return dataDictionary;
@@ -980,8 +985,8 @@ static struct {
 		@"IP D",
 		@"IP C",
 		@"IP B",
-		@"IP A"};
-
+	@"IP A"};
+	
 	if(aSlot<4) return slotName[aSlot];
 	else return [NSString stringWithFormat:@"IP %2d",aSlot];		
 }
@@ -990,26 +995,26 @@ static struct {
 {
 	if(!dataSet)[self setDataSet:[[[ORDataSet alloc] initWithKey:@"IP320" guardian:nil] autorelease]];
 	[dataSet loadTimeSeries:convertedValue atTime:aTime sender:self withKeys:@"IP320",@"Value",
-															[NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
-															[NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
-															[self getSlotKey:[self slot]],
-															[NSString stringWithFormat:@"Chan %02d",channel],nil];
+	 [NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
+	 [NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
+	 [self getSlotKey:[self slot]],
+	 [NSString stringWithFormat:@"Chan %02d",channel],nil];
 }
 
 - (void) loadRawTimeSeries:(float)aRawValue atTime:(time_t) aTime forChannel:(int) channel
 {
 	if(!dataSet)[self setDataSet:[[[ORDataSet alloc] initWithKey:@"IP320" guardian:nil] autorelease]];
 	[dataSet loadTimeSeries:aRawValue atTime:aTime sender:self withKeys:@"IP320",@"Raw",
-															[NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
-															[NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
-															[self getSlotKey:[self slot]],
-															[NSString stringWithFormat:@"Chan %02d",channel],nil];
+	 [NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
+	 [NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
+	 [self getSlotKey:[self slot]],
+	 [NSString stringWithFormat:@"Chan %02d",channel],nil];
 }
 
 - (void) shipRawValues
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
-
+	
 	if(runInProgress){
 		unsigned long data[43];
 		
@@ -1038,7 +1043,7 @@ static struct {
 		if(index>3){
 			//the full record goes into the data stream via a notification
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-														object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+																object:[NSData dataWithBytes:data length:index*sizeof(long)]];
 		}
 	}
 }
@@ -1046,7 +1051,7 @@ static struct {
 - (void) shipConvertedValues
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
-
+	
 	if(runInProgress){
 		unsigned long data[83];
 		
@@ -1063,13 +1068,13 @@ static struct {
 		int n;
 		if(mode == 0) n = 20;
 		else n = 40;
-
+		
 		union {
 			long asLong;
 			float asFloat;
 		} theValue;
-
-
+		
+		
 		int i;
 		for(i=0;i<n;i++){
 			if([[chanObjs objectAtIndex:i] readEnabled]){
@@ -1083,7 +1088,7 @@ static struct {
 		if(index>3){
 			//the full record goes into the data stream via a notification
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-														object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+																object:[NSData dataWithBytes:data length:index*sizeof(long)]];
 		}
 	}
 }

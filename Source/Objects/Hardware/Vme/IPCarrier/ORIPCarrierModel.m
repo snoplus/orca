@@ -66,7 +66,7 @@
 - (void) probe
 {
     NSLog(@"Probing IP Carrier %d,%d address:<0x%08x>\n",[self crateNumber],[self slot],[self baseAddress]);
-	    
+	
     int addressOffset[4]={0x0080,0x0180,0x0280,0x0380};
 	
 	int conv[4] = {3,2,1,0};
@@ -80,7 +80,7 @@
 	int aCard;
 	for(aCard = 3;aCard>=0;aCard--){
 		int i = conv[aCard];
-		NS_DURING
+		@try {
 			unsigned char ipac[5];
 			strncpy((char*)ipac,"\0",5);
 			[[self adapter] readByteBlock:&ipac[0] atAddress:[self baseAddress]+addressOffset[i]+0x1
@@ -88,27 +88,28 @@
 			
 			[[self adapter] readByteBlock:&ipac[1] atAddress:[self baseAddress]+addressOffset[i]+0x3
 								numToRead:1 withAddMod:[self addressModifier] usingAddSpace:0x01];
-
+			
 			[[self adapter] readByteBlock:&ipac[2] atAddress:[self baseAddress]+addressOffset[i]+0x5
 								numToRead:1 withAddMod:[self addressModifier] usingAddSpace:0x01];
-								
+			
 			[[self adapter] readByteBlock:&ipac[3] atAddress:[self baseAddress]+addressOffset[i]+0x7
 								numToRead:1 withAddMod:[self addressModifier] usingAddSpace:0x01];
-
+			
 			unsigned char manufacturerCode = 0;
 			[[self adapter] readByteBlock:&manufacturerCode atAddress:[self baseAddress]+addressOffset[i]+0x9
 								numToRead:1 withAddMod:[self addressModifier] usingAddSpace:0x01];
-
+			
 			unsigned char modelCode = 0;
 			[[self adapter] readByteBlock:&modelCode atAddress:[self baseAddress]+addressOffset[i]+0x0b
 								numToRead:1 withAddMod:[self addressModifier] usingAddSpace:0x01];
-
+			
 			if(!strcmp((const char*)ipac,"IPAC"))NSLog(@"%@ %s Manufacturer Code: 0x%x  Model Code: 0x%x\n",s[conv[aCard]],ipac,manufacturerCode,modelCode);
 			else NSLog(@"%@ ID Prom appears to contain garbage.\n",s[conv[aCard]]);
-
-		NS_HANDLER
+			
+		}
+		@catch(NSException* localException) {
 			NSLog(@"%@ raised exception during probe. Position probably empty.\n",s[conv[aCard]]);
-		NS_ENDHANDLER
+		}
 	}
 }
 @end

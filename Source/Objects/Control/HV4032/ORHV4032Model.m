@@ -58,7 +58,7 @@ NSString* HV4032Lock					= @"HV4032Lock";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		NSEnumerator* e = [supplies objectEnumerator];
 		id s;
 		while(s = [e nextObject]){
@@ -67,8 +67,9 @@ NSString* HV4032Lock					= @"HV4032Lock";
 			[s setAdcVoltage:theVoltage];
 			[s setDacValue:theVoltage];
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException*localException) {
+	}
 }
 
 
@@ -80,7 +81,7 @@ NSString* HV4032Lock					= @"HV4032Lock";
                      selector : @selector(voltageChangedAtController:)
                          name : ORHV2132VoltageChanged
 						object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(onOffStateChangedAtController:)
                          name : ORHV2132OnOffChanged
@@ -126,7 +127,7 @@ NSString* HV4032Lock					= @"HV4032Lock";
     hvState = aHvState;
 	
 	[self performSelector:@selector(setUpImage) withObject:nil afterDelay:0];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHV4032ModelHvStateChanged object:self];
 }
 
@@ -134,7 +135,7 @@ NSString* HV4032Lock					= @"HV4032Lock";
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-
+	
     [rampTimer invalidate];
     [rampTimer release];
     rampTimer = nil;
@@ -163,7 +164,7 @@ NSString* HV4032Lock					= @"HV4032Lock";
     [hvNoPollingAlarm clearAlarm];
     [hvNoPollingAlarm release];
     hvNoPollingAlarm = nil;
-    	
+	
 }
 
 
@@ -195,10 +196,10 @@ NSString* HV4032Lock					= @"HV4032Lock";
 	if([self mainFrameID]== 0xffffffff) s = @"--";
 	else s = [NSString stringWithFormat:@"%d",[self mainFrameID]];
 	n = [[NSAttributedString alloc] 
-			initWithString:s
-				attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:10],NSFontAttributeName,
-																	  [NSColor yellowColor],NSForegroundColorAttributeName,
-																	  nil]];
+		 initWithString:s
+		 attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:10],NSFontAttributeName,
+					 [NSColor yellowColor],NSForegroundColorAttributeName,
+					 nil]];
 	if([self mainFrameID]<10 || ![self mainFrameID])[n drawInRect:NSMakeRect(29,8,20,10)];
 	else [n drawInRect:NSMakeRect(26,8,20,10)];
 	[n release];
@@ -209,8 +210,8 @@ NSString* HV4032Lock					= @"HV4032Lock";
     [i release];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORForceRedraw
-                      object: self];
+	 postNotificationName:ORForceRedraw
+	 object: self];
     
 }
 
@@ -233,8 +234,8 @@ NSString* HV4032Lock					= @"HV4032Lock";
 	[aConnector addRestrictedConnectionType: '403I' ]; //can only connect to 4032 inputs
     [[self connectors] setObject:aConnector forKey:ORHV4032ConnectorOut];
     [aConnector release];
-
-
+	
+	
 }
 
 - (void) connectionChanged
@@ -292,8 +293,8 @@ NSString* HV4032Lock					= @"HV4032Lock";
     pollingState = aState;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:HV4032PollingStateChangedNotification
-                      object: self];
+	 postNotificationName:HV4032PollingStateChangedNotification
+	 object: self];
     
     [self performSelector:@selector(_setUpPolling) withObject:nil afterDelay:0.5];
 }
@@ -357,7 +358,7 @@ NSString* HV4032Lock					= @"HV4032Lock";
 
 - (void) pollHardware
 {
-    NS_DURING {
+    @try { 
         id hvController = [self getHVController];
         if(hvController){ //no sense in doing anything if not connected.
             hasBeenPolled = YES;
@@ -378,12 +379,13 @@ NSString* HV4032Lock					= @"HV4032Lock";
 				}
             }
         }
+		
     }
-    NS_HANDLER {
+	@catch(NSException*localException) {
 		NSLog(@"HV4032 %d polling turned off due to timeout\n",[self mainFrameID]);
 		[self setPollingState:0];
+		
     }
-    NS_ENDHANDLER
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(pollingState!=0){
 		[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollingState];
@@ -545,7 +547,7 @@ static NSString *ORHVPollingState 	= @"ORHVPollingState";
 	if(!supplies){
 		[self makeSupplies];
 	}
-
+	
     NSEnumerator* e = [supplies objectEnumerator];
     id s;
     while(s = [e nextObject]){
@@ -635,11 +637,11 @@ static NSString *ORHVPollingState 	= @"ORHVPollingState";
 {
     
     if(!rampTimer){
-                
+		
         rampTimer = [[NSTimer scheduledTimerWithTimeInterval:kDeltaTime target:self selector:@selector(doRamp) userInfo:nil repeats:YES] retain];
         [[NSNotificationCenter defaultCenter]
-				postNotificationName:HV4032StartedNotification
-                              object: self];
+		 postNotificationName:HV4032StartedNotification
+		 object: self];
     }
 }
 
@@ -650,11 +652,11 @@ static NSString *ORHVPollingState 	= @"ORHVPollingState";
     rampTimer = nil;
     [self setStates:kHV4032Idle onlyControlled:NO];
     [[NSNotificationCenter defaultCenter]
-		    postNotificationName:HV4032StoppedNotification
-                          object: self];
+	 postNotificationName:HV4032StoppedNotification
+	 object: self];
     
 	[[self getHVController] saveHVParams];
-
+	
 }
 
 - (void) doRamp
@@ -672,7 +674,7 @@ static NSString *ORHVPollingState 	= @"ORHVPollingState";
         int theTargetVoltage = [hvSupply targetVoltage];			
         int theState = [hvSupply rampState];
 		int theValueToSet = 0;
-
+		
 		if(theTargetVoltage==0 && theState != kHV4032Panic && theState != kHV4032Done){
 			theState = kHV4032Zero;
 		}
@@ -685,7 +687,7 @@ static NSString *ORHVPollingState 	= @"ORHVPollingState";
 				if(unitStep<1)unitStep=1;
 			}
 			else unitStep = 1;
-
+			
 			if(theState == kHV4032Up ){
 				theValueToSet = theDACVoltage + unitStep;
 				

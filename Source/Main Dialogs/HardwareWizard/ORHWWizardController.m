@@ -249,8 +249,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 - (void)setContainerCount:(short)aContainerCount {
     containerCount = aContainerCount;
     [[NSNotificationCenter defaultCenter] 
-		    postNotificationName:ORHWWizCountsChangedNotification 
-                          object: self];
+	 postNotificationName:ORHWWizCountsChangedNotification 
+	 object: self];
 }
 
 - (short)objectCount {
@@ -261,8 +261,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 - (void)setObjectCount:(short)anObjectCount {
     objectCount = anObjectCount;
     [[NSNotificationCenter defaultCenter] 
-		    postNotificationName:ORHWWizCountsChangedNotification 
-                          object: self];
+	 postNotificationName:ORHWWizCountsChangedNotification 
+	 object: self];
 }
 
 - (short)chanCount {
@@ -274,8 +274,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 {
     chanCount = aChanCount;
     [[NSNotificationCenter defaultCenter] 
-		    postNotificationName:ORHWWizCountsChangedNotification 
-                          object: self];
+	 postNotificationName:ORHWWizCountsChangedNotification 
+	 object: self];
 }
 
 - (ORHWUndoManager *) hwUndoManager
@@ -1000,7 +1000,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         while( containerObj = [e nextObject]){
             int containerTag = [containerObj tag] + [containerObj tagBase];
             [controlArray replaceObjectAtIndex:containerTag withObject:[NSMutableArray array]]; //insert the container object
-                                                                                                //set up this container's objects
+			//set up this container's objects
             NSArray* objectList = [containerObj collectObjectsOfClass:objectClass]; 
             [self addObjectList:objectList atIndex:containerTag];
         }
@@ -1008,7 +1008,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     else {
         int containerTag = 0;
         [controlArray replaceObjectAtIndex:containerTag withObject:[NSMutableArray array]]; //insert the container object
-                                                                                            //set up this container's objects
+		//set up this container's objects
         NSArray* objectList = [[[NSApp delegate] document] collectObjectsOfClass:objectClass]; 
         [self addObjectList:objectList atIndex:containerTag];
         
@@ -1192,8 +1192,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             default:
 				break;
         }
-            
-            NSEnumerator* containerEnum = [controlArray objectEnumerator];
+		
+		NSEnumerator* containerEnum = [controlArray objectEnumerator];
         id container;
         while(container = [containerEnum nextObject]){
             if([container respondsToSelector:@selector(objectEnumerator)]){
@@ -1388,7 +1388,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             [invocationForUndo setArgument:1  to:returnValue];
         }
         switch(actionSelection){
-            
+				
             case kAction_Set:
                 [invocationForSetter setArgument:valueArg  to:aValue];
 				break;
@@ -1409,18 +1409,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				break;
                 
             case kAction_Restore:
-					NS_DURING
-						NSNumber* theValue = [target extractParam:[paramObj name] from:[dataPacket fileHeader]  forChannel:[theChan intValue]];
-						if(theValue!=nil){
-							[invocationForSetter setArgument:valueArg  to:theValue];
-						}
-						else skip = YES;
-						
-					NS_HANDLER
-					NS_ENDHANDLER
+				@try {
+					NSNumber* theValue = [target extractParam:[paramObj name] from:[dataPacket fileHeader]  forChannel:[theChan intValue]];
+					if(theValue!=nil){
+						[invocationForSetter setArgument:valueArg  to:theValue];
+					}
+					else skip = YES;
 					
-					break;
-					
+				}
+				@catch(NSException* localException) {
+				}
+				
+				break;
+				
 			case kAction_Restore_All:
 			{
 				ORHWWizParam* aParam;
@@ -1437,12 +1438,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				
 			default: break;
 		}
-				
+		
 		if(!skip){
 			[invocationForSetter invoke];        
 			[[self hwUndoManager] addToUndo:invocationForUndo withRedo:invocationForSetter];
 		}
-				
+		
 	}
 	[undoButton setEnabled:[hwUndoManager canUndo]];
 	[redoButton setEnabled:[hwUndoManager canRedo]];
@@ -1611,7 +1612,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [[self undoManager] enableUndoRegistration];
 	
     delayDataPacketRelease = YES; //we'll do it ourselves instead of the usual place
-								  //loop thru all availiable objects and do a 'Restore All'
+	//loop thru all availiable objects and do a 'Restore All'
 	n = [objectPU numberOfItems];
 	for(i=0;i<n;i++){
 		[objectPU selectItemAtIndex:i];

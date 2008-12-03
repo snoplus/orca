@@ -42,13 +42,14 @@
 - (void) loadHardware
 {
 	//load to hardware
-	NS_DURING
+	@try {
 		[owner loadDac:[self channelNumber]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self stopRamper];
 		NSRunAlertPanel([localException name], @"%@\n\nRamp Stopped for %@", @"OK", nil, nil,
-					localException,[self itemName]);
-	NS_ENDHANDLER
+						localException,[self itemName]);
+	}
 }
 
 

@@ -70,7 +70,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 			[self deactivateDevice:i];
 		}
 	} 
-
+	
 	if(rpcClient)clnt_destroy(rpcClient);
     [theHWLock release];
     [mErrorMsg release];
@@ -79,11 +79,12 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		[self connect];
 		[self connectionChanged];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) setUpImage
@@ -135,7 +136,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     
     [command autorelease];
     command = [aCommand copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORICS8065ModelCommandChanged object:self];
 }
 
@@ -149,7 +150,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setPrimaryAddress:primaryAddress];
     
     primaryAddress = aPrimaryAddress;
-		
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORICS8065PrimaryAddressChanged object:self];
 }
 
@@ -173,7 +174,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 - (void) setIsConnected:(BOOL)aFlag
 {
     isConnected = aFlag;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORICS8065ModelIsConnectedChanged object:self];
 }
 
@@ -189,7 +190,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     
     [ipAddress autorelease];
     ipAddress = [aIpAddress copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORICS8065ModelIpAddressChanged object:self];
 }
 
@@ -200,7 +201,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		CLIENT* aClient = clnt_create((char*)[ipAddress cStringUsingEncoding:NSASCIIStringEncoding],DEVICE_CORE,DEVICE_CORE_VERSION, "TCP");
 		[self setRpcClient:aClient];	
         [self setIsConnected: aClient!=nil];
-
+		
 	}
 	else {
 		[self setRpcClient:nil];	
@@ -234,7 +235,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 {
     BOOL  bRetVal = false;
     if ( ! [self isEnabled]) return bRetVal;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         // Check if device has been setup.
         if ( mDeviceLink[aPrimaryAddress].lid != 0 ){
@@ -242,10 +243,11 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         }
 		
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
     return( bRetVal );    
 }
@@ -253,7 +255,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 
 - (void) enableEOT:(short)aPrimaryAddress state: (BOOL) state
 {
-
+	
 }
 
 - (void) resetDevice: (short) aPrimaryAddress
@@ -280,7 +282,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     if(![self isEnabled])return;
 	if(mDeviceLink[aPrimaryAddress].lid != 0) return; //already setup  
 	
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
 		
 		Create_LinkParms crlp;
@@ -293,17 +295,18 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		memcpy(&mDeviceLink[aPrimaryAddress], create_link_1(&crlp, rpcClient),sizeof(Create_LinkResp));
         [theHWLock unlock];   //-----end critical section
 		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
 - (void) deactivateDevice: (short) aPrimaryAddress
 {
     if( ![self isEnabled]) return;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
 		
 		if ( mDeviceLink[aPrimaryAddress].lid != 0 ){
@@ -313,20 +316,21 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		}
 		
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
 - (long) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (long) aMaxLength
 {
-
+	
     if ( ! [self isEnabled]) return 0;
     long	nReadBytes = 0;
     
-    NS_DURING
+    @try {
         // Make sure that device is initialized.
         [theHWLock lock];   //-----begin critical section
 		if ( mDeviceLink[aPrimaryAddress].lid == 0 ){
@@ -359,29 +363,30 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         else {
             nReadBytes = dwrr->data.data_len;
 			aData[nReadBytes] = '\0';
-          
+			
             // Allow monitoring of commands.
             if ( mMonitorRead ) {
                 NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];	
                 NSString* dataStr = [[NSString alloc] initWithBytes: aData length: nReadBytes encoding: NSASCIIStringEncoding];
                 [userInfo setObject: [NSString stringWithFormat: @"Read - Address: %d length: %d data: %@\n", 
-                    aPrimaryAddress, nReadBytes, dataStr] 
-                              forKey: ORGpib1Monitor]; 
+									  aPrimaryAddress, nReadBytes, dataStr] 
+							 forKey: ORGpib1Monitor]; 
                 
                 [[NSNotificationCenter defaultCenter]
-				postNotificationName: ORGpib1MonitorNotification
-			                  object: self
-					        userInfo: userInfo];
+				 postNotificationName: ORGpib1MonitorNotification
+				 object: self
+				 userInfo: userInfo];
                 [dataStr release];
             }
             
         }
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
-
+    }
+	
     return nReadBytes;
 }
 
@@ -390,9 +395,9 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 - (void) writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand
 {
     if ( ! [self isEnabled]) return;
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
-                              // Make sure that device is initialized.
+		// Make sure that device is initialized.
 		if ( mDeviceLink[aPrimaryAddress].lid == 0 ){
 			[self setupDevice:aPrimaryAddress];
 		}
@@ -401,18 +406,18 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         if ( mMonitorWrite ) {
             NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
             [userInfo setObject: [NSString stringWithFormat: @"Write - Address: %d Comm: %s\n", aPrimaryAddress, [aCommand cStringUsingEncoding:NSASCIIStringEncoding]] 
-                          forKey: ORGpib1Monitor]; 
+						 forKey: ORGpib1Monitor]; 
             
             [[NSNotificationCenter defaultCenter]
-		    postNotificationName: ORGpib1MonitorNotification
-			              object: self
-					    userInfo: userInfo];
+			 postNotificationName: ORGpib1MonitorNotification
+			 object: self
+			 userInfo: userInfo];
         }
         
         //	printf( "Command %s\n", [aCommand cString] );
         
         // Write to device.
-				
+		
 		Device_WriteParms  dwrp; 
 		Device_WriteResp*  dwrr; 
 		dwrp.lid = mDeviceLink[aPrimaryAddress].lid; 
@@ -430,11 +435,12 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
             [NSException raise: OExceptionGpibError format: mErrorMsg];
         }  
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER  
-
+    }  
+	
 }
 
 
@@ -443,17 +449,18 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 {
     long retVal = 0;
     if ( ! [self isEnabled]) return -1;
-    NS_DURING
+    @try {
         
         [theHWLock lock];   //-----begin critical section
         [self writeToDevice: aPrimaryAddress command: aCommand];
         retVal = [self readFromDevice: aPrimaryAddress data: aData maxLength: aMaxLength];
         
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
     return( retVal );
 }
@@ -471,7 +478,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 - (void) gpibError: (NSMutableString*) aMsg number:(int)anErrorNum
 {
     if ( ! [self isEnabled]) return;
-    NS_DURING
+    @try {
         // Handle the master error register and extract error.
         [theHWLock unlock];   //-----end critical section
         [aMsg appendString: [NSString stringWithFormat:  @" e = %d < ", anErrorNum]];
@@ -489,13 +496,14 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         
 		
         [theHWLock unlock];   //-----end critical section
-                              // Call ibonl to take the device and interface offline
-                              //    ibonl( Device, 0 );
-                              //    ibonl( BoardIndex, 0 );
-    NS_HANDLER
+		// Call ibonl to take the device and interface offline
+		//    ibonl( Device, 0 );
+		//    ibonl( BoardIndex, 0 );
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
 }
 
@@ -509,7 +517,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     [self setCommand:		[decoder decodeObjectForKey:@"command"]];
  	[self setIpAddress:		[decoder decodeObjectForKey:@"ipAddress"]];
 	[self setPrimaryAddress:[decoder decodeIntForKey:   @"primaryAddress"]];
-  
+	
     [[self undoManager] enableUndoRegistration];
     
     return self;

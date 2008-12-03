@@ -139,8 +139,8 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     writeMask = aMask;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORIP408WriteMaskChangedNotification
-                      object:self];
+	 postNotificationName:ORIP408WriteMaskChangedNotification
+	 object:self];
 }
 
 - (unsigned long) writeValue
@@ -153,8 +153,8 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
     writeValue = aValue;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORIP408WriteValueChangedNotification
-                      object:self];
+	 postNotificationName:ORIP408WriteValueChangedNotification
+	 object:self];
 }
 
 - (unsigned long) readMask
@@ -169,8 +169,8 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     readMask = aMask;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORIP408ReadMaskChangedNotification
-                      object:self];
+	 postNotificationName:ORIP408ReadMaskChangedNotification
+	 object:self];
 }
 
 
@@ -186,8 +186,8 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     readValue = aValue;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORIP408ReadValueChangedNotification
-                      object:self];
+	 postNotificationName:ORIP408ReadValueChangedNotification
+	 object:self];
 }
 
 
@@ -198,7 +198,7 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     unsigned long aReturnValue = 0L;
     unsigned short theChannels;
     [hwLock lock];
-    NS_DURING
+    @try {
         for(theChannels=0; theChannels<32; theChannels+=8 ) {
             if(aChannelMask & (0x000000ff<<theChannels)){
                 unsigned long theRegister;
@@ -213,19 +213,20 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
             }
         }
         
-        NS_HANDLER
-            NS_ENDHANDLER
-            [hwLock unlock];
-            
-            
-            return aReturnValue;
+	}
+	@catch(NSException* localException) {
+	}
+	[hwLock unlock];
+	
+	
+	return aReturnValue;
 }
 
 
 - (void) setOutputWithMask:(unsigned long) aChannelMask value:(unsigned long) aMaskValue
 {
     [hwLock lock];
-    NS_DURING
+    @try {
 		unsigned short theChannels;
 		for( theChannels=0; theChannels<32; theChannels+=8 ) {
 			if(aChannelMask & (0x000000ff<<theChannels)){
@@ -242,9 +243,10 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 				}
 			}
 		}
-        NS_HANDLER
-            NS_ENDHANDLER
-            [hwLock unlock];
+	}
+	@catch(NSException* localException) {
+	}
+	[hwLock unlock];
 }
 
 
@@ -351,7 +353,7 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
 					   numToWrite:1L
 					   withAddMod:[guardian addressModifier]
 					usingAddSpace:kAccessRemoteIO];
-        
+	
     
 }
 

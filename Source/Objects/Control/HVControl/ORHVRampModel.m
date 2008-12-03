@@ -126,7 +126,7 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 	[currentTrends release];
     [currentFile release];
 	[lastTrendSnapShot release];
-
+	
     [dirName release];
     [super dealloc];
 }
@@ -209,8 +209,8 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
     pollingState = aState;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:HVPollingStateChangedNotification
-                      object: self];
+	 postNotificationName:HVPollingStateChangedNotification
+	 object: self];
     
     [self performSelector:@selector(_setUpPolling) withObject:nil afterDelay:0.5];
 }
@@ -261,8 +261,8 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
     dirName = [aDirName copy];
     
 	[[NSNotificationCenter defaultCenter]
-                    postNotificationName:HVStateFileDirChangedNotification
-                                  object: self];
+	 postNotificationName:HVStateFileDirChangedNotification
+	 object: self];
     
 }
 
@@ -317,7 +317,7 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 
 - (void) pollHardware:(ORHVRampModel*)theModel
 {
-    NS_DURING {
+    @try { 
         
         if([self interfaceObj]){ //no sense in doing anything if not connected.
             hasBeenPolled = YES;
@@ -366,7 +366,7 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
                     [self checkCurrent:aSupply];
                 }
 				if(saveCurrentToFile){
-					 currentRecord = [currentRecord stringByAppendingFormat:@"%2d ",[aSupply current]];
+					currentRecord = [currentRecord stringByAppendingFormat:@"%2d ",[aSupply current]];
 				}
 				
 				[self addCurrentToTrend:aSupply];
@@ -403,16 +403,17 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 					currentRecord = [currentRecord stringByAppendingString:@"\n"];
 					[fh writeData:[currentRecord dataUsingEncoding:NSASCIIStringEncoding]];
 					[[NSNotificationCenter defaultCenter]
-							postNotificationName:ORHVRampModelUpdatedTrends
-										  object: self];
+					 postNotificationName:ORHVRampModelUpdatedTrends
+					 object: self];
 				}
 			}
         }
     }
-    NS_HANDLER {
+	
+	@catch(NSException* localException) {  
         //catch this here to prevent it from falling thru, but nothing to do.
-    }
-    NS_ENDHANDLER
+		
+	}
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(pollingState!=0){
 		[self performSelector:@selector(pollHardware:) withObject:self afterDelay:pollingState];
@@ -717,7 +718,7 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
 {	
     
     NSString* fullFileName = [[[self dirName]stringByExpandingTildeInPath] 
-                                        stringByAppendingPathComponent:@"HVState"];
+							  stringByAppendingPathComponent:@"HVState"];
     NSData*		data 	= [NSData dataWithContentsOfFile:fullFileName];
     
     if(data){
@@ -818,8 +819,8 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
         
         rampTimer = [[NSTimer scheduledTimerWithTimeInterval:kDeltaTime target:self selector:@selector(doRamp) userInfo:nil repeats:YES] retain];
         [[NSNotificationCenter defaultCenter]
-				postNotificationName:HVRampStartedNotification
-                              object: self];
+		 postNotificationName:HVRampStartedNotification
+		 object: self];
     }
 }
 
@@ -830,8 +831,8 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
     rampTimer = nil;
     [self setStates:kHVRampIdle onlyControlled:NO];
     [[NSNotificationCenter defaultCenter]
-		    postNotificationName:HVRampStoppedNotification
-                          object: self];
+	 postNotificationName:HVRampStoppedNotification
+	 object: self];
     
 }
 

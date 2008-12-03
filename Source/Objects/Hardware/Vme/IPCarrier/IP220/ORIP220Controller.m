@@ -44,22 +44,22 @@
     
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	[super registerNotificationObservers];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(outputValuesChanged:)
                          name : ORIP220VoltageChanged
                        object : model];
-    	
+	
     [notifyCenter addObserver : self
                      selector : @selector(transferModeChanged:)
                          name : ORIP220TransferModeChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(slotChanged:)
                          name : ORVmeCardSlotChangedNotification
                        object : model];
-
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(settingsLockChanged:)
 						 name : ORRunStatusChangedNotification
@@ -163,25 +163,27 @@
 
 - (IBAction) write:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model initBoard];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Write Op of IP220 Values FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed IP220 Write Op", @"OK", nil, nil,
                         localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) resetAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model resetBoard];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Reset Op of IP220 Values FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed IP220 Reset Op", @"OK", nil, nil,
                         localException);
-	NS_ENDHANDLER
+	}
 }
 
 @end

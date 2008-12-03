@@ -90,7 +90,7 @@
     [multiPlotView setDoubleAction:@selector(doubleClickMultiPlot:)];
 	[splitView loadLayoutWithName:[NSString stringWithFormat:@"IP320-%d",[model uniqueIdNumber]]];
 	[plotGroupButton setEnabled:NO];    
-
+	
     [super awakeFromNib];
 }
 
@@ -103,23 +103,23 @@
                      selector : @selector(pollingStateChanged:)
                          name : ORIP320PollingStateChangedNotification
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(valuesChanged:)
                          name : ORIP320AdcValueChangedNotification
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(slotChanged:)
                          name : ORVmeCardSlotChangedNotification
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(displayRawChanged:)
                          name : ORIP320ModelDisplayRawChanged
 						object: model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(modeChanged:)
                          name : ORIP320ModelModeChanged
 						object: model];
@@ -127,53 +127,53 @@
                      selector : @selector(logToFileChanged:)
                          name : ORIP320ModelLogToFileChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(logFileChanged:)
                          name : ORIP320ModelLogFileChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(shipRecordsChanged:)
                          name : ORIP320ModelShipRecordsChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(cardJumperSettingChanged:)
                          name : ORIP320ModelCardJumperSettingChanged
 						object: model];
-
+	
     
     [notifyCenter addObserver : self
                      selector : @selector(multiPlotsChanged:)
                          name : ORIP320ModelMultiPlotsChangedNotification
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(multiPlotsChanged:)
                          name : ORMultiPlotDataSetItemsChangedNotification
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(multiPlotsChanged:)
                          name : ORMultiPlotNameChangedNotification
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(outlineViewSelectionDidChange:)
                          name : NSOutlineViewSelectionDidChangeNotification
                        object : outlineView];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(dataChanged:)
                          name : ORDataSetDataChanged
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(calibrationDateChanged:)
                          name : ORIP320ModelCalibrationDateChanged
 						object: model];
-
+	
 }
 
 
@@ -199,7 +199,7 @@
 {
     if([notification object] == outlineView){
         NSMutableArray *selection = [NSMutableArray arrayWithArray:[outlineView allSelectedItems]];
-    
+		
         int validCount = 0;
         int i;
         for(i=0;i<[selection count];i++){
@@ -308,7 +308,7 @@
 	[valueTableScrollView setHidden:![model mode]];
 	[calibrationTableScrollView setHidden:![model mode]];
 	[alarmTableScrollView setHidden:![model mode]];
-
+	
 }
 
 - (void) valuesChanged:(NSNotification*)aNotification
@@ -431,7 +431,7 @@
     [multiPlotView reloadData];
     [outlineView deselectAll:self];
     [outlineView reloadData];
-
+	
 }
 
 - (IBAction) shipRecordsAction:(id)sender
@@ -502,8 +502,8 @@
                         modalDelegate:self
                        didEndSelector:@selector(selectLogFileDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-
- }
+	
+}
 
 - (IBAction) logToFileAction:(id)sender
 {
@@ -523,12 +523,13 @@
 
 - (IBAction) readAll:(id)sender
 {
-    NS_DURING
+    @try {
         [model readAllAdcChannels];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nRead of", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 - (IBAction) setPollingAction:(id)sender
 {
@@ -573,9 +574,9 @@
 	if([model mode] == 1)return YES;
 	else {
 		if( tableView == valueTable2 || 
-			tableView == calibrationTable2 ||
-			tableView == alarmTable2 ) {
-				return NO;
+		   tableView == calibrationTable2 ||
+		   tableView == alarmTable2 ) {
+			return NO;
 		}
 		else return YES;
 	}

@@ -32,7 +32,7 @@
 - (void) awakeFromNib
 {
 	[self populatePullDowns];
-
+	
 	[super awakeFromNib];
     if(![model isEnabled]) {
         [self disableAll];
@@ -85,7 +85,7 @@
                      selector : @selector(commandChanged:)
                          name : ORICS8065ModelCommandChanged
 						object: model];
-
+	
 }
 
 - (void) checkGlobalSecurity
@@ -128,17 +128,18 @@
 - (void) writeToMonitor: (NSNotification*) aNotification
 {
     unsigned long maxTextSize = 100000;
-	NS_DURING
+	@try {
 		NSString* command = [[aNotification userInfo] objectForKey: ORGpib1Monitor];
 		[monitorView replaceCharactersInRange:NSMakeRange([[monitorView textStorage] length], 0) withString:command];
 		if([[monitorView textStorage] length] > maxTextSize){
 			[[monitorView textStorage] deleteCharactersInRange:NSMakeRange(0,maxTextSize/3)];
 		}
 		[monitorView scrollRangeToVisible: NSMakeRange([[monitorView textStorage] length], 0)];
-
-	NS_HANDLER
-	NS_ENDHANDLER
-
+		
+	}
+	@catch(NSException* localException) {
+	}
+	
 }
 
 #pragma mark •••Actions
@@ -169,24 +170,25 @@
     long	returnLen;
     long	maxLength = sizeof( data ) - 1;
     
-    NS_DURING
+    @try {
         returnLen =  [[self model] writeReadDevice:[primaryAddressPU indexOfSelectedItem] 
-                                             command:[model command]
-                                                data:&data[0]
-                                           maxLength:maxLength];
-   
+										   command:[model command]
+											  data:&data[0]
+										 maxLength:maxLength];
+		
         if ( returnLen > 0 ){
             data[returnLen] = '\0';
             [mResult insertText: [NSString stringWithCString: data]];
         }
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"%@\n",[localException reason]);
         NSRunAlertPanel( [localException name], 	// Name of panel
                         [localException reason],	// Reason for error
                         @"OK",				// Okay button
                         nil,				// alternate button
                         nil );				// other button
-    NS_ENDHANDLER
+    }
 }
 
 
@@ -195,39 +197,41 @@
     char	data[2048];
     long	returnLen;
     
-    NS_DURING
+    @try {
         returnLen = [[self model] readFromDevice: [primaryAddressPU indexOfSelectedItem]
-                                              data: &data[0]
-                                         maxLength: sizeof( data ) - 1];
-                                     
+											data: &data[0]
+									   maxLength: sizeof( data ) - 1];
+		
         if ( returnLen > 0 )
             [mResult insertText: [NSString stringWithCString: data]];
-            
-    NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog(@"%@\n",[localException reason]);
         NSRunAlertPanel( [localException name], 	// Name of panel
-                         [localException reason],	// Reason for error
+						[localException reason],	// Reason for error
                         @"OK", 						// Okay button
                         nil, 						// alternate button
                         nil );						// other button
-    NS_ENDHANDLER
+    }
 }
 
 
 - (IBAction) write: (id) aSender
 {
-    NS_DURING
+    @try {
         [[self model] writeToDevice: [primaryAddressPU indexOfSelectedItem]
-                              command: [model command]];
-    
-    NS_HANDLER
+							command: [model command]];
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"%@\n",[localException reason]);
         NSRunAlertPanel( [localException name], 	// Name of panel
-                         [localException reason],	// Reason for error
-                         @"OK",						// Okay button
-                         nil, 						// alternate button
-                         nil );						// other button
-    NS_ENDHANDLER
+						[localException reason],	// Reason for error
+						@"OK",						// Okay button
+						nil, 						// alternate button
+						nil );						// other button
+    }
 }
 
 
@@ -235,31 +239,32 @@
 {
     short primaryAddress;
     
-    NS_DURING
+    @try {
         primaryAddress = [primaryAddressPU indexOfSelectedItem];
         if ( primaryAddress  > -1 && primaryAddress < kMaxGpibAddresses ) {
-		
+			
             [[self model] setupDevice:primaryAddress];
             [mConfigured setStringValue:[NSString stringWithFormat:
-                                                @"Configured:%d\n", primaryAddress]];
+										 @"Configured:%d\n", primaryAddress]];
             [self setTestButtonsEnabled:true];
         }
-
-    NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         NSLog(@"%@\n",[localException reason]);
         NSRunAlertPanel( [localException name], 	// Name of panel
                         [localException reason],	// Reason for error
                         @"OK", 						// Okay button
                         nil, 						// alternate button
                         nil );						// other button
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) primaryAddressAction: (id) aSender
 {
-// Make sure that value has changed.
+	// Make sure that value has changed.
     if ( [aSender indexOfSelectedItem] != [model primaryAddress]){
-
+		
         [model setPrimaryAddress: [aSender indexOfSelectedItem]];
         NSLog ( [NSString stringWithFormat: @"New Address %d\n", [model primaryAddress]] );
         
@@ -267,13 +272,13 @@
         if ( [[self model] checkAddress:[model primaryAddress]] ){
             NSLog ( @"Configured\n" );
             [mConfigured setStringValue:[NSString stringWithFormat:
-                                                @"Configured:%d\n", [model primaryAddress]]];
+										 @"Configured:%d\n", [model primaryAddress]]];
             [self setTestButtonsEnabled: true];
         }
         else {
             NSLog ( @"Not Configured\n" );
             [mConfigured setStringValue: [NSString stringWithFormat:
-                                                @"Not configured:%d", [model primaryAddress]]];
+										  @"Not configured:%d", [model primaryAddress]]];
             [self setTestButtonsEnabled: false];
         }
     }
@@ -320,10 +325,10 @@
 {
     short	i;
     
-// Remove all items from popup menus
+	// Remove all items from popup menus
     [primaryAddressPU removeAllItems];
-        
-// Repopulate Primary GPIB address
+	
+	// Repopulate Primary GPIB address
     for ( i = 0; i <  kMaxGpibAddresses; i++ ) {
         [primaryAddressPU insertItemWithTitle:[NSString stringWithFormat:@"%d", i]
                                       atIndex:i];
@@ -347,5 +352,5 @@
     [mWrite setEnabled:NO];
     [mRead setEnabled:NO];
 }
-    
+
 @end
