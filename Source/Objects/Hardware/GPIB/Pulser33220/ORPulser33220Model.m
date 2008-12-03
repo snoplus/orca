@@ -45,8 +45,8 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 {
 	if(![[ self connectors ] objectForKey:ORPulserUSBInConnection]){
 		ORConnector* connectorObj1 = [[ ORConnector alloc ] 
-                                initAt: NSMakePoint( 2, 2 )
-                            withGuardian: self];
+									  initAt: NSMakePoint( 2, 2 )
+									  withGuardian: self];
 		[[ self connectors ] setObject: connectorObj1 forKey: ORPulserUSBInConnection ];
 		[ connectorObj1 setConnectorType: 'USBI' ];
 		[ connectorObj1 addRestrictedConnectionType: 'USBO' ]; //can only connect to gpib outputs
@@ -56,8 +56,8 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	
 	if(![[ self connectors ] objectForKey:ORPulserUSBNextConnection]){
 		ORConnector* connectorObj2 = [[ ORConnector alloc ] 
-									initAt: NSMakePoint( [self frame].size.width-kConnectorSize-2, 2 )
-								withGuardian: self];
+									  initAt: NSMakePoint( [self frame].size.width-kConnectorSize-2, 2 )
+									  withGuardian: self];
 		[[ self connectors ] setObject: connectorObj2 forKey: ORPulserUSBNextConnection ];
 		[ connectorObj2 setConnectorType: 'USBO' ];
 		[ connectorObj2 addRestrictedConnectionType: 'USBI' ]; //can only connect to gpib inputs
@@ -122,11 +122,12 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		[self connect];
 		[self connectionChanged];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) connectionChanged
@@ -149,7 +150,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     //---------------------------------------------------------------------------------------------------
     
     NSImage* aCachedImage = [NSImage imageNamed:@"Pulser33220Icon"];
-
+	
     NSSize theIconSize = [aCachedImage size];
     NSPoint theOffset = NSZeroPoint;
     NSImage* netConnectIcon = nil;
@@ -165,7 +166,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
         theOffset.x += 10;
     }
     [aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
-
+	
     if(connectionProtocol == kHPPulserUseUSB && !usbInterface){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSMakePoint(20,10)];
@@ -176,7 +177,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
         [[NSColor redColor] set];
         [path stroke];
     }    
-
+	
     [i unlockFocus];
     
     [self setImage:i];
@@ -233,12 +234,12 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     
     [serialNumber autorelease];
     serialNumber = [aSerialNumber copy];    
-
+	
 	if(!serialNumber){
 		[[self getUSBController] releaseInterfaceFor:self];
 	}
 	else [[self getUSBController] claimInterfaceWithSerialNumber:serialNumber for:self];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelSerialNumberChanged object:self];
 }
 
@@ -251,7 +252,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 {
     
     canChangeConnectionProtocol = aCanChangeConnectionProtocol;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelCanChangeConnectionProtocolChanged object:self];
 }
 
@@ -276,7 +277,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 - (void) setIpConnected:(BOOL)aIpConnected
 {
     ipConnected = aIpConnected;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelIpConnectedChanged object:self];
 }
 
@@ -292,7 +293,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 - (void) setUsbConnected:(BOOL)aUsbConnected
 {
     usbConnected = aUsbConnected;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelUsbConnectedChanged object:self];
 }
 
@@ -308,7 +309,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     
     [ipAddress autorelease];
     ipAddress = [aIpAddress copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelIpAddressChanged object:self];
 }
 
@@ -322,7 +323,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	[[[self undoManager] prepareWithInvocationTarget:self] setConnectionProtocol:connectionProtocol];
 	
 	connectionProtocol = aConnectionProtocol;
-
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33220ModelConnectionProtocolChanged object:self];
 	[self setUpImage];
 }
@@ -372,23 +373,23 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) setUsbInterface:(ORUSBInterface*)anInterface
 {
-
+	
 	if(connectionProtocol == kHPPulserUseUSB){
-
+		
 		[self enableEOT:YES];
 		[usbInterface release];
 		usbInterface = anInterface;
 		[usbInterface retain];
-			
+		
 		[usbInterface writeUSB488Command:@"SYST:COMM:RLST REM;*WAI" eom:YES];
 		[usbInterface writeUSB488Command:@"OUTPUT 1;*WAI" eom:YES];
-
+		
 		[[NSNotificationCenter defaultCenter]
-				postNotificationName: ORPulser33220ModelUSBInterfaceChanged
-							  object: self];
-
+		 postNotificationName: ORPulser33220ModelUSBInterfaceChanged
+		 object: self];
+		
 		[self setUpImage];
-
+		
 	}
 }
 
@@ -426,7 +427,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 		[noUSBAlarm setAcknowledged:NO];
 		[noUSBAlarm postAlarm];
 	}
-
+	
 }
 
 - (NSArray*) usbInterfaces
@@ -473,7 +474,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 - (void) emptyVolatileMemory
 {
 	if(connectionProtocol == kHPPulserUseIP){
-		NS_DURING
+		@try {
 			NSEnumerator* e = [allWaveFormsInMemory objectEnumerator];
 			NSString* aName;
 			while(aName = [e nextObject]){
@@ -482,10 +483,11 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 				}
 			}
 			
-		NS_HANDLER
-		NS_ENDHANDLER
-
-
+		}
+		@catch(NSException* localException) {
+		}
+		
+		
 		waitForGetWaveformsLoadedDone = YES;
 		[self writeToGPIBDevice:@"Data:CAT?;*WAI;*OPC?"];
 	}
@@ -522,8 +524,8 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	waitForAsyncDownloadDone = NO;
 	loading = NO;
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName: ORHPPulserWaveformLoadFinishedNotification
-						  object: self];
+	 postNotificationName: ORHPPulserWaveformLoadFinishedNotification
+	 object: self];
 	waitForGetWaveformsLoadedDone = YES;
 	[self writeToGPIBDevice:@"Data:CAT?;*WAI;*OPC?"];
 }
@@ -533,13 +535,13 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	switch(connectionProtocol){
 		case kHPPulserUseGPIB: 
 			[super connect];		
-		break;
+			break;
 		case kHPPulserUseUSB: 
 			[self connectUSB];
-		break;
+			break;
 		case kHPPulserUseIP: 
 			if(!ipConnected && !socket) [self connectIP]; 
-		break;
+			break;
 	}	
 }
 
@@ -548,15 +550,15 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	switch(connectionProtocol){
 		case kHPPulserUseGPIB: 
 			return [super isConnected];		
-		break;
+			break;
 		case kHPPulserUseUSB: 
 			if(!usbConnected && !usbInterface)[self connectUSB];
 			return YES;	
-		break;
+			break;
 		case kHPPulserUseIP: 
 			if(!ipConnected && !socket) [self connectIP]; 
 			return ipConnected;
-		break;
+			break;
 	}
 	return NO;
 }
@@ -641,7 +643,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	[self setIpAddress:[decoder decodeObjectForKey:@"ORPulser33220ModelIpAddress"]];
     [self setConnectionProtocol:[decoder decodeIntForKey:@"ORPulser33220ModelConnectionProtocol"]];
     [[self undoManager] enableUndoRegistration];    
-		
+	
     return self;
 }
 
@@ -678,11 +680,11 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
 				
 			}
-		break;
+			break;
 		case kHPPulserUseIP: 
 			//nothing to do... all incoming data is initiated by us and we'll be notified 
 			//when any data arrives in the  netsocket:dataAvailable: method
-		break;
+			break;
 	}
 	return 0;
 }
@@ -691,7 +693,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 {
 	switch(connectionProtocol){
 		case kHPPulserUseGPIB:  [super writeToGPIBDevice:aCommand]; break;
-
+			
 		case kHPPulserUseUSB:
 			if(usbInterface && [self getUSBController]){
 				if(mEOT)aCommand = [aCommand stringByAppendingString:@"\n"];
@@ -702,8 +704,8 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
 				
 			}
-		break;
-		
+			break;
+			
 		case kHPPulserUseIP: 
 			if([self isConnected]){
 				if(mEOT)aCommand = [aCommand stringByAppendingString:@"\n"];
@@ -713,9 +715,9 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 			else {
 				NSString *errorMsg = @"Must establish IP connection prior to issuing command.\n";
 				[ NSException raise: OExceptionGPIBConnectionError format: errorMsg ];
-
+				
 			} 			
-		break;
+			break;
 	}
 }
 

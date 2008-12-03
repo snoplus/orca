@@ -40,37 +40,37 @@
                      selector : @selector(connectionProtocolChanged:)
                          name : ORPulser33220ModelConnectionProtocolChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(ipAddressChanged:)
                          name : ORPulser33220ModelIpAddressChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(usbConnectedChanged:)
                          name : ORPulser33220ModelUsbConnectedChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(ipConnectedChanged:)
                          name : ORPulser33220ModelIpConnectedChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(canChangeConnectionProtocolChanged:)
                          name : ORPulser33220ModelCanChangeConnectionProtocolChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(interfacesChanged:)
                          name : ORUSBInterfaceAdded
 						object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(interfacesChanged:)
                          name : ORUSBInterfaceRemoved
 						object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(serialNumberChanged:)
                          name : ORPulser33220ModelSerialNumberChanged
@@ -80,7 +80,7 @@
                      selector : @selector(serialNumberChanged:)
                          name : ORPulser33220ModelUSBInterfaceChanged
 						object: nil];
-
+	
 }
 
 - (void) awakeFromNib
@@ -158,11 +158,11 @@
 - (void) setButtonStates
 {
 	[super setButtonStates];
-
+	
     BOOL runInProgress  = [gOrcaGlobals runInProgress];
     BOOL locked			= [gSecurity isLocked:[model dialogLock]] || [model lockGUI];
     BOOL loading		= [model loading];
-
+	
 	[connectionProtocolMatrix setEnabled:!runInProgress || !locked];
 	[ipConnectButton setEnabled:!runInProgress || !locked];
 	[usbConnectButton setEnabled:!runInProgress || !locked];
@@ -180,26 +180,27 @@
 - (IBAction) connectionProtocolAction:(id)sender
 {
 	[model setConnectionProtocol:[[connectionProtocolMatrix selectedCell] tag]];
-
+	
 	BOOL undoWasEnabled = [[model undoManager] isUndoRegistrationEnabled];
     if(undoWasEnabled)[[model undoManager] disableUndoRegistration];
 	[model adjustConnectors:NO];
 	if(undoWasEnabled)[[model undoManager] enableUndoRegistration];
-
+	
 }
 
 - (IBAction) remoteAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model sendRemoteCommand];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog( [ localException reason ] );
 		NSRunAlertPanel( [ localException name ], 	// Name of panel
-						 [ localException reason ],	// Reason for error
-						 @"OK",				// Okay button
-						 nil,				// alternate button
-						 nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (void) populateInterfacePopup

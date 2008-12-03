@@ -1,65 +1,65 @@
 /*
-
-File:		CVmeContrl620.cpp
-
-Usage:		Implementation for the Bit3 620 PCI VME
-I/O Kit Kernel Extension (KEXT) Functions
-
-Author:		FM
-
-Copyright:		Copyright 2001-2002 F. McGirt.  All rights reserved.
-
-Change History:	1/22/02, 2/2/02, 2/12/02,
-3/1/02  - number of transfers <= 4096 bytes
-3/4/02 - transfers > 4096 bytes done in chunks
-
-According to Apple, currently the IOKit and IOUserClient
-(IOConnectMethodxx) do not support the transfer of single
-blocks larger than 4096 bytes (a memory page) between user
-space and kernel space.  Thus any larger block must be
-transferred in chunks of 4096 bytes or less.
-
-5/21/02 - IOServiceClose() added in destructor to match
-IOServiceOpen()
-
-5/22/02 - Open/Close calls to User Client methods added
-5/29/02 - direct mapping of 620 address spaces from user
-space added, single transfers up to 64768 32 bit
-items allowed
-6/5/02 - added comments and some cleanup
-8/7/02 - additional cleanup
-11/20/02 - added error returns to selected functions
-11/20/02 - MAH CENPA. converted to Obj-C 
-11/03/04  - MAH CENPA. converted to generic Bit3 Model
-
-
-Notes:		620 PCI Matching is done with
-Vendor ID 0x108a and Device IDs of the Bit3 devices.
-
-This task would have be much easier had there been an
-IOKit PCI family library available from Apple.  Since
-one cannot inherit from an IOKit provided family for
-PCI, one must write the required methods using the raw
-tools that IOKit provide.  Hopefully, at some point
-this situation will improve.
-
-
------------------------------------------------------------
-    This program was prepared for the Regents of the University of 
-    Washington at the Center for Experimental Nuclear Physics and 
-    Astrophysics (CENPA) sponsored in part by the United States 
-    Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-    The University has certain rights in the program pursuant to 
-    the contract and the program should not be copied or distributed 
-    outside your organization.  The DOE and the University of 
-    Washington reserve all rights in the program. Neither the authors,
-    University of Washington, or U.S. Government make any warranty, 
-    express or implied, or assume any liability or responsibility 
-    for the use of this software.
--------------------------------------------------------------
-
-
-    */
+ 
+ File:		CVmeContrl620.cpp
+ 
+ Usage:		Implementation for the Bit3 620 PCI VME
+ I/O Kit Kernel Extension (KEXT) Functions
+ 
+ Author:		FM
+ 
+ Copyright:		Copyright 2001-2002 F. McGirt.  All rights reserved.
+ 
+ Change History:	1/22/02, 2/2/02, 2/12/02,
+ 3/1/02  - number of transfers <= 4096 bytes
+ 3/4/02 - transfers > 4096 bytes done in chunks
+ 
+ According to Apple, currently the IOKit and IOUserClient
+ (IOConnectMethodxx) do not support the transfer of single
+ blocks larger than 4096 bytes (a memory page) between user
+ space and kernel space.  Thus any larger block must be
+ transferred in chunks of 4096 bytes or less.
+ 
+ 5/21/02 - IOServiceClose() added in destructor to match
+ IOServiceOpen()
+ 
+ 5/22/02 - Open/Close calls to User Client methods added
+ 5/29/02 - direct mapping of 620 address spaces from user
+ space added, single transfers up to 64768 32 bit
+ items allowed
+ 6/5/02 - added comments and some cleanup
+ 8/7/02 - additional cleanup
+ 11/20/02 - added error returns to selected functions
+ 11/20/02 - MAH CENPA. converted to Obj-C 
+ 11/03/04  - MAH CENPA. converted to generic Bit3 Model
+ 
+ 
+ Notes:		620 PCI Matching is done with
+ Vendor ID 0x108a and Device IDs of the Bit3 devices.
+ 
+ This task would have be much easier had there been an
+ IOKit PCI family library available from Apple.  Since
+ one cannot inherit from an IOKit provided family for
+ PCI, one must write the required methods using the raw
+ tools that IOKit provide.  Hopefully, at some point
+ this situation will improve.
+ 
+ 
+ -----------------------------------------------------------
+ This program was prepared for the Regents of the University of 
+ Washington at the Center for Experimental Nuclear Physics and 
+ Astrophysics (CENPA) sponsored in part by the United States 
+ Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+ The University has certain rights in the program pursuant to 
+ the contract and the program should not be copied or distributed 
+ outside your organization.  The DOE and the University of 
+ Washington reserve all rights in the program. Neither the authors,
+ University of Washington, or U.S. Government make any warranty, 
+ express or implied, or assume any liability or responsibility 
+ for the use of this software.
+ -------------------------------------------------------------
+ 
+ 
+ */
 
 
 #pragma mark ¥¥¥Imported Files
@@ -91,9 +91,9 @@ NSString* ORPciBit3Lock										= @"ORPciBit3Lock";
 
 // swap 8 bit quantities in 32 bit value ( |4| |3| |2| |1| -> |1| |2| |3| |4| )
 #define Swap8Bits(x)	(((x) & 0x000000FF) << 24) |	\
-						(((x) & 0x0000FF00) <<  8) |	\
-						(((x) & 0x00FF0000) >>  8) |	\
-						(((x) & 0xFF000000) >> 24)
+(((x) & 0x0000FF00) <<  8) |	\
+(((x) & 0x00FF0000) >>  8) |	\
+(((x) & 0xFF000000) >> 24)
 
 
 #pragma mark ¥¥¥Definitions
@@ -103,9 +103,9 @@ struct {
     NSString* deviceName;
     unsigned short deviceID;
 }pciDevices[kNumPciDevices]={
-    {@"617",            0x0001},
-    {@"618/620/622",    0x0010},
-    {@"810",            0x0040}
+{@"617",            0x0001},
+{@"618/620/622",    0x0010},
+{@"810",            0x0040}
 };
 
 #pragma mark ¥¥¥Private Methods
@@ -238,15 +238,16 @@ struct {
             NSLog(@"Since only one device found, this will not be a problem.\n");
         }
         
-        NS_DURING
+        @try {
             [self resetContrl];
             NSLog(@"Reset %@ Controller\n",deviceName);
-        NS_HANDLER
+        }
+		@catch(NSException* localException) {
             NSLogColor([NSColor redColor],@"*** Unable to send %@ reset ***\n",deviceName);
             NSLogColor([NSColor redColor],@"*** Check VME bus power and/or cables ***\n");
             if(okToShowResetWarning) NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
-                            localException);
-        NS_ENDHANDLER
+													 localException);
+        }
     }
 	[self setUpImage];
 }
@@ -258,11 +259,11 @@ struct {
     [noHardwareAlarm clearAlarm];
     [noHardwareAlarm release];
     noHardwareAlarm = nil;
-
+	
     [noDriverAlarm clearAlarm];
     [noDriverAlarm release];
     noDriverAlarm = nil;
-
+	
     
     // unmap Bit3 address spaces
     IOConnectUnmapMemory(dataPort, 1, mach_task_self(), CSRRegisterAddress);
@@ -284,7 +285,7 @@ struct {
         IOObjectRelease(bit3Device);
         bit3Device = 0;
     }
-            
+	
     // release master port to IOKit
     if( masterPort ) {
         mach_port_deallocate(mach_task_self(), masterPort);
@@ -349,7 +350,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setRange:range];
     
     range = aRange;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPciBit3ModelRangeChanged object:self];
 }
 
@@ -363,7 +364,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setDoRange:doRange];
     
     doRange = aDoRange;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPciBit3ModelDoRangeChanged object:self];
 }
 
@@ -378,8 +379,8 @@ struct {
     deviceName = [aDeviceName copy];
     
     [[NSNotificationCenter defaultCenter]
-                                postNotificationName:ORPciBit3DeviceNameChangedNotification
-                                              object:self];
+	 postNotificationName:ORPciBit3DeviceNameChangedNotification
+	 object:self];
     
 }
 
@@ -393,8 +394,8 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setRwAddress:[self rwAddress]];
     rwAddress = aValue;
     [[NSNotificationCenter defaultCenter]
-                                postNotificationName:ORPciBit3RWAddressChangedNotification
-                                              object:self];
+	 postNotificationName:ORPciBit3RWAddressChangedNotification
+	 object:self];
     
 }
 
@@ -408,8 +409,8 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
     writeValue = aValue;
     [[NSNotificationCenter defaultCenter]
-                        postNotificationName:ORPciBit3WriteValueChangedNotification
-                                      object:self];
+	 postNotificationName:ORPciBit3WriteValueChangedNotification
+	 object:self];
     
 }
 
@@ -423,8 +424,8 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setRwAddressModifier:[self rwAddressModifier]];
     rwAddressModifier = aValue;
     [[NSNotificationCenter defaultCenter]
-		    postNotificationName:ORPciBit3RWAddressModifierChangedNotification
-                          object:self];
+	 postNotificationName:ORPciBit3RWAddressModifierChangedNotification
+	 object:self];
     
 }
 
@@ -438,8 +439,8 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setReadWriteIOSpace:[self readWriteIOSpace]];
     readWriteIOSpace = aValue;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORPciBit3RWIOSpaceChangedNotification
-                      object:self];
+	 postNotificationName:ORPciBit3RWIOSpaceChangedNotification
+	 object:self];
     
 }
 
@@ -453,8 +454,8 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setReadWriteType:readWriteType];
     readWriteType = aValue;
     [[NSNotificationCenter defaultCenter]
-		    postNotificationName:ORPciBit3RWTypeChangedNotification
-                          object:self];
+	 postNotificationName:ORPciBit3RWTypeChangedNotification
+	 object:self];
     
 }
 
@@ -482,8 +483,8 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setDualPortAddress:dualPortAddress];
     dualPortAddress = theAddress;
     [[NSNotificationCenter defaultCenter]
-         postNotificationName:ORPciBit3DualPortAddresChangedNotification
-                       object:self];
+	 postNotificationName:ORPciBit3DualPortAddresChangedNotification
+	 object:self];
 }
 
 -(unsigned int) dualPortAddress
@@ -496,8 +497,8 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setDualPortRamSize:dualPortRamSize];
     dualPortRamSize = theSize;
     [[NSNotificationCenter defaultCenter]
-	postNotificationName:ORPciBit3DualPortRamSizeChangedNotification
-                  object:self];
+	 postNotificationName:ORPciBit3DualPortRamSizeChangedNotification
+	 object:self];
 }
 
 -(unsigned int) dualPortRamSize
@@ -516,8 +517,8 @@ struct {
 	errorRateGroup = newErrorRateGroup;
 	
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORPciBit3RateGroupChangedNotification
-                      object:self];    
+	 postNotificationName:ORPciBit3RateGroupChangedNotification
+	 object:self];    
 }
 
 - (void) setIntegrationTime:(double)newIntegrationTime
@@ -577,7 +578,7 @@ struct {
 										   &outputCount				// number of scalar output values
 										   );
 		*data = (char) output_64;
-
+		
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -644,7 +645,7 @@ struct {
 										   &outputCount					// number of scalar output values
 										   );
 		*data = (char) output_64;
-
+		
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -672,7 +673,7 @@ struct {
 		uint64_t input = address;
 		uint64_t output_64;
 		uint32_t outputCount = 1;
-
+		
 		result = IOConnectCallScalarMethod(dataPort,					// connection
 										   kBit3ReadPCIConfig,	// selector
 										   &input,					// input values
@@ -694,7 +695,7 @@ struct {
 {
     kern_return_t result = 0;
 	size_t pciDataSize = sizeof(PCIConfigStruct);
-
+	
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
@@ -711,16 +712,16 @@ struct {
 		//10.5
 		uint64_t scalarI = maxAddress;
 		result = IOConnectCallMethod(  dataPort,					// connection
-										   kBit3GetPCIConfig,			// selector
-										   &scalarI,					// input values
-										   1,							// number of scalar input values
-										   NULL,						// Pointer to input struct
-										   0,							// Size of input struct
-										   NULL,						// output scalar array
-										   NULL,						// pointer to number of scalar output
-										   pciData,						// pointer to struct output
-										   &pciDataSize					// pointer to size of struct output
-										   );
+									 kBit3GetPCIConfig,			// selector
+									 &scalarI,					// input values
+									 1,							// number of scalar input values
+									 NULL,						// Pointer to input struct
+									 0,							// Size of input struct
+									 NULL,						// output scalar array
+									 NULL,						// pointer to number of scalar output
+									 pciData,						// pointer to struct output
+									 &pciDataSize					// pointer to size of struct output
+									 );
 #endif
     }
     [theHWLock unlock];   //-----end critical section
@@ -849,7 +850,7 @@ struct {
 			[NSException raise: OExceptionVmeUnableToClear format:[NSString stringWithFormat:@"%@ unable to access Vme Crate. Check Power and Cables.",deviceName]];
 		}
 		else if( data & ( LOCAL_STATUS_LRC | LOCAL_STATUS_IFTO
-						  | LOCAL_STATUS_VMEBERR | LOCAL_STATUS_IFPE ) ) {	// unable to access
+						 | LOCAL_STATUS_VMEBERR | LOCAL_STATUS_IFPE ) ) {	// unable to access
 			
 			NSString* baseString = [NSString stringWithFormat:@"%@ Vme Address Exception. ",deviceName];
 			NSString* details = @"";
@@ -931,13 +932,14 @@ struct {
     *status = data;
     
     [theHWLock lock];   //-----begin critical section
-	NS_DURING
+	@try {
 		[self checkStatusErrors];
-	NS_HANDLER
-        NS_ENDHANDLER
-        [theHWLock unlock];   //-----end critical section
-        
-        NSLog(@"Vme Sys Reset\n");
+	}
+	@catch(NSException* localException) {
+	}
+	[theHWLock unlock];   //-----end critical section
+	
+	NSLog(@"Vme Sys Reset\n");
 }
 
 
@@ -950,7 +952,7 @@ struct {
             withAddMod:(unsigned short) addModifier
          usingAddSpace:(unsigned short) addressSpace
 {
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){
             [self  _setupMapping: vmeAddress
@@ -962,7 +964,7 @@ struct {
 			//if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:status];
 			// transfer data
 			unsigned long *pulr = (unsigned long *)( ( vmeAddress & 0x00000fff ) +
-									   (unsigned long)remMemRegisterAddress );
+													(unsigned long)remMemRegisterAddress );
 			unsigned long *pulb = (unsigned long *)readAddress;
 			unsigned int n = numberLongs;
 			for(;n--;)*pulb++ = *pulr++;
@@ -973,7 +975,8 @@ struct {
         [theHWLock unlock];   //-----end critical section
         
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
         errorCount++;
@@ -988,19 +991,19 @@ struct {
             retryFailedCount[kLongRetryIndex]++;
             [localException raise]; //rethrown the exception
         }
-        NS_ENDHANDLER
-        errorCount = 0;
-        
+	}
+	errorCount = 0;
+	
 }
 
 //a special read for reading fifos that reads one address multiple times
 - (void) readLong:(unsigned long *) readAddress
-             atAddress:(unsigned long) vmeAddress
-             timesToRead:(unsigned int) numberLongs
-            withAddMod:(unsigned short) addModifier
-         usingAddSpace:(unsigned short) addressSpace
+		atAddress:(unsigned long) vmeAddress
+	  timesToRead:(unsigned int) numberLongs
+	   withAddMod:(unsigned short) addModifier
+	usingAddSpace:(unsigned short) addressSpace
 {
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){
             [self  _setupMapping: vmeAddress
@@ -1014,20 +1017,21 @@ struct {
 			unsigned long *pulb = (unsigned long *)readAddress;
 			unsigned int n = numberLongs;
 			for(;n--;)*pulb++ = *pulr++;
-
+			
 			
  			if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
             
         }
 		else *readAddress = 0;
-
+		
         [theHWLock unlock];   //-----end critical section
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
 		[localException raise]; //rethrown the exception
-	NS_ENDHANDLER        
+	}        
 }
 
 
@@ -1041,7 +1045,7 @@ struct {
           usingAddSpace:(unsigned short) addressSpace
 {
     
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){            
             [self  _setupMapping: vmeAddress
@@ -1052,7 +1056,7 @@ struct {
 			//if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:status];
 			// transfer data
 			unsigned long *pulr = (unsigned long *)( ( vmeAddress & 0x00000fff ) +
-									   (unsigned long)remMemRegisterAddress );
+													(unsigned long)remMemRegisterAddress );
 			unsigned long *pulb = (unsigned long *)writeAddress;
 			unsigned int n = numberLongs;
 			for(;n--;)*pulr++ = *pulb++;
@@ -1063,7 +1067,8 @@ struct {
         [theHWLock unlock];   //-----end critical section
         
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
         errorCount++;
@@ -1078,9 +1083,9 @@ struct {
             errorCount = 0;
             [localException raise]; //rethrown the exception
         }
-        NS_ENDHANDLER
-        errorCount = 0;
-        
+	}
+	errorCount = 0;
+	
 }
 
 
@@ -1092,7 +1097,7 @@ struct {
             withAddMod:(unsigned short) addModifier
          usingAddSpace:(unsigned short) addressSpace
 {
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){
             [self  _setupMapping_Byte: vmeAddress
@@ -1103,7 +1108,7 @@ struct {
 			//if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
 			// transfer data
 			unsigned char *pulr = (unsigned char *)( ( vmeAddress & 0x00000fff ) +
-									 (unsigned long)remMemRegisterAddress );
+													(unsigned long)remMemRegisterAddress );
 			unsigned char *pulb = (unsigned char *)readAddress;
 			unsigned int n = numberBytes;
 			for(;n--;)*pulb++ = *pulr++;
@@ -1111,10 +1116,11 @@ struct {
             
         }
 		else *readAddress = 0;
-
+		
         [theHWLock unlock];   //-----end critical section
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
         errorCount++;
@@ -1129,9 +1135,9 @@ struct {
             errorCount = 0;
             [localException raise]; //rethrown the exception
         }
-        NS_ENDHANDLER
-        errorCount = 0;
-        
+	}
+	errorCount = 0;
+	
 }
 
 
@@ -1143,7 +1149,7 @@ struct {
              withAddMod:(unsigned short) addModifier
           usingAddSpace:(unsigned short) addressSpace
 {	
-    NS_DURING        
+    @try {        
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){
             [self  _setupMapping_Byte: vmeAddress
@@ -1154,7 +1160,7 @@ struct {
 			//if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
 			// transfer data
 			unsigned char *pulr = (unsigned char *)( ( vmeAddress & 0x00000fff ) +
-									 (unsigned long)remMemRegisterAddress );
+													(unsigned long)remMemRegisterAddress );
 			unsigned char *pulb = (unsigned char *)writeAddress;
 			unsigned int n = numberBytes;
 			for(;n--;)*pulr++ = *pulb++;
@@ -1163,7 +1169,8 @@ struct {
         }
         [theHWLock unlock];   //-----end critical section
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
         errorCount++;
@@ -1178,8 +1185,8 @@ struct {
             errorCount = 0;
             [localException raise]; //rethrown the exception
         }
-        NS_ENDHANDLER
-        errorCount = 0;
+	}
+	errorCount = 0;
 }
 
 
@@ -1191,7 +1198,7 @@ struct {
              withAddMod:(unsigned short) addModifier
           usingAddSpace:(unsigned short) addressSpace
 {	
-    NS_DURING
+    @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){
             [self  _setupMapping: vmeAddress
@@ -1202,7 +1209,7 @@ struct {
 			//if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
             // transfer data
 			UInt16 *pulr = (UInt16 *)( ( vmeAddress & 0x00000fff ) +
-									   (unsigned long)remMemRegisterAddress );
+									  (unsigned long)remMemRegisterAddress );
 			UInt16 *pulb = (UInt16 *)readAddress;
 			unsigned short n = numberWords;
 			for(;n--;)*pulb++ = *pulr++;
@@ -1210,10 +1217,11 @@ struct {
             
         }
 		else *readAddress = 0;
-
+		
         [theHWLock unlock];   //-----end critical section
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
         errorCount++;
@@ -1228,8 +1236,8 @@ struct {
             errorCount = 0;
             [localException raise]; //rethrown the exception
         }
-        NS_ENDHANDLER
-        errorCount = 0;
+	}
+	errorCount = 0;
 }
 
 
@@ -1242,7 +1250,7 @@ struct {
            usingAddSpace:(unsigned short) addressSpace
 {	
     
-    NS_DURING        
+    @try {        
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){
             [self  _setupMapping: vmeAddress
@@ -1253,16 +1261,17 @@ struct {
 			//if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
 			// transfer data
 			UInt16 *pulr = (UInt16 *)( ( vmeAddress & 0x00000fff ) +
-									   (unsigned long)remMemRegisterAddress );
+									  (unsigned long)remMemRegisterAddress );
 			UInt16 *pulb = (UInt16 *)writeAddress;
 			unsigned int n = numberWords;
 			for(;n--;)*pulr++ = *pulb++;
  			if(*fVStatusReg & STATUS_PROBLEM)[self checkStatusWord:*fVStatusReg];
-           
+			
         }
         [theHWLock unlock];   //-----end critical section
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [self _resetNoRaise];
         errorCount++;
@@ -1277,8 +1286,8 @@ struct {
             errorCount = 0;
             [localException raise]; //rethrown the exception
         }
-        NS_ENDHANDLER
-        errorCount = 0;
+	}
+	errorCount = 0;
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -1288,9 +1297,9 @@ struct {
 - (kern_return_t) _openUserClient:(io_service_t) serviceObject
                      withDataPort:(io_connect_t) aDataPort
 {
-
+	
 	kern_return_t kernResult;
-
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//10.4
 	kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
@@ -1316,7 +1325,7 @@ struct {
 - (kern_return_t) _closeUserClient:(io_connect_t) aDataPort
 {
 	kern_return_t kernResult;
-
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//10.4
 	kernResult = IOConnectMethodScalarIScalarO(aDataPort,		// service
@@ -1327,12 +1336,12 @@ struct {
 #else
 	//10.5
 	kernResult =  IOConnectCallScalarMethod( aDataPort,		// connection
-											 kBit3UserClientClose,	// selector
-											 0,			// input values
-											 0,			// number of scalar input values														
-											 0,			// output values
-											 0			// number of scalar output values
-											 );
+											kBit3UserClientClose,	// selector
+											0,			// input values
+											0,			// number of scalar input values														
+											0,			// output values
+											0			// number of scalar output values
+											);
 #endif
 	return kernResult;
 }
@@ -1449,10 +1458,10 @@ struct {
     
     // pick up a12-a31 address bits
     unsigned long mapValue = ((remoteAddress & 0xfffff000)
-                       | ((addModifier << 6) & 0x00000fc0)  // add address modifier bits
-                       | ((addressSpace << 4) & 0x00000030) // add function code bits
-                       | 0x00000002)	// add swapping bit - byte swap for non-byte data enable
-					   & 0xfffffffe;	// clear map register invalid bit at d0 - enable PCI to VME access
+							  | ((addModifier << 6) & 0x00000fc0)  // add address modifier bits
+							  | ((addressSpace << 4) & 0x00000030) // add function code bits
+							  | 0x00000002)	// add swapping bit - byte swap for non-byte data enable
+	& 0xfffffffe;	// clear map register invalid bit at d0 - enable PCI to VME access
     
 	volatile unsigned long* mptr = (unsigned long *)(mapRegisterAddress);
 	unsigned long n = numberBytes + ( remoteAddress & 0x00000fff );
@@ -1478,10 +1487,10 @@ struct {
     
     // pick up a12-a31 address bits
     unsigned long mapValue = ((remoteAddress & 0xfffff000)
-                       | ((addModifier << 6) & 0x00000fc0) // add address modifier bits
-                       | ((addressSpace << 4) & 0x00000030)// add function code bits
-                       | 0x00000008)	// add swapping bit - byte swap for byte data enable
-					   & 0xfffffffe;	// clear map register invalid bit at d0 - enable PCI to VME access
+							  | ((addModifier << 6) & 0x00000fc0) // add address modifier bits
+							  | ((addressSpace << 4) & 0x00000030)// add function code bits
+							  | 0x00000008)	// add swapping bit - byte swap for byte data enable
+	& 0xfffffffe;	// clear map register invalid bit at d0 - enable PCI to VME access
     
     // put map value in proper mapping register(s) - note byte swapping to
     // change mac big endian value to little endian for pci
@@ -1509,10 +1518,10 @@ struct {
 //			at the beginning of the buffer for dma flags
 // NOTE - the VME address (vmeAddress) must be long word aligned
 - (void) readLongBlock:(unsigned long *) readAddress
-					 atAddress:(unsigned long) vmeAddress
-					 numToRead:(unsigned int) numberLongs
-				 usingAddSpace:(unsigned short) addressSpace
-				 useBlockMode:(bool) useBlockMode
+			 atAddress:(unsigned long) vmeAddress
+			 numToRead:(unsigned int) numberLongs
+		 usingAddSpace:(unsigned short) addressSpace
+		  useBlockMode:(bool) useBlockMode
 {
 	// setup parameters
 	Boolean enableByteSwap = TRUE;
@@ -1527,7 +1536,7 @@ struct {
 	unsigned long *pucb = dmaBuffer;
 	unsigned long j;
 	for(j = 0L; j < 4L; j++ ) *pucb++ = 0x00000000;
-
+	
 	// reserve 4 bytes (1 long) at beginning of dma buffer for flags
 	unsigned long *dmaFlags = dmaBuffer;
 	dmaBuffer += 4L;
@@ -1536,19 +1545,19 @@ struct {
 	// start dma
 	*dmaFlags = (unsigned long)0x00000000L;
 	[self  startDma: address 
-  physicalBufferAddress: physicalAddress
-		numberTransfers: transfers 
-		   addressSpace: space
-		 enableByteSwap: enableByteSwap 
-		 enableWordSwap: enableWordSwap
-		   useBlockMode: useBlockMode
-			  direction: 'R'];
-
+physicalBufferAddress: physicalAddress
+	numberTransfers: transfers 
+	   addressSpace: space
+	 enableByteSwap: enableByteSwap 
+	 enableWordSwap: enableWordSwap
+	   useBlockMode: useBlockMode
+		  direction: 'R'];
+	
 	// wait for dma to complete or done interrupt to occur
 	unsigned long elapsedTime;
 	unsigned long startTime = TickCount();
 	do {
-
+		
 		// need to put a reasonable delay here to prevent slowdown
 		// by repeated check for dma complete
 		elapsedTime = TickCount() - startTime;
@@ -1558,13 +1567,13 @@ struct {
 		if( elapsedTime > 1000L ) {  // to prevent hang
 			break;
 		}
-
+		
 	} while( ![self checkDmaComplete:dmaFlags] );
 	//unsigned long endTime = TickCount();
 	//StatusPrintf("Time For %ld Byte Reads = %ld Ticks",bytes,
 	//		(unsigned long)(endTime - startTime));
 	//StatusPrintf("DmaFlags = 0x%08x",*dmaFlags); 
-
+	
 	// check for errors	
 	if( ![self checkDmaErrors] ) {
 		NSString* baseString = [NSString stringWithFormat:@"%@ Vme DMA Exception. ",deviceName];
@@ -1581,10 +1590,10 @@ struct {
 //			at the beginning of the buffer for dma flags
 // NOTE - the VME address (vmeAddress) must be long word aligned
 - (void) writeLongBlock:(unsigned long *) writeAddress
-					  atAddress:(unsigned long) vmeAddress
-					  numToWrite:(unsigned int) numberLongs
-				  usingAddSpace:(unsigned short) addressSpace
-				 useBlockMode:(bool) useBlockMode
+			  atAddress:(unsigned long) vmeAddress
+			 numToWrite:(unsigned int) numberLongs
+		  usingAddSpace:(unsigned short) addressSpace
+		   useBlockMode:(bool) useBlockMode
 {
 	// setup parameters
 	Boolean enableByteSwap = TRUE;
@@ -1601,7 +1610,7 @@ struct {
 	for(j = 0L; j < 4L; j++ ) {
 		*pucb++ = 0x00000000;
 	}
-
+	
 	// reserve 4 bytes (1 long) at beginning of dma buffer for flags
 	unsigned long *dmaFlags = dmaBuffer;
 	dmaBuffer += 4L;
@@ -1609,23 +1618,23 @@ struct {
 	
 	// start dma
 	*dmaFlags = (unsigned long)0x00000000L;
-
+	
 	[self startDma: address 
-		physicalBufferAddress: physicalAddress
+physicalBufferAddress: physicalAddress
    numberTransfers: transfers 
 	  addressSpace: space
 	enableByteSwap: enableByteSwap 
 	enableWordSwap: enableWordSwap
 	  useBlockMode: useBlockMode
 		 direction: 'W'];
-		
-
-
+	
+	
+	
 	// wait for dma to complete or done interrupt to occur
 	unsigned long elapsedTime;
 	unsigned long startTime = TickCount();
 	do {
-
+		
 		// need to put a reasonable delay here to prevent slowdown
 		// by repeated check for dma complete
 		elapsedTime = TickCount() - startTime;
@@ -1635,13 +1644,13 @@ struct {
 		if( elapsedTime > 1000L ) {  // to prevent hang
 			break;
 		}
-
+		
 	} while( ![self checkDmaComplete:dmaFlags]);
 	//unsigned long endTime = TickCount();
 	//StatusPrintf("Time For %ld Byte Reads = %ld Ticks",bytes,
 	//		(unsigned long)(endTime - startTime));
 	//StatusPrintf("DmaFlags = 0x%08x",*dmaFlags); 
-
+	
 	// check for errors	
 	if( ![self checkDmaErrors] ) {
 		NSString* baseString = [NSString stringWithFormat:@"%@ Vme DMA Exception. ",deviceName];
@@ -1657,10 +1666,10 @@ struct {
 {
 	//volatile unsigned char *cptr = (unsigned char *)GetIoBaseAddress();
 	volatile unsigned char *cptr = (unsigned char *)CSRRegisterAddress;
-
+	
 	unsigned char uc;
 	Boolean errorStatus;
-
+	
 	// display results of dma registers
 	//uc = *(cptr + PCIVME_DMA_LOCAL_REMAINDER_COUNT_OFFSET); // debug read
 	//StatusPrintf("DMA Local DMA Remainder Count Register = 0x%02x",uc); // debug
@@ -1670,7 +1679,7 @@ struct {
 	//StatusPrintf("DMA Local DMA Packet Count Register(8-15) = 0x%02x",uc); // debug
 	//uc = *(cptr + PCIVME_DMA_REMOTE_REMAINDER_COUNT_OFFSET); // debug read
 	//StatusPrintf("DMA Remote DMA Remainder Count Register = 0x%02x",uc); //debug
-
+	
 	// check local status register for errors
 	uc = *(cptr + PCIVME_CSR_LOCAL_STATUS_OFFSET);
 	if( ( uc & 0xc7 ) == 0x00 ) {
@@ -1680,20 +1689,20 @@ struct {
 	else {
 		//StatusPrintf("Errors During DMA, Local Status = 0x%02x",uc);
 		errorStatus = FALSE;
-
+		
 		// clear any interface errors
 		uc = *(cptr + PCIVME_CSR_REMOTE_STATUS_OFFSET);
 		//StatusPrintf("Errors During DMA, Remote Status = 0x%02x",uc);
-	
+		
 		// clear any status errors
 		uc = 0x80;
 		*(cptr + PCIVME_CSR_LOCAL_COMMAND_OFFSET) = uc;
 	}
-
+	
 	// clear remote command reg 2
 	uc = 0x00;
 	*(cptr + PCIVME_CSR_REMOTE_COMMAND_2_OFFSET) = uc;
-
+	
 	return errorStatus;
 }
 
@@ -1701,14 +1710,14 @@ struct {
 {
 	// make compiler happy
 	checkFlag = checkFlag;
-
+	
 	// check for dma complete
 #ifndef USE_INTERRUPT		// without dma done interupt
-
+	
 	//volatile unsigned char *cptr = (unsigned char *)GetIoBaseAddress();
 	volatile unsigned char *cptr = (unsigned char *)CSRRegisterAddress;
 	unsigned char uc;
-
+	
 	uc = *(cptr + PCIVME_DMA_LOCAL_COMMAND_OFFSET);
 	if( ( uc & 0x02 ) == 0x00 ) {
 		return FALSE;
@@ -1716,16 +1725,16 @@ struct {
 	else {
 		return TRUE;
 	}
-
+	
 #else						// with dma done interrupt
-
+	
 	if( *( checkFlag + DMA_COMPLETE_OFFSET ) == (unsigned char)0x00 ) {
 		return FALSE;
 	}
 	else {
 		return TRUE;
 	}
-
+	
 #endif
 }
 
@@ -1734,13 +1743,13 @@ struct {
 // theDirection = 'R' for VME to PCI DMAs
 // theDirection = 'W' for PCI to VME DMAs
 - (void) startDma:(unsigned long) vmeAddress 
-  physicalBufferAddress:(unsigned long) physicalBufferAddress
-		numberTransfers:(unsigned long) numberTransfers 
-		   addressSpace:(unsigned short) addressSpace
-		 enableByteSwap:(bool) enableByteSwap 
-		 enableWordSwap:(bool) enableWordSwap
-		   useBlockMode:(bool) useBlockMode
-			  direction:(char) theDirection;
+physicalBufferAddress:(unsigned long) physicalBufferAddress
+  numberTransfers:(unsigned long) numberTransfers 
+	 addressSpace:(unsigned short) addressSpace
+   enableByteSwap:(bool) enableByteSwap 
+   enableWordSwap:(bool) enableWordSwap
+	 useBlockMode:(bool) useBlockMode
+		direction:(char) theDirection;
 {
 	// seup dma map registers(s)
 	unsigned long bytes = 4L * numberTransfers;
@@ -1748,70 +1757,70 @@ struct {
 			  numberBytes: bytes
 		   enableByteSwap: enableByteSwap 
 		   enableWordSwap: enableWordSwap];
-		
+	
 	// load local dma remainder count reg (8 bits)
 	//volatile unsigned char *cptr = (unsigned char *)GetIoBaseAddress();
 	volatile unsigned char *cptr = (unsigned char *)CSRRegisterAddress;
 	unsigned char uc = (unsigned char)( bytes & 0x000000fc );
 	*(cptr + PCIVME_DMA_LOCAL_REMAINDER_COUNT_OFFSET) = uc;
-//	uc = *(cptr + PCIVME_DMA_LOCAL_REMAINDER_COUNT_OFFSET); // debug read
-//	StatusPrintf("DMA Local DMA Remainder Count Register = 0x%02x",uc); // debug
-
+	//	uc = *(cptr + PCIVME_DMA_LOCAL_REMAINDER_COUNT_OFFSET); // debug read
+	//	StatusPrintf("DMA Local DMA Remainder Count Register = 0x%02x",uc); // debug
+	
 	// local dma packet count reg (16 bits)
 	unsigned short us = (unsigned short)( bytes / 256L );
 	*(cptr + PCIVME_DMA_LOCAL_PACKET_COUNT_0_7_OFFSET) =
-			(unsigned char)( us & 0x00ff );
+	(unsigned char)( us & 0x00ff );
 	*(cptr + PCIVME_DMA_LOCAL_PACKET_COUNT_8_15_OFFSET) =
-			(unsigned char)( ( us >> 8 ) & 0x00ff );
-//	uc = *(cptr + PCIVME_DMA_LOCAL_PACKET_COUNT_0_7_OFFSET); // debug read
-//	StatusPrintf("DMA Local DMA Packet Count Register(0-7) = 0x%02x",uc); // debug
-//	uc = *(cptr + PCIVME_DMA_LOCAL_PACKET_COUNT_8_15_OFFSET); // debug read
-//	StatusPrintf("DMA Local DMA Packet Count Register(8-15) = 0x%02x",uc); // debug
-
+	(unsigned char)( ( us >> 8 ) & 0x00ff );
+	//	uc = *(cptr + PCIVME_DMA_LOCAL_PACKET_COUNT_0_7_OFFSET); // debug read
+	//	StatusPrintf("DMA Local DMA Packet Count Register(0-7) = 0x%02x",uc); // debug
+	//	uc = *(cptr + PCIVME_DMA_LOCAL_PACKET_COUNT_8_15_OFFSET); // debug read
+	//	StatusPrintf("DMA Local DMA Packet Count Register(8-15) = 0x%02x",uc); // debug
+	
 	// load local dma address reg (24 bits)
 	us = (unsigned short)( physicalBufferAddress & 0x00000fff); // use address bit 0-11 and first map reg
 	*(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_0_7_OFFSET) =
-			(unsigned char)( us & 0x00ff );
+	(unsigned char)( us & 0x00ff );
 	*(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_8_15_OFFSET) =
-			(unsigned char)( ( us >> 8 ) & 0x00ff );
+	(unsigned char)( ( us >> 8 ) & 0x00ff );
 	uc = 0x00; // use first dma map register
 	*(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_16_23_OFFSET) = uc;
-//	uc = *(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_0_7_OFFSET); // debug read
-//	StatusPrintf("DMA Local PCI Address Register(0-7) = 0x%02x",uc); // debug
-//	uc = *(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_8_15_OFFSET); // debug read
-//	StatusPrintf("DMA Local PCI Address Register(8-15) = 0x%02x",uc); // debug
-//	uc = *(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_16_23_OFFSET); // debug read
-//	StatusPrintf("DMA Local PCI Address Register(16-23) = 0x%02x",uc); // debug
-
+	//	uc = *(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_0_7_OFFSET); // debug read
+	//	StatusPrintf("DMA Local PCI Address Register(0-7) = 0x%02x",uc); // debug
+	//	uc = *(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_8_15_OFFSET); // debug read
+	//	StatusPrintf("DMA Local PCI Address Register(8-15) = 0x%02x",uc); // debug
+	//	uc = *(cptr + PCIVME_DMA_LOCAL_PCI_ADDRESS_16_23_OFFSET); // debug read
+	//	StatusPrintf("DMA Local PCI Address Register(16-23) = 0x%02x",uc); // debug
+	
 	// load remote dma remainder count reg (8 bits)
 	uc = (unsigned char)( bytes & 0x000000fc );
 	*(cptr + PCIVME_DMA_REMOTE_REMAINDER_COUNT_OFFSET) = uc;
-//	uc = *(cptr + PCIVME_DMA_REMOTE_REMAINDER_COUNT_OFFSET); // debug read
-//	StatusPrintf("DMA Remote DMA Remainder Count Register = 0x%02x",uc); //debug
-
+	//	uc = *(cptr + PCIVME_DMA_REMOTE_REMAINDER_COUNT_OFFSET); // debug read
+	//	StatusPrintf("DMA Remote DMA Remainder Count Register = 0x%02x",uc); //debug
+	
 	// load remote dma address reg (32 bits)
 	unsigned long ul = (unsigned long)vmeAddress;
 	*(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_0_7_OFFSET) =
-		(unsigned char)( ul & 0x000000ff );
+	(unsigned char)( ul & 0x000000ff );
 	*(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_8_15_OFFSET) =
-		(unsigned char)( ( ul >> 8 ) & 0x000000ff );
+	(unsigned char)( ( ul >> 8 ) & 0x000000ff );
 	*(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_16_23_OFFSET) =
-		(unsigned char)( ( ul >> 16 ) & 0x000000ff );
+	(unsigned char)( ( ul >> 16 ) & 0x000000ff );
 	*(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_24_31_OFFSET) =
-		(unsigned char)( ( ul >> 24 ) & 0x000000ff );
-//	uc = *(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_0_7_OFFSET); // debug read
-//	StatusPrintf("DMA Remote VME Address Register(0-7) = 0x%02x",uc); // debug
-//	uc = *(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_8_15_OFFSET); // debug read
-//	StatusPrintf("DMA Remote VME Address Register(8-15) = 0x%02x",uc); // debug
-//	uc = *(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_16_23_OFFSET); // debug read
-//	StatusPrintf("DMA Remote VME Address Register(16-23) = 0x%02x",uc); // debug
-//	uc = *(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_24_31_OFFSET); // debug read
-//	StatusPrintf("DMA Remote VME Address Register(24-31) = 0x%02x",uc); // debug
-
+	(unsigned char)( ( ul >> 24 ) & 0x000000ff );
+	//	uc = *(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_0_7_OFFSET); // debug read
+	//	StatusPrintf("DMA Remote VME Address Register(0-7) = 0x%02x",uc); // debug
+	//	uc = *(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_8_15_OFFSET); // debug read
+	//	StatusPrintf("DMA Remote VME Address Register(8-15) = 0x%02x",uc); // debug
+	//	uc = *(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_16_23_OFFSET); // debug read
+	//	StatusPrintf("DMA Remote VME Address Register(16-23) = 0x%02x",uc); // debug
+	//	uc = *(cptr + PCIVME_DMA_REMOTE_VME_ADDRESS_24_31_OFFSET); // debug read
+	//	StatusPrintf("DMA Remote VME Address Register(24-31) = 0x%02x",uc); // debug
+	
 	// clear remote command reg 1
 	uc = 0x00;
 	*(cptr + PCIVME_CSR_REMOTE_COMMAND_1_OFFSET) = uc;
-
+	
 	// load remote command reg 2
 	//uc = *(cptr + PCIVME_CSR_REMOTE_COMMAND_2_OFFSET);
 	uc = 0x00;
@@ -1823,9 +1832,9 @@ struct {
 	//uc |= 0x40;		// use remote am reg
 	//uc |= 0x80;		// use pause mode
 	*(cptr + PCIVME_CSR_REMOTE_COMMAND_2_OFFSET) = uc;
-//	uc = *(cptr + PCIVME_CSR_REMOTE_COMMAND_2_OFFSET); // debug read
-//	StatusPrintf("DMA Remote Command Register 2 = 0x%02x",uc); // debug
-
+	//	uc = *(cptr + PCIVME_CSR_REMOTE_COMMAND_2_OFFSET); // debug read
+	//	StatusPrintf("DMA Remote Command Register 2 = 0x%02x",uc); // debug
+	
 	// load remote address modifier csr reg
 	unsigned short am;
 	if( vmeAddress < 0x01000000 ) {
@@ -1846,9 +1855,9 @@ struct {
 	}
 	uc = (unsigned char)am;
 	*(cptr + PCIVME_CSR_REMOTE_VME_ADD_MOD_OFFSET) = uc;
-//	uc = *(cptr + PCIVME_CSR_REMOTE_VME_ADD_MOD_OFFSET); // debug read
-//	StatusPrintf("CSR Remote VME AM Register = 0x%02x",uc); // debug
-
+	//	uc = *(cptr + PCIVME_CSR_REMOTE_VME_ADD_MOD_OFFSET); // debug read
+	//	StatusPrintf("CSR Remote VME AM Register = 0x%02x",uc); // debug
+	
 	// enable dma done interrupt in local interrupt control register
 #ifdef USE_INTERRUPT
 	uc = 0x40;			// dma done interrupt
@@ -1856,9 +1865,9 @@ struct {
 	uc = 0x00;			// no interrupts
 #endif
 	*(cptr + PCIVME_CSR_LOCAL_INT_CONTROL_OFFSET) = uc;
-
+	
 	if( theDirection == 'R' ) {			// vme to pci
-
+		
 		// load local dma command reg for vme to pci dma transfers (8 bits) and
 		// enable dma done interrupt
 		if( addressSpace == ACCESS_REMOTE_DPRAM ) {
@@ -1877,7 +1886,7 @@ struct {
 		}
 	}
 	else {							// pci to vme
-
+		
 		// load local dma command reg for vme to pci dma transfers (8 bits) and
 		// enable dma done interrupt
 		if( addressSpace == ACCESS_REMOTE_DPRAM ) {
@@ -1895,12 +1904,12 @@ struct {
 #endif
 		}
 	}
-
+	
 	unsigned char startDMA = uc;
 	*(cptr + PCIVME_DMA_LOCAL_COMMAND_OFFSET) = uc;
-//	uc = *(cptr + PCIVME_DMA_LOCAL_COMMAND_OFFSET); // debug read
-//	StatusPrintf("DMA Local Command Register = 0x%02x",uc); // debug
-
+	//	uc = *(cptr + PCIVME_DMA_LOCAL_COMMAND_OFFSET); // debug read
+	//	StatusPrintf("DMA Local Command Register = 0x%02x",uc); // debug
+	
 	// start dma
 	*(cptr + PCIVME_DMA_LOCAL_COMMAND_OFFSET) = ( startDMA | 0x80 );
 }
@@ -1909,48 +1918,48 @@ struct {
 
 
 - (void) setupMappingDMA:(unsigned long) remoteAddress
-	numberBytes:(unsigned long) numberBytes
-		 enableByteSwap:(bool) enableByteSwap 
-		 enableWordSwap:(bool) enableWordSwap;
+			 numberBytes:(unsigned long) numberBytes
+		  enableByteSwap:(bool) enableByteSwap 
+		  enableWordSwap:(bool) enableWordSwap;
 {
-
+	
 	// pick up a12-a31 address bits
 	unsigned long mapValue = remoteAddress & (unsigned long)0xfffff000;
-
+	
 	// add byte swap on non-byte data bit
 	if( enableByteSwap ) {
-
+		
 		// add swapping bit for byte swap for non-byte data enable
 		mapValue |= (unsigned long)0x00000002;
 	} 
-
+	
 	// add word swap bit
 	if( enableWordSwap ) {
-
+		
 		// add swapping bit for word swap
 		mapValue |= (unsigned long)0x00000004;
 	} 
-
+	
 	// clear map register invalid bit at d0 - enable PCI to VME access
 	mapValue &= (unsigned long)0xfffffffe;
 	//StatusPrintf("Starting Map Value = 0x%08lx",mapValue);
-
+	
 	// put map value in proper mapping register(s)
-//	volatile unsigned long *mptr = (unsigned long *)( (unsigned long)GetMappingBaseAddress() +
-//			 (unsigned long)DMA_MAPPING_REGISTER_OFFSET );
-
+	//	volatile unsigned long *mptr = (unsigned long *)( (unsigned long)GetMappingBaseAddress() +
+	//			 (unsigned long)DMA_MAPPING_REGISTER_OFFSET );
+	
 	volatile unsigned long *mptr = (unsigned long *)( (unsigned long)mapRegisterAddress +
-			 (unsigned long)DMA_MAPPING_REGISTER_OFFSET );
-
-
+													 (unsigned long)DMA_MAPPING_REGISTER_OFFSET );
+	
+	
 	unsigned long j;
 	for( j = 0L; j < numberBytes + ( remoteAddress & 0x00000fff );
 		j += (unsigned long)0x00001000 ) {
-
+		
 		unsigned long swappedMapValue = Swap8Bits(mapValue);
 		//StatusPrintf("j = %ld,MapRegPtr = 0x%08x, MapValue = 0x%08x,SwappedMapValue = 0x%08x",j,
 		//	(unsigned long)mptr,(unsigned long)mapValue,(unsigned long)swappedMapValue);
-
+		
 		*mptr++ = swappedMapValue;
 		mapValue += (unsigned long)0x00001000;
 	}
@@ -2125,7 +2134,7 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
     
     NSString* progressString;
     
-    NS_DURING
+    @try {
         progressString = [NSString stringWithString:@"Checking Status"];
         [self checkStatusErrors];
         
@@ -2147,10 +2156,11 @@ static NSString *ORPciBit3ErrorRateYAttributes  = @"Bit3 ErrorRateYAttributes";
         
         cdata = [self getLocalStatus];
         NSLog(@"*** Adapter Local Status = 0x%02x ***\n",cdata);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Check Status Failed: %@");
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 #pragma mark ¥¥¥NSOrderedObjHolding Protocol

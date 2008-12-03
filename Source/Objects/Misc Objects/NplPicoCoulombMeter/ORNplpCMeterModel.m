@@ -55,15 +55,16 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
-	
+	@try {
+		
 		int i;
 		for(i=0;i<kNplpCNumChannels;i++) dataStack[i] = [[ORQueue alloc] init];
 		
 		[self connect];
 		[self connectionChanged];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) setUpImage
@@ -106,7 +107,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 {
 	frameError = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORNplpCMeterFrameError object:self];
-
+	
 }
 
 - (void) setIsConnected:(BOOL)aFlag
@@ -128,7 +129,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
     
     [ipAddress autorelease];
     ipAddress = [aIpAddress copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNplpCMeterIpAddressChanged object:self];
 }
 
@@ -238,11 +239,11 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORNplpCMeterDecoder",					@"decoder",
-        [NSNumber numberWithLong:dataId],       @"dataId",
-        [NSNumber numberWithBool:YES],          @"variable",
-        [NSNumber numberWithLong:-1],			@"length",
-        nil];
+								 @"ORNplpCMeterDecoder",					@"decoder",
+								 [NSNumber numberWithLong:dataId],       @"dataId",
+								 [NSNumber numberWithBool:YES],          @"variable",
+								 [NSNumber numberWithLong:-1],			@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"NplpCMeter"];
     
     return dataDictionary;
@@ -251,7 +252,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 - (void) shipValues
 {
 	if(meterData){
-	
+		
 		unsigned int numBytes = [meterData length];
 		if(numBytes%4 == 0) {											//OK, we know we got a integer number of long words
 			if([self validateMeterData]){
@@ -292,7 +293,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 				
 				if([gOrcaGlobals runInProgress] && numBytes>0){
 					[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:(3+numLongsToShip)*sizeof(long)]];
+																		object:[NSData dataWithBytes:data length:(3+numLongsToShip)*sizeof(long)]];
 				}
 				[self setReceiveCount: receiveCount + numLongsToShip];
 			}
@@ -325,7 +326,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 			}
 		}
 		else [self setMeter:chan average:0];
-
+		
 	}
 }
 
@@ -349,7 +350,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
     [[self undoManager] disableUndoRegistration];
 	[self setIpAddress:[decoder decodeObjectForKey:@"ORNplpCMeterModelIpAddress"]];
     [[self undoManager] enableUndoRegistration];    
-		
+	
     return self;
 }
 

@@ -49,7 +49,7 @@
 
 // swap 8 bit quantities in 32 bit value ( |4| |3| |2| |1| -> |1| |2| |3| |4| )
 #define Swap8Bits(x)	((((Swap16Bits(x) & 0x0000ff00) >> 8) | ((Swap16Bits(x) & 0x000000ff) << 8)) \
-                         | (((Swap16Bits(x) & 0xff000000) >> 8) | ((Swap16Bits(x) & 0x00ff0000) << 8)))
+| (((Swap16Bits(x) & 0xff000000) >> 8) | ((Swap16Bits(x) & 0x00ff0000) << 8)))
 
 
 // methods
@@ -84,12 +84,12 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     
     [super registerNotificationObservers];
-        
+	
     [notifyCenter addObserver : self
                      selector : @selector(rwAddressTextChanged:)
                          name : ORPciBit3RWAddressChangedNotification
                         object: model];
-        
+	
     [notifyCenter addObserver : self
                      selector : @selector(writeValueTextChanged:)
                          name : ORPciBit3WriteValueChangedNotification
@@ -158,19 +158,19 @@
                      selector : @selector(slotChanged:)
                          name : ORDualPortLAMSlotChangedNotification
                         object: nil];
-
+	
     [self registerRates];
     
     [notifyCenter addObserver : self
                      selector : @selector(doRangeChanged:)
                          name : ORPciBit3ModelDoRangeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(rangeChanged:)
                          name : ORPciBit3ModelRangeChanged
 						object: model];
-
+	
 }
 
 - (void) registerRates
@@ -420,30 +420,32 @@
 
 -(IBAction)sysReset:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         unsigned char cdata;
         [model vmeSysReset:&cdata];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"*** Unable To Send VME SYSRESET ***\n");
         NSLog(@"*** Check VME Bus Power and Cables ***\n");
         NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
     
 }
 
 -(IBAction)reset:(id)sender
 {
     // try to reset Bit3
-    NS_DURING
+    @try {
         [self endEditing];
         [model resetContrl];
         NSLog(@"%@ Reset\n",[model objectName]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 -(void)dpmTest
@@ -465,7 +467,7 @@
     
     NSString* progressString = @"";
     
-    NS_DURING
+    @try {
         NSLog(@"Starting dpm Tests\n");
 		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
 								 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
@@ -614,10 +616,11 @@
 		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
 								 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
 		
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"DPM Test Failed %@",progressString);
 		[localException raise]; //rethrow it
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -632,7 +635,7 @@
                              beforeDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
 	
     
-    NS_DURING
+    @try {
         
         [self endEditing];
         
@@ -670,10 +673,11 @@
         [self dpmTest];
         NSLog(@"All %@ Tests Complete.\n",[model objectName]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
     
 }
 
@@ -688,13 +692,13 @@
 	unsigned long	endAddress		= [model doRange]?startAddress + [model range]*[addressStepper increment] : startAddress;
     unsigned short 	addressModifier = [model rwAddressModifierValue];
     unsigned short 	addressSpace	= [model rwIOSpaceValue];
-    	
+	
 	unsigned long address = startAddress;
 	if([model doRange] && [model range]==0){
 		NSLog(@"Range == 0: nothing to do\n");
 		return;
 	}
-    NS_DURING
+    @try {
 		do {
 			switch([model readWriteType]){
 				case 0: //byte
@@ -730,10 +734,11 @@
 			address+=[addressStepper increment];
 		}while(address<endAddress);
 		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
                         localException,address);
-    NS_ENDHANDLER
+    }
 }
 
 -(IBAction)write:(id)sender
@@ -753,7 +758,7 @@
 		NSLog(@"Range == 0: nothing to do\n");
 		return;
 	}
-    NS_DURING
+    @try {
 		do {
 			switch([model readWriteType]){
 				case 0: //byte
@@ -787,15 +792,16 @@
 					break;
 			}
 			address+=[addressStepper increment];
-
+			
 		}while(address<endAddress);
 		if([model doRange]) NSLog(@"Vme Write Range @ (0x%08x-0x%08x 0x%x 0x%x): 0x%08x\n",startAddress,endAddress,addressModifier,addressSpace,ldata);
 		else				NSLog(@"Vme Write @ (0x%08x 0x%x 0x%x): 0x%08x\n",startAddress,addressModifier,addressSpace,ldata);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
                         localException,address);
-    NS_ENDHANDLER
+    }
 }
 
 

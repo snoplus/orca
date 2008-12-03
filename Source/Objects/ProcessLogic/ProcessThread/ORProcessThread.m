@@ -166,7 +166,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     NSSet* objectSet = [NSSet setWithArray:trueEndNodes];
     
     [trueEndNodes makeObjectsPerformSelector:@selector(processIsStopping)];
-
+	
     [processLock lock];     //begin critical section
     [endNodes minusSet:objectSet];
     if(![endNodes count]){
@@ -233,28 +233,28 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     if(!running){
         if( _cancelled ) [ _cancelled release ];
         _cancelled  = [[ NSConditionLock alloc ] initWithCondition: NO ];
-
+		
 		int i;
 		for(i=0;i<8;i++)crBits[i] = 0L;
-                
+		
         allProcesses      = [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain];
         allProcessElements = [[[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORProcessElementModel")] retain];
         allEndNodes        = [[[[NSApp delegate] document] collectObjectsRespondingTo:@selector(isTrueEndNode)] retain];
         [allProcesses makeObjectsPerformSelector:@selector(processIsStarting)];
         [allEndNodes makeObjectsPerformSelector:@selector(processIsStarting)];
         [NSThread detachNewThreadSelector:@selector(processThread) toTarget:self withObject:nil];
-
+		
 		[[NSNotificationCenter defaultCenter] addObserver : self
-						 selector : @selector(stop)
-							 name : ORDocumentClosedNotification
-						   object : [[NSApp delegate] document]];
+												 selector : @selector(stop)
+													 name : ORDocumentClosedNotification
+												   object : [[NSApp delegate] document]];
     }
 }
 
 - (void) stop
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-
+	
 	float totalTime = 0;
     while([self isRunning]){
 		[self markAsCanceled];
@@ -266,12 +266,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 			break;
 		}
 	}
-
+	
 	[allEndNodes makeObjectsPerformSelector:@selector(processIsStopping)];
     
     [allEndNodes release];
     allEndNodes = nil;
-
+	
     [allProcessElements release];
     allProcessElements = nil;
     
@@ -303,27 +303,30 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
         [processLock lock];     //begin critical section
         
         [allProcessElements makeObjectsPerformSelector:@selector(clearAlreadyEvaluatedFlag)];
-
+		
         //tell all the input hw to store the current state
-		NS_DURING
+		@try {
 			[allProcesses makeObjectsPerformSelector:@selector(startProcessCycle)];
 			[inputs startProcessCycle];
-		NS_HANDLER
-		NS_ENDHANDLER
-
-		NS_DURING
+		}
+		@catch(NSException* localException) {
+		}
+		
+		@try {
 			[endNodes makeObjectsPerformSelector:@selector(eval)];
-  		NS_HANDLER
-		NS_ENDHANDLER
-      
-		NS_DURING
+		}
+		@catch(NSException* localException) {
+		}
+		
+		@try {
 			//tell all the output hw to write out the current state
 			[outputs endProcessCycle];
 			[inputs endProcessCycle];
 			[allProcesses makeObjectsPerformSelector:@selector(endProcessCycle)];
-		NS_HANDLER
-		NS_ENDHANDLER
-
+		}
+		@catch(NSException* localException) {
+		}
+		
         [processLock unlock];   //end critical section
         
         [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.1]];

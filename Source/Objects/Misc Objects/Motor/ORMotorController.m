@@ -332,14 +332,14 @@ enum {
 	[[motorPatternMatrix cellWithTag:kPatternDeltaTag] setIntValue:[model patternDeltaSteps]];
 	[[motorPatternMatrix cellWithTag:kDwellTimeTag] setFloatValue:[model patternDwellTime]];
 	[[motorPatternMatrix cellWithTag:kNSweepsTag] setIntValue:[model patternNumSweeps]];
-
+	
 	if([model patternStartCount] < [model patternEndCount]){
 		[xAxis setRngLimitsLow:[model patternStartCount] withHigh:[model patternEndCount] withMinRng:abs([model patternEndCount] - [model patternStartCount])];
 	}
 	else {
 		[xAxis setRngLimitsLow:[model patternEndCount] withHigh:[model patternStartCount] withMinRng:abs([model patternEndCount] - [model patternStartCount])];
 	}
-
+	
 	//[xAxis setRngLimitsLow:[model patternStartCount] withHigh:[model patternEndCount] withMinRng:abs([model patternEndCount] - [model patternStartCount])];
 	[queueView setNeedsDisplay:YES];
 }
@@ -463,7 +463,7 @@ enum {
 
 - (IBAction) readMotorAction:(id)sender
 {
-    NS_DURING
+    @try {
         long thePosition = [model readMotor];
         
         NSString* movingState;
@@ -471,48 +471,53 @@ enum {
         else					  movingState = @"Stopped";
         NSLog(@"%@ Pos: %d <%@>\n",[model motorName],thePosition,movingState);
         
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Exception on Read Motor: %@\n",localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) goAction:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model startMotor];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Exception on Motor Start: %@\n",localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) stopAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model stopMotor];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Exception on Stop Motor: %@\n",localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) incAction:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model incMotor];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Exception on Motor Increment: %@\n",[model motorName],localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) decAction:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model decMotor];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Exception on %@ Decrement: %@\n",[model motorName],localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) stepModeAction:(id)sender
@@ -538,12 +543,13 @@ enum {
 
 - (IBAction) readHomeAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model readHome];
         NSLog(@"Home switch %@: %@\n",[model motorName],[model homeDetected]==0?@"Low":@"High");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Exception on %@ Read Home: %@\n",[model motorName],localException);
-    NS_ENDHANDLER
+    }
     
 }
 
@@ -590,13 +596,14 @@ enum {
     [self endEditing];
     int choice = NSRunAlertPanel(@"You are setting the step count WITHOUT moving the motor!",@"Is this really what you want?",@"Cancel",@"YES/Change Count",nil);
     if(choice == NSAlertAlternateReturn){
-        NS_DURING
+        @try {
             [model loadStepCount];	
             [model readMotor];
             NSLog(@"Loaded Step Count %@ to: %d\n",[model motorName],[model stepCount]);
-        NS_HANDLER
+		}
+		@catch(NSException* localException) {
             NSLog(@"Exception on %@ Load Step Count: %@\n",[model motorName],localException);
-        NS_ENDHANDLER
+        }
     }
 }
 

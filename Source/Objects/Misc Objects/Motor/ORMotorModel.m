@@ -171,12 +171,13 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 {
     if([self motorController]){
         [[self motorController] assignTag:self];
-        NS_DURING
+        @try {
             [[self motorController] readMotor:self];
-        NS_HANDLER
+		}
+		@catch(NSException* localException) {
             NSBeep();
             NSLog(@"%@\n",localException);
-        NS_ENDHANDLER
+        }
     }
     else {
         [self setTag:-1];
@@ -200,8 +201,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     motorName = [aMotorName copy];
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorMotorNameChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorMotorNameChangedNotification
+	 object:self];
     
 }
 
@@ -214,8 +215,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setUseFileForPattern:useFileForPattern];
     useFileForPattern = flag;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorUsePatternFileChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorUsePatternFileChangedNotification
+	 object:self];
 }
 
 - (NSString *)patternFileName
@@ -230,8 +231,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [patternFileName autorelease];
     patternFileName = [aPatternFileName copy];
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorPatternFileNameChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorPatternFileNameChangedNotification
+	 object:self];
 }
 
 - (int)  patternStartCount
@@ -246,8 +247,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     patternStartCount = aCount;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorPatternChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorPatternChangedNotification
+	 object:self];
 }
 
 - (int)  patternEndCount
@@ -262,8 +263,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     patternEndCount = aCount;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorPatternChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorPatternChangedNotification
+	 object:self];
 }
 
 - (void) roundPatternEnd 
@@ -277,8 +278,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
         patternDeltaSteps = d;
         
         [[NSNotificationCenter defaultCenter]
-            postNotificationName:ORMotorPatternChangedNotification
-                          object:self];
+		 postNotificationName:ORMotorPatternChangedNotification
+		 object:self];
     }
 }
 
@@ -295,8 +296,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     patternDeltaSteps = aCount;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorPatternChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorPatternChangedNotification
+	 object:self];
 }
 - (int)  patternNumSweeps
 {
@@ -309,8 +310,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     patternNumSweeps = count;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorPatternChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorPatternChangedNotification
+	 object:self];
 }
 
 - (int)  patternType
@@ -324,8 +325,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     patternType = count;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorPatternTypeChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorPatternTypeChangedNotification
+	 object:self];
 }
 
 
@@ -341,8 +342,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     patternDwellTime = aTime;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorPatternChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorPatternChangedNotification
+	 object:self];
 }
 
 - (BOOL) motorRunning
@@ -375,8 +376,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     multiplierX = aMultiplier;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorMultiplierChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorMultiplierChangedNotification
+	 object:self];
 }
 
 - (BOOL) absoluteMotion
@@ -389,8 +390,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setAbsoluteMotion:absoluteMotion];
     absoluteMotion = absMot;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorAbsoluteMotionChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorAbsoluteMotionChangedNotification
+	 object:self];
 }
 
 //=========================================================== 
@@ -407,8 +408,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     riseFreq = aRiseFreq;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorRiseFreqChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorRiseFreqChangedNotification
+	 object:self];
 }
 
 //=========================================================== 
@@ -425,8 +426,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     driveFreq = aDriveFreq;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorDriveFreqChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorDriveFreqChangedNotification
+	 object:self];
 }
 
 //=========================================================== 
@@ -443,8 +444,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     acceleration = anAcceleration;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorAccelerationChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorAccelerationChangedNotification
+	 object:self];
 }
 
 //=========================================================== 
@@ -461,8 +462,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     xyPosition = aPosition;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorPositionChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorPositionChangedNotification
+	 object:self];
 }
 
 - (int)  seekAmount
@@ -476,8 +477,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     seekAmount = anAmount;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorSeekAmountChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorSeekAmountChangedNotification
+	 object:self];
 }
 
 
@@ -490,8 +491,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setRisingEdge:risingEdge];
     risingEdge = flag;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorRisingEdgeChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorRisingEdgeChangedNotification
+	 object:self];
 }
 
 - (int)stepMode
@@ -504,8 +505,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setStepMode:stepMode];
     stepMode = aStepMode;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorStepModeChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorStepModeChangedNotification
+	 object:self];
 }
 
 - (int)holdCurrent
@@ -517,8 +518,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setHoldCurrent:holdCurrent];
     holdCurrent = aHoldCurrent;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorHoldCurrentChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorHoldCurrentChangedNotification
+	 object:self];
 }
 
 - (BOOL) absoluteBrkPt
@@ -532,8 +533,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setAbsoluteBrkPt:absoluteBrkPt];
     absoluteBrkPt = flag;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorAbsoluteBrkPtChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorAbsoluteBrkPtChangedNotification
+	 object:self];
 }
 
 - (int)  breakPoint
@@ -546,8 +547,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setBreakPoint:breakPoint];
     breakPoint = aPosition;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorBreakPointChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorBreakPointChangedNotification
+	 object:self];
 }
 
 
@@ -561,8 +562,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setStepCount:stepCount];
     stepCount = aPosition;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorStepCountChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorStepCountChangedNotification
+	 object:self];
 }
 
 - (BOOL) patternInProgress
@@ -582,8 +583,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     motorWorker = aWorker;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorMotorWorkerChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorMotorWorkerChangedNotification
+	 object:self];
 }
 
 - (unsigned long)  optionMask
@@ -596,8 +597,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [[[self undoManager] prepareWithInvocationTarget:self] setOptionMask:optionMask];
     optionMask = aMask;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorOptionsMaskChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorOptionsMaskChangedNotification
+	 object:self];
 }
 
 
@@ -807,11 +808,11 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORMotorDecoderForMotor",                      @"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:NO],                   @"variable",
-        [NSNumber numberWithLong:4],                    @"length",
-        nil];
+								 @"ORMotorDecoderForMotor",                      @"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:NO],                   @"variable",
+								 [NSNumber numberWithLong:4],                    @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Stepper"];
     
     return dataDictionary;
@@ -929,9 +930,9 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
         if( [self optionSet:kSyncWithRunOption] && [self optionSet:kStopRunOption]){
             NSString* reason = [NSString stringWithFormat:@"%@  Pattern Finished",[self  motorName]];
             [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORRequestRunStop
-                              object:self
-                            userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+			 postNotificationName:ORRequestRunStop
+			 object:self
+			 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
         }
     }
     else {
@@ -956,10 +957,10 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
             data[0] = dataId | 4;
             data[1] = ut_time;
             data[2] = ([[self motorController] crateNumber]&0x0000000f) << 28 | 
-                ([[[self motorController] guardian] slot] & 0x0000001f) << 23     |
-                ([[self motorController] slot]          & 0x00000007) << 20		|
-                ([[aWorker motor] tag]   & 0x00000003) << 16		|
-                ([aWorker stateId]    & 0x0000000F) << 12;
+			([[[self motorController] guardian] slot] & 0x0000001f) << 23     |
+			([[self motorController] slot]          & 0x00000007) << 20		|
+			([[aWorker motor] tag]   & 0x00000003) << 16		|
+			([aWorker stateId]    & 0x0000000F) << 12;
             
             data[3] = [self motorPosition];
             
@@ -991,8 +992,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     homeDetected = flag;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorHomeDetectedChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorHomeDetectedChangedNotification
+	 object:self];
     
 }
 
@@ -1002,8 +1003,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     motorRunning = flag;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorMotorRunningChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorMotorRunningChangedNotification
+	 object:self];
 }
 
 - (void) setMotorPosition:(long)aValue 
@@ -1012,8 +1013,8 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     motorPosition = aValue;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORMotorMotorPositionChangedNotification
-                      object:self];
+	 postNotificationName:ORMotorMotorPositionChangedNotification
+	 object:self];
 }
 
 - (void) postBreakPointAlarm
@@ -1033,9 +1034,9 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
         NSString* reason = [NSString stringWithFormat:@"%@ SW BreakPoint Hit",[self  motorName]];
         
         [[NSNotificationCenter defaultCenter]
-            postNotificationName:ORRequestRunHalt
-                          object:self
-                        userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+		 postNotificationName:ORRequestRunHalt
+		 object:self
+		 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
         
     }
 }

@@ -97,13 +97,13 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                      selector : @selector(commentChanged:)
                          name : ORProcessCommentChangedNotification
                        object : model];
- 
+	
 	[notifyCenter addObserver : self
                      selector : @selector(shortNameChanged:)
                          name : ORProcessModelShortNameChangedNotification
                        object : model];
-
-	      
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(detailsChanged:)
                          name : NSTableViewSelectionDidChangeNotification
@@ -114,7 +114,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
                      selector : @selector(sampleRateChanged:)
                          name : ORProcessModelSampleRateChanged
 						object: model];
-
+	
 }
 
 - (void) updateWindow
@@ -155,16 +155,16 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 {
     if([[model orcaObjects] containsObject:[aNote object]]){
         //if([[aNote object] canImageChangeWithState]){
-			NSRect objRect = [[aNote object] frame];
-			//add in all the bounds of the lines
-			NSEnumerator* e = [[[aNote object] connectors] objectEnumerator];
-			id aConnector;
-			while(aConnector = [e nextObject]){
-				if([aConnector connector]) objRect = NSUnionRect(objRect,[aConnector lineBounds]);
-			}
-            [groupView setNeedsDisplayInRect:objRect];
-            [tableView reloadData];
-       // }
+		NSRect objRect = [[aNote object] frame];
+		//add in all the bounds of the lines
+		NSEnumerator* e = [[[aNote object] connectors] objectEnumerator];
+		id aConnector;
+		while(aConnector = [e nextObject]){
+			if([aConnector connector]) objRect = NSUnionRect(objRect,[aConnector lineBounds]);
+		}
+		[groupView setNeedsDisplayInRect:objRect];
+		[tableView reloadData];
+		// }
     }
 }
 
@@ -218,10 +218,11 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     NSParameterAssert(rowIndex >= 0 && rowIndex < [[model orcaObjects] count]);
     NSString* columnID =  [aTableColumn identifier];
     id item = @"--";
-    NS_DURING
+    @try {
         item =  [[[model orcaObjects]objectAtIndex:rowIndex] valueForKey:columnID];
-    NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	return item;
 }
 - (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex

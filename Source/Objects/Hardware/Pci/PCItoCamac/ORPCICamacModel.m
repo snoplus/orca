@@ -1,65 +1,65 @@
 /*
-
-File:		ORPCICamacModel.cpp
-
-Usage:		Implementation for the ARW PCI-CAMAC
-I/O Kit Kernel Extension (KEXT) Functions
-
-Author:		F. McGirt
-
-Copyright:		Copyright 2003 F. McGirt.  All rights reserved.
-
-Change History:	1/20/03
-07/29/03 MAH CENPA. Converted to Obj-C for the ORCA project.
-
-
-Notes:		617 PCI Matching is done with
-Vendor ID 0x10b5 and Device ID 0x2258
-Subsystem Vendor ID 0x9050
-Subsystem Device ID 0x2258
-
-
-There are two "features" of the ARE PCI-CAMAC hardware to
-be aware of:
-
-The hardware as delivered may come configured for use with
-MS-DOS and force all memory accesses to lie below 1MB. This
-will not work for either Mac or Win OSs and must be changed
-using the PLX tools for re-programming the EEPROM on board
-the PCI card.
-
-The PCI-CAMAC hardware forces all NAF command writes to set
-the F16 bit to a 1 and all NAF command reads to set the F16
-bit to 0.  Therefore all F values from F0 through F15 MUST
-be used with CAMAC bus read accesses and all F values from
-F16 through F31 MUST be used with CAMAC bus write accesses.
-
-
-At times delays must be used between a sequence
-of NAF commands or the PCICamac status returns
-will not reflect the current status - but usually
-that of the previous NAF command.  (See the
-                                    ORPCICamacModelTest object.)  This may possibly
-be due to the design of the controller hardware, 
-the speed of the PowerMac G4, or to the use of an
-optimizing compiler which may relocate memory
-accesses.   In an effort to alleviate this problem
-all variables used to access PCI-CAMAC memory spaces
-are declared volatile.
------------------------------------------------------------
-    This program was prepared for the Regents of the University of 
-    Washington at the Center for Experimental Nuclear Physics and 
-    Astrophysics (CENPA) sponsored in part by the United States 
-    Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-    The University has certain rights in the program pursuant to 
-    the contract and the program should not be copied or distributed 
-    outside your organization.  The DOE and the University of 
-    Washington reserve all rights in the program. Neither the authors,
-    University of Washington, or U.S. Government make any warranty, 
-    express or implied, or assume any liability or responsibility 
-    for the use of this software.
--------------------------------------------------------------
-    */
+ 
+ File:		ORPCICamacModel.cpp
+ 
+ Usage:		Implementation for the ARW PCI-CAMAC
+ I/O Kit Kernel Extension (KEXT) Functions
+ 
+ Author:		F. McGirt
+ 
+ Copyright:		Copyright 2003 F. McGirt.  All rights reserved.
+ 
+ Change History:	1/20/03
+ 07/29/03 MAH CENPA. Converted to Obj-C for the ORCA project.
+ 
+ 
+ Notes:		617 PCI Matching is done with
+ Vendor ID 0x10b5 and Device ID 0x2258
+ Subsystem Vendor ID 0x9050
+ Subsystem Device ID 0x2258
+ 
+ 
+ There are two "features" of the ARE PCI-CAMAC hardware to
+ be aware of:
+ 
+ The hardware as delivered may come configured for use with
+ MS-DOS and force all memory accesses to lie below 1MB. This
+ will not work for either Mac or Win OSs and must be changed
+ using the PLX tools for re-programming the EEPROM on board
+ the PCI card.
+ 
+ The PCI-CAMAC hardware forces all NAF command writes to set
+ the F16 bit to a 1 and all NAF command reads to set the F16
+ bit to 0.  Therefore all F values from F0 through F15 MUST
+ be used with CAMAC bus read accesses and all F values from
+ F16 through F31 MUST be used with CAMAC bus write accesses.
+ 
+ 
+ At times delays must be used between a sequence
+ of NAF commands or the PCICamac status returns
+ will not reflect the current status - but usually
+ that of the previous NAF command.  (See the
+ ORPCICamacModelTest object.)  This may possibly
+ be due to the design of the controller hardware, 
+ the speed of the PowerMac G4, or to the use of an
+ optimizing compiler which may relocate memory
+ accesses.   In an effort to alleviate this problem
+ all variables used to access PCI-CAMAC memory spaces
+ are declared volatile.
+ -----------------------------------------------------------
+ This program was prepared for the Regents of the University of 
+ Washington at the Center for Experimental Nuclear Physics and 
+ Astrophysics (CENPA) sponsored in part by the United States 
+ Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+ The University has certain rights in the program pursuant to 
+ the contract and the program should not be copied or distributed 
+ outside your organization.  The DOE and the University of 
+ Washington reserve all rights in the program. Neither the authors,
+ University of Washington, or U.S. Government make any warranty, 
+ express or implied, or assume any liability or responsibility 
+ for the use of this software.
+ -------------------------------------------------------------
+ */
 
 #import "ORPCICamacModel.h"
 #import "ORCC32Model.h"
@@ -186,7 +186,7 @@ static UInt32 *fVPCICamacMem;
         }
         else {
             if(!driverExists){
-                 NSLogColor([NSColor redColor],@"*** Unable To Locate Camac Driver ***\n");
+				NSLogColor([NSColor redColor],@"*** Unable To Locate Camac Driver ***\n");
                 if(!noDriverAlarm){
                     noDriverAlarm = [[ORAlarm alloc] initWithName:@"No Camac Driver Found" severity:kHardwareAlarm];
                     [noDriverAlarm setSticky:NO];
@@ -263,7 +263,7 @@ static UInt32 *fVPCICamacMem;
 - (kern_return_t)  _openUserClient:(io_service_t) serviceObject port:(io_connect_t) aDataPort
 {
 	kern_return_t kernResult;
-
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//for 10.4
 	kernResult =  IOConnectMethodScalarIScalarO( aDataPort,		// service
@@ -274,12 +274,12 @@ static UInt32 *fVPCICamacMem;
 #else
 	//for 10.5
 	kernResult = IOConnectCallScalarMethod(aDataPort,		// connection
-										  kPCICAMACUserClientOpen,	// selector
-										  0,			// input values
-										  0,			// number of scalar input values														
-										  0,			// output values
-										  0			// number of scalar output values
-										  );
+										   kPCICAMACUserClientOpen,	// selector
+										   0,			// input values
+										   0,			// number of scalar input values														
+										   0,			// output values
+										   0			// number of scalar output values
+										   );
 #endif
 	return kernResult;
 }
@@ -289,7 +289,7 @@ static UInt32 *fVPCICamacMem;
 - (kern_return_t)  _closeUserClient:(io_connect_t) aDataPort
 {
 	kern_return_t kernResult;
-
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//10.4
 	kernResult =  IOConnectMethodScalarIScalarO( aDataPort,		// service
@@ -300,12 +300,12 @@ static UInt32 *fVPCICamacMem;
 #else
 	//10.5
 	kernResult =  IOConnectCallScalarMethod( aDataPort,		// connection
-											 kPCICAMACUserClientClose,	// selector
-											 0,			// input values
-											 0,			// number of scalar input values														
-											 0,			// output values
-											 0			// number of scalar output values
-											 );
+											kPCICAMACUserClientClose,	// selector
+											0,			// input values
+											0,			// number of scalar input values														
+											0,			// output values
+											0			// number of scalar output values
+											);
 #endif
 	return kernResult;
 }
@@ -314,7 +314,7 @@ static UInt32 *fVPCICamacMem;
 // locate PCI device in the registry and open user client in driver
 - (BOOL)  _findDevice
 {
-
+	
     //first make sure the driver is installed.
     NSFileManager* fm = [NSFileManager defaultManager];
     if(![fm fileExistsAtPath:kCamacDriverPath]){
@@ -322,7 +322,7 @@ static UInt32 *fVPCICamacMem;
         return NO;
     }
     else driverExists = YES;
-
+	
     // create Master Mach Port which is used to initiate
     // communication with IOKit
     kern_return_t ret = IOMasterPort(MACH_PORT_NULL, &masterPort);
@@ -394,7 +394,7 @@ static UInt32 *fVPCICamacMem;
 - (kern_return_t)  readPCIConfigRegister:(unsigned int) address data:(unsigned int*)data
 {
 	kern_return_t kernResult;
-
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4	
 	//10.4
 	kernResult = IOConnectMethodScalarIScalarO(
@@ -405,7 +405,7 @@ static UInt32 *fVPCICamacMem;
 											   address,		// scalar input value
 											   data		// scalar output value
 											   );
-
+	
 #else
 	//10.5
 	uint64_t input = address;
@@ -421,7 +421,7 @@ static UInt32 *fVPCICamacMem;
 										   );
 	*data = (uint32_t) output_64;
 #endif
-
+	
 	return kernResult;
 }
 
@@ -431,7 +431,7 @@ static UInt32 *fVPCICamacMem;
 {
     size_t pciDataSize = sizeof(PCIConfigStruct);
 	kern_return_t kernResult;
-
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	//10.4
 	kernResult = IOConnectMethodScalarIStructureO(  dataPort,		// service
@@ -445,17 +445,17 @@ static UInt32 *fVPCICamacMem;
 	//10.5
 	uint64_t scalarI = maxAddress;
 	kernResult = IOConnectCallMethod(  dataPort,					// connection
-									   kPCICAMACGetPCIConfig,		// selector
-									   &scalarI,					// input values
-									   1,							// number of scalar input values
-									   NULL,						// Pointer to input struct
-									   0,							// Size of input struct
-									   NULL,						// output scalar array
-									   NULL,						// pointer to number of scalar output
-									   pciData,						// pointer to struct output
-									   &pciDataSize					// pointer to size of struct output
-									   );
-				
+									 kPCICAMACGetPCIConfig,		// selector
+									 &scalarI,					// input values
+									 1,							// number of scalar input values
+									 NULL,						// Pointer to input struct
+									 0,							// Size of input struct
+									 NULL,						// output scalar array
+									 NULL,						// pointer to number of scalar output
+									 pciData,						// pointer to struct output
+									 &pciDataSize					// pointer to size of struct output
+									 );
+	
 #endif
 	return kernResult;
 }
@@ -466,7 +466,7 @@ static UInt32 *fVPCICamacMem;
 {
     if(hardwareExists){
         [theLCLock lock]; //----begin critical section
-                          // check if offset valid
+		// check if offset valid
         if((regOffSet != kLCRIntCSROffset) && (regOffSet != kLCDControlOffset)) {
             [theLCLock unlock]; //----end critical section early because of exception
             [NSException raise: OExceptionBadCamacStatus format:OExceptionBadLCRArguments];
@@ -484,7 +484,7 @@ static UInt32 *fVPCICamacMem;
 {
     if(hardwareExists){
         [theLCLock lock]; //----begin critical section
-                          // check if offset is out of range
+		// check if offset is out of range
         if((regOffSet!=kLCRIntCSROffset) && ( regOffSet!=kLCDControlOffset)) {
             [theLCLock unlock]; //----end critical section early because of exception
             [NSException raise: OExceptionBadCamacStatus format:OExceptionBadLCRArguments];
@@ -552,7 +552,7 @@ static UInt32 *fVPCICamacMem;
 {
     unsigned short theStatus = 0;
     if(hardwareExists){
-        NS_DURING
+        @try {
             [theHWLock lock];   //----begin crital section
             
             // read dataway
@@ -579,11 +579,12 @@ static UInt32 *fVPCICamacMem;
 			theStatus = Swap8BitsIn16(*statusValue);
 			[self checkStatusReturn:theStatus station:n];
             [theHWLock unlock];     //----end crital section
-          
-        NS_HANDLER
+			
+        }
+		@catch(NSException* localException) {
             [theHWLock unlock]; //----end crital section because of exception
             [localException raise];
-        NS_ENDHANDLER
+        }
     }
     return theStatus;
     
@@ -606,7 +607,7 @@ static UInt32 *fVPCICamacMem;
 {
     unsigned short theStatus = 0;
     if(hardwareExists && data!=nil){
-        NS_DURING
+        @try {
             [theHWLock lock];   //----begin crital section
             
             // write dataway
@@ -636,10 +637,11 @@ static UInt32 *fVPCICamacMem;
 			theStatus = Swap8BitsIn16(*statusValue);
 			[self checkStatusReturn:theStatus station:n];
 			[theHWLock unlock];   //----end crital section
-        NS_HANDLER
+        }
+		@catch(NSException* localException) {
             [theHWLock unlock]; //----end crital section because of exception
             [localException raise];
-        NS_ENDHANDLER
+        }
     }
     return theStatus;
 }
@@ -651,7 +653,7 @@ static UInt32 *fVPCICamacMem;
 {
     unsigned short theStatus = 0;
     if(hardwareExists){
-        NS_DURING
+        @try {
             [theHWLock lock];   //---begin critical section
             // read dataway
             UInt32 lnafOffset = (UInt32)(offsetNAF(n,a,f) / 4);	 // note divide by 4
@@ -671,12 +673,13 @@ static UInt32 *fVPCICamacMem;
 			volatile UInt16* statusValue = (UInt16 *)&fVPCICamacMem[0];
 			theStatus = Swap8BitsIn16(*statusValue);
 			[self checkStatusReturn:theStatus station:n];
-				
+			
             [theHWLock unlock]; //---end critical section
-        NS_HANDLER
+        }
+		@catch(NSException* localException) {
             [theHWLock unlock]; //---end critical section because of exception
             [localException raise];
-        NS_ENDHANDLER
+        }
     }
     // get status
     return  theStatus;
@@ -684,14 +687,14 @@ static UInt32 *fVPCICamacMem;
 
 // write block of longs to dataway
 - (unsigned short) camacLongNAFBlock:(unsigned short)n 
-									a:(unsigned short)a 
-									f:(unsigned short)f
-								 data:(unsigned long*) data 
-							   length:(unsigned long) numWords
+								   a:(unsigned short)a 
+								   f:(unsigned short)f
+								data:(unsigned long*) data 
+							  length:(unsigned long) numWords
 {
     unsigned short theStatus = 0;
     if(hardwareExists && data!=nil){
-        NS_DURING
+        @try {
             [theHWLock lock];   //----begin crital section
             
             // write dataway
@@ -721,10 +724,11 @@ static UInt32 *fVPCICamacMem;
 			theStatus = Swap8BitsIn16(*statusValue);
 			[self checkStatusReturn:theStatus station:n];
 			[theHWLock unlock];   //----end crital section
-        NS_HANDLER
+        }
+		@catch(NSException* localException) {
             [theHWLock unlock]; //----end crital section because of exception
             [localException raise];
-        NS_ENDHANDLER
+        }
     }
     return theStatus;
 }
@@ -744,7 +748,7 @@ static UInt32 *fVPCICamacMem;
     kern_return_t result = 0;
     [theHWLock lock];   //-----begin critical section
     if(hardwareExists){
-
+		
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		//10.4
 		result =  IOConnectMethodScalarIScalarO(dataPort,		// service
@@ -866,7 +870,7 @@ static UInt32 *fVPCICamacMem;
 - (void)  checkCratePower
 {
     [thePowerLock lock];   //----begin critical section
-                           //unsigned short statusLCRC = [self readLCRegister:kLCDControlOffset];
+	//unsigned short statusLCRC = [self readLCRegister:kLCDControlOffset];
     unsigned short statusLCRC = 0;
     if(hardwareExists){
         volatile UInt16 *address = (UInt16 *)&fVLCReg[kLCDControlOffset];
@@ -875,10 +879,10 @@ static UInt32 *fVPCICamacMem;
     if( ( statusLCRC & kPowerControlStatus ) != kPowerControlStatus ) {
         [self  writeLCRegister:kLCRCntrlOffset data:kEnableCC32];
     	[self  writeLCRegister:kLCRIntCSROffset data:kDisableAllInterrupts];
-
+		
         [[NSNotificationCenter defaultCenter] postNotificationName:@"CamacPowerFailedNotification" object:self];
         powerOK = NO;
-
+		
         [thePowerLock unlock];//----end critical section early because of exception
 		[NSException raise: OExceptionNoCamacCratePower format:OExceptionNoCamacCratePower];
     }

@@ -362,19 +362,19 @@
 	NSComparisonResult result;
 	id val;
 	switch([[p nodeData] operatorTag]) {
-						
+			
 		case ';':				return [self processStatements:p];
 		case kFuncCall:			return [self doFunctionCall:p];
 		case kMakeArgList:		return [self doValueAppend:p container:aContainer];
 		case ',':				return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@"," stringByAppendingFormat:@"%@",NodeValue(1)]];
-
-		//array stuff
+			
+			//array stuff
 		case kDefineArray:		return [self defineArray:p];
 		case kLeftArray:		return [self processLeftArray:p];
 		case kArrayAssign:		return [self arrayAssignment:p leftBranch:[[p nodeData] objectAtIndex:0] withValue:NodeValue(1)];
 		case kArrayListAssign:	return [self arrayList:p];
-
-		//loops
+			
+			//loops
 		case FOR:			return [self forLoop:p];
 		case BREAK:			[NSException raise:@"break" format:nil]; return nil;
 		case CONTINUE:		[NSException raise:@"continue" format:nil]; return nil;
@@ -385,16 +385,16 @@
 		case SWITCH:		return [self doSwitch:p];
 		case CASE:			return [self doCase:p];
 		case DEFAULT:		return [self doDefault:p];
-
-		//built-in funcs
+			
+			//built-in funcs
 		case SLEEP:			return [self sleepFunc:p];
 		case WAITUNTIL:		return [self waitUntil:p];
 		case kWaitTimeOut:	return [self waitTimeOut:p];
 		case MAKESTRING:	return [self makeString:p];
 		case ALARM:			return [self postAlarm:p];
 		case CLEAR:			return [self clearAlarm:p];
-		
-		//printing
+			
+			//printing
 		case PRINT:			return [self print:p];
 		case LOGFILE:		return [self openLogFile:p];
 		case kAppend:		return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@" " stringByAppendingFormat:@"%@",NodeValue(1)]];
@@ -402,14 +402,14 @@
 		case HEX:			return [NSString stringWithFormat:@"0x%x",[NodeValue(0) longValue]];
 		case MAKEPOINT:		return [NSString stringWithFormat:@"@(%@,%@)",NodeValue(0),NodeValue(1)];
 		case MAKERECT:		return [NSString stringWithFormat:@"@(%@,%@,%@,%@)",NodeValue(0),NodeValue(1),NodeValue(2),NodeValue(3)];
-
-		//obj-C ops
+			
+			//obj-C ops
 		case '@':			return [self processObjC:p];
 		case kObjList:		return [NodeValue(0) stringByAppendingFormat:@"%@",NodeValue(1)];
 		case kSelName:		return [NSString stringWithFormat:@"%@:%@#",NodeValue(0),NodeValue(1)];
 		case FIND:			return [self findObject:p];
-
-		//math ops
+			
+			//math ops
 		case '=':			return [self setValue: NodeValue(1) forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
 		case UMINUS:		return [[NSDecimalNumber decimalNumberWithString:@"-1"] decimalNumberByMultiplyingBy:NodeValue(0)];
 		case '%':			return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] % [NodeValue(1) longValue]];
@@ -427,41 +427,41 @@
 		case MOD_ASSIGN:	return [self doAssign:p op:MOD_ASSIGN];
 		case XOR_ASSIGN:	return [self doAssign:p op:XOR_ASSIGN];
 		case AND_ASSIGN:	return [self doAssign:p op:AND_ASSIGN];
-		
-		//bit ops
+			
+			//bit ops
 		case '&':			return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] & [NodeValue(1) longValue]];
 		case '|':			return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] | [NodeValue(1) longValue]];
 		case LEFT_OP:		return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] << [NodeValue(1) longValue]];
 		case RIGHT_OP:	return [NSDecimalNumber numberWithLong:[NodeValue(0) longValue] >> [NodeValue(1) longValue]];
 		case '~':			return [NSDecimalNumber numberWithLong: ~[NodeValue(0) longValue]];
 		case '^':			return [NSDecimalNumber numberWithLong: [NodeValue(0) longValue] ^ [NodeValue(1) longValue]];
-		
-		//logic
+			
+			//logic
 		case IF:			return [self processIf:p];
 		case kConditional:  
-			{
-				if([NodeValue(0) isKindOfClass:[NSNumber class]]){
-					return [NodeValue(0) boolValue] ? NodeValue(1) : NodeValue(2);
-				}
-				else return NodeValue(0)  ? NodeValue(1) : NodeValue(2);
+		{
+			if([NodeValue(0) isKindOfClass:[NSNumber class]]){
+				return [NodeValue(0) boolValue] ? NodeValue(1) : NodeValue(2);
 			}
+			else return NodeValue(0)  ? NodeValue(1) : NodeValue(2);
+		}
 		case '!':  
-			{
-				if([NodeValue(0) isKindOfClass:[NSNumber class]]){
-					if(![NodeValue(0) boolValue])return _one;
-					else return _zero;
-				}
-				else if(!NodeValue(0))return _one;
+		{
+			if([NodeValue(0) isKindOfClass:[NSNumber class]]){
+				if(![NodeValue(0) boolValue])return _one;
+				else return _zero;
 			}
+			else if(!NodeValue(0))return _one;
+		}
 			
 		case AND_OP:
 			if([NodeValue(0) longValue] && [NodeValue(1) longValue]) return _one;
 			else return _zero;
-
+			
 		case OR_OP:
 			if([NodeValue(0) longValue] || [NodeValue(1) longValue]) return _one;
 			else return _zero;
-
+			
 		case '>':       
 			if([NodeValue(0) compare: NodeValue(1)] == NSOrderedDescending) return _one;
 			else return _zero;
@@ -489,24 +489,24 @@
 			result = [NodeValue(0) compare: NodeValue(1)];
 			if(result==NSOrderedSame)return _one;
 			else return _zero;
-												
-		//inc/dec ops
+			
+			//inc/dec ops
 		case kPreInc: return  [self setValue:[NodeValue(0) decimalNumberByAdding: _one] forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
 		case kPreDec: return [self setValue:[NodeValue(0) decimalNumberBySubtracting: _one] forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
-
+			
 		case kPostInc:
-			{
-				val = NodeValue(0);
-				[self setValue:[val decimalNumberByAdding: _one] forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
-				return val;
-			}
+		{
+			val = NodeValue(0);
+			[self setValue:[val decimalNumberByAdding: _one] forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
+			return val;
+		}
 			
 		case kPostDec:
-			{
-				val = NodeValue(0);
-				[self setValue:[val decimalNumberBySubtracting: _one] forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
-				return val;
-			}
+		{
+			val = NodeValue(0);
+			[self setValue:[val decimalNumberBySubtracting: _one] forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
+			return val;
+		}
 	}
     return 0; //should never actually get here.
 }
@@ -514,24 +514,26 @@
 - (id) processDiv:(id) p
 {
 	id result = nil;
-	NS_DURING
+	@try {
 		result =  [NodeValue(0) decimalNumberByDividingBy:NodeValue(1)];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"divide by zero in %@\n",scriptName);
 		result = [NSDecimalNumber notANumber];
-	NS_ENDHANDLER
+	}
 	return result;
 }
 
 - (id) processDIV_ASSIGN:(id)p
 {
 	id result = nil;
-	NS_DURING
+	@try {
 		result =  [self setValue:[NodeValue(0) decimalNumberByDividingBy:NodeValue(1)] forSymbol:VARIABLENAME(0)];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"divide by zero in %@\n",scriptName);
 		result = [NSDecimalNumber notANumber];
-	NS_ENDHANDLER
+	}
 	return result;
 }
 
@@ -662,7 +664,7 @@
 		[anEvaluator setDelegate:delegate];
 		[anEvaluator setSymbolTable:[self makeSymbolTableFor:functionName args:argObject]];
 		
-		NS_DURING
+		@try {
 			unsigned i;
 			unsigned numNodes = [someNodes count];
 			for(i=0;i<numNodes;i++){
@@ -670,7 +672,8 @@
 				id aNode = [someNodes objectAtIndex:i];
 				[anEvaluator execute:aNode container:nil];
 			}
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			if([[localException name] isEqualToString: @"return"]){
 				NSDictionary* userInfo = [localException userInfo];
 				if(userInfo){
@@ -682,7 +685,7 @@
 				[anEvaluator release];
 				[localException raise];
 			}
-		NS_ENDHANDLER
+		}
 		[anEvaluator release];
 	}
 	else {
@@ -700,7 +703,7 @@
 		}
 	}
 	[argObject release];
-		
+	
 	return returnValue;
 }
 
@@ -762,17 +765,18 @@
 
 - (id) doSwitch:(id) p
 {
-	NS_DURING
+	@try {
 		switchLevel++;
 		switchValue[switchLevel] = NodeValue(0);
 		NodeValue(1);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		if(![[localException name] isEqualToString:@"break"]){
 			switchValue[switchLevel] = nil;
 			switchLevel--;
 			[localException raise]; //rethrow
 		}
-	NS_ENDHANDLER
+	}
 	switchValue[switchLevel] = nil;
 	switchLevel--;
 	return nil;
@@ -806,9 +810,10 @@
 			break; 
 		}
 		else {
-			NS_DURING
+			@try {
 				NodeValue(0);
-			NS_HANDLER
+			}
+			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"]){
 					continueLoop = YES;
 				}
@@ -816,13 +821,13 @@
 					breakLoop = YES;
 				}
 				else [localException raise];
-			NS_ENDHANDLER
+			}
 		}
 		[pool release];
 		if(breakLoop)break;
 		if(continueLoop)continue;
 	} while(![NodeValue(1) isEqual:_zero]);
-
+	
 	return nil;
 }
 
@@ -837,9 +842,10 @@
 			break; 
 		}
 		else {
-			NS_DURING
+			@try {
 				NodeValue(1);
-			NS_HANDLER
+			}
+			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"]){
 					continueLoop = YES;
 				}
@@ -847,7 +853,7 @@
 					breakLoop = YES;
 				}
 				else [localException raise];
-			NS_ENDHANDLER
+			}
 		}
 		[pool release];
 		if(breakLoop)	 break;
@@ -867,9 +873,10 @@
 			break;
 		}
 		else {
-			NS_DURING
+			@try {
 				NodeValue(3);
-			NS_HANDLER
+			}
+			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"]){
 					continueLoop = YES;
 				}
@@ -877,7 +884,7 @@
 					breakLoop = YES;
 				}
 				else [localException raise];
-			NS_ENDHANDLER
+			}
 		}
 		[pool release];
 		if(breakLoop)	 break;
@@ -891,7 +898,7 @@
 	bool exitTime = NO;
 	do {
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		NS_DURING
+		@try {
 			if([self exitNow]){	
 				exitTime = YES;
 			}
@@ -900,8 +907,9 @@
 				exitTime = YES;
 			}
 			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 		[pool release];
 		if(exitTime)break;
 	}while(1);
@@ -918,7 +926,7 @@
 	NSNumber* exitValue = _one;
 	do {
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		NS_DURING
+		@try {
 			if([self exitNow]){
 				exitTime = YES;
 			}
@@ -932,12 +940,13 @@
 				exitTime = YES;
 				exitValue = _zero;
 			}
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 		
 		[pool release];
 		if(exitTime)break;
-
+		
 	}while(1);
 	return exitValue;
 }
@@ -949,14 +958,15 @@
 	bool exitTime = NO;
 	do {
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		NS_DURING
+		@try {
 			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
 			if([self exitNow]){
 				exitTime = YES;
 			}
 			total += .01f;
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 		[pool release];
 		if(exitTime)break;
 	}while(total<delay);
@@ -1053,7 +1063,7 @@
 @implementation ORNodeEvaluator (Graph_Private)
 - (id) printNode:(id)p atLevel:(int)aLevel lastOne:(BOOL)lastChild
 {
-
+	
     if (!p) return @"";
 	
 	NSMutableString* line = @"?";
@@ -1157,7 +1167,7 @@
 	}
 	
     /* node is leaf */
-   if (count == 0) {
+	if (count == 0) {
 		if(lastChild){
 			NSString* suffixString = @"";
 			int i;
@@ -1168,7 +1178,7 @@
 		}
         return line;
     }
-
+	
 	aLevel++;
     /* node has children */
     for (i = 0; i < count; i++) {

@@ -22,10 +22,10 @@
 #pragma mark ***Initialization
 //--------------------------------------------------------------------------------
 /*!\method  initWithWindowNibName
-* \brief	Initialize the window using the nib file.
-* \param	aNibName			- The name of the nib object.
-* \note	
-*/
+ * \brief	Initialize the window using the nib file.
+ * \param	aNibName			- The name of the nib object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (id) initWithWindowNibName: (NSString*) aNibName
 {
@@ -35,9 +35,9 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  dealloc
-* \brief	Just calls super dealloc
-* \note	
-*/
+ * \brief	Just calls super dealloc
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) dealloc
 {
@@ -46,11 +46,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  awakeFromNib
-* \brief	Initializes object after everything is loaded.  Populates the
-*			pulldown menus, registers to receive notifications and updates
-*			the GUI.
-* \note	Since this is a sub class must call base classes awakeFromNib.
-*/
+ * \brief	Initializes object after everything is loaded.  Populates the
+ *			pulldown menus, registers to receive notifications and updates
+ *			the GUI.
+ * \note	Since this is a sub class must call base classes awakeFromNib.
+ */
 //--------------------------------------------------------------------------------
 - (void) awakeFromNib
 {
@@ -64,13 +64,13 @@
 //{
 //    return( mChnlAcquire );
 //}
-    
+
 //--------------------------------------------------------------------------------
 /*!\method  setModel
-* \brief	overridden to set the title of the scope dialog with the scope type and 
-*			gpid address.
-* \note	
-*/
+ * \brief	overridden to set the title of the scope dialog with the scope type and 
+ *			gpid address.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) setModel: (id) aModel
 {
@@ -81,9 +81,9 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  setTitle
-* \brief	Set the title of the dialog using the identifier from the GPIB unit.
-* \note	
-*/
+ * \brief	Set the title of the dialog using the identifier from the GPIB unit.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) setTitle
 {
@@ -113,9 +113,9 @@
 #pragma mark ***Notifications
 //--------------------------------------------------------------------------------
 /*!\method  registerNotificationObservers
-* \brief	Register notices that we want to receive.
-* \note	
-*/
+ * \brief	Register notices that we want to receive.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) registerNotificationObservers
 {
@@ -237,9 +237,9 @@
 #pragma mark ***Interface Management
 //--------------------------------------------------------------------------------
 /*!\method  updateWindow
-* \brief	Sets all GUI values to current model values.
-* \note	
-*/
+ * \brief	Sets all GUI values to current model values.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) updateWindow
 {
@@ -256,24 +256,24 @@
         [ userInfo setObject: [ NSNumber numberWithInt: i ] forKey: OROscChnl ]; 
         // Send out notification for each channel parameter.
         [[ NSNotificationCenter defaultCenter ]
-            postNotificationName: OROscChnlAcqChangedNotification
-                          object: model
-                        userInfo: userInfo ];
+		 postNotificationName: OROscChnlAcqChangedNotification
+		 object: model
+		 userInfo: userInfo ];
         
         [[ NSNotificationCenter defaultCenter ]
-            postNotificationName: OROscChnlCouplingChangedNotification
-                          object: model
-                        userInfo: userInfo ];
+		 postNotificationName: OROscChnlCouplingChangedNotification
+		 object: model
+		 userInfo: userInfo ];
         
         [[ NSNotificationCenter defaultCenter ]
-            postNotificationName: OROscChnlPosChangedNotification
-                          object: model
-                        userInfo: userInfo ];
+		 postNotificationName: OROscChnlPosChangedNotification
+		 object: model
+		 userInfo: userInfo ];
         
         [[ NSNotificationCenter defaultCenter ]
-            postNotificationName: OROscChnlScaleChangedNotification
-                          object: model
-                        userInfo: userInfo ];
+		 postNotificationName: OROscChnlScaleChangedNotification
+		 object: model
+		 userInfo: userInfo ];
     }
     
     // Do initialization of Horizontal parameters
@@ -299,27 +299,27 @@
 #pragma mark ***Interface Management - Channels
 //--------------------------------------------------------------------------------
 /*!\method  oscChnlAcquireChanged
-* \brief	Have received notification that acquire value has changed.  Update
-*			the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that acquire value has changed.  Update
+ *			the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscChnlAcquireChanged: (NSNotification*) aNotification
 {
-        // Get the channel that changed and then set the GUI value using the model value.
-        int chnl = [[[ aNotification userInfo ] objectForKey: OROscChnl ] intValue ];
-        [[ mChnlAcquire cellWithTag: chnl ] setIntValue: [model chnlAcquire: chnl ]];
+	// Get the channel that changed and then set the GUI value using the model value.
+	int chnl = [[[ aNotification userInfo ] objectForKey: OROscChnl ] intValue ];
+	[[ mChnlAcquire cellWithTag: chnl ] setIntValue: [model chnlAcquire: chnl ]];
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  oscChnlCouplingChanged
-* \brief	Have received notification that coupling value has changed.  Update
-*			the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that coupling value has changed.  Update
+ *			the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscChnlCouplingChanged: (NSNotification*) aNotification
 {    
@@ -347,10 +347,10 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  connectionChanged
-* \brief	Reacts to connection established message and updates GUI.
-* \param	aNotification		- The message that was sent out.
-* \note	
-*/
+ * \brief	Reacts to connection established message and updates GUI.
+ * \param	aNotification		- The message that was sent out.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) connectionChanged: (NSNotification*) aNotification
 {
@@ -361,11 +361,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscChnlPosChanged
-* \brief	Have received notification that vertical position has changed.  Update
-*			the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that vertical position has changed.  Update
+ *			the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscChnlPosChanged: (NSNotification*) aNotification
 {
@@ -377,11 +377,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscChnlScaleChanged
-* \brief	Have received notification that vertical scale has changed.  Update
-*			the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that vertical scale has changed.  Update
+ *			the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscChnlScaleChanged: (NSNotification*) aNotification
 {
@@ -394,11 +394,11 @@
 #pragma mark ***Interface Management - Horizontal parameters
 //--------------------------------------------------------------------------------
 /*!\method  oscHorizPosChanged
-* \brief	Have received notification that horizontal position has changed.  Update
-*			the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that horizontal position has changed.  Update
+ *			the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscHorizPosChanged: (NSNotification*) aNotification
 {
@@ -409,11 +409,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscHorizRecordLengthChanged
-* \brief	Have received notification record length has changed.  Update
-*			the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification record length has changed.  Update
+ *			the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscHorizRecordLengthChanged: (NSNotification*) aNotification
 {
@@ -424,13 +424,13 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscHorizScaleChanged
-* \brief	Have received notification that the horizontal scale or units have changed.
-*			Update the interface for both the units and the number.
-* \param	aNotification			- The notification object.
-* \note	We must split the value obtained from the model into a number and exponent
-*			where the exponential part is seconds, millisecs., microsecs., or
-*			nanosecs. 
-*/
+ * \brief	Have received notification that the horizontal scale or units have changed.
+ *			Update the interface for both the units and the number.
+ * \param	aNotification			- The notification object.
+ * \note	We must split the value obtained from the model into a number and exponent
+ *			where the exponential part is seconds, millisecs., microsecs., or
+ *			nanosecs. 
+ */
 //--------------------------------------------------------------------------------
 - (void) oscHorizScaleChanged: (NSNotification*) aNotification
 {
@@ -438,12 +438,12 @@
     int		exponent;
     int		units;
     
-        
+	
 	// convert value to units plus modified scale value in those units.
 	origScaleValue = [model horizontalScale ];
 	exponent = floor( log10( origScaleValue ) );
 	units = ( abs( exponent ) + 2 ) / 3;
-        
+	
 	// Set the GUI
 	[ mHorizScale setFloatValue:  origScaleValue * pow( 10.000, (units) * 3 ) ];
 	[ mHorizUnits selectCellWithTag: units ];	                
@@ -453,25 +453,25 @@
 #pragma mark ***Interface Management - Trigger parameters
 //--------------------------------------------------------------------------------
 /*!\method  oscTriggerCouplingChanged
-* \brief	Have received notification that the trigger coupling has changed.
-*			Update the interface for both the units and the number.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that the trigger coupling has changed.
+ *			Update the interface for both the units and the number.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscTriggerCouplingChanged: (NSNotification*) aNotification
 {
-
+	
 	[ mTriggerCoupling selectItemAtIndex: [model triggerCoupling ]];
 }
 
 //--------------------------------------------------------------------------------
 /*!\method  oscTriggerLevelChanged
-* \brief	Have received notification that the trigger level has changed.
-*			Update the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that the trigger level has changed.
+ *			Update the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscTriggerLevelChanged: (NSNotification*) aNotification
 {
@@ -480,11 +480,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscTriggerModeChanged
-* \brief	Have received notification that the trigger mode has changed.
-*			Update the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that the trigger mode has changed.
+ *			Update the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscTriggerModeChanged: (NSNotification*) aNotification
 {
@@ -493,11 +493,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscTriggerPolarityChanged
-* \brief	Have received notification that the trigger polarity has changed.
-*			Update the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that the trigger polarity has changed.
+ *			Update the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscTriggerPolarityChanged: (NSNotification*) aNotification
 {
@@ -510,11 +510,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscTriggerPosChanged
-* \brief	Have received notification that the trigger position has changed.
-*			Update the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that the trigger position has changed.
+ *			Update the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscTriggerPosChanged: (NSNotification*) aNotification
 {
@@ -524,11 +524,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscTriggerSourceChanged
-* \brief	Have received notification that the trigger source has changed.
-*			Update the interface.
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that the trigger source has changed.
+ *			Update the interface.
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (void) oscTriggerSourceChanged: (NSNotification*) aNotification
 {
@@ -537,10 +537,10 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  oscModelReflectsHardwareChange
-* \brief	Have received notification that model may reflect hardware
-* \param	aNotification			- The notification object.
-* \note	
-*/
+ * \brief	Have received notification that model may reflect hardware
+ * \param	aNotification			- The notification object.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 #pragma mark ***Interface Management - Misc
 - (void) oscModelReflectsHardwareChanged: (NSNotification*) aNotification
@@ -643,11 +643,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  chnlAcquireAction
-* \brief	One of the channels has changed value because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element (in this case an NSMatrix object).
-* \note	
-*/
+ * \brief	One of the channels has changed value because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element (in this case an NSMatrix object).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) chnlAcquireAction: (id) aSender
 {
@@ -662,11 +662,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  chnlCouplingAction0
-* \brief	Channel 0 coupling has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element (in this case an NSMatrix object).
-* \note	
-*/
+ * \brief	Channel 0 coupling has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element (in this case an NSMatrix object).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) chnlCouplingAction0: (id) aSender
 {
@@ -677,11 +677,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  chnlCouplingAction1
-* \brief	Channel 1 coupling has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element (in this case an NSMatrix object).
-* \note	
-*/
+ * \brief	Channel 1 coupling has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element (in this case an NSMatrix object).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) chnlCouplingAction1: (id) aSender
 {
@@ -692,11 +692,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  chnlCouplingAction2
-* \brief	Channel 2 coupling has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element (in this case an NSMatrix object).
-* \note	
-*/
+ * \brief	Channel 2 coupling has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element (in this case an NSMatrix object).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) chnlCouplingAction2: (id) aSender
 {
@@ -707,11 +707,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  chnlCouplingAction3
-* \brief	Channel 3 coupling has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element (in this case an NSMatrix object).
-* \note	
-*/
+ * \brief	Channel 3 coupling has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element (in this case an NSMatrix object).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) chnlCouplingAction3: (id) aSender
 {
@@ -722,11 +722,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  chnlPosAction
-* \brief	One of the channels has changed value because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element (in this case an NSMatrix object).
-* \note	
-*/
+ * \brief	One of the channels has changed value because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element (in this case an NSMatrix object).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) chnlPosAction: (id) aSender
 {
@@ -740,11 +740,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  chnlScaleAction
-* \brief	One of the channels has changed value because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element (in this case an NSMatrix object).
-* \note	
-*/
+ * \brief	One of the channels has changed value because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element (in this case an NSMatrix object).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) chnlScaleAction: (id) aSender
 {
@@ -759,11 +759,11 @@
 #pragma mark ***Actions - Horizontal
 //--------------------------------------------------------------------------------
 /*!\method  horizPosAction
-* \brief	The horizontal position of the scope trace has changed.
-* \param	aSender			- The GUI element (in this case an text field object or
-                                               *							  stepper field.).
-* \note	
-*/
+ * \brief	The horizontal position of the scope trace has changed.
+ * \param	aSender			- The GUI element (in this case an text field object or
+ *							  stepper field.).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) horizPosAction: (id) aSender
 {
@@ -777,12 +777,12 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  horizScaleAction
-* \brief	The scale factor has changed so the the factor, combine it with the
-*			existing units reading and change the model with the actual scale
-*			factor in seconds (seconds / division).
-* \param	aSender			- The GUI element which is a text field.
-* \note	
-*/
+ * \brief	The scale factor has changed so the the factor, combine it with the
+ *			existing units reading and change the model with the actual scale
+ *			factor in seconds (seconds / division).
+ * \param	aSender			- The GUI element which is a text field.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) horizScaleAction: (id) aSender
 {
@@ -801,12 +801,12 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  horizUnitsAction
-* \brief	The units have changed so get the new units, combine it with the
-*			existing scale reading and change the model with the actual scale
-*			factor in seconds (seconds / division).
-* \param	aSender			- The GUI element (in this case an NSMatrix object).
-* \note	
-*/
+ * \brief	The units have changed so get the new units, combine it with the
+ *			existing scale reading and change the model with the actual scale
+ *			factor in seconds (seconds / division).
+ * \param	aSender			- The GUI element (in this case an NSMatrix object).
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) horizUnitsAction: (id) aSender
 {
@@ -826,11 +826,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  horizRecordLengthAction
-* \brief	The record length has changed.  This routine is called by the user 
-* 			interface when the value changes.
-* \param	aSender			- The GUI element - in this case the NSPopUpButton.
-* \note	
-*/
+ * \brief	The record length has changed.  This routine is called by the user 
+ * 			interface when the value changes.
+ * \param	aSender			- The GUI element - in this case the NSPopUpButton.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) horizRecordLengthAction: (id) aSender
 {
@@ -848,11 +848,11 @@
 #pragma mark ***Actions - Trigger
 //--------------------------------------------------------------------------------
 /*!\method  triggerCouplingAction
-* \brief	The trigger coupling has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element - in this case the NSPopUpButton.
-* \note	
-*/
+ * \brief	The trigger coupling has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element - in this case the NSPopUpButton.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) triggerCouplingAction: (id) aSender
 {
@@ -866,11 +866,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  triggerLevelAction
-* \brief	The trigger level has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element - in this case the NSTextField.
-* \note	
-*/
+ * \brief	The trigger level has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element - in this case the NSTextField.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) triggerLevelAction: (id) aSender
 {
@@ -883,11 +883,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  triggerModeAction
-* \brief	The trigger mode has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element - in this case the NSPopUpButton.
-* \note	
-*/
+ * \brief	The trigger mode has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element - in this case the NSPopUpButton.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) triggerModeAction: (id) aSender
 {
@@ -900,11 +900,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  triggerPolarityAction
-* \brief	The trigger polarity has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element - in this case the NSMatrix.
-* \note	
-*/
+ * \brief	The trigger polarity has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element - in this case the NSMatrix.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) triggerPolarityAction: (id) aSender
 {
@@ -920,11 +920,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  triggerPosAction
-* \brief	The trigger position has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element - in this case the NSPopUpButton.
-* \note	
-*/
+ * \brief	The trigger position has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element - in this case the NSPopUpButton.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) triggerPosAction: (id) aSender
 {
@@ -937,11 +937,11 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  triggerSourceAction
-* \brief	The trigger source has changed because user changed it.  This
-*			routine is called by user interface when the value changes.
-* \param	aSender			- The GUI element - in this case the NSPopUpButton.
-* \note	
-*/
+ * \brief	The trigger source has changed because user changed it.  This
+ *			routine is called by user interface when the value changes.
+ * \param	aSender			- The GUI element - in this case the NSPopUpButton.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) triggerSourceAction: (id) aSender
 {
@@ -955,10 +955,10 @@
 #pragma mark ***Commands
 //--------------------------------------------------------------------------------
 /*!\method  autoReset
-* \brief	Do an autoreset of the oscilloscope.
-* \param	aSender			- The auto reset button.
-* \note	
-*/
+ * \brief	Do an autoreset of the oscilloscope.
+ * \param	aSender			- The auto reset button.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) autoReset: (id) aSender
 {
@@ -967,15 +967,15 @@
 
 //--------------------------------------------------------------------------------
 /*!\method  setDialogFromOsc
-* \brief	Read all standard parameters from the osc and set the dialog from the
-*			returned results.
-* \param	aSender			- The set dialog from Osc button.
-* \note	
-*/
+ * \brief	Read all standard parameters from the osc and set the dialog from the
+ *			returned results.
+ * \param	aSender			- The set dialog from Osc button.
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) setDialogFromOsc: (id) aSender
 {
-    NS_DURING
+    @try {
         
         // Make sure that we are connected.
         if ( [model isConnected ] )
@@ -986,27 +986,28 @@
         else
         {
             NSRunAlertPanel( @"GPIB Connection Fault", 
-                             @"Must first establish connection to GPIB device.", 
-                             @"OK", nil, nil );
+							@"Must first establish connection to GPIB device.", 
+							@"OK", nil, nil );
         }
-        NS_HANDLER
-            NSLog( @"Loading of oscilloscope parameters FAILED.\n" );
-            NSRunAlertPanel( [ localException name ], @"Failed to load oscilloscope parameters.",
-                             @"OK", nil, nil );
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog( @"Loading of oscilloscope parameters FAILED.\n" );
+		NSRunAlertPanel( [ localException name ], @"Failed to load oscilloscope parameters.",
+						@"OK", nil, nil );
+	}
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  setOscFromDialog
-* \brief	Send current settings out to the oscilloscope.
-* \param	aSender			- The set Osc From Dialog button..
-* \note	
-*/
+ * \brief	Send current settings out to the oscilloscope.
+ * \param	aSender			- The set Osc From Dialog button..
+ * \note	
+ */
 //--------------------------------------------------------------------------------
 - (IBAction) setOscFromDialog: (id) aSender
 {
-    NS_DURING
+    @try {
         
         // Make sure that we are connected.
         if ( [model isConnected ] )
@@ -1017,21 +1018,22 @@
         else
         {
             NSRunAlertPanel( @"GPIB Connection Fault", 
-                             @"Must first establish connection to GPIB device.", 
-                             @"OK", nil, nil );
+							@"Must first establish connection to GPIB device.", 
+							@"OK", nil, nil );
         }
         
-        NS_HANDLER
-            NSLog( @"Setting of oscilloscope parameters FAILED.\n" );
-            NSRunAlertPanel( [ localException name ], @"Failed to set oscilloscope parameters.",
-                             @"OK", nil, nil );
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog( @"Setting of oscilloscope parameters FAILED.\n" );
+		NSRunAlertPanel( [ localException name ], @"Failed to set oscilloscope parameters.",
+						@"OK", nil, nil );
+	}
 }
 
 #pragma mark ***Support
 //--------------------------------------------------------------------------------
 /*!
-* \method  populatePullDownsOscBase
+ * \method  populatePullDownsOscBase
  * \brief	Populate the GPIB board pulldown and the primary address pulldown
  *			items.
  * \note	

@@ -34,9 +34,9 @@ NSString* ORNPLCommBoardModelIpAddressChanged		= @"ORNPLCommBoardModelIpAddressC
 NSString* ORNPLCommBoardLock						= @"ORNPLCommBoardLock";
 
 static NSString* NPLComConnectors[8] = {
-    @"NPLCom0 Connector", @"NPLCom1 Connector", @"NPLCom2 Connector",
-    @"NPLCom3 Connector", @"NPLCom4 Connector", @"NPLCom5 Connector",
-    @"NPLCom6 Connector", @"NPLCom7 Connector",
+@"NPLCom0 Connector", @"NPLCom1 Connector", @"NPLCom2 Connector",
+@"NPLCom3 Connector", @"NPLCom4 Connector", @"NPLCom5 Connector",
+@"NPLCom6 Connector", @"NPLCom7 Connector",
 };
 
 @implementation ORNPLCommBoardModel
@@ -55,11 +55,12 @@ static NSString* NPLComConnectors[8] = {
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		[self connect];
 		[self connectionChanged];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) setUpImage
@@ -98,13 +99,13 @@ static NSString* NPLComConnectors[8] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg:controlReg];
     
     controlReg = aControlReg;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelControlRegChanged object:self];
 }
 
 - (void) formatCmdString
 {
-
+	
 	char bytes[3];
 	if(numBytesToSend == 5){
 		bytes[0] = (writeValue>>16 & 0xf);
@@ -122,9 +123,9 @@ static NSString* NPLComConnectors[8] = {
 		bytes[2] = 0;
 	}
 	NSString* s = [NSString stringWithFormat:@"0x%02x 0x%02x 0x%02x",
-					numBytesToSend,
-					(([self board] & 0xf)<<4) | (([self bloc] & 0x3)<<2) | ([self functionNumber] & 0x3),
-					[self controlReg]];
+				   numBytesToSend,
+				   (([self board] & 0xf)<<4) | (([self bloc] & 0x3)<<2) | ([self functionNumber] & 0x3),
+				   [self controlReg]];
 	int i;
 	for(i=0;i<numBytesToSend-2;i++){
 		s = [s stringByAppendingFormat:@" 0x%02x",(unsigned char)bytes[i]];
@@ -141,7 +142,7 @@ static NSString* NPLComConnectors[8] = {
 {
     [cmdString autorelease];
     cmdString = [aCmdString copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelCmdStringChanged object:self];
 }
 
@@ -158,7 +159,7 @@ static NSString* NPLComConnectors[8] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setNumBytesToSend:numBytesToSend];
     
     numBytesToSend = aNumBytesToSend;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelNumBytesToSendChanged object:self];
 	[self formatCmdString];
 }
@@ -178,7 +179,7 @@ static NSString* NPLComConnectors[8] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:writeValue];
     
     writeValue = aWriteValue;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelWriteValueChanged object:self];
 	[self formatCmdString];
 }
@@ -193,7 +194,7 @@ static NSString* NPLComConnectors[8] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setFunctionNumber:functionNumber];
     
     functionNumber = aFunction;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelFunctionChanged object:self];
 	[self formatCmdString];
 }
@@ -208,7 +209,7 @@ static NSString* NPLComConnectors[8] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setBloc:bloc];
     
     bloc = aBloc;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelBlocChanged object:self];
 	[self formatCmdString];
 }
@@ -223,7 +224,7 @@ static NSString* NPLComConnectors[8] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setBoard:board];
     
     board = aBoard;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelBoardChanged object:self];
 	[self formatCmdString];
 }
@@ -245,7 +246,7 @@ static NSString* NPLComConnectors[8] = {
 - (void) setIsConnected:(BOOL)aFlag
 {
     isConnected = aFlag;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelIsConnectedChanged object:self];
 }
 
@@ -261,7 +262,7 @@ static NSString* NPLComConnectors[8] = {
     
     [ipAddress autorelease];
     ipAddress = [aIpAddress copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORNPLCommBoardModelIpAddressChanged object:self];
 }
 
@@ -328,7 +329,7 @@ static NSString* NPLComConnectors[8] = {
     [self setBoard:			[decoder decodeIntForKey:	@"board"]];
 	[self setIpAddress:		[decoder decodeObjectForKey:@"ipAddress"]];
     [[self undoManager] enableUndoRegistration];    
-		
+	
     return self;
 }
 
@@ -363,12 +364,12 @@ static NSString* NPLComConnectors[8] = {
 	else if(aLen == 3){
 		bytes[3] = (writeValue & 0xf); 
 	}
-
+	
 	int i;
 	for(i=0;i< 1 + aLen;i++){
 		NSLog(@"%d: 0x%0x\n",i,bytes[i]);
 	}
-
+	
 	[socket write:bytes length:aLen + 1];
 	
 }
