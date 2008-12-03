@@ -48,11 +48,11 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
     [[self undoManager] disableUndoRegistration];
     
     [self setPatternArray:[NSMutableArray arrayWithObjects:
-        [NSNumber numberWithLong:0],
-        [NSNumber numberWithLong:0],
-        [NSNumber numberWithLong:0],
-        [NSNumber numberWithLong:0],
-        nil]];
+						   [NSNumber numberWithLong:0],
+						   [NSNumber numberWithLong:0],
+						   [NSNumber numberWithLong:0],
+						   [NSNumber numberWithLong:0],
+						   nil]];
     [self setNoisyEnvBroadcastEnabled:YES];
     [[self undoManager] enableUndoRegistration];
     return self;
@@ -70,13 +70,13 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
 {
     
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
     
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pulserStartingToLoad:)
                          name : ORHPPulserWaveformLoadStartedNotification
@@ -101,11 +101,11 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
     if(disableForPulser){
         NSLog(@"Disabling the PDS while the Pulser is downloading.\n");
         NSArray* zeroArray = [NSMutableArray arrayWithObjects:
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            nil];
+							  [NSNumber numberWithLong:0],
+							  [NSNumber numberWithLong:0],
+							  [NSNumber numberWithLong:0],
+							  [NSNumber numberWithLong:0],
+							  nil];
         
         [self loadHardware:zeroArray];
     }
@@ -155,7 +155,7 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
     [[[self undoManager] prepareWithInvocationTarget:self] setNoisyEnvBroadcastEnabled:noisyEnvBroadcastEnabled];
     
     noisyEnvBroadcastEnabled = aNoisyEnvBroadcastEnabled;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulserDistribNoisyEnvBroadcastEnabledChanged object:self];
 }
 
@@ -188,8 +188,8 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
     patternArray=[newPatternArray retain];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORPulserDistribPatternChangedNotification
-                      object:self];
+	 postNotificationName:ORPulserDistribPatternChangedNotification
+	 object:self];
 }
 
 -(unsigned long)patternMaskForArray:(int)arrayIndex
@@ -205,8 +205,8 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
     [patternArray replaceObjectAtIndex:arrayIndex withObject:[NSNumber numberWithLong:aValue]];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORPulserDistribPatternBitChangedNotification
-                      object:self];
+	 postNotificationName:ORPulserDistribPatternBitChangedNotification
+	 object:self];
 }
 
 
@@ -228,8 +228,8 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
     [[[self undoManager] prepareWithInvocationTarget:self] setDisableForPulser:disableForPulser];
     disableForPulser = flag;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORPulserDisableForPulserChangedNotification
-                      object:self];
+	 postNotificationName:ORPulserDisableForPulserChangedNotification
+	 object:self];
 }
 
 
@@ -296,11 +296,11 @@ static NSString *ORPulserDisableForPulser    = @"ORPulserDisableForPulser";
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORPulserDistribDecoderForPDS",      @"decoder",
-        [NSNumber numberWithLong:dataId],     @"dataId",
-        [NSNumber numberWithBool:NO],         @"variable",
-        [NSNumber numberWithLong:4],          @"length",
-        nil];
+								 @"ORPulserDistribDecoderForPDS",      @"decoder",
+								 [NSNumber numberWithLong:dataId],     @"dataId",
+								 [NSNumber numberWithBool:NO],         @"variable",
+								 [NSNumber numberWithLong:4],          @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"PDSRecord"];
     return dataDictionary;
 }
@@ -327,7 +327,7 @@ static NSString *ORPulserDisableForPulser    = @"ORPulserDisableForPulser";
 //-------------------------------------------------------------------------------
 -(void)loadHardware:(NSArray*)aPatternArray
 {
-	NS_DURING    
+	@try {    
         if(noisyEnvBroadcastEnabled){
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORHardwareEnvironmentNoisy object:self];
 		}
@@ -374,17 +374,18 @@ static NSString *ORPulserDisableForPulser    = @"ORPulserDisableForPulser";
 		else {
 			[NSException raise:@"PDS Not Connected to IP408" format:@"Connection IP408 is required."];
 		}
-        NS_HANDLER
-			if(noisyEnvBroadcastEnabled){
-				[[NSNotificationCenter defaultCenter] postNotificationName:ORHardwareEnvironmentQuiet object:self];
-			}
-            NSLogError(@" ",@"Pulser",@"Loading PDS",nil);
-            [localException raise];
-        NS_ENDHANDLER
-		
+	}
+	@catch(NSException* localException) {
 		if(noisyEnvBroadcastEnabled){
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORHardwareEnvironmentQuiet object:self];
 		}
+		NSLogError(@" ",@"Pulser",@"Loading PDS",nil);
+		[localException raise];
+	}
+	
+	if(noisyEnvBroadcastEnabled){
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORHardwareEnvironmentQuiet object:self];
+	}
 }
 
 -(BOOL)waitForCompletion
@@ -429,7 +430,7 @@ static NSString *ORPulserDisableForPulser    = @"ORPulserDisableForPulser";
         dataWord[1] = gtid;    
         dataWord[2] = ([[aPatternArray objectAtIndex:1] longValue] & 0x0000ffff)<<16 | ([[aPatternArray objectAtIndex:0] longValue] & 0x0000ffff);
         dataWord[3] = ([[aPatternArray objectAtIndex:3] longValue] & 0x0000ffff)<<16 | ([[aPatternArray objectAtIndex:2] longValue] & 0x0000ffff);
-
+		
         //now that we know the size we fill in the header and ship
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                             object:[NSData dataWithBytes:dataWord length:4*sizeof(long)]];
@@ -454,7 +455,7 @@ static NSString *ORPulserDisableForPulser    = @"ORPulserDisableForPulser";
     NSString* word2 = [NSString stringWithFormat:@"Board1 = 0x%02x\n",(ptr[2] & 0xffff0000)>>16];
     NSString* word3 = [NSString stringWithFormat:@"Board2 = 0x%02x\n",ptr[3] & 0x0000ffff];
     NSString* word4 = [NSString stringWithFormat:@"Board3 = 0x%02x\n",(ptr[3] & 0xffff0000)>>16];
-   
+	
     return [NSString stringWithFormat:@"%@%@%@%@%@%@",title,gtid,word1,word2,word3,word4];               
 }
 

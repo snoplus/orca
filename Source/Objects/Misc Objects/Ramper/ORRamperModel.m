@@ -65,23 +65,23 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
     //---------------------------------------------------------------------------------------------------
     
     NSImage* aCachedImage = [NSImage imageNamed:@"Ramper"];
-	    
+	
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
     [aCachedImage compositeToPoint:NSZeroPoint operation:NSCompositeCopy];
     if([self runningCount]){
         [[NSImage imageNamed:@"RampRunning"] compositeToPoint:NSZeroPoint operation:NSCompositeSourceOver];
     }
-
+	
     [i unlockFocus];
     
     [self setImage:i];
     [i release];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORForceRedraw
-                      object: self];
-
+	 postNotificationName:ORForceRedraw
+	 object: self];
+	
 }
 
 
@@ -185,10 +185,11 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		[rampItems makeObjectsPerformSelector:@selector(loadProxyObjects)];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (NSString*) lockName
@@ -239,7 +240,7 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 	}
 	[rampingItems addObject:anItem];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRamperNeedsUpdate object: self];
-
+	
 	if(!loadSet)loadSet = [[NSMutableSet alloc] init];
 	if(!loadableObjects)loadableObjects = [[NSMutableSet alloc] init];
 	if(![loadableObjects containsObject:[anItem targetObject]]){

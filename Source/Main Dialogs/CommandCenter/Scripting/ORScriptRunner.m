@@ -165,8 +165,8 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		if([theString length]){
 			parsedOK = NO;
 			scriptExists = YES;
-
-			NS_DURING {
+			
+			@try { 
 				
 				yyreset_state();
 				OrcaScriptrestart(NULL);
@@ -187,16 +187,17 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 																	  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
 				}
 			}
-			NS_HANDLER {
+			
+			@catch(NSException* localException) { 
 				NSLog(@"line %d: %@\n",num_lines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:num_lines]);
 				[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerParseError 
-																		object:self 
-																	  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
+																	object:self 
+																  userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithLong:num_lines+1] forKey:@"ErrorLocation"]];
 				NSLog(@"Caught %@: %@\n",[localException name],[localException reason]);
 				[functionList release];
 				functionList = nil;
+				
 			}
-			NS_ENDHANDLER
 		}
 		else {
 			//no script... 
@@ -215,7 +216,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	}
 	return [self functionTable];
 }
-	
+
 #pragma mark ¥¥¥Group Evaluators
 - (void) stopThread
 {
@@ -286,10 +287,11 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	BOOL failed = NO;
 	for(i=0;i<numNodes;i++){
 		NSAutoreleasePool* innerPool = [[NSAutoreleasePool alloc] init];			
-		NS_DURING
+		@try {
 			id aNode = [someNodes objectAtIndex:i];
 			[eval execute:aNode container:nil];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			if([[localException name] isEqualToString:@"return"]){
 				NSDictionary* userInfo = [localException userInfo];
 				if(userInfo){
@@ -307,7 +309,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				NSLogColor([NSColor redColor],@"Script will exit because of exception: %@\n",localException);
 				failed = YES;
 			}
-		NS_ENDHANDLER
+		}
 		[innerPool release];
 		if(stopThread || failed){
 			if(stopThread){

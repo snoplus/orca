@@ -135,7 +135,7 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 	[scriptNames release];
 	scriptNames = someNames;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRemoteRunModelScriptNamesChanged object:self];
-
+	
 }
 
 - (BOOL) offline
@@ -159,8 +159,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 	isConnected = aIsConnected;
     
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORRemoteRunIsConnectedChanged
-                      object:self];
+	 postNotificationName:ORRemoteRunIsConnectedChanged
+	 object:self];
 }
 
 - (BOOL) autoReconnect
@@ -174,8 +174,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 	autoReconnect = aAutoReconnect;
     
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORRemoteRunAutoReconnectChanged
-                      object:self];
+	 postNotificationName:ORRemoteRunAutoReconnectChanged
+	 object:self];
 }
 
 - (BOOL) connectAtStart
@@ -189,8 +189,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 	connectAtStart = aConnectAtStart;
     
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORRemoteRunConnectAtStartChanged
-                      object:self];
+	 postNotificationName:ORRemoteRunConnectAtStartChanged
+	 object:self];
 }
 
 - (NSString*) selectedStartScriptName
@@ -241,8 +241,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     remotePort = aRemotePort;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORRemoteRunRemotePortChanged
-                      object:self];
+	 postNotificationName:ORRemoteRunRemotePortChanged
+	 object:self];
 }
 - (NSString*) remoteHost
 {
@@ -257,8 +257,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     remoteHost = [aRemoteHost copy];
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORRemoteRunRemoteHostChanged
-                      object:self];
+	 postNotificationName:ORRemoteRunRemoteHostChanged
+	 object:self];
 }
 
 -(unsigned long)runNumber
@@ -271,8 +271,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     runNumber = aRunNumber;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORRemoteRunNumberChanged
-                      object: self];
+	 postNotificationName:ORRemoteRunNumberChanged
+	 object: self];
 }
 
 -(BOOL)isRunning
@@ -292,8 +292,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     startTime = [aDate copy];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORRemoteRunStartTimeChanged
-                      object: self];
+	 postNotificationName:ORRemoteRunStartTimeChanged
+	 object: self];
 }
 
 -(NSTimeInterval) elapsedTime
@@ -305,8 +305,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 {
     elapsedTime = aValue;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORRemoteRunElapsedTimeChanged
-                      object: self];
+	 postNotificationName:ORRemoteRunElapsedTimeChanged
+	 object: self];
 }
 
 -(NSTimeInterval) timeToGo
@@ -318,8 +318,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 {
     timeToGo = aValue;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORRemoteRunTimeToGoChanged
-                      object: self];
+	 postNotificationName:ORRemoteRunTimeToGoChanged
+	 object: self];
 }
 
 -(BOOL)timedRun
@@ -332,8 +332,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     [[[self undoManager] prepareWithInvocationTarget:self] setTimedRun:[self timedRun]];
     timedRun = aValue;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORRemoteRunTimedRunChanged
-                      object: self];
+	 postNotificationName:ORRemoteRunTimedRunChanged
+	 object: self];
 }
 
 -(BOOL)repeatRun
@@ -346,8 +346,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     [[[self undoManager] prepareWithInvocationTarget:self] setRepeatRun:[self repeatRun]];
     repeatRun = aValue;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORRemoteRunRepeatRunChanged
-                      object: self];
+	 postNotificationName:ORRemoteRunRepeatRunChanged
+	 object: self];
 }
 
 -(NSTimeInterval) timeLimit
@@ -360,8 +360,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     [[[self undoManager] prepareWithInvocationTarget:self] setTimeLimit:[self timeLimit]];
     timeLimit = aValue;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORRemoteRunTimeLimitChanged
-                      object: self];
+	 postNotificationName:ORRemoteRunTimeLimitChanged
+	 object: self];
 }
 
 
@@ -375,8 +375,8 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     [[[self undoManager] prepareWithInvocationTarget:self] setQuickStart:quickStart];
     quickStart = flag;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORRemoteRunQuickStartChanged
-                      object: self];
+	 postNotificationName:ORRemoteRunQuickStartChanged
+	 object: self];
     
 }
 
@@ -401,14 +401,14 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
         runningState = aRunningState;
         
         NSDictionary* userInfo = [NSDictionary
-            dictionaryWithObjectsAndKeys:[NSNumber
-                numberWithInt:runningState],ORRunStatusValue,
-            runState[runningState],ORRunStatusString,nil];
+								  dictionaryWithObjectsAndKeys:[NSNumber
+																numberWithInt:runningState],ORRunStatusValue,
+								  runState[runningState],ORRunStatusString,nil];
         
         [[NSNotificationCenter defaultCenter]
-            postNotificationName:ORRemoteRunStatusChanged
-                          object: self
-                        userInfo: userInfo];
+		 postNotificationName:ORRemoteRunStatusChanged
+		 object: self
+		 userInfo: userInfo];
     }
 }
 
@@ -617,15 +617,16 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
                 if([numberSet characterIsMember:[value characterAtIndex:0]]){
                     value = [NSDecimalNumber decimalNumberWithString:value];
                 }
-                NS_DURING
+                @try {
                     [self setValue:value forKey:key];
-                NS_HANDLER
-                    NS_ENDHANDLER
+				}
+				@catch(NSException* localException) {
+				}
             }
         }
-            
+		
     }
-        [[self undoManager] enableUndoRegistration];
+	[[self undoManager] enableUndoRegistration];
 }
 
 - (int) processScripts:(NSArray*)lines index:(int)i
@@ -743,7 +744,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
 - (void) waitForRunStop
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(waitForRunStop) object:nil];
-
+	
 	if(runningState == eRunStopped){
 		NSLog(@"-------------------------------------\n");
 		NSLog(@"Remote Run %d stopped.\n",[self runNumber]);
@@ -755,6 +756,6 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
 		return;
 	}
     [self performSelector:@selector(waitForRunStop) withObject:nil afterDelay:1];
- }
+}
 
 @end

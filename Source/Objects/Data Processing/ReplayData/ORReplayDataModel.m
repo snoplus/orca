@@ -78,7 +78,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	[fileToReplay release];
 	
     [dataRecords release];
-
+	
     [super dealloc];
 }
 
@@ -137,8 +137,8 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	NSLog(@"Replaying: %@\n",[newFileToReplay  stringByAbbreviatingWithTildeInPath]);
 	
     [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORRelayFileChangedNotification
-                              object: self];
+	 postNotificationName:ORRelayFileChangedNotification
+	 object: self];
     
 }
 - (NSArray *) dataRecords
@@ -187,8 +187,8 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     [filesToReplay sortUsingSelector:@selector(caseInsensitiveCompare:)];
     
     [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORReplayFileListChangedNotification
-                              object: self];
+	 postNotificationName:ORReplayFileListChangedNotification
+	 object: self];
     
 }
 
@@ -240,16 +240,16 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 
 - (void) replayFiles
 {
-
+	
 	if([self isReplaying]) return;
 	stop = NO;
 	
     [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORReplayRunningNotification
-                              object: self];
-
+	 postNotificationName:ORReplayRunningNotification
+	 object: self];
+	
 	sentRunStart = NO;
-
+	
 	[self parseFile];
 	
 }
@@ -290,8 +290,8 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     [[[self undoManager] prepareWithInvocationTarget:self] addFilesToReplay:anArray];
     [filesToReplay removeObjectsInArray:anArray];
     [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORReplayFileListChangedNotification
-                              object: self];
+	 postNotificationName:ORReplayFileListChangedNotification
+	 object: self];
 }
 
 - (void) removeFilesWithIndexes:(NSIndexSet*)indexSet;
@@ -306,11 +306,11 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	if([filesToRemove count]){
 		[[[self undoManager] prepareWithInvocationTarget:self] addFilesToReplay:filesToRemove];
 		[filesToReplay removeObjectsInArray:filesToRemove];
-    
-    
+		
+		
 		[[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORReplayFileListChangedNotification
-                              object: self];
+		 postNotificationName:ORReplayFileListChangedNotification
+		 object: self];
 	}
 }
 
@@ -365,8 +365,8 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
                          didEndSelector:@selector(parseThreadExited:)] retain];
     
     [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORRelayParseStartedNotification
-                              object: self];
+	 postNotificationName:ORRelayParseStartedNotification
+	 object: self];
     
     if(!parseThread){
         [self parseThreadExited:nil];
@@ -382,7 +382,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 		if(stop)break;
 		
 		[self performSelectorOnMainThread:@selector(setFileToReplay:) withObject:aFile waitUntilDone:YES];
-
+		
 		NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
 		NSFileHandle* fp = [NSFileHandle fileHandleForReadingAtPath:aFile];
 		[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
@@ -405,12 +405,13 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 					[self setDataRecords:[fileAsDataPacket decodeDataIntoArrayForDelegate:self]]; 
 					
 					[self performSelectorOnMainThread:@selector(postProcessingStarted) withObject:nil waitUntilDone:NO];
-					NS_DURING
+					@try {
 						[self processData];
 						[self performSelectorOnMainThread:@selector(fileFinished) withObject:nil waitUntilDone:YES];
-					NS_HANDLER
+					}
+					@catch(NSException* localException) {
 						stop = true;
-					NS_ENDHANDLER
+					}
 				}
 				else {
 					NSLogColor([NSColor redColor],@"Problem reading <%@> for replaying.\n",[aFile stringByAbbreviatingWithTildeInPath]);
@@ -425,7 +426,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 		}
 		[pool release];
 	}
-
+	
     return @"done";
 }
 
@@ -436,30 +437,30 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     [parseThread release];
     parseThread = nil;
     [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORRelayParseEndedNotification
-                              object: self];
+	 postNotificationName:ORRelayParseEndedNotification
+	 object: self];
     
 }
 
 - (void) postReadStarted
 {
     [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORReplayReadingNotification
-                              object: self];
+	 postNotificationName:ORReplayReadingNotification
+	 object: self];
 }
 
 - (void) postParseStarted
 {
     [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORReplayParseStartedNotification
-                              object: self];
+	 postNotificationName:ORReplayParseStartedNotification
+	 object: self];
 }
 
 - (void) postProcessingStarted
 {
     [[NSNotificationCenter defaultCenter]
-			    postNotificationName:ORReplayProcessingStartedNotification
-                              object: self];
+	 postNotificationName:ORReplayProcessingStartedNotification
+	 object: self];
 }
 - (void) processData
 {
@@ -475,7 +476,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	[tempData release];
 	
 	[tempPacket generateObjectLookup]; 
-		
+	
 	[tempPacket addData:[tempPacket headerAsData]];
 	[nextObject processData:tempPacket userInfo:nil];
 	[tempPacket clearData];
@@ -483,7 +484,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     NSAutoreleasePool *pool = nil;
 	NSArray* theDataArray = [fileAsDataPacket dataArray];
 	NSData* theData = [theDataArray objectAtIndex:0];
-
+	
 	unsigned long* startPtr = ((unsigned long*)[theData bytes]);
 	unsigned long* endPtr   = startPtr + [theData length]/4;
 	
@@ -559,17 +560,17 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
     
     [nextObject runTaskStopped:fileAsDataPacket userInfo:nil];
     [nextObject closeOutRun:fileAsDataPacket userInfo:nil];
-
+	
 	[fileAsDataPacket clearData];
     [fileAsDataPacket release];
     fileAsDataPacket = nil;
 	
     [self setDataRecords:nil];
-	      
+	
     [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORReplayStoppedNotification
-                              object: self];
-
+	 postNotificationName:ORReplayStoppedNotification
+	 object: self];
+	
 }
 
 - (void) fileFinished

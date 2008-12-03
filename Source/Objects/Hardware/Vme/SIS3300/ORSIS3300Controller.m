@@ -45,21 +45,21 @@
 
 - (void) awakeFromNib
 {
-
+	
     settingSize     = NSMakeSize(790,460);
     rateSize		= NSMakeSize(790,300);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-
-
+	
+	
     NSString* key = [NSString stringWithFormat: @"orca.SIS3300%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-
+	
 	[super awakeFromNib];
-
+	
 }
 
 #pragma mark •••Notifications
@@ -67,12 +67,12 @@
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [super registerNotificationObservers];
-        
+	
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORVmeCardSlotChangedNotification
 					   object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(baseAddressChanged:)
                          name : ORVmeIOCardBaseAddressChangedNotification
@@ -92,18 +92,18 @@
                      selector : @selector(rateGroupChanged:)
                          name : ORSIS3300RateGroupChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(totalRateChanged:)
 						 name : ORRateGroupTotalRateChangedNotification
 					   object : nil];
-					   
+	
     //a fake action for the scale objects
     [notifyCenter addObserver : self
                      selector : @selector(scaleAction:)
                          name : ORAxisRangeChangedNotification
                        object : nil];
-                       
+	
     [notifyCenter addObserver : self
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
@@ -118,100 +118,100 @@
                      selector : @selector(integrationChanged:)
                          name : ORRateGroupIntegrationChangedNotification
                        object : nil];
-											
+	
     [notifyCenter addObserver : self
                      selector : @selector(enabledChanged:)
                          name : ORSIS3300ModelEnabledChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(ltGtChanged:)
                          name : ORSIS3300ModelLtGtChanged
                        object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(thresholdChanged:)
                          name : ORSIS3300ModelThresholdChanged
                        object : model];
-					   
- 
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(pageSizeChanged:)
                          name : ORSIS3300ModelPageSizeChanged
 						object: model];
-
+	
     [self registerRates];
     [notifyCenter addObserver : self
                      selector : @selector(stopDelayChanged:)
                          name : ORSIS3300ModelStopDelayChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORSIS3300ModelClockSourceChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(startDelayChanged:)
                          name : ORSIS3300ModelStartDelayChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(stopDelayChanged:)
                          name : ORSIS3300ModelStopDelayChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(stopDelayEnabledChanged:)
                          name : ORSIS3300ModelStopDelayEnabledChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(startDelayEnabledChanged:)
                          name : ORSIS3300ModelStartDelayEnabledChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(gateModeChanged:)
                          name : ORSIS3300ModelGateModeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(randomClockChanged:)
                          name : ORSIS3300ModelRandomClockChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(lemoStartStopChanged:)
                          name : ORSIS3300ModelLemoStartStopChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(p2StartStopChanged:)
                          name : ORSIS3300ModelP2StartStopChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(stopTriggerChanged:)
                          name : ORSIS3300ModelStopTriggerChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pageWrapChanged:)
                          name : ORSIS3300ModelPageWrapChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(multiEventModeChanged:)
                          name : ORSIS3300ModelMultiEventModeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(autoStartChanged:)
                          name : ORSIS3300ModelAutoStartChanged
 						object: model];
-
+	
 }
 
 - (void) registerRates
@@ -223,9 +223,9 @@
     NSEnumerator* e = [[[model waveFormRateGroup] rates] objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
-    
+		
         [notifyCenter removeObserver:self name:ORRateChangedNotification object:obj];
-
+		
         [notifyCenter addObserver : self
                          selector : @selector(waveFormRateChanged:)
                              name : ORRateChangedNotification
@@ -407,7 +407,7 @@
 	[enabledMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[ltGtMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix		setEnabled:!lockedOrRunningMaintenance];
-
+	
 	[autoStartButton		setEnabled:!lockedOrRunningMaintenance];
 	[multiEventModeButton	setEnabled:!lockedOrRunningMaintenance];
 	[pageWrapButton			setEnabled:!lockedOrRunningMaintenance];
@@ -627,16 +627,17 @@
 
 -(IBAction)initBoard:(id)sender
 {
-    NS_DURING
+    @try {
         [self endEditing];
         [model initBoard];		//initialize and load hardward
         NSLog(@"Initialized SIS3300 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset and Init of SIS3300 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed SIS3300 Reset and Init", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) integrationAction:(id)sender

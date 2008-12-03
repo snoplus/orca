@@ -63,13 +63,13 @@
 	[scrollView setRulersVisible:YES];
 	
 	[aNumberingRulerView release];
-
-
+	
+	
 	autoSyntaxColoring = YES;
 	maintainIndentation = YES;
 	recolorTimer = nil;
 	syntaxColoringBusy = NO;
-
+	
 	[self setDelegate:self];
 	
 	[progress setUsesThreadedAnimation:YES];
@@ -79,13 +79,13 @@
 	
 	[[NSNotificationCenter defaultCenter] removeObserver: self];	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(processEditing:)
-					name: NSTextStorageDidProcessEditingNotification
-					object: [self textStorage]];
+												 name: NSTextStorageDidProcessEditingNotification
+											   object: [self textStorage]];
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(colorsChanged:)
-					name: ORSyntaxColorChangedNotification
-					object: nil];
-
+												 name: ORSyntaxColorChangedNotification
+											   object: nil];
+	
 	// Put selection at top like Project Builder has it, so user sees it:
 	[self setSelectedRange: NSMakeRange(0,0)];
 	[self turnOffWrapping];
@@ -102,14 +102,14 @@
 		[enclosingView setBackgroundColor:[self backgroundColor]];
 		[enclosingView setNeedsDisplay:YES];
 	}
-
+	
 }
 
 - (void) processEditing: (NSNotification*)notification
 {
     NSTextStorage				*textStorage = [notification object];
     NSRange						range = [textStorage editedRange];
-		
+	
 	// Was delete op? Try to get chars around this to recolor any identifier we're in:
 	if( range.length == 0 ){
 		if( range.location > 0 )									range.location--;
@@ -126,15 +126,15 @@
 		
 		
 		rangeMode = [textStorage attribute: TD_SYNTAX_COLORING_MODE_ATTR
-								atIndex: currRange.location
-								effectiveRange: &effectiveRange];
+								   atIndex: currRange.location
+							effectiveRange: &effectiveRange];
 		
 		unsigned int		x = range.location;
 		
 		/* TODO: If we're in a multi-line comment and we're typing a comment-end
-			character, or we're in a string and we're typing a quote character,
-			this should include the rest of the text up to the next comment/string
-			end character in the recalc. */
+		 character, or we're in a string and we're typing a quote character,
+		 this should include the rest of the text up to the next comment/string
+		 end character in the recalc. */
 		
 		// Scan up to prev line break:
 		while( x > 0 ){
@@ -171,7 +171,7 @@
 		NSMutableAttributedString*  textStore = [self textStorage];
 		BOOL						hadSpaces = NO;
 		unsigned int				lastSpace = affectedCharRange.location,
-									prevLineBreak = 0;
+		prevLineBreak = 0;
 		NSRange						spacesRange = { 0, 0 };
 		unichar						theChar = 0;
 		unsigned int				x;
@@ -190,7 +190,7 @@
 					prevLineBreak = x +1;
 					x = 0;  // Terminate the loop.
 					break;
-				
+					
 				case ' ':
 				case '\t':
 					if( !hadSpaces ){
@@ -198,7 +198,7 @@
 						hadSpaces = YES;
 					}
 					break;
-				
+					
 				default:
 					hadSpaces = NO;
 					break;
@@ -241,7 +241,7 @@
 	
 	// Schedule a new timer:
 	recolorTimer = [[NSTimer scheduledTimerWithTimeInterval:1.5 target:self selector:@selector(recolorSyntaxTimer:)
-		userInfo:nil repeats: NO] retain];
+												   userInfo:nil repeats: NO] retain];
 }
 
 // This actually triggers the recoloring:
@@ -348,7 +348,7 @@
 	[textContainer setContainerSize: NSMakeSize(LargeNumberForText, LargeNumberForText)];
 	[textContainer setWidthTracksTextView:  NO];
     [textContainer setHeightTracksTextView: NO];
-
+	
 	// Make sure text view is wide enough:
 	frame.origin = NSMakePoint(0.0, 0.0);
     frame.size	 = [scrollView contentSize];
@@ -410,13 +410,13 @@
 - (void) recolorRange: (NSRange)range
 {
  	if( syntaxColoringBusy ) return;			 // Prevent endless loop when recoloring's replacement of text causes processEditing to fire again.
-		
+	
 	
 	if( range.length == 0 || recolorTimer )	{    // don't recolor partially if a full recolorization is pending.
 		return;
 	}
 	[[[NSApp delegate] undoManager] disableUndoRegistration];
-	NS_DURING
+	@try {
 		syntaxColoringBusy = YES;
 		[progress startAnimation:nil];
 		
@@ -442,7 +442,7 @@
 		NSColor*					vIdentifier2Color	= colorForData([[NSUserDefaults standardUserDefaults] objectForKey: ORScriptIdentifier2Color]);
 		NSColor*					vConstantsColor	    = colorForData([[NSUserDefaults standardUserDefaults] objectForKey: ORScriptConstantsColor]);
 		NSDictionary*				vStyles				= [NSDictionary dictionaryWithObject: [NSFont fontWithName:@"Monaco" size:10.0] forKey: NSFontAttributeName];
-	
+		
 		// Color identifiers listed in identifiers1.txt:
 		NSCharacterSet*	vIdentCharset		 = [NSCharacterSet characterSetWithCharactersInString: [vSyntaxDefinition objectForKey: @"Identifiers:Charset"]];
 		NSString*		vCurrIdent;
@@ -451,7 +451,7 @@
 		while( vCurrIdent = [vItty nextObject] ){
 			[self colorIdentifier:vCurrIdent inString:vString withColor:vIdentifier1Color andMode:TD_IDENTIFIER1_ATTR charset:vIdentCharset];
 		}
-
+		
 		
 		// Color identifiers listed in identifiers2.txt:
 		vIdents = [vSyntaxDefinition objectForKey: @"Identifiers2"];
@@ -466,10 +466,10 @@
 		while( vCurrIdent = [vItty nextObject] ){
 			[self colorIdentifier:vCurrIdent inString:vString withColor:vConstantsColor andMode:TD_CONSTANTS_ATTR charset:vIdentCharset];
 		}
-				
+		
 		// Colorize comments, strings etc, obliterating any identifiers inside them:
 		[self colorStringsFrom: @"\"" to: @"\"" inString: vString withColor: vStringColor andMode: TD_DOUBLE_QUOTED_STRING_ATTR];   // Strings.
-				
+		
 		// Comments:
 		[self colorOneLineComment: vOneLineCommentStart inString: vString withColor: vCommentColor andMode: TD_ONE_LINE_COMMENT_ATTR];
 		[self colorCommentsFrom: vBlockCommentStart to: vBlockCommentEnd inString: vString withColor:vCommentColor andMode: TD_MULTI_LINE_COMMENT_ATTR];
@@ -477,19 +477,21 @@
 		// Replace the range with our recolored part:
 		[vString addAttributes: vStyles range: NSMakeRange( 0, [vString length] )];
 		[[self textStorage] replaceCharactersInRange: range withAttributedString: vString];
-
-		NS_DURING
-//			[self setSelectedRange:vOldSelection];  // Restore selection.
-		NS_HANDLER
-		NS_ENDHANDLER
-	
+		
+		@try {
+			//			[self setSelectedRange:vOldSelection];  // Restore selection.
+		}
+		@catch(NSException* localException) {
+		}
+		
 		[progress stopAnimation:nil];
 		syntaxColoringBusy = NO;
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		syntaxColoringBusy = NO;
 		[progress stopAnimation:nil];
 		//[localException raise];
-	NS_ENDHANDLER
+	}
 	[[[NSApp delegate] undoManager] enableUndoRegistration];
 }
 
@@ -500,11 +502,11 @@
 //		display to indicate which characters are selected.
 //-----------------------------------------------------------------------------
 - (NSRange)  textView: (NSTextView*)textView willChangeSelectionFromCharacterRange: (NSRange)oldSelectedCharRange
-					toCharacterRange:(NSRange)newSelectedCharRange
+	 toCharacterRange:(NSRange)newSelectedCharRange
 {
 	[status setStringValue: [NSString stringWithFormat: @"Selected char %u to %u",
-						newSelectedCharRange.location +1,
-						newSelectedCharRange.location +newSelectedCharRange.length]];
+							 newSelectedCharRange.location +1,
+							 newSelectedCharRange.location +newSelectedCharRange.length]];
 	
 	// TODO: Also display line number in status line.
 	
@@ -543,19 +545,19 @@
 // ----------------------------------------------------------------------------
 
 - (void)	colorStringsFrom: (NSString*) startCh to: (NSString*) endCh inString: (NSMutableAttributedString*) s
-							withColor: (NSColor*) col andMode:(NSString*)attr
+				withColor: (NSColor*) col andMode:(NSString*)attr
 {
-	NS_DURING
+	@try {
 		NSScanner*					vScanner = [NSScanner scannerWithString: [s string]];
 		NSDictionary*				vStyles = [NSDictionary dictionaryWithObjectsAndKeys:
-													col, NSForegroundColorAttributeName,
-													attr, TD_SYNTAX_COLORING_MODE_ATTR,
-													nil];
+											   col, NSForegroundColorAttributeName,
+											   attr, TD_SYNTAX_COLORING_MODE_ATTR,
+											   nil];
 		BOOL						vIsEndChar = NO;
 		
 		while( ![vScanner isAtEnd] ){
 			int		vStartOffs,
-					vEndOffs;
+			vEndOffs;
 			vIsEndChar = NO;
 			
 			// Look for start of string:
@@ -563,11 +565,11 @@
 			vStartOffs = [vScanner scanLocation];
 			if( ![vScanner scanString:startCh intoString:nil] )
 				NS_VOIDRETURN;
-
+			
 			while( !vIsEndChar && ![vScanner isAtEnd] )	{  // Loop until we find end-of-string marker or our text to color is finished:
 				[vScanner scanUpToString: endCh intoString: nil];
 				unsigned x = [vScanner scanLocation] -1;
-
+				
 				if( [[s string] characterAtIndex: x] != '\\' )	// Backslash before the end marker? That means ignore the end marker.
 					vIsEndChar = YES;	// A real one! Terminate loop.
 				if( ![vScanner scanString:endCh intoString:nil] )	// But skip this char before that.
@@ -580,11 +582,12 @@
 			
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, vEndOffs -vStartOffs )];
-
+			
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		// Just ignore it, syntax coloring isn't that important.
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -600,61 +603,62 @@
 // ---------------------------------------------------------------------------
 
 - (void)	colorCommentsFrom: (NSString*) startCh to: (NSString*) endCh inString: (NSMutableAttributedString*) s
-							withColor: (NSColor*) col andMode:(NSString*)attr
+				 withColor: (NSColor*) col andMode:(NSString*)attr
 {
-	NS_DURING
+	@try {
 		NSScanner*					vScanner = [NSScanner scannerWithString: [s string]];
 		NSDictionary*				vStyles = [NSDictionary dictionaryWithObjectsAndKeys:
-													col, NSForegroundColorAttributeName,
-													attr, TD_SYNTAX_COLORING_MODE_ATTR,
-													nil];
+											   col, NSForegroundColorAttributeName,
+											   attr, TD_SYNTAX_COLORING_MODE_ATTR,
+											   nil];
 		
 		while( ![vScanner isAtEnd] ){
 			int		vStartOffs,
-					vEndOffs;
+			vEndOffs;
 			
 			// Look for start of multi-line comment:
 			[vScanner scanUpToString: startCh intoString: nil];
 			vStartOffs = [vScanner scanLocation];
 			if( ![vScanner scanString:startCh intoString:nil] )
 				NS_VOIDRETURN;
-
+			
 			// Look for associated end-of-comment marker:
 			[vScanner scanUpToString: endCh intoString: nil];
 			if( ![vScanner scanString:endCh intoString:nil] )
-				/*NS_VOIDRETURN*/;  // Don't exit. If user forgot trailing marker, indicate this by "bleeding" until end of string.
+			/*NS_VOIDRETURN*/;  // Don't exit. If user forgot trailing marker, indicate this by "bleeding" until end of string.
 			vEndOffs = [vScanner scanLocation];
 			
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, vEndOffs -vStartOffs )];
-				
+			
 			[progress animate:nil];
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		// Just ignore it, syntax coloring isn't that important.
-	NS_ENDHANDLER
+	}
 }
 
 - (void)	colorOneLineComment: (NSString*) startCh inString: (NSMutableAttributedString*) s
-				withColor: (NSColor*) col andMode:(NSString*)attr
+				   withColor: (NSColor*) col andMode:(NSString*)attr
 {
-	NS_DURING
+	@try {
 		NSScanner*					vScanner = [NSScanner scannerWithString: [s string]];
 		NSDictionary*				vStyles = [NSDictionary dictionaryWithObjectsAndKeys:
-													col, NSForegroundColorAttributeName,
-													attr, TD_SYNTAX_COLORING_MODE_ATTR,
-													nil];
+											   col, NSForegroundColorAttributeName,
+											   attr, TD_SYNTAX_COLORING_MODE_ATTR,
+											   nil];
 		
 		while( ![vScanner isAtEnd] ) {
 			int		vStartOffs,
-					vEndOffs;
+			vEndOffs;
 			
 			// Look for start of one-line comment:
 			[vScanner scanUpToString: startCh intoString: nil];
 			vStartOffs = [vScanner scanLocation];
 			if( ![vScanner scanString:startCh intoString:nil] )
 				NS_VOIDRETURN;
-
+			
 			// Look for associated line break:
 			if( ![vScanner skipUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString: @"\n\r"]] );
 			
@@ -662,28 +666,29 @@
 			
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, vEndOffs -vStartOffs )];
-				
+			
 			[progress animate:nil];
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		// Just ignore it, syntax coloring isn't that important.
-	NS_ENDHANDLER
+	}
 }
 
 
 - (void)	colorIdentifier: (NSString*) ident inString: (NSMutableAttributedString*) s
-			withColor: (NSColor*) col andMode:(NSString*)attr charset: (NSCharacterSet*)cset
+			   withColor: (NSColor*) col andMode:(NSString*)attr charset: (NSCharacterSet*)cset
 {
-	NS_DURING
+	@try {
 		NSScanner*					vScanner = [NSScanner scannerWithString: [s string]];
 		NSDictionary*				vStyles = [NSDictionary dictionaryWithObjectsAndKeys:
-													col, NSForegroundColorAttributeName,
-													attr, TD_SYNTAX_COLORING_MODE_ATTR,
-													nil];
-
-
+											   col, NSForegroundColorAttributeName,
+											   attr, TD_SYNTAX_COLORING_MODE_ATTR,
+											   nil];
+		
+		
 		int							vStartOffs = 0;
-
+		
 		[vScanner setCaseSensitive:YES];
 		
 		// Skip any leading whitespace chars, somehow NSScanner doesn't do that:
@@ -712,13 +717,14 @@
 			
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, [ident length] )];
-				
+			
 			[progress animate:nil];
 		}
 		
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		// Just ignore it, syntax coloring isn't that important.
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) shiftLeft:(id)sender
@@ -750,7 +756,7 @@
 {
 	NSString* originalText = [[self textStorage] string];
 	NSRange	theSelection   = [self selectedRange];
-
+	
 	NSRange paragraphRange = [self selectionRangeForProposedRange:theSelection granularity:NSSelectByParagraph];
 	NSArray* lines = [[originalText substringWithRange:paragraphRange] componentsSeparatedByString:@"\n"];
 	NSMutableArray* newLines = [NSMutableArray array];

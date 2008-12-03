@@ -32,27 +32,27 @@ const struct {
 	unsigned long Register;
 	unsigned long Memory;
 } kSnoCrateBaseAddress[]={
-	{0x00002800, 	0x01400000},	//0
-	{0x00003000,	0x01800000},	//1
-	{0x00003800,	0x01c00000},	//2
-	{0x00004000,	0x02000000},	//3
-	{0x00004800,	0x02400000},	//4
-	{0x00005000,	0x02800000},	//5
-	{0x00005800,	0x02c00000},	//6
-	{0x00006000,	0x03000000},	//7
-	{0x00006800,	0x03400000},	//8
-	{0x00007800,	0x03C00000},	//9
-	{0x00008000,	0x04000000},	//10
-	{0x00008800,	0x04400000},	//11
-	{0x00009000,	0x04800000},	//12
-	{0x00009800,	0x04C00000},	//13
-	{0x0000a000,	0x05000000},	//14
-	{0x0000a800,	0x05400000},	//15
-	{0x0000b000,	0x05800000},	//16
-	{0x0000b800,	0x05C00000},	//17
-	{0x0000c000,	0x06000000},	//18
-	//{0x0000c800,	0x06400000}	//crate 19 is really at 0xd000
-	{0x0000d000,	0x06800000}		//19
+{0x00002800, 	0x01400000},	//0
+{0x00003000,	0x01800000},	//1
+{0x00003800,	0x01c00000},	//2
+{0x00004000,	0x02000000},	//3
+{0x00004800,	0x02400000},	//4
+{0x00005000,	0x02800000},	//5
+{0x00005800,	0x02c00000},	//6
+{0x00006000,	0x03000000},	//7
+{0x00006800,	0x03400000},	//8
+{0x00007800,	0x03C00000},	//9
+{0x00008000,	0x04000000},	//10
+{0x00008800,	0x04400000},	//11
+{0x00009000,	0x04800000},	//12
+{0x00009800,	0x04C00000},	//13
+{0x0000a000,	0x05000000},	//14
+{0x0000a800,	0x05400000},	//15
+{0x0000b000,	0x05800000},	//16
+{0x0000b800,	0x05C00000},	//17
+{0x0000c000,	0x06000000},	//18
+//{0x0000c800,	0x06400000}	//crate 19 is really at 0xd000
+{0x0000d000,	0x06800000}		//19
 };
 
 
@@ -78,9 +78,9 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     if(powerOff){
         NSAttributedString* s = [[[NSAttributedString alloc] initWithString:@"No Pwr"
                                                                  attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                     [NSColor redColor],NSForegroundColorAttributeName,
-                                                                     [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
-                                                                     nil]] autorelease]; 
+																			 [NSColor redColor],NSForegroundColorAttributeName,
+																			 [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+																			 nil]] autorelease]; 
         [s drawAtPoint:NSMakePoint(25,5)];
     }
     
@@ -103,9 +103,9 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     [i release];
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:OROrcaObjectImageChanged
-                              object:self];
-
+	 postNotificationName:OROrcaObjectImageChanged
+	 object:self];
+	
 }
 
 - (void) makeMainController
@@ -141,10 +141,10 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     while(anObject = [e nextObject]){
 		[anObject guardian:self positionConnectorsForCard:anObject];
     }
-
+	
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORSNOCrateSlotChanged
-                              object:self];
+	 postNotificationName:ORSNOCrateSlotChanged
+	 object:self];
 }
 
 - (int) slot
@@ -218,12 +218,12 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	
 	[super registerNotificationObservers];
-	   
+	
     [notifyCenter addObserver : self
                      selector : @selector(viewChanged:)
                          name : ORSNOCardSlotChanged
                        object : nil];
-
+	
 }
 
 - (NSString*) identifier
@@ -244,15 +244,16 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	[proxyFec32 setGuardian:self];
 	for(card=0;card<kNumSNOCards;card++){
 		BOOL xl2OK = YES;
-		NS_DURING
+		@try {
 			[[self xl2] selectCards:1L<<card];	
-		NS_HANDLER
-		xl2OK = NO;
+		}
+		@catch(NSException* localException) {
+			xl2OK = NO;
 			NSLog(@"Unable to reach XL2 in crate: %d (Not inited?)\n",[self crateNumber]);
-		NS_ENDHANDLER
+		}
 		if(!xl2OK)break;
 		
-		NS_DURING
+		@try {
 			[proxyFec32 setSlot:card];
 			NSString* boardID = [proxyFec32 performBoardIDRead:MC_BOARD_ID_INDEX];
 			if(![boardID isEqual: @"0000"]){
@@ -265,9 +266,10 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 				[aFec32 release];
 			}
 			else NSLog(@"BadID (%@)\n",boardID);
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLog(@"Slot: %d BoardID: ----\n",card);
-		NS_ENDHANDLER
+		}
 	}
 	[proxyFec32 release];
 	[[self xl2] deselectCards];	
@@ -281,7 +283,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
     
     [self setSlot:[decoder decodeIntForKey:@"slot"]];
 	[[self undoManager] enableUndoRegistration];
-	    
+	
     return self;
 }
 
@@ -298,7 +300,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 - (void) initCrate:(BOOL) loadTheFEC32XilinxFile
 {
 	
-	NS_DURING
+	@try {
 		// Now perfom a crate level initialization
 		[[self xl2] reset];			// STEP 1
 		[[self xl2] loadTheClocks]; // STEP 2
@@ -306,21 +308,22 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 		// STEP 3 - don't load Xilinx if this crate is supplying HV
 		if(loadTheFEC32XilinxFile){
 			//MAH TBC implement this check somehow
-//			if( theHVStatus.IsThisSNOCrateSupplyingHV(its_SC_Number) ) {
-//				SetStatustoWarningStyle();
-//				StatusPrintf("Can not load Xilinx on crate %d",its_SC_Number);
-//				StatusPrintf("As the crate is supplying HV!!");
-//				StatusPrintf("Xilinx load skipped for crate %d",its_SC_Number);
-//				RestoreStatusStyle();
-//			}
-//			else {
-				[[self xl2] loadTheXilinx];
-//			}
+			//			if( theHVStatus.IsThisSNOCrateSupplyingHV(its_SC_Number) ) {
+			//				SetStatustoWarningStyle();
+			//				StatusPrintf("Can not load Xilinx on crate %d",its_SC_Number);
+			//				StatusPrintf("As the crate is supplying HV!!");
+			//				StatusPrintf("Xilinx load skipped for crate %d",its_SC_Number);
+			//				RestoreStatusStyle();
+			//			}
+			//			else {
+			[[self xl2] loadTheXilinx];
+			//			}
 		}
-
-	NS_HANDLER		
+		
+	}
+	@catch(NSException* localException) {		
 		NSLog(@"Crate %d init failed\n",[self crateNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 

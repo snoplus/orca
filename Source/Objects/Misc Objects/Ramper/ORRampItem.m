@@ -60,7 +60,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	self = [super init];
 	owner = anOwner;
 	[self setWayPoints:[NSMutableArray array]];
-
+	
 	int i;
 	for(i=0;i<5;i++){
 		ORWayPoint* p = [[ORWayPoint alloc] initWithPosition:NSMakePoint(i*50,i*50)];
@@ -170,7 +170,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setDownRampPath:downRampPath];
     
     downRampPath = aDownRampPath;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemDownRampPathChanged object:self];
 }
 
@@ -185,7 +185,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setDownRate:downRate];
     
     downRate = aDownRate;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemDownRateChanged object:self];
 }
 
@@ -312,8 +312,8 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	targetName = [aName copy];
     
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORRampItemTargetNameChanged
-						  object:self];
+	 postNotificationName:ORRampItemTargetNameChanged
+	 object:self];
 }
 
 - (NSString*) parameterName
@@ -328,8 +328,8 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	parameterName = [aName copy];
     
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORRampItemParameterNameChanged
-						  object:self];
+	 postNotificationName:ORRampItemParameterNameChanged
+	 object:self];
 }
 
 - (int) crateNumber
@@ -347,8 +347,8 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	[self placeCurrentValue];
     
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORRampItemCrateNumberChanged
-						  object:self];
+	 postNotificationName:ORRampItemCrateNumberChanged
+	 object:self];
 }
 
 - (int) cardNumber
@@ -364,11 +364,11 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
     
 	[self checkTargetObject];
 	[self placeCurrentValue];
-
+	
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORRampItemCardNumberChanged
-						  object:self];
-						  
+	 postNotificationName:ORRampItemCardNumberChanged
+	 object:self];
+	
 }
 
 - (int) channelNumber
@@ -387,8 +387,8 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	[self placeCurrentValue];
 	
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORRampItemChannelNumberChanged
-						  object:self];
+	 postNotificationName:ORRampItemChannelNumberChanged
+	 object:self];
 }
 
 - (NSArray*) parameterList
@@ -421,14 +421,14 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		}
 	}
 	
-
+	
 	NSArray* objects = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(targetName)];
 	if([objects count]){
 		[self loadParams:[objects lastObject]];
 		[self setProxyObject:[objects lastObject]];
 	}
 	[self loadParameterObject];
-
+	
 }
 
 - (void) loadTargetObject
@@ -479,7 +479,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		else [self setParameterList:nil];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRamperModelParametersChanged object:self];
-
+	
 }
 
 - (NSArray*) rampableParametersForTarget:(id)aTarget
@@ -508,7 +508,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 - (void) setMiscAttributes:(NSMutableDictionary*)someAttributes forKey:(NSString*)aKey
 {
 	if(!aKey || !someAttributes)return;
-
+	
 	if(!miscAttributes)  miscAttributes = [[NSMutableDictionary alloc] init];
 	
 	NSMutableDictionary* oldAttrib = [miscAttributes objectForKey:aKey];
@@ -519,7 +519,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemMiscAttributesChanged 
 														object:self
-														userInfo:[NSDictionary dictionaryWithObject:aKey forKey:ORRampItemMiscAttributeKey]];    
+													  userInfo:[NSDictionary dictionaryWithObject:aKey forKey:ORRampItemMiscAttributeKey]];    
 }
 - (void) setXAxisIgnoreMouse:(BOOL)flag
 {
@@ -532,15 +532,15 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (void) placeCurrentValue
 {
-
+	
 	if(!targetObject)[self loadTargetObject];
 	if(!parameterObject)[self loadParameterObject];
-
+	
 	if(!parameterObject || !targetObject) return;
 	
 	int n = [wayPoints count];
 	int i;
-
+	
 	SEL targetGetter = [parameterObject getMethodSelector];
 	
 	NSInvocation* invGet = [NSInvocation invocationWithMethodSignature:[targetObject methodSignatureForSelector:targetGetter]];
@@ -629,7 +629,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		[aWayPoint setXyPosition:NSMakePoint(oldX,oldY * scaleFactor)];
 	}
 	if(scaleTarget)[self setRampTarget:rampTarget*scaleFactor];
-		
+	
 	[self placeCurrentValue];	
 }
 
@@ -694,7 +694,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	if(!parameterObject)[self loadParameterObject];
 	
 	if(!parameterObject || !targetObject) return;
-
+	
 	running = YES;
 	if(panic || rampTarget < [currentWayPoint xyPosition].y)dir = -1;
 	else dir = 1;
@@ -727,17 +727,17 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	invocationForSetter = [[NSInvocation invocationWithMethodSignature:[targetObject methodSignatureForSelector:targetSetter]] retain];
 	[invocationForSetter setSelector:targetSetter];
 	[invocationForSetter setTarget:targetObject];
-
+	
 	SEL targetGetter = [parameterObject getMethodSelector];
 	invocationForGetter = [[NSInvocation invocationWithMethodSignature:[targetObject methodSignatureForSelector:targetGetter]] retain];
 	[invocationForGetter setSelector:targetGetter];
 	[invocationForGetter setTarget:targetObject];
-
+	
 	//get the starting value
 	//[invocationForGetter invoke];
 	//NSString* finalValue = [invocationForGetter returnValue];
 	//NSLog(@"Ramper %d: Started ramping %@ %@ channel %d %@ from %@ to %f.\n",[self uniqueIdNumber],[targetObject className],[targetObject identifier],channelNumber,[parameterObject name],finalValue,rampTarget);
-
+	
 	[owner startRamping:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemRunningChanged object:self];
 }
@@ -797,27 +797,28 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	[invocationForSetter setArgument:0 to:[NSNumber numberWithInt:channelNumber]];
 	[invocationForSetter setArgument:1 to:[NSNumber numberWithFloat:newValue]];
 	[invocationForSetter invoke];
-
+	
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemInc object:self];
 	if(done)[self stopRamper];
 	else 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemCurrentValueChanged object:self];
-
+	
 }
 
 - (void) loadHardware
 {
 	if(invocationForInit){
 		//load to hardware
-		NS_DURING
+		@try {
 			[invocationForInit invoke];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			[self stopRamper];
 			NSRunAlertPanel([localException name], @"%@\n\nRamp Stopped for %@", @"OK", nil, nil,
-                        localException,[self itemName]);
-		NS_ENDHANDLER
+							localException,[self itemName]);
+		}
 	}
-
+	
 }
 
 - (void) stopRamper
@@ -828,18 +829,18 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
 		running = NO;
 		panic = NO;
-
+		
 		//[invocationForGetter invoke];
 		//NSString* finalValue = [invocationForGetter returnValue];
 		//id targetObject;// = [[[readOutList children] objectAtIndex:0] object];
 		//NSLog(@"Ramper %d: Stopped ramping %@ %@ channel %d %@ Final Value = %@. Target was %f\n",[self uniqueIdNumber],[targetObject className],[targetObject identifier],channelNumber,[parameterObject name],finalValue,rampTarget);
-
+		
 		[invocationForGetter release];
 		invocationForGetter = nil;
 		
 		[invocationForSetter release];
 		invocationForSetter = nil;
-
+		
 		[invocationForInit release];
 		invocationForInit = nil;
 		[self placeCurrentValue];
@@ -852,11 +853,11 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 {
 	NSString* ident = [NSString stringWithFormat:@"%@",targetName];
 	if( (targetObject && [targetObject isKindOfClass:NSClassFromString(@"ORCard")]) || 
-		(proxyObject && [proxyObject isKindOfClass:NSClassFromString(@"ORCard")])){
+	   (proxyObject && [proxyObject isKindOfClass:NSClassFromString(@"ORCard")])){
 		ident = [ident stringByAppendingFormat:@",%d,%d,%d",crateNumber,cardNumber,channelNumber];
 	}
 	else ident = [ident stringByAppendingFormat:@",%d",crateNumber];
-
+	
 	return ident;
 }
 
@@ -945,17 +946,17 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	if(x2-x1 != 0){
 		float slope		= (y2-y1)/(x2-x1);
 		float intercept = (x2*y1 - x1*y2)/(x2-x1);
-	
+		
 		for(i=1;i<n-1;i++){
 			ORWayPoint* aWayPoint1 = [wayPoints objectAtIndex:i];
 			float x = startX + (deltaX * i);
 			float y = slope*x + intercept;
-		
+			
 			[aWayPoint1 setXyPosition:NSMakePoint(x,y)];
 		}
 	}	
 	[self placeCurrentValue];
-
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemForceUpdate object:self];
 }
 
@@ -987,9 +988,9 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		x = startX + (x2-x1)/pow(2.,e);
 	}	
 	[self placeCurrentValue];
-
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemForceUpdate object:self];
-
+	
 }
 
 
@@ -1017,10 +1018,10 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
     miscAttributes = [[decoder decodeObjectForKey:@"miscAttributes"] retain];
 	
     [[self undoManager] enableUndoRegistration];
-
+	
 	if(!wayPoints){
 		[self setWayPoints:[NSMutableArray array]];
-
+		
 		int i;
 		for(i=0;i<5;i++){
 			ORWayPoint* p = [[ORWayPoint alloc] initWithPosition:NSMakePoint(i*50,i*50)];
@@ -1052,9 +1053,9 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
     [encoder encodeBool:visible forKey:@"visible"];
     [encoder encodeBool:globalEnabled forKey:@"globalEnabled"];
 	[encoder encodeObject:miscAttributes forKey:@"miscAttributes"];
-
+	
 	[self loadProxyObjects];
-
+	
 }
 
 @end
@@ -1092,7 +1093,7 @@ NSString* ORWayPointChanged = @"ORWayPointChanged";
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-
+	
     [encoder encodeFloat:xyPosition.x forKey:@"positionX"];
     [encoder encodeFloat:xyPosition.y forKey:@"positionY"];
 }

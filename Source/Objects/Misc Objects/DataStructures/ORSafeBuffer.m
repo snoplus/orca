@@ -56,11 +56,12 @@
 {
 	id anObject = nil;
 	[bufferLock lock];
-	NS_DURING
+	@try {
 		if([self isFull])	anObject = [buffer objectAtIndex:(startIndex+index)%maxSize];
 		else				anObject = [buffer objectAtIndex:index];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	
 	[bufferLock unlock];
 	return anObject;
@@ -69,7 +70,7 @@
 - (void) addObject:(id) anObject
 {
 	[bufferLock lock];
-	NS_DURING
+	@try {
 		if([self isFull]){
 			[buffer replaceObjectAtIndex:startIndex withObject:anObject];
 			startIndex = (startIndex+1)%maxSize;
@@ -77,8 +78,9 @@
 		else {
 			[buffer addObject:anObject];
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	
 	[bufferLock unlock];
 }
@@ -87,11 +89,12 @@
 {
 	id anObject = nil;
 	[bufferLock lock];
-	NS_DURING
+	@try {
 		if([self isFull])	anObject = [buffer objectAtIndex:startIndex];
 		else				anObject = [buffer lastObject];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	
 	[bufferLock unlock];
 	return anObject;

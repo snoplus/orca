@@ -168,7 +168,7 @@ NSString* ORSBC_LAMLock						= @"ORSBC_LAMLock";
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)params
 {
     NSString* errorLocation = @"";
-    NS_DURING
+    @try {
 		if(busy){  
             
             //check if any data for the data stream
@@ -178,13 +178,13 @@ NSString* ORSBC_LAMLock						= @"ORSBC_LAMLock";
             //check if any userData for the Children
             int i;
 			//if(!params)params = [NSMutableDictionary dictionary];
-           // for(i=0;i<eCpuLAMStruct.numberUserInfoWords;i++){
+			// for(i=0;i<eCpuLAMStruct.numberUserInfoWords;i++){
             //    if(i< [variableNames count] && [variableNames objectAtIndex:i]!=nil){
             //        [params setObject:[NSNumber numberWithLong:eCpuLAMStruct.userInfoWord[i]] forKey:[variableNames objectAtIndex:i]];
             //    }
             //}
             
-           // macLAMStruct.lamAcknowledged_counter = eCpuLAMStruct.lamFired_counter;
+			// macLAMStruct.lamAcknowledged_counter = eCpuLAMStruct.lamFired_counter;
 			
 			errorLocation = @"Clearing LAM";
             busy = NO;
@@ -196,10 +196,11 @@ NSString* ORSBC_LAMLock						= @"ORSBC_LAMLock";
             
         }
         
-        NS_HANDLER
-            NSLogError(@"",@"LAM Exception Error",errorLocation,nil);
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"LAM Exception Error",errorLocation,nil);
+		[localException raise];
+	}
 }
 
 

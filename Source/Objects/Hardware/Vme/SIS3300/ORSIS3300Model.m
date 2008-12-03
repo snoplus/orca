@@ -51,8 +51,8 @@ NSString* ORSIS3300ModelThresholdChanged		= @"ORSIS3300ModelThresholdChanged";
 NSString* ORSIS3300ModelThresholdArrayChanged	= @"ORSIS3300ModelThresholdArrayChanged";
 NSString* ORSIS3300ModelLtGtChanged				= @"ORSIS3300ModelLtGtChanged";
 
- // Bits in the data acquisition control register:
- //
+// Bits in the data acquisition control register:
+//
 #define kSISSampleBank1On        0x00000001
 #define kSISSampleBank2On        0x00000002
 #define kSISEnableHiRARCM        0x00000008
@@ -119,27 +119,27 @@ NSString* ORSIS3300ModelLtGtChanged				= @"ORSIS3300ModelLtGtChanged";
 #pragma mark •••Static Declarations
 //offsets from the base address
 static unsigned long register_offsets[kNumberOfSIS3300Registers] = {
-	0x00, // [] Control/Status
-	0x10, // [] Acquistion Control 
-	0x14, // [] Start Delay Clocks
-	0x18, // [] Start Delay Clocks
-	0x20, // [] General Reset
-	0x30, // [] Start Sampling
-	0x34, // [] Stop Sampling
+0x00, // [] Control/Status
+0x10, // [] Acquistion Control 
+0x14, // [] Start Delay Clocks
+0x18, // [] Start Delay Clocks
+0x20, // [] General Reset
+0x30, // [] Start Sampling
+0x34, // [] Stop Sampling
 };
 
 static unsigned long thresholdRegOffsets[4]={
-	0x00200004,
-	0x00280004,
-	0x00300004,
-	0x00380004
+0x00200004,
+0x00280004,
+0x00300004,
+0x00380004
 };
 
 static unsigned long eventRegOffsets[4]={
-	0x00200008,
-	0x00280008,
-	0x00300008,
-	0x00380008
+0x00200008,
+0x00280008,
+0x00300008,
+0x00380008
 };
 
 #pragma mark ***Initialization
@@ -187,7 +187,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setAutoStart:autoStart];
     
     autoStart = aAutoStart;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelAutoStartChanged object:self];
 }
 
@@ -201,7 +201,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setMultiEventMode:multiEventMode];
     
     multiEventMode = aMultiEventMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelMultiEventModeChanged object:self];
 }
 
@@ -215,7 +215,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setPageWrap:pageWrap];
     
     pageWrap = aPageWrap;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelPageWrapChanged object:self];
 }
 
@@ -229,7 +229,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setStopTrigger:stopTrigger];
     
     stopTrigger = aStopTrigger;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelStopTriggerChanged object:self];
 }
 
@@ -243,7 +243,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setP2StartStop:p2StartStop];
     
     p2StartStop = ap2StartStop;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelP2StartStopChanged object:self];
 }
 
@@ -257,7 +257,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setLemoStartStop:lemoStartStop];
     
     lemoStartStop = aLemoStartStop;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelLemoStartStopChanged object:self];
 }
 
@@ -271,7 +271,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setRandomClock:randomClock];
     
     randomClock = aRandomClock;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelRandomClockChanged object:self];
 }
 
@@ -285,7 +285,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setGateMode:gateMode];
     
     gateMode = aGateMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelGateModeChanged object:self];
 }
 
@@ -299,7 +299,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setStartDelayEnabled:startDelayEnabled];
     
     startDelayEnabled = aStartDelayEnabled;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelStartDelayEnabledChanged object:self];
 }
 
@@ -313,7 +313,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setStopDelayEnabled:stopDelayEnabled];
     
     stopDelayEnabled = aStopDelayEnabled;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelStopDelayEnabledChanged object:self];
 }
 
@@ -327,7 +327,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setStopDelay:stopDelay];
     
     stopDelay = aStopDelay;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelStopDelayChanged object:self];
 }
 
@@ -341,7 +341,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setStartDelay:startDelay];
     
     startDelay = aStartDelay;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelStartDelayChanged object:self];
 }
 - (int) clockSource
@@ -354,7 +354,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setClockSource:clockSource];
     
     clockSource = aClockSource;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelClockSourceChanged object:self];
 }
 
@@ -369,7 +369,7 @@ static unsigned long eventRegOffsets[4]={
     [[[self undoManager] prepareWithInvocationTarget:self] setPageSize:pageSize];
     
     pageSize = aPageSize;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelPageSizeChanged object:self];
 }
 
@@ -385,8 +385,8 @@ static unsigned long eventRegOffsets[4]={
     waveFormRateGroup = newRateGroup;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORSIS3300RateGroupChangedNotification
-                      object:self];    
+	 postNotificationName:ORSIS3300RateGroupChangedNotification
+	 object:self];    
 }
 
 - (id) rateObject:(int)channel
@@ -455,7 +455,7 @@ static unsigned long eventRegOffsets[4]={
 
 - (void) setLtGtMask:(long)aMask	
 { 
-   [[[self undoManager] prepareWithInvocationTarget:self] setLtGtMask:ltGtMask];
+	[[[self undoManager] prepareWithInvocationTarget:self] setLtGtMask:ltGtMask];
 	ltGtMask = aMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelLtGtChanged object:self];
 }
@@ -466,7 +466,7 @@ static unsigned long eventRegOffsets[4]={
 	if(aValue)aMask |= (1<<chan);
 	else aMask &= ~(1<<chan);
 	[self setLtGtMask:aMask];
- }
+}
 
 
 - (NSMutableArray*) thresholds
@@ -483,8 +483,8 @@ static unsigned long eventRegOffsets[4]={
     thresholds = someThresholds;
 	
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORSIS3300ModelThresholdArrayChanged
-					  object:self];
+	 postNotificationName:ORSIS3300ModelThresholdArrayChanged
+	 object:self];
 }
 
 - (int) threshold:(short)aChan
@@ -496,10 +496,10 @@ static unsigned long eventRegOffsets[4]={
 { 
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
     [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
-		
+	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORSIS3300ModelThresholdChanged
-						  object:self];
+	 postNotificationName:ORSIS3300ModelThresholdChanged
+	 object:self];
 }
 
 
@@ -508,13 +508,13 @@ static unsigned long eventRegOffsets[4]={
 #pragma mark •••Hardware Access
 - (void) writeControlStatusRegister
 {
-   //   LED off, Output is trigger. Trigger output is univerted.
-   //   Trigger on armed if trigger is start, or armed and started if trigger
-   //   is stop.
-   unsigned long csrmask = kSISLedOff | kSISUserOutputOff | kSISEnableTriggerOutput | kSISNormalTriggerOutput;
-   if(stopTrigger)	csrmask |= kSISTriggerOnArmedAndStarted;
-   else				csrmask |= kSISTriggerOnArmed;
-   
+	//   LED off, Output is trigger. Trigger output is univerted.
+	//   Trigger on armed if trigger is start, or armed and started if trigger
+	//   is stop.
+	unsigned long csrmask = kSISLedOff | kSISUserOutputOff | kSISEnableTriggerOutput | kSISNormalTriggerOutput;
+	if(stopTrigger)	csrmask |= kSISTriggerOnArmedAndStarted;
+	else				csrmask |= kSISTriggerOnArmed;
+	
 	[[self adapter] writeLongBlock:&csrmask
                          atAddress:[self baseAddress] + register_offsets[kControlStatus]
                         numToWrite:1
@@ -533,7 +533,7 @@ static unsigned long eventRegOffsets[4]={
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-					 
+	
 	unsigned long aMask = 0x0;
 	
 	aMask |= (clockSource << kSISClockSetShiftCount) ;			//set the clock source
@@ -544,10 +544,10 @@ static unsigned long eventRegOffsets[4]={
 	if(stopDelayEnabled)	aMask |= kSISStopDelayOn;			//set Extern Start Delay Enable
 	if(multiEventMode)		aMask |= kSISMultiEventOn;			//set MultiEvent Enable
 	if(multiEventMode & autoStart)		aMask |= kSISAutostartOn;	//set AutoStart Enable (only if in multiEvent)
-
+	
 	if(randomClock)			aMask |= kSISEnableRandomClock;		//set Extern Random Clock Enable
-   
-
+	
+	
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:[self baseAddress] + register_offsets[kAcquisitionControlReg]
                         numToWrite:1
@@ -582,7 +582,7 @@ static unsigned long eventRegOffsets[4]={
 - (void) writeStopDelay
 {
 	unsigned long aValue = startDelay;
-
+	
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + register_offsets[kStopDelay]
                         numToWrite:1
@@ -627,7 +627,7 @@ static unsigned long eventRegOffsets[4]={
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-
+	
 }
 
 - (void) startSampling
@@ -651,20 +651,20 @@ static unsigned long eventRegOffsets[4]={
 }
 
 - (unsigned long) eventNumber:(int) bank
- {
+{
 	//Note, here banks are 0,1,2,3 NOT 1,2,3,4
 	unsigned long eventNumber = 0x0;   
 	[[self adapter] readLongBlock:&eventNumber
-                         atAddress:[self baseAddress] + eventRegOffsets[bank]
+						atAddress:[self baseAddress] + eventRegOffsets[bank]
                         numToRead:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	
+	
+	return eventNumber;
+}
 
- 
-   return eventNumber;
- }
- 
- 
+
 - (void) clearDaq
 {
  	unsigned long aValue = kSISSampleBank1On;
@@ -714,7 +714,7 @@ static unsigned long eventRegOffsets[4]={
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
- 
+
 - (void) writeThresholds
 {   
 	int tchan = 0;
@@ -730,13 +730,13 @@ static unsigned long eventRegOffsets[4]={
 		tchan++;
 		
 		unsigned long aValue = (odd_thresh << kSISTHRChannelShift) | even_thresh;
-
+		
 		[[self adapter] writeLongBlock:&aValue
-							atAddress:[self baseAddress] + thresholdRegOffsets[i]
+							 atAddress:[self baseAddress] + thresholdRegOffsets[i]
 							numToWrite:1
 							withAddMod:[self addressModifier]
-						usingAddSpace:0x01];
-
+						 usingAddSpace:0x01];
+		
 	}
 }
 
@@ -752,88 +752,88 @@ static unsigned long eventRegOffsets[4]={
 
 
 /*
-- (unsigned int) readAGroup(void*) pbuffer,
-                           volatile unsigned long* pAddressReg,
-                           unsigned long           nBase)
-{
-
---------------------------------------------------------------
-Function to read a full event. This breaks into these cases:
---pageWrap false. 
-	In this case, the event directory entry determines the end of the event 
-	as well as the number of samples. 
-	Note that we assume that the wrap bit in the event directory allows us 
-	to differentiate between 0 samples and 128Ksamples.
-	
---pageWrap true, but the event directory wrap bit is false. 
-	Again, the number of samples is determined by the address pointer.
-	
---pageWrap true and event directory wrap bit is true. 
-	In this case, a full m_nPagesize samples have been taken and the address pointer 
-	indicates the start of event. The data procede circularly in the first m_nPagesize 
-	words of the buffer memory since we don't support multi-event mode yet.
---------------------------------------------------------------
-*/
+ - (unsigned int) readAGroup(void*) pbuffer,
+ volatile unsigned long* pAddressReg,
+ unsigned long           nBase)
+ {
+ 
+ --------------------------------------------------------------
+ Function to read a full event. This breaks into these cases:
+ --pageWrap false. 
+ In this case, the event directory entry determines the end of the event 
+ as well as the number of samples. 
+ Note that we assume that the wrap bit in the event directory allows us 
+ to differentiate between 0 samples and 128Ksamples.
+ 
+ --pageWrap true, but the event directory wrap bit is false. 
+ Again, the number of samples is determined by the address pointer.
+ 
+ --pageWrap true and event directory wrap bit is true. 
+ In this case, a full m_nPagesize samples have been taken and the address pointer 
+ indicates the start of event. The data procede circularly in the first m_nPagesize 
+ words of the buffer memory since we don't support multi-event mode yet.
+ --------------------------------------------------------------
+ */
 /*	unsigned long nPagesize(m_nPagesize); // Max conversion count.
-	
-	// Decode the event directory entry:
-	
-	unsigned long  AddressRegister = *pAddressReg;
-	bool           fWrapped      = (*pAddressReg & EDIRWrapFlag ) != 0;
-	unsigned long  nEventEnd     = (*pAddressReg & EDIREndEventMask);
-	nEventEnd                   &= (nPagesize-1); // Wrap the pointer to pagesize
-	
-	unsigned long  nLongs(0);
-	unsigned long* Samples((unsigned long*)pbuffer);
-	
-	// The three cases above break into two cases: fWrapped true or not.
-	
-	if(fWrapped) {
-		//  Full set of samples... 
-		
-		nLongs = nPagesize;
-		
-		// Breaks down into two reads:
-		
-		// The first read is from nEventEnd -> nPagesize.
-		
-		int nReadSize = (nPagesize - nEventEnd);
-		if(nReadSize > 0) {
-			CVMEInterface::Read((void*)m_nFd,
-								nBase + nEventEnd*sizeof(long),
-								Samples,
-								nReadSize*sizeof(long));
-		}
-		
-		// The second read, if necessary, is from 0 ->nEventEnd-1.
-		
-		unsigned long nOffset =  nReadSize; // Offset into Samples where data goes.
-		nReadSize = nPagesize - nReadSize;  // Size of remaining read.
-		if(nReadSize > 0) {
-			CVMEInterface::Read((void*)m_nFd,
-								nBase,
-								&(Samples[nOffset]),
-								nReadSize*sizeof(long));
-		}
-		nLongs = nPagesize;
-	}
-	else {                        
-		// Only 0 - nEventEnd to read...
-		if(nEventEnd > 0) {
-			CVMEInterface::Read((void*)m_nFd,
-								nBase, Samples, 
-								(nEventEnd*sizeof(long)));
-			nLongs = nEventEnd;
-		} 
-		else {                      // nothing to read...
-			nLongs = 0;
-		}
-	}
-	
-	return nLongs*sizeof(unsigned long)/sizeof(unsigned short);
-	
-}
-*/
+ 
+ // Decode the event directory entry:
+ 
+ unsigned long  AddressRegister = *pAddressReg;
+ bool           fWrapped      = (*pAddressReg & EDIRWrapFlag ) != 0;
+ unsigned long  nEventEnd     = (*pAddressReg & EDIREndEventMask);
+ nEventEnd                   &= (nPagesize-1); // Wrap the pointer to pagesize
+ 
+ unsigned long  nLongs(0);
+ unsigned long* Samples((unsigned long*)pbuffer);
+ 
+ // The three cases above break into two cases: fWrapped true or not.
+ 
+ if(fWrapped) {
+ //  Full set of samples... 
+ 
+ nLongs = nPagesize;
+ 
+ // Breaks down into two reads:
+ 
+ // The first read is from nEventEnd -> nPagesize.
+ 
+ int nReadSize = (nPagesize - nEventEnd);
+ if(nReadSize > 0) {
+ CVMEInterface::Read((void*)m_nFd,
+ nBase + nEventEnd*sizeof(long),
+ Samples,
+ nReadSize*sizeof(long));
+ }
+ 
+ // The second read, if necessary, is from 0 ->nEventEnd-1.
+ 
+ unsigned long nOffset =  nReadSize; // Offset into Samples where data goes.
+ nReadSize = nPagesize - nReadSize;  // Size of remaining read.
+ if(nReadSize > 0) {
+ CVMEInterface::Read((void*)m_nFd,
+ nBase,
+ &(Samples[nOffset]),
+ nReadSize*sizeof(long));
+ }
+ nLongs = nPagesize;
+ }
+ else {                        
+ // Only 0 - nEventEnd to read...
+ if(nEventEnd > 0) {
+ CVMEInterface::Read((void*)m_nFd,
+ nBase, Samples, 
+ (nEventEnd*sizeof(long)));
+ nLongs = nEventEnd;
+ } 
+ else {                      // nothing to read...
+ nLongs = 0;
+ }
+ }
+ 
+ return nLongs*sizeof(unsigned long)/sizeof(unsigned short);
+ 
+ }
+ */
 #pragma mark •••Data Taker
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
@@ -854,11 +854,11 @@ Function to read a full event. This breaks into these cases:
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORSIS33004WaveformDecoder",            @"decoder",
-        [NSNumber numberWithLong:dataId],        @"dataId",
-        [NSNumber numberWithBool:YES],           @"variable",
-        [NSNumber numberWithLong:-1],			 @"length",
-        nil];
+								 @"ORSIS33004WaveformDecoder",            @"decoder",
+								 [NSNumber numberWithLong:dataId],        @"dataId",
+								 [NSNumber numberWithBool:YES],           @"variable",
+								 [NSNumber numberWithLong:-1],			 @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"SIS3300"];
     
     return dataDictionary;
@@ -885,7 +885,7 @@ Function to read a full event. This breaks into these cases:
     [p setSetMethod:@selector(setPageSize:) getMethod:@selector(pageSize)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Start Delay"];
     [p setFormat:@"##0" upperLimit:0xffff lowerLimit:0 stepSize:1 units:@""];
@@ -899,14 +899,14 @@ Function to read a full event. This breaks into these cases:
     [p setSetMethod:@selector(setStopDelay:) getMethod:@selector(stopDelay)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Clock Source"];
     [p setFormat:@"##0" upperLimit:7 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setClockSource:) getMethod:@selector(clockSource)];
     [p setActionMask:kAction_Set_Mask];
     [a addObject:p];
-
+	
 	
     [a addObject:[ORHWWizParam boolParamWithName:@"PageWrap" setter:@selector(setPageWrap:) getter:@selector(pageWrap)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"StopTrigger" setter:@selector(setStopTrigger:) getter:@selector(stopTrigger)]];
@@ -918,8 +918,8 @@ Function to read a full event. This breaks into these cases:
     [a addObject:[ORHWWizParam boolParamWithName:@"StopDelayEnabled" setter:@selector(setStopDelayEnabled:) getter:@selector(stopDelayEnabled)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"MultiEvent" setter:@selector(setMultiEventMode:) getter:@selector(multiEventMode)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"AutoStart" setter:@selector(setAutoStart:) getter:@selector(autoStart)]];
-
-
+	
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
     [p setFormat:@"##0" upperLimit:0x7fff lowerLimit:0 stepSize:1 units:@""];
@@ -996,11 +996,12 @@ Function to read a full event. This breaks into these cases:
 //**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NS_DURING
-	NS_HANDLER
+    @try {
+	}
+	@catch(NSException* localException) {
 		[self incExceptionCount];
-           [localException raise];
-	NS_ENDHANDLER
+		[localException raise];
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1012,7 +1013,7 @@ Function to read a full event. This breaks into these cases:
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-
+	
     /* The current hardware specific data is:               *
      *                                                      *
      * 0: FIFO state address                                *
@@ -1101,7 +1102,7 @@ Function to read a full event. This breaks into these cases:
     [self setPageSize:			[decoder decodeIntForKey:@"pageSize"]];
     [self setEnabledMask:		[decoder decodeInt32ForKey:@"enabledMask"]];
 	[self setThresholds:		[decoder decodeObjectForKey:@"thresholds"]];
-   
+	
     [self setWaveFormRateGroup:[decoder decodeObjectForKey:@"waveFormRateGroup"]];
     
     if(!waveFormRateGroup){
@@ -1110,7 +1111,7 @@ Function to read a full event. This breaks into these cases:
     }
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
-		      
+	
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -1137,8 +1138,8 @@ Function to read a full event. This breaks into these cases:
     [encoder encodeObject:thresholds		forKey:@"thresholds"];
 	
     [encoder encodeObject:waveFormRateGroup forKey:@"waveFormRateGroup"];
-
- }
+	
+}
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {

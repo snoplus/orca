@@ -32,7 +32,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"PulserDistrib"];
-
+	
 	return self;
 }
 
@@ -40,30 +40,30 @@
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {	
-
+	
 	[super registerNotificationObservers];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [notifyCenter addObserver : self
-                 selector : @selector(patternChanged:)
-                     name : ORPulserDistribPatternChangedNotification
-                   object : model];
-
+					 selector : @selector(patternChanged:)
+						 name : ORPulserDistribPatternChangedNotification
+					   object : model];
+	
     [notifyCenter addObserver : self
-                 selector : @selector(patternChanged:)
-                     name : ORPulserDistribPatternBitChangedNotification
-                   object : model];
-
-   [notifyCenter addObserver : self
-                 selector : @selector(disableForPulserChanged:)
-                     name : ORPulserDisableForPulserChangedNotification
-                   object : model];
-					
-
+					 selector : @selector(patternChanged:)
+						 name : ORPulserDistribPatternBitChangedNotification
+					   object : model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(disableForPulserChanged:)
+						 name : ORPulserDisableForPulserChangedNotification
+					   object : model];
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(noisyEnvBroadcastEnabledChanged:)
                          name : ORPulserDistribNoisyEnvBroadcastEnabledChanged
 						object: model];
-
+	
 }
 - (void) disableForPulserChanged:(NSNotification*)aNotification
 {
@@ -116,15 +116,16 @@
 
 - (IBAction) loadAction:(id)sender
 {
-	NS_DURING
+	@try {
 	    NSLog(@"Loading Pulser Distribution Data\n");
 	    [model loadHardware:[model patternArray]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 	    NSLog(@"Load of Pulser Distribution Data FAILED.\n");
 	    NSRunAlertPanel([localException name], @"%@\nLoad of Pulser Distribution Data FAILED", @"OK", nil, nil,
                         localException);
 		
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) patternAction:(id)sender
@@ -152,7 +153,7 @@
 - (IBAction) disableForPulserAction:(id)sender
 {
 	[model setDisableForPulser:[sender state]];
-
+	
 }
 
 
