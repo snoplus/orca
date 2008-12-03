@@ -45,8 +45,8 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 - (void) makeConnectors
 {
 	ORConnector* connectorObj1 = [[ ORConnector alloc ] 
-							initAt: NSMakePoint( 0, [self frame].size.height-20 )
-					  withGuardian: self];
+								  initAt: NSMakePoint( 0, [self frame].size.height-20 )
+								  withGuardian: self];
 	[[ self connectors ] setObject: connectorObj1 forKey: ORADU200USBInConnection ];
 	[ connectorObj1 setConnectorType: 'USBI' ];
 	[ connectorObj1 addRestrictedConnectionType: 'USBO' ]; //can only connect to gpib outputs
@@ -54,8 +54,8 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 	[ connectorObj1 release ];
 	
 	ORConnector* connectorObj2 = [[ ORConnector alloc ] 
-								initAt: NSMakePoint( [self frame].size.width-kConnectorSize, 10 )
-						  withGuardian: self];
+								  initAt: NSMakePoint( [self frame].size.width-kConnectorSize, 10 )
+								  withGuardian: self];
 	[[ self connectors ] setObject: connectorObj2 forKey: ORADU200USBNextConnection ];
 	[ connectorObj2 setConnectorType: 'USBO' ];
 	[ connectorObj2 addRestrictedConnectionType: 'USBI' ]; //can only connect to gpib inputs
@@ -83,11 +83,11 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
-
+	@try {
+		
 		[self connectionChanged];
-
-	   //make sure the driver is installed.
+		
+		//make sure the driver is installed.
 		NSFileManager* fm = [NSFileManager defaultManager];
 		if(![fm fileExistsAtPath:kADU200DriverPath]){
 			NSLogColor([NSColor redColor],@"*** Unable To Locate ADU200 Driver ***\n");
@@ -99,9 +99,10 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 			[noDriverAlarm setAcknowledged:NO];
 			[noDriverAlarm postAlarm];
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
-
+	}
+	@catch(NSException* localException) {
+	}
+	
 }
 
 
@@ -285,8 +286,8 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 	[usbInterface setUsePipeType:kUSBInterrupt];
 	
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName: ORADU200ModelUSBInterfaceChanged
-						  object: self];
+	 postNotificationName: ORADU200ModelUSBInterfaceChanged
+	 object: self];
 	
 	if(usbInterface){
 		[noUSBAlarm clearAlarm];
@@ -532,7 +533,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 		[usbInterface writeBytesOnInterruptPipe:data length:8];
 	}
 }
-	
+
 #pragma mark ¥¥¥Bit Processing Protocol
 - (void)processIsStarting
 {
@@ -576,5 +577,5 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 {
     return [NSString stringWithFormat:@"ADU200,%d",[self serialNumber]];
 }
-	
+
 @end

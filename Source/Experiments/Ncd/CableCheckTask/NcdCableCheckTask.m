@@ -178,7 +178,7 @@ enum {
 }
 
 - (float)amplitude {
-
+	
     return amplitude;
 }
 
@@ -207,7 +207,7 @@ enum {
 
 - (int) numPulses
 {
-
+	
     return numPulses;
 }
 
@@ -309,7 +309,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setVerbose:verbose];
     verbose = flag;
     [verboseButton setState:verbose];
-
+	
 }
 
 #pragma mark ¥¥¥Actions
@@ -355,10 +355,10 @@ enum {
     if([objects count]){
         [self setThePDSModel:[objects objectAtIndex:0]];
         [self setPdsMemento :[thePDSModel memento]];  //save the old values
-
+		
         [thePDSModel setDisableForPulser:YES];
     }
-      
+	
     objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
     if([objects count]){
         [self setThePulserModel:[objects objectAtIndex:0]];
@@ -388,7 +388,7 @@ enum {
     }
     
     NSLog(@"Found %d tubes set for checking.\n",[tubeArray count]);
-
+	
     [self setNewValues];
     
     tubeIndex = 0;
@@ -427,18 +427,20 @@ enum {
     
     [self setMessage:@"Restore Pulser"];
     if(thePulserModel){
-		NS_DURING
+		@try {
 			[thePulserModel restoreFromMemento:pulserMemento];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
         [self setPulserMemento:nil];
     }
     [self setMessage:@"Restore PDS"];
     if(thePDSModel){
-		NS_DURING
+		@try {
 			[thePDSModel restoreFromMemento:pdsMemento];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
         [self setPdsMemento:nil];
     }
     [self setMessage:@"Idle"];
@@ -503,9 +505,9 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     self = [super initWithCoder:decoder];
     
     [NSBundle loadNibNamed: @"NcdCableCheckTask" owner: self];
-
+	
     [[self undoManager] disableUndoRegistration];
-
+	
     if([decoder decodeFloatForKey:NcdCableCheckAmplitude]){
         [self setAmplitude:[decoder decodeFloatForKey:NcdCableCheckAmplitude]];
         [self setWidth:[decoder decodeFloatForKey:NcdCableCheckWidth]];
@@ -553,7 +555,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     
     //must wait for the pulser to load waveform
     if([thePulserModel loading])return YES;
-
+	
     BOOL quit = NO;
     
     if(phase == kFindObjects){
@@ -565,20 +567,21 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
         [self setCurrentTube:[tubeArray objectAtIndex:tubeIndex]];  //get the next tube to work on
         
         [self setMessage:[NSString stringWithFormat:@" Checking %@ (%d/%d)",[currentTube objectForKey:@"kLabel"],tubeIndex+1,[tubeArray count]]];
-
+		
         [self findShaperForCurrentTube];
         [self findMuxForCurrentTube];
         [self findScopeForCurrentTube];
-
+		
         tubeIndex++;
         
-        NS_DURING
+        @try {
             [self loadPDSForCurrentTube];
             //[self pulsePulser];
-        NS_HANDLER
+		}
+		@catch(NSException* localException) {
             NSLogColor([NSColor redColor],@"Cable check task quit. Vme exception: %@\n",[localException name]);
             quit = YES;
-        NS_ENDHANDLER
+        }
         
         
         if(quit){
@@ -592,14 +595,14 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
                 
                 NSLog(@"%@ skipped (PDS out of range)\n",[currentTube objectForKey:@"kLabel"]);
                 [self setCurrentTube:nil];
-                    
+				
                 phase = kFindObjects;
             }
             else {
                 phase = kWait;
             }
         }
-
+		
     }
     
     else if(phase == kWait){
@@ -609,23 +612,24 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
             [self setLastTime:now];
             if(pulseCount>=numPulses)phase = kCheckObjects;
             else {
-                NS_DURING
+                @try {
                     [self pulsePulser];
-                NS_HANDLER
+				}
+				@catch(NSException* localException) {
                     NSLogColor([NSColor redColor],@"Cable check task quit because of Vme exception\n");
                     quit = YES;
-                NS_ENDHANDLER
+                }
             }
             
             if(quit){
                 [self finishUp];
                 return NO;
             }
-       }
+		}
     }
     
     else if(phase == kCheckObjects){
-    
+		
         [self checkCurrentShaper];
         [self checkCurrentMux];
         [self checkCurrentScope];
@@ -666,7 +670,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
         
         phase = kFindObjects;
     }
-
+	
     return YES;
 }
 
@@ -717,21 +721,21 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
         if(([currentShaper adcCount:currentShaperChannel] - startingShaperCounts)>=numPulses){
             shaperResult = kPassed;
             if(verbose)NSLog(@"%@ Shaper <0x%08x> slot: %d channel: %d passed. (counts: %d)\n",
-                    [currentTube objectForKey:@"kLabel"],
-                    [currentShaper baseAddress], 
-                    [currentShaper slot], 
-                    currentShaperChannel,
-                    [currentShaper adcCount:currentShaperChannel]-startingShaperCounts);
-
+							 [currentTube objectForKey:@"kLabel"],
+							 [currentShaper baseAddress], 
+							 [currentShaper slot], 
+							 currentShaperChannel,
+							 [currentShaper adcCount:currentShaperChannel]-startingShaperCounts);
+			
         }
         else {
             shaperResult = kFailed;
             if(verbose)NSLogColor([NSColor redColor],@"%@ Shaper <0x%08x> slot: %d channel: %d FAILED. (counts: %d)\n",
-                    [currentTube objectForKey:@"kLabel"],
-                    [currentShaper baseAddress], 
-                    [currentShaper slot], 
-                    currentShaperChannel,
-                    [currentShaper adcCount:currentShaperChannel]-startingShaperCounts);
+								  [currentTube objectForKey:@"kLabel"],
+								  [currentShaper baseAddress], 
+								  [currentShaper slot], 
+								  currentShaperChannel,
+								  [currentShaper adcCount:currentShaperChannel]-startingShaperCounts);
             passed = NO;
         }
     }
@@ -743,7 +747,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     [self setCurrentMux:nil channel:0];
     
     NSArray* allMuxes = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
-
+	
     int muxBox      = [[currentTube objectForKey:@"kMuxBusNum"] intValue];  //arggggggg!!!! they switched box/bus  
     int muxBus      = [[currentTube objectForKey:@"kMuxBoxNum"] intValue];  //arggggggg!!!! they switched box/bus
     int muxChannel  = [[currentTube objectForKey:@"kMuxChan"] intValue];
@@ -766,7 +770,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     else {
         startingMuxCounts = [currentMux rateCount:muxChannel];
     }
-
+	
 }
 
 - (void) checkCurrentMux
@@ -775,20 +779,20 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
         if(([currentMux rateCount:currentMuxChannel] - startingMuxCounts)>=numPulses){
             muxResult = kPassed;
             if(verbose)NSLog(@"%@ Mux <0x%08x>  box: %d channel: %d passed. (counts: %d)\n",
-                    [currentTube objectForKey:@"kLabel"],
-                    [currentMux busNumber], 
-                    [currentMux muxID], 
-                    currentMuxChannel,
-                    [currentMux rateCount:currentMuxChannel]-startingMuxCounts);
-       }
+							 [currentTube objectForKey:@"kLabel"],
+							 [currentMux busNumber], 
+							 [currentMux muxID], 
+							 currentMuxChannel,
+							 [currentMux rateCount:currentMuxChannel]-startingMuxCounts);
+		}
         else {
             muxResult = kFailed;
             if(verbose)NSLogColor([NSColor redColor],@"%@ Mux <0x%08x>  box: %d channel: %d FAILED. (counts: %d)\n",
-                    [currentTube objectForKey:@"kLabel"],
-                    [currentMux busNumber], 
-                    [currentMux muxID], 
-                    currentMuxChannel,
-                    [currentMux rateCount:currentMuxChannel]-startingMuxCounts);
+								  [currentTube objectForKey:@"kLabel"],
+								  [currentMux busNumber], 
+								  [currentMux muxID], 
+								  currentMuxChannel,
+								  [currentMux rateCount:currentMuxChannel]-startingMuxCounts);
             passed = NO;
         }
     }
@@ -807,7 +811,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     int scopeChannel  = [[currentTube objectForKey:@"kScopeChannel"] intValue];
     NSArray* allScopes = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"OROscBaseModel")];
     [self setCurrentScopes:allScopes channel:scopeChannel];
-        
+	
     if([allScopes count]==0){
         //if it's in the tube map it better a real object in the configuration
         //post error and raise exception
@@ -823,7 +827,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
             startingScopeCounts += [aScope eventCount:scopeChannel];
         }
     }
-
+	
 }
 
 - (void) setCurrentScopes:(NSArray*)someScopes channel:(int)aChannel;
@@ -844,20 +848,20 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
         while(aScope = [e nextObject]){
             currentScopeCounts += [aScope eventCount:currentScopeChannel];
         }
-
+		
         if((currentScopeCounts - startingScopeCounts)>=numPulses){
             scopeResult = kPassed;
             if(verbose)NSLog(@"%@ Scope channel: %d passed. (counts: %d)\n",
-                    [currentTube objectForKey:@"kLabel"],
-                    currentScopeChannel, 
-                    currentScopeCounts-startingScopeCounts);
+							 [currentTube objectForKey:@"kLabel"],
+							 currentScopeChannel, 
+							 currentScopeCounts-startingScopeCounts);
         }
         else {
             scopeResult = kFailed;
             if(verbose) NSLogColor([NSColor redColor],@"%@ Scope channel: %d FAILED. (counts: %d)\n",
-                    [currentTube objectForKey:@"kLabel"],
-                    currentScopeChannel, 
-                    currentScopeCounts-startingScopeCounts);
+								   [currentTube objectForKey:@"kLabel"],
+								   currentScopeChannel, 
+								   currentScopeCounts-startingScopeCounts);
             passed = NO;
         }
     }
@@ -884,15 +888,15 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
 
 - (void) loadPDSForCurrentTube
 {
-
-    NS_DURING
+	
+    @try {
         NSMutableArray* workingArray = [NSMutableArray arrayWithObjects:
-                                            [NSNumber numberWithLong:0],
-                                            [NSNumber numberWithLong:0],
-                                            [NSNumber numberWithLong:0],
-                                            [NSNumber numberWithLong:0],
-                                            nil];
-
+										[NSNumber numberWithLong:0],
+										[NSNumber numberWithLong:0],
+										[NSNumber numberWithLong:0],
+										[NSNumber numberWithLong:0],
+										nil];
+		
         unsigned short pdsBoard    = [[currentTube objectForKey:@"kPdsBoardNum"] intValue];
         unsigned short pdsChannel  = [[currentTube objectForKey:@"kPdsChan"] intValue];
         if(pdsBoard<4 && pdsChannel<16){
@@ -908,12 +912,13 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
         
         //load the mask to hardware...
         [thePDSModel loadHardware:workingArray];
-
-    NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
         passed = NO;
         NSLogColor([NSColor redColor],@"Vme exception for PDS.\n");
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) pulsePulser
@@ -927,7 +932,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     NSArray* allShapers = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
     [allShapers makeObjectsPerformSelector:@selector(restoreAllThresholds)];
     [allShapers makeObjectsPerformSelector:@selector(loadThresholds)];
-
+	
     NSArray* allMuxes = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
     [allMuxes makeObjectsPerformSelector:@selector(restoreAllThresholds)];
     [allMuxes makeObjectsPerformSelector:@selector(loadThresholdDacs)];
@@ -939,7 +944,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     [allShapers makeObjectsPerformSelector:@selector(saveAllThresholds)];
     [allShapers makeObjectsPerformSelector:@selector(setAllThresholdsTo:) withObject:[NSNumber numberWithFloat:shaperThreshold]];
     [allShapers makeObjectsPerformSelector:@selector(loadThresholds)];
-
+	
     NSArray* allMuxes = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"NcdMuxBoxModel")];
     [allMuxes makeObjectsPerformSelector:@selector(saveAllThresholds)];
     [allMuxes makeObjectsPerformSelector:@selector(setAllThresholdsTo:) withObject:[NSNumber numberWithFloat:muxThreshold]];

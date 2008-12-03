@@ -325,11 +325,11 @@ NSString* OR4ChanSpecialLock				= @"OR4ChanSpecialLock";
 - (NSMutableArray*) children {
     //methods exists to give common interface across all objects for display in lists
     return [NSMutableArray arrayWithObjects:
-        [triggerGroups objectAtIndex:0],
-        [triggerGroups objectAtIndex:1],
-        [triggerGroups objectAtIndex:2],
-        [triggerGroups objectAtIndex:3],
-        nil];
+			[triggerGroups objectAtIndex:0],
+			[triggerGroups objectAtIndex:1],
+			[triggerGroups objectAtIndex:2],
+			[triggerGroups objectAtIndex:3],
+			nil];
 }
 
 
@@ -439,11 +439,11 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"OR4ChanTriggerDecoderFor100MHzClock",   @"decoder",
-        [NSNumber numberWithLong:clockDataId],    @"dataId",
-        [NSNumber numberWithBool:NO],             @"variable",
-        [NSNumber numberWithLong:3],              @"length",
-        nil];
+								 @"OR4ChanTriggerDecoderFor100MHzClock",   @"decoder",
+								 [NSNumber numberWithLong:clockDataId],    @"dataId",
+								 [NSNumber numberWithBool:NO],             @"variable",
+								 [NSNumber numberWithLong:3],              @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"100MHz Clock"];
     
     return dataDictionary;
@@ -457,13 +457,13 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 			NSMutableArray* eventGroup = [NSMutableArray array];
 			if([self shipClock:i]){
 				NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-									[NSString stringWithFormat: @"100MHz Clock Record%d",i], @"name",
-									[NSNumber numberWithLong:clockDataId],  @"dataId",
-									[NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
-									[NSNumber numberWithLong:i],			@"value",
-									[NSNumber numberWithLong:0x7L<<24],		@"mask",
-									[NSNumber numberWithLong:24],			@"shift",
-										nil];
+											 [NSString stringWithFormat: @"100MHz Clock Record%d",i], @"name",
+											 [NSNumber numberWithLong:clockDataId],  @"dataId",
+											 [NSNumber numberWithLong:1],			@"secondaryIdWordIndex",
+											 [NSNumber numberWithLong:i],			@"value",
+											 [NSNumber numberWithLong:0x7L<<24],		@"mask",
+											 [NSNumber numberWithLong:24],			@"shift",
+											 nil];
 				[eventGroup addObject:aDictionary];
 			}
 			NSMutableDictionary* aDictionary = [NSMutableDictionary dictionary];
@@ -473,7 +473,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 			[anEventDictionary setObject:eventGroup forKey:@"OR4ChanTrigger Trigger"];	
 		}
 	}
-
+	
 }
 
 
@@ -492,11 +492,11 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
     
     //cache the data takers for alittle more speed
     dataTakers = [[NSArray arrayWithObjects:
-        [[triggerGroups objectAtIndex:0] allObjects],
-        [[triggerGroups objectAtIndex:1] allObjects],
-        [[triggerGroups objectAtIndex:2] allObjects],
-        [[triggerGroups objectAtIndex:3] allObjects],
-        nil] retain];
+				   [[triggerGroups objectAtIndex:0] allObjects],
+				   [[triggerGroups objectAtIndex:1] allObjects],
+				   [[triggerGroups objectAtIndex:2] allObjects],
+				   [[triggerGroups objectAtIndex:3] allObjects],
+				   nil] retain];
     
     controller = [[self adapter] controllerCard]; //cache the controller for alittle bit more speed.
     
@@ -543,7 +543,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 {
     NSString* errorLocation = @"";
     
-    NS_DURING
+    @try {
         // read the status register to check for an event
 		//there are four data child data takers. The status reg, however, starts with a 
 		//software latch at status bit 1. that's why the i+1 stuff below, because we never
@@ -581,11 +581,12 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
                 }
             }
         }
-        NS_HANDLER
-            NSLogError(@"",@"Four Channel Trigger Card Error",errorLocation,nil);
-            [self incExceptionCount];
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"Four Channel Trigger Card Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

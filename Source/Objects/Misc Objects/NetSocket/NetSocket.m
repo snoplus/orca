@@ -543,7 +543,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 		[mLock unlock];
 		return nil;
     }
-
+	
     
     // Read bytes from our incoming buffer
     [mIncomingBuffer replaceBytesInRange:NSMakeRange( 0, amountToRead ) withBytes:NULL length:0];
@@ -599,7 +599,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 		[mLock unlock];
 		return nil;
     }
-
+	
     
     // Create a new NSString from the read bytes using the specified encoding
     NSString* readString = [[[NSString alloc] initWithData:readData encoding:inEncoding] autorelease];
@@ -732,7 +732,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     struct sockaddr_in      address;
     socklen_t				addressLength = sizeof( address );
  	[mLock lock];
-   
+	
     // Get the native socket
     nativeSocket = [self nativeSocketHandle];
     if( nativeSocket < 0 ){
@@ -746,7 +746,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     }
     // Return local port
     int p =  ntohs( address.sin_port );
-		[mLock unlock];
+	[mLock unlock];
 	return p;
 }
 
@@ -763,7 +763,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 - (unsigned)incomingBufferLength
 {
  	[mLock lock];
-
+	
     int i =  [mIncomingBuffer length];
 	[mLock unlock];
 	return i;
@@ -868,15 +868,16 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     // Remember that we are now connected
     mSocketConnected = YES;
     
-	NS_DURING
+	@try {
 		// Notify our delegate that the socket has connected successfully
 		if( [mDelegate respondsToSelector:@selector( netsocketConnected: )] )
 			[mDelegate netsocketConnected:self];
-    
+		
 		// Attempt to write any data that has already been added to our outgoing buffer
 		[self _socketWriteData];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	[mLock unlock];
 }
 
@@ -916,7 +917,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     // Store the old incoming buffer length
     oldIncomingBufferLength = [mIncomingBuffer length];
     
-//    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc]init];
+	//    NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc]init];
     // Read in available data
     [self _socketReadData];
     
@@ -928,7 +929,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
             [mDelegate netsocket:self dataAvailable:[mIncomingBuffer length]];
         }
     }
-//    [thePool release]; 
+	//    [thePool release]; 
 	[mLock unlock];
 }
 
@@ -989,7 +990,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 		close( socketDescriptor );
     
  	[mLock unlock];
-   // Return NetSocket based on accepted connection
+	// Return NetSocket based on accepted connection
     return netsocket;
 }
 
@@ -1152,7 +1153,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 			bytesAvailable = 0;
     }
     
-		[mLock unlock];
+	[mLock unlock];
     return bytesAvailable;
 }
 

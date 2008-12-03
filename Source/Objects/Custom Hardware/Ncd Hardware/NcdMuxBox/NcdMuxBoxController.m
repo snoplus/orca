@@ -441,38 +441,40 @@
 -(IBAction) thresholdDacAction:(id)sender
 {
     if([sender intValue] != [model thresholdDac:[[sender selectedCell] tag]]){
-                     [[self undoManager] setActionName: @"Set Mux Threshold Dac"];
+		[[self undoManager] setActionName: @"Set Mux Threshold Dac"];
         [model setThresholdDac:[[sender selectedCell] tag] withValue:[sender intValue]];
     }
 }
 
 - (IBAction) readThresholdAction:(id)sender
 {
-    NS_DURING
-        [self endEditing];
-        [model readThresholds];
-        
-    NS_HANDLER
-        NSLog(@"Read of Mux %d Thresholds Failed.\n",[model muxID]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Read of Mux Thresholds.", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+    @try {
+		[self endEditing];
+		[model readThresholds];
+		
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Read of Mux %d Thresholds Failed.\n",[model muxID]);
+		NSRunAlertPanel([localException name], @"%@\nFailed Read of Mux Thresholds.", @"OK", nil, nil,
+						localException);
+    }
 }
 
 - (IBAction) initThresholdAction:(id)sender
 {
-    NS_DURING
-        [self endEditing];
-        [model loadThresholdDacs];
-        NSLog(@"Loaded Mux %d Thresholds\n",[model muxID]);
-        [model readThresholds];
+    @try {
+		[self endEditing];
+		[model loadThresholdDacs];
+		NSLog(@"Loaded Mux %d Thresholds\n",[model muxID]);
+		[model readThresholds];
 		[model checkThresholds];
-        
-    NS_HANDLER
-        NSLog(@"Load of Mux %d Thresholds Failed.\n",[model muxID]);
-        NSRunAlertPanel([localException name], @"%@\nFailed Load of Mux Thresholds.", @"OK", nil, nil,
-            localException);
-    NS_ENDHANDLER
+		
+    }
+	@catch(NSException* localException) {
+		NSLog(@"Load of Mux %d Thresholds Failed.\n",[model muxID]);
+		NSRunAlertPanel([localException name], @"%@\nFailed Load of Mux Thresholds.", @"OK", nil, nil,
+						localException);
+    }
 }
 
 - (IBAction) settingsLockAction:(id)sender
@@ -501,18 +503,18 @@
     [[self window] setContentView:blankView];
     switch([tabView indexOfTabViewItem:tabViewItem]){
         case 0: [self resizeWindowToSize:settingSize];      break;
-	case 1: [self resizeWindowToSize:rateSize];	    break;
-	case 2: [self resizeWindowToSize:calibrationSize];  break;
-	default:[self resizeWindowToSize:testingSize];      break;
+		case 1: [self resizeWindowToSize:rateSize];	    break;
+		case 2: [self resizeWindowToSize:calibrationSize];  break;
+		default:[self resizeWindowToSize:testingSize];      break;
     }
     [[self window] setContentView:tabView];
-            
+	
     NSString* key = [NSString stringWithFormat: @"orca.ORMuxBox%d.selectedtab",[model muxID]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
-        
+
 - (void) rateChanged:(NSNotification*)aNotification
 {
     ORRate* theRateObj = [aNotification object];
@@ -527,9 +529,9 @@
 {
     ORRateGroup* theRateObj = [aNotification object];
     if(aNotification == nil || [model rateGroup] == theRateObj){
-	
-	[totalRateText setFloatValue: [theRateObj totalRate]];
-	[totalRate setNeedsDisplay:YES];
+		
+		[totalRateText setFloatValue: [theRateObj totalRate]];
+		[totalRate setNeedsDisplay:YES];
     }
 }
 
@@ -542,14 +544,14 @@
 {
 	[scopeChanTextField setIntValue:[model scopeChan]];
 	[scopeChanStepper setIntValue:[model scopeChan]];
-
+	
 }
 
 
 - (void) integrationChanged:(NSNotification*)aNotification
 {
     ORRateGroup* theRateGroup = [aNotification object];
-		if(aNotification == nil || [model rateGroup] == theRateGroup || [aNotification object] == model){
+	if(aNotification == nil || [model rateGroup] == theRateGroup || [aNotification object] == model){
 		double dValue = [[model rateGroup] integrationTime];
 		[integrationStepper setDoubleValue:dValue];
 		[integrationText setDoubleValue: dValue];
@@ -567,7 +569,7 @@
 	
 	BOOL state = [[[model rateAttributes] objectForKey:ORAxisUseLog] boolValue];
 	[rateLogCB setState:state];
-
+	
 }
 
 - (void) totalRateAttributesChanged:(NSNotification*)aNote
@@ -607,7 +609,7 @@
 - (void) channelChanged:(NSNotification*)aNote
 {
 	[self updatePopUpButton:selectChannelPU setting:[model selectedChannel]];
-
+	
 }
 
 - (void) dacValueChanged:(NSNotification*)aNote
@@ -629,22 +631,22 @@
 - (void) scaleAction:(NSNotification*)aNotification
 {
     if(aNotification == nil || [aNotification object] == [rate0 xScale]){
-	[[self undoManager] setActionName: @"Set Mux Rate Attributes"];
-	[model setRateAttributes:[[rate0 xScale]attributes]];
+		[[self undoManager] setActionName: @"Set Mux Rate Attributes"];
+		[model setRateAttributes:[[rate0 xScale]attributes]];
     };
     if(aNotification == nil || [aNotification object] == [totalRate xScale]){
-	[[self undoManager] setActionName: @"Set Mux Total Rate Attributes"];
-	[model setTotalRateAttributes:[[totalRate xScale]attributes]];
+		[[self undoManager] setActionName: @"Set Mux Total Rate Attributes"];
+		[model setTotalRateAttributes:[[totalRate xScale]attributes]];
     };
     
     
     if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
-	[[self undoManager] setActionName: @"Set Mux Time Rate X Attributes"];
-	[model setTimeRateXAttributes:[[timeRatePlot xScale]attributes]];
+		[[self undoManager] setActionName: @"Set Mux Time Rate X Attributes"];
+		[model setTimeRateXAttributes:[[timeRatePlot xScale]attributes]];
     };
     if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
-	[[self undoManager] setActionName: @"Set Mux Time Rate Y Attributes"];
-	[model setTimeRateYAttributes:[[timeRatePlot yScale]attributes]];
+		[[self undoManager] setActionName: @"Set Mux Time Rate Y Attributes"];
+		[model setTimeRateYAttributes:[[timeRatePlot yScale]attributes]];
     };
     
 }
@@ -653,8 +655,8 @@
 {
     [self endEditing];
     if([sender doubleValue] != [[model rateGroup]integrationTime]){
-	[[self undoManager] setActionName: @"Set Integration Time"];
-	[model setIntegrationTime:[sender doubleValue]];
+		[[self undoManager] setActionName: @"Set Integration Time"];
+		[model setIntegrationTime:[sender doubleValue]];
     }
     
 }
@@ -662,27 +664,27 @@
 - (IBAction) rateUsesLogAction:(id)sender
 {
     if([sender state] != [[rate0 xScale] isLog]){
-	NSMutableDictionary* attributes = [[rate0 xScale]attributes];
-	[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
-	[model setRateAttributes:attributes];
+		NSMutableDictionary* attributes = [[rate0 xScale]attributes];
+		[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
+		[model setRateAttributes:attributes];
     }
     
 }
 - (IBAction) totalRateUsesLogAction:(id)sender
 {
     if([sender state] != [[totalRate xScale] isLog]){
-	NSMutableDictionary* attributes = [[totalRate xScale]attributes];
-	[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
-	[model setTotalRateAttributes:attributes];
+		NSMutableDictionary* attributes = [[totalRate xScale]attributes];
+		[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
+		[model setTotalRateAttributes:attributes];
     }
 }
 
 - (IBAction) timeRateUsesLogAction:(id)sender
 {
     if([sender state] != [[timeRatePlot yScale] isLog]){
-	NSMutableDictionary* attributes = [[timeRatePlot yScale]attributes];
-	[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
-	[model setTimeRateYAttributes:attributes];
+		NSMutableDictionary* attributes = [[timeRatePlot yScale]attributes];
+		[attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
+		[model setTimeRateYAttributes:attributes];
     }
 }
 - (IBAction) ping:(id)sender
@@ -693,8 +695,8 @@
 - (IBAction) channelAction:(id)sender
 {
     if([sender indexOfSelectedItem] != [model selectedChannel]){
-	[[self undoManager] setActionName: @"Set Selected Channel"];
-	[model setSelectedChannel:[sender indexOfSelectedItem]];
+		[[self undoManager] setActionName: @"Set Selected Channel"];
+		[model setSelectedChannel:[sender indexOfSelectedItem]];
     }
 }
 
@@ -702,8 +704,8 @@
 {
     [self endEditing];
     if([sender doubleValue] != [model dacValue]){
-	[[self undoManager] setActionName: @"Set Dac Value"];
-	[model setDacValue:[sender doubleValue]];
+		[[self undoManager] setActionName: @"Set Dac Value"];
+		[model setDacValue:[sender doubleValue]];
     }
 }
 
@@ -711,8 +713,8 @@
 {
     [self endEditing];
     if([sender intValue] != [model scopeChan]){
-	[[self undoManager] setActionName: @"Set Mux Scope Chan"];
-	[model setScopeChan:[sender intValue]];
+		[[self undoManager] setActionName: @"Set Mux Scope Chan"];
+		[model setScopeChan:[sender intValue]];
     }
 }
 
@@ -755,7 +757,7 @@
 	int i;
 	for(i=0;i<kNumMuxChannels-1;i++){
 	    if([[calibrationEnabledMatrix cellWithTag:i] state])
-	    mask |= 1<<i ;
+			mask |= 1<<i ;
 	}
 	[model setCalibrationEnabledMask:mask];
     // }
@@ -767,8 +769,8 @@
 {
     [self endEditing];
     if([sender intValue] != [model calibrationFinalDelta]){
-	[[self undoManager] setActionName: @"Set Calibration Final Level"];
-	[model setCalibrationFinalDelta:[sender intValue]];
+		[[self undoManager] setActionName: @"Set Calibration Final Level"];
+		[model setCalibrationFinalDelta:[sender intValue]];
     }
 }
 
@@ -796,8 +798,8 @@
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
 {
     if(set == 0){
-	int count = [[[model rateGroup]timeRate]count];
-	return [[[model rateGroup]timeRate]valueAtIndex:count-x-1];
+		int count = [[[model rateGroup]timeRate]count];
+		return [[[model rateGroup]timeRate]valueAtIndex:count-x-1];
     }
     return 0;
 }

@@ -165,8 +165,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     thresholdDacs = someThresholds;
     
     if(someThresholds)[[NSNotificationCenter defaultCenter]
-        postNotificationName:NcdMuxDacArrayChangedNotification
-                      object:self];
+					   postNotificationName:NcdMuxDacArrayChangedNotification
+					   object:self];
     
 }
 
@@ -235,8 +235,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     rateGroup = newRateGroup;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxRateGroupChangedNotification
-                      object:self];
+	 postNotificationName:ORMuxBoxRateGroupChangedNotification
+	 object:self];
 }
 
 - (unsigned long) rateCount:(unsigned short)index
@@ -269,8 +269,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     rateAttributes=[newRateAttributes retain];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxRateChangedNotification
-                      object:self];
+	 postNotificationName:ORMuxBoxRateChangedNotification
+	 object:self];
 }
 
 - (NSMutableDictionary*) totalRateAttributes
@@ -285,8 +285,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     totalRateAttributes=[newTotalRateAttributes retain];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxTotalRateChangedNotification
-                      object:self];
+	 postNotificationName:ORMuxBoxTotalRateChangedNotification
+	 object:self];
 }
 
 
@@ -302,8 +302,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     timeRateXAttributes=[newTimeRateXAttributes retain];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxTimeRateXChangedNotification
-                      object:self];
+	 postNotificationName:ORMuxBoxTimeRateXChangedNotification
+	 object:self];
 }
 
 - (NSMutableDictionary*) timeRateYAttributes
@@ -318,8 +318,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     timeRateYAttributes=[newTimeRateYAttributes retain];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxTimeRateYChangedNotification
-                      object:self];
+	 postNotificationName:ORMuxBoxTimeRateYChangedNotification
+	 object:self];
 }
 
 - (unsigned short) busNumber
@@ -331,8 +331,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
 {
     busNumber=newBusNumber;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxBusNumberChangedNotification
-                      object:self];
+	 postNotificationName:ORMuxBoxBusNumberChangedNotification
+	 object:self];
 }
 
 - (int) scopeChan
@@ -346,8 +346,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     scopeChan = aNewScopeChan;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORNcdMuxBoxScopeChanChangedNotification
-                      object:self];
+	 postNotificationName:ORNcdMuxBoxScopeChanChangedNotification
+	 object:self];
 }
 
 - (NSMutableArray *)thresholdCalibrationStates {
@@ -371,8 +371,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     [[[self undoManager] prepareWithInvocationTarget:self] setCalibrationEnabledMask:calibrationEnabledMask];
     calibrationEnabledMask = aCalibrationEnabledMask;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxCalibrationEnabledMaskChanged
-                      object:self];
+	 postNotificationName:ORMuxBoxCalibrationEnabledMaskChanged
+	 object:self];
 }
 
 
@@ -386,8 +386,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     [[[self undoManager] prepareWithInvocationTarget:self] setCalibrationFinalDelta:calibrationFinalDelta];
     calibrationFinalDelta = aCalibrationFinalDelta;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxCalibrationFinalDeltaChanged
-                      object:self];
+	 postNotificationName:ORMuxBoxCalibrationFinalDeltaChanged
+	 object:self];
 }
 
 - (ThresholdCalibrationTask *) calibrationTask 
@@ -402,8 +402,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     calibrationTask = aCalibrationTask;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxCalibrationTaskChanged
-                      object:self];
+	 postNotificationName:ORMuxBoxCalibrationTaskChanged
+	 object:self];
 }
 
 
@@ -419,8 +419,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     dacValue = aDacValue;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxDacValueChangedNotification
-                      object:self];
+	 postNotificationName:ORMuxBoxDacValueChangedNotification
+	 object:self];
 }
 
 // ===========================================================
@@ -439,23 +439,24 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannel:selectedChannel];
     selectedChannel = aSelectedChannel;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORMuxBoxChannelSelectionChangedNotification
-                      object:self];
+	 postNotificationName:ORMuxBoxChannelSelectionChangedNotification
+	 object:self];
 }
 
 
 
 - (void) loadThresholdDacs
 {
-    NS_DURING
+    @try {
 		short chan;
 		for(chan = 0;chan<kNumMuxChannels;chan++){
 			[self writeThresholdDac:chan withValue:[[thresholdDacs objectAtIndex:chan] shortValue]];
 			
 		}
-        NS_HANDLER
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		[localException raise];
+	}
 }
 
 - (void) writeThresholdDac:(unsigned short)chan withValue:(unsigned short)aValue
@@ -467,7 +468,7 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
 
 -(void) readThresholds
 {
-    NS_DURING
+    @try {
 		short chan;
 		for(chan = 0;chan<kNumMuxChannels;chan++){
 			[self readThreshold:chan];
@@ -479,9 +480,10 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
 				[self readThreshold:chan];
 			}
 		}    
-        NS_HANDLER
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		[localException raise];
+	}
 }
 
 -(void) readThreshold:(unsigned short) aChannel
@@ -655,42 +657,43 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
                         else aValue = 0x0a;
                         break;
                 }
-                NS_DURING
+                @try {
                     [self setThresholdDac:i withValue:aValue];
                     unsigned short theDrValue;
                     if([[aConnection objectLink] getADCValue:&theDrValue mux:muxBox channel:i] == kAdcToDr){
                         [self setThresholdAdc:i withValue:(kDataByteMask & theDrValue)];
                     }
                     
-                    NS_HANDLER
-                        anError = true;
-                    NS_ENDHANDLER
-                    if(anError)break;
-                    if(([self thresholdAdc:i] & (1<<thebit)) != (aValue & (1<<thebit))){
-                        if(aValue & (1<<thebit)){
-                            aChanHighBitStruct[thebit]++;
-                        }
-                        else{
-                            aChanLowBitStruct[thebit]++;
-                        }
-                    }
+				}
+				@catch(NSException* localException) {
+					anError = true;
+				}
+				if(anError)break;
+				if(([self thresholdAdc:i] & (1<<thebit)) != (aValue & (1<<thebit))){
+					if(aValue & (1<<thebit)){
+						aChanHighBitStruct[thebit]++;
+					}
+					else{
+						aChanLowBitStruct[thebit]++;
+					}
+				}
             }
-                if(anError) break;
+			if(anError) break;
         }
-            NSLog(@"Channel %d...\n",i);
-            short l;
-            for(l=0;l<8;l++){
-                if(aChanHighBitStruct[l] != 0 | aChanLowBitStruct[l] != 0){
-                    NSLog(@"Errors on Bit %d\n",l);
-                    NSLog(@"read a 0 when wrote a 1:%d\n",aChanHighBitStruct[l]);
-                    NSLog(@"read a 1 when wrote a 0:%d\n",aChanLowBitStruct[l]);
-                }
-            }
-            if(anError) break;
+		NSLog(@"Channel %d...\n",i);
+		short l;
+		for(l=0;l<8;l++){
+			if(aChanHighBitStruct[l] != 0 | aChanLowBitStruct[l] != 0){
+				NSLog(@"Errors on Bit %d\n",l);
+				NSLog(@"read a 0 when wrote a 1:%d\n",aChanHighBitStruct[l]);
+				NSLog(@"read a 1 when wrote a 0:%d\n",aChanLowBitStruct[l]);
+			}
+		}
+		if(anError) break;
     }
-        
-        [self setThresholdDacs:oldValues];
-        
+	
+	[self setThresholdDacs:oldValues];
+	
 }
 
 
@@ -865,10 +868,11 @@ static NSString* ORMuxBoxBusNumber          = @"ORMuxBoxBusNumber";
 		[self loadMemento:unarchiver];
 		[unarchiver finishDecoding];
 		[unarchiver release];
-		NS_DURING
+		@try {
 			[self initMux];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 	}
 }
 

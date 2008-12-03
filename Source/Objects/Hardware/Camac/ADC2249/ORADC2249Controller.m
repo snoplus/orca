@@ -72,7 +72,7 @@
 					 selector : @selector(suppressZerosChanged:)
 						 name : ORADC2249SuppressZerosChangedNotification
 					   object : model];
-
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(includeTimingChanged:)
 						 name : ORADC2249ModelIncludeTimingChanged
@@ -117,7 +117,7 @@
     [disableLAMEnableLatchButton setEnabled:!lockedOrRunningMaintenance];
     [enableLAMEnableLatchButton setEnabled:!lockedOrRunningMaintenance];
     [testAllChansButton setEnabled:!lockedOrRunningMaintenance];
-//  [testBusyButton setEnabled:!lockedOrRunningMaintenance];
+	//  [testBusyButton setEnabled:!lockedOrRunningMaintenance];
 	[generalResetButton setEnabled:!lockedOrRunningMaintenance];
     [suppressZerosButton setEnabled:!lockedOrRunningMaintenance];
     [includeTimingButton setEnabled:!runInProgress];
@@ -175,99 +175,108 @@
 
 - (IBAction) readNoResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readNoReset];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/No Reset" fCode:0];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readReset];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/Reset" fCode:2];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testLAM];
 		NSLog(@"ADC2249 Test LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM" fCode:8];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) resetLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model resetLAM];
         NSLog(@"ADC2249 Reset LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Reset LAM" fCode:10];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) generalResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model generalReset];
         NSLog(@"ADC2249 General Reset for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"General Reset" fCode:9];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) disableLAMEnableLatchAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model disableLAMEnableLatch];
         NSLog(@"ADC2249 Disable LAM enable latch for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Disable LAM enable latch" fCode:24];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) enableLAMEnableLatchAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model enableLAMEnableLatch];
         NSLog(@"ADC2249 Enable LAM enable latch for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Enable LAM enable latch" fCode:26];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testAllChansAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testAllChannels];
         NSLog(@"ADC2249 Test all channels for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test All Channels" fCode:25];
-    NS_ENDHANDLER
+    }
 }
 
 //- (IBAction) testBusyAction:(id)sender
 //{
-//    NS_DURING
+//    @try {
 //        [model checkCratePower];
 //        [model testBusy];
 //        NSLog(@"ADC2249 Test busy for Station %d\n",[model stationNumber]);
-//    NS_HANDLER
+//    }
+//@catch(NSException* localException) {
 //        [self showError:localException name:@"Test busy" fCode:27];
-//    NS_ENDHANDLER
+//    }
 //}
 
 - (IBAction) suppressZerosAction:(id)sender
@@ -282,14 +291,14 @@
 
 - (void) showError:(NSException*)anException name:(NSString*)name fCode:(int)i
 {
-    NSLog(@"Failed Cmd: %@ (F%d)\n",name,i);
-    if([[anException name] isEqualToString: OExceptionNoCamacCratePower]) {
-        [[model crate]  doNoPowerAlert:anException action:[NSString stringWithFormat:@"%@ (F%d)",name,i]];
-    }
-    else {
-        NSRunAlertPanel([anException name], @"%@\n%@ (F%d)", @"OK", nil, nil,
-                        [anException name],name,i);
-    }
+	NSLog(@"Failed Cmd: %@ (F%d)\n",name,i);
+	if([[anException name] isEqualToString: OExceptionNoCamacCratePower]) {
+		[[model crate]  doNoPowerAlert:anException action:[NSString stringWithFormat:@"%@ (F%d)",name,i]];
+	}
+	else {
+		NSRunAlertPanel([anException name], @"%@\n%@ (F%d)", @"OK", nil, nil,
+						[anException name],name,i);
+	}
 }
 @end
 

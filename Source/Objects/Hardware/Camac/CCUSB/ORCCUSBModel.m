@@ -199,10 +199,11 @@ enum {
 - (void) interfaceAdded:(NSNotification*)aNote
 {
 	[[aNote object] claimInterfaceWithSerialNumber:[self serialNumber] for:self];
-	NS_DURING
+	@try {
 		[self checkInterface];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+@catch(NSException* localException) {
+	}
 }
 
 - (void) interfaceRemoved:(NSNotification*)aNote
@@ -216,10 +217,11 @@ enum {
 			usbInterface = nil;
 		}
 		
-		NS_DURING
+		@try {
 			[self checkInterface];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+@catch(NSException* localException) {
+		}
 	}
 }
 

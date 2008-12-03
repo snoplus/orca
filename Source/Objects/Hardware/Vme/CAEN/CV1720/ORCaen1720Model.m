@@ -34,55 +34,55 @@
 #define k792DefaultAddressModifier 	0x09
 NSString* ORCaen1720ModelEventSizeChanged = @"ORCaen1720ModelEventSizeChanged";
 static NSString* Caen1720RunModeString[4] = {
-	@"Register-Controlled",
-	@"S-In Controlled",
-	@"S-In Gate",
-	@"Multi-Board Sync",
+@"Register-Controlled",
+@"S-In Controlled",
+@"S-In Gate",
+@"Multi-Board Sync",
 };
 // Define all the registers available to this unit.
 static Caen1720RegisterNamesStruct reg[kNumRegisters] = {
-	{@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly}, //not implemented in HW yet
-	{@"ZS_Thres",			false,	true, 	true,	0x1024,		kReadWrite}, //not implemented in HW yet
-	{@"ZS_NsAmp",			false,	true, 	true,	0x1028,		kReadWrite},
-	{@"Thresholds",			false,	true, 	true,	0x1080,		kReadWrite},
-	{@"Num O/U Threshold",	false,	true, 	true,	0x1084,		kReadWrite},
-	{@"Status",				false,	true, 	true,	0x1088,		kReadOnly},
-	{@"Firmware Version",	false,	false, 	false,	0x108C,		kReadOnly},
-	{@"Buffer Occupancy",	true,	true, 	true,	0x1094,		kReadOnly},
-	{@"Dacs",				false,	true, 	true,	0x1098,		kReadWrite},
-	{@"Adc Config",			false,	true, 	true,	0x109C,		kReadWrite},
-	{@"Chan Config",		false,	true, 	true,	0x8000,		kReadWrite},
-	{@"Chan Config Bit Set",false,	true, 	true,	0x8004,		kWriteOnly},
-	{@"Chan Config Bit Clr",false,	true, 	true,	0x8008,		kWriteOnly},
-	{@"Buffer Organization",false,	true, 	true,	0x800C,		kReadWrite},
-	{@"Buffer Free",		false,	false, 	false,	0x8010,		kReadWrite},
-	{@"Custom Size",		false,	true, 	true,	0x8020,		kReadWrite},
-	{@"Acq Control",		false,	true, 	true,	0x8100,		kReadWrite},
-	{@"Acq Status",			false,	false, 	false,	0x8104,		kReadOnly},
-	{@"SW Trigger",			false,	false, 	false,	0x8108,		kWriteOnly},
-	{@"Trig Src Enbl Mask",	false,	true, 	true,	0x810C,		kReadWrite},
-	{@"FP Trig Out Enbl Mask",false,true, 	true,	0x8110,		kReadWrite},
-	{@"Post Trig Setting",	false,	true, 	true,	0x8114,		kReadWrite},
-	{@"FP I/O Data",		false,	true, 	true,	0x8118,		kReadWrite},
-	{@"FP I/O Control",		false,	true, 	true,	0x811C,		kReadWrite},
-	{@"Chan Enable Mask",	false,	true, 	true,	0x8120,		kReadWrite},
-	{@"ROC FPGA Version",	false,	false, 	false,	0x8124,		kReadOnly},
-	{@"Event Stored",		true,	true, 	true,	0x812C,		kReadOnly},
-	{@"Set Monitor DAC",	false,	true, 	true,	0x8138,		kReadWrite},
-	{@"Board Info",			false,	false, 	false,	0x8140,		kReadOnly},
-	{@"Monitor Mode",		false,	true, 	true,	0x8144,		kReadWrite},
-	{@"Event Size",			true,	true, 	true,	0x814C,		kReadOnly},
-	{@"VME Control",		false,	false, 	true,	0xEF00,		kReadWrite},
-	{@"VME Status",			false,	false, 	false,	0xEF04,		kReadOnly},
-	{@"Board ID",			false,	true, 	true,	0xEF08,		kReadWrite},
-	{@"MultCast Base Add",	false,	false, 	true,	0xEF0C,		kReadWrite},
-	{@"Relocation Add",		false,	false, 	true,	0xEF10,		kReadWrite},
-	{@"Interrupt Status ID",false,	false, 	true,	0xEF14,		kReadWrite},
-	{@"Interrupt Event Num",false,	true, 	true,	0xEF18,		kReadWrite},
-	{@"BLT Event Num",		false,	true, 	true,	0xEF1C,		kReadWrite},
-	{@"Scratch",			false,	true, 	true,	0xEF20,		kReadWrite},
-	{@"SW Reset",			false,	false, 	false,	0xEF24,		kWriteOnly},
-	{@"SW Clear",			false,	false, 	false,	0xEF28,		kWriteOnly}
+{@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly}, //not implemented in HW yet
+{@"ZS_Thres",			false,	true, 	true,	0x1024,		kReadWrite}, //not implemented in HW yet
+{@"ZS_NsAmp",			false,	true, 	true,	0x1028,		kReadWrite},
+{@"Thresholds",			false,	true, 	true,	0x1080,		kReadWrite},
+{@"Num O/U Threshold",	false,	true, 	true,	0x1084,		kReadWrite},
+{@"Status",				false,	true, 	true,	0x1088,		kReadOnly},
+{@"Firmware Version",	false,	false, 	false,	0x108C,		kReadOnly},
+{@"Buffer Occupancy",	true,	true, 	true,	0x1094,		kReadOnly},
+{@"Dacs",				false,	true, 	true,	0x1098,		kReadWrite},
+{@"Adc Config",			false,	true, 	true,	0x109C,		kReadWrite},
+{@"Chan Config",		false,	true, 	true,	0x8000,		kReadWrite},
+{@"Chan Config Bit Set",false,	true, 	true,	0x8004,		kWriteOnly},
+{@"Chan Config Bit Clr",false,	true, 	true,	0x8008,		kWriteOnly},
+{@"Buffer Organization",false,	true, 	true,	0x800C,		kReadWrite},
+{@"Buffer Free",		false,	false, 	false,	0x8010,		kReadWrite},
+{@"Custom Size",		false,	true, 	true,	0x8020,		kReadWrite},
+{@"Acq Control",		false,	true, 	true,	0x8100,		kReadWrite},
+{@"Acq Status",			false,	false, 	false,	0x8104,		kReadOnly},
+{@"SW Trigger",			false,	false, 	false,	0x8108,		kWriteOnly},
+{@"Trig Src Enbl Mask",	false,	true, 	true,	0x810C,		kReadWrite},
+{@"FP Trig Out Enbl Mask",false,true, 	true,	0x8110,		kReadWrite},
+{@"Post Trig Setting",	false,	true, 	true,	0x8114,		kReadWrite},
+{@"FP I/O Data",		false,	true, 	true,	0x8118,		kReadWrite},
+{@"FP I/O Control",		false,	true, 	true,	0x811C,		kReadWrite},
+{@"Chan Enable Mask",	false,	true, 	true,	0x8120,		kReadWrite},
+{@"ROC FPGA Version",	false,	false, 	false,	0x8124,		kReadOnly},
+{@"Event Stored",		true,	true, 	true,	0x812C,		kReadOnly},
+{@"Set Monitor DAC",	false,	true, 	true,	0x8138,		kReadWrite},
+{@"Board Info",			false,	false, 	false,	0x8140,		kReadOnly},
+{@"Monitor Mode",		false,	true, 	true,	0x8144,		kReadWrite},
+{@"Event Size",			true,	true, 	true,	0x814C,		kReadOnly},
+{@"VME Control",		false,	false, 	true,	0xEF00,		kReadWrite},
+{@"VME Status",			false,	false, 	false,	0xEF04,		kReadOnly},
+{@"Board ID",			false,	true, 	true,	0xEF08,		kReadWrite},
+{@"MultCast Base Add",	false,	false, 	true,	0xEF0C,		kReadWrite},
+{@"Relocation Add",		false,	false, 	true,	0xEF10,		kReadWrite},
+{@"Interrupt Status ID",false,	false, 	true,	0xEF14,		kReadWrite},
+{@"Interrupt Event Num",false,	true, 	true,	0xEF18,		kReadWrite},
+{@"BLT Event Num",		false,	true, 	true,	0xEF1C,		kReadWrite},
+{@"Scratch",			false,	true, 	true,	0xEF20,		kReadWrite},
+{@"SW Reset",			false,	false, 	false,	0xEF24,		kWriteOnly},
+{@"SW Clear",			false,	false, 	false,	0xEF28,		kWriteOnly}
 //	{@"Flash Enable",		false,	false, 	true,	0xEF2C,		kReadWrite},
 //	{@"Flash Data",			false,	false, 	true,	0xEF30,		kReadWrite},
 //	{@"Config Reload",		false,	false, 	false,	0xEF34,		kWriteOnly},
@@ -127,7 +127,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [self setNumberBLTEventsToReadout:1];
     [[self undoManager] enableUndoRegistration];
     
-   
+	
     return self;
 }
 
@@ -152,7 +152,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setEventSize:eventSize];
     
     eventSize = aEventSize;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelEventSizeChanged object:self];
 }
 - (int)	bufferState
@@ -195,8 +195,8 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     waveFormRateGroup = newRateGroup;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORCaen1720RateGroupChanged
-                      object:self];    
+	 postNotificationName:ORCaen1720RateGroupChanged
+	 object:self];    
 }
 
 - (unsigned short) selectedRegIndex
@@ -208,15 +208,15 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 {
     // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self]
-        setSelectedRegIndex:[self selectedRegIndex]];
+	 setSelectedRegIndex:[self selectedRegIndex]];
     
     // Set the new value in the model.
     selectedRegIndex = anIndex;
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORCaen1720SelectedRegIndexChanged
-                      object:self];
+	 postNotificationName:ORCaen1720SelectedRegIndexChanged
+	 object:self];
 }
 
 - (unsigned short) selectedChannel
@@ -228,15 +228,15 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 {
     // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self]
-        setSelectedChannel:[self selectedChannel]];
+	 setSelectedChannel:[self selectedChannel]];
     
     // Set the new value in the model.
     selectedChannel = anIndex;
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORCaen1720SelectedChannelChanged
-                      object:self];
+	 postNotificationName:ORCaen1720SelectedChannelChanged
+	 object:self];
 }
 
 - (unsigned long) writeValue
@@ -254,8 +254,8 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORCaen1720WriteValueChanged
-                      object:self];
+	 postNotificationName:ORCaen1720WriteValueChanged
+	 object:self];
 }
 
 - (unsigned short) enabledMask
@@ -268,7 +268,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
     
     enabledMask = aEnabledMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelEnabledMaskChanged object:self];
 }
 
@@ -282,7 +282,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerSetting:postTriggerSetting];
     
     postTriggerSetting = aPostTriggerSetting;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelPostTriggerSettingChanged object:self];
 }
 
@@ -296,7 +296,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerSourceMask:triggerSourceMask];
     
     triggerSourceMask = aTriggerSourceMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelTriggerSourceMaskChanged object:self];
 }
 
@@ -310,7 +310,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setCoincidenceLevel:coincidenceLevel];
     
     coincidenceLevel = aCoincidenceLevel;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelCoincidenceLevelChanged object:self];
 }
 
@@ -324,7 +324,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setAcquisitionMode:acquisitionMode];
     
     acquisitionMode = aMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelAcquisitionModeChanged object:self];
 }
 
@@ -338,7 +338,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setCountAllTriggers:countAllTriggers];
     
     countAllTriggers = aCountAllTriggers;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelCountAllTriggersChanged object:self];
 }
 
@@ -352,7 +352,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [[[self undoManager] prepareWithInvocationTarget:self] setCustomSize:customSize];
     
     customSize = aCustomSize;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1720ModelCustomSizeChanged object:self];
 }
 
@@ -395,7 +395,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 - (void) makeMainController
 {
     [self linkToController:@"ORCaen1720Controller"];
- }
+}
 
 
 #pragma mark ***Register - General routines
@@ -444,7 +444,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 
 - (void) setDac:(unsigned short) aChnl withValue:(unsigned short) aValue
 {
-
+	
     // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self] setDac:aChnl withValue:dac[aChnl]];
     
@@ -457,9 +457,9 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORCaen1720ChnlDacChanged
-                      object:self
-                    userInfo:userInfo];
+	 postNotificationName:ORCaen1720ChnlDacChanged
+	 object:self
+	 userInfo:userInfo];
 }
 
 - (unsigned short) overUnderThreshold:(unsigned short) aChnl
@@ -469,7 +469,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 
 - (void) setOverUnderThreshold:(unsigned short) aChnl withValue:(unsigned short) aValue
 {
-
+	
     // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self] setOverUnderThreshold:aChnl withValue:overUnderThreshold[aChnl]];
     
@@ -482,9 +482,9 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORCaen1720OverUnderThresholdChanged
-                      object:self
-                    userInfo:userInfo];
+	 postNotificationName:ORCaen1720OverUnderThresholdChanged
+	 object:self
+	 userInfo:userInfo];
 }
 
 
@@ -526,15 +526,16 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     }
     
     // Do actual write
-    NS_DURING
+    @try {
 		[[self adapter] writeLongBlock:&theValue
-                                 atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
-                                numToWrite:1
-                                withAddMod:[self addressModifier]
-                             usingAddSpace:0x01];
-            
-        NS_HANDLER
-		NS_ENDHANDLER
+							 atAddress:[self baseAddress] + [self getAddressOffset:pReg] + chan*0x100
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
+		
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (unsigned short) threshold:(unsigned short) aChnl
@@ -557,9 +558,9 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORCaen1720ChnlThresholdChanged
-                      object:self
-                    userInfo:userInfo];
+	 postNotificationName:ORCaen1720ChnlThresholdChanged
+	 object:self
+	 userInfo:userInfo];
 }
 
 - (void) read
@@ -571,7 +572,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     short theChannelIndex	 = [self selectedChannel];
     short theRegIndex		 = [self selectedRegIndex];
     
-    NS_DURING
+    @try {
         if (theRegIndex >= kZS_Thres && theRegIndex<=kAdcConfig){
             start = theChannelIndex;
             end = theChannelIndex;
@@ -591,19 +592,20 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 			NSLog(@"CAEN reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
 		}
         
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Can't Read [%@] on the %@.\n",
-		[self getRegisterName:theRegIndex], [self identifier]);
+			  [self getRegisterName:theRegIndex], [self identifier]);
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  write
-* \brief	Writes data out to a CAEN VME device register.
-* \note
-*/
+ * \brief	Writes data out to a CAEN VME device register.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) write
 {
@@ -615,7 +617,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     short theChannelIndex	= [self selectedChannel];
     short theRegIndex 		= [self selectedRegIndex];
     
-    NS_DURING
+    @try {
         
         NSLog(@"Register is:%@\n", [self getRegisterName:theRegIndex]);
         NSLog(@"Value is   :0x%04x\n", theValue);
@@ -629,7 +631,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
                 end = [self numberOfChannels] - 1;
             }
 			else NSLog(@"Channel: %d\n", theChannelIndex);
-
+			
             for (i = start; i <= end; i++){
                 if(theRegIndex == kThresholds){
 					[self setThreshold:i withValue:theValue];
@@ -642,11 +644,12 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
         else {
 			[self write:theRegIndex sendValue: theValue];
         } 
-        NS_HANDLER
-            NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
-                  theValue, [self getRegisterName:theRegIndex],[self identifier]);
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
+			  theValue, [self getRegisterName:theRegIndex],[self identifier]);
+		[localException raise];
+	}
 }
 
 
@@ -686,15 +689,16 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     }
     
     // Do actual write
-    NS_DURING
+    @try {
 		[[self adapter] writeLongBlock:&pValue
-							atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+							 atAddress:[self baseAddress] + [self getAddressOffset:pReg]
 							numToWrite:1
 							withAddMod:[self addressModifier]
-							usingAddSpace:0x01];
-            
-        NS_HANDLER
-            NS_ENDHANDLER
+						 usingAddSpace:0x01];
+		
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 
@@ -715,10 +719,10 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	for(i=0;i<8;i++){
 		unsigned long aValue = overUnderThreshold[i];
 		[[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+							 atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
+							numToWrite:1
+							withAddMod:[self addressModifier]
+						 usingAddSpace:0x01];
 	}
 }
 
@@ -728,10 +732,10 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	for(i=0;i<8;i++){
 		unsigned long value;
 		[[self adapter] readLongBlock:&value
-                         atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
-                        numToRead:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+							atAddress:[self baseAddress] + reg[kNumOUThreshold].addressOffset + (i * 0x100)
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
 	}
 }
 
@@ -807,30 +811,30 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 			else if(status & 0x01)	statusString = @"Full ";
 		}
 		NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"  %d     %@    0x%04x  0x%04x  %@  0x%04x  %6.3f  %@\n",
-				chan, enabled&(1<<chan)?@"E":@"X",
-				threshold&0xfff, numOU&0xfff,statusString, 
-				bufferOccupancy&0x7ff, [self convertDacToVolts:dacValue], 
-				triggerSrc&(1<<chan)?@"Y":@"N");
+				  chan, enabled&(1<<chan)?@"E":@"X",
+				  threshold&0xfff, numOU&0xfff,statusString, 
+				  bufferOccupancy&0x7ff, [self convertDacToVolts:dacValue], 
+				  triggerSrc&(1<<chan)?@"Y":@"N");
 	}
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"-----------------------------------------------------------\n");
-
+	
 	unsigned long aValue;
 	[self read:kBufferOrganization returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"# Buffer Blocks : %d\n",(long)powf(2.,(float)aValue));
-
+	
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Software Trigger: %@\n",triggerSrc&0x80000000?@"Enabled":@"Disabled");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"External Trigger: %@\n",triggerSrc&0x40000000?@"Enabled":@"Disabled");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Trigger nHit    : %d\n",(triggerSrc&0x00c000000) >> 24);
-
+	
 	
 	[self read:kAcqControl returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Triggers Count  : %@\n",aValue&0x4?@"Accepted":@"All");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Run Mode        : %@\n",Caen1720RunModeString[aValue&0x3]);
-
+	
 	[self read:kCustomSize returnValue:&aValue];
 	if(aValue)NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : %d\n",aValue);
 	else      NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Custom Size     : Disabled\n");
-
+	
 	[self read:kAcqStatus returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Board Ready     : %@\n",aValue&0x100?@"YES":@"NO");
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"PLL Locked      : %@\n",aValue&0x80?@"YES":@"NO");
@@ -842,7 +846,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	
 	[self read:kEventStored returnValue:&aValue];
 	NSLogFont([NSFont fontWithName:@"Monaco" size:10],@"Events Stored   : %d\n",aValue);
-
+	
 } 
 
 - (void) initBoard
@@ -860,7 +864,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	[self writeDacs];
 	[self writePostTriggerSetting];
     
-
+	
 }
 
 - (float) convertDacToVolts:(unsigned short)aDacValue 
@@ -891,7 +895,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-
+	
 }
 
 - (void) clearAllMemory
@@ -902,7 +906,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-
+	
 }
 
 - (void) writeTriggerCount
@@ -983,11 +987,11 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 {
     unsigned long aValue;
 	[[self adapter] readLongBlock:&aValue
-                         atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
+						atAddress:[self baseAddress] + reg[kVMEControl].addressOffset
                         numToRead:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-                     
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	
     if ( enable ) aValue |= 0x10;
     else aValue &= 0xFFEF;
     
@@ -1050,11 +1054,11 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORCaen1720WaveformDecoder",				@"decoder",
-        [NSNumber numberWithLong:dataId],           @"dataId",
-        [NSNumber numberWithBool:YES],              @"variable",
-        [NSNumber numberWithLong:-1],               @"length",
-        nil];
+								 @"ORCaen1720WaveformDecoder",				@"decoder",
+								 [NSNumber numberWithLong:dataId],           @"dataId",
+								 [NSNumber numberWithBool:YES],              @"variable",
+								 [NSNumber numberWithLong:-1],               @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"CAEN"];
     return dataDictionary;
 }
@@ -1079,10 +1083,10 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 
 - (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
-   if(![[self adapter] controllerCard]){
+	if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     }
-
+	
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
@@ -1096,38 +1100,38 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 	isRunning		= NO;
     
     BOOL sbcRun = [[userInfo objectForKey:kSBCisDataTaker] boolValue];
-
+	
     [self startRates];
     [self initBoard];
     [self setNumberBLTEventsToReadout:1];  // Hardcode this for now
     [self writeNumberBLTEvents:sbcRun];
     [self writeEnableBerr:sbcRun];
-
-
+	
+	
 	[self writeAcquistionControl:YES];
 	[self performSelector:@selector(checkBufferAlarm) withObject:nil afterDelay:1];
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 {
-	NS_DURING
+	@try {
 		unsigned long status;
 		isRunning = YES; 
 		
 		[controller readLongBlock:&status
-							 atAddress:statusReg
-							numToRead:1
-							withAddMod:addressModifier 
-						 usingAddSpace:0x01];
+						atAddress:statusReg
+						numToRead:1
+					   withAddMod:addressModifier 
+					usingAddSpace:0x01];
 		bufferState = (status & 0x10) >> 4;						
 		if(status & kEventReadyMask){
 			//OK, at least one event is ready
 			unsigned long theEventSize;
 			[controller readLongBlock:&theEventSize
-							 atAddress:eventSizeReg
+							atAddress:eventSizeReg
 							numToRead:1
-							withAddMod:addressModifier 
-						 usingAddSpace:0x01];
+						   withAddMod:addressModifier 
+						usingAddSpace:0x01];
             if ( theEventSize == 0 ) return;
 			NSMutableData* theData = [NSMutableData dataWithCapacity:2+theEventSize*sizeof(long)];
 			[theData setLength:(2+theEventSize)*sizeof(long)];
@@ -1135,11 +1139,11 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 			*p++ = dataId | (2 + theEventSize);
 			*p++ = location; 
 			[controller readLongBlock:p
-							 atAddress:dataReg
+							atAddress:dataReg
 							numToRead:theEventSize
-							withAddMod:addressModifier 
-						 usingAddSpace:0xFF]; //we set it to not increment the address.
-						 
+						   withAddMod:addressModifier 
+						usingAddSpace:0xFF]; //we set it to not increment the address.
+			
 			[aDataPacket addData:theData];
 			unsigned short chanMask = p[1]; //remember, the point was already inc'ed to the start of data
 			int i;
@@ -1148,10 +1152,11 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 			}
 		}
 		
-			
-	NS_HANDLER
-	NS_ENDHANDLER
-
+		
+	}
+	@catch(NSException* localException) {
+	}
+	
 }
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
@@ -1208,7 +1213,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
 - (id) initWithCoder:(NSCoder*) aDecoder
 {
     self = [super initWithCoder:aDecoder];
-
+	
     [[self undoManager] disableUndoRegistration];
     [self setEventSize:[aDecoder decodeIntForKey:@"ORCaen1720ModelEventSize"]];
     [self setEnabledMask:[aDecoder decodeIntForKey:@"ORCaen1720ModelEnabledMask"]];
@@ -1228,7 +1233,7 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     }
     [waveFormRateGroup resetRates];
     [waveFormRateGroup calcRates];
-
+	
 	int i;
     for (i = 0; i < [self numberOfChannels]; i++){
         [self setDac:i withValue:      [aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"CAENDacChnl%d", i]]];

@@ -63,7 +63,7 @@
 - (IBAction) showHideAction:(id)sender
 {
     NSRect aFrame = [NSWindow contentRectForFrameRect:[[self window] frame] 
-                styleMask:[[self window] styleMask]];
+											styleMask:[[self window] styleMask]];
     if([showHideButton state] == NSOnState)aFrame.size.height = 375;
     else aFrame.size.height = 305;
     [self resizeWindowToSize:aFrame.size];
@@ -71,44 +71,48 @@
 
 - (IBAction) executeZCycleAction:(id)sender
 {
-    NS_DURING
+    @try {
         [[model adapter]  checkCratePower];
         [[model adapter]  executeZCycle];
         NSLog(@"Execute Z-Cycle Crate %d\n",[model crateNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Execute Z-Cycle"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) executeCCycleAction:(id)sender
 {
-    NS_DURING
+    @try {
         [[model adapter]  checkCratePower];
         [[model adapter]  executeCCycle];
         NSLog(@"Execute C-Cycle Crate %d\n",[model crateNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Execute C-Cycle"];
-    NS_ENDHANDLER
+    }
 }
 - (IBAction) setInhibitOnAction:(id)sender
 {
-   NS_DURING
+	@try {
         [[model adapter]  checkCratePower];
         [[model adapter]  setCrateInhibit:YES];
         NSLog(@"Set Crate Inhibit ON for Crate %d\n",[model crateNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Set Crate Inhibit ON"];
-    NS_ENDHANDLER
+    }
 }
 - (IBAction) setInhibitOffAction:(id)sender
 {
-   NS_DURING
+	@try {
         [[model adapter]  checkCratePower];
         [[model adapter]  setCrateInhibit:NO];
         NSLog(@"Set Crate Inhibit OFF for Crate %d\n",[model crateNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Set Crate Inhibit OFF"];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) showError:(NSException*)anException name:(NSString*)name

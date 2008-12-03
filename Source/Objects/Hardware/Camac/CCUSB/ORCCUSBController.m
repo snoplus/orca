@@ -74,12 +74,12 @@
                      selector : @selector(interfacesChanged:)
                          name : ORUSBInterfaceAdded
 						object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(interfacesChanged:)
                          name : ORUSBInterfaceRemoved
 						object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(serialNumberChanged:)
                          name : ORCCUSBSerialNumberChanged
@@ -89,122 +89,122 @@
                      selector : @selector(serialNumberChanged:)
                          name : ORCCUSBInterfaceChanged
 						object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(internalRegSelectionChanged:)
                          name : ORCCUSBModelInternalRegSelectionChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(registerValueChanged:)
                          name : ORCCUSBModelRegisterValueChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(globalModeChanged:)
                          name : ORCCUSBModelGlobalModeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(delaysChanged:)
                          name : ORCCUSBModelDelaysChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(userLEDSelectorChanged:)
                          name : ORCCUSBModelUserLEDSelectorChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(userNIMSelectorChanged:)
                          name : ORCCUSBModelUserNIMSelectorChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(userDeviceSelectorChanged:)
                          name : ORCCUSBModelUserDeviceSelectorChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(scalerReadoutChanged:)
                          name : ORCCUSBModelScalerReadoutChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(delayAndGateAChanged:)
                          name : ORCCUSBModelDelayAndGateAChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(delayAndGateBChanged:)
                          name : ORCCUSBModelDelayAndGateBChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(delayAndGateExtChanged:)
                          name : ORCCUSBModelDelayAndGateExtChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(scalerAChanged:)
                          name : ORCCUSBModelScalerAChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(scalerBChanged:)
                          name : ORCCUSBModelScalerBChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(LAMMaskChanged:)
                          name : ORCCUSBModelLAMMaskChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(usbTransferSetupChanged:)
                          name : ORCCUSBModelUsbTransferSetupChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(nValueChanged:)
                          name : ORCCUSBModelNValueChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(aValueChanged:)
                          name : ORCCUSBModelAValueChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(fValueChanged:)
                          name : ORCCUSBModelFValueChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(nafModBitsChanged:)
                          name : ORCCUSBModelNafModBitsChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(dataModifierBitsChanged:)
                          name : ORCCUSBModelDataModifierBitsChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(dataWordChanged:)
                          name : ORCCUSBModelDataWordChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(useDataModifierChanged:)
                          name : ORCCUSBModelUseDataModifierChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(customStackChanged:)
                          name : ORCCUSBModelCustomStackChanged
 						object: model];
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -234,7 +234,7 @@
 	}
 	
 	[numberOfProductTermsTextField setIntValue: (mask >> 12) & 0x3];
-
+	
 }
 
 - (void) nafModBitsChanged:(NSNotification*)aNote
@@ -316,7 +316,7 @@
 	[[userNIMLatchInvertMatrix cellWithTag:3] setState:regValue & (0x1<<kNIM01InvertBit)];
 	[[userNIMLatchInvertMatrix cellWithTag:4] setState:regValue & (0x1<<kNIM02InvertBit)];
 	[[userNIMLatchInvertMatrix cellWithTag:5] setState:regValue & (0x1<<kNIM03InvertBit)];	
-
+	
 	[nim01SourcePopup selectItemAtIndex:(regValue >> kNIM01CodeBit) & 0x7];
 	[nim02SourcePopup selectItemAtIndex:(regValue >> kNIM02CodeBit) & 0x7];
 	[nim03SourcePopup selectItemAtIndex:(regValue >> kNIM03CodeBit) & 0x7];
@@ -332,11 +332,11 @@
 	[[userLEDLatchInvertMatrix cellWithTag:3] setState:regValue & (0x1<<kRedLEDInvertBit)];
 	[[userLEDLatchInvertMatrix cellWithTag:4] setState:regValue & (0x1<<kGreenLEDInvertBit)];
 	[[userLEDLatchInvertMatrix cellWithTag:5] setState:regValue & (0x1<<kYellowLEDInvertBit)];	
-
+	
 	[redLedSourcePopup    selectItemAtIndex:(regValue >> kRedLEDCodeBit)    & 0x7];
 	[greenLedSourcePopup  selectItemAtIndex:(regValue >> kGreenLEDCodeBit)  & 0x7];
 	[yellowLedSourcePopup selectItemAtIndex:(regValue >> kYellowLEDCodeBit) & 0x7];
-
+	
 }
 
 - (void) userDeviceSelectorChanged:(NSNotification*)aNote
@@ -346,12 +346,12 @@
 	[[scalerEnableMatrix cellWithTag:1] setState:regValue & (0x1<<kSclr_BEnableBit)];	
 	[[scalerResetMatrix cellWithTag:0] setState:regValue & (0x1<<kSclr_AResetBit)];	
 	[[scalerResetMatrix cellWithTag:1] setState:regValue & (0x1<<kSclr_BResetBit)];	
-
+	
 	[scalerAModePopup selectItemAtIndex:(regValue >> kSclr_AModeBit) & 0x7];
 	[scalerBModePopup selectItemAtIndex:(regValue >> kSclr_BModeBit) & 0x7];
 	[dggAModePopup selectItemAtIndex:(regValue >> kDGG_AModeBit) & 0x7];
 	[dggBModePopup selectItemAtIndex:(regValue >> kDGG_BModeBit) & 0x7];
-
+	
 }
 
 - (void) scalerReadoutChanged:(NSNotification*)aNote
@@ -379,13 +379,13 @@
 {
 	[registerValueTextField setIntValue: [model registerValue]];
 	[registerValueStepper setIntValue: [model registerValue]];
-
+	
 }
 
 - (void) internalRegSelectionChanged:(NSNotification*)aNote
 {
 	[internalRegSelectionPopup selectItemAtIndex: [model internalRegSelection]];
-
+	
 }
 
 - (void) serialNumberChanged:(NSNotification*)aNote
@@ -651,19 +651,21 @@
 
 - (IBAction) writeRegAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model writeReg:[model internalRegSelection]  value:[model registerValue]];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (IBAction) readRegAction:(id)sender
 {
-	NS_DURING
+	@try {
 		NSLog(@"0x%x\n",[model readReg:[model internalRegSelection]]);
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	
 }
 
@@ -690,11 +692,12 @@
 
 - (IBAction) writeInternalRegistersAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model writeInternalRegisters];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	
 }
 
@@ -718,7 +721,7 @@
 	[internalRegSelectionPopup setEnabled: !lockedOrRunningMaintenance];
 	[registerValueTextField setEnabled: !lockedOrRunningMaintenance];
 	[serialNumberPopup setEnabled: !locked];
-
+	
 	[bufferSizePopup setEnabled: notLockedAndNotRunning];
 	
 	[userLEDLatchInvertMatrix setEnabled: notLockedAndNotRunning];
@@ -730,24 +733,24 @@
 	[nim01SourcePopup setEnabled: notLockedAndNotRunning];
 	[nim02SourcePopup setEnabled: notLockedAndNotRunning];
 	[nim03SourcePopup setEnabled: notLockedAndNotRunning];
-
+	
 	[lamTimeOutField setEnabled: notLockedAndNotRunning];
 	[triggerDelayField setEnabled: notLockedAndNotRunning];
-
+	
 	[timeIntervalField setEnabled: notLockedAndNotRunning];
 	[numSepEventsField setEnabled: notLockedAndNotRunning];
-
+	
 	[scalerEnableMatrix setEnabled: notLockedAndNotRunning];
 	[scalerResetMatrix setEnabled: notLockedAndNotRunning];
 	[scalerAModePopup setEnabled: notLockedAndNotRunning];
 	[scalerBModePopup setEnabled: notLockedAndNotRunning];
 	[dggAModePopup setEnabled: notLockedAndNotRunning];
 	[dggBModePopup setEnabled: notLockedAndNotRunning];
-
+	
 	[dggAGateTextField setEnabled: notLockedAndNotRunning];
 	[dggADelayFineTextField setEnabled: notLockedAndNotRunning];
 	[dggADelayCoarseTextField setEnabled: notLockedAndNotRunning];
-
+	
 	[dggBGateTextField setEnabled: notLockedAndNotRunning];
 	[dggBDelayFineTextField setEnabled: notLockedAndNotRunning];
 	[dggBDelayCoarseTextField setEnabled: notLockedAndNotRunning];
@@ -755,7 +758,7 @@
 	[timeOutTextField setEnabled: notLockedAndNotRunning];
 	[numBuffersTextField setEnabled: notLockedAndNotRunning];
 	[writeInternalRegistersButton setEnabled: notLockedAndNotRunning];
-
+	
 	short continuationBitSet = [model nafModBits] & 0x1;
 	short useDataModifier = [model useDataModifier];
 	[dataWordTextField setEnabled:notLockedAndNotRunning];
@@ -767,16 +770,17 @@
 - (IBAction) test:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model test];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"CC32 Test FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"CC32 Test"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\n%@", @"OK", nil, nil,
                             [localException name],statusCC32,@"Failed Test of CC32");
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) addNAFToStack:(id)sender
@@ -811,7 +815,7 @@
     NSString* startingDir;
     if([model lastStackFilePath]) startingDir = [[model lastStackFilePath] stringByDeletingLastPathComponent];
     else						  startingDir = NSHomeDirectory();
-
+	
     [openPanel beginSheetForDirectory:startingDir
                                  file:nil
                                 types:nil
@@ -819,7 +823,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(_readStackFilePanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-
+	
 }
 
 - (IBAction) saveStackAction:(id)sender
@@ -879,7 +883,7 @@
 			[[serialNumberPopup itemWithTitle:serialNumber] setEnabled:YES];
 		}
 		else [[serialNumberPopup itemWithTitle:serialNumber] setEnabled:NO];
-
+		
 	}
 }
 
@@ -923,10 +927,10 @@
 - (void)_saveStackFilePanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
-       [model setLastStackFilePath:[sheet filename]];
-	   NSString* theContents = [[model customStack] componentsJoinedByString:@"\n"];
-	   [theContents writeToFile:[sheet filename] atomically:YES encoding:NSASCIIStringEncoding error:nil];
-
+		[model setLastStackFilePath:[sheet filename]];
+		NSString* theContents = [[model customStack] componentsJoinedByString:@"\n"];
+		[theContents writeToFile:[sheet filename] atomically:YES encoding:NSASCIIStringEncoding error:nil];
+		
     }
 }
 

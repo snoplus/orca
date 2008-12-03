@@ -598,7 +598,7 @@ static NSString *NcdMuxdelayAdcRead 		= @"NcdMuxdelayAdcRead";
 	mux_result theResult = 0;
 	[sendLock lock];
 	
-	NS_DURING
+	@try {
 		if(![self waitForCSBLow]){
 			[self resetBusStrobeInWord:anOutputWord];
 			theResult =  kTimeOut;
@@ -623,10 +623,11 @@ static NSString *NcdMuxdelayAdcRead 		= @"NcdMuxdelayAdcRead";
 			}
 		}
 		[sendLock unlock];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[sendLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 	
 	return theResult;
 }

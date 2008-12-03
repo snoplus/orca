@@ -182,13 +182,14 @@
 
 - (IBAction) connectAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		if([model isConnected])[model disconnect];
 		else [model connect];
-	NS_HANDLER
+	    }
+	@catch(NSException* localException) {
 		NSLog(@"%@\n",localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) sendAsciiCmd:(id)sender

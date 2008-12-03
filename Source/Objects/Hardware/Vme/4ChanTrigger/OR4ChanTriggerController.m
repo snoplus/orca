@@ -27,7 +27,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"4ChanTrigger"];
-
+	
     return self;
 }
 
@@ -67,7 +67,7 @@
                      selector : @selector(upperClockChanged:)
                          name : OR4ChanUpperClockChangedNotification
                        object : model];
-        
+	
     [notifyCenter addObserver : self
                      selector : @selector(shipClockChanged:)
                          name : OR4ChanShipClockChangedNotification
@@ -77,7 +77,7 @@
                      selector : @selector(errorCountChanged:)
                          name : OR4ChanErrorCountChangedNotification
                        object : model];
-        
+	
     [notifyCenter addObserver : self
                      selector : @selector(triggerNameChanged:)
                          name : OR4ChanNameChangedNotification
@@ -102,13 +102,13 @@
                      selector : @selector(specialLockChanged:)
                          name : OR4ChanSpecialLock
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(enableClockChanged:)
                          name : OR4ChanEnableClockChangedNotification
                         object: nil];
-
-	        
+	
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -124,7 +124,7 @@
     [self settingsLockChanged:nil];
     [self specialLockChanged:nil];
     [self enableClockChanged:nil];
-
+	
     [self updateClockMask];
 }
 
@@ -143,73 +143,73 @@
     NSString* key = [NSString stringWithFormat: @"orca.OR4Chan%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-
+	
 }
 
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:OR4ChanSettingsLock];
     BOOL locked = [gSecurity isLocked:OR4ChanSettingsLock];
-
+	
     [settingLockButton setState: locked];
     [addressStepper setEnabled:!locked && !runInProgress];
     [addressText setEnabled:!locked && !runInProgress];
-
+	
     [resetRegistersButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [resetClockButtonPage1 setEnabled:!locked && !lockedOrRunningMaintenance];
     [boardIDButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [getStatusButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [trigger1NameField setEnabled:!locked && !runInProgress];
     [trigger2NameField setEnabled:!locked && !runInProgress];
     [trigger3NameField setEnabled:!locked && !runInProgress];
     [trigger4NameField setEnabled:!locked && !runInProgress];
-
+	
     [shipClockMatrix setEnabled:!locked && !lockedOrRunningMaintenance];
     [clockEnableButton setEnabled:!locked && !lockedOrRunningMaintenance];
-   
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-	if(runInProgress && ![gSecurity isLocked:OR4ChanSettingsLock])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:OR4ChanSettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingLockDocField setStringValue:s];
-
+	
 }
 
 - (void) specialLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:OR4ChanSpecialLock];
     BOOL locked = [gSecurity isLocked:OR4ChanSpecialLock];
-
+	
     [specialLockButton setState: locked];
-
+	
     [loadLowerClockButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [loadUpperClockButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [resetClockButtonPage2 setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [enableClockButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [disableClockButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
-
+	
+	
     [lowerClockField setEnabled:!locked && !lockedOrRunningMaintenance];
     [upperClockField setEnabled:!locked && !lockedOrRunningMaintenance];
     [lowerClockStepper setEnabled:!locked && !lockedOrRunningMaintenance];
     [upperClockStepper setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     [readClocksButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [softLatchButton setEnabled:!locked && !lockedOrRunningMaintenance];
-
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-	if(runInProgress && ![gSecurity isLocked:OR4ChanSettingsLock])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:OR4ChanSettingsLock])s = @"Not in Maintenance Run.";
     }
     [specialLockDocField setStringValue:s];
-
+	
 }
 
 - (void) errorCountChanged:(NSNotification*)aNotification
@@ -305,19 +305,20 @@
 
 - (IBAction) boardIDAction:(id)sender
 {
-    NS_DURING
+    @try {
 		NSLog(@"%@\n",[model boardIdString]);
 		
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board ID FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nRead of Trigger Card Board ID FAILED", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER	
+    }	
 }
 
 - (IBAction) statusReadAction:(id)sender
 {
-	NS_DURING
+	@try {
         unsigned short status = [model readStatus];
 		NSLog(@"---Trigger Board Status---\n");
         NSLog(@"Status Register : 0x%04x\n",status);
@@ -327,26 +328,28 @@
 		NSLog(@"Trigger 3 Event : %s\n",status&kEvent3Mask?"true":"false");
 		NSLog(@"Trigger 4 Event : %s\n",status&kEvent4Mask?"true":"false");
 		NSLog(@"--------------------------\n");
-			
-				
-    NS_HANDLER
+		
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"Read of Trigger Board Status FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nRead of Trigger Board Status FAILED", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER	
+    }	
 }
 
 - (IBAction) resetAction:(id)sender
 {
-	NS_DURING
+	@try {
         [model reset];
         NSLog(@"Trigger Board Reset\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset of Trigger Board FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nReset of Trigger Board FAILED", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER	
+    }	
 }
 
 
@@ -357,53 +360,57 @@
 
 - (IBAction) writeEnableClockAction:(id)sender
 {
-	NS_DURING
+	@try {
         [model writeEnableClock:YES];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to enable Trigger 100MHz Clock: 0x%04x\n",[model lowerClock]);
 		NSRunAlertPanel([localException name], @"%@\nFAILED to enable Trigger 100MHz Clock", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 
 - (IBAction) writeDisableClockAction:(id)sender
 {
-	NS_DURING
+	@try {
         [model writeEnableClock:NO];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to disable Trigger 100MHz Clock: 0x%04x\n",[model lowerClock]);
 		NSRunAlertPanel([localException name], @"%@\nFAILED to disable Trigger 100MHz Clock", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER
+						localException);
+    }
 }
 
 - (IBAction) loadLowerClockAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model loadLowerClock:[model lowerClock]];
 		NSLog(@"Loaded Trigger Lower 100MHz Clock: 0x%04x\n",[model lowerClock]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Lower 100MHz Clock: 0x%04x\n",[model lowerClock]);
 		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Lower 100MHz Clock: 0x%04x", @"OK", nil, nil,
-				  localException,[model lowerClock]);
-    NS_ENDHANDLER
+						localException,[model lowerClock]);
+    }
 }
 
 - (IBAction) loadUpperClockAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model loadUpperClock:[model upperClock]];
 		NSLog(@"Loaded Trigger Upper 100MHz Clock: 0x%04x\n",[model upperClock]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to load Trigger Upper 100MHz Clock: 0x%04x\n",[model upperClock]);
 		NSRunAlertPanel([localException name], @"%@\nFAILED to load Trigger Upper 100MHz Clock: 0x%04x", @"OK", nil, nil,
-				  localException,[model upperClock]);
-    NS_ENDHANDLER	
+						localException,[model upperClock]);
+    }	
 }
 
 - (IBAction) triggerNameAction:(id)sender
@@ -425,20 +432,21 @@
 
 - (IBAction) softLatchAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model softLatch];
 		NSLog(@"Trigger card soft Latch.\n");
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to send soft Latch to trigger card.\n");
 		NSRunAlertPanel([localException name], @"%@\nSoft Latch FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER	
+						localException);
+    }	
 }
 
 - (IBAction) readClocksAction:(id)sender
 {
-	NS_DURING
+	@try {
         int i;
         for(i=0;i<5;i++){
             unsigned long long upper = [model readUpperClock:i];
@@ -446,22 +454,24 @@
             unsigned long long theValue = (upper<<32) | lower;
             NSLog(@"Clock Reg%d: %lld\n",i,theValue);
         }
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to read clocks.\n");
 		NSRunAlertPanel([localException name], @"%@\nRead Clocks FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER	
+						localException);
+    }	
 }
 
 - (IBAction) resetClockAction:(id)sender
 {
-	NS_DURING
+	@try {
         [model resetClock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
 		NSLog(@"FAILED to reset clock.\n");
 		NSRunAlertPanel([localException name], @"%@\nReset Clock FAILED\n", @"OK", nil, nil,
-				  localException);
-    NS_ENDHANDLER	
+						localException);
+    }	
 }
 
 

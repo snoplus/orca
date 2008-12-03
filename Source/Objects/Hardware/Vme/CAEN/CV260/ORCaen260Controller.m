@@ -36,7 +36,7 @@
 		[[enabledMaskMatrix cellAtRow:i column:0] setTag:i];
 		[[channelLabelMatrix cellAtRow:i column:0] setIntValue:i];
 	}
-
+	
 	[super awakeFromNib];	
 }
 
@@ -61,18 +61,18 @@
                      selector : @selector(enabledMaskChanged:)
                          name : ORCaen260ModelEnabledMaskChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(scalerValueChanged:)
                          name : ORCaen260ModelScalerValueChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pollingStateChanged:)
                          name : ORCaen260ModelPollingStateChanged
 						object: model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(shipRecordsChanged:)
                          name : ORCaen260ModelShipRecordsChanged
 						object: model];
@@ -202,67 +202,72 @@
 
 - (IBAction) setInhibitAction:(id)sender
 {
-   NS_DURING
+	@try {
         [model setInhibit];
 		NSLog(@"Set Inhibit on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Set Inhibit of Caen260 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Set Inhibit", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) resetInhibitAction:(id)sender
 {
-   NS_DURING
+	@try {
         [model resetInhibit];
 		NSLog(@"Reset Inhibit on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset Inhibit of Caen260 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Caen260 reset Inhibit", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) clearScalers:(id)sender
 {
-   NS_DURING
+	@try {
         [model clearScalers];
 		NSLog(@"Clear Scalers on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Clear Scalers of Caen260 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Clear Scalers", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readScalers:(id)sender
 {
-   NS_DURING
+	@try {
         [model readScalers];
 		NSLog(@"Read Scalers on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Read Scalers of Caen260 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Read Scalers", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) incScalers:(id)sender
 {
-   NS_DURING
+	@try {
         [model incScalers];
 		NSLog(@"Inc Scalers on Caen260 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Inc Scalers of Caen260 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Caen260 Inc Scalers", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 
@@ -279,13 +284,13 @@
 - (void) populatePullDown
 {
     short	i;
-        
+	
     [registerAddressPopUp removeAllItems];
     
     for (i = 0; i < [model getNumberRegisters]; i++) {
         [registerAddressPopUp insertItemWithTitle:[model 
-                                    getRegisterName:i] 
-                                            atIndex:i];
+												   getRegisterName:i] 
+										  atIndex:i];
     }
     
 }
@@ -301,11 +306,11 @@
 		[self resizeWindowToSize:NSMakeSize(357,452)];
 		[[self window] setContentView:tabView];
     }
-
+	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-
+	
 }
 
 @end

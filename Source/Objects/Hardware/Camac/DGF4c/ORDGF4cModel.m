@@ -153,7 +153,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setRunBehaviorMask:runBehaviorMask];
     
     runBehaviorMask = aRunBehaviorMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelRunBehaviorMaskChanged object:self];
 }
 
@@ -193,7 +193,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setXwait:chan withValue:xwait[chan]];
     
     xwait[chan] = aXwait;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelXwaitChanged object:self];
 }
 
@@ -207,7 +207,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleWaveforms:sampleWaveforms];
     
     sampleWaveforms = state;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDFG4cSampleWaveformChangedNotification object:self];
 }
 
@@ -221,7 +221,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setRunTask:runTask];
     
     runTask = aRunTask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelRunTaskChanged object:self];
 }
 
@@ -235,7 +235,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setTau:chan withValue:tau[chan]];
     
     tau[chan] = aTau;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelTauChanged object:self];
 }
 
@@ -249,7 +249,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setTauSigma:chan withValue:tauSigma[chan]];
     
     tauSigma[chan] = aTauSigma;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelTauSigmaChanged object:self];
 }
 
@@ -265,9 +265,9 @@ enum {
     
     if(aBinFactor < 1)       aBinFactor = 1;
     else if(aBinFactor > 6)  aBinFactor = 6;
-
+	
     binFactor[chan] = aBinFactor;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelBinFactorChanged object:self];
 }
 
@@ -283,11 +283,11 @@ enum {
     if(aEMin > 32768)  aEMin = 32768;
     
     eMin[chan] = aEMin;
-
-     //compute the value that will be written to HW.
+	
+	//compute the value that will be written to HW.
     [self setParam:@"ENERGYLOW" value:eMin[chan] channel:chan];
-
-
+	
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelEMinChanged object:self];
 }
 
@@ -303,11 +303,11 @@ enum {
     if(aPsaEnd > 100)aPsaEnd = 100;
     
     psaEnd[chan] = aPsaEnd;
-
-     //compute the value that will be written to HW.
+	
+	//compute the value that will be written to HW.
     [self setParam:@"PSALENGTH" value: psaEnd[chan]-psaStart[chan] channel:chan];
-
-
+	
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelPsaEndChanged object:self];
 }
 
@@ -321,13 +321,13 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setPsaStart:chan withValue:psaStart[chan]];
     
     if(aPsaStart > 100)aPsaStart = 100;
-
+	
     psaStart[chan] = aPsaStart;
-
-     //compute the value that will be written to HW.
+	
+	//compute the value that will be written to HW.
     [self setParam:@"PSAOFFSET" value: psaStart[chan] channel:chan];
-
-
+	
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelPsaStartChanged object:self];
 }
 
@@ -341,7 +341,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setTraceDelay:chan withValue:traceDelay[chan]];
     
     if(aTraceDelay > 4096)  aTraceDelay = 4096;
-
+	
     traceDelay[chan] = aTraceDelay;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelTraceDelayChanged object:self];
@@ -357,9 +357,9 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setTraceLength:chan withValue:traceLength[chan]];
     
     if(aTraceLength > 4096)  aTraceLength = 4096;
-
+	
     traceLength[chan] = aTraceLength;
-
+	
     [self setParam:@"TRACELENGTH" value: traceLength[chan] channel:chan];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelTraceLengthChanged object:self];
@@ -376,7 +376,7 @@ enum {
     
     if(aVOffset < -3)       aVOffset = -3;
     else if(aVOffset > 3)  aVOffset = 3;
-
+	
     vOffset[chan] = aVOffset;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelVOffsetChanged object:self];
@@ -393,9 +393,9 @@ enum {
     
     if(aVGain < 0)        aVGain = 0;
     else if(aVGain > 16)  aVGain = 16;
-
+	
     vGain[chan] = aVGain;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelVGainChanged object:self];
 }
 
@@ -415,7 +415,7 @@ enum {
 	else if(aTriggerThreshold > upperLimit)  aTriggerThreshold = upperLimit;
 	
     triggerThreshold[chan] = aTriggerThreshold;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelTriggerThresholdChanged object:self];
 }
 
@@ -430,9 +430,9 @@ enum {
     
     if(aTriggerFlatTop < 0)          aTriggerFlatTop = 0;
     else if(aTriggerFlatTop > 0.75)  aTriggerFlatTop = 0.75;
-
+	
     triggerFlatTop[chan] = aTriggerFlatTop;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelTriggerFlatTopChanged object:self];
 }
 
@@ -447,7 +447,7 @@ enum {
     
     if(aTriggerRiseTime < 0.025)      aTriggerRiseTime = 0.025;
     else if(aTriggerRiseTime > 0.775) aTriggerRiseTime = 0.775;
-
+	
     triggerRiseTime[chan] = aTriggerRiseTime;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelTriggerRiseTimeChanged object:self];
@@ -463,7 +463,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyFlatTop:chan withValue:energyFlatTop[chan]];
     
     energyFlatTop[chan] = aEnergyFlatTop;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelEnergyFlatTopChanged object:self];
 }
 
@@ -476,7 +476,7 @@ enum {
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyRiseTime:chan withValue:energyRiseTime[chan]];
     
-
+	
     energyRiseTime[chan] = aEnergyRiseTime;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDGF4cModelEnergyRiseTimeChanged object:self];
@@ -494,8 +494,8 @@ enum {
     oscEnabledMask = aMask;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDFG4cOscEnabledMaskChangedNotification
-							  object:self];
+	 postNotificationName:ORDFG4cOscEnabledMaskChangedNotification
+	 object:self];
 	
 }
 
@@ -520,10 +520,10 @@ enum {
 	else if(aDecimation>6) aDecimation = 6;
 	
     decimation = aDecimation;
-
+	
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDFG4cDecimationChangedNotification
-							  object:self];
+	 postNotificationName:ORDFG4cDecimationChangedNotification
+	 object:self];
     
 }
 
@@ -567,8 +567,8 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setRevision:revision];
 	revision = aValue;
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDFG4cRevisionChangedNotification
-							  object:self];
+	 postNotificationName:ORDFG4cRevisionChangedNotification
+	 object:self];
 }
 
 - (NSMutableDictionary *)lookUpTable
@@ -592,8 +592,8 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setChannel:channel];
     channel = aChannel;
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDFG4cChannelChangedNotification
-							  object:self];
+	 postNotificationName:ORDFG4cChannelChangedNotification
+	 object:self];
 }
 
 - (NSString *) firmWarePath
@@ -609,8 +609,8 @@ enum {
     firmWarePath = [aFirmWarePath copy];
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDFG4cFirmWarePathChangedNotification
-							  object:self];
+	 postNotificationName:ORDFG4cFirmWarePathChangedNotification
+	 object:self];
 }
 
 - (NSString *) dspCodePath
@@ -626,8 +626,8 @@ enum {
     dspCodePath = [aDSPCodePath copy];
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDFG4cDSPCodePathChangedNotification
-							  object:self];
+	 postNotificationName:ORDFG4cDSPCodePathChangedNotification
+	 object:self];
 }
 
 
@@ -685,9 +685,9 @@ enum {
     [[array objectAtIndex:index] setObject:[NSNumber numberWithUnsignedShort:aValue] forKey:[NSString stringWithFormat:@"value%d",aChannel]];
     
     [[NSNotificationCenter defaultCenter] 
-                postNotificationName:ORDFG4cParamChangedNotification
-                              object:self
-                            userInfo: [NSDictionary dictionaryWithObject:aParamName forKey:@"ParamName"]];
+	 postNotificationName:ORDFG4cParamChangedNotification
+	 object:self
+	 userInfo: [NSDictionary dictionaryWithObject:aParamName forKey:@"ParamName"]];
 }
 
 - (unsigned short) paramValue:(NSString*)aParamName
@@ -707,9 +707,9 @@ enum {
     [[array objectAtIndex:index] setObject:[NSNumber numberWithUnsignedShort:aValue] forKey:@"value"];
     
     [[NSNotificationCenter defaultCenter] 
-                postNotificationName:ORDFG4cParamChangedNotification
-                              object:self
-                            userInfo: [NSDictionary dictionaryWithObject:aParamName forKey:@"ParamName"]];
+	 postNotificationName:ORDFG4cParamChangedNotification
+	 object:self
+	 userInfo: [NSDictionary dictionaryWithObject:aParamName forKey:@"ParamName"]];
 }
 
 - (void) set:(NSString*)arrayName index:(unsigned)index toObject:(id)anObject forKey:(NSString*)aKey
@@ -722,13 +722,13 @@ enum {
         [item setObject:anObject forKey:aKey];
         
         [[NSNotificationCenter defaultCenter] 
-                    postNotificationName:ORDFG4cParamChangedNotification
-                                  object:self
-                                userInfo: [NSDictionary dictionaryWithObjectsAndKeys: 
-                                    arrayName, @"ArrayName",
-                                    [NSNumber numberWithInt:index], @"ArrayIndex",
-                                    [item objectForKey:@"name"], @"ParamName",
-                                    nil]];
+		 postNotificationName:ORDFG4cParamChangedNotification
+		 object:self
+		 userInfo: [NSDictionary dictionaryWithObjectsAndKeys: 
+					arrayName, @"ArrayName",
+					[NSNumber numberWithInt:index], @"ArrayIndex",
+					[item objectForKey:@"name"], @"ParamName",
+					nil]];
         
     }
 }
@@ -807,7 +807,7 @@ enum {
 - (void) loadSystemFPGA:(NSString*)filePath
 {
 	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-	NS_DURING
+	@try {
 		[controller lock];
 		[self writeICSR:0x01];	//prepare to configure the system FPGA
 		[ORTimer delay:0.060];	//must delay abit
@@ -827,10 +827,11 @@ enum {
 		}
 		else NSLogColor([NSColor redColor],@"Unable to open: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
 		[controller unlock];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[controller unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) loadFilterTriggerFPGAs:(NSString*)filePath
@@ -844,17 +845,18 @@ enum {
 	if(fpgaData){
 		int i;
 		const unsigned char* dataPtr = (unsigned char*)[fpgaData bytes];
-		NS_DURING
+		@try {
 			[controller lock];
 			for(i=0;i<len;i++){
 				unsigned short data = (dataPtr[i]&0x00ff);
 				[controller camacShortNAF:[self stationNumber] a:9 f:17 data:&data];
 			}
 			[controller unlock];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			[controller unlock];
 			[localException raise];
-		NS_ENDHANDLER
+		}
 		
 		NSLog(@"Loaded: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
 	}
@@ -867,7 +869,7 @@ enum {
     
 	[[self undoManager] disableUndoRegistration];
 	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-	NS_DURING
+	@try {
 		[controller lock];
 		unsigned short data;
 		
@@ -900,18 +902,19 @@ enum {
 			}
 		}
 		if(revision >= 3) { //revision 'D' or 'E'
-                            //set the switch bus
+			//set the switch bus
 			[self writeICSR:0x2400];
 			[ORTimer delay:0.060];
 		}
 		[[self undoManager] enableUndoRegistration];
 		[controller unlock];
-       
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		[controller unlock];
 		[[self undoManager] enableUndoRegistration];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (unsigned long) readDSPProgramWord
@@ -942,11 +945,11 @@ enum {
 	//the read-back and comparision of the DSP memory before starting the DSP.
     
     if(!dspCodePath)return; //should throw or post alarm here.
-
+	
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    NS_DURING
+    @try {
 		[controller lock];
-       
+		
         [self writeCSR:kDSPResetCSRBit];
         [ORTimer delay:0.060];
         
@@ -985,10 +988,11 @@ enum {
         }
         else  NSLog(@"**Unable to open <%@>\n",dspCodePath);
         [controller unlock];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [controller unlock];
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) fullInit
@@ -1008,12 +1012,12 @@ enum {
 - (void) loadParamsWithReadBack:(BOOL)readBack
 {
 	if(okToLoadWhileRunning && [gOrcaGlobals runInProgress])[paramLoadLock lock];
-
+	
     [self setComputableParams];
 	long errorCount = 0;
 	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-
-	NS_DURING 
+	
+	@try { 
 		unsigned short data;
 		
 		//stop the DSP runtask.
@@ -1091,7 +1095,7 @@ enum {
 				}
 			}
 		}
-	
+		
 		if(revision == 2) { //revision 'D' only
 			address = [self getDSPParamAddress:@"AOUTBUFFER"];
 			int i,n=256;
@@ -1106,7 +1110,7 @@ enum {
 		
  		[self executeTask:kSetDACs];
 		[self executeTask:kProgramFiPPI];
-       
+		
 		if(readBack){
 			if(errorCount){
 				NSLogColor([NSColor redColor],@"Loaded DGF4c parameter set. Read back comparision showed %d error%@\n",errorCount,errorCount>1?@"s.":@" ");
@@ -1115,10 +1119,11 @@ enum {
 				NSLog(@"Loaded DGF4c parameter set. Read back comparision matches.\n");
 			}
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLogColor([NSColor redColor], @"%@\n",localException);
 		NSLogError(@"",@"DFG4c Card Error",localException,nil);
-	NS_ENDHANDLER
+	}
 	
 	if(okToLoadWhileRunning && [gOrcaGlobals runInProgress]){
 		[self writeCSR:csrValueForResuming];
@@ -1128,32 +1133,34 @@ enum {
 
 - (void) setParam:(NSString*)paramName to:(unsigned short)aValue
 {
-    NS_DURING
+    @try {
         unsigned short address = [self getDSPParamAddress:paramName];
 		[self writeTSAR:address];
         [[self adapter] camacShortNAF:[self stationNumber] a:0 f:16 data:&aValue];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"ORDFG4cModel unable to find address for '%@' parameter\n",paramName);
-    NS_ENDHANDLER
+    }
 }
 
 - (short) readParam:(NSString*)paramName
 {
 	unsigned short aValue;
-    NS_DURING
+    @try {
         unsigned short address = [self getDSPParamAddress:paramName];
 		[self writeTSAR:address];
         [[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:&aValue];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"ORDFG4cModel unable to find address for '%@' parameter\n",paramName);
-    NS_ENDHANDLER
+    }
 	return aValue;
 }
 
 - (void) readParams
 {
     [[self undoManager] disableUndoRegistration];
-	NS_DURING 
+	@try { 
 		controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
         
 		unsigned short address;
@@ -1196,10 +1203,11 @@ enum {
 				[self setParam:[paramDict objectForKey:@"name"] value:outValue];
 			}
 		}
-        NS_HANDLER
-            NSLogError(@"",@"DFG4c Card Error",localException,nil);
-        NS_ENDHANDLER	
-        [[self undoManager] enableUndoRegistration];
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"DFG4c Card Error",localException,nil);
+	}	
+	[[self undoManager] enableUndoRegistration];
 }
 
 - (void) sampleChannel:(short)aChannel
@@ -1252,9 +1260,9 @@ enum {
 	double sigmaTauRaw;
 	double avgtau;
 	double tauvalues[kNumRepeatedTauRuns];
-		
+	
 	tauRaw=tau[chan]*1.0e-6;
-
+	
 	int j=0;
 	int i;
 	double sumtau=0.0;
@@ -1266,26 +1274,26 @@ enum {
 			sumtau += tauRaw;
 		}
 	}
-
+	
 	avgtau=sumtau/j;  /* Average tau value */
 	
 	sumtau=0.0;
 	for(i=0; i<j; i++){  /* To derive the sigma of tau value */
 		sumtau += pow((tauvalues[i]-avgtau), 2.0);
 	}
-
+	
 	sigmaTauRaw=sqrt(sumtau)/j;
 	if(avgtau>0){
 		[self setTau:chan withValue:avgtau/1.0e-6];
 		[self setTauSigma:chan withValue:sigmaTauRaw/1.0e-6];
 		NSLog(@"dgf4c station %d channel: %d tau:%.4f sigma:%.4f\n", [self stationNumber], chan, tau[chan],tauSigma[chan]);
-
+		
 		/* Update DSP parameters */
 		[self setParam:@"PREAMPTAUA" value:floor(tau[chan]) channel:chan];
 		[self setParam:@"PREAMPTAUB" value:floor((unsigned short)((tau[chan]-floor(tau[chan]))*65536)) channel:chan];		
-
+		
 		[self loadParamsWithReadBack:NO];
-
+		
 		[self runBaselineCut:chan];
 	}
 }
@@ -1299,7 +1307,7 @@ enum {
 	unsigned short buffer[kLinearBufferSize*2]={0};
 	double sdev,sdevCount,val,BLsigma;
 	double baseline[kLinearBufferSize/6];
-
+	
 	/* Store the DSP parameter Log2BWeight value */
 	KeepLog=[self paramValue:@"LOG2BWEIGHT" channel:chan];
 	[self setParam:@"LOG2BWEIGHT" value:0 channel:chan];
@@ -1307,40 +1315,40 @@ enum {
 	/* Get the values of DSP parameters SlowLength, SlowGap and BLCut */
     SG = [self paramValue:@"SLOWGAP" channel:chan];
     SL = [self paramValue:@"SLOWLENGTH" channel:chan];
-
+	
 	/* Set the DSP parameter BLcut  */
 	BLcut=[self paramValue:@"BLCUT" channel:chan];
 	[self setParam:@"BLCUT" value:0 channel:chan];
-
+	
 	/* Set the DSP parameter HostIO  */
 	KeepHostIO=[self paramValue:@"HOSTIO" channel:chan];
 	[self setParam:@"HOSTIO" value:0 channel:chan ];
-
+	
 	[self loadParamsWithReadBack:NO];
-
+	
 	tim=(double)(SL+SG)*pow(2.0,(double)decimation);
-
+	
 	sdev=0;
 	sdevCount=0;
 	LC=0;
 	do{
 		/* Start Control Task 6 to collect 1365 baselines */
 		[self executeTask:kMeasureBaselines];
-
+		
 		[self writeTSAR:linearDataBufferStart];
 		for(k=0;k<kLinearBufferSize;k++){
 			[controller camacShortNAF:cachedStation a:0 f:0 data:buffer];
 		}
-
+		
 		for(k=0; k<1365; k+=1){
 			baseline[k]=buffer[6*k]+buffer[6*k+1]*65536;
 			baseline[k]=buffer[6*k+2]+buffer[6*k+3]*65536-exp(-tim/(tau[chan]*SYSTEM_CLOCK_MHZ))*baseline[k];
 			baseline[k]/=pow(2.0,(decimation+8));
 		}
-
+		
 		for(k=0; k<1364; k+=2){
 			val=fabs(baseline[k]-baseline[k+1]);
-
+			
 			if(val!=0){
 				if(BLcut==0){
 					sdev+=val;
@@ -1360,10 +1368,10 @@ enum {
 			break;
 		
 	}while(sdevCount<1000);
-
+	
 	BLsigma=sdev*sqrt(3.1415927/2)/sdevCount;
 	BLcut=(unsigned short)floor(8.0*BLsigma);
-
+	
 	/* Set the DSP parameter BLcut  */
 	[self setParam:@"BLCUT" value: BLcut channel:chan];
 	[self loadParamsWithReadBack:NO];
@@ -1374,21 +1382,21 @@ enum {
 	do{
 		/* Start Control Task 6 to collect 1365 baselines */
 		[self executeTask:kMeasureBaselines];
-
+		
 		[self writeTSAR:linearDataBufferStart];
 		for(k=0;k<kLinearBufferSize;k++){
 			[controller camacShortNAF:cachedStation a:0 f:0 data:buffer];
 		}
-
+		
 		for(k=0; k<1365; k+=1){
 			baseline[k]=buffer[6*k]+buffer[6*k+1]*65536;
 			baseline[k]=buffer[6*k+2]+buffer[6*k+3]*65536-exp(-tim/(tau[chan]*SYSTEM_CLOCK_MHZ))*baseline[k];
 			baseline[k]/=pow(2.0,(decimation+8));
 		}
-
+		
 		for(k=0; k<1364; k+=2){
 			val=fabs(baseline[k]-baseline[k+1]);
-
+			
 			if(val!=0){
 				if(BLcut==0){
 					sdev+=val;
@@ -1411,22 +1419,22 @@ enum {
 	
 	BLsigma=sdev*sqrt(3.1415927/2)/sdevCount;
 	BLcut=(unsigned short)floor(8.0*BLsigma);
-
+	
 	/* Set the DSP parameter BLcut  */
 	[self setParam:@"BLCUT" value: BLcut channel:chan];
-
+	
 	/* Restore the DSP parameter Log2BWeight */
 	[self setParam:@"LOG2BWEIGHT" value: KeepLog channel:chan];
-
+	
 	/* Restore the DSP parameter HostIO  */
 	[self setParam:@"HOSTIO" value: KeepHostIO];
-
+	
 	[self loadParams];
-
+	
 	/* Update user value BLCUT  */
 	//index=Find_Xact_User_Match("BLCUT");
 	//Dgf4c_Devices[Chosen_Module].user_values[Chosen_Chan][index]=BLcut;
-
+	
 }
 
 
@@ -1440,9 +1448,9 @@ enum {
 	unsigned short TRACKDAC;
 	double ADCtarget,baselinepercent;
 	NSLog(@"Calculating Offsets DGF4c Station %d\n",[self stationNumber]);
-
+	
 	[self executeTask:kRampOffsetDAC];
-
+	
 	[self writeTSAR:linearDataBufferStart];
     controller = [self adapter];			//cache the controller and station for alittle bit more speed.
 	cachedStation = [self stationNumber];
@@ -1452,9 +1460,9 @@ enum {
 		[controller camacShortNAF:cachedStation a:0 f:0 data:&data];
 		TDACwave[j] = data;
 	}
-
+	
 	/*	clean up the array by removing entries that are out of bounds, or on 
-		a constant level */
+	 a constant level */
 	for (j = (kLinearBufferSize - 1); j > 0; j--){
 		if ((TDACwave[j] > adcMax) || (TDACwave[j] == TDACwave[j-1])){
 			TDACwave[j] = 0;
@@ -1462,9 +1470,9 @@ enum {
 	}
 	/* take care of the 0th element last, always lose it */
 	TDACwave[0] = 0.0;
-
+	
 	/*	Another pass through the array, removing any element that is 
-		surrounded by ZEROs */
+	 surrounded by ZEROs */
 	for(j = 1; j < (kLinearBufferSize - 1); j++){
 		if(TDACwave[j] != 0){	/* remove out-of-range points and failed measurements */
 			if ((TDACwave[j - 1] == 0) && (TDACwave[j + 1] == 0)){
@@ -1472,7 +1480,7 @@ enum {
 			}
 		}
 	}
-
+	
 	for( j = 0; j < 4; j ++ ){
 		//check and only do good channels
 		unsigned short csra = [self paramValue:@"CHANCSRA" channel:j];
@@ -1494,7 +1502,7 @@ enum {
 				b = (float) (floor(abmid + (0.25 * abdiff)));
 				coeff[0] = a;
 				coeff[1] = b;
-
+				
 				ret = linefit(TDACwave, coeff);
 				if ( ret == 0 ){
 					a = -coeff[0] / coeff[1];
@@ -1513,16 +1521,16 @@ enum {
 						ChanGain = coeff[1] / 6.0;
 						DACfifty = (2048 - coeff[0]) / coeff[1];
 						DACcenter = (DACfifty - low) * 32;
-
+						
 						/* Find baseline percent and calculate ADCtarget */
 						baselinepercent=(double)[self paramValue:@"BASELINEPERCENT" channel:j];
 						ADCtarget=4096*baselinepercent/100.0;
-
+						
 						TRACKDAC = (unsigned short)round(DACcenter+32*(ADCtarget-2048)/(6*ChanGain));
-			
+						
 						[self setParam:@"TRACKDAC" value:TRACKDAC channel:j];
 						[self setVOffset:j withValue:((32768.0-TRACKDAC)/32768.0)*3.0];
-
+						
 					}
 					else NSLogColor([NSColor redColor],@"Dgf4c Station: %d channel: %d AdjustOffsets: linear fit error\n",cachedStation,j);
 				}
@@ -1546,113 +1554,113 @@ enum {
 	double threshold,t0,t1,TriggerLevelShift,avg,MaxTimeDiff;
 	double localAmplitude, s1,s0; // used to determine which tau fit was best
 	long TFcount;
-
+	
 	ndat=8192;
 	/* Generate random indices */
 	RandomSwap();
-
+	
 	/* Get FastLength, FastGap, XWait */
     FL		= [self paramValue:@"FASTLENGTH" channel:chan];
     FG		= [self paramValue:@"FASTGAP" channel:chan];
     Xwait	= [self paramValue:@"XWAIT" channel:chan];
 	dt=Xwait/SYSTEM_CLOCK_MHZ*1e-6;
-
+	
 	localAmplitude=0;
 	for(TFcount=0;TFcount<10;TFcount++){
-	[self sampleChannel:chan];		  /* get an ADC-trace via control task 4*/
-  
-	  /* Find threshold */
-	  threshold = Thresh_Finder((unsigned int*)oscModeData[chan], Tau, FF, FF2, FL, FG,Xwait);
-	  
-	  kmin=2*FL+FG;
-
-	  for(k=0;k<kmin;k+=1) Trig[k]= 0;
-
-	  /* Find average FF shift */
-	  avg=0.0;
-	  n=0;
-	  for(k=kmin;k<(ndat-1);k+=1){
-		  if(FF[k+1]-FF[k]<threshold){
-			  avg+=FF[k];
-			  n+=1;
-		  }
-	  }
-	  avg/=n;
-	  for(k=kmin;k<(ndat-1);k+=1)
-		  FF[k]-=avg;
-
-	  for(k=kmin;k<(ndat-1);k+=1)  /* look for rising edges */
-		  Trig[k]= (FF[k]>threshold)?1:0;
-
-	  tcount=0;
-	  for(k=kmin;k<(ndat-1);k+=1){  /* record trigger times */
-		if((Trig[k+1]-Trig[k])==1)
-			TimeStamp[tcount++]=k+2;  /* there are tcount triggers */
-	  }
-	  if(tcount>2){
-		  TriggerLevelShift=0.0;
-		  for(n=0; n<(tcount-1); n+=1){
-			  avg=0.0;
-			  kmin=(long)(TimeStamp[n]+2*FL+FG);
-			  kmax=(long)(TimeStamp[n+1]-1);
-			  if((kmax-kmin)>0){
-				  for(k=kmin;k<kmax;k+=1)
-					  avg+=FF2[k];
-
-				  TriggerLevelShift+=avg/(kmax-kmin);
-			  }
-		  }
-		  TriggerLevelShift/=tcount;
-	  }
-
-	  switch(tcount){
-		case 0:
-			continue;
-			break;
-		case 1:
-			t0=TimeStamp[0]+2*FL+FG;
-			t1=ndat-2;
-			break;
-		default:
-			MaxTimeDiff=0.0;
-			for(k=0;k<(tcount-1);k+=1){
-				if((TimeStamp[k+1]-TimeStamp[k])>MaxTimeDiff){
-					MaxTimeDiff=TimeStamp[k+1]-TimeStamp[k];
-					MaxTimeIndex=k;
+		[self sampleChannel:chan];		  /* get an ADC-trace via control task 4*/
+		
+		/* Find threshold */
+		threshold = Thresh_Finder((unsigned int*)oscModeData[chan], Tau, FF, FF2, FL, FG,Xwait);
+		
+		kmin=2*FL+FG;
+		
+		for(k=0;k<kmin;k+=1) Trig[k]= 0;
+		
+		/* Find average FF shift */
+		avg=0.0;
+		n=0;
+		for(k=kmin;k<(ndat-1);k+=1){
+			if(FF[k+1]-FF[k]<threshold){
+				avg+=FF[k];
+				n+=1;
+			}
+		}
+		avg/=n;
+		for(k=kmin;k<(ndat-1);k+=1)
+			FF[k]-=avg;
+		
+		for(k=kmin;k<(ndat-1);k+=1)  /* look for rising edges */
+			Trig[k]= (FF[k]>threshold)?1:0;
+		
+		tcount=0;
+		for(k=kmin;k<(ndat-1);k+=1){  /* record trigger times */
+			if((Trig[k+1]-Trig[k])==1)
+				TimeStamp[tcount++]=k+2;  /* there are tcount triggers */
+		}
+		if(tcount>2){
+			TriggerLevelShift=0.0;
+			for(n=0; n<(tcount-1); n+=1){
+				avg=0.0;
+				kmin=(long)(TimeStamp[n]+2*FL+FG);
+				kmax=(long)(TimeStamp[n+1]-1);
+				if((kmax-kmin)>0){
+					for(k=kmin;k<kmax;k+=1)
+						avg+=FF2[k];
+					
+					TriggerLevelShift+=avg/(kmax-kmin);
 				}
 			}
-
-			if((ndat-TimeStamp[tcount-1])<MaxTimeDiff){
-				t0=TimeStamp[MaxTimeIndex]+2*FL+FG;
-				t1=TimeStamp[MaxTimeIndex+1]-1;
-			}
-			else{
-				t0=TimeStamp[tcount-1]+2*FL+FG;
+			TriggerLevelShift/=tcount;
+		}
+		
+		switch(tcount){
+			case 0:
+				continue;
+				break;
+			case 1:
+				t0=TimeStamp[0]+2*FL+FG;
 				t1=ndat-2;
-			}
-
-			break;
-	  }
-
-	  if(((t1-t0)*dt)<3*Tau)
-		  continue;
-
-	  t1=MIN(t1,(t0+round(6*Tau/dt+4)));
-	  
-	  s0=0;	s1=0;
-	  kmin=(long)t0-(2*FL+FG)-FL-1;
-	  for(k=0;k<FL;k++){
-		s0+=oscModeData[chan][kmin+k];
-		s1+=oscModeData[chan][(long)(t0+k)];
-	  }
-	  if((s1-s0)/FL > localAmplitude){
-		Tau=Tau_Fit((unsigned int*)oscModeData[chan], (long)t0, (long)t1, dt);
-		localAmplitude=(s1-s0)/FL;
-	  }
-  }
-
-  return Tau;   /* do fit */
-
+				break;
+			default:
+				MaxTimeDiff=0.0;
+				for(k=0;k<(tcount-1);k+=1){
+					if((TimeStamp[k+1]-TimeStamp[k])>MaxTimeDiff){
+						MaxTimeDiff=TimeStamp[k+1]-TimeStamp[k];
+						MaxTimeIndex=k;
+					}
+				}
+				
+				if((ndat-TimeStamp[tcount-1])<MaxTimeDiff){
+					t0=TimeStamp[MaxTimeIndex]+2*FL+FG;
+					t1=TimeStamp[MaxTimeIndex+1]-1;
+				}
+				else{
+					t0=TimeStamp[tcount-1]+2*FL+FG;
+					t1=ndat-2;
+				}
+				
+				break;
+		}
+		
+		if(((t1-t0)*dt)<3*Tau)
+			continue;
+		
+		t1=MIN(t1,(t0+round(6*Tau/dt+4)));
+		
+		s0=0;	s1=0;
+		kmin=(long)t0-(2*FL+FG)-FL-1;
+		for(k=0;k<FL;k++){
+			s0+=oscModeData[chan][kmin+k];
+			s1+=oscModeData[chan][(long)(t0+k)];
+		}
+		if((s1-s0)/FL > localAmplitude){
+			Tau=Tau_Fit((unsigned int*)oscModeData[chan], (long)t0, (long)t1, dt);
+			localAmplitude=(s1-s0)/FL;
+		}
+	}
+	
+	return Tau;   /* do fit */
+	
 }
 
 
@@ -1700,29 +1708,29 @@ enum {
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORDGF4cDecoderForWaveform",       @"decoder",
-        [NSNumber numberWithLong:mcaDataId],@"dataId",
-        [NSNumber numberWithBool:YES],      @"variable",
-        [NSNumber numberWithLong:-1],       @"length",
-        nil];
+								 @"ORDGF4cDecoderForWaveform",       @"decoder",
+								 [NSNumber numberWithLong:mcaDataId],@"dataId",
+								 [NSNumber numberWithBool:YES],      @"variable",
+								 [NSNumber numberWithLong:-1],       @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Waveform"];
 	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORDGF4cDecoderForEvent",			@"decoder",
-        [NSNumber numberWithLong:dataId],   @"dataId",
-        [NSNumber numberWithBool:YES],      @"variable",
-        [NSNumber numberWithLong:-1],       @"length",
-        nil];
+				   @"ORDGF4cDecoderForEvent",			@"decoder",
+				   [NSNumber numberWithLong:dataId],   @"dataId",
+				   [NSNumber numberWithBool:YES],      @"variable",
+				   [NSNumber numberWithLong:-1],       @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"Event"];
-
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORDGF4cDecoderForLiveTime",        @"decoder",
-        [NSNumber numberWithLong:liveTimeId],@"dataId",
-        [NSNumber numberWithBool:NO],        @"variable",
-        [NSNumber numberWithLong:19],        @"length",
-        nil];
+				   @"ORDGF4cDecoderForLiveTime",        @"decoder",
+				   [NSNumber numberWithLong:liveTimeId],@"dataId",
+				   [NSNumber numberWithBool:NO],        @"variable",
+				   [NSNumber numberWithLong:19],        @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"LiveTime"];
-
+	
 	
     return dataDictionary;
 }
@@ -1731,21 +1739,21 @@ enum {
 {
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"Waveform",						@"name",
-							[NSNumber numberWithLong:dataId],   @"dataId",
-							[NSNumber numberWithLong:4],		@"maxChannels",
-								nil];
-		
+				   @"Waveform",						@"name",
+				   [NSNumber numberWithLong:dataId],   @"dataId",
+				   [NSNumber numberWithLong:4],		@"maxChannels",
+				   nil];
+	
 	[anEventDictionary setObject:aDictionary forKey:@"ORDGF4cModel"];
 }
 
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
+	
 	memset(oscModeData,0,4*8192*sizeof(short));
 	[self performSelectorOnMainThread:@selector(updateOsc) withObject:nil waitUntilDone:NO];
-
+	
     if(![self adapter]){
 		[NSException raise:@"Not Connected" format:@"You must connect to a PCI-CAMAC Controller (i.e. a CC32)."];
     }
@@ -1771,7 +1779,7 @@ enum {
 	
     firstTime = YES;
 	okToLoadWhileRunning = ![gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORDFG4cDSPSettingsLock];
-
+	
 	linearDataBufferStart	= [self readParam:@"AOUTBUFFER"];
 	linearDataBufferSize	= [self readParam:@"LOUTBUFFER"];
 	
@@ -1794,7 +1802,7 @@ enum {
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     BOOL locked = NO;
-    NS_DURING
+    @try {
         if(!firstTime){
 			unsigned short csr;
 			if(okToLoadWhileRunning)[paramLoadLock lock];
@@ -1827,7 +1835,7 @@ enum {
 					int i;
 					for(i=0;i<numWordsInBuffer;i++){
 						[controller camacShortNAF:cachedStation a:0 f:0 data:sptr++];
-					//	[ORTimer delayNanoseconds:100];
+						//	[ORTimer delayNanoseconds:100];
 					}
 					if(padIt){
 						*sptr = 0;	
@@ -1845,7 +1853,7 @@ enum {
 					[self writeCSR:csrValueForResuming];
                     [controller unlock];    //end special global critical section
                     locked = NO;
-
+					
 				}
 				
 				
@@ -1854,7 +1862,7 @@ enum {
 				}
 			}
 			if(okToLoadWhileRunning)[paramLoadLock unlock];
-
+			
 		}
         else {
 			unsigned short csr = [self readCSR];
@@ -1864,12 +1872,13 @@ enum {
             firstTime = NO;
 		}
 		
-        NS_HANDLER
-            if(locked)[controller unlock];//end special global critical section (after exception)
-            NSLogError(@"",@"DFG4c Card Error",@"Take Data Loop",nil);
-            [self incExceptionCount];
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		if(locked)[controller unlock];//end special global critical section (after exception)
+		NSLogError(@"",@"DFG4c Card Error",@"Take Data Loop",nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 
@@ -1884,17 +1893,17 @@ enum {
 			break;
 		}
 	}
-
+	
 	int i;
 	for(i=0;i<4;i++){
 		[self readMCA:aDataPacket channel:i];
 	}
-		
+	
 	//[self executeTask:kDisconnectInputs];
 	[self readParams];
-
+	
 	[self shipLiveTime];
-
+	
 }
 
 - (void) shipLiveTime
@@ -1902,13 +1911,13 @@ enum {
 	//this routine assumes that the params have been read from the board
 	unsigned long liveTimeData[19];
 	
-
+	
 	liveTimeData[0] = liveTimeId | 19;		//old version == 13 new version == 19
 	liveTimeData[1] = 0;					//spare
 	liveTimeData[2] = (([self crateNumber]&0x1e)<<21) | (([self stationNumber]& 0x0000001f)<<16);
 	
 	int chan;
-
+	
 	unsigned long rta = [self paramValue:@"REALTIMEA"];
 	unsigned long rtb = [self paramValue:@"REALTIMEB"];
 	unsigned long rtc = [self paramValue:@"REALTIMEC"];
@@ -1916,7 +1925,7 @@ enum {
 	//packedDGF4LiveTime.asDouble = realTime;
 	liveTimeData[3] = rta;
 	liveTimeData[4] = rtb<<16 | rtc;
-
+	
 	rta = [self paramValue:@"RUNTIMEA"];
 	rtb = [self paramValue:@"RUNTIMEB"];
 	rtc = [self paramValue:@"RUNTIMEC"];
@@ -1924,10 +1933,10 @@ enum {
 	//packedDGF4LiveTime.asDouble = runTime;
 	liveTimeData[5] = rta;
 	liveTimeData[6] = rtb<<16 | rtc;
-
+	
 	int index = 7;
 	for(chan = 0;chan<4;chan++){
-
+		
 		rta = [self paramValue:@"LIVETIMEA" channel:chan];
 		rtb = [self paramValue:@"LIVETIMEB" channel:chan];
 		rtc = [self paramValue:@"LIVETIMEC" channel:chan];
@@ -1935,7 +1944,7 @@ enum {
 		//packedDGF4LiveTime.asDouble = liveTime;
 		liveTimeData[index++] = rta;
 		liveTimeData[index++] = rtb<<16 | rtc;
-
+		
 		
 		unsigned short na = [self paramValue:@"FASTPEAKSA" channel:chan];
 		unsigned short nb = [self paramValue:@"FASTPEAKSB" channel:chan];
@@ -1953,17 +1962,17 @@ enum {
 		unsigned long bufferLength   = [self readParam:@"LOUTBUFFER"]; //number of shorts
 		
 		[self setParam:@"HOSTIO" to:aChannel];
-	
+		
 		//reconstructed data (size in longs + extra head stuff
 		NSMutableData* mcaData = [NSMutableData dataWithLength:(8*2*bufferLength)+2*sizeof(long)];
 		unsigned long* mcaPtr = (unsigned long*)[mcaData bytes];
-
+		
 		long wordCount = 2;
 		
 		controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 		cachedStation = [self stationNumber];
 		
-		NS_DURING
+		@try {
 			[controller lock];
 			int numPage;
 			for(numPage=0;numPage<8;numPage++){
@@ -1980,10 +1989,11 @@ enum {
 				}
 			}
 			[controller unlock];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			[controller unlock];
 			[localException raise];
-		NS_ENDHANDLER
+		}
 		
 		mcaPtr[0] = mcaDataId | wordCount; //len in longs!
 		mcaPtr[1] = unChangingDataPart | (aChannel<<12);
@@ -2024,7 +2034,7 @@ enum {
             }
         }
     }
-
+	
 #   define NAME(xx) [NSString stringWithFormat:(xx),i]
     int i;
     for(i=0;i<4;i++){
@@ -2047,10 +2057,10 @@ enum {
     }
 	//[self calcUserParams];
     [self setComputableParams];
-
+	
 	oscLock			= [[NSLock alloc] init];
 	paramLoadLock	= [[NSLock alloc] init];
-
+	
     return self;
 }
 
@@ -2092,11 +2102,11 @@ enum {
 
 - (NSArray*) valueArrayFor:(SEL)sel
 {
-
+	
     NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:sel]];
     [invocation setSelector:sel];
     [invocation setTarget:self];
-
+	
 	NSMutableArray* theValues = [NSMutableArray arrayWithCapacity:4];
 	int i;
 	for(i=0;i<4;i++){
@@ -2118,8 +2128,8 @@ enum {
 			[invocation getReturnValue:&iValue];
 			[theValues addObject:[NSNumber numberWithInt:iValue]];
 		}
-
-
+		
+		
 	}
 	return theValues;
 }
@@ -2146,7 +2156,7 @@ enum {
     [objDictionary setObject:[self valueArrayFor:@selector(xwait:)] forKey:@"xwait"];
     [objDictionary setObject:[NSNumber numberWithBool:[self syncWait]] forKey:@"syncWait"];
     [objDictionary setObject:[NSNumber numberWithBool:[self inSync]] forKey:@"inSync"];
-       
+	
 	return objDictionary;
 }
 
@@ -2233,10 +2243,10 @@ enum {
         } 
         else {
             [dspArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                [NSNumber numberWithInt:[addressString intValue]], @"address",
-                nameString, @"name",
-                [NSNumber numberWithInt:0], @"value",
-                nil]];
+								 [NSNumber numberWithInt:[addressString intValue]], @"address",
+								 nameString, @"name",
+								 [NSNumber numberWithInt:0], @"value",
+								 nil]];
             
             [theLines removeObjectAtIndex:0];
         }
@@ -2356,8 +2366,8 @@ enum {
 	[p setCanBeRamped:YES];
 	[p setInitMethodSelector:@selector(loadParams)];
     [a addObject:p];
-
-
+	
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Energy Rise Time"];
     [p setFormat:@"##0.0000" upperLimit:64 lowerLimit:0 stepSize:.01 units:@""];
@@ -2369,73 +2379,73 @@ enum {
     [p setFormat:@"##0.0000" upperLimit:64 lowerLimit:0 stepSize:.01 units:@""];
     [p setSetMethod:@selector(setEnergyFlatTop:withValue:) getMethod:@selector(energyFlatTop:)];
     [a addObject:p];
-
-
+	
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trace Length"];
     //[p setFormatter:[[[OHexFormatter alloc] init] autorelease]];
     [p setFormat:@"##0" upperLimit:20 lowerLimit:0 stepSize:1 units:@"uS"];
     [p setSetMethod:@selector(setTraceLength:withValue:) getMethod:@selector(traceLength:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trace Delay"];
     //[p setFormatter:[[[OHexFormatter alloc] init] autorelease]];
     [p setFormat:@"##0.00" upperLimit:100 lowerLimit:0 stepSize:1 units:@"uS"];
     [p setSetMethod:@selector(setTraceDelay:withValue:) getMethod:@selector(traceDelay:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"PSA Start"];
     //[p setFormatter:[[[OHexFormatter alloc] init] autorelease]];
     [p setFormat:@"##0.00" upperLimit:100 lowerLimit:0 stepSize:1 units:@"uS"];
     [p setSetMethod:@selector(setPsaStart:withValue:) getMethod:@selector(psaStart:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"PSA End"];
     //[p setFormatter:[[[OHexFormatter alloc] init] autorelease]];
     [p setFormat:@"##0.00" upperLimit:100 lowerLimit:0 stepSize:1 units:@"uS"];
     [p setSetMethod:@selector(setPsaEnd:withValue:) getMethod:@selector(psaEnd:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"V Gain"];
     [p setFormat:@"##0.000" upperLimit:16 lowerLimit:0 stepSize:.1 units:@"V/V"];
     [p setSetMethod:@selector(setVGain:withValue:) getMethod:@selector(vGain:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"V Offset"];
     [p setFormat:@"##0.000" upperLimit:3 lowerLimit:-3 stepSize:.1 units:@"V"];
     [p setSetMethod:@selector(setVOffset:withValue:) getMethod:@selector(vOffset:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Tau"];
     [p setFormat:@"##0" upperLimit:10000000 lowerLimit:0 stepSize:1 units:@"uS"];
     [p setSetMethod:@selector(setTau:withValue:) getMethod:@selector(tau:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"TauSigma"];
     [p setFormat:@"##0.0000" upperLimit:10000000 lowerLimit:0 stepSize:.1 units:@"uS"];
     [p setSetMethod:@selector(setTauSigma:withValue:) getMethod:@selector(tauSigma:)];
     [a addObject:p];
-
-
+	
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Bin Factor"];
     [p setFormat:@"##0" upperLimit:6 lowerLimit:1 stepSize:1 units:@""];
     [p setSetMethod:@selector(setBinFactor:withValue:) getMethod:@selector(binFactor:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Cutoff Emin"];
     [p setFormat:@"##0" upperLimit:32768 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setEMin:withValue:) getMethod:@selector(eMin:)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"XWait"];
     [p setFormat:@"##0" upperLimit:100 lowerLimit:0 stepSize:1 units:@"x25ns"];
@@ -2444,31 +2454,31 @@ enum {
 	
     [a addObject:[ORHWWizParam boolParamWithName:@"SyncWait" setter:@selector(setSyncWait:) getter:@selector(syncWait)]];
     [a addObject:[ORHWWizParam boolParamWithName:@"InSync" setter:@selector(setInSync:) getter:@selector(inSync)]];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Calc Baselines"];
     [p setSetMethodSelector:@selector(runBaselineCuts)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Calc Offset"];
     [p setSetMethodSelector:@selector(calcOffsets)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Load Params"];
     [p setSetMethodSelector:@selector(loadParams)];
     [a addObject:p];
-
+	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Full Init"];
     [p setSetMethodSelector:@selector(fullInit)];
     [a addObject:p];
-
+	
     return a;
 }
 
@@ -2515,10 +2525,10 @@ enum {
 
 - (long) computeMaxEvents:(long) runType
 {
-
+	
 	long k,maximumEvents;
 	unsigned short bhl,ehl,chl,leventbuffer,loutputbuffer,lengthin,lengthout;
-
+	
 	/* Check InputEventSize for list modes (0x101, 0x102, 0x103)  */
 	/* and must not exceed EventBufferSize; Check OutputEventSize */
 	/* for all list modes.								          */
@@ -2527,11 +2537,11 @@ enum {
 	ehl				= kEventHeaderLength;				//Event Head Length
 	leventbuffer	= kEventBufferLength;				//Event Buffer Length
 	loutputbuffer	= [self readParam:@"LOUTBUFFER"];	//Output Buffer Length
-
+	
 	if(runType != kMCAMode){ /* All list modes */
 		
 		if((runType == kListModeCompression1) || (runType == kListModeCompression2) || (runType == kListModeCompression3)){
-
+			
 			lengthin = bhl + ehl;
 			/* Set Channel Head Length */
 			switch(runType){
@@ -2539,7 +2549,7 @@ enum {
 				case kListModeCompression2: chl=4; break;
 				case kListModeCompression3: chl=2; break;
 			}
-		
+			
 			for(k = 0; k < 4; k ++){
 				unsigned short csra = [self paramValue:@"CHANCSRA" channel:k];
 				if(csra & 0x0004){
@@ -2552,11 +2562,11 @@ enum {
 				return -1;
 			}
 		}
-
+		
 		/* Check OutputEventSize for list modes and fast list modes; */
 		/* must not exceed OutBufferSize; if successful, calculate   */
 		/* maximumEvents.												 */
-
+		
 		/* Set Channel Head Length */
 		switch(runType){
 			case kListMode:
@@ -2574,7 +2584,7 @@ enum {
 				NSLogColor([NSColor redColor],@"Bad run type for DGF4d station %d.\n",[self stationNumber]);
 				return -1;
 		}
-
+		
 		lengthout = ehl;
 		for(k = 0; k < 4; k ++){
 			unsigned short csra = [self paramValue:@"CHANCSRA" channel:k];
@@ -2587,22 +2597,22 @@ enum {
 					lengthout += chl;
 			}
 		}
-
+		
 		if(lengthout > (loutputbuffer-bhl)){
 			NSLogColor([NSColor redColor],@"The event is too long for DGF4d station %d. Please shorten traces\n",[self stationNumber]);
 			return -1;
 		}
-
+		
 		/* Calculate maximumEvents */
 		maximumEvents = (long)floor((loutputbuffer-bhl)/lengthout);
 	}				
 	else{ /* No need to check MCA run mode 0x301 */
 		maximumEvents=0;
 	}
-
+	
 	/* Update the DSP parameter MAXEVENTS */
 	[self setParam:@"MAXEVENTS" value:maximumEvents];
-		
+	
 	return maximumEvents;
 }
 
@@ -2610,7 +2620,7 @@ enum {
 {
     
     unsigned short val;
-
+	
 	[self setParam:@"RUNTASK"  value:runTask ];
 	if([self multipleCardEnvironment]){
 		[self setParam:@"SYNCHWAIT" value:runBehaviorMask&0x1];
@@ -2621,22 +2631,22 @@ enum {
 		[self setParam:@"INSYNCH"  value:0];
 	}
 	[self setParam:@"DECIMATION" value:decimation];
-
+	
     //peaksample
     short i;
     for(i=0;i<4;i++){
-
-         //XWAIT
+		
+		//XWAIT
         [self setParam:@"XWAIT" value:xwait[i] channel:i];
-
-         //GAINDAC
+		
+		//GAINDAC
         val = 65535.0 - (32768.0*log10(((double)vGain[i]/0.1639)));
         [self setParam:@"GAINDAC" value:val channel:i];
-
-         //TRACKDAC
+		
+		//TRACKDAC
         val = 32768 * (1. - (vOffset[i]/3.0));
-       [self setParam:@"TRACKDAC" value:val channel:i];
-
+		[self setParam:@"TRACKDAC" value:val channel:i];
+		
         //-------------------------------------------------------------------------
         //energy filter parameters
         //SLOWGAP
@@ -2646,13 +2656,13 @@ enum {
         //SLOWLENGTH
         unsigned short val = energyRiseTime[i]/((pow(2.,(double)decimation))*0.025);
         [self setParam:@"SLOWLENGTH" value: val channel:i];
- 
+		
         //-------------------------------------------------------------------------
         //trigger filter parameters
         //FASTGAP
         val = triggerFlatTop[i]/0.025;
         [self setParam:@"FASTGAP" value: val channel:i];
- 
+		
         //FASTLENGTH
         val = triggerRiseTime[i]/0.025;    
         [self setParam:@"FASTLENGTH" value: val channel:i];
@@ -2660,17 +2670,17 @@ enum {
 		//FASTTHRES
 		val = triggerThreshold[i] * val;
 		[self setParam:@"FASTTHRESH" value:val channel:i];
-
+		
 		//-------------------------------------------------------------------------
-
-
+		
+		
         unsigned short slowLength   = [self paramValue:@"SLOWLENGTH" channel:i];
         unsigned short slowGap      = [self paramValue:@"SLOWGAP"    channel:i];
         unsigned short fastLength   = [self paramValue:@"FASTLENGTH" channel:i];
         unsigned short fastGap      = [self paramValue:@"FASTGAP"    channel:i];
         unsigned short trigDelay    = [self paramValue:@"TRIGGERDELAY"    channel:i];
-
- 
+		
+		
         //check constraints
         if(!((slowLength + slowGap) < 32)) {
 			[self constraintViolated:@"SLOWLENGTH+SLOWGAP < 32 Check Decimation!"];
@@ -2684,7 +2694,7 @@ enum {
 			[self constraintViolated:@"FASTLENGTH+FASTGAP < 32"];
 			NSLog(@"Try adjusting the Trigger Filter parameters (chan: %d)\n",i);
 		}
-
+		
         //PEAKSAMPLE
 		unsigned short peakSample,peakSep;
         switch (decimation) {
@@ -2693,7 +2703,7 @@ enum {
             case 2:  peakSample = slowLength+slowGap-2;			peakSep = peakSample+5; break;
             default: peakSample = slowLength+slowGap-1;			peakSep = peakSample+5; break;
         }
-    
+		
 		if(peakSample>33) {
 			peakSep = peakSample+1;
 		}
@@ -2702,35 +2712,35 @@ enum {
 		}
         [self setParam:@"PEAKSAMPLE" value:peakSample channel:i];
         [self setParam:@"PEAKSEP" value:peakSep channel:i];
-	
+		
         //MINWIDTH and MAXWIDTH
         val = triggerFlatTop[i]/0.025 + triggerRiseTime[i]/0.025 + (2.0/*micro seconds*//0.025);
 		[self setParam:@"MAXWIDTH" value:val channel:i];
         if(val>255)[self setParam:@"MAXWIDTH" value:255 channel:i]; 
         [self setParam:@"MINWIDTH" value:fastLength+fastGap channel:i];
-
+		
         //paflength       
         val = trigDelay + (traceDelay[i]*SYSTEM_CLOCK_MHZ) + 8;
         if(val > 4092)val = 4092;
         [self setParam:@"PAFLENGTH" value:val channel:i];
-
+		
         //triggerDelay       
         val = (peakSample + 6)*pow(2.,(double)decimation);
         if(val > 4092)val = 4092;
         [self setParam:@"TRIGGERDELAY" value:val channel:i];
-
+		
         //trace length 
 		//1 sample every 25 ns. user inputs micro secs. so 40 samples/microsec     
 		val = traceLength[i]*SYSTEM_CLOCK_MHZ;
         [self setParam:@"TRACELENGTH" value:val channel:i];
-
+		
 		//compute the value that will be written to HW.
 		[self setParam:@"PREAMPTAUA" value: floor(tau[i]) channel:i];
 		[self setParam:@"PREAMPTAUB" value: 65536*(tau[i] - floor(tau[i]))  channel:i];
-
+		
 		[self setParam:@"LOG2EBIN" value:(65536-binFactor[i]) channel:i];
-
-
+		
+		
     }
 }
 
@@ -2739,57 +2749,57 @@ enum {
 	double UDcorr[7]={8.0,0.0,8.0,0.0,8.0,0.0,8.0};
 	int chan;
 	[self setDecimation:[self paramValue:@"DECIMATION"]];
-
+	
 	double dt=pow(2.0,(double)decimation)/SYSTEM_CLOCK_MHZ;
 	for(chan=0;chan<4;chan++){
-
+		
 		unsigned short slowLength = [self paramValue:@"SLOWLENGTH" channel:chan];
 		unsigned short slowGap    = [self paramValue:@"SLOWGAP" channel:chan];
 		[self setEnergyRiseTime:chan withValue:slowLength*dt];
 		[self setEnergyFlatTop:chan withValue:slowGap*dt];
-
+		
 		unsigned short fastLength = [self paramValue:@"FASTLENGTH" channel:chan];
 		unsigned short fastGap    = [self paramValue:@"FASTGAP" channel:chan];
 		unsigned short fastThres  = [self paramValue:@"FASTTHRESH" channel:chan];
 		[self setTriggerRiseTime:chan withValue:fastLength/SYSTEM_CLOCK_MHZ];
 		[self setTriggerFlatTop:chan withValue:fastGap/SYSTEM_CLOCK_MHZ];
 		[self setTriggerThreshold:chan withValue:fastThres/fastLength];
-		 
+		
 		unsigned short rta = [self paramValue:@"PREAMPTAUA" channel:chan];
 		unsigned short rtb = [self paramValue:@"PREAMPTAUB" channel:chan];
 		[self setTau:chan withValue:(double)(rta+rtb/65536.0)];
-
+		
 		[self setTraceLength:chan withValue:[self paramValue:@"TRACELENGTH" channel:chan]];
-
+		
 		/*----- Get trace delay -----*/
 		/* Get the DSP parameter PAFLENGTH */
 		unsigned short PAFLength    = [self paramValue:@"PAFLENGTH" channel:chan];
 		unsigned short triggerDelay = [self paramValue:@"TRIGGERDELAY" channel:chan];
-
+		
 		[self setTraceDelay:chan withValue:PAFLength-triggerDelay-UDcorr[decimation]];
 		if(traceDelay[chan] < 0.0) {  // Ensure limit
 			traceDelay[chan] = 0.0;
 		}
-
+		
 		/* Get the DSP parameter PSAOFFSET */
 		[self setPsaStart:chan withValue:[self paramValue:@"PSAOFFSET" channel:chan]];
 		unsigned short psaLength = [self paramValue:@"PSALENGTH" channel:chan];
 		[self setPsaEnd:chan withValue:psaStart[chan] + psaLength];
-
+		
 		/*----- Get Vgain -----*/
 		/* Get DSP parameter GAINDAC */
 		unsigned short GAINDAC			 = [self paramValue:@"GAINDAC" channel:chan];
 		[self setVGain:chan withValue: 0.1639*pow(10.0,(65535.0-((double)GAINDAC))/32768.0)];
-
+		
 		/*----- Get Voffset -----*/
 		/* Get DSP parameter TRACKDAC */
 		unsigned short TRACKDAC			 = [self paramValue:@"TRACKDAC" channel:chan];
 		[self setVOffset:chan withValue:((32768.0-TRACKDAC)/32768.0)*3.0];
-
+		
 		/* Get DSP parameter ENERGYLOW */
 		[self setEMin:chan withValue:[self paramValue:@"ENERGYLOW" channel:chan]];
 		[self setBinFactor:chan	withValue:[self paramValue:@"LOG2EBIN" channel:chan]];
-
+		
 		/* Get DSP parameter XWAIT */
 		unsigned short XWAIT = [self paramValue:@"XWAIT" channel:chan];
 		[self setXwait:chan withValue: XWAIT];
@@ -2847,10 +2857,10 @@ enum {
     int i;
     for(i=0;i<n;i++){
         NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSNumber numberWithInt:i],@"index",
-            [NSNumber numberWithBool:NO],@"channelParam",
-            array,@"array",
-            nil];
+									[NSNumber numberWithInt:i],@"index",
+									[NSNumber numberWithBool:NO],@"channelParam",
+									array,@"array",
+									nil];
         
         [lookUpTable setObject:dictionary forKey:[[array objectAtIndex:i] objectForKey:@"name"]];
     }
@@ -2858,10 +2868,10 @@ enum {
     n = [array count];
     for(i=0;i<n;i++){
         NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-            [NSNumber numberWithInt:i],@"index",
-            array,@"array",
-            [NSNumber numberWithBool:YES],@"channelParam",
-            nil];
+									[NSNumber numberWithInt:i],@"index",
+									array,@"array",
+									[NSNumber numberWithBool:YES],@"channelParam",
+									nil];
         [lookUpTable setObject:dictionary forKey:[[array objectAtIndex:i] objectForKey:@"name"]];
     }
 }
@@ -2870,11 +2880,11 @@ enum {
 {
     NSLogError(@"",@"DFG4c Card Error",@"Param Constraint Violated",reasonString,nil);
     reasonString = [@"Violated: " stringByAppendingString:reasonString];
-
+	
     NSLogColor([NSColor redColor],@"%@\n",reasonString);
-
+	
 	[self postWarning:reasonString];
-
+	
 }
 
 
@@ -2882,7 +2892,7 @@ enum {
 - (void) sampleWaveforms:(unsigned long*)recordPtr
 {
 	[oscLock lock];
-
+	
 	if(recordPtr != NULL) {
 		long totalWords			= (recordPtr[0] & kLongFormLengthMask)*2;	//length was in longs, convert to words
 		unsigned short* dataPtr = (unsigned short*)&recordPtr[2];	//recast to short
@@ -2910,28 +2920,28 @@ enum {
 			case kFastListMode:
 			case kFastListModeCompression1:
 				chl = 9;
-			break;
+				break;
 			case kListModeCompression2:
 			case kFastListModeCompression2:
 				chl = 4;
-			break;
+				break;
 			case kListModeCompression3:
 			case kFastListModeCompression3:
 				chl = 2;
-			break;
+				break;
 			default:
 				[oscLock unlock];
 				return; //somethings wrong, just return
-			break;
+				break;
 		}
 		
 		dataPtr += kBufferHeaderLength;
-
+		
 		do {
 			unsigned short* eventHeader = dataPtr;
 			unsigned short evtPattern = eventHeader[0];	//get the event hit pattern
 			dataPtr += kEventHeaderLength;				//the data Ptr ahead to the first channel header
-
+			
 			if( evtPattern != 0 ){
 				int chan;
 				for( chan = 0; chan < 4; chan++){

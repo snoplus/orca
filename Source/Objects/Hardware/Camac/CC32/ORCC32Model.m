@@ -1,69 +1,69 @@
 /*
-
-File:		ORCC32Model.cpp
-
-Usage:		Implementation for the ARW PCI-CAMAC
-I/O Kit Kernel Extension (KEXT) Functions
-
-Author:		F. McGirt
-
-Copyright:		Copyright 2003 F. McGirt.  All rights reserved.
-
-Change History:	1/20/03
-07/29/03 MAH CENPA. Converted to Obj-C for the ORCA project.
-
-
-Notes:		617 PCI Matching is done with
-Vendor ID 0x10b5 and Device ID 0x2258
-Subsystem Vendor ID 0x9050
-Subsystem Device ID 0x2258
-
-
-There are two "features" of the ARE PCI-CAMAC hardware to
-be aware of:
-
-The hardware as delivered may come configured for use with
-MS-DOS and force all memory accesses to lie below 1MB. This
-will not work for either Mac or Win OSs and must be changed
-using the PLX tools for re-programming the EEPROM on board
-the PCI card.
-
-The PCI-CAMAC hardware forces all NAF command writes to set
-the F16 bit to a 1 and all NAF command reads to set the F16
-bit to 0.  Therefore all F values from F0 through F15 MUST
-be used with CAMAC bus read accesses and all F values from
-F16 through F31 MUST be used with CAMAC bus write accesses.
-
-
-At times delays must be used between a sequence
-of NAF commands or the CC32 status returns
-will not reflect the current status - but usually
-that of the previous NAF command.  (See the
-                                    ORCC32ModelTest object.)  This may possibly
-be due to the design of the controller hardware, 
-the speed of the PowerMac G4, or to the use of an
-optimizing compiler which may relocate memory
-accesses.   In an effort to alleviate this problem
-all variables used to access PCI-CAMAC memory spaces
-are declared volatile.
-
-
------------------------------------------------------------
-    This program was prepared for the Regents of the University of 
-    Washington at the Center for Experimental Nuclear Physics and 
-    Astrophysics (CENPA) sponsored in part by the United States 
-    Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
-    The University has certain rights in the program pursuant to 
-    the contract and the program should not be copied or distributed 
-    outside your organization.  The DOE and the University of 
-    Washington reserve all rights in the program. Neither the authors,
-    University of Washington, or U.S. Government make any warranty, 
-    express or implied, or assume any liability or responsibility 
-    for the use of this software.
--------------------------------------------------------------
-
-
-    */
+ 
+ File:		ORCC32Model.cpp
+ 
+ Usage:		Implementation for the ARW PCI-CAMAC
+ I/O Kit Kernel Extension (KEXT) Functions
+ 
+ Author:		F. McGirt
+ 
+ Copyright:		Copyright 2003 F. McGirt.  All rights reserved.
+ 
+ Change History:	1/20/03
+ 07/29/03 MAH CENPA. Converted to Obj-C for the ORCA project.
+ 
+ 
+ Notes:		617 PCI Matching is done with
+ Vendor ID 0x10b5 and Device ID 0x2258
+ Subsystem Vendor ID 0x9050
+ Subsystem Device ID 0x2258
+ 
+ 
+ There are two "features" of the ARE PCI-CAMAC hardware to
+ be aware of:
+ 
+ The hardware as delivered may come configured for use with
+ MS-DOS and force all memory accesses to lie below 1MB. This
+ will not work for either Mac or Win OSs and must be changed
+ using the PLX tools for re-programming the EEPROM on board
+ the PCI card.
+ 
+ The PCI-CAMAC hardware forces all NAF command writes to set
+ the F16 bit to a 1 and all NAF command reads to set the F16
+ bit to 0.  Therefore all F values from F0 through F15 MUST
+ be used with CAMAC bus read accesses and all F values from
+ F16 through F31 MUST be used with CAMAC bus write accesses.
+ 
+ 
+ At times delays must be used between a sequence
+ of NAF commands or the CC32 status returns
+ will not reflect the current status - but usually
+ that of the previous NAF command.  (See the
+ ORCC32ModelTest object.)  This may possibly
+ be due to the design of the controller hardware, 
+ the speed of the PowerMac G4, or to the use of an
+ optimizing compiler which may relocate memory
+ accesses.   In an effort to alleviate this problem
+ all variables used to access PCI-CAMAC memory spaces
+ are declared volatile.
+ 
+ 
+ -----------------------------------------------------------
+ This program was prepared for the Regents of the University of 
+ Washington at the Center for Experimental Nuclear Physics and 
+ Astrophysics (CENPA) sponsored in part by the United States 
+ Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+ The University has certain rights in the program pursuant to 
+ the contract and the program should not be copied or distributed 
+ outside your organization.  The DOE and the University of 
+ Washington reserve all rights in the program. Neither the authors,
+ University of Washington, or U.S. Government make any warranty, 
+ express or implied, or assume any liability or responsibility 
+ for the use of this software.
+ -------------------------------------------------------------
+ 
+ 
+ */
 
 #import "ORCC32Model.h"
 #import "ORPCICamacModel.h"
@@ -87,7 +87,7 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:@"ReadOut"];
     [self setReadOutGroup:r1];
     [r1 release];
-
+	
     return self;
 }
 
@@ -116,7 +116,7 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 
 - (void) makeConnectors
 {	
-   //make and cache our connector. However this connector will be 'owned' by another object (the crate)
+	//make and cache our connector. However this connector will be 'owned' by another object (the crate)
     //so we don't add it to our list of connectors. It will be added to the true owner later.
     [self setConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
     [connector setOffColor:[NSColor blueColor]];
@@ -298,10 +298,10 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 }
 
 - (unsigned short)  camacLongNAFBlock:(unsigned short) n 
-									 a:(unsigned short) a 
-									 f:(unsigned short) f
-								  data:(unsigned long*) data
-                                length:(unsigned long)    numWords
+									a:(unsigned short) a 
+									f:(unsigned short) f
+								 data:(unsigned long*) data
+							   length:(unsigned long)    numWords
 {
     return  [[self controller] camacLongNAFBlock:n a:a f:f data:data length:numWords];
 }
@@ -324,7 +324,7 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 	}
     unsigned short theStatus = [[self controller] camacShortNAF:cmdStation a:cmdSubAddress f:cmdSelection data:&data];
     [self decodeStatus:theStatus];
-
+	
 	BOOL CC32LAM = lookAtMe;
 	unsigned long theStations;
 	[self readLAMStations:&theStations];
@@ -334,8 +334,8 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 	theStatus = [self readLAMMask:&theMask]; 
 	
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORCamacControllerCmdValuesChangedNotification
-					  object:self];
+	 postNotificationName:ORCamacControllerCmdValuesChangedNotification
+	 object:self];
     
     
 	NSLog(@"CC32:         LAM:%@ Mask:0x%x LAMs(ALL):0x%x\n",CC32LAM?@"Set":@"Clr",theMask,theStations);
@@ -353,13 +353,14 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     [self delay:kDelay];		// use delays between calls to CC32 to get correct status
     
     // check crate power function
-    NS_DURING
+    @try {
         [[self controller] checkCratePower];
         NSLog(@"CheckCratePower() Finds Power ON\n");
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"****** Controller Not Available ******\n");
         NSLogColor([NSColor redColor],@"****** Check Crate Power and Cable ******\n");
-    NS_ENDHANDLER    
+    }    
     if(![[self controller] powerOK])return;
     
     [self delay:kDelay];

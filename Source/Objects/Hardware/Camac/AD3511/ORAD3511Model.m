@@ -85,7 +85,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
     [[[self undoManager] prepareWithInvocationTarget:self] setIncludeTiming:includeTiming];
     
     includeTiming = aIncludeTiming;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD3511ModelIncludeTimingChanged object:self];
 }
 
@@ -99,7 +99,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabled:enabled];
     
     enabled = aEnabled;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD3511EnabledChanged object:self];
 }
 
@@ -124,9 +124,9 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 
 - (void) postWarning:(NSString*)aMessage
 {
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORAD3511WarningPosted 
-			object:self 
-			userInfo:[NSDictionary dictionaryWithObjectsAndKeys:aMessage,@"WarningMessage",nil]];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORAD3511WarningPosted 
+														object:self 
+													  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:aMessage,@"WarningMessage",nil]];
 }
 
 
@@ -144,10 +144,10 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 	}
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setGain:gain];
-
+	
     
     gain = aGain;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD3511GainChanged object:self];
 }
 
@@ -178,12 +178,12 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORAD3511DecoderForAdc",                       @"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:YES],                  @"variable",
-        [NSNumber numberWithLong:-1],					@"length",
-        [NSNumber numberWithBool:YES],                  @"canBeGated",
-        nil];
+								 @"ORAD3511DecoderForAdc",                       @"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:YES],                  @"variable",
+								 [NSNumber numberWithLong:-1],					@"length",
+								 [NSNumber numberWithBool:YES],                  @"canBeGated",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"ADC"];
     return dataDictionary;
 }
@@ -217,7 +217,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NS_DURING
+    @try {
         
 		if(!firstTime){
 			//test the LAM
@@ -256,13 +256,13 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 				}while(isQbitSet(status));
 				
 				if(eventCount){
-						dataBuffer[0] =  dataId | eventCount+dataOffset;
-						dataBuffer[1] =  crateAndStationId;
-						if(includeTiming){
-							dataBuffer[2] = theTimeRef.asLongs[1];
-							dataBuffer[3] = theTimeRef.asLongs[0];
-						}
-						[aDataPacket addLongsToFrameBuffer:dataBuffer length:eventCount+dataOffset];
+					dataBuffer[0] =  dataId | eventCount+dataOffset;
+					dataBuffer[1] =  crateAndStationId;
+					if(includeTiming){
+						dataBuffer[2] = theTimeRef.asLongs[1];
+						dataBuffer[3] = theTimeRef.asLongs[0];
+					}
+					[aDataPacket addLongsToFrameBuffer:dataBuffer length:eventCount+dataOffset];
 				}
 				[controller camacShortNAF:cachedStation a:0 f:26 data:&dummy]; //enable LAM
 			}
@@ -276,11 +276,12 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 			[self initBoard];
 		}
   		
-		NS_HANDLER
-			NSLogError(@"",@"AD3512 Card Error",nil);
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"AD3512 Card Error",nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 

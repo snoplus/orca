@@ -83,7 +83,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 	if(aOverFlowCheckTime<10)aOverFlowCheckTime = 10;
     
     overFlowCheckTime = aOverFlowCheckTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OR2228AModelOverFlowCheckTimeChanged object:self];
 }
 - (unsigned long) dataId { return dataId; }
@@ -103,8 +103,8 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
     onlineMask = anOnlineMask;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:OR2228AOnlineMaskChangedNotification
-							  object:self];
+	 postNotificationName:OR2228AOnlineMaskChangedNotification
+	 object:self];
 	
 }
 
@@ -132,8 +132,8 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
     suppressZeros = aFlag;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:OR2228ASuppressZerosChangedNotification
-							  object:self];
+	 postNotificationName:OR2228ASuppressZerosChangedNotification
+	 object:self];
     
 }
 
@@ -158,12 +158,12 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"OR2228ADecoderForTdc",                        @"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:NO],                   @"variable",
-        [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
-        [NSNumber numberWithBool:YES],                  @"canBeGated",
-        nil];
+								 @"OR2228ADecoderForTdc",                        @"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:NO],                   @"variable",
+								 [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
+								 [NSNumber numberWithBool:YES],                  @"canBeGated",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"tdc"];
     return dataDictionary;
 }
@@ -217,7 +217,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     NSString* errorLocation = @"";
-    NS_DURING
+    @try {
         
 		if(!firstTime){
 			//check the LAM
@@ -256,10 +256,10 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 			firstTime = NO;
 		}
 		NS_HANDLER
-			NSLogError(@"",@"2228A Card Error",errorLocation,nil);
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
+		NSLogError(@"",@"2228A Card Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 

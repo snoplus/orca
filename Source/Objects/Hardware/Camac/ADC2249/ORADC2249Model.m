@@ -215,7 +215,7 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 		unsigned long asLongs[2];
 	}theTimeRef;
 
-    NS_DURING
+    @try {
         
         //check the LAM
         unsigned short dummy;
@@ -263,11 +263,12 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
             
             
   		}
-		NS_HANDLER
+		}
+@catch(NSException* localException) {
 			NSLogError(@"",@"ADC2249 Card Error",nil);
 			[self incExceptionCount];
 			[localException raise];
-		NS_ENDHANDLER
+		}
 }
 
 

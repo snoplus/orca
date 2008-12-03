@@ -73,7 +73,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
     [[[self undoManager] prepareWithInvocationTarget:self] setIncludeTiming:includeTiming];
     
     includeTiming = aIncludeTiming;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD811ModelIncludeTimingChanged object:self];
 }
 - (unsigned long) dataId { return dataId; }
@@ -93,8 +93,8 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
     onlineMask = anOnlineMask;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORAD811OnlineMaskChangedNotification
-							  object:self];
+	 postNotificationName:ORAD811OnlineMaskChangedNotification
+	 object:self];
 	
 }
 
@@ -122,8 +122,8 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
     suppressZeros = aFlag;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORAD811SuppressZerosChangedNotification
-							  object:self];
+	 postNotificationName:ORAD811SuppressZerosChangedNotification
+	 object:self];
     
 }
 
@@ -153,12 +153,12 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 		if(IsLongForm(dataId))len = 2;	//not timing, long form = 2 words total
 	}
 	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORAD811DecoderForAdc",                        @"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:NO],                   @"variable",
-        [NSNumber numberWithLong:len],		@"length",
-        [NSNumber numberWithBool:YES],                  @"canBeGated",
-        nil];
+								 @"ORAD811DecoderForAdc",                        @"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:NO],                   @"variable",
+								 [NSNumber numberWithLong:len],		@"length",
+								 [NSNumber numberWithBool:YES],                  @"canBeGated",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"ADC"];
     return dataDictionary;
 }
@@ -214,7 +214,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 		unsigned long asLongs[2];
 	}theTimeRef;
 	
-    NS_DURING
+    @try {
         
         //check the LAM
         unsigned short dummy;
@@ -262,11 +262,12 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
             
             
   		}
-		NS_HANDLER
-			NSLogError(@"",@"AD811 Card Error",errorLocation,nil);
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"AD811 Card Error",errorLocation,nil);
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 

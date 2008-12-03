@@ -104,8 +104,8 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     onlineMask = anOnlineMask;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORAD413AOnlineMaskChangedNotification
-							  object:self];
+	 postNotificationName:ORAD413AOnlineMaskChangedNotification
+	 object:self];
 	
 }
 
@@ -144,11 +144,11 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     if(!discriminators){
         [self setDiscriminators:[NSMutableArray arrayWithObjects:
-            [NSNumber numberWithChar:0],
-            [NSNumber numberWithChar:0],
-            [NSNumber numberWithChar:0],
-            [NSNumber numberWithChar:0],
-            nil]];
+								 [NSNumber numberWithChar:0],
+								 [NSNumber numberWithChar:0],
+								 [NSNumber numberWithChar:0],
+								 [NSNumber numberWithChar:0],
+								 nil]];
         
     }
     [[[self undoManager] prepareWithInvocationTarget:self] setDiscriminator:[self discriminatorForChan:aChan] forChan:aChan];
@@ -156,9 +156,9 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     [discriminators replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORAD413ADiscriminatorChangedNotification
-							  object:self
-							userInfo: [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"]];
+	 postNotificationName:ORAD413ADiscriminatorChangedNotification
+	 object:self
+	 userInfo: [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"]];
 }
 
 - (unsigned short) controlReg1
@@ -174,8 +174,8 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     controlReg1 = aControlReg1;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORAD413AControlReg1ChangedNotification
-							  object:self];
+	 postNotificationName:ORAD413AControlReg1ChangedNotification
+	 object:self];
 }
 
 
@@ -189,12 +189,12 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg2:controlReg2];
 	
-
+	
     controlReg2 = aControlReg2 & 0x001f;
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORAD413AControlReg2ChangedNotification
-							  object:self];
+	 postNotificationName:ORAD413AControlReg2ChangedNotification
+	 object:self];
 }
 
 #pragma mark ¥¥¥Hardware functions
@@ -274,12 +274,12 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORAD413ADecoderForAdc",                       @"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:NO],                   @"variable",
-        [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
-        [NSNumber numberWithBool:YES],                  @"canBeGated",
-        nil];
+								 @"ORAD413ADecoderForAdc",                       @"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:NO],                   @"variable",
+								 [NSNumber numberWithLong:IsShortForm(dataId)?1:2],@"length",
+								 [NSNumber numberWithBool:YES],                  @"canBeGated",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"ADC"];
     return dataDictionary;
 }
@@ -332,13 +332,13 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NS_DURING
+    @try {
         
         //test the LAM
         unsigned short dummy;
         unsigned short adcValue;
 		unsigned short status = [controller camacShortNAF:cachedStation a:0 f:8 data:&dummy];
-
+		
         if(isQbitSet(status)) { //LAM status comes back in the Q bit
             
             if(zeroSuppressionMode){            
@@ -376,10 +376,11 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 			[controller camacShortNAF:cachedStation a:0 f:10 data:&dummy];
             
         }
-        NS_HANDLER
-			[self incExceptionCount];
-			[localException raise];
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		[self incExceptionCount];
+		[localException raise];
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo

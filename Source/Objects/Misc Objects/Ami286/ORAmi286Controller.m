@@ -55,7 +55,7 @@
     [[plotter0 yScale] setRngLow:0.0 withHigh:100.];
 	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:100 withMinRng:10];
 	[plotter0 setDrawWithGradient:YES];
-
+	
     [super awakeFromNib];
 }
 
@@ -74,63 +74,63 @@
                      selector : @selector(stateChanged:)
                          name : ORAmi286Lock
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portNameChanged:)
                          name : ORAmi286ModelPortNameChanged
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portStateChanged:)
                          name : ORSerialPortStateChanged
                        object : nil];
-                                              
+	
     [notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
                          name : ORAmi286ModelPollTimeChanged
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(shipLevelsChanged:)
                          name : ORAmi286ModelShipLevelsChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(scaleAction:)
 						 name : ORAxisRangeChangedNotification
 					   object : nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(updateMonitor:)
                          name : ORAmi286Update
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(enabledMaskChanged:)
                          name : ORAmi286ModelEnabledMaskChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(fillStateChanged:)
                          name : ORAmi286FillStateChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(alarmLevelChanged:)
                          name : ORAmi286AlarmLevelChanged
 						object: model];
-
-
+	
+	
 }
 
 - (void) setModel:(id)aModel
@@ -188,7 +188,7 @@
 
 - (void) miscAttributesChanged:(NSNotification*)aNote
 {
-
+	
 	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
 	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
 	
@@ -268,7 +268,7 @@
 	}
 	[[levelMatrix cellWithTag:index] setStringValue:levelAsString];
 	[[level1Matrix cellWithTag:index] setStringValue:levelAsString];
-
+	
 	unsigned long t = [model timeMeasured:index];
 	NSCalendarDate* theDate;
 	if(t){
@@ -329,19 +329,19 @@
 
 - (void) stateChanged:(NSNotification*)aNotification
 {
-
-//    BOOL runInProgress = [gOrcaGlobals runInProgress];
-//    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORAmi286Lock];
+	
+	//    BOOL runInProgress = [gOrcaGlobals runInProgress];
+	//    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORAmi286Lock];
     BOOL locked = [gSecurity isLocked:ORAmi286Lock];
-
+	
     [lockButton setState: locked];
-
+	
     [enabledMaskMatrix setEnabled:!locked];
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
     [shipLevelsButton setEnabled:!locked];
-
+	
 	int i;
 	unsigned char aMask = [model enabledMask];
 	for(i=0;i<4;i++){
@@ -361,7 +361,7 @@
     if(aNotification == nil || [aNotification object] == [model serialPort]){
         if([model serialPort]){
             [openPortButton setEnabled:YES];
-
+			
             if([[model serialPort] isOpen]){
                 [openPortButton setTitle:@"Close"];
                 [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
@@ -393,7 +393,7 @@
     
 	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
 	ORSerialPort *aPort;
-
+	
     [portListPopup selectItemAtIndex:0]; //the default
     while (aPort = [enumerator nextObject]) {
         if([portName isEqualToString:[aPort name]]){
@@ -418,11 +418,12 @@
 #pragma mark ***Actions
 - (IBAction) loadHardwareAction:(id)sender;
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model loadHardware];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (IBAction) fillStateAction:(id)sender;
@@ -580,7 +581,7 @@
 	ORSerialPort *aPort;
     [portListPopup removeAllItems];
     [portListPopup addItemWithTitle:@"--"];
-
+	
 	while (aPort = [enumerator nextObject]) {
         [portListPopup addItemWithTitle:[aPort name]];
 	}    

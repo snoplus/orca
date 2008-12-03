@@ -42,7 +42,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"AD3511"];
-
+	
     return self;
 }
 
@@ -68,7 +68,7 @@
 					 selector : @selector(settingsLockChanged:)
 						 name : ORAD3511SettingsLock
 						object: nil];
-		
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(enabledChanged:)
 						 name : ORAD3511EnabledChanged
@@ -78,17 +78,17 @@
 					 selector : @selector(gainChanged:)
 						 name : ORAD3511GainChanged
 					   object : model];
-					   
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(offsetChanged:)
 						 name : ORAD3511StorageOffsetChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(includeTimingChanged:)
                          name : ORAD3511ModelIncludeTimingChanged
 						object: model];
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -119,26 +119,26 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORAD3511SettingsLock];
     BOOL locked = [gSecurity isLocked:ORAD3511SettingsLock];
-
+	
     [settingLockButton setState: locked];
-
+	
     [readButton setEnabled:!lockedOrRunningMaintenance];
     [testLAMButton setEnabled:!lockedOrRunningMaintenance];
     [resetLAMButton setEnabled:!lockedOrRunningMaintenance];
     [enabledButton setEnabled:!lockedOrRunningMaintenance];
     [initButton setEnabled:!lockedOrRunningMaintenance];
     [includeTimingButton setEnabled:!runInProgress];
-
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORAD3511SettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingLockDocField setStringValue:s];
-
+	
 }
 
 
@@ -180,57 +180,62 @@
 
 - (IBAction) readAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model read];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/Reset" fCode:0];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testLAM];
-    NSLog(@"AD3512 Test LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+		NSLog(@"AD3512 Test LAM for Station %d\n",[model stationNumber]);
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM" fCode:8];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) resetLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model resetLAMandClearBuffer];
         NSLog(@"AD3512 Reset LAM and clear buffer for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Reset LAM/Clear buffer" fCode:10];
-    NS_ENDHANDLER
+    }
 }
 
 
 - (IBAction) disableLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model disableLAM];
         NSLog(@"AD3512 Disable LAM enable latch for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Disable LAM enable latch" fCode:24];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) enableLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model enableLAM];
         NSLog(@"AD3512 Enable LAM enable latch for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Enable LAM enable latch" fCode:26];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) enabledAction:(id)sender
@@ -249,12 +254,13 @@
 }
 - (IBAction) initAction:(id)sender
 {
-    NS_DURING
+    @try {
 		[model initBoard];
 		NSLog(@"Init AD3511 station:%d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Board Init" fCode:26];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) showError:(NSException*)anException name:(NSString*)name fCode:(int)i

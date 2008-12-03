@@ -99,12 +99,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(dataReceived:)
                          name : ORSerialPortDataReceived
                        object : nil];
-
+	
     [notifyCenter addObserver: self
                      selector: @selector(runStarted:)
                          name: ORRunStartedNotification
@@ -114,7 +114,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
                      selector: @selector(runStopped:)
                          name: ORRunStoppedNotification
                        object: nil];
-
+	
 }
 
 - (void) dataReceived:(NSNotification*)note
@@ -123,7 +123,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         NSString* theString = [[[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
 												      encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
-
+		
 		//the serial port may break the data up into small chunks, so we have to accumulate the chunks until
 		//we get a full piece.
         theString = [[theString componentsSeparatedByString:@"\n"] componentsJoinedByString:@""];
@@ -137,7 +137,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
                 [buffer deleteCharactersInRange:NSMakeRange(0,lineRange.location+1)];      //take the cmd out of the buffer
 				
 				[self process_response:theResponse];
-		
+				
 				[self setLastRequest:nil];			 //clear the last request
 				[self processOneCommandFromQueue];	 //do the next command in the queue
             }
@@ -186,7 +186,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
     
     enabledMask = anEnabledMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelEnabledMaskChanged object:self];
 }
 
@@ -205,7 +205,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setShipLevels:shipLevels];
     
     shipLevels = aShipLevels;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelShipLevelsChanged object:self];
 }
 
@@ -219,7 +219,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
     pollTime = aPollTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelPollTimeChanged object:self];
-
+	
 	if(pollTime){
 		[self performSelector:@selector(pollLevels) withObject:nil afterDelay:2];
 	}
@@ -252,11 +252,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	if(index>=0 && index<4){
 		fillStatus[index] = aValue;
-
+		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
 		[[NSNotificationCenter defaultCenter] postNotificationName: ORAmi286Update
 															object:self 
-														userInfo:userInfo];
+														  userInfo:userInfo];
 	}
 }
 
@@ -271,12 +271,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	if(index>=0 && index<4){
 		alarmStatus[index] = aValue;
-
+		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
 		[[NSNotificationCenter defaultCenter] postNotificationName: ORAmi286Update
 															object:self 
-														userInfo:userInfo];
-
+														  userInfo:userInfo];
+		
 		if(alarmStatus[index] & (1<<0)){
 			if(!hiAlarm){
 				hiAlarm = [[ORAlarm alloc] initWithName:@"Ami 286 Hi Level" severity:kRangeAlarm];
@@ -313,8 +313,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			[expiredAlarm release];
 			expiredAlarm = nil;
 		}
-
-
+		
+		
 	}
 }
 
@@ -329,13 +329,13 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	if(index>=0 && index<4){
 		[[[self undoManager] prepareWithInvocationTarget:self] setFillState:index value:fillState[index]];
-
+		
 		fillState[index] = aValue;
-
+		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286FillStateChanged 
 															object:self 
-														userInfo:userInfo];
+														  userInfo:userInfo];
 	}
 }
 
@@ -370,15 +370,15 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		time(&theTime);
 		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		timeMeasured[index] = mktime(theTimeGMTAsStruct);
-
+		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286Update 
 															object:self 
-														userInfo:userInfo];
-
+														  userInfo:userInfo];
+		
 		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
 		[timeRates[index] addDataToTimeAverage:aValue];
-
+		
 	}
 }
 
@@ -388,13 +388,13 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	if(aValue<0)aValue = 0;
 	else if(aValue>100)aValue=100;
     [[[self undoManager] prepareWithInvocationTarget:self] setLowAlarmLevel:index value:lowAlarmLevel[index]];
-
+	
 	lowAlarmLevel[index] = aValue;
 	if(lowAlarmLevel[index] >= hiAlarmLevel[index])[self setHiAlarmLevel:index value:lowAlarmLevel[index]];
-
+	
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286AlarmLevelChanged object:self userInfo:userInfo];
-
+	
 }
 
 - (float) lowAlarmLevel:(int)index
@@ -407,15 +407,15 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	if(aValue<0)aValue = 0;
 	else if(aValue>100)aValue=100;
-		
+	
     [[[self undoManager] prepareWithInvocationTarget:self] setHiAlarmLevel:index value:hiAlarmLevel[index]];
-
+	
 	hiAlarmLevel[index] = aValue;
 	if(hiAlarmLevel[index] < lowAlarmLevel[index])[self setLowAlarmLevel:index value:hiAlarmLevel[index]];
-
+	
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286AlarmLevelChanged object:self userInfo:userInfo];
-
+	
 }
 
 - (float) hiAlarmLevel:(int)index
@@ -457,7 +457,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     if(![aPortName isEqualToString:portName]){
         [portName autorelease];
         portName = [aPortName copy];    
-
+		
         BOOL valid = NO;
         NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
         ORSerialPort *aPort;
@@ -466,7 +466,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
                 [self setSerialPort:aPort];
                 if(portWasOpen){
                     [self openPort:YES];
-                 }
+				}
                 valid = YES;
                 break;
             }
@@ -475,7 +475,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
             [self setSerialPort:nil];
         }       
     }
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelPortNameChanged object:self];
 }
 
@@ -489,7 +489,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [aSerialPort retain];
     [serialPort release];
     serialPort = aSerialPort;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSerialPortChanged object:self];
 }
 
@@ -528,7 +528,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		[self setFillState:i value:[decoder decodeIntForKey:[NSString stringWithFormat:@"FillState%d",i]]];
 	}
     [self registerNotificationObservers];
-
+	
 	return self;
 }
 
@@ -654,11 +654,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORAmi286DecoderForLevel",     @"decoder",
-        [NSNumber numberWithLong:dataId],   @"dataId",
-        [NSNumber numberWithBool:NO],       @"variable",
-        [NSNumber numberWithLong:8],        @"length",
-        nil];
+								 @"ORAmi286DecoderForLevel",     @"decoder",
+								 [NSNumber numberWithLong:dataId],   @"dataId",
+								 [NSNumber numberWithBool:NO],       @"variable",
+								 [NSNumber numberWithLong:8],        @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Levels"];
     
     return dataDictionary;
@@ -685,7 +685,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) processOneCommandFromQueue
 {
 	if([cmdQueue count] == 0) return;
-	NS_DURING
+	@try {
 		NSString* aCmd = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 		[cmdQueue removeObjectAtIndex:0];
 		if([aCmd isEqualToString:@"++ShipRecords"]){
@@ -702,9 +702,10 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 				[self performSelector:@selector(processOneCommandFromQueue) withObject:nil afterDelay:.1];
 			}
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
-
+	}
+	@catch(NSException* localException) {
+	}
+	
 }
 
 - (void) process_response:(NSString*)theResponse

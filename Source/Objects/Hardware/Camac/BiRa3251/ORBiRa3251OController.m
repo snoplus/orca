@@ -6,7 +6,7 @@
  *  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
  *
  */
- //-----------------------------------------------------------
+//-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
 //Astrophysics (CENPA) sponsored in part by the United States 
@@ -55,7 +55,7 @@
                      selector : @selector(outputRegisterChanged:)
                          name : ORBiRa3251OModelOutputRegisterChanged
 						object: model];
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -95,12 +95,13 @@
 
 - (IBAction) initAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model initBoard];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Load Register"];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) showError:(NSException*)anException name:(NSString*)name

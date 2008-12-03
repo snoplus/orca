@@ -66,7 +66,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	[transactionTimer release];
 	[socketLock release];
 	[irqLock release];  
-
+	
 	[self disconnect];
     [super dealloc];
 }
@@ -137,16 +137,17 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
     [[[self undoManager] prepareWithInvocationTarget:self] setStationToTest:stationToTest];
     
     stationToTest = aStationToTest;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORC111CModelStationToTestChanged object:self];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		if(ipAddress) [self connect];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 
@@ -175,11 +176,11 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 {
 	isConnected = aNewIsConnected;
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORC111CConnectionChanged 
-                          object: self];
-
+	 postNotificationName:ORC111CConnectionChanged 
+	 object: self];
+	
 	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
-
+	
 }
 
 - (NSCalendarDate*) timeConnected
@@ -206,7 +207,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
     
     [ipAddress autorelease];
     ipAddress = [aIpAddress copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORC111CIpAddressChanged object:self];
 }
 
@@ -279,7 +280,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	[socketLock lock];		//begin critical section
 	res = CCCC(crate_id);
 	[socketLock unlock];	//end critical section
-
+	
 	return res;
 }
 
@@ -309,7 +310,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 - (unsigned short)  readLAMMask:(unsigned long *)mask
 {
 	NSLog(@"C111C doesn't support a read LAM mask function\n");
-
+	
 	*mask = 0;
 	return 1;
 } 
@@ -317,7 +318,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 - (unsigned short)  readLAMFFStatus:(unsigned short*)value
 {
 	NSLog(@"C111C doesn't support a read LAMFF Status function\n");
-
+	
 	*value = 0;
 	return 1;
 }
@@ -526,10 +527,10 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 }
 
 - (unsigned short)  camacLongNAFBlock:(unsigned short) n 
-									 a:(unsigned short) a 
-									 f:(unsigned short) f
-								  data:(unsigned long*) data
-                                length:(unsigned long)    numWords
+									a:(unsigned short) a 
+									f:(unsigned short) f
+								 data:(unsigned long*) data
+							   length:(unsigned long)    numWords
 {
 	short result = 0;
 	[socketLock lock];		//begin critical section
@@ -575,19 +576,19 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	switch (irq_type) { 
 		case LAM_INT: 
 			lamMask = irq_data;
-		break; 
-		
+			break; 
+			
 		case COMBO_INT: 
 			NSLog(@"got combo irq\n");
 			// Do something when a COMBO event occurs 
 			// Write your code here 
-		break; 
-		
+			break; 
+			
 		case DEFAULT_INT:
 			NSLog(@"got default irq\n");
 			// Do something when the 'DEFAULT' button is pressed  
 			// Write your code here 
-		break; 
+			break; 
 	} 
 	[irqLock unlock];		//end critical section
 }

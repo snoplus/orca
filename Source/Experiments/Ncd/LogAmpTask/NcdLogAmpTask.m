@@ -87,7 +87,7 @@
         pdsMemento = [[thePDSModel memento] retain];  //save the old values
         [thePDSModel setDisableForPulser:YES];
     }
-
+	
     objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
     if([objects count]){
         thePulserModel = [objects objectAtIndex:0];
@@ -114,7 +114,7 @@
         NSLogColor([NSColor redColor],@"No PDS stepper task defined, so nothing to do!\n");
         return NO;
     }
-
+	
     if(!thePulserModel){
         NSLogColor([NSColor redColor],@"No Pulser object in config, so nothing to do!\n");
         NSLogColor([NSColor redColor],@"Start of <%@> aborted!\n",[self title]);
@@ -153,22 +153,24 @@
         [stepTask setIsSlave:NO];
     }
     if(thePDSModel){
-		NS_DURING
+		@try {
 			[thePDSModel restoreFromMemento:pdsMemento];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
         [pdsMemento release];
         pdsMemento = nil;
     }
     if(thePulserModel){
-		NS_DURING
+		@try {
 			[thePulserModel restoreFromMemento:pulserMemento];
-		NS_HANDLER
-		NS_ENDHANDLER
-
+		}
+		@catch(NSException* localException) {
+		}
+		
         [pulserMemento release];
         pulserMemento = nil;
-                
+		
         [stepTask restoreFromMemento:stepTaskMemento];
         [stepTaskMemento release];
         stepTaskMemento = nil;
@@ -192,7 +194,7 @@ static NSString* NcdPDSStepTaskTime  = @"NcdPDSStepTaskTime";
     self = [super initWithCoder:decoder];
     
     [NSBundle loadNibNamed: @"NcdLogAmpTask" owner: self];	
-
+	
     [[self undoManager] disableUndoRegistration];
     
     [self setTimeOnOneChannel:[decoder decodeIntForKey:NcdPDSStepTaskTime]];

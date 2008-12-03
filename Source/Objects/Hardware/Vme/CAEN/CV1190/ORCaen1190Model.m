@@ -26,32 +26,32 @@
 
 // Define all the registers available to this unit.
 static RegisterNamesStruct reg[kNumRegisters] = {
-	{@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly,	kD32}, //0
-	{@"Control Register",	false,  true, 	true,	0x1000,		kReadWrite,	kD16}, //1
-	{@"Status Register",	false,	false, 	false,	0x1002,		kReadOnly,	kD16}, //2
-	{@"Interrupt Level",	false,	false, 	true,	0x100A,		kReadWrite,	kD16}, //3
-	{@"Interrupt Vector",	false,	false, 	true,	0x100C,		kReadWrite,	kD16}, //4
-	{@"Geo Address",		false,	false, 	true,	0x100E,		kReadWrite,	kD16}, //5
-	{@"MCST Base Address",  false,	false, 	true,	0x1010,		kReadWrite,	kD16}, //6
-	{@"MCST Control",		false,	false, 	true,	0x1012,		kReadWrite,	kD16}, //7
-	{@"Module Reset",		false,	false, 	false,	0x1014,		kWriteOnly,	kD16}, //8
-	{@"Software Clear",		false,	false, 	false,	0x1016,		kWriteOnly,	kD16}, //9
-	{@"Software Event Reset",false,	false, 	false,	0x1018,		kWriteOnly,	kD16}, //10
-	{@"Software Trigger",	false,	false, 	false,	0x101A,		kWriteOnly,	kD16}, //11
-	{@"Event Counter",		true,	true, 	true,	0x101C,		kReadOnly,	kD32}, //12
-	{@"Event Stored",		true,	true, 	true,	0x1020,		kReadOnly,	kD16}, //13
-	{@"Almost Full Level",	false,	true, 	true,	0x1022,		kReadWrite,	kD16}, //14
-	{@"BLT Event Number",	false,	true, 	true,	0x1024,		kReadWrite,	kD16}, //15
-	{@"Firmware Revision",	false,	true, 	false,	0x1026,		kReadOnly,	kD16}, //16
-	{@"TestReg",			false,	true, 	true,	0x1028,		kReadWrite,	kD32}, //17
-	{@"Output Prog Control",false,	true, 	true,	0x102C,		kReadWrite,	kD16}, //18
-	{@"Micro",				false,	false, 	false,	0x102E,		kReadWrite,	kD16}, //18
-	{@"Micro Handshake",	false,	false, 	false,	0x1030,		kReadWrite,	kD16}, //18
-	{@"Event FIFO",			true,	true, 	true,	0x1038,		kReadWrite,	kD16}, //18
-	{@"Event FIFO Stored",	true,	true, 	true,	0x103C,		kReadWrite,	kD16}, //18
-	{@"Event FIFO Status",	false,	false, 	false,	0x103E,		kReadWrite,	kD16}, //18
-	{@"Dummy 32",			false,	true, 	true,	0x1200,		kReadWrite,	kD32}, //21
-	{@"Dummy 16",			false,	true, 	true,	0x1204,		kReadOnly,	kD16}  //22
+{@"Output Buffer",      true,	true, 	true,	0x0000,		kReadOnly,	kD32}, //0
+{@"Control Register",	false,  true, 	true,	0x1000,		kReadWrite,	kD16}, //1
+{@"Status Register",	false,	false, 	false,	0x1002,		kReadOnly,	kD16}, //2
+{@"Interrupt Level",	false,	false, 	true,	0x100A,		kReadWrite,	kD16}, //3
+{@"Interrupt Vector",	false,	false, 	true,	0x100C,		kReadWrite,	kD16}, //4
+{@"Geo Address",		false,	false, 	true,	0x100E,		kReadWrite,	kD16}, //5
+{@"MCST Base Address",  false,	false, 	true,	0x1010,		kReadWrite,	kD16}, //6
+{@"MCST Control",		false,	false, 	true,	0x1012,		kReadWrite,	kD16}, //7
+{@"Module Reset",		false,	false, 	false,	0x1014,		kWriteOnly,	kD16}, //8
+{@"Software Clear",		false,	false, 	false,	0x1016,		kWriteOnly,	kD16}, //9
+{@"Software Event Reset",false,	false, 	false,	0x1018,		kWriteOnly,	kD16}, //10
+{@"Software Trigger",	false,	false, 	false,	0x101A,		kWriteOnly,	kD16}, //11
+{@"Event Counter",		true,	true, 	true,	0x101C,		kReadOnly,	kD32}, //12
+{@"Event Stored",		true,	true, 	true,	0x1020,		kReadOnly,	kD16}, //13
+{@"Almost Full Level",	false,	true, 	true,	0x1022,		kReadWrite,	kD16}, //14
+{@"BLT Event Number",	false,	true, 	true,	0x1024,		kReadWrite,	kD16}, //15
+{@"Firmware Revision",	false,	true, 	false,	0x1026,		kReadOnly,	kD16}, //16
+{@"TestReg",			false,	true, 	true,	0x1028,		kReadWrite,	kD32}, //17
+{@"Output Prog Control",false,	true, 	true,	0x102C,		kReadWrite,	kD16}, //18
+{@"Micro",				false,	false, 	false,	0x102E,		kReadWrite,	kD16}, //18
+{@"Micro Handshake",	false,	false, 	false,	0x1030,		kReadWrite,	kD16}, //18
+{@"Event FIFO",			true,	true, 	true,	0x1038,		kReadWrite,	kD16}, //18
+{@"Event FIFO Stored",	true,	true, 	true,	0x103C,		kReadWrite,	kD16}, //18
+{@"Event FIFO Status",	false,	false, 	false,	0x103E,		kReadWrite,	kD16}, //18
+{@"Dummy 32",			false,	true, 	true,	0x1200,		kReadWrite,	kD32}, //21
+{@"Dummy 16",			false,	true, 	true,	0x1204,		kReadOnly,	kD16}  //22
 };
 
 NSString* ORCaen1190DeadTimeChanged					= @"ORCaen1190DeadTimeChanged";
@@ -83,7 +83,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	[tdcRateGroup setIntegrationTime:5];
 	
     [[self undoManager] enableUndoRegistration];
-   
+	
     return self;
 }
 
@@ -120,8 +120,8 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	tdcRateGroup = newTdcRateGroup;
 	
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORCaen1190RateGroupChangedNotification
-					  object:self];    
+	 postNotificationName:ORCaen1190RateGroupChangedNotification
+	 object:self];    
 }
 
 - (int) deadTime
@@ -134,7 +134,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [[[self undoManager] prepareWithInvocationTarget:self] setDeadTime:deadTime];
     
     deadTime = aDeadTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190DeadTimeChanged object:self];
 }
 
@@ -148,7 +148,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [[[self undoManager] prepareWithInvocationTarget:self] setLeadingWidthResolution:leadingWidthResolution];
     
     leadingWidthResolution = aLeadingWidthResolution;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190LeadingWidthResolutionChanged object:self];
 }
 
@@ -162,7 +162,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [[[self undoManager] prepareWithInvocationTarget:self] setLeadingTimeResolution:leadingTimeResolution];
     
     leadingTimeResolution = aLeadingTimeResolution;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190LeadingTimeResolutionChanged object:self];
 }
 
@@ -176,7 +176,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [[[self undoManager] prepareWithInvocationTarget:self] setLeadingTrailingLSB:leadingTrailingLSB];
     
     leadingTrailingLSB = aLeadingTrailingLSB;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190LeadingTrailingLSBChanged object:self];
 }
 
@@ -190,7 +190,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [[[self undoManager] prepareWithInvocationTarget:self] setEdgeDetection:edgeDetection];
     
     edgeDetection = aEdgeDetection;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190EdgeDetectionChanged object:self];
 }
 
@@ -201,7 +201,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [[[self undoManager] prepareWithInvocationTarget:self] setEnableTrigTimeSub:enableTrigTimeSub];
     
     enableTrigTimeSub = aEnableTrigTimeSub;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190EnableTrigTimeSubChanged object:self];
 }
 
@@ -213,9 +213,9 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	
 	if(aRejectMargin < 0)aRejectMargin = 0;
 	else if(aRejectMargin>0xfff)aRejectMargin = 0xfff;
-   
+	
     rejectMargin = aRejectMargin;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190RejectMarginChanged object:self];
 }
 
@@ -224,12 +224,12 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 - (void) setSearchMargin:(int)aSearchMargin
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSearchMargin:searchMargin];
-
+	
     if(aSearchMargin < 0)aSearchMargin = 0;
 	else if(aSearchMargin>0xfff)aSearchMargin = 0xfff;
     
     searchMargin = aSearchMargin;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190SearchMarginChanged object:self];
 }
 
@@ -243,7 +243,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	else if(aWindowOffset>40)aWindowOffset = 40;
     
     windowOffset = aWindowOffset;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190WindowOffsetChanged object:self];
 }
 
@@ -257,7 +257,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	else if(aWindowWidth>0xfff)aWindowWidth = 0xfff;
 	
     windowWidth = aWindowWidth;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190WindowWidthChanged object:self];
 }
 
@@ -268,7 +268,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [[[self undoManager] prepareWithInvocationTarget:self] setAcqMode:acqMode];
     
     acqMode = aAcqMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190AcqModeChanged object:self];
 }
 
@@ -282,7 +282,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [[[self undoManager] prepareWithInvocationTarget:self] setParamGroup:paramGroup];
     
     paramGroup = aGroup;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen1190ParamGroupChanged object:self];
 }
 
@@ -297,9 +297,9 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	[[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:n withValue:enabledMask[n]];
     enabledMask[n] = aMask;
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:ORCaen1190EnabledChanged
-					  object:self];
-
+	 postNotificationName:ORCaen1190EnabledChanged
+	 object:self];
+	
 }
 
 
@@ -458,11 +458,11 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORCaen1190DecoderForTdc",			@"decoder",
-        [NSNumber numberWithLong:dataId],	@"dataId",
-        [NSNumber numberWithBool:YES],		@"variable",
-        [NSNumber numberWithLong:-1],		@"length",
-        nil];
+								 @"ORCaen1190DecoderForTdc",			@"decoder",
+								 [NSNumber numberWithLong:dataId],	@"dataId",
+								 [NSNumber numberWithBool:YES],		@"variable",
+								 [NSNumber numberWithLong:-1],		@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Caen1190"];
     
     return dataDictionary;
@@ -472,7 +472,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 - (void) 	runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
     //if(![[self adapter] controllerCard]){
-       // [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
+	// [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
     //}
     
     [self startRates];
@@ -510,8 +510,8 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     
     unsigned short 	theStatus;
  	isRunning = YES;
-						
-    NS_DURING
+	
+    @try {
         [self read:kStatusRegister returnValue:&theStatus];
 		BOOL dataIsReady 	= theStatus & 0x0001;
 		
@@ -523,7 +523,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 							numToRead:1
 						   withAddMod:addressModifier
 						usingAddSpace:0x01];
-						
+			
 			int wordCount = eventFIFO & 0x0000ffff; 
 			if(wordCount){
 				
@@ -548,10 +548,11 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 				}
 			}
 		}
-			
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		errorCount++;
-	NS_ENDHANDLER
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
@@ -571,7 +572,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     self = [super initWithCoder:aDecoder];
     
     [[self undoManager] disableUndoRegistration];
-        
+	
     [self setDeadTime:				[aDecoder decodeIntForKey:@"deadTime"]];
     [self setLeadingWidthResolution:[aDecoder decodeIntForKey:@"leadingWidthResolution"]];
     [self setLeadingTimeResolution:	[aDecoder decodeIntForKey:@"leadingTimeResolution"]];
@@ -585,12 +586,12 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	[self setParamGroup:	[aDecoder decodeIntForKey:@"paramGroup"]];
 	[self setAcqMode:		[aDecoder decodeIntForKey:@"acqMode"]];
 	[self setTdcRateGroup:  [aDecoder decodeObjectForKey:@"tdcRateGroup"]];
-
+	
 	int i;
     for (i = 0; i < 4; i++){
         [self setEnabledMask:i withValue:[aDecoder decodeInt32ForKey: [NSString stringWithFormat:@"enabledMask%d", i]]];
     }
-   
+	
 	if(!tdcRateGroup){
 		[self setTdcRateGroup:[[[ORRateGroup alloc] initGroup:128 groupTag:0] autorelease]];
 	    [tdcRateGroup setIntegrationTime:5];
@@ -598,7 +599,7 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
     [self startRates];
     [tdcRateGroup resetRates];
     [tdcRateGroup calcRates];
-   
+	
     [[self undoManager] enableUndoRegistration];
     
     return self;

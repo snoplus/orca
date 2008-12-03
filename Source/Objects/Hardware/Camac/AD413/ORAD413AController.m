@@ -36,7 +36,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"AD413A"];
-
+	
     return self;
 }
 
@@ -52,37 +52,37 @@
                      selector : @selector(slotChanged:)
                          name : ORCamacCardSlotChangedNotification
                        object : model];
-
-   [notifyCenter addObserver : self
-	    selector : @selector(settingsLockChanged:)
-	    name : ORRunStatusChangedNotification
-	    object : nil];
-
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(settingsLockChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
     [notifyCenter addObserver : self
-	    selector : @selector(settingsLockChanged:)
-	    name : ORAD413ASettingsLock
-	    object: nil];
-
-   [notifyCenter addObserver : self
-		selector : @selector(onlineMaskChanged:)
-		name : ORAD413AOnlineMaskChangedNotification
-		object : model];
-
-   [notifyCenter addObserver : self
-		selector : @selector(controlReg1Changed:)
-		name : ORAD413AControlReg1ChangedNotification
-		object : model];
-
-   [notifyCenter addObserver : self
-		selector : @selector(controlReg2Changed:)
-		name : ORAD413AControlReg2ChangedNotification
-		object : model];
-
-   [notifyCenter addObserver : self
-		selector : @selector(discriminatorChanged:)
-		name : ORAD413ADiscriminatorChangedNotification
-		object : model];
-
+					 selector : @selector(settingsLockChanged:)
+						 name : ORAD413ASettingsLock
+						object: nil];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(onlineMaskChanged:)
+						 name : ORAD413AOnlineMaskChangedNotification
+					   object : model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(controlReg1Changed:)
+						 name : ORAD413AControlReg1ChangedNotification
+					   object : model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(controlReg2Changed:)
+						 name : ORAD413AControlReg2ChangedNotification
+					   object : model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(discriminatorChanged:)
+						 name : ORAD413ADiscriminatorChangedNotification
+					   object : model];
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -96,7 +96,7 @@
 	[self discriminatorChanged:nil];
 	[self controlReg1Changed:nil];
     [self controlReg2Changed:nil];
-
+	
     int i;
     for(i=0;i<4;i++){
         [[discriminatorFieldMatrix cellWithTag:i] setIntValue:[model discriminatorForChan:i]];
@@ -113,20 +113,20 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORAD413ASettingsLock];
     BOOL locked = [gSecurity isLocked:ORAD413ASettingsLock];
-
+	
     [settingLockButton setState: locked];
     [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
-
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORAD413ASettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingLockDocField setStringValue:s];
-
+	
 }
 
 
@@ -176,7 +176,7 @@
     [[controlReg2Matrix cellWithTag:kEnableGate3Bit] setState: !((regValue>>kEnableGate3Bit)&0x1)];
     [[controlReg2Matrix cellWithTag:kEnableGate4Bit] setState: !((regValue>>kEnableGate4Bit)&0x1)];
     [[controlReg2Matrix cellWithTag:kMasterGateBit]  
-    setState: !((regValue>>kMasterGateBit)&0x1)];
+	 setState: !((regValue>>kMasterGateBit)&0x1)];
 }
 
 
@@ -208,33 +208,36 @@
 
 - (IBAction) readDiscriminatorAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model readDiscriminators];
         NSLog(@"AD413A Read Discriminators Station %d\n",[model stationNumber]+1);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Discriminators"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) writeDiscriminatorAction:(id)sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
         [model writeDiscriminators];
         NSLog(@"AD413A Write Discriminators Station %d\n",[model stationNumber]+1);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Write Discriminators"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) clearModuleAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model clearModule];
         NSLog(@"AD413A Clear Model for Station %d\n",[model stationNumber]+1);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Clear Model"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) controlReg1Action:(id)sender
@@ -253,11 +256,11 @@
             case kOFSuppressionBit:
                 if([[sender selectedCell] state])value &= ~(0x1<<tag);
                 else value |= (0x1<<tag);
-            break;
+				break;
             default:
                 if([[sender selectedCell] state])value |= (0x1<<tag);
                 else value &= ~(0x1<<tag);
-            break;
+				break;
         }
     }
     
@@ -276,43 +279,47 @@
 
 - (IBAction) readControlReg1Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model readControlReg1];
         NSLog(@"AD413A Read Control Register1 for Station %d result:0x%0x\n",[model stationNumber]+1,[model controlReg1]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Control Register1"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) writeControlReg1Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model writeControlReg1];
         NSLog(@"AD413A Write Control Register1 for Station %d value:0x%0x \n",[model stationNumber]+1,[model controlReg1]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Write Control Register1"];
-    NS_ENDHANDLER
+    }
 }
 
 
 - (IBAction) readControlReg2Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model readControlReg2];
         NSLog(@"AD413A Read Control Register2 for Station %d result:0x%0x\n",[model stationNumber]+1,[model controlReg2]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Control Register2"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) writeControlReg2Action:(id)sender
 {
-    NS_DURING
+    @try {
         [model writeControlReg2];
         NSLog(@"AD413A Write Control Register2 for Station %d value:0x%0x\n",[model stationNumber]+1,[model controlReg1]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Write Control Register2"];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) showError:(NSException*)anException name:(NSString*)name

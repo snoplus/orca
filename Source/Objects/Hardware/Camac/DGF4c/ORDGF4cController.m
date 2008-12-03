@@ -44,7 +44,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"DGF4c"];
-
+	
     return self;
 }
 
@@ -77,7 +77,7 @@
                      selector : @selector(slotChanged:)
                          name : ORCamacCardSlotChangedNotification
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(firmWarePathChanged:)
                          name : ORDFG4cFirmWarePathChangedNotification
@@ -102,129 +102,129 @@
                      selector : @selector(settingsLockChanged:)
                          name : ORDFG4cDSPSettingsLock
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(channelChanged:)
                          name : ORDFG4cChannelChangedNotification
                         object: model];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(revisionChanged:)
                          name : ORDFG4cRevisionChangedNotification
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(decimationChanged:)
                          name : ORDFG4cDecimationChangedNotification
                         object: model];
     
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(oscChanEnableChanged:)
                          name : ORDFG4cOscEnabledMaskChangedNotification
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(tauChanged:)
                          name : ORDGF4cModelTauChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(tauSigmaChanged:)
                          name : ORDGF4cModelTauSigmaChanged
                         object: model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(binFactorChanged:)
                          name : ORDGF4cModelBinFactorChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(eMinChanged:)
                          name : ORDGF4cModelEMinChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(psaEndChanged:)
                          name : ORDGF4cModelPsaEndChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(psaStartChanged:)
                          name : ORDGF4cModelPsaStartChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(traceDelayChanged:)
                          name : ORDGF4cModelTraceDelayChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(traceLengthChanged:)
                          name : ORDGF4cModelTraceLengthChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(vOffsetChanged:)
                          name : ORDGF4cModelVOffsetChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(vGainChanged:)
                          name : ORDGF4cModelVGainChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(triggerThresholdChanged:)
                          name : ORDGF4cModelTriggerThresholdChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(triggerFlatTopChanged:)
                          name : ORDGF4cModelTriggerFlatTopChanged
                         object: model];
-                        
+	
     [notifyCenter addObserver : self
                      selector : @selector(triggerRiseTimeChanged:)
                          name : ORDGF4cModelTriggerRiseTimeChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(energyFlatTopChanged:)
                          name : ORDGF4cModelEnergyFlatTopChanged
                         object: model];
-                        
+	
     [notifyCenter addObserver : self
                      selector : @selector(energyRiseTimeChanged:)
                          name : ORDGF4cModelEnergyRiseTimeChanged
                         object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(runTaskChanged:)
                          name : ORDGF4cModelRunTaskChanged
                         object: model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(sampleWaveformsChanged:)
                          name : ORDFG4cSampleWaveformChangedNotification
                         object: model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(updateOsc:)
                          name : ORDFG4cWaveformChangedNotification
                         object: model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(xwaitChanged:)
                          name : ORDGF4cModelXwaitChanged
                         object: model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(runBehaviorChanged:)
                          name : ORDGF4cModelRunBehaviorMaskChanged
                         object: model];
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -454,17 +454,17 @@
 {
 	unsigned short aValue;        
 	NSString* theParamName = [[aNote userInfo] objectForKey:@"ParamName"];
- 
+	
 	if(!aNote || [theParamName isEqualToString:@"MODCSRA"]){
 		aValue = [model paramValue:@"MODCSRA"];
 		[[registerFieldMatrix cellWithTag:0]   setIntValue:aValue];
 	}
-
+	
 	if(!aNote || [theParamName isEqualToString:@"CHANCSRA"]){
 		aValue = [model paramValue:@"CHANCSRA" channel:[model channel]];
 		[[registerFieldMatrix cellWithTag:1]   setIntValue:aValue];
 	}
-
+	
 	if(!aNote || [theParamName isEqualToString:@"COINCPATTERN"]){
 		aValue = [model paramValue:@"COINCPATTERN"];
 		[[registerFieldMatrix cellWithTag:2]   setIntValue:aValue];
@@ -474,7 +474,7 @@
 - (void) timeChanged:(NSNotification*)aNote;
 {
 	NSString* theParamName = [[aNote userInfo] objectForKey:@"ParamName"];
- 
+	
 	if(!aNote || [theParamName isEqualToString:@"REALTIMEC"]){
 		unsigned short rta = [model paramValue:@"REALTIMEA"];
 		unsigned short rtb = [model paramValue:@"REALTIMEB"];
@@ -482,7 +482,7 @@
 		double realTime = (rta*pow(65536.0,2.0)+rtb*65536.0+rtc)*1.0e-6/40.;
 		[[timeMatrix cellWithTag:0] setStringValue:[NSString stringWithFormat:@"%.4f",realTime]];
 	}
-
+	
 	if(!aNote || [theParamName isEqualToString:@"RUNTIMEC"]){
 		unsigned short rta = [model paramValue:@"RUNTIMEA"];
 		unsigned short rtb = [model paramValue:@"RUNTIMEB"];
@@ -495,7 +495,7 @@
 - (void) liveTimeChanged:(NSNotification*)aNote
 {
 	NSString* theParamName = [[aNote userInfo] objectForKey:@"ParamName"];
- 
+	
 	if(!aNote || [theParamName isEqualToString:@"LIVETIMEC"]){
 		int i;
 		for(i=0;i<4;i++){
@@ -511,7 +511,7 @@
 - (void) inputCountsChanged:(NSNotification*)aNote
 {
 	NSString* theParamName = [[aNote userInfo] objectForKey:@"ParamName"];
- 
+	
 	if(!aNote || [theParamName isEqualToString:@"FASTPEAKSB"]){
 		int i;
 		for(i=0;i<4;i++){
@@ -539,7 +539,7 @@
 - (void) chanCSRAChanged:(NSNotification*)aNote;
 {
 	NSString* theParamName = [[aNote userInfo] objectForKey:@"ParamName"];
- 
+	
 	if(!aNote || [theParamName isEqualToString:@"CHANCSRA"]){
 		int chan;
 		for(chan=0;chan<4;chan++){
@@ -582,75 +582,75 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORDFG4cDSPSettingsLock];
     BOOL locked = [gSecurity isLocked:ORDFG4cDSPSettingsLock];
-
+	
     [settingLockButton setState: locked];
-
+	
     [loadDefaultsButton setEnabled:!lockedOrRunningMaintenance];
     [saveSetButton setEnabled:!lockedOrRunningMaintenance];
     [loadSetButton setEnabled:!lockedOrRunningMaintenance];
     [mergeSetButton setEnabled:!lockedOrRunningMaintenance];
-
+	
     [dspCodePathButton setEnabled:!lockedOrRunningMaintenance];
     [bootDSPButton setEnabled:!locked && !runInProgress];
-
+	
     [firmWarePathButton setEnabled:!lockedOrRunningMaintenance];
     [loadFirmWareButton setEnabled:!locked && !runInProgress];
-
-
+	
+	
     [sampleContinousButton setEnabled:!locked && !runInProgress];
     [ocsChanEnableMatrix setEnabled:!locked];
     [sampleWaveformsButton setEnabled:!locked];
-
+	
     [runTypePopup setEnabled:!locked && !runInProgress];
     [decimationPopup setEnabled:!lockedOrRunningMaintenance];
     [triggerFilterFieldMatrix setEnabled:!lockedOrRunningMaintenance];
     [triggerFilterStepperMatrix setEnabled:!lockedOrRunningMaintenance];
     [energyFilterFieldMatrix setEnabled:!lockedOrRunningMaintenance];
     [energyFilterStepperMatrix setEnabled:!lockedOrRunningMaintenance];
-		
+	
     [pulseShapeFieldMatrix setEnabled:!lockedOrRunningMaintenance];
     [pulseShapeStepperMatrix setEnabled:!lockedOrRunningMaintenance];
-
+	
     [registerFieldMatrix setEnabled:!lockedOrRunningMaintenance];
-
+	
     [calibrateFieldMatrix setEnabled:!lockedOrRunningMaintenance];
     [calibrateStepperMatrix setEnabled:!lockedOrRunningMaintenance];
-
+	
     [histogramFieldMatrix setEnabled:!lockedOrRunningMaintenance];
     [histogramStepperMatrix setEnabled:!lockedOrRunningMaintenance];
-        
+	
     [chanCSRAMatrix setEnabled:!lockedOrRunningMaintenance];
-        		
+	
     [loadParamsToHWButton setEnabled:!lockedOrRunningMaintenance];
     [loadParamsToHWButton2 setEnabled:!lockedOrRunningMaintenance];
     [sampleButton setEnabled:!locked && !runInProgress];
-
+	
     [baselineCutButton setEnabled:!locked && !runInProgress];
     [offsetButton setEnabled:!locked && !runInProgress];
-
+	
     [autoTauFindButton setEnabled:!locked && !runInProgress];
     
     [xwaitField setEnabled:!lockedOrRunningMaintenance];
     [xwaitStepper setEnabled:!lockedOrRunningMaintenance];
-
-		   
+	
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORDFG4cDSPSettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingLockDocField setStringValue:s];
-
+	
 	if(runInProgress && sampling){
 		//if running and sampling, turn off sampling
 		sampling = NO;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample:) object:nil];
 		[sampleButton setTitle:sampling?@"Stop":@"Sample"];
 	}
-
+	
 }
 
 #pragma mark ¥¥¥Actions
@@ -661,18 +661,20 @@
 
 - (IBAction) bootDSPAction:(id) sender;
 {
-    NS_DURING
+    @try {
         [model bootDSP];
-    NS_HANDLER
-    NS_ENDHANDLER
+    }
+	@catch(NSException* localException) {
+    }
 }
 
 - (IBAction) loadFirmWareAction:(id) sender;
 {
-    NS_DURING
+    @try {
         [model loadSystemFPGA];
-    NS_HANDLER
-    NS_ENDHANDLER
+    }
+	@catch(NSException* localException) {
+    }
 }
 
 - (IBAction) loadDefaults:(id) sender;
@@ -696,7 +698,7 @@
             startDir = NSHomeDirectory();
         }
     }
-
+	
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:nil
@@ -704,7 +706,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(firmWareSelectionDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-
+	
 }
 
 
@@ -723,7 +725,7 @@
             startDir = NSHomeDirectory();
         }
     }
-
+	
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:[NSArray arrayWithObject:@"bin"]
@@ -731,7 +733,7 @@
                         modalDelegate:self
                        didEndSelector:@selector(dspCodeSelectionDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
-
+	
 }
 
 - (IBAction) loadSetAction:(id) sender
@@ -749,7 +751,7 @@
             startDir = NSHomeDirectory();
         }
     }
-
+	
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:[NSArray arrayWithObject:@"plist"]
@@ -796,7 +798,7 @@
             startDir = NSHomeDirectory();
         }
     }
-
+	
     [openPanel beginSheetForDirectory:startDir
                                  file:nil
                                 types:[NSArray arrayWithObject:@"var"]
@@ -810,7 +812,7 @@
 {
     short runType = [[runTypePopup selectedItem] tag];
 	[model setRunTask:runType];
-
+	
 }
 
 - (IBAction) runBehaviorAction:(id)sender
@@ -829,7 +831,7 @@
     short chan = [model channel];
     [model setEnergyRiseTime:chan withValue:[model energyRiseTime:chan]];
     [model setEnergyFlatTop:chan withValue:[model energyFlatTop:chan]];
-
+	
 }
 
 - (IBAction) sampleWaveformsAction:(id) sender
@@ -845,7 +847,7 @@
 
 - (IBAction) sampleAction:(id)sender
 {
-
+	
 	if(sampling){
 		sampling = NO;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample:) object:nil];
@@ -854,14 +856,14 @@
 		sampling = [sampleContinousButton state];
 		[self performSelector:@selector(takeSample) withObject:nil afterDelay:0];
 	}
-
+	
 	[sampleButton setTitle:sampling?@"Stop":@"Sample"];
 }
 
 - (void) takeSample
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(takeSample:) object:nil];
-
+	
 	int i,n=4;
 	for(i=0;i<n;i++){
 		[model sampleChannel:i];
@@ -869,7 +871,7 @@
 	//[plotter autoScale:nil];
 	[plotter setNeedsDisplay:YES];
 	//[yScale setRngLimitsLow:-65535 withHigh:65535 withMinRng:10];
-
+	
 	if(sampling){
 		[self performSelector:@selector(takeSample) withObject:nil afterDelay:.5];
 	}
@@ -891,13 +893,13 @@
     switch(aTag){
         case 0: //rise time
             [model setTriggerRiseTime:channel withValue:[sender floatValue]];
-        break;
+			break;
         case 1: //flat top
             [model setTriggerFlatTop:channel withValue:[sender floatValue]];
-        break;
+			break;
         case 2: //threshold
             [model setTriggerThreshold:channel withValue:[sender floatValue]];
-        break;
+			break;
     }
 }
 
@@ -908,10 +910,10 @@
     switch(aTag){
         case 0: 
             [model setEnergyRiseTime:channel withValue:[sender floatValue]];
-        break;
+			break;
         case 1: 
             [model setEnergyFlatTop:channel withValue:[sender floatValue]];
-        break;
+			break;
     }
 }
 
@@ -924,18 +926,18 @@
     switch(aTag){
         case 0:             
             [model setTraceLength:channel withValue:[sender intValue]];
-        break;
- 
+			break;
+			
         case 1: 
             [model setTraceDelay:channel withValue:[sender floatValue]];
-        break;
-
+			break;
+			
         case 2: 
             [model setPsaStart:channel withValue:[sender floatValue]];
-        break;
+			break;
         case 3: 
             [model setPsaEnd:channel withValue:[sender floatValue]];
-        break;
+			break;
     }
 }
 
@@ -944,19 +946,19 @@
     short aTag = [[sender selectedCell] tag];
     short channel = [model channel];
     unsigned short aValue = [sender intValue];
-        
+	
     switch(aTag){
         case 0:             
             [model setParam:@"MODCSRA" value:aValue];
-        break;
- 
+			break;
+			
         case 1: 
             [model setParam:@"CHANCSRA" value:aValue channel:channel];
-        break;
-
+			break;
+			
         case 2: 
             [model setParam:@"COINCPATTERN" value:aValue];
-        break;
+			break;
     }
 }
 
@@ -964,25 +966,25 @@
 {
     short aTag = [[sender selectedCell] tag];
     short channel = [model channel];
-
+	
     switch(aTag){
         case 0:  
             [model setVGain:channel withValue:[sender floatValue]];
-        break;
- 
+			break;
+			
         case 1: 
             [model setVOffset:channel withValue:[sender floatValue]];
-        break;
-
+			break;
+			
         case 2: 
             [model setTau:channel withValue:[sender floatValue]];
-        break;
-
-
+			break;
+			
+			
         case 3: 
             [model setTauSigma:channel withValue:[sender floatValue]];
-        break;
-        
+			break;
+			
     }
 }
 
@@ -990,15 +992,15 @@
 {
     short aTag = [[sender selectedCell] tag];
     short channel = [model channel];
-
+	
     switch(aTag){
         case 0:             
             [model setEMin:channel withValue:[sender intValue]];
-        break;
- 
+			break;
+			
         case 1: 
             [model setBinFactor:channel withValue:[sender intValue]];
-        break;
+			break;
     }
 }
 
@@ -1018,7 +1020,7 @@
     unsigned short   crsaWord     = [model paramValue:@"CHANCSRA" channel:chan];
     if(theNewState)crsaWord |= (1<<bit);
     else crsaWord &= ~(1<<bit);
-
+	
     [model setParam:@"CHANCSRA" value:crsaWord channel:chan];
     
 }

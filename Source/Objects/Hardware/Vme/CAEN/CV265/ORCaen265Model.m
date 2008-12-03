@@ -33,14 +33,14 @@
 #pragma mark •••Static Declarations
 //offsets from the base address (kDefaultBaseAddress)
 static unsigned long register_offsets[kNumberOfV265Registers] = {
-    0x00,		// [0]  kStatusControl
-    0x02,		// [1]	kClear
-    0x04,		// [2]  kDAC
-    0x06,		// [3]  kGateGeneration
-    0x08,		// [3]  kDataRegister
-    0xFA,		// [4]  kFixedCode
-    0xFC,		// [5]  kBoardID
-    0xFE,		// [6]	kVersion
+0x00,		// [0]  kStatusControl
+0x02,		// [1]	kClear
+0x04,		// [2]  kDAC
+0x06,		// [3]  kGateGeneration
+0x08,		// [3]  kDataRegister
+0xFA,		// [4]  kFixedCode
+0xFC,		// [5]  kBoardID
+0xFE,		// [6]	kVersion
 };
 
 #pragma mark •••Notification Strings
@@ -55,7 +55,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
     self = [super init];
 	
     [[self undoManager] disableUndoRegistration];
-		
+	
     [[self undoManager] enableUndoRegistration];
     
     [self setAddressModifier:0x39];
@@ -92,7 +92,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setSuppressZeros:suppressZeros];
     
     suppressZeros = aSuppressZeros;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen265ModelSuppressZerosChanged object:self];
 }
 
@@ -106,7 +106,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
     
     enabledMask = aEnabledMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen265ModelEnabledMaskChanged object:self];
 }
 
@@ -132,10 +132,10 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 {
 	unsigned short aValue = 0; //anything value will do
     [[self adapter] writeWordBlock:&aValue
-						atAddress:[self baseAddress]+register_offsets[kClear]
+						 atAddress:[self baseAddress]+register_offsets[kClear]
 						numToWrite:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
 }
 
 
@@ -179,10 +179,10 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 {
 	unsigned short aValue = 0;
     [[self adapter] writeWordBlock:&aValue
-						atAddress:[self baseAddress]+register_offsets[kGateGeneration]
+						 atAddress:[self baseAddress]+register_offsets[kGateGeneration]
 						numToWrite:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
 }
 
 
@@ -190,11 +190,11 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORCaen265DecoderForAdc",							@"decoder",
-        [NSNumber numberWithLong:dataId],					@"dataId",
-        [NSNumber numberWithBool:NO],						@"variable",
-        [NSNumber numberWithLong:IsShortForm(dataId)?1:3],	@"length",
-        nil];
+								 @"ORCaen265DecoderForAdc",							@"decoder",
+								 [NSNumber numberWithLong:dataId],					@"dataId",
+								 [NSNumber numberWithBool:NO],						@"variable",
+								 [NSNumber numberWithLong:IsShortForm(dataId)?1:3],	@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Caen265"];
     
     return dataDictionary;
@@ -204,11 +204,11 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 {
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"Adc",								@"name",
-							[NSNumber numberWithLong:dataId],   @"dataId",
-							[NSNumber numberWithLong:8],		@"maxChannels",
-								nil];
-		
+				   @"Adc",								@"name",
+				   [NSNumber numberWithLong:dataId],   @"dataId",
+				   [NSNumber numberWithLong:8],		@"maxChannels",
+				   nil];
+	
 	[anEventDictionary setObject:aDictionary forKey:@"Caen265"];
 }
 
@@ -236,7 +236,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 	
 	[self initBoard];
 	isRunning = NO;
-
+	
 }
 
 //**************************************************************************************
@@ -246,21 +246,21 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	isRunning = YES;
-    NS_DURING
+    @try {
 		unsigned short statusValue = 0;
 		[controller readWordBlock:&statusValue
 						atAddress:statusAddress
 						numToRead:1
 					   withAddMod:[ self addressModifier]
 					usingAddSpace:0x01];
-					
+		
 		if(statusValue & 0x8000){
 			unsigned short dataValue;
 			[controller readWordBlock:&dataValue
-								atAddress:fifoAddress
-								numToRead:1
-							   withAddMod:[self addressModifier]
-							usingAddSpace:0x01];
+							atAddress:fifoAddress
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
 			short chan = (dataValue >> 13) & 0x7;
 			if(enabledMask & (1L<<chan)){
 				if(!(suppressZeros && (dataValue & 0xfff)==0)){
@@ -279,11 +279,12 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 			}
 		}
 		
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLogError(@"",@"Caen265 Card Error",nil);
 		[self incExceptionCount];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -302,20 +303,20 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-/*	configStruct->total_cards++;
-	configStruct->card_info[index].hw_type_id = kCaen265; //should be unique
-	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
-	configStruct->card_info[index].slot 	 = [self slot];
-	configStruct->card_info[index].crate 	 = [self crateNumber];
-	configStruct->card_info[index].add_mod 	 = [self addressModifier];
-	configStruct->card_info[index].base_add  = [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0] = onlineMask;
-	configStruct->card_info[index].deviceSpecificData[1] = register_offsets[kConversionStatusRegister];
-	configStruct->card_info[index].deviceSpecificData[2] = register_offsets[kADC1OutputRegister];
-	configStruct->card_info[index].num_Trigger_Indexes = 0;
-	
-	configStruct->card_info[index].next_Card_Index 	= index+1;	
-*/	
+	/*	configStruct->total_cards++;
+	 configStruct->card_info[index].hw_type_id = kCaen265; //should be unique
+	 configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
+	 configStruct->card_info[index].slot 	 = [self slot];
+	 configStruct->card_info[index].crate 	 = [self crateNumber];
+	 configStruct->card_info[index].add_mod 	 = [self addressModifier];
+	 configStruct->card_info[index].base_add  = [self baseAddress];
+	 configStruct->card_info[index].deviceSpecificData[0] = onlineMask;
+	 configStruct->card_info[index].deviceSpecificData[1] = register_offsets[kConversionStatusRegister];
+	 configStruct->card_info[index].deviceSpecificData[2] = register_offsets[kADC1OutputRegister];
+	 configStruct->card_info[index].num_Trigger_Indexes = 0;
+	 
+	 configStruct->card_info[index].next_Card_Index 	= index+1;	
+	 */	
 	return index+1;
 }
 
@@ -340,16 +341,16 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 }
 
 /*- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
-{
-    
-    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    [encoder encodeBool:suppressZeros forKey:@"ORCaen265ModelSuppressZeros"];
-    [encoder encodeInt:enabledMask forKey:@"ORCaen265ModelEnabledMask"];
-    [objDictionary setObject:thresholds forKey:@"thresholds"];
-        
-	return objDictionary;
-}
-*/
+ {
+ 
+ NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+ [encoder encodeBool:suppressZeros forKey:@"ORCaen265ModelSuppressZeros"];
+ [encoder encodeInt:enabledMask forKey:@"ORCaen265ModelEnabledMask"];
+ [objDictionary setObject:thresholds forKey:@"thresholds"];
+ 
+ return objDictionary;
+ }
+ */
 
 
 - (BOOL) partOfEvent:(unsigned short)aChannel

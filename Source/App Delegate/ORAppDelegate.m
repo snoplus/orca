@@ -50,7 +50,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 {
 	unsigned major, minor, bugFix;
     [[NSApplication sharedApplication] getSystemVersionMajor:&major minor:&minor bugFix:&bugFix];
-
+	
 	return (minor >= 5);
 }
 
@@ -58,7 +58,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 {
 	unsigned major, minor, bugFix;
     [[NSApplication sharedApplication] getSystemVersionMajor:&major minor:&minor bugFix:&bugFix];
-
+	
 	return (minor >= 4);
 }
 
@@ -89,7 +89,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
         
 		[initialUserDefaults setObject:[NSNumber numberWithBool:YES]  forKey:ORHelpFilesUseDefault];
 		[initialUserDefaults setObject:@"" forKey:ORHelpFilesPath];
-	
+		
         [defaults registerDefaults:initialUserDefaults];
         initialized = YES;
         
@@ -105,7 +105,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	
 	theSplashController = [[ORSplashWindowController alloc] init];
 	[theSplashController showWindow:self];
-
+	
 	return self;
 }
 
@@ -124,7 +124,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     [self registerNotificationObservers];
     [self setAlarmCollection:[[[ORAlarmCollection alloc] init] autorelease]];
     [self setMemoryWatcher:[[[MemoryWatcher alloc] init] autorelease]];
-
+	
 }
 
 
@@ -297,7 +297,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     
     
 	[self showStatusLog:self];
-
+	
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
 	NSMutableString* svnVersion = @"";
@@ -328,7 +328,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];    
     
     
-	NS_DURING
+	@try {
 		if(![[NSApp orderedDocuments] count] && ![self applicationShouldOpenUntitledFile:NSApp]){
 			NSString* lastFile = [[NSUserDefaults standardUserDefaults] objectForKey: ORLastDocumentName];
 			if([[NSDocumentController sharedDocumentController] openDocumentWithContentsOfFile: lastFile display:YES] == nil){
@@ -347,13 +347,14 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 			}
 			
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLogColor([NSColor redColor],@"There was an exception thrown during load... configuration may not be complete!\n");
-	NS_ENDHANDLER
+	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
-															object:self
-															userInfo:[NSDictionary dictionaryWithObject:@"Loading LogBook..." forKey:@"Message"]];
+														object:self
+													  userInfo:[NSDictionary dictionaryWithObject:@"Loading LogBook..." forKey:@"Message"]];
 	[[ORStatusController sharedStatusController] loadCurrentLogBook];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
@@ -364,11 +365,11 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	
 	//create an instance of the ORCARoot service and possibly connect    
     [[ORCARootService sharedORCARootService] connectAtStartUp];    
-
+	
 	[self performSelector:@selector(closeAboutBox) withObject:self afterDelay:kORSplashScreenDelay];
 	
 	[[self undoManager] removeAllActions];
-
+	
 }
 
 - (void) closeAboutBox

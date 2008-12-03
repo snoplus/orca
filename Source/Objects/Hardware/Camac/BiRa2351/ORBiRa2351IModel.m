@@ -82,7 +82,7 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
 {
     [lastRead autorelease];
     lastRead = [aLastRead copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBiRa2351IModelLastReadChanged object:self];
 }
 - (int) pollingState
@@ -96,7 +96,7 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
     
     pollingState = aPollingState;
     [self performSelector:@selector(_setUpPolling) withObject:nil afterDelay:0.5];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBiRa2351IModelPollingStateChanged object:self];
 }
 
@@ -110,7 +110,7 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setInputRegister:inputRegister];
     
     inputRegister = aMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORBiRa2351IModelInputRegisterChanged object:self];
 }
 
@@ -222,13 +222,14 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
 - (void) _pollInputRegister
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-    NS_DURING 
+    @try { 
         [self readInputRegister:NO];    
 		[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
-    NS_HANDLER 
+    }
+	@catch(NSException* localException) { 
         //catch this here to prevent it from falling thru, but nothing to do.
-	NS_ENDHANDLER
-        
+	}
+	
 	if(pollingState!=0){
 		[self performSelector:@selector(_pollInputRegister) withObject:nil afterDelay:pollingState];
 	}

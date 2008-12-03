@@ -54,7 +54,7 @@
                      selector : @selector(lastReadChanged:)
                          name : ORBiRa2351IModelLastReadChanged
 						object: model];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(slotChanged:)
                          name : ORCamacCardSlotChangedNotification
@@ -64,7 +64,7 @@
                      selector : @selector(inputRegisterChanged:)
                          name : ORBiRa2351IModelInputRegisterChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pollingStateChanged:)
                          name : ORBiRa2351IModelPollingStateChanged
@@ -115,12 +115,13 @@
 
 - (IBAction) readRegisterAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readInputRegister:YES];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Input Register"];
-    NS_ENDHANDLER
+    }
 }
 
 

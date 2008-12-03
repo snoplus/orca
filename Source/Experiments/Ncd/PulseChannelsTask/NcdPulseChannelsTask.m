@@ -267,27 +267,28 @@ enum {
     [super prepare];
     [[self undoManager] disableUndoRegistration];
     
-        
+	
     NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if([objects count]){
         thePDSModel = [objects objectAtIndex:0];
         pdsMemento = [[thePDSModel memento] retain];  //save the old values
         [thePDSModel setDisableForPulser:YES];
 		NSMutableArray* zeroArray = [NSMutableArray arrayWithObjects:
-			[NSNumber numberWithLong:0],	//board 0
-			[NSNumber numberWithLong:0],	//board 1
-			[NSNumber numberWithLong:0],	//board 2
-			[NSNumber numberWithLong:0],	//board 3
-			nil];
+									 [NSNumber numberWithLong:0],	//board 0
+									 [NSNumber numberWithLong:0],	//board 1
+									 [NSNumber numberWithLong:0],	//board 2
+									 [NSNumber numberWithLong:0],	//board 3
+									 nil];
 		
-		NS_DURING
+		@try {
 			[thePDSModel setPatternArray:zeroArray];
 			[thePDSModel loadHardware:zeroArray];
-		NS_HANDLER
-		NS_ENDHANDLER
-
+		}
+		@catch(NSException* localException) {
+		}
+		
     }
-        
+	
     objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORHPPulserModel")];
     if([objects count]){
         thePulserModel = [objects objectAtIndex:0];
@@ -353,19 +354,21 @@ enum {
 	lastTime = nil;
     [self setMessage:@"Idle"];
     if(thePulserModel){
-		NS_DURING
+		@try {
 			[thePulserModel restoreFromMemento:pulserMemento];
-		NS_HANDLER
-        NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+        }
         [pulserMemento release];
         pulserMemento = nil;
 		[thePulserModel setLockGUI:NO];
     }
     if(thePDSModel){
-        NS_DURING
+        @try {
             [thePDSModel restoreFromMemento:pdsMemento];
-        NS_HANDLER
-        NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+        }
         [pdsMemento release];
         pdsMemento = nil;
     }
@@ -391,7 +394,7 @@ enum {
 		s = [s stringByAppendingFormat:@"Time/chan: %d  Waveform: %d\n",sourceParam[kTimePerChannelIndex],sourceWaveform];
 		s = [s stringByAppendingFormat:@"Amp: %.2f Width : %.2f\n",sourceParam[kVoltageIndex],sourceParam[kWidthIndex]];
 	}
-
+	
     return s;
 }
 
@@ -404,12 +407,12 @@ enum {
 	[self setNeutrinoParam:kVoltageIndex value:250];
 	[self setNeutrinoParam:kWidthIndex value:7.8];
 	[self setNeutrinoWaveform:0];
-
+	
 	[self setSourceParam:kTimePerChannelIndex value:5];
 	[self setSourceParam:kVoltageIndex value:250];
 	[self setSourceParam:kWidthIndex value:7.8];
 	[self setSourceWaveform:0];
-
+	
     [[self undoManager] enableUndoRegistration];    
 }
 
@@ -422,14 +425,14 @@ enum {
     [NSBundle loadNibNamed: @"NcdPulseChannelsTask" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
     
     [[self undoManager] disableUndoRegistration];
-        
+	
 	int i;
 	for(i=0;i<kNumItems;i++){
 		[self setNeutrinoParam:i value:[decoder decodeFloatForKey:   [NSString stringWithFormat:@"NcdPulseChannelsNeutrinoParam%d",i]]];    
 		[self setSourceParam:i   value:[decoder decodeFloatForKey:    [NSString stringWithFormat:@"NcdPulseChannelsSourceParam%d",i]]];    
 	}
 	if(neutrinoParam[0] == 0)[self setDefaults];
-
+	
 	[self setNeutrinoWaveform:[decoder decodeIntForKey:	@"neutrinoWaveform"]];
 	[self setSourceWaveform:[decoder decodeIntForKey:	@"sourceWaveform"]];
 	[self setAutoStart:[decoder decodeIntForKey:		@"autoStart"]];
@@ -445,7 +448,7 @@ enum {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-        
+	
     int i;
 	for(i=0;i<kNumItems;i++){
         [encoder encodeFloat:neutrinoParam[i] forKey:  [NSString stringWithFormat:@"NcdPulseChannelsNeutrinoParam%d",i]];    
@@ -501,25 +504,27 @@ enum {
 			NcdTube* currentTube = [onlineTubes objectAtIndex:tubeIndex];
 			int pdsBoard = [[currentTube objectForKey:@"kPdsBoardNum"] intValue];
 			int pdsChan  = [[currentTube objectForKey:@"kPdsChan"] intValue];
-
+			
 			NSMutableArray* patternArray = [NSMutableArray arrayWithObjects:
-				[NSNumber numberWithLong:(pdsBoard==0)?(0x01<<pdsChan):0],	//board 0
-				[NSNumber numberWithLong:(pdsBoard==1)?(0x01<<pdsChan):0],	//board 1
-				[NSNumber numberWithLong:(pdsBoard==2)?(0x01<<pdsChan):0],	//board 2
-				[NSNumber numberWithLong:(pdsBoard==3)?(0x01<<pdsChan):0],	//board 3
-				nil];
+											[NSNumber numberWithLong:(pdsBoard==0)?(0x01<<pdsChan):0],	//board 0
+											[NSNumber numberWithLong:(pdsBoard==1)?(0x01<<pdsChan):0],	//board 1
+											[NSNumber numberWithLong:(pdsBoard==2)?(0x01<<pdsChan):0],	//board 2
+											[NSNumber numberWithLong:(pdsBoard==3)?(0x01<<pdsChan):0],	//board 3
+											nil];
 			
 			[self setMessage:[NSString stringWithFormat:@"Pulsing: %@",[currentTube objectForKey:@"kLabel"]]];
-			NS_DURING
+			@try {
 				[thePDSModel setPatternArray:patternArray];
 				[thePDSModel loadHardware:patternArray];
-			NS_HANDLER
-			NS_ENDHANDLER
-			NS_DURING
+			}
+			@catch(NSException* localException) {
+			}
+			@try {
 				[thePulserModel trigger];
-			NS_HANDLER
+			}
+			@catch(NSException* localException) {
 				NSLogError(@"Pulse Channels Task",@"Pulser Trigger Error",nil);
-			NS_ENDHANDLER
+			}
 			tubeIndex = (tubeIndex + 1)%[onlineTubes count];
 		}
     }

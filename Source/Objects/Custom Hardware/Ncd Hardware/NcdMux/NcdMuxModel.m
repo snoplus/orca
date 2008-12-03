@@ -38,14 +38,14 @@ static NSString* NcdMuxToHVConnector  	= @"Ncd Mux to HV Connector";
 
 #pragma mark ¥¥¥Static Definitions
 static NSString* NcdMuxConnectors[8] = {
-    @"MuxBox0 Connector", @"MuxBox1 Connector", @"MuxBox2 Connector",
-    @"MuxBox3 Connector", @"MuxBox4 Connector", @"MuxBox5 Connector",
-    @"MuxBox6 Connector", @"MuxBox7 Connector",
+@"MuxBox0 Connector", @"MuxBox1 Connector", @"MuxBox2 Connector",
+@"MuxBox3 Connector", @"MuxBox4 Connector", @"MuxBox5 Connector",
+@"MuxBox6 Connector", @"MuxBox7 Connector",
 };
 static NSString* selectError[8] = {
-    @"Getting Selected Mux 0", @"Getting Selected Mux 1", @"Getting Selected Mux 2",
-    @"Getting Selected Mux 3", @"Getting Selected Mux 4", @"Getting Selected Mux 5",
-    @"Getting Selected Mux 6", @"Getting Selected Mux 7",
+@"Getting Selected Mux 0", @"Getting Selected Mux 1", @"Getting Selected Mux 2",
+@"Getting Selected Mux 3", @"Getting Selected Mux 4", @"Getting Selected Mux 5",
+@"Getting Selected Mux 6", @"Getting Selected Mux 7",
 };
 
 #pragma mark ¥¥¥Notification Strings
@@ -147,7 +147,7 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
                      selector : @selector(disableScopes:)
                          name : ORHardwareEnvironmentNoisy
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(reArmScopes:)
                          name : ORHardwareEnvironmentQuiet
@@ -241,8 +241,8 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
     
     [muxBoxHw setScopeSelection:newScopeSelection];
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:NcdMuxScopeSelectionChangedNotification
-                      object:self];
+	 postNotificationName:NcdMuxScopeSelectionChangedNotification
+	 object:self];
 }
 
 
@@ -319,19 +319,19 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdMuxDecoderForMuxEventReg",             @"decoder",
-        [NSNumber numberWithLong:muxEventDataId],   @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:IsShortForm(muxEventDataId)?1:2],@"length",
-        nil];
+								 @"NcdMuxDecoderForMuxEventReg",             @"decoder",
+								 [NSNumber numberWithLong:muxEventDataId],   @"dataId",
+								 [NSNumber numberWithBool:NO],               @"variable",
+								 [NSNumber numberWithLong:IsShortForm(muxEventDataId)?1:2],@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"MuxEventReg"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdMuxDecoderForMux",                     @"decoder",
-        [NSNumber numberWithLong:muxDataId],        @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:IsShortForm(muxDataId)?1:2],@"length",
-        nil];
+				   @"NcdMuxDecoderForMux",                     @"decoder",
+				   [NSNumber numberWithLong:muxDataId],        @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:IsShortForm(muxDataId)?1:2],@"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"Mux"];
     return dataDictionary;
 }
@@ -341,18 +341,18 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 	NSDictionary* aDictionary;
     NSMutableArray* eventGroup = [NSMutableArray array];
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-							@"MuxEventReg",								@"name",
-							[NSNumber numberWithLong:muxEventDataId],   @"dataId",
-							nil];
+				   @"MuxEventReg",								@"name",
+				   [NSNumber numberWithLong:muxEventDataId],   @"dataId",
+				   nil];
 	[eventGroup addObject:aDictionary];
-
+	
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-					@"Mux",									@"name",		
-					[NSNumber numberWithLong:muxDataId],	@"dataId",
-					[NSNumber numberWithLong:4],			@"maxChannels",
-					nil];
+				   @"Mux",									@"name",		
+				   [NSNumber numberWithLong:muxDataId],	@"dataId",
+				   [NSNumber numberWithLong:4],			@"maxChannels",
+				   nil];
 	[eventGroup addObject:aDictionary];
-		
+	
 	[anEventDictionary setObject:eventGroup forKey:@"NcdMux"];
 	
 	//these are async scope readouts so add separatly
@@ -453,7 +453,7 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
     id scopeB = [dataTakers2 lastObject];
     NSString* errorLocation = @"No Error";
     
-    NS_DURING {
+    @try { 
         
 		
 		NSNumber* isSAMEventNumber= [userInfo objectForKey:@"MSAMEvent"];
@@ -555,20 +555,20 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 						[self readOutScope:0 usingPacket:aDataPacket hitDR:aHitDR userInfo:userInfo];
 					}
 					/*else {
-                    //should not happen very often
-                    NSTimeInterval t1 = [NSDate timeIntervalSinceReferenceDate];
-                    while([scopeA runInProgress]){
-                        //wait for the scope to finish, but not forever.
-                        if([NSDate timeIntervalSinceReferenceDate]-t1 > .2){
-                            NSLogError(@"",@"Mux Error",@"Scope A thread busy timeout!",nil);
-                            break;
-                        }
-                    }
-                    if(![scopeA runInProgress]){
-                        [self readOutScope:0 usingPacket:aDataPacket hitDR:aHitDR userInfo:userInfo];
-                    }
-                    else NSLogError(@"",@"Mux Error",@"Scope A busy/Thread busy conflict!",nil);
-					}*/
+					 //should not happen very often
+					 NSTimeInterval t1 = [NSDate timeIntervalSinceReferenceDate];
+					 while([scopeA runInProgress]){
+					 //wait for the scope to finish, but not forever.
+					 if([NSDate timeIntervalSinceReferenceDate]-t1 > .2){
+					 NSLogError(@"",@"Mux Error",@"Scope A thread busy timeout!",nil);
+					 break;
+					 }
+					 }
+					 if(![scopeA runInProgress]){
+					 [self readOutScope:0 usingPacket:aDataPacket hitDR:aHitDR userInfo:userInfo];
+					 }
+					 else NSLogError(@"",@"Mux Error",@"Scope A busy/Thread busy conflict!",nil);
+					 }*/
 				}
 				else {
 					if(!usingSAM && !(aHitDR & kScopeBTrigMask)){
@@ -608,20 +608,20 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 						[self readOutScope:1 usingPacket:aDataPacket hitDR:aHitDR userInfo:userInfo];
 					}
 					/*else {
-                    //should not happen very often
-                    NSTimeInterval t1 = [NSDate timeIntervalSinceReferenceDate];
-                    while([scopeB runInProgress]){
-                        //wait for the scope to finish, but not forever.
-                        if([NSDate timeIntervalSinceReferenceDate]-t1 > .2){
-                            NSLogError(@"",@"Mux Error",@"Scope B thread busy timeout!",nil);
-                            break;
-                        }
-                    }
-                    if(![scopeB runInProgress]){
-                        [self readOutScope:1 usingPacket:aDataPacket hitDR:aHitDR userInfo:userInfo];
-                    }
-                    else NSLogError(@"",@"Mux Error",@"Scope B busy/Thread busy conflict!",nil);
-					}*/
+					 //should not happen very often
+					 NSTimeInterval t1 = [NSDate timeIntervalSinceReferenceDate];
+					 while([scopeB runInProgress]){
+					 //wait for the scope to finish, but not forever.
+					 if([NSDate timeIntervalSinceReferenceDate]-t1 > .2){
+					 NSLogError(@"",@"Mux Error",@"Scope B thread busy timeout!",nil);
+					 break;
+					 }
+					 }
+					 if(![scopeB runInProgress]){
+					 [self readOutScope:1 usingPacket:aDataPacket hitDR:aHitDR userInfo:userInfo];
+					 }
+					 else NSLogError(@"",@"Mux Error",@"Scope B busy/Thread busy conflict!",nil);
+					 }*/
 				}
 				else if(!usingSAM && !(aHitDR & kScopeATrigMask)){
 					if(timingEvent[1] && [NSDate timeIntervalSinceReferenceDate] - timeOfLastScopeEvent[1] > 5){
@@ -643,19 +643,20 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 		else {
 			eventReadError++;
 			[[NSNotificationCenter defaultCenter]
-                    postNotificationName:NcdMuxErrorCountChangedNotification
-                                  object:self];
+			 postNotificationName:NcdMuxErrorCountChangedNotification
+			 object:self];
 			NSLogError(@"",@"Mux Error",@"Event Reg Read Failed.",nil);
 			[NSException raise:@"Mux Error" format:@"Reading Event Reg"];
 		}
 		
+		
 	}
-    NS_HANDLER {
+	@catch(NSException* localException) { 
 		NSLogError(@"",@"Mux Error",errorLocation,nil);
 		[self reArm];
 		[localException raise];
-	}
-    NS_ENDHANDLER
+		
+    }
     
 }
 
@@ -677,19 +678,20 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 
 - (void) takeScopeData:(ORDataPacket*)aDataPacket onScope:(id)scope userInfo:(id)userInfo
 {
-    NS_DURING
+    @try {
         [scope takeData:aDataPacket userInfo:userInfo];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLogError(@"",@"Mux Error",@"Scope Read Exception.",nil);
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 //for testing only
 - (void) readAndDumpEvent
 {
     
-    NS_DURING {
+    @try { 
 		
 		//read the event reg to see if a mux box has fired.
 		unsigned short aHitDR = 0;
@@ -746,18 +748,19 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 		else {
 			eventReadError++;
 			[[NSNotificationCenter defaultCenter]
-                    postNotificationName:NcdMuxErrorCountChangedNotification
-                                  object:self];
+			 postNotificationName:NcdMuxErrorCountChangedNotification
+			 object:self];
 			NSLogError(@"",@"Mux Error",@"Event Reg Read Failed.",nil);
 			[NSException raise:@"Mux Error" format:@"Reading Event Reg"];
 		}
 		
+		
 	}
-    NS_HANDLER {
+	@catch(NSException* localException) { 
 		[self reArm];
 		[localException raise];
-	}
-    NS_ENDHANDLER
+		
+    }
 }
 
 - (void) disableScopes:(NSNotification*)aNote
@@ -768,8 +771,8 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
         if([muxBoxHw disableScopes] != kControllerReset){
             armError++;
             [[NSNotificationCenter defaultCenter]
-                postNotificationName:NcdMuxErrorCountChangedNotification
-                              object:self];
+			 postNotificationName:NcdMuxErrorCountChangedNotification
+			 object:self];
             NSLogError(@"",@"Mux Error",@"DisAarm error.",nil);
             [muxLock unlock];
             [NSException raise:@"Mux Error" format:@"DisAarm Error"];
@@ -797,8 +800,8 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
         if([muxBoxHw armScopeSelection] != kControllerReset){
             armError++;
             [[NSNotificationCenter defaultCenter]
-                postNotificationName:NcdMuxErrorCountChangedNotification
-                              object:self];
+			 postNotificationName:NcdMuxErrorCountChangedNotification
+			 object:self];
             NSLogError(@"",@"Mux Error",@"Rearm error.",nil);
             [muxLock unlock];
             [NSException raise:@"Mux Error" format:@"Arm Error"];
@@ -839,7 +842,7 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     
-  //  [[NSNotificationCenter defaultCenter] removeObserver:self];
+	//  [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     NSEnumerator* e = [dataTakers1 objectEnumerator];
     id obj;

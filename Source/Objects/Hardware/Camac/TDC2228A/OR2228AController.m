@@ -36,7 +36,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"2228A"];
-
+	
     return self;
 }
 
@@ -72,12 +72,12 @@
                      selector : @selector(suppressZerosChanged:)
                          name : OR2228ASuppressZerosChangedNotification
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(overflowCheckTimeChanged:)
                          name : OR2228AModelOverFlowCheckTimeChanged
                        object : model];
-
+	
     
 }
 
@@ -103,14 +103,14 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:OR2228ASettingsLock];
     BOOL locked = [gSecurity isLocked:OR2228ASettingsLock];
-
+	
     [settingLockButton setState: locked];
     [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
-
+	
     [readNoResetButton setEnabled:!lockedOrRunningMaintenance];
     [readResetButton setEnabled:!lockedOrRunningMaintenance];
     [testLAMButton setEnabled:!lockedOrRunningMaintenance];
@@ -127,7 +127,7 @@
         if(runInProgress && ![gSecurity isLocked:OR2228ASettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingLockDocField setStringValue:s];
-
+	
 }
 
 
@@ -177,88 +177,96 @@
 
 - (IBAction) readNoResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readNoReset];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/No Reset" fCode:0];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readReset];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/Reset" fCode:0];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testLAM];
-    NSLog(@"2228A Test LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+		NSLog(@"2228A Test LAM for Station %d\n",[model stationNumber]);
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM" fCode:8];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) resetLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model resetLAM];
         NSLog(@"2228A Reset LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Reset LAM" fCode:10];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) generalResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model generalReset];
         NSLog(@"2228A General Reset for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"General Reset" fCode:11];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) disableLAMEnableLatchAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model disableLAMEnableLatch];
         NSLog(@"2228A Disable LAM enable latch for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Disable LAM enable latch" fCode:24];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) enableLAMEnableLatchAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model enableLAMEnableLatch];
         NSLog(@"2228A Enable LAM enable latch for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Enable LAM enable latch" fCode:26];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testAllChansAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testAllChannels];
         NSLog(@"2228A Test all channels for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test All Channels" fCode:25];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) suppressZerosAction:(id)sender

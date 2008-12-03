@@ -48,50 +48,51 @@
 
 - (NSArray *)rowsAndColumns
 {
-   NSString *fileContents;
-   
-   NS_DURING
-       fileContents = [[[NSString alloc] initWithData: self encoding: NSASCIIStringEncoding] autorelease];
-   NS_HANDLER
-       fileContents = nil;
-       [NSException raise: @"Format Error"
-                   format: @"There was a problem reading your file.  Please make sure that it is a Tab delimited file.  Additional information:\n\nException: %@\nReason: %@\nDetail: %@", 
-				   [localException name], 
-				   [localException reason], 
-				   [localException userInfo]];
-   NS_ENDHANDLER
-   
-   return [[fileContents lines] valueForKey: @"tabSeparatedComponents"];
+	NSString *fileContents;
+	
+	@try {
+		fileContents = [[[NSString alloc] initWithData: self encoding: NSASCIIStringEncoding] autorelease];
+   	}
+	@catch(NSException* localException) {
+		fileContents = nil;
+		[NSException raise: @"Format Error"
+					format: @"There was a problem reading your file.  Please make sure that it is a Tab delimited file.  Additional information:\n\nException: %@\nReason: %@\nDetail: %@", 
+		 [localException name], 
+		 [localException reason], 
+		 [localException userInfo]];
+	}
+	
+	return [[fileContents lines] valueForKey: @"tabSeparatedComponents"];
 }
 
 - (NSString *)description
 {
-    unsigned char *bytes = (unsigned char *)[self bytes];
+	unsigned char *bytes = (unsigned char *)[self bytes];
 	NSMutableString *s   = [NSMutableString stringWithFormat:@"NSData (total length: %d bytes):\n", [self length]];
 	int maxIndex = 1024;
-    int i, j;
+	int i, j;
 	int len = MIN([self length],maxIndex);
-    for (i=0 ; i<len ; i+=16 ){
-        for (j=0 ; j<16 ; j++) {
-            int index = i+j;
-            if (index < maxIndex)	[s appendFormat:@"%02X ", bytes[index]];
-            else				[s appendFormat:@"   "];
-        }
+	for (i=0 ; i<len ; i+=16 ){
+		for (j=0 ; j<16 ; j++) {
+			int index = i+j;
+			if (index < maxIndex)	[s appendFormat:@"%02X ", bytes[index]];
+			else				[s appendFormat:@"   "];
+		}
 		
-        [s appendString:@"| "];   
-        for (j=0 ; j<16 ; j++){
-            int index = i+j;
-            if (index < maxIndex){
-                unsigned char c = bytes[index];
-                if (c < 32 || c > 127) c = '.';
-                [s appendFormat:@"%c", c];
-            }
-        }
+		[s appendString:@"| "];   
+		for (j=0 ; j<16 ; j++){
+			int index = i+j;
+			if (index < maxIndex){
+				unsigned char c = bytes[index];
+				if (c < 32 || c > 127) c = '.';
+				[s appendFormat:@"%c", c];
+			}
+		}
 		
 		if (i+16 < maxIndex)[s appendString:@"\n"]; //all but last row gets a newline
 	}
 	
-    return s;	
+	return s;	
 }
 
 @end

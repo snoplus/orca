@@ -36,11 +36,11 @@
         
         [self setTitle:@"PDS Step Thru"];
         [self setPatternArray:[NSMutableArray arrayWithObjects:
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            nil]];
+							   [NSNumber numberWithLong:0],
+							   [NSNumber numberWithLong:0],
+							   [NSNumber numberWithLong:0],
+							   [NSNumber numberWithLong:0],
+							   nil]];
         
         [self registerNotificationObservers];
     }
@@ -61,11 +61,11 @@
     [self addExtraPanel:extraView];
     if(!patternArray){
     	[self setPatternArray:[NSMutableArray arrayWithObjects:
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            [NSNumber numberWithLong:0],
-            nil]];
+							   [NSNumber numberWithLong:0],
+							   [NSNumber numberWithLong:0],
+							   [NSNumber numberWithLong:0],
+							   [NSNumber numberWithLong:0],
+							   nil]];
         
     }
     [self distributionPatternChanged:nil];
@@ -227,23 +227,23 @@
 
 - (void) tubeMapChanged:(NSNotification*)aNotification
 {
-/*    NSEnumerator* e = [[[NcdDetector sharedInstance] tubes] objectEnumerator];
-    NcdTube* tube;
-    while(tube = [e nextObject]){
-        NSString* pBoard = [tube objectForKeyIndex:kPdsBoardNum]; 
-        NSString* pChan = [tube objectForKeyIndex:kPdsChan];
-        if(pBoard && pChan){
-            int board = [pBoard intValue];
-            int chan  = [pChan intValue];
-            NSMatrix* matrix;
-            if(board == 0)matrix = patternMatrix0;
-            else if(board == 1)matrix = patternMatrix1;
-            else if(board == 2)matrix = patternMatrix2;
-            else if(board == 3)matrix = patternMatrix3;
-            //[matrix setToolTip:[tube objectForKeyIndex:kLabel] forCell:[matrix cellWithTag:chan]];
-        } 
-    }
-	*/
+	/*    NSEnumerator* e = [[[NcdDetector sharedInstance] tubes] objectEnumerator];
+	 NcdTube* tube;
+	 while(tube = [e nextObject]){
+	 NSString* pBoard = [tube objectForKeyIndex:kPdsBoardNum]; 
+	 NSString* pChan = [tube objectForKeyIndex:kPdsChan];
+	 if(pBoard && pChan){
+	 int board = [pBoard intValue];
+	 int chan  = [pChan intValue];
+	 NSMatrix* matrix;
+	 if(board == 0)matrix = patternMatrix0;
+	 else if(board == 1)matrix = patternMatrix1;
+	 else if(board == 2)matrix = patternMatrix2;
+	 else if(board == 3)matrix = patternMatrix3;
+	 //[matrix setToolTip:[tube objectForKeyIndex:kLabel] forCell:[matrix cellWithTag:chan]];
+	 } 
+	 }
+	 */
 }
 
 - (void) distributionPatternChanged:(NSNotification*)aNotification
@@ -344,7 +344,7 @@
 
 - (void) loadMaskForChannelIndex:(int) index
 {
-
+	
     int count = 0;
     //find the bit to set
     id patternObj;
@@ -369,8 +369,8 @@
                     break;
                 }
                 ++count;
-           }
-           ++totalChanCount;
+			}
+			++totalChanCount;
         }
         if(done)break;
     }
@@ -536,14 +536,15 @@ static NSString* NcdPDSStepTaskTime  = @"NcdPDSStepTaskTime";
         }
         else {
             [self setMessage:[NSString stringWithFormat:@"Working on: %d/%d",workingChannelIndex+1, totalChannels]];
-            NS_DURING
+            @try {
                 [self loadMaskForChannelIndex:workingChannelIndex];
-            NS_HANDLER
+            }
+			@catch(NSException* localException) {
                 NSLog(@"\n");
                 NSLogColor([NSColor redColor],@"NCD PDS Step Task: Exception thrown! %@\n",localException);
                 NSLogColor([NSColor redColor],@"NCD PDS Step Task: Calibration Task skipped chan %d!\n",workingChannelIndex);
                 //abort = YES;
-            NS_ENDHANDLER
+            }
             workingChannelIndex++;
             [[NSNotificationCenter defaultCenter] postNotificationName:ORTaskDidStepNotification object:self];
             return YES;
@@ -560,7 +561,7 @@ static NSString* NcdPDSStepTaskTime  = @"NcdPDSStepTaskTime";
     workingChannelIndex = 0;
     thePDSModel = nil;
     [self setMessage:@"Idle"];
-
+	
 }
 
 

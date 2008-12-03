@@ -46,20 +46,20 @@ NSString* ORAcqirisDC440SamplingWaveforms			 = @"ORAcqirisDC440SamplingWaveforms
 NSString* ORAcqirisDC440SettingsLock				 = @"ORAcqirisDC440SettingsLock";
 
 static NSString* trigggerSlopeNames[6] = {
-		@"Positive",
-		@"Negative",
-		@"Out of Window",
-		@"Into Window",
-		@"HF Divide",
-		@"SpikeStretcher"
+@"Positive",
+@"Negative",
+@"Out of Window",
+@"Into Window",
+@"HF Divide",
+@"SpikeStretcher"
 };
 
 static NSString* verticalCouplingNames[5] = {
-		@"Ground",
-		@"DC, 1M Ohm",
-		@"AC, 1M Ohm",
-		@"DC, 50 Ohm",
-		@"AC, 50 Ohm"
+@"Ground",
+@"DC, 1M Ohm",
+@"AC, 1M Ohm",
+@"DC, 50 Ohm",
+@"AC, 50 Ohm"
 };
 
 static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0}; 
@@ -125,7 +125,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setEnableMask:enableMask];
     
     enableMask = aEnableMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440ModelEnableMaskChanged object:self];
 }
 
@@ -152,8 +152,8 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	sampleRateGroup = newSampleRateGroup;
 	
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORAcqirisDC440RateGroupChangedNotification
-					  object:self];    
+	 postNotificationName:ORAcqirisDC440RateGroupChangedNotification
+	 object:self];    
 }
 
 - (BOOL) readContinously
@@ -166,7 +166,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setReadContinously:readContinously];
     
     readContinously = aReadContinously;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440ReadContinouslyChanged object:self];
 }
 
@@ -181,7 +181,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerSlope:triggerSlope];
     
     triggerSlope = aTriggerSlope;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440TriggerSlopeChanged object:self];
 }
 
@@ -198,7 +198,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerLevel:index withValue:[[triggerLevels objectAtIndex:index] doubleValue]];
     
     [triggerLevels replaceObjectAtIndex:index withObject:[NSNumber numberWithDouble:aTriggerLevel]];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440TriggerLevelChanged object:self];
 }
 
@@ -212,7 +212,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerCoupling:triggerCoupling];
     
     triggerCoupling = aTriggerCoupling;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440TriggerCouplingChanged object:self];
 }
 
@@ -226,7 +226,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setTriggerSource:triggerSource];
     
     triggerSource = aTriggerSource;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440TriggerSourceChanged object:self];
 }
 
@@ -240,7 +240,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setCoupling:coupling];
     
     coupling = aCoupling;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440CouplingChanged object:self];
 }
 
@@ -254,7 +254,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setVerticalOffset:verticalOffset];
     
     verticalOffset = aOffset;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440VerticalOffsetChanged object:self];
 }
 
@@ -285,7 +285,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setFullScale:fullScale];
     
     fullScale = aFullScale;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440FullScaleChanged object:self];
 }
 - (double) delayTime
@@ -298,7 +298,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setDelayTime:delayTime];
     
     delayTime = aDelayTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440DelayTimeChanged object:self];
 }
 
@@ -313,7 +313,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setSampleInterval:sampleInterval];
     
     sampleInterval = aSampleInterval;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440SampleIntervalChanged object:self];
 }
 
@@ -327,7 +327,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [[[self undoManager] prepareWithInvocationTarget:self] setNumberSamples:numberSamples];
     
     numberSamples = aNumberSamples;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440NumberSamplesChanged object:self];
 }
 
@@ -531,7 +531,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 		if(trig & 0x1)				[self setTriggerSource:1];
 		else if(trig & 0x2)			[self setTriggerSource:2];
 		else if(trig & 0x80000000)	[self setTriggerSource:0];
-			
+		
 		[[self undoManager] enableUndoRegistration];
 	}
 	return response.status;
@@ -642,7 +642,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 {
 	
 	if(!samplingWaveforms && readContinously) [self setSamplingWaveforms:YES];
-
+	
 	SBC_Packet aPacket;
 	aPacket.cmdHeader.destination	  = kAcqirisDC440;
 	aPacket.cmdHeader.cmdID			  = kAcqiris_Get1WaveForm;
@@ -657,7 +657,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	[[self adapter] send:&aPacket receive:&aPacket];
 	Acquiris_WaveformResponseStruct* wPtr = (Acquiris_WaveformResponseStruct*)aPacket.payload;
 	long numRecords = wPtr->numWaveformStructsToFollow;
-		
+	
 	Acquiris_OrcaWaveformStruct* recordPtr = (Acquiris_OrcaWaveformStruct*)(wPtr+1);
 	int j;
 	for(j=0;j<numRecords;j++){
@@ -666,7 +666,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 		if(channel<0 || channel>=2) break;
 		
 		lengthBuffer[channel] = recordPtr->numShorts- recordPtr->offsetToValidData;
-
+		
 		short* dataPtr = (short*)(recordPtr+1);	//get pointer to start of the data
 		
 		int i;
@@ -680,14 +680,14 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORAcqirisDC440DataChanged object:self];
-
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(getOneWaveform) object:nil];
-		
+	
 	if(readContinously && ![gOrcaGlobals runInProgress]){
 		[self performSelector:@selector(getOneWaveform) withObject:nil afterDelay:.3];
 	}
 	else [self setSamplingWaveforms:NO];
-
+	
 }
 
 
@@ -718,14 +718,14 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	aPacket.cmdHeader.destination	= kAcqirisDC440;
 	aPacket.cmdHeader.cmdID			= aCmdNumber;
 	aPacket.cmdHeader.numberBytesinPayload	= sizeof(Acquiris_AsciiCmdStruct);
-			
+	
 	Acquiris_AsciiCmdStruct* cmdPtr = (Acquiris_AsciiCmdStruct*)aPacket.payload;
 	if([args length]){
 		strncpy(cmdPtr->argBuffer,[args cStringUsingEncoding:NSASCIIStringEncoding],kMaxAsciiCmdLength);
 	}
 	else cmdPtr->argBuffer[0]='\0';
 	[[self adapter] send:&aPacket receive:&aPacket];
-
+	
 	Acquiris_SetCmdStatusStruct *responsePtr = (Acquiris_SetCmdStatusStruct*)aPacket.payload;
 	status = responsePtr->status;
 	return status;
@@ -762,7 +762,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 
 - (void) loadDialog
 {
-    NS_DURING
+    @try {
 		if([[self adapter] isConnected]){
 			[self getMemory];
 			[self getHorizontal];
@@ -771,8 +771,9 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 			[self getTriggerSource];
 			[self getTriggerClass];
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 #pragma mark ¥¥¥Data Taker
@@ -790,11 +791,11 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORAcqirisDC440DecoderForWaveform",            @"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:YES],                  @"variable",
-        [NSNumber numberWithLong:-1],					@"length",
-        nil];
+								 @"ORAcqirisDC440DecoderForWaveform",            @"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:YES],                  @"variable",
+								 [NSNumber numberWithLong:-1],					@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Waveform"];
     
     return dataDictionary;
@@ -821,9 +822,9 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(getOneWaveform) object:nil];
 	[self setSamplingWaveforms:NO];
 	
-//    if(![self connected]){
-//		[NSException raise:@"Not Connected" format:@"No connection to crate."];
-//    }
+	//    if(![self connected]){
+	//		[NSException raise:@"Not Connected" format:@"No connection to crate."];
+	//    }
 	
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
@@ -833,7 +834,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     //----------------------------------------------------------------------------------------
     controller = [self adapter]; //cache the controller for alittle bit more speed.
     location   = (([self crateNumber]&0x000000f)<<21) | (([self stationNumber]& 0x0000001f)<<16);
-
+	
     //[self clearExceptionCount];
     if([[userInfo objectForKey:@"doinit"]intValue]){
 		[self initBoard];
@@ -854,10 +855,10 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 //**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    NS_DURING
+    @try {
 		if(!firstTime){
 			if([self dataAvailable]){
-
+				
 				[[self adapter] send:&readDataPacket receive:&returnPacket];
 				
 				Acquiris_WaveformResponseStruct* wPtr = (Acquiris_WaveformResponseStruct*)returnPacket.payload;
@@ -875,7 +876,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 		else {
 			isRunning = YES;
 			unsigned long status = [self startAcquisition];
-
+			
 			//cache a data structure
 			readDataPacket.cmdHeader.destination = kAcqirisDC440;
 			readDataPacket.cmdHeader.cmdID		 = kAcqiris_GetDataRequest;
@@ -892,12 +893,13 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 			}
 			firstTime = NO;
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLogError(@"Acqiris DC440 Card Error",nil);
 		[self incExceptionCount];
 		[localException raise];
-	NS_ENDHANDLER
-
+	}
+	
 }
 
 
@@ -969,7 +971,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	[self setDelayTime:[decoder decodeDoubleForKey:@"delayTime"]];
     [self setSampleRateGroup:[decoder decodeObjectForKey:@"sampleRateGroup"]];
 	triggerLevels = [[decoder decodeObjectForKey:@"triggerLevels"] retain];
-
+	
 	if(!triggerLevels){
 		triggerLevels = [[NSMutableArray arrayWithObjects:[NSNumber numberWithDouble:0],[NSNumber numberWithDouble:1],nil] retain];
 	}
@@ -1057,7 +1059,7 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [p setSetMethod:@selector(setSampleInterval:) getMethod:@selector(sampleInterval)];
 	[p setInitMethodSelector:@selector(initBoard)];
     [a addObject:p];
-		
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"FullScale"];
     [p setFormat:@"##0.00" upperLimit:1000 lowerLimit:0 stepSize:1 units:@"V"];
@@ -1071,35 +1073,35 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
     [p setSetMethod:@selector(setVerticalOffset:) getMethod:@selector(verticalOffset)];
 	[p setInitMethodSelector:@selector(initBoard)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"VerticalCoupling"];
     [p setFormat:@"##0" upperLimit:4 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setCoupling:) getMethod:@selector(coupling)];
 	[p setInitMethodSelector:@selector(initBoard)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"TriggerSource"];
     [p setFormat:@"##0" upperLimit:2 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setTriggerSource:) getMethod:@selector(triggerSource)];
 	[p setInitMethodSelector:@selector(initBoard)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"TriggerCoupling"];
     [p setFormat:@"##0" upperLimit:4 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setTriggerCoupling:) getMethod:@selector(triggerCoupling)];
 	[p setInitMethodSelector:@selector(initBoard)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"TriggerLevel"];
     [p setFormat:@"##0" upperLimit:100 lowerLimit:0 stepSize:1 units:@"%/mV"];
     [p setSetMethod:@selector(setTriggerLevel:withValue:) getMethod:@selector(triggerLevel:)];
 	[p setInitMethodSelector:@selector(initBoard)];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"TriggerSlope"];
     [p setFormat:@"##0" upperLimit:5 lowerLimit:0 stepSize:1 units:@""];

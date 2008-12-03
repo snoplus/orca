@@ -43,11 +43,11 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 #pragma mark ¥¥¥Inialization
 //--------------------------------------------------------------------------------
 /*!\method  initWithDocument
-* \brief	Called first time class is initialized.  Used to set basic
-*			default values first time object is created.
-* \param	aDocument			- The initialization document.
-* \note
-*/
+ * \brief	Called first time class is initialized.  Used to set basic
+ *			default values first time object is created.
+ * \param	aDocument			- The initialization document.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (id) init //designated initializer
 {
@@ -75,16 +75,16 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 //--------------------------------------------------------------------------------
 - (unsigned long) errorCount { return(errorCount); }
 
-    //--------------------------------------------------------------------------------
-    // Method:	getTotalEventCount
-    // Purpose:Return total number of errors.
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+// Method:	getTotalEventCount
+// Purpose:Return total number of errors.
+//--------------------------------------------------------------------------------
 - (unsigned long) getTotalEventCount { return totalEventCounter; }
 
-    //--------------------------------------------------------------------------------
-    // Method:	getEventCount
-    // Purpose:Return current number of events read in.
-    //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+// Method:	getEventCount
+// Purpose:Return current number of events read in.
+//--------------------------------------------------------------------------------
 - (unsigned long)  getEventCount:(unsigned short) pIndex
 {
     if(pIndex < 32)return eventCounter[pIndex];
@@ -93,9 +93,9 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 
 //--------------------------------------------------------------------------------
 /*!\method  selectedRegIndex
-* \brief	Returns which register was selected.
-* \note
-*/
+ * \brief	Returns which register was selected.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (unsigned short) selectedRegIndex
 {
@@ -104,32 +104,32 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 
 //--------------------------------------------------------------------------------
 /*!\method  setSelectedRegIndex
-* \brief	Sets the register commands will work on.
-* \param	anIndex		- The index of the register.
-* \note
-*/
+ * \brief	Sets the register commands will work on.
+ * \param	anIndex		- The index of the register.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) setSelectedRegIndex:(unsigned short) anIndex
 {
     // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self]
-        setSelectedRegIndex:[self selectedRegIndex]];
+	 setSelectedRegIndex:[self selectedRegIndex]];
     
     // Set the new value in the model.
     selectedRegIndex = anIndex;
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:caenSelectedRegIndexChanged
-                      object:self];
+	 postNotificationName:caenSelectedRegIndexChanged
+	 object:self];
 }
 
 //--------------------------------------------------------------------------------
 /*!\method  selectedChannel
-* \brief	Returns the currently selected channel.
-* \return	The selected channel.
-* \note
-*/
+ * \brief	Returns the currently selected channel.
+ * \return	The selected channel.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (unsigned short) selectedChannel
 {
@@ -138,32 +138,32 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 
 //--------------------------------------------------------------------------------
 /*!\method  setSelectedChannel
-* \brief	Sets the currently selected channel.
-* \param	anIndex			- The index for the channel.
-* \note
-*/
+ * \brief	Sets the currently selected channel.
+ * \param	anIndex			- The index for the channel.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) setSelectedChannel:(unsigned short) anIndex
 {
     // Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[self undoManager] prepareWithInvocationTarget:self]
-        setSelectedChannel:[self selectedChannel]];
+	 setSelectedChannel:[self selectedChannel]];
     
     // Set the new value in the model.
     selectedChannel = anIndex;
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:caenSelectedChannelChanged
-                      object:self];
+	 postNotificationName:caenSelectedChannelChanged
+	 object:self];
 }
 
 //--------------------------------------------------------------------------------
 /*!\method  writeValue
-* \brief	Return the value written out to the register.
-* \return	The value written to the register
-* \note
-*/
+ * \brief	Return the value written out to the register.
+ * \return	The value written to the register
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (unsigned long) writeValue
 {
@@ -172,10 +172,10 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 
 //--------------------------------------------------------------------------------
 /*!\method  setWriteValue
-* \brief	Set the value written out to the register
-* \param	aValue		- The value to write to the register.
-* \note
-*/
+ * \brief	Set the value written out to the register
+ * \param	aValue		- The value to write to the register.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) setWriteValue:(unsigned long) aValue
 {
@@ -187,17 +187,17 @@ NSString* 	caenChnl				= @"CAEN Chnl";
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:caenWriteValueChanged
-                      object:self];
+	 postNotificationName:caenWriteValueChanged
+	 object:self];
 }
 
 //--------------------------------------------------------------------------------
 /*!\method  threshold
-* \brief	Returns the internal model value for the threshold of specific channel.
-* \param	aChnl			- Channel to get value for.
-* \return	The threshold value.
-* \note
-*/
+ * \brief	Returns the internal model value for the threshold of specific channel.
+ * \param	aChnl			- Channel to get value for.
+ * \return	The threshold value.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (unsigned short) threshold:(unsigned short) aChnl
 {
@@ -206,11 +206,11 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 
 //--------------------------------------------------------------------------------
 /*!\method  setThreshold
-* \brief	Sets the internal model value for the threshold of specific channel.
-* \param	aChnl			- Channel to get value for.
-* \param	aValue			- The value to use for the threshold.
-* \note
-*/
+ * \brief	Sets the internal model value for the threshold of specific channel.
+ * \param	aChnl			- Channel to get value for.
+ * \param	aValue			- The value to use for the threshold.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) setThreshold:(unsigned short) aChnl threshold:(unsigned short) aValue
 {
@@ -227,9 +227,9 @@ NSString* 	caenChnl				= @"CAEN Chnl";
     
     // Send out notification that the value has changed.
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:caenChnlThresholdChanged
-                      object:self
-                    userInfo:userInfo];
+	 postNotificationName:caenChnlThresholdChanged
+	 object:self
+	 userInfo:userInfo];
 }
 
 - (void) setDataIds:(id)assigner
@@ -251,9 +251,9 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 #pragma mark ***CAEN Commands
 //--------------------------------------------------------------------------------
 /*!\method  read
-* \brief	Reads data from CAEN vme device register.
-* \note
-*/
+ * \brief	Reads data from CAEN vme device register.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) read
 {
@@ -266,7 +266,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
     short theChannelIndex	= [self selectedChannel];
     short theRegIndex 		= [self selectedRegIndex];
     
-    NS_DURING
+    @try {
         
         if (theRegIndex == [self getThresholdIndex]){
             start = theChannelIndex;
@@ -300,19 +300,20 @@ NSString* 	caenChnl				= @"CAEN Chnl";
             NSLog(@"CAEN reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
         }
         
-        NS_HANDLER
-            NSLog(@"Can't Read [%@] on the %@.\n",
-                  [self getRegisterName:theRegIndex], [self identifier]);
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Can't Read [%@] on the %@.\n",
+			  [self getRegisterName:theRegIndex], [self identifier]);
+		[localException raise];
+	}
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  write
-* \brief	Writes data out to a CAEN VME device register.
-* \note
-*/
+ * \brief	Writes data out to a CAEN VME device register.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) write
 {
@@ -327,7 +328,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
     short theChannelIndex	= [self selectedChannel];
     short theRegIndex 		= [self selectedRegIndex];
     
-    NS_DURING
+    @try {
         
         NSLog(@"Register is:%d\n", theRegIndex);
         NSLog(@"Index is   :%d\n", theChannelIndex);
@@ -351,22 +352,23 @@ NSString* 	caenChnl				= @"CAEN Chnl";
             [self write:theRegIndex sendValue:(short) theValue];
         }
         
-        NS_HANDLER
-            NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
-                  theValue, [self getRegisterName:theRegIndex],[self identifier]);
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
+			  theValue, [self getRegisterName:theRegIndex],[self identifier]);
+		[localException raise];
+	}
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  read
-* \brief	Performs low level read from CAEN VME register
-* \param	pReg			- index of register.
-* \param	pValue			- Value read from register
-* \return	noErr if no problem.
-* \note	Gets offset to register from unit register map.
-*/
+ * \brief	Performs low level read from CAEN VME register
+ * \param	pReg			- index of register.
+ * \param	pValue			- Value read from register
+ * \return	noErr if no problem.
+ * \note	Gets offset to register from unit register map.
+ */
 //--------------------------------------------------------------------------------
 - (void) read:(unsigned short) pReg returnValue:(void*) pValue
 {
@@ -385,31 +387,31 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 	if ([self getAccessSize:pReg] == kD16){
 		unsigned short aValue;
 		[[self adapter] readWordBlock:&aValue
-                        atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
+							atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
 		*((unsigned short*)pValue) = aValue;
 	}
 	else {
 		unsigned long aValue;
 		[[self adapter] readLongBlock:&aValue
-                        atAddress:[self baseAddress] + [self getAddressOffset:pReg]
-                        numToRead:1
-                       withAddMod:[self addressModifier]
-                    usingAddSpace:0x01];
+							atAddress:[self baseAddress] + [self getAddressOffset:pReg]
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
 		*((unsigned long*)pValue) = aValue;
 	}
 }
 
 //--------------------------------------------------------------------------------
 /*!\method  write
-* \brief	Performs low level write to CAEN VME device register.
-* \param	pReg			- index of register.
-* \param	pValue			- Value to write to register
-* \return	noErr if no problem.
-* \note	Gets offset to register from unit register map.
-*/
+ * \brief	Performs low level write to CAEN VME device register.
+ * \param	pReg			- index of register.
+ * \param	pValue			- Value to write to register
+ * \return	noErr if no problem.
+ * \note	Gets offset to register from unit register map.
+ */
 //--------------------------------------------------------------------------------
 - (void) write:(unsigned short) pReg sendValue:(unsigned long) pValue
 {
@@ -425,7 +427,7 @@ NSString* 	caenChnl				= @"CAEN Chnl";
     }
     
     // Do actual write
-    NS_DURING
+    @try {
         if ([self getAccessSize:pReg] == kD16){
 			unsigned short aValue = (unsigned short)pValue;
             [[self adapter] writeWordBlock:&aValue
@@ -441,18 +443,19 @@ NSString* 	caenChnl				= @"CAEN Chnl";
                                 numToWrite:1
                                 withAddMod:[self addressModifier]
                              usingAddSpace:0x01];
-
+			
 		}
-		NS_HANDLER
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 
 //--------------------------------------------------------------------------------
 /*!\method  readThresholds
-* \brief	Calls low level routine to read all the thresholds.
-* \return	noErr if no problem.
-*/
+ * \brief	Calls low level routine to read all the thresholds.
+ * \return	noErr if no problem.
+ */
 //--------------------------------------------------------------------------------
 - (void) readThresholds
 {
@@ -464,9 +467,9 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 
 //--------------------------------------------------------------------------------
 /*!\method  writeThresholds
-* \brief	Calls low level routine to write all the thresholds.
-* \return	noErr if no problem.
-*/
+ * \brief	Calls low level routine to write all the thresholds.
+ * \return	noErr if no problem.
+ */
 //--------------------------------------------------------------------------------
 - (void) writeThresholds
 {
@@ -479,11 +482,11 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 
 //--------------------------------------------------------------------------------
 /*!\method  caenInitializeForDataTaking
-* \brief	This routine setups up the caen device so that it can acquire data using
-*			the computer.
-* \error	Throws error if any command fails.
-* \note
-*/
+ * \brief	This routine setups up the caen device so that it can acquire data using
+ *			the computer.
+ * \error	Throws error if any command fails.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) caenInitializeForDataTaking
 {
@@ -549,10 +552,10 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 
 //--------------------------------------------------------------------------------
 /*!\method  initWithCoder
-* \brief	Initialize object using archived settings.
-* \param	aDecoder			- Object used for getting archived internal parameters.
-* \note
-*/
+ * \brief	Initialize object using archived settings.
+ * \param	aDecoder			- Object used for getting archived internal parameters.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (id) initWithCoder:(NSCoder*) aDecoder
 {
@@ -571,7 +574,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     for (i = 0; i < [self numberOfChannels]; i++){
         [self setThreshold:i
                  threshold:[aDecoder decodeIntForKey:
-                     [NSString stringWithFormat:CAENThresholdChnl, i]]];
+							[NSString stringWithFormat:CAENThresholdChnl, i]]];
     }
     
     [[self undoManager] enableUndoRegistration];
@@ -581,10 +584,10 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 
 //--------------------------------------------------------------------------------
 /*!\method  encodeWithCoder
-* \brief	Save the internal settings to the archive.
-* \param	anEncoder			- Object used for encoding.
-* \note
-*/
+ * \brief	Save the internal settings to the archive.
+ * \param	anEncoder			- Object used for encoding.
+ * \note
+ */
 //--------------------------------------------------------------------------------
 - (void) encodeWithCoder:(NSCoder*) anEncoder
 {
@@ -642,11 +645,11 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     NSString* decoderName = [[NSStringFromClass([self class]) componentsSeparatedByString:@"Model"] componentsJoinedByString:@"DecoderFor"];
     decoderName = [decoderName stringByAppendingString:@"CAEN"];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        decoderName,                 @"decoder",
-        [NSNumber numberWithLong:dataId],           @"dataId",
-        [NSNumber numberWithBool:YES],              @"variable",
-        [NSNumber numberWithLong:-1],               @"length",
-        nil];
+								 decoderName,                 @"decoder",
+								 [NSNumber numberWithLong:dataId],           @"dataId",
+								 [NSNumber numberWithBool:YES],              @"variable",
+								 [NSNumber numberWithLong:-1],               @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"CAEN"];
     return dataDictionary;
 }
@@ -672,11 +675,11 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 }
 //--------------------------------------------------------------------------------
 /*!\method  takeData
-* \brief	Read out the output Buffer up to a max number of bytes. Actual bufferSize
-*          read will be inserted for the returned value.
-* \param	aDataPacket	- Pointer to output data packet.
-* \param	userInfo	- arbitrary data.
-*/
+ * \brief	Read out the output Buffer up to a max number of bytes. Actual bufferSize
+ *          read will be inserted for the returned value.
+ * \param	aDataPacket	- Pointer to output data packet.
+ * \param	userInfo	- arbitrary data.
+ */
 //--------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 //data format
@@ -695,7 +698,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
     unsigned short 	theStatus1;
     unsigned short 	theStatus2;
     
-    NS_DURING
+    @try {
         
         //first read the status resisters to see if there is anything to read.
         [self read:[self getStatusRegisterIndex:1] returnValue:&theStatus1];
@@ -785,9 +788,10 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
                 }
             }
         }
-        NS_HANDLER
-            errorCount++;
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		errorCount++;
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo

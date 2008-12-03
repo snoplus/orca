@@ -124,23 +124,24 @@
 - (SCBHeader) readControlBlockHeader
 {
 	SCBHeader theControlBlockHeader;
-	NS_DURING
+	@try {
 		[adapter readLongBlock:(unsigned long*)&theControlBlockHeader
-								atAddress:baseAddress
-								numToRead:sizeof(SCBHeader)/sizeof(unsigned long)
-								withAddMod:addressModifier
-							usingAddSpace:addressSpace];
-
-
+					 atAddress:baseAddress
+					 numToRead:sizeof(SCBHeader)/sizeof(unsigned long)
+					withAddMod:addressModifier
+				 usingAddSpace:addressSpace];
+		
+		
 		queueSize = theControlBlockHeader.cbNumWords;
 		headValue = (tCBWord)theControlBlockHeader.qHead;
 		tailValue = (tCBWord)theControlBlockHeader.qTail;
-
-	NS_HANDLER
-		memset(&theControlBlockHeader,0,sizeof(SCBHeader));		
-	NS_ENDHANDLER
-	
 		
+	}
+	@catch(NSException* localException) {
+		memset(&theControlBlockHeader,0,sizeof(SCBHeader));		
+	}
+	
+	
 	return theControlBlockHeader;
 }
 
@@ -194,12 +195,13 @@
 	int sentinelRetry;
 	BOOL sentinelOK = false;
 	for(sentinelRetry=0;sentinelRetry<3;sentinelRetry++){
-		NS_DURING
+		@try {
 			SCBHeader theControlBlockHeader = [self readControlBlockHeader];
 			sentinelOK = ((theControlBlockHeader.writeSentinel & 0x00ffffff) == CB_SENTINEL);
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			++sentinelRetryTotal;
-		NS_ENDHANDLER
+		}
 		if(sentinelOK)break;
 	}
 	return sentinelOK;
@@ -208,37 +210,37 @@
 - (void) writeLongBlock:(unsigned long) anAddress blocks:(unsigned long) aNumberOfBlocks atPtr:(unsigned long*) aWritePtr
 {
 	[adapter writeLongBlock:aWritePtr
-					atAddress:anAddress
-					numToWrite:aNumberOfBlocks
-					withAddMod:addressModifier
-			usingAddSpace:addressSpace];
+				  atAddress:anAddress
+				 numToWrite:aNumberOfBlocks
+				 withAddMod:addressModifier
+			  usingAddSpace:addressSpace];
 }
 
 - (void) writeLong:(unsigned long) anAddress value:(unsigned long) aValue
 {
 	[adapter writeLongBlock:&aValue
-					atAddress:anAddress
-					numToWrite:1
-					withAddMod:addressModifier
-			usingAddSpace:addressSpace];
+				  atAddress:anAddress
+				 numToWrite:1
+				 withAddMod:addressModifier
+			  usingAddSpace:addressSpace];
 }
 
 - (void) readLongBlock:(unsigned long) anAddress blocks:(unsigned long) aNumberOfBlocks atPtr:(unsigned long*)aReadPtr
 {
 	[adapter readLongBlock:aReadPtr
-					atAddress:anAddress
-					numToRead:aNumberOfBlocks
-					withAddMod:addressModifier
-			usingAddSpace:addressSpace];
+				 atAddress:anAddress
+				 numToRead:aNumberOfBlocks
+				withAddMod:addressModifier
+			 usingAddSpace:addressSpace];
 }
 
 - (void) readLong:(unsigned long) anAddress atPtr:(unsigned long*) aValue
 {
 	[adapter readLongBlock:aValue
-			atAddress:anAddress
-			numToRead:1
-			withAddMod:addressModifier
-	usingAddSpace:addressSpace];
+				 atAddress:anAddress
+				 numToRead:1
+				withAddMod:addressModifier
+			 usingAddSpace:addressSpace];
 }
 
 

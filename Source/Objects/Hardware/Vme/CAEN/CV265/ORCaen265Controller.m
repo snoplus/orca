@@ -35,7 +35,7 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
- }
+}
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
@@ -63,12 +63,12 @@
                      selector : @selector(enabledMaskChanged:)
                          name : ORCaen265ModelEnabledMaskChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(suppressZerosChanged:)
                          name : ORCaen265ModelSuppressZerosChanged
 						object: model];
-
+	
 }
 
 #pragma mark •••Interface Management
@@ -182,22 +182,23 @@
 
 -(IBAction)initBoard:(id)sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
         [model reset];		//initialize and load hardward
 		NSLog(@"Initialized Caen265 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Reset and Init of Caen265 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Caen265 Reset and Init", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 -(IBAction) probeBoard:(id)sender
 {
 	[self endEditing];    
-	NS_DURING
+	@try {
 		unsigned short fixedCode	= [model readFixedCode];
 		NSLog(@"Probing CAEN V265,%d,%d\n",[model crateNumber],[model slot]);
 		if(fixedCode == 0xFAF5){
@@ -211,25 +212,27 @@
 		else {
 			NSLog(@"Fixed Code Readback == 0x%x (should have been 0xFAF5)\n",fixedCode);
 		}
-	   NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Probe Caen265 Board FAILED.\n");
 		NSRunAlertPanel([localException name], @"%@\nFailed Probe", @"OK", nil, nil,
 						localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) triggerAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model trigger];		//force trigger
 		NSLog(@"Triggered Caen265 (Slot %d <%p>)\n",[model slot],[model baseAddress]);
         
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Trigger of Caen265 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\nFailed Caen265 Trigger", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
-
+    }
+	
 }
 
 @end

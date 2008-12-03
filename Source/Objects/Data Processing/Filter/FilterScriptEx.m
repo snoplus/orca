@@ -43,10 +43,11 @@ void startFilterScript(id delegate)
 {
 	unsigned node;
 	for(node=0;node<startFilterNodeCount;node++){
-		NS_DURING
+		@try {
 			ex(startFilterNodes[node],delegate);
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 	}
 }
 
@@ -54,10 +55,11 @@ void finishFilterScript(id delegate)
 {
 	unsigned node;
 	for(node=0;node<finishFilterNodeCount;node++){
-		NS_DURING
+		@try {
 			ex(finishFilterNodes[node],delegate);
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 	}
 }
 
@@ -66,26 +68,28 @@ void runFilterScript(id delegate)
 {
 	unsigned node;
 	for(node=0;node<filterNodeCount;node++){
-		NS_DURING
+		@try {
 			ex(filterNodes[node],delegate);
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 	}
 }
 
 void doSwitch(nodeType *p, id delegate)
 {
-	NS_DURING
+	@try {
 		switchLevel++;
 		switchValue[switchLevel] = ex(p->opr.op[0],delegate).val.lValue;
 		ex(p->opr.op[1],delegate);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		if(![[localException name] isEqualToString:@"break"]){
 			switchValue[switchLevel] = 0;
 			switchLevel--;
 			[localException raise]; //rethrow
 		}
-	NS_ENDHANDLER
+	}
 	switchValue[switchLevel] = 0;
 	switchLevel--;
 }
@@ -112,13 +116,14 @@ void doLoop(nodeType *p, id delegate)
 	do {
 		if([delegate exitNow])break; 
 		else {
-			NS_DURING
+			@try {
 				ex(p->opr.op[0],delegate);
-			NS_HANDLER
+			}
+			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"])continueLoop = YES;
 				else if([[localException name] isEqualToString:@"break"])breakLoop = YES;
 				else [localException raise];
-			NS_ENDHANDLER
+			}
 		}
 		if(breakLoop)break;
 		if(continueLoop)continue;
@@ -132,13 +137,14 @@ void whileLoop(nodeType* p, id delegate)
 	while(ex(p->opr.op[0],delegate).val.lValue){ 
 		if([delegate exitNow])break; 
 		else {
-			NS_DURING
+			@try {
 				ex(p->opr.op[1],delegate);
-			NS_HANDLER
+			}
+			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"])continueLoop = YES;
 				else if([[localException name] isEqualToString:@"break"])breakLoop = YES;
 				else [localException raise];
-			NS_ENDHANDLER
+			}
 		}
 		if(breakLoop)	 break;
 		if(continueLoop) continue;
@@ -152,13 +158,14 @@ void forLoop(nodeType* p, id delegate)
 	for(ex(p->opr.op[0],delegate).val.lValue ; ex(p->opr.op[1],delegate).val.lValue ; ex(p->opr.op[2],delegate).val.lValue){
 		if([delegate exitNow])break;
 		else {
-			NS_DURING
+			@try {
 				ex(p->opr.op[3],delegate);
-			NS_HANDLER
+			}
+			@catch(NSException* localException) {
 				if([[localException name] isEqualToString:@"continue"])  continueLoop = YES;
 				else if([[localException name] isEqualToString:@"break"])breakLoop = YES;
 				else [localException raise];
-			NS_ENDHANDLER
+			}
 		}
 		if(breakLoop)	 break;
 		if(continueLoop) continue;
@@ -200,13 +207,13 @@ unsigned long* loadArray(unsigned long* ptr, nodeType* p)
 		case typeId:       
 			[symbolTable getData:&tempData forKey:p->ident.key];
 			*ptr++ = tempData.val.lValue;
-		break;
+			break;
 		case typeOpr:
 			switch(p->opr.oper) {
 				case kMakeArgList:	
 					ptr = loadArray(ptr++,p->opr.op[0]); 
 					if(p->opr.nops == 2)ptr = loadArray(ptr++,p->opr.op[1]); 
-				break;
+					break;
 				default: break;
 			}
 		default: break;
@@ -233,152 +240,152 @@ filterData ex(nodeType *p,id delegate)
     if (!p) {
 		tempData.type = kFilterLongType;
 		tempData.val.lValue = 0;
-
+		
 	}
     switch(p->type) {
 		case typeCon:       
 			tempData.type = kFilterLongType;
 			tempData.val.lValue = p->con.value;
-		return tempData;
-		
+			return tempData;
+			
 		case typeId:       
 			[symbolTable getData:&tempData forKey:p->ident.key];
 			return tempData;
 			
 		case typeOpr:
 			switch(p->opr.oper) {
-			case DO:		doLoop(p,delegate); return tempData;
-			case WHILE:     whileLoop(p,delegate); return tempData;
-			case FOR:		forLoop(p,delegate); return tempData;
-			case CONTINUE:	[NSException raise:@"continue" format:nil]; return tempData;
-			case IF:        if (ex(p->opr.op[0],delegate).val.lValue != 0) ex(p->opr.op[1],delegate);
-							else if (p->opr.nops > 2) ex(p->opr.op[2],delegate);
-							return tempData;
-
-			case UNLESS:    if (ex(p->opr.op[0],delegate).val.lValue) ex(p->opr.op[1],delegate);
-							return tempData;
-
-			case BREAK:		[NSException raise:@"break" format:nil]; return tempData;
-			case SWITCH:	doSwitch(p,delegate); return tempData;
-			case CASE:		doCase(p,delegate); return tempData;
-			case DEFAULT:	doDefault(p,delegate); return tempData;
-			case PRINT:
+				case DO:		doLoop(p,delegate); return tempData;
+				case WHILE:     whileLoop(p,delegate); return tempData;
+				case FOR:		forLoop(p,delegate); return tempData;
+				case CONTINUE:	[NSException raise:@"continue" format:nil]; return tempData;
+				case IF:        if (ex(p->opr.op[0],delegate).val.lValue != 0) ex(p->opr.op[1],delegate);
+				else if (p->opr.nops > 2) ex(p->opr.op[2],delegate);
+					return tempData;
+					
+				case UNLESS:    if (ex(p->opr.op[0],delegate).val.lValue) ex(p->opr.op[1],delegate);
+					return tempData;
+					
+				case BREAK:		[NSException raise:@"break" format:nil]; return tempData;
+				case SWITCH:	doSwitch(p,delegate); return tempData;
+				case CASE:		doCase(p,delegate); return tempData;
+				case DEFAULT:	doDefault(p,delegate); return tempData;
+				case PRINT:
 					tempData = ex(p->opr.op[0],delegate);
 					if(tempData.type == kFilterPtrType){
 						if(tempData.val.pValue) NSLog(@"%ld\n", *tempData.val.pValue); 
 						else					NSLog(@"<nil ptr>\n"); 
 					}
 					else NSLog(@"%ld\n", tempData.val.lValue); 
-			return tempData;
-			
-			case PRINTH:
+					return tempData;
+					
+				case PRINTH:
 					tempData = ex(p->opr.op[0],delegate);
 					if(tempData.type == kFilterPtrType){
 						if(tempData.val.pValue) NSLog(@"0x%07lx\n", *tempData.val.pValue); 
 						else					NSLog(@"<nil ptr>\n"); 
 					}
 					else NSLog(@"0x%07lx\n", tempData.val.lValue); 
-			return tempData;
-			case ';':       if (p->opr.nops>=1) ex(p->opr.op[0],delegate); if (p->opr.nops>=2)return ex(p->opr.op[1],delegate); else return tempData;
-			case '=':      
+					return tempData;
+				case ';':       if (p->opr.nops>=1) ex(p->opr.op[0],delegate); if (p->opr.nops>=2)return ex(p->opr.op[1],delegate); else return tempData;
+				case '=':      
 				{
 					tempData = ex(p->opr.op[1],delegate);
 					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
 					return tempData;
 				}
-			case UMINUS: 
-				tempData = ex(p->opr.op[0],delegate);
-				tempData.val.lValue = -tempData.val.lValue;
-			return tempData;
-			
-			case '+':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue + ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '-':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue - ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '*':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue * ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '/':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue / ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '<':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue < ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '>':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue > ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '^':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue ^ ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '%':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue % ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '|':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue | ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '&':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue & ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case '!':       tempData.val.lValue = !ex(p->opr.op[0],delegate).val.lValue; return tempData;
-			case '~':       tempData.val.lValue = ~ex(p->opr.op[0],delegate).val.lValue; return tempData;
-			case GE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue >= ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case LE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue <= ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case NE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue != ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case EQ_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue == ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case LEFT_OP:   tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue << ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case RIGHT_OP:  tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue >> ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case AND_OP:	tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue && ex(p->opr.op[1],delegate).val.lValue; return tempData;
-			case OR_OP:		tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue || ex(p->opr.op[1],delegate).val.lValue; return tempData;
-
-			case RIGHT_ASSIGN: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue>>ex(p->opr.op[1],delegate).val.lValue;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-				
-			case LEFT_ASSIGN: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue<<ex(p->opr.op[1],delegate).val.lValue;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-
-			case MUL_ASSIGN: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue * ex(p->opr.op[1],delegate).val.lValue;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-
-			case DIV_ASSIGN: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue / ex(p->opr.op[1],delegate).val.lValue;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-
-			case OR_ASSIGN: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue | ex(p->opr.op[1],delegate).val.lValue;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-
-			case MOD_ASSIGN: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue % ex(p->opr.op[1],delegate).val.lValue;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-
-			case AND_ASSIGN: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue & ex(p->opr.op[1],delegate).val.lValue;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-
-			case XOR_ASSIGN: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue ^ ex(p->opr.op[1],delegate).val.lValue;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-
-
-			case kPostInc: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue;
-				tempData1 = tempData;
-				tempData1.val.lValue++;
-				[symbolTable setData:tempData1 forKey:p->opr.op[0]->ident.key];
-				return tempData;
-				
-			case kPreInc: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue+1;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-				
-			case kPostDec: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue;
-				tempData1 = tempData;
-				tempData1.val.lValue--;
-				[symbolTable setData:tempData1 forKey:p->opr.op[0]->ident.key];
-				
-			case kPreDec: 
-				tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue-1;
-				[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
-				return tempData;
-
-
-			//array stuff
-			case kArrayAssign:
+				case UMINUS: 
+					tempData = ex(p->opr.op[0],delegate);
+					tempData.val.lValue = -tempData.val.lValue;
+					return tempData;
+					
+				case '+':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue + ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '-':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue - ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '*':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue * ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '/':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue / ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '<':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue < ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '>':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue > ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '^':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue ^ ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '%':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue % ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '|':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue | ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '&':       tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue & ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case '!':       tempData.val.lValue = !ex(p->opr.op[0],delegate).val.lValue; return tempData;
+				case '~':       tempData.val.lValue = ~ex(p->opr.op[0],delegate).val.lValue; return tempData;
+				case GE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue >= ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case LE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue <= ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case NE_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue != ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case EQ_OP:     tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue == ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case LEFT_OP:   tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue << ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case RIGHT_OP:  tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue >> ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case AND_OP:	tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue && ex(p->opr.op[1],delegate).val.lValue; return tempData;
+				case OR_OP:		tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue || ex(p->opr.op[1],delegate).val.lValue; return tempData;
+					
+				case RIGHT_ASSIGN: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue>>ex(p->opr.op[1],delegate).val.lValue;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case LEFT_ASSIGN: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue<<ex(p->opr.op[1],delegate).val.lValue;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case MUL_ASSIGN: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue * ex(p->opr.op[1],delegate).val.lValue;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case DIV_ASSIGN: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue / ex(p->opr.op[1],delegate).val.lValue;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case OR_ASSIGN: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue | ex(p->opr.op[1],delegate).val.lValue;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case MOD_ASSIGN: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue % ex(p->opr.op[1],delegate).val.lValue;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case AND_ASSIGN: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue & ex(p->opr.op[1],delegate).val.lValue;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case XOR_ASSIGN: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue ^ ex(p->opr.op[1],delegate).val.lValue;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+					
+				case kPostInc: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue;
+					tempData1 = tempData;
+					tempData1.val.lValue++;
+					[symbolTable setData:tempData1 forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case kPreInc: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue+1;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+				case kPostDec: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue;
+					tempData1 = tempData;
+					tempData1.val.lValue--;
+					[symbolTable setData:tempData1 forKey:p->opr.op[0]->ident.key];
+					
+				case kPreDec: 
+					tempData.val.lValue = ex(p->opr.op[0],delegate).val.lValue-1;
+					[symbolTable setData:tempData forKey:p->opr.op[0]->ident.key];
+					return tempData;
+					
+					
+					//array stuff
+				case kArrayAssign:
 				{
 					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
 					if(ptr!=0){
@@ -390,9 +397,9 @@ filterData ex(nodeType *p,id delegate)
 						[NSException raise:@"Access Violation" format:@"Nil Pointer"];
 					}
 				}
-			return tempData;
-
-			case kLeftArray:
+					return tempData;
+					
+				case kLeftArray:
 				{
 					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
 					if(ptr!=0){
@@ -404,9 +411,9 @@ filterData ex(nodeType *p,id delegate)
 						[NSException raise:@"Access Violation" format:@"Nil Pointer"];
 					}
 				}
-			return tempData;
-
-			case kArrayElement:
+					return tempData;
+					
+				case kArrayElement:
 				{
 					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
 					if(ptr!=0){
@@ -418,104 +425,104 @@ filterData ex(nodeType *p,id delegate)
 						[NSException raise:@"Access Violation" format:@"Nil Pointer"];
 					}
 				}
-			return tempData;
-
-			case kDefineArray:		defineArray(p,delegate); 		break;
-			case FREEARRAY:			freeArray(p,delegate); 			break;
-
-			case kArrayListAssign:	
-				arrayList(p,delegate);
-			break;
-
-			case EXTRACTRECORD_ID: 
-				tempData.val.lValue =  [delegate extractRecordID:ex(p->opr.op[0],delegate).val.lValue]; 
-			return tempData;
-
-			case EXTRACTRECORD_LEN: 
-				tempData.val.lValue =  [delegate extractRecordLen:ex(p->opr.op[0],delegate).val.lValue]; 
-			return tempData;
-
-			case EXTRACT_VALUE: 
-				tempData.val.lValue =  [delegate extractValue:ex(p->opr.op[0],delegate).val.lValue 
-														 mask:ex(p->opr.op[1],delegate).val.lValue
-													thenShift:ex(p->opr.op[2],delegate).val.lValue]; 
-			return tempData;
-
-			
-			case SHIP_RECORD:
+					return tempData;
+					
+				case kDefineArray:		defineArray(p,delegate); 		break;
+				case FREEARRAY:			freeArray(p,delegate); 			break;
+					
+				case kArrayListAssign:	
+					arrayList(p,delegate);
+					break;
+					
+				case EXTRACTRECORD_ID: 
+					tempData.val.lValue =  [delegate extractRecordID:ex(p->opr.op[0],delegate).val.lValue]; 
+					return tempData;
+					
+				case EXTRACTRECORD_LEN: 
+					tempData.val.lValue =  [delegate extractRecordLen:ex(p->opr.op[0],delegate).val.lValue]; 
+					return tempData;
+					
+				case EXTRACT_VALUE: 
+					tempData.val.lValue =  [delegate extractValue:ex(p->opr.op[0],delegate).val.lValue 
+															 mask:ex(p->opr.op[1],delegate).val.lValue
+														thenShift:ex(p->opr.op[2],delegate).val.lValue]; 
+					return tempData;
+					
+					
+				case SHIP_RECORD:
 				{
 					unsigned long* ptr = ex(p->opr.op[0],delegate).val.pValue;
 					if(ptr) [delegate shipRecord:ptr length:ExtractLength(*ptr)]; 
 				}
-			break;
-
-			case PUSH_RECORD:
+					break;
+					
+				case PUSH_RECORD:
 				{
 					long stack = ex(p->opr.op[0],delegate).val.lValue;
 					unsigned long* ptr  = ex(p->opr.op[1],delegate).val.pValue;
 					if(ptr)[delegate pushOntoStack:stack record:ptr]; 
 				}
-			break;
-
-			case POP_RECORD:
-				tempData.val.pValue = [delegate popFromStack:ex(p->opr.op[0],delegate).val.lValue];
-			return tempData;
-			
-			case BOTTOM_POP_RECORD:
-				tempData.val.pValue = [delegate popFromStackBottom:ex(p->opr.op[0],delegate).val.lValue];
-			return tempData;
-
-			case SHIP_STACK:
-				[delegate shipStack:ex(p->opr.op[0],delegate).val.lValue];
-			break;
-			
-			case DUMP_STACK:
-				[delegate dumpStack:ex(p->opr.op[0],delegate).val.lValue];
-			break;
-
-			case STACK_COUNT:
-				tempData.val.lValue = [delegate stackCount:ex(p->opr.op[0],delegate).val.lValue];
-			return tempData;
-			
-			case HISTO_1D:				
-				[delegate histo1D:ex(p->opr.op[0],delegate).val.lValue value:ex(p->opr.op[1],delegate).val.lValue];
-			break;
-
-			case HISTO_2D:	
+					break;
+					
+				case POP_RECORD:
+					tempData.val.pValue = [delegate popFromStack:ex(p->opr.op[0],delegate).val.lValue];
+					return tempData;
+					
+				case BOTTOM_POP_RECORD:
+					tempData.val.pValue = [delegate popFromStackBottom:ex(p->opr.op[0],delegate).val.lValue];
+					return tempData;
+					
+				case SHIP_STACK:
+					[delegate shipStack:ex(p->opr.op[0],delegate).val.lValue];
+					break;
+					
+				case DUMP_STACK:
+					[delegate dumpStack:ex(p->opr.op[0],delegate).val.lValue];
+					break;
+					
+				case STACK_COUNT:
+					tempData.val.lValue = [delegate stackCount:ex(p->opr.op[0],delegate).val.lValue];
+					return tempData;
+					
+				case HISTO_1D:				
+					[delegate histo1D:ex(p->opr.op[0],delegate).val.lValue value:ex(p->opr.op[1],delegate).val.lValue];
+					break;
+					
+				case HISTO_2D:	
 				{
 					unsigned long x = ex(p->opr.op[1],delegate).val.lValue;
 					unsigned long y = ex(p->opr.op[2],delegate).val.lValue;
 					[delegate histo2D:ex(p->opr.op[0],delegate).val.lValue x:x y:y];
 				}
-			break;
-
-			case STRIPCHART:	
+					break;
+					
+				case STRIPCHART:	
 				{
 					unsigned long aTime = ex(p->opr.op[1],delegate).val.lValue;
 					unsigned long aValue = ex(p->opr.op[2],delegate).val.lValue;
 					[delegate stripChart:ex(p->opr.op[0],delegate).val.lValue time:aTime value:aValue];
 				}
-			break;
-
-			case TIME:	
+					break;
+					
+				case TIME:	
 				{
-				time_t theTime;
-				time(&theTime);
-				tempData.val.lValue = theTime;
+					time_t theTime;
+					time(&theTime);
+					tempData.val.lValue = theTime;
 				}
-			break;
-
-
-			case DISPLAY_VALUE:	
-				[delegate setOutput:ex(p->opr.op[0],delegate).val.lValue 
-						   withValue:ex(p->opr.op[1],delegate).val.lValue];
-			break;
-			
-			case RESET_DISPLAYS:
-				[delegate resetDisplays];
-			break;	
-
-		}
+					break;
+					
+					
+				case DISPLAY_VALUE:	
+					[delegate setOutput:ex(p->opr.op[0],delegate).val.lValue 
+							  withValue:ex(p->opr.op[1],delegate).val.lValue];
+					break;
+					
+				case RESET_DISPLAYS:
+					[delegate resetDisplays];
+					break;	
+					
+			}
     }
     return tempData;
 }

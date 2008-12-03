@@ -50,26 +50,26 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) awakeFromNib
 {
-
+	
     basicSize      = NSMakeSize(280,400);
     settingsSize   = NSMakeSize(630,450);
     monitoringSize = NSMakeSize(783,320);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-
+	
     [registerAddressPopUp setAlignment:NSCenterTextAlignment];
     [channelPopUp setAlignment:NSCenterTextAlignment];
-	    
+	
     [self populatePullDown];
     
     [super awakeFromNib];
-
+	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-
+	
 }
 
 #pragma mark •••Notifications
@@ -92,7 +92,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 					 selector : @selector(selectedRegChannelChanged:)
 						 name : ORCaen1720SelectedChannelChanged
 					   object : model];
-		
+	
     [notifyCenter addObserver : self
 					 selector : @selector(writeValueChanged:)
 						 name : ORCaen1720WriteValueChanged
@@ -121,79 +121,79 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [notifyCenter addObserver : self
                      selector : @selector(customSizeChanged:)
                          name : ORCaen1720ModelCustomSizeChanged
-						object : model];
+					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(countAllTriggersChanged:)
                          name : ORCaen1720ModelCountAllTriggersChanged
-						object : model];
+					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(acquisitionModeChanged:)
                          name : ORCaen1720ModelAcquisitionModeChanged
-						object : model];
+					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(coincidenceLevelChanged:)
                          name : ORCaen1720ModelCoincidenceLevelChanged
-						object : model];
+					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(triggerSourceMaskChanged:)
                          name : ORCaen1720ModelTriggerSourceMaskChanged
-						object : model];
+					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(postTriggerSettingChanged:)
                          name : ORCaen1720ModelPostTriggerSettingChanged
-						object : model];
+					   object : model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(enabledMaskChanged:)
                          name : ORCaen1720ModelEnabledMaskChanged
-						object : model];
+					   object : model];
 	
-   [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
 					 selector : @selector(basicLockChanged:)
 						 name : ORCaen1720BasicLock
-						object : nil];
-
-   [notifyCenter addObserver : self
-					selector : @selector(settingsLockChanged:)
-						name : ORCaen1720SettingsLock
 					   object : nil];
-					   
-   [notifyCenter addObserver : self
-					selector : @selector(basicLockChanged:)
-						name : ORCaen1720BasicLock
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(settingsLockChanged:)
+						 name : ORCaen1720SettingsLock
 					   object : nil];
-
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(basicLockChanged:)
+						 name : ORCaen1720BasicLock
+					   object : nil];
+	
     [notifyCenter addObserver : self
                      selector : @selector(integrationChanged:)
                          name : ORRateGroupIntegrationChangedNotification
                        object : nil];
- 
+	
     [notifyCenter addObserver : self
 					 selector : @selector(totalRateChanged:)
 						 name : ORRateGroupTotalRateChangedNotification
 					   object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(settingsLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(basicLockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-					   
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(setBufferStateLabel)
                          name : ORCaen1720ModelBufferCheckChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(eventSizeChanged:)
                          name : ORCaen1720ModelEventSizeChanged
@@ -206,7 +206,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	
 	
 	[self registerRates];
-
+	
 }
 
 - (void) registerRates
@@ -218,9 +218,9 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     NSEnumerator* e = [[[model waveFormRateGroup] rates] objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
-    
+		
         [notifyCenter removeObserver:self name:ORRateChangedNotification object:obj];
-
+		
         [notifyCenter addObserver:self
                          selector:@selector(waveFormRateChanged:)
                              name:ORRateChangedNotification
@@ -253,7 +253,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [self waveFormRateChanged:nil];
  	[self eventSizeChanged:nil];
  	[self slotChanged:nil];
-
+	
 	[self settingsLockChanged:nil];
     [self basicLockChanged:nil];
 }
@@ -342,25 +342,25 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNotification
 {
-
+	
 	//  Set value of popup
 	short index = [model selectedRegIndex];
 	[self updatePopUpButton:registerAddressPopUp setting:index];
 	[self updateRegisterDescription:index];
-
-
+	
+	
 	BOOL readAllowed = [model getAccessType:index] == kReadOnly || [model getAccessType:index] == kReadWrite;
 	BOOL writeAllowed = [model getAccessType:index] == kWriteOnly || [model getAccessType:index] == kReadWrite;
-
+	
 	[basicWriteButton setEnabled:writeAllowed];
 	[basicReadButton setEnabled:readAllowed];
- 
+	
 	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORCaen1720BasicLock];
 	if ([model selectedRegIndex] >= kZS_Thres && [model selectedRegIndex]<=kAdcConfig){
 		[channelPopUp setEnabled:!lockedOrRunningMaintenance];
 	}
 	else [channelPopUp setEnabled:NO];
-
+	
 }
 
 - (void) selectedRegChannelChanged:(NSNotification*) aNotification
@@ -421,20 +421,20 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 	for(i=0;i<kNumChanConfigBits;i++){
 		[[channelConfigMaskMatrix cellWithTag:i] setIntValue:(mask & (1<<chanConfigToMaskBit[i])) !=0];
 	}
-
-
+	
+	
 }
 
 - (void) baseAddressChanged:(NSNotification*) aNotification
 {
 	//  Set value of both text and stepper
-	 [self updateStepper:addressStepper setting:[model baseAddress]];
-	 [addressTextField setIntValue:[model baseAddress]];
+	[self updateStepper:addressStepper setting:[model baseAddress]];
+	[addressTextField setIntValue:[model baseAddress]];
 }
 
 - (void) thresholdChanged:(NSNotification*) aNotification
 {
-// Get the channel that changed and then set the GUI value using the model value.
+	// Get the channel that changed and then set the GUI value using the model value.
 	if(aNotification){
 		int chnl = [[[aNotification userInfo] objectForKey:ORCaen1720Chnl] intValue];
 		[[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
@@ -486,13 +486,13 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     
     [addressStepper setEnabled:!locked && !runInProgress];
     [addressTextField setEnabled:!locked && !runInProgress];
-
+	
     [writeValueStepper setEnabled:!lockedOrRunningMaintenance];
     [writeValueTextField setEnabled:!lockedOrRunningMaintenance];
     [registerAddressPopUp setEnabled:!lockedOrRunningMaintenance];
-
+	
     [self selectedRegIndexChanged:nil];
-
+	
     [basicWriteButton setEnabled:!lockedOrRunningMaintenance];
     [basicReadButton setEnabled:!lockedOrRunningMaintenance]; 
     
@@ -525,19 +525,19 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [eventSizePopUp setEnabled:!lockedOrRunningMaintenance]; 
     [loadThresholdsButton setEnabled:!lockedOrRunningMaintenance]; 
     [initButton setEnabled:!lockedOrRunningMaintenance]; 
-
+	
 	//these must NOT or can not be changed when run in progress
     [customSizeTextField setEnabled:!locked && !runInProgress]; 
     [eventSizePopUp setEnabled:!locked && !runInProgress]; 
     [enabledMaskMatrix setEnabled:!locked && !runInProgress]; 
-
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
 		if(runInProgress && ![gSecurity isLocked:ORCaen1720SettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingsLockDocField setStringValue:s];
-
-
+	
+	
 }
 
 #pragma mark •••Actions
@@ -565,24 +565,26 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) basicRead:(id) pSender
 {
-	NS_DURING
+	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model read];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) basicWrite:(id) pSender
 {
-	NS_DURING
+	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model write];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) writeValueAction:(id) aSender
@@ -623,34 +625,37 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) report: (id) sender
 {
-	NS_DURING
+	@try {
 		[model report];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nRead failed", @"OK", nil, nil,
                         localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) loadThresholds: (id) sender
 {
-	NS_DURING
+	@try {
 		[model writeThresholds];
 		NSLog(@"Caen 1720 Card %d thresholds loaded\n",[model slot]);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nThreshold loading failed", @"OK", nil, nil,
                         localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) initBoard: (id) sender
 {
-	NS_DURING
+	@try {
 		[model initBoard];
 		NSLog(@"Caen 1720 Card %d inited\n",[model slot]);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nInit failed", @"OK", nil, nil,
                         localException);
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -662,7 +667,7 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 		if([[sender cellWithTag:i] intValue]) mask |= (1 << i);
 	}
 	[model setEnabledMask:mask];	
-
+	
 }
 
 - (void) postTriggerSettingTextFieldAction:(id)sender
@@ -689,12 +694,13 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (IBAction) generateTriggerAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model generateSoftwareTrigger];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nSoftware Trigger Failed", @"OK", nil, nil,
                         localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) acquisitionModeAction:(id)sender
@@ -746,25 +752,25 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (void) populatePullDown
 {
     short	i;
-        
+	
     [registerAddressPopUp removeAllItems];
     [channelPopUp removeAllItems];
     
     for (i = 0; i < [model getNumberRegisters]; i++) {
         [registerAddressPopUp insertItemWithTitle:[model 
-                                    getRegisterName:i] 
-                                            atIndex:i];
+												   getRegisterName:i] 
+										  atIndex:i];
     }
- 
+	
 	for (i = 0; i < 8 ; i++) {
         [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i] 
-                                    atIndex:i];
+								  atIndex:i];
     }
     [channelPopUp insertItemWithTitle:@"All" atIndex:8];
     
     [self selectedRegIndexChanged:nil];
     [self selectedRegChannelChanged:nil];
-
+	
 }
 
 - (void) updateRegisterDescription:(short) aRegisterIndex
@@ -774,14 +780,14 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 		@"[WriteOnly]",
 		@"[ReadWrite]"
     };
-
+	
     [registerOffsetTextField setStringValue:
-    [NSString stringWithFormat:@"0x%04x",
-    [model getAddressOffset:aRegisterIndex]]];
+	 [NSString stringWithFormat:@"0x%04x",
+	  [model getAddressOffset:aRegisterIndex]]];
 	
     [registerReadWriteTextField setStringValue:types[[model getAccessType:aRegisterIndex]]];
     [regNameField setStringValue:[model getRegisterName:aRegisterIndex]];
-
+	
     [drTextField setStringValue:[model dataReset:aRegisterIndex] ? @"Y" :@"N"];
     [srTextField setStringValue:[model swReset:aRegisterIndex]   ? @"Y" :@"N"];
     [hrTextField setStringValue:[model hwReset:aRegisterIndex]   ? @"Y" :@"N"];    
@@ -804,11 +810,11 @@ int chanConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 		[self resizeWindowToSize:monitoringSize];
 		[[self window] setContentView:tabView];
     }
-
+	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-
+	
 }
 
 #pragma mark •••Data Source

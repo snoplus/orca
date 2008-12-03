@@ -36,7 +36,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"AD811"];
-
+	
     return self;
 }
 
@@ -52,32 +52,32 @@
                      selector : @selector(slotChanged:)
                          name : ORCamacCardSlotChangedNotification
                        object : model];
-
-   [notifyCenter addObserver : self
-	    selector : @selector(settingsLockChanged:)
-	    name : ORRunStatusChangedNotification
-	    object : nil];
-
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(settingsLockChanged:)
+						 name : ORRunStatusChangedNotification
+					   object : nil];
+	
     [notifyCenter addObserver : self
-	    selector : @selector(settingsLockChanged:)
-	    name : ORAD811SettingsLock
-	    object: nil];
-
-   [notifyCenter addObserver : self
-		selector : @selector(onlineMaskChanged:)
-		name : ORAD811OnlineMaskChangedNotification
-		object : model];
-
-   [notifyCenter addObserver : self
-		selector : @selector(suppressZerosChanged:)
-		name : ORAD811SuppressZerosChangedNotification
-		object : model];
-		
+					 selector : @selector(settingsLockChanged:)
+						 name : ORAD811SettingsLock
+						object: nil];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(onlineMaskChanged:)
+						 name : ORAD811OnlineMaskChangedNotification
+					   object : model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(suppressZerosChanged:)
+						 name : ORAD811SuppressZerosChangedNotification
+					   object : model];
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(includeTimingChanged:)
 						 name : ORAD811ModelIncludeTimingChanged
 					   object : model];	
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -102,14 +102,14 @@
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORAD811SettingsLock];
     BOOL locked = [gSecurity isLocked:ORAD811SettingsLock];
-
+	
     [settingLockButton setState: locked];
     [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
-
+	
     [readNoResetButton setEnabled:!lockedOrRunningMaintenance];
     [readResetButton setEnabled:!lockedOrRunningMaintenance];
     [testLAMButton setEnabled:!lockedOrRunningMaintenance];
@@ -121,13 +121,13 @@
     [testBusyButton setEnabled:!lockedOrRunningMaintenance];
     [suppressZerosButton setEnabled:!lockedOrRunningMaintenance];
 	[includeTimingButton setEnabled:!runInProgress];
-
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORAD811SettingsLock])s = @"Not in Maintenance Run.";
     }
     [settingLockDocField setStringValue:s];
-
+	
 }
 
 
@@ -177,99 +177,108 @@
 
 - (IBAction) readNoResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readNoReset];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/No Reset" fCode:0];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model readReset];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read/Reset" fCode:0];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testLAM];
-    NSLog(@"AD811 Test LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+		NSLog(@"AD811 Test LAM for Station %d\n",[model stationNumber]);
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM" fCode:8];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) resetLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model resetLAM];
         NSLog(@"AD811 Reset LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Reset LAM" fCode:10];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) generalResetAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model generalReset];
         NSLog(@"AD811 General Reset for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"General Reset" fCode:11];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) disableLAMEnableLatchAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model disableLAMEnableLatch];
         NSLog(@"AD811 Disable LAM enable latch for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Disable LAM enable latch" fCode:24];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) enableLAMEnableLatchAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model enableLAMEnableLatch];
         NSLog(@"AD811 Enable LAM enable latch for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Enable LAM enable latch" fCode:26];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testAllChansAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testAllChannels];
         NSLog(@"AD811 Test all channels for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test All Channels" fCode:25];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) testBusyAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testBusy];
         NSLog(@"AD811 Test busy for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test busy" fCode:27];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) suppressZerosAction:(id)sender

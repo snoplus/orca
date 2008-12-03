@@ -43,9 +43,9 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 - (void) sleep
 {
     [super sleep];
-   // [cratePowerAlarm clearAlarm];
-   // [cratePowerAlarm release];
-   // cratePowerAlarm = nil;
+	// [cratePowerAlarm clearAlarm];
+	// [cratePowerAlarm release];
+	// cratePowerAlarm = nil;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
 
@@ -84,8 +84,8 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 	[[[self connectors] objectForKey:[self crateAdapterConnectorKey]] setObjectLink: adapter];
 	
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORCrateAdapterChangedNotification
-                      object:self];
+	 postNotificationName:ORCrateAdapterChangedNotification
+	 object:self];
     
 }
 - (BOOL) showLabels
@@ -98,10 +98,10 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 	[[[self undoManager] prepareWithInvocationTarget:self] setShowLabels:showLabels];
     
 	showLabels = aState;
-    	
+	
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORCrateModelShowLabelsChanged
-                      object:self];
+	 postNotificationName:ORCrateModelShowLabelsChanged
+	 object:self];
 }
 
 - (id) controllerCard
@@ -147,7 +147,7 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
                      selector : @selector(childChanged:)
                          name : OROrcaObjectMoved
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(childChanged:)
                          name : OROrcaObjectImageChanged
@@ -169,12 +169,12 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
                          name: ORRunAboutToStopNotification
                        object: nil];
     
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(adapterChanged:)
                          name : ORCrateAdapterChangedNotification
                        object : nil];
-
+	
 }
 
 - (void) runAboutToStart:(NSNotification*)aNote
@@ -227,10 +227,10 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
     crateNumber = aCrateNumber;
 	[self setTag:crateNumber];
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORCrateModelCrateNumberChanged
-                      object:self];
-
-
+	 postNotificationName:ORCrateModelCrateNumberChanged
+	 object:self];
+	
+	
 }
 
 - (NSComparisonResult) crateNumberCompare:(id)aCard
@@ -259,20 +259,21 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
         powerOff = state;
         [self viewChanged:nil];
         [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORForceRedraw
-                              object:self];
+		 postNotificationName:ORForceRedraw
+		 object:self];
     }
 }
 
 - (void) pollCratePower
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCratePower) object:nil];
-    NS_DURING
+    @try {
         //if(![[ORGlobal sharedInstance] runInProgress]){
         [[self controllerCard] checkCratePower];
         //}
-    NS_HANDLER
-    NS_ENDHANDLER
+    }
+	@catch(NSException* localException) {
+    }
     [self performSelector:@selector(pollCratePower) withObject:nil afterDelay:10];
 }
 
@@ -350,12 +351,12 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 			break;
 		}
 	}
-
+	
 	NSMutableDictionary* dictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-											[NSNumber numberWithInt:[self crateNumber]], @"CrateNumber",
-											[self className],	@"ClassName",
-											[NSNumber numberWithInt:cardStart],	@"FirstSlot",nil];
-
+									   [NSNumber numberWithInt:[self crateNumber]], @"CrateNumber",
+									   [self className],	@"ClassName",
+									   [NSNumber numberWithInt:cardStart],	@"FirstSlot",nil];
+	
 	NSArray* cards = [self collectObjectsOfClass:NSClassFromString(@"ORCard")];
 	if([cards count]){
 		NSMutableArray* cardArray = [NSMutableArray array];
@@ -370,8 +371,8 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 			[dictionary setObject:cardArray forKey:@"Cards"];
 		}
 	}
-
-
+	
+	
 	[anArray addObject:dictionary];
 }
 

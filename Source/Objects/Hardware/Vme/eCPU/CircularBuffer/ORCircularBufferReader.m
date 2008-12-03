@@ -35,20 +35,21 @@
 {
 	SCBHeader theControlBlockHeader;
 	memset(&theControlBlockHeader,0,sizeof(SCBHeader));		
-	NS_DURING
+	@try {
 		[adapter writeLongBlock:(unsigned long*)&theControlBlockHeader
-								atAddress:baseAddress
-								numToWrite:sizeof(SCBHeader)/sizeof(unsigned long)
-								withAddMod:addressModifier
-							usingAddSpace:addressSpace];
-
-
+					  atAddress:baseAddress
+					 numToWrite:sizeof(SCBHeader)/sizeof(unsigned long)
+					 withAddMod:addressModifier
+				  usingAddSpace:addressSpace];
+		
+		
 		queueSize = theControlBlockHeader.cbNumWords;
 		headValue = (tCBWord)theControlBlockHeader.qHead;
 		tailValue = (tCBWord)theControlBlockHeader.qTail;
-
-	NS_HANDLER
-	NS_ENDHANDLER
+		
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) writeControlBlockHeader:(SCBHeader*)theControlBlockHeader
@@ -61,47 +62,47 @@
 
 - (tCBWord) readBlockUsing:(SCBHeader*)theControlBlockHeader into:(tCBWord*)aBlockOfMemory size:(tCBWord) blockSize
 {
-		tCBWord maxAddress		= [self baseAddress] + DATA_CIRC_BUF_SIZE_BYTE;
-		tCBWord readPtr			= (tCBWord)theControlBlockHeader->qTail;
-
-		blockSize--;				//take account of the first word (the size)
-		readPtr += sizeof(tCBWord);	//point past the size.
+	tCBWord maxAddress		= [self baseAddress] + DATA_CIRC_BUF_SIZE_BYTE;
+	tCBWord readPtr			= (tCBWord)theControlBlockHeader->qTail;
+	
+	blockSize--;				//take account of the first word (the size)
+	readPtr += sizeof(tCBWord);	//point past the size.
+	if(readPtr>=maxAddress){
+		readPtr = [self baseAddress] + sizeof( SCBHeader ) - sizeof( tCBWord );
+	}
+	
+	if( (readPtr+(blockSize*sizeof(tCBWord))) <= maxAddress  ) {
+		// One big copy
+		[self readLongBlock:readPtr blocks:blockSize atPtr:aBlockOfMemory];
+		readPtr += blockSize*sizeof(tCBWord);
 		if(readPtr>=maxAddress){
 			readPtr = [self baseAddress] + sizeof( SCBHeader ) - sizeof( tCBWord );
 		}
+	}
+	else {
+		// Two smaller copies. first read to the end
+		tCBWord numLongsToEnd = (maxAddress - readPtr)/sizeof(tCBWord);
+		[self readLongBlock:readPtr blocks:numLongsToEnd atPtr:aBlockOfMemory];
 		
-		if( (readPtr+(blockSize*sizeof(tCBWord))) <= maxAddress  ) {
-			// One big copy
-			[self readLongBlock:readPtr blocks:blockSize atPtr:aBlockOfMemory];
-			readPtr += blockSize*sizeof(tCBWord);
-			if(readPtr>=maxAddress){
-				readPtr = [self baseAddress] + sizeof( SCBHeader ) - sizeof( tCBWord );
-			}
-		}
-		else {
-			// Two smaller copies. first read to the end
-			tCBWord numLongsToEnd = (maxAddress - readPtr)/sizeof(tCBWord);
-			[self readLongBlock:readPtr blocks:numLongsToEnd atPtr:aBlockOfMemory];
-
-			//reset the tail
-			readPtr = [self baseAddress] + sizeof( SCBHeader ) - sizeof( tCBWord);
-
-			//read the reset
-			[self readLongBlock:readPtr blocks:blockSize - numLongsToEnd
-				   atPtr:aBlockOfMemory+numLongsToEnd];
-			
-			readPtr += (blockSize - numLongsToEnd)*sizeof(tCBWord);
-		}
-		// Calculate tail and blocks/bytes read
-		theControlBlockHeader->blocksRead++;
-		theControlBlockHeader->bytesRead += blockSize*sizeof(tCBWord);
-		if( theControlBlockHeader->bytesRead > theControlBlockHeader->cbNumWords*sizeof(tCBWord) )
-			theControlBlockHeader->bytesRead -= theControlBlockHeader->cbNumWords*sizeof(tCBWord);
-		theControlBlockHeader->qTail = (tCBWord *)readPtr;
+		//reset the tail
+		readPtr = [self baseAddress] + sizeof( SCBHeader ) - sizeof( tCBWord);
 		
-		[self writeControlBlockHeader:theControlBlockHeader];
+		//read the reset
+		[self readLongBlock:readPtr blocks:blockSize - numLongsToEnd
+					  atPtr:aBlockOfMemory+numLongsToEnd];
 		
-		return blockSize;
+		readPtr += (blockSize - numLongsToEnd)*sizeof(tCBWord);
+	}
+	// Calculate tail and blocks/bytes read
+	theControlBlockHeader->blocksRead++;
+	theControlBlockHeader->bytesRead += blockSize*sizeof(tCBWord);
+	if( theControlBlockHeader->bytesRead > theControlBlockHeader->cbNumWords*sizeof(tCBWord) )
+		theControlBlockHeader->bytesRead -= theControlBlockHeader->cbNumWords*sizeof(tCBWord);
+	theControlBlockHeader->qTail = (tCBWord *)readPtr;
+	
+	[self writeControlBlockHeader:theControlBlockHeader];
+	
+	return blockSize;
 }
 
 
@@ -157,7 +158,7 @@
 		}
 	}
 	return wasData;
-
+	
 }
 @end
 

@@ -53,26 +53,26 @@
 //--------------------------------------------------------------------------------
 - (void) awakeFromNib
 {
-
+	
     settingSize     = NSMakeSize(280,400);
     thresholdSize   = [self thresholdDialogSize];
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-
-
+	
+	
     [registerAddressPopUp setAlignment:NSCenterTextAlignment];
     [channelPopUp setAlignment:NSCenterTextAlignment];
-	    
+	
     [self populatePullDown];
     
     [super awakeFromNib];
-
+	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-
+	
 }
 
 - (NSSize) thresholdDialogSize
@@ -182,11 +182,11 @@
     for (i = 0; i < [model numberOfChannels]; i++){
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:caenChnl];
-    
+		
         [[NSNotificationCenter defaultCenter]
-            postNotificationName:caenChnlThresholdChanged
-                          object:model
-                        userInfo:userInfo];
+		 postNotificationName:caenChnlThresholdChanged
+		 object:model
+		 userInfo:userInfo];
     }
     
     [self slotChanged:nil];
@@ -224,19 +224,19 @@
     
     [addressStepper setEnabled:!locked && !runInProgress];
     [addressTextField setEnabled:!locked && !runInProgress];
-
+	
     [writeValueStepper setEnabled:!lockedOrRunningMaintenance];
     [writeValueTextField setEnabled:!lockedOrRunningMaintenance];
     [registerAddressPopUp setEnabled:!lockedOrRunningMaintenance];
     [channelPopUp setEnabled:!lockedOrRunningMaintenance];
-
-
+	
+	
     [basicWriteButton setEnabled:!lockedOrRunningMaintenance];
     [basicReadButton setEnabled:!lockedOrRunningMaintenance]; 
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-	if(runInProgress && ![gSecurity isLocked:[self basicLockName]])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:[self basicLockName]])s = @"Not in Maintenance Run.";
     }
     [basicLockDocField setStringValue:s];
 }
@@ -252,13 +252,13 @@
     [stepperA setEnabled:!lockedOrRunningMaintenance];
     [thresholdB setEnabled:!lockedOrRunningMaintenance];
     [stepperB setEnabled:!lockedOrRunningMaintenance];
-
+	
     [thresholdWriteButton setEnabled:!lockedOrRunningMaintenance];
     [thresholdReadButton setEnabled:!lockedOrRunningMaintenance]; 
     
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
-	if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
+		if(runInProgress && ![gSecurity isLocked:[self thresholdLockName]])s = @"Not in Maintenance Run.";
     }
     [thresholdLockDocField setStringValue:s];
 }
@@ -273,8 +273,8 @@
 - (void) baseAddressChanged:(NSNotification*) aNotification
 {
 	//  Set value of both text and stepper
-	 [self updateStepper:addressStepper setting:[model baseAddress]];
-	 [addressTextField setIntValue:[model baseAddress]];
+	[self updateStepper:addressStepper setting:[model baseAddress]];
+	[addressTextField setIntValue:[model baseAddress]];
 }
 
 //--------------------------------------------------------------------------------
@@ -298,16 +298,16 @@
 //--------------------------------------------------------------------------------
 - (void) selectedRegIndexChanged:(NSNotification*) aNotification
 {
-
+	
 	//  Set value of popup
 	short index = [model selectedRegIndex];
 	[self updatePopUpButton:registerAddressPopUp setting:index];
 	[self updateRegisterDescription:index];
-
-
+	
+	
 	BOOL readAllowed = [model getAccessType:index] == kReadOnly || [model getAccessType:index] == kReadWrite;
 	BOOL writeAllowed = [model getAccessType:index] == kWriteOnly || [model getAccessType:index] == kReadWrite;
-
+	
 	[basicWriteButton setEnabled:writeAllowed];
 	[basicReadButton setEnabled:readAllowed];
     
@@ -333,7 +333,7 @@
 //--------------------------------------------------------------------------------
 - (void) thresholdChanged:(NSNotification*) aNotification
 {
-// Get the channel that changed and then set the GUI value using the model value.
+	// Get the channel that changed and then set the GUI value using the model value.
 	int chnl = [[[aNotification userInfo] objectForKey:caenChnl] intValue];
 	if (chnl < 16){
 		[[thresholdA cellWithTag:chnl] setIntValue:[model threshold:chnl]];
@@ -343,7 +343,7 @@
 		[[thresholdB cellWithTag:chnl-16] setIntValue:[model threshold:chnl]];
 		[[stepperB cellWithTag:chnl-16] setIntValue:[model threshold:chnl]];
 	}
-
+	
 }
 
 #pragma mark ¥¥¥Actions
@@ -358,8 +358,8 @@
 {
     // Make sure that value has changed.
     if ([aSender intValue] != [model baseAddress]){
-	[[[model document] undoManager] setActionName:@"Set Base Address"]; // Set undo name.
-	[model setBaseAddress:[aSender intValue]]; // set new value.
+		[[[model document] undoManager] setActionName:@"Set Base Address"]; // Set undo name.
+		[model setBaseAddress:[aSender intValue]]; // set new value.
     }
 } 
 
@@ -373,8 +373,8 @@
 {
     // Make sure that value has changed.
     if ([aSender intValue] != [model writeValue]){
-	[[[model document] undoManager] setActionName:@"Set Write Value"]; // Set undo name.
-	[model setWriteValue:[aSender intValue]]; // Set new value
+		[[[model document] undoManager] setActionName:@"Set Write Value"]; // Set undo name.
+		[model setWriteValue:[aSender intValue]]; // Set new value
     }
 }
 
@@ -403,8 +403,8 @@
 {
     // Make sure that value has changed.
     if ([aSender indexOfSelectedItem] != [model selectedChannel]){
-	[[[model document] undoManager] setActionName:@"Select Channel"]; // Set undo name
-	[model setSelectedChannel:[aSender indexOfSelectedItem]]; // Set new value
+		[[[model document] undoManager] setActionName:@"Select Channel"]; // Set undo name
+		[model setSelectedChannel:[aSender indexOfSelectedItem]]; // Set new value
     }
 }
 
@@ -432,13 +432,14 @@
 //--------------------------------------------------------------------------------
 - (IBAction) read:(id) pSender
 {
-	NS_DURING
+	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model read];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
-    NS_ENDHANDLER
+    }
 }
 
 //--------------------------------------------------------------------------------
@@ -451,13 +452,14 @@
 //--------------------------------------------------------------------------------
 - (IBAction) write:(id) pSender
 {
-	NS_DURING
+	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model write];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
-    NS_ENDHANDLER
+    }
 }
 
 //--------------------------------------------------------------------------------
@@ -470,15 +472,16 @@
 //--------------------------------------------------------------------------------
 - (IBAction) readThresholds:(id) pSender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model readThresholds];
 		[model logThresholds];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Read of %@ thresholds FAILED.\n",[model identifier]);
         NSRunAlertPanel([localException name], @"%@\nFailed Reading Thresholds", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 	
 }
 
@@ -492,14 +495,15 @@
 //--------------------------------------------------------------------------------
 - (IBAction) writeThresholds:(id) pSender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model writeThresholds];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"Write of %@ thresholds FAILED.\n",[model identifier]);
         NSRunAlertPanel([localException name], @"%@\nFailed Writing Thresholds", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) thresholdLockAction:(id)sender
@@ -524,28 +528,28 @@
 - (void) populatePullDown
 {
     short	i;
-        
-// Clear all the popup items.
+	
+	// Clear all the popup items.
     [registerAddressPopUp removeAllItems];
     [channelPopUp removeAllItems];
     
-// Populate the register popup
+	// Populate the register popup
     for (i = 0; i < [model getNumberRegisters]; i++) {
         [registerAddressPopUp insertItemWithTitle:[model 
-                                    getRegisterName:i] 
-                                            atIndex:i];
+												   getRegisterName:i] 
+										  atIndex:i];
     }
     
-// Populate the channel popup
+	// Populate the channel popup
     for (i = 0; i < 32; i++) {
         [channelPopUp insertItemWithTitle:[NSString stringWithFormat:@"%d", i] 
-                                    atIndex:i];
+								  atIndex:i];
     }
-
+	
     [channelPopUp insertItemWithTitle:@"All" atIndex:32];
-
+	
     [self selectedRegIndexChanged:nil];
-
+	
 }
 
 //--------------------------------------------------------------------------------
@@ -563,14 +567,14 @@
 		@"[WriteOnly]",
 		@"[ReadWrite]"
     };
-
+	
     [registerOffsetTextField setStringValue:
-    [NSString stringWithFormat:@"0x%04x",
-    [model getAddressOffset:aRegisterIndex]]];
+	 [NSString stringWithFormat:@"0x%04x",
+	  [model getAddressOffset:aRegisterIndex]]];
 	
     [registerReadWriteTextField setStringValue:types[[model getAccessType:aRegisterIndex]]];
     [regNameField setStringValue:[model getRegisterName:aRegisterIndex]];
-
+	
     [drTextField setStringValue:[model dataReset:aRegisterIndex] ? @"Y" :@"N"];
     [srTextField setStringValue:[model swReset:aRegisterIndex]   ? @"Y" :@"N"];
     [hrTextField setStringValue:[model hwReset:aRegisterIndex]   ? @"Y" :@"N"];    
@@ -588,11 +592,11 @@
 		[self resizeWindowToSize:thresholdSize];
 		[[self window] setContentView:tabView];
     }
-
+	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
-
+	
 }
 
 

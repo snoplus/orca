@@ -37,17 +37,17 @@
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
     [ super registerNotificationObservers ];
     
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(interfacesChanged:)
                          name : ORUSBInterfaceAdded
 						object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(interfacesChanged:)
                          name : ORUSBInterfaceRemoved
 						object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(serialNumberChanged:)
                          name : ORADU200ModelSerialNumberChanged
@@ -57,12 +57,12 @@
                      selector : @selector(serialNumberChanged:)
                          name : ORADU200ModelUSBInterfaceChanged
 						object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(relayStateChanged:)
                          name : ORADU200ModelRelayChanged
 						object: nil];
-
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(lockChanged:)
 						 name : ORRunStatusChangedNotification
@@ -72,22 +72,22 @@
 					 selector : @selector(lockChanged:)
 						 name : ORADU200ModelLock
 						object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portAChanged:)
                          name : ORADU200ModelPortAChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(eventCounterChanged:)
                          name : ORADU200ModelEventCounterChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(debounceChanged:)
                          name : ORADU200ModelDebounceChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pollTimeChanged:)
                          name : ORADU200ModelPollTimeChanged
@@ -175,7 +175,7 @@
 {
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORADU200ModelLock];
     BOOL locked = [gSecurity isLocked:ORADU200ModelLock];
-
+	
     [lockButton setState: locked];
 	[serialNumberPopup setEnabled:!locked];
 	[relayControlMatrix setEnabled:!lockedOrRunningMaintenance ]; 
@@ -193,17 +193,18 @@
 
 - (IBAction) debounceAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model setDebounce:[sender indexOfSelectedItem]];
 		[model sendDebounce];	
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) settingLockAction:(id) sender
@@ -241,7 +242,7 @@
 			[[serialNumberPopup itemWithTitle:serialNumber] setEnabled:YES];
 		}
 		else [[serialNumberPopup itemWithTitle:serialNumber] setEnabled:NO];
-
+		
 	}
 }
 
@@ -258,35 +259,37 @@
 
 - (IBAction) relayControlAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model toggleRelay:[[sender selectedCell]tag]];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) readClearAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model readAndClear];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
 }
 
 - (IBAction) queryAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model queryAll];
 		int i;
 		for(i=0;i<4;i++){
@@ -296,33 +299,35 @@
 		for(i=0;i<4;i++){
 			NSLog(@"ADU200: Event Counter %d: %d\n",i,[model eventCounter:i]);
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
-
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
+	
 }
 
 - (IBAction) sendCommandAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		if([commandField stringValue]){
 			[model writeCommand:[commandField stringValue]];
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
-                         [ localException reason ],	// Reason for error
-                         @"OK",				// Okay button
-                         nil,				// alternate button
-                         nil );				// other button
-	NS_ENDHANDLER
-
+						[ localException reason ],	// Reason for error
+						@"OK",				// Okay button
+						nil,				// alternate button
+						nil );				// other button
+	}
+	
 }
 
 

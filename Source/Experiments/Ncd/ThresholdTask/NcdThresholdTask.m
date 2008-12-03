@@ -218,17 +218,17 @@
     currentStep = 1;
     NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORPulserDistribModel")];
     if([objects count]){
-        NS_DURING
+        @try {
             thePDSModel = [objects objectAtIndex:0];
             pdsMemento = [[thePDSModel memento] retain];  //save the old values
             
             if(doAllChannels){
                 [thePDSModel setPatternArray:[NSMutableArray arrayWithObjects:
-                    [NSNumber numberWithLong:0xffff],
-                    [NSNumber numberWithLong:0xffff],
-                    [NSNumber numberWithLong:0xffff],
-                    [NSNumber numberWithLong:0xffff],
-                    nil]];
+											  [NSNumber numberWithLong:0xffff],
+											  [NSNumber numberWithLong:0xffff],
+											  [NSNumber numberWithLong:0xffff],
+											  [NSNumber numberWithLong:0xffff],
+											  nil]];
             }
             else {
                 if([delegate respondsToSelector:@selector(dependentTask:)]){
@@ -240,12 +240,13 @@
             [thePDSModel loadHardware:[thePDSModel patternArray]];
             [thePDSModel setDisableForPulser:YES];
             
-        NS_HANDLER
+        }
+		@catch(NSException* localException) {
             NSLog(@"\n");
             NSLogColor([NSColor redColor],@"NCD Threshold Task: Exception thrown! %@\n",localException);
             NSLogColor([NSColor redColor],@"NCD Threshold Task: couldn't set up PDS!\n");
             //abort = YES;
-        NS_ENDHANDLER
+        }
 		if(!numOfValues)[self setNumOfValues:1];
     }
     
@@ -306,17 +307,17 @@
         if(newAmplitude<endAmplitude)return NO;
         else {
             [thePulserModel setVoltage:newAmplitude];
-
+			
 			//disable PDS while loading pulser values 06/16/05
 			[thePDSModel loadHardware:[NSMutableArray arrayWithObjects:
-                    [NSNumber numberWithLong:0x0],
-                    [NSNumber numberWithLong:0x0],
-                    [NSNumber numberWithLong:0x0],
-                    [NSNumber numberWithLong:0x0],
-                    nil]];
+									   [NSNumber numberWithLong:0x0],
+									   [NSNumber numberWithLong:0x0],
+									   [NSNumber numberWithLong:0x0],
+									   [NSNumber numberWithLong:0x0],
+									   nil]];
 			[thePulserModel outputWaveformParams];
             [thePDSModel loadHardware:[thePDSModel patternArray]];
-
+			
             [delegate shipPulserRecord:thePulserModel];
             currentStep++;
 			if(currentStep > numOfValues){
@@ -336,18 +337,20 @@
     lastTime = nil;
     
     if(thePulserModel){
-		NS_DURING
+		@try {
 			[thePulserModel restoreFromMemento:pulserMemento];
-		NS_HANDLER
-        NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+        }
         [pulserMemento release];
         pulserMemento = nil;
     }
     if(thePDSModel){
-        NS_DURING
+        @try {
             [thePDSModel restoreFromMemento:pdsMemento];
-        NS_HANDLER
-        NS_ENDHANDLER
+        }
+		@catch(NSException* localException) {
+        }
         
         [pdsMemento release];
         pdsMemento = nil;

@@ -229,7 +229,7 @@
 	//if(runInProgress && ![gSecurity isLocked:[model settingsLock]])s = @"Not in Maintenance Run.";
     //}
     //[settingLockDocField setStringValue:s];
-
+	
 }
 
 
@@ -292,45 +292,48 @@
 - (IBAction) init:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model initializeContrl];
         NSLog(@"Initialize CC32 - LCR CNTRL Status: 0x%04x\n",statusCC32);
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"CC32 Initialization FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"CC32 Initialization"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed Initialization of CC32", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) test:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model test];
         statusCC32 = [model initializeContrl];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSLog(@"CC32 Test FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"CC32 Test"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\n%@", @"OK", nil, nil,
                             [localException name],statusCC32,@"Failed Test of CC32");
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) execute:(id)sender
 {
     [self endEditing];
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model execute];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         int i = [cmdSelectPopUp indexOfSelectedItem];
         NSDictionary* dict = [helpStrings objectAtIndex:i];
         NSString* name = [dict objectForKey:@"Name"];
@@ -341,59 +344,62 @@
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\n%@ (F%d)", @"OK", nil, nil,
                             [localException name],statusCC32,name,i);
         }
-        NS_ENDHANDLER
+	}
 }
 
 
 - (IBAction) resetController:(id)sender
 {   
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model resetContrl];
         NSLog(@"Reset CC32\n");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLogColor([NSColor redColor],@"Reset Failed\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Reset"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Reset", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) inhibitOnAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model setCrateInhibit:YES];
         NSLog(@"SET CC32 inhibit\n");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"SET CC32 inhibit FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Inhibit On"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Inhibit On", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) inhibitOffAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model setCrateInhibit:NO];
         NSLog(@"CLEAR CC32 inhibit\n");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"CLEAR CC32 inhibit FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Inhibit Off"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Inhibit Off", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 
@@ -401,18 +407,19 @@
 {
     unsigned short statusCC32 = 0;
     unsigned short inhibitState;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model readCrateInhibit:&inhibitState];
         NSLog(@"CC32 inhibit state = %@\n",inhibitState?@"SET":@"CLEAR");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Read CC32 inhibit FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Read Inhibit"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Read Inhibit", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) setLamMaskAction:(id)sender
@@ -420,18 +427,19 @@
     [self endEditing];
     unsigned short statusCC32 = 0;
     unsigned short maskValue = [model moduleWriteValue];
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model setLAMMask:maskValue];
         NSLog(@"CC32 LAM Mask set to 0x%0x\n",maskValue);
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Set CC32 LAM Mask FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Set LAM Mask"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Set LAM Mask", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 
@@ -439,154 +447,163 @@
 {
     unsigned short statusCC32 = 0;
     unsigned long maskValue;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model readLAMMask:&maskValue];
         NSLog(@"CC32 LAM Mask: 0x%0x\n",maskValue);
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Read CC32 LAM Mask FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Read LAM Mask"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Read LAM Mask", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) readLamStationsAction:(id)sender
 {
     unsigned short statusCC32 = 0;
     unsigned long value;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model readLAMStations:&value];
         NSLog(@"CC32 LAM Stations: 0x%0x\n",value);
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Read CC32 LAM Stations FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Read LAM Stations"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Read LAM Stations", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) readLedsAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
 		NSLog(@"LEDs: 0x%08x\n",[model readLEDs]);
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Read CC32 LEDs FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Read LEDs"];
         else {
             NSRunAlertPanel([localException name], @"%@\nFailed CC32 Read LEDs", @"OK", nil, nil,
                             [localException name]);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) zCycleAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model executeZCycle];
         NSLog(@"CC32 Z-Cycle\n");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Execute Z-Cycle FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Z-Cycle"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Z-Cycle", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) cCycleAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model executeCCycle];
         NSLog(@"CC32 C-Cycle\n");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Execute C-Cycle FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"C-Cycle"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 C-Cycle", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) cCycleIAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model executeCCycleIOff];
         NSLog(@"CC32 C-Cycle, Inhibit Off\n");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Execute C-Cycle, Inhibit Off FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"C-Cycle, Inhibit Off"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 C-Cycle, Inhibit Off", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) zCycleIAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model executeZCycleIOn];
         NSLog(@"CC32 Z-Cycle, Inhibit On\n");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Execute Z-Cycle, Inhibit On FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Z-Cycle, Inhibit On"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Z-Cycle, Inhibit On", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) resetLamFFAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model resetLAMFF];
         NSLog(@"Reset CC32 LAM_FF\n");
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Read CC32 LAM_FF Failed\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Reset LAM-FF"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Reset LAM_FF", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) readLamFFAction:(id)sender
 {
     unsigned short statusCC32 = 0;
     unsigned short value;
-    NS_DURING
+    @try {
         [model checkCratePower];
         statusCC32 = [model readLAMFFStatus:&value];
         NSLog(@"CC32 LAM_FF: 0x%0x\n",value);
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Read CC32 LAM_FF FAILED\n");
         if([[localException name] isEqualToString: OExceptionNoCamacCratePower]) [[model crate] doNoPowerAlert:localException action:@"Read LAM_FF"];
         else {
             NSRunAlertPanel([localException name], @"%@\nStatus=%d\nFailed CC32 Read LAM_FF", @"OK", nil, nil,
                             [localException name],statusCC32);
         }
-        NS_ENDHANDLER
+	}
 }
 
 - (IBAction) cmdSelectAction:(id)sender

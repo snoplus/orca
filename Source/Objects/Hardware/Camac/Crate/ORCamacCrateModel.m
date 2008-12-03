@@ -44,9 +44,9 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
     if([self powerOff]){
         NSAttributedString* s = [[[NSAttributedString alloc] initWithString:@"No Pwr"
                                                                  attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                     [NSColor redColor],NSForegroundColorAttributeName,
-                                                                     [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
-                                                                     nil]] autorelease]; 
+																			 [NSColor redColor],NSForegroundColorAttributeName,
+																			 [NSFont fontWithName:@"Geneva" size:10],NSFontAttributeName,
+																			 nil]] autorelease]; 
         [s drawAtPoint:NSMakePoint(35,10)];
     }
     
@@ -69,8 +69,8 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
     [i release];
     
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:OROrcaObjectImageChanged
-                              object:self];
+	 postNotificationName:OROrcaObjectImageChanged
+	 object:self];
 }
 
 - (void) makeMainController
@@ -102,9 +102,9 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
 			cratePowerAlarm = nil;
 			[self viewChanged:nil];
 			[[NSNotificationCenter defaultCenter]
-                postNotificationName:ORForceRedraw
-                              object:self];
-
+			 postNotificationName:ORForceRedraw
+			 object:self];
+			
 		}
 	}
 	else {
@@ -145,7 +145,7 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
                      selector : @selector(viewChanged:)
                          name : ORCamacCardSlotChangedNotification
                        object : nil];
-
+	
     
     [notifyCenter addObserver : self
                      selector : @selector(powerFailed:)
@@ -189,12 +189,13 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
 {
 	if(usingUSB){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollCratePower) object:nil];
-		NS_DURING
+		@try {
 			//if(![[ORGlobal sharedInstance] runInProgress]){
 			[[self controllerCard] checkCratePower];
 			//}
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 		[self performSelector:@selector(pollCratePower) withObject:nil afterDelay:10];
 	}
 	else [super pollCratePower];

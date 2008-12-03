@@ -539,18 +539,20 @@
         [stepTask setIsSlave:NO];
     }
     if(thePulserModel){
-		NS_DURING
+		@try {
 			[thePulserModel restoreFromMemento:pulserMemento];
-		NS_HANDLER
-        NS_ENDHANDLER
+		}
+@catch(NSException* localException) {
+        }
         [pulserMemento release];
         pulserMemento = nil;
     }
     if(thePDSModel){
-        NS_DURING
+        @try {
             [thePDSModel restoreFromMemento:pdsMemento];
-        NS_HANDLER
-        NS_ENDHANDLER
+        }
+@catch(NSException* localException) {
+        }
         [pdsMemento release];
         pdsMemento = nil;
     }

@@ -89,7 +89,7 @@ enum {
 	
     altMuxThresholds = [[NSMutableArray alloc] init];
     fullEfficiencyMuxThresholds = [[NSMutableArray alloc] init];
-
+	
     return self;
     
     
@@ -130,19 +130,19 @@ enum {
     
     [failedShaperCheckAlarm clearAlarm];
     [failedShaperCheckAlarm release];
-
+	
     [failedTriggerCheckAlarm clearAlarm];
     [failedTriggerCheckAlarm release];
- 
+	
 	[failedMuxCheckAlarm clearAlarm];
     [failedMuxCheckAlarm release];
-
+	
 	[noDispatcherAlarm clearAlarm];
     [noDispatcherAlarm release];
-
+	
 	[builderNotConnectedAlarm clearAlarm];
     [builderNotConnectedAlarm release];
-
+	
     [captureDate release];
     [problemArray release];
     [altMuxThresholds release];
@@ -181,7 +181,7 @@ enum {
     [noDispatcherAlarm clearAlarm];
 	[noDispatcherAlarm release];
 	noDispatcherAlarm = nil;
-
+	
 	[failedHardwareCheckAlarm clearAlarm];
     [failedHardwareCheckAlarm release];
 	failedHardwareCheckAlarm = nil;
@@ -189,21 +189,21 @@ enum {
     [failedShaperCheckAlarm clearAlarm];
     [failedShaperCheckAlarm release];
 	failedShaperCheckAlarm = nil;
-
+	
     [failedTriggerCheckAlarm clearAlarm];
     [failedTriggerCheckAlarm release];
 	failedTriggerCheckAlarm = nil;
- 
+	
 	[failedMuxCheckAlarm clearAlarm];
     [failedMuxCheckAlarm release];
 	failedMuxCheckAlarm = nil;
-
-
+	
+	
 	[builderNotConnectedAlarm clearAlarm];
     [builderNotConnectedAlarm release];
 	builderNotConnectedAlarm = nil;
-
-
+	
+	
 }
 
 - (void) installTasks:(NSNotification*)aNote
@@ -235,7 +235,7 @@ enum {
     }
     [ncdCableCheckTask setDelegate:self];
     [ncdCableCheckTask wakeUp];
-
+	
     if(!ncdPulseChannelsTask){
         ncdPulseChannelsTask = [[NcdPulseChannelsTask alloc] init];
     }
@@ -275,8 +275,8 @@ enum {
 - (void) reloadData:(id)obj
 {
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORNcdRateColorBarChangedNotification
-                      object:self];
+	 postNotificationName:ORNcdRateColorBarChangedNotification
+	 object:self];
 }
 
 #pragma mark ¥¥¥Notifications
@@ -387,7 +387,7 @@ enum {
     [aReducedEfficiencyDate retain];
     [reducedEfficiencyDate release];
     reducedEfficiencyDate = aReducedEfficiencyDate;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:NcdModelReducedEfficiencyDateChanged object:self];
 }
 
@@ -399,7 +399,7 @@ enum {
 - (void) setRunningAtReducedEfficiency:(BOOL)aRunningAtReducedEfficiency
 {
     runningAtReducedEfficiency = aRunningAtReducedEfficiency;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:NcdModelRunningAtReducedEfficiencyChanged object:self];
 }
 
@@ -414,7 +414,7 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setCurrentMuxEfficiency:currentMuxEfficiency];
     
     currentMuxEfficiency = aCurrentMuxEfficiency;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:NcdModelCurrentMuxEfficiencyChanged object:self];
 }
 
@@ -429,7 +429,7 @@ enum {
     
     [nominalSettingsFile autorelease];
     nominalSettingsFile = [aNominalSettingsFile copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:NcdModelNominalSettingsFileChanged object:self];
 }
 - (BOOL)allDisabled
@@ -441,8 +441,8 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setAllDisabled:allDisabled];
     allDisabled = flag;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORNcdRateAllDisableChangedNotification
-                      object:self];
+	 postNotificationName:ORNcdRateAllDisableChangedNotification
+	 object:self];
 }
 
 - (NSMutableArray *)altMuxThresholds
@@ -486,8 +486,8 @@ enum {
     colorBarAttributes=newColorBarAttributes;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORNcdRateColorBarChangedNotification
-                      object:self];
+	 postNotificationName:ORNcdRateColorBarChangedNotification
+	 object:self];
     
 }
 
@@ -528,8 +528,8 @@ enum {
 {
     hardwareCheck = aState;
     [[NSNotificationCenter defaultCenter] 
-        postNotificationName:ORNcdHardwareCheckChangedNotification
-                      object:self];
+	 postNotificationName:ORNcdHardwareCheckChangedNotification
+	 object:self];
     
     
     
@@ -558,8 +558,8 @@ enum {
 {
     shaperCheck = aState;
     [[NSNotificationCenter defaultCenter]
-         postNotificationName:ORNcdShaperCheckChangedNotification
-                       object:self];
+	 postNotificationName:ORNcdShaperCheckChangedNotification
+	 object:self];
     
     if(shaperCheck==NO) {
 		if(!failedShaperCheckAlarm){
@@ -585,8 +585,8 @@ enum {
 {
     muxCheck = aState;
     [[NSNotificationCenter defaultCenter] 
-        postNotificationName:ORNcdMuxCheckChangedNotification
-                      object:self];
+	 postNotificationName:ORNcdMuxCheckChangedNotification
+	 object:self];
     if(muxCheck==NO) {
 		if(!failedMuxCheckAlarm){
 			failedMuxCheckAlarm = [[ORAlarm alloc] initWithName:@"Mux Check Failed" severity:kSetupAlarm];
@@ -611,8 +611,8 @@ enum {
 {
     triggerCheck = aState;
     [[NSNotificationCenter defaultCenter] 
-        postNotificationName:ORNcdTriggerCheckChangedNotification
-                      object:self];
+	 postNotificationName:ORNcdTriggerCheckChangedNotification
+	 object:self];
     if(triggerCheck==NO) {
 		if(!failedTriggerCheckAlarm){
 			failedTriggerCheckAlarm = [[ORAlarm alloc] initWithName:@"Trigger Card Check Failed" severity:kSetupAlarm];
@@ -659,8 +659,8 @@ enum {
     captureDate = aCaptureDate;
     
     [[NSNotificationCenter defaultCenter] 
-        postNotificationName:ORNcdCaptureDateChangedNotification
-                      object:self];
+	 postNotificationName:ORNcdCaptureDateChangedNotification
+	 object:self];
     
 }
 
@@ -689,23 +689,23 @@ enum {
 {
 	if(filePath){
 		filePath = [filePath stringByExpandingTildeInPath];
-
+		
 		NSMutableArray* muxNominals = [NSMutableArray array];
 		[[self detector] saveMuxMementos:muxNominals];
-
+		
 		NSMutableArray* shaperGainNominals = [NSMutableArray array];
 		[[self detector] saveShaperGainMementos:shaperGainNominals];
-
+		
 		NSMutableArray* shaperThresholdNominals = [NSMutableArray array];
 		[[self detector] saveShaperThresholdMementos:shaperThresholdNominals];
-
+		
 		NSDictionary* theMementos = [NSDictionary dictionaryWithObjectsAndKeys:muxNominals,@"Mux",
-																			   shaperGainNominals,@"ShaperGains",
-																			   shaperThresholdNominals,@"ShaperThresholds",
-																			   nil];
+									 shaperGainNominals,@"ShaperGains",
+									 shaperThresholdNominals,@"ShaperThresholds",
+									 nil];
 		[theMementos writeToFile:filePath atomically:YES];
 		[self setNominalSettingsFile:filePath];
-
+		
 		NSLog(@"Saved Mux and Shaper nominal values to file: %@\n",[nominalSettingsFile stringByAbbreviatingWithTildeInPath]);
 	}
 }
@@ -714,15 +714,15 @@ enum {
 {
 	if(nominalSettingsFile){
 		if([[NSFileManager defaultManager] fileExistsAtPath:nominalSettingsFile]){
-				NSLog(@"Restoring Mux and Shaper settings to nominal values (file: %@)\n",[nominalSettingsFile stringByAbbreviatingWithTildeInPath]);
-				NSDictionary* theMementos = [NSDictionary dictionaryWithContentsOfFile:nominalSettingsFile];
-				NSArray* array;
-				array = [theMementos objectForKey:@"Mux"];
-				[[self detector] restoreMuxMementos:array];
-				array = [theMementos objectForKey:@"ShaperGains"];
-				[[self detector] restoreShaperGainMementos:array];
-				array = [theMementos objectForKey:@"ShaperThresholds"];
-				[[self detector] restoreShaperThresholdMementos:array];
+			NSLog(@"Restoring Mux and Shaper settings to nominal values (file: %@)\n",[nominalSettingsFile stringByAbbreviatingWithTildeInPath]);
+			NSDictionary* theMementos = [NSDictionary dictionaryWithContentsOfFile:nominalSettingsFile];
+			NSArray* array;
+			array = [theMementos objectForKey:@"Mux"];
+			[[self detector] restoreMuxMementos:array];
+			array = [theMementos objectForKey:@"ShaperGains"];
+			[[self detector] restoreShaperGainMementos:array];
+			array = [theMementos objectForKey:@"ShaperThresholds"];
+			[[self detector] restoreShaperThresholdMementos:array];
 		}
 		else {
 			NSLogColor([NSColor redColor],@"Nominal settings file <%@> not found!\n",nominalSettingsFile);
@@ -757,7 +757,7 @@ enum {
 			[[self detector] restoreShaperGainMementos:array];
 			array = [theMementos objectForKey:@"ShaperThresholds"];
 			[[self detector] restoreShaperThresholdMementos:array];
-
+			
 		}
 		else {
 			NSLogColor([NSColor redColor],@"Nominal settings file <%@> not found!\n",nominalSettingsFile);
@@ -814,8 +814,8 @@ enum {
     [[[self undoManager] prepareWithInvocationTarget:self] setDisplayOptionMask:displayOptionMask];
     displayOptionMask = aDisplayOptionMask;
     [[NSNotificationCenter defaultCenter] 
-    postNotificationName:ORNcdDisplayOptionMaskChangedNotification
-                  object:self];
+	 postNotificationName:ORNcdDisplayOptionMaskChangedNotification
+	 object:self];
     
 }
 
@@ -902,7 +902,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     
     if(!altMuxThresholds)[self setAltMuxThresholds:[NSMutableArray array]];
     if(!fullEfficiencyMuxThresholds)[self setFullEfficiencyMuxThresholds:[NSMutableArray array]];
-
+	
     [[self undoManager] enableUndoRegistration];
     
     [self registerNotificationObservers];
@@ -915,14 +915,14 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     
     [[NcdDetector sharedInstance] saveWithCoder:encoder];
     
-
-
+	
+	
     [encoder encodeObject:reducedEfficiencyDate forKey:@"NcdModelReducedEfficiencyDate"];
     [encoder encodeBool:runningAtReducedEfficiency forKey:@"NcdModelRunningAtReducedEfficiency"];
     [encoder encodeFloat:currentMuxEfficiency forKey:@"NcdModelCurrentMuxEfficiency"];
     [encoder encodeObject:nominalSettingsFile forKey:@"NcdModelNominalSettingsFile"];
     [encoder encodeBool:allDisabled forKey:ORNcdAllDisabled];
-
+	
     [encoder encodeObject:ncdPulseChannelsTask forKey:ORNcdPulseChannelsTask];
     [encoder encodeObject:ncdPDSStepTask forKey:ORNcdPDSStepTask];
     [encoder encodeObject:ncdLogAmpTask forKey:ORNcdLogAmpCalibrationTask];
@@ -1031,7 +1031,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 	
 	//only run the pulser channel task if in neutrino run or source run.
 	if(runTypeMask &  0x2 || runTypeMask &  0x4){
-	   if(runTypeMask &  0x2 ){
+		if(runTypeMask &  0x2 ){
 			//source run
 			[ncdPulseChannelsTask setUseNeutrinoRun:YES];
 			if([ncdPulseChannelsTask autoStart]){
@@ -1044,7 +1044,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 				[ncdPulseChannelsTask startTask];
 			}
 		}
-	
+		
 	}
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(checkBuilderConnection) object:nil];
 	[self performSelector:@selector(checkBuilderConnection) withObject:nil afterDelay:0];
@@ -1059,25 +1059,25 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 		sourceMask = 0;
         [[self detector] restoreMuxMementos];
     }
-
+	
 	if([ncdPulseChannelsTask taskState] == eTaskRunning || [ncdPulseChannelsTask taskState] == eTaskWaiting){
 		[ncdPulseChannelsTask stopTask];
 	}
-
+	
 }
 
 - (void) taskDidStart:(NSNotification*)aNote
 {
 	//this really means a task is about to start....
 	id task = [aNote object];
-
+	
 	if(task != ncdPulseChannelsTask){
 		if([ncdPulseChannelsTask taskState] == eTaskRunning || [ncdPulseChannelsTask taskState] == eTaskWaiting){
 			[ncdPulseChannelsTask stopTask];
 		}
 	}
-
-
+	
+	
     [self shipTaskRecord:[aNote object] running:YES];
 }
 
@@ -1233,60 +1233,60 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdDecoderForStepPDSTask",                @"decoder",
-        [NSNumber numberWithLong:stepPDSDataId],    @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+								 @"NcdDecoderForStepPDSTask",                @"decoder",
+								 [NSNumber numberWithLong:stepPDSDataId],    @"dataId",
+								 [NSNumber numberWithBool:NO],               @"variable",
+								 [NSNumber numberWithLong:3],                @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"StepPDSTask"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdDecoderForThresholdTask",              @"decoder",
-        [NSNumber numberWithLong:thresholdDataId],  @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+				   @"NcdDecoderForThresholdTask",              @"decoder",
+				   [NSNumber numberWithLong:thresholdDataId],  @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:3],                @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"ThresholdTask"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdDecoderForLinearityTask",              @"decoder",
-        [NSNumber numberWithLong:linearityDataId],  @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+				   @"NcdDecoderForLinearityTask",              @"decoder",
+				   [NSNumber numberWithLong:linearityDataId],  @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:3],                @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"LinearityTask"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdDecoderForLogAmpTask",                 @"decoder",
-        [NSNumber numberWithLong:logAmpDataId],     @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+				   @"NcdDecoderForLogAmpTask",                 @"decoder",
+				   [NSNumber numberWithLong:logAmpDataId],     @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:3],                @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"LogAmpTask"];
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdDecoderForCableCheckTask",             @"decoder",
-        [NSNumber numberWithLong:cableCheckDataId], @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+				   @"NcdDecoderForCableCheckTask",             @"decoder",
+				   [NSNumber numberWithLong:cableCheckDataId], @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:3],                @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"CableCheckTask"];
-
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdDecoderForPulseChannelsTask",               @"decoder",
-        [NSNumber numberWithLong:pulseChannelsDataId], @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:3],                @"length",
-        nil];
+				   @"NcdDecoderForPulseChannelsTask",               @"decoder",
+				   [NSNumber numberWithLong:pulseChannelsDataId], @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:3],                @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"NcdPulseChannelsTask"];
     
     
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"NcdDecoderForPulserSettings",             @"decoder",
-        [NSNumber numberWithLong:pulserDataId],     @"dataId",
-        [NSNumber numberWithBool:NO],               @"variable",
-        [NSNumber numberWithLong:6],                @"length",
-        nil];
+				   @"NcdDecoderForPulserSettings",             @"decoder",
+				   [NSNumber numberWithLong:pulserDataId],     @"dataId",
+				   [NSNumber numberWithBool:NO],               @"variable",
+				   [NSNumber numberWithLong:6],                @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"PulserSettings"];
     return dataDictionary;
 }
@@ -1305,7 +1305,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
 {  
     NSArray* triggerCards = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORTrigger32Model")];
     if([triggerCards count]){
-        NS_DURING
+        @try {
             
             union packed {
                 unsigned long longValue;
@@ -1329,11 +1329,12 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                                 object:[NSData dataWithBytes:&data length:sizeof(long)*kNcdPulserRecordSize]];
             
-        NS_HANDLER
+        }
+		@catch(NSException* localException) {
             NSLog(@"\n");
             NSLogColor([NSColor redColor],@"HW exception on the trigger card.\n");
             NSLogColor([NSColor redColor],@"So didn't ship the Pulser record because no GTID.\n");
-        NS_ENDHANDLER
+        }
     }
 }
 
@@ -1347,16 +1348,16 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     else if(aTask == ncdPulseChannelsTask)taskId = pulseChannelsDataId;
     else if(aTask == ncdPDSStepTask){
         if( [ncdLogAmpTask taskState] != eTaskRunning    && 
-            [ncdLinearityTask taskState] != eTaskRunning &&
-            [ncdThresholdTask taskState] != eTaskRunning &&
-            [ncdCableCheckTask taskState] != eTaskRunning){
+		   [ncdLinearityTask taskState] != eTaskRunning &&
+		   [ncdThresholdTask taskState] != eTaskRunning &&
+		   [ncdCableCheckTask taskState] != eTaskRunning){
             taskId = stepPDSDataId;
         }
     }
     if(taskId!= -1){
         NSArray* triggerCards = [[[NSApp delegate]  document] collectObjectsOfClass:NSClassFromString(@"ORTrigger32Model")];
         if([triggerCards count]){
-            NS_DURING
+            @try {
                 
                 unsigned long data[3];
                 data[0] = taskId | 3; //size is two plus header 
@@ -1366,12 +1367,13 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
                                                                     object:[NSData dataWithBytes:&data length:sizeof(long)*3]];
                 
-            NS_HANDLER
+			}
+			@catch(NSException* localException) {
                 NSLog(@"\n");
                 
                 NSLogColor([NSColor redColor],@"HW exception on the trigger card.\n");
                 NSLogColor([NSColor redColor],@"So didn't ship the Task start/stop record because no GTID.\n");
-            NS_ENDHANDLER
+            }
         }
     }
 }
@@ -1583,9 +1585,9 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
             if(![[oldRecord objectForKey:aKey] isEqualTo:[newRecord objectForKey:aKey]]){
                 [self performSelector:checkSelector];
                 [problemArray addObject:[NSString stringWithFormat:@"%@ <0x%x slot %@> %@ changed.\n",
-                    [oldRecord objectForKey:@"Class Name"],
-                    [[oldRecord objectForKey:@"baseAddress"]longValue],
-                    [oldRecord objectForKey:@"slot"], aKey]];
+										 [oldRecord objectForKey:@"Class Name"],
+										 [[oldRecord objectForKey:@"baseAddress"]longValue],
+										 [oldRecord objectForKey:@"slot"], aKey]];
                 
                 [problemArray addObject:[NSString stringWithFormat:@"%@: <%@/%@>\n",aKey,[oldRecord objectForKey:aKey],[newRecord objectForKey:aKey]]];
             }
@@ -1602,9 +1604,9 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
             if(![[oldRecord objectForKey:aKey] isEqualTo:[newRecord objectForKey:aKey]]){
                 [self performSelector:checkSelector];
                 [problemArray addObject:[NSString stringWithFormat:@"%@ <0x%x mux %@> %@ changed.\n",
-                    [oldRecord objectForKey:@"Class Name"],
-                    [[oldRecord objectForKey:@"busNumber"]longValue],
-                    [oldRecord objectForKey:@"muxID"], aKey]];
+										 [oldRecord objectForKey:@"Class Name"],
+										 [[oldRecord objectForKey:@"busNumber"]longValue],
+										 [oldRecord objectForKey:@"muxID"], aKey]];
                 
                 [problemArray addObject:[NSString stringWithFormat:@"%@: <%@/%@>\n",aKey,[oldRecord objectForKey:aKey],[newRecord objectForKey:aKey]]];
             }
