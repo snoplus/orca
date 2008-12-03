@@ -82,41 +82,41 @@ struct ipeReg {
 	unsigned long address;
 	unsigned long space;
 }ipeReg[kNumFLTChannels] = {
-	{0x0L, 0x0L},	//kFLTControlReg
-	{0x1L, 0x0L},	//kFLTPixelStatus1Reg
-	{0x2L, 0x0L},	//kFLTPixelStatus2Reg
-	{0x3L, 0x0L},	//kFLTPixelStatus3Reg
-	{0x4L, 0x0L},	//kFLTDisOnCntrlReg
-	{0x5L, 0x0L},	//kFLTMarginsLReg
-	{0x6L, 0x0L},	//kFLTMarginsHReg
-	{0x7L, 0x0L},	//kFLTCheckSumDReg
-	{0x8L, 0x0L},	//kFLTTestPulsMemReg
-	{0x8L, 0x1L},	//kFLTHitRateMemReg
-	{0x9L, 0x1L},	//kFLTGainReg
-	{0x0L, 0x1L},	//kFLTPeriphStatusReg
-	{0x1L, 0x1L},	//kFLTStaticSetReg
-	{0x2L, 0x1L},	//kFLTThresholdReg
-	{0x3L, 0x1L},	//kFLTSumXReg
-	{0x5L, 0x1L},	//kFLTSumX2Reg
-	{0x6L, 0x1L},	//kFLTChannelOnOffReg
-	{0x0L, 0x2L}	//kFLTAdcMemory
+{0x0L, 0x0L},	//kFLTControlReg
+{0x1L, 0x0L},	//kFLTPixelStatus1Reg
+{0x2L, 0x0L},	//kFLTPixelStatus2Reg
+{0x3L, 0x0L},	//kFLTPixelStatus3Reg
+{0x4L, 0x0L},	//kFLTDisOnCntrlReg
+{0x5L, 0x0L},	//kFLTMarginsLReg
+{0x6L, 0x0L},	//kFLTMarginsHReg
+{0x7L, 0x0L},	//kFLTCheckSumDReg
+{0x8L, 0x0L},	//kFLTTestPulsMemReg
+{0x8L, 0x1L},	//kFLTHitRateMemReg
+{0x9L, 0x1L},	//kFLTGainReg
+{0x0L, 0x1L},	//kFLTPeriphStatusReg
+{0x1L, 0x1L},	//kFLTStaticSetReg
+{0x2L, 0x1L},	//kFLTThresholdReg
+{0x3L, 0x1L},	//kFLTSumXReg
+{0x5L, 0x1L},	//kFLTSumX2Reg
+{0x6L, 0x1L},	//kFLTChannelOnOffReg
+{0x0L, 0x2L}	//kFLTAdcMemory
 };
 
 static int trigChanConvFLT[4][6]={
-	{ 0,  2,  4,  6,  8, 10},	//FPGA-1
-	{12, 14, 16, 18, 20, 22},	//FPGA-2
-	{ 1,  3,  5,  7,  9, 11},	//FPGA-3
-	{13, 15, 17, 19, 21, 23},	//FPGA-4
+{ 0,  2,  4,  6,  8, 10},	//FPGA-1
+{12, 14, 16, 18, 20, 22},	//FPGA-2
+{ 1,  3,  5,  7,  9, 11},	//FPGA-3
+{13, 15, 17, 19, 21, 23},	//FPGA-4
 };
 
 
 
 static NSString* fltTestName[kNumIpeFLTTests]= {
-	@"Run Mode",
-	@"Ram",
-	@"Threshold/Gain",
-	@"Speed",
-	@"Event",
+@"Run Mode",
+@"Ram",
+@"Threshold/Gain",
+@"Speed",
+@"Event",
 };
 
 @interface ORIpeFLTModel (private)
@@ -186,7 +186,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setThresholdOffset:thresholdOffset];
     
     thresholdOffset = aThresholdOffset;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelThresholdOffsetChanged object:self];
 }
 
@@ -199,7 +199,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 {
     
     ledOff = aState;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelLedOffChanged object:self];
 }
 
@@ -216,7 +216,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setCoinTime:coinTime];
     
     coinTime = aValue;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelCoinTimeChanged object:self];
 }
 
@@ -232,7 +232,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setIntegrationTime:integrationTime];
     
     integrationTime = aValue;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelIntegrationTimeChanged object:self];
 }
 
@@ -247,7 +247,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setInterruptMask:interruptMask];
     
     interruptMask = aInterruptMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelInterruptMaskChanged object:self];
 }
 
@@ -261,7 +261,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setPage:page];
     
     page = aPage;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelTestParamChanged object:self];
 }
 
@@ -275,7 +275,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setIterations:iterations];
     
     iterations = aIterations;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelTestParamChanged object:self];
 }
 
@@ -292,7 +292,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setEndChan:endChan];
     
     endChan = aEndChan;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelTestParamChanged object:self];
 }
 
@@ -308,7 +308,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [[[self undoManager] prepareWithInvocationTarget:self] setStartChan:startChan];
     
     startChan = aStartChan;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelTestParamChanged object:self];
 }
 
@@ -443,10 +443,10 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORIpeFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORIpeFLTModelThresholdChanged
-						  object:self
-						userInfo: userInfo];
-						
+	 postNotificationName:ORIpeFLTModelThresholdChanged
+	 object:self
+	 userInfo: userInfo];
+	
 	//ORAdcInfoProviding protocol requirement
 	[self postAdcInfoProvidingValueChanged];
 }
@@ -462,10 +462,10 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORIpeFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORIpeFLTModelGainChanged
-						  object:self
-						userInfo: userInfo];
- 
+	 postNotificationName:ORIpeFLTModelGainChanged
+	 object:self
+	 userInfo: userInfo];
+	
 	//ORAdcInfoProviding protocol requirement
 	[self postAdcInfoProvidingValueChanged];
 }
@@ -474,9 +474,9 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 - (void) postAdcInfoProvidingValueChanged
 {
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:ORAdcInfoProvidingValueChanged
-						  object:self
-						userInfo: nil];
+	 postNotificationName:ORAdcInfoProvidingValueChanged
+	 object:self
+	 userInfo: nil];
 }
 
 
@@ -502,9 +502,9 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORIpeFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORIpeFLTModelTriggerEnabledChanged
-						  object:self
-						userInfo: userInfo];
+	 postNotificationName:ORIpeFLTModelTriggerEnabledChanged
+	 object:self
+	 userInfo: userInfo];
 }
 
 - (BOOL) hitRateEnabled:(unsigned short) aChan
@@ -522,9 +522,9 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORIpeFLTChan];
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORIpeFLTModelHitRateEnabledChanged
-						  object:self
-						userInfo: userInfo];
+	 postNotificationName:ORIpeFLTModelHitRateEnabledChanged
+	 object:self
+	 userInfo: userInfo];
 }
 
 
@@ -619,22 +619,22 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 
 - (void) autoCalibrate:(int)theEndingOffset
 {
-
+	
     // There is no need to load any kind of hitrate measurement of 
 	// control parameters if the thresholds shold be set in a fixed 
 	// distance to the mean ADC value
-
+	
     // If the gains should be adjusted to have equal peak height
 	// the test pulser can be used to compensate differences in the 
 	// channel. In this case the ADC pedestal is needed and the result 
 	// of the testpulse (needs data aquisition task).
     // ak, 7.10.07
-
-
+	
+	
     // Init board
 	[self initBoard];
     usleep(100);
-
+	
     // Set threshold to ADC + offset
 	double pedestal;
 	double var;
@@ -643,7 +643,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	// ADC * T_int = Threshold
 	unsigned long status = [self readReg: kFLTPeriphStatusReg];	
 	int t_Int = (status>>20) & 0xf; // default: 10
-
+	
 	unsigned long hitRateEnabledMask = 0x0;
 	int chan;
 	for(chan = 0;chan<kNumFLTChannels;chan++){
@@ -651,7 +651,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 			hitRateEnabledMask |= (0x1L<<chan);
 		}
 	}
-
+	
 	for(chan=0;chan<kNumFLTChannels;chan++){
 		// Get the ADC pedestal
 		[self getStatistics:chan mean:&pedestal var:&var]; 
@@ -663,7 +663,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 			[self writeThreshold:chan value:val];
 		}
 	}
-
+	
     // Adjust gains
 	// Not implemented now, ak 7.10.07
 	
@@ -683,12 +683,13 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 #pragma mark ¥¥¥HW Access
 - (void) checkPresence
 {
-	NS_DURING
+	@try {
 		[self readCardId];
 		[self setPresent:YES];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self setPresent:NO];
-	NS_ENDHANDLER
+	}
 }
 
 - (int)  readVersion
@@ -732,9 +733,9 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	unsigned long n = 65000;				// There is not really a need to make them variable. ak 7.10.07
 	
     aValue =     (  ( (unsigned long) (enabled  &   0x1) ) << 31)
-           | (  ( (unsigned long) (adc_guess   & 0x3ff) ) << 16)
-           |    ( (unsigned long) ( (n-1)  & 0xffff) ) ; // 16 bit !
-		 
+	| (  ( (unsigned long) (adc_guess   & 0x3ff) ) << 16)
+	|    ( (unsigned long) ( (n-1)  & 0xffff) ) ; // 16 bit !
+	
 	// Broadcast to all channel	(pseudo channel 0x1f)     
 	[self writeReg:kFLTStaticSetReg channel:0x1f value:aValue]; 
 	
@@ -749,19 +750,19 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     unsigned long data;
 	signed long sum;
     unsigned long sumSq;
-
+	
     // Read Statistic parameter
     data = [self  readReg:kFLTStaticSetReg channel:aChannel];
 	statisticOffset = (data  >> 16) & 0x3ff;
 	statisticN = (data & 0xffff) +1;
 	
-
+	
     // Read statistics
 	// The sum is a 25bit signed number.
 	sum = [self readReg:kFLTSumXReg channel:aChannel];
 	// Move the sign
 	sum = (sum & 0x01000000) ? (sum | 0xFE000000) : (sum & 0x00FFFFFF);
-
+	
     // Read the sum of squares	
 	sumSq = [self readReg:kFLTSumX2Reg channel:aChannel];
 	
@@ -769,12 +770,12 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	
 	// Calculate mean and variance
 	if (statisticN > 0){
-	  *aMean = (double) sum / statisticN + statisticOffset;
-	  *aVar = (double) sumSq / statisticN 
-                 - (double) sum / statisticN * sum / statisticN;
+		*aMean = (double) sum / statisticN + statisticOffset;
+		*aVar = (double) sumSq / statisticN 
+		- (double) sum / statisticN * sum / statisticN;
     } else {
-	  *aMean = -1; 
-      *aVar = -1;
+		*aMean = -1; 
+		*aVar = -1;
 	}
 	
 }
@@ -802,10 +803,10 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 - (void) writeControlStatus
 {
 	unsigned long aValue =	(interruptMask  & kIpeFlt_Cntl_InterruptMask_Mask) << kIpeFlt_Cntl_InterruptMask_Shift  |
-							(ledOff			& kIpeFlt_Cntl_LedOff_Mask)		   << kIpeFlt_Cntl_LedOff_Shift			| 
-							(hitRateLength  & kIpeFlt_Cntl_HitRateLength_Mask) << kIpeFlt_Cntl_HitRateLength_Shift  |
-							(fltRunMode		& kIpeFlt_Cntl_Mode_Mask)		   << kIpeFlt_Cntl_Mode_Shift;
-							
+	(ledOff			& kIpeFlt_Cntl_LedOff_Mask)		   << kIpeFlt_Cntl_LedOff_Shift			| 
+	(hitRateLength  & kIpeFlt_Cntl_HitRateLength_Mask) << kIpeFlt_Cntl_HitRateLength_Shift  |
+	(fltRunMode		& kIpeFlt_Cntl_Mode_Mask)		   << kIpeFlt_Cntl_Mode_Shift;
+	
 	[self writeReg: kFLTControlReg value:aValue];
 }
 
@@ -814,11 +815,11 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	int fpga;
 	for(fpga=0;fpga<4;fpga++){
 		unsigned long aValue = (!fltRunMode &kIpeFlt_Periph_Mode_Mask) << kIpeFlt_Periph_Mode_Shift |
-							   (coinTime & kIpeFlt_Periph_CoinTme_Mask) << kIpeFlt_Periph_CoinTme_Shift |    
-							   (0 & kIpeFlt_Periph_LedOff_Mask) <<kIpeFlt_Periph_LedOff_Shift |
-							   (1 & kIpeFlt_Periph_ThresDelta_Mask) <<kIpeFlt_Periph_ThresDelta_Shift |
-							   (integrationTime & kIpeFlt_Periph_Integration_Mask) <<kIpeFlt_Periph_Integration_Shift;  // ak 5.10.07
-							   
+		(coinTime & kIpeFlt_Periph_CoinTme_Mask) << kIpeFlt_Periph_CoinTme_Shift |    
+		(0 & kIpeFlt_Periph_LedOff_Mask) <<kIpeFlt_Periph_LedOff_Shift |
+		(1 & kIpeFlt_Periph_ThresDelta_Mask) <<kIpeFlt_Periph_ThresDelta_Shift |
+		(integrationTime & kIpeFlt_Periph_Integration_Mask) <<kIpeFlt_Periph_Integration_Shift;  // ak 5.10.07
+		
 		[self writeReg: kFLTPeriphStatusReg channel:trigChanConvFLT[fpga][0] value:aValue];
 	}
 }
@@ -959,7 +960,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 
 - (void) writeGain:(int)i value:(unsigned short)aValue
 {
-     // invert the gain scale, ak 20.7.07
+	// invert the gain scale, ak 20.7.07
 	[self writeReg:kFLTGainReg channel:i value:(255-aValue)]; 
 }
 
@@ -988,10 +989,10 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 - (void) clear:(int)aChan page:(int)aPage value:(unsigned short)aValue
 {
 	unsigned long aPattern;
-
+	
 	aPattern =  aValue;
 	aPattern = ( aPattern << 16 ) + aValue;
-
+	
 	// While emulating the block transfer by a loop of single transfers
 	// it is nec. to increment the address pointer by 2
 	[self clearBlock:[self adcMemoryChannel:aChan page:aPage]
@@ -1002,19 +1003,19 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 
 - (void) writeMemoryChan:(int)aChan page:(int)aPage pageBuffer:(unsigned short*)aPageBuffer
 {
-		[self writeBlock: [self adcMemoryChannel:aChan page:aPage] 
-			 dataBuffer: (unsigned long*)aPageBuffer
-				 length: kIpeFlt_Page_Size/2
-			  increment: 2];
+	[self writeBlock: [self adcMemoryChannel:aChan page:aPage] 
+		  dataBuffer: (unsigned long*)aPageBuffer
+			  length: kIpeFlt_Page_Size/2
+		   increment: 2];
 }
 
 - (void) readMemoryChan:(int)aChan page:(int)aPage pageBuffer:(unsigned short*)aPageBuffer
 {
-
-		[self readBlock: [self adcMemoryChannel:aChan page:aPage]
-			 dataBuffer: (unsigned long*)aPageBuffer
-				 length: kIpeFlt_Page_Size/2
-			  increment: 2];
+	
+	[self readBlock: [self adcMemoryChannel:aChan page:aPage]
+		 dataBuffer: (unsigned long*)aPageBuffer
+			 length: kIpeFlt_Page_Size/2
+		  increment: 2];
 }
 
 - (unsigned long) readMemoryChan:(int)aChan page:(int)aPage
@@ -1069,7 +1070,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		
 		[self writeReg:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]  value:aValue];
 		unsigned long checkValue = [self readReg:kFLTChannelOnOffReg channel:trigChanConvFLT[fpga][0]];
-			
+		
 		aValue	   &= 0xfff;
 		checkValue &= 0xfff;
 		
@@ -1086,10 +1087,10 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 
 - (void) readHitRates
 {
-
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
-
-	NS_DURING
+	
+	@try {
 		unsigned long aValue;
 		BOOL overflow;
 		float measurementAge;
@@ -1103,7 +1104,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 			measurementAge = (aValue >> 12) & 0x1f;
 			overflow = (aValue >> 10) & 0x1;
 			aValue = aValue & 0x3FF;
-
+			
 			if(aValue != hitRate[chan] || overflow != hitRateOverFlow[chan]){
 				// The hitrate counter has to be scaled by the counting time 
 				// ak, 15.6.07
@@ -1125,16 +1126,17 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 				newTotal += hitRate[chan];
 			}
 		}
-				
+		
 		[self setHitRateTotal:newTotal];
 		
 		if(oneChanged){
 		    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelHitRateChanged object:self];
 		}
-		NS_HANDLER
-		NS_ENDHANDLER
-		
-		[self performSelector:@selector(readHitRates) withObject:nil afterDelay:[self hitRateLength]];
+	}
+	@catch(NSException* localException) {
+	}
+	
+	[self performSelector:@selector(readHitRates) withObject:nil afterDelay:[self hitRateLength]];
 }
 
 - (NSString*) rateNotification
@@ -1177,7 +1179,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	[self setTestEnabledArray:	[decoder decodeObjectForKey:@"testsEnabledArray"]];
 	[self setTestStatusArray:	[decoder decodeObjectForKey:@"testsStatusArray"]];
     [self setReadoutPages:		[decoder decodeIntForKey:@"ORIpeFLTModelReadoutPages"]];	// ak, 2.7.07
-			
+	
 	//make sure these objects exist and are populated with nil objects.
 	int i;	
 	if(!triggersEnabled){
@@ -1194,22 +1196,22 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		[self setThresholds: [NSMutableArray array]];
 		for(i=0;i<kNumFLTChannels;i++) [thresholds addObject:[NSNumber numberWithInt:50]];
 	}
-
+	
 	if(!gains){
 		[self setGains: [NSMutableArray array]];
 		for(i=0;i<kNumFLTChannels;i++) [gains addObject:[NSNumber numberWithInt:100]];
 	}
-
+	
 	if(!testStatusArray){
 		[self setTestStatusArray: [NSMutableArray array]];
 		for(i=0;i<kNumIpeFLTTests;i++) [testStatusArray addObject:@"--"];
 	}
-
+	
 	if(!testEnabledArray){
 		[self setTestEnabledArray: [NSMutableArray array]];
 		for(i=0;i<kNumIpeFLTTests;i++) [testEnabledArray addObject:[NSNumber numberWithBool:YES]];
 	}
-
+	
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -1244,12 +1246,12 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORIpeFLTDecoderForWaveForm",		@"decoder",
-        [NSNumber numberWithLong:waveFormId],   @"dataId",
-        [NSNumber numberWithBool:YES],			@"variable",
-        [NSNumber numberWithLong:-1],			@"length",
-        nil];
-
+								 @"ORIpeFLTDecoderForWaveForm",		@"decoder",
+								 [NSNumber numberWithLong:waveFormId],   @"dataId",
+								 [NSNumber numberWithBool:YES],			@"variable",
+								 [NSNumber numberWithLong:-1],			@"length",
+								 nil];
+	
     [dataDictionary setObject:aDictionary forKey:@"IpeFLTWaveForm"];
 	
     return dataDictionary;
@@ -1259,9 +1261,9 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 {
 	NSDictionary* aDictionary;
 	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithLong:dataId],				@"dataId",
-		[NSNumber numberWithLong:kNumFLTChannels],		@"maxChannels",
-								nil];
+				   [NSNumber numberWithLong:dataId],				@"dataId",
+				   [NSNumber numberWithLong:kNumFLTChannels],		@"maxChannels",
+				   nil];
 	
 	[anEventDictionary setObject:aDictionary forKey:@"IpeFLT"];
 }
@@ -1285,9 +1287,9 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	id slt = [[self crate] adapter];
-
+	
 	firstTime = YES;
-
+	
     [self clearExceptionCount];
 	
 	//check that we can actually run
@@ -1309,12 +1311,12 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 			break;
 		}
 	}
-		
+	
     //if([[userInfo objectForKey:@"doinit"]intValue]){
-		[self setLedOff:NO];
-		[self initBoard];					
+	[self setLedOff:NO];
+	[self initBoard];					
 	//}
-		
+	
 	
 	if(ratesEnabled){
 		[self performSelector:@selector(readHitRates) 
@@ -1345,29 +1347,29 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 //***************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {	
-    NS_DURING	
-	   			
+    @try {	
+		
 		//retrieve the parameters
 		int fltPageStart = [[userInfo objectForKey:@"page"] intValue];
 		int lStart		 = [[userInfo objectForKey:@"lStart"] intValue];
 		unsigned long pixelList = [[userInfo objectForKey:@"pixelList"] intValue]; // ak, 5.10.2007
 		unsigned long fltSize = pageSize * 5; // Size in long words
-
+		
 		//int eventCounter = [[userInfo objectForKey:@"eventCounter"] intValue];
 		[self eventMask:pixelList];	
 		
 		//NSLog(@"Pixellist = %08x\n", pixelList);	
-				
+		
 		int aChan;
 		for(aChan=0;aChan<kNumFLTChannels;aChan++){	
 		    if (( (pixelList >> aChan) & 0x1 == 0x1)) {	
 			    //NSLog(@"Reading channel (%d,%d)\n", [self slot], aChan);
-									
+				
 				locationWord &= 0xffff0000;
 				locationWord |= (aChan&0xff)<<8;
 				
 				unsigned long totalLength = (2 + readoutPages * fltSize);	// longs
-																		//unsigned long totalLength = (2 + 500);	// longs
+				//unsigned long totalLength = (2 + 500);	// longs
 				NSMutableData* theWaveFormData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
 				unsigned long header = waveFormId | totalLength;
 				
@@ -1375,12 +1377,12 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 				[theWaveFormData appendBytes:&locationWord length:4];		           //which crate, which card info
 				
 				[theWaveFormData setLength:totalLength*sizeof(long)]; //we're going to dump directly into the NSData object so
-																	  //we have to set the total size first. (Note: different than 'Capacity')
+				//we have to set the total size first. (Note: different than 'Capacity')
 				
 				
 				short* waveFormPtr = ((short*)[theWaveFormData bytes]) + (4*sizeof(short)); //point to start of waveform
 				unsigned long* wPtr = (unsigned long*)waveFormPtr;
-								
+				
 				int i;
 				int j;
 				long addr =  memoryAddress | (aChan << kIpeFlt_ChannelAddress) | (fltPageStart<<10) | lStart; // ak, 5.10.07
@@ -1401,19 +1403,20 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 					wPtr += fltSize;				
 					addr = (addr + 1024) % 0x10000;
 				}
-								
+				
 				[aDataPacket addData:theWaveFormData]; //ship the waveform
 				
 			}
 		} // end of loop over all channel
-
-	NS_HANDLER
-	
+		
+	}
+	@catch(NSException* localException) {
+		
 		NSLogError(@"",@"Ipe FLT Card Error",[NSString stringWithFormat:@"Card%d",[self stationNumber]],@"Data Readout",nil);
 		[self incExceptionCount];
 		[localException raise];
 		
-	NS_ENDHANDLER
+	}
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1426,7 +1429,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		hitRate[chan] = 0;
 	}
 	[self setHitRateTotal:0];
-
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelHitRateChanged object:self];
 }
 
@@ -1459,7 +1462,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [p setSetMethod:@selector(setGain:withValue:) getMethod:@selector(gain:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
-		
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Trigger Enable"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
@@ -1521,7 +1524,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 - (void) setTestsRunning:(BOOL)aTestsRunning
 {
     testsRunning = aTestsRunning;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelTestsRunningChanged object:self];
 }
 
@@ -1537,7 +1540,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [aTestEnabledArray retain];
     [testEnabledArray release];
     testEnabledArray = aTestEnabledArray;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelTestEnabledArrayChanged object:self];
 }
 
@@ -1551,7 +1554,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
     [aTestStatusArray retain];
     [testStatusArray release];
     testStatusArray = aTestStatusArray;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeFLTModelTestStatusArrayChanged object:self];
 }
 
@@ -1570,10 +1573,10 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 - (void) runTests
 {
 	if(!testsRunning){
-		NS_DURING
+		@try {
 			[self setTestsRunning:YES];
 			NSLog(@"Starting tests for FLT station %d\n",[self stationNumber]);
-
+			
 			//clear the status text array
 			int i;
 			for(i=0;i<kNumIpeFLTTests;i++){
@@ -1588,10 +1591,11 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 			if([self testEnabled:2]) [testSuit addTest:[ORTest testSelector:@selector(thresholdGainTest) tag:2]];
 			if([self testEnabled:3]) [testSuit addTest:[ORTest testSelector:@selector(speedTest) tag:3]];
 			if([self testEnabled:4]) [testSuit addTest:[ORTest testSelector:@selector(eventTest) tag:4]];
-
+			
 			[testSuit runForObject:self];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 	}
 	else {
 		NSLog(@"Tests for FLT (station: %d) stopped manually\n",[self stationNumber]);
@@ -1614,9 +1618,9 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
+	
 	savedMode = fltRunMode;
-	NS_DURING
+	@try {
 		BOOL passed = YES;
 		int i;
 		for(i=0;i<2;i++){
@@ -1639,9 +1643,10 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		if(passed){
 			[self test:testNumber result:@"Passed" color:[NSColor passedColor]];
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-	NS_ENDHANDLER
+	}
 	
 	[testSuit runForObject:self]; //do next test
 }
@@ -1654,21 +1659,21 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
+	
 	unsigned short pat1[kIpeFlt_Page_Size],buf[kIpeFlt_Page_Size];
 	int i,chan;
 	for(i=0;i<kIpeFlt_Page_Size;i++)pat1[i]=i;
-
-	NS_DURING
+	
+	@try {
 		[self enterTestMode];
 		int aPage;
-				
+		
 		int n_error = 0;
 		for (chan=startChan;chan<=endChan;chan++) {
 			for(aPage=0;aPage<32;aPage++) {
 				[self writeMemoryChan:chan page:aPage pageBuffer:pat1];
 				[self readMemoryChan:chan page:aPage pageBuffer:buf];
-								
+				
 				if ([self compareData:buf pattern:pat1 shift:0 n:kIpeFlt_Page_Size] != kIpeFlt_Page_Size) n_error++;
 			}
 		}
@@ -1681,14 +1686,15 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		}
 		
 		[self leaveTestMode];
-
-	
-	NS_HANDLER
-		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-	NS_ENDHANDLER		
-
-	[testSuit runForObject:self]; //do next test
 		
+		
+	}
+	@catch(NSException* localException) {
+		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
+	}		
+	
+	[testSuit runForObject:self]; //do next test
+	
 }
 
 
@@ -1699,8 +1705,8 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
-	NS_DURING
+	
+	@try {
 		[self enterTestMode];
 		unsigned long aPattern[4] = {0x3fff,0x0,0x2aaa,0x1555};
 		int chan;
@@ -1724,7 +1730,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		}
 		if(passed){		
 			unsigned long gainPattern[4] = {0xff,0x0,0xaa,0x55};
-
+			
 			//now gains
 			for(testIndex = 0;testIndex<4;testIndex++){
 				unsigned short thePattern = gainPattern[testIndex];
@@ -1749,13 +1755,14 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		[self loadThresholdsAndGains];
 		
 		[self leaveTestMode];
-
-	NS_HANDLER
-		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-	NS_ENDHANDLER		
-
-	[testSuit runForObject:self]; //do next test
 		
+	}
+	@catch(NSException* localException) {
+		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
+	}		
+	
+	[testSuit runForObject:self]; //do next test
+	
 }
 
 
@@ -1766,12 +1773,12 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		[self runningTest:testNumber status:@"stopped"];
 		return;
 	}
-
+	
 	unsigned short buf[kIpeFlt_Page_Size];
 	ORTimer* timer = [[ORTimer alloc] init];
 	[timer reset];
 	
-	NS_DURING
+	@try {
 		[self enterTestMode];		
 		[timer start];
 		[self readMemoryChan:startChan page:page pageBuffer:buf];
@@ -1787,16 +1794,17 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		
 		
 		[self runningTest:testNumber status:@"See StatusLog"];
-
+		
 		[self leaveTestMode];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-
-	NS_ENDHANDLER		
+		
+	}		
 	[timer release];
 	
 	[testSuit runForObject:self]; //do next test
-		
+	
 }
 
 - (void) eventTest
@@ -1807,7 +1815,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		return;
 	}
 	
-	NS_DURING
+	@try {
 		//cache some addresses.
 		statusAddress		= [self regAddress:kFLTControlReg];
 		
@@ -1823,10 +1831,10 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 			[self writeControlStatus];
 			[ORTimer delay:.1];
 		}
-
+		
 		ledOff	  = YES;
 		[self writeControlStatus];
-
+		
 		//go to test mode
 		fltRunMode = kIpeFlt_Run_Mode;
 		ledOff = YES;
@@ -1839,13 +1847,13 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		}
 		
 		[self initBoard];
-
+		
 		NSLog(@"FLT %d\n",[self stationNumber]);
 		
 		[slt setSwInhibit]; 
 		[slt releaseAllPages]; 
 		[slt releaseSwInhibit]; 
-
+		
 		int numPulses = 10;
 		for(i=0;i<numPulses;i++){
 			[slt pulseOnce];
@@ -1872,40 +1880,41 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 		else NSLog(@"No Data\n");
 		
 		[self runningTest:testNumber status:@"See StatusLog"];
-
+		
 		fltRunMode = savedMode;
 		ledOff   = savedLed;
 		[self writeControlStatus];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self test:testNumber result:@"FAILED" color:[NSColor failedColor]];
-
-	NS_ENDHANDLER		
+		
+	}		
 	
 	[testSuit runForObject:self]; //do next test
-		
+	
 }
 
 - (int) compareData:(unsigned short*) data
-                     pattern:(unsigned short*) pattern
-					 shift:(int) shift
-					 n:(int) n 
+			pattern:(unsigned short*) pattern
+			  shift:(int) shift
+				  n:(int) n 
 {
-   int i, j;
-
-   // Check for errors
-   for (i=0;i<n;i++) {
-     if (data[i]!=pattern[(i+shift)%n]) {
-         for (j=(i/4);(j<i/4+3) && (j < n/4);j++){
-			NSLog(@"%04x: %04x %04x %04x %04x - %04x %04x %04x %04x \n",j*4,
-              data[j*4],data[j*4+1],data[j*4+2],data[j*4+3],
-              pattern[(j*4+shift)%n],  pattern[(j*4+1+shift)%n],
-              pattern[(j*4+2+shift)%n],pattern[(j*4+3+shift)%n]  );
-			return i; // check only for one error in every page!
+	int i, j;
+	
+	// Check for errors
+	for (i=0;i<n;i++) {
+		if (data[i]!=pattern[(i+shift)%n]) {
+			for (j=(i/4);(j<i/4+3) && (j < n/4);j++){
+				NSLog(@"%04x: %04x %04x %04x %04x - %04x %04x %04x %04x \n",j*4,
+					  data[j*4],data[j*4+1],data[j*4+2],data[j*4+3],
+					  pattern[(j*4+shift)%n],  pattern[(j*4+1+shift)%n],
+					  pattern[(j*4+2+shift)%n],pattern[(j*4+3+shift)%n]  );
+				return i; // check only for one error in every page!
+			}
 		}
-     }
-   }
-
-   return n;
+	}
+	
+	return n;
 }
 
 @end
@@ -1916,8 +1925,8 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 {
 	NSLogColor(aColor,@"%@ test %@\n",fltTestName[testIndex],result);
 	id theString = [[NSAttributedString alloc] initWithString:result 
-														attributes:[NSDictionary dictionaryWithObject: aColor forKey:NSForegroundColorAttributeName]];
-
+												   attributes:[NSDictionary dictionaryWithObject: aColor forKey:NSForegroundColorAttributeName]];
+	
 	[self runningTest:testIndex status:theString];
 	return [theString autorelease];
 }
@@ -1936,7 +1945,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 
 - (void) leaveTestMode
 {
-		fltRunMode = savedMode;
-		[self writeControlStatus];
+	fltRunMode = savedMode;
+	[self writeControlStatus];
 }
 @end

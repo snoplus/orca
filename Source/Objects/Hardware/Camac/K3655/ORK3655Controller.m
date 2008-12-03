@@ -72,43 +72,43 @@
                      selector : @selector(numberToSetChanged:)
                          name : ORK3655PulseNumberToSetChanged
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(numberToClearChanged:)
                          name : ORK3655PulseNumberToClearChanged
                         object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(clockFreqChanged:)
                          name : ORK3655ClockFreqChanged
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(numChansChanged:)
                          name : ORK3655NumChansToUseChanged
                         object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(continousChanged:)
                          name : ORK3655ContinousChanged
                         object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(inhibitEnabledChanged:)
                          name : ORK3655InhibitEnabledChanged
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(useExtClockChanged:)
                          name : ORK3655UseExtClockChanged
                         object: nil];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(setPointsChanged:)
                          name : ORK3655SetPointsChangedNotification
                         object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(setPointChanged:)
                          name : ORK3655SetPointChangedNotification
@@ -217,18 +217,18 @@
     BOOL locked = [gSecurity isLocked:ORK3655SettingsLock];
     
     [settingLockButton setState: locked];
-
+	
 	if(!lockedOrRunningMaintenance){
 		[self enableSetPointFields];
 	}
 	else {
 		[setPointMatrix setEnabled:NO];
 	}
-
+	
     [inhibitEnabledButton setEnabled:!lockedOrRunningMaintenance];
     [continousButton setEnabled:!lockedOrRunningMaintenance];
     [useExtClockButton setEnabled:!lockedOrRunningMaintenance];
-
+	
 	if([model useExtClock]){
 		[clockFreqField setEnabled:NO];
 	}
@@ -237,7 +237,7 @@
 	}
 	
 	[numChansField setEnabled:!lockedOrRunningMaintenance];
-
+	
 	if([model inhibitEnabled]){
 		[numberToClearField setEnabled:!lockedOrRunningMaintenance];
 		[numberToSetField setEnabled:!lockedOrRunningMaintenance];
@@ -251,7 +251,7 @@
     [testLAMButton setEnabled:!lockedOrRunningMaintenance];
     [clearLAMButton setEnabled:!lockedOrRunningMaintenance];
     [readSetPointButton setEnabled:!lockedOrRunningMaintenance];
-        
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORK3655SettingsLock])s = @"Not in Maintenance Run.";
@@ -269,13 +269,14 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) initAction:(id) sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
         [model initBoard];
         NSLog(@"K3655 Init for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Init Error" fCode:8];
-    NS_ENDHANDLER
+    }
 }
 
 
@@ -286,25 +287,27 @@
 
 - (IBAction) testLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model testLAM];
         NSLog(@"K3655 Test LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM" fCode:8];
-    NS_ENDHANDLER
+    }
 }
 
 
 - (IBAction) clearLAMAction:(id)sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         [model clearLAM];
         NSLog(@"K3655 Clear LAM for Station %d\n",[model stationNumber]);
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Enable LAM" fCode:26];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) continousAction:(id)sender
@@ -352,11 +355,12 @@
 
 - (IBAction) readSetPointAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model readSetPoints];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         [self showError:localException name:@"Test LAM" fCode:8];
-    NS_ENDHANDLER
+    }
 }
 
 

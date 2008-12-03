@@ -52,10 +52,11 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		[self findInterface];	
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (NSDictionary*) matchingDictionary
@@ -75,7 +76,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
     [aFwInterface retain];
     [fireWireInterface release];
     fireWireInterface = aFwInterface;
-
+	
 	[fireWireInterface open];
 	
 	if(!fireWireInterface){
@@ -86,7 +87,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 	}
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeInterfaceChanged object:self];
-
+	
 }
 
 - (void) setGuardian:(id)aGuardian
@@ -97,7 +98,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 		}
 	}
     else [[self guardian] setAdapter:nil];
-
+	
     [super setGuardian:aGuardian];
 }
 
@@ -166,7 +167,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 - (void) attemptConnection
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(attemptConnection) object:nil];
-
+	
 	[self findInterface];
 	if(!fireWireInterface)[self performSelector:@selector(attemptConnection) withObject:nil afterDelay:15];
 }
@@ -175,18 +176,18 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 - (void) registerNotificationObservers
 {	
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
-			   
+	
     [notifyCenter addObserver : self
                      selector : @selector(serviceChanged:)
                          name : ORFireWireInterfaceServiceAliveChanged
                        object : fireWireInterface];
     
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(serviceChanged:)
                          name : ORFireWireInterfaceIsOpenChanged
                        object : fireWireInterface];
-
+	
 }
 
 - (void) serviceChanged:(NSNotification*)aNote
@@ -248,7 +249,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 		else {
 			int i;
 			for (i=0;i<len/sizeof(unsigned long);i++){
-			  theData[i] = ((2*i+1) << 16) + (2*i);
+				theData[i] = ((2*i+1) << 16) + (2*i);
 			}
 			//NSLog(@"Simulated data: %08x %08x %08x\n", theData[0], theData[1], theData[2]);
 		}
@@ -268,7 +269,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 
 
 - (void) writeBitsAtAddress:(unsigned long)address 
-					   value:(unsigned long)dataWord 
+					  value:(unsigned long)dataWord 
 					   mask:(unsigned long)aMask 
 					shifted:(int)shiftAmount
 {
@@ -296,7 +297,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 		[NSException raise:@"ORFireWireInterface" format:@"No Firewire Service: check cables and power"];
 	}
 }
-						
+
 - (void) setBitsHighAtAddress:(unsigned long)address 
 						 mask:(unsigned long)aMask
 {
@@ -325,7 +326,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 				aDataBuffer[i*length + j] = [fireWireInterface read_raw:(anAddress + i*incrSlots + j*incr)]; // Slots start with id 1 !!!
 			}
 		}
-
+		
 	}
 	else if(!pBusSim){
 		NSLogColor([NSColor redColor],@"No Firewire Service: check cables and power!\n");
@@ -369,7 +370,7 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 }
 
 - (void) clearBlock:(unsigned long)  anAddress 
-		 pattern:(unsigned long) aPattern
+			pattern:(unsigned long) aPattern
 			 length:(unsigned long)  length 
 		  increment:(unsigned long)  incr
 {
@@ -394,9 +395,9 @@ NSString* ORIpePBusSimChanged		= @"ORIpePBusSimChanged";
 	[[self undoManager] disableUndoRegistration];
 	[self setPBusSim:[decoder decodeBoolForKey:@"pBusSim"]];
 	[[self undoManager] enableUndoRegistration];
-
+	
 	[self registerNotificationObservers];
-
+	
 	return self;
 }
 

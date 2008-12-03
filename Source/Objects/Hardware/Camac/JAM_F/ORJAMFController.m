@@ -51,8 +51,8 @@
 	[[plotter2 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
     [[plotter3 yScale] setRngLow:-12.0 withHigh:12.];
 	[[plotter3 yScale] setRngLimitsLow:-12.0 withHigh:12 withMinRng:4];
-
-
+	
+	
     [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
     [[plotter1 xScale] setRngLow:0.0 withHigh:10000];
@@ -95,73 +95,73 @@
                      selector : @selector(enabledMaskChanged:)
                          name : ORJAMFModelEnabledMaskChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(alarmsEnabledMaskChanged:)
                          name : ORJAMFModelAlarmsEnabledMaskChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(lowLimitChanged:)
                          name : ORJAMFModelLowLimitChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(highLimitChanged:)
                          name : ORJAMFModelHighLimitChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(adcValueChanged:)
                          name : ORJAMFModelAdcValueChanged
 						object: model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(rangeIndexChanged:)
                          name : ORJAMFModelRangeIndexChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(lastReadChanged:)
                          name : ORJAMFModelLastReadChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(pollingStateChanged:)
                          name : ORJAMFModelPollingStateChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(scaleAction:)
 						 name : ORAxisRangeChangedNotification
 					   object : nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(scanLimitChanged:)
                          name : ORJAMFModelScanLimitChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(scanEnabledChanged:)
                          name : ORJAMFModelScanEnabledChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(shipRecordsChanged:)
                          name : ORJAMFModelShipRecordsChanged
 						object: model];
-
+	
 }
 
 #pragma mark •••Interface Management
@@ -210,7 +210,7 @@
 	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
 		[model setMiscAttributes:[[plotter0 yScale]attributes] forKey:@"YAttributes0"];
 	};
-
+	
 	if(aNotification == nil || [aNotification object] == [plotter1 xScale]){
 		[model setMiscAttributes:[[plotter1 xScale]attributes] forKey:@"XAttributes1"];
 	};
@@ -226,7 +226,7 @@
 	if(aNotification == nil || [aNotification object] == [plotter2 yScale]){
 		[model setMiscAttributes:[[plotter2 yScale]attributes] forKey:@"YAttributes2"];
 	};
-
+	
 	if(aNotification == nil || [aNotification object] == [plotter3 xScale]){
 		[model setMiscAttributes:[[plotter3 xScale]attributes] forKey:@"XAttributes3"];
 	};
@@ -234,12 +234,12 @@
 	if(aNotification == nil || [aNotification object] == [plotter3 yScale]){
 		[model setMiscAttributes:[[plotter3 yScale]attributes] forKey:@"YAttributes3"];
 	};
-
+	
 }
 
 - (void) miscAttributesChanged:(NSNotification*)aNote
 {
-
+	
 	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
 	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
 	
@@ -259,7 +259,7 @@
 			[[plotter0 yScale] setNeedsDisplay:YES];
 		}
 	}
-
+	
 	if(aNote == nil || [key isEqualToString:@"XAttributes1"]){
 		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes1"];
 		if(attrib){
@@ -324,7 +324,7 @@
 	else if(!aNote || ([aNote object] == [model timeRate:3])){
 		[plotter3 setNeedsDisplay:YES];
 	}
-
+	
 }
 
 - (void) pollingStateChanged:(NSNotification*)aNote
@@ -362,7 +362,7 @@
 	if(aNote == nil){
 		int i;
 		for(i=0;i<16;i++)[[lowLimitsMatrix cellWithTag:i] setFloatValue: [model lowLimit:i]];
-
+		
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:ORJAMFChan] intValue];
@@ -375,7 +375,7 @@
 	if(aNote == nil){
 		int i;
 		for(i=0;i<16;i++)[[highLimitsMatrix cellWithTag:i] setFloatValue: [model highLimit:i]];
-
+		
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:ORJAMFChan] intValue];
@@ -391,7 +391,7 @@
 			[[adcValueMatrix cellWithTag:i] setFloatValue: [model adcValue:i]];
 			[[adcValueMatrix cellWithTag:i] setTextColor:[NSColor blackColor]];
 		}
-
+		
 	}
 	else {
 		int chan = [[[aNote userInfo] objectForKey:ORJAMFChan] intValue];
@@ -529,29 +529,31 @@
 
 - (IBAction) initAction:(id)sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
         [model checkCratePower];
         [model initBoard];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [self showError:localException name:@"InitBoard"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readAdcsAction:(id)sender
 {
-    NS_DURING
+    @try {
 		[self endEditing];
         [model checkCratePower];
         [model readAdcs:YES];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read Adcs"];
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readID:(id) sender
 {
-    NS_DURING
+    @try {
         [model checkCratePower];
         unsigned short anID = [model readBoardID];
 		char boardID[9];
@@ -559,9 +561,10 @@
 		strncpy(boardID,p,8);
 		boardID[8] = '\0';
 		NSLog(@"JAM-F ID: %s\n",boardID);
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [self showError:localException name:@"Read ID"];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) showError:(NSException*)anException name:(NSString*)name fCode:(int)i

@@ -47,11 +47,11 @@ struct {
 	float lowRange;
 	float highRange;
 } adclRanges[5]={
-	{0,10.24},
-	{0,5.12},
-	{-10.24,10.24},
-	{-5.12,5.12},
-	{-2.56,2.56}
+{0,10.24},
+{0,5.12},
+{-10.24,10.24},
+{-5.12,5.12},
+{-2.56,2.56}
 };
 
 @interface ORJADCLModel (private)
@@ -134,7 +134,7 @@ struct {
     
     pollingState = aPollingState;
     [self performSelector:@selector(_setUpPolling) withObject:nil afterDelay:0.5];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJADCLModelPollingStateChanged object:self];
 }
 
@@ -147,7 +147,7 @@ struct {
 {
     [lastRead autorelease];
     lastRead = [aLastRead copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJADCLModelLastReadChanged object:self];
 }
 
@@ -161,7 +161,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setRangeIndex:rangeIndex];
     
     rangeIndex = aRangeIndex;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJADCLModelRangeIndexChanged object:self];
 }
 
@@ -175,7 +175,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
     
     enabledMask = aEnabledMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJADCLModelEnabledMaskChanged object:self];
 }
 
@@ -202,7 +202,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setAlarmsEnabledMask:alarmsEnabledMask];
     
     alarmsEnabledMask = aEnabledMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJADCLModelAlarmsEnabledMaskChanged object:self];
 }
 
@@ -229,7 +229,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setHighLimit:aChan withValue:[self highLimit:aChan]];
     
     highLimits[aChan] = aHighLimit;
-
+	
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORJADCLChan];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJADCLModelHighLimitChanged object:self userInfo:userInfo];
@@ -245,10 +245,10 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:aChan withValue:[self lowLimit:aChan]];
     
     lowLimits[aChan] = aLowLimit;
- 
+	
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORJADCLChan];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJADCLModelLowLimitChanged object:self userInfo:userInfo];
 }
 
@@ -262,12 +262,12 @@ struct {
     
 	if(anAdcValue != adcValue[aChan]){
 		adcValue[aChan] = anAdcValue;
-	 
+		
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORJADCLChan];
-
+		
 		[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORJADCLModelAdcValueChanged object:self userInfo:userInfo] waitUntilDone:NO];
-
+		
 	}
 	
 	if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
@@ -282,10 +282,10 @@ struct {
 -(void) setAdcRange:(unsigned short) aChan withValue:(int) anAdcRange
 {    
     adcRange[aChan] = anAdcRange;
- 
+	
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORJADCLChan];
-
+	
 	[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORJADCLModelAdcValueChanged object:self userInfo:userInfo] waitUntilDone:NO];
 }
 
@@ -326,7 +326,7 @@ struct {
 				}
 			}
 			[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
-
+			
 		}
 		else NSLog(@"nothing enabled\n");
 	}
@@ -430,9 +430,9 @@ struct {
 		[self setHighLimit:i withValue:[decoder decodeFloatForKey: [NSString stringWithFormat:@"ORJADCLModelHighLimit_%d",i]]];
 	}
 	[self setLastRead:[NSString stringWithString:@"Never"]];
-
+	
     [[self undoManager] enableUndoRegistration];
-
+	
     return self;
 }
 
@@ -443,7 +443,7 @@ struct {
     [encoder encodeInt:rangeIndex			forKey:@"ORJADCLModelRangeIndex"];
     [encoder encodeInt:enabledMask			forKey:	@"ORJADCLModelEnabledMask"];
     [encoder encodeInt:alarmsEnabledMask	forKey:	@"ORJADCLModelAlarmsEnabledMask"];
-
+	
 	int i;
 	for(i=0;i<16;i++){
 		[encoder encodeFloat: lowLimits[i] forKey: [NSString stringWithFormat:@"ORJADCLModelLowLimit_%d",i]];
@@ -552,14 +552,14 @@ struct {
     [p setSetMethod:@selector(setEnabledBit:withValue:) getMethod:@selector(enabledBit:)];
     [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Alarm Enabled"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setAlarmsEnabledMask:withValue:) getMethod:@selector(alarmsEnabledBit:)];
     [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
     [a addObject:p];
-
+	
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
@@ -654,12 +654,13 @@ struct {
 }
 - (void) _pollAllChannels
 {
-    NS_DURING 
+    @try { 
         [self readAdcs:NO];    
-    NS_HANDLER 
+    }
+	@catch(NSException* localException) { 
         //catch this here to prevent it from falling thru, but nothing to do.
-	NS_ENDHANDLER
-        
+	}
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(pollingState!=0){
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];

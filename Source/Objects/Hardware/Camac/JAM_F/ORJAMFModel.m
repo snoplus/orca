@@ -51,9 +51,9 @@ struct {
 	float lowRange;
 	float highRange;
 } adcfRanges[3]={
-	{-10.0,10.0},
-	{-5.0,5.0},
-	{-1.0,1.0}
+{-10.0,10.0},
+{-5.0,5.0},
+{-1.0,1.0}
 };
 
 @interface ORJAMFModel (private)
@@ -126,7 +126,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setShipRecords:shipRecords];
     
     shipRecords = aShipRecords;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelShipRecordsChanged object:self];
 }
 
@@ -140,7 +140,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setScanEnabled:scanEnabled];
     
     scanEnabled = aScanEnabled;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelScanEnabledChanged object:self];
 }
 
@@ -154,7 +154,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setScanLimit:scanLimit];
     
     scanLimit = aScanLimit;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelScanLimitChanged object:self];
 }
 
@@ -185,7 +185,7 @@ struct {
     
     pollingState = aPollingState;
     [self performSelector:@selector(_setUpPolling) withObject:nil afterDelay:0.5];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelPollingStateChanged object:self];
 }
 
@@ -198,7 +198,7 @@ struct {
 {
     [lastRead autorelease];
     lastRead = [aLastRead copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelLastReadChanged object:self];
 }
 
@@ -214,7 +214,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setRangeIndex:aChan withValue:rangeIndex[aChan]];
     
     rangeIndex[aChan] = aRangeIndex;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelRangeIndexChanged object:self];
 }
 
@@ -228,7 +228,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnabledMask:enabledMask];
     
     enabledMask = aEnabledMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelEnabledMaskChanged object:self];
 }
 
@@ -255,7 +255,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setAlarmsEnabledMask:alarmsEnabledMask];
     
     alarmsEnabledMask = aEnabledMask;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelAlarmsEnabledMaskChanged object:self];
 }
 
@@ -282,7 +282,7 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setHighLimit:aChan withValue:[self highLimit:aChan]];
     
     highLimits[aChan] = aHighLimit;
-
+	
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORJAMFChan];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelHighLimitChanged object:self userInfo:userInfo];
@@ -298,10 +298,10 @@ struct {
     [[[self undoManager] prepareWithInvocationTarget:self] setLowLimit:aChan withValue:[self lowLimit:aChan]];
     
     lowLimits[aChan] = aLowLimit;
- 
+	
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORJAMFChan];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORJAMFModelLowLimitChanged object:self userInfo:userInfo];
 }
 
@@ -315,12 +315,12 @@ struct {
     
 	if(anAdcValue != adcValue[aChan]){
 		adcValue[aChan] = anAdcValue;
-	 
+		
 		NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 		[userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORJAMFChan];
-
+		
 		[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORJAMFModelAdcValueChanged object:self userInfo:userInfo] waitUntilDone:NO];
-
+		
 	}
 	
 	if(timeRates[aChan] == nil) timeRates[aChan] = [[ORTimeRate alloc] init];
@@ -335,10 +335,10 @@ struct {
 -(void) setAdcRange:(unsigned short) aChan withValue:(int) anAdcRange
 {    
     adcRange[aChan] = anAdcRange;
- 
+	
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORJAMFChan];
-
+	
 	[self performSelectorOnMainThread:@selector(postNotification:) withObject:[NSNotification notificationWithName:ORJAMFModelAdcValueChanged object:self userInfo:userInfo] waitUntilDone:NO];
 }
 
@@ -363,7 +363,7 @@ struct {
 					
 					float theValue = [self convertRawAdcToVolts:theRawValues[chan]&0xfff chan:chan];
 					[self setAdcValue:chan withValue:theValue];
-			
+					
 					if(theValue<lowLimits[chan])		[self setAdcRange:chan withValue:kAdcFRangeLow];
 					else if(theValue>highLimits[chan])[self setAdcRange:chan withValue:kAdcFRangeHigh];
 					else			[self setAdcRange:chan withValue:kAdcFRangeOK];
@@ -379,11 +379,11 @@ struct {
 					[self setAdcValue:chan withValue:0];
 					[self setAdcRange:chan withValue:kAdcFRangeOK];		
 				}
-
+				
 				[self _checkAlarm:chan];
 			}
 			[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
-
+			
 		}
 		else NSLog(@"nothing enabled\n");
 	}
@@ -445,7 +445,7 @@ struct {
 	}
 	aValue = scanEnabled;
 	[[self adapter] camacShortNAF:[self stationNumber] a:0 f:17 data:&aValue];
-
+	
 }
 
 - (unsigned short) readBoardID
@@ -477,9 +477,9 @@ struct {
 		[self setRangeIndex:i withValue:[decoder decodeIntForKey:  [NSString stringWithFormat:@"ORJAMFModelRangeIndex_%d",i]]];
 	}
 	[self setLastRead:[NSString stringWithString:@"Never"]];
-
+	
     [[self undoManager] enableUndoRegistration];
-
+	
     return self;
 }
 
@@ -492,7 +492,7 @@ struct {
     [encoder encodeInt:pollingState			forKey:@"ORJAMFModelPollingState"];
     [encoder encodeInt:enabledMask			forKey:	@"ORJAMFModelEnabledMask"];
     [encoder encodeInt:alarmsEnabledMask	forKey:	@"ORJAMFModelAlarmsEnabledMask"];
-
+	
 	int i;
 	for(i=0;i<16;i++){
 		[encoder encodeFloat: lowLimits[i] forKey: [NSString stringWithFormat:@"ORJAMFModelLowLimit_%d",i]];
@@ -602,14 +602,14 @@ struct {
     [p setSetMethod:@selector(setEnabledBit:withValue:) getMethod:@selector(enabledBit:)];
     [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
     [a addObject:p];
-
+	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Alarm Enabled"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@"BOOL"];
     [p setSetMethod:@selector(setAlarmsEnabledMask:withValue:) getMethod:@selector(alarmsEnabledBit:)];
     [p setActionMask:kAction_Set_Mask|kAction_Restore_Mask];
     [a addObject:p];
-
+	
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
@@ -652,11 +652,11 @@ struct {
 {
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORJAMFDecoderForAdc",							@"decoder",
-        [NSNumber numberWithLong:dataId],               @"dataId",
-        [NSNumber numberWithBool:YES],                  @"variable",
-        [NSNumber numberWithLong:-1],					@"length",
-        nil];
+								 @"ORJAMFDecoderForAdc",							@"decoder",
+								 [NSNumber numberWithLong:dataId],               @"dataId",
+								 [NSNumber numberWithBool:YES],                  @"variable",
+								 [NSNumber numberWithLong:-1],					@"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"JAMFADC"];
     
     return dataDictionary;
@@ -688,7 +688,7 @@ struct {
 		
 		if(index>3){
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-														object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+																object:[NSData dataWithBytes:data length:index*sizeof(long)]];
 		}
 	}
 }
@@ -765,13 +765,14 @@ struct {
 }
 - (void) _pollAllChannels
 {
-    NS_DURING 
+    @try { 
         [self readAdcs:NO];
 		if(shipRecords) [self shipValues];    
-    NS_HANDLER 
+    }
+	@catch(NSException* localException) { 
         //catch this here to prevent it from falling thru, but nothing to do.
-	NS_ENDHANDLER
-        
+	}
+	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	if(pollingState!=0){
 		[self performSelector:@selector(_pollAllChannels) withObject:nil afterDelay:pollingState];

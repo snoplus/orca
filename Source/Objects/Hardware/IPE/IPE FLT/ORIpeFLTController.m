@@ -50,22 +50,22 @@
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-
+	
     settingSize			= NSMakeSize(546,670);
     rateSize			= NSMakeSize(430,650);
     testSize			= NSMakeSize(400,400);
-
+	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
 	[totalHitRateField setFormatter:rateFormatter];
-
+	
     blankView = [[NSView alloc] init];
     
     NSString* key = [NSString stringWithFormat: @"orca.ORIpeFLT%d.selectedtab",[model stationNumber]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
-
+	
 	ORValueBar* bar = rate0;
 	do {
 		[bar setBackgroundColor:[NSColor whiteColor]];
@@ -75,8 +75,8 @@
 	
 	[totalRate setBackgroundColor:[NSColor whiteColor]];
 	[totalRate setBarColor:[NSColor greenColor]];
-
-
+	
+	
     [self updateWindow];
 }
 
@@ -104,13 +104,13 @@
 					 selector : @selector(slotChanged:)
 						 name : ORIpeCardSlotChangedNotification
 					   object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(modeChanged:)
                          name : ORIpeFLTModelModeChanged
                        object : model];
-					   
+	
     [notifyCenter addObserver : self
 					 selector : @selector(thresholdChanged:)
 						 name : ORIpeFLTModelThresholdChanged
@@ -120,115 +120,115 @@
 					 selector : @selector(gainChanged:)
 						 name : ORIpeFLTModelGainChanged
 					   object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(triggerEnabledChanged:)
 						 name : ORIpeFLTModelTriggerEnabledChanged
 					   object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(hitRateEnabledChanged:)
 						 name : ORIpeFLTModelHitRateEnabledChanged
 					   object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(triggersEnabledArrayChanged:)
 						 name : ORIpeFLTModelTriggersEnabledChanged
 					   object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
 					 selector : @selector(hitRatesEnabledArrayChanged:)
 						 name : ORIpeFLTModelHitRatesArrayChanged
 					   object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
 					 selector : @selector(gainArrayChanged:)
 						 name : ORIpeFLTModelGainsChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(thresholdArrayChanged:)
 						 name : ORIpeFLTModelThresholdsChanged
 					   object : model];
-					   
+	
     [notifyCenter addObserver : self
 					 selector : @selector(hitRateLengthChanged:)
 						 name : ORIpeFLTModelHitRateLengthChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(hitRateChanged:)
 						 name : ORIpeFLTModelHitRateChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(scaleAction:)
 						 name : ORAxisRangeChangedNotification
 					   object : nil];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(miscAttributesChanged:)
 						 name : ORMiscAttributesChanged
 					   object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(totalRateChanged:)
 						 name : ORRateAverageChangedNotification
 					   object : [model totalRate]];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(testEnabledArrayChanged:)
                          name : ORIpeFLTModelTestEnabledArrayChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(testStatusArrayChanged:)
                          name : ORIpeFLTModelTestStatusArrayChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(updateWindow)
                          name : ORIpeFLTModelTestsRunningChanged
                        object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(testParamChanged:)
                          name : ORIpeFLTModelTestParamChanged
                        object : model];
-
+	
     [notifyCenter addObserver : self
 					 selector : @selector(readoutPagesChanged:)
 						 name : ORIpeFLTModelReadoutPagesChanged
 					   object : model];
-
-
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(interruptMaskChanged:)
                          name : ORIpeFLTModelInterruptMaskChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(ledOffChanged:)
                          name : ORIpeFLTModelLedOffChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(thresholdOffsetChanged:)
                          name : ORIpeFLTModelThresholdOffsetChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(coinTimeChanged:)
                          name : ORIpeFLTModelCoinTimeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(integrationTimeChanged:)
                          name : ORIpeFLTModelIntegrationTimeChanged
 						object: model];
-
+	
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -303,7 +303,7 @@
 	BOOL testsAreRunning = [model testsRunning];
 	BOOL testingOrRunning = testsAreRunning | runInProgress;
     
-
+	
     [testEnabledMatrix setEnabled:!locked && !testingOrRunning];
     [settingLockButton setState: locked];
 	[integrationTimeField setEnabled:!lockedOrRunningMaintenance];
@@ -316,17 +316,17 @@
     [thresholdTextFields setEnabled:!lockedOrRunningMaintenance];
     [triggerEnabledCBs setEnabled:!lockedOrRunningMaintenance];
     [hitRateEnabledCBs setEnabled:!lockedOrRunningMaintenance];
-
+	
 	[versionButton setEnabled:!isRunning];
 	[testButton setEnabled:!isRunning];
 	[statusButton setEnabled:!isRunning];
-
+	
     [hitRateLengthPU setEnabled:!lockedOrRunningMaintenance];
     [hitRateAllButton setEnabled:!lockedOrRunningMaintenance];
     [hitRateNoneButton setEnabled:!lockedOrRunningMaintenance];
 	
 	[readoutPagesField setEnabled:!lockedOrRunningMaintenance]; // ak, 2.7.07
-
+	
 	if(testsAreRunning){
 		[testButton setEnabled: YES];
 		[testButton setTitle: @"Stop"];
@@ -469,7 +469,7 @@
 	short chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
 		[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
-
+		
 	}	
 }
 
@@ -486,7 +486,7 @@
 	short chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
 		[[triggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
-
+		
 	}
 }
 
@@ -495,7 +495,7 @@
 	short chan;
 	for(chan=0;chan<kNumFLTChannels;chan++){
 		[[hitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
-
+		
 	}
 }
 
@@ -553,7 +553,7 @@
 		default: [self resizeWindowToSize:testSize];	    break;
     }
     [[self window] setContentView:totalView];
-            
+	
     NSString* key = [NSString stringWithFormat: @"orca.ORIpeFLT%d.selectedtab",[model stationNumber]];
     int index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
@@ -598,7 +598,7 @@
 
 - (IBAction) readThresholdsGains:(id)sender
 {
-	NS_DURING
+	@try {
 		int i;
 		NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 		NSLogFont(aFont,   @"FLT (station %d)\n",[model stationNumber]); // ak, 5.10.07
@@ -609,23 +609,25 @@
 			//NSLog(@"%d: %d\n",i,[model readGain:i]);
 		}
 		NSLogFont(aFont,   @"-----------------------\n");
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT gains and thresholds\n");
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) writeThresholdsGains:(id)sender
 {
 	[self endEditing];
-	NS_DURING
+	@try {
 		[model loadThresholdsAndGains];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception writing FLT gains and thresholds\n");
         NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) gainAction:(id)sender
@@ -661,29 +663,31 @@
 - (IBAction) reportButtonAction:(id)sender
 {
 	[self endEditing];
-	NS_DURING
+	@try {
 		[model printStatusReg];
 		[model printPeriphStatusReg];
 		[model printPixelRegs];
 		[self readThresholdsGains:sender];
 		[model printStatistics];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT (%d) status\n",[model stationNumber]);
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) initBoardButtonAction:(id)sender
 {
 	[self endEditing];
-	NS_DURING
+	@try {
 		[model initBoard];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception intitBoard FLT (%d) status\n",[model stationNumber]);
         NSRunAlertPanel([localException name], @"%@\nWrite of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) settingLockAction:(id) sender
@@ -698,36 +702,39 @@
 
 - (IBAction) versionAction: (id) sender
 {
-	NS_DURING
+	@try {
 		NSLog(@"FLT %d Revision: %d\n",[model stationNumber],[model readVersion]);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Version\n");
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) testAction: (id) sender
 {
-	NS_DURING
+	@try {
 		[model runTests];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception reading FLT HW Model Test\n");
         NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 
 - (IBAction) resetAction: (id) sender
 {
-	NS_DURING
+	@try {
 		[model reset];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT reset\n");
         NSRunAlertPanel([localException name], @"%@\nFLT%d Access failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) hitRateLengthAction: (id) sender
@@ -772,13 +779,14 @@
 
 - (IBAction) statusAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model printStatusReg];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception during FLT read status\n");
         NSRunAlertPanel([localException name], @"%@\nRead of FLT%d failed", @"OK", nil, nil,
                         localException,[model stationNumber]);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) readoutPagesAction: (id) sender
