@@ -254,16 +254,12 @@
 
 - (void) startScriptNameChanged:(NSNotification*)aNote
 {
-	NSString* aName = [model selectedStartScriptName];
-	if(!aName)[startUpScripts selectItemAtIndex:0];
-	else [startUpScripts selectItemWithTitle:aName];
+	[startUpScripts selectItemWithTitle:[model selectedStartScriptName]];
 }
 
 - (void) shutDownScriptNameChanged:(NSNotification*)aNote
 {
-	NSString* aName = [model selectedShutDownScriptName];
-	if(!aName)[shutDownScripts selectItemAtIndex:0];
-	else [shutDownScripts selectItemWithTitle:aName];
+	[shutDownScripts selectItemWithTitle:[model selectedShutDownScriptName]];
 }
 
 - (void) isConnectedChanged:(NSNotification*)aNote

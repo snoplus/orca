@@ -1466,13 +1466,13 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 
 - (NSString*) selectedStartScriptName
 {
-	if(!startScript)return 0;
+	if(!startScript) return @"---";
 	else return [startScript identifier];
 }
 
 - (NSString*) selectedShutDownScriptName
 {
-	if(!shutDownScript)return 0;
+	if(!shutDownScript) return @"---";
 	else return [shutDownScript identifier];
 }
 
