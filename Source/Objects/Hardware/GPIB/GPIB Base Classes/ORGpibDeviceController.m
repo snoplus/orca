@@ -53,12 +53,13 @@
 {
 	[ self populatePullDownsGpibDevice ];
     [ mConfigured setStringValue: [ NSString stringWithFormat: 
-                                    @"Not configured: %d", [[ self model ] primaryAddress ]]];
-//    mConnected = false;
-	NS_DURING
+								   @"Not configured: %d", [[ self model ] primaryAddress ]]];
+	//    mConnected = false;
+	@try {
 		[super awakeFromNib];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 #pragma mark ***Accessors
@@ -86,19 +87,19 @@
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];
-
+	
     [super registerNotificationObservers];
     
     [ notifyCenter addObserver: self
                       selector: @selector( primaryAddressChanged: )
                           name: ORGpibPrimaryAddressChangedNotification
                         object: model];
-                        
+	
     [ notifyCenter addObserver: self
                       selector: @selector( secondaryAddressChanged: )
                           name: ORGpibSecondaryAddressChangedNotification
                         object: model];
-
+	
     [ notifyCenter addObserver: self
                       selector: @selector( connectionChanged: )
                           name: ORGpibDeviceConnectedNotification
@@ -131,25 +132,25 @@
 {
     bool	deviceConnected = false;
     
-// Check to see that device was connected.
+	// Check to see that device was connected.
 	int chnl = [[[ aNotification userInfo ] objectForKey: ORGpibAddress ] intValue ];
 	if ( chnl == [[ self model ] primaryAddress ] )
 	{
-
-// Device was connected so update GUI appropriately.
+		
+		// Device was connected so update GUI appropriately.
 		if ( [[[ aNotification userInfo ] objectForKey: ORGpibDeviceConnected ] intValue ] )
 		{
 			[ mConfigured setStringValue: [ NSString stringWithFormat: 
-								@"Configured: %d", [[ self model ] primaryAddress ]]];
+										   @"Configured: %d", [[ self model ] primaryAddress ]]];
 			deviceConnected = true;
 		}
 	}
     
-// Device was not connected so update GUI appropriately
+	// Device was not connected so update GUI appropriately
     if ( !deviceConnected )
     {
         [ mConfigured setStringValue: [ NSString stringWithFormat: 
-                                                @"Not configured: %d", [[ self model ] primaryAddress ]]];
+									   @"Not configured: %d", [[ self model ] primaryAddress ]]];
     }
 }
 
@@ -174,7 +175,7 @@
 - (void) secondaryAddressChanged: (NSNotification*) aNotification
 {
 	[ mSecondaryAddress setStringValue: [ NSString stringWithFormat: @"%d",
-													[[ self model ] secondaryAddress ]]];
+										 [[ self model ] secondaryAddress ]]];
 }
 
 #pragma mark ***Actions
@@ -186,14 +187,15 @@
 //--------------------------------------------------------------------------------
 - (IBAction) connectAction: (id) aSender
 {
-    NS_DURING
-//        primaryAddress = [ mPrimaryAddress indexOfSelectedItem ];
+    @try {
+		//        primaryAddress = [ mPrimaryAddress indexOfSelectedItem ];
         
         [[ self model ] connect ];
-//        mConnected = true;
-    
-    NS_HANDLER
-//        mConnected = false;
+		//        mConnected = true;
+		
+    }
+	@catch(NSException* localException) {
+		//        mConnected = false;
         NSLog( [ localException reason ] );
         NSRunAlertPanel( [ localException name ], 	// Name of panel
                         [ localException reason ],	// Reason for error
@@ -201,7 +203,7 @@
                         nil, 						// alternate button
                         nil );						// other button
         
-    NS_ENDHANDLER
+    }
 }
 
 //--------------------------------------------------------------------------------
@@ -250,10 +252,10 @@
 {
     short	i;
     
-// Remove all items from popup menus
+	// Remove all items from popup menus
     [ mPrimaryAddress removeAllItems ];
     
-// Repopulate Primary GPIB address
+	// Repopulate Primary GPIB address
     for ( i = 0; i <  kMaxGpibAddresses; i++ ) {
         [ mPrimaryAddress insertItemWithTitle: [ NSString stringWithFormat: @"%d", i ]
                                       atIndex: i ];

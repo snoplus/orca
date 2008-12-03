@@ -34,31 +34,31 @@
 // register offset for the FEC32 Discret and Sequencer Registers
 static unsigned long fec32_register_offsets[] =
 {	
-	128,			// [0]  General Control and Status    	R/W
-	132,			// [1]  ADC Value						R				
-	136,			// [2]  Voltage Monitor C/S				R/W
-	140,			// [3]  Pedestal Enable					W
-	144,			// [4]  DAC Program						R/W
-	148,			// [5]  Calibration DAC Program			W
-	152,			// [6]  High Voltage Card C/S			R/W
-	156, 			// [7]  CMOS spy-on-data-output			R
-	160,			// [8]  CMOS Full						R
-	164,			// [9]  CMOS Chip Select				R
-	168,			// [10] CMOS Program [1-16]				W
-	172,			// [11] CMOS Program [17-32]			W
-	176,			// [12] CMOS LGISEL Set					R/W
-	180,			// [13] Board ID						R/W
+128,			// [0]  General Control and Status    	R/W
+132,			// [1]  ADC Value						R				
+136,			// [2]  Voltage Monitor C/S				R/W
+140,			// [3]  Pedestal Enable					W
+144,			// [4]  DAC Program						R/W
+148,			// [5]  Calibration DAC Program			W
+152,			// [6]  High Voltage Card C/S			R/W
+156, 			// [7]  CMOS spy-on-data-output			R
+160,			// [8]  CMOS Full						R
+164,			// [9]  CMOS Chip Select				R
+168,			// [10] CMOS Program [1-16]				W
+172,			// [11] CMOS Program [17-32]			W
+176,			// [12] CMOS LGISEL Set					R/W
+180,			// [13] Board ID						R/W
 // Changed these offsets -- they were incorrect.  RGV, PW, 5/18/96
 
-	512,			// [32] Sequencer output C/S			R
-	528,			// [33] Sequencer input C/S				R
-	544,			// [34] CMOS Data Available				R/W
-	560,			// [35] CMOS Chip Select				R/W
-	576,			// [36] CMOS Chip Disable				W
-	592, 			// [37] CMOS Data output				R
-	628,			// [38] Fifo write pointer				R
-	624,			// [39] Fifo read pointer				R
-	632,			// [40] Fifo pointer difference			R
+512,			// [32] Sequencer output C/S			R
+528,			// [33] Sequencer input C/S				R
+544,			// [34] CMOS Data Available				R/W
+560,			// [35] CMOS Chip Select				R/W
+576,			// [36] CMOS Chip Disable				W
+592, 			// [37] CMOS Data output				R
+628,			// [38] Fifo write pointer				R
+624,			// [39] Fifo read pointer				R
+632,			// [40] Fifo pointer difference			R
 };
 
 NSString* ORFecShowVoltsChanged				= @"ORFecShowVoltsChanged";
@@ -244,7 +244,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setShowVolts:showVolts];
     
     showVolts = aShowVolts;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecShowVoltsChanged object:self];
 }
 
@@ -260,7 +260,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
     
     [comments autorelease];
     comments = [aComments copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecCommentsChanged object:self];
 }
 
@@ -353,7 +353,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-
+	
     [self setShowVolts:			[decoder decodeBoolForKey:  @"showVolts"]];
     [self setComments:			[decoder decodeObjectForKey:@"comments"]];
     [self setVRes:				[decoder decodeFloatForKey: @"vRes"]];
@@ -409,7 +409,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 - (void) readBoardIds
 {
 	id xl2 = [self xl2];
-	NS_DURING
+	@try {
 		[xl2 select:self];
 		
 		// Read the Daughter Cards for their ids
@@ -420,23 +420,25 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 				[aCard readBoardIds];
 			}
 		}	
-
+		
 		// Read the PMTIC for its id
 		//PerformBoardIDRead(HV_BOARD_ID_INDEX,&dataValue);
-
+		
 		//read the Mother Card for its id
-		NS_DURING
+		@try {
 			[self setBoardID:[self performBoardIDRead:MC_BOARD_ID_INDEX]];
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			[self setBoardID:@"0000"];	
-		NS_ENDHANDLER
-	
+		}
+		
 		[xl2 deselectCards];
 	    
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[xl2 deselectCards];
-	
-	NS_ENDHANDLER
+		
+	}
 }
 
 - (NSString*) performBoardIDRead:(short) boardIndex
@@ -448,12 +450,12 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	
 	// first select the board
 	unsigned long boardSelectVal = 0;
-	 boardSelectVal |= (1UL << boardIndex);
+	boardSelectVal |= (1UL << boardIndex);
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:boardSelectVal];
-
+	
 	// load and clock in the first 9 bits instruction code and register address
 	[self boardIDOperation:(BOARD_ID_READ | theRegister) boardSelectValue:boardSelectVal beginIndex: 8];
-
+	
 	// now read the data value; 17 reads, the last data bit is a dummy bit
 	writeValue = boardSelectVal;
 	
@@ -464,7 +466,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		readValue = [self readFromFec32Register:FEC32_BOARD_ID_REG];						// read the data bit
 		if ( readValue & BOARD_ID_DO)dataValue |= (1U << index);
 	}
-
+	
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:writeValue];					// read out the dummy bit
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)];	// now clock in value
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:0UL];							// Now de-select all and clock
@@ -513,7 +515,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	// load and clock in the instruction code
 	short index;
 	for (index = beginIndex; index >= 0; index--){
-	
+		
 		if ( theDataValue & (1U << index) ) writeValue = (boardSelectVal | BOARD_ID_DI);
 		else								writeValue = boardSelectVal;
 		
@@ -525,8 +527,8 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 
 - (void) autoInitThisCard
 {
-	NS_DURING
-
+	@try {
+		
 		[self readBoardIds];	//Find out if the HW is there...
 		if(![boardID isEqualToString:@"0000"]  && ![boardID isEqualToString:@"FFFF"]){
 			[self setOnlineMask:0xFFFFFFFF];
@@ -537,30 +539,31 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		[self loadCrateAddress];
 		[self loadAllDacs];
 		//always disable TR20 and TR100 on autoinit - as per JFW instructions 07/23/98 PH
-//		LoadCmosShiftRegisters(true);
+		//		LoadCmosShiftRegisters(true);
 		
 		// set up the hardware according to the ConfigDB
 		[self setPedestals]; 	//MAH 3/22/98
 		
 		// now setup the PMT's wrt online/offline status - added 8/20/98 PMT
 		[self performPMTSetup:YES];
-
-	NS_HANDLER	
+		
+	}
+	@catch(NSException* localException) {	
 		// set the flags for the off-line status
 		//theConfigDB -> SlotOnline(GetTheSnoCrateNumber(),itsFec32SlotNumber,FALSE);
 		[self setOnlineMask:0x00000000];
 		
-	NS_ENDHANDLER
+	}
 }
 
 
 - (void) fullResetOfCard
 {	
-	NS_DURING
+	@try {
 		[[self xl2] select:self];
 		[self setFec32RegisterBits:Fec32_GENERAL_CS_REG bitMask:FEC32_CSR_FULL_RESET]; // STEP 1: Master Reset the FEC32
 		[self loadCrateAddress];													// STEP 2: Perform load of crate address
-
+		
 		// additional effect is to disable all the triggers
 		short i;
 		for(i=0;i<32;i++) {
@@ -568,16 +571,17 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 			//theConfigDB->Pmt100nsTriggerDisabled(itsSNOCrate->Get_SC_Number(),itsFec32SlotNumber,i,true);
 		}
 		
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
 		NSLog(@"Failure during full reset of FEC32 Crate %d Slot %d.", [self crateNumber], [self stationNumber]);	
-	NS_ENDHANDLER		
+	}		
 }
 
 - (void) loadCrateAddress
 {
-	NS_DURING	
-
+	@try {	
+		
 		[[self xl2] select:self];
 		unsigned long theOldCSRValue = [self readFromFec32Register:Fec32_GENERAL_CS_REG];
 		// create new crate number in proper bit positions
@@ -587,42 +591,43 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		[self writeToFec32Register:Fec32_GENERAL_CS_REG value:theNewCSRValue];
 		[[self xl2] deselectCards];
 		
-	NS_HANDLER
-	
+	}
+	@catch(NSException* localException) {
+		
 		[[self xl2] deselectCards];
 		NSLog(@"Failure during load of crate address on FEC32 Crate %d Slot %d.", [self crateNumber], [self stationNumber]);	
-
-	NS_ENDHANDLER
+		
+	}
 }
 
 - (void) loadAllDacs
 {
 	//-------------- variables -----------------
 	unsigned long	i,j,k;								
-
+	
 	short theIndex;
-
+	
 	const short numChannels = 8;
 	unsigned long writeValue = 0;
 	
 	unsigned long dacValues[8][17];
-
+	
 	//------------------------------------------
-
-
-//	StatusPrintf("Setting all DACs for FEC32 #%d....", itsFec32SlotNumber);
-//	StatusPrintf("Reading the DATABASE to get the values....");
-
-	NS_DURING
+	
+	
+	//	StatusPrintf("Setting all DACs for FEC32 #%d....", itsFec32SlotNumber);
+	//	StatusPrintf("Reading the DATABASE to get the values....");
+	
+	@try {
 		[[self xl2] select:self];
-					
+		
 		// Need to do Full Buffer mode before and after the DACs are loaded the first time
 		// Full Buffer Mode of DAC loading, before the DACs are loaded -- this works 1/20/97
 		
 		[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:0x0];  // set DACSEL
-
+		
 		for ( i = 1; i<= 16 ; i++) {
-
+			
 			if ( ( i<9 ) || ( i == 10) ){
 				writeValue = 0UL;
 				[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:writeValue];
@@ -631,20 +636,20 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 				writeValue = 0x0007FFFC;
 				[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:writeValue];	// address value, enable this channel					
 			}
-
+			
 			[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:writeValue+1];
 		}
-
+		
 		[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:0x2];// remove DACSEL
 		
 		// now clock in the address and data values
 		for ( i = numChannels; i >= 1 ; i--) {			// 8 channels, i.e. there are 8 lines of data values
-
+			
 			[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:0x0];  // set DACSEL
-
+			
 			// clock in the address values
 			for ( j = 1; j<= 8; j++){					
-
+				
 				if ( j == i) {
 					// enable all 17 DAC address lines for a particular channel
 					writeValue = 0x0007FFFC;
@@ -663,51 +668,51 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 				short rIndex;
 				for (rIndex = 0; rIndex <= 7; rIndex++){
 					switch( cIndex ){
-					
+							
 						case 0:
 							if ( rIndex%2 == 0 )	{
 								theIndex = (rIndex/2);
 								dacValues[rIndex][cIndex]		= [dc[theIndex] rp2:0];
 								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] rp2:1];
 							}	
-						break;
-						
+							break;
+							
 						case 1:
 							if ( rIndex%2 == 0)	{
 								theIndex = (rIndex/2);
 								dacValues[rIndex][cIndex]		= [dc[theIndex] vli:0];					
 								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] vli:1];	
 							}	
-						break;
-						
+							break;
+							
 						case 2:
 							if ( rIndex%2 == 0 )	{
 								theIndex = (rIndex/2);
 								dacValues[rIndex][cIndex]		= [dc[theIndex] vsi:0];					
 								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] vsi:1];		
 							}	
-						break;
-						
+							break;
+							
 						case 15:
 							if ( rIndex%2 == 0 )	{
 								theIndex = (rIndex/2);
 								dacValues[rIndex][cIndex]		= [dc[theIndex] rp1:0];						
 								dacValues[rIndex + 1][cIndex]   = [dc[theIndex] rp1:0];		
 							}	
-						break;
-						
+							break;
+							
 					}
 					
 					if ( (cIndex >= 3) && (cIndex <= 6) ) {
-					
+						
 						dacValues[rIndex][cIndex] = [dc[cIndex - 3] vt:rIndex];
 					}
-
+					
 					else if ( (cIndex >= 7) && (cIndex <= 14) ) {
-
+						
 						if ( (cIndex - 7)%2 == 0)	{
 							theIndex = ( (cIndex - 7) / 2 );
-
+							
 							unsigned long theGain;
 							if (rIndex/4)	theGain = 1;
 							else			theGain = 0;
@@ -727,31 +732,31 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 			
 			// load data values, 17 DAC values at a time, from the electronics database
 			// there are a total of 8x17 = 136 DAC values
-
+			
 			// load the data values
 			for (j = 8; j >= 1; j--){					// 8 bits of data per channel
-			
+				
 				writeValue = 0UL;
 				for (k = 2; k<= 18; k++){				// 17 octal DACs
 					if ( (1UL << j-1 ) & dacValues[numChannels - i][k-2] ) {
-					  writeValue |= 1UL << k;
+						writeValue |= 1UL << k;
 					}
 				}
 				
 				[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:writeValue];
 				[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:writeValue+1];	// clock in
 			}
-
+			
 			[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:0x2]; // remove DACSEL
 		}
-			
+		
 		// Full Buffer Mode of DAC loading, after the DACs are loaded -- this works 1/13/97
-
+		
 		// set DACSEL
 		[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:0x0]; // set DACSEL
-
+		
 		for ( i = 1; i<= 16 ; i++){
-
+			
 			if ( ( i<9 ) || ( i == 10) ){
 				writeValue = 0UL;
 				[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:writeValue];
@@ -762,41 +767,43 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 			}
 			[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:writeValue + 1];	// clock in with bit 0 high
 		}
-
+		
 		// remove DACSEL
 		[self writeToFec32Register:Fec32_DAC_PROGRAM_REG value:0x2]; // remove DACSEL
 		
 		[[self xl2] deselectCards];		
-
 		
-	NS_HANDLER
+		
+	}
+	@catch(NSException* localException) {
 		[[self xl2] deselectCards];		
 		NSLog(@"Could not load the DACs for FEC32 Crate %d Slot %d!", [self crateNumber], [self stationNumber]);			
-	NS_ENDHANDLER	
+	}	
 }
 
 - (void) setPedestals
 {
-	NS_DURING
+	@try {
 		[[self xl2] select:self];
 		[self writeToFec32Register:Fec32_PEDESTAL_ENABLE_REG value:pedEnabledMask];
 		[[self xl2] deselectCards];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
 		NSLog(@"Failure during Pedestal set of FEC32 Crate %d Slot %d.", [self crateNumber], [self stationNumber]);			
-	
-	NS_ENDHANDLER	
 		
+	}	
+	
 }
 
 -(void) performPMTSetup:(BOOL) aTriggersDisabled
 {
-	NS_DURING
-	
+	@try {
+		
 		[[self xl2] select:self];
 		
 		[self writeToFec32Register:Fec32_CMOS_CHIP_DISABLE_REG value:seqDisabledMask];
-
+		
 		//MAH 7/2/98
 		unsigned long value = [self readFromFec32Register:Fec32_CMOS_LGISEL_SET_REG];
 		if(qllEnabled)	value |= 0x00000001;
@@ -806,12 +813,13 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		//do the triggers
 		[self loadCmosShiftRegisters:aTriggersDisabled];
 		[[self xl2] deselectCards];
-
-				
-	NS_HANDLER
+		
+		
+	}
+	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
 		NSLog(@"Error during taking channel(s) off-line on  FEC32 Crate %d Slot %d!", [self crateNumber], [self stationNumber]);	 		
-	NS_ENDHANDLER
+	}
 }
 
 #pragma mark •••OROrderedObjHolding Protocol
@@ -872,7 +880,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 
 - (void) loadCmosShiftRegisters:(BOOL) aTriggersDisabled
 {
-
+	
 	//-------------- variables -----------------
 	
 	unsigned short whichChannels;
@@ -881,32 +889,32 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 #ifdef VERIFY_CMOS_SHIFT_REGISTER
 	int retry_cmos_load = 0;
 #endif			
-
-
-//	StatusPrintf("Loading all CMOS Shift Registers for FEC32 #%d....",itsFec32SlotNumber);
-//	StatusPrintf("Reading the DATABASE to get the values....");
 	
-	NS_DURING
-
+	
+	//	StatusPrintf("Loading all CMOS Shift Registers for FEC32 #%d....",itsFec32SlotNumber);
+	//	StatusPrintf("Reading the DATABASE to get the values....");
+	
+	@try {
+		
 		[[self xl2] select:self];
 		
 		short channel_index;
 		for( channel_index = 0; channel_index < 2; channel_index++){
-
+			
 			switch (channel_index){
 				case BOTTOM_CHANNELS:
 					whichChannels = BOTTOM_CHANNELS;
 					registerAddress = FEC32_CMOS_1_16_REG;
-				break;
+					break;
 				case UPPER_CHANNELS:				
 					whichChannels = UPPER_CHANNELS;
 					registerAddress = FEC32_CMOS_17_32_REG;
-				break;	
+					break;	
 			}
-
+			
 			// load data into structure from database
 			[self loadCmosShiftRegData:whichChannels triggersDisabled:aTriggersDisabled];
-
+			
 			// serially shift in 35 bits of data, the top 10 bits are shifted in as zero
 			//STEP 1:
 			// first shift in the top 10 bits: the bottom 0-15 channels first
@@ -918,43 +926,43 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 			
 			// STEP 2: tacTrim1
 			[self cmosShiftLoadAndClock:registerAddress cmosRegItem:TAC_TRIM1 bitMaskStart:TACTRIM_BITS];
-
+			
 			// STEP 3: tacTrim0
 			[self cmosShiftLoadAndClock:registerAddress cmosRegItem:TAC_TRIM0 bitMaskStart:TACTRIM_BITS];
-
+			
 			// STEP 4: ns20Mask
 			[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_MASK bitMaskStart:NS20_MASK_BITS];
 			
 			// STEP 5: ns20Width
 			[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_WIDTH bitMaskStart:NS20_WIDTH_BITS];
-
+			
 			// STEP 6: ns20Delay
 			[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS20_DELAY bitMaskStart:NS20_DELAY_BITS];
-
+			
 			// STEP 7: ns100Mask
 			[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS100_MASK bitMaskStart:NS_MASK_BITS];
 			
 			// STEP 8: ns100Delay
 			[self cmosShiftLoadAndClock:registerAddress cmosRegItem:NS100_DELAY bitMaskStart:NS100_DELAY_BITS];
-
+			
 			// FINAL STEP: SERSTOR
 			writeValue = 0x3FFFF;
 			[self writeToFec32Register:registerAddress value:writeValue];
-/*
-** VERIFY that we have set the shift register properly for the 16 channels just loaded - PH 09/17/99
-*/		
+			/*
+			 ** VERIFY that we have set the shift register properly for the 16 channels just loaded - PH 09/17/99
+			 */		
 #ifdef VERIFY_CMOS_SHIFT_REGISTER
-
+			
 			// maximum number of times to attempt loading the CMOS shift register before throwing an exception
 			const short	kMaxCmosLoadAttempts = 2;
 			
 			// maximum number of times to check the busy bit on the CMOS read before using the value
 			const short kMaxCmosReadAttempts = 3;
-
+			
 			// verify each of the 16 channels that we just loaded
 			int theChannel;
 			for (theChannel=0; theChannel<16; ++theChannel) {
-			
+				
 				unsigned long actualShiftReg, expectedShiftReg;
 				
 				// read back the CMOS shift register
@@ -966,19 +974,19 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 				}
 				// calculate the expected shift register value
 				expectedShiftReg = ((cmosShiftRegisterValue[theChannel].cmos_shift_item[TAC_TRIM1]   & 0x0fUL) << 20) |
-								   ((cmosShiftRegisterValue[theChannel].cmos_shift_item[TAC_TRIM0]   & 0x0fUL) << 16) |
-								   ((cmosShiftRegisterValue[theChannel].cmos_shift_item[NS100_DELAY] & 0x3fUL) << 10) |
-								   ((cmosShiftRegisterValue[theChannel].cmos_shift_item[NS20_MASK]   & 0x01UL) <<  9) |
-								   ((cmosShiftRegisterValue[theChannel].cmos_shift_item[NS20_WIDTH]  & 0x1fUL) <<  4) |
-								   ((cmosShiftRegisterValue[theChannel].cmos_shift_item[NS20_DELAY]  & 0x0fUL));
-								   
+				((cmosShiftRegisterValue[theChannel].cmos_shift_item[TAC_TRIM0]   & 0x0fUL) << 16) |
+				((cmosShiftRegisterValue[theChannel].cmos_shift_item[NS100_DELAY] & 0x3fUL) << 10) |
+				((cmosShiftRegisterValue[theChannel].cmos_shift_item[NS20_MASK]   & 0x01UL) <<  9) |
+				((cmosShiftRegisterValue[theChannel].cmos_shift_item[NS20_WIDTH]  & 0x1fUL) <<  4) |
+				((cmosShiftRegisterValue[theChannel].cmos_shift_item[NS20_DELAY]  & 0x0fUL));
+				
 				// check the shift register value, ignoring upper 8 bits (write address and read error flag)
 				if ((actualShiftReg & 0x00ffffffUL) == expectedShiftReg) {
 					// success!
 					if (retry_cmos_load) {
 						// print a message if we needed to retry the load
 						NSLog(@"Loaded CMOS Shift Registers for Crate %d, Card %d, Channel %d after %d attempts", 
-									 [self crateNumber], [self stationNumber], theChannel + 16 * channel_index, retry_cmos_load+1);
+							  [self crateNumber], [self stationNumber], theChannel + 16 * channel_index, retry_cmos_load+1);
 						retry_cmos_load = 0;	// reset retry counter
 					}		
 				} else if (++retry_cmos_load < kMaxCmosLoadAttempts) {
@@ -987,34 +995,34 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 				} else {
 					// verification error after maximum number of retries
 					NSLog(@"Error verifying CMOS Shift Register for Crate %d, Card %d, Channel %d:",
-								 [self crateNumber], [self stationNumber], theChannel + 16 * channel_index);
+						  [self crateNumber], [self stationNumber], theChannel + 16 * channel_index);
 					unsigned long badBits = (actualShiftReg ^ expectedShiftReg);
 					if (actualShiftReg == 0UL) {
 						NSLog(@"  - all shift register bits read back as zero");
 					} else {
 						if ((badBits >> 20) & 0x0fUL) {
 							NSLog(@"  - loaded TAC1 trim   0x%.2lx, but read back 0x%.2lx",(expectedShiftReg >> 20) & 0x0fUL,
-																								 (actualShiftReg   >> 20) & 0x0fUL);
+								  (actualShiftReg   >> 20) & 0x0fUL);
 						}
 						if ((badBits >> 16) & 0x0fUL) {
 							NSLog(@"  - loaded TAC0 trim   0x%.2lx, but read back 0x%.2lx",(expectedShiftReg >> 16) & 0x0fUL,
-																								 (actualShiftReg   >> 16) & 0x0fUL);
+								  (actualShiftReg   >> 16) & 0x0fUL);
 						}
 						if ((badBits >> 10) & 0x3fUL) {
 							NSLog(@"  - loaded 100ns width 0x%.2lx, but read back 0x%.2lx",(expectedShiftReg >> 10) & 0x3fUL,
-																							  	 (actualShiftReg   >> 10) & 0x3fUL);
+								  (actualShiftReg   >> 10) & 0x3fUL);
 						}
 						if ((badBits >> 9) & 0x01UL) {
 							NSLog(@"  - loaded 20ns enable 0x%.2lx, but read back 0x%.2lx",(expectedShiftReg >> 9) & 0x01UL,
-																								 (actualShiftReg   >> 9) & 0x01UL);
+								  (actualShiftReg   >> 9) & 0x01UL);
 						}
 						if ((badBits >> 4) & 0x1fUL) {
 							NSLog(@"  - loaded 20ns width  0x%.2lx, but read back 0x%.2lx",(expectedShiftReg >> 4) & 0x1fUL,
-																								 (actualShiftReg   >> 4) & 0x1fUL);
+								  (actualShiftReg   >> 4) & 0x1fUL);
 						}
 						if ((badBits) & 0x0fUL) {
 							NSLog(@"  - loaded 20ns delay  0x%.2lx, but read back 0x%.2lx",(expectedShiftReg) & 0x0fUL,
-																								 (actualShiftReg)   & 0x0fUL);
+								  (actualShiftReg)   & 0x0fUL);
 						}
 					}
 					retry_cmos_load = 0;	// reset retry counter
@@ -1022,30 +1030,31 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 			}
 #endif // VERIFY_CMOS_SHIFT_REGISTER
 		}
-
+		
 		[[self xl2] deselectCards];
-
+		
 		// CMOS Shift Register loading successful message to status window
-//		StatusPrintf("CMOS Shift Registers for FEC32 #%d have been loaded.",itsFec32SlotNumber);
-
-	NS_HANDLER
+		//		StatusPrintf("CMOS Shift Registers for FEC32 #%d have been loaded.",itsFec32SlotNumber);
+		
+	}
+	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
 		NSLog(@"Could not load the CMOS Shift Registers for FEC32 Crate %d Slot %d!", [self crateNumber], [self stationNumber]);	 		
-
-	NS_ENDHANDLER
+		
+	}
 	
-
+	
 }
 
 
 - (void) cmosShiftLoadAndClock:(unsigned short) registerAddress cmosRegItem:(unsigned short) cmosRegItem bitMaskStart:(short) bit_mask_start
 {
-
+	
 	short bit_mask;
-			
+	
 	// bit_mask_start : the number of bits to peel off from cmosRegItem
 	for(bit_mask = bit_mask_start; bit_mask >= 0; bit_mask--){
-
+		
 		unsigned long writeValue = 0UL;
 		short channel_index;
 		for(channel_index = 0; channel_index < 16; channel_index++){
@@ -1053,12 +1062,12 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 				writeValue |= (1UL << channel_index + 2);
 			}
 		}
-
+		
 		// place data on line
 		[self writeToFec32Register:registerAddress value:writeValue | FEC32_CMOS_SHIFT_SERSTROB];
 		// now clock in data without SERSTROB for bit_mask = 0 and cmosRegItem = NS100_DELAY
 		if( (cmosRegItem == NS100_DELAY) && (bit_mask == 0) ){
-				[self writeToFec32Register:registerAddress value:writeValue | FEC32_CMOS_SHIFT_CLOCK];
+			[self writeToFec32Register:registerAddress value:writeValue | FEC32_CMOS_SHIFT_CLOCK];
 		}
 		// now clock in data
 		[self writeToFec32Register:registerAddress value:writeValue | FEC32_CMOS_SHIFT_SERSTROB | FEC32_CMOS_SHIFT_CLOCK];
@@ -1068,16 +1077,16 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 -(void) loadCmosShiftRegData:(unsigned short)whichChannels triggersDisabled:(BOOL)aTriggersDisabled
 {
 	unsigned short dc_offset;
-
+	
 	switch (whichChannels){
 		case BOTTOM_CHANNELS:
 			dc_offset = 0;
-		break;
+			break;
 		case UPPER_CHANNELS:
 			dc_offset = 2;
-		break;
+			break;
 	}
-
+	
 	// initialize cmosShiftRegisterValue structure	
 	unsigned short i;
 	for (i = 0; i < 16 ; i++){
@@ -1091,9 +1100,9 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	//temp.....CHVStatus theHVStatus;
 	unsigned short dc_index;
 	for ( dc_index= 0; dc_index < 2 ; dc_index++){
-
+		
 		unsigned short offset_index = dc_index*8;
-
+		
 		unsigned short regIndex;
 		for (regIndex = 0; regIndex < 8 ; regIndex++){
 			unsigned short channel = 8*(dc_offset+dc_index) + regIndex;
@@ -1102,7 +1111,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 			cmosShiftRegisterValue[offset_index + regIndex].cmos_shift_item[NS20_WIDTH] = ([dc[dc_index + dc_offset]  ns20width:regIndex]) >> 1;	 // since bit 1 is the LSB
 			cmosShiftRegisterValue[offset_index + regIndex].cmos_shift_item[NS20_DELAY] = ([dc[dc_index + dc_offset]  ns20delay:regIndex]) >> 1;    // since bit 1 is the LSB
 			cmosShiftRegisterValue[offset_index + regIndex].cmos_shift_item[NS100_DELAY] = ([dc[dc_index + dc_offset] ns100width:regIndex]) >> 1;   // since bit 1 is the LSB
-
+			
 			if (aTriggersDisabled /*|| !theHVStatus.IsHVOnThisChannel(itsSNOCrate->Get_SC_Number(),itsFec32SlotNumber,channel)*/ ) {
 				cmosShiftRegisterValue[offset_index + regIndex].cmos_shift_item[NS20_MASK] = 0;
 				cmosShiftRegisterValue[offset_index + regIndex].cmos_shift_item[NS100_MASK] = 0;
@@ -1113,7 +1122,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 				cmosShiftRegisterValue[offset_index + regIndex].cmos_shift_item[NS100_MASK] = ![self trigger100nsDisabled:channel];
 			}
 		}
-
+		
 	}		
 }
 @end

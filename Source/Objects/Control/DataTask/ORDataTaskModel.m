@@ -150,8 +150,8 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 	timeScaler = aValue;
 	
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORDataTaskTimeScalerChangedNotification
-                      object:self];
+	 postNotificationName:ORDataTaskTimeScalerChangedNotification
+	 object:self];
 	
 }
 
@@ -176,8 +176,8 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     [[[self undoManager] prepareWithInvocationTarget:self] setCollectMode:[self collectMode]];
     collectMode=newMode;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORDataTaskCollectModeChangedNotification
-                      object:self];
+	 postNotificationName:ORDataTaskCollectModeChangedNotification
+	 object:self];
 }
 
 - (unsigned long)cycleRate
@@ -189,8 +189,8 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 	cycleRate = cycleCount;
 	cycleCount = 0;
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORDataTaskCycleRateChangedNotification
-                      object:self];
+	 postNotificationName:ORDataTaskCycleRateChangedNotification
+	 object:self];
 }
 
 // ===========================================================
@@ -209,8 +209,8 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     queueCount = aQueueCount;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORDataTaskQueueCountChangedNotification
-                      object:self];
+	 postNotificationName:ORDataTaskQueueCountChangedNotification
+	 object:self];
     
 }
 
@@ -276,7 +276,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 	[self clearTimeHistogram];
     
     runStartTime = times(&runStartTmsTime); 
-        
+	
 	if(enableTimer){
 		[timerLock lock];	//start critical section
 		dataTimer = [[ORTimer alloc]init];
@@ -329,22 +329,22 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
         [obj appendDataDescription:aDataPacket userInfo:userInfo];
     }
 	
-//---------------------------------------------------
-// comment out some in-development code.....
+	//---------------------------------------------------
+	// comment out some in-development code.....
 	NSMutableDictionary* eventDictionary = [NSMutableDictionary dictionary];
 	[readOutList appendEventDictionary:eventDictionary topLevel:eventDictionary];
 	if([eventDictionary count]){
 		[aDataPacket addEventDescriptionItem:eventDictionary];
 	}
-//---------------------------------------------------	
- 
+	//---------------------------------------------------	
+	
 	if([dataTakers count]){
 		[aDataPacket addReadoutDescription:[self readoutInfo:readOutList array:[NSMutableArray array]]];
 	}
-
-	      
+	
+	
     [aDataPacket generateObjectLookup];	 //MUST be done before data header will work.
-
+	
 	if(transferDataPacket){
 		[transferDataPacket release];
 		transferDataPacket = nil;
@@ -352,8 +352,8 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     transferDataPacket  = [aDataPacket copy];
     [transferDataPacket generateObjectLookup];	//MUST be done before data header will work.
     [transferDataPacket clearData];	
-
-   if(transferQueue){
+	
+	if(transferQueue){
         [transferQueue release];
         transferQueue = nil;
     }
@@ -362,7 +362,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     //cache the next object
     nextObject =  [self objectConnectedTo: ORDataTaskDataOut];
     [nextObject runTaskStarted:aDataPacket userInfo:userInfo];
-    	
+	
 	timeToStopProcessThread = NO;
     [NSThread detachNewThreadSelector:@selector(sendDataFromQueue) toTarget:self withObject:nil];
 	NSLog(@"Processing Thread Started\n");
@@ -400,7 +400,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 //this operates out of the data taking thread. It should not be called from anywhere else.
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-        
+	
 	//ship pending records.
 	if(areRecordsPending){
 		id rec;
@@ -416,7 +416,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 		++i;
     }
     
-
+	
     [aDataPacket addCachedData];
     [self putDataInQueue:aDataPacket force:NO];   
     
@@ -486,10 +486,10 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     
     //issue a final call for actions at end of run time.
     NSDictionary* statusInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithInt:eRunStopped], ORRunStatusValue,
-        @"Last Call",                         ORRunStatusString,
-        aDataPacket,                          @"DataPacket",
-        nil];
+								[NSNumber numberWithInt:eRunStopped], ORRunStatusValue,
+								@"Last Call",                         ORRunStatusString,
+								aDataPacket,                          @"DataPacket",
+								nil];
     
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunFinalCallNotification
@@ -512,7 +512,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     //tell everyone it's over and done.
     [nextObject closeOutRun:aDataPacket userInfo:userInfo];
 	
-
+	
 	NSLog(@"Final end of run cleanup\n");
     nextObject = nil;
     
@@ -534,7 +534,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 	[aDataPacket stopFrameTimer];
 	[self setCycleRate:0];
 	[self setQueueCount:0];
-   
+	
 }
 
 
@@ -616,8 +616,8 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 	[self setCycleRate:cycleCount];
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORDataTaskQueueCountChangedNotification
-                      object:self];
+	 postNotificationName:ORDataTaskQueueCountChangedNotification
+	 object:self];
     [self performSelector:@selector(doCycleRate) withObject:nil afterDelay:1];
 }
 @end
@@ -659,7 +659,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 				queueFullAlarm = nil;
 			}
 			
-			NS_DURING 
+			@try { 
 				NSArray* theDataArray = [transferQueue dequeueArray];
 				if(theDataArray){
 					unsigned long theFirstLong = *((unsigned long*)[[theDataArray objectAtIndex:0] bytes]);
@@ -672,9 +672,10 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 					}
 				}
 				[transferDataPacket clearData];
-			NS_HANDLER
+			}
+			@catch(NSException* localException) {
 				NSLogError(@"Main Queue Exception",@"Data Read_out",nil);
-			NS_ENDHANDLER
+			}
 			
 		}
 		else {
@@ -704,7 +705,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 		}
 		[pool release];
 	} while(!timeToQuit);
-			
+	
 	NSLog(@"Processing Thread Exited\n");
 	[threadPool	release];
 	

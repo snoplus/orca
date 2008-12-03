@@ -37,13 +37,13 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"Fifo"];
-
+	
 	return self;
 }
 
 - (void) dealloc
 {
-
+	
 	[readWriteTestThread markAsCancelled];
 	[readWriteTestThread release];
 	readWriteTestThread = nil;
@@ -55,7 +55,7 @@
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [super registerNotificationObservers];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(slotChanged:)
                          name : ORVmeCardSlotChangedNotification
@@ -77,27 +77,29 @@
 
 -(IBAction)reset:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model resetFifo];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
-				localException);
-	NS_ENDHANDLER
-		
+						localException);
+	}
+	
 }
 
 
 -(IBAction)status:(id)sender
 {
     unsigned short sdata;
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model readFifo:FIFO_CSR_REGISTER atPtr:&sdata];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSRunAlertPanel([localException name], @"%@\nStatus Reg: %d", @"OK", nil, nil,
-		localException,sdata);
-	NS_ENDHANDLER
+						localException,sdata);
+	}
 	NSLog(@"Fifo Status: %d\n",sdata);
 	
 }
@@ -105,19 +107,20 @@
 -(IBAction)loadUnloadTest:(id)sender
 {
     // run FIFO block load/unload test
-	NS_DURING
+	@try {
 		[self endEditing];
 		[model blockLoadUnloadTest];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
-				  localException);
+						localException);
 		NSLog(@"*** FIFO Block Load/Unload Test Failed ***\n");
-	NS_ENDHANDLER
+	}
 }
 
 -(IBAction)readWriteTest:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		
 		if(!readWriteTestThread){
@@ -142,27 +145,28 @@
 		}
 		
 		[readWriteTestControl setEnabled:YES];
-
 		
-		NS_HANDLER
-			NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
-				   localException);
-			NSLog(@"*** FIFO Block Read/Write Test Failed ***\n");
-		NS_ENDHANDLER
+		
+	}
+	@catch(NSException* localException) {
+		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+						localException);
+		NSLog(@"*** FIFO Block Read/Write Test Failed ***\n");
+	}
 }
 
 #pragma mark ¥¥¥Thread Worker Methods
 - (id) runWriteReadTest:(id)userInfo thread:tw
 {
-
+	
 	unsigned short j;
 	NSDictionary* params = userInfo;
 	NSProgressIndicator* progress = [params objectForKey:@"Progress"];
 	id theModel = [params objectForKey:@"Model"];
 	[progress setDoubleValue:0.];
-
-	NS_DURING
-
+	
+	@try {
+		
 		[theModel setupTestMode];
 		
 		for(j=1;j<=4096;j++){
@@ -170,21 +174,22 @@
 			[theModel writeLocationTest: j];
 			[progress setDoubleValue:50*j/4095.];
 		}	
-	
+		
 		for(j=1;j<=4096;j++){
 			if([tw cancelled])break;
 			[theModel readLocationTest: j];
 			[progress setDoubleValue:50 + 50*j/4095.];
 		}
 		
-
-	NS_HANDLER
-		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
-				localException);
-		NSLog(@"*** FIFO Block Read/Write Test Failed ***\n");
-	NS_ENDHANDLER
-
 		
+	}
+	@catch(NSException* localException) {
+		NSRunAlertPanel([localException name], @"%@", @"OK", nil, nil,
+						localException);
+		NSLog(@"*** FIFO Block Read/Write Test Failed ***\n");
+	}
+	
+	
 	[progress setDoubleValue:100.];
 	return @"done";
 }

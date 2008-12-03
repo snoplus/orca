@@ -96,7 +96,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
     
     [comments autorelease];
     comments = [aComments copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDCModelCommentsChanged object:self];
 }
 
@@ -357,7 +357,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 	for(i=0;i<16;i++){
 		[self setVb:i withValue:160]; 
 	}
-
+	
 	for(i=0;i<8;i++){
 		[self setNs100width:i withValue:126]; 
 		[self setNs20width:i withValue:32]; 
@@ -424,17 +424,18 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
  	for(i=0;i<16;i++){
 		[encoder encodeInt:vb[i] forKey:[NSString stringWithFormat:@"vb_%d",i]];
 	}
- }
- 
- - (void) readBoardIds
- {
-	 NS_DURING
+}
+
+- (void) readBoardIds
+{
+	@try {
 		[self setBoardID:[[self guardian] performBoardIDRead:DC_BOARD0_ID_INDEX + [self slot]]];
-	 NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[self setBoardID:@"0000"];
-	 NS_ENDHANDLER
- }
- 
- @end
+	}
+}
+
+@end
 
 

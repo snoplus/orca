@@ -91,7 +91,7 @@ int filterGraph(nodeType*);
     
     [[self undoManager] disableUndoRegistration];
     [[self undoManager] enableUndoRegistration];
-        
+	
 	return self;
 }
 
@@ -101,7 +101,7 @@ int filterGraph(nodeType*);
 	[pluginInstance release];
 	[self freeNodes];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(scheduledUpdate) object:nil];
-
+	
 	[transferDataPacket release];
 	[expressionAsData release];
 	[inputValues release];
@@ -138,7 +138,7 @@ int filterGraph(nodeType*);
 		free(finishFilterNodes);
 		finishFilterNodes = nil;
 	}
-
+	
 }
 
 - (void) setUpImage
@@ -157,7 +157,7 @@ int filterGraph(nodeType*);
     [[self connectors] setObject:aConnector forKey:ORFilterInConnector];
 	[aConnector setIoType:kInputConnector];
     [aConnector release];
-
+	
     aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width/2 - kConnectorSize/2 , 0) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORFilterFilteredConnector];
 	[aConnector setIoType:kOutputConnector];
@@ -181,7 +181,7 @@ int filterGraph(nodeType*);
     [[[self undoManager] prepareWithInvocationTarget:self] setUsePlugin:usePlugin];
     
     usePlugin = aUsePlugin;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFilterModelUsePluginChanged object:self];
 }
 
@@ -193,7 +193,7 @@ int filterGraph(nodeType*);
 - (void) setPluginValid:(BOOL)aPluginValid
 {
     pluginValid = aPluginValid;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFilterModelPluginValidChanged object:self];
 }
 
@@ -209,9 +209,9 @@ int filterGraph(nodeType*);
     
     [pluginPath autorelease];
     pluginPath = [aPluginPath copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFilterModelPluginPathChanged object:self];
-
+	
 }
 
 - (NSMutableArray*) inputValues
@@ -228,9 +228,9 @@ int filterGraph(nodeType*);
 {
 	if(!inputValues)inputValues = [[NSMutableArray array] retain];
 	[inputValues addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-			[NSString stringWithFormat:@"$%d",[inputValues count]],	@"name",
-			[NSNumber numberWithUnsignedLong:0],					@"iValue",
-			nil]];
+							[NSString stringWithFormat:@"$%d",[inputValues count]],	@"name",
+							[NSNumber numberWithUnsignedLong:0],					@"iValue",
+							nil]];
 	
 }
 
@@ -295,14 +295,14 @@ int filterGraph(nodeType*);
 		mainTimer = nil;
 	}
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORFilterTimerEnabledChanged
-                      object:self];
+	 postNotificationName:ORFilterTimerEnabledChanged
+	 object:self];
 }
 
 #pragma mark •••Data Handling
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
 {
-
+	
 	if(someData != currentDataPacket){
 		[someData generateObjectLookup];	 //MUST be done before data header will work.
 		if(usePlugin && firstTime){
@@ -329,11 +329,11 @@ int filterGraph(nodeType*);
 		[transferDataPacket generateObjectLookup];	//MUST be done before data header will work.
 		[transferDataPacket clearData];	
 	}
-
+	
 	//pass it on
 	[thePassThruObject processData:someData userInfo:userInfo];
-
-
+	
+	
 	//each block of data is an array of NSData objects, each potentially containing many records..
 	NSArray* theDataArray = [someData dataArray];
 	int n = [theDataArray count];
@@ -345,7 +345,7 @@ int filterGraph(nodeType*);
 		if(totalLen>0){
 			unsigned long* ptr = (unsigned long*)[data bytes];
 			while(totalLen>0){
-			
+				
 				long recordLen = ExtractLength(*ptr);
 				
 				filterData tempData;
@@ -366,7 +366,7 @@ int filterGraph(nodeType*);
 					tempData.type		= kFilterPtrType;
 					tempData.val.pValue = ptr;
 					[symbolTable setData:tempData forKey:"CurrentRecordPtr"];
-				
+					
 					tempData.type		= kFilterLongType;
 					tempData.val.lValue = recordLen;
 					[symbolTable setData:tempData forKey:"CurrentRecordLen"];
@@ -379,7 +379,7 @@ int filterGraph(nodeType*);
 					if(delta<kFilterTimeHistoSize)processingTimeHist[(int)delta]++;
 					else processingTimeHist[kFilterTimeHistoSize-1]++;
 				}
-			
+				
 				ptr += recordLen;
 				totalLen -= recordLen;
 			}
@@ -428,27 +428,27 @@ int filterGraph(nodeType*);
     NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
 	
     NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORFilterDecoderFor1D",				@"decoder",
-        [NSNumber numberWithLong:dataId1D],     @"dataId",
-        [NSNumber numberWithBool:NO],           @"variable",
-        [NSNumber numberWithLong:2],            @"length",
-        nil];
+								 @"ORFilterDecoderFor1D",				@"decoder",
+								 [NSNumber numberWithLong:dataId1D],     @"dataId",
+								 [NSNumber numberWithBool:NO],           @"variable",
+								 [NSNumber numberWithLong:2],            @"length",
+								 nil];
     [dataDictionary setObject:aDictionary forKey:@"Filter1D"];
 	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORFilterDecoderFor2D",				@"decoder",
-        [NSNumber numberWithLong:dataId2D],     @"dataId",
-        [NSNumber numberWithBool:NO],           @"variable",
-        [NSNumber numberWithLong:3],            @"length",
-        nil];
+				   @"ORFilterDecoderFor2D",				@"decoder",
+				   [NSNumber numberWithLong:dataId2D],     @"dataId",
+				   [NSNumber numberWithBool:NO],           @"variable",
+				   [NSNumber numberWithLong:3],            @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"Filter2D"];
-
+	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-        @"ORFilterDecoderForStrip",				@"decoder",
-        [NSNumber numberWithLong:dataIdStrip],   @"dataId",
-        [NSNumber numberWithBool:NO],           @"variable",
-        [NSNumber numberWithLong:3],            @"length",
-        nil];
+				   @"ORFilterDecoderForStrip",				@"decoder",
+				   [NSNumber numberWithLong:dataIdStrip],   @"dataId",
+				   [NSNumber numberWithBool:NO],           @"variable",
+				   [NSNumber numberWithLong:3],            @"length",
+				   nil];
     [dataDictionary setObject:aDictionary forKey:@"StripChart"];
 	
     return dataDictionary;
@@ -514,7 +514,7 @@ int filterGraph(nodeType*);
 	}
 	else {
 		[self parseScript];
-	
+		
 		if(!parsedOK){
 			NSLog(@"Filter script parse error prevented run start\n");
 			[NSException raise:@"Parse Error" format:@"Filter Script parse failed."];
@@ -530,7 +530,7 @@ int filterGraph(nodeType*);
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORFilterModel"];  
 	
 	[self verifyFilterIsReady]; //throws on error
-
+	
 	NSMutableDictionary* theHeader = [aDataPacket fileHeader];
 	NSMutableDictionary* runControlSection = [theHeader objectForKey:@"Run Control"];
 	if(runControlSection)[aDataPacket setRunNumber:[[runControlSection objectForKey:@"RunNumber"] longValue]];
@@ -547,14 +547,14 @@ int filterGraph(nodeType*);
 			}
 		}
 	}
-
+	
 	NSString* currentPrefix = [aDataPacket filePrefix];
 	if(currentPrefix)[aDataPacket setFilePrefix:[currentPrefix stringByAppendingString:@"Filtered"]];
 	else [aDataPacket setFilePrefix:@"FilteredRun"];
-
+	
 	thePassThruObject = [self objectConnectedTo:ORFilterOutConnector];
 	theFilteredObject = [self objectConnectedTo:ORFilterFilteredConnector];
-
+	
 	[thePassThruObject runTaskStarted:aDataPacket userInfo:userInfo];
 	[theFilteredObject runTaskStarted:aDataPacket userInfo:userInfo];
 	
@@ -578,35 +578,35 @@ int filterGraph(nodeType*);
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterUpdateTiming object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
-
+	
 }
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	[thePassThruObject closeOutRun:aDataPacket userInfo:userInfo];
 	[theFilteredObject closeOutRun:aDataPacket userInfo:userInfo];
-
+	
 	[transferDataPacket release];
 	transferDataPacket = nil;
-
+	
 	if(usePlugin){
 		[pluginInstance finish];
 	}
 	else {
 		finishFilterScript(self);
 	}
-
+	
 	[self freeNodes];
 	
 	int i;
 	for(i=0;i<kNumFilterStacks;i++){
 		[stacks[i] release];
 	}
-
+	
 	[runTimer release];
 	runTimer = nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORFilterDisplayValuesChanged object:self];
-
+	
 }
 
 - (NSString*) script
@@ -735,7 +735,7 @@ int filterGraph(nodeType*);
 	// Acquire the lock to ensure one parse processing at a time
 	@synchronized([NSApp delegate]){
 		parsedOK = NO;
-		NS_DURING {
+		@try { 
 			
 			resetFilterState();
 			FilterScriptrestart(NULL);
@@ -753,15 +753,16 @@ int filterGraph(nodeType*);
 			else  {
 				NSLog(@"line %d: %@\n",numFilterLines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:numFilterLines]);
 			}
-
+			
+			
 		}
-		NS_HANDLER {
+		@catch(NSException* localException) {
 			NSLog(@"line %d: %@\n",numFilterLines+1,[[theString componentsSeparatedByString:@"\n"] objectAtIndex:numFilterLines]);
 			NSLog(@"Caught %@: %@\n",[localException name],[localException reason]);
 			//[functionList release];
 			//functionList = nil;
+			
 		}
-		NS_ENDHANDLER
 		theFilterRunner = nil;
 	}
 }
@@ -844,7 +845,7 @@ int filterGraph(nodeType*);
 		//pass it on
 		[theFilteredObject processData:transferDataPacket userInfo:nil];
 		[transferDataPacket clearData];
-	
+		
 		[self dumpStack:i];
 	}
 }
@@ -906,22 +907,22 @@ int filterGraph(nodeType*);
 		int i;
 		for(i=[outputValues count];i<index;i++){
 			[outputValues addObject: [NSMutableDictionary dictionaryWithObjectsAndKeys:
-			[NSString stringWithFormat:@"%d",i], @"name",
-			[NSString stringWithFormat:@"%d",0], @"iValue",
-			nil]];
+									  [NSString stringWithFormat:@"%d",i], @"name",
+									  [NSString stringWithFormat:@"%d",0], @"iValue",
+									  nil]];
 		}
 	}
 	if(index==[outputValues count]){
 		[outputValues addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-			[NSString stringWithFormat:@"%d",index],   @"name",
-			[NSString stringWithFormat:@"%d",aValue], @"iValue",
-			nil]];
+								 [NSString stringWithFormat:@"%d",index],   @"name",
+								 [NSString stringWithFormat:@"%d",aValue], @"iValue",
+								 nil]];
 	}
 	else {
 		[outputValues replaceObjectAtIndex:index withObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-			[NSString stringWithFormat:@"%d",index],  @"name",
-			[NSString stringWithFormat:@"%d",aValue], @"iValue",
-			nil]];
+															 [NSString stringWithFormat:@"%d",index],  @"name",
+															 [NSString stringWithFormat:@"%d",aValue], @"iValue",
+															 nil]];
 	}
 	NSTimeInterval currentTimeRef = [NSDate timeIntervalSinceReferenceDate];
 	if(currentTimeRef - lastOutputUpdateTimeRef >= 1){
@@ -979,10 +980,10 @@ int filterGraph(nodeType*);
 			[self setDataIdStrip:maxLongID<<18];
 			[descriptionDict setObject:[self dataRecordDescription] forKey:@"ORFilterModel"];
 			[aDataPacket generateObjectLookup];
-
+			
 		}
 	}
-
+	
 	descriptionDictEnum = [descriptionDict keyEnumerator];
 	while(objKey = [descriptionDictEnum nextObject]){
 		NSDictionary* objDictionary = [descriptionDict objectForKey:objKey];
@@ -999,7 +1000,7 @@ int filterGraph(nodeType*);
 	}
 	
 	descriptionDict = [[aDataPacket fileHeader] objectForKey:@"dataDescription"];
-
+	
 	NSEnumerator* e = [inputValues objectEnumerator];
 	NSDictionary* anInputValueDictionary;
 	filterData tempData;
@@ -1019,13 +1020,13 @@ int filterGraph(nodeType*);
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 2;
-
+	
     unsigned short index  = (ptr[1]&0xff00000)>>24;
     unsigned long  value = ptr[1]&0x00ffffff;
-
+	
     [aDataSet histogram:value numBins:4096  sender:self  withKeys:@"Filter",
-		[NSString stringWithFormat:@"%d",index],
-        nil];
+	 [NSString stringWithFormat:@"%d",index],
+	 nil];
     return length; //must return number of longs processed.
 }
 
@@ -1035,7 +1036,7 @@ int filterGraph(nodeType*);
     
     NSString* value  = [NSString stringWithFormat:@"Value = %d\n",ptr[1]&0x00ffffff];    
     NSString* index  = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0xff00000)>>24];    
-
+	
     return [NSString stringWithFormat:@"%@%@%@",title,value,index];               
 }
 
@@ -1047,12 +1048,12 @@ int filterGraph(nodeType*);
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 3;
-
+	
     [aDataSet histogram2DX:ptr[1]&0x0000ffff y:ptr[2]&0x0000ffff size:256  sender:self  
-		withKeys:@"Filter2D",[NSString stringWithFormat:@"%d",(ptr[1]&0xff00000)>>24],
-        nil];
-
-
+				  withKeys:@"Filter2D",[NSString stringWithFormat:@"%d",(ptr[1]&0xff00000)>>24],
+	 nil];
+	
+	
     return length; //must return number of longs processed.
 }
 
@@ -1063,7 +1064,7 @@ int filterGraph(nodeType*);
     NSString* index   = [NSString stringWithFormat: @"Index  = %d\n",(ptr[1]&0xff00000)>>24];    
     NSString* valueX  = [NSString stringWithFormat: @"ValueX = %d\n",ptr[1]&0x0000ffff];    
     NSString* valueY  = [NSString stringWithFormat: @"ValueY = %d\n",ptr[2]&0x0000ffff];    
-
+	
     return [NSString stringWithFormat:@"%@%@%@%@",title,valueX,valueY,index];               
 }
 @end
@@ -1073,11 +1074,11 @@ int filterGraph(nodeType*);
 {
     unsigned long* ptr = (unsigned long*)someData;
     unsigned long length = 3;
-
+	
     [aDataSet loadTimeSeries:ptr[1]&0xFFFF atTime:ptr[2] sender:self  
-		withKeys:@"FilterStripChart",[NSString stringWithFormat:@"%d",(ptr[1]&0xffff0000)>>16],
-        nil];
-		
+					withKeys:@"FilterStripChart",[NSString stringWithFormat:@"%d",(ptr[1]&0xffff0000)>>16],
+	 nil];
+	
     return length; //must return number of longs processed.
 }
 
@@ -1088,7 +1089,7 @@ int filterGraph(nodeType*);
     NSString* index  =     [NSString stringWithFormat: @"Index = %d\n",(ptr[1] & 0xffff0000)>>16];    
     NSString* timeValue  = [NSString stringWithFormat: @"Time  = %d\n",ptr[1] & 0x0000ffff];    
     NSString* value  =     [NSString stringWithFormat: @"Value = %d\n",ptr[2]];    
-
+	
     return [NSString stringWithFormat:@"%@%@%@%@",title,index,timeValue,value];               
 }
 @end

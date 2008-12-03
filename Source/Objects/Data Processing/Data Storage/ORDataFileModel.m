@@ -193,7 +193,7 @@ static const int currentVersion = 1;           // Current version
     [[[self undoManager] prepareWithInvocationTarget:self] setUseDatedFileNames:useDatedFileNames];
     
     useDatedFileNames = aUseDatedFileNames;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelUseDatedFileNamesChanged object:self];
 }
 
@@ -210,7 +210,7 @@ static const int currentVersion = 1;           // Current version
 	[dataFolder setUseFolderStructure:aUseFolderStructure];
 	[configFolder setUseFolderStructure:aUseFolderStructure];
 	[statusFolder setUseFolderStructure:aUseFolderStructure];
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelUseFolderStructureChanged object:self];
 }
 
@@ -225,7 +225,7 @@ static const int currentVersion = 1;           // Current version
     if(aFilePrefix == nil)aFilePrefix = @"Run";
     [filePrefix autorelease];
     filePrefix = [aFilePrefix copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelFilePrefixChanged object:self];
 }
 
@@ -252,7 +252,7 @@ static const int currentVersion = 1;           // Current version
     [[[self undoManager] prepareWithInvocationTarget:self] setMaxFileSize:maxFileSize];
     
     maxFileSize = aMaxFileSize;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelMaxFileSizeChanged object:self];
 }
 
@@ -266,7 +266,7 @@ static const int currentVersion = 1;           // Current version
     [[[self undoManager] prepareWithInvocationTarget:self] setLimitSize:limitSize];
     
     limitSize = aLimitSize;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelLimitSizeChanged object:self];
 }
 
@@ -315,10 +315,10 @@ static const int currentVersion = 1;           // Current version
     
     [fileName autorelease];
     fileName = [aFileName copy];
-    	
+	
     [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORDataFileChangedNotification
-                              object:self];
+	 postNotificationName:ORDataFileChangedNotification
+	 object:self];
 }
 
 - (NSString*)fileName
@@ -373,8 +373,8 @@ static const int currentVersion = 1;           // Current version
     [[[self undoManager] prepareWithInvocationTarget:self] setSaveConfiguration:saveConfiguration];
     saveConfiguration = flag;
     [[NSNotificationCenter defaultCenter]
-	postNotificationName:ORDataSaveConfigurationChangedNotification
-                  object: self];
+	 postNotificationName:ORDataSaveConfigurationChangedNotification
+	 object: self];
 }
 
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
@@ -398,9 +398,9 @@ static const int currentVersion = 1;           // Current version
 			NSString* reason = [NSString stringWithFormat:@"File size exceeded %.1f MB",maxFileSize];
 			
 			[[NSNotificationCenter defaultCenter]
-					postNotificationName:ORRequestRunStop
-								  object:self
-								userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+			 postNotificationName:ORRequestRunStop
+			 object:self
+			 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
 			fileLimitExceeded = NO;
 		}
     }
@@ -423,7 +423,7 @@ static const int currentVersion = 1;           // Current version
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         //open file and write headers
 		if(filePrefix)[aDataPacket setFilePrefix:filePrefix];
-
+		
         [self setFileName:[self formRunName:aDataPacket]];
 		
         if(fileName){
@@ -437,8 +437,8 @@ static const int currentVersion = 1;           // Current version
         }
         
         [[NSNotificationCenter defaultCenter]
-                postNotificationName:ORDataFileStatusChangedNotification
-                              object: self];
+		 postNotificationName:ORDataFileStatusChangedNotification
+		 object: self];
         
         
         [self getDataFileSize:nil];
@@ -524,36 +524,38 @@ static const int currentVersion = 1;           // Current version
 	    NSLog(@"Copied Status to: %@\n",[fullStatusFileName stringByAbbreviatingWithTildeInPath]);
 	    statusEnd = [[ORStatusController sharedStatusController] statusTextlength];
 	    
-	    NS_DURING
+	    @try {
             NSString* text = [[ORStatusController sharedStatusController] substringWithRange:NSMakeRange(statusStart, statusEnd - statusStart)];
             [statusFilePointer writeData:[text dataUsingEncoding:NSASCIIStringEncoding]];
-	    NS_HANDLER
-            NS_ENDHANDLER
-            
-            NS_DURING
-                [statusFilePointer writeData:[@"\n\n----------------------------------------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
-                [statusFilePointer writeData:[@"------------------Error Summary---------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
-                [statusFilePointer writeData:[@"----------------------------------------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
-                NSString* errorSummary = [[ORStatusController sharedStatusController] errorSummary];
-                if([errorSummary length] == 0){
-                    [statusFilePointer writeData:[@"No Errors in Error Log.\n" dataUsingEncoding:NSASCIIStringEncoding]];
-                }
-                else [statusFilePointer writeData:[errorSummary dataUsingEncoding:NSASCIIStringEncoding]];
-            NS_HANDLER
-                NS_ENDHANDLER
-                
-                [statusFilePointer closeFile];
-                
-                if([statusFolder copyEnabled]){	
-                    [statusFolder queueFileForSending:fullStatusFileName];
-                }
+		}
+		@catch(NSException* localException) {
+		}
+		
+		@try {
+			[statusFilePointer writeData:[@"\n\n----------------------------------------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
+			[statusFilePointer writeData:[@"------------------Error Summary---------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
+			[statusFilePointer writeData:[@"----------------------------------------------------\n" dataUsingEncoding:NSASCIIStringEncoding]];
+			NSString* errorSummary = [[ORStatusController sharedStatusController] errorSummary];
+			if([errorSummary length] == 0){
+				[statusFilePointer writeData:[@"No Errors in Error Log.\n" dataUsingEncoding:NSASCIIStringEncoding]];
+			}
+			else [statusFilePointer writeData:[errorSummary dataUsingEncoding:NSASCIIStringEncoding]];
+		}
+		@catch(NSException* localException) {
+		}
+		
+		[statusFilePointer closeFile];
+		
+		if([statusFolder copyEnabled]){	
+			[statusFolder queueFileForSending:fullStatusFileName];
+		}
 	}
-            statusStart = statusEnd; 
-            
-            [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORDataFileStatusChangedNotification
-                          object: self];
-            
+	statusStart = statusEnd; 
+	
+	[[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORDataFileStatusChangedNotification
+	 object: self];
+	
 }
 
 
@@ -571,8 +573,8 @@ static const int currentVersion = 1;           // Current version
 	}
 	
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORDataFileSizeChangedNotification
-                          object: self];
+	 postNotificationName:ORDataFileSizeChangedNotification
+	 object: self];
     
 }
 
@@ -684,9 +686,9 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     [objDictionary setObject:[statusFolder addParametersToDictionary:[NSMutableDictionary dictionary]] forKey:@"StatusFolder"];
     [objDictionary setObject:[configFolder addParametersToDictionary:[NSMutableDictionary dictionary]] forKey:@"ConfigFolder"];
     [objDictionary setObject:[NSNumber numberWithInt:saveConfiguration] forKey:@"SaveConfiguration"];
-   
+	
     [dictionary setObject:objDictionary forKey:@"Data File"];
-
+	
     return objDictionary;
 }
 

@@ -26,12 +26,13 @@ NSMutableString* getNextString(NSFileHandle* fp)
 {
     NSMutableString* aString = [NSMutableString stringWithCapacity:64];
     char c;
-    NS_DURING
-	while((c = *((char*)[[fp readDataOfLength:1] bytes])) != '\0'){
-	    if(c!='\n')[aString appendFormat:@"%c",c];
-	}
-    NS_HANDLER
-    NS_ENDHANDLER
+    @try {
+		while((c = *((char*)[[fp readDataOfLength:1] bytes])) != '\0'){
+			if(c!='\n')[aString appendFormat:@"%c",c];
+		}
+    }
+	@catch(NSException* localException) {
+    }
     return aString;
 }
 

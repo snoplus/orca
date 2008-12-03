@@ -147,16 +147,16 @@ static NSString *ORDualPortLAMVariables       = @"ORDualPortLAMVariables";
 	memset(&macLAMStruct,0,sizeof(MacWriteLAMStruct));
 	
 	[guardian writeLongBlock:(unsigned long*)&eCpuLAMStruct
-                        atAddress:MAC_DPM(ECPU_WRITE_LAM_START) + sizeof(EcpuWriteLAMStruct)*[self slot]
-                       numToWrite:sizeof(EcpuWriteLAMStruct)/sizeof(long)
-                       withAddMod:0x09
-                    usingAddSpace:0x03]; //kAccessRemoteDRAM
+				   atAddress:MAC_DPM(ECPU_WRITE_LAM_START) + sizeof(EcpuWriteLAMStruct)*[self slot]
+				  numToWrite:sizeof(EcpuWriteLAMStruct)/sizeof(long)
+				  withAddMod:0x09
+			   usingAddSpace:0x03]; //kAccessRemoteDRAM
     
 	[guardian writeLongBlock:(unsigned long*)&macLAMStruct
-                        atAddress:MAC_DPM(MAC_WRITE_LAM_START) + sizeof(MacWriteLAMStruct)*[self slot]
-                       numToWrite:sizeof(MacWriteLAMStruct)/sizeof(long)
-                       withAddMod:0x09
-                    usingAddSpace:0x03]; //kAccessRemoteDRAM
+				   atAddress:MAC_DPM(MAC_WRITE_LAM_START) + sizeof(MacWriteLAMStruct)*[self slot]
+				  numToWrite:sizeof(MacWriteLAMStruct)/sizeof(long)
+				  withAddMod:0x09
+			   usingAddSpace:0x03]; //kAccessRemoteDRAM
     
     
 	if(!started){
@@ -190,20 +190,20 @@ static NSString *ORDualPortLAMVariables       = @"ORDualPortLAMVariables";
     NSString* errorLocation = @"";
     EcpuWriteLAMStruct eCpuLAMStruct;
     MacWriteLAMStruct macLAMStruct;
-    NS_DURING
+    @try {
 		errorLocation = @"DualPort LAM (W)";
         [guardian readLongBlock:(unsigned long*)&eCpuLAMStruct
-                           atAddress:MAC_DPM(ECPU_WRITE_LAM_START) + sizeof(EcpuWriteLAMStruct)*[self slot]
-                           numToRead:sizeof(EcpuWriteLAMStruct)/sizeof(long)
-                          withAddMod:0x09
-                       usingAddSpace:0x03]; //kAccessRemoteDRAM
+					  atAddress:MAC_DPM(ECPU_WRITE_LAM_START) + sizeof(EcpuWriteLAMStruct)*[self slot]
+					  numToRead:sizeof(EcpuWriteLAMStruct)/sizeof(long)
+					 withAddMod:0x09
+				  usingAddSpace:0x03]; //kAccessRemoteDRAM
         
 		errorLocation = @"DualPort LAM (R)";
         [guardian readLongBlock:(unsigned long*)&macLAMStruct
-                           atAddress:MAC_DPM(MAC_WRITE_LAM_START) + sizeof(MacWriteLAMStruct)*[self slot]
-                           numToRead:sizeof(MacWriteLAMStruct)/sizeof(long)
-                          withAddMod:0x09
-                       usingAddSpace:0x03]; //kAccessRemoteDRAM
+					  atAddress:MAC_DPM(MAC_WRITE_LAM_START) + sizeof(MacWriteLAMStruct)*[self slot]
+					  numToRead:sizeof(MacWriteLAMStruct)/sizeof(long)
+					 withAddMod:0x09
+				  usingAddSpace:0x03]; //kAccessRemoteDRAM
         
         
 		if(eCpuLAMStruct.lamFired_counter != macLAMStruct.lamAcknowledged_counter){  
@@ -225,10 +225,10 @@ static NSString *ORDualPortLAMVariables       = @"ORDualPortLAMVariables";
 			
 			errorLocation = @"Clearing LAM";
             [guardian writeLongBlock:(unsigned long*)&macLAMStruct
-                                atAddress:MAC_DPM(MAC_WRITE_LAM_START) + sizeof(MacWriteLAMStruct)*[self slot]
-                               numToWrite:sizeof(MacWriteLAMStruct)/sizeof(long)
-                               withAddMod:0x09
-                            usingAddSpace:0x03]; //kAccessRemoteDRAM
+						   atAddress:MAC_DPM(MAC_WRITE_LAM_START) + sizeof(MacWriteLAMStruct)*[self slot]
+						  numToWrite:sizeof(MacWriteLAMStruct)/sizeof(long)
+						  withAddMod:0x09
+					   usingAddSpace:0x03]; //kAccessRemoteDRAM
             
             
 			errorLocation = @"LAM Reading Children";
@@ -238,10 +238,11 @@ static NSString *ORDualPortLAMVariables       = @"ORDualPortLAMVariables";
             
         }
         
-        NS_HANDLER
-            NSLogError(@"",@"LAM Exception Error",errorLocation,nil);
-            [localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLogError(@"",@"LAM Exception Error",errorLocation,nil);
+		[localException raise];
+	}
 }
 
 

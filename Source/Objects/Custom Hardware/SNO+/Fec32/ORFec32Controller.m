@@ -66,18 +66,18 @@
 	pmtImages[1] = pmtImages1;
 	pmtImages[2] = pmtImages2;
 	pmtImages[3] = pmtImages3;
-
+	
 	//set up the switch images and the pmt images
 	for(i=0;i<8;i++){
 		[[pmtImages0 cellAtRow:0 column:i] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:180]];
 		[[onlineSwitches0 cellAtRow:0 column:i] setTag:7-i];
-
+		
 		[[pmtImages1 cellAtRow:i column:0] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:90]];
 		[[onlineSwitches1 cellAtRow:i column:0] setTag:15-i];
-
+		
 		[[pmtImages2 cellAtRow:i column:0] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:90]];
 		[[onlineSwitches2 cellAtRow:i column:0] setTag:23-i];
-
+		
 		[[pmtImages3 cellAtRow:0 column:i] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:0]];
 		[[onlineSwitches3 cellAtRow:0 column:i] setTag:24+i];
 	}
@@ -124,27 +124,27 @@
                      selector : @selector(runStatusChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(updateWindow)
                          name : ORSNOCardSlotChanged
                        object : nil];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(hvRefChanged:)
                          name : ORFecHVRefChanged
                        object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(cmosChanged:)
                          name : ORFecCmosChanged
                        object : model];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(vResChanged:)
                          name : ORFecVResChanged
                        object : model];
-					   
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(lockChanged:)
 						 name : ORRunStatusChangedNotification
@@ -154,17 +154,17 @@
 					 selector : @selector(lockChanged:)
 						 name : ORFecLock
 						object: nil];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(commentsChanged:)
                          name : ORFecCommentsChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(showVoltsChanged:)
                          name : ORFecShowVoltsChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(onlineMaskChanged:)
                          name : ORFecOnlineMaskChanged
@@ -289,7 +289,7 @@
 
 - (void) runStatusChanged:(NSNotification*)aNotification
 {
-   // int status = [[[aNotification userInfo] objectForKey:ORRunStatusValue] intValue];
+	// int status = [[[aNotification userInfo] objectForKey:ORRunStatusValue] intValue];
 }
 
 -(void) groupChanged:(NSNotification*)note
@@ -342,14 +342,15 @@
 
 - (IBAction) probeAction:(id)sender
 {
-	NS_DURING
+	@try {
 		[model readBoardIds];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Probe of Fec32 FAILED.\n");
         NSRunAlertPanel([localException name], @"%@\n\nFailed Fec32 Probe.", @"OK", nil, nil,
                         localException);
-	
-	NS_ENDHANDLER
+		
+	}
 }
 
 - (IBAction) commentsTextFieldAction:(id)sender

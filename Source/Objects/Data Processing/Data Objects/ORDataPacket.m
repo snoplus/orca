@@ -36,7 +36,7 @@
 - (id)init
 {
     self = [super init];
-        
+	
     theDataLock         = [[NSRecursiveLock alloc] init];
     
     version = kDataVersion;
@@ -256,7 +256,7 @@
             }
             else NSLogError(decoderName,@"Data Description Item",@"Programming Error (no Object)",nil);
         }
-   }      
+	}      
 }
 
 
@@ -294,7 +294,7 @@
         lastFrameBufferSize = [frameBuffer length];
 	}
     memcpy(((unsigned long*)[frameBuffer bytes])+frameIndex,someData,length*sizeof(long));
-
+	
 	frameIndex += length;
     addedData = YES;
 	[theDataLock unlock];   //-----end critical section
@@ -327,7 +327,7 @@
     reservePool[reserveIndex] = frameIndex;
 	unsigned long oldIndex = reserveIndex;
     reserveIndex++;
-
+	
 	frameIndex += length;
 	if([frameBuffer length]<=frameIndex*sizeof(long)){
 		[frameBuffer increaseLengthBy:(length*sizeof(long))+kMinSize];
@@ -363,7 +363,7 @@
 		[theDataLock lock];   //-----begin critical section
 		oldFrameCounter = frameCounter;
 		[frameBuffer setLength:(frameIndex*sizeof(long))];
-
+		
 		//[self addData:frameBuffer];
 		if(!dataArray)[self setDataArray:[NSMutableArray arrayWithCapacity:kMinCapacity]];
 		[dataArray addObject:frameBuffer];
@@ -439,7 +439,7 @@
 {
     [theDataLock lock];   //-----begin critical section
     [dataArray removeAllObjects];
-
+	
 	frameIndex = 0;
     reserveIndex = 0;
 	
@@ -484,7 +484,7 @@
     unsigned long keyMaskValue;
     do {
         if(!dPtr)break;
-				
+		
 		keyMaskValue = ExtractDataId(*dPtr);
  		
         id anObj = fastLookupCache[keyMaskValue>>18]; //optimization, but dangerous. keyMask must be < kFastLoopupCacheSize
@@ -511,7 +511,7 @@
             else break;									//old form--can not decode.
         }
         else numLong = [anObj decodeData:dPtr  fromDataPacket:self intoDataSet:aDataSet];
-                
+		
         if(numLong)dPtr+=numLong;
         else break; //can not continue with this record.. size was zero
 		
@@ -570,7 +570,7 @@
     
     NSMutableArray* array = nil;
     NSAutoreleasePool *pool = nil;
-    NS_DURING
+    @try {
         array = [NSMutableArray arrayWithCapacity:1024*1000];
         NSData* d = [dataArray objectAtIndex:0];
         NSNumber* aKey;
@@ -589,9 +589,9 @@
             
 			id anObj = nil;
 			if(version>=2){
-			   //get length from the first word.
-			   unsigned long val = *dPtr;
-			   if(needToSwap)val = CFSwapInt32(val); //if data is from old PPC file, must swap.
+				//get length from the first word.
+				unsigned long val = *dPtr;
+				if(needToSwap)val = CFSwapInt32(val); //if data is from old PPC file, must swap.
 				aKey		  = [NSNumber  numberWithLong:ExtractDataId(val)];
 				decodedLength = ExtractLength(val);
 				anObj		  = [objectLookup objectForKey:aKey];
@@ -600,13 +600,13 @@
             if(anObj){
                 NSString* shortName = [nameCatalog objectForKey:aKey];
                 if(!shortName){
-                     NSString* sname = [[NSStringFromClass([anObj class]) componentsSeparatedByString:@"DecoderFor"] componentsJoinedByString:@" "];
+					NSString* sname = [[NSStringFromClass([anObj class]) componentsSeparatedByString:@"DecoderFor"] componentsJoinedByString:@" "];
                     if([sname hasPrefix:@"OR"])     sname = [sname substringFromIndex:2];
                     if([sname hasSuffix:@"Record"]) sname = [sname substringToIndex:[sname length]-6];
                     [nameCatalog setObject:sname forKey:aKey]; 
                     shortName = sname;
                 }
-                                                                                              
+				
                 if(decodedLength){
 					if((dPtr+decodedLength) > end){
 						NSLog(@"Parser stepped past end of file...\n");
@@ -620,12 +620,12 @@
 					else {
 						unsigned long offset = dPtr - start;
 						[array addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							[NSNumber numberWithLong:decodedLength],@"Length",
-							shortName,@"Name",
-							aKey,@"Key",
-							decodedFlag,@"DecodedOnce",
-							[NSNumber numberWithLong:offset],@"StartingOffset",
-							nil]];
+										  [NSNumber numberWithLong:decodedLength],@"Length",
+										  shortName,@"Name",
+										  aKey,@"Key",
+										  decodedFlag,@"DecodedOnce",
+										  [NSNumber numberWithLong:offset],@"StartingOffset",
+										  nil]];
 						dPtr+=decodedLength;
 					}
 				}
@@ -643,14 +643,15 @@
 			}
             [innerPool release];
         } while( length>0 );
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [array release];
         array = nil;
-    NS_ENDHANDLER
+    }
     
     [pool release];
     pool = nil;
-
+	
     return array;
 }
 
@@ -751,7 +752,7 @@
 		theDataId = ExtractDataId(CFSwapInt32(*p));	
 	}
 	else theDataId = ExtractDataId(*p);	
-
+	
 	
 	if(theDataId == 0x00000000){
 		p++;	//in valid file the second word is the length
@@ -817,7 +818,7 @@
 - (BOOL) readHeaderReturnRunLength: (NSFileHandle*)fp 
 						  runStart:(unsigned long*)aRunStart 
 							runEnd:(unsigned long*)aRunEnd
-							runNumber:(unsigned long*)aRunNumber
+						 runNumber:(unsigned long*)aRunNumber
 {
 	//a special function for reading the file and extracting the run length
 	//assumes special knowledge of the run record
@@ -835,11 +836,11 @@
 	if(needToSwap)for(i=0;i<4;i++)run2[i] = CFSwapInt32(run2[i]);
 	
 	unsigned long runId = [[[fileHeader objectForKeyArray:
-								[NSMutableArray arrayWithObjects:  @"dataDescription",
-															@"ORRunModel",
-															@"Run",
-															nil]] objectForKey:@"dataId"] longValue];
-
+							 [NSMutableArray arrayWithObjects:  @"dataDescription",
+							  @"ORRunModel",
+							  @"Run",
+							  nil]] objectForKey:@"dataId"] longValue];
+	
 	if(ExtractDataId(run1[0]) == runId && ExtractDataId(run2[0]) == runId){
 		
 		if(!(run1[1] & 0x8) && !(run2[1] & 0x8)){        
@@ -938,7 +939,7 @@ static NSString *ORDataPacketFileHeader        = @"ORDataPacketFileHeader";
 	}
     NSDictionary* docinfo = [fileHeader objectForKey:@"Document Info"];
     [self setVersion:[[docinfo objectForKey:@"dataVersion"] intValue]];
-       
+	
     return fileHeader!=nil;
 }
 
@@ -967,7 +968,7 @@ static NSString *ORDataPacketFileHeader        = @"ORDataPacketFileHeader";
 	//only get here if the data is a data header
     unsigned long* ptr = (unsigned long*)someData;
 	unsigned long val = *ptr;
-
+	
 	unsigned long theDataId = ExtractDataId(val);
 	
 	if(theDataId == 0x0) {		//great, this is easy... it's the new form

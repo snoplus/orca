@@ -80,11 +80,12 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [statusText release];
-	NS_DURING
+	@try {
 		[orcaControllers makeObjectsPerformSelector:@selector(close)];
 		[orcaControllers release];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
     [group sleep];
     [group release];
     [self setGateGroup: nil];
@@ -143,7 +144,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     
     if(abs(aScaleFactor-scaleFactor)>1){
         [[[self undoManager] prepareWithInvocationTarget:self] setScaleFactor:scaleFactor];
-                
+		
         scaleFactor = aScaleFactor;
         
         [[NSNotificationCenter defaultCenter] postNotificationName:ORDocumentScaleChangedNotification
@@ -165,23 +166,23 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     statusText = [aName copy];
     
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORStatusTextChangedNotification
-                          object:self];
+	 postNotificationName:ORStatusTextChangedNotification
+	 object:self];
     
 }
 
 /*- (NKDPostgreSQLConnection*) dbConnection
-{
-    return dbConnection;
-}
-
-- (void) setDbConnection:(NKDPostgreSQLConnection*)aConnection
-{
-    [aConnection retain];
-    [dbConnection release];
-    dbConnection = aConnection;
-}
-*/
+ {
+ return dbConnection;
+ }
+ 
+ - (void) setDbConnection:(NKDPostgreSQLConnection*)aConnection
+ {
+ [aConnection retain];
+ [dbConnection release];
+ dbConnection = aConnection;
+ }
+ */
 
 
 
@@ -227,13 +228,13 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 - (void) makeWindowControllers
 {
     ORDocumentController* documentController = [[ORDocumentController alloc] init];
-
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
-															object:self
-															userInfo:[NSDictionary dictionaryWithObject:@"Preloading Catalog..." forKey:@"Message"]];
+														object:self
+													  userInfo:[NSDictionary dictionaryWithObject:@"Preloading Catalog..." forKey:@"Message"]];
 	[documentController preloadCatalog];
-
-
+	
+	
     if(scaleFactor == 0)[self setScaleFactor:100];
     [self addWindowController:documentController];
     [documentController showWindow:self];
@@ -278,7 +279,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 	
 	//add in any gategroups
     if([gateGroup count])[gateGroup addParametersToDictionary:dictionary];
-
+	
 	//have our group add parameters
 	//[group addParametersToDictionary:dictionary];
 	
@@ -382,7 +383,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		[[self undoManager] removeAllActions];
 		
 		[self performSelector:@selector(saveFinished) withObject:nil afterDelay:0];
-
+		
 		return data;
 	}
     
@@ -392,10 +393,11 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 - (void) saveFinished
 {
 	NSLog(@"Saved Configuration: %@\n",[self fileName]);
-	NS_DURING
-	[afterSaveTarget performSelector:afterSaveSelector];
-	NS_HANDLER
-	NS_ENDHANDLER
+	@try {
+		[afterSaveTarget performSelector:afterSaveSelector];
+	}
+	@catch(NSException* localException) {
+	}
 	afterSaveTarget = nil;
 }
 - (void) afterSaveDo:(SEL)aSelector withTarget:(id)aTarget
@@ -425,7 +427,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		[[ORAlarmCollection sharedAlarmCollection] decodeEMailList:unarchiver];
 		[[ORStatusController sharedStatusController] decode:unarchiver];
 		
-		NS_DURING
+		@try {
 			if((GetCurrentKeyModifiers() & shiftKey) == 0){
 				[self setOrcaControllers:[unarchiver decodeObjectForKey:OROrcaControllers]];
 				[self checkControllers];
@@ -433,10 +435,11 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 			else {
 				NSLogColor([NSColor redColor], @"Shift Down down....Dialogs NOT loaded.\n");
 			}
-		NS_HANDLER
+		}
+		@catch(NSException* localException) {
 			NSLogColor([NSColor redColor], @"Something wrong with the dialog configuration... Dialogs NOT restored\n");
 			NSLogColor([NSColor redColor], @"but model data OK.\n");		
-		NS_ENDHANDLER
+		}
 		
 		if([unarchiver decodeBoolForKey:ORTaskMasterVisibleKey] == YES){
 			[[[ORTaskMaster sharedTaskMaster] window] orderFront:nil];
@@ -458,25 +461,27 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		NSEnumerator* e = [orcaControllers objectEnumerator];
 		id controller;
 		while(controller = [e nextObject]){
-			NS_DURING
+			@try {
 				[controller showWindow:controller];
-			NS_HANDLER
-			NS_ENDHANDLER
+			}
+			@catch(NSException* localException) {
+			}
 		}
 		
 		
 		[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORDocumentLoadedNotification
-					  object:self];
+		 postNotificationName:ORDocumentLoadedNotification
+		 object:self];
 		
-		NS_DURING
+		@try {
 			[group awakeAfterDocumentLoaded];
-		NS_HANDLER
-		NS_ENDHANDLER
+		}
+		@catch(NSException* localException) {
+		}
 		
 		[[self undoManager] removeAllActions];
-
-					
+		
+		
 		return YES;
 	}
 	return NO;
@@ -645,11 +650,12 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
     while(controller = [e nextObject]){
         if([controller window] == [aNote object]){
             //[controller retain];
-			NS_DURING
+			@try {
 				[orcaControllers removeObject:controller];
-			NS_HANDLER
-			NS_ENDHANDLER
-           // [controller performSelector:@selector(release) withObject:nil afterDelay:.1];
+			}
+			@catch(NSException* localException) {
+			}
+			// [controller performSelector:@selector(release) withObject:nil afterDelay:.1];
             break;
         }
     }
@@ -670,8 +676,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
         if(choice == NSAlertAlternateReturn){
             //[[self undoManager] removeAllActions];
             [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORDocumentClosedNotification
-                          object:self];
+			 postNotificationName:ORDocumentClosedNotification
+			 object:self];
             
             return YES;
         }

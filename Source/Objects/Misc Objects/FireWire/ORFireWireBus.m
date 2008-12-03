@@ -53,12 +53,12 @@
 {
 	//io_object_t service = [[[devices objectForKey:[NSNumber numberWithLong:aVendorID]] objectAtIndex:0] longValue];
 	//if(!service){
-		[self getDevicesWithVenderID:aVendorID];
-		io_object_t service = [[[devices objectForKey:[NSNumber numberWithLong:aVendorID]] objectAtIndex:0] longValue];
+	[self getDevicesWithVenderID:aVendorID];
+	io_object_t service = [[[devices objectForKey:[NSNumber numberWithLong:aVendorID]] objectAtIndex:0] longValue];
 	//}
 	if(!service)return nil;
 	else return [[[ORFireWireInterface alloc] initWithService:service] autorelease];
-	 
+	
 }
 
 #pragma mark ¥¥¥HW access
@@ -66,18 +66,18 @@
 {    
 	mach_port_t				masterDevicePort = 0;	// Master port
 	io_iterator_t			enumerator		 = 0;	// Enumerator of matching kFWDevType devices
-
+	
 	IOReturn				result;					// Result of function
 	NSMutableDictionary*	matchDictionary;		// Dictionary of kFWDevType devices
-	    
-	NS_DURING
+	
+	@try {
 		// Get the master port
 		result = IOMasterPort( bootstrap_port, &masterDevicePort );
 		if ( result != kIOReturnSuccess ) {
 			NSLog(@"Unable to access master system I/O port\n" );
 			[NSException raise:@"IOKit Port Error" format:@"Unable to access master system I/O port"];
 		}
-
+		
 		
 		matchDictionary = (NSMutableDictionary*)IOServiceMatching("IOFireWireDevice");
 		[matchDictionary setObject:[NSNumber numberWithLong:aVendorID] forKey:@"Vendor_ID"];
@@ -87,7 +87,7 @@
 			NSLog(@"Unable to obtain I/O matching dictionary\n" );
 			[NSException raise:@"IOKit Matching Error" format:@"Unable to match firewire device venderID %d",aVendorID];
 		}
-			
+		
 		// Get a registry enumerator for all matching kFWDevType devices
 		result = IOServiceGetMatchingServices( masterDevicePort, (CFMutableDictionaryRef)matchDictionary, &enumerator );
 		
@@ -107,11 +107,11 @@
 			if(!devices)[self setDevices:[NSMutableDictionary dictionary]];
 			[devices setObject:deviceList forKey:[NSNumber numberWithLong:aVendorID]];
 		}
-
-
 		
-    NS_HANDLER
-	NS_ENDHANDLER
+		
+		
+		NS_HANDLER
+	}
 	
     // Clean up
 	if ( enumerator ) {

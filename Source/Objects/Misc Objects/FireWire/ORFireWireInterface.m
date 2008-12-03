@@ -1,11 +1,11 @@
 /*
-	File:		ORFireWireInterface.m
-
-	Synopsis: 	ObjC class to represent an device on the FireWire bus. Corresponds
-				to IOFireWireDeviceInterface.
-
-	Note: converted to ObjC from the C++ version in Apples example code.
-*/
+ File:		ORFireWireInterface.m
+ 
+ Synopsis: 	ObjC class to represent an device on the FireWire bus. Corresponds
+ to IOFireWireDeviceInterface.
+ 
+ Note: converted to ObjC from the C++ version in Apples example code.
+ */
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -43,12 +43,12 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	
 	mIsochRunLoop = 0;
 	fwLock = [[NSLock alloc] init];
-	NS_DURING
-	
+	@try {
+		
 		io_name_t			className ;
 		err = IOObjectGetClass( aDevice, className ) ;
 		NSLog(@"creating service for <%p> %s\n",aDevice,className);
-
+		
 		// get IOCFPlugInInterface plug-in interface
 		err = IOCreatePlugInInterfaceForService(aDevice, kIOFireWireLibTypeID, kIOCFPlugInInterfaceID, &mIOCFPlugInInterface, &theScore);
 		if(err){
@@ -58,11 +58,12 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 		err = (**mIOCFPlugInInterface).QueryInterface(mIOCFPlugInInterface, kDeviceIID, (void**) &mDevice);
 		
 		if(err)[NSException raise:@"IOReturn" format:@"%s %u: QueryInterface <%@>", __FILE__, __LINE__,NSStringFromClass([self class])];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		if(err) NSLogColor([NSColor redColor],@"Service NOT opened\n");
 		NSLog(@"%@\n",localException);
 		[localException raise];
-	NS_ENDHANDLER
+	}
 	
 	return self;
 }
@@ -81,7 +82,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 		//CFRelease( source ) ;
 	}
 	if(mNotification)IOObjectRelease( mNotification ) ;
-
+	
 	if(mDevice)(**mDevice).Release(mDevice);
 	if(mIOCFPlugInInterface) IODestroyPlugInInterface(mIOCFPlugInInterface);
 	[fwLock release];
@@ -99,7 +100,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 {
 	if(aServiceAlive != serviceAlive){
 		serviceAlive = aServiceAlive;
-
+		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORFireWireInterfaceServiceAliveChanged object:self];
 	}
 }
@@ -171,7 +172,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 		
 		// the run loop has the source, so we release it.
 		CFRelease( source ) ;
-
+		
 		IOServiceAddInterestNotification( mNotificationPort, [self service], kIOGeneralInterest, &deviceInterestCallback, self, &mNotification ) ;
 	}
 }
@@ -182,11 +183,11 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	switch(messageType) {
 		case kIOMessageServiceIsRequestingClose:   
 			NSLog(@"kIOMessageServiceIsRequestingClose\n");
-		break;
+			break;
 		case kIOFWMessageServiceIsRequestingClose:	
 			NSLog(@"kIOFWMessageServiceIsRequestingClose\n");	
 			[self setServiceAlive:NO];
-
+			
 			if(!fireWireServiceAlarm){
 				fireWireServiceAlarm = [[ORAlarm alloc] initWithName:@"No FireWire Service" severity:kHardwareAlarm];
 				[fireWireServiceAlarm setSticky:YES];
@@ -197,27 +198,27 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 				[fireWireServiceAlarm setAcknowledged:NO];
 				[fireWireServiceAlarm postAlarm];
 			}
-		break;
+			break;
 		case kIOMessageServiceIsTerminated:			
 			[self setServiceAlive:NO];
 			NSLog(@"kIOMessageServiceIsTerminated\n");			
-		break;
+			break;
 		case kIOMessageServiceIsSuspended:	
 			[self setServiceAlive:NO];
 			NSLog(@"kIOMessageServiceIsSuspended\n");	
-		break;
-		
+			break;
+			
 		case kIOMessageServiceIsResumed:			
 			NSLog(@"kIOMessageServiceIsResumed\n");	
 			[self setServiceAlive:YES];
-
+			
 			if(fireWireServiceAlarm){
 				[fireWireServiceAlarm clearAlarm];
 				[fireWireServiceAlarm release];
 				fireWireServiceAlarm = nil;
 			}
-		break;
-		
+			break;
+			
 		case kIOMessageServiceIsAttemptingOpen:		NSLog(@"kIOMessageServiceIsAttemptingOpen\n");		break;
 		case kIOMessageServiceWasClosed:			NSLog(@"kIOMessageServiceWasClosed\n");				break;
 		case kIOMessageServiceBusyStateChange:		NSLog(@"kIOMessageServiceBusyStateChange\n");		break;
@@ -234,7 +235,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 		case kIOMessageSystemHasPoweredOn:			NSLog(@"kIOMessageSystemHasPoweredOn\n");			break;
 		case kIOMessageSystemWillPowerOn:			NSLog(@"kIOMessageSystemWillPowerOn\n");			break;
 		case kIOMessageSystemWillRestart:			NSLog(@"kIOMessageSystemWillRestart\n");			break;
-
+			
 		case  kIOFireWireBusReset:					NSLog(@"kFWResponseBusResetError\n");				break;
 		case  kIOConfigNoEntry:						NSLog(@"kIOConfigNoEntry\n");						break;
 		case  kIOFireWirePending:					NSLog(@"kIOFireWirePending\n");						break;
@@ -253,15 +254,15 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 		case  kIOFireWireOutOfTLabels:				NSLog(@"kIOFireWireOutOfTLabels\n");				break;
 		case  kIOFireWireBogusDCLProgram:			NSLog(@"kIOFireWireBogusDCLProgram\n");				break;
 		case  kIOFireWireTalkingAndListening:		NSLog(@"kIOFireWireTalkingAndListening\n");			break;
-		//case  kIOFireWireHardwareSlept:			NSLog(@"kIOFireWireHardwareSlept\n");				break;
-		//case  kIOFireWireCompleting:				NSLog(@"kIOFireWireCompleting\n");					break;
+			//case  kIOFireWireHardwareSlept:			NSLog(@"kIOFireWireHardwareSlept\n");				break;
+			//case  kIOFireWireCompleting:				NSLog(@"kIOFireWireCompleting\n");					break;
 		case  kIOFWMessagePowerStateChanged:		NSLog(@"kIOFWMessagePowerStateChanged\n");			break;
-		//case  kIOFWMessageTopologyChanged:		NSLog(@"kIOFWMessageTopologyChanged\n");			break;
-
-
+			//case  kIOFWMessageTopologyChanged:		NSLog(@"kIOFWMessageTopologyChanged\n");			break;
+			
+			
 		default:
 			//NSLog(@"FW Interface message: <%d>\n",messageType);
-		break ;			
+			break ;			
 	}
 }
 
@@ -281,14 +282,14 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	ioaddr.addressHi = address >> 32;
 	ioaddr.addressLo = address & 0xffffffff;  // ak 16.10.07
 	//NSLog(@"write_raw(addr=%llx, hi=%lx, lo=%lx\n", address, ioaddr.addressHi, ioaddr.addressLo);
-
+	
     // Convert to net byte order
 	// ak 16.10.07 
 	int i;
     unsigned long netData[len];
     for (i=0; i<len/sizeof(unsigned long); i++)
-      netData[i] = htonl(theData[i]);
-
+		netData[i] = htonl(theData[i]);
+	
 	[fwLock lock];
 	if(mDevice && serviceAlive && isOpen){
 		IOReturn error = (**mDevice).Write(mDevice, (**mDevice).GetDevice(mDevice), &ioaddr, netData, &len, NO, 0);  
@@ -309,7 +310,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	ioaddr.addressHi = address >> 32;
 	ioaddr.addressLo = address & 0xffffffff;  // ak 16.10.07
 	//NSLog(@"read_raw(addr=%llx, hi=%lx, lo=%lx\n", address, ioaddr.addressHi, ioaddr.addressLo);
-
+	
 	[fwLock lock];	
 	if(mDevice && serviceAlive && isOpen){
 		unsigned long len = 4;
@@ -335,11 +336,11 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	ioaddr.addressHi = address >> 32;
 	ioaddr.addressLo = address & 0xffffffff;  // ak 16.10.07
 	//NSLog(@"read_raw(addr=%llx, hi=%lx, lo=%lx\n", address, ioaddr.addressHi, ioaddr.addressLo);
-
+	
     // Convert to net byte order
     unsigned long netValue;
     netValue = htonl(aValue); // ak 16.10.07
-
+	
 	[fwLock lock];
 	if(mDevice && serviceAlive && isOpen){
 		unsigned long len = 4;
@@ -360,7 +361,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	ioaddr.addressHi = address >> 32;
 	ioaddr.addressLo = address & 0xffffffff;  // ak 16.10.07
 	//NSLog(@"read_raw(addr=%llx, hi=%lx, lo=%lx\n", address, ioaddr.addressHi, ioaddr.addressLo);
-
+	
 	[fwLock lock];
 	if(mDevice && serviceAlive && isOpen){
 		IOReturn error = (**mDevice).Read(mDevice, (**mDevice).GetDevice(mDevice), &ioaddr, theData, &len, NO, 0);    
@@ -377,7 +378,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	// ak 16.10.07 
 	int i;
     for (i=0; i<len/sizeof(unsigned long); i++)
-      theData[i] = ntohl(theData[i]);
+		theData[i] = ntohl(theData[i]);
 	
 	
 }
@@ -437,7 +438,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 }
 
 - (void) getLocalNodeIDWithGeneration:(unsigned long) checkGeneration
-							  localNodeID:(unsigned short*) localNodeID								
+						  localNodeID:(unsigned short*) localNodeID								
 { 
 	[fwLock lock];
 	if(mDevice && serviceAlive && isOpen){
@@ -453,7 +454,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 }
 
 - (void) getRemoteNodeID:(unsigned long) checkGeneration
-				remoteNodeID:(unsigned short*) remoteNodeID								
+			remoteNodeID:(unsigned short*) remoteNodeID								
 { 
 	[fwLock lock];
 	if(mDevice && serviceAlive && isOpen){
@@ -468,7 +469,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 }
 
 - (void) getSpeedToNode:(unsigned long) checkGeneration
-					  speed:(IOFWSpeed*) speed	
+				  speed:(IOFWSpeed*) speed	
 { 
 	[fwLock lock];
 	if(mDevice && serviceAlive && isOpen){
@@ -484,9 +485,9 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 }
 
 - (void) getSpeedBetweenNodes:(unsigned long) checkGeneration
-						srcNodeId:(unsigned long) srcNodeID
-					   destNodeID:(unsigned short) destNodeID
-							speed:(IOFWSpeed*) speed					
+					srcNodeId:(unsigned long) srcNodeID
+				   destNodeID:(unsigned short) destNodeID
+						speed:(IOFWSpeed*) speed					
 {
 	[fwLock lock];
 	if(mDevice && serviceAlive && isOpen){
@@ -513,7 +514,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	unsigned long			size ;
 	
 	NSLog(@"Config ROM for device = %x, service = %x\n", mDevice, [self service]);
-
+	
 	// initialize the address to read from to start of  the Config ROM
 	currentAddress.addressHi = 0xffff;
 	currentAddress.addressLo = 0xf0000400;
@@ -521,7 +522,7 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 	size					 = 4 ;
 	
 	// Read quadlet at current address
-	NS_DURING
+	@try {
 		while(currentAddress.addressLo < 0xf00004BC){
 			IOReturn error = (**mDevice).ReadQuadlet(mDevice, (**mDevice).GetDevice(mDevice), &currentAddress, &readValue, NO, 0);
 	        readValue = ntohl(readValue);
@@ -532,17 +533,18 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 				else								 NSLog(@"\t\t%04X.%08lX:\t%08lX\n", currentAddress.addressHi, currentAddress.addressLo, readValue) ;
 			}
 			else NSLog(@"\t\t\t\t\t\t%08lX\n", readValue) ;
-
+			
 			currentAddress.addressLo += size; // move to next address
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
-
-
+	}
+	@catch(NSException* localException) {
+	}
+	
+	
 	long long guid = 0;
 	currentAddress.addressHi = 0xffff;
 	currentAddress.addressLo = 0xf000040c;
-	NS_DURING
+	@try {
 		unsigned long len = 4;
 		IOReturn error = (**mDevice).Read(mDevice, (**mDevice).GetDevice(mDevice), &currentAddress, &readValue, &len, NO, 0);    
 		readValue = ntohl(readValue);
@@ -560,9 +562,10 @@ NSString* ORFireWireInterfaceIsOpenChanged = @"ORFireWireInterfaceIsOpenChanged"
 		}
 		guid |= readValue;
 		NSLog(@"GUID: 0x%llx\n",guid);
-	NS_HANDLER
-	NS_ENDHANDLER
-
+	}
+	@catch(NSException* localException) {
+	}
+	
 }	
 
 
