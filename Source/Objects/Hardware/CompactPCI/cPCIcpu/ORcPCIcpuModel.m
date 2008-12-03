@@ -62,13 +62,13 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		if(!sbcLink){
 			sbcLink = [[SBC_Link alloc] initWithDelegate:self];
 		}
 		[sbcLink connect];
-	NS_HANDLER
-	NS_ENDHANDLER
+		NS_HANDLER
+	}
 }
 
 - (void) wakeUp 
@@ -143,7 +143,7 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 	[[self undoManager] disableUndoRegistration];
 	
 	[self setReadOutGroup:  [decoder decodeObjectForKey:@"ReadoutGroup"]];
-
+	
 	sbcLink = [[decoder decodeObjectForKey:@"SBC_Link"] retain];
 	if(!sbcLink){
 		sbcLink = [[SBC_Link alloc] initWithDelegate:self];
@@ -220,7 +220,7 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 	SBC_crate_config configStruct;
 	
 	configStruct.total_cards = 0;
-
+	
 	while(obj = [e nextObject]){
 		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
 			index = [obj load_HW_Config_Structure:&configStruct index:index];

@@ -87,9 +87,9 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 				[self updateWindow];
             }
 			[[NSNotificationCenter defaultCenter]
-				postNotificationName:ORModelChangedNotification
-							  object: self 
-							userInfo: nil];
+			 postNotificationName:ORModelChangedNotification
+			 object: self 
+			 userInfo: nil];
         }
     }
 }
@@ -143,12 +143,12 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
                      selector : @selector(documentClosing:)
                          name : ORDocumentClosedNotification
                        object : nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(endAllEditing:)
                          name : NSWindowDidResignKeyNotification
                        object : [self window]];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(isNowKeyWindow:)
                          name : NSWindowDidBecomeKeyNotification
@@ -159,13 +159,13 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
                      selector : @selector(uniqueIDChanged:)
                          name : ORIDChangedNotification
                        object : model];
-
+	
 	[notifyCenter addObserver : self
 					 selector : @selector(warningPosted:)
 						 name : ORWarningPosted
 					   object : model];
-
-
+	
+	
 }
 
 
@@ -333,15 +333,16 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
 - (id)initWithCoder:(NSCoder*)decoder
 {
     NSString* nibName = @"??";
-    NS_DURING
+    @try {
         nibName = [decoder decodeObjectForKey:OROrcaObjectControllerNibName];
         self = [super initWithWindowNibName:nibName];
         [self setWindowFrameAutosaveName:nibName];
         [self setModel:[decoder decodeObjectForKey:OROrcaObjectControllerModel]];
         [[self window] setFrameFromString:[decoder decodeObjectForKey:OROrcaObjectControllerFrame]];
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         NSLog(@"Failed loading: %@\n",nibName);
-    NS_ENDHANDLER
+    }
     return self;
 }
 

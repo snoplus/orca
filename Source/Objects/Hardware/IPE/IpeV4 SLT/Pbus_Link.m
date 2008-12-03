@@ -17,66 +17,67 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark â€¢â€¢â€¢Imported Files
+#pragma mark ¥¥¥Imported Files
 
 #import "Pbus_Link.h"
 
 
 @implementation Pbus_Link
 
-#pragma mark â€¢â€¢â€¢Accessors
+#pragma mark ¥¥¥Accessors
 
 - (void) readLongBlockPbus:(unsigned long *) buffer
-			 atAddress:(unsigned int) aPbusAddress
-			 numToRead:(unsigned int) numberLongs
+				 atAddress:(unsigned int) aPbusAddress
+				 numToRead:(unsigned int) numberLongs
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_IPEv4ReadBlockStruct);
-			
+		
 		SBC_IPEv4ReadBlockStruct* readBlockPtr = (SBC_IPEv4ReadBlockStruct*)aPacket.payload;
 		readBlockPtr->address			= aPbusAddress;
 		readBlockPtr->numItems			= numberLongs;
-
+		
         //NSLog(@"Addr = %08x, n=%d\n", readBlockPtr->address, readBlockPtr->numItems);
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket];	//write the packet
         NSLog(@"-tb- Sending a packet, waiting for response ...\n");
 		[self read:socketfd buffer:&aPacket];		//read the response
         NSLog(@"-tb- Got the response ...\n");
-				
+		
 		SBC_IPEv4ReadBlockStruct* rp = (SBC_IPEv4ReadBlockStruct*)aPacket.payload;
         NSLog(@"Addr = %08x, n=%d (err=%d)\n", rp->address, rp->numItems, rp->errorCode);
-
+		
 		if(!rp->errorCode){		
 			int num = rp->numItems;
-
+			
 			rp++;
 			memcpy(buffer,rp,num*sizeof(long));
             NSLog(@"n=%d: %08x\n", num, buffer[0]);
 		}
 		else [self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
 
 - (void) writeLongBlockPbus:(unsigned long *) buffer
-			  atAddress:(unsigned int) aPbusAddress
-			 numToWrite:(unsigned int) numberLongs
+				  atAddress:(unsigned int) aPbusAddress
+				 numToWrite:(unsigned int) numberLongs
 {
-
-	NS_DURING
+	
+	@try {
 		[socketLock lock]; //begin critical section
-
+		
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
@@ -87,7 +88,7 @@
 		writeBlockPtr->numItems			= numberLongs;
 		writeBlockPtr++;				//point to the payload
 		memcpy(writeBlockPtr,buffer,numberLongs*sizeof(long));
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket];	//write the packet
 		[self read:socketfd buffer:&aPacket];		//read the response
@@ -95,11 +96,12 @@
 		SBC_IPEv4ReadBlockStruct* rp = (SBC_IPEv4ReadBlockStruct*)aPacket.payload;
 		if(rp->errorCode)[self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
-
+	}
+	
 }
 
 

@@ -117,7 +117,7 @@
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
+	
     [super registerNotificationObservers];
     [notifyCenter addObserver : self
 					 selector : @selector(fileNameChanged:)
@@ -169,7 +169,7 @@
 		eCPU_MAC_DualPortComm communicationBlock = [model communicationBlock];
 		SCBHeader 			  cbHeader 			 = [model cbControlBlockHeader];
 		eCPUDualPortControl   dualPortControl 	 = [model dualPortControl];
-
+		
 		NSMutableString* s1 =  [NSMutableString stringWithFormat:@"Heart beat     : %-12d   Status  : %-d\n",communicationBlock.heartbeat,communicationBlock.ecpu_status];
 		[s1 appendFormat:@"CB Head        : 0x%-10x   Debug   : %-d\n",cbHeader.qHead,dualPortControl.ecpu_dbg_level];
 		[s1 appendFormat:@"CB Tail        : 0x%-10x   Errors  : %-d\n",cbHeader.qTail,communicationBlock.tot_err_cnt];
@@ -223,35 +223,38 @@
 
 - (IBAction) download:(id)sender
 {
-	NS_DURING
+	@try {
 		[model downloadUserCode];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception thrown trying to download user code.\n");
 		NSRunAlertPanel([localException name], @"%@\nCould not download.", @"OK", nil, nil,
 						localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) start:(id)sender
 {
-	NS_DURING
+	@try {
 		[model startUserCodeWithRetries:0];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception thrown trying to start user code.\n");
 		NSRunAlertPanel([localException name], @"%@\nCould not start user code.", @"OK", nil, nil,
 						localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) stop:(id)sender
 {
-	NS_DURING
+	@try {
 		[model stopUserCode];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception thrown trying to stop user code.\n");
 		NSRunAlertPanel([localException name], @"%@\nCould not stop user code.", @"OK", nil, nil,
 						localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (IBAction) setUpdateIntervalAction:(id)sender
@@ -273,7 +276,7 @@
 
 - (IBAction) dump:(id)sender
 {
-    NS_DURING
+    @try {
 		unsigned long startAddress = 0;
 		unsigned long numBytes = 0;
 		NSData* buffer = nil;
@@ -301,22 +304,24 @@
 			[hexView replaceCharactersInRange:NSMakeRange([[hexView string] length], 0) withString:lineString];
 			if(offset >= numBytes) break;
 		}
-		NS_HANDLER
-			NSLog(@"Could not dump memory from eCPU.\n");
-			NSRunAlertPanel([localException name], @"%@\nCould not dump memory from eCPU.", @"OK", nil, nil,
-							localException);
-		NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Could not dump memory from eCPU.\n");
+		NSRunAlertPanel([localException name], @"%@\nCould not dump memory from eCPU.", @"OK", nil, nil,
+						localException);
+	}
 }
 
 - (IBAction) verifyCodeAction:(id)sender
 {
-    NS_DURING
+    @try {
 		[model verifyCode];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
 		NSLog(@"Could not dump memory from eCPU.\n");
 		NSRunAlertPanel([localException name], @"%@\nCould not dump memory from eCPU.", @"OK", nil, nil,
 						localException);
-    NS_ENDHANDLER
+    }
 	
 }
 

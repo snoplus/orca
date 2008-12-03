@@ -106,7 +106,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setStepTime:stepTime];
     
     stepTime = aStepTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelStepTimeChanged object:self];
 }
 
@@ -123,7 +123,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setOvershoot:overshoot];
     
     overshoot = aOvershoot;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelOvershootChanged object:self];
 }
 
@@ -136,7 +136,7 @@ NSString* OReGunLock = @"OReGunLock";
 {
     [stateString autorelease];
     stateString = [aStateString copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelStateStringChanged object:self];
 }
 
@@ -152,7 +152,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setDecayTime:decayTime];
     
     decayTime = aDecayTime;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelDecayTimeChanged object:self];
 }
 
@@ -165,10 +165,10 @@ NSString* OReGunLock = @"OReGunLock";
 {
  	if(aDecayRate<=1)aDecayRate=1;
 	else if(aDecayRate>99)aDecayRate = 99;
-   [[[self undoManager] prepareWithInvocationTarget:self] setDecayRate:decayRate];
+	[[[self undoManager] prepareWithInvocationTarget:self] setDecayRate:decayRate];
     
     decayRate = aDecayRate;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelDecayRateChanged object:self];
 }
 
@@ -184,7 +184,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setExcursion:excursion];
     
     excursion = aExcursion;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelExcursionChanged object:self];
 }
 
@@ -198,7 +198,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setViewType:viewType];
     
     viewType = aViewType;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelViewTypeChanged object:self];
 }
 
@@ -216,7 +216,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setMillimetersPerVolt:millimetersPerVolt];
     
     millimetersPerVolt = aMillimetersPerVolt;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelMillimetersPerVoltChanged object:self];
 }
 
@@ -230,7 +230,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setChanY:chanY];
 	if(aChanY>15)aChanY=15;
     chanY = aChanY;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelChanYChanged object:self];
 }
 
@@ -245,7 +245,7 @@ NSString* OReGunLock = @"OReGunLock";
     
 	if(chanX>15)chanX=15;
     chanX = aChanX;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelChanXChanged object:self];
 }
 
@@ -261,7 +261,7 @@ NSString* OReGunLock = @"OReGunLock";
 		if(!moving){
 			[self performSelector:@selector(resetTrackAndNotify) withObject:nil afterDelay:.3];
 			[self setStateString:@""];
-
+			
 		}
         [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelMovingChanged object:self];
     }
@@ -294,7 +294,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setAbsMotion:absMotion];
     
     absMotion = aAbsMotion;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelAbsMotionChanged object:self];
 }
 
@@ -308,7 +308,7 @@ NSString* OReGunLock = @"OReGunLock";
     [[[self undoManager] prepareWithInvocationTarget:self] setCmdPosition:cmdPosition];
     
     cmdPosition = aCmdPosition;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:OReGunModelCmdPositionChanged object:self];
 }
 
@@ -316,25 +316,27 @@ NSString* OReGunLock = @"OReGunLock";
 - (NSPoint) xyVoltage
 {
 	NSPoint xyVoltage;
-	NS_DURING
+	@try {
 		float x = 0;
 		float y = 0;
 		if([x220Object hwObject])x = [x220Object outputVoltage:chanX];
 		if([y220Object hwObject])y = [y220Object outputVoltage:chanY];
 		xyVoltage = NSMakePoint(x, y);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		xyVoltage = NSZeroPoint;
-	NS_ENDHANDLER
+	}
     return xyVoltage;
 }
 
 - (void) setXyVoltage:(NSPoint)aPoint
 {
-	NS_DURING
+	@try {
 		[x220Object setOutputVoltage:chanX withValue:aPoint.x - 0.01*aPoint.y];
 		[y220Object setOutputVoltage:chanY withValue:aPoint.y - 0.01*aPoint.x];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) updateTrack
@@ -367,7 +369,7 @@ NSString* OReGunLock = @"OReGunLock";
 	x220Object = [[decoder decodeObjectForKey: @"x220Object"] retain];
 	y220Object = [[decoder decodeObjectForKey: @"y220Object"] retain];
 	[[self undoManager] enableUndoRegistration];
-
+	
 	return self;
 }
 - (void) encodeWithCoder:(NSCoder*)encoder
@@ -391,13 +393,14 @@ NSString* OReGunLock = @"OReGunLock";
 #pragma mark ***eGun Commands
 - (void) getPosition
 {
-	NS_DURING
+	@try {
 		[x220Object readBoard];
 		if([x220Object hwObject] != [y220Object hwObject]){
 			[y220Object readBoard];
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	
 }
 
@@ -420,7 +423,7 @@ NSString* OReGunLock = @"OReGunLock";
 	NSPoint currentPt	= [self xyVoltage];
 	NSPoint delta 		= NSMakePoint((0 - currentPt.x)*overshoot/100.,(0 - currentPt.y)*overshoot/100.);
 	NSPoint newPt		= NSMakePoint(0 + delta.x,0 + delta.y);
-
+	
 	[self setXyVoltage:newPt];
 	[self loadBoard];
 	[self updateTrack];
@@ -503,7 +506,7 @@ NSString* OReGunLock = @"OReGunLock";
 		[self setMoving:NO];
 		[self setStateString:@""];
 		//NSPoint currentPosition = [self xyVoltage];
-
+		
 		[self setXyVoltage:goalPosition];
 		[self loadBoard];
 		[self updateTrack];
@@ -542,7 +545,7 @@ NSString* OReGunLock = @"OReGunLock";
 	[[self undoManager] disableUndoRegistration];
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(processDegauss) object:nil];
-
+	
 	if(firstPoint){
 		NSPoint newPt		= NSMakePoint(degaussPosition.x + [self excursion]/millimetersPerVolt,degaussPosition.y + [self excursion]/millimetersPerVolt);
 		[self setXyVoltage:newPt];
@@ -553,7 +556,7 @@ NSString* OReGunLock = @"OReGunLock";
 		NSPoint currentPt	= [self xyVoltage];
 		NSPoint delta 		= NSMakePoint((degaussPosition.x - currentPt.x)*[self decayRate]/100.,(degaussPosition.y - currentPt.y)*[self decayRate]/100.);
 		NSPoint newPt		= NSMakePoint(degaussPosition.x + delta.x,degaussPosition.y + delta.y);
-
+		
 		if(fabs(delta.x*millimetersPerVolt) > .5){
 			[self setXyVoltage:newPt];
 			[self performSelector:@selector(processDegauss) withObject:nil afterDelay:[self decayTime]];
@@ -562,25 +565,26 @@ NSString* OReGunLock = @"OReGunLock";
 			[self setXyVoltage:degaussPosition];
 			[self setMoving:NO];		
 		}
-
+		
 	}
 	
 	[self updateTrack];
 	[self loadBoard];
 	
 	[[self undoManager] enableUndoRegistration];
-
+	
 }
 
 - (void) loadBoard
 {
-	NS_DURING
+	@try {
 		[x220Object initBoard];
 		if([x220Object hwObject] != [y220Object hwObject]){
 			[y220Object initBoard];
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
-
+	}
+	@catch(NSException* localException) {
+	}
+	
 }
 @end

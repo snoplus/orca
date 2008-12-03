@@ -58,17 +58,17 @@ const struct {
 	NSString* message;
 	
 } ecpu_err[]={
-	{ER_NOERROR,		 	@"---"}, 						// no error
-	{ER_NOT_A_167,		 	@"HW Requires a MVME167"},		// Not a VME167 eCPU
-    {ER_CB_FULL,		 	@"DPM CB FULL. "},		
-	{ER_NO_CARDS,		 	@"Invalid Number of Unique HW Cards "},
-	{ER_CHKSUM_CARDS,	 	@"Invalid Total number of HW Cards "},
-	{ER_RD_ERR,			 	@"HW Rd Err"},
-	{ER_WR_ERR,			 	@"HW Wr Err"},		
-	{MSG_GEN,			 	@"Generic"},		
-	{CB_WRITE_DONE,		 	@"CB Write Done"},			
-	{MSG_RD,				@"HW Read"},			
-	{MSG_WR,				@"HW Write"},			
+{ER_NOERROR,		 	@"---"}, 						// no error
+{ER_NOT_A_167,		 	@"HW Requires a MVME167"},		// Not a VME167 eCPU
+{ER_CB_FULL,		 	@"DPM CB FULL. "},		
+{ER_NO_CARDS,		 	@"Invalid Number of Unique HW Cards "},
+{ER_CHKSUM_CARDS,	 	@"Invalid Total number of HW Cards "},
+{ER_RD_ERR,			 	@"HW Rd Err"},
+{ER_WR_ERR,			 	@"HW Wr Err"},		
+{MSG_GEN,			 	@"Generic"},		
+{CB_WRITE_DONE,		 	@"CB Write Done"},			
+{MSG_RD,				@"HW Read"},			
+{MSG_WR,				@"HW Write"},			
 };
 
 
@@ -168,8 +168,8 @@ const struct {
 	fileName = [aFile copy];
     
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName:OReCPU147FileNameChanged
-						  object:self];
+	 postNotificationName:OReCPU147FileNameChanged
+	 object:self];
 	
 }
 
@@ -219,8 +219,8 @@ const struct {
 	updateInterval=newUpdateInterval;
     
     [[NSNotificationCenter defaultCenter]
-		postNotificationName:OReCPU147UpdateIntervalChangedNotification
-                      object: self];
+	 postNotificationName:OReCPU147UpdateIntervalChangedNotification
+	 object: self];
     
 	[self update];
 }
@@ -252,7 +252,7 @@ const struct {
 {
     
 	int tryCount = 0;
-	NS_DURING
+	@try {
         BOOL successfullyStarted = NO; //assume the worst
 		do {
             
@@ -314,30 +314,31 @@ const struct {
             eCpuNoStartAlarm = nil;
         }
         
-        NS_HANDLER
-            NSLog(@"Could not start user code in eCPU.\n");
-            NSLog(@"You may have to do a VME sysReset or push the reset button on the eCPU front panel.\n");
-            if(!eCpuNoStartAlarm){
-                eCpuNoStartAlarm = [[ORAlarm alloc] initWithName:@"eCPU didn't start" severity:kRunInhibitorAlarm];
-                [eCpuNoStartAlarm setSticky:YES];
-                [eCpuNoStartAlarm setHelpStringFromFile:@"eCPUNoStartHelp"];
-            }
-            if(![eCpuNoStartAlarm isPosted]){
-                [eCpuNoStartAlarm setAcknowledged:NO];
-                [eCpuNoStartAlarm postAlarm];
-            }
-            [[NSNotificationCenter defaultCenter]
-            postNotificationName:@"forceRunStopNotification"
-                          object:self];
-            
-            //[localException raise];
-        NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Could not start user code in eCPU.\n");
+		NSLog(@"You may have to do a VME sysReset or push the reset button on the eCPU front panel.\n");
+		if(!eCpuNoStartAlarm){
+			eCpuNoStartAlarm = [[ORAlarm alloc] initWithName:@"eCPU didn't start" severity:kRunInhibitorAlarm];
+			[eCpuNoStartAlarm setSticky:YES];
+			[eCpuNoStartAlarm setHelpStringFromFile:@"eCPUNoStartHelp"];
+		}
+		if(![eCpuNoStartAlarm isPosted]){
+			[eCpuNoStartAlarm setAcknowledged:NO];
+			[eCpuNoStartAlarm postAlarm];
+		}
+		[[NSNotificationCenter defaultCenter]
+		 postNotificationName:@"forceRunStopNotification"
+		 object:self];
+		
+		//[localException raise];
+	}
 }
 
 
 - (void) stopUserCode
 {
-	NS_DURING
+	@try {
         
 		int i;
 		for(i=0;i<6;i++){
@@ -370,11 +371,12 @@ const struct {
 		}
         
 		NSLog(@"eCPU code stopped. File: <%@>\n",fileName);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Exception thrown trying to stop user code.\n");
 		NSRunAlertPanel([localException name], @"%@\nCould not stop user code in eCPU.", @"OK", nil, nil,
                         localException);
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -430,7 +432,7 @@ const struct {
 {
 	double t0;
 	
-	NS_DURING
+	@try {
 		
 		NSData *theCodeData = [self codeAsData];
 		codeLength = *((unsigned long*)[theCodeData bytes] + 0x100/4);
@@ -483,10 +485,11 @@ const struct {
 			}
 		}
 		NSLog(@"Comparison of eCPU memory and file shows %d Errors\n",errors);
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Could not download eCpu code. Vme exception.\n");
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (NSData*) codeAsData
@@ -595,29 +598,29 @@ const struct {
 	//else {
 	//	NSLog(@"eCPU code download skipped for quickstart\n");
 	//}
-
+	
     //zero out the critical data structures in the DPM. Note that the eCPU is not
     //running at this time.
 	memset(&communicationBlock,0,sizeof(eCPU_MAC_DualPortComm));
 	memset(&dualPortControl,0,sizeof(eCPUDualPortControl));
-
+	
     [[self adapter] writeLongBlock:(unsigned long*)&communicationBlock
                          atAddress:MAC_DPM(COMM_ADDRESS_START)
                         numToWrite:sizeof(eCPU_MAC_DualPortComm)/4
                         withAddMod:0x09
                      usingAddSpace:kAccessRemoteDRAM];
-
+	
 	[[self adapter] writeLongBlock:(unsigned long*)&dualPortControl
                          atAddress:MAC_DPM(CONTROL_ADDRESS_START)
                         numToWrite:sizeof(eCPUDualPortControl)/sizeof(long)
                         withAddMod:0x09
                      usingAddSpace:kAccessRemoteDRAM];
-
+	
     //load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
-
+	
     startedCode = NO;    
-
+	
 	if(![self circularBufferReader]){
 		ORCircularBufferReader* cb = [[ORCircularBufferReader alloc] init];
 		[self setCircularBufferReader:cb];
@@ -625,11 +628,11 @@ const struct {
 		[cb clear];
 		[cb release];
 	}
-
+	
 	[eCpuDeadAlarm clearAlarm];
 	missedHeartBeat = 0;
 	isRunning = YES;
-
+	
 	[self update];
 }
 
@@ -640,8 +643,8 @@ const struct {
             if(!lastQueUpdate || fabs([lastQueUpdate timeIntervalSinceNow]) > 1){
                 [self setLastQueUpdate:[NSDate date]];
                 [[NSNotificationCenter defaultCenter]
-                    postNotificationName:OReCPU147QueChanged
-                                  object:self];
+				 postNotificationName:OReCPU147QueChanged
+				 object:self];
                 
             }
         }
@@ -669,8 +672,8 @@ const struct {
 	[circularBufferReader runTaskStopped:aDataPacket userInfo:(id)userInfo];
     
 	[[NSNotificationCenter defaultCenter]
-		postNotificationName:OReCPU147QueChanged
-                      object:self];
+	 postNotificationName:OReCPU147QueChanged
+	 object:self];
     
     
     NSEnumerator* e = [dataTakers objectEnumerator];
@@ -753,7 +756,7 @@ static NSString *OReCPUReadOutGroup1		= @"OReCPU ReadOut Group 1";
 {
 	[[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(update) object:nil];
     
-	NS_DURING
+	@try {
 		[[self adapter] readLongBlock:(unsigned long*)&communicationBlock
                             atAddress:MAC_DPM(COMM_ADDRESS_START)
                             numToRead:sizeof(eCPU_MAC_DualPortComm)/4
@@ -787,18 +790,19 @@ static NSString *OReCPUReadOutGroup1		= @"OReCPU ReadOut Group 1";
         
         
         
-        NS_HANDLER
-            memset(&communicationBlock,0,sizeof(eCPU_MAC_DualPortComm));
-        NS_ENDHANDLER
-        
-        [[NSNotificationCenter defaultCenter]
-			postNotificationName:OReCPU147StructureUpdated
-						  object:self];
-        
-        
-        if([self updateInterval] && isRunning){
-            [self performSelector:@selector(update) withObject:nil afterDelay:[self updateInterval]];
-        }
+	}
+	@catch(NSException* localException) {
+		memset(&communicationBlock,0,sizeof(eCPU_MAC_DualPortComm));
+	}
+	
+	[[NSNotificationCenter defaultCenter]
+	 postNotificationName:OReCPU147StructureUpdated
+	 object:self];
+	
+	
+	if([self updateInterval] && isRunning){
+		[self performSelector:@selector(update) withObject:nil afterDelay:[self updateInterval]];
+	}
 }
 
 - (void) incDebugLevel
@@ -889,7 +893,7 @@ static NSString *OReCPUReadOutGroup1		= @"OReCPU ReadOut Group 1";
 		case 0: if(communicationBlock.msg_parm0[an_Index]!=0){
             [aString appendFormat:@" [%@]",[[[NSString alloc] initWithBytes:&communicationBlock.msg_parm0[an_Index] length:4 encoding:NSASCIIStringEncoding]autorelease]];
         }
-            else [aString appendFormat:@" [%d]",communicationBlock.msg_parm0[an_Index]];
+		else [aString appendFormat:@" [%d]",communicationBlock.msg_parm0[an_Index]];
             break;
 		case 1: [aString appendFormat:@" [%d]",communicationBlock.msg_parm1[an_Index]];break;
 		case 2: [aString appendFormat:@" [%d]",communicationBlock.msg_parm2[an_Index]];break;
@@ -905,7 +909,7 @@ static NSString *OReCPUReadOutGroup1		= @"OReCPU ReadOut Group 1";
 		case 0: if(communicationBlock.er_parm0[an_Index]!=0){
             [aString appendFormat:@" [%@]",[[[NSString alloc] initWithBytes:&communicationBlock.er_parm0[an_Index] length:4 encoding:NSASCIIStringEncoding]autorelease]];
         }
-            else [aString appendFormat:@" [%d]",communicationBlock.er_parm0[an_Index]];
+		else [aString appendFormat:@" [%d]",communicationBlock.er_parm0[an_Index]];
             break;
 		case 1: [aString appendFormat:@" [%d]",communicationBlock.er_parm1[an_Index]];break;
 		case 2: [aString appendFormat:@" [%d]",communicationBlock.er_parm2[an_Index]];break;
