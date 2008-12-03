@@ -74,7 +74,7 @@
     int addressOffset[4]={0x0080,0x0180,0x0280,0x0380};
     
     int i = [self slotConv];
-    NS_DURING
+    @try {
         unsigned char ipac[5];
         strncpy((char*)ipac,"\0",5);
         [[self adapter] readByteBlock:&ipac[0] atAddress:[guardian baseAddress]+addressOffset[i]+0x1
@@ -82,28 +82,29 @@
         
         [[self adapter] readByteBlock:&ipac[1] atAddress:[guardian baseAddress]+addressOffset[i]+0x3
                             numToRead:1 withAddMod:[guardian addressModifier] usingAddSpace:0x01];
-
+		
         [[self adapter] readByteBlock:&ipac[2] atAddress:[guardian baseAddress]+addressOffset[i]+0x5
                             numToRead:1 withAddMod:[guardian addressModifier] usingAddSpace:0x01];
-                            
+		
         [[self adapter] readByteBlock:&ipac[3] atAddress:[guardian baseAddress]+addressOffset[i]+0x7
                             numToRead:1 withAddMod:[guardian addressModifier] usingAddSpace:0x01];
-
+		
         unsigned char manufacturerCode = 0;
         [[self adapter] readByteBlock:&manufacturerCode atAddress:[guardian baseAddress]+addressOffset[i]+0x9
                             numToRead:1 withAddMod:[guardian addressModifier] usingAddSpace:0x01];
-
+		
         unsigned char modelCode = 0;
         [[self adapter] readByteBlock:&modelCode atAddress:[guardian baseAddress]+addressOffset[i]+0x0b
                             numToRead:1 withAddMod:[guardian addressModifier] usingAddSpace:0x01];
-
+		
         if(!strcmp((const char*)ipac,"IPAC"))NSLog(@"%@ %s Manufacturer Code: 0x%x  Model Code: 0x%x\n",[self identifier],ipac,manufacturerCode,modelCode);
         else NSLog(@"%@ ID Prom appears to contain garbage.\n",[self identifier]);
-
-    NS_HANDLER
+		
+    }
+	@catch(NSException* localException) {
         NSLog(@"%@ raised exception during probe. gion probably empty.\n",[self identifier]);
-    NS_ENDHANDLER
-
+    }
+	
 }
 
 

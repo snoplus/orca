@@ -70,13 +70,14 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		if(!sbcLink){
 			sbcLink = [[SBC_Link alloc] initWithDelegate:self];
 		}
 		[sbcLink connect];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 #pragma mark ¥¥¥Accessors
@@ -148,7 +149,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	[[self undoManager] disableUndoRegistration];
 	
 	[self setReadOutGroup:  [decoder decodeObjectForKey:@"ReadoutGroup"]];
-
+	
 	sbcLink = [[decoder decodeObjectForKey:@"SBC_Link"] retain];
 	if(!sbcLink){
 		sbcLink = [[SBC_Link alloc] initWithDelegate:self];
@@ -175,10 +176,10 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	dataTakers = [[readOutGroup allObjects] retain];									//cache of data takers.
-
+	
 	NSMutableDictionary* extraUserInfo = [NSMutableDictionary dictionaryWithDictionary:userInfo];		
     [extraUserInfo setObject:[NSNumber numberWithBool:YES] forKey:kSBCisDataTaker];		//tell our objects that ORCA is NOT the dataTaker
-
+	
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
     while(obj = [e nextObject]){
@@ -240,17 +241,17 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 {
     unsigned long registerRead = 0x0;
     [self readLongBlock:&registerRead 
-            atAddress:0x404 
-            numToRead:1
-            withAddMod:0x39
-            usingAddSpace:0xFFFF];
+			  atAddress:0x404 
+			  numToRead:1
+			 withAddMod:0x39
+		  usingAddSpace:0xFFFF];
     registerRead |= 0x404000;
     
     [self writeLongBlock:&registerRead
-            atAddress:0x404 
-            numToWrite:1
-            withAddMod:0x39
-            usingAddSpace:0xFFFF];
+			   atAddress:0x404 
+			  numToWrite:1
+			  withAddMod:0x39
+		   usingAddSpace:0xFFFF];
     
     NSLog(@"VmecpuModel (crate: %d, card: %d): Performed SYSRESET.\n", [self crateNumber], [self slot]);
 }
@@ -263,7 +264,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	SBC_crate_config configStruct;
 	
 	configStruct.total_cards = 0;
-
+	
 	while(obj = [e nextObject]){
 		if([obj respondsToSelector:@selector(load_HW_Config_Structure:index:)]){
 			index = [obj load_HW_Config_Structure:&configStruct index:index];
@@ -284,10 +285,10 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readLongBlock:readAddress
-					atAddress:vmeAddress
-					numToRead:numberLongs
-				   withAddMod:anAddressModifier
-				usingAddSpace:anAddressSpace];
+				 atAddress:vmeAddress
+				 numToRead:numberLongs
+				withAddMod:anAddressModifier
+			 usingAddSpace:anAddressSpace];
 }
 
 -(void) writeLongBlock:(unsigned long *) writeAddress
@@ -300,17 +301,17 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink writeLongBlock:writeAddress
-					 atAddress:vmeAddress
-					numToWrite:numberLongs
-					withAddMod:anAddressModifier
-				 usingAddSpace:anAddressSpace];
+				  atAddress:vmeAddress
+				 numToWrite:numberLongs
+				 withAddMod:anAddressModifier
+			  usingAddSpace:anAddressSpace];
 	
 }
 
-	/* readLong is for reading a long from a single address 
-	   so that the address never changes, i.e. it does not
-	   auto-increment.  We use a specific address space to
-	   do this: 0xFF. */
+/* readLong is for reading a long from a single address 
+ so that the address never changes, i.e. it does not
+ auto-increment.  We use a specific address space to
+ do this: 0xFF. */
 -(void) readLong:(unsigned long *) readAddress
 	   atAddress:(unsigned int) vmeAddress
 	 timesToRead:(unsigned int) numberLongs
@@ -321,10 +322,10 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readLongBlock:readAddress
-			   atAddress:vmeAddress
-			   numToRead:numberLongs
-			  withAddMod:anAddressModifier
-		   usingAddSpace:0xFF];
+				 atAddress:vmeAddress
+				 numToRead:numberLongs
+				withAddMod:anAddressModifier
+			 usingAddSpace:0xFF];
 }
 
 -(void) readByteBlock:(unsigned char *) readAddress
@@ -337,10 +338,10 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readByteBlock:readAddress
-					atAddress:vmeAddress
-					numToRead:numberBytes
-				   withAddMod:anAddressModifier
-				usingAddSpace:anAddressSpace];
+				 atAddress:vmeAddress
+				 numToRead:numberBytes
+				withAddMod:anAddressModifier
+			 usingAddSpace:anAddressSpace];
 	
 }
 
@@ -354,10 +355,10 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink writeByteBlock:writeAddress
-					 atAddress:vmeAddress
-					numToWrite:numberBytes
-					withAddMod:anAddressModifier
-				 usingAddSpace:anAddressSpace];
+				  atAddress:vmeAddress
+				 numToWrite:numberBytes
+				 withAddMod:anAddressModifier
+			  usingAddSpace:anAddressSpace];
 	
 }
 
@@ -372,10 +373,10 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readWordBlock:readAddress
-					atAddress:vmeAddress
-					numToRead:numberWords
-				   withAddMod:anAddressModifier
-				usingAddSpace:anAddressSpace];
+				 atAddress:vmeAddress
+				 numToRead:numberWords
+				withAddMod:anAddressModifier
+			 usingAddSpace:anAddressSpace];
 	
 }
 
@@ -389,10 +390,10 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		[NSException raise:@"Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink writeWordBlock:writeAddress
-					 atAddress:vmeAddress
-					numToWrite:numberWords
-					withAddMod:anAddressModifier
-				 usingAddSpace:anAddressSpace];
+				  atAddress:vmeAddress
+				 numToWrite:numberWords
+				 withAddMod:anAddressModifier
+			  usingAddSpace:anAddressSpace];
 }
 
 @end

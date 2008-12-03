@@ -1,11 +1,11 @@
 /*
-	File:		ORUSBInterface.m
-
-	Synopsis: 	ObjC class to represent an device on the USB bus. Corresponds
-				to IOUSBDeviceInterface.
-
-	Note: converted to ObjC from the C++ version in Apples example code.
-*/
+ File:		ORUSBInterface.m
+ 
+ Synopsis: 	ObjC class to represent an device on the USB bus. Corresponds
+ to IOUSBDeviceInterface.
+ 
+ Note: converted to ObjC from the C++ version in Apples example code.
+ */
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -162,7 +162,7 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 		(*interface)->Release(interface);
 	}
 	interface = anInterface;
-
+	
 	if(interface){
 		IOReturn kr = (*interface)->USBInterfaceOpen(interface);
 		NSLog(@"Open: 0x%x\n",kr);
@@ -183,12 +183,12 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 		
 		//(*interface)->ResetPipe(interface,outPipe);
 		//(*interface)->ResetPipe(interface,inPipe);
-
+		
 		//startUp Interrupt handling
 		//UInt32 numBytesRead = sizeof(_recieveBuffer); // leave one byte at the end for NUL termination
 		//bzero(&_recieveBuffer, numBytesRead);
 		//kr = (*interface)->ReadPipeAsync(interface, inPipe, &_recieveBuffer, numBytesRead, (IOAsyncCallback1)_interruptRecieved, self);
-	   
+		
 		//if (kIOReturnSuccess != kr) {
 		//	NSLog(@"unable to do async interrupt read (%08x)\n", kr);
 		//	(void) (*interface)->USBInterfaceClose(interface);
@@ -207,14 +207,14 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 			goto readon;
         }
     }
-   
+	
 readon:
     bzero(receiveBuffer, 1024);
     kr = (*interface)->ReadPipeAsync(interface, inPipe, receiveBuffer, 1024, (IOAsyncCallback1)_interruptRecieved, self);
     if (kIOReturnSuccess != kr) {
         NSLog(@"unable to do async interrupt read (%08x). this means the card is stopped!\n", kr);
     }
-       
+	
 }
 
 
@@ -229,7 +229,7 @@ readon:
 	UInt8 pipe = outPipe;
 	if(transferType == kUSBBulk)		 pipe = outPipe;
 	else if(transferType == kUSBInterrupt) pipe = interruptOutPipe;
-
+	
 	char* p = (char*)[aCommand cStringUsingEncoding:NSASCIIStringEncoding];
 	IOReturn kr = (*interface)->WritePipe(interface, pipe, p, strlen(p));
 	if(kr)	{
@@ -241,14 +241,14 @@ readon:
 
 - (void) writeUSB488Command:(NSString*)aCommand eom:(BOOL)eom
 {
-
+	
 	[usbLock lock];
-	NS_DURING
+	@try {
 		char buffer[512];
 		USB488Header* hp;
-
+		
 		unsigned int commandLength =  [aCommand length];
-
+		
 		unsigned long unpaddedLength = commandLength + sizeof(USB488Header);
 		unsigned long paddedLength;
 		if(unpaddedLength%4 != 0){
@@ -257,10 +257,10 @@ readon:
 		else {
 			paddedLength = unpaddedLength;
 		}
-
+		
 		if(paddedLength%4!=0)NSLog(@"USB command NOT padded to long word size\n");
 		memset(buffer,0,paddedLength);
-
+		
 		hp = (USB488Header*)buffer;
 		hp->messageID = 0x01;
 		hp->bTag = tag;
@@ -268,15 +268,16 @@ readon:
 		hp->transferLength = CFSwapInt32HostToLittle(commandLength);
 		hp->eom = eom; //1 == last byte is end of message
 		tag++;
-
+		
 		strncpy(&buffer[sizeof(USB488Header)],[aCommand cStringUsingEncoding:NSASCIIStringEncoding],commandLength);
-
+		
 		[self writeBytes:buffer length:paddedLength];
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[usbLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
-
+	}
+	
 	[usbLock unlock];
 }
 
@@ -315,7 +316,7 @@ readon:
 {
 	int bytesRead = 0;
 	[usbLock lock];
-	NS_DURING
+	@try {
 		char buffer[512];
 		USB488Header* hp = (USB488Header*)buffer;
 		unsigned long len = 512;
@@ -334,10 +335,11 @@ readon:
 		if(bytesRead>sizeof(USB488Header)){
 			memcpy(resultData,&buffer[sizeof(USB488Header)],bytesRead - sizeof(USB488Header));
 		}
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		[usbLock unlock];
 		[localException raise];
-	NS_ENDHANDLER
+	}
 	[usbLock unlock];
 	return bytesRead;
 }
@@ -506,23 +508,23 @@ readon:
 {
 	NSString* s = [NSString stringWithFormat:@"HW Object: %@\n",deviceName];
 	if(registeredObject){
-			  s = [s stringByAppendingFormat:@"SW Object: %@\n",[registeredObject className]];
+		s = [s stringByAppendingFormat:@"SW Object: %@\n",[registeredObject className]];
 	}
 	else      s = [s stringByAppendingString:@"SW Object: ---\n"];
-			  s = [s stringByAppendingFormat:@"Location : 0x%x\n",locationID];
+	s = [s stringByAppendingFormat:@"Location : 0x%x\n",locationID];
 	if(serialNumber){
-			  s = [s stringByAppendingFormat:@"Serial # : %@\n",serialNumber];
+		s = [s stringByAppendingFormat:@"Serial # : %@\n",serialNumber];
 	}
 	if(inPipe){
-			  s = [s stringByAppendingFormat:@"In Pipe  : 0x%x\n",inPipe];
+		s = [s stringByAppendingFormat:@"In Pipe  : 0x%x\n",inPipe];
 	}
 	else	  s = [s stringByAppendingString:@"In Pipe  : ?\n"];
 	if(outPipe){
-			  s = [s stringByAppendingFormat:@"Out Pipe : 0x%x\n",outPipe];
+		s = [s stringByAppendingFormat:@"Out Pipe : 0x%x\n",outPipe];
 	}
 	else	  s = [s stringByAppendingString:@"Out Pipe : ?\n"];
 	if(controlPipe){
-			  s = [s stringByAppendingFormat:@"Control Pipe : 0x%x\n",outPipe];
+		s = [s stringByAppendingFormat:@"Control Pipe : 0x%x\n",outPipe];
 	}
 	else	  s = [s stringByAppendingString:@"Control Pipe : ?\n"];
 	return s;

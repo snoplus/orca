@@ -56,13 +56,13 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 	while(intf = [e nextObject]){
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfaceRemoved object:self userInfo:nil];
 	}
-
+	
 	e = [devices objectEnumerator];
 	id device;
 	while(device = [e nextObject]){
 		[[NSNotificationCenter defaultCenter] removeObserver:device];
 	}
-
+	
 	[devices release];
 	[interfaces release];
 	if(_deviceAddedIter)IOObjectRelease(_deviceAddedIter);
@@ -73,14 +73,15 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 
 - (void) awakeAfterDocumentLoaded
 {	
-	NS_DURING
+	@try {
 		NSArray* allDevices = [[[NSApp delegate] document] collectObjectsConformingTo:@protocol(USBDevice)];
 		devices = [NSMutableArray arrayWithArray:allDevices];
 		[devices retain];
 		[devices makeObjectsPerformSelector:@selector(registerWithUSB:) withObject:self];
 		[self startMatching];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 - (void) registerForUSBNotifications:(id)anObj
@@ -108,7 +109,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			}
 		}
 	}
-
+	
 	if(anythingAdded){
 		//tell the world
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBDevicesAdded object:self userInfo:nil];
@@ -218,15 +219,15 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 	mach_port_t                 masterPort;
 	CFMutableDictionaryRef      matchingDict;
 	kern_return_t               kr;
-
+	
 	if (_runLoopSource) return;
-   
+	
 	// first create a master_port for my task
 	kr = IOMasterPort(MACH_PORT_NULL, &masterPort);
 	if (kr || !masterPort) {
 		NSLog(@"ERR: Couldn't create a master IOKit Port(%08x)\n", kr);
 	}
-
+	
 	// Set up the matching criteria for the devices we're interested in
 	matchingDict = IOServiceMatching(kIOUSBDeviceClassName);    // Interested in instances of class IOUSBDevice and its subclasses
 	if (!matchingDict) {
@@ -234,14 +235,14 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 		//mach_port_deallocate(mach_task_self(), masterPort);
 		return;
 	}
-   
+	
 	// Create a notification port and add its run loop event source to our run loop
 	// This is how async notifications get set up.
 	_notifyPort = IONotificationPortCreate(masterPort);
 	_runLoopSource = IONotificationPortGetRunLoopSource(_notifyPort);
-   
+	
 	CFRunLoopAddSource(CFRunLoopGetCurrent(), _runLoopSource, kCFRunLoopDefaultMode);
-   
+	
 	// Retain additional references because we use this same dictionary with two calls to
 	// IOServiceAddMatchingNotification, each of which consumes one reference.
 	matchingDict = (CFMutableDictionaryRef) CFRetain(matchingDict);
@@ -249,17 +250,17 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 	// Now set up two more notifications, one to be called when a device is first matched by I/O Kit, and the other to be
 	// called when the device is terminated.
 	kr = IOServiceAddMatchingNotification(  _notifyPort,
-											kIOFirstMatchNotification,
-											matchingDict,
-											_deviceAdded,
-											self,
-											&_deviceAddedIter);
-										   
+										  kIOFirstMatchNotification,
+										  matchingDict,
+										  _deviceAdded,
+										  self,
+										  &_deviceAddedIter);
+	
 	[self deviceAdded:_deviceAddedIter];				// Iterate once to get already-present devices and arm the notification
-
+	
 	// Now done with the master_port
 	masterPort = 0;
-
+	
 }
 
 
@@ -279,8 +280,8 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 		io_name_t				deviceName;
 		IOUSBDeviceInterface182**	deviceInterface;
 		ORUSBInterface*			usbCallbackData = 0;
-
-		NS_DURING
+		
+		@try {
 			
 			// Get the USB device's name.
 			kr = IORegistryEntryGetName(usbDevice, deviceName);
@@ -293,27 +294,27 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			usbCallbackData = [[ORUSBInterface alloc] init];
 			
 			deviceNameAsString = [NSString stringWithCString:deviceName];
-																																			
+			
 			// Now, get the locationID of this device. In order to do this, we need to create an IOUSBDeviceInterface182 
 			// for our device. This will create the necessary connections between our userland application and the 
 			// kernel object for the USB Device.
 			SInt32 score;
 			kr = IOCreatePlugInInterfaceForService(usbDevice, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID,
 												   &plugInInterface, &score);
-
+			
 			if ((kIOReturnSuccess != kr) || !plugInInterface){
 				[NSException raise: @"USB Exception" format:@"Unable to create USB plugin"];
 			}
-
+			
 			// Use the plugin interface to retrieve the device interface.
 			res = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID182),
 													 (LPVOID) &deviceInterface);
 			IODestroyPlugInInterface(plugInInterface);			// done with this
-				  
+			
 			if (res || !deviceInterface){
 				[NSException raise: @"USB Exception" format:@"Unable to create USB device interface"];
 			}
-
+			
 			// Now that we have the IOUSBDeviceInterface182, we can call the routines in IOUSBLib.h.
 			// In this case, fetch the locationID. The locationID uniquely identifies the device
 			// and will remain the same, even across reboots, so long as the bus topology doesn't change.
@@ -322,7 +323,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			if (KERN_SUCCESS != kr) {
 				[NSException raise: @"USB Exception" format:@"Unable to get USB device location"];
 			}
-
+			
 			
 			kr = (*deviceInterface)->GetDeviceVendor(deviceInterface, &vendor);
 			kr = (*deviceInterface)->GetDeviceProduct(deviceInterface, &product);
@@ -332,9 +333,9 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			int i;
 			for(i=0;i<kNumberSupportedDevices;i++){
 				if(	vendor  == supportedUSBDevice[i].vendorID &&
-					product == supportedUSBDevice[i].productID   ){
-						supported = YES;
-						break;
+				   product == supportedUSBDevice[i].productID   ){
+					supported = YES;
+					break;
 				}
 			}
 			if(!supported) {
@@ -350,9 +351,9 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			unsigned char theSpeed;
 			kr = (*deviceInterface)->GetDeviceSpeed(deviceInterface, &theSpeed);
 			if(kr == KERN_SUCCESS)NSLog(@"Device Speed: %d\n",theSpeed);
-		 
+			
 			UInt8 snsi;
-			 kr = (*deviceInterface)->USBGetSerialNumberStringIndex(deviceInterface, &snsi);
+			kr = (*deviceInterface)->USBGetSerialNumberStringIndex(deviceInterface, &snsi);
 			char serialString[128];
 			if(snsi){
 				IOUSBDevRequest   req;
@@ -362,7 +363,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 				req.wIndex = 0x0409; // LangID == English?
 				req.wLength = 128; // 32bit int
 				req.pData = serialString;
-			   
+				
 				kr = (*deviceInterface)->DeviceRequest(deviceInterface, &req);
 				if (kIOReturnSuccess == kr){
 					NSString* s = [NSString stringWithUSBDesc:serialString];
@@ -390,13 +391,13 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 					}
 				}
 			}
-	 
+			
 			//load up the private data that will be passed to the feneral interest notification
 			[usbCallbackData setCallBackObject:self];
 			[usbCallbackData setLocationID:locationID];
 			[usbCallbackData setVendor:vendor];
 			[usbCallbackData setProduct:product];
-
+			
 			// need to open the device in order to change its state
 			kr = (*deviceInterface)->USBDeviceOpen(deviceInterface);
 			if (KERN_SUCCESS != kr){
@@ -408,36 +409,37 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 				(void) (*deviceInterface)->USBDeviceClose(deviceInterface);
 				[NSException raise: @"USB Exception" format:@"Unable to open configure device"];
 			}
-
+			
 			(void) (*deviceInterface)->USBDeviceClose(deviceInterface);
-
-
+			
+			
 			// Register for an interest notification of this device being removed. Use a reference to our
 			// private data as the refCon which will be passed to the notification callback.
 			io_object_t aNotification;
 			kr = IOServiceAddInterestNotification( _notifyPort,						// notifyPort
-												   usbDevice,						// service
-												   kIOGeneralInterest,				// interestType
-												   DeviceNotification,				// callback
-												   usbCallbackData,					// refCon
-												   &aNotification  // notification
-												   );
+												  usbDevice,						// service
+												  kIOGeneralInterest,				// interestType
+												  DeviceNotification,				// callback
+												  usbCallbackData,					// refCon
+												  &aNotification  // notification
+												  );
 			[usbCallbackData setNotification:aNotification];
-													
+			
 			if (KERN_SUCCESS != kr)[NSException raise: @"USB Exception" format:@"Unable to add USB interest notification"];
-						
+			
 			[self _findInterfaces:deviceInterface  userInfo:usbCallbackData];
 			
 			// Done with this USB device; release the reference added by IOIteratorNext
 			IOObjectRelease(usbDevice);
-
-		NS_HANDLER
+			
+		}
+		@catch(NSException* localException) {
 			if(plugInInterface)	(*plugInInterface)->Release(plugInInterface);
 			if(usbDevice)		IOObjectRelease(usbDevice);
-		NS_ENDHANDLER
+		}
 		
 		[usbCallbackData release];
-
+		
     }
 }
 
@@ -458,8 +460,8 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 
 - (void) deviceNotification:(void*)refCon
 					service:(io_service_t) service
-						messageType:(natural_t) messageType
-						messageArgument:(void*) messageArgument
+				messageType:(natural_t) messageType
+			messageArgument:(void*) messageArgument
 {
     ORUSBInterface* usbCallbackData = (ORUSBInterface*) refCon;
     
@@ -478,11 +480,11 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
     UInt8                               numConf;
     IOReturn                            kr;
     IOUSBConfigurationDescriptorPtr     confDesc;
-   
+	
     kr = (*dev)->GetNumberOfConfigurations(dev, &numConf);
     if (!numConf)
         return kIOReturnError;
-   
+	
     // get the configuration descriptor for index 0
     kr = (*dev)->GetConfigurationDescriptorPtr(dev, 0, &confDesc);
     if (kr) {
@@ -494,24 +496,24 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
         NSLog(@"\tunable to set configuration to value %d (err=%08x)\n", 0, kr);
         return kIOReturnError;
     }
-   
+	
     return kIOReturnSuccess;
 }
 
 -(IOReturn) _findInterfaces:(IOUSBDeviceInterface182**)dev userInfo:(ORUSBInterface*) usbCallbackData
- {
-   // UInt8                       intfClass;
+{
+	// UInt8                       intfClass;
     //UInt8                       intfSubClass;
-      
+	
     IOUSBFindInterfaceRequest   request;
     request.bInterfaceClass		= kIOUSBFindInterfaceDontCare;
     request.bInterfaceSubClass	= kIOUSBFindInterfaceDontCare;
     request.bInterfaceProtocol	= kIOUSBFindInterfaceDontCare;
     request.bAlternateSetting	= kIOUSBFindInterfaceDontCare;
-   
+	
     io_iterator_t iterator;
     IOReturn kr = (*dev)->CreateInterfaceIterator(dev, &request, &iterator);
-   
+	
     io_service_t  usbInterface;
     while (usbInterface = IOIteratorNext(iterator)) {
 		IOUSBInterfaceInterface197** intf = NULL;
@@ -522,17 +524,17 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 		if ((kIOReturnSuccess != kr) || !plugInInterface) {
 			[NSException raise: @"USB Exception" format:@"unable to create a plugin (%08x)\n", kr];
 		}
-		   
+		
 		// I have the interface plugin. I need the interface interface
 		HRESULT res = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID), (void**) &intf);
 		(*plugInInterface)->Release(plugInInterface);                   // done with this
 		if (res || !intf) {
 			[NSException raise: @"USB Exception" format:@"couldn't create an IOUSBInterfaceInterface (%08x)\n", res];
 		}
-			 
+		
 		//kr = (*intf)->GetInterfaceClass(intf, &intfClass);
 		//kr = (*intf)->GetInterfaceSubClass(intf, &intfSubClass);
-	   
+		
 		//NSLog(@"Interface class %d, subclass %d\n", intfClass, intfSubClass);
 		
 		// Now open the interface. This will cause the pipes to be instantiated that are
@@ -545,7 +547,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 				[NSException raise: @"USB Exception" format:@"Interface already open for exclusive access (%08x)\n", kr];
 			}
 		}
-	   
+		
 		UInt8 intfNumEndpoints;
 		kr = (*intf)->GetNumEndpoints(intf, &intfNumEndpoints);
 		if (kIOReturnSuccess != kr) {
@@ -553,13 +555,13 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			(void) (*intf)->Release(intf);
 			[NSException raise: @"USB Exception" format:@"unable to get number of endpoints (%08x)\n", kr];
 		}
-	   	   
-	   unsigned char inPipe			= 0;
-	   unsigned char outPipe		= 0;
-	   unsigned char controlPipe	= 0;
-	   unsigned char interruptInPipe	= 0;
-	   unsigned char interruptOutPipe	= 0;
-	   
+		
+		unsigned char inPipe			= 0;
+		unsigned char outPipe		= 0;
+		unsigned char controlPipe	= 0;
+		unsigned char interruptInPipe	= 0;
+		unsigned char interruptOutPipe	= 0;
+		
 		UInt8 pipeRef;
 		for (pipeRef = 1; pipeRef <= intfNumEndpoints; pipeRef++){
 			IOReturn    kr2;
@@ -568,7 +570,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			UInt8       transferType;
 			UInt16      maxPacketSize;
 			UInt8       interval;
-		   
+			
 			kr2 = (*intf)->GetPipeProperties(intf, pipeRef, &direction, &number, &transferType, &maxPacketSize, &interval);
 			if(kIOReturnNoDevice == kr2)NSLog(@"no Device\n");
 			else if(kIOReturnNotOpen == kr2) NSLog(@"not open\n");
@@ -594,7 +596,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 				NSLog(@"unable to get properties of pipe %d (%08x)\n", pipeRef, kr2);
 			}
 		}
-	   
+		
 		// Just like with service matching notifications, we need to create an event source and add it
 		//  to our run loop in order to receive async completion notifications.
 		//CFRunLoopSourceRef runLoopSource;
@@ -605,7 +607,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 		//	[NSException raise: @"USB Exception" format:@"unable to create async event source (%08x)\n", kr];
 		//}
 		//CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);
-			
+		
 		//create and save an ORCA interface object with this USB interface.
 		(void) (*intf)->USBInterfaceClose(intf);
 		
@@ -623,30 +625,30 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 		
 		//done with the intf, the ORCA interface has retained a ref to the interface.
 		(void) (*intf)->Release(intf);
-
+		
 		//tell the world
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfaceAdded object:self userInfo:nil];
-													   
+		
 		if (KERN_SUCCESS != kr){
 			[NSException raise: @"USB Exception" format:@"IOServiceAddInterestNotification returned %08x\n", kr];
 		}
-//        NSLog(@"now ready to start working.\n");
-	   
+		//        NSLog(@"now ready to start working.\n");
+		
 		//startUp Interrupt handling
-//        UInt32 numBytesRead = sizeof(_recieveBuffer); // leave one byte at the end for NUL termination
-//        bzero(&_recieveBuffer, numBytesRead);
-//        kr = (*intf)->ReadPipeAsync(intf, kInPipe, &_recieveBuffer, numBytesRead, (IOAsyncCallback1)_interruptRecieved, this);
-	   
-//        if (kIOReturnSuccess != kr) {
-//            NSLog(@"unable to do async interrupt read (%08x)\n", kr);
-//            (void) (*intf)->USBInterfaceClose(intf);
-//            (void) (*intf)->Release(intf);
-//            break;
-//        }
-						 
+		//        UInt32 numBytesRead = sizeof(_recieveBuffer); // leave one byte at the end for NUL termination
+		//        bzero(&_recieveBuffer, numBytesRead);
+		//        kr = (*intf)->ReadPipeAsync(intf, kInPipe, &_recieveBuffer, numBytesRead, (IOAsyncCallback1)_interruptRecieved, this);
+		
+		//        if (kIOReturnSuccess != kr) {
+		//            NSLog(@"unable to do async interrupt read (%08x)\n", kr);
+		//            (void) (*intf)->USBInterfaceClose(intf);
+		//            (void) (*intf)->Release(intf);
+		//            break;
+		//        }
+		
 		//break; //only want the first interface
     }
-   
+	
     return kr;
 }
 

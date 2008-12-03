@@ -46,8 +46,8 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 - (void) makeConnectors
 {
 	ORConnector* connectorObj1 = [[ ORConnector alloc ] 
-							initAt: NSMakePoint(0,[self frame].size.height/2-kConnectorSize/2)
-					  withGuardian: self];
+								  initAt: NSMakePoint(0,[self frame].size.height/2-kConnectorSize/2)
+								  withGuardian: self];
 	[[ self connectors ] setObject: connectorObj1 forKey: ORUSBtoGPIBUSBInConnection ];
 	[ connectorObj1 setConnectorType: 'USBI' ];
 	[ connectorObj1 addRestrictedConnectionType: 'USBO' ]; //can only connect to gpib outputs
@@ -55,22 +55,22 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 	[ connectorObj1 release ];
 	
 	ORConnector* connectorObj2 = [[ ORConnector alloc ] 
-								initAt: NSMakePoint( [self frame].size.width-kConnectorSize, [self frame].size.height-15 )
-						  withGuardian: self];
+								  initAt: NSMakePoint( [self frame].size.width-kConnectorSize, [self frame].size.height-15 )
+								  withGuardian: self];
 	[[ self connectors ] setObject: connectorObj2 forKey: ORUSBtoGPIBNextConnection ];
 	[ connectorObj2 setConnectorType: 'GPI2' ];
 	[ connectorObj2 addRestrictedConnectionType: 'GPI1' ]; //can only connect to gpib inputs
 	[ connectorObj2 release ];
-
+	
 	ORConnector* connectorObj3 = [[ ORConnector alloc ] 
-								initAt: NSMakePoint( [self frame].size.width-kConnectorSize, 5 )
-					  withGuardian: self];
+								  initAt: NSMakePoint( [self frame].size.width-kConnectorSize, 5 )
+								  withGuardian: self];
 	[[ self connectors ] setObject: connectorObj3 forKey: ORUSBtoGPIBUSBOutConnection ];
 	[ connectorObj3 setConnectorType: 'USBO' ];
 	[ connectorObj3 addRestrictedConnectionType: 'USBI' ]; //can only connect to gpib inputs
 	[connectorObj3 setOffColor:[NSColor yellowColor]];
 	[ connectorObj3 release ];
-
+	
 }
 
 - (void) makeMainController
@@ -95,10 +95,11 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 
 - (void) awakeAfterDocumentLoaded
 {
-	NS_DURING
+	@try {
 		[self connectionChanged];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 }
 
 
@@ -177,12 +178,12 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 {
 	if(usbInterface)return YES;
 	else return NO;
-
+	
 }
 
 - (void) enableEOT:(short)aPrimaryAddress state: (BOOL) state
 {
-    NS_DURING
+    @try {
 		[theHWLock lock];   //-----begin critical section
 		[self selectDevice:aPrimaryAddress];
 		NSString* cmd = [NSString stringWithFormat:@"++eoi %d\r",state];
@@ -195,15 +196,16 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 		}
 		enableEOT = state;
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) setupDevice: (short) aPrimaryAddress secondaryAddress: (short) aSecondaryAddress
 {
-    NS_DURING
+    @try {
 		[theHWLock lock];   //-----begin critical section
 		[self selectDevice:aPrimaryAddress];
 		
@@ -215,15 +217,16 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 		
 		[self enableEOT:aPrimaryAddress state:YES];
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (void) selectDevice:(short) aPrimaryAddress
 {
-    NS_DURING
+    @try {
 		if(aPrimaryAddress != lastSelectedAddress){
 			NSString* cmd = [NSString stringWithFormat:@"++addr %d\r++mode 1\r++auto 0\r++eos 3\r++eoi 1\r",aPrimaryAddress];
 			if(fd){
@@ -234,27 +237,29 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 			}
 			lastSelectedAddress = aPrimaryAddress;
 		}
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (long) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
                maxLength: (long) aMaxLength
 {
     long retVal = 0;
-    NS_DURING
+    @try {
         
         [theHWLock lock];   //-----begin critical section
         [ self writeToDevice: aPrimaryAddress command: aCommand ];
-
+		
         retVal = [ self readFromDevice: aPrimaryAddress data: aData maxLength: aMaxLength ];
-       
+		
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
     
     return( retVal );
 }
@@ -263,30 +268,31 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 - (void) writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand
 {
 	if(!fd)return;
-    NS_DURING
+    @try {
 		[theHWLock lock];   //-----begin critical section
 		[self selectDevice:aPrimaryAddress];
 		NSMutableString* cmd = [NSMutableString stringWithString:aCommand];
 		[cmd replaceOccurrencesOfString:@"\n" withString:@"\033\n" options:NSLiteralSearch range:NSMakeRange(0,[cmd length])];
 		if(![cmd hasSuffix:@"\r"])[cmd appendString:@"\r"];
-				
+		
 		int n = write(fd,[cmd cStringUsingEncoding:NSASCIIStringEncoding],[cmd length]);
 		if(n<=0){
 			[theHWLock unlock];   //-----end critical section
 			[NSException raise:@"Serial Write" format:@"ORUSBtoBPIBMode.m %u: Write to serial port <%@> failed\n", __LINE__,serialNumber];
 		}
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
 }
 
 - (long) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (long) aMaxLength
 {
 	int result = 0;
 	if(!fd)return result;
-    NS_DURING
+    @try {
 		[theHWLock lock];   //-----begin critical section
 		[self selectDevice:aPrimaryAddress];
 		
@@ -308,10 +314,11 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 		}
 		
         [theHWLock unlock];   //-----end critical section
-    NS_HANDLER
+	}
+	@catch(NSException* localException) {
         [theHWLock unlock];   //-----end critical section
         [localException raise];
-    NS_ENDHANDLER
+    }
 	
 	return result;
 }
@@ -329,7 +336,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
     
     [command autorelease];
     command = [aCommand copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORUSBtoGPIBModelCommandChanged object:self];
 }
 
@@ -341,12 +348,12 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 - (void) setGpibAddress:(char)aAddress
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setGpibAddress:gpibAddress];
-
+	
     if(aAddress<0)aAddress=0;
 	else if(aAddress>31)aAddress = 31;
 	
     gpibAddress = aAddress;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORUSBtoGPIBModelAddressChanged object:self];
 }
 
@@ -358,7 +365,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 - (void) setSerialNumber:(NSString*)aSerialNumber
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSerialNumber:serialNumber];
-
+	
     [serialNumber autorelease];
     serialNumber = [aSerialNumber copy];    
 	
@@ -386,8 +393,8 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 	[usbInterface retain];
 	
 	[[NSNotificationCenter defaultCenter]
-			postNotificationName: ORUSBtoGPIBModelUSBInterfaceChanged
-						  object: self];
+	 postNotificationName: ORUSBtoGPIBModelUSBInterfaceChanged
+	 object: self];
 	
 	if(usbInterface){
 		[noUSBAlarm clearAlarm];

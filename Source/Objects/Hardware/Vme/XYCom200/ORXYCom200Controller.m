@@ -25,7 +25,7 @@
 -(id)init
 {
     self = [super initWithWindowNibName:@"XYCom200"];
-	   
+	
     return self;
 }
 
@@ -40,12 +40,12 @@
 	[super awakeFromNib];
 	
     [registerAddressPopUp setAlignment:NSCenterTextAlignment];
-	    
+	
     [self populatePopup];
 	
 	[self modelChanged:nil];
 	[self setUpViews];
-
+	
 }
 
 - (NSMutableArray*) subControllers
@@ -73,12 +73,12 @@
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [super registerNotificationObservers];
-        
+	
     [notifyCenter addObserver : self
 					 selector : @selector(slotChanged:)
 						 name : ORVmeCardSlotChangedNotification
 					   object : model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(baseAddressChanged:)
                          name : ORVmeIOCardBaseAddressChangedNotification
@@ -93,7 +93,7 @@
                      selector : @selector(lockChanged:)
                          name : ORXYCom200Lock
                         object: nil];
-   
+	
 	[notifyCenter addObserver:self
 					 selector:@selector(selectedRegIndexChanged:)
 						 name:ORXYCom200SelectedRegIndexChanged
@@ -103,7 +103,7 @@
 					 selector:@selector(writeValueChanged:)
 						 name:ORXYCom200WriteValueChanged
 					   object:model]; 
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(selectedPLTChanged:)
                          name : ORXYCom200SelectedPLTChanged
@@ -117,7 +117,7 @@
     [self baseAddressChanged:nil];
     [self slotChanged:nil];
     [self lockChanged:nil];
-
+	
     [self writeValueChanged:nil];
     [self selectedRegIndexChanged:nil];
 	[self selectedPLTChanged:nil];
@@ -146,7 +146,7 @@
 	NSEnumerator* e = [subControllers objectEnumerator];
 	id obj;
 	while(obj = [e nextObject]){
-       [[obj getView] setNeedsDisplay:YES];
+		[[obj getView] setNeedsDisplay:YES];
     }
 }
 
@@ -166,9 +166,9 @@
 - (void) lockChanged:(NSNotification*)aNotification
 {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
-   // BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXYCom200Lock];
+	// BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXYCom200Lock];
     BOOL locked = [gSecurity isLocked:ORXYCom200Lock];
-    	
+	
     [settingLockButton setState: locked];
     [basicOpsLockButton setState: locked];
     [addressText setEnabled:!locked && !runInProgress];
@@ -215,23 +215,25 @@
 
 - (IBAction) initBoard:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model initBoard];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"Init failed: %@", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER	
+    }	
 }
 
 - (IBAction) report:(id)sender
 {
-	NS_DURING
+	@try {
 		[model report];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%Report failed: %@", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER
+    }
 }
 
 - (void) selectedPLTPUAction:(id)sender
@@ -270,35 +272,38 @@
 
 - (IBAction) read:(id) pSender
 {
-	NS_DURING
+	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model read];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nRead of %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) write:(id) pSender
 {
-	NS_DURING
+	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model write];
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nWrite to %@ failed", @"OK", nil, nil,
                         localException,[model getRegisterName:[model selectedRegIndex]]);
-    NS_ENDHANDLER
+    }
 }
 
 - (void) initSquareWave:(int)chipIndex
 {
-	NS_DURING
+	@try {
 		[self endEditing];		// Save in memory user changes before executing command.
 		[model initSqWave:chipIndex];	
-    NS_HANDLER
+    }
+	@catch(NSException* localException) {
         NSRunAlertPanel([localException name], @"Init Square Wave failed: ", @"OK", nil, nil,
                         localException);
-    NS_ENDHANDLER	
+    }	
 }
 #pragma mark ***Misc Helpers
 - (void) populatePopup
@@ -308,8 +313,8 @@
     short	i;
     for (i = 0; i < [model getNumberRegisters]; i++) {
         [registerAddressPopUp insertItemWithTitle:[model 
-                                    getRegisterName:i] 
-                                            atIndex:i];
+												   getRegisterName:i] 
+										  atIndex:i];
     }
     
     [self selectedRegIndexChanged:nil];
@@ -318,11 +323,11 @@
 - (void) updateRegisterDescription:(short) aRegisterIndex
 {
     [registerOffsetField setStringValue:
-    [NSString stringWithFormat:@"0x%04x",
-    [model getAddressOffset:aRegisterIndex]]];
+	 [NSString stringWithFormat:@"0x%04x",
+	  [model getAddressOffset:aRegisterIndex]]];
 	
     [regNameField setStringValue:[model getRegisterName:aRegisterIndex]];
-
+	
 }
 @end
 
@@ -363,32 +368,32 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	[notifyCenter removeObserver:self];
 	if(!model)return;
-		
+	
 	//Gen Reg
 	[notifyCenter addObserver : self selector : @selector(modeChanged:)
                          name : ORPISlashTChipModeChanged
 						object: model];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(H1SenseChanged:)
                          name : ORPISlashTChipH1SenseChanged
 						object: model];
- 
+	
     [notifyCenter addObserver : self
                      selector : @selector(H2SenseChanged:)
                          name : ORPISlashTChipH2SenseChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(H3SenseChanged:)
                          name : ORPISlashTChipH3SenseChanged
 						object: model];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(H4SenseChanged:)
                          name : ORPISlashTChipH4SenseChanged
 						object: model];
-
+	
 	[notifyCenter addObserver : self
                      selector : @selector(H12EnableChanged:)
                          name : ORPISlashTChipH12EnableChanged
@@ -397,124 +402,124 @@
                      selector : @selector(H34EnableChanged:)
                          name : ORPISlashTChipH34EnableChanged
 						object: model];
-
-
+	
+	
 	//Port A
-   [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector(portASubModeChanged:)
                          name : ORPISlashTChipPortASubModeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portAH1ControlChanged:)
                          name : ORPISlashTChipPortAH1ControlChanged
 						object: model];
-						
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(portAH2ControlChanged:)
                          name : ORPISlashTChipPortAH2ControlChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portAH2InterruptChanged:)
                          name : ORPISlashTChipPortAH2InterruptChanged
 						object: model];
-
+	
 	[notifyCenter addObserver : self
                      selector : @selector(portADataChanged:)
                          name : ORPISlashTChipPortADataChanged
 						object: model];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(portADirectionChanged:)
                          name : ORPISlashTChipPortADirectionChanged
 						object: model];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(portATransceiverDirChanged:)
                          name : ORPISlashTChipPortATransceiverDirChanged
 						object: model];
-						
-
+	
+	
 	//Port B
-   [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector(portBSubModeChanged:)
                          name : ORPISlashTChipPortBSubModeChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portBH1ControlChanged:)
                          name : ORPISlashTChipPortBH1ControlChanged
 						object: model];
-						
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(portBH2ControlChanged:)
                          name : ORPISlashTChipPortBH2ControlChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portBH2InterruptChanged:)
                          name : ORPISlashTChipPortBH2InterruptChanged
 						object: model];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(portBDirectionChanged:)
                          name : ORPISlashTChipPortBDirectionChanged
 						object: model];
-						
+	
     [notifyCenter addObserver : self
                      selector : @selector(portBDataChanged:)
                          name : ORPISlashTChipPortBDataChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portBTransceiverDirChanged:)
                          name : ORPISlashTChipPortBTransceiverDirChanged
 						object: model];
-						
+	
 	//Port C
     [notifyCenter addObserver : self
                      selector : @selector(portCDirectionChanged:)
                          name : ORPISlashTChipPortCDirectionChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(portCDataChanged:)
                          name : ORPISlashTChipPortCDataChanged
 						object: model];
-
+	
 	//timer
 	[notifyCenter addObserver : self
                      selector : @selector(timerControlChanged:)
                          name : ORPISlashTChipTimerControlChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(preloadHighChanged:)
                          name : ORPISlashTChipPreloadHighChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(preloadMiddleChanged:)
                          name : ORPISlashTChipPreloadMiddleChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(preloadLowChanged:)
                          name : ORPISlashTChipPreloadLowChanged
 						object: model];
-
+	
 	//Other
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORXYCom200Lock
                         object: nil];
-
+	
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
                        object : nil];
-					   
+	
     [notifyCenter addObserver : self
                      selector : @selector(periodChanged:)
                          name : ORPISlashTChipPeriodChanged
@@ -561,7 +566,7 @@
 	[self preloadMiddleChanged:nil];
 	[self preloadLowChanged:nil];
 	[self periodChanged:nil];
-
+	
 	[self lockChanged:nil];
 }
 
@@ -581,7 +586,7 @@
     //BOOL runInProgress				= [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXYCom200Lock];
     //BOOL locked						= [gSecurity isLocked:ORXYCom200Lock];
-    	
+	
 	//Gen Reg
 	[modePU setEnabled: !lockedOrRunningMaintenance];
     [H1SensePU setEnabled: !lockedOrRunningMaintenance];
@@ -590,7 +595,7 @@
     [H4SensePU setEnabled: !lockedOrRunningMaintenance];
     [H12EnablePU setEnabled: !lockedOrRunningMaintenance];
     [H34EnablePU setEnabled: !lockedOrRunningMaintenance];
-
+	
 	//Port A
 	[portASubModePU setEnabled: !lockedOrRunningMaintenance];
     [portAH1ControlPU setEnabled: !lockedOrRunningMaintenance];
@@ -600,7 +605,7 @@
 	[portADataField  setEnabled: !lockedOrRunningMaintenance];
     [portADirectionMatrix setEnabled: !lockedOrRunningMaintenance];
     [emitModeButton setEnabled: !lockedOrRunningMaintenance];
-
+	
 	//Port B
  	[portBSubModePU setEnabled: !lockedOrRunningMaintenance];
     [portBH1ControlPU setEnabled: !lockedOrRunningMaintenance];
@@ -609,11 +614,11 @@
 	[portBTransceiverDirPU setEnabled: !lockedOrRunningMaintenance];
 	[portBDataField  setEnabled: !lockedOrRunningMaintenance];
     [portBDirectionMatrix setEnabled: !lockedOrRunningMaintenance];
-
+	
 	//Port C
     [portCDirectionMatrix setEnabled: !lockedOrRunningMaintenance];
 	[portCDataMatrix  setEnabled: !lockedOrRunningMaintenance ];
-
+	
 	//Timer
 	[timerControlField  setEnabled: !lockedOrRunningMaintenance ];
 	[preloadHighField  setEnabled: !lockedOrRunningMaintenance ];
@@ -621,7 +626,7 @@
 	[preloadLowField  setEnabled: !lockedOrRunningMaintenance ];
 	[periodField  setEnabled: !lockedOrRunningMaintenance ];
 	[easyTimerStartButton  setEnabled: !lockedOrRunningMaintenance ];
-
+	
 }
 
 //Gen Reg

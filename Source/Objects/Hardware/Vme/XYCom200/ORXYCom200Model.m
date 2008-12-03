@@ -36,36 +36,36 @@ static struct {
 	NSString*	  regName;
 	unsigned long addressOffset;
 } mIOXY200Reg[kNumRegs]={
-	{@"General Control",		0x01},
-	{@"Service Request",		0x03},
-	{@"A Data Direction",		0x05},
-	{@"B Data Direction",		0x07},
-	{@"C Data Direction",		0x09},
-	{@"Interrupt Vector",		0x0b},
-	{@"A Control",				0x0d},
-	{@"B Control",				0x0f},
-	{@"A Data",					0x11},
-	{@"B Data",					0x13},
-	{@"C Data",					0x19},
-	{@"A Alternate",			0x15},
-	{@"B Alternate",			0x17},
-	{@"Status",					0x1b},
-	{@"Timer Control",			0x21},
-	{@"Timer Interrupt Vector",	0x23},
-	{@"Timer Status",			0x35},
-	{@"Counter Preload High",	0x27},
-	{@"Counter Preload Mid",	0x29},
-	{@"Counter Preload Low",	0x2b},
-	{@"Count High",				0x2f},
-	{@"Count Mid",				0x31},		
-	{@"Count Lo",				0x33}		
+{@"General Control",		0x01},
+{@"Service Request",		0x03},
+{@"A Data Direction",		0x05},
+{@"B Data Direction",		0x07},
+{@"C Data Direction",		0x09},
+{@"Interrupt Vector",		0x0b},
+{@"A Control",				0x0d},
+{@"B Control",				0x0f},
+{@"A Data",					0x11},
+{@"B Data",					0x13},
+{@"C Data",					0x19},
+{@"A Alternate",			0x15},
+{@"B Alternate",			0x17},
+{@"Status",					0x1b},
+{@"Timer Control",			0x21},
+{@"Timer Interrupt Vector",	0x23},
+{@"Timer Status",			0x35},
+{@"Counter Preload High",	0x27},
+{@"Counter Preload Mid",	0x29},
+{@"Counter Preload Low",	0x2b},
+{@"Count High",				0x2f},
+{@"Count Mid",				0x31},		
+{@"Count Lo",				0x33}		
 };	
 
 NSString* mIOXY200SubModeName[4][3] = {
-		{@"Dbl Buff in, Single Buff out",			@"NonLatched in, Double Buff out",		@"NonLatched in, Single Buff out"},
-		{@"Double Buffered in, Single Buffered out",@"Non-Latched in, Double Buffered out", @"N/A"},
-		{@"N/A",									@"N/A",									@"N/A"},
-		{@"N/A",									@"N/A",									@"N/A"}
+{@"Dbl Buff in, Single Buff out",			@"NonLatched in, Double Buff out",		@"NonLatched in, Single Buff out"},
+{@"Double Buffered in, Single Buffered out",@"Non-Latched in, Double Buffered out", @"N/A"},
+{@"N/A",									@"N/A",									@"N/A"},
+{@"N/A",									@"N/A",									@"N/A"}
 };
 
 #pragma mark ***Initialization
@@ -122,7 +122,7 @@ NSString* mIOXY200SubModeName[4][3] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setSelectedPLT:selectedPLT];
     
     selectedPLT = aSelectedPLT;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXYCom200SelectedPLTChanged object:self];
 }
 
@@ -139,8 +139,8 @@ NSString* mIOXY200SubModeName[4][3] = {
     selectedRegIndex = anIndex;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORXYCom200SelectedRegIndexChanged
-                      object:self];
+	 postNotificationName:ORXYCom200SelectedRegIndexChanged
+	 object:self];
 }
 
 - (unsigned long) writeValue
@@ -155,8 +155,8 @@ NSString* mIOXY200SubModeName[4][3] = {
     writeValue = aValue;
     
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:ORXYCom200WriteValueChanged
-                      object:self];
+	 postNotificationName:ORXYCom200WriteValueChanged
+	 object:self];
 }
 
 #pragma mark •••Hardware Access
@@ -166,38 +166,40 @@ NSString* mIOXY200SubModeName[4][3] = {
     short theRegIndex 		= [self selectedRegIndex];
     unsigned char theValue;
 	
-    NS_DURING
+    @try {
         
 		[self read:theRegIndex returnValue:&theValue chip:selectedPLT];
-			
+		
 		NSLog(@"XYCom reg [%@]:0x%04lx\n", [self getRegisterName:theRegIndex], theValue);
         
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Can't Read [%@] on the %@.\n",
-		[self getRegisterName:theRegIndex], [self identifier]);
+			  [self getRegisterName:theRegIndex], [self identifier]);
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) write
 {
-     
+	
  	//write hw based on the dialog settings
 	long theValue			=  [self writeValue];
     short theRegIndex 		= [self selectedRegIndex];
     
-    NS_DURING
+    @try {
         
         NSLog(@"Register is:%d\n", theRegIndex);
         NSLog(@"Value is   :0x%02x\n", theValue);
         
 		[self write:theRegIndex sendValue:(char) theValue chip:selectedPLT];
         
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Can't write 0x%04lx to [%@] on the %@.\n",
-                  theValue, [self getRegisterName:theRegIndex],[self identifier]);
+			  theValue, [self getRegisterName:theRegIndex],[self identifier]);
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -236,9 +238,9 @@ NSString* mIOXY200SubModeName[4][3] = {
 		NSLogFont(monoSpacedFont,@"H3 Sense: %@\n", ((aValue>>2) & 0x1)?@"Active High":@"Active Low");
 		NSLogFont(monoSpacedFont,@"H4 Sense: %@\n", ((aValue>>3) & 0x1)?@"Active High":@"Active Low");
 		int mode = (aValue>>6) & 0x3;
-
+		
 		NSLog(@"Port A\n");
-
+		
 		[self read:kAControl returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"SubMode   : %@\n", mIOXY200SubModeName[mode][(aValue>>6) & 0x3]);
 		int h = (aValue>>5) & 0x1;
@@ -252,15 +254,15 @@ NSString* mIOXY200SubModeName[4][3] = {
 		}
 		NSLogFont(monoSpacedFont,@"H2 Interrput: %@\n", ((aValue>>2) & 0x1)?@"Enabled":@"Disabled");
 		NSLogFont(monoSpacedFont,@"H1 Control  : Interrupt %@\n", ((aValue>>1) & 0x1)?@"enabled":@"enabled");
-	
+		
 		[self read:kADataDirection returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"Data Dir    : 0x%02x\n", aValue);
-	
+		
 		[self read:kAData returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"Data Value  : 0x%02x\n", aValue);
-
+		
 		NSLog(@"Port B\n");
-
+		
 		[self read:kBControl returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"SubMode   : %@\n", mIOXY200SubModeName[mode][(aValue>>6) & 0x3]);
 		h = (aValue>>5) & 0x1;
@@ -274,17 +276,17 @@ NSString* mIOXY200SubModeName[4][3] = {
 		}
 		NSLogFont(monoSpacedFont,@"H2 Interrput: %@\n", ((aValue>>2) & 0x1)?@"Enabled":@"Disabled");
 		NSLogFont(monoSpacedFont,@"H1 Control  : Interrupt %@\n", ((aValue>>1) & 0x1)?@"enabled":@"enabled");
-
+		
 		[self read:kBDataDirection returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"Data Dir    : 0x%02x\n", aValue);
-	
+		
 		[self read:kBData returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"Data Value  : 0x%02x\n", aValue);
-
+		
 		NSLog(@"Port C\n");
 		[self read:kCDataDirection returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"Data Dir    : 0x%02x\n", aValue);
-	
+		
 		[self read:kCData returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"Data Value  : 0x%02x\n", aValue);
 		
@@ -305,7 +307,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 		NSLogFont(monoSpacedFont,@"Count Middle   : 0x%02x\n", aValue);
 		[self read:kCountLow returnValue:&aValue chip:i];
 		NSLogFont(monoSpacedFont,@"Count Low      : 0x%02x\n", aValue);
-}}
+	}}
 
 - (void) read:(unsigned short) pReg returnValue:(void*) pValue chip:(int)chipIndex
 {
@@ -321,7 +323,7 @@ NSString* mIOXY200SubModeName[4][3] = {
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
-					
+	
 	*((unsigned char*)pValue) = aValue;
 }
 
@@ -473,7 +475,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 	[chip setPortAH1Control:0x0];	//Disabled
 	[chip setPortADirection:0xff];  //output
 	[chip setPortCData:0x00];
-
+	
 	[self initBoard];
 }
 
@@ -496,7 +498,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 	[chip setPortBH1Control:0x0];	//Disabled
 	[chip setPortBDirection:0xff];  //output
 	[chip setPortCData:0x00];
-
+	
 	[self initBoard];
 }
 
@@ -515,10 +517,11 @@ NSString* mIOXY200SubModeName[4][3] = {
 	ORPISlashTChip* chip = [chips objectAtIndex:i];	
 	int period = [chip period];
 	
-	NS_DURING
+	@try {
 		[self initOutA:i];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	
 	// convert time to upper and lower ticks
 	const double kTICKConv = 48.828125;
@@ -526,7 +529,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 	unsigned char CounterLoadVal = (unsigned char) d_ticks;
 	unsigned char CounterValHigh = ((0xff00 & CounterLoadVal) >> 8);
 	unsigned char CounterValMid = CounterLoadVal;
-
+	
 	[chip setPreloadLow:0x0];							
 	[chip setPreloadMiddle:CounterValMid];	
 	[chip setPreloadHigh:CounterValHigh];	
@@ -544,14 +547,14 @@ NSString* mIOXY200SubModeName[4][3] = {
     [self setSelectedPLT:		[decoder decodeIntForKey:@"selectedPLT"]];
 	[self setChips:				[decoder decodeObjectForKey:@"chips"]];
     [[self undoManager] enableUndoRegistration];
-
+	
  	if(!chips){
 		chips = [[NSArray arrayWithObjects:
-					[[[ORPISlashTChip alloc] initChip:0] autorelease],
-					[[[ORPISlashTChip alloc] initChip:1] autorelease],
-					nil] retain];
+				  [[[ORPISlashTChip alloc] initChip:0] autorelease],
+				  [[[ORPISlashTChip alloc] initChip:1] autorelease],
+				  nil] retain];
 	}
-   
+	
     return self;
 }
 
@@ -567,7 +570,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	[chips makeObjectsPerformSelector:@selector(addParametersToDictionary:) withObject:objDictionary];
-
+	
     return objDictionary;
 }
 
@@ -906,7 +909,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
     self = [super init];
     
     [[self undoManager] disableUndoRegistration];
-
+	
 	//Gen Cntrl Reg
     [self setMode:				[decoder decodeIntForKey:@"mode"]];
     [self setH1Sense:			[decoder decodeBoolForKey:@"H1Sense"]];
@@ -937,14 +940,14 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
 	//Port B
     [self setPortCDirection:	[decoder decodeIntForKey:@"portCDirection"]];
     [self setPortCData:			[decoder decodeIntForKey:@"portCData"]];
-
+	
 	//Timer
 	[self setPreloadLow:		[decoder decodeIntForKey:@"preloadLow"]];
     [self setPreloadMiddle:		[decoder decodeIntForKey:@"preloadMiddle"]];
     [self setPreloadHigh:		[decoder decodeIntForKey:@"preloadHigh"]];
     [self setTimerControl:		[decoder decodeIntForKey:@"timerControl"]];
     [self setPeriod:			[decoder decodeIntForKey:@"period"]];
-
+	
 	
     [[self undoManager] enableUndoRegistration];
     
@@ -970,7 +973,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
 	[encoder encodeInt:portADirection	forKey:@"portADirection"];
 	[encoder encodeInt:portATransceiverDir	forKey:@"portATransceiverDir"];
 	[encoder encodeInt:portAData		forKey:@"portAData"];
-
+	
 	//Port B
 	[encoder encodeInt:portBSubMode		forKey:@"portBSubMode"];
 	[encoder encodeInt:portBH1Control	forKey:@"portBH1Control"];
@@ -979,7 +982,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
 	[encoder encodeInt:portBDirection	forKey:@"portBDirection"];
 	[encoder encodeInt:portBTransceiverDir	forKey:@"portBTransceiverDir"];
 	[encoder encodeInt:portBData		forKey:@"portBData"];
-
+	
 	//Port C
 	[encoder encodeInt:portCDirection	forKey:@"portCDirection"];
  	[encoder encodeInt:portCData		forKey:@"portCData"];
@@ -1014,7 +1017,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
     [objDictionary setObject:[NSNumber numberWithInt:portADirection]	forKey:@"portADirection"];
     [objDictionary setObject:[NSNumber numberWithInt:portATransceiverDir]	forKey:@"portATransceiverDir"];
     [objDictionary setObject:[NSNumber numberWithInt:portAData]			forKey:@"portAData"];
-
+	
 	//Port B
     [objDictionary setObject:[NSNumber numberWithInt:portBSubMode]		forKey:@"portBSubMode"];
     [objDictionary setObject:[NSNumber numberWithInt:portBH1Control]	forKey:@"portBH1Control"];
@@ -1023,18 +1026,18 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
     [objDictionary setObject:[NSNumber numberWithInt:portBDirection]	forKey:@"portBDirection"];
 	[objDictionary setObject:[NSNumber numberWithInt:portBTransceiverDir]	forKey:@"portBTransceiverDir"];
 	[objDictionary setObject:[NSNumber numberWithInt:portBData]			forKey:@"portBData"];
-
+	
 	//Port C
     [objDictionary setObject:[NSNumber numberWithInt:portCDirection]	forKey:@"portCDirection"];
     [objDictionary setObject:[NSNumber numberWithInt:portCData]			forKey:@"portCData"];
-
+	
 	//Timer
     [objDictionary setObject:[NSNumber numberWithInt:preloadLow]		forKey:@"preloadLow"];
     [objDictionary setObject:[NSNumber numberWithInt:preloadMiddle]		forKey:@"preloadMiddle"];
     [objDictionary setObject:[NSNumber numberWithInt:preloadHigh]		forKey:@"preloadHigh"];
     [objDictionary setObject:[NSNumber numberWithInt:timerControl]		forKey:@"timerControl"];
     [objDictionary setObject:[NSNumber numberWithInt:period]			forKey:@"period"];
-
+	
     return objDictionary;
 }
 

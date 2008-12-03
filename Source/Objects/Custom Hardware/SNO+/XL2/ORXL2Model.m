@@ -30,18 +30,18 @@
 
 unsigned long xl2_register_offsets[] =
 {	
-	0,				// [ 0]  Select Register
-	4,				// [ 1]  Data Available Register
-	8,				// [ 2]  XL2 Control Status Register
-	12,				// [ 3]  Mask Register
-	16,				// [ 4]  Clock CSR
-	20,				// [ 5]  HV Relay Control
-	24,				// [ 6]  Xilinx User Control
-	28, 			// [ 7]  General R/W display test register
-	32,				// [ 8]  HV CSR
-	36,				// [ 9]  HV Setpoints
-	40,				// [10]  HV Voltage Readback
-	44,				// [11]  HV Current Readback
+0,				// [ 0]  Select Register
+4,				// [ 1]  Data Available Register
+8,				// [ 2]  XL2 Control Status Register
+12,				// [ 3]  Mask Register
+16,				// [ 4]  Clock CSR
+20,				// [ 5]  HV Relay Control
+24,				// [ 6]  Xilinx User Control
+28, 			// [ 7]  General R/W display test register
+32,				// [ 8]  HV CSR
+36,				// [ 9]  HV Setpoints
+40,				// [10]  HV Voltage Readback
+44,				// [11]  HV Current Readback
 };
 
 @interface ORXL2Model (SBC)
@@ -77,7 +77,7 @@ unsigned long xl2_register_offsets[] =
     //so we don't add it to our list of connectors. It will be added to the true owner later.
     [self setInputConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
     [self setOutputConnector: [[[ORConnector alloc] initAt:NSZeroPoint withGuardian:self withObjectLink:self] autorelease]];
-        
+	
 	[inputConnector setConnectorType: 'XL2I'];
 	[inputConnector setConnectorImageType:kSmallDot]; 
 	[inputConnector setIoType:kInputConnector];
@@ -90,7 +90,7 @@ unsigned long xl2_register_offsets[] =
 	[outputConnector setIoType:kOutputConnector];
 	[outputConnector addRestrictedConnectionType: 'XL2I']; //can only connect to XL2I inputs
 	[outputConnector setOffColor:[NSColor colorWithCalibratedRed:0 green:.68 blue:.65 alpha:1.]];
-
+	
 }
 
 - (void) positionConnector:(ORConnector*)aConnector
@@ -150,8 +150,8 @@ unsigned long xl2_register_offsets[] =
     [self guardian:guardian positionConnectorsForCard:self];
     
     [[NSNotificationCenter defaultCenter]
-			postNotificationName:ORSNOCardSlotChanged
-                          object: self];
+	 postNotificationName:ORSNOCardSlotChanged
+	 object: self];
 }
 
 - (int) slotConv
@@ -168,9 +168,9 @@ unsigned long xl2_register_offsets[] =
 - (void) setGuardian:(id)aGuardian
 {
     id oldGuardian = guardian;
-
+	
 	[super setGuardian:aGuardian];
-      
+	
     if(oldGuardian != aGuardian){
 		[oldGuardian setAdapter:nil];	//old crate can't use this card any more
         [oldGuardian removeDisplayOf:[self inputConnector]];
@@ -244,7 +244,7 @@ unsigned long xl2_register_offsets[] =
     [self setInputConnector:		[decoder decodeObjectForKey:@"inputConnector"]];
     [self setOutputConnector:		[decoder decodeObjectForKey:@"outputConnector"]];
 	[self setSlot:					[decoder decodeIntForKey:   @"slot"]];
-   
+	
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -296,7 +296,7 @@ unsigned long xl2_register_offsets[] =
 	if (aRegister > XL2_MASK_REG){   //Higer registers require that bit 17 be set in the XL2 select register
 		[self writeHardwareRegister:[self xl2RegAddress:XL2_SELECT_REG] value:0x20000];
 	}
-
+	
 	// Now read the value
 	return  [self  readHardwareRegister:[self xl2RegAddress:aRegister]]; 	
 }
@@ -316,12 +316,13 @@ unsigned long xl2_register_offsets[] =
 
 - (void) reset
 {
-	NS_DURING
+	@try {
 		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_CRATE_RESET | XL2_CONTROL_DONE_PROG]; // select the cards by writing to the XL2 REG 0 
 		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_DONE_PROG]; // select the cards by writing to the XL2 REG 0 
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Failure during reset of XL2 Crate %d Slot %d.\n", [self crateNumber], [self stationNumber]);	
-	NS_ENDHANDLER		
+	}		
 	
 }
 
@@ -395,19 +396,20 @@ unsigned long xl2_register_offsets[] =
 	char* p = (char*)payloadPtr + sizeof(SNOXL2_ClockLoadStruct);
 	bcopy(dataPtr, p, [theData length]);
 	
-	NS_DURING
-	[[[[self xl1] adapter] sbcLink] send:&aPacket receive:&aPacket];
-	SNOXL2_ClockLoadStruct *responsePtr = (SNOXL2_ClockLoadStruct*)aPacket.payload;
-	errorCode = responsePtr->errorCode;
-	if(errorCode){
-		NSLog(@"%s\n",aPacket.message);
-		[NSException raise:@"Clock load failed" format:@""];
+	@try {
+		[[[[self xl1] adapter] sbcLink] send:&aPacket receive:&aPacket];
+		SNOXL2_ClockLoadStruct *responsePtr = (SNOXL2_ClockLoadStruct*)aPacket.payload;
+		errorCode = responsePtr->errorCode;
+		if(errorCode){
+			NSLog(@"%s\n",aPacket.message);
+			[NSException raise:@"Clock load failed" format:@""];
+		}
+		else NSLog(@"Looks like success.\n");
 	}
-	else NSLog(@"Looks like success.\n");
-	NS_HANDLER
-	NSLog(@"Clock load failed: %@\n",localException);
-	[localException raise];
-	NS_ENDHANDLER
+	@catch(NSException* localException) {
+		NSLog(@"Clock load failed: %@\n",localException);
+		[localException raise];
+	}
 }
 
 - (void) loadXilinixUsingSBC:(NSData*)theData
@@ -443,7 +445,7 @@ unsigned long xl2_register_offsets[] =
 	char* p = (char*)payloadPtr + sizeof(SNOXL2_XilinixLoadStruct);
 	bcopy(dataPtr, p, [theData length]);
 	
-	NS_DURING
+	@try {
 		[[[[self xl1] adapter] sbcLink] send:&aPacket receive:&aPacket];
 		SNOXL2_XilinixLoadStruct *responsePtr = (SNOXL2_XilinixLoadStruct*)aPacket.payload;
 		errorCode = responsePtr->errorCode;
@@ -452,10 +454,11 @@ unsigned long xl2_register_offsets[] =
 			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
 		}
 		else NSLog(@"Looks like success.\n");
-	NS_HANDLER
+	}
+	@catch(NSException* localException) {
 		NSLog(@"Xilinx load failed. %@\n",localException);
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 @end
 
@@ -467,62 +470,63 @@ unsigned long xl2_register_offsets[] =
 	unsigned long writeValue;
 	//------------------------------------------
 	
-	NS_DURING
-	
-	NSData* theData = [[self xl1] clockFileData];	// load the entire content of the file
-	char* charData = (char*)[theData bytes];		// high in the heap and then lock it before dereferencing
-	
-	[self select:self];
-	
-	// Enable master clock 
-	[self writeToXL2Register:XL2_CLOCK_CS_REG value:XL2_MASTER_CLK_EN];
-	
-	int j;
-	for(j = 1; j<=3; j++){			// there are three clocks, Memory, Sequencer and ADC
+	@try {
 		
-		// skip the comment line
-		while ( *charData != '\r' ) charData++;
+		NSData* theData = [[self xl1] clockFileData];	// load the entire content of the file
+		char* charData = (char*)[theData bytes];		// high in the heap and then lock it before dereferencing
 		
-		charData++;
+		[self select:self];
 		
-		// the first field has to be a ONE or a ZERO
-		if ( ( *charData != '1') && ( *charData != '0')) {	
-			[NSException raise:@"Bad Clock File" format:@"Invalid first characer in clock file"];
-		}
-		int i;
-		for (i = 1; i<=4; i++){		// there are four lines of data per clock
-			while ( *charData != '\r' ){    
-				
-				writeValue = XL2_MASTER_CLK_EN;	// keep the master clock enabled
-				if( *charData == '1' ){
-					writeValue |= (1UL<< (1 + theOffset));
-				}
-				charData++;
-				
-				[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
-				
-				if (theOffset == 0)	writeValue += 1;
-				else				writeValue |= (1UL << theOffset);
-				
-				[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
-				
-			}
+		// Enable master clock 
+		[self writeToXL2Register:XL2_CLOCK_CS_REG value:XL2_MASTER_CLK_EN];
+		
+		int j;
+		for(j = 1; j<=3; j++){			// there are three clocks, Memory, Sequencer and ADC
+			
+			// skip the comment line
+			while ( *charData != '\r' ) charData++;
 			
 			charData++;
+			
+			// the first field has to be a ONE or a ZERO
+			if ( ( *charData != '1') && ( *charData != '0')) {	
+				[NSException raise:@"Bad Clock File" format:@"Invalid first characer in clock file"];
+			}
+			int i;
+			for (i = 1; i<=4; i++){		// there are four lines of data per clock
+				while ( *charData != '\r' ){    
+					
+					writeValue = XL2_MASTER_CLK_EN;	// keep the master clock enabled
+					if( *charData == '1' ){
+						writeValue |= (1UL<< (1 + theOffset));
+					}
+					charData++;
+					
+					[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+					
+					if (theOffset == 0)	writeValue += 1;
+					else				writeValue |= (1UL << theOffset);
+					
+					[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+					
+				}
+				
+				charData++;
+			}
+			theOffset += 4;
 		}
-		theOffset += 4;
+		
+		// keep the master clock enabled and enable all three clocks
+		writeValue = XL2_MASTER_CLK_EN | XL2_MEMORY_CLK_EN | XL2_SEQUENCER_CLK_EN | XL2_ADC_CLK_EN;	
+		[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+		
+		[self deselectCards];
+		NSLog(@"loaded the clock file\n");
 	}
-	
-	// keep the master clock enabled and enable all three clocks
-	writeValue = XL2_MASTER_CLK_EN | XL2_MEMORY_CLK_EN | XL2_SEQUENCER_CLK_EN | XL2_ADC_CLK_EN;	
-	[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
-	
-	[self deselectCards];
-	NSLog(@"loaded the clock file\n");
-	NS_HANDLER
-	[self deselectCards];
-	NSLog(@"Could not load the clock file!\n");	
-	NS_ENDHANDLER
+	@catch(NSException* localException) {
+		[self deselectCards];
+		NSLog(@"Could not load the clock file!\n");	
+	}
 }
 
 
@@ -547,131 +551,132 @@ unsigned long xl2_register_offsets[] =
 	unsigned long mc_SelectBits	= 0;						
 	Boolean firstPass			= TRUE;
 	
-	NS_DURING
-	
-	// Load the data from the Xilinx File
-	NSData* theData = [[self xl1] xilinxFileData];	// load the entire content of the file
-	char*   charData = (char*)[theData bytes];
-	unsigned long length = [theData length];
-	unsigned long index = length; 
-	
-	// select the mother cards in the SNO Crate
-	int card_index;
-	for (card_index = 0; card_index < kNumSNOCards ; card_index++){
-		//TBD Make select mask based on old criteria
-		//if(    ( theConfigDB -> MCPresent(its_SC_Number,card_index) )
-		//   && ( theConfigDB -> SlotOnline(its_SC_Number,card_index) ) ){
+	@try {
 		
-		// build the bit pattern			
-		mc_SelectBits |= ( 1UL << 8);
+		// Load the data from the Xilinx File
+		NSData* theData = [[self xl1] xilinxFileData];	// load the entire content of the file
+		char*   charData = (char*)[theData bytes];
+		unsigned long length = [theData length];
+		unsigned long index = length; 
 		
-		//}
-	}	
-	mc_SelectBits |= XL2_SELECT_XL2;
-	[self selectCards:mc_SelectBits];
-	
-	// make sure that the XL2 DP bit is set low and bit 11 (xilinx active) is high -- 
-	// this is not yet sent to the MB
-	writeValue = XL2_CONTROL_BIT11;	
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
-	
-	// This seems to fix the xilinx reprogramming problem with the Power PC
-	[ORTimer delay:.200];   // doubled MAH 01/18/00
-	
-	// now toggle this on the MB and turn on the XL2 xilinx load permission bit
-	
-	// DO NOT USE CXL2_Secondary_Reg_Access here unless you retain the state
-	// of the select bits in register zero!!!!		
-	writeValue = XL2_XLPERMIT | XL2_ENABLE_DP;
-	[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
-	//		Wait(100);   // 100 msec delay  QRA 1/18/98
-	// This seems to fix the xilinx reprogramming problem with the Power PC
-	[ORTimer delay:.200];   // doubled MAH 01/18/00
-	
-	// turn off the DP bit but keep 
-	writeValue = XL2_XLPERMIT | XL2_DISABLE_DP;
-	[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
-	
-	// set  bit 11 high, bit 10 high
-	writeValue = XL2_CONTROL_BIT11 | XL2_CONTROL_CLOCK;
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
-	
-	[ORTimer delay:.200];   // doubled MAH 01/18/00
-	
-	//unsigned long theDelay = theConfigDB->getXiLinxLoadDelay(its_SC_Number); 
-	unsigned long theDelay = 40000; //nSec
-	int i;
-	for (i = 1;i < index;i++){
-		
-		if ( (firstPass) && (*charData != '/') ){
-			[NSException raise:@"Bad Xilinx File" format:@"Invalid first characer in xilinx file"];
-		}
-		
-		if (firstPass){
-			charData++;							// for the first backslash
-			i++;  									// need to keep track of i
+		// select the mother cards in the SNO Crate
+		int card_index;
+		for (card_index = 0; card_index < kNumSNOCards ; card_index++){
+			//TBD Make select mask based on old criteria
+			//if(    ( theConfigDB -> MCPresent(its_SC_Number,card_index) )
+			//   && ( theConfigDB -> SlotOnline(its_SC_Number,card_index) ) ){
 			
-			while(*charData++ != '/'){
+			// build the bit pattern			
+			mc_SelectBits |= ( 1UL << 8);
+			
+			//}
+		}	
+		mc_SelectBits |= XL2_SELECT_XL2;
+		[self selectCards:mc_SelectBits];
+		
+		// make sure that the XL2 DP bit is set low and bit 11 (xilinx active) is high -- 
+		// this is not yet sent to the MB
+		writeValue = XL2_CONTROL_BIT11;	
+		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
+		
+		// This seems to fix the xilinx reprogramming problem with the Power PC
+		[ORTimer delay:.200];   // doubled MAH 01/18/00
+		
+		// now toggle this on the MB and turn on the XL2 xilinx load permission bit
+		
+		// DO NOT USE CXL2_Secondary_Reg_Access here unless you retain the state
+		// of the select bits in register zero!!!!		
+		writeValue = XL2_XLPERMIT | XL2_ENABLE_DP;
+		[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
+		//		Wait(100);   // 100 msec delay  QRA 1/18/98
+		// This seems to fix the xilinx reprogramming problem with the Power PC
+		[ORTimer delay:.200];   // doubled MAH 01/18/00
+		
+		// turn off the DP bit but keep 
+		writeValue = XL2_XLPERMIT | XL2_DISABLE_DP;
+		[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
+		
+		// set  bit 11 high, bit 10 high
+		writeValue = XL2_CONTROL_BIT11 | XL2_CONTROL_CLOCK;
+		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
+		
+		[ORTimer delay:.200];   // doubled MAH 01/18/00
+		
+		//unsigned long theDelay = theConfigDB->getXiLinxLoadDelay(its_SC_Number); 
+		unsigned long theDelay = 40000; //nSec
+		int i;
+		for (i = 1;i < index;i++){
+			
+			if ( (firstPass) && (*charData != '/') ){
+				[NSException raise:@"Bad Xilinx File" format:@"Invalid first characer in xilinx file"];
+			}
+			
+			if (firstPass){
+				charData++;							// for the first backslash
+				i++;  									// need to keep track of i
 				
-				i++;
-				if ( i>index ){
-					[NSException raise:@"Bad Xilinx File" format:@"Comment block not delimited by a backslash"];
+				while(*charData++ != '/'){
+					
+					i++;
+					if ( i>index ){
+						[NSException raise:@"Bad Xilinx File" format:@"Comment block not delimited by a backslash"];
+					}
 				}
 			}
-		}
-		
-		firstPass = FALSE;
-		
-		// strip carriage return, tabs
-		if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
-			charData++;
-		}
-		else {
-			bitCount++;
 			
-			if ( *charData == '1' ) {
-				writeValue = XL2_CONTROL_BIT11 | XL2_CONTROL_DATA;	// bit set in data to load
-			}
-			else if ( *charData == '0' ) {
-				writeValue = XL2_CONTROL_BIT11;						// bit not set in data
+			firstPass = FALSE;
+			
+			// strip carriage return, tabs
+			if ( ((*charData =='\r') || (*charData =='\n') || (*charData =='\t' )) && (!firstPass) ){		
+				charData++;
 			}
 			else {
-				[NSException raise:@"Bad Xilinx File" format:@"Invalid character in Xilinx file"];
+				bitCount++;
+				
+				if ( *charData == '1' ) {
+					writeValue = XL2_CONTROL_BIT11 | XL2_CONTROL_DATA;	// bit set in data to load
+				}
+				else if ( *charData == '0' ) {
+					writeValue = XL2_CONTROL_BIT11;						// bit not set in data
+				}
+				else {
+					[NSException raise:@"Bad Xilinx File" format:@"Invalid character in Xilinx file"];
+				}
+				charData++;	
+				
+				[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue | XL2_CONTROL_CLOCK];	// changed PMT 1/17/98 to match Penn code
+				[ORTimer delayNanoseconds:theDelay];
+				
+				// toggle clock high
+				[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue]; // changed PMT 1/17/98 to match Penn code
+				[ORTimer delayNanoseconds:theDelay];
 			}
-			charData++;	
-			
-			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue | XL2_CONTROL_CLOCK];	// changed PMT 1/17/98 to match Penn code
-			[ORTimer delayNanoseconds:theDelay];
-			
-			// toggle clock high
-			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue]; // changed PMT 1/17/98 to match Penn code
-			[ORTimer delayNanoseconds:theDelay];
 		}
+		//Wait(100);   // 100 msec delay
+		[ORTimer delay:.200];// doubled MAH 01/18/00
+		
+		// QRA :5/31/97 -- do this before reading the DON_PROG bit. Xilinx Load on our
+		// system now works. Why this should make any diferrence is a puzzle. 
+		// More Changes, RGV, PW : turn off XLPERMIT & clear this register
+		writeValue = 0UL;
+		[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
+		
+		[ORTimer delay:.200];// added MAH 01/18/00
+		
+		if(![self checkXlinixLoadOK:XL2_SELECT_XL2]){
+			NSLog(@"Xilinx load failed XL2! (Status bit checked twice)");
+		}
+		else NSLog(@"looks like a successful Xilinx load\n");
+		
+		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG];	//BLW 10/31/02-set bit 11 low, similar to previous version
+		
+		// now deselect all mother cards
+		[self deselectCards];
+		
 	}
-	//Wait(100);   // 100 msec delay
-	[ORTimer delay:.200];// doubled MAH 01/18/00
-	
-	// QRA :5/31/97 -- do this before reading the DON_PROG bit. Xilinx Load on our
-	// system now works. Why this should make any diferrence is a puzzle. 
-	// More Changes, RGV, PW : turn off XLPERMIT & clear this register
-	writeValue = 0UL;
-	[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
-	
-	[ORTimer delay:.200];// added MAH 01/18/00
-	
-	if(![self checkXlinixLoadOK:XL2_SELECT_XL2]){
-		NSLog(@"Xilinx load failed XL2! (Status bit checked twice)");
-	}
-	else NSLog(@"looks like a successful Xilinx load\n");
-	
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG];	//BLW 10/31/02-set bit 11 low, similar to previous version
-	
-	// now deselect all mother cards
-	[self deselectCards];
-	
-	NS_HANDLER
-	[self deselectCards];
-	NS_ENDHANDLER	
+	@catch(NSException* localException) {
+		[self deselectCards];
+	}	
 	
 }
 @end

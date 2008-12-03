@@ -171,8 +171,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
                 postNotificationName:OROrcaObjectImageChanged
                               object:self];
 		
-
-//	NS_DURING		
+		
 
 }
 
