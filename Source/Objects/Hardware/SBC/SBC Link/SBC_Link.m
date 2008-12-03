@@ -80,22 +80,22 @@ NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged"
 NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 /*
-@interface SBC_Link (private)
-- (void) throwError:(int)anError;
-- (void) fillInScript:(NSString*)theScript;
-- (void) runFailed;
-- (void) startCrateProcess;
-- (void) watchIrqSocket;
-- (void) write:(int)aSocket buffer:(SBC_Packet*)aPacket;
-- (void) read:(int)aSocket buffer:(SBC_Packet*)aPacket;
-- (BOOL) dataAvailable:(int) sck;
-- (BOOL) canWriteTo:(int) sck;
-- (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket;
-- (void) sampleCBTransferSpeed;
-- (void) doOneCBTransferTest:(long)payloadSize;
-- (void) doCBTransferTest;
-@end
-*/
+ @interface SBC_Link (private)
+ - (void) throwError:(int)anError;
+ - (void) fillInScript:(NSString*)theScript;
+ - (void) runFailed;
+ - (void) startCrateProcess;
+ - (void) watchIrqSocket;
+ - (void) write:(int)aSocket buffer:(SBC_Packet*)aPacket;
+ - (void) read:(int)aSocket buffer:(SBC_Packet*)aPacket;
+ - (BOOL) dataAvailable:(int) sck;
+ - (BOOL) canWriteTo:(int) sck;
+ - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket;
+ - (void) sampleCBTransferSpeed;
+ - (void) doOneCBTransferTest:(long)payloadSize;
+ - (void) doCBTransferTest;
+ @end
+ */
 
 @implementation SBC_Link
 - (id)   initWithDelegate:(ORCard*)aDelegate
@@ -106,17 +106,18 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	
 	exitCBTest    = YES;
 	cbTestRunning = NO;
-
+	
 	return self;
 }
 
 
 - (void) dealloc
 {
-	NS_DURING
+	@try {
 		[self stopCrate];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch (NSException* localException) {
+	}
 	[socketLock release];
 	[eCpuDeadAlarm clearAlarm];
 	[eCpuDeadAlarm release];
@@ -161,7 +162,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setNumTestPoints:numTestPoints];
     
     numTestPoints = num;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkNumCBTextPointsChanged object:self];
 }
 
@@ -175,7 +176,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setInfoType:infoType];
     
     infoType = aType;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkInfoTypeChanged object:self];
 }
 
@@ -209,7 +210,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setLoadMode:loadMode];
     
     loadMode = aLoadMode;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkLoadModeChanged object:self];
 }
 
@@ -223,7 +224,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setInitAfterConnect:initAfterConnect];
     
     initAfterConnect = aInitAfterConnect;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkInitAfterConnectChanged object:self];
 }
 
@@ -236,7 +237,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 {
 	tryingTostartCrate = flag;
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkTryingToStartCrateChanged object:self];
-		
+	
 }
 
 - (BOOL) verbose
@@ -247,9 +248,9 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) setVerbose:(BOOL)flag
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setVerbose:verbose];
-
+	
     verbose = flag;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkVerboseChanged object:self];
 }
 
@@ -262,9 +263,9 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) setForceReload:(BOOL)flag
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setForceReload:forceReload];
-
+	
     forceReload = flag;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkForceReloadChanged object:self];
 }
 
@@ -276,7 +277,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) setReloading:(BOOL)aReloading
 {
     reloading = aReloading;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkReloadingChanged object:self];
 }
 
@@ -293,7 +294,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) setCompilerErrors:(int)aValue
 {
     compilerErrors = aValue;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCompilerErrorsChanged object:self];
 }
 
@@ -305,7 +306,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) setCompilerWarnings:(int)aValue
 {
     compilerWarnings = aValue;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCompilerWarningsChanged object:self];
 }
 
@@ -340,7 +341,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:writeValue];
     
     writeValue = aWriteValue;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkWriteValueChanged object:self];
 }
 
@@ -354,7 +355,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteAddress:writeAddress];
     
     writeAddress = aAddress;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkWriteAddressChanged object:self];
 }
 
@@ -371,7 +372,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     
     [filePath autorelease];
     filePath = [aPath copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkPathChanged object:self];
 }
 
@@ -388,7 +389,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     
     [userName autorelease];
     userName = [aUserName copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkUserNameChanged object:self];
 }
 
@@ -405,7 +406,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     
     [passWord autorelease];
     passWord = [aPassWord copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkPassWordChanged object:self];
 }
 
@@ -424,9 +425,9 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 {
 	isConnected = aNewIsConnected;
 	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:SBC_LinkConnectionChanged 
-                          object: self];
-
+	 postNotificationName:SBC_LinkConnectionChanged 
+	 object: self];
+	
 	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
 }
 
@@ -448,7 +449,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setPortNumber:portNumber];
     
     portNumber = aPort;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkPortChanged object:self];
 }
 
@@ -466,7 +467,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     
     [IPNumber autorelease];
     IPNumber = [aIPNumber copy];    
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkIPNumberChanged object:self];
 }
 
@@ -511,7 +512,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setRange:range];
     
     range = aRange;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRangeChanged object:self];
 }
 
@@ -525,7 +526,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setDoRange:doRange];
     
     doRange = aDoRange;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkDoRangeChanged object:self];
 }
 
@@ -540,8 +541,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setReadWriteType:readWriteType];
     readWriteType = aValue;
     [[NSNotificationCenter defaultCenter]
-		    postNotificationName:SBC_LinkRWTypeChanged
-                          object:self];
+	 postNotificationName:SBC_LinkRWTypeChanged
+	 object:self];
 }
 
 - (unsigned long) addressModifier
@@ -555,8 +556,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [[[self undoManager] prepareWithInvocationTarget:self] setAddressModifier:addressModifier];
     addressModifier = aValue;
     [[NSNotificationCenter defaultCenter]
-		    postNotificationName:SBC_LinkAddressModifierChanged
-                          object:self];
+	 postNotificationName:SBC_LinkAddressModifierChanged
+	 object:self];
 }
 
 
@@ -573,7 +574,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	long lnum = [decoder decodeInt32ForKey:  @"payloadSize"];
 	if(lnum==0)[self setPayloadSize:65000];
 	else [self setPayloadSize:lnum];
-		
+	
 	[self setInfoType:		[decoder decodeIntForKey:   @"infoType"]];
 	[self setLoadMode:		[decoder decodeIntForKey:   @"loadMode"]];
 	[self setInitAfterConnect:[decoder decodeBoolForKey:@"InitAfterConnect"]];
@@ -591,10 +592,10 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
     [self setReadWriteType: [decoder decodeIntForKey:   @"ReadWriteType"]];	
     [self setAddressModifier: [decoder decodeIntForKey:   @"addressModifier"]];	
 	socketLock = [[NSLock alloc] init];
-
+	
 	exitCBTest    = YES;
 	cbTestRunning = NO;
-
+	
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
@@ -653,7 +654,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		}
 		[self setCompilerErrors:0];
 		[self setCompilerWarnings:0];
-
+		
 		[self performSelector:@selector(startCrateCode) withObject:self afterDelay:0];
 	}
 }
@@ -668,7 +669,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	[self send:&aPacket receive:&aPacket];
 	
 	memcpy(&runInfo,aPacket.payload,sizeof(SBC_info_struct));
-			
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkRunInfoChanged object:self];
 }
 
@@ -676,7 +677,6 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 {
 	return throttle;
 }
-
 - (void) reloadClient
 {
 	[self setReloading:YES];
@@ -685,11 +685,12 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	//this loads an entire copy of the client code onto the remote server and does a make.
 	//it does NOT start the code
     if(portNumber){
-		NS_DURING
+		@try {
 			[self stopCrate];
-		NS_HANDLER
+		}
+		@catch (NSException* localException) {
 			NSLog(@"Could not stop crate ... Probably already stopped\n");
-		NS_ENDHANDLER
+		}
 		NSLog(@"Core code for crate reload starting\n");
 		NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
@@ -697,7 +698,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"/bin/rm",@"-rf",@"ORCA",nil]];
 		[aSequence setVerbose:verbose];
 		[aSequence setTextToDelegate:YES];
-				 
+		
 		[self fillInScript:@"makeScript"];
 		[self fillInScript:@"goScript"];
 		[self fillInScript:@"organizeScript"];
@@ -709,16 +710,16 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		else		 coreCodePath = [resourcePath stringByAppendingPathComponent:@"SBC_Code"];
 		
 		[coreSBCFileMover setMoveParams:[coreCodePath stringByExpandingTildeInPath]
-							  to:@"ORCA" 
-					  remoteHost:IPNumber 
-						userName:userName 
-						passWord:passWord];
+									 to:@"ORCA" 
+							 remoteHost:IPNumber 
+							   userName:userName 
+							   passWord:passWord];
 		[coreSBCFileMover setVerbose:NO];
 		[coreSBCFileMover doNotMoveFilesToSentFolder];
 		[coreSBCFileMover setTransferType:eUseSCP];
 		[aSequence addTaskObj:coreSBCFileMover];
-
-
+		
+		
 		specificHWFileMover = [[ORFileMover alloc] init];
 		[specificHWFileMover setDelegate:aSequence];
 		
@@ -727,42 +728,43 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		else hwSpecificCodePath = [resourcePath stringByAppendingPathComponent:[delegate codeResourcePath]];
 		
 		[specificHWFileMover setMoveParams:[hwSpecificCodePath stringByExpandingTildeInPath]
-							  to:@"ORCA/HW_Readout" 
-					  remoteHost:IPNumber 
-						userName:userName 
-						passWord:passWord];
+										to:@"ORCA/HW_Readout" 
+								remoteHost:IPNumber 
+								  userName:userName 
+								  passWord:passWord];
 		[specificHWFileMover setVerbose:NO];
 		[specificHWFileMover doNotMoveFilesToSentFolder];
 		[specificHWFileMover setTransferType:eUseSCP];
 		[aSequence addTaskObj:specificHWFileMover];
-				
+		
 		[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
 				 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/makeScript",nil]];
-
+		
 		[aSequence launch];
 	}
 }
 
 - (void) killCrate
 {
-	NS_DURING
+	@try {
 		startCrateState = kDone;
 		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkCrateStartStatusChanged object:self];
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startCrateProcess) object:nil];
 		[self stopCrate];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch (NSException* localException) {
+	}
 	
 	[self fillInScript:@"killScript"];
 	
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/killScript",nil]];
-
+			 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/killScript",nil]];
+	
 	[aSequence setVerbose:verbose];
 	[aSequence setTextToDelegate:YES];
-
+	
 	[aSequence launch];
 }
 
@@ -804,11 +806,12 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) toggleCrate
 {
 	if([self isConnected]){
-		NS_DURING
+		@try {
 			[self stopCrate];
-		NS_HANDLER
+		}
+		@catch (NSException* localException) {
 			[self disconnect];
-		NS_ENDHANDLER
+		}
 	}
 	else {
 		[self setTryingToStartCrate:YES];
@@ -849,17 +852,17 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	NSString* resourcePath = [[NSBundle mainBundle] resourcePath];
 	ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 	[aSequence addTask:[resourcePath stringByAppendingPathComponent:@"loginScript"] 
-				arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/goScript",nil]];
-
+			 arguments:[NSArray arrayWithObjects:userName,passWord,IPNumber,@"~/ORCA/goScript",nil]];
+	
 	[aSequence setVerbose:verbose];
 	[aSequence setTextToDelegate:YES];
-
+	
 	[aSequence launch];
 }
 
 - (void) tellClientToStartRun
 {
-
+	
 	[self sendPayloadSize:65000];
 	
 	SBC_CmdOptionStruct optionBlock;
@@ -868,7 +871,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		//future run options could be added here.
 		optionBlock.option[i]	= 0;
 	}
-
+	
 	[self sendCommand:kSBC_StartRun withOptions:&optionBlock expectResponse:YES];
 	
 	if(optionBlock.option[0] == 1){
@@ -879,7 +882,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[NSException raise:@"Run Didn't Start" format:@"%@ failed to start run",[self crateName]];	
 	}
 }
-	
+
 - (void) tellClientToStopRun
 {
 	SBC_CmdOptionStruct optionBlock;
@@ -888,7 +891,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		//future run options could be added here.
 		optionBlock.option[i]	= 0;
 	}
-
+	
 	[self sendCommand:kSBC_StopRun withOptions:&optionBlock expectResponse:YES];
 	
 	if(optionBlock.option[0] == 0){
@@ -898,7 +901,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[NSException raise:@"Run Didn't Stop" format:@"%@ failed to stop run",[self crateName]];	
 	}
 }
-	
+
 - (void) sendCommand:(long)aCmd withOptions:(SBC_CmdOptionStruct*)optionBlock expectResponse:(BOOL)askForResponse
 {
 	SBC_Packet aPacket;
@@ -907,11 +910,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	aPacket.cmdHeader.cmdID					= aCmd;
 	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_CmdOptionStruct);
 	memcpy(aPacket.payload,optionBlock,sizeof(SBC_CmdOptionStruct));
-		
-	NS_DURING
+	
+	@try {
 		[socketLock lock]; //begin critical section
 		[self write:socketfd buffer:&aPacket];
-
+		
 		if(askForResponse){
 			//get the response....
 			[self read:socketfd buffer:&aPacket];
@@ -922,19 +925,20 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			}
 		}
 		[socketLock unlock]; //end critical section
-
-	NS_HANDLER
+		
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
-
+	}
+	
 }
 
 - (void) writeLongBlock:(long*) buffer
 			  atAddress:(unsigned long) anAddress
 			 numToWrite:(unsigned int)  numberLongs
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
@@ -946,13 +950,14 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		writeBlockPtr->numLongs		= numberLongs;
 		writeBlockPtr++;
 		memcpy(writeBlockPtr,buffer,numberLongs*sizeof(long));
-
+		
 		[self write:socketfd buffer:&aPacket];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -960,17 +965,17 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			 atAddress:(unsigned long) anAddress
 			 numToRead:(unsigned int) numberLongs
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_ReadBlockStruct);
-			
+		
 		SBC_ReadBlockStruct* readBlockPtr = (SBC_ReadBlockStruct*)aPacket.payload;
 		readBlockPtr->address		= anAddress;
 		readBlockPtr->numLongs		= numberLongs;
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket]; //write the packet
 		[self read:socketfd buffer:&aPacket]; //read the response
@@ -984,10 +989,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			buffer[i] = dp[i];
 		}
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readByteBlock:(unsigned char *) buffer
@@ -996,20 +1002,20 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace;
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
-			
+		
 		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		readBlockPtr->address			= aVmeAddress;
 		readBlockPtr->addressModifier	= anAddressModifier;
 		readBlockPtr->addressSpace		= anAddressSpace;
 		readBlockPtr->unitSize			= 1;
 		readBlockPtr->numItems			= numberBytes;
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket]; //write the packet
 		[self read:socketfd buffer:&aPacket];  //read the response
@@ -1022,10 +1028,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		}
 		else [self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readWordBlock:(unsigned short *) buffer
@@ -1034,20 +1041,20 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
-			
+		
 		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		readBlockPtr->address			= aVmeAddress;
 		readBlockPtr->addressModifier	= anAddressModifier;
 		readBlockPtr->addressSpace		= anAddressSpace;
 		readBlockPtr->unitSize			= 2;
 		readBlockPtr->numItems			= numberWords;
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket]; //write the packet
 		[self read:socketfd buffer:&aPacket];  //read the response
@@ -1060,10 +1067,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		}
 		else [self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) readLongBlock:(unsigned long *) buffer
@@ -1072,20 +1080,20 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_ReadBlock;
 		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_VmeReadBlockStruct);
-			
+		
 		SBC_VmeReadBlockStruct* readBlockPtr = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		readBlockPtr->address			= aVmeAddress;
 		readBlockPtr->addressModifier	= anAddressModifier;
 		readBlockPtr->addressSpace		= anAddressSpace;
 		readBlockPtr->unitSize			= 4;
 		readBlockPtr->numItems			= numberLongs;
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket];	//write the packet
 		[self read:socketfd buffer:&aPacket];		//read the response
@@ -1093,16 +1101,17 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(!rp->errorCode){		
 			int num = rp->numItems;
-
+			
 			rp++;
 			memcpy(buffer,rp,num*sizeof(long));
 		}
 		else [self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -1112,9 +1121,9 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
-
+		
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
@@ -1128,7 +1137,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		writeBlockPtr->numItems			= numberBytes;
 		char* bPtr = (char*)(writeBlockPtr+1); //point to the payload
 		memcpy(bPtr,buffer,numberBytes);
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket];	//write the packet
 		[self read:socketfd buffer:&aPacket];		//read the response
@@ -1136,10 +1145,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(rp->errorCode)[self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -1149,9 +1159,9 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
-
+		
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
@@ -1165,7 +1175,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		writeBlockPtr->numItems			= numberWords;
 		short* wPtr = (short*)(writeBlockPtr+1); //point to the payload
 		memcpy(wPtr,buffer,numberWords*sizeof(short));
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket];	//write the packet
 		[self read:socketfd buffer:&aPacket];		//read the response
@@ -1173,10 +1183,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(rp->errorCode)[self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 - (void) writeLongBlock:(unsigned long *) buffer
@@ -1185,9 +1196,9 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace
 {
-	NS_DURING
+	@try {
 		[socketLock lock]; //begin critical section
-
+		
 		SBC_Packet aPacket;
 		aPacket.cmdHeader.destination			= kSBC_Process;
 		aPacket.cmdHeader.cmdID					= kSBC_WriteBlock;
@@ -1201,7 +1212,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		writeBlockPtr->numItems			= numberLongs;
 		writeBlockPtr++;				//point to the payload
 		memcpy(writeBlockPtr,buffer,numberLongs*sizeof(long));
-
+		
 		//Do NOT call the combo send:receive method here... we have the locks already in place
 		[self write:socketfd buffer:&aPacket];	//write the packet
 		[self read:socketfd buffer:&aPacket];		//read the response
@@ -1209,23 +1220,25 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		SBC_VmeReadBlockStruct* rp = (SBC_VmeReadBlockStruct*)aPacket.payload;
 		if(rp->errorCode)[self throwError:rp->errorCode];
 		[socketLock unlock]; //end critical section
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critical section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 }
 
 
 - (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket
 {
 	[socketLock lock]; //begin critial section
-	NS_DURING
+	@try {
 		[self write:socketfd buffer:aSendPacket];
 		[self read:socketfd buffer:aReceivePacket];
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		[socketLock unlock]; //end critial section
 		[localException raise];
-	NS_ENDHANDLER
+	}
 	[socketLock unlock]; //end critial section
 }
 
@@ -1254,9 +1267,9 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		}	
 	}
     /*if (throttle > kShrinkThrottleBy && runInfo.amountInBuffer > kAmountInBufferThreshold) {
-        *//* Let's try diminishing the throttle */
-        /*throttle -= kShrinkThrottleBy;
-    }*/
+	 *//* Let's try diminishing the throttle */
+	/*throttle -= kShrinkThrottleBy;
+	 }*/
 	if(isRunning){
 		[self performSelector:@selector(update) withObject:nil afterDelay:.5];
 	}
@@ -1264,7 +1277,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
+	
 	if([[self orcaObjects] count]){
 		//set up the irq thread to watch that socket, but only if there are LAMS defined
 		stopWatchingIRQ = NO;
@@ -1291,7 +1304,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
         aPacket.cmdHeader.cmdID			= kSBC_CBRead;
         aPacket.cmdHeader.numberBytesinPayload = 0;
 		[self send:&aPacket receive:&aPacket];
-					
+		
 		unsigned long* rp = (unsigned long*)aPacket.payload;
 		long numLongs = aPacket.cmdHeader.numberBytesinPayload/sizeof(long);
 		if(numLongs){
@@ -1302,20 +1315,21 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	NS_DURING
+	@try {
 		[self tellClientToStopRun];
 		stopWatchingIRQ = YES;
 		[self getRunInfoBlock];
 		/* We no longer need the throttle since we are just clearing the circular buffer.
-		It will be reset when the run starts.                                           */
+		 It will be reset when the run starts.                                           */
 		throttle = 0;
 		if(runInfo.amountInBuffer > 0){
 			lastAmountInBuffer = runInfo.amountInBuffer;
 			NSLog(@"%@ %d %d reading out last %d bytes in CB\nm",[delegate className],[delegate crateNumber],[delegate slot],runInfo.amountInBuffer);
 		}
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		NSLog(@"%@\n",localException);
-	NS_ENDHANDLER
+	}
 }
 
 - (BOOL) doneTakingData
@@ -1358,7 +1372,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	*aMaxValue  = runInfo.bufferSize;
 	*aHeadValue = runInfo.writeIndex;
 	*aTailValue = runInfo.readIndex;
-
+	
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1369,27 +1383,28 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) connect
 {
 	if(!socketfd && !irqfd && ([IPNumber length]!=0) && (portNumber!=0)){
-		NS_DURING
+		@try {
 			//get the socket descriptor for the main com link
 			socketfd = [self connectToPort:portNumber];
-
+			
 			//send a test word to determine if swapping will be needed. All swapping is handled on the 'other' side.
 			long testWord = 0x0000DCBA;
 			int bytesWritten = write(socketfd,&testWord,4);
 			if(bytesWritten!=4) [NSException raise:@"Test Send Failed" format:@"Couldn't write to %@",IPNumber];
-
+			
 			//get the socket descriptor for the interrupt link
 			irqfd = [self connectToPort:portNumber+1];
-
+			
 			[self setIsConnected: YES];
 			[self setTimeConnected:[NSCalendarDate date]];
 			[self setReloading:NO];
-						
+			
 			NSLog(@"Connected to %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
 			//[self getRunInfoBlock];
 			[[delegate crate] performSelector:@selector(connected) withObject:nil afterDelay:1];
-
-		NS_HANDLER
+			
+		}
+		@catch (NSException* localException) {
 			if(socketfd){
 				close(socketfd);
 				socketfd = 0;
@@ -1400,9 +1415,9 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			}
 			[self setIsConnected: NO];
 			[self setTimeConnected:nil];
-
+			
 			[localException raise];
-		NS_ENDHANDLER
+		}
 		
 	}
 }
@@ -1427,7 +1442,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	[self setTimeConnected:nil];
 	NSLog(@"Disconnected from %@ <%@> port: %d\n",[self crateName],IPNumber,portNumber);
 	[[delegate crate] disconnected];
-		
+	
 }
 
 - (int) connectToPort:(unsigned short) aPort
@@ -1441,7 +1456,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	target_address.sin_port = htons(aPort);				// short, network byte order 
 	target_address.sin_addr = *((struct in_addr *)he->h_addr);
 	memset(&(target_address.sin_zero), '\0', 8);		// zero the rest of the struct 
-
+	
     int sck = socket(AF_INET, SOCK_STREAM, 0);
 	if(sck == kError)[NSException raise:@"Socket Failed" format:@"Couldn't couldn't get a socket for %@ Port %d",IPNumber,aPort];
 	
@@ -1455,7 +1470,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		}
 	}
 	//fcntl(sck, F_SETFL, oflag | O_NONBLOCK);
-
+	
 	return sck;
 }
 
@@ -1493,7 +1508,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	if(!pingTask){
 		ORTaskSequence* aSequence = [ORTaskSequence taskSequenceWithDelegate:self];
 		pingTask = [[NSTask alloc] init];
-
+		
 		[pingTask setLaunchPath:@"/sbin/ping"];
 		[pingTask setArguments: [NSArray arrayWithObjects:@"-c",@"5",@"-t",@"10",@"-q",IPNumber,nil]];
 		
@@ -1589,7 +1604,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	else if(aValue>350000)aValue = 35000;
 	
     payloadSize = aValue;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkNumPayloadSizeChanged object:self];
 }
 
@@ -1637,15 +1652,15 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	NSMutableString* contents = [NSMutableString stringWithContentsOfFile:aScriptPath];
 	[contents replaceOccurrencesOfString:@"<serverName>" withString:@"OrcaReadout" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [contents length])];
 	[contents replaceOccurrencesOfString:@"<port>" withString:[NSString stringWithFormat:@"%d",portNumber] options:NSCaseInsensitiveSearch range:NSMakeRange(0, [contents length])];
-
+	
 	//then, copy it into either the ORCA source tree or the App Bundle resource
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSString* coreCodePath;
 	if(loadMode) coreCodePath = [filePath stringByAppendingPathComponent:@"Source/Objects/Hardware/SBC/SBC_Code"];
 	else		 coreCodePath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"SBC_Code"];
-
+	
 	NSString* newScriptPath = [[coreCodePath stringByAppendingPathComponent:theScript] stringByExpandingTildeInPath];
-
+	
 	if([fm fileExistsAtPath: newScriptPath]) [fm removeFileAtPath:newScriptPath handler:nil];
 	NSDictionary *attrib = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithInt:0777], NSFilePosixPermissions, NSFileTypeRegular, NSFileType,nil];
 	[fm createFileAtPath:newScriptPath contents:[contents dataUsingEncoding:NSASCIIStringEncoding] attributes:attrib]; 
@@ -1670,49 +1685,52 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	int oldState = startCrateState;
 	switch(startCrateState){
 		case kTryToConnect:
-			NS_DURING
+			@try {
 				[self connect]; //will throw if can't connect
 				startCrateState = kDone;
-			NS_HANDLER
+			}
+			@catch (NSException* localException) {
 				//couldn't connect, try to start the code
 				startCrateState = kTryToStartCode;
-			NS_ENDHANDLER
-		break;
-		
+			}
+			break;
+			
 		case kTryToStartCode:
-			NS_DURING
+			@try {
 				[self startCrateCode];
 				startCrateState = kWaitingForStart;
 				waitCount = 0;
-			NS_HANDLER
+			}
+			@catch (NSException* localException) {
 				startCrateState = kReloadCode;
-			NS_ENDHANDLER
-		break;
-		
+			}
+			break;
+			
 		case kWaitingForStart:
 			if(isConnected)startCrateState = kDone;
 			else if (goScriptFailed) startCrateState = kDone;
 			else {
-				NS_DURING
+				@try {
 					[self connect];
 					startCrateState = kDone;
-				NS_HANDLER
-				NS_ENDHANDLER
+				}
+				@catch (NSException* localException) {
+				}
 				waitCount++;
 				if(waitCount > 200){
 					waitCount = 0;
 					startCrateState = kReloadCode;
 				}
 			}
-		break;
-		
+			break;
+			
 		case kReloadCode:
 			[self reloadClient];
 			NSLog(@"waiting for code reload\n");
 			startCrateState = kWaitingForReload;
 			waitCount = 0;
-		break;
-		
+			break;
+			
 		case kWaitingForReload:
 			if(!reloading){
 				startCrateState = kTryToConnect2;
@@ -1728,15 +1746,16 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 					[self setReloading:NO];
 				}
 			}
-		break;
-		
+			break;
+			
 		case kTryToConnect2:
 			if(isConnected)startCrateState = kDone;
 			else {
-				NS_DURING
+				@try {
 					[self connect];
-				NS_HANDLER
-				NS_ENDHANDLER
+				}
+				@catch (NSException* localException) {
+				}
 				waitCount++;
 				if(waitCount > 10){
 					waitCount = 0;
@@ -1746,7 +1765,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 					[self setReloading:NO];
 				}
 			}
-		break;
+			break;
 	} 
 	
 	if(startCrateState != oldState){
@@ -1813,23 +1832,23 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	//be taken that thread locks are provided at a higher level.
 	aPacket->message[0] = '\0';
 	if(!aSocket)	[NSException raise:@"Write Error" format:@"Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
-
-    	// set up the file descriptor set
+	
+	// set up the file descriptor set
 	fd_set write_fds;
 	FD_ZERO(&write_fds);
 	FD_SET(aSocket, &write_fds);
-
+	
 	struct timeval tv;
 	tv.tv_sec  = 2;
 	tv.tv_usec = 0;
-
+	
 	// wait until timeout or data received
     int selectionResult = 0;
     int bytesWritten = 0;
 	int numBytesToSend = sizeof(long) +
-						 sizeof(SBC_CommandHeader) + 
-						 kSBC_MaxMessageSize + 
-						 aPacket->cmdHeader.numberBytesinPayload;
+	sizeof(SBC_CommandHeader) + 
+	kSBC_MaxMessageSize + 
+	aPacket->cmdHeader.numberBytesinPayload;
 	aPacket->numBytes = numBytesToSend;
 	char* packetPtr = (char*)aPacket;		//recast the first 'real' word in the packet
 	while (numBytesToSend) {
@@ -1859,17 +1878,17 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	//Note that there are NO locks on this method, but it is private and can only be called from this object. 
 	//Care must be taken that thread locks are provided at a higher level in this object
 	if(!aSocket)	[NSException raise:@"Read Error" format:@"Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
-
+	
 	
 	// set up the file descriptor set
 	fd_set fds;
 	FD_ZERO(&fds);
 	FD_SET(aSocket, &fds);
-
+	
 	struct timeval tv;
 	tv.tv_sec  = 3;
 	tv.tv_usec = 0;
-
+	
 	// wait until timeout or data received
 	int  selectionResult = select(aSocket+1, &fds, NULL, NULL, &tv);
 	if(selectionResult > 0){
@@ -1911,16 +1930,16 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
         while (numToGet) {
             selectionResult = select(aSocket+1, &read_fds, NULL, NULL, &tv);
             if(selectionResult > 0){
-                    n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
-                    if(n==0){
-                        [self disconnect];
-                        [NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-                    } else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
-                        [NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
-                    } else {
-                        numToGet -= n;
-                        ptrToNumBytesToGet += n;    
-                    }
+				n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
+				if(n==0){
+					[self disconnect];
+					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+				} else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
+					[NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
+				} else {
+					numToGet -= n;
+					ptrToNumBytesToGet += n;    
+				}
             }
             else if (selectionResult == kSelectionError){
                 [NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
@@ -1962,13 +1981,13 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 {
 	fd_set wfds;
 	struct timeval tv;
-
+	
 	FD_ZERO(&wfds);
 	FD_SET(sck, &wfds);
-
+	
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
-
+	
 	int retval = select(sck + 1, NULL, &wfds, NULL, &tv);
 	return (retval > 0) && FD_ISSET(sck, &wfds);
 }
@@ -1981,11 +2000,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	fd_set fds;
 	FD_ZERO(&fds);
 	FD_SET(aSocket, &fds);
-
+	
 	struct timeval tv;
 	tv.tv_sec  = 0;
 	tv.tv_usec = 10000;
-
+	
 	// wait until timeout or data received
 	int  selectionResult = select(aSocket+1, &fds, NULL, NULL, &tv);
 	return (selectionResult > 0) && FD_ISSET(aSocket, &fds);
@@ -1994,7 +2013,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) doCBTransferTest
 {	
 	if(exitCBTest) return;
-
+	
 	if(!cbTestRunning){
 		currentBlockSize = startBlockSize + cbTestCount*deltaBlockSize;
 		
@@ -2006,14 +2025,14 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		else {
 			exitCBTest = YES;
 			[[ORGlobal sharedGlobal] removeRunVeto:@"CBTestInProgress"];
-
+			
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
 			return;
 		}
 	}
 	
 	[self performSelector:@selector(doCBTransferTest) withObject:nil afterDelay:1];
-
+	
 }
 
 - (void) doOneCBTransferTest:(long)aPayloadSize
@@ -2024,7 +2043,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	
 	SBC_CmdOptionStruct optionBlock;
 	[self sendCommand:kSBC_CBTest withOptions:&optionBlock expectResponse:YES];
-
+	
 	if(optionBlock.option[0] == 1){
 		[self performSelector:@selector(sampleCBTransferSpeed) withObject:nil afterDelay:1];
 		cbTestRunning = YES;
@@ -2038,7 +2057,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 - (void) sampleCBTransferSpeed
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sampleCBTransferSpeed) object:nil];
-
+	
 	NSDate* now = [NSDate date];
 	if([now timeIntervalSinceDate:lastInfoUpdate] > .5){
 		[self getRunInfoBlock];
@@ -2063,7 +2082,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	long numLongs = aPacket.cmdHeader.numberBytesinPayload/sizeof(long);
 	unsigned long* endPt = rp + numLongs;
 	
-
+	
 	while(rp<endPt){
 		unsigned long n = *rp++;
 		long i;

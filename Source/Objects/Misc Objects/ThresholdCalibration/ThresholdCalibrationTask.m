@@ -37,7 +37,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [channelArray release];
 	[reportArray release];
-
+	
     [super dealloc];
 }
 
@@ -114,17 +114,17 @@
 - (void) start:(int)num enabledMask:(unsigned long)enabledMask rateGroup:(ORRateGroup*)aRateGroup tag:(int)aTag
 { 
     numChannels = num;
-
+	
     [self setRateGroup:aRateGroup];
     [self setTag:aTag];
     
     NSLog(@"%@ <%d>: started.\n",name,tag);
-
-   [[NSNotificationCenter defaultCenter] addObserver : self
-	    selector : @selector(runStatusChanged:)
-	    name : ORRunStatusChangedNotification
-	    object : nil];
-	    
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+											 selector : @selector(runStatusChanged:)
+												 name : ORRunStatusChangedNotification
+											   object : nil];
+	
     savedIntegrationTime = [aRateGroup integrationTime];
     [aRateGroup setIntegrationTime:.2];
     int i;
@@ -159,15 +159,16 @@
 		}
 		else [aChannel stepCalibration];
     } 
-	 
+	
 	//load the hw with the last set values
     [delegate loadCalibrationValues];
-	NS_DURING
+	@try {
 		if([delegate respondsToSelector:@selector(reArm)]){
 			[delegate reArm];
 		}
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch(NSException* localException) {
+	}
 	
     //remove all done channels.
     [channelArray removeObjectsInArray:doneChannels];

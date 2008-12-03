@@ -25,18 +25,18 @@
 #import "ORRateGroup.h"
 
 static NSString* thresholdCalibrationStateNames[kNumStates]={
-	@"Idle",
-	@"Starting",
-	@"Search",
-	@"Down",
-	@"Integrate",
-	@"Up",
-	@"Tweak Dn",
-	@"Integrate",
-	@"Tweak Up",
-	@"Finishing",
-	@"Done",
-	@"Failed",
+@"Idle",
+@"Starting",
+@"Search",
+@"Down",
+@"Integrate",
+@"Up",
+@"Tweak Dn",
+@"Integrate",
+@"Tweak Up",
+@"Finishing",
+@"Done",
+@"Failed",
 };
 
 #define kNoiseGoal 10
@@ -109,21 +109,21 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 		}
 		else state = kFailed;
 	}
-	NS_DURING
-	
-		switch(state){
+	@try {
 		
+		switch(state){
+				
 			case kIdle:
 				originalThreshold = [[owner delegate] thresholdDac:channel];
 				state = kStarting;
 				bottomSearchCount = 0;
-			break;
-			
+				break;
+				
 			case kStarting:
 				[self setThreshold:0x00];
 				state = kBottomSearch;
-			break;
-			
+				break;
+				
 			case kBottomSearch:
 				[self setThreshold:threshold+1];
 				if(threshold>0x40 && bottomSearchCount<2){
@@ -144,8 +144,8 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 					[self setReason:@"No Noise"];
 					state = kFailed;
 				}
-			break;
-			
+				break;
+				
 			case kIteratingDown:
 				stateCount = 0;
 				delta = abs(threshold-baseThreshold)/2;
@@ -157,8 +157,8 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 					[self setThreshold:threshold - delta];
 					state = kIntegrating;
 				}
-			break;
-			
+				break;
+				
 			case kIteratingUp:
 				stateCount = 0;
 				delta = abs(threshold-baseThreshold)/2;
@@ -170,8 +170,8 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 					[self setThreshold:threshold + delta];
 					state = kIntegrating;
 				}
-			break;
-			
+				break;
+				
 			case kIntegrating:
 				if(++stateCount>=2){
 					if(rate < kNoiseGoal){
@@ -191,8 +191,8 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 						}
 					}
 				}
-			break;
-
+				break;
+				
 			case kIntegrating1:
 				if(++stateCount>=2){
 					if(rate > 1.0){
@@ -217,8 +217,8 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 						}
 					}
 				}
-			break;
-
+				break;
+				
 			case kTweakDown:
 				stateCount = 0;
 				if(threshold < noiseBottom){
@@ -229,8 +229,8 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 					state = kIntegrating1;
 					[self setThreshold:(threshold - 1)];
 				}
-			break;
-			
+				break;
+				
 			case kTweakUp:
 				stateCount = 0;
 				if(threshold >= [owner maxThreshold]){
@@ -241,21 +241,21 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 					[self setThreshold:(threshold + 1)];
 					state = kIntegrating1;
 				}
-			break;
-
-
+				break;
+				
+				
 			case kFinishing:
 				[self setThreshold:threshold + [[owner delegate] calibrationFinalDelta]];
 				state = kDone;
-			break;
-			
+				break;
+				
 			case kFailed:
 				[[owner delegate] setThresholdDac:channel withValue:originalThreshold];
 				isDone = YES;
-			break;
+				break;
 			case kDone:
 				isDone = YES;
-			break;
+				break;
 		}
 		
 		[[owner delegate] setThresholdDac:channel withValue:threshold];
@@ -266,9 +266,10 @@ static NSString* thresholdCalibrationStateNames[kNumStates]={
 			else string = [NSString stringWithFormat:@"(%d)",delta];
 		}
 		[[owner delegate] setThresholdCalibration:channel state:string];
-			
-	NS_HANDLER
-	NS_ENDHANDLER
+		
+	}
+	@catch(NSException* localException) {
+	}
 	if(threshold>[owner maxThreshold])NSLog(@"*************** >%x\n",[owner maxThreshold]);
 }
 

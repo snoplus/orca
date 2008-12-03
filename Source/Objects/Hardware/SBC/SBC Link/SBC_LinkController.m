@@ -54,7 +54,7 @@
 {
 	[super awakeFromNib];
 	[groupView setGroup:model];
-		
+	
     NSString* key = [NSString stringWithFormat: @"orca.%@%d.selectedtab",[model className],[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
@@ -65,7 +65,7 @@
     [[plotter yScale] setRngLimitsLow:0 withHigh:100 withMinRng:10];
     [plotter setDrawWithGradient:YES];
     [plotter setBackgroundColor:[NSColor colorWithCalibratedRed:.9 green:1.0 blue:.9 alpha:1.0]];
-
+	
 	[[histogram xScale] setRngLimitsLow:0 withHigh:1000 withMinRng:300];
     [[histogram yScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
     [histogram setDrawWithGradient:YES];
@@ -108,172 +108,172 @@
                          name : [model sbcLockName]
                         object: nil];
 	
-	   [notifyCenter addObserver : self
-						selector : @selector(filePathChanged:)
-							name : SBC_LinkPathChanged
-						  object : [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(verboseChanged:)
-							name : SBC_LinkVerboseChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(forceReloadChanged:)
-							name : SBC_LinkForceReloadChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(startStatusChanged:)
-							name : SBC_LinkReloadingChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(sbcLockChanged:)
-							name : SBC_LinkReloadingChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(startStatusChanged:)
-							name : SBC_LinkTryingToStartCrateChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(loadModeChanged:)
-							name : SBC_LinkLoadModeChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(runInfoChanged:)
-							name :  SBC_LinkRunInfoChanged
-						  object : [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(byteRateChanged:)
-							name :  SBC_LinkByteRateChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(runInfoChanged:)
-							name :  SBC_LinkConnectionChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(ipNumberChanged:)
-							name : SBC_LinkIPNumberChanged
-						  object : [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(portNumberChanged:)
-							name : SBC_LinkPortChanged
-						  object : [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(userNameChanged:)
-							name : SBC_LinkUserNameChanged
-						  object : [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(passWordChanged:)
-							name : SBC_LinkPassWordChanged
-						  object : [model sbcLink]];
-	   
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(startStatusChanged:)
-							name : SBC_LinkCrateStartStatusChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(startStatusChanged:)
-							name : SBC_LinkConnectionChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(initAfterConnectChanged:)
-							name : SBC_LinkInitAfterConnectChanged
-						   object: [model sbcLink]];
-	   
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(sbcLockChanged:)
-							name : [model sbcLockName]
-						   object: nil];
-							
-	   [notifyCenter addObserver : self
-						selector : @selector(addressChanged:)
-							name : SBC_LinkWriteAddressChanged
-						  object : [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(writeValueChanged:)
-							name : SBC_LinkWriteValueChanged
-						  object : [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(doRangeChanged:)
-							name : SBC_LinkDoRangeChanged
-						   object: [model sbcLink]];
-	   
-	   [notifyCenter addObserver : self
-						selector : @selector(rangeChanged:)
-							name : SBC_LinkRangeChanged
-						   object: [model sbcLink]];
-	   
+	[notifyCenter addObserver : self
+					 selector : @selector(filePathChanged:)
+						 name : SBC_LinkPathChanged
+					   object : [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(verboseChanged:)
+						 name : SBC_LinkVerboseChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(forceReloadChanged:)
+						 name : SBC_LinkForceReloadChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(startStatusChanged:)
+						 name : SBC_LinkReloadingChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(sbcLockChanged:)
+						 name : SBC_LinkReloadingChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(startStatusChanged:)
+						 name : SBC_LinkTryingToStartCrateChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(loadModeChanged:)
+						 name : SBC_LinkLoadModeChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(runInfoChanged:)
+						 name :  SBC_LinkRunInfoChanged
+					   object : [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(byteRateChanged:)
+						 name :  SBC_LinkByteRateChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(runInfoChanged:)
+						 name :  SBC_LinkConnectionChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(ipNumberChanged:)
+						 name : SBC_LinkIPNumberChanged
+					   object : [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(portNumberChanged:)
+						 name : SBC_LinkPortChanged
+					   object : [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(userNameChanged:)
+						 name : SBC_LinkUserNameChanged
+					   object : [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(passWordChanged:)
+						 name : SBC_LinkPassWordChanged
+					   object : [model sbcLink]];
+	
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(startStatusChanged:)
+						 name : SBC_LinkCrateStartStatusChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(startStatusChanged:)
+						 name : SBC_LinkConnectionChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(initAfterConnectChanged:)
+						 name : SBC_LinkInitAfterConnectChanged
+						object: [model sbcLink]];
+	
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(sbcLockChanged:)
+						 name : [model sbcLockName]
+						object: nil];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(addressChanged:)
+						 name : SBC_LinkWriteAddressChanged
+					   object : [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(writeValueChanged:)
+						 name : SBC_LinkWriteValueChanged
+					   object : [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(doRangeChanged:)
+						 name : SBC_LinkDoRangeChanged
+						object: [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(rangeChanged:)
+						 name : SBC_LinkRangeChanged
+						object: [model sbcLink]];
+	
     [notifyCenter addObserver : self
                      selector : @selector(readWriteTypeChanged:)
                          name : SBC_LinkRWTypeChanged
                        object : [model sbcLink]];
-
-   [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(addressModifierChanged:)
                          name : SBC_LinkAddressModifierChanged
                        object : [model sbcLink]];
-
-  [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(lamSlotChanged:)
                          name : ORSBC_LAMSlotChangedNotification
                        object : nil];
-
-  [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(infoTypeChanged:)
                          name : SBC_LinkInfoTypeChanged
                        object : [model sbcLink]];
-
-  [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(pingTaskChanged:)
                          name : ORSBC_LinkPingTask
                        object : [model sbcLink]];
-
-  [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(cbTestChanged:)
                          name : ORSBC_LinkCBTest
                        object : [model sbcLink]];
-
-  [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(numTestPointsChanged:)
                          name : ORSBC_LinkNumCBTextPointsChanged
                        object : [model sbcLink]];
-
-  [notifyCenter addObserver : self
+	
+	[notifyCenter addObserver : self
                      selector : @selector(payloadSizeChanged:)
                          name : ORSBC_LinkNumPayloadSizeChanged
                        object : [model sbcLink]];
-
-
+	
+	
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
     [self settingsLockChanged:nil];
-
+	
 	[self filePathChanged:nil];
 	[self verboseChanged:nil];
 	[self forceReloadChanged:nil];
     [self setToggleCrateButtonState];
 	[self loadModeChanged:nil];
-
+	
 	[self byteRateChanged:nil];
 	
 	[self ipNumberChanged:nil];
@@ -281,7 +281,7 @@
 	[self userNameChanged:nil];
 	[self passWordChanged:nil];
 	[self initAfterConnectChanged:nil];
-
+	
 	[self writeValueChanged:nil];
 	[self addressChanged:nil];
 	[self doRangeChanged:nil];
@@ -342,7 +342,7 @@
 	[cbTestButton setTitle:isRunning?@"Stop":@"Test CB"];
 	[numTestPointsField setEnabled:!isRunning];
 	[killCrateButton setEnabled:!isRunning];
-
+	
 	[plotter setNeedsDisplay:YES];
 	[cbTestButton setNeedsDisplay:YES];
 	[numRecordsField setIntValue:[[model sbcLink] totalRecordsChecked]];
@@ -396,7 +396,7 @@
 {
 	[self updateRadioCluster:infoTypeMatrix setting:[[model sbcLink] infoType]];
 	[self runInfoChanged:nil];
-
+	
 }
 
 - (void) addressModifierChanged:(NSNotification*)aNotification
@@ -418,7 +418,7 @@
 	[connect1Button setTitle:connected?@"Disconnect":@"Connect"];
 	
 	BOOL functionsExist = 	[model showBasicOps] && connected;
-
+	
 	[addressModifierPU  setEnabled:functionsExist];
 	[readWriteTypeMatrix  setEnabled:functionsExist];
 	[doRangeButton setEnabled:functionsExist];
@@ -432,21 +432,21 @@
     [rangeTextField setEnabled:functionsExist && [[model sbcLink] doRange]];
     [resetCrateBusButton setEnabled:functionsExist];
     [cbTestButton setEnabled:connected];
-
+	
 	[self loadModeChanged:nil];
-
+	
 	if(![model showBasicOps]) [functionAllowedField setStringValue:@"Low-Level Access NOT allowed with this SBC"];
 	else [functionAllowedField setStringValue:@""];
-
+	
 }
 
 - (void) sbcLockChanged:(NSNotification*)aNotification
 {
-
+	
     BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL locked = [gSecurity isLocked:[model sbcLockName]];
 	BOOL connected		 = [[model sbcLink] isConnected];
- 
+	
 	[pingButton setEnabled:!locked && !runInProgress];
     [cbTestButton setEnabled:!locked && !runInProgress && connected];
 	[payloadSizeSlider setEnabled:!locked && !runInProgress && connected];
@@ -482,8 +482,8 @@
 		[toggleCrateButton setEnabled:!locked && !runInProgress];
 	}
 	
-//	if([[model sbcLink] isConnected])	[connectButton setTitle:@"Disconnect"];
-//	else					[connectButton setTitle:@"Connect"];
+	//	if([[model sbcLink] isConnected])	[connectButton setTitle:@"Disconnect"];
+	//	else					[connectButton setTitle:@"Connect"];
 }
 
 
@@ -514,7 +514,7 @@
 	SBC_info_struct theRunInfo =  [[model sbcLink] runInfo];
 	NSString* theRunInfoString = @"";
 	int i,num;
-
+	
 	unsigned long aMinValue,aMaxValue,aWriteMark,aReadMark;
 	[[model sbcLink] getQueMinValue:&aMinValue maxValue:&aMaxValue head:&aWriteMark tail:&aReadMark];
 	switch([[model sbcLink] infoType]){
@@ -524,27 +524,27 @@
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %d\n",(theRunInfo.statusBits & kSBC_RunningMask) ? @"YES":@"NO ",[[model sbcLink] throttle]]];
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
-
+			
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9d   Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9d   Err Count   : %d\n",aReadMark,theRunInfo.msg_count]];
 			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d   Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
-		break;
-
+			break;
+			
 		case 1:
 			num = MIN(kSBC_MaxErrorBufferSize,theRunInfo.err_count);
 			if(num == 0) theRunInfoString =  @"No Errors";
 			for(i=0;i<num;i++){
 				theRunInfoString =  [theRunInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.errorStrings[i]];
 			}
-		break;
-
+			break;
+			
 		case 2:
 			num = MIN(kSBC_MaxErrorBufferSize,theRunInfo.msg_count);
 			if(num == 0) theRunInfoString =  @"No Messages";
 			for(i=0;i<num;i++){
 				theRunInfoString =  [theRunInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.messageStrings[i]];
 			}
-		break;
+			break;
 	}
 	float amountFilled;
 	float totalAmount = (float)(aMaxValue-aMinValue);
@@ -577,7 +577,7 @@
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
 {
 	[[model sbcLink]  getQueMinValue:aMinValue maxValue:aMaxValue head:aHeadValue tail:aTailValue];
-
+	
 }
 
 - (void) initAfterConnectChanged:(NSNotification*)aNote
@@ -654,12 +654,12 @@
 - (IBAction) killCrateAction:(id)sender
 {
 	int choice = NSRunAlertPanelRelativeToWindow(@"This will KILL the crate process. There may be other ORCAs connected to the crate.",
-												@"Is this really what you want?",
-												@"Cancel",@"Yes, Kill Crate",nil,[self window]);
+												 @"Is this really what you want?",
+												 @"Cancel",@"Yes, Kill Crate",nil,[self window]);
 	if(choice == NSAlertAlternateReturn){		
 		[[model sbcLink] killCrate];
 	}
-
+	
 }
 
 - (IBAction) verboseAction:(id)sender
@@ -699,12 +699,14 @@
 
 - (IBAction) connectionAction:(id)sender
 {
-	NS_DURING
+	@try {
+		[self endEditing];
 		if([[model sbcLink] isConnected])[[model sbcLink] disconnect];
 		else [[model sbcLink] connect];
-	NS_HANDLER
+	}
+	@catch (NSException* localException) {
 		NSLog(@"%@\n",localException);
-	NS_ENDHANDLER
+	}
 }
 
 -(IBAction) addressAction:(id)sender
@@ -724,7 +726,7 @@
 	[self endEditing];
 	long value = [[model sbcLink] writeValue];
 	int address = 0;
-    NS_DURING
+    @try {
 		if([model isKindOfClass:[ORVmeAdapter class]]){
 			int 			startAddress 	= [[model sbcLink] writeAddress];
 			int				endAddress		= [[model sbcLink] doRange]?startAddress + [[model sbcLink] range]*[addressStepper increment] : startAddress;
@@ -742,30 +744,30 @@
 					case 0: //byte
 						cdata = (unsigned char)ldata;
 						[[model sbcLink] writeByteBlock:&cdata
-									atAddress:address
-								   numToWrite:1
-								   withAddMod:addressModifier
-								usingAddSpace:addressSpace];
+											  atAddress:address
+											 numToWrite:1
+											 withAddMod:addressModifier
+										  usingAddSpace:addressSpace];
 						ldata = cdata;
 						break;
 						
 					case 1:	//short
 						sdata = (unsigned short)ldata;
 						[[model sbcLink] writeWordBlock:&sdata
-									atAddress:address
-								   numToWrite:1
-								   withAddMod:addressModifier
-								usingAddSpace:addressSpace];
+											  atAddress:address
+											 numToWrite:1
+											 withAddMod:addressModifier
+										  usingAddSpace:addressSpace];
 						
 						ldata = sdata;
 						break;
 						
 					case 2: //long
 						[[model sbcLink] writeLongBlock:&ldata
-									atAddress:address
-								   numToWrite:1
-								   withAddMod:addressModifier
-								usingAddSpace:addressSpace];
+											  atAddress:address
+											 numToWrite:1
+											 withAddMod:addressModifier
+										  usingAddSpace:addressSpace];
 						
 						break;
 				}
@@ -776,16 +778,17 @@
 			else				NSLog(@"Vme Write @ (0x%08x 0x%x 0x%x): 0x%08x\n",startAddress,addressModifier,addressSpace,ldata);
 			
 		}
-	else {
-		address = [[model sbcLink] writeAddress];
-		[[model sbcLink] writeLongBlock:&value
-				 atAddress:address
-				numToWrite:1];
+		else {
+			address = [[model sbcLink] writeAddress];
+			[[model sbcLink] writeLongBlock:&value
+								  atAddress:address
+								 numToWrite:1];
+		}
 	}
-    NS_HANDLER
+	@catch (NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
                         localException,address);
-    NS_ENDHANDLER
+    }
 }
 
 - (IBAction) readAction:(id)sender
@@ -795,7 +798,7 @@
     unsigned char  cdata;
 	[self endEditing];
 	unsigned long address = 0;
-	NS_DURING
+	@try {
 		if([model isKindOfClass:[ORVmeAdapter class]]){
 			unsigned long 	startAddress 	= [[model sbcLink] writeAddress];
 			unsigned long	endAddress		= [[model sbcLink] doRange]?startAddress + [[model sbcLink] range]*[addressStepper increment] : startAddress;
@@ -811,32 +814,32 @@
 				switch([[model sbcLink] readWriteType]){
 					case 0: //byte
 						[[model sbcLink] readByteBlock:&cdata
-								   atAddress:address
-								   numToRead:1
-								  withAddMod:addressModifier
-							   usingAddSpace:addressSpace];
+											 atAddress:address
+											 numToRead:1
+											withAddMod:addressModifier
+										 usingAddSpace:addressSpace];
 						ldata = cdata;
-					break;
+						break;
 						
 					case 1: //short
 						[[model sbcLink] readWordBlock:&sdata
-								   atAddress:address
-								   numToRead:1
-								  withAddMod:addressModifier
-							   usingAddSpace:addressSpace];
+											 atAddress:address
+											 numToRead:1
+											withAddMod:addressModifier
+										 usingAddSpace:addressSpace];
 						
 						ldata = sdata;
 						
-					break;
+						break;
 						
 					case 2: //long
 						[[model sbcLink] readLongBlock:&ldata
-								   atAddress:address
-								   numToRead:1
-								  withAddMod:addressModifier
-							   usingAddSpace:addressSpace];
+											 atAddress:address
+											 numToRead:1
+											withAddMod:addressModifier
+										 usingAddSpace:addressSpace];
 						
-					break;
+						break;
 				}
 				NSLog(@"Vme Read @ (0x%08x 0x%x %d): 0x%08x\n",address,addressModifier,addressSpace,ldata);
 				address+=[addressStepper increment];
@@ -850,10 +853,11 @@
 								 numToRead:1];
 			NSLog(@"%@ Address: 0x%08x = 0x%0x\n",[[model sbcLink] crateName],[[model sbcLink] writeAddress], result);
 		}
-    NS_HANDLER
+	}
+	@catch (NSException* localException) {
         NSRunAlertPanel([localException name], @"%@\nAddress: 0x%08X", @"OK", nil, nil,
                         localException,address);
-    NS_ENDHANDLER
+    }
 }
 
 
@@ -896,19 +900,21 @@
 
 - (IBAction) ping:(id)sender
 {
-	NS_DURING
+	@try {
 		[[model sbcLink] ping];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch (NSException* localException) {
+	}
 }
 
 - (IBAction) cbTest:(id)sender
 {
-	NS_DURING
+	@try {
 		[self endEditing];
 		[[model sbcLink] startCBTransferTest];
-	NS_HANDLER
-	NS_ENDHANDLER
+	}
+	@catch (NSException* localException) {
+	}
 }
 
 - (IBAction) numTestPointsAction:(id)sender

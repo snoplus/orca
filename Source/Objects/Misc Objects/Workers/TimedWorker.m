@@ -75,18 +75,18 @@ NSString* TimedWorkerIsRunningChangedNotification       = @"TimedWorkerIsRunning
 - (void) setTimeInterval: (NSTimeInterval) aTimeInterval
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTimeInterval:timeInterval];
-
+	
     timeInterval = aTimeInterval;
     if(timeInterval < .001) {
         [NSObject cancelPreviousPerformRequestsWithTarget:self];
         [self setIsRunning:NO];
     }
-
+	
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:TimedWorkerTimeIntervalChangedNotification
-							  object:self
-							userInfo: [NSDictionary dictionaryWithObject: self
-																  forKey:@"OrcaObject Notification Sender"]];
+	 postNotificationName:TimedWorkerTimeIntervalChangedNotification
+	 object:self
+	 userInfo: [NSDictionary dictionaryWithObject: self
+										   forKey:@"OrcaObject Notification Sender"]];
 }
 
 
@@ -99,12 +99,12 @@ NSString* TimedWorkerIsRunningChangedNotification       = @"TimedWorkerIsRunning
 {
     isRunning = flag;
     [[NSNotificationCenter defaultCenter]
-                postNotificationName:TimedWorkerIsRunningChangedNotification
-							  object:self
-							userInfo: [NSDictionary dictionaryWithObjectsAndKeys: 
-                                self,@"OrcaObject Notification Sender",
-                                [NSNumber numberWithBool:isRunning],@"State",
-                                nil]];
+	 postNotificationName:TimedWorkerIsRunningChangedNotification
+	 object:self
+	 userInfo: [NSDictionary dictionaryWithObjectsAndKeys: 
+				self,@"OrcaObject Notification Sender",
+				[NSNumber numberWithBool:isRunning],@"State",
+				nil]];
 }
 
 #pragma mark •••Archival
@@ -134,10 +134,11 @@ NSString* TimedWorkerIsRunningChangedNotification       = @"TimedWorkerIsRunning
         [self setIsRunning:NO];
         return;
     }
-    NS_DURING
+    @try {
         [target performSelector:_selector];
-    NS_HANDLER
-    NS_ENDHANDLER
+    }
+	@catch(NSException* localException) {
+    }
     
     [self performSelector:@selector(execute) withObject:self afterDelay:timeInterval];
 }
