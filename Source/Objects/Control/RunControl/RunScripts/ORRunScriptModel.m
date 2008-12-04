@@ -295,7 +295,7 @@ NSString* ORRunScriptLock					= @"ORRunScriptLock";
 		[scriptRunner parse:script];
 		parsedOK = [scriptRunner parsedOK];
 		if(parsedOK){
-			if([scriptRunner parsedOK]){
+			if([scriptRunner scriptExists]){
 				[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
 				[scriptRunner run:inputValues sender:self];
 			}
