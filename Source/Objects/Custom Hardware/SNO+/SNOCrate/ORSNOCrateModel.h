@@ -22,6 +22,9 @@
 
 @interface ORSNOCrateModel : ORCrate  {
 	int slot;
+	int workingSlot;
+	BOOL working;
+	BOOL pauseWork;
 }
 
 - (void) setUpImage;
@@ -42,6 +45,7 @@
 - (void) registerNotificationObservers;
 
 - (void) scan;
+- (void) scanWorkingSlot;
 - (short) numberSlotsUsed;
 - (void) initCrate:(BOOL) loadTheFEC32XilinxFile;
 

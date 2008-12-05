@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Imported Files
+#pragma mark ***Imported Files
 
 #import "SBC_Link.h"
 #import "SBC_Linking.h"
@@ -47,7 +47,7 @@
 
 #define kSBCRateIntegrationTime 1.5
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢External Strings
+#pragma mark ***External Strings
 NSString* SBC_LinkLoadModeChanged			= @"SBC_LinkLoadModeChanged";
 NSString* SBC_LinkInitAfterConnectChanged	= @"SBC_LinkInitAfterConnectChanged";
 NSString* SBC_LinkReloadingChanged			= @"SBC_LinkReloadingChanged";
@@ -78,6 +78,7 @@ NSString* ORSBC_LinkPingTask				= @"ORSBC_LinkPingTask";
 NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged";
 NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
+NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 
 /*
  @interface SBC_Link (private)
@@ -143,7 +144,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
+#pragma mark ***Accessors
 - (int) slot
 {
 	return [delegate slot];
@@ -560,8 +561,24 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	 object:self];
 }
 
+- (ORSBCLinkJobStatus*) jobStatus
+{
+	return jobStatus;
+}
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Archival
+- (void) setJobStatus:(ORSBCLinkJobStatus*)theJobStatus
+{
+	[theJobStatus retain];
+	[jobStatus release];
+	jobStatus = theJobStatus;
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkJobStatus 
+														object:jobDelegate 
+													  userInfo:[NSDictionary dictionaryWithObject:jobStatus forKey:@"jobStatus"]];
+	
+}
+
+#pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super init];
@@ -1365,7 +1382,7 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	[self write:socketfd buffer:&aPacket];	
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢DataSource
+#pragma mark ***DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
 {
 	*aMinValue  = 0;
@@ -1864,7 +1881,8 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 			packetPtr += bytesWritten;
 			numBytesToSend -= bytesWritten;
 			bytesSent += bytesWritten;
-		} else if (bytesWritten < 0) {
+		} 
+		else if (bytesWritten < 0) {
             if (errno == EPIPE) {
                 [self disconnect];
             }
@@ -1921,9 +1939,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 	if(n==0){
 		[self disconnect];
 		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-	} else if (n<0) {
+	} 
+	else if (n<0) {
 		[NSException raise:@"Socket Error" format:@"Error: %s",strerror(errno)];
-    } else if (n < sizeof(long)) {
+    } 
+	else if (n < sizeof(long)) {
         /* We didn't get the whole word.  This probably will never happen. */
         int numToGet = sizeof(numBytesToGet) - n;
         char* ptrToNumBytesToGet = ((char*)&numBytesToGet) + n;
@@ -1934,9 +1954,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 				if(n==0){
 					[self disconnect];
 					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-				} else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
+				} 
+				else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
 					[NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
-				} else {
+				} 
+				else {
 					numToGet -= n;
 					ptrToNumBytesToGet += n;    
 				}
@@ -1966,9 +1988,11 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
         if(n==0){
             [self disconnect];
             [NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
-        } else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
+        } 
+		else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
             [NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
-        } else {
+        } 
+		else {
             packetPtr += n;
             numBytesToGet -= n;
             bytesReceived += n;
@@ -2119,5 +2143,64 @@ NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
 	}
 }
+
+- (void) monitorJobFor:(id)aDelegate statusSelector:(SEL)aSelector
+{
+	jobDelegate = aDelegate;
+	statusSelector= aSelector;
+	[self monitorJob];
+}
+
+- (void) monitorJob
+{
+	SBC_Packet aPacket;
+	aPacket.cmdHeader.destination			= kSBC_Process;
+	aPacket.cmdHeader.cmdID					= kSBC_JobStatus;
+	aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_JobStatusStruct);
+	
+	@try {
+		[self send:&aPacket receive:&aPacket];
+		
+		SBC_JobStatusStruct* p	= (SBC_JobStatusStruct*)aPacket.payload;
+		if([jobDelegate respondsToSelector:statusSelector]){
+			ORSBCLinkJobStatus* aJobStatus = [ORSBCLinkJobStatus jobStatus:p message:aPacket.message];
+			[self setJobStatus:aJobStatus];
+			[jobDelegate performSelector:statusSelector withObject:jobStatus];
+		}
+		if(p->running){
+			[self performSelector:@selector(monitorJob) withObject:nil afterDelay:1];
+		}
+	}
+	@catch(NSException* localException) {
+	}
+}
+@end
+
+//a quicky wrapper so we can pass the job status around as an object.
+@implementation ORSBCLinkJobStatus
++ (id) jobStatus:(SBC_JobStatusStruct*) p message:(char*)aPacketMessage
+{
+	return [[[ORSBCLinkJobStatus alloc] initWith:p message:aPacketMessage] autorelease];
+}
+- (id) initWith:(SBC_JobStatusStruct*)p message:(char*)aPacketMessage
+{
+	self = [super init];
+	memcpy(&status,p,sizeof(SBC_JobStatusStruct));
+	message = [[NSString stringWithCString:aPacketMessage encoding:NSASCIIStringEncoding] retain];
+	return self;
+}
+- (void) dealloc
+{
+	[message release];
+	[super dealloc];
+}
+- (NSString*) message {return message;}
+- (long) running	 { return status.running; }
+- (long) finalStatus { return status.finalStatus; }
+- (long) progress	 { return status.progress; }
+
+
+
+
 
 @end

@@ -22,6 +22,8 @@
 
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
+#include <pthread.h>
 #include "SBC_Readout.h"
 #include "SNOCmds.h"
 #include "universe_api.h"
@@ -29,17 +31,20 @@
 #include "VME_HW_Definitions.h"
 #include "HW_Readout.h"
 #include "SNO.h"
+#include "SBC_Job.h"
 
 extern int32_t		dataIndex;
 extern int32_t*		data;
 extern char			needToSwap;
+extern SBC_JOB		sbc_job;
+extern pthread_mutex_t jobInfoMutex;
 
 void processSNOCommand(SBC_Packet* aPacket)
 {
 	switch(aPacket->cmdHeader.cmdID){		
-		case kSNOMtcLoadXilinx: loadMtcXilinx(aPacket); break;
-		case kSNOXL2LoadClocks: loadXL2Clocks(aPacket); break;
-		case kSNOXL2LoadXilinx: loadXL2Xilinx(aPacket); break;
+		case kSNOMtcLoadXilinx: loadMtcXilinx(aPacket);				break;
+		case kSNOXL2LoadClocks: loadXL2Clocks(aPacket);				break;
+		case kSNOXL2LoadXilinx: startJob(&loadXL2Xilinx,aPacket);	break;
 	}
 }
 
@@ -343,6 +348,9 @@ void loadXL2Clocks(SBC_Packet* aPacket)
 
 void loadXL2Xilinx(SBC_Packet* aPacket)
 {
+	//
+	//this function is meant to be launched as a job
+	//
 	SNOXL2_XilinixLoadStruct* p = (SNOXL2_XilinixLoadStruct*)aPacket->payload;
 	//swap if needed, but note that we don't swap the data file part
 	if(needToSwap) SwapLongBlock(p,sizeof(SNOXL2_XilinixLoadStruct)/sizeof(int32_t));
@@ -367,8 +375,9 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 	
 	char  errorMessage[80];
 	memset(errorMessage,'\0',80);		
-	uint8_t  errorFlag		= 0;
-
+	uint32_t  errorFlag	 = 0;
+	uint8_t  finalStatus = 0; //assume failure
+	
 	TUVMEDevice* device = get_new_device(0x0, addressModifier, 4, 0x10000);
 	if(device != 0){
 		//--------------------------- The file format as of 4/17/96 -------------------------------------
@@ -425,6 +434,8 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		uint32_t i;
 		for (i = 1;i < index;i++){
 			
+			if(sbc_job.killJobNow) FATAL_ERROR(666,"Job Killed. Early Exit.");
+			
 			if ((firstPass) && (*charData != '/')) FATAL_ERROR(2,"Bad Xilinx File: Invalid first characer in xilinx file");
 			
 			if (firstPass){
@@ -458,6 +469,10 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 				if(result!=4)FATAL_ERROR(4,"Write Error: xl2_control_status_reg");
 				usleep(theDelay);
 			}
+			pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+			sbc_job.progress = 100*i/index;			//percent done
+			pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+			
 		}
 
 		usleep(20000);	//200 ms
@@ -489,8 +504,10 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 			if (!(readValue & xl2_control_done_prog)){	
 				if(result!=4)FATAL_ERROR(11,"Xilinx load failed XL2! (Status bit checked twice)");
 			}
+			else finalStatus = 1;
 		}
-					   
+		else finalStatus = 1;
+
 		result = write_device(device, (char*)(&xl2_control_done_prog), 4, xl2_control_status_reg);	//BLW 10/31/02-set bit 11 low, similar to previous version
 		if(result!=4)FATAL_ERROR(12,"Write Error: xl2_control_status_reg");
 		
@@ -504,24 +521,16 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		strcpy(errorMessage,"Unable to get device.");		
 	}
 
-	/* echo the structure back with the error code*/
-	/* 0 == no Error*/
-	/* non-0 means an error*/
-	SNOXL2_XilinixLoadStruct* returnDataPtr = (SNOXL2_XilinixLoadStruct*)aPacket->payload;
-	uint32_t errLen = strlen(errorMessage);
-	if(errLen >= kSBC_MaxMessageSize-1){
-		errLen = kSBC_MaxMessageSize-1;
-		aPacket->message[kSBC_MaxMessageSize-1] = '\0';	
-	}
-	strncpy(aPacket->message,errorMessage,errLen);
-	
-	returnDataPtr->errorCode		= errorFlag;
-	
-	int32_t* lptr = (int32_t*)returnDataPtr;
-	if(needToSwap) SwapLongBlock(lptr,sizeof(SNOXL2_XilinixLoadStruct)/sizeof(int32_t));
-	
-	writeBuffer(aPacket);  
 	close_device(device);
+
+	pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+	sbc_job.progress    = 100;
+	sbc_job.running     = 0;
+	sbc_job.killJobNow  = 0;
+	sbc_job.finalStatus = finalStatus;
+	strncpy(sbc_job.message,errorMessage,255);
+	sbc_job.message[255] = '\0';
+    pthread_mutex_unlock (&jobInfoMutex);   //end critical section
 	
 }
 

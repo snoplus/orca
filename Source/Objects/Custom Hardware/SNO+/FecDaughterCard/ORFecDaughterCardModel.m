@@ -48,6 +48,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
     self = [super init];
     [[self undoManager] disableUndoRegistration];
 	[self loadDefaultValues];
+	[self setComments:@""];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
@@ -429,11 +430,23 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 - (void) readBoardIds
 {
 	@try {
-		[self setBoardID:[[self guardian] performBoardIDRead:DC_BOARD0_ID_INDEX + [self slot]]];
+		[self setBoardID:[self performBoardIDRead:[self slot]]];
 	}
 	@catch(NSException* localException) {
-		[self setBoardID:@"0000"];
+		//[self setBoardID:@"0000"];	
 	}
+}
+
+- (NSString*) performBoardIDRead:(short) boardIndex
+{
+	NSString* result = @"---";
+	@try {
+		result = [[self guardian] performBoardIDRead:DC_BOARD0_ID_INDEX + boardIndex];
+	}
+	@catch(NSException* localException) {
+		//result=@"0000";
+	}
+	return result;
 }
 
 @end

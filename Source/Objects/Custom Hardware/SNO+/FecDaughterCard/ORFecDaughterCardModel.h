@@ -118,7 +118,8 @@
 - (unsigned char) vb:(short)ch egain:(short)gain;
 
 #pragma mark •••Hardware Access
- - (void) readBoardIds;
+- (NSString*) performBoardIDRead:(short) boardIndex;
+- (void) readBoardIds;
 
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

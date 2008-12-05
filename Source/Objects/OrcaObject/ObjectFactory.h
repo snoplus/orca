@@ -22,7 +22,8 @@
 @interface ObjectFactory : NSButton {
     id object;
 }
-#pragma mark ¥¥¥Factory method
+#pragma mark ¥¥¥Factory methods
++ (id) makeObject:(NSString*)aClassName;
 - (void) makeObject;
 @end
 

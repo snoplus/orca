@@ -32,9 +32,10 @@
 #include <signal.h>
 #include "CircularBuffer.h"
 #include <pthread.h>
+#include <sys/time.h>
 #include "SBC_Readout.h"
 #include "HW_Readout.h"
-#include <sys/time.h>
+#include "SBC_Job.h"
 
 #define BACKLOG 1     // how many pending connections queue will hold
 #ifndef TRUE
@@ -47,6 +48,7 @@
 #define kCBBufferSize 1024*1024*12
 
 void* readoutThread (void* p);
+void* jobThread (void* p);
 void* irqAckThread (void* p);
 char startRun (void);
 void stopRun (void);
@@ -67,6 +69,7 @@ pthread_t irqAckThreadId;
 pthread_attr_t readoutThreadAttr;
 pthread_mutex_t runInfoMutex;
 pthread_mutex_t lamInfoMutex;
+pthread_mutex_t jobInfoMutex;
 int32_t  workingSocket;
 int32_t  workingIRQSocket;
 char needToSwap;
@@ -76,6 +79,8 @@ char needToSwap;
 int32_t  dataIndex = 0;
 int32_t* data = 0;
 int32_t  maxPacketSize;
+
+SBC_JOB	 sbc_job;
 /*---------------*/
 
 void sigchld_handler(int32_t s)
@@ -166,6 +171,11 @@ int32_t main(int32_t argc, char *argv[])
         run_info.err_buf_index      = 0;
         run_info.msg_buf_index      = 0;
         pthread_mutex_unlock (&runInfoMutex);//end critical section
+		
+        pthread_attr_init(&sbc_job.jobThreadAttr);
+        pthread_attr_setdetachstate(&sbc_job.jobThreadAttr, PTHREAD_CREATE_JOINABLE);
+		pthread_mutex_init(&jobInfoMutex, NULL);
+
         
         pthread_mutex_init(&lamInfoMutex, NULL);
         pthread_mutex_lock (&lamInfoMutex);  //begin critical section
@@ -218,6 +228,8 @@ int32_t main(int32_t argc, char *argv[])
         /* Take care of pthread variables. */
         pthread_mutex_destroy(&runInfoMutex);
         pthread_attr_destroy(&readoutThreadAttr);
+        pthread_mutex_destroy(&jobInfoMutex);
+        pthread_attr_destroy(&sbc_job.jobThreadAttr);
 
         /* This releases hardware. */
         ReleaseHardware();
@@ -236,8 +248,8 @@ void processBuffer(SBC_Packet* aPacket)
     int32_t destination = aPacket->cmdHeader.destination;
 
     switch(destination){
-        case kSBC_Process:   processSBCCommand(aPacket);             break;
-        default:             processHWCommand(aPacket); break;
+        case kSBC_Process:   processSBCCommand(aPacket);    break;
+        default:             processHWCommand(aPacket);		break;
     }
 }
 
@@ -268,6 +280,8 @@ void processSBCCommand(SBC_Packet* aPacket)
         case kSBC_CBRead:           sendCBRecord();				break;
 		case kSBC_CBTest:			runCBTest(aPacket);			break;
 		case kSBC_PacketOptions:	setPacketOptions(aPacket);	break;
+		case kSBC_KillJob:			killJob(aPacket);			break;
+		case kSBC_JobStatus:		jobStatus(aPacket);			break;
         case kSBC_Exit:             timeToExit = 1;				break;
     }
 }
@@ -290,6 +304,100 @@ void doRunCommand(SBC_Packet* aPacket)
     sendResponse(aPacket);
 }
 
+void killJob(SBC_Packet* aPacket)
+{
+    aPacket->cmdHeader.cmdID = kSBC_JobStatus;
+	
+	pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+	sbc_job.killJobNow = 1;
+    pthread_mutex_unlock (&jobInfoMutex);	//end critical section
+	
+    pthread_join(sbc_job.jobThreadId, NULL);		//block until job exits -- would be better to have some timout here
+													//but if the thread doesn't exit the whole thing is screwed anyway.
+
+	jobStatus(aPacket);
+
+}
+
+void jobStatus(SBC_Packet* aPacket)
+{
+    aPacket->cmdHeader.cmdID = kSBC_JobStatus;
+    SBC_JobStatusStruct* p = (SBC_JobStatusStruct*)aPacket->payload;
+ 
+	pthread_mutex_lock (&jobInfoMutex);                //begin critical section
+	p->running		= sbc_job.running;
+	p->finalStatus	= sbc_job.finalStatus; 
+	p->progress		= sbc_job.progress;
+	strncpy(aPacket->message,sbc_job.message,256);
+    pthread_mutex_unlock (&jobInfoMutex);             //end critical section
+
+    aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_JobStatusStruct);
+    if(needToSwap)SwapLongBlock(p,sizeof(SBC_JobStatusStruct)/sizeof(int32_t));
+    if (writeBuffer(aPacket) < 0) { 
+        LogError("sendResponse Error: %s", strerror(errno));   
+    }
+}
+
+void startJob(void(*jobFunction)(SBC_Packet*),SBC_Packet* aPacket)
+{
+	//----------------------------------------------------------------------------
+	//Start a Job, we return a packet immediately with the thread creation status
+	//ORCA should check periodically on the job status
+	//Another job can not be launched until this one is done.
+	//----------------------------------------------------------------------------
+	pthread_mutex_lock (&jobInfoMutex);				//begin critical section
+	char job_running = sbc_job.running;
+	if(!job_running){
+		memcpy(&sbc_job.workingPacket,aPacket,sizeof(SBC_Packet));
+		sbc_job.running = 1;					
+	}
+    pthread_mutex_unlock (&jobInfoMutex);          //end critical section
+	char started = 0;
+	if(!job_running){
+        started = !pthread_create(&sbc_job.jobThreadId,&sbc_job.jobThreadAttr, jobThread, jobFunction);
+	}
+	
+    aPacket->cmdHeader.cmdID = kSBC_JobStatus;
+    SBC_JobStatusStruct* p = (SBC_JobStatusStruct*)aPacket->payload;
+	
+	//we load up the fact that the job is done, but ORCA will ask for the status 
+	pthread_mutex_lock (&jobInfoMutex);		//begin critical section
+	p->running		= started;
+	p->finalStatus	= 0; 
+	p->progress		= 0;
+    pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+
+	jobStatus(aPacket);
+
+}
+
+//---------------------------
+//-----Job Thread -----------
+//---------------------------
+void* jobThread (void* aFunction)
+{
+	void(*jobFunction)(SBC_Packet*);
+	jobFunction = aFunction;
+	
+    pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+    sbc_job.running  = 1;					//should have been set already, but....
+	sbc_job.progress = 0;
+	sbc_job.killJobNow = 0;
+    pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+	
+	jobFunction(&sbc_job.workingPacket);	//we don't return until done.
+	
+    pthread_exit((void *) 0);
+	
+    pthread_mutex_lock (&jobInfoMutex);     //begin critical section
+    sbc_job.running  = 0;					
+	sbc_job.progress = 100;
+	sbc_job.killJobNow  = 0;
+	//final status was set by the job
+    pthread_mutex_unlock (&jobInfoMutex);   //end critical section
+}
+//---------------------------
+//---------------------------
 
 void sendResponse(SBC_Packet* aPacket)
 {
@@ -473,9 +581,8 @@ int32_t readIRQ(SBC_Packet* aPacket)
 
     return returnValue;
 }
+
 //----------------------------------------------------------------------------------------------
-
-
 char startRun (void)
 {    
     /*---------------------------------*/

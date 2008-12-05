@@ -27,7 +27,16 @@ NSString* ORSNOCardSlotChanged		= @"ORSNOCardSlotChanged";
 NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 
 @implementation ORSNOCard
-
+- (id) init //designated initializer
+{
+    self = [super init];
+    
+    [[self undoManager] disableUndoRegistration];
+	[self setBoardID:@"0000"];
+    [[self undoManager] enableUndoRegistration];
+    
+    return self;
+}
 #pragma mark •••Accessors
 - (Class) guardianClass 
 {
@@ -68,12 +77,13 @@ NSString* ORSNOCardBoardIDChanged 	= @"ORSNOCardBoardIDChanged";
 #pragma mark •••Accessors
 - (NSString*) boardID
 {
+	if(!boardID)return @"0000";
 	return boardID;
 }
 
 - (void) setBoardID:(NSString*)anId
 {
-	if(!boardID)anId = @"0000";
+	if(!anId)anId = @"0000";
 	[boardID autorelease];
     boardID = [anId copy];    
 

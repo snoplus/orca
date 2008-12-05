@@ -196,6 +196,9 @@ typedef struct Fec32CmosShiftReg{
 	BOOL			dcPresent[4];
 	ORFecDaughterCardModel* dc[4]; //cache the dc's
 	aFec32CmosShiftReg	cmosShiftRegisterValue[16];
+	int workingSlot;
+	BOOL working;
+	SEL resumeSelectorInGuardian;
 }
 - (void) setUpImage;
 - (void) makeMainController;
@@ -261,7 +264,9 @@ typedef struct Fec32CmosShiftReg{
 - (void) loadCrateAddress;
 - (void) loadAllDacs;
 - (void) setPedestals;
--(void) performPMTSetup:(BOOL) aTriggersDisabled;
+- (void) performPMTSetup:(BOOL) aTriggersDisabled;
+- (void) scan:(SEL)aResumeSelectorInGuardian; 
+- (void) scanWorkingSlot;
 
 #pragma mark •••OROrderedObjHolding Protocal
 - (int) maxNumberOfObjects;

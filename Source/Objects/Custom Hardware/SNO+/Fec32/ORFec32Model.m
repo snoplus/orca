@@ -24,6 +24,8 @@
 #import "ORSNOCrateModel.h"
 #import "ORFecDaughterCardModel.h"
 #import "ORSNOConstants.h"
+#import "OROrderedObjManager.h"
+#import "ObjectFactory.h"
 
 #define VERIFY_CMOS_SHIFT_REGISTER	// uncomment this to verify CMOS shift register loads - PH 09/17/99
 
@@ -88,6 +90,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
     self = [super init];
     
     [[self undoManager] disableUndoRegistration];
+	[self setComments:@""];
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -426,7 +429,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		
 		//read the Mother Card for its id
 		@try {
-			[self setBoardID:[self performBoardIDRead:MC_BOARD_ID_INDEX]];
+			[self setBoardID:[self performBoardIDRead:[self stationNumber]]];
 		}
 		@catch(NSException* localException) {
 			[self setBoardID:@"0000"];	
@@ -438,6 +441,69 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	@catch(NSException* localException) {
 		[xl2 deselectCards];
 		
+	}
+}
+
+- (void) scan:(SEL)aResumeSelectorInGuardian 
+{
+	workingSlot = 0;
+	working = YES;
+	[self performSelector:@selector(scanWorkingSlot)withObject:nil afterDelay:0];
+	resumeSelectorInGuardian = aResumeSelectorInGuardian;
+}
+
+- (void) scanWorkingSlot
+{
+	BOOL xl2OK = YES;
+	@try {
+		[[self xl2] selectCards:1L<<[self slot]];	
+	}
+	@catch(NSException* localException) {
+		xl2OK = NO;
+		NSLog(@"Unable to reach XL2 in crate: %d (Not inited?)\n",[self crateNumber]);
+	}
+	if(!xl2OK) working = NO;
+	if(working) {
+		@try {
+			
+			ORFecDaughterCardModel* proxyDC = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
+			[proxyDC setGuardian:self];
+			
+			NSString* aBoardID = [proxyDC performBoardIDRead:workingSlot];
+			if(![aBoardID isEqual: @"0000"]){
+				NSLog(@"\tDC Slot: %d BoardID: %@\n",workingSlot,aBoardID);
+				ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
+				if(!theCard){
+					[self addObject:proxyDC];
+					[self place:proxyDC intoSlot:workingSlot];
+					theCard = proxyDC;
+				}
+				[theCard setBoardID:aBoardID];
+			}
+			else {
+				NSLog(@"\tDC Slot: %d BoardID: BAD\n",workingSlot);
+				ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
+				if(theCard)[self removeObject:theCard];
+			}
+		}
+		@catch(NSException* localException) {
+			NSLog(@"\tDC Slot: %d BoardID: ----\n",workingSlot);
+			ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
+			if(theCard)[self removeObject:theCard];
+		}
+	}
+	
+	workingSlot++;
+	if(working && (workingSlot<kNumSNODaughterCards)){
+		[self performSelector:@selector(scanWorkingSlot) withObject:nil afterDelay:0];
+	}
+	else {
+		[[self xl2] deselectCards];
+		if(resumeSelectorInGuardian){
+			[[self guardian] performSelector:resumeSelectorInGuardian withObject:nil afterDelay:0];
+			resumeSelectorInGuardian = nil;
+
+		}
 	}
 }
 

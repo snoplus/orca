@@ -69,9 +69,17 @@
 			<dict>
 				<key>crateNumberField</key>
 				<string>NSTextField</string>
+				<key>initButton</key>
+				<string>NSButton</string>
 				<key>memBaseAddressField</key>
 				<string>NSTextField</string>
 				<key>regBaseAddressField</key>
+				<string>NSTextField</string>
+				<key>scanButton</key>
+				<string>NSButton</string>
+				<key>xilinixLoadProgress</key>
+				<string>NSProgressIndicator</string>
+				<key>xilinixStatusField</key>
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>

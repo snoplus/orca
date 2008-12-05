@@ -92,12 +92,12 @@
 	IBOutlet NSSlider*		payloadSizeSlider;
 }
 
-#pragma mark â€¢â€¢â€¢Initialization
+#pragma mark ¥¥¥Initialization
 
 - (void) dealloc;
 - (void) awakeFromNib;
 
-#pragma mark â€¢â€¢â€¢Notifications
+#pragma mark ¥¥¥Notifications
 
 - (void) registerNotificationObservers;
 - (void) updateWindow;
@@ -114,7 +114,7 @@
 - (void) loadModeChanged:(NSNotification*)aNote;
 
 - (void) byteRateChanged:(NSNotification*)aNote;
-- (void) runInfoChanged:(NSNotification*)aNote;
+- (void) statusInfoChanged:(NSNotification*)aNote;
 - (void) infoTypeChanged:(NSNotification*)aNote;
 
 - (void) initAfterConnectChanged:(NSNotification*)aNote;
@@ -140,7 +140,7 @@
 - (NSString*) literalToString:(int)aLiteral;
 
 
-#pragma mark â€¢â€¢â€¢Actions
+#pragma mark ¥¥¥Actions
 - (IBAction) lockAction:(id)sender;
 
 - (IBAction) loadModeAction:(id)sender;
@@ -174,7 +174,7 @@
 - (IBAction) numTestPointsAction:(id)sender;
 - (IBAction) payloadSizeAction:(id)sender;
 
-#pragma mark â€¢â€¢â€¢DataSource
+#pragma mark ¥¥¥DataSource
 - (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue;
 - (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;

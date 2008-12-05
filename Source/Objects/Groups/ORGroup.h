@@ -40,6 +40,8 @@
 - (id) objectAtIndex:(unsigned) index;
 
 #pragma mark ¥¥¥Undoable Actions
+- (void) addObject:(id)anObject;
+- (void) removeObject:(id)anObject;
 - (void) addObjects:(NSArray*)someObjects;
 - (void) removeObjects:(NSArray*)someObjects;
 - (void) objectCountChanged;

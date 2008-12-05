@@ -24,6 +24,8 @@
 #import "ORSNOCrateController.h"
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
+#import "SBC_Link.h"
+#import "ORXL2Model.h"
 
 
 @implementation ORSNOCrateController
@@ -59,6 +61,12 @@
 					 selector : @selector(slotChanged:)
 						 name : ORSNOCardSlotChanged
 					   object : model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(xilinxLoadChanged:)
+						 name : ORSBC_LinkJobStatus
+					   object : nil];
+	
 }
 
 
@@ -84,6 +92,25 @@
 	[memBaseAddressField setIntValue:[model memoryBaseAddress]];
 	[regBaseAddressField setIntValue:[model registerBaseAddress]];
 	[crateNumberField setIntValue:[model crateNumber]];
+}
+
+- (void) xilinxLoadChanged:(NSNotification*)aNote
+{
+	if([aNote object] == [model xl2] ){
+		ORSBCLinkJobStatus* jobStatus = [[aNote userInfo] objectForKey:@"jobStatus"];
+		if([jobStatus running]){
+			[xilinixStatusField setStringValue:@"Loading"];
+			[xilinixLoadProgress setDoubleValue:[jobStatus progress]];
+		}
+		else {
+			if([jobStatus finalStatus]) [xilinixStatusField setStringValue:@""];
+			else						[xilinixStatusField setStringValue:@"FAILED"];
+			[xilinixStatusField setStringValue:@""];
+			[xilinixLoadProgress setDoubleValue:0];
+		}
+		[initButton setEnabled:![jobStatus running]];
+		[scanButton setEnabled:![jobStatus running]];
+	}
 }
 
 #pragma mark •••Actions

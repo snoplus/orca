@@ -32,6 +32,10 @@
 void processBuffer(SBC_Packet* aPacket);
 void processSBCCommand(SBC_Packet* aPacket);
 void doRunCommand(SBC_Packet* aPacket);
+void startJob(void(*jobFunction)(SBC_Packet*),SBC_Packet* aPacket);
+void jobStatus(SBC_Packet* aPacket);
+void killJob(SBC_Packet* aPacket);
+
 void sendResponse(SBC_Packet* aPacket);
 int32_t readBuffer(SBC_Packet* aPacket);
 int32_t writeBuffer(SBC_Packet* aPacket);

@@ -105,6 +105,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>group</key>
+				<string>id</string>
 				<key>mouseTask</key>
 				<string>id</string>
 			</dict>
@@ -139,6 +141,8 @@
 				<string>id</string>
 				<key>incCardAction</key>
 				<string>id</string>
+				<key>initAction</key>
+				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
 				<key>onlineMaskAction</key>
@@ -169,9 +173,11 @@
 				<key>fecNumberField</key>
 				<string>NSTextField</string>
 				<key>groupView</key>
-				<string>ORFec32View</string>
+				<string>ORGroupView</string>
 				<key>hvRefField</key>
 				<string>NSTextField</string>
+				<key>initButton</key>
+				<string>NSButton</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
 				<key>lockDocField</key>
@@ -211,14 +217,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>ORGroupView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORFec32View</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORCardContainerView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

@@ -27,6 +27,10 @@
 	IBOutlet NSTextField* memBaseAddressField;
 	IBOutlet NSTextField* regBaseAddressField;
     IBOutlet NSTextField* crateNumberField;
+    IBOutlet NSProgressIndicator* xilinixLoadProgress;
+    IBOutlet NSTextField* xilinixStatusField;
+	IBOutlet NSButton*  initButton;
+	IBOutlet NSButton*  scanButton;
 }
 
 #pragma mark •••Initializations

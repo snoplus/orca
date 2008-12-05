@@ -195,7 +195,7 @@
 }
 
 #pragma mark •••Accessors
-- (ORFec32View *)groupView
+- (ORGroupView *)groupView
 {
     return [self groupView];
 }
@@ -338,6 +338,11 @@
 - (IBAction) showVoltsAction:(id)sender
 {
 	[model setShowVolts:[sender intValue]];	
+}
+
+- (IBAction) initAction:(id)sender;
+{
+	[model scan:nil];
 }
 
 - (IBAction) probeAction:(id)sender

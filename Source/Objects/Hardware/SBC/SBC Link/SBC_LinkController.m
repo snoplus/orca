@@ -144,9 +144,14 @@
 						object: [model sbcLink]];
 	
 	[notifyCenter addObserver : self
-					 selector : @selector(runInfoChanged:)
+					 selector : @selector(statusInfoChanged:)
 						 name :  SBC_LinkRunInfoChanged
 					   object : [model sbcLink]];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(statusInfoChanged:)
+                         name : ORSBC_LinkJobStatus
+                       object : nil];
 	
 	[notifyCenter addObserver : self
 					 selector : @selector(byteRateChanged:)
@@ -154,7 +159,7 @@
 						object: [model sbcLink]];
 	
 	[notifyCenter addObserver : self
-					 selector : @selector(runInfoChanged:)
+					 selector : @selector(statusInfoChanged:)
 						 name :  SBC_LinkConnectionChanged
 						object: [model sbcLink]];
 	
@@ -259,8 +264,6 @@
                      selector : @selector(payloadSizeChanged:)
                          name : ORSBC_LinkNumPayloadSizeChanged
                        object : [model sbcLink]];
-	
-	
 }
 
 - (void) updateWindow
@@ -395,7 +398,7 @@
 - (void) infoTypeChanged:(NSNotification*)aNotification
 {
 	[self updateRadioCluster:infoTypeMatrix setting:[[model sbcLink] infoType]];
-	[self runInfoChanged:nil];
+	[self statusInfoChanged:nil];
 	
 }
 
@@ -509,42 +512,61 @@
 	[bytesSentRateBar setNeedsDisplay:YES];
 }
 
-- (void) runInfoChanged:(NSNotification*)aNote
+- (void) statusInfoChanged:(NSNotification*)aNote
 {
-	SBC_info_struct theRunInfo =  [[model sbcLink] runInfo];
-	NSString* theRunInfoString = @"";
+	SBC_info_struct theRunInfo		 =  [[model sbcLink] runInfo];
+	ORSBCLinkJobStatus* jobStatus =  [[model sbcLink] jobStatus];
+	NSString* theInfoString = @"";
 	int i,num;
 	
 	unsigned long aMinValue,aMaxValue,aWriteMark,aReadMark;
 	[[model sbcLink] getQueMinValue:&aMinValue maxValue:&aMaxValue head:&aWriteMark tail:&aReadMark];
 	switch([[model sbcLink] infoType]){
 		case 0:
-			theRunInfoString =                                 [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Config loaded : %@\t\tWrap Arounds: %d\n",(theRunInfo.statusBits & kSBC_ConfigLoadedMask) ? @"YES":@"NO ",theRunInfo.wrapArounds]];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %d\n",(theRunInfo.statusBits & kSBC_RunningMask) ? @"YES":@"NO ",[[model sbcLink] throttle]]];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
+			theInfoString =                                 [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Config loaded : %@\t\tWrap Arounds: %d\n",(theRunInfo.statusBits & kSBC_ConfigLoadedMask) ? @"YES":@"NO ",theRunInfo.wrapArounds]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %d\n",(theRunInfo.statusBits & kSBC_RunningMask) ? @"YES":@"NO ",[[model sbcLink] throttle]]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %d\n",theRunInfo.readCycles/10000]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %d\n",theRunInfo.lostByteCount]];
 			
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9d   Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9d   Err Count   : %d\n",aReadMark,theRunInfo.msg_count]];
-			theRunInfoString = [theRunInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d   Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
-			break;
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9d   Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9d   Err Count   : %d\n",aReadMark,theRunInfo.msg_count]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d   Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
+		break;
 			
 		case 1:
 			num = MIN(kSBC_MaxErrorBufferSize,theRunInfo.err_count);
-			if(num == 0) theRunInfoString =  @"No Errors";
+			if(num == 0) theInfoString =  @"No Errors";
 			for(i=0;i<num;i++){
-				theRunInfoString =  [theRunInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.errorStrings[i]];
+				theInfoString =  [theInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.errorStrings[i]];
 			}
-			break;
+		break;
 			
 		case 2:
 			num = MIN(kSBC_MaxErrorBufferSize,theRunInfo.msg_count);
-			if(num == 0) theRunInfoString =  @"No Messages";
+			if(num == 0) theInfoString =  @"No Messages";
 			for(i=0;i<num;i++){
-				theRunInfoString =  [theRunInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.messageStrings[i]];
+				theInfoString =  [theInfoString stringByAppendingFormat: @"[%2d] %s\n",i, theRunInfo.messageStrings[i]];
 			}
-			break;
+		break;
+
+		case 3:
+			if(jobStatus){
+				if([jobStatus running]){
+					theInfoString =                                        [NSString stringWithFormat: @"Current Job Status\n-----------------------\n"];
+					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running  : %@\n", [jobStatus running]?@"Running":@"Done" ]];
+					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Progress : %d%%\n",[jobStatus progress]]];
+				}
+				else {
+					theInfoString =                                        [NSString stringWithFormat: @"Last Job Status\n-----------------------\n"];
+					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Status : %@\n",[jobStatus finalStatus]?@"Success Reported":@"Failure Reported"]];
+				}
+			}
+			else theInfoString = [NSString stringWithFormat: @"No info available, or no job running"];
+		break;
+			
+	
+	
 	}
 	float amountFilled;
 	float totalAmount = (float)(aMaxValue-aMinValue);
@@ -555,7 +577,7 @@
 	
 	
 	[cbPercentField setFloatValue:totalAmount!=0?100.*amountFilled/totalAmount:0];
-	[runInfoField setStringValue:theRunInfoString];
+	[runInfoField setStringValue:theInfoString];
 	[queView setNeedsDisplay:YES];
 }
 

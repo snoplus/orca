@@ -5,31 +5,12 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>SBCLamView</string>
+			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>ORCardContainerView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -44,19 +25,6 @@
 				<string>id</string>
 				<key>mXScale</key>
 				<string>id</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORColorScale</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>colorAxis</key>
-				<string>ORAxis</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
@@ -93,9 +61,13 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
 				<key>autoScale</key>
 				<string>id</string>
 				<key>copy</key>
+				<string>id</string>
+				<key>removeGateAction</key>
 				<string>id</string>
 				<key>resetScales</key>
 				<string>id</string>
@@ -112,6 +84,10 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
 				<key>curve</key>
 				<string>id</string>
 				<key>mColorScale</key>
@@ -127,14 +103,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORCardContainerView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>ORGroupView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -208,6 +176,10 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>alignLeft</key>
+				<string>id</string>
+				<key>arrangeInCircle</key>
+				<string>id</string>
 				<key>concludeDragOperation</key>
 				<string>id</string>
 				<key>copy</key>
@@ -227,60 +199,10 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>group</key>
+				<string>id</string>
 				<key>mouseTask</key>
 				<string>id</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>addGateAction</key>
-				<string>id</string>
-				<key>analyze</key>
-				<string>id</string>
-				<key>autoScale</key>
-				<string>id</string>
-				<key>averageWindowAction</key>
-				<string>id</string>
-				<key>centerOnPeak</key>
-				<string>id</string>
-				<key>clearActiveCurveGates</key>
-				<string>id</string>
-				<key>clearActiveGate</key>
-				<string>id</string>
-				<key>clearAllGates</key>
-				<string>id</string>
-				<key>copy</key>
-				<string>id</string>
-				<key>differentiateAction</key>
-				<string>id</string>
-				<key>removeGateAction</key>
-				<string>id</string>
-				<key>resetScales</key>
-				<string>id</string>
-				<key>savePDF</key>
-				<string>id</string>
-				<key>xAndYAutoScale</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORPlotter1D</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>analysisDrawer</key>
-				<string>NSDrawer</string>
-				<key>analysisView</key>
-				<string>ZFlowLayout</string>
-				<key>mDataSource</key>
-				<string>id</string>
-				<key>mXScale</key>
-				<string>ORAxis</string>
-				<key>mYScale</key>
-				<string>ORAxis</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
@@ -458,6 +380,110 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>SBCLamView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORCardContainerView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORColorScale</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>colorAxis</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORCardContainerView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORGroupView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

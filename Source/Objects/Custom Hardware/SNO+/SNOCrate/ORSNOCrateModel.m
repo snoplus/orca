@@ -26,7 +26,8 @@
 #import "ORXL1Model.h"
 #import "ORXL2Model.h"
 #import "ORFec32Model.h"
-
+#import "ObjectFactory.h"
+#import "OROrderedObjManager.h"
 
 const struct {
 	unsigned long Register;
@@ -239,40 +240,64 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 - (void) scan
 {
 	NSLog(@"scanning crate %d for FEC32 cards\n",[self crateNumber]);
-	int card;
-	ORFec32Model* proxyFec32 = [[ORFec32Model alloc] init];
-	[proxyFec32 setGuardian:self];
-	for(card=0;card<kNumSNOCards;card++){
-		BOOL xl2OK = YES;
+	workingSlot = 0;
+	working = YES;
+	[self performSelector:@selector(scanWorkingSlot)withObject:nil afterDelay:0];
+}
+
+- (void) scanWorkingSlot
+{
+	pauseWork = NO;
+	BOOL xl2OK = YES;
+	@try {
+		[[self xl2] selectCards:1L<<workingSlot];	
+	}
+	@catch(NSException* localException) {
+		xl2OK = NO;
+		NSLog(@"Unable to reach XL2 in crate: %d (Not inited?)\n",[self crateNumber]);
+	}
+	if(!xl2OK)working = NO;
+	if(working){
 		@try {
-			[[self xl2] selectCards:1L<<card];	
-		}
-		@catch(NSException* localException) {
-			xl2OK = NO;
-			NSLog(@"Unable to reach XL2 in crate: %d (Not inited?)\n",[self crateNumber]);
-		}
-		if(!xl2OK)break;
-		
-		@try {
-			[proxyFec32 setSlot:card];
+			
+			ORFec32Model* proxyFec32 = [ObjectFactory makeObject:@"ORFec32Model"];
+			[proxyFec32 setGuardian:self];
+			
 			NSString* boardID = [proxyFec32 performBoardIDRead:MC_BOARD_ID_INDEX];
 			if(![boardID isEqual: @"0000"]){
-				NSLog(@"Slot: %d BoardID: %@\n",card,boardID);
-				ORFec32Model* aFec32 = [[ORFec32Model alloc] init];
-				[aFec32 setUpImage];
-				[aFec32 setGuardian:self];
-				[self addObjects:[NSArray arrayWithObject:aFec32]];
-				[aFec32 setSlot:card];
-				[aFec32 release];
+				NSLog(@"Slot: %2d BoardID: %@\n",workingSlot,boardID);
+				ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
+				if(!theCard){
+					[self addObjects:[NSArray arrayWithObject:proxyFec32]];
+					[self place:proxyFec32 intoSlot:workingSlot];
+					theCard = proxyFec32;
+				}
+				pauseWork = YES;
+				workingSlot++;
+				[theCard setBoardID:boardID];
+				[theCard scan:@selector(scanWorkingSlot)];
 			}
-			else NSLog(@"BadID (%@)\n",boardID);
+			else {
+				NSLog(@"BadID (%@)\n",boardID);
+				ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
+				if(theCard)[self removeObject:theCard];
+			}
 		}
 		@catch(NSException* localException) {
-			NSLog(@"Slot: %d BoardID: ----\n",card);
+			NSLog(@"Slot: %2d BoardID: ----\n",workingSlot);
+			ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
+			if(theCard)[self removeObject:theCard];
 		}
 	}
-	[proxyFec32 release];
-	[[self xl2] deselectCards];	
+	if(!pauseWork){
+		workingSlot++;
+		if(working && (workingSlot<kNumSNOCards)){
+			[self performSelector:@selector(scanWorkingSlot)withObject:nil afterDelay:0];
+		}	
+		else {
+			[[self xl2] deselectCards];
+		}
+	}
 }
 
 - (id)initWithCoder:(NSCoder*)decoder

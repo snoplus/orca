@@ -127,6 +127,16 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
 
 
 #pragma mark ¥¥¥Undoable Actions
+- (void) addObject:(id)anObject
+{
+	[self addObjects:[NSArray arrayWithObject:anObject]]; 
+}
+
+- (void) removeObject:(id)anObject
+{
+	[self removeObjects:[NSArray arrayWithObject:anObject]]; 
+}
+
 - (void) addObjects:(NSArray*)someObjects
 {
 	//all objects in paste must accept this guardian

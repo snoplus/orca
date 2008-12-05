@@ -44,9 +44,11 @@ unsigned long xl2_register_offsets[] =
 44,				// [11]  HV Current Readback
 };
 
+
 @interface ORXL2Model (SBC)
 - (void) loadClocksUsingSBC:(NSData*)theData;
 - (void) loadXilinixUsingSBC:(NSData*)theData;
+- (void) xilinxLoadStatus:(ORSBCLinkJobStatus*) jobStatus;
 @end
 
 @interface ORXL2Model (LocalAdapter)
@@ -57,6 +59,14 @@ unsigned long xl2_register_offsets[] =
 @implementation ORXL2Model
 
 #pragma mark •••Initialization
+
+- (id) init
+{
+	self = [super init];
+	[self setAddressModifier:0x29];
+	return self;
+}
+
 - (void) setUpImage
 {
     [self setImage:[NSImage imageNamed:@"XL2Card"]];
@@ -219,6 +229,11 @@ unsigned long xl2_register_offsets[] =
 	return [obj getXL1];
 }
 
+- (id) sbcLink
+{
+	return [[[self xl1] adapter] sbcLink];
+}
+
 - (void) connectionChanged
 {
 	ORXL1Model* theXL1 = [self getXL1];
@@ -244,6 +259,8 @@ unsigned long xl2_register_offsets[] =
     [self setInputConnector:		[decoder decodeObjectForKey:@"inputConnector"]];
     [self setOutputConnector:		[decoder decodeObjectForKey:@"outputConnector"]];
 	[self setSlot:					[decoder decodeIntForKey:   @"slot"]];
+
+	[self setAddressModifier:0x29];
 	
     [[self undoManager] enableUndoRegistration];
     
@@ -397,7 +414,7 @@ unsigned long xl2_register_offsets[] =
 	bcopy(dataPtr, p, [theData length]);
 	
 	@try {
-		[[[[self xl1] adapter] sbcLink] send:&aPacket receive:&aPacket];
+		[[self sbcLink] send:&aPacket receive:&aPacket];
 		SNOXL2_ClockLoadStruct *responsePtr = (SNOXL2_ClockLoadStruct*)aPacket.payload;
 		errorCode = responsePtr->errorCode;
 		if(errorCode){
@@ -417,7 +434,6 @@ unsigned long xl2_register_offsets[] =
 	
 	NSLog(@"Sending Xilinx file\n");
 	
-	long errorCode = 0;
 	unsigned long numLongs		= ceil([theData length]/4.0); //round up to long word boundary
 	SBC_Packet aPacket;
 	aPacket.cmdHeader.destination			= kSNO;
@@ -446,20 +462,32 @@ unsigned long xl2_register_offsets[] =
 	bcopy(dataPtr, p, [theData length]);
 	
 	@try {
-		[[[[self xl1] adapter] sbcLink] send:&aPacket receive:&aPacket];
-		SNOXL2_XilinixLoadStruct *responsePtr = (SNOXL2_XilinixLoadStruct*)aPacket.payload;
-		errorCode = responsePtr->errorCode;
-		if(errorCode){
-			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
-			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
+		//launch the load job. The response will be a job status record
+		[[self sbcLink] send:&aPacket receive:&aPacket];
+		SBC_JobStatusStruct *responsePtr = (SBC_JobStatusStruct*)aPacket.payload;
+		long running = responsePtr->running;
+		if(running){
+			NSLog(@"Xinlinx load in progress on the SBC.\n");
+			[[self sbcLink] monitorJobFor:self statusSelector:@selector(xilinxLoadStatus:)];
 		}
-		else NSLog(@"Looks like success.\n");
+//			NSLog(@"Error Code: %d %s\n",errorCode,aPacket.message);
+//			[NSException raise:@"Xilinx load failed" format:@"%d",errorCode];
+//		}
+//		else NSLog(@"Looks like success.\n");
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Xilinx load failed. %@\n",localException);
 		[localException raise];
 	}
 }
+
+- (void) xilinxLoadStatus:(ORSBCLinkJobStatus*) jobStatus
+{
+	if(![jobStatus running]){
+		NSLog(@"%@\n",[jobStatus message]);
+	}
+}
+
 @end
 
 @implementation ORXL2Model (LocalAdapter)

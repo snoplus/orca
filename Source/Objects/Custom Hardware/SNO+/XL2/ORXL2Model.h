@@ -73,6 +73,7 @@
 - (void)         guardianAssumingDisplayOfConnectors:(id)aGuardian;
 - (void)		 setCrateNumber:(int)crateNumber;
 - (id)			 getXL1;
+- (id)			 sbcLink;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -94,5 +95,4 @@
 - (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask;
 
 @end
-
 

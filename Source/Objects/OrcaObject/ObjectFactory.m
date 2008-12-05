@@ -29,7 +29,7 @@
 @implementation ObjectFactory
 
 #pragma mark ¥¥¥Initialization
-- (id)initWithFrame:(NSRect)frameRect
+- (id) initWithFrame:(NSRect)frameRect
 {
 	[super initWithFrame:frameRect];
 	[self setImagePosition:NSImageOnly];
@@ -120,15 +120,19 @@
 #pragma mark ¥¥¥Factory method
 - (void) makeObject
 {
-    Class aClass = NSClassFromString([self toolTip]);
+    [self setObject:[ObjectFactory makeObject:[self toolTip]]];
+}
+
++ (id) makeObject:(NSString*)aClassName
+{
+    Class aClass = NSClassFromString(aClassName);
     id obj		 = [[aClass alloc] init];
 	
     if([obj respondsToSelector:@selector(setUpImage)])		[obj setUpImage];
     if([obj respondsToSelector:@selector(makeConnectors)])	[obj makeConnectors];
     if([obj respondsToSelector:@selector(setHighlighted:)])	[obj setHighlighted:YES];
 	
-    [self setObject: obj];
-	[obj release];
+    return [obj autorelease];
 }
 
 @end

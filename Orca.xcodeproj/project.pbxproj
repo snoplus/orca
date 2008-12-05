@@ -1729,6 +1729,7 @@
 		84FAD2B40EE46AF500746B91 /* ORRunScriptModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */; };
 		84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FAD2AF0EE46AF500746B91 /* RunScript.gif */; };
 		84FAD2B60EE46AF500746B91 /* RunScript.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FAD2B00EE46AF500746B91 /* RunScript.nib */; };
+		84FAF2910EE8246200746B91 /* SBC_Job.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FAF2900EE8246200746B91 /* SBC_Job.h */; };
 		84FB4E010D91E1D90055813E /* ORAnalysisPanel2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */; };
 		84FB4E020D91E1D90055813E /* ORAnalysisPanel2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */; };
 		84FB4E220D92F7560055813E /* BugReporter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FB4E1F0D92F7560055813E /* BugReporter.nib */; };
@@ -3599,6 +3600,7 @@
 		84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunScriptModel.m; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptModel.m; sourceTree = SOURCE_ROOT; };
 		84FAD2AF0EE46AF500746B91 /* RunScript.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = RunScript.gif; path = Source/Objects/Control/RunControl/RunScripts/RunScript.gif; sourceTree = SOURCE_ROOT; };
 		84FAD2B00EE46AF500746B91 /* RunScript.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RunScript.nib; path = Source/Objects/Control/RunControl/RunScripts/RunScript.nib; sourceTree = SOURCE_ROOT; };
+		84FAF2900EE8246200746B91 /* SBC_Job.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBC_Job.h; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Job.h; sourceTree = SOURCE_ROOT; };
 		84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAnalysisPanel2D.m; path = Source/Widgets/Plotting/ORAnalysisPanel2D.m; sourceTree = SOURCE_ROOT; };
 		84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAnalysisPanel2D.h; path = Source/Widgets/Plotting/ORAnalysisPanel2D.h; sourceTree = SOURCE_ROOT; };
 		84FB4E1F0D92F7560055813E /* BugReporter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BugReporter.nib; path = "Source/Main Dialogs/BugReporter/BugReporter.nib"; sourceTree = SOURCE_ROOT; };
@@ -6180,6 +6182,7 @@
 				8493CC3D0C99FA0700B46CD4 /* CircularBuffer.h */,
 				8493CC3E0C99FA0700B46CD4 /* SBC_Cmds.h */,
 				8493CC3F0C99FA0700B46CD4 /* SBC_Config.h */,
+				84FAF2900EE8246200746B91 /* SBC_Job.h */,
 				8493CC400C99FA0700B46CD4 /* SBC_Readout.c */,
 				8493CC410C99FA0700B46CD4 /* SBC_Readout.h */,
 			);
@@ -9068,6 +9071,7 @@
 				84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */,
 				84FAD2B10EE46AF500746B91 /* ORRunScriptController.h in Headers */,
 				84FAD2B30EE46AF500746B91 /* ORRunScriptModel.h in Headers */,
+				84FAF2910EE8246200746B91 /* SBC_Job.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

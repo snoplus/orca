@@ -50,7 +50,8 @@
 #define kSBC_LAM			   0x10
 #define kSBC_CBTest			   0x11
 #define kSBC_PacketOptions	   0x12
-
+#define kSBC_KillJob		   0x13
+#define kSBC_JobStatus		   0x14
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
 typedef 
@@ -175,6 +176,16 @@ typedef
 		SBC_Packet lam_Packet;
 	} 
 SBC_LAM_info_struct;
+
+//---------------------
+
+typedef 
+    struct {
+		uint32_t running;		//1==yes, 0==no
+		uint32_t finalStatus;   //has meaning only if the job is done
+		uint32_t progress;		//0-100%
+    }
+SBC_JobStatusStruct;
 
 //---------------------
 

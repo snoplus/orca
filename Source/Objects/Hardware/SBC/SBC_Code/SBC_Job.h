@@ -1,11 +1,10 @@
-/*
- *  ORSNOConstants.h
- *  Orca
- *
- *  Created by Mark Howe on 11/17/08.
- *  Copyright 2008 University of North Carolina. All rights reserved.
- *
- */
+
+#ifndef _H_SBC_JOB_
+#define _H_SBC_JOB_
+
+#include "SBC_Cmds.h"
+#include <sys/types.h>
+#include <stdint.h>
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -20,14 +19,16 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#define kMaxSNOCrates			20
-#define kNumSNOCards			16
-#define kNumSNOCrateSlots		18
-#define kNumSNODaughterCards	4
+typedef struct {
+	pthread_t		jobThreadId;	//job thread ID
+	pthread_attr_t	jobThreadAttr;	//job thread attributes
+	char			running;	//there can be only one
+	char			killJobNow;		//set to 1 to stop early
+	SBC_Packet		workingPacket;	//copy of the SBC packet for use by the job
+	uint32_t		progress;		//number from 0 - 100%
+	uint32_t		finalStatus;	//a success flag- 1=OK, 0=BAD
+	char			message[256];
+	
+} SBC_JOB;
 
-// Board Id Register Definitions
-#define MC_BOARD_ID_INDEX		1
-#define DC_BOARD0_ID_INDEX		2
-#define DC_BOARD1_ID_INDEX		3
-#define DC_BOARD2_ID_INDEX		4
-#define DC_BOARD3_ID_INDEX		5
+#endif

@@ -23,11 +23,11 @@
 #import "ORFec32Model.h"
 
 #pragma mark •••Forward Declarations
-@class ORFec32View;
 @class ORFecPmtsView;
+@class ORGroupView;
 
 @interface ORFec32Controller : OrcaObjectController  {
-    IBOutlet ORFec32View*	groupView;
+    IBOutlet ORGroupView*	groupView;
 	IBOutlet NSButton*		showVoltsCB;
 	IBOutlet NSTextField*	commentsTextField;
     IBOutlet ORFecPmtsView* pmtView;
@@ -47,6 +47,7 @@
 	IBOutlet NSMatrix*		pmtImages2;
 	IBOutlet NSMatrix*		pmtImages3;
 	IBOutlet NSTextField*	boardIdField;
+    IBOutlet NSButton*		initButton;
 	NSNumberFormatter*		cmosFormatter;
 	
 	//cache some stuff to make things easier
@@ -56,7 +57,7 @@
 }
 
 #pragma mark •••Accessors
-- (ORFec32View *)groupView;
+- (ORGroupView *)groupView;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
@@ -77,6 +78,7 @@
 - (void) boardIdChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) initAction:(id)sender;
 - (IBAction) probeAction:(id)sender;
 - (IBAction) onlineMaskAction:(id)sender;
 - (IBAction) incCardAction:(id)sender;

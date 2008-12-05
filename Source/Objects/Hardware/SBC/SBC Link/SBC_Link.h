@@ -43,6 +43,7 @@ typedef enum eSBC_ThrottleConsts{
 @class  ORFileMover;
 @class  ORCard;
 @class ORSafeQueue;
+@class ORSBCLinkJobStatus;
 
 @interface SBC_Link : ORGroup {
 	id				delegate;
@@ -124,6 +125,9 @@ typedef enum eSBC_ThrottleConsts{
 	NSPoint         cbPoints[100];
 	int				recordSizeHisto[1000];
 	unsigned long	lastAmountInBuffer;
+	id				jobDelegate;
+	SEL				statusSelector;
+	ORSBCLinkJobStatus* jobStatus;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -189,7 +193,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) setAddressModifier:(unsigned long)aValue;
 - (long) payloadSize;
 - (void) setPayloadSize:(long)aValue;
-
+- (ORSBCLinkJobStatus*) jobStatus;
+- (void) setJobStatus:(ORSBCLinkJobStatus*)theJobStatus;
 
 - (void) calculateRates;
 - (void) setByteRateSent:(float)aRate;
@@ -322,8 +327,25 @@ typedef enum eSBC_ThrottleConsts{
 - (void) sampleCBTransferSpeed;
 - (void) doOneCBTransferTest:(long)payloadSize;
 - (void) doCBTransferTest;
+- (void) monitorJobFor:(id)aDelegate statusSelector:(SEL)aSelector;
+- (void) monitorJob;
 
 @end
+
+@interface ORSBCLinkJobStatus : NSObject
+{
+	SBC_JobStatusStruct status;
+	NSString* message;
+}
++ (id) jobStatus:(SBC_JobStatusStruct*) p message:(char*)aPacketMessage;
+- (id) initWith:(SBC_JobStatusStruct*)p message:(char*)aPacketMessage;
+- (void) dealloc;
+- (NSString*) message;
+- (long) running;	
+- (long) finalStatus;
+- (long) progress;	
+@end
+
 
 @interface NSObject (SBC_Link)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
@@ -331,9 +353,10 @@ typedef enum eSBC_ThrottleConsts{
 - (SBC_Link*) sbcLink;
 @end
 
+extern NSString* SBC_LinkReloadingChanged;
 extern NSString* SBC_LinkLoadModeChanged;
 extern NSString* SBC_LinkInitAfterConnectChanged;	
-extern NSString* SBC_LinkReloadingChanged;
+extern NSString* SgBC_LinkReloadingChanged;
 extern NSString* SBC_LinkWriteValueChanged;	
 extern NSString* SBC_LinkWriteAddressChanged;
 extern NSString* SBC_LinkPathChanged;	
@@ -360,4 +383,4 @@ extern NSString* ORSBC_LinkPingTask;
 extern NSString* ORSBC_LinkCBTest;
 extern NSString* ORSBC_LinkNumCBTextPointsChanged;
 extern NSString* ORSBC_LinkNumPayloadSizeChanged;
-
+extern NSString* ORSBC_LinkJobStatus;
