@@ -23,8 +23,8 @@
 
 #import "ORCard.h"
 
-#define UVkNumChannels 12
 #define UVkChnlNumParameters 11 //see below for list.
+#define UVkNumChannels 12
 
 enum hveStatus {eHVUEnabled = 1, eHVURampingUp = 2, eHVURampingDown = 4, evHVUTripForSupplyLimits = 16,
                 eHVUTripForUserCurrent = 32, eHVUTripForHVError = 64, eHVUTripForHVLimit= 128};
@@ -89,6 +89,7 @@ typedef enum hveStatus hveStatus;
 #pragma mark •••Interpret data
 - (void) interpretDataReturn: (NSNotification*) aNote;
 - (void) interpretDMPReturn: (NSDictionary*) aReturnData channel: (int) aCurChnl;
+- (void) interpretLDReturn: (NSDictionary*) aReturnData;
 
 #pragma mark •••Utilities
 - (void) printDictionary: (int) aCurrentChnl;

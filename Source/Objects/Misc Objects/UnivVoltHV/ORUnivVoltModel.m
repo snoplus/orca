@@ -31,9 +31,9 @@
 #import "ORDataPacket.h"
 #import "ORQueue.h"
 
-
 //NSString* ORUVChnlSlotChanged				= @"ORUVChnlSlotChanged";
 
+#pragma mark •••Constants
 // HV Unit parameters by symbol.
 NSString* HVkParam = @"Params";
 NSString* HVkChannelEnabled = @"CE";
@@ -65,6 +65,8 @@ const int HVkStatusIndx = 9;
 const int HVkMVDZIndx = 10;
 const int HVkMCDZIndx = 11;
 const int HVkHVLimitIndx = 12;
+
+//const int HVkNumChannels = 12;
 
 const float kMinutesToSecs = 60.0;
 
@@ -688,6 +690,12 @@ NSString* UVkWrite = @"W";
 				                                                    object: self
 																  userInfo: chnlDictObj];
 			}
+			else if( [retCmd isEqualTo: HVkModuleLD] ) 
+			{
+				// Interpret return from LD command.  Notifications are done from within interpretLDReturn routine
+				// since have to update many channels.
+				[self interpretLDReturn: returnData];
+			}
 		}				
 	}
 	@catch (NSException * e) {
@@ -795,6 +803,111 @@ NSString* UVkWrite = @"W";
 //	[notifyCenter postNotificationName: UVChnlHVLimitChanged object: self userInfo: chnlDictObj];
 }
 
+- (void) interpretLDReturn: (NSDictionary*) aReturnData
+{
+	int			i;
+	int			j;
+//	NSString*			statusStr;
+//	int					status;
+	NSNumber*			valueObj;
+	
+//	NSMutableDictionary* chnl = [mChannelArray objectAtIndex: 10];
+	NSArray* tokens = [aReturnData objectForKey: UVkReturn];
+	for ( i = 3; i < 10; i++ ) {
+		NSString* oneParameter = [tokens objectAtIndex: i];
+		NSLog( @"Token %d, String: %@\n", i, oneParameter );
+	}
+
+	// discover load command executed
+	NSString* command = [tokens objectAtIndex: 2];
+	
+	NSArray*	allKeys = [mParams allKeys];
+	for ( i = 0; i < [allKeys count]; i++ )
+	 {
+		NSString* oneParamName = [allKeys objectAtIndex: i];
+		if ( [command localizedCaseInsensitiveCompare: oneParamName] == NSOrderedSame ) 
+		{
+			// Now process data for all returned values
+			NSLog( @"Found command %@ in dictionary %@\n", command, oneParamName );
+			for ( j = 0; j < HVkNumChannels; j++ )
+			{
+				NSNumber* curChnlNum = [NSNumber  numberWithInt: j];
+				NSDictionary* chnlDictObj = [NSDictionary dictionaryWithObject: curChnlNum forKey: HVkCurChnl];
+				int tokenIndex = 2 + j;
+				if ( [tokens count] > tokenIndex )
+				{
+					NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: j];
+					NSString* parameter = [tokens objectAtIndex: j];
+					NSLog( @"Token %d, String: %@\n", i, parameter );
+
+//					NSNumber* valueLoaded = [NSNumber numberWithFloat: aRampUpRate];
+//					[tmpChnl setObject: rampUpRate forKey: command];
+					
+					NSString* type = [mParams objectForKey: oneParamName];
+					NSString* valueStr = [tokens objectAtIndex: tokenIndex];
+					
+					if ( type == UVkFLOAT )
+					{
+						float value = [valueStr floatValue];
+						valueObj = [NSNumber numberWithFloat: value];
+					}
+					else if ( type = UVkINT )
+					{
+						int value = [valueStr intValue];
+						valueObj = [NSNumber numberWithInt: value];
+					}
+					[tmpChnl setObject: valueObj forKey: oneParamName];
+	
+					if ( [oneParamName isEqualTo: HVkChannelEnabled] ) {
+//						[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlEnabledChanged object: self];
+//						NSDictionary* chnlDictObj = [NSDictionary dictionaryWithObject: curChnlNum forKey: HVkCurChnl];
+						[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlEnabledChanged 
+				                                                    object: self
+																  userInfo: chnlDictObj];
+					}
+					
+					else if ( [oneParamName isEqualTo: HVkDemandHV] ) {
+						[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlDemandHVChanged 
+						                                                    object: self 
+																		  userInfo: chnlDictObj];	
+					}
+					
+					else if ( [oneParamName isEqualTo: HVkRampUpRate] ) {
+						[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlRampUpRateChanged 
+																			object: self
+																		  userInfo: chnlDictObj];
+							
+					}
+					
+					else if ( [oneParamName isEqualTo: HVkRampDownRate] ) {
+						[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlRampDownRateChanged 
+																			object: self	
+																		  userInfo: chnlDictObj];
+					}
+					
+					else if ( [oneParamName isEqualTo: HVkTripCurrent] ){
+						[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlTripCurrentChanged 
+						                                                    object: self	
+																		  userInfo: chnlDictObj];
+					}
+
+					else if ( [oneParamName isEqualTo: HVkMVDZ] ){
+						[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlMVDZChanged 
+						                                                    object: self	
+																		  userInfo: chnlDictObj];
+					}
+
+					else if ( [oneParamName isEqualTo: HVkMCDZ] ){
+						[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlMCDZChanged 
+						                                                    object: self	
+																		  userInfo: chnlDictObj];
+					}	// End of if statements to figure out which notification message to send
+				}		// End of if determining whether token exists for channel.
+			}			// end of loop through all channels.
+			return;
+		}				// End of if determining if we have found correct command.
+	}					// End of loop through all keys to determine which key to use.
+}
 
 /*
 #pragma mark •••Data Records

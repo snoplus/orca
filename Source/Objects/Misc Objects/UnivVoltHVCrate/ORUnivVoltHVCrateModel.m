@@ -524,14 +524,25 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 					char retChar = [retSlotChnl characterAtIndex: 0];
 					if ( retChar == 'S' || retChar == 's' )
 					{
+					
+						// Look for slot
 						NSScanner* scannerForSlotAndChnl = [NSScanner scannerWithString: retSlotChnl];
 						[scannerForSlotAndChnl setScanLocation: 1];
 						[scannerForSlotAndChnl scanInt: &retSlotNum];
 						retSlot = [NSNumber numberWithInt: retSlotNum];
 						scanLoc = [scannerForSlotAndChnl scanLocation];
-						[scannerForSlotAndChnl setScanLocation: scanLoc + 1];
-						[scannerForSlotAndChnl scanInt: &retChnlNum];
-						retChnl = [NSNumber numberWithInt: retChnlNum];
+//						[scannerForSlotAndChnl setScanLocation: scanLoc + 1];
+
+
+						BOOL hasPeriod = [scannerForSlotAndChnl scanString: @"." intoString: NULL];
+						
+						// Look for channel if present.
+						if ( hasPeriod ) {
+							[scannerForSlotAndChnl scanInt: &retChnlNum];
+							retChnl = [NSNumber numberWithInt: retChnlNum];
+						} else {
+							retChnl = [NSNumber numberWithInt: -1];
+						}
 						f_NotFound = NO;
 					} // End parsing address.
 					i++;
