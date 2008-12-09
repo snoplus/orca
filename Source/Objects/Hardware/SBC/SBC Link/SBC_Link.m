@@ -25,9 +25,6 @@
 #import "ORReadOutList.h"
 #import "SBC_Config.h"
 #import "ORTaskSequence.h"
-#import "ORDataPacket.h"
-#import "ORCard.h"
-#import "ORCrate.h"
 #import "ORSafeQueue.h"
 #import "ORSBC_LAMModel.h"
 
@@ -37,13 +34,13 @@
 #import <sys/select.h>
 #import <sys/errno.h>
 
-#define kError -1
-#define kNoSelectionError 0
-#define kSelectionError  -1
-#define kSelectionTimeout  0
-#define kNoData -2
-#define kBlock   1
-#define kNoBlock 0
+#define kNoSelectionError	 0
+#define kSelectionTimeout	 0
+#define kNoBlock			 0
+#define kBlock				 1
+#define kError				-1
+#define kSelectionError		-1
+#define kNoData				-2
 
 #define kSBCRateIntegrationTime 1.5
 
@@ -79,24 +76,6 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged";
 NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
-
-/*
- @interface SBC_Link (private)
- - (void) throwError:(int)anError;
- - (void) fillInScript:(NSString*)theScript;
- - (void) runFailed;
- - (void) startCrateProcess;
- - (void) watchIrqSocket;
- - (void) write:(int)aSocket buffer:(SBC_Packet*)aPacket;
- - (void) read:(int)aSocket buffer:(SBC_Packet*)aPacket;
- - (BOOL) dataAvailable:(int) sck;
- - (BOOL) canWriteTo:(int) sck;
- - (void) readSocket:(int)aSocket buffer:(SBC_Packet*)aPacket;
- - (void) sampleCBTransferSpeed;
- - (void) doOneCBTransferTest:(long)payloadSize;
- - (void) doCBTransferTest;
- @end
- */
 
 @implementation SBC_Link
 - (id)   initWithDelegate:(ORCard*)aDelegate
