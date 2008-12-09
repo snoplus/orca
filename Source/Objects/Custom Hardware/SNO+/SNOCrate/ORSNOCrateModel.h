@@ -44,7 +44,7 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
-- (void) scan;
+- (void) autoInit;
 - (void) scanWorkingSlot;
 - (short) numberSlotsUsed;
 - (void) initCrate:(BOOL) loadTheFEC32XilinxFile;
@@ -54,7 +54,7 @@
 @interface ORSNOCrateModel (OROrderedObjHolding)
 - (int) maxNumberOfObjects;
 - (int) objWidth;
-- (NSRange) legalSlotsForObj:(id)anObj;
+- (int) stationForSlot:(int)aSlot;
 @end
 
 extern NSString* ORSNOCrateSlotChanged;

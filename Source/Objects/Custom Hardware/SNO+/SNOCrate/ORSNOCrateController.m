@@ -100,6 +100,7 @@
 		ORSBCLinkJobStatus* jobStatus = [[aNote userInfo] objectForKey:@"jobStatus"];
 		if([jobStatus running]){
 			[xilinixStatusField setStringValue:@"Loading"];
+			[xilinixLoadProgress startAnimation:self];
 			[xilinixLoadProgress setDoubleValue:[jobStatus progress]];
 		}
 		else {
@@ -107,9 +108,12 @@
 			else						[xilinixStatusField setStringValue:@"FAILED"];
 			[xilinixStatusField setStringValue:@""];
 			[xilinixLoadProgress setDoubleValue:0];
+			[xilinixLoadProgress stopAnimation:self];
 		}
-		[initButton setEnabled:![jobStatus running]];
-		[scanButton setEnabled:![jobStatus running]];
+		[probeButton setEnabled:![jobStatus running]];
+		[autoInitButton setEnabled:![jobStatus running]];
+		[initNoXilinxButton setEnabled:![jobStatus running]];
+		[initXilinxButton setEnabled:![jobStatus running]];
 	}
 }
 
@@ -124,14 +128,19 @@
 	[self decModelSortedBy:@selector(crateNumberCompare:)];
 }
 
-- (IBAction) scan:(id)sender
+- (IBAction) autoInit:(id)sender
 {
-	[model scan];
+	[model autoInit];
 }
 
-- (IBAction) doCrateLevelInit:(id)sender
+- (IBAction) initXilinx:(id)sender
 {
 	[model initCrate:YES];
+}
+
+- (IBAction) initNoXilinx:(id)sender
+{
+	[model initCrate:NO];
 }
 
 @end

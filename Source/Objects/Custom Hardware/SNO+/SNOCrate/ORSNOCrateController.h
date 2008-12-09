@@ -29,8 +29,10 @@
     IBOutlet NSTextField* crateNumberField;
     IBOutlet NSProgressIndicator* xilinixLoadProgress;
     IBOutlet NSTextField* xilinixStatusField;
-	IBOutlet NSButton*  initButton;
-	IBOutlet NSButton*  scanButton;
+	IBOutlet NSButton*  initXilinxButton;
+	IBOutlet NSButton*  initNoXilinxButton;
+	IBOutlet NSButton*  autoInitButton;
+	IBOutlet NSButton*  probeButton;
 }
 
 #pragma mark •••Initializations
@@ -48,7 +50,8 @@
 #pragma mark •••Actions
 - (IBAction) incCrateAction:(id)sender;
 - (IBAction) decCrateAction:(id)sender;
-- (IBAction) scan:(id)sender;
-- (IBAction) doCrateLevelInit:(id)sender;
+- (IBAction) autoInit:(id)sender;
+- (IBAction) initXilinx:(id)sender;
+- (IBAction) initNoXilinx:(id)sender;
 
 @end

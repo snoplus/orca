@@ -237,10 +237,10 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	return [self adapter];
 }
 
-- (void) scan
+- (void) autoInit
 {
 	NSLog(@"scanning crate %d for FEC32 cards\n",[self crateNumber]);
-	workingSlot = 0;
+	workingSlot = 16;
 	working = YES;
 	[self performSelector:@selector(scanWorkingSlot)withObject:nil afterDelay:0];
 }
@@ -250,7 +250,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	pauseWork = NO;
 	BOOL xl2OK = YES;
 	@try {
-		[[self xl2] selectCards:1L<<workingSlot];	
+		[[self xl2] selectCards:1L<<[self stationForSlot:workingSlot]];	
 	}
 	@catch(NSException* localException) {
 		xl2OK = NO;
@@ -265,7 +265,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 			
 			NSString* boardID = [proxyFec32 performBoardIDRead:MC_BOARD_ID_INDEX];
 			if(![boardID isEqual: @"0000"]){
-				NSLog(@"Slot: %2d BoardID: %@\n",workingSlot,boardID);
+				NSLog(@"Crate %2d Fec %2d BoardID: %@\n",[self crateNumber],[self stationForSlot:workingSlot],boardID);
 				ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
 				if(!theCard){
 					[self addObjects:[NSArray arrayWithObject:proxyFec32]];
@@ -273,25 +273,25 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 					theCard = proxyFec32;
 				}
 				pauseWork = YES;
-				workingSlot++;
 				[theCard setBoardID:boardID];
 				[theCard scan:@selector(scanWorkingSlot)];
+				workingSlot--;
 			}
 			else {
-				NSLog(@"BadID (%@)\n",boardID);
+				NSLog(@"Crate %2d Fec %2d BoardID: %@\n",[self crateNumber],[self stationForSlot:workingSlot],boardID);
 				ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
 				if(theCard)[self removeObject:theCard];
 			}
 		}
 		@catch(NSException* localException) {
-			NSLog(@"Slot: %2d BoardID: ----\n",workingSlot);
+			NSLog(@"Crate %2d Fec %2d BoardID: -----\n",[self crateNumber],[self stationForSlot:workingSlot]);
 			ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
 			if(theCard)[self removeObject:theCard];
 		}
 	}
 	if(!pauseWork){
-		workingSlot++;
-		if(working && (workingSlot<kNumSNOCards)){
+		workingSlot--;
+		if(working && (workingSlot>0)){
 			[self performSelector:@selector(scanWorkingSlot)withObject:nil afterDelay:0];
 		}	
 		else {
@@ -367,7 +367,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 
 - (int) stationForSlot:(int)aSlot
 {
-	return 17-aSlot;
+	return 16-aSlot;
 }
 
 - (NSRange) legalSlotsForObj:(id)anObj

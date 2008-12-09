@@ -82,7 +82,6 @@
     id anObj;
     while(anObj = [e nextObject]){
 		if(NSIntersectionRange(slotRange,NSMakeRange([containerObj slotForObj:anObj],[containerObj numberSlotsNeededFor:anObj])).length != 0){
-			NSLog(@"Rejected attempt to place multiple objects in %@\n",[containerObj nameForSlot:[containerObj slotForObj:anObj]]);
 			return NO;
 		}
     }
