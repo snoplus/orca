@@ -26,6 +26,7 @@
 #import "ORSNOConstants.h"
 #import "OROrderedObjManager.h"
 #import "ObjectFactory.h"
+#import "ORSNOCrateModel.h"
 
 #define VERIFY_CMOS_SHIFT_REGISTER	// uncomment this to verify CMOS shift register loads - PH 09/17/99
 
@@ -429,7 +430,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		
 		//read the Mother Card for its id
 		@try {
-			[self setBoardID:[self performBoardIDRead:[self stationNumber]]];
+			[self setBoardID:[self performBoardIDRead:MC_BOARD_ID_INDEX]];
 		}
 		@catch(NSException* localException) {
 			[self setBoardID:@"0000"];	
@@ -513,14 +514,18 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	unsigned short 	dataValue = 0;
 	unsigned long	writeValue = 0UL;
 	unsigned long	theRegister = BOARD_ID_REG_NUMBER;
-	
-	// first select the board
+	NSLog(@"performBoardIDRead\n");
+	ORTimer* timer = [[ORTimer alloc] init];
+	[timer start];
+	// first select the board (XL2 must already be selected)
 	unsigned long boardSelectVal = 0;
 	boardSelectVal |= (1UL << boardIndex);
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:boardSelectVal];
+	NSLog(@"0: %.3f\n",[timer seconds]); [timer reset];
 	
 	// load and clock in the first 9 bits instruction code and register address
 	[self boardIDOperation:(BOARD_ID_READ | theRegister) boardSelectValue:boardSelectVal beginIndex: 8];
+	NSLog(@"1: %.3f\n",[timer seconds]); [timer reset];
 	
 	// now read the data value; 17 reads, the last data bit is a dummy bit
 	writeValue = boardSelectVal;
@@ -532,12 +537,14 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 		readValue = [self readFromFec32Register:FEC32_BOARD_ID_REG];						// read the data bit
 		if ( readValue & BOARD_ID_DO)dataValue |= (1U << index);
 	}
+	NSLog(@"2: %.3f\n",[timer seconds]); [timer reset];
 	
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:writeValue];					// read out the dummy bit
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)];	// now clock in value
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:0UL];							// Now de-select all and clock
 	[self writeToFec32Register:FEC32_BOARD_ID_REG value:BOARD_ID_SK];					// now clock in value
-	
+	NSLog(@"3: %.3f\n",[timer seconds]); [timer reset];
+	[timer release];
 	return hexToString(dataValue);
 }
 
@@ -888,6 +895,12 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	}
 }
 
+- (int) stationNumber
+{
+	//we have a weird mapping because fec cards can only be in slots 1-16 and they are mapped to 0 - 15
+	return [[self crate] maxNumberOfObjects] - [self slot] - 2;
+}
+
 #pragma mark •••OROrderedObjHolding Protocol
 - (int) maxNumberOfObjects	{ return 4; }
 - (int) objWidth			{ return 39; }
@@ -908,7 +921,7 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 	float w = objWidth * [self maxNumberOfObjects] + [self groupSeparation];
 	
 	if(y>=0 && y<objWidth)						return 0;
-	else if(y>objWidth && y<objWidth*2)		return 1;
+	else if(y>objWidth && y<objWidth*2)			return 1;
 	else if(y>=w-objWidth*2 && y<w-objWidth)	return 2;
 	else if(y>=w-objWidth && y<w)				return 3;
 	else										return -1;
