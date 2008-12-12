@@ -67,6 +67,8 @@
 #import "ORRateGroup.h"
 #import "ORScale.h"
 #import "ORPciBit3Commands.h"
+#import "ORCommandList.h"
+#import "ORVmeReadWriteCommand.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORPciBit3ModelRangeChanged						= @"ORPciBit3ModelRangeChanged";
@@ -1965,7 +1967,80 @@ physicalBufferAddress:(unsigned long) physicalBufferAddress
 	}
 }
 
-
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	ORVmeReadWriteCommand* aCmd;
+	NSEnumerator* e = [aList objectEnumerator];
+	while(aCmd = [e nextObject]){
+		unsigned char*	byteData;
+		unsigned short* wordData;
+		unsigned long*	longData;
+		@try {
+			//writes
+			if([aCmd opType] == kWriteOp){
+				switch([aCmd itemSize]){
+					case 1:		//byte block
+						byteData = (unsigned char*)[[aCmd data] bytes];
+						[self writeByteBlock:byteData 
+								   atAddress:[aCmd vmeAddress] 
+								  numToWrite:[aCmd numberItems] 
+								  withAddMod:[aCmd addressModifier] 
+							   usingAddSpace:[aCmd addressSpace]];
+						break;
+					case 2:		//word block
+						wordData = (unsigned short*)[[aCmd data] bytes];
+						[self writeWordBlock:wordData 
+								   atAddress:[aCmd vmeAddress] 
+								  numToWrite:[aCmd numberItems] 
+								  withAddMod:[aCmd addressModifier] 
+							   usingAddSpace:[aCmd addressSpace]];
+						break;
+					case 4:		//long block
+						longData = (unsigned long*)[[aCmd data] bytes];
+						[self writeLongBlock:longData 
+								   atAddress:[aCmd vmeAddress] 
+								  numToWrite:[aCmd numberItems] 
+								  withAddMod:[aCmd addressModifier] 
+							   usingAddSpace:[aCmd addressSpace]];
+						break;
+				}
+			}
+			else {
+				//reads
+				switch([aCmd itemSize]){
+					case 1:		//byte block
+						byteData = (unsigned char*)[aCmd bytes];
+						[self readByteBlock:byteData 
+								  atAddress:[aCmd vmeAddress] 
+								  numToRead:[aCmd numberItems] 
+								 withAddMod:[aCmd addressModifier] 
+							  usingAddSpace:[aCmd addressSpace]];
+						break;
+					case 2:		//word block
+						wordData = (unsigned short*)[aCmd bytes];
+						[self readWordBlock:wordData 
+								  atAddress:[aCmd vmeAddress] 
+								  numToRead:[aCmd numberItems] 
+								 withAddMod:[aCmd addressModifier] 
+							  usingAddSpace:[aCmd addressSpace]];
+						break;
+					case 4:		//long block
+						longData = (unsigned long*)[aCmd bytes];
+						[self readLongBlock:longData 
+								  atAddress:[aCmd vmeAddress] 
+								  numToRead:[aCmd numberItems] 
+								 withAddMod:[aCmd addressModifier] 
+							  usingAddSpace:[aCmd addressSpace]];
+						break;
+				}
+			}
+			[aCmd setReturnCode: 1]; //must have worked since nothing was thrown
+		}
+		@catch (NSException* localException) {
+			[aCmd setReturnCode: 0];
+		}
+	}
+}
 
 
 #pragma mark ¥¥¥Rates

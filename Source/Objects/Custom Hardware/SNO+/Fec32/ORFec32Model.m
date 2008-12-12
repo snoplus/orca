@@ -27,6 +27,8 @@
 #import "OROrderedObjManager.h"
 #import "ObjectFactory.h"
 #import "ORSNOCrateModel.h"
+#import "ORVmeReadWriteCommand.h"
+#import "ORCommandList.h"
 
 #define VERIFY_CMOS_SHIFT_REGISTER	// uncomment this to verify CMOS shift register loads - PH 09/17/99
 
@@ -424,7 +426,6 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 				[aCard readBoardIds];
 			}
 		}	
-		
 		// Read the PMTIC for its id
 		//PerformBoardIDRead(HV_BOARD_ID_INDEX,&dataValue);
 		
@@ -510,47 +511,77 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 
 - (NSString*) performBoardIDRead:(short) boardIndex
 {
-	unsigned long 	readValue;
 	unsigned short 	dataValue = 0;
 	unsigned long	writeValue = 0UL;
 	unsigned long	theRegister = BOARD_ID_REG_NUMBER;
-	NSLog(@"performBoardIDRead\n");
-	ORTimer* timer = [[ORTimer alloc] init];
-	[timer start];
 	// first select the board (XL2 must already be selected)
 	unsigned long boardSelectVal = 0;
 	boardSelectVal |= (1UL << boardIndex);
-	[self writeToFec32Register:FEC32_BOARD_ID_REG value:boardSelectVal];
-	NSLog(@"0: %.3f\n",[timer seconds]); [timer reset];
 	
+	ORCommandList* aList = [ORCommandList commandList];		//start a command list.
+	
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:boardSelectVal]];
+	
+	//-------------------------------------------------------------------------------------------
 	// load and clock in the first 9 bits instruction code and register address
-	[self boardIDOperation:(BOARD_ID_READ | theRegister) boardSelectValue:boardSelectVal beginIndex: 8];
-	NSLog(@"1: %.3f\n",[timer seconds]); [timer reset];
+	//[self boardIDOperation:(BOARD_ID_READ | theRegister) boardSelectValue:boardSelectVal beginIndex: 8];
+	//moved here so we could combine all the commands into one list for speed.
+	unsigned long theDataValue = (BOARD_ID_READ | theRegister);
+	short index;
+	for (index = 8; index >= 0; index--){
+		if ( theDataValue & (1U << index) ) writeValue = (boardSelectVal | BOARD_ID_DI);
+		else								writeValue = boardSelectVal;
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];					// load data value
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
+	}
+	//-------------------------------------------------------------------------------------------
 	
 	// now read the data value; 17 reads, the last data bit is a dummy bit
 	writeValue = boardSelectVal;
 	
-	short index;
+	int cmdRef[16];
 	for (index = 15; index >= 0; index--){
-		[self writeToFec32Register:FEC32_BOARD_ID_REG value:writeValue];
-		[self writeToFec32Register:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)];	// now clock in value
-		readValue = [self readFromFec32Register:FEC32_BOARD_ID_REG];						// read the data bit
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
+		cmdRef[index] = [aList addCommand: [self readFromFec32RegisterCmd:FEC32_BOARD_ID_REG]];											// read the data bit
+	}
+	
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];					// read out the dummy bit
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:0UL]];						// Now de-select all and clock
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:BOARD_ID_SK]];				// now clock in value
+
+	[self executeCommandList:aList]; //send out the list (blocks until reply or timeout)
+	
+	//OK, assemble the result
+	for (index = 15; index >= 0; index--){
+		long readValue = [aList longValueForCmd:cmdRef[index]];
 		if ( readValue & BOARD_ID_DO)dataValue |= (1U << index);
 	}
-	NSLog(@"2: %.3f\n",[timer seconds]); [timer reset];
 	
-	[self writeToFec32Register:FEC32_BOARD_ID_REG value:writeValue];					// read out the dummy bit
-	[self writeToFec32Register:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)];	// now clock in value
-	[self writeToFec32Register:FEC32_BOARD_ID_REG value:0UL];							// Now de-select all and clock
-	[self writeToFec32Register:FEC32_BOARD_ID_REG value:BOARD_ID_SK];					// now clock in value
-	NSLog(@"3: %.3f\n",[timer seconds]); [timer reset];
-	[timer release];
 	return hexToString(dataValue);
+}
+
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	[[self xl2] executeCommandList:aList];		
 }
 
 - (unsigned long) fec32RegAddress:(unsigned long)aRegOffset
 {
 	return [[self guardian] registerBaseAddress] + fec32_register_offsets[aRegOffset];
+}
+
+- (id) writeToFec32RegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern
+{
+	unsigned long theAddress = [self fec32RegAddress:aRegister];
+	return [[self xl2] writeHardwareRegisterCmd:theAddress value:aBitPattern];		
+}
+
+- (id) readFromFec32RegisterCmd:(unsigned long) aRegister
+{
+	unsigned long theAddress = [self fec32RegAddress:aRegister];
+	return [[self xl2] readHardwareRegisterCmd:theAddress]; 		
 }
 
 - (void) writeToFec32Register:(unsigned long) aRegister value:(unsigned long) aBitPattern
@@ -586,16 +617,18 @@ NSString* ORFecQllEnabledChanged			= @"ORFecQllEnabledChanged";
 {
 	unsigned long writeValue = 0UL;
 	// load and clock in the instruction code
+
+	
+	ORCommandList* aList = [ORCommandList commandList];
 	short index;
 	for (index = beginIndex; index >= 0; index--){
-		
 		if ( theDataValue & (1U << index) ) writeValue = (boardSelectVal | BOARD_ID_DI);
 		else								writeValue = boardSelectVal;
-		
-		[self writeToFec32Register:FEC32_BOARD_ID_REG value:writeValue];					// load data value
-		[self writeToFec32Register:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)];	// now clock in value
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];					// load data value
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
 		writeValue = 0UL;
 	}
+	[self executeCommandList:aList];
 }
 
 - (void) autoInitThisCard

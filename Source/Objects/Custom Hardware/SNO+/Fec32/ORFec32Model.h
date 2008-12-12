@@ -23,6 +23,7 @@
 #import "OROrderedObjHolding.h"
 
 @class ORFecDaughterCardModel;
+@class ORCommandList;
 
 #define kISetA1 0
 #define kISetA0	1
@@ -267,6 +268,11 @@ typedef struct Fec32CmosShiftReg{
 - (void) performPMTSetup:(BOOL) aTriggersDisabled;
 - (void) scan:(SEL)aResumeSelectorInGuardian; 
 - (void) scanWorkingSlot;
+
+#pragma mark •••Hw Access Helpers
+- (id) writeToFec32RegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
+- (id) readFromFec32RegisterCmd:(unsigned long) aRegister;
+- (void) executeCommandList:(ORCommandList*)aList;
 
 #pragma mark •••OROrderedObjHolding Protocal
 - (int) maxNumberOfObjects;

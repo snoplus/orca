@@ -23,6 +23,8 @@
 #import "SBC_Cmds.h"
 #import "ORGroup.h"
 
+@class ORCommandList;
+
 typedef  enum eSBC_CrateStates{
 	kIdle,
 	kTryToConnect,
@@ -277,6 +279,7 @@ typedef enum eSBC_ThrottleConsts{
 			 withAddMod:(unsigned short) anAddressModifier
 		  usingAddSpace:(unsigned short) anAddressSpace;
 
+- (void) executeCommandList:(ORCommandList*)aList;
 
 - (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket;
 

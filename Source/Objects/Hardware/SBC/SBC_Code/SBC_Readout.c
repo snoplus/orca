@@ -195,7 +195,7 @@ int32_t main(int32_t argc, char *argv[])
             numRead = readBuffer(&aPacket);
             if(numRead == 0) break;
             if (numRead > 0) {
-                processBuffer(&aPacket);
+                processBuffer(&aPacket,kReply);
             } else {
               /* if numRead is less than 0, then an error occurred.  We'll try to continue. */
                 LogError("Error reading buffer: %s", strerror(errno));
@@ -242,29 +242,29 @@ int32_t main(int32_t argc, char *argv[])
     return 0;
 } 
 
-void processBuffer(SBC_Packet* aPacket)
+void processBuffer(SBC_Packet* aPacket, uint8_t reply)
 {
     /*look at the first word to get the destination*/
     int32_t destination = aPacket->cmdHeader.destination;
 
     switch(destination){
-        case kSBC_Process:   processSBCCommand(aPacket);    break;
-        default:             processHWCommand(aPacket);		break;
+        case kSBC_Process:   processSBCCommand(aPacket,reply);    break;
+        default:             processHWCommand(aPacket);			  break;
     }
 }
 
-void processSBCCommand(SBC_Packet* aPacket)
+void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 {
     switch(aPacket->cmdHeader.cmdID){
         case kSBC_WriteBlock:        
             pthread_mutex_lock (&runInfoMutex);                            //begin critical section
-            doWriteBlock(aPacket); 
+            doWriteBlock(aPacket,reply); 
             pthread_mutex_unlock (&runInfoMutex);                        //end critical section
         break;
         
         case kSBC_ReadBlock:
             pthread_mutex_lock (&runInfoMutex);                            //begin critical section
-            doReadBlock(aPacket);  
+            doReadBlock(aPacket,reply);  
             pthread_mutex_unlock (&runInfoMutex);                        //end critical section
         break;
             
@@ -273,7 +273,11 @@ void processSBCCommand(SBC_Packet* aPacket)
             memcpy(&crate_config, aPacket->payload, sizeof(SBC_crate_config));
             run_info.statusBits    |= kSBC_ConfigLoadedMask;
         break;
-                    
+			
+		case kSBC_CmdBlock:
+			processCmdBlock(aPacket);
+		break;
+			
         case kSBC_StartRun:			doRunCommand(aPacket);		break;
         case kSBC_StopRun:          doRunCommand(aPacket);		break;
         case kSBC_RunInfoRequest:   sendRunInfo();				break;
@@ -879,3 +883,20 @@ void runCBTest(SBC_Packet* aPacket)
 	}
 }
 
+void processCmdBlock(SBC_Packet* aPacket)
+{
+	unsigned long totalBytes = aPacket->cmdHeader.numberBytesinPayload;	//total for all enclosed cmd packets
+	uint32_t* theCmdPacket = (uint32_t*)aPacket->payload;
+	while(totalBytes>0){
+		//might have to swap the first part of the payload which is really a size and an SBC_CommandHeader
+		//each cmd payload will be swapped if needed by routines that know how what the contents are 
+		if(needToSwap)SwapLongBlock(theCmdPacket,1+sizeof(SBC_CommandHeader)/sizeof(int32_t));
+		uint32_t bytesInThisCmd = ((SBC_Packet*)theCmdPacket)->numBytes;
+		if(!bytesInThisCmd)break;
+		processBuffer((SBC_Packet*)theCmdPacket,kNoReply); //we'll do the reply, so tell them not to.
+		theCmdPacket += bytesInThisCmd/sizeof(uint32_t);
+		totalBytes -= bytesInThisCmd;
+	}
+	//echo the block back as a response
+	writeBuffer(aPacket);
+}

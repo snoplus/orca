@@ -21,6 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
+@class ORCommandList;
 
 // SNTR XL2 register indices, Changed 4/13/97 for new XL2, JB
 #define XL2_SELECT_REG							0
@@ -93,6 +94,10 @@
 - (void) loadTheClocks;
 - (void) loadTheXilinx;
 - (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask;
+
+- (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
+- (id) readHardwareRegisterCmd:(unsigned long) regAddress;
+- (void) executeCommandList:(ORCommandList*)aList;
 
 @end
 

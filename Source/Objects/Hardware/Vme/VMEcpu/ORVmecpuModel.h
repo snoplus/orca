@@ -23,6 +23,7 @@
 #import "ORDataTaker.h"
 #import "ORVmeBusProtocol.h"
 #import "SBC_Linking.h"
+#import "ORCommandList.h"
 
 @class ORReadOutList;
 @class ORDataPacket;
@@ -116,6 +117,8 @@
 			numToWrite:(unsigned int) numberWords
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace;
+
+- (void) executeCommandList:(ORCommandList*)aList;
 
 @end
 

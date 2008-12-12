@@ -114,7 +114,7 @@ void ReleaseHardware(void)
 	ReleaseAcqirisDC440s();
 }
 
-void doWriteBlock(SBC_Packet* aPacket)
+void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 {
 	SBC_WriteBlockStruct* p = (SBC_WriteBlockStruct*)aPacket->payload;
 	if(needToSwap)SwapLongBlock(p,sizeof(SBC_WriteBlockStruct)/sizeof(int32_t));
@@ -127,9 +127,10 @@ void doWriteBlock(SBC_Packet* aPacket)
 	for(i=0;i<num;i++){
 		writeAddress(startAddress+i,dataToRead[i]);
 	}
+	if(reply)writeBuffer(aPacket);
 }
 
-void doReadBlock(SBC_Packet* aPacket)
+void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 {
 	//what to read?
 	SBC_ReadBlockStruct* p = (SBC_ReadBlockStruct*)aPacket->payload;
@@ -154,7 +155,7 @@ void doReadBlock(SBC_Packet* aPacket)
 	for(i=0;i<numLongs;i++)*lPtr++ = readAddress(address+i);    //read from hardware addresses
 	if(needToSwap)SwapLongBlock(startPtr,numLongs/sizeof(int32_t));
 
-	writeBuffer(aPacket);
+	if(reply)writeBuffer(aPacket);
 	
 }
 

@@ -1501,6 +1501,9 @@
 		84B7F8D80820551F00721869 /* bigdotshadow.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B7F8D50820551F00721869 /* bigdotshadow.tif */; };
 		84B7FBDD0993CF7300255787 /* ORScaleTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B7FBDB0993CF7300255787 /* ORScaleTask.h */; };
 		84B7FBDE0993CF7300255787 /* ORScaleTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B7FBDC0993CF7300255787 /* ORScaleTask.m */; };
+		84B89EA10EF1977800E0C395 /* ORCommandList.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B89E9F0EF1977800E0C395 /* ORCommandList.h */; };
+		84B89EA20EF1977800E0C395 /* ORCommandList.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B89EA00EF1977800E0C395 /* ORCommandList.m */; };
+		84B89ED20EF1995800E0C395 /* ORVmeReadWriteCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B89ED10EF1995800E0C395 /* ORVmeReadWriteCommand.m */; };
 		84BA98FD0E91260600E19946 /* SNO.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA98FB0E91260500E19946 /* SNO.h */; };
 		84BA99010E91279000E19946 /* SNOCmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOCmds.h */; };
 		84BA99050E91288800E19946 /* SNOCmds.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOCmds.h */; };
@@ -1722,6 +1725,7 @@
 		84F7FB610AE5566D00A5AA4C /* my_list.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5C0AE5566D00A5AA4C /* my_list.h */; };
 		84F7FB620AE5566D00A5AA4C /* mysql_com.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */; };
 		84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB630AE5569100A5AA4C /* my_alloc.h */; };
+		84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */; };
 		84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */; };
 		84FAD2B10EE46AF500746B91 /* ORRunScriptController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FAD2AB0EE46AF500746B91 /* ORRunScriptController.h */; };
 		84FAD2B20EE46AF500746B91 /* ORRunScriptController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FAD2AC0EE46AF500746B91 /* ORRunScriptController.m */; };
@@ -3266,6 +3270,9 @@
 		84B7F8D50820551F00721869 /* bigdotshadow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = bigdotshadow.tif; path = "Source/Objects/Misc Objects/Dots/DotImages/bigdotshadow.tif"; sourceTree = SOURCE_ROOT; };
 		84B7FBDB0993CF7300255787 /* ORScaleTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScaleTask.h; path = "Source/Objects/Misc Objects/Mouse Tasks/ORScaleTask.h"; sourceTree = SOURCE_ROOT; };
 		84B7FBDC0993CF7300255787 /* ORScaleTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScaleTask.m; path = "Source/Objects/Misc Objects/Mouse Tasks/ORScaleTask.m"; sourceTree = SOURCE_ROOT; };
+		84B89E9F0EF1977800E0C395 /* ORCommandList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORCommandList.h; sourceTree = "<group>"; };
+		84B89EA00EF1977800E0C395 /* ORCommandList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORCommandList.m; sourceTree = "<group>"; };
+		84B89ED10EF1995800E0C395 /* ORVmeReadWriteCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVmeReadWriteCommand.m; path = "Source/Objects/Hardware/Vme/Vme Base Classes/ORVmeReadWriteCommand.m"; sourceTree = SOURCE_ROOT; };
 		84B8B99604DB33F8005F64B1 /* Ncd.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Ncd.gif; path = Source/Experiments/Ncd/Ncd.gif; sourceTree = SOURCE_ROOT; };
 		84B8B99704DB33F8005F64B1 /* Ncd.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Ncd.nib; path = Source/Experiments/Ncd/Ncd.nib; sourceTree = SOURCE_ROOT; };
 		84B8B99804DB33F8005F64B1 /* NcdController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NcdController.h; path = Source/Experiments/Ncd/NcdController.h; sourceTree = SOURCE_ROOT; };
@@ -3593,6 +3600,7 @@
 		84F7FB5C0AE5566D00A5AA4C /* my_list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_list.h; path = Libraries/my_list.h; sourceTree = SOURCE_ROOT; };
 		84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql_com.h; path = Libraries/mysql_com.h; sourceTree = SOURCE_ROOT; };
 		84F7FB630AE5569100A5AA4C /* my_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_alloc.h; path = Libraries/my_alloc.h; sourceTree = SOURCE_ROOT; };
+		84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeReadWriteCommand.h; sourceTree = "<group>"; };
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
 		84FAD2AB0EE46AF500746B91 /* ORRunScriptController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunScriptController.h; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptController.h; sourceTree = SOURCE_ROOT; };
 		84FAD2AC0EE46AF500746B91 /* ORRunScriptController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunScriptController.m; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptController.m; sourceTree = SOURCE_ROOT; };
@@ -6165,6 +6173,8 @@
 				84A8B14D0D35703300263D31 /* SBCLamView.h */,
 				8493CC340C99FA0700B46CD4 /* SBC_LinkController.h */,
 				8493CC350C99FA0700B46CD4 /* SBC_LinkController.m */,
+				84B89E9F0EF1977800E0C395 /* ORCommandList.h */,
+				84B89EA00EF1977800E0C395 /* ORCommandList.m */,
 				8493CC360C99FA0700B46CD4 /* SBC_Link.nib */,
 				8493CC370C99FA0700B46CD4 /* killScript */,
 				8493CC380C99FA0700B46CD4 /* makeScript */,
@@ -6443,8 +6453,8 @@
 		849DA4D60BE7BBE600044320 /* LakeShore210 */ = {
 			isa = PBXGroup;
 			children = (
-				849DA4D70BE7BBE600044320 /* LakeShore210.nib */,
 				849DA4D80BE7BBE600044320 /* LakeShore210.tif */,
+				849DA4D70BE7BBE600044320 /* LakeShore210.nib */,
 				849DA4D90BE7BBE600044320 /* ORLakeShore210Controller.h */,
 				849DA4DA0BE7BBE600044320 /* ORLakeShore210Controller.m */,
 				849DA4DB0BE7BBE600044320 /* ORLakeShore210Decoders.h */,
@@ -8273,6 +8283,8 @@
 				842B061A040C1D3F005F64B1 /* ORVmeIPCard.m */,
 				842A63540700A951007536B6 /* ORVmeCardDecoder.h */,
 				842A63550700A951007536B6 /* ORVmeCardDecoder.m */,
+				84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */,
+				84B89ED10EF1995800E0C395 /* ORVmeReadWriteCommand.m */,
 			);
 			path = "Vme Base Classes";
 			sourceTree = "<group>";
@@ -9072,6 +9084,8 @@
 				84FAD2B10EE46AF500746B91 /* ORRunScriptController.h in Headers */,
 				84FAD2B30EE46AF500746B91 /* ORRunScriptModel.h in Headers */,
 				84FAF2910EE8246200746B91 /* SBC_Job.h in Headers */,
+				84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */,
+				84B89EA10EF1977800E0C395 /* ORCommandList.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10302,6 +10316,8 @@
 				842376920ED46B7A00BECB64 /* OROrderedObjManager.m in Sources */,
 				84FAD2B20EE46AF500746B91 /* ORRunScriptController.m in Sources */,
 				84FAD2B40EE46AF500746B91 /* ORRunScriptModel.m in Sources */,
+				84B89EA20EF1977800E0C395 /* ORCommandList.m in Sources */,
+				84B89ED20EF1995800E0C395 /* ORVmeReadWriteCommand.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

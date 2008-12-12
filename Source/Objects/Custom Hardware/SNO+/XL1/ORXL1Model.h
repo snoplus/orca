@@ -21,6 +21,7 @@
 
 #pragma mark •••Imported Files
 #import "ORVmeCard.h"
+@class ORCommandList;
 
 #define kNumFecMonitorAdcs		21
 #define kAllowedFecMonitorError	0.1
@@ -77,6 +78,9 @@
 #pragma mark •••Hardware Access
 - (void) writeHardwareRegister:(unsigned long) regAddress value:(unsigned long) aValue;
 - (unsigned long) readHardwareRegister:(unsigned long) regAddress;
+- (id) writeHardwareRegisterCmd:(unsigned long) regAddress value:(unsigned long) aValue;
+- (id) readHardwareRegisterCmd:(unsigned long) regAddress;
+- (void) executeCommandList:(ORCommandList*)aList;
 
 @end
 

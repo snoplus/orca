@@ -27,6 +27,7 @@
 #import "ORTaskSequence.h"
 #import "ORSafeQueue.h"
 #import "ORSBC_LAMModel.h"
+#import "ORCommandList.h"
 
 #import <netdb.h>
 #import <sys/types.h>
@@ -1224,18 +1225,40 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 }
 
 
+//temp discrete ops
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	@try {
+		SBC_Packet blockPacket = [aList SBCPacket];
+		
+		[socketLock lock]; //begin critical section
+		//Do NOT call the combo send:receive method here... we have the locks already in place
+		[self write:socketfd buffer:&blockPacket];	//write the packet
+		[self read:socketfd buffer:&blockPacket];	//read the response
+		[socketLock unlock]; //end critical section
+		
+		[aList extractData:&blockPacket];
+	
+	}
+	@catch (NSException* localException) {
+		[socketLock unlock]; //end critical section
+		[localException raise];
+	}
+}
+
+
 - (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket
 {
-	[socketLock lock]; //begin critial section
 	@try {
+		[socketLock lock]; //begin critial section
 		[self write:socketfd buffer:aSendPacket];
 		[self read:socketfd buffer:aReceivePacket];
+		[socketLock unlock]; //end critial section
 	}
 	@catch (NSException* localException) {
 		[socketLock unlock]; //end critial section
 		[localException raise];
 	}
-	[socketLock unlock]; //end critial section
 }
 
 

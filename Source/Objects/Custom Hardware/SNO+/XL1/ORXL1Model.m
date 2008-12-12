@@ -23,6 +23,8 @@
 #import "ORXL1Model.h"
 #import "ORSNOCrateModel.h"
 #import "ORSNOCard.h"
+#import "ORCommandList.h"
+#import "ORVmeReadWriteCommand.h"
 
 NSString* ORXL1ClockFileChanged			= @"ORXL1ClockFileChanged";
 NSString* ORXL1XilinxFileChanged		= @"ORXL1XilinxFileChanged";
@@ -343,5 +345,26 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	return aValue;
 }
 
+- (id) writeHardwareRegisterCmd:(unsigned long) regAddress value:(unsigned long) aValue
+{
+	return [ORVmeReadWriteCommand writeLongBlock:&aValue
+								  atAddress:regAddress
+								 numToWrite:1
+								 withAddMod:0x29
+							  usingAddSpace:0x01];
+}
+
+- (id) readHardwareRegisterCmd:(unsigned long) regAddress
+{
+	return [ORVmeReadWriteCommand readLongBlockAtAddress:regAddress
+						numToRead:1
+					   withAddMod:0x29
+					usingAddSpace:0x01];
+}
+
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	[[self adapter] executeCommandList:aList];		
+}
 
 @end

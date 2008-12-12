@@ -114,7 +114,7 @@ void ReleaseHardware(void)
 }
 
 
-void doWriteBlock(SBC_Packet* aPacket)
+void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 {
     SBC_VmeWriteBlockStruct* p = (SBC_VmeWriteBlockStruct*)aPacket->payload;
     if(needToSwap) SwapLongBlock(p,sizeof(SBC_VmeWriteBlockStruct)/sizeof(int32_t));
@@ -134,7 +134,7 @@ void doWriteBlock(SBC_Packet* aPacket)
         if (unitSize != sizeof(uint32_t) && numItems != 1) {
             sprintf(aPacket->message,"error: size and number not correct");
             p->errorCode = -1;
-            writeBuffer(aPacket);
+            if(reply)writeBuffer(aPacket);
             return;
         }
     } else if(unitSize*numItems >= kDMALowerLimit) {
@@ -160,7 +160,7 @@ void doWriteBlock(SBC_Packet* aPacket)
         if (memMapHandle == NULL) {
             sprintf(aPacket->message,"error: %d : %s\n",(int32_t)errno,strerror(errno));
             p->errorCode = -1;
-            writeBuffer(aPacket);
+            if(reply)writeBuffer(aPacket);
             return;
         }
         deleteHandle = true;
@@ -221,15 +221,14 @@ void doWriteBlock(SBC_Packet* aPacket)
     if(result == (numItems*unitSize)){
         returnDataPtr->errorCode = 0;
     } else {
-        aPacket->cmdHeader.numberBytesinPayload    
-          = sizeof(SBC_VmeWriteBlockStruct);
+        aPacket->cmdHeader.numberBytesinPayload = sizeof(SBC_VmeWriteBlockStruct);
         returnDataPtr->errorCode = result;        
     }
 
     lptr = (int32_t*)returnDataPtr;
     if(needToSwap) SwapLongBlock(lptr,numItems);
 
-    writeBuffer(aPacket);    
+    if(reply)writeBuffer(aPacket);    
 
     if (deleteHandle) {
         close_device(memMapHandle);
@@ -237,7 +236,7 @@ void doWriteBlock(SBC_Packet* aPacket)
 
 }
 
-void doReadBlock(SBC_Packet* aPacket)
+void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 {
     SBC_VmeReadBlockStruct* p = (SBC_VmeReadBlockStruct*)aPacket->payload;
     if(needToSwap) {
@@ -256,7 +255,7 @@ void doReadBlock(SBC_Packet* aPacket)
     if (numItems*unitSize > kSBC_MaxPayloadSize) {
         sprintf(aPacket->message,"error: requested greater than payload size.");
         p->errorCode = -1;
-        writeBuffer(aPacket);
+        if(reply)writeBuffer(aPacket);
         return;
     }
     if (addressSpace == kControlSpace) {
@@ -264,7 +263,7 @@ void doReadBlock(SBC_Packet* aPacket)
         if (unitSize != sizeof(uint32_t) && numItems != 1) {
             sprintf(aPacket->message,"error: size and number not correct");
             p->errorCode = -1;
-            writeBuffer(aPacket);
+            if(reply) writeBuffer(aPacket);
             return;
          }
     } 
@@ -298,7 +297,7 @@ void doReadBlock(SBC_Packet* aPacket)
             sprintf(aPacket->message,"error: %d : %s\n",
                 (int32_t)errno,strerror(errno));
             p->errorCode = -1;
-            writeBuffer(aPacket);
+            if(reply)writeBuffer(aPacket);
             return;
         }
         deleteHandle = true;
@@ -365,7 +364,7 @@ void doReadBlock(SBC_Packet* aPacket)
         SwapLongBlock(returnDataPtr,
             sizeof(SBC_VmeReadBlockStruct)/sizeof(int32_t));
     }
-    writeBuffer(aPacket);
+    if(reply)writeBuffer(aPacket);
     if (deleteHandle) {
         close_device(memMapHandle);
     } 

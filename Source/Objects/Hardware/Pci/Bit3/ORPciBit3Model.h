@@ -72,6 +72,7 @@ this situation will improve.
 #import "OROrderedObjHolding.h"
 
 @class ORAlarm;
+@class ORCommandList;
 
 #pragma mark ¥¥¥Type Defs
 typedef struct PCIConfigStructUser
@@ -308,6 +309,7 @@ enum {
 					 withAddMod:(unsigned short) addressModifier
 				  usingAddSpace:(unsigned short) addressSpace;
 
+- (void) executeCommandList:(ORCommandList*)aList;
 
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (void) printErrorSummary;

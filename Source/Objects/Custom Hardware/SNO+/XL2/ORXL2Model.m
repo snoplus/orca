@@ -329,6 +329,20 @@ unsigned long xl2_register_offsets[] =
 	return [[self xl1] readHardwareRegister:regAddress];
 }
 
+- (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern
+{
+	return [[self xl1] writeHardwareRegisterCmd:aRegister value:aBitPattern];		
+}
+
+- (id) readHardwareRegisterCmd:(unsigned long) regAddress
+{
+	return [[self xl1] readHardwareRegisterCmd:regAddress];
+}
+
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	[[self xl1] executeCommandList:aList];		
+}
 #pragma mark •••Composite HW Functions
 
 - (void) reset

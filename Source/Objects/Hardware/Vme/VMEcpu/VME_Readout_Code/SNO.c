@@ -402,11 +402,11 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 
 		//select the cards that will be inited
 		result = write_device(device, (char*)(&selectBits), 4, xl2_select_reg);
-		if(result!=4) FATAL_ERROR(3,"Write Error: select xl2");	
+		if(result!=4) FATAL_ERROR(3,"Write Error: select xl2")
 
 		// make sure that the XL2 DP bit is set low and bit 11 (xilinx active) is high -- this is not yet sent to the MB
 		result = write_device(device, (char*)(&xl2_control_bit11), 4, xl2_control_status_reg);
-		if(result!=4) FATAL_ERROR(3,"Write Error: Setting DP bit");	
+		if(result!=4) FATAL_ERROR(3,"Write Error: Setting DP bit")
 		
 		usleep(20000);	//200 ms
 		
@@ -415,26 +415,26 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		// of the select bits in register zero!!!!		
 		writeValue = xl2_xlpermit | xl2_enable_dp;
 		result = write_device(device, (char*)(&writeValue), 4, xl2_xilinx_user_control);
-		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_xlpermit | xl2_enable_dp");	
+		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_xlpermit | xl2_enable_dp")	
 		
 		usleep(20000);	//200 ms
 		
 		// turn off the DP bit but keep 
 		writeValue = xl2_xlpermit | xl2_disable_dp;
 		result = write_device(device, (char*)(&writeValue), 4, xl2_xilinx_user_control);
-		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_xlpermit | xl2_disable_dp");	
+		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_xlpermit | xl2_disable_dp")	
 		
 		// set  bit 11 high, bit 10 high
 		writeValue = xl2_control_bit11 | xl2_control_clock;
 		result = write_device(device, (char*)(&writeValue), 4, xl2_control_status_reg);
-		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_control_bit11 | xl2_control_clock");	
+		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_control_bit11 | xl2_control_clock")
 		
 		usleep(20000);	//200 ms
 			
 		uint32_t i;
 		for (i = 1;i < index;i++){
 			
-			if(sbc_job.killJobNow) FATAL_ERROR(666,"Job Killed. Early Exit.");
+			if(sbc_job.killJobNow) FATAL_ERROR(666,"Job Killed. Early Exit.")
 			
 			if ((firstPass) && (*charData != '/')) FATAL_ERROR(2,"Bad Xilinx File: Invalid first characer in xilinx file");
 			
@@ -444,7 +444,7 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 				while(*charData++ != '/'){
 					
 					i++;
-					if (i>index) FATAL_ERROR(1,"Bad Xilinx File: Comment block not delimited by a backslash");
+					if (i>index) FATAL_ERROR(1,"Bad Xilinx File: Comment block not delimited by a backslash")
 				}
 			}
 			firstPass = 0;
@@ -457,16 +457,16 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 				
 				if      (*charData == '1')  writeValue = xl2_control_bit11 | xl2_control_data;	// bit set in data to load
 				else if (*charData == '0')	writeValue = xl2_control_bit11;						// bit not set in data
-				else						FATAL_ERROR(2,"Bad Xilinx File: Invalid character in Xilinx file");
+				else						FATAL_ERROR(2,"Bad Xilinx File: Invalid character in Xilinx file")
 				charData++;	
 				
 				int32_t val = writeValue | xl2_control_data;
 				result = write_device(device, (char*)(&val), 4, xl2_control_status_reg); // changed PMT 1/17/98 to match Penn code
-				if(result!=4)FATAL_ERROR(3,"Write Error: xl2_control_status_reg");
+				if(result!=4)FATAL_ERROR(3,"Write Error: xl2_control_status_reg")
 				usleep(theDelay);
 				
 				result = write_device(device, (char*)(&writeValue), 4, xl2_control_status_reg); // changed PMT 1/17/98 to match Penn code
-				if(result!=4)FATAL_ERROR(4,"Write Error: xl2_control_status_reg");
+				if(result!=4)FATAL_ERROR(4,"Write Error: xl2_control_status_reg")
 				usleep(theDelay);
 			}
 			pthread_mutex_lock (&jobInfoMutex);     //begin critical section
@@ -481,35 +481,35 @@ void loadXL2Xilinx(SBC_Packet* aPacket)
 		// More Changes, RGV, PW : turn off XLPERMIT & clear this register
 		writeValue = 0UL;
 		result = write_device(device, (char*)(&writeValue), 4, xl2_xilinx_user_control);
-		if(result!=4)FATAL_ERROR(5,"Write Error: xl2_xilinx_user_control");
+		if(result!=4)FATAL_ERROR(5,"Write Error: xl2_xilinx_user_control")
 			
 		usleep(20000);	//200 ms
 		
 		//check that the load was OK
 		result = write_device(device, (char*)(&xl2_control_done_prog), 4, xl2_control_status_reg);	
-		if(result!=4)FATAL_ERROR(6,"Write Error: xl2_control_status_reg");
+		if(result!=4)FATAL_ERROR(6,"Write Error: xl2_control_status_reg")
 		result = write_device(device, (char*)(&xl2_select_xl2), 4, xl2_select_reg);			
-		if(result!=4)FATAL_ERROR(7,"Write Error: xl2_select_reg");
+		if(result!=4)FATAL_ERROR(7,"Write Error: xl2_select_reg")
 
 		result = write_device(device, (char*)(&xl2_control_bit11), 4, xl2_control_status_reg);
-		if(result!=4)FATAL_ERROR(8,"Write Error: xl2_control_status_reg");
+		if(result!=4)FATAL_ERROR(8,"Write Error: xl2_control_status_reg")
 		uint32_t readValue = 0;
 		result = read_device(device,(char*)(&readValue),4,xl2_control_status_reg);
-		if(result!=4)FATAL_ERROR(9,"Write Error: xl2_control_status_reg");
+		if(result!=4)FATAL_ERROR(9,"Write Error: xl2_control_status_reg")
 							   
 		if (!(readValue & xl2_control_done_prog)){	
 			usleep(10000);
 			result = read_device(device,(char*)(&readValue),4,xl2_control_status_reg);
-			if(result!=4)FATAL_ERROR(10,"Write Error: Checking Prog Done");
+			if(result!=4)FATAL_ERROR(10,"Write Error: Checking Prog Done")
 			if (!(readValue & xl2_control_done_prog)){	
-				if(result!=4)FATAL_ERROR(11,"Xilinx load failed XL2! (Status bit checked twice)");
+				if(result!=4)FATAL_ERROR(11,"Xilinx load failed XL2! (Status bit checked twice)")
 			}
 			else finalStatus = 1;
 		}
 		else finalStatus = 1;
 
 		result = write_device(device, (char*)(&xl2_control_done_prog), 4, xl2_control_status_reg);	//BLW 10/31/02-set bit 11 low, similar to previous version
-		if(result!=4)FATAL_ERROR(12,"Write Error: xl2_control_status_reg");
+		if(result!=4)FATAL_ERROR(12,"Write Error: xl2_control_status_reg")
 		
 	earlyExit:
 		// now deselect all cards

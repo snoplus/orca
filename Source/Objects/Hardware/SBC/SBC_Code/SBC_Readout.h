@@ -29,8 +29,10 @@
 
 #define kMaxDataBufferSize 1024*400
 
-void processBuffer(SBC_Packet* aPacket);
-void processSBCCommand(SBC_Packet* aPacket);
+void processBuffer(SBC_Packet* aPacket,uint8_t reply);
+void processSBCCommand(SBC_Packet* aPacket,uint8_t reply);
+void processCmdBlock(SBC_Packet* aPacket);
+
 void doRunCommand(SBC_Packet* aPacket);
 void startJob(void(*jobFunction)(SBC_Packet*),SBC_Packet* aPacket);
 void jobStatus(SBC_Packet* aPacket);

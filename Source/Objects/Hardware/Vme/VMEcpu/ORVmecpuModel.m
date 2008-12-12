@@ -24,6 +24,7 @@
 #import "ORReadOutList.h"
 #import "SBC_Link.h"
 #import "SBC_config.h"
+#import "ORCommandList.h"
 
 #pragma mark ¥¥¥External Strings
 NSString* ORVmecpuLock = @"ORVmecpuLock";	
@@ -394,6 +395,11 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 				 numToWrite:numberWords
 				 withAddMod:anAddressModifier
 			  usingAddSpace:anAddressSpace];
+}
+
+- (void) executeCommandList:(ORCommandList*)aList
+{
+	[sbcLink executeCommandList:aList];
 }
 
 @end

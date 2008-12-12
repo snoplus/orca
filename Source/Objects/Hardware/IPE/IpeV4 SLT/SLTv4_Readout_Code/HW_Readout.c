@@ -94,7 +94,7 @@ void ReleaseHardware(void)
         pbusFree();
 }
 
-void doWriteBlock(SBC_Packet* aPacket)
+void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 {
     SBC_IPEv4WriteBlockStruct* p = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
     if(needToSwap)SwapLongBlock(p,sizeof(SBC_IPEv4WriteBlockStruct)/sizeof(int32_t));
@@ -141,11 +141,11 @@ void doWriteBlock(SBC_Packet* aPacket)
     if(needToSwap)SwapLongBlock(lptr,numItems);
 
 	//send back to ORCA
-    writeBuffer(aPacket);    
+    if(reply)writeBuffer(aPacket);    
 	
 }
 
-void doReadBlock(SBC_Packet* aPacket)
+void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 {
     SBC_IPEv4ReadBlockStruct* p = (SBC_IPEv4ReadBlockStruct*)aPacket->payload;
     if(needToSwap) SwapLongBlock(p,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
@@ -156,7 +156,7 @@ void doReadBlock(SBC_Packet* aPacket)
     if (numItems*sizeof(uint32_t) > kSBC_MaxPayloadSize) {
         sprintf(aPacket->message,"error: requested greater than payload size.");
         p->errorCode = -1;
-        writeBuffer(aPacket);
+        if(reply)writeBuffer(aPacket);
         return;
     }
  
@@ -200,7 +200,7 @@ void doReadBlock(SBC_Packet* aPacket)
     }
 
     if(needToSwap) SwapLongBlock(returnDataPtr,sizeof(SBC_IPEv4ReadBlockStruct)/sizeof(int32_t));
-    writeBuffer(aPacket);
+    if(reply)writeBuffer(aPacket);
 	
 }
 

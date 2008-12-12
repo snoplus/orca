@@ -29,6 +29,9 @@
 #include <stdint.h>
 #include "SBC_Config.h"
 
+#define kNoReply 0
+#define kReply	 1
+
 /*destinations*/
 #define kSBC_Process           0x1
 #define kAcqirisDC440          0x2
@@ -52,6 +55,7 @@
 #define kSBC_PacketOptions	   0x12
 #define kSBC_KillJob		   0x13
 #define kSBC_JobStatus		   0x14
+#define kSBC_CmdBlock		   0x15
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
 typedef 
