@@ -362,6 +362,11 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 					usingAddSpace:0x01];
 }
 
+- (id) delayCmd:(unsigned long) milliSeconds
+{
+	return [ORVmeReadWriteCommand delayCmd:milliSeconds];
+}
+
 - (void) executeCommandList:(ORCommandList*)aList
 {
 	[[self adapter] executeCommandList:aList];		

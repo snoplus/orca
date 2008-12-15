@@ -27,7 +27,6 @@
 #import "SBC_Link.h"
 #import "ORXL2Model.h"
 
-
 @implementation ORSNOCrateController
 
 - (id) init

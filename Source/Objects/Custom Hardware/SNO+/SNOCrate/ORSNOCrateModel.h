@@ -19,12 +19,14 @@
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
 #import "ORCrate.h"
+#import "Sno_Monitor_Adcs.h"
 
 @interface ORSNOCrateModel : ORCrate  {
 	int slot;
 	int workingSlot;
 	BOOL working;
 	BOOL pauseWork;
+	eFecMonitorState  voltageStatus;
 }
 
 - (void) setUpImage;
@@ -48,7 +50,8 @@
 - (void) scanWorkingSlot;
 - (short) numberSlotsUsed;
 - (void) initCrate:(BOOL) loadTheFEC32XilinxFile;
-
+- (eFecMonitorState) voltageStatus;
+- (void) setVoltageStatus:(eFecMonitorState)aState;
 @end
 
 @interface ORSNOCrateModel (OROrderedObjHolding)

@@ -22,8 +22,10 @@ for the use of this software.
 
 #define kWriteOp 0
 #define kReadOp	 1
+#define kDelayOp 2
 
 @interface ORVmeReadWriteCommand : NSObject {
+	long			milliSecondDelay;
 	int				opType;				//read/write
 	int				addressModifier;	//vme address modifier
 	int				addressSpace;		//vme address space
@@ -33,7 +35,8 @@ for the use of this software.
 	int				returnCode;			//should be 1 for success, 0 for failure
 	NSMutableData*	data;			//if read theData == returned data, if write theData = writeData
 }
-
++ (id) delayCmd:(unsigned long) milliSeconds;
+	
 + (id) writeLongBlock:(unsigned long *) writeAddress
 			atAddress:(unsigned int) vmeAddress
 		   numToWrite:(unsigned int) numberLongs
@@ -45,6 +48,8 @@ for the use of this software.
 				   withAddMod:(unsigned short) anAddressModifier
 				usingAddSpace:(unsigned short) anAddressSpace;
 
+- (id) initWithMilliSecondDelay:(unsigned long) aMilliSecondDelay;
+	
 - (id) initWithOp: (int) aOpType
 	   dataAdress: (unsigned long*) dataAddress
 	   vmeAddress: (unsigned int) vmeAddress
@@ -53,6 +58,7 @@ for the use of this software.
 	   withAddMod: (unsigned short) anAddressModifier
 	usingAddSpace: (unsigned short) anAddressSpace;
 
+- (unsigned long) milliSecondDelay;
 - (int)	opType;
 - (int)	addressModifier;
 - (int)	addressSpace;

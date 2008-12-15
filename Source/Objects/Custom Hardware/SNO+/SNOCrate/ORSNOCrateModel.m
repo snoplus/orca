@@ -153,6 +153,16 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	return slot;
 }
 
+- (eFecMonitorState) voltageStatus
+{
+	return voltageStatus;
+}
+
+- (void) setVoltageStatus:(eFecMonitorState)aState
+{
+	voltageStatus = aState;
+}
+
 #pragma mark •••Accessors
 - (unsigned long) memoryBaseAddress
 {

@@ -50,6 +50,15 @@
 	}
 	else return -1;
 }
+- (int) addCommands:(ORCommandList*)anOtherList
+{
+	if(anOtherList){
+		if(!commands)commands = [[NSMutableArray array] retain];
+		[commands addObjectsFromArray:[anOtherList commands]];
+		return [commands count] - 1;
+	}
+	else return -1;
+}
 
 - (id) command:(int)index
 {

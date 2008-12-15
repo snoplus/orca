@@ -21,6 +21,10 @@
 #import "ORVmeReadWriteCommand.h"
 
 @implementation ORVmeReadWriteCommand
++ (id) delayCmd:(unsigned long)aMilliSeconds
+{
+	return [[[ORVmeReadWriteCommand alloc] initWithMilliSecondDelay: kDelayOp] autorelease];
+}
 
 + (id) writeLongBlock:(unsigned long *) writeAddress
 			 atAddress:(unsigned int) vmeAddress
@@ -53,6 +57,13 @@
 	
 }
 
+- (id) initWithMilliSecondDelay:(unsigned long) aMilliSecondDelay
+{
+	self			= [super init];
+	opType			= kDelayOp;
+	milliSecondDelay= aMilliSecondDelay;
+	return self;
+}
 
 - (id) initWithOp: (int) anOpType
 	   dataAdress: (unsigned long*) dataAddress
@@ -82,6 +93,7 @@
 	[super dealloc];
 }
 
+- (unsigned long) milliSecondDelay { return milliSecondDelay;}
 - (int)	opType				 { return opType; }
 - (int) numberItems			 { return numberItems; }
 - (int) itemSize			 { return itemSize; }
@@ -123,6 +135,13 @@
 		readBlockPtr++;				//point to the payload
 		memset(readBlockPtr,0,numberItems*itemSize);
 	}
+	else if(opType == kDelayOp){
+		aPacket.cmdHeader.cmdID			= kSBC_TimeDelay;
+		aPacket.cmdHeader.numberBytesinPayload	= sizeof(SBC_TimeDelay) + numberItems*itemSize;
+		SBC_TimeDelay* delayStructPtr = (SBC_TimeDelay*)aPacket.payload;
+		delayStructPtr->milliSecondDelay			= milliSecondDelay;
+	}
+	
 	aPacket.numBytes = sizeof(unsigned long) + sizeof(SBC_CommandHeader) + kSBC_MaxMessageSize + aPacket.cmdHeader.numberBytesinPayload;
 	return aPacket;
 }

@@ -36,7 +36,7 @@
 		float			sequencerClock;
 		float			memoryClock;
 		float			adcAllowedError[kNumFecMonitorAdcs];
-    NSString* clockFile;
+		NSString*		clockFile;
 }
 
 #pragma mark •••Connection Stuff
@@ -81,6 +81,7 @@
 - (id) writeHardwareRegisterCmd:(unsigned long) regAddress value:(unsigned long) aValue;
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress;
 - (void) executeCommandList:(ORCommandList*)aList;
+- (id) delayCmd:(unsigned long) milliSeconds;
 
 @end
 

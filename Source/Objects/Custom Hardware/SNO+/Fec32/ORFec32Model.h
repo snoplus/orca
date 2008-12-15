@@ -21,6 +21,7 @@
 #pragma mark •••Imported Files
 #import "ORSNOCard.h"
 #import "OROrderedObjHolding.h"
+#import "Sno_Monitor_Adcs.h"
 
 @class ORFecDaughterCardModel;
 @class ORCommandList;
@@ -70,6 +71,14 @@
 #define FEC32_FIFO_READ_POINTER_REG				21
 #define FEC32_FIFO_POINTER_DIFF_REG				22
 
+#define FEC32_CMOS_MISSED_COUNT_OFFSET			23
+#define FEC32_CMOS_BUSY_REG_OFFSET				24
+#define FEC32_CMOS_TOTALS_COUNTER_OFFSET		25
+#define FEC32_CMOS_TEST_ID_OFFSET				26
+#define FEC32_CMOS_SHIFT_REG_OFFSET				27
+#define FEC32_CMOS_ARRAY_POINTER_OFFSET			28
+#define FEC32_CMOS_COUNT_INFO_OFFSET			29
+
 // FEC32 CMOS Internal register indices, used for Apple Events only
 #define FEC32_CMOS_MISSED_COUNT_REG				0					
 #define FEC32_CMOS_BUSY_REG						1
@@ -105,7 +114,7 @@
 #define FEC32_CSR_CRATE_BITSIFT					11
 
 // Fec32 Discrete and Sequencer register offsets 
-#define Fec32_GENERAL_CS_REG					128
+/*#define Fec32_GENERAL_CS_REG					128
 #define Fec32_ADC_VALUE_REG						132
 #define Fec32_VOLTAGE_MONITOR_REG				136
 #define Fec32_PEDESTAL_ENABLE_REG				140
@@ -129,7 +138,7 @@
 #define Fec32_FIFO_READ_POINTER_REG				624
 #define Fec32_FIFO_WRITE_POINTER_REG			628
 #define Fec32_FIFO_POINTER_DIFF_REG				632
-
+*/
 #define Fec32_CMOS_MISSED_COUNT_OFFSET		   1028
 #define Fec32_CMOS_BUSY_REG_OFFSET			   1032
 #define Fec32_CMOS_TOTALS_COUNTER_OFFSET	   1036
@@ -200,11 +209,15 @@ typedef struct Fec32CmosShiftReg{
 	int workingSlot;
 	BOOL working;
 	SEL resumeSelectorInGuardian;
+	float			  adcVoltage[kNumFecMonitorAdcs]; 				//converted voltage
+	eFecMonitorState  adcVoltageStatusOfCard;
+	eFecMonitorState  adcVoltageStatus[kNumFecMonitorAdcs];
 }
 - (void) setUpImage;
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (id) xl1;
 - (id) xl2;
 - (BOOL)			dcPresent:(unsigned short)index;
 - (unsigned long)	pedEnabledMask;
@@ -237,6 +250,12 @@ typedef struct Fec32CmosShiftReg{
 - (float)	hVRef;
 - (void)	setHVRef:(float)aValue;
 - (BOOL)	pmtOnline:(unsigned short)index;
+- (float)				adcVoltage:(int)index; 
+- (void)				setAdcVoltage:(int)index withValue:(float)aValue;
+- (eFecMonitorState)	adcVoltageStatus:(int)index;
+- (void)				setAdcVoltageStatus:(int)index withValue:(eFecMonitorState)aState;
+- (eFecMonitorState)	adcVoltageStatusOfCard;
+- (void)				setAdcVoltageStatusOfCard:(eFecMonitorState)aState;
 
 #pragma mark Converted Data Methods
 - (void)	setCmosVoltage:(short)anIndex withValue:(float) value;
@@ -256,11 +275,12 @@ typedef struct Fec32CmosShiftReg{
 - (void) writeToFec32Register:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (void) setFec32RegisterBits:(unsigned long) aRegister bitMask:(unsigned long) bits_to_set;
 - (void) clearFec32RegisterBits:(unsigned long) aRegister bitMask:(unsigned long) bits_to_clear;
-
+- (void) readVoltages;
+- (short) readVoltageValue:(unsigned long) aMask;
 - (unsigned long) readFromFec32Register:(unsigned long) Register;
 - (void) readBoardIds;
 - (void) boardIDOperation:(unsigned long)theDataValue boardSelectValue:(unsigned long) boardSelectVal beginIndex:(short) beginIndex;
-- (void) autoInitThisCard;
+- (void) autoInit;
 - (void) fullResetOfCard;
 - (void) loadCrateAddress;
 - (void) loadAllDacs;
@@ -273,6 +293,7 @@ typedef struct Fec32CmosShiftReg{
 - (id) writeToFec32RegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (id) readFromFec32RegisterCmd:(unsigned long) aRegister;
 - (void) executeCommandList:(ORCommandList*)aList;
+- (id) delayCmd:(unsigned long) milliSeconds;
 
 #pragma mark •••OROrderedObjHolding Protocal
 - (int) maxNumberOfObjects;
@@ -300,6 +321,9 @@ extern NSString* ORFecSeqDisabledMaskChanged;
 extern NSString* ORFecTrigger20nsDisabledMaskChanged;
 extern NSString* ORFecTrigger100nsDisabledMaskChanged;
 extern NSString* ORFecQllEnabledChanged;
+extern NSString* ORFec32ModelAdcVoltageChanged;
+extern NSString* ORFec32ModelAdcVoltageStatusChanged;
+extern NSString* ORFec32ModelAdcVoltageStatusOfCardChanged;
 
 extern NSString* ORFecLock;
 

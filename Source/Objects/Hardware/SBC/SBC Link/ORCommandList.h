@@ -26,6 +26,7 @@
 - (int) addCommand:(id)aCommand;
 - (NSEnumerator*) objectEnumerator;
 - (NSMutableArray*) commands;
+- (int) addCommands:(ORCommandList*)anOtherList;
 - (id) command:(int)index;
 - (SBC_Packet) SBCPacket;
 - (void) extractData:(SBC_Packet*) aPacket;

@@ -48,8 +48,13 @@
 	IBOutlet NSMatrix*		pmtImages3;
 	IBOutlet NSTextField*	boardIdField;
     IBOutlet NSButton*		initButton;
+	IBOutlet NSButton*		autoInitButton;
+	IBOutlet NSButton*		readVoltagesButton;
+	IBOutlet NSMatrix*		monitorValueLabelsMatrix;
+	IBOutlet NSMatrix*		monitorValuesMatrix;
+	IBOutlet NSMatrix*		monitorValueUnitsMatrix;
 	NSNumberFormatter*		cmosFormatter;
-	
+
 	//cache some stuff to make things easier
 	NSMatrix* onlineSwitches[4];
 	NSMatrix* pmtImages[4];
@@ -63,6 +68,8 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) adcStatusChanged:(NSNotification*)aNote;
+- (void) loadAdcStatus:(int)i;
 - (void) enablePmtGroup:(short)enabled groupNumber:(short)group;
 - (void) onlineMaskChanged:(NSNotification*)aNote;
 - (void) showVoltsChanged:(NSNotification*)aNote;
@@ -89,5 +96,7 @@
 - (IBAction) vResAction:(id)sender;
 - (IBAction) hvRefAction:(id)sender;
 - (IBAction) cmosAction:(id)sender;
+- (IBAction) autoInitAction:(id)sender;
+- (IBAction) readVoltagesAction:(id)sender;
 
 @end

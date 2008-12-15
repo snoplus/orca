@@ -291,7 +291,7 @@ unsigned long xl2_register_offsets[] =
 	unsigned long selectBits;
 	if(aCard == self)	selectBits = XL2_SELECT_XL2;
 	else				selectBits = (1L<<[aCard stationNumber]);
-	[self writeToXL2Register:XL2_SELECT_REG value: selectBits]; // select the cards by writing to the XL2 REG 0 
+	[self selectCards:selectBits];
 }
 
 - (void) writeToXL2Register:(unsigned long) aRegister value:(unsigned long) aValue
@@ -337,6 +337,11 @@ unsigned long xl2_register_offsets[] =
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress
 {
 	return [[self xl1] readHardwareRegisterCmd:regAddress];
+}
+
+- (id) delayCmd:(unsigned long) milliSeconds
+{
+	return [[self xl1] delayCmd:milliSeconds]; 		
 }
 
 - (void) executeCommandList:(ORCommandList*)aList

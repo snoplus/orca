@@ -114,6 +114,7 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	[super dealloc];
 }
 
+
 - (void) wakeUp 
 {
 	[self performSelector:@selector(calculateRates) withObject:self afterDelay:kSBCRateIntegrationTime];

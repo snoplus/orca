@@ -98,6 +98,7 @@
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress;
 - (void) executeCommandList:(ORCommandList*)aList;
+- (id) delayCmd:(unsigned long) milliSeconds;
 
 @end
 

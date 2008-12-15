@@ -278,6 +278,10 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 			processCmdBlock(aPacket);
 		break;
 			
+		case kSBC_TimeDelay:
+			processTimeDelay(aPacket,reply);
+		break;
+			
         case kSBC_StartRun:			doRunCommand(aPacket);		break;
         case kSBC_StopRun:          doRunCommand(aPacket);		break;
         case kSBC_RunInfoRequest:   sendRunInfo();				break;
@@ -881,6 +885,15 @@ void runCBTest(SBC_Packet* aPacket)
 			}
 		}
 	}
+}
+
+void processTimeDelay(SBC_Packet* aPacket,uint8_t reply)
+{
+	SBC_TimeDelay* p = (SBC_TimeDelay*)aPacket->payload;
+    if(needToSwap)SwapLongBlock(p,sizeof(SBC_TimeDelay)/sizeof(int32_t));
+	uint32_t sleepTime = p->milliSecondDelay*1000;
+	usleep(sleepTime);
+	if(reply)sendResponse(aPacket);
 }
 
 void processCmdBlock(SBC_Packet* aPacket)

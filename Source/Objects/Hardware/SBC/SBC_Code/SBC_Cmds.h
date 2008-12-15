@@ -56,6 +56,7 @@
 #define kSBC_KillJob		   0x13
 #define kSBC_JobStatus		   0x14
 #define kSBC_CmdBlock		   0x15
+#define kSBC_TimeDelay		   0x16
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
 typedef 
@@ -65,6 +66,13 @@ typedef
         uint32_t numberBytesinPayload;
     }
 SBC_CommandHeader;
+
+typedef 
+    struct {
+        unsigned long milliSecondDelay;
+    }
+SBC_TimeDelay;
+
 
 typedef 
     struct {

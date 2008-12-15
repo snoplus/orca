@@ -131,6 +131,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>autoInitAction</key>
+				<string>id</string>
 				<key>cmosAction</key>
 				<string>id</string>
 				<key>commentsTextFieldAction</key>
@@ -149,6 +151,8 @@
 				<string>id</string>
 				<key>probeAction</key>
 				<string>id</string>
+				<key>readVoltagesAction</key>
+				<string>id</string>
 				<key>showVoltsAction</key>
 				<string>id</string>
 				<key>vResAction</key>
@@ -162,6 +166,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>autoInitButton</key>
+				<string>NSButton</string>
 				<key>boardIdField</key>
 				<string>NSTextField</string>
 				<key>cmosMatrix</key>
@@ -182,6 +188,12 @@
 				<string>NSButton</string>
 				<key>lockDocField</key>
 				<string>NSTextField</string>
+				<key>monitorValueLabelsMatrix</key>
+				<string>NSMatrix</string>
+				<key>monitorValueUnitsMatrix</key>
+				<string>NSMatrix</string>
+				<key>monitorValuesMatrix</key>
+				<string>NSMatrix</string>
 				<key>onlineSwitches0</key>
 				<string>NSMatrix</string>
 				<key>onlineSwitches1</key>
@@ -200,6 +212,8 @@
 				<string>NSMatrix</string>
 				<key>pmtView</key>
 				<string>ORFecPmtsView</string>
+				<key>readVoltagesButton</key>
+				<string>NSButton</string>
 				<key>showVoltsCB</key>
 				<string>NSButton</string>
 				<key>vResField</key>

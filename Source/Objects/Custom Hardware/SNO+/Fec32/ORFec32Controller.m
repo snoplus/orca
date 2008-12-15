@@ -26,6 +26,7 @@
 #import "ORPmtImage.h"
 #import "ORSwitchImage.h"
 #import "ORFecDaughterCardModel.h";
+#import "Sno_Monitor_Adcs.h"
 
 @implementation ORFec32Controller
 
@@ -91,6 +92,12 @@
 	onlineStateImage[2][0]	= [[ORSwitchImage openSwitchWithAngle:0] retain];
 	onlineStateImage[3][1]	= [[ORSwitchImage closedSwitchWithAngle:-90] retain];
 	onlineStateImage[3][0]	= [[ORSwitchImage openSwitchWithAngle:-90] retain];
+
+	for(i=0;i<kNumFecMonitorAdcs;i++){
+		[[monitorValueLabelsMatrix cellAtRow:i column:0] setStringValue:[NSString stringWithCString:fecVoltageAdc[i].label encoding:NSASCIIStringEncoding]];
+		[[monitorValueUnitsMatrix cellAtRow:i column:0] setStringValue:[NSString stringWithCString:fecVoltageAdc[i].units encoding:NSASCIIStringEncoding]];
+		
+	}
 	
 	[super awakeFromNib];
 }
@@ -175,6 +182,16 @@
                          name : ORSNOCardBoardIDChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(adcStatusChanged:)
+                         name : ORFec32ModelAdcVoltageChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(adcStatusChanged:)
+                         name : ORFec32ModelAdcVoltageStatusChanged
+						object: model];
+	
 }
 
 - (void) updateWindow
@@ -192,6 +209,7 @@
     [groupView setNeedsDisplay:YES];
 	[self commentsChanged:nil];
 	[pmtView setNeedsDisplay:YES];
+	[self  adcStatusChanged:nil];
 }
 
 #pragma mark •••Accessors
@@ -220,6 +238,27 @@
 {
 	[onlineSwitches[group] setEnabled:enabled];
  	[self updateButtons];
+}
+
+- (void) adcStatusChanged:(NSNotification*)aNote
+{
+	int i;
+	if(!aNote)for(i=0;i<kNumFecMonitorAdcs;i++)[self loadAdcStatus:i];
+	else [self loadAdcStatus:[[[aNote userInfo] objectForKey:@"index"] intValue]];
+}
+
+- (void) loadAdcStatus:(int)i
+{
+	id theCell = [monitorValuesMatrix cellAtRow:i column:0];
+	if([model adcVoltageStatus:i] != kFecMonitorInRange)[theCell setTextColor:[NSColor redColor]];
+	else [theCell setTextColor:[NSColor blackColor]];
+	NSString* s= @"---";
+	if([model adcVoltageStatus:i] == kFecMonitorNeverMeasured)s = @"---";
+	else if([model adcVoltageStatus:i] == kFecMonitorReadError)s = @"RdErr";
+	else if([model adcVoltageStatus:i] == kFecMonitorReadError)s = @"RgErr";
+	else s = [NSString stringWithFormat:@"%5.1f",[model adcVoltage:i]];
+	[theCell setObjectValue:s];
+	
 }
 
 - (void) onlineMaskChanged:(NSNotification*)aNote
@@ -256,9 +295,11 @@
 - (void) updateButtons
 {
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORFecLock];
+    BOOL locked = [gSecurity isLocked:ORFecLock];
 	[vResField		setEnabled: !lockedOrRunningMaintenance];
 	[hvRefField		setEnabled: !lockedOrRunningMaintenance];
 	[cmosMatrix		setEnabled: !lockedOrRunningMaintenance];
+	[autoInitButton setEnabled: !locked];
 	int i;
 	for(i=0;i<4;i++){
 		[onlineSwitches[i] setEnabled:[model dcPresent:i] && !lockedOrRunningMaintenance];
@@ -333,6 +374,25 @@
 	unsigned long mask = [model onlineMask];
 	mask ^= (1L<<tag);
 	[model setOnlineMask:mask];
+}
+
+- (IBAction) autoInitAction:(id)sender
+{
+	@try {
+		[model autoInit];
+	}
+	@catch (NSException* localException) {
+		NSLog(@"AutoInit of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
+	}
+}
+- (IBAction) readVoltagesAction:(id)sender
+{
+	@try {
+		[model readVoltages];
+	}
+	@catch (NSException* localException) {
+		NSLog(@"Read Voltages of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
+	}
 }
 
 - (IBAction) showVoltsAction:(id)sender

@@ -2005,7 +2005,7 @@ physicalBufferAddress:(unsigned long) physicalBufferAddress
 						break;
 				}
 			}
-			else {
+			else if([aCmd opType] == kReadOp){
 				//reads
 				switch([aCmd itemSize]){
 					case 1:		//byte block
@@ -2033,6 +2033,9 @@ physicalBufferAddress:(unsigned long) physicalBufferAddress
 							  usingAddSpace:[aCmd addressSpace]];
 						break;
 				}
+			}
+			else if([aCmd opType] == kReadOp){
+				[ORTimer delay:[aCmd milliSecondDelay]];
 			}
 			[aCmd setReturnCode: 1]; //must have worked since nothing was thrown
 		}
