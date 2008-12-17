@@ -517,7 +517,8 @@
 		
 		if(numLong > length){
 			//really bad... the length or the nuLongs processed was incorrect for some reason. We can not continue.
-			[NSException raise:@"Bad Record" format:@"Incorrect Length"];
+			NSLogError(@"Data Decoder",@"Bad Record:Incorrect Length",nil);
+			break;
 		}
 		
         length-=numLong;
