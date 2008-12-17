@@ -102,7 +102,7 @@
 - (void) clearData;
 - (void) decodeIntoDataSet:(ORDataSet*)aDataSet;
 - (void) decode:(NSData*)someData intoDataSet:(ORDataSet*)aDataSet;
-- (void) decode:(unsigned long*)dPtr length:(unsigned long)length intoDataSet:(ORDataSet*)aDataSet;
+- (void) decode:(unsigned long*)dPtr length:( long)length intoDataSet:(ORDataSet*)aDataSet;
 - (NSArray*) decodeDataIntoArrayForDelegate:(id)aDelegate;
 - (unsigned long) dataCount;
 - (NSString*) dataRecordDescription:(unsigned long)anOffset forKey:(NSNumber*)aKey;

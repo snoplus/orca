@@ -479,7 +479,7 @@
 	[self decode:dPtr length:length intoDataSet:aDataSet];
 }
 
-- (void) decode:(unsigned long*)dPtr length:(unsigned long)length intoDataSet:(ORDataSet*)aDataSet
+- (void) decode:(unsigned long*)dPtr length:(long)length intoDataSet:(ORDataSet*)aDataSet
 {
     unsigned long keyMaskValue;
     do {
@@ -515,8 +515,13 @@
         if(numLong)dPtr+=numLong;
         else break; //can not continue with this record.. size was zero
 		
-        length-=numLong;
+		if(numLong > length){
+			//really bad... the length or the nuLongs processed was incorrect for some reason. We can not continue.
+			[NSException raise:@"Bad Record" format:@"Incorrect Length"];
+		}
 		
+        length-=numLong;
+				
     } while( length>0 );
 }
 
