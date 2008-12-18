@@ -174,6 +174,15 @@ unsigned long xl2_register_offsets[] =
     return [guardian crateNumber];
 }
 
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"card %d",[self stationNumber]];
+}
+
+- (NSComparisonResult)	slotCompare:(id)otherCard
+{
+    return [self stationNumber] - [otherCard stationNumber];
+}
 
 - (void) setGuardian:(id)aGuardian
 {
@@ -357,7 +366,8 @@ unsigned long xl2_register_offsets[] =
 		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_DONE_PROG]; // select the cards by writing to the XL2 REG 0 
 	}
 	@catch(NSException* localException) {
-		NSLog(@"Failure during reset of XL2 Crate %d Slot %d.\n", [self crateNumber], [self stationNumber]);	
+		NSLog(@"Failure during reset of XL2 Crate %d Slot %d.\n", [self crateNumber], [self stationNumber]);
+		[NSException raise:@"XL2 Reset Failed" format:@"%@",localException];
 	}		
 	
 }
@@ -444,7 +454,7 @@ unsigned long xl2_register_offsets[] =
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Clock load failed: %@\n",localException);
-		[localException raise];
+		[NSException raise:@"XL2 Load Clocks Failed" format:@"%@",localException];
 	}
 }
 
@@ -496,7 +506,7 @@ unsigned long xl2_register_offsets[] =
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Xilinx load failed. %@\n",localException);
-		[localException raise];
+		[NSException raise:@"XL2 Load Xilinix Failed" format:@"%@",localException];
 	}
 }
 
@@ -516,13 +526,14 @@ unsigned long xl2_register_offsets[] =
 	short 	theOffset = 0;	
 	unsigned long writeValue;
 	//------------------------------------------
-	
+	BOOL selectOK = NO;
 	@try {
 		
 		NSData* theData = [[self xl1] clockFileData];	// load the entire content of the file
 		char* charData = (char*)[theData bytes];		// high in the heap and then lock it before dereferencing
 		
 		[self select:self];
+		selectOK = YES;
 		
 		// Enable master clock 
 		[self writeToXL2Register:XL2_CLOCK_CS_REG value:XL2_MASTER_CLK_EN];
@@ -571,8 +582,9 @@ unsigned long xl2_register_offsets[] =
 		NSLog(@"loaded the clock file\n");
 	}
 	@catch(NSException* localException) {
-		[self deselectCards];
+		if(selectOK)[self deselectCards];
 		NSLog(@"Could not load the clock file!\n");	
+		[NSException raise:@"XL2 Load Clocks Failed" format:@"%@",localException];
 	}
 }
 
@@ -597,6 +609,7 @@ unsigned long xl2_register_offsets[] =
 	unsigned long writeValue	= 0UL;
 	unsigned long mc_SelectBits	= 0;						
 	Boolean firstPass			= TRUE;
+	BOOL selectOK = NO;
 	
 	@try {
 		
@@ -620,7 +633,7 @@ unsigned long xl2_register_offsets[] =
 		}	
 		mc_SelectBits |= XL2_SELECT_XL2;
 		[self selectCards:mc_SelectBits];
-		
+		selectOK = YES;
 		// make sure that the XL2 DP bit is set low and bit 11 (xilinx active) is high -- 
 		// this is not yet sent to the MB
 		writeValue = XL2_CONTROL_BIT11;	
@@ -722,7 +735,9 @@ unsigned long xl2_register_offsets[] =
 		
 	}
 	@catch(NSException* localException) {
-		[self deselectCards];
+		if(selectOK)[self deselectCards];
+		NSLog(@"Could not load the clock file!\n");	
+		[NSException raise:@"XL2 Load Clocks Failed" format:@"%@",localException];
 	}	
 	
 }

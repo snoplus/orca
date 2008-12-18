@@ -21,6 +21,6 @@
 
 @interface NSScanner (OrcaExtensions)
 
--(BOOL) skipUpToCharactersFromSet:(NSCharacterSet*)set;
-
+- (BOOL) skipUpToCharactersFromSet:(NSCharacterSet*)set;
+- (int) intAfterString:(NSString*)aString;
 @end

@@ -17,7 +17,6 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
 @interface ORPmtImage : NSImage 
 {
 	float angle;
@@ -26,5 +25,12 @@
 + (ORPmtImage *)pmtWithColor:(NSColor *)aColor angle:(float)anAngle;
 - (id) initWithColor:(NSColor*)aColor angle:(float)anAngle; 
 - (void) setColor:(NSColor*)aColor;
+@end
 
+@interface ORPmtImages : NSObject 
+{
+	NSMutableDictionary* pmtImages;
+}
++ (ORPmtImages*) sharedPmtImages;
+- (ORPmtImage *) pmtWithColor:(NSColor *)aColor angle:(float)anAngle;
 @end

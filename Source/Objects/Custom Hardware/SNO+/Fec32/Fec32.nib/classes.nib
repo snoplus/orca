@@ -157,6 +157,8 @@
 				<string>id</string>
 				<key>vResAction</key>
 				<string>id</string>
+				<key>variableDisplayPUAction</key>
+				<string>id</string>
 				<key>xilinxFileAction</key>
 				<string>id</string>
 			</dict>
@@ -166,6 +168,12 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>adcLabelsMatrix</key>
+				<string>NSMatrix</string>
+				<key>adcMatrix</key>
+				<string>NSMatrix</string>
+				<key>adcUnitsMatrix</key>
+				<string>NSMatrix</string>
 				<key>autoInitButton</key>
 				<string>NSButton</string>
 				<key>boardIdField</key>
@@ -176,6 +184,14 @@
 				<string>NSTextField</string>
 				<key>crateNumberField</key>
 				<string>NSTextField</string>
+				<key>dc0Labels</key>
+				<string>NSMatrix</string>
+				<key>dc1Labels</key>
+				<string>NSMatrix</string>
+				<key>dc2Labels</key>
+				<string>NSMatrix</string>
+				<key>dc3Labels</key>
+				<string>NSMatrix</string>
 				<key>fecNumberField</key>
 				<string>NSTextField</string>
 				<key>groupView</key>
@@ -188,12 +204,6 @@
 				<string>NSButton</string>
 				<key>lockDocField</key>
 				<string>NSTextField</string>
-				<key>monitorValueLabelsMatrix</key>
-				<string>NSMatrix</string>
-				<key>monitorValueUnitsMatrix</key>
-				<string>NSMatrix</string>
-				<key>monitorValuesMatrix</key>
-				<string>NSMatrix</string>
 				<key>onlineSwitches0</key>
 				<string>NSMatrix</string>
 				<key>onlineSwitches1</key>
@@ -216,8 +226,32 @@
 				<string>NSButton</string>
 				<key>showVoltsCB</key>
 				<string>NSButton</string>
+				<key>thresholds0LabelsMatrix</key>
+				<string>NSMatrix</string>
+				<key>thresholds0Matrix</key>
+				<string>NSMatrix</string>
+				<key>thresholds1LabelsMatrix</key>
+				<string>NSMatrix</string>
+				<key>thresholds1Matrix</key>
+				<string>NSMatrix</string>
 				<key>vResField</key>
 				<string>NSTextField</string>
+				<key>variablesSelectionPU</key>
+				<string>NSPopUpButton</string>
+				<key>variablesTabView</key>
+				<string>NSTabView</string>
+				<key>vb0HMatrix</key>
+				<string>NSMatrix</string>
+				<key>vb0LMatrix</key>
+				<string>NSMatrix</string>
+				<key>vb0LabelsMatrix</key>
+				<string>NSMatrix</string>
+				<key>vb1HMatrix</key>
+				<string>NSMatrix</string>
+				<key>vb1LMatrix</key>
+				<string>NSMatrix</string>
+				<key>vb1LabelsMatrix</key>
+				<string>NSMatrix</string>
 				<key>xilinixFileField</key>
 				<string>NSTextField</string>
 			</dict>

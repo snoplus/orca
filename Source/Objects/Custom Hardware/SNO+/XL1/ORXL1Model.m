@@ -25,6 +25,7 @@
 #import "ORSNOCard.h"
 #import "ORCommandList.h"
 #import "ORVmeReadWriteCommand.h"
+#import "ORSNOCableDB.h"
 
 NSString* ORXL1ClockFileChanged			= @"ORXL1ClockFileChanged";
 NSString* ORXL1XilinxFileChanged		= @"ORXL1XilinxFileChanged";
@@ -182,7 +183,10 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 {
     [aGuardian assumeDisplayOf:connector];
 }
- 
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"XL1 (%d,%d)",[self crateNumber],[self slot]];
+}
 - (void) awakeAfterDocumentLoaded
 {
 	int i;
@@ -279,8 +283,10 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	int i;
 	for(i=0;i<kNumFecMonitorAdcs;i++){
 		[self setAdcAllowedError:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"adcAllowedError%d",i]]];
-	}	
-    
+	}
+	ORSNOCableDB* db = [ORSNOCableDB sharedSNOCableDB];
+	[db setCableDBFilePath:@"/Users/markhowe/Desktop/CableDB.h"];
+	
     [[self undoManager] enableUndoRegistration];
     
     return self;

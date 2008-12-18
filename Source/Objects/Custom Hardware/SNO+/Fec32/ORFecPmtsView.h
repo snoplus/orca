@@ -24,4 +24,7 @@
 	IBOutlet id anchorView; //view to draw pmt lines to/from
 }
 
+- (void)awakeFromNib;
+- (BOOL) acceptsFirstMouse;
+- (void) drawRect:(NSRect)rect; 
 @end

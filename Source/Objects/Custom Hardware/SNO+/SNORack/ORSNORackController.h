@@ -26,6 +26,9 @@
 {
     IBOutlet ORGroupView*   groupView;
     IBOutlet NSTextField*   lockDocField;
+    IBOutlet NSTextField*   rackNumberField;
+    IBOutlet NSTextField*   crate0Field;
+    IBOutlet NSTextField*   crate1Field;
 }
 
 - (id) init;
@@ -34,11 +37,9 @@
 #pragma mark •••Accessors
 - (ORGroupView *)groupView;
 - (void) setModel:(id)aModel;
-- (void) setRackTitle;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
-- (void) rackNumberChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
@@ -46,6 +47,7 @@
 - (void) slotChanged:(NSNotification*)aNote;
 - (BOOL) validateMenuItem:(NSMenuItem*)aMenuItem;
 - (void) documentLockChanged:(NSNotification*)aNote;
+- (void) setCrateLabels;
 
 - (IBAction) delete:(id)sender; 
 - (IBAction) cut:(id)sender; 

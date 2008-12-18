@@ -19,6 +19,34 @@
 //-------------------------------------------------------------
 #import "ORSwitchImage.h"
 #import "NSImage+Extensions.h"
+#import "SynthesizeSingleton.h"
+
+@implementation ORSwitchImages
+
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(SwitchImages);
+
+- (ORSwitchImage *) switchWithState:(BOOL)aState angle:(float)anAngle;
+{
+	id theStateKey = [NSNumber numberWithBool:aState];
+	id theAngleKey = [NSNumber numberWithInt:(int)anAngle];
+	id anImage = [[switchImages objectForKey:theStateKey] objectForKey:theAngleKey];
+	if(anImage) return anImage;
+	else {																				//couldn't find one already made.
+		if(!aState) anImage = [ORSwitchImage openSwitchWithAngle:anAngle];
+		else	   anImage = [ORSwitchImage closedSwitchWithAngle:anAngle];
+		
+		if(!switchImages) switchImages = [[NSMutableDictionary dictionary] retain];		//check the top level dictionary
+		NSMutableDictionary* stateGroup = [switchImages objectForKey:theStateKey];		//check the top level entry
+		if(!stateGroup) {																//couldn't find anything for this color
+			stateGroup = [[NSMutableDictionary dictionary] retain];						//make an dictionary
+			[switchImages setObject:stateGroup forKey:theStateKey];								//enter it
+		}
+		[stateGroup setObject:anImage forKey:[NSNumber numberWithInt:(int)anAngle]];
+	}
+	return anImage;
+}
+@end
+
 
 @implementation ORSwitchImage
 //assumes a 20x20 area to draw into
@@ -63,3 +91,5 @@
 }
 
 @end
+
+

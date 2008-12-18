@@ -21,8 +21,16 @@
 @interface ORSwitchImage : NSImage 
 {
 }
++ (id) switchWithState:(BOOL)aState angle:(float)anAngle;
 + (id) closedSwitchWithAngle:(float)anAngle;
 + (id) openSwitchWithAngle:(float)anAngle;
 + (id) switchWithAngle:(float)anAngle points:(NSPoint*)switchPoints;
+@end
 
+@interface ORSwitchImages : NSObject 
+{
+	NSMutableDictionary* switchImages;
+}
++ (ORSwitchImages*) sharedSwitchImages;
+- (ORSwitchImage *) switchWithState:(BOOL)aState angle:(float)anAngle;
 @end

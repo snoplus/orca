@@ -39,4 +39,14 @@
 	}
 	else return NO;
 }
+
+- (int) intAfterString:(NSString*)aString
+{
+	int aValue;
+	[self scanUpToString:aString intoString:nil]; 
+	[self scanString:aString intoString:nil];
+	[self scanInt:&aValue];
+	return aValue;
+}
+
 @end

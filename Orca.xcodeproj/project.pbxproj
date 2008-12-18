@@ -1552,6 +1552,15 @@
 		84C281D40B45BDEB00C9CDA9 /* ORNodeEvaluator.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C281D20B45BDEA00C9CDA9 /* ORNodeEvaluator.m */; };
 		84C377FF0EF6B71B00E77E09 /* Sno_Monitor_Adcs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C377FE0EF6B71B00E77E09 /* Sno_Monitor_Adcs.h */; };
 		84C37A110EF6FCB900E77E09 /* SBC_Job.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 84FAF2900EE8246200746B91 /* SBC_Job.h */; };
+		84C37B6B0EF7F30B00E77E09 /* ORSNOCableDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C37B690EF7F30B00E77E09 /* ORSNOCableDB.h */; };
+		84C37B6C0EF7F30B00E77E09 /* ORSNOCableDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C37B6A0EF7F30B00E77E09 /* ORSNOCableDB.m */; };
+		84C37D2B0EF834DD00E77E09 /* SNO.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84C37D250EF834DD00E77E09 /* SNO.gif */; };
+		84C37D2C0EF834DD00E77E09 /* SNO.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84C37D260EF834DD00E77E09 /* SNO.nib */; };
+		84C37D2D0EF834DD00E77E09 /* SNOController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C37D270EF834DD00E77E09 /* SNOController.h */; };
+		84C37D2E0EF834DD00E77E09 /* SNOController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C37D280EF834DD00E77E09 /* SNOController.m */; };
+		84C37D2F0EF834DD00E77E09 /* SNOModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C37D290EF834DD00E77E09 /* SNOModel.h */; };
+		84C37D300EF834DD00E77E09 /* SNOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C37D2A0EF834DD00E77E09 /* SNOModel.m */; };
+		84C37E250EF8408F00E77E09 /* ORPSUPTubePosition.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C37E240EF8408F00E77E09 /* ORPSUPTubePosition.h */; };
 		84C5332A0652BA6B00E4731F /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84C533280652BA6B00E4731F /* MainMenu.nib */; };
 		84C7542006654C3E00EC5D1C /* ORAnalysisPanel1D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C7540F06654C3D00EC5D1C /* ORAnalysisPanel1D.m */; };
 		84C7542106654C3E00EC5D1C /* ORAnalysisPanel1D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C7541006654C3D00EC5D1C /* ORAnalysisPanel1D.h */; };
@@ -3348,6 +3357,15 @@
 		84C281D10B45BDEA00C9CDA9 /* ORNodeEvaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORNodeEvaluator.h; sourceTree = "<group>"; };
 		84C281D20B45BDEA00C9CDA9 /* ORNodeEvaluator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORNodeEvaluator.m; sourceTree = "<group>"; };
 		84C377FE0EF6B71B00E77E09 /* Sno_Monitor_Adcs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sno_Monitor_Adcs.h; sourceTree = "<group>"; };
+		84C37B690EF7F30B00E77E09 /* ORSNOCableDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSNOCableDB.h; sourceTree = "<group>"; };
+		84C37B6A0EF7F30B00E77E09 /* ORSNOCableDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSNOCableDB.m; sourceTree = "<group>"; };
+		84C37D250EF834DD00E77E09 /* SNO.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = SNO.gif; path = Source/Experiments/SNO/SNO.gif; sourceTree = SOURCE_ROOT; };
+		84C37D260EF834DD00E77E09 /* SNO.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = SNO.nib; path = Source/Experiments/SNO/SNO.nib; sourceTree = SOURCE_ROOT; };
+		84C37D270EF834DD00E77E09 /* SNOController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SNOController.h; path = Source/Experiments/SNO/SNOController.h; sourceTree = SOURCE_ROOT; };
+		84C37D280EF834DD00E77E09 /* SNOController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SNOController.m; path = Source/Experiments/SNO/SNOController.m; sourceTree = SOURCE_ROOT; };
+		84C37D290EF834DD00E77E09 /* SNOModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SNOModel.h; path = Source/Experiments/SNO/SNOModel.h; sourceTree = SOURCE_ROOT; };
+		84C37D2A0EF834DD00E77E09 /* SNOModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SNOModel.m; path = Source/Experiments/SNO/SNOModel.m; sourceTree = SOURCE_ROOT; };
+		84C37E240EF8408F00E77E09 /* ORPSUPTubePosition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPSUPTubePosition.h; sourceTree = "<group>"; };
 		84C4939A04059AEA005F64B1 /* ORGpibEnetController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORGpibEnetController.h; sourceTree = "<group>"; };
 		84C4939B04059AEA005F64B1 /* ORGpibEnetController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORGpibEnetController.m; sourceTree = "<group>"; };
 		84C4939E04059AEA005F64B1 /* ORGpibEnetModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORGpibEnetModel.h; sourceTree = "<group>"; };
@@ -6376,7 +6394,10 @@
 				8499FF8F0DC9090400E82DB4 /* ORSNOCard.h */,
 				8499FF900DC9090400E82DB4 /* ORSNOCard.m */,
 				842360B60ED1F4D800BECB64 /* ORSNOConstants.h */,
+				84C37B690EF7F30B00E77E09 /* ORSNOCableDB.h */,
+				84C37B6A0EF7F30B00E77E09 /* ORSNOCableDB.m */,
 				84C377FE0EF6B71B00E77E09 /* Sno_Monitor_Adcs.h */,
+				84C37E240EF8408F00E77E09 /* ORPSUPTubePosition.h */,
 			);
 			name = "SNO Base Classes";
 			path = "Source/Objects/Custom Hardware/SNO+/SNO Base Classes";
@@ -6955,6 +6976,7 @@
 				849B25E30B2F34F90007484F /* Prespectrometer */,
 				84B8B99404DB33F8005F64B1 /* Ncd */,
 				84EA6C940C73D11200083319 /* nTPC */,
+				84C37D240EF834DD00E77E09 /* SNO */,
 			);
 			name = Experiments;
 			path = Source/Experiments;
@@ -7174,6 +7196,20 @@
 			path = Plotting;
 			sourceTree = "<group>";
 		};
+		84C37D240EF834DD00E77E09 /* SNO */ = {
+			isa = PBXGroup;
+			children = (
+				84C37D250EF834DD00E77E09 /* SNO.gif */,
+				84C37D260EF834DD00E77E09 /* SNO.nib */,
+				84C37D270EF834DD00E77E09 /* SNOController.h */,
+				84C37D280EF834DD00E77E09 /* SNOController.m */,
+				84C37D290EF834DD00E77E09 /* SNOModel.h */,
+				84C37D2A0EF834DD00E77E09 /* SNOModel.m */,
+			);
+			name = SNO;
+			path = Source/Experiments/SNO;
+			sourceTree = SOURCE_ROOT;
+		};
 		84C4939604059AEA005F64B1 /* GPIB */ = {
 			isa = PBXGroup;
 			children = (
@@ -7251,9 +7287,9 @@
 		84C4948A0405A0C0005F64B1 /* Custom Hardware */ = {
 			isa = PBXGroup;
 			children = (
+				84C4948C0405A0C0005F64B1 /* Ncd Hardware */,
 				847E6C120CFF4C3200E963C6 /* eGun */,
 				843CDF55071C9C0A009D7D30 /* RandomPulser */,
-				84C4948C0405A0C0005F64B1 /* Ncd Hardware */,
 				8499FE810DC8E86800E82DB4 /* SNO+ */,
 			);
 			name = "Custom Hardware";
@@ -9092,6 +9128,10 @@
 				84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */,
 				84B89EA10EF1977800E0C395 /* ORCommandList.h in Headers */,
 				84C377FF0EF6B71B00E77E09 /* Sno_Monitor_Adcs.h in Headers */,
+				84C37B6B0EF7F30B00E77E09 /* ORSNOCableDB.h in Headers */,
+				84C37D2D0EF834DD00E77E09 /* SNOController.h in Headers */,
+				84C37D2F0EF834DD00E77E09 /* SNOModel.h in Headers */,
+				84C37E250EF8408F00E77E09 /* ORPSUPTubePosition.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9659,6 +9699,8 @@
 				9C9861580ED10DC900E18ED7 /* MailScript.txt in Resources */,
 				84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */,
 				84FAD2B60EE46AF500746B91 /* RunScript.nib in Resources */,
+				84C37D2B0EF834DD00E77E09 /* SNO.gif in Resources */,
+				84C37D2C0EF834DD00E77E09 /* SNO.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10324,6 +10366,9 @@
 				84FAD2B40EE46AF500746B91 /* ORRunScriptModel.m in Sources */,
 				84B89EA20EF1977800E0C395 /* ORCommandList.m in Sources */,
 				84B89ED20EF1995800E0C395 /* ORVmeReadWriteCommand.m in Sources */,
+				84C37B6C0EF7F30B00E77E09 /* ORSNOCableDB.m in Sources */,
+				84C37D2E0EF834DD00E77E09 /* SNOController.m in Sources */,
+				84C37D300EF834DD00E77E09 /* SNOModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

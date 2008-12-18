@@ -73,7 +73,10 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 {
 	return NSClassFromString(@"ORFec32Model");
 }
-
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"DC (%d,%d,%d)",[[guardian guardian ] crateNumber],[guardian stationNumber],[self stationNumber]];
+}
 #pragma mark •••Accessors
 - (int) globalCardNumber
 {

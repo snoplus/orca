@@ -3,7 +3,7 @@
 //  Orca
 //
 //  Created by Mark Howe on Tue, Apr 30, 2008.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright © 2002 CENPA, University of Washington. All rights rORCrateLabelView.m
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 

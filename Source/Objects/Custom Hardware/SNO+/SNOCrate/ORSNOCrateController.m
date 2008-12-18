@@ -129,17 +129,35 @@
 
 - (IBAction) autoInit:(id)sender
 {
-	[model autoInit];
+	@try {
+		[model autoInit];
+	}
+	@catch (NSException* localException) {
+		NSBeginAlertSheet(@"Crate AutoInit Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
+		NSLog(@"AutoInit of Crate (%d) failed.\n",[model crateNumber]);
+	}
 }
 
 - (IBAction) initXilinx:(id)sender
 {
-	[model initCrate:YES];
+	@try {
+		[model initCrate:YES];
+	}
+	@catch (NSException* localException) {
+		NSBeginAlertSheet(@"Crate Init Xinlinix Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
+		NSLog(@"Init Xilinix of Crate (%d) failed.\n",[model crateNumber]);
+	}
 }
 
 - (IBAction) initNoXilinx:(id)sender
 {
-	[model initCrate:NO];
+	@try {
+		[model initCrate:NO];
+	}
+	@catch (NSException* localException) {
+		NSBeginAlertSheet(@"Crate Init No Xinlinix Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
+		NSLog(@"Init No Xilinix of Crate (%d) failed.\n",[model crateNumber]);
+	}
 }
 
 @end

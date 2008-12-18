@@ -51,7 +51,6 @@
     [super awakeFromNib];
     [self performSelector:@selector(updateWithCurrentRunNumber)withObject:self afterDelay:0];
     [self updateButtons];
-	[self populatePopups];
 }
 
 #pragma mark ¥¥¥Accessors
@@ -816,6 +815,8 @@
 @implementation ORRunController (private)
 - (void) populatePopups
 {
+	[[model undoManager] disableUndoRegistration];
+	
 	[startUpScripts removeAllItems];
 	[shutDownScripts removeAllItems];
 	[startUpScripts addItemWithTitle:@"---"];
@@ -838,6 +839,7 @@
 	[shutDownScripts selectItemWithTitle:selectedItemName]; 
 	[self selectShutDownScript:shutDownScripts];
 
+	[[model undoManager] enableUndoRegistration];
 }
 
 @end

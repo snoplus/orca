@@ -45,48 +45,6 @@
 #define kHVRefMax		5.0
 #define kHVResStep 		((kHVRefMax-kHVRefMin)/255.0)
 
-// FEC32 Discrete and Sequencer register indices 
-#define FEC32_GENERAL_CS_REG					0
-#define FEC32_ADC_VALUE_REG						1
-#define FEC32_VOLTAGE_MONITOR_REG				2
-#define FEC32_PEDESTAL_ENABLE_REG				3
-#define FEC32_DAC_PROGRAM_REG					4
-#define FEC32_CALIBRATION_DAC_PROGRAM_REG		5
-#define FEC32_HVC_CS_REG						6
-#define FEC32_CMOS_SPY_OUTPUT_REG				7
-#define FEC32_CMOS_FULL_REG						8
-#define FEC32_CMOS_SELECT_REG					9
-#define FEC32_CMOS_1_16_REG						10
-#define FEC32_CMOS_17_32_REG					11
-#define FEC32_CMOS_LGISEL_SET_REG				12
-#define FEC32_BOARD_ID_REG						13
-
-#define FEC32_SEQ_OUTPUT_CS_REG					14
-#define FEC32_SEQ_INTPUT_CS_REG					15
-#define FEC32_CMOS_DATA_AVAIL_REG				16
-#define FEC32_CMOS_CHIP_SELECT_REG				17
-#define FEC32_CMOS_CHIP_DISABLE_REG				18
-#define FEC32_CMOS_DATA_OUTPUT_REG				19
-#define FEC32_FIFO_WRITE_POINTER_REG			20
-#define FEC32_FIFO_READ_POINTER_REG				21
-#define FEC32_FIFO_POINTER_DIFF_REG				22
-
-#define FEC32_CMOS_MISSED_COUNT_OFFSET			23
-#define FEC32_CMOS_BUSY_REG_OFFSET				24
-#define FEC32_CMOS_TOTALS_COUNTER_OFFSET		25
-#define FEC32_CMOS_TEST_ID_OFFSET				26
-#define FEC32_CMOS_SHIFT_REG_OFFSET				27
-#define FEC32_CMOS_ARRAY_POINTER_OFFSET			28
-#define FEC32_CMOS_COUNT_INFO_OFFSET			29
-
-// FEC32 CMOS Internal register indices, used for Apple Events only
-#define FEC32_CMOS_MISSED_COUNT_REG				0					
-#define FEC32_CMOS_BUSY_REG						1
-#define FEC32_CMOS_TOTAL_COUNT_REG				2	
-#define FEC32_CMOS_TEST_ID_REG					3
-#define FEC32_CMOS_SPARE_COUNTER_REG			4
-#define FEC32_CMOS_ARRAY_POINTER_REG			5
-#define	FEC32_CMOS_COUNT_INFO_REG				6
 
 // SNTR CSR register, bit masks
 #define FEC32_CSR_ZERO					0x00000000
@@ -114,38 +72,38 @@
 #define FEC32_CSR_CRATE_BITSIFT					11
 
 // Fec32 Discrete and Sequencer register offsets 
-/*#define Fec32_GENERAL_CS_REG					128
-#define Fec32_ADC_VALUE_REG						132
-#define Fec32_VOLTAGE_MONITOR_REG				136
-#define Fec32_PEDESTAL_ENABLE_REG				140
-#define Fec32_DAC_PROGRAM_REG					144
-#define Fec32_CALIBRATION_DAC_PROGRAM_REG		148
-#define Fec32_HVC_CS_REG						152
-#define Fec32_CMOS_SPY_OUTPUT_REG				156
-#define Fec32_CMOS_FULL_REG						160
-#define Fec32_CMOS_SELECT_REG					164
-#define Fec32_CMOS_1_16_REG						168
-#define Fec32_CMOS_17_32_REG					172
-#define Fec32_CMOS_LGISEL_SET_REG				176
-#define Fec32_BOARD_ID_REG						180
+#define FEC32_GENERAL_CS_REG					128
+#define FEC32_ADC_VALUE_REG						132
+#define FEC32_VOLTAGE_MONITOR_REG				136
+#define FEC32_PEDESTAL_ENABLE_REG				140
+#define FEC32_DAC_PROGRAM_REG					144
+#define FEC32_CALIBRATION_DAC_PROGRAM_REG		148
+#define FEC32_HVC_CS_REG						152
+#define FEC32_CMOS_SPY_OUTPUT_REG				156
+#define FEC32_CMOS_FULL_REG						160
+#define FEC32_CMOS_SELECT_REG					164
+#define FEC32_CMOS_1_16_REG						168
+#define FEC32_CMOS_17_32_REG					172
+#define FEC32_CMOS_LGISEL_SET_REG				176
+#define FEC32_BOARD_ID_REG						180
 
-#define Fec32_SEQ_OUTPUT_CS_REG					512
-#define Fec32_SEQ_INTPUT_CS_REG					528
-#define Fec32_CMOS_DATA_AVAIL_REG				544
-#define Fec32_CMOS_CHIP_SELECT_REG				560
-#define Fec32_CMOS_CHIP_DISABLE_REG				576
-#define Fec32_CMOS_DATA_OUTPUT_REG				592
-#define Fec32_FIFO_READ_POINTER_REG				624
-#define Fec32_FIFO_WRITE_POINTER_REG			628
-#define Fec32_FIFO_POINTER_DIFF_REG				632
-*/
-#define Fec32_CMOS_MISSED_COUNT_OFFSET		   1028
-#define Fec32_CMOS_BUSY_REG_OFFSET			   1032
-#define Fec32_CMOS_TOTALS_COUNTER_OFFSET	   1036
-#define Fec32_CMOS_TEST_ID_OFFSET			   1040
-#define Fec32_CMOS_SHIFT_REG_OFFSET			   1044
-#define Fec32_CMOS_ARRAY_POINTER_OFFSET		   1048
-#define Fec32_CMOS_COUNT_INFO_OFFSET		   1052
+#define FEC32_SEQ_OUTPUT_CS_REG					512
+#define FEC32_SEQ_INTPUT_CS_REG					528
+#define FEC32_CMOS_DATA_AVAIL_REG				544
+#define FEC32_CMOS_CHIP_SELECT_REG				560
+#define FEC32_CMOS_CHIP_DISABLE_REG				576
+#define FEC32_CMOS_DATA_OUTPUT_REG				592
+#define FEC32_FIFO_READ_POINTER_REG				624
+#define FEC32_FIFO_WRITE_POINTER_REG			628
+#define FEC32_FIFO_POINTER_DIFF_REG				632
+
+#define FEC32_CMOS_MISSED_COUNT_OFFSET		   1028
+#define FEC32_CMOS_BUSY_REG_OFFSET			   1032
+#define FEC32_CMOS_TOTALS_COUNTER_OFFSET	   1036
+#define FEC32_CMOS_TEST_ID_OFFSET			   1040
+#define FEC32_CMOS_SHIFT_REG_OFFSET			   1044
+#define FEC32_CMOS_ARRAY_POINTER_OFFSET		   1048
+#define FEC32_CMOS_COUNT_INFO_OFFSET		   1052
 
 // CMOS Shoft Register defintions
 #define FEC32_CMOS_SHIFT_SERSTROB		0x00000001
@@ -212,11 +170,15 @@ typedef struct Fec32CmosShiftReg{
 	float			  adcVoltage[kNumFecMonitorAdcs]; 				//converted voltage
 	eFecMonitorState  adcVoltageStatusOfCard;
 	eFecMonitorState  adcVoltageStatus[kNumFecMonitorAdcs];
+    int variableDisplay;
 }
+
 - (void) setUpImage;
 - (void) makeMainController;
 
 #pragma mark •••Accessors
+- (int) variableDisplay;
+- (void) setVariableDisplay:(int)aVariableDisplay;
 - (id) xl1;
 - (id) xl2;
 - (BOOL)			dcPresent:(unsigned short)index;
@@ -310,6 +272,7 @@ typedef struct Fec32CmosShiftReg{
 @end
 
 
+extern NSString* ORFec32ModelVariableDisplayChanged;
 extern NSString* ORFecShowVoltsChanged;
 extern NSString* ORFecCommentsChanged;
 extern NSString* ORFecCmosChanged;

@@ -25,6 +25,7 @@
 #import "ORSNORackModel.h"
 #import "ORSNOCard.h"
 #import "ORSNOCrateModel.h"
+#import "OROrderedObjManager.h"
 
 
 @implementation ORSNORackController
@@ -91,16 +92,6 @@
     [model performSelector:@selector(setUpImage) withObject:nil afterDelay:0];
 }
 
-- (void) rackNumberChanged:(NSNotification*)aNote
-{
-	[self setRackTitle];
-}
-
-- (void) setRackTitle
-{
-	[[self window] setTitle:[NSString stringWithFormat:@"Rack %d",[model uniqueIdNumber]]];
-}
-
 - (void) updateWindow
 {
     [super updateWindow];
@@ -127,6 +118,21 @@
     [super setModel:aModel];
     [groupView setGroup:(ORGroup*)model];
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
+	[rackNumberField setIntValue:[model rackNumber]];
+	
+	[self setCrateLabels];
+
+}
+
+- (void) setCrateLabels
+{
+	id crate0 = [[OROrderedObjManager for:model] objectInSlot:0];
+	if(crate0)[crate0Field setIntValue:[crate0 crateNumber]];
+	else [crate0Field setStringValue:@""];
+
+	id crate1 = [[OROrderedObjManager for:model] objectInSlot:1];
+	if(crate1)[crate1Field setIntValue:[crate1 crateNumber]];
+	else [crate1Field setStringValue:@""];
 }
 
 - (void) setCrateTitle
@@ -140,6 +146,7 @@
 		[model setUpImage];
 		[self updateWindow];
 	}
+	[self setCrateLabels];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem

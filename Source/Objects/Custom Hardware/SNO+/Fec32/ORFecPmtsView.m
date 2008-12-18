@@ -25,19 +25,6 @@
 
 @implementation ORFecPmtsView
 
-- (id)initWithFrame:(NSRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code here.
-    }
-    return self;
-}
-
-- (void) dealloc
-{
-	[super dealloc];
-}
-
 - (void)awakeFromNib
 {
 	//have to make sure that the card view is on top

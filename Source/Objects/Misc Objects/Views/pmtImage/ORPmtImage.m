@@ -18,8 +18,31 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORPmtImage.h"
+#import "SynthesizeSingleton.h"
+
+@implementation ORPmtImages
+
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(PmtImages);
+
+- (ORPmtImage *) pmtWithColor:(NSColor *)aColor angle:(float)anAngle
+{
+	id anImage = [[pmtImages objectForKey:aColor] objectForKey:[NSNumber numberWithInt:(int)anAngle]];
+	if(anImage)return anImage;
+	else {																		//couldn't find one already made.
+		anImage = [ORPmtImage pmtWithColor:aColor angle:anAngle];				//make one
+		if(!pmtImages) pmtImages = [[NSMutableDictionary dictionary] retain];	//check the top level dictionary
+		NSMutableDictionary* colorGroup = [pmtImages objectForKey:aColor];		//check the top level entry
+		if(!colorGroup) {														//couldn't find anything for this color
+			colorGroup = [[NSMutableDictionary dictionary] retain];				//make an dictionary
+			[pmtImages setObject:colorGroup forKey:aColor];						//enter it
+		}
+		[colorGroup setObject:anImage forKey:[NSNumber numberWithInt:(int)anAngle]];
+	}
+	return anImage;
+}
+@end
+
 
 static NSImage *pmtImage, *colorMaskImage, *topImage;
 

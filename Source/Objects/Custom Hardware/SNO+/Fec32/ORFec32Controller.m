@@ -27,6 +27,9 @@
 #import "ORSwitchImage.h"
 #import "ORFecDaughterCardModel.h";
 #import "Sno_Monitor_Adcs.h"
+#import "OROrderedObjManager.h"
+#import "ORSNOConstants.h"
+#import "ORSNOCableDB.h"
 
 @implementation ORFec32Controller
 
@@ -40,13 +43,6 @@
 - (void) dealloc
 {
 	[cmosFormatter release];
-	int i;
-	int j;
-	for(i=0;i<4;i++){
-		for(j=0;j<2;j++){
-			[onlineStateImage[i][j] release];
-		}
-	}
 	[super dealloc];
 }
 
@@ -70,33 +66,34 @@
 	
 	//set up the switch images and the pmt images
 	for(i=0;i<8;i++){
-		[[pmtImages0 cellAtRow:0 column:i] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:180]];
 		[[onlineSwitches0 cellAtRow:0 column:i] setTag:7-i];
-		
-		[[pmtImages1 cellAtRow:i column:0] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:90]];
 		[[onlineSwitches1 cellAtRow:i column:0] setTag:15-i];
-		
-		[[pmtImages2 cellAtRow:i column:0] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:90]];
 		[[onlineSwitches2 cellAtRow:i column:0] setTag:23-i];
-		
-		[[pmtImages3 cellAtRow:0 column:i] setImage:[ORPmtImage pmtWithColor:[NSColor redColor] angle:0]];
 		[[onlineSwitches3 cellAtRow:0 column:i] setTag:24+i];
 	}
 	
-	//cache some switch images
-	onlineStateImage[0][1]	= [[ORSwitchImage closedSwitchWithAngle:90] retain];
-	onlineStateImage[0][0]	= [[ORSwitchImage openSwitchWithAngle:90] retain];
-	onlineStateImage[1][1]	= [[ORSwitchImage closedSwitchWithAngle:0] retain];
-	onlineStateImage[1][0]	= [[ORSwitchImage openSwitchWithAngle:0] retain];
-	onlineStateImage[2][1]	= [[ORSwitchImage closedSwitchWithAngle:0] retain];
-	onlineStateImage[2][0]	= [[ORSwitchImage openSwitchWithAngle:0] retain];
-	onlineStateImage[3][1]	= [[ORSwitchImage closedSwitchWithAngle:-90] retain];
-	onlineStateImage[3][0]	= [[ORSwitchImage openSwitchWithAngle:-90] retain];
-
 	for(i=0;i<kNumFecMonitorAdcs;i++){
-		[[monitorValueLabelsMatrix cellAtRow:i column:0] setStringValue:[NSString stringWithCString:fecVoltageAdc[i].label encoding:NSASCIIStringEncoding]];
-		[[monitorValueUnitsMatrix cellAtRow:i column:0] setStringValue:[NSString stringWithCString:fecVoltageAdc[i].units encoding:NSASCIIStringEncoding]];
+		[[adcLabelsMatrix cellAtRow:i column:0] setStringValue:[NSString stringWithCString:fecVoltageAdc[i].label encoding:NSASCIIStringEncoding]];
+		[[adcUnitsMatrix cellAtRow:i column:0] setStringValue:[NSString stringWithCString:fecVoltageAdc[i].units encoding:NSASCIIStringEncoding]];
 		
+	}
+	for(i=0;i<16;i++){
+		[[thresholds0LabelsMatrix cellAtRow:i column:0] setIntValue:i];
+		[[thresholds0LabelsMatrix cellAtRow:i column:0] setTextColor:[NSColor grayColor]];
+		[[thresholds1LabelsMatrix cellAtRow:i column:0] setIntValue:i+16];
+		[[thresholds1LabelsMatrix cellAtRow:i column:0] setTextColor:[NSColor grayColor]];
+		[[thresholds0Matrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
+		[[thresholds1Matrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
+		
+		
+		[[vb0LabelsMatrix cellAtRow:i column:0] setIntValue:i];
+		[[vb0LabelsMatrix cellAtRow:i column:0] setTextColor:[NSColor grayColor]];
+		[[vb1LabelsMatrix cellAtRow:i column:0] setIntValue:i+16];
+		[[vb1LabelsMatrix cellAtRow:i column:0] setTextColor:[NSColor grayColor]];
+		[[vb0HMatrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
+		[[vb0LMatrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
+		[[vb1HMatrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
+		[[vb1LMatrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
 	}
 	
 	[super awakeFromNib];
@@ -192,6 +189,27 @@
                          name : ORFec32ModelAdcVoltageStatusChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(variableDisplayChanged:)
+                         name : ORFec32ModelVariableDisplayChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(dcThresholdsChanged:)
+                         name : ORDCModelVtChanged
+						object: nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(dcVBsChanged:)
+                         name : ORDCModelVbChanged
+						object: nil];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(updatePMTInfo:)
+                         name : ORSNOCableDBReadIn
+						object: nil];
+	
+
 }
 
 - (void) updateWindow
@@ -210,6 +228,10 @@
 	[self commentsChanged:nil];
 	[pmtView setNeedsDisplay:YES];
 	[self  adcStatusChanged:nil];
+	[self variableDisplayChanged:nil];
+	[self dcThresholdsChanged:nil];
+	[self dcVBsChanged:nil];
+	[self updatePMTInfo:nil];
 }
 
 #pragma mark •••Accessors
@@ -225,10 +247,92 @@
 	[fecNumberField setIntValue:[model stationNumber]];
 	[crateNumberField setIntValue:[[model guardian] crateNumber]];
 	[pmtView setNeedsDisplay:YES];
+	[self adcStatusChanged:nil];
+	[self dcThresholdsChanged:nil];
+	[self dcVBsChanged:nil];
  	[self updateButtons];
 }
 
 #pragma mark •••Interface Management
+- (void) updatePMTInfo:(NSNotification*)aNote
+{
+	int crate = [model crateNumber];
+	int card  = [model stationNumber];
+	int i;
+	ORPmtImages* pmtImageCatalog = [ORPmtImages sharedPmtImages];
+	for(i=0;i<kNumSNOPmts;i++){
+		NSString* label;
+		if([model dcPresent:i/8])label = [[ORSNOCableDB sharedSNOCableDB] pmtID:crate card:card channel:i];
+		else label = @"---";
+		NSColor* tubeColor = [[ORSNOCableDB sharedSNOCableDB] pmtColor:crate card:card channel:i];
+		if(i>=0 && i<8)	{
+			[[dc0Labels cellAtRow:0 column:7-i] setObjectValue:label];
+			[[pmtImages0 cellAtRow:0 column:7-i] setImage:[pmtImageCatalog pmtWithColor:tubeColor angle:180]];
+		}
+		else if(i>=8 && i<16)	{
+			[[dc1Labels cellAtRow:15-i column:0] setObjectValue:label];
+			[[pmtImages1 cellAtRow:15-i column:0] setImage:[pmtImageCatalog pmtWithColor:tubeColor angle:90]];
+		}
+		else if(i>=16 && i<24)	{
+			[[dc2Labels cellAtRow:23-i column:0] setObjectValue:label];
+			[[pmtImages2 cellAtRow:23-i column:0] setImage:[pmtImageCatalog pmtWithColor:tubeColor angle:90]];
+		}
+		else if(i>=24 && i<32)	{
+			[[dc3Labels cellAtRow:0 column:i-24] setObjectValue:label];
+			[[pmtImages3 cellAtRow:0 column:i-24] setImage:[pmtImageCatalog pmtWithColor:tubeColor angle:0]];
+		}
+	}	
+}
+
+- (void) dcThresholdsChanged:(NSNotification*)aNote
+{
+	int i;
+	int displayRow = 0;
+	for(i=0;i<kNumSNODaughterCards;i++){
+		ORFecDaughterCardModel* dc = [[OROrderedObjManager for:model] objectInSlot:i];
+		NSMatrix* matrix = i<2 ? thresholds0Matrix : thresholds1Matrix;
+		int chan;
+		for(chan=0;chan<8;chan++){
+			id displayItem = [matrix cellAtRow:displayRow column:0];
+			if(dc)[displayItem setObjectValue:[NSNumber numberWithInt:[dc vt:chan]]];
+			else [displayItem setObjectValue:@"---"];
+			displayRow++;
+			if(displayRow>15)displayRow=0;
+		}
+	}
+}
+
+- (void) dcVBsChanged:(NSNotification*)aNote
+{
+	int set;
+	for(set=0;set<2;set++){
+		int displayRow = 0;
+		int i;
+		for(i=0;i<kNumSNODaughterCards;i++){
+			ORFecDaughterCardModel* dc = [[OROrderedObjManager for:model] objectInSlot:i];
+			NSMatrix* matrix;
+			if(set == 0) matrix = i<2 ? vb0HMatrix : vb1HMatrix;
+			else         matrix = i<2 ? vb0LMatrix : vb1LMatrix;
+			int chan;
+			for(chan=0;chan<8;chan++){
+				id displayItem = [matrix cellAtRow:displayRow column:0];
+				if(dc)[displayItem setObjectValue:[NSNumber numberWithInt:[dc vb:chan+(set*8)]]];
+				else [displayItem setObjectValue:@"---"];
+				displayRow++;
+				if(displayRow>15)displayRow=0;
+			}
+		}
+	}
+}
+
+
+- (void) variableDisplayChanged:(NSNotification*)aNote
+{
+	[variablesSelectionPU selectItemAtIndex: [model variableDisplay]];
+	[variablesTabView selectTabViewItemAtIndex:[model variableDisplay]];
+	[self updateButtons];
+}
+
 - (void) isNowKeyWindow:(NSNotification*)aNotification
 {
 	[[self window] makeFirstResponder:(NSResponder*)groupView];
@@ -249,7 +353,7 @@
 
 - (void) loadAdcStatus:(int)i
 {
-	id theCell = [monitorValuesMatrix cellAtRow:i column:0];
+	id theCell = [adcMatrix cellAtRow:i column:0];
 	if([model adcVoltageStatus:i] != kFecMonitorInRange)[theCell setTextColor:[NSColor redColor]];
 	else [theCell setTextColor:[NSColor blackColor]];
 	NSString* s= @"---";
@@ -263,11 +367,13 @@
 
 - (void) onlineMaskChanged:(NSNotification*)aNote
 {
+	ORSwitchImages* switchCatalog = [ORSwitchImages sharedSwitchImages];
+	float switchAngles[4] = {90,0,0,-90};
 	int i;
 	for(i=0;i<32;i++){
 		int pmtGroup = i/8;
 		int state = [model pmtOnline:i];
-		[[onlineSwitches[pmtGroup] cellWithTag:i] setImage:onlineStateImage[pmtGroup][state]];
+		[[onlineSwitches[pmtGroup] cellWithTag:i] setImage:[switchCatalog switchWithState:state angle:switchAngles[pmtGroup]]];
 	}
 }
 
@@ -305,6 +411,7 @@
 		[onlineSwitches[i] setEnabled:[model dcPresent:i] && !lockedOrRunningMaintenance];
 		[pmtImages[i] setEnabled:[model dcPresent:i]];
 	}
+	[readVoltagesButton setEnabled:!lockedOrRunningMaintenance && ([model variableDisplay] == 0)];
 }
 
 - (void) lockChanged:(NSNotification*)aNotification
@@ -368,6 +475,12 @@
 }
 
 #pragma mark •••Actions
+
+- (IBAction) variableDisplayPUAction:(id)sender
+{
+	[model setVariableDisplay:[sender indexOfSelectedItem]];
+}
+
 - (IBAction) onlineMaskAction:(id)sender
 {
 	int tag = [[sender selectedCell] tag];
@@ -382,16 +495,23 @@
 		[model autoInit];
 	}
 	@catch (NSException* localException) {
+		NSBeginAlertSheet(@"Fec32 AutoInit Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
 		NSLog(@"AutoInit of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
 	}
 }
+
 - (IBAction) readVoltagesAction:(id)sender
 {
-	@try {
-		[model readVoltages];
-	}
-	@catch (NSException* localException) {
-		NSLog(@"Read Voltages of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
+	switch([model variableDisplay]){
+		case 0:
+			@try {
+				[model readVoltages];
+			}
+			@catch (NSException* localException) {
+				NSBeginAlertSheet(@"Fec32 Voltage Read Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
+				NSLog(@"Read Voltages of Fec32 (%d,%d) failed.\n",[model crateNumber],[model stationNumber]);
+			}
+		break;
 	}
 }
 
@@ -402,7 +522,13 @@
 
 - (IBAction) initAction:(id)sender;
 {
-	[model scan:nil];
+	@try {
+		[model scan:nil];
+	}
+	@catch(NSException* localException) {
+		NSLog(@"Scan of Fec32 FAILED.\n");
+		NSBeginAlertSheet(@"Fec32 Scan Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
+	}
 }
 
 - (IBAction) probeAction:(id)sender
@@ -412,9 +538,7 @@
 	}
 	@catch(NSException* localException) {
         NSLog(@"Probe of Fec32 FAILED.\n");
-        NSRunAlertPanel([localException name], @"%@\n\nFailed Fec32 Probe.", @"OK", nil, nil,
-                        localException);
-		
+		NSBeginAlertSheet(@"Fec32 Probe Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);			
 	}
 }
 

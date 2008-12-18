@@ -54,9 +54,15 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>crate0Field</key>
+				<string>NSTextField</string>
+				<key>crate1Field</key>
+				<string>NSTextField</string>
 				<key>groupView</key>
 				<string>ORGroupView</string>
 				<key>lockDocField</key>
+				<string>NSTextField</string>
+				<key>rackNumberField</key>
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
@@ -116,6 +122,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>group</key>
+				<string>id</string>
 				<key>mouseTask</key>
 				<string>id</string>
 			</dict>

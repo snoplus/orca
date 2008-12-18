@@ -50,15 +50,41 @@
     IBOutlet NSButton*		initButton;
 	IBOutlet NSButton*		autoInitButton;
 	IBOutlet NSButton*		readVoltagesButton;
-	IBOutlet NSMatrix*		monitorValueLabelsMatrix;
-	IBOutlet NSMatrix*		monitorValuesMatrix;
-	IBOutlet NSMatrix*		monitorValueUnitsMatrix;
+	
+	//labels
+	IBOutlet NSMatrix*		dc0Labels;
+	IBOutlet NSMatrix*		dc1Labels;
+	IBOutlet NSMatrix*		dc2Labels;
+	IBOutlet NSMatrix*		dc3Labels;
+
+    
+	IBOutlet NSTabView*		variablesTabView;
+	IBOutlet NSPopUpButton*	variablesSelectionPU;
+	
+	//voltage adcs
+	IBOutlet NSMatrix*		adcLabelsMatrix;
+	IBOutlet NSMatrix*		adcMatrix;
+	IBOutlet NSMatrix*		adcUnitsMatrix;
+
+	//thresholds
+	IBOutlet NSMatrix*		thresholds0LabelsMatrix;
+	IBOutlet NSMatrix*		thresholds0Matrix;
+	IBOutlet NSMatrix*		thresholds1LabelsMatrix;
+	IBOutlet NSMatrix*		thresholds1Matrix;
+	
+	//vbals
+	IBOutlet NSMatrix*		vb0LabelsMatrix;
+	IBOutlet NSMatrix*		vb0HMatrix;
+	IBOutlet NSMatrix*		vb0LMatrix;
+	IBOutlet NSMatrix*		vb1LabelsMatrix;
+	IBOutlet NSMatrix*		vb1HMatrix;
+	IBOutlet NSMatrix*		vb1LMatrix;
+	
 	NSNumberFormatter*		cmosFormatter;
 
 	//cache some stuff to make things easier
 	NSMatrix* onlineSwitches[4];
 	NSMatrix* pmtImages[4];
-	NSImage* onlineStateImage[4][2];
 }
 
 #pragma mark •••Accessors
@@ -68,6 +94,10 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) updatePMTInfo:(NSNotification*)aNote;
+- (void) dcVBsChanged:(NSNotification*)aNote;
+- (void) dcThresholdsChanged:(NSNotification*)aNote;
+- (void) variableDisplayChanged:(NSNotification*)aNote;
 - (void) adcStatusChanged:(NSNotification*)aNote;
 - (void) loadAdcStatus:(int)i;
 - (void) enablePmtGroup:(short)enabled groupNumber:(short)group;
@@ -85,6 +115,7 @@
 - (void) boardIdChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) variableDisplayPUAction:(id)sender;
 - (IBAction) initAction:(id)sender;
 - (IBAction) probeAction:(id)sender;
 - (IBAction) onlineMaskAction:(id)sender;

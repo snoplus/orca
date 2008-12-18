@@ -19,10 +19,15 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#define kChannelsPerBoard 	32
+#define kCardsPerCrate		16
+#define kChannelsPerCrate  512
+#define kMaxNumberPMTs	  9685
 
 #define kMaxSNOCrates			20
 #define kNumSNOCards			16
 #define kNumSNOCrateSlots		18
+#define kNumSNOPmts				32
 #define kNumSNODaughterCards	4
 
 // Board Id Register Definitions
