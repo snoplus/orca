@@ -46,6 +46,18 @@
     [queueLock unlock];
 }
 
+- (unsigned int) count
+{
+	//we try to get the count. but if we can not get the lock, just return 0
+	//we want the data taking thread to block as little as possible even our expense.
+	unsigned int theCount = 0;
+    if([queueLock tryLock]){
+		theCount = [super count];
+        [queueLock unlock];
+    }
+	return theCount;
+}
+
 -(BOOL) tryEnqueue:(id)pushedObj
 {
     if([queueLock tryLock]){
