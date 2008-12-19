@@ -50,6 +50,7 @@ NSString* HVkHVLimit = @"HVL";
 NSString* HVkCurChnl = @"HVCurChnl";
 
 NSString* HVkPollTimeMinutes = @"mPollTimeMinutes";
+NSString* HVkChannel = @"Channel";
 
 // Order in which data is returned from DMP command.  Index in token array.
 const int HVkCommandIndx = 0;
@@ -90,6 +91,7 @@ NSString* UVPollTimeMinutesChanged		= @"UVPollTimeMinutesChanged";
 NSString* UVStatusPollTaskChanged		= @"UVStatusPollTaskChanged";
 
 NSString* UVChnlHVValuesChanged			= @"ChnlHVValuesChanged";
+NSString* UVErrorNotification			= @"UVErrorNotification";
 
 // Commands possible from HV Unit.
 NSString* HVkModuleDMP	= @"DMP";
@@ -151,7 +153,7 @@ NSString* UVkWrite = @"W";
 - (void) awakeAfterDocumentLoaded
 {
 
-	NSLog( @"awakeAfterDocumentLoaded - ORUnivVoltModel.m" );
+	NSLog( @"awakeAfterDocumentLoaded - ORUnivVoltModel.m\n" );
 		@try {
 			mParams = [NSMutableDictionary dictionaryWithCapacity: UVkChnlNumParameters];
 
@@ -230,7 +232,7 @@ NSString* UVkWrite = @"W";
 			[mParams retain];
 		
 			//Debug code - Print out parameters and their attributes.
-	
+/*	
 			NSDictionary* dictObjDeb = [mParams objectForKey: [mParams objectForKey: HVkTripCurrent]];				// Get static dictionary for this chnl describing the parameters.
 			NSLog( @"command: %@,  type: %@,  R/W: %@\n", [[dictObjDeb objectForKey: UVkCommand] stringValue], 
 	                                            [[dictObjDeb objectForKey: UVkType] stringValue],
@@ -247,7 +249,7 @@ NSString* UVkWrite = @"W";
 		
 				NSLog( @" Param '%@', R/W :%@, Type: %@\n", commandDict, writableDict, typeDict );
 			}
-			
+*/			
 			// Set polltask to false
 			mPollTaskIsRunning = FALSE;
 		/* */
@@ -412,7 +414,7 @@ NSString* UVkWrite = @"W";
 	[mPollTimeMinutes release];
     mPollTimeMinutes = [NSNumber numberWithFloat: aPollTimeMinutes];
 	[mPollTimeMinutes retain];
-	NSLog( @"UnivVoltModel - Set polling time to %f\n", [mPollTimeMinutes floatValue]);
+//	NSLog( @"UnivVoltModel - Set polling time to %f\n", [mPollTimeMinutes floatValue]);
     [[NSNotificationCenter defaultCenter] postNotificationName: UVPollTimeMinutesChanged object: self];
 }
 
@@ -439,22 +441,31 @@ NSString* UVkWrite = @"W";
 - (void) stopPolling
 {	
 	NSLog( @"Stopped poll task with interval: %f\n", [mPollTimeMinutes floatValue]);
+	mPollTaskIsRunning = FALSE;
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 	[[NSNotificationCenter defaultCenter] postNotificationName: UVStatusPollTaskChanged object: self];
-	mPollTaskIsRunning = FALSE;
 }
 
 - (void) pollTask;
 {
 	float pollTimeSecs = kMinutesToSecs * [mPollTimeMinutes floatValue];
+	NSDate *now = [NSDate date];	
 
+	NSString* lastPollTime = [now descriptionWithCalendarFormat: @"%H:%M:%S"
+	                                                   timeZone: nil   
+													     locale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]];
+	NSString* lastPollTimeMsg = [NSString stringWithFormat: @"Last Poll :%@", lastPollTime];
+	
+	NSLog( @"%@\n", lastPollTimeMsg );
+
+	// Send notification of latest poll time.
+	NSDictionary* retMsg = [NSDictionary dictionaryWithObject: lastPollTimeMsg forKey: UVkErrorMsg]; 
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVErrorNotification object: self userInfo: retMsg];
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 //	[self getValues: -1];
-	NSDate *now = [NSDate date]; 
-	NSLog( @"Polling task called %@\n", [now description] );
 	[self performSelector: @selector( pollTask) withObject: nil afterDelay: pollTimeSecs];
-	mPollTaskIsRunning = TRUE;
+//	mPollTaskIsRunning = TRUE;	
 }
 
 - (bool) isPollingTaskRunning
@@ -487,14 +498,16 @@ NSString* UVkWrite = @"W";
 	return( [numObj intValue] );
 }
 
-- (void) setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl
+- (void) setChannelEnabled: (int) anEnabled chnl: (int) aCurChannel
 {
-	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];
+	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	
 	NSNumber* enabledNumber = [NSNumber numberWithInt: anEnabled];
 	[tmpChnl setObject: enabledNumber forKey: enabledNumber];
+//	NSLog( @"Channel %d has enabled flag set to %d \n", aCurChannel, [enabledNumber intValue]);
 	
-	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlEnabledChanged object: self];		
+	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlEnabledChanged object: self userInfo: chnlRet];		
 }
 
 - (float) demandHV: (int) aCurChannel
@@ -511,7 +524,8 @@ NSString* UVkWrite = @"W";
 	[tmpChnl setObject: demandHV forKey: HVkDemandHV];
 	
 	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlDemandHVChanged object: self];	
+	NSDictionary* retDict = [self createChnlRetDict: aCurChannel];
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlDemandHVChanged object: self userInfo: retDict];	
 }
 
 - (float) measuredCurrent: (int) aChnl
@@ -538,9 +552,6 @@ NSString* UVkWrite = @"W";
 
 - (float) tripCurrent: (int) aChnl
 {
-	// Send command to get trip current
-	//	[adapter sendCommand: @"RC"];
-	
 	// Now update dictionary
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
 	return( [[tmpChnl objectForKey: HVkTripCurrent] floatValue] );
@@ -552,17 +563,13 @@ NSString* UVkWrite = @"W";
 	NSNumber* tripCurrent = [NSNumber numberWithFloat: aTripCurrent];
 	[tmpChnl setObject: tripCurrent forKey: HVkTripCurrent];
 	
-	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlTripCurrentChanged object: self];	
+	// Create return dictionary with channel.  Then send notification that value has changed.
+	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlTripCurrentChanged object: self userInfo: chnlRet];	
 }
 
 - (float) rampUpRate: (int) aChnl
 {
-	// Send command to get HV
-//	[adapter sendCommand: @"RC"];
-	
-	// Now update dictionary
-	
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
 	return( [[tmpChnl objectForKey: HVkRampUpRate] floatValue] );
 }
@@ -573,19 +580,14 @@ NSString* UVkWrite = @"W";
 	NSNumber* rampUpRate = [NSNumber numberWithFloat: aRampUpRate];
 	[tmpChnl setObject: rampUpRate forKey: HVkRampUpRate];
 	
-	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlRampUpRateChanged object: self];	
+	// Create return dictionary with channel.  Then send notification that value has changed.
+	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlRampUpRateChanged object: self userInfo: chnlRet];	
 }
-
 
 
 - (float) rampDownRate: (int) aChnl
 {
-	// Send command to get HV
-//	[adapter sendCommand: @"RC"];
-	
-	// Now update dictionary
-	
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
 	return( [[tmpChnl objectForKey: HVkRampDownRate] floatValue] );
 }
@@ -594,10 +596,11 @@ NSString* UVkWrite = @"W";
 {
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	NSNumber* rampDownRate = [NSNumber numberWithFloat: aRampDownRate];
-	[tmpChnl setObject: rampDownRate forKey: HVkRampUpRate];
+	[tmpChnl setObject: rampDownRate forKey: HVkRampDownRate];
 	
-	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlRampDownRateChanged object: self];	
+	// Create return dictionary with channel.  Then send notification that value has changed.
+	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlRampDownRateChanged object: self userInfo: chnlRet];	
 }
 
 - (NSString*) status: (int) aCurChannel
@@ -610,11 +613,6 @@ NSString* UVkWrite = @"W";
 
 - (float) MVDZ: (int) aCurChannel
 {
-	// Send command to get HV
-//	[adapter sendCommand: @"RC"];
-	
-	// Now update dictionary
-	
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	return( [[tmpChnl objectForKey: HVkMVDZ] floatValue] );
 }
@@ -625,17 +623,13 @@ NSString* UVkWrite = @"W";
 	NSNumber* hvWindow = [NSNumber numberWithFloat: aChargeWindow];
 	[tmpChnl setObject: hvWindow forKey: HVkMVDZ];
 	
-	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlMVDZChanged object: self];	
+	// Create return dictionary with channel.  Then send notification that value has changed.
+	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlMVDZChanged object: self userInfo: chnlRet];	
 }
 
 - (float) MCDZ: (int) aChnl
 {
-	// Send command to get HV
-//	[adapter sendCommand: @"RC"];
-	
-	// Now update dictionary
-	
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aChnl];
 	return( [[tmpChnl objectForKey: HVkMCDZ] floatValue] );
 }
@@ -646,8 +640,9 @@ NSString* UVkWrite = @"W";
 	NSNumber* chargeWindow = [NSNumber numberWithFloat: aChargeWindow];
 	[tmpChnl setObject: chargeWindow forKey: HVkMCDZ];
 	
-	// Put specific code here to talk with unit.
-	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlMCDZChanged object: self];	
+	// Create return dictionary with channel.  Then send notification that value has changed.
+	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlMCDZChanged object: self userInfo: chnlRet];	
 }
 
 - (float) HVLimit: (int) aCurChannel
@@ -1017,7 +1012,7 @@ NSString* UVkWrite = @"W";
     [[self undoManager] disableUndoRegistration];
 	[self setChannelArray: [decoder decodeObjectForKey: @"mChannelArray"]];
 	mPollTimeMinutes = [decoder decodeObjectForKey: HVkPollTimeMinutes];
-	if( !mChannelArray ){
+/*	if( !mChannelArray ){
 		//first time.... set up the structure....
 		[self setChannelArray: [NSMutableArray array]];
 		int i;
@@ -1061,7 +1056,7 @@ NSString* UVkWrite = @"W";
 		}
 		
 	}
-	
+	*/
 	[mChannelArray retain];
 	[mPollTimeMinutes retain];
     [[self undoManager] enableUndoRegistration]; 
@@ -1134,12 +1129,22 @@ NSString* UVkWrite = @"W";
 //Added the following during a sweep to put the CrateView functionality into the Crate  objects MAH 11/18/08
 - (int) stationNumber
 {
-	return [[self crate] maxNumberOfObjects] - [self slot] - 1;
+	int station = [[self crate] maxNumberOfObjects] - [self slot] - 1;
+	return( station );
 }
 
 - (NSString*) cardSlotChangedNotification
 {
     return UVCardSlotChanged;
+}
+
+- (NSDictionary*) createChnlRetDict: (int) aCurrentChnl
+{
+	NSNumber* curChannel = [NSNumber numberWithInt: aCurrentChnl];
+	[curChannel retain];
+	NSDictionary* retDict = [NSDictionary dictionaryWithObject: curChannel forKey: HVkChannel];
+	[curChannel release];
+	return( retDict );
 }
 
 @end

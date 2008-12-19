@@ -93,6 +93,7 @@ typedef enum hveStatus hveStatus;
 
 #pragma mark •••Utilities
 - (void) printDictionary: (int) aCurrentChnl;
+- (NSDictionary*) createChnlRetDict: (int) aCurrentChnl;
 
 #pragma mark ***Archival
 - (id) initWithCoder: (NSCoder*) decoder;
@@ -118,6 +119,10 @@ extern NSString* UVChnlHVValuesChanged;
 
 extern NSString* UVPollTimeMinutesChanged;
 extern NSString* UVStatusPollTaskChanged;
+
+extern NSString* UVErrorNotification;
+
+extern NSString* HVkChannel;
 
 // HV unit Parameters
 // Data is stored as dictionary objects in mChannelArray.

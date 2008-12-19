@@ -193,7 +193,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	@finally
 	{
 	}
-	NSLog( @"awakeAfterDocumentLoaded - OUnivVoltHVCrateModel." );
+	NSLog( @"awakeAfterDocumentLoaded - OUnivVoltHVCrateModel.\n" );
 }
 
 

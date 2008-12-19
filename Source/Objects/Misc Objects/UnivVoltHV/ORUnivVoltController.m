@@ -62,13 +62,11 @@
                      selector : @selector( demandHVChanged:)
                          name : UVChnlDemandHVChanged
 						object: model];
-
 						
-	[notifyCenter  addObserver: self
-	                  selector: @selector( writeErrorMsg: )
-					     name : HVSocketNotConnectedNotification
-					   object : nil];
-
+//	[notifyCenter  addObserver: self
+//	                  selector: @selector( writeErrorMsg: )
+//					     name : HVSocketNotConnectedNotification
+//					   object : nil];
 
    [notifyCenter addObserver : self
                      selector : @selector( rampUpRateChanged:)
@@ -122,8 +120,9 @@
 
 	[notifyCenter  addObserver: self
 	                  selector: @selector( writeErrorMsg: )
-					     name : HVSocketNotConnectedNotification
+					     name : UVErrorNotification
 					   object : nil];
+	
 
 }
 
@@ -192,45 +191,57 @@
 
 - (void) measuredCurrentChanged: (NSNotification*) aNote
 {
-	[self setCurrentChnl: (NSNotification *) aNote ];  
+//	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mMeasuredCurrent setFloatValue: [model measuredCurrent: mCurrentChnl]];
 	NSLog( @"Measured current: %g, for chnl: %d", [model measuredCurrent: mCurrentChnl], mCurrentChnl );
 }
 
 - (void) demandHVChanged: (NSNotification*) aNote
 {
+	float value;
 	[self setCurrentChnl: (NSNotification *) aNote ];  
-	[mDemandHV setFloatValue: [model demandHV: mCurrentChnl]];
+	value = [model demandHV: mCurrentChnl];
+	NSLog( @"Setting demand HV to: %f  for channel %d\n", value, mCurrentChnl);
+	[mDemandHV setFloatValue: value];
 }
 
 - (void) measuredHVChanged: (NSNotification*) aNote
 {
-	[self setCurrentChnl: (NSNotification *) aNote ];  
+//	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mMeasuredHV setFloatValue: [model measuredHV: mCurrentChnl]];
 }
 
 - (void) tripCurrentChanged: (NSNotification*) aNote
 {
+	float value;
 	[self setCurrentChnl: (NSNotification *) aNote ];  
-	[mTripCurrent setFloatValue: [model tripCurrent: mCurrentChnl]];
+	value = [model tripCurrent: mCurrentChnl];
+	NSLog( @"tripCurrentChanged for chnl %d: %f\n", mCurrentChnl, value );
+	[mTripCurrent setFloatValue: value];
 }
 
 - (void) rampUpRateChanged: (NSNotification*) aNote
 {
-	[self setCurrentChnl: (NSNotification *) aNote ];  
+	float value;
+	[self setCurrentChnl: (NSNotification *) aNote ]; 
+	value = [model rampUpRate: mCurrentChnl];
+	NSLog( @"RampUpRate %f for channel %d changed.\n", value, mCurrentChnl);
 	[mRampUpRate setFloatValue: [model rampUpRate: mCurrentChnl]];
+}
+
+- (void) rampDownRateChanged: (NSNotification*) aNote
+{
+	float value;
+	[self setCurrentChnl: (NSNotification *) aNote ]; 
+	value = [model rampDownRate: mCurrentChnl];
+	NSLog( @"RampDownRate %f for channel %d changed.\n", value, mCurrentChnl);
+	[mRampDownRate setFloatValue: [model rampDownRate: mCurrentChnl]];
 }
 
 -(void) statusChanged: (NSNotification*) aNote
 {
 	[self setCurrentChnl: (NSNotification *) aNote ];  
 	[mStatus setStringValue: [model status: mCurrentChnl]];
-}
-
-- (void) rampDownRateChanged: (NSNotification*) aNote
-{
-	[self setCurrentChnl: (NSNotification *) aNote ];  
-	[mRampDownRate setFloatValue: [model rampDownRate: mCurrentChnl]];
 }
 
 - (void) MVDZChanged: (NSNotification*) aNote
@@ -259,9 +270,8 @@
 
 - (void) pollingStatusChanged: (NSNotification *) aNote
 {
-	bool ifPoll = [model isPollingTaskRunning];;
+	bool ifPoll = [model isPollingTaskRunning];
 	[mStartStopPolling setTitle: ( ifPoll ? @"Stop" : @"Start" ) ];
-//		[mStartStopPolling setText
 }
 
 - (void) writeErrorMsg: (NSNotification*) aNote
@@ -316,10 +326,14 @@
 
 - (IBAction) setDemandHV: (id) aSender
 {	
-	[model setDemandHV: [mDemandHV floatValue] chnl: mCurrentChnl];}
+	[model setDemandHV: [mDemandHV floatValue] chnl: mCurrentChnl];
+}
+
 - (IBAction) setTripCurrent: (id) aSender
 {
-	[model setTripCurrent: [mTripCurrent floatValue] chnl: mCurrentChnl];	
+	float value = [mTripCurrent floatValue];
+	NSLog( @"Set trip current for channel %d to %f\n", mCurrentChnl, value );
+	[model setTripCurrent: value chnl: mCurrentChnl];	
 }
 
 - (IBAction) setRampUpRate: (id) aSender
@@ -463,35 +477,82 @@
 {
 	NSMutableDictionary* tmpChnl = [model channelDictionary: aRowIndex];
 	NSString* colIdentifier = [aTableColumn identifier];
-//	if ( [colIdentifier isEqualToString: @"chnlEnabled"]) NSLog( @"Row: %d, column: %@", aRowIndex, colIdentifier );
+	if ( [colIdentifier isEqualToString: @"chnlEnabled"]) NSLog( @"Row: %d, column: %@", aRowIndex, colIdentifier );
 	return( [tmpChnl objectForKey: colIdentifier] );
 }
 
 #pragma mark •••Utilities
 - (void) setCurrentChnl: (NSNotification *) aNote
 {
-	NSDictionary* chnlDict = [aNote userInfo];
-	mCurrentChnl = [[chnlDict objectForKey: HVkCurChnl] intValue];
+	if ( aNote == 0 ) {
+//	    NSLog( @"aNote is nil" );
+		mCurrentChnl = 0;
+	} else {
+		NSDictionary* chnlDict = [aNote userInfo];
+		mCurrentChnl = [[chnlDict objectForKey: HVkChannel] intValue];
+	}
+//[chnlDict objectForKey: HVkCurChnl];
+
 }
 
 - (void) setChnlValues: (int) aCurrentChannel
 {
+	float			value;
 	NSDictionary*	tmpChnl = [model channelDictionary: aCurrentChannel];
 	bool			state = [mChnlEnabled state];
+	NSString*		valueStr;
 //	int				status;
 
-	[model printDictionary: mCurrentChnl];
+//	[model printDictionary: mCurrentChnl];
+//	NSLog( @"\n\nChnl: %d\n", aCurrentChannel );
 	
 	[mChnlEnabled setState: state];
-	[mMeasuredCurrent setStringValue: [tmpChnl objectForKey: HVkMeasuredCurrent]];
-	[mMeasuredHV setStringValue: [tmpChnl objectForKey: HVkMeasuredHV]];
-	[mDemandHV setStringValue: [tmpChnl objectForKey: HVkDemandHV] ];
-	[mRampUpRate setStringValue: [tmpChnl objectForKey: HVkRampUpRate]];
-	[mRampDownRate setStringValue: [tmpChnl objectForKey: HVkRampDownRate]];
-	[mTripCurrent setStringValue: [tmpChnl objectForKey: HVkTripCurrent]];
-	[mMVDZ setStringValue: [tmpChnl objectForKey: HVkMVDZ]];
-	[mMCDZ setStringValue: [tmpChnl objectForKey: HVkMCDZ]];
-	[mHVLimit setStringValue: [tmpChnl objectForKey: HVkHVLimit]];
+//	NSLog( @"State: %d\n", state );
+	
+	value = [[tmpChnl objectForKey: HVkMeasuredCurrent] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mMeasuredCurrent setStringValue: valueStr];
+//	NSLog( @"Measured current: %f\n", value );
+	
+	value = [[tmpChnl objectForKey: HVkMeasuredHV] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mMeasuredHV setStringValue: valueStr];
+//	NSLog( @"Measured HV: %f\n", value );
+
+	value = [[tmpChnl objectForKey: HVkDemandHV] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mDemandHV setStringValue: valueStr];
+//	NSLog( @"Demand HV: %f\n", value );
+	
+	value = [[tmpChnl objectForKey: HVkRampUpRate] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mRampUpRate setStringValue: valueStr];
+//	NSLog( @"mRampUpRate: %f\n", value );
+	
+	value = [[tmpChnl objectForKey: HVkRampDownRate] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mRampDownRate setStringValue: valueStr];
+//	NSLog( @"mRampDownRate: %f\n", value );
+	
+	value = [[tmpChnl objectForKey: HVkTripCurrent] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mTripCurrent setStringValue: valueStr];
+	NSLog( @"mTripCurrent: %f\n", value );
+	
+	value = [[tmpChnl objectForKey: HVkMVDZ] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mMVDZ setStringValue: valueStr];
+//	NSLog( @"mMVDZ: %f\n", value );
+	
+	value = [[tmpChnl objectForKey: HVkMCDZ] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mMCDZ setStringValue: valueStr];
+//	NSLog( @"mMCDZ: %f\n", value );
+	
+	value = [[tmpChnl objectForKey: HVkHVLimit] floatValue];
+	valueStr = [NSString stringWithFormat: @"%f", value];
+	[mHVLimit setStringValue: valueStr];
+//	NSLog( @"mHVLimit: %f\n", value );
 	
 	// status case statement
 	[mStatus setStringValue: [tmpChnl objectForKey: HVkStatus]];
