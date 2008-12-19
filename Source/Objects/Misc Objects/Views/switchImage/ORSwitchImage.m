@@ -25,7 +25,7 @@
 
 SYNTHESIZE_SINGLETON_FOR_ORCLASS(SwitchImages);
 
-- (ORSwitchImage *) switchWithState:(BOOL)aState angle:(float)anAngle;
+- (ORSwitchImage *) switchWithState:(BOOL)aState angle:(float)anAngle
 {
 	id theStateKey = [NSNumber numberWithBool:aState];
 	id theAngleKey = [NSNumber numberWithInt:(int)anAngle];
