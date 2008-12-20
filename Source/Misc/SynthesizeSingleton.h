@@ -38,7 +38,7 @@ return self; \
 \
 - (unsigned)retainCount \
 { \
-return NSUIntegerMax; \
+return 0xffffffff; \
 } \
 \
 - (void)release \
@@ -89,7 +89,7 @@ return self; \
 \
 - (unsigned)retainCount \
 { \
-return NSUIntegerMax; \
+return 0xffffffff; \
 } \
 \
 - (void)release \
