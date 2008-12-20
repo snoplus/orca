@@ -87,7 +87,7 @@ return self; \
 return self; \
 } \
 \
-- (NSUInteger)retainCount \
+- (unsigned)retainCount \
 { \
 return NSUIntegerMax; \
 } \

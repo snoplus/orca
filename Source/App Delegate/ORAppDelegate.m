@@ -300,7 +300,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSString* svnVersionPath = [[NSBundle mainBundle] pathForResource:@"svnversion"ofType:nil];
-	NSMutableString* svnVersion = @"";
+	NSMutableString* svnVersion = [NSMutableString stringWithString:@""];
 	if([fm fileExistsAtPath:svnVersionPath]){
 		svnVersion = [NSMutableString stringWithContentsOfFile:svnVersionPath encoding:NSASCIIStringEncoding error:nil];
 		if([svnVersion hasSuffix:@"\n"]){
