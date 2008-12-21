@@ -109,8 +109,8 @@
 		}
 		
 		
-		
-		NS_HANDLER
+	}
+	@catch(NSException* localException){
 	}
 	
     // Clean up

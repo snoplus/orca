@@ -67,7 +67,8 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 			sbcLink = [[SBC_Link alloc] initWithDelegate:self];
 		}
 		[sbcLink connect];
-		NS_HANDLER
+	}
+	@catch(NSException* localException){
 	}
 }
 
