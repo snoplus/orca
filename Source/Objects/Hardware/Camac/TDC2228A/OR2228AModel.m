@@ -255,7 +255,9 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 			[controller camacShortNAF:cachedStation a:7 f:2 data:&dummy];
 			firstTime = NO;
 		}
-		NS_HANDLER
+	}
+	@catch (NSException* localException){
+	
 		NSLogError(@"",@"2228A Card Error",errorLocation,nil);
 		[self incExceptionCount];
 		[localException raise];
