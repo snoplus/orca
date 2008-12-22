@@ -24,7 +24,7 @@
 //			Structures:
 //			  mCmdCmdQueue - Holds queued up commands and is used  
 //					by sendSingleCommand to dequeue appropriate
-//					command.
+//					command and send it.
 //
 //		Logic: when mRetsToProcess == mTotalCmds routine calls
 //				sendSingleCommand to send out one command.
@@ -93,6 +93,8 @@ NSString* HVCrateConfigAvailableNotification			= @"HVCrateConfigAvailableNotific
 NSString* HVCrateEnetAvailableNotification				= @"HVCrateEnetAvailableNotification";
 NSString* HVUnitInfoAvailableNotification				= @"HVUnitInfoAvailableNotification";
 NSString* HVSocketNotConnectedNotification				= @"HVSocketNotConnectedNotification";
+NSString* HVShortErrorNotification						= @"HVShortErrorNotification";
+NSString* HVLongErrorNotification						= @"HVLongErrorNotification";
 
 NSString* HVCratePollTimeChanged						= @"HVCratePollTimeChanged";
 
@@ -115,7 +117,7 @@ NSString* UVkChnl    = @"Chnl";
 NSString* UVkCommand = @"Command";
 NSString* UVkReturn  = @"Return";
 
-NSString* UVkErrorMsg = @"ErrorMsg";
+NSString* HVkErrorMsg = @"ErrorMsg";
 
 @implementation ORUnivVoltHVCrateModel
 
@@ -202,10 +204,8 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 {
 	if ( mCmdCmdQueue != nil ) [mCmdCmdQueue dealloc];
 	if ( mRetQueue != nil ) [mRetQueue dealloc];
-	[mSocket close];
-	[mSocket release];
+	if ( mSocket != nil ) [mSocket dealloc];
 	
-
     [super dealloc];
 }
 
@@ -297,14 +297,26 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 //---------------------------------------------------------------------------------------------------
 - (void) setSocket: (NetSocket*) aSocket
 {
-	if(aSocket != mSocket)[mSocket close];
-	[aSocket retain];
-	[mSocket release];
-	mSocket = aSocket;
+	if (aSocket != nil)
+	{
+		if( aSocket != mSocket && mSocket != nil ) 
+		{
+			[mSocket close];
+			[mSocket release];
+		}
+					
+		[aSocket retain];
+		mSocket = aSocket;
 	
+ 
 	// setIsConnected sends notification message
-    [mSocket setDelegate: self];
-	mCmdQueueBlocked = NO;  // Now that socket is setup allow commands to be issued.
+		[mSocket setDelegate: self];
+		mCmdQueueBlocked = NO;  // Now that socket is setup allow commands to be issued.
+	}
+	else
+	{
+		[self setIsConnected: NO];
+	}
 }
  
 //---------------------------------------------------------------------------------------------------
@@ -373,8 +385,6 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 				if ( mCmdCmdQueue == nil ) {
 					mCmdCmdQueue = [[ORQueue alloc] init];
 					[mCmdCmdQueue retain];
-//					mCmdRetQueue = [[ORQueue alloc] init];
-//					[mCmdRetQueue retain];
 				}
 		
 				// Create command dictionary object
@@ -489,6 +499,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 	
 		// Parse the returned data.
 		returnFromSocket = [[self interpretDataFromSocket: aSomeData returnCode: &returnCode] retain];
+		
 		NSLog( @"return from socket %@\n", returnFromSocket );
 		NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
 		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
@@ -505,90 +516,114 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
 #endif
 
-
-		
-		// 1) Make sure we have data returned from HV Crate.
-		if ( [tokens count] > 0 )
+		// Process return code
+		if ( returnCode != 1 )
 		{
-			NSString* retCommand = [tokens objectAtIndex: 0];
-		
-			// 2) if chnl > -1 then have a unit return rather than crate return
-			i = 0;
-			if ( [queuedSlot intValue] > -1 )
-			{
+			NSString* fullErrorMsg = [tokens componentsJoinedByString: @" " ];
+			NSString* shortErrorMsg = [NSString stringWithFormat: @"Hardware error %d (%@)\n", returnCode, fullErrorMsg];
+			NSString* longErrorMsg = [NSString stringWithFormat: @"%@ - for cmd '%@' \n", shortErrorMsg, queuedCommandStr]; 
+			NSLog( @"handleDataReturn - longErrorMsg: '%@'\n", longErrorMsg );
 			
-				// Get slot and possibly channel of return data
-				while ( f_NotFound && i < [tokens count] )
+			// Clear command and return queues.
+			[mCmdCmdQueue removeAllObjects];
+			[mRetQueue removeAllObjects];
+			mCmdsToProcess = 0;
+			mRetsToProcess = 0;
+			mCmdQueueBlocked = NO;
+			[mLastCmdIssued release];
+
+			NSDictionary* shortErrorRet = [NSDictionary dictionaryWithObject:  shortErrorMsg forKey: HVkErrorMsg];
+			[[NSNotificationCenter defaultCenter] postNotificationName: HVShortErrorNotification object: self userInfo: shortErrorRet];
+
+			NSDictionary* longErrorRet = [NSDictionary dictionaryWithObject:  longErrorMsg forKey: HVkErrorMsg];
+			[[NSNotificationCenter defaultCenter] postNotificationName: HVLongErrorNotification object: self userInfo: longErrorRet];
+		}
+		else
+		{
+		
+			// 1) Make sure we have data returned from HV Crate.
+			if ( [tokens count] > 0 )
+			{
+				NSString* retCommand = [tokens objectAtIndex: 0];
+		
+				// 2) if chnl > -1 then have a unit return rather than crate return
+				i = 0;
+				if ( [queuedSlot intValue] > -1 )
 				{
-					retSlotChnl = [tokens objectAtIndex: 1];
-					char retChar = [retSlotChnl characterAtIndex: 0];
-					if ( retChar == 'S' || retChar == 's' )
+			
+					// Get slot and possibly channel of return data
+					while ( f_NotFound && i < [tokens count] )
 					{
+						retSlotChnl = [tokens objectAtIndex: 1];
+						char retChar = [retSlotChnl characterAtIndex: 0];
+						if ( retChar == 'S' || retChar == 's' )
+						{
 					
-						// Look for slot
-						NSScanner* scannerForSlotAndChnl = [NSScanner scannerWithString: retSlotChnl];
-						[scannerForSlotAndChnl setScanLocation: 1];
-						[scannerForSlotAndChnl scanInt: &retSlotNum];
-						retSlot = [NSNumber numberWithInt: retSlotNum];
-						scanLoc = [scannerForSlotAndChnl scanLocation];
+							// Look for slot
+							NSScanner* scannerForSlotAndChnl = [NSScanner scannerWithString: retSlotChnl];
+							[scannerForSlotAndChnl setScanLocation: 1];
+							[scannerForSlotAndChnl scanInt: &retSlotNum];
+							retSlot = [NSNumber numberWithInt: retSlotNum];
+							scanLoc = [scannerForSlotAndChnl scanLocation];
 //						[scannerForSlotAndChnl setScanLocation: scanLoc + 1];
 
 
-						BOOL hasPeriod = [scannerForSlotAndChnl scanString: @"." intoString: NULL];
+							BOOL hasPeriod = [scannerForSlotAndChnl scanString: @"." intoString: NULL];
 						
-						// Look for channel if present.
-						if ( hasPeriod ) {
-							[scannerForSlotAndChnl scanInt: &retChnlNum];
-							retChnl = [NSNumber numberWithInt: retChnlNum];
-						} else {
-							retChnl = [NSNumber numberWithInt: -1];
-						}
-						f_NotFound = NO;
-					} // End parsing address.
-					i++;
+							// Look for channel if present.
+							if ( hasPeriod ) {
+								[scannerForSlotAndChnl scanInt: &retChnlNum];
+								retChnl = [NSNumber numberWithInt: retChnlNum];
+							} else {
+								retChnl = [NSNumber numberWithInt: -1];
+							}
+							f_NotFound = NO;
+						} // End parsing address.
+						i++;
 					
-				}	// End looking for address token
-			}
-		
-			// 3) Verify that last command issued corresponds to data return.
-			NSLog( @"Returned command '%@', recent command '%@'.", retCommand, queuedCommandStr );
-			if ( [retCommand isEqualTo: storedCmdStr]  )
-			{
-				// Debug only. Print list of tokens.
-/*				
-					int j;
-					for ( j = 0;  j < [tokens count]; j++ ) {
-					NSString* object = [tokens objectAtIndex: j];
-					NSLog( @"Token ( %d ) string: %@\n", j, object );
+					}	// End looking for address token
 				}
-*/			
-				// 4) Crate only returns.
-				if ( [queuedChnl intValue] == -1 )
-					[self handleCrateReturn: retCommand retString: returnFromSocket retTokens: tokens];
-					
-				// 5) Handle return to HV unit.
-				else if ( [retChnl intValue] > -1 )
+		
+				// 3) Verify that last command issued corresponds to data return.
+				NSLog( @"Returned command '%@', recent command '%@'.", retCommand, queuedCommandStr );
+				if ( [retCommand isEqualTo: storedCmdStr]  )
 				{
-					[self handleUnitReturn: cmdId slot: retSlot channel: retChnl command: retCommand retTokens: tokens];
-				}  // End if processing crate and Unit returns.
+					// Debug only. Print list of tokens.
+/*				
+						int j;
+						for ( j = 0;  j < [tokens count]; j++ ) {
+						NSString* object = [tokens objectAtIndex: j];
+						NSLog( @"Token ( %d ) string: %@\n", j, object );
+					}
+*/			
+					// 4) Crate only returns.
+					if ( [queuedChnl intValue] == -1 )
+						[self handleCrateReturn: retCommand retString: returnFromSocket retTokens: tokens];
+					
+					// 5) Handle return to HV unit.
+					else if ( [retChnl intValue] > -1 )
+					{
+						[self handleUnitReturn: cmdId slot: retSlot channel: retChnl command: retCommand retTokens: tokens];
+					}  // End if processing crate and Unit returns.
 				
-				// Decrement returns to process.
-				mRetsToProcess--;
+					// Decrement returns to process.
+					mRetsToProcess--;
 
-			}      // End if looking if returned command equals queued command.
+				}      // End if looking if returned command equals queued command.
 			
-			// 6) No more returns expected so deque all the data.
-			if ( mRetsToProcess == 0 )
-			{
-				[self dequeueAllReturns];
-			}
+				// 6) No more returns expected so deque all the data.
+				if ( mRetsToProcess == 0 )
+				{
+					[self dequeueAllReturns];
+				}
 			
-			// 7) Expect more returns so issue next command.
-			else 
-			{
-				[self sendSingleCommand];
-			}
-		}		       // End if verifying that we actually have data.
+				// 7) Expect more returns so issue next command.
+				else 
+				{
+					[self sendSingleCommand];
+				}
+			}		// End of encountering error.
+		}		    // End if verifying that we actually have data.
 	}
 	
 	@catch (NSException *exception) {
@@ -726,8 +761,11 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 - (void) disconnect
 {
-	if (mIsConnected ) {	
+	if (mIsConnected ) 
+	{	
 		[mSocket close];
+//		[mSocket release];
+		[self setSocket: nil];
 	}
 }
 
@@ -808,7 +846,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		}
 		
 		displayArray[ 1 ] = '\0';
-/*		for ( i = 0; i < lengthOfReturn; i++ ) {
+		for ( i = 0; i < lengthOfReturn; i++ ) {
 			displayArray[ 0 ] = returnBufferArray[ i ];
 			if ( returnBufferArray[ i ] == '\0' ) 
 				displayArray[ 0 ] = '-';
@@ -817,7 +855,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 
 			NSLog( @"Interpreted.  Char( %d ): %s\n", i, displayArray );
 		}
-*/		
+		
 		nChar = 0;
 				
 		// Find the C and \0 in the character array.  Replace them with \n except for the last
@@ -963,7 +1001,7 @@ NSString* UVkErrorMsg = @"ErrorMsg";
 		else
 		{
 			NSString* errorMsg = [NSString stringWithFormat: @"Socket not connected to Crate.\n"];
-			NSDictionary* errorMsgDict = [NSDictionary dictionaryWithObject: errorMsg forKey: UVkErrorMsg];
+			NSDictionary* errorMsgDict = [NSDictionary dictionaryWithObject: errorMsg forKey: HVkErrorMsg];
 			[[NSNotificationCenter defaultCenter] postNotificationName: HVSocketNotConnectedNotification object: self userInfo: errorMsgDict];
 			mRetsToProcess = 0;
 			mCmdsToProcess = 0;

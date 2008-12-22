@@ -120,7 +120,7 @@ extern NSString* UVChnlHVValuesChanged;
 extern NSString* UVPollTimeMinutesChanged;
 extern NSString* UVStatusPollTaskChanged;
 
-extern NSString* UVErrorNotification;
+//extern NSString* UVErrorNotification;
 
 extern NSString* HVkChannel;
 

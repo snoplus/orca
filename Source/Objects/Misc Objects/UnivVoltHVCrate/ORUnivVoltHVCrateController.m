@@ -89,6 +89,11 @@
                      selector : @selector( writeErrorMsg: )
                          name : HVSocketNotConnectedNotification
                        object : model];	
+
+    [notifyCenter addObserver : self
+                     selector : @selector( writeErrorMsg: )
+                         name : HVLongErrorNotification
+                       object : model];	
 }
 
 - (void) updateWindow
@@ -115,8 +120,8 @@
 - (void) writeErrorMsg: (NSNotification*) aNote
 {
 	NSDictionary* errorDict = [aNote userInfo];
-	NSLog( @"error: %@", [errorDict objectForKey: UVkErrorMsg] );
-	[outputArea setString: [errorDict objectForKey: UVkErrorMsg]];
+	NSLog( @"error: %@", [errorDict objectForKey: HVkErrorMsg] );
+	[outputArea setString: [errorDict objectForKey: HVkErrorMsg]];
 }
 
 

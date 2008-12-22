@@ -120,7 +120,7 @@
 
 	[notifyCenter  addObserver: self
 	                  selector: @selector( writeErrorMsg: )
-					     name : UVErrorNotification
+					     name : HVShortErrorNotification
 					   object : nil];
 	
 
@@ -132,6 +132,7 @@
 	[super awakeFromNib];
 	
 	mCurrentChnl = 0;
+	NSLog( @"UnivVolt:AwakeFromNIB.  Current chnl: ", mCurrentChnl );
 	[mChannelStepperField setIntValue: mCurrentChnl];
 	[mChannelNumberField setIntValue: mCurrentChnl];
 	
@@ -277,8 +278,8 @@
 - (void) writeErrorMsg: (NSNotification*) aNote
 {
 	NSDictionary* errorDict = [aNote userInfo];
-	NSLog( @"error: %@", [errorDict objectForKey: UVkErrorMsg] );
-	[mCmdStatus setStringValue: [errorDict objectForKey: UVkErrorMsg]];
+	NSLog( @"error: %@", [errorDict objectForKey: HVkErrorMsg] );
+	[mCmdStatus setStringValue: [errorDict objectForKey: HVkErrorMsg]];
 }
 
 /*- (void) checkGlobalSecurity

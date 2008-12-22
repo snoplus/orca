@@ -91,7 +91,7 @@ NSString* UVPollTimeMinutesChanged		= @"UVPollTimeMinutesChanged";
 NSString* UVStatusPollTaskChanged		= @"UVStatusPollTaskChanged";
 
 NSString* UVChnlHVValuesChanged			= @"ChnlHVValuesChanged";
-NSString* UVErrorNotification			= @"UVErrorNotification";
+//NSString* UVErrorNotification			= @"UVNotification";
 
 // Commands possible from HV Unit.
 NSString* HVkModuleDMP	= @"DMP";
@@ -309,6 +309,7 @@ NSString* UVkWrite = @"W";
 //	int			i;
 	int			jParam;
 	int			writeCmdCtr = 0;
+//	int			totalCmdsToExecute;
 //	int			nParams;
 //	float		value;	
 	//Debug code - 
@@ -322,6 +323,8 @@ NSString* UVkWrite = @"W";
 	
 	// loop through parameters since we load all twelve channels at once on a normal basis.
 //	for ( jParam = 0; jParam < [allKeys count]; jParam++ )
+
+//	totalCmdsToExecute = mWParams * HVkNumChannels;
 	for ( jParam = 0; jParam < [allKeys count]; jParam++ )
 	{
 		int				iChnl;
@@ -345,9 +348,8 @@ NSString* UVkWrite = @"W";
 								      command: command];
 				[command retain];
 //				[[ self crate] queueCommand: jParam totalCmds: 1 slot: [self slot] channel: aCurrentChnl command: command];
-				[[ self crate] queueCommand: writeCmdCtr totalCmds: mWParams slot: [self slot] channel: aCurrentChnl command: command];
+				[[ self crate] queueCommand: writeCmdCtr totalCmds: mWParams slot: [self stationNumber] channel: aCurrentChnl command: command];
 				writeCmdCtr++;
-				[command release];
 			}
 			
 			else
@@ -355,17 +357,18 @@ NSString* UVkWrite = @"W";
 				// Loop through all channels to load all values for specified parameter for all channels with one command.
 				for ( iChnl = 0; iChnl < HVkNumChannels; iChnl++ )
 				{					
-					command = [self createCommand: iChnl 
+					command = [self createCommand: iChnl
 									 dictParamObj: dictParamObj
 									      command: command];
 				
 				    [command retain];
-					// Single command has been assembled for one param - now queue it.
-				    [[ self crate] queueCommand: writeCmdCtr totalCmds: mWParams slot: [self slot] channel: iChnl command: command];
-					writeCmdCtr++;
-					[command release];
-
 				} // Loop through channels
+				
+				// Single command has been assembled for one param - now queue it.
+				[[ self crate] queueCommand: writeCmdCtr totalCmds: mWParams slot: [self slot] channel: iChnl command: command];
+				writeCmdCtr++;
+				[command release];
+
 			}     // Determine if one should process one or all channels
 		}			  // Determine if parameter is writeable.
 	}				  // Loop through all parameters.
@@ -389,7 +392,10 @@ NSString* UVkWrite = @"W";
 	{
 		// LD command handles all channels at once so unit identifier is Sx followed by parameter followed
 		// by values for all 12 channels.
-		aCommand = [NSString stringWithFormat: @"LD S%d.%d %@", [self stationNumber], aCurChnl, param];
+		if ( aCurChnl == -1 )
+			aCommand = [NSString stringWithFormat: @"LD S%d %@", [self stationNumber], param];
+		else
+			aCommand = [NSString stringWithFormat: @"LD S%d.%d %@", [self stationNumber], aCurChnl, param];
 	}
 			
 	if ( [[aDictParamObj objectForKey: UVkType] isEqualTo: UVkINT] )
@@ -459,8 +465,8 @@ NSString* UVkWrite = @"W";
 	NSLog( @"%@\n", lastPollTimeMsg );
 
 	// Send notification of latest poll time.
-	NSDictionary* retMsg = [NSDictionary dictionaryWithObject: lastPollTimeMsg forKey: UVkErrorMsg]; 
-	[[NSNotificationCenter defaultCenter] postNotificationName: UVErrorNotification object: self userInfo: retMsg];
+	NSDictionary* retMsg = [NSDictionary dictionaryWithObject: lastPollTimeMsg forKey: HVkErrorMsg]; 
+	[[NSNotificationCenter defaultCenter] postNotificationName: HVShortErrorNotification object: self userInfo: retMsg];
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 //	[self getValues: -1];

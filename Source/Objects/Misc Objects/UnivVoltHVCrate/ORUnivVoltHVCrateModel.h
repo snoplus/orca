@@ -127,6 +127,8 @@ extern NSString* HVCrateConfigAvailableNotification;
 extern NSString* HVCrateEnetAvailableNotification;
 extern NSString* HVUnitInfoAvailableNotification ;
 extern NSString* HVSocketNotConnectedNotification;
+extern NSString* HVShortErrorNotification;
+extern NSString* HVLongErrorNotification;
 
 #pragma mark •••Constants for command queue dictionary entry and data return dictionary.
 // Data return dictionary extern definitions.
@@ -135,7 +137,7 @@ extern NSString* UVkChnl;
 extern NSString* UVkCommand;
 extern NSString* UVkReturn;
 
-extern NSString* UVkErrorMsg;
+extern NSString* HVkErrorMsg;
 
 
 
