@@ -554,7 +554,7 @@
 											   attr, TD_SYNTAX_COLORING_MODE_ATTR,
 											   nil];
 		BOOL						vIsEndChar = NO;
-		
+		BOOL						justExtit = NO;
 		while( ![vScanner isAtEnd] ){
 			int		vStartOffs,
 			vEndOffs;
@@ -563,18 +563,20 @@
 			// Look for start of string:
 			[vScanner scanUpToString: startCh intoString: nil];
 			vStartOffs = [vScanner scanLocation];
-			if( ![vScanner scanString:startCh intoString:nil] )
-				NS_VOIDRETURN;
-			
+			if( ![vScanner scanString:startCh intoString:nil] ) {
+				break;
+			}
 			while( !vIsEndChar && ![vScanner isAtEnd] )	{  // Loop until we find end-of-string marker or our text to color is finished:
 				[vScanner scanUpToString: endCh intoString: nil];
 				unsigned x = [vScanner scanLocation] -1;
 				
 				if( [[s string] characterAtIndex: x] != '\\' )	// Backslash before the end marker? That means ignore the end marker.
 					vIsEndChar = YES;	// A real one! Terminate loop.
-				if( ![vScanner scanString:endCh intoString:nil] )	// But skip this char before that.
-					NS_VOIDRETURN;
-				
+				if( ![vScanner scanString:endCh intoString:nil] ){	// But skip this char before that.
+					justExtit = YES;
+					break;
+					//NS_VOIDRETURN;
+				}
 				[progress animate:nil];
 			}
 			
@@ -582,7 +584,7 @@
 			
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, vEndOffs -vStartOffs )];
-			
+			if(justExtit)break;
 		}
 	}
 	@catch(NSException* localException) {
@@ -620,12 +622,11 @@
 			[vScanner scanUpToString: startCh intoString: nil];
 			vStartOffs = [vScanner scanLocation];
 			if( ![vScanner scanString:startCh intoString:nil] )
-				NS_VOIDRETURN;
+				break;
 			
 			// Look for associated end-of-comment marker:
 			[vScanner scanUpToString: endCh intoString: nil];
-			if( ![vScanner scanString:endCh intoString:nil] )
-			/*NS_VOIDRETURN*/;  // Don't exit. If user forgot trailing marker, indicate this by "bleeding" until end of string.
+			if( ![vScanner scanString:endCh intoString:nil] )break;
 			vEndOffs = [vScanner scanLocation];
 			
 			// Now mess with the string's styles:
@@ -656,8 +657,7 @@
 			// Look for start of one-line comment:
 			[vScanner scanUpToString: startCh intoString: nil];
 			vStartOffs = [vScanner scanLocation];
-			if( ![vScanner scanString:startCh intoString:nil] )
-				NS_VOIDRETURN;
+			if( ![vScanner scanString:startCh intoString:nil] )break;
 			
 			// Look for associated line break:
 			if( ![vScanner skipUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString: @"\n\r"]] );
@@ -703,7 +703,7 @@
 			// Look for start of identifier:
 			[vScanner scanUpToString: ident intoString: nil];
 			vStartOffs = [vScanner scanLocation];
-			if( ![vScanner scanString:ident intoString:nil] )  NS_VOIDRETURN;
+			if( ![vScanner scanString:ident intoString:nil] )  break;
 			
 			if( vStartOffs > 0 ) {	// Check that we're not in the middle of an identifier:
 				// Alphanum character before identifier start?
