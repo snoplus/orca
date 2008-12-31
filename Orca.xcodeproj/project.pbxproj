@@ -333,6 +333,7 @@
 		841DAAC507846CC20099BBF6 /* ORCamacControllerCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 841DAAC307846CC20099BBF6 /* ORCamacControllerCard.m */; };
 		84200CA206764C120048DFB4 /* ORSubPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84200CA006764C120048DFB4 /* ORSubPlotController.h */; };
 		84200CA306764C120048DFB4 /* ORSubPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84200CA106764C120048DFB4 /* ORSubPlotController.m */; };
+		842042070F0C082D00720846 /* Continue.tif in Resources */ = {isa = PBXBuildFile; fileRef = 842042060F0C082D00720846 /* Continue.tif */; };
 		84216070094F7F9E002E68B7 /* ORAdcModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8421606E094F7F9E002E68B7 /* ORAdcModel.h */; };
 		84216071094F7F9E002E68B7 /* ORAdcModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8421606F094F7F9E002E68B7 /* ORAdcModel.m */; };
 		8421607B094F861E002E68B7 /* adc.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8421607A094F861E002E68B7 /* adc.tif */; };
@@ -2321,6 +2322,7 @@
 		841DAAC307846CC20099BBF6 /* ORCamacControllerCard.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacControllerCard.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacControllerCard.m"; sourceTree = SOURCE_ROOT; };
 		84200CA006764C120048DFB4 /* ORSubPlotController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSubPlotController.h; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.h"; sourceTree = SOURCE_ROOT; };
 		84200CA106764C120048DFB4 /* ORSubPlotController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSubPlotController.m; path = "Source/Objects/Data Processing/Data Objects/ORSubPlotController.m"; sourceTree = SOURCE_ROOT; };
+		842042060F0C082D00720846 /* Continue.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Continue.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Continue.tif"; sourceTree = SOURCE_ROOT; };
 		8421606E094F7F9E002E68B7 /* ORAdcModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAdcModel.h; sourceTree = "<group>"; };
 		8421606F094F7F9E002E68B7 /* ORAdcModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORAdcModel.m; sourceTree = "<group>"; };
 		8421607A094F861E002E68B7 /* adc.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = adc.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/adc/adc.tif; sourceTree = SOURCE_ROOT; };
@@ -5352,6 +5354,7 @@
 				844357470B5AC9DB0033B918 /* Play.tif */,
 				844357480B5AC9DB0033B918 /* Stop.tif */,
 				84E18D5F0F0A7EFA0096F0F3 /* SingleStep.tif */,
+				842042060F0C082D00720846 /* Continue.tif */,
 				84E18D610F0A7EFA0096F0F3 /* Pause.tif */,
 				841924480F0BD91A00EF1C1C /* ScriptRunning.tif */,
 				844357490B5AC9DC0033B918 /* SyntaxDefinition.plist */,
@@ -9719,6 +9722,7 @@
 				84E18D660F0A7EFA0096F0F3 /* Pause.tif in Resources */,
 				841922810F0BC1E300EF1C1C /* ScriptIDE.nib in Resources */,
 				841924490F0BD91A00EF1C1C /* ScriptRunning.tif in Resources */,
+				842042070F0C082D00720846 /* Continue.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
