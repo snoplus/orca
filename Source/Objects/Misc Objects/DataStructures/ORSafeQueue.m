@@ -83,7 +83,7 @@
 -(id) dequeue
 {
     [queueLock lock];
-    id retval = [super dequeue];
+    id retval = [[[super dequeue]retain] autorelease];
     [queueLock unlock];
     return retval;
 }
@@ -92,7 +92,7 @@
 {
     NSMutableArray* theDataArray = nil;
 	[queueLock lock];
-    if([self count]){
+    if([super count]){
         theDataArray = [NSMutableArray array];
         while([super count]){
             [theDataArray addObject:[super dequeue]];
