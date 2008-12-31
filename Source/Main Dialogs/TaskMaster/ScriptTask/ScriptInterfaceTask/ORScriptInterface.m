@@ -53,7 +53,6 @@
 - (void) setDelegate:(id)aDelegate
 {
 	[super setDelegate:aDelegate];
-	[self argsChanged:nil];
 	[self breakChainChanged:nil];
     [self registerNotificationObservers];
 }
@@ -63,25 +62,14 @@
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    [notifyCenter addObserver : self
-                     selector : @selector(argsChanged:)
-                         name : ORScriptTaskArgsChanged
-                       object : delegate];
 
     [notifyCenter addObserver : self
                      selector : @selector(breakChainChanged:)
-                         name : ORScriptTaskBreakChainChanged
+                         name : ORScriptIDEModelBreakChainChanged
 						object: delegate];	
 
 }
 
-- (void) argsChanged:(NSNotification*)aNote
-{
-	int i;
-	for(i=0;i<kNumScriptArgs;i++){
-		[[argsMatrix cellWithTag:i] setObjectValue:[delegate arg:i]];
-	}
-}
 
 - (void) breakChainChanged:(NSNotification*)aNote
 {
@@ -89,19 +77,6 @@
 }
 
 #pragma mark ¥¥¥Actions
-
-- (IBAction) argAction:(id)sender
-{
-	int i = [[sender selectedCell] tag];
-	NSDecimalNumber* n;
-	NSString* s = [[sender selectedCell] stringValue];
-	if([s rangeOfString:@"x"].location != NSNotFound || [s rangeOfString:@"X"].location != NSNotFound){
-		unsigned long num = strtoul([s cStringUsingEncoding:NSASCIIStringEncoding],0,16);
-		n = (NSDecimalNumber*)[NSDecimalNumber numberWithUnsignedLong:num];
-	}
-	else n = [NSDecimalNumber decimalNumberWithString:s];
-	[delegate setArg:i withValue:n];
-}
 
 - (IBAction) editAction:(id)sender
 {
@@ -156,10 +131,6 @@
     [self setMessage:@"Idle"];
 }
 
-- (void) enableGUI:(BOOL)state
-{
-    [argsMatrix setEnabled:state];
-}
 
 
 - (NSString*) description
@@ -184,6 +155,5 @@
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
-    [encoder encodeObject:args forKey:@"args"];
 }
 @end

@@ -24,24 +24,19 @@
 #import "ORTask.h"
 @interface ORScriptInterface : ORTask
 {
-	IBOutlet NSMatrix*		argsMatrix;
 	IBOutlet NSButton*		breakChainButton;
-	NSMutableArray*			args;
 	BOOL					didStart;
 	BOOL					waitedOnce;
 }
 
 #pragma mark ¥¥¥Interface
 - (void) registerNotificationObservers;
-- (void) argsChanged:(NSNotification*)aNote;
 - (void) breakChainChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
-- (IBAction) argAction:(id)sender;
 - (IBAction) editAction:(id)sender;
 
 #pragma mark ¥¥¥Actions
-- (IBAction) argAction:(id) sender;
 - (IBAction) editAction:(id)sender;
 - (IBAction) breakChainAction:(id) sender;
 
