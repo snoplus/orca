@@ -17,7 +17,8 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
+#define kDebuggerPaused  1
+#define kDebuggerRunning 2
 
 @interface ORNodeEvaluator : NSObject {
 	NSMutableDictionary* symbolTable;
@@ -33,6 +34,14 @@
 	id					 delegate;
 	BOOL				 stop;
 	NSFileHandle*		 logFileHandle;
+	unsigned long		 lastLine;
+	BOOL				 debugging;
+	BOOL				 step;
+	BOOL				 paused;
+	BOOL				 continueRunning;
+	int					 debuggerState;
+	NSLock*				 symbolTableLock; 
+	NSMutableIndexSet*	 breakpoints;
 }
 
 #pragma mark •••Initialization
@@ -45,14 +54,23 @@
 - (NSString*) scriptName;
 - (void) setScriptName:(NSString*)aString;
 - (BOOL)	exitNow;
+- (int) debuggerState;
+- (void) setDebuggerState:(int)aState;
+- (void) setBreakpoints:(NSMutableIndexSet*)aSet;
 
 #pragma mark •••Symbol Table Routines
+- (void) setValue:(id)aValue forIndex:(int) anIndex;
+- (unsigned) symbolTableCount;
+- (id) symbolNameForIndex:(int)i;
+- (id) symbolValueForIndex:(int)i;
+- (NSMutableDictionary*) minSymbolTable;
 - (NSDictionary*) makeSymbolTableFor:(NSString*)functionName args:(id)argObject;
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable;
 - (void) setArgs:(id)someArgs;
 - (id) valueForSymbol:(NSString*) aSymbol;
 - (id) setValue:(id)aValue forSymbol:(id) aSymbol;
 - (void) setUpSysCallTable;
+- (long) lastLine;
 
 #pragma mark •••Finders
 - (id) findObject:(id) p;
@@ -63,7 +81,10 @@
 - (id)		execute:(id) p container:(id)aContainer;
 - (id)		printNode:(id) p;
 - (void)	printAll:(NSArray*)someNodes;
-
+- (void)	setDebugging:(BOOL)aState;
+- (void)	pauseRunning;
+- (void)	continueRunning;
+- (void)	singleStep;
 @end
 
 @interface ORSysCall : NSObject
@@ -73,15 +94,14 @@
 	int numArgs;
 	id anObject;
 }
-+(id) sysCall:(void*)aFuncPtr name:(NSString*)aFuncName numArgs:(int)aNumArgs;
-+(id) sysCall:(void*)aFuncPtr name:(NSString*)aFuncName obj:(id)anObject numArgs:(int)aNumArgs;
++ (id) sysCall:(void*)aFuncPtr name:(NSString*)aFuncName numArgs:(int)aNumArgs;
++ (id) sysCall:(void*)aFuncPtr name:(NSString*)aFuncName obj:(id)anObject numArgs:(int)aNumArgs;
 
--(id) initWithCall:(void*)afunc name:(NSString*)aFuncName obj:(id)anObject numArgs:(int)n;
+- (id) initWithCall:(void*)afunc name:(NSString*)aFuncName obj:(id)anObject numArgs:(int)n;
 - (id) executeWithArgs:(NSArray*)valueArray;
-
-
 @end
 
+extern NSString* ORNodeEvaluatorDebuggerStateChanged;
 
 @interface OrcaObject (ORNodeEvaluation)
 - (NSComparisonResult)compare:(NSNumber *)otherNumber;

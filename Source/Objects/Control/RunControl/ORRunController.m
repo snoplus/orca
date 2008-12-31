@@ -159,7 +159,7 @@
 
     [notifyCenter addObserver: self
                      selector: @selector(populatePopups)
-                         name: ORRunScriptNameChanged
+                         name: ORScriptIDEModelNameChanged
                        object: nil];
 
     [notifyCenter addObserver: self

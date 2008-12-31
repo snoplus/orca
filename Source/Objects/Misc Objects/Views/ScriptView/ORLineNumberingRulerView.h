@@ -17,31 +17,37 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@class ORLineMarker;
 
-extern const int MNNoLineNumbering;
-extern const int MNParagraphNumber;
-extern const int MNCharacterNumber;
-extern const int MNLineNumber;
-extern const int MNDrawBookmarks;
-
-@interface ORLineNumberingRulerView : NSRulerView {
-	
-	NSMutableDictionary*	marginAttributes;	
-	NSTextView*				textView;
-	NSLayoutManager*		layoutManager;
-	int						rulerOption;
+@interface ORLineNumberingRulerView : NSRulerView
+{
+    NSMutableArray      *lineIndices;		//Array of character indices for the beginning of each line
+	NSMutableDictionary	*linesToMarkers;	//Maps line numbers to markers
+	NSFont              *font;
+	NSColor				*textColor;
+	NSColor				*alternateTextColor;
+	NSColor				*backgroundColor;
+	NSImage				*markerImage;
 }
 
-- (void) setVisible:(BOOL)flag;
-- (BOOL) isVisible;
-- (void) setOption:(unsigned)option;
+- (id) initWithScrollView:(NSScrollView *)aScrollView;
 
-////// private
-- (unsigned) lineNumberAtIndex:(unsigned)charIndex;
+- (void) setFont:(NSFont *)aFont;
+- (NSFont*) font;
 
-- (void) drawEmptyMargin;
-- (void) drawNumbersInMargin;
-- (void) drawOneNumberInMargin:(unsigned) aNumber inRect:(NSRect)r ;
+- (void) setTextColor:(NSColor*)color;
+- (NSColor*) textColor;
 
-- (unsigned) characterIndexAtLocation:(float)pos;
+- (void) setAlternateTextColor:(NSColor*) color;
+- (NSColor*) alternateTextColor;
+
+- (void) setBackgroundColor:(NSColor*) color;
+- (NSColor*) backgroundColor;
+
+- (unsigned) lineNumberForLocation:(float)location;
+- (ORLineMarker*) markerAtLine:(unsigned)line;
+- (void) loadLineMarkers:(NSDictionary*)someLineMarkers;
+
 @end
+
+extern NSString* ORBreakpointsAction;

@@ -26,8 +26,10 @@
 #import "ORCamacCard.h"
 #import "NSInvocation+Extensions.h"
 #import "OrcaScript.tab.h"
-#import <math.h>
 #import "ORAlarmCollection.h"
+#import "NSNotifications+Extensions.h"
+
+NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateChanged";
 
 @interface ORNodeEvaluator (Interpret_private)
 - (id)		processStatements:(id) p;
@@ -81,6 +83,7 @@
 		_zero = [[NSDecimalNumber zero] retain];
 		switchLevel = 0;
 		[self setUpSysCallTable];
+		symbolTableLock = [[NSLock alloc] init];
 	}  
 	return self;  
 }
@@ -94,6 +97,8 @@
 	[_zero release];
 	[parsedNodes release];
 	[sysCallTable release];
+	[symbolTableLock release];
+	[breakpoints release];
 	[super dealloc];
 }
 
@@ -104,6 +109,13 @@
 
 
 #pragma mark •••Accessors
+- (void) setBreakpoints:(NSMutableIndexSet*)aSet
+{
+	[aSet retain];
+	[breakpoints release];
+	breakpoints = aSet;
+}
+
 - (void) setDelegate:(id)aDelegate
 {
 	delegate = aDelegate;
@@ -158,6 +170,69 @@
 		}
 	}
 }
+
+//------------------
+// external access to the 'min' set of symbols
+
+- (unsigned) symbolTableCount
+{
+	[symbolTableLock lock];
+
+	int theCount = [[self minSymbolTable] count];
+	[symbolTableLock unlock];
+	return theCount;
+}
+
+- (id) symbolNameForIndex:(int)i
+{
+	[symbolTableLock lock];
+	NSArray* keys = [[[self minSymbolTable] allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	id theName = [[[keys objectAtIndex:i] retain] autorelease];
+	[symbolTableLock unlock];
+
+	return theName;
+}
+
+- (id) symbolValueForIndex:(int)i
+{
+	[symbolTableLock lock];
+	NSMutableDictionary* subsetTable = [self minSymbolTable];
+	NSArray* keys = [[subsetTable allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	id theValue = [[[subsetTable objectForKey:[keys objectAtIndex:i]] retain] autorelease];
+	[symbolTableLock unlock];
+	
+	return theValue;
+}
+
+- (void) setValue:(id)aValue forIndex:(int) anIndex
+{
+	[symbolTableLock lock];
+	NSArray* keys = [[[self minSymbolTable] allKeys] sortedArrayUsingSelector:@selector(compare:)];
+	[symbolTable setObject:aValue forKey:[keys objectAtIndex:anIndex]];
+	[symbolTableLock unlock];	
+}
+//------------------
+
+
+- (NSMutableDictionary*) minSymbolTable
+{
+	NSMutableDictionary* minSymbolTable = [symbolTable mutableCopy];
+	
+	[minSymbolTable removeObjectsForKeys:[NSArray arrayWithObjects:	@"nil",
+																	@"NULL",
+																	@"FALSE",
+																	@"false",
+																	@"true",
+																	@"TRUE",
+																	@"no",
+																	@"NO",
+																	@"yes",
+																	@"YES",
+																	nil]];
+	 
+	return [minSymbolTable autorelease];
+}
+
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable
 {
 	if(!aSymbolTable)return;
@@ -168,7 +243,7 @@
 
 - (id) valueForSymbol:(NSString*) aKey
 {
-	id aValue  = [symbolTable objectForKey:aKey];
+	id aValue  = [symbolTable threadSafeObjectForKey:aKey usingLock:symbolTableLock];
 	if(!aValue){
 		aValue = [NSDecimalNumber zero];
 		[self setValue:aValue forSymbol:aKey];
@@ -183,7 +258,8 @@
 		aValue = [NSDecimalNumber zero];
 	}
 	if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
-	[symbolTable setObject:aValue forKey:aSymbol];
+	if(!aValue)aValue = [NSDecimalNumber zero];
+	[symbolTable threadSafeSetObject:aValue forKey:aSymbol usingLock:symbolTableLock];
 	return aValue;
 }
 
@@ -212,6 +288,31 @@
 	return nil;
 }
 
+- (void) setDebugging:(BOOL)aState;
+{
+	debugging = aState;
+}
+
+- (void) pauseRunning
+{
+	if(paused) paused = NO;
+	else	   paused = YES;
+}
+
+- (void) continueRunning
+{
+	continueRunning = YES;
+}
+
+- (void) singleStep
+{
+	step = YES;
+}
+- (long) lastLine
+{
+	return lastLine;
+}
+
 #pragma mark •••Individual Evaluators
 #define NodeValue(aNode) [self execute:[[p nodeData] objectAtIndex:aNode] container:nil]
 #define NodeValueWithContainer(aNode,aContainer) [self execute:[[p nodeData] objectAtIndex:aNode] container:aContainer]
@@ -219,6 +320,43 @@
 
 - (id) execute:(id) p container:(id)aContainer
 {
+	if(debugging){
+		unsigned long lineNumber = [p line];
+		BOOL atBreakPoint = NO;
+		if(lineNumber != 0){
+			if(lineNumber != lastLine){
+				lastLine = lineNumber;
+				if([breakpoints containsIndex:lineNumber] || paused){
+					atBreakPoint = YES;
+					paused = YES;
+				}
+			}	
+			if(atBreakPoint){
+				[self setDebuggerState:kDebuggerPaused];
+				do {
+					[NSThread sleepForTimeInterval:.1];
+					if(!debugging){
+						paused		 = NO;
+						atBreakPoint = NO;
+						step		 = NO;
+						break;
+					}
+					if(!paused){
+						atBreakPoint = NO;
+						step		 = NO;
+						break;
+					}
+					if(step){
+						step		 = NO;
+						atBreakPoint = NO;
+						break;
+					}
+				} while(1);
+				[self setDebuggerState:kDebuggerRunning];
+			}
+		}
+	}
+	
 	if([delegate exitNow])return 0;
     if (!p) return 0;
     switch([(Node*)p type]) {
@@ -233,6 +371,16 @@
 	return nil; //should never actually get here.
 }
 
+- (int) debuggerState
+{
+	return debuggerState;
+}
+
+- (void) setDebuggerState:(int)aState
+{
+	debuggerState = aState;
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNodeEvaluatorDebuggerStateChanged object:self];
+}
 
 #pragma mark •••Finders and Helpers
 - (id) findObject:(id) p
