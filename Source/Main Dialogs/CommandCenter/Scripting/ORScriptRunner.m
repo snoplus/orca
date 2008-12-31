@@ -22,9 +22,12 @@
 #import "ORScriptRunner.h"
 #import "NodeTree.h"
 #import "ORNodeEvaluator.h"
+#import "NSNotifications+Extensions.h"
 
 NSString* ORScriptRunnerRunningChanged = @"ORScriptRunnerRunningChanged";
 NSString* ORScriptRunnerParseError	   = @"ORScriptRunnerParseError";
+NSString* ORScriptRunnerDebuggerStateChanged	   = @"ORScriptRunnerDebuggerStateChanged";
+
 //========================================================================
 #pragma mark ¥¥¥YACC interface
 #import "OrcaScript.tab.h"
@@ -43,7 +46,6 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 @interface ORScriptRunner (private)
 - (void)    _evalMain:(id)someNodes;
-- (void)	postRunningChanged;
 - (void)	reportResult:(id)aResult;
 @end
 
@@ -67,6 +69,11 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 }
 
 #pragma mark ¥¥¥Accessors
+- (ORNodeEvaluator*) eval
+{
+	return eval;
+}
+
 - (BOOL)	exitNow
 {
 	return exitNow;
@@ -122,15 +129,56 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	return running;
 }
 
+- (BOOL) debugging
+{
+	return debugging;
+}
+
+- (void) setDebugging:(BOOL)aState
+{
+	debugging = aState;
+	if(running)[eval setDebugging:aState];
+}
+
 - (void) run:(id)someArgs sender:(id)aSender
 {
-	if(!running)[self evaluateAll:someArgs sender:aSender];
+	if(!running){
+		[self evaluateAll:someArgs sender:aSender];
+	}
+}
+
+- (void) pauseRunning
+{
+	if(debugging)[eval pauseRunning];
+}
+
+- (void) singleStep
+{
+	if(debugging)[eval singleStep];
+}
+
+- (void) continueRunning
+{
+	if(debugging)[eval continueRunning];
+}
+
+- (int) debuggerState
+{
+	if(debugging)return [eval debuggerState];
+	else return 0;
+}
+
+- (long) lastLine
+{
+	if(debugging)return [eval lastLine];
+	else return 0;
 }
 
 - (void) stop
 {
 	stopThread = YES;
 	exitNow = YES;;
+	if(debugging)[eval setDebugging:NO];
 }
 
 - (void) setFinishCallBack:(id)aTarget selector:(SEL)aSelector
@@ -138,6 +186,25 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	finishTarget	= aTarget;
 	finishSelector  = aSelector;
 }
+
+ - (unsigned) symbolTableCount
+{
+	return [eval symbolTableCount];
+}
+- (id) symbolNameForIndex:(int)i
+{
+	return [eval symbolNameForIndex:i];
+}
+
+- (id) symbolValueForIndex:(int)i
+{
+	return [eval symbolValueForIndex:i];
+}
+
+//- (id) minSymbolTable
+//{
+//	return [eval minSymbolTable];
+//}
 
 #pragma mark ¥¥¥Parsers
 
@@ -206,8 +273,14 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		}
 		theScriptRunner = nil;
 		[self setFunctionTable:functionList];
+		
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:ORNodeEvaluatorDebuggerStateChanged object:eval];
+		
 		[eval release];
 		eval = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(evalDebuggerStateChanged:) name:ORNodeEvaluatorDebuggerStateChanged object:eval];
+		
 		if(inputValue){
 			[eval setSymbolTable:[eval makeSymbolTableFor:@"main" args:[NSArray arrayWithObject:inputValue]]];
 		}
@@ -217,9 +290,17 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	return [self functionTable];
 }
 
+- (void) evalDebuggerStateChanged:(NSNotificationCenter*)aNote
+{
+	//just pass it on
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerDebuggerStateChanged object:self];
+	
+}
+
 #pragma mark ¥¥¥Group Evaluators
 - (void) stopThread
 {
+	[eval setDebugging:NO];
 	stopThread = YES;
 }
 
@@ -231,6 +312,9 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 - (void) evaluateAll:(id)someArgs sender:(id)aSender;
 {
 	if(!running){
+		
+		[eval setDebugging:debugging];
+		
 		exitNow	   = NO;
 		stopThread = NO;
 		[eval setScriptName:scriptName];
@@ -277,14 +361,17 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 {
 	running = YES;
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	[self performSelectorOnMainThread:@selector(postRunningChanged) withObject:nil waitUntilDone:YES];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerRunningChanged object:self userInfo:nil waitUntilDone:YES];
+
 	if([scriptName length])NSLog(@"Started %@\n",scriptName);
 	else NSLog(@"Started OrcaScript\n");
 	[someNodes retain];
 	
 	unsigned i;
 	unsigned numNodes = [someNodes count];
-	BOOL failed = NO;
+	BOOL failed		= NO;
+	BOOL reported	= NO;
 	for(i=0;i<numNodes;i++){
 		NSAutoreleasePool* innerPool = [[NSAutoreleasePool alloc] init];			
 		@try {
@@ -296,12 +383,14 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				NSDictionary* userInfo = [localException userInfo];
 				if(userInfo){
 					[self reportResult:[userInfo objectForKey:@"returnValue"]];
+					reported = YES;
 					[innerPool release];
 					break;
 				}
 			}
 			else if([[localException name] isEqualToString:@"exit"]){
 				[self reportResult:[NSDecimalNumber numberWithInt:0]];
+				reported = YES;
 				[innerPool release];
 				break;
 			}
@@ -314,8 +403,9 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		if(stopThread || failed){
 			if(stopThread){
 				NSLogColor([NSColor redColor],@"Script manually stopped\n");
-				[self reportResult:[NSDecimalNumber numberWithInt:0]];
 			}
+			[self reportResult:[NSDecimalNumber numberWithInt:0]];
+
 			break;
 		}
 	}	
@@ -323,18 +413,18 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		NSLogColor([NSColor redColor],@"Run Time Error....Abnormal Exit\n");
 	}
 	
+	if(!reported){
+		[self reportResult:[NSDecimalNumber numberWithInt:1]];
+	}
+	
 	[someNodes release];
 	if([scriptName length])NSLog(@"%@ Exited\n",scriptName);
 	else NSLog(@"OrcaScript Exited\n");
 	running = NO;
-	[self performSelectorOnMainThread:@selector(postRunningChanged) withObject:nil waitUntilDone:YES];
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerRunningChanged object:self userInfo:nil waitUntilDone:YES];
 	[pool release];
 }
 
-- (void) postRunningChanged
-{	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerRunningChanged object:self];
-}
 
 - (void) reportResult:(id)aResult
 {

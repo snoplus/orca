@@ -22,45 +22,31 @@
 #pragma mark ***Imported Files
 #import <Cocoa/Cocoa.h>
 #import "ORScriptTaskModel.h"
-#import "ORScriptRunner.h"
 #import "ORScriptInterface.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
+#import "ORScriptRunner.h"
 
-NSString* ORScriptTaskModelShowSuperClassChanged = @"ORScriptTaskModelShowSuperClassChanged";
-NSString* ORScriptTaskScriptChanged			= @"ORScriptTaskScriptChanged";
-NSString* ORScriptTaskNameChanged			= @"ORScriptTaskNameChanged";
-NSString* ORScriptTaskArgsChanged			= @"ORScriptTaskArgsChanged";
 NSString* ORScriptTaskBreakChainChanged		= @"ORScriptTaskBreakChainChanged";
-NSString* ORScriptTaskLastFileChangedChanged= @"ORScriptTaskLastFileChangedChanged";
-
 NSString*  ORScriptTaskInConnector			= @"ORScriptTaskInConnector";
 NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 
 @implementation ORScriptTaskModel
 
 #pragma mark ***Initialization
-- (id) init 
-{
-    self = [super init];
-    return self;
-}
 
 - (void) dealloc 
 {
     [task release];
     task = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[scriptName release];
-	[args release];
-	[scriptRunner release];
     [super dealloc];
 }
 
 -(void)makeMainController
 {
-    [self linkToController:@"ORScriptTaskController"];
+    [self linkToController:@"ORScriptIDEController"];
 }
 
 - (void) makeConnectors
@@ -160,21 +146,6 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 }
 
 #pragma mark ***Accessors
-
-- (BOOL) showSuperClass
-{
-    return showSuperClass;
-}
-
-- (void) setShowSuperClass:(BOOL)aShowSuperClass
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setShowSuperClass:showSuperClass];
-    
-    showSuperClass = aShowSuperClass;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptTaskModelShowSuperClassChanged object:self];
-}
-
 - (BOOL) breakChain
 {
 	return breakChain;
@@ -187,80 +158,6 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	[self setUpImage];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptTaskBreakChainChanged object:self];
 
-}
-
-- (NSString*) lastFile
-{
-	return lastFile;
-}
-
-- (void) setLastFile:(NSString*)aFile
-{
-	if(!aFile)aFile = [[NSHomeDirectory() stringByAppendingPathComponent:@"Untitled"] stringByExpandingTildeInPath];
-	[[[self undoManager] prepareWithInvocationTarget:self] setLastFile:lastFile];
-    [lastFile autorelease];
-    lastFile = [aFile copy];		
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptTaskLastFileChangedChanged object:self];
-}
-
-- (id) inputValue
-{
-	return inputValue;
-}
-
-- (void) setInputValue:(id)aValue
-{
-	[aValue retain];
-	[inputValue release];
-	inputValue = aValue;
-}
-
-- (NSString*) script
-{
-	return script;
-}
-
-- (void) setScript:(NSString*)aString
-{
-	if(!aString)aString= @"";
-    //[[[self undoManager] prepareWithInvocationTarget:self] setScript:script];
-    [script autorelease];
-    script = [aString copy];	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptTaskScriptChanged object:self];
-}
-
-- (void) setScriptNoNote:(NSString*)aString
-{
-    [script autorelease];
-    script = [aString copy];	
-}
-
-- (NSString*) scriptName
-{
-	return scriptName;
-}
-
-- (void) setScriptName:(NSString*)aString
-{
-	if(!aString)aString = @"OrcaScript";
-    [[[self undoManager] prepareWithInvocationTarget:self] setScriptName:scriptName];
-	[task setTitle:scriptName];
-    [scriptName autorelease];
-    scriptName = [aString copy];	
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptTaskNameChanged object:self];
-}
-
-- (id) arg:(int)index
-{
-	if(index>=0 && index<[args count])return [args objectAtIndex:index];
-	else return nil;
-}
-
-- (void) setArg:(int)index withValue:(id)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setArg:index withValue:[self arg:index]];
-	[args replaceObjectAtIndex:index withObject:aValue];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptTaskArgsChanged object:self];
 }
 
 #pragma mark ***Data ID
@@ -302,100 +199,9 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 }
 
 #pragma mark ***Script Methods
-- (ORScriptRunner*) scriptRunner
+- (id) nextScriptConnector
 {
-	return scriptRunner;
-}
-- (BOOL) parsedOK
-{
-	return parsedOK;
-}
-
-- (void) parseScript
-{
-	parsedOK = YES;
-	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
-	if(![scriptRunner running]){
-		[scriptRunner setScriptName:scriptName];
-		[scriptRunner parse:script];
-		parsedOK = [scriptRunner parsedOK];
-		if(([[NSApp currentEvent] modifierFlags] & 0x80000)>0){
-			//option key is down
-			[scriptRunner printAll];
-		}
-		[scriptRunner release];
-		scriptRunner = nil;
-	}
-}
-
-- (void) runScript
-{
-	parsedOK = YES;
-	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
-	if(![scriptRunner running]){
-		[scriptRunner setScriptName:scriptName];
-		[scriptRunner setInputValue:inputValue];
-		[scriptRunner parse:script];
-		parsedOK = [scriptRunner parsedOK];
-		if(parsedOK){
-			[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
-			[scriptRunner run:args sender:self];
-		}
-	}
-	else {
-		[scriptRunner stop];
-		[scriptRunner release];
-		scriptRunner = nil;
-		[task hardHaltTask];
-	}
-}
-
-
-- (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue
-{
-	[self setInputValue:nil];
-	if(normalFinish && !breakChain){
-		ORScriptTaskModel* nextScriptTask =  [self objectConnectedTo: ORScriptTaskOutConnector];
-		[nextScriptTask setInputValue:aValue];
-		[nextScriptTask runScript];
-	}
-	if(normalFinish)NSLog(@"[%@] Returned with: %@\n",[scriptRunner scriptName],aValue);
-	else NSLogColor([NSColor redColor],@"[%@] Abnormal exit!\n",[scriptRunner scriptName]);
-
-}
-
-- (void) stopScript
-{
-	[scriptRunner stop];
-	[scriptRunner release];
-	scriptRunner = nil;
-}
-
-- (BOOL) running
-{
-	return [scriptRunner running];
-}
-
-- (void) loadScriptFromFile:(NSString*)aFilePath
-{
-	[self setLastFile:aFilePath];
-	[self setScript:[NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]]];
-}
-
-- (void) saveFile
-{
-	[self saveScriptToFile:lastFile];
-}
-
-- (void) saveScriptToFile:(NSString*)aFilePath
-{
-	NSFileManager* fm = [NSFileManager defaultManager];
-	if([fm fileExistsAtPath:[aFilePath stringByExpandingTildeInPath]]){
-		[fm removeFileAtPath:[aFilePath stringByExpandingTildeInPath] handler:nil];
-	}
-	NSData* theData = [script dataUsingEncoding:NSASCIIStringEncoding];
-	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
-	[self setLastFile:aFilePath];
+	return ORScriptTaskOutConnector;
 }
 
 #pragma mark ¥¥¥Archival
@@ -405,20 +211,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     
     [[self undoManager] disableUndoRegistration];
 	
-    [self setShowSuperClass:[decoder decodeBoolForKey:@"showSuperClass"]];
     [self setBreakChain:[decoder decodeBoolForKey:@"breakChain"]];
-    [self setScript:[decoder decodeObjectForKey:@"script"]];
-    [self setScriptName:[decoder decodeObjectForKey:@"scriptName"]];
-    [self setLastFile:[decoder decodeObjectForKey:@"lastFile"]];
-    args = [[decoder decodeObjectForKey:@"args"] retain];
-
-	if(!args){
-		args = [[NSMutableArray array] retain];
-		int i;
-		for(i=0;i<kNumScriptArgs;i++){
-			[args addObject:[NSDecimalNumber zero]];
-		}
-	}
 	
     task = [[decoder decodeObjectForKey:@"task"] retain];
     [self installTasks:nil];
@@ -432,12 +225,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:showSuperClass forKey:@"showSuperClass"];
     [encoder encodeObject:task forKey:@"task"];
-    [encoder encodeObject:script forKey:@"script"];
-    [encoder encodeObject:scriptName forKey:@"scriptName"];
-    [encoder encodeObject:args forKey:@"args"];
-    [encoder encodeObject:lastFile forKey:@"lastFile"];
     [encoder encodeBool:breakChain forKey:@"breakChain"];
 }
 

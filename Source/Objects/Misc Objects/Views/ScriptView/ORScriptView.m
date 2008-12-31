@@ -54,16 +54,11 @@
 	[self setUsesFindPanel:YES];
 	NSScrollView* scrollView = [self enclosingScrollView];
 	
-	ORLineNumberingRulerView* aNumberingRulerView =  [[ORLineNumberingRulerView alloc] initWithScrollView:scrollView orientation:NSVerticalRuler];
-	[scrollView setVerticalRulerView:aNumberingRulerView ];
-	
-	[scrollView setHasVerticalRuler:YES];
-	[scrollView setHasHorizontalRuler:NO];
-	
-	[scrollView setRulersVisible:YES];
-	
-	[aNumberingRulerView release];
-	
+	ORLineNumberingRulerView* lineNumberView = [[ORLineNumberingRulerView alloc] initWithScrollView:scrollView];
+    [scrollView setVerticalRulerView:lineNumberView];
+    [scrollView setHasHorizontalRuler:NO];
+    [scrollView setHasVerticalRuler:YES];
+    [scrollView setRulersVisible:YES];
 	
 	autoSyntaxColoring = YES;
 	maintainIndentation = YES;
@@ -85,14 +80,13 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(colorsChanged:)
 												 name: ORSyntaxColorChangedNotification
 											   object: nil];
-	
+		
 	// Put selection at top like Project Builder has it, so user sees it:
 	[self setSelectedRange: NSMakeRange(0,0)];
 	[self turnOffWrapping];
 	[self recolorCompleteFile:nil];
 	[self colorsChanged:nil];
 }
-
 
 - (void) colorsChanged: (NSNotification*)notification
 {
@@ -105,6 +99,21 @@
 	
 }
 
+- (void) unselectAll
+{
+	[self setSelectedRange: NSMakeRange(0,0)];
+}
+
+- (void) selectLine:(unsigned long)aLine
+{
+	NSString* originalText = [[self textStorage] string];
+	NSArray* lines = [originalText componentsSeparatedByString:@"\n"];
+	if([lines count] > aLine){
+		NSString* lineToSelect = [lines objectAtIndex:aLine];
+		NSRange selectionRange = [originalText rangeOfString:lineToSelect]; 
+		[self setSelectedRange: selectionRange];
+	}
+}
 - (void) processEditing: (NSNotification*)notification
 {
     NSTextStorage				*textStorage = [notification object];
@@ -775,5 +784,14 @@
 	}
 }
 
+- (BOOL) breakPointAtLine:(unsigned)aLineNumber
+{
+	NSScrollView* scrollView = [self enclosingScrollView];
+	id theRuler = [scrollView verticalRulerView];
+	if([ORLineNumberingRulerView isKindOfClass:[ORLineNumberingRulerView class]]){
+		return [(ORLineNumberingRulerView*)theRuler markerAtLine:aLineNumber] != nil;
+	}
+	else return NO;
+}
 
 @end

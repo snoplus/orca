@@ -21,27 +21,29 @@
 @class ORNodeEvaluator;
 
 @interface ORScriptRunner : NSObject {
-	@private
-		id					 finishTarget;
-		SEL					 finishSelector;
-		unsigned			 yaccInputPosition;
-		BOOL				 stopThread;
-		BOOL				 running;
-		BOOL				 parsedOK;
-		BOOL				 normalExit;
-		id					 returnValue;
-		NSData*				 expressionAsData;
-		NSString*			 scriptName;
-		
-		NSMutableDictionary* functionTable;
-		ORNodeEvaluator*	eval;
-		id					inputValue;
-		BOOL				exitNow;
-		BOOL				scriptExists;
-
+@private
+	id					 finishTarget;
+	SEL					 finishSelector;
+	unsigned			 yaccInputPosition;
+	BOOL				 stopThread;
+	BOOL				 running;
+	BOOL				 parsedOK;
+	BOOL				 normalExit;
+	id					 returnValue;
+	NSData*				 expressionAsData;
+	NSString*			 scriptName;
+	
+	NSMutableDictionary* functionTable;
+	ORNodeEvaluator*	eval;
+	id					inputValue;
+	BOOL				exitNow;
+	BOOL				scriptExists;
+	BOOL				debugging;
+	
 } 
 
 #pragma mark ¥¥¥Accessors
+- (ORNodeEvaluator*) eval;
 - (BOOL)	exitNow;
 - (id)		inputValue;
 - (void)	setInputValue:(id)aValue;
@@ -55,10 +57,22 @@
 - (void)	 setArgs:(NSArray*)args;
 
 #pragma mark ¥¥¥Run Methods
+- (BOOL) debugging;
+- (void) setDebugging:(BOOL)aState;
 - (BOOL) running;
 - (void) run:(id) someArgs  sender:(id)aSender;
 - (void) stop;
 - (void) setFinishCallBack:(id)aTarget selector:(SEL)aSelector;
+- (void) pauseRunning;
+- (void) continueRunning;
+- (void) singleStep;
+- (unsigned) symbolTableCount;
+- (id) symbolNameForIndex:(int)i;
+- (id) symbolValueForIndex:(int)i;
+///- (id) minSymbolTable;
+- (void) evalDebuggerStateChanged:(NSNotificationCenter*)aNote;
+- (long) lastLine;
+- (int) debuggerState;
 
 #pragma mark ¥¥¥Parsers
 - (id)		 parseFile:(NSString*) aPath;
@@ -73,5 +87,6 @@
 
 @end
 
+extern NSString* ORScriptRunnerDebuggerStateChanged;
 extern NSString* ORScriptRunnerRunningChanged;
 extern NSString* ORScriptRunnerParseError;
