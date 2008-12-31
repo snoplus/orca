@@ -496,7 +496,11 @@
 	}
 	else if(aTable == debuggerTableView) {
 		if([[aCol identifier] isEqualToString:@"Name"])return [[model evaluator] symbolNameForIndex:aRow];
-		else return [[model evaluator] symbolValueForIndex:aRow];
+		else {
+			id aValue = [[model evaluator] symbolValueForIndex:aRow];
+			if([aValue isKindOfClass:[OrcaObject class]]) return [NSString stringWithFormat:@"<%@>",[aValue className]];
+			else return aValue;
+		}
 	}
 	else return nil;
 }
@@ -508,8 +512,18 @@
 	}
 	else if(aTable == debuggerTableView) {
 		if([[aCol identifier] isEqualToString:@"Value"]){
-			NSDecimalNumber* aNumber = [NSDecimalNumber decimalNumberWithString:aData];
-			[[model evaluator] setValue:aNumber forIndex:aRow];
+			//what is the type? Just check for all numbers;
+			id oldValue = [[model evaluator] symbolValueForIndex:aRow];
+			if([oldValue isKindOfClass:[NSDecimalNumber class]] ){				
+				NSDecimalNumber* aNumber = [NSDecimalNumber decimalNumberWithString:aData];
+				if(![aNumber isEqualToNumber:[NSDecimalNumber notANumber]]){
+					[[model evaluator] setValue:aNumber forIndex:aRow];
+				}
+			}
+			else if([oldValue isKindOfClass:[NSString class]] ){
+				[[model evaluator] setValue:aData forIndex:aRow];
+			}
+			//else don't allow changes
 		}
 	}
  
