@@ -386,7 +386,7 @@
 - (IBAction) nameAction:(id) sender
 {
 	[model setScriptName:[sender stringValue]];
-	[[self window] setTitle:[NSString stringWithFormat:@"Run Script: %@",[model scriptName]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Script: %@",[model scriptName]]];
 }
 
 
