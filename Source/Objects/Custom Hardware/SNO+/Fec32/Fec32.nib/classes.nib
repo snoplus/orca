@@ -151,6 +151,8 @@
 				<string>id</string>
 				<key>probeAction</key>
 				<string>id</string>
+				<key>readCmosRatesAction</key>
+				<string>id</string>
 				<key>readVoltagesAction</key>
 				<string>id</string>
 				<key>showVoltsAction</key>
@@ -179,6 +181,14 @@
 				<key>boardIdField</key>
 				<string>NSTextField</string>
 				<key>cmosMatrix</key>
+				<string>NSMatrix</string>
+				<key>cmosRates0LabelsMatrix</key>
+				<string>NSMatrix</string>
+				<key>cmosRates0Matrix</key>
+				<string>NSMatrix</string>
+				<key>cmosRates1LabelsMatrix</key>
+				<string>NSMatrix</string>
+				<key>cmosRates1Matrix</key>
 				<string>NSMatrix</string>
 				<key>commentsTextField</key>
 				<string>NSTextField</string>
