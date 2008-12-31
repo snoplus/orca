@@ -111,18 +111,10 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     }
 }
 
-// ===========================================================
-// - taskState:
-// ===========================================================
-
 - (ORTaskState)taskState
 {
     return taskState;
 }
-
-// ===========================================================
-// - setTaskState:
-// ===========================================================
 
 - (void)setTaskState:(ORTaskState)aState
 {
@@ -144,18 +136,10 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
 }
 
 
-// ===========================================================
-// - timeDelay:
-// ===========================================================
-
 - (NSTimeInterval)timeDelay
 {
     return timeDelay;
 }
-
-// ===========================================================
-// - setTimeDelay:
-// ===========================================================
 
 - (void)setTimeDelay:(NSTimeInterval)aTimeDelay
 {
@@ -165,18 +149,10 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     [timeDelayField setIntValue:timeDelay];
 }
 
-// ===========================================================
-// - timeInterval:
-// ===========================================================
-
 - (NSTimeInterval)timeInterval
 {
     return timeInterval;
 }
-
-// ===========================================================
-// - setTimeInterval:
-// ===========================================================
 
 - (void)setTimeInterval:(NSTimeInterval)aTimeInterval
 {
@@ -186,18 +162,10 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     [timeIntervalField setIntValue:timeInterval];
 }
 
-// ===========================================================
-// - startIsDelayed:
-// ===========================================================
-
 - (BOOL)startIsDelayed
 {
     return startIsDelayed;
 }
-
-// ===========================================================
-// - setStartIsDelayed:
-// ===========================================================
 
 - (void)setStartIsDelayed:(BOOL)flag
 {
@@ -206,18 +174,11 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     [delayStartCB setState:!startIsDelayed];
     [self updateButtons];
 }
-// ===========================================================
-// - delegate:
-// ===========================================================
 
 - (id)delegate
 {
     return delegate; 
 }
-
-// ===========================================================
-// - setDelegate:
-// ===========================================================
 
 - (void)setDelegate:(id)aDelegate
 {
@@ -246,18 +207,10 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
     
 }
 
-// ===========================================================
-// - willRepeat:
-// ===========================================================
-
 - (BOOL)willRepeat
 {
     return willRepeat;
 }
-
-// ===========================================================
-// - setWillRepeat:
-// ===========================================================
 
 - (void)setWillRepeat:(BOOL)flag
 {

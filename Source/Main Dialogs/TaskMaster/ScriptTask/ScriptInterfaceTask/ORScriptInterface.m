@@ -21,6 +21,7 @@
 
 #import "ORScriptInterface.h"
 #import "ORScriptTaskModel.h"
+#import "ORScriptRunner.h"
 
 @implementation ORScriptInterface
 -(id)	init
@@ -68,12 +69,33 @@
                          name : ORScriptIDEModelBreakChainChanged
 						object: delegate];	
 
+    [notifyCenter addObserver : self
+                     selector : @selector(nameChanged:)
+                         name : ORScriptIDEModelNameChanged
+						object: delegate];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(runningChanged:)
+                         name : ORScriptRunnerRunningChanged
+						object: [delegate scriptRunner]];	
+	
 }
 
 
 - (void) breakChainChanged:(NSNotification*)aNote
 {
 	[breakChainButton setState:[delegate breakChain]];
+}
+
+- (void) nameChanged:(NSNotification*)aNote
+{
+	[self setTitle:[delegate scriptName]];
+}
+
+- (void) runningChanged:(NSNotification*)aNote
+{
+	if([delegate running])[self setMessage:@"Running"];
+	else [self setMessage:@"Idle"];
 }
 
 #pragma mark ¥¥¥Actions

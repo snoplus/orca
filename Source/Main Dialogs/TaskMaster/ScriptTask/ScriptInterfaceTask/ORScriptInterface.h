@@ -32,9 +32,8 @@
 #pragma mark ¥¥¥Interface
 - (void) registerNotificationObservers;
 - (void) breakChainChanged:(NSNotification*)aNote;
-
-#pragma mark ¥¥¥Actions
-- (IBAction) editAction:(id)sender;
+- (void) nameChanged:(NSNotification*)aNote;
+- (void) runningChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) editAction:(id)sender;
