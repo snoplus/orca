@@ -102,10 +102,8 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 - (id) init
 {
 	self = [super init];
-	
 	theSplashController = [[ORSplashWindowController alloc] init];
 	[theSplashController showWindow:self];
-	
 	return self;
 }
 
@@ -114,8 +112,6 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [alarmCollection release];
     [memoryWatcher release];
-    [[ORCommandCenterController sharedCommandCenterController] release];
-    [[ORCARootServiceController sharedORCARootServiceController] release];
     [super dealloc];
 }    
 
@@ -124,21 +120,19 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     [self registerNotificationObservers];
     [self setAlarmCollection:[[[ORAlarmCollection alloc] init] autorelease]];
     [self setMemoryWatcher:[[[MemoryWatcher alloc] init] autorelease]];
-	
 }
-
 
 - (MemoryWatcher*) memoryWatcher
 {
     return memoryWatcher;
 }
+
 - (void) setMemoryWatcher:(MemoryWatcher*)aWatcher
 {
 	[aWatcher retain];
 	[memoryWatcher release];
 	memoryWatcher = aWatcher;
 }
-
 
 - (ORAlarmCollection*) alarmCollection
 {
@@ -152,20 +146,16 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	alarmCollection = someAlarms;
 }
 
-
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers
 {
-	
 }
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification
+- (void) applicationWillTerminate:(NSNotification *)aNotification
 {
 	[[ORProcessCenter sharedProcessCenter] stopAll:nil];
 	[ORTimer delay:0.3];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[ORCommandCenterController sharedCommandCenterController] release];
-    [[ORCARootServiceController sharedORCARootServiceController] release];
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORAppTerminating" object:self];
 }
 
@@ -255,6 +245,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 
 - (IBAction) terminate:(id)sender
 {
+	[[ORCommandCenter sharedCommandCenter] closeScriptIDE];
 	[[ORProcessCenter sharedProcessCenter] stopAll:nil];
 	[ORTimer delay:1];
 	

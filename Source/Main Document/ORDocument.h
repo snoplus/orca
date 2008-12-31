@@ -89,6 +89,7 @@
 - (void)    saveDefaultFileName;
 - (void)    windowMovedToFront:(NSWindowController*)aController;
 - (void)    checkControllers;
+- (NSArray*) controllersToSave;
 - (void)	saveFinished;
 - (void)	afterSaveDo:(SEL)aSelector withTarget:(id)aTarget;
 

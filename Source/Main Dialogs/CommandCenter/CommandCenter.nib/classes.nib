@@ -1,65 +1,147 @@
-{
-    IBClasses = (
-        {
-            ACTIONS = {"" = id; }; 
-            CLASS = FirstResponder; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {
-            ACTIONS = {
-                argAction = id; 
-                cancelLoadSaveAction = id; 
-                doCmdAction = id; 
-                listMethodsAction = id; 
-                loadFileAction = id; 
-                loadSaveAction = id; 
-                parseScript = id; 
-                processFileAction = id; 
-                runScript = id; 
-                saveAsFileAction = id; 
-                saveFileAction = id; 
-                setPortAction = id; 
-            }; 
-            CLASS = ORCommandCenterController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                argsMatrix = NSMatrix; 
-                argsView = NSView; 
-                checkButton = NSButton; 
-                classNameField = NSTextField; 
-                clientCountField = NSTextField; 
-                clientListView = NSTableView; 
-                cmdField = NSTextField; 
-                helpDrawer = NSDrawer; 
-                helpView = NSTextView; 
-                lastFileField = NSTextField; 
-                lastFileField1 = NSTextField; 
-                loadSaveButton = NSButton; 
-                loadSaveView = id; 
-                panelView = NSView; 
-                portField = NSTextField; 
-                runButton = NSButton; 
-                scriptView = ORScriptView; 
-                statusField = ORTimedTextField; 
-            }; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {
-            ACTIONS = {
-                recolorCompleteFile = id; 
-                recolorCompleteFileDeferred = id; 
-                recolorSyntaxTimer = id; 
-                toggleAutoSyntaxColoring = id; 
-                toggleMaintainIndentation = id; 
-            }; 
-            CLASS = ORScriptView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {progress = NSProgressIndicator; status = NSTextField; }; 
-            SUPERCLASS = NSTextView; 
-        }, 
-        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>doCmdAction</key>
+				<string>id</string>
+				<key>processFileAction</key>
+				<string>id</string>
+				<key>scriptIDEAction</key>
+				<string>id</string>
+				<key>setPortAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORCommandCenterController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>argsMatrix</key>
+				<string>NSMatrix</string>
+				<key>argsView</key>
+				<string>NSView</string>
+				<key>checkButton</key>
+				<string>NSButton</string>
+				<key>clientCountField</key>
+				<string>NSTextField</string>
+				<key>clientListView</key>
+				<string>NSTableView</string>
+				<key>cmdField</key>
+				<string>NSTextField</string>
+				<key>helpDrawer</key>
+				<string>NSDrawer</string>
+				<key>helpView</key>
+				<string>NSTextView</string>
+				<key>loadSaveButton</key>
+				<string>NSButton</string>
+				<key>loadSaveView</key>
+				<string>id</string>
+				<key>panelView</key>
+				<string>NSView</string>
+				<key>portField</key>
+				<string>NSTextField</string>
+				<key>runButton</key>
+				<string>NSButton</string>
+				<key>scriptView</key>
+				<string>ORScriptView</string>
+				<key>statusField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key></key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>recolorCompleteFile</key>
+				<string>id</string>
+				<key>recolorCompleteFileDeferred</key>
+				<string>id</string>
+				<key>recolorSyntaxTimer</key>
+				<string>NSTimer</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>toggleAutoSyntaxColoring</key>
+				<string>id</string>
+				<key>toggleMaintainIndentation</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORScriptView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>progress</key>
+				<string>NSProgressIndicator</string>
+				<key>status</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSTextView</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

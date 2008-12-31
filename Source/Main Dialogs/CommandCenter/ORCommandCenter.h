@@ -25,6 +25,7 @@
 @class NetSocket;
 @class ORCommandClient;
 @class ORScriptRunner;
+@class ORScriptIDEModel;
 
 #pragma mark •••Definitions
 #define kORCommandPort 4667
@@ -36,15 +37,12 @@
     NetSocket*              serverSocket;
     NSMutableArray*         clients;
     NSTimer*				heartBeatTimer;
-	NSMutableArray*			args;
 
 	NSString*				script;
-	ORScriptRunner*			scriptRunner;
-	BOOL					parsedOK;
-	NSString*				lastFile;
 	
 	unsigned				historyIndex;
 	NSMutableArray*			history;
+	ORScriptIDEModel*		scriptIDEModel;
 }
 
 + (ORCommandCenter*) sharedCommandCenter;
@@ -52,10 +50,10 @@
 - (void) registerNotificationObservers;
 - (void) serve;
 - (NSUndoManager *)undoManager;
+- (void) openScriptIDE;
+- (void) closeScriptIDE;
 
 #pragma mark •••Accessors
-- (id) arg:(int)index;
-- (void) setArg:(int)index withValue:(id)aValue;
 - (NSDictionary*) destinationObjects;
 - (void) setDestinationObjects:(NSMutableDictionary*)newDestinationObjects;
 - (void) addDestination:(id)obj;
@@ -75,21 +73,8 @@
 - (void) timeToBeat:(NSTimer*)aTimer;
 - (NSString*) script;
 - (void) setScript:(NSString*)aString;
-- (void) setScriptNoNote:(NSString*)aString;
-- (BOOL) parsedOK;
-- (ORScriptRunner*) scriptRunner;
-- (NSString*) lastFile;
-- (void) setLastFile:(NSString*)aFile;
+- (ORScriptIDEModel*) scriptIDEModel;
 
-#pragma mark ***Script Methods
-- (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
-- (void) parseScript;
-- (void) runScript;
-- (BOOL) running;
-- (void) stopScript;
-- (void) loadScriptFromFile:(NSString*)aFilePath;
-- (void) saveFile;
-- (void) saveScriptToFile:(NSString*)aFilePath;
 - (void) moveInHistoryDown;
 - (void) moveInHistoryUp;
 

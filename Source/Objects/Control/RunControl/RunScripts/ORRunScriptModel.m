@@ -29,11 +29,6 @@
 
 #pragma mark ***Initialization
 
-- (void) makeMainController
-{
-    [self linkToController:@"ORScriptIDEController"];
-}
-
 - (void) connectionChanged
 {
 	[self setUpImage];

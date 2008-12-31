@@ -18,9 +18,9 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark •••Imported Files
 #import "ORTimedTextField.h"
+
 #pragma mark •••Forward Declarations
 @class ORCommandCenter;
 @class ORScriptView;
@@ -46,9 +46,6 @@
 	IBOutlet NSMatrix*			argsMatrix;
 	IBOutlet NSView*			argsView;
 	
-    IBOutlet NSTextField*		classNameField;
-    IBOutlet NSTextField*		lastFileField;
-    IBOutlet NSTextField*		lastFileField1;
 }
 
 #pragma mark •••Initialization
@@ -66,29 +63,15 @@
 
 #pragma mark •••Actions
 - (void)	 sendCommand:(NSString*)aCmd;
-- (IBAction) argAction:(id) sender;
 - (IBAction) setPortAction:(id) sender;
 - (IBAction) doCmdAction:(id) sender;
 - (IBAction) processFileAction:(id) sender;
-- (IBAction) cancelLoadSaveAction:(id)sender;
-- (IBAction) loadSaveAction:(id)sender;
-- (IBAction) parseScript:(id) sender;
-- (IBAction) runScript:(id) sender;
-- (IBAction) loadFileAction:(id) sender;
-- (IBAction) saveFileAction:(id) sender;
-- (IBAction) saveAsFileAction:(id) sender;
-- (IBAction) listMethodsAction:(id) sender;
+- (IBAction) scriptIDEAction:(id) sender;
 
 #pragma mark •••Interface Management
-- (void) lastFileChanged:(NSNotification*)aNote;
 - (void) commandChanged:(NSNotification*)aNote;
-- (void) argsChanged:(NSNotification*)aNote;
 - (void) portChanged:(NSNotification*)aNotification;
 - (void) clientsChanged:(NSNotification*)aNotification;
-- (void) scriptChanged:(NSNotification*)aNote;
-- (void) runningChanged:(NSNotification*)aNote;
-- (void) textDidChange:(NSNotification*)aNote;
-- (void) errorChanged:(NSNotification*)aNote;
 - (BOOL) control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command;
 
 @end

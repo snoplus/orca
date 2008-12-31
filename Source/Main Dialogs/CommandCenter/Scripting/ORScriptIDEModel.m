@@ -47,6 +47,11 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
     [super dealloc];
 }
 
+- (void) makeMainController
+{
+    [self linkToController:@"ORScriptIDEController"];
+}
+
 #pragma mark ***Accessors
 - (BOOL) breakChain
 {
@@ -85,6 +90,7 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 
 - (NSString*) comments
 {
+	if(!comments)return @"";
     return comments;
 }
 
@@ -115,7 +121,8 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 
 - (NSString*) lastFile
 {
-	return lastFile;
+	if(!lastFile)return @"";
+	else return lastFile;
 }
 
 - (void) setLastFile:(NSString*)aFile
@@ -129,6 +136,7 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 
 - (NSString*) script
 {
+	if(!script)return @"";
 	return script;
 }
 
@@ -143,12 +151,14 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 
 - (void) setScriptNoNote:(NSString*)aString
 {
+	if(!aString)aString= @"";
     [script autorelease];
     script = [aString copy];	
 }
 
 - (NSString*) scriptName
 {
+	if(!scriptName)return @"ORCAScript";
 	return scriptName;
 }
 

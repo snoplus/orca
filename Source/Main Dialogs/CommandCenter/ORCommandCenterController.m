@@ -21,15 +21,12 @@
 
 #import "ORCommandCenterController.h"
 #import "ORCommandCenter.h"
-#import "ORScriptRunner.h"
-#import "ORScriptView.h"
 #import "Utilities.h"
 #import "SynthesizeSingleton.h"
+#import "ORScriptIDEModel.h"
 
 @interface ORCommandCenterController (private)
 - (void)_processFilePanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
-- (void) saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
 
 @implementation ORCommandCenterController
@@ -53,9 +50,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
 {
 	
     [self registerNotificationObservers];
-	[panelView addSubview:argsView];
-	NSString*   path = [[NSBundle mainBundle] pathForResource: @"OrcaScriptGuide" ofType: @"rtf"];
-	[helpView readRTFDFromFile:path];
     [self updateWindow];
 	[cmdField setDelegate:self];
 }
@@ -65,18 +59,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
     return [[self commandCenter]  undoManager];
 }
 
-
 #pragma mark •••Accessors
 - (ORCommandCenter*) commandCenter
 {
     return [ORCommandCenter sharedCommandCenter];
 }
 
-- (NSString *)lastPath {
+- (NSString *)lastPath 
+{
     return lastPath;
 }
 
-- (void)setLastPath:(NSString *)aLastPath {
+- (void)setLastPath:(NSString *)aLastPath 
+{
     [lastPath autorelease];
     lastPath = [aLastPath copy];
 }
@@ -96,50 +91,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
                          name : ORCommandClientsChangedNotification
                        object : [self commandCenter]];
     
-
     [notifyCenter addObserver : self
                      selector : @selector(commandChanged:)
                          name : ORCommandCommandChangedNotification
                        object : [self commandCenter]];
 
-    
     [notifyCenter addObserver : self
                      selector : @selector(portChanged:)
                          name : ORDocumentLoadedNotification
                        object : [self commandCenter]];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(argsChanged:)
-                         name : ORCommandArgsChanged
-						object: [self commandCenter]];	
-
-
-	[notifyCenter addObserver: self 
-					 selector: @selector(scriptChanged:) 
-						 name: ORCommandScriptChanged 
-					   object: [self commandCenter]];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(runningChanged:)
-                         name : ORScriptRunnerRunningChanged
-						object: [[self commandCenter] scriptRunner]];	
-
-    [notifyCenter addObserver : self
-                     selector : @selector(errorChanged:)
-                         name : ORScriptRunnerParseError
-						object: [[self commandCenter] scriptRunner]];	
-
-
-    [notifyCenter addObserver : self
-                     selector : @selector(textDidChange:)
-                         name : NSTextDidChangeNotification
-						object: scriptView];	
-
-    [notifyCenter addObserver : self
-                     selector : @selector(lastFileChanged:)
-                         name : ORCommandLastFileChangedNotification
-						object: [self commandCenter]];	
-
+ 
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 
@@ -157,37 +118,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
 
 #pragma mark •••Actions
 
-- (IBAction) cancelLoadSaveAction:(id)sender
-{
-	[loadSaveView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:loadSaveView];
-}
-
-- (IBAction) parseScript:(id) sender
-{
-	[statusField setStringValue:@""];	
-	[self endEditing];
-	[[self commandCenter] setScript:[scriptView string]];
-	[[self commandCenter] parseScript];
-	if([[self commandCenter] parsedOK])[statusField setStringValue:@"Parsed OK"];
-	else [statusField setStringValue:@"ERRORS"];
-}
-	
-- (IBAction) runScript:(id) sender
-{
-	[statusField setStringValue:@""];	
-	[self endEditing];
-	[[self commandCenter] setScript:[scriptView string]];
-	BOOL showError;
-	if(![[self commandCenter] running]) showError = YES;
-	else showError = NO;
-	[[self commandCenter] runScript];
-	if(showError){
-		if([[self commandCenter] parsedOK])[statusField setStringValue:@"Parsed OK"];
-		else [statusField setStringValue:@"ERRORS"];
-	}
-}
-
 - (IBAction) setPortAction:(id) sender;
 {
     if([sender intValue] != [[self commandCenter] socketPort]){
@@ -195,7 +125,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
         [[self commandCenter] serve];
     }
 }
-
 
 - (IBAction) doCmdAction:(id) sender
 {
@@ -218,87 +147,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
                           contextInfo:NULL];
 }
 
-- (IBAction) loadSaveAction:(id)sender
-{
-	[[NSApplication sharedApplication] beginSheet:loadSaveView
-								   modalForWindow:[self window]
-									modalDelegate:self
-								   didEndSelector:NULL
-									  contextInfo:NULL];
-}
-
-
-- (IBAction) loadFileAction:(id) sender
-{
-	[loadSaveView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:loadSaveView];
-    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-    [openPanel setCanChooseDirectories:NO];
-    [openPanel setCanChooseFiles:YES];
-    [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setPrompt:@"Choose"];
-    NSString* startingDir;
-	NSString* fullPath = [[[self commandCenter] lastFile] stringByExpandingTildeInPath];
-    if(fullPath) startingDir = [fullPath stringByDeletingLastPathComponent];
-    else		 startingDir = NSHomeDirectory();
-
-    [openPanel beginSheetForDirectory:startingDir
-                                 file:nil
-                                types:nil
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(loadFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-}
-
-
-- (IBAction) saveFileAction:(id) sender
-{
-	[loadSaveView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:loadSaveView];
-	if(![[self commandCenter] lastFile]){
-		[self saveAsFileAction:nil];
-	}
-	else [[self commandCenter] saveFile];
-}
-
-- (IBAction) saveAsFileAction:(id) sender
-{
-	[loadSaveView orderOut:self];
-	[[NSApplication sharedApplication]  endSheet:loadSaveView];
-	NSSavePanel *savePanel = [NSSavePanel savePanel];
-    [savePanel setPrompt:@"Save As"];
-    [savePanel setCanCreateDirectories:YES];
-    
-    NSString* startingDir;
-    NSString* defaultFile;
-    
-	NSString* fullPath = [[[self commandCenter] lastFile] stringByExpandingTildeInPath];
-    if(fullPath){
-        startingDir = [fullPath stringByDeletingLastPathComponent];
-        defaultFile = [fullPath lastPathComponent];
-    }
-    else {
-        startingDir = NSHomeDirectory();
-        defaultFile = @"OrcaScript";
-    }
-	
-    [savePanel beginSheetForDirectory:startingDir
-                                 file:defaultFile
-                       modalForWindow:[self window]
-                        modalDelegate:self
-                       didEndSelector:@selector(saveFileDidEnd:returnCode:contextInfo:)
-                          contextInfo:NULL];
-}
-
-- (IBAction) listMethodsAction:(id) sender
-{
-	NSString* theClassName = [classNameField stringValue];
-	if([theClassName length]){
-		NSLog(@"\n%@\n",listMethods(NSClassFromString(theClassName)));
-	}
-}
-
 - (void) sendCommand:(NSString*)aCmd
 {
     [[self commandCenter] handleLocalCommand:aCmd];
@@ -314,17 +162,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
     [[[NSApp delegate]document] saveDocumentAs:sender];
 }
 
-- (IBAction) argAction:(id) sender
+- (IBAction) scriptIDEAction:(id) sender
 {
-	int i = [[sender selectedCell] tag];
-	NSDecimalNumber* n;
-	NSString* s = [[sender selectedCell] stringValue];
-	if([s rangeOfString:@"x"].location != NSNotFound || [s rangeOfString:@"X"].location != NSNotFound){
-		unsigned long num = strtoul([s cStringUsingEncoding:NSASCIIStringEncoding],0,16);
-		n = (NSDecimalNumber*)[NSDecimalNumber numberWithUnsignedLong:num];
-	}
-	else n = [NSDecimalNumber decimalNumberWithString:s];
-	[[self commandCenter] setArg:i withValue:n];
+	[[ORCommandCenter sharedCommandCenter] openScriptIDE];
 }
 
 #pragma mark •••Interface Management
@@ -332,16 +172,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
 {
     [self portChanged:nil];
     [self clientsChanged:nil];
-	[self scriptChanged:nil];
-	[self runningChanged:nil];
-	[self argsChanged:nil];
-	[self lastFileChanged:nil];
-}
-
-- (void) lastFileChanged:(NSNotification*)aNote
-{
-	[lastFileField setStringValue:[[[self commandCenter] lastFile] stringByAbbreviatingWithTildeInPath]];
-	[lastFileField1 setStringValue:[[[self commandCenter] lastFile] stringByAbbreviatingWithTildeInPath]];
 }
 
 - (void) commandChanged:(NSNotification*)aNote
@@ -349,14 +179,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
 	NSString* aCommand = [[aNote userInfo] objectForKey:ORCommandCommandChangedNotification];
 	if(aCommand){
 		[cmdField setStringValue:aCommand];
-	}
-}
-
-- (void) argsChanged:(NSNotification*)aNote;
-{
-	int i;
-	for(i=0;i<5;i++){
-		[[argsMatrix cellWithTag:i] setObjectValue:[[self commandCenter] arg:i]];
 	}
 }
 
@@ -376,39 +198,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
     }
 }
 
-- (void) textDidChange:(NSNotification*)aNote
-{
-	[[self commandCenter] setScriptNoNote:[scriptView string]];
-}
-
-- (void) scriptChanged:(NSNotification*)aNote
-{
-	[scriptView setString:[[self commandCenter] script]];
-}
-
-- (void) errorChanged:(NSNotification*)aNote
-{
-	int lineNumber = [[[aNote userInfo] objectForKey:@"ErrorLocation"] intValue];
-	[scriptView goToLine:lineNumber];
-}
-
-- (void) runningChanged:(NSNotification*)aNote
-{
-	if([[self commandCenter] running]){
-		[statusField setStringValue:@"Running"];
-		[runButton setImage:[NSImage imageNamed:@"Stop"]];
-		[runButton setAlternateImage:[NSImage imageNamed:@"Stop"]];
-		[loadSaveButton setEnabled:NO];
-	}
-	else {
-		[statusField setStringValue:@""];
-		[runButton setImage:[NSImage imageNamed:@"Play"]];
-		[runButton setAlternateImage:[NSImage imageNamed:@"Play"]];
-		[loadSaveButton setEnabled:YES];
-	}
-}
-
-- (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command
+- (BOOL) control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)command
 {
 	if ((command == @selector(moveDown:))) {
 		[[self commandCenter] moveInHistoryDown];
@@ -448,18 +238,5 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenterController);
     }
 }
 
-- (void)loadFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [[self commandCenter] loadScriptFromFile:[[[sheet filenames] objectAtIndex:0]stringByAbbreviatingWithTildeInPath]];
-    }
-}
-
-- (void)saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode){
-        [[self commandCenter] saveScriptToFile:[sheet filename]];
-    }
-}
 @end
 

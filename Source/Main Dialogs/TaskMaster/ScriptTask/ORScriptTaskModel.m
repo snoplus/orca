@@ -20,7 +20,6 @@
 //-------------------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import <Cocoa/Cocoa.h>
 #import "ORScriptTaskModel.h"
 #import "ORScriptInterface.h"
 #import "ORDataTypeAssigner.h"
@@ -42,11 +41,6 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     task = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
-}
-
--(void)makeMainController
-{
-    [self linkToController:@"ORScriptIDEController"];
 }
 
 - (void) makeConnectors

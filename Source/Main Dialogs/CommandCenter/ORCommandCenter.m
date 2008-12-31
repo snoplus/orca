@@ -20,7 +20,7 @@
 
 
 #import "ORCommandCenter.h"
-
+#import "ORScriptIDEModel.h"
 #import "ORCommandClient.h"
 #import "NetSocket.h"
 #import "ORAlarmCollection.h"
@@ -54,8 +54,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 		theArgs = [NSMutableArray arrayWithObjects:[NSDecimalNumber zero],[NSDecimalNumber zero],[NSDecimalNumber zero],
 		[NSDecimalNumber zero],[NSDecimalNumber zero],nil];
 	}
-	args = [theArgs retain];
-    [self setLastFile:[[NSUserDefaults standardUserDefaults] objectForKey: @"orca.CommandCenter.lastFile"]];
 
     
     [self setSocketPort:port];
@@ -85,8 +83,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     [clients release];
     [serverSocket release];
     [destinationObjects release];
-	[scriptRunner release];
-	[args release];
 	[history release];
     [super dealloc];
 }
@@ -94,37 +90,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 
 #pragma mark •••Accessors
 
-- (id) arg:(int)index
-{
-	if(index>=0 && index<[args count])return [args objectAtIndex:index];
-	else return nil;
-}
-
-- (void) setArg:(int)index withValue:(id)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setArg:index withValue:[self arg:index]];
-	[args replaceObjectAtIndex:index withObject:aValue];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCommandArgsChanged object:self];
-    [[NSUserDefaults standardUserDefaults] setObject:args forKey:@"orca.CommandCenter.args"];
-}
-
-- (NSString*) lastFile
-{
-	return lastFile;
-}
-
-- (void) setLastFile:(NSString*)aFile
-{
-	if(!aFile)aFile = [[NSHomeDirectory() stringByAppendingPathComponent:@"Untitled"] stringByExpandingTildeInPath];
-
-    [[[self undoManager] prepareWithInvocationTarget:self] setLastFile:lastFile];
-    [lastFile autorelease];
-    lastFile = [aFile copy];		
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORCommandLastFileChangedNotification object:self];
-
-    [[NSUserDefaults standardUserDefaults] setObject:lastFile forKey:@"orca.CommandCenter.lastFile"];
-
-}
 
 - (NSUndoManager *)undoManager
 {
@@ -153,11 +118,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     script = [aString copy];	
 }
 
-
 - (NSDictionary*) destinationObjects
 {
     return destinationObjects;
 }
+
 - (void) setDestinationObjects:(NSMutableDictionary*)newDestinationObjects
 {
     [destinationObjects autorelease];
@@ -185,6 +150,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 {
     return socketPort;
 }
+
 - (void) setSocketPort:(int)aPort
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setSocketPort:socketPort];
@@ -193,8 +159,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCommandPortChangedNotification
                                                         object:self];
     [[NSUserDefaults standardUserDefaults] setInteger:socketPort forKey:@"orca.CommandCenter.ListeningPort"];
-    
-    
 }
 
 - (NSArray*)clients
@@ -217,7 +181,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 
 - (void)serve
 {
-    
     if(serverSocket && ![self clientCount]){
         [serverSocket release];
         serverSocket = nil;
@@ -230,7 +193,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 }
 
 #pragma mark •••Delegate Methods
-
 - (void) clientChanged:(id)aClient
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCommandClientsChangedNotification
@@ -543,9 +505,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
         [client sendCmd:@"postAlarm" withString:[anAlarm name]];
     }
 }
+
 - (void) sendCurrentRunStatus:(ORCommandClient*)client
 {
     [client sendCmd:@"runStatus" withString:[NSString stringWithFormat:@"%d",[gOrcaGlobals runInProgress]]];
+}
+
+- (ORScriptIDEModel*) scriptIDEModel
+{
+	return scriptIDEModel;
 }
 
 - (void) sendHeartBeat:(ORCommandClient*)client
@@ -553,92 +521,25 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     [client sendCmd:@"OrcaHeartBeat" withString:nil];
 }
 
-#pragma mark ***Script Methods
-- (ORScriptRunner*) scriptRunner
+- (void) closeScriptIDE
 {
-	return scriptRunner;
-}
-- (BOOL) parsedOK
-{
-	return parsedOK;
-}
-
-- (void) parseScript
-{
-	parsedOK = YES;
-	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
-	if(![scriptRunner running]){
-		[scriptRunner setScriptName:@"CommandCenter"];
-		[scriptRunner parse:script];
-		parsedOK = [scriptRunner parsedOK];
-		if(([[NSApp currentEvent] modifierFlags] & 0x80000)>0){
-			//option key is down
-			[scriptRunner printAll];
-		}
-
-		[scriptRunner release];
-		scriptRunner = nil;
+	if(scriptIDEModel){
+		[self setScript:[scriptIDEModel script]];
+		NSArray* w = [[[NSApp delegate] document] findControllersWithModel:scriptIDEModel];
+		[w makeObjectsPerformSelector:@selector(setModel:) withObject:nil];
+		[w makeObjectsPerformSelector:@selector(close)];
+		[scriptIDEModel release];
+		scriptIDEModel = nil;
 	}
 }
 
-- (void) runScript
+- (void) openScriptIDE
 {
-	parsedOK = YES;
-	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
-	if(![scriptRunner running]){
-		[scriptRunner setScriptName:@"CommandCenter"];
-		[scriptRunner parse:script];
-		parsedOK = [scriptRunner parsedOK];
-		if(parsedOK){
-			[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
-			[scriptRunner run:args sender:self];
-		}
-	}
-	else {
-		[self stopScript];
-	}
-}
-
-
-- (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue
-{
-	if(normalFinish)NSLog(@"[%@] Returned with: %@\n",[scriptRunner scriptName],aValue);
-	else NSLogColor([NSColor redColor],@"[%@] Abnormal exit!\n",[scriptRunner scriptName]);
-}
-
-- (void) stopScript
-{
-	[scriptRunner stop];
-	[scriptRunner release];
-	scriptRunner = nil;
-}
-
-- (BOOL) running
-{
-	return [scriptRunner running];
-}
-
-- (void) loadScriptFromFile:(NSString*)aFilePath
-{
-	[self setLastFile:aFilePath];
-	[self setScript:[NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]]];
-}
-
-- (void) saveFile
-{
-	[self saveScriptToFile:lastFile];
-}
-
-
-- (void) saveScriptToFile:(NSString*)aFilePath
-{
-	NSFileManager* fm = [NSFileManager defaultManager];
-	if([fm fileExistsAtPath:[aFilePath stringByExpandingTildeInPath]]){
-		[fm removeFileAtPath:[aFilePath stringByExpandingTildeInPath] handler:nil];
-	}
-	NSData* theData = [script dataUsingEncoding:NSASCIIStringEncoding];
-	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
-	[self setLastFile:aFilePath];
+	if(!scriptIDEModel){
+		scriptIDEModel = [[ORScriptIDEModel alloc] init];
+	}	
+	[scriptIDEModel makeMainController];
+	[scriptIDEModel setScript:[self script]];
 }
 
 - (void) moveInHistoryDown

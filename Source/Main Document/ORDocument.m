@@ -364,7 +364,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[archiver encodeObject:[self group] forKey:ORGroupKey];
 		
-		[archiver encodeObject:orcaControllers forKey:OROrcaControllers];						
+		[archiver encodeObject:[self controllersToSave] forKey:OROrcaControllers];						
 		
 		[archiver encodeBool:[[[ORTaskMaster sharedTaskMaster] window] isVisible] forKey:ORTaskMasterVisibleKey];
 		
@@ -487,6 +487,19 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 	return NO;
 }
 
+- (NSArray*) controllersToSave
+{
+	NSMutableArray* controllersToSave = [NSMutableArray array];
+    NSEnumerator* e = [orcaControllers objectEnumerator];
+    id controller;
+    while(controller = [e nextObject]){
+        if([controller model] != [[ORCommandCenter sharedCommandCenter] scriptIDEModel]){
+            [controllersToSave addObject:controller];
+        }
+    }
+	return controllersToSave;
+}
+
 - (void) checkControllers
 {
     NSEnumerator* e = [orcaControllers objectEnumerator];
@@ -592,7 +605,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
             [self setOrcaControllers:[NSMutableArray array]];
         }
         
-        [orcaControllers addObject:controller];
+		[orcaControllers addObject:controller];
+
         [controller showWindow:self];
 		[[controller window] makeFirstResponder:[controller window]];
     }
