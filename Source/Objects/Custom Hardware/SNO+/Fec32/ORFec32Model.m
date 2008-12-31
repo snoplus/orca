@@ -38,16 +38,19 @@
 #define UPPER_CHANNELS	1
 
 
-NSString* ORFec32ModelVariableDisplayChanged	= @"ORFec32ModelVariableDisplayChanged";
-NSString* ORFecShowVoltsChanged					= @"ORFecShowVoltsChanged";
-NSString* ORFecCommentsChanged					= @"ORFecCommentsChanged";
-NSString* ORFecCmosChanged						= @"ORFecCmosChanged";
-NSString* ORFecVResChanged						= @"ORFecVResChanged";
-NSString* ORFecHVRefChanged						= @"ORFecHVRefChanged";
-NSString* ORFecLock								= @"ORFecLock";
-NSString* ORFecOnlineMaskChanged				= @"ORFecOnlineMaskChanged";
-NSString* ORFecPedEnabledMaskChanged			= @"ORFecPedEnabledMaskChanged";
-NSString* ORFecSeqDisabledMaskChanged			= @"ORFecSeqDisabledMaskChanged";
+NSString* ORFec32ModelCmosReadDisabledMaskChanged	= @"ORFec32ModelCmosReadDisabledMaskChanged";
+NSString* ORFec32ModelCmosRateChanged				= @"ORFec32ModelCmosRateChanged";
+NSString* ORFec32ModelBaseCurrentChanged			= @"ORFec32ModelBaseCurrentChanged";
+NSString* ORFec32ModelVariableDisplayChanged		= @"ORFec32ModelVariableDisplayChanged";
+NSString* ORFecShowVoltsChanged						= @"ORFecShowVoltsChanged";
+NSString* ORFecCommentsChanged						= @"ORFecCommentsChanged";
+NSString* ORFecCmosChanged							= @"ORFecCmosChanged";
+NSString* ORFecVResChanged							= @"ORFecVResChanged";
+NSString* ORFecHVRefChanged							= @"ORFecHVRefChanged";
+NSString* ORFecLock									= @"ORFecLock";
+NSString* ORFecOnlineMaskChanged					= @"ORFecOnlineMaskChanged";
+NSString* ORFecPedEnabledMaskChanged				= @"ORFecPedEnabledMaskChanged";
+NSString* ORFecSeqDisabledMaskChanged				= @"ORFecSeqDisabledMaskChanged";
 NSString* ORFecTrigger100nsDisabledMaskChanged		= @"ORFecTrigger100nsDisabledMaskChanged";
 NSString* ORFecTrigger20nsDisabledMaskChanged		= @"ORFecTrigger20nsDisabledMaskChanged";
 NSString* ORFecQllEnabledChanged					= @"ORFecQllEnabledChanged";
@@ -109,6 +112,47 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 }
 
 #pragma mark ***Accessors
+
+- (unsigned long) cmosReadDisabledMask;
+{
+    return cmosReadDisabledMask;;
+}
+
+- (void) setCmosReadDisabledMask:(unsigned long)aCmosReadDisabledMask;
+{
+    cmosReadDisabledMask = aCmosReadDisabledMask;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosReadDisabledMaskChanged object:self];
+}
+
+- (BOOL) cmosReadDisabled:(short)aChannel
+{
+	return (cmosReadDisabledMask & (1<aChannel))!=0;
+}
+
+- (long) cmosRate:(short)index
+{
+    return cmosRate[index];
+}
+
+- (void) setCmosRate:(short)index withValue:(long)aCmosRate
+{
+    cmosRate[index] = aCmosRate;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelCmosRateChanged object:self];
+}
+
+- (float) baseCurrent:(short)index
+{
+    return baseCurrent[index];
+}
+
+- (void) setBaseCurrent:(short)index withValue:(float)aBaseCurrent
+{
+    baseCurrent[index] = aBaseCurrent;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFec32ModelBaseCurrentChanged object:self];
+}
 
 - (int) variableDisplay
 {
@@ -213,6 +257,11 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
     seqDisabledMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFecSeqDisabledMaskChanged object:self];
 	
+}
+
+- (BOOL) seqDisabled:(short)chan
+{
+	return (seqDisabledMask & (1<<chan))!=0;
 }
 
 - (BOOL) trigger20nsDisabled:(short)chan
@@ -530,7 +579,8 @@ const short kVoltageADCMaximumAttempts = 10;
 	
     [[self undoManager] disableUndoRegistration];
 	
-    [self setVariableDisplay:		[decoder decodeIntForKey:@"variableDisplay"]];
+    [self setCmosReadDisabledMask:	[decoder decodeInt32ForKey:	@"cmosReadDisabledMask;"]];
+    [self setVariableDisplay:		[decoder decodeIntForKey:	@"variableDisplay"]];
     [self setShowVolts:				[decoder decodeBoolForKey:  @"showVolts"]];
     [self setComments:				[decoder decodeObjectForKey:@"comments"]];
     [self setVRes:					[decoder decodeFloatForKey: @"vRes"]];
@@ -538,7 +588,7 @@ const short kVoltageADCMaximumAttempts = 10;
 	[self setOnlineMask:			[decoder decodeInt32ForKey: @"onlineMask"]];
 	[self setPedEnabledMask:		[decoder decodeInt32ForKey: @"pedEnableMask"]];
 	[self setSeqDisabledMask:		[decoder decodeInt32ForKey: @"seqDisabledMask"]];
-	[self setAdcVoltageStatusOfCard:[decoder decodeIntForKey: @"adcVoltageStatusOfCard"]];
+	[self setAdcVoltageStatusOfCard:[decoder decodeIntForKey:	@"adcVoltageStatusOfCard"]];
 	int i;
 	for(i=0;i<6;i++){
 		[self setCmos:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"cmos%d",i]]];
@@ -547,7 +597,11 @@ const short kVoltageADCMaximumAttempts = 10;
 		[self setAdcVoltage:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"adcVoltage%d",i]]];
 		[self setAdcVoltageStatus:i withValue: (eFecMonitorState)[decoder decodeIntForKey: [NSString stringWithFormat:@"adcStatus%d",i]]];
 	}
-    [[self undoManager] enableUndoRegistration];
+	for(i=0;i<32;i++){
+		[self setCmosRate:i withValue:[decoder decodeInt32ForKey:		[NSString stringWithFormat:@"cmosRate%d",i]]];
+		[self setBaseCurrent:i withValue:[decoder decodeFloatForKey:	[NSString stringWithFormat:@"baseCurrent%d",i]]];
+	}
+	[[self undoManager] enableUndoRegistration];
 	
     return self;
 }
@@ -556,15 +610,17 @@ const short kVoltageADCMaximumAttempts = 10;
 {
 	[super encodeWithCoder:encoder];
 	
-	[encoder encodeInt:variableDisplay		forKey:@"variableDisplay"];
-	[encoder encodeBool:showVolts			forKey:@"showVolts"];
-	[encoder encodeObject:comments			forKey:@"comments"];
-	[encoder encodeFloat:vRes				forKey:@"vRes"];
-	[encoder encodeFloat:hVRef				forKey:@"hVRef"];
-	[encoder encodeInt32:onlineMask			forKey:@"onlineMask"];
-	[encoder encodeInt32:pedEnabledMask		forKey:@"pedEnabledMask"];
-	[encoder encodeInt32:seqDisabledMask	forKey:@"seqDisabledMask"];
-	[encoder encodeInt:adcVoltageStatusOfCard forKey:@"adcVoltageStatusOfCard"];
+	[encoder encodeInt32:cmosReadDisabledMask	forKey: @"cmosReadDisabledMask;"];
+
+	[encoder encodeInt:variableDisplay			forKey: @"variableDisplay"];
+	[encoder encodeBool:showVolts				forKey: @"showVolts"];
+	[encoder encodeObject:comments				forKey: @"comments"];
+	[encoder encodeFloat:vRes					forKey: @"vRes"];
+	[encoder encodeFloat:hVRef					forKey: @"hVRef"];
+	[encoder encodeInt32:onlineMask				forKey: @"onlineMask"];
+	[encoder encodeInt32:pedEnabledMask			forKey: @"pedEnabledMask"];
+	[encoder encodeInt32:seqDisabledMask		forKey: @"seqDisabledMask"];
+	[encoder encodeInt:adcVoltageStatusOfCard	forKey: @"adcVoltageStatusOfCard"];
 	
 	int i;
 	for(i=0;i<6;i++){
@@ -573,6 +629,10 @@ const short kVoltageADCMaximumAttempts = 10;
 	for(i=0;i<kNumFecMonitorAdcs;i++){
 		[encoder encodeFloat:adcVoltage[i] forKey:[NSString stringWithFormat:@"adcVoltage%d",i]];
 		[encoder encodeInt:adcVoltageStatus[i] forKey:[NSString stringWithFormat:@"adcStatus%d",i]];
+	}
+	for(i=0;i<32;i++){
+		[encoder encodeInt32:cmosRate[i]			forKey: [NSString stringWithFormat:@"cmosRate%d",i]];
+		[encoder encodeFloat:baseCurrent[i]			forKey: [NSString stringWithFormat:@"baseCurrent%d",i]];
 	}
 }
 #pragma mark •••Hardware Access
@@ -844,8 +904,7 @@ const short kVoltageADCMaximumAttempts = 10;
 		// set the flags for the off-line status
 		//theConfigDB -> SlotOnline(GetTheSnoCrateNumber(),itsFec32SlotNumber,FALSE);
 		[self setOnlineMask:0x00000000];
-		[localException raise];
-		
+		@throw;
 	}
 }
 
@@ -868,6 +927,7 @@ const short kVoltageADCMaximumAttempts = 10;
 	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
 		NSLog(@"Failure during full reset of FEC32 (%d,%d).\n", [self crateNumber], [self stationNumber]);	
+		@throw;
 	}		
 }
 
@@ -886,8 +946,102 @@ const short kVoltageADCMaximumAttempts = 10;
 	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
 		NSLog(@"Failure during load of crate address on FEC32 Crate %d Slot %d.", [self crateNumber], [self stationNumber]);	
+		@throw;
 	}
 }
+
+- (void) resetFifo
+{
+	BOOL selected = NO;
+	@try {	
+		[[self xl2] select:self];
+		selected = YES;
+		//Reset the fifo 
+		unsigned long theSequencerDisableMask = 0;
+		//set the specified offline channels to max threshold
+		short chan;
+		for(chan=0;chan<32;chan++){
+			//set up a sequencer disable mask, all chan that are offline and have the sequencer disable bit set.
+			if([self seqDisabled:chan]) {
+				theSequencerDisableMask |= (1UL<<chan); 
+			}
+			
+		}	
+		
+		ORCommandList* aList = [ORCommandList commandList];
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_CMOS_CHIP_DISABLE_REG value:0xFFFFFFFFUL]];
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_GENERAL_CS_REG value:FEC32_CSR_FIFO_RESET]];
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_GENERAL_CS_REG value:FEC32_CSR_ZERO]];
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_CMOS_CHIP_DISABLE_REG value:theSequencerDisableMask]];
+		[self executeCommandList:aList];
+		
+		[self loadCrateAddress]; 
+	}
+	@catch(NSException* localException) {
+		if(!selected){
+			NSLog(@"Could not select the XL2 for FEC32 Crate %d!\n", [self crateNumber]);	
+		}
+		else {
+			[[self xl2] deselectCards];
+			NSLog(@"Failure during fifo reset of FEC32 (%d,%d)/n",[self crateNumber], [self stationNumber]);	
+		}
+		@throw;
+	}
+}
+
+// ResetFec32Cmos : Reset the CMOS chips on the mother card
+- (void) resetCmos
+{
+	BOOL selected = NO;
+	@try {	
+		[[self xl2] select:self];
+		selected = YES;
+				
+		//Reset the FEC32 cmos chips
+		[self setFec32RegisterBits:FEC32_GENERAL_CS_REG bitMask:FEC32_CSR_CMOS_RESET];
+		[self clearFec32RegisterBits:FEC32_GENERAL_CS_REG bitMask:FEC32_CSR_CMOS_RESET];
+		
+		// additional effect is to disable all the triggers
+		[self setTrigger20nsDisabledMask:0xFFFFFFFF];
+		[self setTrigger100nsDisabledMask:0xFFFFFFFF];
+		
+	}
+	@catch(NSException* localException) {
+		if(!selected){
+			NSLog(@"Could not select the XL2 for FEC32 Crate %d!\n", [self crateNumber]);	
+		}
+		else {
+			[[self xl2] deselectCards];
+			NSLog(@"Failure during CMOS reset of FEC32 (%d,%d)/n",[self crateNumber], [self stationNumber]);	
+		}
+		@throw;
+	}
+}
+
+- (void) resetSequencer
+{
+	BOOL selected = NO;
+	@try {	
+		[[self xl2] select:self];
+		selected = YES;
+		
+		//Reset the FEC32 cmos chips
+		[self setFec32RegisterBits:FEC32_GENERAL_CS_REG bitMask:FEC32_CSR_SEQ_RESET];
+		[self clearFec32RegisterBits:FEC32_GENERAL_CS_REG bitMask:FEC32_CSR_SEQ_RESET];
+	}
+	@catch(NSException* localException) {
+		if(!selected){
+			NSLog(@"Could not select the XL2 for FEC32 Crate %d!\n", [self crateNumber]);	
+		}
+		else {
+			[[self xl2] deselectCards];
+			NSLog(@"Failure during Sequencer reset of FEC32 (%d,%d)/n",[self crateNumber], [self stationNumber]);	
+		}
+		@throw;
+	}
+}
+
+
 
 - (void) loadAllDacs
 {
@@ -1087,8 +1241,58 @@ const short kVoltageADCMaximumAttempts = 10;
 	}
 	@catch(NSException* localException) {
 		[[self xl2] deselectCards];
-		NSLog(@"Error during taking channel(s) off-line on  FEC32 (%d,%d)!", [self crateNumber], [self stationNumber]);	 		
+		NSLog(@"Error during taking channel(s) off-line on  FEC32 (%d,%d)!", [self crateNumber], [self stationNumber]);	 
+		@throw;
 	}
+}
+
+- (float) readPmtCurrent:(short) aChannel
+{
+	float theAveCurrent = 0.0;	
+	
+	BOOL selected = NO;
+	@try {	
+		[[self xl2] select:self];
+		selected = YES;
+		
+		ORCommandList* aList = [ORCommandList commandList];
+		unsigned long word;
+		//shift in the channel selection first 5 bits
+		short aBit;
+		for(aBit=4; aBit >=0 ; aBit--) {
+		    if( (0x1UL << aBit) & aChannel ) word = HV_CSR_DATIN;
+			else							 word = 0x0UL;
+			[aList addCommand:[self writeToFec32RegisterCmd:FEC32_HVC_CS_REG value:word]];				// write data bit
+			[aList addCommand:[self writeToFec32RegisterCmd:FEC32_HVC_CS_REG value:word | HV_CSR_CLK]];	// toggle clock
+		}
+		
+		//shift 0's into the next 32 bits for a total of 37 bits
+		for(aBit=31; aBit >= 0; aBit--) {
+		    word = 0x0UL;
+		   	[aList addCommand:[self writeToFec32RegisterCmd:FEC32_HVC_CS_REG value:word]];
+		    [aList addCommand:[self writeToFec32RegisterCmd:FEC32_HVC_CS_REG value:word | HV_CSR_CLK]];   // toggle clock
+		}
+		
+		// finally, toggle HVLOAD
+		[aList addCommand:[self writeToFec32RegisterCmd:FEC32_HVC_CS_REG value:0]];
+		[aList addCommand:[self writeToFec32RegisterCmd:FEC32_HVC_CS_REG value:HV_CSR_LOAD]];
+		[self executeCommandList:aList];
+		
+		theAveCurrent = ((float)[self readVoltageValue:fecVoltageAdc[0].mask] - 128.0)*fecVoltageAdc[0].multiplier;
+		[self setBaseCurrent:aChannel withValue:theAveCurrent];
+	}
+	@catch(NSException* localException) {
+		if(!selected){
+			NSLog(@"Could not select the XL2 for FEC32 Crate %d!\n", [self crateNumber]);	
+		}
+		else {
+			[[self xl2] deselectCards];
+			NSLog(@"Failure during Pmt Current read for FEC32 (%d,%d)/n",[self crateNumber], [self stationNumber]);	
+		}
+		@throw;
+	}
+		
+	return theAveCurrent;
 }
 
 - (int) stationNumber
@@ -1149,6 +1353,94 @@ const short kVoltageADCMaximumAttempts = 10;
 {
 	return [anObj numberSlotsUsed];
 }
+
+//--Read_CMOS_Counts
+//PH 03/09/98. Read the CMOS totals counter and calculate rates if calcRates is true
+// otherwise sets rates to zero.  a negative rate indicates a CMOS or VME read error.
+// returns true if rates were calculated
+- (BOOL) readCMOSCounts:(BOOL)calcRates channelMask:(unsigned long) aChannelMask
+{
+	long		   	theRate = kCMOSRateUnmeasured;
+	long		   	maxRate = kCMOSRateUnmeasured;
+	unsigned long  	theCount;
+	unsigned short 	channel;
+	unsigned short	maxRateChannel = 0;
+	
+	NSDate* lastTime = cmosCountTimeStamp;
+	NSDate* thisTime = [NSDate date];
+	NSTimeInterval timeDiff = [thisTime timeIntervalSinceDate:lastTime];
+	
+	if (calcRates && (timeDiff<0 || timeDiff>kMaxTimeDiff)) {
+		calcRates = 0;	// don't calculate rates if time diff is silly
+	}
+	
+	float sampleFreq = 1 / (thisTime - lastTime);
+	
+	[cmosCountTimeStamp release];
+	cmosCountTimeStamp = [thisTime retain];
+	
+	//unsigned long theOnlineMask = [self onlineMask];
+	
+	BOOL selected = NO;
+	@try {	
+		[[self xl2] select:self];
+		selected = YES;
+		
+		ORCommandList* aList = [ORCommandList commandList];
+		unsigned long resultIndex[32];
+		for (channel=0; channel<32; ++channel) {
+			if(aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]){
+				resultIndex[channel] = [aList addCommand:[self readFromFec32RegisterCmd:FEC32_CMOS_TOTALS_COUNTER_OFFSET+32*channel]];
+			}
+		}
+		[self executeCommandList:aList];
+		//pull the results
+		for (channel=0; channel<32; ++channel) {
+			if(aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]){
+				theCount = [aList longValueForCmd:resultIndex[channel]];
+				//if( (theCount & 0x80000000) == 0x80000000 ){
+				//busy... TBD put out error or something MAH 12/19/08
+				//}
+			}
+			else {
+				theCount = kCMOSRateUnmeasured;
+			}
+			
+			if (calcRates) {
+				if (aChannelMask & (1UL<<channel) && ![self cmosReadDisabled:channel]) {
+					// get value of last totals counter read
+					if ((theCount | cmosCount[channel]) & 0x80000000UL) {	// test for CMOS read error
+						if( (cmosCount[channel] == 0x8000deadUL) || (theCount == 0x8000deadUL) ) theRate = kCMOSRateBusError;
+						else															theRate = kCMOSRateBusyRead;
+					} 
+					else theRate = (theCount - cmosCount[channel]) * sampleFreq;
+					
+					// keep track of maximum count rate
+					if (maxRate < theRate) {
+						maxRate = theRate;
+						maxRateChannel = channel;
+					}
+					if (theRate > 1e9) theRate = kCMOSRateCorruptRead;			//MAH 3/19/98
+				} 
+				else theRate = kCMOSRateUnmeasured;								//PH 04/07/99
+			}
+			
+			cmosCount[channel] = theCount;	// save the new CMOS totals counter and rate
+			cmosRate[channel]  = theRate;	// this will be kCMOSRateUnmeasured if not calculating rates
+		}
+	}
+	@catch (NSException* localException){
+	}
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORFec32ModelCmosRateChanged" object:self userInfo:nil];
+	
+	//	if (calcRates) {
+	// save maximum rate
+	//		theConfigDB->CardMaxCMOSRate(crate,slot,maxRateChannel,maxRate);
+	//	}
+	return calcRates;
+}
+
 @end
 
 @implementation ORFec32Model (private)
@@ -1341,5 +1633,7 @@ const short kVoltageADCMaximumAttempts = 10;
 		
 	}		
 }
+
+
 @end
 

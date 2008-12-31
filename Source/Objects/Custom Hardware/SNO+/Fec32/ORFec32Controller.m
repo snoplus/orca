@@ -94,6 +94,13 @@
 		[[vb0LMatrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
 		[[vb1HMatrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
 		[[vb1LMatrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
+		
+		[[cmosRates0LabelsMatrix cellAtRow:i column:0] setIntValue:i];
+		[[cmosRates0LabelsMatrix cellAtRow:i column:0] setTextColor:[NSColor grayColor]];
+		[[cmosRates1LabelsMatrix cellAtRow:i column:0] setIntValue:i+16];
+		[[cmosRates1LabelsMatrix cellAtRow:i column:0] setTextColor:[NSColor grayColor]];
+		[[cmosRates0Matrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
+		[[cmosRates1Matrix cellAtRow:i column:0] setAlignment:NSRightTextAlignment];
 	}
 	
 	[super awakeFromNib];
@@ -198,18 +205,22 @@
                      selector : @selector(dcThresholdsChanged:)
                          name : ORDCModelVtChanged
 						object: nil];
-	
+
 	[notifyCenter addObserver : self
                      selector : @selector(dcVBsChanged:)
                          name : ORDCModelVbChanged
 						object: nil];
-
+	
 	[notifyCenter addObserver : self
                      selector : @selector(updatePMTInfo:)
                          name : ORSNOCableDBReadIn
 						object: nil];
 	
-
+	[notifyCenter addObserver : self
+                     selector : @selector(cmosRatesChanged:)
+                         name : ORFec32ModelCmosRateChanged
+						object: nil];
+	
 }
 
 - (void) updateWindow
@@ -231,6 +242,7 @@
 	[self variableDisplayChanged:nil];
 	[self dcThresholdsChanged:nil];
 	[self dcVBsChanged:nil];
+	[self cmosRatesChanged:nil];
 	[self updatePMTInfo:nil];
 }
 
@@ -247,9 +259,7 @@
 	[fecNumberField setIntValue:[model stationNumber]];
 	[crateNumberField setIntValue:[[model guardian] crateNumber]];
 	[pmtView setNeedsDisplay:YES];
-	[self adcStatusChanged:nil];
-	[self dcThresholdsChanged:nil];
-	[self dcVBsChanged:nil];
+	[self updateWindow];
  	[self updateButtons];
 }
 
@@ -301,6 +311,20 @@
 		}
 	}
 }
+
+- (void) cmosRatesChanged:(NSNotification*)aNote
+{
+	int i;
+	int displayRow = 0;
+	for(i=0;i<32;i++){
+		NSMatrix* matrix = i<16 ? cmosRates0Matrix : cmosRates1Matrix;
+		id displayItem = [matrix cellAtRow:displayRow column:0];
+		[displayItem setIntValue:[model cmosRate:i]];
+		displayRow++;
+		if(displayRow>15)displayRow=0;
+	}
+}
+
 
 - (void) dcVBsChanged:(NSNotification*)aNote
 {
@@ -475,6 +499,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) readCmosRatesAction:(id)sender
+{
+	[model readCMOSCounts:NO channelMask:0xffffffff];
+}
+
 
 - (IBAction) variableDisplayPUAction:(id)sender
 {

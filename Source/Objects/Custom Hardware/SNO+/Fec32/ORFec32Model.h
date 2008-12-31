@@ -142,6 +142,35 @@
 #define	BOARD_ID_PE 		0x00000200			
 #define	BOARD_ID_DO 		0x00000400	
 
+// HV Supply Definitions ...TBD move to HV when available....
+
+#define	HIGH_VOLTAGE_A					0
+#define	HIGH_VOLTAGE_B					1
+
+#define HV_CSR_CLK						0x1UL	  	//added for HV Current read routines
+#define HV_CSR_DATIN            		0x2UL
+#define HV_CSR_LOAD             		0x4UL
+#define HV_CSR_DATOUT           		0x8UL
+
+#define HV_A_SETPOINT_MASK				0x00000FFF
+#define HV_B_SETPOINT_MASK				0x0FFF0000
+
+#define HIGH_VOLTAGE_A_SWITCH			0x00000001
+#define HIGH_VOLTAGE_B_SWITCH			0x00010000
+
+#define HV_INTERLOCK_BIT_MASK			0x00000004
+
+#define HV_RELAY_DATA_CLOSE				0x00000000
+#define HV_RELAY_DATA_OPEN				0x00000002
+#define HV_RELAY_DATA_LOAD				0x00000004
+#define HV_RELAY_DATA_CLOCK				0x00000008
+
+#define kCMOSRateUnmeasured		 -1
+#define kCMOSRateBusyRead		 -2
+#define kCMOSRateBusError		 -3
+#define kCMOSRateCorruptRead	 -4
+#define kMaxTimeDiff			100.0	// don't calculate rates over longer times than this
+
 typedef struct Fec32CmosShiftReg{
 	unsigned short	cmos_shift_item[7];
 } aFec32CmosShiftReg;
@@ -149,17 +178,22 @@ typedef struct Fec32CmosShiftReg{
 @interface ORFec32Model :  ORSNOCard <OROrderedObjHolding>
 {
 	unsigned char	cmos[6];	//board related	0-ISETA1 1-ISETA0 2-ISETM1 3-ISETM0 4-TACREF 5-VMAX
-	unsigned char	vRes;	//VRES for bipolar chip
-	unsigned char	hVRef;	//HVREF for high voltage
+	unsigned char	vRes;		//VRES for bipolar chip
+	unsigned char	hVRef;		//HVREF for high voltage
     NSString*		comments;
     BOOL			showVolts;	
 	unsigned long   onlineMask;
+    unsigned long	cmosReadDisabledMask;
 	unsigned long   pedEnabledMask;
 	unsigned long   seqDisabledMask;
 	unsigned long   dirtyMask;
 	unsigned long   thresholdToMax;
 	unsigned long   trigger20nsDisabledMask;
 	unsigned long   trigger100nsDisabledMask;
+    float			baseCurrent[32];
+	NSDate*			cmosCountTimeStamp;
+	unsigned long	cmosCount[32];
+    long			cmosRate[32];
 	BOOL			qllEnabled;
 	BOOL			dcPresent[4];
 	ORFecDaughterCardModel* dc[4]; //cache the dc's
@@ -177,17 +211,25 @@ typedef struct Fec32CmosShiftReg{
 - (void) makeMainController;
 
 #pragma mark •••Accessors
-- (int) variableDisplay;
-- (void) setVariableDisplay:(int)aVariableDisplay;
-- (id) xl1;
-- (id) xl2;
+- (unsigned long)	cmosReadDisabledMask;
+- (void)			setCmosReadDisabledMask:(unsigned long)aCmosReadDisabledMask;
+- (BOOL)			cmosReadDisabled:(short)aChannel;
+- (long)			cmosRate:(short)index;
+- (void)			setCmosRate:(short)index withValue:(long)aCmosRate;
+- (id)				xl1;
+- (id)				xl2;
 - (BOOL)			dcPresent:(unsigned short)index;
+- (float)			baseCurrent:(short)index;
+- (void)			setBaseCurrent:(short)idex withValue:(float)aBaseCurrent;
+- (int)				variableDisplay;
+- (void)			setVariableDisplay:(int)aVariableDisplay;
 - (unsigned long)	pedEnabledMask;
 - (void)			setPedEnabledMask:(unsigned long) aMask;
 - (unsigned long)	onlineMask;
 - (void)			setOnlineMask:(unsigned long) aMask;
 - (unsigned long)	seqDisabledMask;
 - (void)			setSeqDisabledMask:(unsigned long) aMask;
+- (BOOL)			seqDisabled:(short)chan;
 - (BOOL)			trigger20nsDisabled:(short)chan;
 - (BOOL)			trigger100nsDisabled:(short)chan;
 - (void)			setTrigger20ns:(short) chan disabled:(short)state;
@@ -199,25 +241,25 @@ typedef struct Fec32CmosShiftReg{
 - (BOOL)			qllEnabled;
 - (void)			setQllEnabled:(BOOL) aState;
 
-- (int)     globalCardNumber;
+- (int)				globalCardNumber;
 - (NSComparisonResult) globalCardNumberCompare:(id)aCard;
-- (BOOL)	showVolts;
-- (void)	setShowVolts:(BOOL)aShowVolts;
-- (NSString*)	comments;
-- (void)		setComments:(NSString*)aComments;
-- (unsigned char)  cmos:(short)anIndex;
-- (void)	setCmos:(short)anIndex withValue:(unsigned char)aValue;
-- (float)	vRes;
-- (void)	setVRes:(float)aValue;
-- (float)	hVRef;
-- (void)	setHVRef:(float)aValue;
-- (BOOL)	pmtOnline:(unsigned short)index;
-- (float)				adcVoltage:(int)index; 
-- (void)				setAdcVoltage:(int)index withValue:(float)aValue;
-- (eFecMonitorState)	adcVoltageStatus:(int)index;
-- (void)				setAdcVoltageStatus:(int)index withValue:(eFecMonitorState)aState;
-- (eFecMonitorState)	adcVoltageStatusOfCard;
-- (void)				setAdcVoltageStatusOfCard:(eFecMonitorState)aState;
+- (BOOL)			showVolts;
+- (void)			setShowVolts:(BOOL)aShowVolts;
+- (NSString*)		comments;
+- (void)			setComments:(NSString*)aComments;
+- (unsigned char)	cmos:(short)anIndex;
+- (void)			setCmos:(short)anIndex withValue:(unsigned char)aValue;
+- (float)			vRes;
+- (void)			setVRes:(float)aValue;
+- (float)			hVRef;
+- (void)			setHVRef:(float)aValue;
+- (BOOL)			pmtOnline:(unsigned short)index;
+- (float)			adcVoltage:(int)index; 
+- (void)			setAdcVoltage:(int)index withValue:(float)aValue;
+- (eFecMonitorState)adcVoltageStatus:(int)index;
+- (void)			setAdcVoltageStatus:(int)index withValue:(eFecMonitorState)aState;
+- (eFecMonitorState)adcVoltageStatusOfCard;
+- (void)			setAdcVoltageStatusOfCard:(eFecMonitorState)aState;
 
 #pragma mark Converted Data Methods
 - (void)	setCmosVoltage:(short)anIndex withValue:(float) value;
@@ -244,12 +286,15 @@ typedef struct Fec32CmosShiftReg{
 - (void) boardIDOperation:(unsigned long)theDataValue boardSelectValue:(unsigned long) boardSelectVal beginIndex:(short) beginIndex;
 - (void) autoInit;
 - (void) fullResetOfCard;
+- (void) resetFifo;
+- (void) resetSequencer;
 - (void) loadCrateAddress;
 - (void) loadAllDacs;
 - (void) setPedestals;
 - (void) performPMTSetup:(BOOL) aTriggersDisabled;
 - (void) scan:(SEL)aResumeSelectorInGuardian; 
 - (void) scanWorkingSlot;
+- (BOOL) readCMOSCounts:(BOOL)calcRates channelMask:(unsigned long) aChannelMask;
 
 #pragma mark •••Hw Access Helpers
 - (id) writeToFec32RegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
@@ -272,6 +317,9 @@ typedef struct Fec32CmosShiftReg{
 @end
 
 
+extern NSString* ORFec32ModelCmosReadDisabledMaskChanged;
+extern NSString* ORFec32ModelCmosRateChanged;
+extern NSString* ORFec32ModelBaseCurrentChanged;
 extern NSString* ORFec32ModelVariableDisplayChanged;
 extern NSString* ORFecShowVoltsChanged;
 extern NSString* ORFecCommentsChanged;

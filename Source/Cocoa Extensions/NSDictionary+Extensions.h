@@ -38,3 +38,17 @@
 @interface NSMutableDictionary (OrcaExtensions)
 - (void) setObject:(id)anObject forNestedKey:(NSString*)aStringList;
 @end
+
+@interface NSMutableDictionary (ThreadSafety)
+
+- (id) threadSafeObjectForKey: (id) aKey
+					usingLock: (NSLock *) aLock;
+
+- (void) threadSafeRemoveObjectForKey: (id) aKey
+							usingLock: (NSLock *) aLock;
+
+- (void) threadSafeSetObject: (id) anObject
+					  forKey: (id) aKey
+				   usingLock: (NSLock *) aLock;
+
+@end

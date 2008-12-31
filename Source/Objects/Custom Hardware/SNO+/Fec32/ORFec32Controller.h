@@ -80,6 +80,12 @@
 	IBOutlet NSMatrix*		vb1HMatrix;
 	IBOutlet NSMatrix*		vb1LMatrix;
 	
+	//cmos
+	IBOutlet NSMatrix*		cmosRates0LabelsMatrix;
+	IBOutlet NSMatrix*		cmosRates0Matrix;
+	IBOutlet NSMatrix*		cmosRates1LabelsMatrix;
+	IBOutlet NSMatrix*		cmosRates1Matrix;
+	
 	NSNumberFormatter*		cmosFormatter;
 
 	//cache some stuff to make things easier
@@ -113,8 +119,10 @@
 - (void) hvRefChanged:(NSNotification*)aNote;
 - (void) cmosChanged:(NSNotification*)aNote;
 - (void) boardIdChanged:(NSNotification*)aNote;
+- (void) cmosRatesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) readCmosRatesAction:(id)sender;
 - (IBAction) variableDisplayPUAction:(id)sender;
 - (IBAction) initAction:(id)sender;
 - (IBAction) probeAction:(id)sender;

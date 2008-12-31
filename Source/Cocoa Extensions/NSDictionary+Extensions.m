@@ -164,3 +164,39 @@
 }
 
 @end
+
+@implementation NSMutableDictionary (ThreadSafety)
+
+- (id) threadSafeObjectForKey: (id) aKey
+					usingLock: (NSLock *) aLock;
+{
+    id    result;
+	
+    [aLock lock];
+    result = [self objectForKey: aKey];
+    [[result retain] autorelease];
+    [aLock unlock];
+	
+    return result;
+}
+
+- (void) threadSafeRemoveObjectForKey: (id) aKey
+							usingLock: (NSLock *) aLock;
+{
+    [aLock lock];
+    [self removeObjectForKey: aKey];
+    [aLock unlock];
+}
+
+- (void) threadSafeSetObject: (id) anObject
+					  forKey: (id) aKey
+				   usingLock: (NSLock *) aLock;
+{
+    [aLock lock];
+    [[anObject retain] autorelease];
+    [self setObject: anObject  forKey: aKey];
+    [aLock unlock];
+}
+
+@end
+
