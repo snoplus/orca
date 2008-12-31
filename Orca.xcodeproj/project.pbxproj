@@ -169,7 +169,6 @@
 		840B207C0B4D79400021220C /* NSScanner+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B207A0B4D79400021220C /* NSScanner+Extensions.h */; };
 		840B207D0B4D79400021220C /* NSScanner+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 840B207B0B4D79400021220C /* NSScanner+Extensions.m */; };
 		840B20C60B4D7CE80021220C /* Editing.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840B20C50B4D7CE80021220C /* Editing.tif */; };
-		840B22900B4DB1740021220C /* ScriptRunning.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8438246F0B41C8AE00B7F417 /* ScriptRunning.tif */; };
 		840B72200948AE3A00B1B135 /* smallLock.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840B721E0948AE3900B1B135 /* smallLock.tif */; };
 		840B78F9094A47AF00B1B135 /* Inverter.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840B78F6094A47AF00B1B135 /* Inverter.tif */; };
 		840B78FA094A47B000B1B135 /* ORInverterModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B78F7094A47AF00B1B135 /* ORInverterModel.h */; };
@@ -272,6 +271,12 @@
 		84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 84178D4E0923C4B100C15D2B /* ORSocketClient.h */; };
 		84178D510923C4B100C15D2B /* ORSocketClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 84178D4F0923C4B100C15D2B /* ORSocketClient.m */; };
 		84178E0C0923F60F00C15D2B /* ORCommandClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 8434A3E4055C223A002D3102 /* ORCommandClient.m */; };
+		8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8419221D0F0BBE8000EF1C1C /* ORScriptIDEModel.h */; };
+		841922200F0BBE8000EF1C1C /* ORScriptIDEModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419221E0F0BBE8000EF1C1C /* ORScriptIDEModel.m */; };
+		8419227E0F0BC18800EF1C1C /* ORScriptIDEController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8419227C0F0BC18800EF1C1C /* ORScriptIDEController.m */; };
+		8419227F0F0BC18800EF1C1C /* ORScriptIDEController.h in Headers */ = {isa = PBXBuildFile; fileRef = 8419227D0F0BC18800EF1C1C /* ORScriptIDEController.h */; };
+		841922810F0BC1E300EF1C1C /* ScriptIDE.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841922800F0BC1E300EF1C1C /* ScriptIDE.nib */; };
+		841924490F0BD91A00EF1C1C /* ScriptRunning.tif in Resources */ = {isa = PBXBuildFile; fileRef = 841924480F0BD91A00EF1C1C /* ScriptRunning.tif */; };
 		841B061B0EC4837000B6F77C /* SupportedUSBDevices.h in Headers */ = {isa = PBXBuildFile; fileRef = 841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */; };
 		841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */; };
 		841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */; };
@@ -752,11 +757,8 @@
 		843800320AB23EC20069C0BA /* ORRangeTimerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8438002C0AB23EC20069C0BA /* ORRangeTimerModel.m */; };
 		843800330AB23EC20069C0BA /* RangeTimer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8438002D0AB23EC20069C0BA /* RangeTimer.nib */; };
 		843800510AB244350069C0BA /* rangeTimer.tif in Resources */ = {isa = PBXBuildFile; fileRef = 843800500AB244350069C0BA /* rangeTimer.tif */; };
-		843824660B41BF4800B7F417 /* ORScriptTaskController.h in Headers */ = {isa = PBXBuildFile; fileRef = 843824610B41BF4800B7F417 /* ORScriptTaskController.h */; };
-		843824670B41BF4800B7F417 /* ORScriptTaskController.m in Sources */ = {isa = PBXBuildFile; fileRef = 843824620B41BF4800B7F417 /* ORScriptTaskController.m */; };
 		843824680B41BF4800B7F417 /* ORScriptTaskModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 843824630B41BF4800B7F417 /* ORScriptTaskModel.h */; };
 		843824690B41BF4800B7F417 /* ORScriptTaskModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 843824640B41BF4800B7F417 /* ORScriptTaskModel.m */; };
-		8438246A0B41BF4800B7F417 /* ScriptTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 843824650B41BF4800B7F417 /* ScriptTask.nib */; };
 		8438246E0B41C5E400B7F417 /* ScriptTask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8438246D0B41C5E400B7F417 /* ScriptTask.tif */; };
 		843828AF0B43413500B7F417 /* ORScriptInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 843828AC0B43413500B7F417 /* ORScriptInterface.h */; };
 		843828B00B43413500B7F417 /* ORScriptInterface.m in Sources */ = {isa = PBXBuildFile; fileRef = 843828AD0B43413500B7F417 /* ORScriptInterface.m */; };
@@ -1646,6 +1648,12 @@
 		84E099630CC934CC00EFBC8F /* stop.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84E099610CC934CB00EFBC8F /* stop.tiff */; };
 		84E09A220CCD1AA400EFBC8F /* dec.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E09A200CCD1AA400EFBC8F /* dec.tif */; };
 		84E09A230CCD1AA400EFBC8F /* inc.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E09A210CCD1AA400EFBC8F /* inc.tif */; };
+		84E18C3A0F0A5D3B0096F0F3 /* NSNotifications+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E18C380F0A5D3B0096F0F3 /* NSNotifications+Extensions.h */; };
+		84E18C3B0F0A5D3B0096F0F3 /* NSNotifications+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E18C390F0A5D3B0096F0F3 /* NSNotifications+Extensions.m */; };
+		84E18C560F0A640C0096F0F3 /* ORLineMarker.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E18C540F0A640C0096F0F3 /* ORLineMarker.h */; };
+		84E18C570F0A640C0096F0F3 /* ORLineMarker.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E18C550F0A640C0096F0F3 /* ORLineMarker.m */; };
+		84E18D640F0A7EFA0096F0F3 /* SingleStep.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E18D5F0F0A7EFA0096F0F3 /* SingleStep.tif */; };
+		84E18D660F0A7EFA0096F0F3 /* Pause.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84E18D610F0A7EFA0096F0F3 /* Pause.tif */; };
 		84E24F42093E703100E963DF /* ORBitProcessing.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E24F41093E703000E963DF /* ORBitProcessing.h */; };
 		84E5B23A0715C65500C7B798 /* NcdCableCheckTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E5B2360715C65500C7B798 /* NcdCableCheckTask.h */; };
 		84E5B23B0715C65500C7B798 /* NcdCableCheckTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E5B2370715C65500C7B798 /* NcdCableCheckTask.m */; };
@@ -1738,12 +1746,9 @@
 		84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB630AE5569100A5AA4C /* my_alloc.h */; };
 		84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */; };
 		84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */; };
-		84FAD2B10EE46AF500746B91 /* ORRunScriptController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FAD2AB0EE46AF500746B91 /* ORRunScriptController.h */; };
-		84FAD2B20EE46AF500746B91 /* ORRunScriptController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FAD2AC0EE46AF500746B91 /* ORRunScriptController.m */; };
 		84FAD2B30EE46AF500746B91 /* ORRunScriptModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FAD2AD0EE46AF500746B91 /* ORRunScriptModel.h */; };
 		84FAD2B40EE46AF500746B91 /* ORRunScriptModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */; };
 		84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84FAD2AF0EE46AF500746B91 /* RunScript.gif */; };
-		84FAD2B60EE46AF500746B91 /* RunScript.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84FAD2B00EE46AF500746B91 /* RunScript.nib */; };
 		84FAF2910EE8246200746B91 /* SBC_Job.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FAF2900EE8246200746B91 /* SBC_Job.h */; };
 		84FB4E010D91E1D90055813E /* ORAnalysisPanel2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */; };
 		84FB4E020D91E1D90055813E /* ORAnalysisPanel2D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */; };
@@ -2254,6 +2259,12 @@
 		8418DC520531EF7A005F64B1 /* ORPulserDistribModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORPulserDistribModel.h; sourceTree = "<group>"; };
 		8418DC530531EF7A005F64B1 /* ORPulserDistribModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORPulserDistribModel.m; sourceTree = "<group>"; };
 		8418DC540531EF7A005F64B1 /* PulserDistrib.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PulserDistrib.nib; sourceTree = "<group>"; };
+		8419221D0F0BBE8000EF1C1C /* ORScriptIDEModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORScriptIDEModel.h; path = "Source/Main Dialogs/CommandCenter/Scripting/ORScriptIDEModel.h"; sourceTree = SOURCE_ROOT; };
+		8419221E0F0BBE8000EF1C1C /* ORScriptIDEModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORScriptIDEModel.m; path = "Source/Main Dialogs/CommandCenter/Scripting/ORScriptIDEModel.m"; sourceTree = SOURCE_ROOT; };
+		8419227C0F0BC18800EF1C1C /* ORScriptIDEController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORScriptIDEController.m; path = "Source/Main Dialogs/CommandCenter/Scripting/ORScriptIDEController.m"; sourceTree = SOURCE_ROOT; };
+		8419227D0F0BC18800EF1C1C /* ORScriptIDEController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORScriptIDEController.h; path = "Source/Main Dialogs/CommandCenter/Scripting/ORScriptIDEController.h"; sourceTree = SOURCE_ROOT; };
+		841922800F0BC1E300EF1C1C /* ScriptIDE.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ScriptIDE.nib; path = "Source/Main Dialogs/CommandCenter/Scripting/ScriptIDE.nib"; sourceTree = SOURCE_ROOT; };
+		841924480F0BD91A00EF1C1C /* ScriptRunning.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ScriptRunning.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/ScriptRunning.tif"; sourceTree = SOURCE_ROOT; };
 		841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedUSBDevices.h; sourceTree = "<group>"; };
 		841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Controller.m; sourceTree = SOURCE_ROOT; };
 		841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Model.m; sourceTree = SOURCE_ROOT; };
@@ -2454,13 +2465,9 @@
 		8438002C0AB23EC20069C0BA /* ORRangeTimerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRangeTimerModel.m; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/ORRangeTimerModel.m; sourceTree = SOURCE_ROOT; };
 		8438002D0AB23EC20069C0BA /* RangeTimer.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = RangeTimer.nib; sourceTree = "<group>"; };
 		843800500AB244350069C0BA /* rangeTimer.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = rangeTimer.tif; path = Source/Objects/ProcessLogic/ProcessElements/analog/rangeTimer/rangeTimer.tif; sourceTree = SOURCE_ROOT; };
-		843824610B41BF4800B7F417 /* ORScriptTaskController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptTaskController.h; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ORScriptTaskController.h"; sourceTree = SOURCE_ROOT; };
-		843824620B41BF4800B7F417 /* ORScriptTaskController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptTaskController.m; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ORScriptTaskController.m"; sourceTree = SOURCE_ROOT; };
 		843824630B41BF4800B7F417 /* ORScriptTaskModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptTaskModel.h; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ORScriptTaskModel.h"; sourceTree = SOURCE_ROOT; };
 		843824640B41BF4800B7F417 /* ORScriptTaskModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptTaskModel.m; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ORScriptTaskModel.m"; sourceTree = SOURCE_ROOT; };
-		843824650B41BF4800B7F417 /* ScriptTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ScriptTask.nib; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptTask.nib"; sourceTree = SOURCE_ROOT; };
 		8438246D0B41C5E400B7F417 /* ScriptTask.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ScriptTask.tif; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptTask.tif"; sourceTree = SOURCE_ROOT; };
-		8438246F0B41C8AE00B7F417 /* ScriptRunning.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ScriptRunning.tif; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptRunning.tif"; sourceTree = SOURCE_ROOT; };
 		843828AC0B43413500B7F417 /* ORScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptInterface.h; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ORScriptInterface.h"; sourceTree = SOURCE_ROOT; };
 		843828AD0B43413500B7F417 /* ORScriptInterface.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptInterface.m; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ORScriptInterface.m"; sourceTree = SOURCE_ROOT; };
 		843828AE0B43413500B7F417 /* ScriptInterfaceTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ScriptInterfaceTask.nib; path = "Source/Main Dialogs/TaskMaster/ScriptTask/ScriptInterfaceTask/ScriptInterfaceTask.nib"; sourceTree = SOURCE_ROOT; };
@@ -3500,6 +3507,12 @@
 		84E151F10551D88A00503E02 /* ORDataSetController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORDataSetController.h; path = "Source/Objects/Data Processing/Data Objects/ORDataSetController.h"; sourceTree = SOURCE_ROOT; };
 		84E151F20551D88A00503E02 /* ORDataSetController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDataSetController.m; path = "Source/Objects/Data Processing/Data Objects/ORDataSetController.m"; sourceTree = SOURCE_ROOT; };
 		84E1520B0551D95200503E02 /* DataSet.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = DataSet.nib; path = "Source/Objects/Data Processing/Data Objects/DataSet.nib"; sourceTree = SOURCE_ROOT; };
+		84E18C380F0A5D3B0096F0F3 /* NSNotifications+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSNotifications+Extensions.h"; path = "Source/Cocoa Extensions/NSNotifications+Extensions.h"; sourceTree = SOURCE_ROOT; };
+		84E18C390F0A5D3B0096F0F3 /* NSNotifications+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSNotifications+Extensions.m"; path = "Source/Cocoa Extensions/NSNotifications+Extensions.m"; sourceTree = SOURCE_ROOT; };
+		84E18C540F0A640C0096F0F3 /* ORLineMarker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLineMarker.h; path = "Source/Objects/Misc Objects/Views/ScriptView/ORLineMarker.h"; sourceTree = SOURCE_ROOT; };
+		84E18C550F0A640C0096F0F3 /* ORLineMarker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLineMarker.m; path = "Source/Objects/Misc Objects/Views/ScriptView/ORLineMarker.m"; sourceTree = SOURCE_ROOT; };
+		84E18D5F0F0A7EFA0096F0F3 /* SingleStep.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = SingleStep.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/SingleStep.tif"; sourceTree = SOURCE_ROOT; };
+		84E18D610F0A7EFA0096F0F3 /* Pause.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Pause.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Pause.tif"; sourceTree = SOURCE_ROOT; };
 		84E22AAD0417F26A005F64B1 /* DataTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = DataTask.nib; sourceTree = "<group>"; };
 		84E22AB00417F26A005F64B1 /* ORDataTaskController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDataTaskController.h; sourceTree = "<group>"; };
 		84E22AB10417F26A005F64B1 /* ORDataTaskController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDataTaskController.m; sourceTree = "<group>"; };
@@ -3624,12 +3637,9 @@
 		84F7FB630AE5569100A5AA4C /* my_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_alloc.h; path = Libraries/my_alloc.h; sourceTree = SOURCE_ROOT; };
 		84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeReadWriteCommand.h; sourceTree = "<group>"; };
 		84F9836C06A441CF0087FA3E /* ORGTIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGTIDGenerator.h; path = Source/Objects/OrcaObject/ORGTIDGenerator.h; sourceTree = SOURCE_ROOT; };
-		84FAD2AB0EE46AF500746B91 /* ORRunScriptController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunScriptController.h; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptController.h; sourceTree = SOURCE_ROOT; };
-		84FAD2AC0EE46AF500746B91 /* ORRunScriptController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunScriptController.m; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptController.m; sourceTree = SOURCE_ROOT; };
 		84FAD2AD0EE46AF500746B91 /* ORRunScriptModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRunScriptModel.h; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptModel.h; sourceTree = SOURCE_ROOT; };
 		84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRunScriptModel.m; path = Source/Objects/Control/RunControl/RunScripts/ORRunScriptModel.m; sourceTree = SOURCE_ROOT; };
 		84FAD2AF0EE46AF500746B91 /* RunScript.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = RunScript.gif; path = Source/Objects/Control/RunControl/RunScripts/RunScript.gif; sourceTree = SOURCE_ROOT; };
-		84FAD2B00EE46AF500746B91 /* RunScript.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RunScript.nib; path = Source/Objects/Control/RunControl/RunScripts/RunScript.nib; sourceTree = SOURCE_ROOT; };
 		84FAF2900EE8246200746B91 /* SBC_Job.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBC_Job.h; path = Source/Objects/Hardware/SBC/SBC_Code/SBC_Job.h; sourceTree = SOURCE_ROOT; };
 		84FB4DFF0D91E1D90055813E /* ORAnalysisPanel2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAnalysisPanel2D.m; path = Source/Widgets/Plotting/ORAnalysisPanel2D.m; sourceTree = SOURCE_ROOT; };
 		84FB4E000D91E1D90055813E /* ORAnalysisPanel2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAnalysisPanel2D.h; path = Source/Widgets/Plotting/ORAnalysisPanel2D.h; sourceTree = SOURCE_ROOT; };
@@ -4214,6 +4224,11 @@
 		84080D230B3C7FBE009D3704 /* Scripting */ = {
 			isa = PBXGroup;
 			children = (
+				8419221D0F0BBE8000EF1C1C /* ORScriptIDEModel.h */,
+				8419221E0F0BBE8000EF1C1C /* ORScriptIDEModel.m */,
+				8419227C0F0BC18800EF1C1C /* ORScriptIDEController.m */,
+				8419227D0F0BC18800EF1C1C /* ORScriptIDEController.h */,
+				841922800F0BC1E300EF1C1C /* ScriptIDE.nib */,
 				84080D240B3C7FBE009D3704 /* ORScriptRunner.h */,
 				84080D250B3C7FBE009D3704 /* ORScriptRunner.m */,
 				84C281D10B45BDEA00C9CDA9 /* ORNodeEvaluator.h */,
@@ -5184,13 +5199,9 @@
 		843824600B41BF4800B7F417 /* ScriptTask */ = {
 			isa = PBXGroup;
 			children = (
-				843824610B41BF4800B7F417 /* ORScriptTaskController.h */,
-				843824620B41BF4800B7F417 /* ORScriptTaskController.m */,
 				843824630B41BF4800B7F417 /* ORScriptTaskModel.h */,
 				843824640B41BF4800B7F417 /* ORScriptTaskModel.m */,
 				8438246D0B41C5E400B7F417 /* ScriptTask.tif */,
-				8438246F0B41C8AE00B7F417 /* ScriptRunning.tif */,
-				843824650B41BF4800B7F417 /* ScriptTask.nib */,
 				843828AB0B43413500B7F417 /* ScriptInterfaceTask */,
 			);
 			name = ScriptTask;
@@ -5334,10 +5345,15 @@
 				844357410B5AC9DB0033B918 /* Get Info.tiff */,
 				844357430B5AC9DB0033B918 /* ORLineNumberingRulerView.h */,
 				844357440B5AC9DB0033B918 /* ORLineNumberingRulerView.m */,
+				84E18C540F0A640C0096F0F3 /* ORLineMarker.h */,
+				84E18C550F0A640C0096F0F3 /* ORLineMarker.m */,
 				844357450B5AC9DB0033B918 /* ORScriptView.h */,
 				844357460B5AC9DB0033B918 /* ORScriptView.m */,
 				844357470B5AC9DB0033B918 /* Play.tif */,
 				844357480B5AC9DB0033B918 /* Stop.tif */,
+				84E18D5F0F0A7EFA0096F0F3 /* SingleStep.tif */,
+				84E18D610F0A7EFA0096F0F3 /* Pause.tif */,
+				841924480F0BD91A00EF1C1C /* ScriptRunning.tif */,
 				844357490B5AC9DC0033B918 /* SyntaxDefinition.plist */,
 			);
 			name = ScriptView;
@@ -7861,12 +7877,9 @@
 		84FAD2AA0EE46AF500746B91 /* RunScripts */ = {
 			isa = PBXGroup;
 			children = (
-				84FAD2AB0EE46AF500746B91 /* ORRunScriptController.h */,
-				84FAD2AC0EE46AF500746B91 /* ORRunScriptController.m */,
 				84FAD2AD0EE46AF500746B91 /* ORRunScriptModel.h */,
 				84FAD2AE0EE46AF500746B91 /* ORRunScriptModel.m */,
 				84FAD2AF0EE46AF500746B91 /* RunScript.gif */,
-				84FAD2B00EE46AF500746B91 /* RunScript.nib */,
 			);
 			name = RunScripts;
 			path = Source/Objects/Control/RunControl/RunScripts;
@@ -8099,6 +8112,8 @@
 		F51E695703AE4775015F64B1 /* Cocoa Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				84E18C380F0A5D3B0096F0F3 /* NSNotifications+Extensions.h */,
+				84E18C390F0A5D3B0096F0F3 /* NSNotifications+Extensions.m */,
 				8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */,
 				8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */,
 				848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */,
@@ -8902,7 +8917,6 @@
 				84080D2B0B3C7FBF009D3704 /* ORScriptRunner.h in Headers */,
 				84080D2D0B3C7FBF009D3704 /* NodeTree.h in Headers */,
 				84080D2F0B3C7FBF009D3704 /* OrcaScript.h in Headers */,
-				843824660B41BF4800B7F417 /* ORScriptTaskController.h in Headers */,
 				843824680B41BF4800B7F417 /* ORScriptTaskModel.h in Headers */,
 				843828AF0B43413500B7F417 /* ORScriptInterface.h in Headers */,
 				84C281D30B45BDEA00C9CDA9 /* ORNodeEvaluator.h in Headers */,
@@ -9122,7 +9136,6 @@
 				842376910ED46B7A00BECB64 /* OROrderedObjManager.h in Headers */,
 				8423770A0ED4710700BECB64 /* OROrderedObjHolding.h in Headers */,
 				84EC7CCF0ED718570057C5D8 /* SynthesizeSingleton.h in Headers */,
-				84FAD2B10EE46AF500746B91 /* ORRunScriptController.h in Headers */,
 				84FAD2B30EE46AF500746B91 /* ORRunScriptModel.h in Headers */,
 				84FAF2910EE8246200746B91 /* SBC_Job.h in Headers */,
 				84F910BC0EEEC43C007B583A /* ORVmeReadWriteCommand.h in Headers */,
@@ -9132,6 +9145,10 @@
 				84C37D2D0EF834DD00E77E09 /* SNOController.h in Headers */,
 				84C37D2F0EF834DD00E77E09 /* SNOModel.h in Headers */,
 				84C37E250EF8408F00E77E09 /* ORPSUPTubePosition.h in Headers */,
+				84E18C3A0F0A5D3B0096F0F3 /* NSNotifications+Extensions.h in Headers */,
+				84E18C560F0A640C0096F0F3 /* ORLineMarker.h in Headers */,
+				8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */,
+				8419227F0F0BC18800EF1C1C /* ORScriptIDEController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9515,11 +9532,9 @@
 				849B25EC0B2F34F90007484F /* Prespectrometer.nib in Resources */,
 				849B25ED0B2F34FA0007484F /* prespectrometer.tif in Resources */,
 				84760D350B3728DF00512F67 /* KatrinConstants.h in Resources */,
-				8438246A0B41BF4800B7F417 /* ScriptTask.nib in Resources */,
 				8438246E0B41C5E400B7F417 /* ScriptTask.tif in Resources */,
 				843828B10B43413500B7F417 /* ScriptInterfaceTask.nib in Resources */,
 				840B20C60B4D7CE80021220C /* Editing.tif in Resources */,
-				840B22900B4DB1740021220C /* ScriptRunning.tif in Resources */,
 				844352090B56E9360033B918 /* FindPanel.nib in Resources */,
 				8443574A0B5AC9DE0033B918 /* chainBroken.tif in Resources */,
 				8443574B0B5AC9E00033B918 /* checkScript.tif in Resources */,
@@ -9698,9 +9713,12 @@
 				8491F6740EC0D3C40084BAD6 /* pmt.gif in Resources */,
 				9C9861580ED10DC900E18ED7 /* MailScript.txt in Resources */,
 				84FAD2B50EE46AF500746B91 /* RunScript.gif in Resources */,
-				84FAD2B60EE46AF500746B91 /* RunScript.nib in Resources */,
 				84C37D2B0EF834DD00E77E09 /* SNO.gif in Resources */,
 				84C37D2C0EF834DD00E77E09 /* SNO.nib in Resources */,
+				84E18D640F0A7EFA0096F0F3 /* SingleStep.tif in Resources */,
+				84E18D660F0A7EFA0096F0F3 /* Pause.tif in Resources */,
+				841922810F0BC1E300EF1C1C /* ScriptIDE.nib in Resources */,
+				841924490F0BD91A00EF1C1C /* ScriptRunning.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10168,7 +10186,6 @@
 				84760D580B37437400512F67 /* ORExperimentController.m in Sources */,
 				84080D2C0B3C7FBF009D3704 /* ORScriptRunner.m in Sources */,
 				84080D2E0B3C7FBF009D3704 /* NodeTree.m in Sources */,
-				843824670B41BF4800B7F417 /* ORScriptTaskController.m in Sources */,
 				843824690B41BF4800B7F417 /* ORScriptTaskModel.m in Sources */,
 				843828B00B43413500B7F417 /* ORScriptInterface.m in Sources */,
 				84C281D40B45BDEB00C9CDA9 /* ORNodeEvaluator.m in Sources */,
@@ -10362,13 +10379,16 @@
 				8491FE430EC1DD270084BAD6 /* NSImage+Extensions.m in Sources */,
 				8491FE8C0EC1DF780084BAD6 /* ORSwitchImage.m in Sources */,
 				842376920ED46B7A00BECB64 /* OROrderedObjManager.m in Sources */,
-				84FAD2B20EE46AF500746B91 /* ORRunScriptController.m in Sources */,
 				84FAD2B40EE46AF500746B91 /* ORRunScriptModel.m in Sources */,
 				84B89EA20EF1977800E0C395 /* ORCommandList.m in Sources */,
 				84B89ED20EF1995800E0C395 /* ORVmeReadWriteCommand.m in Sources */,
 				84C37B6C0EF7F30B00E77E09 /* ORSNOCableDB.m in Sources */,
 				84C37D2E0EF834DD00E77E09 /* SNOController.m in Sources */,
 				84C37D300EF834DD00E77E09 /* SNOModel.m in Sources */,
+				84E18C3B0F0A5D3B0096F0F3 /* NSNotifications+Extensions.m in Sources */,
+				84E18C570F0A640C0096F0F3 /* ORLineMarker.m in Sources */,
+				841922200F0BBE8000EF1C1C /* ORScriptIDEModel.m in Sources */,
+				8419227E0F0BC18800EF1C1C /* ORScriptIDEController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
