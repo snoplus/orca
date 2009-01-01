@@ -135,7 +135,7 @@ NSString* ORCountInputConnection				= @"ORCountInputConnection";
     resetState = 0;
     count = 0;
     oldCount = 0;
-	[self performSelectorOnMainThread:@selector(postStateChange) withObject:nil waitUntilDone:NO];
+	[self postStateChange];
 }
 
 //--------------------------------
@@ -172,7 +172,7 @@ NSString* ORCountInputConnection				= @"ORCountInputConnection";
         
         if(setStateTransition || resetTransition || count != oldCount){
             oldCount = count;
-            [self performSelectorOnMainThread:@selector(postStateChange) withObject:nil waitUntilDone:NO];
+			[self postStateChange];
         }
         
     }

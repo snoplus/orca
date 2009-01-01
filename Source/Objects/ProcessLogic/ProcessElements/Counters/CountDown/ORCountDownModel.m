@@ -211,7 +211,7 @@ NSString* ORCountDownLock							= @"ORCountDownLock";
         
         if(setStateTransition || resetTransition || count != oldCount){
             oldCount = count;
-            [self performSelectorOnMainThread:@selector(postStateChange) withObject:nil waitUntilDone:NO];
+			[self postStateChange];
         }
         
     }

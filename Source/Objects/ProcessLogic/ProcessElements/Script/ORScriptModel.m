@@ -141,7 +141,7 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
     [super processIsStarting];
     setState = 0;
     resetState = 0;
-	[self performSelectorOnMainThread:@selector(postStateChange) withObject:nil waitUntilDone:NO];
+	[self postStateChange];
 }
 
 //--------------------------------
@@ -172,7 +172,7 @@ NSString* ORScriptPathChanged					= @"ORScriptPathChanged";
 			else {
 				[scriptRunner stop];
 			}
-            [self performSelectorOnMainThread:@selector(postStateChange) withObject:nil waitUntilDone:NO];
+			[self postStateChange];
         }
         
     }

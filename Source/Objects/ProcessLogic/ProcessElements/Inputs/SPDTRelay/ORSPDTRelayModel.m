@@ -100,7 +100,7 @@ NSString* ORSPDTRelayOutOffConnection  = @"ORSPDTRelayOutOffConnection";
 	@synchronized (self){
 		if(value != evaluatedState){
 			evaluatedState = value;
-			[guardian performSelectorOnMainThread:@selector(postStateChange) withObject:nil waitUntilDone:NO];
+			[guardian postStateChange];
 		}
 	}
 }

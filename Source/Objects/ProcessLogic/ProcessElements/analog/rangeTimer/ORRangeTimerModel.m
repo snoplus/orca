@@ -300,7 +300,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 		
 		if((newState == [self state]) && updateNeeded){
 			//if the state will not post an update, then do it here.
-			[self performSelectorOnMainThread:@selector(postStateChange) withObject:nil waitUntilDone:NO];
+			[self postStateChange];
 		}
 		[self setState: newState];
 		[self setEvaluatedState: newState];
