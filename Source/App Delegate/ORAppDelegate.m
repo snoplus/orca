@@ -325,6 +325,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 			if([[NSDocumentController sharedDocumentController] openDocumentWithContentsOfFile: lastFile display:YES] == nil){
 				NSLogColor([NSColor redColor],@"Last File Opened By Orca Does Not Exist!\n");
 				NSLogColor([NSColor redColor],@"<%@>\n",lastFile);
+				[self closeSplashWindow];
 				NSRunAlertPanel(@"File Error",@"Last File Opened By Orca Does Not Exist!\n\n<%@>",nil,nil,nil,lastFile);
 			}
 			else {
@@ -357,25 +358,23 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	//create an instance of the ORCARoot service and possibly connect    
     [[ORCARootService sharedORCARootService] connectAtStartUp];    
 	
-	[self performSelector:@selector(closeAboutBox) withObject:self afterDelay:kORSplashScreenDelay];
+	[self performSelector:@selector(closeSplashWindow) withObject:self afterDelay:kORSplashScreenDelay];
 	
 	[[self undoManager] removeAllActions];
 	
 }
 
-- (void) closeAboutBox
+- (void) closeSplashWindow
 {
 	[theSplashController close];
 	[theSplashController release];
 	theSplashController = nil;	
-	
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
     return [[[NSUserDefaults standardUserDefaults] objectForKey: OROpeningDocPreferences] intValue];
 }
-
 
 #pragma mark ¥¥¥Menu Management
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem
