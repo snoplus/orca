@@ -41,6 +41,7 @@
 - (void) setAlarmCollection:(ORAlarmCollection*)someAlarms;
 - (void) mailCrashLog;
 - (void) deleteCrashLog;
+- (void) closeSplashWindow;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
