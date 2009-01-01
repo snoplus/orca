@@ -108,10 +108,18 @@
 {
 	NSString* originalText = [[self textStorage] string];
 	NSArray* lines = [originalText componentsSeparatedByString:@"\n"];
+	long selectionStart = 0;
+	long selectionLen = 0;
 	if([lines count] > aLine){
-		NSString* lineToSelect = [lines objectAtIndex:aLine];
-		NSRange selectionRange = [originalText rangeOfString:lineToSelect]; 
+		int i;
+		for(i=0;i<aLine;i++){
+			long lineLen = [[lines objectAtIndex:i] length];
+			selectionStart+=lineLen+1;
+			selectionLen = lineLen;
+		}
+		NSRange selectionRange = NSMakeRange(selectionStart,selectionLen);
 		[self setSelectedRange: selectionRange];
+		[self scrollRangeToVisible: selectionRange];
 	}
 }
 - (void) processEditing: (NSNotification*)notification
