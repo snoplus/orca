@@ -46,8 +46,9 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 
 @interface ORScriptRunner (private)
-- (void)    _evalMain:(id)someNodes;
-- (void)	reportResult:(id)aResult;
+- (void) _evalMain:(id)someNodes;
+- (void) reportResult:(id)aResult;
+- (void) pauseScript;
 @end
 
 @implementation ORScriptRunner
@@ -148,15 +149,9 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerDebuggerStateChanged object:self];
 }
 
-- (void) pauseRunning
+- (void) togglePause
 {
-	if(paused) paused = NO;
-	else	   paused = YES;
-}
-
-- (void) continueRunning
-{
-	continueRunning = YES;
+	scriptShouldPause = !scriptShouldPause;
 }
 
 - (void) singleStep
@@ -265,7 +260,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		[self setFunctionTable:functionList];
 		
 		[eval release];
-		eval = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable];
+		eval = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable functionName:@"main"];
 				
 		if(inputValue){
 			[eval setSymbolTable:[eval makeSymbolTableFor:@"main" args:[NSArray arrayWithObject:inputValue]]];
@@ -342,44 +337,18 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 														object:self];
 }
 //called from the NodeEvaluator from the eval thread
-- (void) checkBreakpoint:(unsigned long) lineNumber
+- (void) checkBreakpoint:(unsigned long) lineNumber functionLevel:(int)functionLevel
 {
 	if([self debugging]){
-		BOOL atBreakPoint = NO;
-		if(lineNumber != 0){
-			if(lineNumber != lastLine){
-				lastLine = lineNumber;
-				if([breakpoints containsIndex:lineNumber] || paused){
-					atBreakPoint = YES;
-					paused = YES;
-				}
-			}	
-			if(atBreakPoint){
-				[self setDebuggerState:kDebuggerPaused];
-				do {
-					[NSThread sleepForTimeInterval:.1];
-					if(!debugging){
-						paused		 = NO;
-						atBreakPoint = NO;
-						step		 = NO;
-						break;
-					}
-					if(!paused){
-						atBreakPoint = NO;
-						step		 = NO;
-						break;
-					}
-					if(step){
-						step		 = NO;
-						atBreakPoint = NO;
-						break;
-					}
-				} while(!exitNow);
-				[self setDebuggerState:kDebuggerRunning];
+		if(lineNumber != lastLine){
+			lastLine = lineNumber;
+			if([breakpoints containsIndex:lineNumber] || scriptShouldPause){
+				[self pauseScript];
 			}
-		}
+		}	
 	}
 }
+
 - (void) run:(id)someArgs sender:(id)aSender
 {
 	if(!running){
@@ -473,6 +442,28 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		[callBack setTarget:finishTarget];
 		[callBack performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:YES];
 	}
+}
+
+- (void) pauseScript
+{
+	scriptShouldPause = YES;
+	
+	[self setDebuggerState:kDebuggerPaused];
+	
+	do {
+		[NSThread sleepForTimeInterval:.1];
+		if(!debugging){
+			scriptShouldPause		 = NO;
+			break;
+		}
+		if(!scriptShouldPause)break;
+		if(step){
+			step = NO;
+			break;
+		}
+	} while(!exitNow);
+	
+	[self setDebuggerState:kDebuggerRunning];
 }
 
 @end

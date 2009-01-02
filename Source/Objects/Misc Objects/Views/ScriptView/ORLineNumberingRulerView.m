@@ -76,6 +76,12 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
 	[markerImage setSize:NSMakeSize(thickness, kMarkerHeight)];	
 }
 
+- (void) showBreakpoints:(BOOL)aState
+{
+	showBreakpoints = aState;
+	[self setNeedsDisplay:YES];
+}
+
 - (void) drawMarkerImageIntoRep:(id)rep
 {	
 	NSRect rect = NSMakeRect(1.0, 2.0, [rep size].width - 2.0, [rep size].height - 3.0);
@@ -113,6 +119,9 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
 
 - (void) mouseDown:(NSEvent*)theEvent
 {	
+	
+	if(!showBreakpoints)return;
+	
 	NSPoint location = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	unsigned line = [self lineNumberForLocation:location.y];
 	if (line != NSNotFound) {
@@ -438,26 +447,27 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
                     float ypos = yinset + NSMinY(rects[0]) - NSMinY(visibleRect);
 					
 					ORLineMarker* marker = [linesToMarkers objectForKey:[NSNumber numberWithUnsignedInt:line]];
-					
-					if (marker != nil){
-						markerImage = [marker image];
-						NSSize markerSize = [markerImage size];
-						NSRect markerRect = NSMakeRect(0.0, 0.0, markerSize.width, markerSize.height);
+					if(showBreakpoints){
 						
-						// Marker is flush right and centered vertically within the line.
-						markerRect.origin.x = NSWidth(bounds) - [markerImage size].width - 1.0;
-						markerRect.origin.y = ypos + NSHeight(rects[0]) / 2.0 - [marker imageOrigin].y;
-						
-						[markerImage drawInRect:markerRect fromRect:NSMakeRect(0, 0, markerSize.width, markerSize.height) operation:NSCompositeSourceOver fraction:1.0];
-					}
-                    
+						if (marker != nil){
+							markerImage = [marker image];
+							NSSize markerSize = [markerImage size];
+							NSRect markerRect = NSMakeRect(0.0, 0.0, markerSize.width, markerSize.height);
+							
+							// Marker is flush right and centered vertically within the line.
+							markerRect.origin.x = NSWidth(bounds) - [markerImage size].width - 1.0;
+							markerRect.origin.y = ypos + NSHeight(rects[0]) / 2.0 - [marker imageOrigin].y;
+							
+							[markerImage drawInRect:markerRect fromRect:NSMakeRect(0, 0, markerSize.width, markerSize.height) operation:NSCompositeSourceOver fraction:1.0];
+						}
+                    }
                     // Line numbers are internally stored starting at 0
                     NSString* labelText = [NSString stringWithFormat:@"%d", line + 1];
                     
                     NSSize stringSize = [labelText sizeWithAttributes:textAttributes];
 					
 					NSDictionary* currentTextAttributes;
-					if (marker == nil)	currentTextAttributes = textAttributes;
+					if (marker == nil || !showBreakpoints)	currentTextAttributes = textAttributes;
 					else				currentTextAttributes = [self markerTextAttributes];
 					
                     // Draw string flush right, centered vertically within the line

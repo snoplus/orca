@@ -41,9 +41,9 @@
 	BOOL				exitNow;
 	BOOL				scriptExists;
 	unsigned long		lastLine;
+	unsigned long		lastLevel;
 	BOOL				step;
-	BOOL				paused;
-	BOOL				continueRunning;
+	BOOL				scriptShouldPause;
 	int					debuggerState;
 	BOOL				debugging;
 	NSMutableIndexSet*	breakpoints;
@@ -52,25 +52,24 @@
 #pragma mark ¥¥¥Accessors
 - (void) setBreakpoints:(NSMutableIndexSet*)aSet;
 - (ORNodeEvaluator*) eval;
-- (BOOL)	exitNow;
-- (id)		inputValue;
-- (void)	setInputValue:(id)aValue;
-- (void)	 setString:(NSString* )theString;
+- (BOOL)		exitNow;
+- (id)			inputValue;
+- (void)		setInputValue:(id)aValue;
+- (void)		setString:(NSString* )theString;
 - (NSMutableDictionary*) functionTable;
-- (void)	 setFunctionTable:(NSMutableDictionary*)aFunctionTable;
-- (NSString*) scriptName;
-- (void)	 setScriptName:(NSString*)aString;
-- (BOOL)	 parsedOK;
-- (BOOL)	 scriptExists;
-- (void)	 setArgs:(NSArray*)args;
+- (void)		setFunctionTable:(NSMutableDictionary*)aFunctionTable;
+- (NSString*)	scriptName;
+- (void)		setScriptName:(NSString*)aString;
+- (BOOL)		parsedOK;
+- (BOOL)		scriptExists;
+- (void)		setArgs:(NSArray*)args;
 
 #pragma mark ¥¥¥Run Methods
 - (BOOL) running;
 - (void) run:(id) someArgs  sender:(id)aSender;
 - (void) stop;
 - (void) setFinishCallBack:(id)aTarget selector:(SEL)aSelector;
-- (void) pauseRunning;
-- (void) continueRunning;
+- (void) togglePause;
 - (void) singleStep;
 - (unsigned) symbolTableCount;
 - (id) symbolNameForIndex:(int)i;
@@ -79,7 +78,7 @@
 - (int) debuggerState;
 - (void) setDebuggerState:(int)aState;
 - (void) setBreakpoints:(NSMutableIndexSet*)aSet;
-- (void) checkBreakpoint:(unsigned long) lineNumber;
+- (void) checkBreakpoint:(unsigned long) lineNumber functionLevel:(int)functionLevel;
 - (BOOL) debugging;
 - (void) setDebugging:(BOOL)aState;
 

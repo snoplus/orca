@@ -159,13 +159,13 @@
 - (void) updateWindow
 {
 	[super updateWindow];
-	[self debuggingChanged:nil];
 	[self scriptChanged:nil];
 	[self commentsChanged:nil];
 	[self runningChanged:nil];
 	[self nameChanged:nil];
 	[self lastFileChanged:nil];
 	[self showSuperClassChanged:nil];
+	[self debuggingChanged:nil];
 	[self breakpointsChanged:nil];
 	[self breakChainChanged:nil];
 }
@@ -215,15 +215,16 @@
 {
 	int debuggerState = [[model scriptRunner] debuggerState];
 	int line = [[model scriptRunner] lastLine];
+	NSString* functionName = [[[model scriptRunner] eval] functionName];
 	if(debuggerState == kDebuggerPaused){
-		[debugStatusField setStringValue:[NSString stringWithFormat:@"Stopped on Line: %d",line]];
+		[debugStatusField setStringValue:[NSString stringWithFormat:@"<%@()> Stopped on Line: %d",functionName,line]];
 		[pauseButton setImage:[NSImage imageNamed:@"Continue"]];
 		[stepButton setEnabled:YES];
 		unsigned long line = [[model scriptRunner] lastLine]-1;
 		[scriptView selectLine:line];
 	}
 	else if(debuggerState == kDebuggerRunning){
-		[debugStatusField setStringValue:[NSString stringWithFormat:@"Running on Line: %d",line]];
+		[debugStatusField setStringValue:[NSString stringWithFormat:@""]];
 		[pauseButton setImage:[NSImage imageNamed:@"Pause"]];
 		[stepButton setEnabled:NO];
 		[scriptView unselectAll];
@@ -265,7 +266,12 @@
 }
 
 - (void) debuggingChanged:(NSNotification*)aNote
-{
+{	
+	NSScrollView* scrollView = [scriptView enclosingScrollView];
+	id theRuler = [scrollView verticalRulerView];
+	
+	[theRuler showBreakpoints:[[model scriptRunner] debugging]];
+	
 	if([[model scriptRunner] debugging]) [debuggerDrawer open];
 	else {
 		[debuggerDrawer close];
@@ -274,6 +280,7 @@
 	if([model running]){
 		[runStatusField setStringValue:[[model scriptRunner] debugging]?@"Debugging":@"Running"];
 	}
+	[self debuggerStateChanged:aNote];
 }
 
 - (void) nameChanged:(NSNotification*)aNote
@@ -295,8 +302,6 @@
 		
 		[runButton setImage:[NSImage imageNamed:@"Stop"]];
 		[runButton setAlternateImage:[NSImage imageNamed:@"Stop"]];
-		[run1Button setImage:[NSImage imageNamed:@"Stop"]];
-		[run1Button setAlternateImage:[NSImage imageNamed:@"Stop"]];
 		[loadSaveButton setEnabled:NO];
 		[scriptView setEditable:NO];
 	}
@@ -305,8 +310,6 @@
 		[runStatusField setStringValue:@""];
 		[runButton setImage:[NSImage imageNamed:@"Play"]];
 		[runButton setAlternateImage:[NSImage imageNamed:@"Play"]];
-		[run1Button setImage:[NSImage imageNamed:@"Play"]];
-		[run1Button setAlternateImage:[NSImage imageNamed:@"Play"]];
 		[loadSaveButton setEnabled:YES];
 		[scriptView setEditable:YES];
 	}
@@ -315,6 +318,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) clearAllBreakpoints:(id) sender
+{
+	[model setBreakpoints:nil];
+}
+
 - (IBAction) breakChainAction:(id) sender
 {
 	[model setBreakChain:[sender intValue]];
@@ -367,7 +375,7 @@
 
 - (IBAction) pauseScript:(id) sender
 {
-	[[model scriptRunner] pauseRunning];
+	[[model scriptRunner] togglePause];
 }
 
 - (IBAction) runScript:(id) sender

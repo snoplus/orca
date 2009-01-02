@@ -72,7 +72,7 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 
 - (void) setBreakpoints:(NSDictionary*) someBreakpoints
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setBreakpoints:breakpoints];
+    //[[[self undoManager] prepareWithInvocationTarget:self] setBreakpoints:breakpoints];
 	
 	[someBreakpoints retain];
 	[breakpoints release];

@@ -28,9 +28,12 @@
 	NSColor				*alternateTextColor;
 	NSColor				*backgroundColor;
 	NSImage				*markerImage;
+	BOOL				showBreakpoints;
 }
 
 - (id) initWithScrollView:(NSScrollView *)aScrollView;
+
+- (void) showBreakpoints:(BOOL)aState;
 
 - (void) setFont:(NSFont *)aFont;
 - (NSFont*) font;

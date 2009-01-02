@@ -65,6 +65,8 @@
 				<string>id</string>
 				<key>cancelLoadSaveAction</key>
 				<string>id</string>
+				<key>clearAllBreakpoints</key>
+				<string>id</string>
 				<key>debuggerAction</key>
 				<string>id</string>
 				<key>listMethodsAction</key>
@@ -139,8 +141,6 @@
 				<key>pauseButton</key>
 				<string>NSButton</string>
 				<key>removeInputButton</key>
-				<string>NSButton</string>
-				<key>run1Button</key>
 				<string>NSButton</string>
 				<key>runButton</key>
 				<string>NSButton</string>

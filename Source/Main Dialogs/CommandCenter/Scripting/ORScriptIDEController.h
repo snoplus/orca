@@ -34,7 +34,6 @@
 	IBOutlet ORScriptView*		scriptView;
 	IBOutlet NSButton*			checkButton;
 	IBOutlet NSButton*			runButton;
-	IBOutlet NSButton*			run1Button;
 	IBOutlet NSMatrix*			argsMatrix;
 	IBOutlet id					loadSaveView;
 	IBOutlet NSButton*			loadSaveButton;
@@ -74,9 +73,10 @@
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) debuggingChanged:(NSNotification*)aNote;
 - (void) debuggerStateChanged:(NSNotification*)aNote;
-- (IBAction) breakChainAction:(id) sender;
 
 #pragma mark •••Actions
+- (IBAction) clearAllBreakpoints:(id) sender;
+- (IBAction) breakChainAction:(id) sender;
 - (IBAction) debuggerAction:(id)sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) showSuperClassAction:(id)sender;

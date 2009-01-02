@@ -33,12 +33,14 @@
 	BOOL				 stop;
 	NSFileHandle*		 logFileHandle;
 	NSLock*				 symbolTableLock; 
-	ORNodeEvaluator*	functionEvaluator;
+	ORNodeEvaluator*	 functionEvaluator;
+	int					 functionLevel;
+	NSString*			 functionName;
 }
 
 #pragma mark •••Initialization
-- (id)		initWithFunctionTable:(id)aFunctionTable;
-- (void)	dealloc; 
+- (id) initWithFunctionTable:(id)aFunctionTable functionName:(NSString*)aFunctionName;
+- (void) dealloc; 
 - (NSUndoManager*) undoManager;
 
 #pragma mark •••Accessors
@@ -49,12 +51,15 @@
 - (BOOL)	exitNow;
 
 #pragma mark •••Symbol Table Routines
+- (void) setFunctionLevel:(int)aLevel;
+- (int) functionLevel;
+- (NSString*) functionName;
 - (void) setValue:(id)aValue forIndex:(int) anIndex;
 - (unsigned) symbolTableCount;
 - (id) symbolNameForIndex:(int)i;
 - (id) symbolValueForIndex:(int)i;
 - (NSMutableDictionary*) minSymbolTable;
-- (NSDictionary*) makeSymbolTableFor:(NSString*)functionName args:(id)argObject;
+- (NSDictionary*) makeSymbolTableFor:(NSString*)aFunctionName args:(id)argObject;
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable;
 - (void) setArgs:(id)someArgs;
 - (id) valueForSymbol:(NSString*) aSymbol;

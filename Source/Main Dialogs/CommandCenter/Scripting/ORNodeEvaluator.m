@@ -61,7 +61,7 @@
 - (id)		doAssign:(id)p op:(int)opr;
 - (id)		postAlarm:(id)p;
 - (id)		clearAlarm:(id)p;
-- (id)		extractValue:(int)index name:(NSString*)functionName args:(NSArray*)valueArray;
+- (id)		extractValue:(int)index name:(NSString*)aFunctionName args:(NSArray*)valueArray;
 - (NSMutableDictionary*) makeSymbolTable;
 @end
 
@@ -73,7 +73,7 @@
 @implementation ORNodeEvaluator
 
 #pragma mark •••Initialization
-- (id) initWithFunctionTable:(id)aFunctionTable
+- (id) initWithFunctionTable:(id)aFunctionTable functionName:(NSString*)aFunctionName
 {
 	self = [super init];
 	if(self) {
@@ -81,6 +81,7 @@
 		_one  = [[NSDecimalNumber one] retain];
 		_zero = [[NSDecimalNumber zero] retain];
 		switchLevel = 0;
+		functionName = [aFunctionName copy];
 		[self setUpSysCallTable];
 		symbolTableLock = [[NSLock alloc] init];
 	}  
@@ -97,6 +98,7 @@
 	[parsedNodes release];
 	[sysCallTable release];
 	[symbolTableLock release];
+	[functionName release];
 	[super dealloc];
 }
 
@@ -107,6 +109,20 @@
 
 
 #pragma mark •••Accessors
+- (NSString*) functionName
+{
+	return functionName;
+}
+
+- (void) setFunctionLevel:(int)aLevel
+{
+	functionLevel = aLevel;
+}
+
+- (int) functionLevel
+{
+	return functionLevel;
+}
 
 - (void) setDelegate:(id)aDelegate
 {
@@ -255,11 +271,11 @@
 	return aValue;
 }
 
-- (NSDictionary*) makeSymbolTableFor:(NSString*)functionName args:(id)argObject
+- (NSDictionary*) makeSymbolTableFor:(NSString*)aFunctionName args:(id)argObject
 {
 	if(!argObject)return nil;
 	
-	NSString* argumentNameString = [self execute:[functionTable objectForKey:[NSString stringWithFormat:@"%@_ArgNode",functionName]] container:nil];
+	NSString* argumentNameString = [self execute:[functionTable objectForKey:[NSString stringWithFormat:@"%@_ArgNode",aFunctionName]] container:nil];
 	NSArray* argKeys = [argumentNameString componentsSeparatedByString:@","];
 	if([argKeys count] == [argObject count]){
 		if([argObject count]){
@@ -269,11 +285,11 @@
 	else {
 		//arg count mismatch
 		//allow main to be special and ignore input arg if none declared
-		if([functionName isEqualToString:@"main"] && [argKeys count]==0){
+		if([aFunctionName isEqualToString:@"main"] && [argKeys count]==0){
 			return nil;
 		}
 		else {
-			NSLogColor([NSColor redColor],@"[%@] %@ called with wrong number of arguments. Check the syntax.\n",scriptName,functionName);
+			NSLogColor([NSColor redColor],@"[%@] %@ called with wrong number of arguments. Check the syntax.\n",scriptName,aFunctionName);
 			[NSException raise:@"Run time" format:@"Wrong number of Arguments"];
 		}
 	}
@@ -288,7 +304,7 @@
 
 - (id) execute:(id) p container:(id)aContainer
 {
-	[delegate checkBreakpoint:[p line]];
+	[delegate checkBreakpoint:[p line] functionLevel:functionLevel];
 	if([delegate exitNow])return 0;
     if (!p) return 0;
     switch([(Node*)p type]) {
@@ -727,16 +743,17 @@
 - (id) doFunctionCall:(id)p
 {
 	id returnValue = nil;
-	NSString* functionName = VARIABLENAME(0);
+	NSString* aFunctionName = VARIABLENAME(0);
 	NSMutableArray* argObject = [[NSMutableArray alloc] initWithCapacity:10];
 	id result = NodeValueWithContainer(1,argObject);
 	if([argObject count] == 0 && result!=nil)[argObject addObject:result];
 	
-	id someNodes = [functionTable objectForKey:functionName];
+	id someNodes = [functionTable objectForKey:aFunctionName];
 	if(someNodes){
-		functionEvaluator = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable];	
+		functionEvaluator = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable functionName:aFunctionName];	
 		[functionEvaluator setDelegate:delegate];
-		[functionEvaluator setSymbolTable:[self makeSymbolTableFor:functionName args:argObject]];
+		[functionEvaluator setFunctionLevel:++functionLevel];
+		[functionEvaluator setSymbolTable:[self makeSymbolTableFor:aFunctionName args:argObject]];
 		
 		@try {
 			unsigned i;
@@ -765,16 +782,16 @@
 		functionEvaluator = nil;
 	}
 	else {
-		ORSysCall* aCall = [sysCallTable objectForKey:functionName];
+		ORSysCall* aCall = [sysCallTable objectForKey:aFunctionName];
 		if(aCall) return [aCall executeWithArgs:argObject];
-		else if([functionName isEqualToString:@"pointx"])   return [self extractValue:0			name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"pointy"])   return [self extractValue:1			name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"rectx"])    return [self extractValue:0			name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"recty"])    return [self extractValue:1			name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"rectw"])    return [self extractValue:2			name:functionName	args:argObject];
-		else if([functionName isEqualToString:@"recth"])    return [self extractValue:3			name:functionName	args:argObject];
+		else if([aFunctionName isEqualToString:@"pointx"])   return [self extractValue:0			name:aFunctionName	args:argObject];
+		else if([aFunctionName isEqualToString:@"pointy"])   return [self extractValue:1			name:aFunctionName	args:argObject];
+		else if([aFunctionName isEqualToString:@"rectx"])    return [self extractValue:0			name:aFunctionName	args:argObject];
+		else if([aFunctionName isEqualToString:@"recty"])    return [self extractValue:1			name:aFunctionName	args:argObject];
+		else if([aFunctionName isEqualToString:@"rectw"])    return [self extractValue:2			name:aFunctionName	args:argObject];
+		else if([aFunctionName isEqualToString:@"recth"])    return [self extractValue:3			name:aFunctionName	args:argObject];
 		else {
-			NSLog(@"%@ has no function called %@ in its function table. Check the syntax.\n",scriptName,functionName);
+			NSLog(@"%@ has no function called %@ in its function table. Check the syntax.\n",scriptName,aFunctionName);
 			[NSException raise:@"Run time" format:@"Function not found"];
 		}
 	}
@@ -1098,7 +1115,7 @@
 	return nil; //never actually gets here.
 }
 
-- (id) extractValue:(int)index name:(NSString*)functionName args:(NSArray*)valueArray
+- (id) extractValue:(int)index name:(NSString*)aFunctionName args:(NSArray*)valueArray
 {
 	id string = [valueArray objectAtIndex:0];
 	if([string isKindOfClass:[NSString class]]){
@@ -1112,7 +1129,7 @@
 		}
 	}
 	
-	NSLog(@"In %@, <%@> not passed the right kind of argument. Check the syntax.\n",scriptName,functionName);
+	NSLog(@"In %@, <%@> not passed the right kind of argument. Check the syntax.\n",scriptName,aFunctionName);
 	[NSException raise:@"Run time" format:@"Arg Type error"];
 	return nil;
 }
