@@ -20,6 +20,7 @@
 
 
 #import "ORNodeEvaluator.h"
+#import "ORScriptRunner.h"
 #import "NodeTree.h"
 #import "OrcaScript.h"
 #import "ORCard.h"
@@ -98,7 +99,6 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
 	[parsedNodes release];
 	[sysCallTable release];
 	[symbolTableLock release];
-	[breakpoints release];
 	[super dealloc];
 }
 
@@ -109,12 +109,6 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
 
 
 #pragma mark •••Accessors
-- (void) setBreakpoints:(NSMutableIndexSet*)aSet
-{
-	[aSet retain];
-	[breakpoints release];
-	breakpoints = aSet;
-}
 
 - (void) setDelegate:(id)aDelegate
 {
@@ -288,30 +282,6 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
 	return nil;
 }
 
-- (void) setDebugging:(BOOL)aState;
-{
-	debugging = aState;
-}
-
-- (void) pauseRunning
-{
-	if(paused) paused = NO;
-	else	   paused = YES;
-}
-
-- (void) continueRunning
-{
-	continueRunning = YES;
-}
-
-- (void) singleStep
-{
-	step = YES;
-}
-- (long) lastLine
-{
-	return lastLine;
-}
 
 #pragma mark •••Individual Evaluators
 #define NodeValue(aNode) [self execute:[[p nodeData] objectAtIndex:aNode] container:nil]
@@ -320,43 +290,7 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
 
 - (id) execute:(id) p container:(id)aContainer
 {
-	if(debugging){
-		unsigned long lineNumber = [p line];
-		BOOL atBreakPoint = NO;
-		if(lineNumber != 0){
-			if(lineNumber != lastLine){
-				lastLine = lineNumber;
-				if([breakpoints containsIndex:lineNumber] || paused){
-					atBreakPoint = YES;
-					paused = YES;
-				}
-			}	
-			if(atBreakPoint){
-				[self setDebuggerState:kDebuggerPaused];
-				do {
-					[NSThread sleepForTimeInterval:.1];
-					if(!debugging){
-						paused		 = NO;
-						atBreakPoint = NO;
-						step		 = NO;
-						break;
-					}
-					if(!paused){
-						atBreakPoint = NO;
-						step		 = NO;
-						break;
-					}
-					if(step){
-						step		 = NO;
-						atBreakPoint = NO;
-						break;
-					}
-				} while(1);
-				[self setDebuggerState:kDebuggerRunning];
-			}
-		}
-	}
-	
+	[delegate checkBreakpoint:[p line]];
 	if([delegate exitNow])return 0;
     if (!p) return 0;
     switch([(Node*)p type]) {
@@ -371,16 +305,6 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
 	return nil; //should never actually get here.
 }
 
-- (int) debuggerState
-{
-	return debuggerState;
-}
-
-- (void) setDebuggerState:(int)aState
-{
-	debuggerState = aState;
-	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORNodeEvaluatorDebuggerStateChanged object:self];
-}
 
 #pragma mark •••Finders and Helpers
 - (id) findObject:(id) p
@@ -500,7 +424,11 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
     NSLogFont([NSFont fontWithName:@"Monaco" size:9.0],@"\n%@",[self finalPass:[self printNode:p atLevel:level lastOne:NO]]);
     return 0;
 }
-
+- (ORNodeEvaluator*) functionEvaluator
+{
+	if(functionEvaluator)return [functionEvaluator functionEvaluator];
+	else return self;
+}
 @end
 
 @implementation ORNodeEvaluator (Interpret_private)
@@ -808,9 +736,9 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
 	
 	id someNodes = [functionTable objectForKey:functionName];
 	if(someNodes){
-		ORNodeEvaluator* anEvaluator = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable];	
-		[anEvaluator setDelegate:delegate];
-		[anEvaluator setSymbolTable:[self makeSymbolTableFor:functionName args:argObject]];
+		functionEvaluator = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable];	
+		[functionEvaluator setDelegate:delegate];
+		[functionEvaluator setSymbolTable:[self makeSymbolTableFor:functionName args:argObject]];
 		
 		@try {
 			unsigned i;
@@ -818,7 +746,7 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
 			for(i=0;i<numNodes;i++){
 				if([delegate exitNow])break;
 				id aNode = [someNodes objectAtIndex:i];
-				[anEvaluator execute:aNode container:nil];
+				[functionEvaluator execute:aNode container:nil];
 			}
 		}
 		@catch(NSException* localException) {
@@ -830,11 +758,13 @@ NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateCh
 			}
 			else {
 				[argObject release];
-				[anEvaluator release];
+				[functionEvaluator release];
+				functionEvaluator = nil;
 				[localException raise];
 			}
 		}
-		[anEvaluator release];
+		[functionEvaluator release];
+		functionEvaluator = nil;
 	}
 	else {
 		ORSysCall* aCall = [sysCallTable objectForKey:functionName];

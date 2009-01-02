@@ -24,9 +24,10 @@
 #import "ORNodeEvaluator.h"
 #import "NSNotifications+Extensions.h"
 
-NSString* ORScriptRunnerRunningChanged = @"ORScriptRunnerRunningChanged";
-NSString* ORScriptRunnerParseError	   = @"ORScriptRunnerParseError";
-NSString* ORScriptRunnerDebuggerStateChanged	   = @"ORScriptRunnerDebuggerStateChanged";
+NSString* ORScriptRunnerRunningChanged			= @"ORScriptRunnerRunningChanged";
+NSString* ORScriptRunnerParseError				= @"ORScriptRunnerParseError";
+NSString* ORScriptRunnerDebuggerStateChanged	= @"ORScriptRunnerDebuggerStateChanged";
+NSString* ORScriptRunnerDebuggingChanged		= @"ORScriptRunnerDebuggingChanged";
 
 //========================================================================
 #pragma mark ¥¥¥YACC interface
@@ -65,13 +66,21 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	[eval release];
 	[functionTable release];
 	[expressionAsData release];
+	[breakpoints release];
 	[super dealloc];
 }
 
 #pragma mark ¥¥¥Accessors
+- (void) setBreakpoints:(NSMutableIndexSet*)aSet
+{
+	[aSet retain];
+	[breakpoints release];
+	breakpoints = aSet;
+}
+
 - (ORNodeEvaluator*) eval
 {
-	return eval;
+	return [eval functionEvaluator] ;
 }
 
 - (BOOL)	exitNow
@@ -128,57 +137,42 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 {
 	return running;
 }
-
-- (BOOL) debugging
+- (int) debuggerState
 {
-	return debugging;
+	return debuggerState;
 }
 
-- (void) setDebugging:(BOOL)aState
+- (void) setDebuggerState:(int)aState
 {
-	debugging = aState;
-	if(running)[eval setDebugging:aState];
-}
-
-- (void) run:(id)someArgs sender:(id)aSender
-{
-	if(!running){
-		[self evaluateAll:someArgs sender:aSender];
-	}
+	debuggerState = aState;
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerDebuggerStateChanged object:self];
 }
 
 - (void) pauseRunning
 {
-	if(debugging)[eval pauseRunning];
-}
-
-- (void) singleStep
-{
-	if(debugging)[eval singleStep];
+	if(paused) paused = NO;
+	else	   paused = YES;
 }
 
 - (void) continueRunning
 {
-	if(debugging)[eval continueRunning];
+	continueRunning = YES;
 }
 
-- (int) debuggerState
+- (void) singleStep
 {
-	if(debugging)return [eval debuggerState];
-	else return 0;
+	step = YES;
 }
 
 - (long) lastLine
 {
-	if(debugging)return [eval lastLine];
-	else return 0;
+	return lastLine;
 }
 
 - (void) stop
 {
 	stopThread = YES;
 	exitNow = YES;;
-	if(debugging)[eval setDebugging:NO];
 }
 
 - (void) setFinishCallBack:(id)aTarget selector:(SEL)aSelector
@@ -201,10 +195,6 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	return [eval symbolValueForIndex:i];
 }
 
-//- (id) minSymbolTable
-//{
-//	return [eval minSymbolTable];
-//}
 
 #pragma mark ¥¥¥Parsers
 
@@ -274,13 +264,9 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		theScriptRunner = nil;
 		[self setFunctionTable:functionList];
 		
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:ORNodeEvaluatorDebuggerStateChanged object:eval];
-		
 		[eval release];
 		eval = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(evalDebuggerStateChanged:) name:ORNodeEvaluatorDebuggerStateChanged object:eval];
-		
+				
 		if(inputValue){
 			[eval setSymbolTable:[eval makeSymbolTableFor:@"main" args:[NSArray arrayWithObject:inputValue]]];
 		}
@@ -290,17 +276,9 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	return [self functionTable];
 }
 
-- (void) evalDebuggerStateChanged:(NSNotificationCenter*)aNote
-{
-	//just pass it on
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerDebuggerStateChanged object:self];
-	
-}
-
 #pragma mark ¥¥¥Group Evaluators
 - (void) stopThread
 {
-	[eval setDebugging:NO];
 	stopThread = YES;
 }
 
@@ -312,9 +290,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 - (void) evaluateAll:(id)someArgs sender:(id)aSender;
 {
 	if(!running){
-		
-		[eval setDebugging:debugging];
-		
+				
 		exitNow	   = NO;
 		stopThread = NO;
 		[eval setScriptName:scriptName];
@@ -352,6 +328,63 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	[expressionAsData getBytes:theBuffer range:NSMakeRange(yaccInputPosition,theCopySize)];  
 	yaccInputPosition = yaccInputPosition + theCopySize;
 	return theCopySize;
+}
+
+- (BOOL) debugging
+{
+	return debugging;
+}
+
+- (void) setDebugging:(BOOL)aState
+{
+	debugging = aState;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptRunnerDebuggingChanged 
+														object:self];
+}
+//called from the NodeEvaluator from the eval thread
+- (void) checkBreakpoint:(unsigned long) lineNumber
+{
+	if([self debugging]){
+		BOOL atBreakPoint = NO;
+		if(lineNumber != 0){
+			if(lineNumber != lastLine){
+				lastLine = lineNumber;
+				if([breakpoints containsIndex:lineNumber] || paused){
+					atBreakPoint = YES;
+					paused = YES;
+				}
+			}	
+			if(atBreakPoint){
+				[self setDebuggerState:kDebuggerPaused];
+				do {
+					[NSThread sleepForTimeInterval:.1];
+					if(!debugging){
+						paused		 = NO;
+						atBreakPoint = NO;
+						step		 = NO;
+						break;
+					}
+					if(!paused){
+						atBreakPoint = NO;
+						step		 = NO;
+						break;
+					}
+					if(step){
+						step		 = NO;
+						atBreakPoint = NO;
+						break;
+					}
+				} while(!exitNow);
+				[self setDebuggerState:kDebuggerRunning];
+			}
+		}
+	}
+}
+- (void) run:(id)someArgs sender:(id)aSender
+{
+	if(!running){
+		[self evaluateAll:someArgs sender:aSender];
+	}
 }
 
 @end

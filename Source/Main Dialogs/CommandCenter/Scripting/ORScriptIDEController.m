@@ -128,8 +128,8 @@
 		
     [notifyCenter addObserver : self
                      selector : @selector(debuggingChanged:)
-                         name : ORScriptIDEModelDebuggingChanged
-						object: model];
+                         name : ORScriptRunnerDebuggingChanged
+						object: [model scriptRunner]];
 	
 	[notifyCenter addObserver : self
                      selector : @selector(debuggerStateChanged:)
@@ -219,7 +219,7 @@
 		[debugStatusField setStringValue:[NSString stringWithFormat:@"Stopped on Line: %d",line]];
 		[pauseButton setImage:[NSImage imageNamed:@"Continue"]];
 		[stepButton setEnabled:YES];
-		unsigned long line = [[model evaluator] lastLine]-1;
+		unsigned long line = [[model scriptRunner] lastLine]-1;
 		[scriptView selectLine:line];
 	}
 	else if(debuggerState == kDebuggerRunning){
@@ -228,7 +228,7 @@
 		[stepButton setEnabled:NO];
 		[scriptView unselectAll];
 	}
-	[pauseButton setEnabled:[model debugging] && [model running]];
+	[pauseButton setEnabled:[[model scriptRunner] debugging] && [model running]];
 	[debuggerTableView reloadData];
 }
 
@@ -266,13 +266,13 @@
 
 - (void) debuggingChanged:(NSNotification*)aNote
 {
-	if([model debugging]) [debuggerDrawer open];
+	if([[model scriptRunner] debugging]) [debuggerDrawer open];
 	else {
 		[debuggerDrawer close];
 		[scriptView unselectAll];
 	}
 	if([model running]){
-		[runStatusField setStringValue:[model debugging]?@"Debugging":@"Running"];
+		[runStatusField setStringValue:[[model scriptRunner] debugging]?@"Debugging":@"Running"];
 	}
 }
 
@@ -291,14 +291,14 @@
 {
 	if([model running]){
 		[statusField setStringValue:@"Started"];
-		[runStatusField setStringValue:[model debugging]?@"Debugging":@"Running"];
+		[runStatusField setStringValue:[[model scriptRunner] debugging]?@"Debugging":@"Running"];
 		
 		[runButton setImage:[NSImage imageNamed:@"Stop"]];
 		[runButton setAlternateImage:[NSImage imageNamed:@"Stop"]];
 		[run1Button setImage:[NSImage imageNamed:@"Stop"]];
 		[run1Button setAlternateImage:[NSImage imageNamed:@"Stop"]];
 		[loadSaveButton setEnabled:NO];
-		
+		[scriptView setEditable:NO];
 	}
 	else {
 		[statusField setStringValue:@""];
@@ -308,9 +308,10 @@
 		[run1Button setImage:[NSImage imageNamed:@"Play"]];
 		[run1Button setAlternateImage:[NSImage imageNamed:@"Play"]];
 		[loadSaveButton setEnabled:YES];
+		[scriptView setEditable:YES];
 	}
 	[stepButton setEnabled:NO];
-	[pauseButton setEnabled:[model debugging] && [model running]];
+	[pauseButton setEnabled:[[model scriptRunner] debugging] && [model running]];
 }
 
 #pragma mark •••Actions
@@ -321,14 +322,15 @@
 
 - (IBAction) debuggerAction:(id)sender
 {
-	BOOL state = [model debugging];
-	[model setDebugging:!state];	
+	BOOL state = [[model scriptRunner] debugging];
+	[[model scriptRunner] setDebugging:!state];	
 }
 
 - (IBAction) lockAction:(id)sender
 {
     [gSecurity tryToSetLock:ORScriptIDEModelLock to:[sender intValue] forWindow:[self window]];
 }
+
 - (void) showSuperClassAction:(id)sender
 {
 	[model setShowSuperClass:[sender intValue]];	

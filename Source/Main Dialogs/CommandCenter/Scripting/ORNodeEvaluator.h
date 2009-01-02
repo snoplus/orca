@@ -34,14 +34,8 @@
 	id					 delegate;
 	BOOL				 stop;
 	NSFileHandle*		 logFileHandle;
-	unsigned long		 lastLine;
-	BOOL				 debugging;
-	BOOL				 step;
-	BOOL				 paused;
-	BOOL				 continueRunning;
-	int					 debuggerState;
 	NSLock*				 symbolTableLock; 
-	NSMutableIndexSet*	 breakpoints;
+	ORNodeEvaluator*	functionEvaluator;
 }
 
 #pragma mark •••Initialization
@@ -50,13 +44,11 @@
 - (NSUndoManager*) undoManager;
 
 #pragma mark •••Accessors
+- (ORNodeEvaluator*) functionEvaluator;
 - (void) setDelegate:(id)aDelegate;
 - (NSString*) scriptName;
 - (void) setScriptName:(NSString*)aString;
 - (BOOL)	exitNow;
-- (int) debuggerState;
-- (void) setDebuggerState:(int)aState;
-- (void) setBreakpoints:(NSMutableIndexSet*)aSet;
 
 #pragma mark •••Symbol Table Routines
 - (void) setValue:(id)aValue forIndex:(int) anIndex;
@@ -70,7 +62,6 @@
 - (id) valueForSymbol:(NSString*) aSymbol;
 - (id) setValue:(id)aValue forSymbol:(id) aSymbol;
 - (void) setUpSysCallTable;
-- (long) lastLine;
 
 #pragma mark •••Finders
 - (id) findObject:(id) p;
@@ -81,10 +72,6 @@
 - (id)		execute:(id) p container:(id)aContainer;
 - (id)		printNode:(id) p;
 - (void)	printAll:(NSArray*)someNodes;
-- (void)	setDebugging:(BOOL)aState;
-- (void)	pauseRunning;
-- (void)	continueRunning;
-- (void)	singleStep;
 @end
 
 @interface ORSysCall : NSObject
@@ -101,7 +88,6 @@
 - (id) executeWithArgs:(NSArray*)valueArray;
 @end
 
-extern NSString* ORNodeEvaluatorDebuggerStateChanged;
 
 @interface OrcaObject (ORNodeEvaluation)
 - (NSComparisonResult)compare:(NSNumber *)otherNumber;

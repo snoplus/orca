@@ -38,11 +38,17 @@
 	id					inputValue;
 	BOOL				exitNow;
 	BOOL				scriptExists;
+	unsigned long		lastLine;
+	BOOL				step;
+	BOOL				paused;
+	BOOL				continueRunning;
+	int					debuggerState;
 	BOOL				debugging;
-	
+	NSMutableIndexSet*	breakpoints;
 } 
 
 #pragma mark ¥¥¥Accessors
+- (void) setBreakpoints:(NSMutableIndexSet*)aSet;
 - (ORNodeEvaluator*) eval;
 - (BOOL)	exitNow;
 - (id)		inputValue;
@@ -57,8 +63,6 @@
 - (void)	 setArgs:(NSArray*)args;
 
 #pragma mark ¥¥¥Run Methods
-- (BOOL) debugging;
-- (void) setDebugging:(BOOL)aState;
 - (BOOL) running;
 - (void) run:(id) someArgs  sender:(id)aSender;
 - (void) stop;
@@ -69,10 +73,13 @@
 - (unsigned) symbolTableCount;
 - (id) symbolNameForIndex:(int)i;
 - (id) symbolValueForIndex:(int)i;
-///- (id) minSymbolTable;
-- (void) evalDebuggerStateChanged:(NSNotificationCenter*)aNote;
 - (long) lastLine;
 - (int) debuggerState;
+- (void) setDebuggerState:(int)aState;
+- (void) setBreakpoints:(NSMutableIndexSet*)aSet;
+- (void) checkBreakpoint:(unsigned long) lineNumber;
+- (BOOL) debugging;
+- (void) setDebugging:(BOOL)aState;
 
 #pragma mark ¥¥¥Parsers
 - (id)		 parseFile:(NSString*) aPath;
@@ -87,6 +94,7 @@
 
 @end
 
+extern NSString* ORScriptRunnerDebuggingChanged;
 extern NSString* ORScriptRunnerDebuggerStateChanged;
 extern NSString* ORScriptRunnerRunningChanged;
 extern NSString* ORScriptRunnerParseError;

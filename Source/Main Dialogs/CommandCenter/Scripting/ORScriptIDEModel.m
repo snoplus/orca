@@ -31,7 +31,6 @@ NSString* ORScriptIDEModelScriptChanged			 = @"ORScriptIDEModelScriptChanged";
 NSString* ORScriptIDEModelNameChanged			 = @"ORScriptIDEModelNameChanged";
 NSString* ORScriptIDEModelLastFileChangedChanged = @"ORScriptIDEModelLastFileChangedChanged";
 NSString* ORScriptIDEModelLock					 = @"ORScriptIDEModelLock";
-NSString* ORScriptIDEModelDebuggingChanged		 = @"ORScriptIDEModelDebuggingChanged";
 NSString* ORScriptIDEModelBreakpointsChanged	 = @"ORScriptIDEModelBreakpointsChanged";
 NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChanged";
 
@@ -79,13 +78,30 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	[breakpoints release];
 	breakpoints = someBreakpoints;
 	
-	if(debugging && [scriptRunner running]){
-		ORNodeEvaluator* eval = [self evaluator];
-		[eval setBreakpoints:[self breakpointSet]];
+	if([scriptRunner debugging] && [scriptRunner running]){
+		[scriptRunner setBreakpoints:[self breakpointSet]];
 	}
 	
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelBreakpointsChanged object:self];
+}
+
+- (NSMutableIndexSet*) breakpointSet
+{
+	NSMutableIndexSet* aBreakpointSet = [NSMutableIndexSet indexSet];
+	if([breakpoints count]){
+		NSEnumerator* e = [breakpoints objectEnumerator];
+		ORLineMarker* aMarker;
+		while (aMarker = [e nextObject]) {
+			[aBreakpointSet addIndex: [aMarker lineNumber]];
+		}	
+	}
+	return aBreakpointSet;
+}
+- (id) evaluator
+{
+	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
+	return [scriptRunner eval];
 }
 
 - (NSString*) comments
@@ -218,13 +234,6 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	return scriptRunner;
 }
 
-- (id) evaluator
-{
-	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
-	return [scriptRunner eval];
-}
-
-
 - (BOOL) parsedOK
 {
 	return parsedOK;
@@ -233,25 +242,6 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 - (BOOL) scriptExists
 {
 	return scriptExists;
-}
-
-- (BOOL) debugging
-{
-	return debugging;
-}
-
-- (void) setDebugging:(BOOL)aState
-{
-	debugging = aState;
-	if([scriptRunner running]){
-		if(debugging){
-			ORNodeEvaluator* eval = [self evaluator];
-			[eval setBreakpoints:[self breakpointSet]];
-		}
-		[scriptRunner setDebugging:aState];
-	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelDebuggingChanged 
-														object:self];
 }
 
 - (void) parseScript
@@ -272,18 +262,6 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	}
 }
 
-- (NSMutableIndexSet*) breakpointSet
-{
-	NSMutableIndexSet* aBreakpointSet = [NSMutableIndexSet indexSet];
-	if([breakpoints count]){
-		NSEnumerator* e = [breakpoints objectEnumerator];
-		ORLineMarker* aMarker;
-		while (aMarker = [e nextObject]) {
-			[aBreakpointSet addIndex: [aMarker lineNumber]];
-		}	
-	}
-	return aBreakpointSet;
-}
 
 
 - (void) runScript
@@ -298,10 +276,8 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 		if(parsedOK){
 			if([scriptRunner scriptExists]){
 				[scriptRunner setFinishCallBack:self selector:@selector(scriptRunnerDidFinish:returnValue:)];
-				[scriptRunner setDebugging:debugging];
-				if(debugging){
-					ORNodeEvaluator* eval = [self evaluator];
-					[eval setBreakpoints:[self breakpointSet]];
+				if([scriptRunner debugging]){
+					[scriptRunner setBreakpoints:[self breakpointSet]];
 				}
 				[scriptRunner run:inputValues sender:self];
 			}

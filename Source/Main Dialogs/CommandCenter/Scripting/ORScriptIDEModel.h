@@ -62,7 +62,6 @@
 - (BOOL)		parsedOK;
 - (BOOL)		scriptExists;
 - (ORScriptRunner*)	scriptRunner;
-- (id)			evaluator;
 - (NSMutableArray*) inputValues;
 - (void)		addInputValue;
 - (void)		removeInputValue:(int)i;
@@ -78,8 +77,7 @@
 - (void) saveFile;
 - (void) loadScriptFromFile:(NSString*)aFilePath;
 - (void) saveScriptToFile:(NSString*)aFilePath;
-- (BOOL) debugging;
-- (void) setDebugging:(BOOL)aState;
+- (id) evaluator;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -92,7 +90,6 @@ extern NSString* ORScriptIDEModelShowSuperClassChanged;
 extern NSString* ORScriptIDEModelScriptChanged;
 extern NSString* ORScriptIDEModelNameChanged;
 extern NSString* ORScriptIDEModelLastFileChangedChanged;
-extern NSString* ORScriptIDEModelDebuggingChanged;
 extern NSString* ORScriptIDEModelBreakpointsChanged;
 extern NSString* ORScriptIDEModelBreakChainChanged;
 

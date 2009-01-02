@@ -27,7 +27,6 @@
 #import "ORDataSet.h"
 #import "ORScriptRunner.h"
 
-NSString* ORScriptTaskBreakChainChanged		= @"ORScriptTaskBreakChainChanged";
 NSString*  ORScriptTaskInConnector			= @"ORScriptTaskInConnector";
 NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 
@@ -139,21 +138,6 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 	[self setUpImage];
 }
 
-#pragma mark ***Accessors
-- (BOOL) breakChain
-{
-	return breakChain;
-}
-
-- (void) setBreakChain:(BOOL)aState
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setBreakChain:breakChain];
-	breakChain = aState;
-	[self setUpImage];
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptTaskBreakChainChanged object:self];
-
-}
-
 #pragma mark ***Data ID
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
@@ -204,9 +188,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-	
-    [self setBreakChain:[decoder decodeBoolForKey:@"breakChain"]];
-	
+		
     task = [[decoder decodeObjectForKey:@"task"] retain];
     [self installTasks:nil];
 	[task setTitle:scriptName];
@@ -220,7 +202,6 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:task forKey:@"task"];
-    [encoder encodeBool:breakChain forKey:@"breakChain"];
 }
 
 - (void) shipTaskRecord:(id)aTask running:(BOOL)aState
