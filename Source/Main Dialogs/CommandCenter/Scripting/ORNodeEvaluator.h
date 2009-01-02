@@ -17,8 +17,6 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#define kDebuggerPaused  1
-#define kDebuggerRunning 2
 
 @interface ORNodeEvaluator : NSObject {
 	NSMutableDictionary* symbolTable;

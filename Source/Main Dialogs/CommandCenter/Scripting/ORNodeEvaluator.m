@@ -30,8 +30,6 @@
 #import "ORAlarmCollection.h"
 #import "NSNotifications+Extensions.h"
 
-NSString* ORNodeEvaluatorDebuggerStateChanged = @"ORNodeEvaluatorDebuggerStateChanged";
-
 @interface ORNodeEvaluator (Interpret_private)
 - (id)		processStatements:(id) p;
 - (id)		doOperation:(id) p container:(id)aContainer;
