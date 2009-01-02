@@ -455,10 +455,10 @@ id executionNode(int oper, ...)
 {
     va_list ap;
 	Node* p = [[Node alloc] init];
-	//[p setLine:num_lines+1];
+	[p setLine:num_lines+1];
 	[p setType:typeOpr];
 	OprNode* leaf = [[OprNode alloc] init];
-	//[leaf setLine:num_lines+1];
+	[leaf setLine:num_lines+1];
 	[leaf setOperatorTag:oper];
 	[p setNodeData:leaf];
 	
