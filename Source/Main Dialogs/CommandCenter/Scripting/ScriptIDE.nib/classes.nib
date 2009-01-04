@@ -93,6 +93,10 @@
 				<string>id</string>
 				<key>showSuperClassAction</key>
 				<string>id</string>
+				<key>stepIn</key>
+				<string>id</string>
+				<key>stepOut</key>
+				<string>id</string>
 				<key>stepScript</key>
 				<string>id</string>
 			</dict>
@@ -153,6 +157,10 @@
 				<key>statusField</key>
 				<string>ORTimedTextField</string>
 				<key>stepButton</key>
+				<string>NSButton</string>
+				<key>stepInButton</key>
+				<string>NSButton</string>
+				<key>stepOutButton</key>
 				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>

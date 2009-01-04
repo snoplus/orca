@@ -20,6 +20,12 @@
 #define kDebuggerPaused  1
 #define kDebuggerRunning 2
 
+#define kPauseHere		 0
+#define kRunToBreakPoint 1
+#define kSingleStep		 2
+#define kStepInto		 3
+#define kStepOutof		 4
+
 @class ORNodeEvaluator;
 
 @interface ORScriptRunner : NSObject {
@@ -42,11 +48,13 @@
 	BOOL				scriptExists;
 	unsigned long		lastLine;
 	unsigned long		lastLevel;
+	unsigned long       lastFunctionLevel;
 	BOOL				step;
 	BOOL				scriptShouldPause;
 	int					debuggerState;
 	BOOL				debugging;
 	NSMutableIndexSet*	breakpoints;
+	int					debugMode;
 } 
 
 #pragma mark ¥¥¥Accessors
@@ -81,6 +89,8 @@
 - (void) checkBreakpoint:(unsigned long) lineNumber functionLevel:(int)functionLevel;
 - (BOOL) debugging;
 - (void) setDebugging:(BOOL)aState;
+- (int) debugMode;
+- (void) setDebugMode:(int) aMode;
 
 #pragma mark ¥¥¥Parsers
 - (id)		 parseFile:(NSString*) aPath;

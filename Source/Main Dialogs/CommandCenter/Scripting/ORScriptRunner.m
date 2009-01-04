@@ -342,11 +342,34 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	if([self debugging]){
 		if(lineNumber != lastLine){
 			lastLine = lineNumber;
-			if([breakpoints containsIndex:lineNumber] || scriptShouldPause){
+			if((debugMode == kPauseHere) || [breakpoints containsIndex:lineNumber]) 	[self pauseScript];
+			else if((debugMode == kStepInto))											[self pauseScript];
+			else if((debugMode == kSingleStep) && (functionLevel<=lastFunctionLevel))
+			{
+				if(functionLevel != lastFunctionLevel){
+					lastFunctionLevel = functionLevel;
+				}
+				[self pauseScript];
+			}
+			else if((debugMode == kStepOutof)  && (functionLevel>lastFunctionLevel)){
+				if(functionLevel != lastFunctionLevel){
+					lastFunctionLevel = functionLevel;
+				}
+				
 				[self pauseScript];
 			}
 		}	
 	}
+}
+
+- (void) setDebugMode:(int) aMode
+{
+	debugMode = aMode;
+}
+
+- (int) debugMode
+{
+	return debugMode;
 }
 
 - (void) run:(id)someArgs sender:(id)aSender
@@ -445,24 +468,15 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 }
 
 - (void) pauseScript
-{
-	scriptShouldPause = YES;
-	
+{	
 	[self setDebuggerState:kDebuggerPaused];
-	
+	debugMode = kPauseHere;
 	do {
 		[NSThread sleepForTimeInterval:.1];
-		if(!debugging){
-			scriptShouldPause		 = NO;
-			break;
-		}
-		if(!scriptShouldPause)break;
-		if(step){
-			step = NO;
-			break;
-		}
+		if(!debugging)break;
+		if(debugMode!=kPauseHere)break;
 	} while(!exitNow);
-	
+
 	[self setDebuggerState:kDebuggerRunning];
 }
 

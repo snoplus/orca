@@ -220,6 +220,8 @@
 		[debugStatusField setStringValue:[NSString stringWithFormat:@"<%@()> Stopped on Line: %d",functionName,line]];
 		[pauseButton setImage:[NSImage imageNamed:@"Continue"]];
 		[stepButton setEnabled:YES];
+		[stepInButton setEnabled:YES];
+		[stepOutButton setEnabled:YES];
 		unsigned long line = [[model scriptRunner] lastLine]-1;
 		[scriptView selectLine:line];
 	}
@@ -227,6 +229,8 @@
 		[debugStatusField setStringValue:[NSString stringWithFormat:@""]];
 		[pauseButton setImage:[NSImage imageNamed:@"Pause"]];
 		[stepButton setEnabled:NO];
+		[stepInButton setEnabled:NO];
+		[stepOutButton setEnabled:NO];
 		[scriptView unselectAll];
 	}
 	[pauseButton setEnabled:[[model scriptRunner] debugging] && [model running]];
@@ -314,6 +318,8 @@
 		[scriptView setEditable:YES];
 	}
 	[stepButton setEnabled:NO];
+	[stepInButton setEnabled:NO];
+	[stepOutButton setEnabled:NO];
 	[pauseButton setEnabled:[[model scriptRunner] debugging] && [model running]];
 }
 
@@ -370,12 +376,23 @@
 
 - (IBAction) stepScript:(id) sender
 {
-	[[model scriptRunner] singleStep];
+	[[model scriptRunner] setDebugMode:kSingleStep];
+}
+
+- (IBAction) stepIn:(id) sender
+{	
+	[[model scriptRunner] setDebugMode:kStepInto];
+}
+
+- (IBAction) stepOut:(id) sender
+{	
+	[[model scriptRunner] setDebugMode:kStepInto];
 }
 
 - (IBAction) pauseScript:(id) sender
 {
-	[[model scriptRunner] togglePause];
+	if([[model scriptRunner] debugMode] >= kPauseHere) [[model scriptRunner] setDebugMode:kRunToBreakPoint];
+	else [[model scriptRunner] setDebugMode:kPauseHere];
 }
 
 - (IBAction) runScript:(id) sender

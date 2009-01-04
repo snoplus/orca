@@ -51,6 +51,8 @@
     IBOutlet NSTextField*		debugStatusField;
 	IBOutlet NSButton*			pauseButton;
 	IBOutlet NSButton*			stepButton;
+	IBOutlet NSButton*			stepInButton;
+	IBOutlet NSButton*			stepOutButton;
 }
 
 #pragma mark •••Initialization
@@ -92,6 +94,8 @@
 - (IBAction) addInput:(id)sender;
 - (IBAction) removeInput:(id)sender;
 - (IBAction) stepScript:(id) sender;
+- (IBAction) stepIn:(id) sender;
+- (IBAction) stepOut:(id) sender;
 - (IBAction) pauseScript:(id) sender;
 
 @end

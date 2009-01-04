@@ -1831,6 +1831,8 @@
 		9C7DCCAA0E202C1B0034CC44 /* ORNPLCommBoardController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA40E202C1B0034CC44 /* ORNPLCommBoardController.m */; };
 		9C7DCCAB0E202C1B0034CC44 /* ORNPLCommBoardModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7DCCA50E202C1B0034CC44 /* ORNPLCommBoardModel.h */; };
 		9C7DCCAC0E202C1B0034CC44 /* ORNPLCommBoardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA60E202C1B0034CC44 /* ORNPLCommBoardModel.m */; };
+		9C8752580F1138F9005E3686 /* StepOut.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C8752560F1138F9005E3686 /* StepOut.tif */; };
+		9C8752590F1138F9005E3686 /* StepInto.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C8752570F1138F9005E3686 /* StepInto.tif */; };
 		9C8846850E2D8D960099B98E /* ORHP4405A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C88467D0E2D8D960099B98E /* ORHP4405A.nib */; };
 		9C8846860E2D8D960099B98E /* ORHP4405AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C88467E0E2D8D960099B98E /* ORHP4405AController.h */; };
 		9C8846870E2D8D960099B98E /* ORHP4405AController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C88467F0E2D8D960099B98E /* ORHP4405AController.m */; };
@@ -3726,6 +3728,8 @@
 		9C7DCCA50E202C1B0034CC44 /* ORNPLCommBoardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNPLCommBoardModel.h; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.h"; sourceTree = SOURCE_ROOT; };
 		9C7DCCA60E202C1B0034CC44 /* ORNPLCommBoardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNPLCommBoardModel.m; path = "Source/Objects/Misc Objects/NPLCommBoard/ORNPLCommBoardModel.m"; sourceTree = SOURCE_ROOT; };
 		9C7E0885051A522B005F64D5 /* MuxScopeMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MuxScopeMap.h; path = Source/Experiments/Ncd/Detector/MuxScopeMap.h; sourceTree = SOURCE_ROOT; };
+		9C8752560F1138F9005E3686 /* StepOut.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = StepOut.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/StepOut.tif"; sourceTree = SOURCE_ROOT; };
+		9C8752570F1138F9005E3686 /* StepInto.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = StepInto.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/StepInto.tif"; sourceTree = SOURCE_ROOT; };
 		9C88467D0E2D8D960099B98E /* ORHP4405A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ORHP4405A.nib; sourceTree = "<group>"; };
 		9C88467E0E2D8D960099B98E /* ORHP4405AController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AController.h; sourceTree = "<group>"; };
 		9C88467F0E2D8D960099B98E /* ORHP4405AController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AController.m; sourceTree = "<group>"; };
@@ -5356,6 +5360,8 @@
 				84E18D5F0F0A7EFA0096F0F3 /* SingleStep.tif */,
 				842042060F0C082D00720846 /* Continue.tif */,
 				84E18D610F0A7EFA0096F0F3 /* Pause.tif */,
+				9C8752560F1138F9005E3686 /* StepOut.tif */,
+				9C8752570F1138F9005E3686 /* StepInto.tif */,
 				841924480F0BD91A00EF1C1C /* ScriptRunning.tif */,
 				844357490B5AC9DC0033B918 /* SyntaxDefinition.plist */,
 			);
@@ -9723,6 +9729,8 @@
 				841922810F0BC1E300EF1C1C /* ScriptIDE.nib in Resources */,
 				841924490F0BD91A00EF1C1C /* ScriptRunning.tif in Resources */,
 				842042070F0C082D00720846 /* Continue.tif in Resources */,
+				9C8752580F1138F9005E3686 /* StepOut.tif in Resources */,
+				9C8752590F1138F9005E3686 /* StepInto.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

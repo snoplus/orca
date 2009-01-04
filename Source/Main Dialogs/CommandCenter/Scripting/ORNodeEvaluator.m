@@ -752,7 +752,7 @@
 	if(someNodes){
 		functionEvaluator = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable functionName:aFunctionName];	
 		[functionEvaluator setDelegate:delegate];
-		[functionEvaluator setFunctionLevel:++functionLevel];
+		[functionEvaluator setFunctionLevel:functionLevel+1];
 		[functionEvaluator setSymbolTable:[self makeSymbolTableFor:aFunctionName args:argObject]];
 		
 		@try {
