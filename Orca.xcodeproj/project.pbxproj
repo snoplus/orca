@@ -820,7 +820,6 @@
 		844357530B5AC9E00033B918 /* ORScriptView.m in Sources */ = {isa = PBXBuildFile; fileRef = 844357460B5AC9DB0033B918 /* ORScriptView.m */; };
 		844357540B5AC9E00033B918 /* Play.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844357470B5AC9DB0033B918 /* Play.tif */; };
 		844357550B5AC9E00033B918 /* Stop.tif in Resources */ = {isa = PBXBuildFile; fileRef = 844357480B5AC9DB0033B918 /* Stop.tif */; };
-		844357560B5AC9E00033B918 /* SyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844357490B5AC9DC0033B918 /* SyntaxDefinition.plist */; };
 		844384C40B273F9C00A94E26 /* ORAdcInfoProviding.m in Sources */ = {isa = PBXBuildFile; fileRef = 844384C30B273F9C00A94E26 /* ORAdcInfoProviding.m */; };
 		844384C80B273FB600A94E26 /* ORAdcInfoProviding.h in Headers */ = {isa = PBXBuildFile; fileRef = 844384C70B273FB600A94E26 /* ORAdcInfoProviding.h */; };
 		844445770E81311500A1440D /* IpeV4FLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8444456E0E81311500A1440D /* IpeV4FLT.nib */; };
@@ -868,6 +867,7 @@
 		8446CE2607B847B8006CD9C4 /* ORAD413AModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8446CE1E07B847B8006CD9C4 /* ORAD413AModel.h */; };
 		8448E4FC09E5C4AC001B88B5 /* NSView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */; };
 		8448E4FD09E5C4AC001B88B5 /* NSView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */; };
+		844998640F1282E7004B855B /* SyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844998630F1282E7004B855B /* SyntaxDefinition.plist */; };
 		844B42BF0DE5D5680061AE80 /* ORSNORackController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B70DE5D5680061AE80 /* ORSNORackController.h */; };
 		844B42C00DE5D5680061AE80 /* ORSNORackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B42B80DE5D5680061AE80 /* ORSNORackController.m */; };
 		844B42C10DE5D5680061AE80 /* ORSNORackModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B90DE5D5680061AE80 /* ORSNORackModel.h */; };
@@ -2537,7 +2537,6 @@
 		844357460B5AC9DB0033B918 /* ORScriptView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORScriptView.m; path = "Source/Objects/Misc Objects/Views/ScriptView/ORScriptView.m"; sourceTree = SOURCE_ROOT; };
 		844357470B5AC9DB0033B918 /* Play.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Play.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Play.tif"; sourceTree = SOURCE_ROOT; };
 		844357480B5AC9DB0033B918 /* Stop.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Stop.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/Stop.tif"; sourceTree = SOURCE_ROOT; };
-		844357490B5AC9DC0033B918 /* SyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = SyntaxDefinition.plist; path = "Source/Objects/Misc Objects/Views/ScriptView/SyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
 		844384C30B273F9C00A94E26 /* ORAdcInfoProviding.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAdcInfoProviding.m; path = "Source/Objects/Hardware/Hardware Base Classes/ORAdcInfoProviding.m"; sourceTree = SOURCE_ROOT; };
 		844384C70B273FB600A94E26 /* ORAdcInfoProviding.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAdcInfoProviding.h; path = "Source/Objects/Hardware/Hardware Base Classes/ORAdcInfoProviding.h"; sourceTree = SOURCE_ROOT; };
 		8444456E0E81311500A1440D /* IpeV4FLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = IpeV4FLT.nib; sourceTree = "<group>"; };
@@ -2587,6 +2586,7 @@
 		8446CE1E07B847B8006CD9C4 /* ORAD413AModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORAD413AModel.h; sourceTree = "<group>"; };
 		8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+Extensions.h"; sourceTree = "<group>"; };
 		8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+Extensions.m"; sourceTree = "<group>"; };
+		844998630F1282E7004B855B /* SyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = SyntaxDefinition.plist; path = "Source/Main Dialogs/CommandCenter/Scripting/SyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
 		844B42B70DE5D5680061AE80 /* ORSNORackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackController.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.h"; sourceTree = SOURCE_ROOT; };
 		844B42B80DE5D5680061AE80 /* ORSNORackController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNORackController.m; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.m"; sourceTree = SOURCE_ROOT; };
 		844B42B90DE5D5680061AE80 /* ORSNORackModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackModel.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackModel.h"; sourceTree = SOURCE_ROOT; };
@@ -4244,6 +4244,7 @@
 				84080D280B3C7FBF009D3704 /* OrcaScript.h */,
 				84080D290B3C7FBF009D3704 /* OrcaScript.lm */,
 				84759CF40B6036D600123411 /* OrcaScript.ym */,
+				844998630F1282E7004B855B /* SyntaxDefinition.plist */,
 				84759A990B6025E200123411 /* OrcaScriptGuide.rtf */,
 			);
 			name = Scripting;
@@ -5363,7 +5364,6 @@
 				9C8752560F1138F9005E3686 /* StepOut.tif */,
 				9C8752570F1138F9005E3686 /* StepInto.tif */,
 				841924480F0BD91A00EF1C1C /* ScriptRunning.tif */,
-				844357490B5AC9DC0033B918 /* SyntaxDefinition.plist */,
 			);
 			name = ScriptView;
 			path = "Source/Objects/Misc Objects/Views/ScriptView";
@@ -9552,7 +9552,6 @@
 				8443574E0B5AC9E00033B918 /* Get Info.tiff in Resources */,
 				844357540B5AC9E00033B918 /* Play.tif in Resources */,
 				844357550B5AC9E00033B918 /* Stop.tif in Resources */,
-				844357560B5AC9E00033B918 /* SyntaxDefinition.plist in Resources */,
 				84519C6C0B5C0B0900B08915 /* GoToLine.nib in Resources */,
 				842702810B5EE938009176B4 /* katrin.gif in Resources */,
 				847597510B5EF26500123411 /* Sql.gif in Resources */,
@@ -9731,6 +9730,7 @@
 				842042070F0C082D00720846 /* Continue.tif in Resources */,
 				9C8752580F1138F9005E3686 /* StepOut.tif in Resources */,
 				9C8752590F1138F9005E3686 /* StepInto.tif in Resources */,
+				844998640F1282E7004B855B /* SyntaxDefinition.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

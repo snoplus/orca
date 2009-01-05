@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BlockComment:End</key>
+	<string>*/</string>
+	<key>BlockComment:Start</key>
+	<string>/*</string>
+	<key>Identifiers1</key>
+	<array>
+		<string>return</string>
+		<string>exit</string>
+		<string>else</string>
+		<string>if</string>
+		<string>do</string>
+		<string>while</string>
+		<string>for</string>
+		<string>break</string>
+		<string>continue</string>
+		<string>switch</string>
+		<string>case</string>
+		<string>default</string>
+		<string>unless</string>
+	</array>
+	<key>Identifiers2</key>
+	<array>
+		<string>function</string>
+		<string>find</string>
+		<string>waituntil</string>
+		<string>sleep</string>
+		<string>print</string>
+		<string>printh</string>
+		<string>logfile</string>
+		<string>string</string>
+		<string>array</string>
+		<string>point</string>
+		<string>pointx</string>
+		<string>pointy</string>
+		<string>rectx</string>
+		<string>recty</string>
+		<string>rectw</string>
+		<string>recth</string>
+		<string>postalarm</string>
+		<string>clearalarm</string>
+	</array>
+	<key>Constants</key>
+	<array>
+		<string>nil</string>
+		<string>NULL</string>
+		<string>true</string>
+		<string>TRUE</string>
+		<string>false</string>
+		<string>FALSE</string>
+		<string>YES</string>
+		<string>yes</string>
+		<string>NO</string>
+		<string>no</string>
+	</array>
+	<key>Identifiers:Charset</key>
+	<string>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@_1234567890</string>
+	<key>OneLineComment:Start</key>
+	<string>//</string>
+</dict>
+</plist>
