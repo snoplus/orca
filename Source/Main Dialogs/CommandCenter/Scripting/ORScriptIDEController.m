@@ -386,12 +386,12 @@
 
 - (IBAction) stepOut:(id) sender
 {	
-	[[model scriptRunner] setDebugMode:kStepInto];
+	[[model scriptRunner] setDebugMode:kStepOutof];
 }
 
 - (IBAction) pauseScript:(id) sender
 {
-	if([[model scriptRunner] debugMode] >= kPauseHere) [[model scriptRunner] setDebugMode:kRunToBreakPoint];
+	if([[model scriptRunner] debugMode] == kPauseHere) [[model scriptRunner] setDebugMode:kRunToBreakPoint];
 	else [[model scriptRunner] setDebugMode:kPauseHere];
 }
 

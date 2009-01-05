@@ -262,8 +262,6 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	}
 }
 
-
-
 - (void) runScript
 {
 	parsedOK = YES;
@@ -279,6 +277,7 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 				if([scriptRunner debugging]){
 					[scriptRunner setBreakpoints:[self breakpointSet]];
 				}
+				[scriptRunner setDebugMode:kRunToBreakPoint];
 				[scriptRunner run:inputValues sender:self];
 			}
 			else {

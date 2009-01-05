@@ -193,9 +193,13 @@
 
 - (id) symbolNameForIndex:(int)i
 {
+	id theName = @"";
 	[symbolTableLock lock];
-	NSArray* keys = [[[self minSymbolTable] allKeys] sortedArrayUsingSelector:@selector(compare:)];
-	id theName = [[[keys objectAtIndex:i] retain] autorelease];
+	NSMutableDictionary* subsetTable = [self minSymbolTable];
+	if(i<[subsetTable count]){
+		NSArray* keys = [[subsetTable allKeys] sortedArrayUsingSelector:@selector(compare:)];
+		theName = [[[keys objectAtIndex:i] retain] autorelease];
+	}
 	[symbolTableLock unlock];
 
 	return theName;
@@ -203,10 +207,13 @@
 
 - (id) symbolValueForIndex:(int)i
 {
+	id theValue = @"";
 	[symbolTableLock lock];
 	NSMutableDictionary* subsetTable = [self minSymbolTable];
-	NSArray* keys = [[subsetTable allKeys] sortedArrayUsingSelector:@selector(compare:)];
-	id theValue = [[[subsetTable objectForKey:[keys objectAtIndex:i]] retain] autorelease];
+	if(i<[subsetTable count]){
+		NSArray* keys = [[subsetTable allKeys] sortedArrayUsingSelector:@selector(compare:)];
+		 theValue = [[[subsetTable objectForKey:[keys objectAtIndex:i]] retain] autorelease];
+	}
 	[symbolTableLock unlock];
 	
 	return theValue;
