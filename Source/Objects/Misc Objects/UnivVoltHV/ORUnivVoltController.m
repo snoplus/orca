@@ -307,7 +307,7 @@
 	 mCurrentChnl = [mChannelNumberField intValue];
 	[mChannelStepperField setIntValue: mCurrentChnl];
 	[self setChnlValues: mCurrentChnl];
-	[self updateWindow];
+//	[self updateWindow];
 }
 
 - (IBAction) setChannelNumberStepper: (id) aSender
@@ -320,7 +320,7 @@
 
 - (IBAction) setChnlEnabled: (id) aSender
 {
-	int enabled = [mChnlEnabled state];
+	int enabled = [mChnlEnabled intValue];
 
 	[model setChannelEnabled: enabled chnl: mCurrentChnl];
 }
@@ -478,7 +478,7 @@
 {
 	NSMutableDictionary* tmpChnl = [model channelDictionary: aRowIndex];
 	NSString* colIdentifier = [aTableColumn identifier];
-	if ( [colIdentifier isEqualToString: @"chnlEnabled"]) NSLog( @"Row: %d, column: %@", aRowIndex, colIdentifier );
+	if ( [colIdentifier isEqualToString: @"chnlEnabled"]) NSLog( @"ORUnivVoltCont - Row: %d, column: %@", aRowIndex, colIdentifier );
 	return( [tmpChnl objectForKey: colIdentifier] );
 }
 
@@ -496,22 +496,28 @@
 
 }
 
+// Set values for single channel display.
 - (void) setChnlValues: (int) aCurrentChannel
 {
 	float			value;
 	NSDictionary*	tmpChnl = [model channelDictionary: aCurrentChannel];
-	bool			state = [mChnlEnabled state];
+//	bool			state = [mChnlEnabled state];
 	NSString*		valueStr;
+	int				valueInt;
 //	int				status;
 
 //	[model printDictionary: mCurrentChnl];
 //	NSLog( @"\n\nChnl: %d\n", aCurrentChannel );
 	
-	[mChnlEnabled setState: state];
+//	[mChnlEnabled setState: state];
 //	NSLog( @"State: %d\n", state );
+	valueInt = [[tmpChnl objectForKey: HVkChannelEnabled] intValue];
+	[mChnlEnabled setIntValue: valueInt];
+//	valueStr = [mChnlEnabled: intValue: valueInt];
 	
 	value = [[tmpChnl objectForKey: HVkMeasuredCurrent] floatValue];
 	valueStr = [NSString stringWithFormat: @"%f", value];
+	
 	[mMeasuredCurrent setStringValue: valueStr];
 //	NSLog( @"Measured current: %f\n", value );
 	

@@ -127,7 +127,7 @@ extern NSString* HVkChannel;
 // HV unit Parameters
 // Data is stored as dictionary objects in mChannelArray.
 extern NSString* HVkParam;			// The parameters
-extern NSString* HVkChnlEnabled;		//1
+extern NSString* HVkChannelEnabled;		//1
 extern NSString* HVkMeasuredCurrent;	//2
 extern NSString* HVkMeasuredHV;			//3
 extern NSString* HVkDemandHV;		    //4

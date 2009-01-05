@@ -500,7 +500,7 @@ NSString* UVkWrite = @"W";
 - (int) chnlEnabled: (int) aCurrentChnl
 {
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];
-	NSNumber* numObj = [tmpChnl objectForKey: [tmpChnl objectForKey: @"CE"]];
+	NSNumber* numObj = [tmpChnl objectForKey: [tmpChnl objectForKey: HVkChannelEnabled]];
 	return( [numObj intValue] );
 }
 
@@ -509,7 +509,7 @@ NSString* UVkWrite = @"W";
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	
 	NSNumber* enabledNumber = [NSNumber numberWithInt: anEnabled];
-	[tmpChnl setObject: enabledNumber forKey: enabledNumber];
+	[tmpChnl setObject: enabledNumber forKey: HVkChannelEnabled];
 //	NSLog( @"Channel %d has enabled flag set to %d \n", aCurChannel, [enabledNumber intValue]);
 	
 	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
