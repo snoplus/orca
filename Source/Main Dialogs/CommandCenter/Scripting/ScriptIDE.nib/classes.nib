@@ -69,6 +69,8 @@
 				<string>id</string>
 				<key>debuggerAction</key>
 				<string>id</string>
+				<key>insertCode</key>
+				<string>id</string>
 				<key>listMethodsAction</key>
 				<string>id</string>
 				<key>loadFileAction</key>
@@ -116,6 +118,8 @@
 				<string>NSButton</string>
 				<key>classNameField</key>
 				<string>NSTextField</string>
+				<key>codeHelperPU</key>
+				<string>NSPopUpButton</string>
 				<key>commentsView</key>
 				<string>NSTextView</string>
 				<key>debugStatusField</key>

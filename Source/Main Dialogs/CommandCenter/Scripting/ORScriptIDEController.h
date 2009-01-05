@@ -53,6 +53,7 @@
 	IBOutlet NSButton*			stepButton;
 	IBOutlet NSButton*			stepInButton;
 	IBOutlet NSButton*			stepOutButton;
+	IBOutlet NSPopUpButton*		codeHelperPU;
 }
 
 #pragma mark •••Initialization
@@ -97,5 +98,6 @@
 - (IBAction) stepIn:(id) sender;
 - (IBAction) stepOut:(id) sender;
 - (IBAction) pauseScript:(id) sender;
+- (IBAction) insertCode:(id) sender;
 
 @end

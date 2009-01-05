@@ -217,7 +217,7 @@
 	int debuggerState = [[model scriptRunner] debuggerState];
 	int line = [[model scriptRunner] lastLine];
 	NSString* functionName = [[[model scriptRunner] eval] functionName];
-	if(debuggerState == kDebuggerPaused){
+	if(debuggerState == kDebuggerPaused) {
 		[debugStatusField setStringValue:[NSString stringWithFormat:@"<%@()> Stopped on Line: %d",functionName,line]];
 		[pauseButton setImage:[NSImage imageNamed:@"Continue"]];
 		[stepButton setEnabled:YES];
@@ -226,7 +226,7 @@
 		unsigned long line = [[model scriptRunner] lastLine]-1;
 		[scriptView selectLine:line];
 	}
-	else if(debuggerState == kDebuggerRunning){
+	else if(debuggerState == kDebuggerRunning) {
 		[debugStatusField setStringValue:[NSString stringWithFormat:@""]];
 		[pauseButton setImage:[NSImage imageNamed:@"Pause"]];
 		[stepButton setEnabled:NO];
@@ -309,7 +309,10 @@
 		[runButton setImage:[NSImage imageNamed:@"Stop"]];
 		[runButton setAlternateImage:[NSImage imageNamed:@"Stop"]];
 		[loadSaveButton setEnabled:NO];
-		[scriptView setEditable:NO];
+		[loadSaveButton setEnabled:NO];
+		[codeHelperPU setEnabled:NO];
+		[addInputButton setEnabled:NO];
+		[removeInputButton setEnabled:NO];
 	}
 	else {
 		[statusField setStringValue:@""];
@@ -318,6 +321,9 @@
 		[runButton setAlternateImage:[NSImage imageNamed:@"Play"]];
 		[loadSaveButton setEnabled:YES];
 		[scriptView setEditable:YES];
+		[codeHelperPU setEnabled:YES];
+		[addInputButton setEnabled:YES];
+		[removeInputButton setEnabled:YES];
 	}
 	[stepButton setEnabled:NO];
 	[stepInButton setEnabled:NO];
@@ -508,6 +514,26 @@
 	}
 	[inputVariablesTableView reloadData];
 }
+
+- (IBAction) insertCode:(id) sender
+{
+	NSString* stringToInsert = @"";
+	switch ([sender indexOfSelectedItem]) {
+		case 0: stringToInsert = @"function <name> {\n}";	break;
+		case 1: stringToInsert = @"for(<var> = <start> ; <var> < <end> ; <var>++) {\n}";	break;
+		case 2: stringToInsert = @"while (<condition>) {\n}";	break;
+		case 3: stringToInsert = @"do {\n}while(<condition>);";	break;
+		case 4: stringToInsert = @"if (<condition>) {\n}";	break;
+		case 5: stringToInsert = @"if (<condition>) {\n}\nelse {\n}";	break;
+		case 6: stringToInsert = @"switch (<condition>) {\n\t case <item>:\n\t\t<statement>\n\tbreak;\n\tdefault:\n\t\t<statement>\n\tbreak;\n}";	break;
+		case 7: stringToInsert = @"case <item>:\n\t\t<statement>\n\tbreak;";	break;
+		default:break;
+	}
+	if([stringToInsert length]){
+		[scriptView insertText:stringToInsert];
+	}
+}
+
 
 - (int) numberOfRowsInTableView:(NSTableView *)aTable
 {
