@@ -79,6 +79,7 @@ E			[Ee][+-]?{D}+
 "while"         return WHILE;
 "for"			return FOR;
 "if"            return IF;
+"unless"        return UNLESS;
 "switch"        return SWITCH;
 "case"			return CASE;
 "default"		return DEFAULT;

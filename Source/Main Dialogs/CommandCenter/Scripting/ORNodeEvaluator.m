@@ -44,6 +44,7 @@
 - (id)		defineVariable:(id) p;
 - (id)		processLeftArray:(id) p;
 - (id)		processIf:(id) p;
+- (id)		processUnless:(id) p;
 - (id)		forLoop:(id) p;
 - (id)		waitUntil:(id) p;
 - (id)		waitTimeOut:(id) p;
@@ -374,7 +375,7 @@
 	}
 	else if(numArgs == 2){
 		//only a slot number is included
-		crateNumber = 1;
+		crateNumber = 0;
 		cardNumber = [NodeValue(1) intValue];
 	}
 	else return [NSDecimalNumber zero];
@@ -535,6 +536,7 @@
 			
 			//logic
 		case IF:			return [self processIf:p];
+		case UNLESS:		return [self processUnless:p];
 		case kConditional:  
 		{
 			if([NodeValue(0) isKindOfClass:[NSNumber class]]){
@@ -863,6 +865,12 @@
 	return nil;
 }
 
+- (id) processUnless:(id) p
+{
+	if ([NodeValue(0) isEqual: _zero])		  NodeValue(1);
+	return nil;
+}
+
 - (id) doSwitch:(id) p
 {
 	@try {
@@ -1186,6 +1194,7 @@
                 case WHILE:				line = [NSMutableString stringWithString:@"[while]"];		break;
                 case FOR:				line = [NSMutableString stringWithString:@"[for]"];			break;
                 case IF:				line = [NSMutableString stringWithString:@"[if]"];			break;
+                case UNLESS:			line = [NSMutableString stringWithString:@"[unless]"];			break;
                 case SWITCH:			line = [NSMutableString stringWithString:@"[switch]"];		break;
                 case CASE:				line = [NSMutableString stringWithString:@"[case]"];		break;
                 case DEFAULT:			line = [NSMutableString stringWithString:@"[default]"];		break;

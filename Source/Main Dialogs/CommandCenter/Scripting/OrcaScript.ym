@@ -34,7 +34,7 @@
 %token FUNCTION WHILE DO FOR IF PRINT LOGFILE FIND BREAK EXIT CONTINUE SLEEP RETURN WAITUNTIL HEX MAKEARRAY
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT
-%token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR
+%token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS
 %nonassoc ELSE
 
 %left '+' '-' 
@@ -133,6 +133,7 @@ selection_statement
 : IF '(' expr ')' statement					{ $$ = executionNode(IF, $3, $5,nil); }
 | IF '(' expr ')' statement ELSE statement	{ $$ = executionNode(IF, $3, $5, $7,nil); }
 | SWITCH '(' expr ')'  '{' case_list '}'	{ $$ = executionNode(SWITCH, $3, $6,nil); }
+| UNLESS '(' expr ')' statement				{ $$ = executionNode(UNLESS, $3, $5, nil); }
 ;
 
 iteration_statement
