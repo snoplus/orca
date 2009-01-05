@@ -151,15 +151,6 @@
                          name : ORScriptIDEModelBreakChainChanged
 						object: model];	
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(drawerWillOpen:)
-                         name : NSDrawerWillOpenNotification
-						object: nil];	
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(drawerWillClose:)
-                         name : NSDrawerWillCloseNotification
-						object: nil];	
 	
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
@@ -295,21 +286,6 @@
 		[runStatusField setStringValue:[[model scriptRunner] debugging]?@"Debugging":@"Running"];
 	}
 	[self debuggerStateChanged:aNote];
-}
-
-- (void) drawerWillOpen:(NSNotification *)aNote
-{
-	if([aNote object] == debuggerDrawer)[helpDrawer close];
-	else if([aNote object] == helpDrawer)[debuggerDrawer close];
-}
-
-- (void) drawerWillClose:(NSNotification *)aNote
-{
-	if([aNote object] == helpDrawer){
-		if([[model scriptRunner] debugging]){
-			[debuggerDrawer open];
-		}
-	}
 }
 
 

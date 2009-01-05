@@ -340,7 +340,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 - (void) checkBreakpoint:(unsigned long) lineNumber functionLevel:(int)functionLevel
 {
 	if([self debugging]){
-		if(lineNumber != lastLine){
+		if((lineNumber>0) && (lineNumber != lastLine)){
 			lastLine = lineNumber;
 			if((debugMode == kPauseHere) || [breakpoints containsIndex:lineNumber]) 	[self pauseScript];
 			else if((debugMode == kStepInto))											[self pauseScript];

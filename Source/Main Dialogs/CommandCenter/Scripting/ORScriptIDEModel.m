@@ -257,8 +257,6 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 			//option key is down
 			[scriptRunner printAll];
 		}
-		[scriptRunner release];
-		scriptRunner = nil;
 	}
 }
 

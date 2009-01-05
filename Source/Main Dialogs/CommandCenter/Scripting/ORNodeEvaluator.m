@@ -1261,7 +1261,7 @@
             }
             break;
     }
-	NSString* prependString = @"";
+	NSString* prependString = [p line] ? [NSString stringWithFormat:@"%3d",[p line]]:@"   ";
 	int i;
 	for(i=0;i<aLevel;i++){
 		if(i>=aLevel-1)prependString = [prependString stringByAppendingString:@"|----"];
