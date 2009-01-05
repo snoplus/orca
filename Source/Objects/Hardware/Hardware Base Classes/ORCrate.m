@@ -67,6 +67,11 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 	[self setCrateNumber:anIdNumber-1];
 }
 
+- (NSString*) fullID
+{
+    return [NSString stringWithFormat:@"%@,%d",NSStringFromClass([self class]),[self crateNumber]];
+}
+
 #pragma mark ¥¥¥Accessors
 - (id) adapter
 {
@@ -245,7 +250,7 @@ NSString* ORCrateModelCrateNumberChanged	= @"ORCrateModelCrateNumberChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"%@ %d",[self className],[self tag]];
+    return [NSString stringWithFormat:@"%@ %d",[self className],[self crateNumber]];
 }
 
 - (BOOL) powerOff
