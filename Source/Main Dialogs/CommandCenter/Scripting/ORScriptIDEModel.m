@@ -113,12 +113,12 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 - (void) setComments:(NSString*)aComments
 {
 	if(!aComments)aComments = @"";
-    [[[self undoManager] prepareWithInvocationTarget:self] setComments:comments];
+    //[[[self undoManager] prepareWithInvocationTarget:self] setComments:comments];
     
     [comments autorelease];
     comments = [aComments copy];    
 	
-    //[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelCommentsChanged object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelCommentsChanged object:self];
 }
 
 - (BOOL) showSuperClass

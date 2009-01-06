@@ -31,6 +31,7 @@
 NSString* ORCommandPortChangedNotification		= @"ORCommandPortChangedNotification";
 NSString* ORCommandClientsChangedNotification	= @"ORCommandClientsChangedNotification";
 NSString* ORCommandScriptChanged				= @"ORCommandScriptChanged";
+NSString* ORCommandScriptCommentsChanged		= @"ORCommandScriptCommentsChanged";
 NSString* ORCommandArgsChanged					= @"ORCommandArgsChanged";
 NSString* ORCommandCommandChangedNotification	= @"ORCommandCommandChangedNotification";
 NSString* ORCommandLastFileChangedNotification	= @"ORCommandLastFileChangedNotification";
@@ -46,9 +47,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     [[self undoManager] disableUndoRegistration];
     int port = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.CommandCenter.ListeningPort"];
     if(port==0)port = kORCommandPort;
+	
     NSString* theScript = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.CommandCenter.script"];
     if(theScript)[self setScript:theScript];
 	else [self setScript:@"function main()\n{\nprint \"hello\";\n}\n"];
+	
+	NSString* theComments = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.CommandCenter.scriptComments"];
+    [self setScriptComments:theComments];
+	
 	NSMutableArray* theArgs = [[[[NSUserDefaults standardUserDefaults] objectForKey: @"orca.CommandCenter.args"] mutableCopy] autorelease];
 	if(!theArgs){
 		theArgs = [NSMutableArray arrayWithObjects:[NSDecimalNumber zero],[NSDecimalNumber zero],[NSDecimalNumber zero],
@@ -81,6 +87,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     [heartBeatTimer release];
     
     [clients release];
+    [script release];
+    [scriptComments release];
     [serverSocket release];
     [destinationObjects release];
 	[history release];
@@ -109,7 +117,23 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     script = [aString copy];	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORCommandScriptChanged object:self];
     [[NSUserDefaults standardUserDefaults] setObject:script forKey:@"orca.CommandCenter.script"];
+	[[NSUserDefaults standardUserDefaults] synchronize];
+}
 
+- (NSString*) scriptComments
+{
+	return scriptComments;
+}
+
+- (void) setScriptComments:(NSString*)aString
+{
+	if(!aString)aString= @"";
+    [[[self undoManager] prepareWithInvocationTarget:self] setScriptComments:scriptComments];
+    [scriptComments autorelease];
+    scriptComments = [aString copy];	
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCommandScriptCommentsChanged object:self];
+    [[NSUserDefaults standardUserDefaults] setObject:scriptComments forKey:@"orca.CommandCenter.scriptComments"];
+	[[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void) setScriptNoNote:(NSString*)aString
@@ -524,7 +548,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 - (void) closeScriptIDE
 {
 	if(scriptIDEModel){
+		[[NSUserDefaults standardUserDefaults] synchronize];
 		[self setScript:[scriptIDEModel script]];
+		[self setScriptComments:[scriptIDEModel comments]];
 		NSArray* w = [[[NSApp delegate] document] findControllersWithModel:scriptIDEModel];
 		[w makeObjectsPerformSelector:@selector(setModel:) withObject:nil];
 		[w makeObjectsPerformSelector:@selector(close)];
@@ -540,6 +566,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 	}	
 	[scriptIDEModel makeMainController];
 	[scriptIDEModel setScript:[self script]];
+	[scriptIDEModel setComments:[self scriptComments]];
 }
 
 - (void) moveInHistoryDown

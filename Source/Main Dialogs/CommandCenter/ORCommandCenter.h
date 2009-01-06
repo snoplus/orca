@@ -39,6 +39,7 @@
     NSTimer*				heartBeatTimer;
 
 	NSString*				script;
+	NSString*				scriptComments;
 	
 	unsigned				historyIndex;
 	NSMutableArray*			history;
@@ -73,6 +74,8 @@
 - (void) timeToBeat:(NSTimer*)aTimer;
 - (NSString*) script;
 - (void) setScript:(NSString*)aString;
+- (NSString*) scriptComments;
+- (void) setScriptComments:(NSString*)aString;
 - (ORScriptIDEModel*) scriptIDEModel;
 
 - (void) moveInHistoryDown;
@@ -105,3 +108,4 @@ extern NSString* ORCommandClientsChangedNotification;
 extern NSString* ORCommandScriptChanged;
 extern NSString* ORCommandCommandChangedNotification;
 extern NSString* ORCommandLastFileChangedNotification;
+extern NSString* ORCommandScriptCommentsChanged;
