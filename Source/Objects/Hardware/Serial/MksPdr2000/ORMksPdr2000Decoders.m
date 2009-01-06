@@ -36,8 +36,6 @@
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 0 taken in seconds since Jan 1, 1970
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure chan 1 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 1 taken in seconds since Jan 1, 1970
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure chan 2 encoded as a float
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 2 taken in seconds since Jan 1, 1970
 //-----------------------------------------------------------------------------------------------
 static NSString* kMkePdrUnit[2] = {
     //pre-make some keys for speed.
