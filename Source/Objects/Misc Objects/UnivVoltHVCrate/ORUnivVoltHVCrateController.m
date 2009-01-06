@@ -42,7 +42,7 @@
 	[super awakeFromNib];
 	
 	NSString* testString = [[NSString alloc] initWithString: @"See if anything appears in text view.\n"];
-	NSLog( @" IPAddress: ",[model ipAddress] );
+	NSLog( @" IPAddress: %@\n", [model ipAddress] );
 	[ipAddressTextField setStringValue: [model ipAddress]];
 //	[mReturnStringFromSocket setString: testString];
 //	[mReturnStringFromSocket appendString: testString1];

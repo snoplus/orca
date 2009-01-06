@@ -186,8 +186,10 @@
 
 - (void) channelEnabledChanged: (NSNotification*) aNote
 {
-	[self setCurrentChnl: (NSNotification *) aNote ];  
-	[mChnlEnabled setIntValue: [model chnlEnabled: mCurrentChnl]];
+	[self setCurrentChnl: (NSNotification *) aNote ]; 
+	int value =  [model chnlEnabled: mCurrentChnl];
+	NSLog( @"ORController - EnabledChanged( %d ): %d\n", mCurrentChnl, value );
+		[mChnlEnabled setIntValue: value];
 }
 
 - (void) measuredCurrentChanged: (NSNotification*) aNote
@@ -307,7 +309,7 @@
 	 mCurrentChnl = [mChannelNumberField intValue];
 	[mChannelStepperField setIntValue: mCurrentChnl];
 	[self setChnlValues: mCurrentChnl];
-//	[self updateWindow];
+//	[self updateWindow]; Not needed.
 }
 
 - (IBAction) setChannelNumberStepper: (id) aSender
@@ -321,6 +323,7 @@
 - (IBAction) setChnlEnabled: (id) aSender
 {
 	int enabled = [mChnlEnabled intValue];
+	NSLog( @"ORController - SetEnabled( %d ): %d\n", mCurrentChnl, enabled );
 	[model setChannelEnabled: enabled chnl: mCurrentChnl];
 }
 

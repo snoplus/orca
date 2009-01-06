@@ -190,12 +190,12 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	}
 	@catch (NSException *exception) {
 
-		NSLog(@"awakeAfterDocumentLoaded: Caught %@: %@", [exception name], [exception  reason]);
+		NSLog(@"ORUnivVoltHVCrateModel - awakeAfterDocumentLoaded: Caught %@: %@", [exception name], [exception  reason]);
 	}
 	@finally
 	{
 	}
-	NSLog( @"awakeAfterDocumentLoaded - OUnivVoltHVCrateModel.\n" );
+	NSLog( @"ORUnivVoltHVCrateModel::awakeAfterDocumentLoaded\n" );
 }
 
 

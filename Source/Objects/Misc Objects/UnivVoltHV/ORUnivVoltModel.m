@@ -152,8 +152,7 @@ NSString* UVkWrite = @"W";
 
 - (void) awakeAfterDocumentLoaded
 {
-
-	NSLog( @"awakeAfterDocumentLoaded - ORUnivVoltModel.m\n" );
+	NSLog( @"ORUnivVoltModel - awakeAfterDocumentLoaded\n" );
 		@try {
 			mParams = [NSMutableDictionary dictionaryWithCapacity: UVkChnlNumParameters];
 
@@ -255,7 +254,7 @@ NSString* UVkWrite = @"W";
 		/* */
 	}	
 	@catch (NSException *exception) {
-		NSLog(@"awakeFromNib: Caught %@: %@", [exception name], [exception  reason]);
+		NSLog(@"***Error: ORUnivVoltModel - awakeAfter Document Loaded: Caught %@: %@", [exception name], [exception  reason]);
 	}
 	@finally
 	{
@@ -500,19 +499,22 @@ NSString* UVkWrite = @"W";
 - (int) chnlEnabled: (int) aCurrentChnl
 {
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];
-	NSNumber* numObj = [tmpChnl objectForKey: [tmpChnl objectForKey: HVkChannelEnabled]];
-	return( [numObj intValue] );
+	NSNumber* numObj = [tmpChnl objectForKey: HVkChannelEnabled];
+	int value = [numObj intValue];
+	NSLog( @"ORModel - ChnlEnabled( %d ): %d %@\n", aCurrentChnl, value, numObj );
+	return( value );
 }
 
 - (void) setChannelEnabled: (int) anEnabled chnl: (int) aCurChannel
 {
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
 	
-	NSNumber* enabledNumber = [NSNumber numberWithInt: anEnabled];
-	[tmpChnl setObject: enabledNumber forKey: HVkChannelEnabled];
-//	NSLog( @"Channel %d has enabled flag set to %d \n", aCurChannel, [enabledNumber intValue]);
+	NSNumber* numObj = [NSNumber numberWithInt: anEnabled];
+	[tmpChnl setObject: numObj forKey: HVkChannelEnabled];
 	
 	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
+	NSLog( @"ORModel - SetEnabled( %d ): %d  Number:Obj %@\n", aCurChannel, anEnabled, numObj );
+
 	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlEnabledChanged object: self userInfo: chnlRet];		
 }
 
