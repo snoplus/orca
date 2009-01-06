@@ -139,6 +139,6 @@ extern NSString* HVkMVDZ;				//9
 extern NSString* HVkMCDZ;				//10
 extern NSString* HVkHVLimit;			//11
 
-extern NSString* HVkCurChnl;
+extern NSString* HVkCurChnl;			// Current channel
 
 //extern NSString* ORUnivVoltLock;

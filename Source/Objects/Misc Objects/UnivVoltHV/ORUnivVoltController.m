@@ -321,7 +321,6 @@
 - (IBAction) setChnlEnabled: (id) aSender
 {
 	int enabled = [mChnlEnabled intValue];
-
 	[model setChannelEnabled: enabled chnl: mCurrentChnl];
 }
 
