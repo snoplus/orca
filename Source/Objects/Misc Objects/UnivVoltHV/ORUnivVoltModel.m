@@ -501,7 +501,7 @@ NSString* UVkWrite = @"W";
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurrentChnl];
 	NSNumber* numObj = [tmpChnl objectForKey: HVkChannelEnabled];
 	int value = [numObj intValue];
-	NSLog( @"ORModel - ChnlEnabled( %d ): %d %@\n", aCurrentChnl, value, numObj );
+//	NSLog( @"ORModel - ChnlEnabled( %d ): %d %@\n", aCurrentChnl, value, numObj );
 	return( value );
 }
 
@@ -513,7 +513,7 @@ NSString* UVkWrite = @"W";
 	[tmpChnl setObject: numObj forKey: HVkChannelEnabled];
 	
 	NSDictionary* chnlRet = [self createChnlRetDict: aCurChannel];
-	NSLog( @"ORModel - SetEnabled( %d ): %d  Number:Obj %@\n", aCurChannel, anEnabled, numObj );
+//	NSLog( @"ORModel - SetEnabled( %d ): %d  Number:Obj %@\n", aCurChannel, anEnabled, numObj );
 
 	[[NSNotificationCenter defaultCenter] postNotificationName: UVChnlEnabledChanged object: self userInfo: chnlRet];		
 }

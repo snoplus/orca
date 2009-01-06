@@ -500,10 +500,10 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 		// Parse the returned data.
 		returnFromSocket = [[self interpretDataFromSocket: aSomeData returnCode: &returnCode] retain];
 		
-		NSLog( @"return from socket %@\n", returnFromSocket );
+//		NSLog( @"return from socket %@\n", returnFromSocket );
 		NSCharacterSet* separators = [NSCharacterSet characterSetWithCharactersInString: @" \n"];
 		NSArray* tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
- 		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
+// 		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
 		
 //added the following to get rid of a 10.4 compiler warning.   MAH 11/13/08 
 #if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
@@ -511,10 +511,10 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 		NSString* temp = [tokens componentsJoinedByString:@" "];
 		tokens = [temp componentsSeparatedByString: @" "]; 
 #else
-		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
- 		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
+//		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
 		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
 #endif
+ 		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
 
 		// Process return code
 		if ( returnCode != 1 )
@@ -821,7 +821,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	char		returnBufferArray[ 257 ];	// 0 Byte is continuation character C is continuation.
 	char		returnBufferString[ 257 ];
 	char		returnCodeArray[ NUMcCODENUM + 1  ];
-	char		displayArray[ 2 ];
+//	char		displayArray[ 2 ];
 	int			lengthOfReturn = 0;
 	int			i;
 	int			responseIndex;
@@ -845,6 +845,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 			returnBufferString[ i ] = '\0';
 		}
 		
+/*
 		displayArray[ 1 ] = '\0';
 		for ( i = 0; i < lengthOfReturn; i++ ) {
 			displayArray[ 0 ] = returnBufferArray[ i ];
@@ -855,7 +856,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 
 			NSLog( @"Interpreted.  Char( %d ): %s\n", i, displayArray );
 		}
-		
+*/		
 		nChar = 0;
 				
 		// Find the C and \0 in the character array.  Replace them with \n except for the last

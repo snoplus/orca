@@ -188,8 +188,8 @@
 {
 	[self setCurrentChnl: (NSNotification *) aNote ]; 
 	int value =  [model chnlEnabled: mCurrentChnl];
-	NSLog( @"ORController - EnabledChanged( %d ): %d\n", mCurrentChnl, value );
-		[mChnlEnabled setIntValue: value];
+//	NSLog( @"ORController - EnabledChanged( %d ): %d\n", mCurrentChnl, value );
+	[mChnlEnabled setIntValue: value];
 }
 
 - (void) measuredCurrentChanged: (NSNotification*) aNote
@@ -323,7 +323,7 @@
 - (IBAction) setChnlEnabled: (id) aSender
 {
 	int enabled = [mChnlEnabled intValue];
-	NSLog( @"ORController - SetEnabled( %d ): %d\n", mCurrentChnl, enabled );
+//	NSLog( @"ORController - SetEnabled( %d ): %d\n", mCurrentChnl, enabled );
 	[model setChannelEnabled: enabled chnl: mCurrentChnl];
 }
 
