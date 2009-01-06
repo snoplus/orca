@@ -71,7 +71,7 @@
 - (id) nextScriptConnector;
 - (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
 - (void) parseScript;
-- (void) runScript;
+- (BOOL) runScript;
 - (BOOL) running;
 - (void) stopScript;
 - (void) saveFile;

@@ -260,7 +260,7 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	}
 }
 
-- (void) runScript
+- (BOOL) runScript
 {
 	parsedOK = YES;
 	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
@@ -286,6 +286,7 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	else {
 		[scriptRunner stop];
 	}
+	return parsedOK;
 }
 
 - (void) stopScript
