@@ -408,7 +408,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 			    NSLog( @"Queue cmd with id: %d - %@\n", aCmdId, aCommand );
 				*/
 				queuedCmd = YES;
-				NSLog( @"Queue cmd: %@ for channel: %d\n", aCommand, aCurrentChnl );
+				NSLog( @"Queue cmd: %@ for cmd id: %d\n", aCommand, aCmdId );
 		    }
 		
 		    // Queue has been filled so dequeue a single command.
