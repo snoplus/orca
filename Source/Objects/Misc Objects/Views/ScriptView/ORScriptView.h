@@ -48,6 +48,7 @@
 - (IBAction) toggleMaintainIndentation: (id)sender;
 - (IBAction) shiftLeft:(id)sender;
 - (IBAction) shiftRight:(id)sender;
+- (IBAction) prettify:(id)sender;
 
 - (void)	 setAutoSyntaxColoring: (BOOL)state;
 - (BOOL)	 autoSyntaxColoring;

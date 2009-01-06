@@ -311,8 +311,10 @@
 		[loadSaveButton setEnabled:NO];
 		[loadSaveButton setEnabled:NO];
 		[codeHelperPU setEnabled:NO];
+		[insertCodeButton setEnabled:NO];
 		[addInputButton setEnabled:NO];
 		[removeInputButton setEnabled:NO];
+
 	}
 	else {
 		[statusField setStringValue:@""];
@@ -322,6 +324,7 @@
 		[loadSaveButton setEnabled:YES];
 		[scriptView setEditable:YES];
 		[codeHelperPU setEnabled:YES];
+		[insertCodeButton setEnabled:YES];
 		[addInputButton setEnabled:YES];
 		[removeInputButton setEnabled:YES];
 	}
@@ -518,7 +521,7 @@
 - (IBAction) insertCode:(id) sender
 {
 	NSString* stringToInsert = @"";
-	switch ([sender indexOfSelectedItem]) {
+	switch ([codeHelperPU indexOfSelectedItem]) {
 		case 0: stringToInsert = @"function <name> {\n}";	break;
 		case 1: stringToInsert = @"for(<var> = <start> ; <var> < <end> ; <var>++) {\n}";	break;
 		case 2: stringToInsert = @"while (<condition>) {\n}";	break;

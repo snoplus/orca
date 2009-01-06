@@ -54,6 +54,7 @@
 	IBOutlet NSButton*			stepInButton;
 	IBOutlet NSButton*			stepOutButton;
 	IBOutlet NSPopUpButton*		codeHelperPU;
+	IBOutlet NSButton*			insertCodeButton;
 }
 
 #pragma mark •••Initialization

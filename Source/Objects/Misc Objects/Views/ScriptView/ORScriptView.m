@@ -799,4 +799,52 @@
 	else return NO;
 }
 
+- (IBAction) prettify:(id)sender
+{
+	NSString* originalText = [[self textStorage] string];
+	NSRange	theSelection   = [self selectedRange];
+	BOOL wasSelection = YES;
+	if(theSelection.length == 0){
+		theSelection = NSMakeRange(0,[originalText length]);
+		wasSelection = NO;
+	}
+	NSRange paragraphRange = [self selectionRangeForProposedRange:theSelection granularity:NSSelectByParagraph];
+	NSArray* lines = [[originalText substringWithRange:paragraphRange] componentsSeparatedByString:@"\n"];
+	//step one -- remove all leading tabs and spaces
+	NSMutableArray* newLines = [NSMutableArray array];
+	NSEnumerator* e = [lines objectEnumerator];
+	NSString* s;
+	int level = 0;
+	while(s = [e nextObject]){
+		while([s hasPrefix:@" "] || [s hasPrefix:@"\t"]){
+			s = [s stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:@""];
+		} 
+		NSMutableString* tabs = [NSMutableString stringWithString:@""];
+		int i;
+		for(i=0;i<level;i++)[tabs insertString:@"\t" atIndex:0];
+		s = [s stringByReplacingCharactersInRange:NSMakeRange(0,0) withString:tabs];
+		if( (([s rangeOfString:@"{"].location != NSNotFound) && ([s rangeOfString:@"}"].location == NSNotFound)) || 
+		   ([s rangeOfString:@"case"].location != NSNotFound) || 
+		   ([s rangeOfString:@"default"].location != NSNotFound)){
+			level++;
+		}
+		if( (([s rangeOfString:@"}"].location != NSNotFound) && ([s rangeOfString:@"{"].location == NSNotFound)) ||
+			([s rangeOfString:@"break;"].location != NSNotFound)){
+
+			level--;
+			if(level<0)level=0;
+			if([s hasPrefix:@"\t"])	s = [s stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:@""];
+		}
+		[newLines addObject:s];
+	}
+	
+	s = [newLines componentsJoinedByString:@"\n"];
+	s = [s substringToIndex:[s length]];
+	//put the text back
+	if([self shouldChangeTextInRange:paragraphRange replacementString:s]){
+		[self replaceCharactersInRange:paragraphRange withString:s];
+		if(wasSelection)[self setSelectedRange:NSMakeRange(paragraphRange.location,[s length]-1)];
+		[self didChangeText];
+	}
+}
 @end

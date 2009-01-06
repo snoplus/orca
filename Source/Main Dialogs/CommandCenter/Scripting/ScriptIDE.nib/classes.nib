@@ -134,6 +134,8 @@
 				<string>NSTextView</string>
 				<key>inputVariablesTableView</key>
 				<string>NSTableView</string>
+				<key>insertCodeButton</key>
+				<string>NSButton</string>
 				<key>lastFileField</key>
 				<string>NSTextField</string>
 				<key>lastFileField1</key>
@@ -188,6 +190,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>prettify</key>
+				<string>id</string>
 				<key>recolorCompleteFile</key>
 				<string>id</string>
 				<key>recolorCompleteFileDeferred</key>
