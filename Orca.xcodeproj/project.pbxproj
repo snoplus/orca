@@ -868,6 +868,14 @@
 		8448E4FC09E5C4AC001B88B5 /* NSView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */; };
 		8448E4FD09E5C4AC001B88B5 /* NSView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */; };
 		844998640F1282E7004B855B /* SyntaxDefinition.plist in Resources */ = {isa = PBXBuildFile; fileRef = 844998630F1282E7004B855B /* SyntaxDefinition.plist */; };
+		84499B770F13BB6E004B855B /* MksPdr2000.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84499B6F0F13BB6E004B855B /* MksPdr2000.nib */; };
+		84499B780F13BB6E004B855B /* MksPdr2000.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84499B700F13BB6E004B855B /* MksPdr2000.tif */; };
+		84499B790F13BB6E004B855B /* ORMksPdr2000Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499B710F13BB6E004B855B /* ORMksPdr2000Controller.h */; };
+		84499B7A0F13BB6E004B855B /* ORMksPdr2000Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499B720F13BB6E004B855B /* ORMksPdr2000Controller.m */; };
+		84499B7B0F13BB6E004B855B /* ORMksPdr2000Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499B730F13BB6E004B855B /* ORMksPdr2000Decoders.h */; };
+		84499B7C0F13BB6E004B855B /* ORMksPdr2000Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499B740F13BB6E004B855B /* ORMksPdr2000Decoders.m */; };
+		84499B7D0F13BB6E004B855B /* ORMksPdr2000Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499B750F13BB6E004B855B /* ORMksPdr2000Model.h */; };
+		84499B7E0F13BB6E004B855B /* ORMksPdr2000Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499B760F13BB6E004B855B /* ORMksPdr2000Model.m */; };
 		844B42BF0DE5D5680061AE80 /* ORSNORackController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B70DE5D5680061AE80 /* ORSNORackController.h */; };
 		844B42C00DE5D5680061AE80 /* ORSNORackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B42B80DE5D5680061AE80 /* ORSNORackController.m */; };
 		844B42C10DE5D5680061AE80 /* ORSNORackModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B90DE5D5680061AE80 /* ORSNORackModel.h */; };
@@ -2587,6 +2595,14 @@
 		8448E4FA09E5C4AC001B88B5 /* NSView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+Extensions.h"; sourceTree = "<group>"; };
 		8448E4FB09E5C4AC001B88B5 /* NSView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+Extensions.m"; sourceTree = "<group>"; };
 		844998630F1282E7004B855B /* SyntaxDefinition.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = SyntaxDefinition.plist; path = "Source/Main Dialogs/CommandCenter/Scripting/SyntaxDefinition.plist"; sourceTree = SOURCE_ROOT; };
+		84499B6F0F13BB6E004B855B /* MksPdr2000.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MksPdr2000.nib; path = Source/Objects/Hardware/Serial/MksPdr2000/MksPdr2000.nib; sourceTree = SOURCE_ROOT; };
+		84499B700F13BB6E004B855B /* MksPdr2000.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MksPdr2000.tif; path = Source/Objects/Hardware/Serial/MksPdr2000/MksPdr2000.tif; sourceTree = SOURCE_ROOT; };
+		84499B710F13BB6E004B855B /* ORMksPdr2000Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMksPdr2000Controller.h; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Controller.h; sourceTree = SOURCE_ROOT; };
+		84499B720F13BB6E004B855B /* ORMksPdr2000Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMksPdr2000Controller.m; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Controller.m; sourceTree = SOURCE_ROOT; };
+		84499B730F13BB6E004B855B /* ORMksPdr2000Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMksPdr2000Decoders.h; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Decoders.h; sourceTree = SOURCE_ROOT; };
+		84499B740F13BB6E004B855B /* ORMksPdr2000Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMksPdr2000Decoders.m; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Decoders.m; sourceTree = SOURCE_ROOT; };
+		84499B750F13BB6E004B855B /* ORMksPdr2000Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMksPdr2000Model.h; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Model.h; sourceTree = SOURCE_ROOT; };
+		84499B760F13BB6E004B855B /* ORMksPdr2000Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMksPdr2000Model.m; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Model.m; sourceTree = SOURCE_ROOT; };
 		844B42B70DE5D5680061AE80 /* ORSNORackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackController.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.h"; sourceTree = SOURCE_ROOT; };
 		844B42B80DE5D5680061AE80 /* ORSNORackController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNORackController.m; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.m"; sourceTree = SOURCE_ROOT; };
 		844B42B90DE5D5680061AE80 /* ORSNORackModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackModel.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackModel.h"; sourceTree = SOURCE_ROOT; };
@@ -5461,6 +5477,31 @@
 			path = Source/Objects/Hardware/Camac/AD413;
 			sourceTree = SOURCE_ROOT;
 		};
+		84499B6D0F13BAB8004B855B /* Serial */ = {
+			isa = PBXGroup;
+			children = (
+				84499B6E0F13BB6E004B855B /* MksPdr2000 */,
+			);
+			name = Serial;
+			path = Source/Objects/Hardware/Serial;
+			sourceTree = SOURCE_ROOT;
+		};
+		84499B6E0F13BB6E004B855B /* MksPdr2000 */ = {
+			isa = PBXGroup;
+			children = (
+				84499B6F0F13BB6E004B855B /* MksPdr2000.nib */,
+				84499B700F13BB6E004B855B /* MksPdr2000.tif */,
+				84499B710F13BB6E004B855B /* ORMksPdr2000Controller.h */,
+				84499B720F13BB6E004B855B /* ORMksPdr2000Controller.m */,
+				84499B730F13BB6E004B855B /* ORMksPdr2000Decoders.h */,
+				84499B740F13BB6E004B855B /* ORMksPdr2000Decoders.m */,
+				84499B750F13BB6E004B855B /* ORMksPdr2000Model.h */,
+				84499B760F13BB6E004B855B /* ORMksPdr2000Model.m */,
+			);
+			name = MksPdr2000;
+			path = Source/Objects/Hardware/Serial/MksPdr2000;
+			sourceTree = SOURCE_ROOT;
+		};
 		844B42B60DE5D5680061AE80 /* SNORack */ = {
 			isa = PBXGroup;
 			children = (
@@ -8270,6 +8311,7 @@
 				84F46F090CA44255007EFADA /* IPE */,
 				84C4939604059AEA005F64B1 /* GPIB */,
 				849E7C900B6956B200353D50 /* USB */,
+				84499B6D0F13BAB8004B855B /* Serial */,
 			);
 			path = Hardware;
 			sourceTree = "<group>";
@@ -9158,6 +9200,9 @@
 				84E18C560F0A640C0096F0F3 /* ORLineMarker.h in Headers */,
 				8419221F0F0BBE8000EF1C1C /* ORScriptIDEModel.h in Headers */,
 				8419227F0F0BC18800EF1C1C /* ORScriptIDEController.h in Headers */,
+				84499B790F13BB6E004B855B /* ORMksPdr2000Controller.h in Headers */,
+				84499B7B0F13BB6E004B855B /* ORMksPdr2000Decoders.h in Headers */,
+				84499B7D0F13BB6E004B855B /* ORMksPdr2000Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9731,6 +9776,8 @@
 				9C8752580F1138F9005E3686 /* StepOut.tif in Resources */,
 				9C8752590F1138F9005E3686 /* StepInto.tif in Resources */,
 				844998640F1282E7004B855B /* SyntaxDefinition.plist in Resources */,
+				84499B770F13BB6E004B855B /* MksPdr2000.nib in Resources */,
+				84499B780F13BB6E004B855B /* MksPdr2000.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10401,6 +10448,9 @@
 				84E18C570F0A640C0096F0F3 /* ORLineMarker.m in Sources */,
 				841922200F0BBE8000EF1C1C /* ORScriptIDEModel.m in Sources */,
 				8419227E0F0BC18800EF1C1C /* ORScriptIDEController.m in Sources */,
+				84499B7A0F13BB6E004B855B /* ORMksPdr2000Controller.m in Sources */,
+				84499B7C0F13BB6E004B855B /* ORMksPdr2000Decoders.m in Sources */,
+				84499B7E0F13BB6E004B855B /* ORMksPdr2000Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
