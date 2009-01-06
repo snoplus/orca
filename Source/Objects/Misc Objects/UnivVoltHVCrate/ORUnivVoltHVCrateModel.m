@@ -366,8 +366,8 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 {
 	BOOL	queuedCmd = NO;
 	
-	if ( aCmdId == 11 )
-		NSLog( @"id: %d, total: %d\n", aCmdId, aTotalCmds );
+//	if ( aCmdId == 11 )
+//		NSLog( @"id: %d, total: %d\n", aCmdId, aTotalCmds );
 	
 	@try
 	{

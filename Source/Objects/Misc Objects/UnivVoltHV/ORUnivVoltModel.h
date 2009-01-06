@@ -50,10 +50,11 @@ typedef enum hveStatus hveStatus;
 #pragma mark ••• Send Commands
 - (void) getValues: (int) aCurrentChnl;
 - (void)  loadValues: (int) aCurrentChnl;
-- (NSString *) createCommand: (int) aCurChnl 
+- (NSString *) createCommand: (int) aCurChnl
                 dictParamObj: (NSDictionary *) aDictParamObj
-				     command: (NSString *) aCommand;
-
+				     command: (NSString *) aCommand
+					 loadAll: (bool) aLoadAllValues;
+					 
 #pragma mark ••• Polling
 - (float) pollTimeMinutes;
 - (void) setPollTimeMinutes: (float) aPollTimeMinutes;

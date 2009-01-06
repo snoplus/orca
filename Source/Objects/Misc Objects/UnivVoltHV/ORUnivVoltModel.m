@@ -344,7 +344,8 @@ NSString* UVkWrite = @"W";
 			{
 				command = [self createCommand: aCurrentChnl          
 								 dictParamObj: dictParamObj
-								      command: command];
+								      command: command
+									  loadAll: NO];
 				[command retain];
 //				[[ self crate] queueCommand: jParam totalCmds: 1 slot: [self slot] channel: aCurrentChnl command: command];
 				[[ self crate] queueCommand: writeCmdCtr totalCmds: mWParams slot: [self stationNumber] channel: aCurrentChnl command: command];
@@ -358,7 +359,8 @@ NSString* UVkWrite = @"W";
 				{					
 					command = [self createCommand: iChnl
 									 dictParamObj: dictParamObj
-									      command: command];
+									      command: command
+										  loadAll: YES];
 				
 				    [command retain];
 				} // Loop through channels
@@ -377,6 +379,7 @@ NSString* UVkWrite = @"W";
 - (NSString *) createCommand: (int) aCurChnl
                 dictParamObj: (NSDictionary *) aDictParamObj
 				     command: (NSString *) aCommand
+					 loadAll: (bool) aLoadAllValues
 {
 	
 	// Get value to set parameter to.
@@ -391,7 +394,7 @@ NSString* UVkWrite = @"W";
 	{
 		// LD command handles all channels at once so unit identifier is Sx followed by parameter followed
 		// by values for all 12 channels.
-		if ( aCurChnl == -1 )
+		if ( aLoadAllValues == YES )
 			aCommand = [NSString stringWithFormat: @"LD S%d %@", [self stationNumber], param];
 		else
 			aCommand = [NSString stringWithFormat: @"LD S%d.%d %@", [self stationNumber], aCurChnl, param];

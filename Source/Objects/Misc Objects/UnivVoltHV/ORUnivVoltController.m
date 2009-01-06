@@ -546,7 +546,7 @@
 	value = [[tmpChnl objectForKey: HVkTripCurrent] floatValue];
 	valueStr = [NSString stringWithFormat: @"%f", value];
 	[mTripCurrent setStringValue: valueStr];
-	NSLog( @"mTripCurrent: %f\n", value );
+//	NSLog( @"mTripCurrent: %f\n", value );
 	
 	value = [[tmpChnl objectForKey: HVkMVDZ] floatValue];
 	valueStr = [NSString stringWithFormat: @"%f", value];
