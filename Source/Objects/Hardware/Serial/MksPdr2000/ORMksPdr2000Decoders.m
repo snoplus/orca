@@ -31,7 +31,7 @@
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //                          ^^^^ ^^^^ ^^^^--device id
-//                ^^^^----------------------units id (0=unknown,1=Torr,2=mBar,3=Pascal,4=Arb
+//                ^^^^----------------------units id (0=unknown,1=Torr,2=mBar,3=Pascal,4=Arb)
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure chan 0 encoded as a float
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 0 taken in seconds since Jan 1, 1970
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure chan 1 encoded as a float
