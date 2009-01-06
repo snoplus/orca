@@ -876,6 +876,14 @@
 		84499B7C0F13BB6E004B855B /* ORMksPdr2000Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499B740F13BB6E004B855B /* ORMksPdr2000Decoders.m */; };
 		84499B7D0F13BB6E004B855B /* ORMksPdr2000Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499B750F13BB6E004B855B /* ORMksPdr2000Model.h */; };
 		84499B7E0F13BB6E004B855B /* ORMksPdr2000Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499B760F13BB6E004B855B /* ORMksPdr2000Model.m */; };
+		84499CC60F13E457004B855B /* CTITemp.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84499CBE0F13E457004B855B /* CTITemp.nib */; };
+		84499CC70F13E457004B855B /* CTITemp.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84499CBF0F13E457004B855B /* CTITemp.tif */; };
+		84499CC80F13E457004B855B /* ORCTITempController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499CC00F13E457004B855B /* ORCTITempController.h */; };
+		84499CC90F13E457004B855B /* ORCTITempController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499CC10F13E457004B855B /* ORCTITempController.m */; };
+		84499CCA0F13E457004B855B /* ORCTITempDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499CC20F13E457004B855B /* ORCTITempDecoders.h */; };
+		84499CCB0F13E457004B855B /* ORCTITempDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499CC30F13E457004B855B /* ORCTITempDecoders.m */; };
+		84499CCC0F13E457004B855B /* ORCTITempModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84499CC40F13E457004B855B /* ORCTITempModel.h */; };
+		84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84499CC50F13E457004B855B /* ORCTITempModel.m */; };
 		844B42BF0DE5D5680061AE80 /* ORSNORackController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B70DE5D5680061AE80 /* ORSNORackController.h */; };
 		844B42C00DE5D5680061AE80 /* ORSNORackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844B42B80DE5D5680061AE80 /* ORSNORackController.m */; };
 		844B42C10DE5D5680061AE80 /* ORSNORackModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 844B42B90DE5D5680061AE80 /* ORSNORackModel.h */; };
@@ -2603,6 +2611,14 @@
 		84499B740F13BB6E004B855B /* ORMksPdr2000Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMksPdr2000Decoders.m; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Decoders.m; sourceTree = SOURCE_ROOT; };
 		84499B750F13BB6E004B855B /* ORMksPdr2000Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMksPdr2000Model.h; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Model.h; sourceTree = SOURCE_ROOT; };
 		84499B760F13BB6E004B855B /* ORMksPdr2000Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMksPdr2000Model.m; path = Source/Objects/Hardware/Serial/MksPdr2000/ORMksPdr2000Model.m; sourceTree = SOURCE_ROOT; };
+		84499CBE0F13E457004B855B /* CTITemp.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CTITemp.nib; path = Source/Objects/Hardware/Serial/CTITemp/CTITemp.nib; sourceTree = SOURCE_ROOT; };
+		84499CBF0F13E457004B855B /* CTITemp.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CTITemp.tif; path = Source/Objects/Hardware/Serial/CTITemp/CTITemp.tif; sourceTree = SOURCE_ROOT; };
+		84499CC00F13E457004B855B /* ORCTITempController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCTITempController.h; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempController.h; sourceTree = SOURCE_ROOT; };
+		84499CC10F13E457004B855B /* ORCTITempController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCTITempController.m; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempController.m; sourceTree = SOURCE_ROOT; };
+		84499CC20F13E457004B855B /* ORCTITempDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCTITempDecoders.h; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempDecoders.h; sourceTree = SOURCE_ROOT; };
+		84499CC30F13E457004B855B /* ORCTITempDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCTITempDecoders.m; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempDecoders.m; sourceTree = SOURCE_ROOT; };
+		84499CC40F13E457004B855B /* ORCTITempModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCTITempModel.h; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempModel.h; sourceTree = SOURCE_ROOT; };
+		84499CC50F13E457004B855B /* ORCTITempModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCTITempModel.m; path = Source/Objects/Hardware/Serial/CTITemp/ORCTITempModel.m; sourceTree = SOURCE_ROOT; };
 		844B42B70DE5D5680061AE80 /* ORSNORackController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackController.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.h"; sourceTree = SOURCE_ROOT; };
 		844B42B80DE5D5680061AE80 /* ORSNORackController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORSNORackController.m; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackController.m"; sourceTree = SOURCE_ROOT; };
 		844B42B90DE5D5680061AE80 /* ORSNORackModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORSNORackModel.h; path = "Source/Objects/Custom Hardware/SNO+/SNORack/ORSNORackModel.h"; sourceTree = SOURCE_ROOT; };
@@ -5480,6 +5496,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
+				84499CBD0F13E457004B855B /* CTITemp */,
 				84499B6E0F13BB6E004B855B /* MksPdr2000 */,
 			);
 			name = Serial;
@@ -5500,6 +5517,22 @@
 			);
 			name = MksPdr2000;
 			path = Source/Objects/Hardware/Serial/MksPdr2000;
+			sourceTree = SOURCE_ROOT;
+		};
+		84499CBD0F13E457004B855B /* CTITemp */ = {
+			isa = PBXGroup;
+			children = (
+				84499CBE0F13E457004B855B /* CTITemp.nib */,
+				84499CBF0F13E457004B855B /* CTITemp.tif */,
+				84499CC00F13E457004B855B /* ORCTITempController.h */,
+				84499CC10F13E457004B855B /* ORCTITempController.m */,
+				84499CC20F13E457004B855B /* ORCTITempDecoders.h */,
+				84499CC30F13E457004B855B /* ORCTITempDecoders.m */,
+				84499CC40F13E457004B855B /* ORCTITempModel.h */,
+				84499CC50F13E457004B855B /* ORCTITempModel.m */,
+			);
+			name = CTITemp;
+			path = Source/Objects/Hardware/Serial/CTITemp;
 			sourceTree = SOURCE_ROOT;
 		};
 		844B42B60DE5D5680061AE80 /* SNORack */ = {
@@ -9203,6 +9236,9 @@
 				84499B790F13BB6E004B855B /* ORMksPdr2000Controller.h in Headers */,
 				84499B7B0F13BB6E004B855B /* ORMksPdr2000Decoders.h in Headers */,
 				84499B7D0F13BB6E004B855B /* ORMksPdr2000Model.h in Headers */,
+				84499CC80F13E457004B855B /* ORCTITempController.h in Headers */,
+				84499CCA0F13E457004B855B /* ORCTITempDecoders.h in Headers */,
+				84499CCC0F13E457004B855B /* ORCTITempModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9778,6 +9814,8 @@
 				844998640F1282E7004B855B /* SyntaxDefinition.plist in Resources */,
 				84499B770F13BB6E004B855B /* MksPdr2000.nib in Resources */,
 				84499B780F13BB6E004B855B /* MksPdr2000.tif in Resources */,
+				84499CC60F13E457004B855B /* CTITemp.nib in Resources */,
+				84499CC70F13E457004B855B /* CTITemp.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10451,6 +10489,9 @@
 				84499B7A0F13BB6E004B855B /* ORMksPdr2000Controller.m in Sources */,
 				84499B7C0F13BB6E004B855B /* ORMksPdr2000Decoders.m in Sources */,
 				84499B7E0F13BB6E004B855B /* ORMksPdr2000Model.m in Sources */,
+				84499CC90F13E457004B855B /* ORCTITempController.m in Sources */,
+				84499CCB0F13E457004B855B /* ORCTITempDecoders.m in Sources */,
+				84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
