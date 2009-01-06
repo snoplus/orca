@@ -718,7 +718,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	if(startScript){
 		[startScript setSelectorOK:@selector(startRun1:) bad:@selector(runAbortFromScript) withObject:[NSNumber numberWithBool:doInit] target:self];
 		[self setStartScriptState:@"Running"];
-		[startScript runScript];
+		if(![startScript runScript]){
+			[self runAbortFromScript];
+		}
 	}
 	else [self performSelector:@selector(startRun1:) withObject:[NSNumber numberWithBool:doInit] afterDelay:0];
 }
