@@ -132,6 +132,7 @@
 	[super awakeFromNib];
 	
 	mCurrentChnl = 0;
+	mOrigChnl = 0;
 	NSLog( @"UnivVolt:AwakeFromNIB.  Current chnl: ", mCurrentChnl );
 	[mChannelStepperField setIntValue: mCurrentChnl];
 	[mChannelNumberField setIntValue: mCurrentChnl];
@@ -457,6 +458,25 @@
 	[tmpChnl setObject: MCDZ forKey: ORHVkMCDZ];
 }
 */
+
+#pragma mark •••Delegate
+- (void) tabView: (NSTabView*) aTabView didSelectTabViewItem: (NSTabViewItem*) aTabViewItem
+{
+	int index = [aTabView indexOfTabViewItem: aTabViewItem];
+	NSString* labelTab = [aTabViewItem label];
+	NSLog( @"tab index: %d, tab label %@\n", index, labelTab );
+	if ( [labelTab isEqualToString: @"Channel"] )
+	{
+		mCurrentChnl = mOrigChnl;
+		[mChannelStepperField setIntValue: mCurrentChnl];
+		[mChannelNumberField setIntValue: mCurrentChnl];
+		[self setChnlValues: mCurrentChnl];
+	}
+	else
+	{
+		mOrigChnl = mCurrentChnl;
+	}
+}
 
 #pragma mark •••Table handling routines
 - (int) numberOfRowsInTableView: (NSTableView*) aTableView

@@ -43,6 +43,7 @@
 	IBOutlet NSButton*				mStartStopPolling;  // Button that can start and stop the polling.
 	char							mStatusByte;
 	int								mCurrentChnl;		// Current channel visible in display.
+	int								mOrigChnl;		// Channel last displayed in channel view.
 }
 
 #pragma mark •••Notifications
