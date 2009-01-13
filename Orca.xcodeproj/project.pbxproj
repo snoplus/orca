@@ -88,6 +88,12 @@
 		2ACEE0E40612266000CAD497 /* ThresholdCalibrationTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */; };
 		2ACEE0E50612266000CAD497 /* ThresholdCalibrationTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */; };
 		2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AE87BDD0D6E486900A839FC /* libmysqlclient.a */; };
+		2D1AB81A0F1B9F2400E6B850 /* IpeSlowControl.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */; };
+		2D1AB81B0F1B9F2400E6B850 /* IpeSlowControl.tif in Resources */ = {isa = PBXBuildFile; fileRef = 2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */; };
+		2D1AB81C0F1B9F2400E6B850 /* ORIpeSlowControlController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */; };
+		2D1AB81D0F1B9F2400E6B850 /* ORIpeSlowControlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */; };
+		2D1AB81E0F1B9F2400E6B850 /* ORIpeSlowControlModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */; };
+		2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
 		546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA80874BDD60072A274 /* 2228ACard.gif */; };
 		546D9DB10874BDD60072A274 /* OR2228AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 546D9DA90874BDD60072A274 /* OR2228AController.h */; };
@@ -2074,6 +2080,12 @@
 		2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ThresholdCalibrationTask.h; sourceTree = "<group>"; };
 		2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationTask.m; sourceTree = "<group>"; };
 		2AE87BDD0D6E486900A839FC /* libmysqlclient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmysqlclient.a; sourceTree = "<group>"; };
+		2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = IpeSlowControl.nib; path = "IPE SlowControl/IpeSlowControl.nib"; sourceTree = "<group>"; };
+		2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = IpeSlowControl.tif; path = "IPE SlowControl/IpeSlowControl.tif"; sourceTree = "<group>"; };
+		2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlController.h; path = "IPE SlowControl/ORIpeSlowControlController.h"; sourceTree = "<group>"; };
+		2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlController.m; path = "IPE SlowControl/ORIpeSlowControlController.m"; sourceTree = "<group>"; };
+		2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlModel.h; path = "IPE SlowControl/ORIpeSlowControlModel.h"; sourceTree = "<group>"; };
+		2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlModel.m; path = "IPE SlowControl/ORIpeSlowControlModel.m"; sourceTree = "<group>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
 		546D9DA90874BDD60072A274 /* OR2228AController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2228AController.h; path = Source/Objects/Hardware/Camac/TDC2228A/OR2228AController.h; sourceTree = SOURCE_ROOT; };
@@ -4136,6 +4148,19 @@
 				2AE87BDD0D6E486900A839FC /* libmysqlclient.a */,
 			);
 			path = libUniversal;
+			sourceTree = "<group>";
+		};
+		2D1AB8070F1B9EBC00E6B850 /* IPE SlowControl */ = {
+			isa = PBXGroup;
+			children = (
+				2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */,
+				2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */,
+				2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */,
+				2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */,
+				2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */,
+				2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */,
+			);
+			name = "IPE SlowControl";
 			sourceTree = "<group>";
 		};
 		546D9DA60874BDD60072A274 /* TDC2228A */ = {
@@ -7773,6 +7798,7 @@
 		84F46F090CA44255007EFADA /* IPE */ = {
 			isa = PBXGroup;
 			children = (
+				2D1AB8070F1B9EBC00E6B850 /* IPE SlowControl */,
 				84F46F0A0CA44255007EFADA /* IPE Base Classes */,
 				84F46F110CA44255007EFADA /* IPE Crate */,
 				84FDF5450D7F084E003AE119 /* IpeV4 Crate */,
@@ -9239,6 +9265,8 @@
 				84499CC80F13E457004B855B /* ORCTITempController.h in Headers */,
 				84499CCA0F13E457004B855B /* ORCTITempDecoders.h in Headers */,
 				84499CCC0F13E457004B855B /* ORCTITempModel.h in Headers */,
+				2D1AB81C0F1B9F2400E6B850 /* ORIpeSlowControlController.h in Headers */,
+				2D1AB81E0F1B9F2400E6B850 /* ORIpeSlowControlModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9816,6 +9844,8 @@
 				84499B780F13BB6E004B855B /* MksPdr2000.tif in Resources */,
 				84499CC60F13E457004B855B /* CTITemp.nib in Resources */,
 				84499CC70F13E457004B855B /* CTITemp.tif in Resources */,
+				2D1AB81A0F1B9F2400E6B850 /* IpeSlowControl.nib in Resources */,
+				2D1AB81B0F1B9F2400E6B850 /* IpeSlowControl.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10492,6 +10522,8 @@
 				84499CC90F13E457004B855B /* ORCTITempController.m in Sources */,
 				84499CCB0F13E457004B855B /* ORCTITempDecoders.m in Sources */,
 				84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */,
+				2D1AB81D0F1B9F2400E6B850 /* ORIpeSlowControlController.m in Sources */,
+				2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
