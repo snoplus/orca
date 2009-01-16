@@ -61,33 +61,33 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>autoStartAction</key>
+				<key>acqAction</key>
 				<string>id</string>
 				<key>baseAddressAction</key>
 				<string>id</string>
+				<key>checkEvent</key>
+				<string>id</string>
 				<key>clockSourceAction</key>
+				<string>id</string>
+				<key>csrAction</key>
 				<string>id</string>
 				<key>enabledAction</key>
 				<string>id</string>
-				<key>gateModeAction</key>
+				<key>eventConfigAction</key>
 				<string>id</string>
 				<key>initBoard</key>
 				<string>id</string>
 				<key>integrationAction</key>
 				<string>id</string>
-				<key>lemoStartStopAction</key>
-				<string>id</string>
 				<key>ltGtAction</key>
-				<string>id</string>
-				<key>multiEventModeAction</key>
-				<string>id</string>
-				<key>p2StartStopAction</key>
 				<string>id</string>
 				<key>pageSizeAction</key>
 				<string>id</string>
-				<key>pageWrapAction</key>
+				<key>probeBoardAction</key>
 				<string>id</string>
 				<key>randomClockAction</key>
+				<string>id</string>
+				<key>readThresholdsAction</key>
 				<string>id</string>
 				<key>settingLockAction</key>
 				<string>id</string>
@@ -101,7 +101,13 @@
 				<string>id</string>
 				<key>stopTriggerAction</key>
 				<string>id</string>
+				<key>testMemoryBankAction</key>
+				<string>id</string>
+				<key>testReadAction</key>
+				<string>id</string>
 				<key>thresholdAction</key>
+				<string>id</string>
+				<key>writeThresholdsAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -110,36 +116,32 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>acqMatrix</key>
+				<string>NSMatrix</string>
 				<key>addressText</key>
 				<string>NSTextField</string>
-				<key>autoStartButton</key>
-				<string>NSButton</string>
 				<key>clockSourcePU</key>
 				<string>NSPopUpButton</string>
+				<key>csrMatrix</key>
+				<string>NSMatrix</string>
 				<key>enabled2Matrix</key>
 				<string>NSMatrix</string>
 				<key>enabledMatrix</key>
 				<string>NSMatrix</string>
-				<key>gateModeButton</key>
-				<string>NSButton</string>
+				<key>eventConfigMatrix</key>
+				<string>NSMatrix</string>
 				<key>initButton</key>
 				<string>NSButton</string>
 				<key>integrationStepper</key>
 				<string>NSStepper</string>
 				<key>integrationText</key>
 				<string>NSTextField</string>
-				<key>lemoStartStopButton</key>
-				<string>NSButton</string>
 				<key>ltGtMatrix</key>
 				<string>NSMatrix</string>
-				<key>multiEventModeButton</key>
-				<string>NSButton</string>
-				<key>p2StartStopButton</key>
-				<string>NSButton</string>
 				<key>pageSizePU</key>
 				<string>NSPopUpButton</string>
-				<key>pageWrapButton</key>
-				<string>NSButton</string>
+				<key>plotter</key>
+				<string>ORPlotter1D</string>
 				<key>randomClockButton</key>
 				<string>NSButton</string>
 				<key>rate0</key>
@@ -148,6 +150,8 @@
 				<string>NSButton</string>
 				<key>rateTextFields</key>
 				<string>NSMatrix</string>
+				<key>readThresholdButton</key>
+				<string>NSButton</string>
 				<key>settingLockButton</key>
 				<string>NSButton</string>
 				<key>slotField</key>
@@ -178,6 +182,8 @@
 				<string>NSButton</string>
 				<key>totalRateText</key>
 				<string>NSTextField</string>
+				<key>writeThresholdButton</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
@@ -249,6 +255,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>

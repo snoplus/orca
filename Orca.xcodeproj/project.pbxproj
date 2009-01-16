@@ -1251,6 +1251,14 @@
 		8493D2AA0C99FC2C00B46CD4 /* SBC_Cmds.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3E0C99FA0700B46CD4 /* SBC_Cmds.h */; };
 		8493D2AB0C99FC2C00B46CD4 /* SBC_Config.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC3F0C99FA0700B46CD4 /* SBC_Config.h */; };
 		8493D2AD0C99FC2C00B46CD4 /* SBC_Readout.h in SBC_Code Copy */ = {isa = PBXBuildFile; fileRef = 8493CC410C99FA0700B46CD4 /* SBC_Readout.h */; };
+		8493D6BB0F21315300BCD331 /* CMC203.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8493D6B30F21315300BCD331 /* CMC203.nib */; };
+		8493D6BC0F21315300BCD331 /* CMC203Card.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8493D6B40F21315300BCD331 /* CMC203Card.tif */; };
+		8493D6BD0F21315300BCD331 /* ORCMC203Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493D6B50F21315300BCD331 /* ORCMC203Controller.h */; };
+		8493D6BE0F21315300BCD331 /* ORCMC203Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6B60F21315300BCD331 /* ORCMC203Controller.m */; };
+		8493D6BF0F21315300BCD331 /* ORCMC203Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493D6B70F21315300BCD331 /* ORCMC203Decoders.h */; };
+		8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6B80F21315300BCD331 /* ORCMC203Decoders.m */; };
+		8493D6C10F21315300BCD331 /* ORCMC203Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493D6B90F21315300BCD331 /* ORCMC203Model.h */; };
+		8493D6C20F21315300BCD331 /* ORCMC203Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6BA0F21315300BCD331 /* ORCMC203Model.m */; };
 		84951F980CFC805C00B4558E /* Help.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84951F970CFC805C00B4558E /* Help.tiff */; };
 		84954B8305C87518004EBD3D /* ORHWWizParam.h in Headers */ = {isa = PBXBuildFile; fileRef = 84954B8105C87518004EBD3D /* ORHWWizParam.h */; };
 		84954B8405C87518004EBD3D /* ORHWWizParam.m in Sources */ = {isa = PBXBuildFile; fileRef = 84954B8205C87518004EBD3D /* ORHWWizParam.m */; };
@@ -3030,6 +3038,14 @@
 		8493CC7E0C99FA4B00B46CD4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; name = Makefile; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/Makefile; sourceTree = SOURCE_ROOT; };
 		8493CC7F0C99FA4B00B46CD4 /* HW_Readout.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = HW_Readout.c; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Readout.c; sourceTree = SOURCE_ROOT; };
 		8493CC800C99FA4B00B46CD4 /* HW_Readout.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = HW_Readout.h; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/HW_Readout.h; sourceTree = SOURCE_ROOT; };
+		8493D6B30F21315300BCD331 /* CMC203.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = CMC203.nib; path = Source/Objects/Hardware/Camac/CMC203/CMC203.nib; sourceTree = SOURCE_ROOT; };
+		8493D6B40F21315300BCD331 /* CMC203Card.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CMC203Card.tif; path = Source/Objects/Hardware/Camac/CMC203/CMC203Card.tif; sourceTree = SOURCE_ROOT; };
+		8493D6B50F21315300BCD331 /* ORCMC203Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCMC203Controller.h; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Controller.h; sourceTree = SOURCE_ROOT; };
+		8493D6B60F21315300BCD331 /* ORCMC203Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCMC203Controller.m; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Controller.m; sourceTree = SOURCE_ROOT; };
+		8493D6B70F21315300BCD331 /* ORCMC203Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCMC203Decoders.h; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Decoders.h; sourceTree = SOURCE_ROOT; };
+		8493D6B80F21315300BCD331 /* ORCMC203Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCMC203Decoders.m; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Decoders.m; sourceTree = SOURCE_ROOT; };
+		8493D6B90F21315300BCD331 /* ORCMC203Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCMC203Model.h; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Model.h; sourceTree = SOURCE_ROOT; };
+		8493D6BA0F21315300BCD331 /* ORCMC203Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCMC203Model.m; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Model.m; sourceTree = SOURCE_ROOT; };
 		84940B3E04E07FA6005F64B1 /* ORRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRate.h; sourceTree = "<group>"; };
 		84940B3F04E07FA6005F64B1 /* ORRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRate.m; sourceTree = "<group>"; };
 		84951F970CFC805C00B4558E /* Help.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Help.tiff; path = Source/Preferences/Help.tiff; sourceTree = SOURCE_ROOT; };
@@ -4832,6 +4848,7 @@
 				841DAA5107838C990099BBF6 /* DGF4c */,
 				841DA0070780D7CA0099BBF6 /* TRS1 */,
 				8408A4B409071C6A004A3B34 /* HV2132 */,
+				8493D6B20F21315300BCD331 /* CMC203 */,
 			);
 			name = Camac;
 			path = Source/Objects/Hardware/Camac;
@@ -6399,6 +6416,22 @@
 			);
 			name = VME_Readout_Code;
 			path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code;
+			sourceTree = SOURCE_ROOT;
+		};
+		8493D6B20F21315300BCD331 /* CMC203 */ = {
+			isa = PBXGroup;
+			children = (
+				8493D6B30F21315300BCD331 /* CMC203.nib */,
+				8493D6B40F21315300BCD331 /* CMC203Card.tif */,
+				8493D6B50F21315300BCD331 /* ORCMC203Controller.h */,
+				8493D6B60F21315300BCD331 /* ORCMC203Controller.m */,
+				8493D6B70F21315300BCD331 /* ORCMC203Decoders.h */,
+				8493D6B80F21315300BCD331 /* ORCMC203Decoders.m */,
+				8493D6B90F21315300BCD331 /* ORCMC203Model.h */,
+				8493D6BA0F21315300BCD331 /* ORCMC203Model.m */,
+			);
+			name = CMC203;
+			path = Source/Objects/Hardware/Camac/CMC203;
 			sourceTree = SOURCE_ROOT;
 		};
 		84940B3D04E07F87005F64B1 /* Rates */ = {
@@ -9267,6 +9300,9 @@
 				84499CCC0F13E457004B855B /* ORCTITempModel.h in Headers */,
 				2D1AB81C0F1B9F2400E6B850 /* ORIpeSlowControlController.h in Headers */,
 				2D1AB81E0F1B9F2400E6B850 /* ORIpeSlowControlModel.h in Headers */,
+				8493D6BD0F21315300BCD331 /* ORCMC203Controller.h in Headers */,
+				8493D6BF0F21315300BCD331 /* ORCMC203Decoders.h in Headers */,
+				8493D6C10F21315300BCD331 /* ORCMC203Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9846,6 +9882,8 @@
 				84499CC70F13E457004B855B /* CTITemp.tif in Resources */,
 				2D1AB81A0F1B9F2400E6B850 /* IpeSlowControl.nib in Resources */,
 				2D1AB81B0F1B9F2400E6B850 /* IpeSlowControl.tif in Resources */,
+				8493D6BB0F21315300BCD331 /* CMC203.nib in Resources */,
+				8493D6BC0F21315300BCD331 /* CMC203Card.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10524,6 +10562,9 @@
 				84499CCD0F13E457004B855B /* ORCTITempModel.m in Sources */,
 				2D1AB81D0F1B9F2400E6B850 /* ORIpeSlowControlController.m in Sources */,
 				2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */,
+				8493D6BE0F21315300BCD331 /* ORCMC203Controller.m in Sources */,
+				8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */,
+				8493D6C20F21315300BCD331 /* ORCMC203Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

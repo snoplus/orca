@@ -31,29 +31,9 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 --------^-^^^--------------------------- Crate number
 -------------^-^^^^--------------------- Card number
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
-------------------------------------^^^- Channel number
-^^^^ ^^^^ ^^^^ ^^^^--------------------- Data Length
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
---------------------^^^^ ^^^^ ^^^^ ^^^^- LED1
-^^^^ ^^^^ ^^^^ ^^^^--------------------- LED2
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
---------------------^^^^ ^^^^ ^^^^ ^^^^- LED3
-^^^^ ^^^^ ^^^^ ^^^^--------------------- Energy bit 0-15
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
--------------------------------^^^ ^^^^- Energy bit 16-22
---------------------^------------------- P
----------------------^------------------ C
-----------------------^----------------- E
------------------------^---------------- Sx
-^^^^ ^^^^ ^^^^ ^^^^--------------------- CFD Timestamp bit0-15
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
---------------------^^^^ ^^^^ ^^^^ ^^^^- CFD Timestamp bit16-31
-^^^^ ^^^^ ^^^^ ^^^^--------------------- CFD Timestamp bit32-47
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
------------------------- ^^^^ ^^^^ ^^^^- Raw data point0
------^^^^ ^^^^ ^^^^--------------------- Raw data point1
-Raw data points continue until the Data length is used up....
+xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Trigger Event Word
+waveform follows
+
 */
 
 @implementation ORSIS3300WaveformDecoder
@@ -79,75 +59,77 @@ Raw data points continue until the Data length is used up....
     int crate = (*ptr&0x01e00000)>>21;
     int card  = (*ptr&0x001f0000)>>16;
 
-	ptr++; //first word of the actual card packet
-	int channel		 = *ptr&0x7;
-	int packetLength = (*ptr>>16) - 6;
+	ptr++; //event trigger word
+	unsigned long triggerWord= *ptr;
 	
-/*	ptr++; //point to led0-15 && 16-31
-	unsigned short led1 = *ptr & 0xffff;
-	unsigned short led2 = (*ptr & 0xffff0000)>>8;
- 
-	ptr++;
-	unsigned short led3 = *ptr & 0xffff;
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* cardKey		= [self getCardKey: card];
 
-	NSLog(@"0x%08x 0x%08x 0x%08x\n",led3,led2,led1);
-*/	
-	ptr += 2; //point to Energy low word
-	unsigned long energy = *ptr >> 16;
-	ptr++;	  //point to Energy second word
-	energy += (*ptr & 0x0000007f) << 16;
-	
-	// energy is in 2's complement, taking abs value if necessary
-    if((energy >> 22) & 0x1) energy = (~energy + 1) & 0x7fffff;
+	ptr++; //point to the data
 
-	NSString* crateKey = [self getCrateKey: crate];
-	NSString* cardKey = [self getCardKey: card];
-	NSString* channelKey = [self getChannelKey: channel];
-
-
-    [aDataSet histogram:energy>>2 numBins:4096*8 sender:self  withKeys:@"SIS3300", @"Energy",crateKey,cardKey,channelKey,nil];
-	
-	ptr += 3; //point to the data
-
-    NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
-	
-	//note:  there is something wrong here. The package length should be in longs but the
-	//packet is always half empty.   
-	[tmpData setLength:packetLength*sizeof(long)];
-	unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-	int i;
-	int wordCount = 0;
-	for(i=0;i<packetLength;i++){
-		dPtr[wordCount++] =	0x00000fff & *ptr;		
-		dPtr[wordCount++] =	(0x0fff0000 & *ptr) >> 16;		
-		ptr++;
+	unsigned long* dataStart = ptr;
+	long numDataWords = length-3;
+	NSMutableData* tmpData = [NSMutableData dataWithLength:numDataWords*sizeof(short)]; //plot buffer
+	unsigned short* sPtr = (unsigned short*)[tmpData bytes];
+	//any of the channels may have triggered, so have to check each bit in the adc mask
+	int channel;
+	BOOL loadedOnce = NO;
+	for(channel=0;channel<8;channel+=2){
+		if(triggerWord & (0x80000000 >> channel)){
+			NSString* channelKey	= [self getChannelKey: channel];
+			int i;
+			if(!loadedOnce){
+				for(i=0;i<(length-3);i++)sPtr[i] =	dataStart[i] & 0x3fff;	
+				loadedOnce = YES;
+			}
+			[aDataSet loadWaveform:tmpData 
+							offset:0 //bytes!
+						  unitSize:2 //unit size in bytes!
+							sender:self  
+						  withKeys:@"SIS3300", @"Waveforms",crateKey,cardKey,channelKey,nil];
+			
+		}
 	}
-    [aDataSet loadWaveform:tmpData 
-					offset:0 //bytes!
-				  unitSize:2 //unit size in bytes!
-					sender:self  
-				  withKeys:@"SIS3300", @"Waveforms",crateKey,cardKey,channelKey,nil];
+	//now the odd channels
+	loadedOnce = NO;
+	for(channel=1;channel<8;channel+=2){
+		if(triggerWord & (0x80000000 >> channel)){
+			NSString* channelKey	= [self getChannelKey: channel];
+			int i;
+			if(!loadedOnce){
+				for(i=0;i<(length-3);i++)sPtr[i] =	(dataStart[i]>>16) & 0x3fff;	
+				loadedOnce = YES;
+			}
+			[aDataSet loadWaveform:tmpData 
+							offset:0 //bytes!
+						  unitSize:2 //unit size in bytes!
+							sender:self  
+						  withKeys:@"SIS3300", @"Waveforms",crateKey,cardKey,channelKey,nil];
+			
+		}
+	}
 
-	//get the actual object
-	if(getRatesFromDecodeStage){
-		NSString* aKey = [crateKey stringByAppendingString:cardKey];
-		if(!actualSIS3300Cards)actualSIS3300Cards = [[NSMutableDictionary alloc] init];
-		ORSIS3300Model* obj = [actualSIS3300Cards objectForKey:aKey];
-		if(!obj){
-			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3300Model")];
-			NSEnumerator* e = [listOfCards objectEnumerator];
-			ORSIS3300Model* aCard;
-			while(aCard = [e nextObject]){
-				if([aCard slot] == card){
-					[actualSIS3300Cards setObject:aCard forKey:aKey];
-					obj = aCard;
-					break;
+		/*		//get the actual object
+		if(getRatesFromDecodeStage){
+			NSString* aKey = [crateKey stringByAppendingString:cardKey];
+			if(!actualSIS3300Cards)actualSIS3300Cards = [[NSMutableDictionary alloc] init];
+			ORSIS3300Model* obj = [actualSIS3300Cards objectForKey:aKey];
+			if(!obj){
+				NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3300Model")];
+				NSEnumerator* e = [listOfCards objectEnumerator];
+				ORSIS3300Model* aCard;
+				while(aCard = [e nextObject]){
+					if([aCard slot] == card){
+						[actualSIS3300Cards setObject:aCard forKey:aKey];
+						obj = aCard;
+						break;
+					}
 				}
 			}
+			getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
 		}
-		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
-	}
-
+ */
+	
 
 	 
     return length; //must return number of longs

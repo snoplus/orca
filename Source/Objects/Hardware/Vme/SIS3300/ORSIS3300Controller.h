@@ -27,29 +27,34 @@
 
 @interface ORSIS3300Controller : OrcaObjectController 
 {
+	//base address
+    IBOutlet NSTextField*   slotField;
+    IBOutlet NSTextField*   addressText;
+	
+	//CSR
+	IBOutlet NSMatrix*		csrMatrix;
+	IBOutlet NSMatrix*		acqMatrix;
+	IBOutlet NSMatrix*		eventConfigMatrix;
+
     IBOutlet NSTabView* 	tabView;
-	IBOutlet NSButton*		autoStartButton;
-	IBOutlet NSButton*		multiEventModeButton;
-	IBOutlet NSButton*		pageWrapButton;
+	
 	IBOutlet NSButton*		stopTriggerButton;
-	IBOutlet NSButton*		p2StartStopButton;
-	IBOutlet NSButton*		lemoStartStopButton;
 	IBOutlet NSButton*		randomClockButton;
-	IBOutlet NSButton*		gateModeButton;
 	IBOutlet NSButton*		startDelayEnabledButton;
 	IBOutlet NSButton*		stopDelayEnabledButton;
+	IBOutlet NSButton*		writeThresholdButton;
+	IBOutlet NSButton*		readThresholdButton;
 	IBOutlet NSTextField*	startDelayField;
 	IBOutlet NSPopUpButton* clockSourcePU;
 	IBOutlet NSTextField*	stopDelayField;
 	IBOutlet NSPopUpButton* pageSizePU;
-	
-    //basic ops page
+	IBOutlet ORPlotter1D*   plotter;
+
+	//thresholds
 	IBOutlet NSMatrix*		enabledMatrix;
 	IBOutlet NSMatrix*		ltGtMatrix;
 	IBOutlet NSMatrix*		thresholdMatrix;
 
-    IBOutlet NSTextField*   slotField;
-    IBOutlet NSTextField*   addressText;
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
@@ -80,16 +85,12 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
-- (void) autoStartChanged:(NSNotification*)aNote;
-- (void) multiEventModeChanged:(NSNotification*)aNote;
-- (void) pageWrapChanged:(NSNotification*)aNote;
+- (void) csrChanged:(NSNotification*)aNote;
+- (void) acqChanged:(NSNotification*)aNote;
+- (void) eventConfigChanged:(NSNotification*)aNote;
+
 - (void) stopTriggerChanged:(NSNotification*)aNote;
-- (void) p2StartStopChanged:(NSNotification*)aNote;
-- (void) lemoStartStopChanged:(NSNotification*)aNote;
 - (void) randomClockChanged:(NSNotification*)aNote;
-- (void) gateModeChanged:(NSNotification*)aNote;
-- (void) startDelayEnabledChanged:(NSNotification*)aNote;
-- (void) stopDelayEnabledChanged:(NSNotification*)aNote;
 - (void) stopDelayChanged:(NSNotification*)aNote;
 - (void) startDelayChanged:(NSNotification*)aNote;
 - (void) clockSourceChanged:(NSNotification*)aNote;
@@ -112,28 +113,32 @@
 - (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) autoStartAction:(id)sender;
-- (IBAction) multiEventModeAction:(id)sender;
-- (IBAction) pageWrapAction:(id)sender;
+- (IBAction) csrAction:(id)sender;
+- (IBAction) acqAction:(id)sender;
+- (IBAction) eventConfigAction:(id)sender;
+- (IBAction) pageSizeAction:(id)sender;
+
 - (IBAction) stopTriggerAction:(id)sender;
-- (IBAction) p2StartStopAction:(id)sender;
-- (IBAction) lemoStartStopAction:(id)sender;
 - (IBAction) randomClockAction:(id)sender;
-- (IBAction) gateModeAction:(id)sender;
 - (IBAction) startDelayEnabledAction:(id)sender;
 - (IBAction) stopDelayEnabledAction:(id)sender;
 - (IBAction) stopDelayAction:(id)sender;
 - (IBAction) startDelayAction:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
-- (IBAction) pageSizeAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) initBoard:(id)sender;
 - (IBAction) integrationAction:(id)sender;
+- (IBAction) probeBoardAction:(id)sender;
 
 - (IBAction) enabledAction:(id)sender;
 - (IBAction) ltGtAction:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
+- (IBAction) writeThresholdsAction:(id)sender;
+- (IBAction) readThresholdsAction:(id)sender;
+- (IBAction) testReadAction:(id)sender;
+- (IBAction) testMemoryBankAction:(id)sender;
+- (IBAction) checkEvent:(id)sender;
 
 #pragma mark •••Data Source
 - (double)  getBarValue:(int)tag;

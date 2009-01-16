@@ -27,6 +27,7 @@
 #import "ORAxis.h"
 #import "ORTimeRate.h"
 #import "ORRate.h"
+#import "OHexFormatter.h"
 
 @implementation ORSIS3300Controller
 
@@ -57,6 +58,17 @@
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
+			
+	//NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	OHexFormatter *numberFormatter = [[[OHexFormatter alloc] init] autorelease];
+	
+	//[numberFormatter setFormat:@"##0.000;0;-##0.000"];
+	
+	int i;
+	for(i=0;i<8;i++){
+		NSCell* theCell = [thresholdMatrix cellAtRow:i column:0];
+		[theCell setFormatter:numberFormatter];
+	}
 	
 	[super awakeFromNib];
 	
@@ -129,12 +141,10 @@
                          name : ORSIS3300ModelLtGtChanged
                        object : model];
 	
-	
     [notifyCenter addObserver : self
                      selector : @selector(thresholdChanged:)
                          name : ORSIS3300ModelThresholdChanged
                        object : model];
-	
 	
     [notifyCenter addObserver : self
                      selector : @selector(pageSizeChanged:)
@@ -161,36 +171,7 @@
                      selector : @selector(stopDelayChanged:)
                          name : ORSIS3300ModelStopDelayChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(stopDelayEnabledChanged:)
-                         name : ORSIS3300ModelStopDelayEnabledChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(startDelayEnabledChanged:)
-                         name : ORSIS3300ModelStartDelayEnabledChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(gateModeChanged:)
-                         name : ORSIS3300ModelGateModeChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(randomClockChanged:)
-                         name : ORSIS3300ModelRandomClockChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(lemoStartStopChanged:)
-                         name : ORSIS3300ModelLemoStartStopChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(p2StartStopChanged:)
-                         name : ORSIS3300ModelP2StartStopChanged
-						object: model];
+			
 	
     [notifyCenter addObserver : self
                      selector : @selector(stopTriggerChanged:)
@@ -198,18 +179,23 @@
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(pageWrapChanged:)
-                         name : ORSIS3300ModelPageWrapChanged
+                     selector : @selector(eventConfigChanged:)
+                         name : ORSIS3300ModelEventConfigChanged
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(multiEventModeChanged:)
-                         name : ORSIS3300ModelMultiEventModeChanged
+                     selector : @selector(csrChanged:)
+                         name : ORSIS3300ModelCSRRegChanged
 						object: model];
-	
+
     [notifyCenter addObserver : self
-                     selector : @selector(autoStartChanged:)
-                         name : ORSIS3300ModelAutoStartChanged
+                     selector : @selector(acqChanged:)
+                         name : ORSIS3300ModelAcqRegChanged
+						object: model];
+		
+    [notifyCenter addObserver : self
+                     selector : @selector(updatePlot)
+                         name : ORSIS3300ModelSampleDone
 						object: model];
 	
 }
@@ -254,33 +240,50 @@
 	[self clockSourceChanged:nil];
 	[self startDelayChanged:nil];
 	[self stopDelayChanged:nil];
-	[self stopDelayEnabledChanged:nil];
-	[self startDelayEnabledChanged:nil];
-	[self gateModeChanged:nil];
 	[self randomClockChanged:nil];
-	[self lemoStartStopChanged:nil];
-	[self p2StartStopChanged:nil];
 	[self stopTriggerChanged:nil];
-	[self pageWrapChanged:nil];
-	[self multiEventModeChanged:nil];
-	[self autoStartChanged:nil];
+	
+	[self eventConfigChanged:nil];
+	[self csrChanged:nil];
+	[self acqChanged:nil];
+
+}
+
+- (void) updatePlot
+{
+	[plotter setNeedsDisplay:YES];
 }
 
 #pragma mark •••Interface Management
-
-- (void) autoStartChanged:(NSNotification*)aNote
+- (void) csrChanged:(NSNotification*)aNote
 {
-	[autoStartButton setIntValue: [model autoStart]];
+	[[csrMatrix cellWithTag:0] setIntValue:[model enableTriggerOutput]];
+	[[csrMatrix cellWithTag:1] setIntValue:[model invertTrigger]];
+	[[csrMatrix cellWithTag:2] setIntValue:[model activateTriggerOnArmed]];
+	[[csrMatrix cellWithTag:3] setIntValue:[model enableInternalRouting]];
+	[[csrMatrix cellWithTag:4] setIntValue:[model bankFullTo1]];
+	[[csrMatrix cellWithTag:5] setIntValue:[model bankFullTo2]];
+	[[csrMatrix cellWithTag:6] setIntValue:[model bankFullTo3]];
 }
 
-- (void) multiEventModeChanged:(NSNotification*)aNote
+- (void) acqChanged:(NSNotification*)aNote
 {
-	[multiEventModeButton setIntValue: [model multiEventMode]];
+	[[acqMatrix cellWithTag:0] setIntValue:[model bankSwitchMode]];
+	[[acqMatrix cellWithTag:1] setIntValue:[model autoStart]];
+	[[acqMatrix cellWithTag:2] setIntValue:[model multiEventMode]];
+	[[acqMatrix cellWithTag:3] setIntValue:[model multiplexerMode]];
+	[[acqMatrix cellWithTag:4] setIntValue:[model lemoStartStop]];
+	[[acqMatrix cellWithTag:5] setIntValue:[model p2StartStop]];
+	[[acqMatrix cellWithTag:6] setIntValue:[model gateMode]];
+	[startDelayEnabledButton setIntValue: [model startDelayEnabled]];
+	[stopDelayEnabledButton setIntValue: [model stopDelayEnabled]];
 }
 
-- (void) pageWrapChanged:(NSNotification*)aNote
+
+- (void) eventConfigChanged:(NSNotification*)aNote
 {
-	[pageWrapButton setIntValue: [model pageWrap]];
+	[[eventConfigMatrix cellWithTag:0] setIntValue:[model pageWrap]];
+	[[eventConfigMatrix cellWithTag:1] setIntValue:[model gateChaining]];
 }
 
 - (void) stopTriggerChanged:(NSNotification*)aNote
@@ -288,34 +291,9 @@
 	[stopTriggerButton setIntValue: [model stopTrigger]];
 }
 
-- (void) p2StartStopChanged:(NSNotification*)aNote
-{
-	[p2StartStopButton setIntValue: [model p2StartStop]];
-}
-
-- (void) lemoStartStopChanged:(NSNotification*)aNote
-{
-	[lemoStartStopButton setIntValue: [model lemoStartStop]];
-}
-
 - (void) randomClockChanged:(NSNotification*)aNote
 {
 	[randomClockButton setIntValue: [model randomClock]];
-}
-
-- (void) gateModeChanged:(NSNotification*)aNote
-{
-	[gateModeButton setIntValue: [model gateMode]];
-}
-
-- (void) startDelayEnabledChanged:(NSNotification*)aNote
-{
-	[startDelayEnabledButton setIntValue: [model startDelayEnabled]];
-}
-
-- (void) stopDelayEnabledChanged:(NSNotification*)aNote
-{
-	[stopDelayEnabledButton setIntValue: [model stopDelayEnabled]];
 }
 
 - (void) clockSourceChanged:(NSNotification*)aNote
@@ -359,6 +337,7 @@
 {
 	short i;
 	for(i=0;i<kNumSIS3300Channels;i++){
+		//float volts = (0.0003*[model threshold:i])-5.0;
 		[[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
 	}
 }
@@ -408,14 +387,11 @@
 	[ltGtMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix		setEnabled:!lockedOrRunningMaintenance];
 	
-	[autoStartButton		setEnabled:!lockedOrRunningMaintenance];
-	[multiEventModeButton	setEnabled:!lockedOrRunningMaintenance];
-	[pageWrapButton			setEnabled:!lockedOrRunningMaintenance];
+	[csrMatrix				setEnabled:!lockedOrRunningMaintenance];
+	[acqMatrix				setEnabled:!lockedOrRunningMaintenance];
+	[eventConfigMatrix		setEnabled:!lockedOrRunningMaintenance];
 	[stopTriggerButton		setEnabled:!lockedOrRunningMaintenance];
-	[p2StartStopButton		setEnabled:!lockedOrRunningMaintenance];
-	[lemoStartStopButton	setEnabled:!lockedOrRunningMaintenance];
 	[randomClockButton		setEnabled:!lockedOrRunningMaintenance];
-	[gateModeButton			setEnabled:!lockedOrRunningMaintenance];
 	[startDelayEnabledButton setEnabled:!lockedOrRunningMaintenance];
 	[stopDelayEnabledButton setEnabled:!lockedOrRunningMaintenance];
 	[startDelayField		setEnabled:!lockedOrRunningMaintenance];
@@ -523,74 +499,107 @@
 }
 
 #pragma mark •••Actions
-
-- (void) autoStartAction:(id)sender
+- (IBAction) csrAction:(id)sender
 {
-	[model setAutoStart:[sender intValue]];	
+	//tags are defined in IB, they have to match here or there will be trouble
+	BOOL state = [[sender selectedCell] intValue];
+	switch ([[sender selectedCell] tag]) {
+		case 0: [model setEnableTriggerOutput:state];		break; 
+		case 1: [model setInvertTrigger:state];				break; 
+		case 2: [model setActivateTriggerOnArmed:state];	break; 
+		case 3: [model setEnableInternalRouting:state];		break; 
+		case 4: [model setBankFullTo1:state];				break; 
+		case 5: [model setBankFullTo2:state];				break; 
+		case 6: [model setBankFullTo3:state];				break; 
+		default: break;
+	}
 }
 
-- (void) multiEventModeAction:(id)sender
+- (IBAction) acqAction:(id)sender
 {
-	[model setMultiEventMode:[sender intValue]];	
+	//tags are defined in IB, they have to match here or there will be trouble
+	BOOL state = [[sender selectedCell] intValue];
+	switch ([[sender selectedCell] tag]) {
+		case 0: [model setBankSwitchMode:state];	break; 
+		case 1: [model setAutoStart:state];			break; 
+		case 2: [model setMultiEventMode:state];	break; 
+		case 3: [model setMultiplexerMode:state];	break; 
+		case 4: [model setLemoStartStop:state];		break; 
+		case 5: [model setP2StartStop:state];		break; 
+		case 6: [model setGateMode:state];			break; 
+		case 7: [model setStartDelayEnabled:state];			break; 
+		case 8: [model setStopDelayEnabled:state];			break; 
+		default: break;
+	}
 }
 
-- (void) pageWrapAction:(id)sender
+- (IBAction) eventConfigAction:(id)sender
 {
-	[model setPageWrap:[sender intValue]];	
+	//tags are defined in IB, they have to match here or there will be trouble
+	BOOL state = [[sender selectedCell] intValue];
+	switch ([[sender selectedCell] tag]) {
+		case 0: [model setPageWrap:state];			break; 
+		case 1: [model setGateChaining:state];		break; 
+		default: break;
+	}
 }
 
-- (void) stopTriggerAction:(id)sender
+//hardware actions
+- (IBAction) testMemoryBankAction:(id)sender;
+{
+	@try {
+		[model testMemory];
+	}
+	@catch (NSException* localException) {
+		NSLog(@"Probe of SIS 3300 Memory Bank failed\n");
+	}
+}
+- (IBAction) probeBoardAction:(id)sender;
+{
+	@try {
+		[model readModuleID];
+	}
+	@catch (NSException* localException) {
+		NSLog(@"Probe of SIS 3300 board ID failed\n");
+	}
+}
+
+- (IBAction) stopTriggerAction:(id)sender
 {
 	[model setStopTrigger:[sender intValue]];	
 }
 
-- (void) p2StartStopAction:(id)sender
-{
-	[model setP2StartStop:[sender intValue]];	
-}
-
-- (void) lemoStartStopAction:(id)sender
-{
-	[model setLemoStartStop:[sender intValue]];	
-}
-
-- (void) randomClockAction:(id)sender
+- (IBAction) randomClockAction:(id)sender
 {
 	[model setRandomClock:[sender intValue]];	
 }
 
-- (void) gateModeAction:(id)sender
-{
-	[model setGateMode:[sender intValue]];	
-}
-
-- (void) startDelayEnabledAction:(id)sender
+- (IBAction) startDelayEnabledAction:(id)sender
 {
 	[model setStartDelayEnabled:[sender intValue]];	
 }
 
-- (void) stopDelayEnabledAction:(id)sender
+- (IBAction) stopDelayEnabledAction:(id)sender
 {
 	[model setStopDelayEnabled:[sender intValue]];	
 }
 
-
-- (void) startDelayAction:(id)sender
+- (IBAction) startDelayAction:(id)sender
 {
 	[model setStartDelay:[sender intValue]];	
 }
 
-- (void) clockSourceAction:(id)sender
+- (IBAction) clockSourceAction:(id)sender
 {
 	[model setClockSource:[sender indexOfSelectedItem]];	
 }
 
-- (void) stopDelayAction:(id)sender
+- (IBAction) stopDelayAction:(id)sender
 {
 	[model setStopDelay:[sender intValue]];	
 }
 
-- (void) pageSizeAction:(id)sender
+- (IBAction) pageSizeAction:(id)sender
 {
 	[model setPageSize:[sender indexOfSelectedItem]];	
 }
@@ -607,12 +616,12 @@
 
 - (IBAction) thresholdAction:(id)sender
 {
-	if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
+	//int dacVal = ([sender floatValue]+5)/0.0003;
+    if([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
 		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
-
--(IBAction)baseAddressAction:(id)sender
+-(IBAction) baseAddressAction:(id)sender
 {
     if([sender intValue] != [model baseAddress]){
         [model setBaseAddress:[sender intValue]];
@@ -625,7 +634,7 @@
 }
 
 
--(IBAction)initBoard:(id)sender
+-(IBAction) initBoard:(id)sender
 {
     @try {
         [self endEditing];
@@ -667,6 +676,42 @@
 	
 }
 
+- (IBAction) writeThresholdsAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model writeThresholds:YES];
+    }
+	@catch(NSException* localException) {
+        NSLog(@"SIS3300 Thresholds write FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nSIS3300 Write FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) readThresholdsAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model readThresholds:YES];
+    }
+	@catch(NSException* localException) {
+        NSLog(@"SIS3300 Thresholds read FAILED.\n");
+        NSRunAlertPanel([localException name], @"%@\nSIS3300 Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+- (IBAction) testReadAction:(id)sender
+{
+	[self endEditing];
+	[model sampleAdcValues];
+}
+
+- (IBAction) checkEvent:(id)sender
+{
+	[self endEditing];
+	[model testEventRead];
+}
 
 #pragma mark •••Data Source
 
@@ -678,14 +723,20 @@
 
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-	return [[[model waveFormRateGroup]timeRate]count];
+	if(aPlotter== plotter)return 512;
+	else return [[[model waveFormRateGroup]timeRate]count];
 }
 
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
 	if(set == 0){
-		int count = [[[model waveFormRateGroup]timeRate] count];
-		return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
+		if(aPlotter== plotter){
+			return [model adcValue:0 index:x];
+		}
+		else {
+			int count = [[[model waveFormRateGroup]timeRate] count];
+			return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
+		}
 	}
 	return 0;
 }

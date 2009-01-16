@@ -29,54 +29,43 @@
 @class ORAlarm;
 
 #define kNumSIS3300Channels			8 
-#define kNumSIS3300CardParams		6
-
-#define kSIS3300FIFOEmpty		0x800
-#define kSIS3300FIFOAlmostEmpty 0x1000
-#define kSIS3300FIFOHalfFull	0x2000
-#define kSIS3300FIFOAllFull		0x4000
-
-#pragma mark •••Register Definitions
-enum {
-	kControlStatus,				// []
-	kAcquisitionControlReg,		// [] 
-	kStartDelay,				// []
-	kStopDelay,					// []
-	kGeneralReset,				// []
-	kStartSampling,				// []
-	kStopSampling,				// []
-	kNumberOfSIS3300Registers	//must be last
-};
-
-enum SIS3300FIFOStates {
-	kEmpty,
-	kAlmostEmpty,	
-	kHalfFull,
-	kFull,
-	kSome
-};
 
 @interface ORSIS3300Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
   @private
     int				pageSize;
-    int				clockSource;
-    int				startDelay;
-    int				stopDelay;
-    BOOL			stopDelayEnabled;
-    BOOL			startDelayEnabled;
-    BOOL			randomClock;
-	
-    BOOL			gateMode;
-    BOOL			lemoStartStop;
-    BOOL			p2StartStop;
-	
+ 	
+ 	
     BOOL			stopTrigger;
     BOOL			pageWrap;
-    BOOL			multiEventMode;
-    BOOL			autoStart;
+    BOOL			gateChaining;
 
+	//control status reg
+    BOOL enableTriggerOutput;
+    BOOL invertTrigger;
+    BOOL activateTriggerOnArmed;
+    BOOL enableInternalRouting;
+    BOOL bankFullTo1;
+    BOOL bankFullTo2;
+    BOOL bankFullTo3;	
+	
+	//Acquisition control reg
+	BOOL bankSwitchMode;
+    BOOL autoStart;
+    BOOL multiEventMode;
+	BOOL lemoStartStop;
+    BOOL p2StartStop;
+    BOOL gateMode;
+    BOOL multiplexerMode;
 
+	//clocks and delays (Acquistion control reg)
+    BOOL stopDelayEnabled;
+    BOOL startDelayEnabled;
+    BOOL randomClock;
+	int	 clockSource;
+    int	 startDelay;
+    int	 stopDelay;
+	
 	unsigned long   dataId;
 
 	long			enabledMask;
@@ -86,13 +75,16 @@ enum SIS3300FIFOStates {
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3300Channels];
 	BOOL isRunning;
+	unsigned long*  dataBuffer;
 
 	//cach to speed takedata
 	unsigned long location;
 	id theController;
 	unsigned long fifoAddress;
 	unsigned long fifoStateAddress;
-
+	BOOL firstTime;
+	int currentBank;
+	int adcValue[8][512];
 }
 
 - (id) init;
@@ -101,32 +93,61 @@ enum SIS3300FIFOStates {
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+//CSR bits
+- (BOOL) bankFullTo3;
+- (void) setBankFullTo3:(BOOL)aBankFullTo3;
+- (BOOL) bankFullTo2;
+- (void) setBankFullTo2:(BOOL)aBankFullTo2;
+- (BOOL) bankFullTo1;
+- (void) setBankFullTo1:(BOOL)aBankFullTo1;
+- (BOOL) enableInternalRouting;
+- (void) setEnableInternalRouting:(BOOL)aEnableInternalRouting;
+- (BOOL) activateTriggerOnArmed;
+- (void) setActivateTriggerOnArmed:(BOOL)aActivateTriggerOnArmed;
+- (BOOL) invertTrigger;
+- (void) setInvertTrigger:(BOOL)aInvertTrigger;
+- (BOOL) enableTriggerOutput;
+- (void) setEnableTriggerOutput:(BOOL)aEnableTriggerOutput;
+
+//Acquisition control reg
+- (BOOL) bankSwitchMode;
+- (void) setBankSwitchMode:(BOOL)aBankSwitchMode;
 - (BOOL) autoStart;
 - (void) setAutoStart:(BOOL)aAutoStart;
 - (BOOL) multiEventMode;
 - (void) setMultiEventMode:(BOOL)aMultiEventMode;
-- (BOOL) pageWrap;
-- (void) setPageWrap:(BOOL)aPageWrap;
-- (BOOL) stopTrigger;
-- (void) setStopTrigger:(BOOL)aStopTrigger;
-- (BOOL) p2StartStop;
-- (void) setP2StartStop:(BOOL)aP2StartStop;
+- (BOOL) multiplexerMode;
+- (void) setMultiplexerMode:(BOOL)aMultiplexerMode;
 - (BOOL) lemoStartStop;
 - (void) setLemoStartStop:(BOOL)aLemoStartStop;
-- (BOOL) randomClock;
-- (void) setRandomClock:(BOOL)aRandomClock;
+- (BOOL) p2StartStop;
+- (void) setP2StartStop:(BOOL)aP2StartStop;
 - (BOOL) gateMode;
 - (void) setGateMode:(BOOL)aGateMode;
+
+//clocks and delays (Acquistion control reg)
 - (BOOL) startDelayEnabled;
 - (void) setStartDelayEnabled:(BOOL)aStartDelayEnabled;
 - (BOOL) stopDelayEnabled;
 - (void) setStopDelayEnabled:(BOOL)aStopDelayEnabled;
+- (BOOL) randomClock;
+- (void) setRandomClock:(BOOL)aRandomClock;
+- (int) clockSource;
+- (void) setClockSource:(int)aClockSource;
+
+//event configuration
+- (BOOL) pageWrap;
+- (void) setPageWrap:(BOOL)aPageWrap;
+- (BOOL) gateChaining;
+- (void) setGateChaining:(BOOL)aState;
+
+
+- (BOOL) stopTrigger;
+- (void) setStopTrigger:(BOOL)aStopTrigger;
 - (int) stopDelay;
 - (void) setStopDelay:(int)aStopDelay;
 - (int) startDelay;
 - (void) setStartDelay:(int)aStartDelay;
-- (int) clockSource;
-- (void) setClockSource:(int)aClockSource;
 - (int) pageSize;
 - (void) setPageSize:(int)aPageSize;
 
@@ -154,25 +175,47 @@ enum SIS3300FIFOStates {
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
+- (int) sampleSize;
+- (int) nPages;
 
 #pragma mark •••Hardware Access
 - (void) initBoard;
+- (void) readModuleID;
 - (void) writeControlStatusRegister;
 - (void) writeAcquistionRegister;
 - (void) writeEventConfigurationRegister;
-- (void) writeThresholds;
+- (void) writeThresholds:(BOOL)verbose;
+- (void) readThresholds:(BOOL)verbose;
 - (void) writeStartDelay;
 - (void) writeStopDelay;
+- (void) setLed:(BOOL)state;
 - (void) enableUserOut:(BOOL)state;
-- (void) strobeUserOut;
 - (void) startSampling;
 - (void) stopSampling;
-- (unsigned long) eventNumber:(int) bank;
-- (void) clearDaq;
-- (void) disArm1;
-- (void) disArm2;
-- (void) arm1;
-- (void) arm2;
+- (void) startBankSwitching;
+- (void) stopBankSwitching;
+- (void) clearBankFullFlag:(int)whichFlag;
+- (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
+- (void) writeTriggerClearValue:(unsigned long)aValue;
+- (void) setMaxNumberEvents:(unsigned long)aValue;
+- (unsigned long) eventTriggerGroup:(int)group bank:(int) bank;
+
+- (void) disArm:(int)bank;
+- (void) arm:(int)bank;
+- (BOOL) bankIsFull:(int)bank;
+- (void) writeTriggerSetup;
+
+//some test functions
+- (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
+- (void) readAddressCounts;
+
+- (void) readAdcValues:(int)i;
+- (int) adcValue:(int)chan index:(int)index;
+
+- (unsigned long) acqReg;
+- (unsigned long) configReg;
+- (void) testMemory;
+- (void) testEventRead;
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId;
@@ -189,6 +232,12 @@ enum SIS3300FIFOStates {
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
+- (void) sampleAdcValues;
+- (unsigned long) readGroup:(int)aGroup intoBuffer:(void*)aBuffer;
+- (unsigned int) readEventDirectory: (unsigned long) eventDirAddressOffset 
+				  bankAddressOffest: (unsigned long) bankAddressOffest
+						 intoBuffer: (void*) pBuffer;
+
 #pragma mark •••HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;
@@ -202,16 +251,13 @@ enum SIS3300FIFOStates {
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 @end
 
-extern NSString* ORSIS3300ModelAutoStartChanged;
-extern NSString* ORSIS3300ModelMultiEventModeChanged;
-extern NSString* ORSIS3300ModelPageWrapChanged;
+//CSR
+extern NSString* ORSIS3300ModelCSRRegChanged;
+extern NSString* ORSIS3300ModelAcqRegChanged;
+extern NSString* ORSIS3300ModelEventConfigChanged;
+
 extern NSString* ORSIS3300ModelStopTriggerChanged;
-extern NSString* ORSIS3300ModelP2StartStopChanged;
-extern NSString* ORSIS3300ModelLemoStartStopChanged;
 extern NSString* ORSIS3300ModelRandomClockChanged;
-extern NSString* ORSIS3300ModelGateModeChanged;
-extern NSString* ORSIS3300ModelStartDelayEnabledChanged;
-extern NSString* ORSIS3300ModelStopDelayEnabledChanged;
 extern NSString* ORSIS3300ModelStopDelayChanged;
 extern NSString* ORSIS3300ModelStartDelayChanged;
 extern NSString* ORSIS3300ModelClockSourceChanged;
@@ -223,3 +269,4 @@ extern NSString* ORSIS3300ModelLtGtChanged;
 
 extern NSString* ORSIS3300SettingsLock;
 extern NSString* ORSIS3300RateGroupChangedNotification;
+extern NSString* ORSIS3300ModelSampleDone;
