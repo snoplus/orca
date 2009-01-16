@@ -1446,7 +1446,7 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 {
 	if([self cbTestRunning]){
 		exitCBTest = YES;
-		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTest"];
+		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTestInProgress"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
 	}
 	if(socketfd){
@@ -1552,7 +1552,7 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 {
 	if([self cbTestRunning]){
 		exitCBTest = YES;
-		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTest"];
+		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTestInProgress"];
 	}
 	else if(![gOrcaGlobals runInProgress]){
 		[[ORGlobal sharedGlobal] addRunVeto:@"CBTestInProgress" comment:@"CB Test In Progress"];
@@ -2039,8 +2039,11 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 
 - (void) doCBTransferTest
 {	
-	if(exitCBTest) return;
-	
+	if(exitCBTest) {
+		[[ORGlobal sharedGlobal] removeRunVeto:@"CBTestInProgress"];
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkCBTest object:self];
+		return;
+	}
 	if(!cbTestRunning){
 		currentBlockSize = startBlockSize + cbTestCount*deltaBlockSize;
 		
