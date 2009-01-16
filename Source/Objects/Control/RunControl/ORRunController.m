@@ -508,22 +508,10 @@
 - (IBAction) startRunAction:(id)sender
 {
 	if([[model document] isDocumentEdited]){
-		NSBeginAlertSheet(@"Configuration Not Saved",@"Cancel",@"Just Save",
-						  @"Save, Then Run",[self window],self,@selector(sheetDidEnd:returnCode:contextInfo:),
-						  nil,nil, @"Run can not be started until the configuration is saved!\nWhat would you like to do?");
-    }
-	else [self startRun];
-}
-
-- (void) sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
-{
-    if(returnCode == NSAlertAlternateReturn){
-        [[model document] saveDocument:[self document]];
-	}
-    else if(returnCode == NSAlertOtherReturn){
 		[[model document] afterSaveDo:@selector(startRun) withTarget:self];
         [[model document] saveDocument:[self document]];
-	}
+    }
+	else [self startRun];
 }
 
 - (void) startRun
