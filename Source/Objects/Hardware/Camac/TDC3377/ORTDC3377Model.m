@@ -1085,7 +1085,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
     
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"OR2228AModel"];    
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORTDC3377Model"];    
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
