@@ -17,8 +17,11 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@class WebView;
+
 @interface ORIpeSlowControlController : OrcaObjectController
 {
+    //all obsolete -tb-
 	IBOutlet NSTextField*   remotePortField;
 	IBOutlet NSTextField*   remoteHostField;
 	IBOutlet NSTextField*   connectionStatusField;
@@ -27,9 +30,25 @@
     IBOutlet NSButton*      lockButton;
 	IBOutlet NSButton*      connectAtStartButton;
 	IBOutlet NSButton*      autoReconnectButton;
+    
+    
     //slow control -tb-
 	IBOutlet NSTextField*   monitoringField;
 	IBOutlet NSTextField*   monitoringIntValueField;
+    
+    //new -tb-
+    IBOutlet NSOutlineView *sensorTreeOutlineView;
+    IBOutlet NSTableView  *sensorTableView; // the channel/sensor list view
+    IBOutlet NSTextField *adeiUrlField;
+    IBOutlet NSScrollView *textView; //super class of a text view is NSText -tb-
+                                     //[textView documentView] is a NSTextView -tb-
+    // Drawers
+    IBOutlet NSDrawer *leftDrawer;
+    IBOutlet NSDrawer *rightDrawer;
+    //IBOutlet id  *adeiWebInterfaceWebView;
+    IBOutlet WebView  *adeiWebInterfaceWebView;
+
+    
 }
 
 #pragma mark ***Initialization
@@ -40,13 +59,20 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 - (void) remotePortChanged:(NSNotification*)note;
 - (void) remoteHostChanged:(NSNotification*)note;
 - (void) isConnectedChanged:(NSNotification*)note;
 - (void) byteCountChanged:(NSNotification*)note;
-- (void) lockChanged:(NSNotification*)aNotification;
 - (void) connectAtStartChanged:(NSNotification*)note;
 - (void) autoReconnectChanged:(NSNotification*)note;
+#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+- (void) lockChanged:(NSNotification*)aNotification;
+//slow control
+- (void) adeiServerUrlChanged:(NSNotification*)aNote;
+- (void) adeiTreeChanged:(NSNotification*)aNote;
+- (void) sensorListChanged:(NSNotification*)aNote;
+
 // slow control -tb-
 - (void) monitoringFieldChanged:(NSNotification*)aNotification;
 
@@ -54,10 +80,54 @@
 
 #pragma mark ***Actions
 - (IBAction) lockAction:(id)sender;
+#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 - (IBAction) remotePortFieldAction:(id)sender;
 - (IBAction) remoteHostFieldAction:(id)sender;
 - (IBAction) connectButtonAction:(id)sender;
 - (IBAction) connectAtStartAction:(id)sender;
 - (IBAction) autoReconnectAction:(id)sender;
+#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//new -tb-
+//- (IBAction) loadButtonAction:(id)sender;  OBSOLETE -tb-
+//- (IBAction) loadCSVFileButtonAction:(id)sender; OBSOLETE -tb-
+- (IBAction) requestSensorTreeButtonAction:(id)sender;
+- (IBAction) sensorlistButtonAction:(id)sender;
+- (IBAction) dumpSensorlistButtonAction:(id)sender;
+//drawer actions
+- (IBAction)openLeftDrawer:(id)sender;
+- (IBAction)closeLeftDrawer:(id)sender;
+- (IBAction)toggleLeftDrawer:(id)sender;
+- (IBAction)openRightDrawer:(id)sender;
+- (IBAction)closeRightDrawer:(id)sender;
+- (IBAction)toggleRightDrawer:(id)sender;
+
+//web view
+
+- (IBAction)sensorListContextMenuAction:(id)sender;
+- (IBAction)sensorListContextMenuLoadValueAction:(id)sender;
+- (IBAction)sensorListContextMenuEditAction:(id)sender;
+- (IBAction)sensorListContextMenuRemoveAction:(id)sender;
+- (IBAction)sensorListContextMenuDisplayWebViewAction:(id)sender;
+- (IBAction)loadAdeiHomeInWebInterfaceWebViewAction:(id)sender;
+
+
+
+#pragma mark •••Data Source Methods (OutlineView)
+- (id) outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;
+- (BOOL) outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
+- (int) outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
+- (id) outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
+- (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
+
+
+#pragma mark •••Data Source Methods (TableView)
+- (int)numberOfRowsInTableView:(NSTableView *)tableView;
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
+
+/* Optional - Editing Support
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row;
+*/
+
 @end
 

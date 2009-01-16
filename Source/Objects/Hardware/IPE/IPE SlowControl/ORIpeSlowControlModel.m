@@ -16,75 +16,78 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
+
+    #define USE_TILLS_DEBUG_MACRO //<--- to switch on/off debug output use/comment out this line -tb-
+    #ifdef USE_TILLS_DEBUG_MACRO
+      #define    DebugTB(x) x
+    #else
+      #define    DebugTB(x) 
+    #endif
+
+#else
+  #define    DebugTB(x) 
+#endif
+
+
+
+
+
 
 #pragma mark ***Imported Files
 
 #import "ORIpeSlowControlModel.h"
-#import "NetSocket.h"
-#import "ORDataPacket.h"
-#import "ORDataTaker.h"
-#import "ORSafeQueue.h"
-#import "ORDataTaker.h"
-#import "ORDataTypeAssigner.h"
+//#import "ORDataTaker.h"
+//#import "ORDataTypeAssigner.h"
 
  
 #pragma mark •••Notification Strings
-NSString* ORIpeSlowControlConnectAtStartChangedNotification = @"ORIpeSlowControlConnectAtStartChangedNotification";
-NSString* ORIpeSlowControlAutoReconnectChangedNotification = @"ORIpeSlowControlAutoReconnectChangedNotification";
-NSString* ORIpeSlowControlQueueCountChangedNotification = @"ORIpeSlowControlQueueCountChangedNotification";
-NSString* ORIpeSlowControlRemotePortChangedNotification  = @"ORIpeSlowControlRemotePortChangedNotification";
-NSString* ORIpeSlowControlRemoteHostChangedNotification  = @"ORIpeSlowControlRemoteHostChangedNotification";
-NSString* ORIpeSlowControlIsConnectedChangedNotification = @"ORIpeSlowControlIsConnectedChangedNotification";
-NSString* ORIpeSlowControlByteCountChangedNotification   = @"ORIpeSlowControlByteCountChangedNotification";
-NSString* ORIpeSlowControlLock                           = @"ORIpeSlowControlLock";
+NSString* ORIpeSlowControlLock                                 = @"ORIpeSlowControlLock";
 //slow control -tb-
 NSString* ORIpeSlowControlMonitoringFieldChangedNotification   = @"ORIpeSlowControlMonitoringFieldChangedNotification";
+NSString* ORIpeSlowControlAdeiServerUrlChangedNotification   = @"ORIpeSlowControlAdeiServerUrlChangedNotification";
+NSString* ORIpeSlowControlAdeiTreeChangedNotification   = @"ORIpeSlowControlAdeiTreeChangedNotification";
+NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSensorListChangedNotification";
 
 
-static NSString* ORIpeSlowControlConnector = @"ORIpeSlowControlConnector";
 
-#define kProcessingBusy 1
-#define kProcessingDone 0
-#define kMaxQueueSize   10*1024
-
-@interface ORIpeSlowControlModel (processThread)
-- (void) processDataFromQueue;
-- (void) process:(NSMutableData*)dataChunk;
-- (void) processRecords:(NSMutableData*)dataChunk;
-- (void) startProcessing;
-- (void) stopProcessing;
-- (void) reConnect;
-@end
-
-@interface ORIpeSlowControlModel (private)
-- (void) sendRunTaskStarted:(ORDataPacket*)aDataPacket;
-@end
 
 @implementation ORIpeSlowControlModel
 - (id) init
 {
 	self = [super init];
+#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     readingLock = [[NSLock alloc] init];
     processLock = [[NSConditionLock alloc] init];
-    currentSensor= @""; //slow control
+#endif//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    currentSensor= @""; //slow control  TODO: obsolete -tb-
     NSLog(@"init: self is %p, currentSensor is %p\n",self, currentSensor);
+
+    //FZK-internal: [self setAdeiServerUrl: @"http://ipepdvadei.ka.fzk.de/adei/services/"];//TODO: make attribute -tb-
+    [self setAdeiServerUrl: @"http://fuzzy.fzk.de/adei/services/"];//TODO: make attribute -tb-
+    maxSensorListLength = 30;//TODO: if using a getter/setter sensor list needs to be adjusted/inited -tb-
+    NSLog(@"init 1\n" );
+    
+    //this is necessary also for encodeWithCoder ...!!! -tb-
+    //[self setSensorList:[NSMutableArray array]];
+    [self initSensorList];
+
+    //TODO: in the test application this was in awakeFromNib; maybe I will need it in initWithCoder ... -tb- TODO: the same for setAdeiServerUrl (see above)
+    rootAdeiTree = [ORSensorItem sensorWithAdeiType: kAdeiTypeRoot named: @"root"];
+
+
 	return self;
 }
 
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-	[timeToStopProcessThread release];
-    [processLock release];
-    [readingLock release];
-    [dataPacket release];
-	[remoteHost release];
-	[socket release];
-	[dataPacket release];
-	[transferQueue release];
-	[currentSensor release];//slow control
+    //[NSObject cancelPreviousPerformRequestsWithTarget:self];  needed?? -tb-
+	[currentSensor release];//slow control TODO: obsolete -tb-
 	[super dealloc];
 }
+
+
 
 - (void) setUpImage
 {
@@ -96,21 +99,13 @@ static NSString* ORIpeSlowControlConnector = @"ORIpeSlowControlConnector";
 	[self linkToController:@"ORIpeSlowControlController"];
 }
 
-- (void) makeConnectors
-{
-    //TODO: currently we dont need a connector -tb- 2008-05-19
-    return;
-    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width-kConnectorSize,[self frame].size.height/2 - kConnectorSize/2) withGuardian:self withObjectLink:self];
-    [[self connectors] setObject:aConnector forKey:ORIpeSlowControlConnector];
-    [aConnector release];
-    
-}
+
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    notifyCenter=notifyCenter;//nonsense, just to suppress compiler warnings -tb-
+    notifyCenter=notifyCenter;//TODO: nonsense, just to suppress compiler warnings -tb-
     
     //TODO: currently deactivated (old Listener code) -tb- 2008-05-19
     #if 0
@@ -128,214 +123,25 @@ static NSString* ORIpeSlowControlConnector = @"ORIpeSlowControlConnector";
     
 }
 
-- (void) documentLoaded:(NSNotification*)aNotification
-{
-    if([self objectConnectedTo:ORIpeSlowControlConnector] && connectAtStart){
-        docLoaded = YES;
-        [self connectSocket:YES];
-    }
-}
 
-- (void) connectionChanged:(NSNotification*)aNotification
-{
-    if([aNotification object] == self){
-        if([self objectConnectedTo:ORIpeSlowControlConnector]){
-            theNextObject =  [self objectConnectedTo: ORIpeSlowControlConnector];
-            if(docLoaded){
-                [self connectSocket:YES];
-            }
-        }
-        else {
-            [self connectSocket:NO];
-            //theNextObject = nil;
-        }
-    }
-}
+
 
 
 #pragma mark ***Accessors
-- (BOOL) connectAtStart
-{
-	return connectAtStart;
-}
-- (void) setConnectAtStart:(BOOL)aConnectAtStart
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setConnectAtStart:connectAtStart];
-    
-	connectAtStart = aConnectAtStart;
-    
-	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORIpeSlowControlConnectAtStartChangedNotification
-                      object:self];
-}
-- (BOOL) autoReconnect
-{
-	return autoReconnect;
-}
-- (void) setAutoReconnect:(BOOL)aAutoReconnect
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setAutoReconnect:autoReconnect];
-    
-	autoReconnect = aAutoReconnect;
-    
-	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORIpeSlowControlAutoReconnectChangedNotification
-                      object:self];
-}
 
-- (ORSafeQueue*) transferQueue
-{
-	return transferQueue;
-}
-
-- (void) setTransferQueue:(ORSafeQueue*)aTransferQueue
-{
-	[aTransferQueue retain];
-	[transferQueue release];
-	transferQueue = aTransferQueue;
-}
-
-- (unsigned long) queueCount
-{
-	return queueCount;
-}
-- (void) setQueueCount:(unsigned long)aQueueCount
-{
-	queueCount = aQueueCount;
-    
-	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORIpeSlowControlQueueCountChangedNotification
-                      object:self];
-}
-- (ORDataPacket*) dataPacket
-{
-    return dataPacket;
-}
-
-- (void) setDataPacket:(ORDataPacket*)aDataPacket
-{
-    [aDataPacket retain];
-    [dataPacket release];
-    dataPacket = aDataPacket;
-}
-
-- (NetSocket*) socket
-{
-	return socket;
-}
-- (void) setSocket:(NetSocket*)aSocket
-{
-	[aSocket retain];
-	[socket release];
-	socket = aSocket;
-    [socket setDelegate:self];
-}
-
-- (unsigned short) remotePort
-{
-	return remotePort;
-}
-- (void) setRemotePort:(unsigned short)aNewRemotePort
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setRemotePort:remotePort];
-    
-	remotePort = aNewRemotePort;
-    
-	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORIpeSlowControlRemotePortChangedNotification 
-                          object: self];
-}
-
-- (NSString*) remoteHost
-{
-	return remoteHost;
-}
-- (void) setRemoteHost:(NSString*)aNewRemoteHost
-{
-    if(!aNewRemoteHost)aNewRemoteHost = @"";
-    
-    NSString* thisHostAdress    = [[NSHost currentHost] address];
-    NSString* remoteHostAddress = [[NSHost hostWithName:aNewRemoteHost] address];
-    
-    if([thisHostAdress isEqualToString:remoteHostAddress]){
-        aNewRemoteHost = @"";   
-        NSLog(@"Sorry, you can not connect a IpeSlowControl to the local host.\n"); 
-        NSLog(@"The remote host must be a different computer.\n"); 
-    }
-    
-	[[[self undoManager] prepareWithInvocationTarget:self] setRemoteHost:remoteHost];
-    
-	[remoteHost autorelease];
-	remoteHost = [aNewRemoteHost copy];
-    
-	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORIpeSlowControlRemoteHostChangedNotification 
-                          object: self ];
-}
-
-- (BOOL) isConnected
-{
-	return isConnected;
-}
-- (void) setIsConnected:(BOOL)aNewIsConnected
-{
-	isConnected = aNewIsConnected;
-    
-	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORIpeSlowControlIsConnectedChangedNotification 
-                          object: self ];
-    
-}
-
-- (unsigned long) byteCount
-{
-	return byteCount;
-}
-- (void) setByteCount:(unsigned long)aNewByteCount
-{
-	byteCount = aNewByteCount;
-    
-	[[NSNotificationCenter defaultCenter] 
-			postNotificationName:ORIpeSlowControlByteCountChangedNotification 
-                          object: self ];
-}
-
-- (void) clearByteCount
-{
-    [self setByteCount:0];
-}
-
-- (void) incByteCount:(unsigned long)anAmount
-{
-    unsigned long newAmount = byteCount + anAmount;
-	[self setByteCount:newAmount];
-}
-
-- (void) connectSocket:(BOOL)state
-{
-    if(state){
-        [self setSocket:[NetSocket netsocketConnectedToHost:remoteHost port:remotePort]];
-    }
-    else {
-        [socket close];
-        [self stopProcessing];
-        [self setIsConnected:[socket isConnected]];
-    }
-}
 
 #pragma mark ***Slow Control Accessors
+//obsolete -tb-
 - (NSString*) currentSensor
 {
     return currentSensor;
 }
-
 - (void) setCurrentSensor:(NSString*)aString
 {
     if(!aString) aString=@"";
     [currentSensor autorelease];
     currentSensor=[aString copy];
 }
-
 - (int) currentSensorIntValue
 {
     return currentSensorIntValue;
@@ -344,6 +150,167 @@ static NSString* ORIpeSlowControlConnector = @"ORIpeSlowControlConnector";
 {
     currentSensorIntValue=aValue;
 }
+
+
+//new -tb-
+- (ORSensorItem*) rootAdeiTree
+{
+    if(!rootAdeiTree) NSLog(@"ORIpeSlowControl: ERROR: rootAdeiTree is nil!\n");//TODO: make a better handler -tb-
+    return rootAdeiTree;
+}
+
+- (NSString*) adeiServerUrl
+{
+    return adeiServerUrl;
+}
+
+- (void) setAdeiServerUrl: (NSString*) aUrl
+{
+//TODO: undo not yet implemented! -tb- better: implement history of the url textField?
+    [aUrl retain];
+    [adeiServerUrl release];
+    adeiServerUrl = aUrl;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiServerUrlChangedNotification object:self];
+}
+
+- (NSMutableArray *) sensorList;
+{
+    return sensorList; 
+}
+
+- (void) setSensorList: (NSMutableArray *) anItems;
+{
+    [anItems retain];
+    [sensorList release];
+    sensorList = anItems;
+    //no notification! -tb-
+}
+
+- (int) maxSensorListLength
+{    return maxSensorListLength;
+}
+
+- (void) initSensorList //TODO: rename to "populateSensorList" -tb-
+{
+    if(!sensorList) [self setSensorList:[NSMutableArray array]];
+    int sensorListIndex;
+    for(sensorListIndex=0; sensorListIndex < maxSensorListLength ; sensorListIndex++){
+        ORSensorItem *sensor = [ORSensorItem emptySensorListItemWithChanNum: sensorListIndex];
+        [sensorList addObject: sensor];
+    }
+    
+}
+
+
+- (void) insertSensorListItem:(ORSensorItem*) sensorItem
+{//TODO: unneeded? -tb-
+}
+
+- (void) replaceSensorListItemAtIndex:(int)index withSensorTreeItem:(ORSensorItem*)treeSensorItem
+{
+    ORSensorItem *mapListSensorItem = [treeSensorItem sibling];// if ==0x0: treeSensorItem was not in the sensorlist before
+    
+    ORSensorItem *sensorListItemOfIndex=[sensorList objectAtIndex:index];
+    if(sensorListItemOfIndex==mapListSensorItem) return; // was the same number, do nothing
+    
+    //if the channel 'index' was already defined, "clear" the according  tree and list items
+    if([sensorListItemOfIndex isDefinedSensorListItem]){//or call removeSensorListItem
+         ORSensorItem*oldSensorListItemSibling=[sensorListItemOfIndex sibling];
+              NSLog(@"Channel %i was defined: - sibling %p,sibling name %@\n", index,oldSensorListItemSibling , [oldSensorListItemSibling name]);
+         [oldSensorListItemSibling setChannelMapNum: -1];
+         [sensorListItemOfIndex disconnectSiblings];
+         [sensorListItemOfIndex setAdeiType: kSensorListEmptyItem];
+         //[oldSensorListItem release];//TODO: ?????
+    }
+    
+    //maybe the selected tree sensor had already another channel number (was already defined in the sensor list),
+    // then remove this entry in the sensor list ...
+    int oldCh = [treeSensorItem channelMapNum ];//read old chMap
+    if(oldCh>=0 && oldCh != index){// != -1 would be sufficient
+        //[sensorList replaceObjectAtIndex: oldCh withObject: [self emptyItem] ];
+        ORSensorItem *sensorToClear = [sensorList objectAtIndex: oldCh];  //TODO: simplify it!!! -tb-
+        [sensorToClear clearSensorListItem];
+        //and release oldSensorListItem
+        //and clear channelMapNum of sibling of oldSensorListItem (below)
+    }
+    
+    //define new entry in sensor list
+    //TODO: pack it together in one method -tb-
+    [sensorListItemOfIndex setAdeiType: kSensorListItem];// mark as "not empty"
+    [sensorListItemOfIndex createAdeiPathFromSibling: treeSensorItem];//create the adei path dictionary
+    [sensorListItemOfIndex setSibling: treeSensorItem]; 
+    [sensorListItemOfIndex setName: [treeSensorItem name]]; 
+    // ... and connect tree item and list item
+    [treeSensorItem setSibling: sensorListItemOfIndex];
+    [treeSensorItem setChannelMapNum: index];
+        
+
+    //[sensorTableView setNeedsDisplay: YES];  instead send a notification
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChangedNotification object:self];
+        // TODO: do I need this notification? it is always called by 
+        // - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+
+}
+
+- (void) removeSensorListItemWithIndex:(int)index
+{
+    ORSensorItem *sensorListItem = [sensorList objectAtIndex:index];
+    if(sensorListItem){
+        if([sensorListItem isDefinedSensorListItem]) [self removeSensorListItem: sensorListItem];
+    }
+    //else do nothing
+}
+
+//remove a sensor item from sensor list/cannel map (it is allowed to pass a sibling of a list item)
+- (void) removeSensorListItem:(ORSensorItem*)sensorItem
+{
+    ORSensorItem* treeSensorItem, *sensorListItem;
+    if([sensorItem isDefinedSensorListItem]){
+        sensorListItem = sensorItem;
+        treeSensorItem = [sensorItem sibling];
+        if(!treeSensorItem){//it has no sibling: no adei tree present or reloaded
+            //TODO:
+            //TODO:
+        }
+    }else{
+        sensorListItem = [sensorItem sibling];
+        treeSensorItem = sensorItem;
+    }
+    
+    NSLog(@"This is method: %@ - item %p \n",NSStringFromSelector(_cmd),sensorItem );
+    //ORSensorItem *mapListSensorItem = [treeSensorItem sibling];//
+    int index = [sensorListItem channelMapNum ];
+    if(index<0) return; //item was empty before
+ NSLog(@"This is method: %@ - item %p, index %i\n",NSStringFromSelector(_cmd),treeSensorItem,index);
+//    [sensorList replaceObjectAtIndex: index withObject: [self emptyItem] ];
+    [sensorListItem clearSensorListItem];
+    if(treeSensorItem){
+        [treeSensorItem setChannelMapNum:-1];
+        [treeSensorItem disconnectSiblings];
+    }
+    //release sibling
+    //[sensorListItem release];//TODO: ?????
+    
+    //[sensorTableView setNeedsDisplay];  instead send a notification
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChangedNotification object:self];
+    
+}
+
+//searches the first free slot in the sensor list and returns the corresponding index; returns -1 if theres no free slot
+- (int) nextFreeChanMap
+{
+    int chMap=-1;
+    id obj;
+    for(chMap=0;chMap<maxSensorListLength;chMap++){
+        obj = [sensorList objectAtIndex:chMap];
+        if([obj isEmptySensorListItem]) return chMap;
+    }
+    return -1;
+}
+
+
+
+
 
 
 #pragma mark ***Slow Control
@@ -387,72 +354,289 @@ static NSString* ORIpeSlowControlConnector = @"ORIpeSlowControlConnector";
 
 }
 
-#pragma mark ***Delegate Methods
-- (void) netsocketConnected:(NetSocket*)inNetSocket
+
+
+//TODO: just for testing -tb-
+- (void) sensorlistButtonAction
 {
-    if(inNetSocket == socket){
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reConnect) object:nil];
-        [self startProcessing];
-        [self setIsConnected:[socket isConnected]];
-        [self setIsConnected:YES];
+    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    
+    //[model sensorListButtonAction];
+    #if 1
+    // just a test for the tableView / sensor list view
+    NSEnumerator *enumerator = [sensorList objectEnumerator];
+    id object;
+    while ((object = [enumerator nextObject])) {
+        ORSensorItem *sensor=object;//TODO: could check the class -tb-
+        if([sensor isEmptySensorListItem]) continue;
+        if([sensor name]) NSLog(@"  (name) %@ (channelMapNum) %i\n",[sensor name],[sensor channelMapNum]);
+        else NSLog(@"  has no name\n");
+        //NSLog(@"  (stringValue) %@\n",[attNode stringValue]);
+        //d+=1.0;        [sensor setData: [NSString stringWithFormat: @"%5.3f",d*100.0+d*0.1]];
+        [sensor loadSensorValueWithSensorPath];
     }
+    #endif
+    //[sensorTableView setNeedsDisplay];
+    
+    
+    
+    #if 0
+    // THIS WAS A OLD TEST ... -tb-
+    NSLog(@"insert item %p at index 5\n",root);
+    NSLog(@"sensor list is %p \n", [self sensorList]);
+    [[self sensorList] insertObject:root atIndex: 5];
+    NSLog(@"length is %i\n",[[self sensorList] count]);
+    NSLog(@"item 5  is %p\n",[[self sensorList] objectAtIndex:5]);
+    //[sensorTableView display];  // setNeedsDisplay recommended
+    //[sensorTableView displayIfNeeded];// setNeedsDisplay recommended
+    [sensorTableView setNeedsDisplay];
+    #endif
+    
+    
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) dumpSensorlist
 {
-    if(inNetSocket == socket){
-        id theData = [socket readData];
-        if(theData){
-            [transferQueue enqueue:theData];
-            [self incByteCount:inAmount];
+    NSLog(@"BEGIN>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    NSLog(@"Calling %@ :: %@ for %p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    //encode sensorlist
+    int sensorListIndex;
+    for(sensorListIndex=0; sensorListIndex< maxSensorListLength ; sensorListIndex++){
+        ORSensorItem *sensor=[sensorList objectAtIndex: sensorListIndex];
+        NSLog(@"SENSORLISTITEM>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+        NSLog(@"    Sensor %i is ptr %p and has adeiType %i\n",sensorListIndex,sensor, [sensor adeiType]); 
+        if([sensor isAdeiTreeItem]) NSLog(@"    Sensor  is a AdeiTreeItem\n"); 
+        if([sensor isSensorListItem]){
+            if([sensor isEmptySensorListItem]) NSLog(@"    Sensor  isEmptySensorListItem\n"); 
+            else NSLog(@"    Sensor  isSensorListItem\n"); 
         }
+        if([sensor name]){
+             NSLog(@"    Sensor name: %@\n",[sensor name]); 
+        }
+        NSLog(@"    Sensor sibling: %@\n",[sensor sibling]); 
+        if([sensor sibling]) NSLog(@"    Sensor sibling name: %@\n",[[sensor sibling] name]); 
+        NSLog(@"    Sensor sensorPath: %p\n",[sensor sensorPath]); 
+        if([sensor sensorPath]) [sensor dumpSensorPath];
     }
+    NSLog(@"END>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 }
 
-- (void) netsocketDisconnected:(NetSocket*)inNetSocket
+
+// used by - (void) requestSensorTreeADEI
+- (NSXMLDocument*) createXMLDocumentFromURL:(NSString *)urlname
 {
-    if(inNetSocket == socket){
-        [self stopProcessing];
-        [self setIsConnected:[socket isConnected]];
-        if(autoReconnect)[self performSelector:@selector(reConnect) withObject:nil afterDelay:10];
-        [self setIsConnected:NO];
+    NSXMLDocument *xmlDoc=nil;
+    NSError *err=nil;
+    NSURL *furl = [NSURL URLWithString: urlname];
+    if (!furl) {
+        NSLog(@"Can't create an URL from string  %@.", urlname);
+        //return nil;
     }
+    xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl
+            options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA)
+            error:&err];
+    if (xmlDoc == nil) {
+        xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl
+                    options:NSXMLDocumentTidyXML
+                    error:&err];
+    }
+    if (xmlDoc == nil)  {
+        if (err) {
+            //[self handleError:err];
+            NSLog(@"ERROR: xmlDoc == nil\n");
+        }
+        return nil;
+    }
+ 
+    if (err) {
+        //[self handleError:err];
+        NSLog(@"ERROR: err != 0\n");
+    }
+    return xmlDoc;
 }
+
+
+
+
+- (void) requestSensorTreeADEI
+{
+    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    if(adeiServerUrl){
+        NSLog(@"Using ADEI server URL: %@\n",adeiServerUrl);
+    }else{
+        NSLog(@"ERROR: No ADEI server URL defined!\n");
+        return;
+    }
+    
+    int err=0;
+    NSXMLDocument* aXmlDoc;
+    //request servers
+    NSString *serverRequestString = [NSString stringWithFormat: @"%@%@",adeiServerUrl,@"list.php?target=servers"];
+    NSLog(@"serverRequestString: %@\n",serverRequestString);
+    //[root setXmlDoc: [self createXMLDocumentFromURL: serverRequestString]];
+    aXmlDoc = [self createXMLDocumentFromURL: serverRequestString];
+
+    if(aXmlDoc){ //check if service available
+        //delete old tree
+          //TODO:
+        // set the "service" node
+        [rootAdeiTree setAdeiType:  kAdeiTypeService];
+        [rootAdeiTree setName:  @"AdeiService"];
+        [rootAdeiTree setValue:  adeiServerUrl];
+        //[root setXmlDoc: aXmlDoc];
+        //request servers
+        [rootAdeiTree createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeServer];
+        NSLog(@"After root createChildrenFromXmlDoc: root count is %i\n",[rootAdeiTree count]);
+        //request database names
+        int i,n=[rootAdeiTree count];
+        for(i=0;i<n;i++){
+            ORSensorItem *serverItem = [rootAdeiTree childAtIndex:i];
+            NSString *databaseRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@",adeiServerUrl,@"databases", [serverItem value]];
+            //NSLog(@" \n");
+            //NSLog(@">>>>>>>>>>>>>database>>>>>>>>>>>>>\n");
+            //NSLog(@"Request databases of server: %@\n",databaseRequestString);
+            aXmlDoc = [self createXMLDocumentFromURL: databaseRequestString];
+            [serverItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeDatabase];
+            //request groups
+            int j,m=[serverItem count];
+            for(j=0;j<m;j++){
+                ORSensorItem *databaseItem = [serverItem childAtIndex:j];
+                NSString *groupRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@",adeiServerUrl,@"groups", [serverItem value], [databaseItem value]];
+                //NSLog(@" \n");
+                //NSLog(@"    >>>>>>>>>>>>>>>group>>>>>>>>>>\n");
+                //NSLog(@"    Request databases of server: %@\n",groupRequestString);
+                aXmlDoc = [self createXMLDocumentFromURL: groupRequestString];
+                err=[databaseItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeGroup];
+                if(err<=0){
+                    NSLog(@" err is %i, ERROR in request? %@ \n",err,groupRequestString);
+                }
+                //request items (sensors)
+                int k,l=[databaseItem count];
+                for(k=0;k<l;k++){
+                    ORSensorItem *groupItem = [databaseItem childAtIndex:k];
+                    NSString *sensorRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@&db_group=%@",adeiServerUrl,@"items", [serverItem value], [databaseItem value], [groupItem value]];
+                    //NSLog(@" \n");
+                    //NSLog(@"        >>>>>>>>>>>>sensor>>>>>>>>>>\n");
+                    //NSLog(@"        Request databases of server: %@\n",sensorRequestString);
+                    aXmlDoc = [self createXMLDocumentFromURL: sensorRequestString];
+                    [groupItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeItem];
+                }
+            }
+        }
+        // refresh display
+        //[sensorOutlineView reloadItem:root reloadChildren:YES]; instead send a notification
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChangedNotification object:self];
+
+    }else{
+        NSLog(@"ERROR: Service not available: %@\n",serverRequestString);
+    }
+    
+    
+}
+
+
+
+
+
+
+
+#pragma mark ***Delegate Methods
+
 
 
 #pragma mark ***Archival
 
 - (id) initWithCoder:(NSCoder*)decoder
 {
+    [self initSensorList];
 
-NSLog(@"initWithCoder: self before super init...: %p\n",self);
+NSLog(@"ORIpeSlowControlModel::initWithCoder: self before super init...: %p\n",self);
 	self = [super initWithCoder:decoder];
-NSLog(@"initWithCoder: self AFTER  super init...: %p\n",self);
+NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",self);
 	[[self undoManager] disableUndoRegistration];
     
+    [self init];//TODO: not everything from init is necessary -tb-
+    
+#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[self setRemoteHost:[decoder decodeObjectForKey:@"ORIpeSlowControlRemoteHost"]];
     [self setConnectAtStart:[decoder decodeBoolForKey:@"ConnectAtStart"]];
     [self setAutoReconnect:[decoder decodeBoolForKey:@"AutoReconnect"]];
 	[self setRemotePort:[decoder decodeIntForKey:@"ORIpeSlowControlRemotePort"]];
+#endif//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    //decode sensorlist
+    int sensorListIndex;
+    for(sensorListIndex=0; sensorListIndex< maxSensorListLength ; sensorListIndex++){
+        ORSensorItem *sensor=[sensorList objectAtIndex: sensorListIndex];
+        NSString *sensorNameKey = [NSString stringWithFormat:@"ORIpeSlowControlSensorListSensorName%i",sensorListIndex];
+        if([decoder containsValueForKey:sensorNameKey]){// empty sensors are not stored
+            [sensor setName:	[decoder decodeObjectForKey:sensorNameKey]]; 
+            NSString *sensorPathKey = [NSString stringWithFormat:@"ORIpeSlowControlSensorListSensorPath%i",sensorListIndex];
+            [sensor setSensorPath:	[decoder decodeObjectForKey:sensorPathKey]]; 
+            [sensor setAdeiType:	kSensorListItem]; 
+        }
+        
+        
+    }
+    
     
     if(!currentSensor) currentSensor=@"-";
     
 	[[self undoManager] enableUndoRegistration];
     
+#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     if(remotePort==0)remotePort = 44666;
-	[self registerNotificationObservers];
     readingLock = [[NSLock alloc] init];
     processLock = [[NSConditionLock alloc] init];
+#endif//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	[self registerNotificationObservers];
     
 	return self;
 }
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[encoder encodeObject:remoteHost forKey:@"ORIpeSlowControlRemoteHost"];
     [encoder encodeBool:connectAtStart forKey:@"ConnectAtStart"];
     [encoder encodeBool:autoReconnect forKey:@"AutoReconnect"];
 	[encoder encodeInt:remotePort forKey:@"ORIpeSlowControlRemotePort"];
+#endif//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    //encode sensorlist
+    int sensorListIndex;
+    for(sensorListIndex=0; sensorListIndex< maxSensorListLength ; sensorListIndex++){
+        ORSensorItem *sensor=[sensorList objectAtIndex: sensorListIndex];
+        if(![sensor isEmptySensorListItem]){
+            //save name
+            NSString *sensorNameKey = [NSString stringWithFormat:@"ORIpeSlowControlSensorListSensorName%i",sensorListIndex];
+            NSLog(@"Save/encode %@ with name %@\n",sensorNameKey, [sensor name]);
+	        [encoder encodeObject: [sensor name] forKey: sensorNameKey];
+            //save path
+            NSString *sensorPathKey = [NSString stringWithFormat:@"ORIpeSlowControlSensorListSensorPath%i",sensorListIndex];
+	        [encoder encodeObject: [sensor sensorPath] forKey: sensorPathKey];
+        }
+    }
+    
+    #if 0
+    NSEnumerator *enumerator = [sensorList objectEnumerator];
+    id object;
+    while ((object = [enumerator nextObject])) {
+        ORSensorItem *sensor=object;//TODO: could check the class -tb-
+        if([sensor isEmptySensorListItem]) continue;
+        channelMapIndex = [sensor channelMapNum];
+        NSString *sensorListIndex = [NSString stringWithFormat:@"%i",sensor.channelMapNum];
+        NSString *mapNumKey = [NSString stringWithFormat:@"ORIpeSlowControlChannelMapNum%i",sensor.channelMapNum];
+	//[encoder encodeInt:remotePort forKey:@"ORIpeSlowControlRemotePort"];
+        [sensor encodeWithCoder: encoder];
+        //if([sensor name]) NSLog(@"  (name) %@ (channelMapNum) %i\n",[sensor name],[sensor channelMapNum]);
+        //else NSLog(@"  has no name\n");
+        //NSLog(@"  (stringValue) %@\n",[attNode stringValue]);
+        //d+=1.0;        [sensor setData: [NSString stringWithFormat: @"%5.3f",d*100.0+d*0.1]];
+        //[sensor loadSensorValueWithSensorPath];
+    }
+    #endif
+    
 }
 
 
@@ -537,195 +721,12 @@ NSLog(@"initWithCoder: self AFTER  super init...: %p\n",self);
 
 @end
 
-@implementation ORIpeSlowControlModel (processThread)
-//-----------------------------------------------------------
-//processDataFromQueue runs out of the processing thread
-//-----------------------------------------------------------
-- (void) processDataFromQueue
-{
-    
-    if(![socket isConnected])return;
-    
-    if(!dataPacket){
-        ORDataPacket* aDataPacket= [[ORDataPacket alloc] init];
-        [self setDataPacket: aDataPacket];
-        [aDataPacket release];
-    }
-    
-    [processLock lock];
-	[NSThread setThreadPriority:1.0];
-	BOOL flushMessagePrintedOnce = NO;
-    BOOL timeToQuit              = NO;
-    threadRunning                = YES;
-    do {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
-        [[NSRunLoop currentRunLoop] run];
-        queueCount = [transferQueue count];
-        if(queueCount){
-			[dataToProcess appendData:[transferQueue dequeue]];
-            [self process:dataToProcess];
-        }
-        if([timeToStopProcessThread condition]){
-            queueCount = [transferQueue count];
-            if(!flushMessagePrintedOnce){
-                if(queueCount){
-                    NSLog(@"flushing %d block%@ from listening queue\n",queueCount,(queueCount>1)?@"s ":@" ");
-                }
-                flushMessagePrintedOnce = YES;						
-            }
-            if(queueCount == 0){
-                timeToQuit = YES;
-            }
-        }
-        [pool release];
-    } while(!timeToQuit);
-    
-	[[NSRunLoop currentRunLoop] run];
-    [processLock unlockWithCondition:kProcessingDone];
-    threadRunning = NO;
-}
 
-- (void) process:(NSMutableData*)dataChunk
-{
-	[self processRecords:dataChunk];    
-}
 
-- (void) processRecords:(NSMutableData*)dataChunk
-{
-    char* buffer = (char*)[dataChunk bytes];
-    char* endPtr = buffer + [dataChunk length];
-    
-    while (buffer<endPtr) {
-		NSAutoreleasePool* outerPool = [[NSAutoreleasePool allocWithZone:nil] init];
-		unsigned long* lptr = (unsigned long*)buffer;
-        unsigned long recordHeader = *lptr;
-		unsigned long dataId = ExtractDataId(recordHeader);
-		
-		if(dataId == 0x00000000){
-			//new style headers always have a id of zero.
-			unsigned long length = ExtractLength(recordHeader)*4; //bytes
-			if(buffer + length <= endPtr){
-				buffer+=4;	 //point to header length
-				unsigned long headerLength = *((unsigned long*)buffer); //bytes
-				//we have the whole header, extract it for use
-				buffer+=4;	 //point to header itself
 
-				NSString* theHeader = [[NSString alloc] initWithBytes:buffer length:headerLength encoding:NSASCIIStringEncoding];
-				[dataPacket setFileHeader:[theHeader propertyList]]; 
-				[theHeader release];
-                [dataPacket generateObjectLookup];
-				buffer += length-4-4;
-				runDataID = [[dataPacket headerObject:@"dataDescription",@"ORRunModel",@"Run",@"dataId",nil] longValue];
-				
-			}
-		}
-		else {
-			BOOL endOfRun = NO;
-		    while (buffer<endPtr) {
-				NSAutoreleasePool* innerPool = [[NSAutoreleasePool allocWithZone:nil] init];
 
-				//OK, regular record
-				lptr = (unsigned long*)buffer;
-				recordHeader = *lptr;
-				dataId = ExtractDataId(recordHeader);
-				unsigned long length = ExtractLength(recordHeader)*4; //bytes
-				if(buffer + length <= endPtr){
-					if(dataId == runDataID){
-						lptr++;
-						unsigned long firstWord = *lptr;
-						if(!(firstWord & 0x8)){
-							if(firstWord & 0x1){
-								NSLog(@"IpeSlowControl: Run Start on Host: %@\n",remoteHost);
-							}
-							else {
-								//it's an end of run record --  we have some end of run cleanup to handle
-								NSLog(@"IpeSlowControl: Run Ended on Host: %@\n",remoteHost);
-								//OK end of run received
-								endOfRun = YES;
-							}
-						}
-					}
-					[dataPacket addData:[NSMutableData dataWithBytes:buffer length:length]];
-					
-					[theNextObject processData:dataPacket userInfo:nil];
-					if(endOfRun){
-						[self performSelectorOnMainThread:@selector(sendRunTaskStopped:) withObject:dataPacket waitUntilDone:YES];
-						[dataPacket clearData];
-						[self performSelectorOnMainThread:@selector(sendCloseOutRun:)    withObject:dataPacket waitUntilDone:YES];
-						[self performSelectorOnMainThread:@selector(clearByteCount)      withObject:nil        waitUntilDone:YES];
-					}
-					[dataPacket clearData];
-					buffer += length;
-				}
-				else {
-					[innerPool release];
-					break;
-				}
-				[innerPool release];
-			}
-			
-			//remove processed data
-			unsigned long newLength = endPtr - buffer;
-			[dataToProcess replaceBytesInRange:NSMakeRange(0,(unsigned long)(endPtr-buffer)) withBytes:buffer];
-			[dataToProcess setLength:newLength];
-			break;
-		}
-		[outerPool release];
-	}
-}
 
-- (void) startProcessing
-{
-    if(!threadRunning && [socket isConnected]){
-        theNextObject =  [self objectConnectedTo: ORIpeSlowControlConnector];
-        [self setByteCount:0];
-        if(!transferQueue){
-            [self setTransferQueue:[[[ORSafeQueue alloc] init] autorelease]];
-        }
-        dataToProcess = [[NSMutableData alloc] init];
-        //set up the process thread control lock
-        if( timeToStopProcessThread ) [ timeToStopProcessThread release ];
-        timeToStopProcessThread  = [[ NSConditionLock alloc ] initWithCondition: NO ];
-        
-        [NSThread detachNewThreadSelector:@selector(processDataFromQueue) toTarget:self withObject:nil];
-    }        
-}
-
-- (void) stopProcessing
-{
-    if(threadRunning){
-        [timeToStopProcessThread unlockWithCondition: YES];
-        
-        //....wait for processing to finish.....
-        //wait for the processing thread to exit.
-        BOOL timeout = NO;
-        NSTimeInterval t0 = [NSDate timeIntervalSinceReferenceDate];
-        while(![processLock tryLockWhenCondition:kProcessingDone]){
-            [NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.01]];
-            if([NSDate timeIntervalSinceReferenceDate]-t0 > 10){
-                timeout = YES;
-                threadRunning = NO;
-                break;
-            }
-        }
-        if(!timeout)[processLock unlock];
-        //
-        [dataToProcess release];
-		dataToProcess = nil;
-        [self setByteCount:0];
-        [dataPacket release];
-        dataPacket = nil;
-        [socket readData];
-    }
-}
-
-- (void) reConnect
-{
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(reConnect) object:nil];
-    [self connectSocket:YES];
-}
-
-@end
+#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 @implementation ORIpeSlowControlModel (private)
 //these exist so the process thread can do some work in the main thread
@@ -745,3 +746,591 @@ NSLog(@"initWithCoder: self AFTER  super init...: %p\n",self);
 }
 
 @end
+#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
+
+
+
+#pragma mark •••Class ORSensorItem
+
+@implementation ORSensorItem
+
++ (ORSensorItem*) sensorFromObject:(id)anObject named:(NSString*)aName //TODO: create a better constructor -tb-
+{
+    ORSensorItem* item = (ORSensorItem*)[[ORSensorItem alloc] init];
+    [item setName: aName];
+    [item setObject: anObject];
+    [item setChannelMapNum:-1];
+    if(anObject==nil) [item setClassType:@"-"];
+    else [item setClassType:NSStringFromClass([anObject class])];
+    //[item setItems:[NSMutableArray array]];// moved to init -tb-
+
+    return item;//TODO: who is responsible for releasing the sensor items? -tb- 2008-12-02
+    //return [item autorelease];
+}
+
++ (ORSensorItem*) sensorWithAdeiType:(int)aValue named:(NSString*)aName
+{
+    ORSensorItem* item = (ORSensorItem*)[[ORSensorItem alloc] init];
+    [item setAdeiType: aValue];
+    [item setName: aName];
+    //[item setObject: anObject];
+    if(aValue<kAdeiTypeLast){//sensor tree item
+        [item setItems:[NSMutableArray array]];
+    }else{//channel map list item
+        [item setSensorPath:[NSMutableDictionary dictionary]];
+    }
+    [item setChannelMapNum:-1];
+    [item setClassType:@"-"];//unneeded
+
+    return item;//TODO: who is responsible for releasing the sensor items? -tb- 2008-12-02
+}
+
++ (ORSensorItem*) sensorForSibling:(ORSensorItem*) aSibling
+{
+    ORSensorItem* item;
+    if([aSibling adeiType]<kAdeiTypeLast){//sibling of a adei tree item
+        item =  [ORSensorItem sensorWithAdeiType:kSensorListItem named:[aSibling name]];
+        [item connectSiblings: aSibling];
+        //TODO: fill the path dictionary with help of the adei tree
+        //if([aSibling adeiType]<kAdeiTypeItem){
+        //    [[item sensorPath] setValue: [aSibling value] forKey: kSensorIDString];
+        //}
+        //TODO: fill the path dictionary with help of the adei tree
+        //TODO: fill the path dictionary with help of the adei tree
+        //TODO: fill the path dictionary with help of the adei tree
+        //TODO: fill the path dictionary with help of the adei tree
+        //TODO: fill the path dictionary with help of the adei tree
+        //TODO: fill the path dictionary with help of the adei tree
+        //TODO: fill the path dictionary with help of the adei tree
+    }else{//sibling of a sensor list item
+        //TODO: does this make sense? -tb-
+        item = (ORSensorItem*)[[ORSensorItem alloc] init];
+    }
+    return item;//TODO: who is responsible for releasing the sensor items? -tb- 2008-12-02
+}
+
+
++ (ORSensorItem*) emptySensorListItemWithChanNum:(int)aNum;
+{
+    ORSensorItem* item =  [ORSensorItem sensorWithAdeiType: kSensorListEmptyItem named:@"-"];
+    item.channelMapNum = aNum;
+    return item;
+}
+
+#if 1
+- (id) init
+{
+    //NSLog(@"ORSensorItem:init shouldn't be called directly! \n");
+    //NSLog(@"Calling ORSensorItem init\n");
+    //NSLog(@"Calling %@ %@ for %p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    self=[super init];
+    //[self setItems:[NSMutableArray array]];
+    //[self setSensorPath:[NSMutableDictionary dictionary]];
+    [self setChannelMapNum:-1];
+    //NSLog(@"Calling ORSensorItem init 2 items %p self %p\n",items,self);
+    return self;
+}
+#endif
+
+- (void) dealloc
+{
+    NSLog(@"Calling %@ %@ for %p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    [self setName: nil];
+    [self setClassType: nil];
+    [self setItems: nil];
+    [self setObject: nil];
+    [self setSensorPath: nil];
+
+    [super dealloc];
+}
+
+
+- (void) setGuardian:(ORSensorItem*)anObject
+{
+	guardian = anObject; //don't retain
+}
+
+- (ORSensorItem*) guardian
+{
+	return guardian;
+}
+
+
+- (NSString *) name
+{
+    return name; 
+}
+
+- (void) setName: (NSString *) aName
+{
+    [aName retain];
+    [name release];
+    name = aName;
+}
+
+- (NSString *) tree
+{
+    return tree; 
+}
+- (void) setTree: (NSString *) aName
+{
+    [aName retain];
+    [tree release];
+    tree = aName;
+}
+
+
+- (NSString *) value
+{
+    return value; 
+}
+- (void) setValue: (NSString *) aName
+{
+    [aName retain];
+    [value release];
+    value = aName;
+}
+
+
+- (NSString *) type
+{
+    return type; 
+}
+- (void) setType: (NSString *) aName
+{
+    [aName retain];
+    [type release];
+    type = aName;
+}
+
+- (NSString *) data
+{
+    return data; 
+}
+- (void) setData: (NSString *) aString
+{
+    [aString retain];
+    [data release];
+    data = aString;
+}
+
+- (double) doubleData
+{
+    return doubleData; 
+}
+- (void) setDoubleData: (double) aValue
+{
+    doubleData = aValue;
+}
+
+- (NSString *) date
+{
+    return date; 
+}
+- (void) setDate: (NSString *) aString
+{
+    [aString retain];
+    [date release];
+    date = aString;
+}
+
+
+
+#pragma  mark •••Actions using the ADEI interface
+- (int) adeiType
+{
+    return adeiType;
+}
+
+- (void) setAdeiType:(int) aValue
+{
+    adeiType=aValue;
+}
+
+- (BOOL) isAdeiTreeItem
+{  return ((adeiType>kAdeiUnknown) && (adeiType<kAdeiTypeLast));  }
+
+- (BOOL) isSensorListItem
+{  return ((adeiType==kSensorListItem) || (adeiType==kSensorListEmptyItem));  }
+
+- (BOOL) isEmptySensorListItem
+{  return (adeiType==kSensorListEmptyItem);  }
+
+- (BOOL) isDefinedSensorListItem
+{ return (adeiType==kSensorListItem);}
+
+- (double) loadSensorValueWithSensorPath
+{
+    //called from e.g. - (IBAction) sensorlistButtonAction:(id)sender
+
+    int retVal=-1.0;
+    NSURL *csvurl;
+    NSData *csvData;
+    NSError *err=nil;
+    
+    if(sensorPath  && [sensorPath count]!=0){
+        NSLog(@"OK: sensorPath has length:%i\n",[sensorPath count]);
+    }else{
+        //NSLog(@"ERROR: sensorPath is empty or undefined!\n");
+        return retVal;//returns -1
+    }
+    
+    //example: csvurl = [NSURL URLWithString: @"http://ipepdvadei.ka.fzk.de/adei/services/getdata.php?format=csv&db_server=toskanadb&db_name=prespektrometer_rep&db_group=1&window=1227618000-1227620000&db_mask=5,6,7,81,82,83"];
+    NSString *requestString = 
+        [NSString stringWithFormat: @"%@getdata.php?format=csv&db_server=%@&db_name=%@&db_group=%@&window=-1&db_mask=%@",
+            [sensorPath valueForKey: kServiceString],
+            [sensorPath valueForKey: kServerString],
+            [sensorPath valueForKey: kDatabaseString],
+            [sensorPath valueForKey: kGroupIDString],
+            [sensorPath valueForKey: kSensorIDString]
+        ];
+    // DebugTB( NSLog(@"Request string is %@\n", requestString); )
+
+    csvurl = [NSURL URLWithString: requestString ];
+
+    //request the csv file
+    csvData= [NSData dataWithContentsOfURL: csvurl  options:  NSUncachedRead error: &err  ];
+    //TODO: NOTE: to have more contol over the loading process we could use [NSURL loadResourceDataNotifyingClient:usingCache:] -tb-
+    //HINT: see file://localhost/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/Cocoa/Conceptual/URLLoadingSystem/index.html
+    //HINT2: could use NSString + stringWithContentsOfURL:usedEncoding:error:  
+    if (err) {
+        //[self handleError:err];
+        NSLog(@"ERROR: err != 0 in call of dataWithContentsOfURL:options:error: &err\n");
+        return retVal;
+    }else{
+        // DebugTB( NSLog(@"SUCCESS reading CSV file\n"); )
+    }
+    // DebugTB( NSLog(@"NSData CSV file object has length %i\n",[csvData length]); )
+    // DebugTB( NSLog(@"NSData CSV file description:\n%@\n",[csvData description]); )
+    
+    NSString *csvText;
+    csvText = [[NSString alloc] initWithData: csvData encoding: NSUTF8StringEncoding];
+    // other values for encoding: NSASCIIStringEncoding, NSNonLossyASCIIStringEncoding, NSISOLatin1StringEncoding, NSNEXTSTEPStringEncoding
+    /* this is not able to read the degree sign (°) correctly:
+    csvText = [[NSString alloc] initWithData: csvData encoding: NSASCIIStringEncoding];
+    */
+    // DebugTB( NSLog(@"Received CSV files contents:\n%@END\n", csvText); )
+    
+    //parse the string/csv file
+    //  This is based on a example in "String Programming Guide for Cocoa" (Strings.pdf) (replaced getParagraphStart by getLineStart) -tb-
+    //    Creates a array of the lines of string 'csvText'
+    unsigned length = [csvText length];
+    unsigned paraStart = 0, paraEnd = 0, contentsEnd = 0;
+    NSMutableArray *array = [NSMutableArray array];
+    NSRange currentRange;
+    while (paraEnd < length) {
+        [csvText getParagraphStart:&paraStart end:&paraEnd
+        contentsEnd:&contentsEnd forRange:NSMakeRange(paraEnd, 0)];
+        currentRange = NSMakeRange(paraStart, contentsEnd - paraStart);
+        NSString *substring = [csvText substringWithRange:currentRange];
+        // DebugTB( NSLog(@"PARSING: Substring is >>>%@<<<, paraStart %i,  paraEnd %i, contentsEnd %i\n",substring, paraStart ,  paraEnd , contentsEnd); )
+        [array addObject:substring];
+        //[array addObject:[csvText substringWithRange:currentRange]];
+    }    
+    //    Now parse the second line for the date and data
+    NSArray *listItems = [[array objectAtIndex:1] componentsSeparatedByString:@", "];
+    // DebugTB( NSLog(@"Line contents: Date is >>>%@<<<, Data is >>>%@<<<\n",[listItems objectAtIndex:0],[listItems objectAtIndex:1]); )
+
+    if([listItems count]>1){
+        //retVal = [[listItems objectAtIndex:1] doubleValue];
+        [self setDate: [listItems objectAtIndex:0]];
+        [self setData: [listItems objectAtIndex:1]];
+        [self setDoubleData: [[self data] doubleValue] ];
+        retVal = [self doubleData];
+    }
+    
+    
+    //return to caller
+    return retVal;
+}
+
+- (NSString*) createWebinterfaceRequestStringWithSensorPath
+{
+//examples for a single sensor request:
+//fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
+//fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0
+//fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&window=0
+    NSString *requestString = 
+        [NSString stringWithFormat: @"%@#db_server=%@&db_name=%@&db_group=%@&db_mask=%@&window=0",
+            [sensorPath valueForKey: kAdeiUrlString],
+            [sensorPath valueForKey: kServerString],
+            [sensorPath valueForKey: kDatabaseString],
+            [sensorPath valueForKey: kGroupIDString],
+            [sensorPath valueForKey: kSensorIDString]
+        ];
+    DebugTB( NSLog(@"Request string is %@\n", requestString); )
+    return requestString;
+}
+
+
+
+//link between channel map list items and sensor tree items
+- (void) setSibling:(ORSensorItem*)anObject
+{
+	sibling = anObject; //don't retain
+}
+
+- (ORSensorItem*) sibling
+{
+	return sibling;
+}
+
+- (void) connectSiblings:(ORSensorItem*)anObject
+{
+	sibling = anObject; //don't retain
+    [anObject setSibling: self];
+}
+
+- (void) disconnectSiblings
+{
+    [sibling setSibling: nil];
+	sibling = nil;
+}
+
+- (void) createAdeiPathFromSibling:(ORSensorItem*)aSibling
+{    
+    ORSensorItem* item;
+        if([aSibling adeiType]==kAdeiTypeItem){
+            [sensorPath setValue: [aSibling value] forKey: kSensorIDString];
+            item = [aSibling guardian];
+            [sensorPath setValue: [item value] forKey: kGroupIDString];
+            item = [item guardian];
+            [sensorPath setValue: [item value] forKey: kDatabaseString];
+            item = [item guardian];
+            [sensorPath setValue: [item value] forKey: kServerString];
+            item = [item guardian];
+            [sensorPath setValue: [item value] forKey: kServiceString];
+            [sensorPath setValue: [[item value] substringToIndex: [[item value] length]-9 ] forKey: kAdeiUrlString]; //remove trailing "services/"
+            //TODO: maybe this should saved in the root (instead of the service url) -tb-
+        }
+        
+        #if 0
+        [self dumpSensorPath];
+        #endif
+        #if 1
+        //dump the dictionary
+        NSLog(@"DUMP the dictionary:\n" );    /* code that uses the returned key */
+        NSEnumerator *enumerator = [sensorPath keyEnumerator];
+        id key;
+        while ((key = [enumerator nextObject])) {
+            NSLog(@"  key: %@, value: %@", key, [sensorPath valueForKey:key]);    /* code that uses the returned key */
+        }
+        #endif
+}
+
+
+
+//channel map items
+- (void) clearSensorListItem
+{
+    [self setAdeiType: kSensorListEmptyItem ];
+    [self clearSensorPath ];
+    
+}
+
+- (int) channelMapNum
+{
+    return channelMapNum;
+}
+
+- (void) setChannelMapNum:(int) aValue
+{
+    channelMapNum=aValue;
+}
+
+- (NSMutableDictionary*) sensorPath
+{
+    return sensorPath;
+}
+
+- (void) setSensorPath: (NSMutableDictionary *) aDict
+{
+    [aDict retain];
+    [sensorPath release];
+    sensorPath = aDict;
+}
+
+- (void) clearSensorPath
+{
+    [self setSensorPath: [NSMutableDictionary dictionary]];
+}
+
+- (void) dumpSensorPath
+{
+        NSLog(@"DUMP the dictionary:\n" );    /* code that uses the returned key */
+        NSEnumerator *enumerator = [sensorPath keyEnumerator];
+        id key;
+        while ((key = [enumerator nextObject])) {
+            NSLog(@"  key: %@, value: %@\n", key, [sensorPath valueForKey:key]);    /* code that uses the returned key */
+        }
+}
+
+//unused? unneeded?
+- (NSString *) classType
+{
+    return classType; 
+}
+
+- (void) setClassType: (NSString *) aType
+{
+    //if([aType hasPrefix:@"NSCF"])aType = [aType substringFromIndex:4];
+    [aType retain];
+    [classType release];
+    classType = aType ;
+}
+
+- (id) object
+{
+    return object; 
+}
+
+- (void) setObject: (id) anObject
+{
+    [anObject retain];
+    [object release];
+    object = anObject;
+}
+
+
+- (NSXMLDocument*) xmlDoc
+{
+    return xmlDoc;
+}
+
+- (void) setXmlDoc:(NSXMLDocument*)aDoc
+{
+    xmlDoc=aDoc;
+}
+
+- (NSXMLNode*) xmlNode
+{
+    return xmlNode;
+}
+
+- (void) setXmlNode:(NSXMLNode*)aNode
+{
+    xmlNode= aNode;
+}
+
+
+
+- (NSMutableArray *) items
+{
+    return items; 
+}
+
+- (void) setItems: (NSMutableArray *) anItems
+{
+    [anItems retain];
+    [items release];
+    items = anItems;
+}
+- (void) addObject:(id)anObject
+{
+    [items addObject:anObject];
+}
+
+- (unsigned) count
+{
+    //TODO: if([self isLeafNode]){
+	//	return 1;
+	//}
+	//else 
+    return [items count];
+}
+- (BOOL) isLeafNode
+{
+    return object!=nil;
+}
+- (id) childAtIndex:(int)index
+{
+	//TODO: if([self isLeafNode])return object;
+    //else 
+    return [items objectAtIndex:index];
+}
+
+
+// 'local' DebugTB for testing the tree scanning -tb-
+#define DebugTB2(x)
+//#define DebugTB2(x) x
+- (int) createChildrenFromXmlDoc:(NSXMLDocument*)aDoc withType:(int)aType
+{
+
+    DebugTB2(  NSLog(@"Calling %@ %@ for %p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);   )
+
+    int count = 0;
+    if(!aDoc) return 0;
+    [self setXmlDoc: aDoc];
+    NSXMLNode *attributeNode ;
+    NSXMLNode *rootNode =  [aDoc rootElement];
+    NSXMLNode *aNode = rootNode;
+    while (aNode) {//immediately skip "result" node -tb- 
+        if([[aNode name]  isEqualToString:@"Value"] ){
+            if ( [aNode kind] == NSXMLElementKind ) {  //NSXMLTextKind , NSXMLCommentKind, usw.
+                DebugTB2( NSLog(@"   Reading ... Element %@\n",[aNode XMLString]);  ) // <<< DEBUG OUT
+                count++;
+                //create sensoritem, scan the attributes, set attributes of sensor item
+                NSXMLElement *element=(NSXMLElement *)aNode;
+                if([element attributes]){
+                    DebugTB2( NSLog(@"  Node is a NSXMLElementKind, check attributes: %p, num attributes %i \n",[element attributes],[[element attributes] count]);  )
+                    //new node
+                    ORSensorItem *newChild = [ORSensorItem sensorWithAdeiType: aType named: @""];
+                    //ORSensorItem *newChild = [[ORSensorItem alloc] init];
+                    [newChild setAdeiType: aType];
+                    [newChild setGuardian: self];
+                    //[newChild setObject: element];
+                    [[self items] addObject: newChild];
+                    //set name and value for new node
+                    attributeNode =[element attributeForName:@"value"];
+                    if(attributeNode){
+                        //NSLog(@"  Attribute  is (name) %@\n",[attributeNode name]);
+                        //NSLog(@"  Attribute  is (stringValue) %@\n",[attributeNode stringValue]);
+                        [newChild setValue: [attributeNode stringValue]];
+                    }
+                    attributeNode =[element attributeForName:@"name"];
+                    if(attributeNode){
+                        DebugTB2( NSLog(@"  Attribute  is (name) %@\n",[attributeNode name]); )
+                        DebugTB2( NSLog(@"  Attribute  is (stringValue) %@\n",[attributeNode stringValue]); )
+                        [newChild setName: [attributeNode stringValue]];
+                    }
+                    #if 0 //replaced loops by attribute request -tb-
+                    NSEnumerator *enumerator = [[element attributes] objectEnumerator];
+                    id obj;
+                    while ((obj = [enumerator nextObject])) {
+                        NSXMLNode *attNode=obj;
+                        NSLog(@"  Attribute  is (name) %@\n",[attNode name]);
+                        NSLog(@"  Attribute  is (stringValue) %@\n",[attNode stringValue]);
+                    }
+                    
+                    int i,n=[[element attributes] count];
+                    for(i=0;i<n;i++){
+                        NSXMLNode *attNode=[[element attributes] objectAtIndex:i];
+                        NSLog(@"  Attribute  is %@\n",[attNode stringValue]);
+                    }
+                    #endif
+                }
+                
+            }
+        }else if ( [[aNode name]  isEqualToString:@"Error"] ) {  //NSXMLTextKind , NSXMLCommentKind, usw.
+            NSLog(@"IPESlowControl: Error: bad request?\n");  //TODO: handle ERROR! -tb-
+              NSLog(@"   Reading ... Element %@\n",[aNode XMLString]);  // <<< DEBUG OUT
+              //return -1; is 0 anyway ...
+        }else{
+            DebugTB2( NSLog(@"   Skip node %@\n",[aNode name]);  )
+        }
+        aNode = [aNode nextNode];
+    }
+    
+    DebugTB2( 
+    NSLog(@"Summary: added %i (%i,%i) children to node %@ (%p)\n",[self count],[[self items] count],count,[self name], self);
+    NSLog(@" \n" );
+    )
+    return count;
+}
+
+@end
+
