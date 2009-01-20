@@ -21,6 +21,12 @@
 
 #import "ORCMC203Controller.h"
 #import "ORCMC203Model.h"
+#import "ORRate.h"
+#import "ORRateGroup.h"
+#import "ORValueBar.h"
+#import "ORAxis.h"
+#import "ORPlotter1D.h"
+#import "ORTimeRate.h"
 
 @interface ORCMC203Controller (private)
 - (void) updateButtons;
@@ -99,6 +105,36 @@
                          name : ORCMC203ModelOperationModeChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+					 selector : @selector(integrationChanged:)
+						 name : ORRateGroupIntegrationChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(rateGroupChanged:)
+						 name : ORCMC203RateGroupChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(totalRateChanged:)
+						 name : ORRateGroupTotalRateChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(scaleAction:)
+						 name : ORAxisRangeChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(miscAttributesChanged:)
+						 name : ORMiscAttributesChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(updateTimePlot:)
+						 name : ORRateAverageChangedNotification
+					   object : [[model fifoRateGroup]timeRate]];
+	
 }
 
 - (void) updateWindow
@@ -112,11 +148,17 @@
 	[self histogramModeChanged:nil];
 	[self adcBitsChanged:nil];
 	[self operationModeChanged:nil];
+    [self totalRateChanged:nil];
+    [self integrationChanged:nil];
+    [self miscAttributesChanged:nil];
+    [self updateTimePlot:nil];
 }
 
 - (void) operationModeChanged:(NSNotification*)aNote
 {
-	[operationModeMatrix  selectCellWithTag: [model operationMode]];
+	BOOL state = [model operationMode];
+	[fifoModeButton       setIntValue: !state];
+	[histogramModeButton  setIntValue: state];
 	[self updateButtons];
 }
 
@@ -162,11 +204,98 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"CMC203 (Station %d)",[model stationNumber]]];
 }
 
+- (void) totalRateChanged:(NSNotification*)aNotification
+{
+	ORRateGroup* theRateObj = [aNotification object];
+	if(aNotification == nil || [model fifoRateGroup] == theRateObj){
+		
+		[totalRateText setFloatValue: [theRateObj totalRate]];
+		[totalRate setNeedsDisplay:YES];
+	}
+}
+
+- (void) integrationChanged:(NSNotification*)aNotification
+{
+	ORRateGroup* theRateGroup = [aNotification object];
+	if(aNotification == nil || [model fifoRateGroup] == theRateGroup || [aNotification object] == model){
+		double dValue = [[model fifoRateGroup] integrationTime];
+		[integrationStepper setDoubleValue:dValue];
+		[integrationText setDoubleValue: dValue];
+	}
+}
+
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+	if(!aNote || ([aNote object] == [[model fifoRateGroup]timeRate])){
+		[timeRatePlot setNeedsDisplay:YES];
+	}
+}
+
+//a fake action from the scale object
+- (void) scaleAction:(NSNotification*)aNotification
+{
+	
+	if(aNotification == nil || [aNotification object] == [totalRate xScale]){
+		[model setMiscAttributes:[[totalRate xScale]attributes] forKey:@"TotalRateXAttributes"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
+		[model setMiscAttributes:[[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
+		[model setMiscAttributes:[[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
+	};
+	
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString:@"TotalRateXAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"TotalRateXAttributes"];
+		if(attrib){
+			[[totalRate xScale] setAttributes:attrib];
+			[totalRate setNeedsDisplay:YES];
+			[[totalRate xScale] setNeedsDisplay:YES];
+			[totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
+		if(attrib){
+			[[timeRatePlot xScale] setAttributes:attrib];
+			[timeRatePlot setNeedsDisplay:YES];
+			[[timeRatePlot xScale] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
+		if(attrib){
+			[[timeRatePlot yScale] setAttributes:attrib];
+			[timeRatePlot setNeedsDisplay:YES];
+			[[timeRatePlot yScale] setNeedsDisplay:YES];
+			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+		}
+	}
+}
+
 #pragma mark ***Actions
+- (IBAction) integrationAction:(id)sender
+{
+    [self endEditing];
+	if([sender doubleValue] != [[model fifoRateGroup]integrationTime]){
+		[[self undoManager] setActionName: @"Set Integration Time"];
+		[model setIntegrationTime:[sender doubleValue]];		
+	}
+	
+}
 
 - (IBAction) operationModeAction:(id)sender
 {
-	[model setOperationMode:[[sender selectedCell] tag]];	
+	[model setOperationMode:[sender  tag]];	
 }
 
 - (IBAction) adcBitsAction:(id)sender
@@ -242,6 +371,32 @@
 	}
 }
 
+- (double) getBarValue:(int)tag
+{
+	
+	return [[[[model fifoRateGroup]rates] objectAtIndex:tag] rate];
+}
+
+
+- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+	return [[[model fifoRateGroup]timeRate]count];
+}
+- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+{
+	if(set == 0){
+		int count = [[[model fifoRateGroup]timeRate] count];
+		return [[[model fifoRateGroup]timeRate]valueAtIndex:count-x-1];
+	}
+	return 0;
+}
+
+- (unsigned long)  	secondsPerUnit:(id) aPlotter
+{
+	return [[[model fifoRateGroup]timeRate]sampleTime];
+}
+
+
 @end
 
 @implementation ORCMC203Controller (private)
@@ -252,7 +407,8 @@
 	BOOL locked = [gSecurity isLocked:ORCMC203SettingsLock];
     [settingLockButton setState: locked];
     [loadButton setEnabled:!runInProgress];
-    [operationModeMatrix setEnabled:!runInProgress];
+    [fifoModeButton setEnabled:!runInProgress];
+    [histogramModeButton setEnabled:!runInProgress];
 	[adcBitsTextField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
 	[histogramModePU setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
 	[wordSizeField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];

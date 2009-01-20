@@ -16,12 +16,15 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+@class ORValueBar;
+@class ORPlotter1D;
 
 @interface ORCMC203Controller : OrcaObjectController
 {
     IBOutlet NSButton*		loadButton;
     IBOutlet NSButton*		sampleButton;
-	IBOutlet NSMatrix*		operationModeMatrix;
+	IBOutlet NSButton*		fifoModeButton;
+	IBOutlet NSButton*		histogramModeButton;
 	IBOutlet NSTextField*	adcBitsTextField;
 	IBOutlet NSPopUpButton* histogramModePU;
 	IBOutlet NSPopUpButton* histogramMaxCountsPU;
@@ -31,6 +34,16 @@
 	IBOutlet NSButton*		initButton;
 
 	IBOutlet NSButton*		settingLockButton;
+
+	//rate page
+    IBOutlet NSStepper* 	integrationStepper;
+    IBOutlet NSTextField* 	integrationText;
+    IBOutlet NSTextField* 	totalRateText;
+	
+    IBOutlet ORValueBar*	totalRate;
+    IBOutlet NSButton*		totalRateLogCB;
+    IBOutlet ORPlotter1D*	timeRatePlot;
+    IBOutlet NSButton*		timeRateLogCB;
 }
 
 #pragma mark ***Initialization
@@ -52,8 +65,13 @@
 - (void) histogramStartChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
+- (void) totalRateChanged:(NSNotification*)aNote;
+- (void) integrationChanged:(NSNotification*)aNote;
+- (void) updateTimePlot:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
+- (IBAction) integrationAction:(id)sender;
 - (IBAction) operationModeAction:(id)sender;
 - (IBAction) sampleAction:(id)sender;
 - (IBAction) adcBitsAction:(id)sender;

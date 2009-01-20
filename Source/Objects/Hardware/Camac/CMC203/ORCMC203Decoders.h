@@ -34,6 +34,8 @@
 
 @interface ORCMC203DecoderForFifo : ORCamacCardDecoder {
 @private 
+	BOOL getRatesFromDecodeStage;
+	NSMutableDictionary* actualCards;
 }
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;

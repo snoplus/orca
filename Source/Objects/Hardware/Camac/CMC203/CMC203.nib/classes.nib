@@ -14,6 +14,23 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>ORValueBar</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>chainedView</key>
+				<string>id</string>
+				<key>dataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -72,6 +89,34 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>sequenceCompleted</key>
 				<string>id</string>
 				<key>taskFinished</key>
@@ -83,6 +128,14 @@
 			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -118,6 +171,8 @@
 				<key>histogramStartTextFieldAction</key>
 				<string>id</string>
 				<key>initAction</key>
+				<string>id</string>
+				<key>integrationAction</key>
 				<string>id</string>
 				<key>ledAssigmentPopupAction</key>
 				<string>id</string>
@@ -170,6 +225,8 @@
 				<string>NSPopUpButton</string>
 				<key>feraClrWidthTextField</key>
 				<string>NSTextField</string>
+				<key>fifoModeButton</key>
+				<string>NSButton</string>
 				<key>gateTimeOutTextField</key>
 				<string>NSTextField</string>
 				<key>histoBlockSizeTextField</key>
@@ -184,20 +241,24 @@
 				<string>NSTextField</string>
 				<key>histogramMaxCountsPU</key>
 				<string>NSPopUpButton</string>
+				<key>histogramModeButton</key>
+				<string>NSButton</string>
 				<key>histogramModePU</key>
 				<string>NSPopUpButton</string>
 				<key>histogramStartTextField</key>
 				<string>NSTextField</string>
 				<key>initButton</key>
 				<string>NSButton</string>
+				<key>integrationStepper</key>
+				<string>NSStepper</string>
+				<key>integrationText</key>
+				<string>NSTextField</string>
 				<key>ledAssigmentPopup</key>
 				<string>NSPopUpButton</string>
 				<key>loadButton</key>
 				<string>NSButton</string>
 				<key>multiHistogramTextField</key>
 				<string>NSTextField</string>
-				<key>operationModeMatrix</key>
-				<string>NSMatrix</string>
 				<key>pingPongTextField</key>
 				<string>NSTextField</string>
 				<key>qOutputSelectionPopup</key>
@@ -216,6 +277,16 @@
 				<string>NSButton</string>
 				<key>testGateWidthTextField</key>
 				<string>NSTextField</string>
+				<key>timeRateLogCB</key>
+				<string>NSButton</string>
+				<key>timeRatePlot</key>
+				<string>ORPlotter1D</string>
+				<key>totalRate</key>
+				<string>ORValueBar</string>
+				<key>totalRateLogCB</key>
+				<string>NSButton</string>
+				<key>totalRateText</key>
+				<string>NSTextField</string>
 				<key>vsnTextField</key>
 				<string>NSTextField</string>
 				<key>wordSizeField</key>
@@ -227,6 +298,66 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimeAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>ORAxis</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

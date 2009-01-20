@@ -26,6 +26,7 @@
 #import "ORDataTypeAssigner.h"
 #import "ORCamacCrateModel.h"
 #import "ORCamacControllerCard.h"
+#import "ORRateGroup.h"
 
 #pragma mark ***External Strings
 NSString* ORCMC203ModelOperationModeChanged		= @"ORCMC203ModelOperationModeChanged";
@@ -34,6 +35,7 @@ NSString* ORCMC203ModelHistogramModeChanged		= @"ORCMC203ModelHistogramModeChang
 NSString* ORCMC203ModelWordSizeChanged			= @"ORCMC203ModelWordSizeChanged";
 NSString* ORCMC203ModelHistogramLengthChanged	= @"ORCMC203ModelHistogramLengthChanged";
 NSString* ORCMC203ModelHistogramStartChanged	= @"ORCMC203ModelHistogramStartChanged";
+NSString* ORCMC203RateGroupChangedNotification  = @"ORCMC203RateGroupChangedNotification";
 
 NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 
@@ -41,12 +43,15 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 - (id) init
 {
 	self = [super init];
+	[self setFifoRateGroup:[[[ORRateGroup alloc] initGroup:1 groupTag:0] autorelease]];
+	[fifoRateGroup setIntegrationTime:5];
 	return self;
 }
 
 - (void) dealloc
 {
-	[histogramData release];
+    [fifoRateGroup quit];
+    [fifoRateGroup release];
 	[super dealloc];
 }
 
@@ -61,6 +66,28 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 }
 
 #pragma mark ***Accessors
+- (ORRateGroup*) fifoRateGroup
+{
+	return fifoRateGroup;
+}
+- (void) setFifoRateGroup:(ORRateGroup*)newFifoRateGroup
+{
+	[newFifoRateGroup retain];
+	[fifoRateGroup release];
+	fifoRateGroup = newFifoRateGroup;
+	
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORCMC203RateGroupChangedNotification
+	 object:self];    
+}
+
+- (void) setIntegrationTime:(double)newIntegrationTime
+{
+	//we this here so we have undo/redo on the rate object.
+    [[[self undoManager] prepareWithInvocationTarget:self] setIntegrationTime:[fifoRateGroup integrationTime]];
+	[fifoRateGroup setIntegrationTime:newIntegrationTime];
+}
+
 - (int) operationMode
 {
     return operationMode;
@@ -153,19 +180,34 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
     fifoDataId = aDataId;
 }
 
-
+- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+{
+	if(groupTag == 0){
+		return fifoCount;
+	}
+	else return 0;
+}
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setOperationMode:[decoder decodeIntForKey:@"operationMode"]];
+	[self setOperationMode:[decoder decodeIntForKey:	 @"operationMode"]];
 	[self setAdcBits:		 [decoder decodeIntForKey:   @"adcBits;"]];
 	[self setHistogramMode:  [decoder decodeIntForKey:   @"histogramMode"]];
 	[self setWordSize:		 [decoder decodeIntForKey:   @"wordSize"]];
 	[self setHistogramLength:[decoder decodeInt32ForKey: @"histogramLength"]];
 	[self setHistogramStart: [decoder decodeInt32ForKey: @"histogramStart"]];
+    [self setFifoRateGroup:  [decoder decodeObjectForKey:@"adcRateGroup"]];
+	
+    if(!fifoRateGroup){
+	    [self setFifoRateGroup:[[[ORRateGroup alloc] initGroup:1 groupTag:0] autorelease]];
+	    [fifoRateGroup setIntegrationTime:5];
+    }
+    [self startRates];
+    [fifoRateGroup resetRates];
+    [fifoRateGroup calcRates];
 	
 	[[self undoManager] enableUndoRegistration];
 	return self;
@@ -173,12 +215,13 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:operationMode forKey:@"operationMode"];
+    [encoder encodeInt:	  operationMode	  forKey:@"operationMode"];
     [encoder encodeInt:	  adcBits		  forKey:@"adcBits;"];
     [encoder encodeInt:   histogramMode   forKey:@"histogramMode"];
     [encoder encodeInt:   wordSize		  forKey:@"wordSize"];
     [encoder encodeInt32: histogramLength forKey:@"histogramLength"];
     [encoder encodeInt32: histogramStart  forKey:@"histogramStart"];
+    [encoder encodeObject:fifoRateGroup	  forKey:@"fifoRateGroup"];
 }
 
 #pragma mark •••HW Wizard
@@ -280,14 +323,16 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 		if(operationMode == kCMC203HistogramMode){
 			[[self adapter] camacShortNAF:[self stationNumber] a:42 f:9];  //reset histo memory
 			
-			if(wordSize == 0)	controlReg = 0x100;
-			else				controlReg = 0x101;
+			if(wordSize == 0)	controlReg = 0x100; //16bit histograms
+			else				controlReg = 0x101; //32bit histograms
 			unsigned short maxAdc = powf(2.0, (float)adcBits);
 			unsigned short adcMask = maxAdc-1;
 			[[self adapter] camacShortNAF:[self stationNumber] a:4 f:17 data:&adcMask];
 			[[self adapter] camacShortNAF:[self stationNumber] a:5 f:17 data:&maxAdc]; 
 		}
 		else {
+			//1MB FIFO mode
+			controlReg = 0x011;
 		}
 		[[self adapter] camacShortNAF:[self stationNumber] a:1 f:16 data:&controlReg];  
 	}
@@ -311,33 +356,35 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
 	[self stopDevice];
 	[self readHistogram];
+	//tbd--store the histogram for local viewing
 	[self startDevice];
 }
 
-- (void) readHistogram
+- (NSData*) readHistogram
 {
 	readingHistogram = YES;
 	//!!!!!Assumes that the device has been disabled
 	unsigned short maxAdc = powf(2.0, (float)adcBits);								//max number of values			
-	if(!histogramData){
-			histogramData = [[NSMutableData dataWithLength:(kCMC203ReservedHistoHeaderWords + maxAdc)*sizeof(long)] retain];
-	}
+	NSMutableData* histogramData = [[NSMutableData dataWithLength:(kCMC203ReservedHistoHeaderWords + maxAdc)*sizeof(long)] retain];
+
 	unsigned short startAddress = 0;
 	[[self adapter] camacShortNAF:[self stationNumber] a:1 f:17 data:&startAddress];	//load the memory start
 	[[self adapter] camacShortNAF:[self stationNumber] a:5 f:17 data:&maxAdc];			//number to read
 	
 	int index = 0;
 	unsigned long* ptr = (unsigned long*)[histogramData bytes];
-	[[self adapter] camacLongNAF:[self stationNumber] a:10 f:2 data:&ptr[3]];
-	[[self adapter] camacLongNAF:[self stationNumber] a:11 f:2 data:&ptr[4]];
+	ptr[0] = histoDataId | (kCMC203ReservedHistoHeaderWords + maxAdc);
+	ptr[1] = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16);
+	[[self adapter] camacLongNAF:[self stationNumber] a:10 f:2 data:&ptr[3]];		//ls histo count
+	[[self adapter] camacLongNAF:[self stationNumber] a:11 f:2 data:&ptr[4]];		//ms histo count
 	while(1){
 		unsigned short status = [[self adapter] camacLongNAF:[self stationNumber] a:1 f:17 data:&ptr[kCMC203ReservedHistoHeaderWords+index++]];
 		if(isQbitSet(status))break;
-		if(index>maxAdc)break;
+		if(index>=maxAdc)break;
 	}
 
 	readingHistogram = NO;
-
+	return histogramData;
 }
 
 #pragma mark •••DataTaker
@@ -397,29 +444,26 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORCMC203Model"];    
     //----------------------------------------------------------------------------------------
 	if(operationMode == kCMC203HistogramMode){
-		unsigned short maxAdc = powf(2.0, (float)adcBits);
-		[histogramData replaceBytesInRange:NSMakeRange(0,(kCMC203ReservedHistoHeaderWords + maxAdc)*sizeof(long)) withBytes:0];
-		unsigned long* ptr = (unsigned long*)[histogramData bytes];
-		//preload the data header
-		ptr[0] = histoDataId | (kCMC203ReservedHistoHeaderWords + maxAdc);
-		ptr[1] = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16);
-		//ptr[2] will be the total histo count ls part
-		//ptr[3] will be the total histo count ms part
 		[self clearExceptionCount];
-		[self initBoard];
-		[self startDevice];
 	}
+	else {
+		[self startRates];
+		isRunning = NO;
+	}
+	[self initBoard];
+	[self startDevice];
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	if(operationMode == kCMC203ReservedFifoHeaderWords){
+	if(operationMode == kCMC203FifoMode){
+		isRunning = YES;
 		//read the number in the fifo
-		unsigned long fifoCount=0;
-		[[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&fifoCount];
+		unsigned long numInFifo=0;
+		[[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&numInFifo];
 		//read up to 512
 		unsigned long dataBuffer[kCMC203ReservedFifoHeaderWords+512];
-		if(fifoCount){
+		if(numInFifo){
 			unsigned long count = 0;
 			do {
 				unsigned long data;
@@ -427,6 +471,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 				if(!isQbitSet(status))break;
 				dataBuffer[kCMC203ReservedFifoHeaderWords+count] = data;
 				count++;
+				fifoCount++; //for the rate
 			} while(count<512);
 			dataBuffer[0] = fifoDataId | kCMC203ReservedFifoHeaderWords+count;
 			dataBuffer[1] = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16);
@@ -440,21 +485,46 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	if(operationMode == kCMC203ReservedFifoHeaderWords){
+	if(operationMode == kCMC203HistogramMode){
 		[self stopDevice];
-		[self readHistogram];
-		[aDataPacket addData:histogramData];
+		[aDataPacket addData:[self readHistogram]];
 	}
 }
 
 - (BOOL) doneTakingData
 {
-	if(operationMode == kCMC203ReservedFifoHeaderWords) return YES;
-	else										  return readingHistogram;
+	if(operationMode == kCMC203FifoMode) return YES;
+	else								 return readingHistogram;
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    [fifoRateGroup stop];
+	isRunning = NO;
+}
+
+- (BOOL) bumpRateFromDecodeStage
+{
+	if(isRunning)return NO;
+    
+    ++fifoCount;
+    return YES;
+}
+
+- (unsigned long) fifoCount
+{
+    return fifoCount;
+}
+
+-(void) startRates
+{
+	[self clearFifoCounts];
+    [fifoRateGroup start:self];
+}
+
+- (void) clearFifoCounts
+{
+	fifoCount=0;
 }
 
 @end

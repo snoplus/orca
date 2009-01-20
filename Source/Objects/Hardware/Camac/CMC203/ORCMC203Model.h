@@ -24,6 +24,8 @@
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"
 
+@class ORRateGroup;
+
 #define kNum3377TDCTests 3
 #define kCMC203FifoMode		 0
 #define kCMC203HistogramMode 1
@@ -40,9 +42,11 @@
 		int	 wordSize;
 		int	 histogramMode;
 		int	 adcBits;
-		NSMutableData* histogramData;
 		BOOL readingHistogram;
 		BOOL operationMode;
+		ORRateGroup*	fifoRateGroup;
+		unsigned long 	fifoCount;
+	BOOL isRunning;
 }   
 
 #pragma mark ***Initialization
@@ -62,11 +66,20 @@
 - (void) setHistogramLength:(long)aHistogramLength;
 - (long) histogramStart;
 - (void) setHistogramStart:(long)aHistogramStart;
+- (ORRateGroup*)    fifoRateGroup;
+- (void)	    setFifoRateGroup:(ORRateGroup*)newFifoRateGroup;
 
 - (unsigned long) fifoDataId;
 - (void) setFifoDataId: (unsigned long) aDataId;
 - (unsigned long) histoDataId;
 - (void) setHistoDataId: (unsigned long) aDataId;
+
+#pragma mark •••Rates
+- (BOOL) bumpRateFromDecodeStage;
+- (unsigned long) fifoCount;
+- (void) startRates;
+- (void) clearFifoCounts;
+- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 
 #pragma mark •••HW Wizard
 - (NSArray*) wizardSelections;
@@ -87,7 +100,7 @@
 #pragma mark •••Hardware Access
 - (void) forceFPGALoad;
 - (void) initBoard;
-- (void) readHistogram;
+- (NSData*) readHistogram;
 - (void) stopDevice;
 - (void) startDevice;
 - (void) sample;
@@ -105,5 +118,6 @@ extern NSString* ORCMC203ModelWordSizeChanged;
 extern NSString* ORCMC203ModelHistogramLengthChanged;
 extern NSString* ORCMC203ModelHistogramStartChanged;
 extern NSString* ORCMC203SettingsLock;
+extern NSString* ORCMC203RateGroupChangedNotification;
 
 

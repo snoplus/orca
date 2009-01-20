@@ -96,11 +96,13 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 - (id) init
 {
     self = [super init];
+    getRatesFromDecodeStage = YES;
     return self;
 }
 
 - (void) dealloc
 {
+	[actualCards release];
     [super dealloc];
 }
 
@@ -134,6 +136,26 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 		ptr++;
 		[aDataSet histogram:*ptr numBins:8192 sender:self  withKeys:@"MC203",@"FIFO Histogram",crateKey,cardKey,nil];
 	}
+	//get the actual object
+	if(getRatesFromDecodeStage){
+		NSString* cmc203Key = [crateKey stringByAppendingString:cardKey];
+		if(!actualCards)actualCards = [[NSMutableDictionary alloc] init];
+		ORCMC203Model* obj = [actualCards objectForKey:cmc203Key];
+		if(!obj){
+			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCMC203Model")];
+			NSEnumerator* e = [listOfCards objectEnumerator];
+			ORCMC203Model* aCard;
+			while(aCard = [e nextObject]){
+				if(/*[aCard crateNumber] == crate &&*/ [aCard slot] == card){
+					[actualCards setObject:aCard forKey:cmc203Key];
+					obj = aCard;
+					break;
+				}
+			}
+		}
+		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage];
+	}
+	
     return length; //must return number of bytes processed.
 }
 
