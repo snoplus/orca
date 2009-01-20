@@ -52,7 +52,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 
 - (void) setUpImage
 {
-	[self setImage:[NSImage imageNamed:@"CMC203"]];
+	[self setImage:[NSImage imageNamed:@"CMC203Card"]];
 }
 
 - (void) makeMainController
