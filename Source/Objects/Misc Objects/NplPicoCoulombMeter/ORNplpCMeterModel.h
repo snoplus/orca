@@ -62,6 +62,7 @@
 - (void) averageMeterData;
 - (void) setMeter:(int)chan average:(float)aValue;
 - (float) meterAverage:(unsigned short)aChannel;
+- (void) restart;
 
 #pragma mark ***Utilities
 - (void) connect;

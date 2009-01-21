@@ -148,6 +148,7 @@
 - (IBAction) connectAction:(id)sender
 {
 	[self endEditing];
+	[model setFrameError:0];
 	[model connect];
 }
 

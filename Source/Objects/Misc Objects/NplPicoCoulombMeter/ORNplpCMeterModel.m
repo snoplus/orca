@@ -201,7 +201,6 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 - (void) start
 {
 	[socket write:&kNplpCStart length:1];
-	[self setFrameError:0];
 }
 
 - (void) stop
@@ -254,7 +253,7 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 	if(meterData){
 		
 		unsigned int numBytes = [meterData length];
-		if(numBytes%4 == 0) {											//OK, we know we got a integer number of long words
+		if((numBytes>0) && (numBytes%4 == 0)) {											//OK, we know we got a integer number of long words
 			if([self validateMeterData]){
 				unsigned long data[1003];									//max buffer size is 1000 data words + ORCA header
 				unsigned int numLongsToShip = numBytes/sizeof(long);		//convert size to longs
@@ -280,31 +279,36 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 				}
 				
 				[self averageMeterData];
-				
-				if(numLongsToShip*sizeof(long) == numBytes){
-					//OK, shipped it all
-					[meterData release];
-					meterData = nil;
-				}
-				else {
-					//only part of the record was shipped, zero the part that was and keep the part that wasn't
-					[meterData replaceBytesInRange:NSMakeRange(0,numLongsToShip*sizeof(long)) withBytes:nil length:0];
-				}
+				[meterData replaceBytesInRange:NSMakeRange(0,numLongsToShip*sizeof(long)) withBytes:nil length:0];
 				
 				if([gOrcaGlobals runInProgress] && numBytes>0){
 					[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																		object:[NSData dataWithBytes:data length:(3+numLongsToShip)*sizeof(long)]];
 				}
-				[self setReceiveCount: receiveCount + numLongsToShip];
+				[self setReceiveCount: receiveCount + 1];
 			}
 			
 			else {
-				[meterData release];
-				meterData = nil;
+				[self stop];
+				[self performSelector:@selector(restart) withObject:nil afterDelay:2];
 				[self setFrameError:frameError+1];
 			}
 		}
 	}
+}
+
+- (void) restart
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[meterData release];
+	meterData = nil;
+	int i;
+	for(i=0;i<kNplpCNumChannels;i++) {
+		[dataStack[i] release];
+		dataStack[i] = [[ORQueue alloc] init];
+	}
+	[self performSelector:@selector(start) withObject:nil afterDelay:2];
+	
 }
 
 - (void) averageMeterData
