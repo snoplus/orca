@@ -817,7 +817,7 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 + (ORSensorItem*) emptySensorListItemWithChanNum:(int)aNum;
 {
     ORSensorItem* item =  [ORSensorItem sensorWithAdeiType: kSensorListEmptyItem named:@"-"];
-    item.channelMapNum = aNum;
+    [item setChannelMapNum:aNum];
     return item;
 }
 
