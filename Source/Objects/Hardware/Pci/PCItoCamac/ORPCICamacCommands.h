@@ -105,7 +105,11 @@ typedef struct PCIConfigStruct
 } PCIConfigStruct;
 
 // driver class name
-#define kPCICAMACServiceClassName "com_fm_camaccc32_PCIFMDriver"
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+#define kPCICAMACServiceClassName "edu_washington_npl_driver_PCICAMACFMDriver_10_4"
+#else
+#define kPCICAMACServiceClassName "edu_washington_npl_driver_PCICAMACFMDriver"
+#endif
 
 // PCI definitions
 #define PCI_VENDOR_ID_ARW_CAMAC			0x10b5
