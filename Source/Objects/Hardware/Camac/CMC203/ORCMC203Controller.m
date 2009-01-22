@@ -50,6 +50,7 @@
 
 - (void) awakeFromNib
 {
+	[[totalRate xScale] setRngLimitsLow:0 withHigh:100E6 withMinRng:10000];
 	 [super awakeFromNib];
 }
 

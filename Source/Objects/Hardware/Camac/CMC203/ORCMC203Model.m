@@ -413,19 +413,12 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	
     aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORCMC203DecoderForFifo",				@"decoder",
-								 [NSNumber numberWithLong:histoDataId], @"fifoDataId",
+								 [NSNumber numberWithLong:fifoDataId], @"fifoDataId",
 								 [NSNumber numberWithBool:YES],			@"variable",
 								 [NSNumber numberWithLong:-1],			@"length",
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"fifoData"];
     return dataDictionary;
-}
-
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORCMC203"];
 }
 
 - (void) reset
@@ -461,8 +454,8 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 		//read the number in the fifo
 		unsigned long numInFifo=0;
 		[[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&numInFifo];
-		//read up to 512
-		unsigned long dataBuffer[kCMC203ReservedFifoHeaderWords+512];
+		//read up to kMCM203MaxFifoWords
+		unsigned long dataBuffer[kCMC203ReservedFifoHeaderWords+kMCM203MaxFifoWords];
 		if(numInFifo){
 			unsigned long count = 0;
 			do {
@@ -472,8 +465,8 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 				dataBuffer[kCMC203ReservedFifoHeaderWords+count] = data;
 				count++;
 				fifoCount++; //for the rate
-			} while(count<512);
-			dataBuffer[0] = fifoDataId | kCMC203ReservedFifoHeaderWords+count;
+			} while(count<kMCM203MaxFifoWords);
+			dataBuffer[0] = fifoDataId | (kCMC203ReservedFifoHeaderWords+count);
 			dataBuffer[1] = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16);
 			[aDataPacket addLongsToFrameBuffer:dataBuffer length:kCMC203ReservedFifoHeaderWords+count];
 		}

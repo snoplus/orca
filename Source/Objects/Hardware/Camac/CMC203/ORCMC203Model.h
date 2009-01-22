@@ -31,8 +31,9 @@
 #define kCMC203HistogramMode 1
 #define kCMC203ReservedHistoHeaderWords 4
 #define kCMC203ReservedFifoHeaderWords  2
+#define kMCM203MaxFifoWords	32*1024
 
-@interface ORCMC203Model : ORCamacIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
+@interface ORCMC203Model : ORCamacIOCard <ORDataTaker,ORHWWizard>
 {
     @private
 		unsigned long histoDataId;
@@ -88,7 +89,6 @@
 
 #pragma mark •••DataTaker
 - (NSDictionary*) dataRecordDescription;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
