@@ -50,6 +50,11 @@
     [self linkToController:@"ORIPCarrierController"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x0380);
+}
+
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard
 {
     float tweakX[4] = {1,-1,1,-1};

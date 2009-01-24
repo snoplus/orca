@@ -205,6 +205,11 @@ static struct {
 	return NSClassFromString(@"ORVme64CrateModel");
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,baseAddress+0x1000+0xffff);
+}
+
 #pragma mark ***Accessors
 - (BOOL) downLoadMainFPGAInProgress
 {

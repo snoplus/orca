@@ -127,6 +127,11 @@ static struct {
     [self linkToController:@"ORGretinaController"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,baseAddress*0x100+0xffff);
+}
+
 #pragma mark ***Accessors
 
 - (float) noiseFloorIntegrationTime
