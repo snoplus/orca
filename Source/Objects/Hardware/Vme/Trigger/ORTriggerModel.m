@@ -125,6 +125,11 @@ NSString* ORTriggerSpecialLock				= @"ORTriggerSpecialLock";
     [self linkToController:@"ORTriggerController"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x2a);
+}
+
 #pragma mark ¥¥¥Accessors
 - (unsigned short) gtidLower
 {

@@ -60,6 +60,17 @@ NSString* ORVmeIOCardExceptionCountChanged 			= @"ORVmeIOCardExceptionCountChang
     return baseAddress;
 }
 
+- (NSRange)	memoryFootprint
+{
+	//subclasses should overide to provide an accurate memory range
+	return NSMakeRange(baseAddress,1*sizeof(long));
+}
+
+- (BOOL) memoryConflictsWith:(NSRange)aRange
+{
+	return NSIntersectionRange(aRange,[self memoryFootprint]).length != 0;
+}
+
 - (id)	adapter
 {
 	id anAdapter = [guardian adapter];

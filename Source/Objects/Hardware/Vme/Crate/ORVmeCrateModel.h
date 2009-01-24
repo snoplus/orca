@@ -21,11 +21,11 @@
 
 #pragma mark ¥¥¥Imported Files
 
-#import "ORCrate.h"
+#import "ORVmeCrate.h"
 
 #pragma mark ¥¥¥Forward Declarations
 
-@interface ORVmeCrateModel : ORCrate   {
+@interface ORVmeCrateModel : ORVmeCrate   {
 }
 
 - (void) makeConnectors;

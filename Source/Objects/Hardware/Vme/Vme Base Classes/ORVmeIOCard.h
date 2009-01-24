@@ -47,6 +47,9 @@
 - (unsigned long)   exceptionCount;
 - (void)			incExceptionCount;
 - (void)			clearExceptionCount;
+- (NSRange)			memoryFootprint;
+- (BOOL)			memoryConflictsWith:(NSRange)aRange;
+
 @end
 
 #pragma mark ¥¥¥External String Definitions

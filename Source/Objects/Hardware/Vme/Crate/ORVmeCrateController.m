@@ -58,4 +58,10 @@
 
 }
 
+#pragma mark ¥¥¥Actions
+- (IBAction) printMemoryMap:(id)sender
+{
+	[model printMemoryMap];
+}
+
 @end

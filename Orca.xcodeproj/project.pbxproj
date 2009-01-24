@@ -1863,6 +1863,8 @@
 		9C7DCCAC0E202C1B0034CC44 /* ORNPLCommBoardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7DCCA60E202C1B0034CC44 /* ORNPLCommBoardModel.m */; };
 		9C8752580F1138F9005E3686 /* StepOut.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C8752560F1138F9005E3686 /* StepOut.tif */; };
 		9C8752590F1138F9005E3686 /* StepInto.tif in Resources */ = {isa = PBXBuildFile; fileRef = 9C8752570F1138F9005E3686 /* StepInto.tif */; };
+		9C880ED90F2B5B2500394AEC /* ORVmeCrate.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C880ED70F2B5B2500394AEC /* ORVmeCrate.h */; };
+		9C880EDA0F2B5B2500394AEC /* ORVmeCrate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C880ED80F2B5B2500394AEC /* ORVmeCrate.m */; };
 		9C8846850E2D8D960099B98E /* ORHP4405A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 9C88467D0E2D8D960099B98E /* ORHP4405A.nib */; };
 		9C8846860E2D8D960099B98E /* ORHP4405AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C88467E0E2D8D960099B98E /* ORHP4405AController.h */; };
 		9C8846870E2D8D960099B98E /* ORHP4405AController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C88467F0E2D8D960099B98E /* ORHP4405AController.m */; };
@@ -3790,6 +3792,8 @@
 		9C7E0885051A522B005F64D5 /* MuxScopeMap.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MuxScopeMap.h; path = Source/Experiments/Ncd/Detector/MuxScopeMap.h; sourceTree = SOURCE_ROOT; };
 		9C8752560F1138F9005E3686 /* StepOut.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = StepOut.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/StepOut.tif"; sourceTree = SOURCE_ROOT; };
 		9C8752570F1138F9005E3686 /* StepInto.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = StepInto.tif; path = "Source/Objects/Misc Objects/Views/ScriptView/StepInto.tif"; sourceTree = SOURCE_ROOT; };
+		9C880ED70F2B5B2500394AEC /* ORVmeCrate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORVmeCrate.h; sourceTree = "<group>"; };
+		9C880ED80F2B5B2500394AEC /* ORVmeCrate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORVmeCrate.m; sourceTree = "<group>"; };
 		9C88467D0E2D8D960099B98E /* ORHP4405A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ORHP4405A.nib; sourceTree = "<group>"; };
 		9C88467E0E2D8D960099B98E /* ORHP4405AController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHP4405AController.h; sourceTree = "<group>"; };
 		9C88467F0E2D8D960099B98E /* ORHP4405AController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHP4405AController.m; sourceTree = "<group>"; };
@@ -8484,6 +8488,8 @@
 				842A63550700A951007536B6 /* ORVmeCardDecoder.m */,
 				84F910BA0EEEC43C007B583A /* ORVmeReadWriteCommand.h */,
 				84B89ED10EF1995800E0C395 /* ORVmeReadWriteCommand.m */,
+				9C880ED70F2B5B2500394AEC /* ORVmeCrate.h */,
+				9C880ED80F2B5B2500394AEC /* ORVmeCrate.m */,
 			);
 			path = "Vme Base Classes";
 			sourceTree = "<group>";
@@ -9303,6 +9309,7 @@
 				8493D6BD0F21315300BCD331 /* ORCMC203Controller.h in Headers */,
 				8493D6BF0F21315300BCD331 /* ORCMC203Decoders.h in Headers */,
 				8493D6C10F21315300BCD331 /* ORCMC203Model.h in Headers */,
+				9C880ED90F2B5B2500394AEC /* ORVmeCrate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10565,6 +10572,7 @@
 				8493D6BE0F21315300BCD331 /* ORCMC203Controller.m in Sources */,
 				8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */,
 				8493D6C20F21315300BCD331 /* ORCMC203Model.m in Sources */,
+				9C880EDA0F2B5B2500394AEC /* ORVmeCrate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

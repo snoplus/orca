@@ -1,9 +1,9 @@
-//
-//  ORVmeCrateController.h
+
+//  ORVmeCrate.h
 //  Orca
 //
-//  Created by Mark Howe on Fri Nov 22 2002.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on 1/24/09.
+//  Copyright (c) 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -18,23 +18,11 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+#import "ORCrate.h"
 
-#pragma mark ¥¥¥Imported Files
+@interface ORVmeCrate : ORCrate {
 
-#import "ORCrateController.h"
-
-#pragma mark ¥¥¥Forward Declarations
-
-@interface ORVmeCrateController : ORCrateController
-{
 }
-
-- (id) init;
-
-#pragma mark ¥¥¥Notifications
-- (void) registerNotificationObservers;
-
-#pragma mark ¥¥¥Actions
-- (IBAction) printMemoryMap:(id)sender;
+- (void) printMemoryMap;
 
 @end

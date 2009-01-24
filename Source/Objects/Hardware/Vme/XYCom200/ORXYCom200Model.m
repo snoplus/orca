@@ -92,7 +92,10 @@ NSString* mIOXY200SubModeName[4][3] = {
 {
     [self linkToController:@"ORXYCom200Controller"];
 }
-
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x33);
+}
 #pragma mark ***Accessors
 
 - (NSArray*) chips
