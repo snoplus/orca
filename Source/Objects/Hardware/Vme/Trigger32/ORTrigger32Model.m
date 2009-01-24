@@ -130,6 +130,11 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
     [self linkToController:@"ORTrigger32Controller"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x3C);
+}
+
 #pragma mark ¥¥¥Accessors
 
 - (BOOL) restartClkAtRunStart

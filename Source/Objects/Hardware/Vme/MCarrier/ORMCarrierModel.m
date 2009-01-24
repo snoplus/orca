@@ -48,6 +48,11 @@
     [self linkToController:@"ORMCarrierController"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0xFE);
+}
+
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard
 {
     NSRect aFrame = [aConnector localFrame];

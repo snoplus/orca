@@ -195,6 +195,11 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
     [self linkToController:@"ORSIS3300Controller"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x00780000+0x80000);
+}
+
 #pragma mark ***Accessors
 //csr reg
 - (BOOL) bankFullTo3

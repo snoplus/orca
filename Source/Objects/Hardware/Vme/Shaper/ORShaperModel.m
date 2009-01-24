@@ -209,6 +209,10 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [self linkToController:@"ORShaperController"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x2e);
+}
 
 #pragma mark ¥¥¥Accessors
 - (NSMutableArray*) thresholds
