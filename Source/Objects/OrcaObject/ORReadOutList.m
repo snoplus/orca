@@ -21,6 +21,7 @@
 
 #import "ORReadOutList.h"
 #import "ORDataPacket.h"
+#import "ORDataTaker.h"
 
 #import "ORFileIOHelpers.h"
 
@@ -49,6 +50,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
     object 	= anObject;
     return self;
 }
+
 
 - (void) setOwner:(id)aOwner
 {
@@ -215,6 +217,22 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
     return [children indexOfObject:anObj];
 }
 
+- (NSString*) acceptedProtocol
+{
+	return acceptedProtocol;
+}
+
+- (void) setAcceptedProtocol:(NSString*)aString
+{
+	[acceptedProtocol autorelease];
+	acceptedProtocol = [aString copy];
+}
+
+- (BOOL) acceptsObject:(id) anObject
+{
+	if(!acceptedProtocol)return [anObject conformsToProtocol:@protocol(ORDataTaker)];
+	else return [anObject conformsToProtocol:NSProtocolFromString(acceptedProtocol)];
+}
 
 - (NSArray*) allObjects
 {
@@ -381,6 +399,7 @@ static NSString *ORReadOutList_Identifier 	= @"ORReadOutList_Identifier";
     [[self undoManager] disableUndoRegistration];	
     [self setIdentifier:[decoder decodeObjectForKey:ORReadOutList_Identifier]];
     [self setChildren:[decoder decodeObjectForKey:ORReadOutList_List]];
+    [self setAcceptedProtocol:[decoder decodeObjectForKey:@"acceptedProtocol"]];
     [[self undoManager] enableUndoRegistration];
 	
     [self registerNotificationObservers];
@@ -391,6 +410,7 @@ static NSString *ORReadOutList_Identifier 	= @"ORReadOutList_Identifier";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [encoder encodeObject:identifier forKey:ORReadOutList_Identifier];
+    [encoder encodeObject:acceptedProtocol forKey:@"acceptedProtocol"];
     [encoder encodeObject:children forKey:ORReadOutList_List];
 }
 

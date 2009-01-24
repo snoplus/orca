@@ -25,19 +25,19 @@
 #import "ORDataTaker.h"
 
 @class ORRateGroup;
+@class ORReadOutList;
 
 #define kNum3377TDCTests 3
 #define kCMC203FifoMode		 0
 #define kCMC203HistogramMode 1
 #define kCMC203ReservedHistoHeaderWords 4
 #define kCMC203ReservedFifoHeaderWords  2
-#define kMCM203MaxFifoWords	32*1024
+#define kMCM203MaxFifoWords	16*1024
 
 @interface ORCMC203Model : ORCamacIOCard <ORDataTaker,ORHWWizard>
 {
     @private
 		unsigned long histoDataId;
-		unsigned long fifoDataId;
 		long histogramStart;
 		long histogramLength;
 		int	 wordSize;
@@ -47,7 +47,10 @@
 		BOOL operationMode;
 		ORRateGroup*	fifoRateGroup;
 		unsigned long 	fifoCount;
-	BOOL isRunning;
+		BOOL isRunning;
+		ORReadOutList*	readOutGroup;
+		NSArray*		dataTakers;			//cache of data takers.
+
 }   
 
 #pragma mark ***Initialization
@@ -70,10 +73,10 @@
 - (ORRateGroup*)    fifoRateGroup;
 - (void)	    setFifoRateGroup:(ORRateGroup*)newFifoRateGroup;
 
-- (unsigned long) fifoDataId;
-- (void) setFifoDataId: (unsigned long) aDataId;
 - (unsigned long) histoDataId;
 - (void) setHistoDataId: (unsigned long) aDataId;
+- (ORReadOutList*) readOutGroup;
+- (void) setReadOutGroup:(ORReadOutList*)newReadOutGroup;
 
 #pragma mark •••Rates
 - (BOOL) bumpRateFromDecodeStage;
@@ -96,6 +99,10 @@
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) reset;
+
+- (void) saveReadOutList:(NSFileHandle*)aFile;
+- (void) loadReadOutList:(NSFileHandle*)aFile;
+
 
 #pragma mark •••Hardware Access
 - (void) forceFPGALoad;

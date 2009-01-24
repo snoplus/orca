@@ -32,6 +32,11 @@
 - (void) reset;
 @end
 
+@protocol ORFeraReadout
+- (void) setVSN:(int)aVSN;
+- (void) shipFeraData:(void*)ptr length:(int)len;
+@end
+
 
 @interface NSObject (ORDataTaker)
 - (void) processData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;

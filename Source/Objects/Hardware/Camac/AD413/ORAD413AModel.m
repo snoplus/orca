@@ -387,6 +387,13 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
 }
 
+#pragma mark ¥¥¥FERA
+- (void) setVSN:(int)aVSN
+{
+}
+- (void) shipFeraData:(void*)ptr length:(int)len
+{
+}
 
 #pragma mark ¥¥¥Archival
 

@@ -27,6 +27,7 @@
 #import "ORCamacCrateModel.h"
 #import "ORCamacControllerCard.h"
 #import "ORRateGroup.h"
+#import "ORReadOutList.h"
 
 #pragma mark ***External Strings
 NSString* ORCMC203ModelOperationModeChanged		= @"ORCMC203ModelOperationModeChanged";
@@ -45,6 +46,10 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	self = [super init];
 	[self setFifoRateGroup:[[[ORRateGroup alloc] initGroup:1 groupTag:0] autorelease]];
 	[fifoRateGroup setIntegrationTime:5];
+	ORReadOutList* readList = [[ORReadOutList alloc] initWithIdentifier:@"FERA Objects"];
+	[readList setAcceptedProtocol:@"ORFeraReadout"];
+	[self setReadOutGroup:readList];
+	[readList release];
 	return self;
 }
 
@@ -52,6 +57,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
     [fifoRateGroup quit];
     [fifoRateGroup release];
+	[readOutGroup release];
 	[super dealloc];
 }
 
@@ -70,15 +76,16 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
 	return fifoRateGroup;
 }
+
 - (void) setFifoRateGroup:(ORRateGroup*)newFifoRateGroup
 {
 	[newFifoRateGroup retain];
 	[fifoRateGroup release];
 	fifoRateGroup = newFifoRateGroup;
 	
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORCMC203RateGroupChangedNotification
-	 object:self];    
+    [[NSNotificationCenter defaultCenter] 
+		postNotificationName:ORCMC203RateGroupChangedNotification
+					  object:self];    
 }
 
 - (void) setIntegrationTime:(double)newIntegrationTime
@@ -86,6 +93,23 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	//we this here so we have undo/redo on the rate object.
     [[[self undoManager] prepareWithInvocationTarget:self] setIntegrationTime:[fifoRateGroup integrationTime]];
 	[fifoRateGroup setIntegrationTime:newIntegrationTime];
+}
+
+- (ORReadOutList*) readOutGroup
+{
+	return readOutGroup;
+}
+
+- (void) setReadOutGroup:(ORReadOutList*)newReadOutGroup
+{
+	[readOutGroup autorelease];
+	readOutGroup=[newReadOutGroup retain];
+}
+
+- (NSMutableArray*) children 
+{
+	//method exists to give common interface across all objects for display in lists
+	return [NSMutableArray arrayWithObject:readOutGroup];
 }
 
 - (int) operationMode
@@ -174,11 +198,6 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
     histoDataId = aDataId;
 }
-- (unsigned long) fifoDataId { return fifoDataId; }
-- (void) setFifoDataId: (unsigned long) aDataId
-{
-    fifoDataId = aDataId;
-}
 
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
 {
@@ -200,6 +219,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	[self setHistogramLength:[decoder decodeInt32ForKey: @"histogramLength"]];
 	[self setHistogramStart: [decoder decodeInt32ForKey: @"histogramStart"]];
     [self setFifoRateGroup:  [decoder decodeObjectForKey:@"adcRateGroup"]];
+	[self setReadOutGroup:  [decoder decodeObjectForKey:@"ReadoutGroup"]];
 	
     if(!fifoRateGroup){
 	    [self setFifoRateGroup:[[[ORRateGroup alloc] initGroup:1 groupTag:0] autorelease]];
@@ -222,6 +242,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
     [encoder encodeInt32: histogramLength forKey:@"histogramLength"];
     [encoder encodeInt32: histogramStart  forKey:@"histogramStart"];
     [encoder encodeObject:fifoRateGroup	  forKey:@"fifoRateGroup"];
+	[encoder encodeObject:readOutGroup  forKey:@"ReadoutGroup"];
 }
 
 #pragma mark •••HW Wizard
@@ -391,13 +412,11 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 - (void) setDataIds:(id)assigner
 {
     histoDataId = [assigner assignDataIds:kLongForm];
-    fifoDataId = [assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherCard
 {
     [self setHistoDataId:[anotherCard histoDataId]];
-    [self setFifoDataId:[anotherCard fifoDataId]];
 }
 
 - (NSDictionary*) dataRecordDescription
@@ -411,13 +430,6 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 								 nil];
     [dataDictionary setObject:aDictionary forKey:@"histogramData"];
 	
-    aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORCMC203DecoderForFifo",				@"decoder",
-								 [NSNumber numberWithLong:fifoDataId], @"fifoDataId",
-								 [NSNumber numberWithBool:YES],			@"variable",
-								 [NSNumber numberWithLong:-1],			@"length",
-								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"fifoData"];
     return dataDictionary;
 }
 
@@ -430,6 +442,14 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	
     if(![self adapter]){
 		[NSException raise:@"Not Connected" format:@"You must connect to a PCI-CAMAC Controller (i.e. a CC32)."];
+    }
+	
+	dataTakers = [[readOutGroup allObjects] retain];	//cache of data takers.
+    NSEnumerator* e = [dataTakers objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        [obj runTaskStarted:aDataPacket userInfo:userInfo];
+		//[obj setVSN:[dataTakers indexOfObject:obj]]; //put into fera protocol
     }
 	
     //----------------------------------------------------------------------------------------
@@ -455,20 +475,20 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 		unsigned long numInFifo=0;
 		[[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&numInFifo];
 		//read up to kMCM203MaxFifoWords
-		unsigned long dataBuffer[kCMC203ReservedFifoHeaderWords+kMCM203MaxFifoWords];
 		if(numInFifo){
 			unsigned long count = 0;
 			do {
 				unsigned long data;
 				unsigned short status = [[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&data];
 				if(!isQbitSet(status))break;
-				dataBuffer[kCMC203ReservedFifoHeaderWords+count] = data;
+				//send to the right item in our fera list --- let them decode the data
+				// 1 - grab the vsn bits
+				// 2- fing the object with that vsn number
+				// 3- [obj shipFeraData:data];
+				// ---+++---+++--- tbd -- add the vsn and shipFerData methods to the Fera protocol
 				count++;
 				fifoCount++; //for the rate
 			} while(count<kMCM203MaxFifoWords);
-			dataBuffer[0] = fifoDataId | (kCMC203ReservedFifoHeaderWords+count);
-			dataBuffer[1] = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16);
-			[aDataPacket addLongsToFrameBuffer:dataBuffer length:kCMC203ReservedFifoHeaderWords+count];
 		}
 	}
 	else {
@@ -478,6 +498,11 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    NSEnumerator* e = [dataTakers objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        [obj runIsStopping:aDataPacket userInfo:userInfo];
+    }
 	if(operationMode == kCMC203HistogramMode){
 		[self stopDevice];
 		[aDataPacket addData:[self readHistogram]];
@@ -492,6 +517,11 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    NSEnumerator* e = [dataTakers objectEnumerator];
+    id obj;
+    while(obj = [e nextObject]){
+        [obj runTaskStopped:aDataPacket userInfo:userInfo];
+    }
     [fifoRateGroup stop];
 	isRunning = NO;
 }
@@ -520,6 +550,16 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	fifoCount=0;
 }
 
+- (void) saveReadOutList:(NSFileHandle*)aFile
+{
+    [readOutGroup saveUsingFile:aFile];
+}
+
+- (void) loadReadOutList:(NSFileHandle*)aFile
+{
+    [self setReadOutGroup:[[[ORReadOutList alloc] initWithIdentifier:@"cPCI"]autorelease]];
+    [readOutGroup loadUsingFile:aFile];
+}
 @end
 
 

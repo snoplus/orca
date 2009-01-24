@@ -43,7 +43,7 @@ enum {
 };
 
 
-@interface ORAD413AModel : ORCamacIOCard <ORDataTaker> {
+@interface ORAD413AModel : ORCamacIOCard <ORDataTaker,ORFeraReadout> {
     @private
         unsigned long dataId;
         unsigned short onlineMask;
@@ -101,6 +101,10 @@ enum {
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
+
+#pragma mark ¥¥¥FERA
+- (void) setVSN:(int)aVSN;
+- (void) shipFeraData:(void*)ptr length:(int)len;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;

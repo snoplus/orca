@@ -48,6 +48,7 @@
 @interface ORReadOutList : NSObject {
     NSString*       identifier;
     NSMutableArray* children;
+	NSString* acceptedProtocol;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -58,10 +59,13 @@
 - (unsigned) count;
 - (NSMutableArray*) children;
 - (void)	    setChildren:(NSMutableArray*)newChildren;
+- (NSString*) acceptedProtocol;
+- (void) setAcceptedProtocol:(NSString*)aString;
 
 - (BOOL) containsObject:(id) anObj;
 - (unsigned) indexOfObject:(id) anObj;
 
+- (BOOL) acceptsObject:(id) anObject;
 - (void) moveObject:(id)anObj toIndex:(unsigned)index;
 - (void) removeObject:(id)obj;
 - (void) addObject:(id)obj;

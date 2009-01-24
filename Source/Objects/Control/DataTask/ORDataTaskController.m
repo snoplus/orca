@@ -447,23 +447,22 @@ else {\
     
 	BOOL result = NO;
 	NSArray *possibleItems = [[[info draggingSource] dataSource] draggedNodes];
-
+	
+	GET_CHILDREN; //macro: given an item, sets children array and guardian. 
+	
 	NSMutableArray* nodeItems = [NSMutableArray array];
 	NSEnumerator* e = [possibleItems objectEnumerator];
 	id anItem;
 	while(anItem = [e nextObject]){
-		if([[anItem object] conformsToProtocol:@protocol(ORDataTaker)]){
+		if([guardian acceptsObject:[anItem object]]){
 			[nodeItems addObject:anItem];
 		}
 	}
-
-    
+	
 	if(ov == readoutListView && [nodeItems count]){
         
 		if(item == nil || [[item class] isSubclassOfClass: NSClassFromString(@"ORReadOutList")]){
-			
-			GET_CHILDREN; //macro: given an item, sets children array and guardian. 
-			
+					
 			int realIndex;
 			if(item == nil && index == NSOutlineViewDropOnItemIndex) realIndex = [[guardian children] count];
 			else if (index == NSOutlineViewDropOnItemIndex)          realIndex = 0;
