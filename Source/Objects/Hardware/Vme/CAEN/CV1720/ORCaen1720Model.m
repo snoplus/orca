@@ -138,6 +138,11 @@ NSString* ORCaen1720ModelBufferCheckChanged                 = @"ORCaen1720ModelB
     [super dealloc];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0xEF28);
+}
+
 #pragma mark ***Accessors
 
 - (int) eventSize

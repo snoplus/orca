@@ -91,6 +91,11 @@ NSString* OR4ChanSpecialLock				= @"OR4ChanSpecialLock";
     [self linkToController:@"OR4ChanTriggerController"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x68);
+}
+
 #pragma mark ¥¥¥Accessors
 - (unsigned long) lowerClock
 {

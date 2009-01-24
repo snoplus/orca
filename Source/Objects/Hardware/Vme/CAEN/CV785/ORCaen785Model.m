@@ -112,6 +112,10 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [self linkToController:@"ORCaen785Controller"];
  }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x1080);
+}
 
 #pragma mark ***Register - General routines
 //--------------------------------------------------------------------------------

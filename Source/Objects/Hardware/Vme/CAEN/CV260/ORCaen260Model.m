@@ -122,6 +122,10 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
     [self linkToController:@"ORCaen260Controller"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0xFE);
+}
 
 #pragma mark •••Accessors
 #pragma mark ***Register - General routines

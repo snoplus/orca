@@ -79,6 +79,10 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
     [self linkToController:@"ORCaen265Controller"];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0xFE);
+}
 
 #pragma mark •••Accessors
 

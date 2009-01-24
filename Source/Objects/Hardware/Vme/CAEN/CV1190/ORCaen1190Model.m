@@ -95,6 +95,11 @@ NSString* ORCaen1190RateGroupChangedNotification    = @"ORCaen1190RateGroupChang
 	[super dealloc];
 }
 
+- (NSRange)	memoryFootprint
+{
+	return NSMakeRange(baseAddress,0x1204);
+}
+
 #pragma mark ***Accessors
 - (void) setIntegrationTime:(double)newIntegrationTime
 {
