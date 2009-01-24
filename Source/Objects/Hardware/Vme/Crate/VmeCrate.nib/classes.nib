@@ -161,6 +161,11 @@
 			<string>ORGroupView</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>printMemoryMap</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>ORVmeCrateController</string>
 			<key>LANGUAGE</key>
