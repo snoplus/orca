@@ -77,9 +77,10 @@ are declared volatile.
 #define kLCRCntrlOffset		20			// 0x50 / 4 = 0x14 = 20
 #define kInitialCC32Status		0x8300
 #define kInitialControlStatus	0x4986
-#define kEnableCC32				0x4186
-#define kEnableCC32AutoRead     0x4182
-#define kDisableCC32			0x4086
+#define kEnableCC32				0x4184
+//#define kEnableCC32AutoRead     0x4182
+#define kEnableCC32AutoRead     0x4184
+#define kDisableCC32			0x4084
 #define kDisableAllInterrupts	0x0000
 
 
@@ -108,6 +109,7 @@ are declared volatile.
 
 #pragma mark ¥¥¥Module Cmds
 - (unsigned short)  resetContrl;     //can throw
+- (unsigned short)	generateQAndX;
 - (unsigned short)  setCrateInhibit:(BOOL)state;
 - (unsigned short)  readCrateInhibit:(unsigned short*)state;
 - (unsigned short)  executeCCycle;

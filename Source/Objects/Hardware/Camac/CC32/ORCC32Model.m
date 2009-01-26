@@ -232,6 +232,12 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     return [[self controller] readLEDs];
 }
 
+- (unsigned short)	generateQAndX
+{
+	unsigned short tempTest = 0;
+	return [self camacShortNAF:([self slot]+1) a:0 f:16 data:&tempTest];	
+}
+
 - (unsigned short)  executeCCycle
 {
     return [[self controller] camacShortNAF:0 a:0 f:0];
@@ -371,13 +377,24 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     
     [self delay:kDelay];		// use delays between calls to CC32 to get correct status
     
+	// generate Q & X
+	unsigned short statusCC32 = [self generateQAndX];
+	[self decodeStatus:statusCC32];
+    NSLog(@"Generate Q & X, Q:%d, X:%d, I:%d, LAM:%d\n", cmdResponse, cmdAccepted, inhibit, lookAtMe);
+    
+    [self delay:kDelay];
+    
+    NSLog(@"Q & X - CC32 Status: 0x%04x\n",[self camacStatus]);
+    
+    [self delay:kDelay];
+	
     NSLog(@"LEDs: 0x%08x\n",[self readLEDs]);
     
     [self delay:kDelay];
     
     
     // reset controller
-    unsigned short statusCC32 = [self initializeContrl];
+    statusCC32 = [self initializeContrl];
     
     [self delay:kDelay];
     
@@ -437,17 +454,6 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     [self delay:kDelay];
     
     
-    // generate Q & X
-	statusCC32 = [self camacShortNAF:12 a:0 f:16];
-	[self decodeStatus:statusCC32];
-    NSLog(@"Generate Q & X, Q:%d, X:%d, I:%d, LAM:%d\n", cmdResponse, cmdAccepted, inhibit, lookAtMe);
-    
-    [self delay:kDelay];
-    
-    NSLog(@"Q & X - CC32 Status: 0x%04x\n",[self camacStatus]);
-    
-    [self delay:kDelay];
-    
     NSLog(@"LEDs: 0x%08x\n",[self readLEDs]);
     
     [self delay:kDelay];
@@ -480,7 +486,7 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     [self delay:kDelay];
     
     unsigned short rdata = 5;
-    statusCC32 = [self camacShortNAF:12 a:0 f:16 data:&rdata];
+    statusCC32 = [self camacShortNAF:([self slot]+1) a:0 f:16 data:&rdata];
 	[self decodeStatus:statusCC32];
     NSLog(@"Generate Q, X & LAM On Dataway, Q:%d, X:%d, I:%d, LAM:%d\n",
           cmdResponse, cmdAccepted, inhibit, lookAtMe);

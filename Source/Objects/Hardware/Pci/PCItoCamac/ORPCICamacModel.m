@@ -316,12 +316,13 @@ static UInt32 *fVPCICamacMem;
 {
 	
     //first make sure the driver is installed.
-    NSFileManager* fm = [NSFileManager defaultManager];
-    if(![fm fileExistsAtPath:kCamacDriverPath]){
-        driverExists = NO;
-        return NO;
-    }
-    else driverExists = YES;
+    //NSFileManager* fm = [NSFileManager defaultManager];
+    //if(![fm fileExistsAtPath:kCamacDriverPath]){
+    //    driverExists = NO;
+    //    return NO;
+    //}
+    //else driverExists = YES;
+	driverExists = YES;
 	
     // create Master Mach Port which is used to initiate
     // communication with IOKit
@@ -565,12 +566,14 @@ static UInt32 *fVPCICamacMem;
             //be used with CAMAC bus read accesses and all F values from
             //F16 through F31 MUST be used with CAMAC bus write accesses.
 			if(f < 16){
+			// Read access
                 if(data){
                     unsigned short temp = *wPCICamacMemBase;
                     *data = Swap8BitsIn16(temp);
                 }
             }
             else {
+				// Write access
 				if(data)*wPCICamacMemBase = Swap8BitsIn16(*data);
 				else *wPCICamacMemBase = 0;
 			}

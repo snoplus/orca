@@ -101,7 +101,7 @@ enum PCICAMACUserClientCommandCodes {
 // PCI configuration structure
 typedef struct PCIConfigStruct
 {
-    UInt32 int32[64];
+    uint32_t int32[64];
 } PCIConfigStruct;
 
 // driver class name
