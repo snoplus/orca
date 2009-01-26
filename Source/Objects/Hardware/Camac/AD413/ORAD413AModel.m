@@ -201,35 +201,35 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (void) readControlReg1
 {
     unsigned short aValue;
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:0 data:&aValue];
+    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:&aValue];
     [self setControlReg1:aValue];
 }
 
 - (void) readControlReg2
 {
     unsigned short aValue;
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:1 f:0 data:&aValue];
+    [[self adapter] camacShortNAF:[self stationNumber] a:1 f:0 data:&aValue];
     [self setControlReg2:aValue];
 }
 
 - (void) writeControlReg1
 {
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:16 data:&controlReg1];
+    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:16 data:&controlReg1];
 }
 
 - (void) writeControlReg2
 {
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:1 f:16 data:&controlReg2];
+    [[self adapter] camacShortNAF:[self stationNumber] a:1 f:16 data:&controlReg2];
 }
 
 - (void) clearModule
 {
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:9 data:&controlReg2];
+    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:9 data:&controlReg2];
 }
 
 - (void) clearLAM
 {
-    [controller camacShortNAF:[self stationNumber]+1 a:0 f:10 data:nil];
+    [controller camacShortNAF:[self stationNumber] a:0 f:10 data:nil];
 }
 
 - (void) readDiscriminators
@@ -237,7 +237,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     unsigned short aValue;
     int i;
     for(i=0;i<4;i++){
-        [[self adapter] camacShortNAF:[self stationNumber]+1 a:i f:1 data:&aValue];
+        [[self adapter] camacShortNAF:[self stationNumber] a:i f:1 data:&aValue];
         [self setDiscriminator:0x00ff&aValue forChan:i];
     }
 }
@@ -248,7 +248,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     int i;
     for(i=0;i<4;i++){
         aValue = [self discriminatorForChan:i];
-        [[self adapter] camacShortNAF:[self stationNumber]+1 a:i f:17 data:&aValue];
+        [[self adapter] camacShortNAF:[self stationNumber] a:i f:17 data:&aValue];
     }
 }
 
@@ -298,8 +298,8 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | ((([self stationNumber]+1)& 0x0000001f)<<16); //doesn't change so do it here.
-	cachedStation = [self stationNumber]+1;
+    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | ((([self stationNumber])& 0x0000001f)<<16); //doesn't change so do it here.
+	cachedStation = [self stationNumber];
     randomAccessMode    = (controlReg1>>kRandomAccessBit)    & 0x1;
     zeroSuppressionMode = !((controlReg1>>kZeroSuppressionBit) & 0x1);
     eclMode				= !((controlReg1>>kECLPortEnableBit) & 0x1);
@@ -390,7 +390,10 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 #pragma mark ¥¥¥FERA
 - (void) setVSN:(int)aVSN
 {
+	unsigned short data = aVSN & 0xff;
+    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:16 data:&data];
 }
+
 - (void) shipFeraData:(void*)ptr length:(int)len
 {
 }
