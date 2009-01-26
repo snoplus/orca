@@ -48,6 +48,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	[fifoRateGroup setIntegrationTime:5];
 	ORReadOutList* readList = [[ORReadOutList alloc] initWithIdentifier:@"FERA Objects"];
 	[readList setAcceptedProtocol:@"ORFeraReadout"];
+	[readList addAcceptedObjectName:@"ORAD413AModel"];
 	[self setReadOutGroup:readList];
 	[readList release];
 	return self;

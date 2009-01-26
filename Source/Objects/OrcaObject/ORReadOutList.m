@@ -153,6 +153,8 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [children release];
     [identifier release];
+	[acceptedClasses release];
+	[acceptedProtocol release];
     [super dealloc];
 }
 
@@ -228,10 +230,27 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 	acceptedProtocol = [aString copy];
 }
 
+- (void) addAcceptedObjectName:(NSString*)objectName
+{
+	if(!acceptedClasses)acceptedClasses = [[NSMutableArray array] retain];
+	[acceptedClasses addObject:objectName];
+}
+
 - (BOOL) acceptsObject:(id) anObject
 {
-	if(!acceptedProtocol)return [anObject conformsToProtocol:@protocol(ORDataTaker)];
-	else return [anObject conformsToProtocol:NSProtocolFromString(acceptedProtocol)];
+	BOOL accepted = NO;
+	if(!acceptedProtocol){
+		accepted =  [anObject conformsToProtocol:@protocol(ORDataTaker)];
+	}
+	else {
+		accepted = [anObject conformsToProtocol:NSProtocolFromString(acceptedProtocol)];
+		if(accepted){
+			if(acceptedClasses){
+				accepted = [acceptedClasses containsObject:[anObject className]];
+			}
+		}
+	}
+	return accepted;
 }
 
 - (NSArray*) allObjects
@@ -400,6 +419,7 @@ static NSString *ORReadOutList_Identifier 	= @"ORReadOutList_Identifier";
     [self setIdentifier:[decoder decodeObjectForKey:ORReadOutList_Identifier]];
     [self setChildren:[decoder decodeObjectForKey:ORReadOutList_List]];
     [self setAcceptedProtocol:[decoder decodeObjectForKey:@"acceptedProtocol"]];
+	acceptedClasses = [[decoder decodeObjectForKey:@"acceptedClasses"] retain];
     [[self undoManager] enableUndoRegistration];
 	
     [self registerNotificationObservers];
@@ -412,6 +432,7 @@ static NSString *ORReadOutList_Identifier 	= @"ORReadOutList_Identifier";
     [encoder encodeObject:identifier forKey:ORReadOutList_Identifier];
     [encoder encodeObject:acceptedProtocol forKey:@"acceptedProtocol"];
     [encoder encodeObject:children forKey:ORReadOutList_List];
+	[encoder encodeObject:acceptedClasses forKey:@"acceptedClasses"];
 }
 
 - (void) saveUsingFile:(NSFileHandle*)aFile

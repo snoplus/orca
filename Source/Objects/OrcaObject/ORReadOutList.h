@@ -49,6 +49,7 @@
     NSString*       identifier;
     NSMutableArray* children;
 	NSString* acceptedProtocol;
+	NSMutableArray*  acceptedClasses;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -61,6 +62,7 @@
 - (void)	    setChildren:(NSMutableArray*)newChildren;
 - (NSString*) acceptedProtocol;
 - (void) setAcceptedProtocol:(NSString*)aString;
+- (void) addAcceptedObjectName:(NSString*)objectName;
 
 - (BOOL) containsObject:(id) anObj;
 - (unsigned) indexOfObject:(id) anObj;
