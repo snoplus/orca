@@ -158,30 +158,22 @@
 
 - (void) controlReg1Changed:(NSNotification*)aNotification
 {
-    unsigned short regValue = [model controlReg1];
-    [virtualStationField setIntValue: regValue&0xff];
-    [[controlReg1Matrix cellWithTag:kZeroSuppressionBit] setState: !((regValue>>kZeroSuppressionBit)&0x1)];
-    [[controlReg1Matrix cellWithTag:kCoincidenceBit]     setState: !((regValue>>kCoincidenceBit)&0x1)];
-    [[controlReg1Matrix cellWithTag:kECLPortEnableBit]   setState: !((regValue>>kECLPortEnableBit)&0x1)];
-    [[controlReg1Matrix cellWithTag:kRandomAccessBit]    setState: (regValue>>kRandomAccessBit)&0x1];
-    [[controlReg1Matrix cellWithTag:kLAMEnableBit]       setState: (regValue>>kLAMEnableBit)&0x1];
-    [[controlReg1Matrix cellWithTag:kOFSuppressionBit]   setState: !(regValue>>kOFSuppressionBit)&0x1];
+    [[controlReg1Matrix cellWithTag:kZeroSuppressionBit] setState: [model zeroSuppressionMode]];
+    [[controlReg1Matrix cellWithTag:kCoincidenceBit]     setState: [model coincidence]];
+    [[controlReg1Matrix cellWithTag:kRandomAccessBit]    setState: [model randomAccessMode]];
+    [[controlReg1Matrix cellWithTag:kLAMEnableBit]       setState: [model lamEnable]];
+    [[controlReg1Matrix cellWithTag:kOFSuppressionBit]   setState: [model ofSuppressionMode]];
+	[eclEnabledField setStringValue: [model eclMode]?@"YES":@"NO"];
+	[virtualStationField setIntValue:[model vsn]];
 }
 
 - (void) controlReg2Changed:(NSNotification*)aNotification
 {
-    unsigned short regValue = [model controlReg2];
-    [[controlReg2Matrix cellWithTag:kEnableGate1Bit] setState: !((regValue>>kEnableGate1Bit)&0x1)];
-    [[controlReg2Matrix cellWithTag:kEnableGate2Bit] setState: !((regValue>>kEnableGate2Bit)&0x1)];
-    [[controlReg2Matrix cellWithTag:kEnableGate3Bit] setState: !((regValue>>kEnableGate3Bit)&0x1)];
-    [[controlReg2Matrix cellWithTag:kEnableGate4Bit] setState: !((regValue>>kEnableGate4Bit)&0x1)];
-    [[controlReg2Matrix cellWithTag:kMasterGateBit]  
-	 setState: !((regValue>>kMasterGateBit)&0x1)];
+	int bit;
+	for(bit=0;bit<5;bit++){
+		[[controlReg2Matrix cellWithTag:bit] setState: ![model gateEnable:bit]];
+	}
 }
-
-
-
-#pragma mark ¥¥¥Accessors
 
 #pragma mark ¥¥¥Actions
 - (IBAction) settingLockAction:(id) sender
@@ -196,7 +188,6 @@
 		[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
-
 
 - (IBAction) discriminatorAction:(id)sender
 {
@@ -242,38 +233,22 @@
 
 - (IBAction) controlReg1Action:(id)sender
 {
-    unsigned short value = [model controlReg1];
-    if(sender == virtualStationField){
-        value &= ~0xff;
-        value |= [sender intValue] & 0xff;
-    }
-    else {
-        int tag = [[sender selectedCell] tag];
-        switch(tag){
-            case kZeroSuppressionBit:
-            case kECLPortEnableBit:
-            case kCoincidenceBit:
-            case kOFSuppressionBit:
-                if([[sender selectedCell] state])value &= ~(0x1<<tag);
-                else value |= (0x1<<tag);
-				break;
-            default:
-                if([[sender selectedCell] state])value |= (0x1<<tag);
-                else value &= ~(0x1<<tag);
-				break;
-        }
-    }
-    
-    [model setControlReg1:value];
+	int tag = [[sender selectedCell] tag];
+	BOOL state = [[sender selectedCell] intValue];
+	switch(tag){
+		case kCoincidenceBit:		[model setCoincidence:state];			break;
+		case kZeroSuppressionBit:	[model setZeroSuppressionMode:state];	break;
+		case kRandomAccessBit:		[model setRandomAccessMode:state];		break;
+		case kLAMEnableBit:			[model setLamEnable:state];				break;
+		case kOFSuppressionBit:		[model setOfSuppressionMode:state];		break;
+	}
 }
 
 - (IBAction) controlReg2Action:(id)sender
 {
-    unsigned short value = [model controlReg2];
-    int tag = [[sender selectedCell] tag];
-	if([[sender selectedCell] state])value &= ~(0x1<<tag);
-    else value |= (0x1<<tag);
-    [model setControlReg2:value];
+	int tag = [[sender selectedCell] tag];
+	BOOL state = [[sender selectedCell] intValue];
+    [model setGateEnable:tag withValue:!state];
 }
 
 
@@ -281,8 +256,13 @@
 {
     @try {
         [model readControlReg1];
-        NSLog(@"AD413A Read Control Register1 for Station %d result:0x%0x\n",[model stationNumber]+1,[model controlReg1]);
-    }
+        NSLog(@"AD413A Read Control Register1 for Station %d\n",[model stationNumber]+1);
+		NSLog(@"lamEnable: %d\n",[model lamEnable]);
+		NSLog(@"coincidence: %d\n",[model coincidence]);
+		NSLog(@"randomAccessMode: %d\n",[model randomAccessMode]);
+		NSLog(@"ofSuppressionMode: %d\n",[model ofSuppressionMode]);
+		NSLog(@"eclMode: %d\n",[model eclMode]);
+	}
 	@catch(NSException* localException) {
         [self showError:localException name:@"Read Control Register1"];
     }
@@ -292,7 +272,7 @@
 {
     @try {
         [model writeControlReg1];
-        NSLog(@"AD413A Write Control Register1 for Station %d value:0x%0x \n",[model stationNumber]+1,[model controlReg1]);
+        NSLog(@"AD413A Write Control Register1 for Station %d\n",[model stationNumber]+1);
     }
 	@catch(NSException* localException) {
         [self showError:localException name:@"Write Control Register1"];
@@ -304,7 +284,11 @@
 {
     @try {
         [model readControlReg2];
-        NSLog(@"AD413A Read Control Register2 for Station %d result:0x%0x\n",[model stationNumber]+1,[model controlReg2]);
+        NSLog(@"AD413A Read Control Register2 for Station %d result:0x%0x\n",[model stationNumber]+1);
+		int bit;
+		for(bit=0;bit<5;bit++){
+			NSLog(@"Gate %d Enabled = %d\n",bit,![model gateEnable:bit]);
+		}
     }
 	@catch(NSException* localException) {
         [self showError:localException name:@"Read Control Register2"];
@@ -315,7 +299,7 @@
 {
     @try {
         [model writeControlReg2];
-        NSLog(@"AD413A Write Control Register2 for Station %d value:0x%0x\n",[model stationNumber]+1,[model controlReg1]);
+        NSLog(@"AD413A Write Control Register2 for Station %d\n",[model stationNumber]+1);
     }
 	@catch(NSException* localException) {
         [self showError:localException name:@"Write Control Register2"];

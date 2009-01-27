@@ -28,18 +28,18 @@
 @class ORDataPacket;
 
 enum {
+    kEnableGate1Bit     = 0,
+    kEnableGate2Bit     = 1,
+    kEnableGate3Bit     = 2,
+    kEnableGate4Bit     = 3,
+    kMasterGateBit      = 4,
     kZeroSuppressionBit = 8,
     kECLPortEnableBit   = 9,
     kCoincidenceBit     = 12,
     kRandomAccessBit    = 13,
     kLAMEnableBit       = 14,
     kOFSuppressionBit   = 15,
-    kEnableGate1Bit     = 0,
-    kEnableGate2Bit     = 1,
-    kEnableGate3Bit     = 2,
-    kEnableGate4Bit     = 3,
-    kMasterGateBit      = 4,
-
+	
 };
 
 
@@ -48,18 +48,22 @@ enum {
         unsigned long dataId;
         unsigned short onlineMask;
 		NSMutableArray* discriminators;
-		unsigned short controlReg1;
-		unsigned short controlReg2;
         
-        //place to cache some stuff for alittle more speed.
-        unsigned long 	unChangingDataPart;
-        unsigned short cachedStation;
+ 		short vsn;
+		BOOL lamEnable;
+		BOOL  coincidence;
         BOOL  randomAccessMode;
-        BOOL  zeroSuppressionMode;
+		BOOL  ofSuppressionMode;
+		BOOL  zeroSuppressionMode;
 		BOOL  eclMode;
+		BOOL  gateEnable[5];
         short onlineChannelCount;
-        short onlineList[8];
-        
+        short onlineList[4];
+	
+		//place to cache some stuff for alittle more speed.
+		unsigned long 	unChangingDataPart;
+		unsigned short cachedStation;
+		BOOL oldZeroSuppressionMode;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -78,10 +82,24 @@ enum {
 - (void)	    setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
 - (void)        setDiscriminator:(unsigned short)aValue forChan:(int)aChan;
 - (unsigned short) discriminatorForChan:(int)aChan;
-- (unsigned short) controlReg1;
-- (void)        setControlReg1: (unsigned short) aControlReg1;
-- (unsigned short) controlReg2;
-- (void)        setControlReg2: (unsigned short) aControlReg2;
+
+//control Reg1
+- (BOOL) coincidence;
+- (void) setCoincidence:(BOOL)aState;
+- (BOOL) randomAccessMode;
+- (void) setRandomAccessMode:(BOOL)aState;
+- (BOOL) zeroSuppressionMode;
+- (void) setZeroSuppressionMode:(BOOL)aState;
+- (BOOL) ofSuppressionMode;
+- (void) setOfSuppressionMode:(BOOL)aState;
+- (BOOL) eclMode;
+- (void) setEclMode:(BOOL)aState;
+- (BOOL) lamEnable;
+- (void) setLamEnable: (BOOL) aState;
+
+- (BOOL) gateEnable:(int)index;
+- (void) setGateEnable:(int)index withValue:(BOOL) aState;
+- (int) vsn;
 
 #pragma mark ¥¥¥Hardware functions
 - (void) readControlReg1;
@@ -104,7 +122,9 @@ enum {
 
 #pragma mark ¥¥¥FERA
 - (void) setVSN:(int)aVSN;
-- (void) shipFeraData:(void*)ptr length:(int)len;
+- (void) setFeraEnable:(BOOL)aState;
+- (void) shipFeraData:(ORDataPacket*)aDataPacket data:(unsigned long)data;
+- (int) maxNumChannels;
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
