@@ -163,7 +163,7 @@
     [[controlReg1Matrix cellWithTag:kRandomAccessBit]    setState: [model randomAccessMode]];
     [[controlReg1Matrix cellWithTag:kLAMEnableBit]       setState: [model lamEnable]];
     [[controlReg1Matrix cellWithTag:kOFSuppressionBit]   setState: [model ofSuppressionMode]];
-	[CAMACEnabledField setStringValue: [model CAMACMode]?@"YES":@"NO"];
+	[CAMACEnabledField setStringValue: [model CAMACMode]?@"CAMAC":@"FERA"];
 	[virtualStationField setIntValue:[model vsn]];
 }
 
@@ -257,12 +257,12 @@
     @try {
         [model readControlReg1];
         NSLog(@"AD413A Read Control Register1 for Station %d\n",[model stationNumber]+1);
-		NSLog(@"lamEnable: %d\n",[model lamEnable]);
-		NSLog(@"coincidence: %d\n",[model coincidence]);
-		NSLog(@"randomAccessMode: %d\n",[model randomAccessMode]);
-		NSLog(@"ofSuppressionMode: %d\n",[model ofSuppressionMode]);
-		NSLog(@"zeroSuppressionMode: %d\n",[model zeroSuppressionMode]);
-		NSLog(@"CAMAC Mode: %d\n",![model CAMACMode]);
+		NSLog(@"lamEnable: %@\n",[model lamEnable]?@"YES":@"NO");
+		NSLog(@"coincidence: %@\n",[model coincidence]?@"YES":@"NO");
+		NSLog(@"randomAccessMode: %@\n",[model randomAccessMode]?@"YES":@"NO");
+		NSLog(@"ofSuppressionMode: %@\n",[model ofSuppressionMode]?@"YES":@"NO");
+		NSLog(@"zeroSuppressionMode: %@\n",[model zeroSuppressionMode]?@"YES":@"NO");
+		NSLog(@"Mode: %@\n",[model CAMACMode]?@"CAMAC":@"FERA");
 	}
 	@catch(NSException* localException) {
         [self showError:localException name:@"Read Control Register1"];

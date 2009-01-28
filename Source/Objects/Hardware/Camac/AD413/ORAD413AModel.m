@@ -243,10 +243,10 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     unsigned short aValue;
     [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:0 data:&aValue];
-	zeroSuppressionMode |= (aValue>>kZeroSuppressionBit)&0x1;
-	coincidence			|= (aValue>>kCoincidenceBit)&0x1;
+	zeroSuppressionMode |= !(aValue>>kZeroSuppressionBit)&0x1;
+	coincidence			|= !(aValue>>kCoincidenceBit)&0x1;
 	randomAccessMode	|= (aValue>>kRandomAccessBit)&0x1;
-	ofSuppressionMode	|= (aValue>>kOFSuppressionBit)&0x1;
+	ofSuppressionMode	|= !(aValue>>kOFSuppressionBit)&0x1;
 	CAMACMode			|= (aValue>>kECLPortEnableBit)&0x1;
 	lamEnable			|= (aValue>>kLAMEnableBit)&0x1;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
@@ -268,10 +268,10 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
 	unsigned short controlReg1 = 0;
 	controlReg1 |= vsn;
-	controlReg1 |= zeroSuppressionMode<<kZeroSuppressionBit;
-	controlReg1 |= coincidence<<kCoincidenceBit;
+	controlReg1 |= (!zeroSuppressionMode)<<kZeroSuppressionBit;
+	controlReg1 |= (!coincidence)<<kCoincidenceBit;
 	controlReg1 |= randomAccessMode<<kRandomAccessBit;
-	controlReg1 |= ofSuppressionMode<<kOFSuppressionBit;
+	controlReg1 |= (!ofSuppressionMode)<<kOFSuppressionBit;
 	controlReg1 |= zeroSuppressionMode<<kZeroSuppressionBit;
 	controlReg1 |= CAMACMode<<kECLPortEnableBit;
 	controlReg1 |= lamEnable<<kLAMEnableBit;
@@ -542,7 +542,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     [objDictionary setObject:[NSNumber numberWithBool:randomAccessMode]		forKey:@"randomAccessMode"];
     [objDictionary setObject:[NSNumber numberWithBool:zeroSuppressionMode]	forKey:@"zeroSuppressionMode"];
     [objDictionary setObject:[NSNumber numberWithBool:ofSuppressionMode]	forKey:@"ofSuppressionMode"];
-    [objDictionary setObject:[NSNumber numberWithBool:CAMACMode]				forKey:@"CAMACMode"];
+    [objDictionary setObject:[NSNumber numberWithBool:CAMACMode]			forKey:@"CAMACMode"];
     [objDictionary setObject:[NSNumber numberWithBool:lamEnable]			forKey:@"lamEnable"];
 	int bit;
 	for(bit=0;bit<5;bit++){
