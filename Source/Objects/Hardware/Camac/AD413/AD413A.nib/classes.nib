@@ -113,6 +113,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>CAMACEnabledField</key>
+				<string>NSTextField</string>
 				<key>clearModuleButton</key>
 				<string>NSButton</string>
 				<key>controlReg1Matrix</key>
@@ -123,8 +125,6 @@
 				<string>NSMatrix</string>
 				<key>discriminatorStepperMatrix</key>
 				<string>NSMatrix</string>
-				<key>eclEnabledField</key>
-				<string>NSTextField</string>
 				<key>onlineMaskMatrix</key>
 				<string>NSMatrix</string>
 				<key>readControlReg1Button</key>

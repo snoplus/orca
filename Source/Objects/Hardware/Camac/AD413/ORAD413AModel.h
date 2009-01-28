@@ -55,7 +55,7 @@ enum {
         BOOL  randomAccessMode;
 		BOOL  ofSuppressionMode;
 		BOOL  zeroSuppressionMode;
-		BOOL  eclMode;
+		BOOL  CAMACMode;
 		BOOL  gateEnable[5];
         short onlineChannelCount;
         short onlineList[4];
@@ -92,8 +92,8 @@ enum {
 - (void) setZeroSuppressionMode:(BOOL)aState;
 - (BOOL) ofSuppressionMode;
 - (void) setOfSuppressionMode:(BOOL)aState;
-- (BOOL) eclMode;
-- (void) setEclMode:(BOOL)aState;
+- (BOOL) CAMACMode;
+- (void) setCAMACMode:(BOOL)aState;
 - (BOOL) lamEnable;
 - (void) setLamEnable: (BOOL) aState;
 

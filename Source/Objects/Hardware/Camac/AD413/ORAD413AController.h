@@ -37,7 +37,7 @@
         IBOutlet NSTextField*   settingLockDocField;
 
 		IBOutlet NSTextField*   virtualStationField;
-		IBOutlet NSTextField*   eclEnabledField;
+		IBOutlet NSTextField*   CAMACEnabledField;
         IBOutlet NSMatrix*		controlReg1Matrix;
         IBOutlet NSButton*		readControlReg1Button;
         IBOutlet NSButton*		writeControlReg1Button;

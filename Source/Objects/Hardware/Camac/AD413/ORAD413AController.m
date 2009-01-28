@@ -163,7 +163,7 @@
     [[controlReg1Matrix cellWithTag:kRandomAccessBit]    setState: [model randomAccessMode]];
     [[controlReg1Matrix cellWithTag:kLAMEnableBit]       setState: [model lamEnable]];
     [[controlReg1Matrix cellWithTag:kOFSuppressionBit]   setState: [model ofSuppressionMode]];
-	[eclEnabledField setStringValue: [model eclMode]?@"YES":@"NO"];
+	[CAMACEnabledField setStringValue: [model CAMACMode]?@"YES":@"NO"];
 	[virtualStationField setIntValue:[model vsn]];
 }
 
@@ -261,7 +261,8 @@
 		NSLog(@"coincidence: %d\n",[model coincidence]);
 		NSLog(@"randomAccessMode: %d\n",[model randomAccessMode]);
 		NSLog(@"ofSuppressionMode: %d\n",[model ofSuppressionMode]);
-		NSLog(@"eclMode: %d\n",[model eclMode]);
+		NSLog(@"zeroSuppressionMode: %d\n",[model zeroSuppressionMode]);
+		NSLog(@"CAMAC Mode: %d\n",![model CAMACMode]);
 	}
 	@catch(NSException* localException) {
         [self showError:localException name:@"Read Control Register1"];
