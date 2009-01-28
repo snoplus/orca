@@ -276,7 +276,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	controlReg1 |= CAMACMode<<kECLPortEnableBit;
 	controlReg1 |= lamEnable<<kLAMEnableBit;
 	
-    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:16 data:&controlReg1];
+    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:16 data:&controlReg1];
 
 }
 
@@ -287,13 +287,13 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	for(bit=0;bit<5;bit++){
 		if(!gateEnable[bit])controlReg2 |= (1<<bit); //zero is enabled
 	}
-    [[self adapter] camacShortNAF:[self stationNumber] a:1 f:16 data:&controlReg2];
+    [[self adapter] camacShortNAF:[self stationNumber]+1 a:1 f:16 data:&controlReg2];
 
 }
 
 - (void) clearModule
 {
-    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:9];
+    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:9];
 
 }
 
@@ -405,48 +405,43 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     @try {
         
-        //test the LAM
-        unsigned short dummy;
         unsigned short adcValue;
-		unsigned short status = [controller camacShortNAF:cachedStation a:0 f:8 data:&dummy];
 		
-        if(isQbitSet(status)) { //LAM status comes back in the Q bit
-            
-            if(zeroSuppressionMode){            
-                unsigned short data;
-                [controller camacShortNAF:cachedStation a:0 f:2 data:&data];
-                int numValues = (data>>11) & 0x3;
-                int i;
-                for(i=0;i<numValues;i++){
-                    [controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&data];
-                    int chan = (data>>13)&0x3;
-                    [self ship:aDataPacket adc:data&0x1fff forChan:chan];
-                    //in this mode, the LAM is cleared when the last adc is read.
-                }
-            }
-            else {
-                if(randomAccessMode){
-                    if(onlineChannelCount){
-                        int i;
-                        for(i=0;i<onlineChannelCount;i++){
-                            //read one adc channnel
-                            [controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
-                            [self ship:aDataPacket adc:adcValue&0x1fff forChan:onlineList[i]];
-                        }
-                    }
-                }
-                else {
-                    int i;
-                    for(i=0;i<4;i++){
-                        [controller camacShortNAF:cachedStation a:i f:2 data:&adcValue];
-                        [self ship:aDataPacket adc:adcValue&0x1fff forChan:i];
-                    }
-                }
-            }
-			
-			[controller camacShortNAF:cachedStation a:0 f:10 data:&dummy];
-            
-        }
+		if(randomAccessMode){
+			if(onlineChannelCount){
+				int i;
+				for(i=0;i<onlineChannelCount;i++){
+					//read one adc channnel
+					[controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
+					[self ship:aDataPacket adc:adcValue&0x1fff forChan:onlineList[i]];
+				}
+			}
+		}
+		else {
+			if(zeroSuppressionMode){            
+				unsigned short data;
+				unsigned short  status = [controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+				if(isQbitSet(status)){
+					int numValues = (data>>11) & 0x3;
+					int i;
+					for(i=0;i<numValues;i++){
+						[controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+						int chan = (data>>13)&0x3;
+						[self ship:aDataPacket adc:data&0x1fff forChan:chan];
+						//in this mode, the LAM is cleared when the last adc is read.
+					}
+				}
+			}
+			else {
+
+				int i;
+				for(i=0;i<4;i++){
+					[controller camacShortNAF:cachedStation a:i f:2 data:&adcValue];
+					[self ship:aDataPacket adc:adcValue&0x1fff forChan:i];
+				}
+			}
+
+		}
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];
@@ -508,6 +503,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	for(bit=0;bit<5;bit++){
 		[self setGateEnable:bit withValue: [decoder decodeBoolForKey:[NSString stringWithFormat:@"enableGate%d",bit]]];
 	}
+	[self setCAMACMode:YES];
     
     [[self undoManager] enableUndoRegistration];
 	
