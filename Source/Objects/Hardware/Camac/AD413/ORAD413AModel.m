@@ -44,19 +44,6 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (id) init
 {		
     self = [super init];
-    
-    //set default:
-    //zero suppresion   = NO
-    //ECL port enable   = NO
-    //Coincidence       = NO
-    //Random Access     = NO
-    //OF suppression    = NO
-    controlReg1 = 0x9300;
-    
-    //all gates disabled
-    controlReg2 = 0x00ff;
-    
-    
     return self;
 }
 
@@ -161,41 +148,91 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	 userInfo: [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"]];
 }
 
-- (unsigned short) controlReg1
+- (BOOL) gateEnable:(int)index
 {
-    
-    return controlReg1;
+	return gateEnable[index];
 }
 
-- (void) setControlReg1: (unsigned short) aControlReg1
+- (void) setGateEnable:(int)index withValue:(BOOL) aState
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setControlReg1:controlReg1];
-	
-    controlReg1 = aControlReg1;
-    
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORAD413AControlReg1ChangedNotification
-	 object:self];
+	[[[self undoManager] prepareWithInvocationTarget:self] setGateEnable:index withValue:gateEnable[index]];
+    gateEnable[index] = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg2ChangedNotification object:self];
+
 }
 
-
-- (unsigned short) controlReg2
+- (BOOL) coincidence
 {
-    
-    return controlReg2;
+    return coincidence;
 }
 
-- (void) setControlReg2: (unsigned short) aControlReg2
+- (void) setCoincidence: (BOOL) aState
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setControlReg2:controlReg2];
-	
-	
-    controlReg2 = aControlReg2 & 0x001f;
-    
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORAD413AControlReg2ChangedNotification
-	 object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setCoincidence:coincidence];
+    coincidence = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
 }
+
+- (BOOL) randomAccessMode
+{
+    return randomAccessMode;
+}
+
+- (void) setRandomAccessMode: (BOOL) aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRandomAccessMode:randomAccessMode];
+    randomAccessMode = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
+}
+
+- (BOOL) zeroSuppressionMode
+{
+    return zeroSuppressionMode;
+}
+
+- (void) setZeroSuppressionMode: (BOOL) aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setZeroSuppressionMode:zeroSuppressionMode];
+    zeroSuppressionMode = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
+}
+
+- (BOOL) ofSuppressionMode
+{
+    return ofSuppressionMode;
+}
+
+- (void) setOfSuppressionMode: (BOOL) aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setOfSuppressionMode:ofSuppressionMode];
+    ofSuppressionMode = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
+}
+
+- (BOOL) lamEnable
+{
+    return lamEnable;
+}
+
+- (void) setLamEnable: (BOOL) aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setLamEnable:lamEnable];
+    lamEnable = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
+}
+
+- (BOOL) eclMode
+{
+    return eclMode;
+}
+
+- (void) setEclMode: (BOOL) aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEclMode:eclMode];
+    eclMode = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
+}
+
 
 #pragma mark ¥¥¥Hardware functions
 
@@ -205,29 +242,58 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     unsigned short aValue;
     [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:0 data:&aValue];
-    [self setControlReg1:aValue];
+	zeroSuppressionMode |= (aValue>>kZeroSuppressionBit)&0x1;
+	coincidence			|= (aValue>>kCoincidenceBit)&0x1;
+	randomAccessMode	|= (aValue>>kRandomAccessBit)&0x1;
+	ofSuppressionMode	|= (aValue>>kOFSuppressionBit)&0x1;
+	eclMode				|= (aValue>>kECLPortEnableBit)&0x1;
+	lamEnable			|= (aValue>>kLAMEnableBit)&0x1;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
 }
 
 - (void) readControlReg2
 {
     unsigned short aValue;
     [[self adapter] camacShortNAF:[self stationNumber]+1 a:1 f:0 data:&aValue];
-    [self setControlReg2:aValue];
+	int bit;
+	for(bit=0;bit<5;bit++){
+		gateEnable[bit] = ((aValue>>bit) & 0x1);
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg2ChangedNotification object:self];
+	
 }
 
 - (void) writeControlReg1
 {
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:16 data:&controlReg1];
+	unsigned short controlReg1 = 0;
+	controlReg1 |= vsn;
+	controlReg1 |= zeroSuppressionMode<<kZeroSuppressionBit;
+	controlReg1 |= coincidence<<kCoincidenceBit;
+	controlReg1 |= randomAccessMode<<kRandomAccessBit;
+	controlReg1 |= ofSuppressionMode<<kOFSuppressionBit;
+	controlReg1 |= zeroSuppressionMode<<kZeroSuppressionBit;
+	controlReg1 |= eclMode<<kECLPortEnableBit;
+	controlReg1 |= lamEnable<<kLAMEnableBit;
+	
+    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:16 data:&controlReg1];
+
 }
 
 - (void) writeControlReg2
 {
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:1 f:16 data:&controlReg2];
+	unsigned short controlReg2 = 0;
+	int bit;
+	for(bit=0;bit<5;bit++){
+		if(!gateEnable[bit])controlReg2 |= (1<<bit);
+	}
+    [[self adapter] camacShortNAF:[self stationNumber] a:1 f:16 data:&controlReg2];
+
 }
 
 - (void) clearModule
 {
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:9 data:&controlReg2];
+    [[self adapter] camacShortNAF:[self stationNumber] a:0 f:9];
+
 }
 
 - (void) clearLAM
@@ -243,6 +309,11 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
         [[self adapter] camacShortNAF:[self stationNumber]+1 a:i f:1 data:&aValue];
         [self setDiscriminator:0x00ff&aValue forChan:i];
     }
+}
+
+- (int) vsn
+{
+	return vsn;
 }
 
 - (void) writeDiscriminators
@@ -303,9 +374,6 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
     unChangingDataPart   = (([self crateNumber]&0xf)<<21) | ((([self stationNumber]+1)& 0x0000001f)<<16); //doesn't change so do it here.
 	cachedStation = [self stationNumber]+1;
-    randomAccessMode    = (controlReg1>>kRandomAccessBit)    & 0x1;
-    zeroSuppressionMode = !((controlReg1>>kZeroSuppressionBit) & 0x1);
-    eclMode				= !((controlReg1>>kECLPortEnableBit) & 0x1);
 	
     [self clearExceptionCount];
     
@@ -332,7 +400,6 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
-
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
@@ -357,7 +424,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
                 }
             }
             else {
-                if(randomAccessMode && !eclMode ){
+                if(randomAccessMode){
                     if(onlineChannelCount){
                         int i;
                         for(i=0;i<onlineChannelCount;i++){
@@ -393,12 +460,32 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 #pragma mark ¥¥¥FERA
 - (void) setVSN:(int)aVSN
 {
-	unsigned short data = aVSN & 0xff;
-    [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:16 data:&data];
+	vsn = aVSN;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
 }
 
-- (void) shipFeraData:(void*)ptr length:(int)len
+- (void) setFeraEnable:(BOOL)aState
 {
+	[self setEclMode:aState];
+	if(aState){
+		oldZeroSuppressionMode = zeroSuppressionMode;
+		[self setZeroSuppressionMode:YES];
+	}
+	else {
+		[self setZeroSuppressionMode:oldZeroSuppressionMode];
+	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
+}
+
+- (int) maxNumChannels
+{
+	return 4;
+}
+
+- (void) shipFeraData:(ORDataPacket*)aDataPacket data:(unsigned long)data 
+{
+	int chan = (data>>13)&0x3;
+	[self ship:aDataPacket adc:data&0x1fff forChan:chan];
 }
 
 #pragma mark ¥¥¥Archival
@@ -409,10 +496,17 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	
     [[self undoManager] disableUndoRegistration];
     
-    [self setOnlineMask:[decoder decodeIntForKey:   @"ORAD413AOnlineMask"]];
-    [self setDiscriminators:[decoder decodeObjectForKey:@"OR413Discriminators"]];
-    [self setControlReg1:[decoder decodeIntForKey:@"OR413AControlReg1"]];
-    [self setControlReg2:[decoder decodeIntForKey:@"OR413AControlReg2"]];
+    [self setOnlineMask:			[decoder decodeIntForKey:   @"ORAD413AOnlineMask"]];
+    [self setDiscriminators:		[decoder decodeObjectForKey:@"OR413Discriminators"]];
+    [self setCoincidence:			[decoder decodeBoolForKey:	@"coincidence"]];
+    [self setRandomAccessMode:		[decoder decodeBoolForKey:	@"randomAccessMode"]];
+    [self setZeroSuppressionMode:	[decoder decodeBoolForKey:	@"zeroSuppressionMode"]];
+    [self setOfSuppressionMode:		[decoder decodeBoolForKey:	@"ofSuppressionMode"]];
+    [self setLamEnable:				[decoder decodeBoolForKey:	@"lamEnable"]];
+	int bit;
+	for(bit=0;bit<5;bit++){
+		[self setGateEnable:bit withValue: [decoder decodeBoolForKey:[NSString stringWithFormat:@"enableGate%d",bit]]];
+	}
     
     [[self undoManager] enableUndoRegistration];
 	
@@ -422,27 +516,43 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:onlineMask    forKey:@"ORAD413AOnlineMask"];
-    [encoder encodeObject:discriminators forKey:@"OR413Discriminators"];
-    [encoder encodeInt:controlReg1 forKey:@"OR413AControlReg1"];
-    [encoder encodeInt:controlReg2 forKey:@"OR413AControlReg2"];
+    [encoder encodeInt:onlineMask			forKey:@"ORAD413AOnlineMask"];
+    [encoder encodeObject:discriminators	forKey:@"OR413Discriminators"];
+	
+    [encoder encodeBool:coincidence			forKey:@"coincidence"];
+    [encoder encodeBool:randomAccessMode	forKey:@"randomAccessMode"];
+    [encoder encodeBool:zeroSuppressionMode forKey:@"zeroSuppressionMode"];
+    [encoder encodeBool:ofSuppressionMode	forKey:@"ofSuppressionMode"];
+    [encoder encodeBool:lamEnable			forKey:@"lamEnable"];
+	
+	int bit;
+	for(bit=0;bit<5;bit++){
+		[encoder encodeBool:gateEnable[bit] forKey:[NSString stringWithFormat:@"enableGate%d",bit]];
+	}
 	
 }
-
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithInt:onlineMask] forKey:@"onlineMask"];
-    [objDictionary setObject:[NSNumber numberWithInt:controlReg1] forKey:@"controlReg1"];
-    [objDictionary setObject:[NSNumber numberWithInt:controlReg1] forKey:@"controlReg2"];
+	
+    [objDictionary setObject:[NSNumber numberWithBool:coincidence]			forKey:@"coincidence"];
+    [objDictionary setObject:[NSNumber numberWithBool:randomAccessMode]		forKey:@"randomAccessMode"];
+    [objDictionary setObject:[NSNumber numberWithBool:zeroSuppressionMode]	forKey:@"zeroSuppressionMode"];
+    [objDictionary setObject:[NSNumber numberWithBool:ofSuppressionMode]	forKey:@"ofSuppressionMode"];
+    [objDictionary setObject:[NSNumber numberWithBool:eclMode]				forKey:@"eclMode"];
+    [objDictionary setObject:[NSNumber numberWithBool:lamEnable]			forKey:@"lamEnable"];
+	int bit;
+	for(bit=0;bit<5;bit++){
+		[objDictionary setObject:[NSNumber numberWithBool:gateEnable[bit]]	forKey:[NSString stringWithFormat:@"enableGate%d",bit]];
+	}
+	
     return objDictionary;
 }
-
 @end
 
 @implementation ORAD413AModel (private)
-
 - (void) ship:(ORDataPacket*)aDataPacket adc:(unsigned short)adcValue forChan:(int)i
 {
     if(IsShortForm(dataId)){
@@ -456,5 +566,4 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
         [aDataPacket addLongsToFrameBuffer:data length:2];
     }
 }
-
 @end
