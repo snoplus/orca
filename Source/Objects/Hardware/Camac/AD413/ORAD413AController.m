@@ -288,7 +288,8 @@
         NSLog(@"AD413A Read Control Register2 for Station %d result:0x%0x\n",[model stationNumber]+1);
 		int bit;
 		for(bit=0;bit<5;bit++){
-			NSLog(@"Gate %d Enabled = %d\n",bit,![model gateEnable:bit]);
+			if(bit<4)NSLog(@"Gate %d Enabled = %@\n",bit,[model gateEnable:bit]?@"NO":@"YES");
+			else     NSLog(@"Master Gate Enabled = %@\n",[model gateEnable:bit]?@"NO":@"YES");
 		}
     }
 	@catch(NSException* localException) {

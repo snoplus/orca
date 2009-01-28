@@ -258,7 +258,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     [[self adapter] camacShortNAF:[self stationNumber]+1 a:1 f:0 data:&aValue];
 	int bit;
 	for(bit=0;bit<5;bit++){
-		gateEnable[bit] = ((aValue>>bit) & 0x1);
+		gateEnable[bit] = !((aValue>>bit) & 0x1); //zero is enabled
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg2ChangedNotification object:self];
 	
@@ -285,7 +285,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	unsigned short controlReg2 = 0;
 	int bit;
 	for(bit=0;bit<5;bit++){
-		if(!gateEnable[bit])controlReg2 |= (1<<bit);
+		if(!gateEnable[bit])controlReg2 |= (1<<bit); //zero is enabled
 	}
     [[self adapter] camacShortNAF:[self stationNumber] a:1 f:16 data:&controlReg2];
 
