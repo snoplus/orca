@@ -44,6 +44,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (id) init
 {		
     self = [super init];
+	[self setCAMACMode:YES];
     return self;
 }
 
