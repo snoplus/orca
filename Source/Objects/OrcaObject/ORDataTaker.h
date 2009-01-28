@@ -34,7 +34,9 @@
 
 @protocol ORFeraReadout
 - (void) setVSN:(int)aVSN;
-- (void) shipFeraData:(void*)ptr length:(int)len;
+- (void) setFeraEnable:(BOOL)aState;
+- (void) shipFeraData:(ORDataPacket*)aDataPacket data:(unsigned long)data;
+- (int) maxNumChannels;
 @end
 
 
