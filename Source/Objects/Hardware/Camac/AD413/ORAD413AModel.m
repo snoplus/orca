@@ -408,7 +408,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     @try {
 		unsigned short status = [controller camacShortNAF:cachedStation a:0 f:8]; //test the lam
 		BOOL lamIsSet = isQbitSet(status);
-		if((lamEnable && lamIsSet) || lamEnable){
+		if((lamEnable && lamIsSet) || !lamEnable){
 			if(randomAccessMode)		[self readChannels:aDataPacket];
 			else {
 				if(zeroSuppressionMode)	[self readZeroSuppressedChannels:aDataPacket];
