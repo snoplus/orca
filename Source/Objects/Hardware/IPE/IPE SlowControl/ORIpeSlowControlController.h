@@ -32,18 +32,44 @@
 	IBOutlet NSButton*      autoReconnectButton;
     
     
-    //slow control -tb-
+    //slow control - obsolete -tb-
 	IBOutlet NSTextField*   monitoringField;
 	IBOutlet NSTextField*   monitoringIntValueField;
     
-    //new -tb-
+    //slow control - new -tb-
     IBOutlet NSOutlineView *sensorTreeOutlineView;
+    
+    // Main Dialog
     IBOutlet NSTableView  *sensorTableView; // the channel/sensor list view
-    IBOutlet NSTextField *adeiUrlField;
+    //tab view
+    IBOutlet NSTabView   *ipeSlowControlTabView;
+    //general settings tab
+    IBOutlet NSTextField *adeiBaseUrlField;
+    IBOutlet NSComboBox  *adeiSetupOptionsComboBox;
+    //IBOutlet NSComboBox  *adeiSetupOptionsComboBox;
+    IBOutlet NSTextField *adeiServiceUrlField;
+    IBOutlet NSTableView *adeiSetupOptionsTableView; // the setup options list view
+	IBOutlet NSButton    *addAdeiSetupOptionButton;
+	IBOutlet NSButton    *removeAdeiSetupOptionButton;// button text changed to "Delete"
     IBOutlet NSScrollView *textView; //super class of a text view is NSText -tb-
                                      //[textView documentView] is a NSTextView -tb-
+    //sensor settings tab
+    IBOutlet NSTextField *sensorNumField;
+    IBOutlet NSTextField *sensorAdeiBaseUrlField;
+    IBOutlet NSTextField *sensorAdeiServiceUrlField;
+    IBOutlet NSTextField *sensorPathField;
+    IBOutlet NSTextField *minValueField;
+    IBOutlet NSTextField *maxValueField;
+    IBOutlet NSTextField *lowAlarmRangeField;
+    IBOutlet NSTextField *highAlarmRangeField;
+	IBOutlet NSButton    *isRecordingDataButton;
+                                     
+                                     
     // Drawers
     IBOutlet NSDrawer *leftDrawer;
+	IBOutlet NSButton *requestAdeiSensorTreeButton;
+	IBOutlet NSProgressIndicator *requestAdeiSensorTreeProgressIndicator;
+	IBOutlet NSButton *clearAdeiSensorTreeButton;
     IBOutlet NSDrawer *rightDrawer;
     //IBOutlet id  *adeiWebInterfaceWebView;
     IBOutlet WebView  *adeiWebInterfaceWebView;
@@ -59,6 +85,7 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) updateSensorSettings;
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 - (void) remotePortChanged:(NSNotification*)note;
 - (void) remoteHostChanged:(NSNotification*)note;
@@ -68,10 +95,28 @@
 - (void) autoReconnectChanged:(NSNotification*)note;
 #endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 - (void) lockChanged:(NSNotification*)aNotification;
+
 //slow control
-- (void) adeiServerUrlChanged:(NSNotification*)aNote;
+
+//general settings tab
+- (void) adeiBaseUrlChanged:(NSNotification*)aNote;
+- (void) adeiServiceUrlChanged:(NSNotification*)aNote;
+- (void) adeiSetupOptionsChanged:(NSNotification*)aNote;
 - (void) adeiTreeChanged:(NSNotification*)aNote;
+- (void) requestingAdeiTreeStarted:(NSNotification*)aNote;
+- (void) requestingAdeiTreeStopped:(NSNotification*)aNote;
+
 - (void) sensorListChanged:(NSNotification*)aNote;
+
+//sensor setting notifications
+- (void) selectedSensorNumChanged:(NSNotification*)aNote;
+- (void) dataChanged:(NSNotification*)aNote;
+- (void) adeiBaseUrlForSensorChanged:(NSNotification*)aNote;
+- (void) minValueChanged:(NSNotification*)aNote;
+- (void) maxValueChanged:(NSNotification*)aNote;
+- (void) lowAlarmRangeChanged:(NSNotification*)aNote;
+- (void) highAlarmRangeChanged:(NSNotification*)aNote;
+- (void) isRecordingDataChanged:(NSNotification*)aNote;
 
 // slow control -tb-
 - (void) monitoringFieldChanged:(NSNotification*)aNotification;
@@ -80,20 +125,23 @@
 
 #pragma mark ***Actions
 - (IBAction) lockAction:(id)sender;
-#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-- (IBAction) remotePortFieldAction:(id)sender;
-- (IBAction) remoteHostFieldAction:(id)sender;
-- (IBAction) connectButtonAction:(id)sender;
-- (IBAction) connectAtStartAction:(id)sender;
-- (IBAction) autoReconnectAction:(id)sender;
-#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 //new -tb-
 //- (IBAction) loadButtonAction:(id)sender;  OBSOLETE -tb-
 //- (IBAction) loadCSVFileButtonAction:(id)sender; OBSOLETE -tb-
+- (IBAction) adeiBaseUrlFieldAction:(id)sender;
+- (IBAction) addAdeiSetupOptionAction:(id)sender;
+- (IBAction) removeAdeiSetupOptionAction:(id)sender;
 - (IBAction) requestSensorTreeButtonAction:(id)sender;
 - (IBAction) sensorlistButtonAction:(id)sender;
 - (IBAction) dumpSensorlistButtonAction:(id)sender;
+//sensor settings actions
+- (IBAction) adeiBaseUrlForSensorAction:(id)sender;
+- (IBAction) minValueChangedAction:(id)sender;
+- (IBAction) maxValueChangedAction:(id)sender;
+- (IBAction) lowAlarmRangeChangedAction:(id)sender;
+- (IBAction) highAlarmRangeChangedAction:(id)sender;
+- (IBAction) isRecordingDataChangedAction:(id)sender;
 //drawer actions
 - (IBAction)openLeftDrawer:(id)sender;
 - (IBAction)closeLeftDrawer:(id)sender;
@@ -102,14 +150,15 @@
 - (IBAction)closeRightDrawer:(id)sender;
 - (IBAction)toggleRightDrawer:(id)sender;
 
-//web view
-
+//list view context menu
 - (IBAction)sensorListContextMenuAction:(id)sender;
 - (IBAction)sensorListContextMenuLoadValueAction:(id)sender;
 - (IBAction)sensorListContextMenuEditAction:(id)sender;
 - (IBAction)sensorListContextMenuRemoveAction:(id)sender;
-- (IBAction)sensorListContextMenuDisplayWebViewAction:(id)sender;
-- (IBAction)loadAdeiHomeInWebInterfaceWebViewAction:(id)sender;
+- (IBAction)sensorListContextMenuDisplayWebViewAction:(id)sender;//web view
+
+
+- (IBAction)loadAdeiHomeInWebInterfaceWebViewAction:(id)sender;//web view
 
 
 
@@ -124,6 +173,12 @@
 #pragma mark •••Data Source Methods (TableView)
 - (int)numberOfRowsInTableView:(NSTableView *)tableView;
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row;
+//cloned Data Source Methods (TableView) for adeiSetupOptionsTableView
+- (int)numberOfRowsInAdeiSetupOptionsTableView:(NSTableView *)tableView;
+- (id)adeiSetupOptionsTableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
+- (void)adeiSetupOptionsTableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row;
+
 
 /* Optional - Editing Support
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row;

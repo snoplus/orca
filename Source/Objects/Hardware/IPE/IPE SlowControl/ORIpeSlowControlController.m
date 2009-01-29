@@ -34,8 +34,14 @@
       #define    DebugTB(x) 
     #endif
 
+    #if 1
+      // if 1 all methods will print out a message -> for testing IB connections -tb-
+      #define    DebugMethCallsTB(x) x
+    #endif
+    
 #else
   #define    DebugTB(x) 
+  #define    DebugMethCallsTB(x) 
 #endif
 
 
@@ -84,8 +90,18 @@
                        object : nil];
                        
 	[notifyCenter addObserver : self
-                      selector: @selector(adeiServerUrlChanged:)
-                          name: ORIpeSlowControlAdeiServerUrlChangedNotification
+                      selector: @selector(adeiBaseUrlChanged:)
+                          name: ORIpeSlowControlAdeiBaseUrlChangedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(adeiServiceUrlChanged:)
+                          name: ORIpeSlowControlAdeiServiceUrlChangedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(adeiSetupOptionsChanged:)
+                          name: ORIpeSlowControlAdeiSetupOptionsChangedNotification
                        object : model];
                        
 	[notifyCenter addObserver : self
@@ -94,11 +110,62 @@
                        object : model];
                        
 	[notifyCenter addObserver : self
+                      selector: @selector(requestingAdeiTreeStarted:)
+                          name: ORIpeSlowControlRequestingAdeiTreeStartedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(requestingAdeiTreeStopped:)
+                          name: ORIpeSlowControlRequestingAdeiTreeStoppedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
                       selector: @selector(sensorListChanged:)
                           name: ORIpeSlowControlSensorListChangedNotification
                        object : model];
                        
+	[notifyCenter addObserver : self
+                      selector: @selector(minValueChanged:)
+                          name: ORIpeSlowControlminValueChangedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(dataChanged:)
+                          name: ORIpeSlowControlDataChangedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(adeiBaseUrlForSensorChanged:)
+                          name: ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification  
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(maxValueChanged:)
+                          name: ORIpeSlowControlmaxValueChangedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(lowAlarmRangeChanged:)
+                          name: ORIpeSlowControllowAlarmRangeChangedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(highAlarmRangeChanged:)
+                          name: ORIpeSlowControlhighAlarmRangeChangedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(selectedSensorNumChanged:)
+                          name: ORIpeSlowControlSelectedSensorNumChangedNotification
+                       object : model];
+                       
+	[notifyCenter addObserver : self
+                      selector: @selector(isRecordingDataChanged:)
+                          name: ORIpeSlowControlSetIsRecordingDataChangedNotification
+                       object : model];
+                       
     
+
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[notifyCenter addObserver : self
                       selector: @selector(remotePortChanged:)
@@ -152,14 +219,46 @@
 #endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	[self monitoringFieldChanged:nil]; //obsolete -tb-
-	[self adeiServerUrlChanged:nil];
+    
+	[self adeiBaseUrlChanged:nil];
+	[self adeiServiceUrlChanged:nil];
+	[self adeiSetupOptionsChanged:nil];
 	
+	[self selectedSensorNumChanged:nil];
+	[self updateSensorSettings];
+
+    [sensorTableView reloadData];
+    [sensorTableView setNeedsDisplay: YES];
+    [sensorTreeOutlineView setNeedsDisplay: YES];
+    
 }
 
-
-- (void) adeiServerUrlChanged:(NSNotification*)aNote
+- (void) updateSensorSettings
 {
-	[adeiUrlField setStringValue: [model adeiServerUrl]];
+	[self minValueChanged:nil];
+	[self maxValueChanged:nil];
+	[self lowAlarmRangeChanged:nil];
+	[self highAlarmRangeChanged:nil];
+	[self isRecordingDataChanged:nil];
+}
+
+//general settings tab
+- (void) adeiBaseUrlChanged:(NSNotification*)aNote
+{
+	[adeiBaseUrlField setStringValue: [model adeiBaseUrl]];
+    //[adeiServiceUrlField setStringValue: [model adeiServiceUrl]];
+}
+
+- (void) adeiServiceUrlChanged:(NSNotification*)aNote
+{
+	[adeiServiceUrlField setStringValue: [model adeiServiceUrl]];
+}
+
+- (void) adeiSetupOptionsChanged:(NSNotification*)aNote
+{
+    [adeiSetupOptionsTableView reloadData]; //necessary when adding lines!!! (setNeedsDisplay: YES is not enough) -tb-
+    //[adeiSetupOptionsTableView noteNumberOfRowsChanged];// need reloadData or noteNumberOfRowsChanged!
+	[adeiSetupOptionsTableView setNeedsDisplay: YES];
 }
 
 - (void) adeiTreeChanged:(NSNotification*)aNote
@@ -167,14 +266,114 @@
     [sensorTreeOutlineView reloadItem:[model rootAdeiTree] reloadChildren:YES];
 }
 
+- (void) requestingAdeiTreeStarted:(NSNotification*)aNote
+{
+    NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+	[requestAdeiSensorTreeButton setEnabled: NO];
+	[clearAdeiSensorTreeButton setEnabled: NO];
+	[requestAdeiSensorTreeProgressIndicator startAnimation: self];
+}
+
+- (void) requestingAdeiTreeStopped:(NSNotification*)aNote
+{
+    NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+	[requestAdeiSensorTreeButton setEnabled: YES];
+	//TODO: not yet implemented [clearAdeiSensorTreeButton setEnabled: YES];
+	[requestAdeiSensorTreeProgressIndicator stopAnimation: self];
+}
+
 - (void) sensorListChanged:(NSNotification*)aNote
 {
     [sensorTableView setNeedsDisplay: YES];
 }
 
+//sensor setting notifications
+- (void) selectedSensorNumChanged:(NSNotification*)aNote
+{
+    int sensorNum = [model selectedSensorNum];
+    
+    NSLog(@"Calling %@ :: %@ for self=%p  sensorNum is %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self,sensorNum);
+
+    //TODO: if -1 or sensor undefined - clear out everything  -tb-
+    [sensorNumField setIntValue: sensorNum];
+    [sensorAdeiBaseUrlField setStringValue: [model adeiBaseUrlForChan: sensorNum] ];
+    [sensorAdeiServiceUrlField setStringValue: [model adeiServiceUrlForChan: sensorNum] ];
+    [sensorPathField setStringValue: [model adeiPathForChan: sensorNum] ];
+    [self updateSensorSettings];//would be enough to update the 'Edit Sensor' area
+}
+
+- (void) dataChanged:(NSNotification*)aNote
+{
+    NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    //TODO:
+}
+
+- (void) adeiBaseUrlForSensorChanged:(NSNotification*)aNote
+{
+    NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    int sensorNum = [model selectedSensorNum];
+    [sensorAdeiBaseUrlField setStringValue: [model adeiBaseUrlForChan: sensorNum] ];
+    [sensorAdeiServiceUrlField setStringValue: [model adeiServiceUrlForChan: sensorNum] ];
+    [sensorPathField setStringValue: [model adeiPathForChan: sensorNum] ];
+    [sensorTableView setNeedsDisplay: YES];
+}
+
+- (void) minValueChanged:(NSNotification*)aNote
+{
+    //int sensorNum = [sensorNumField intValue];
+    int sensorNum = [model selectedSensorNum];
+    [minValueField setDoubleValue: [[[model sensorList] objectAtIndex:sensorNum ] minValue]  ];
+    [sensorTableView setNeedsDisplay: YES];
+}
+
+- (void) maxValueChanged:(NSNotification*)aNote
+{
+    //int sensorNum = [sensorNumField intValue];
+    int sensorNum = [model selectedSensorNum];
+    [maxValueField setDoubleValue: [[[model sensorList] objectAtIndex:sensorNum ] maxValue]  ];
+    [sensorTableView setNeedsDisplay: YES];
+}
+
+- (void) lowAlarmRangeChanged:(NSNotification*)aNote
+{
+    //int sensorNum = [sensorNumField intValue];
+    int sensorNum = [model selectedSensorNum];
+    [lowAlarmRangeField setDoubleValue: [[[model sensorList] objectAtIndex:sensorNum ] lowAlarmRange]  ];
+    [sensorTableView setNeedsDisplay: YES];
+}
+
+- (void) highAlarmRangeChanged:(NSNotification*)aNote
+{
+    //int sensorNum = [sensorNumField intValue];
+    int sensorNum = [model selectedSensorNum];
+    [highAlarmRangeField setDoubleValue: [[[model sensorList] objectAtIndex:sensorNum ] highAlarmRange]  ];
+    [sensorTableView setNeedsDisplay: YES];
+}
+
+- (void) isRecordingDataChanged:(NSNotification*)aNote
+{
+    //int index = [sensorNumField intValue];
+    int sensorNum = [model selectedSensorNum];
+    //[isRecordingDataButton setIntValue: [[[model sensorList] objectAtIndex:sensorNum ] isRecordingData]  ];
+    //[isRecordingDataButton setState: [[[model sensorList] objectAtIndex:sensorNum ] isRecordingData]  ];
+    [isRecordingDataButton setState: [model  isRecordingDataForChan: sensorNum] ];
+    [sensorTableView setNeedsDisplay: YES];
+
+	//IBOutlet NSButtonCell    *recordingDataButtonCell;
+    //[sensorTableView setNeedsDisplay];
+    //[sensorTableView display];
+    //[recordingDataButtonCell display];
+    //NSRect	cellFrame = [sensorTableView frameOfCellAtColumn: [sensorTableView columnWithIdentifier:@"Record" ] row:index];
+	//[sensorTableView setNeedsDisplayInRect:cellFrame];
+    //NSRect	cellFrame = [sensorTableView frameOfCellAtColumn:column row:row];
+	//[sensorTableView setNeedsDisplayInRect:cellFrame];
+}
+
+
+
 
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+//TODO: remove it -tb-
 - (void) connectAtStartChanged:(NSNotification*)aNote
 {
 	[connectAtStartButton setState:[model connectAtStart]];
@@ -254,55 +453,54 @@
 
 
 
-#if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-- (IBAction) remotePortFieldAction:(id)sender
+
+
+
+//general settings tab
+
+
+- (IBAction) adeiBaseUrlFieldAction:(id)sender
 {
-	[model setRemotePort:[sender intValue]];
+    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    //NSLog(@"String:%@ \n", [adeiBaseUrlField stringValue]);
+    [model setAdeiBaseUrl: [adeiBaseUrlField stringValue]];
+    //this is done in 'setAdeiBaseUrl:':[model setAdeiServiceUrl: [NSString stringWithFormat:@"%@%@",[model adeiServiceUrl],@"services/"]];
 }
 
-- (IBAction) remoteHostFieldAction:(id)sender
+    
+- (IBAction) addAdeiSetupOptionAction:(id)sender
 {
-	[model setRemoteHost:[sender stringValue]];
+    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    int index=[adeiSetupOptionsTableView selectedRow];// if -1 inserts at end
+    [model  insertAdeiSetupOption:@"&setup=NEWOPTION" atIndex: index];
+
 }
 
-
-- (IBAction) connectButtonAction:(id)sender
+- (IBAction) removeAdeiSetupOptionAction:(id)sender
 {
-    if([model isConnected]){
-        [model connectSocket:NO];
-    }
-    else {
-        [model connectSocket:YES];
-    }
+    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    int index=[adeiSetupOptionsTableView selectedRow];// if -1 nothing happens
+    [model  removeAdeiSetupOptionAtIndex: index];
 }
-
-- (IBAction) connectAtStartAction:(id)sender
-{
-	[[self model] setConnectAtStart:[sender state]];
-}
-
-- (IBAction) autoReconnectAction:(id)sender
-{
-	[[self model] setAutoReconnect:[sender state]];
-}
-#endif  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-
-
 
 
 
 - (IBAction) requestSensorTreeButtonAction:(id)sender
 {
     NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    [model requestSensorTreeADEI];
+    //close the view
+    //[sensorTreeOutlineView collapseItem: [model rootAdeiTree] ];
+    [sensorTreeOutlineView collapseItem: [model rootAdeiTree] collapseChildren: YES];
+    //TODO: and maybe a redraw ??? -tb-
+    //[model requestSensorTreeADEI];// the old code without error and timeout handling (but much more streightforward) -tb-
+    [model startRequestingADEISensorTreeWithErrorHandling];
 }
 
 - (IBAction) sensorlistButtonAction:(id)sender
 {
     NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
     
-    [model sensorlistButtonAction];
+    [model loadAllSensorValuesWithSensorPath];
     #if 0
     // just a test for the tableView / sensor list view
     NSEnumerator *enumerator = [[model sensorList] objectEnumerator];
@@ -341,6 +539,45 @@
     [model dumpSensorlist];
 }
 
+
+//sensor settings actions
+- (IBAction) adeiBaseUrlForSensorAction:(id)sender
+{
+    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
+    [model setAdeiBaseUrl:  [sensorAdeiBaseUrlField stringValue] forChan: [model selectedSensorNum]];
+}
+
+- (IBAction) minValueChangedAction:(id)sender
+{
+    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
+    [model setMinValue:[minValueField doubleValue] forChan: [model selectedSensorNum]];
+}
+
+- (IBAction) maxValueChangedAction:(id)sender
+{
+    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
+    [model setMaxValue:[maxValueField doubleValue] forChan: [model selectedSensorNum]];
+}
+
+- (IBAction) lowAlarmRangeChangedAction:(id)sender
+{
+    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
+    [model setLowAlarmRange:[lowAlarmRangeField doubleValue] forChan: [model selectedSensorNum]];
+}
+
+- (IBAction) highAlarmRangeChangedAction:(id)sender
+{
+    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
+    [model setHighAlarmRange:[highAlarmRangeField doubleValue] forChan: [model selectedSensorNum]];
+}
+
+- (IBAction) isRecordingDataChangedAction:(id)sender;
+{
+    DebugMethCallsTB(  NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);  )
+    [model setIsRecordingData: [isRecordingDataButton intValue] forChan: [model selectedSensorNum]];
+}
+
+
 #pragma mark •••Drawer Actions
 
 
@@ -352,6 +589,7 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 - (void)closeLeftDrawer:(id)sender {[leftDrawer close];}
 
 - (void)toggleLeftDrawer:(id)sender {
+    //NSLog(@"This is method: %@ of  %@ (self %p) \n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),self);
     NSDrawerState state = [leftDrawer state];
     if (NSDrawerOpeningState == state || NSDrawerOpenState == state) {
         [leftDrawer close];
@@ -365,8 +603,8 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 - (void)closeRightDrawer:(id)sender {[rightDrawer close];}
 
 - (void)toggleRightDrawer:(id)sender {
-            NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-            NSLog(@"    sender %p, rightDrawer %p\n",sender,  rightDrawer);
+    DebugMethCallsTB(  NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+                       NSLog(@"    sender %p, rightDrawer %p\n",sender,  rightDrawer);   )
     NSDrawerState state = [rightDrawer state];
     if (NSDrawerOpeningState == state || NSDrawerOpenState == state) {
         [rightDrawer close];
@@ -377,18 +615,24 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 
 
 
-//web view
+
+#pragma mark •••Sensor List Context Menu Actions
+//list view context menu
 - (IBAction)sensorListContextMenuAction:(id)sender
 {
-            NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-            NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    DebugMethCallsTB(  
+        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
 }
 
 - (IBAction)sensorListContextMenuLoadValueAction:(id)sender
 {
-            NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-            NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
-
+    DebugMethCallsTB(  
+        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
+    
     int row = [sensorTableView selectedRow];
     NSLog(@"Selected row of tableView is %i\n", row);
     [[[model sensorList] objectAtIndex:row] loadSensorValueWithSensorPath];
@@ -398,51 +642,68 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 
 - (IBAction)sensorListContextMenuEditAction:(id)sender
 {
-            NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-            NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    DebugMethCallsTB(  
+        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+        NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
+    int row = [sensorTableView selectedRow];
+    NSLog(@"Selected row of tableView is %i\n", row);
+    [model setSelectedSensorNum: row];
+    [ipeSlowControlTabView selectTabViewItemWithIdentifier: @"SensorSettings"];
+    //[sensorNumField setIntValue:row];
+    //[self updateWindow];//moved to selectedSensorNumChanged -tb-
+    
+    #if 0
+	[self minValueChanged:nil];
+	[self maxValueChanged:nil];
+	[self lowAlarmRangeChanged:nil];
+	[self highAlarmRangeChanged:nil];
+    #endif
 }
 
 - (IBAction)sensorListContextMenuRemoveAction:(id)sender
 {
-    NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-    //NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    DebugMethCallsTB(  
+        NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
+        //NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
+    )
     //NSMenuItem *menuitem = sender; // no, I need the selectedItem of the ListView
     int row = [sensorTableView selectedRow];
     NSLog(@"Selected row of tableView is %i\n", row);
     [model removeSensorListItemWithIndex: row];
-    [sensorTableView setNeedsDisplay: TRUE];
+    [model setSelectedSensorNum: row-1];
+    //[sensorTableView setNeedsDisplay: TRUE]; TODO: model will all this via notification -tb-
     [sensorTreeOutlineView reloadItem:[model rootAdeiTree] reloadChildren:YES]; //TODO: improvement: reload only the affected item -tb-
 
 }
 
 - (IBAction)sensorListContextMenuDisplayWebViewAction:(id)sender
 {
+    DebugMethCallsTB(  
             NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
             NSLog(@"This is method: %@ of  %@ sender has class %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),  NSStringFromClass([sender class]));
-
-            int row = [sensorTableView selectedRow];
-            NSString *requestString =  [[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath];
+    )
+    
+    int row = [sensorTableView selectedRow];
+    NSString *requestString =  [[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath];
     DebugTB( NSLog(@"Request string is %@\n", requestString); )
 
-		    [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: requestString ]]];
-            [self openRightDrawer: nil];
+    [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: requestString ]]];
+    [self openRightDrawer: nil];
 
-// example: http://fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
-// example: "dei"
-// e: http:  //    
-//fuzzy.fzk.de/adei/
-//#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
-//fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
-//fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0
-//fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&window=0
+    // example: http://fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
+    // other examples:
+    //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0&history_id=1232130010554
+    //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0
+    //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&window=0
 }
 
-
+//web view
 - (IBAction)loadAdeiHomeInWebInterfaceWebViewAction:(id)sender
 {
-            NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));
-		    //[[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self helpFilePath]]]];
-		    [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://fuzzy.fzk.de/adei/"]]];
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    //[[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self helpFilePath]]]];
+    [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://fuzzy.fzk.de/adei/"]]];
 }
 
 
@@ -450,15 +711,15 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 #pragma mark •••Data Source Methods  (OutlineView)
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
 {
-    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    DebugMethCallsTB(  NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));  )
     if(outlineView==sensorTreeOutlineView){
         if(item){
             //NSLog(@"This is method: %@  - item %p\n",NSStringFromSelector(_cmd),item);
-            return [[item items] objectAtIndex: index]; //TODO: use a getter! (e.g. children) -tb-
+            //return [[item children] objectAtIndex: index]; 
+            return [item childAtIndex: index]; 
         }else{
             //NSLog(@"This is method: %@  - NIL (root item)- item %p\n",NSStringFromSelector(_cmd),root);
             return [model rootAdeiTree];
-            //return [[root items] objectAtIndex: index];
         }
     }
     return nil;
@@ -466,12 +727,11 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
     //NSLog(@"This is method: %@ with item %p\n",NSStringFromSelector(_cmd),item);
     if(outlineView==sensorTreeOutlineView){
-        //NSLog(@"   Has name %@ children %i (%i)\n",[item name],[[item items] count],[ item  count] );
+        //NSLog(@"   Has name %@ children %i (%i)\n",[item name],[[item children] count],[ item  count] );
         if(item==nil) return NO;
-        else return ([[item items] count] >0);
+        else return ([[item children] count] >0);
     }
     return NO;
 }
@@ -483,11 +743,9 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
     if(outlineView==sensorTreeOutlineView){
         //NSLog(@"This is method: %@ - item %p\n",NSStringFromSelector(_cmd),item);
         if(item==nil){
-            //NSLog(@"This is method: %@ - item %p - 1\n",NSStringFromSelector(_cmd),item);
             return 1; //root = service
         }else{
-            //NSLog(@"This is method: %@ - item %p - %i\n",NSStringFromSelector(_cmd),item,[[item items] count]);
-            return ([[item items] count]);
+            return ([[item children] count]);
         }
     }
     //NSLog(@"This is method: %@ - UNDEFINED outlineView - returns 1\n",NSStringFromSelector(_cmd));
@@ -523,15 +781,7 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
                 return [item name];
             }
             if([[tableColumn identifier] isEqualToString:@"Type"]){
-                //return [NSNumber numberWithInt: [item adeiType]];
-                switch([item adeiType]){
-                    case kAdeiTypeService  : return @"Service"; break;
-                    case kAdeiTypeServer   : return @"Server"; break; 
-                    case kAdeiTypeDatabase : return @"Database"; break; 
-                    case kAdeiTypeGroup : return @"Group"; break; 
-                    case kAdeiTypeItem: return @"Item"; break;
-                    default: return @"unknown"; break;
-                }
+                return [ORSensorItem stringForAdeiType: [item adeiType]];
             }
             if([[tableColumn identifier] isEqualToString:@"ChanMap"]){
                 if([item adeiType]==kAdeiTypeItem){
@@ -599,10 +849,15 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 #pragma mark •••Data Source Methods (TableView)
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
     if(tableView==sensorTableView){
         //NSLog(@"This is method: %@ ret 2\n",NSStringFromSelector(_cmd)); return 2;
         return [[model sensorList] count];
+    }
+    
+    // for adeiSetupOptionsTableView I call cusom methods
+    if(tableView==adeiSetupOptionsTableView){
+        return [self numberOfRowsInAdeiSetupOptionsTableView: tableView];
     }
     return 0;
 }
@@ -627,9 +882,9 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
         if([[tableColumn identifier] isEqualToString:@"Name"]){
             //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
             if(currItem)
-                return [NSString stringWithFormat:@"Name %@",[currItem name]];
+                return [NSString stringWithFormat:@"%@",[currItem name]];
             else
-                return [NSString stringWithFormat:@"Name -",row];
+                return [NSString stringWithFormat:@"-",row];
         }
         if([[tableColumn identifier] isEqualToString:@"Value"]){
             //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
@@ -643,11 +898,11 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
         }
         if([[tableColumn identifier] isEqualToString:@"Path"]){
             if(currItem){
+                return [currItem adeiPath];
+                #if 0
                 NSMutableDictionary *sensorPath=[currItem sensorPath];
                 if(sensorPath){
                     NSMutableString *pstr = [[NSMutableString alloc] init];
-                    [pstr appendString: [sensorPath valueForKey: kServiceString] ];
-                    [pstr appendString: @" - " ];
                     [pstr appendString: [sensorPath valueForKey: kServerString] ];
                     [pstr appendString: @"." ];
                     [pstr appendString: [sensorPath valueForKey: kDatabaseString] ];
@@ -655,8 +910,11 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
                     [pstr appendString: [sensorPath valueForKey: kGroupIDString] ];
                     [pstr appendString: @"." ];
                     [pstr appendString: [sensorPath valueForKey: kSensorIDString] ];
+                    [pstr appendString: @" - " ];
+                    [pstr appendString: [sensorPath valueForKey: kServiceString] ];
                     return pstr;
                 }
+                #endif
                 #if 0  //this was for testing
                 if([currItem sibling]){
                     NSMutableString *pstr = [[NSMutableString alloc] init];
@@ -686,16 +944,88 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
             }else
                 return @"-";
         }
+        if([[tableColumn identifier] isEqualToString:@"Record"]){
+            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
+            if(currItem){
+                return [NSNumber numberWithBool: [currItem isRecordingData] ];
+            }else
+                return FALSE;
+        }
+        if([[tableColumn identifier] isEqualToString:@"MinVal"]){
+            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
+            if(currItem){
+                return  [NSNumber numberWithDouble: [currItem minValue] ];
+            }else
+                return @"-";
+        }
+        if([[tableColumn identifier] isEqualToString:@"MaxVal"]){
+            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
+            if(currItem){
+                return  [NSNumber numberWithDouble: [currItem maxValue] ];
+            }else
+                return @"-";
+        }
+        if([[tableColumn identifier] isEqualToString:@"AlarmLow"]){
+            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
+            if(currItem){
+                return  [NSNumber numberWithDouble: [currItem lowAlarmRange] ];
+            }else
+                return @"-";
+        }
+        if([[tableColumn identifier] isEqualToString:@"AlarmHigh"]){
+            //NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
+            if(currItem){
+                return  [NSNumber numberWithDouble: [currItem highAlarmRange] ];
+            }else
+                return @"-";
+        }
         //if([[tableColumn identifier] isEqualToString:@"Type"]){
         //    NSLog(@"This is method: %@ ret row (%i)\n",NSStringFromSelector(_cmd),row);
         //    return [NSString stringWithFormat:@"Type %i",row];
         //}
         return [NSString stringWithFormat:@"empty %i",row];
     }
+    
+    // for adeiSetupOptionsTableView I call cusom methods
+    if(tableView==adeiSetupOptionsTableView){
+        return [self adeiSetupOptionsTableView: tableView objectValueForTableColumn: tableColumn row: row];
+    }
     return @"-";
 }
 
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row
+{
+    if(tableView==sensorTableView){
+        //this table view is not editable up to now -tb-
+        return;
+    }
+    
+    // for adeiSetupOptionsTableView I call cusom methods
+    if(tableView==adeiSetupOptionsTableView){
+        [self adeiSetupOptionsTableView: tableView setObjectValue: object forTableColumn: tableColumn row: row];
+    }
+}
 
+//cloned Data Source Methods (TableView) for adeiSetupOptionsTableView
+- (int)numberOfRowsInAdeiSetupOptionsTableView:(NSTableView *)tableView
+{
+    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    return [[model adeiSetupOptionsList] count];
+}
+
+- (id)adeiSetupOptionsTableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+{
+    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    //NSLog(@"row; %i\n",row);
+    if([model adeiSetupOptionsList]) return [model adeiSetupOptionAtIndex: row];
+    return @"empty";
+}
+- (void)adeiSetupOptionsTableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row
+{
+    //NSLog(@"Calling %@ :: %@ for self=%p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    //NSLog(@"Value is %@\n",object);
+    [model  replaceAdeiSetupOptionAtIndex: row withString: object];
+}
 
 
 @end

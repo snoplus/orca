@@ -25,8 +25,14 @@
       #define    DebugTB(x) 
     #endif
 
+    #if 1
+      // if 1 all methods will print out a message -> for testing IB connections -tb-
+      #define    DebugMethCallsTB(x) x
+    #endif
+
 #else
   #define    DebugTB(x) 
+  #define    DebugMethCallsTB(x) 
 #endif
 
 
@@ -42,12 +48,26 @@
 
  
 #pragma mark •••Notification Strings
-NSString* ORIpeSlowControlLock                                 = @"ORIpeSlowControlLock";
+NSString* ORIpeSlowControlLock                                   = @"ORIpeSlowControlLock";
 //slow control -tb-
-NSString* ORIpeSlowControlMonitoringFieldChangedNotification   = @"ORIpeSlowControlMonitoringFieldChangedNotification";
-NSString* ORIpeSlowControlAdeiServerUrlChangedNotification   = @"ORIpeSlowControlAdeiServerUrlChangedNotification";
-NSString* ORIpeSlowControlAdeiTreeChangedNotification   = @"ORIpeSlowControlAdeiTreeChangedNotification";
-NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSensorListChangedNotification";
+NSString* ORIpeSlowControlMonitoringFieldChangedNotification     = @"ORIpeSlowControlMonitoringFieldChangedNotification";
+NSString* ORIpeSlowControlAdeiServiceUrlChangedNotification      = @"ORIpeSlowControlAdeiServiceUrlChangedNotification";
+NSString* ORIpeSlowControlAdeiSetupOptionsChangedNotification      = @"ORIpeSlowControlAdeiSetupOptionsChangedNotification";
+NSString* ORIpeSlowControlSelectedSensorNumChangedNotification     = @"ORIpeSlowControlSelectedSensorNumChangedNotification";
+NSString* ORIpeSlowControlAdeiBaseUrlChangedNotification   = @"ORIpeSlowControlAdeiBaseUrlChangedNotification";
+NSString* ORIpeSlowControlAdeiTreeChangedNotification      = @"ORIpeSlowControlAdeiTreeChangedNotification";
+NSString* ORIpeSlowControlRequestingAdeiTreeStartedNotification      = @"ORIpeSlowControlRequestingAdeiTreeStartedNotification";
+NSString* ORIpeSlowControlRequestingAdeiTreeStoppedNotification      = @"ORIpeSlowControlRequestingAdeiTreeStoppedNotification";
+NSString* ORIpeSlowControlSensorListChangedNotification    = @"ORIpeSlowControlSensorListChangedNotification";
+
+NSString* ORIpeSlowControlDataChangedNotification          = @"ORIpeSlowControlDataChangedNotification";
+NSString* ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification          = @"ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification";
+
+NSString* ORIpeSlowControlminValueChangedNotification         = @"ORIpeSlowControlminValueChangedNotification";
+NSString* ORIpeSlowControlmaxValueChangedNotification         = @"ORIpeSlowControlmaxValueChangedNotification";
+NSString* ORIpeSlowControllowAlarmRangeChangedNotification    = @"ORIpeSlowControllowAlarmRangeChangedNotification";
+NSString* ORIpeSlowControlhighAlarmRangeChangedNotification   = @"ORIpeSlowControlhighAlarmRangeChangedNotification";
+NSString* ORIpeSlowControlSetIsRecordingDataChangedNotification   = @"ORIpeSlowControlSetIsRecordingDataChangedNotification";
 
 
 
@@ -56,28 +76,41 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
 - (id) init
 {
 	self = [super init];
+	[self initBasics];
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     readingLock = [[NSLock alloc] init];
     processLock = [[NSConditionLock alloc] init];
 #endif//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-    currentSensor= @""; //slow control  TODO: obsolete -tb-
-    NSLog(@"init: self is %p, currentSensor is %p\n",self, currentSensor);
 
-    //FZK-internal: [self setAdeiServerUrl: @"http://ipepdvadei.ka.fzk.de/adei/services/"];//TODO: make attribute -tb-
-    [self setAdeiServerUrl: @"http://fuzzy.fzk.de/adei/services/"];//TODO: make attribute -tb-
+	return self;
+}
+
+/** This is called from init and initWithCoder (for basic initialisations).
+  *
+  */
+- (id) initBasics
+{
+    currentSensor= @""; //slow control  TODO: obsolete -tb-
+    NSLog(@"initBasics: self is %p, currentSensor is %p\n",self, currentSensor);
+
+    //FZK-internal: [self setAdeiServiceUrl: @"http://ipepdvadei.ka.fzk.de/adei/services/"];//TODO: make attribute -tb-
+    [self setAdeiServiceUrl: @"http://fuzzy.fzk.de/adei/services/"];//TODO: make attribute -tb-
+    [self setAdeiBaseUrl: @"http://fuzzy.fzk.de/adei/"];//TODO: make attribute -tb-
     maxSensorListLength = 30;//TODO: if using a getter/setter sensor list needs to be adjusted/inited -tb-
     NSLog(@"init 1\n" );
     
     //this is necessary also for encodeWithCoder ...!!! -tb-
     //[self setSensorList:[NSMutableArray array]];
     [self initSensorList];
+    [self initAdeiSetupOptionsList];
 
-    //TODO: in the test application this was in awakeFromNib; maybe I will need it in initWithCoder ... -tb- TODO: the same for setAdeiServerUrl (see above)
-    rootAdeiTree = [ORSensorItem sensorWithAdeiType: kAdeiTypeRoot named: @"root"];
-
+    //TODO: in the test application this was in awakeFromNib; maybe I will need it in initWithCoder ... -tb- TODO: the same for setAdeiServiceUrl (see above)
+    //rootAdeiTree = [ORSensorItem sensorWithAdeiType: kAdeiTypeRoot named: @"root"];
+    rootAdeiTree = [ORSensorItem sensorWithAdeiType: kAdeiTypeService named: @"ADEIRoot"];
 
 	return self;
 }
+
 
 - (void) dealloc
 {
@@ -153,24 +186,92 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
 
 
 //new -tb-
+//remembers the number of the currently selected sensor (-1 if nothing selected)
+-(int) selectedSensorNum
+{
+    return selectedSensorNum;
+}
+
+-(void) setSelectedSensorNum:(int) aValue
+{
+    selectedSensorNum=aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSelectedSensorNumChangedNotification object:self];
+}
+
 - (ORSensorItem*) rootAdeiTree
 {
     if(!rootAdeiTree) NSLog(@"ORIpeSlowControl: ERROR: rootAdeiTree is nil!\n");//TODO: make a better handler -tb-
     return rootAdeiTree;
 }
 
-- (NSString*) adeiServerUrl
+- (NSString*) adeiBaseUrl
 {
-    return adeiServerUrl;
+    return adeiBaseUrl;
 }
 
-- (void) setAdeiServerUrl: (NSString*) aUrl
+/** Adds a missing leading 'http://'  and a missing trailing '/' to the base URL.
+  * It sets also the adeiServiceUrl (adding 'services/').
+  */
+- (void) setAdeiBaseUrl: (NSString*) aUrl
 {
 //TODO: undo not yet implemented! -tb- better: implement history of the url textField?
-    [aUrl retain];
-    [adeiServerUrl release];
-    adeiServerUrl = aUrl;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiServerUrlChangedNotification object:self];
+    if(aUrl==nil){
+        [adeiBaseUrl release];
+        adeiBaseUrl = nil;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlChangedNotification object:self];
+        return;
+    }
+    
+    NSMutableString* goodUrl;
+    goodUrl = [[NSMutableString alloc] initWithString: aUrl];
+    if(![goodUrl hasPrefix:   @"http://"]) [goodUrl insertString: @"http://"  atIndex: 0];
+    if(![goodUrl hasSuffix:   @"/"]) [goodUrl appendString: @"/"];
+    
+    [goodUrl retain];
+    [adeiBaseUrl release];
+    adeiBaseUrl = goodUrl; //TODO: do I need to convert the mutable string 'goodUrl' to ordinary string? -tb-
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlChangedNotification object:self];
+    [self setAdeiServiceUrl: [NSString stringWithFormat:@"%@%@",adeiBaseUrl,@"services/"]];
+}
+
+- (NSString*) adeiServiceUrl
+{
+    return adeiServiceUrl;
+}
+
+/** Adds a missing leading 'http://'  and a missing trailing '/' to the base URL.
+  *
+  */
+- (void) setAdeiServiceUrl: (NSString*) aUrl
+{
+//TODO: undo not yet implemented! -tb- better: implement history of the url textField?
+    if(aUrl==nil){
+        [adeiServiceUrl release];
+        adeiServiceUrl = nil;
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiServiceUrlChangedNotification object:self];
+        return;
+    }
+    
+    NSMutableString* goodUrl;
+    if(aUrl!=nil){
+        goodUrl = [[NSMutableString alloc] initWithString: aUrl];
+        if(![goodUrl hasPrefix:   @"http://"]) [goodUrl insertString: @"http://"  atIndex: 0];
+        if(![goodUrl hasSuffix:   @"/"]) [goodUrl appendString: @"/"];
+    }else{
+    }
+    
+    [goodUrl retain];
+    [adeiServiceUrl release];
+    adeiServiceUrl = goodUrl;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiServiceUrlChangedNotification object:self];
+}
+
+/** Add 'service/' to the base URL.
+  *
+  */
+- (void) setAdeiServiceUrlFromAdeiBaseUrl
+{
+    [self setAdeiServiceUrl: [NSString stringWithFormat:@"%@services/", [self adeiBaseUrl]] ];
 }
 
 - (NSMutableArray *) sensorList;
@@ -202,9 +303,6 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
 }
 
 
-- (void) insertSensorListItem:(ORSensorItem*) sensorItem
-{//TODO: unneeded? -tb-
-}
 
 - (void) replaceSensorListItemAtIndex:(int)index withSensorTreeItem:(ORSensorItem*)treeSensorItem
 {
@@ -309,11 +407,171 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
 }
 
 
+// adei setup option list handling
 
+
+- (NSMutableArray *) adeiSetupOptionsList
+{
+    return adeiSetupOptionsList; 
+}
+
+- (void) setAdeiSetupOptionsList: (NSMutableArray *) anItems
+{
+    [anItems retain];
+    [adeiSetupOptionsList release];
+    adeiSetupOptionsList = anItems;
+    //no notification! -tb-
+}
+
+//! Init with empty option @"".
+- (void) initAdeiSetupOptionsList
+{
+    if(!adeiSetupOptionsList) [self setAdeiSetupOptionsList:[NSMutableArray array]];
+    [adeiSetupOptionsList addObject: @"&setup="];
+}
+
+//! If index == -1 insert at end
+- (void) insertAdeiSetupOption:(NSString *)aName atIndex:(int) index
+{
+    if(aName==nil) return;
+    if(index==-1) index=[adeiSetupOptionsList count];
+    [adeiSetupOptionsList insertObject: aName atIndex: index];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChangedNotification object:self];
+}
+
+// one item must always remain in the list! if one tries to remove the last item, it will be cleared (?)
+- (void) removeAdeiSetupOptionAtIndex:(int) index
+{
+    if(index==-1) return;
+    if([adeiSetupOptionsList count]==1){
+        [adeiSetupOptionsList replaceObjectAtIndex: 0 withObject: @"&setup=" ];
+    }else{
+        [adeiSetupOptionsList removeObjectAtIndex: index];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChangedNotification object:self];
+}
+
+- (void) replaceAdeiSetupOptionAtIndex:(int) index withString:(NSString *)aName
+{
+    if(aName==nil) return;
+    [adeiSetupOptionsList replaceObjectAtIndex: index withObject: aName ];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiSetupOptionsChangedNotification object:self];
+}
+
+- (NSString *) adeiSetupOptionAtIndex:(int) index
+{
+    return [adeiSetupOptionsList objectAtIndex: index];
+}
+
+
+
+- (void) setMinValue:(double)aValue forChan:(int)channel
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor) [sensor setMinValue: aValue];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlminValueChangedNotification object:self];
+}
+
+- (void) setMaxValue:(double)aValue forChan:(int)channel
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor) [sensor setMaxValue: aValue];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlmaxValueChangedNotification object:self];
+}
+
+- (void) setLowAlarmRange:(double)aValue forChan:(int)channel
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor) [sensor setLowAlarmRange: aValue];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControllowAlarmRangeChangedNotification object:self];
+}
+
+- (void) setHighAlarmRange:(double)aValue forChan:(int)channel
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor) [sensor setHighAlarmRange: aValue];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlhighAlarmRangeChangedNotification object:self];
+}
+
+- (double) doubleDataForChan:(int)channel;
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor) return [sensor doubleData];
+    return 0.0; 
+}
+- (void) setDoubleData: (double) aValue forChan:(int)channel;
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor) [sensor setDoubleData: aValue];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlDataChangedNotification object:self];
+//TODO:
+//TODO:
+//TODO:
+//TODO:
+//TODO:
+//TODO:
+}
+- (BOOL) isRecordingDataForChan:(int)channel;
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor) return [sensor isRecordingData];
+    return false; 
+}
+
+- (void) setIsRecordingData:(BOOL)aValue forChan:(int)channel;
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor) [sensor setIsRecordingData: aValue];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSetIsRecordingDataChangedNotification object:self];
+}
+
+
+
+- (void) setAdeiBaseUrl: (NSString*) aUrl forChan:(int)channel
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor){
+        [sensor setAdeiBaseUrl: aUrl];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiBaseUrlForSensorChangedNotification object:self];
+    }
+}
+
+- (NSString*) adeiBaseUrlForChan:(int)channel
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor && [sensor isDefinedSensorListItem]){
+        NSMutableDictionary * dict =[sensor sensorPath];
+        return [dict  valueForKey: kAdeiUrlString];
+    }else{
+        return @"";
+    }
+}
+
+- (NSString*) adeiServiceUrlForChan:(int)channel
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor && [sensor isDefinedSensorListItem]){
+        return [[sensor sensorPath]  valueForKey: kServiceString];
+    }else{
+        return @"";
+    }
+}
+
+- (NSString*) adeiPathForChan:(int)channel
+{
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    if(sensor && [sensor isDefinedSensorListItem]){
+        return [sensor adeiPath];
+    }else{
+        return @"";
+    }
+}
 
 
 
 #pragma mark ***Slow Control
+//OBSOLETE -tb-
+
 
 /** This can be tested by
   * sending out
@@ -356,12 +614,12 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
 
 
 
-//TODO: just for testing -tb-
-- (void) sensorlistButtonAction
+//! Loads the sensor values for all sensors of the sensor list (calls loadSensorValueWithSensorPath recursively for all sensors in the sensor list.
+- (void) loadAllSensorValuesWithSensorPath
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    DebugMethCallsTB(    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));   )
     
-    //[model sensorListButtonAction];
+    //[model loadAllSensorValuesWithSensorPath];
     #if 1
     // just a test for the tableView / sensor list view
     NSEnumerator *enumerator = [sensorList objectEnumerator];
@@ -369,8 +627,8 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
     while ((object = [enumerator nextObject])) {
         ORSensorItem *sensor=object;//TODO: could check the class -tb-
         if([sensor isEmptySensorListItem]) continue;
-        if([sensor name]) NSLog(@"  (name) %@ (channelMapNum) %i\n",[sensor name],[sensor channelMapNum]);
-        else NSLog(@"  has no name\n");
+        //if([sensor name]) NSLog(@"  (name) %@ (channelMapNum) %i\n",[sensor name],[sensor channelMapNum]);
+        //else NSLog(@"  has no name\n");
         //NSLog(@"  (stringValue) %@\n",[attNode stringValue]);
         //d+=1.0;        [sensor setData: [NSString stringWithFormat: @"%5.3f",d*100.0+d*0.1]];
         [sensor loadSensorValueWithSensorPath];
@@ -392,6 +650,7 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
     [sensorTableView setNeedsDisplay];
     #endif
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlSensorListChangedNotification object:self];
     
 }
 
@@ -422,7 +681,74 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
 }
 
 
-// used by - (void) requestSensorTreeADEI
+//TODO: move comments to startRequestingADEISensorTreeWithErrorHandling!!!! -tb-
+//TODO: remove method, not needed!!!! -tb-
+
+/** This is a improved version of #requestSensorTreeADEI.
+  * It uses NSURLConnection which provides error handling and time out notifications.
+  * the steps are:
+  * - Creating a connection using NSURLConnection (with a NSURLRequest).
+  * -
+  * -
+  * -Create NSXMLDocument with initWithData:options:error: instead of initWithURL:options:error:
+  */
+//  * See file://localhost/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/Cocoa/Conceptual/URLLoadingSystem/Tasks/UsingNSURLConnection.html
+// for local docu -tb-
+- (NSXMLDocument*) createXMLDocumentWithErrorHandlingFromURL:(NSString *)urlname
+{
+    NSXMLDocument *xmlDoc=nil;
+    NSError *err=nil;
+    NSURL *furl = [NSURL URLWithString: urlname];
+    if (!furl) {
+        NSLog(@"Can't create an URL from string  %@.", urlname);
+        //return nil;
+    }
+    
+    // Based on example code from "Using NSURLConnection":
+    // create the request
+    NSURLRequest *theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:60.0];
+    //for downward compatibility I use the cache policy: NSURLRequestReloadIgnoringCacheData (since 10.3) -tb-
+    //for 10.5 I would prefer cache policy NSURLRequestReloadRevalidatingCacheData -tb-
+    //(default cache policy: NSURLRequestUseProtocolCachePolicy)
+    
+    // create the connection with the request and start loading the data
+    theXMLConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
+    if (theXMLConnection) {
+        // Create the NSMutableData that will hold the received data
+        // receivedXMLData is declared as a method instance elsewhere
+        receivedXMLData=[[NSMutableData data] retain];
+    } else {
+        // inform the user that the download could not be made
+        NSLog(@"%@ :: %@ for self=%p  : ERROR: could NOT create NSURLConnection\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    }
+    
+    
+    xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl
+            options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA)
+            error:&err];
+    if (xmlDoc == nil) {
+        xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl
+                    options:NSXMLDocumentTidyXML
+                    error:&err];
+    }
+    if (xmlDoc == nil)  {
+        if (err) {
+            //[self handleError:err];
+            NSLog(@"ERROR: xmlDoc == nil\n");
+        }
+        return nil;
+    }
+ 
+    if (err) {
+        //[self handleError:err];
+        NSLog(@"ERROR: err != 0\n");
+    }
+    return xmlDoc;
+}
+
+
+/** used by - (void) requestSensorTreeADEI
+  */
 - (NSXMLDocument*) createXMLDocumentFromURL:(NSString *)urlname
 {
     NSXMLDocument *xmlDoc=nil;
@@ -456,82 +782,474 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
 }
 
 
+/** Loading ADEI tree with error handling:
+  * In a queue (queueForLoadingAdeiTree) all tree nodes are added which want to make e XML request to receive
+  * information about their children. The list is startet with the ADEI root children (which means: the ADEI base URL
+  * with the setup options),  i.e. the list will have the same initial length as the setup option list.
+  * 
+  * <br>
+  * After initializing the queue #serveQueueForLoadingAdeiTree is called, which will sequentially request the whole ADEI tree.
+  * 
+  * <br>
+  * See comments for #requestSensorTreeADEI (it implements a easier way to load the tree but without error handling).
+  */
+- (void) startRequestingADEISensorTreeWithErrorHandling
+{
+    if(!queueForLoadingAdeiTree){
+        queueForLoadingAdeiTree = [[NSMutableArray alloc] init];
+    }
+   //TODO: delete old tree -tb-
+       //TODO:
+       //TODO:
+       //TODO: release children of root, clear siblings of sensor list
+       [rootAdeiTree setChildren:  [[NSMutableArray alloc] init]];//TODO: will dealloc be called ??? I need to disconnect the sibling pointers somehow!!! -tb-
+       [rootAdeiTree setXmlNode: nil];//TODO: need to release xmlNode? better do it immediately after parsing -tb-
+       //TODO:
+       //TODO:
+    // set the "service" node (already done in init?)
+    [rootAdeiTree setAdeiType:  kAdeiTypeService];
+    [rootAdeiTree setName:  @"AdeiService"];
+    [rootAdeiTree setValue:  adeiServiceUrl];
+    //handle options
+    NSString *adeiSetupOptionString ;
+    //NSString *adeiSetupOptionString = [NSString stringWithString: @"&setup=autogen"];
+    //NSString *adeiSetupOptionString = [NSString stringWithString: @""];
+    int optIndex;
+    
+    #if 0
+    //dump the list
+    NSLog(@"Dump the SetupOptionsList:\n");
+    for(optIndex=0; optIndex<[adeiSetupOptionsList count]; optIndex++){
+        NSLog(@"requestSensorTreeADEI: index %i, option >%@<\n",optIndex,[adeiSetupOptionsList objectAtIndex: optIndex]);
+    }
+    #endif
+    
+    //loop over options
+    ORSensorItem *newSetupOptionChild ;
+    for(optIndex=0; optIndex<[adeiSetupOptionsList count]; optIndex++){
+        adeiSetupOptionString=[adeiSetupOptionsList objectAtIndex: optIndex];
+        //debug
+        NSLog(@"requestSensorTreeADEI: index %i, option >%@<\n",optIndex,adeiSetupOptionString);
+
+        //create new SetupOption tree sensor item
+        newSetupOptionChild = [ORSensorItem sensorWithAdeiType: kAdeiTypeSetupOption named: adeiSetupOptionString];
+        [newSetupOptionChild setAdeiType: kAdeiTypeSetupOption];
+        [newSetupOptionChild setParent: rootAdeiTree];
+        [rootAdeiTree addChild: newSetupOptionChild];
+        //[newSetupOptionChild setValue: @"Value"];
+        [newSetupOptionChild setValue: adeiSetupOptionString];
+        //[newSetupOptionChild setName: ];//TODO: test then remove -tb-
+
+        //add the new sensor to queueForLoadingAdeiTree
+        [queueForLoadingAdeiTree addObject: newSetupOptionChild];
+    }
+    
+    //say the controler to start the progress indicator
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlRequestingAdeiTreeStartedNotification object:self];
+    //now start requesting the XML info for the nodes in queueForLoadingAdeiTree
+    [self serveQueueForLoadingAdeiTree];
+    
+// refresh display
+//[sensorOutlineView reloadItem:root reloadChildren:YES]; instead send a notification
+[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChangedNotification object:self];
+        
+}
+
+- (void) serveQueueForLoadingAdeiTree
+{
+    ORSensorItem *sensorNode;
+    if([queueForLoadingAdeiTree count]>0){//could check currentlyLoadingSensorNode
+        if(currentlyLoadingSensorNode) NSLog(@"Calling serveQueueForLoadingAdeiTree :: WARNING currentlyLoadingSensorNode not nil! (%p)\n",currentlyLoadingSensorNode);
+        sensorNode = [queueForLoadingAdeiTree objectAtIndex:0];
+        [queueForLoadingAdeiTree removeObjectAtIndex:0];
+        [self loadAdeiTreeChildrenForNode: sensorNode];//after loading this method (serveQueueForLoadingAdeiTree) will be called again -tb-
+    }else{
+        //all nodes have requested their children
+        //TODO: redraw tree -tb-
+        NSLog(@"Calling %@ :: %@ for self=%p: ADEI tree loading finished!!! \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+        //say the controler to stop the progress indicator
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlRequestingAdeiTreeStoppedNotification object:self];
+        // refresh display
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChangedNotification object:self];
+    }
+}
 
 
+/** This creates the NSURLConnection (with a NSURLRequest) and starts downloading the tree info.
+  *  
+  *  
+  * Based on example code from "Using NSURLConnection" (Listing 1):
+  */
+- (void) loadAdeiTreeChildrenForNode:(ORSensorItem*) sensorNode
+{
+    currentlyLoadingSensorNode = sensorNode;
+    
+    //create the request string
+    NSString *urlname;
+    //NSString *adeiSetupOptionString = nil;
+    ORSensorItem *serviceItem = nil;
+    ORSensorItem *setupOptionItem = nil;
+    ORSensorItem *serverItem = nil;
+    ORSensorItem *databaseItem = nil;
+    ORSensorItem *groupItem = nil;
+    ORSensorItem* item=sensorNode;
+    
+    int aAdeiType;
+    {//step up until tree root is reached
+        while(item){
+            aAdeiType = [item adeiType];
+            if(aAdeiType == kAdeiTypeItem){
+                NSLog(@"WARNING: kAdeiTypeItem in loadAdeiTreeChildrenForNode: - something is wrong!\n");
+            }
+            if(aAdeiType == kAdeiTypeGroup)    groupItem = item;
+            if(aAdeiType == kAdeiTypeDatabase) databaseItem = item;
+            if(aAdeiType == kAdeiTypeServer)   serverItem = item;
+            if(aAdeiType == kAdeiTypeSetupOption)setupOptionItem = item;
+            if(aAdeiType == kAdeiTypeService)  serviceItem = item;
+            
+            item = [item parent];//go up in the tree ...
+        }
+    }
+    
+    switch([sensorNode adeiType]){
+        case kAdeiTypeSetupOption:
+            urlname =  [NSString stringWithFormat: @"%@%@%@",[serviceItem value],@"list.php?target=servers", [setupOptionItem value]];
+            break; 
+        case kAdeiTypeServer:
+            urlname =  [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@%@",[serviceItem value],@"databases", [serverItem value], [setupOptionItem value]];
+            break; 
+        case kAdeiTypeDatabase:
+            urlname =  [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@%@",[serviceItem value],@"groups", [serverItem value], [databaseItem value], [setupOptionItem value]];
+            break; 
+        case kAdeiTypeGroup:
+            urlname =  [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@&db_group=%@%@",[serviceItem value],@"items", [serverItem value], [databaseItem value], [groupItem value], [setupOptionItem value]];
+            break; 
+        default:
+            NSLog(@"WARNING: reached default case in loadAdeiTreeChildrenForNode: - something is wrong!\n");
+            urlname =  @"";
+            break; 
+    }
+    NSLog(@"%@ :: %@: request string is %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),urlname);
+    
+    
+    //create the url
+    NSURL *furl = [NSURL URLWithString: urlname];
+    if (!furl) {
+        NSLog(@"ERROR: loadAdeiTreeChildrenForNode: Can't create an URL from string  %@.", urlname);
+        //return nil;
+    }
+    
+    // Based on example code from "Using NSURLConnection" (Listing 1):
+    // create the request
+    NSURLRequest *theRequest=[NSURLRequest requestWithURL:furl  cachePolicy:NSURLRequestReloadIgnoringCacheData  timeoutInterval:3.0];// make it configurable
+    //for downward compatibility I use the cache policy: NSURLRequestReloadIgnoringCacheData (since 10.3) -tb-
+    //for 10.5 I would prefer cache policy NSURLRequestReloadRevalidatingCacheData -tb-
+    //(default cache policy: NSURLRequestUseProtocolCachePolicy)
+    
+    // create the connection with the request and start loading the data
+    theXMLConnection=[[NSURLConnection alloc] initWithRequest:theRequest delegate:self];
+    if (theXMLConnection) {
+        // Create the NSMutableData that will hold the received data
+        // receivedXMLData is declared as a method instance elsewhere
+        receivedXMLData=[[NSMutableData data] retain];
+    } else {
+        // inform the user that the download could not be made
+        NSLog(@"%@ :: %@ for self=%p  : ERROR: could NOT create NSURLConnection\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
+    }
+}
+
+#pragma mark ***Delegate Methods
+/** NSURLConnection delegate method.
+  * This method will be called for receive response of the server, which was connected by creating the NSURLConnection in #loadAdeiTreeChildrenForNode:
+  *
+  * Based on example code from "Using NSURLConnection" (Listing 2):
+  */
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    NSLog(@"%@ :: %@: connection is %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),connection);
+
+    // this method is called when the server has determined that it
+    // has enough information to create the NSURLResponse
+
+    // it can be called multiple times, for example in the case of a
+    // redirect, so each time we reset the data.
+    // receivedData is declared as a method instance elsewhere
+    if(connection==theXMLConnection)
+        [receivedXMLData setLength:0];
+}
+
+/** NSURLConnection delegate method.
+  * This method will be called when data is received from the server, which was connected by creating the NSURLConnection in #loadAdeiTreeChildrenForNode:
+  *
+  *
+  * Based on example code from "Using NSURLConnection" (Listing 5):
+  */
+//! Based on example code from "Using NSURLConnection" (Listing 3):
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    NSLog(@"%@ :: %@: connection is %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),connection);
+
+    // append the new data to the receivedXMLData
+    if(connection==theXMLConnection)
+      [receivedXMLData appendData:data];
+
+}
+
+/** NSURLConnection delegate method.
+  * This method will be called when there is a failure in the connection to the server, which was connected by creating the NSURLConnection in #loadAdeiTreeChildrenForNode:
+  *
+  *
+  * Based on example code from "Using NSURLConnection" (Listing 4):
+  */
+- (void)connection:(NSURLConnection *)connection  didFailWithError:(NSError *)error
+{
+    NSLog(@"%@ :: %@: connection is %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),connection);
+
+    if(connection==theXMLConnection){
+        // release the connection, and the data object
+        [theXMLConnection release];
+        [receivedXMLData release];
+
+        // inform the user
+        NSLog(@"CONNECTION FAILED! Error - >%@< >%i< >%@<\n",[error localizedDescription], [error code], [[error userInfo] objectForKey:NSErrorFailingURLStringKey]);
+        //TODO: write a message into the tree -tb-
+        //TODO: write a message into the tree -tb-
+        //TODO: need to improve the message !!!! maybe a alarm popup? -tb-
+        [currentlyLoadingSensorNode setName:   [NSString stringWithFormat:@"%@-ERROR IN REQUEST:%@",[currentlyLoadingSensorNode name],[error localizedDescription]]    ];
+        //TODO: write a message into the tree -tb-
+        //TODO: write a message into the tree -tb-
+        
+        //try to load next node in the queue
+        currentlyLoadingSensorNode = nil;
+        [self serveQueueForLoadingAdeiTree];
+    }
+}
+
+
+/** NSURLConnection delegate method.
+  * This method will be called in case of success of downloading the data requested from the server, which was connected by creating the NSURLConnection in #loadAdeiTreeChildrenForNode:
+  *
+  *
+  * Based on example code from "Using NSURLConnection" (Listing 5):
+  */
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    NSLog(@"%@ :: %@: connection is %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),connection);
+
+    if(connection==theXMLConnection){
+        // do something with the data
+        NSLog(@"SUCCEEDED! Received %d bytes of data\n",[receivedXMLData length]);
+        //NSLog(@"SUCCEEDED! Contents:%@\n",[[NSString alloc] initWithData: receivedXMLData encoding:  NSUTF8StringEncoding]);
+        NSError *err=nil;
+        
+        NSXMLDocument * aXmlDoc = [[NSXMLDocument alloc] initWithData: receivedXMLData options: (NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA) error: &err];
+        if (aXmlDoc == nil || (err)) {
+            //[self handleError:err];
+            NSLog(@"ERROR: in connectionDidFinishLoading: calling [NSXMLDocument ... initWithData:] xmlDoc == nil or err!=nil\n");
+        }
+
+        NSLog(@"connectionDidFinishLoading: children of node: %i\n",[[currentlyLoadingSensorNode children] count]);
+        
+        if(aXmlDoc){
+            switch([currentlyLoadingSensorNode adeiType]){
+                case kAdeiTypeSetupOption:
+                    [currentlyLoadingSensorNode createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeServer];
+                    break; 
+                case kAdeiTypeServer:
+                    [currentlyLoadingSensorNode createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeDatabase];
+                    break; 
+                case kAdeiTypeDatabase:
+                    [currentlyLoadingSensorNode createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeGroup];
+                    break; 
+                case kAdeiTypeGroup:
+                    [currentlyLoadingSensorNode createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeItem];
+                    break; 
+                default:
+                    NSLog(@"WARNING: reached default case in connectionDidFinishLoading: - something is wrong!\n");
+                    break; 
+            }
+        }
+        NSLog(@"connectionDidFinishLoading: children of node after createChildrenFromXmlDoc: %i\n",[[currentlyLoadingSensorNode children] count]);
+        //add the new children to the queue (not for children of group items (=sensor items) they have no children)
+        if([currentlyLoadingSensorNode adeiType]!=kAdeiTypeGroup && [currentlyLoadingSensorNode children]){
+            int i,n=[currentlyLoadingSensorNode countChildren];
+            for(i=0;i<n;i++){
+                [queueForLoadingAdeiTree addObject: [currentlyLoadingSensorNode childAtIndex:i]];
+            }
+        }
+        
+        //release aXmlDoc
+        //TODO: is it necessary to release the NSXMLDocument ? -tb-
+        
+        // release the connection, and the data object
+        [theXMLConnection release];
+        [receivedXMLData release];
+        currentlyLoadingSensorNode = nil;
+        
+        //try to load next node in the queue
+        [self serveQueueForLoadingAdeiTree];
+    }
+
+}
+
+
+
+
+
+/** Starting from the given AdeiURL the ADEI hierarchy is requested from the service.
+  * (This is done for the given service URL together with all setup options in the setup options list,
+  * e.g. if there are 2 setup options, there will be 2 nodes according to the options.)
+  * The requests are:
+  * service+setup optinn  -> servers  -> databases  -> (log) groups  -> item (mask)
+  * This is displayed in a hierarchy tree in this way:
+  @verbatim
+  >adei service
+      >setup option0
+          >server0
+              >database0
+                 >group0
+                    >item mask0
+                    >item mask1
+                    >item mask...
+                 >group1
+                 >group...
+              >database1
+              >database...
+          >server1
+          >server...
+      >setup option1
+      >setup option...
+  @endverbatim
+  * 
+  * <br> There is an improved way to load the tree, see #startRequestingADEISensorTreeWithErrorHandling
+  */
 - (void) requestSensorTreeADEI
 {
     NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    if(adeiServerUrl){
-        NSLog(@"Using ADEI server URL: %@\n",adeiServerUrl);
+    if(adeiServiceUrl){
+        NSLog(@"Using ADEI service URL: %@\n",adeiServiceUrl);
     }else{
-        NSLog(@"ERROR: No ADEI server URL defined!\n");
+        NSLog(@"ERROR: No ADEI service URL defined!\n");
         return;
     }
     
     int err=0;
     NSXMLDocument* aXmlDoc;
-    //request servers
-    NSString *serverRequestString = [NSString stringWithFormat: @"%@%@",adeiServerUrl,@"list.php?target=servers"];
-    NSLog(@"serverRequestString: %@\n",serverRequestString);
-    //[root setXmlDoc: [self createXMLDocumentFromURL: serverRequestString]];
-    aXmlDoc = [self createXMLDocumentFromURL: serverRequestString];
+    
+   //TODO: delete old tree -tb-
+       //TODO:
+       //TODO:
+       //TODO: release children of root, clear siblings of sensor list
+       //TODO:
+       //TODO:
+    // set the "service" node (already done in init?)
+    [rootAdeiTree setAdeiType:  kAdeiTypeService];
+    [rootAdeiTree setName:  @"AdeiService"];
+    [rootAdeiTree setValue:  adeiServiceUrl];
+    //[root setXmlDoc: aXmlDoc];
+    
+    //handle options
+    NSString *adeiSetupOptionString ;
+    //NSString *adeiSetupOptionString = [NSString stringWithString: @"&setup=autogen"];
+    //NSString *adeiSetupOptionString = [NSString stringWithString: @""];
+    int optIndex;
+    
+    #if 0
+    //dump the list
+    NSLog(@"Dump the SetupOptionsList:\n");
+    for(optIndex=0; optIndex<[adeiSetupOptionsList count]; optIndex++){
+        NSLog(@"requestSensorTreeADEI: index %i, option >%@<\n",optIndex,[adeiSetupOptionsList objectAtIndex: optIndex]);
+    }
+    #endif
+    
+    //loop over options
+    ORSensorItem *newSetupOptionChild ;
+    for(optIndex=0; optIndex<[adeiSetupOptionsList count]; optIndex++){
+        adeiSetupOptionString=[adeiSetupOptionsList objectAtIndex: optIndex];
+        //debug
+        NSLog(@"requestSensorTreeADEI: index %i, option >%@<\n",optIndex,adeiSetupOptionString);
 
-    if(aXmlDoc){ //check if service available
-        //delete old tree
-          //TODO:
-        // set the "service" node
-        [rootAdeiTree setAdeiType:  kAdeiTypeService];
-        [rootAdeiTree setName:  @"AdeiService"];
-        [rootAdeiTree setValue:  adeiServerUrl];
-        //[root setXmlDoc: aXmlDoc];
+        //create new SetupOption tree sensor item
+        newSetupOptionChild = [ORSensorItem sensorWithAdeiType: kAdeiTypeSetupOption named: adeiSetupOptionString];
+        [newSetupOptionChild setAdeiType: kAdeiTypeSetupOption];
+        [newSetupOptionChild setParent: rootAdeiTree];
+        [rootAdeiTree addChild: newSetupOptionChild];
+        //[newSetupOptionChild setValue: @"Value"];
+        [newSetupOptionChild setValue: adeiSetupOptionString];
+        //[newSetupOptionChild setName: ];//TODO: test then remove -tb-
+        
         //request servers
-        [rootAdeiTree createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeServer];
-        NSLog(@"After root createChildrenFromXmlDoc: root count is %i\n",[rootAdeiTree count]);
-        //request database names
-        int i,n=[rootAdeiTree count];
-        for(i=0;i<n;i++){
-            ORSensorItem *serverItem = [rootAdeiTree childAtIndex:i];
-            NSString *databaseRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@",adeiServerUrl,@"databases", [serverItem value]];
-            //NSLog(@" \n");
-            //NSLog(@">>>>>>>>>>>>>database>>>>>>>>>>>>>\n");
-            //NSLog(@"Request databases of server: %@\n",databaseRequestString);
-            aXmlDoc = [self createXMLDocumentFromURL: databaseRequestString];
-            [serverItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeDatabase];
-            //request groups
-            int j,m=[serverItem count];
-            for(j=0;j<m;j++){
-                ORSensorItem *databaseItem = [serverItem childAtIndex:j];
-                NSString *groupRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@",adeiServerUrl,@"groups", [serverItem value], [databaseItem value]];
+        NSString *serverRequestString = [NSString stringWithFormat: @"%@%@%@",adeiServiceUrl,@"list.php?target=servers", adeiSetupOptionString];
+        NSLog(@"    serverRequestString: %@\n",serverRequestString);
+        //[root setXmlDoc: [self createXMLDocumentFromURL: serverRequestString]];
+        aXmlDoc = [self createXMLDocumentFromURL: serverRequestString];
+        
+        if(aXmlDoc){ //check if service available
+            //request servers
+            [newSetupOptionChild createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeServer];
+            NSLog(@"After root createChildrenFromXmlDoc: root count is %i\n",[rootAdeiTree countChildren]);
+            //request database names
+            int i,n=[newSetupOptionChild countChildren];
+            for(i=0;i<n;i++){
+                ORSensorItem *serverItem = [newSetupOptionChild childAtIndex:i];
+                NSString *databaseRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@%@",adeiServiceUrl,@"databases", [serverItem value], adeiSetupOptionString];
                 //NSLog(@" \n");
-                //NSLog(@"    >>>>>>>>>>>>>>>group>>>>>>>>>>\n");
-                //NSLog(@"    Request databases of server: %@\n",groupRequestString);
-                aXmlDoc = [self createXMLDocumentFromURL: groupRequestString];
-                err=[databaseItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeGroup];
-                if(err<=0){
-                    NSLog(@" err is %i, ERROR in request? %@ \n",err,groupRequestString);
-                }
-                //request items (sensors)
-                int k,l=[databaseItem count];
-                for(k=0;k<l;k++){
-                    ORSensorItem *groupItem = [databaseItem childAtIndex:k];
-                    NSString *sensorRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@&db_group=%@",adeiServerUrl,@"items", [serverItem value], [databaseItem value], [groupItem value]];
+                //NSLog(@">>>>>>>>>>>>>database>>>>>>>>>>>>>\n");
+                //NSLog(@"Request databases of server: %@\n",databaseRequestString);
+                aXmlDoc = [self createXMLDocumentFromURL: databaseRequestString];
+                [serverItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeDatabase];
+                //request groups
+                int j,m=[serverItem countChildren];
+                for(j=0;j<m;j++){
+                    ORSensorItem *databaseItem = [serverItem childAtIndex:j];
+                    NSString *groupRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@%@",adeiServiceUrl,@"groups", [serverItem value], [databaseItem value], adeiSetupOptionString];
                     //NSLog(@" \n");
-                    //NSLog(@"        >>>>>>>>>>>>sensor>>>>>>>>>>\n");
-                    //NSLog(@"        Request databases of server: %@\n",sensorRequestString);
-                    aXmlDoc = [self createXMLDocumentFromURL: sensorRequestString];
-                    [groupItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeItem];
+                    //NSLog(@"    >>>>>>>>>>>>>>>group>>>>>>>>>>\n");
+                    //NSLog(@"    Request databases of server: %@\n",groupRequestString);
+                    aXmlDoc = [self createXMLDocumentFromURL: groupRequestString];
+                    err=[databaseItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeGroup];
+                    if(err<=0){
+                        NSLog(@" err is %i, ERROR in request? %@ \n",err,groupRequestString);
+                    }
+                    //request items (sensors)
+                    int k,l=[databaseItem countChildren];
+                    for(k=0;k<l;k++){
+                        ORSensorItem *groupItem = [databaseItem childAtIndex:k];
+                        NSString *sensorRequestString = [NSString stringWithFormat: @"%@list.php?target=%@&db_server=%@&db_name=%@&db_group=%@%@",adeiServiceUrl,@"items", [serverItem value], [databaseItem value], [groupItem value], adeiSetupOptionString];
+                        //NSLog(@" \n");
+                        //NSLog(@"        >>>>>>>>>>>>sensor>>>>>>>>>>\n");
+                        //NSLog(@"        Request databases of server: %@\n",sensorRequestString);
+                        aXmlDoc = [self createXMLDocumentFromURL: sensorRequestString];
+                        [groupItem createChildrenFromXmlDoc:aXmlDoc withType: kAdeiTypeItem];
+                    }
                 }
             }
+            // refresh display
+            //[sensorOutlineView reloadItem:root reloadChildren:YES]; instead send a notification
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChangedNotification object:self];
+            
+        }else{
+            NSLog(@"ERROR: Service not available: %@\n",serverRequestString);
         }
-        // refresh display
-        //[sensorOutlineView reloadItem:root reloadChildren:YES]; instead send a notification
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlAdeiTreeChangedNotification object:self];
-
-    }else{
-        NSLog(@"ERROR: Service not available: %@\n",serverRequestString);
     }
     
     
+}
+
+
+- (void) rebuildConnectionsBetweenAdeiTreeAndSensorList
+{
+
+//TODO: !!!!
+//TODO: !!!!
+//TODO: !!!!
+//TODO: !!!!
+//TODO: !!!!
+//TODO: !!!!
+//TODO: !!!!
+//TODO: !!!!
+//TODO: !!!!
+//TODO: !!!!
 }
 
 
@@ -540,22 +1258,24 @@ NSString* ORIpeSlowControlSensorListChangedNotification   = @"ORIpeSlowControlSe
 
 
 
-#pragma mark ***Delegate Methods
-
-
 
 #pragma mark ***Archival
 
 - (id) initWithCoder:(NSCoder*)decoder
 {
-    [self initSensorList];
 
 NSLog(@"ORIpeSlowControlModel::initWithCoder: self before super init...: %p\n",self);
 	self = [super initWithCoder:decoder];
 NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",self);
 	[[self undoManager] disableUndoRegistration];
     
-    [self init];//TODO: not everything from init is necessary -tb-
+    [self initBasics];//TODO: not everything from init is necessary -tb-
+
+    if([decoder containsValueForKey:@"ORIpeSlowControlAdeiBaseUrl"])
+	    [self setAdeiBaseUrl:[decoder decodeObjectForKey:@"ORIpeSlowControlAdeiBaseUrl"]];
+    
+    if([decoder containsValueForKey:@"ORIpeSlowControlAdeiSetupOptionsList"])
+	    [self setAdeiSetupOptionsList:[decoder decodeObjectForKey:@"ORIpeSlowControlAdeiSetupOptionsList"]];
     
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[self setRemoteHost:[decoder decodeObjectForKey:@"ORIpeSlowControlRemoteHost"]];
@@ -574,6 +1294,16 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
             NSString *sensorPathKey = [NSString stringWithFormat:@"ORIpeSlowControlSensorListSensorPath%i",sensorListIndex];
             [sensor setSensorPath:	[decoder decodeObjectForKey:sensorPathKey]]; 
             [sensor setAdeiType:	kSensorListItem]; 
+            //extract vars from dictionary
+            NSMutableDictionary *dict=[sensor sensorPath];
+            if([dict valueForKey: kMinValueString]) [sensor setMinValue:        [[dict valueForKey: kMinValueString] doubleValue]];
+            if([dict valueForKey: kMaxValueString]) [sensor setMaxValue:        [[dict valueForKey: kMaxValueString] doubleValue]];
+            if([dict valueForKey: kLowAlarmRangeString]) [sensor setLowAlarmRange:   [[dict valueForKey: kLowAlarmRangeString] doubleValue]];
+            if([dict valueForKey: kHighAlarmRangeString]) [sensor setHighAlarmRange:  [[dict valueForKey: kHighAlarmRangeString] doubleValue]];
+            if([dict valueForKey: kIsRecordingDataString]) [sensor setIsRecordingData: [[dict valueForKey: kIsRecordingDataString] boolValue]];
+            
+            if(![dict valueForKey: kSetupOptionString]) [dict setValue: @"" forKey: kSetupOptionString];//TODO: this can be removed in the future - for downward compatibility -tb-
+             
         }
         
         
@@ -593,9 +1323,16 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     
 	return self;
 }
+
+
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    
+    //encode main properties
+	[encoder encodeObject:adeiBaseUrl forKey:@"ORIpeSlowControlAdeiBaseUrl"];
+	[encoder encodeObject:adeiSetupOptionsList forKey:@"ORIpeSlowControlAdeiSetupOptionsList"];
+    
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[encoder encodeObject:remoteHost forKey:@"ORIpeSlowControlRemoteHost"];
     [encoder encodeBool:connectAtStart forKey:@"ConnectAtStart"];
@@ -608,6 +1345,13 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     for(sensorListIndex=0; sensorListIndex< maxSensorListLength ; sensorListIndex++){
         ORSensorItem *sensor=[sensorList objectAtIndex: sensorListIndex];
         if(![sensor isEmptySensorListItem]){
+            //place all vars into the dictionary
+            NSMutableDictionary *dict=[sensor sensorPath];
+            [dict setValue: [NSNumber numberWithDouble:[sensor minValue]]        forKey: kMinValueString];
+            [dict setValue: [NSNumber numberWithDouble:[sensor maxValue]]        forKey: kMaxValueString];
+            [dict setValue: [NSNumber numberWithDouble:[sensor lowAlarmRange]]   forKey: kLowAlarmRangeString];
+            [dict setValue: [NSNumber numberWithDouble:[sensor highAlarmRange]]  forKey: kHighAlarmRangeString];
+            [dict setValue: [NSNumber numberWithBool:[sensor isRecordingData]] forKey: kIsRecordingDataString];
             //save name
             NSString *sensorNameKey = [NSString stringWithFormat:@"ORIpeSlowControlSensorListSensorName%i",sensorListIndex];
             NSLog(@"Save/encode %@ with name %@\n",sensorNameKey, [sensor name]);
@@ -641,22 +1385,57 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 
 #pragma mark •••Adc or Bit Processing Protocol
+/** This is called once per "processing" cycle and is called at the begin of the process cycle.
+  * The process control calls (also in test mode): processIsStarting, multiple times (startProcessCycle, endProcessCycle) , processIsStopping
+  * The ORAdcModel calls (not in test mode!):  
+  @verbatim
+  if  processValue: is TRUE startProcessCycle, endProcessCycle runs with polling rate in a own thread;
+  normal cycle is:
+    maxValueForChan:
+    minValueForChan:
+    getAlarmRangeLow:high:channel:
+    convertedValue:
+
+  if  processValue: is FALSE
+    maxValueForChan:
+    minValueForChan:
+    getAlarmRangeLow:high:channel:
+    convertedValue:
+    
+    Comment in ORProcessThread.m:
+    in startProcessCycle-loop: comment: "tell all the input hw to store the current state"
+  @endverbatim
+  
+  * <br>
+  * The protocol ORAdcProcessing is in: ORAdcProcessing.h
+  * The protocol ORBitProcessing is in: ORBitProcessing.h
+  */
+
+
+//note that everything called by these routines MUST be threadsafe
 - (void) startProcessCycle
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);    )
+    [self loadAllSensorValuesWithSensorPath];
 }
 
+/** This is called once per "processing" cycle and is called at the end of the process cycle.
+  *
+    Comment in ORProcessThread.m:
+    in endProcessCycle-loop: comment: "tell all the output hw to write out the current state"
+  */
 - (void) endProcessCycle
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
 }
 
-
+//TODO: when this is needed? -tb-
 - (BOOL) processValue:(int)channel
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    DebugMethCallsTB()  NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
+    DebugMethCallsTB()  NSLog(@"    ARG: channel is %i\n",  channel );
     
-    if(channel > 15) return NO;//
+    if(channel > 23) return NO;//TODO: when this value is used? -tb-
     
     return YES;
 }
@@ -664,58 +1443,103 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 - (void) setProcessOutput:(int)channel value:(int)value
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
+    NSLog(@"    ARG: channel is %i  value is %i\n",  channel , value);
 }
  //not usually used, but needed for easy compatibility with the bit protocol
 
 - (NSString*) processingTitle
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    
-    return @"IPESlowControl-TEST";
+    DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
+    static int ind=0;
+    //ind++;
+    //return [NSString stringWithFormat:@"%@",[self identifier]];//copy from ORIP320Model.m -tb-
+    return [NSString stringWithFormat: @"%@%i",@"IPE-ADEI",ind];//TODO: add a number, if there are more than one IpeSlowControl object ? -tb-
+    //return @"IPE-ADEI";//TODO: add a number, if there are more than one IpeSlowControl object ? -tb-
 }
 
 
 - (double) convertedValue:(int)channel
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    return (double) channel;
+    DebugMethCallsTB(  NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);  )
+    DebugMethCallsTB(  NSLog(@"    ARG: channel is %i\n",  channel );  )
+    
+    double retval;
+    ORSensorItem *sensor = [sensorList objectAtIndex: channel];
+    retval = [sensor doubleData];
+    //DebugTB(    NSLog(@"    retval for chan %i   is %f   (sensor: %p)\n",  channel, retval , sensor);   )
+    return  retval;
+
+    #if 0 //for testing -tb- TODO: create a simulation mode??? -tb-
+    static double val=5.0, inc=0.5;
+    val=val+inc;
+    if(val>40.0) inc=-inc;
+    if(val<1.0) inc=-inc;
+    return (double) val;
+    #endif
+    
+    if(channel>=0 && channel < maxSensorListLength){
+        return [[sensorList objectAtIndex: channel] doubleData];
+    }
+    
+    return (double) channel;// return something if channel number out of range
 }
 
 
 - (double) maxValueForChan:(int)channel
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
-    return 15.0;
+    DebugMethCallsTB(  NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);  )
+    DebugMethCallsTB(  NSLog(@"    ARG: channel is %i\n",  channel );  )
+    if(channel>=0 && channel < maxSensorListLength){
+        return [[sensorList objectAtIndex: channel] maxValue];
+    }
+    return 100.0;// return something if channel number out of range
 }
 
 
 - (double) minValueForChan:(int)channel
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
+    DebugMethCallsTB(   NSLog(@"    ARG: channel is %i\n",  channel );   )
+    if(channel>=0 && channel < maxSensorListLength){
+        return [[sensorList objectAtIndex: channel] minValue];
+    }
     
-    return 2.0;
+    return 0.5; // return something if channel number out of range
 }
 
 
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
+    DebugMethCallsTB(   NSLog(@"    ARG: channel is %i\n",  channel );   )
 	//	*theLowLimit = [[[chanObjs objectAtIndex:channel] objectForKey:k320ChannelLowValue] doubleValue];
-//		*theHighLimit = [[[chanObjs objectAtIndex:channel] objectForKey:k320ChannelHighValue] doubleValue];
+    //		*theHighLimit = [[[chanObjs objectAtIndex:channel] objectForKey:k320ChannelHighValue] doubleValue];
+    if(channel>=0 && channel < maxSensorListLength){
+        ORSensorItem *sensor=[sensorList objectAtIndex: channel];
+		*theLowLimit  =  ((double) [sensor lowAlarmRange]) ;
+		*theHighLimit =  ((double) [sensor highAlarmRange]) ;
+    }else{
 		*theLowLimit = 0.5 * ((double) channel) ;
 		*theHighLimit = 2.0 * ((double) channel) ;
+    }
+    //DebugTB(   NSLog(@"    ARG: theLowLimit %f  ,  theHighLimit   %f \n",  *theLowLimit,  *theHighLimit);   )
 }
 
 
+/** This is called once when "processing" is started. Intended for initialisation (?).
+  */
 - (void)processIsStarting //not in Bit Processing Protocol, but seems to be necessary -tb-
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    //NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
 }
 
+/** This is called once when "processing" is stopped. Intended for cleanup (?).
+  */
 - (void)processIsStopping //not in Bit Processing Protocol, but seems to be necessary -tb-
 {
-    NSLog(@"This is method: %@\n",NSStringFromSelector(_cmd));
+    NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
 }
 
 
@@ -752,25 +1576,29 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 
 
+/*********************************************************************-tb-
+ * from here: class ORSensorItem
+ *********************************************************************/
 
 
 #pragma mark •••Class ORSensorItem
 
+NSString * kSensorIDString  = @"kSensorIDString";
+NSString * kGroupIDString   = @"kGroupIDString";
+NSString * kDatabaseString  = @"kDatabaseString";
+NSString * kServerString    = @"kServerString";
+NSString * kSetupOptionString   = @"kSetupOptionString";
+NSString * kServiceString   = @"kServiceString";
+NSString * kAdeiUrlString   = @"kAdeiUrlString";
+
+NSString * kMinValueString        = @"kMinValueString";
+NSString * kMaxValueString        = @"kMaxValueString";
+NSString * kLowAlarmRangeString   = @"kLowAlarmRangeString";
+NSString * kHighAlarmRangeString  = @"kHighAlarmRangeString";
+NSString * kIsRecordingDataString = @"kIsRecordingDataString";
+
 @implementation ORSensorItem
 
-+ (ORSensorItem*) sensorFromObject:(id)anObject named:(NSString*)aName //TODO: create a better constructor -tb-
-{
-    ORSensorItem* item = (ORSensorItem*)[[ORSensorItem alloc] init];
-    [item setName: aName];
-    [item setObject: anObject];
-    [item setChannelMapNum:-1];
-    if(anObject==nil) [item setClassType:@"-"];
-    else [item setClassType:NSStringFromClass([anObject class])];
-    //[item setItems:[NSMutableArray array]];// moved to init -tb-
-
-    return item;//TODO: who is responsible for releasing the sensor items? -tb- 2008-12-02
-    //return [item autorelease];
-}
 
 + (ORSensorItem*) sensorWithAdeiType:(int)aValue named:(NSString*)aName
 {
@@ -779,39 +1607,18 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     [item setName: aName];
     //[item setObject: anObject];
     if(aValue<kAdeiTypeLast){//sensor tree item
-        [item setItems:[NSMutableArray array]];
-    }else{//channel map list item
-        [item setSensorPath:[NSMutableDictionary dictionary]];
+        [item setChildren:[NSMutableArray array]];
+        [item setTree: [ORSensorItem stringForAdeiType: [item adeiType]]];
+    }else{//channel/sensor list item
+        //[item setSensorPath:[NSMutableDictionary dictionary]];  moved to initSensorListItem
+        [item initSensorListItem];
     }
     [item setChannelMapNum:-1];
-    [item setClassType:@"-"];//unneeded
+    [item setClassType:@"-"];//TODO: unneeded
 
-    return item;//TODO: who is responsible for releasing the sensor items? -tb- 2008-12-02
+    return item;//TODO: who is responsible for releasing the sensor children? -tb- 2008-12-02
 }
 
-+ (ORSensorItem*) sensorForSibling:(ORSensorItem*) aSibling
-{
-    ORSensorItem* item;
-    if([aSibling adeiType]<kAdeiTypeLast){//sibling of a adei tree item
-        item =  [ORSensorItem sensorWithAdeiType:kSensorListItem named:[aSibling name]];
-        [item connectSiblings: aSibling];
-        //TODO: fill the path dictionary with help of the adei tree
-        //if([aSibling adeiType]<kAdeiTypeItem){
-        //    [[item sensorPath] setValue: [aSibling value] forKey: kSensorIDString];
-        //}
-        //TODO: fill the path dictionary with help of the adei tree
-        //TODO: fill the path dictionary with help of the adei tree
-        //TODO: fill the path dictionary with help of the adei tree
-        //TODO: fill the path dictionary with help of the adei tree
-        //TODO: fill the path dictionary with help of the adei tree
-        //TODO: fill the path dictionary with help of the adei tree
-        //TODO: fill the path dictionary with help of the adei tree
-    }else{//sibling of a sensor list item
-        //TODO: does this make sense? -tb-
-        item = (ORSensorItem*)[[ORSensorItem alloc] init];
-    }
-    return item;//TODO: who is responsible for releasing the sensor items? -tb- 2008-12-02
-}
 
 
 + (ORSensorItem*) emptySensorListItemWithChanNum:(int)aNum;
@@ -821,6 +1628,22 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     return item;
 }
 
++ (NSString*) stringForAdeiType:(int)aValue
+{
+    switch(aValue){
+        case kAdeiTypeRoot  : return @"Root"; break;
+        case kAdeiTypeService  : return @"ADEIService"; break;
+        case kAdeiTypeSetupOption  : return @"SetupOption"; break;
+        case kAdeiTypeServer   : return @"Server"; break; 
+        case kAdeiTypeDatabase : return @"Database"; break; 
+        case kAdeiTypeGroup : return @"Group"; break; 
+        case kAdeiTypeItem: return @"SensorItem"; break;
+        case kSensorListItem: return @"SensorListItem"; break;
+        case kSensorListEmptyItem: return @"EmptySensorListItem"; break;
+        default: return @"unknown"; break;
+    }
+}
+
 #if 1
 - (id) init
 {
@@ -828,20 +1651,31 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     //NSLog(@"Calling ORSensorItem init\n");
     //NSLog(@"Calling %@ %@ for %p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
     self=[super init];
-    //[self setItems:[NSMutableArray array]];
+    //[self setChildren:[NSMutableArray array]];
     //[self setSensorPath:[NSMutableDictionary dictionary]];
     [self setChannelMapNum:-1];
-    //NSLog(@"Calling ORSensorItem init 2 items %p self %p\n",items,self);
+    //NSLog(@"Calling ORSensorItem init 2 children %p self %p\n",children,self);
     return self;
 }
 #endif
+
+- (id) initSensorListItem
+{
+    [self setChannelMapNum:-1];
+    [self setSensorPath:[NSMutableDictionary dictionary]];
+    [self setMinValue:0.0];
+    [self setMaxValue:100.0];
+    [self setLowAlarmRange:30.0];
+    [self setHighAlarmRange:60.0];
+    return self;
+}
 
 - (void) dealloc
 {
     NSLog(@"Calling %@ %@ for %p\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),self);
     [self setName: nil];
     [self setClassType: nil];
-    [self setItems: nil];
+    [self setChildren: nil];
     [self setObject: nil];
     [self setSensorPath: nil];
 
@@ -849,14 +1683,14 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 }
 
 
-- (void) setGuardian:(ORSensorItem*)anObject
+- (void) setParent:(ORSensorItem*)anObject 
 {
-	guardian = anObject; //don't retain
+	parent = anObject; //don't retain
 }
 
-- (ORSensorItem*) guardian
+- (ORSensorItem*) parent
 {
-	return guardian;
+	return parent;
 }
 
 
@@ -911,6 +1745,7 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 {
     return data; 
 }
+
 - (void) setData: (NSString *) aString
 {
     [aString retain];
@@ -927,6 +1762,13 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     doubleData = aValue;
 }
 
+- (BOOL) isRecordingData
+{    return isRecordingData;    }
+
+- (void) setIsRecordingData:(BOOL)aValue
+{    isRecordingData = aValue;    }
+
+
 - (NSString *) date
 {
     return date; 
@@ -937,6 +1779,26 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     [date release];
     date = aString;
 }
+
+- (double) minValue
+{   return minValue;    }
+- (void) setMinValue:(double)aValue
+{   minValue= aValue;    }
+
+- (double) maxValue;
+{   return maxValue;    }
+- (void) setMaxValue:(double)aValue
+{   maxValue= aValue;    }
+
+- (double) lowAlarmRange;
+{   return lowAlarmRange;    }
+- (void) setLowAlarmRange:(double)aValue
+{   lowAlarmRange= aValue;    }
+
+- (double) highAlarmRange;
+{   return highAlarmRange;    }
+- (void) setHighAlarmRange:(double)aValue
+{   highAlarmRange= aValue;    }
 
 
 
@@ -965,7 +1827,7 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 - (double) loadSensorValueWithSensorPath
 {
-    //called from e.g. - (IBAction) sensorlistButtonAction:(id)sender
+    //called from e.g. - (IBAction) loadAllSensorValuesWithSensorPath:(id)sender
 
     int retVal=-1.0;
     NSURL *csvurl;
@@ -973,7 +1835,7 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     NSError *err=nil;
     
     if(sensorPath  && [sensorPath count]!=0){
-        NSLog(@"OK: sensorPath has length:%i\n",[sensorPath count]);
+        DebugTB(  NSLog(@"loadSensorValueWithSensorPath: OK: sensorPath has length:%i\n",[sensorPath count]);  )
     }else{
         //NSLog(@"ERROR: sensorPath is empty or undefined!\n");
         return retVal;//returns -1
@@ -981,12 +1843,13 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     
     //example: csvurl = [NSURL URLWithString: @"http://ipepdvadei.ka.fzk.de/adei/services/getdata.php?format=csv&db_server=toskanadb&db_name=prespektrometer_rep&db_group=1&window=1227618000-1227620000&db_mask=5,6,7,81,82,83"];
     NSString *requestString = 
-        [NSString stringWithFormat: @"%@getdata.php?format=csv&db_server=%@&db_name=%@&db_group=%@&window=-1&db_mask=%@",
+        [NSString stringWithFormat: @"%@getdata.php?format=csv&db_server=%@&db_name=%@&db_group=%@&window=-1&db_mask=%@%@",
             [sensorPath valueForKey: kServiceString],
             [sensorPath valueForKey: kServerString],
             [sensorPath valueForKey: kDatabaseString],
             [sensorPath valueForKey: kGroupIDString],
-            [sensorPath valueForKey: kSensorIDString]
+            [sensorPath valueForKey: kSensorIDString],
+            [sensorPath valueForKey: kSetupOptionString]
         ];
     // DebugTB( NSLog(@"Request string is %@\n", requestString); )
 
@@ -1055,14 +1918,15 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&experiment=0-0&window=0
 //fuzzy.fzk.de/adei/#db_server=katrin&db_name=hauptspektrometer&db_group=0&db_mask=1&window=0
     NSString *requestString = 
-        [NSString stringWithFormat: @"%@#db_server=%@&db_name=%@&db_group=%@&db_mask=%@&window=0",
+        [NSString stringWithFormat: @"%@#db_server=%@&db_name=%@&db_group=%@&db_mask=%@&window=0%@",
             [sensorPath valueForKey: kAdeiUrlString],
             [sensorPath valueForKey: kServerString],
             [sensorPath valueForKey: kDatabaseString],
             [sensorPath valueForKey: kGroupIDString],
-            [sensorPath valueForKey: kSensorIDString]
+            [sensorPath valueForKey: kSensorIDString],
+            [sensorPath valueForKey: kSetupOptionString] //TODO: !!!!!!! test for missing setup option???!!!!!!!!!!!! -tb-
         ];
-    DebugTB( NSLog(@"Request string is %@\n", requestString); )
+    DebugTB( NSLog(@"Request string is %@\n", requestString); ) //TODO: log the request string somewhere -tb-
     return requestString;
 }
 
@@ -1093,20 +1957,45 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 - (void) createAdeiPathFromSibling:(ORSensorItem*)aSibling
 {    
-    ORSensorItem* item;
+    ORSensorItem* item=aSibling;
+    int aAdeiType;
+    if([aSibling adeiType]==kAdeiTypeItem){
+        while(item){
+            aAdeiType = [item adeiType];
+            if(aAdeiType == kAdeiTypeItem)
+                [sensorPath setValue: [item value] forKey: kSensorIDString];
+            if(aAdeiType == kAdeiTypeGroup)
+                [sensorPath setValue: [item value] forKey: kGroupIDString];
+            if(aAdeiType == kAdeiTypeDatabase)
+                [sensorPath setValue: [item value] forKey: kDatabaseString];
+            if(aAdeiType == kAdeiTypeServer)
+                [sensorPath setValue: [item value] forKey: kServerString];
+            if(aAdeiType == kAdeiTypeSetupOption)
+                [sensorPath setValue: [item value] forKey: kSetupOptionString];
+            if(aAdeiType == kAdeiTypeService){
+                [sensorPath setValue: [item value] forKey: kServiceString];
+                [sensorPath setValue: [[item value] substringToIndex: [[item value] length]-9 ] forKey: kAdeiUrlString]; //remove trailing "services/"
+                //TODO: maybe this should saved in the root (instead of the service url) -tb-
+            }
+            item = [item parent];//go up in the tree ...
+        }
+    }
+        
+        #if 0  //this was OK, but a while loop is more flexible
         if([aSibling adeiType]==kAdeiTypeItem){
             [sensorPath setValue: [aSibling value] forKey: kSensorIDString];
-            item = [aSibling guardian];
+            item = [aSibling parent];
             [sensorPath setValue: [item value] forKey: kGroupIDString];
-            item = [item guardian];
+            item = [item parent];
             [sensorPath setValue: [item value] forKey: kDatabaseString];
-            item = [item guardian];
+            item = [item parent];
             [sensorPath setValue: [item value] forKey: kServerString];
-            item = [item guardian];
+            item = [item parent];
             [sensorPath setValue: [item value] forKey: kServiceString];
             [sensorPath setValue: [[item value] substringToIndex: [[item value] length]-9 ] forKey: kAdeiUrlString]; //remove trailing "services/"
             //TODO: maybe this should saved in the root (instead of the service url) -tb-
         }
+        #endif
         
         #if 0
         [self dumpSensorPath];
@@ -1142,6 +2031,35 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     channelMapNum=aValue;
 }
 
+//! Sets the ADEI base and service url.
+- (void) setAdeiBaseUrl: (NSString*) aUrl
+{
+    if(aUrl==nil){
+        return;
+    }
+    BOOL hasHttp, hasSlash;
+    hasHttp = [aUrl hasPrefix:   @"http://"];
+    hasSlash = [aUrl hasSuffix:   @"/"];
+    NSString* goodUrl = [NSString stringWithFormat: @"%@%@%@", hasHttp?@"":@"http://",aUrl,hasSlash?@"":@"/"];
+    
+    [sensorPath setValue: goodUrl forKey: kAdeiUrlString];
+    [sensorPath setValue: [NSString stringWithFormat:@"%@%@",goodUrl,@"services/"] forKey: kServiceString];
+}
+
+- (NSString*) adeiBaseUrl
+{
+    if(sensorPath) return [sensorPath valueForKey: kAdeiUrlString];
+    else return @"";
+}
+
+- (NSString*) adeiServiceUrl
+{
+    if(sensorPath) return [sensorPath valueForKey: kServiceString];
+    else return @"";
+}
+
+
+
 - (NSMutableDictionary*) sensorPath
 {
     return sensorPath;
@@ -1167,6 +2085,27 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
         while ((key = [enumerator nextObject])) {
             NSLog(@"  key: %@, value: %@\n", key, [sensorPath valueForKey:key]);    /* code that uses the returned key */
         }
+}
+
+- (NSString*) adeiPath
+{
+    if(sensorPath){
+        NSMutableString *pstr = [[NSMutableString alloc] init];
+        [pstr appendString: [sensorPath valueForKey: kServerString] ];
+        [pstr appendString: @"." ];
+        [pstr appendString: [sensorPath valueForKey: kDatabaseString] ];
+        [pstr appendString: @"." ];
+        [pstr appendString: [sensorPath valueForKey: kGroupIDString] ];
+        [pstr appendString: @"." ];
+        [pstr appendString: [sensorPath valueForKey: kSensorIDString] ];
+        [pstr appendString: @" - " ];
+        [pstr appendString: [sensorPath valueForKey: kServiceString] ];
+        [pstr appendString: @" - " ];
+        [pstr appendString: [sensorPath valueForKey: kSetupOptionString] ];
+        return pstr;
+    }else{
+        return @"";
+    }
 }
 
 //unused? unneeded?
@@ -1218,29 +2157,29 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 
 
-- (NSMutableArray *) items
+- (NSMutableArray *) children
 {
-    return items; 
+    return children; 
 }
 
-- (void) setItems: (NSMutableArray *) anItems
+- (void) setChildren: (NSMutableArray *) anArray
 {
-    [anItems retain];
-    [items release];
-    items = anItems;
+    [anArray retain];
+    [children release];
+    children = anArray;
 }
-- (void) addObject:(id)anObject
+- (void) addChild:(id)anObject
 {
-    [items addObject:anObject];
+    [children addObject:anObject];
 }
 
-- (unsigned) count
+- (unsigned) countChildren
 {
     //TODO: if([self isLeafNode]){
 	//	return 1;
 	//}
 	//else 
-    return [items count];
+    return [children count];
 }
 - (BOOL) isLeafNode
 {
@@ -1250,11 +2189,11 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 {
 	//TODO: if([self isLeafNode])return object;
     //else 
-    return [items objectAtIndex:index];
+    return [children objectAtIndex:index];
 }
 
 
-// 'local' DebugTB for testing the tree scanning -tb-
+// 'local' DebugTB2 for testing the tree scanning -tb-
 #define DebugTB2(x)
 //#define DebugTB2(x) x
 - (int) createChildrenFromXmlDoc:(NSXMLDocument*)aDoc withType:(int)aType
@@ -1277,13 +2216,14 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
                 NSXMLElement *element=(NSXMLElement *)aNode;
                 if([element attributes]){
                     DebugTB2( NSLog(@"  Node is a NSXMLElementKind, check attributes: %p, num attributes %i \n",[element attributes],[[element attributes] count]);  )
-                    //new node
+                    //Create new ORSensorItem node for ADEI tree:
                     ORSensorItem *newChild = [ORSensorItem sensorWithAdeiType: aType named: @""];
                     //ORSensorItem *newChild = [[ORSensorItem alloc] init];
-                    [newChild setAdeiType: aType];
-                    [newChild setGuardian: self];
+                    [newChild setAdeiType: aType];//TODO: test then remove -tb-
+                    [newChild setParent: self];
                     //[newChild setObject: element];
-                    [[self items] addObject: newChild];
+                    [self addChild: newChild];
+                    //was [[self children] addObject: newChild];
                     //set name and value for new node
                     attributeNode =[element attributeForName:@"value"];
                     if(attributeNode){
@@ -1326,7 +2266,7 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
     }
     
     DebugTB2( 
-    NSLog(@"Summary: added %i (%i,%i) children to node %@ (%p)\n",[self count],[[self items] count],count,[self name], self);
+    NSLog(@"Summary: added %i (%i,%i) children to node %@ (%p)\n",[self count],[[self children] count],count,[self name], self);
     NSLog(@" \n" );
     )
     return count;

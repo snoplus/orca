@@ -23,29 +23,37 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>autoReconnectAction</key>
+				<key>addAdeiSetupOptionAction</key>
+				<string>id</string>
+				<key>adeiBaseUrlFieldAction</key>
+				<string>id</string>
+				<key>adeiBaseUrlForSensorAction</key>
 				<string>id</string>
 				<key>closeLeftDrawer</key>
 				<string>id</string>
 				<key>closeRightDrawer</key>
 				<string>id</string>
-				<key>connectAtStartAction</key>
-				<string>id</string>
-				<key>connectButtonAction</key>
-				<string>id</string>
 				<key>dumpSensorlistButtonAction</key>
+				<string>id</string>
+				<key>highAlarmRangeChangedAction</key>
+				<string>id</string>
+				<key>isRecordingDataChangedAction</key>
 				<string>id</string>
 				<key>loadAdeiHomeInWebInterfaceWebViewAction</key>
 				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
+				<key>lowAlarmRangeChangedAction</key>
+				<string>id</string>
+				<key>maxValueChangedAction</key>
+				<string>id</string>
+				<key>minValueChangedAction</key>
+				<string>id</string>
 				<key>openLeftDrawer</key>
 				<string>id</string>
 				<key>openRightDrawer</key>
 				<string>id</string>
-				<key>remoteHostFieldAction</key>
-				<string>id</string>
-				<key>remotePortFieldAction</key>
+				<key>removeAdeiSetupOptionAction</key>
 				<string>id</string>
 				<key>requestSensorTreeButtonAction</key>
 				<string>id</string>
@@ -72,24 +80,46 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>adeiUrlField</key>
+				<key>addAdeiSetupOptionButton</key>
+				<string>NSButton</string>
+				<key>adeiBaseUrlField</key>
 				<string>NSTextField</string>
+				<key>adeiServiceUrlField</key>
+				<string>NSTextField</string>
+				<key>adeiSetupOptionsComboBox</key>
+				<string>NSComboBox</string>
+				<key>adeiSetupOptionsTableView</key>
+				<string>NSTableView</string>
 				<key>adeiWebInterfaceWebView</key>
 				<string>WebView</string>
 				<key>autoReconnectButton</key>
 				<string>NSButton</string>
 				<key>byteRecievedField</key>
 				<string>NSTextField</string>
+				<key>clearAdeiSensorTreeButton</key>
+				<string>NSButton</string>
 				<key>connectAtStartButton</key>
 				<string>NSButton</string>
 				<key>connectButton</key>
 				<string>NSButton</string>
 				<key>connectionStatusField</key>
 				<string>NSTextField</string>
+				<key>highAlarmRangeField</key>
+				<string>NSTextField</string>
+				<key>ipeSlowControlTabView</key>
+				<string>NSTabView</string>
+				<key>isRecordingDataButton</key>
+				<string>NSButton</string>
 				<key>leftDrawer</key>
 				<string>NSDrawer</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
+				<key>lowAlarmRangeField</key>
+				<string>NSTextField</string>
+				<key>maxValueField</key>
+				<string>NSTextField</string>
+				<key>minValueField</key>
+				<string>NSTextField</string>
 				<key>monitoringField</key>
 				<string>NSTextField</string>
 				<key>monitoringIntValueField</key>
@@ -98,8 +128,22 @@
 				<string>NSTextField</string>
 				<key>remotePortField</key>
 				<string>NSTextField</string>
+				<key>removeAdeiSetupOptionButton</key>
+				<string>NSButton</string>
+				<key>requestAdeiSensorTreeButton</key>
+				<string>NSButton</string>
+				<key>requestAdeiSensorTreeProgressIndicator</key>
+				<string>NSProgressIndicator</string>
 				<key>rightDrawer</key>
 				<string>NSDrawer</string>
+				<key>sensorAdeiBaseUrlField</key>
+				<string>NSTextField</string>
+				<key>sensorAdeiServiceUrlField</key>
+				<string>NSTextField</string>
+				<key>sensorNumField</key>
+				<string>NSTextField</string>
+				<key>sensorPathField</key>
+				<string>NSTextField</string>
 				<key>sensorTableView</key>
 				<string>NSTableView</string>
 				<key>sensorTreeOutlineView</key>
