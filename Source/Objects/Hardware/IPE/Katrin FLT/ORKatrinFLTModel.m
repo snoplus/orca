@@ -327,7 +327,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 }
 
 /** For version 3 veto and histogram feature are not available at the same time.
- * As this is not critical I don't care about this. See: @setHistoFeatureIsAvailable:
+ * As this is not critical I don't care about this. See: #setHistoFeatureIsAvailable:
  */
 - (void) setVetoFeatureIsAvailable:(BOOL)aBool
 {
