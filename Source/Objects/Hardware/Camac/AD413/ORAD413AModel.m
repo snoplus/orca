@@ -405,42 +405,54 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     @try {
         
-        unsigned short adcValue;
-		
-		if(randomAccessMode){
-			if(onlineChannelCount){
-				int i;
-				for(i=0;i<onlineChannelCount;i++){
-					//read one adc channnel
-					[controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
-					[self ship:aDataPacket adc:adcValue&0x1fff forChan:onlineList[i]];
-				}
-			}
-		}
-		else {
-			if(zeroSuppressionMode){            
-				unsigned short data;
-				unsigned short  status = [controller camacShortNAF:cachedStation a:0 f:2 data:&data];
-				if(isQbitSet(status)){
-					int numValues = (data>>11) & 0x3;
+		unsigned short status = [controller camacShortNAF:cachedStation a:0 f:10]; //test and clear the lam
+		if((lamEnable && isQbitSet(status)) || lamEnable){
+			unsigned short adcValue;
+			if(randomAccessMode){
+				if(onlineChannelCount){
 					int i;
-					for(i=0;i<numValues;i++){
-						[controller camacShortNAF:cachedStation a:0 f:2 data:&data];
-						int chan = (data>>13)&0x3;
-						[self ship:aDataPacket adc:data&0x1fff forChan:chan];
-						//in this mode, the LAM is cleared when the last adc is read.
+					for(i=0;i<onlineChannelCount;i++){
+						//read one adc channnel
+						[controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
+						[self ship:aDataPacket adc:adcValue&0x1fff forChan:onlineList[i]];
 					}
 				}
 			}
 			else {
-
-				int i;
-				for(i=0;i<4;i++){
-					[controller camacShortNAF:cachedStation a:i f:2 data:&adcValue];
-					[self ship:aDataPacket adc:adcValue&0x1fff forChan:i];
+				if(zeroSuppressionMode){            
+					unsigned short data;
+					unsigned short  status = [controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+					if(isQbitSet(status)){
+						int numValues = (data>>11) & 0x3;
+						int i;
+						if( numValues==0 ){ //means read out all channels
+							for(i=0;i<4;i++){
+								[controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+								int chan = (data>>13)&0x3;
+								[self ship:aDataPacket adc:data&0x1fff forChan:chan];
+								//in this mode, the LAM is cleared when the last adc is read.
+							}
+						}
+						else {	
+							for(i=0;i<numValues;i++){
+								[controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+								int chan = (data>>13)&0x3;
+								[self ship:aDataPacket adc:data&0x1fff forChan:chan];
+								//in this mode, the LAM is cleared when the last adc is read.
+							}
+						}
+					}
 				}
-			}
+				else {
 
+					int i;
+					for(i=0;i<4;i++){
+						[controller camacShortNAF:cachedStation a:i f:2 data:&adcValue];
+						[self ship:aDataPacket adc:adcValue&0x1fff forChan:i];
+					}
+				}
+
+			}
 		}
 	}
 	@catch(NSException* localException) {
