@@ -1053,7 +1053,6 @@ enum {
 						[self writeTSAR:address];
 						unsigned short outValue;
 						[controller camacShortNAF:[self stationNumber] a:0 f:0 data:&outValue];
-						NSLog(@"%@ chan: %d <%d != %d>\n",[paramDict objectForKey:@"name"],chan,value,outValue);
 						if(outValue!=value) {
 							NSLogColor([NSColor redColor],@"%@ chan: %d <%d != %d>\n",[paramDict objectForKey:@"name"],chan,value,outValue);
 							NSLogError(@"",@"DFG4c Card Error",@"Param Write/Read Error",nil);
@@ -1086,7 +1085,6 @@ enum {
 					[self writeTSAR:address];
 					unsigned short outValue;
 					[controller camacShortNAF:[self stationNumber] a:0 f:0 data:&outValue];
-					NSLog(@"%@  %d <%d != %d>\n",[paramDict objectForKey:@"name"],value,outValue);
 					if(outValue!=value) {
 						NSLogColor([NSColor redColor],@"%@  %d <%d != %d>\n",[paramDict objectForKey:@"name"],value,outValue);
 						NSLogError(@"",@"DFG4c Card Error",@"Param Write/Read Error",nil);
