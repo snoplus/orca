@@ -35,6 +35,8 @@ NSString* ORAD413AControlReg1ChangedNotification     = @"ORAD413AControlReg1Chan
 NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2ChangedNotification";
 
 @interface ORAD413AModel (private)
+- (void) readChannels:(ORDataPacket*)aDataPacket;
+- (void) readZeroSuppressedChannels:(ORDataPacket*)aDataPacket;
 - (void) ship:(ORDataPacket*)aDataPacket adc:(unsigned short)adcValue forChan:(int)i;
 @end
 
@@ -162,15 +164,15 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 
 }
 
-- (BOOL) coincidence
+- (BOOL) singles
 {
-    return coincidence;
+    return singles;
 }
 
-- (void) setCoincidence: (BOOL) aState
+- (void) setSingles: (BOOL) aState
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setCoincidence:coincidence];
-    coincidence = aState;
+    [[[self undoManager] prepareWithInvocationTarget:self] setSingles:singles];
+    singles = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
 }
 
@@ -244,7 +246,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     unsigned short aValue;
     [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:0 data:&aValue];
 	zeroSuppressionMode |= !(aValue>>kZeroSuppressionBit)&0x1;
-	coincidence			|= !(aValue>>kCoincidenceBit)&0x1;
+	singles				|= (aValue>>kSinglesBit)&0x1;				//in manual -- coincidence bit
 	randomAccessMode	|= (aValue>>kRandomAccessBit)&0x1;
 	ofSuppressionMode	|= !(aValue>>kOFSuppressionBit)&0x1;
 	CAMACMode			|= (aValue>>kECLPortEnableBit)&0x1;
@@ -269,7 +271,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	unsigned short controlReg1 = 0;
 	controlReg1 |= vsn;
 	controlReg1 |= (!zeroSuppressionMode)<<kZeroSuppressionBit;
-	controlReg1 |= (!coincidence)<<kCoincidenceBit;
+	controlReg1 |= (singles)<<kSinglesBit;							//in manual -- coincidence bit
 	controlReg1 |= randomAccessMode<<kRandomAccessBit;
 	controlReg1 |= (!ofSuppressionMode)<<kOFSuppressionBit;
 	controlReg1 |= zeroSuppressionMode<<kZeroSuppressionBit;
@@ -404,55 +406,15 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-        
-		unsigned short status = [controller camacShortNAF:cachedStation a:0 f:10]; //test and clear the lam
-		if((lamEnable && isQbitSet(status)) || lamEnable){
-			unsigned short adcValue;
-			if(randomAccessMode){
-				if(onlineChannelCount){
-					int i;
-					for(i=0;i<onlineChannelCount;i++){
-						//read one adc channnel
-						[controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
-						[self ship:aDataPacket adc:adcValue&0x1fff forChan:onlineList[i]];
-					}
-				}
-			}
+		unsigned short status = [controller camacShortNAF:cachedStation a:0 f:8]; //test the lam
+		BOOL lamIsSet = isQbitSet(status);
+		if((lamEnable && lamIsSet) || lamEnable){
+			if(randomAccessMode)		[self readChannels:aDataPacket];
 			else {
-				if(zeroSuppressionMode){            
-					unsigned short data;
-					unsigned short  status = [controller camacShortNAF:cachedStation a:0 f:2 data:&data];
-					if(isQbitSet(status)){
-						int numValues = (data>>11) & 0x3;
-						int i;
-						if( numValues==0 ){ //means read out all channels
-							for(i=0;i<4;i++){
-								[controller camacShortNAF:cachedStation a:0 f:2 data:&data];
-								int chan = (data>>13)&0x3;
-								[self ship:aDataPacket adc:data&0x1fff forChan:chan];
-								//in this mode, the LAM is cleared when the last adc is read.
-							}
-						}
-						else {	
-							for(i=0;i<numValues;i++){
-								[controller camacShortNAF:cachedStation a:0 f:2 data:&data];
-								int chan = (data>>13)&0x3;
-								[self ship:aDataPacket adc:data&0x1fff forChan:chan];
-								//in this mode, the LAM is cleared when the last adc is read.
-							}
-						}
-					}
-				}
-				else {
-
-					int i;
-					for(i=0;i<4;i++){
-						[controller camacShortNAF:cachedStation a:i f:2 data:&adcValue];
-						[self ship:aDataPacket adc:adcValue&0x1fff forChan:i];
-					}
-				}
-
+				if(zeroSuppressionMode)	[self readZeroSuppressedChannels:aDataPacket];
+				else					[self readChannels:aDataPacket];
 			}
+			if(lamIsSet)[controller camacShortNAF:cachedStation a:0 f:10]; //clear lam
 		}
 	}
 	@catch(NSException* localException) {
@@ -464,6 +426,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 }
+
 
 #pragma mark ¥¥¥FERA
 - (void) setVSN:(int)aVSN
@@ -506,7 +469,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     
     [self setOnlineMask:			[decoder decodeIntForKey:   @"ORAD413AOnlineMask"]];
     [self setDiscriminators:		[decoder decodeObjectForKey:@"OR413Discriminators"]];
-    [self setCoincidence:			[decoder decodeBoolForKey:	@"coincidence"]];
+    [self setSingles:				[decoder decodeBoolForKey:	@"singles"]];
     [self setRandomAccessMode:		[decoder decodeBoolForKey:	@"randomAccessMode"]];
     [self setZeroSuppressionMode:	[decoder decodeBoolForKey:	@"zeroSuppressionMode"]];
     [self setOfSuppressionMode:		[decoder decodeBoolForKey:	@"ofSuppressionMode"]];
@@ -528,7 +491,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     [encoder encodeInt:onlineMask			forKey:@"ORAD413AOnlineMask"];
     [encoder encodeObject:discriminators	forKey:@"OR413Discriminators"];
 	
-    [encoder encodeBool:coincidence			forKey:@"coincidence"];
+    [encoder encodeBool:singles				forKey:@"singles"];
     [encoder encodeBool:randomAccessMode	forKey:@"randomAccessMode"];
     [encoder encodeBool:zeroSuppressionMode forKey:@"zeroSuppressionMode"];
     [encoder encodeBool:ofSuppressionMode	forKey:@"ofSuppressionMode"];
@@ -545,8 +508,8 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     [objDictionary setObject:[NSNumber numberWithInt:onlineMask] forKey:@"onlineMask"];
-	
-    [objDictionary setObject:[NSNumber numberWithBool:coincidence]			forKey:@"coincidence"];
+		
+    [objDictionary setObject:[NSNumber numberWithBool:singles]				forKey:@"singles"];
     [objDictionary setObject:[NSNumber numberWithBool:randomAccessMode]		forKey:@"randomAccessMode"];
     [objDictionary setObject:[NSNumber numberWithBool:zeroSuppressionMode]	forKey:@"zeroSuppressionMode"];
     [objDictionary setObject:[NSNumber numberWithBool:ofSuppressionMode]	forKey:@"ofSuppressionMode"];
@@ -562,6 +525,40 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 @end
 
 @implementation ORAD413AModel (private)
+
+- (void) readChannels:(ORDataPacket*)aDataPacket
+{
+	int numToRead;
+	if(randomAccessMode) numToRead = onlineChannelCount;
+	else				 numToRead = 4;
+	
+	int i;
+	for(i=0;i<numToRead;i++){
+		unsigned short adcValue;
+		[controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
+		int chan;
+		if(randomAccessMode)chan = onlineList[i];
+		else chan = i;
+		[self ship:aDataPacket adc:adcValue&0x1fff forChan:chan];
+	}
+}
+
+- (void) readZeroSuppressedChannels:(ORDataPacket*)aDataPacket
+{
+	unsigned short data;
+	unsigned short  status = [controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+	if(isQbitSet(status)){
+		int numValues = (data>>11) & 0x3;
+		if(numValues==0)numValues=4;
+		int i;
+		for(i=0;i<numValues;i++){
+			[controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+			int chan = (data>>13)&0x3;
+			[self ship:aDataPacket adc:data&0x1fff forChan:chan];
+		}
+	}
+}
+
 - (void) ship:(ORDataPacket*)aDataPacket adc:(unsigned short)adcValue forChan:(int)i
 {
     if(IsShortForm(dataId)){

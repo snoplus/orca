@@ -35,7 +35,7 @@ enum {
     kMasterGateBit      = 4,
     kZeroSuppressionBit = 8,
     kECLPortEnableBit   = 9,
-    kCoincidenceBit     = 12,
+    kSinglesBit			= 12,	//in manual -- coincidence bit
     kRandomAccessBit    = 13,
     kLAMEnableBit       = 14,
     kOFSuppressionBit   = 15,
@@ -51,7 +51,7 @@ enum {
         
  		short vsn;
 		BOOL lamEnable;
-		BOOL  coincidence;
+		BOOL  singles;
         BOOL  randomAccessMode;
 		BOOL  ofSuppressionMode;
 		BOOL  zeroSuppressionMode;
@@ -84,8 +84,8 @@ enum {
 - (unsigned short) discriminatorForChan:(int)aChan;
 
 //control Reg1
-- (BOOL) coincidence;
-- (void) setCoincidence:(BOOL)aState;
+- (BOOL) singles;
+- (void) setSingles:(BOOL)aState;
 - (BOOL) randomAccessMode;
 - (void) setRandomAccessMode:(BOOL)aState;
 - (BOOL) zeroSuppressionMode;

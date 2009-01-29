@@ -120,6 +120,15 @@
 	
     [settingLockButton setState: locked];
     [onlineMaskMatrix setEnabled:!lockedOrRunningMaintenance];
+    [discriminatorFieldMatrix setEnabled:!lockedOrRunningMaintenance];
+    [discriminatorStepperMatrix setEnabled:!lockedOrRunningMaintenance];
+    [clearModuleButton setEnabled:!locked && !runInProgress];
+    [controlReg1Matrix setEnabled:!locked && !runInProgress];
+    [controlReg2Matrix setEnabled:!locked && !runInProgress];
+    [writeControlReg1Button setEnabled:!locked && !runInProgress];
+    [readControlReg1Button setEnabled:!lockedOrRunningMaintenance];
+    [writeControlReg2Button setEnabled:!locked && !runInProgress];
+    [readControlReg2Button setEnabled:!lockedOrRunningMaintenance];
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -159,7 +168,7 @@
 - (void) controlReg1Changed:(NSNotification*)aNotification
 {
     [[controlReg1Matrix cellWithTag:kZeroSuppressionBit] setState: [model zeroSuppressionMode]];
-    [[controlReg1Matrix cellWithTag:kCoincidenceBit]     setState: [model coincidence]];
+    [[controlReg1Matrix cellWithTag:kSinglesBit]     setState: [model singles]];
     [[controlReg1Matrix cellWithTag:kRandomAccessBit]    setState: [model randomAccessMode]];
     [[controlReg1Matrix cellWithTag:kLAMEnableBit]       setState: [model lamEnable]];
     [[controlReg1Matrix cellWithTag:kOFSuppressionBit]   setState: [model ofSuppressionMode]];
@@ -236,7 +245,7 @@
 	int tag = [[sender selectedCell] tag];
 	BOOL state = [[sender selectedCell] intValue];
 	switch(tag){
-		case kCoincidenceBit:		[model setCoincidence:state];			break;
+		case kSinglesBit:			[model setSingles:state];			break;
 		case kZeroSuppressionBit:	[model setZeroSuppressionMode:state];	break;
 		case kRandomAccessBit:		[model setRandomAccessMode:state];		break;
 		case kLAMEnableBit:			[model setLamEnable:state];				break;
@@ -258,7 +267,7 @@
         [model readControlReg1];
         NSLog(@"AD413A Read Control Register1 for Station %d\n",[model stationNumber]+1);
 		NSLog(@"lamEnable: %@\n",[model lamEnable]?@"YES":@"NO");
-		NSLog(@"coincidence: %@\n",[model coincidence]?@"YES":@"NO");
+		NSLog(@"singles: %@\n",[model singles]?@"YES":@"NO");
 		NSLog(@"randomAccessMode: %@\n",[model randomAccessMode]?@"YES":@"NO");
 		NSLog(@"ofSuppressionMode: %@\n",[model ofSuppressionMode]?@"YES":@"NO");
 		NSLog(@"zeroSuppressionMode: %@\n",[model zeroSuppressionMode]?@"YES":@"NO");
