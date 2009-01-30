@@ -197,7 +197,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 - (IBAction) startProcess:(id)sender
 {
-	[self endEditing];
+	[[self window] endEditingFor:nil];		
     [model startStopRun];
 	[groupView setNeedsDisplayInRect:[groupView bounds]];
 }
