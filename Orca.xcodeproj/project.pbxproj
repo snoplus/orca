@@ -94,6 +94,7 @@
 		2D1AB81D0F1B9F2400E6B850 /* ORIpeSlowControlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */; };
 		2D1AB81E0F1B9F2400E6B850 /* ORIpeSlowControlModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */; };
 		2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */; };
+		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
 		546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA80874BDD60072A274 /* 2228ACard.gif */; };
 		546D9DB10874BDD60072A274 /* OR2228AController.h in Headers */ = {isa = PBXBuildFile; fileRef = 546D9DA90874BDD60072A274 /* OR2228AController.h */; };
@@ -2096,6 +2097,7 @@
 		2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlController.m; path = "IPE SlowControl/ORIpeSlowControlController.m"; sourceTree = "<group>"; };
 		2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlModel.h; path = "IPE SlowControl/ORIpeSlowControlModel.h"; sourceTree = "<group>"; };
 		2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlModel.m; path = "IPE SlowControl/ORIpeSlowControlModel.m"; sourceTree = "<group>"; };
+		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
 		546D9DA90874BDD60072A274 /* OR2228AController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = OR2228AController.h; path = Source/Objects/Hardware/Camac/TDC2228A/OR2228AController.h; sourceTree = SOURCE_ROOT; };
@@ -3910,6 +3912,7 @@
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
 				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
+				2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3931,6 +3934,7 @@
 		1058C7A8FEA54F5311CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2DC1EE7F0F33724E00E93C75 /* WebKit.framework */,
 				84AA7A470545B167005F64B1 /* Foundation.framework */,
 				84AA7A4F0545B17C005F64B1 /* AppKit.framework */,
 			);
