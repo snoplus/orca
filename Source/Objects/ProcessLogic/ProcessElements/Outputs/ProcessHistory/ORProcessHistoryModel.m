@@ -99,7 +99,7 @@ NSString* historyConnectors[4] = {
 		[obj processIsStarting];
 		[inputValue[i] release];
 		inputValue[i] = [[ORTimeRate alloc] init];
-		[inputValue[i] setSampleTime:10];
+		[inputValue[i] setSampleTime:1];
 	}
 	[lastEval release];
 	lastEval = nil;
