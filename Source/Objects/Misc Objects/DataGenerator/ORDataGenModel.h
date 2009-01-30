@@ -21,15 +21,16 @@
 
 #pragma mark ¥¥¥Imported Files
 #import "ORDataTaker.h"
+#import "ORAdcProcessing.h"
 
-#pragma mark ¥¥¥Forward Declarations
-
-@interface ORDataGenModel :  OrcaObject <ORDataTaker>
+@interface ORDataGenModel :  OrcaObject <ORDataTaker,ORAdcProcessing>
 {
     unsigned long dataId1D;
     unsigned long dataId2D;
     unsigned long dataIdWaveform;
 	BOOL first;
+	float adcValue;
+	int theta;
 }
 - (unsigned long) dataId1D;
 - (unsigned long) dataId2D;
@@ -39,6 +40,18 @@
 - (void) setDataIdWaveform: (unsigned long) aDataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
+
+#pragma mark ¥¥¥Adc Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (int) processValue:(int)channel;
+- (void) setProcessOutput:(int)channel value:(int)value;
+- (NSString*) processingTitle;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
 
 #pragma mark ¥¥¥Data Taking
 - (NSDictionary*) dataRecordDescription;

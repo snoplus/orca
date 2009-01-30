@@ -161,6 +161,67 @@
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo  {}
 - (void)reset  {}
 
+
+
+
+#pragma mark ¥¥¥Bit Processing Protocol
+- (void)processIsStarting
+{
+	adcValue = 0;
+	theta = 0;
+}
+
+- (void)processIsStopping
+{
+}
+
+//note that everything called by these routines MUST be threadsafe
+- (void) startProcessCycle
+{
+	adcValue = 10.0*sinf(0.017453 * theta);
+	theta = (theta+1)%360;
+}
+
+- (void) endProcessCycle
+{
+}
+
+- (int) processValue:(int)channel
+{
+	return 0;
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do
+}
+
+- (NSString*) processingTitle
+{
+    return @"Data Gen";
+}
+
+- (double) convertedValue:(int)channel
+{
+	return adcValue;
+}
+
+- (double) maxValueForChan:(int)channel
+{
+	return 10.0;
+}
+- (double) minValueForChan:(int)channel
+{
+	return -10.0;
+}
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
+{
+	@synchronized(self){
+		*theLowLimit = -5.0;
+		*theHighLimit = +5.0;
+	}		
+}
+
 @end
 
 
