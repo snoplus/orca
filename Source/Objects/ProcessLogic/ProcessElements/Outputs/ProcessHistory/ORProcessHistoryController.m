@@ -128,6 +128,7 @@
 {
     scheduledToUpdate = NO;
 	[plotter setNeedsDisplay:YES];
+	[[plotter xScale] setNeedsDisplay:YES];
 }
 
 #pragma mark ¥¥¥Plot Data Source
