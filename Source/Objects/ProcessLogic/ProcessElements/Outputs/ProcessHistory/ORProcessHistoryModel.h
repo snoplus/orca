@@ -46,6 +46,10 @@
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x ;
 @end
 
+@interface NSObject (ProcessHistory)
+-(float) evalAndReturnAnalogValue;
+@end
+
 extern NSString* ORHistoryElementIn1Connection;
 extern NSString* ORHistoryElementIn2Connection;
 extern NSString* ORHistoryElementIn3Connection;

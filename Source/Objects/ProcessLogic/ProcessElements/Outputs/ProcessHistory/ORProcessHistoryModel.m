@@ -122,7 +122,13 @@ NSString* historyConnectors[4] = {
 		lastEval = [now retain];
 		int i;
 		for(i=0;i<4;i++){
-			[inputValue[i] addDataToTimeAverage:[[self objectConnectedTo:historyConnectors[i]] eval]];
+			id obj = [self objectConnectedTo:historyConnectors[i]];
+			if([obj respondsToSelector:@selector(evalAndReturnAnalogValue)]){
+				[inputValue[i] addDataToTimeAverage:[obj evalAndReturnAnalogValue]];
+			}
+			else {
+				[inputValue[i] addDataToTimeAverage:[obj eval]];
+			}
 		}	
 		[self performSelectorOnMainThread:@selector(postUpdate) withObject:nil waitUntilDone:NO];
 	}

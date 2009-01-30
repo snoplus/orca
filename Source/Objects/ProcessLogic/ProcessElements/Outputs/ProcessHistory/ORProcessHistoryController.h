@@ -37,8 +37,10 @@
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
-- (void) dataChanged:(NSNotification*)aNotification;
+- (void) dataChanged:(NSNotification*)aNote;
 - (void) doUpdate;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 

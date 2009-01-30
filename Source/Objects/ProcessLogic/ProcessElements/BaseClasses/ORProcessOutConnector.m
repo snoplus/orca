@@ -60,8 +60,8 @@
 {
 	if(![objectLink partOfRun])[super strokeLine:path];
 	else {
-		if([objectLink evaluatedState]){
-			[path setLineWidth:2];
+		if([objectLink evaluatedState] || [objectLink respondsToSelector:@selector(evalAndReturnAnalogValue)]){
+			[path setLineWidth:1.0];
 			[kProcessOnColor set];
 		}
 		else {

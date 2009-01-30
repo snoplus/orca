@@ -44,7 +44,7 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[[plotter yScale] setRngLimitsLow:0 withHigh:20 withMinRng:5];
+	[[plotter yScale] setRngLimitsLow:-1000 withHigh:1000 withMinRng:5];
 	[[plotter yScale] setRngDefaultsLow:0 withHigh:20];
 
 	[[plotter xScale] setRngLimitsLow:0 withHigh:5000 withMinRng:10];
@@ -61,13 +61,60 @@
                      selector : @selector(dataChanged:)
                          name : ORHistoryElementDataChanged
                        object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(scaleAction:)
+                         name : ORAxisRangeChangedNotification
+                       object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(miscAttributesChanged:)
+						 name : ORMiscAttributesChanged
+					   object : model];
+	
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
+	[self miscAttributesChanged:nil];
 }
 
+- (void) scaleAction:(NSNotification*)aNotification
+{
+	
+	if(aNotification == nil || [aNotification object] == [plotter xScale]){
+		[model setMiscAttributes:[[plotter xScale]attributes] forKey:@"plotterXAttributes"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter yScale]){
+		[model setMiscAttributes:[[plotter yScale]attributes] forKey:@"plotterYAttributes"];
+	};
+	
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString:@"plotterXAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"plotterXAttributes"];
+		if(attrib){
+			[[plotter xScale] setAttributes:attrib];
+			[plotter setNeedsDisplay:YES];
+			[[plotter xScale] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"plotterYAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"plotterYAttributes"];
+		if(attrib){
+			[[plotter yScale] setAttributes:attrib];
+			[plotter setNeedsDisplay:YES];
+			[[plotter yScale] setNeedsDisplay:YES];
+		}
+	}
+}
 
 - (void) dataChanged:(NSNotification*)aNotification
 {
