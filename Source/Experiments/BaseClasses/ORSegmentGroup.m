@@ -401,6 +401,20 @@ NSString* ORSegmentGroupConfiguationChanged = @"ORSegmentGroupConfiguationChange
 	}
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* mapDictionary = [NSMutableDictionary dictionary];
+	NSString* contents = [NSString stringWithContentsOfFile:[mapFile stringByExpandingTildeInPath]];
+	if(contents){
+		[mapDictionary setObject:contents forKey:@"Geometry"];
+	}
+	else {
+		[mapDictionary setObject:@"NONE" forKey:@"Geometry"];
+	}
+    [dictionary setObject:mapDictionary forKey:groupName];
+    return dictionary;
+}
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {

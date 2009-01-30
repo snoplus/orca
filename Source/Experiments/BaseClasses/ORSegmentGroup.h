@@ -78,6 +78,7 @@
 - (NSString*) selectedSegementInfo:(int)index;
 - (void) clearSegmentErrors;
 - (NSSet*) hwCards;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark •••Work Methods
 - (void) histogram;
