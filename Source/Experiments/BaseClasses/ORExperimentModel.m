@@ -459,8 +459,12 @@ NSString* ExperimentModelSelectionChanged				 = @"ExperimentModelSelectionChange
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)aDictionary
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
-        
-    [aDictionary setObject:objDictionary forKey:@"ExperimentModel"];
+	id aSegmentGroup;
+	NSEnumerator* e = [segmentGroups objectEnumerator];
+	while(aSegmentGroup = [e nextObject]){
+		[aSegmentGroup addParametersToDictionary:objDictionary];
+	}
+    [aDictionary setObject:objDictionary forKey:[self className]];
     return aDictionary;
 }
 
