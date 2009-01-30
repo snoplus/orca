@@ -33,6 +33,32 @@
     return self;
 }
 
+- (void) registerNotificationObservers
+{
+    [super registerNotificationObservers];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(minChangeChanged:)
+                         name : ORAdcModelMinChangeChanged
+                       object : model];
+}
+
+- (void) updateWindow
+{
+	[super updateWindow];
+    [self minChangeChanged:nil];
+ }
+
+- (void) minChangeChanged:(NSNotification*)aNote
+{
+	[minChangeField setFloatValue:[model minChange]];
+}
+
+- (IBAction) minChangeAction:(id)sender
+{
+	[model setMinChange:[sender floatValue]];
+}
 
 
 @end

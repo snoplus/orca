@@ -25,6 +25,7 @@
 #import "ORProcessThread.h"
 #import "ORAdcProcessing.h"
 
+NSString* ORAdcModelMinChangeChanged = @"ORAdcModelMinChangeChanged";
 NSString* ORAdcModelOKConnection     = @"ORAdcModelOKConnection";
 NSString* ORAdcModelLowConnection    = @"ORAdcModelLowConnection";
 NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
@@ -36,6 +37,21 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	[lowLimitNub release];
 	[highLimitNub release];
 	[super dealloc];
+}
+
+#pragma mark ***Accessors
+
+- (float) minChange
+{
+    return minChange;
+}
+
+- (void) setMinChange:(float)aMinChange
+{
+	if(aMinChange<0)aMinChange=0;
+    [[[self undoManager] prepareWithInvocationTarget:self] setMinChange:minChange];
+    minChange = aMinChange;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAdcModelMinChangeChanged object:self];
 }
 
 -(void)makeConnectors
@@ -156,9 +172,8 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 			double theConvertedValue  = [hwObject convertedValue:[self bit]]; //reads the hw
 			double theMaxValue		  = [hwObject maxValueForChan:[self bit]];
 			double theMinValue		  = [hwObject minValueForChan:[self bit]];
-			
-			
-			if(fabs(theConvertedValue-hwValue) >= .1 || theMaxValue!=maxValue || theMinValue!=minValue)updateNeeded = YES;
+		
+			if(fabs(theConvertedValue-hwValue) >= minChange || theMaxValue!=maxValue || theMinValue!=minValue)updateNeeded = YES;
 			hwValue = theConvertedValue;
 			maxValue = theMaxValue;
 			minValue = theMinValue;
@@ -170,17 +185,14 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 			lowLimit = theLowLimit;
 			highLimit = theHighLimit;
 
-			if(lowLimit>0) valueTooLow  = hwValue<lowLimit;
-			else valueTooLow = NO;
-			
-			if(highLimit>0) valueTooHigh = hwValue>highLimit;
-			else valueTooHigh = NO;
+			valueTooLow  = hwValue<lowLimit;
+			valueTooHigh = hwValue>highLimit;
 
 		}
 		BOOL newState = !(valueTooLow || valueTooHigh);
 		
 		if((newState == [self state]) && updateNeeded){
-			//if the state will not post an update, then do it where.
+			//if the state will not post an update, then do it here.
 			[self postStateChange];
 		}
 		[self setState: newState];
@@ -188,10 +200,20 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 	}
 	return evaluatedState;
 }
+
+- (float) evalAndReturnAnalogValue
+{
+	[self eval];
+	return hwValue;
+}
+
 //--------------------------------
 
 - (void) addOverLay
 {
+	
+#define kRadius 30.
+	
     if(!guardian) return;
     
     NSImage* aCachedImage = [self image];
@@ -215,9 +237,10 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
             NSPoint theCenter = NSMakePoint((theIconSize.width-10.)/2.+1.,27.);
            if(lowLimit>minValue){
                 float lowLimitAngle = 180*(lowLimit-minValue)/(maxValue-minValue);
+			   lowLimitAngle = -lowLimitAngle + 180;
 				if(lowLimitAngle>=0 && lowLimitAngle<=180){
-					[path appendBezierPathWithArcWithCenter:theCenter radius:30.
-								startAngle:0 endAngle:lowLimitAngle];
+					[path appendBezierPathWithArcWithCenter:theCenter radius:kRadius
+								startAngle:lowLimitAngle endAngle:180];
 					[path lineToPoint:theCenter];
 					[path closePath];
 					[[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
@@ -227,10 +250,11 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
             }
             if(highLimit<maxValue){
 				float highLimitAngle = 180*(highLimit-minValue)/(maxValue-minValue);
+				highLimitAngle = -highLimitAngle + 180;
 				if(highLimitAngle>=0 && highLimitAngle<=180){
 
-					[path appendBezierPathWithArcWithCenter:theCenter radius:30.
-                            startAngle:highLimitAngle endAngle:180.];
+					[path appendBezierPathWithArcWithCenter:theCenter radius:kRadius
+                            startAngle:0 endAngle:highLimitAngle];
 					[path lineToPoint:theCenter];
 					[path closePath];
 					[[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
@@ -241,7 +265,8 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
             
 			NSBezierPath* needlepath = [NSBezierPath bezierPath];
 			float needleAngle = 180*(hwValue-minValue)/(maxValue-minValue);
-            [needlepath appendBezierPathWithArcWithCenter:theCenter radius:30.
+			needleAngle = -needleAngle + 180;
+           [needlepath appendBezierPathWithArcWithCenter:theCenter radius:kRadius
                         startAngle:needleAngle endAngle:needleAngle];
             [needlepath lineToPoint:theCenter];
             [[NSColor redColor] set];
@@ -296,13 +321,29 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
         [n release];
     }
 
-
-    
     [i unlockFocus];
     
     [self setImage:i];
     [i release];
     
+}
+
+#pragma mark ***Archival
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+    
+    [[self undoManager] disableUndoRegistration];
+    [self setMinChange:[decoder decodeFloatForKey:@"minChange"]];
+    [[self undoManager] enableUndoRegistration];    
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder*)encoder
+{
+    [super encodeWithCoder:encoder];
+    [encoder encodeFloat:minChange forKey:@"minChange"];
 }
 
 @end

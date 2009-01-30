@@ -24,9 +24,11 @@
 #import "ORProcessHwAccessorController.h"
 
 @interface ORAdcController : ORProcessHwAccessorController {
+	IBOutlet NSTextField* minChangeField;
  }
 
 #pragma mark ¥¥¥Initialization
--(id)init;
-
+- (id)init;
+- (void) minChangeChanged:(NSNotification*)aNote;
+- (IBAction) minChangeAction:(id)sender;
 @end

@@ -36,7 +36,12 @@
 	BOOL valueTooHigh;
 	ORAdcLowLimitNub*  lowLimitNub;
 	ORAdcHighLimitNub* highLimitNub;
+    float minChange;
 }
+
+#pragma mark ***Accessors
+- (float) minChange;
+- (void) setMinChange:(float)aMinChange;
 - (void) dealloc;
 
 - (BOOL) valueTooLow;
@@ -46,8 +51,14 @@
 - (double) hwValue;
 - (double) maxValue;
 - (void) viewSource;
+- (float) evalAndReturnAnalogValue;
+
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
+
+extern NSString* ORAdcModelMinChangeChanged;
 
 @interface ORAdcLowLimitNub : ORProcessNub
 - (int) eval;
