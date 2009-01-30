@@ -264,6 +264,10 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 			
 			float needleAngle = 180*(hwValue-minValue)/(maxValue-minValue);
 			needleAngle = 180 - needleAngle;
+			
+			if(needleAngle<0)needleAngle=0;
+			if(needleAngle>180)needleAngle=180;
+			
 			float nA = .0174553*needleAngle;
 			[[NSColor redColor] set];
 			[NSBezierPath setDefaultLineWidth:0];
