@@ -232,12 +232,12 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 
     }
     if(hwObject){
-        NSBezierPath* path = [NSBezierPath bezierPath];
         if(maxValue-minValue != 0){
-            NSPoint theCenter = NSMakePoint((theIconSize.width-10.)/2.+1.,27.);
-           if(lowLimit>minValue){
+			NSPoint theCenter = NSMakePoint((theIconSize.width-10.)/2.+1.,27.);
+			if(lowLimit>minValue){
+				NSBezierPath* path = [NSBezierPath bezierPath];
                 float lowLimitAngle = 180*(lowLimit-minValue)/(maxValue-minValue);
-			   lowLimitAngle = -lowLimitAngle + 180;
+				lowLimitAngle =  180-lowLimitAngle;
 				if(lowLimitAngle>=0 && lowLimitAngle<=180){
 					[path appendBezierPathWithArcWithCenter:theCenter radius:kRadius
 								startAngle:lowLimitAngle endAngle:180];
@@ -245,35 +245,30 @@ NSString* ORAdcModelHighConnection   = @"ORAdcModelHighConnection";
 					[path closePath];
 					[[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
 					[path fill];
-					[path removeAllPoints];
 				}
             }
+			
             if(highLimit<maxValue){
 				float highLimitAngle = 180*(highLimit-minValue)/(maxValue-minValue);
-				highLimitAngle = -highLimitAngle + 180;
+				highLimitAngle = 180-highLimitAngle;
 				if(highLimitAngle>=0 && highLimitAngle<=180){
-
+					NSBezierPath* path = [NSBezierPath bezierPath];
 					[path appendBezierPathWithArcWithCenter:theCenter radius:kRadius
                             startAngle:0 endAngle:highLimitAngle];
 					[path lineToPoint:theCenter];
 					[path closePath];
 					[[NSColor colorWithCalibratedRed:.75 green:0. blue:0. alpha:.3] set];
 					[path fill];
-					[path removeAllPoints];
 				}
             }
-            
-			NSBezierPath* needlepath = [NSBezierPath bezierPath];
+			
 			float needleAngle = 180*(hwValue-minValue)/(maxValue-minValue);
-			needleAngle = -needleAngle + 180;
-           [needlepath appendBezierPathWithArcWithCenter:theCenter radius:kRadius
-                        startAngle:needleAngle endAngle:needleAngle];
-            [needlepath lineToPoint:theCenter];
-            [[NSColor redColor] set];
-			[NSBezierPath setDefaultLineWidth:1];
-            [needlepath stroke];
+			needleAngle = 180 - needleAngle;
+			float nA = .0174553*needleAngle;
+			[[NSColor redColor] set];
+			[NSBezierPath setDefaultLineWidth:0];
+            [NSBezierPath strokeLineFromPoint:theCenter toPoint:NSMakePoint(theCenter.x + kRadius*cosf(nA),theCenter.y + kRadius*sinf(nA))];
         }
-
     }
     
     NSString* label;
