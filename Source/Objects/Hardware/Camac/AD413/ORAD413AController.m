@@ -180,7 +180,7 @@
 {
 	int bit;
 	for(bit=0;bit<5;bit++){
-		[[controlReg2Matrix cellWithTag:bit] setState: ![model gateEnable:bit]];
+		[[controlReg2Matrix cellWithTag:bit] setState: [model gateEnable:bit]];
 	}
 }
 
@@ -257,7 +257,7 @@
 {
 	int tag = [[sender selectedCell] tag];
 	BOOL state = [[sender selectedCell] intValue];
-    [model setGateEnable:tag withValue:!state];
+    [model setGateEnable:tag withValue:state];
 }
 
 

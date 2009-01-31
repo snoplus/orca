@@ -245,10 +245,10 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     unsigned short aValue;
     [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:0 data:&aValue];
-	zeroSuppressionMode |= !(aValue>>kZeroSuppressionBit)&0x1;
+	zeroSuppressionMode |= !((aValue>>kZeroSuppressionBit)&0x1);
 	singles				|= (aValue>>kSinglesBit)&0x1;				//in manual -- coincidence bit
 	randomAccessMode	|= (aValue>>kRandomAccessBit)&0x1;
-	ofSuppressionMode	|= !(aValue>>kOFSuppressionBit)&0x1;
+	ofSuppressionMode	|= !((aValue>>kOFSuppressionBit)&0x1);
 	CAMACMode			|= (aValue>>kECLPortEnableBit)&0x1;
 	lamEnable			|= (aValue>>kLAMEnableBit)&0x1;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
@@ -271,7 +271,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	unsigned short controlReg1 = 0;
 	controlReg1 |= vsn;
 	controlReg1 |= (!zeroSuppressionMode)<<kZeroSuppressionBit;
-	controlReg1 |= (singles)<<kSinglesBit;							//in manual -- coincidence bit
+	controlReg1 |= singles<<kSinglesBit;							//in manual -- coincidence bit
 	controlReg1 |= randomAccessMode<<kRandomAccessBit;
 	controlReg1 |= (!ofSuppressionMode)<<kOFSuppressionBit;
 	controlReg1 |= zeroSuppressionMode<<kZeroSuppressionBit;
