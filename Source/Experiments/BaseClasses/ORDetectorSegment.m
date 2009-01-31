@@ -331,7 +331,7 @@ NSString* KSegmentRateChangedNotification = @"KSegmentRateChangedNotification";
 			if( theSlot == [aCard displayedSlotNumber]){
 				
 				id rateObj = [aCard rateObject:[[params objectForKey: kSegmentParam[kChannel].key]intValue]];
-				[notifyCenter addObserver : self
+				if(rateObj)[notifyCenter addObserver : self
 								 selector : @selector(rateChanged:)
 									 name : [rateObj rateNotification]
 								   object : rateObj];

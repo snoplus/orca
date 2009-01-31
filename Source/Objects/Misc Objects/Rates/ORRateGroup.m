@@ -75,7 +75,10 @@ NSString* ORRateGroupTotalRateChangedNotification   = @"ORRateGroupTotalRateChan
 
 - (id) rateObject:(int)index
 {
-	return [rates objectAtIndex:index];
+	if(index<[rates count]){
+		return [rates objectAtIndex:index];
+	}
+	else return nil;
 }
 
 - (double) integrationTime
