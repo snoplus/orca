@@ -30,6 +30,11 @@
 #define kNum3377TDCTests 3
 #define kCMC203FifoMode		 0
 #define kCMC203HistogramMode 1
+
+#define kCMC203SingleHistoMode 0
+#define kCMC203MultipleHistoMode 1
+#define kCMC203FixedEventHistoMode 2
+
 #define kCMC203ReservedHistoHeaderWords 4
 #define kCMC203ReservedFifoHeaderWords  2
 #define kMCM203MaxFifoWords	16*1024
@@ -48,9 +53,11 @@
 		ORRateGroup*	fifoRateGroup;
 		unsigned long 	fifoCount;
 		BOOL isRunning;
+		NSMutableData* histogramData;
+		unsigned long histoMask;
 		ORReadOutList*	readOutGroup;
 		NSArray*		dataTakers;			//cache of data takers.
-
+		unsigned short  savedHeader;
 }   
 
 #pragma mark ***Initialization
@@ -75,6 +82,8 @@
 
 - (unsigned long) histoDataId;
 - (void) setHistoDataId: (unsigned long) aDataId;
+- (int) histogramCount;
+- (unsigned long) histoDataValueAtIndex:(int)index;
 - (ORReadOutList*) readOutGroup;
 - (void) setReadOutGroup:(ORReadOutList*)newReadOutGroup;
 
@@ -107,7 +116,7 @@
 #pragma mark •••Hardware Access
 - (void) forceFPGALoad;
 - (void) initBoard;
-- (NSData*) readHistogram;
+- (void) readHistogram;
 - (void) stopDevice;
 - (void) startDevice;
 - (void) sample;
@@ -126,5 +135,6 @@ extern NSString* ORCMC203ModelHistogramLengthChanged;
 extern NSString* ORCMC203ModelHistogramStartChanged;
 extern NSString* ORCMC203SettingsLock;
 extern NSString* ORCMC203RateGroupChangedNotification;
+extern NSString* ORCMC203HistoDataChangedNotification;
 
 

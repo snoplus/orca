@@ -51,7 +51,7 @@
 - (void) awakeFromNib
 {
 	[[totalRate xScale] setRngLimitsLow:0 withHigh:100E6 withMinRng:10000];
-	 [super awakeFromNib];
+	[super awakeFromNib];
 }
 
 #pragma mark ***Notifications
@@ -136,6 +136,12 @@
 						 name : ORRateAverageChangedNotification
 					   object : [[model fifoRateGroup]timeRate]];
 	
+    [notifyCenter addObserver : self
+					 selector : @selector(updateHistoPlot:)
+						 name : ORCMC203HistoDataChangedNotification
+					   object : model];
+	
+
 }
 
 - (void) updateWindow
@@ -155,11 +161,12 @@
     [self updateTimePlot:nil];
 }
 
+
 - (void) operationModeChanged:(NSNotification*)aNote
 {
-	BOOL state = [model operationMode];
-	[fifoModeButton       setIntValue: !state];
-	[histogramModeButton  setIntValue: state];
+	int mode = [model operationMode];
+	[operationModeMatrix  selectCellWithTag:mode];
+	[dataTabView selectTabViewItemAtIndex:mode];
 	[self updateButtons];
 }
 
@@ -231,6 +238,11 @@
 		[timeRatePlot setNeedsDisplay:YES];
 	}
 }
+	
+- (void) updateHistoPlot:(NSNotification*)aNote
+{
+	[histoPlot setNeedsDisplay:YES];
+}
 
 //a fake action from the scale object
 - (void) scaleAction:(NSNotification*)aNotification
@@ -247,6 +259,14 @@
 	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
 		[model setMiscAttributes:[[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
 	};
+
+	if(aNotification == nil || [aNotification object] == [histoPlot yScale]){
+		[model setMiscAttributes:[[histoPlot yScale]attributes] forKey:@"histoYAttributes"];
+	};
+	if(aNotification == nil || [aNotification object] == [histoPlot xScale]){
+		[model setMiscAttributes:[[histoPlot xScale]attributes] forKey:@"histoXAttributes"];
+	};
+	
 	
 }
 
@@ -281,9 +301,29 @@
 			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
 		}
 	}
+	
+	if(aNote == nil || [key isEqualToString:@"HistoYAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"HistoYAttributes"];
+		if(attrib){
+			[[histoPlot yScale] setAttributes:attrib];
+			[histoPlot setNeedsDisplay:YES];
+			[[histoPlot yScale] setNeedsDisplay:YES];
+		}
+	}
+	
+	if(aNote == nil || [key isEqualToString:@"HistoXAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"HistoXAttributes"];
+		if(attrib){
+			[[histoPlot xScale] setAttributes:attrib];
+			[histoPlot setNeedsDisplay:YES];
+			[[histoPlot xScale] setNeedsDisplay:YES];
+		}
+	}
 }
 
 #pragma mark ***Actions
+
+
 - (IBAction) integrationAction:(id)sender
 {
     [self endEditing];
@@ -296,7 +336,7 @@
 
 - (IBAction) operationModeAction:(id)sender
 {
-	[model setOperationMode:[sender  tag]];	
+	[model setOperationMode:[[sender selectedCell]tag]];	
 }
 
 - (IBAction) adcBitsAction:(id)sender
@@ -381,11 +421,13 @@
 
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-	return [[[model fifoRateGroup]timeRate]count];
+	if(aPlotter == histoPlot)	return [model histogramCount];
+	else						return [[[model fifoRateGroup]timeRate]count];
 }
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
-	if(set == 0){
+	if(aPlotter == histoPlot) return [model histoDataValueAtIndex:x];
+	else {
 		int count = [[[model fifoRateGroup]timeRate] count];
 		return [[[model fifoRateGroup]timeRate]valueAtIndex:count-x-1];
 	}
@@ -407,18 +449,17 @@
 	BOOL runInProgress = [gOrcaGlobals runInProgress];
 	BOOL locked = [gSecurity isLocked:ORCMC203SettingsLock];
     [settingLockButton setState: locked];
-    [loadButton setEnabled:!runInProgress];
-    [fifoModeButton setEnabled:!runInProgress];
-    [histogramModeButton setEnabled:!runInProgress];
-	[adcBitsTextField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
-	[histogramModePU setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
-	[wordSizeField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
-	[histogramLengthTextField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
-	[histogramStartTextField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
-	[histogramModePU setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
-	[histogramMaxCountsPU setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode)];
-	[sampleButton setEnabled: (operationMode == kCMC203HistogramMode)];
-	[initButton setEnabled: !runInProgress];
+    [operationModeMatrix setEnabled:!runInProgress && !locked];
+	[adcBitsTextField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode) && !locked];
+	[histogramModePU setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode) && !locked];
+	[wordSizeField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode) && !locked];
+	[histogramLengthTextField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode) && !locked];
+	[histogramStartTextField setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode) && !locked];
+	[histogramModePU setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode) && !locked];
+	[histogramMaxCountsPU setEnabled: !runInProgress & (operationMode == kCMC203HistogramMode) && !locked];
+	[sampleButton setEnabled: (operationMode == kCMC203HistogramMode) && !locked];
+	[initButton setEnabled: !runInProgress && !locked];
+    [loadButton setEnabled:!runInProgress && !locked];
 }
 @end
 

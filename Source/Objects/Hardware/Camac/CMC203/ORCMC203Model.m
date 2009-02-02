@@ -30,6 +30,7 @@
 #import "ORReadOutList.h"
 
 #pragma mark ***External Strings
+NSString* ORCMC203ModelHistoMaskChanged = @"ORCMC203ModelHistoMaskChanged";
 NSString* ORCMC203ModelOperationModeChanged		= @"ORCMC203ModelOperationModeChanged";
 NSString* ORCMC203ModelAdcBitsChanged			= @"ORCMC203ModelAdcBitsChanged";
 NSString* ORCMC203ModelHistogramModeChanged		= @"ORCMC203ModelHistogramModeChanged";
@@ -37,6 +38,7 @@ NSString* ORCMC203ModelWordSizeChanged			= @"ORCMC203ModelWordSizeChanged";
 NSString* ORCMC203ModelHistogramLengthChanged	= @"ORCMC203ModelHistogramLengthChanged";
 NSString* ORCMC203ModelHistogramStartChanged	= @"ORCMC203ModelHistogramStartChanged";
 NSString* ORCMC203RateGroupChangedNotification  = @"ORCMC203RateGroupChangedNotification";
+NSString* ORCMC203HistoDataChangedNotification  = @"ORCMC203HistoDataChangedNotification";
 
 NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 
@@ -58,6 +60,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
     [fifoRateGroup quit];
     [fifoRateGroup release];
+	[histogramData release];
 	[readOutGroup release];
 	[super dealloc];
 }
@@ -73,6 +76,22 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 }
 
 #pragma mark ***Accessors
+
+- (int) histoMask
+{
+    return histoMask;
+}
+
+- (void) setHistoMask:(int)aHistoMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHistoMask:histoMask];
+    
+    histoMask = aHistoMask;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCMC203ModelHistoMaskChanged object:self];
+}
+
+
 - (ORRateGroup*) fifoRateGroup
 {
 	return fifoRateGroup;
@@ -84,6 +103,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	[fifoRateGroup release];
 	fifoRateGroup = newFifoRateGroup;
 	
+
     [[NSNotificationCenter defaultCenter] 
 		postNotificationName:ORCMC203RateGroupChangedNotification
 					  object:self];    
@@ -121,11 +141,10 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 - (void) setOperationMode:(int)aMode
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setOperationMode:operationMode];
-    
     operationMode = aMode;
-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCMC203ModelOperationModeChanged object:self];
 }
+
 - (int) adcBits
 {
     return adcBits;
@@ -133,8 +152,14 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 
 - (void) setAdcBits:(int)aAdcBits
 {
+	if(aAdcBits<8)aAdcBits = 8;
+	if(aAdcBits>=16)aAdcBits=16;
     [[[self undoManager] prepareWithInvocationTarget:self] setAdcBits:adcBits];
     adcBits = aAdcBits;
+	if(histogramData){
+		[histogramData release];
+		histogramData = nil;
+	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCMC203ModelAdcBitsChanged object:self];
 }
 
@@ -213,13 +238,14 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setOperationMode:[decoder decodeIntForKey:	 @"operationMode"]];
-	[self setAdcBits:		 [decoder decodeIntForKey:   @"adcBits;"]];
-	[self setHistogramMode:  [decoder decodeIntForKey:   @"histogramMode"]];
-	[self setWordSize:		 [decoder decodeIntForKey:   @"wordSize"]];
-	[self setHistogramLength:[decoder decodeInt32ForKey: @"histogramLength"]];
-	[self setHistogramStart: [decoder decodeInt32ForKey: @"histogramStart"]];
-    [self setFifoRateGroup:  [decoder decodeObjectForKey:@"adcRateGroup"]];
+	[self setHistoMask:			[decoder decodeIntForKey:@"histoMask"]];
+	[self setOperationMode:		[decoder decodeIntForKey:	@"operationMode"]];
+	[self setAdcBits:			[decoder decodeIntForKey:   @"adcBits;"]];
+	[self setHistogramMode:		[decoder decodeIntForKey:   @"histogramMode"]];
+	[self setWordSize:			[decoder decodeIntForKey:   @"wordSize"]];
+	[self setHistogramLength:	[decoder decodeInt32ForKey: @"histogramLength"]];
+	[self setHistogramStart:	[decoder decodeInt32ForKey: @"histogramStart"]];
+    [self setFifoRateGroup:		[decoder decodeObjectForKey:@"adcRateGroup"]];
 	[self setReadOutGroup:  [decoder decodeObjectForKey:@"ReadoutGroup"]];
 	
     if(!fifoRateGroup){
@@ -230,12 +256,15 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
     [fifoRateGroup resetRates];
     [fifoRateGroup calcRates];
 	
+	if(adcBits<8)[self setAdcBits:8];
+	
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:histoMask forKey:@"histoMask"];
     [encoder encodeInt:	  operationMode	  forKey:@"operationMode"];
     [encoder encodeInt:	  adcBits		  forKey:@"adcBits;"];
     [encoder encodeInt:   histogramMode   forKey:@"histogramMode"];
@@ -260,8 +289,8 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
     NSMutableArray* a = [NSMutableArray array];
 	
-    ORHWWizParam* p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Word Size"];
+	ORHWWizParam* p = [[[ORHWWizParam alloc] init] autorelease];
+     [p setName:@"Word Size"];
     [p setFormat:@"##0" upperLimit:1 lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setWordSize:) getMethod:@selector(wordSize)];
     [a addObject:p];
@@ -311,6 +340,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
     else if([param isEqualToString:@"Histogram Mode"]) return [cardDictionary objectForKey:@"histogramMode"];
     else if([param isEqualToString:@"Word Size"]) return [cardDictionary objectForKey:@"wordSize"];
     else if([param isEqualToString:@"Adc Resolution"]) return [cardDictionary objectForKey:@"adcBits"];
+    else if([param isEqualToString:@"Number Channels"]) return [cardDictionary objectForKey:@"numberChannels"];
     else return nil;
 }
 
@@ -378,17 +408,19 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
 	[self stopDevice];
 	[self readHistogram];
-	//tbd--store the histogram for local viewing
 	[self startDevice];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCMC203HistoDataChangedNotification object:self];    
 }
 
-- (NSData*) readHistogram
+- (void) readHistogram
 {
 	readingHistogram = YES;
 	//!!!!!Assumes that the device has been disabled
 	unsigned short maxAdc = powf(2.0, (float)adcBits);								//max number of values			
-	NSMutableData* histogramData = [[NSMutableData dataWithLength:(kCMC203ReservedHistoHeaderWords + maxAdc)*sizeof(long)] retain];
+	if(!histogramData && maxAdc) histogramData = [[NSMutableData dataWithLength:(kCMC203ReservedHistoHeaderWords + maxAdc)*sizeof(long)] retain];
+	[histogramData resetBytesInRange:NSMakeRange(0,[histogramData length])];
 
+	
 	unsigned short startAddress = 0;
 	[[self adapter] camacShortNAF:[self stationNumber] a:1 f:17 data:&startAddress];	//load the memory start
 	[[self adapter] camacShortNAF:[self stationNumber] a:5 f:17 data:&maxAdc];			//number to read
@@ -406,7 +438,20 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	}
 
 	readingHistogram = NO;
-	return histogramData;
+}
+
+- (int) histogramCount
+{
+	int totalcount = [histogramData length]/sizeof(long);
+	if(totalcount>=kCMC203ReservedHistoHeaderWords)return totalcount - kCMC203ReservedHistoHeaderWords;
+	else return 0;
+}
+
+- (unsigned long) histoDataValueAtIndex:(int)index
+{
+	unsigned long* ptr = (unsigned long*)[histogramData bytes];
+	if(ptr)return ptr[kCMC203ReservedHistoHeaderWords + index];
+	else return 0;
 }
 
 #pragma mark •••DataTaker
@@ -450,7 +495,8 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
     id obj;
     while(obj = [e nextObject]){
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
-		//[obj setVSN:[dataTakers indexOfObject:obj]]; //put into fera protocol
+		[obj setVSN:[dataTakers indexOfObject:obj]];	//put into fera mode
+		[obj setFeraEnable:YES];
     }
 	
     //----------------------------------------------------------------------------------------
@@ -466,6 +512,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	}
 	[self initBoard];
 	[self startDevice];
+	savedHeader = 0;
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -474,20 +521,46 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 		isRunning = YES;
 		//read the number in the fifo
 		unsigned long numInFifo=0;
+		unsigned short status;
 		[[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&numInFifo];
 		//read up to kMCM203MaxFifoWords
 		if(numInFifo){
 			unsigned long count = 0;
 			do {
 				unsigned long data;
-				unsigned short status = [[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&data];
-				if(!isQbitSet(status))break;
-				//send to the right item in our fera list --- let them decode the data
-				// 1 - grab the vsn bits
-				// 2- fing the object with that vsn number
-				// 3- [obj shipFeraData:data];
-				// ---+++---+++--- tbd -- add the vsn and shipFerData methods to the Fera protocol
-				count++;
+				if(!savedHeader){
+					status = [[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&data];
+					if(!isQbitSet(status))break;
+					count++;
+				}
+				else data = savedHeader;
+				
+				//what we do here is grab the first word, decode the vsn number
+				//use it to give the proper obj its data --- let that object package and ship the data
+				
+				int vsn = data & 0xff;
+				if(vsn<[dataTakers count]){
+					id obj = [dataTakers objectAtIndex:vsn];
+					
+					int wordCount = (data & 0x7800) >> 11;
+					if(wordCount==0)wordCount=[obj maxNumChannels];
+				
+					if(numInFifo < wordCount+1){
+						//didn't have enough data to process, save the header and do it next time.
+						savedHeader = data;
+						break;
+					}
+					int i;
+					for(i=0;i<wordCount;i++){
+						unsigned long aDataWord;
+						status = [[self adapter] camacLongNAF:[self stationNumber] a:1 f:2 data:&aDataWord];
+						if(!isQbitSet(status))break;
+						[obj shipFeraData:aDataPacket data:aDataWord];
+						count++;
+					}
+					savedHeader = 0;
+				}
+				
 				fifoCount++; //for the rate
 			} while(count<kMCM203MaxFifoWords);
 		}
@@ -506,7 +579,8 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
     }
 	if(operationMode == kCMC203HistogramMode){
 		[self stopDevice];
-		[aDataPacket addData:[self readHistogram]];
+		[self readHistogram];
+		[aDataPacket addData:histogramData];
 	}
 }
 
@@ -522,6 +596,8 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
     id obj;
     while(obj = [e nextObject]){
         [obj runTaskStopped:aDataPacket userInfo:userInfo];
+		[obj setVSN:0]; //put into fera protocol
+		[obj setFeraEnable:NO]; //put into fera protocol
     }
     [fifoRateGroup stop];
 	isRunning = NO;

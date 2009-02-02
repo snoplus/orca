@@ -23,8 +23,7 @@
 {
     IBOutlet NSButton*		loadButton;
     IBOutlet NSButton*		sampleButton;
-	IBOutlet NSButton*		fifoModeButton;
-	IBOutlet NSButton*		histogramModeButton;
+	IBOutlet NSMatrix*		operationModeMatrix;
 	IBOutlet NSTextField*	adcBitsTextField;
 	IBOutlet NSPopUpButton* histogramModePU;
 	IBOutlet NSPopUpButton* histogramMaxCountsPU;
@@ -32,10 +31,11 @@
 	IBOutlet NSTextField*	histogramLengthTextField;
 	IBOutlet NSTextField*	histogramStartTextField;
 	IBOutlet NSButton*		initButton;
+	IBOutlet NSTabView*		dataTabView;
 
 	IBOutlet NSButton*		settingLockButton;
 
-	//rate page
+	//rates (fifo mode)
     IBOutlet NSStepper* 	integrationStepper;
     IBOutlet NSTextField* 	integrationText;
     IBOutlet NSTextField* 	totalRateText;
@@ -44,6 +44,9 @@
     IBOutlet NSButton*		totalRateLogCB;
     IBOutlet ORPlotter1D*	timeRatePlot;
     IBOutlet NSButton*		timeRateLogCB;
+	
+	//histograms (histo mode)
+    IBOutlet ORPlotter1D*	histoPlot;
 }
 
 #pragma mark ***Initialization
@@ -69,6 +72,7 @@
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) updateHistoPlot:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 - (IBAction) integrationAction:(id)sender;

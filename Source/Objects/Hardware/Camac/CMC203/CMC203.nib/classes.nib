@@ -219,20 +219,22 @@
 				<string>NSPopUpButton</string>
 				<key>dacValueTextField</key>
 				<string>NSTextField</string>
+				<key>dataTabView</key>
+				<string>NSTabView</string>
 				<key>eventTimeoutTextField</key>
 				<string>NSTextField</string>
 				<key>extRenInputSigSelPopup</key>
 				<string>NSPopUpButton</string>
 				<key>feraClrWidthTextField</key>
 				<string>NSTextField</string>
-				<key>fifoModeButton</key>
-				<string>NSButton</string>
 				<key>gateTimeOutTextField</key>
 				<string>NSTextField</string>
 				<key>histoBlockSizeTextField</key>
 				<string>NSTextField</string>
 				<key>histoModeModeButton</key>
 				<string>NSButton</string>
+				<key>histoPlot</key>
+				<string>ORPlotter1D</string>
 				<key>histogramControlPopup</key>
 				<string>NSPopUpButton</string>
 				<key>histogramLengthTextField</key>
@@ -241,8 +243,6 @@
 				<string>NSTextField</string>
 				<key>histogramMaxCountsPU</key>
 				<string>NSPopUpButton</string>
-				<key>histogramModeButton</key>
-				<string>NSButton</string>
 				<key>histogramModePU</key>
 				<string>NSPopUpButton</string>
 				<key>histogramStartTextField</key>
@@ -259,6 +259,8 @@
 				<string>NSButton</string>
 				<key>multiHistogramTextField</key>
 				<string>NSTextField</string>
+				<key>operationModeMatrix</key>
+				<string>NSMatrix</string>
 				<key>pingPongTextField</key>
 				<string>NSTextField</string>
 				<key>qOutputSelectionPopup</key>
