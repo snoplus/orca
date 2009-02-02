@@ -17,8 +17,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-
 #pragma mark ***Imported Files
 #import "ORSIS3300Model.h"
 #import "ORDataTypeAssigner.h"
@@ -29,9 +27,9 @@
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
 
-NSString* ORSIS3300ModelCSRRegChanged		= @"ORSIS3300ModelCSRRegChanged";
-NSString* ORSIS3300ModelAcqRegChanged		= @"ORSIS3300ModelAcqRegChanged";
-NSString* ORSIS3300ModelEventConfigChanged	= @"ORSIS3300ModelEventConfigChanged";
+NSString* ORSIS3300ModelCSRRegChanged			= @"ORSIS3300ModelCSRRegChanged";
+NSString* ORSIS3300ModelAcqRegChanged			= @"ORSIS3300ModelAcqRegChanged";
+NSString* ORSIS3300ModelEventConfigChanged		= @"ORSIS3300ModelEventConfigChanged";
 NSString* ORSIS3300ModelPageSizeChanged			= @"ORSIS3300ModelPageSizeChanged";
 
 NSString* ORSIS3300ModelClockSourceChanged		= @"ORSIS3300ModelClockSourceChanged";
@@ -55,7 +53,7 @@ NSString* ORSIS3300ModelSampleDone				= @"ORSIS3300ModelSampleDone";
 #define kModuleIDReg				0x04		// [] module ID
 #define kAcquisitionControlReg		0x10		// [] Acquistion Control 
 #define kStartDelay					0x14		// [] Start Delay Clocks
-#define kStopDelay					0x18		// [] Start Delay Clocks
+#define kStopDelay					0x18		// [] Stop Delay Clocks
 #define kGeneralReset				0x20		// [] General Reset
 #define kStartSampling				0x30		// [] Start Sampling
 #define kStopSampling				0x34		// [] Stop Sampling
@@ -91,6 +89,8 @@ NSString* ORSIS3300ModelSampleDone				= @"ORSIS3300ModelSampleDone";
 #define kSISBusyStatus			0x00010000
 #define kSISBank1ClockStatus	0x00000001
 #define kSISBank2ClockStatus	0x00000002
+#define kSISBank1BusyStatus		0x00100000
+#define kSISBank2BusyStatus		0x00400000
 
 //Control Status Register Bits
 //defined state sets value, shift left 16 to clear
@@ -129,13 +129,6 @@ static unsigned long thresholdRegOffsets[4]={
 	0x00380004
 };
 
-/*static unsigned long eventRegOffsets[4]={
-	0x00200008,
-	0x00280008,
-	0x00300008,
-	0x00380008
-};
- */
 static unsigned long bankMemory[4][2]={
 {0x00400000,0x00600000},
 {0x00480000,0x00680000},
@@ -160,6 +153,10 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 
 #define kTriggerEvent1DirOffset 0x101000
 #define kTriggerEvent2DirOffset 0x102000
+
+#define kTriggerTime1Offset 0x1000
+#define kTriggerTime2Offset 0x2000
+
 #pragma mark ***Initialization
 - (id) init 
 {
@@ -172,14 +169,12 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
     for(i=0;i<kNumSIS3300Channels;i++){
         [thresholds addObject:[NSNumber numberWithInt:0]];
     }
-	dataBuffer = 0;
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
 - (void) dealloc 
 {
-	if(dataBuffer) free(dataBuffer);
 	[thresholds release];
     [waveFormRateGroup release];
     [super dealloc];
@@ -494,25 +489,20 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelPageSizeChanged object:self];
 }
 
-- (int) sampleSize
+- (int) numberOfSamples
 {
 	static unsigned long sampleSize[8]={
-		128*1024,
-		16*1024,
-		4*1024,
-		2*1024,
-		1*1024,
-		512,
-		256,
-		128
+		0x20000,
+		0x4000,
+		0x1000,
+		0x800,
+		0x400,
+		0x200,
+		0x100,
+		0x80
 	};
 	
 	return sampleSize[pageSize];
-}
-
-- (int) nPages
-{
-	return (128*1024)/[self sampleSize];
 }
 
 - (ORRateGroup*) waveFormRateGroup
@@ -647,7 +637,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 }
 
 #pragma mark •••Hardware Access
-- (void) readModuleID
+- (void) readModuleID:(BOOL)verbose
 {	
 	unsigned long result = 0;
 	[[self adapter] readLongBlock:&result
@@ -655,24 +645,24 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
                         numToRead:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
-	unsigned short moduleID = result >> 16;
+	moduleID = result >> 16;
 	unsigned short majorRev = (result >> 8) & 0xff;
 	unsigned short minorRev = result & 0xff;
-	NSLog(@"SIS3300 ID: %x  Firmware:%x.%x\n",moduleID,majorRev,minorRev);
+	if(verbose)NSLog(@"SIS3300 ID: %x  Firmware:%x.%x\n",moduleID,majorRev,minorRev);
 }
 
 - (void) writeControlStatusRegister
 {		
 	//The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.
-	unsigned long aMask = 0xffff0000;
+	//unsigned long aMask = 0xffff0000;
 	
-	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kControlStatus
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+	//[[self adapter] writeLongBlock:&aMask
+    //                     atAddress:[self baseAddress] + kControlStatus
+    //                    numToWrite:1
+    //                    withAddMod:[self addressModifier]
+    //                 usingAddSpace:0x01];
 	
-	aMask = 0x0;	
+	unsigned long aMask = 0x0;	
 
 	if(enableTriggerOutput)		aMask |= kSISEnableTriggerOutput;
 	if(invertTrigger)			aMask |= kSISInvertTrigger;
@@ -683,7 +673,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	if(bankFullTo3)				aMask |= kSISBankFullTo3;
 	
 	
-	//aMask = (((~aMask & ~kCSRReservedMask)<<16)&0xffff0000) | aMask ;
+	aMask = ((~aMask & 0x0000ffff)<<16) | aMask ;
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:[self baseAddress] + kControlStatus
                         numToWrite:1
@@ -695,15 +685,15 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 {
 	// The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.	
 	
-	unsigned long aMask = 0xffff0000;
+	//unsigned long aMask = 0xffff0000;
 	
-	[[self adapter] writeLongBlock:&aMask
-                         atAddress:[self baseAddress] + kAcquisitionControlReg
-                        numToWrite:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
+	//[[self adapter] writeLongBlock:&aMask
+	//                    atAddress:[self baseAddress] + kAcquisitionControlReg
+	//                   numToWrite:1
+	//                   withAddMod:[self addressModifier]
+	//               usingAddSpace:0x01];
 	
-	aMask = 0x0;
+	unsigned long aMask = 0x0;
 	if(bankSwitchMode)			aMask |= kSISBankSwitch;
 	if(autoStart)				aMask |= kSISAutostart;
 	if(multiEventMode)			aMask |= kSISMultiEvent;
@@ -717,7 +707,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	if(multiplexerMode)			aMask |= kSISMultiplexerMode;
 		
 	//put the inverse in the top bits to turn off everything else
-	//aMask = ((~aMask<<16)&0xffff0000) | aMask;
+	aMask = ((~aMask & 0x0000ffff)<<16) | aMask;
 	
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:[self baseAddress] + kAcquisitionControlReg
@@ -904,6 +894,9 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 - (void) readAdcValues:(int)i
 {
 	i = i%512;
+	if(!moduleID)[self readModuleID:NO];
+	unsigned long dataMask = ((moduleID==0x3300)?0xfff:0x3fff);
+	
 	unsigned long aValue;   
 	[[self adapter] readLongBlock:&aValue
 						atAddress:[self baseAddress] + 0x200018
@@ -911,32 +904,32 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 	
-	adcValue[0][i] = (aValue&0x3fff0000) >> 16;
-	adcValue[1][i] = aValue&0x00003fff;
+	adcValue[0][i] = ((aValue>>16)&dataMask);
+	adcValue[1][i] = aValue&dataMask;
 
 	[[self adapter] readLongBlock:&aValue
 						atAddress:[self baseAddress] + 0x280018
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-	adcValue[2][i] = (aValue&0x3fff0000) >> 16;
-	adcValue[3][i] = aValue&0x00003fff;
+	adcValue[2][i] = ((aValue>>16)&dataMask);
+	adcValue[3][i] = aValue&dataMask;
 	
 	[[self adapter] readLongBlock:&aValue
 						atAddress:[self baseAddress] + 0x300018
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-	adcValue[4][i] = (aValue&0x3fff0000) >> 16;
-	adcValue[5][i] = aValue&0x00003fff;
+	adcValue[4][i] = ((aValue>>16)&dataMask);
+	adcValue[5][i] = aValue&dataMask;
 	
 	[[self adapter] readLongBlock:&aValue
 						atAddress:[self baseAddress] + 0x380018
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
-	adcValue[6][i] = (aValue&0x3fff0000) >> 16;
-	adcValue[7][i] = aValue&0x00003fff;
+	adcValue[6][i] = ((aValue>>16)&dataMask);
+	adcValue[7][i] = aValue&dataMask;
 	
 }	
 
@@ -1045,14 +1038,29 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	unsigned long mask = (bank?kSISBank2ClockStatus : kSISBank1ClockStatus);
-	return !((aValue & mask) == mask);
+	return (aValue & mask) == 0;
 }
+
+- (BOOL) bankIsBusy:(int)bank
+{
+	unsigned long aValue=0;
+	[[self adapter] readLongBlock:&aValue
+						atAddress:[self baseAddress] + kAcquisitionControlReg
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	unsigned long mask = (bank?kSISBank2BusyStatus : kSISBank1BusyStatus);
+	return (aValue & mask) != 0;
+}
+
 
 - (void) writeThresholds:(BOOL)verbose
 {   
 	int tchan = 0;
 	int i;
 	if(verbose) NSLog(@"Writing Thresholds:\n");
+	if(!moduleID)[self readModuleID:NO];
+	unsigned long thresholdMask = ((moduleID==0x3300)?0xfff:0x3fff);
 	for(i = 0; i < 4; i++) {
 		//the thresholds are packed even/odd into one long word with the Less/Greater Than bits
 		//ADC 0,2,4,6
@@ -1061,7 +1069,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 			if([self ltGt:tchan]) even_thresh |= kSISTHRLt;
 		}
 		else {
-			even_thresh = 0x3fff;
+			even_thresh = thresholdMask;
 		}
 		if(verbose) NSLog(@"%d: 0x%04x %@\n",tchan, even_thresh & ~kSISTHRLt, (even_thresh & kSISTHRLt)?@"(LE)":@"");
 		tchan++;
@@ -1071,7 +1079,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 			if([self ltGt:tchan]) odd_thresh |= kSISTHRLt;
 		}
 		else {
-			odd_thresh = 0x3fff;
+			odd_thresh = thresholdMask;
 		}
 		if(verbose) NSLog(@"%d: 0x%04x %@\n",tchan, odd_thresh & ~kSISTHRLt, (odd_thresh & kSISTHRLt)?@"(LE)":@"");
 		tchan++;
@@ -1109,11 +1117,11 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	}
 }
 
-- (unsigned long) readTriggerEventBank:(int)bank index:(int)index
+- (unsigned long) readTriggerTime:(int)bank index:(int)index
 {   		
 	unsigned long aValue;
 	[[self adapter] readLongBlock: &aValue
-						atAddress: [self baseAddress] + (bank?kTriggerEvent2DirOffset:kTriggerEvent1DirOffset) + index*4
+						atAddress: [self baseAddress] + (bank?kTriggerTime2Offset:kTriggerTime1Offset) + index*sizeof(long)
 						numToRead: 1
 					   withAddMod: [self addressModifier]
 					usingAddSpace: 0x01];
@@ -1121,6 +1129,17 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	return aValue;
 }
 
+- (unsigned long) readTriggerEventBank:(int)bank index:(int)index
+{   		
+	unsigned long aValue;
+	[[self adapter] readLongBlock: &aValue
+						atAddress: [self baseAddress] + (bank?kTriggerEvent2DirOffset:kTriggerEvent1DirOffset) + index*sizeof(long)
+						numToRead: 1
+					   withAddMod: [self addressModifier]
+					usingAddSpace: 0x01];
+	
+	return aValue;
+}
 
 - (BOOL) isBusy
 {
@@ -1145,7 +1164,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	[self writeThresholds:NO];
 	[self writeControlStatusRegister];		//set up Control/Status Register
 	//[self writeTriggerSetup];
-	[self writeTriggerClearValue:[self sampleSize]];
+	//[self writeTriggerClearValue:[self numberOfSamples]+100];
 	
 }
 
@@ -1161,7 +1180,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 						usingAddSpace: 0x01];
 	}
 	long errorCount =0;
-	for(i=0;i<8000;i++){
+	for(i=0;i<1024;i++){
 		unsigned long aValue;
 		[[self adapter] readLongBlock: &aValue
 							atAddress: [self baseAddress] + 0x00400000+i*4
@@ -1178,6 +1197,9 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 {
 	[self reset];
 	[self initBoard];
+	if(!moduleID)[self readModuleID:NO];
+	unsigned long dataMask = ((moduleID==0x3300)?0xfff:0x3fff);
+
 	[self clearBankFullFlag:0];
 	NSLog(@"After Init Bank Full: %d\n",[self bankIsFull:0]);
 	[self arm:0];
@@ -1196,126 +1218,78 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	if(!timeout){
 		int numEvents= [self eventNumberGroup:0 bank:0];
 		NSLog(@"got %d event\n",numEvents);
-		int event;
-		for(event=0;event<numEvents;event++){
-			unsigned long triggerEventDir = [self readTriggerEventBank:currentBank index:event];
-			NSLog(@"trigger Event:%d 0x%08x\n",event,triggerEventDir);
+		unsigned long triggerEventDir;
+		//for(event=0;event<numEvents;event++){
+			triggerEventDir = [self readTriggerEventBank:0 index:0];
+			NSLog(@"trigger Event (first Event):0x%08x\n",triggerEventDir);
+		//}
+		int i,j;
+		for(j=0;j<8;j++){
+			for(i=0;i<[self numberOfSamples];i++){
+				adcValue[j][i]= 0;
 			}
 		}
-}
-
-- (void) sampleAdcValues
-{
-	int i;
-	for(i=0;i<512;i++){
-		[self readAdcValues:i];
-	}
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelSampleDone object:self];
-}
-
-- (unsigned long) readGroup:(int)aGroup intoBuffer:(void*)aBuffer
-{
-	//NSLog(@"%d event Count: %d\n",aGroup,[self eventNumber:aGroup]);
-
-	switch (aGroup) {
-		case 0: return [self readEventDirectory:0x200000 bankAddressOffest:0x400000 intoBuffer:aBuffer];
-		case 1: return [self readEventDirectory:0x280000 bankAddressOffest:0x480000 intoBuffer:aBuffer];
-		case 2: return [self readEventDirectory:0x300000 bankAddressOffest:0x500000 intoBuffer:aBuffer];
-		case 3: return [self readEventDirectory:0x380000 bankAddressOffest:0x580000 intoBuffer:aBuffer];
-		default: return 0;
-	}
-}
-
-- (unsigned int) readEventDirectory: (unsigned long) eventDirAddressOffset 
-				  bankAddressOffest: (unsigned long) bankAddressOffest
-						 intoBuffer: (void*) pBuffer
-{
-	/*
-	 --------------------------------------------------------------
-	 Function to read a full event. This breaks into these cases:
-	 --pageWrap false. 
-	 In this case, the event directory entry determines the end of the event 
-	 as well as the number of samples. 
-	 Note that we assume that the wrap bit in the event directory allows us 
-	 to differentiate between 0 samples and 128Ksamples.
-	 
-	 --pageWrap true, but the event directory wrap bit is false. 
-	 Again, the number of samples is determined by the address pointer.
-	 
-	 --pageWrap true and event directory wrap bit is true. 
-	 In this case, a full m_nPagesize samples have been taken and the address pointer 
-	 indicates the start of event. The data procede circularly in the first m_nPagesize 
-	 words of the buffer memory since we don't support multi-event mode yet.
-	 --------------------------------------------------------------
-	 */
-	unsigned long nPagesize = [self sampleSize]; // Max conversion count.
-	
-	// Decode the event directory entry:
-	
-	unsigned long  eventRegValue = [self readTriggerEventBank:0 index:0];	//------read from bank 0 only for now.....
-	int adcMask= (eventRegValue&0xff000000) >> 24;
-	
-	bool           fWrapped      = (eventRegValue & kSISEventDirWrapFlag ) != 0;
-	unsigned long  nEventEnd     = (eventRegValue & kSISEventDirEndEventMask);
-	nEventEnd                   &= ([self sampleSize]-1); // limit the pointer to pagesize
-	NSLog(@"-----------------acd mask: 0x%02x\n",adcMask);
-	NSLog(@"pageSize: 0x%x\n",[self sampleSize]);
-	NSLog(@"wrapped:  %d\n",fWrapped);
-	NSLog(@"eventEnd:  0x%x\n",nEventEnd);
-	unsigned long  nLongs = 0;
-	unsigned long* Samples = ((unsigned long*)pBuffer);
-	
-	// The three cases above break into two cases: fWrapped true or not.
-	
-	if(fWrapped) {
-		//  Full set of samples... 
+		BOOL wrapped = ((triggerEventDir&0x80000) !=0);
+		unsigned long startOffset = triggerEventDir & 0x1ffff;
+		NSLog(@"address counter0:0x%0x wrapped: %d\n",startOffset,wrapped);
 		
-		nLongs = [self sampleSize];
+		unsigned long nLongsToRead = [self numberOfSamples] - startOffset;
 		
-		// Breaks down into two reads:
+		[[self adapter] readLongBlock: adcValue[0]
+							atAddress: [self baseAddress] + 0x400000 + 4*startOffset
+							numToRead: nLongsToRead
+						   withAddMod: [self addressModifier]
+						usingAddSpace: 0x01];		
+		[[self adapter] readLongBlock: adcValue[2]
+							atAddress: [self baseAddress] + 0x480000 + 4*startOffset
+							numToRead: nLongsToRead
+						   withAddMod: [self addressModifier]
+						usingAddSpace: 0x01];		
+		[[self adapter] readLongBlock: adcValue[4]
+							atAddress: [self baseAddress] + 0x50000 + 4*startOffset
+							numToRead: nLongsToRead
+						   withAddMod: [self addressModifier]
+						usingAddSpace: 0x01];
 		
-		// The first read is from nEventEnd -> nPagesize.
-		
-		int nReadSize = (nPagesize - nEventEnd); //bytes?
-		if(nReadSize > 0) {
-			[[self adapter] readLongBlock: Samples
-								atAddress: [self baseAddress] + bankAddressOffest + nEventEnd
-								numToRead: nReadSize/sizeof(long)
+		if(startOffset>0){
+			int index = startOffset;
+			[[self adapter] readLongBlock: &adcValue[0][index]
+								atAddress: [self baseAddress] + 0x400000
+								numToRead: startOffset
+							   withAddMod: [self addressModifier]
+							usingAddSpace: 0x01];		
+			[[self adapter] readLongBlock: &adcValue[2][index]
+								atAddress: [self baseAddress] + 0x480000
+								numToRead: startOffset
+							   withAddMod: [self addressModifier]
+							usingAddSpace: 0x01];		
+			[[self adapter] readLongBlock: &adcValue[4][index]
+								atAddress: [self baseAddress] + 0x50000
+								numToRead: startOffset
 							   withAddMod: [self addressModifier]
 							usingAddSpace: 0x01];
 		}
 		
-		// The second read, if necessary, is from 0 ->nEventEnd-1.
-		
-		unsigned long nOffset =  nReadSize; // Offset into Samples where data goes.
-		nReadSize = nPagesize - nReadSize;  // Size of remaining read.
-		if(nReadSize > 0) {
-			[[self adapter] readLongBlock: &Samples[nOffset]
-								atAddress: [self baseAddress] + bankAddressOffest
-								numToRead: nReadSize/sizeof(long)
-							   withAddMod: [self addressModifier]
-							usingAddSpace: 0x01];			
-		}
-		nLongs = nPagesize;
-	}
-	else {                        
-		// Only 0 - nEventEnd to read...
-		if(nEventEnd > 0) {
-			[[self adapter] readLongBlock: Samples
-								atAddress: [self baseAddress] + bankAddressOffest
-								numToRead: nEventEnd
-							   withAddMod: [self addressModifier]
-							usingAddSpace: 0x01];
+		unsigned short temp1,temp2;
+		for(i=0;i<[self numberOfSamples];i++){
+			temp1 = (adcValue[0][i]>>16) & dataMask;
+			temp2 = (adcValue[0][i]) & dataMask;
+			adcValue[0][i] = temp1;
+			adcValue[1][i] = temp2;
 			
-			nLongs = nEventEnd;
-		} 
-		else {                      // nothing to read...
-			nLongs = 0;
+			temp1 = (adcValue[2][i]>>16) & dataMask;
+			temp2 = (adcValue[2][i]) & dataMask;
+			adcValue[2][i] = temp1;
+			adcValue[3][i] = temp2;
+			
+			temp1 = (adcValue[4][i]>>16) & dataMask;
+			temp2 = (adcValue[4][i]) & dataMask;
+			adcValue[4][i] = temp1;
+			adcValue[5][i] = temp2;
+			
 		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelSampleDone object:self];
 	}
-	
-	return nLongs;
-	
 }
 
 #pragma mark •••Data Taker
@@ -1464,94 +1438,105 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
     theController   = [self adapter];
     
-   // [self startRates];
-	
+    [self startRates];
+	[self reset];
     [self initBoard];
+	
+	if(!moduleID)[self readModuleID:NO];
 			
-    if(!dataBuffer) dataBuffer = (unsigned long*)malloc(0x80000);
 	if(bankSwitchMode)	[self startBankSwitching];
 	else				[self stopBankSwitching];
-	if(multiEventMode)[self setMaxNumberEvents:0x80000/[self sampleSize]]; 
+	
+	if(multiEventMode)[self setMaxNumberEvents:0x20000/[self numberOfSamples]]; 
 	else [self setMaxNumberEvents:1]; 
 	
 	currentBank = 0;
 	[self clearBankFullFlag:currentBank];
 	[self arm:currentBank];
 	[self startSampling];
-	
-	isRunning = true;
+	isRunning = NO;
+	count=0;
 }
 
 //**************************************************************************************
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-		if(![self bankIsFull:currentBank]){
-			//get the number of events
-			int numEvents = [self eventNumberGroup:0 bank:currentBank];
+		isRunning = YES;
+		if([self bankIsFull:currentBank] && ![self bankIsBusy:currentBank]){
+			int bankToUse = currentBank;
+			
+			int numEvents = [self eventNumberGroup:0 bank:bankToUse];
 			int event,group;
 			for(event=0;event<numEvents;event++){
-				unsigned long triggerEventDir = [self readTriggerEventBank:currentBank index:event];
-				unsigned long startOffset = triggerEventDir&0x1fff;
-			
+				unsigned long triggerEventDir = [self readTriggerEventBank:bankToUse index:event];
+				unsigned long startOffset = triggerEventDir&0x1ffff & ([self numberOfSamples]-1);
+				unsigned long triggerTime = [self readTriggerTime:bankToUse index:event];
+				
 				for(group=0;group<4;group++){
 					unsigned long channelMask = triggerEventDir & (0xC0000000 >> (group*2));
-					BOOL wrapped = ((triggerEventDir&0x80000) == 0x80000);
-					//only read the channel that have trigger info
 					if(channelMask==0)continue;
-					unsigned long numLongs = 0;
-					dataBuffer[numLongs++] = dataId | 0; //we'll fill in the length later
-					dataBuffer[numLongs++] = location;
-					dataBuffer[numLongs++] = triggerEventDir;
 					
-					int nBytesToRead;
-					if(wrapped) {
-						// Breaks down into two reads:
+					int i;
+					for(i=0;i<2;i++){
+						int channel = (group*2) + i;
+						if(triggerEventDir & (0x80000000 >> channel)){
+							++waveFormCount[channel];
+						}
+					}
+					//only read the channels that have trigger info
+					unsigned long numLongs = 0;
+					unsigned long totalNumLongs = [self numberOfSamples] + 4;
+					
+					NSMutableData* d = [NSMutableData dataWithLength:totalNumLongs*sizeof(long)];
+					unsigned long* dataBuffer = (unsigned long*)[d bytes];
+					dataBuffer[numLongs++] = dataId | totalNumLongs;
+					dataBuffer[numLongs++] = location | ((moduleID==0x3301) ? 1:0);
+
+					dataBuffer[numLongs++] = triggerEventDir;
+					dataBuffer[numLongs++] = ((event&0xFF)<<24) | (triggerTime & 0xFFFFFF);
+					
+					if(!pageWrap){
+						[[self adapter] readLongBlock: &dataBuffer[numLongs]
+											atAddress: [self baseAddress] + bankMemory[group][bankToUse]
+											numToRead: [self numberOfSamples]
+										   withAddMod: [self addressModifier]
+										usingAddSpace: 0x01];
+						numLongs +=  [self numberOfSamples];
+					}
+					
+					else {
 						// The first read is from startOffset -> nPagesize.
-						nBytesToRead = ([self sampleSize] - startOffset);
-						if(nBytesToRead > 0) {
-							[[self adapter] readLongBlock: dataBuffer
-												atAddress: [self baseAddress] + bankMemory[group][currentBank] + startOffset
-												numToRead: nBytesToRead/sizeof(long)
+						unsigned long nLongsToRead = [self numberOfSamples] - startOffset;	
+						if(nLongsToRead>0){
+							[[self adapter] readLongBlock: &dataBuffer[numLongs]
+												atAddress: [self baseAddress] + bankMemory[group][bankToUse] + 4*startOffset
+												numToRead: nLongsToRead
 											   withAddMod: [self addressModifier]
 											usingAddSpace: 0x01];
+							numLongs +=  nLongsToRead;
 						}
 						
 						// The second read, if necessary, is from 0 ->nEventEnd-1.
-						
-						unsigned long nOffset =  nBytesToRead; // Offset into Samples where data goes.
-						nBytesToRead = startOffset;  // Size of remaining read.
-						if(nBytesToRead > 0) {
-							[[self adapter] readLongBlock: &dataBuffer[nOffset]
-												atAddress: [self baseAddress] + bankMemory[group][currentBank]
-												numToRead: nBytesToRead/sizeof(long)
+						if(startOffset>0) {
+							[[self adapter] readLongBlock: &dataBuffer[numLongs]
+												atAddress: [self baseAddress] + bankMemory[group][bankToUse]
+												numToRead: startOffset-1
 											   withAddMod: [self addressModifier]
 											usingAddSpace: 0x01];			
 						}
 					}
-					else {                        
-						// Only 0 - nEventEnd to read...
-						[[self adapter] readLongBlock: dataBuffer
-											atAddress: [self baseAddress] + bankMemory[group][currentBank] + startOffset
-											numToRead: [self sampleSize]/sizeof(long)
-										   withAddMod: [self addressModifier]
-										usingAddSpace: 0x01];
-					}
 					
-					long totalNumLongs = numLongs + [self sampleSize]/sizeof(long);
-					dataBuffer[0] |= totalNumLongs; //see, we did fill it in...
-					[aDataPacket addLongsToFrameBuffer:dataBuffer length:totalNumLongs];
-					
+					[aDataPacket addData:d];
 				}
 			}
-			if(bankSwitchMode) currentBank= (currentBank+1)%2;
 			[self clearBankFullFlag:currentBank];
+			if(bankSwitchMode) currentBank= (currentBank+1)%2;
 			[self arm:currentBank];
 			[self startSampling];
-			
 		}
 	}
 	@catch(NSException* localException) {
@@ -1562,6 +1547,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	[self stopSampling];
 	[self stopBankSwitching];
     isRunning = NO;
     [waveFormRateGroup stop];
@@ -1570,15 +1556,6 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {
-	
-    /* The current hardware specific data is:               *
-     *                                                      *
-     * 0: FIFO state address                                *
-     * 1: FIFO empty state mask                             *
-     * 2: FIFO address                                      *
-     * 3: FIFO address AM                                   *
-     * 4: FIFO size                                         */
-    
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id				= kSIS3300; //should be unique
 	configStruct->card_info[index].hw_mask[0]				= dataId; //better be unique
@@ -1586,10 +1563,9 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	configStruct->card_info[index].crate					= [self crateNumber];
 	configStruct->card_info[index].add_mod					= [self addressModifier];
 	configStruct->card_info[index].base_add					= [self baseAddress];
-    configStruct->card_info[index].deviceSpecificData[1]	= 0;
-    configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] * 0x100;
-    configStruct->card_info[index].deviceSpecificData[3]	= 0x09;
-    configStruct->card_info[index].deviceSpecificData[4]	= 0x4000;
+    configStruct->card_info[index].deviceSpecificData[0]	= bankSwitchMode;
+    configStruct->card_info[index].deviceSpecificData[1]	= [self numberOfSamples];
+	configStruct->card_info[index].deviceSpecificData[2]	= moduleID;
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	

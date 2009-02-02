@@ -34,12 +34,14 @@
 {
   @private
     int				pageSize;
+	BOOL			isRunning;
  	
  	
     BOOL			stopTrigger;
     BOOL			pageWrap;
     BOOL			gateChaining;
-
+	unsigned short	moduleID;
+	
 	//control status reg
     BOOL enableTriggerOutput;
     BOOL invertTrigger;
@@ -74,8 +76,6 @@
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3300Channels];
-	BOOL isRunning;
-	unsigned long*  dataBuffer;
 
 	//cach to speed takedata
 	unsigned long location;
@@ -84,7 +84,8 @@
 	unsigned long fifoStateAddress;
 	BOOL firstTime;
 	int currentBank;
-	int adcValue[8][512];
+	unsigned long adcValue[8][128*1024];					
+	long count;
 }
 
 - (id) init;
@@ -175,12 +176,11 @@
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (BOOL)			bumpRateFromDecodeStage:(short)channel;
 
-- (int) sampleSize;
-- (int) nPages;
+- (int) numberOfSamples;
 
 #pragma mark •••Hardware Access
 - (void) initBoard;
-- (void) readModuleID;
+- (void) readModuleID:(BOOL)verbose;
 - (void) writeControlStatusRegister;
 - (void) writeAcquistionRegister;
 - (void) writeEventConfigurationRegister;
@@ -199,6 +199,7 @@
 - (void) writeTriggerClearValue:(unsigned long)aValue;
 - (void) setMaxNumberEvents:(unsigned long)aValue;
 - (unsigned long) eventTriggerGroup:(int)group bank:(int) bank;
+- (unsigned long) readTriggerTime:(int)bank index:(int)index;
 
 - (void) disArm:(int)bank;
 - (void) arm:(int)bank;
@@ -217,6 +218,7 @@
 - (void) testMemory;
 - (void) testEventRead;
 
+
 #pragma mark •••Data Taker
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
@@ -232,11 +234,6 @@
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
-- (void) sampleAdcValues;
-- (unsigned long) readGroup:(int)aGroup intoBuffer:(void*)aBuffer;
-- (unsigned int) readEventDirectory: (unsigned long) eventDirAddressOffset 
-				  bankAddressOffest: (unsigned long) bankAddressOffest
-						 intoBuffer: (void*) pBuffer;
 
 #pragma mark •••HW Wizard
 - (int) numberOfChannels;

@@ -27,13 +27,16 @@
 /*
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
------------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
+				^^ ^^^^ ^^^^ ^^^^ ^^^^- length
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 --------^-^^^--------------------------- Crate number
--------------^-^^^^--------------------- Card number
-xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Trigger Event Word
+             ^-^^^^--------------------- Card number
+                                      ^- 1==SIS33001, 0==SIS3000 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Trigger Event Word
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^--------------------------------Event #
+           ^^^^ ^^^^ ^^^^ ^^^^ ^^^^ ^^^^--Time from previous event
 waveform follows
-
 */
 
 @implementation ORSIS3300WaveformDecoder
@@ -58,102 +61,85 @@ waveform follows
 	ptr++; //point to location info
     int crate = (*ptr&0x01e00000)>>21;
     int card  = (*ptr&0x001f0000)>>16;
-
+	int moduleID = (*ptr & 0x1);
 	ptr++; //event trigger word
 	unsigned long triggerWord= *ptr;
 	
-	NSString* crateKey		= [self getCrateKey: crate];
-	NSString* cardKey		= [self getCardKey: card];
-
+	ptr++; //point to the event# and timestamp (timestamp always zero unless in multievent mode)
 	ptr++; //point to the data
 
-	unsigned long* dataStart = ptr;
-	long numDataWords = length-3;
-	NSMutableData* tmpData = [NSMutableData dataWithLength:numDataWords*sizeof(short)]; //plot buffer
-	unsigned short* sPtr = (unsigned short*)[tmpData bytes];
+	NSString* crateKey		= [self getCrateKey: crate];
+	NSString* cardKey		= [self getCardKey: card];
+	
+	long numDataWords = length-4;
 	//any of the channels may have triggered, so have to check each bit in the adc mask
 	int channel;
-	BOOL loadedOnce = NO;
-	for(channel=0;channel<8;channel+=2){
+	unsigned long aMask = moduleID?0x3fff:0xfff;
+	for(channel=0;channel<8;channel++){
 		if(triggerWord & (0x80000000 >> channel)){
-			NSString* channelKey	= [self getChannelKey: channel];
+			NSMutableData* tmpData = [NSMutableData dataWithLength:numDataWords*sizeof(short)];
+			short* sPtr = (short*)[tmpData bytes];
+			NSString* channelKey = [self getChannelKey: channel];
 			int i;
-			if(!loadedOnce){
-				for(i=0;i<(length-3);i++)sPtr[i] =	dataStart[i] & 0x3fff;	
-				loadedOnce = YES;
-			}
-			[aDataSet loadWaveform:tmpData 
-							offset:0 //bytes!
-						  unitSize:2 //unit size in bytes!
-							sender:self  
-						  withKeys:@"SIS3300", @"Waveforms",crateKey,cardKey,channelKey,nil];
-			
-		}
-	}
-	//now the odd channels
-	loadedOnce = NO;
-	for(channel=1;channel<8;channel+=2){
-		if(triggerWord & (0x80000000 >> channel)){
-			NSString* channelKey	= [self getChannelKey: channel];
-			int i;
-			if(!loadedOnce){
-				for(i=0;i<(length-3);i++)sPtr[i] =	(dataStart[i]>>16) & 0x3fff;	
-				loadedOnce = YES;
-			}
-			[aDataSet loadWaveform:tmpData 
-							offset:0 //bytes!
-						  unitSize:2 //unit size in bytes!
-							sender:self  
-						  withKeys:@"SIS3300", @"Waveforms",crateKey,cardKey,channelKey,nil];
-			
-		}
-	}
-
-		/*		//get the actual object
-		if(getRatesFromDecodeStage){
-			NSString* aKey = [crateKey stringByAppendingString:cardKey];
-			if(!actualSIS3300Cards)actualSIS3300Cards = [[NSMutableDictionary alloc] init];
-			ORSIS3300Model* obj = [actualSIS3300Cards objectForKey:aKey];
-			if(!obj){
-				NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3300Model")];
-				NSEnumerator* e = [listOfCards objectEnumerator];
-				ORSIS3300Model* aCard;
-				while(aCard = [e nextObject]){
-					if([aCard slot] == card){
-						[actualSIS3300Cards setObject:aCard forKey:aKey];
-						obj = aCard;
-						break;
-					}
+			if(channel%2){
+				for(i=0;i<(length-3);i++) {
+					sPtr[i] = ptr[i] & aMask;	
 				}
 			}
-			getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+			else {
+				for(i=0;i<(length-3);i++) {
+					sPtr[i] = (ptr[i]>>16) & aMask;	
+				}
+			}
+			
+			[aDataSet loadWaveform:tmpData
+							offset:0 //bytes!
+						  unitSize:2 //unit size in bytes!
+							sender:self  
+						  withKeys:@"SIS3300", @"Waveforms",crateKey,cardKey,channelKey,nil];
+			
+			//get the actual object
+			if(getRatesFromDecodeStage){
+				NSString* aKey = [crateKey stringByAppendingString:cardKey];
+				if(!actualSIS3300Cards)actualSIS3300Cards = [[NSMutableDictionary alloc] init];
+				ORSIS3300Model* obj = [actualSIS3300Cards objectForKey:aKey];
+				if(!obj){
+					NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3300Model")];
+					NSEnumerator* e = [listOfCards objectEnumerator];
+					ORSIS3300Model* aCard;
+					while(aCard = [e nextObject]){
+						if([aCard slot] == card){
+							[actualSIS3300Cards setObject:aCard forKey:aKey];
+							obj = aCard;
+							break;
+						}
+					}
+				}
+				getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+			}
+			
+			
 		}
- */
-	
+	}
 
-	 
+ 
     return length; //must return number of longs
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
 	ptr++;
-
     NSString* title= @"SIS3300 Waveform Record\n\n";
-    
     NSString* crate = [NSString stringWithFormat:@"Crate = %d\n",(*ptr&0x01e00000)>>21];
     NSString* card  = [NSString stringWithFormat:@"Card  = %d\n",(*ptr&0x001f0000)>>16];
+	NSString* moduleID = (*ptr&0x1)?@"SIS3301":@"SIS3300";
 	ptr++;
-    NSString* chan  = [NSString stringWithFormat:@"Chan  = %d\n",*ptr&0x7];
-	ptr+=2;
-	unsigned long energy = *ptr >> 16;
-	ptr++;	  //point to Energy second word
-	energy += (*ptr & 0x0000007f) << 16;
-	
-	// energy is in 2's complement, taking abs value if necessary
-    if((energy >> 22) & 0x1) energy = (~energy + 1) & 0x7fffff;
-	NSString* energyStr  = [NSString stringWithFormat:@"Energy  = %d\n",energy];
-    return [NSString stringWithFormat:@"%@%@%@%@%@",title,crate,card,chan,energyStr];               
+	NSString* triggerWord = [NSString stringWithFormat:@"TriggerWord  = 0x08%x\n",*ptr];
+	ptr++;
+	NSString* Event = [NSString stringWithFormat:@"Event  = 0x08%x\n",(*ptr>>24)&0xff];
+	NSString* Time = [NSString stringWithFormat:@"Time Since Last Trigger  = 0x08%x\n",*ptr&0xffffff];
+
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@",title,crate,card,moduleID,triggerWord,Event,Time];               
 }
 
 @end

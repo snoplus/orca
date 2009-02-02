@@ -1621,7 +1621,7 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
     [[[self undoManager] prepareWithInvocationTarget:self] setPayloadSize:payloadSize];
     
 	if(aValue<=5000)aValue = 5000;
-	else if(aValue>350000)aValue = 35000;
+	else if(aValue>kSBC_MaxPayloadSize)aValue = kSBC_MaxPayloadSize;
 	
     payloadSize = aValue;
 	

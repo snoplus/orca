@@ -59,17 +59,20 @@
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 			
-	//NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 	OHexFormatter *numberFormatter = [[[OHexFormatter alloc] init] autorelease];
 	
-	//[numberFormatter setFormat:@"##0.000;0;-##0.000"];
+	NSNumberFormatter *rateFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[rateFormatter setFormat:@"##0.0;0;-##0.0"];
 	
 	int i;
 	for(i=0;i<8;i++){
 		NSCell* theCell = [thresholdMatrix cellAtRow:i column:0];
 		[theCell setFormatter:numberFormatter];
 	}
-	
+	for(i=0;i<8;i++){
+		NSCell* theCell = [rateTextFields cellAtRow:i column:0];
+		[theCell setFormatter:rateFormatter];
+	}
 	[super awakeFromNib];
 	
 }
@@ -379,13 +382,14 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORSIS3300SettingsLock];
     BOOL locked = [gSecurity isLocked:ORSIS3300SettingsLock];
     
-    [settingLockButton setState: locked];
-	
+    [settingLockButton		setState: locked];
     [addressText			setEnabled:!locked && !runInProgress];
     [initButton				setEnabled:!lockedOrRunningMaintenance];
 	[enabledMatrix			setEnabled:!lockedOrRunningMaintenance];
 	[ltGtMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix		setEnabled:!lockedOrRunningMaintenance];
+	[checkEventButton	    setEnabled:!locked && !runInProgress];
+	[testMemoryButton	    setEnabled:!locked && !runInProgress];
 	
 	[csrMatrix				setEnabled:!lockedOrRunningMaintenance];
 	[acqMatrix				setEnabled:!lockedOrRunningMaintenance];
@@ -397,7 +401,7 @@
 	[startDelayField		setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU			setEnabled:!lockedOrRunningMaintenance];
 	[stopDelayField			setEnabled:!lockedOrRunningMaintenance];
-	[pageSizePU				setEnabled:!lockedOrRunningMaintenance];
+	[pageSizePU				setEnabled:!locked && !runInProgress];
 }
 
 - (void) setModel:(id)aModel
@@ -551,13 +555,13 @@
 		[model testMemory];
 	}
 	@catch (NSException* localException) {
-		NSLog(@"Probe of SIS 3300 Memory Bank failed\n");
+		NSLog(@"Test of SIS 3300 Memory Bank failed\n");
 	}
 }
 - (IBAction) probeBoardAction:(id)sender;
 {
 	@try {
-		[model readModuleID];
+		[model readModuleID:YES];
 	}
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS 3300 board ID failed\n");
@@ -701,11 +705,6 @@
                         localException);
     }
 }
-- (IBAction) testReadAction:(id)sender
-{
-	[self endEditing];
-	[model sampleAdcValues];
-}
 
 - (IBAction) checkEvent:(id)sender
 {
@@ -720,23 +719,41 @@
 	
 	return [[[[model waveFormRateGroup]rates] objectAtIndex:tag] rate];
 }
+- (BOOL)   	willSupplyColors
+{
+    return YES;
+}
+
+- (NSColor*) colorForDataSet:(int)set
+{
+    switch(set){
+        case 0:  return [NSColor colorWithCalibratedRed:10/255. green:90/255. blue:0 alpha:1];
+        case 1:  return [NSColor redColor];
+        default: return [NSColor blueColor];
+    }
+}
+
+- (int) 	numberOfDataSetsInPlot:(id)aPlotter
+{
+	if(aPlotter== plotter)return 6;
+	else return 1;
+}
 
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-	if(aPlotter== plotter)return 512;
+	if(aPlotter== plotter)return [model numberOfSamples];
 	else return [[[model waveFormRateGroup]timeRate]count];
 }
 
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
-	if(set == 0){
-		if(aPlotter== plotter){
-			return [model adcValue:0 index:x];
-		}
-		else {
-			int count = [[[model waveFormRateGroup]timeRate] count];
-			return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
-		}
+	if(aPlotter== plotter){
+		return [model adcValue:set index:x];
+	}
+	else if(set == 0){
+		int count = [[[model waveFormRateGroup]timeRate] count];
+		return [[[model waveFormRateGroup]timeRate]valueAtIndex:count-x-1];
+		
 	}
 	return 0;
 }

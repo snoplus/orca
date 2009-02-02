@@ -42,6 +42,7 @@
 void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
 int32_t writeBuffer(SBC_Packet* aPacket);
+int32_t sis3300CurrentBank[32];
 
 extern char needToSwap;
 extern int32_t  dataIndex;
@@ -65,12 +66,14 @@ void processHWCommand(SBC_Packet* aPacket)
 void startHWRun (SBC_crate_config* config)
 {    
     int32_t index = 0;
-    while(1){
+	while(1){
         switch(config->card_info[index].hw_type_id){
             default:     index =  -1; break;
         }
         if(index>=config->total_cards || index<0)break;
     }
+	int32_t i;
+	for(i=0;i<32;i++)sis3300CurrentBank[i]=0;
 }
 
 void stopHWRun (SBC_crate_config* config)
@@ -390,6 +393,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
             case kCaen1720:     index = Readout_CAEN1720(config,index,lamData);		break;
             case kMtc:			index = Readout_MTC(config,index,lamData);			break;
             case kFec:			index = Readout_Fec(config,index,lamData);			break;
+            case kSIS3300:		index = Readout_SIS3300(config,index,lamData);		break;
             default:            index = -1;                                         break;
         }
         return index;
@@ -440,6 +444,191 @@ int32_t Readout_Fec(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDat
 
     return config->card_info[index].next_Card_Index;
 }
+
+/*************************************************************/
+/*             Reads out SIS3300 cards.                       */
+/*************************************************************/
+int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+	
+#define kSISBank1ClockStatus	0x00000001
+#define kSISBank2ClockStatus	0x00000002
+#define kSISBank1BusyStatus		0x00100000
+#define kSISBank2BusyStatus		0x00400000
+#define kTriggerEvent1DirOffset 0x101000
+#define kTriggerEvent2DirOffset 0x102000
+#define kTriggerTime1Offset		0x1000
+#define kTriggerTime2Offset		0x2000
+#define kSISAcqReg				0x10		// [] Acquistion Reg
+#define kStartSampling			0x30		// [] Start Sampling
+#define kClearBank1FullFlag		0x48		// [] Clear Bank 1 Full Flag
+#define kClearBank2FullFlag		0x4C		// [] Clear Bank 2 Full Flag
+#define kSISSampleBank1			0x0001L
+#define kSISSampleBank2			0x0002L
+
+	static uint32_t eventCountOffset[4][2]={ //group,bank
+			{0x00200010,0x00200014},
+			{0x00280010,0x00280014},
+			{0x00300010,0x00300014},
+			{0x00380010,0x00380014},
+		};
+		
+	static uint32_t bankMemory[4][2]={
+			{0x00400000,0x00600000},
+			{0x00480000,0x00680000},
+			{0x00500000,0x00700000},
+			{0x00580000,0x00780000},
+		};	
+
+    uint32_t baseAddress       = config->card_info[index].base_add;
+    uint32_t theMod			   = config->card_info[index].add_mod;
+	uint32_t dataId            = config->card_info[index].hw_mask[0];
+	uint32_t slot              = config->card_info[index].slot;
+	uint32_t crate             = config->card_info[index].crate;
+	uint32_t locationMask      = ((crate & 0x0000000f)<<21) | ((slot & 0x0000001f)<<16);
+	uint32_t bankSwitchMode	   = config->card_info[index].deviceSpecificData[0];
+	uint32_t numberOfSamples   = config->card_info[index].deviceSpecificData[1];
+	uint32_t moduleID		   = config->card_info[index].deviceSpecificData[2];
+	int32_t result;
+
+    TUVMEDevice* vmeReadOutHandle = get_new_device(baseAddress, theMod, 4, 0);
+	if ( vmeReadOutHandle == NULL ) {
+		LogBusError("No vmeAM9Handle: %s 0x%08x",strerror(errno),baseAddress);
+		return config->card_info[index].next_Card_Index;
+	}
+	uint32_t currentBank = sis3300CurrentBank[crate];
+	
+	uint32_t mask;
+	
+	//read the acq register and decode the bank full and bank busy bits
+	uint32_t theValue;
+	result = read_device(vmeReadOutHandle,(char*)&theValue,4,kSISAcqReg); 
+	if (result < 4){
+		LogBusError("Rd Err0: SIS3300 0x%04x %s",kSISAcqReg,strerror(errno));
+		close_device(vmeReadOutHandle);
+		return config->card_info[index].next_Card_Index;
+	}
+	mask = (currentBank?kSISBank2ClockStatus : kSISBank1ClockStatus);
+	uint32_t bankIsFull = ((theValue & mask) == 0);
+	
+	mask =  (currentBank?kSISBank2BusyStatus : kSISBank1BusyStatus);
+	uint32_t bankIsBusy = ((theValue & mask) != 0);
+	
+	if(bankIsFull && !bankIsBusy) {
+		int bankToUse = currentBank;
+		//read the number of events
+		int numEvents;
+		result = read_device(vmeReadOutHandle,(char*)&numEvents,4,eventCountOffset[bankToUse][0]); 
+		if (result < 4){
+			LogBusError("Rd Err1: SIS3300 0x%04x %s",eventCountOffset[bankToUse][0],strerror(errno));
+			close_device(vmeReadOutHandle);
+			return config->card_info[index].next_Card_Index;
+		}
+		uint32_t event,group;
+		for(event=0;event<numEvents;event++){
+			
+			//read the trigger Event Directory
+			uint32_t triggerEventBankReg = (bankToUse?kTriggerEvent2DirOffset:kTriggerEvent1DirOffset) + (event*sizeof(uint32_t));
+			uint32_t triggerEventDir;
+			result = read_device(vmeReadOutHandle,(char*)&triggerEventDir,4,triggerEventBankReg); 
+			if (result < 4){
+				LogBusError("Rd Err2: SIS3300 0x%04x %s",triggerEventBankReg,strerror(errno));
+				close_device(vmeReadOutHandle);
+				return config->card_info[index].next_Card_Index;
+			}
+			
+			uint32_t startOffset = (triggerEventDir&0x1ffff) & (numberOfSamples-1);
+			
+			uint32_t triggerTime;
+			uint32_t triggerTriggerReg = (bankToUse?kTriggerTime2Offset:kTriggerTime1Offset) + event*sizeof(long);
+			result = read_device(vmeReadOutHandle,(char*)&triggerTime,4,triggerTriggerReg); 
+			if (result < 4){
+				LogBusError("Rd Err3: SIS3300 0x%04x %s",triggerTriggerReg,strerror(errno));
+				close_device(vmeReadOutHandle);
+				return config->card_info[index].next_Card_Index;
+			}
+			
+			for(group=0;group<4;group++){
+				uint32_t channelMask = triggerEventDir & (0xC0000000 >> (group*2));
+				if(channelMask==0)continue;
+				
+				//only read the channels that have trigger info
+				uint32_t totalNumLongs = numberOfSamples + 4;
+				uint32_t startIndex = dataIndex;
+				data[dataIndex++] = dataId | totalNumLongs; //but we are going to write over this below
+				data[dataIndex++] = locationMask | ((moduleID==0x3301) ? 1:0);
+				
+				data[dataIndex++] = triggerEventDir;
+				data[dataIndex++] = ((event&0xFF)<<24) | (triggerTime & 0xFFFFFF);
+			
+				// The first read is from startOffset -> nPagesize.
+				uint32_t nLongsToRead = numberOfSamples - startOffset;	
+				if(nLongsToRead>0){
+					result = read_device(vmeReadOutHandle,(char*)&data[dataIndex],nLongsToRead*4, bankMemory[group][bankToUse] + 4*startOffset); 
+					printf("0x%08x/0x%08x first Read at 0x%08x + 0x%08x\n",result,nLongsToRead*4,bankMemory[group][bankToUse] , 4*startOffset);
+					if (result < nLongsToRead*4){
+						dataIndex = startIndex; //dump the record
+						LogBusError("Rd Err4: SIS3300 0x%04x %s",bankMemory[group][bankToUse] + 4*startOffset,strerror(errno));
+						close_device(vmeReadOutHandle);
+						return config->card_info[index].next_Card_Index;
+					}
+					
+					dataIndex +=  nLongsToRead;
+				}
+				
+				// The second read, if necessary, is from 0 ->nEventEnd-1.
+				if(startOffset>0) {
+					result = read_device(vmeReadOutHandle,(char*)&data[dataIndex],startOffset*4, bankMemory[group][bankToUse]); 
+					printf("0x%08x/0x%08x second Read at 0x%08x\n",result,startOffset*4,bankMemory[group][bankToUse]);
+					if (result < startOffset*4){
+						dataIndex = startIndex; //dump the record
+						LogBusError("Rd Err5: SIS3300 0x%04x %s",bankMemory[group][bankToUse],strerror(errno));
+						close_device(vmeReadOutHandle);
+						return config->card_info[index].next_Card_Index;
+					}
+					dataIndex +=  startOffset;
+				}
+				printf("0x08%x/0x08%x\n",totalNumLongs,dataIndex-startIndex);
+				data[startIndex] = dataId | dataIndex;
+			}
+			 
+		}
+		
+		uint32_t clearBankReg = (bankToUse?kClearBank2FullFlag:kClearBank1FullFlag);
+		uint32_t dummy = 0;
+		result = write_device(vmeReadOutHandle,(char*)&dummy,4,clearBankReg);
+		if (result < 4){
+			LogBusError("Rd Err6: SIS3300 0x%04x %s",clearBankReg,strerror(errno));
+			close_device(vmeReadOutHandle);
+			return config->card_info[index].next_Card_Index;
+		}		
+		if(bankSwitchMode) {
+			currentBank= (currentBank+1)%2;
+			sis3300CurrentBank[crate] = currentBank;
+		}
+				
+		//Arm the current Bank
+		uint32_t armBit = (bankToUse?kSISSampleBank2:kSISSampleBank1);
+		result = write_device(vmeReadOutHandle,(char*)&armBit,4,kSISAcqReg);
+		if (result < 4){
+			LogBusError("Rd Err7: SIS3300 0x%04x %s",kSISAcqReg,strerror(errno));
+			close_device(vmeReadOutHandle);
+			return config->card_info[index].next_Card_Index;
+		}		
+		//Start Sampling
+		result = write_device(vmeReadOutHandle,(char*)&dummy,4,kStartSampling);
+		if (result < 4){
+			LogBusError("Rd Err8: SIS3300 0x%04x %s",kStartSampling,strerror(errno));
+			close_device(vmeReadOutHandle);
+			return config->card_info[index].next_Card_Index;
+		}
+	}
+	
+	close_device(vmeReadOutHandle);
+	
+    return config->card_info[index].next_Card_Index;
+}
+
 
 /*************************************************************/
 /*             Reads out Shaper cards.                       */

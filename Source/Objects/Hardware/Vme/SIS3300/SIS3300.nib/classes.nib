@@ -103,8 +103,6 @@
 				<string>id</string>
 				<key>testMemoryBankAction</key>
 				<string>id</string>
-				<key>testReadAction</key>
-				<string>id</string>
 				<key>thresholdAction</key>
 				<string>id</string>
 				<key>writeThresholdsAction</key>
@@ -120,6 +118,8 @@
 				<string>NSMatrix</string>
 				<key>addressText</key>
 				<string>NSTextField</string>
+				<key>checkEventButton</key>
+				<string>NSButton</string>
 				<key>clockSourcePU</key>
 				<string>NSPopUpButton</string>
 				<key>csrMatrix</key>
@@ -170,6 +170,8 @@
 				<string>NSButton</string>
 				<key>tabView</key>
 				<string>NSTabView</string>
+				<key>testMemoryButton</key>
+				<string>NSButton</string>
 				<key>thresholdMatrix</key>
 				<string>NSMatrix</string>
 				<key>timeRateLogCB</key>

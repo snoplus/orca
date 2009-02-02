@@ -39,6 +39,7 @@ int32_t Readout_CAEN(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamDa
 int32_t Readout_CAEN1720(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_MTC(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Fec(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
+int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index);
 
 #endif

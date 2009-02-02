@@ -767,7 +767,7 @@ void LogMessage (const char *format,...)
     vsprintf (run_info.messageStrings[run_info.msg_buf_index], format, ap);
     run_info.msg_buf_index = (run_info.msg_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
     pthread_mutex_unlock (&runInfoMutex);//end critical section
-    run_info.err_count++;
+    run_info.msg_count++;
     va_end (ap);
 }
 
@@ -779,7 +779,7 @@ void LogError (const char *format,...)
     pthread_mutex_lock (&runInfoMutex);  //begin critical section
     vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
-    run_info.msg_count++;
+    run_info.err_count++;
     pthread_mutex_unlock (&runInfoMutex);//end critical section
     va_end (ap);
 }
@@ -792,7 +792,7 @@ void LogBusError (const char *format,...)
     pthread_mutex_lock (&runInfoMutex);  //begin critical section
     vsprintf (run_info.errorStrings[run_info.err_buf_index], format, ap);
     run_info.err_buf_index = (run_info.err_buf_index + 1 ) % kSBC_MaxErrorBufferSize;
-    run_info.msg_count++;
+    run_info.err_count++;
     run_info.busErrorCount++;
     pthread_mutex_unlock (&runInfoMutex);//end critical section
     va_end (ap);

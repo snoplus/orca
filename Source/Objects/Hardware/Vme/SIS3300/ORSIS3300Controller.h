@@ -59,6 +59,8 @@
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
     IBOutlet NSButton*      statusButton;
+	IBOutlet NSButton*		checkEventButton;
+	IBOutlet NSButton*		testMemoryButton;
 
     //rate page
     IBOutlet NSMatrix*      rateTextFields;
@@ -136,7 +138,6 @@
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) writeThresholdsAction:(id)sender;
 - (IBAction) readThresholdsAction:(id)sender;
-- (IBAction) testReadAction:(id)sender;
 - (IBAction) testMemoryBankAction:(id)sender;
 - (IBAction) checkEvent:(id)sender;
 
@@ -145,5 +146,6 @@
 - (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
 - (unsigned long)  	secondsPerUnit:(id) aPlotter;
+- (int) 	numberOfDataSetsInPlot:(id)aPlotter;
 
 @end
