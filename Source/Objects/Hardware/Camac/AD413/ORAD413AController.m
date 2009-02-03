@@ -20,23 +20,17 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #pragma mark ¥¥¥Imported Files
 #import "ORAD413AController.h"
 #import "ORCamacExceptions.h"
 #import "ORAD413AModel.h"
 
-#pragma mark ¥¥¥Macros
-
-
-// methods
 @implementation ORAD413AController
 
 #pragma mark ¥¥¥Initialization
 -(id)init
 {
     self = [super initWithWindowNibName:@"AD413A"];
-	
     return self;
 }
 
