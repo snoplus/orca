@@ -563,7 +563,9 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 		for(i=0;i<numValues;i++){
 			[controller camacShortNAF:cachedStation a:i f:2 data:&data];
 			int chan = (data>>13)&0x3;
-			[self ship:aDataPacket adc:data&0x1fff forChan:chan];
+			if(onlineMask & (0x1<<chan)){
+				[self ship:aDataPacket adc:data&0x1fff forChan:chan];
+			}
 		}
 		[controller camacShortNAF:cachedStation a:0 f:9];
 	}
