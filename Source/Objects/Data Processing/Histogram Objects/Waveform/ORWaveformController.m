@@ -96,13 +96,13 @@
 	else {
 		[differentiateText setStringValue:@""];
 	}
-	[[self plotter] autoScale:nil];
+	//[[self plotter] autoScale:nil];
 }
 
 - (void) averageWindowChanged:(NSNotification*)aNote
 {
 	[averageWindowField setIntValue:[[self plotter] averageWindow]];
-	[[self plotter] autoScale:nil];
+	//[[self plotter] autoScale:nil];
 }
 
 - (void) integrateChanged:(NSNotification*)aNote
@@ -118,7 +118,7 @@
 	else {
 		[[[self plotter] xScale] setRngLow:0 withHigh:[model numberBins]];
 	}
-	[[self plotter] autoScale:nil];
+	//[[self plotter] autoScale:nil];
 }
 
 - (void) baselineValueChanged:(NSNotification*)aNote
