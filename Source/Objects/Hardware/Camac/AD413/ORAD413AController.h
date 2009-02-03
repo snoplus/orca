@@ -34,13 +34,13 @@
         IBOutlet NSButton*		clearModuleButton;
         
         IBOutlet NSButton*		settingLockButton;
-        IBOutlet NSTextField*   settingLockDocField;
 
 		IBOutlet NSTextField*   virtualStationField;
 		IBOutlet NSTextField*   CAMACEnabledField;
         IBOutlet NSMatrix*		controlReg1Matrix;
         IBOutlet NSButton*		readControlReg1Button;
         IBOutlet NSButton*		writeControlReg1Button;
+		IBOutlet NSTextField*   conflictField;
 
         IBOutlet NSMatrix*		controlReg2Matrix;
         IBOutlet NSButton*		readControlReg2Button;

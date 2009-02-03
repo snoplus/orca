@@ -130,12 +130,6 @@
     [writeControlReg2Button setEnabled:!locked && !runInProgress];
     [readControlReg2Button setEnabled:!lockedOrRunningMaintenance];
 	
-    NSString* s = @"";
-    if(lockedOrRunningMaintenance){
-        if(runInProgress && ![gSecurity isLocked:ORAD413ASettingsLock])s = @"Not in Maintenance Run.";
-    }
-    [settingLockDocField setStringValue:s];
-	
 }
 
 
@@ -168,12 +162,18 @@
 - (void) controlReg1Changed:(NSNotification*)aNotification
 {
     [[controlReg1Matrix cellWithTag:kZeroSuppressionBit] setState: [model zeroSuppressionMode]];
-    [[controlReg1Matrix cellWithTag:kSinglesBit]     setState: [model singles]];
+    [[controlReg1Matrix cellWithTag:kSinglesBit]		 setState: [model singles]];
     [[controlReg1Matrix cellWithTag:kRandomAccessBit]    setState: [model randomAccessMode]];
     [[controlReg1Matrix cellWithTag:kLAMEnableBit]       setState: [model lamEnable]];
     [[controlReg1Matrix cellWithTag:kOFSuppressionBit]   setState: [model ofSuppressionMode]];
 	[CAMACEnabledField setStringValue: [model CAMACMode]?@"CAMAC":@"FERA"];
 	[virtualStationField setIntValue:[model vsn]];
+	if([model zeroSuppressionMode] && [model randomAccessMode]){
+		[conflictField setStringValue:@"Random Access has precedence over zero suppression"];
+	}
+	else {
+		[conflictField setStringValue:@""];
+	}
 }
 
 - (void) controlReg2Changed:(NSNotification*)aNotification

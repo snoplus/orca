@@ -274,7 +274,6 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	controlReg1 |= singles<<kSinglesBit;							//in manual -- coincidence bit
 	controlReg1 |= randomAccessMode<<kRandomAccessBit;
 	controlReg1 |= (!ofSuppressionMode)<<kOFSuppressionBit;
-	controlReg1 |= zeroSuppressionMode<<kZeroSuppressionBit;
 	controlReg1 |= CAMACMode<<kECLPortEnableBit;
 	controlReg1 |= lamEnable<<kLAMEnableBit;
 	
@@ -397,6 +396,12 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	[self writeDiscriminators];
     [self clearLAM];
     //}
+	
+	if(zeroSuppressionMode && randomAccessMode){
+		NSLogColor([NSColor redColor],@"OR413 (%d,%d) Parameter conflict -- both zero suppression and random access modes selected.\n");
+		NSLogColor([NSColor redColor],@"The random access mode has precedence. Zero Suppresion not used.\n");
+	}
+	
 }
 
 //**************************************************************************************
@@ -539,8 +544,12 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 		int chan;
 		if(randomAccessMode)chan = onlineList[i];
 		else chan = i;
-		[self ship:aDataPacket adc:adcValue&0x1fff forChan:chan];
+		if(onlineMask & (0x1<<chan)){
+			[self ship:aDataPacket adc:adcValue&0x1fff forChan:chan];
+		}
 	}
+	[controller camacShortNAF:cachedStation a:0 f:9];
+
 }
 
 - (void) readZeroSuppressedChannels:(ORDataPacket*)aDataPacket
@@ -552,10 +561,11 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 		if(numValues==0)numValues=4;
 		int i;
 		for(i=0;i<numValues;i++){
-			[controller camacShortNAF:cachedStation a:0 f:2 data:&data];
+			[controller camacShortNAF:cachedStation a:i f:2 data:&data];
 			int chan = (data>>13)&0x3;
 			[self ship:aDataPacket adc:data&0x1fff forChan:chan];
 		}
+		[controller camacShortNAF:cachedStation a:0 f:9];
 	}
 }
 

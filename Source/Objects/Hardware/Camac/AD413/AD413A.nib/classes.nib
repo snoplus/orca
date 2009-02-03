@@ -117,6 +117,8 @@
 				<string>NSTextField</string>
 				<key>clearModuleButton</key>
 				<string>NSButton</string>
+				<key>conflictField</key>
+				<string>NSTextField</string>
 				<key>controlReg1Matrix</key>
 				<string>NSMatrix</string>
 				<key>controlReg2Matrix</key>
@@ -135,8 +137,6 @@
 				<string>NSButton</string>
 				<key>settingLockButton</key>
 				<string>NSButton</string>
-				<key>settingLockDocField</key>
-				<string>NSTextField</string>
 				<key>virtualStationField</key>
 				<string>NSTextField</string>
 				<key>writeControlReg1Button</key>
