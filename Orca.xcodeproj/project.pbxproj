@@ -206,6 +206,14 @@
 		840B813F094E4D8D00B1B135 /* ORLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B8139094E4D8D00B1B135 /* ORLabelModel.h */; };
 		840B8140094E4D8D00B1B135 /* ORLabelModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840B813A094E4D8D00B1B135 /* ORLabelModel.m */; };
 		840B8141094E4D8D00B1B135 /* ORLabelController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B813B094E4D8D00B1B135 /* ORLabelController.h */; };
+		840D56E00F39E9BF00F9A274 /* ORPacController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D56D80F39E9BF00F9A274 /* ORPacController.h */; };
+		840D56E10F39E9BF00F9A274 /* ORPacController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D56D90F39E9BF00F9A274 /* ORPacController.m */; };
+		840D56E20F39E9BF00F9A274 /* ORPacDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D56DA0F39E9BF00F9A274 /* ORPacDecoders.h */; };
+		840D56E30F39E9BF00F9A274 /* ORPacDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D56DB0F39E9BF00F9A274 /* ORPacDecoders.m */; };
+		840D56E40F39E9BF00F9A274 /* ORPacModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840D56DC0F39E9BF00F9A274 /* ORPacModel.h */; };
+		840D56E50F39E9BF00F9A274 /* ORPacModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840D56DD0F39E9BF00F9A274 /* ORPacModel.m */; };
+		840D56E60F39E9BF00F9A274 /* Pac.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840D56DE0F39E9BF00F9A274 /* Pac.nib */; };
+		840D56E70F39E9BF00F9A274 /* Pac.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840D56DF0F39E9BF00F9A274 /* Pac.tif */; };
 		840E00030944B29000049827 /* edu.washington.npl.orca.Process.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840EFFA50944B28F00049827 /* edu.washington.npl.orca.Process.plist */; };
 		840E00040944B29000049827 /* ORProcessController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840EFFA60944B28F00049827 /* ORProcessController.h */; };
 		840E00050944B29000049827 /* ORProcessController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840EFFA70944B28F00049827 /* ORProcessController.m */; };
@@ -2221,6 +2229,14 @@
 		840B8139094E4D8D00B1B135 /* ORLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLabelModel.h; path = "Source/Objects/Misc Objects/Label/ORLabelModel.h"; sourceTree = SOURCE_ROOT; };
 		840B813A094E4D8D00B1B135 /* ORLabelModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLabelModel.m; path = "Source/Objects/Misc Objects/Label/ORLabelModel.m"; sourceTree = SOURCE_ROOT; };
 		840B813B094E4D8D00B1B135 /* ORLabelController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORLabelController.h; sourceTree = "<group>"; };
+		840D56D80F39E9BF00F9A274 /* ORPacController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPacController.h; path = Source/Objects/Hardware/Serial/Pac/ORPacController.h; sourceTree = SOURCE_ROOT; };
+		840D56D90F39E9BF00F9A274 /* ORPacController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPacController.m; path = Source/Objects/Hardware/Serial/Pac/ORPacController.m; sourceTree = SOURCE_ROOT; };
+		840D56DA0F39E9BF00F9A274 /* ORPacDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPacDecoders.h; path = Source/Objects/Hardware/Serial/Pac/ORPacDecoders.h; sourceTree = SOURCE_ROOT; };
+		840D56DB0F39E9BF00F9A274 /* ORPacDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPacDecoders.m; path = Source/Objects/Hardware/Serial/Pac/ORPacDecoders.m; sourceTree = SOURCE_ROOT; };
+		840D56DC0F39E9BF00F9A274 /* ORPacModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPacModel.h; path = Source/Objects/Hardware/Serial/Pac/ORPacModel.h; sourceTree = SOURCE_ROOT; };
+		840D56DD0F39E9BF00F9A274 /* ORPacModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPacModel.m; path = Source/Objects/Hardware/Serial/Pac/ORPacModel.m; sourceTree = SOURCE_ROOT; };
+		840D56DE0F39E9BF00F9A274 /* Pac.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Pac.nib; path = Source/Objects/Hardware/Serial/Pac/Pac.nib; sourceTree = SOURCE_ROOT; };
+		840D56DF0F39E9BF00F9A274 /* Pac.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Pac.tif; path = Source/Objects/Hardware/Serial/Pac/Pac.tif; sourceTree = SOURCE_ROOT; };
 		840DFF0B03C37EAA00DCF929 /* FanIn.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = FanIn.nib; sourceTree = "<group>"; };
 		840DFF0D03C37EAA00DCF929 /* ORFanInController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORFanInController.h; sourceTree = "<group>"; };
 		840DFF0E03C37EAA00DCF929 /* ORFanInController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORFanInController.m; sourceTree = "<group>"; };
@@ -4491,6 +4507,22 @@
 			path = "Source/Objects/Misc Objects/Label";
 			sourceTree = SOURCE_ROOT;
 		};
+		840D56D70F39E9BF00F9A274 /* Pac */ = {
+			isa = PBXGroup;
+			children = (
+				840D56D80F39E9BF00F9A274 /* ORPacController.h */,
+				840D56D90F39E9BF00F9A274 /* ORPacController.m */,
+				840D56DA0F39E9BF00F9A274 /* ORPacDecoders.h */,
+				840D56DB0F39E9BF00F9A274 /* ORPacDecoders.m */,
+				840D56DC0F39E9BF00F9A274 /* ORPacModel.h */,
+				840D56DD0F39E9BF00F9A274 /* ORPacModel.m */,
+				840D56DE0F39E9BF00F9A274 /* Pac.nib */,
+				840D56DF0F39E9BF00F9A274 /* Pac.tif */,
+			);
+			name = Pac;
+			path = Source/Objects/Hardware/Serial/Pac;
+			sourceTree = SOURCE_ROOT;
+		};
 		840DFF0703C37EAA00DCF929 /* Data Flow */ = {
 			isa = PBXGroup;
 			children = (
@@ -5548,6 +5580,7 @@
 			children = (
 				84499CBD0F13E457004B855B /* CTITemp */,
 				84499B6E0F13BB6E004B855B /* MksPdr2000 */,
+				840D56D70F39E9BF00F9A274 /* Pac */,
 			);
 			name = Serial;
 			path = Source/Objects/Hardware/Serial;
@@ -9314,6 +9347,9 @@
 				8493D6BF0F21315300BCD331 /* ORCMC203Decoders.h in Headers */,
 				8493D6C10F21315300BCD331 /* ORCMC203Model.h in Headers */,
 				9C880ED90F2B5B2500394AEC /* ORVmeCrate.h in Headers */,
+				840D56E00F39E9BF00F9A274 /* ORPacController.h in Headers */,
+				840D56E20F39E9BF00F9A274 /* ORPacDecoders.h in Headers */,
+				840D56E40F39E9BF00F9A274 /* ORPacModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9895,6 +9931,8 @@
 				2D1AB81B0F1B9F2400E6B850 /* IpeSlowControl.tif in Resources */,
 				8493D6BB0F21315300BCD331 /* CMC203.nib in Resources */,
 				8493D6BC0F21315300BCD331 /* CMC203Card.tif in Resources */,
+				840D56E60F39E9BF00F9A274 /* Pac.nib in Resources */,
+				840D56E70F39E9BF00F9A274 /* Pac.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10577,6 +10615,9 @@
 				8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */,
 				8493D6C20F21315300BCD331 /* ORCMC203Model.m in Sources */,
 				9C880EDA0F2B5B2500394AEC /* ORVmeCrate.m in Sources */,
+				840D56E10F39E9BF00F9A274 /* ORPacController.m in Sources */,
+				840D56E30F39E9BF00F9A274 /* ORPacDecoders.m in Sources */,
+				840D56E50F39E9BF00F9A274 /* ORPacModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
