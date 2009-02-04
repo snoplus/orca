@@ -112,21 +112,12 @@ NSString* ORPacLock = @"ORPacLock";
 		unsigned long data[18];
 		data[0] = dataId | 18;
 		data[1] = ([self uniqueIdNumber]&0xfff);
-		
-		union {
-			float asFloat;
-			unsigned long asLong;
-		}theData;
-		
+				
 		int index = 2;
 		int i;
 		for(i=0;i<8;i++){
-			theData.asFloat = adc[i];
-			data[index] = theData.asLong;
-			index++;
-			
-			data[index] = timeMeasured[i];
-			index++;
+			data[index++] = adc[i];
+			data[index++] = timeMeasured[i];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 															object:[NSData dataWithBytes:&data length:sizeof(long)*6]];
