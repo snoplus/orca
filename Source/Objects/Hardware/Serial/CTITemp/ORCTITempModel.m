@@ -435,7 +435,8 @@ NSString* ORCTITempLock = @"ORCTITempLock";
 
 - (void) process_response:(NSString*)theResponse
 {	
-	if([lastRequest hasPrefix:@"T"]){
+	if([theResponse hasPrefix:@"T"]){
+		theResponse = [theResponse substringFromIndex:1];
 		[self setTemperature:[theResponse floatValue]];
 	}
 }
