@@ -21,9 +21,8 @@
 
 #import "ORPacModel.h"
 #import "ORSerialPort.h"
-#import "ORSerialPortList.h"
-#import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
+#import "ORSerialPortList.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
@@ -34,9 +33,10 @@ NSString* ORPacModelPollTimeChanged		= @"ORPacModelPollTimeChanged";
 NSString* ORPacModelSerialPortChanged	= @"ORPacModelSerialPortChanged";
 NSString* ORPacModelPortNameChanged		= @"ORPacModelPortNameChanged";
 NSString* ORPacModelPortStateChanged	= @"ORPacModelPortStateChanged";
-NSString* ORPacAdcChanged			= @"ORPacAdcChanged";
-
-NSString* ORPacLock = @"ORPacLock";
+NSString* ORPacModelAdcChanged			= @"ORPacModelAdcChanged";
+NSString* ORPacModelPortDMaskChanged	= @"ORPacModelPortDMaskChanged";
+NSString* ORPacModelDacChanged			= @"ORPacModelDacChanged";
+NSString* ORPacLock						= @"ORPacLock";
 
 @interface ORPacModel (private)
 - (void) runStarted:(NSNotification*)aNote;
@@ -173,19 +173,19 @@ NSString* ORPacLock = @"ORPacLock";
 	[self performSelector:@selector(pollAdcs) withObject:nil afterDelay:pollTime];
 }
 
-- (float) adc:(int)index
+- (unsigned short) adc:(int)index
 {
-	if(index>=0 && index<2)return adc[index];
+	if(index>=0 && index<8)return adc[index];
 	else return 0.0;
 }
 
 - (unsigned long) timeMeasured:(int)index
 {
-	if(index>=0 && index<2)return timeMeasured[index];
+	if(index>=0 && index<8)return timeMeasured[index];
 	else return 0;
 }
 
-- (void) setAdc:(int)index value:(char)aValue;
+- (void) setAdc:(int)index value:(unsigned short)aValue;
 {
 	if(index>=0 && index<8){
 		adc[index] = aValue;
@@ -195,7 +195,7 @@ NSString* ORPacLock = @"ORPacLock";
 		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		timeMeasured[index] = mktime(theTimeGMTAsStruct);
 
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacAdcChanged 
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAdcChanged 
 															object:self 
 														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"]];
 
@@ -204,6 +204,20 @@ NSString* ORPacLock = @"ORPacLock";
 
 	}
 }
+
+- (unsigned short) dac:(int)index
+{
+	return dac[index];
+}
+
+- (void) setDac:(int)index value:(unsigned short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDac:index value:aValue];
+	dac[index] = aValue;
+	NSDictionary* chanInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacChanged object:self userInfo:chanInfo];
+}
+
 
 - (NSData*) lastRequest
 {
@@ -290,6 +304,22 @@ NSString* ORPacLock = @"ORPacLock";
     
 }
 
+- (void) setPortDMask:(unsigned char)aMask
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setPortDMask:portDMask];
+	portDMask	 = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortDMaskChanged object:self];
+}
+
+- (BOOL) portDBit:(int)i
+{
+	return (portDMask & (1<<i)) != 0;
+}
+
+- (void) writePortD
+{
+	[self enqueWritePortD];
+}
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -334,6 +364,23 @@ NSString* ORPacLock = @"ORPacLock";
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
 }
+
+- (void) enqueWritePortD
+{
+    if([serialPort isOpen]){ 
+		
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		
+		NSMutableData* cmd = [NSMutableData data];
+		char theCommand = kPacSelCmd;
+		[cmd appendBytes:&theCommand length:1];
+		[cmd appendBytes:&portDMask length:1];
+		[cmdQueue addObject:cmd];
+		
+		if(!lastRequest)[self processOneCommandFromQueue];
+	}
+}
+
 
 - (void) enqueShipCmd
 {
@@ -417,7 +464,16 @@ NSString* ORPacLock = @"ORPacLock";
 					else						 NSLogError(@"PAC",@"ADC !OK",nil);
 					done = YES;
 				}
-				break;
+			break;
+				
+			case kPacSelCmd:
+				if([inComingData length] == 1) {
+					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+					if(theData[0] != kPacOkByte)  NSLogError(@"PAC",@"Port D !OK",nil);
+					done = YES;
+				}
+			break;
+				
 		}
 		
 		if(done){

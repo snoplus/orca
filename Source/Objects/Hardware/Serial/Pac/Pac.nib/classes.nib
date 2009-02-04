@@ -118,17 +118,23 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>dacAction</key>
+				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
 				<key>openPortAction</key>
 				<string>id</string>
 				<key>pollTimeAction</key>
 				<string>id</string>
+				<key>portDAction</key>
+				<string>id</string>
 				<key>portListAction</key>
 				<string>id</string>
 				<key>readAdcsAction</key>
 				<string>id</string>
 				<key>shipAdcsAction</key>
+				<string>id</string>
+				<key>writePortDAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -141,6 +147,8 @@
 				<string>NSMatrix</string>
 				<key>adcMatrix</key>
 				<string>NSMatrix</string>
+				<key>dacMatrix</key>
+				<string>NSMatrix</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
 				<key>lockDocField</key>
@@ -151,6 +159,10 @@
 				<string>ORPlotter1D</string>
 				<key>pollTimePopup</key>
 				<string>NSPopUpButton</string>
+				<key>portDButton</key>
+				<string>NSButton</string>
+				<key>portDMatrix</key>
+				<string>NSMatrix</string>
 				<key>portListPopup</key>
 				<string>NSPopUpButton</string>
 				<key>portStateField</key>

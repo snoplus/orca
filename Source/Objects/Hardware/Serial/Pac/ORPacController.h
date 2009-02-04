@@ -26,6 +26,7 @@
     IBOutlet NSTextField*   lockDocField;
 	IBOutlet NSButton*		shipAdcsButton;
     IBOutlet NSButton*      lockButton;
+    IBOutlet NSButton*      portDButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSPopUpButton* pollTimePopup;
@@ -35,6 +36,8 @@
     IBOutlet NSMatrix*      adc1Matrix;
     IBOutlet NSMatrix*      timeMatrix;
 	IBOutlet ORPlotter1D*   plotter0;
+    IBOutlet NSMatrix*      portDMatrix;
+	IBOutlet NSMatrix*		dacMatrix;
 }
 
 #pragma mark •••Initialization
@@ -47,17 +50,19 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
-- (void) updateTimePlot:(NSNotification*)aNotification;
-- (void) scaleAction:(NSNotification*)aNotification;
-- (void) shipAdcsChanged:(NSNotification*)aNotification;
-- (void) lockChanged:(NSNotification*)aNotification;
-- (void) portNameChanged:(NSNotification*)aNotification;
-- (void) portStateChanged:(NSNotification*)aNotification;
-- (void) adcChanged:(NSNotification*)aNotification;
-- (void) pollTimeChanged:(NSNotification*)aNotification;
-- (void) miscAttributesChanged:(NSNotification*)aNotification;
-- (void) scaleAction:(NSNotification*)aNotification;
+- (void) updateTimePlot:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) shipAdcsChanged:(NSNotification*)aNote;
+- (void) lockChanged:(NSNotification*)aNote;
+- (void) portNameChanged:(NSNotification*)aNote;
+- (void) portStateChanged:(NSNotification*)aNote;
+- (void) adcChanged:(NSNotification*)aNote;
+- (void) dacChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
 - (void) loadAdcTimeValuesForIndex:(int)index;
+- (void) portDMaskChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) shipAdcsAction:(id)sender;
@@ -66,6 +71,10 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) readAdcsAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
+- (IBAction) portDAction:(id) sender;
+- (IBAction) dacAction:(id) sender;
+- (IBAction) writePortDAction:(id) sender;
+- (IBAction) dacAction:(id)sender;
 
 @end
 

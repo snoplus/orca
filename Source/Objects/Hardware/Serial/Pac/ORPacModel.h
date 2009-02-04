@@ -60,13 +60,15 @@
         unsigned long		dataId;
 		NSData*				lastRequest;
 		NSMutableArray*		cmdQueue;
-		float				adc[8];
+		unsigned short		adc[8];
 		unsigned long		timeMeasured[8];
 		int					pollTime;
         NSMutableString*    buffer;
 		BOOL				shipAdcs;
 		ORTimeRate*			timeRates[8];
 		NSMutableData*		inComingData;
+		unsigned char		portDMask;
+		unsigned short		dac[8];
 }
 
 #pragma mark •••Initialization
@@ -92,10 +94,13 @@
 - (NSData*) lastRequest;
 - (void) setLastRequest:(NSData*)aRequest;
 - (void) openPort:(BOOL)state;
-- (float) adc:(int)index;
+- (unsigned short) adc:(int)index;
 - (unsigned long) timeMeasured:(int)index;
-- (void) setAdc:(int)index value:(char)aValue;
-
+- (void) setAdc:(int)index value:(unsigned short)aValue;
+- (void) setPortDMask:(unsigned char)aMask;
+- (BOOL) portDBit:(int)i;
+- (unsigned short) dac:(int)index;
+- (void) setDac:(int)index value:(unsigned short)aValue;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -104,11 +109,12 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherPac;
-
+- (void) writePortD;
 - (void) shipAdcValues;
 
 #pragma mark •••Commands
 - (void) enqueReadADC:(char)aChannel;
+- (void) enqueWritePortD;
 - (void) enqueShipCmd;
 - (void) readAdcs;
 
@@ -124,4 +130,6 @@ extern NSString* ORPacModelSerialPortChanged;
 extern NSString* ORPacLock;
 extern NSString* ORPacModelPortNameChanged;
 extern NSString* ORPacModelPortStateChanged;
-extern NSString* ORPacAdcChanged;
+extern NSString* ORPacModelAdcChanged;
+extern NSString* ORPacModelPortDMaskChanged;
+extern NSString* ORPacModelDacChanged;

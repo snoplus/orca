@@ -96,7 +96,7 @@
                                               
     [notifyCenter addObserver : self
                      selector : @selector(adcChanged:)
-                         name : ORPacAdcChanged
+                         name : ORPacModelAdcChanged
                        object : nil];
 
     [notifyCenter addObserver : self
@@ -123,7 +123,18 @@
 					 selector : @selector(updateTimePlot:)
 						 name : ORRateAverageChangedNotification
 					   object : nil];
-
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(portDMaskChanged:)
+						 name : ORPacModelPortDMaskChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(dacChanged:)
+						 name : ORPacModelDacChanged
+					   object : model];
+	
+		
 }
 
 - (void) setModel:(id)aModel
@@ -139,7 +150,9 @@
     [self portStateChanged:nil];
     [self portNameChanged:nil];
 	[self adcChanged:nil];
+	[self dacChanged:nil];
 	[self pollTimeChanged:nil];
+	[self portDMaskChanged:nil];
 	[self shipAdcsChanged:nil];
 	[self updateTimePlot:nil];
     [self miscAttributesChanged:nil];
@@ -189,6 +202,14 @@
 	}
 }
 
+- (void) portDMaskChanged:(NSNotification*)aNote
+{
+	int i;
+	for(i=0;i<8;i++){
+		[[portDMatrix cellWithTag:i] setIntValue: [model portDBit:i]];
+	}
+}
+
 - (void) shipAdcsChanged:(NSNotification*)aNote
 {
 	[shipAdcsButton setIntValue: [model shipAdcs]];
@@ -208,11 +229,25 @@
 	}
 }
 
+- (void) dacChanged:(NSNotification*)aNote
+{
+	if(aNote){
+		int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+		[[dacMatrix cellWithTag:index] setIntValue:[model dac:index]];
+	}
+	else {
+		int i;
+		for(i=0;i<8;i++){
+			[[dacMatrix cellWithTag:i] setIntValue:[model dac:i]];
+		}
+	}
+}
+
+
 - (void) loadAdcTimeValuesForIndex:(int)index
 {
-	NSString* adcAsString = [NSString stringWithFormat:@"%.2E",[model adc:index]];
-	[[adcMatrix cellWithTag:index] setStringValue:adcAsString];
-	[[adc1Matrix cellWithTag:index] setStringValue:adcAsString];
+	[[adcMatrix cellWithTag:index] setIntValue:[model adc:index]];
+	[[adc1Matrix cellWithTag:index] setIntValue:[model adc:index]];
 	unsigned long t = [model timeMeasured:index];
 	NSCalendarDate* theDate;
 	if(t){
@@ -302,7 +337,12 @@
 
 
 #pragma mark •••Actions
-- (void) shipAdcsAction:(id)sender
+- (IBAction) dacAction:(id)sender
+{
+	[model setDac:[[sender selectedCell] tag] value:[sender intValue]];
+}
+
+- (IBAction) shipAdcsAction:(id)sender
 {
 	[model setShipAdcs:[sender intValue]];	
 }
@@ -331,9 +371,22 @@
 {
 	[model setPollTime:[[sender selectedItem] tag]];
 }
+- (IBAction) portDAction:(id)sender
+{
+	unsigned char mask = 0;
+	int i;
+	for(i=0;i<8;i++){
+		if([[portDMatrix cellWithTag:i] intValue])mask |= (1<<i);
+	}
+	[model setPortDMask:mask];
+}
 
+- (IBAction) writePortDAction:(id) sender
+{
+	[model writePortD];
+}
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source
+#pragma mark •••Data Source
 - (BOOL) willSupplyColors
 {
 	return YES;
