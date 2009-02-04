@@ -31,44 +31,29 @@
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //                          ^^^^ ^^^^ ^^^^--device id
-//                ^^^^----------------------units id (0=unknown,1=Torr,2=mBar,3=Pascal,4=Arb)
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure chan 0 encoded as a float
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 0
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 0 taken in seconds since Jan 1, 1970
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  pressure chan 1 encoded as a float
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 1 taken in seconds since Jan 1, 1970
+// ..
+// ..
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 7
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 7 taken in seconds since Jan 1, 1970
 //-----------------------------------------------------------------------------------------------
-static NSString* kMkePdrUnit[2] = {
-    //pre-make some keys for speed.
-    @"Gauge 0",  @"Gauge 1"
-
-};
 
 @implementation ORPacDecoderForAdc
-
-- (NSString*) getGaugeKey:(unsigned short)aUnit
-{
-    if(aUnit<3) return kMkePdrUnit[aUnit];
-    else return [NSString stringWithFormat:@"Gauge %d",aUnit];			
-}
 
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
 	unsigned long *dataPtr = (unsigned long*)someData;
-	union {
-		float asFloat;
-		unsigned long asLong;
-	}theTemp;
 	int ident = dataPtr[1] & 0xfff;
 	int i;
 	int index = 2;
-	for(i=0;i<2;i++){
-		theTemp.asLong = dataPtr[index];									//encoded as float, use union to convert
-		[aDataSet loadTimeSeries:theTemp.asFloat										
+	for(i=0;i<8;i++){
+		[aDataSet loadTimeSeries:(float)dataPtr[index]										
 						  atTime:dataPtr[index+1]
 						  sender:self 
-						withKeys:@"BOCTIC3",
+						withKeys:@"PAC",
 								[NSString stringWithFormat:@"Unit %d",ident],
-								[self getGaugeKey:i],
+								[self getChannelKey:i],
 								nil];
 		index+=2;
 	}
@@ -78,29 +63,18 @@ static NSString* kMkePdrUnit[2] = {
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
-    NSString* title= @"BOC TIC Controller\n\n";
+    NSString* title= @"POC Controller\n\n";
     NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
-	int units = (dataPtr[1]>>16) & 0xf;
-	if(units == 0)		[theString stringByAppendingString: @"Units = Unknown\n"];
-	else if(units == 1)	[theString stringByAppendingString: @"Units = Torr\n"];
-	else if(units == 2)	[theString stringByAppendingString: @"Units = mBar\n"];
-	else if(units == 3)	[theString stringByAppendingString: @"Units = Pascal\n"];
-	else				[theString stringByAppendingString: @"Units = Arb\n"];
 	int ident = dataPtr[1] & 0xfff;
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
-	union {
-		float asFloat;
-		unsigned long asLong;
-	}theData;
 	int i;
 	int index = 2;
-	for(i=0;i<2;i++){
-		theData.asLong = dataPtr[index];
+	for(i=0;i<8;i++){
 		
 		NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
 		[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
 		
-		theString = [theString stringByAppendingFormat:@"Gauge %d: %.2E %@\n",i,theData.asFloat,date];
+		theString = [theString stringByAppendingFormat:@"Channel %d: 0x%02x %@\n",i,dataPtr[index],date];
 		index+=2;
 	}
 	return theString;
