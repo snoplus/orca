@@ -216,6 +216,7 @@ NSString* ORPacLock						= @"ORPacLock";
 	dac[index] = aValue;
 	NSDictionary* chanInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacChanged object:self userInfo:chanInfo];
+	NSLog(@"setDac: %d value: %d\n",index,aValue);
 }
 
 

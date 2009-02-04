@@ -234,6 +234,7 @@
 	if(aNote){
 		int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
 		[[dacMatrix cellWithTag:index] setIntValue:[model dac:index]];
+		NSLog(@"dac changed: %d value: %d\n",index,[model dac:index]);
 	}
 	else {
 		int i;
@@ -339,6 +340,7 @@
 #pragma mark •••Actions
 - (IBAction) dacAction:(id)sender
 {
+	NSLog(@"dac action: %d value: %d\n",[[sender selectedCell] tag],[sender intValue]);
 	[model setDac:[[sender selectedCell] tag] value:[sender intValue]];
 }
 
