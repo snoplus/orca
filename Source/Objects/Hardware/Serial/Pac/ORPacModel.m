@@ -120,7 +120,7 @@ NSString* ORPacLock = @"ORPacLock";
 			data[index++] = timeMeasured[i];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*6]];
+															object:[NSData dataWithBytes:&data length:sizeof(long)*18]];
 	}
 }
 
