@@ -537,6 +537,18 @@ NSString* ORPacLock						= @"ORPacLock";
     return dataDictionary;
 }
 
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+	NSMutableArray* dacArray = [NSArray array];
+	int i;
+	for(i=0;i<8;i++){
+		[dacArray addObject:[NSNumber numberWithShort:dac[i]]];
+    }
+	[objDictionary setObject:dacArray forKey:@"dacs"];
+    return objDictionary;
+}
+
 - (void) dataReceived:(NSNotification*)note
 {
 	BOOL done = NO;
