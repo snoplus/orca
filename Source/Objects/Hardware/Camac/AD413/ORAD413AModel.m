@@ -275,8 +275,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	controlReg1 |= randomAccessMode<<kRandomAccessBit;
 	controlReg1 |= (!ofSuppressionMode)<<kOFSuppressionBit;
 	controlReg1 |= CAMACMode<<kECLPortEnableBit;
-	controlReg1 |= lamEnable<<kLAMEnableBit;
-	
+	controlReg1 |= lamEnable<<kLAMEnableBit;	
     [[self adapter] camacShortNAF:[self stationNumber]+1 a:0 f:16 data:&controlReg1];
 
 }
@@ -387,15 +386,13 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
             onlineChannelCount++;
         }
     }
-    
 	
-    //if([[userInfo objectForKey:@"doinit"]intValue]){
     [self clearModule];
     [self writeControlReg2];
     [self writeControlReg1];  //LAM enable is rolled into this load
 	[self writeDiscriminators];
     [self clearLAM];
-    //}
+	
 	
 	if(zeroSuppressionMode && randomAccessMode){
 		NSLogColor([NSColor redColor],@"OR413 (%d,%d) Parameter conflict -- both zero suppression and random access modes selected.\n");
@@ -419,7 +416,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 				if(zeroSuppressionMode)	[self readZeroSuppressedChannels:aDataPacket];
 				else					[self readChannels:aDataPacket];
 			}
-			if(lamIsSet)[controller camacShortNAF:cachedStation a:0 f:10]; //clear lam
+			if(lamIsSet && lamEnable)[controller camacShortNAF:cachedStation a:0 f:10]; //clear lam
 			[controller camacShortNAF:cachedStation a:0 f:9]; //clear module
 		}
 	}
