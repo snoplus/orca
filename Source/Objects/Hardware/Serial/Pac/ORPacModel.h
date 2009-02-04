@@ -113,12 +113,15 @@
 - (void) writeDacs;
 - (void) readDacs;
 - (void) shipAdcValues;
+- (void) setLcmEna;
+- (void) clrLcmEna;
 
 #pragma mark •••Commands
 - (void) enqueReadADC:(int)aChannel;
 - (void) enqueWritePortD;
 - (void) enqueWriteDac:(int)aChannel;
 - (void) enqueReadDac:(int)aChannel;
+- (void) enqueSetLcmEna:(BOOL)state;
 
 - (void) enqueShipCmd;
 - (void) readAdcs;

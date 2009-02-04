@@ -284,6 +284,8 @@
     [writeDacButton setEnabled:!locked];
     [readAdcsButton setEnabled:!locked];
     [portDButton setEnabled:!locked];
+    [setLcmEnaButton setEnabled:!locked];
+    [clrLcmEnaButton setEnabled:!locked];
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -346,6 +348,16 @@
 - (IBAction) readDacAction:(id)sender
 {
 	[model readDacs];
+}
+
+- (IBAction) setLcmEnaAction:(id)sender
+{
+	[model setLcmEna];
+}
+
+- (IBAction) clrLcmEnaAction:(id)sender
+{
+	[model clrLcmEna];
 }
 
 - (IBAction) writeDacAction:(id)sender

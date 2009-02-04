@@ -40,6 +40,8 @@
 	IBOutlet NSMatrix*		dacMatrix;
     IBOutlet NSButton*      readDacButton;
     IBOutlet NSButton*      writeDacButton;
+    IBOutlet NSButton*      setLcmEnaButton;
+    IBOutlet NSButton*      clrLcmEnaButton;
 }
 
 #pragma mark •••Initialization
@@ -79,6 +81,8 @@
 - (IBAction) dacAction:(id)sender;
 - (IBAction) readDacAction:(id)sender;
 - (IBAction) writeDacAction:(id)sender;
+- (IBAction) setLcmEnaAction:(id)sender;
+- (IBAction) clrLcmEnaAction:(id)sender;
 
 @end
 

@@ -321,6 +321,16 @@ NSString* ORPacLock						= @"ORPacLock";
 	[self enqueWritePortD];
 }
 
+- (void) setLcmEna
+{
+	[self enqueSetLcmEna:YES];
+}
+
+- (void) clrLcmEna
+{
+	[self enqueSetLcmEna:NO];
+}
+
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
@@ -349,6 +359,23 @@ NSString* ORPacLock						= @"ORPacLock";
 }
 
 #pragma mark ••• Commands
+
+- (void) enqueSetLcmEna:(BOOL)state
+{
+    if([serialPort isOpen]){ 
+		
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		
+		NSMutableData* cmd = [NSMutableData data];
+		char theCommand = kPacLcmEnaCmd;
+		[cmd appendBytes:&theCommand length:1];
+		char stateWord = (state?kPacLcmEnaSet:kPacLcmEnaClr);
+		[cmd appendBytes:&stateWord length:1];
+		[cmdQueue addObject:cmd];
+		
+		if(!lastRequest)[self processOneCommandFromQueue];
+	}
+}
 - (void) enqueReadADC:(int)aChannel
 {
     if([serialPort isOpen]){ 
@@ -560,6 +587,15 @@ NSString* ORPacLock						= @"ORPacLock";
 					}
 				}
 			break;
+				
+			case kPacLcmEnaCmd:
+				if([inComingData length] == 1) {
+					unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+					if(theData[0] != kPacOkByte)  NSLogError(@"PAC",@"LCM ENA !OK",nil);
+					done = YES;
+				}
+			break;
+				
 		}
 		
 		if(done){

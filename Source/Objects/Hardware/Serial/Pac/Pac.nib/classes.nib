@@ -118,6 +118,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clrLcmEnaAction</key>
+				<string>id</string>
 				<key>dacAction</key>
 				<string>id</string>
 				<key>lockAction</key>
@@ -133,6 +135,8 @@
 				<key>readAdcsAction</key>
 				<string>id</string>
 				<key>readDacAction</key>
+				<string>id</string>
+				<key>setLcmEnaAction</key>
 				<string>id</string>
 				<key>shipAdcsAction</key>
 				<string>id</string>
@@ -151,6 +155,8 @@
 				<string>NSMatrix</string>
 				<key>adcMatrix</key>
 				<string>NSMatrix</string>
+				<key>clrLcmEnaButton</key>
+				<string>NSButton</string>
 				<key>dacMatrix</key>
 				<string>NSMatrix</string>
 				<key>lockButton</key>
@@ -174,6 +180,8 @@
 				<key>readAdcsButton</key>
 				<string>NSButton</string>
 				<key>readDacButton</key>
+				<string>NSButton</string>
+				<key>setLcmEnaButton</key>
 				<string>NSButton</string>
 				<key>shipAdcsButton</key>
 				<string>NSButton</string>
