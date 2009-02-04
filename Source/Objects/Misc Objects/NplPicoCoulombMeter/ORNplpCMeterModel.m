@@ -250,51 +250,50 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 
 - (void) shipValues
 {
-	if(meterData){
-		
-		unsigned int numBytes = [meterData length];
-		if((numBytes>0) && (numBytes%4 == 0)) {											//OK, we know we got a integer number of long words
-			if([self validateMeterData]){
-				unsigned long data[1003];									//max buffer size is 1000 data words + ORCA header
-				unsigned int numLongsToShip = numBytes/sizeof(long);		//convert size to longs
-				numLongsToShip = numLongsToShip<1000?numLongsToShip:1000;	//don't exceed the data array
-				data[0] = dataId | (3 + numLongsToShip);					//first word is ORCA id and size
-				data[1] =  [self uniqueIdNumber]&0xf;						//second word is device number
-				
-				//get the time(UT!)
-				time_t	theTime;
-				time(&theTime);
-				struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-				time_t ut_time = mktime(theTimeGMTAsStruct);
-				data[2] = ut_time;											//third word is seconds since 1970 (UT)
-				
-				unsigned long* p = (unsigned long*)[meterData bytes];
-				
-				int i;
-				for(i=0;i<numLongsToShip;i++){
-					p[i] = CFSwapInt32BigToHost(p[i]);
-					data[3+i] = p[i];
-					int chan = (p[i] & 0x00600000) >> 21;
-					if(chan < kNplpCNumChannels) [dataStack[chan] enqueue: [NSNumber numberWithLong:p[i] & 0x000fffff]];
-				}
-				
-				[self averageMeterData];
-				[meterData replaceBytesInRange:NSMakeRange(0,numLongsToShip*sizeof(long)) withBytes:nil length:0];
-				
-				if([gOrcaGlobals runInProgress] && numBytes>0){
-					[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																		object:[NSData dataWithBytes:data length:(3+numLongsToShip)*sizeof(long)]];
-				}
-				[self setReceiveCount: receiveCount + 1];
+	
+	unsigned int numBytes = [meterData length];
+	if((numBytes>0) && (numBytes%4 == 0)) {											//OK, we know we got a integer number of long words
+		if([self validateMeterData]){
+			unsigned long data[1003];									//max buffer size is 1000 data words + ORCA header
+			unsigned int numLongsToShip = numBytes/sizeof(long);		//convert size to longs
+			numLongsToShip = numLongsToShip<1000?numLongsToShip:1000;	//don't exceed the data array
+			data[0] = dataId | (3 + numLongsToShip);					//first word is ORCA id and size
+			data[1] =  [self uniqueIdNumber]&0xf;						//second word is device number
+			
+			//get the time(UT!)
+			time_t	theTime;
+			time(&theTime);
+			struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+			time_t ut_time = mktime(theTimeGMTAsStruct);
+			data[2] = ut_time;											//third word is seconds since 1970 (UT)
+			
+			unsigned long* p = (unsigned long*)[meterData bytes];
+			
+			int i;
+			for(i=0;i<numLongsToShip;i++){
+				p[i] = CFSwapInt32BigToHost(p[i]);
+				data[3+i] = p[i];
+				int chan = (p[i] & 0x00600000) >> 21;
+				if(chan < kNplpCNumChannels) [dataStack[chan] enqueue: [NSNumber numberWithLong:p[i] & 0x000fffff]];
 			}
 			
-			else {
-				[self stop];
-				[self performSelector:@selector(restart) withObject:nil afterDelay:2];
-				[self setFrameError:frameError+1];
+			[self averageMeterData];
+			[meterData replaceBytesInRange:NSMakeRange(0,numLongsToShip*sizeof(long)) withBytes:nil length:0];
+			
+			if([gOrcaGlobals runInProgress] && numBytes>0){
+				[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																	object:[NSData dataWithBytes:data length:(3+numLongsToShip)*sizeof(long)]];
 			}
+			[self setReceiveCount: receiveCount + 1];
+		}
+		
+		else {
+			[self stop];
+			[self performSelector:@selector(restart) withObject:nil afterDelay:2];
+			[self setFrameError:frameError+1];
 		}
 	}
+	
 }
 
 - (void) restart
@@ -336,14 +335,24 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 
 - (BOOL) validateMeterData
 {
-	unsigned char* p = (unsigned char*)[meterData bytes];
-	unsigned int len = [meterData length];
+	unsigned long* p = (unsigned long*)[meterData bytes];
+	unsigned int len = [meterData length]/4;
 	int i;
-	for(i=4;i<len;i+=4){
-		if(p[i-4] == 255 && p[i] == 0)return YES;
-		else if(p[i] != p[i-4]+1)return NO;
+	short lastCount,count;
+	BOOL seemsOK = YES;
+	//NSLog(@"len: %d\n",len);
+	for(i=0;i<len;i++){
+		count = p[i]>>24;
+		//NSLog(@"count: %d %d\n",lastCount,count);
+		if(i!=0){
+			short currentCount = p[i]>>24; 
+			if(currentCount != (lastCount+1)%256){
+				seemsOK = NO;
+			}
+		}
+		lastCount = count;
 	}
-	return YES;
+	return seemsOK;
 }
 
 #pragma mark ***Archival
