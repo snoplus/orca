@@ -138,7 +138,6 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 {
 	if(!isConnected){
 		[self setSocket:[NetSocket netsocketConnectedToHost:ipAddress port:kNplpCMeterPort]];	
-        [self setIsConnected:[socket isConnected]];
 	}
 	else {
 		[self stop];
