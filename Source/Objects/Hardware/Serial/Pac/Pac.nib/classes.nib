@@ -126,19 +126,21 @@
 				<string>id</string>
 				<key>portListAction</key>
 				<string>id</string>
-				<key>pressureScaleAction</key>
+				<key>readAdcsAction</key>
 				<string>id</string>
-				<key>readPressuresAction</key>
-				<string>id</string>
-				<key>shipPressuresAction</key>
+				<key>shipAdcsAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
-			<string>ORMksPdr2000Controller</string>
+			<string>ORPacController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>adc1Matrix</key>
+				<string>NSMatrix</string>
+				<key>adcMatrix</key>
+				<string>NSMatrix</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
 				<key>lockDocField</key>
@@ -153,22 +155,12 @@
 				<string>NSPopUpButton</string>
 				<key>portStateField</key>
 				<string>NSTextField</string>
-				<key>pressure1Matrix</key>
-				<string>NSMatrix</string>
-				<key>pressureMatrix</key>
-				<string>NSMatrix</string>
-				<key>pressureScalePU</key>
-				<string>NSPopUpButton</string>
-				<key>readPressuresButton</key>
+				<key>readAdcsButton</key>
 				<string>NSButton</string>
-				<key>shipPressuresButton</key>
+				<key>shipAdcsButton</key>
 				<string>NSButton</string>
 				<key>timeMatrix</key>
 				<string>NSMatrix</string>
-				<key>unitsTextField</key>
-				<string>NSTextField</string>
-				<key>unitsTextField1</key>
-				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
