@@ -132,7 +132,11 @@
 				<string>id</string>
 				<key>readAdcsAction</key>
 				<string>id</string>
+				<key>readDacAction</key>
+				<string>id</string>
 				<key>shipAdcsAction</key>
+				<string>id</string>
+				<key>writeDacAction</key>
 				<string>id</string>
 				<key>writePortDAction</key>
 				<string>id</string>
@@ -169,10 +173,14 @@
 				<string>NSTextField</string>
 				<key>readAdcsButton</key>
 				<string>NSButton</string>
+				<key>readDacButton</key>
+				<string>NSButton</string>
 				<key>shipAdcsButton</key>
 				<string>NSButton</string>
 				<key>timeMatrix</key>
 				<string>NSMatrix</string>
+				<key>writeDacButton</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>

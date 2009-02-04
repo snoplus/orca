@@ -110,11 +110,16 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherPac;
 - (void) writePortD;
+- (void) writeDacs;
+- (void) readDacs;
 - (void) shipAdcValues;
 
 #pragma mark •••Commands
-- (void) enqueReadADC:(char)aChannel;
+- (void) enqueReadADC:(int)aChannel;
 - (void) enqueWritePortD;
+- (void) enqueWriteDac:(int)aChannel;
+- (void) enqueReadDac:(int)aChannel;
+
 - (void) enqueShipCmd;
 - (void) readAdcs;
 

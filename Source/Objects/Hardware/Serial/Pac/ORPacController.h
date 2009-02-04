@@ -38,6 +38,8 @@
 	IBOutlet ORPlotter1D*   plotter0;
     IBOutlet NSMatrix*      portDMatrix;
 	IBOutlet NSMatrix*		dacMatrix;
+    IBOutlet NSButton*      readDacButton;
+    IBOutlet NSButton*      writeDacButton;
 }
 
 #pragma mark •••Initialization
@@ -75,6 +77,8 @@
 - (IBAction) dacAction:(id) sender;
 - (IBAction) writePortDAction:(id) sender;
 - (IBAction) dacAction:(id)sender;
+- (IBAction) readDacAction:(id)sender;
+- (IBAction) writeDacAction:(id)sender;
 
 @end
 

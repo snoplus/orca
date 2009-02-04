@@ -212,11 +212,10 @@ NSString* ORPacLock						= @"ORPacLock";
 
 - (void) setDac:(int)index value:(unsigned short)aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setDac:index value:aValue];
+    [[[self undoManager] prepareWithInvocationTarget:self] setDac:index value:dac[index]];
 	dac[index] = aValue;
 	NSDictionary* chanInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacChanged object:self userInfo:chanInfo];
-	NSLog(@"setDac: %d value: %d\n",index,aValue);
 }
 
 
@@ -350,7 +349,7 @@ NSString* ORPacLock						= @"ORPacLock";
 }
 
 #pragma mark ••• Commands
-- (void) enqueReadADC:(char)aChannel
+- (void) enqueReadADC:(int)aChannel
 {
     if([serialPort isOpen]){ 
 		
@@ -383,6 +382,57 @@ NSString* ORPacLock						= @"ORPacLock";
 }
 
 
+- (void) enqueWriteDac:(int)aChannel
+{
+    if([serialPort isOpen]){ 
+		
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+
+		NSMutableData* cmd = [NSMutableData data];
+		//put in the cmd
+		char theCommand = kPacRDacCmd;
+		[cmd appendBytes:&theCommand length:1];
+		//put in the cmd that specifies R/W
+		theCommand = kPacRDacWriteOneRDac;
+		[cmd appendBytes:&theCommand length:1];
+		//select the channel
+		[cmd appendBytes:&aChannel length:1];
+		//put in the data
+		char msb = dac[aChannel]>>8;
+		char lsb = dac[aChannel]&0xff;
+		[cmd appendBytes:&msb length:1];
+		[cmd appendBytes:&lsb length:1];
+		
+		[cmdQueue addObject:cmd];
+		
+		if(!lastRequest)[self processOneCommandFromQueue];
+	}
+}
+
+- (void) enqueReadDac:(int)aChannel
+{
+    if([serialPort isOpen]){ 
+		
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		
+		NSMutableData* cmd = [NSMutableData data];
+		//put in the cmd
+		char theCommand = kPacRDacCmd;
+		[cmd appendBytes:&theCommand length:1];
+		//put in the cmd that specifies R/W	
+		theCommand = kPacRDacReadOneRDac;
+		[cmd appendBytes:&theCommand length:1];
+		//select the channel		
+		[cmd appendBytes:&aChannel length:1];
+				
+		[cmdQueue addObject:cmd];
+		
+		if(!lastRequest)[self processOneCommandFromQueue];
+	}
+}
+
+
+
 - (void) enqueShipCmd
 {
     if([serialPort isOpen]){ 
@@ -405,6 +455,22 @@ NSString* ORPacLock						= @"ORPacLock";
 		[self enqueReadADC:i];
 	}
 	[self enqueShipCmd];
+}
+
+- (void) writeDacs
+{
+	int i;
+	for(i=0;i<8;i++){
+		[self enqueWriteDac:i];
+	}
+}
+
+- (void) readDacs
+{
+	int i;
+	for(i=0;i<8;i++){
+		[self enqueReadDac:i];
+	}
 }
 
 #pragma mark •••Data Records
@@ -475,6 +541,25 @@ NSString* ORPacLock						= @"ORPacLock";
 				}
 			break;
 				
+			case kPacRDacCmd:
+				if(theCmd[1] == kPacRDacReadOneRDac){
+					if([inComingData length] == 3) {
+						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+						short theChannel = theCmd[1] & 0x7;
+						short msb		 = theData[0];
+						short lsb		 = theData[1];
+						if(theData[2] == kPacOkByte) [self setDac:theChannel value: msb<<8 | lsb];
+						else						 NSLogError(@"PAC",@"DAC !OK",nil);
+						done = YES;
+					}
+				}
+				else if(theCmd[1] == kPacRDacWriteOneRDac){
+					if([inComingData length] == 1) {
+						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
+					}
+				}
+			break;
 		}
 		
 		if(done){

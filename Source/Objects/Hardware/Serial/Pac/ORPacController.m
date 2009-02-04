@@ -234,7 +234,6 @@
 	if(aNote){
 		int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
 		[[dacMatrix cellWithTag:index] setIntValue:[model dac:index]];
-		NSLog(@"dac changed: %d value: %d\n",index,[model dac:index]);
 	}
 	else {
 		int i;
@@ -279,7 +278,13 @@
     [openPortButton setEnabled:!locked];
     [pollTimePopup setEnabled:!locked];
     [shipAdcsButton setEnabled:!locked];
-    
+    [portDMatrix setEnabled:!locked];
+    [dacMatrix setEnabled:!locked];
+    [readDacButton setEnabled:!locked];
+    [writeDacButton setEnabled:!locked];
+    [readAdcsButton setEnabled:!locked];
+    [portDButton setEnabled:!locked];
+	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
         if(runInProgress && ![gSecurity isLocked:ORPacLock])s = @"Not in Maintenance Run.";
@@ -338,9 +343,18 @@
 
 
 #pragma mark •••Actions
+- (IBAction) readDacAction:(id)sender
+{
+	[model readDacs];
+}
+
+- (IBAction) writeDacAction:(id)sender
+{
+	[model readDacs];
+}
+
 - (IBAction) dacAction:(id)sender
 {
-	NSLog(@"dac action: %d value: %d\n",[[sender selectedCell] tag],[sender intValue]);
 	[model setDac:[[sender selectedCell] tag] value:[sender intValue]];
 }
 
