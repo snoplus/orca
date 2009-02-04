@@ -420,6 +420,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 				else					[self readChannels:aDataPacket];
 			}
 			if(lamIsSet)[controller camacShortNAF:cachedStation a:0 f:10]; //clear lam
+			[controller camacShortNAF:cachedStation a:0 f:9]; //clear module
 		}
 	}
 	@catch(NSException* localException) {
@@ -548,7 +549,6 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 			[self ship:aDataPacket adc:adcValue&0x1fff forChan:chan];
 		}
 	}
-	[controller camacShortNAF:cachedStation a:0 f:9];
 
 }
 
@@ -567,7 +567,6 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 				[self ship:aDataPacket adc:data&0x1fff forChan:chan];
 			}
 		}
-		[controller camacShortNAF:cachedStation a:0 f:9];
 	}
 }
 
