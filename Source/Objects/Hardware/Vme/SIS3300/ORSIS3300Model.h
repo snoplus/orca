@@ -84,7 +84,7 @@
 	unsigned long fifoStateAddress;
 	BOOL firstTime;
 	int currentBank;
-	unsigned long adcValue[8][128*1024];					
+	unsigned long dataWord[4][16*1024];					
 	long count;
 }
 
@@ -210,8 +210,7 @@
 - (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
 - (void) readAddressCounts;
 
-- (void) readAdcValues:(int)i;
-- (int) adcValue:(int)chan index:(int)index;
+- (int) dataWord:(int)chan index:(int)index;
 
 - (unsigned long) acqReg;
 - (unsigned long) configReg;

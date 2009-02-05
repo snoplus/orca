@@ -316,7 +316,7 @@
 
 - (void) pageSizeChanged:(NSNotification*)aNote
 {
-	[pageSizePU selectItemAtIndex: [model pageSize]];
+	[pageSizePU selectItemWithTag: [model pageSize]];
 }
 
 - (void) enabledChanged:(NSNotification*)aNote
@@ -605,7 +605,7 @@
 
 - (IBAction) pageSizeAction:(id)sender
 {
-	[model setPageSize:[sender indexOfSelectedItem]];	
+	[model setPageSize:[[sender selectedItem] tag]];	
 }
 
 - (IBAction) enabledAction:(id)sender
@@ -721,16 +721,7 @@
 }
 - (BOOL)   	willSupplyColors
 {
-    return YES;
-}
-
-- (NSColor*) colorForDataSet:(int)set
-{
-    switch(set){
-        case 0:  return [NSColor colorWithCalibratedRed:10/255. green:90/255. blue:0 alpha:1];
-        case 1:  return [NSColor redColor];
-        default: return [NSColor blueColor];
-    }
+    return NO;
 }
 
 - (int) 	numberOfDataSetsInPlot:(id)aPlotter
@@ -748,7 +739,7 @@
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
 	if(aPlotter== plotter){
-		return [model adcValue:set index:x];
+		return [model dataWord:set index:x];
 	}
 	else if(set == 0){
 		int count = [[[model waveFormRateGroup]timeRate] count];

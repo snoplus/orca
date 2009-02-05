@@ -150,6 +150,12 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 {0x00381000,0x00382000},
 };
 
+static unsigned long addressCounterOffset[4][2]={ //group,bank
+{0x00200008,0x0020000C},
+{0x00280008,0x0028000C},
+{0x00300008,0x0030000C},
+{0x00380008,0x0038000C},
+};
 
 #define kTriggerEvent1DirOffset 0x101000
 #define kTriggerEvent2DirOffset 0x102000
@@ -735,7 +741,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 
 - (void) writeStartDelay
 {
-	unsigned long aValue = stopDelay;
+	unsigned long aValue = startDelay;
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kStartDelay
                         numToWrite:1
@@ -745,7 +751,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 
 - (void) writeStopDelay
 {
-	unsigned long aValue = startDelay;
+	unsigned long aValue = stopDelay;
 	
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kStopDelay
@@ -886,105 +892,35 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	return triggerWord;
 }
 
-- (int) adcValue:(int)chan index:(int)index
+- (int) dataWord:(int)chan index:(int)index
 {
-	return adcValue[chan][index];
+	if([self enabled:chan]){	
+		unsigned long dataMask = ((moduleID==0x3300)?0xfff:0x3fff);
+		unsigned long theValue = dataWord[chan/2][index];
+		if((chan%2)==0)	return (theValue>>16) & dataMask; 
+		else			return theValue & dataMask; 
+	}
+	else return 0;
 }
-
-- (void) readAdcValues:(int)i
-{
-	i = i%512;
-	if(!moduleID)[self readModuleID:NO];
-	unsigned long dataMask = ((moduleID==0x3300)?0xfff:0x3fff);
-	
-	unsigned long aValue;   
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + 0x200018
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	
-	adcValue[0][i] = ((aValue>>16)&dataMask);
-	adcValue[1][i] = aValue&dataMask;
-
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + 0x280018
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	adcValue[2][i] = ((aValue>>16)&dataMask);
-	adcValue[3][i] = aValue&dataMask;
-	
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + 0x300018
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	adcValue[4][i] = ((aValue>>16)&dataMask);
-	adcValue[5][i] = aValue&dataMask;
-	
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + 0x380018
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	adcValue[6][i] = ((aValue>>16)&dataMask);
-	adcValue[7][i] = aValue&dataMask;
-	
-}	
 
 - (void) readAddressCounts
 {
-	unsigned long aValue = 0x0;   
-	unsigned long aValue1 = 0x0;   
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + 0x200008
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	[[self adapter] readLongBlock:&aValue1
-						atAddress:[self baseAddress] + 0x200010
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	NSLog(@"Bank1 Address Counter 1:  0x%04x   0x%04x\n",aValue,aValue1);
-
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + 0x280008
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	[[self adapter] readLongBlock:&aValue1
-						atAddress:[self baseAddress] + 0x280010
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	NSLog(@"Bank1 Address Counter 2:  0x%04x   0x%04x\n",aValue,aValue1);
-	
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + 0x300008
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	[[self adapter] readLongBlock:&aValue1
-						atAddress:[self baseAddress] + 0x300010
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-	NSLog(@"Bank1 Address Counter 3:    0x%04x  0x%04x\n",aValue,aValue1);
-
-	[[self adapter] readLongBlock:&aValue
-						atAddress:[self baseAddress] + 0x380008
-                        numToRead:1
-					   withAddMod:[self addressModifier]
-					usingAddSpace:0x01];
-		  [[self adapter] readLongBlock:&aValue1
-							  atAddress:[self baseAddress] + 0x380010
-							  numToRead:1
-							 withAddMod:[self addressModifier]
-						  usingAddSpace:0x01];
-	NSLog(@"Bank1 Address Counter 4:    0x%04x  0x%04x\n",aValue,aValue1);
-	
+	unsigned long aValue;   
+	unsigned long aValue1; 
+	int i;
+	for(i=0;i<4;i++){
+		[[self adapter] readLongBlock:&aValue
+							atAddress:[self baseAddress] + addressCounterOffset[i][0]
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+		[[self adapter] readLongBlock:&aValue1
+							atAddress:[self baseAddress] + addressCounterOffset[i][1]
+							numToRead:1
+						   withAddMod:[self addressModifier]
+						usingAddSpace:0x01];
+		NSLog(@"Group %d Address Counters:  0x%04x   0x%04x\n",i,aValue,aValue1);
+	}
 }
 
 
@@ -1198,14 +1134,10 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	[self reset];
 	[self initBoard];
 	if(!moduleID)[self readModuleID:NO];
-	unsigned long dataMask = ((moduleID==0x3300)?0xfff:0x3fff);
 
 	[self clearBankFullFlag:0];
-	NSLog(@"After Init Bank Full: %d\n",[self bankIsFull:0]);
 	[self arm:0];
-	NSLog(@"After Arm Bank Full: %d\n",[self bankIsFull:0]);
 	[self startSampling];
-	NSLog(@"Sampling started Bank Full: %d\n",[self bankIsFull:0]);
 	int totalTime = 0;
 	BOOL timeout = NO;
 	while(![self bankIsFull:0]){
@@ -1217,76 +1149,44 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 	}
 	if(!timeout){
 		int numEvents= [self eventNumberGroup:0 bank:0];
-		NSLog(@"got %d event\n",numEvents);
+		NSLog(@"Number Events: %d\n",numEvents);
 		unsigned long triggerEventDir;
-		//for(event=0;event<numEvents;event++){
-			triggerEventDir = [self readTriggerEventBank:0 index:0];
-			NSLog(@"trigger Event (first Event):0x%08x\n",triggerEventDir);
-		//}
-		int i,j;
-		for(j=0;j<8;j++){
-			for(i=0;i<[self numberOfSamples];i++){
-				adcValue[j][i]= 0;
-			}
-		}
+		triggerEventDir = [self readTriggerEventBank:0 index:0];
+
 		BOOL wrapped = ((triggerEventDir&0x80000) !=0);
 		unsigned long startOffset = triggerEventDir & 0x1ffff;
 		NSLog(@"address counter0:0x%0x wrapped: %d\n",startOffset,wrapped);
-		
+		[self readAddressCounts];
 		unsigned long nLongsToRead = [self numberOfSamples] - startOffset;
-		
-		[[self adapter] readLongBlock: adcValue[0]
-							atAddress: [self baseAddress] + 0x400000 + 4*startOffset
-							numToRead: nLongsToRead
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];		
-		[[self adapter] readLongBlock: adcValue[2]
-							atAddress: [self baseAddress] + 0x480000 + 4*startOffset
-							numToRead: nLongsToRead
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];		
-		[[self adapter] readLongBlock: adcValue[4]
-							atAddress: [self baseAddress] + 0x50000 + 4*startOffset
-							numToRead: nLongsToRead
-						   withAddMod: [self addressModifier]
-						usingAddSpace: 0x01];
-		
-		if(startOffset>0){
-			int index = startOffset;
-			[[self adapter] readLongBlock: &adcValue[0][index]
-								atAddress: [self baseAddress] + 0x400000
-								numToRead: startOffset
-							   withAddMod: [self addressModifier]
-							usingAddSpace: 0x01];		
-			[[self adapter] readLongBlock: &adcValue[2][index]
-								atAddress: [self baseAddress] + 0x480000
-								numToRead: startOffset
-							   withAddMod: [self addressModifier]
-							usingAddSpace: 0x01];		
-			[[self adapter] readLongBlock: &adcValue[4][index]
-								atAddress: [self baseAddress] + 0x50000
-								numToRead: startOffset
-							   withAddMod: [self addressModifier]
-							usingAddSpace: 0x01];
-		}
-		
-		unsigned short temp1,temp2;
-		for(i=0;i<[self numberOfSamples];i++){
-			temp1 = (adcValue[0][i]>>16) & dataMask;
-			temp2 = (adcValue[0][i]) & dataMask;
-			adcValue[0][i] = temp1;
-			adcValue[1][i] = temp2;
-			
-			temp1 = (adcValue[2][i]>>16) & dataMask;
-			temp2 = (adcValue[2][i]) & dataMask;
-			adcValue[2][i] = temp1;
-			adcValue[3][i] = temp2;
-			
-			temp1 = (adcValue[4][i]>>16) & dataMask;
-			temp2 = (adcValue[4][i]) & dataMask;
-			adcValue[4][i] = temp1;
-			adcValue[5][i] = temp2;
-			
+		int i;
+		for(i=0;i<4;i++){
+			if([self enabled:i*2] || [self enabled:i*2+1]){
+				if(!wrapped){
+					[[self adapter] readLongBlock: dataWord[i]
+										atAddress: [self baseAddress] + bankMemory[i][0]
+										numToRead: [self numberOfSamples]
+									   withAddMod: [self addressModifier]
+									usingAddSpace: 0x01];
+				}
+				
+				else {
+					[[self adapter] readLongBlock: &dataWord[i][0]
+									atAddress: [self baseAddress] + bankMemory[i][0] + 4*startOffset
+									numToRead: nLongsToRead
+								   withAddMod: [self addressModifier]
+								usingAddSpace: 0x01];		
+					NSLog(@"read1 from %d to %d\n", startOffset,  startOffset + nLongsToRead);
+					
+					if(startOffset>0){
+						[[self adapter] readLongBlock: &dataWord[i][nLongsToRead]
+											atAddress: [self baseAddress] + bankMemory[i][0]
+											numToRead: startOffset-1
+										   withAddMod: [self addressModifier]
+										usingAddSpace: 0x01];		
+						NSLog(@"read2 from %d to %d\n", 0,  startOffset-1);
+					}
+				}
+			}
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelSampleDone object:self];
 	}
@@ -1496,7 +1396,7 @@ static unsigned long eventDirOffset[4][2]={ //group,bank
 					dataBuffer[numLongs++] = dataId | totalNumLongs;
 					dataBuffer[numLongs++] = location | ((moduleID==0x3301) ? 1:0);
 
-					dataBuffer[numLongs++] = triggerEventDir;
+					dataBuffer[numLongs++] = triggerEventDir & (channelMask | 0x00FFFFFF);
 					dataBuffer[numLongs++] = ((event&0xFF)<<24) | (triggerTime & 0xFFFFFF);
 					
 					if(!pageWrap){

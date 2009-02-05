@@ -558,37 +558,56 @@ int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 				data[dataIndex++] = dataId | totalNumLongs; //but we are going to write over this below
 				data[dataIndex++] = locationMask | ((moduleID==0x3301) ? 1:0);
 				
-				data[dataIndex++] = triggerEventDir;
+				data[dataIndex++] = triggerEventDir & (channelMask | 0x00FFFFFF);
 				data[dataIndex++] = ((event&0xFF)<<24) | (triggerTime & 0xFFFFFF);
 			
 				// The first read is from startOffset -> nPagesize.
 				uint32_t nLongsToRead = numberOfSamples - startOffset;	
 				if(nLongsToRead>0){
-					result = read_device(vmeReadOutHandle,(char*)&data[dataIndex],nLongsToRead*4, bankMemory[group][bankToUse] + 4*startOffset); 
-					printf("0x%08x/0x%08x first Read at 0x%08x + 0x%08x\n",result,nLongsToRead*4,bankMemory[group][bankToUse] , 4*startOffset);
+					TUVMEDevice* sis3300DMADevice = get_dma_device(baseAddress+bankMemory[group][bankToUse] + 4*startOffset, theMod, 4, true);
+					if (sis3300DMADevice == NULL) {
+						LogBusError("DMA1: SIS3300 Rd Error: %s",strerror(errno));
+						dataIndex = startIndex; //dump the record
+						close_device(vmeReadOutHandle);
+						release_dma_device();
+						return config->card_info[index].next_Card_Index;
+					}
+					result = read_device(sis3300DMADevice,(char*)&data[dataIndex],nLongsToRead*4, 0); 
+					//result = read_device(vmeReadOutHandle,(char*)&data[dataIndex],nLongsToRead*4, bankMemory[group][bankToUse] + 4*startOffset); 
 					if (result < nLongsToRead*4){
 						dataIndex = startIndex; //dump the record
-						LogBusError("Rd Err4: SIS3300 0x%04x %s",bankMemory[group][bankToUse] + 4*startOffset,strerror(errno));
+						LogBusError("DMA2: SIS3300 Rd Error: %s",strerror(errno));
 						close_device(vmeReadOutHandle);
+						release_dma_device();
 						return config->card_info[index].next_Card_Index;
 					}
 					
 					dataIndex +=  nLongsToRead;
+					release_dma_device();
 				}
 				
 				// The second read, if necessary, is from 0 ->nEventEnd-1.
 				if(startOffset>0) {
-					result = read_device(vmeReadOutHandle,(char*)&data[dataIndex],startOffset*4, bankMemory[group][bankToUse]); 
-					printf("0x%08x/0x%08x second Read at 0x%08x\n",result,startOffset*4,bankMemory[group][bankToUse]);
+					TUVMEDevice* sis3300DMADevice = get_dma_device(baseAddress+bankMemory[group][bankToUse], theMod, 4, true);
+					if (sis3300DMADevice == NULL) {
+						dataIndex = startIndex; //dump the record
+						close_device(vmeReadOutHandle);
+						release_dma_device();
+						return config->card_info[index].next_Card_Index;
+					}
+					result = read_device(sis3300DMADevice,(char*)&data[dataIndex],startOffset*4, 0); 
+					//result = read_device(vmeReadOutHandle,(char*)&data[dataIndex],startOffset*4, bankMemory[group][bankToUse]); 
+				
 					if (result < startOffset*4){
 						dataIndex = startIndex; //dump the record
 						LogBusError("Rd Err5: SIS3300 0x%04x %s",bankMemory[group][bankToUse],strerror(errno));
 						close_device(vmeReadOutHandle);
+						release_dma_device();
 						return config->card_info[index].next_Card_Index;
 					}
 					dataIndex +=  startOffset;
+					release_dma_device();
 				}
-				printf("0x08%x/0x08%x\n",totalNumLongs,dataIndex-startIndex);
 				data[startIndex] = dataId | dataIndex;
 			}
 			 
@@ -600,6 +619,7 @@ int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 		if (result < 4){
 			LogBusError("Rd Err6: SIS3300 0x%04x %s",clearBankReg,strerror(errno));
 			close_device(vmeReadOutHandle);
+			release_dma_device();
 			return config->card_info[index].next_Card_Index;
 		}		
 		if(bankSwitchMode) {
@@ -613,6 +633,7 @@ int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 		if (result < 4){
 			LogBusError("Rd Err7: SIS3300 0x%04x %s",kSISAcqReg,strerror(errno));
 			close_device(vmeReadOutHandle);
+			release_dma_device();
 			return config->card_info[index].next_Card_Index;
 		}		
 		//Start Sampling
@@ -620,6 +641,7 @@ int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 		if (result < 4){
 			LogBusError("Rd Err8: SIS3300 0x%04x %s",kStartSampling,strerror(errno));
 			close_device(vmeReadOutHandle);
+			release_dma_device();
 			return config->card_info[index].next_Card_Index;
 		}
 	}
