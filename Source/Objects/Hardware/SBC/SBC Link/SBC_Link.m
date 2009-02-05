@@ -1486,7 +1486,7 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	while (connect(sck, (struct sockaddr *) &target_address, sizeof(target_address)) == -1) {
 		if([self canWriteTo:sck]) break;
 		if ((time(NULL) - now) > 3){
-			[NSException raise:@"Connection Failed" format:@"Couldn't get a connection for %@ Port %d -- Is the firewire off?",IPNumber,portNumber];
+			[NSException raise:@"Connection Failed" format:@"Couldn't get a connection for %@ Port %d -- Check power and connections.",IPNumber,portNumber];
 		}
 	}
 	//fcntl(sck, F_SETFL, oflag | O_NONBLOCK);
