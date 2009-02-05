@@ -736,7 +736,7 @@
 
 - (int) 	numberOfDataSetsInPlot:(id)aPlotter
 {
-	if(aPlotter== plotter)return 6;
+	if(aPlotter== plotter)return 8;
 	else return 1;
 }
 
