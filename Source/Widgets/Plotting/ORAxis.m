@@ -1070,13 +1070,25 @@ enum {
 		[aColor set];
 		float val = [markerNumber floatValue];
 		val = [self getPixAbs:val];
+		NSString* label = [NSString stringWithFormat:@"%.0f",[markerNumber floatValue]];
 		if([self isXAxis]){
 			[NSBezierPath strokeLineFromPoint:NSMakePoint(val,0) 
 									toPoint:NSMakePoint(val,aFrame.size.height-1)];
+			
+			int labelWidth = [label sizeWithAttributes:[self labelAttributes]].width;
+			float x;
+			if(val + labelWidth > aFrame.size.width)x = val - labelWidth-3;
+			else x = val+3;
+			[label drawAtPoint:NSMakePoint(x,3) withAttributes:[self labelAttributes]];
 		}
 		else {
 			[NSBezierPath strokeLineFromPoint:NSMakePoint(0,val) 
 								  toPoint:NSMakePoint(aFrame.size.width-1,val)];
+			int labelHeight = [label sizeWithAttributes:[self labelAttributes]].height;
+			float y;
+			if(val + labelHeight > aFrame.size.height)y = val - labelHeight;
+			else y = val;
+			[label drawAtPoint:NSMakePoint(3,y) withAttributes:[self labelAttributes]];
 		}
 
 		[NSBezierPath setDefaultLineWidth:oldLineWidth];
