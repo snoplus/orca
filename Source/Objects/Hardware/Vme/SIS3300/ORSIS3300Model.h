@@ -94,6 +94,7 @@
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (unsigned short) moduleID;
 //CSR bits
 - (BOOL) bankFullTo3;
 - (void) setBankFullTo3:(BOOL)aBankFullTo3;
@@ -266,3 +267,4 @@ extern NSString* ORSIS3300ModelLtGtChanged;
 extern NSString* ORSIS3300SettingsLock;
 extern NSString* ORSIS3300RateGroupChangedNotification;
 extern NSString* ORSIS3300ModelSampleDone;
+extern NSString* ORSIS3300ModelIDChanged;

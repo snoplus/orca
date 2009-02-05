@@ -27,6 +27,8 @@
 
 @interface ORSIS3300Controller : OrcaObjectController 
 {
+    IBOutlet NSTabView* 	tabView;
+	
 	//base address
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
@@ -35,8 +37,6 @@
 	IBOutlet NSMatrix*		csrMatrix;
 	IBOutlet NSMatrix*		acqMatrix;
 	IBOutlet NSMatrix*		eventConfigMatrix;
-
-    IBOutlet NSTabView* 	tabView;
 	
 	IBOutlet NSButton*		stopTriggerButton;
 	IBOutlet NSButton*		randomClockButton;
@@ -54,7 +54,6 @@
 	IBOutlet NSMatrix*		enabledMatrix;
 	IBOutlet NSMatrix*		ltGtMatrix;
 	IBOutlet NSMatrix*		thresholdMatrix;
-
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
@@ -75,11 +74,11 @@
     IBOutlet NSButton*      totalRateLogCB;
     IBOutlet ORPlotter1D*   timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
-
+	IBOutlet NSTextField*	moduleIDField;
+	
     NSView *blankView;
     NSSize settingSize;
     NSSize rateSize;
-
 }
 
 - (id)   init;
@@ -109,6 +108,7 @@
 - (void) ltGtChanged:(NSNotification*)aNote;
 - (void) thresholdChanged:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) moduleIDChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;

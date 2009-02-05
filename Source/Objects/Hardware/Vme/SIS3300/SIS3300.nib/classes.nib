@@ -138,6 +138,8 @@
 				<string>NSTextField</string>
 				<key>ltGtMatrix</key>
 				<string>NSMatrix</string>
+				<key>moduleIDField</key>
+				<string>NSTextField</string>
 				<key>pageSizePU</key>
 				<string>NSPopUpButton</string>
 				<key>plotter</key>

@@ -46,6 +46,7 @@ NSString* ORSIS3300ModelThresholdChanged		= @"ORSIS3300ModelThresholdChanged";
 NSString* ORSIS3300ModelThresholdArrayChanged	= @"ORSIS3300ModelThresholdArrayChanged";
 NSString* ORSIS3300ModelLtGtChanged				= @"ORSIS3300ModelLtGtChanged";
 NSString* ORSIS3300ModelSampleDone				= @"ORSIS3300ModelSampleDone";
+NSString* ORSIS3300ModelIDChanged				= @"ORSIS3300ModelIDChanged";
 
 
 //general register offsets
@@ -202,6 +203,11 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 }
 
 #pragma mark ***Accessors
+- (unsigned short) moduleID;
+{
+	return moduleID;
+}
+
 //csr reg
 - (BOOL) bankFullTo3
 {
@@ -637,9 +643,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
     [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
 	
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORSIS3300ModelThresholdChanged
-	 object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelThresholdChanged object:self];
 }
 
 #pragma mark •••Hardware Access
@@ -655,21 +659,14 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	unsigned short majorRev = (result >> 8) & 0xff;
 	unsigned short minorRev = result & 0xff;
 	if(verbose)NSLog(@"SIS3300 ID: %x  Firmware:%x.%x\n",moduleID,majorRev,minorRev);
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3300ModelIDChanged object:self];
 }
 
 - (void) writeControlStatusRegister
 {		
 	//The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.
-	//unsigned long aMask = 0xffff0000;
-	
-	//[[self adapter] writeLongBlock:&aMask
-    //                     atAddress:[self baseAddress] + kControlStatus
-    //                    numToWrite:1
-    //                    withAddMod:[self addressModifier]
-    //                 usingAddSpace:0x01];
-	
 	unsigned long aMask = 0x0;	
-
 	if(enableTriggerOutput)		aMask |= kSISEnableTriggerOutput;
 	if(invertTrigger)			aMask |= kSISInvertTrigger;
 	if(activateTriggerOnArmed)	aMask |= kSISTriggerOnArmedAndStarted;
@@ -678,7 +675,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	if(bankFullTo2)				aMask |= kSISBankFullTo2;
 	if(bankFullTo3)				aMask |= kSISBankFullTo3;
 	
-	
+	//put the inverse in the top bits to turn off everything else
 	aMask = ((~aMask & 0x0000ffff)<<16) | aMask ;
 	[[self adapter] writeLongBlock:&aMask
                          atAddress:[self baseAddress] + kControlStatus
@@ -690,15 +687,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (void) writeAcquistionRegister
 {
 	// The register is set up as a J/K flip/flop -- 1 bit to set a function and 1 bit to disable.	
-	
-	//unsigned long aMask = 0xffff0000;
-	
-	//[[self adapter] writeLongBlock:&aMask
-	//                    atAddress:[self baseAddress] + kAcquisitionControlReg
-	//                   numToWrite:1
-	//                   withAddMod:[self addressModifier]
-	//               usingAddSpace:0x01];
-	
 	unsigned long aMask = 0x0;
 	if(bankSwitchMode)			aMask |= kSISBankSwitch;
 	if(autoStart)				aMask |= kSISAutostart;
@@ -724,7 +712,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (void) writeEventConfigurationRegister
 {
-	 
 	//enable/disable autostop at end of page
 	//set pagesize
 	unsigned long aMask = 0x0;
@@ -923,7 +910,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	}
 }
 
-
 - (unsigned long) acqReg
 {
  	unsigned long aValue = 0;
@@ -945,6 +931,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 					usingAddSpace:0x01];
 	return aValue;
 }
+
 - (void) disArm:(int)bank
 {
  	unsigned long aValue = ACQMask(FALSE,bank?kSISSampleBank2:kSISSampleBank1);

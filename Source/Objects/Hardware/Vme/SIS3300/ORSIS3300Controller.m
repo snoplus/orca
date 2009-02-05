@@ -47,7 +47,7 @@
 - (void) awakeFromNib
 {
 	
-    settingSize     = NSMakeSize(790,460);
+    settingSize     = NSMakeSize(765,460);
     rateSize		= NSMakeSize(790,300);
     
     blankView = [[NSView alloc] init];
@@ -201,6 +201,10 @@
                          name : ORSIS3300ModelSampleDone
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(moduleIDChanged:)
+                         name : ORSIS3300ModelIDChanged
+						object: model];
 }
 
 - (void) registerRates
@@ -249,7 +253,7 @@
 	[self eventConfigChanged:nil];
 	[self csrChanged:nil];
 	[self acqChanged:nil];
-
+	[self moduleIDChanged:nil];
 }
 
 - (void) updatePlot
@@ -282,6 +286,12 @@
 	[stopDelayEnabledButton setIntValue: [model stopDelayEnabled]];
 }
 
+- (void) moduleIDChanged:(NSNotification*)aNote
+{
+	unsigned short moduleID = [model moduleID];
+	if(moduleID) [moduleIDField setStringValue:[NSString stringWithFormat:@"%x",moduleID]];
+	else		 [moduleIDField setStringValue:@"---"];
+}
 
 - (void) eventConfigChanged:(NSNotification*)aNote
 {
