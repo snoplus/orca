@@ -81,6 +81,7 @@ int32_t* data = 0;
 int32_t  maxPacketSize;
 
 SBC_JOB	 sbc_job;
+
 /*---------------*/
 
 void sigchld_handler(int32_t s)
@@ -458,11 +459,20 @@ void sendCBRecord(void)
     int32_t* dataPtr = (int32_t*)aPacket.payload;    
     
     int32_t recordCount = 0;
+	
     //put data from the circular buffer into the payload until either, 1)the payload is full, or 2)the CB is empty.
     do {
         int32_t nextBlockSize = CB_nextBlockSize();
         if(nextBlockSize == 0)break;
-        if((aPacket.cmdHeader.numberBytesinPayload + nextBlockSize*sizeof(int32_t)) < (maxPacketSize-32)){
+		if(nextBlockSize > (kSBC_MaxPayloadSize/sizeof(int32_t))){
+			LogError("sendCBRecord Error: Block too Large!");   
+			break;
+		}
+		if((recordCount == 0) && (nextBlockSize > maxPacketSize/sizeof(int32_t))){
+			//adjust the packetsize if needed.
+			maxPacketSize = nextBlockSize*sizeof(int32_t);
+		}
+        if((aPacket.cmdHeader.numberBytesinPayload + nextBlockSize*sizeof(int32_t)) <= maxPacketSize){
             int32_t maxToRead        = (maxPacketSize - aPacket.cmdHeader.numberBytesinPayload)/sizeof(int32_t);
             if(!CB_readNextDataBlock(dataPtr,maxToRead)) break;
             aPacket.cmdHeader.numberBytesinPayload    += nextBlockSize*sizeof(int32_t);
