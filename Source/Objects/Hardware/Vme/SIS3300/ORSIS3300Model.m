@@ -1341,6 +1341,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	[self clearBankFullFlag:currentBank];
 	[self arm:currentBank];
 	[self startSampling];
+	[self setLed:YES];
 	isRunning = NO;
 	count=0;
 }
@@ -1374,6 +1375,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 							++waveFormCount[channel];
 						}
 					}
+					
 					//only read the channels that have trigger info
 					unsigned long numLongs = 0;
 					unsigned long totalNumLongs = [self numberOfSamples] + 4;
@@ -1386,44 +1388,36 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 					dataBuffer[numLongs++] = triggerEventDir & (channelMask | 0x00FFFFFF);
 					dataBuffer[numLongs++] = ((event&0xFF)<<24) | (triggerTime & 0xFFFFFF);
 					
-					if(!pageWrap){
+
+					// The first read is from startOffset -> nPagesize.
+					unsigned long nLongsToRead = [self numberOfSamples] - startOffset;	
+					if(nLongsToRead>0){
 						[[self adapter] readLongBlock: &dataBuffer[numLongs]
-											atAddress: [self baseAddress] + bankMemory[group][bankToUse]
-											numToRead: [self numberOfSamples]
+											atAddress: [self baseAddress] + bankMemory[group][bankToUse] + 4*startOffset
+											numToRead: nLongsToRead
 										   withAddMod: [self addressModifier]
 										usingAddSpace: 0x01];
-						numLongs +=  [self numberOfSamples];
+						numLongs +=  nLongsToRead;
 					}
 					
-					else {
-						// The first read is from startOffset -> nPagesize.
-						unsigned long nLongsToRead = [self numberOfSamples] - startOffset;	
-						if(nLongsToRead>0){
-							[[self adapter] readLongBlock: &dataBuffer[numLongs]
-												atAddress: [self baseAddress] + bankMemory[group][bankToUse] + 4*startOffset
-												numToRead: nLongsToRead
-											   withAddMod: [self addressModifier]
-											usingAddSpace: 0x01];
-							numLongs +=  nLongsToRead;
-						}
-						
-						// The second read, if necessary, is from 0 ->nEventEnd-1.
-						if(startOffset>0) {
-							[[self adapter] readLongBlock: &dataBuffer[numLongs]
-												atAddress: [self baseAddress] + bankMemory[group][bankToUse]
-												numToRead: startOffset-1
-											   withAddMod: [self addressModifier]
-											usingAddSpace: 0x01];			
-						}
+					// The second read, if necessary, is from 0 ->nEventEnd-1.
+					if(startOffset>0) {
+						[[self adapter] readLongBlock: &dataBuffer[numLongs]
+											atAddress: [self baseAddress] + bankMemory[group][bankToUse]
+											numToRead: startOffset-1
+										   withAddMod: [self addressModifier]
+										usingAddSpace: 0x01];			
 					}
-					
+			
 					[aDataPacket addData:d];
 				}
 			}
+			
 			[self clearBankFullFlag:currentBank];
 			if(bankSwitchMode) currentBank= (currentBank+1)%2;
 			[self arm:currentBank];
 			[self startSampling];
+			
 		}
 	}
 	@catch(NSException* localException) {
@@ -1438,6 +1432,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	[self stopBankSwitching];
     isRunning = NO;
     [waveFormRateGroup stop];
+	[self setLed:NO];
 }
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)

@@ -609,11 +609,19 @@ int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 					release_dma_device();
 				}
 				data[startIndex] = dataId | dataIndex;
+				//we ship from here to prevent putting too much data into the data array
+				if(dataIndex>0){
+					if(needToSwap)SwapLongBlock(data, dataIndex);
+					CB_writeDataBlock(data,dataIndex);
+					dataIndex = 0;
+				}
+				index = 0;
+				
 			}
 			 
 		}
 		
-		uint32_t clearBankReg = (bankToUse?kClearBank2FullFlag:kClearBank1FullFlag);
+		uint32_t clearBankReg = (currentBank?kClearBank2FullFlag:kClearBank1FullFlag);
 		uint32_t dummy = 0;
 		result = write_device(vmeReadOutHandle,(char*)&dummy,4,clearBankReg);
 		if (result < 4){
@@ -628,7 +636,7 @@ int32_t Readout_SIS3300(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 		}
 				
 		//Arm the current Bank
-		uint32_t armBit = (bankToUse?kSISSampleBank2:kSISSampleBank1);
+		uint32_t armBit = (currentBank?kSISSampleBank2:kSISSampleBank1);
 		result = write_device(vmeReadOutHandle,(char*)&armBit,4,kSISAcqReg);
 		if (result < 4){
 			LogBusError("Rd Err7: SIS3300 0x%04x %s",kSISAcqReg,strerror(errno));
