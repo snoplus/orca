@@ -22,6 +22,7 @@
 
 @interface ORHistoController : OrcaObjectController  {
     IBOutlet NSSplitView*	splitView;
+	IBOutlet NSButton*		shipFinalHistogramsButton;
     IBOutlet NSOutlineView* outlineView;
     IBOutlet NSOutlineView* multiPlotView;
     IBOutlet NSButton* 		chooseDirButton;
@@ -36,6 +37,7 @@
 #pragma mark ¥¥¥Accessors
 
 #pragma mark ¥¥¥Interface Management
+- (void) shipFinalHistogramsChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) modelChanged:(NSNotification*)aNotification;
 - (void) dirChanged:(NSNotification*)note;
@@ -50,6 +52,7 @@
 - (void)splitViewDidResizeSubviews:(NSNotification *)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) shipFinalHistogramsAction:(id)sender;
 - (IBAction) doubleClick:(id)sender;
 - (IBAction) chooseDir:(id)sender;
 - (IBAction) writeFileAction:(id)sender;

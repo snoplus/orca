@@ -97,6 +97,8 @@
 				<string>id</string>
 				<key>removeItemAction</key>
 				<string>id</string>
+				<key>shipFinalHistogramsAction</key>
+				<string>id</string>
 				<key>writeFileAction</key>
 				<string>id</string>
 			</dict>
@@ -120,6 +122,8 @@
 				<string>NSOutlineView</string>
 				<key>plotGroupButton</key>
 				<string>NSButton</string>
+				<key>shipFinalHistogramsButton</key>
+				<string>NSButton</string>
 				<key>splitView</key>
 				<string>NSSplitView</string>
 				<key>writeFileButton</key>
@@ -131,6 +135,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>

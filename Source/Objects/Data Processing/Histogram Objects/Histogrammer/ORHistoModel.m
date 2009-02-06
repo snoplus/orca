@@ -28,6 +28,7 @@
 #import "ORDataSet.h"
 
 #pragma mark ¥¥¥Notification Strings
+NSString* ORHistoModelShipFinalHistogramsChanged = @"ORHistoModelShipFinalHistogramsChanged";
 NSString* ORHistoModelChangedNotification		= @"The Histogram Model Object Has Changed";
 NSString* ORHistoModelDirChangedNotification	= @"The Histogram Model Dir Changed";
 NSString* ORHistoModelFileChangedNotification	= @"The Histogram Model File Has Changed";
@@ -151,6 +152,20 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) shipFinalHistograms
+{
+    return shipFinalHistograms;
+}
+
+- (void) setShipFinalHistograms:(BOOL)aShipFinalHistograms
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipFinalHistograms:shipFinalHistograms];
+    
+    shipFinalHistograms = aShipFinalHistograms;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHistoModelShipFinalHistogramsChanged object:self];
+}
 - (ORDataSet*) dataSet
 {
 	[mLock lock];
@@ -330,7 +345,6 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    
     [[self objectConnectedTo:ORHistoDataOutConnection] runTaskStopped:aDataPacket userInfo:userInfo];
     [[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
     [dataSet runTaskStopped];
@@ -366,16 +380,22 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
         }
     }
     
-    [[self objectConnectedTo:ORHistoPassThruConnection] closeOutRun:aDataPacket userInfo:userInfo];
 	
+	if(shipFinalHistograms){
+		[dataSet packageData:aDataPacket userInfo:nil];
+		[self processData:aDataPacket userInfo:userInfo];
+	}
+    [[self objectConnectedTo:ORHistoPassThruConnection] closeOutRun:aDataPacket userInfo:userInfo];
+
 	if(processedFinalCall) return;
-    processedFinalCall = YES;
+	processedFinalCall = YES;
     id theNextObject = [self objectConnectedTo:ORHistoDataOutConnection];
     if(theNextObject){
         //send the packaged data on to the next object
         [dataSet packageData:aDataPacket userInfo:nil];
 		[theNextObject closeOutRun:aDataPacket userInfo:userInfo];
     }
+	
 }
 
 - (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
@@ -454,6 +474,7 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 	mLock = [[NSLock alloc] init];
     
     [[self undoManager] disableUndoRegistration];
+    [self setShipFinalHistograms:[decoder decodeBoolForKey:@"shipFinalHistograms"]];
     [self setDirectoryName:[decoder decodeObjectForKey:ORHistoDirName]];
     [self setWriteFile:[decoder decodeIntForKey:ORHistoWriteFile]];
     [self setDataSet:[decoder decodeObjectForKey:ORHistoDataSet]];
@@ -468,6 +489,7 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:shipFinalHistograms forKey:@"shipFinalHistograms"];
     [encoder encodeObject:[self directoryName] forKey:ORHistoDirName];
     [encoder encodeInt:[self writeFile] forKey:ORHistoWriteFile];
     [encoder encodeObject:dataSet forKey:ORHistoDataSet];

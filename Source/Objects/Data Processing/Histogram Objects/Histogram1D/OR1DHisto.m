@@ -321,28 +321,31 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
 
     //append the keys
     NSString* allKeys = [aKeyArray componentsJoinedByString:@"/"];
-    const char* p = [allKeys UTF8String];
-    unsigned long allKeysLengthWithTerminator = strlen(p)+1;
-    unsigned long paddedKeyLength = 4*((unsigned long)(allKeysLengthWithTerminator+4)/4);
-    unsigned long paddedKeyLengthLong = paddedKeyLength/4;
-    [dataToShip appendBytes:&paddedKeyLengthLong length:4];
-    [dataToShip appendBytes:p length:allKeysLengthWithTerminator];
+	if(allKeys && ![allKeys hasPrefix:@"Final"]){
+		allKeys = [@"Final/" stringByAppendingString:allKeys];
+		const char* p = [allKeys UTF8String];
+		unsigned long allKeysLengthWithTerminator = strlen(p)+1;
+		unsigned long paddedKeyLength = 4*((unsigned long)(allKeysLengthWithTerminator+4)/4);
+		unsigned long paddedKeyLengthLong = paddedKeyLength/4;
+		[dataToShip appendBytes:&paddedKeyLengthLong length:4];
+		[dataToShip appendBytes:p length:allKeysLengthWithTerminator];
 
-    //pad to the long word boundary
-    int i;
-    for(i=0;i< paddedKeyLength-allKeysLengthWithTerminator;i++){
-        char null = '\0';
-        [dataToShip appendBytes:&null length:1];
-    }
-    
-    [dataToShip appendBytes:&numberBins length:4];            //length of the histogram
-    [dataToShip appendBytes:histogram length:numberBins*4]; //note size in number bytes--not longs
-    
-    //go back and fill in the total length
-    unsigned long *ptr = (unsigned long*)[dataToShip bytes];
-    unsigned long totalLength = [dataToShip length]/4; //num of longs
-    *ptr |= (kLongFormLengthMask & totalLength);
-    [aDataPacket addData:dataToShip];
+		//pad to the long word boundary
+		int i;
+		for(i=0;i< paddedKeyLength-allKeysLengthWithTerminator;i++){
+			char null = '\0';
+			[dataToShip appendBytes:&null length:1];
+		}
+		
+		[dataToShip appendBytes:&numberBins length:4];            //length of the histogram
+		[dataToShip appendBytes:histogram length:numberBins*4]; //note size in number bytes--not longs
+		
+		//go back and fill in the total length
+		unsigned long *ptr = (unsigned long*)[dataToShip bytes];
+		unsigned long totalLength = [dataToShip length]/4; //num of longs
+		*ptr |= (kLongFormLengthMask & totalLength);
+		[aDataPacket addData:dataToShip];
+	}
 }
 
 - (BOOL) canJoinMultiPlot

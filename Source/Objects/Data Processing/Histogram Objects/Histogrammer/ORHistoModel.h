@@ -36,6 +36,7 @@
 		NSLock*		 mLock;
         BOOL         processedFinalCall;
         NSMutableArray* multiPlots;
+		BOOL		shipFinalHistograms;
 }
 
 
@@ -43,7 +44,9 @@
 - (void) makeConnectors;
 
 #pragma mark ¥¥¥Accessors
-- (id) objectForKeyArray:(NSMutableArray*)anArray;
+- (BOOL)		shipFinalHistograms;
+- (void)		setShipFinalHistograms:(BOOL)aShipFinalHistograms;
+- (id)			objectForKeyArray:(NSMutableArray*)anArray;
 - (ORDataSet*) 	dataSet;
 - (void)        setDataSet:(ORDataSet*)aDataSet;
 - (void)        setDirectoryName:(NSString*)aFileName;
@@ -74,14 +77,18 @@
 - (id)   name;
 - (void) removeDataSet:(ORDataSet*)aSet;
 - (BOOL) leafNode;
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 @end
+
 
 @interface NSObject (ORHistModel)
 - (void) removeFrom:(NSMutableArray*)anArray;
 @end
 
 #pragma mark ¥¥¥External String Definitions
+extern NSString* ORHistoModelShipFinalHistogramsChanged;
 extern NSString* ORHistoModelDirChangedNotification;
 extern NSString* ORHistoModelFileChangedNotification;
 extern NSString* ORHistoModelWriteFileChangedNotification;

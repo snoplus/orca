@@ -69,6 +69,11 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) shipFinalHistogramsChanged:(NSNotification*)aNote
+{
+	[shipFinalHistogramsButton setIntValue: [model shipFinalHistograms]];
+}
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -116,6 +121,11 @@
                        object : outlineView];
 
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipFinalHistogramsChanged:)
+                         name : ORHistoModelShipFinalHistogramsChanged
+						object: model];
+
 }
 
 - (void) updateWindow
@@ -126,6 +136,7 @@
     [self dirChanged:nil];
     [self fileChanged:nil];
     [self writeFileChanged:nil];
+	[self shipFinalHistogramsChanged:nil];
 }
 
 
@@ -221,6 +232,11 @@
 }
 
 #pragma  mark ¥¥¥Actions
+
+- (void) shipFinalHistogramsAction:(id)sender
+{
+	[model setShipFinalHistograms:[sender intValue]];	
+}
 
 - (IBAction) plotGroupAction:(id)sender
 {
