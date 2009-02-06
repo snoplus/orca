@@ -22,6 +22,7 @@
 @interface OR4ChanTriggerController : OrcaObjectController {
 	
     IBOutlet NSTabView*		tabView;
+	IBOutlet NSButton*		shipFirstLastButton;
     IBOutlet NSTextField*   slotField;
     IBOutlet NSStepper* 	addressStepper;
     IBOutlet NSTextField* 	addressText;
@@ -64,6 +65,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management
+- (void) shipFirstLastChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNotification;
 - (void) baseAddressChanged:(NSNotification*)aNotification;
 
@@ -81,6 +83,7 @@
 - (void) specialLockChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) shipFirstLastAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 
 - (IBAction) lowerClockAction:(id)sender;

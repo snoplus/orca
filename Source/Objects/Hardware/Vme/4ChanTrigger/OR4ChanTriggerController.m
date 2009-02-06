@@ -108,10 +108,19 @@
                          name : OR4ChanEnableClockChangedNotification
                         object: nil];
 	
-	
+    [notifyCenter addObserver : self
+                     selector : @selector(shipFirstLastChanged:)
+                         name : OR4ChanTriggerModelShipFirstLastChanged
+						object: model];
+
 }
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) shipFirstLastChanged:(NSNotification*)aNote
+{
+	[shipFirstLastButton setIntValue: [model shipFirstLast]];
+}
 - (void) updateWindow
 {
     [super updateWindow];
@@ -126,6 +135,7 @@
     [self enableClockChanged:nil];
 	
     [self updateClockMask];
+	[self shipFirstLastChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -167,7 +177,8 @@
     [trigger2NameField setEnabled:!locked && !runInProgress];
     [trigger3NameField setEnabled:!locked && !runInProgress];
     [trigger4NameField setEnabled:!locked && !runInProgress];
-	
+
+	[shipFirstLastButton setEnabled:!locked && !lockedOrRunningMaintenance];
     [shipClockMatrix setEnabled:!locked && !lockedOrRunningMaintenance];
     [clockEnableButton setEnabled:!locked && !lockedOrRunningMaintenance];
 	
@@ -268,6 +279,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) shipFirstLastAction:(id)sender
+{
+	[model setShipFirstLast:[sender intValue]];	
+}
 
 - (IBAction) settingLockAction:(id) sender
 {

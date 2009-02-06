@@ -32,6 +32,7 @@
 #define kDefaultBaseAddress		    0x0007000
 
 #pragma mark ¥¥¥Notification Strings
+NSString* OR4ChanTriggerModelShipFirstLastChanged = @"OR4ChanTriggerModelShipFirstLastChanged";
 NSString* OR4ChanLowerClockChangedNotification       = @"OR4ChanLowerClockChangedNotification";
 NSString* OR4ChanUpperClockChangedNotification		 = @"OR4ChanUpperClockChangedNotification";
 NSString* OR4ChanShipClockChangedNotification        = @"OR4ChanShipClockChangedNotification";
@@ -97,6 +98,21 @@ NSString* OR4ChanSpecialLock				= @"OR4ChanSpecialLock";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) shipFirstLast
+{
+    return shipFirstLast;
+}
+
+- (void) setShipFirstLast:(BOOL)aShipFirstLast
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipFirstLast:shipFirstLast];
+    
+    shipFirstLast = aShipFirstLast;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:OR4ChanTriggerModelShipFirstLastChanged object:self];
+}
+
 - (unsigned long) lowerClock
 {
     return lowerClock;
@@ -352,6 +368,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setShipFirstLast:[decoder decodeBoolForKey:@"shipFirstLast"]];
     [self setLowerClock:[decoder decodeInt32ForKey:OR4ChanLowerClock]];
     [self setUpperClock:[decoder decodeInt32ForKey:OR4ChanUpperClock]];
     [self setTriggerGroups:[decoder decodeObjectForKey:OR4ChanGroups]];
@@ -367,6 +384,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:shipFirstLast forKey:@"shipFirstLast"];
     [encoder encodeInt32:lowerClock forKey:OR4ChanLowerClock];
     [encoder encodeInt32:upperClock forKey:OR4ChanUpperClock];
     [encoder encodeObject:triggerGroups forKey:OR4ChanGroups];
@@ -380,6 +398,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];    
     [objDictionary setObject:[NSNumber numberWithInt:shipClockMask] forKey:@"shipClockMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:shipFirstLast] forKey:@"shipFirstLast"];
     return objDictionary;
 }
 
@@ -525,6 +544,9 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 		[self readLowerClock:i];
 	}
     [self writeEnableClock:enableClock];
+	for(i=0;i<4;i++){
+		gotFirstClk[i] = NO;
+	}
 }
 
 
@@ -566,10 +588,8 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
             for(i=0;i<4;i++){
                 if(statusReg & (0x1<<(i+1))){
 					unsigned long eventPlaceHolder = 0;
-					BOOL ship = shipClockMask & (0x1<<(i+1));
-					if(ship){
-						eventPlaceHolder = [aDataPacket reserveSpaceInFrameBuffer:3];
-					}
+					BOOL ship = shipClockMask & (0x1<<(i+1)) || (shipFirstLast && !gotFirstClk[i]);
+					if(ship)eventPlaceHolder = [aDataPacket reserveSpaceInFrameBuffer:3];
                     [self _readOutChildren:[dataTakers objectAtIndex:i] dataPacket:aDataPacket];
 					
                     //must read the clock to reset the status bit.
@@ -577,7 +597,8 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
                     unsigned long upper = [self readUpperClock:i+1];
                     unsigned long lower = [self readLowerClock:i+1];
                     if(ship){
-                        unsigned long data[3];
+  						gotFirstClk[i] = YES;
+						unsigned long data[3];
                         data[0] = clockDataId | 3;                          //id and length
                         data[1] = ((i&0x7)<<24) | (0x00ffffff&upper);   //index and upper clock
                         data[2] = lower;                               //lower clock
@@ -596,6 +617,18 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	if(shipFirstLast){
+		int i;
+		for(i=0;i<4;i++){
+			unsigned long upper = [self readUpperClock:i+1];
+			unsigned long lower = [self readLowerClock:i+1];
+			unsigned long data[3];
+			data[0] = clockDataId | 3;                     //id and length
+			data[1] = ((i&0x7)<<24) | (0x00ffffff&upper);  //index and upper clock
+			data[2] = lower;                               //lower clock
+			[aDataPacket addLongsToFrameBuffer:data length:3];
+		}
+	}
     
     int i;
     for(i=0;i<4;i++){

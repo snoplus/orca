@@ -72,11 +72,15 @@ enum {
         NSMutableArray* triggerNames;
         unsigned long errorCount;
         BOOL enableClock;
+		BOOL shipFirstLast;
+		BOOL gotFirstClk[4];
         //local cache variables
         NSArray* dataTakers;	//cache of data takers.
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) shipFirstLast;
+- (void) setShipFirstLast:(BOOL)aShipFirstLast;
 - (unsigned long) lowerClock;
 - (void) setLowerClock:(unsigned long)newGtidLower;
 - (unsigned long) upperClock;
@@ -133,10 +137,15 @@ enum {
 - (void) saveReadOutList:(NSFileHandle*)aFile;
 - (void) loadReadOutList:(NSFileHandle*)aFile;
 
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
 
+
 #pragma mark ¥¥¥External String Definitions
+extern NSString* OR4ChanTriggerModelShipFirstLastChanged;
 extern NSString* OR4ChanLowerClockChangedNotification;
 extern NSString* OR4ChanUpperClockChangedNotification;
 extern NSString* OR4ChanShipClockChangedNotification;
