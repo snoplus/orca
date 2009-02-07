@@ -466,11 +466,12 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
         [cachedDataTakers[i] runTaskStopped:aDataPacket userInfo:userInfo];
     }
     free(cachedDataTakers);
-    [nextObject runTaskStopped:aDataPacket userInfo:userInfo];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
     [aDataPacket addCachedData];	 //data from other threads
     [self shipPendingRecords:aDataPacket];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
+	
+    [nextObject runTaskStopped:aDataPacket userInfo:userInfo];
 	
     [self setQueueCount:[transferQueue count]];
 	[self setCycleRate:0];

@@ -345,9 +345,18 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    [[self objectConnectedTo:ORHistoDataOutConnection] runTaskStopped:aDataPacket userInfo:userInfo];
-    [[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
     [dataSet runTaskStopped];
+	if(shipFinalHistograms){
+		[dataSet packageData:aDataPacket userInfo:nil];
+	}
+    [[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
+    
+	id theNextObject = [self objectConnectedTo:ORHistoDataOutConnection];
+    if(theNextObject){
+        //send the packaged data on to the next object
+        [dataSet packageData:aDataPacket userInfo:nil];
+		[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
+    }	
 }
 
 - (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -380,22 +389,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
         }
     }
     
-	
-	if(shipFinalHistograms){
-		[dataSet packageData:aDataPacket userInfo:nil];
-		[self processData:aDataPacket userInfo:userInfo];
-	}
+	processedFinalCall = YES;
+	[[self objectConnectedTo:ORHistoDataOutConnection] closeOutRun:aDataPacket userInfo:userInfo];
     [[self objectConnectedTo:ORHistoPassThruConnection] closeOutRun:aDataPacket userInfo:userInfo];
 
-	if(processedFinalCall) return;
-	processedFinalCall = YES;
-    id theNextObject = [self objectConnectedTo:ORHistoDataOutConnection];
-    if(theNextObject){
-        //send the packaged data on to the next object
-        [dataSet packageData:aDataPacket userInfo:nil];
-		[theNextObject closeOutRun:aDataPacket userInfo:userInfo];
-    }
-	
 }
 
 - (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
