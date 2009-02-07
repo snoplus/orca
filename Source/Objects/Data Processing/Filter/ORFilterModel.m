@@ -570,8 +570,6 @@ int filterGraph(nodeType*);
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[symbolTable release];
-	symbolTable = nil;
 	
 	[thePassThruObject runTaskStopped:aDataPacket userInfo:userInfo];
 	[theFilteredObject runTaskStopped:aDataPacket userInfo:userInfo];
@@ -595,6 +593,9 @@ int filterGraph(nodeType*);
 	else {
 		finishFilterScript(self);
 	}
+	
+	[symbolTable release];
+	symbolTable = nil;
 	
 	[self freeNodes];
 	
