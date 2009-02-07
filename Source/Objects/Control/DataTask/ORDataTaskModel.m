@@ -471,8 +471,20 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     [self shipPendingRecords:aDataPacket];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
 	
-    [nextObject runTaskStopped:aDataPacket userInfo:userInfo];
+
+	//wait for the processing thread to exit.
+	float totalTime = 0;
+    while([transferQueue count]){
+		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.01]];
+		totalTime += .01;
+		if(totalTime > 200){
+			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 2 seconds.\n");
+			break;
+		}
+	}	
 	
+	[nextObject runTaskStopped:aDataPacket userInfo:userInfo];
+
     [self setQueueCount:[transferQueue count]];
 	[self setCycleRate:0];
     cachedGateGroup = nil;    
@@ -502,7 +514,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     while(processThreadRunning){
 		timeToStopProcessThread = YES;
 		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.1]];
-		totalTime += .2;
+		totalTime += .1;
 		if(totalTime > 20){
 			NSLogColor([NSColor redColor], @"Processing Thread Failed to stop.....You should stop and restart ORCA!\n");
 			break;
