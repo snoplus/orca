@@ -26,6 +26,7 @@
 #import "ORScriptView.h"
 #import "ORScriptRunner.h"
 #import "ORPlotter1D.h"
+#import "ORDataPacket.h"
 
 @interface ORFilterController (private)
 - (void) pluginPathSelectDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -234,6 +235,32 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) listDecoders:(id)sender
+{
+    NSArray* objectList = [NSArray arrayWithArray:[[model document]collectObjectsRespondingTo:@selector(dataRecordDescription)]];
+    NSEnumerator* e = [objectList objectEnumerator];
+	NSMutableArray* decoderList = [NSMutableArray array];
+    id obj;
+    while(obj = [e nextObject]){
+        NSDictionary* decoderDictionary = [obj dataRecordDescription];
+		NSEnumerator* e1 = [decoderDictionary keyEnumerator];
+		id aKey;
+		while(aKey = [e1 nextObject]){
+			NSDictionary* entry = [decoderDictionary objectForKey:aKey];
+			NSString* decoderName = [entry objectForKey:@"decoder"];
+			if(decoderName){
+				if(![decoderList containsObject:decoderName]){
+					[decoderList addObject:decoderName];
+				}
+			}
+		}
+    }
+	if([decoderList count]){
+		NSLog(@"\n");
+		NSLog(@"Record IDs in the FilterScript Symbol Table:\n");
+		NSLog(@"%@\n",[decoderList sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)]);
+	}
+}
 
 - (IBAction) usePluginAction:(id)sender
 {

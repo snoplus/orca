@@ -124,6 +124,8 @@
 				<string>id</string>
 				<key>enableTimer</key>
 				<string>id</string>
+				<key>listDecoders</key>
+				<string>id</string>
 				<key>listMethodsAction</key>
 				<string>id</string>
 				<key>loadFileAction</key>

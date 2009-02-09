@@ -64,6 +64,7 @@
 - (void) displayValuesChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) listDecoders:(id)sender;
 - (IBAction) usePluginAction:(id)sender;
 - (IBAction) enableTimer:(id)sender;
 - (IBAction) lockAction:(id)sender;
@@ -88,4 +89,3 @@
 - (void) tableView:(NSTableView*)aTable setObjectValue:(id)aData forTableColumn:(NSTableColumn*)aCol row:(int)aRow;
 
 @end
-
