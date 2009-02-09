@@ -144,7 +144,7 @@ void exNode
                 case kArrayAssign:		s="[kArrayAssign]";	break;
                 case kArrayListAssign:	s="[kArrayListAssign]";	break;
 				case FREEARRAY:			s="[free]";			break;
-                case EXTRACTRECORD_LEN:	s="[exgtractLen]";	break;
+                case EXTRACTRECORD_LEN:	s="[extractLen]";	break;
                 case EXTRACTRECORD_ID:	s="[exgtractID]";	break;
                 case SHIP_RECORD:		s="[shipRecord]";	break;
                 case PUSH_RECORD:		s="[push]";			break;
