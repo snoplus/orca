@@ -163,6 +163,7 @@
 - (void) stopRun;
 - (void) haltRun;
 
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (void) takeData;
 - (void) runStarted:(BOOL)doInit;

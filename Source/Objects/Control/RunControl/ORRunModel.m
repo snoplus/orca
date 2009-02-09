@@ -1056,6 +1056,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return dataDictionary;
 }
 
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORRunModel"];
+}
+
 - (void) runStarted:(BOOL)doInit
 {
 	
@@ -1091,7 +1096,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [dataTypeAssigner assignDataIds];
     
     
-    [dataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORRunModel"];
     
     //get the time(UT!)
     time_t	theTime;
