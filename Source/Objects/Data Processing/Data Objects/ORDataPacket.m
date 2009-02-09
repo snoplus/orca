@@ -414,13 +414,18 @@
 
 - (unsigned long) dataCount
 {
-    return [dataArray count];
+	unsigned long theCount = 0;
+	if([theDataLock tryLock]){  //-----begin critical section
+		theCount = [dataArray count];
+		[theDataLock unlock];   //-----end critical section
+	}
+	return theCount;
 }
 
 - (void) addDataToCach:(NSData*)someData;
 {
-    if(!cacheArray)[self setCacheArray:[NSMutableArray arrayWithCapacity:kMinCapacity]];
     [theDataLock lock];   //-----begin critical section
+    if(!cacheArray)[self setCacheArray:[NSMutableArray arrayWithCapacity:kMinCapacity]];
     [cacheArray addObject:someData];
 	dataInCache = YES;
     [theDataLock unlock];   //-----end critical section
