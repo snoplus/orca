@@ -589,7 +589,7 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 			}
 			else {
 				problemReason = [NSString stringWithFormat:@" <%@> doesn't appear to be a legal ORCA data file.\n",[aFile stringByAbbreviatingWithTildeInPath]];
-				NSLogColor([NSColor redColor],@"%s",problemReason);
+				NSLogColor([NSColor redColor],@"%@",problemReason);
 			}
 		}
 		else {
