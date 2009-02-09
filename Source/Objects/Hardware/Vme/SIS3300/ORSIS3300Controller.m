@@ -401,9 +401,9 @@
 	[checkEventButton	    setEnabled:!locked && !runInProgress];
 	[testMemoryButton	    setEnabled:!locked && !runInProgress];
 	
-	[csrMatrix				setEnabled:!lockedOrRunningMaintenance];
-	[acqMatrix				setEnabled:!lockedOrRunningMaintenance];
-	[eventConfigMatrix		setEnabled:!lockedOrRunningMaintenance];
+	[csrMatrix				setEnabled:!locked && !runInProgress];
+	[acqMatrix				setEnabled:!locked && !runInProgress];
+	[eventConfigMatrix		setEnabled:!locked && !runInProgress];
 	[stopTriggerButton		setEnabled:!lockedOrRunningMaintenance];
 	[randomClockButton		setEnabled:!lockedOrRunningMaintenance];
 	[startDelayEnabledButton setEnabled:!lockedOrRunningMaintenance];
