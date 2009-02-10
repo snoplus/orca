@@ -19,7 +19,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "ORDataChainObject.h"
-
+#import "ORDataPacket.h"
 
 @implementation ORDataChainObject
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray
@@ -33,4 +33,7 @@
 	}
 }
 
+- (void) endOfRunCleanup:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+}
 @end

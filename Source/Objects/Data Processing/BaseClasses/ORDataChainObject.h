@@ -19,8 +19,11 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+@class ORDataPacket;
+
 @interface ORDataChainObject : OrcaObject {
 }
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray;
+- (void) endOfRunCleanup:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
 @end

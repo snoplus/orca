@@ -426,6 +426,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 			[aDataPacket setAddedData:NO];
 		}
     }
+    [self putDataInQueue:aDataPacket force:YES];   
 	
 	if(enableTimer){
 		[timerLock lock];	//start critical section
@@ -460,7 +461,6 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	
     int i;
     for(i=0;i<cachedNumberDataTakers;i++){
         [cachedDataTakers[i] runTaskStopped:aDataPacket userInfo:userInfo];
@@ -471,7 +471,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     [self shipPendingRecords:aDataPacket];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
 	
-
+	[nextObject runTaskStopped:aDataPacket userInfo:userInfo];
 	//wait for the processing queu to clear.
 	float totalTime = 0;
     while([transferQueue count]){
@@ -483,7 +483,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 		}
 	}	
 	
-	[nextObject runTaskStopped:aDataPacket userInfo:userInfo];
+	[nextObject endOfRunCleanup:aDataPacket userInfo:userInfo];
 
     [self setQueueCount:[transferQueue count]];
 	[self setCycleRate:0];
@@ -495,6 +495,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 	
     [self shipPendingRecords:aDataPacket];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
+
     
     //issue a final call for actions at end of run time.
     NSDictionary* statusInfo = [NSDictionary dictionaryWithObjectsAndKeys:
