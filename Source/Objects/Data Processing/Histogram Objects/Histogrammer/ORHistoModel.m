@@ -374,9 +374,6 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     [dataSet runTaskStopped];
 	[[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
 	
-	if(shipFinalHistograms){
-		[self shipTheFinalHistograms:aDataPacket];
-	}
 	
 	
 	id theNextObject = [self objectConnectedTo:ORHistoDataOutConnection];
@@ -395,7 +392,12 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    [[NSNotificationCenter defaultCenter]
+ 	if(shipFinalHistograms){
+		[self shipTheFinalHistograms:aDataPacket];
+		[self processData:aDataPacket userInfo:userInfo];
+	}
+	
+	[[NSNotificationCenter defaultCenter]
 				postNotificationName:ORHistoModelChangedNotification
                               object: self ];
     
