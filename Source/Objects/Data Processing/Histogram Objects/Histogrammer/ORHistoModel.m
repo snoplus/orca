@@ -373,15 +373,8 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 {
     [dataSet runTaskStopped];
 	[[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
+	[[self objectConnectedTo:ORHistoDataOutConnection] runTaskStopped:aDataPacket userInfo:userInfo];
 	
-	
-	
-	id theNextObject = [self objectConnectedTo:ORHistoDataOutConnection];
-    if(theNextObject){
-        //send the packaged data on to the next object
-        [dataSet packageData:aDataPacket userInfo:nil];
-		[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
-    }	
 }
 
 
@@ -392,11 +385,16 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	id theNextObject = [self objectConnectedTo:ORHistoDataOutConnection];
+    if(theNextObject){
+        //send the packaged data on to the next object
+        [dataSet packageData:aDataPacket userInfo:nil];
+    }	
  	if(shipFinalHistograms){
 		[self shipTheFinalHistograms:aDataPacket];
 		[self processData:aDataPacket userInfo:userInfo];
 	}
-	
+
 	[[NSNotificationCenter defaultCenter]
 				postNotificationName:ORHistoModelChangedNotification
                               object: self ];
