@@ -372,12 +372,12 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [dataSet runTaskStopped];
+	[[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	if(shipFinalHistograms){
 		[self shipTheFinalHistograms:aDataPacket];
 	}
 	
-	[[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
 	
 	id theNextObject = [self objectConnectedTo:ORHistoDataOutConnection];
     if(theNextObject){
