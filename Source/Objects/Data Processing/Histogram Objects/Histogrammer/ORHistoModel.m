@@ -26,6 +26,8 @@
 #import "ORDataPacket.h"
 #import "ORDataTaker.h"
 #import "ORDataSet.h"
+#import "OR1DHisto.h"
+#import "OR2DHisto.h"
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORHistoModelShipFinalHistogramsChanged = @"ORHistoModelShipFinalHistogramsChanged";
@@ -39,6 +41,10 @@ NSString* ORHistoModelMultiPlotsChangedNotification = @"ORHistoModelMultiPlotsCh
 static NSString *ORHistoDataConnection 		= @"Histogrammer Data Connector";
 static NSString *ORHistoDataOutConnection 	= @"Histogrammer Data Out Connector";
 static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector";
+
+@interface ORHistoModel (private)
+- (void) shipTheFinalHistograms:(ORDataPacket*)aDataPacket;
+@end
 
 @implementation ORHistoModel
 
@@ -85,6 +91,8 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 -(void)dealloc
 {    
+	[dummy1DHisto release];
+	[dummy2DHisto release];
     [multiPlots makeObjectsPerformSelector:@selector(invalidateDataSource) withObject:nil];
     [multiPlots release];
     [dataSet release];
@@ -136,10 +144,26 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector
 {
+	
+	NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
+    [collection addObjectsFromArray:[super collectObjectsRespondingTo:aSelector]];
+	
+ 	if(shipFinalHistograms){
+		//argh --- special case -- the final histograms have to be included
+		if(!dummy1DHisto)dummy1DHisto = [[OR1DHisto alloc] init];
+		if([dummy1DHisto respondsToSelector:aSelector]){
+			[collection addObject:dummy1DHisto];
+		}
+		if(!dummy2DHisto)dummy2DHisto = [[OR2DHisto alloc] init];
+		if([dummy2DHisto respondsToSelector:aSelector]){
+			[collection addObject:dummy2DHisto];
+		}
+	}   
 	[mLock lock];
-    NSArray* theCollection =  [dataSet collectObjectsRespondingTo:aSelector];    
+    NSArray* theCollection =  [dataSet collectObjectsRespondingTo:aSelector];  
+	[collection addObjectsFromArray:theCollection];
 	[mLock unlock];
-	return theCollection;
+	return collection;
 }
 
 - (NSArray*) subObjectsThatMayHaveDialogs
@@ -299,7 +323,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     NSMutableArray* collection = [NSMutableArray arrayWithCapacity:256];
     
     [collection addObjectsFromArray:[super collectObjectsOfClass:aClass]];
-    
+	
     NSEnumerator* e  = [dataSet objectEnumerator];
     OrcaObject* anObject;
     while(anObject = [e nextObject]){
@@ -314,15 +338,16 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 #pragma mark ¥¥¥Run Management
 
+
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [dataSet appendDataDescription:aDataPacket userInfo:userInfo];
-
 }
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    processedFinalCall = NO;
+
+	processedFinalCall = NO;
     if(!dataSet){
         [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease] ];
     }
@@ -347,11 +372,13 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     [dataSet runTaskStopped];
+	
 	if(shipFinalHistograms){
-		[dataSet packageData:aDataPacket userInfo:nil];
+		[self shipTheFinalHistograms:aDataPacket];
 	}
-    [[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
-    
+	
+	[[self objectConnectedTo:ORHistoPassThruConnection] runTaskStopped:aDataPacket userInfo:userInfo];
+	
 	id theNextObject = [self objectConnectedTo:ORHistoDataOutConnection];
     if(theNextObject){
         //send the packaged data on to the next object
@@ -359,6 +386,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 		[theNextObject runTaskStopped:aDataPacket userInfo:userInfo];
     }	
 }
+
 
 - (void) runTaskBoundary:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -495,3 +523,20 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 }
 
 @end
+
+@implementation ORHistoModel (private)
+- (void) shipTheFinalHistograms:(ORDataPacket*)aDataPacket
+{
+	NSArray* objs1d = [[self document]  collectObjectsOfClass:[OR1DHisto class]];
+	id anObj;
+	NSEnumerator* e = [objs1d objectEnumerator];
+	while(anObj = [e nextObject])[anObj setDataId:[dummy1DHisto dataId]];
+	
+	NSArray* objs2d = [[self document]  collectObjectsOfClass:[OR2DHisto class]];
+	e = [objs2d objectEnumerator];
+	while(anObj = [e nextObject])[anObj setDataId:[dummy2DHisto dataId]];
+	
+	[dataSet packageData:aDataPacket userInfo:nil];
+}
+@end
+

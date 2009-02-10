@@ -25,6 +25,8 @@
 #pragma mark ¥¥¥Forward Declarations
 @class ORDataPacket;
 @class ORDataSet;
+@class OR1DHisto;
+@class OR2DHisto;
 
 @interface ORHistoModel :  ORDataChainObject 
 {
@@ -37,6 +39,9 @@
         BOOL         processedFinalCall;
         NSMutableArray* multiPlots;
 		BOOL		shipFinalHistograms;
+		OR1DHisto*  dummy1DHisto;
+		OR2DHisto*  dummy2DHisto;
+	
 }
 
 
