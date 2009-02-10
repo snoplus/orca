@@ -467,12 +467,12 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     }
     free(cachedDataTakers);
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
-    [aDataPacket addCachedData];	 //data from other threads
+    [aDataPacket addCachedData];					//data from other threads
     [self shipPendingRecords:aDataPacket];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
 	
 
-	//wait for the processing thread to exit.
+	//wait for the processing queu to clear.
 	float totalTime = 0;
     while([transferQueue count]){
 		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.01]];
@@ -495,7 +495,6 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 	
     [self shipPendingRecords:aDataPacket];
     [self putDataInQueue:aDataPacket force:YES];	//last data packet for this run
-	
     
     //issue a final call for actions at end of run time.
     NSDictionary* statusInfo = [NSDictionary dictionaryWithObjectsAndKeys:
