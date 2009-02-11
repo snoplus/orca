@@ -1180,7 +1180,7 @@
         case typeCon:				line = [NSMutableString stringWithFormat:@"c(%@)",		[p nodeData]];	break;
         case typeId:				line = [NSMutableString stringWithFormat:@"ident(%s)",	[[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
         case typeSelVar:			line = [NSMutableString stringWithFormat:@"selVar(%s)", [[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
-        case typeStr:				line = [NSMutableString stringWithFormat:@"\"%s\"", [[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
+        case typeStr:				line = [NSMutableString stringWithFormat:@"\"%s\"",		[[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
 		case typeOperationSymbol:	line = [NSMutableString stringWithFormat:@"oper(%s)",	[[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
         case typeOpr:
             switch([[p nodeData] operatorTag]){
@@ -1194,7 +1194,7 @@
                 case WHILE:				line = [NSMutableString stringWithString:@"[while]"];		break;
                 case FOR:				line = [NSMutableString stringWithString:@"[for]"];			break;
                 case IF:				line = [NSMutableString stringWithString:@"[if]"];			break;
-                case UNLESS:			line = [NSMutableString stringWithString:@"[unless]"];			break;
+                case UNLESS:			line = [NSMutableString stringWithString:@"[unless]"];		break;
                 case SWITCH:			line = [NSMutableString stringWithString:@"[switch]"];		break;
                 case CASE:				line = [NSMutableString stringWithString:@"[case]"];		break;
                 case DEFAULT:			line = [NSMutableString stringWithString:@"[default]"];		break;
