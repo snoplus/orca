@@ -65,7 +65,6 @@ extern long finishFilterNodeCount;
 extern nodeType** finishFilterNodes;
 
 extern long numFilterLines;
-extern int graphNumber;
 extern BOOL parsedSuccessfully;
 extern ORFilterSymbolTable* symbolTable;
 
@@ -662,7 +661,6 @@ int filterGraph(nodeType*);
 		parsedOK = parsedSuccessfully;
 		if(parsedOK && ([[NSApp currentEvent] modifierFlags] & 0x80000)>0){
 			//option key is down
-			graphNumber = 0;		
 			int i;
 			for(i=0;i<startFilterNodeCount;i++)	 filterGraph(startFilterNodes[i]);
 			for(i=0;i<filterNodeCount;i++)		 filterGraph(filterNodes[i]);

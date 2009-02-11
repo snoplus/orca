@@ -25,249 +25,172 @@
 #include "FilterScript.h"
 #include "FilterScript.tab.h"
 
-int del = 1; /* distance of graph columns */
-int eps = 3; /* distance of graph lines */
-
-/* interface for drawing (can be replaced by "real" graphic using GD or other) */
-void graphInit (void);
-void graphFinish();
-void graphBox (char *s, int *w, int *h);
-void graphDrawBox (char *s, int c, int l);
-void graphDrawArrow (int c1, int l1, int c2, int l2);
-
 /* recursive drawing of the syntax tree */
-void exNode (nodeType *p, int c, int l, int *ce, int *cm);
+id exNode(nodeType *p, int level, BOOL lastOne);
+id finalPass(id string);
 
 /*****************************************************************************/
 
 /* main entry point of the manipulation of the syntax tree */
-int filterGraph (nodeType *p ) {
-    int rte, rtm;
-
-    graphInit ();
-    exNode (p, 0, 0, &rte, &rtm);
-    graphFinish();
+int filterGraph (nodeType *p ) 
+{
+	int level = 0;
+	NSLogFont([NSFont fontWithName:@"Monaco" size:9.0],@"\n%@\n",finalPass( exNode (p, level, NO)));
     return 0;
 }
 
-/*c----cm---ce---->                       drawing of leaf-nodes
- l leaf-info
- */
-
-/*c---------------cm--------------ce----> drawing of non-leaf-nodes
- l            node-info
- *                |
- *    -------------     ...----
- *    |       |               |
- *    v       v               v
- * child1  child2  ...     child-n
- *        che     che             che
- *cs      cs      cs              cs
- *
- */
-
-void exNode
-    (   nodeType *p,
-        int c, int l,        /* start column and line of node */
-        int *ce, int *cm     /* resulting end column and mid of node */
-    )
+id exNode(nodeType *p, int aLevel, BOOL lastChild)
 {
-    int w, h;           /* node width and height */
-    char *s;            /* node text */
-    int cbar;           /* "real" start column of node (centred above subnodes) */
-    int k;              /* child number */
-    int che, chm;       /* end column and mid of children */
-    int cs;             /* start column of children */
-    char word[100];      /* extended node text */
 
-    if (!p) return;
-
-    strcpy (word, "???"); /* should never appear */
-    s = word;
+    if (!p) return @"";
+	NSMutableString* line = @"?";
+	
     switch(p->type) {
-        case typeCon: sprintf (word, "c(%ld)", p->con.value); break;
-        case typeId:  sprintf (word, "(%s)", p->ident.key); break;
+        case typeCon: line = [NSMutableString stringWithFormat:@"c(%ld)", p->con.value]; break;
+        case typeId:  line = [NSMutableString stringWithFormat:@"(%s)", p->ident.key]; break;
         case typeOpr:
             switch(p->opr.oper){
-                case kConditional:		s="[Conditional]";	break;
-                case DO:				s="[do]";			break;
-                case WHILE:				s="[while]";		break;
-                case FOR:				s="[for]";			break;
-                case IF:				s="[if]";			break;
-                case UNLESS:			s="[unless]";		break;
-				case SWITCH:			s="[switch]";		break;
-                case CASE:				s="[case]";			break;
-                case DEFAULT:			s="[default]";		break;
-                case PRINT:				s="[print]";		break;
-                case PRINTH:			s="[printhex]";		break;
-                case kPostInc:			s="[postInc]";		break;
-                case kPreInc:			s="[preInc]";		break;
-                case kPostDec:			s="[postDec]";		break;
-                case kPreDec:			s="[prdDec]";		break;
-                case ';':				s="[;]";			break;
-                case '=':				s="[=]";			break;
-                case UMINUS:			s="[-]";			break;
-                case '~':				s="[~]";			break;
-                case '^':				s="[^]";			break;
-                case '%':				s="[%]";			break;
-                case '!':				s="[!]";			break;
-                case '+':				s="[+]";			break;
-                case '-':				s="[-]";			break;
-                case '*':				s="[*]";			break;
-                case '/':				s="[/]";			break;
-                case '<':				s="[<]";			break;
-                case '>':				s="[>]";			break;
-                case LEFT_OP:			s="[<<]";			break;
-                case RIGHT_OP:			s="[<<]";			break;
-				case AND_OP:			s="[&&]";			break;
-				case '&':				s="[&]";			break;
-				case OR_OP:				s="[||]";			break;
-				case '|':				s="[|]";			break;
-				case GE_OP:				s="[>=]";			break;
-                case LE_OP:				s="[<=]";			break;
-                case NE_OP:				s="[!=]";			break;
-                case EQ_OP:				s="[==]";			break;
-				case BREAK:				s="[break]";		break;
-				case CONTINUE:			s="[continue]";	break;
-                case LEFT_ASSIGN:		s="[<<=]";			break;
-                case RIGHT_ASSIGN:		s="[>>=]";			break;
-                case ADD_ASSIGN:		s="[+=]";			break;
-                case SUB_ASSIGN:		s="[-=]";			break;
-                case MUL_ASSIGN:		s="[*=]";			break;
-                case DIV_ASSIGN:		s="[/=]";			break;
-                case OR_ASSIGN:			s="[|=]";			break;
-                case AND_ASSIGN:		s="[&=]";			break;
-                case ',':				s="[,]";			break;
-                case kDefineArray:		s="[kDefineArray]";	break;
-                case kLeftArray:		s="[kLeftArray]";	break;
-                case kArrayElement:		s="[arrayElement]";	break;
-                case kArrayAssign:		s="[kArrayAssign]";	break;
-                case kArrayListAssign:	s="[kArrayListAssign]";	break;
-				case FREEARRAY:			s="[free]";			break;
-                case EXTRACTRECORD_LEN:	s="[extractLen]";	break;
-                case EXTRACTRECORD_ID:	s="[exgtractID]";	break;
-                case SHIP_RECORD:		s="[shipRecord]";	break;
-                case PUSH_RECORD:		s="[push]";			break;
-                case POP_RECORD:		s="[pop]";			break;
-                case BOTTOM_POP_RECORD:	s="[bottomPop]";			break;
-                case SHIP_STACK:		s="[shipStack]";	break;
-                case DUMP_STACK:		s="[dumpStack]";	break;
-				case STACK_COUNT:		s="[stackCount]";	break;
-				case HISTO_1D:			s="[histo1D]";		break;
-				case HISTO_2D:			s="[histo2D]";		break;
-				case TIME:				s="[time]";			break;
-				case STRIPCHART:		s="[stripChart]";	break;
-				case DISPLAY_VALUE:		s="[displayValue]";	break;
-				case RESET_DISPLAYS:	s="[resetDisplays]";break;
-				case EXTRACT_VALUE:		s="[extractValue]";break;
-            }
+                case kConditional:		line = [NSMutableString stringWithString:@"[Conditional]"];	break;
+                case DO:				line = [NSMutableString stringWithString:@"[do]"];			break;
+                case WHILE:				line = [NSMutableString stringWithString:@"[while]"];		break;
+                case FOR:				line = [NSMutableString stringWithString:@"[for]"];			break;
+                case IF:				line = [NSMutableString stringWithString:@"[if]"];			break;
+                case UNLESS:			line = [NSMutableString stringWithString:@"[unless]"];		break;
+				case SWITCH:			line = [NSMutableString stringWithString:@"[switch]"];		break;
+                case CASE:				line = [NSMutableString stringWithString:@"[case]"];		break;
+                case DEFAULT:			line = [NSMutableString stringWithString:@"[default]"];		break;
+                case PRINT:				line = [NSMutableString stringWithString:@"[print]"];		break;
+                case PRINTH:			line = [NSMutableString stringWithString:@"[printhex]"];	break;
+                case kPostInc:			line = [NSMutableString stringWithString:@"[postInc]"];		break;
+                case kPreInc:			line = [NSMutableString stringWithString:@"[preInc]"];		break;
+                case kPostDec:			line = [NSMutableString stringWithString:@"[postDec]"];		break;
+                case kPreDec:			line = [NSMutableString stringWithString:@"[prdDec]"];		break;
+                case ';':				line = [NSMutableString stringWithString:@"[;]"];			break;
+                case '=':				line = [NSMutableString stringWithString:@"[=]"];			break;
+                case UMINUS:			line = [NSMutableString stringWithString:@"[-]"];			break;
+                case '~':				line = [NSMutableString stringWithString:@"[~]"];			break;
+                case '^':				line = [NSMutableString stringWithString:@"[^]"];			break;
+                case '%':				line = [NSMutableString stringWithString:@"[%]"];			break;
+                case '!':				line = [NSMutableString stringWithString:@"[!]"];			break;
+                case '+':				line = [NSMutableString stringWithString:@"[+]"];			break;
+                case '-':				line = [NSMutableString stringWithString:@"[-]"];			break;
+                case '*':				line = [NSMutableString stringWithString:@"[*]"];			break;
+                case '/':				line = [NSMutableString stringWithString:@"[/]"];			break;
+                case '<':				line = [NSMutableString stringWithString:@"[<]"];			break;
+                case '>':				line = [NSMutableString stringWithString:@"[>]"];			break;
+                case LEFT_OP:			line = [NSMutableString stringWithString:@"[<<]"];			break;
+                case RIGHT_OP:			line = [NSMutableString stringWithString:@"[<<]"];			break;
+				case AND_OP:			line = [NSMutableString stringWithString:@"[&&]"];			break;
+				case '&':				line = [NSMutableString stringWithString:@"[&]"];			break;
+				case OR_OP:				line = [NSMutableString stringWithString:@"[||]"];			break;
+				case '|':				line = [NSMutableString stringWithString:@"[|]"];			break;
+				case GE_OP:				line = [NSMutableString stringWithString:@"[>=]"];			break;
+                case LE_OP:				line = [NSMutableString stringWithString:@"[<=]"];			break;
+                case NE_OP:				line = [NSMutableString stringWithString:@"[!=]"];			break;
+                case EQ_OP:				line = [NSMutableString stringWithString:@"[==]"];			break;
+				case BREAK:				line = [NSMutableString stringWithString:@"[break]"];		break;
+				case CONTINUE:			line = [NSMutableString stringWithString:@"[continue]"];	break;
+                case LEFT_ASSIGN:		line = [NSMutableString stringWithString:@"[<<=]"];			break;
+                case RIGHT_ASSIGN:		line = [NSMutableString stringWithString:@"[>>=]"];			break;
+                case ADD_ASSIGN:		line = [NSMutableString stringWithString:@"[+=]"];			break;
+                case SUB_ASSIGN:		line = [NSMutableString stringWithString:@"[-=]"];			break;
+                case MUL_ASSIGN:		line = [NSMutableString stringWithString:@"[*=]"];			break;
+                case DIV_ASSIGN:		line = [NSMutableString stringWithString:@"[/=]"];			break;
+                case OR_ASSIGN:			line = [NSMutableString stringWithString:@"[|=]"];			break;
+                case AND_ASSIGN:		line = [NSMutableString stringWithString:@"[&=]"];			break;
+                case ',':				line = [NSMutableString stringWithString:@"[,]"];			break;
+                case kDefineArray:		line = [NSMutableString stringWithString:@"[kDefineArray]"];break;
+                case kLeftArray:		line = [NSMutableString stringWithString:@"[kLeftArray]"];	break;
+                case kArrayElement:		line = [NSMutableString stringWithString:@"[arrayElement]"];break;
+                case kArrayAssign:		line = [NSMutableString stringWithString:@"[kArrayAssign]"];break;
+                case kArrayListAssign:	line = [NSMutableString stringWithString:@"[kArrayListAssign]"];break;
+				case FREEARRAY:			line = [NSMutableString stringWithString:@"[free]"];		break;
+                case EXTRACTRECORD_LEN:	line = [NSMutableString stringWithString:@"[extractLen]"];	break;
+                case EXTRACTRECORD_ID:	line = [NSMutableString stringWithString:@"[exgtractID]"];	break;
+                case SHIP_RECORD:		line = [NSMutableString stringWithString:@"[shipRecord]"];	break;
+                case PUSH_RECORD:		line = [NSMutableString stringWithString:@"[push]"];		break;
+                case POP_RECORD:		line = [NSMutableString stringWithString:@"[pop]"];			break;
+                case BOTTOM_POP_RECORD:	line = [NSMutableString stringWithString:@"[bottomPop]"];	break;
+                case SHIP_STACK:		line = [NSMutableString stringWithString:@"[shipStack]"];	break;
+                case DUMP_STACK:		line = [NSMutableString stringWithString:@"[dumpStack]"];	break;
+				case STACK_COUNT:		line = [NSMutableString stringWithString:@"[stackCount]"];	break;
+				case HISTO_1D:			line = [NSMutableString stringWithString:@"[histo1D]"];		break;
+				case HISTO_2D:			line = [NSMutableString stringWithString:@"[histo2D]"];		break;
+				case TIME:				line = [NSMutableString stringWithString:@"[time]"];		break;
+				case STRIPCHART:		line = [NSMutableString stringWithString:@"[stripChart]"];	break;
+				case DISPLAY_VALUE:		line = [NSMutableString stringWithString:@"[displayValue]"];break;
+				case RESET_DISPLAYS:	line = [NSMutableString stringWithString:@"[resetDisplays]"];break;
+				case EXTRACT_VALUE:		line = [NSMutableString stringWithString:@"[extractValue]"];break;
+ 				default:				line = [NSMutableString stringWithString:@"[??]"];			break;
+           }
             break;
     }
-
-    /* construct node text box */
-    graphBox (s, &w, &h);
-    cbar = c;
-    *ce = c + w;
-    *cm = c + w / 2;
-
+	NSString* prependString = @"";
+	int i;
+	for(i=0;i<aLevel;i++){
+		if(i>=aLevel-1)prependString = [prependString stringByAppendingString:@"|----"];
+		else prependString = [prependString stringByAppendingString:@"|    "];
+	}
+	[line insertString:prependString atIndex:0];
+	[line appendString:@"\n"];
+							  
+	int count = 0;
+	if (p->type == typeOpr){
+		count = p->opr.nops;
+	}
+	
     /* node is leaf */
-    if (p->type == typeCon || p->type == typeId || p->opr.nops == 0) {
-        graphDrawBox (s, cbar, l);
-        return;
+    if (count == 0) {
+		if(lastChild){
+			NSString* suffixString = @"";
+			int i;
+			for(i=0;i<aLevel;i++){
+				if(i<aLevel)suffixString = [suffixString stringByAppendingString:@"|    "];
+			}
+			[line appendFormat:@"%@\n",suffixString];
+		}
+        return line;
     }
+	aLevel++;
 
     /* node has children */
-    cs = c;
-    for (k = 0; k < p->opr.nops; k++) {
-        exNode (p->opr.op[k], cs, l+h+eps, &che, &chm);
-        cs = che;
+    int k;         
+    for (k = 0; k < count; k++) {
+        [line appendString: exNode (p->opr.op[k], aLevel, k==count-1)];
     }
-
-    /* total node width */
-    if (w < che - c) {
-        cbar += (che - c - w) / 2;
-        *ce = che;
-        *cm = (c + che) / 2;
-    }
-
-    /* draw node */
-    graphDrawBox (s, cbar, l);
-
-    /* draw arrows (not optimal: children are drawn a second time) */
-    cs = c;
-    for (k = 0; k < p->opr.nops; k++) {
-        exNode (p->opr.op[k], cs, l+h+eps, &che, &chm);
-        graphDrawArrow (*cm, l+h, chm, l+h+eps-1);
-        cs = che;
-    }
+	return line;
 }
 
-/* interface for drawing */
-
-#define lmax 500
-#define cmax 500
-
-char graph[lmax][cmax]; /* array for ASCII-Graphic */
-int graphNumber = 0;
-
-void graphTest (int l, int c)
-{   int ok;
-    ok = 1;
-    if (l < 0) ok = 0;
-    if (l >= lmax) ok = 0;
-    if (c < 0) ok = 0;
-    if (c >= cmax) ok = 0;
-    if (ok) return;
-    printf ("\n+++error: l=%d, c=%d not in drawing rectangle 0, 0 ... %d, %d", 
-        l, c, lmax, cmax);
-}
-
-void graphInit (void) {
-    int i, j;
-    for (i = 0; i < lmax; i++) {
-        for (j = 0; j < cmax; j++) {
-            graph[i][j] = ' ';
-        }
-    }
-}
-
-void graphFinish() {
-    int i, j;
-    for (i = 0; i < lmax; i++) {
-        for (j = cmax-1; j > 0 && graph[i][j] == ' '; j--);
-        graph[i][cmax-1] = 0;
-        if (j < cmax-1) graph[i][j+1] = 0;
-        if (graph[i][j] == ' ') graph[i][j] = 0;
-    }
-    for (i = lmax-1; i > 0 && graph[i][0] == 0; i--);
-	NSString* aString = [NSString stringWithFormat:@"\nGraph %d:\n", graphNumber++];
-    for (j = 0; j <= i; j++){
-		aString = [aString stringByAppendingFormat:@"\n%s", graph[j]];
+id finalPass(id string)
+{
+	NSMutableArray* lines = [NSMutableArray arrayWithArray:[string componentsSeparatedByString:@"\n"]];
+	NSMutableString* aLine;
+	int r1 = 0;
+	while(1) {
+		NSRange r = NSMakeRange(r1,2);
+		BOOL delete = YES;
+		int count = [lines count];
+		int i;
+		BOOL done = YES;
+		for(i=count-1;i>=0;i--){
+			aLine = [lines objectAtIndex:i];
+			if([aLine length] < NSMaxRange(r))continue;
+			done = NO;
+			
+			if(delete && [[aLine substringWithRange:r] isEqualToString:@"| "]){
+				NSMutableString* newString = [NSMutableString stringWithString:aLine];
+				[newString replaceCharactersInRange:r withString:@"  "];
+				[lines replaceObjectAtIndex:i withObject:newString];
+			}
+			else if(delete && [[aLine substringWithRange:r] isEqualToString:@"|-"]){
+				delete = NO;
+			}
+			else if(!delete && ![[aLine substringWithRange:NSMakeRange(r1,1)] isEqualToString:@"|"]){
+				delete = YES;
+			}
+		}
+		r1 += 5;
+		if(done)break;
 	}
-    NSLogFont([NSFont fontWithName:@"Monaco" size:9],@"%@\n\n",aString);
+	return [lines componentsJoinedByString:@"\n"];
 }
-
-void graphBox (char *s, int *w, int *h) {
-    *w = strlen (s) + del;
-    *h = 1;
-}
-
-void graphDrawBox (char *s, int c, int l) {
-    int i;
-    graphTest (l, c+strlen(s)-1+del);
-    for (i = 0; i < strlen (s); i++) {
-        graph[l][c+i+del] = s[i];
-    }
-}
-
-void graphDrawArrow (int c1, int l1, int c2, int l2) {
-    int m;
-    graphTest (l1, c1);
-    graphTest (l2, c2);
-    m = (l1 + l2) / 2;
-    while (l1 != m) { graph[l1][c1] = '|'; if (l1 < l2) l1++; else l1--; }
-    while (c1 != c2) { graph[l1][c1] = '-'; if (c1 < c2) c1++; else c1--; }
-    while (l1 != l2) { graph[l1][c1] = '|'; if (l1 < l2) l1++; else l1--; }
-    graph[l1][c1] = '|';
-}
-

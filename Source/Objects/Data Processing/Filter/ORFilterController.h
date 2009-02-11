@@ -46,6 +46,7 @@
 	IBOutlet ORPlotter1D*		timePlot;
 	IBOutlet NSButton*			addInputButton;
 	IBOutlet NSButton*			removeInputButton;
+	IBOutlet NSButton*			parseButton;
 }
 
 #pragma mark •••Initialization

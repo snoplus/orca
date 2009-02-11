@@ -175,6 +175,8 @@
 				<string>NSTableView</string>
 				<key>panelView</key>
 				<string>NSView</string>
+				<key>parseButton</key>
+				<string>NSButton</string>
 				<key>pluginNameField</key>
 				<string>NSTextField</string>
 				<key>pluginPathField</key>

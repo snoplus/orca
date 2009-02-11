@@ -198,9 +198,10 @@
 
 - (void) lockChanged:(NSNotification*)aNotification
 {
+	BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL locked = [gSecurity isLocked:ORFilterLock];
     [lockButton setState: locked];
-    
+	[parseButton setEnabled:!locked && !runInProgress];
 }
 
 - (void) updateTiming:(NSNotification*)aNote
