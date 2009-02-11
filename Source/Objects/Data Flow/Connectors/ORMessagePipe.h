@@ -36,6 +36,7 @@
 #pragma mark ¥¥¥Message Passing
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector;
 - (void) forwardInvocation:(NSInvocation *)invocation;
+- (void) connectionChanged;
 
 #pragma mark ¥¥¥Optimization
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;

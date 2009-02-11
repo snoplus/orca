@@ -59,6 +59,9 @@
 	if(obj)[invocation invokeWithTarget:obj];
 }
 
+- (void) connectionChanged
+{
+}
 
 #pragma mark ¥¥¥Optimization
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
