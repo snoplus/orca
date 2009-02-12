@@ -1882,8 +1882,10 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
         }
         else if (selectionResult == kSelectionTimeout) {
             [NSException raise:@"ConnectionTimeOut" format:@"Write from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
-        }       
-		bytesWritten = write(aSocket,packetPtr,numBytesToSend);
+        }   
+		do {
+			bytesWritten = write(aSocket,packetPtr,numBytesToSend);
+		} while (bytesWritten < 0 && (errno == EAGAIN || errno == EINTR));
 		if (bytesWritten > 0) {
 			packetPtr += bytesWritten;
 			numBytesToSend -= bytesWritten;
@@ -1938,7 +1940,10 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
     int  selectionResult = 0;
 	long numBytesToGet = 0;
     
-	n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);
+	do {
+		n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);
+	} while (n<0 && (errno == EAGAIN || errno == EINTR));
+	
 	if(n==0){
 		[self disconnect];
 		[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
@@ -1965,15 +1970,16 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 			} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
 
             if(selectionResult > 0){
-				n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
+				do {
+					n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
+				} while (n<0 && (errno == EAGAIN || errno == EINTR));
 				if(n==0){
 					[self disconnect];
 					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
 				} 
-				else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
+				else if (n<0) {
 					[NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
-				} 
-				else {
+				} else {
 					numToGet -= n;
 					ptrToNumBytesToGet += n;    
 				}
@@ -2011,12 +2017,15 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
         else if (selectionResult == kSelectionTimeout) {
             [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
         }
-		n = recv(aSocket, packetPtr, numBytesToGet, 0);
+		do {
+			n = recv(aSocket, packetPtr, numBytesToGet, 0);
+		} while (n<0 && (errno == EAGAIN || errno == EINTR));
+		
         if(n==0){
             [self disconnect];
             [NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
         } 
-		else if (n<0 && (errno != EAGAIN && errno != EWOULDBLOCK)) {
+		else if (n<0) {
             [NSException raise:@"Socket Error" format:@"Error <%@>: %s",IPNumber,strerror(errno)];
         } 
 		else {
