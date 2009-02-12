@@ -221,7 +221,7 @@ union {
 - (void) writeCSR:(unsigned short)aValue;
 - (void) writeICSR:(unsigned short)aValue;
 - (void) loadSystemFPGA:(NSString*)filePath;
-- (void) loadFilterTriggerFPGAs:(NSString*)filePath;
+- (BOOL) loadFilterTriggerFPGAs:(NSString*)filePath;
 - (void) writeDSPProgramWord:(unsigned long)data;
 - (unsigned long) readDSPProgramWord;
 - (void) setCSRBit:(unsigned short)bitMask;

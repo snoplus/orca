@@ -834,7 +834,7 @@ enum {
 	}
 }
 
-- (void) loadFilterTriggerFPGAs:(NSString*)filePath
+- (BOOL) loadFilterTriggerFPGAs:(NSString*)filePath
 {
 	[self writeICSR:0xF0];	//configure the Trigger/Filter FPGA
 	[ORTimer delay:0.060];	//delay at least 50ms
@@ -859,8 +859,12 @@ enum {
 		}
 		
 		NSLog(@"Loaded: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
+		return YES;
 	}
-	else NSLogColor([NSColor redColor],@"Unable to open: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
+	else {
+		NSLogColor([NSColor redColor],@"Unable to open: <%@>\n",[filePath stringByAbbreviatingWithTildeInPath]);
+		return NO;
+	}
 }
 
 - (void) loadSystemFPGA
@@ -887,12 +891,12 @@ enum {
 		
 		
 		filePath		= [NSString stringWithFormat:@"%@/f%@%d%c.bin",firmWarePath,rootName,decimation,'A'+revision];
-		[self loadFilterTriggerFPGAs:filePath];
+		BOOL loadedOK = [self loadFilterTriggerFPGAs:filePath];
         
 		//confirm the downloads
 		data = 0;
 		[controller camacShortNAF:[self stationNumber] a:8 f:1 data:&data];
-		if(data == 0)NSLog(@"downloads successful\n");
+		if(data == 0 && loadedOK)NSLog(@"downloads successful\n");
 		else {
 			NSLogColor([NSColor redColor],@"downloads FAILED\n");
 			if(data & 0x1)NSLogColor([NSColor redColor],@"System FPGA not configured\n");
