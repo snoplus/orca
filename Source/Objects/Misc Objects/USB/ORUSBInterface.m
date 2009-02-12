@@ -358,19 +358,19 @@ readon:
 			kr = (*interface)->ClearPipeStallBothEnds(interface, pipe);
 			if(kr){
 				[usbLock unlock];
-				[NSException raise:@"USB Write" format:@"ORUSBInterface.m %u: ReadPipe stalled and unable to clear for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
+				[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe stalled and unable to clear for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
 			}
 			else {
 				kr = (*interface)->ReadPipeTO(interface, pipe, bytes, &actualRead,100,100);
 				if(kr){
 					[usbLock unlock];
-					[NSException raise:@"USB Write" format:@"ORUSBInterface.m %u: WritePipe failed on second try <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
+					[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe failed on second try <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
 				}
 			}
 		}
 		else {
 			[usbLock unlock];
-			[NSException raise:@"USB Write" format:@"ORUSBInterface.m %u: ReadPipe failed for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
+			[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe failed for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
 		}
 	}
 	result = actualRead;
