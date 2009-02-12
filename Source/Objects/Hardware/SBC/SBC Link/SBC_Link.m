@@ -1853,14 +1853,6 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	aPacket->message[0] = '\0';
 	if(!aSocket)	[NSException raise:@"Write Error" format:@"Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
 	
-	// set up the file descriptor set
-	fd_set write_fds;
-	FD_ZERO(&write_fds);
-	FD_SET(aSocket, &write_fds);
-	
-	struct timeval tv;
-	tv.tv_sec  = 2;
-	tv.tv_usec = 0;
 	
 	// wait until timeout or data received
     int selectionResult = 0;
@@ -1872,7 +1864,19 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	aPacket->numBytes = numBytesToSend;
 	char* packetPtr = (char*)aPacket;		//recast the first 'real' word in the packet
 	while (numBytesToSend) {
-        selectionResult = select(aSocket+1, NULL, &write_fds, NULL, &tv);
+		// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
+		do {
+			// set up the file descriptor set
+			fd_set write_fds;
+			FD_ZERO(&write_fds);
+			FD_SET(aSocket, &write_fds);
+			
+			struct timeval tv;
+			tv.tv_sec  = 2;
+			tv.tv_usec = 0;
+			selectionResult = select(aSocket+1, NULL, &write_fds, NULL, &tv);
+		} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
+		
         if (selectionResult == kSelectionError){
             [NSException raise:@"Write Error" format:@"Write Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
         }
@@ -1900,18 +1904,22 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	//Care must be taken that thread locks are provided at a higher level in this object
 	if(!aSocket)	[NSException raise:@"Read Error" format:@"Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
 	
-	
-	// set up the file descriptor set
-	fd_set fds;
-	FD_ZERO(&fds);
-	FD_SET(aSocket, &fds);
-	
-	struct timeval tv;
-	tv.tv_sec  = 3;
-	tv.tv_usec = 0;
-	
 	// wait until timeout or data received
-	int  selectionResult = select(aSocket+1, &fds, NULL, NULL, &tv);
+	int  selectionResult;
+	
+	// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
+	do {
+		// set up the file descriptor set
+		fd_set read_fds;
+		FD_ZERO(&read_fds);
+		FD_SET(aSocket, &read_fds);
+		
+		struct timeval tv;
+		tv.tv_sec  = 2;
+		tv.tv_usec = 0;
+		selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
+	} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
+	
 	if(selectionResult > 0){
 		[self readSocket:aSocket buffer:aPacket];
 	}
@@ -1929,14 +1937,6 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	int n;			
     int  selectionResult = 0;
 	long numBytesToGet = 0;
-    // setting file descriptor set
-    fd_set read_fds;
-	FD_ZERO(&read_fds);
-	FD_SET(aSocket, &read_fds);
-    
-    struct timeval tv;
-	tv.tv_sec  = 2;
-	tv.tv_usec = 0;
     
 	n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);
 	if(n==0){
@@ -1951,7 +1951,19 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
         int numToGet = sizeof(numBytesToGet) - n;
         char* ptrToNumBytesToGet = ((char*)&numBytesToGet) + n;
         while (numToGet) {
-            selectionResult = select(aSocket+1, &read_fds, NULL, NULL, &tv);
+			// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
+			do {
+				// set up the file descriptor set
+				fd_set read_fds;
+				FD_ZERO(&read_fds);
+				FD_SET(aSocket, &read_fds);
+				
+				struct timeval tv;
+				tv.tv_sec  = 2;
+				tv.tv_usec = 0;
+				selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
+			} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
+
             if(selectionResult > 0){
 				n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
 				if(n==0){
@@ -1980,7 +1992,19 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	
 	char* packetPtr = (char*)&aPacket->cmdHeader;
 	while(numBytesToGet){
-        selectionResult = select(aSocket+1, &read_fds, NULL, NULL, &tv);
+		// The loop is to ignore EAGAIN and EINTR errors as these are harmless 
+		do {
+			// set up the file descriptor set
+			fd_set read_fds;
+			FD_ZERO(&read_fds);
+			FD_SET(aSocket, &read_fds);
+			
+			struct timeval tv;
+			tv.tv_sec  = 2;
+			tv.tv_usec = 0;
+			selectionResult = select(aSocket+1, NULL, &read_fds, NULL, &tv);
+		} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
+		
         if (selectionResult == kSelectionError){
             [NSException raise:@"Read Error" format:@"Read Error %@ <%@>: %s",[self crateName],IPNumber,strerror(errno)];
         }
