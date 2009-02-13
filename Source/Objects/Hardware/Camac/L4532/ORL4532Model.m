@@ -410,7 +410,6 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
     [self clearExceptionCount];
     [self readStatusRegister];
 	eventCounter = 0;
-	firstTime = YES;
 	triggerMask = 0;
 	
 	int i;
@@ -423,6 +422,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 			[obj runTaskStarted:aDataPacket userInfo:userInfo];
 		}
 	}
+	[self readInputPatternClearMemoryAndLAM];
 }
 
 //**************************************************************************************
@@ -438,60 +438,53 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 	}theTimeRef;
 	
     @try {
-        
-		if(!firstTime){
-            //test if data ready to be read out
-			unsigned long dummy;
-			unsigned short statusWord = [[self adapter] camacLongNAF:[self stationNumber] a:0 f:8 data:&dummy];
-            if(isQbitSet(statusWord)){
-				//data is ready to be readout
-				unsigned long inputMask = [self readInputPattern];
-				if(inputMask & triggerMask){
-					eventCounter++;
-					//grab the event time as reference from Jan 1, 2004.
-					theTimeRef.asTimeInterval = [NSDate timeIntervalSinceReferenceDate];
-					int triggerRecordLength = includeTiming?5:3;
-					unsigned long triggerRecord[5];
-					triggerRecord[0] = triggerId | triggerRecordLength;
-					triggerRecord[1] = eventCounter;
-					triggerRecord[2] = unChangingDataPart;
-					if(includeTiming){
-						triggerRecord[3] = theTimeRef.asLongs[1];
-						triggerRecord[4] = theTimeRef.asLongs[0];
-					}
-					
-					[aDataPacket addLongsToFrameBuffer:triggerRecord length:triggerRecordLength];
-					
-					
-					//read out the children for each input bit that's set
-					int i;
-					for(i=0;i<numberTriggers;i++){
-						if(inputMask & (0x1L<<i)){
-							unsigned long channelRecord[3];
-							channelRecord[0] = channelTriggerId | 3;
-							channelRecord[1] = unChangingDataPart;
-							channelRecord[2] = inputMask & (0x1L<<i);
-							[aDataPacket addLongsToFrameBuffer:channelRecord length:3];
-							if(delayEnableMask & (1L<<i)){
-								[ORTimer delay:[[delays objectAtIndex:i] intValue]*1E-6];
-							}
-							
-							NSEnumerator* e = [dataTakers[i] objectEnumerator];
-							id obj;
-							while(obj = [e nextObject]){
-								[obj takeData:aDataPacket userInfo:userInfo];
-							}
+		//test if data ready to be read out
+		unsigned long dummy;
+		if(isQbitSet([[self adapter] camacLongNAF:[self stationNumber] a:0 f:8 data:&dummy])){
+			//data is ready to be readout
+			unsigned long inputMask = [self readInputPattern];
+			if(inputMask & triggerMask){
+				eventCounter++;
+				//grab the event time as reference from Jan 1, 2004.
+				theTimeRef.asTimeInterval = [NSDate timeIntervalSinceReferenceDate];
+				int triggerRecordLength = includeTiming?5:3;
+				unsigned long triggerRecord[5];
+				triggerRecord[0] = triggerId | triggerRecordLength;
+				triggerRecord[1] = eventCounter;
+				triggerRecord[2] = unChangingDataPart;
+				if(includeTiming){
+					triggerRecord[3] = theTimeRef.asLongs[1];
+					triggerRecord[4] = theTimeRef.asLongs[0];
+				}
+				
+				[aDataPacket addLongsToFrameBuffer:triggerRecord length:triggerRecordLength];
+				
+				
+				//read out the children for each input bit that's set
+				int i;
+				for(i=0;i<numberTriggers;i++){
+					if(inputMask & (0x1L<<i)){
+						unsigned long channelRecord[3];
+						channelRecord[0] = channelTriggerId | 3;
+						channelRecord[1] = unChangingDataPart;
+						channelRecord[2] = inputMask & (0x1L<<i);
+						[aDataPacket addLongsToFrameBuffer:channelRecord length:3];
+						if(delayEnableMask & (1L<<i)){
+							[ORTimer delay:[[delays objectAtIndex:i] intValue]*1E-6];
+						}
+						
+						NSEnumerator* e = [dataTakers[i] objectEnumerator];
+						id obj;
+						while(obj = [e nextObject]){
+							[obj takeData:aDataPacket userInfo:userInfo];
 						}
 					}
 				}
-				//clear memory and LAM
-				[[self adapter] camacLongNAF:[self stationNumber] a:0 f:9 data:&dummy];
 			}
+			//clear memory and LAM
+			[[self adapter] camacLongNAF:[self stationNumber] a:0 f:9 data:&dummy];
 		}
-		else {
-			[self readInputPatternClearMemoryAndLAM];
-			firstTime = NO;
-		}
+
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];

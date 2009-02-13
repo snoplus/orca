@@ -32,7 +32,6 @@
 	@private
         unsigned long   triggerId;
 		unsigned long   channelTriggerId;
-        BOOL            firstTime;
 		unsigned long   eventCounter;
 		ORReadOutList*  triggerGroup[32];
 		BOOL			includeTiming;
