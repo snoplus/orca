@@ -53,6 +53,7 @@ NSString* kDefFont = @"Helvetica";
 #define	kYAxisRoomAbove		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room above y axis
 #define	kYAxisRoomBelow		    ([kLongestNumber sizeWithAttributes:labelAttributes].height/2-2)       // room below y axis
 #define	kXNumberOptimalSeparation   ([kLongestNumber sizeWithAttributes:labelAttributes].width * 7/3)      // optimal x scale label sep
+#define	kXCalibratedOptimalSeparation   ([@"99999.999" sizeWithAttributes:labelAttributes].width * 7/3)      // optimal x scale label sep
 #define	kYNumberOptimalSeparation   ([kLongestNumber sizeWithAttributes:labelAttributes].height * 3)		// optimal y scale label sep
 #define kPixelTolerancePinCursor    4				// pixel tolerance for pin cursor
 
@@ -933,7 +934,8 @@ enum {
 - (double) optimalLabelSeparation
 {
     if([self isXAxis]){
-		return kXNumberOptimalSeparation;
+		if(![[self calibration] useCalibration]) return kXNumberOptimalSeparation;
+		else									return kXCalibratedOptimalSeparation;
 	}
     else return kYNumberOptimalSeparation;
     
@@ -1070,7 +1072,17 @@ enum {
 		[aColor set];
 		float val = [markerNumber floatValue];
 		val = [self getPixAbs:val];
-		NSString* label = [NSString stringWithFormat:@"%.0f",[markerNumber floatValue]];
+		
+		NSString* label;
+		float markerValue;
+		if([self isXAxis] && [[self calibration] useCalibration]){
+			markerValue = [[self calibration] convertedValueForChannel:[markerNumber floatValue]];
+			label = [NSString stringWithFormat:@"%.3f",markerValue];
+		}
+		else {
+			markerValue = [markerNumber floatValue];
+			label = [NSString stringWithFormat:@"%.0f",markerValue];
+		}
 		if([self isXAxis]){
 			[NSBezierPath strokeLineFromPoint:NSMakePoint(val,0) 
 									toPoint:NSMakePoint(val,aFrame.size.height-1)];
