@@ -45,6 +45,11 @@
 		NSMutableArray*	delays;
 		unsigned long	delayEnableMask;
 		NSMutableArray*	triggerNames;
+		union {
+			NSTimeInterval asTimeInterval;
+			unsigned long asLongs[2];
+		}theTimeRef;
+		
 }
 
 #pragma mark ¥¥¥Initialization

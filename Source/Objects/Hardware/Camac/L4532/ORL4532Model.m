@@ -412,7 +412,6 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 	triggerMask = 0;
 	
 	int i;
-	int aVSN=0;
 	for(i=0;i<numberTriggers;i++){
 		triggerMask |= (1<<i);
 	    dataTakers[i] = [[triggerGroup[i] allObjects] retain];	//cache of data takers.
@@ -420,14 +419,8 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		id obj;
 		while(obj = [e nextObject]){
 			[obj runTaskStarted:aDataPacket userInfo:userInfo];
-			if([obj conformsToProtocol:@protocol(ORFeraReadout)]){
-				[obj setVSN:aVSN++];	//put into fera mode
-				[obj setFeraEnable:YES];
-			}
-			else {
-				if([obj respondsToSelector:@selector(setCAMACMode:)]){
-					[obj setCAMACMode:NO];
-				}
+			if([obj respondsToSelector:@selector(setCAMACMode:)]){
+				[obj setCAMACMode:NO];
 			}
 		}
 	}
@@ -441,10 +434,6 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	union {
-		NSTimeInterval asTimeInterval;
-		unsigned long asLongs[2];
-	}theTimeRef;
 	
     @try {
 		//test if data ready to be read out
