@@ -204,13 +204,12 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 #pragma mark ¥¥¥Hardware functions
 - (unsigned long) readInputPattern
 {
-	unsigned long bits1_16 = 0;
-	unsigned long bits17_32 = 0;
-	[[self adapter] camacLongNAF:[self stationNumber] a:0 f:0 data:&bits1_16];
-	[[self adapter] camacLongNAF:[self stationNumber] a:1 f:0 data:&bits17_32];
-	bits1_16 &= 0xffff;
-	bits17_32 &= 0xffff;
-	return (bits17_32<<16) | bits1_16;
+	unsigned short bits1_16 = 0;
+	unsigned short bits17_32 = 0;
+	[[self adapter] camacShortNAF:[self stationNumber] a:0 f:0 data:&bits1_16];
+	if(numberTriggers>16)[[self adapter] camacShortNAF:[self stationNumber] a:1 f:0 data:&bits17_32];
+	unsigned long bits17_32L = bits17_32;
+	return (bits17_32L<<16) | bits1_16;
 }
 
 - (unsigned short) readStatusRegister
@@ -413,6 +412,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 	triggerMask = 0;
 	
 	int i;
+	int aVSN=0;
 	for(i=0;i<numberTriggers;i++){
 		triggerMask |= (1<<i);
 	    dataTakers[i] = [[triggerGroup[i] allObjects] retain];	//cache of data takers.
@@ -420,6 +420,15 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		id obj;
 		while(obj = [e nextObject]){
 			[obj runTaskStarted:aDataPacket userInfo:userInfo];
+			if([obj conformsToProtocol:@protocol(ORFeraReadout)]){
+				[obj setVSN:aVSN++];	//put into fera mode
+				[obj setFeraEnable:YES];
+			}
+			else {
+				if([obj respondsToSelector:@selector(setCAMACMode:)]){
+					[obj setCAMACMode:NO];
+				}
+			}
 		}
 	}
 	[self readInputPatternClearMemoryAndLAM];
@@ -439,8 +448,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 	
     @try {
 		//test if data ready to be read out
-		unsigned long dummy;
-		if(isQbitSet([[self adapter] camacLongNAF:[self stationNumber] a:0 f:8 data:&dummy])){
+		if(isQbitSet([[self adapter] camacShortNAF:[self stationNumber] a:0 f:8])){
 			//data is ready to be readout
 			unsigned long inputMask = [self readInputPattern];
 			if(inputMask & triggerMask){
@@ -482,7 +490,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 				}
 			}
 			//clear memory and LAM
-			[[self adapter] camacLongNAF:[self stationNumber] a:0 f:9 data:&dummy];
+			[[self adapter] camacShortNAF:[self stationNumber] a:0 f:9];
 		}
 
 	}

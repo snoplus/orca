@@ -50,12 +50,12 @@ enum {
 		NSMutableArray* discriminators;
         
  		short vsn;
+		BOOL  CAMACMode;
 		BOOL lamEnable;
 		BOOL  singles;
         BOOL  randomAccessMode;
 		BOOL  ofSuppressionMode;
 		BOOL  zeroSuppressionMode;
-		BOOL  CAMACMode;
 		BOOL  gateEnable[5];
         short onlineChannelCount;
         short onlineList[4];

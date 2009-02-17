@@ -112,3 +112,6 @@ extern NSString* ORL4532ModelInputRegisterChanged;
 extern NSString* ORL4532SettingsLock;
 extern NSString* ORL4532ModelDelaysChanged;
 
+@interface NSObject (setCAMACMode)
+- (void)setCAMACMode:(BOOL)aState;
+@end

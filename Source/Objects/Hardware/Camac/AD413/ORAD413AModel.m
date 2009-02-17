@@ -408,15 +408,16 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     @try {
-		unsigned short status = [controller camacShortNAF:cachedStation a:0 f:8]; //test the lam
-		BOOL lamIsSet = isQbitSet(status);
+		BOOL lamIsSet = NO;
+		if(CAMACMode) lamIsSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8]); //test the lam
+		else lamIsSet = YES;
 		if((lamEnable && lamIsSet) || !lamEnable){
 			if(randomAccessMode)		[self readChannels:aDataPacket];
 			else {
 				if(zeroSuppressionMode)	[self readZeroSuppressedChannels:aDataPacket];
 				else					[self readChannels:aDataPacket];
 			}
-			if(lamIsSet && lamEnable)[controller camacShortNAF:cachedStation a:0 f:10]; //clear lam
+			if(CAMACMode && lamIsSet && lamEnable)[controller camacShortNAF:cachedStation a:0 f:10]; //clear lam
 			[controller camacShortNAF:cachedStation a:0 f:9]; //clear module
 		}
 	}

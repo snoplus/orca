@@ -32,6 +32,7 @@ NSString* ORADC2249ModelIncludeTimingChanged		= @"ORADC2249ModelIncludeTimingCha
 NSString* ORADC2249OnlineMaskChangedNotification	= @"ORADC2249OnlineMaskChangedNotification";
 NSString* ORADC2249SettingsLock						= @"ORADC2249SettingsLock";
 NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosChangedNotification";
+NSString* ORADC2249CAMACModeChangedNotification		= @"ORADC2249CAMACModeChangedNotification";
 
 
 @implementation ORADC2249Model
@@ -40,6 +41,7 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 - (id) init
 {		
     self = [super init];
+	[self setCAMACMode:YES];
     return self;
 }
 
@@ -127,6 +129,18 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
                 postNotificationName:ORADC2249SuppressZerosChangedNotification
 							  object:self];
     
+}
+
+- (BOOL) CAMACMode
+{
+    return CAMACMode;
+}
+
+- (void) setCAMACMode: (BOOL) aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCAMACMode:CAMACMode];
+    CAMACMode = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORADC2249CAMACModeChangedNotification object:self];
 }
 
 #pragma mark ¥¥¥DataTaker
@@ -219,8 +233,10 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
         
         //check the LAM
         unsigned short dummy;
-        unsigned short status = [controller camacShortNAF:cachedStation a:0 f:8 data:&dummy];
-        if(isQbitSet(status)) { //LAM status comes back in the Q bit
+		BOOL isLamSet = NO;
+		if(CAMACMode)isLamSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8 data:&dummy]); //LAM status comes back in the Q bit
+		else isLamSet =YES;
+        if(isLamSet) { 
             if(onlineChannelCount){
 				resetDone = NO;
 				int i;
@@ -393,6 +409,8 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
     [self setOnlineMask:[decoder decodeIntForKey:@"ORADC2249OnlineMask"]];
     [self setSuppressZeros:[decoder decodeIntForKey:@"ORADC2249SuppressZeros"]];
     [[self undoManager] enableUndoRegistration];
+	
+	[self setCAMACMode:YES];
 	
     return self;
 }
