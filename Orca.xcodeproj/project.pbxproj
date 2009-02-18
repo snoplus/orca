@@ -1121,14 +1121,6 @@
 		848627AC08E4A9F900301049 /* Listener.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848627AB08E4A9F900301049 /* Listener.tif */; };
 		848627AE08E4B5EB00301049 /* GpibEnetBox.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848627AD08E4B5EB00301049 /* GpibEnetBox.tif */; };
 		848627B308E4BC4800301049 /* HPPulserIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848627B208E4BC4800301049 /* HPPulserIcon.tif */; };
-		848627C008E4BEC000301049 /* ORVXMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 848627B708E4BEC000301049 /* ORVXMController.h */; };
-		848627C108E4BEC000301049 /* ORVXMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 848627B808E4BEC000301049 /* ORVXMController.m */; };
-		848627C208E4BEC000301049 /* ORVXMDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 848627B908E4BEC000301049 /* ORVXMDecoders.h */; };
-		848627C308E4BEC000301049 /* ORVXMDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 848627BA08E4BEC000301049 /* ORVXMDecoders.m */; };
-		848627C408E4BEC000301049 /* ORVXMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 848627BB08E4BEC000301049 /* ORVXMModel.h */; };
-		848627C508E4BEC000301049 /* ORVXMModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 848627BC08E4BEC000301049 /* ORVXMModel.m */; };
-		848627C708E4BEC000301049 /* VXM.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848627BE08E4BEC000301049 /* VXM.nib */; };
-		848627CA08E4BEE400301049 /* VXM.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848627C908E4BEE400301049 /* VXM.tif */; };
 		848629CE08E4C4CA00301049 /* OrcaLeft.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848629CC08E4C4CA00301049 /* OrcaLeft.tif */; };
 		848629CF08E4C4CA00301049 /* OrcaRight.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848629CD08E4C4CA00301049 /* OrcaRight.tif */; };
 		84862BB708E8650900301049 /* Tek754DOscilloscope.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84862BB608E8650900301049 /* Tek754DOscilloscope.tif */; };
@@ -1514,6 +1506,14 @@
 		84B28D7F0F4C658500E2B056 /* ORNplpCMeterDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D660F4C658400E2B056 /* ORNplpCMeterDecoders.m */; };
 		84B28D800F4C658500E2B056 /* ORNplpCMeterModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D670F4C658400E2B056 /* ORNplpCMeterModel.h */; };
 		84B28D810F4C658500E2B056 /* ORNplpCMeterModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D680F4C658400E2B056 /* ORNplpCMeterModel.m */; };
+		84B28D8C0F4C66BE00E2B056 /* ORVXMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D840F4C66BE00E2B056 /* ORVXMController.h */; };
+		84B28D8D0F4C66BE00E2B056 /* ORVXMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D850F4C66BE00E2B056 /* ORVXMController.m */; };
+		84B28D8E0F4C66BE00E2B056 /* ORVXMDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D860F4C66BE00E2B056 /* ORVXMDecoders.h */; };
+		84B28D8F0F4C66BE00E2B056 /* ORVXMDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D870F4C66BE00E2B056 /* ORVXMDecoders.m */; };
+		84B28D900F4C66BE00E2B056 /* ORVXMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D880F4C66BE00E2B056 /* ORVXMModel.h */; };
+		84B28D910F4C66BE00E2B056 /* ORVXMModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D890F4C66BE00E2B056 /* ORVXMModel.m */; };
+		84B28D920F4C66BE00E2B056 /* VXM.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D8A0F4C66BE00E2B056 /* VXM.nib */; };
+		84B28D930F4C66BE00E2B056 /* VXM.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D8B0F4C66BE00E2B056 /* VXM.tif */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -2919,14 +2919,6 @@
 		848627AB08E4A9F900301049 /* Listener.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Listener.tif; path = "Source/Objects/Data Processing/Listener/Listener.tif"; sourceTree = SOURCE_ROOT; };
 		848627AD08E4B5EB00301049 /* GpibEnetBox.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = GpibEnetBox.tif; path = "Source/Objects/Hardware/GPIB/ENET-GPIB/GpibEnetBox.tif"; sourceTree = SOURCE_ROOT; };
 		848627B208E4BC4800301049 /* HPPulserIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HPPulserIcon.tif; path = Source/Objects/Hardware/GPIB/HPPulser/HPPulserIcon.tif; sourceTree = SOURCE_ROOT; };
-		848627B708E4BEC000301049 /* ORVXMController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVXMController.h; path = "Source/Objects/Misc Objects/MotorControllers/VXM/ORVXMController.h"; sourceTree = SOURCE_ROOT; };
-		848627B808E4BEC000301049 /* ORVXMController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVXMController.m; path = "Source/Objects/Misc Objects/MotorControllers/VXM/ORVXMController.m"; sourceTree = SOURCE_ROOT; };
-		848627B908E4BEC000301049 /* ORVXMDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVXMDecoders.h; path = "Source/Objects/Misc Objects/MotorControllers/VXM/ORVXMDecoders.h"; sourceTree = SOURCE_ROOT; };
-		848627BA08E4BEC000301049 /* ORVXMDecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVXMDecoders.m; path = "Source/Objects/Misc Objects/MotorControllers/VXM/ORVXMDecoders.m"; sourceTree = SOURCE_ROOT; };
-		848627BB08E4BEC000301049 /* ORVXMModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORVXMModel.h; path = "Source/Objects/Misc Objects/MotorControllers/VXM/ORVXMModel.h"; sourceTree = SOURCE_ROOT; };
-		848627BC08E4BEC000301049 /* ORVXMModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORVXMModel.m; path = "Source/Objects/Misc Objects/MotorControllers/VXM/ORVXMModel.m"; sourceTree = SOURCE_ROOT; };
-		848627BE08E4BEC000301049 /* VXM.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = VXM.nib; path = "Source/Objects/Misc Objects/MotorControllers/VXM/VXM.nib"; sourceTree = SOURCE_ROOT; };
-		848627C908E4BEE400301049 /* VXM.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VXM.tif; path = "Source/Objects/Misc Objects/MotorControllers/VXM/VXM.tif"; sourceTree = SOURCE_ROOT; };
 		848629CC08E4C4CA00301049 /* OrcaLeft.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OrcaLeft.tif; path = "Source/Main Dialogs/About Box/OrcaLeft.tif"; sourceTree = SOURCE_ROOT; };
 		848629CD08E4C4CA00301049 /* OrcaRight.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = OrcaRight.tif; path = "Source/Main Dialogs/About Box/OrcaRight.tif"; sourceTree = SOURCE_ROOT; };
 		84862BB608E8650900301049 /* Tek754DOscilloscope.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Tek754DOscilloscope.tif; path = "Source/Objects/Hardware/GPIB/Oscilloscope T754D/Tek754DOscilloscope.tif"; sourceTree = SOURCE_ROOT; };
@@ -3327,6 +3319,14 @@
 		84B28D660F4C658400E2B056 /* ORNplpCMeterDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNplpCMeterDecoders.m; path = Source/Objects/Hardware/Internet/NplPicoCoulombMeter/ORNplpCMeterDecoders.m; sourceTree = SOURCE_ROOT; };
 		84B28D670F4C658400E2B056 /* ORNplpCMeterModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNplpCMeterModel.h; path = Source/Objects/Hardware/Internet/NplPicoCoulombMeter/ORNplpCMeterModel.h; sourceTree = SOURCE_ROOT; };
 		84B28D680F4C658400E2B056 /* ORNplpCMeterModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNplpCMeterModel.m; path = Source/Objects/Hardware/Internet/NplPicoCoulombMeter/ORNplpCMeterModel.m; sourceTree = SOURCE_ROOT; };
+		84B28D840F4C66BE00E2B056 /* ORVXMController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVXMController.h; path = Source/Objects/Hardware/Serial/VXM/ORVXMController.h; sourceTree = SOURCE_ROOT; };
+		84B28D850F4C66BE00E2B056 /* ORVXMController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVXMController.m; path = Source/Objects/Hardware/Serial/VXM/ORVXMController.m; sourceTree = SOURCE_ROOT; };
+		84B28D860F4C66BE00E2B056 /* ORVXMDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVXMDecoders.h; path = Source/Objects/Hardware/Serial/VXM/ORVXMDecoders.h; sourceTree = SOURCE_ROOT; };
+		84B28D870F4C66BE00E2B056 /* ORVXMDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVXMDecoders.m; path = Source/Objects/Hardware/Serial/VXM/ORVXMDecoders.m; sourceTree = SOURCE_ROOT; };
+		84B28D880F4C66BE00E2B056 /* ORVXMModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORVXMModel.h; path = Source/Objects/Hardware/Serial/VXM/ORVXMModel.h; sourceTree = SOURCE_ROOT; };
+		84B28D890F4C66BE00E2B056 /* ORVXMModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVXMModel.m; path = Source/Objects/Hardware/Serial/VXM/ORVXMModel.m; sourceTree = SOURCE_ROOT; };
+		84B28D8A0F4C66BE00E2B056 /* VXM.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = VXM.nib; path = Source/Objects/Hardware/Serial/VXM/VXM.nib; sourceTree = SOURCE_ROOT; };
+		84B28D8B0F4C66BE00E2B056 /* VXM.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VXM.tif; path = Source/Objects/Hardware/Serial/VXM/VXM.tif; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -5041,7 +5041,6 @@
 				843A48510A0AC2F4003DF248 /* USB */,
 				2A178EB608DB3F66001D78BC /* FireWire */,
 				2A943A5B08A8194B00D04541 /* SerialPorts */,
-				8479977508DB59FA00D848FB /* MotorControllers */,
 				841C842207EB418A0028BEED /* Motor */,
 				840B8135094E4D8D00B1B135 /* Label */,
 				847597450B5EF26500123411 /* SQL */,
@@ -5562,6 +5561,7 @@
 				840D56D70F39E9BF00F9A274 /* Pac */,
 				84B28D180F4C614000E2B056 /* XYScanner */,
 				84B28D340F4C63A000E2B056 /* LakeShore210 */,
+				84B28D830F4C66BE00E2B056 /* VXM */,
 			);
 			name = Serial;
 			path = Source/Objects/Hardware/Serial;
@@ -5979,14 +5979,6 @@
 			path = Source/Objects/Hardware/Pci/Bit3;
 			sourceTree = SOURCE_ROOT;
 		};
-		8479977508DB59FA00D848FB /* MotorControllers */ = {
-			isa = PBXGroup;
-			children = (
-				848627B608E4BEC000301049 /* VXM */,
-			);
-			path = MotorControllers;
-			sourceTree = "<group>";
-		};
 		847997A008DB69FC00D848FB /* PieChart */ = {
 			isa = PBXGroup;
 			children = (
@@ -6164,22 +6156,6 @@
 			);
 			name = L4532;
 			path = Source/Objects/Hardware/Camac/L4532;
-			sourceTree = SOURCE_ROOT;
-		};
-		848627B608E4BEC000301049 /* VXM */ = {
-			isa = PBXGroup;
-			children = (
-				848627B708E4BEC000301049 /* ORVXMController.h */,
-				848627B808E4BEC000301049 /* ORVXMController.m */,
-				848627B908E4BEC000301049 /* ORVXMDecoders.h */,
-				848627BA08E4BEC000301049 /* ORVXMDecoders.m */,
-				848627BB08E4BEC000301049 /* ORVXMModel.h */,
-				848627BC08E4BEC000301049 /* ORVXMModel.m */,
-				848627C908E4BEE400301049 /* VXM.tif */,
-				848627BE08E4BEC000301049 /* VXM.nib */,
-			);
-			name = VXM;
-			path = "Source/Objects/Misc Objects/MotorControllers/VXM";
 			sourceTree = SOURCE_ROOT;
 		};
 		848D84230DDE060100D44B81 /* TimeMultiPlot */ = {
@@ -7074,6 +7050,22 @@
 			);
 			name = NplPicoCoulombMeter;
 			path = Source/Objects/Hardware/Internet/NplPicoCoulombMeter;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28D830F4C66BE00E2B056 /* VXM */ = {
+			isa = PBXGroup;
+			children = (
+				84B28D840F4C66BE00E2B056 /* ORVXMController.h */,
+				84B28D850F4C66BE00E2B056 /* ORVXMController.m */,
+				84B28D860F4C66BE00E2B056 /* ORVXMDecoders.h */,
+				84B28D870F4C66BE00E2B056 /* ORVXMDecoders.m */,
+				84B28D880F4C66BE00E2B056 /* ORVXMModel.h */,
+				84B28D890F4C66BE00E2B056 /* ORVXMModel.m */,
+				84B28D8A0F4C66BE00E2B056 /* VXM.nib */,
+				84B28D8B0F4C66BE00E2B056 /* VXM.tif */,
+			);
+			name = VXM;
+			path = Source/Objects/Hardware/Serial/VXM;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B4329005E52B080084845B /* Security */ = {
@@ -8963,9 +8955,6 @@
 				84799A3D08DF5C6400D848FB /* ORSplashWindowController.h in Headers */,
 				2ACB5A4408E3360000E19D34 /* NSColor+Extensions.h in Headers */,
 				2AAB08FB08E36CCE00BB0792 /* ORTest.h in Headers */,
-				848627C008E4BEC000301049 /* ORVXMController.h in Headers */,
-				848627C208E4BEC000301049 /* ORVXMDecoders.h in Headers */,
-				848627C408E4BEC000301049 /* ORVXMModel.h in Headers */,
 				8434150D08EE0378009B7659 /* ORCrateController.h in Headers */,
 				849DDE6308F466630052AFC6 /* ORAD3511Controller.h in Headers */,
 				849DDE6508F466630052AFC6 /* ORAD3511Decoders.h in Headers */,
@@ -9359,6 +9348,9 @@
 				84B28D7C0F4C658500E2B056 /* ORNplpCMeterController.h in Headers */,
 				84B28D7E0F4C658500E2B056 /* ORNplpCMeterDecoders.h in Headers */,
 				84B28D800F4C658500E2B056 /* ORNplpCMeterModel.h in Headers */,
+				84B28D8C0F4C66BE00E2B056 /* ORVXMController.h in Headers */,
+				84B28D8E0F4C66BE00E2B056 /* ORVXMDecoders.h in Headers */,
+				84B28D900F4C66BE00E2B056 /* ORVXMModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9622,8 +9614,6 @@
 				848627AC08E4A9F900301049 /* Listener.tif in Resources */,
 				848627AE08E4B5EB00301049 /* GpibEnetBox.tif in Resources */,
 				848627B308E4BC4800301049 /* HPPulserIcon.tif in Resources */,
-				848627C708E4BEC000301049 /* VXM.nib in Resources */,
-				848627CA08E4BEE400301049 /* VXM.tif in Resources */,
 				848629CE08E4C4CA00301049 /* OrcaLeft.tif in Resources */,
 				848629CF08E4C4CA00301049 /* OrcaRight.tif in Resources */,
 				84862BB708E8650900301049 /* Tek754DOscilloscope.tif in Resources */,
@@ -9942,6 +9932,8 @@
 				84B28D750F4C658500E2B056 /* NPLCommBoardIcon.tif in Resources */,
 				84B28D7A0F4C658500E2B056 /* NplpCMeter.nib in Resources */,
 				84B28D7B0F4C658500E2B056 /* NplpCMeterIcon.tif in Resources */,
+				84B28D920F4C66BE00E2B056 /* VXM.nib in Resources */,
+				84B28D930F4C66BE00E2B056 /* VXM.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10271,9 +10263,6 @@
 				84799A3E08DF5C6400D848FB /* ORSplashWindowController.m in Sources */,
 				2ACB5A4508E3360000E19D34 /* NSColor+Extensions.m in Sources */,
 				2AAB08FC08E36CCE00BB0792 /* ORTest.m in Sources */,
-				848627C108E4BEC000301049 /* ORVXMController.m in Sources */,
-				848627C308E4BEC000301049 /* ORVXMDecoders.m in Sources */,
-				848627C508E4BEC000301049 /* ORVXMModel.m in Sources */,
 				8434150E08EE0378009B7659 /* ORCrateController.m in Sources */,
 				849DDE6408F466630052AFC6 /* ORAD3511Controller.m in Sources */,
 				849DDE6608F466630052AFC6 /* ORAD3511Decoders.m in Sources */,
@@ -10627,6 +10616,9 @@
 				84B28D7D0F4C658500E2B056 /* ORNplpCMeterController.m in Sources */,
 				84B28D7F0F4C658500E2B056 /* ORNplpCMeterDecoders.m in Sources */,
 				84B28D810F4C658500E2B056 /* ORNplpCMeterModel.m in Sources */,
+				84B28D8D0F4C66BE00E2B056 /* ORVXMController.m in Sources */,
+				84B28D8F0F4C66BE00E2B056 /* ORVXMDecoders.m in Sources */,
+				84B28D910F4C66BE00E2B056 /* ORVXMModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
