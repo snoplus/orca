@@ -1505,7 +1505,7 @@
 		84B28E280F4C718400E2B056 /* ORHV4032Supply.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E0F0F4C718400E2B056 /* ORHV4032Supply.m */; };
 		84B28E320F4C7FD400E2B056 /* LDA102.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E2B0F4C7FD400E2B056 /* LDA102.nib */; };
 		84B28E330F4C7FD400E2B056 /* LDA102.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E2C0F4C7FD400E2B056 /* LDA102.tif */; };
-		84B28E340F4C7FD400E2B056 /* NoADUDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E2D0F4C7FD400E2B056 /* NoADUDriverHelp.plist */; };
+		84B28E340F4C7FD400E2B056 /* NoLDA102DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E2D0F4C7FD400E2B056 /* NoLDA102DriverHelp.plist */; };
 		84B28E350F4C7FD400E2B056 /* ORLDA102Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E2E0F4C7FD400E2B056 /* ORLDA102Controller.h */; };
 		84B28E360F4C7FD400E2B056 /* ORLDA102Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E2F0F4C7FD400E2B056 /* ORLDA102Controller.m */; };
 		84B28E370F4C7FD400E2B056 /* ORLDA102Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E300F4C7FD400E2B056 /* ORLDA102Model.h */; };
@@ -3341,7 +3341,7 @@
 		84B28E0F0F4C718400E2B056 /* ORHV4032Supply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Supply.m; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Supply.m; sourceTree = SOURCE_ROOT; };
 		84B28E2B0F4C7FD400E2B056 /* LDA102.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LDA102.nib; path = Source/Objects/Hardware/USB/LDA102/LDA102.nib; sourceTree = SOURCE_ROOT; };
 		84B28E2C0F4C7FD400E2B056 /* LDA102.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = LDA102.tif; path = Source/Objects/Hardware/USB/LDA102/LDA102.tif; sourceTree = SOURCE_ROOT; };
-		84B28E2D0F4C7FD400E2B056 /* NoADUDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoADUDriverHelp.plist; path = Source/Objects/Hardware/USB/LDA102/NoADUDriverHelp.plist; sourceTree = SOURCE_ROOT; };
+		84B28E2D0F4C7FD400E2B056 /* NoLDA102DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NoLDA102DriverHelp.plist; sourceTree = "<group>"; };
 		84B28E2E0F4C7FD400E2B056 /* ORLDA102Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLDA102Controller.h; path = Source/Objects/Hardware/USB/LDA102/ORLDA102Controller.h; sourceTree = SOURCE_ROOT; };
 		84B28E2F0F4C7FD400E2B056 /* ORLDA102Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLDA102Controller.m; path = Source/Objects/Hardware/USB/LDA102/ORLDA102Controller.m; sourceTree = SOURCE_ROOT; };
 		84B28E300F4C7FD400E2B056 /* ORLDA102Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLDA102Model.h; path = Source/Objects/Hardware/USB/LDA102/ORLDA102Model.h; sourceTree = SOURCE_ROOT; };
@@ -7102,7 +7102,7 @@
 			children = (
 				84B28E2B0F4C7FD400E2B056 /* LDA102.nib */,
 				84B28E2C0F4C7FD400E2B056 /* LDA102.tif */,
-				84B28E2D0F4C7FD400E2B056 /* NoADUDriverHelp.plist */,
+				84B28E2D0F4C7FD400E2B056 /* NoLDA102DriverHelp.plist */,
 				84B28E2E0F4C7FD400E2B056 /* ORLDA102Controller.h */,
 				84B28E2F0F4C7FD400E2B056 /* ORLDA102Controller.m */,
 				84B28E300F4C7FD400E2B056 /* ORLDA102Model.h */,
@@ -9997,7 +9997,7 @@
 				84B28E220F4C718400E2B056 /* HV4032On.tif in Resources */,
 				84B28E320F4C7FD400E2B056 /* LDA102.nib in Resources */,
 				84B28E330F4C7FD400E2B056 /* LDA102.tif in Resources */,
-				84B28E340F4C7FD400E2B056 /* NoADUDriverHelp.plist in Resources */,
+				84B28E340F4C7FD400E2B056 /* NoLDA102DriverHelp.plist in Resources */,
 				84B28E5A0F4C835500E2B056 /* UnivVolt.nib in Resources */,
 				84B28E5B0F4C835500E2B056 /* UnivVoltHV.ai in Resources */,
 				84B28E5C0F4C835500E2B056 /* UnivVoltHV.jpeg in Resources */,
