@@ -67,15 +67,15 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>attenuationTextFieldAction</key>
+				<key>attenuationAction</key>
 				<string>id</string>
-				<key>dwellTimeTextFieldAction</key>
+				<key>dwellTimeAction</key>
 				<string>id</string>
-				<key>idleTimeTextFieldAction</key>
+				<key>idleTimeAction</key>
 				<string>id</string>
-				<key>rampEndTextFieldAction</key>
+				<key>rampEndAction</key>
 				<string>id</string>
-				<key>rampStartTextFieldAction</key>
+				<key>rampStartAction</key>
 				<string>id</string>
 				<key>repeatRampAction</key>
 				<string>id</string>
@@ -83,7 +83,7 @@
 				<string>id</string>
 				<key>settingLockAction</key>
 				<string>id</string>
-				<key>stepSizeTextFieldAction</key>
+				<key>stepSizeAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -92,20 +92,24 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>attenuationTextField</key>
+				<key>attenuationField</key>
 				<string>NSTextField</string>
 				<key>commandField</key>
 				<string>NSTextField</string>
-				<key>dwellTimeTextField</key>
+				<key>dwellTimeField</key>
 				<string>NSTextField</string>
-				<key>idleTimeTextField</key>
+				<key>idleTimeField</key>
 				<string>NSTextField</string>
+				<key>loadAttenuationButton</key>
+				<string>NSButton</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
-				<key>rampEndTextField</key>
+				<key>rampEndField</key>
 				<string>NSTextField</string>
-				<key>rampStartTextField</key>
+				<key>rampStartField</key>
 				<string>NSTextField</string>
+				<key>rampStartStopButton</key>
+				<string>NSButton</string>
 				<key>rampValueField</key>
 				<string>NSTextField</string>
 				<key>repeatRampButton</key>
@@ -114,7 +118,7 @@
 				<string>NSButton</string>
 				<key>serialNumberPopup</key>
 				<string>NSPopUpButton</string>
-				<key>stepSizeTextField</key>
+				<key>stepSizeField</key>
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>

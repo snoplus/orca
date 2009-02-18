@@ -2,8 +2,8 @@
 //  ORHPLDA102Controller.m
 //  Orca
 //
-//  Created by Mark Howe on Thurs Jan 26 2007.
-//  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Wed Feb 18, 2009.
+//  Copyright (c) 2009 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -142,32 +142,32 @@
 
 - (void) idleTimeChanged:(NSNotification*)aNote
 {
-	[idleTimeTextField setIntValue: [model idleTime]];
+	[idleTimeField setIntValue: [model idleTime]];
 }
 
 - (void) dwellTimeChanged:(NSNotification*)aNote
 {
-	[dwellTimeTextField setIntValue: [model dwellTime]];
+	[dwellTimeField setIntValue: [model dwellTime]];
 }
 
 - (void) rampEndChanged:(NSNotification*)aNote
 {
-	[rampEndTextField setFloatValue: [model rampEnd]];
+	[rampEndField setFloatValue: [model rampEnd]];
 }
 
 - (void) rampStartChanged:(NSNotification*)aNote
 {
-	[rampStartTextField setFloatValue: [model rampStart]];
+	[rampStartField setFloatValue: [model rampStart]];
 }
 
 - (void) stepSizeChanged:(NSNotification*)aNote
 {
-	[stepSizeTextField setFloatValue: [model stepSize]];
+	[stepSizeField setFloatValue: [model stepSize]];
 }
 
 - (void) attenuationChanged:(NSNotification*)aNote
 {
-	[attenuationTextField setFloatValue: [model attenuation]];
+	[attenuationField setFloatValue: [model attenuation]];
 }
 
 - (void) checkGlobalSecurity
@@ -206,32 +206,32 @@
 	[model setRepeatRamp:[sender intValue]];	
 }
 
-- (void) idleTimeTextFieldAction:(id)sender
+- (void) idleTimeAction:(id)sender
 {
 	[model setIdleTime:[sender intValue]];	
 }
 
-- (void) dwellTimeTextFieldAction:(id)sender
+- (void) dwellTimeAction:(id)sender
 {
 	[model setDwellTime:[sender intValue]];	
 }
 
-- (void) rampEndTextFieldAction:(id)sender
+- (void) rampEndAction:(id)sender
 {
 	[model setRampEnd:[sender floatValue]];	
 }
 
-- (void) rampStartTextFieldAction:(id)sender
+- (void) rampStartAction:(id)sender
 {
 	[model setRampStart:[sender floatValue]];	
 }
 
-- (void) stepSizeTextFieldAction:(id)sender
+- (void) stepSizeAction:(id)sender
 {
 	[model setStepSize:[sender floatValue]];	
 }
 
-- (void) attenuationTextFieldAction:(id)sender
+- (void) attenuationAction:(id)sender
 {
 	[model setAttenuation:[sender floatValue]];	
 }

@@ -2,8 +2,8 @@
 //  ORHPLDA102Controller.h
 //  Orca
 //
-//  Created by Mark Howe on Thurs Jan 26 2007.
-//  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Wed Feb 18, 2009.
+//  Copyright (c) 2009 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -18,9 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-#import "ORHPPulserController.h"
-
 @class ORUSB;
 
 @interface ORLDA102Controller : OrcaObjectController 
@@ -28,20 +25,18 @@
 	IBOutlet NSPopUpButton* serialNumberPopup;
 	IBOutlet NSTextField*	rampValueField;
 	IBOutlet NSButton*		repeatRampButton;
-	IBOutlet NSTextField*	idleTimeTextField;
-	IBOutlet NSTextField*	dwellTimeTextField;
-	IBOutlet NSTextField*	rampEndTextField;
-	IBOutlet NSTextField*	rampStartTextField;
-	IBOutlet NSTextField*	stepSizeTextField;
-	IBOutlet NSTextField*	attenuationTextField;
-    IBOutlet NSTextField*   commandField;
-    IBOutlet NSButton*		sendCommandButton;
+	IBOutlet NSTextField*	idleTimeField;
+	IBOutlet NSTextField*	dwellTimeField;
+	IBOutlet NSTextField*	rampEndField;
+	IBOutlet NSTextField*	rampStartField;
+	IBOutlet NSTextField*	stepSizeField;
+	IBOutlet NSTextField*	attenuationField;
 	IBOutlet NSButton*		lockButton;
+	IBOutlet NSButton*		rampStartStopButton;
+	IBOutlet NSButton*		loadAttenuationButton;
 }
 
 #pragma mark •••Notifications
-
-#pragma mark ***Interface Management
 - (void) rampValueChanged:(NSNotification*)aNote;
 - (void) repeatRampChanged:(NSNotification*)aNote;
 - (void) idleTimeChanged:(NSNotification*)aNote;
@@ -56,15 +51,16 @@
 
 #pragma mark •••Actions
 - (IBAction) repeatRampAction:(id)sender;
-- (IBAction) idleTimeTextFieldAction:(id)sender;
-- (IBAction) dwellTimeTextFieldAction:(id)sender;
-- (IBAction) rampEndTextFieldAction:(id)sender;
-- (IBAction) rampStartTextFieldAction:(id)sender;
-- (IBAction) stepSizeTextFieldAction:(id)sender;
-- (IBAction) attenuationTextFieldAction:(id)sender;
+- (IBAction) idleTimeAction:(id)sender;
+- (IBAction) dwellTimeAction:(id)sender;
+- (IBAction) rampEndAction:(id)sender;
+- (IBAction) rampStartAction:(id)sender;
+- (IBAction) stepSizeAction:(id)sender;
+- (IBAction) attenuationAction:(id)sender;
 - (IBAction) serialNumberAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 
+#pragma mark ***Interface Management
 - (void) populateInterfacePopup:(ORUSB*)usb;
 - (void) validateInterfacePopup;
 

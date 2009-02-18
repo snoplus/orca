@@ -2,8 +2,8 @@
 //  ORLDA102Model.h
 //  Orca
 //
-//  Created by Mark Howe on Thurs Jan 26 2007.
-//  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Wed Feb 18, 2009.
+//  Copyright (c) 2009 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 

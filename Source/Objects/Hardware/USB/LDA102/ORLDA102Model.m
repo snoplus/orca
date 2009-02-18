@@ -4,8 +4,8 @@
 //
 //  USB Relay I/O Interface
 //
-//  Created by Mark Howe on Thurs Jan 26 2007.
-//  Copyright (c) 2003 CENPA, University of Washington. All rights reserved.
+//  Created by Mark Howe on Wed Feb 18, 2009.
+//  Copyright (c) 2009 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -19,7 +19,6 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
 
 #pragma mark •••Imported Files
 #import "ORLDA102Model.h"
@@ -35,11 +34,9 @@ NSString* ORLDA102ModelAttenuationChanged	= @"ORLDA102ModelAttenuationChanged";
 NSString* ORLDA102ModelSerialNumberChanged	= @"ORLDA102ModelSerialNumberChanged";
 NSString* ORLDA102ModelUSBInterfaceChanged	= @"ORLDA102ModelUSBInterfaceChanged";
 NSString* ORLDA102ModelRampValueChanged		= @"ORLDA102ModelRampValueChanged";
-
-NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
-
 NSString* ORLDA102USBInConnection			= @"ORLDA102USBInConnection";
 NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
+NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 #define kLDA102DriverPath @"/System/Library/Extensions/LDA102.kext"
 
