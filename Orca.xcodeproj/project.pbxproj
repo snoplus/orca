@@ -1308,14 +1308,6 @@
 		849C68040A2CC20B00511E30 /* ORCCUSBModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849C68000A2CC20B00511E30 /* ORCCUSBModel.m */; };
 		849C68130A2CC4B700511E30 /* ORCCUSBController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849C68120A2CC4B700511E30 /* ORCCUSBController.m */; };
 		849C68150A2CC4C300511E30 /* ORCCUSBController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849C68140A2CC4C300511E30 /* ORCCUSBController.h */; };
-		849DA4DF0BE7BBE600044320 /* LakeShore210.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849DA4D70BE7BBE600044320 /* LakeShore210.nib */; };
-		849DA4E00BE7BBE600044320 /* LakeShore210.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849DA4D80BE7BBE600044320 /* LakeShore210.tif */; };
-		849DA4E10BE7BBE600044320 /* ORLakeShore210Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DA4D90BE7BBE600044320 /* ORLakeShore210Controller.h */; };
-		849DA4E20BE7BBE600044320 /* ORLakeShore210Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DA4DA0BE7BBE600044320 /* ORLakeShore210Controller.m */; };
-		849DA4E30BE7BBE600044320 /* ORLakeShore210Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DA4DB0BE7BBE600044320 /* ORLakeShore210Decoders.h */; };
-		849DA4E40BE7BBE600044320 /* ORLakeShore210Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DA4DC0BE7BBE600044320 /* ORLakeShore210Decoders.m */; };
-		849DA4E50BE7BBE600044320 /* ORLakeShore210Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DA4DD0BE7BBE600044320 /* ORLakeShore210Model.h */; };
-		849DA4E60BE7BBE600044320 /* ORLakeShore210Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DA4DE0BE7BBE600044320 /* ORLakeShore210Model.m */; };
 		849DA7000BF276AC00044320 /* RawPlot.gif in Resources */ = {isa = PBXBuildFile; fileRef = 849DA6FF0BF276AC00044320 /* RawPlot.gif */; };
 		849DA70E0BF4DB3000044320 /* edu.washington.npl.orca.PlotTimeSeries.plist in Resources */ = {isa = PBXBuildFile; fileRef = 849DA7080BF4DB3000044320 /* edu.washington.npl.orca.PlotTimeSeries.plist */; };
 		849DA70F0BF4DB3000044320 /* ORPlotTimeSeries.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DA7090BF4DB3000044320 /* ORPlotTimeSeries.h */; };
@@ -1502,6 +1494,14 @@
 		84B28D260F4C614000E2B056 /* ORXYScannerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D1E0F4C614000E2B056 /* ORXYScannerModel.m */; };
 		84B28D270F4C614000E2B056 /* XYScanner.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D1F0F4C614000E2B056 /* XYScanner.nib */; };
 		84B28D280F4C614000E2B056 /* XYScanner.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D200F4C614000E2B056 /* XYScanner.tif */; };
+		84B28D3D0F4C63A000E2B056 /* LakeShore210.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D350F4C63A000E2B056 /* LakeShore210.nib */; };
+		84B28D3E0F4C63A000E2B056 /* LakeShore210.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D360F4C63A000E2B056 /* LakeShore210.tif */; };
+		84B28D3F0F4C63A000E2B056 /* ORLakeShore210Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D370F4C63A000E2B056 /* ORLakeShore210Controller.h */; };
+		84B28D400F4C63A000E2B056 /* ORLakeShore210Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D380F4C63A000E2B056 /* ORLakeShore210Controller.m */; };
+		84B28D410F4C63A000E2B056 /* ORLakeShore210Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D390F4C63A000E2B056 /* ORLakeShore210Decoders.h */; };
+		84B28D420F4C63A000E2B056 /* ORLakeShore210Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D3A0F4C63A000E2B056 /* ORLakeShore210Decoders.m */; };
+		84B28D430F4C63A000E2B056 /* ORLakeShore210Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D3B0F4C63A000E2B056 /* ORLakeShore210Model.h */; };
+		84B28D440F4C63A000E2B056 /* ORLakeShore210Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D3C0F4C63A000E2B056 /* ORLakeShore210Model.m */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -3113,14 +3113,6 @@
 		849C68000A2CC20B00511E30 /* ORCCUSBModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORCCUSBModel.m; sourceTree = "<group>"; };
 		849C68120A2CC4B700511E30 /* ORCCUSBController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCCUSBController.m; path = Source/Objects/Hardware/Camac/CCUSB/ORCCUSBController.m; sourceTree = SOURCE_ROOT; };
 		849C68140A2CC4C300511E30 /* ORCCUSBController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCCUSBController.h; path = Source/Objects/Hardware/Camac/CCUSB/ORCCUSBController.h; sourceTree = SOURCE_ROOT; };
-		849DA4D70BE7BBE600044320 /* LakeShore210.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LakeShore210.nib; path = "Source/Objects/Misc Objects/LakeShore210/LakeShore210.nib"; sourceTree = SOURCE_ROOT; };
-		849DA4D80BE7BBE600044320 /* LakeShore210.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = LakeShore210.tif; path = "Source/Objects/Misc Objects/LakeShore210/LakeShore210.tif"; sourceTree = SOURCE_ROOT; };
-		849DA4D90BE7BBE600044320 /* ORLakeShore210Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLakeShore210Controller.h; path = "Source/Objects/Misc Objects/LakeShore210/ORLakeShore210Controller.h"; sourceTree = SOURCE_ROOT; };
-		849DA4DA0BE7BBE600044320 /* ORLakeShore210Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLakeShore210Controller.m; path = "Source/Objects/Misc Objects/LakeShore210/ORLakeShore210Controller.m"; sourceTree = SOURCE_ROOT; };
-		849DA4DB0BE7BBE600044320 /* ORLakeShore210Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLakeShore210Decoders.h; path = "Source/Objects/Misc Objects/LakeShore210/ORLakeShore210Decoders.h"; sourceTree = SOURCE_ROOT; };
-		849DA4DC0BE7BBE600044320 /* ORLakeShore210Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLakeShore210Decoders.m; path = "Source/Objects/Misc Objects/LakeShore210/ORLakeShore210Decoders.m"; sourceTree = SOURCE_ROOT; };
-		849DA4DD0BE7BBE600044320 /* ORLakeShore210Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLakeShore210Model.h; path = "Source/Objects/Misc Objects/LakeShore210/ORLakeShore210Model.h"; sourceTree = SOURCE_ROOT; };
-		849DA4DE0BE7BBE600044320 /* ORLakeShore210Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLakeShore210Model.m; path = "Source/Objects/Misc Objects/LakeShore210/ORLakeShore210Model.m"; sourceTree = SOURCE_ROOT; };
 		849DA6FF0BF276AC00044320 /* RawPlot.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = RawPlot.gif; path = "Source/Objects/Data Processing/Histogram Objects/BaseClasses/RawPlot.gif"; sourceTree = SOURCE_ROOT; };
 		849DA7080BF4DB3000044320 /* edu.washington.npl.orca.PlotTimeSeries.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.PlotTimeSeries.plist; path = "Source/Objects/Data Processing/Histogram Objects/PlotTimeSeries/edu.washington.npl.orca.PlotTimeSeries.plist"; sourceTree = SOURCE_ROOT; };
 		849DA7090BF4DB3000044320 /* ORPlotTimeSeries.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORPlotTimeSeries.h; path = "Source/Objects/Data Processing/Histogram Objects/PlotTimeSeries/ORPlotTimeSeries.h"; sourceTree = SOURCE_ROOT; };
@@ -3315,6 +3307,14 @@
 		84B28D1E0F4C614000E2B056 /* ORXYScannerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYScannerModel.m; path = Source/Objects/Hardware/Serial/XYScanner/ORXYScannerModel.m; sourceTree = SOURCE_ROOT; };
 		84B28D1F0F4C614000E2B056 /* XYScanner.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XYScanner.nib; path = Source/Objects/Hardware/Serial/XYScanner/XYScanner.nib; sourceTree = SOURCE_ROOT; };
 		84B28D200F4C614000E2B056 /* XYScanner.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = XYScanner.tif; path = Source/Objects/Hardware/Serial/XYScanner/XYScanner.tif; sourceTree = SOURCE_ROOT; };
+		84B28D350F4C63A000E2B056 /* LakeShore210.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LakeShore210.nib; path = Source/Objects/Hardware/Serial/LakeShore210/LakeShore210.nib; sourceTree = SOURCE_ROOT; };
+		84B28D360F4C63A000E2B056 /* LakeShore210.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = LakeShore210.tif; path = Source/Objects/Hardware/Serial/LakeShore210/LakeShore210.tif; sourceTree = SOURCE_ROOT; };
+		84B28D370F4C63A000E2B056 /* ORLakeShore210Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLakeShore210Controller.h; path = Source/Objects/Hardware/Serial/LakeShore210/ORLakeShore210Controller.h; sourceTree = SOURCE_ROOT; };
+		84B28D380F4C63A000E2B056 /* ORLakeShore210Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLakeShore210Controller.m; path = Source/Objects/Hardware/Serial/LakeShore210/ORLakeShore210Controller.m; sourceTree = SOURCE_ROOT; };
+		84B28D390F4C63A000E2B056 /* ORLakeShore210Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLakeShore210Decoders.h; path = Source/Objects/Hardware/Serial/LakeShore210/ORLakeShore210Decoders.h; sourceTree = SOURCE_ROOT; };
+		84B28D3A0F4C63A000E2B056 /* ORLakeShore210Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLakeShore210Decoders.m; path = Source/Objects/Hardware/Serial/LakeShore210/ORLakeShore210Decoders.m; sourceTree = SOURCE_ROOT; };
+		84B28D3B0F4C63A000E2B056 /* ORLakeShore210Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLakeShore210Model.h; path = Source/Objects/Hardware/Serial/LakeShore210/ORLakeShore210Model.h; sourceTree = SOURCE_ROOT; };
+		84B28D3C0F4C63A000E2B056 /* ORLakeShore210Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLakeShore210Model.m; path = Source/Objects/Hardware/Serial/LakeShore210/ORLakeShore210Model.m; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -5040,7 +5040,6 @@
 				842162F3043E6317005F64B1 /* Mouse Tasks */,
 				842162F8043E6317005F64B1 /* NetSocket */,
 				843DCF2D058E546A000C5219 /* DataGenerator */,
-				849DA4D60BE7BBE600044320 /* LakeShore210 */,
 				849DAB040C108E3C00044320 /* Ramper */,
 				843A48510A0AC2F4003DF248 /* USB */,
 				2A178EB608DB3F66001D78BC /* FireWire */,
@@ -5565,6 +5564,7 @@
 				84499B6E0F13BB6E004B855B /* MksPdr2000 */,
 				840D56D70F39E9BF00F9A274 /* Pac */,
 				84B28D180F4C614000E2B056 /* XYScanner */,
+				84B28D340F4C63A000E2B056 /* LakeShore210 */,
 			);
 			name = Serial;
 			path = Source/Objects/Hardware/Serial;
@@ -6626,22 +6626,6 @@
 			path = Source/Objects/Hardware/Camac/CCUSB;
 			sourceTree = SOURCE_ROOT;
 		};
-		849DA4D60BE7BBE600044320 /* LakeShore210 */ = {
-			isa = PBXGroup;
-			children = (
-				849DA4D80BE7BBE600044320 /* LakeShore210.tif */,
-				849DA4D70BE7BBE600044320 /* LakeShore210.nib */,
-				849DA4D90BE7BBE600044320 /* ORLakeShore210Controller.h */,
-				849DA4DA0BE7BBE600044320 /* ORLakeShore210Controller.m */,
-				849DA4DB0BE7BBE600044320 /* ORLakeShore210Decoders.h */,
-				849DA4DC0BE7BBE600044320 /* ORLakeShore210Decoders.m */,
-				849DA4DD0BE7BBE600044320 /* ORLakeShore210Model.h */,
-				849DA4DE0BE7BBE600044320 /* ORLakeShore210Model.m */,
-			);
-			name = LakeShore210;
-			path = "Source/Objects/Misc Objects/LakeShore210";
-			sourceTree = SOURCE_ROOT;
-		};
 		849DA7070BF4DB3000044320 /* PlotTimeSeries */ = {
 			isa = PBXGroup;
 			children = (
@@ -7033,6 +7017,22 @@
 			);
 			name = XYScanner;
 			path = Source/Objects/Hardware/Serial/XYScanner;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28D340F4C63A000E2B056 /* LakeShore210 */ = {
+			isa = PBXGroup;
+			children = (
+				84B28D350F4C63A000E2B056 /* LakeShore210.nib */,
+				84B28D360F4C63A000E2B056 /* LakeShore210.tif */,
+				84B28D370F4C63A000E2B056 /* ORLakeShore210Controller.h */,
+				84B28D380F4C63A000E2B056 /* ORLakeShore210Controller.m */,
+				84B28D390F4C63A000E2B056 /* ORLakeShore210Decoders.h */,
+				84B28D3A0F4C63A000E2B056 /* ORLakeShore210Decoders.m */,
+				84B28D3B0F4C63A000E2B056 /* ORLakeShore210Model.h */,
+				84B28D3C0F4C63A000E2B056 /* ORLakeShore210Model.m */,
+			);
+			name = LakeShore210;
+			path = Source/Objects/Hardware/Serial/LakeShore210;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B4329005E52B080084845B /* Security */ = {
@@ -9124,9 +9124,6 @@
 				842539FA0BCD7BFE004C8065 /* ORCARootService.h in Headers */,
 				842539FD0BCD7BFE004C8065 /* ORCARootServiceController.h in Headers */,
 				84D852E60BE171AF00290BDC /* ORCARootServiceDefs.h in Headers */,
-				849DA4E10BE7BBE600044320 /* ORLakeShore210Controller.h in Headers */,
-				849DA4E30BE7BBE600044320 /* ORLakeShore210Decoders.h in Headers */,
-				849DA4E50BE7BBE600044320 /* ORLakeShore210Model.h in Headers */,
 				9CD6DD890BE83F1B007096CE /* ORPlotFFT.h in Headers */,
 				9CD6DD8B0BE83F1B007096CE /* ORPlotFFTController.h in Headers */,
 				849DA70F0BF4DB3000044320 /* ORPlotTimeSeries.h in Headers */,
@@ -9350,6 +9347,9 @@
 				84B28D210F4C614000E2B056 /* ORXYScannerController.h in Headers */,
 				84B28D230F4C614000E2B056 /* ORXYScannerDecoders.h in Headers */,
 				84B28D250F4C614000E2B056 /* ORXYScannerModel.h in Headers */,
+				84B28D3F0F4C63A000E2B056 /* ORLakeShore210Controller.h in Headers */,
+				84B28D410F4C63A000E2B056 /* ORLakeShore210Decoders.h in Headers */,
+				84B28D430F4C63A000E2B056 /* ORLakeShore210Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9756,8 +9756,6 @@
 				842538510BC6E006004C8065 /* HP6622a.nib in Resources */,
 				842538520BC6E006004C8065 /* HP6622a.tif in Resources */,
 				842539FC0BCD7BFE004C8065 /* ORCARootService.nib in Resources */,
-				849DA4DF0BE7BBE600044320 /* LakeShore210.nib in Resources */,
-				849DA4E00BE7BBE600044320 /* LakeShore210.tif in Resources */,
 				9CD6DD880BE83F1B007096CE /* edu.washington.npl.orca.PlotFFT.plist in Resources */,
 				9CD6DD8D0BE83F1B007096CE /* PlotFFT.nib in Resources */,
 				849DA7000BF276AC00044320 /* RawPlot.gif in Resources */,
@@ -9933,6 +9931,8 @@
 				84B28CF90F4C5DBB00E2B056 /* Ami286.tif in Resources */,
 				84B28D270F4C614000E2B056 /* XYScanner.nib in Resources */,
 				84B28D280F4C614000E2B056 /* XYScanner.tif in Resources */,
+				84B28D3D0F4C63A000E2B056 /* LakeShore210.nib in Resources */,
+				84B28D3E0F4C63A000E2B056 /* LakeShore210.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10418,9 +10418,6 @@
 				842539500BCD4C29004C8065 /* ORHP6622aController.m in Sources */,
 				842539FB0BCD7BFE004C8065 /* ORCARootService.m in Sources */,
 				842539FE0BCD7BFE004C8065 /* ORCARootServiceController.m in Sources */,
-				849DA4E20BE7BBE600044320 /* ORLakeShore210Controller.m in Sources */,
-				849DA4E40BE7BBE600044320 /* ORLakeShore210Decoders.m in Sources */,
-				849DA4E60BE7BBE600044320 /* ORLakeShore210Model.m in Sources */,
 				9CD6DD8A0BE83F1B007096CE /* ORPlotFFT.m in Sources */,
 				9CD6DD8C0BE83F1B007096CE /* ORPlotFFTController.m in Sources */,
 				849DA7100BF4DB3000044320 /* ORPlotTimeSeries.m in Sources */,
@@ -10618,6 +10615,9 @@
 				84B28D220F4C614000E2B056 /* ORXYScannerController.m in Sources */,
 				84B28D240F4C614000E2B056 /* ORXYScannerDecoders.m in Sources */,
 				84B28D260F4C614000E2B056 /* ORXYScannerModel.m in Sources */,
+				84B28D400F4C63A000E2B056 /* ORLakeShore210Controller.m in Sources */,
+				84B28D420F4C63A000E2B056 /* ORLakeShore210Decoders.m in Sources */,
+				84B28D440F4C63A000E2B056 /* ORLakeShore210Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
