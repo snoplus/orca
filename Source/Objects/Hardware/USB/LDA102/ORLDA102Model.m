@@ -25,12 +25,12 @@
 #import "ORLDA102Model.h"
 #import "ORUSBInterface.h"
 
-NSString* ORLDA102ModelIdleTimeChanged = @"ORLDA102ModelIdleTimeChanged";
-NSString* ORLDA102ModelDwellTimeChanged = @"ORLDA102ModelDwellTimeChanged";
-NSString* ORLDA102ModelRampEndChanged = @"ORLDA102ModelRampEndChanged";
-NSString* ORLDA102ModelRampStartChanged = @"ORLDA102ModelRampStartChanged";
-NSString* ORLDA102ModelStepSizeChanged = @"ORLDA102ModelStepSizeChanged";
-NSString* ORLDA102ModelAttenuationChanged = @"ORLDA102ModelAttenuationChanged";
+NSString* ORLDA102ModelIdleTimeChanged		= @"ORLDA102ModelIdleTimeChanged";
+NSString* ORLDA102ModelDwellTimeChanged		= @"ORLDA102ModelDwellTimeChanged";
+NSString* ORLDA102ModelRampEndChanged		= @"ORLDA102ModelRampEndChanged";
+NSString* ORLDA102ModelRampStartChanged		= @"ORLDA102ModelRampStartChanged";
+NSString* ORLDA102ModelStepSizeChanged		= @"ORLDA102ModelStepSizeChanged";
+NSString* ORLDA102ModelAttenuationChanged	= @"ORLDA102ModelAttenuationChanged";
 NSString* ORLDA102ModelSerialNumberChanged	= @"ORLDA102ModelSerialNumberChanged";
 NSString* ORLDA102ModelUSBInterfaceChanged	= @"ORLDA102ModelUSBInterfaceChanged";
 NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
@@ -40,8 +40,34 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 
 #define kLDA102DriverPath @"/System/Library/Extensions/LDA102.kext"
 
-@implementation ORLDA102Model
+//set commands
+#define kSetAttenuation 0x8D
+#define kSetDwellTime   0xB3
+#define kSetStartAtt    0xB0
+#define kSetStopAtt     0xB1
+#define kSetStepSize    0xB2
+#define kSetWaitTime    0xB6
+#define kSetRampState	0x89
 
+//ramp state
+#define kSingleRamp		0x01
+#define kStopRamp		0x00
+#define kContinousRamp	0x02
+
+//read commands
+#define kGetAttenuation 0x0D
+#define kGetDwellTime   0x33
+#define kGetStartAtt    0x30
+#define kGetStopAtt     0x31
+#define kGetStepSize    0x32
+#define kGetWaitTime    0x36
+#define kGetRampState	0x09
+#define kGetMaxAtt		0x35
+
+//response commands
+#define kAttResponse	0x04
+
+@implementation ORLDA102Model
 - (void) makeConnectors
 {
 	ORConnector* connectorObj1 = [[ ORConnector alloc ] 
@@ -49,7 +75,7 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 								  withGuardian: self];
 	[[ self connectors ] setObject: connectorObj1 forKey: ORLDA102USBInConnection ];
 	[ connectorObj1 setConnectorType: 'USBI' ];
-	[ connectorObj1 addRestrictedConnectionType: 'USBO' ]; //can only connect to gpib outputs
+	[ connectorObj1 addRestrictedConnectionType: 'USBO' ]; //can only connect to usb outputs
 	[connectorObj1 setOffColor:[NSColor yellowColor]];
 	[ connectorObj1 release ];
 	
@@ -58,7 +84,7 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 								  withGuardian: self];
 	[[ self connectors ] setObject: connectorObj2 forKey: ORLDA102USBNextConnection ];
 	[ connectorObj2 setConnectorType: 'USBO' ];
-	[ connectorObj2 addRestrictedConnectionType: 'USBI' ]; //can only connect to gpib inputs
+	[ connectorObj2 addRestrictedConnectionType: 'USBI' ]; //can only connect to usb inputs
 	[connectorObj2 setOffColor:[NSColor yellowColor]];
 	[ connectorObj2 release ];
 }
@@ -84,7 +110,6 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 - (void) awakeAfterDocumentLoaded
 {
 	@try {
-		
 		[self connectionChanged];
 		
 		//make sure the driver is installed.
@@ -102,18 +127,15 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 	}
 	@catch(NSException* localException) {
 	}
-	
 }
 
 
 -(void) setUpImage
 {
-	
     //---------------------------------------------------------------------------------------------------
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
     //so, we cache the image here so we can draw into it.
     //---------------------------------------------------------------------------------------------------
-    
 	NSImage* aCachedImage = [NSImage imageNamed:@"LDA102"];
     if(!usbInterface){
 		NSSize theIconSize = [aCachedImage size];
@@ -144,7 +166,6 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 		[ self setImage: aCachedImage];
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object: self];
-	
 }
 
 - (NSString*) title 
@@ -154,12 +175,12 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 
 - (unsigned long) vendorID
 {
-	return 0x0a07; //Ontrak ID
+	return 0x041F;
 }
 
 - (unsigned long) productID
 {
-	return 0x00C8;	//LDA102 ID
+	return 0x1207;	//LDA102 ID
 }
 
 - (id) getUSBController
@@ -170,7 +191,6 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 }
 
 #pragma mark ***Accessors
-
 - (int) idleTime
 {
     return idleTime;
@@ -285,11 +305,13 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 	 object: self];
 	
 	if(usbInterface){
+		[self startReadThread];
 		[noUSBAlarm clearAlarm];
 		[noUSBAlarm release];
 		noUSBAlarm = nil;
 	}
 	else {
+		[self stopReadThread];
 		if(!noUSBAlarm){
 			noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for LDA102"] severity:kHardwareAlarm];
 			[noUSBAlarm setSticky:YES];		
@@ -297,9 +319,7 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 		[noUSBAlarm setAcknowledged:NO];
 		[noUSBAlarm postAlarm];
 	}
-	
 	[self setUpImage];
-	
 }
 
 - (void) interfaceAdded:(NSNotification*)aNote
@@ -313,7 +333,6 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 		[self setUsbInterface:nil];
 	}
 }
-
 
 - (NSString*) usbInterfaceDescription
 {
@@ -335,6 +354,54 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 - (void) makeUSBClaim:(NSString*)aSerialNumber
 {
 }
+
+#pragma mark ***Thread methods
+- (void) startReadThread
+{
+	timeToStop = NO;
+	[NSThread detachNewThreadSelector:@selector(responseThread) toTarget:self withObject:(id)nil];
+}
+
+- (void) stopReadThread
+{
+	timeToStop = YES;
+	//wait for thread to stop
+	float timeOut = 1;
+	while(threadRunning){
+		[ORTimer delay:.01];
+		timeOut -= .01;
+		if(timeOut<=0)break;
+	}
+}
+
+- (void) responseThread
+{
+	threadRunning = YES;
+	
+	do {
+		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+		if(usbInterface && [self getUSBController]){
+			unsigned char data[8];
+			int amountRead = [usbInterface readBytesFastNoThrow:data length:8];
+			if(amountRead == 8){
+				[self decodeResponse:data];
+			}
+		}
+		[pool release];
+	} while(!timeToStop);
+	
+	threadRunning = NO;
+}
+
+- (void) decodeResponse:(unsigned char*)data
+{
+	switch(data[0]){
+		case kGetAttenuation:
+		break;
+	}
+}
+
+
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -367,32 +434,18 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 }
 
 #pragma mark ***Comm methods
-
-- (void) formatCommand:(NSString*)aCommand buffer:(char*)data
-{
-	memset(data,0,8);
-	data[0] = 0x1;
-	int i;
-	for(i=0;i<MIN([aCommand length],7);i++){
-		data[i+1] = [aCommand characterAtIndex:i];
-	}
-}
-
-- (void) writeCommand:(NSString*)aCommand
+- (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count data:(unsigned char*)contents
 {
 	if(usbInterface && [self getUSBController]){
-		char data[8];
-		[self formatCommand:aCommand buffer:data];
-		[usbInterface writeBytesOnInterruptPipe:data length:8];
-		if(data[1] == 'R' || [aCommand isEqualToString:@"PK"] || [aCommand isEqualToString:@"PA"] || [aCommand isEqualToString:@"DB"]){
-			int amountRead = [usbInterface readBytesOnInterruptPipe:data length:8];
-			if(amountRead == 8){
-				NSString* s = [[[NSString alloc] initWithBytes:&data[1] length:7 encoding:NSASCIIStringEncoding] autorelease];
-				NSLog(@"Response to command: %@ = %@\n",aCommand,s);
-			}
+		unsigned char data[8];
+		data[0] = cmdWord;
+		data[1] = count;
+		int i;
+		for(i=0;i<count;i++){
+			data[2+i] = contents[i];
 		}
+		[usbInterface writeBytesOnInterruptPipe:data length:8]; //?might have to use the regular out pipe
 	}
 }
-
 
 @end

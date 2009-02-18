@@ -58,7 +58,6 @@
 - (IBAction) stepSizeTextFieldAction:(id)sender;
 - (IBAction) attenuationTextFieldAction:(id)sender;
 - (IBAction) serialNumberAction:(id)sender;
-- (IBAction) sendCommandAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 
 - (void) populateInterfacePopup:(ORUSB*)usb;

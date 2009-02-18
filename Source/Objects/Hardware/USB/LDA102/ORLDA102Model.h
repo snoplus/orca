@@ -39,6 +39,10 @@
     float rampEnd;
     int dwellTime;
     int idleTime;
+	
+	//Thread variables
+	BOOL threadRunning;
+	BOOL timeToStop;
 }
 
 - (id) getUSBController;
@@ -56,7 +60,6 @@
 - (void) setStepSize:(float)aStepSize;
 - (float) attenuation;
 - (void) setAttenuation:(float)aAttenuation;
-- (void) formatCommand:(NSString*)aCommand buffer:(char*)data;
 - (ORUSBInterface*) usbInterface;
 - (void) setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*) serialNumber;
@@ -69,7 +72,13 @@
 - (void) interfaceRemoved:(NSNotification*)aNote;
 
 #pragma mark ***Comm methods
-- (void) writeCommand:(NSString*)aCommand;
+- (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count data:(unsigned char*)contents;
+
+#pragma mark ***Thread methods
+- (void) startReadThread;
+- (void) stopReadThread;
+- (void) decodeResponse:(unsigned char*)data;
+- (void) responseThread;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

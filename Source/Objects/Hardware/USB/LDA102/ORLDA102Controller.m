@@ -253,25 +253,6 @@
 	}
 }
 
-- (IBAction) sendCommandAction:(id)sender
-{
-	@try {
-		[self endEditing];
-		if([commandField stringValue]){
-			[model writeCommand:[commandField stringValue]];
-		}
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
-	
-}
-
 
 
 @end
