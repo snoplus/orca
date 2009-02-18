@@ -25,7 +25,7 @@
 #import "ORLDA102Model.h"
 #import "ORUSBInterface.h"
 
-NSString* ORLDA102ModelRepeatRampChanged = @"ORLDA102ModelRepeatRampChanged";
+NSString* ORLDA102ModelRepeatRampChanged	= @"ORLDA102ModelRepeatRampChanged";
 NSString* ORLDA102ModelIdleTimeChanged		= @"ORLDA102ModelIdleTimeChanged";
 NSString* ORLDA102ModelDwellTimeChanged		= @"ORLDA102ModelDwellTimeChanged";
 NSString* ORLDA102ModelRampEndChanged		= @"ORLDA102ModelRampEndChanged";
@@ -34,6 +34,8 @@ NSString* ORLDA102ModelStepSizeChanged		= @"ORLDA102ModelStepSizeChanged";
 NSString* ORLDA102ModelAttenuationChanged	= @"ORLDA102ModelAttenuationChanged";
 NSString* ORLDA102ModelSerialNumberChanged	= @"ORLDA102ModelSerialNumberChanged";
 NSString* ORLDA102ModelUSBInterfaceChanged	= @"ORLDA102ModelUSBInterfaceChanged";
+NSString* ORLDA102ModelRampValueChanged		= @"ORLDA102ModelRampValueChanged";
+
 NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 NSString* ORLDA102USBInConnection			= @"ORLDA102USBInConnection";
@@ -192,6 +194,18 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 }
 
 #pragma mark ***Accessors
+
+- (float) rampValue
+{
+    return rampValue;
+}
+
+- (void) setRampValue:(float)aRampValue
+{
+    rampValue = aRampValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelRampValueChanged object:self];
+	
+}
 
 - (BOOL) repeatRamp
 {

@@ -33,12 +33,14 @@
     NSString* serialNumber;
 	ORAlarm*  noUSBAlarm;
 	ORAlarm*  noDriverAlarm;
-    short attenuation;
-    float stepSize;
-    float rampStart;
-    float rampEnd;
-    int dwellTime;
-    int idleTime;
+    short	attenuation;
+    float	stepSize;
+    float	rampStart;
+    float	rampEnd;
+    int		dwellTime;
+    int		idleTime;
+    BOOL	repeatRamp;
+    float	rampValue;
 	
 	//Thread variables
 	BOOL threadRunning;
@@ -48,6 +50,10 @@
 - (id) getUSBController;
 
 #pragma mark ***Accessors
+- (float) rampValue;
+- (void) setRampValue:(float)aRampValue;
+- (BOOL) repeatRamp;
+- (void) setRepeatRamp:(BOOL)aRepeatRamp;
 - (int) idleTime;
 - (void) setIdleTime:(int)aIdleTime;
 - (int) dwellTime;
@@ -86,6 +92,8 @@
 
 @end
 
+extern NSString* ORLDA102ModelRampValueChanged;
+extern NSString* ORLDA102ModelRepeatRampChanged;
 extern NSString* ORLDA102ModelIdleTimeChanged;
 extern NSString* ORLDA102ModelDwellTimeChanged;
 extern NSString* ORLDA102ModelRampEndChanged;

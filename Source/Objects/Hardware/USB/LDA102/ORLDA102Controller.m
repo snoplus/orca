@@ -65,6 +65,7 @@
 					 selector : @selector(lockChanged:)
 						 name : ORLDA102ModelLock
 						object: nil];
+	
     [notifyCenter addObserver : self
                      selector : @selector(attenuationChanged:)
                          name : ORLDA102ModelAttenuationChanged
@@ -100,6 +101,12 @@
                          name : ORLDA102ModelRepeatRampChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(rampValueChanged:)
+                         name : ORLDA102ModelRampValueChanged
+						object: model];
+	
+	
 }
 
 - (void) awakeFromNib
@@ -120,11 +127,17 @@
 	[self dwellTimeChanged:nil];
 	[self idleTimeChanged:nil];
 	[self repeatRampChanged:nil];
+	[self rampValueChanged:nil];
 }
 
 - (void) repeatRampChanged:(NSNotification*)aNote
 {
 	[repeatRampButton setIntValue: [model repeatRamp]];
+}
+
+- (void) rampValueChanged:(NSNotification*)aNote
+{
+	[rampValueField setFloatValue: [model rampValue]];
 }
 
 - (void) idleTimeChanged:(NSNotification*)aNote

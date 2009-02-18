@@ -26,6 +26,7 @@
 @interface ORLDA102Controller : OrcaObjectController 
 {
 	IBOutlet NSPopUpButton* serialNumberPopup;
+	IBOutlet NSTextField*	rampValueField;
 	IBOutlet NSButton*		repeatRampButton;
 	IBOutlet NSTextField*	idleTimeTextField;
 	IBOutlet NSTextField*	dwellTimeTextField;
@@ -41,6 +42,7 @@
 #pragma mark •••Notifications
 
 #pragma mark ***Interface Management
+- (void) rampValueChanged:(NSNotification*)aNote;
 - (void) repeatRampChanged:(NSNotification*)aNote;
 - (void) idleTimeChanged:(NSNotification*)aNote;
 - (void) dwellTimeChanged:(NSNotification*)aNote;

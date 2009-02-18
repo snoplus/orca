@@ -106,6 +106,8 @@
 				<string>NSTextField</string>
 				<key>rampStartTextField</key>
 				<string>NSTextField</string>
+				<key>rampValueField</key>
+				<string>NSTextField</string>
 				<key>repeatRampButton</key>
 				<string>NSButton</string>
 				<key>sendCommandButton</key>
