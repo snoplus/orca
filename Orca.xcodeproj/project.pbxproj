@@ -283,14 +283,6 @@
 		841B061B0EC4837000B6F77C /* SupportedUSBDevices.h in Headers */ = {isa = PBXBuildFile; fileRef = 841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */; };
 		841C6CCF0DA1557A007BE1E9 /* ORCaen1720Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */; };
 		841C6CD30DA155AF007BE1E9 /* ORCaen1720Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */; };
-		841C842D07EB418A0028BEED /* Motor.nib in Resources */ = {isa = PBXBuildFile; fileRef = 841C842407EB418A0028BEED /* Motor.nib */; };
-		841C842E07EB418A0028BEED /* MotorBreakpointHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 841C842507EB418A0028BEED /* MotorBreakpointHelp.plist */; };
-		841C842F07EB418A0028BEED /* ORMotorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 841C842607EB418A0028BEED /* ORMotorController.h */; };
-		841C843007EB418A0028BEED /* ORMotorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C842707EB418A0028BEED /* ORMotorController.m */; };
-		841C843107EB418A0028BEED /* ORMotorDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 841C842807EB418A0028BEED /* ORMotorDecoders.h */; };
-		841C843207EB418A0028BEED /* ORMotorDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C842907EB418A0028BEED /* ORMotorDecoders.m */; };
-		841C843307EB418A0028BEED /* ORMotorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 841C842A07EB418A0028BEED /* ORMotorModel.h */; };
-		841C843407EB418A0028BEED /* ORMotorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 841C842B07EB418A0028BEED /* ORMotorModel.m */; };
 		841DA00A0780D7CA0099BBF6 /* ORTRS1Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 841DA0080780D7CA0099BBF6 /* ORTRS1Model.h */; };
 		841DA00B0780D7CA0099BBF6 /* ORTRS1Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 841DA0090780D7CA0099BBF6 /* ORTRS1Model.m */; };
 		841DA01D0780D8E20099BBF6 /* ORCamacIOCard.m in Sources */ = {isa = PBXBuildFile; fileRef = 841DA01B0780D8E20099BBF6 /* ORCamacIOCard.m */; };
@@ -1112,7 +1104,6 @@
 		84861D330ACD83F300C543D7 /* ORL4532Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84861D2D0ACD83F300C543D7 /* ORL4532Model.m */; };
 		84861DAA0ACDA9B600C543D7 /* ORL4532Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84861DA80ACDA9B600C543D7 /* ORL4532Decoders.h */; };
 		84861DAB0ACDA9B600C543D7 /* ORL4532Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84861DA90ACDA9B600C543D7 /* ORL4532Decoders.m */; };
-		8486258D08E474EC00301049 /* Motor.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8486258C08E474EC00301049 /* Motor.tif */; };
 		848625D108E4831700301049 /* DataTask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848625D008E4831700301049 /* DataTask.tif */; };
 		848625D808E4961400301049 /* RunControl.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848625D708E4961400301049 /* RunControl.tif */; };
 		848625DA08E49A8E00301049 /* RemoteRunControl.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848625D908E49A8E00301049 /* RemoteRunControl.tif */; };
@@ -1514,6 +1505,15 @@
 		84B28D910F4C66BE00E2B056 /* ORVXMModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D890F4C66BE00E2B056 /* ORVXMModel.m */; };
 		84B28D920F4C66BE00E2B056 /* VXM.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D8A0F4C66BE00E2B056 /* VXM.nib */; };
 		84B28D930F4C66BE00E2B056 /* VXM.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D8B0F4C66BE00E2B056 /* VXM.tif */; };
+		84B28D9E0F4C684200E2B056 /* Motor.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D950F4C684200E2B056 /* Motor.nib */; };
+		84B28D9F0F4C684200E2B056 /* Motor.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D960F4C684200E2B056 /* Motor.tif */; };
+		84B28DA00F4C684200E2B056 /* MotorBreakpointHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D970F4C684200E2B056 /* MotorBreakpointHelp.plist */; };
+		84B28DA10F4C684200E2B056 /* ORMotorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D980F4C684200E2B056 /* ORMotorController.h */; };
+		84B28DA20F4C684200E2B056 /* ORMotorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D990F4C684200E2B056 /* ORMotorController.m */; };
+		84B28DA30F4C684200E2B056 /* ORMotorDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D9A0F4C684200E2B056 /* ORMotorDecoders.h */; };
+		84B28DA40F4C684200E2B056 /* ORMotorDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D9B0F4C684200E2B056 /* ORMotorDecoders.m */; };
+		84B28DA50F4C684200E2B056 /* ORMotorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D9C0F4C684200E2B056 /* ORMotorModel.h */; };
+		84B28DA60F4C684200E2B056 /* ORMotorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D9D0F4C684200E2B056 /* ORMotorModel.m */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -2315,14 +2315,6 @@
 		841B061A0EC4837000B6F77C /* SupportedUSBDevices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedUSBDevices.h; sourceTree = "<group>"; };
 		841C6CCE0DA1557A007BE1E9 /* ORCaen1720Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Controller.m; sourceTree = SOURCE_ROOT; };
 		841C6CD20DA155AF007BE1E9 /* ORCaen1720Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1720Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1720/ORCaen1720Model.m; sourceTree = SOURCE_ROOT; };
-		841C842407EB418A0028BEED /* Motor.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Motor.nib; sourceTree = "<group>"; };
-		841C842507EB418A0028BEED /* MotorBreakpointHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = MotorBreakpointHelp.plist; sourceTree = "<group>"; };
-		841C842607EB418A0028BEED /* ORMotorController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMotorController.h; sourceTree = "<group>"; };
-		841C842707EB418A0028BEED /* ORMotorController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORMotorController.m; sourceTree = "<group>"; };
-		841C842807EB418A0028BEED /* ORMotorDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMotorDecoders.h; sourceTree = "<group>"; };
-		841C842907EB418A0028BEED /* ORMotorDecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORMotorDecoders.m; sourceTree = "<group>"; };
-		841C842A07EB418A0028BEED /* ORMotorModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORMotorModel.h; sourceTree = "<group>"; };
-		841C842B07EB418A0028BEED /* ORMotorModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORMotorModel.m; sourceTree = "<group>"; };
 		841DA0080780D7CA0099BBF6 /* ORTRS1Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORTRS1Model.h; sourceTree = "<group>"; };
 		841DA0090780D7CA0099BBF6 /* ORTRS1Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORTRS1Model.m; sourceTree = "<group>"; };
 		841DA01B0780D8E20099BBF6 /* ORCamacIOCard.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCamacIOCard.m; path = "Source/Objects/Hardware/Camac/Camac Base Classes/ORCamacIOCard.m"; sourceTree = SOURCE_ROOT; };
@@ -2910,7 +2902,6 @@
 		84861D2D0ACD83F300C543D7 /* ORL4532Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL4532Model.m; path = Source/Objects/Hardware/Camac/L4532/ORL4532Model.m; sourceTree = SOURCE_ROOT; };
 		84861DA80ACDA9B600C543D7 /* ORL4532Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL4532Decoders.h; path = Source/Objects/Hardware/Camac/L4532/ORL4532Decoders.h; sourceTree = SOURCE_ROOT; };
 		84861DA90ACDA9B600C543D7 /* ORL4532Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL4532Decoders.m; path = Source/Objects/Hardware/Camac/L4532/ORL4532Decoders.m; sourceTree = SOURCE_ROOT; };
-		8486258C08E474EC00301049 /* Motor.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Motor.tif; sourceTree = "<group>"; };
 		848625D008E4831700301049 /* DataTask.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DataTask.tif; path = Source/Objects/Control/DataTask/DataTask.tif; sourceTree = SOURCE_ROOT; };
 		848625D708E4961400301049 /* RunControl.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RunControl.tif; sourceTree = "<group>"; };
 		848625D908E49A8E00301049 /* RemoteRunControl.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RemoteRunControl.tif; path = Source/Objects/Control/RemoteRunControl/RemoteRunControl.tif; sourceTree = SOURCE_ROOT; };
@@ -3327,6 +3318,15 @@
 		84B28D890F4C66BE00E2B056 /* ORVXMModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORVXMModel.m; path = Source/Objects/Hardware/Serial/VXM/ORVXMModel.m; sourceTree = SOURCE_ROOT; };
 		84B28D8A0F4C66BE00E2B056 /* VXM.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = VXM.nib; path = Source/Objects/Hardware/Serial/VXM/VXM.nib; sourceTree = SOURCE_ROOT; };
 		84B28D8B0F4C66BE00E2B056 /* VXM.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = VXM.tif; path = Source/Objects/Hardware/Serial/VXM/VXM.tif; sourceTree = SOURCE_ROOT; };
+		84B28D950F4C684200E2B056 /* Motor.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Motor.nib; path = Source/Objects/Hardware/Vme/MCarrier/Motor/Motor.nib; sourceTree = SOURCE_ROOT; };
+		84B28D960F4C684200E2B056 /* Motor.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Motor.tif; path = Source/Objects/Hardware/Vme/MCarrier/Motor/Motor.tif; sourceTree = SOURCE_ROOT; };
+		84B28D970F4C684200E2B056 /* MotorBreakpointHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = MotorBreakpointHelp.plist; path = Source/Objects/Hardware/Vme/MCarrier/Motor/MotorBreakpointHelp.plist; sourceTree = SOURCE_ROOT; };
+		84B28D980F4C684200E2B056 /* ORMotorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMotorController.h; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorController.h; sourceTree = SOURCE_ROOT; };
+		84B28D990F4C684200E2B056 /* ORMotorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotorController.m; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorController.m; sourceTree = SOURCE_ROOT; };
+		84B28D9A0F4C684200E2B056 /* ORMotorDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMotorDecoders.h; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorDecoders.h; sourceTree = SOURCE_ROOT; };
+		84B28D9B0F4C684200E2B056 /* ORMotorDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotorDecoders.m; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorDecoders.m; sourceTree = SOURCE_ROOT; };
+		84B28D9C0F4C684200E2B056 /* ORMotorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMotorModel.h; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorModel.h; sourceTree = SOURCE_ROOT; };
+		84B28D9D0F4C684200E2B056 /* ORMotorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotorModel.m; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorModel.m; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -4830,23 +4830,6 @@
 			path = "Source/Objects/Custom Hardware/Ncd Hardware/PulserDistrib";
 			sourceTree = SOURCE_ROOT;
 		};
-		841C842207EB418A0028BEED /* Motor */ = {
-			isa = PBXGroup;
-			children = (
-				841C842B07EB418A0028BEED /* ORMotorModel.m */,
-				841C842A07EB418A0028BEED /* ORMotorModel.h */,
-				841C842707EB418A0028BEED /* ORMotorController.m */,
-				841C842607EB418A0028BEED /* ORMotorController.h */,
-				841C842807EB418A0028BEED /* ORMotorDecoders.h */,
-				841C842907EB418A0028BEED /* ORMotorDecoders.m */,
-				841C842507EB418A0028BEED /* MotorBreakpointHelp.plist */,
-				8486258C08E474EC00301049 /* Motor.tif */,
-				841C842407EB418A0028BEED /* Motor.nib */,
-			);
-			name = Motor;
-			path = "Source/Objects/Misc Objects/Motor";
-			sourceTree = SOURCE_ROOT;
-		};
 		841DA0050780D7CA0099BBF6 /* Camac */ = {
 			isa = PBXGroup;
 			children = (
@@ -5041,7 +5024,6 @@
 				843A48510A0AC2F4003DF248 /* USB */,
 				2A178EB608DB3F66001D78BC /* FireWire */,
 				2A943A5B08A8194B00D04541 /* SerialPorts */,
-				841C842207EB418A0028BEED /* Motor */,
 				840B8135094E4D8D00B1B135 /* Label */,
 				847597450B5EF26500123411 /* SQL */,
 			);
@@ -5910,6 +5892,7 @@
 				84749D1407D6526F001553EC /* MCarrierCard.gif */,
 				84749D1307D6526F001553EC /* MCarrier.nib */,
 				84749D0B07D6526F001553EC /* M321 */,
+				84B28D940F4C684200E2B056 /* Motor */,
 			);
 			name = MCarrier;
 			path = Source/Objects/Hardware/Vme/MCarrier;
@@ -7066,6 +7049,23 @@
 			);
 			name = VXM;
 			path = Source/Objects/Hardware/Serial/VXM;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28D940F4C684200E2B056 /* Motor */ = {
+			isa = PBXGroup;
+			children = (
+				84B28D950F4C684200E2B056 /* Motor.nib */,
+				84B28D960F4C684200E2B056 /* Motor.tif */,
+				84B28D970F4C684200E2B056 /* MotorBreakpointHelp.plist */,
+				84B28D980F4C684200E2B056 /* ORMotorController.h */,
+				84B28D990F4C684200E2B056 /* ORMotorController.m */,
+				84B28D9A0F4C684200E2B056 /* ORMotorDecoders.h */,
+				84B28D9B0F4C684200E2B056 /* ORMotorDecoders.m */,
+				84B28D9C0F4C684200E2B056 /* ORMotorModel.h */,
+				84B28D9D0F4C684200E2B056 /* ORMotorModel.m */,
+			);
+			name = Motor;
+			path = Source/Objects/Hardware/Vme/MCarrier/Motor;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B4329005E52B080084845B /* Security */ = {
@@ -8914,9 +8914,6 @@
 				84749DCF07D66EBC001553EC /* ORVmeCarrierCard.h in Headers */,
 				84BB920407E210090092B367 /* ORMotorSweeper.h in Headers */,
 				84BB97FC07E613B50092B367 /* ORMotorPattern.h in Headers */,
-				841C842F07EB418A0028BEED /* ORMotorController.h in Headers */,
-				841C843107EB418A0028BEED /* ORMotorDecoders.h in Headers */,
-				841C843307EB418A0028BEED /* ORMotorModel.h in Headers */,
 				1C50F9F408033CA9008D18EA /* ORADC2249Controller.h in Headers */,
 				1C50F9F608033CA9008D18EA /* ORADC2249Decoders.h in Headers */,
 				1C50F9F808033CA9008D18EA /* ORADC2249Model.h in Headers */,
@@ -9351,6 +9348,9 @@
 				84B28D8C0F4C66BE00E2B056 /* ORVXMController.h in Headers */,
 				84B28D8E0F4C66BE00E2B056 /* ORVXMDecoders.h in Headers */,
 				84B28D900F4C66BE00E2B056 /* ORVXMModel.h in Headers */,
+				84B28DA10F4C684200E2B056 /* ORMotorController.h in Headers */,
+				84B28DA30F4C684200E2B056 /* ORMotorDecoders.h in Headers */,
+				84B28DA50F4C684200E2B056 /* ORMotorModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9585,8 +9585,6 @@
 				84749D1C07D6526F001553EC /* M321.nib in Resources */,
 				84749D2207D6526F001553EC /* MCarrier.nib in Resources */,
 				84749D2307D6526F001553EC /* MCarrierCard.gif in Resources */,
-				841C842D07EB418A0028BEED /* Motor.nib in Resources */,
-				841C842E07EB418A0028BEED /* MotorBreakpointHelp.plist in Resources */,
 				1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */,
 				1C50F9F208033CA9008D18EA /* ADC2249Card.gif in Resources */,
 				84539C580807247C00615B6D /* RemoteRunControl.nib in Resources */,
@@ -9605,7 +9603,6 @@
 				2A4553EA08BCE9A3004BB15E /* TDC3377.nib in Resources */,
 				84799A3F08DF5C6400D848FB /* SplashScreen.nib in Resources */,
 				84799B3908DF70B300D848FB /* CENPA.gif in Resources */,
-				8486258D08E474EC00301049 /* Motor.tif in Resources */,
 				848625D108E4831700301049 /* DataTask.tif in Resources */,
 				848625D808E4961400301049 /* RunControl.tif in Resources */,
 				848625DA08E49A8E00301049 /* RemoteRunControl.tif in Resources */,
@@ -9934,6 +9931,9 @@
 				84B28D7B0F4C658500E2B056 /* NplpCMeterIcon.tif in Resources */,
 				84B28D920F4C66BE00E2B056 /* VXM.nib in Resources */,
 				84B28D930F4C66BE00E2B056 /* VXM.tif in Resources */,
+				84B28D9E0F4C684200E2B056 /* Motor.nib in Resources */,
+				84B28D9F0F4C684200E2B056 /* Motor.tif in Resources */,
+				84B28DA00F4C684200E2B056 /* MotorBreakpointHelp.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10223,9 +10223,6 @@
 				84749DD007D66EBC001553EC /* ORVmeCarrierCard.m in Sources */,
 				84BB920507E210090092B367 /* ORMotorSweeper.m in Sources */,
 				84BB97FB07E613B50092B367 /* ORMotorPattern.m in Sources */,
-				841C843007EB418A0028BEED /* ORMotorController.m in Sources */,
-				841C843207EB418A0028BEED /* ORMotorDecoders.m in Sources */,
-				841C843407EB418A0028BEED /* ORMotorModel.m in Sources */,
 				1C50F9F508033CA9008D18EA /* ORADC2249Controller.m in Sources */,
 				1C50F9F708033CA9008D18EA /* ORADC2249Decoders.m in Sources */,
 				1C50F9F908033CA9008D18EA /* ORADC2249Model.m in Sources */,
@@ -10619,6 +10616,9 @@
 				84B28D8D0F4C66BE00E2B056 /* ORVXMController.m in Sources */,
 				84B28D8F0F4C66BE00E2B056 /* ORVXMDecoders.m in Sources */,
 				84B28D910F4C66BE00E2B056 /* ORVXMModel.m in Sources */,
+				84B28DA20F4C684200E2B056 /* ORMotorController.m in Sources */,
+				84B28DA40F4C684200E2B056 /* ORMotorDecoders.m in Sources */,
+				84B28DA60F4C684200E2B056 /* ORMotorModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
