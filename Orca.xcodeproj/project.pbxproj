@@ -953,14 +953,6 @@
 		84662FAD070B3745001CDA7E /* exMark.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84662FAB070B3745001CDA7E /* exMark.tif */; };
 		84662FAE070B3745001CDA7E /* checkMark.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84662FAC070B3745001CDA7E /* checkMark.tif */; };
 		84662FB4070B3879001CDA7E /* questionMark.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84662FB3070B3879001CDA7E /* questionMark.tif */; };
-		8466EE930C83843200D076AA /* BocTIC3.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8466EE8A0C83843200D076AA /* BocTIC3.nib */; };
-		8466EE940C83843200D076AA /* BocTIC3.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8466EE8B0C83843200D076AA /* BocTIC3.tif */; };
-		8466EE960C83843200D076AA /* ORBocTIC3Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8466EE8D0C83843200D076AA /* ORBocTIC3Controller.h */; };
-		8466EE970C83843200D076AA /* ORBocTIC3Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8466EE8E0C83843200D076AA /* ORBocTIC3Controller.m */; };
-		8466EE980C83843200D076AA /* ORBocTIC3Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8466EE8F0C83843200D076AA /* ORBocTIC3Decoders.h */; };
-		8466EE990C83843200D076AA /* ORBocTIC3Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8466EE900C83843200D076AA /* ORBocTIC3Decoders.m */; };
-		8466EE9A0C83843200D076AA /* ORBocTIC3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8466EE910C83843200D076AA /* ORBocTIC3Model.h */; };
-		8466EE9B0C83843200D076AA /* ORBocTIC3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8466EE920C83843200D076AA /* ORBocTIC3Model.m */; };
 		846798A0069385A300DF8B2A /* NcdLogAmpTask.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8467989F069385A300DF8B2A /* NcdLogAmpTask.nib */; };
 		846798C5069475DA00DF8B2A /* StatusLog.h in Headers */ = {isa = PBXBuildFile; fileRef = F51E696D03AE4775015F64B1 /* StatusLog.h */; };
 		846798E9069488AE00DF8B2A /* NcdLinearityTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 846798E6069488AE00DF8B2A /* NcdLinearityTask.h */; };
@@ -1502,6 +1494,14 @@
 		84B0CFC208FC60BC00EBE23C /* ORContainerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B0CFBC08FC60BC00EBE23C /* ORContainerController.h */; };
 		84B0CFEE08FC6C9B00EBE23C /* OfflineRunAlarmHelp in Resources */ = {isa = PBXBuildFile; fileRef = 84AA48320461DE37005F64B1 /* OfflineRunAlarmHelp */; };
 		84B0CFF208FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFF108FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist */; };
+		84B28CDE0F4C597900E2B056 /* BocTIC3.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28CD60F4C597900E2B056 /* BocTIC3.nib */; };
+		84B28CDF0F4C597900E2B056 /* BocTIC3.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28CD70F4C597900E2B056 /* BocTIC3.tif */; };
+		84B28CE00F4C597900E2B056 /* ORBocTIC3Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CD80F4C597900E2B056 /* ORBocTIC3Controller.h */; };
+		84B28CE10F4C597900E2B056 /* ORBocTIC3Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CD90F4C597900E2B056 /* ORBocTIC3Controller.m */; };
+		84B28CE20F4C597900E2B056 /* ORBocTIC3Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CDA0F4C597900E2B056 /* ORBocTIC3Decoders.h */; };
+		84B28CE30F4C597900E2B056 /* ORBocTIC3Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CDB0F4C597900E2B056 /* ORBocTIC3Decoders.m */; };
+		84B28CE40F4C597900E2B056 /* ORBocTIC3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CDC0F4C597900E2B056 /* ORBocTIC3Model.h */; };
+		84B28CE50F4C597900E2B056 /* ORBocTIC3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CDD0F4C597900E2B056 /* ORBocTIC3Model.m */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -2742,14 +2742,6 @@
 		84662FAB070B3745001CDA7E /* exMark.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = exMark.tif; path = Source/Widgets/BiStateView/exMark.tif; sourceTree = SOURCE_ROOT; };
 		84662FAC070B3745001CDA7E /* checkMark.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = checkMark.tif; path = Source/Widgets/BiStateView/checkMark.tif; sourceTree = SOURCE_ROOT; };
 		84662FB3070B3879001CDA7E /* questionMark.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = questionMark.tif; path = Source/Widgets/BiStateView/questionMark.tif; sourceTree = SOURCE_ROOT; };
-		8466EE8A0C83843200D076AA /* BocTIC3.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BocTIC3.nib; path = "Source/Objects/Misc Objects/BocTIC3/BocTIC3.nib"; sourceTree = SOURCE_ROOT; };
-		8466EE8B0C83843200D076AA /* BocTIC3.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BocTIC3.tif; path = "Source/Objects/Misc Objects/BocTIC3/BocTIC3.tif"; sourceTree = SOURCE_ROOT; };
-		8466EE8D0C83843200D076AA /* ORBocTIC3Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Controller.h; path = "Source/Objects/Misc Objects/BocTIC3/ORBocTIC3Controller.h"; sourceTree = SOURCE_ROOT; };
-		8466EE8E0C83843200D076AA /* ORBocTIC3Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBocTIC3Controller.m; path = "Source/Objects/Misc Objects/BocTIC3/ORBocTIC3Controller.m"; sourceTree = SOURCE_ROOT; };
-		8466EE8F0C83843200D076AA /* ORBocTIC3Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Decoders.h; path = "Source/Objects/Misc Objects/BocTIC3/ORBocTIC3Decoders.h"; sourceTree = SOURCE_ROOT; };
-		8466EE900C83843200D076AA /* ORBocTIC3Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBocTIC3Decoders.m; path = "Source/Objects/Misc Objects/BocTIC3/ORBocTIC3Decoders.m"; sourceTree = SOURCE_ROOT; };
-		8466EE910C83843200D076AA /* ORBocTIC3Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Model.h; path = "Source/Objects/Misc Objects/BocTIC3/ORBocTIC3Model.h"; sourceTree = SOURCE_ROOT; };
-		8466EE920C83843200D076AA /* ORBocTIC3Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORBocTIC3Model.m; path = "Source/Objects/Misc Objects/BocTIC3/ORBocTIC3Model.m"; sourceTree = SOURCE_ROOT; };
 		8467989F069385A300DF8B2A /* NcdLogAmpTask.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdLogAmpTask.nib; path = Source/Experiments/Ncd/LogAmpTask/NcdLogAmpTask.nib; sourceTree = SOURCE_ROOT; };
 		846798E6069488AE00DF8B2A /* NcdLinearityTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdLinearityTask.h; sourceTree = "<group>"; };
 		846798E7069488AE00DF8B2A /* NcdLinearityTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdLinearityTask.m; sourceTree = "<group>"; };
@@ -3315,6 +3307,14 @@
 		84B180FA044C7AAC005F64B1 /* 620Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = 620Card.gif; sourceTree = "<group>"; };
 		84B18101044C7AAC005F64B1 /* OR620Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = OR620Model.h; sourceTree = "<group>"; };
 		84B18102044C7AAC005F64B1 /* OR620Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = OR620Model.m; sourceTree = "<group>"; };
+		84B28CD60F4C597900E2B056 /* BocTIC3.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BocTIC3.nib; path = Source/Objects/Hardware/Serial/BocTIC3/BocTIC3.nib; sourceTree = SOURCE_ROOT; };
+		84B28CD70F4C597900E2B056 /* BocTIC3.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BocTIC3.tif; path = Source/Objects/Hardware/Serial/BocTIC3/BocTIC3.tif; sourceTree = SOURCE_ROOT; };
+		84B28CD80F4C597900E2B056 /* ORBocTIC3Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Controller.h; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Controller.h; sourceTree = SOURCE_ROOT; };
+		84B28CD90F4C597900E2B056 /* ORBocTIC3Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORBocTIC3Controller.m; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Controller.m; sourceTree = SOURCE_ROOT; };
+		84B28CDA0F4C597900E2B056 /* ORBocTIC3Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Decoders.h; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Decoders.h; sourceTree = SOURCE_ROOT; };
+		84B28CDB0F4C597900E2B056 /* ORBocTIC3Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORBocTIC3Decoders.m; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Decoders.m; sourceTree = SOURCE_ROOT; };
+		84B28CDC0F4C597900E2B056 /* ORBocTIC3Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Model.h; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Model.h; sourceTree = SOURCE_ROOT; };
+		84B28CDD0F4C597900E2B056 /* ORBocTIC3Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORBocTIC3Model.m; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Model.m; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -5058,7 +5058,6 @@
 				843DCF2D058E546A000C5219 /* DataGenerator */,
 				2A943A3808A8181C00D04541 /* XYScanner */,
 				8486F44E0CC6CFB600800B1E /* Ami286 */,
-				8466EE890C83843200D076AA /* BocTIC3 */,
 				849DA4D60BE7BBE600044320 /* LakeShore210 */,
 				849DAB040C108E3C00044320 /* Ramper */,
 				843A48510A0AC2F4003DF248 /* USB */,
@@ -5578,6 +5577,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
+				84B28CD50F4C597900E2B056 /* BocTIC3 */,
 				84499CBD0F13E457004B855B /* CTITemp */,
 				84499B6E0F13BB6E004B855B /* MksPdr2000 */,
 				840D56D70F39E9BF00F9A274 /* Pac */,
@@ -5801,22 +5801,6 @@
 			);
 			name = BiStateView;
 			path = Source/Widgets/BiStateView;
-			sourceTree = SOURCE_ROOT;
-		};
-		8466EE890C83843200D076AA /* BocTIC3 */ = {
-			isa = PBXGroup;
-			children = (
-				8466EE8A0C83843200D076AA /* BocTIC3.nib */,
-				8466EE8B0C83843200D076AA /* BocTIC3.tif */,
-				8466EE8D0C83843200D076AA /* ORBocTIC3Controller.h */,
-				8466EE8E0C83843200D076AA /* ORBocTIC3Controller.m */,
-				8466EE8F0C83843200D076AA /* ORBocTIC3Decoders.h */,
-				8466EE900C83843200D076AA /* ORBocTIC3Decoders.m */,
-				8466EE910C83843200D076AA /* ORBocTIC3Model.h */,
-				8466EE920C83843200D076AA /* ORBocTIC3Model.m */,
-			);
-			name = BocTIC3;
-			path = "Source/Objects/Misc Objects/BocTIC3";
 			sourceTree = SOURCE_ROOT;
 		};
 		846798E5069488AE00DF8B2A /* LinearityTask */ = {
@@ -7033,6 +7017,22 @@
 			);
 			name = 620;
 			path = Source/Objects/Hardware/Pci/620;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28CD50F4C597900E2B056 /* BocTIC3 */ = {
+			isa = PBXGroup;
+			children = (
+				84B28CD60F4C597900E2B056 /* BocTIC3.nib */,
+				84B28CD70F4C597900E2B056 /* BocTIC3.tif */,
+				84B28CD80F4C597900E2B056 /* ORBocTIC3Controller.h */,
+				84B28CD90F4C597900E2B056 /* ORBocTIC3Controller.m */,
+				84B28CDA0F4C597900E2B056 /* ORBocTIC3Decoders.h */,
+				84B28CDB0F4C597900E2B056 /* ORBocTIC3Decoders.m */,
+				84B28CDC0F4C597900E2B056 /* ORBocTIC3Model.h */,
+				84B28CDD0F4C597900E2B056 /* ORBocTIC3Model.m */,
+			);
+			name = BocTIC3;
+			path = Source/Objects/Hardware/Serial/BocTIC3;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B4329005E52B080084845B /* Security */ = {
@@ -9155,9 +9155,6 @@
 				84EA6CA60C73D11200083319 /* nTPCView.h in Headers */,
 				84EA6CAC0C73D15B00083319 /* ORAcqirisDC440Decoders.h in Headers */,
 				9C38E5590C775F2A00255848 /* ORcPCICardDecoder.h in Headers */,
-				8466EE960C83843200D076AA /* ORBocTIC3Controller.h in Headers */,
-				8466EE980C83843200D076AA /* ORBocTIC3Decoders.h in Headers */,
-				8466EE9A0C83843200D076AA /* ORBocTIC3Model.h in Headers */,
 				8493CC420C99FA0700B46CD4 /* SBC_Linking.h in Headers */,
 				8493CC430C99FA0700B46CD4 /* SBC_Link.h in Headers */,
 				8493CC450C99FA0700B46CD4 /* SBC_LinkController.h in Headers */,
@@ -9350,6 +9347,9 @@
 				840D56E00F39E9BF00F9A274 /* ORPacController.h in Headers */,
 				840D56E20F39E9BF00F9A274 /* ORPacDecoders.h in Headers */,
 				840D56E40F39E9BF00F9A274 /* ORPacModel.h in Headers */,
+				84B28CE00F4C597900E2B056 /* ORBocTIC3Controller.h in Headers */,
+				84B28CE20F4C597900E2B056 /* ORBocTIC3Decoders.h in Headers */,
+				84B28CE40F4C597900E2B056 /* ORBocTIC3Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9784,8 +9784,6 @@
 				9CB167FD0C5BD3CE0053CFAD /* yAxisMarkerOpposite.gif in Resources */,
 				84EA6C9F0C73D11200083319 /* nTPC.nib in Resources */,
 				84EA6CA00C73D11200083319 /* nTPC.tif in Resources */,
-				8466EE930C83843200D076AA /* BocTIC3.nib in Resources */,
-				8466EE940C83843200D076AA /* BocTIC3.tif in Resources */,
 				8493CC470C99FA0700B46CD4 /* SBC_Link.nib in Resources */,
 				8493CC480C99FA0700B46CD4 /* killScript in Resources */,
 				8493CC490C99FA0700B46CD4 /* makeScript in Resources */,
@@ -9933,6 +9931,8 @@
 				8493D6BC0F21315300BCD331 /* CMC203Card.tif in Resources */,
 				840D56E60F39E9BF00F9A274 /* Pac.nib in Resources */,
 				840D56E70F39E9BF00F9A274 /* Pac.tif in Resources */,
+				84B28CDE0F4C597900E2B056 /* BocTIC3.nib in Resources */,
+				84B28CDF0F4C597900E2B056 /* BocTIC3.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10448,9 +10448,6 @@
 				9C38E5580C775F2A00255848 /* ORcPCICardDecoder.m in Sources */,
 				2A7685BA0C7B3A9C000C942F /* ORUSBtoGPIBController.m in Sources */,
 				2A7685C00C7B3AA4000C942F /* ORUSBtoGPIBModel.m in Sources */,
-				8466EE970C83843200D076AA /* ORBocTIC3Controller.m in Sources */,
-				8466EE990C83843200D076AA /* ORBocTIC3Decoders.m in Sources */,
-				8466EE9B0C83843200D076AA /* ORBocTIC3Model.m in Sources */,
 				8493CC440C99FA0700B46CD4 /* SBC_Link.m in Sources */,
 				8493CC460C99FA0700B46CD4 /* SBC_LinkController.m in Sources */,
 				8493CC700C99FA3100B46CD4 /* ORcPCIcpuModel.m in Sources */,
@@ -10618,6 +10615,9 @@
 				840D56E10F39E9BF00F9A274 /* ORPacController.m in Sources */,
 				840D56E30F39E9BF00F9A274 /* ORPacDecoders.m in Sources */,
 				840D56E50F39E9BF00F9A274 /* ORPacModel.m in Sources */,
+				84B28CE10F4C597900E2B056 /* ORBocTIC3Controller.m in Sources */,
+				84B28CE30F4C597900E2B056 /* ORBocTIC3Decoders.m in Sources */,
+				84B28CE50F4C597900E2B056 /* ORBocTIC3Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
