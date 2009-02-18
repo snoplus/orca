@@ -25,6 +25,7 @@
 #import "ORLDA102Model.h"
 #import "ORUSBInterface.h"
 
+NSString* ORLDA102ModelRepeatRampChanged = @"ORLDA102ModelRepeatRampChanged";
 NSString* ORLDA102ModelIdleTimeChanged		= @"ORLDA102ModelIdleTimeChanged";
 NSString* ORLDA102ModelDwellTimeChanged		= @"ORLDA102ModelDwellTimeChanged";
 NSString* ORLDA102ModelRampEndChanged		= @"ORLDA102ModelRampEndChanged";
@@ -191,6 +192,19 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) repeatRamp
+{
+    return repeatRamp;
+}
+
+- (void) setRepeatRamp:(BOOL)aRepeatRamp
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRepeatRamp:repeatRamp];
+    repeatRamp = aRepeatRamp;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelRepeatRampChanged object:self];
+}
+
 - (int) idleTime
 {
     return idleTime;
@@ -409,6 +423,7 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setRepeatRamp:	[decoder decodeBoolForKey:@"repeatRamp"]];
     [self setIdleTime:		[decoder decodeIntForKey:	@"idleTime"]];
     [self setDwellTime:		[decoder decodeIntForKey:	@"dwellTime"]];
     [self setRampEnd:		[decoder decodeFloatForKey:	@"rampEnd"]];
@@ -424,6 +439,7 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:repeatRamp		forKey:@"repeatRamp"];
     [encoder encodeInt:idleTime			forKey: @"idleTime"];
     [encoder encodeInt:dwellTime		forKey: @"dwellTime"];
     [encoder encodeFloat:rampEnd		forKey: @"rampEnd"];

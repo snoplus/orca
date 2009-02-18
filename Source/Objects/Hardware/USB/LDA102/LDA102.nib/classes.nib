@@ -67,6 +67,60 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>attenuationTextFieldAction</key>
+				<string>id</string>
+				<key>dwellTimeTextFieldAction</key>
+				<string>id</string>
+				<key>idleTimeTextFieldAction</key>
+				<string>id</string>
+				<key>rampEndTextFieldAction</key>
+				<string>id</string>
+				<key>rampStartTextFieldAction</key>
+				<string>id</string>
+				<key>repeatRampAction</key>
+				<string>id</string>
+				<key>serialNumberAction</key>
+				<string>id</string>
+				<key>settingLockAction</key>
+				<string>id</string>
+				<key>stepSizeTextFieldAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORLDA102Controller</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>attenuationTextField</key>
+				<string>NSTextField</string>
+				<key>commandField</key>
+				<string>NSTextField</string>
+				<key>dwellTimeTextField</key>
+				<string>NSTextField</string>
+				<key>idleTimeTextField</key>
+				<string>NSTextField</string>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>rampEndTextField</key>
+				<string>NSTextField</string>
+				<key>rampStartTextField</key>
+				<string>NSTextField</string>
+				<key>repeatRampButton</key>
+				<string>NSButton</string>
+				<key>sendCommandButton</key>
+				<string>NSButton</string>
+				<key>serialNumberPopup</key>
+				<string>NSPopUpButton</string>
+				<key>stepSizeTextField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>sequenceCompleted</key>
 				<string>id</string>
 				<key>taskFinished</key>
@@ -78,60 +132,6 @@
 			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>debounceAction</key>
-				<string>id</string>
-				<key>pollTimeAction</key>
-				<string>id</string>
-				<key>queryAction</key>
-				<string>id</string>
-				<key>readClearAction</key>
-				<string>id</string>
-				<key>relayControlAction</key>
-				<string>id</string>
-				<key>sendCommandAction</key>
-				<string>id</string>
-				<key>serialNumberAction</key>
-				<string>id</string>
-				<key>settingLockAction</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORADU200Controller</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>commandField</key>
-				<string>NSTextField</string>
-				<key>debouncePopup</key>
-				<string>NSPopUpButton</string>
-				<key>eventCounterMatrix</key>
-				<string>NSMatrix</string>
-				<key>lockButton</key>
-				<string>NSButton</string>
-				<key>pollTimePopup</key>
-				<string>NSPopUpButton</string>
-				<key>portAMatrix</key>
-				<string>NSMatrix</string>
-				<key>queryButton</key>
-				<string>NSButton</string>
-				<key>readClearButton</key>
-				<string>NSButton</string>
-				<key>relayControlMatrix</key>
-				<string>NSMatrix</string>
-				<key>relayStateMatrix</key>
-				<string>NSMatrix</string>
-				<key>sendCommandButton</key>
-				<string>NSButton</string>
-				<key>serialNumberPopup</key>
-				<string>NSPopUpButton</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>OrcaObjectController</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

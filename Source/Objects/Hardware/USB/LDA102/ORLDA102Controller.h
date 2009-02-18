@@ -26,12 +26,13 @@
 @interface ORLDA102Controller : OrcaObjectController 
 {
 	IBOutlet NSPopUpButton* serialNumberPopup;
-	IBOutlet   NSTextField* idleTimeTextField;
-	IBOutlet   NSTextField* dwellTimeTextField;
-	IBOutlet   NSTextField* rampEndTextField;
-	IBOutlet   NSTextField* rampStartTextField;
-	IBOutlet   NSTextField* stepSizeTextField;
-	IBOutlet   NSTextField* attenuationTextField;
+	IBOutlet NSButton*		repeatRampButton;
+	IBOutlet NSTextField*	idleTimeTextField;
+	IBOutlet NSTextField*	dwellTimeTextField;
+	IBOutlet NSTextField*	rampEndTextField;
+	IBOutlet NSTextField*	rampStartTextField;
+	IBOutlet NSTextField*	stepSizeTextField;
+	IBOutlet NSTextField*	attenuationTextField;
     IBOutlet NSTextField*   commandField;
     IBOutlet NSButton*		sendCommandButton;
 	IBOutlet NSButton*		lockButton;
@@ -40,6 +41,7 @@
 #pragma mark •••Notifications
 
 #pragma mark ***Interface Management
+- (void) repeatRampChanged:(NSNotification*)aNote;
 - (void) idleTimeChanged:(NSNotification*)aNote;
 - (void) dwellTimeChanged:(NSNotification*)aNote;
 - (void) rampEndChanged:(NSNotification*)aNote;
@@ -51,6 +53,7 @@
 - (void) lockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) repeatRampAction:(id)sender;
 - (IBAction) idleTimeTextFieldAction:(id)sender;
 - (IBAction) dwellTimeTextFieldAction:(id)sender;
 - (IBAction) rampEndTextFieldAction:(id)sender;

@@ -95,6 +95,11 @@
                          name : ORLDA102ModelIdleTimeChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(repeatRampChanged:)
+                         name : ORLDA102ModelRepeatRampChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -114,6 +119,12 @@
 	[self rampEndChanged:nil];
 	[self dwellTimeChanged:nil];
 	[self idleTimeChanged:nil];
+	[self repeatRampChanged:nil];
+}
+
+- (void) repeatRampChanged:(NSNotification*)aNote
+{
+	[repeatRampButton setIntValue: [model repeatRamp]];
 }
 
 - (void) idleTimeChanged:(NSNotification*)aNote
@@ -176,6 +187,11 @@
 }
 
 #pragma mark •••Actions
+
+- (void) repeatRampAction:(id)sender
+{
+	[model setRepeatRamp:[sender intValue]];	
+}
 
 - (void) idleTimeTextFieldAction:(id)sender
 {
