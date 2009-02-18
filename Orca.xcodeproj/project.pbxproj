@@ -7,22 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		140D81BD0E15713C0080492E /* UnivVoltHVIcon.gif in Resources */ = {isa = PBXBuildFile; fileRef = 140D81BC0E15713C0080492E /* UnivVoltHVIcon.gif */; };
-		143AEEA30E2E988F003E3CAC /* ORUnivVoltHVCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 143AEE950E2E988F003E3CAC /* ORUnivVoltHVCrateController.h */; };
-		143AEEA40E2E988F003E3CAC /* ORUnivVoltHVCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 143AEE960E2E988F003E3CAC /* ORUnivVoltHVCrateController.m */; };
-		143AEEA50E2E988F003E3CAC /* ORUnivVoltHVCrateExceptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 143AEE970E2E988F003E3CAC /* ORUnivVoltHVCrateExceptions.h */; };
-		143AEEA60E2E988F003E3CAC /* ORUnivVoltHVCrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 143AEE980E2E988F003E3CAC /* ORUnivVoltHVCrateModel.h */; };
-		143AEEA70E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 143AEE990E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m */; };
-		143AEEAD0E2E988F003E3CAC /* UnivVoltHVCrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 143AEEA00E2E988F003E3CAC /* UnivVoltHVCrate.gif */; };
-		143AEEAE0E2E988F003E3CAC /* UnivVoltHVCrate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 143AEEA10E2E988F003E3CAC /* UnivVoltHVCrate.nib */; };
-		143AEEAF0E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 143AEEA20E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif */; };
-		143B09B40E11666800FE9DB8 /* ORUnivVoltController.h in Headers */ = {isa = PBXBuildFile; fileRef = 143B09AC0E11666800FE9DB8 /* ORUnivVoltController.h */; };
-		143B09B50E11666800FE9DB8 /* ORUnivVoltController.m in Sources */ = {isa = PBXBuildFile; fileRef = 143B09AD0E11666800FE9DB8 /* ORUnivVoltController.m */; };
-		143B09B60E11666800FE9DB8 /* ORUnivVoltDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 143B09AE0E11666800FE9DB8 /* ORUnivVoltDecoders.h */; };
-		143B09B70E11666800FE9DB8 /* ORUnivVoltDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 143B09AF0E11666800FE9DB8 /* ORUnivVoltDecoders.m */; };
-		143B09B80E11666800FE9DB8 /* ORUnivVoltModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 143B09B00E11666800FE9DB8 /* ORUnivVoltModel.h */; };
-		143B09B90E11666800FE9DB8 /* ORUnivVoltModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 143B09B10E11666800FE9DB8 /* ORUnivVoltModel.m */; };
-		143B09BA0E11666800FE9DB8 /* UnivVolt.nib in Resources */ = {isa = PBXBuildFile; fileRef = 143B09B20E11666800FE9DB8 /* UnivVolt.nib */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
 		1C50F9F208033CA9008D18EA /* ADC2249Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E708033CA9008D18EA /* ADC2249Card.gif */; };
 		1C50F9F408033CA9008D18EA /* ORADC2249Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C50F9E908033CA9008D18EA /* ORADC2249Controller.h */; };
@@ -1519,6 +1503,31 @@
 		84B28E260F4C718400E2B056 /* ORHV4032Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E0D0F4C718400E2B056 /* ORHV4032Model.m */; };
 		84B28E270F4C718400E2B056 /* ORHV4032Supply.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E0E0F4C718400E2B056 /* ORHV4032Supply.h */; };
 		84B28E280F4C718400E2B056 /* ORHV4032Supply.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E0F0F4C718400E2B056 /* ORHV4032Supply.m */; };
+		84B28E320F4C7FD400E2B056 /* LDA102.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E2B0F4C7FD400E2B056 /* LDA102.nib */; };
+		84B28E330F4C7FD400E2B056 /* LDA102.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E2C0F4C7FD400E2B056 /* LDA102.tif */; };
+		84B28E340F4C7FD400E2B056 /* NoADUDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E2D0F4C7FD400E2B056 /* NoADUDriverHelp.plist */; };
+		84B28E350F4C7FD400E2B056 /* ORLDA102Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E2E0F4C7FD400E2B056 /* ORLDA102Controller.h */; };
+		84B28E360F4C7FD400E2B056 /* ORLDA102Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E2F0F4C7FD400E2B056 /* ORLDA102Controller.m */; };
+		84B28E370F4C7FD400E2B056 /* ORLDA102Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E300F4C7FD400E2B056 /* ORLDA102Model.h */; };
+		84B28E380F4C7FD400E2B056 /* ORLDA102Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E310F4C7FD400E2B056 /* ORLDA102Model.m */; };
+		84B28E540F4C835500E2B056 /* ORUnivVoltController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E410F4C835500E2B056 /* ORUnivVoltController.h */; };
+		84B28E550F4C835500E2B056 /* ORUnivVoltController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E420F4C835500E2B056 /* ORUnivVoltController.m */; };
+		84B28E560F4C835500E2B056 /* ORUnivVoltDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E430F4C835500E2B056 /* ORUnivVoltDecoders.h */; };
+		84B28E570F4C835500E2B056 /* ORUnivVoltDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E440F4C835500E2B056 /* ORUnivVoltDecoders.m */; };
+		84B28E580F4C835500E2B056 /* ORUnivVoltModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E450F4C835500E2B056 /* ORUnivVoltModel.h */; };
+		84B28E590F4C835500E2B056 /* ORUnivVoltModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E460F4C835500E2B056 /* ORUnivVoltModel.m */; };
+		84B28E5A0F4C835500E2B056 /* UnivVolt.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E470F4C835500E2B056 /* UnivVolt.nib */; };
+		84B28E5B0F4C835500E2B056 /* UnivVoltHV.ai in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E480F4C835500E2B056 /* UnivVoltHV.ai */; };
+		84B28E5C0F4C835500E2B056 /* UnivVoltHV.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E490F4C835500E2B056 /* UnivVoltHV.jpeg */; };
+		84B28E5D0F4C835500E2B056 /* UnivVoltHVIcon.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E4A0F4C835500E2B056 /* UnivVoltHVIcon.gif */; };
+		84B28E5E0F4C835500E2B056 /* ORUnivVoltHVCrateController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E4C0F4C835500E2B056 /* ORUnivVoltHVCrateController.h */; };
+		84B28E5F0F4C835500E2B056 /* ORUnivVoltHVCrateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E4D0F4C835500E2B056 /* ORUnivVoltHVCrateController.m */; };
+		84B28E600F4C835500E2B056 /* ORUnivVoltHVCrateExceptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E4E0F4C835500E2B056 /* ORUnivVoltHVCrateExceptions.h */; };
+		84B28E610F4C835500E2B056 /* ORUnivVoltHVCrateModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E4F0F4C835500E2B056 /* ORUnivVoltHVCrateModel.h */; };
+		84B28E620F4C835500E2B056 /* ORUnivVoltHVCrateModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E500F4C835500E2B056 /* ORUnivVoltHVCrateModel.m */; };
+		84B28E630F4C835500E2B056 /* UnivVoltHVCrate.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E510F4C835500E2B056 /* UnivVoltHVCrate.gif */; };
+		84B28E640F4C835500E2B056 /* UnivVoltHVCrate.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E520F4C835500E2B056 /* UnivVoltHVCrate.nib */; };
+		84B28E650F4C835500E2B056 /* UnivVoltHVCrateSmall.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E530F4C835500E2B056 /* UnivVoltHVCrateSmall.gif */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -2025,22 +2034,6 @@
 
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
-		140D81BC0E15713C0080492E /* UnivVoltHVIcon.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVIcon.gif; path = "Source/Objects/Misc Objects/UnivVoltHV/UnivVoltHVIcon.gif"; sourceTree = SOURCE_ROOT; };
-		143AEE950E2E988F003E3CAC /* ORUnivVoltHVCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltHVCrateController.h; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltHVCrateController.h"; sourceTree = SOURCE_ROOT; };
-		143AEE960E2E988F003E3CAC /* ORUnivVoltHVCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltHVCrateController.m; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltHVCrateController.m"; sourceTree = SOURCE_ROOT; };
-		143AEE970E2E988F003E3CAC /* ORUnivVoltHVCrateExceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltHVCrateExceptions.h; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltHVCrateExceptions.h"; sourceTree = SOURCE_ROOT; };
-		143AEE980E2E988F003E3CAC /* ORUnivVoltHVCrateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltHVCrateModel.h; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltHVCrateModel.h"; sourceTree = SOURCE_ROOT; };
-		143AEE990E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltHVCrateModel.m; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/ORUnivVoltHVCrateModel.m"; sourceTree = SOURCE_ROOT; };
-		143AEEA00E2E988F003E3CAC /* UnivVoltHVCrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVCrate.gif; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/UnivVoltHVCrate.gif"; sourceTree = SOURCE_ROOT; };
-		143AEEA10E2E988F003E3CAC /* UnivVoltHVCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = UnivVoltHVCrate.nib; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/UnivVoltHVCrate.nib"; sourceTree = SOURCE_ROOT; };
-		143AEEA20E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVCrateSmall.gif; path = "Source/Objects/Misc Objects/UnivVoltHVCrate/UnivVoltHVCrateSmall.gif"; sourceTree = SOURCE_ROOT; };
-		143B09AC0E11666800FE9DB8 /* ORUnivVoltController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltController.h; path = "Source/Objects/Misc Objects/UnivVoltHV/ORUnivVoltController.h"; sourceTree = SOURCE_ROOT; };
-		143B09AD0E11666800FE9DB8 /* ORUnivVoltController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltController.m; path = "Source/Objects/Misc Objects/UnivVoltHV/ORUnivVoltController.m"; sourceTree = SOURCE_ROOT; };
-		143B09AE0E11666800FE9DB8 /* ORUnivVoltDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltDecoders.h; path = "Source/Objects/Misc Objects/UnivVoltHV/ORUnivVoltDecoders.h"; sourceTree = SOURCE_ROOT; };
-		143B09AF0E11666800FE9DB8 /* ORUnivVoltDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltDecoders.m; path = "Source/Objects/Misc Objects/UnivVoltHV/ORUnivVoltDecoders.m"; sourceTree = SOURCE_ROOT; };
-		143B09B00E11666800FE9DB8 /* ORUnivVoltModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltModel.h; path = "Source/Objects/Misc Objects/UnivVoltHV/ORUnivVoltModel.h"; sourceTree = SOURCE_ROOT; };
-		143B09B10E11666800FE9DB8 /* ORUnivVoltModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltModel.m; path = "Source/Objects/Misc Objects/UnivVoltHV/ORUnivVoltModel.m"; sourceTree = SOURCE_ROOT; };
-		143B09B20E11666800FE9DB8 /* UnivVolt.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = UnivVolt.nib; path = "Source/Objects/Misc Objects/UnivVoltHV/UnivVolt.nib"; sourceTree = SOURCE_ROOT; };
 		1C50F9E608033CA9008D18EA /* ADC2249.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADC2249.nib; sourceTree = "<group>"; };
 		1C50F9E708033CA9008D18EA /* ADC2249Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ADC2249Card.gif; sourceTree = "<group>"; };
 		1C50F9E908033CA9008D18EA /* ORADC2249Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORADC2249Controller.h; sourceTree = "<group>"; };
@@ -3346,6 +3339,31 @@
 		84B28E0D0F4C718400E2B056 /* ORHV4032Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Model.m; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Model.m; sourceTree = SOURCE_ROOT; };
 		84B28E0E0F4C718400E2B056 /* ORHV4032Supply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHV4032Supply.h; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Supply.h; sourceTree = SOURCE_ROOT; };
 		84B28E0F0F4C718400E2B056 /* ORHV4032Supply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Supply.m; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Supply.m; sourceTree = SOURCE_ROOT; };
+		84B28E2B0F4C7FD400E2B056 /* LDA102.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = LDA102.nib; path = Source/Objects/Hardware/USB/LDA102/LDA102.nib; sourceTree = SOURCE_ROOT; };
+		84B28E2C0F4C7FD400E2B056 /* LDA102.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = LDA102.tif; path = Source/Objects/Hardware/USB/LDA102/LDA102.tif; sourceTree = SOURCE_ROOT; };
+		84B28E2D0F4C7FD400E2B056 /* NoADUDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = NoADUDriverHelp.plist; path = Source/Objects/Hardware/USB/LDA102/NoADUDriverHelp.plist; sourceTree = SOURCE_ROOT; };
+		84B28E2E0F4C7FD400E2B056 /* ORLDA102Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLDA102Controller.h; path = Source/Objects/Hardware/USB/LDA102/ORLDA102Controller.h; sourceTree = SOURCE_ROOT; };
+		84B28E2F0F4C7FD400E2B056 /* ORLDA102Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLDA102Controller.m; path = Source/Objects/Hardware/USB/LDA102/ORLDA102Controller.m; sourceTree = SOURCE_ROOT; };
+		84B28E300F4C7FD400E2B056 /* ORLDA102Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLDA102Model.h; path = Source/Objects/Hardware/USB/LDA102/ORLDA102Model.h; sourceTree = SOURCE_ROOT; };
+		84B28E310F4C7FD400E2B056 /* ORLDA102Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLDA102Model.m; path = Source/Objects/Hardware/USB/LDA102/ORLDA102Model.m; sourceTree = SOURCE_ROOT; };
+		84B28E410F4C835500E2B056 /* ORUnivVoltController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltController.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORUnivVoltController.h; sourceTree = SOURCE_ROOT; };
+		84B28E420F4C835500E2B056 /* ORUnivVoltController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltController.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORUnivVoltController.m; sourceTree = SOURCE_ROOT; };
+		84B28E430F4C835500E2B056 /* ORUnivVoltDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltDecoders.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORUnivVoltDecoders.h; sourceTree = SOURCE_ROOT; };
+		84B28E440F4C835500E2B056 /* ORUnivVoltDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltDecoders.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORUnivVoltDecoders.m; sourceTree = SOURCE_ROOT; };
+		84B28E450F4C835500E2B056 /* ORUnivVoltModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltModel.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORUnivVoltModel.h; sourceTree = SOURCE_ROOT; };
+		84B28E460F4C835500E2B056 /* ORUnivVoltModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltModel.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORUnivVoltModel.m; sourceTree = SOURCE_ROOT; };
+		84B28E470F4C835500E2B056 /* UnivVolt.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = UnivVolt.nib; path = Source/Objects/Hardware/HV/UnivVoltHV/UnivVolt.nib; sourceTree = SOURCE_ROOT; };
+		84B28E480F4C835500E2B056 /* UnivVoltHV.ai */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = UnivVoltHV.ai; path = Source/Objects/Hardware/HV/UnivVoltHV/UnivVoltHV.ai; sourceTree = SOURCE_ROOT; };
+		84B28E490F4C835500E2B056 /* UnivVoltHV.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = UnivVoltHV.jpeg; path = Source/Objects/Hardware/HV/UnivVoltHV/UnivVoltHV.jpeg; sourceTree = SOURCE_ROOT; };
+		84B28E4A0F4C835500E2B056 /* UnivVoltHVIcon.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVIcon.gif; path = Source/Objects/Hardware/HV/UnivVoltHV/UnivVoltHVIcon.gif; sourceTree = SOURCE_ROOT; };
+		84B28E4C0F4C835500E2B056 /* ORUnivVoltHVCrateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltHVCrateController.h; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/ORUnivVoltHVCrateController.h; sourceTree = SOURCE_ROOT; };
+		84B28E4D0F4C835500E2B056 /* ORUnivVoltHVCrateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltHVCrateController.m; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/ORUnivVoltHVCrateController.m; sourceTree = SOURCE_ROOT; };
+		84B28E4E0F4C835500E2B056 /* ORUnivVoltHVCrateExceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltHVCrateExceptions.h; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/ORUnivVoltHVCrateExceptions.h; sourceTree = SOURCE_ROOT; };
+		84B28E4F0F4C835500E2B056 /* ORUnivVoltHVCrateModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORUnivVoltHVCrateModel.h; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/ORUnivVoltHVCrateModel.h; sourceTree = SOURCE_ROOT; };
+		84B28E500F4C835500E2B056 /* ORUnivVoltHVCrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORUnivVoltHVCrateModel.m; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/ORUnivVoltHVCrateModel.m; sourceTree = SOURCE_ROOT; };
+		84B28E510F4C835500E2B056 /* UnivVoltHVCrate.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVCrate.gif; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/UnivVoltHVCrate.gif; sourceTree = SOURCE_ROOT; };
+		84B28E520F4C835500E2B056 /* UnivVoltHVCrate.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = UnivVoltHVCrate.nib; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/UnivVoltHVCrate.nib; sourceTree = SOURCE_ROOT; };
+		84B28E530F4C835500E2B056 /* UnivVoltHVCrateSmall.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = UnivVoltHVCrateSmall.gif; path = Source/Objects/Hardware/HV/UnivVoltHVCrate/UnivVoltHVCrateSmall.gif; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -3966,38 +3984,6 @@
 			);
 			name = "Other Frameworks";
 			sourceTree = "<group>";
-		};
-		143AEE940E2E988F003E3CAC /* UnivVoltHVCrate */ = {
-			isa = PBXGroup;
-			children = (
-				143AEE950E2E988F003E3CAC /* ORUnivVoltHVCrateController.h */,
-				143AEE960E2E988F003E3CAC /* ORUnivVoltHVCrateController.m */,
-				143AEE970E2E988F003E3CAC /* ORUnivVoltHVCrateExceptions.h */,
-				143AEE980E2E988F003E3CAC /* ORUnivVoltHVCrateModel.h */,
-				143AEE990E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m */,
-				143AEEA00E2E988F003E3CAC /* UnivVoltHVCrate.gif */,
-				143AEEA10E2E988F003E3CAC /* UnivVoltHVCrate.nib */,
-				143AEEA20E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif */,
-			);
-			name = UnivVoltHVCrate;
-			path = "Source/Objects/Misc Objects/UnivVoltHVCrate";
-			sourceTree = SOURCE_ROOT;
-		};
-		143B09AB0E11666700FE9DB8 /* UnivVoltHV */ = {
-			isa = PBXGroup;
-			children = (
-				140D81BC0E15713C0080492E /* UnivVoltHVIcon.gif */,
-				143B09AC0E11666800FE9DB8 /* ORUnivVoltController.h */,
-				143B09AD0E11666800FE9DB8 /* ORUnivVoltController.m */,
-				143B09AE0E11666800FE9DB8 /* ORUnivVoltDecoders.h */,
-				143B09AF0E11666800FE9DB8 /* ORUnivVoltDecoders.m */,
-				143B09B00E11666800FE9DB8 /* ORUnivVoltModel.h */,
-				143B09B10E11666800FE9DB8 /* ORUnivVoltModel.m */,
-				143B09B20E11666800FE9DB8 /* UnivVolt.nib */,
-			);
-			name = UnivVoltHV;
-			path = "Source/Objects/Misc Objects/UnivVoltHV";
-			sourceTree = SOURCE_ROOT;
 		};
 		19C28FB0FE9D524F11CA2CBB /* Products */ = {
 			isa = PBXGroup;
@@ -4994,8 +4980,6 @@
 		842162EE043E6317005F64B1 /* Misc Objects */ = {
 			isa = PBXGroup;
 			children = (
-				143AEE940E2E988F003E3CAC /* UnivVoltHVCrate */,
-				143B09AB0E11666700FE9DB8 /* UnivVoltHV */,
 				84AB8BB30D2314A500EC39F2 /* CmdHistory */,
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
 				2AAB08F808E36CCE00BB0792 /* Testing */,
@@ -6621,6 +6605,7 @@
 			children = (
 				849E7C910B6956C800353D50 /* ADU200 */,
 				84A4E8950C287CA900CBC222 /* USBtoGPIB */,
+				84B28E2A0F4C7FD400E2B056 /* LDA102 */,
 			);
 			path = USB;
 			sourceTree = "<group>";
@@ -7062,6 +7047,8 @@
 		84B28DF40F4C713500E2B056 /* HV */ = {
 			isa = PBXGroup;
 			children = (
+				84B28E400F4C835500E2B056 /* UnivVoltHV */,
+				84B28E4B0F4C835500E2B056 /* UnivVoltHVCrate */,
 				84B28DF50F4C718300E2B056 /* HVControl */,
 				84B28E050F4C718400E2B056 /* HV4032 */,
 			);
@@ -7108,6 +7095,55 @@
 			);
 			name = HV4032;
 			path = Source/Objects/Hardware/HV/HV4032;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28E2A0F4C7FD400E2B056 /* LDA102 */ = {
+			isa = PBXGroup;
+			children = (
+				84B28E2B0F4C7FD400E2B056 /* LDA102.nib */,
+				84B28E2C0F4C7FD400E2B056 /* LDA102.tif */,
+				84B28E2D0F4C7FD400E2B056 /* NoADUDriverHelp.plist */,
+				84B28E2E0F4C7FD400E2B056 /* ORLDA102Controller.h */,
+				84B28E2F0F4C7FD400E2B056 /* ORLDA102Controller.m */,
+				84B28E300F4C7FD400E2B056 /* ORLDA102Model.h */,
+				84B28E310F4C7FD400E2B056 /* ORLDA102Model.m */,
+			);
+			name = LDA102;
+			path = Source/Objects/Hardware/USB/LDA102;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28E400F4C835500E2B056 /* UnivVoltHV */ = {
+			isa = PBXGroup;
+			children = (
+				84B28E410F4C835500E2B056 /* ORUnivVoltController.h */,
+				84B28E420F4C835500E2B056 /* ORUnivVoltController.m */,
+				84B28E430F4C835500E2B056 /* ORUnivVoltDecoders.h */,
+				84B28E440F4C835500E2B056 /* ORUnivVoltDecoders.m */,
+				84B28E450F4C835500E2B056 /* ORUnivVoltModel.h */,
+				84B28E460F4C835500E2B056 /* ORUnivVoltModel.m */,
+				84B28E470F4C835500E2B056 /* UnivVolt.nib */,
+				84B28E480F4C835500E2B056 /* UnivVoltHV.ai */,
+				84B28E490F4C835500E2B056 /* UnivVoltHV.jpeg */,
+				84B28E4A0F4C835500E2B056 /* UnivVoltHVIcon.gif */,
+			);
+			name = UnivVoltHV;
+			path = Source/Objects/Hardware/HV/UnivVoltHV;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28E4B0F4C835500E2B056 /* UnivVoltHVCrate */ = {
+			isa = PBXGroup;
+			children = (
+				84B28E4C0F4C835500E2B056 /* ORUnivVoltHVCrateController.h */,
+				84B28E4D0F4C835500E2B056 /* ORUnivVoltHVCrateController.m */,
+				84B28E4E0F4C835500E2B056 /* ORUnivVoltHVCrateExceptions.h */,
+				84B28E4F0F4C835500E2B056 /* ORUnivVoltHVCrateModel.h */,
+				84B28E500F4C835500E2B056 /* ORUnivVoltHVCrateModel.m */,
+				84B28E510F4C835500E2B056 /* UnivVoltHVCrate.gif */,
+				84B28E520F4C835500E2B056 /* UnivVoltHVCrate.nib */,
+				84B28E530F4C835500E2B056 /* UnivVoltHVCrateSmall.gif */,
+			);
+			name = UnivVoltHVCrate;
+			path = Source/Objects/Hardware/HV/UnivVoltHVCrate;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B4329005E52B080084845B /* Security */ = {
@@ -9267,18 +9303,12 @@
 				843D35500DEF1C9300330F3F /* ORCaen1190Decoders.h in Headers */,
 				8407F0E60DEF66DB000F1441 /* ORCaen862Controller.h in Headers */,
 				8407F0E80DEF66DB000F1441 /* ORCaen862Model.h in Headers */,
-				143B09B40E11666800FE9DB8 /* ORUnivVoltController.h in Headers */,
-				143B09B60E11666800FE9DB8 /* ORUnivVoltDecoders.h in Headers */,
-				143B09B80E11666800FE9DB8 /* ORUnivVoltModel.h in Headers */,
 				846B8F120E15972A00C41F9D /* ORICS8065Controller.h in Headers */,
 				846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */,
 				846B8F1C0E15973500C41F9D /* vxi11.h in Headers */,
 				9C8846860E2D8D960099B98E /* ORHP4405AController.h in Headers */,
 				9C8846880E2D8D960099B98E /* ORHP4405AData.h in Headers */,
 				9C88468A0E2D8D960099B98E /* ORHP4405AModel.h in Headers */,
-				143AEEA30E2E988F003E3CAC /* ORUnivVoltHVCrateController.h in Headers */,
-				143AEEA50E2E988F003E3CAC /* ORUnivVoltHVCrateExceptions.h in Headers */,
-				143AEEA60E2E988F003E3CAC /* ORUnivVoltHVCrateModel.h in Headers */,
 				9C7CE7E60E2FC22500F63679 /* ORCaen260Controller.h in Headers */,
 				9C7CE7E80E2FC22500F63679 /* ORCaen260Decoders.h in Headers */,
 				9C7CE7EA0E2FC22500F63679 /* ORCaen260Model.h in Headers */,
@@ -9374,6 +9404,14 @@
 				84B28E230F4C718400E2B056 /* ORHV4032Controller.h in Headers */,
 				84B28E250F4C718400E2B056 /* ORHV4032Model.h in Headers */,
 				84B28E270F4C718400E2B056 /* ORHV4032Supply.h in Headers */,
+				84B28E350F4C7FD400E2B056 /* ORLDA102Controller.h in Headers */,
+				84B28E370F4C7FD400E2B056 /* ORLDA102Model.h in Headers */,
+				84B28E540F4C835500E2B056 /* ORUnivVoltController.h in Headers */,
+				84B28E560F4C835500E2B056 /* ORUnivVoltDecoders.h in Headers */,
+				84B28E580F4C835500E2B056 /* ORUnivVoltModel.h in Headers */,
+				84B28E5E0F4C835500E2B056 /* ORUnivVoltHVCrateController.h in Headers */,
+				84B28E600F4C835500E2B056 /* ORUnivVoltHVCrateExceptions.h in Headers */,
+				84B28E610F4C835500E2B056 /* ORUnivVoltHVCrateModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9871,16 +9909,11 @@
 				8407F0EB0DEF6700000F1441 /* C862.gif in Resources */,
 				84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */,
 				84701AD40E0344CF00195E3E /* ORCARootService.tif in Resources */,
-				143B09BA0E11666800FE9DB8 /* UnivVolt.nib in Resources */,
-				140D81BD0E15713C0080492E /* UnivVoltHVIcon.gif in Resources */,
 				846B8F0F0E15972A00C41F9D /* ICS8065Box.tif in Resources */,
 				846B8F100E15972A00C41F9D /* m8065Service.x in Resources */,
 				846B8F110E15972A00C41F9D /* ORICS8065.nib in Resources */,
 				9C8846850E2D8D960099B98E /* ORHP4405A.nib in Resources */,
 				9C8846A60E2D90ED0099B98E /* HP4405A.gif in Resources */,
-				143AEEAD0E2E988F003E3CAC /* UnivVoltHVCrate.gif in Resources */,
-				143AEEAE0E2E988F003E3CAC /* UnivVoltHVCrate.nib in Resources */,
-				143AEEAF0E2E988F003E3CAC /* UnivVoltHVCrateSmall.gif in Resources */,
 				9C7CE7E40E2FC22500F63679 /* Caen260.nib in Resources */,
 				9C7CE7E50E2FC22500F63679 /* CV260Card.gif in Resources */,
 				844445770E81311500A1440D /* IpeV4FLT.nib in Resources */,
@@ -9962,6 +9995,16 @@
 				84B28E200F4C718400E2B056 /* HV4032.tif in Resources */,
 				84B28E210F4C718400E2B056 /* HV4032Off.tif in Resources */,
 				84B28E220F4C718400E2B056 /* HV4032On.tif in Resources */,
+				84B28E320F4C7FD400E2B056 /* LDA102.nib in Resources */,
+				84B28E330F4C7FD400E2B056 /* LDA102.tif in Resources */,
+				84B28E340F4C7FD400E2B056 /* NoADUDriverHelp.plist in Resources */,
+				84B28E5A0F4C835500E2B056 /* UnivVolt.nib in Resources */,
+				84B28E5B0F4C835500E2B056 /* UnivVoltHV.ai in Resources */,
+				84B28E5C0F4C835500E2B056 /* UnivVoltHV.jpeg in Resources */,
+				84B28E5D0F4C835500E2B056 /* UnivVoltHVIcon.gif in Resources */,
+				84B28E630F4C835500E2B056 /* UnivVoltHVCrate.gif in Resources */,
+				84B28E640F4C835500E2B056 /* UnivVoltHVCrate.nib in Resources */,
+				84B28E650F4C835500E2B056 /* UnivVoltHVCrateSmall.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10550,9 +10593,6 @@
 				843D354F0DEF1C9300330F3F /* ORCaen1190Decoders.m in Sources */,
 				8407F0E70DEF66DB000F1441 /* ORCaen862Controller.m in Sources */,
 				8407F0E90DEF66DB000F1441 /* ORCaen862Model.m in Sources */,
-				143B09B50E11666800FE9DB8 /* ORUnivVoltController.m in Sources */,
-				143B09B70E11666800FE9DB8 /* ORUnivVoltDecoders.m in Sources */,
-				143B09B90E11666800FE9DB8 /* ORUnivVoltModel.m in Sources */,
 				846B8F130E15972A00C41F9D /* ORICS8065Controller.m in Sources */,
 				846B8F150E15972A00C41F9D /* ORICS8065Model.m in Sources */,
 				846B8F1D0E15973500C41F9D /* vxi11_clnt.m in Sources */,
@@ -10560,8 +10600,6 @@
 				9C8846870E2D8D960099B98E /* ORHP4405AController.m in Sources */,
 				9C8846890E2D8D960099B98E /* ORHP4405AData.m in Sources */,
 				9C88468B0E2D8D960099B98E /* ORHP4405AModel.m in Sources */,
-				143AEEA40E2E988F003E3CAC /* ORUnivVoltHVCrateController.m in Sources */,
-				143AEEA70E2E988F003E3CAC /* ORUnivVoltHVCrateModel.m in Sources */,
 				9C7CE7E70E2FC22500F63679 /* ORCaen260Controller.m in Sources */,
 				9C7CE7E90E2FC22500F63679 /* ORCaen260Decoders.m in Sources */,
 				9C7CE7EB0E2FC22500F63679 /* ORCaen260Model.m in Sources */,
@@ -10647,6 +10685,13 @@
 				84B28E240F4C718400E2B056 /* ORHV4032Controller.m in Sources */,
 				84B28E260F4C718400E2B056 /* ORHV4032Model.m in Sources */,
 				84B28E280F4C718400E2B056 /* ORHV4032Supply.m in Sources */,
+				84B28E360F4C7FD400E2B056 /* ORLDA102Controller.m in Sources */,
+				84B28E380F4C7FD400E2B056 /* ORLDA102Model.m in Sources */,
+				84B28E550F4C835500E2B056 /* ORUnivVoltController.m in Sources */,
+				84B28E570F4C835500E2B056 /* ORUnivVoltDecoders.m in Sources */,
+				84B28E590F4C835500E2B056 /* ORUnivVoltModel.m in Sources */,
+				84B28E5F0F4C835500E2B056 /* ORUnivVoltHVCrateController.m in Sources */,
+				84B28E620F4C835500E2B056 /* ORUnivVoltHVCrateModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
