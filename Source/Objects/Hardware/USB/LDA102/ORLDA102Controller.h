@@ -26,40 +26,40 @@
 @interface ORLDA102Controller : OrcaObjectController 
 {
 	IBOutlet NSPopUpButton* serialNumberPopup;
-	IBOutlet NSPopUpButton* pollTimePopup;
-	IBOutlet NSPopUpButton* debouncePopup;
-	IBOutlet NSMatrix*		eventCounterMatrix;
-	IBOutlet NSMatrix*		portAMatrix;
-	IBOutlet NSMatrix*		relayStateMatrix;
-	IBOutlet NSMatrix*		relayControlMatrix;
+	IBOutlet   NSTextField* idleTimeTextField;
+	IBOutlet   NSTextField* dwellTimeTextField;
+	IBOutlet   NSTextField* rampEndTextField;
+	IBOutlet   NSTextField* rampStartTextField;
+	IBOutlet   NSTextField* stepSizeTextField;
+	IBOutlet   NSTextField* attenuationTextField;
     IBOutlet NSTextField*   commandField;
     IBOutlet NSButton*		sendCommandButton;
-	IBOutlet NSButton*		queryButton;
-	IBOutlet NSButton*		readClearButton;
 	IBOutlet NSButton*		lockButton;
 }
 
 #pragma mark •••Notifications
 
 #pragma mark ***Interface Management
-- (void) pollTimeChanged:(NSNotification*)aNote;
-- (void) debounceChanged:(NSNotification*)aNote;
-- (void) eventCounterChanged:(NSNotification*)aNote;
-- (void) portAChanged:(NSNotification*)aNote;
+- (void) idleTimeChanged:(NSNotification*)aNote;
+- (void) dwellTimeChanged:(NSNotification*)aNote;
+- (void) rampEndChanged:(NSNotification*)aNote;
+- (void) rampStartChanged:(NSNotification*)aNote;
+- (void) stepSizeChanged:(NSNotification*)aNote;
+- (void) attenuationChanged:(NSNotification*)aNote;
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
-- (void) relayStateChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) pollTimeAction:(id)sender;
-- (IBAction) debounceAction:(id)sender;
+- (IBAction) idleTimeTextFieldAction:(id)sender;
+- (IBAction) dwellTimeTextFieldAction:(id)sender;
+- (IBAction) rampEndTextFieldAction:(id)sender;
+- (IBAction) rampStartTextFieldAction:(id)sender;
+- (IBAction) stepSizeTextFieldAction:(id)sender;
+- (IBAction) attenuationTextFieldAction:(id)sender;
 - (IBAction) serialNumberAction:(id)sender;
-- (IBAction) relayControlAction:(id)sender;
 - (IBAction) sendCommandAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
-- (IBAction) queryAction:(id)sender;
-- (IBAction) readClearAction:(id)sender;
 
 - (void) populateInterfacePopup:(ORUSB*)usb;
 - (void) validateInterfacePopup;

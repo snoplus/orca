@@ -23,40 +23,40 @@
 
 #import "ORHPPulserModel.h"
 #import "ORUSB.h"
-#import "ORBitProcessing.h"
 
 @class ORUSBInterface;
 @class ORAlarm;
 
-@interface ORLDA102Model : OrcaObject <USBDevice, ORBitProcessing> {
+@interface ORLDA102Model : OrcaObject <USBDevice> {
 	NSLock* localLock;
 	ORUSBInterface* usbInterface;
     NSString* serialNumber;
 	ORAlarm*  noUSBAlarm;
 	ORAlarm*  noDriverAlarm;
-	BOOL	  relayState[4];
-    unsigned short portA;
-    unsigned short eventCounter[4];
-    int debounce;
-    int pollTime;
-
-	//bit processing variables
-	unsigned long processInputValue;  //snapshot of the inputs at start of process cycle
-	unsigned long processOutputValue; //outputs to be written at end of process cycle
+    short attenuation;
+    float stepSize;
+    float rampStart;
+    float rampEnd;
+    int dwellTime;
+    int idleTime;
 }
 
 - (id) getUSBController;
 
 #pragma mark ***Accessors
+- (int) idleTime;
+- (void) setIdleTime:(int)aIdleTime;
+- (int) dwellTime;
+- (void) setDwellTime:(int)aDwellTime;
+- (float) rampEnd;
+- (void) setRampEnd:(float)aRampEnd;
+- (float) rampStart;
+- (void) setRampStart:(float)aRampStart;
+- (float) stepSize;
+- (void) setStepSize:(float)aStepSize;
+- (float) attenuation;
+- (void) setAttenuation:(float)aAttenuation;
 - (void) formatCommand:(NSString*)aCommand buffer:(char*)data;
-- (int) pollTime;
-- (void) setPollTime:(int)aPollTime;
-- (int) debounce;
-- (void) setDebounce:(int)aDebounce;
-- (unsigned short) eventCounter:(unsigned short)index;
-- (void) setEventCounter:(unsigned short)index withValue:(unsigned short)aEventCounter;
-- (unsigned short) portA;
-- (void) setPortA:(unsigned short)aValue;
 - (ORUSBInterface*) usbInterface;
 - (void) setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*) serialNumber;
@@ -64,33 +64,12 @@
 - (unsigned long) vendorID;
 - (unsigned long) productID;
 - (NSString*) usbInterfaceDescription;
-- (void) setRelayState:(unsigned short)index withValue:(BOOL)aState;
-- (BOOL) relayState:(unsigned short)index;
 
 - (void) interfaceAdded:(NSNotification*)aNote;
 - (void) interfaceRemoved:(NSNotification*)aNote;
 
 #pragma mark ***Comm methods
-- (void) pollHardware;
 - (void) writeCommand:(NSString*)aCommand;
-- (void) toggleRelay:(unsigned int)index;
-- (void) closeRelay:(unsigned int)index;
-- (void) openRelay:(unsigned int)index;
-- (void) queryAll;
-- (void) queryRelays;
-- (void) queryPortA;
-- (void) queryEventCounters;
-- (void) sendDebounce;
-- (void) queryDebounce;
-- (void) readAndClear;
-- (void) queryRelay:(int)i;
-
-#pragma mark •••Bit Processing Protocol
-- (void) startProcessCycle;
-- (void) endProcessCycle;
-- (int) processValue:(int)channel;
-- (void) setProcessOutput:(int)channel value:(int)value;
-- (NSString*) processingTitle;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -98,10 +77,12 @@
 
 @end
 
-extern NSString* ORLDA102ModelPollTimeChanged;
-extern NSString* ORLDA102ModelDebounceChanged;
-extern NSString* ORLDA102ModelEventCounterChanged;
-extern NSString* ORLDA102ModelPortAChanged;
+extern NSString* ORLDA102ModelIdleTimeChanged;
+extern NSString* ORLDA102ModelDwellTimeChanged;
+extern NSString* ORLDA102ModelRampEndChanged;
+extern NSString* ORLDA102ModelRampStartChanged;
+extern NSString* ORLDA102ModelStepSizeChanged;
+extern NSString* ORLDA102ModelAttenuationChanged;
 extern NSString* ORLDA102ModelSerialNumberChanged;
 extern NSString* ORLDA102ModelUSBInterfaceChanged;
 extern NSString* ORLDA102ModelRelayChanged;

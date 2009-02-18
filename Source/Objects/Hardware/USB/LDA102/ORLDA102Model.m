@@ -24,15 +24,15 @@
 #pragma mark •••Imported Files
 #import "ORLDA102Model.h"
 #import "ORUSBInterface.h"
-#import "NetSocket.h"
 
-NSString* ORLDA102ModelPollTimeChanged		= @"ORLDA102ModelPollTimeChanged";
-NSString* ORLDA102ModelDebounceChanged		= @"ORLDA102ModelDebounceChanged";
-NSString* ORLDA102ModelEventCounterChanged	= @"ORLDA102ModelEventCounterChanged";
-NSString* ORLDA102ModelPortAChanged			= @"ORLDA102ModelPortAChanged";
+NSString* ORLDA102ModelIdleTimeChanged = @"ORLDA102ModelIdleTimeChanged";
+NSString* ORLDA102ModelDwellTimeChanged = @"ORLDA102ModelDwellTimeChanged";
+NSString* ORLDA102ModelRampEndChanged = @"ORLDA102ModelRampEndChanged";
+NSString* ORLDA102ModelRampStartChanged = @"ORLDA102ModelRampStartChanged";
+NSString* ORLDA102ModelStepSizeChanged = @"ORLDA102ModelStepSizeChanged";
+NSString* ORLDA102ModelAttenuationChanged = @"ORLDA102ModelAttenuationChanged";
 NSString* ORLDA102ModelSerialNumberChanged	= @"ORLDA102ModelSerialNumberChanged";
 NSString* ORLDA102ModelUSBInterfaceChanged	= @"ORLDA102ModelUSBInterfaceChanged";
-NSString* ORLDA102ModelRelayChanged			= @"ORLDA102ModelRelayChanged";
 NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 NSString* ORLDA102USBInConnection			= @"ORLDA102USBInConnection";
@@ -170,82 +170,77 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 }
 
 #pragma mark ***Accessors
-- (int) pollTime
+
+- (int) idleTime
 {
-    return pollTime;
+    return idleTime;
 }
 
-- (void) setPollTime:(int)aPollTime
+- (void) setIdleTime:(int)aIdleTime
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
-    
-    pollTime = aPollTime;
-	
-	[self pollHardware];
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelPollTimeChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setIdleTime:idleTime];
+    idleTime = aIdleTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelIdleTimeChanged object:self];
 }
 
-- (void) pollHardware
+- (int) dwellTime
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
-	if(pollTime == 0 )return;
-    [[self undoManager] disableUndoRegistration];
-	[self queryAll];
-    [[self undoManager] enableUndoRegistration];
-	[self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
+    return dwellTime;
 }
 
-- (int) debounce
+- (void) setDwellTime:(int)aDwellTime
 {
-    return debounce;
+    [[[self undoManager] prepareWithInvocationTarget:self] setDwellTime:dwellTime];
+    dwellTime = aDwellTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelDwellTimeChanged object:self];
 }
 
-- (void) setDebounce:(int)aDebounce
+- (float) rampEnd
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setDebounce:debounce];
-    
-    debounce = aDebounce;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelDebounceChanged object:self];
+    return rampEnd;
 }
 
-- (unsigned short) eventCounter:(unsigned short)index
+- (void) setRampEnd:(float)aRampEnd
 {
-	if(index<4)return eventCounter[index];
-	return 0;
+    [[[self undoManager] prepareWithInvocationTarget:self] setRampEnd:rampEnd];
+    rampEnd = aRampEnd;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelRampEndChanged object:self];
 }
 
-- (void) setEventCounter:(unsigned short)index withValue:(unsigned short)aEventCounter
+- (float) rampStart
 {
-	if(index<4){
-		eventCounter[index] = aEventCounter;
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelEventCounterChanged object:self];
-	}
+    return rampStart;
 }
 
-- (unsigned short) portA
+- (void) setRampStart:(float)aRampStart
 {
-	return portA;
+    [[[self undoManager] prepareWithInvocationTarget:self] setRampStart:rampStart];
+    rampStart = aRampStart;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelRampStartChanged object:self];
 }
 
-- (void) setPortA:(unsigned short)aValue;
+- (float) stepSize
 {
-	portA = aValue;
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelPortAChanged object:self];
+    return stepSize;
 }
 
-
-- (void) setRelayState:(unsigned short)index withValue:(BOOL)aState
+- (void) setStepSize:(float)aStepSize
 {
-	if(index<4)relayState[index] = aState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelRelayChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setStepSize:stepSize];
+    stepSize = aStepSize;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelStepSizeChanged object:self];
 }
 
-- (BOOL) relayState:(unsigned short)index
+- (float) attenuation
 {
-	if(index<4)return relayState[index];
-	return NO;
+    return attenuation;
+}
+
+- (void) setAttenuation:(float)aAttenuation
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAttenuation:attenuation];
+    attenuation = aAttenuation;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelAttenuationChanged object:self];
 }
 
 - (NSString*) serialNumber
@@ -339,7 +334,6 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 
 - (void) makeUSBClaim:(NSString*)aSerialNumber
 {
-	
 }
 
 #pragma mark ***Archival
@@ -348,9 +342,13 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setPollTime:[decoder decodeIntForKey:@"ORLDA102ModelPollTime"]];
-    [self setDebounce:[decoder decodeIntForKey:@"ORLDA102ModelDebounce"]];
-    [self setSerialNumber:[decoder decodeObjectForKey:@"ORLDA102ModelSerialNumber"]];
+    [self setIdleTime:		[decoder decodeIntForKey:	@"idleTime"]];
+    [self setDwellTime:		[decoder decodeIntForKey:	@"dwellTime"]];
+    [self setRampEnd:		[decoder decodeFloatForKey:	@"rampEnd"]];
+    [self setRampStart:		[decoder decodeFloatForKey:	@"rampStart"]];
+    [self setStepSize:		[decoder decodeFloatForKey:	@"stepSize"]];
+    [self setAttenuation:	[decoder decodeIntForKey:	@"attenuation"]];
+    [self setSerialNumber:	[decoder decodeObjectForKey:@"serialNumber"]];
     [[self undoManager] enableUndoRegistration];    
 	
     return self;
@@ -359,9 +357,13 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:pollTime forKey:@"ORLDA102ModelPollTime"];
-    [encoder encodeInt:debounce forKey:@"ORLDA102ModelDebounce"];
-    [encoder encodeObject:serialNumber forKey:@"ORLDA102ModelSerialNumber"];
+    [encoder encodeInt:idleTime			forKey: @"idleTime"];
+    [encoder encodeInt:dwellTime		forKey: @"dwellTime"];
+    [encoder encodeFloat:rampEnd		forKey: @"rampEnd"];
+    [encoder encodeFloat:rampStart		forKey: @"rampStart"];
+    [encoder encodeFloat:stepSize		forKey: @"stepSize"];
+    [encoder encodeInt:attenuation		forKey: @"attenuation"];
+    [encoder encodeObject:serialNumber	forKey: @"serialNumber"];
 }
 
 #pragma mark ***Comm methods
@@ -392,190 +394,5 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 	}
 }
 
-- (void) toggleRelay:(unsigned int)index
-{
-	if(index<4){
-		if(relayState[index])[self openRelay:index];
-		else [self closeRelay:index];
-		[self queryRelay:index];
-	}
-}
-
-- (void) closeRelay:(unsigned int)index
-{
-	if(index<4){
-		NSString* aCommand = [NSString stringWithFormat:@"SK%d",index];
-		char data[8];
-		[self formatCommand:aCommand buffer:data];
-		if(usbInterface && [self getUSBController]){
-			[usbInterface writeBytesOnInterruptPipe:data length:8];
-		}
-	}
-}
-
-- (void) openRelay:(unsigned int)index
-{
-	if(index<4){
-		if(usbInterface && [self getUSBController]){
-			NSString* aCommand = [NSString stringWithFormat:@"RK%d",index];
-			char data[8];
-			[self formatCommand:aCommand buffer:data];
-			[usbInterface writeBytesOnInterruptPipe:data length:8];
-		}
-	}
-}
-
-- (void) queryAll
-{
-	
-	[self queryRelays];
-	[self queryPortA];
-	[self queryEventCounters];
-	[self queryDebounce];
-}
-
-- (void) queryRelays
-{
-	if(usbInterface && [self getUSBController]){
-		int i;
-		for(i=0;i<4;i++){
-			[self queryRelay:i];
-		}
-	}
-}
-
-- (void) queryRelay:(int)i
-{
-	NSString* aCommand = [NSString stringWithFormat:@"RPK%d",i];
-	char data[8];
-	[self formatCommand:aCommand buffer:data];
-	[usbInterface writeBytesOnInterruptPipe:data length:8];
-	int amountRead = [usbInterface readBytesOnInterruptPipe:data length:8];
-	if(amountRead == 8){
-		if(data[1] == '1')	[self setRelayState:i withValue:1];
-		else				[self setRelayState:i withValue:0];
-	}
-}
-
-- (void) queryEventCounters
-{
-	if(usbInterface && [self getUSBController]){
-		int i;
-		for(i=0;i<4;i++){			
-			NSString* aCommand = [NSString stringWithFormat:@"RE%d",i];
-			char data[8];
-			[self formatCommand:aCommand buffer:data];
-			[usbInterface writeBytesOnInterruptPipe:data length:8];
-			int amountRead = [usbInterface readBytesOnInterruptPipe:data length:8];
-			if(amountRead == 8){
-				NSString* stringValue = [[[NSString alloc] initWithBytes:&data[1] length:5 encoding:NSASCIIStringEncoding] autorelease];
-				[self setEventCounter:i withValue:[stringValue intValue]];
-			}
-		}
-	}	
-}
-
-- (void) readAndClear
-{
-	if(usbInterface && [self getUSBController]){
-		int i;
-		for(i=0;i<4;i++){			
-			NSString* aCommand = [NSString stringWithFormat:@"RC%d",i];
-			char data[8];
-			[self formatCommand:aCommand buffer:data];
-			[usbInterface writeBytesOnInterruptPipe:data length:8];
-			int amountRead = [usbInterface readBytesOnInterruptPipe:data length:8];
-			if(amountRead == 8){
-				NSString* stringValue = [[[NSString alloc] initWithBytes:&data[1] length:5 encoding:NSASCIIStringEncoding] autorelease];
-				[self setEventCounter:i withValue:[stringValue intValue]];
-			}
-		}
-	}	
-}
-
-- (void) queryPortA
-{
-	if(usbInterface && [self getUSBController]){
-		char data[8];
-		[self formatCommand:@"RPA" buffer:data];
-		[usbInterface writeBytesOnInterruptPipe:data length:8];
-		int amountRead = [usbInterface readBytesOnInterruptPipe:data length:8];
-		if(amountRead ==8){
-			int i;
-			unsigned short result = 0;
-			for(i=0;i<4;i++){
-				if(data[i+1] == '1')result |= (0x8>>i);
-			}
-			[self setPortA:result];
-		}
-	}
-}
-
-- (void) queryDebounce
-{
-	if(usbInterface && [self getUSBController]){
-		char data[8];
-		[self formatCommand:@"DB" buffer:data];
-		[usbInterface writeBytesOnInterruptPipe:data length:8];
-		int amountRead = [usbInterface readBytesOnInterruptPipe:data length:8];
-		if(amountRead ==8){
-			[self setDebounce:2-('2'- data[1])]; //convert ascii 0,1,2 to int
-		}
-	}
-}
-
-- (void) sendDebounce
-{
-	if(usbInterface && [self getUSBController]){
-		char data[8];
-		NSString* aCommand = [NSString stringWithFormat:@"DB%d",debounce];
-		[self formatCommand:aCommand buffer:data];
-		[usbInterface writeBytesOnInterruptPipe:data length:8];
-	}
-}
-
-#pragma mark •••Bit Processing Protocol
-- (void)processIsStarting
-{
-}
-
-- (void)processIsStopping
-{
-}
-
-- (void) startProcessCycle
-{
-	//grab the bit pattern at the start of the cycle. it
-	//will not be changed during the cycle.
-	processInputValue = 0L;
-	[self queryPortA];
-	processInputValue =  portA;
-}
-
-- (void) endProcessCycle
-{
-	if(usbInterface && [self getUSBController]){
-		NSString* aCommand = [NSString stringWithFormat:@"SPK%04x",processOutputValue & 0xf];
-		char data[8];
-		[self formatCommand:aCommand buffer:data];
-		[usbInterface writeBytesOnInterruptPipe:data length:8];
-	}
-}
-
-- (int) processValue:(int)channel
-{
-	return (processInputValue & (1L<<channel)) > 0;
-}
-
-- (void) setProcessOutput:(int)channel value:(int)value
-{
-	if(value)	processOutputValue |= (1L<<channel);
-	else		processOutputValue &= ~(1L<<channel);
-}
-
-- (NSString*) processingTitle
-{
-    return [NSString stringWithFormat:@"LDA102,%d",[self serialNumber]];
-}
 
 @end

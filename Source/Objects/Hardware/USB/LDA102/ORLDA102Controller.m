@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORLDA102Controller.h"
 #import "ORLDA102Model.h"
 #import "ORUSB.h"
@@ -37,7 +36,6 @@
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    
     [ super registerNotificationObservers ];
     
-	
     [notifyCenter addObserver : self
                      selector : @selector(interfacesChanged:)
                          name : ORUSBInterfaceAdded
@@ -57,12 +55,7 @@
                      selector : @selector(serialNumberChanged:)
                          name : ORLDA102ModelUSBInterfaceChanged
 						object: nil];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(relayStateChanged:)
-                         name : ORLDA102ModelRelayChanged
-						object: nil];
-	
+		
 	[notifyCenter addObserver : self
 					 selector : @selector(lockChanged:)
 						 name : ORRunStatusChangedNotification
@@ -72,26 +65,36 @@
 					 selector : @selector(lockChanged:)
 						 name : ORLDA102ModelLock
 						object: nil];
-	
     [notifyCenter addObserver : self
-                     selector : @selector(portAChanged:)
-                         name : ORLDA102ModelPortAChanged
+                     selector : @selector(attenuationChanged:)
+                         name : ORLDA102ModelAttenuationChanged
 						object: model];
-	
+
     [notifyCenter addObserver : self
-                     selector : @selector(eventCounterChanged:)
-                         name : ORLDA102ModelEventCounterChanged
+                     selector : @selector(stepSizeChanged:)
+                         name : ORLDA102ModelStepSizeChanged
 						object: model];
-	
+
     [notifyCenter addObserver : self
-                     selector : @selector(debounceChanged:)
-                         name : ORLDA102ModelDebounceChanged
+                     selector : @selector(rampStartChanged:)
+                         name : ORLDA102ModelRampStartChanged
 						object: model];
-	
+
     [notifyCenter addObserver : self
-                     selector : @selector(pollTimeChanged:)
-                         name : ORLDA102ModelPollTimeChanged
+                     selector : @selector(rampEndChanged:)
+                         name : ORLDA102ModelRampEndChanged
 						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(dwellTimeChanged:)
+                         name : ORLDA102ModelDwellTimeChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(idleTimeChanged:)
+                         name : ORLDA102ModelIdleTimeChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -103,26 +106,45 @@
 - (void) updateWindow
 {
     [ super updateWindow ];
-    
 	[self serialNumberChanged:nil];
-	[self relayStateChanged:nil];
     [self lockChanged:nil];
-	[self portAChanged:nil];
-	[self eventCounterChanged:nil];
-	[self debounceChanged:nil];
-	[self pollTimeChanged:nil];
+	[self attenuationChanged:nil];
+	[self stepSizeChanged:nil];
+	[self rampStartChanged:nil];
+	[self rampEndChanged:nil];
+	[self dwellTimeChanged:nil];
+	[self idleTimeChanged:nil];
 }
 
-- (void) pollTimeChanged:(NSNotification*)aNote
+- (void) idleTimeChanged:(NSNotification*)aNote
 {
-	[pollTimePopup selectItemWithTag: [model pollTime]];
+	[idleTimeTextField setIntValue: [model idleTime]];
 }
 
-- (void) debounceChanged:(NSNotification*)aNote
+- (void) dwellTimeChanged:(NSNotification*)aNote
 {
-	[debouncePopup selectItemAtIndex: [model debounce]];
+	[dwellTimeTextField setIntValue: [model dwellTime]];
 }
 
+- (void) rampEndChanged:(NSNotification*)aNote
+{
+	[rampEndTextField setFloatValue: [model rampEnd]];
+}
+
+- (void) rampStartChanged:(NSNotification*)aNote
+{
+	[rampStartTextField setFloatValue: [model rampStart]];
+}
+
+- (void) stepSizeChanged:(NSNotification*)aNote
+{
+	[stepSizeTextField setFloatValue: [model stepSize]];
+}
+
+- (void) attenuationChanged:(NSNotification*)aNote
+{
+	[attenuationTextField setFloatValue: [model attenuation]];
+}
 
 - (void) checkGlobalSecurity
 {
@@ -131,33 +153,20 @@
     [lockButton setEnabled:secure];
 }
 
-
 #pragma mark •••Notifications
-
-- (void) eventCounterChanged:(NSNotification*)aNote
+- (void) interfacesChanged:(NSNotification*)aNote
 {
-	int i;
-	for(i=0;i<4;i++){
-		[[eventCounterMatrix cellWithTag:i] setIntValue: [model eventCounter:i]];
-	}
+	[self populateInterfacePopup:[aNote object]];
 }
 
-- (void) portAChanged:(NSNotification*)aNote
+- (void) lockChanged:(NSNotification*)aNote
 {
-	int i;
-	for(i=0;i<4;i++){
-		[[portAMatrix cellWithTag:i] setIntValue: ([model portA] & (0x1L<<i))!=0];
-	}
+   // BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORLDA102ModelLock];
+    BOOL locked = [gSecurity isLocked:ORLDA102ModelLock];
+	
+    [lockButton setState: locked];
+	[serialNumberPopup setEnabled:!locked];
 }
-
-- (void) relayStateChanged:(NSNotification*)aNote
-{
-	int i;
-	for(i=0;i<4;i++){
-		[[relayStateMatrix cellWithTag:i] setStringValue:[model relayState:i]?@"Closed":@"Open"];
-	}
-}
-
 
 - (void) serialNumberChanged:(NSNotification*)aNote
 {
@@ -166,47 +175,37 @@
 	[[self window] setTitle:[model title]];
 }
 
-- (void) interfacesChanged:(NSNotification*)aNote
-{
-	[self populateInterfacePopup:[aNote object]];
-}
-
-- (void) lockChanged:(NSNotification*)aNote
-{
-    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORLDA102ModelLock];
-    BOOL locked = [gSecurity isLocked:ORLDA102ModelLock];
-	
-    [lockButton setState: locked];
-	[serialNumberPopup setEnabled:!locked];
-	[relayControlMatrix setEnabled:!lockedOrRunningMaintenance ]; 
-	[queryButton setEnabled:!lockedOrRunningMaintenance];
-	[debouncePopup setEnabled:!lockedOrRunningMaintenance];
-	[pollTimePopup setEnabled:!lockedOrRunningMaintenance];
-	[readClearButton setEnabled:!lockedOrRunningMaintenance];
-}
-
 #pragma mark •••Actions
-- (IBAction) pollTimeAction:(id)sender
+
+- (void) idleTimeTextFieldAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];	
+	[model setIdleTime:[sender intValue]];	
 }
 
-- (IBAction) debounceAction:(id)sender
+- (void) dwellTimeTextFieldAction:(id)sender
 {
-	@try {
-		[model setDebounce:[sender indexOfSelectedItem]];
-		[model sendDebounce];	
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
+	[model setDwellTime:[sender intValue]];	
 }
 
+- (void) rampEndTextFieldAction:(id)sender
+{
+	[model setRampEnd:[sender floatValue]];	
+}
+
+- (void) rampStartTextFieldAction:(id)sender
+{
+	[model setRampStart:[sender floatValue]];	
+}
+
+- (void) stepSizeTextFieldAction:(id)sender
+{
+	[model setStepSize:[sender floatValue]];	
+}
+
+- (void) attenuationTextFieldAction:(id)sender
+{
+	[model setAttenuation:[sender floatValue]];	
+}
 - (IBAction) settingLockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORLDA102ModelLock to:[sender intValue] forWindow:[self window]];
@@ -228,7 +227,6 @@
 	[self validateInterfacePopup];
 	if([model serialNumber])[serialNumberPopup selectItemWithTitle:[model serialNumber]];
 	else [serialNumberPopup selectItemAtIndex:0];
-	
 }
 
 - (void) validateInterfacePopup
@@ -242,7 +240,6 @@
 			[[serialNumberPopup itemWithTitle:serialNumber] setEnabled:YES];
 		}
 		else [[serialNumberPopup itemWithTitle:serialNumber] setEnabled:NO];
-		
 	}
 }
 
@@ -254,61 +251,6 @@
 	else {
 		[model setSerialNumber:[serialNumberPopup titleOfSelectedItem]];
 	}
-	
-}
-
-- (IBAction) relayControlAction:(id)sender
-{
-	@try {
-		[model toggleRelay:[[sender selectedCell]tag]];
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
-}
-
-- (IBAction) readClearAction:(id)sender
-{
-	@try {
-		[model readAndClear];
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
-}
-
-- (IBAction) queryAction:(id)sender
-{
-	@try {
-		[model queryAll];
-		int i;
-		for(i=0;i<4;i++){
-			NSLog(@"LDA102: Relay %d: %@\n",i,[model relayState:i]?@"Closed":@"Open");
-		}
-		NSLog(@"LDA102: PortA: 0x%0x\n",[model portA]);
-		for(i=0;i<4;i++){
-			NSLog(@"LDA102: Event Counter %d: %d\n",i,[model eventCounter:i]);
-		}
-	}
-	@catch(NSException* localException) {
-        NSLog( [ localException reason ] );
-        NSRunAlertPanel( [ localException name ], 	// Name of panel
-						[ localException reason ],	// Reason for error
-						@"OK",				// Okay button
-						nil,				// alternate button
-						nil );				// other button
-	}
-	
 }
 
 - (IBAction) sendCommandAction:(id)sender
