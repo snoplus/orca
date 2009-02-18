@@ -151,14 +151,6 @@
 		8408A4BE09071C6A004A3B34 /* ORHV2132Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A4B809071C6A004A3B34 /* ORHV2132Controller.m */; };
 		8408A4BF09071C6A004A3B34 /* ORHV2132Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408A4B909071C6A004A3B34 /* ORHV2132Model.h */; };
 		8408A4C009071C6A004A3B34 /* ORHV2132Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A4BA09071C6A004A3B34 /* ORHV2132Model.m */; };
-		8408A50D09081E80004A3B34 /* HV4032.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8408A50509081E80004A3B34 /* HV4032.nib */; };
-		8408A50E09081E80004A3B34 /* HV4032Off.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8408A50609081E80004A3B34 /* HV4032Off.tif */; };
-		8408A50F09081E80004A3B34 /* ORHV4032Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408A50709081E80004A3B34 /* ORHV4032Controller.h */; };
-		8408A51009081E80004A3B34 /* ORHV4032Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A50809081E80004A3B34 /* ORHV4032Controller.m */; };
-		8408A51109081E80004A3B34 /* ORHV4032Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408A50909081E80004A3B34 /* ORHV4032Model.h */; };
-		8408A51209081E80004A3B34 /* ORHV4032Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A50A09081E80004A3B34 /* ORHV4032Model.m */; };
-		8408A51309081E80004A3B34 /* ORHV4032Supply.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408A50B09081E80004A3B34 /* ORHV4032Supply.h */; };
-		8408A51409081E80004A3B34 /* ORHV4032Supply.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A50C09081E80004A3B34 /* ORHV4032Supply.m */; };
 		840AF86D0819924D005B750D /* SourceMask.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AF86B0819924D005B750D /* SourceMask.h */; };
 		840AF86E0819924D005B750D /* SourceMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AF86C0819924D005B750D /* SourceMask.m */; };
 		840B207C0B4D79400021220C /* NSScanner+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B207A0B4D79400021220C /* NSScanner+Extensions.h */; };
@@ -498,10 +490,7 @@
 		8434A205055B3287002D3102 /* OROscBaseController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CDDA4A04717166005F64B1 /* OROscBaseController.h */; };
 		8434A206055B3287002D3102 /* ORHPPulserController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CDDA4E047171B1005F64B1 /* ORHPPulserController.h */; };
 		8434A207055B3287002D3102 /* ORTek754DData.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CDDA5404717389005F64B1 /* ORTek754DData.h */; };
-		8434A209055B3287002D3102 /* ORHVRampModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F6D668047BEE2F005F64B1 /* ORHVRampModel.h */; };
-		8434A20A055B3287002D3102 /* ORHVRampController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F6D66A047BEE2F005F64B1 /* ORHVRampController.h */; };
 		8434A20C055B3287002D3102 /* ThreadWorker.h in Headers */ = {isa = PBXBuildFile; fileRef = 842F2343047D365F005F64B1 /* ThreadWorker.h */; };
-		8434A20D055B3287002D3102 /* ORHVSupply.h in Headers */ = {isa = PBXBuildFile; fileRef = 84FE6584047D9140005F64B1 /* ORHVSupply.h */; };
 		8434A20E055B3287002D3102 /* ORReadOutList.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BC3FDD04B9D899005F64B1 /* ORReadOutList.h */; };
 		8434A20F055B3287002D3102 /* NSArray+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BC3FE104B9DA78005F64B1 /* NSArray+Extensions.h */; };
 		8434A210055B3287002D3102 /* NSOutlineView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BC3FE404B9DA78005F64B1 /* NSOutlineView+Extensions.h */; };
@@ -584,9 +573,6 @@
 		8434A284055B3287002D3102 /* TriggerCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 847F59EA0450CB61005F64B1 /* TriggerCard.gif */; };
 		8434A285055B3287002D3102 /* NcdMux.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B649B50406ECBA005F64B1 /* NcdMux.gif */; };
 		8434A287055B3287002D3102 /* HPPulser.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84368AD10471AACA005F64B1 /* HPPulser.nib */; };
-		8434A288055B3287002D3102 /* HVRamp.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84F6D662047BED77005F64B1 /* HVRamp.nib */; };
-		8434A289055B3287002D3102 /* HVRamp.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84F6D666047BEE2F005F64B1 /* HVRamp.gif */; };
-		8434A28A055B3287002D3102 /* HVRampOn.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84C6962804A37CCA005F64B1 /* HVRampOn.gif */; };
 		8434A28C055B3287002D3102 /* Dispatcher.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8499148604BB3E05005F64B1 /* Dispatcher.nib */; };
 		8434A28D055B3287002D3102 /* PCICamac.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84E583FB04DB1772005F64B1 /* PCICamac.nib */; };
 		8434A28E055B3287002D3102 /* PCICamacCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84E583FC04DB1772005F64B1 /* PCICamacCard.gif */; };
@@ -686,10 +672,7 @@
 		8434A31D055B3287002D3102 /* OROscBaseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CDDA4B04717166005F64B1 /* OROscBaseController.m */; };
 		8434A31E055B3287002D3102 /* ORHPPulserController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CDDA4F047171B1005F64B1 /* ORHPPulserController.m */; };
 		8434A31F055B3287002D3102 /* ORTek754DData.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CDDA5504717389005F64B1 /* ORTek754DData.m */; };
-		8434A321055B3287002D3102 /* ORHVRampController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F6D667047BEE2F005F64B1 /* ORHVRampController.m */; };
-		8434A322055B3287002D3102 /* ORHVRampModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F6D669047BEE2F005F64B1 /* ORHVRampModel.m */; };
 		8434A324055B3287002D3102 /* ThreadWorker.m in Sources */ = {isa = PBXBuildFile; fileRef = 842F2341047D3655005F64B1 /* ThreadWorker.m */; };
-		8434A325055B3287002D3102 /* ORHVSupply.m in Sources */ = {isa = PBXBuildFile; fileRef = 84FE6585047D9140005F64B1 /* ORHVSupply.m */; };
 		8434A326055B3287002D3102 /* ORReadOutList.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC3FDE04B9D899005F64B1 /* ORReadOutList.m */; };
 		8434A327055B3287002D3102 /* NSOutlineView+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC3FE204B9DA78005F64B1 /* NSOutlineView+Extensions.m */; };
 		8434A328055B3287002D3102 /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BC3FE304B9DA78005F64B1 /* NSArray+Extensions.m */; };
@@ -1071,8 +1054,6 @@
 		847E6C200CFF4C3200E963C6 /* OReGunModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 847E6C190CFF4C3200E963C6 /* OReGunModel.m */; };
 		847F8B35063DB29E00A8597A /* ORTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 847F8B33063DB29E00A8597A /* ORTimer.h */; };
 		847F8B36063DB29E00A8597A /* ORTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F8B34063DB29E00A8597A /* ORTimer.m */; };
-		8482D8FA0593A50E0013A206 /* HVPowerCycledHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8482D8F90593A50E0013A206 /* HVPowerCycledHelp.plist */; };
-		8482D9160593ABD60013A206 /* HVHighCurrentHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8482D9150593ABD60013A206 /* HVHighCurrentHelp.plist */; };
 		848326E906DA614B00172F1C /* ORDualPortLAMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E506DA614B00172F1C /* ORDualPortLAMController.h */; };
 		848326EA06DA614B00172F1C /* ORDualPortLAMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 848326E606DA614B00172F1C /* ORDualPortLAMController.m */; };
 		848326EB06DA614B00172F1C /* ORDualPortLAMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E706DA614B00172F1C /* ORDualPortLAMModel.h */; };
@@ -1142,7 +1123,6 @@
 		848E201C059282F400B6708F /* statusWindow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E201B059282F400B6708F /* statusWindow.gif */; };
 		848E206A0592891800B6708F /* alarmMaster.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E20690592891800B6708F /* alarmMaster.gif */; };
 		848E2102059378C800B6708F /* catalog.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E2101059378C700B6708F /* catalog.gif */; };
-		848E21620593A4B900B6708F /* HVNotPollingHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 848E21610593A4B900B6708F /* HVNotPollingHelp.plist */; };
 		848E3BC909DB0B3E0003F7A2 /* ORMailCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */; };
 		848E3BCA09DB0B3E0003F7A2 /* ORMailCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 848E3BC709DB0B3E0003F7A2 /* ORMailCenter.m */; };
 		848E3BCB09DB0B3E0003F7A2 /* MailCenter.nib in Resources */ = {isa = PBXBuildFile; fileRef = 848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */; };
@@ -1415,7 +1395,6 @@
 		84AD4CD50BA232FF003C7ABE /* ORWindowListController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84AD4C2D0BA21B7A003C7ABE /* ORWindowListController.h */; };
 		84AD4CD60BA232FF003C7ABE /* ORWindowListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */; };
 		84AD4CD70BA23300003C7ABE /* WindowList.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */; };
-		84AF39FE093D0AED0015BE54 /* HV4032On.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84AF39FD093D0AED0015BE54 /* HV4032On.tif */; };
 		84B0CFBE08FC60BC00EBE23C /* Container.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFB808FC60BC00EBE23C /* Container.nib */; };
 		84B0CFBF08FC60BC00EBE23C /* Container.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFB908FC60BC00EBE23C /* Container.tif */; };
 		84B0CFC008FC60BC00EBE23C /* ORContainerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B0CFBA08FC60BC00EBE23C /* ORContainerController.m */; };
@@ -1515,6 +1494,31 @@
 		84B28DF00F4C6FED00E2B056 /* RampItem.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DDE0F4C6FED00E2B056 /* RampItem.nib */; };
 		84B28DF10F4C6FED00E2B056 /* RampRunning.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DDF0F4C6FED00E2B056 /* RampRunning.tif */; };
 		84B28DF20F4C6FED00E2B056 /* triangleBugRight.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DE00F4C6FED00E2B056 /* triangleBugRight.tif */; };
+		84B28E100F4C718400E2B056 /* HVHighCurrentHelp in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DF60F4C718300E2B056 /* HVHighCurrentHelp */; };
+		84B28E110F4C718400E2B056 /* HVHighCurrentHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DF70F4C718300E2B056 /* HVHighCurrentHelp.plist */; };
+		84B28E120F4C718400E2B056 /* HVNotPollingHelp in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DF80F4C718300E2B056 /* HVNotPollingHelp */; };
+		84B28E130F4C718400E2B056 /* HVNotPollingHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DF90F4C718300E2B056 /* HVNotPollingHelp.plist */; };
+		84B28E140F4C718400E2B056 /* HVPowerCycledHelp in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DFA0F4C718300E2B056 /* HVPowerCycledHelp */; };
+		84B28E150F4C718400E2B056 /* HVPowerCycledHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DFB0F4C718300E2B056 /* HVPowerCycledHelp.plist */; };
+		84B28E160F4C718400E2B056 /* HVRamp.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DFC0F4C718300E2B056 /* HVRamp.gif */; };
+		84B28E170F4C718400E2B056 /* HVRamp.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DFD0F4C718300E2B056 /* HVRamp.nib */; };
+		84B28E180F4C718400E2B056 /* HVRampOn.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DFE0F4C718300E2B056 /* HVRampOn.gif */; };
+		84B28E190F4C718400E2B056 /* ORHVRampController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DFF0F4C718400E2B056 /* ORHVRampController.h */; };
+		84B28E1A0F4C718400E2B056 /* ORHVRampController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E000F4C718400E2B056 /* ORHVRampController.m */; };
+		84B28E1B0F4C718400E2B056 /* ORHVRampModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E010F4C718400E2B056 /* ORHVRampModel.h */; };
+		84B28E1C0F4C718400E2B056 /* ORHVRampModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E020F4C718400E2B056 /* ORHVRampModel.m */; };
+		84B28E1D0F4C718400E2B056 /* ORHVSupply.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E030F4C718400E2B056 /* ORHVSupply.h */; };
+		84B28E1E0F4C718400E2B056 /* ORHVSupply.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E040F4C718400E2B056 /* ORHVSupply.m */; };
+		84B28E1F0F4C718400E2B056 /* HV4032.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E060F4C718400E2B056 /* HV4032.nib */; };
+		84B28E200F4C718400E2B056 /* HV4032.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E070F4C718400E2B056 /* HV4032.tif */; };
+		84B28E210F4C718400E2B056 /* HV4032Off.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E080F4C718400E2B056 /* HV4032Off.tif */; };
+		84B28E220F4C718400E2B056 /* HV4032On.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28E090F4C718400E2B056 /* HV4032On.tif */; };
+		84B28E230F4C718400E2B056 /* ORHV4032Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E0A0F4C718400E2B056 /* ORHV4032Controller.h */; };
+		84B28E240F4C718400E2B056 /* ORHV4032Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E0B0F4C718400E2B056 /* ORHV4032Controller.m */; };
+		84B28E250F4C718400E2B056 /* ORHV4032Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E0C0F4C718400E2B056 /* ORHV4032Model.h */; };
+		84B28E260F4C718400E2B056 /* ORHV4032Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E0D0F4C718400E2B056 /* ORHV4032Model.m */; };
+		84B28E270F4C718400E2B056 /* ORHV4032Supply.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28E0E0F4C718400E2B056 /* ORHV4032Supply.h */; };
+		84B28E280F4C718400E2B056 /* ORHV4032Supply.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28E0F0F4C718400E2B056 /* ORHV4032Supply.m */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -2168,14 +2172,6 @@
 		8408A4B809071C6A004A3B34 /* ORHV2132Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV2132Controller.m; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Controller.m; sourceTree = SOURCE_ROOT; };
 		8408A4B909071C6A004A3B34 /* ORHV2132Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHV2132Model.h; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Model.h; sourceTree = SOURCE_ROOT; };
 		8408A4BA09071C6A004A3B34 /* ORHV2132Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV2132Model.m; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Model.m; sourceTree = SOURCE_ROOT; };
-		8408A50509081E80004A3B34 /* HV4032.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HV4032.nib; path = Source/Objects/Control/HV4032/HV4032.nib; sourceTree = SOURCE_ROOT; };
-		8408A50609081E80004A3B34 /* HV4032Off.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = HV4032Off.tif; sourceTree = "<group>"; };
-		8408A50709081E80004A3B34 /* ORHV4032Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHV4032Controller.h; path = Source/Objects/Control/HV4032/ORHV4032Controller.h; sourceTree = SOURCE_ROOT; };
-		8408A50809081E80004A3B34 /* ORHV4032Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Controller.m; path = Source/Objects/Control/HV4032/ORHV4032Controller.m; sourceTree = SOURCE_ROOT; };
-		8408A50909081E80004A3B34 /* ORHV4032Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHV4032Model.h; path = Source/Objects/Control/HV4032/ORHV4032Model.h; sourceTree = SOURCE_ROOT; };
-		8408A50A09081E80004A3B34 /* ORHV4032Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Model.m; path = Source/Objects/Control/HV4032/ORHV4032Model.m; sourceTree = SOURCE_ROOT; };
-		8408A50B09081E80004A3B34 /* ORHV4032Supply.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHV4032Supply.h; path = Source/Objects/Control/HV4032/ORHV4032Supply.h; sourceTree = SOURCE_ROOT; };
-		8408A50C09081E80004A3B34 /* ORHV4032Supply.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Supply.m; path = Source/Objects/Control/HV4032/ORHV4032Supply.m; sourceTree = SOURCE_ROOT; };
 		840AF86B0819924D005B750D /* SourceMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SourceMask.h; sourceTree = "<group>"; };
 		840AF86C0819924D005B750D /* SourceMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceMask.m; sourceTree = "<group>"; };
 		840B207A0B4D79400021220C /* NSScanner+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSScanner+Extensions.h"; path = "Source/Cocoa Extensions/NSScanner+Extensions.h"; sourceTree = SOURCE_ROOT; };
@@ -2870,8 +2866,6 @@
 		847F59EA0450CB61005F64B1 /* TriggerCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = TriggerCard.gif; path = Source/Objects/Hardware/Vme/Trigger/TriggerCard.gif; sourceTree = SOURCE_ROOT; };
 		847F8B33063DB29E00A8597A /* ORTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTimer.h; sourceTree = "<group>"; };
 		847F8B34063DB29E00A8597A /* ORTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimer.m; sourceTree = "<group>"; };
-		8482D8F90593A50E0013A206 /* HVPowerCycledHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = HVPowerCycledHelp.plist; path = Source/Objects/Control/HVControl/HVPowerCycledHelp.plist; sourceTree = SOURCE_ROOT; };
-		8482D9150593ABD60013A206 /* HVHighCurrentHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = HVHighCurrentHelp.plist; path = Source/Objects/Control/HVControl/HVHighCurrentHelp.plist; sourceTree = SOURCE_ROOT; };
 		848326E506DA614B00172F1C /* ORDualPortLAMController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMController.h; sourceTree = "<group>"; };
 		848326E606DA614B00172F1C /* ORDualPortLAMController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDualPortLAMController.m; sourceTree = "<group>"; };
 		848326E706DA614B00172F1C /* ORDualPortLAMModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMModel.h; sourceTree = "<group>"; };
@@ -2941,7 +2935,6 @@
 		848E201B059282F400B6708F /* statusWindow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = statusWindow.gif; path = "Source/Main Document/statusWindow.gif"; sourceTree = SOURCE_ROOT; };
 		848E20690592891800B6708F /* alarmMaster.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = alarmMaster.gif; path = "Source/Main Document/alarmMaster.gif"; sourceTree = SOURCE_ROOT; };
 		848E2101059378C700B6708F /* catalog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = catalog.gif; path = "Source/Main Document/catalog.gif"; sourceTree = SOURCE_ROOT; };
-		848E21610593A4B900B6708F /* HVNotPollingHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = HVNotPollingHelp.plist; path = Source/Objects/Control/HVControl/HVNotPollingHelp.plist; sourceTree = SOURCE_ROOT; };
 		848E3BC609DB0B3E0003F7A2 /* ORMailCenter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORMailCenter.h; path = "Source/Main Dialogs/MailCenter/ORMailCenter.h"; sourceTree = SOURCE_ROOT; };
 		848E3BC709DB0B3E0003F7A2 /* ORMailCenter.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORMailCenter.m; path = "Source/Main Dialogs/MailCenter/ORMailCenter.m"; sourceTree = SOURCE_ROOT; };
 		848E3BC809DB0B3E0003F7A2 /* MailCenter.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MailCenter.nib; sourceTree = "<group>"; };
@@ -3226,7 +3219,6 @@
 		84AD4C2E0BA21B7A003C7ABE /* ORWindowListController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORWindowListController.m; path = "Source/Main Dialogs/WindowList/ORWindowListController.m"; sourceTree = SOURCE_ROOT; };
 		84AD4C2F0BA21B7A003C7ABE /* WindowList.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = WindowList.nib; path = "Source/Main Dialogs/WindowList/WindowList.nib"; sourceTree = SOURCE_ROOT; };
 		84ADA288040ADF2D005F64B1 /* NcdMux.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = NcdMux.nib; path = "Source/Objects/Custom Hardware/Ncd Hardware/NcdMux/NcdMux.nib"; sourceTree = SOURCE_ROOT; };
-		84AF39FD093D0AED0015BE54 /* HV4032On.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HV4032On.tif; path = Source/Objects/Control/HV4032/HV4032On.tif; sourceTree = SOURCE_ROOT; };
 		84B0CFB808FC60BC00EBE23C /* Container.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Container.nib; path = Source/Objects/Container/Container.nib; sourceTree = SOURCE_ROOT; };
 		84B0CFB908FC60BC00EBE23C /* Container.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Container.tif; path = Source/Objects/Container/Container.tif; sourceTree = SOURCE_ROOT; };
 		84B0CFBA08FC60BC00EBE23C /* ORContainerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORContainerController.m; path = Source/Objects/Container/ORContainerController.m; sourceTree = SOURCE_ROOT; };
@@ -3329,6 +3321,31 @@
 		84B28DDE0F4C6FED00E2B056 /* RampItem.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RampItem.nib; path = Source/Objects/Control/Ramper/RampItem.nib; sourceTree = SOURCE_ROOT; };
 		84B28DDF0F4C6FED00E2B056 /* RampRunning.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RampRunning.tif; path = Source/Objects/Control/Ramper/RampRunning.tif; sourceTree = SOURCE_ROOT; };
 		84B28DE00F4C6FED00E2B056 /* triangleBugRight.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = triangleBugRight.tif; path = Source/Objects/Control/Ramper/triangleBugRight.tif; sourceTree = SOURCE_ROOT; };
+		84B28DF60F4C718300E2B056 /* HVHighCurrentHelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HVHighCurrentHelp; path = Source/Objects/Hardware/HV/HVControl/HVHighCurrentHelp; sourceTree = SOURCE_ROOT; };
+		84B28DF70F4C718300E2B056 /* HVHighCurrentHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = HVHighCurrentHelp.plist; path = Source/Objects/Hardware/HV/HVControl/HVHighCurrentHelp.plist; sourceTree = SOURCE_ROOT; };
+		84B28DF80F4C718300E2B056 /* HVNotPollingHelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HVNotPollingHelp; path = Source/Objects/Hardware/HV/HVControl/HVNotPollingHelp; sourceTree = SOURCE_ROOT; };
+		84B28DF90F4C718300E2B056 /* HVNotPollingHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = HVNotPollingHelp.plist; path = Source/Objects/Hardware/HV/HVControl/HVNotPollingHelp.plist; sourceTree = SOURCE_ROOT; };
+		84B28DFA0F4C718300E2B056 /* HVPowerCycledHelp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HVPowerCycledHelp; path = Source/Objects/Hardware/HV/HVControl/HVPowerCycledHelp; sourceTree = SOURCE_ROOT; };
+		84B28DFB0F4C718300E2B056 /* HVPowerCycledHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = HVPowerCycledHelp.plist; path = Source/Objects/Hardware/HV/HVControl/HVPowerCycledHelp.plist; sourceTree = SOURCE_ROOT; };
+		84B28DFC0F4C718300E2B056 /* HVRamp.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HVRamp.gif; path = Source/Objects/Hardware/HV/HVControl/HVRamp.gif; sourceTree = SOURCE_ROOT; };
+		84B28DFD0F4C718300E2B056 /* HVRamp.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HVRamp.nib; path = Source/Objects/Hardware/HV/HVControl/HVRamp.nib; sourceTree = SOURCE_ROOT; };
+		84B28DFE0F4C718300E2B056 /* HVRampOn.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HVRampOn.gif; path = Source/Objects/Hardware/HV/HVControl/HVRampOn.gif; sourceTree = SOURCE_ROOT; };
+		84B28DFF0F4C718400E2B056 /* ORHVRampController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVRampController.h; path = Source/Objects/Hardware/HV/HVControl/ORHVRampController.h; sourceTree = SOURCE_ROOT; };
+		84B28E000F4C718400E2B056 /* ORHVRampController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVRampController.m; path = Source/Objects/Hardware/HV/HVControl/ORHVRampController.m; sourceTree = SOURCE_ROOT; };
+		84B28E010F4C718400E2B056 /* ORHVRampModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVRampModel.h; path = Source/Objects/Hardware/HV/HVControl/ORHVRampModel.h; sourceTree = SOURCE_ROOT; };
+		84B28E020F4C718400E2B056 /* ORHVRampModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVRampModel.m; path = Source/Objects/Hardware/HV/HVControl/ORHVRampModel.m; sourceTree = SOURCE_ROOT; };
+		84B28E030F4C718400E2B056 /* ORHVSupply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVSupply.h; path = Source/Objects/Hardware/HV/HVControl/ORHVSupply.h; sourceTree = SOURCE_ROOT; };
+		84B28E040F4C718400E2B056 /* ORHVSupply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVSupply.m; path = Source/Objects/Hardware/HV/HVControl/ORHVSupply.m; sourceTree = SOURCE_ROOT; };
+		84B28E060F4C718400E2B056 /* HV4032.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HV4032.nib; path = Source/Objects/Hardware/HV/HV4032/HV4032.nib; sourceTree = SOURCE_ROOT; };
+		84B28E070F4C718400E2B056 /* HV4032.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HV4032.tif; path = Source/Objects/Hardware/HV/HV4032/HV4032.tif; sourceTree = SOURCE_ROOT; };
+		84B28E080F4C718400E2B056 /* HV4032Off.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HV4032Off.tif; path = Source/Objects/Hardware/HV/HV4032/HV4032Off.tif; sourceTree = SOURCE_ROOT; };
+		84B28E090F4C718400E2B056 /* HV4032On.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HV4032On.tif; path = Source/Objects/Hardware/HV/HV4032/HV4032On.tif; sourceTree = SOURCE_ROOT; };
+		84B28E0A0F4C718400E2B056 /* ORHV4032Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHV4032Controller.h; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Controller.h; sourceTree = SOURCE_ROOT; };
+		84B28E0B0F4C718400E2B056 /* ORHV4032Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Controller.m; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Controller.m; sourceTree = SOURCE_ROOT; };
+		84B28E0C0F4C718400E2B056 /* ORHV4032Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHV4032Model.h; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Model.h; sourceTree = SOURCE_ROOT; };
+		84B28E0D0F4C718400E2B056 /* ORHV4032Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Model.m; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Model.m; sourceTree = SOURCE_ROOT; };
+		84B28E0E0F4C718400E2B056 /* ORHV4032Supply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHV4032Supply.h; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Supply.h; sourceTree = SOURCE_ROOT; };
+		84B28E0F0F4C718400E2B056 /* ORHV4032Supply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHV4032Supply.m; path = Source/Objects/Hardware/HV/HV4032/ORHV4032Supply.m; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -3492,7 +3509,6 @@
 		84C533290652BA6B00E4731F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		84C5FD20050E740A005F64B1 /* ORTimeRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTimeRate.h; sourceTree = "<group>"; };
 		84C5FD21050E740A005F64B1 /* ORTimeRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimeRate.m; sourceTree = "<group>"; };
-		84C6962804A37CCA005F64B1 /* HVRampOn.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HVRampOn.gif; path = Source/Objects/Control/HVControl/HVRampOn.gif; sourceTree = SOURCE_ROOT; };
 		84C7540F06654C3D00EC5D1C /* ORAnalysisPanel1D.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAnalysisPanel1D.m; path = Source/Widgets/Plotting/ORAnalysisPanel1D.m; sourceTree = SOURCE_ROOT; };
 		84C7541006654C3D00EC5D1C /* ORAnalysisPanel1D.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAnalysisPanel1D.h; path = Source/Widgets/Plotting/ORAnalysisPanel1D.h; sourceTree = SOURCE_ROOT; };
 		84C7541706654C3D00EC5D1C /* ORPlotter1D.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORPlotter1D.m; path = Source/Widgets/Plotting/ORPlotter1D.m; sourceTree = SOURCE_ROOT; };
@@ -3715,12 +3731,6 @@
 		84F689CF044F7837005F64B1 /* Waveform.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Waveform.nib; sourceTree = "<group>"; };
 		84F69CF50B331BB9000BE0CA /* ORSegmentGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSegmentGroup.h; sourceTree = "<group>"; };
 		84F69CF60B331BB9000BE0CA /* ORSegmentGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSegmentGroup.m; sourceTree = "<group>"; };
-		84F6D662047BED77005F64B1 /* HVRamp.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = HVRamp.nib; sourceTree = "<group>"; };
-		84F6D666047BEE2F005F64B1 /* HVRamp.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = HVRamp.gif; path = Source/Objects/Control/HVControl/HVRamp.gif; sourceTree = SOURCE_ROOT; };
-		84F6D667047BEE2F005F64B1 /* ORHVRampController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHVRampController.m; path = Source/Objects/Control/HVControl/ORHVRampController.m; sourceTree = SOURCE_ROOT; };
-		84F6D668047BEE2F005F64B1 /* ORHVRampModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHVRampModel.h; path = Source/Objects/Control/HVControl/ORHVRampModel.h; sourceTree = SOURCE_ROOT; };
-		84F6D669047BEE2F005F64B1 /* ORHVRampModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHVRampModel.m; path = Source/Objects/Control/HVControl/ORHVRampModel.m; sourceTree = SOURCE_ROOT; };
-		84F6D66A047BEE2F005F64B1 /* ORHVRampController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHVRampController.h; path = Source/Objects/Control/HVControl/ORHVRampController.h; sourceTree = SOURCE_ROOT; };
 		84F7E2310B68281900E52AA5 /* ORCrateLabelView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCrateLabelView.h; path = "Source/Objects/Misc Objects/Views/CardContainerView/ORCrateLabelView.h"; sourceTree = SOURCE_ROOT; };
 		84F7E2320B68281900E52AA5 /* ORCrateLabelView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORCrateLabelView.m; path = "Source/Objects/Misc Objects/Views/CardContainerView/ORCrateLabelView.m"; sourceTree = SOURCE_ROOT; };
 		84F7F3CE0AE3F1A000A5AA4C /* OrcaPrecompiledHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OrcaPrecompiledHeader.h; path = "Source/App Delegate/OrcaPrecompiledHeader.h"; sourceTree = SOURCE_ROOT; };
@@ -3773,8 +3783,6 @@
 		84FDF54C0D7F084E003AE119 /* ORIpeV4CrateModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeV4CrateModel.m; path = "Source/Objects/Hardware/IPE/IpeV4 Crate/ORIpeV4CrateModel.m"; sourceTree = SOURCE_ROOT; };
 		84FE07CE07B403ED00E2CB0E /* NSString+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSString+Extensions.m"; path = "Source/Cocoa Extensions/NSString+Extensions.m"; sourceTree = SOURCE_ROOT; };
 		84FE07CF07B403ED00E2CB0E /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "Source/Cocoa Extensions/NSString+Extensions.h"; sourceTree = SOURCE_ROOT; };
-		84FE6584047D9140005F64B1 /* ORHVSupply.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHVSupply.h; path = Source/Objects/Control/HVControl/ORHVSupply.h; sourceTree = SOURCE_ROOT; };
-		84FE6585047D9140005F64B1 /* ORHVSupply.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHVSupply.m; path = Source/Objects/Control/HVControl/ORHVSupply.m; sourceTree = SOURCE_ROOT; };
 		84FFCAA00636D5B10069432F /* C792.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = C792.gif; sourceTree = "<group>"; };
 		84FFCAA10636D5B10069432F /* Caen792.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Caen792.nib; sourceTree = "<group>"; };
 		84FFCAA20636D5B10069432F /* ORCaen792Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORCaen792Controller.h; sourceTree = "<group>"; };
@@ -4358,23 +4366,6 @@
 			);
 			name = HV2132;
 			path = Source/Objects/Hardware/Camac/HV2132;
-			sourceTree = SOURCE_ROOT;
-		};
-		8408A50409081E80004A3B34 /* HV4032 */ = {
-			isa = PBXGroup;
-			children = (
-				8408A50909081E80004A3B34 /* ORHV4032Model.h */,
-				8408A50A09081E80004A3B34 /* ORHV4032Model.m */,
-				8408A50709081E80004A3B34 /* ORHV4032Controller.h */,
-				8408A50809081E80004A3B34 /* ORHV4032Controller.m */,
-				8408A50B09081E80004A3B34 /* ORHV4032Supply.h */,
-				8408A50C09081E80004A3B34 /* ORHV4032Supply.m */,
-				8408A50609081E80004A3B34 /* HV4032Off.tif */,
-				84AF39FD093D0AED0015BE54 /* HV4032On.tif */,
-				8408A50509081E80004A3B34 /* HV4032.nib */,
-			);
-			name = HV4032;
-			path = Source/Objects/Control/HV4032;
 			sourceTree = SOURCE_ROOT;
 		};
 		840B4BAB03D8754D005F64B1 /* Alarms */ = {
@@ -5184,8 +5175,6 @@
 		842F19A603B8EAF3005F64B1 /* Control */ = {
 			isa = PBXGroup;
 			children = (
-				8408A50409081E80004A3B34 /* HV4032 */,
-				84F6D661047BED77005F64B1 /* HVRampControl */,
 				84E22AAA0417F26A005F64B1 /* DataTask */,
 				84539C470807247A00615B6D /* RemoteRunControl */,
 				842F19A703B8EAF3005F64B1 /* RunControl */,
@@ -7070,6 +7059,57 @@
 			path = Source/Objects/Control/Ramper;
 			sourceTree = SOURCE_ROOT;
 		};
+		84B28DF40F4C713500E2B056 /* HV */ = {
+			isa = PBXGroup;
+			children = (
+				84B28DF50F4C718300E2B056 /* HVControl */,
+				84B28E050F4C718400E2B056 /* HV4032 */,
+			);
+			name = HV;
+			path = Source/Objects/Hardware/HV;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28DF50F4C718300E2B056 /* HVControl */ = {
+			isa = PBXGroup;
+			children = (
+				84B28DF60F4C718300E2B056 /* HVHighCurrentHelp */,
+				84B28DF70F4C718300E2B056 /* HVHighCurrentHelp.plist */,
+				84B28DF80F4C718300E2B056 /* HVNotPollingHelp */,
+				84B28DF90F4C718300E2B056 /* HVNotPollingHelp.plist */,
+				84B28DFA0F4C718300E2B056 /* HVPowerCycledHelp */,
+				84B28DFB0F4C718300E2B056 /* HVPowerCycledHelp.plist */,
+				84B28DFC0F4C718300E2B056 /* HVRamp.gif */,
+				84B28DFD0F4C718300E2B056 /* HVRamp.nib */,
+				84B28DFE0F4C718300E2B056 /* HVRampOn.gif */,
+				84B28DFF0F4C718400E2B056 /* ORHVRampController.h */,
+				84B28E000F4C718400E2B056 /* ORHVRampController.m */,
+				84B28E010F4C718400E2B056 /* ORHVRampModel.h */,
+				84B28E020F4C718400E2B056 /* ORHVRampModel.m */,
+				84B28E030F4C718400E2B056 /* ORHVSupply.h */,
+				84B28E040F4C718400E2B056 /* ORHVSupply.m */,
+			);
+			name = HVControl;
+			path = Source/Objects/Hardware/HV/HVControl;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28E050F4C718400E2B056 /* HV4032 */ = {
+			isa = PBXGroup;
+			children = (
+				84B28E060F4C718400E2B056 /* HV4032.nib */,
+				84B28E070F4C718400E2B056 /* HV4032.tif */,
+				84B28E080F4C718400E2B056 /* HV4032Off.tif */,
+				84B28E090F4C718400E2B056 /* HV4032On.tif */,
+				84B28E0A0F4C718400E2B056 /* ORHV4032Controller.h */,
+				84B28E0B0F4C718400E2B056 /* ORHV4032Controller.m */,
+				84B28E0C0F4C718400E2B056 /* ORHV4032Model.h */,
+				84B28E0D0F4C718400E2B056 /* ORHV4032Model.m */,
+				84B28E0E0F4C718400E2B056 /* ORHV4032Supply.h */,
+				84B28E0F0F4C718400E2B056 /* ORHV4032Supply.m */,
+			);
+			name = HV4032;
+			path = Source/Objects/Hardware/HV/HV4032;
+			sourceTree = SOURCE_ROOT;
+		};
 		84B4329005E52B080084845B /* Security */ = {
 			isa = PBXGroup;
 			children = (
@@ -8040,26 +8080,6 @@
 			path = "Source/Objects/Data Processing/Histogram Objects/Waveform";
 			sourceTree = SOURCE_ROOT;
 		};
-		84F6D661047BED77005F64B1 /* HVRampControl */ = {
-			isa = PBXGroup;
-			children = (
-				84F6D668047BEE2F005F64B1 /* ORHVRampModel.h */,
-				84F6D669047BEE2F005F64B1 /* ORHVRampModel.m */,
-				84F6D66A047BEE2F005F64B1 /* ORHVRampController.h */,
-				84F6D667047BEE2F005F64B1 /* ORHVRampController.m */,
-				84FE6584047D9140005F64B1 /* ORHVSupply.h */,
-				84FE6585047D9140005F64B1 /* ORHVSupply.m */,
-				84C6962804A37CCA005F64B1 /* HVRampOn.gif */,
-				84F6D666047BEE2F005F64B1 /* HVRamp.gif */,
-				8482D8F90593A50E0013A206 /* HVPowerCycledHelp.plist */,
-				848E21610593A4B900B6708F /* HVNotPollingHelp.plist */,
-				8482D9150593ABD60013A206 /* HVHighCurrentHelp.plist */,
-				84F6D662047BED77005F64B1 /* HVRamp.nib */,
-			);
-			name = HVRampControl;
-			path = Source/Objects/Control/HVControl;
-			sourceTree = SOURCE_ROOT;
-		};
 		84F7FB520AE5558900A5AA4C /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -8448,6 +8468,7 @@
 				849E7C900B6956B200353D50 /* USB */,
 				84499B6D0F13BAB8004B855B /* Serial */,
 				84B28D4C0F4C651C00E2B056 /* Internet */,
+				84B28DF40F4C713500E2B056 /* HV */,
 			);
 			path = Hardware;
 			sourceTree = "<group>";
@@ -8737,10 +8758,7 @@
 				8434A205055B3287002D3102 /* OROscBaseController.h in Headers */,
 				8434A206055B3287002D3102 /* ORHPPulserController.h in Headers */,
 				8434A207055B3287002D3102 /* ORTek754DData.h in Headers */,
-				8434A209055B3287002D3102 /* ORHVRampModel.h in Headers */,
-				8434A20A055B3287002D3102 /* ORHVRampController.h in Headers */,
 				8434A20C055B3287002D3102 /* ThreadWorker.h in Headers */,
-				8434A20D055B3287002D3102 /* ORHVSupply.h in Headers */,
 				8434A20E055B3287002D3102 /* ORReadOutList.h in Headers */,
 				8434A20F055B3287002D3102 /* NSArray+Extensions.h in Headers */,
 				8434A210055B3287002D3102 /* NSOutlineView+Extensions.h in Headers */,
@@ -8974,9 +8992,6 @@
 				8435653108FEFFB8002864C7 /* ORMessagePipe.h in Headers */,
 				8408A4BD09071C6A004A3B34 /* ORHV2132Controller.h in Headers */,
 				8408A4BF09071C6A004A3B34 /* ORHV2132Model.h in Headers */,
-				8408A50F09081E80004A3B34 /* ORHV4032Controller.h in Headers */,
-				8408A51109081E80004A3B34 /* ORHV4032Model.h in Headers */,
-				8408A51309081E80004A3B34 /* ORHV4032Supply.h in Headers */,
 				84178D500923C4B100C15D2B /* ORSocketClient.h in Headers */,
 				84E24F42093E703100E963DF /* ORBitProcessing.h in Headers */,
 				840E00040944B29000049827 /* ORProcessController.h in Headers */,
@@ -9353,6 +9368,12 @@
 				84B28DE70F4C6FED00E2B056 /* ORRamperView.h in Headers */,
 				84B28DE90F4C6FED00E2B056 /* ORRampItem.h in Headers */,
 				84B28DEB0F4C6FED00E2B056 /* ORRampItemController.h in Headers */,
+				84B28E190F4C718400E2B056 /* ORHVRampController.h in Headers */,
+				84B28E1B0F4C718400E2B056 /* ORHVRampModel.h in Headers */,
+				84B28E1D0F4C718400E2B056 /* ORHVSupply.h in Headers */,
+				84B28E230F4C718400E2B056 /* ORHV4032Controller.h in Headers */,
+				84B28E250F4C718400E2B056 /* ORHV4032Model.h in Headers */,
+				84B28E270F4C718400E2B056 /* ORHV4032Supply.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9450,9 +9471,6 @@
 				8434A284055B3287002D3102 /* TriggerCard.gif in Resources */,
 				8434A285055B3287002D3102 /* NcdMux.gif in Resources */,
 				8434A287055B3287002D3102 /* HPPulser.nib in Resources */,
-				8434A288055B3287002D3102 /* HVRamp.nib in Resources */,
-				8434A289055B3287002D3102 /* HVRamp.gif in Resources */,
-				8434A28A055B3287002D3102 /* HVRampOn.gif in Resources */,
 				8434A28C055B3287002D3102 /* Dispatcher.nib in Resources */,
 				8434A28D055B3287002D3102 /* PCICamac.nib in Resources */,
 				8434A28E055B3287002D3102 /* PCICamacCard.gif in Resources */,
@@ -9479,9 +9497,6 @@
 				848E201C059282F400B6708F /* statusWindow.gif in Resources */,
 				848E206A0592891800B6708F /* alarmMaster.gif in Resources */,
 				848E2102059378C800B6708F /* catalog.gif in Resources */,
-				848E21620593A4B900B6708F /* HVNotPollingHelp.plist in Resources */,
-				8482D8FA0593A50E0013A206 /* HVPowerCycledHelp.plist in Resources */,
-				8482D9160593ABD60013A206 /* HVHighCurrentHelp.plist in Resources */,
 				84F03E6705A0995400275624 /* muxBoxSmall.gif in Resources */,
 				8439D65F05BF31550077EFF2 /* ActionView.nib in Resources */,
 				8439D66005BF31550077EFF2 /* SelectionView.nib in Resources */,
@@ -9637,10 +9652,7 @@
 				84D0593F08FF39EA00A99A83 /* goBackPressed.tif in Resources */,
 				8408A4BB09071C6A004A3B34 /* HV2132.nib in Resources */,
 				8408A4BC09071C6A004A3B34 /* HV2132Card.tif in Resources */,
-				8408A50D09081E80004A3B34 /* HV4032.nib in Resources */,
-				8408A50E09081E80004A3B34 /* HV4032Off.tif in Resources */,
 				845F745709296E1000A2F593 /* madeWithCocoa.tiff in Resources */,
-				84AF39FE093D0AED0015BE54 /* HV4032On.tif in Resources */,
 				840E00030944B29000049827 /* edu.washington.npl.orca.Process.plist in Resources */,
 				840E00080944B29000049827 /* Process.nib in Resources */,
 				840E00090944B29000049827 /* Process.tif in Resources */,
@@ -9937,6 +9949,19 @@
 				84B28DF00F4C6FED00E2B056 /* RampItem.nib in Resources */,
 				84B28DF10F4C6FED00E2B056 /* RampRunning.tif in Resources */,
 				84B28DF20F4C6FED00E2B056 /* triangleBugRight.tif in Resources */,
+				84B28E100F4C718400E2B056 /* HVHighCurrentHelp in Resources */,
+				84B28E110F4C718400E2B056 /* HVHighCurrentHelp.plist in Resources */,
+				84B28E120F4C718400E2B056 /* HVNotPollingHelp in Resources */,
+				84B28E130F4C718400E2B056 /* HVNotPollingHelp.plist in Resources */,
+				84B28E140F4C718400E2B056 /* HVPowerCycledHelp in Resources */,
+				84B28E150F4C718400E2B056 /* HVPowerCycledHelp.plist in Resources */,
+				84B28E160F4C718400E2B056 /* HVRamp.gif in Resources */,
+				84B28E170F4C718400E2B056 /* HVRamp.nib in Resources */,
+				84B28E180F4C718400E2B056 /* HVRampOn.gif in Resources */,
+				84B28E1F0F4C718400E2B056 /* HV4032.nib in Resources */,
+				84B28E200F4C718400E2B056 /* HV4032.tif in Resources */,
+				84B28E210F4C718400E2B056 /* HV4032Off.tif in Resources */,
+				84B28E220F4C718400E2B056 /* HV4032On.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10056,10 +10081,7 @@
 				8434A31D055B3287002D3102 /* OROscBaseController.m in Sources */,
 				8434A31E055B3287002D3102 /* ORHPPulserController.m in Sources */,
 				8434A31F055B3287002D3102 /* ORTek754DData.m in Sources */,
-				8434A321055B3287002D3102 /* ORHVRampController.m in Sources */,
-				8434A322055B3287002D3102 /* ORHVRampModel.m in Sources */,
 				8434A324055B3287002D3102 /* ThreadWorker.m in Sources */,
-				8434A325055B3287002D3102 /* ORHVSupply.m in Sources */,
 				8434A326055B3287002D3102 /* ORReadOutList.m in Sources */,
 				8434A327055B3287002D3102 /* NSOutlineView+Extensions.m in Sources */,
 				8434A328055B3287002D3102 /* NSArray+Extensions.m in Sources */,
@@ -10283,9 +10305,6 @@
 				84D05976090017B200A99A83 /* ORContainerModel.m in Sources */,
 				8408A4BE09071C6A004A3B34 /* ORHV2132Controller.m in Sources */,
 				8408A4C009071C6A004A3B34 /* ORHV2132Model.m in Sources */,
-				8408A51009081E80004A3B34 /* ORHV4032Controller.m in Sources */,
-				8408A51209081E80004A3B34 /* ORHV4032Model.m in Sources */,
-				8408A51409081E80004A3B34 /* ORHV4032Supply.m in Sources */,
 				84178D510923C4B100C15D2B /* ORSocketClient.m in Sources */,
 				84178E0C0923F60F00C15D2B /* ORCommandClient.m in Sources */,
 				840E00050944B29000049827 /* ORProcessController.m in Sources */,
@@ -10622,6 +10641,12 @@
 				84B28DE80F4C6FED00E2B056 /* ORRamperView.m in Sources */,
 				84B28DEA0F4C6FED00E2B056 /* ORRampItem.m in Sources */,
 				84B28DEC0F4C6FED00E2B056 /* ORRampItemController.m in Sources */,
+				84B28E1A0F4C718400E2B056 /* ORHVRampController.m in Sources */,
+				84B28E1C0F4C718400E2B056 /* ORHVRampModel.m in Sources */,
+				84B28E1E0F4C718400E2B056 /* ORHVSupply.m in Sources */,
+				84B28E240F4C718400E2B056 /* ORHV4032Controller.m in Sources */,
+				84B28E260F4C718400E2B056 /* ORHV4032Model.m in Sources */,
+				84B28E280F4C718400E2B056 /* ORHV4032Supply.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
