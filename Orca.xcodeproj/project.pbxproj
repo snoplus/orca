@@ -64,13 +64,6 @@
 		2A69BE110AAF7FB500FEFDBB /* NoCamacCratePowerHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2A69BE100AAF7FB500FEFDBB /* NoCamacCratePowerHelp.plist */; };
 		2A7685BA0C7B3A9C000C942F /* ORUSBtoGPIBController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7685B90C7B3A9C000C942F /* ORUSBtoGPIBController.m */; };
 		2A7685C00C7B3AA4000C942F /* ORUSBtoGPIBModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A7685BF0C7B3AA4000C942F /* ORUSBtoGPIBModel.m */; };
-		2A943A4108A8181C00D04541 /* ORXYScannerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A943A3908A8181C00D04541 /* ORXYScannerController.h */; };
-		2A943A4208A8181C00D04541 /* ORXYScannerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A943A3A08A8181C00D04541 /* ORXYScannerController.m */; };
-		2A943A4308A8181C00D04541 /* ORXYScannerDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A943A3B08A8181C00D04541 /* ORXYScannerDecoders.h */; };
-		2A943A4408A8181C00D04541 /* ORXYScannerDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A943A3C08A8181C00D04541 /* ORXYScannerDecoders.m */; };
-		2A943A4508A8181C00D04541 /* ORXYScannerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A943A3D08A8181C00D04541 /* ORXYScannerModel.h */; };
-		2A943A4608A8181C00D04541 /* ORXYScannerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A943A3E08A8181C00D04541 /* ORXYScannerModel.m */; };
-		2A943A4808A8181C00D04541 /* XYScanner.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A943A4008A8181C00D04541 /* XYScanner.nib */; };
 		2A943A6408A8194B00D04541 /* ORSerialPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A943A5C08A8194B00D04541 /* ORSerialPort.h */; };
 		2A943A6508A8194B00D04541 /* ORSerialPort.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A943A5D08A8194B00D04541 /* ORSerialPort.m */; };
 		2A943A6608A8194B00D04541 /* ORSerialPortAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A943A5E08A8194B00D04541 /* ORSerialPortAdditions.h */; };
@@ -1133,7 +1126,6 @@
 		84861DAA0ACDA9B600C543D7 /* ORL4532Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84861DA80ACDA9B600C543D7 /* ORL4532Decoders.h */; };
 		84861DAB0ACDA9B600C543D7 /* ORL4532Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84861DA90ACDA9B600C543D7 /* ORL4532Decoders.m */; };
 		8486258D08E474EC00301049 /* Motor.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8486258C08E474EC00301049 /* Motor.tif */; };
-		848625CB08E47D0200301049 /* XYScanner.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848625CA08E47D0200301049 /* XYScanner.tif */; };
 		848625D108E4831700301049 /* DataTask.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848625D008E4831700301049 /* DataTask.tif */; };
 		848625D808E4961400301049 /* RunControl.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848625D708E4961400301049 /* RunControl.tif */; };
 		848625DA08E49A8E00301049 /* RemoteRunControl.tif in Resources */ = {isa = PBXBuildFile; fileRef = 848625D908E49A8E00301049 /* RemoteRunControl.tif */; };
@@ -1502,6 +1494,14 @@
 		84B28CFD0F4C5DBB00E2B056 /* ORAmi286Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CF50F4C5DBB00E2B056 /* ORAmi286Decoders.m */; };
 		84B28CFE0F4C5DBB00E2B056 /* ORAmi286Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CF60F4C5DBB00E2B056 /* ORAmi286Model.h */; };
 		84B28CFF0F4C5DBB00E2B056 /* ORAmi286Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CF70F4C5DBB00E2B056 /* ORAmi286Model.m */; };
+		84B28D210F4C614000E2B056 /* ORXYScannerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D190F4C614000E2B056 /* ORXYScannerController.h */; };
+		84B28D220F4C614000E2B056 /* ORXYScannerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D1A0F4C614000E2B056 /* ORXYScannerController.m */; };
+		84B28D230F4C614000E2B056 /* ORXYScannerDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D1B0F4C614000E2B056 /* ORXYScannerDecoders.h */; };
+		84B28D240F4C614000E2B056 /* ORXYScannerDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D1C0F4C614000E2B056 /* ORXYScannerDecoders.m */; };
+		84B28D250F4C614000E2B056 /* ORXYScannerModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D1D0F4C614000E2B056 /* ORXYScannerModel.h */; };
+		84B28D260F4C614000E2B056 /* ORXYScannerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D1E0F4C614000E2B056 /* ORXYScannerModel.m */; };
+		84B28D270F4C614000E2B056 /* XYScanner.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D1F0F4C614000E2B056 /* XYScanner.nib */; };
+		84B28D280F4C614000E2B056 /* XYScanner.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28D200F4C614000E2B056 /* XYScanner.tif */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -2075,13 +2075,6 @@
 		2A69BE100AAF7FB500FEFDBB /* NoCamacCratePowerHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoCamacCratePowerHelp.plist; path = Source/Objects/Hardware/Pci/PCItoCamac/NoCamacCratePowerHelp.plist; sourceTree = SOURCE_ROOT; };
 		2A7685B90C7B3A9C000C942F /* ORUSBtoGPIBController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORUSBtoGPIBController.m; path = Source/Objects/Hardware/USB/USBtoGPIB/ORUSBtoGPIBController.m; sourceTree = SOURCE_ROOT; };
 		2A7685BF0C7B3AA4000C942F /* ORUSBtoGPIBModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORUSBtoGPIBModel.m; path = Source/Objects/Hardware/USB/USBtoGPIB/ORUSBtoGPIBModel.m; sourceTree = SOURCE_ROOT; };
-		2A943A3908A8181C00D04541 /* ORXYScannerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORXYScannerController.h; path = "Source/Objects/Misc Objects/XYScanner/ORXYScannerController.h"; sourceTree = SOURCE_ROOT; };
-		2A943A3A08A8181C00D04541 /* ORXYScannerController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORXYScannerController.m; path = "Source/Objects/Misc Objects/XYScanner/ORXYScannerController.m"; sourceTree = SOURCE_ROOT; };
-		2A943A3B08A8181C00D04541 /* ORXYScannerDecoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORXYScannerDecoders.h; path = "Source/Objects/Misc Objects/XYScanner/ORXYScannerDecoders.h"; sourceTree = SOURCE_ROOT; };
-		2A943A3C08A8181C00D04541 /* ORXYScannerDecoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORXYScannerDecoders.m; path = "Source/Objects/Misc Objects/XYScanner/ORXYScannerDecoders.m"; sourceTree = SOURCE_ROOT; };
-		2A943A3D08A8181C00D04541 /* ORXYScannerModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORXYScannerModel.h; path = "Source/Objects/Misc Objects/XYScanner/ORXYScannerModel.h"; sourceTree = SOURCE_ROOT; };
-		2A943A3E08A8181C00D04541 /* ORXYScannerModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORXYScannerModel.m; path = "Source/Objects/Misc Objects/XYScanner/ORXYScannerModel.m"; sourceTree = SOURCE_ROOT; };
-		2A943A4008A8181C00D04541 /* XYScanner.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XYScanner.nib; path = "Source/Objects/Misc Objects/XYScanner/XYScanner.nib"; sourceTree = SOURCE_ROOT; };
 		2A943A5C08A8194B00D04541 /* ORSerialPort.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSerialPort.h; path = "Source/Objects/Misc Objects/SerialPorts/ORSerialPort.h"; sourceTree = SOURCE_ROOT; };
 		2A943A5D08A8194B00D04541 /* ORSerialPort.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORSerialPort.m; path = "Source/Objects/Misc Objects/SerialPorts/ORSerialPort.m"; sourceTree = SOURCE_ROOT; };
 		2A943A5E08A8194B00D04541 /* ORSerialPortAdditions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORSerialPortAdditions.h; path = "Source/Objects/Misc Objects/SerialPorts/ORSerialPortAdditions.h"; sourceTree = SOURCE_ROOT; };
@@ -2931,7 +2924,6 @@
 		84861DA80ACDA9B600C543D7 /* ORL4532Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORL4532Decoders.h; path = Source/Objects/Hardware/Camac/L4532/ORL4532Decoders.h; sourceTree = SOURCE_ROOT; };
 		84861DA90ACDA9B600C543D7 /* ORL4532Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORL4532Decoders.m; path = Source/Objects/Hardware/Camac/L4532/ORL4532Decoders.m; sourceTree = SOURCE_ROOT; };
 		8486258C08E474EC00301049 /* Motor.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Motor.tif; sourceTree = "<group>"; };
-		848625CA08E47D0200301049 /* XYScanner.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = XYScanner.tif; path = "Source/Objects/Misc Objects/XYScanner/XYScanner.tif"; sourceTree = SOURCE_ROOT; };
 		848625D008E4831700301049 /* DataTask.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = DataTask.tif; path = Source/Objects/Control/DataTask/DataTask.tif; sourceTree = SOURCE_ROOT; };
 		848625D708E4961400301049 /* RunControl.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RunControl.tif; sourceTree = "<group>"; };
 		848625D908E49A8E00301049 /* RemoteRunControl.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RemoteRunControl.tif; path = Source/Objects/Control/RemoteRunControl/RemoteRunControl.tif; sourceTree = SOURCE_ROOT; };
@@ -3315,6 +3307,14 @@
 		84B28CF50F4C5DBB00E2B056 /* ORAmi286Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Decoders.m; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Decoders.m; sourceTree = SOURCE_ROOT; };
 		84B28CF60F4C5DBB00E2B056 /* ORAmi286Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAmi286Model.h; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Model.h; sourceTree = SOURCE_ROOT; };
 		84B28CF70F4C5DBB00E2B056 /* ORAmi286Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Model.m; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Model.m; sourceTree = SOURCE_ROOT; };
+		84B28D190F4C614000E2B056 /* ORXYScannerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYScannerController.h; path = Source/Objects/Hardware/Serial/XYScanner/ORXYScannerController.h; sourceTree = SOURCE_ROOT; };
+		84B28D1A0F4C614000E2B056 /* ORXYScannerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYScannerController.m; path = Source/Objects/Hardware/Serial/XYScanner/ORXYScannerController.m; sourceTree = SOURCE_ROOT; };
+		84B28D1B0F4C614000E2B056 /* ORXYScannerDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYScannerDecoders.h; path = Source/Objects/Hardware/Serial/XYScanner/ORXYScannerDecoders.h; sourceTree = SOURCE_ROOT; };
+		84B28D1C0F4C614000E2B056 /* ORXYScannerDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYScannerDecoders.m; path = Source/Objects/Hardware/Serial/XYScanner/ORXYScannerDecoders.m; sourceTree = SOURCE_ROOT; };
+		84B28D1D0F4C614000E2B056 /* ORXYScannerModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORXYScannerModel.h; path = Source/Objects/Hardware/Serial/XYScanner/ORXYScannerModel.h; sourceTree = SOURCE_ROOT; };
+		84B28D1E0F4C614000E2B056 /* ORXYScannerModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORXYScannerModel.m; path = Source/Objects/Hardware/Serial/XYScanner/ORXYScannerModel.m; sourceTree = SOURCE_ROOT; };
+		84B28D1F0F4C614000E2B056 /* XYScanner.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = XYScanner.nib; path = Source/Objects/Hardware/Serial/XYScanner/XYScanner.nib; sourceTree = SOURCE_ROOT; };
+		84B28D200F4C614000E2B056 /* XYScanner.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = XYScanner.tif; path = Source/Objects/Hardware/Serial/XYScanner/XYScanner.tif; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -4126,22 +4126,6 @@
 			);
 			name = TDC3377;
 			path = Source/Objects/Hardware/Camac/TDC3377;
-			sourceTree = SOURCE_ROOT;
-		};
-		2A943A3808A8181C00D04541 /* XYScanner */ = {
-			isa = PBXGroup;
-			children = (
-				2A943A3908A8181C00D04541 /* ORXYScannerController.h */,
-				2A943A3A08A8181C00D04541 /* ORXYScannerController.m */,
-				2A943A3B08A8181C00D04541 /* ORXYScannerDecoders.h */,
-				2A943A3C08A8181C00D04541 /* ORXYScannerDecoders.m */,
-				2A943A3D08A8181C00D04541 /* ORXYScannerModel.h */,
-				2A943A3E08A8181C00D04541 /* ORXYScannerModel.m */,
-				848625CA08E47D0200301049 /* XYScanner.tif */,
-				2A943A4008A8181C00D04541 /* XYScanner.nib */,
-			);
-			name = XYScanner;
-			path = "Source/Objects/Misc Objects/XYScanner";
 			sourceTree = SOURCE_ROOT;
 		};
 		2A943A5B08A8194B00D04541 /* SerialPorts */ = {
@@ -5056,7 +5040,6 @@
 				842162F3043E6317005F64B1 /* Mouse Tasks */,
 				842162F8043E6317005F64B1 /* NetSocket */,
 				843DCF2D058E546A000C5219 /* DataGenerator */,
-				2A943A3808A8181C00D04541 /* XYScanner */,
 				849DA4D60BE7BBE600044320 /* LakeShore210 */,
 				849DAB040C108E3C00044320 /* Ramper */,
 				843A48510A0AC2F4003DF248 /* USB */,
@@ -5581,6 +5564,7 @@
 				84499CBD0F13E457004B855B /* CTITemp */,
 				84499B6E0F13BB6E004B855B /* MksPdr2000 */,
 				840D56D70F39E9BF00F9A274 /* Pac */,
+				84B28D180F4C614000E2B056 /* XYScanner */,
 			);
 			name = Serial;
 			path = Source/Objects/Hardware/Serial;
@@ -7033,6 +7017,22 @@
 			);
 			name = Ami286;
 			path = Source/Objects/Hardware/Serial/Ami286;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28D180F4C614000E2B056 /* XYScanner */ = {
+			isa = PBXGroup;
+			children = (
+				84B28D190F4C614000E2B056 /* ORXYScannerController.h */,
+				84B28D1A0F4C614000E2B056 /* ORXYScannerController.m */,
+				84B28D1B0F4C614000E2B056 /* ORXYScannerDecoders.h */,
+				84B28D1C0F4C614000E2B056 /* ORXYScannerDecoders.m */,
+				84B28D1D0F4C614000E2B056 /* ORXYScannerModel.h */,
+				84B28D1E0F4C614000E2B056 /* ORXYScannerModel.m */,
+				84B28D1F0F4C614000E2B056 /* XYScanner.nib */,
+				84B28D200F4C614000E2B056 /* XYScanner.tif */,
+			);
+			name = XYScanner;
+			path = Source/Objects/Hardware/Serial/XYScanner;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B4329005E52B080084845B /* Security */ = {
@@ -8938,9 +8938,6 @@
 				546D9DB30874BDD60072A274 /* OR2228ADecoders.h in Headers */,
 				546D9DB50874BDD60072A274 /* OR2228AModel.h in Headers */,
 				2A41A2B5089AB2A0003D77DD /* ORScalerSum.h in Headers */,
-				2A943A4108A8181C00D04541 /* ORXYScannerController.h in Headers */,
-				2A943A4308A8181C00D04541 /* ORXYScannerDecoders.h in Headers */,
-				2A943A4508A8181C00D04541 /* ORXYScannerModel.h in Headers */,
 				2A943A6408A8194B00D04541 /* ORSerialPort.h in Headers */,
 				2A943A6608A8194B00D04541 /* ORSerialPortAdditions.h in Headers */,
 				2A943A6808A8194B00D04541 /* ORSerialPortList.h in Headers */,
@@ -9350,6 +9347,9 @@
 				84B28CFA0F4C5DBB00E2B056 /* ORAmi286Controller.h in Headers */,
 				84B28CFC0F4C5DBB00E2B056 /* ORAmi286Decoders.h in Headers */,
 				84B28CFE0F4C5DBB00E2B056 /* ORAmi286Model.h in Headers */,
+				84B28D210F4C614000E2B056 /* ORXYScannerController.h in Headers */,
+				84B28D230F4C614000E2B056 /* ORXYScannerDecoders.h in Headers */,
+				84B28D250F4C614000E2B056 /* ORXYScannerModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9598,7 +9598,6 @@
 				54F5B708087206D9003AC228 /* Katrin.nib in Resources */,
 				546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */,
 				546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */,
-				2A943A4808A8181C00D04541 /* XYScanner.nib in Resources */,
 				2A3728F908BCE51A00CA18E5 /* NoDispatcherHelp.plist in Resources */,
 				2A3728FA08BCE51A00CA18E5 /* BuilderConnectHelp.plist in Resources */,
 				2A4553E908BCE9A3004BB15E /* TDC3377.gif in Resources */,
@@ -9606,7 +9605,6 @@
 				84799A3F08DF5C6400D848FB /* SplashScreen.nib in Resources */,
 				84799B3908DF70B300D848FB /* CENPA.gif in Resources */,
 				8486258D08E474EC00301049 /* Motor.tif in Resources */,
-				848625CB08E47D0200301049 /* XYScanner.tif in Resources */,
 				848625D108E4831700301049 /* DataTask.tif in Resources */,
 				848625D808E4961400301049 /* RunControl.tif in Resources */,
 				848625DA08E49A8E00301049 /* RemoteRunControl.tif in Resources */,
@@ -9933,6 +9931,8 @@
 				84B28CDF0F4C597900E2B056 /* BocTIC3.tif in Resources */,
 				84B28CF80F4C5DBB00E2B056 /* Ami286.nib in Resources */,
 				84B28CF90F4C5DBB00E2B056 /* Ami286.tif in Resources */,
+				84B28D270F4C614000E2B056 /* XYScanner.nib in Resources */,
+				84B28D280F4C614000E2B056 /* XYScanner.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10246,9 +10246,6 @@
 				546D9DB40874BDD60072A274 /* OR2228ADecoders.m in Sources */,
 				546D9DB60874BDD60072A274 /* OR2228AModel.m in Sources */,
 				2A41A2B6089AB2A0003D77DD /* ORScalerSum.m in Sources */,
-				2A943A4208A8181C00D04541 /* ORXYScannerController.m in Sources */,
-				2A943A4408A8181C00D04541 /* ORXYScannerDecoders.m in Sources */,
-				2A943A4608A8181C00D04541 /* ORXYScannerModel.m in Sources */,
 				2A943A6508A8194B00D04541 /* ORSerialPort.m in Sources */,
 				2A943A6708A8194B00D04541 /* ORSerialPortAdditions.m in Sources */,
 				2A943A6908A8194B00D04541 /* ORSerialPortList.m in Sources */,
@@ -10618,6 +10615,9 @@
 				84B28CFB0F4C5DBB00E2B056 /* ORAmi286Controller.m in Sources */,
 				84B28CFD0F4C5DBB00E2B056 /* ORAmi286Decoders.m in Sources */,
 				84B28CFF0F4C5DBB00E2B056 /* ORAmi286Model.m in Sources */,
+				84B28D220F4C614000E2B056 /* ORXYScannerController.m in Sources */,
+				84B28D240F4C614000E2B056 /* ORXYScannerDecoders.m in Sources */,
+				84B28D260F4C614000E2B056 /* ORXYScannerModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
