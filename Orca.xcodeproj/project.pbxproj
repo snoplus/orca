@@ -1289,23 +1289,6 @@
 		849DA7170BF4DB5300044320 /* ORTimeSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DA7150BF4DB5300044320 /* ORTimeSeries.m */; };
 		849DA71A0BF4DB8500044320 /* ORTimeLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DA7180BF4DB8400044320 /* ORTimeLine.h */; };
 		849DA71B0BF4DB8500044320 /* ORTimeLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DA7190BF4DB8400044320 /* ORTimeLine.m */; };
-		849DAB160C108E3C00044320 /* dash.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849DAB050C108E3C00044320 /* dash.tif */; };
-		849DAB170C108E3C00044320 /* eye.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849DAB060C108E3C00044320 /* eye.tif */; };
-		849DAB180C108E3C00044320 /* ORRamperController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DAB070C108E3C00044320 /* ORRamperController.h */; };
-		849DAB190C108E3C00044320 /* ORRamperController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DAB080C108E3C00044320 /* ORRamperController.m */; };
-		849DAB1A0C108E3C00044320 /* ORRamperModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DAB090C108E3C00044320 /* ORRamperModel.h */; };
-		849DAB1B0C108E3C00044320 /* ORRamperModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DAB0A0C108E3C00044320 /* ORRamperModel.m */; };
-		849DAB1C0C108E3C00044320 /* ORRamperView.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DAB0B0C108E3C00044320 /* ORRamperView.h */; };
-		849DAB1D0C108E3C00044320 /* ORRamperView.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DAB0C0C108E3C00044320 /* ORRamperView.m */; };
-		849DAB1E0C108E3C00044320 /* ORRampItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DAB0D0C108E3C00044320 /* ORRampItem.h */; };
-		849DAB1F0C108E3C00044320 /* ORRampItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DAB0E0C108E3C00044320 /* ORRampItem.m */; };
-		849DAB200C108E3C00044320 /* ORRampItemController.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DAB0F0C108E3C00044320 /* ORRampItemController.h */; };
-		849DAB210C108E3C00044320 /* ORRampItemController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849DAB100C108E3C00044320 /* ORRampItemController.m */; };
-		849DAB220C108E3C00044320 /* Ramper.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849DAB110C108E3C00044320 /* Ramper.nib */; };
-		849DAB230C108E3C00044320 /* Ramper.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849DAB120C108E3C00044320 /* Ramper.tif */; };
-		849DAB240C108E3C00044320 /* RampItem.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849DAB130C108E3C00044320 /* RampItem.nib */; };
-		849DAB250C108E3C00044320 /* RampRunning.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849DAB140C108E3C00044320 /* RampRunning.tif */; };
-		849DAB260C108E3C00044320 /* triangleBugRight.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849DAB150C108E3C00044320 /* triangleBugRight.tif */; };
 		849DDE6008F466630052AFC6 /* AD3511.nib in Resources */ = {isa = PBXBuildFile; fileRef = 849DDE5708F466630052AFC6 /* AD3511.nib */; };
 		849DDE6108F466630052AFC6 /* AD3511Card.tif in Resources */ = {isa = PBXBuildFile; fileRef = 849DDE5808F466630052AFC6 /* AD3511Card.tif */; };
 		849DDE6308F466630052AFC6 /* ORAD3511Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 849DDE5A08F466630052AFC6 /* ORAD3511Controller.h */; };
@@ -1514,6 +1497,24 @@
 		84B28DA40F4C684200E2B056 /* ORMotorDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D9B0F4C684200E2B056 /* ORMotorDecoders.m */; };
 		84B28DA50F4C684200E2B056 /* ORMotorModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28D9C0F4C684200E2B056 /* ORMotorModel.h */; };
 		84B28DA60F4C684200E2B056 /* ORMotorModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28D9D0F4C684200E2B056 /* ORMotorModel.m */; };
+		84B28DE10F4C6FED00E2B056 /* dash.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DCF0F4C6FED00E2B056 /* dash.tif */; };
+		84B28DE20F4C6FED00E2B056 /* eye.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DD00F4C6FED00E2B056 /* eye.tif */; };
+		84B28DE30F4C6FED00E2B056 /* ORRamperController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD10F4C6FED00E2B056 /* ORRamperController.h */; };
+		84B28DE40F4C6FED00E2B056 /* ORRamperController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DD20F4C6FED00E2B056 /* ORRamperController.m */; };
+		84B28DE50F4C6FED00E2B056 /* ORRamperModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD30F4C6FED00E2B056 /* ORRamperModel.h */; };
+		84B28DE60F4C6FED00E2B056 /* ORRamperModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DD40F4C6FED00E2B056 /* ORRamperModel.m */; };
+		84B28DE70F4C6FED00E2B056 /* ORRamperView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD50F4C6FED00E2B056 /* ORRamperView.h */; };
+		84B28DE80F4C6FED00E2B056 /* ORRamperView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DD60F4C6FED00E2B056 /* ORRamperView.m */; };
+		84B28DE90F4C6FED00E2B056 /* ORRampItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD70F4C6FED00E2B056 /* ORRampItem.h */; };
+		84B28DEA0F4C6FED00E2B056 /* ORRampItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DD80F4C6FED00E2B056 /* ORRampItem.m */; };
+		84B28DEB0F4C6FED00E2B056 /* ORRampItemController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28DD90F4C6FED00E2B056 /* ORRampItemController.h */; };
+		84B28DEC0F4C6FED00E2B056 /* ORRampItemController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28DDA0F4C6FED00E2B056 /* ORRampItemController.m */; };
+		84B28DED0F4C6FED00E2B056 /* Ramp.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DDB0F4C6FED00E2B056 /* Ramp.tif */; };
+		84B28DEE0F4C6FED00E2B056 /* Ramper.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DDC0F4C6FED00E2B056 /* Ramper.nib */; };
+		84B28DEF0F4C6FED00E2B056 /* Ramper.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DDD0F4C6FED00E2B056 /* Ramper.tif */; };
+		84B28DF00F4C6FED00E2B056 /* RampItem.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DDE0F4C6FED00E2B056 /* RampItem.nib */; };
+		84B28DF10F4C6FED00E2B056 /* RampRunning.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DDF0F4C6FED00E2B056 /* RampRunning.tif */; };
+		84B28DF20F4C6FED00E2B056 /* triangleBugRight.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28DE00F4C6FED00E2B056 /* triangleBugRight.tif */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -3094,23 +3095,6 @@
 		849DA7150BF4DB5300044320 /* ORTimeSeries.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORTimeSeries.m; path = "Source/Objects/Misc Objects/Rates/ORTimeSeries.m"; sourceTree = SOURCE_ROOT; };
 		849DA7180BF4DB8400044320 /* ORTimeLine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORTimeLine.h; path = Source/Widgets/Plotting/ORTimeLine.h; sourceTree = SOURCE_ROOT; };
 		849DA7190BF4DB8400044320 /* ORTimeLine.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORTimeLine.m; path = Source/Widgets/Plotting/ORTimeLine.m; sourceTree = SOURCE_ROOT; };
-		849DAB050C108E3C00044320 /* dash.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dash.tif; path = "Source/Objects/Misc Objects/Ramper/dash.tif"; sourceTree = SOURCE_ROOT; };
-		849DAB060C108E3C00044320 /* eye.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = eye.tif; path = "Source/Objects/Misc Objects/Ramper/eye.tif"; sourceTree = SOURCE_ROOT; };
-		849DAB070C108E3C00044320 /* ORRamperController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRamperController.h; path = "Source/Objects/Misc Objects/Ramper/ORRamperController.h"; sourceTree = SOURCE_ROOT; };
-		849DAB080C108E3C00044320 /* ORRamperController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRamperController.m; path = "Source/Objects/Misc Objects/Ramper/ORRamperController.m"; sourceTree = SOURCE_ROOT; };
-		849DAB090C108E3C00044320 /* ORRamperModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRamperModel.h; path = "Source/Objects/Misc Objects/Ramper/ORRamperModel.h"; sourceTree = SOURCE_ROOT; };
-		849DAB0A0C108E3C00044320 /* ORRamperModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRamperModel.m; path = "Source/Objects/Misc Objects/Ramper/ORRamperModel.m"; sourceTree = SOURCE_ROOT; };
-		849DAB0B0C108E3C00044320 /* ORRamperView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRamperView.h; path = "Source/Objects/Misc Objects/Ramper/ORRamperView.h"; sourceTree = SOURCE_ROOT; };
-		849DAB0C0C108E3C00044320 /* ORRamperView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRamperView.m; path = "Source/Objects/Misc Objects/Ramper/ORRamperView.m"; sourceTree = SOURCE_ROOT; };
-		849DAB0D0C108E3C00044320 /* ORRampItem.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRampItem.h; path = "Source/Objects/Misc Objects/Ramper/ORRampItem.h"; sourceTree = SOURCE_ROOT; };
-		849DAB0E0C108E3C00044320 /* ORRampItem.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRampItem.m; path = "Source/Objects/Misc Objects/Ramper/ORRampItem.m"; sourceTree = SOURCE_ROOT; };
-		849DAB0F0C108E3C00044320 /* ORRampItemController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORRampItemController.h; path = "Source/Objects/Misc Objects/Ramper/ORRampItemController.h"; sourceTree = SOURCE_ROOT; };
-		849DAB100C108E3C00044320 /* ORRampItemController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORRampItemController.m; path = "Source/Objects/Misc Objects/Ramper/ORRampItemController.m"; sourceTree = SOURCE_ROOT; };
-		849DAB110C108E3C00044320 /* Ramper.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Ramper.nib; path = "Source/Objects/Misc Objects/Ramper/Ramper.nib"; sourceTree = SOURCE_ROOT; };
-		849DAB120C108E3C00044320 /* Ramper.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Ramper.tif; path = "Source/Objects/Misc Objects/Ramper/Ramper.tif"; sourceTree = SOURCE_ROOT; };
-		849DAB130C108E3C00044320 /* RampItem.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RampItem.nib; path = "Source/Objects/Misc Objects/Ramper/RampItem.nib"; sourceTree = SOURCE_ROOT; };
-		849DAB140C108E3C00044320 /* RampRunning.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RampRunning.tif; path = "Source/Objects/Misc Objects/Ramper/RampRunning.tif"; sourceTree = SOURCE_ROOT; };
-		849DAB150C108E3C00044320 /* triangleBugRight.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = triangleBugRight.tif; path = "Source/Objects/Misc Objects/Ramper/triangleBugRight.tif"; sourceTree = SOURCE_ROOT; };
 		849DDE5708F466630052AFC6 /* AD3511.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = AD3511.nib; path = Source/Objects/Hardware/Camac/AD3511/AD3511.nib; sourceTree = SOURCE_ROOT; };
 		849DDE5808F466630052AFC6 /* AD3511Card.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = AD3511Card.tif; path = Source/Objects/Hardware/Camac/AD3511/AD3511Card.tif; sourceTree = SOURCE_ROOT; };
 		849DDE5A08F466630052AFC6 /* ORAD3511Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAD3511Controller.h; path = Source/Objects/Hardware/Camac/AD3511/ORAD3511Controller.h; sourceTree = SOURCE_ROOT; };
@@ -3327,6 +3311,24 @@
 		84B28D9B0F4C684200E2B056 /* ORMotorDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotorDecoders.m; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorDecoders.m; sourceTree = SOURCE_ROOT; };
 		84B28D9C0F4C684200E2B056 /* ORMotorModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMotorModel.h; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorModel.h; sourceTree = SOURCE_ROOT; };
 		84B28D9D0F4C684200E2B056 /* ORMotorModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotorModel.m; path = Source/Objects/Hardware/Vme/MCarrier/Motor/ORMotorModel.m; sourceTree = SOURCE_ROOT; };
+		84B28DCF0F4C6FED00E2B056 /* dash.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = dash.tif; path = Source/Objects/Control/Ramper/dash.tif; sourceTree = SOURCE_ROOT; };
+		84B28DD00F4C6FED00E2B056 /* eye.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = eye.tif; path = Source/Objects/Control/Ramper/eye.tif; sourceTree = SOURCE_ROOT; };
+		84B28DD10F4C6FED00E2B056 /* ORRamperController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRamperController.h; path = Source/Objects/Control/Ramper/ORRamperController.h; sourceTree = SOURCE_ROOT; };
+		84B28DD20F4C6FED00E2B056 /* ORRamperController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRamperController.m; path = Source/Objects/Control/Ramper/ORRamperController.m; sourceTree = SOURCE_ROOT; };
+		84B28DD30F4C6FED00E2B056 /* ORRamperModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRamperModel.h; path = Source/Objects/Control/Ramper/ORRamperModel.h; sourceTree = SOURCE_ROOT; };
+		84B28DD40F4C6FED00E2B056 /* ORRamperModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRamperModel.m; path = Source/Objects/Control/Ramper/ORRamperModel.m; sourceTree = SOURCE_ROOT; };
+		84B28DD50F4C6FED00E2B056 /* ORRamperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRamperView.h; path = Source/Objects/Control/Ramper/ORRamperView.h; sourceTree = SOURCE_ROOT; };
+		84B28DD60F4C6FED00E2B056 /* ORRamperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRamperView.m; path = Source/Objects/Control/Ramper/ORRamperView.m; sourceTree = SOURCE_ROOT; };
+		84B28DD70F4C6FED00E2B056 /* ORRampItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRampItem.h; path = Source/Objects/Control/Ramper/ORRampItem.h; sourceTree = SOURCE_ROOT; };
+		84B28DD80F4C6FED00E2B056 /* ORRampItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRampItem.m; path = Source/Objects/Control/Ramper/ORRampItem.m; sourceTree = SOURCE_ROOT; };
+		84B28DD90F4C6FED00E2B056 /* ORRampItemController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRampItemController.h; path = Source/Objects/Control/Ramper/ORRampItemController.h; sourceTree = SOURCE_ROOT; };
+		84B28DDA0F4C6FED00E2B056 /* ORRampItemController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORRampItemController.m; path = Source/Objects/Control/Ramper/ORRampItemController.m; sourceTree = SOURCE_ROOT; };
+		84B28DDB0F4C6FED00E2B056 /* Ramp.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Ramp.tif; path = Source/Objects/Control/Ramper/Ramp.tif; sourceTree = SOURCE_ROOT; };
+		84B28DDC0F4C6FED00E2B056 /* Ramper.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Ramper.nib; path = Source/Objects/Control/Ramper/Ramper.nib; sourceTree = SOURCE_ROOT; };
+		84B28DDD0F4C6FED00E2B056 /* Ramper.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Ramper.tif; path = Source/Objects/Control/Ramper/Ramper.tif; sourceTree = SOURCE_ROOT; };
+		84B28DDE0F4C6FED00E2B056 /* RampItem.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = RampItem.nib; path = Source/Objects/Control/Ramper/RampItem.nib; sourceTree = SOURCE_ROOT; };
+		84B28DDF0F4C6FED00E2B056 /* RampRunning.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = RampRunning.tif; path = Source/Objects/Control/Ramper/RampRunning.tif; sourceTree = SOURCE_ROOT; };
+		84B28DE00F4C6FED00E2B056 /* triangleBugRight.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = triangleBugRight.tif; path = Source/Objects/Control/Ramper/triangleBugRight.tif; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -4162,9 +4164,8 @@
 				2ACEE0DE0612266000CAD497 /* ThresholdCalibrationChannel.h */,
 				2ACEE0DF0612266000CAD497 /* ThresholdCalibrationChannel.m */,
 			);
-			name = ThresholdCalibration;
-			path = "Source/Objects/Misc Objects/ThresholdCalibration";
-			sourceTree = SOURCE_ROOT;
+			path = ThresholdCalibration;
+			sourceTree = "<group>";
 		};
 		2AE87BDC0D6E486900A839FC /* libUniversal */ = {
 			isa = PBXGroup;
@@ -5008,6 +5009,7 @@
 				847E6C0D0CFF4BF400E963C6 /* ObjectProxy */,
 				2AAB08F808E36CCE00BB0792 /* Testing */,
 				844048AB08350BEE000D03DB /* MemoryWatcher */,
+				2ACEE0DD0612266000CAD497 /* ThresholdCalibration */,
 				8484811107288C26009EDCE2 /* Dots */,
 				84CF3B3A05E6BF0700C5C320 /* Views */,
 				84CF3B1E05E6B2B800C5C320 /* PrefsPanel */,
@@ -5020,7 +5022,6 @@
 				842162F3043E6317005F64B1 /* Mouse Tasks */,
 				842162F8043E6317005F64B1 /* NetSocket */,
 				843DCF2D058E546A000C5219 /* DataGenerator */,
-				849DAB040C108E3C00044320 /* Ramper */,
 				843A48510A0AC2F4003DF248 /* USB */,
 				2A178EB608DB3F66001D78BC /* FireWire */,
 				2A943A5B08A8194B00D04541 /* SerialPorts */,
@@ -5188,6 +5189,7 @@
 				84E22AAA0417F26A005F64B1 /* DataTask */,
 				84539C470807247A00615B6D /* RemoteRunControl */,
 				842F19A703B8EAF3005F64B1 /* RunControl */,
+				84B28DCE0F4C6FED00E2B056 /* Ramper */,
 			);
 			name = Control;
 			path = Source/Objects/Control;
@@ -6094,7 +6096,6 @@
 		8484811107288C26009EDCE2 /* Dots */ = {
 			isa = PBXGroup;
 			children = (
-				2ACEE0DD0612266000CAD497 /* ThresholdCalibration */,
 				8484811207288C26009EDCE2 /* DotImages */,
 				8484811607288C26009EDCE2 /* ORDotImage.h */,
 				8484811707288C26009EDCE2 /* ORDotImage.m */,
@@ -6580,31 +6581,6 @@
 			path = "Source/Objects/Data Processing/Histogram Objects/PlotTimeSeries";
 			sourceTree = SOURCE_ROOT;
 		};
-		849DAB040C108E3C00044320 /* Ramper */ = {
-			isa = PBXGroup;
-			children = (
-				849DAB070C108E3C00044320 /* ORRamperController.h */,
-				849DAB080C108E3C00044320 /* ORRamperController.m */,
-				849DAB090C108E3C00044320 /* ORRamperModel.h */,
-				849DAB0A0C108E3C00044320 /* ORRamperModel.m */,
-				849DAB0B0C108E3C00044320 /* ORRamperView.h */,
-				849DAB0C0C108E3C00044320 /* ORRamperView.m */,
-				849DAB110C108E3C00044320 /* Ramper.nib */,
-				849DAB0D0C108E3C00044320 /* ORRampItem.h */,
-				849DAB0E0C108E3C00044320 /* ORRampItem.m */,
-				849DAB0F0C108E3C00044320 /* ORRampItemController.h */,
-				849DAB100C108E3C00044320 /* ORRampItemController.m */,
-				849DAB130C108E3C00044320 /* RampItem.nib */,
-				849DAB120C108E3C00044320 /* Ramper.tif */,
-				849DAB050C108E3C00044320 /* dash.tif */,
-				849DAB060C108E3C00044320 /* eye.tif */,
-				849DAB140C108E3C00044320 /* RampRunning.tif */,
-				849DAB150C108E3C00044320 /* triangleBugRight.tif */,
-			);
-			name = Ramper;
-			path = "Source/Objects/Misc Objects/Ramper";
-			sourceTree = SOURCE_ROOT;
-		};
 		849DDE5608F466630052AFC6 /* AD3511 */ = {
 			isa = PBXGroup;
 			children = (
@@ -7066,6 +7042,32 @@
 			);
 			name = Motor;
 			path = Source/Objects/Hardware/Vme/MCarrier/Motor;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28DCE0F4C6FED00E2B056 /* Ramper */ = {
+			isa = PBXGroup;
+			children = (
+				84B28DCF0F4C6FED00E2B056 /* dash.tif */,
+				84B28DD00F4C6FED00E2B056 /* eye.tif */,
+				84B28DD10F4C6FED00E2B056 /* ORRamperController.h */,
+				84B28DD20F4C6FED00E2B056 /* ORRamperController.m */,
+				84B28DD30F4C6FED00E2B056 /* ORRamperModel.h */,
+				84B28DD40F4C6FED00E2B056 /* ORRamperModel.m */,
+				84B28DD50F4C6FED00E2B056 /* ORRamperView.h */,
+				84B28DD60F4C6FED00E2B056 /* ORRamperView.m */,
+				84B28DD70F4C6FED00E2B056 /* ORRampItem.h */,
+				84B28DD80F4C6FED00E2B056 /* ORRampItem.m */,
+				84B28DD90F4C6FED00E2B056 /* ORRampItemController.h */,
+				84B28DDA0F4C6FED00E2B056 /* ORRampItemController.m */,
+				84B28DDB0F4C6FED00E2B056 /* Ramp.tif */,
+				84B28DDC0F4C6FED00E2B056 /* Ramper.nib */,
+				84B28DDD0F4C6FED00E2B056 /* Ramper.tif */,
+				84B28DDE0F4C6FED00E2B056 /* RampItem.nib */,
+				84B28DDF0F4C6FED00E2B056 /* RampRunning.tif */,
+				84B28DE00F4C6FED00E2B056 /* triangleBugRight.tif */,
+			);
+			name = Ramper;
+			path = Source/Objects/Control/Ramper;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B4329005E52B080084845B /* Security */ = {
@@ -9125,11 +9127,6 @@
 				849DA7110BF4DB3000044320 /* ORPlotTimeSeriesController.h in Headers */,
 				849DA7160BF4DB5300044320 /* ORTimeSeries.h in Headers */,
 				849DA71A0BF4DB8500044320 /* ORTimeLine.h in Headers */,
-				849DAB180C108E3C00044320 /* ORRamperController.h in Headers */,
-				849DAB1A0C108E3C00044320 /* ORRamperModel.h in Headers */,
-				849DAB1C0C108E3C00044320 /* ORRamperView.h in Headers */,
-				849DAB1E0C108E3C00044320 /* ORRampItem.h in Headers */,
-				849DAB200C108E3C00044320 /* ORRampItemController.h in Headers */,
 				84A4E82B0C187A3E00CBC222 /* ORIP220Controller.h in Headers */,
 				84A4E82D0C187A3E00CBC222 /* ORIP220Model.h in Headers */,
 				84A4E89A0C287CA900CBC222 /* ORUSBtoGPIBController.h in Headers */,
@@ -9351,6 +9348,11 @@
 				84B28DA10F4C684200E2B056 /* ORMotorController.h in Headers */,
 				84B28DA30F4C684200E2B056 /* ORMotorDecoders.h in Headers */,
 				84B28DA50F4C684200E2B056 /* ORMotorModel.h in Headers */,
+				84B28DE30F4C6FED00E2B056 /* ORRamperController.h in Headers */,
+				84B28DE50F4C6FED00E2B056 /* ORRamperModel.h in Headers */,
+				84B28DE70F4C6FED00E2B056 /* ORRamperView.h in Headers */,
+				84B28DE90F4C6FED00E2B056 /* ORRampItem.h in Headers */,
+				84B28DEB0F4C6FED00E2B056 /* ORRampItemController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9757,13 +9759,6 @@
 				849DA7000BF276AC00044320 /* RawPlot.gif in Resources */,
 				849DA70E0BF4DB3000044320 /* edu.washington.npl.orca.PlotTimeSeries.plist in Resources */,
 				849DA7130BF4DB3000044320 /* PlotTimeSeries.nib in Resources */,
-				849DAB160C108E3C00044320 /* dash.tif in Resources */,
-				849DAB170C108E3C00044320 /* eye.tif in Resources */,
-				849DAB220C108E3C00044320 /* Ramper.nib in Resources */,
-				849DAB230C108E3C00044320 /* Ramper.tif in Resources */,
-				849DAB240C108E3C00044320 /* RampItem.nib in Resources */,
-				849DAB250C108E3C00044320 /* RampRunning.tif in Resources */,
-				849DAB260C108E3C00044320 /* triangleBugRight.tif in Resources */,
 				84A4E8290C187A3E00CBC222 /* IP220.gif in Resources */,
 				84A4E82A0C187A3E00CBC222 /* IP220.nib in Resources */,
 				84A4E89C0C287CA900CBC222 /* USBtoGPIB.gif in Resources */,
@@ -9934,6 +9929,14 @@
 				84B28D9E0F4C684200E2B056 /* Motor.nib in Resources */,
 				84B28D9F0F4C684200E2B056 /* Motor.tif in Resources */,
 				84B28DA00F4C684200E2B056 /* MotorBreakpointHelp.plist in Resources */,
+				84B28DE10F4C6FED00E2B056 /* dash.tif in Resources */,
+				84B28DE20F4C6FED00E2B056 /* eye.tif in Resources */,
+				84B28DED0F4C6FED00E2B056 /* Ramp.tif in Resources */,
+				84B28DEE0F4C6FED00E2B056 /* Ramper.nib in Resources */,
+				84B28DEF0F4C6FED00E2B056 /* Ramper.tif in Resources */,
+				84B28DF00F4C6FED00E2B056 /* RampItem.nib in Resources */,
+				84B28DF10F4C6FED00E2B056 /* RampRunning.tif in Resources */,
+				84B28DF20F4C6FED00E2B056 /* triangleBugRight.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10419,11 +10422,6 @@
 				849DA7120BF4DB3000044320 /* ORPlotTimeSeriesController.m in Sources */,
 				849DA7170BF4DB5300044320 /* ORTimeSeries.m in Sources */,
 				849DA71B0BF4DB8500044320 /* ORTimeLine.m in Sources */,
-				849DAB190C108E3C00044320 /* ORRamperController.m in Sources */,
-				849DAB1B0C108E3C00044320 /* ORRamperModel.m in Sources */,
-				849DAB1D0C108E3C00044320 /* ORRamperView.m in Sources */,
-				849DAB1F0C108E3C00044320 /* ORRampItem.m in Sources */,
-				849DAB210C108E3C00044320 /* ORRampItemController.m in Sources */,
 				84A4E82C0C187A3E00CBC222 /* ORIP220Controller.m in Sources */,
 				84A4E82E0C187A3E00CBC222 /* ORIP220Model.m in Sources */,
 				84A4EE720C2C5D0A00CBC222 /* ORAcqirisDC440Controller.m in Sources */,
@@ -10619,6 +10617,11 @@
 				84B28DA20F4C684200E2B056 /* ORMotorController.m in Sources */,
 				84B28DA40F4C684200E2B056 /* ORMotorDecoders.m in Sources */,
 				84B28DA60F4C684200E2B056 /* ORMotorModel.m in Sources */,
+				84B28DE40F4C6FED00E2B056 /* ORRamperController.m in Sources */,
+				84B28DE60F4C6FED00E2B056 /* ORRamperModel.m in Sources */,
+				84B28DE80F4C6FED00E2B056 /* ORRamperView.m in Sources */,
+				84B28DEA0F4C6FED00E2B056 /* ORRampItem.m in Sources */,
+				84B28DEC0F4C6FED00E2B056 /* ORRampItemController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
