@@ -1159,14 +1159,6 @@
 		848648960975C415001C459D /* ORProcessOutConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = 848648940975C415001C459D /* ORProcessOutConnector.h */; };
 		848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = 848648AA0975CB2E001C459D /* ORProcessConnector.h */; };
 		848648AD0975CB2E001C459D /* ORProcessConnector.m in Sources */ = {isa = PBXBuildFile; fileRef = 848648AB0975CB2E001C459D /* ORProcessConnector.m */; };
-		8486F4570CC6CFB600800B1E /* Ami286.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8486F44F0CC6CFB600800B1E /* Ami286.nib */; };
-		8486F4580CC6CFB600800B1E /* Ami286.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8486F4500CC6CFB600800B1E /* Ami286.tif */; };
-		8486F4590CC6CFB600800B1E /* ORAmi286Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F4510CC6CFB600800B1E /* ORAmi286Controller.h */; };
-		8486F45A0CC6CFB600800B1E /* ORAmi286Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8486F4520CC6CFB600800B1E /* ORAmi286Controller.m */; };
-		8486F45B0CC6CFB600800B1E /* ORAmi286Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F4530CC6CFB600800B1E /* ORAmi286Decoders.h */; };
-		8486F45C0CC6CFB600800B1E /* ORAmi286Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8486F4540CC6CFB600800B1E /* ORAmi286Decoders.m */; };
-		8486F45D0CC6CFB600800B1E /* ORAmi286Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F4550CC6CFB600800B1E /* ORAmi286Model.h */; };
-		8486F45E0CC6CFB600800B1E /* ORAmi286Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8486F4560CC6CFB600800B1E /* ORAmi286Model.m */; };
 		8486F4660CC6D02E00800B1E /* ORIpeDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */; };
 		848B03080D6505C6007FDEBD /* OrcaFilterScript.icns in Resources */ = {isa = PBXBuildFile; fileRef = 848B03060D6505C6007FDEBD /* OrcaFilterScript.icns */; };
 		848CD35C08FB511B0046CD9D /* NSSplitView+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */; };
@@ -1502,6 +1494,14 @@
 		84B28CE30F4C597900E2B056 /* ORBocTIC3Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CDB0F4C597900E2B056 /* ORBocTIC3Decoders.m */; };
 		84B28CE40F4C597900E2B056 /* ORBocTIC3Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CDC0F4C597900E2B056 /* ORBocTIC3Model.h */; };
 		84B28CE50F4C597900E2B056 /* ORBocTIC3Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CDD0F4C597900E2B056 /* ORBocTIC3Model.m */; };
+		84B28CF80F4C5DBB00E2B056 /* Ami286.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28CF00F4C5DBB00E2B056 /* Ami286.nib */; };
+		84B28CF90F4C5DBB00E2B056 /* Ami286.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28CF10F4C5DBB00E2B056 /* Ami286.tif */; };
+		84B28CFA0F4C5DBB00E2B056 /* ORAmi286Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CF20F4C5DBB00E2B056 /* ORAmi286Controller.h */; };
+		84B28CFB0F4C5DBB00E2B056 /* ORAmi286Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CF30F4C5DBB00E2B056 /* ORAmi286Controller.m */; };
+		84B28CFC0F4C5DBB00E2B056 /* ORAmi286Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CF40F4C5DBB00E2B056 /* ORAmi286Decoders.h */; };
+		84B28CFD0F4C5DBB00E2B056 /* ORAmi286Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CF50F4C5DBB00E2B056 /* ORAmi286Decoders.m */; };
+		84B28CFE0F4C5DBB00E2B056 /* ORAmi286Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CF60F4C5DBB00E2B056 /* ORAmi286Model.h */; };
+		84B28CFF0F4C5DBB00E2B056 /* ORAmi286Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B28CF70F4C5DBB00E2B056 /* ORAmi286Model.m */; };
 		84B3EE2305CAFF150059BB49 /* ORHWWizSelection.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */; };
 		84B3EE2405CAFF150059BB49 /* ORHWWizSelection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */; };
 		84B3EEA405CB2FA40059BB49 /* ORHWWizard.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */; };
@@ -2958,14 +2958,6 @@
 		848648AA0975CB2E001C459D /* ORProcessConnector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORProcessConnector.h; sourceTree = "<group>"; };
 		848648AB0975CB2E001C459D /* ORProcessConnector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORProcessConnector.m; sourceTree = "<group>"; };
 		8486F44C0CC6CF9A00800B1E /* ORIpeDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORIpeDefs.h; path = "Source/Objects/Hardware/IPE/IPE Base Classes/ORIpeDefs.h"; sourceTree = SOURCE_ROOT; };
-		8486F44F0CC6CFB600800B1E /* Ami286.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Ami286.nib; path = "Source/Objects/Misc Objects/Ami286/Ami286.nib"; sourceTree = SOURCE_ROOT; };
-		8486F4500CC6CFB600800B1E /* Ami286.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Ami286.tif; path = "Source/Objects/Misc Objects/Ami286/Ami286.tif"; sourceTree = SOURCE_ROOT; };
-		8486F4510CC6CFB600800B1E /* ORAmi286Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAmi286Controller.h; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Controller.h"; sourceTree = SOURCE_ROOT; };
-		8486F4520CC6CFB600800B1E /* ORAmi286Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Controller.m; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Controller.m"; sourceTree = SOURCE_ROOT; };
-		8486F4530CC6CFB600800B1E /* ORAmi286Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAmi286Decoders.h; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Decoders.h"; sourceTree = SOURCE_ROOT; };
-		8486F4540CC6CFB600800B1E /* ORAmi286Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Decoders.m; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Decoders.m"; sourceTree = SOURCE_ROOT; };
-		8486F4550CC6CFB600800B1E /* ORAmi286Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAmi286Model.h; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Model.h"; sourceTree = SOURCE_ROOT; };
-		8486F4560CC6CFB600800B1E /* ORAmi286Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Model.m; path = "Source/Objects/Misc Objects/Ami286/ORAmi286Model.m"; sourceTree = SOURCE_ROOT; };
 		848B03070D6505C6007FDEBD /* English */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = English; path = English.lproj/OrcaFilterScript.icns; sourceTree = "<group>"; };
 		848CD35A08FB511B0046CD9D /* NSSplitView+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSSplitView+Extensions.h"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.h"; sourceTree = SOURCE_ROOT; };
 		848CD35B08FB511B0046CD9D /* NSSplitView+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = "NSSplitView+Extensions.m"; path = "Source/Cocoa Extensions/NSSplitView+Extensions.m"; sourceTree = SOURCE_ROOT; };
@@ -3315,6 +3307,14 @@
 		84B28CDB0F4C597900E2B056 /* ORBocTIC3Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORBocTIC3Decoders.m; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Decoders.m; sourceTree = SOURCE_ROOT; };
 		84B28CDC0F4C597900E2B056 /* ORBocTIC3Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Model.h; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Model.h; sourceTree = SOURCE_ROOT; };
 		84B28CDD0F4C597900E2B056 /* ORBocTIC3Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORBocTIC3Model.m; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Model.m; sourceTree = SOURCE_ROOT; };
+		84B28CF00F4C5DBB00E2B056 /* Ami286.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Ami286.nib; path = Source/Objects/Hardware/Serial/Ami286/Ami286.nib; sourceTree = SOURCE_ROOT; };
+		84B28CF10F4C5DBB00E2B056 /* Ami286.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Ami286.tif; path = Source/Objects/Hardware/Serial/Ami286/Ami286.tif; sourceTree = SOURCE_ROOT; };
+		84B28CF20F4C5DBB00E2B056 /* ORAmi286Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAmi286Controller.h; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Controller.h; sourceTree = SOURCE_ROOT; };
+		84B28CF30F4C5DBB00E2B056 /* ORAmi286Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Controller.m; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Controller.m; sourceTree = SOURCE_ROOT; };
+		84B28CF40F4C5DBB00E2B056 /* ORAmi286Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAmi286Decoders.h; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Decoders.h; sourceTree = SOURCE_ROOT; };
+		84B28CF50F4C5DBB00E2B056 /* ORAmi286Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Decoders.m; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Decoders.m; sourceTree = SOURCE_ROOT; };
+		84B28CF60F4C5DBB00E2B056 /* ORAmi286Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORAmi286Model.h; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Model.h; sourceTree = SOURCE_ROOT; };
+		84B28CF70F4C5DBB00E2B056 /* ORAmi286Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAmi286Model.m; path = Source/Objects/Hardware/Serial/Ami286/ORAmi286Model.m; sourceTree = SOURCE_ROOT; };
 		84B3EE2105CAFF150059BB49 /* ORHWWizSelection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizSelection.h; sourceTree = "<group>"; };
 		84B3EE2205CAFF150059BB49 /* ORHWWizSelection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizSelection.m; sourceTree = "<group>"; };
 		84B3EEA305CB2FA40059BB49 /* ORHWWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizard.h; sourceTree = "<group>"; };
@@ -5057,7 +5057,6 @@
 				842162F8043E6317005F64B1 /* NetSocket */,
 				843DCF2D058E546A000C5219 /* DataGenerator */,
 				2A943A3808A8181C00D04541 /* XYScanner */,
-				8486F44E0CC6CFB600800B1E /* Ami286 */,
 				849DA4D60BE7BBE600044320 /* LakeShore210 */,
 				849DAB040C108E3C00044320 /* Ramper */,
 				843A48510A0AC2F4003DF248 /* USB */,
@@ -5577,6 +5576,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
+				84B28CEF0F4C5DBB00E2B056 /* Ami286 */,
 				84B28CD50F4C597900E2B056 /* BocTIC3 */,
 				84499CBD0F13E457004B855B /* CTITemp */,
 				84499B6E0F13BB6E004B855B /* MksPdr2000 */,
@@ -6215,22 +6215,6 @@
 			);
 			name = VXM;
 			path = "Source/Objects/Misc Objects/MotorControllers/VXM";
-			sourceTree = SOURCE_ROOT;
-		};
-		8486F44E0CC6CFB600800B1E /* Ami286 */ = {
-			isa = PBXGroup;
-			children = (
-				8486F44F0CC6CFB600800B1E /* Ami286.nib */,
-				8486F4500CC6CFB600800B1E /* Ami286.tif */,
-				8486F4510CC6CFB600800B1E /* ORAmi286Controller.h */,
-				8486F4520CC6CFB600800B1E /* ORAmi286Controller.m */,
-				8486F4530CC6CFB600800B1E /* ORAmi286Decoders.h */,
-				8486F4540CC6CFB600800B1E /* ORAmi286Decoders.m */,
-				8486F4550CC6CFB600800B1E /* ORAmi286Model.h */,
-				8486F4560CC6CFB600800B1E /* ORAmi286Model.m */,
-			);
-			name = Ami286;
-			path = "Source/Objects/Misc Objects/Ami286";
 			sourceTree = SOURCE_ROOT;
 		};
 		848D84230DDE060100D44B81 /* TimeMultiPlot */ = {
@@ -7033,6 +7017,22 @@
 			);
 			name = BocTIC3;
 			path = Source/Objects/Hardware/Serial/BocTIC3;
+			sourceTree = SOURCE_ROOT;
+		};
+		84B28CEF0F4C5DBB00E2B056 /* Ami286 */ = {
+			isa = PBXGroup;
+			children = (
+				84B28CF00F4C5DBB00E2B056 /* Ami286.nib */,
+				84B28CF10F4C5DBB00E2B056 /* Ami286.tif */,
+				84B28CF20F4C5DBB00E2B056 /* ORAmi286Controller.h */,
+				84B28CF30F4C5DBB00E2B056 /* ORAmi286Controller.m */,
+				84B28CF40F4C5DBB00E2B056 /* ORAmi286Decoders.h */,
+				84B28CF50F4C5DBB00E2B056 /* ORAmi286Decoders.m */,
+				84B28CF60F4C5DBB00E2B056 /* ORAmi286Model.h */,
+				84B28CF70F4C5DBB00E2B056 /* ORAmi286Model.m */,
+			);
+			name = Ami286;
+			path = Source/Objects/Hardware/Serial/Ami286;
 			sourceTree = SOURCE_ROOT;
 		};
 		84B4329005E52B080084845B /* Security */ = {
@@ -9189,9 +9189,6 @@
 				84F480550CB047C1007EFADA /* ORIpeSLTDecoder.h in Headers */,
 				9CF2C1B80CC195E2002B279B /* ORL8013CrateController.h in Headers */,
 				9CF2C1BA0CC195E2002B279B /* ORL8013CrateModel.h in Headers */,
-				8486F4590CC6CFB600800B1E /* ORAmi286Controller.h in Headers */,
-				8486F45B0CC6CFB600800B1E /* ORAmi286Decoders.h in Headers */,
-				8486F45D0CC6CFB600800B1E /* ORAmi286Model.h in Headers */,
 				8486F4660CC6D02E00800B1E /* ORIpeDefs.h in Headers */,
 				840590EB0CCE5E9C0000DBF3 /* ORLevelMonitor.h in Headers */,
 				84CEDD180CDA7D9E002CFD3A /* ORGretina4Controller.h in Headers */,
@@ -9350,6 +9347,9 @@
 				84B28CE00F4C597900E2B056 /* ORBocTIC3Controller.h in Headers */,
 				84B28CE20F4C597900E2B056 /* ORBocTIC3Decoders.h in Headers */,
 				84B28CE40F4C597900E2B056 /* ORBocTIC3Model.h in Headers */,
+				84B28CFA0F4C5DBB00E2B056 /* ORAmi286Controller.h in Headers */,
+				84B28CFC0F4C5DBB00E2B056 /* ORAmi286Decoders.h in Headers */,
+				84B28CFE0F4C5DBB00E2B056 /* ORAmi286Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9804,8 +9804,6 @@
 				9CF2C1B40CC195E1002B279B /* L8013Crate.gif in Resources */,
 				9CF2C1B50CC195E2002B279B /* L8013Crate.nib in Resources */,
 				9CF2C1B60CC195E2002B279B /* L8013CrateSmall.tif in Resources */,
-				8486F4570CC6CFB600800B1E /* Ami286.nib in Resources */,
-				8486F4580CC6CFB600800B1E /* Ami286.tif in Resources */,
 				84E099620CC934CC00EFBC8F /* play.tiff in Resources */,
 				84E099630CC934CC00EFBC8F /* stop.tiff in Resources */,
 				84E09A220CCD1AA400EFBC8F /* dec.tif in Resources */,
@@ -9933,6 +9931,8 @@
 				840D56E70F39E9BF00F9A274 /* Pac.tif in Resources */,
 				84B28CDE0F4C597900E2B056 /* BocTIC3.nib in Resources */,
 				84B28CDF0F4C597900E2B056 /* BocTIC3.tif in Resources */,
+				84B28CF80F4C5DBB00E2B056 /* Ami286.nib in Resources */,
+				84B28CF90F4C5DBB00E2B056 /* Ami286.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10470,9 +10470,6 @@
 				84F480560CB047C1007EFADA /* ORIpeSLTDecoder.m in Sources */,
 				9CF2C1B90CC195E2002B279B /* ORL8013CrateController.m in Sources */,
 				9CF2C1BB0CC195E2002B279B /* ORL8013CrateModel.m in Sources */,
-				8486F45A0CC6CFB600800B1E /* ORAmi286Controller.m in Sources */,
-				8486F45C0CC6CFB600800B1E /* ORAmi286Decoders.m in Sources */,
-				8486F45E0CC6CFB600800B1E /* ORAmi286Model.m in Sources */,
 				840590EC0CCE5E9C0000DBF3 /* ORLevelMonitor.m in Sources */,
 				84CEDD190CDA7D9E002CFD3A /* ORGretina4Controller.m in Sources */,
 				84CEDD1B0CDA7D9E002CFD3A /* ORGretina4Decoders.m in Sources */,
@@ -10618,6 +10615,9 @@
 				84B28CE10F4C597900E2B056 /* ORBocTIC3Controller.m in Sources */,
 				84B28CE30F4C597900E2B056 /* ORBocTIC3Decoders.m in Sources */,
 				84B28CE50F4C597900E2B056 /* ORBocTIC3Model.m in Sources */,
+				84B28CFB0F4C5DBB00E2B056 /* ORAmi286Controller.m in Sources */,
+				84B28CFD0F4C5DBB00E2B056 /* ORAmi286Decoders.m in Sources */,
+				84B28CFF0F4C5DBB00E2B056 /* ORAmi286Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
