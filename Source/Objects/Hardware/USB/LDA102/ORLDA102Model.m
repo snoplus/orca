@@ -333,7 +333,6 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 	}
 	else {
 		[[self getUSBController] claimInterfaceWithSerialNumber:serialNumber for:self];
-		[self performSelector:@selector(queryRelays) withObject:self afterDelay:.1];
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelSerialNumberChanged object:self];
 }
