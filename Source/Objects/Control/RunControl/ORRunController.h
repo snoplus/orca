@@ -101,6 +101,8 @@
 - (IBAction) openShutDownScript:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
+- (void) sequenceCommentChanged:(NSNotification*)aNote;
+- (void) sequenceNumberChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) registerNotificationObservers;
 - (void) startUpScriptStateChanged:(NSNotification*)aNote;

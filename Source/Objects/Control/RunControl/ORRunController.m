@@ -57,6 +57,16 @@
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) sequenceCommentChanged:(NSNotification*)aNote
+{
+	//nothing to do right now
+}
+
+- (void) sequenceNumberChanged:(NSNotification*)aNote
+{
+	//nothing to do right now
+}
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -181,6 +191,16 @@
                      selector: @selector(shutDownScriptChanged:)
                          name: ORRunModelShutDownScriptChanged
                        object: nil];	
+    [notifyCenter addObserver : self
+                     selector : @selector(sequenceNumberChanged:)
+                         name : ORRunModelSequenceNumberChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sequenceCommentChanged:)
+                         name : ORRunModelSequenceCommentChanged
+						object: model];
+
 }
 
 
@@ -209,6 +229,8 @@
 	[self startUpScriptChanged:nil];
 	[self shutDownScriptChanged:nil];
 	[self vetosChanged:nil];
+	[self sequenceNumberChanged:nil];
+	[self sequenceCommentChanged:nil];
 }
 
 
