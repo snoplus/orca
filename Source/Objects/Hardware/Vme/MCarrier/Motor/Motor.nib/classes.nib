@@ -1,0 +1,81 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
+        {
+            ACTIONS = {
+                absBreakPointAction = id; 
+                absRelAction = id; 
+                breakPointAction = id; 
+                decAction = id; 
+                goAction = id; 
+                holdCurrentAction = id; 
+                incAction = id; 
+                motorNameAction = id; 
+                multiplierAction = id; 
+                optionMaskAction = id; 
+                patternAction = id; 
+                patternFileAction = id; 
+                patternTypeAction = id; 
+                readHomeAction = id; 
+                readMotorAction = id; 
+                risingEdgeAction = id; 
+                seekAmountAction = id; 
+                seekHomeAction = id; 
+                selectPatternFileAction = id; 
+                setProfileAction = id; 
+                setStepCountAction = id; 
+                startPatternRunAction = id; 
+                stepCountAction = id; 
+                stepModeAction = id; 
+                stopAction = id; 
+                targetAction = id; 
+                usePatternFileAction = id; 
+            }; 
+            CLASS = ORMotorController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                absRelBrkPtPopUp = NSPopUpButton; 
+                absRelStepPopUp = NSPopUpButton; 
+                breakPointField = NSTextField; 
+                decButton = NSButton; 
+                goButton = NSButton; 
+                holdCurrentPopUp = NSPopUpButton; 
+                homeButton = NSButton; 
+                homeDetectedField = NSTextField; 
+                incButton = NSButton; 
+                motorNameField = NSTextField; 
+                motorPatternMatrix = NSMatrix; 
+                motorPositionField = NSTextField; 
+                motorProfileFields = NSMatrix; 
+                motorRunningProgress = NSProgressIndicator; 
+                multiplierMatrix = NSMatrix; 
+                optionMatrix = NSMatrix; 
+                patternFileName = NSTextField; 
+                patternTypeMatrix = NSMatrix; 
+                queueView = ORQueueView; 
+                readHomeButton = NSButton; 
+                risingEdgePopUp = NSPopUpButton; 
+                seekAmountField = NSTextField; 
+                setPatternFileButton = NSButton; 
+                setStepCountButton = NSButton; 
+                startRunningPatternButton = NSButton; 
+                statusMatrix = NSMatrix; 
+                stepCountField = NSTextField; 
+                stepModePopUp = NSPopUpButton; 
+                stepTargetField = NSTextField; 
+                stopButton = NSButton; 
+                targetField = NSTextField; 
+                usePatternFileCB = NSButton; 
+                xAxis = ORAxis; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
