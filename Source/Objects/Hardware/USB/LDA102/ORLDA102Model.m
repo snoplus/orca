@@ -432,11 +432,11 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 	do {
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		if(usbInterface && [self getUSBController]){
-			unsigned char data[8];
-			int amountRead = [usbInterface readBytesFastNoThrow:data length:8];
-			if(amountRead == 8){
-				[self decodeResponse:data];
-			}
+			//unsigned char data[8];
+			//int amountRead = [usbInterface readBytesFastNoThrow:data length:8];
+			//if(amountRead == 8){
+			//	[self decodeResponse:data];
+			//}
 		}
 		[pool release];
 	} while(!timeToStop);
