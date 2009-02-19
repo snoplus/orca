@@ -1,98 +1,140 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {
-            ACTIONS = {
-                debounceAction = id; 
-                pollTimeAction = id; 
-                queryAction = id; 
-                readClearAction = id; 
-                relayControlAction = id; 
-                sendCommandAction = id; 
-                serialNumberAction = id; 
-                settingLockAction = id; 
-            }; 
-            CLASS = ORADU200Controller; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                commandField = NSTextField; 
-                debouncePopup = NSPopUpButton; 
-                eventCounterMatrix = NSMatrix; 
-                lockButton = NSButton; 
-                pollTimePopup = NSPopUpButton; 
-                portAMatrix = NSMatrix; 
-                queryButton = NSButton; 
-                readClearButton = NSButton; 
-                relayControlMatrix = NSMatrix; 
-                relayStateMatrix = NSMatrix; 
-                sendCommandButton = NSButton; 
-                serialNumberPopup = NSPopUpButton; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {
-                setLogScale = id; 
-                shiftLeft = id; 
-                shiftRight = id; 
-                zoomIn = id; 
-                zoomOut = id; 
-            }; 
-            CLASS = ORAxis; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {preferenceController = id; viewToScale = NSView; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {savePDF = id; }; 
-            CLASS = ORPlotter; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {mDataSource = id; mXScale = ORScale; mYScale = ORScale; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {
-                addGateAction = id; 
-                analyze = id; 
-                autoScale = id; 
-                averageWindowAction = id; 
-                centerOnPeak = id; 
-                clearActiveCurveGates = id; 
-                clearActiveGate = id; 
-                clearAllGates = id; 
-                copy = id; 
-                differentiateAction = id; 
-                removeGateAction = id; 
-                resetScales = id; 
-                savePDF = id; 
-            }; 
-            CLASS = ORPlotter1D; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                analysisDrawer = NSDrawer; 
-                analysisView = ZFlowLayout; 
-                mDataSource = id; 
-                mXScale = ORAxis; 
-                mYScale = ORAxis; 
-            }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {CLASS = ORSelfScaledPlotter; LANGUAGE = ObjC; SUPERCLASS = ORPlotter; }, 
-        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
-        {
-            ACTIONS = {
-                copy = id; 
-                decDialog = id; 
-                incDialog = id; 
-                saveDocument = id; 
-                saveDocumentAs = id; 
-            }; 
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>debounceAction</key>
+				<string>id</string>
+				<key>pollTimeAction</key>
+				<string>id</string>
+				<key>queryAction</key>
+				<string>id</string>
+				<key>readClearAction</key>
+				<string>id</string>
+				<key>relayControlAction</key>
+				<string>id</string>
+				<key>sendCommandAction</key>
+				<string>id</string>
+				<key>serialNumberAction</key>
+				<string>id</string>
+				<key>settingLockAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORADU200Controller</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>commandField</key>
+				<string>NSTextField</string>
+				<key>debouncePopup</key>
+				<string>NSPopUpButton</string>
+				<key>eventCounterMatrix</key>
+				<string>NSMatrix</string>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>pollTimePopup</key>
+				<string>NSPopUpButton</string>
+				<key>portAMatrix</key>
+				<string>NSMatrix</string>
+				<key>queryButton</key>
+				<string>NSButton</string>
+				<key>readClearButton</key>
+				<string>NSButton</string>
+				<key>relayControlMatrix</key>
+				<string>NSMatrix</string>
+				<key>relayStateMatrix</key>
+				<string>NSMatrix</string>
+				<key>sendCommandButton</key>
+				<string>NSButton</string>
+				<key>serialNumberPopup</key>
+				<string>NSPopUpButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

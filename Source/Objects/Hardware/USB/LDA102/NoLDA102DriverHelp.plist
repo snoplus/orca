@@ -3,10 +3,10 @@
 <plist version="1.0">
 <array>
 <string>
-The configuration has one of the LDA102 USB relay I/O interfaces, but it appears that the driver has not been installed. 
+The configuration has one of the LDA102 USB interface, but it appears that the driver has not been installed. 
 You need to locate the LDA102.pkg installer in the Drivers folder of the distribution, double-click on the installer, and reboot.
 
-The driver is a code-less kext that prevents the system from grabbing the ADU unit for exclusive access.
+The driver is a code-less kext that prevents the system from grabbing the LDA102 unit for exclusive access.
 
 Acknowledging this alarm will make it go away. 
 </string>
