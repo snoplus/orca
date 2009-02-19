@@ -82,6 +82,8 @@
 
 		NSString* startScriptState;
 		NSString* shutDownScriptState;
+		int sequenceNumber;
+		NSString* sequenceComment;
 }
 
 
@@ -89,6 +91,10 @@
 - (void) makeConnectors;
 
 #pragma mark ¥¥¥Accessors
+- (NSString*) sequenceComment;
+- (void) setSequenceComment:(NSString*)aSequenceComment;
+- (int) sequenceNumber;
+- (void) setSequenceNumber:(int)aSequenceNumber;
 - (NSString*) shutDownScriptState;
 - (void) setShutDownScriptState:(NSString*)aShutDownScriptState;
 - (NSString*) startScriptState;
@@ -208,6 +214,8 @@
 - (BOOL) doneTakingData;
 @end
 
+extern NSString* ORRunModelSequenceCommentChanged;
+extern NSString* ORRunModelSequenceNumberChanged;
 extern NSString* ORRunModelShutDownScriptStateChanged;
 extern NSString* ORRunModelStartScriptStateChanged;
 extern NSString* ORRunModelShutDownScriptChanged;

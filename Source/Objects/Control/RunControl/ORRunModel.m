@@ -30,6 +30,8 @@
 
 #pragma mark ¥¥¥Definitions
 
+NSString* ORRunModelSequenceCommentChanged		= @"ORRunModelSequenceCommentChanged";
+NSString* ORRunModelSequenceNumberChanged		= @"ORRunModelSequenceNumberChanged";
 NSString* ORRunModelShutDownScriptStateChanged	= @"ORRunModelShutDownScriptStateChanged";
 NSString* ORRunModelStartScriptStateChanged		= @"ORRunModelStartScriptStateChanged";
 NSString* ORRunModelShutDownScriptChanged		= @"ORRunModelShutDownScriptChanged";
@@ -83,6 +85,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) dealloc
 {
+    [sequenceComment release];
     [shutDownScriptState release];
     [startScriptState release];
     [shutDownScript release];
@@ -174,6 +177,29 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (NSString*) sequenceComment
+{
+    return sequenceComment;
+}
+
+- (void) setSequenceComment:(NSString*)aSequenceComment
+{
+    [sequenceComment autorelease];
+    sequenceComment = [aSequenceComment copy];    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSequenceCommentChanged object:self];
+}
+
+- (int) sequenceNumber
+{
+    return sequenceNumber;
+}
+
+- (void) setSequenceNumber:(int)aSequenceNumber
+{
+    sequenceNumber = aSequenceNumber;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSequenceNumberChanged object:self];
+}
 
 - (NSString*) shutDownScriptState
 {
@@ -1036,6 +1062,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [objDictionary setObject:[NSNumber numberWithLong:runType]          forKey:@"runType"];
     [objDictionary setObject:[NSNumber numberWithBool:quickStart]       forKey:@"quickStart"];
     [objDictionary setObject:[NSNumber numberWithLong:[self runNumber]] forKey:@"RunNumber"];
+    [objDictionary setObject:[NSNumber numberWithLong:[self sequenceNumber]] forKey:@"SequenceNumber"];
+    [objDictionary setObject:[self sequenceComment]						forKey:@"SequenceComment"];
     
     [dictionary setObject:objDictionary forKey:@"Run Control"];
     
