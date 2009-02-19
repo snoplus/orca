@@ -1,0 +1,70 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {
+                adcOffsetAction = id; 
+                adcSlopeAction = id; 
+                calibrationLockAction = id; 
+                controllAction = id; 
+                hvLockAction = id; 
+                panicAction = id; 
+                panicSystemAction = id; 
+                pollNowAction = id; 
+                rampTimeAction = id; 
+                rampToZeroAction = id; 
+                setPollingAction = id; 
+                startRampAction = id; 
+                stopRampAction = id; 
+                syncAction = id; 
+                targetAction = id; 
+                turnHVOffAction = id; 
+                turnHVOnAction = id; 
+            }; 
+            CLASS = ORHV4032Controller; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                adcMatrix = NSMatrix; 
+                calibrationLockButton = NSButton; 
+                controlMatrix = NSMatrix; 
+                dacMatrix = NSMatrix; 
+                hvLockButton = NSButton; 
+                offButton = NSButton; 
+                onButton = NSButton; 
+                panicButton = NSButton; 
+                pollingAlertField = NSTextField; 
+                pollingButton = NSPopUpButton; 
+                rampToZeroButton = NSButton; 
+                settingLockDocField = NSTextField; 
+                startRampButton = NSButton; 
+                stateMatrix = NSMatrix; 
+                statusButton = NSButton; 
+                statusImage = NSImageView; 
+                stopRampButton = NSButton; 
+                syncButton = NSButton; 
+                targetMatrix = NSMatrix; 
+                timeMatrix = NSMatrix; 
+                voltageAdcOffsetMatrix = NSMatrix; 
+                voltageAdcSlopeMatrix = NSMatrix; 
+                warningField = NSTextField; 
+            }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
