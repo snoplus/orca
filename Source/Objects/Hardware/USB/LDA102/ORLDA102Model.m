@@ -111,24 +111,24 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 - (void) awakeAfterDocumentLoaded
 {
-	@try {
+	//@try {
 		[self connectionChanged];
 		
 		//make sure the driver is installed.
-		NSFileManager* fm = [NSFileManager defaultManager];
-		if(![fm fileExistsAtPath:kLDA102DriverPath]){
-			NSLogColor([NSColor redColor],@"*** Unable To Locate LDA102 Driver ***\n");
-			if(!noDriverAlarm){
-				noDriverAlarm = [[ORAlarm alloc] initWithName:@"No LDA102 Driver Found" severity:0];
-				[noDriverAlarm setSticky:NO];
-				[noDriverAlarm setHelpStringFromFile:@"NoLDA102DriverHelp"];
-			}                      
-			[noDriverAlarm setAcknowledged:NO];
-			[noDriverAlarm postAlarm];
-		}
-	}
-	@catch(NSException* localException) {
-	}
+		//NSFileManager* fm = [NSFileManager defaultManager];
+		//if(![fm fileExistsAtPath:kLDA102DriverPath]){
+		//	NSLogColor([NSColor redColor],@"*** Unable To Locate LDA102 Driver ***\n");
+		//	if(!noDriverAlarm){
+		//		noDriverAlarm = [[ORAlarm alloc] initWithName:@"No LDA102 Driver Found" severity:0];
+		//		[noDriverAlarm setSticky:NO];
+		//		[noDriverAlarm setHelpStringFromFile:@"NoLDA102DriverHelp"];
+		//	}                      
+		//	[noDriverAlarm setAcknowledged:NO];
+		//	[noDriverAlarm postAlarm];
+		//}
+//	}
+	//@catch(NSException* localException) {
+	//}
 }
 
 
@@ -499,7 +499,7 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 			[ORTimer delay:.03]; //must delay 30ms between commands
 		}
 		@catch (NSException* localException){
-			NSLog(@"USB exception\n");
+			NSLog(@"USB exception: %@\n",localException);
 		}
 	}
 }
