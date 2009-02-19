@@ -180,11 +180,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (NSString*) sequenceComment
 {
-    return sequenceComment;
+	if(!sequenceComment)return @"no Comment";
+    else return sequenceComment;
 }
 
 - (void) setSequenceComment:(NSString*)aSequenceComment
 {
+	if(!aSequenceComment)aSequenceComment = @"no Comment";
     [sequenceComment autorelease];
     sequenceComment = [aSequenceComment copy];    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSequenceCommentChanged object:self];
@@ -1062,8 +1064,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [objDictionary setObject:[NSNumber numberWithLong:runType]          forKey:@"runType"];
     [objDictionary setObject:[NSNumber numberWithBool:quickStart]       forKey:@"quickStart"];
     [objDictionary setObject:[NSNumber numberWithLong:[self runNumber]] forKey:@"RunNumber"];
-    [objDictionary setObject:[NSNumber numberWithLong:[self sequenceNumber]] forKey:@"SequenceNumber"];
-    [objDictionary setObject:[self sequenceComment]						forKey:@"SequenceComment"];
+    [objDictionary setObject:[NSNumber numberWithInt:[self sequenceNumber]] forKey:@"sequenceNumber"];
+    [objDictionary setObject:[self sequenceComment]						forKey:@"sequenceComment"];
     
     [dictionary setObject:objDictionary forKey:@"Run Control"];
     
