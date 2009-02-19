@@ -73,6 +73,8 @@
 				<string>id</string>
 				<key>idleTimeAction</key>
 				<string>id</string>
+				<key>loadAttenuationAction</key>
+				<string>id</string>
 				<key>rampEndAction</key>
 				<string>id</string>
 				<key>rampStartAction</key>
@@ -106,6 +108,10 @@
 				<string>NSButton</string>
 				<key>rampEndField</key>
 				<string>NSTextField</string>
+				<key>rampRunningField</key>
+				<string>NSTextField</string>
+				<key>rampRunningProgress</key>
+				<string>NSProgressIndicator</string>
 				<key>rampStartField</key>
 				<string>NSTextField</string>
 				<key>rampStartStopButton</key>

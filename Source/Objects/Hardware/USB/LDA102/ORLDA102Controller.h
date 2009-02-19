@@ -34,6 +34,7 @@
 	IBOutlet NSButton*		lockButton;
 	IBOutlet NSButton*		rampStartStopButton;
 	IBOutlet NSButton*		loadAttenuationButton;
+	IBOutlet NSProgressIndicator*		rampRunningProgress;
 }
 
 #pragma mark •••Notifications
@@ -48,8 +49,10 @@
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
+- (void) rampRunningChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) loadAttenuationAction:(id)sender;
 - (IBAction) repeatRampAction:(id)sender;
 - (IBAction) idleTimeAction:(id)sender;
 - (IBAction) dwellTimeAction:(id)sender;

@@ -33,15 +33,16 @@
     NSString* serialNumber;
 	ORAlarm*  noUSBAlarm;
 	ORAlarm*  noDriverAlarm;
-    short	attenuation;
+    float	attenuation;
     float	stepSize;
     float	rampStart;
     float	rampEnd;
-    int		dwellTime;
+    short	dwellTime;
     int		idleTime;
     BOOL	repeatRamp;
     float	rampValue;
-	
+    BOOL	rampRunning;
+
 	//Thread variables
 	BOOL threadRunning;
 	BOOL timeToStop;
@@ -50,14 +51,16 @@
 - (id) getUSBController;
 
 #pragma mark ***Accessors
+- (BOOL) rampRunning;
+- (void) setRampRunning:(BOOL)aRampRunning;
 - (float) rampValue;
 - (void) setRampValue:(float)aRampValue;
 - (BOOL) repeatRamp;
 - (void) setRepeatRamp:(BOOL)aRepeatRamp;
 - (int) idleTime;
 - (void) setIdleTime:(int)aIdleTime;
-- (int) dwellTime;
-- (void) setDwellTime:(int)aDwellTime;
+- (short) dwellTime;
+- (void) setDwellTime:(short)aDwellTime;
 - (float) rampEnd;
 - (void) setRampEnd:(float)aRampEnd;
 - (float) rampStart;
@@ -77,8 +80,12 @@
 - (void) interfaceAdded:(NSNotification*)aNote;
 - (void) interfaceRemoved:(NSNotification*)aNote;
 
-#pragma mark ***Comm methods
-- (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count data:(unsigned char*)contents;
+#pragma mark ***HW Access
+- (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count value:(unsigned long)aValue;
+- (void) loadAttenuation;
+- (void) startRamp;
+- (void) stopRamp;
+- (void) packData:(unsigned char*)data withLong:(unsigned long)aValue;
 
 #pragma mark ***Thread methods
 - (void) startReadThread;
@@ -92,6 +99,7 @@
 
 @end
 
+extern NSString* ORLDA102ModelRampRunningChanged;
 extern NSString* ORLDA102ModelRampValueChanged;
 extern NSString* ORLDA102ModelRepeatRampChanged;
 extern NSString* ORLDA102ModelIdleTimeChanged;

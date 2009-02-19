@@ -24,6 +24,7 @@
 #import "ORLDA102Model.h"
 #import "ORUSBInterface.h"
 
+NSString* ORLDA102ModelRampRunningChanged = @"ORLDA102ModelRampRunningChanged";
 NSString* ORLDA102ModelRepeatRampChanged	= @"ORLDA102ModelRepeatRampChanged";
 NSString* ORLDA102ModelIdleTimeChanged		= @"ORLDA102ModelIdleTimeChanged";
 NSString* ORLDA102ModelDwellTimeChanged		= @"ORLDA102ModelDwellTimeChanged";
@@ -39,6 +40,7 @@ NSString* ORLDA102USBNextConnection			= @"ORLDA102USBNextConnection";
 NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 #define kLDA102DriverPath @"/System/Library/Extensions/LDA102.kext"
+#define kdBPerValue 4
 
 //set commands
 #define kSetAttenuation 0x8D
@@ -65,7 +67,7 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 #define kGetMaxAtt		0x35
 
 //response commands
-#define kAttResponse	0x04
+#define kAttStatus	0x04
 
 @implementation ORLDA102Model
 - (void) makeConnectors
@@ -192,6 +194,18 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 #pragma mark ***Accessors
 
+- (BOOL) rampRunning
+{
+    return rampRunning;
+}
+
+- (void) setRampRunning:(BOOL)aRampRunning
+{
+    rampRunning = aRampRunning;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelRampRunningChanged object:self];
+}
+
 - (float) rampValue
 {
     return rampValue;
@@ -223,18 +237,23 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 - (void) setIdleTime:(int)aIdleTime
 {
+	if(aIdleTime<0)			aIdleTime = 0;
+	else if(aIdleTime>255)	aIdleTime = 255;
+	
     [[[self undoManager] prepareWithInvocationTarget:self] setIdleTime:idleTime];
     idleTime = aIdleTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelIdleTimeChanged object:self];
 }
 
-- (int) dwellTime
+- (short) dwellTime
 {
     return dwellTime;
 }
 
-- (void) setDwellTime:(int)aDwellTime
+- (void) setDwellTime:(short)aDwellTime
 {
+	if(aDwellTime<10)			aDwellTime = 10;
+	else if(aDwellTime>20000)	aDwellTime = 20000;
     [[[self undoManager] prepareWithInvocationTarget:self] setDwellTime:dwellTime];
     dwellTime = aDwellTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelDwellTimeChanged object:self];
@@ -247,6 +266,8 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 - (void) setRampEnd:(float)aRampEnd
 {
+	if(aRampEnd<0)			aRampEnd = 0;
+	else if(aRampEnd>63)	aRampEnd = 63;
     [[[self undoManager] prepareWithInvocationTarget:self] setRampEnd:rampEnd];
     rampEnd = aRampEnd;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelRampEndChanged object:self];
@@ -259,6 +280,8 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 - (void) setRampStart:(float)aRampStart
 {
+	if(aRampStart<0)			aRampStart = 0;
+	else if(aRampStart>63)	aRampStart = 63;
     [[[self undoManager] prepareWithInvocationTarget:self] setRampStart:rampStart];
     rampStart = aRampStart;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelRampStartChanged object:self];
@@ -271,6 +294,8 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 - (void) setStepSize:(float)aStepSize
 {
+	if(aStepSize<.5)		aStepSize = .5;
+	else if(aStepSize>63)	aStepSize = 63;
     [[[self undoManager] prepareWithInvocationTarget:self] setStepSize:stepSize];
     stepSize = aStepSize;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelStepSizeChanged object:self];
@@ -283,6 +308,8 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 - (void) setAttenuation:(float)aAttenuation
 {
+	if(aAttenuation<0)			aAttenuation = 0;
+	else if(aAttenuation>63)	aAttenuation = 63;
     [[[self undoManager] prepareWithInvocationTarget:self] setAttenuation:attenuation];
     attenuation = aAttenuation;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLDA102ModelAttenuationChanged object:self];
@@ -421,12 +448,59 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 - (void) decodeResponse:(unsigned char*)data
 {
 	switch(data[0]){
-		case kGetAttenuation:
+		case kAttStatus:
+			[self setRampValue:data[7]/kdBPerValue];
 		break;
 	}
 }
 
+#pragma mark ***HW Access
+- (void) loadAttenuation
+{
+	[self writeCommand:kSetAttenuation count:1 value:attenuation*kdBPerValue];
+}
 
+- (void) startRamp
+{
+	[self setRampRunning:YES];
+	[self writeCommand:kSetStartAtt	 count:4 value:rampStart*kdBPerValue];
+	[self writeCommand:kSetStopAtt	 count:4 value:rampEnd*kdBPerValue];
+	[self writeCommand:kSetStepSize  count:4 value:stepSize*kdBPerValue];
+	[self writeCommand:kSetDwellTime count:4 value:dwellTime];
+	if(repeatRamp){
+		[self writeCommand:kSetWaitTime  count:1 value:idleTime];
+		[self writeCommand:kSetRampState  count:1 value:kContinousRamp];
+	}
+	else {
+		[self writeCommand:kSetRampState  count:1 value:kSingleRamp];
+	}
+}
+
+- (void) stopRamp
+{
+	[self writeCommand:kSetRampState  count:1 value:kStopRamp];
+	[self setRampRunning:NO];
+}
+
+- (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count value:(unsigned long)aValue
+{
+	if(usbInterface && [self getUSBController]){
+		unsigned char data[8];
+		data[0] = cmdWord;
+		data[1] = count;
+		[self packData:&data[2] withLong:aValue];
+		[usbInterface writeBytesOnInterruptPipe:data length:8]; //?might have to use the regular out pipe
+		[ORTimer delay:.03]; //must delay 30ms between commands
+	}
+}
+
+- (void) packData:(unsigned char*)data withLong:(unsigned long)aValue
+{
+	data[0] = aValue & 0xff;
+	data[1] = (aValue>>8) & 0xff;
+	data[2] = (aValue>>16) & 0xff;
+	data[3] = (aValue>>24) & 0xff;
+}
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -458,21 +532,6 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
     [encoder encodeFloat:stepSize		forKey: @"stepSize"];
     [encoder encodeInt:attenuation		forKey: @"attenuation"];
     [encoder encodeObject:serialNumber	forKey: @"serialNumber"];
-}
-
-#pragma mark ***Comm methods
-- (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count data:(unsigned char*)contents
-{
-	if(usbInterface && [self getUSBController]){
-		unsigned char data[8];
-		data[0] = cmdWord;
-		data[1] = count;
-		int i;
-		for(i=0;i<count;i++){
-			data[2+i] = contents[i];
-		}
-		[usbInterface writeBytesOnInterruptPipe:data length:8]; //?might have to use the regular out pipe
-	}
 }
 
 @end

@@ -106,7 +106,11 @@
                          name : ORLDA102ModelRampValueChanged
 						object: model];
 	
-	
+    [notifyCenter addObserver : self
+                     selector : @selector(rampRunningChanged:)
+                         name : ORLDA102ModelRampRunningChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -128,6 +132,18 @@
 	[self idleTimeChanged:nil];
 	[self repeatRampChanged:nil];
 	[self rampValueChanged:nil];
+	[self rampRunningChanged:nil];
+}
+
+- (void) rampRunningChanged:(NSNotification*)aNote
+{
+	if([model rampRunning]){
+		[rampRunningProgress startAnimation:self];
+	}
+	else {
+		[rampRunningProgress stopAnimation:self];
+	}
+	[self lockChanged:nil];
 }
 
 - (void) repeatRampChanged:(NSNotification*)aNote
@@ -185,11 +201,20 @@
 
 - (void) lockChanged:(NSNotification*)aNote
 {
-   // BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORLDA102ModelLock];
+	BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORLDA102ModelLock];
     BOOL locked = [gSecurity isLocked:ORLDA102ModelLock];
-	
+	BOOL rampRunning = [model rampRunning];
     [lockButton setState: locked];
 	[serialNumberPopup setEnabled:!locked];
+	[repeatRampButton setEnabled:!lockedOrRunningMaintenance && !rampRunning];
+	[idleTimeField setEnabled:!lockedOrRunningMaintenance && !rampRunning];
+	[dwellTimeField setEnabled:!lockedOrRunningMaintenance && !rampRunning];
+	[rampEndField setEnabled:!lockedOrRunningMaintenance && !rampRunning];
+	[rampStartField setEnabled:!lockedOrRunningMaintenance && !rampRunning];
+	[attenuationField setEnabled:!lockedOrRunningMaintenance && !rampRunning];
+	[loadAttenuationButton setEnabled:!lockedOrRunningMaintenance && !rampRunning];
+	[rampStartStopButton setEnabled:!lockedOrRunningMaintenance];
+	[rampStartStopButton setTitle:[model rampRunning]?@"Stop":@"Start"];
 }
 
 - (void) serialNumberChanged:(NSNotification*)aNote
@@ -200,41 +225,46 @@
 }
 
 #pragma mark •••Actions
-
-- (void) repeatRampAction:(id)sender
+- (IBAction) repeatRampAction:(id)sender
 {
 	[model setRepeatRamp:[sender intValue]];	
 }
 
-- (void) idleTimeAction:(id)sender
+- (IBAction) idleTimeAction:(id)sender
 {
 	[model setIdleTime:[sender intValue]];	
 }
 
-- (void) dwellTimeAction:(id)sender
+- (IBAction) dwellTimeAction:(id)sender
 {
 	[model setDwellTime:[sender intValue]];	
 }
 
-- (void) rampEndAction:(id)sender
+- (IBAction) rampEndAction:(id)sender
 {
 	[model setRampEnd:[sender floatValue]];	
 }
 
-- (void) rampStartAction:(id)sender
+- (IBAction) rampStartAction:(id)sender
 {
 	[model setRampStart:[sender floatValue]];	
 }
 
-- (void) stepSizeAction:(id)sender
+- (IBAction) stepSizeAction:(id)sender
 {
 	[model setStepSize:[sender floatValue]];	
 }
 
-- (void) attenuationAction:(id)sender
+- (IBAction) attenuationAction:(id)sender
 {
 	[model setAttenuation:[sender floatValue]];	
 }
+
+- (IBAction) loadAttenuationAction:(id)sender
+{
+	[model loadAttenuation];	
+}
+
 - (IBAction) settingLockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORLDA102ModelLock to:[sender intValue] forWindow:[self window]];
