@@ -496,7 +496,7 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 			NSLog(@"%d: 0x%0x\n",i+2,data[2+i]);
 		}
 		@try{
-			[usbInterface writeBytesOnInterruptPipe:data length:8]; //?might have to use the regular out pipe
+			[usbInterface writeBytes:data length:8]; //?might have to use the regular out pipe
 			[ORTimer delay:.03]; //must delay 30ms between commands
 		}
 		@catch (NSException* localException){
