@@ -262,6 +262,7 @@
 
 - (IBAction) loadAttenuationAction:(id)sender
 {
+	[self endEditing];
 	[model loadAttenuation];	
 }
 
