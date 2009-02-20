@@ -71,6 +71,9 @@
 		2D1AB81D0F1B9F2400E6B850 /* ORIpeSlowControlController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */; };
 		2D1AB81E0F1B9F2400E6B850 /* ORIpeSlowControlModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */; };
 		2D1AB81F0F1B9F2400E6B850 /* ORIpeSlowControlModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */; };
+		2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */; };
+		2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */; };
+		2D2C84090F4EC6650005D69F /* ORIpeSlowControlDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D2C84060F4EC6640005D69F /* ORIpeSlowControlDefs.h */; };
 		2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DC1EE7F0F33724E00E93C75 /* WebKit.framework */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
 		546D9DB00874BDD60072A274 /* 2228ACard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA80874BDD60072A274 /* 2228ACard.gif */; };
@@ -2096,6 +2099,9 @@
 		2D1AB8170F1B9F2400E6B850 /* ORIpeSlowControlController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlController.m; path = "IPE SlowControl/ORIpeSlowControlController.m"; sourceTree = "<group>"; };
 		2D1AB8180F1B9F2400E6B850 /* ORIpeSlowControlModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlModel.h; path = "IPE SlowControl/ORIpeSlowControlModel.h"; sourceTree = "<group>"; };
 		2D1AB8190F1B9F2400E6B850 /* ORIpeSlowControlModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlModel.m; path = "IPE SlowControl/ORIpeSlowControlModel.m"; sourceTree = "<group>"; };
+		2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDecoder.h; path = "IPE SlowControl/ORIpeSlowControlDecoder.h"; sourceTree = "<group>"; };
+		2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIpeSlowControlDecoder.m; path = "IPE SlowControl/ORIpeSlowControlDecoder.m"; sourceTree = "<group>"; };
+		2D2C84060F4EC6640005D69F /* ORIpeSlowControlDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIpeSlowControlDefs.h; path = "IPE SlowControl/ORIpeSlowControlDefs.h"; sourceTree = "<group>"; };
 		2DC1EE7F0F33724E00E93C75 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
 		546D9DA80874BDD60072A274 /* 2228ACard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2228ACard.gif; path = Source/Objects/Hardware/Camac/TDC2228A/2228ACard.gif; sourceTree = SOURCE_ROOT; };
@@ -4172,6 +4178,9 @@
 		2D1AB8070F1B9EBC00E6B850 /* IPE SlowControl */ = {
 			isa = PBXGroup;
 			children = (
+				2D2C84040F4EC6640005D69F /* ORIpeSlowControlDecoder.h */,
+				2D2C84050F4EC6640005D69F /* ORIpeSlowControlDecoder.m */,
+				2D2C84060F4EC6640005D69F /* ORIpeSlowControlDefs.h */,
 				2D1AB8140F1B9F2400E6B850 /* IpeSlowControl.nib */,
 				2D1AB8150F1B9F2400E6B850 /* IpeSlowControl.tif */,
 				2D1AB8160F1B9F2400E6B850 /* ORIpeSlowControlController.h */,
@@ -9412,6 +9421,8 @@
 				84B28E5E0F4C835500E2B056 /* ORUnivVoltHVCrateController.h in Headers */,
 				84B28E600F4C835500E2B056 /* ORUnivVoltHVCrateExceptions.h in Headers */,
 				84B28E610F4C835500E2B056 /* ORUnivVoltHVCrateModel.h in Headers */,
+				2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */,
+				2D2C84090F4EC6650005D69F /* ORIpeSlowControlDefs.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10692,6 +10703,7 @@
 				84B28E590F4C835500E2B056 /* ORUnivVoltModel.m in Sources */,
 				84B28E5F0F4C835500E2B056 /* ORUnivVoltHVCrateController.m in Sources */,
 				84B28E620F4C835500E2B056 /* ORUnivVoltHVCrateModel.m in Sources */,
+				2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
