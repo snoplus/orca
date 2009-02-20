@@ -86,6 +86,7 @@
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) updateSensorSettings;
+- (void) setWindowTitle;
 #if 0 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 - (void) remotePortChanged:(NSNotification*)note;
 - (void) remoteHostChanged:(NSNotification*)note;

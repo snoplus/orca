@@ -19,6 +19,8 @@
 
 #pragma mark ***Imported Files
 #import "ORAdcProcessing.h"
+#import "ORDataTaker.h"
+#import "ORDataChainObject.h"
 
 #pragma mark ***Forward Declarations
 @class ORSensorItem;
@@ -56,11 +58,21 @@
   * So we may or may not have the tree and independently of the tree are able to load the sensor values of
   * the sensors listed in the #sensorList. So the sensorList can be saved in the .Orca file and used without tree.
   * The tree in fact is only necessary for defining the sensors in the "channel map".
+  *
+  *
+  *<br><br><br>
+  * Comments (Till):
+  * <br>
+  * Subclassing from ORDataChainObject is necessary for automatic registering as data taker and writer-to-header. 
+  * Otherwhise there is no difference compared to subclassing from OrcaObject. (ORDataChainObject is a direct subclass of OrcaObject.)
   */
 
-@interface ORIpeSlowControlModel : OrcaObject <ORAdcProcessing>
+@interface ORIpeSlowControlModel : ORDataChainObject <ORAdcProcessing,ORDataTaker>
 {
     //Slow Control
+    int channelDataId;
+    
+    
   	NSString* currentSensor;//TODO: rename to currentSensorName  obsolete -tb-
     int currentSensorIntValue;//obsolete -tb-
     
@@ -83,10 +95,17 @@
 
     //stuff for convenient ADEI tree download (NSURLConnection + NSURLRequest -> NSXMLDocument)
     double xmlRequestTimeout;
+    BOOL            readOnce;
+    double dataRequestTimeout;
     NSMutableArray  *queueForLoadingAdeiTree;
     ORSensorItem    *currentlyLoadingSensorNode;//temp internal variable used for XML request
     NSURLConnection *theXMLConnection;
     NSMutableData   *receivedXMLData;
+    
+    //testing/debugging
+    int heartbeatSec, heartbeatUSec;
+    int heartbeatLastSec, heartbeatLastUSec;
+
 }
 
 #pragma mark ***Initialization
@@ -101,6 +120,10 @@
 
 
 #pragma mark ***Accessors
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherCard;
+- (int) channelDataId;
+- (void) setChannelDataId:(int) aValue;
 
 #pragma mark ***Slow Control Accessors
 //obsolete -tb-
@@ -122,6 +145,7 @@
 - (void) setSensorList: (NSMutableArray *) anItems;
 - (int) maxSensorListLength;
 - (void) initSensorList;
+- (ORSensorItem*) sensorAtIndex:(int)index;
 - (void) replaceSensorListItemAtIndex:(int)index withSensorTreeItem:(ORSensorItem*)sensorItem;
 - (void) removeSensorListItemWithIndex:(int)index;
 - (void) removeSensorListItem:(ORSensorItem*)sensorItem;
@@ -178,10 +202,14 @@
 
 
 
-#pragma mark ***Archival
+#pragma mark •••Archival
 
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
+- (NSDictionary*) dataRecordDescription;
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 
 
@@ -200,6 +228,25 @@
 - (void)processIsStarting; //not in Bit Processing Protocol, but seems to be necessary -tb-
 - (void)processIsStopping; //not in Bit Processing Protocol, but seems to be necessary -tb-
 
+#pragma mark •••  Data Taker Protocol
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) reset;
+
+
+#pragma mark •••ID Helpers (see OrcaObject)
+//- (NSString*) objectName;  // take from super class
+//- (NSString*) isDataTaker;  // take from super class
+//- (NSString*) supportsHardwareWizard;  //TODO: not yet implemented -tb-
+- (NSString*) identifier;
+
+
+ 
+#pragma mark •••  Protocol ORHWWizard
+- (NSArray*) wizardParameters;
+- (NSArray*) wizardSelections;
+- (int) numberOfChannels;
 
 
 
@@ -275,6 +322,9 @@ enum  {kAdeiUnknown=0 , kAdeiTypeRoot, kAdeiTypeService, kAdeiTypeSetupOption, k
     NSString* data;  //a outline view column identifier
     NSString* date;  //a outline view column identifier
     double doubleData; // double version of  NSString* data
+    long dataTimestampSec;// the timestamp of the data (seconds)
+    long dataTimestampSubSec;// the timestamp of the data (subseconds, could be usec or nanosec! -tb-)
+    double setpoint; // the setpoint for a sensor (SOLLWERT)
     BOOL isRecordingData; // TRUE if the sensor shall record its data into the Orca data file
     double minValue;
     double setMinValue;
@@ -322,6 +372,14 @@ enum  {kAdeiUnknown=0 , kAdeiTypeRoot, kAdeiTypeService, kAdeiTypeSetupOption, k
 - (void) setData: (NSString *) aString;
 - (double) doubleData;
 - (void) setDoubleData: (double) aValue;
+- (long)  dataTimestampSec;
+- (void) setDataTimestampSec: (long) aValue;
+- (long)  dataTimestampSubSec;
+- (void) setDataTimestampSubSec: (long) aValue;
+- (void) setDataTimestampSec:(long) aSecValue   subSec:(long) aSubSecValue;
+- (double) setpoint;
+- (void) setSetpoint: (double) aValue;
+
 - (BOOL) isRecordingData;
 - (void) setIsRecordingData:(BOOL)aValue;
 
@@ -395,5 +453,10 @@ enum  {kAdeiUnknown=0 , kAdeiTypeRoot, kAdeiTypeService, kAdeiTypeSetupOption, k
 - (id) childAtIndex:(int)index;
 
 - (int) createChildrenFromXmlDoc:(NSXMLDocument*)aDoc withType:(int)aType;
+
+#pragma mark •••Archival
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
+
+
 @end //of @interface ORSensorItem
 

@@ -34,9 +34,11 @@
       #define    DebugTB(x) 
     #endif
 
-    #if 1
+    #if 0
       // if 1 all methods will print out a message -> for testing IB connections -tb-
       #define    DebugMethCallsTB(x) x
+    #else
+      #define    DebugMethCallsTB(x) 
     #endif
     
 #else
@@ -209,6 +211,7 @@
 - (void) updateWindow
 {
     [super updateWindow];
+    [self setWindowTitle];
 #if 0  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	[self remotePortChanged:nil];
 	[self remoteHostChanged:nil];
@@ -241,6 +244,13 @@
 	[self highAlarmRangeChanged:nil];
 	[self isRecordingDataChanged:nil];
 }
+
+- (void) setWindowTitle
+{
+	//[[self window] setTitle: [model processingTitle]];// we can be more verbose
+	[[self window] setTitle: [NSString stringWithFormat:@"IPE-ADEI Slow Control - %d",[model uniqueIdNumber]]];
+}
+
 
 //general settings tab
 - (void) adeiBaseUrlChanged:(NSNotification*)aNote
@@ -677,6 +687,13 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 
 }
 
+
+//try with module=graph ... NEW: minimal=graph
+#define ADEI_OPTION_STRING @"&module=graph"
+//#define ADEI_OPTION_STRING @"&minimal=graph"
+//#define ADEI_OPTION_STRING @""
+//TODO: Since 2009-02 it doesnt load any more (the Web Interface has been changed!), maybe I need to use more control of loading: 
+//TODO: see "WebFrameLoadDelegate Protocol Reference" -tb-
 - (IBAction)sensorListContextMenuDisplayWebViewAction:(id)sender
 {
     DebugMethCallsTB(  
@@ -685,7 +702,11 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
     )
     
     int row = [sensorTableView selectedRow];
-    NSString *requestString =  [[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath];
+    //NSString *requestString =  [[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath];
+    //NSString *requestString =  [NSString stringWithFormat:@"%@%@",[[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath], @"&module=graph"] ;
+    NSString *requestString =  [NSString stringWithFormat:@"%@%@",[[[model sensorList] objectAtIndex:row] createWebinterfaceRequestStringWithSensorPath], ADEI_OPTION_STRING] ;
+//http:
+//fuzzy.fzk.de/adei/#db_server=toskanadb&db_name=prespektrometer_rep&db_group=3&control_group=0&db_mask=72&window=0&module=graph
     DebugTB( NSLog(@"Request string is %@\n", requestString); )
 
     [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: requestString ]]];
@@ -703,7 +724,19 @@ autoselect an edge, and we want this drawer to open only on the left edge. */
 {
     DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
     //[[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self helpFilePath]]]];
-    [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://fuzzy.fzk.de/adei/"]]];
+    //[[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://fuzzy.fzk.de/adei/"]]];
+    NSString *requestString =  [NSString stringWithFormat:@"%@%@%@" ,[model  adeiBaseUrl], @"#",ADEI_OPTION_STRING];
+    DebugTB( NSLog(@"Request string is %@\n", requestString); )
+    @try{
+        [[adeiWebInterfaceWebView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: requestString]]];
+    }
+    @catch(NSException *exception){
+        DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@: COULD NOT LOAD URL!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+        NSLog(@"ERROR: %@ ; EXCEPTION-NAME:  %@, %i\n",
+             [NSString stringWithFormat:@" >%@< ", [exception reason]] ,
+             [NSString stringWithFormat:@" >%@< ", [exception name]] ,
+             [NSNumber numberWithInt:errOSAGeneralError]  );
+    }
 }
 
 

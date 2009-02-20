@@ -1,0 +1,45 @@
+//
+//  ORIpeSlowControlDecoder.h
+//  Orca
+//
+//  Created by Till Bergmann on 01/16/2009.
+//  Copyright 2009 xxxx, University of xxxx. All rights reserved.
+//-----------------------------------------------------------
+//
+//
+//
+//
+//  TODO: Copyright etc. probably new since 2009? -tb-
+//
+//
+//
+//
+//-------------------------------------------------------------
+
+
+
+#import "ORBaseDecoder.h"
+
+@interface ORIpeSlowControlDecoder : ORBaseDecoder {
+
+}
+
+- (NSString*) getIpeSlowControlObjectKey:(unsigned short)aValue;
+//- (NSString*) getChannelKey:(unsigned short)aChan; //already defined in ORBaseDecoder -tb-
+
+@end
+
+
+
+
+/** Decoder for the hitrate stream.   (copy of "event data stream" -tb-)
+  * This objects are generated in Flt measure mode.
+  */
+@interface ORIpeSlowControlDecoderForChannelData : ORIpeSlowControlDecoder {
+}
+// Documentation in m-file
+- (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+

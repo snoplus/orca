@@ -43,8 +43,11 @@
 #pragma mark ***Imported Files
 
 #import "ORIpeSlowControlModel.h"
-//#import "ORDataTaker.h"
-//#import "ORDataTypeAssigner.h"
+#import "ORIpeSlowControlDefs.h"
+#import "ORDataTaker.h"
+#import "ORDataTypeAssigner.h"
+#import "ORHWWizParam.h" //TODO: necessary? -tb-
+#import "ORHWWizSelection.h"
 
  
 #pragma mark •••Notification Strings
@@ -70,7 +73,131 @@ NSString* ORIpeSlowControlhighAlarmRangeChangedNotification   = @"ORIpeSlowContr
 NSString* ORIpeSlowControlSetIsRecordingDataChangedNotification   = @"ORIpeSlowControlSetIsRecordingDataChangedNotification";
 
 
+//! Used in - (NSString*) identifier (Adc or Bit Processing Protocol) and - (NSString*) processingTitle (ID Helpers; see OrcaObject)
+#define IPE_SLOW_CONTROL_SHORT_NAME @"IPE-ADEI"
+//TODO: use a better name (it should be very short, Process objects are small) -tb-
 
+/** This is called once when "processing" is started. Intended for initialisation (?).
+  */
+/*********************************************************************-tb-
+ * local used auxiliary functions
+ *********************************************************************/
+/** Calls  #gettimeofday (standard C function) and returns seconds, microseconds and both in a double.
+  * <br> 
+  * See ORRunModel.m - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary for usage of
+  * another time function (time_t	theTime;   time(&theTime); ...).
+  * <br>
+  * 
+  * dSec may be a zero pointer (in this case, converting the time to a double value is omitted for sparing computing time).
+  * currentMicroSec may be a zero pointer (then dSec is assumed to be zero too!) if only seconds are needed.
+  */
+void getTimeOfDayInfo(int *currentSec, int * currentMicroSec, double *dSec){
+        //timing
+        struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+        gettimeofday(&t,NULL);
+        *currentSec = t.tv_sec;  
+        *currentMicroSec = t.tv_usec;  
+        if(dSec) *dSec = (double)(*currentSec ) +
+                        ((double)(*currentMicroSec )) * 0.000001;
+}
+
+
+/** Calls  #gettimeofday (standard C function) and returns the difference to a previously stored time
+  * as double (in unizs sec).
+  * 
+  * In getCurrentSec, getCurrentUSec the current time may be used.
+  * Examples:
+  * 
+  @verbatim
+  double difftime = tbGetDiffToTimeOfDay(secBuff, uSecBuff,  0, 0);
+  or
+  double difftime = tbGetDiffToTimeOfDay(secBuff, uSecBuff,  &secBuff, &uSecBuff);
+  or (same as above but 4 variables necessary)
+  double difftime = tbGetDiffToTimeOfDay(lastSecBuff, lastUSecBuff,  &secBuff, &uSecBuff);
+  lastSecBuff = secBuff*;
+  lastUSecBuff = uSecBuff*;
+  @endverbatim
+  * 
+  */
+double tbGetDiffToTimeOfDay(int lastSec, int lastUSec, int *getCurrentSec, int * getCurrentUSec){
+        double currentDoubleSec;
+        struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+        gettimeofday(&t,NULL);
+        int currentSec = t.tv_sec;  
+        int currentUSec = t.tv_usec;  
+        currentDoubleSec = (double)(currentSec  - lastSec) +
+                                                ((double)(currentUSec - lastUSec)) * 0.000001;
+        if(getCurrentSec) *getCurrentSec = currentSec;
+        if(getCurrentUSec) *getCurrentUSec = currentUSec;
+        
+        return currentDoubleSec;
+}
+
+
+
+/** Gets a date in a NSString (returned by a ADEI csv request) and converts it to a struct timeval using mktime
+  * 
+  * 
+  * 
+  */
+struct timeval  tbConvertADEIDateString2time(NSString *aDate){
+        //double currentDoubleSec;
+        struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+        if(!aDate || [aDate length]<24) return t;
+        
+        #if 0
+        gettimeofday(&t,NULL);
+        int currentSec = t.tv_sec;  
+        int currentUSec = t.tv_usec;  
+        currentDoubleSec = (double)(currentSec  - lastSec) +
+                                                ((double)(currentUSec - lastUSec)) * 0.000001;
+        if(getCurrentSec) *getCurrentSec = currentSec;
+        if(getCurrentUSec) *getCurrentUSec = currentUSec;
+        #endif
+        
+        struct tm dateStruct; // see: man ctime
+        dateStruct.tm_mday = [[aDate substringWithRange: NSMakeRange(0,2)] intValue] ;
+        dateStruct.tm_year = [[aDate substringWithRange: NSMakeRange(7,2)] intValue] + 100;/* year - 1900 */
+        dateStruct.tm_hour = [[aDate substringWithRange: NSMakeRange(10,2)] intValue] ;
+        dateStruct.tm_min  = [[aDate substringWithRange: NSMakeRange(13,2)] intValue] ;
+        dateStruct.tm_sec  = [[aDate substringWithRange: NSMakeRange(16,2)] intValue] ;
+        t.tv_usec          = [[aDate substringWithRange: NSMakeRange(19,6)] intValue] ;
+        dateStruct.tm_mon =  -1;
+        NSString *month=[NSString stringWithString: [aDate substringWithRange: NSMakeRange(3,3)]];
+        if([month isEqualToString:@"Jan"]) dateStruct.tm_mon = 0;
+        else if([month isEqualToString:@"Feb"]) dateStruct.tm_mon = 1;
+        else if([month isEqualToString:@"Mar"]) dateStruct.tm_mon = 2;
+        else if([month isEqualToString:@"Apr"]) dateStruct.tm_mon = 3;
+        else if([month isEqualToString:@"May"]) dateStruct.tm_mon = 4;
+        else if([month isEqualToString:@"Jun"]) dateStruct.tm_mon = 5;
+        else if([month isEqualToString:@"Jul"]) dateStruct.tm_mon = 6;
+        else if([month isEqualToString:@"Aug"]) dateStruct.tm_mon = 7;
+        else if([month isEqualToString:@"Sep"]) dateStruct.tm_mon = 8;
+        else if([month isEqualToString:@"Oct"]) dateStruct.tm_mon = 9;
+        else if([month isEqualToString:@"Noc"]) dateStruct.tm_mon = 10;
+        else if([month isEqualToString:@"Dec"]) dateStruct.tm_mon = 11;
+        //if unknown, write out warning ...
+        static int warnCount=0;
+        if(dateStruct.tm_mon == -1 && warnCount<25){
+            NSLog(@"WARNING in ORIpeSlowControlModel.m: could not parse month string >%@<!\n",month);
+            warnCount++;
+        }
+        
+        //NSLog(@"Parsing in ORIpeSlowControlModel.m: >%@< is %i,%i, %i, %i, %i, %i, %i\n",aDate,
+        //    dateStruct.tm_mday,dateStruct.tm_mon,dateStruct.tm_year, dateStruct.tm_hour,  dateStruct.tm_min, dateStruct.tm_sec,  t.tv_usec      );
+        
+        time_t seconds;
+        seconds = mktime(&dateStruct);// returns seconds after 01.01.1970
+        t.tv_sec = seconds;
+        //returns the week day: char daybuf[20]; strftime(daybuf, sizeof(daybuf), "%A", &dateStruct); NSLog(@"daybuf is %s\n",daybuf);
+        return t;
+}
+
+
+
+/*********************************************************************-tb-
+ * from here: class ORIpeSlowControlModel
+ *********************************************************************/
 
 @implementation ORIpeSlowControlModel
 - (id) init
@@ -91,7 +218,7 @@ NSString* ORIpeSlowControlSetIsRecordingDataChangedNotification   = @"ORIpeSlowC
 - (id) initBasics
 {
     currentSensor= @""; //slow control  TODO: obsolete -tb-
-    NSLog(@"initBasics: self is %p, currentSensor is %p\n",self, currentSensor);
+    //NSLog(@"initBasics: self is %p, currentSensor is %p\n",self, currentSensor);
 
     //FZK-internal: [self setAdeiServiceUrl: @"http://ipepdvadei.ka.fzk.de/adei/services/"];//TODO: make attribute -tb-
     [self setAdeiServiceUrl: @"http://fuzzy.fzk.de/adei/services/"];//TODO: make attribute -tb-
@@ -162,6 +289,58 @@ NSString* ORIpeSlowControlSetIsRecordingDataChangedNotification   = @"ORIpeSlowC
 
 #pragma mark ***Accessors
 
+/*! Assign the data IDs which are needed to identify the type of encoded data sets.
+ They are needed in:
+ the takeData methods
+ - (NSDictionary*) dataRecordDescription
+ * <br>See ORDataTypeAssigner.
+ */ //-tb- 2008-02-6
+- (void) setDataIds:(id)assigner
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@.\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    channelDataId            = [assigner assignDataIds:kLongForm];
+    //TODO: UNDER CONSTRUCTION -tb-
+    //TODO: UNDER CONSTRUCTION -tb-
+    //TODO: UNDER CONSTRUCTION -tb-
+    //TODO: UNDER CONSTRUCTION -tb-
+    //TODO: UNDER CONSTRUCTION -tb-
+    //TODO: UNDER CONSTRUCTION -tb-
+    //TODO: UNDER CONSTRUCTION -tb-
+    //TODO: UNDER CONSTRUCTION -tb-
+    #if 0
+    waveFormId        = [assigner assignDataIds:kLongForm];
+	hitRateId         = [assigner assignDataIds:kLongForm]; // new ... -tb- 2008-01-29
+	thresholdScanId   = [assigner assignDataIds:kLongForm];
+	histogramId       = [assigner assignDataIds:kLongForm];
+	vetoId            = [assigner assignDataIds:kLongForm];
+    #endif
+}
+
+- (void) syncDataIdsWith:(id)anotherObject
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@.\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    [self setChannelDataId:     [anotherObject channelDataId]];
+    
+    
+    #if 0
+    [self setDataId:     [anotherCard dataId]];
+    [self setWaveFormId: [anotherCard waveFormId]];
+	[self setHitRateId:  [anotherCard hitRateId]]; // new ... -tb- 2008-01-29
+	[self setThresholdScanId: [anotherCard thresholdScanId]];
+	[self setHistogramId: [anotherCard histogramId]];
+	[self setVetoId:      [anotherCard vetoId]];
+    #endif
+}
+
+- (int) channelDataId
+{
+    return channelDataId;
+}
+
+- (void) setChannelDataId:(int) aValue
+{
+    channelDataId = aValue;
+}
 
 #pragma mark ***Slow Control Accessors
 //obsolete -tb-
@@ -299,9 +478,12 @@ NSString* ORIpeSlowControlSetIsRecordingDataChangedNotification   = @"ORIpeSlowC
         ORSensorItem *sensor = [ORSensorItem emptySensorListItemWithChanNum: sensorListIndex];
         [sensorList addObject: sensor];
     }
-    
 }
 
+- (ORSensorItem*) sensorAtIndex:(int)index;
+{
+    return [sensorList objectAtIndex: index];
+}
 
 
 - (void) replaceSensorListItemAtIndex:(int)index withSensorTreeItem:(ORSensorItem*)treeSensorItem
@@ -1259,14 +1441,13 @@ NSString* ORIpeSlowControlSetIsRecordingDataChangedNotification   = @"ORIpeSlowC
 
 
 
-#pragma mark ***Archival
+#pragma mark •••Archival
 
 - (id) initWithCoder:(NSCoder*)decoder
 {
 
-NSLog(@"ORIpeSlowControlModel::initWithCoder: self before super init...: %p\n",self);
 	self = [super initWithCoder:decoder];
-NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",self);
+
 	[[self undoManager] disableUndoRegistration];
     
     [self initBasics];//TODO: not everything from init is necessary -tb-
@@ -1384,6 +1565,95 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 }
 
 
+
+
+
+- (NSDictionary*) dataRecordDescription
+{
+
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@.\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    //started from example in ORRunModel.m (this is base class and is not a card but DataChainObject)
+
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORIpeSlowControlDecoderForChannelData",  @"decoder",
+								 [NSNumber numberWithLong:channelDataId],   @"dataId",
+								 [NSNumber numberWithBool:YES],       @"variable",
+								 [NSNumber numberWithLong:-1],        @"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"ChannelData"];
+    return dataDictionary;
+}
+
+
+//TODO: is this ncessary? -tb-
+- (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel
+{
+    //
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+}
+
+
+
+
+/** This will go to the XML header of the data file. 
+  * Caller are ORDocument and ORGroup.
+  * (For IPE SC the loop in ORDocument - (NSMutableDictionary*) fillInHeaderInfo:(NSMutableDictionary*)dictionary is relevant!
+  * That means: it needs to be a subclass of ORDataChainObject, ORExperimentModel and other ...)
+  * <br>
+  * Example: see ORIpeCard.m
+  */ //-tb- 2009-02-6
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    
+    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+    [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
+    //add here all individual data for the header
+    [objDictionary setObject: [self adeiBaseUrl]			 forKey:@"adeiBaseUrl"];
+    [objDictionary setObject:[NSNumber numberWithDouble:1.0]			forKey:@"XMLRequestTimeout"];  //TODO: under construction -tb-
+    [objDictionary setObject:[NSNumber numberWithDouble:0.5]			forKey:@"DataRequestTimeout"]; //TODO: under construction -tb-
+    [objDictionary setObject:[NSNumber numberWithDouble:2.0]			forKey:@"DataRefreshTime"];    //TODO: under construction -tb-
+    [objDictionary setObject:[NSNumber numberWithInt:[self uniqueIdNumber]]			forKey:@"uniqueObjectID"];
+    //TODO: WRITE THE SENSOR LIST!!! -tb-
+    //TODO: WRITE THE SENSOR LIST!!! -tb-
+    //TODO: WRITE THE SENSOR LIST!!! -tb-
+    int i,n=[sensorList count];
+    for(i=0;i<n;i++){
+        if([[self sensorAtIndex:i] isDefinedSensorListItem]){
+            [[self sensorAtIndex:i] addParametersToDictionary: objDictionary];
+        }
+    }
+    
+    [dictionary setObject:objDictionary forKey:[self identifier]];
+    return objDictionary;
+    
+    
+    #if 0
+    //Copy from KatrinFLTModel 
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary]; // no subclass for IpeSlowControl, will return nil -tb-
+    [objDictionary setObject:thresholds			forKey:@"thresholds"];
+    [objDictionary setObject:gains				forKey:@"gains"];
+    [objDictionary setObject:hitRatesEnabled	forKey:@"hitRatesEnabled"];
+    [objDictionary setObject:triggersEnabled	forKey:@"triggersEnabled"];
+    [objDictionary setObject:shapingTimes		forKey:@"shapingTimes"];
+    [objDictionary setObject:[NSNumber numberWithInt:daqRunMode]    		forKey:@"daqRunMode"];
+	//TODO: maybe a string is better?(!) or both? -tb- 2008-02-27
+    [objDictionary setObject:[NSNumber numberWithInt: filterGap]    		forKey:@"filterGapSetting"];
+    
+	return objDictionary;
+    #endif
+    
+}
+
+/*
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP320"];
+}
+*/
+
+
 #pragma mark •••Adc or Bit Processing Protocol
 /** This is called once per "processing" cycle and is called at the begin of the process cycle.
   * The process control calls (also in test mode): processIsStarting, multiple times (startProcessCycle, endProcessCycle) , processIsStopping
@@ -1416,7 +1686,10 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 - (void) startProcessCycle
 {
     DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);    )
-    [self loadAllSensorValuesWithSensorPath];
+    if(!readOnce){
+        [self loadAllSensorValuesWithSensorPath];
+        readOnce = YES;
+    }
 }
 
 /** This is called once per "processing" cycle and is called at the end of the process cycle.
@@ -1427,6 +1700,7 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 - (void) endProcessCycle
 {
     DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
+	readOnce = NO;
 }
 
 //TODO: when this is needed? -tb-
@@ -1451,18 +1725,19 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 - (NSString*) processingTitle
 {
     DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
-    static int ind=0;
+    int ind=[self uniqueIdNumber];
     //ind++;
     //return [NSString stringWithFormat:@"%@",[self identifier]];//copy from ORIP320Model.m -tb-
-    return [NSString stringWithFormat: @"%@%i",@"IPE-ADEI",ind];//TODO: add a number, if there are more than one IpeSlowControl object ? -tb-
+    return [NSString stringWithFormat: @"%@-%i",IPE_SLOW_CONTROL_SHORT_NAME,ind];//see comment above -tb-
+    //return [NSString stringWithFormat: @"%@%i",@"IPESlowControl",ind];//TODO: use a better name (it should be very short, Process objects are small) -tb-
     //return @"IPE-ADEI";//TODO: add a number, if there are more than one IpeSlowControl object ? -tb-
 }
 
 
 - (double) convertedValue:(int)channel
 {
-    DebugMethCallsTB(  NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);  )
-    DebugMethCallsTB(  NSLog(@"    ARG: channel is %i\n",  channel );  )
+    //DebugMethCallsTB(  NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);  )
+    //DebugMethCallsTB(  NSLog(@"    ARG: channel is %i\n",  channel );  )
     
     double retval;
     ORSensorItem *sensor = [sensorList objectAtIndex: channel];
@@ -1488,10 +1763,11 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 - (double) maxValueForChan:(int)channel
 {
-    DebugMethCallsTB(  NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);  )
-    DebugMethCallsTB(  NSLog(@"    ARG: channel is %i\n",  channel );  )
+    //DebugMethCallsTB(  NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);  )
+    //DebugMethCallsTB(  NSLog(@"    ARG: channel is %i\n",  channel );  )
     if(channel>=0 && channel < maxSensorListLength){
-        return [[sensorList objectAtIndex: channel] maxValue];
+        return [(ORSensorItem*)([sensorList objectAtIndex: channel]) maxValue];//avoids compiler warning (maxValue multiple def.)
+        //return [ [sensorList objectAtIndex: channel] maxValue];
     }
     return 100.0;// return something if channel number out of range
 }
@@ -1499,8 +1775,8 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 - (double) minValueForChan:(int)channel
 {
-    DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
-    DebugMethCallsTB(   NSLog(@"    ARG: channel is %i\n",  channel );   )
+    //DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
+    //DebugMethCallsTB(   NSLog(@"    ARG: channel is %i\n",  channel );   )
     if(channel>=0 && channel < maxSensorListLength){
         return [[sensorList objectAtIndex: channel] minValue];
     }
@@ -1511,8 +1787,8 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel
 {
-    DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
-    DebugMethCallsTB(   NSLog(@"    ARG: channel is %i\n",  channel );   )
+    //DebugMethCallsTB(   NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);   )
+    //DebugMethCallsTB(   NSLog(@"    ARG: channel is %i\n",  channel );   )
 	//	*theLowLimit = [[[chanObjs objectAtIndex:channel] objectForKey:k320ChannelLowValue] doubleValue];
     //		*theHighLimit = [[[chanObjs objectAtIndex:channel] objectForKey:k320ChannelHighValue] doubleValue];
     if(channel>=0 && channel < maxSensorListLength){
@@ -1540,6 +1816,164 @@ NSLog(@"ORIpeSlowControlModel::initWithCoder: self AFTER  super init...: %p\n",s
 - (void)processIsStopping //not in Bit Processing Protocol, but seems to be necessary -tb-
 {
     NSLog(@"This is method: %@ ::  %@ (self: %p)\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
+}
+
+
+
+#pragma mark •••  Data Taker Protocol
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+
+    unsigned int chan;
+    //TEST
+    //chan = 17+[self uniqueIdNumber];
+    
+    //TEST+DEBUG: heartbeat output -tb-
+    //now class variable: static int heartbeatSec=0, heartbeatUSec=0; // for testing
+    //now class variable: static int heartbeatLastSec=0, heartbeatLastUSec=0; // for testing
+    double diffSec;
+    diffSec = tbGetDiffToTimeOfDay(heartbeatLastSec,heartbeatLastUSec,&heartbeatSec,&heartbeatUSec);
+    if(diffSec>=1.0){//write out heartbeat message for debugging
+        DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT! Identifier: %@\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]),[self identifier]);  )
+        
+        for(chan=0; chan<maxSensorListLength; chan++){
+            ORSensorItem *sensor=[self sensorAtIndex: chan];
+            if(![sensor isRecordingData]) continue;
+            if(![sensor isDefinedSensorListItem]) continue;
+            
+            //write out a test data record
+            ipeSlowControlChannelDataStruct channelData;
+            double doubleData=[sensor doubleData];
+            double intPlaces;
+            double decimalPlaces;
+            if(doubleData<0.0) intPlaces = ceil(doubleData);
+            else intPlaces = floor(doubleData);
+            decimalPlaces= (doubleData - intPlaces) * 1000000.0; //or use fmod(doubleData,1.0) * 1000000.0;
+            //set the data
+            channelData.dataRound         = (long int)intPlaces;
+            channelData.dataDecimalPlaces = (long int)decimalPlaces;
+            channelData.timestampSec      = [sensor dataTimestampSec];
+            channelData.timestampSubSec   = [sensor dataTimestampSubSec];
+            //TEST: channelData.timestampSec      = heartbeatSec;
+            //TEST: channelData.timestampSubSec   = heartbeatUSec;
+            
+            //prepare for shipping
+            unsigned long totalLength = 2 + (sizeof(ipeSlowControlChannelDataStruct)/sizeof(long));
+            unsigned long	locationWord;
+            locationWord			  = (([self uniqueIdNumber]&0x0f)<<21); //  | ([self stationNumber]& 0x0000001f)<<16;// the object ID; see f.i. in KatrinFLT
+            locationWord |= (chan & 0xff)<<8; //  the channel 
+            
+            
+            NSMutableData* channelDataMData = [NSMutableData dataWithCapacity:totalLength*sizeof(long)];
+            unsigned long header = channelDataId | totalLength;	//total event size + the two ORCA header words (in longs!).
+            
+            [channelDataMData appendBytes:&header length:4];		    //ORCA header word
+            [channelDataMData appendBytes:&locationWord length:4];	//which Adei obj. ID, which channel info
+            [channelDataMData appendBytes:&channelData length:sizeof(ipeSlowControlChannelDataStruct)];
+            
+            [aDataPacket addData:channelDataMData];	//ship the channel data record
+        }//end of chan loop
+        
+        //
+        heartbeatLastSec = heartbeatSec ;
+        heartbeatLastUSec = heartbeatUSec ;
+        DebugTB(   NSLog(@"This is the SlowControl heartbeat: difftime %f sec, current sec %i\n",diffSec,heartbeatSec);  )
+    }
+}
+
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    heartbeatSec=0; heartbeatUSec=0; // for testing
+    heartbeatLastSec=0; heartbeatLastUSec=0; // for testing
+    
+	
+    //----------------------------------------------------------------------------------------
+    // Add our description to the data description
+    //[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey: NSStringFromClass([self class])];    
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey: @"IpeSlowControl"];    
+    //----------------------------------------------------------------------------------------	
+	
+    
+}
+
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+
+	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+	NSLogFont(aFont,@"----------------------------------------\n");
+	NSLogFont(aFont,@"IPE Slow Control - Run Summary: IPE-ADEI %d\n",[self uniqueIdNumber]);
+	NSLogFont(aFont,@"Record time    : %d\n", 0);
+	NSLogFont(aFont,@"Events         : %d\n", 0);
+	NSLogFont(aFont,@"ReadTimeouts   : %d\n", 0);
+	NSLogFont(aFont,@"Under Development.\n");
+}
+
+- (void) reset
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+}
+
+
+
+#pragma mark •••ID Helpers (see OrcaObject)
+//- (NSString*) objectName;  // take from super class
+//- (NSString*) isDataTaker;  // take from super class
+//- (NSString*) supportsHardwareWizard;  //TODO: not yet implemented -tb-
+- (NSString*) identifier
+{
+    int ind=[self uniqueIdNumber];
+    return [NSString stringWithFormat: @"%@-%i",IPE_SLOW_CONTROL_SHORT_NAME,ind];
+}
+
+
+
+#pragma mark •••  Protocol ORHWWizard
+/** Here all attributes are defined which are accessible via the hardware wizard.
+ */ //-tb-
+- (NSArray*) wizardParameters
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    NSMutableArray* a = [NSMutableArray array];
+    ORHWWizParam* p;
+    
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"MinValue"];
+    [p setFormat:@"##0" upperLimit:1200 lowerLimit:0 stepSize:1 units:@"raw"];
+    [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
+    
+    return a;
+}
+
+- (NSArray*) wizardSelections
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    NSMutableArray* a = [NSMutableArray array];
+    //[a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate" className:@"ORKatrinCrateModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"IpeSCStation" className:@"ORIpeSlowControlModel"]];
+    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"IpeSCChannel" className:@"ORIpeSlowControlModel"]];
+    return a;
+}
+
+- (int) numberOfChannels
+{
+    DebugMethCallsTB(   NSLog(@"This is method: %@ of  %@. STILL UNDER DEVELOPMENT!\n",NSStringFromSelector(_cmd),  NSStringFromClass([self class]));  )
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    //TODO: UNDER DEVELOPMENT -tb-
+    return maxSensorListLength; // 
 }
 
 
@@ -1753,6 +2187,9 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
     data = aString;
 }
 
+/**  The value of the sensor.
+  *
+  */
 - (double) doubleData
 {
     return doubleData; 
@@ -1760,6 +2197,51 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
 - (void) setDoubleData: (double) aValue
 {
     doubleData = aValue;
+}
+
+/**  The timestamp in seconds of the data.
+  *
+  */
+- (long)  dataTimestampSec
+{
+    return dataTimestampSec; 
+}
+
+- (void) setDataTimestampSec: (long) aValue
+{
+    dataTimestampSec = aValue;
+}
+
+/**  The timestamp in subseconds of the data.
+  *  It is left open whether this are micro or nano seconds to be more flexible in the future.
+  *  Standard is (probably) micro seconds (like in struct timeval).
+  */
+- (long)  dataTimestampSubSec
+{
+    return dataTimestampSubSec; 
+}
+
+- (void) setDataTimestampSubSec: (long) aValue
+{
+    dataTimestampSubSec = aValue;
+}
+
+- (void) setDataTimestampSec:(long) aSecValue   subSec:(long) aSubSecValue
+{
+    dataTimestampSec = aSecValue;
+    dataTimestampSubSec = aSubSecValue;
+}
+
+/**  Setpoint (SOLLWERT) for a sensor.
+  *
+  */
+- (double) setpoint
+{
+    return setpoint; 
+}
+- (void) setSetpoint: (double) aValue
+{
+    setpoint = aValue;
 }
 
 - (BOOL) isRecordingData
@@ -1851,7 +2333,7 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
             [sensorPath valueForKey: kSensorIDString],
             [sensorPath valueForKey: kSetupOptionString]
         ];
-    // DebugTB( NSLog(@"Request string is %@\n", requestString); )
+     DebugTB( NSLog(@"Request string is %@\n", requestString); )
 
     csvurl = [NSURL URLWithString: requestString ];
 
@@ -1904,6 +2386,9 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
         [self setData: [listItems objectAtIndex:1]];
         [self setDoubleData: [[self data] doubleValue] ];
         retVal = [self doubleData];
+        struct timeval t =  tbConvertADEIDateString2time([listItems objectAtIndex:0]);
+        NSLog(@"struct timeval: >%@< is %ld sec ,%ld usec since 1970 01-01 00:00\n",[listItems objectAtIndex:0],t.tv_sec,t.tv_usec);
+        [self setDataTimestampSec:t.tv_sec  subSec:t.tv_usec];
     }
     
     
@@ -2098,9 +2583,9 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
         [pstr appendString: [sensorPath valueForKey: kGroupIDString] ];
         [pstr appendString: @"." ];
         [pstr appendString: [sensorPath valueForKey: kSensorIDString] ];
-        [pstr appendString: @" - " ];
+        [pstr appendString: @" , URL: " ];
         [pstr appendString: [sensorPath valueForKey: kServiceString] ];
-        [pstr appendString: @" - " ];
+        [pstr appendString: @" , Option: " ];
         [pstr appendString: [sensorPath valueForKey: kSetupOptionString] ];
         return pstr;
     }else{
@@ -2271,6 +2756,38 @@ NSString * kIsRecordingDataString = @"kIsRecordingDataString";
     )
     return count;
 }
+
+
+
+#pragma mark •••Archival
+
+
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* sensorDictionary = [NSMutableDictionary dictionary];
+    //subclasses need to call:     NSMutableDictionary* sensorDictionary = [super addParametersToDictionary:dictionary];
+
+    //write out all info: adei path, channel name, channel index is in the key
+    [sensorDictionary setObject:[NSNumber numberWithDouble:1.0]			forKey:@"XMLRequestTimeout"];  //TODO: under construction -tb-
+    [sensorDictionary setObject: name forKey: @"Name"];
+    [sensorDictionary setObject: [self adeiPath] forKey: @"AdeiPath"];
+    //TODO: WRITE SENSOR PROPERTIES!!! -tb-
+    //TODO: WRITE SENSOR PROPERTIES!!! -tb-
+    //TODO: WRITE SENSOR PROPERTIES!!! -tb-
+    //TODO: WRITE SENSOR PROPERTIES!!! -tb-
+    //TODO: WRITE SENSOR PROPERTIES!!! -tb-
+            
+    //
+    [dictionary setObject:sensorDictionary forKey: [NSString stringWithFormat: @"Channel %i",channelMapNum]];
+    
+    
+    return sensorDictionary;
+}
+
+
+
+
 
 @end
 
