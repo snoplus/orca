@@ -47,6 +47,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {		
     self = [super init];
 	[self setCAMACMode:YES];
+	[self setCheckLAM:YES];
     return self;
 }
 
@@ -236,6 +237,11 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD413AControlReg1ChangedNotification object:self];
 }
 
+- (void) setCheckLAM:(BOOL)aState
+{
+    checkLAM = aState;
+}
+
 
 #pragma mark ¥¥¥Hardware functions
 
@@ -409,7 +415,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 {
     @try {
 		BOOL lamIsSet = NO;
-		if(CAMACMode) lamIsSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8]); //test the lam
+		if(checkLAM) lamIsSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8]); //test the lam
 		else lamIsSet = YES;
 		if((lamEnable && lamIsSet) || !lamEnable){
 			if(randomAccessMode)		[self readChannels:aDataPacket];
@@ -417,7 +423,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 				if(zeroSuppressionMode)	[self readZeroSuppressedChannels:aDataPacket];
 				else					[self readChannels:aDataPacket];
 			}
-			if(CAMACMode && lamIsSet && lamEnable)[controller camacShortNAF:cachedStation a:0 f:10]; //clear lam
+			if(checkLAM && lamIsSet && lamEnable)[controller camacShortNAF:cachedStation a:0 f:10]; //clear lam
 			[controller camacShortNAF:cachedStation a:0 f:9]; //clear module
 		}
 	}
@@ -429,6 +435,8 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	[self setCheckLAM:YES];
+	[self setFeraEnable:NO];
 }
 
 
@@ -483,7 +491,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 		[self setGateEnable:bit withValue: [decoder decodeBoolForKey:[NSString stringWithFormat:@"enableGate%d",bit]]];
 	}
 	[self setCAMACMode:YES];
-    
+	[self setCheckLAM:YES];
     [[self undoManager] enableUndoRegistration];
 	
     return self;

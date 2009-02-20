@@ -60,6 +60,7 @@ enum {
         short onlineChannelCount;
         short onlineList[4];
 	
+		BOOL  checkLAM;;
 		//place to cache some stuff for alittle more speed.
 		unsigned long 	unChangingDataPart;
 		unsigned short cachedStation;
@@ -100,6 +101,7 @@ enum {
 - (BOOL) gateEnable:(int)index;
 - (void) setGateEnable:(int)index withValue:(BOOL) aState;
 - (int) vsn;
+- (void) setCheckLAM:(BOOL)aState;
 
 #pragma mark ¥¥¥Hardware functions
 - (void) readControlReg1;
