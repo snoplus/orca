@@ -422,10 +422,7 @@ readon:
 	[usbLock lock];
 	UInt8 pipe = outPipe;
 	if(transferType == kUSBBulk)		 pipe = outPipe;
-	else if(transferType == kUSBInterrupt) {
-		if(interruptOutPipe)pipe = interruptOutPipe;
-		else pipe = interruptInPipe;
-	}
+	else if(transferType == kUSBInterrupt) pipe = interruptOutPipe;	
 	IOReturn kr = (*interface)->WritePipe(interface, pipe, bytes, length);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
