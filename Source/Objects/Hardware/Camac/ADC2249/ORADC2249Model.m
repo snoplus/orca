@@ -32,7 +32,6 @@ NSString* ORADC2249ModelIncludeTimingChanged		= @"ORADC2249ModelIncludeTimingCha
 NSString* ORADC2249OnlineMaskChangedNotification	= @"ORADC2249OnlineMaskChangedNotification";
 NSString* ORADC2249SettingsLock						= @"ORADC2249SettingsLock";
 NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosChangedNotification";
-NSString* ORADC2249CAMACModeChangedNotification		= @"ORADC2249CAMACModeChangedNotification";
 
 
 @implementation ORADC2249Model
@@ -41,7 +40,7 @@ NSString* ORADC2249CAMACModeChangedNotification		= @"ORADC2249CAMACModeChangedNo
 - (id) init
 {		
     self = [super init];
-	[self setCAMACMode:YES];
+	[self setCheckLAM:YES];
     return self;
 }
 
@@ -131,16 +130,9 @@ NSString* ORADC2249CAMACModeChangedNotification		= @"ORADC2249CAMACModeChangedNo
     
 }
 
-- (BOOL) CAMACMode
+- (void) setCheckLAM: (BOOL) aState
 {
-    return CAMACMode;
-}
-
-- (void) setCAMACMode: (BOOL) aState
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setCAMACMode:CAMACMode];
-    CAMACMode = aState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORADC2249CAMACModeChangedNotification object:self];
+    checkLAM = aState;
 }
 
 #pragma mark ¥¥¥DataTaker
@@ -234,7 +226,7 @@ NSString* ORADC2249CAMACModeChangedNotification		= @"ORADC2249CAMACModeChangedNo
         //check the LAM
         unsigned short dummy;
 		BOOL isLamSet = NO;
-		if(CAMACMode)isLamSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8 data:&dummy]); //LAM status comes back in the Q bit
+		if(checkLAM)isLamSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8 data:&dummy]); //LAM status comes back in the Q bit
 		else isLamSet =YES;
         if(isLamSet) { 
             if(onlineChannelCount){
@@ -410,7 +402,7 @@ NSString* ORADC2249CAMACModeChangedNotification		= @"ORADC2249CAMACModeChangedNo
     [self setSuppressZeros:[decoder decodeIntForKey:@"ORADC2249SuppressZeros"]];
     [[self undoManager] enableUndoRegistration];
 	
-	[self setCAMACMode:YES];
+	[self setCheckLAM:YES];
 	
     return self;
 }

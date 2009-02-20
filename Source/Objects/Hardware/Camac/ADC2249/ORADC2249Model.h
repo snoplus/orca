@@ -32,7 +32,7 @@ enum EADC2249ModelConsts { kRegisterNumberADC2249 = 12 };
 
 @interface ORADC2249Model : ORCamacIOCard <ORDataTaker, ORCamacListProtocol> {	
 	@private
-		BOOL  CAMACMode;
+		BOOL  checkLAM;
 		BOOL includeTiming;
         unsigned long dataId;
         unsigned short onlineMask;
@@ -60,8 +60,7 @@ enum EADC2249ModelConsts { kRegisterNumberADC2249 = 12 };
 - (void)	    setOnlineMaskBit:(int)bit withValue:(BOOL)aValue;
 - (void)		setSuppressZeros:(BOOL)aFlag;
 - (BOOL)		suppressZeros;
-- (BOOL)		CAMACMode;
-- (void)		setCAMACMode:(BOOL)aState;
+- (void)		setCheckLAM:(BOOL)aState;
 
 #pragma mark ¥¥¥Hardware Test functions
 - (void) readNoReset;
@@ -94,7 +93,6 @@ enum EADC2249ModelConsts { kRegisterNumberADC2249 = 12 };
 
 @end
 
-extern NSString* ORADC2249CAMACModeChangedNotification;
 extern NSString* ORADC2249ModelIncludeTimingChanged;
 extern NSString* ORADC2249OnlineMaskChangedNotification;
 extern NSString* ORADC2249SettingsLock;
