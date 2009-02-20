@@ -418,10 +418,10 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		NSEnumerator* e = [dataTakers[i] objectEnumerator];
 		id obj;
 		while(obj = [e nextObject]){
-			[obj runTaskStarted:aDataPacket userInfo:userInfo];
 			if([obj respondsToSelector:@selector(setCAMACMode:)]){
 				[obj setCAMACMode:NO];
 			}
+			[obj runTaskStarted:aDataPacket userInfo:userInfo];
 		}
 	}
 	[self readInputPatternClearMemoryAndLAM];
@@ -498,6 +498,9 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		NSEnumerator* e = [dataTakers[i] objectEnumerator];
 		id obj;
 		while(obj = [e nextObject]){
+			if([obj respondsToSelector:@selector(setCAMACMode:)]){
+				[obj setCAMACMode:YES];
+			}
 			[obj runTaskStopped:aDataPacket userInfo:userInfo];
 		}
 		[dataTakers[i] release];
