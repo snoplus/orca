@@ -26,7 +26,7 @@
 
 #define k419DefaultBaseAddress 		0xFFE000
 #define k419DefaultAuxAddress 		0xFFC000
-#define k419DefaultAddressModifier	0x29
+#define k419DefaultAddressModifier	0x39
 
 NSString* ORCaen419ModelEnabledMaskChanged		= @"ORCaen419ModelEnabledMaskChanged";
 NSString* ORCaen419ModelResetMaskChanged		= @"ORCaen419ModelResetMaskChanged";
