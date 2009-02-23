@@ -53,7 +53,8 @@ typedef struct Caen419Registers {
 // Class definition
 @interface ORCaen419Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping>
 {
-    unsigned short  thresholds[kCV419NumberChannels];
+    unsigned short  lowThresholds[kCV419NumberChannels];
+    unsigned short  highThresholds[kCV419NumberChannels];
     unsigned short linearGateMode[kCV419NumberChannels];
     short riseTimeProtection[kCV419NumberChannels];
     unsigned long dataId;
@@ -84,16 +85,20 @@ typedef struct Caen419Registers {
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObj;
 
-- (unsigned long)	threshold: (unsigned short) anIndex;
-- (void) setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
+- (unsigned long)	lowThreshold: (unsigned short) anIndex;
+- (void) setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
+- (unsigned long)	highThreshold: (unsigned short) anIndex;
+- (void) setHighThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
 - (NSString*) 		getRegisterName: (short) anIndex;
 - (unsigned long) 	getAddressOffset: (short) anIndex;
 
 #pragma mark ***Support Hardware Functions
 - (int) lowThresholdOffset:(unsigned short)aChan;
 - (int) highThresholdOffset:(unsigned short)aChan;
-- (unsigned short)		  readThreshold: (unsigned short) pChan; 
-- (void) writeThreshold: (unsigned short) pChan;
+- (unsigned short) readLowThreshold: (unsigned short) pChan; 
+- (unsigned short) readHighThreshold: (unsigned short) pChan; 
+- (void) writeLowThreshold: (unsigned short) pChan;
+- (void) writeHighThreshold: (unsigned short) pChan;
 - (void) writeThresholds;
 - (void) readThresholds;
 - (void) logThresholds;
@@ -113,6 +118,7 @@ extern NSString* ORCaen419ModelResetMaskChanged;
 extern NSString* ORCaen419ModelRiseTimeProtectionChanged;
 extern NSString* ORCaen419ModelLinearGateModeChanged;
 extern NSString* ORCaen419ModelAuxAddressChanged;
-extern NSString* ORCaren419ThresholdChanged;
+extern NSString* ORCaren419LowThresholdChanged;
+extern NSString* ORCaren419HighThresholdChanged;
 extern NSString* ORCaen419BasicLock;
 

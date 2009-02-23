@@ -32,7 +32,8 @@
 	IBOutlet NSPopUpButton* linearGateMode1PU;
 	IBOutlet NSPopUpButton* linearGateMode2PU;
 	IBOutlet NSPopUpButton* linearGateMode3PU;
-    IBOutlet NSMatrix*	  thresholdMatrix;
+    IBOutlet NSMatrix*	  lowThresholdMatrix;
+    IBOutlet NSMatrix*	  highThresholdMatrix;
     IBOutlet NSButton*	  basicLockButton;
     IBOutlet NSButton*	  readThresholdsButton;
     IBOutlet NSButton*	  writeThresholdsButton;
@@ -66,7 +67,8 @@
 - (IBAction) linearGateModeAction:(id)sender;
 - (IBAction) auxAddressAction:(id)sender;
 - (IBAction) baseAddressAction:(id) sender;
-- (IBAction) thresholdAction:(id) sender;
+- (IBAction) lowThresholdAction:(id) sender;
+- (IBAction) highThresholdAction:(id) sender;
 - (IBAction) readThresholds:(id) sender;
 - (IBAction) writeThresholds:(id) sender;
 - (IBAction) basicLockAction:(id)sender;

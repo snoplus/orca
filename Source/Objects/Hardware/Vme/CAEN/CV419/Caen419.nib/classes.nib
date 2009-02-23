@@ -49,17 +49,19 @@
 				<string>id</string>
 				<key>fire</key>
 				<string>id</string>
+				<key>highThresholdAction</key>
+				<string>id</string>
 				<key>initBoard</key>
 				<string>id</string>
 				<key>linearGateModeAction</key>
+				<string>id</string>
+				<key>lowThresholdAction</key>
 				<string>id</string>
 				<key>readThresholds</key>
 				<string>id</string>
 				<key>resetMaskAction</key>
 				<string>id</string>
 				<key>riseTimeProtectionAction</key>
-				<string>id</string>
-				<key>thresholdAction</key>
 				<string>id</string>
 				<key>writeThresholds</key>
 				<string>id</string>
@@ -82,6 +84,8 @@
 				<string>NSMatrix</string>
 				<key>fireButton</key>
 				<string>NSButton</string>
+				<key>highThresholdMatrix</key>
+				<string>NSMatrix</string>
 				<key>initButton</key>
 				<string>NSButton</string>
 				<key>linearGateMode0PU</key>
@@ -92,6 +96,8 @@
 				<string>NSPopUpButton</string>
 				<key>linearGateMode3PU</key>
 				<string>NSPopUpButton</string>
+				<key>lowThresholdMatrix</key>
+				<string>NSMatrix</string>
 				<key>readThresholdsButton</key>
 				<string>NSButton</string>
 				<key>resetMaskMatrix</key>
@@ -100,8 +106,6 @@
 				<string>NSMatrix</string>
 				<key>slotField</key>
 				<string>NSTextField</string>
-				<key>thresholdMatrix</key>
-				<string>NSMatrix</string>
 				<key>writeThresholdsButton</key>
 				<string>NSButton</string>
 			</dict>

@@ -32,9 +32,10 @@ NSString* ORCaen419ModelEnabledMaskChanged		= @"ORCaen419ModelEnabledMaskChanged
 NSString* ORCaen419ModelResetMaskChanged		= @"ORCaen419ModelResetMaskChanged";
 NSString* ORCaen419ModelRiseTimeProtectionChanged = @"ORCaen419ModelRiseTimeProtectionChanged";
 NSString* ORCaen419ModelLinearGateModeChanged	  = @"ORCaen419ModelLinearGateModeChanged";
-NSString* ORCaen419ModelAuxAddressChanged	= @"ORCaen419ModelAuxAddressChanged";
-NSString* ORCaren419ThresholdChanged		= @"ORCaren419ThresholdChanged";
-NSString* ORCaen419BasicLock				= @"ORCaen419BasicLock";
+NSString* ORCaen419ModelAuxAddressChanged		= @"ORCaen419ModelAuxAddressChanged";
+NSString* ORCaren419LowThresholdChanged			= @"ORCaren419LowThresholdChanged";
+NSString* ORCaren419HighThresholdChanged		= @"ORCaren419HighThresholdChanged";
+NSString* ORCaen419BasicLock					= @"ORCaen419BasicLock";
 
 static Caen419Registers reg[kNumRegisters] = {
 	{@"Channel 0 Data",		0x00},
@@ -185,18 +186,32 @@ static Caen419Registers reg[kNumRegisters] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen419ModelRiseTimeProtectionChanged object:self  userInfo:userInfo];
 }
 
-- (unsigned long) threshold:(unsigned short) aChnl
+- (unsigned long) lowThreshold:(unsigned short) aChnl
 {
-    return(thresholds[aChnl]);
+    return lowThresholds[aChnl];
 }
 
-- (void) setThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
+- (void) setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChnl withValue:[self threshold:aChnl]];
-    thresholds[aChnl] = aValue;
+    [[[self undoManager] prepareWithInvocationTarget:self] setLowThreshold:aChnl withValue:[self lowThreshold:aChnl]];
+    lowThresholds[aChnl] = aValue;
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 	[userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:@"channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419ThresholdChanged object:self userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419LowThresholdChanged object:self userInfo:userInfo];
+}
+
+- (unsigned long) highThreshold:(unsigned short) aChnl
+{
+    return highThresholds[aChnl];
+}
+
+- (void) setHighThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHighThreshold:aChnl withValue:[self highThreshold:aChnl]];
+    highThresholds[aChnl] = aValue;
+    NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
+	[userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:@"channel"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419HighThresholdChanged object:self userInfo:userInfo];
 }
 
 
@@ -228,7 +243,8 @@ static Caen419Registers reg[kNumRegisters] = {
 {
     short i;
     for (i = 0; i < kCV419NumberChannels; i++){
-        [self writeThreshold:i];
+        [self writeLowThreshold:i];
+        [self writeHighThreshold:i];
     }
 }
 
@@ -236,30 +252,34 @@ static Caen419Registers reg[kNumRegisters] = {
 {
     short i;
     for (i = 0; i < kCV419NumberChannels; i++){
-        [self readThreshold:i];
+        [self readLowThreshold:i];
+        [self readHighThreshold:i];
     }
 }
 
-- (void) writeThreshold:(unsigned short) pChan
+- (void) writeLowThreshold:(unsigned short) pChan
 {    
-	int lowOffset = [self lowThresholdOffset:pChan];
-	unsigned short lowThreshold = thresholds[pChan]&0x00ff;
+	unsigned short lowThreshold = lowThresholds[pChan];
     [[self adapter] writeWordBlock:&lowThreshold
-                         atAddress:[self baseAddress] + lowOffset
+                         atAddress:[self baseAddress] + [self lowThresholdOffset:pChan]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	
-	int highOffset = [self highThresholdOffset:pChan];
-	unsigned short highThreshold = (thresholds[pChan]>>8)&0x00ff;
+}
+
+- (void) writeHighThreshold:(unsigned short) pChan
+{    
+	unsigned short highThreshold = highThresholds[pChan];
     [[self adapter] writeWordBlock:&highThreshold
-                         atAddress:[self baseAddress] + highOffset
+                         atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 }
 
-- (unsigned short) readThreshold:(unsigned short) pChan
+
+- (unsigned short) readLowThreshold:(unsigned short) pChan
 {    
 	int lowOffset = [self lowThresholdOffset:pChan];
 	unsigned short lowThreshold;
@@ -269,15 +289,21 @@ static Caen419Registers reg[kNumRegisters] = {
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
 	
-	int highOffset = [self highThresholdOffset:pChan];
+	return lowThreshold;
+}
+
+- (unsigned short) readHighThreshold:(unsigned short) pChan
+{    
+
 	unsigned short highThreshold;
     [[self adapter] readWordBlock:&highThreshold
-                         atAddress:[self baseAddress] + highOffset
+						atAddress:[self baseAddress] + [self highThresholdOffset:pChan]
                         numToRead:1
-                        withAddMod:[self addressModifier]
-                     usingAddSpace:0x01];
-	return (highThreshold<<8) | lowThreshold;
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+	return highThreshold;
 }
+
 
 
 - (int) lowThresholdOffset:(unsigned short)aChan
@@ -465,12 +491,21 @@ static Caen419Registers reg[kNumRegisters] = {
     ORHWWizParam* p;
     
     p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Threshold"];
+    [p setName:@"Low Threshold"];
     [p setFormat:@"##0.00" upperLimit:0xffffff lowerLimit:0 stepSize:1 units:@""];
-    [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
+    [p setSetMethod:@selector(setLowThreshold:withValue:) getMethod:@selector(lowThreshold:)];
 	[p setCanBeRamped:YES];
-	[p setInitMethodSelector:@selector(writeThresholds)];
+	[p setInitMethodSelector:@selector(writeLowThresholds)];
     [a addObject:p];
+
+	p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"High Threshold"];
+    [p setFormat:@"##0.00" upperLimit:0xffffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setHighThreshold:withValue:) getMethod:@selector(highThreshold:)];
+	[p setCanBeRamped:YES];
+	[p setInitMethodSelector:@selector(writeLHighThresholds)];
+    [a addObject:p];
+	
 	
 	p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Rise Time Protection"];
@@ -518,7 +553,8 @@ static Caen419Registers reg[kNumRegisters] = {
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel
 {
 	NSDictionary* cardDictionary = [self findCardDictionaryInHeader:fileHeader];
-    if([param isEqualToString:@"Threshold"])return [[cardDictionary objectForKey:@"thresholds"] objectAtIndex:aChannel];
+    if([param isEqualToString:@"Low Threshold"])return [[cardDictionary objectForKey:@"lowThresholds"] objectAtIndex:aChannel];
+    if([param isEqualToString:@"High Threshold"])return [[cardDictionary objectForKey:@"highThresholds"] objectAtIndex:aChannel];
     if([param isEqualToString:@"Rise Time Protection"])return [[cardDictionary objectForKey:@"riseTimeProtection"] objectAtIndex:aChannel];
     if([param isEqualToString:@"Gate Mode"])return [[cardDictionary objectForKey:@"linearGateMode"] objectAtIndex:aChannel];
     if([param isEqualToString:@"Reset"])return [[cardDictionary objectForKey:@"reset"] objectAtIndex:aChannel];
@@ -530,7 +566,7 @@ static Caen419Registers reg[kNumRegisters] = {
     short	i;
     NSLog(@"%@ Thresholds\n",[self identifier]);
     for (i = 0; i < kCV419NumberChannels; i++){
-        NSLog(@"chan:%d value:0x%04x\n",i,[self threshold:i]);
+        NSLog(@"chan:%d low:0x%04x high:0x%04x\n",i,[self lowThreshold:i],[self highThreshold:i]);
     }
     
 }
@@ -540,8 +576,12 @@ static Caen419Registers reg[kNumRegisters] = {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     int i;
     NSMutableArray* array = [NSMutableArray arrayWithCapacity:kCV419NumberChannels];
-    for(i=0;i<kCV419NumberChannels;i++)[array addObject:[NSNumber numberWithShort:thresholds[i]]];
-    [objDictionary setObject:array forKey:@"thresholds"];
+    for(i=0;i<kCV419NumberChannels;i++)[array addObject:[NSNumber numberWithShort:lowThresholds[i]]];
+    [objDictionary setObject:array forKey:@"lowThresholds"];
+	
+	array = [NSMutableArray arrayWithCapacity:kCV419NumberChannels];
+    for(i=0;i<kCV419NumberChannels;i++)[array addObject:[NSNumber numberWithShort:highThresholds[i]]];
+    [objDictionary setObject:array forKey:@"highThresholds"];
 	
 	array = [NSMutableArray arrayWithCapacity:kCV419NumberChannels];
     for(i=0;i<kCV419NumberChannels;i++)[array addObject:[NSNumber numberWithShort:riseTimeProtection[i]]];
@@ -575,7 +615,8 @@ static Caen419Registers reg[kNumRegisters] = {
     [self setAuxAddress:[aDecoder decodeInt32ForKey:@"auxAddress"]];
 	int i;
     for (i = 0; i < [self numberOfChannels]; i++){
-        [self setThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENThresholdChnl%d", i]]];
+        [self setLowThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]]];
+        [self setHighThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]]];
 		[self setLinearGateMode:i withValue:[aDecoder decodeIntForKey:[NSString stringWithFormat:@"CAENLinearGateModeChnl%d", i]]];
 		[self setRiseTimeProtection:i withValue:[aDecoder decodeIntForKey:[NSString stringWithFormat:@"CAENRiseTimeProtectionChnl%d", i]]];
     }    
@@ -593,7 +634,8 @@ static Caen419Registers reg[kNumRegisters] = {
 	[anEncoder encodeInt32:auxAddress forKey:@"auxAddress"];
 	int i;
     for (i = 0; i < [self numberOfChannels]; i++){
-        [anEncoder encodeInt:thresholds[i] forKey:[NSString stringWithFormat:@"CAENThresholdChnl%d", i]];
+        [anEncoder encodeInt:lowThresholds[i] forKey:[NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]];
+        [anEncoder encodeInt:highThresholds[i] forKey:[NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]];
 		[anEncoder encodeInt:linearGateMode[i] forKey:[NSString stringWithFormat:@"CAENLinearGateModeChnl%d", i]];
 		[anEncoder encodeInt:riseTimeProtection[i] forKey:[NSString stringWithFormat:@"CAENRiseTimeProtectionChnl%d", i]];
     }

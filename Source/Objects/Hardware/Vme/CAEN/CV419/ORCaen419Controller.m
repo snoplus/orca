@@ -42,10 +42,16 @@
 					   object:model];
 		
     [notifyCenter addObserver:self
-					 selector:@selector(thresholdChanged:)
-						 name:ORCaren419ThresholdChanged
+					 selector:@selector(lowThresholdChanged:)
+						 name:ORCaren419LowThresholdChanged
 					   object:model];
-		
+
+	[notifyCenter addObserver:self
+					 selector:@selector(highThresholdChanged:)
+						 name:ORCaren419HighThresholdChanged
+					   object:model];
+	
+	
     [notifyCenter addObserver : self
                      selector : @selector(basicLockChanged:)
                          name : ORCaen419BasicLock
@@ -101,7 +107,8 @@
     for (i = 0; i < [model numberOfChannels]; i++){
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:@"channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419ThresholdChanged object:model userInfo:userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419LowThresholdChanged object:model userInfo:userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419HighThresholdChanged object:model userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen419ModelRiseTimeProtectionChanged object:model userInfo:userInfo];
 	}
 	
@@ -134,10 +141,16 @@
 	[[riseTimeProtectionMatrix cellWithTag:chnl] setIntValue: microSec];
 }
 
-- (void) thresholdChanged:(NSNotification*) aNote
+- (void) lowThresholdChanged:(NSNotification*) aNote
 {
 	int chnl = [[[aNote userInfo] objectForKey:@"channel"] intValue];
-	[[thresholdMatrix cellWithTag:chnl] setIntValue:[model threshold:chnl]];
+	[[lowThresholdMatrix cellWithTag:chnl] setIntValue:[model lowThreshold:chnl]];
+}
+
+- (void) highThresholdChanged:(NSNotification*) aNote
+{
+	int chnl = [[[aNote userInfo] objectForKey:@"channel"] intValue];
+	[[highThresholdMatrix cellWithTag:chnl] setIntValue:[model highThreshold:chnl]];
 }
 
 - (void) linearGateModeChanged:(NSNotification*)aNote
@@ -194,7 +207,8 @@
     [linearGateMode1PU setEnabled:!lockedOrRunningMaintenance];
     [linearGateMode2PU setEnabled:!lockedOrRunningMaintenance];
     [linearGateMode3PU setEnabled:!lockedOrRunningMaintenance];
-    [thresholdMatrix setEnabled:!lockedOrRunningMaintenance];
+    [lowThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
+    [highThresholdMatrix setEnabled:!lockedOrRunningMaintenance];
     [readThresholdsButton setEnabled:!lockedOrRunningMaintenance];
     [writeThresholdsButton setEnabled:!lockedOrRunningMaintenance];
     [initButton setEnabled:!lockedOrRunningMaintenance];
@@ -257,10 +271,17 @@
     }
 } 
 
-- (IBAction) thresholdAction:(id) sender
+- (IBAction) lowThresholdAction:(id) sender
 {
-    if ([sender intValue] != [model threshold:[[sender selectedCell] tag]]){
-        [model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; 
+    if ([sender intValue] != [model lowThreshold:[[sender selectedCell] tag]]){
+        [model setLowThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; 
+    }
+}
+
+- (IBAction) highThresholdAction:(id) sender
+{
+    if ([sender intValue] != [model highThreshold:[[sender selectedCell] tag]]){
+        [model setHighThreshold:[[sender selectedCell] tag] withValue:[sender intValue]]; 
     }
 }
 
