@@ -394,6 +394,7 @@ int32_t readHW(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
             case kMtc:			index = Readout_MTC(config,index,lamData);			break;
             case kFec:			index = Readout_Fec(config,index,lamData);			break;
             case kSIS3300:		index = Readout_SIS3300(config,index,lamData);		break;
+            case kCaen419:      index = Readout_CAEN419(config,index,lamData);       break;
             default:            index = -1;                                         break;
         }
         return index;
@@ -1109,6 +1110,47 @@ void flush_CAEN_Fifo(SBC_crate_config* config,int32_t index)
             break;
         }
     }
+}
+/*************************************************************/
+/*             Reads out Caen419 cards.                       */
+/*************************************************************/
+int32_t Readout_CAEN419(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData)
+{
+    uint32_t baseAddress        = config->card_info[index].base_add;
+	uint32_t dataId             = config->card_info[index].hw_mask[0];
+	uint32_t slot               = config->card_info[index].slot;
+	uint32_t crate              = config->card_info[index].crate;
+	uint32_t locationMask       = ((crate & 0x01e)<<21) | ((slot & 0x0000001f)<<16);
+    uint32_t enabledMask		= config->card_info[index].deviceSpecificData[0];
+	uint32_t firstStatusRegOffset = config->card_info[index].deviceSpecificData[1];
+ 	uint32_t firstAdcRegOffset  = config->card_info[index].deviceSpecificData[2];
+   
+    lock_device(vmeAM29Handle);
+	int chan;
+	for(chan=0;chan<4;chan++){
+		if(enabledMask & (1<<chan)){
+			char theStatuReg;
+			int32_t result = read_device(vmeAM29Handle,&theStatuReg,1,baseAddress+firstStatusRegOffset+(chan*4));
+			if(result == 1 && (theStatuReg&0x8000)){
+				uint32_t aValue;
+				result  = read_device(vmeAM29Handle,(char*)&aValue,1,baseAddress+firstAdcRegOffset+(chan*4));
+				if(result == 1){
+					if(((dataId) & 0x80000000)){ //short form
+						data[dataIndex++] = dataId | locationMask | ((chan & 0x0000000f) << 12) | (aValue & 0x0fff);
+					} 
+					else { //long form
+						data[dataIndex++] = dataId | 2;
+						data[dataIndex++] = locationMask | ((chan & 0x0000000f) << 12) | (aValue & 0x0fff);
+					}
+				} 
+				else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));                
+			} 
+			else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));   
+		}
+	}
+    unlock_device(vmeAM29Handle);
+	
+    return config->card_info[index].next_Card_Index;
 }
 
 /*************************************************************/

@@ -1742,6 +1742,14 @@
 		84EA6CA70C73D11200083319 /* nTPCView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6C9D0C73D11200083319 /* nTPCView.m */; };
 		84EA6CAC0C73D15B00083319 /* ORAcqirisDC440Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */; };
 		84EA6CAD0C73D15B00083319 /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */; };
+		84EBBEE50F52D9A700F57BDD /* Caen419.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EBBEDF0F52D9A700F57BDD /* Caen419.nib */; };
+		84EBBEE60F52D9A700F57BDD /* Caen419.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84EBBEE00F52D9A700F57BDD /* Caen419.tif */; };
+		84EBBEE70F52D9A700F57BDD /* ORCaen419Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EBBEE10F52D9A700F57BDD /* ORCaen419Controller.h */; };
+		84EBBEE80F52D9A700F57BDD /* ORCaen419Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EBBEE20F52D9A700F57BDD /* ORCaen419Controller.m */; };
+		84EBBEE90F52D9A700F57BDD /* ORCaen419Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EBBEE30F52D9A700F57BDD /* ORCaen419Model.h */; };
+		84EBBEEA0F52D9A700F57BDD /* ORCaen419Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EBBEE40F52D9A700F57BDD /* ORCaen419Model.m */; };
+		84EBC2130F530E4A00F57BDD /* ORCaen419Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EBC2110F530E4A00F57BDD /* ORCaen419Decoders.m */; };
+		84EBC2140F530E4A00F57BDD /* ORCaen419Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EBC2120F530E4A00F57BDD /* ORCaen419Decoders.h */; };
 		84EC2C38079D95D800188ED3 /* No620DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC2C37079D95D800188ED3 /* No620DriverHelp.plist */; };
 		84EC3461079D973300188ED3 /* No617DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3460079D973300188ED3 /* No617DriverHelp.plist */; };
 		84EC3475079D991000188ED3 /* NoBit3DriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */; };
@@ -3691,6 +3699,14 @@
 		84EA6C9D0C73D11200083319 /* nTPCView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = nTPCView.m; path = Source/Experiments/nTPC/nTPCView.m; sourceTree = SOURCE_ROOT; };
 		84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAcqirisDC440Decoders.h; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.h; sourceTree = SOURCE_ROOT; };
 		84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAcqirisDC440Decoders.m; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.m; sourceTree = SOURCE_ROOT; };
+		84EBBEDF0F52D9A700F57BDD /* Caen419.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Caen419.nib; path = Source/Objects/Hardware/Vme/CAEN/CV419/Caen419.nib; sourceTree = SOURCE_ROOT; };
+		84EBBEE00F52D9A700F57BDD /* Caen419.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Caen419.tif; path = Source/Objects/Hardware/Vme/CAEN/CV419/Caen419.tif; sourceTree = SOURCE_ROOT; };
+		84EBBEE10F52D9A700F57BDD /* ORCaen419Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen419Controller.h; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Controller.h; sourceTree = SOURCE_ROOT; };
+		84EBBEE20F52D9A700F57BDD /* ORCaen419Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen419Controller.m; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Controller.m; sourceTree = SOURCE_ROOT; };
+		84EBBEE30F52D9A700F57BDD /* ORCaen419Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen419Model.h; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Model.h; sourceTree = SOURCE_ROOT; };
+		84EBBEE40F52D9A700F57BDD /* ORCaen419Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen419Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Model.m; sourceTree = SOURCE_ROOT; };
+		84EBC2110F530E4A00F57BDD /* ORCaen419Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen419Decoders.m; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Decoders.m; sourceTree = SOURCE_ROOT; };
+		84EBC2120F530E4A00F57BDD /* ORCaen419Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCaen419Decoders.h; path = Source/Objects/Hardware/Vme/CAEN/CV419/ORCaen419Decoders.h; sourceTree = SOURCE_ROOT; };
 		84EC2C37079D95D800188ED3 /* No620DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = No620DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/No620DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC3460079D973300188ED3 /* No617DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = No617DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/No617DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84EC3474079D991000188ED3 /* NoBit3DriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoBit3DriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoBit3DriverHelp.plist"; sourceTree = SOURCE_ROOT; };
@@ -7979,6 +7995,22 @@
 			path = Source/Experiments/nTPC;
 			sourceTree = SOURCE_ROOT;
 		};
+		84EBBEDE0F52D9A700F57BDD /* CV419 */ = {
+			isa = PBXGroup;
+			children = (
+				84EBBEDF0F52D9A700F57BDD /* Caen419.nib */,
+				84EBBEE00F52D9A700F57BDD /* Caen419.tif */,
+				84EBBEE10F52D9A700F57BDD /* ORCaen419Controller.h */,
+				84EBBEE20F52D9A700F57BDD /* ORCaen419Controller.m */,
+				84EBBEE30F52D9A700F57BDD /* ORCaen419Model.h */,
+				84EBBEE40F52D9A700F57BDD /* ORCaen419Model.m */,
+				84EBC2110F530E4A00F57BDD /* ORCaen419Decoders.m */,
+				84EBC2120F530E4A00F57BDD /* ORCaen419Decoders.h */,
+			);
+			name = CV419;
+			path = Source/Objects/Hardware/Vme/CAEN/CV419;
+			sourceTree = SOURCE_ROOT;
+		};
 		84F18E6405AF49A8001799E6 /* HeartBeat */ = {
 			isa = PBXGroup;
 			children = (
@@ -8675,6 +8707,7 @@
 			isa = PBXGroup;
 			children = (
 				F5B1802103B297FD015F64B1 /* Base */,
+				84EBBEDE0F52D9A700F57BDD /* CV419 */,
 				84FFCA9F0636D5B10069432F /* CV792 */,
 				9C7CE7DB0E2FC22500F63679 /* CV260 */,
 				84DE591F051F7AF9005F64B1 /* CV785 */,
@@ -9423,6 +9456,9 @@
 				84B28E610F4C835500E2B056 /* ORUnivVoltHVCrateModel.h in Headers */,
 				2D2C84070F4EC6640005D69F /* ORIpeSlowControlDecoder.h in Headers */,
 				2D2C84090F4EC6650005D69F /* ORIpeSlowControlDefs.h in Headers */,
+				84EBBEE70F52D9A700F57BDD /* ORCaen419Controller.h in Headers */,
+				84EBBEE90F52D9A700F57BDD /* ORCaen419Model.h in Headers */,
+				84EBC2140F530E4A00F57BDD /* ORCaen419Decoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10016,6 +10052,8 @@
 				84B28E630F4C835500E2B056 /* UnivVoltHVCrate.gif in Resources */,
 				84B28E640F4C835500E2B056 /* UnivVoltHVCrate.nib in Resources */,
 				84B28E650F4C835500E2B056 /* UnivVoltHVCrateSmall.gif in Resources */,
+				84EBBEE50F52D9A700F57BDD /* Caen419.nib in Resources */,
+				84EBBEE60F52D9A700F57BDD /* Caen419.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10704,6 +10742,9 @@
 				84B28E5F0F4C835500E2B056 /* ORUnivVoltHVCrateController.m in Sources */,
 				84B28E620F4C835500E2B056 /* ORUnivVoltHVCrateModel.m in Sources */,
 				2D2C84080F4EC6650005D69F /* ORIpeSlowControlDecoder.m in Sources */,
+				84EBBEE80F52D9A700F57BDD /* ORCaen419Controller.m in Sources */,
+				84EBBEEA0F52D9A700F57BDD /* ORCaen419Model.m in Sources */,
+				84EBC2130F530E4A00F57BDD /* ORCaen419Decoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
