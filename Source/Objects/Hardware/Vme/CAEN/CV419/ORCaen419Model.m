@@ -329,8 +329,8 @@ static Caen419Registers reg[kNumRegisters] = {
 	unsigned short theValue = 0;
 	theValue |= riseTimeProtection[aChan]&0xf;
 	theValue |= (linearGateMode[aChan]&0x3)<<4;
-	if(resetMask & (1<<aChan))   theValue |= 0x1<<5;
-	if(enabledMask & (1<<aChan)) theValue |= 0x1<<6;
+	if(resetMask & (1<<aChan))   theValue |= 0x1<<6;
+	if(enabledMask & (1<<aChan)) theValue |= 0x1<<7;
 	
     [[self adapter] writeWordBlock:&theValue
 						atAddress:[self baseAddress] + reg[kCh0ControlStatus+aChan].addressOffset
