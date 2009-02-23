@@ -100,6 +100,8 @@ typedef struct Caen419Registers {
 - (void) writeControlStatusRegisters;
 - (void) writeControlStatusRegister:(int)aChan;
 - (void) initBoard;
+- (void) fire;
+
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
 - (id)   initWithCoder:(NSCoder*)decoder;

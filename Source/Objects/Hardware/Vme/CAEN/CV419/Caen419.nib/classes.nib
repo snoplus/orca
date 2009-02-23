@@ -47,6 +47,8 @@
 				<string>id</string>
 				<key>enabledMaskAction</key>
 				<string>id</string>
+				<key>fire</key>
+				<string>id</string>
 				<key>initBoard</key>
 				<string>id</string>
 				<key>linearGateModeAction</key>
@@ -78,6 +80,8 @@
 				<string>NSTextField</string>
 				<key>enabledMaskMatrix</key>
 				<string>NSMatrix</string>
+				<key>fireButton</key>
+				<string>NSButton</string>
 				<key>initButton</key>
 				<string>NSButton</string>
 				<key>linearGateMode0PU</key>

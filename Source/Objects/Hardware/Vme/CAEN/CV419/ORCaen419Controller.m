@@ -198,6 +198,7 @@
     [readThresholdsButton setEnabled:!lockedOrRunningMaintenance];
     [writeThresholdsButton setEnabled:!lockedOrRunningMaintenance];
     [initButton setEnabled:!lockedOrRunningMaintenance];
+    [fireButton setEnabled:!lockedOrRunningMaintenance];
 	    
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -307,5 +308,16 @@
                         localException);
     }
 }
-
+- (IBAction) fire:(id) pSender
+{
+	@try {
+		[self endEditing];
+		[model fire];
+    }
+	@catch(NSException* localException) {
+        NSLog(@"Software trigger of %@  FAILED.\n",[model identifier]);
+        NSRunAlertPanel([localException name], @"%@\nFailed Software Trigger", @"OK", nil, nil,
+                        localException);
+    }
+}
 @end

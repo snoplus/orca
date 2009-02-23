@@ -313,6 +313,17 @@ static Caen419Registers reg[kNumRegisters] = {
 					usingAddSpace:0x01];
 }
 
+- (void) fire
+{
+	unsigned short dummy = 0;
+   [[self adapter] writeWordBlock:&dummy
+						 atAddress:[self auxAddress] + 1
+                        numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+
 - (void) initBoard
 {
 	[self writeControlStatusRegisters];
