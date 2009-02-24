@@ -44,7 +44,7 @@ static Caen419Registers reg[kNumRegisters] = {
 	{@"Channel 3 Data",		0x0C},
 	{@"Channel 0 Status",	0x02},
 	{@"Channel 1 Status",	0x06},
-	{@"Channel 2 Status",	0x0C},
+	{@"Channel 2 Status",	0x0A},
 	{@"Channel 3 Status",	0x0E},
 	{@"Chan 0 Low Thres",	0x10},
 	{@"Chan 0 Hi  Thres",	0x12},
@@ -329,7 +329,7 @@ static Caen419Registers reg[kNumRegisters] = {
 	unsigned short theValue = 0;
 	theValue |= riseTimeProtection[aChan]&0xf;
 	theValue |= (linearGateMode[aChan]&0x3)<<4;
-	if(resetMask & (1<<aChan))   theValue |= 0x1<<6;
+	if(!(resetMask & (1<<aChan)))   theValue |= 0x1<<6;
 	if(enabledMask & (1<<aChan)) theValue |= 0x1<<7;
 	
     [[self adapter] writeWordBlock:&theValue
@@ -343,7 +343,7 @@ static Caen419Registers reg[kNumRegisters] = {
 {
 	unsigned short dummy = 0;
    [[self adapter] writeWordBlock:&dummy
-						 atAddress:[self auxAddress] + 1
+						 atAddress:[self auxAddress] + 2
                         numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
