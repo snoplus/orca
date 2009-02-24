@@ -23,6 +23,7 @@
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #include "VME_HW_Definitions.h"
+#import "ORRateGroup.h"
 
 #define k419DefaultBaseAddress 		0xFFE000
 #define k419DefaultAuxAddress 		0xFFC000
@@ -33,9 +34,10 @@ NSString* ORCaen419ModelResetMaskChanged		= @"ORCaen419ModelResetMaskChanged";
 NSString* ORCaen419ModelRiseTimeProtectionChanged = @"ORCaen419ModelRiseTimeProtectionChanged";
 NSString* ORCaen419ModelLinearGateModeChanged	  = @"ORCaen419ModelLinearGateModeChanged";
 NSString* ORCaen419ModelAuxAddressChanged		= @"ORCaen419ModelAuxAddressChanged";
-NSString* ORCaren419LowThresholdChanged			= @"ORCaren419LowThresholdChanged";
-NSString* ORCaren419HighThresholdChanged		= @"ORCaren419HighThresholdChanged";
+NSString* ORCaen419LowThresholdChanged			= @"ORCaen419LowThresholdChanged";
+NSString* ORCaen419HighThresholdChanged			= @"ORCaen419HighThresholdChanged";
 NSString* ORCaen419BasicLock					= @"ORCaen419BasicLock";
+NSString* ORCaen419RateGroupChangedNotification = @"ORShaperRateGroupChangedNotification";
 
 static Caen419Registers reg[kNumRegisters] = {
 	{@"Channel 0 Data",		0x00},
@@ -66,11 +68,19 @@ static Caen419Registers reg[kNumRegisters] = {
     [self setBaseAddress:		k419DefaultBaseAddress];
     [self setAuxAddress:		k419DefaultAuxAddress];
     [self setAddressModifier:	k419DefaultAddressModifier];
+	[self setAdcRateGroup:[[[ORRateGroup alloc] initGroup:kCV419NumberChannels groupTag:0] autorelease]];
+	[adcRateGroup setIntegrationTime:5];
 	
 	[[self undoManager] enableUndoRegistration];
     return self;
 }
 
+- (void) dealloc
+{
+    [adcRateGroup quit];
+    [adcRateGroup release];
+    [super dealloc];
+}
 
 - (void) setUpImage
 {
@@ -197,7 +207,7 @@ static Caen419Registers reg[kNumRegisters] = {
     lowThresholds[aChnl] = aValue;
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 	[userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:@"channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419LowThresholdChanged object:self userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen419LowThresholdChanged object:self userInfo:userInfo];
 }
 
 - (unsigned long) highThreshold:(unsigned short) aChnl
@@ -211,7 +221,7 @@ static Caen419Registers reg[kNumRegisters] = {
     highThresholds[aChnl] = aValue;
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
 	[userInfo setObject:[NSNumber numberWithInt:aChnl] forKey:@"channel"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419HighThresholdChanged object:self userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen419HighThresholdChanged object:self userInfo:userInfo];
 }
 
 
@@ -356,6 +366,34 @@ static Caen419Registers reg[kNumRegisters] = {
 	[self writeThresholds];
 }
 
+#pragma mark ***Rates
+- (id) rateObject:(int)channel
+{
+	return [adcRateGroup rateObject:channel];
+}
+
+- (ORRateGroup*) adcRateGroup
+{
+	return adcRateGroup;
+}
+- (void) setAdcRateGroup:(ORRateGroup*)newAdcRateGroup
+{
+	[newAdcRateGroup retain];
+	[adcRateGroup release];
+	adcRateGroup = newAdcRateGroup;
+	
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORCaen419RateGroupChangedNotification
+	 object:self];    
+}
+
+- (void) setIntegrationTime:(double)newIntegrationTime
+{
+	//we this here so we have undo/redo on the rate object.
+    [[[self undoManager] prepareWithInvocationTarget:self] setIntegrationTime:[adcRateGroup integrationTime]];
+	[adcRateGroup setIntegrationTime:newIntegrationTime];
+}
+
 #pragma mark ***DataTaker
 
 - (NSDictionary*) dataRecordDescription
@@ -399,10 +437,15 @@ static Caen419Registers reg[kNumRegisters] = {
     slotMask   =  (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16;
 	
     [self initBoard];
+	isRunning = NO;
+	
+    [self startRates];
+
 }
 
 - (void) takeData: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
+	isRunning = YES;
 	
     NSString* errorLocation = @"";
     @try {
@@ -435,6 +478,7 @@ static Caen419Registers reg[kNumRegisters] = {
 					data[1] =  slotMask | ((channel & 0x0000000f) << 12) | (theValue & 0x0fff);
 					[aDataPacket addLongsToFrameBuffer:data length:2];
 				}
+				++adcCount[channel]; 
 			}
 		}
 	}
@@ -448,7 +492,9 @@ static Caen419Registers reg[kNumRegisters] = {
 
 - (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
 {
+    [adcRateGroup stop];
     controller = nil;
+	isRunning = NO;
 }
 
 - (void) reset
@@ -472,6 +518,43 @@ static Caen419Registers reg[kNumRegisters] = {
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
 	
 	return index+1;
+}
+
+- (BOOL) bumpRateFromDecodeStage:(short)channel
+{
+	if(isRunning)return NO;
+    ++adcCount[channel];
+    return YES;
+}
+
+- (unsigned long) adcCount:(int)aChannel
+{
+    return adcCount[aChannel];
+}
+
+-(void) startRates
+{
+	[self clearAdcCounts];
+    [adcRateGroup start:self];
+}
+
+- (void) clearAdcCounts
+{
+    int i;
+    for(i=0;i<kCV419NumberChannels;i++){
+		adcCount[i]=0;
+    }
+}
+
+- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+{
+	if(groupTag == 0){
+		if(counterTag>=0 && counterTag<kCV419NumberChannels){
+			return adcCount[counterTag];
+		}	
+		else return 0;
+	}
+	else return 0;
 }
 
 #pragma mark •••HW Wizard
@@ -614,13 +697,23 @@ static Caen419Registers reg[kNumRegisters] = {
     [self setResetMask:[aDecoder decodeBoolForKey:@"resetMask"]];
     [self setAuxAddress:[aDecoder decodeInt32ForKey:@"auxAddress"]];
 	int i;
-    for (i = 0; i < [self numberOfChannels]; i++){
+    for (i = 0; i < kCV419NumberChannels; i++){
         [self setLowThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]]];
         [self setHighThreshold:i withValue:[aDecoder decodeIntForKey: [NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]]];
 		[self setLinearGateMode:i withValue:[aDecoder decodeIntForKey:[NSString stringWithFormat:@"CAENLinearGateModeChnl%d", i]]];
 		[self setRiseTimeProtection:i withValue:[aDecoder decodeIntForKey:[NSString stringWithFormat:@"CAENRiseTimeProtectionChnl%d", i]]];
     }    
-    [[self undoManager] enableUndoRegistration];
+    [self setAdcRateGroup:[aDecoder decodeObjectForKey:@"adcRateGroup"]];
+ 
+	if(!adcRateGroup){
+	    [self setAdcRateGroup:[[[ORRateGroup alloc] initGroup:kCV419NumberChannels groupTag:0] autorelease]];
+	    [adcRateGroup setIntegrationTime:5];
+    }
+    [self startRates];
+    [adcRateGroup resetRates];
+    [adcRateGroup calcRates];
+	
+	[[self undoManager] enableUndoRegistration];
     
     return self;
 	
@@ -633,12 +726,13 @@ static Caen419Registers reg[kNumRegisters] = {
 	[anEncoder encodeBool:resetMask forKey:@"resetMask"];
 	[anEncoder encodeInt32:auxAddress forKey:@"auxAddress"];
 	int i;
-    for (i = 0; i < [self numberOfChannels]; i++){
+    for (i = 0; i < kCV419NumberChannels; i++){
         [anEncoder encodeInt:lowThresholds[i] forKey:[NSString stringWithFormat:@"CAENLowThresholdChnl%d", i]];
         [anEncoder encodeInt:highThresholds[i] forKey:[NSString stringWithFormat:@"CAENHighThresholdChnl%d", i]];
 		[anEncoder encodeInt:linearGateMode[i] forKey:[NSString stringWithFormat:@"CAENLinearGateModeChnl%d", i]];
 		[anEncoder encodeInt:riseTimeProtection[i] forKey:[NSString stringWithFormat:@"CAENRiseTimeProtectionChnl%d", i]];
     }
+    [anEncoder encodeObject:adcRateGroup forKey:@"adcRateGroup"];
 }
 
 @end

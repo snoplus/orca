@@ -18,11 +18,14 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
-
 #import "OrcaObjectController.h";
+
+@class ORValueBar;
+@class ORPlotter1D;
 
 // Definition of class
 @interface ORCaen419Controller : OrcaObjectController {
+    IBOutlet NSTabView*		tabView;
 	IBOutlet NSTextField* baseAddressField;
 	IBOutlet NSTextField* auxAddressField;
 	IBOutlet NSMatrix*	  enabledMaskMatrix;
@@ -41,6 +44,20 @@
     IBOutlet NSButton*	  fireButton;
     IBOutlet NSTextField* slotField;
     IBOutlet NSTextField* basicLockDocField;
+
+	//rate page
+    IBOutlet NSMatrix*		rateTextFields;
+    IBOutlet NSStepper* 	integrationStepper;
+    IBOutlet NSTextField* 	integrationText;
+    IBOutlet NSTextField* 	totalRateText;
+    IBOutlet NSMatrix*		online2MaskMatrix;
+	IBOutlet ORValueBar*	rate0;
+    IBOutlet ORValueBar*	totalRate;
+    IBOutlet NSButton*		rateLogCB;
+    IBOutlet NSButton*		totalRateLogCB;
+    IBOutlet ORPlotter1D*	timeRatePlot;
+    IBOutlet NSButton*		timeRateLogCB;
+	
 }
 
 #pragma mark ***Initialization
@@ -48,6 +65,7 @@
  	
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
+- (void) registerRates;
 
 #pragma mark ***Interface Management
 - (void) enabledMaskChanged:(NSNotification*)aNote;
@@ -59,6 +77,14 @@
 - (void) baseAddressChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) basicLockChanged:(NSNotification*)aNote;
+- (void) adcRateChanged:(NSNotification*)aNotification;
+- (void) totalRateChanged:(NSNotification*)aNotification;
+- (void) rateGroupChanged:(NSNotification*)aNotification;
+- (void) integrationChanged:(NSNotification*)aNotification;
+- (void) scaleAction:(NSNotification*)aNotification;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
+- (void) updateTimePlot:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) enabledMaskAction:(id)sender;
@@ -74,5 +100,6 @@
 - (IBAction) basicLockAction:(id)sender;
 - (IBAction) initBoard:(id) sender;
 - (IBAction) fire:(id) sender;
+- (IBAction) integrationAction:(id)sender;
 
 @end

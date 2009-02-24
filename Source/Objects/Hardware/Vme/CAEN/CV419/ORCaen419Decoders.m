@@ -1,5 +1,5 @@
 //
-//  ORShaperDecoders.m
+//  ORCaen419Decoders.m
 //  Orca
 //
 //  Created by Mark Howe on 2/23.
@@ -23,17 +23,20 @@
 #import "ORDataSet.h"
 #import "ORCaen419Model.h"
 #import "ORDataTypeAssigner.h"
+#import "ORCaen419Model.h"
 
 @implementation ORCaen419DecoderForAdc
 
 - (id) init
 {
     self = [super init];
+    getRatesFromDecodeStage = YES;
     return self;
 }
 
 - (void) dealloc
 {
+	[actual419s release];
     [super dealloc];
 }
 
@@ -57,6 +60,26 @@
 	NSString* channelKey = [self getChannelKey: channel];
 	
     [aDataSet histogram:*ptr&0x00000fff numBins:4096 sender:self  withKeys:@"CV419", crateKey,cardKey,channelKey,nil];
+
+	//get the actual object
+	if(getRatesFromDecodeStage){
+		NSString* caen419Key = [crateKey stringByAppendingString:cardKey];
+		if(!actual419s)actual419s = [[NSMutableDictionary alloc] init];
+		ORCaen419Model* obj = [actual419s objectForKey:caen419Key];
+		if(!obj){
+			NSArray* listOfCards = [[[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCaen419Model")];
+			NSEnumerator* e = [listOfCards objectEnumerator];
+			ORCaen419Model* aCard;
+			while(aCard = [e nextObject]){
+				if([aCard crateNumber] == crate && [aCard slot] == card){
+					[actual419s setObject:aCard forKey:caen419Key];
+					obj = aCard;
+					break;
+				}
+			}
+		}
+		getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+	}
 	
     return length; //must return number of bytes processed.
 }

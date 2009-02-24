@@ -20,6 +20,12 @@
 #import "ORCaen419Controller.h"
 #import "ORCaenDataDecoder.h"
 #import "ORCaen419Model.h"
+#import "ORRate.h"
+#import "ORRateGroup.h"
+#import "ORValueBar.h"
+#import "ORAxis.h"
+#import "ORPlotter1D.h"
+#import "ORTimeRate.h"
 
 @implementation ORCaen419Controller
 #pragma mark ***Initialization
@@ -27,6 +33,17 @@
 {
     self = [ super initWithWindowNibName: @"Caen419" ];
     return self;
+}
+
+- (void) awakeFromNib
+{
+    [super awakeFromNib];
+    NSString* key = [NSString stringWithFormat: @"orca.ORCaen419_%d.selectedtab",[model slot]];
+    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    [tabView selectTabViewItemAtIndex: index];
+	[[rate0 xScale] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
+	[[totalRate xScale] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
 }
 
 #pragma mark •••Notfications
@@ -43,12 +60,12 @@
 		
     [notifyCenter addObserver:self
 					 selector:@selector(lowThresholdChanged:)
-						 name:ORCaren419LowThresholdChanged
+						 name:ORCaen419LowThresholdChanged
 					   object:model];
 
 	[notifyCenter addObserver:self
 					 selector:@selector(highThresholdChanged:)
-						 name:ORCaren419HighThresholdChanged
+						 name:ORCaen419HighThresholdChanged
 					   object:model];
 	
 	
@@ -91,7 +108,56 @@
                          name : ORCaen419ModelEnabledMaskChanged
 						object: model];
 
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(integrationChanged:)
+						 name : ORRateGroupIntegrationChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(rateGroupChanged:)
+						 name : ORCaen419RateGroupChangedNotification
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(totalRateChanged:)
+						 name : ORRateGroupTotalRateChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(scaleAction:)
+						 name : ORAxisRangeChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(miscAttributesChanged:)
+						 name : ORMiscAttributesChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(updateTimePlot:)
+						 name : ORRateAverageChangedNotification
+					   object : [[model adcRateGroup]timeRate]];
+	
+    [self registerRates];
 }
+
+- (void) registerRates
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+	[notifyCenter removeObserver:self name:ORRateChangedNotification object:nil];
+	
+	NSEnumerator* e = [[[model adcRateGroup] rates] objectEnumerator];
+	id obj;
+	while(obj = [e nextObject]){
+		[notifyCenter addObserver : self
+						 selector : @selector(adcRateChanged:)
+							 name : ORRateChangedNotification
+						   object : obj];
+	}
+}
+
 - (void) updateWindow
 {
     [super updateWindow];
@@ -102,13 +168,19 @@
 	[self resetMaskChanged:nil];
 	[self enabledMaskChanged:nil];
 	[self slotChanged:nil];
+    [self adcRateChanged:nil];
+    [self totalRateChanged:nil];
+    [self rateGroupChanged:nil];
+    [self integrationChanged:nil];
+    [self miscAttributesChanged:nil];
+    [self updateTimePlot:nil];
 	
     short 	i;
     for (i = 0; i < [model numberOfChannels]; i++){
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
         [userInfo setObject:[NSNumber numberWithInt:i] forKey:@"channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419LowThresholdChanged object:model userInfo:userInfo];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaren419HighThresholdChanged object:model userInfo:userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen419LowThresholdChanged object:model userInfo:userInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen419HighThresholdChanged object:model userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen419ModelRiseTimeProtectionChanged object:model userInfo:userInfo];
 	}
 	
@@ -213,6 +285,7 @@
     [writeThresholdsButton setEnabled:!lockedOrRunningMaintenance];
     [initButton setEnabled:!lockedOrRunningMaintenance];
     [fireButton setEnabled:!lockedOrRunningMaintenance];
+    [online2MaskMatrix setEnabled:!lockedOrRunningMaintenance];
 	    
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -221,7 +294,126 @@
     [basicLockDocField setStringValue:s];
 }
 
+- (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
+{
+    NSString* key = [NSString stringWithFormat: @"orca.ORCaen419_%d.selectedtab",[model slot]];
+    int index = [tabView indexOfTabViewItem:item];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
+	
+}
+- (void) adcRateChanged:(NSNotification*)aNotification
+{
+	ORRate* theRateObj = [aNotification object];		
+	[[rateTextFields cellWithTag:[theRateObj tag]] setFloatValue: [theRateObj rate]];
+	[rate0 setNeedsDisplay:YES];
+}
+
+- (void) totalRateChanged:(NSNotification*)aNotification
+{
+	ORRateGroup* theRateObj = [aNotification object];
+	if(aNotification == nil || [model adcRateGroup] == theRateObj){
+		
+		[totalRateText setFloatValue: [theRateObj totalRate]];
+		[totalRate setNeedsDisplay:YES];
+	}
+}
+
+- (void) rateGroupChanged:(NSNotification*)aNotification
+{
+	[self registerRates];
+}
+
+- (void) integrationChanged:(NSNotification*)aNotification
+{
+	ORRateGroup* theRateGroup = [aNotification object];
+	if(aNotification == nil || [model adcRateGroup] == theRateGroup || [aNotification object] == model){
+		double dValue = [[model adcRateGroup] integrationTime];
+		[integrationStepper setDoubleValue:dValue];
+		[integrationText setDoubleValue: dValue];
+	}
+}
+
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+	if(!aNote || ([aNote object] == [[model adcRateGroup]timeRate])){
+		[timeRatePlot setNeedsDisplay:YES];
+	}
+}
+
+//a fake action from the scale object
+- (void) scaleAction:(NSNotification*)aNotification
+{
+	if(aNotification == nil || [aNotification object] == [rate0 xScale]){
+		[model setMiscAttributes:[[rate0 xScale]attributes] forKey:@"RateXAttributes"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [totalRate xScale]){
+		[model setMiscAttributes:[[totalRate xScale]attributes] forKey:@"TotalRateXAttributes"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [timeRatePlot xScale]){
+		[model setMiscAttributes:[[timeRatePlot xScale]attributes] forKey:@"TimeRateXAttributes"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [timeRatePlot yScale]){
+		[model setMiscAttributes:[[timeRatePlot yScale]attributes] forKey:@"TimeRateYAttributes"];
+	};
+	
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString:@"RateXAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"RateXAttributes"];
+		if(attrib){
+			[[rate0 xScale] setAttributes:attrib];
+			[rate0 setNeedsDisplay:YES];
+			[[rate0 xScale] setNeedsDisplay:YES];
+			[rateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"TotalRateXAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"TotalRateXAttributes"];
+		if(attrib){
+			[[totalRate xScale] setAttributes:attrib];
+			[totalRate setNeedsDisplay:YES];
+			[[totalRate xScale] setNeedsDisplay:YES];
+			[totalRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"TimeRateXAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateXAttributes"];
+		if(attrib){
+			[[timeRatePlot xScale] setAttributes:attrib];
+			[timeRatePlot setNeedsDisplay:YES];
+			[[timeRatePlot xScale] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"TimeRateYAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"TimeRateYAttributes"];
+		if(attrib){
+			[[timeRatePlot yScale] setAttributes:attrib];
+			[timeRatePlot setNeedsDisplay:YES];
+			[[timeRatePlot yScale] setNeedsDisplay:YES];
+			[timeRateLogCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+		}
+	}
+}
+
 #pragma mark •••Actions
+- (IBAction) integrationAction:(id)sender
+{
+    [self endEditing];
+	if([sender doubleValue] != [[model adcRateGroup]integrationTime]){
+		[[self undoManager] setActionName: @"Set Integration Time"];
+		[model setIntegrationTime:[sender doubleValue]];		
+	}
+	
+}
+
 - (void) enabledMaskAction:(id)sender
 {
 	short aMask = 0;
@@ -341,4 +533,31 @@
                         localException);
     }
 }
+
+- (double) getBarValue:(int)tag
+{
+	
+	return [[[[model adcRateGroup]rates] objectAtIndex:tag] rate];
+}
+
+
+- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+	return [[[model adcRateGroup]timeRate]count];
+}
+
+- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+{
+	if(set == 0){
+		int count = [[[model adcRateGroup]timeRate] count];
+		return [[[model adcRateGroup]timeRate]valueAtIndex:count-x-1];
+	}
+	return 0;
+}
+
+- (unsigned long)  	secondsPerUnit:(id) aPlotter
+{
+	return [[[model adcRateGroup]timeRate]sampleTime];
+}
+
 @end

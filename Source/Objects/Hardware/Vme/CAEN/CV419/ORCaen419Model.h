@@ -23,6 +23,8 @@
 #import "ORHWWizard.h"
 #import "SBC_Config.h"
 
+@class ORRateGroup;
+
 // Declaration of constants for module.
 enum {
 	kCh0DataRegister,
@@ -62,6 +64,9 @@ typedef struct Caen419Registers {
     short resetMask;
     short enabledMask;
 	unsigned long slotMask;
+	BOOL isRunning;
+	ORRateGroup*	adcRateGroup;
+	unsigned long 	adcCount[kCV419NumberChannels];
 }
 
 #pragma mark ***Accessors
@@ -84,6 +89,10 @@ typedef struct Caen419Registers {
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherObj;
+- (void) startRates;
+- (BOOL) bumpRateFromDecodeStage:(short)chan;
+- (ORRateGroup*)    adcRateGroup;
+- (void)	    setAdcRateGroup:(ORRateGroup*)newAdcRateGroup;
 
 - (unsigned long)	lowThreshold: (unsigned short) anIndex;
 - (void) setLowThreshold:(unsigned short) aChnl withValue:(unsigned long) aValue;
@@ -109,6 +118,14 @@ typedef struct Caen419Registers {
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 
+#pragma mark •••Rates
+- (void)		clearAdcCounts;
+- (unsigned long) adcCount:(int)aChannel;
+- (unsigned long) getCounter:(int)tag forGroup:(int)groupTag;
+- (id) rateObject:(int)channel;
+- (void) setIntegrationTime:(double)newIntegrationTime;
+
+#pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
@@ -118,7 +135,8 @@ extern NSString* ORCaen419ModelResetMaskChanged;
 extern NSString* ORCaen419ModelRiseTimeProtectionChanged;
 extern NSString* ORCaen419ModelLinearGateModeChanged;
 extern NSString* ORCaen419ModelAuxAddressChanged;
-extern NSString* ORCaren419LowThresholdChanged;
-extern NSString* ORCaren419HighThresholdChanged;
+extern NSString* ORCaen419LowThresholdChanged;
+extern NSString* ORCaen419HighThresholdChanged;
 extern NSString* ORCaen419BasicLock;
+extern NSString* ORCaen419RateGroupChangedNotification;
 
