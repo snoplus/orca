@@ -279,7 +279,6 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 						theContent = [theContent stringByAppendingFormat:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 						theContent = [theContent stringByAppendingFormat:@"This message generated from %@ %d\n",[self className],[self uniqueIdNumber]];
 						theContent = [theContent stringByAppendingFormat:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-						
 						NSDictionary* item;
 						NSEnumerator* e = [eMailList objectEnumerator];
 						while(item = [e nextObject]){
@@ -427,6 +426,10 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];
 	content = [content stringByAppendingFormat:@"ORCA Message From Host: %@\n",hostAddress];
 	content = [content stringByAppendingString:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n"];
+	NSString* theMessage = [userInfo objectForKey:@"Message"];
+	if(theMessage){
+		content = [content stringByAppendingString:theMessage];
+	}
 	
 	@synchronized([NSApp delegate]){
 
