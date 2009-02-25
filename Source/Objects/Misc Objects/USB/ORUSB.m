@@ -62,7 +62,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 	while(device = [e nextObject]){
 		[[NSNotificationCenter defaultCenter] removeObserver:device];
 	}
-	
+	IONotificationPortDestroy(_notifyPort);
 	[devices release];
 	[interfaces release];
 	if(_deviceAddedIter)IOObjectRelease(_deviceAddedIter);
@@ -226,6 +226,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 	kr = IOMasterPort(MACH_PORT_NULL, &masterPort);
 	if (kr || !masterPort) {
 		NSLog(@"ERR: Couldn't create a master IOKit Port(%08x)\n", kr);
+		return;
 	}
 	
 	// Set up the matching criteria for the devices we're interested in
@@ -259,6 +260,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 	[self deviceAdded:_deviceAddedIter];				// Iterate once to get already-present devices and arm the notification
 	
 	// Now done with the master_port
+	mach_port_deallocate(mach_task_self(), masterPort);
 	masterPort = 0;
 	
 }
