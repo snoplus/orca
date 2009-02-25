@@ -30,6 +30,7 @@
 
 #define kNumGretina4Channels		10 
 #define kNumGretina4CardParams		6
+#define kGretina4HeaderLengthLongs	7
 
 #define kGretina4FIFOEmpty			0x100000
 #define kGretina4FIFOAlmostEmpty	0x400000

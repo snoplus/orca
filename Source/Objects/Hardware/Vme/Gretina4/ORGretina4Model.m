@@ -520,7 +520,11 @@ static struct {
 
 - (void) setDataLength:(short)chan withValue:(int)aValue    
 {
-	if(aValue<0x0)aValue=0x0;
+	// The data length refers to the total length in the buffer, *NOT* the 
+	// length of the trace.  That is, it includes the length of the header
+	// so it can never be shorter than the header (*2 for words).
+	
+	if(aValue<kGretina4HeaderLengthLongs*2)aValue=kGretina4HeaderLengthLongs*2;
 	else if(aValue>0x3FF)aValue = 0x3FF;
     [[[self undoManager] prepareWithInvocationTarget:self] setDataLength:chan withValue:dataLength[chan]];
 	dataLength[chan] = aValue;
@@ -542,10 +546,10 @@ static struct {
 - (int) dataLength:(short)chan		{ return dataLength[chan]; }
 
 
-- (float) cfdDelayConverted:(short)chan		{ return cfdDelay[chan]*630./(float)0x3F; }		//convert to ns
-- (float) cfdThresholdConverted:(short)chan	{ return cfdThreshold[chan]*160./(float)0x10; }	//convert to kev
-- (float) dataDelayConverted:(short)chan	{ return dataDelay[chan]*4.5/(float)0x01C2; }	//convert to µs
-- (float) dataLengthConverted:(short)chan	{ return dataLength[chan]*10.0; }               //convert to ns
+- (float) cfdDelayConverted:(short)chan		{ return cfdDelay[chan]*630./(float)0x3F; }						//convert to ns
+- (float) cfdThresholdConverted:(short)chan	{ return cfdThreshold[chan]*160./(float)0x10; }					//convert to kev
+- (float) dataDelayConverted:(short)chan	{ return dataDelay[chan]*4.5/(float)0x01C2; }					//convert to µs
+- (float) dataLengthConverted:(short)chan	{ return (dataLength[chan]-2*kGretina4HeaderLengthLongs)*10.0; }//convert to ns, making sure to remove header length
 
 - (void) setCFDDelayConverted:(short)chan withValue:(float)aValue
 {

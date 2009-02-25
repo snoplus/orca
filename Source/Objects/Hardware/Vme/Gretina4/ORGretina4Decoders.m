@@ -70,7 +70,7 @@
 
 	ptr++; //first word of the actual card packet
 	int channel		 = *ptr&0xF;
-	int packetLength = ((*ptr & kGretina4NumberWordsMask) >>16) - 7;
+	int packetLength = ((*ptr & kGretina4NumberWordsMask) >>16) - kGretina4HeaderLengthLongs;
 	ptr += 2; //point to Energy low word
 	unsigned long energy = *ptr >> 16;
 	ptr++;	  //point to Energy second word
