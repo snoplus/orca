@@ -246,8 +246,10 @@ enum Gretina4FIFOStates {
 - (void) setCFDDelay:(short)chan withValue:(int)aValue;	
 - (void) setCFDFraction:(short)chan withValue:(int)aValue;	
 - (void) setCFDThreshold:(short)chan withValue:(int)aValue;
-- (void) setDataDelay:(short)chan withValue:(int)aValue;   
+- (void) setDataDelay:(short)chan withValue:(int)aValue;
+// Data Length refers to total length of the record (w/ header), trace length refers to length of trace
 - (void) setDataLength:(short)chan withValue:(int)aValue;  
+- (void) setTraceLength:(short)chan withValue:(int)aValue;  
 
 - (int) enabled:(short)chan;
 - (int) poleZeroEnabled:(short)chan;
@@ -261,18 +263,21 @@ enum Gretina4FIFOStates {
 - (int) cfdFraction:(short)chan;	
 - (int) cfdThreshold:(short)chan;	
 - (int) dataDelay:(short)chan;		
-- (int) dataLength:(short)chan;		
+// Data Length refers to total length of the record (w/ header), trace length refers to length of trace
+- (int) dataLength:(short)chan;
+- (int) traceLength:(short)chan;
 
 //conversion methods
 - (float) cfdDelayConverted:(short)chan;
 - (float) cfdThresholdConverted:(short)chan;
 - (float) dataDelayConverted:(short)chan;
-- (float) dataLengthConverted:(short)chan;
+- (float) traceLengthConverted:(short)chan;
 
 - (void) setCFDDelayConverted:(short)chan withValue:(float)aValue;	
 - (void) setCFDThresholdConverted:(short)chan withValue:(float)aValue;
+// Data Length refers to total length of the record (w/ header), trace length refers to length of trace
 - (void) setDataDelayConverted:(short)chan withValue:(float)aValue;   
-- (void) setDataLengthConverted:(short)chan withValue:(float)aValue;  
+- (void) setTraceLengthConverted:(short)chan withValue:(float)aValue;  
 
 #pragma mark ¥¥¥Hardware Access
 - (short) readBoardID;
@@ -314,6 +319,7 @@ enum Gretina4FIFOStates {
 - (void) checkFifoAlarm;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
+
 
 #pragma mark ¥¥¥HW Wizard
 - (int) numberOfChannels;

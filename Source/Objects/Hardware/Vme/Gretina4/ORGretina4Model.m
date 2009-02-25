@@ -518,6 +518,11 @@ static struct {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelDataDelayChanged object:self];
 }
 
+- (void) setTraceLength:(short)chan withValue:(int)aValue
+{
+	[self setDataLength:chan withValue:(aValue+kGretina4HeaderLengthLongs*2)];
+}
+
 - (void) setDataLength:(short)chan withValue:(int)aValue    
 {
 	// The data length refers to the total length in the buffer, *NOT* the 
@@ -544,12 +549,13 @@ static struct {
 - (int) cfdThreshold:(short)chan	{ return cfdThreshold[chan]; }
 - (int) dataDelay:(short)chan		{ return dataDelay[chan]; }
 - (int) dataLength:(short)chan		{ return dataLength[chan]; }
+- (int) traceLength:(short)chan		{ return dataLength[chan]-2*kGretina4HeaderLengthLongs; }
 
 
 - (float) cfdDelayConverted:(short)chan		{ return cfdDelay[chan]*630./(float)0x3F; }						//convert to ns
 - (float) cfdThresholdConverted:(short)chan	{ return cfdThreshold[chan]*160./(float)0x10; }					//convert to kev
 - (float) dataDelayConverted:(short)chan	{ return dataDelay[chan]*4.5/(float)0x01C2; }					//convert to Âµs
-- (float) dataLengthConverted:(short)chan	{ return (dataLength[chan]-2*kGretina4HeaderLengthLongs)*10.0; }//convert to ns, making sure to remove header length
+- (float) traceLengthConverted:(short)chan	{ return (dataLength[chan]-2*kGretina4HeaderLengthLongs)*10.0; }//convert to ns, making sure to remove header length
 
 - (void) setCFDDelayConverted:(short)chan withValue:(float)aValue
 {
@@ -566,9 +572,9 @@ static struct {
 	[self setDataDelay:chan withValue:aValue*0x01C2/4.5];		//Âµs -> raw
 } 
 
-- (void) setDataLengthConverted:(short)chan withValue:(float)aValue
+- (void) setTraceLengthConverted:(short)chan withValue:(float)aValue
 {
-	[self setDataLength:chan withValue:aValue/10.0];		//ns -> raw
+	[self setDataLength:chan withValue:(aValue/10.0 + 2*kGretina4HeaderLengthLongs)];		//ns -> raw
 }  
 
 #pragma mark ¥¥¥Hardware Access

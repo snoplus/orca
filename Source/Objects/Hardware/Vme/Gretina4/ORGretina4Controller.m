@@ -448,7 +448,7 @@
 {
 	short i;
 	for(i=0;i<kNumGretina4Channels;i++){
-		[[dataLengthMatrix cellWithTag:i] setFloatValue:[model dataLengthConverted:i]];
+		[[dataLengthMatrix cellWithTag:i] setFloatValue:[model traceLengthConverted:i]];
 	}
 }
 
@@ -758,7 +758,7 @@
 - (IBAction) dataLengthAction:(id)sender
 {
 	if([sender intValue] != [model dataLength:[[sender selectedCell] tag]]){
-		[model setDataLengthConverted:[[sender selectedCell] tag] withValue:[sender floatValue]];
+		[model setTraceLengthConverted:[[sender selectedCell] tag] withValue:[sender floatValue]];
 	}
 }
 
