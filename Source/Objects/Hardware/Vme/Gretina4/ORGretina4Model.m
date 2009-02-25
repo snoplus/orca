@@ -834,7 +834,8 @@ static struct {
 								  withAddMod:[self addressModifier] 
 							   usingAddSpace:0x01];
 				count++;
-			} else {
+			} 
+			else {
 				if (errorFound) {
 					NSLog(@"Clearing FIFO: lost place in the FIFO twice, is the FIFO corrupted? (slot %d). \n",[self slot]);
 					break;
@@ -844,19 +845,29 @@ static struct {
                 NSLog(@"Clearing FIFO: Next event found on Gretina4 card (slot %d), continuing to clear FIFO. \n",[self slot]);
 				errorFound = YES;
 			}
-		} else { 
+		} 
+		else { 
             /* The FIFO has been cleared. */
             break;
         }
 		
     }
 	
-    for(i=0;i<kNumGretina4Channels;i++) {
-        /* Now reenable all the channels that were enabled before (on the *BOARD*). */
-        [self setEnabled:i withValue:boardStateEnabled[i]];
-        [self writeControlReg:i enabled:YES];
-        [self setEnabled:i withValue:modelStateEnabled[i]];
-    }	
+	[[self undoManager] disableUndoRegistration];
+	@try {
+		for(i=0;i<kNumGretina4Channels;i++) {
+			/* Now reenable all the channels that were enabled before (on the *BOARD*). */
+			[self setEnabled:i withValue:boardStateEnabled[i]];
+			[self writeControlReg:i enabled:YES];
+			[self setEnabled:i withValue:modelStateEnabled[i]];
+		}
+	}
+	@catch(NSException* localException){
+		@throw;
+	}
+	@finally {
+		[[self undoManager] enableUndoRegistration];	
+	}
 	return count;
 }
 
