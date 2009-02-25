@@ -351,9 +351,21 @@ static Caen419Registers reg[kNumRegisters] = {
 
 - (void) fire
 {
+	/* Initiate a software trigger */
 	unsigned short dummy = 0;
-   [[self adapter] writeWordBlock:&dummy
+	[[self adapter] writeWordBlock:&dummy
 						 atAddress:[self auxAddress] + 2
+                        numToWrite:1
+						withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];
+}
+
+- (void) reset
+{
+	/* zero out all the channels. */
+	unsigned short dummy = 0;
+	[[self adapter] writeWordBlock:&dummy
+						 atAddress:[self auxAddress]
                         numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -497,9 +509,6 @@ static Caen419Registers reg[kNumRegisters] = {
 	isRunning = NO;
 }
 
-- (void) reset
-{
-}
 
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
 {

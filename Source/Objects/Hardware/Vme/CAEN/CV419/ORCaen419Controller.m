@@ -285,6 +285,7 @@
     [writeThresholdsButton setEnabled:!lockedOrRunningMaintenance];
     [initButton setEnabled:!lockedOrRunningMaintenance];
     [fireButton setEnabled:!lockedOrRunningMaintenance];
+	[resetButton setEnabled:!lockedOrRunningMaintenance];
     [online2MaskMatrix setEnabled:!lockedOrRunningMaintenance];
 	    
     NSString* s = @"";
@@ -530,6 +531,19 @@
 	@catch(NSException* localException) {
         NSLog(@"Software trigger of %@  FAILED.\n",[model identifier]);
         NSRunAlertPanel([localException name], @"%@\nFailed Software Trigger", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) reset:(id) pSender
+{
+	@try {
+		[self endEditing];
+		[model reset];
+    }
+	@catch(NSException* localException) {
+        NSLog(@"Reset data buffer of %@  FAILED.\n",[model identifier]);
+        NSRunAlertPanel([localException name], @"%@\nFailed data buffer reset", @"OK", nil, nil,
                         localException);
     }
 }

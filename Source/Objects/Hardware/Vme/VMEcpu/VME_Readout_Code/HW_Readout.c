@@ -1125,16 +1125,16 @@ int32_t Readout_CAEN419(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 	uint32_t firstStatusRegOffset = config->card_info[index].deviceSpecificData[1];
  	uint32_t firstAdcRegOffset  = config->card_info[index].deviceSpecificData[2];
    
-    lock_device(vmeAM29Handle);
+    lock_device(vmeAM39Handle);
 	int chan;
 	for(chan=0;chan<4;chan++){
 		if(enabledMask & (1<<chan)){
-			char theStatuReg;
-			int32_t result = read_device(vmeAM29Handle,&theStatuReg,1,baseAddress+firstStatusRegOffset+(chan*4));
-			if(result == 1 && (theStatuReg&0x8000)){
-				uint32_t aValue;
-				result  = read_device(vmeAM29Handle,(char*)&aValue,1,baseAddress+firstAdcRegOffset+(chan*4));
-				if(result == 1){
+			uint16_t theStatusReg;
+			int32_t result = read_device(vmeAM39Handle,(char*)&theStatusReg,sizeof(theStatusReg),baseAddress+firstStatusRegOffset+(chan*4));
+			if(result == sizeof(theStatusReg) && (theStatusReg&0x8000)){
+				uint16_t aValue;
+				result  = read_device(vmeAM39Handle,(char*)&aValue,sizeof(aValue),baseAddress+firstAdcRegOffset+(chan*4));
+				if(result == sizeof(aValue)){
 					if(((dataId) & 0x80000000)){ //short form
 						data[dataIndex++] = dataId | locationMask | ((chan & 0x0000000f) << 12) | (aValue & 0x0fff);
 					} 
@@ -1148,7 +1148,7 @@ int32_t Readout_CAEN419(SBC_crate_config* config,int32_t index, SBC_LAM_Data* la
 			else if (result < 0)LogBusError("Rd Err: Shaper 0x%04x %s",baseAddress,strerror(errno));   
 		}
 	}
-    unlock_device(vmeAM29Handle);
+    unlock_device(vmeAM39Handle);
 	
     return config->card_info[index].next_Card_Index;
 }

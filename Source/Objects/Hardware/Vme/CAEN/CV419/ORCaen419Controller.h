@@ -42,6 +42,7 @@
     IBOutlet NSButton*	  writeThresholdsButton;
     IBOutlet NSButton*	  initButton;
     IBOutlet NSButton*	  fireButton;
+	IBOutlet NSButton*	  resetButton;
     IBOutlet NSTextField* slotField;
     IBOutlet NSTextField* basicLockDocField;
 
@@ -100,6 +101,7 @@
 - (IBAction) basicLockAction:(id)sender;
 - (IBAction) initBoard:(id) sender;
 - (IBAction) fire:(id) sender;
+- (IBAction) reset:(id) sender;
 - (IBAction) integrationAction:(id)sender;
 
 @end
