@@ -226,7 +226,7 @@ enum Gretina4FIFOStates {
 - (void) setNoiseWindow:(int)aValue;
 - (void) setExtTrigLength:(int)aValue;
 - (void) setCollectionTime:(int)aValue;
-- (void) setIntegratonTime:(int)aValue;
+- (void) setIntegrationTime:(int)aValue;
 
 - (int) externalWindow;
 - (int) pileUpWindow;
