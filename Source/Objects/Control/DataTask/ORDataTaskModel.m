@@ -509,8 +509,19 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
                                                         object: self
                                                       userInfo: statusInfo];
 	
-    //wait for the processing thread to exit.
+ 	//wait for the processing queu to clear.
 	float totalTime = 0;
+    while([transferQueue count]){
+		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.01]];
+		totalTime += .01;
+		if(totalTime > 200){
+			NSLogColor([NSColor redColor], @"Continuing after data que didn't flush after 2 seconds.\n");
+			break;
+		}
+	}	
+	
+	//wait for the processing thread to exit.
+	totalTime = 0;
     while(processThreadRunning){
 		timeToStopProcessThread = YES;
 		[NSThread sleepUntilDate:[[NSDate date] addTimeInterval:.1]];
