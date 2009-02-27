@@ -215,6 +215,8 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
         [obj runTaskStopped:aDataPacket userInfo:userInfo];
     }
 	[sbcLink runTaskStopped:aDataPacket userInfo:userInfo];
+	[dataTakers release];
+	dataTakers = nil;
 }
 
 - (BOOL) doneTakingData
