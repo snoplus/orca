@@ -334,7 +334,7 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
 	if(cachedController)theController =  cachedController;
 	else theController = [guardian adapter];
 	[theController readByteBlock:&aValue
-					   atAddress:baseAddress + aRegister
+					   atAddress:[self baseAddress] + aRegister
 					   numToRead:1L
 					  withAddMod:[guardian addressModifier]
 				   usingAddSpace:kAccessRemoteIO];
@@ -349,7 +349,7 @@ static NSString *ORIP408ReadMask 		= @"IP408 ReadMask";
 	if(cachedController)theController =  cachedController;
 	else theController = [guardian adapter];
 	[theController writeByteBlock:&aValue
-						atAddress:baseAddress + aRegister
+						atAddress:[self baseAddress] + aRegister
 					   numToWrite:1L
 					   withAddMod:[guardian addressModifier]
 					usingAddSpace:kAccessRemoteIO];
