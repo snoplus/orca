@@ -31,7 +31,6 @@
 static NSString* ORDataTaskInConnector 	= @"Data Task In Connector";
 static NSString* ORDataTaskDataOut      = @"Data Task Data Out Connector";
 
-NSString* ORDataTaskCollectModeChangedNotification	= @"Data Task Mode Changed Notification";
 NSString* ORDataTaskQueueCountChangedNotification	= @"Data Task Queue Count Changed Notification";
 NSString* ORDataTaskTimeScalerChangedNotification	= @"ORDataTaskTimeScalerChangedNotification";
 NSString* ORDataTaskListLock						= @"ORDataTaskListLock";
@@ -167,19 +166,6 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     readOutList = someDataTakers;
 }
 
-- (BOOL) collectMode
-{
-    return collectMode;
-}
-- (void) setCollectMode:(BOOL)newMode
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setCollectMode:[self collectMode]];
-    collectMode=newMode;
-    [[NSNotificationCenter defaultCenter]
-	 postNotificationName:ORDataTaskCollectModeChangedNotification
-	 object:self];
-}
-
 - (unsigned long)cycleRate
 {
 	return cycleRate;
@@ -287,14 +273,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 	}
     
     //tell all data takers to get ready
-    if(collectMode == kDataTaskAutoCollect){
-        NSMutableArray* classList = [NSMutableArray arrayWithArray:[[self document]  collectObjectsConformingTo:@protocol(ORDataTaker)]];
-        dataTakers = [classList retain];
-        
-    }
-    else {
-        dataTakers = [[readOutList allObjects] retain];
-    }
+	dataTakers = [[readOutList allObjects] retain];
     
 	if([dataTakers count] == 0){
 		NSLogColor([NSColor redColor],@"----------------------------------------------------------\n");
@@ -570,7 +549,6 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 
 #pragma mark ¥¥¥Archival
 static NSString *ORDataTaskReadOutList 		= @"ORDataTask ReadOutList";
-static NSString *ORDataTaskCollectMode 		= @"ORDataTask CollectMode";
 static NSString *ORDataTaskLastFile 		= @"ORDataTask LastFile";
 static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 
@@ -580,7 +558,6 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
     
     [[self undoManager] disableUndoRegistration];
     [self setReadOutList:[decoder decodeObjectForKey:ORDataTaskReadOutList]];
-    [self setCollectMode:[decoder decodeBoolForKey:ORDataTaskCollectMode]];
     [self setLastFile:[decoder decodeObjectForKey:ORDataTaskLastFile]];
     [self setTimeScaler:[decoder decodeIntForKey:ORDataTaskTimeScaler]];
     [[self undoManager] enableUndoRegistration];
@@ -596,7 +573,6 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:readOutList forKey:ORDataTaskReadOutList];
-    [encoder encodeBool:collectMode forKey:ORDataTaskCollectMode];
     [encoder encodeObject:lastFile forKey:ORDataTaskLastFile];
     [encoder encodeInt:timeScaler forKey:ORDataTaskTimeScaler];
 }

@@ -30,8 +30,6 @@
     IBOutlet NSOutlineView* readoutListView;
     IBOutlet NSButton*      removeButton;
     IBOutlet NSButton*      removeAllButton;
-    IBOutlet NSMatrix*      modeMatrix;
-    IBOutlet NSTabView*     autoTabView;
     IBOutlet NSTabView*     tabView;
     IBOutlet ORValueBar*    queueBarGraph;
 	IBOutlet NSTextField*   cycleRateField;
@@ -52,7 +50,6 @@
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
 - (void) reloadObjects:(NSNotification*)aNote;
-- (void) modeChanged:(NSNotification*)aNote;
 - (void) listLockChanged:(NSNotification*)aNotification;
 - (void) timeScalerChanged:(NSNotification*)aNotification;
 - (void) cycleRateChanged:(NSNotification*)aNote;
@@ -62,7 +59,6 @@
 - (IBAction) tableDoubleClick:(id)sender;
 - (IBAction) removeItemAction:(id)sender;
 - (IBAction) removeAllAction:(id)sender;
-- (IBAction) modeAction:(id)sender;
 - (IBAction) listLockAction:(id)sender;
 - (IBAction) saveAsAction:(id)sender;
 - (IBAction) loadListAction:(id)sender;

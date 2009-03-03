@@ -120,12 +120,6 @@
                          name : NSReadOutListChangedNotification
                        object : nil];
     
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(modeChanged:)
-                         name : ORDataTaskCollectModeChangedNotification
-                       object : nil];
-    
     [notifyCenter addObserver : self
                      selector : @selector(queueCountChanged:)
                          name : ORDataTaskQueueCountChangedNotification
@@ -159,7 +153,6 @@
     BOOL locked = [gSecurity isLocked:ORDataTaskListLock];
     [listLockButton setState: locked];
     
-    [modeMatrix setEnabled:!locked];
     [saveAsButton setEnabled:![gSecurity runInProgressOrIsLocked:ORDataTaskListLock]];
     [loadListButton setEnabled:![gSecurity runInProgressOrIsLocked:ORDataTaskListLock]];
     if(locked){
@@ -185,21 +178,6 @@
 	[queueBarGraph setNeedsDisplay:YES];		
 }
 
-- (void) modeChanged:(NSNotification*)aNote
-{
-	[self updateRadioCluster:modeMatrix setting:[model collectMode]];
-	if([model collectMode] == kDataTaskAutoCollect){
-		//auto mode
-		[autoTabView selectTabViewItemAtIndex:1];
-	}
-	else {
-		//manual mode
-		[autoTabView selectTabViewItemAtIndex:0];
-	}
-	[self setButtonStates];
-
-}
-
 - (NSArray*)draggedNodes
 { 
     return draggedNodes; 
@@ -213,9 +191,9 @@
 - (void) setButtonStates
 {
     BOOL locked = [gSecurity isLocked:ORDataTaskListLock];
-    [removeAllButton setEnabled:!locked && [model collectMode] == kDataTaskManualCollect && [readoutListView numberOfRows]>0];
+    [removeAllButton setEnabled:!locked  && [readoutListView numberOfRows]>0];
     NSArray *selection = [readoutListView allSelectedItems];
-    [removeButton setEnabled:!locked && [model collectMode] == kDataTaskManualCollect && [selection count]>0];
+    [removeButton setEnabled:!locked  && [selection count]>0];
 }
 
 - (void) reloadObjects:(NSNotification*)aNote
@@ -274,14 +252,6 @@
 {
 	[readoutListView selectAll:sender];
 	[self removeItemAction:self];
-}
-
-- (IBAction) modeAction:(id)sender
-{
-	if([[sender selectedCell] tag] != [model collectMode]){
-		[[self undoManager] setActionName: @"Set Collect Mode"];
-		[model setCollectMode:[[sender selectedCell] tag]];
-	}
 }
 
 - (IBAction) listLockAction:(id)sender
@@ -525,7 +495,6 @@ else {\
     [super updateWindow];
     [totalListView reloadData];
     [readoutListView reloadData];
-    [self modeChanged:nil];
     [self queueCountChanged:nil];
     [self timeScalerChanged:nil];
     [self cycleRateChanged:nil];

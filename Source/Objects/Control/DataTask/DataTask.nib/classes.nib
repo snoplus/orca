@@ -1,58 +1,273 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {
-            ACTIONS = {
-                cut = id; 
-                delete = id; 
-                enableTimer = id; 
-                listLockAction = id; 
-                loadListAction = id; 
-                modeAction = id; 
-                refreshTimeAction = id; 
-                removeAllAction = id; 
-                removeItemAction = id; 
-                saveAsAction = id; 
-                tableClick = id; 
-                tableDoubleClick = id; 
-                timeScaleAction = id; 
-            }; 
-            CLASS = ORDataTaskController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                autoTabView = NSTabView; 
-                cycleRateField = NSTextField; 
-                listLockButton = NSButton; 
-                loadListButton = NSButton; 
-                modeMatrix = NSMatrix; 
-                plotter = ORPlotter1D; 
-                queueBarGraph = ORValueBar; 
-                readoutListView = NSOutlineView; 
-                removeAllButton = NSButton; 
-                removeButton = NSButton; 
-                saveAsButton = NSButton; 
-                tabView = NSTabView; 
-                timeScaleMatrix = NSMatrix; 
-                totalListView = NSOutlineView; 
-                totalListViewDrawer = NSDrawer; 
-                viewListButton = NSButton; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            CLASS = ORValueBar; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {chainedView = id; dataSource = id; mXScale = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {modelStepperAction = id; modelSwitchAction = id; }; 
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {model = id; modelStepper = NSStepper; modelSwitchPopUp = NSPopUpButton; }; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORValueBar</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>chainedView</key>
+				<string>id</string>
+				<key>dataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSOutlineView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTableView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>modelStepperAction</key>
+				<string>id</string>
+				<key>modelSwitchAction</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>modelStepper</key>
+				<string>NSStepper</string>
+				<key>modelSwitchPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cut</key>
+				<string>id</string>
+				<key>delete</key>
+				<string>id</string>
+				<key>enableTimer</key>
+				<string>id</string>
+				<key>listLockAction</key>
+				<string>id</string>
+				<key>loadListAction</key>
+				<string>id</string>
+				<key>refreshTimeAction</key>
+				<string>id</string>
+				<key>removeAllAction</key>
+				<string>id</string>
+				<key>removeItemAction</key>
+				<string>id</string>
+				<key>saveAsAction</key>
+				<string>id</string>
+				<key>tableClick</key>
+				<string>id</string>
+				<key>tableDoubleClick</key>
+				<string>id</string>
+				<key>timeScaleAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORDataTaskController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>cycleRateField</key>
+				<string>NSTextField</string>
+				<key>listLockButton</key>
+				<string>NSButton</string>
+				<key>loadListButton</key>
+				<string>NSButton</string>
+				<key>plotter</key>
+				<string>ORPlotter1D</string>
+				<key>queueBarGraph</key>
+				<string>ORValueBar</string>
+				<key>readoutListView</key>
+				<string>NSOutlineView</string>
+				<key>removeAllButton</key>
+				<string>NSButton</string>
+				<key>removeButton</key>
+				<string>NSButton</string>
+				<key>saveAsButton</key>
+				<string>NSButton</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
+				<key>timeScaleMatrix</key>
+				<string>NSMatrix</string>
+				<key>totalListView</key>
+				<string>NSOutlineView</string>
+				<key>totalListViewDrawer</key>
+				<string>NSDrawer</string>
+				<key>viewListButton</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ZFlowLayout</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

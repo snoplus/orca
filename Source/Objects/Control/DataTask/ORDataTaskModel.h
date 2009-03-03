@@ -30,8 +30,6 @@
 @class ORTimer;
 @class ORGateGroup;
 
-#define kDataTaskAutoCollect 	0
-#define kDataTaskManualCollect 	1
 #define kTimeHistoSize 4000
 
 @class ORAlarm;
@@ -40,7 +38,6 @@
     ORReadOutList*  readOutList;
     id              nextObject;     //cache for alittle bit more speed.
     NSArray*        dataTakers;     //cache of data takers.
-    BOOL            collectMode;
     unsigned long   queueCount;
     
     ORDataPacket*   transferDataPacket;
@@ -80,8 +77,6 @@
 #pragma mark ¥¥¥Accessors
 - (ORReadOutList*) readOutList;
 - (void) setReadOutList:(ORReadOutList*)someDataTakers;
-- (BOOL) collectMode;
-- (void) setCollectMode:(BOOL)newMode;
 - (unsigned long)queueCount;
 - (void)setQueueCount:(unsigned long)aQueueCount;
 - (unsigned long) queueMaxSize;
@@ -115,7 +110,6 @@
 
 extern NSString* ORDataTakerAdded;
 extern NSString* ORDataTakerRemoved;
-extern NSString* ORDataTaskCollectModeChangedNotification;
 extern NSString* ORDataTaskQueueCountChangedNotification;
 extern NSString* ORDataTaskListLock;
 extern NSString* ORDataTaskTimeScalerChangedNotification;
