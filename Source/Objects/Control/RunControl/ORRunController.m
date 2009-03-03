@@ -245,6 +245,9 @@
 	[openStartScriptButton setEnabled:[model startScript]!=nil]; 
 	[openShutDownScriptButton setEnabled:[model shutDownScript]!=nil]; 
 	
+	[runModeMatrix setEnabled:![model remoteControl] && !running && [model runningState] != eRunStarting && [model runningState] != eRunStopping];
+
+	
     if([model remoteControl]){
         [startRunButton setEnabled:NO];
         [restartRunButton setEnabled:NO];
@@ -253,7 +256,7 @@
         [repeatRunCB setEnabled:NO];
         [timeLimitField setEnabled:NO];
         [timeLimitStepper setEnabled:NO];
-        [runModeMatrix setEnabled:NO];
+        //[runModeMatrix setEnabled:NO];
 		[quickStartCB setEnabled:NO];
 		[startUpScripts setEnabled:NO];
 		[shutDownScripts setEnabled:NO];
@@ -269,7 +272,7 @@
             [timedRunCB setEnabled:NO];
             [timeLimitField setEnabled:NO];
             [timeLimitStepper setEnabled:NO];
-            [runModeMatrix setEnabled:NO];
+            //[runModeMatrix setEnabled:NO];
             [repeatRunCB setEnabled:[model timedRun]];
 			[startUpScripts setEnabled:NO];
 			[shutDownScripts setEnabled:NO];
@@ -281,7 +284,7 @@
             [timedRunCB setEnabled:YES];
             [timeLimitField setEnabled:[model timedRun]];
             [timeLimitStepper setEnabled:[model timedRun]];
-            [runModeMatrix setEnabled:YES];
+           // [runModeMatrix setEnabled:YES];
             [repeatRunCB setEnabled:[model timedRun]];
 			[startUpScripts setEnabled:YES];
 			[shutDownScripts setEnabled:YES];
@@ -293,7 +296,7 @@
             [timedRunCB setEnabled:NO];
             [timeLimitField setEnabled:NO];
             [timeLimitStepper setEnabled:NO];
-            [runModeMatrix setEnabled:NO];
+            //[runModeMatrix setEnabled:NO];
             [repeatRunCB setEnabled:NO];
 			[startUpScripts setEnabled:NO];
 			[shutDownScripts setEnabled:NO];
