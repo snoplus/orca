@@ -865,7 +865,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 {
 	float newValue = 0;
 	if(panic){
-		newValue = time*kPanicRate;
+		newValue = time*[self maxValueForParameter]/100.;
 	}
 	else if(running && dir<0 && downRampPath == 0){
 		newValue = time*downRate;
@@ -900,7 +900,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 {
 	float newTime = 0.0;
 	if(panic){
-		newTime = value/kPanicRate;
+		newTime = value/([self maxValueForParameter]/100.);
 	}
 	else if(running && dir<0 && downRampPath == 0){
 		newTime = value/downRate;
