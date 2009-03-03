@@ -27,7 +27,9 @@
     @protected 
         BOOL gatesInstalled;				//at least one gate installed.
         NSMutableArray* gates;
+	@private
 		NSMutableDictionary* cachedObjects;	//decoder can cache info here
+		NSLock* cachedObjectsLock;
 }
 
 - (NSString*) getChannelKey:(unsigned short)aChan;

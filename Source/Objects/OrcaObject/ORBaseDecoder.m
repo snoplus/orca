@@ -69,7 +69,10 @@ static NSString* kCrateKey[16] = {
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [gates release];
+	[cachedObjectsLock lock];
 	[cachedObjects release];
+	[cachedObjectsLock unlock];
+	[cachedObjectsLock release];
     [super dealloc];
 }
 
@@ -88,8 +91,6 @@ static NSString* kCrateKey[16] = {
 
 - (void) runStopped:(NSNotification*)aNote
 {
-	[cachedObjects release];
-	cachedObjects = nil;
 }
 
 
@@ -148,10 +149,12 @@ static NSString* kCrateKey[16] = {
 
 - (id) objectForNestedKey:(id)firstKey,...
 {
+	[cachedObjectsLock lock];
 	va_list args;
 	va_start(args, firstKey);
-	id objectToReturn = [cachedObjects nestedObjectForKeyList:firstKey withvaList:args];
+	id objectToReturn = [[[cachedObjects nestedObjectForKeyList:firstKey withvaList:args] retain] autorelease];
 	va_end(args);
+	[cachedObjectsLock unlock];
 	return objectToReturn;
 }
 
@@ -167,6 +170,7 @@ static NSString* kCrateKey[16] = {
 
 - (void) setObject:(id)obj forNestedKey:(id)firstKey,...
 {
+	[cachedObjectsLock lock];
 		if(!cachedObjects)cachedObjects = [[NSMutableDictionary dictionary] retain];
     va_list myArgs;
 
@@ -208,16 +212,20 @@ static NSString* kCrateKey[16] = {
 	else [cachedObjects setObject: obj forKey:firstKey];
 	
     va_end(myArgs);
-	
+	[cachedObjectsLock unlock];
 }
 
 - (BOOL) cacheSetUp
 {
-	return cachedObjects!=nil;
+	[cachedObjectsLock lock];
+	BOOL result =  (cachedObjects!=nil);
+	[cachedObjectsLock unlock];
+	return result;
 }
 
 - (void) cacheCardLevelObject:(id)aKey fromHeader:(NSDictionary*)aHeader
 {
+	[cachedObjectsLock lock];
 	if(!cachedObjects)cachedObjects = [[NSMutableDictionary dictionary] retain];
 	
 	//set up the crate cache
@@ -251,6 +259,7 @@ static NSString* kCrateKey[16] = {
 			if(objectToCache)[cachedCardDictionary setObject:objectToCache  forKey:aKey];
 		}
 	}
+	[cachedObjectsLock unlock];
 }
 
 @end
