@@ -400,7 +400,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 
 - (void) mailSent:(NSString*)address
 {
-	NSLog(@"ORCA Range Timer report was sent to:\n%@",address);
+	NSLog(@"ORCA Range Timer report was sent to:\n%@\n",address);
 }
 
 @end
