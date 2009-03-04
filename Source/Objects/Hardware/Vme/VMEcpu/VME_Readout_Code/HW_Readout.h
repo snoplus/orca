@@ -31,6 +31,7 @@ void ReleaseHardware(void);
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply);
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
 
+int32_t Readout_DataGen(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_CAEN419(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Shaper(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);
 int32_t Readout_Gretina(SBC_crate_config* config,int32_t index, SBC_LAM_Data* lamData);

@@ -1222,7 +1222,7 @@ static struct {
     
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"LED Threshold"];
-    [p setFormat:@"##0" upperLimit:0x1ffff lowerLimit:0 stepSize:1 units:@""];
+    [p setFormat:@"##0" upperLimit:0x7fff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setLEDThreshold:withValue:) getMethod:@selector(ledThreshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];

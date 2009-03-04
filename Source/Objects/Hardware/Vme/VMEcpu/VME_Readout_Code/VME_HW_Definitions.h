@@ -30,5 +30,6 @@
 #define kFec	   8 
 #define kSIS3300   9 
 #define kCaen419   10
+#define kDataGen   11 //a test data generator
 
 #endif

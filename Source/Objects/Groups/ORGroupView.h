@@ -66,7 +66,6 @@
 - (void) moveSelectedObjectsRight:(NSEvent*)event;
 - (void) moveSelectedObjects:(NSPoint)delta;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
-- (BOOL) validateLayoutItems:(NSMenuItem*)menuItem;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) copy:(id)sender;
@@ -75,6 +74,13 @@
 - (IBAction) delete:(id)sender;
 - (IBAction) arrangeInCircle:(id)sender;
 - (IBAction) alignLeft:(id)sender;
+- (IBAction) alignRight:(id)sender;
+- (IBAction) alignBottom:(id)sender;
+- (IBAction) alignTop:(id)sender;
+- (IBAction) alignVerticalCenters:(id)sender;
+- (IBAction) alignHorizontalCenters:(id)sender;
+- (IBAction) sendToBack:(id)sender;
+- (IBAction) bringToFront:(id)sender;
 
 #pragma mark ¥¥¥Drag and Drop
 - (NSPoint) suggestPasteLocationFor:(id)anObject;

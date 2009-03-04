@@ -45,6 +45,8 @@
 - (void) addObjects:(NSArray*)someObjects;
 - (void) removeObjects:(NSArray*)someObjects;
 - (void) objectCountChanged;
+- (void) bringSelectedObjectsToFront;
+- (void) sendSelectedObjectsToBack;
 
 #pragma mark ¥¥¥Group Methods
 - (BOOL)    changesAllowed;

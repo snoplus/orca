@@ -73,50 +73,15 @@
                      selector : @selector(numberTriggersChanged:)
                          name : ORL4532ModelNumberTriggersChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(delayEnableMaskChanged:)
-                         name : ORL4532ModelDelayEnableMaskChanged
-						object: model];
-	
+		
     [notifyCenter addObserver : self
                      selector : @selector(triggerNamesChanged:)
                          name : ORL4532ModelTriggerNamesChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(delaysChanged:)
-                         name : ORL4532ModelDelaysChanged
-						object: model];
-	
+		
 }
 
 #pragma mark ¥¥¥Interface Management
-- (void) delaysChanged:(NSNotification*)aNote
-{
-	short i;
-	for(i=0;i<16;i++){
-		[[delays0_15 cellWithTag:i] setIntValue:[model delay:i]];
-	}
-	for(i=16;i<32;i++){
-		[[delays16_31 cellWithTag:(i-16)] setIntValue:[model delay:i]];
-	}
-}
-
-- (void) delayEnableMaskChanged:(NSNotification*)aNote
-{
-	short i;
-	unsigned long theMask = [model delayEnableMask];
-	for(i=0;i<16;i++){
-		BOOL bitSet = (theMask&(1L<<i))>0;
-		[[delayEnableMask0_15 cellWithTag:i] setState:bitSet];
-	}
-	for(i=16;i<32;i++){
-		BOOL bitSet = (theMask&(1L<<i))>0;
-		[[delayEnableMask16_31 cellWithTag:(i-16)] setState:bitSet];
-	}
-	[self checkDelaysInUseMessage];	
-}
 
 - (void) triggerNamesChanged:(NSNotification*)aNote
 {
@@ -133,18 +98,6 @@
 {
 	[numberTriggersTextField setIntValue: [model numberTriggers]];
 	[self enableMatrices];
-	[self checkDelaysInUseMessage];
-}
-
-- (void) checkDelaysInUseMessage
-{
-	int i;
-	unsigned long inUseMask = 0L;
-	for(i=0 ; i<[model numberTriggers] ; i++){
-		inUseMask |= (1L<<i);
-	}
-	if([model delayEnableMask] & inUseMask) [delayWarningField setStringValue:@"Delays Enabled"];
-	else									[delayWarningField setStringValue:@"No Delays Enabled"];
 }
 
 - (void) enableMatrices
@@ -153,13 +106,9 @@
 	int i;
 	for(i=0;i<16;i++){
 		[[triggerNames0_15 cellWithTag:i] setEnabled:i<n];
-		[[delayEnableMask0_15 cellWithTag:i] setEnabled:i<n];
-		[[delays0_15 cellWithTag:i] setEnabled:i<n];
 	}
 	for(i=16;i<32;i++){
 		[[triggerNames16_31 cellWithTag:i-16] setEnabled:i<n];
-		[[delayEnableMask16_31 cellWithTag:i-16] setEnabled:i<n];
-		[[delays16_31 cellWithTag:i-16] setEnabled:i<n];
 	}	
 }
 
@@ -176,9 +125,7 @@
     [self slotChanged:nil];
 	[self includeTimingChanged:nil];
 	[self numberTriggersChanged:nil];
-	[self delayEnableMaskChanged:nil];
 	[self triggerNamesChanged:nil];
-	[self delaysChanged:nil];
     [self settingsLockChanged:nil];
 }
 
@@ -209,10 +156,6 @@
 	
 	[triggerNames0_15 setEnabled:!lockedOrRunningMaintenance];
 	[triggerNames16_31 setEnabled:!lockedOrRunningMaintenance];
-	[delayEnableMask0_15 setEnabled:!lockedOrRunningMaintenance];
-	[delayEnableMask16_31 setEnabled:!lockedOrRunningMaintenance];
-	[delays0_15 setEnabled:!lockedOrRunningMaintenance];
-	[delays16_31 setEnabled:!lockedOrRunningMaintenance];
 	
 	[[triggerNames0_15 cellWithTag:13] setEnabled:NO];
 	
@@ -239,22 +182,6 @@
 	if(sender == triggerNames0_15)offset = 0;
 	else offset = 16;
 	[model setTrigger:[[sender selectedCell] tag]+offset withName:[sender stringValue]];	
-}
-
-- (void) delayEnableMaskAction:(id)sender
-{
-	int offset;
-	if(sender == delayEnableMask0_15)offset = 0;
-	else offset = 16;
-	[model setDelayEnabledMaskBit:[[sender selectedCell] tag]+offset withValue:[sender intValue]];
-}
-
-- (void) delaysAction:(id)sender
-{
-	int offset;
-	if(sender == delays0_15)offset = 0;
-	else offset = 16;
-	[model setDelay:[[sender selectedCell] tag]+offset withValue:[sender intValue]];
 }
 
 - (void) numberTriggersAction:(id)sender

@@ -295,6 +295,25 @@ static NSString *ORGroupObjects 			= @"ORGroupObjects";
     }
 }
 
+- (void) bringSelectedObjectsToFront
+{
+	NSEnumerator* e = [[self selectedObjects] reverseObjectEnumerator];
+	OrcaObject* anObject;
+	while(anObject = [e nextObject]){
+		[orcaObjects moveObject:anObject toIndex:[orcaObjects count]];
+	}
+}
+
+- (void) sendSelectedObjectsToBack
+{
+	NSEnumerator* e = [[self selectedObjects] objectEnumerator];
+	OrcaObject* anObject;
+	while(anObject = [e nextObject]){
+		[orcaObjects moveObject:anObject toIndex:0];
+	}
+	
+}
+
 - (void) removeSelectedObjects
 {
     [self removeObjects:[self selectedObjects]];

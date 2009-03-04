@@ -23,6 +23,8 @@
 #import "ORDataGenModel.h"
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
+#import "SBC_Config.h"
+#import "VME_HW_Definitions.h"
 
 @implementation ORDataGenModel
 
@@ -162,6 +164,17 @@
 - (void)reset  {}
 
 
+- (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index
+{
+	configStruct->total_cards++;
+	configStruct->card_info[index].hw_type_id = kDataGen; 
+	configStruct->card_info[index].hw_mask[0] = dataId1D; 
+	configStruct->card_info[index].hw_mask[1] = dataId2D; 
+	configStruct->card_info[index].hw_mask[2] = dataIdWaveform; 
+	configStruct->card_info[index].num_Trigger_Indexes = 0;	
+	configStruct->card_info[index].next_Card_Index 	= index+1;	
+	return index+1;
+}
 
 
 #pragma mark ¥¥¥Bit Processing Protocol
@@ -194,6 +207,11 @@
 - (void) setProcessOutput:(int)channel value:(int)value
 {
     //nothing to do
+}
+
+- (NSString*) identifier
+{
+    return [NSString stringWithFormat:@"Test Data %d",[self uniqueIdNumber]];
 }
 
 - (NSString*) processingTitle

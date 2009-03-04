@@ -469,23 +469,17 @@
 	else if ([menuItem action] == @selector(selectAll:)){
 		return changesAllowed;
 	}
-    
-    return [self validateLayoutItems:menuItem] || [[NSApp delegate] validateMenuItem:menuItem];
-}
-
-- (BOOL) validateLayoutItems:(NSMenuItem*)menuItem
-{
-    int selectedCount = [[group selectedObjects] count];
-    BOOL changesAllowed = [group changesAllowed];
-    if ([menuItem action] == @selector(arrangeInCircle:)) {
-        if(!changesAllowed)return NO;
-        else return selectedCount>0;
-    }
-    else if ([menuItem action] == @selector(alignLeft:)) {
-        if(!changesAllowed)return NO;
-        else return selectedCount>0;
-    }
-	return NO;
+	
+    else if ([menuItem action] == @selector(arrangeInCircle:))	return changesAllowed & (selectedCount>0);
+    else if ([menuItem action] == @selector(alignLeft:))		return changesAllowed & (selectedCount>0);
+    else if ([menuItem action] == @selector(alignRight:))		return changesAllowed & (selectedCount>0);
+    else if ([menuItem action] == @selector(alignVerticalCenters:))		return changesAllowed & (selectedCount>0);
+    else if ([menuItem action] == @selector(alignHorizontalCenters:))	return changesAllowed & (selectedCount>0);
+    else if ([menuItem action] == @selector(alignTop:))			return changesAllowed & (selectedCount>0);
+    else if ([menuItem action] == @selector(bringToFront:))		return changesAllowed & (selectedCount>0);
+    else if ([menuItem action] == @selector(sendToBack:))		return changesAllowed & (selectedCount>0);
+    else if ([menuItem action] == @selector(alignBottom:))		return changesAllowed & (selectedCount>0);
+	else return  [[NSApp delegate] validateMenuItem:menuItem];
 }
 
 - (void) clearSelections:(BOOL)shiftKeyDown
@@ -506,6 +500,29 @@
 
 
 #pragma mark ¥¥¥Actions
+
+- (IBAction) alignBottom:(id)sender
+{
+	NSArray* items = [group selectedObjects];
+	NSEnumerator* e = [items objectEnumerator];
+	id obj = [e nextObject];
+	float y = [obj frame].origin.y;
+	while(obj = [e nextObject]){
+		[obj moveTo:NSMakePoint([obj frame].origin.x,y)];
+	}
+}
+
+- (IBAction) alignTop:(id)sender
+{
+	NSArray* items = [group selectedObjects];
+	NSEnumerator* e = [items objectEnumerator];
+	id obj = [e nextObject];
+	float y = [obj frame].origin.y + [obj frame].size.height;
+	while(obj = [e nextObject]){
+		[obj moveTo:NSMakePoint([obj frame].origin.x,y - [obj frame].size.height)];
+	}	
+}
+
 - (IBAction) alignLeft:(id)sender
 {
 	NSArray* items = [group selectedObjects];
@@ -515,7 +532,39 @@
 	while(obj = [e nextObject]){
 		[obj moveTo:NSMakePoint(x,[obj frame].origin.y)];
 	}
+}
 
+- (IBAction) alignRight:(id)sender
+{
+	NSArray* items = [group selectedObjects];
+	NSEnumerator* e = [items objectEnumerator];
+	id obj = [e nextObject];
+	float x = [obj frame].origin.x + [obj frame].size.width;
+	while(obj = [e nextObject]){
+		[obj moveTo:NSMakePoint(x - [obj frame].size.width,[obj frame].origin.y)];
+	}	
+}
+
+- (IBAction) alignVerticalCenters:(id)sender
+{
+	NSArray* items = [group selectedObjects];
+	NSEnumerator* e = [items objectEnumerator];
+	id obj = [e nextObject];
+	float xc = [obj frame].origin.x + [obj frame].size.width/2.;
+	while(obj = [e nextObject]){
+		[obj moveTo:NSMakePoint(xc - [obj frame].size.width/2.,[obj frame].origin.y)];
+	}	
+}
+
+- (IBAction) alignHorizontalCenters:(id)sender
+{
+	NSArray* items = [group selectedObjects];
+	NSEnumerator* e = [items objectEnumerator];
+	id obj = [e nextObject];
+	float yc = [obj frame].origin.y + [obj frame].size.height/2.;
+	while(obj = [e nextObject]){
+		[obj moveTo:NSMakePoint([obj frame].origin.x,yc - [obj frame].size.height/2.)];
+	}	
 }
 
 - (IBAction) arrangeInCircle:(id)sender
@@ -551,9 +600,19 @@
 		[obj moveTo:NSMakePoint(newX,newY)];
 		a += deltaAngle;
 	}
-
 }
 
+- (IBAction) sendToBack:(id)sender
+{
+    [group sendSelectedObjectsToBack];
+    [self setNeedsDisplay:YES];
+}
+
+- (IBAction) bringToFront:(id)sender
+{
+    [group bringSelectedObjectsToFront];
+    [self setNeedsDisplay:YES];
+}
 
 - (IBAction)copy:(id)sender
 {

@@ -42,8 +42,6 @@
 		unsigned long   triggerMask;
 		int				numberTriggers;
 		
-		NSMutableArray*	delays;
-		unsigned long	delayEnableMask;
 		NSMutableArray*	triggerNames;
 		union {
 			NSTimeInterval asTimeInterval;
@@ -59,14 +57,7 @@
 - (NSArray*) triggerNames;
 - (void) setTriggerNames:(NSMutableArray*)aTriggerNames;
 - (NSString*) triggerName:(int)index;
-- (unsigned long) delayEnableMask;
-- (void) setDelayEnableMask:(unsigned long)anEnableMask;
-- (NSArray*) delays;
-- (void) setDelays:(NSMutableArray*)aDelays;
 - (void) setTrigger:(int)index withName:(NSString*)aName;	
-- (void) setDelayEnabledMaskBit:(int)index withValue:(BOOL)aValue;
-- (void) setDelay:(int)index withValue:(int)aValue;	
-- (int) delay:(int)index;
 
 
 - (int) numberTriggers;
@@ -110,12 +101,10 @@
 @end
 
 extern NSString* ORL4532ModelTriggerNamesChanged;
-extern NSString* ORL4532ModelDelayEnableMaskChanged;
 extern NSString* ORL4532ModelNumberTriggersChanged;
 extern NSString* ORL4532ModelIncludeTimingChanged;
 extern NSString* ORL4532ModelInputRegisterChanged;
 extern NSString* ORL4532SettingsLock;
-extern NSString* ORL4532ModelDelaysChanged;
 
 @interface NSObject (setCAMACMode)
 - (void)setCheckLAM:(BOOL)aState;
