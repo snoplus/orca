@@ -33,6 +33,8 @@ NSString* ORL4532ModelNumberTriggersChanged   = @"ORL4532ModelNumberTriggersChan
 NSString* ORL4532ModelIncludeTimingChanged    = @"ORL4532ModelIncludeTimingChanged";
 NSString* ORL4532ModelInputRegisterChanged	  = @"ORL4532ModelInputRegisterChanged";
 NSString* ORL4532SettingsLock				  = @"ORL4532SettingsLock";
+NSString* ORL4532ModelDelaysChanged			  = @"ORL4532ModelDelaysChanged";
+NSString* ORL4532ModelDelayEnableMaskChanged  = @"ORL4532ModelDelayEnableMaskChanged";
 NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged";
 
 @implementation ORL4532Model
@@ -53,6 +55,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 - (void) dealloc
 {
     [triggerNames release];
+    [delays release];
 	int i;
 	for(i=0;i<32;i++){
 		[triggerGroup[i] release];
@@ -92,6 +95,38 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 	return [triggerNames objectAtIndex:index];
 }
 
+- (unsigned long) delayEnableMask
+{
+    return delayEnableMask;
+}
+
+- (void) setDelayEnableMask:(unsigned long)anEnableMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDelayEnableMask:delayEnableMask];
+	
+    delayEnableMask = anEnableMask;
+	
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORL4532ModelDelayEnableMaskChanged
+	 object:self];    
+}
+
+- (NSArray*) delays
+{
+    return delays;
+}
+
+- (void) setDelays:(NSMutableArray*)aDelays
+{
+    [aDelays retain];
+    [delays release];
+    delays = aDelays;
+}
+
+- (int) delay:(int)index
+{
+	return [[delays objectAtIndex:index] intValue];
+}
 
 - (void) setTrigger:(int)index withName:(NSString*)aName
 {
@@ -102,6 +137,23 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
     [triggerGroup[index] setIdentifier:aName];
 	
 }
+
+- (void) setDelayEnabledMaskBit:(int)bit withValue:(BOOL)aValue
+{
+	unsigned long aMask = delayEnableMask;
+	if(aValue)aMask |= (1L<<bit);
+	else aMask &= ~(1L<<bit);
+	[self setDelayEnableMask:aMask];
+}	
+
+- (void) setDelay:(int)index withValue:(int)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDelay:index withValue:[[delays objectAtIndex:index] intValue]];
+	[delays replaceObjectAtIndex:index withObject:[NSNumber numberWithInt:aValue]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORL4532ModelDelaysChanged object:self];
+}
+
+
 
 - (int) numberTriggers
 {
@@ -207,11 +259,19 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 	
     [[self undoManager] disableUndoRegistration];
     [self setTriggerNames:[decoder decodeObjectForKey:@"ORL4532ModelTriggerNames"]];
+    [self setDelayEnableMask:[decoder decodeInt32ForKey:@"ORL4532ModelDelayEnableMask"]];
+    [self setDelays:[decoder decodeObjectForKey:@"ORL4532ModelDelays"]];
     [self setNumberTriggers:[decoder decodeIntForKey:@"ORL4532ModelNumberTriggers"]];
     [self setIncludeTiming:[decoder decodeBoolForKey:@"ORL4532ModelIncludeTiming"]];
 	int i;
 	for(i=0;i<32;i++){
 		[self setTrigger:i group:[decoder decodeObjectForKey:[NSString stringWithFormat:@"Trigger %d",i]]];
+	}
+	if(!delays){
+		[self setDelays:[NSMutableArray array]];
+		for(i=0;i<32;i++){
+			[delays addObject:[NSNumber numberWithInt:0]];
+		}
 	}
 	
 	if(!triggerNames){
@@ -231,12 +291,23 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 {
     [super encodeWithCoder:encoder];	
     [encoder encodeObject:triggerNames forKey:@"ORL4532ModelTriggerNames"];
+    [encoder encodeInt32:delayEnableMask forKey:@"ORL4532ModelDelayEnableMask"];
+    [encoder encodeObject:delays forKey:@"ORL4532ModelDelays"];
     [encoder encodeInt:numberTriggers forKey:@"ORL4532ModelNumberTriggers"];
     [encoder encodeBool:includeTiming forKey:@"ORL4532ModelIncludeTiming"];
 	int i;
 	for(i=0;i<32;i++){
 		[encoder encodeObject:triggerGroup[i] forKey:[NSString stringWithFormat:@"Trigger %d",i]];
 	}
+}
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
+    [objDictionary setObject:delays forKey:@"delays"];
+    [objDictionary setObject:[NSNumber numberWithInt:delayEnableMask] forKey:@"delayEnableMask"];
+    
+	return objDictionary;
 }
 
 
@@ -343,7 +414,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 	int i;
 	for(i=0;i<numberTriggers;i++){
 		triggerMask |= (1<<i);
-	    dataTakers[i] = [[triggerGroup[i] allObjects] retain];	//cache the data takers.
+	    dataTakers[i] = [[triggerGroup[i] allObjects] retain];	//cache of data takers.
 		NSEnumerator* e = [dataTakers[i] objectEnumerator];
 		id obj;
 		while(obj = [e nextObject]){
@@ -354,13 +425,30 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		}
 	}
 	[self readInputPatternClearMemoryAndLAM];
+	loop1count=0;
+	loop2count=0;
+	t = [[ORTimer alloc] init];
+	
 }
+
+//**************************************************************************************
+// Function:	TakeData
+// Description: Read data from a card
+//**************************************************************************************
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	
     @try {
+		[t start];
+		loop1TimeTotal+=[t microseconds];
+		loop1count++;
+		//test if data ready to be read out
+		
 		if(isQbitSet([[self adapter] camacShortNAF:[self stationNumber] a:0 f:8])){
+			loop2TimeTotal+=[t microseconds];
+			loop2count++;
+			//data is ready to be readout
 			unsigned long inputMask = [self readInputPattern];
 			if(inputMask & triggerMask){
 				eventCounter++;
@@ -377,7 +465,8 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 				}
 				
 				[aDataPacket addLongsToFrameBuffer:triggerRecord length:triggerRecordLength];
-
+				
+				
 				//read out the children for each input bit that's set
 				int i;
 				for(i=0;i<numberTriggers;i++){
@@ -387,6 +476,9 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 						channelRecord[1] = unChangingDataPart;
 						channelRecord[2] = inputMask & (0x1L<<i);
 						[aDataPacket addLongsToFrameBuffer:channelRecord length:3];
+						if(delayEnableMask & (1L<<i)){
+							[ORTimer delay:[[delays objectAtIndex:i] intValue]*1E-6];
+						}
 						
 						NSEnumerator* e = [dataTakers[i] objectEnumerator];
 						id obj;
@@ -399,15 +491,21 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 			//clear memory and LAM
 			[[self adapter] camacShortNAF:[self stationNumber] a:0 f:9];
 		}
+		[t stop];
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];
 		[localException raise];
 	}
+	
 }
+
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	NSLog(@"Total: %d time in takedata: %f   time/loop: %f\n",loop1count,loop1TimeTotal,loop1TimeTotal/(float)loop1count);
+	NSLog(@"Total: %d time in event readout: %f time/event: %f\n",loop2count,loop2TimeTotal,loop2TimeTotal/(float)loop2count);
+	
 	int i;
 	for(i=0;i<numberTriggers;i++){
 		NSEnumerator* e = [dataTakers[i] objectEnumerator];
@@ -417,6 +515,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		}
 		[dataTakers[i] release];
 	}
+	
 }
 
 @end

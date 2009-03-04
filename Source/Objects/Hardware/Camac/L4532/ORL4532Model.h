@@ -20,7 +20,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
- 
+
 #pragma mark ¥¥¥Imported Files
 #import "ORCamacIOCard.h"
 #import "ORDataTaker.h"
@@ -29,35 +29,49 @@
 @class ORReadOutList;
 
 @interface ORL4532Model : ORCamacIOCard <ORDataTaker> {	
-	@private
-        unsigned long   triggerId;
-		unsigned long   channelTriggerId;
-		unsigned long   eventCounter;
-		ORReadOutList*  triggerGroup[32];
-		BOOL			includeTiming;
-		
-		NSArray*		dataTakers[32];       //cache of data takers.
-        unsigned long 	unChangingDataPart;
-        unsigned short  cachedStation;
-		unsigned long   triggerMask;
-		int				numberTriggers;
-		
-		NSMutableArray*	triggerNames;
-		union {
-			NSTimeInterval asTimeInterval;
-			unsigned long asLongs[2];
-		}theTimeRef;
-		
+@private
+	unsigned long   triggerId;
+	unsigned long   channelTriggerId;
+	unsigned long   eventCounter;
+	ORReadOutList*  triggerGroup[32];
+	BOOL			includeTiming;
+	
+	NSArray*		dataTakers[32];       //cache of data takers.
+	unsigned long 	unChangingDataPart;
+	unsigned short  cachedStation;
+	unsigned long   triggerMask;
+	int				numberTriggers;
+	
+	NSMutableArray*	delays;
+	unsigned long	delayEnableMask;
+	NSMutableArray*	triggerNames;
+	union {
+		NSTimeInterval asTimeInterval;
+		unsigned long asLongs[2];
+	}theTimeRef;
+	
+	ORTimer* t;
+	double loop1TimeTotal;
+	double loop2TimeTotal;
+	long loop1count;
+	long loop2count;
 }
 
 #pragma mark ¥¥¥Initialization
 - (void) dealloc;
-        
+
 #pragma mark ¥¥¥Accessors
 - (NSArray*) triggerNames;
 - (void) setTriggerNames:(NSMutableArray*)aTriggerNames;
 - (NSString*) triggerName:(int)index;
+- (unsigned long) delayEnableMask;
+- (void) setDelayEnableMask:(unsigned long)anEnableMask;
+- (NSArray*) delays;
+- (void) setDelays:(NSMutableArray*)aDelays;
 - (void) setTrigger:(int)index withName:(NSString*)aName;	
+- (void) setDelayEnabledMaskBit:(int)index withValue:(BOOL)aValue;
+- (void) setDelay:(int)index withValue:(int)aValue;	
+- (int) delay:(int)index;
 
 
 - (int) numberTriggers;
@@ -101,10 +115,12 @@
 @end
 
 extern NSString* ORL4532ModelTriggerNamesChanged;
+extern NSString* ORL4532ModelDelayEnableMaskChanged;
 extern NSString* ORL4532ModelNumberTriggersChanged;
 extern NSString* ORL4532ModelIncludeTimingChanged;
 extern NSString* ORL4532ModelInputRegisterChanged;
 extern NSString* ORL4532SettingsLock;
+extern NSString* ORL4532ModelDelaysChanged;
 
 @interface NSObject (setCAMACMode)
 - (void)setCheckLAM:(BOOL)aState;

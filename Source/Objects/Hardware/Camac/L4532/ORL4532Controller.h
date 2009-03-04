@@ -25,25 +25,32 @@
 #import "ORL4532Model.h"
 
 @interface ORL4532Controller : OrcaObjectController {
-	@private
-		IBOutlet NSButton*		includeTimingButton;
-		
-		IBOutlet NSMatrix*		triggerNames0_15;
-		IBOutlet NSMatrix*		triggerNames16_31;
-					
-		IBOutlet NSTextField*	numberTriggersTextField;
-		IBOutlet NSButton*		readInputsButton;
-		
-		IBOutlet NSButton*		testLAMButton;
-		IBOutlet NSButton*		testLAMClearButton;
-		IBOutlet NSButton*		readInputsClearButton;
-		IBOutlet NSButton*		clearMemLAMButton;
-		
-        IBOutlet NSTextField*   settingLockDocField;
-		IBOutlet NSButton*		statusButton;
-        IBOutlet NSButton*		settingLockButton;
-		IBOutlet NSButton*      showHideButton;
- };
+@private
+	IBOutlet NSButton*		includeTimingButton;
+	
+	IBOutlet NSMatrix*		triggerNames0_15;
+	IBOutlet NSMatrix*		triggerNames16_31;
+	
+	IBOutlet NSMatrix*		delayEnableMask0_15;
+	IBOutlet NSMatrix*		delayEnableMask16_31;
+	
+	IBOutlet NSMatrix*		delays0_15;
+	IBOutlet NSMatrix*		delays16_31;
+	
+	IBOutlet NSTextField*	numberTriggersTextField;
+	IBOutlet NSButton*		readInputsButton;
+	
+	IBOutlet NSButton*		testLAMButton;
+	IBOutlet NSButton*		testLAMClearButton;
+	IBOutlet NSButton*		readInputsClearButton;
+	IBOutlet NSButton*		clearMemLAMButton;
+	
+	IBOutlet NSTextField*   settingLockDocField;
+	IBOutlet NSButton*		statusButton;
+	IBOutlet NSButton*		settingLockButton;
+	IBOutlet NSButton*      showHideButton;
+	IBOutlet NSTextField*   delayWarningField;
+};
 
 -(id)init;
 
@@ -51,8 +58,10 @@
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) enableMatrices;
+- (void) checkDelaysInUseMessage;
 
 #pragma mark ¥¥¥Interface Management
+- (void) delayEnableMaskChanged:(NSNotification*)aNote;
 - (void) numberTriggersChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNotification;
 - (void) includeTimingChanged:(NSNotification*)aNote;
@@ -62,6 +71,8 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) showHideAction:(id)sender;
 - (IBAction) triggerNamesAction:(id)sender;
+- (IBAction) delayEnableMaskAction:(id)sender;
+- (IBAction) delaysAction:(id)sender;
 - (IBAction) numberTriggersAction:(id)sender;
 - (IBAction) testLAM:(id)sender;
 - (IBAction) testClearLAM:(id)sender;
