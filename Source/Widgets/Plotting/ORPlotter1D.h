@@ -84,7 +84,7 @@
 	 returnCode:(int)code
 	contextInfo:(void *)contextInfo;
 
-- (IBAction)copy:(id)sender;
+- (IBAction) copy:(id)sender;
 - (IBAction) clearActiveGate:(id)sender;
 - (IBAction) clearActiveCurveGates:(id)sender;
 - (IBAction) clearAllGates:(id)sender;
@@ -98,6 +98,7 @@
 - (IBAction) removeGateAction:(id)sender;
 - (IBAction) differentiateAction:(id)sender;
 - (IBAction) averageWindowAction:(id)sender;
+- (IBAction) refresh:(id)sender;
 
 - (id)	initWithCoder:(NSCoder *)coder;
 - (void) encodeWithCoder:(NSCoder *)coder;

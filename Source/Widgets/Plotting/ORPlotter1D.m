@@ -656,10 +656,10 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     double mmax = maxY+0.2*rngY;
     mmax = mmax>250?mmax:250;
     double mmin = 0;
-    if(minY<0)mmin = -250 - 0.2*rngY;
+    if(minY<0)mmin = -250 - rngY;
     
-    [mYScale setRngLimitsLow:MIN(mmin,0) withHigh:5E9 withMinRng:25];
-    [mYScale setRngLow:MIN(mmin,0) withHigh:maxY+0.2*rngY];
+    [mYScale setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:250];
+    [mYScale setRngLow:MIN(mmin,0) withHigh:maxY+rngY];
     [mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:100];
     [mXScale setRngLow:0 withHigh:maxX];
     [self setNeedsDisplay:YES];
@@ -747,6 +747,10 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     [mXScale rangingDonePostChange];
 }
 
+- (IBAction) refresh:(id)sender;
+{
+	[self setNeedsDisplay:YES];
+}
 
 - (IBAction) autoScale:(id)sender
 {
@@ -803,14 +807,18 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     
     /* set the scale to 20% beyond extremes */
     double mmax = maxY+0.2*rngY;
-    //double mmin = minY - 0.2*rngY;
+    double mmin = minY - rngY;
     //mmax = mmax>250?mmax:250;
-   // double mmin = 0;
-   // if(minY<0)mmin = -250 - 0.2*rngY;
+    //double mmin = 0;
+    if(minY<0)mmin = -250 - rngY;
     
-    [mYScale setRngLimitsLow:-5E6 withHigh:5E9 withMinRng:minYRange];
-    [mYScale setRngLow:MAX(0,minY) withHigh:mmax];
-    //[mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:100];
+    //[mYScale setRngLimitsLow:-5E6 withHigh:5E9 withMinRng:minYRange];
+    //[mYScale setRngLow:MAX(0,minY) withHigh:mmax];
+
+	[mYScale setRngLimitsLow:MIN(mmin,0) withHigh:5E9 withMinRng:25];
+    [mYScale setRngLow:MIN(mmin,0) withHigh:maxY+0.2*rngY];
+
+	//[mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:100];
     //[mXScale setRngLow:0 withHigh:maxX];
     [self setNeedsDisplay:YES];
     [mYScale setNeedsDisplay:YES];

@@ -426,10 +426,10 @@ enum {
     }
     
     /* convert to integer if integer scale */
-    if ([self integer]) {
-        *low = roundToLong(*low);
-        *high = roundToLong(*high);
-    }
+   // if ([self integer]) {
+   //     *low = roundToLong(*low);
+   //     *high = roundToLong(*high);
+  //  }
     v1 = *low;
     v2 = *high;
     
@@ -1312,7 +1312,7 @@ enum {
                 /* (we do this here instead of letting CheckRng() do it	*/
                 /* because we want to keep the pin point at the same	*/
                 /* location after we adjust the scale range)			*/
-                if (newMax-newMin < [self minimumRange]) {
+                if (fabs(newMax-newMin) < [self minimumRange]) {
                     
                     if (newMax >= newMin) {
                         
