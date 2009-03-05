@@ -27,6 +27,7 @@
 #import "ORDataPacket.h"
 #import "ORCamacControllerCard.h"
 #import "ORCamacCrateModel.h"
+#import "ORDataTaskModel.h"
 
 NSString* ORAD413AOnlineMaskChangedNotification		= @"ORAD413AOnlineMaskChangedNotification";
 NSString* ORAD413ASettingsLock						= @"ORAD413ASettingsLock";
@@ -399,6 +400,9 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	[self writeDiscriminators];
     [self clearLAM];
 	
+	NSArray* objs = [[self document] collectObjectsOfClass:[ORDataTaskModel class]];
+	if([objs count]) theDataTaker = [objs objectAtIndex:0];
+	else theDataTaker = nil;
 	
 	if(zeroSuppressionMode && randomAccessMode){
 		NSLogColor([NSColor redColor],@"OR413 (%d,%d) Parameter conflict -- both zero suppression and random access modes selected.\n");
@@ -418,6 +422,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 		if(checkLAM) lamIsSet = isQbitSet([controller camacShortNAF:cachedStation a:0 f:8]); //test the lam
 		else lamIsSet = YES;
 		if((lamEnable && lamIsSet) || !lamEnable){
+			[theDataTaker setGrabTime:YES];
 			if(randomAccessMode)		[self readChannels:aDataPacket];
 			else {
 				if(zeroSuppressionMode)	[self readZeroSuppressedChannels:aDataPacket];

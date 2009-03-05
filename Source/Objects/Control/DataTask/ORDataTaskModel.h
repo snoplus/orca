@@ -68,7 +68,7 @@
     NSLock*			 timerLock;
     BOOL            doGateProcessing;
     ORGateGroup*    cachedGateGroup; 
-	
+	BOOL			grabTime;
 	//hints
 	unsigned long queAddCount;
 	unsigned long lastqueAddCount;
@@ -102,6 +102,7 @@
 - (void) queueRecordForShipping:(NSNotification*)aNote;
 - (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) doCycleRate;
+- (void) setGrabTime:(int)aState;
 
 #pragma mark ¥¥¥Save/Restore
 - (void) saveReadOutListTo:(NSString*)fileName;

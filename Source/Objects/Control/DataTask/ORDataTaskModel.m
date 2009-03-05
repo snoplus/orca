@@ -231,6 +231,11 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     memset(dataTimeHist,0,kTimeHistoSize*sizeof(unsigned long));
 }
 
+- (void) setGrabTime:(int)aState
+{
+	grabTime = aState;
+}
+
 - (void) setEnableTimer:(int)aState
 {
 	[timerLock lock];	//start critical section
@@ -391,7 +396,22 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     
     int i=0;
 	while(i<cachedNumberDataTakers){
+		if(enableTimer){
+			[dataTimer reset];
+		}
+		
         [cachedDataTakers[i] takeData:aDataPacket userInfo:userInfo];
+		
+		if(enableTimer && grabTime){
+			[timerLock lock];	//start critical section
+			long delta = [dataTimer microseconds];
+			if(timeScaler==0)timeScaler=1;
+			if((delta/timeScaler) < kTimeHistoSize)dataTimeHist[(int)delta/timeScaler]++;
+			else dataTimeHist[kTimeHistoSize-1]++;
+			[timerLock unlock];	//end critical section
+			grabTime = NO;
+		}
+		
 		++i;
     }
     
