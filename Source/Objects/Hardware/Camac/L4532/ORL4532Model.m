@@ -425,9 +425,6 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		}
 	}
 	[self readInputPatternClearMemoryAndLAM];
-	loop1count=0;
-	loop2count=0;
-	t = [[ORTimer alloc] init];
 	
 }
 
@@ -440,16 +437,18 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 {
 	
     @try {
-		[t start];
-		loop1TimeTotal+=[t microseconds];
-		loop1count++;
 		//test if data ready to be read out
 		
-		if(isQbitSet([[self adapter] camacShortNAF:[self stationNumber] a:0 f:8])){
-			loop2TimeTotal+=[t microseconds];
-			loop2count++;
+		if(isQbitSet([controller camacShortNAF:cachedStation a:0 f:8])){
+
 			//data is ready to be readout
-			unsigned long inputMask = [self readInputPattern];
+			unsigned short bits1_16 = 0;
+			unsigned short bits17_32 = 0;
+			[controller camacShortNAF:cachedStation a:0 f:0 data:&bits1_16];
+			if(numberTriggers>16)[controller camacShortNAF:cachedStation a:1 f:0 data:&bits17_32];
+			unsigned long bits17_32L = bits17_32;
+			unsigned long inputMask =  (bits17_32L<<16) | bits1_16;
+			
 			if(inputMask & triggerMask){
 				eventCounter++;
 				//grab the event time as reference from Jan 1, 2004.
@@ -489,9 +488,8 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 				}
 			}
 			//clear memory and LAM
-			[[self adapter] camacShortNAF:[self stationNumber] a:0 f:9];
+			[controller camacShortNAF:cachedStation a:0 f:9];
 		}
-		[t stop];
 	}
 	@catch(NSException* localException) {
 		[self incExceptionCount];
@@ -503,9 +501,6 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	NSLog(@"Total: %d time in takedata: %f   time/loop: %f\n",loop1count,loop1TimeTotal,loop1TimeTotal/(float)loop1count);
-	NSLog(@"Total: %d time in event readout: %f time/event: %f\n",loop2count,loop2TimeTotal,loop2TimeTotal/(float)loop2count);
-	
 	int i;
 	for(i=0;i<numberTriggers;i++){
 		NSEnumerator* e = [dataTakers[i] objectEnumerator];

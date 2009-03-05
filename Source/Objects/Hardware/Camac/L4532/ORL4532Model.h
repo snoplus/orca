@@ -50,11 +50,6 @@
 		unsigned long asLongs[2];
 	}theTimeRef;
 	
-	ORTimer* t;
-	double loop1TimeTotal;
-	double loop2TimeTotal;
-	long loop1count;
-	long loop2count;
 }
 
 #pragma mark ¥¥¥Initialization
