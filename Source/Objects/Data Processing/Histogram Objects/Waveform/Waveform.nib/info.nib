@@ -1,35 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>IBDocumentLocation</key>
-	<string>270 124 424 403 0 0 1920 1178 </string>
-	<key>IBEditorPositions</key>
-	<dict>
-		<key>268</key>
-		<string>851 696 217 215 0 0 1920 1178 </string>
-	</dict>
 	<key>IBFramework Version</key>
-	<string>446.1</string>
-	<key>IBGroupedObjects</key>
-	<dict>
-		<key>7</key>
-		<array>
-			<string>399</string>
-			<string>398</string>
-			<string>396</string>
-			<string>397</string>
-			<string>390</string>
-		</array>
-	</dict>
-	<key>IBLastGroupID</key>
-	<string>10</string>
+	<string>677</string>
+	<key>IBLastKnownRelativeProjectPath</key>
+	<string>../../../../../Orca.xcodeproj</string>
+	<key>IBOldestOS</key>
+	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>21</integer>
 		<integer>268</integer>
+		<integer>370</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>8P2137</string>
+	<string>9G55</string>
+	<key>targetFramework</key>
+	<string>IBCocoaFramework</string>
 </dict>
 </plist>
