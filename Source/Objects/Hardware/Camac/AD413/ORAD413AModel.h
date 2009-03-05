@@ -26,7 +26,7 @@
 #import "ORDataTaker.h"
 
 @class ORDataPacket;
-@class ORDataTaskModel;
+
 enum {
     kEnableGate1Bit     = 0,
     kEnableGate2Bit     = 1,
@@ -65,7 +65,6 @@ enum {
 		unsigned long 	unChangingDataPart;
 		unsigned short cachedStation;
 		BOOL oldZeroSuppressionMode;
-		ORDataTaskModel* theDataTaker;
 }
 
 #pragma mark ¥¥¥Initialization
