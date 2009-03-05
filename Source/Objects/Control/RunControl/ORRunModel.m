@@ -1209,20 +1209,20 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	NSAutoreleasePool *outerpool = [[NSAutoreleasePool allocWithZone:nil] init];
 	NSLog(@"DataTaking Thread Started\n");
-	[NSThread setThreadPriority:1];
-	size_t len;
-	int ret, bus_speed, mib[2] = { CTL_HW, HW_BUS_FREQ };
-	len = sizeof( bus_speed);
-	ret = sysctl (mib, 2, &bus_speed, &len, NULL, 0);	
-	struct thread_time_constraint_policy ttcpolicy;
-    ttcpolicy.period		=	0;		//period HZ/160
-    ttcpolicy.computation	=	bus_speed/3300;	//computation HZ/3300;
-    ttcpolicy.constraint	=	bus_speed/2;	//constraint HZ/2200;
-    ttcpolicy.preemptible	=	1;
-	NSLog(@"set_realtime = %d\n",ttcpolicy.period);
+	[NSThread setThreadPriority:.9];
+//	size_t len;
+//	int ret, bus_speed, mib[2] = { CTL_HW, HW_BUS_FREQ };
+//	len = sizeof( bus_speed);
+//	ret = sysctl (mib, 2, &bus_speed, &len, NULL, 0);	
+//	struct thread_time_constraint_policy ttcpolicy;
+//    ttcpolicy.period		=	0;		//period HZ/160
+//    ttcpolicy.computation	=	bus_speed/3300;	//computation HZ/3300;
+//    ttcpolicy.constraint	=	bus_speed/2;	//constraint HZ/2200;
+//    ttcpolicy.preemptible	=	1;
+//	NSLog(@"set_realtime = %d\n",ttcpolicy.period);
 	
-	struct thread_extended_policy texpolicy;
-    texpolicy.timeshare		=	0;		//period HZ/160
+//	struct thread_extended_policy texpolicy;
+//    texpolicy.timeshare		=	0;		//period HZ/160
 	
 //	if ((ret=thread_policy_set(mach_thread_self(),
 //							   THREAD_EXTENDED_POLICY, (thread_policy_t)&texpolicy,
@@ -1248,12 +1248,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [self clearExceptionCount];
     while(!timeToStopTakingData) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
-		if ((ret=thread_policy_set(mach_thread_self(),
-								   THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&ttcpolicy,
-								   THREAD_TIME_CONSTRAINT_POLICY_COUNT)) != KERN_SUCCESS) {
+//		if ((ret=thread_policy_set(mach_thread_self(),
+//								   THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&ttcpolicy,
+//								   THREAD_TIME_CONSTRAINT_POLICY_COUNT)) != KERN_SUCCESS) {
 			//NSLog(@"set_realtime() failed.\n");
 			//return;
-		}	
+//		}	
         @try {
 			if(!runPaused){
 				[client takeData:dataPacket userInfo:nil];
