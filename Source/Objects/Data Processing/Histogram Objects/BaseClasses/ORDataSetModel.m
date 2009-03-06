@@ -23,6 +23,7 @@
 #import "ORScale.h"
 #import "ORGate.h"
 
+NSString* ORDataSetModelPausedChanged = @"ORDataSetModelPausedChanged";
 NSString* ORDataSetModelRefreshModeChanged = @"ORDataSetModelRefreshModeChanged";
 NSString* ORDataSetModelRemoved            = @"ORDataSetModelRemoved";
 NSString* ORDataSetDataChanged             = @"ORDataSetDataChanged";
@@ -54,6 +55,21 @@ NSString* ORDataSetDataChanged             = @"ORDataSetDataChanged";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (BOOL) paused
+{
+    return paused;
+}
+
+- (void) setPaused:(BOOL)aPaused
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPaused:paused];
+    
+    paused = aPaused;
+	scheduledForUpdate = NO;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetModelPausedChanged object:self];
+}
 
 - (int) refreshMode
 {
@@ -185,16 +201,17 @@ NSString* ORDataSetDataChanged             = @"ORDataSetDataChanged";
 - (void) incrementTotalCounts
 {
 	++totalCounts;
-	if(!scheduledForUpdate){
-		scheduledForUpdate = YES;
-		[self performSelectorOnMainThread:@selector(scheduleUpdateOnMainThread) withObject:nil waitUntilDone:NO];
+	if(!paused){
+		if(!scheduledForUpdate){
+			scheduledForUpdate = YES;
+			[self performSelectorOnMainThread:@selector(scheduleUpdateOnMainThread) withObject:nil waitUntilDone:NO];
+		}
 	}
 }
 
 - (void) postUpdateOnMainThread
 {
 	[self performSelectorOnMainThread:@selector(postUpdate) withObject:nil waitUntilDone:NO];
-    
 }
 
 - (void) scheduleUpdateOnMainThread

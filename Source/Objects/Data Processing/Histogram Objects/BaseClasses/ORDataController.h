@@ -29,9 +29,11 @@
     IBOutlet NSButton*		hideShowButton;
     IBOutlet NSView*        containingView;
     IBOutlet NSTextField*   positionField;
+    IBOutlet NSTextField*   pausedField;
     IBOutlet NSTableView*   rawDataTable;
     IBOutlet NSTabView*		rawDataTabView;
     IBOutlet NSPopUpButton*	refreshModePU;
+	IBOutlet NSButton*		pauseButton;
 }
 
 
@@ -50,6 +52,7 @@
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) serviceResponse:(NSNotification*)aNote;
 - (void) refreshModeChanged:(NSNotification*)aNote;
+- (void) pausedChanged:(NSNotification*)aNote;
 
 - (IBAction) printDocument:(id)sender;
 
@@ -61,6 +64,7 @@
 - (IBAction) autoScale:(NSToolbarItem*)item;
 - (IBAction) hideShowControls:(id)sender;
 - (IBAction) refreshModeAction:(id)sender;
+- (IBAction) pauseAction:(id)sender;
 - (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 @end

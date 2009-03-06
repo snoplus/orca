@@ -121,6 +121,11 @@
 						 name : ORDataSetModelRefreshModeChanged
 					   object : model];
 	
+    [notifyCenter addObserver : self
+					 selector : @selector(pausedChanged:)
+						 name : ORDataSetModelPausedChanged
+					   object : model];
+	
 }
 
 - (void) updateWindow
@@ -128,6 +133,7 @@
 	[super updateWindow];
     [self dataSetChanged:nil];
     [self refreshModeChanged:nil];
+    [self pausedChanged:nil];
     [self miscAttributesChanged:nil];
 }
 
@@ -184,6 +190,12 @@
 - (void) refreshModeChanged:(NSNotification*)aNotification
 {
 	[refreshModePU selectItemAtIndex:[model refreshMode]];
+}
+
+- (void) pausedChanged:(NSNotification*)aNotification
+{
+	[pausedField setStringValue:[model paused]?@"Paused":@""];
+	[pauseButton setTitle:[model paused]?@"Update":@"Pause"];
 }
 
 - (void) dataSetRemoved:(NSNotification*)aNote
@@ -275,6 +287,11 @@
 - (IBAction) refreshModeAction:(id)sender 
 {
 	[model setRefreshMode:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) pauseAction:(id)sender 
+{
+	[model setPaused:[sender intValue]];
 }
 
 - (IBAction)clear:(NSToolbarItem*)item 

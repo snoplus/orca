@@ -181,6 +181,8 @@
 				<string>id</string>
 				<key>logLin</key>
 				<string>NSToolbarItem</string>
+				<key>pauseAction</key>
+				<string>id</string>
 				<key>printDocument</key>
 				<string>id</string>
 				<key>refreshModeAction</key>
@@ -200,6 +202,10 @@
 				<string>NSView</string>
 				<key>hideShowButton</key>
 				<string>NSButton</string>
+				<key>pauseButton</key>
+				<string>NSButton</string>
+				<key>pausedField</key>
+				<string>NSTextField</string>
 				<key>plotter</key>
 				<string>id</string>
 				<key>plotterGroupView</key>
