@@ -179,6 +179,8 @@
 				<string>NSToolbarItem</string>
 				<key>printDocument</key>
 				<string>id</string>
+				<key>refreshModeAction</key>
+				<string>id</string>
 				<key>toggleRaw</key>
 				<string>NSToolbarItem</string>
 			</dict>
@@ -204,6 +206,8 @@
 				<string>NSTabView</string>
 				<key>rawDataTable</key>
 				<string>NSTableView</string>
+				<key>refreshModePU</key>
+				<string>NSPopUpButton</string>
 				<key>titleField</key>
 				<string>NSTextField</string>
 			</dict>

@@ -23,8 +23,9 @@
 #import "ORScale.h"
 #import "ORGate.h"
 
-NSString* ORDataSetModelRemoved                     = @"ORDataSetModelRemoved";
-NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
+NSString* ORDataSetModelRefreshModeChanged = @"ORDataSetModelRefreshModeChanged";
+NSString* ORDataSetModelRemoved            = @"ORDataSetModelRemoved";
+NSString* ORDataSetDataChanged             = @"ORDataSetDataChanged";
 
 @implementation ORDataSetModel
 - (id) init
@@ -53,6 +54,19 @@ NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (int) refreshMode
+{
+    return refreshMode;
+}
+
+- (void) setRefreshMode:(int)aRefreshMode
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRefreshMode:refreshMode];
+    refreshMode = aRefreshMode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetModelRefreshModeChanged object:self];
+}
+
 - (id) calibration
 {
 	return calibration;
@@ -186,8 +200,19 @@ NSString* ORDataSetDataChanged                      = @"ORDataSetDataChanged";
 - (void) scheduleUpdateOnMainThread
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(postUpdate) object:nil];;
-	[self performSelector:@selector(postUpdate) withObject:nil afterDelay:1.0];
+	[self performSelector:@selector(postUpdate) withObject:nil afterDelay:[self refreshRate]];
 	scheduledForUpdate = YES;
+}
+
+- (float) refreshRate
+{
+	switch(refreshMode){
+		case 0: return 1.0;
+		case 1: return 0.5;
+		case 2: return 0.2;
+		case 3: return 0.0;
+		default: return 1.0;
+	}
 }
 
 - (void) postUpdate
@@ -246,6 +271,7 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
 	dataSetLock = [[NSLock alloc] init];
+    [self setRefreshMode:[decoder decodeIntForKey:@"refreshMode"]];
     [self setKey:[decoder decodeObjectForKey:ORDataSetModelKey]];
     [self setFullName:[decoder decodeObjectForKey:ORDataSetModelFullName]];
 	[self setCalibration:[decoder decodeObjectForKey:@"calibration"]];
@@ -261,6 +287,7 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:refreshMode forKey:@"refreshMode"];
     [encoder encodeObject:key forKey:ORDataSetModelKey];
     [encoder encodeObject:fullName forKey:ORDataSetModelFullName];
     [encoder encodeObject:calibration forKey:@"calibration"];

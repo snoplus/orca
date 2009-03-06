@@ -31,6 +31,7 @@
     IBOutlet NSTextField*   positionField;
     IBOutlet NSTableView*   rawDataTable;
     IBOutlet NSTabView*		rawDataTabView;
+    IBOutlet NSPopUpButton*	refreshModePU;
 }
 
 
@@ -42,12 +43,13 @@
 - (void) dataSetRemoved:(NSNotification*)aNote;
 - (void) updateWindow;
 
-- (void) dataSetChanged:(NSNotification*)aNotification;
-- (void)drawerDidOpen:(NSNotification *)aNotification;
-- (void)drawerDidClose:(NSNotification *)aNotification;
-- (void) scaleAction:(NSNotification*)aNotification;
+- (void) dataSetChanged:(NSNotification*)aNote;
+- (void) drawerDidOpen:(NSNotification*)aNote;
+- (void) drawerDidClose:(NSNotification*)aNote;
+- (void) scaleAction:(NSNotification*)aNote;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) serviceResponse:(NSNotification*)aNote;
+- (void) refreshModeChanged:(NSNotification*)aNote;
 
 - (IBAction) printDocument:(id)sender;
 
@@ -56,8 +58,9 @@
 - (IBAction) clearROI:(NSToolbarItem*)item;
 - (IBAction) clear:(NSToolbarItem*)item;
 - (IBAction) doAnalysis:(NSToolbarItem*)item;
-- (IBAction)autoScale:(NSToolbarItem*)item;
+- (IBAction) autoScale:(NSToolbarItem*)item;
 - (IBAction) hideShowControls:(id)sender;
+- (IBAction) refreshModeAction:(id)sender;
 - (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 
 @end

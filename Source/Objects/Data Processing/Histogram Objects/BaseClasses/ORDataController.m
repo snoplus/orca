@@ -116,12 +116,18 @@
 						 name : ORCARootServiceReponseNotification
 					   object : plotter];
 
+    [notifyCenter addObserver : self
+					 selector : @selector(refreshModeChanged:)
+						 name : ORDataSetModelRefreshModeChanged
+					   object : model];
+	
 }
 
 - (void) updateWindow
 {
 	[super updateWindow];
     [self dataSetChanged:nil];
+    [self refreshModeChanged:nil];
     [self miscAttributesChanged:nil];
 }
 
@@ -173,6 +179,11 @@
         [[plotter xScale] setNeedsDisplay:YES];
 		[rawDataTable reloadData];
     }
+}
+
+- (void) refreshModeChanged:(NSNotification*)aNotification
+{
+	[refreshModePU selectItemAtIndex:[model refreshMode]];
 }
 
 - (void) dataSetRemoved:(NSNotification*)aNote
@@ -246,20 +257,24 @@
 	return [model plotter:aPlotter dataSet:set];
 }
 
-- (IBAction)logLin:(NSToolbarItem*)item 
+- (IBAction) logLin:(NSToolbarItem*)item 
 {
 	[[plotter yScale] setLog:![[plotter yScale] isLog]];
 }
 
-- (IBAction)autoScale:(NSToolbarItem*)item 
+- (IBAction) autoScale:(NSToolbarItem*)item 
 {
 	[plotter autoScale:nil];
 }
 
-
-- (IBAction)clearROI:(NSToolbarItem*)item 
+- (IBAction) clearROI:(NSToolbarItem*)item 
 {
 	[plotter clearActiveGate:self];
+}
+
+- (IBAction) refreshModeAction:(id)sender 
+{
+	[model setRefreshMode:[sender indexOfSelectedItem]];
 }
 
 - (IBAction)clear:(NSToolbarItem*)item 

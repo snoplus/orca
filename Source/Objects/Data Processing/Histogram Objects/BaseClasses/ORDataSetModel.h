@@ -29,9 +29,12 @@
 	NSLock*				dataSetLock;
 	id					dataSet;
 	id					calibration;
+    int refreshMode;
 }
 
 #pragma mark ¥¥¥Accessors
+- (int) refreshMode;
+- (void) setRefreshMode:(int)aRefreshMode;
 - (void) setDataSet:(id)aDataSet;
 - (id) dataSet;
 
@@ -57,6 +60,10 @@
 - (void) processResponse:(NSDictionary*)aResponse;
 - (NSString*) runNumberString;
 - (NSString*) fullNameWithRunNumber;
+- (float) refreshRate;
+
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ¥¥¥Data Source Methods
 - (unsigned)  numberOfChildren;
@@ -65,6 +72,7 @@
 
 @end
 
+
 @interface NSObject (ORDatasSetModel_Cat)
 - (void)  clear;
 - (void)  runTaskStopped;
@@ -72,6 +80,7 @@
 @end
 
 
+extern NSString* ORDataSetModelRefreshModeChanged;
 extern NSString* ORDataSetModelRemoved;
 extern NSString* ORDataSetDataChanged;
 
