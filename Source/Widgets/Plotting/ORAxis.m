@@ -463,21 +463,22 @@ enum {
         
         if (dv < [self minimumRange]) {
             if (dv < 0) {
+				return NO;
                 v1 = [self minLimit];
                 v2 = [self maxLimit];
                 dv = v2 - v1;
-            } 
+			} 
             else {
                 /* expand scale, keeping the same center */
                 //cen = (v1 + v2) / 2;
                 //v1 = cen - [self minimumRange]/2;
                 v2 = v1  + [self minimumRange];
                 dv = [self minimumRange];
-                if ([self integer]) {
-                    v1 = roundToLong(v1);
-                    v2 = roundToLong(v2);
-                }
-            }
+               // if ([self integer]) {
+                //    v1 = roundToLong(v1);
+               //     v2 = roundToLong(v2);
+               // }
+			}
         }
     }
     
@@ -519,7 +520,7 @@ enum {
         /* make sure we haven't put v2 over the top */
         if (v2 > [self maxLimit]) v2 = [self maxLimit];
     }
-    
+	
     /* update range limits and return */
     if (v1!=*low || v2!=*high) {
         *low = v1;
@@ -1312,7 +1313,7 @@ enum {
                 /* (we do this here instead of letting CheckRng() do it	*/
                 /* because we want to keep the pin point at the same	*/
                 /* location after we adjust the scale range)			*/
-                if (fabs(newMax-newMin) < [self minimumRange]) {
+                if (newMax-newMin < [self minimumRange]) {
                     
                     if (newMax >= newMin) {
                         
@@ -1322,9 +1323,10 @@ enum {
                         
                     }
                     else {
-                        newMin = [self minLimit];
-                        newMax = [self maxLimit];
-                        [self adjustToPinLow:&newMin withHigh:&newMax];
+						return YES;
+                        //newMin = [self minLimit];
+                       // newMax = [self maxLimit];
+                        //[self adjustToPinLow:&newMin withHigh:&newMax];
                     }
                 }
                 
@@ -1414,7 +1416,8 @@ enum {
     }
     
     /* are we within kPixelTolerancePinCursor pixels of the pin point itself? */
-    diff = pix - roundToLong(pinPix);
+    //diff = pix - roundToLong(pinPix);
+    diff = pix - pinPix;
     
     if ([self allowShifts]) {
         if (diff > kPixelTolerancePinCursor) return 1;

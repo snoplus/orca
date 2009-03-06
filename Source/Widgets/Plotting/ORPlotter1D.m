@@ -653,13 +653,12 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     if(maxX < minX || (maxX-minX) < 1)return;
     
     /* set the scale to 20% beyond extremes */
-    double mmax = maxY+0.2*rngY;
-    mmax = mmax>250?mmax:250;
+    double mmax = maxY+0.2*rngY/2.;
     double mmin = 0;
-    if(minY<0)mmin = -250 - rngY;
-    
-    [mYScale setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:250];
-    [mYScale setRngLow:MIN(mmin,0) withHigh:maxY+rngY];
+    if(minY<0)mmin = minY - 0.2*rngY/2.;
+	
+    [mYScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:25];
+    [mYScale setRngLow:MIN(mmin,0) withHigh:mmax];
     [mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:100];
     [mXScale setRngLow:0 withHigh:maxX];
     [self setNeedsDisplay:YES];
@@ -668,7 +667,6 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     
     [mYScale rangingDonePostChange];
     [mXScale rangingDonePostChange];
-    
 }
 
 //**************************************************************************************
@@ -751,14 +749,12 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 {
 	[self setNeedsDisplay:YES];
 }
-
 - (IBAction) autoScale:(id)sender
 {
     int         i, minX, maxX;
     double      t, minY, maxY;
     double	    rngY = 0;
-    double		minYRange = [mYScale minimumRange];
-    /* determine the maximum value of the data */
+	
     minX = [mXScale minValue];
     maxX = MIN([mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex],[mXScale maxValue]);
 	BOOL differentiate		= [self differentiate];
@@ -806,27 +802,15 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     if(maxX < minX || (maxX-minX) < 1)return;
     
     /* set the scale to 20% beyond extremes */
-    double mmax = maxY+0.2*rngY;
-    double mmin = minY - rngY;
-    //mmax = mmax>250?mmax:250;
-    //double mmin = 0;
-    if(minY<0)mmin = -250 - rngY;
+    double mmax = maxY+0.2*rngY/2.;
+    double mmin = 0;
+    if(minY<0)mmin = minY - 0.2*rngY/2.;
     
-    //[mYScale setRngLimitsLow:-5E6 withHigh:5E9 withMinRng:minYRange];
-    //[mYScale setRngLow:MAX(0,minY) withHigh:mmax];
-
-	[mYScale setRngLimitsLow:MIN(mmin,0) withHigh:5E9 withMinRng:25];
-    [mYScale setRngLow:MIN(mmin,0) withHigh:maxY+0.2*rngY];
-
-	//[mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:100];
-    //[mXScale setRngLow:0 withHigh:maxX];
+    [mYScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:25];
+    [mYScale setRngLow:MIN(mmin,0) withHigh:mmax];
     [self setNeedsDisplay:YES];
     [mYScale setNeedsDisplay:YES];
-   // [mXScale setNeedsDisplay:YES];
-    
     [mYScale rangingDonePostChange];
-   // [mXScale rangingDonePostChange];
-    
 }
 
 
