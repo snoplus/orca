@@ -20,19 +20,22 @@
 
 
 @interface ORDataSetModel : OrcaObject {
-    NSString*			key;
-    NSString*			fullName;
-    NSString*			shortName;
-    unsigned long       totalCounts;
+    NSString*		key;
+    NSString*		fullName;
+    NSString*		shortName;
+    unsigned long   totalCounts;
     
-    BOOL				scheduledForUpdate;
-	NSLock*				dataSetLock;
-	id					dataSet;
-	id					calibration;
-    int refreshMode;
+    BOOL			scheduledForUpdate;
+	NSLock*			dataSetLock;
+	id				dataSet;
+	id				calibration;
+    int				refreshMode;
+    BOOL			paused;
 }
 
 #pragma mark ¥¥¥Accessors
+- (BOOL) paused;
+- (void) setPaused:(BOOL)aPaused;
 - (int) refreshMode;
 - (void) setRefreshMode:(int)aRefreshMode;
 - (void) setDataSet:(id)aDataSet;
@@ -80,6 +83,7 @@
 @end
 
 
+extern NSString* ORDataSetModelPausedChanged;
 extern NSString* ORDataSetModelRefreshModeChanged;
 extern NSString* ORDataSetModelRemoved;
 extern NSString* ORDataSetDataChanged;

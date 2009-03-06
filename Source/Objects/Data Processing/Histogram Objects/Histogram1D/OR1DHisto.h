@@ -32,6 +32,7 @@
     unsigned long 	overFlow;
     unsigned int 	numberBins;
     unsigned long* 	histogram;
+    unsigned long* 	pausedHistogram;
 	BOOL			rebin;
 	unsigned int	rebinNumber;
 }

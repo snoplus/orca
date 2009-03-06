@@ -23,10 +23,10 @@
 #import "ORScale.h"
 #import "ORGate.h"
 
-NSString* ORDataSetModelPausedChanged = @"ORDataSetModelPausedChanged";
-NSString* ORDataSetModelRefreshModeChanged = @"ORDataSetModelRefreshModeChanged";
-NSString* ORDataSetModelRemoved            = @"ORDataSetModelRemoved";
-NSString* ORDataSetDataChanged             = @"ORDataSetDataChanged";
+NSString* ORDataSetModelPausedChanged		= @"ORDataSetModelPausedChanged";
+NSString* ORDataSetModelRefreshModeChanged	= @"ORDataSetModelRefreshModeChanged";
+NSString* ORDataSetModelRemoved				= @"ORDataSetModelRemoved";
+NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 
 @implementation ORDataSetModel
 - (id) init
@@ -67,7 +67,6 @@ NSString* ORDataSetDataChanged             = @"ORDataSetDataChanged";
     
     paused = aPaused;
 	scheduledForUpdate = NO;
-	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataSetModelPausedChanged object:self];
 }
 

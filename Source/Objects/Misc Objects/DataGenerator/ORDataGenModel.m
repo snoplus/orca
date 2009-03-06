@@ -131,8 +131,8 @@
         data[2] = (aValue & 0x0fff);
         [aDataPacket addLongsToFrameBuffer:data length:3];
     }
-	if(first){
-		first = NO;
+	if(random()%500 > 495 ){
+		 
 		unsigned long data[2048];
         data[0] = dataIdWaveform | 2048+2;
         data[1] = 0; //card 0, chan 0
@@ -140,8 +140,10 @@
 		int i;
 		float radians = 0;
 		float delta = 2*3.141592/360.;
+		 short a = random()%20;
+		 short b = random()%20;
 		for(i=0;i<2048;i++){
-			data[i] = (long)(10*sinf(radians) + 20*sinf(2*radians));
+			data[i] = (long)(a*sinf(radians) + b*sinf(2*radians));
 			radians += delta;
 		}
         [aDataPacket addLongsToFrameBuffer:data length:2048];
@@ -152,7 +154,7 @@
 		radians = 0;
 		delta = 2*3.141592/360.;
 		for(i=0;i<2048;i++){
-			data[i] = (long)(2*sinf(4*radians));
+			data[i] = (long)(a*sinf(4*radians));
 			radians += delta;
 		}
         [aDataPacket addLongsToFrameBuffer:data length:2048];

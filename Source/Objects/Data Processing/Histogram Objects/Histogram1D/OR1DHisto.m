@@ -45,11 +45,30 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
 {
     if(histogram)free(histogram);
     histogram = nil;
+    if(pausedHistogram)free(pausedHistogram);
+    pausedHistogram = nil;
     [super dealloc];
 }
 
 
 #pragma mark ¥¥¥Accessors
+
+- (void) setPaused:(BOOL)aPaused
+{
+	[super setPaused:aPaused];
+	[dataSetLock lock];
+	if([self paused]){
+		if(pausedHistogram) {
+			free(pausedHistogram);
+			pausedHistogram = 0;
+		}
+		pausedHistogram = malloc(numberBins*sizeof(unsigned long));
+		if(pausedHistogram) memcpy(pausedHistogram,histogram,numberBins*sizeof(unsigned long));
+	}
+	[dataSetLock unlock];
+	
+}
+
 - (unsigned long) dataId
 {
     return dataId;
@@ -118,11 +137,16 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
 
 -(unsigned long)value:(unsigned short)aChan
 {
+	
     unsigned long theValue;
 	[dataSetLock lock];
 	
+	unsigned long* histogramPtr;
+	if([self paused])histogramPtr = pausedHistogram;
+	else histogramPtr = histogram;
+	
 	if(!rebin || rebinNumber == 0){
-		if(aChan<numberBins)theValue = histogram[aChan];
+		if(aChan<numberBins)theValue = histogramPtr[aChan];
 		else theValue = 0;
 	}
 	else {
@@ -130,7 +154,7 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
 		theValue =0;
 		int start = aChan*rebinNumber;
 		for(i=0;i<rebinNumber;i++){
-			theValue += histogram[start+i];
+			theValue += histogramPtr[start+i];
 		}
 	}
 	

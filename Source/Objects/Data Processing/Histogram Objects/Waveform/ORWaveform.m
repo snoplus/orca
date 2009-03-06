@@ -196,7 +196,7 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 - (void) incrementTotalCounts
 {
 	[super incrementTotalCounts];
-	if(integrate){
+	if(integrate && ![self paused]){
 		if(!integratedWaveform){
 			integratedWaveform = [[OR1DHisto alloc] init];
 			[integratedWaveform setNumberBins:65536];
@@ -257,10 +257,13 @@ NSString* ORWaveformUseUnsignedChanged   = @"ORWaveformUseUnsignedChanged";
 - (void) setWaveform:(NSData*)aWaveform
 {
 	[dataLock lock];
-    [aWaveform retain];
-    [waveform release];
-    waveform = aWaveform;
-    
+	
+	if(![self paused]){
+		[aWaveform retain];
+		[waveform release];
+		waveform = aWaveform;
+    }
+	
     if(aWaveform)[self incrementTotalCounts];
 	[dataLock unlock];
 
