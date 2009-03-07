@@ -1005,7 +1005,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[dataTypeAssigner release];
 	dataTypeAssigner = nil;
 	
-	if(_forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
+	if(_forceRestart ||(/*[self timedRun] &&*/ [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;
 		[self restartRun];
