@@ -92,6 +92,8 @@
 				<string>id</string>
 				<key>saveConfigurationAction</key>
 				<string>id</string>
+				<key>sizeLimitReachedAction</key>
+				<string>id</string>
 				<key>stopSendingAction</key>
 				<string>id</string>
 				<key>useDatedFileNamesAction</key>
@@ -139,6 +141,10 @@
 				<string>NSTextField</string>
 				<key>saveConfigurationCB</key>
 				<string>NSButton</string>
+				<key>sizeLimitActionMatrix</key>
+				<string>NSMatrix</string>
+				<key>sizeLimitReachedField</key>
+				<string>NSTextField</string>
 				<key>sizeTextField</key>
 				<string>NSTextField</string>
 				<key>statusTextField</key>
