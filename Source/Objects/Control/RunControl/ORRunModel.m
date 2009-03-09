@@ -401,10 +401,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (NSString*) endOfRunState
 {
 	if([self isRunning]){
-		if(timedRun && repeatRun){
-			return @"Until Repeating";
+		if(timedRun){
+			if(repeatRun){
+				return @"Until Repeating";
+			}
+			else return @"Until Stopping";
 		}
-		else return @"Until Stopping";
+		else return @"";
 
 	}
 	else return @"";
