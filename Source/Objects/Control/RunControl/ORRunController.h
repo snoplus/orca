@@ -46,6 +46,7 @@
     IBOutlet NSTextField* statusField;
     IBOutlet NSTextField* timeStartedField;
     IBOutlet NSTextField* elapsedTimeField;
+    IBOutlet NSTextField* endOfRunStateField;
     IBOutlet NSTextField* timeToGoField;
     IBOutlet NSTextField* vetoCountField;
     IBOutlet NSTextField* vetoedTextField;

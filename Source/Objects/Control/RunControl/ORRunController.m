@@ -415,6 +415,7 @@
 - (void) repeatRunChanged:(NSNotification*)aNotification
 {
 	[self updateTwoStateCheckbox:repeatRunCB setting:[model repeatRun]];
+	[endOfRunStateField setStringValue:[model endOfRunState]];
 }
 
 
@@ -432,12 +433,14 @@
 {
 
 	[elapsedTimeField setStringValue:[model elapsedTimeString]];
+	[endOfRunStateField setStringValue:[model endOfRunState]];
 	
 	if([model timedRun]){
 		double timeLimit = [model timeLimit];
 		double elapsedTime = [model elapsedTime];
 		[runBar setDoubleValue:100*elapsedTime/timeLimit];
 	}
+	
 }
 
 - (void) startTimeChanged:(NSNotification*)aNotification

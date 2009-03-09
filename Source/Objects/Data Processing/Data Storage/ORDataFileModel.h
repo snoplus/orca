@@ -27,6 +27,9 @@
 @class ORQueue;
 @class ORSmartFolder;
 
+#define kStopOnLimit	0
+#define kRestartOnLimit 1
+
 @interface ORDataFileModel :  ORDataChainObject
 {
     @private
@@ -55,6 +58,7 @@
 		NSString*		filePrefix;
 		BOOL			useFolderStructure;
 		BOOL			useDatedFileNames;
+		int				sizeLimitReachedAction;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -76,7 +80,8 @@
 - (void)setStatusFolder:(ORSmartFolder *)aStatusFolder;
 - (ORSmartFolder *)configFolder;
 - (void)setConfigFolder:(ORSmartFolder *)aConfigFolder;
-
+- (int)sizeLimitReachedAction;
+- (void) setSizeLimitReachedAction:(int)aValue;
 - (void) setFileName:(NSString*)aFileName;
 - (NSString*)fileName;
 - (NSFileHandle *)filePointer;
@@ -121,4 +126,5 @@ extern NSString* ORDataFileStatusChangedNotification;
 extern NSString* ORDataFileSizeChangedNotification;
 extern NSString* ORDataFileLock;
 extern NSString* ORDataSaveConfigurationChangedNotification;
+extern NSString* ORDataFileModelSizeLimitReachedActionChanged;
 

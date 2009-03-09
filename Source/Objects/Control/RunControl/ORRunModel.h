@@ -185,10 +185,13 @@
 - (void) gotForceRunStopNotification:(NSNotification*)aNotification;
 - (void) gotRequestedRunStopNotification:(NSNotification*)aNotification;
 - (void) gotRequestedRunHaltNotification:(NSNotification*)aNotification;
+- (void) gotRequestedRunRestartNotification:(NSNotification*)aNotification;
 - (void) requestedRunHalt:(id)userInfo;
 - (void) requestedRunStop:(id)userInfo;
+- (void) requestedRunRestart:(id)userInfo;
 - (BOOL) readRunTypeNames;
 - (NSString*) shortStatus;
+- (NSString*) endOfRunState;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;

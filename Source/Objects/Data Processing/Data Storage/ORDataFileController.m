@@ -96,6 +96,11 @@ enum {
 	[self lockChanged:nil];	
 }
 
+- (IBAction) sizeLimitReachedAction:(id)sender
+{
+	[model setSizeLimitReachedAction:[[sender selectedCell] tag]];
+}
+
 - (IBAction) lockButtonAction:(id)sender
 {
     [gSecurity tryToSetLock:ORDataFileLock to:[sender intValue] forWindow:[self window]];
@@ -176,7 +181,6 @@ enum {
 						 name : ORDataFileChangedNotification
 						object: model];
 
-	
     [notifyCenter addObserver : self
 					 selector : @selector(fileStatusChanged:)
 						 name : ORDataFileStatusChangedNotification
@@ -258,6 +262,12 @@ enum {
                          name : ORDataFileModelUseDatedFileNamesChanged
 						object: model];
 
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sizeLimitReachedActionChanged:)
+                         name : ORDataFileModelSizeLimitReachedActionChanged
+						object: model];
+	
 }
 
 - (void) updateWindow
@@ -276,6 +286,7 @@ enum {
 	[self filePrefixChanged:nil];
 	[self useFolderStructureChanged:nil];
 	[self useDatedFileNamesChanged:nil];
+	[self sizeLimitReachedActionChanged:nil];
 }
 
 
@@ -310,8 +321,14 @@ enum {
     [saveConfigurationCB setEnabled: !locked];
 	[maxFileSizeTextField setEnabled: !(locked || isRunning) && [model limitSize]];
 	[limitSizeCB setEnabled: !(locked || isRunning)];
+	[sizeLimitActionMatrix setEnabled: !(locked || isRunning) && [model limitSize]];
 	[filePrefixTextField setEnabled:!(locked || isRunning)];
 	[useFolderStructureCB setEnabled:!(locked || isRunning)];
+}
+
+- (void) sizeLimitReachedActionChanged:(NSNotification*)note
+{
+	[sizeLimitActionMatrix selectCellWithTag:[model sizeLimitReachedAction]];
 }
 
 - (void) fileChanged:(NSNotification*)note

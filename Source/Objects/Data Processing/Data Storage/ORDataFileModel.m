@@ -36,6 +36,8 @@ NSString* ORDataFileChangedNotification             = @"The DataFile File Has Ch
 NSString* ORDataFileStatusChangedNotification 		= @"The DataFile Status Has Changed";
 NSString* ORDataFileSizeChangedNotification 		= @"The DataFile Size Has Changed";
 NSString* ORDataSaveConfigurationChangedNotification    = @"ORDataSaveConfigurationChangedNotification";
+NSString* ORDataFileModelSizeLimitReachedActionChanged	= @"ORDataFileModelSizeLimitReachedActionChanged";
+
 NSString* ORDataFileLock							= @"ORDataFileLock";
 
 #pragma mark ¥¥¥Definitions
@@ -270,6 +272,20 @@ static const int currentVersion = 1;           // Current version
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelLimitSizeChanged object:self];
 }
 
+- (int)sizeLimitReachedAction
+{
+    return sizeLimitReachedAction;
+}
+
+- (void) setSizeLimitReachedAction:(int)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSizeLimitReachedAction:sizeLimitReachedAction];
+    
+    sizeLimitReachedAction = aValue;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelSizeLimitReachedActionChanged object:self];
+}
+
 
 - (ORSmartFolder *)dataFolder 
 {
@@ -397,11 +413,20 @@ static const int currentVersion = 1;           // Current version
 		if(fileLimitExceeded){
 			NSString* reason = [NSString stringWithFormat:@"File size exceeded %.1f MB",maxFileSize];
 			
-			[[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORRequestRunStop
-			 object:self
-			 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
-			fileLimitExceeded = NO;
+			if(sizeLimitReachedAction == kStopOnLimit){
+				[[NSNotificationCenter defaultCenter]
+				 postNotificationName:ORRequestRunStop
+				 object:self
+				 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+				
+			}
+			else {
+				[[NSNotificationCenter defaultCenter] 
+				 postNotificationName:ORRequestRunRestart
+				 object:self
+				 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
+			}
+				fileLimitExceeded = NO;
 		}
     }
 }
@@ -619,6 +644,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     [self setUseDatedFileNames:	[decoder decodeBoolForKey:@"ORDataFileModelUseDatedFileNames"]];
     [self setMaxFileSize:		[decoder decodeFloatForKey:@"ORDataFileModelMaxFileSize"]];
     [self setLimitSize:			[decoder decodeBoolForKey:@"ORDataFileModelLimitSize"]];
+    [self setSizeLimitReachedAction:[decoder decodeIntForKey:@"sizeLimitReachedAction"]];
+	
     int  version =				[decoder decodeIntForKey:ORDataVersion];
     
     //-------------------------------------------------------------------------------
@@ -676,7 +703,8 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     [encoder encodeObject:dataFolder		forKey:ORDataDataFolderName];
     [encoder encodeObject:statusFolder		forKey:ORDataStatusFolderName];
     [encoder encodeObject:configFolder		forKey:ORDataConfigFolderName];
-    [encoder encodeBool:[self saveConfiguration] forKey:ORDataSaveConfiguration];
+    [encoder encodeBool:saveConfiguration	forKey:ORDataSaveConfiguration];
+    [encoder encodeInt:sizeLimitReachedAction forKey:@"sizeLimitReachedAction"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary

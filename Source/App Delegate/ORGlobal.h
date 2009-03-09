@@ -114,6 +114,7 @@ extern NSString* ORRunFinalCallNotification;
 extern NSString* ORRunAboutToStartNotification;
 extern NSString* ORRunStartedNotification;
 extern NSString* ORRequestRunStop;
+extern NSString* ORRequestRunRestart;
 extern NSString* ORRequestRunHalt;
 extern NSString* ORRunVetosChanged;
 

@@ -147,6 +147,8 @@
 				<string>NSTextField</string>
 				<key>elapsedTimeField</key>
 				<string>NSTextField</string>
+				<key>endOfRunStateField</key>
+				<string>NSTextField</string>
 				<key>lightBoardView</key>
 				<string>StopLightView</string>
 				<key>listVetosButton</key>

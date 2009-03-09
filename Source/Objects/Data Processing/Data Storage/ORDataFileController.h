@@ -50,6 +50,9 @@
 
 	IBOutlet NSButton*      lockButton;
 	IBOutlet NSTabView*     tabView;
+	
+	IBOutlet NSTextField* 	sizeLimitReachedField;
+	IBOutlet NSMatrix*		sizeLimitActionMatrix;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -60,6 +63,7 @@
 - (IBAction) filePrefixTextFieldAction:(id)sender;
 - (IBAction) maxFileSizeTextFieldAction:(id)sender;
 - (IBAction) limitSizeAction:(id)sender;
+- (IBAction) sizeLimitReachedAction:(id)sender;
 - (IBAction) saveConfigurationAction:(id)sender;
 
 - (IBAction) stopSendingAction:(id)sender;
@@ -71,6 +75,7 @@
 - (void) filePrefixChanged:(NSNotification*)aNote;
 - (void) maxFileSizeChanged:(NSNotification*)aNote;
 - (void) limitSizeChanged:(NSNotification*)aNote;
+- (void) sizeLimitReachedActionChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 
 #pragma mark ¥¥¥Interface Management

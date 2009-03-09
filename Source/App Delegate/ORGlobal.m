@@ -52,6 +52,7 @@ NSString* ORRunStatusChangedNotification    = @"Run Status Changed";
 NSString* ORTaskStateChangedNotification    = @"Task State Changed";
 NSString* ORRunModeChangedNotification      = @"Run Mode Has Changed";
 NSString* ORRequestRunStop					= @"ORRequestRunStop";
+NSString* ORRequestRunRestart				= @"ORRequestRunRestart";
 NSString* ORRequestRunHalt					= @"ORRequestRunHalt";
 
 NSString* ORRunTypeMask			    = @"ORRunTypeMask";

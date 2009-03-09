@@ -398,6 +398,18 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return elapsedTime;
 }
 
+- (NSString*) endOfRunState
+{
+	if([self isRunning]){
+		if(timedRun && repeatRun){
+			return @"Until Repeating";
+		}
+		else return @"Until Stopping";
+
+	}
+	else return @"";
+}
+
 - (void) setElapsedTime:(NSTimeInterval)aValue
 {
     elapsedTime = aValue;
@@ -1005,7 +1017,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[dataTypeAssigner release];
 	dataTypeAssigner = nil;
 	
-	if(_forceRestart ||(/*[self timedRun] &&*/ [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
+	if(_forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;
 		[self restartRun];
@@ -1316,6 +1328,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                        object: nil];
 	
     [notifyCenter addObserver: self
+                     selector: @selector(gotRequestedRunRestartNotification:)
+                         name: ORRequestRunRestart
+                       object: nil];
+	
+    [notifyCenter addObserver: self
                      selector: @selector(vetosChanged:)
                          name: ORRunVetosChanged
                        object: nil];    
@@ -1366,6 +1383,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[self performSelectorOnMainThread:@selector(forceHalt) withObject:nil waitUntilDone:NO];
 }
 
+- (void) gotRequestedRunRestartNotification:(NSNotification*)aNotification
+{
+	[self performSelectorOnMainThread:@selector(requestedRunRestart:) withObject:[aNotification userInfo] waitUntilDone:NO];
+}
+
 - (void) gotRequestedRunStopNotification:(NSNotification*)aNotification
 {
 	[self performSelectorOnMainThread:@selector(requestedRunStop:) withObject:[aNotification userInfo] waitUntilDone:NO];
@@ -1377,11 +1399,22 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	else NSLog(@"Got halt run request (No reason given)\n");
 	[self haltRun];
 }
+
 - (void) requestedRunStop:(id)userInfo
 {
 	if(userInfo)NSLog(@"Got stop run request:     %@\n",userInfo);
 	else NSLog(@"Got stop run request (No reason given)\n");
+	ignoreRepeat = YES;
 	[self stopRun];
+}
+
+- (void) requestedRunRestart:(id)userInfo
+{
+	if(userInfo)NSLog(@"Got restart run request:     %@\n",userInfo);
+	else NSLog(@"Got restart run request (No reason given)\n");
+	[self setForceRestart:YES];
+    [self performSelector:@selector(stopRun)withObject:nil afterDelay:0];
+
 }
 
 - (void) forceHalt
