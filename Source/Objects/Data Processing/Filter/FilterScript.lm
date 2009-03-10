@@ -81,6 +81,7 @@ H			[a-fA-F0-9]
 "continue"		return CONTINUE;
 "array"			return MAKEARRAY;
 "free"			return FREEARRAY;
+"currentRecordIs"		return CURRENTRECORD_IS;
 "extractRecordID"		return EXTRACTRECORD_ID;
 "extractRecordLen"		return EXTRACTRECORD_LEN;
 "extractValue"			return EXTRACT_VALUE;

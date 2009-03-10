@@ -106,6 +106,7 @@ id exNode(nodeType *p, int aLevel, BOOL lastChild)
                 case kArrayListAssign:	line = [NSMutableString stringWithString:@"[kArrayListAssign]"];break;
 				case FREEARRAY:			line = [NSMutableString stringWithString:@"[free]"];		break;
                 case EXTRACTRECORD_LEN:	line = [NSMutableString stringWithString:@"[extractLen]"];	break;
+                case CURRENTRECORD_IS:	line = [NSMutableString stringWithString:@"[currentRecordIs]"];	break;
                 case EXTRACTRECORD_ID:	line = [NSMutableString stringWithString:@"[exgtractID]"];	break;
                 case SHIP_RECORD:		line = [NSMutableString stringWithString:@"[shipRecord]"];	break;
                 case PUSH_RECORD:		line = [NSMutableString stringWithString:@"[push]"];		break;

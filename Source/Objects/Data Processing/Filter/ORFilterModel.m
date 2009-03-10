@@ -787,6 +787,12 @@ int filterGraph(nodeType*);
 }
 
 #pragma mark ***Plugin Interface
+
+- (BOOL) record:(unsigned long*)aRecordPtr isEqualTo:(unsigned long)aValue
+{
+	return ExtractDataId(aRecordPtr[0]) == aValue;
+}
+
 - (unsigned long) extractRecordID:(unsigned long)aValue
 {
 	return ExtractDataId(aValue);

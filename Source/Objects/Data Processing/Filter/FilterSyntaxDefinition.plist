@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>BlockComment:End</key>
@@ -23,12 +23,12 @@
 		<string>filter</string>
 		<string>finish</string>
 	</array>
-	
 	<key>Identifiers2</key>
 	<array>
 		<string>print</string>
 		<string>printh</string>
 		<string>array</string>
+		<string>currentRecordIs</string>
 		<string>extractRecordID</string>
 		<string>extractRecordLen</string>
 		<string>extractValue</string>
@@ -47,7 +47,6 @@
 		<string>display</string>
 		<string>time</string>
 	</array>
-
 	<key>Constants</key>
 	<array>
 		<string>nil</string>
@@ -64,8 +63,6 @@
 		<string>CurrentRecordLen</string>
 		<string>ElapsedTime</string>
 	</array>
-
-
 	<key>Identifiers:Charset</key>
 	<string>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@_1234567890</string>
 	<key>OneLineComment:Start</key>

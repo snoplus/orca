@@ -434,6 +434,11 @@ filterData ex(nodeType *p,id delegate)
 					arrayList(p,delegate);
 					break;
 					
+				case CURRENTRECORD_IS:
+					[symbolTable getData:&tempData forKey:"CurrentRecordPtr"];
+					tempData.val.lValue =  [delegate record:tempData.val.pValue isEqualTo:ex(p->opr.op[0],delegate).val.lValue]; 
+					return tempData;
+					
 				case EXTRACTRECORD_ID: 
 					tempData.val.lValue =  [delegate extractRecordID:ex(p->opr.op[0],delegate).val.lValue]; 
 					return tempData;

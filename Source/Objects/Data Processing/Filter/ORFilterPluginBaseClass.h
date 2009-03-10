@@ -56,6 +56,7 @@
 @end
 
 @interface NSObject (FilterBaseClass)
+- (BOOL) record:(unsigned long*)aRecordPtr isEqualTo:(unsigned long)aValue;
 - (unsigned long) extractRecordID:(unsigned long)aValue;
 - (unsigned long) extractRecordLen:(unsigned long)aValue;
 - (unsigned long) extractValue:(unsigned long)aValue mask:(unsigned long)aMask thenShift:(unsigned long)shift;
