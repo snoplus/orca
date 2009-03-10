@@ -40,6 +40,8 @@
 #import "ORCARootServiceController.h"
 #import "ORMailer.h"
 
+#import <sys/sysctl.h>
+
 NSString* kCrashLogLocation     = @"~/Library/Logs/CrashReporter/Orca.crash.log";
 NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 
@@ -361,7 +363,17 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	[self performSelector:@selector(closeSplashWindow) withObject:self afterDelay:kORSplashScreenDelay];
 	
 	[[self undoManager] removeAllActions];
-	
+
+	int     count ;
+	size_t  size=sizeof(count) ;
+	if (sysctlbyname("hw.ncpu",&count,&size,NULL,0)) count =  1;
+	if(count==1){
+		[self closeSplashWindow];
+		NSLogColor([NSColor redColor],@"Number Processors: %d\n",count);
+		NSRunInformationalAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",nil,nil,nil,nil);
+	}
+	else NSLog(@"Number Processors: %d\n",count);
+
 }
 
 - (void) closeSplashWindow
