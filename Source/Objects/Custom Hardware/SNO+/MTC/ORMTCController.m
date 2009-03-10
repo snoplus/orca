@@ -306,7 +306,7 @@
 
 	//load the nhit values
 	int col,row;
-	float displayValue;
+	float displayValue=0;
 	for(col=0;col<4;col++){
 		for(row=0;row<6;row++){
 			int index = kNHit100HiThreshold + row + (col * 6);
@@ -997,7 +997,7 @@
 - (void) storeUserNHitValue:(float)userValue index:(int) thresholdIndex
 {
 	//user changed the NHit threshold -- convert from the displayed value to the raw value and store
-	float numberToStore;
+	float numberToStore=0;
 	int viewType = [model nHitViewType];
 	if((thresholdIndex >= kNHit100HiThreshold) && (thresholdIndex <= kOWLNThreshold)){
 		if(viewType == kNHitsViewRaw) {
@@ -1034,7 +1034,7 @@
 - (void) storeUserESumValue:(float)userValue index:(int) thresholdIndex
 {
 	//user changed the ESum threshold -- convert from the displayed value to the raw value and store
-	float numberToStore;
+	float numberToStore=0;
 	int viewType = [model eSumViewType];
 	if((thresholdIndex >= kESumLowThreshold) && (thresholdIndex <= kOWLEHiThreshold)){
 		if(viewType == kESumViewRaw) {

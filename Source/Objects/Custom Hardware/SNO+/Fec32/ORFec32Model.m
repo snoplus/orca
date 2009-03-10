@@ -1456,9 +1456,9 @@ const short kVoltageADCMaximumAttempts = 10;
 		[[self xl2] select:self];
 		
 		short channel_index;
+		unsigned long registerAddress=0;
+		unsigned short whichChannels=0;
 		for( channel_index = 0; channel_index < 2; channel_index++){
-			unsigned long registerAddress;
-			unsigned short whichChannels;
 			
 			switch (channel_index){
 				case BOTTOM_CHANNELS:
@@ -1588,7 +1588,7 @@ const short kVoltageADCMaximumAttempts = 10;
 
 -(void) loadCmosShiftRegData:(unsigned short)whichChannels triggersDisabled:(BOOL)aTriggersDisabled
 {
-	unsigned short dc_offset;
+	unsigned short dc_offset=0;
 	
 	switch (whichChannels){
 		case BOTTOM_CHANNELS:	dc_offset = 0;	break;

@@ -138,7 +138,7 @@ HP3458aNamesStruct aciNames[aciCount] = {
 
 - (int) maxInput
 {
-	int maxIndex;
+	int maxIndex=0;
 	switch(functionDef){
 		case 1:
 		case 2: maxIndex = dcvAcvCount-1; break;

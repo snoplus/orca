@@ -143,6 +143,9 @@ double tbGetDiffToTimeOfDay(int lastSec, int lastUSec, int *getCurrentSec, int *
 struct timeval  tbConvertADEIDateString2time(NSString *aDate){
         //double currentDoubleSec;
         struct timeval t;//    struct timezone tz; is obsolete ... -tb-
+		t.tv_sec = 0;	//to get rid of a compiler warning
+		t.tv_usec = 0;
+	
         if(!aDate || [aDate length]<24) return t;
         
         #if 0

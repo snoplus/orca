@@ -337,7 +337,8 @@ NSString* ORNplpCMeterLock					= @"ORNplpCMeterLock";
 	unsigned long* p = (unsigned long*)[meterData bytes];
 	unsigned int len = [meterData length]/4;
 	int i;
-	short lastCount,count;
+	short lastCount = 0;
+	short count;
 	BOOL seemsOK = YES;
 	//NSLog(@"len: %d\n",len);
 	for(i=0;i<len;i++){

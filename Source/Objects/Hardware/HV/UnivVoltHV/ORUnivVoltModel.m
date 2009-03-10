@@ -815,7 +815,7 @@ NSString* UVkWrite = @"W";
 	int			j;
 //	NSString*			statusStr;
 //	int					status;
-	NSNumber*			valueObj;
+	NSNumber*			valueObj = nil;
 	
 //	NSMutableDictionary* chnl = [mChannelArray objectAtIndex: 10];
 	NSArray* tokens = [aReturnData objectForKey: UVkReturn];

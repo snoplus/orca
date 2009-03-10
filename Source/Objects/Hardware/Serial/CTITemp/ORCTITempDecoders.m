@@ -75,14 +75,13 @@ static NSString* kCTITempUnit[8] = {
 		unsigned long asLong;
 	}theData;
 	theString = [theString stringByAppendingFormat:@"HW ID = %d\n",dataPtr[1] & 0x0000ffff];
-	int i;
 	int index = 2;
 	theData.asLong = dataPtr[index];
 	
 	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];
 	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S"];
 	
-	theString = [theString stringByAppendingFormat:@"%d: %.2f %@\n",i,theData.asFloat,date];
+	theString = [theString stringByAppendingFormat:@"%.2f %@\n",theData.asFloat,date];
 	
 	return theString;
 }
