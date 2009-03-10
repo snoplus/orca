@@ -30,7 +30,8 @@
 #import "ORAxis.h"
 
 @interface SBC_LinkController (private)
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 
@@ -659,7 +660,7 @@
                                 types:nil
                        modalForWindow:[self window]
                         modalDelegate:self
-                       didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
+                       didEndSelector:@selector(_openPanelDidEnd:returnCode:contextInfo:)
                           contextInfo:NULL];
 }
 
@@ -675,13 +676,14 @@
 
 - (IBAction) killCrateAction:(id)sender
 {
-	int choice = NSRunAlertPanelRelativeToWindow(@"This will KILL the crate process. There may be other ORCAs connected to the crate.",
-												 @"Is this really what you want?",
-												 @"Cancel",@"Yes, Kill Crate",nil,[self window]);
-	if(choice == NSAlertAlternateReturn){		
-		[[model sbcLink] killCrate];
-	}
-	
+    NSBeginAlertSheet(@"This will KILL the crate process. There may be other ORCAs connected to the crate.",
+                      @"Cancel",
+                      @"Yes, Kill Crate",
+                      nil,[self window],
+                      self,
+                      @selector(_killCrateDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Is this really what you want?");
 }
 
 - (IBAction) verboseAction:(id)sender
@@ -989,13 +991,20 @@
 @end
 
 @implementation SBC_LinkController (private)
-- (void)openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+- (void)_openPanelDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         NSString* path = [[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath];
         [[model sbcLink] setFilePath:path];
     }
 }
+- (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	if(returnCode == NSAlertAlternateReturn){		
+		[[model sbcLink] killCrate];
+	}
+}
+
 @end
 
 @implementation OrcaObject (SBC_Link)
