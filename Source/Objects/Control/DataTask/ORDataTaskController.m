@@ -30,6 +30,7 @@
 #import "ORAxis.h"
 
 #define ORDataTakerItem @"ORDataTaker Drag Item"
+#define kManualRefresh 1E10
 
 @interface ORDataTaskController (Private)
 - (void) _saveListPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
@@ -145,7 +146,15 @@
                          name : ORDataTaskCycleRateChangedNotification
                        object : nil];
 
-    
+    [notifyCenter addObserver : self
+                     selector : @selector(refreshRateChanged:)
+                         name : ORDataTaskModelRefreshRateChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(refreshRateChanged:)
+                         name : ORDataTaskModelTimerEnableChanged
+						object: model];
 }
 
 - (void) listLockChanged:(NSNotification*)aNotification
@@ -160,7 +169,13 @@
         [readoutListView deselectAll:self];
     }
     [self setButtonStates];
-    
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+    if(runInProgress && [model timerEnabled] && (refreshDelay!=kManualRefresh)){
+		[self doTimedRefresh];
+	}
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doTimedRefresh) object:nil];
+	}
 }
 
 - (void) cycleRateChanged:(NSNotification*)aNote
@@ -204,6 +219,21 @@
 }
 
 #pragma mark ¥¥¥Actions
+
+- (void) refreshRateAction:(id)sender
+{
+	[model setRefreshRate:[sender indexOfSelectedItem]];	
+}
+
+- (void) doTimedRefresh
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doTimedRefresh) object:nil];
+	[plotter setNeedsDisplay:YES];
+	if([model timerEnabled]){
+		[self performSelector:@selector(doTimedRefresh) withObject:nil afterDelay:refreshDelay];
+	}
+}
+
 - (IBAction) enableTimer:(id)sender
 {
 	[model setEnableTimer:[sender state]];
@@ -490,6 +520,34 @@ else {\
 
 
 #pragma mark ¥¥¥Interface Management
+
+- (void) refreshRateChanged:(NSNotification*)aNote
+{
+	[refreshRatePU selectItemAtIndex: [model refreshRate]];
+	[refreshButton setEnabled:[model refreshRate]==0];
+	[clearButton   setEnabled:[model timerEnabled]];
+	
+	switch([model refreshRate]){
+		case 0: refreshDelay = kManualRefresh; break;
+		case 1: refreshDelay = 1.0; break;
+		case 2: refreshDelay = 0.2; break;
+		case 3: refreshDelay = 0.01; break;
+	}
+
+	if([model refreshRate]>0){
+		[self performSelector:@selector(doTimedRefresh) withObject:self afterDelay:refreshDelay];
+	}
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doTimedRefresh) object:nil];
+	}
+	if([model timerEnabled]){
+		[timerEnabledWarningField setStringValue:@"Data Queue Stats Enabled!"];
+	}
+	else {
+		[timerEnabledWarningField setStringValue:@""];
+	}
+}
+
 - (void) updateWindow
 {
     [super updateWindow];
@@ -498,6 +556,7 @@ else {\
     [self queueCountChanged:nil];
     [self timeScalerChanged:nil];
     [self cycleRateChanged:nil];
+	[self refreshRateChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -601,6 +660,11 @@ else {\
     [self removeItemAction:nil];
 }
 
+- (IBAction) clearAction:(id)sender
+{
+	[model clearTimeHistogram];
+	[plotter setNeedsDisplay:YES];
+}
 
 @end
 

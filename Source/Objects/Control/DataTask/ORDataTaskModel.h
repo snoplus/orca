@@ -71,9 +71,12 @@
 	//hints
 	unsigned long queAddCount;
 	unsigned long lastqueAddCount;
+    int refreshRate;
 }
 
 #pragma mark ¥¥¥Accessors
+- (int) refreshRate;
+- (void) setRefreshRate:(int)aRefreshRate;
 - (ORReadOutList*) readOutList;
 - (void) setReadOutList:(ORReadOutList*)someDataTakers;
 - (unsigned long)queueCount;
@@ -86,6 +89,7 @@
 - (short) timeScaler;
 - (void) setTimeScaler:(short)aValue;
 - (void) clearTimeHistogram;
+- (BOOL) timerEnabled;
 - (void) setEnableTimer:(int)aState;
 - (unsigned long)cycleRate;
 - (void) setCycleRate:(unsigned long)aRate;
@@ -105,14 +109,19 @@
 #pragma mark ¥¥¥Save/Restore
 - (void) saveReadOutListTo:(NSString*)fileName;
 - (void) loadReadOutListFrom:(NSString*)fileName;
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+
+extern NSString* ORDataTaskModelRefreshRateChanged;
 extern NSString* ORDataTakerAdded;
 extern NSString* ORDataTakerRemoved;
 extern NSString* ORDataTaskQueueCountChangedNotification;
 extern NSString* ORDataTaskListLock;
 extern NSString* ORDataTaskTimeScalerChangedNotification;
 extern NSString* ORDataTaskCycleRateChangedNotification;
+extern NSString* ORDataTaskModelTimerEnableChanged;
 
 @interface NSObject (ORDataTaskModel)
 

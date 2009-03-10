@@ -10,8 +10,8 @@
 	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
+		<integer>75</integer>
 		<integer>26</integer>
-		<integer>240</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9G55</string>

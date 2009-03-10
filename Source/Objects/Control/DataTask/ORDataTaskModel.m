@@ -28,6 +28,7 @@
 #import "ORGateGroup.h"
 
 #pragma mark ¥¥¥Local Strings
+NSString* ORDataTaskModelRefreshRateChanged = @"ORDataTaskModelRefreshRateChanged";
 static NSString* ORDataTaskInConnector 	= @"Data Task In Connector";
 static NSString* ORDataTaskDataOut      = @"Data Task Data Out Connector";
 
@@ -35,6 +36,7 @@ NSString* ORDataTaskQueueCountChangedNotification	= @"Data Task Queue Count Chan
 NSString* ORDataTaskTimeScalerChangedNotification	= @"ORDataTaskTimeScalerChangedNotification";
 NSString* ORDataTaskListLock						= @"ORDataTaskListLock";
 NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedNotification";
+NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChanged";
 
 #define kMaxQueueSize   10*1024
 #define kQueueHighWater kMaxQueueSize*.90
@@ -137,6 +139,19 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     
 }
 #pragma mark ¥¥¥Accessors
+- (int) refreshRate
+{
+    return refreshRate;
+}
+
+- (void) setRefreshRate:(int)aRefreshRate
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRefreshRate:refreshRate];
+    
+    refreshRate = aRefreshRate;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataTaskModelRefreshRateChanged object:self];
+}
 - (short) timeScaler
 {
 	return timeScaler;
@@ -231,6 +246,11 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
     memset(dataTimeHist,0,kTimeHistoSize*sizeof(unsigned long));
 }
 
+- (BOOL) timerEnabled
+{
+	return enableTimer;
+}
+
 - (void) setEnableTimer:(int)aState
 {
 	[timerLock lock];	//start critical section
@@ -249,6 +269,7 @@ NSString* ORDataTaskCycleRateChangedNotification	= @"ORDataTaskCycleRateChangedN
 		mainTimer = nil;
 	}
 	[timerLock unlock];	//end critical section
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORDataTaskModelTimerEnableChanged object:self];
 }
 
 
@@ -557,6 +578,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setRefreshRate:[decoder decodeIntForKey:@"ORDataTaskModelRefreshRate"]];
     [self setReadOutList:[decoder decodeObjectForKey:ORDataTaskReadOutList]];
     [self setLastFile:[decoder decodeObjectForKey:ORDataTaskLastFile]];
     [self setTimeScaler:[decoder decodeIntForKey:ORDataTaskTimeScaler]];
@@ -572,6 +594,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:refreshRate forKey:@"ORDataTaskModelRefreshRate"];
     [encoder encodeObject:readOutList forKey:ORDataTaskReadOutList];
     [encoder encodeObject:lastFile forKey:ORDataTaskLastFile];
     [encoder encodeInt:timeScaler forKey:ORDataTaskTimeScaler];

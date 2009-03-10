@@ -39,8 +39,12 @@
     IBOutlet NSButton*      loadListButton;
 	IBOutlet ORPlotter1D*   plotter;
 	IBOutlet NSMatrix*		timeScaleMatrix;
+	IBOutlet NSPopUpButton* refreshRatePU;
+    IBOutlet NSButton*      refreshButton;
+    IBOutlet NSButton*      clearButton;
+	IBOutlet NSTextField*	timerEnabledWarningField;
     NSMutableArray*         draggedNodes;
-    
+	float					refreshDelay;
 }
 
 - (NSArray*)draggedNodes;
@@ -55,6 +59,8 @@
 - (void) cycleRateChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) clearAction:(id)sender;
+- (IBAction) refreshRateAction:(id)sender;
 - (IBAction) tableClick:(id)sender;
 - (IBAction) tableDoubleClick:(id)sender;
 - (IBAction) removeItemAction:(id)sender;
@@ -68,6 +74,7 @@
 - (IBAction) delete:(id)sender;
 - (IBAction) cut:(id)sender;
 
+- (void) doTimedRefresh;
 
 #pragma mark ¥¥¥Data Source Methods
 - (BOOL) outlineView:(NSOutlineView*)ov isItemExpandable:(id)item;
@@ -80,6 +87,7 @@
 - (double) doubleValue;
 
 #pragma mark ¥¥¥Interface Management
+- (void) refreshRateChanged:(NSNotification*)aNote;
 - (void) updateWindow;
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item;
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem;
