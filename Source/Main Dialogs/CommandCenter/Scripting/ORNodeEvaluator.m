@@ -53,7 +53,6 @@
 - (id)		doSwitch:(id) p;
 - (id)		doCase:(id)p;
 - (id)		doDefault:(id)p;
-- (id)		sleepFunc:(id) p;
 - (id)		processObjC:(id) p;
 - (id)		processDiv:(id) p;
 - (id)		processDIV_ASSIGN:(id) p;
@@ -63,6 +62,7 @@
 - (id)		postAlarm:(id)p;
 - (id)		clearAlarm:(id)p;
 - (id)		extractValue:(int)index name:(NSString*)aFunctionName args:(NSArray*)valueArray;
+- (id)		sleepFunc:(id)p;
 - (NSMutableDictionary*) makeSymbolTable;
 @end
 
@@ -486,6 +486,7 @@
 			
 			//built-in funcs
 		case SLEEP:			return [self sleepFunc:p];
+		case DISPLAY:		return [delegate display:NodeValue(1) forKey:NodeValue(0)];
 		case WAITUNTIL:		return [self waitUntil:p];
 		case kWaitTimeOut:	return [self waitTimeOut:p];
 		case MAKESTRING:	return [self makeString:p];
@@ -1199,6 +1200,7 @@
                 case CASE:				line = [NSMutableString stringWithString:@"[case]"];		break;
                 case DEFAULT:			line = [NSMutableString stringWithString:@"[default]"];		break;
                 case PRINT:				line = [NSMutableString stringWithString:@"[print]"];		break;
+                case DISPLAY:			line = [NSMutableString stringWithString:@"[display]"];		break;
                 case LOGFILE:			line = [NSMutableString stringWithString:@"[logFile]"];		break;
 				case MAKESTRING:		line = [NSMutableString stringWithString:@"[makeString]"];	break;
                 case kPostInc:			line = [NSMutableString stringWithString:@"[postInc]"];		break;

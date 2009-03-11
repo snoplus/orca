@@ -28,6 +28,7 @@ NSString* ORScriptRunnerRunningChanged			= @"ORScriptRunnerRunningChanged";
 NSString* ORScriptRunnerParseError				= @"ORScriptRunnerParseError";
 NSString* ORScriptRunnerDebuggerStateChanged	= @"ORScriptRunnerDebuggerStateChanged";
 NSString* ORScriptRunnerDebuggingChanged		= @"ORScriptRunnerDebuggingChanged";
+NSString* ORScriptRunnerDisplayDictionaryChanged= @"ORScriptRunnerDisplayDictionaryChanged";
 
 //========================================================================
 #pragma mark ¥¥¥YACC interface
@@ -68,6 +69,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	[functionTable release];
 	[expressionAsData release];
 	[breakpoints release];
+	[displayDictionary release];
 	[super dealloc];
 }
 
@@ -99,6 +101,14 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	[aValue retain];
 	[inputValue release];
 	inputValue = aValue;
+}
+- (id) displayDictionary
+{
+	id dic =nil;
+	@synchronized ([NSApp delegate]){
+		dic =  [[displayDictionary copy] autorelease];
+	}
+	return dic;
 }
 
 - (NSString*) scriptName
@@ -315,6 +325,19 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	NSLog(@"==================================\n");
 }
 
+- (id) display:(id)aValue forKey:(id)aKey
+{
+	@synchronized ([NSApp delegate]){
+		if(!displayDictionary){
+			displayDictionary = [[NSMutableDictionary alloc] init];
+		}
+		[displayDictionary setObject:aValue	forKey:aKey];
+	}
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerDisplayDictionaryChanged object:self userInfo:nil waitUntilDone:YES];
+	return nil;
+}
+
+
 #pragma mark ¥¥¥Yacc Input
 -(int)yyinputToBuffer:(char* )theBuffer withSize:(int)maxSize 
 {
@@ -364,6 +387,11 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 - (void) run:(id)someArgs sender:(id)aSender
 {
 	if(!running){
+		@synchronized ([NSApp delegate]){
+			[displayDictionary release];
+			displayDictionary = nil;
+			[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORScriptRunnerDisplayDictionaryChanged object:self userInfo:nil waitUntilDone:NO];
+		}
 		[self evaluateAll:someArgs sender:aSender];
 	}
 }

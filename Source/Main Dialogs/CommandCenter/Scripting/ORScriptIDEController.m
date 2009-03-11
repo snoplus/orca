@@ -151,6 +151,11 @@
                          name : ORScriptIDEModelBreakChainChanged
 						object: model];	
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(displayDictionaryChanged:)
+                         name : ORScriptRunnerDisplayDictionaryChanged
+						object: [model scriptRunner]];	
+	
 	
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
@@ -169,6 +174,7 @@
 	[self debuggingChanged:nil];
 	[self breakpointsChanged:nil];
 	[self breakChainChanged:nil];
+	[self displayDictionaryChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -180,6 +186,12 @@
 }
 
 #pragma mark •••Interface Management
+- (void) displayDictionaryChanged:(NSNotification*)aNote
+{
+	[outputVariablesTableView reloadData];
+}
+
+
 - (void) breakChainChanged:(NSNotification*)aNote
 {
 	[breakChainButton setState:[model breakChain]];
@@ -537,11 +549,11 @@
 	}
 }
 
-
 - (int) numberOfRowsInTableView:(NSTableView *)aTable
 {
-	if(aTable == inputVariablesTableView)	return ([[model inputValues] count]);
-	else if(aTable == debuggerTableView)	return ([[model evaluator] symbolTableCount]);
+	if(aTable == inputVariablesTableView)		return ([[model inputValues] count]);
+	else if(aTable == outputVariablesTableView)	return ([[[model scriptRunner] displayDictionary] count]);
+	else if(aTable == debuggerTableView)		return ([[model evaluator] symbolTableCount]);
 	else return 0;
 }
 
@@ -552,8 +564,23 @@
 		anArray= [model inputValues];
 		return [[anArray objectAtIndex:aRow] objectForKey:[aCol identifier]];
 	}
+	else if(aTable == outputVariablesTableView){
+		anArray= [[model scriptRunner] displayDictionary];
+		NSArray* keyArray = [anArray allKeys];
+		if([[aCol identifier] isEqualToString:@"name"])		   return [keyArray objectAtIndex:aRow];
+		else if([[aCol identifier] isEqualToString:@"value"]){
+			id theValue =  [anArray objectForKey:[keyArray objectAtIndex:aRow]];
+			return theValue;
+		}
+		else if([[aCol identifier] isEqualToString:@"iValueHex"]){
+			id aValue = [anArray objectForKey:[keyArray objectAtIndex:aRow]];
+			return [NSString stringWithFormat:@"0x%08x",[aValue longValue]];
+		}
+		else return nil;
+	}
+	
 	else if(aTable == debuggerTableView) {
-		if([[aCol identifier] isEqualToString:@"Name"])return [[model evaluator] symbolNameForIndex:aRow];
+		if([[aCol identifier] isEqualToString:@"Name"]) return [[model evaluator] symbolNameForIndex:aRow];
 		else {
 			id aValue = [[model evaluator] symbolValueForIndex:aRow];
 			if([aValue isKindOfClass:[OrcaObject class]]) return [NSString stringWithFormat:@"<%@>",[aValue className]];
@@ -586,6 +613,7 @@
 	}
  
 }
+
 @end
 
 @implementation ORScriptIDEController (private)

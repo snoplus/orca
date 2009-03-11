@@ -148,6 +148,8 @@
 				<string>NSButton</string>
 				<key>nameField</key>
 				<string>NSTextField</string>
+				<key>outputVariablesTableView</key>
+				<string>NSTableView</string>
 				<key>pauseButton</key>
 				<string>NSButton</string>
 				<key>removeInputButton</key>

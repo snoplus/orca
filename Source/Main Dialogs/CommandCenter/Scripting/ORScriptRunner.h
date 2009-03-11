@@ -55,12 +55,14 @@
 	BOOL				debugging;
 	NSMutableIndexSet*	breakpoints;
 	int					debugMode;
+	NSMutableDictionary*    displayDictionary;
 } 
 
 #pragma mark ¥¥¥Accessors
 - (void) setBreakpoints:(NSMutableIndexSet*)aSet;
 - (ORNodeEvaluator*) eval;
 - (BOOL)		exitNow;
+- (id)			displayDictionary;
 - (id)			inputValue;
 - (void)		setInputValue:(id)aValue;
 - (void)		setString:(NSString* )theString;
@@ -91,6 +93,7 @@
 - (void) setDebugging:(BOOL)aState;
 - (int) debugMode;
 - (void) setDebugMode:(int) aMode;
+- (id) display:(id)aValue forKey:(id)aKey;
 
 #pragma mark ¥¥¥Parsers
 - (id)		 parseFile:(NSString*) aPath;
@@ -109,3 +112,4 @@ extern NSString* ORScriptRunnerDebuggingChanged;
 extern NSString* ORScriptRunnerDebuggerStateChanged;
 extern NSString* ORScriptRunnerRunningChanged;
 extern NSString* ORScriptRunnerParseError;
+extern NSString* ORScriptRunnerDisplayDictionaryChanged;

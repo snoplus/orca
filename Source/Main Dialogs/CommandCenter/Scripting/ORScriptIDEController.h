@@ -44,6 +44,7 @@
     IBOutlet NSTextField*		lastFileField;
     IBOutlet NSTextField*		lastFileField1;
 	IBOutlet NSTableView*		inputVariablesTableView;
+	IBOutlet NSTableView*		outputVariablesTableView;
 	IBOutlet NSTableView*		debuggerTableView;
 	IBOutlet NSButton*			addInputButton;
 	IBOutlet NSButton*			removeInputButton;
@@ -77,6 +78,7 @@
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) debuggingChanged:(NSNotification*)aNote;
 - (void) debuggerStateChanged:(NSNotification*)aNote;
+- (void) displayDictionaryChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) clearAllBreakpoints:(id) sender;

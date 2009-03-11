@@ -29,6 +29,7 @@
 		<string>waituntil</string>
 		<string>sleep</string>
 		<string>print</string>
+		<string>display</string>
 		<string>printh</string>
 		<string>logfile</string>
 		<string>string</string>

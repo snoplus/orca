@@ -85,6 +85,7 @@ E			[Ee][+-]?{D}+
 "default"		return DEFAULT;
 "else"          return ELSE;
 "print"         return PRINT;
+"display"       return DISPLAY;
 "find"			return FIND;
 "break"			return BREAK;
 "exit"			return EXIT;

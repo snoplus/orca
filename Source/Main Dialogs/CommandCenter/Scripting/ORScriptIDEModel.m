@@ -24,6 +24,7 @@
 #import "ORScriptRunner.h"
 #import "ORLineMarker.h"
 #import "ORNodeEvaluator.h"
+#import "NSNotifications+Extensions.h"
 
 NSString* ORScriptIDEModelCommentsChanged		 = @"ORScriptIDEModelCommentsChanged";
 NSString* ORScriptIDEModelShowSuperClassChanged	 = @"ORScriptIDEModelShowSuperClassChanged";
@@ -343,6 +344,7 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
 	[self setLastFile:aFilePath];
 }
+
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
