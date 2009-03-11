@@ -487,6 +487,7 @@ void addNode(id node)
 void addFunction(id node,id nodeArgs)
 {
 	if(!functionList) functionList = [[NSMutableDictionary dictionary] retain];
+	if(!nodeList)nodeList = [[NSMutableArray array] retain];
 	[functionList setObject:nodeList forKey:[node nodeData]];
 	if(nodeArgs){
 		[functionList setObject:nodeArgs forKey:[NSString stringWithFormat:@"%@_ArgNode",[node nodeData]]];
