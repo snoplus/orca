@@ -735,17 +735,21 @@
 {
 	id value = NodeValueWithContainer(0,aContainer);
 	if(value){
+		BOOL doRelease = YES;
 		if([value isKindOfClass:[NSMutableArray class]]) value = [value mutableCopy];
-		else value = [value copy];
+		else if(![value isKindOfClass:[OrcaObject class]]) value = [value copy];
+		else doRelease = NO;
 		[aContainer addObject:value];
-		[value release];
+		if(doRelease)[value release];
 	}
 	value = NodeValueWithContainer(1,aContainer);
 	if(value){
+		BOOL doRelease = YES;
 		if([value isKindOfClass:[NSMutableArray class]]) value = [value mutableCopy];
-		else value = [value copy];
+		else if(![value isKindOfClass:[OrcaObject class]]) value = [value copy];
+		else doRelease = NO;
 		[aContainer addObject:value];
-		[value release];
+		if(doRelease)[value release];
 	}
 	return nil;
 }
