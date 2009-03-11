@@ -733,23 +733,17 @@
 
 - (id) doValueAppend:(id)p container:(id)aContainer
 {
-	id value = NodeValueWithContainer(0,aContainer);
-	if(value){
-		BOOL doRelease = YES;
-		if([value isKindOfClass:[NSMutableArray class]]) value = [value mutableCopy];
-		else if(![value isKindOfClass:[OrcaObject class]]) value = [value copy];
-		else doRelease = NO;
-		[aContainer addObject:value];
-		if(doRelease)[value release];
-	}
-	value = NodeValueWithContainer(1,aContainer);
-	if(value){
-		BOOL doRelease = YES;
-		if([value isKindOfClass:[NSMutableArray class]]) value = [value mutableCopy];
-		else if(![value isKindOfClass:[OrcaObject class]]) value = [value copy];
-		else doRelease = NO;
-		[aContainer addObject:value];
-		if(doRelease)[value release];
+	int i;
+	for(i=0;i<2;i++){
+		id value = NodeValueWithContainer(i,aContainer);
+		if(value){
+			BOOL doRelease = YES;
+			if([value isKindOfClass:[NSMutableArray class]]) value = [value mutableCopy];
+			else if(![value isKindOfClass:[OrcaObject class]]) value = [value copy];
+			else doRelease = NO;
+			[aContainer addObject:value];
+			if(doRelease)[value release];
+		}
 	}
 	return nil;
 }
