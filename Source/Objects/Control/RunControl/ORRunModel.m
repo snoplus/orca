@@ -18,20 +18,12 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
-
 #pragma mark ¥¥¥Imported Files
 #import "ORRunModel.h"
 #import "ORDataTaker.h"
 #import "ORDataPacket.h"
 #import "ORDataTypeAssigner.h"
 #import "ORRunScriptModel.h";
-#include <mach/mach_init.h>
-#include <mach/thread_policy.h>
-#include <mach/thread_act.h>
-#include <sys/types.h>
-#include <sys/sysctl.h>
 
 #pragma mark ¥¥¥Definitions
 
@@ -784,13 +776,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     @try {
         [runFailedAlarm clearAlarm];
         client =  [self objectConnectedTo: ORRunModelRunControlConnection];
-        
-		//        [self getCurrentRunNumber];
-        
-		//        if([[ORGlobal sharedInstance] runMode] == kNormalRun && (!remoteControl || remoteInterface)){
-		//           [self setRunNumber:[self runNumber]+1];
-		//       }
-        
+                
         [self runStarted:doInit];
         
         //start the thread
@@ -968,8 +954,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	}
 	@catch(NSException* localException) {
 	}
-	
-	
 	
 	//get the time(UT!)
 	time_t	theTime;
@@ -1224,51 +1208,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	NSAutoreleasePool *outerpool = [[NSAutoreleasePool allocWithZone:nil] init];
 	NSLog(@"DataTaking Thread Started\n");
-	[NSThread setThreadPriority:.9];
-//	size_t len;
-//	int ret, bus_speed, mib[2] = { CTL_HW, HW_BUS_FREQ };
-//	len = sizeof( bus_speed);
-//	ret = sysctl (mib, 2, &bus_speed, &len, NULL, 0);	
-//	struct thread_time_constraint_policy ttcpolicy;
-//    ttcpolicy.period		=	0;		//period HZ/160
-//    ttcpolicy.computation	=	bus_speed/3300;	//computation HZ/3300;
-//    ttcpolicy.constraint	=	bus_speed/2;	//constraint HZ/2200;
-//    ttcpolicy.preemptible	=	1;
-//	NSLog(@"set_realtime = %d\n",ttcpolicy.period);
-	
-//	struct thread_extended_policy texpolicy;
-//    texpolicy.timeshare		=	0;		//period HZ/160
-	
-//	if ((ret=thread_policy_set(mach_thread_self(),
-//							   THREAD_EXTENDED_POLICY, (thread_policy_t)&texpolicy,
-//							   THREAD_EXTENDED_POLICY_COUNT)) != KERN_SUCCESS) {
-		//NSLog(@"set_realtime() failed.\n");
-		//return;
-//	}	
-//	if ((ret=thread_policy_set(mach_thread_self(),
-//							   THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&ttcpolicy,
-//							   THREAD_TIME_CONSTRAINT_POLICY_COUNT)) != KERN_SUCCESS) {
-	//NSLog(@"set_realtime() failed.\n");
-	//return;
-//	}	
-	
+	[NSThread setThreadPriority:1];
 	//alloc a large block to force the memory system to clean house
 	char* p = malloc(1024*1024*50);
-	if(p)*p=1;
+	if(p)*p=1; //use it so the compile doesn't optimize it away.
 	free(p);
 
-	
-	
 	dataTakingThreadRunning = YES;
     [self clearExceptionCount];
     while(!timeToStopTakingData) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
-//		if ((ret=thread_policy_set(mach_thread_self(),
-//								   THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&ttcpolicy,
-//								   THREAD_TIME_CONSTRAINT_POLICY_COUNT)) != KERN_SUCCESS) {
-			//NSLog(@"set_realtime() failed.\n");
-			//return;
-//		}	
         @try {
 			if(!runPaused){
 				[client takeData:dataPacket userInfo:nil];
