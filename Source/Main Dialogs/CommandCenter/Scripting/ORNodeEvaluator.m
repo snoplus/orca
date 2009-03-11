@@ -660,13 +660,16 @@
 	NSString* argList = NodeValue(1); //argList is string with the format name:value#name:value#etc...
 	argList = [argList stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	argList = [argList stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"#"]];
-	[[self undoManager] disableUndoRegistration];
-	id result =  [NSInvocation invoke:argList withTarget:NodeValue(0)];
-	[[self undoManager] enableUndoRegistration];
-	if(result == nil){
-		return _zero;
+	id result= nil;
+	@try {
+		[[self undoManager] disableUndoRegistration];
+		result =  [NSInvocation invoke:argList withTarget:NodeValue(0)];
+		[[self undoManager] enableUndoRegistration];
 	}
-	return result;
+	@catch (NSException* localException){
+	}
+	if(result == nil) return _zero;
+	else			  return result;
 }
 
 - (id) processStatements:(id) p
@@ -725,8 +728,7 @@
 	NSMutableArray* theArray = [self execute:[[leftNode nodeData] objectAtIndex:0] container:nil];
 	int n = [[self execute:[[leftNode nodeData] objectAtIndex:1] container:nil] longValue];
 	if(n>=0 && n<[theArray count]){
-		id val = NodeValue(1);
-		[theArray replaceObjectAtIndex:n withObject:val];
+		[theArray replaceObjectAtIndex:n withObject:aValue];
 	}
 	return nil;
 }
