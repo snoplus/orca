@@ -65,6 +65,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
     ORAlarm*    runModeAlarm;
     unsigned long runType;
 	NSMutableDictionary* runVetos;
+	int cpuCount;
 }
 
 + (ORGlobal*) sharedGlobal;
@@ -90,6 +91,7 @@ extern NSString* ORTaskStateName[eMaxTaskState];
 - (void) listVetoReasons;
 - (BOOL) anyVetosInPlace;
 - (int) vetoCount;
+- (int) cpuCount;
 
 #pragma mark •••Archival
 - (id)loadParams:(NSCoder*)decoder;

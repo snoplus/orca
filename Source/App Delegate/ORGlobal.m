@@ -188,6 +188,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
     }
 }
 
+- (int) cpuCount
+{
+	if(cpuCount)return cpuCount;
+	else {
+		size_t  size=sizeof(cpuCount) ;
+		if (sysctlbyname("hw.ncpu",&cpuCount,&size,NULL,0)) cpuCount =  1;
+		return cpuCount;
+	}
+}
+
 - (BOOL) runInProgress
 {
     return runInProgress >= eRunInProgress;

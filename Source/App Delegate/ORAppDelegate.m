@@ -364,9 +364,7 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	
 	[[self undoManager] removeAllActions];
 
-	int     count ;
-	size_t  size=sizeof(count) ;
-	if (sysctlbyname("hw.ncpu",&count,&size,NULL,0)) count =  1;
+	int     count  = [[ORGlobal sharedGlobal] cpuCount];
 	if(count==1){
 		[self closeSplashWindow];
 		NSLogColor([NSColor redColor],@"Number Processors: %d\n",count);
