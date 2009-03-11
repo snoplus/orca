@@ -229,7 +229,7 @@
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(doTimedRefresh) object:nil];
 	[plotter setNeedsDisplay:YES];
-	if([model timerEnabled]){
+	if([model timerEnabled] && [gOrcaGlobals runInProgress]){
 		[self performSelector:@selector(doTimedRefresh) withObject:nil afterDelay:refreshDelay];
 	}
 }
