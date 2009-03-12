@@ -158,7 +158,7 @@
 	[sysCallTable setObject: [ORSysCall sysCall:&acosf	name:@"acos"	numArgs:1] forKey:@"acos"];
 	[sysCallTable setObject: [ORSysCall sysCall:&asinf	name:@"asin"	numArgs:1] forKey:@"asin"];
 	[sysCallTable setObject: [ORSysCall sysCall:&atanf	name:@"atan"	numArgs:1] forKey:@"atan"];
-	[sysCallTable setObject: [ORSysCall sysCall:&abs	name:@"abs"		numArgs:1] forKey:@"abs"];
+	[sysCallTable setObject: [ORSysCall sysCall:&fabsf	name:@"abs"		numArgs:1] forKey:@"abs"];
 	[sysCallTable setObject: [ORSysCall sysCall:&expf	name:@"exp"		numArgs:1] forKey:@"exp"];
 	[sysCallTable setObject: [ORSysCall sysCall:&logf	name:@"log"		numArgs:1] forKey:@"log"];
 	[sysCallTable setObject: [ORSysCall sysCall:&log10f	name:@"log10"	numArgs:1] forKey:@"log10"];
