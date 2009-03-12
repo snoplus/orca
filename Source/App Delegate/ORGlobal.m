@@ -20,6 +20,7 @@
 
 #import "ORStatusController.h"
 #import "SynthesizeSingleton.h"
+#import <sys/sysctl.h>
 
 //--------------------------------------------------------
 NSString* runState[kNumRunStates] ={
