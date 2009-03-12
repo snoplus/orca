@@ -67,12 +67,6 @@
 	IBOutlet NSPopUpButton*	triggerModePU9;
 	NSPopUpButton* triggerModePU[kNumGretina4Channels];
 	
-	IBOutlet NSPopUpButton*	registerPU;
-	IBOutlet NSTextField*	registerTextField;
-	IBOutlet NSButton*		writeRegisterButton;
-	IBOutlet NSButton*		readRegisterButton;
-
-	
     IBOutlet NSTextField*   slotField;
     IBOutlet NSTextField*   addressText;
     IBOutlet NSMatrix*      cardInfoMatrix;
@@ -107,14 +101,20 @@
     IBOutlet ORPlotter1D*   timeRatePlot;
     IBOutlet NSButton*      timeRateLogCB;
 	
-
+    //register page
+	IBOutlet NSPopUpButton*	registerIndexPU;
+	IBOutlet NSTextField*	registerWriteValueField;
+	IBOutlet NSButton*		writeRegisterButton;
+	IBOutlet NSButton*		readRegisterButton;
+	
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
     IBOutlet NSTextField*			noiseFloorOffsetField;
     IBOutlet NSTextField*			noiseFloorIntegrationField;
     IBOutlet NSButton*				startNoiseFloorButton;
     IBOutlet NSProgressIndicator*	noiseFloorProgress;
-
+	IBOutlet NSButton*				registerLockButton;
+	
     NSView *blankView;
     NSSize settingSize;
     NSSize rateSize;
@@ -127,6 +127,7 @@
 - (void) updateWindow;
 
 #pragma mark ¥¥¥Interface Management
+- (void) registerIndexChanged:(NSNotification*)aNote;
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote;
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote;
 - (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote;
@@ -161,6 +162,8 @@
 - (void) integrationChanged:(NSNotification*)aNote;
 - (void) updateTimePlot:(NSNotification*)aNote;
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
+- (void) registerLockChanged:(NSNotification*)aNote;
+- (void) registerWriteValueChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) baseAddressAction:(id)sender;
@@ -194,8 +197,11 @@
 - (IBAction) downloadMainFPGAAction:(id)sender;
 - (IBAction) stopLoadingMainFPGAAction:(id)sender;
 
+- (IBAction) registerIndexPUAction:(id)sender;
 - (IBAction) readRegisterAction:(id)sender;
 - (IBAction) writeRegisterAction:(id)sender;
+- (IBAction) registerLockAction:(id) sender;
+- (IBAction) registerWriteValueAction:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (double)  getBarValue:(int)tag;

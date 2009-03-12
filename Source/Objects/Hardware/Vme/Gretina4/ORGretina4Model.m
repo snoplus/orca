@@ -29,6 +29,8 @@
 #import "ORTimer.h"
 #import "VME_HW_Definitions.h"
 
+NSString* ORGretina4ModelRegisterIndexChanged = @"ORGretina4ModelRegisterIndexChanged";
+NSString* ORGretina4ModelRegisterWriteValueChanged		= @"ORGretina4ModelRegisterWriteValueChanged";
 NSString* ORGretina4ModelFpgaDownProgressChanged = @"ORGretina4ModelFpgaDownProgressChanged";
 NSString* ORGretina4ModelMainFPGADownLoadStateChanged = @"ORGretina4ModelMainFPGADownLoadStateChanged";
 NSString* ORGretina4ModelFpgaFilePathChanged	= @"ORGretina4ModelFpgaFilePathChanged";
@@ -36,7 +38,7 @@ NSString* ORGretina4ModelNoiseFloorIntegrationTimeChanged = @"ORGretina4ModelNoi
 NSString* ORGretina4ModelNoiseFloorOffsetChanged = @"ORGretina4ModelNoiseFloorOffsetChanged";
 NSString* ORGretina4CardInfoUpdated				= @"ORGretina4CardInfoUpdated";
 NSString* ORGretina4RateGroupChangedNotification= @"ORGretina4RateGroupChangedNotification";
-NSString* ORGretina4SettingsLock				= @"ORGretina4SettingsLock";
+
 NSString* ORGretina4NoiseFloorChanged			= @"ORGretina4NoiseFloorChanged";
 NSString* ORGretina4ModelFIFOCheckChanged		= @"ORGretina4ModelFIFOCheckChanged";
 
@@ -55,6 +57,8 @@ NSString* ORGretina4ModelDataDelayChanged		= @"ORGretina4ModelDataDelayChanged";
 NSString* ORGretina4ModelDataLengthChanged		= @"ORGretina4ModelDataLengthChanged";
 NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged		= @"ORGretina4ModelMainFPGADownLoadInProgressChanged";
 NSString* ORGretina4CardInited					= @"ORGretina4CardInited";
+NSString* ORGretina4SettingsLock				= @"ORGretina4SettingsLock";
+NSString* ORGretina4RegisterLock				= @"ORGretina4RegisterLock";
 
 @interface ORGretina4Model (private)
 - (void) programFlashBuffer:(NSData*)theData;
@@ -127,51 +131,51 @@ static unsigned long register_offsets[kNumberOfGretina4Registers] = {
 0x868  //[43] self trigger count
 };
 
-static const char* register_names[kNumberOfGretina4Registers] = {
-"board ID",
-"Programming done",
-"External Window",
-"Pileup Window",
-"Noise Window",
-"Extrn trigger sliding length",
-"Collection time",
-"Integration time",
-"Hardware Status",
-"Control/Status",
-"LED Threshold",
-"CFD Parameters",
-"Raw data sliding length",
-"Raw data window length",
-"DAC",
-"Slave Front bus status",
-"Channel Zero time stamp LSB",
-"Channel Zero time stamp MSB",
-"Slave Front Bus Send Box 18 - 1",
-"Slave Front bus register 0 - 10",
-"Master Logic Status",
-"SlowData CCLED timers",
-"DeltaT155_DeltaT255 (3)",
-"SnapShot ",
-"XTAL ID ",
-"Length of Time to get Hit Pattern ",
-"Front Side Bus Register",
-"FrontBus Registers 0-10",
-"Debug data buffer address",
-"Debug data buffer data",
-"LED flag window",
-"Aux io read",
-"Aux io write",
-"Aux io config",
-"FB_Read",
-"FB_Write",
-"FB_Config",
-"SD_Read",
-"SD_Write",
-"SD_Config",
-"Adc config",
-"self trigger enable",
-"self trigger period",
-"self trigger count"
+static NSString* register_names[kNumberOfGretina4Registers] = {
+	@"board ID",
+	@"Programming done",
+	@"External Window",
+	@"Pileup Window",
+	@"Noise Window",
+	@"Extrn trigger sliding length",
+	@"Collection time",
+	@"Integration time",
+	@"Hardware Status",
+	@"Control/Status",
+	@"LED Threshold",
+	@"CFD Parameters",
+	@"Raw data sliding length",
+	@"Raw data window length",
+	@"DAC",
+	@"Slave Front bus status",
+	@"Channel Zero time stamp LSB",
+	@"Channel Zero time stamp MSB",
+	@"Slave Front Bus Send Box 18 - 1",
+	@"Slave Front bus register 0 - 10",
+	@"Master Logic Status",
+	@"SlowData CCLED timers",
+	@"DeltaT155_DeltaT255 (3)",
+	@"SnapShot ",
+	@"XTAL ID ",
+	@"Length of Time to get Hit Pattern ",
+	@"Front Side Bus Register",
+	@"FrontBus Registers 0-10",
+	@"Debug data buffer address",
+	@"Debug data buffer data",
+	@"LED flag window",
+	@"Aux io read",
+	@"Aux io write",
+	@"Aux io config",
+	@"FB_Read",
+	@"FB_Write",
+	@"FB_Config",
+	@"SD_Read",
+	@"SD_Write",
+	@"SD_Config",
+	@"Adc config",
+	@"self trigger enable",
+	@"self trigger period",
+	@"self trigger count"
 };
 
 static unsigned long fpga_register_offsets[kNumberOfFPGARegisters] = {
@@ -188,18 +192,18 @@ static unsigned long fpga_register_offsets[kNumberOfFPGARegisters] = {
 0x98C	//[10] FlashCommandRegister
 };
 
-static const char* fpga_register_names[kNumberOfFPGARegisters] = {
-"Main Digitizer FPGA configuration register",
-"Main Digitizer FPGA status register",
-"Voltage and Temperature Status",
-"General Purpose VME Control Settings",
-"VME Timeout Value Register",
-"VME Version/Status",
-"VME FPGA Sandbox Register Block",
-"Flash Address",
-"Flash Data with Auto-increment address",
-"Flash Data",
-"FlashCommandRegister"
+static NSString* fpga_register_names[kNumberOfFPGARegisters] = {
+	@"Main Digitizer FPGA configuration register",
+	@"Main Digitizer FPGA status register",
+	@"Voltage and Temperature Status",
+	@"General Purpose VME Control Settings",
+	@"VME Timeout Value Register",
+	@"VME Version/Status",
+	@"VME FPGA Sandbox Register Block",
+	@"Flash Address",
+	@"Flash Data with Auto-increment address",
+	@"Flash Data",
+	@"FlashCommandRegister"
 };
 
 enum {
@@ -272,15 +276,40 @@ static struct {
 }
 
 #pragma mark ***Accessors
-- (const char*) registerNameAt:(unsigned int)index
+
+- (int) registerIndex
 {
-	if (index >= kNumberOfGretina4Registers) return "";
+    return registerIndex;
+}
+
+- (void) setRegisterIndex:(int)aRegisterIndex
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRegisterIndex:registerIndex];
+    registerIndex = aRegisterIndex;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelRegisterIndexChanged object:self];
+}
+
+- (unsigned long) registerWriteValue
+{
+    return registerWriteValue;
+}
+
+- (void) setRegisterWriteValue:(unsigned long)aWriteValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRegisterWriteValue:registerWriteValue];
+    registerWriteValue = aWriteValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ModelRegisterWriteValueChanged object:self];
+}
+
+- (NSString*) registerNameAt:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4Registers) return @"";
 	return register_names[index];
 }
 
-- (const char*) fpgaRegisterNameAt:(unsigned int)index
+- (NSString*) fpgaRegisterNameAt:(unsigned int)index
 {
-	if (index >= kNumberOfFPGARegisters) return "";
+	if (index >= kNumberOfFPGARegisters) return @"";
 	return fpga_register_names[index];
 }
 
@@ -1630,6 +1659,8 @@ static struct {
     
     [[self undoManager] disableUndoRegistration];
     
+    [self setRegisterIndex:				[decoder decodeIntForKey:@"registerIndex"]];
+    [self setRegisterWriteValue:		[decoder decodeInt32ForKey:@"registerWriteValue"]];
     [self setFpgaFilePath:				[decoder decodeObjectForKey:@"fpgaFilePath"]];
     [self setNoiseFloorIntegrationTime:	[decoder decodeFloatForKey:@"NoiseFloorIntegrationTime"]];
     [self setNoiseFloorOffset:			[decoder decodeIntForKey:@"NoiseFloorOffset"]];
@@ -1668,6 +1699,8 @@ static struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:registerIndex				forKey:@"registerIndex"];
+    [encoder encodeInt32:registerWriteValue			forKey:@"registerWriteValue"];
     [encoder encodeObject:fpgaFilePath				forKey:@"fpgaFilePath"];
     [encoder encodeFloat:noiseFloorIntegrationTime	forKey:@"NoiseFloorIntegrationTime"];
     [encoder encodeInt:noiseFloorOffset				forKey:@"NoiseFloorOffset"];

@@ -57,7 +57,7 @@
 	
     settingSize     = NSMakeSize(790,500);
     rateSize		= NSMakeSize(790,340);
-    registerTabSize	= NSMakeSize(790,187);
+    registerTabSize	= NSMakeSize(400,187);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -85,14 +85,14 @@
 	triggerModePU[9] = triggerModePU9;
 	
 	// Setup register popup buttons
-	[registerPU removeAllItems];
+	[registerIndexPU removeAllItems];
 	int i;
 	for (i=0;i<kNumberOfGretina4Registers;i++) {
-		[registerPU insertItemWithTitle:[NSString stringWithUTF8String:[model registerNameAt:i]]	atIndex:i];
+		[registerIndexPU insertItemWithTitle:[model registerNameAt:i]	atIndex:i];
 	}
 	// And now the FPGA registers
 	for (i=0;i<kNumberOfFPGARegisters;i++) {
-		[registerPU insertItemWithTitle:[NSString stringWithUTF8String:[model fpgaRegisterNameAt:i]]	atIndex:(i+kNumberOfGretina4Registers)];
+		[registerIndexPU insertItemWithTitle:[model fpgaRegisterNameAt:i]	atIndex:(i+kNumberOfGretina4Registers)];
 	}
 	
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4%d.selectedtab",[model slot]];
@@ -129,7 +129,17 @@
                      selector : @selector(settingsLockChanged:)
                          name : ORGretina4SettingsLock
                         object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(registerLockChanged:)
+                         name : ORRunStatusChangedNotification
+                       object : nil];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(registerLockChanged:)
+                         name : ORGretina4RegisterLock
+                        object: nil];
+	
     [notifyCenter addObserver:self selector:@selector(updateCardInfo:)
                          name:ORGretina4CardInfoUpdated 
                        object:model];
@@ -274,9 +284,23 @@
                      selector : @selector(settingsLockChanged:)
                          name : ORGretina4ModelMainFPGADownLoadInProgressChanged
                        object : nil];
+
+	[notifyCenter addObserver : self
+                     selector : @selector(registerLockChanged:)
+                         name : ORGretina4ModelMainFPGADownLoadInProgressChanged
+                       object : nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(registerWriteValueChanged:)
+                         name : ORGretina4ModelRegisterWriteValueChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(registerIndexChanged:)
+                         name : ORGretina4ModelRegisterIndexChanged
+						object: model];
+
     [self registerRates];
-	
 }
 
 - (void) registerRates
@@ -329,15 +353,29 @@
 	[self noiseFloorChanged:nil];
 	[self noiseFloorIntegrationChanged:nil];
 	[self noiseFloorOffsetChanged:nil];
-	
-	
+		
 	[self fpgaFilePathChanged:nil];
 	[self mainFPGADownLoadStateChanged:nil];
 	[self fpgaDownProgressChanged:nil];
 	[self fpgaDownInProgressChanged:nil];
+
+    [self registerLockChanged:nil];
+
+	[self registerIndexChanged:nil];
+	[self registerWriteValueChanged:nil];
 }
 
 #pragma mark ¥¥¥Interface Management
+- (void) registerWriteValueChanged:(NSNotification*)aNote
+{
+	[registerWriteValueField setIntValue: [model registerWriteValue]];
+}
+
+- (void) registerIndexChanged:(NSNotification*)aNote
+{
+	[registerIndexPU selectItemAtIndex: [model registerIndex]];
+}
+
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote
 {
 	if([model downLoadMainFPGAInProgress])[loadFPGAProgress startAnimation:self];
@@ -512,7 +550,9 @@
 {
     BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     [gSecurity setLock:ORGretina4SettingsLock to:secure];
+    [gSecurity setLock:ORGretina4RegisterLock to:secure];
     [settingLockButton setEnabled:secure];
+    [registerLockButton setEnabled:secure];
 }
 
 - (void) settingsLockChanged:(NSNotification*)aNotification
@@ -554,6 +594,21 @@
 		[triggerModePU[i] setEnabled:!lockedOrRunningMaintenance && !downloading];
 	}		
 }
+
+- (void) registerLockChanged:(NSNotification*)aNotification
+{
+    
+    BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORGretina4RegisterLock];
+    BOOL locked = [gSecurity isLocked:ORGretina4RegisterLock];
+    BOOL downloading = [model downLoadMainFPGAInProgress];
+		
+    [registerLockButton setState: locked];
+    [registerWriteValueField setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [registerIndexPU setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [readRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+    [writeRegisterButton setEnabled:!lockedOrRunningMaintenance && !downloading];
+}
+
 
 - (void) setFifoStateLabel
 {
@@ -687,6 +742,12 @@
 
 
 #pragma mark ¥¥¥Actions
+
+- (IBAction) registerIndexPUAction:(id)sender
+{
+	[model setRegisterIndex:[sender indexOfSelectedItem]];	
+}
+
 - (IBAction) enabledAction:(id)sender
 {
 	if([sender intValue] != [model enabled:[[sender selectedCell] tag]]){
@@ -788,35 +849,43 @@
     }
 }
 
--(IBAction)baseAddressAction:(id)sender
+- (IBAction) baseAddressAction:(id)sender
 {
     if([sender intValue] != [model baseAddress]){
         [model setBaseAddress:[sender intValue]];
     }
 }
 
+- (IBAction) registerWriteValueAction:(id)sender
+{
+	[model setRegisterWriteValue:[sender intValue]];
+}
+
 - (IBAction) readRegisterAction:(id)sender
 {
 	[self endEditing];
 	unsigned long aValue = 0;
-	unsigned int index = [registerPU indexOfSelectedItem];
+	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4Registers) {
 		aValue = [model readRegister:index];
-	} else {
+	} 
+	else {
 		index -= kNumberOfGretina4Registers;
 		aValue = [model readFPGARegister:index];	
 	}
-	[registerTextField setIntValue:aValue];
+	NSLog(@"Gretina4(%d,%d) %@: %u (0x%0x)\n",[model crateNumber],[model slot], [model registerNameAt:index],aValue,aValue);
+	//[registerWriteValueField setIntValue:aValue];
 }
 
 - (IBAction) writeRegisterAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = [registerTextField intValue];
-	unsigned int index = [registerPU indexOfSelectedItem];
+	unsigned long aValue = [model registerWriteValue];
+	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4Registers) {
 		[model writeRegister:index withValue:aValue];
-	} else {
+	} 
+	else {
 		index -= kNumberOfGretina4Registers;
 		[model writeFPGARegister:index withValue:aValue];	
 	}
@@ -826,6 +895,12 @@
 {
     [gSecurity tryToSetLock:ORGretina4SettingsLock to:[sender intValue] forWindow:[self window]];
 }
+
+- (IBAction) registerLockAction:(id) sender
+{
+    [gSecurity tryToSetLock:ORGretina4RegisterLock to:[sender intValue] forWindow:[self window]];
+}
+
 
 - (IBAction) resetBoard:(id) sender
 {
@@ -840,7 +915,7 @@
     }
 }
 
--(IBAction)initBoard:(id)sender
+- (IBAction) initBoard:(id)sender
 {
     @try {
         [self endEditing];
@@ -868,7 +943,6 @@
     }
 }
 
-
 - (IBAction) cardInfoAction:(id) sender
 {
     int index = [[sender selectedCell] tag];
@@ -883,7 +957,6 @@
         [model setRateIntegrationTime:[sender doubleValue]];		
     }
 }
-
 
 -(IBAction)probeBoard:(id)sender
 {
@@ -928,7 +1001,7 @@
     }
 }
 
--(IBAction)readStatus:(id)sender
+- (IBAction) readStatus:(id)sender
 {    
     [self endEditing];
     @try {
@@ -1008,7 +1081,6 @@
 #pragma mark ¥¥¥Data Source
 - (double) getBarValue:(int)tag
 {
-	
 	return [[[[model waveFormRateGroup]rates] objectAtIndex:tag] rate];
 }
 
@@ -1034,7 +1106,6 @@
 @end
 
 @implementation ORGretina4Controller (private)
-
 - (void) openPanelForMainFPGADidEnd:(NSOpenPanel*)sheet
 						 returnCode:(int)returnCode
 						contextInfo:(void*)contextInfo
@@ -1044,5 +1115,4 @@
 		[model startDownLoadingMainFPGA];
     }
 }
-
 @end

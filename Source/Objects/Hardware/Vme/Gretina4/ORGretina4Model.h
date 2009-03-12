@@ -188,6 +188,9 @@ enum Gretina4FIFOStates {
 	BOOL downLoadMainFPGAInProgress;
     int fpgaDownProgress;
 	NSLock* progressLock;
+	
+    unsigned long registerWriteValue;
+    int registerIndex;
 }
 
 - (id) init;
@@ -196,6 +199,10 @@ enum Gretina4FIFOStates {
 - (void) makeMainController;
 
 #pragma mark ***Accessors
+- (int) registerIndex;
+- (void) setRegisterIndex:(int)aRegisterIndex;
+- (unsigned long) registerWriteValue;
+- (void) setRegisterWriteValue:(unsigned long)aWriteValue;
 - (BOOL) downLoadMainFPGAInProgress;
 - (void) setDownLoadMainFPGAInProgress:(BOOL)aState;
 - (int) fpgaDownProgress;
@@ -214,8 +221,8 @@ enum Gretina4FIFOStates {
 - (id)   cardInfo:(int)index;
 - (id)   rawCardValue:(int)index value:(id)aValue;
 - (id)   convertedCardValue:(int)index;
-- (const char*) registerNameAt:(unsigned int)index;
-- (const char*) fpgaRegisterNameAt:(unsigned int)index;
+- (NSString*) registerNameAt:(unsigned int)index;
+- (NSString*) fpgaRegisterNameAt:(unsigned int)index;
 - (unsigned long) readRegister:(unsigned int)index;
 - (void) writeRegister:(unsigned int)index withValue:(unsigned long)value;
 - (unsigned long) readFPGARegister:(unsigned int)index;
@@ -326,13 +333,11 @@ enum Gretina4FIFOStates {
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
 
-
 #pragma mark ¥¥¥HW Wizard
 - (int) numberOfChannels;
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
-
 
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -341,6 +346,8 @@ enum Gretina4FIFOStates {
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(short*)anArray forKey:(NSString*)aKey;
 @end
 
+extern NSString* ORGretina4ModelRegisterIndexChanged;
+extern NSString* ORGretina4ModelRegisterWriteValueChanged;
 extern NSString* ORGretina4ModelMainFPGADownLoadInProgressChanged;
 extern NSString* ORGretina4ModelFpgaDownProgressChanged;
 extern NSString* ORGretina4ModelMainFPGADownLoadStateChanged;
@@ -363,6 +370,7 @@ extern NSString* ORGretina4ModelDataDelayChanged;
 extern NSString* ORGretina4ModelDataLengthChanged;
 
 extern NSString* ORGretina4SettingsLock;
+extern NSString* ORGretina4RegisterLock;
 extern NSString* ORGretina4CardInfoUpdated;
 extern NSString* ORGretina4RateGroupChangedNotification;
 extern NSString* ORGretina4NoiseFloorChanged;
