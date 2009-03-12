@@ -754,7 +754,7 @@
 			[registerWriteValueField setEnabled:NO];
 			[readRegisterButton setEnabled:NO];
 			[registerStatusField setTextColor:[NSColor redColor]];
-			[registerStatusField setStringValue:@"Set value on main tab."];
+			[registerStatusField setStringValue:@"Set value in Basic Ops."];
 		}
 	} 
 	else {
@@ -769,7 +769,7 @@
 			[registerWriteValueField setEnabled:NO];
 			[readRegisterButton setEnabled:NO];
 			[registerStatusField setTextColor:[NSColor redColor]];
-			[registerStatusField setStringValue:@"Set value on main tab."];
+			[registerStatusField setStringValue:@"Set value in Basic Ops."];
 		}
 	}
 	
