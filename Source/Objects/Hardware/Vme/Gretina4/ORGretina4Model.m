@@ -84,127 +84,76 @@ NSString* ORGretina4RegisterLock				= @"ORGretina4RegisterLock";
 @implementation ORGretina4Model
 #pragma mark ¥¥¥Static Declarations
 //offsets from the base address
-static unsigned long register_offsets[kNumberOfGretina4Registers] = {
-0x00,  //[0] board ID
-0x04,  //[1] Programming done
-0x08,  //[2] External Window
-0x0C,  //[3] Pileup Window
-0x10,  //[4] Noise Window
-0x14,  //[5] Extrn trigger sliding length
-0x18,  //[6] Collection time
-0x1C,  //[7] Integration time
-0x20,  //[8] Hardware Status
-0x40,  //[9] Control/Status
-0x80,  //[10] LED Threshold
-0xC0,  //[11] CFD Parameters
-0x100, //[12] Raw data sliding length
-0x140, //[13] Raw data window length
-0x400, //[14] DAC
-0x480, //[15] Slave Front bus status
-0x484, //[16] Channel Zero time stamp LSB
-0x488, //[17] Channel Zero time stamp MSB
-0x48C, //[18] Slave Front Bus Send Box 18 - 1
-0x4D4, //[19] Slave Front bus register 0 - 10
-0x500, //[20] Master Logic Status
-0x504, //[21] SlowData CCLED timers
-0x508, //[22] DeltaT155_DeltaT255 (3)
-0x514, //[23] SnapShot 
-0x518, //[24] XTAL ID 
-0x51C, //[25] Length of Time to get Hit Pattern 
-0x520, //[26] Front Side Bus Register
-0x524, //[27] FrontBus Registers 0-10
-0x780, //[28] Debug data buffer address
-0x784, //[29] Debug data buffer data
-0x788, //[30] LED flag window
-0x800, //[31] Aux io read
-0x804, //[32] Aux io write
-0x808, //[33] Aux io config
-0x820, //[34] FB_Read
-0x824, //[35] FB_Write
-0x828, //[36] FB_Config
-0x840, //[37] SD_Read
-0x844, //[38] SD_Write
-0x848, //[39] SD_Config
-0x84C, //[40] Adc config
-0x860, //[41] self trigger enable
-0x864, //[42] self trigger period
-0x868  //[43] self trigger count
+typedef struct {
+	unsigned long offset;
+	NSString* name;
+	BOOL canRead;
+	BOOL canWrite;
+	BOOL hasChannels;
+	BOOL displayOnMainGretinaPage;
+} Gretina4RegisterInformation;
+	
+static Gretina4RegisterInformation register_information[kNumberOfGretina4Registers] = {
+{0x00,  @"Board ID", YES, NO, NO, NO},                         
+{0x04,  @"Programming done", YES, YES, NO, NO},                
+{0x08,  @"External Window",  YES, YES, NO, YES},               
+{0x0C,  @"Pileup Window", YES, YES, NO, YES},                  
+{0x10,  @"Noise Window", YES,YES, NO, YES},                    
+{0x14,  @"External trigger sliding length", YES, YES, NO, YES},
+{0x18,  @"Collection time", YES, YES, NO, YES},                
+{0x1C,  @"Integration time", YES, YES, NO, YES},               
+{0x20,  @"Hardware Status", YES, YES, NO, NO},                 
+{0x40,  @"Control/Status", YES, YES, YES, YES},                
+{0x80,  @"LED Threshold", YES, YES, YES, YES},                 
+{0xC0,  @"CFD Parameters", YES, YES, YES, YES},                
+{0x100, @"Raw data sliding length", YES, YES, YES, YES},       
+{0x140, @"Raw data window length", YES, YES, YES, YES},        
+{0x400, @"DAC", YES, YES, NO, NO},                             
+{0x480, @"Slave Front bus status", YES, YES, NO, NO},          
+{0x484, @"Channel Zero time stamp LSB", YES, YES, NO, NO},     
+{0x488, @"Channel Zero time stamp MSB",  YES, YES, NO, NO},    
+{0x48C, @"Slave Front Bus Send Box 18 - 1", YES, YES, NO, NO}, 
+{0x4D4, @"Slave Front bus register 0 - 10", YES, YES, NO, NO}, 
+{0x500, @"Master Logic Status", YES, YES, NO, NO},             
+{0x504, @"SlowData CCLED timers", YES, YES, NO, NO},           
+{0x508, @"DeltaT155_DeltaT255 (3)", YES, YES, NO, NO},         
+{0x514, @"SnapShot ", YES, YES, NO, NO},                       
+{0x518, @"XTAL ID ", YES, YES, NO, NO},                        
+{0x51C, @"Length of Time to get Hit Pattern", YES, YES, NO, NO},
+{0x520, @"Front Side Bus Register", YES, YES, NO, NO},         
+{0x524, @"FrontBus Registers 0-10", YES, YES, NO, NO},         
+{0x780, @"Debug data buffer address", YES, YES, NO, NO},       
+{0x784, @"Debug data buffer data", YES, YES, NO, NO},          
+{0x788, @"LED flag window", YES, YES, NO, NO},                 
+{0x800, @"Aux io read", YES, YES, NO, NO},                     
+{0x804, @"Aux io write", YES, YES, NO, NO},                    
+{0x808, @"Aux io config", YES, YES, NO, NO},                   
+{0x820, @"FB_Read", YES, YES, NO, NO},                         
+{0x824, @"FB_Write", YES, YES, NO, NO},                        
+{0x828, @"FB_Config", YES, YES, NO, NO},                       
+{0x840, @"SD_Read", YES, YES, NO, NO},                         
+{0x844, @"SD_Write", YES, YES, NO, NO},                        
+{0x848, @"SD_Config", YES, YES, NO, NO},                       
+{0x84C, @"Adc config", YES, YES, NO, NO},                      
+{0x860, @"self trigger enable", YES, YES, NO, NO},             
+{0x864, @"self trigger period", YES, YES, NO, NO},             
+{0x868, @"self trigger count", YES, YES, NO, NO}               
 };
-
-static NSString* register_names[kNumberOfGretina4Registers] = {
-	@"board ID",
-	@"Programming done",
-	@"External Window",
-	@"Pileup Window",
-	@"Noise Window",
-	@"Extrn trigger sliding length",
-	@"Collection time",
-	@"Integration time",
-	@"Hardware Status",
-	@"Control/Status",
-	@"LED Threshold",
-	@"CFD Parameters",
-	@"Raw data sliding length",
-	@"Raw data window length",
-	@"DAC",
-	@"Slave Front bus status",
-	@"Channel Zero time stamp LSB",
-	@"Channel Zero time stamp MSB",
-	@"Slave Front Bus Send Box 18 - 1",
-	@"Slave Front bus register 0 - 10",
-	@"Master Logic Status",
-	@"SlowData CCLED timers",
-	@"DeltaT155_DeltaT255 (3)",
-	@"SnapShot ",
-	@"XTAL ID ",
-	@"Length of Time to get Hit Pattern ",
-	@"Front Side Bus Register",
-	@"FrontBus Registers 0-10",
-	@"Debug data buffer address",
-	@"Debug data buffer data",
-	@"LED flag window",
-	@"Aux io read",
-	@"Aux io write",
-	@"Aux io config",
-	@"FB_Read",
-	@"FB_Write",
-	@"FB_Config",
-	@"SD_Read",
-	@"SD_Write",
-	@"SD_Config",
-	@"Adc config",
-	@"self trigger enable",
-	@"self trigger period",
-	@"self trigger count"
-};
-
-static unsigned long fpga_register_offsets[kNumberOfFPGARegisters] = {
-0x900,	//[0] Main Digitizer FPGA configuration register
-0x904,	//[1] Main Digitizer FPGA status register
-0x908,	//[2] Voltage and Temperature Status
-0x910,	//[3] General Purpose VME Control Settings
-0x914,	//[4] VME Timeout Value Register
-0x920,	//[5] VME Version/Status
-0x930,	//[6] VME FPGA Sandbox Register Block
-0x980,	//[7] Flash Address
-0x984,	//[8] Flash Data with Auto-increment address
-0x988,	//[9] Flash Data
-0x98C	//[10] FlashCommandRegister
-};
-
-static NSString* fpga_register_names[kNumberOfFPGARegisters] = {
-	@"Main Digitizer FPGA configuration register",
-	@"Main Digitizer FPGA status register",
-	@"Voltage and Temperature Status",
-	@"General Purpose VME Control Settings",
-	@"VME Timeout Value Register",
-	@"VME Version/Status",
-	@"VME FPGA Sandbox Register Block",
-	@"Flash Address",
-	@"Flash Data with Auto-increment address",
-	@"Flash Data",
-	@"FlashCommandRegister"
-};
+                                      
+static Gretina4RegisterInformation fpga_register_information[kNumberOfFPGARegisters] = {
+{0x900,	@"Main Digitizer FPGA configuration register", YES, YES, NO, NO},  
+{0x904,	@"Main Digitizer FPGA status register", YES, NO, NO, NO},          
+{0x908,	@"Voltage and Temperature Status", YES, NO, NO, NO},               
+{0x910,	@"General Purpose VME Control Settings", YES, YES, NO, NO},        
+{0x914,	@"VME Timeout Value Register", YES, YES, NO, NO},                  
+{0x920,	@"VME Version/Status", YES, NO, NO, NO},                           
+{0x930,	@"VME FPGA Sandbox Register Block", YES, YES, NO, NO},             
+{0x980,	@"Flash Address", YES, YES, NO, NO},                               
+{0x984,	@"Flash Data with Auto-increment address", YES, YES, NO, NO},      
+{0x988,	@"Flash Data", YES, YES, NO, NO},                                  
+{0x98C,	@"Flash Command Register", YES, YES, NO, NO}                       
+                                                                                       
+};                                                        
 
 enum {
     kExternalWindowIndex,
@@ -304,21 +253,22 @@ static struct {
 - (NSString*) registerNameAt:(unsigned int)index
 {
 	if (index >= kNumberOfGretina4Registers) return @"";
-	return register_names[index];
+	return register_information[index].name;
 }
 
 - (NSString*) fpgaRegisterNameAt:(unsigned int)index
 {
 	if (index >= kNumberOfFPGARegisters) return @"";
-	return fpga_register_names[index];
+	return fpga_register_information[index].name;
 }
 
 - (unsigned long) readRegister:(unsigned int)index
 {
 	if (index >= kNumberOfGretina4Registers) return -1;
+	if (![self canReadRegister:index]) return -1;
 	unsigned long theValue = 0;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[index]
+                        atAddress:[self baseAddress] + register_information[index].offset
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -328,19 +278,39 @@ static struct {
 - (void) writeRegister:(unsigned int)index withValue:(unsigned long)value
 {
 	if (index >= kNumberOfGretina4Registers) return;
+	if (![self canWriteRegister:index]) return;
     [[self adapter] writeLongBlock:&value
-                         atAddress:[self baseAddress] + register_offsets[index]
+                         atAddress:[self baseAddress] + register_information[index].offset
                          numToWrite:1
 					    withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];	
 }
 
+- (BOOL) canReadRegister:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4Registers) return NO;
+	return register_information[index].canRead;
+}
+
+- (BOOL) canWriteRegister:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4Registers) return NO;
+	return register_information[index].canWrite;
+}
+
+- (BOOL) displayRegisterOnMainPage:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4Registers) return NO;
+	return register_information[index].displayOnMainGretinaPage;
+}
+
 - (unsigned long) readFPGARegister:(unsigned int)index;
 {
 	if (index >= kNumberOfFPGARegisters) return -1;
+	if (![self canReadFPGARegister:index]) return -1;
 	unsigned long theValue = 0;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + fpga_register_offsets[index]
+                        atAddress:[self baseAddress] + fpga_register_information[index].offset
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -350,11 +320,30 @@ static struct {
 - (void) writeFPGARegister:(unsigned int)index withValue:(unsigned long)value
 {
 	if (index >= kNumberOfFPGARegisters) return;
+	if (![self canWriteFPGARegister:index]) return;
     [[self adapter] writeLongBlock:&value
-                         atAddress:[self baseAddress] + fpga_register_offsets[index]
+                         atAddress:[self baseAddress] + fpga_register_information[index].offset
                          numToWrite:1
 					    withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];	
+}
+
+- (BOOL) canReadFPGARegister:(unsigned int)index
+{
+	if (index >= kNumberOfFPGARegisters) return NO;
+	return fpga_register_information[index].canRead;
+}
+
+- (BOOL) canWriteFPGARegister:(unsigned int)index
+{
+	if (index >= kNumberOfFPGARegisters) return NO;
+	return fpga_register_information[index].canWrite;
+}
+
+- (BOOL) displayFPGARegisterOnMainPage:(unsigned int)index
+{
+	if (index >= kNumberOfFPGARegisters) return NO;
+	return fpga_register_information[index].displayOnMainGretinaPage;
 }
 
 - (BOOL) downLoadMainFPGAInProgress
@@ -733,7 +722,7 @@ static struct {
 {
     unsigned long theValue = 0;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kBoardID]
+                        atAddress:[self baseAddress] + register_information[kBoardID].offset
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -744,7 +733,7 @@ static struct {
 {
     unsigned long theValue = 0;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kSDConfig]
+                        atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -753,7 +742,7 @@ static struct {
     theValue |= 0x200;
     
     [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_offsets[kSDConfig]
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToWrite:1
                         withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -780,7 +769,7 @@ static struct {
 {
     unsigned long theValue = 0;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kHardwareStatus]
+                        atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
                         numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
@@ -789,7 +778,7 @@ static struct {
     theValue = 0x22;
     /* First we set to loop back mode so the SD can lock. */
     [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_offsets[kSDConfig]
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
                         numToWrite:1
                         withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -798,7 +787,7 @@ static struct {
     while(1) {
         /* Wait for the SD and DCM to lock */
         [[self adapter] readLongBlock:&theValue
-                            atAddress:[self baseAddress] + register_offsets[kHardwareStatus]
+                            atAddress:[self baseAddress] + register_information[kHardwareStatus].offset
                             numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];
@@ -811,7 +800,7 @@ static struct {
     }
     theValue = 0x02;
     [[self adapter] writeLongBlock:&theValue
-						 atAddress:[self baseAddress] + register_offsets[kSDConfig]
+						 atAddress:[self baseAddress] + register_information[kSDConfig].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];    
@@ -845,7 +834,7 @@ static struct {
 {
     unsigned long theValue = 0 ;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kControlStatus] + 4*channel
+                        atAddress:[self baseAddress] + register_information[kControlStatus].offset + 4*channel
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -866,7 +855,7 @@ static struct {
     unsigned long theValue = (poleZeroEnabled[chan] << 13) | (cfdEnabled[chan] << 12) | (polarity[chan] << 10) 
 	| (triggerMode[chan] << 3) | (pileUp[chan] << 2) | (debug[chan] << 1) | startStop;
     [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_offsets[kControlStatus] + 4*chan
+                         atAddress:[self baseAddress] + register_information[kControlStatus].offset + 4*chan
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -879,7 +868,7 @@ static struct {
 - (void) writeLEDThreshold:(int)channel
 {    
     [[self adapter] writeLongBlock:&ledThreshold[channel]
-                         atAddress:[self baseAddress] + register_offsets[kLEDThreshold] + 4*channel
+                         atAddress:[self baseAddress] + register_information[kLEDThreshold].offset + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -890,7 +879,7 @@ static struct {
 {    
     unsigned long theValue = ((cfdDelay[channel] & 0x3F) << 7) | ((cfdFraction[channel] & 0x3) << 5) | (cfdThreshold[channel]);
     [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_offsets[kCFDParameters] + 4*channel
+                         atAddress:[self baseAddress] + register_information[kCFDParameters].offset + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -901,7 +890,7 @@ static struct {
 {    
     unsigned long theValue = (unsigned long)dataDelay[channel];
     [[self adapter] writeLongBlock:&theValue
-                         atAddress:[self baseAddress] + register_offsets[kRawDataSlidingLength] + 4*channel
+                         atAddress:[self baseAddress] + register_information[kRawDataSlidingLength].offset + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -912,7 +901,7 @@ static struct {
 {    
 	unsigned long aValue = dataLength[channel];
     [[self adapter] writeLongBlock:&aValue
-                         atAddress:[self baseAddress] + register_offsets[kRawDataWindowLength] + 4*channel
+                         atAddress:[self baseAddress] + register_information[kRawDataWindowLength].offset + 4*channel
                         numToWrite:1
                         withAddMod:[self addressModifier]
                      usingAddSpace:0x01];
@@ -924,7 +913,7 @@ static struct {
 {
     unsigned long theValue = 0 ;
     [[self adapter] readLongBlock:&theValue
-                        atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
+                        atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
                         numToRead:1
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -941,7 +930,7 @@ static struct {
     /* clearFIFO clears the FIFO and then resets the enabled flags on the board to whatever *
      * was currently set *ON THE BOARD*.                                                    */
 	int count = 0;
-    fifoStateAddress  = [self baseAddress] + register_offsets[kProgrammingDone];
+    fifoStateAddress  = [self baseAddress] + register_information[kProgrammingDone].offset;
     fifoAddress       = [self baseAddress] + 0x1000;
 	theController     = [self adapter];
 	unsigned long  dataDump[0xffff];
@@ -1154,7 +1143,7 @@ static struct {
 			case 2:
 				//read the fifo state
 				[[self adapter] readLongBlock:&val
-									atAddress:[self baseAddress] + register_offsets[kProgrammingDone]
+									atAddress:[self baseAddress] + register_information[kProgrammingDone].offset
 									numToRead:1
 								   withAddMod:[self addressModifier]
 								usingAddSpace:0x01];
@@ -1448,7 +1437,7 @@ static struct {
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
     theController   = [self adapter];
     fifoAddress     = [self baseAddress] + 0x1000;
-    fifoStateAddress= [self baseAddress] + register_offsets[kProgrammingDone];
+    fifoStateAddress= [self baseAddress] + register_information[kProgrammingDone].offset;
     
     short i;
     for(i=0;i<kNumGretina4Channels;i++) {
@@ -1640,7 +1629,7 @@ static struct {
 	configStruct->card_info[index].crate		= [self crateNumber];
 	configStruct->card_info[index].add_mod		= [self addressModifier];
 	configStruct->card_info[index].base_add		= [self baseAddress];
-	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_offsets[kProgrammingDone]; //fifoStateAddress
+	configStruct->card_info[index].deviceSpecificData[0]	= [self baseAddress] + register_information[kProgrammingDone].offset; //fifoStateAddress
     configStruct->card_info[index].deviceSpecificData[1]	= kGretina4FIFOEmpty; // fifoEmptyMask
     configStruct->card_info[index].deviceSpecificData[2]	= [self baseAddress] + 0x1000; // fifoAddress
     configStruct->card_info[index].deviceSpecificData[3]	= 0x0B; // fifoAM
@@ -1877,21 +1866,21 @@ static struct {
 {
 	unsigned long tempToWrite = kGretina4FlashClearrSRCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
 	tempToWrite = kGretina4FlashReadArrayCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
 	tempToWrite = 0x0;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashAddress].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -1901,7 +1890,7 @@ static struct {
 {
 	unsigned long tempToWrite = kGretina4FlashEnableWrite;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kVMEGPControl]
+						 atAddress:[self baseAddress] + fpga_register_information[kVMEGPControl].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -1912,7 +1901,7 @@ static struct {
 {
 	unsigned long tempToWrite = kGretina4FlashDisableWrite;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kVMEGPControl]
+						 atAddress:[self baseAddress] + fpga_register_information[kVMEGPControl].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -1943,14 +1932,14 @@ static struct {
 	} 	
 	unsigned long tempToWrite = anAddress;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashAddress].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
 	tempToWrite = kGretina4FlashWriteCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -1959,14 +1948,14 @@ static struct {
 		// Checking status to make sure that flash is ready
 		/* This is slightly different since we give another command if the status hasn't updated. */
 		[[self adapter] readLongBlock:&tempToWrite
-							atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
+							atAddress:[self baseAddress] + fpga_register_information[kFlashData].offset
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];		
 		if ( (tempToWrite & kGretina4FlashReady)  == 0 ) {
 			tempToWrite = kGretina4FlashWriteCmd;
 			[[self adapter] writeLongBlock:&tempToWrite
-								 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+								 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 								numToWrite:1
 								withAddMod:[self addressModifier]
 							 usingAddSpace:0x01];			
@@ -1976,7 +1965,7 @@ static struct {
 	// Setting how many we are trying to write
 	tempToWrite = (aNumber/2) - 1;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -1989,7 +1978,7 @@ static struct {
 		(((unsigned long)(bufferToWrite[i+2]) << 16) & 0xFF0000)|    
 		(((unsigned long)(bufferToWrite[i+3]) << 24) & 0xFF000000);
 		[[self adapter] writeLongBlock:&tempToWrite
-							 atAddress:[self baseAddress] + fpga_register_offsets[kFlashDataWithAddrIncr]
+							 atAddress:[self baseAddress] + fpga_register_information[kFlashDataWithAddrIncr].offset
 							numToWrite:1
 							withAddMod:[self addressModifier]
 						 usingAddSpace:0x01];	
@@ -1998,7 +1987,7 @@ static struct {
 	// Finishing the write
 	tempToWrite = kGretina4FlashConfirmCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -2012,7 +2001,7 @@ static struct {
 	while(1) {
 		// Checking status to make sure that flash is ready
 		[[self adapter] readLongBlock:&tempToRead
-							atAddress:[self baseAddress] + fpga_register_offsets[kFlashData]
+							atAddress:[self baseAddress] + fpga_register_information[kFlashData].offset
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];		
@@ -2025,7 +2014,7 @@ static struct {
 {
 	unsigned long tempToWrite = kGretina4FlashStatusRegCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -2042,14 +2031,14 @@ static struct {
 	}
 	unsigned long tempToWrite = 0x0;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashAddress].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
 	tempToWrite = kGretina4FlashBlockEraseCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -2057,7 +2046,7 @@ static struct {
 	/* Now denote which block we're going to do. */
 	tempToWrite = blockNumber*kGretina4FlashBlockSize;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashAddress]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashAddress].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
@@ -2065,7 +2054,7 @@ static struct {
 	/* And confirm. */
 	tempToWrite = kGretina4FlashConfirmCmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kFlashCommandRegister]
+						 atAddress:[self baseAddress] + fpga_register_information[kFlashCommandRegister].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];					 
@@ -2087,7 +2076,7 @@ static struct {
 	[self setFpgaDownProgress:0.];
 	while ( position < [theData length] ) {
 		[[self adapter] readLongBlock:&tempToRead
-							atAddress:[self baseAddress] + fpga_register_offsets[kFlashDataWithAddrIncr]
+							atAddress:[self baseAddress] + fpga_register_information[kFlashDataWithAddrIncr].offset
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];	
@@ -2124,28 +2113,28 @@ static struct {
 {
 	unsigned long tempToWrite = kGretina4ResetMainFPGACmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAControl]
+						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
 	tempToWrite = kGretina4ReloadMainFPGACmd;
 	[[self adapter] writeLongBlock:&tempToWrite
-						 atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAControl]
+						 atAddress:[self baseAddress] + fpga_register_information[kMainFPGAControl].offset
 						numToWrite:1
 						withAddMod:[self addressModifier]
 					 usingAddSpace:0x01];
 	
 	/* Now check if it is done reloading before releasing. */
 	[[self adapter] readLongBlock:&tempToWrite
-						atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAStatus]
+						atAddress:[self baseAddress] + fpga_register_information[kMainFPGAStatus].offset
 						numToRead:1
 					   withAddMod:[self addressModifier]
 					usingAddSpace:0x01];
 	
 	while ( ( tempToWrite & kGretina4MainFPGAIsLoaded ) != kGretina4MainFPGAIsLoaded ) {
 		[[self adapter] readLongBlock:&tempToWrite
-							atAddress:[self baseAddress] + fpga_register_offsets[kMainFPGAStatus]
+							atAddress:[self baseAddress] + fpga_register_information[kMainFPGAStatus].offset
 							numToRead:1
 						   withAddMod:[self addressModifier]
 						usingAddSpace:0x01];

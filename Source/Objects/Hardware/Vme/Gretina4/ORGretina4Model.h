@@ -221,12 +221,20 @@ enum Gretina4FIFOStates {
 - (id)   cardInfo:(int)index;
 - (id)   rawCardValue:(int)index value:(id)aValue;
 - (id)   convertedCardValue:(int)index;
+
+// Register access
 - (NSString*) registerNameAt:(unsigned int)index;
 - (NSString*) fpgaRegisterNameAt:(unsigned int)index;
 - (unsigned long) readRegister:(unsigned int)index;
 - (void) writeRegister:(unsigned int)index withValue:(unsigned long)value;
+- (BOOL) canReadRegister:(unsigned int)index;
+- (BOOL) canWriteRegister:(unsigned int)index;
+- (BOOL) displayRegisterOnMainPage:(unsigned int)index;
 - (unsigned long) readFPGARegister:(unsigned int)index;
 - (void) writeFPGARegister:(unsigned int)index withValue:(unsigned long)value;
+- (BOOL) canReadFPGARegister:(unsigned int)index;
+- (BOOL) canWriteFPGARegister:(unsigned int)index;
+- (BOOL) displayFPGARegisterOnMainPage:(unsigned int)index;
 
 - (ORRateGroup*)    waveFormRateGroup;
 - (void)			setWaveFormRateGroup:(ORRateGroup*)newRateGroup;

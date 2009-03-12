@@ -106,6 +106,7 @@
 	IBOutlet NSTextField*	registerWriteValueField;
 	IBOutlet NSButton*		writeRegisterButton;
 	IBOutlet NSButton*		readRegisterButton;
+	IBOutlet NSTextField*	registerStatusField;
 	
     //offset panel
     IBOutlet NSPanel*				noiseFloorPanel;
@@ -164,6 +165,8 @@
 - (void) noiseFloorIntegrationChanged:(NSNotification*)aNote;
 - (void) registerLockChanged:(NSNotification*)aNote;
 - (void) registerWriteValueChanged:(NSNotification*)aNote;
+
+- (void) setRegisterDisplay:(unsigned int)index;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) baseAddressAction:(id)sender;

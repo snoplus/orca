@@ -374,6 +374,7 @@
 - (void) registerIndexChanged:(NSNotification*)aNote
 {
 	[registerIndexPU selectItemAtIndex: [model registerIndex]];
+	[self setRegisterDisplay:[model registerIndex]];
 }
 
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote
@@ -740,12 +741,47 @@
     }
 }
 
+- (void) setRegisterDisplay:(unsigned int)index
+{
+	if (index < kNumberOfGretina4Registers) {
+		if (![model displayRegisterOnMainPage:index]) {
+			[writeRegisterButton setEnabled:[model canWriteRegister:index]];
+			[registerWriteValueField setEnabled:[model canWriteRegister:index]];
+			[readRegisterButton setEnabled:[model canReadRegister:index]];
+			[registerStatusField setStringValue:@""];
+		} else {
+			[writeRegisterButton setEnabled:NO];
+			[registerWriteValueField setEnabled:NO];
+			[readRegisterButton setEnabled:NO];
+			[registerStatusField setTextColor:[NSColor redColor]];
+			[registerStatusField setStringValue:@"Set value on main tab."];
+		}
+	} 
+	else {
+		if (![model displayFPGARegisterOnMainPage:index]) {
+			index -= kNumberOfGretina4Registers;
+			[writeRegisterButton setEnabled:[model canWriteFPGARegister:index]];
+			[registerWriteValueField setEnabled:[model canWriteFPGARegister:index]];
+			[readRegisterButton setEnabled:[model canReadFPGARegister:index]];
+			[registerStatusField setStringValue:@""];
+		} else {
+			[writeRegisterButton setEnabled:NO];
+			[registerWriteValueField setEnabled:NO];
+			[readRegisterButton setEnabled:NO];
+			[registerStatusField setTextColor:[NSColor redColor]];
+			[registerStatusField setStringValue:@"Set value on main tab."];
+		}
+	}
+	
+}
 
 #pragma mark ¥¥¥Actions
 
 - (IBAction) registerIndexPUAction:(id)sender
 {
-	[model setRegisterIndex:[sender indexOfSelectedItem]];	
+	unsigned int index = [sender indexOfSelectedItem];
+	[model setRegisterIndex:index];
+	[self setRegisterDisplay:index];
 }
 
 - (IBAction) enabledAction:(id)sender

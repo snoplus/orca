@@ -7331,6 +7331,22 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 													<int key="NSPeriodicInterval">75</int>
 												</object>
 											</object>
+											<object class="NSTextField" id="10123820">
+												<reference key="NSNextResponder" ref="664957062"/>
+												<int key="NSvFlags">268</int>
+												<string key="NSFrame">{{117, 369}, {175, 17}}</string>
+												<reference key="NSSuperview" ref="664957062"/>
+												<bool key="NSEnabled">YES</bool>
+												<object class="NSTextFieldCell" key="NSCell" id="92278453">
+													<int key="NSCellFlags">68288064</int>
+													<int key="NSCellFlags2">272761856</int>
+													<string key="NSContents"> </string>
+													<reference key="NSSupport" ref="26"/>
+													<reference key="NSControlView" ref="10123820"/>
+													<reference key="NSBackgroundColor" ref="125656912"/>
+													<reference key="NSTextColor" ref="39517887"/>
+												</object>
+											</object>
 										</object>
 										<string key="NSFrame">{{10, 25}, {785, 470}}</string>
 										<reference key="NSSuperview" ref="618019199"/>
@@ -8920,6 +8936,14 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					</object>
 					<int key="connectionID">2416</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">registerStatusField</string>
+						<reference key="source" ref="348592300"/>
+						<reference key="destination" ref="10123820"/>
+					</object>
+					<int key="connectionID">2421</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -9169,9 +9193,9 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="1984701"/>
 							<reference ref="1051486003"/>
-							<reference ref="501179346"/>
 							<reference ref="817903657"/>
 							<reference ref="193622450"/>
+							<reference ref="501179346"/>
 							<reference ref="915023649"/>
 						</object>
 						<reference key="parent" ref="505112664"/>
@@ -12621,6 +12645,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<reference ref="281549266"/>
 							<reference ref="230750104"/>
 							<reference ref="498283396"/>
+							<reference ref="10123820"/>
 						</object>
 						<reference key="parent" ref="993624043"/>
 					</object>
@@ -12751,6 +12776,20 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 						<int key="objectID">2408</int>
 						<reference key="object" ref="989867082"/>
 						<reference key="parent" ref="1026296319"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2419</int>
+						<reference key="object" ref="10123820"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="92278453"/>
+						</object>
+						<reference key="parent" ref="664957062"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">2420</int>
+						<reference key="object" ref="92278453"/>
+						<reference key="parent" ref="10123820"/>
 					</object>
 				</object>
 			</object>
@@ -13736,6 +13775,8 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<string>2407.IBPluginDependency</string>
 					<string>2407.ImportedFromIB2</string>
 					<string>2408.IBPluginDependency</string>
+					<string>2419.IBPluginDependency</string>
+					<string>2420.IBPluginDependency</string>
 					<string>387.IBPluginDependency</string>
 					<string>387.ImportedFromIB2</string>
 				</object>
@@ -14736,8 +14777,8 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{77, 434}, {831, 525}}</string>
-					<string>{{77, 434}, {831, 525}}</string>
+					<string>{{480, 253}, {831, 525}}</string>
+					<string>{{480, 253}, {831, 525}}</string>
 					<reference ref="5"/>
 					<reference ref="5"/>
 					<string>{213, 107}</string>
@@ -14888,6 +14929,8 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 				</object>
 			</object>
@@ -14911,7 +14954,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">2418</int>
+			<int key="maxID">2421</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -15613,6 +15656,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>readRegisterButton</string>
 							<string>registerIndexPU</string>
 							<string>registerLockButton</string>
+							<string>registerStatusField</string>
 							<string>registerWriteValueField</string>
 							<string>resetButton</string>
 							<string>settingLockButton</string>
@@ -15685,6 +15729,7 @@ AAD+/wBIAGUAbAB2AGUAdABpAGMAYYQBZgyEAWMAmAGYAJgAhg</bytes>
 							<string>NSButton</string>
 							<string>NSPopUpButton</string>
 							<string>NSButton</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSButton</string>
 							<string>NSButton</string>
