@@ -207,9 +207,15 @@
 	int i;
 	for(i=0;i<n;i++){
 		pairString = [pairList objectAtIndex:i];
-		NSArray* pair = [pairString componentsSeparatedByString:@":"];
-		if(pair)[orderedList addObject:[pair objectAtIndex:0]];
-		if([pair count]==2)[orderedList addObject:[pair lastObject]];
+		NSRange rangeOfFirstColon = [pairString rangeOfString:@":"];
+		NSString* part1 = nil;
+		NSString* part2 = nil;
+		if(rangeOfFirstColon.location!=NSNotFound){
+			part1 = [pairString substringToIndex:rangeOfFirstColon.location];
+			part2 = [pairString substringFromIndex:rangeOfFirstColon.location+1];
+		}
+		if(part1)[orderedList addObject:part1];
+		if(part2)[orderedList addObject:part2];
 	}
 
 	SEL theSelector = [NSInvocation makeSelectorFromArray:orderedList];
