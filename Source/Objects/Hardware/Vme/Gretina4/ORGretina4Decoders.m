@@ -89,28 +89,31 @@
 	
     [aDataSet histogram:energy numBins:0x1fff sender:self  withKeys:@"Gretina4", @"Energy",crateKey,cardKey,channelKey,nil];
 	
-	ptr += 4; //point to the data
-
-    NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
 	
-	//note:  there is something wrong here. The package length should be in longs but the
-	//packet is always half empty.   
-	[tmpData setLength:packetLength*sizeof(long)];
-	unsigned short* dPtr = (unsigned short*)[tmpData bytes];
-	int i;
-	int wordCount = 0;
-	//data is actually 2's complement. detwiler 08/26/08
-	for(i=0;i<packetLength;i++){
-		dPtr[wordCount++] =    (0x0000ffff & *ptr);
-		dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
-		ptr++;
-	}
-    [aDataSet loadWaveform:tmpData 
-					offset:0 //bytes!
-				  unitSize:2 //unit size in bytes!
-					sender:self  
-				  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
+	if (packetLength > 0) {
+		/* Decode the waveforms if the exist. */
+		ptr += 4; //point to the data
 
+		NSMutableData* tmpData = [NSMutableData dataWithCapacity:512*2];
+		
+		//note:  there is something wrong here. The package length should be in longs but the
+		//packet is always half empty.   
+		[tmpData setLength:packetLength*sizeof(long)];
+		unsigned short* dPtr = (unsigned short*)[tmpData bytes];
+		int i;
+		int wordCount = 0;
+		//data is actually 2's complement. detwiler 08/26/08
+		for(i=0;i<packetLength;i++){
+			dPtr[wordCount++] =    (0x0000ffff & *ptr);
+			dPtr[wordCount++] =    (0xffff0000 & *ptr) >> 16;
+			ptr++;
+		}
+		[aDataSet loadWaveform:tmpData 
+						offset:0 //bytes!
+					  unitSize:2 //unit size in bytes!
+						sender:self  
+					  withKeys:@"Gretina4", @"Waveforms",crateKey,cardKey,channelKey,nil];
+	}
 	if(getRatesFromDecodeStage){
 		//get the actual object
 		NSString* aKey = [crateKey stringByAppendingString:cardKey];

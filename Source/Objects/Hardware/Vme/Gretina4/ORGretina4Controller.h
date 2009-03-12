@@ -66,6 +66,11 @@
 	IBOutlet NSPopUpButton*	triggerModePU8;
 	IBOutlet NSPopUpButton*	triggerModePU9;
 	NSPopUpButton* triggerModePU[kNumGretina4Channels];
+	
+	IBOutlet NSPopUpButton*	registerPU;
+	IBOutlet NSTextField*	registerTextField;
+	IBOutlet NSButton*		writeRegisterButton;
+	IBOutlet NSButton*		readRegisterButton;
 
 	
     IBOutlet NSTextField*   slotField;
@@ -113,6 +118,7 @@
     NSView *blankView;
     NSSize settingSize;
     NSSize rateSize;
+    NSSize registerTabSize;
 
 }
 
@@ -187,6 +193,9 @@
 - (IBAction) dataLengthAction:(id)sender;
 - (IBAction) downloadMainFPGAAction:(id)sender;
 - (IBAction) stopLoadingMainFPGAAction:(id)sender;
+
+- (IBAction) readRegisterAction:(id)sender;
+- (IBAction) writeRegisterAction:(id)sender;
 
 #pragma mark ¥¥¥Data Source
 - (double)  getBarValue:(int)tag;

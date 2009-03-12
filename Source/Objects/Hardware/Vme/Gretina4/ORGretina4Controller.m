@@ -57,6 +57,7 @@
 	
     settingSize     = NSMakeSize(790,500);
     rateSize		= NSMakeSize(790,340);
+    registerTabSize	= NSMakeSize(790,187);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
@@ -82,6 +83,17 @@
 	triggerModePU[7] = triggerModePU7;
 	triggerModePU[8] = triggerModePU8;
 	triggerModePU[9] = triggerModePU9;
+	
+	// Setup register popup buttons
+	[registerPU removeAllItems];
+	int i;
+	for (i=0;i<kNumberOfGretina4Registers;i++) {
+		[registerPU insertItemWithTitle:[NSString stringWithUTF8String:[model registerNameAt:i]]	atIndex:i];
+	}
+	// And now the FPGA registers
+	for (i=0;i<kNumberOfFPGARegisters;i++) {
+		[registerPU insertItemWithTitle:[NSString stringWithUTF8String:[model fpgaRegisterNameAt:i]]	atIndex:(i+kNumberOfGretina4Registers)];
+	}
 	
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -783,6 +795,33 @@
     }
 }
 
+- (IBAction) readRegisterAction:(id)sender
+{
+	[self endEditing];
+	unsigned long aValue = 0;
+	unsigned int index = [registerPU indexOfSelectedItem];
+	if (index < kNumberOfGretina4Registers) {
+		aValue = [model readRegister:index];
+	} else {
+		index -= kNumberOfGretina4Registers;
+		aValue = [model readFPGARegister:index];	
+	}
+	[registerTextField setIntValue:aValue];
+}
+
+- (IBAction) writeRegisterAction:(id)sender
+{
+	[self endEditing];
+	unsigned long aValue = [registerTextField intValue];
+	unsigned int index = [registerPU indexOfSelectedItem];
+	if (index < kNumberOfGretina4Registers) {
+		[model writeRegister:index withValue:aValue];
+	} else {
+		index -= kNumberOfGretina4Registers;
+		[model writeFPGARegister:index withValue:aValue];	
+	}
+}
+
 - (IBAction) settingLockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORGretina4SettingsLock to:[sender intValue] forWindow:[self window]];
@@ -932,7 +971,12 @@
 		[[self window] setContentView:blankView];
 		[self resizeWindowToSize:rateSize];
 		[[self window] setContentView:tabView];
-    }
+    }     
+	else if([tabView indexOfTabViewItem:tabViewItem] == 2){
+		[[self window] setContentView:blankView];
+		[self resizeWindowToSize:registerTabSize];
+		[[self window] setContentView:tabView];
+    } 
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORGretina4%d.selectedtab",[model slot]];
     int index = [tabView indexOfTabViewItem:tabViewItem];

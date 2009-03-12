@@ -127,6 +127,53 @@ static unsigned long register_offsets[kNumberOfGretina4Registers] = {
 0x868  //[43] self trigger count
 };
 
+static const char* register_names[kNumberOfGretina4Registers] = {
+"board ID",
+"Programming done",
+"External Window",
+"Pileup Window",
+"Noise Window",
+"Extrn trigger sliding length",
+"Collection time",
+"Integration time",
+"Hardware Status",
+"Control/Status",
+"LED Threshold",
+"CFD Parameters",
+"Raw data sliding length",
+"Raw data window length",
+"DAC",
+"Slave Front bus status",
+"Channel Zero time stamp LSB",
+"Channel Zero time stamp MSB",
+"Slave Front Bus Send Box 18 - 1",
+"Slave Front bus register 0 - 10",
+"Master Logic Status",
+"SlowData CCLED timers",
+"DeltaT155_DeltaT255 (3)",
+"SnapShot ",
+"XTAL ID ",
+"Length of Time to get Hit Pattern ",
+"Front Side Bus Register",
+"FrontBus Registers 0-10",
+"Debug data buffer address",
+"Debug data buffer data",
+"LED flag window",
+"Aux io read",
+"Aux io write",
+"Aux io config",
+"FB_Read",
+"FB_Write",
+"FB_Config",
+"SD_Read",
+"SD_Write",
+"SD_Config",
+"Adc config",
+"self trigger enable",
+"self trigger period",
+"self trigger count"
+};
+
 static unsigned long fpga_register_offsets[kNumberOfFPGARegisters] = {
 0x900,	//[0] Main Digitizer FPGA configuration register
 0x904,	//[1] Main Digitizer FPGA status register
@@ -139,6 +186,20 @@ static unsigned long fpga_register_offsets[kNumberOfFPGARegisters] = {
 0x984,	//[8] Flash Data with Auto-increment address
 0x988,	//[9] Flash Data
 0x98C	//[10] FlashCommandRegister
+};
+
+static const char* fpga_register_names[kNumberOfFPGARegisters] = {
+"Main Digitizer FPGA configuration register",
+"Main Digitizer FPGA status register",
+"Voltage and Temperature Status",
+"General Purpose VME Control Settings",
+"VME Timeout Value Register",
+"VME Version/Status",
+"VME FPGA Sandbox Register Block",
+"Flash Address",
+"Flash Data with Auto-increment address",
+"Flash Data",
+"FlashCommandRegister"
 };
 
 enum {
@@ -211,6 +272,62 @@ static struct {
 }
 
 #pragma mark ***Accessors
+- (const char*) registerNameAt:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4Registers) return "";
+	return register_names[index];
+}
+
+- (const char*) fpgaRegisterNameAt:(unsigned int)index
+{
+	if (index >= kNumberOfFPGARegisters) return "";
+	return fpga_register_names[index];
+}
+
+- (unsigned long) readRegister:(unsigned int)index
+{
+	if (index >= kNumberOfGretina4Registers) return -1;
+	unsigned long theValue = 0;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + register_offsets[index]
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+    return theValue;
+}
+
+- (void) writeRegister:(unsigned int)index withValue:(unsigned long)value
+{
+	if (index >= kNumberOfGretina4Registers) return;
+    [[self adapter] writeLongBlock:&value
+                         atAddress:[self baseAddress] + register_offsets[index]
+                         numToWrite:1
+					    withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];	
+}
+
+- (unsigned long) readFPGARegister:(unsigned int)index;
+{
+	if (index >= kNumberOfFPGARegisters) return -1;
+	unsigned long theValue = 0;
+    [[self adapter] readLongBlock:&theValue
+                        atAddress:[self baseAddress] + fpga_register_offsets[index]
+                        numToRead:1
+					   withAddMod:[self addressModifier]
+					usingAddSpace:0x01];
+    return theValue;
+}
+
+- (void) writeFPGARegister:(unsigned int)index withValue:(unsigned long)value
+{
+	if (index >= kNumberOfFPGARegisters) return;
+    [[self adapter] writeLongBlock:&value
+                         atAddress:[self baseAddress] + fpga_register_offsets[index]
+                         numToWrite:1
+					    withAddMod:[self addressModifier]
+					 usingAddSpace:0x01];	
+}
+
 - (BOOL) downLoadMainFPGAInProgress
 {
 	return downLoadMainFPGAInProgress;
