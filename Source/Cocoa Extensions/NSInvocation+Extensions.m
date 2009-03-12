@@ -214,6 +214,7 @@
 			part1 = [pairString substringToIndex:rangeOfFirstColon.location];
 			part2 = [pairString substringFromIndex:rangeOfFirstColon.location+1];
 		}
+		else part1 = pairString;
 		if(part1)[orderedList addObject:part1];
 		if(part2)[orderedList addObject:part2];
 	}
