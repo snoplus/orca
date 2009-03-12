@@ -368,7 +368,13 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 	if(count==1){
 		[self closeSplashWindow];
 		NSLogColor([NSColor redColor],@"Number Processors: %d\n",count);
-		NSRunInformationalAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",nil,nil,nil,nil);
+		if([[NSUserDefaults standardUserDefaults] objectForKey:@"IgnoreSingleCPUWarning"] == nil){
+			int result = NSRunInformationalAlertPanel(@"Single CPU Warning",@"ORCA runs best on machines with multiple processors!",@"OK",nil,@"OK/Don't remind me",nil);
+			if(result == -1){
+				[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:@"IgnoreSingleCPUWarning"];    
+				[[NSUserDefaults standardUserDefaults] synchronize];
+			}
+		}
 	}
 	else NSLog(@"Number Processors: %d\n",count);
 
