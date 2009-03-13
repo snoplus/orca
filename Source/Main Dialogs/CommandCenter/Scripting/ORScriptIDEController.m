@@ -118,7 +118,7 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(lastFileChanged:)
-                         name : ORScriptIDEModelShowSuperClassChanged
+                         name : ORScriptIDEModelLastFileChangedChanged
 						object: model];	
 	
     [notifyCenter addObserver : self
