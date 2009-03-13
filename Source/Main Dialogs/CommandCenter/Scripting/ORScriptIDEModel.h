@@ -79,6 +79,14 @@
 - (void) saveScriptToFile:(NSString*)aFilePath;
 - (id) evaluator;
 
+//functions for testing script objC calls
+- (float) testNoArgFunc;
+- (float) testOneArgFunc:(float)aValue;
+- (float) testTwoArgFunc:(float)aValue argTwo:(float)aValue2;
+- (NSString*) testFuncStringReturn;
+- (NSPoint) testFuncPointReturn:(NSPoint)aPoint;
+- (NSRect) testFuncRectReturn:(NSRect)aRect;
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;

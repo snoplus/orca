@@ -345,6 +345,13 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	[self setLastFile:aFilePath];
 }
 
+//functions for testing script objC calls
+- (float) testNoArgFunc											{ return 1.1; }
+- (float) testOneArgFunc:(float)aValue							{ return aValue; }
+- (float) testTwoArgFunc:(float)aValue argTwo:(float)aValue2	{ return aValue + aValue2; }
+- (NSString*) testFuncStringReturn								{ return @"PASSED";}
+- (NSPoint) testFuncPointReturn:(NSPoint)aPoint					{ return aPoint; }
+- (NSRect) testFuncRectReturn:(NSRect)aRect						{ return aRect; }
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
