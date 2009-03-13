@@ -86,9 +86,11 @@
 	
 	// Setup register popup buttons
 	[registerIndexPU removeAllItems];
+	[registerIndexPU setAutoenablesItems:NO];
 	int i;
 	for (i=0;i<kNumberOfGretina4Registers;i++) {
 		[registerIndexPU insertItemWithTitle:[model registerNameAt:i]	atIndex:i];
+		[[registerIndexPU itemAtIndex:i] setEnabled:![model displayRegisterOnMainPage:i] && ![model displayFPGARegisterOnMainPage:i]];
 	}
 	// And now the FPGA registers
 	for (i=0;i<kNumberOfFPGARegisters;i++) {
