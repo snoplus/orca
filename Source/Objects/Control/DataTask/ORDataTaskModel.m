@@ -658,6 +658,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 	BOOL flushMessagePrintedOnce = NO;
     BOOL timeToQuit              = NO;
 	processThreadRunning = YES;
+	BOOL singleProcessor = [[ORGlobal sharedGlobal]cpuCount] == 1;
     do {
 		NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
 		unsigned long qc = [transferQueue count];
@@ -702,7 +703,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 			
 		}
 		else {
-			[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
+			if(singleProcessor)[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]];
 		}
 		
 		if(enableTimer){
