@@ -35,6 +35,7 @@
 		<string>string</string>
 		<string>array</string>
 		<string>point</string>
+		<string>rect</string>
 		<string>pointx</string>
 		<string>pointy</string>
 		<string>rectx</string>
