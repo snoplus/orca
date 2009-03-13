@@ -369,7 +369,7 @@ point_str
 ;
 
 rect_str
-: MAKEPOINT '(' expr ',' expr ',' expr ',' expr')'				{ $$ = executionNode(MAKERECT,$3,$5,$7,$9,nil);}
+: MAKERECT '(' expr ',' expr ',' expr ',' expr ')'	{ $$ = executionNode(MAKERECT,$3,$5,$7,$9,nil);}
 ;
 
 //--------------------------------------------------------------------
