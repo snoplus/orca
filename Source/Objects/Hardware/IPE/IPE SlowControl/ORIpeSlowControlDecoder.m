@@ -167,11 +167,12 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timestampSubSec
 	NSString* sampleTime     = [NSString stringWithFormat:@"Time       = %@\n", [theDate descriptionWithCalendarFormat:@"%H:%M:%S"]];
 
 	NSString* seconds		= [NSString stringWithFormat:@"Seconds    = %d\n", ePtr->timestampSec];
-	NSString* subseconds		= [NSString stringWithFormat:@"SubSeconds = %d\n", ePtr->timestampSubSec];
+	NSString* subseconds	= [NSString stringWithFormat:@"SubSeconds = %d\n", ePtr->timestampSubSec];
+	NSString* flags		    = [NSString stringWithFormat:@"Flags      = 0x%0.8x\n", ePtr->flags];
 		
 
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@",title,objectKey,chan,
-	                    dataString,sampleDate,sampleTime,seconds,subseconds];               
+    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@",title,objectKey,chan,
+	                    dataString,sampleDate,sampleTime,seconds,subseconds,flags];               
 
 }
 @end

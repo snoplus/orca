@@ -65,6 +65,7 @@
   * <br>
   * Subclassing from ORDataChainObject is necessary for automatic registering as data taker and writer-to-header. 
   * Otherwhise there is no difference compared to subclassing from OrcaObject. (ORDataChainObject is a direct subclass of OrcaObject.)
+  * ((See fillInHeaderInfo in ORDocument.m))
   */
 
 @interface ORIpeSlowControlModel : ORDataChainObject <ORAdcProcessing,ORDataTaker>

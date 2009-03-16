@@ -15,4 +15,9 @@ typedef struct {
 	long dataDecimalPlaces;
 	long timestampSec;
 	long timestampSubSec;
+	long flags;
+    union {
+	    double doubleData;
+	    long longData; //dummy
+    };
 } ipeSlowControlChannelDataStruct;

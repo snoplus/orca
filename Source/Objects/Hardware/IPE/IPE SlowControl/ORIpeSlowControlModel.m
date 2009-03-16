@@ -1857,6 +1857,8 @@ struct timeval  tbConvertADEIDateString2time(NSString *aDate){
             channelData.dataDecimalPlaces = (long int)decimalPlaces;
             channelData.timestampSec      = [sensor dataTimestampSec];
             channelData.timestampSubSec   = [sensor dataTimestampSubSec];
+            channelData.flags             = 0x01020304;
+            channelData.doubleData        = doubleData;
             //TEST: channelData.timestampSec      = heartbeatSec;
             //TEST: channelData.timestampSubSec   = heartbeatUSec;
             
