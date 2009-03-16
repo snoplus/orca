@@ -806,7 +806,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         
 	}
 	@catch(NSException* localException) {
-        [self stopRun];
+        //[self stopRun];
         [self setRunningState:eRunStopped];
         
 		if(!runFailedAlarm){
