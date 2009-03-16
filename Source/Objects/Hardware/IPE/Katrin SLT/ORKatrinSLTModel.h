@@ -55,6 +55,7 @@
 - (int) waitForSecondStrobeOfFLT:(ORKatrinFLTModel *)flt;
 - (void) startAllHistoModeFLTs;
 - (void) stopAllHistoModeFLTs;
+- (void) clearAllHistoModeFLTBuffers;
 
 #pragma mark •••DataTaker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;

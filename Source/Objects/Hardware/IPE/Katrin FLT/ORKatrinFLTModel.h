@@ -527,9 +527,10 @@
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) postHitRateChange;
+//- (void) reset; //see above -tb-
 
 #pragma mark ¥¥¥SubSets of TakeData
+- (void) postHitRateChange;
 - (void) takeDataHitrateMode:(ORDataPacket*)aDataPacket;
 - (void) takeDataMeasureMode:(ORDataPacket*)aDataPacket;
 - (void) takeDataRunOrDebugMode:(ORDataPacket*) aDataPacket;

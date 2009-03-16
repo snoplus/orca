@@ -202,13 +202,12 @@ followed by waveform data (n x 1024 16-bit words)
 	//       Every data set should be only swapped once (!)
 	// ak, 29.2.08
     #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
-    NSLog(@"ORKatrinFLTDecoder::decodeData: flag isSwapped is  %d (0x%x), (ntohl(1) == 1) is  (%d) \n", isSwapped,ePtr->eventID, (ntohl(1) == 1));
-    if( (ntohl(1) == 1) )
-        NSLog(@"    ORKatrinFLTDecoder::decodeData:   is big endian host!\n" );
+    //NSLog(@"ORKatrinFLTDecoder::decodeData: flag isSwapped is  %d (0x%x), (ntohl(1) == 1) is  (%d) \n", isSwapped,ePtr->eventID, (ntohl(1) == 1));
+    //if( (ntohl(1) == 1) ) NSLog(@"    ORKatrinFLTDecoder::decodeData:   is big endian host!\n" );
     #endif
 	if ((ntohl(1) == 1) && (!isSwapped) ){ // big endian host
         #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
-        NSLog(@"    ORKatrinFLTDecoder::decodeData:   will swap unsigned long  NOW!\n" );
+        //NSLog(@"    ORKatrinFLTDecoder::decodeData:   will swap unsigned long  NOW!\n" );
         #endif
 		// Point to ADC data
 		ptr += (sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/sizeof(unsigned long);

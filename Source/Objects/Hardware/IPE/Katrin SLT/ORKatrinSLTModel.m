@@ -191,10 +191,65 @@
                 flt=(ORKatrinFLTModel *)card;
                 if([flt daqRunMode] == kKatrinFlt_DaqHistogram_Mode){
                     DebugHistoTB( NSLog(@"SLT:stopAllHistoModeFLTs: stopping FLT %i\n",[card slot]); )
-                    // left over for the FLT runTaskStopped
+                    // left over for the FLT runTaskStopped -tb-
                 }
 			}
 		}
+}
+
+- (void) clearAllHistoModeFLTBuffers
+{
+       DebugHistoTB( NSLog(@"SLT:calling clearAllHistoModeFLTBuffers \n"); )
+            //swInhibit
+	        [self setSwInhibit];
+
+    ORKatrinFLTModel *aFLT=nil;
+            
+		NSArray* cards = [[self crate] orcaObjects];
+		NSEnumerator* e  ;
+		id card;
+        ORKatrinFLTModel *flt;
+        
+        //set TRun to 1
+        e = [cards objectEnumerator];
+		while (card = [e nextObject]){
+			if([card isKindOfClass:NSClassFromString(@"ORKatrinFLTModel")]){
+                flt=(ORKatrinFLTModel *)card;
+                if([flt daqRunMode] == kKatrinFlt_DaqHistogram_Mode){
+                    if(!aFLT) aFLT = flt; //remember pointer to one of the flts
+                    // write TRun, EMin, BinWidth
+                    [flt writeTRun: 1 forChan: 31];
+                    [flt writeHistogramSettingsForChan:31 mode: 0 /*0=continous*/ binWidth: 1 ];
+                }
+			}
+		}
+            //wait after second strobe
+            [self waitForSecondStrobeOfFLT: aFLT];
+            //start histogramming with clear
+        e = [cards objectEnumerator];
+		while (card = [e nextObject]){
+			if([card isKindOfClass:NSClassFromString(@"ORKatrinFLTModel")]){
+                flt=(ORKatrinFLTModel *)card;
+                if([flt daqRunMode] == kKatrinFlt_DaqHistogram_Mode){
+                    [flt writeStartHistogramForChan:31 withClear: 1 ];
+                }
+			}
+		}
+            //wait after second strobe
+            [self waitForSecondStrobeOfFLT: aFLT];
+            //clear + stop
+        e = [cards objectEnumerator];
+		while (card = [e nextObject]){
+			if([card isKindOfClass:NSClassFromString(@"ORKatrinFLTModel")]){
+                flt=(ORKatrinFLTModel *)card;
+                if([flt daqRunMode] == kKatrinFlt_DaqHistogram_Mode){
+                    [flt writeStartHistogramForChan:31 withClear: 1 ];
+                }
+			}
+		}
+            //reset TRun  --> will be done in startAllHistoModeFLTs -tb-
+            //swRelease   --> will be done in takeData -tb-
+            
 }
 
 #pragma mark •••Data Taker
@@ -333,7 +388,7 @@
         if(histoIsRunning) NSLog(@"SLT::runTaskStarted: At least one FLT is still running in histogram mode; STOP all.\n");
         //stop histogramming
         if(histoIsRunning){
-            //wait after second strobe (use firstFLT for timing) TODO: ask Denis: is SLT and FLT timer syncronous? -tb-
+            //wait after second strobe (use firstFLT for timing) TODO: ask Denis: is SLT and FLT timer syncronous? NO for v3! -tb-
             [self waitForSecondStrobeOfFLT:firstHistoModeFLT];
             //broadcast to all cards a "stop histogramming"
             [firstHistoModeFLT writeHistogramControlRegisterForSlot: 31 chan: 31 value: 0]; //broadcast to the crate
@@ -348,7 +403,10 @@
             //start histogramming with clear
             //wait after second strobe
             //clear + stop
+            //reset TRun
             //swRelease
+            // all moved to: clearAllHistoModeFLTBuffers
+            [self clearAllHistoModeFLTBuffers];
         }
         //start histogramming modes
         if(fltsInHistoDaqMode){ //TODO: under construction -tb- (up to now: throw away first data record)

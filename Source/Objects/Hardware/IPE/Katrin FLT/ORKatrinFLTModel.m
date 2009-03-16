@@ -1263,6 +1263,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 }
 
 
+//this is a method of the ORDataTaker protocol! -tb-
 - (void)  reset
 {
 	//reset the W/R pointers
@@ -1632,6 +1633,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 
 - (void) loadTime
 {
+    NSLog(@"This is method: %@ ::  %@ (self: %p)  STARTING\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
 	//attempt to the load time as close as possible to a seconds boundary
 	NSDate* then = [NSDate date];
 	while(1){
@@ -1647,6 +1649,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 			break;
 		}
 	}
+    NSLog(@"This is method: %@ ::  %@ (self: %p)  STOPPING\n",  NSStringFromClass([self class]) ,NSStringFromSelector(_cmd),  self);
 }
 
 //testpattern stuff
@@ -3927,7 +3930,15 @@ clean_up_mark:
 	if(fltRunMode == kKatrinFlt_Debug_Mode)	[self restartRun]; //reset the trigger //TODO: we probably should check the daqRunMode instead of the fltMode -tb- 2008-02-29
 	else                                    [self reset];      //reset the r/w pointer
 	
-	[self loadTime];					//set the time on the flts to mac time
+    //see 5 lines above: initBoard calles loadTime, writeMode:fltRunMode, loadThresholdsAndGains, writeHitRateMask ... -tb-
+    //is this necessary before calling restartRun or reset ? why writeTriggerControl is missing in initBoard? ... -tb-
+    if([[userInfo objectForKey:@"doinit"]intValue]){ // this produced a delay of 1 sec per FLT, so only for cold start necessary ... -tb- 2009-03
+	    [self loadTime];					//set the time on the flts to mac time
+         NSLog(@"CALLING loadTime!!!!!!!!!!!!!!!!!\n" );
+         NSLog(@"CALLING loadTime!!!!!!!!!!!!!!!!!\n" );
+         NSLog(@"CALLING loadTime!!!!!!!!!!!!!!!!!\n" );
+         NSLog(@"CALLING loadTime!!!!!!!!!!!!!!!!!\n" );
+	}
 	[self writeMode:fltRunMode];
 	[self writeHitRateMask];			//set the hit rate masks
 	[self writeTriggerControl];			//set trigger mask
