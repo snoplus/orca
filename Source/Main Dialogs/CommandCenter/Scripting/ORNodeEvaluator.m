@@ -37,6 +37,7 @@
 - (id)		openLogFile:(id) p;
 - (id)		arrayList:(id) p;
 - (id)		makeString:(id) p;
+- (id)		catString:(id) p;
 - (id)		arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue;
 - (id)		doFunctionCall:(id)p;
 - (id)		doValueAppend:(id)p container:(id)aContainer;
@@ -490,6 +491,7 @@
 		case WAITUNTIL:		return [self waitUntil:p];
 		case kWaitTimeOut:	return [self waitTimeOut:p];
 		case MAKESTRING:	return [self makeString:p];
+		case CATSTRING:		return [self catString:p];
 		case ALARM:			return [self postAlarm:p];
 		case CLEAR:			return [self clearAlarm:p];
 			
@@ -721,6 +723,12 @@
 - (id) makeString:(id) p
 {
 	return NodeValue(0); 
+}	
+
+- (id) catString:(id) p
+{
+	NSString* s = NodeValue(0);
+	return [[s componentsSeparatedByString:@" "] componentsJoinedByString:@""]; 
 }	
 
 - (id) arrayAssignment:(id)p leftBranch:(id)leftNode withValue:(id)aValue
@@ -1203,6 +1211,7 @@
                 case DISPLAY:			line = [NSMutableString stringWithString:@"[display]"];		break;
                 case LOGFILE:			line = [NSMutableString stringWithString:@"[logFile]"];		break;
 				case MAKESTRING:		line = [NSMutableString stringWithString:@"[makeString]"];	break;
+				case CATSTRING:			line = [NSMutableString stringWithString:@"[catString]"];	break;
                 case kPostInc:			line = [NSMutableString stringWithString:@"[postInc]"];		break;
                 case kPreInc:			line = [NSMutableString stringWithString:@"[preInc]"];		break;
                 case kPostDec:			line = [NSMutableString stringWithString:@"[postDec]"];		break;

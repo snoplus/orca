@@ -96,6 +96,7 @@ E			[Ee][+-]?{D}+
 "hex"			return HEX;
 "array"			return MAKEARRAY;
 "string"		return MAKESTRING;
+"strcat"		return CATSTRING;
 "point"			return MAKEPOINT;
 "rect"			return MAKERECT;
 "postalarm"		return ALARM;

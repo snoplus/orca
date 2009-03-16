@@ -33,6 +33,7 @@
 		<string>hex</string>
 		<string>logfile</string>
 		<string>string</string>
+		<string>strcat</string>
 		<string>array</string>
 		<string>point</string>
 		<string>rect</string>
