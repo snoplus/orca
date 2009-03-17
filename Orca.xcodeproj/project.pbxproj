@@ -1575,12 +1575,12 @@
 		84BA5DE60F6E8C8900CF92D6 /* HVRampItem.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BA5DE10F6E8C8900CF92D6 /* HVRampItem.nib */; };
 		84BA5DE70F6E8C8900CF92D6 /* ORHVRampItemController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BA5DE20F6E8C8900CF92D6 /* ORHVRampItemController.m */; };
 		84BA5DE80F6E8C8900CF92D6 /* ORHVRampItemController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA5DE30F6E8C8900CF92D6 /* ORHVRampItemController.h */; };
-		84BA5DFD0F6E8F3600CF92D6 /* ORZupController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA5DF60F6E8F3600CF92D6 /* ORZupController.h */; };
-		84BA5DFE0F6E8F3600CF92D6 /* ORZupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BA5DF70F6E8F3600CF92D6 /* ORZupController.m */; };
-		84BA5DFF0F6E8F3600CF92D6 /* ORZupModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA5DF80F6E8F3600CF92D6 /* ORZupModel.h */; };
-		84BA5E000F6E8F3600CF92D6 /* ORZupModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BA5DF90F6E8F3600CF92D6 /* ORZupModel.m */; };
-		84BA5E010F6E8F3600CF92D6 /* Zup.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BA5DFA0F6E8F3600CF92D6 /* Zup.nib */; };
-		84BA5E020F6E8F3600CF92D6 /* ZupIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84BA5DFB0F6E8F3600CF92D6 /* ZupIcon.tif */; };
+		84BA5F2B0F70388D00CF92D6 /* ORZupController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA5F250F70388C00CF92D6 /* ORZupController.h */; };
+		84BA5F2C0F70388D00CF92D6 /* ORZupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BA5F260F70388C00CF92D6 /* ORZupController.m */; };
+		84BA5F2D0F70388D00CF92D6 /* ORZupModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA5F270F70388C00CF92D6 /* ORZupModel.h */; };
+		84BA5F2E0F70388D00CF92D6 /* ORZupModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84BA5F280F70388C00CF92D6 /* ORZupModel.m */; };
+		84BA5F2F0F70388D00CF92D6 /* Zup.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84BA5F290F70388C00CF92D6 /* Zup.nib */; };
+		84BA5F300F70388D00CF92D6 /* ZupIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84BA5F2A0F70388C00CF92D6 /* ZupIcon.tif */; };
 		84BA98FD0E91260600E19946 /* SNO.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA98FB0E91260500E19946 /* SNO.h */; };
 		84BA99010E91279000E19946 /* SNOCmds.h in Headers */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOCmds.h */; };
 		84BA99050E91288800E19946 /* SNOCmds.h in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84BA99000E91279000E19946 /* SNOCmds.h */; };
@@ -3453,12 +3453,12 @@
 		84BA5DE10F6E8C8900CF92D6 /* HVRampItem.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HVRampItem.nib; path = Source/Objects/Hardware/HV/HVItem/HVRampItem.nib; sourceTree = SOURCE_ROOT; };
 		84BA5DE20F6E8C8900CF92D6 /* ORHVRampItemController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVRampItemController.m; path = Source/Objects/Hardware/HV/HVItem/ORHVRampItemController.m; sourceTree = SOURCE_ROOT; };
 		84BA5DE30F6E8C8900CF92D6 /* ORHVRampItemController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVRampItemController.h; path = Source/Objects/Hardware/HV/HVItem/ORHVRampItemController.h; sourceTree = SOURCE_ROOT; };
-		84BA5DF60F6E8F3600CF92D6 /* ORZupController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORZupController.h; path = Source/Objects/Hardware/Internet/Zup/ORZupController.h; sourceTree = SOURCE_ROOT; };
-		84BA5DF70F6E8F3600CF92D6 /* ORZupController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORZupController.m; path = Source/Objects/Hardware/Internet/Zup/ORZupController.m; sourceTree = SOURCE_ROOT; };
-		84BA5DF80F6E8F3600CF92D6 /* ORZupModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORZupModel.h; path = Source/Objects/Hardware/Internet/Zup/ORZupModel.h; sourceTree = SOURCE_ROOT; };
-		84BA5DF90F6E8F3600CF92D6 /* ORZupModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORZupModel.m; path = Source/Objects/Hardware/Internet/Zup/ORZupModel.m; sourceTree = SOURCE_ROOT; };
-		84BA5DFA0F6E8F3600CF92D6 /* Zup.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Zup.nib; path = Source/Objects/Hardware/Internet/Zup/Zup.nib; sourceTree = SOURCE_ROOT; };
-		84BA5DFB0F6E8F3600CF92D6 /* ZupIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ZupIcon.tif; path = Source/Objects/Hardware/Internet/Zup/ZupIcon.tif; sourceTree = SOURCE_ROOT; };
+		84BA5F250F70388C00CF92D6 /* ORZupController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORZupController.h; path = Source/Objects/Hardware/Internet/ZupSupply/ORZupController.h; sourceTree = SOURCE_ROOT; };
+		84BA5F260F70388C00CF92D6 /* ORZupController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORZupController.m; path = Source/Objects/Hardware/Internet/ZupSupply/ORZupController.m; sourceTree = SOURCE_ROOT; };
+		84BA5F270F70388C00CF92D6 /* ORZupModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORZupModel.h; path = Source/Objects/Hardware/Internet/ZupSupply/ORZupModel.h; sourceTree = SOURCE_ROOT; };
+		84BA5F280F70388C00CF92D6 /* ORZupModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORZupModel.m; path = Source/Objects/Hardware/Internet/ZupSupply/ORZupModel.m; sourceTree = SOURCE_ROOT; };
+		84BA5F290F70388C00CF92D6 /* Zup.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Zup.nib; path = Source/Objects/Hardware/Internet/ZupSupply/Zup.nib; sourceTree = SOURCE_ROOT; };
+		84BA5F2A0F70388C00CF92D6 /* ZupIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ZupIcon.tif; path = Source/Objects/Hardware/Internet/ZupSupply/ZupIcon.tif; sourceTree = SOURCE_ROOT; };
 		84BA98FA0E91260500E19946 /* SNO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SNO.c; sourceTree = "<group>"; };
 		84BA98FB0E91260500E19946 /* SNO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNO.h; sourceTree = "<group>"; };
 		84BA99000E91279000E19946 /* SNOCmds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SNOCmds.h; sourceTree = "<group>"; };
@@ -6965,10 +6965,10 @@
 		84B28D4C0F4C651C00E2B056 /* Internet */ = {
 			isa = PBXGroup;
 			children = (
+				84BA5F240F70388C00CF92D6 /* ZupSupply */,
 				84B28D4D0F4C658400E2B056 /* NplHV */,
 				84B28D590F4C658400E2B056 /* NPLCommBoard */,
 				84B28D600F4C658400E2B056 /* NplPicoCoulombMeter */,
-				84BA5DF40F6E8F3600CF92D6 /* Zup */,
 			);
 			name = Internet;
 			path = Source/Objects/Hardware/Internet;
@@ -7370,18 +7370,18 @@
 			path = Source/Objects/Hardware/HV/HVItem;
 			sourceTree = SOURCE_ROOT;
 		};
-		84BA5DF40F6E8F3600CF92D6 /* Zup */ = {
+		84BA5F240F70388C00CF92D6 /* ZupSupply */ = {
 			isa = PBXGroup;
 			children = (
-				84BA5DF60F6E8F3600CF92D6 /* ORZupController.h */,
-				84BA5DF70F6E8F3600CF92D6 /* ORZupController.m */,
-				84BA5DF80F6E8F3600CF92D6 /* ORZupModel.h */,
-				84BA5DF90F6E8F3600CF92D6 /* ORZupModel.m */,
-				84BA5DFA0F6E8F3600CF92D6 /* Zup.nib */,
-				84BA5DFB0F6E8F3600CF92D6 /* ZupIcon.tif */,
+				84BA5F250F70388C00CF92D6 /* ORZupController.h */,
+				84BA5F260F70388C00CF92D6 /* ORZupController.m */,
+				84BA5F270F70388C00CF92D6 /* ORZupModel.h */,
+				84BA5F280F70388C00CF92D6 /* ORZupModel.m */,
+				84BA5F290F70388C00CF92D6 /* Zup.nib */,
+				84BA5F2A0F70388C00CF92D6 /* ZupIcon.tif */,
 			);
-			name = Zup;
-			path = Source/Objects/Hardware/Internet/Zup;
+			name = ZupSupply;
+			path = Source/Objects/Hardware/Internet/ZupSupply;
 			sourceTree = SOURCE_ROOT;
 		};
 		84BAA29A0E92A81A00E19946 /* SIS3300 */ = {
@@ -9495,8 +9495,8 @@
 				84EBC2140F530E4A00F57BDD /* ORCaen419Decoders.h in Headers */,
 				84BA5DE50F6E8C8900CF92D6 /* ORHVRampItem.h in Headers */,
 				84BA5DE80F6E8C8900CF92D6 /* ORHVRampItemController.h in Headers */,
-				84BA5DFD0F6E8F3600CF92D6 /* ORZupController.h in Headers */,
-				84BA5DFF0F6E8F3600CF92D6 /* ORZupModel.h in Headers */,
+				84BA5F2B0F70388D00CF92D6 /* ORZupController.h in Headers */,
+				84BA5F2D0F70388D00CF92D6 /* ORZupModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10092,8 +10092,8 @@
 				84EBBEE50F52D9A700F57BDD /* Caen419.nib in Resources */,
 				84EBBEE60F52D9A700F57BDD /* Caen419.tif in Resources */,
 				84BA5DE60F6E8C8900CF92D6 /* HVRampItem.nib in Resources */,
-				84BA5E010F6E8F3600CF92D6 /* Zup.nib in Resources */,
-				84BA5E020F6E8F3600CF92D6 /* ZupIcon.tif in Resources */,
+				84BA5F2F0F70388D00CF92D6 /* Zup.nib in Resources */,
+				84BA5F300F70388D00CF92D6 /* ZupIcon.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10785,8 +10785,8 @@
 				84EBC2130F530E4A00F57BDD /* ORCaen419Decoders.m in Sources */,
 				84BA5DE40F6E8C8900CF92D6 /* ORHVRampItem.m in Sources */,
 				84BA5DE70F6E8C8900CF92D6 /* ORHVRampItemController.m in Sources */,
-				84BA5DFE0F6E8F3600CF92D6 /* ORZupController.m in Sources */,
-				84BA5E000F6E8F3600CF92D6 /* ORZupModel.m in Sources */,
+				84BA5F2C0F70388D00CF92D6 /* ORZupController.m in Sources */,
+				84BA5F2E0F70388D00CF92D6 /* ORZupModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
