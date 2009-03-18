@@ -46,6 +46,7 @@
 		<string>resetDisplays</string>
 		<string>display</string>
 		<string>time</string>
+		<string>random</string>
 	</array>
 	<key>Constants</key>
 	<array>

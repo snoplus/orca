@@ -118,6 +118,7 @@ id exNode(nodeType *p, int aLevel, BOOL lastChild)
 				case HISTO_1D:			line = [NSMutableString stringWithString:@"[histo1D]"];		break;
 				case HISTO_2D:			line = [NSMutableString stringWithString:@"[histo2D]"];		break;
 				case TIME:				line = [NSMutableString stringWithString:@"[time]"];		break;
+				case RANDOM:			line = [NSMutableString stringWithString:@"[random]"];		break;
 				case STRIPCHART:		line = [NSMutableString stringWithString:@"[stripChart]"];	break;
 				case DISPLAY_VALUE:		line = [NSMutableString stringWithString:@"[displayValue]"];break;
 				case RESET_DISPLAYS:	line = [NSMutableString stringWithString:@"[resetDisplays]"];break;

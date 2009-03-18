@@ -25,6 +25,7 @@
 #import "StatusLog.h"
 #import "ORDataTypeAssigner.h"
 #import <time.h>
+#include <stdlib.h>
 
 extern unsigned short   switchLevel;
 extern long				switchValue[512];
@@ -41,6 +42,11 @@ filterData ex(nodeType*,id);
 
 void startFilterScript(id delegate)
 {
+	
+	time_t seconds;
+	time(&seconds);
+	srand((unsigned int) seconds);
+	
 	unsigned node;
 	for(node=0;node<startFilterNodeCount;node++){
 		@try {
@@ -522,6 +528,20 @@ filterData ex(nodeType *p,id delegate)
 					[delegate setOutput:ex(p->opr.op[0],delegate).val.lValue 
 							  withValue:ex(p->opr.op[1],delegate).val.lValue];
 					break;
+					
+				case RANDOM:
+				{
+					int high = ex(p->opr.op[0],delegate).val.lValue;
+					int low  = ex(p->opr.op[1],delegate).val.lValue;
+					if(low>high){
+						int temp = high;
+						high = low;
+						low = temp;
+					}
+					tempData.val.lValue = rand() % (high - low + 1) + low;
+				}
+					break;
+					
 					
 				case RESET_DISPLAYS:
 					[delegate resetDisplays];

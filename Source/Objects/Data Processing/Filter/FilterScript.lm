@@ -98,6 +98,7 @@ H			[a-fA-F0-9]
 "display"				return DISPLAY_VALUE;
 "resetDisplays"			return RESET_DISPLAYS;
 "time"					return TIME;
+"random"				return RANDOM;
 
 {L}({L}|{D})* { 
                 strncpy(FilterScriptlval.sIndex,yytext,yyleng);
