@@ -39,7 +39,7 @@
     [super awakeFromNib];
 
     basicOpsSize	= NSMakeSize(320,320);
-    rampOpsSize		= NSMakeSize(570,750);
+    rampOpsSize		= NSMakeSize(570,710);
     blankView		= [[NSView alloc] init];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORZup%d.selectedtab",[model uniqueIdNumber]];
