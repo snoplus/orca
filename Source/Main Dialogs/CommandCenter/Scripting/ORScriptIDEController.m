@@ -43,7 +43,6 @@
 - (void) awakeFromNib
 {
 	[super awakeFromNib];
-	[commentsView setAllowsUndo:YES];
 	[statusField setTimeOut:1.5];
 	NSString*   path = [[NSBundle mainBundle] pathForResource: @"OrcaScriptGuide" ofType: @"rtf"];
 	[helpView readRTFDFromFile:path];
@@ -269,7 +268,7 @@
 - (void) textDidChange:(NSNotification*)aNote
 {
 	if([aNote object] == scriptView)		[model setScriptNoNote:[scriptView string]];
-	else if([aNote object] == commentsView) [model setComments:[commentsView string]];
+	else if([aNote object] == commentsView) [model setCommentsNoNote:[commentsView string]];
 }
 
 - (void) scriptChanged:(NSNotification*)aNote

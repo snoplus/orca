@@ -50,6 +50,7 @@
 - (void)		setBreakpoints:(NSDictionary*) someBreakpoints;
 - (NSString*)	comments;
 - (void)		setComments:(NSString*)aComments;
+- (void)		setCommentsNoNote:(NSString*)aString;
 - (BOOL)		showSuperClass;
 - (void)		setShowSuperClass:(BOOL)aShowSuperClass;
 - (NSString*)	lastFile;
