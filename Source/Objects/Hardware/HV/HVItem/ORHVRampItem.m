@@ -23,7 +23,7 @@
 @implementation ORHVRampItem
 - (NSString*) itemName
 {
-	return [NSString stringWithFormat:@"Npl HV Channel %d",channelNumber];
+	return [NSString stringWithFormat:@"Voltage Channel %d",channelNumber];
 }
 - (void) loadTargetObject
 {
