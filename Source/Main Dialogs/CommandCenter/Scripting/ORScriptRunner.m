@@ -365,11 +365,21 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	if([self debugging]){
 		if((lineNumber>0) && (lineNumber != lastLine)){
 			lastLine = lineNumber;
-			if((debugMode == kPauseHere) || [breakpoints containsIndex:lineNumber]) 	[self pauseScript];
-			else if((debugMode == kStepInto))											[self pauseScript];
-			else if((debugMode == kSingleStep) && (functionLevel<=lastFunctionLevel))	[self pauseScript];
-			else if((debugMode == kStepOutof)  && (functionLevel<lastFunctionLevel))	[self pauseScript];
-			if((debugMode != kSingleStep) || (debugMode != kSingleStep))lastFunctionLevel = functionLevel;
+			if((debugMode == kPauseHere) || [breakpoints containsIndex:lineNumber]){
+				lastFunctionLevel = functionLevel;
+				[self pauseScript];
+			}
+			else if((debugMode == kStepInto)) {
+				lastFunctionLevel = functionLevel;
+				[self pauseScript];
+			}
+			else if((debugMode == kSingleStep) && (functionLevel<=lastFunctionLevel)){
+				[self pauseScript];
+			}
+			else if((debugMode == kStepOutof)  && (functionLevel<lastFunctionLevel)){
+				lastFunctionLevel = functionLevel;
+				[self pauseScript];
+			}
 		}	
 	}
 }
