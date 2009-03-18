@@ -399,13 +399,39 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 //a simple command parser. Turns a string into a selector and executes it.
 - (void) handleCommand:(NSString*)aCommandString fromClient:(id)aClient
 {
-    
-    NSArray*        allCmds         = [aCommandString componentsSeparatedByString:@";"];
-    
     NSCharacterSet* whiteset     = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     NSCharacterSet* delimiterset = [NSCharacterSet characterSetWithCharactersInString:@": "];
+    NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\""];
     NSCharacterSet* inverteddelimiterset = [delimiterset invertedSet];
     NSCharacterSet* trimSet = [NSCharacterSet characterSetWithCharactersInString:@" [];\n\r\t"];
+	
+	//preprocess for strings with embedded quotes which cause a problem if there are colons in the string
+	NSString* theProcessedString = @"";
+	NSMutableArray* embeddedStrings	= [NSMutableArray array];
+	NSScanner* 	scanner  = [NSScanner scannerWithString:aCommandString];
+	while(![scanner isAtEnd]) {
+		NSString* embeddedString;
+		NSString* part;
+		if([scanner scanUpToCharactersFromSet:quoteSet intoString:&part]){
+			if([scanner isAtEnd]){
+				theProcessedString = [theProcessedString stringByAppendingString:part];
+			}
+			else {
+				theProcessedString = [theProcessedString stringByAppendingString:part];
+				[scanner scanString:@"\"" intoString:&part];
+				theProcessedString = [theProcessedString stringByAppendingString:part];
+				if([scanner scanUpToCharactersFromSet:quoteSet intoString:&embeddedString]){
+					[scanner scanString:@"\"" intoString:&part];
+					theProcessedString = [theProcessedString stringByAppendingString:part];
+					[embeddedStrings addObject:embeddedString];
+				}
+			}
+		}
+	}
+	
+	aCommandString = theProcessedString;
+
+    NSArray*        allCmds         = [aCommandString componentsSeparatedByString:@";"];
     
     NSEnumerator* e = [allCmds objectEnumerator];
     NSString* string;
@@ -488,8 +514,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
                     int i;
                     int argI;
                     BOOL ok = YES;
+					int argStringCount = 0;
                     for(i=1,argI=0 ; i<=n*2 ; i+=2,argI++){
-                        if(![theInvocation setArgument:argI to:[cmdItems objectAtIndex:i]]){
+						NSString* aCmdItem = [cmdItems objectAtIndex:i];
+						if([aCmdItem isEqualToString:@"\"\""]){
+							if(argStringCount < [embeddedStrings count]){
+								aCmdItem = [embeddedStrings objectAtIndex:argStringCount];
+								argStringCount++;
+							}
+						}
+                        if(![theInvocation setArgument:argI to:aCmdItem]){
                             ok = NO;
                             break;
                             
