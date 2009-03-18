@@ -184,6 +184,8 @@
 				<string>id</string>
 				<key>functionAction</key>
 				<string>id</string>
+				<key>initBoard</key>
+				<string>id</string>
 				<key>ipAddressTextFieldAction</key>
 				<string>id</string>
 				<key>lockAction</key>
@@ -230,6 +232,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
