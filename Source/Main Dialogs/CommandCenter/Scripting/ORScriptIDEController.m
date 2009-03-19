@@ -155,6 +155,10 @@
                          name : ORScriptRunnerDisplayDictionaryChanged
 						object: [model scriptRunner]];	
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(globalsChanged:)
+                         name : ORScriptIDEModelGlobalsChanged
+						object: model];	
 	
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
@@ -190,6 +194,10 @@
 	[outputVariablesTableView reloadData];
 }
 
+- (void) globalsChanged:(NSNotification*)aNote
+{
+	[inputVariablesTableView reloadData];
+}
 
 - (void) breakChainChanged:(NSNotification*)aNote
 {

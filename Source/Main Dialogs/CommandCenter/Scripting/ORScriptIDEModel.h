@@ -101,4 +101,5 @@ extern NSString* ORScriptIDEModelNameChanged;
 extern NSString* ORScriptIDEModelLastFileChangedChanged;
 extern NSString* ORScriptIDEModelBreakpointsChanged;
 extern NSString* ORScriptIDEModelBreakChainChanged;
+extern NSString* ORScriptIDEModelGlobalsChanged;
 

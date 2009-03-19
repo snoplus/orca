@@ -64,6 +64,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) globalsChanged:(NSNotification*)aNote;
 - (void) breakChainChanged:(NSNotification*)aNote;
 - (void) breakpointsChanged:(NSNotification*)aNote;
 - (void) commentsChanged:(NSNotification*)aNote;

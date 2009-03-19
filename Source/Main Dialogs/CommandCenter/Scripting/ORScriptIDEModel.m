@@ -35,6 +35,7 @@ NSString* ORScriptIDEModelLastFileChangedChanged = @"ORScriptIDEModelLastFileCha
 NSString* ORScriptIDEModelLock					 = @"ORScriptIDEModelLock";
 NSString* ORScriptIDEModelBreakpointsChanged	 = @"ORScriptIDEModelBreakpointsChanged";
 NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChanged";
+NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 
 @implementation ORScriptIDEModel
 
@@ -355,6 +356,32 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 		else [self setComments:@""];
 	}
 	else [self setComments:@""];
+	
+	//next the globals
+	[inputValues release];
+	inputValues = [[NSMutableArray array] retain];
+	
+	do {
+		if([theContents hasPrefix:@"//#Global:"]){
+			unsigned eofLoc = [theContents rangeOfString:@"\n"].location;
+			NSString* theLine = [theContents substringToIndex:eofLoc];
+			theContents = [theContents substringFromIndex:eofLoc+1];
+			theLine = [theLine substringFromIndex:[theLine rangeOfString:@":"].location+1];
+			if(theLine){
+				NSArray* theParts = [theLine componentsSeparatedByString:@" "];
+				if([theParts count] == 2){
+					NSDictionary* d = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+															[NSString stringWithFormat:[theParts objectAtIndex:0]],@"name",
+															[NSDecimalNumber decimalNumberWithString:[theParts objectAtIndex:1]],@"iValue",
+															 nil];
+					[inputValues addObject:d];
+				}
+			}
+		}
+		else break;
+	} while(1);
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORScriptIDEModelGlobalsChanged object:self];
+
 	[self setScript: theContents];
 }
 
@@ -369,8 +396,14 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	if([fm fileExistsAtPath:[aFilePath stringByExpandingTildeInPath]]){
 		[fm removeFileAtPath:[aFilePath stringByExpandingTildeInPath] handler:nil];
 	}
-	//prepend the name and description
 	NSMutableString* theScript = [script mutableCopy];
+	//prepend the globals
+	NSEnumerator* e = [inputValues reverseObjectEnumerator];
+	NSDictionary* aGlobal;
+	while(aGlobal = [e nextObject]){
+		[theScript insertString:[NSString stringWithFormat:@"//#Global:%@ %@\n",[aGlobal objectForKey:@"name"],[aGlobal objectForKey:@"iValue"]] atIndex:0];
+	}
+	//prepend the name and description
 	if([[self comments] length]){
 		[theScript insertString:[NSString stringWithFormat:@"//#Comments:%@\n",[[self comments]removeNLandCRs]] atIndex:0];
 	}
@@ -380,6 +413,7 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	else {
 		[theScript insertString:@"//#Name:OrcaScript\n" atIndex:0];
 	}
+
 	NSData* theData = [theScript dataUsingEncoding:NSASCIIStringEncoding];
 	[theScript release];
 	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
