@@ -7734,8 +7734,8 @@
 			children = (
 				84789FD50528A49E005F64B1 /* BaseClasses */,
 				844D2B0E0455BFD7005F64B1 /* Generic */,
-				2A41A2B2089AB2A0003D77DD /* ScalerSum */,
 				84F689C9044F7837005F64B1 /* Waveform */,
+				2A41A2B2089AB2A0003D77DD /* ScalerSum */,
 				84DDEB9A07BD3E080060D0B4 /* HistogramMultiPlot */,
 				848D84230DDE060100D44B81 /* TimeMultiPlot */,
 				844E6B5F03C274CE005F64B1 /* Histogrammer */,
@@ -8189,9 +8189,8 @@
 				849194450725CB6C00F454F1 /* edu.washington.npl.orca.Waveform.plist */,
 				84F689CF044F7837005F64B1 /* Waveform.nib */,
 			);
-			name = Waveform;
-			path = "Source/Objects/Data Processing/Histogram Objects/Waveform";
-			sourceTree = SOURCE_ROOT;
+			path = Waveform;
+			sourceTree = "<group>";
 		};
 		84F7FB520AE5558900A5AA4C /* Libraries */ = {
 			isa = PBXGroup;

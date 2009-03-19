@@ -861,7 +861,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (void) haltRun
 {
     ignoreRepeat = YES;
-    [self stopRun];
+    if([self runningState] != eRunStopping){
+		[self stopRun];
+	}
 }
 
 

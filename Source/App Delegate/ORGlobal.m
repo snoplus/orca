@@ -20,6 +20,7 @@
 
 #import "ORStatusController.h"
 #import "SynthesizeSingleton.h"
+#import "NSNotifications+Extensions.h"
 #import <sys/sysctl.h>
 
 //--------------------------------------------------------
@@ -236,19 +237,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 	if(!runVetos){
 		runVetos = [[NSMutableDictionary dictionary] retain];
 	}
+	BOOL vetoExisted = [runVetos objectForKey:vetoName]!=nil;
 	[runVetos setObject:aComment forKey:vetoName];
-    [[NSNotificationCenter defaultCenter] postNotificationName: ORRunVetosChanged object:self userInfo:nil];
-
+	if(!vetoExisted)[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRunVetosChanged object:nil userInfo:nil waitUntilDone:NO]; 
 }
 
 - (void) removeRunVeto:(NSString*)vetoName
 {
+	BOOL vetoExisted = [runVetos objectForKey:vetoName]!=nil;
 	[runVetos removeObjectForKey:vetoName];
 	if([runVetos count] == 0){
 		[runVetos release];
 		runVetos = nil;
 	}
-    [[NSNotificationCenter defaultCenter] postNotificationName: ORRunVetosChanged object:self userInfo:nil];
+	if(vetoExisted)[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRunVetosChanged object:nil userInfo:nil waitUntilDone:NO]; 
 }
 
 - (BOOL) anyVetosInPlace

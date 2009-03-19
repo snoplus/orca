@@ -116,12 +116,16 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 
 - (void) setState:(int)value
 {
-    [processLock lock];     //start critical section
-    if(value != state){
-        state = value;
-		[self postStateChange];
-    }
-    [processLock unlock];   //end critical section
+	@try {
+		[processLock lock];     //start critical section
+		if(value != state){
+			state = value;
+			[self postStateChange];
+		}
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
 }
 
 - (int) state
@@ -131,12 +135,16 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 
 - (void) setEvaluatedState:(int)value
 {
-    [processLock lock];     //start critical section
-    if(value != evaluatedState){
-        evaluatedState = value;
-		[self postStateChange];
-    }
-    [processLock unlock];   //end critical section
+	@try {
+		[processLock lock];     //start critical section
+		if(value != evaluatedState){
+			evaluatedState = value;
+			[self postStateChange];
+		}
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
 }
 
 - (int) evaluatedState
@@ -193,7 +201,7 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
 
 - (void) postStateChange
 {
-    if([self canImageChangeWithState])[self setUpImage];
+	if([self canImageChangeWithState])[self performSelectorOnMainThread:@selector(setUpImage) withObject:nil waitUntilDone:NO];
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORProcessElementStateChangedNotification object:self userInfo:nil waitUntilDone:NO]; 
 }
 

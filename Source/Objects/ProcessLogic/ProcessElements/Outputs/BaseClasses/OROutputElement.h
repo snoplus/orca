@@ -23,7 +23,6 @@
 
 
 @interface OROutputElement : ORProcessEndNode {
-
 }
 - (int) eval;
 - (void) makeConnectors;

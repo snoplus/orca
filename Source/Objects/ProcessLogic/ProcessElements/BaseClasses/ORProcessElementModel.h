@@ -25,6 +25,7 @@
     @protected
         BOOL        alreadyEvaluated;
 		int			evaluatedState;
+
     @private
         int         state;
         NSLock*     processLock;

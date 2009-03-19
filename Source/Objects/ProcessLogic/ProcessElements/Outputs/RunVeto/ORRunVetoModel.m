@@ -56,6 +56,7 @@
 	
 	if([self state]) [[ORGlobal sharedGlobal] addRunVeto:vetoName comment:vetoComment]; 
 	else			 [[ORGlobal sharedGlobal] removeRunVeto:vetoName]; 
+	
 }
 
 - (void) setUpImage

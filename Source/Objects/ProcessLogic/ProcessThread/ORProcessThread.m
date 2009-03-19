@@ -141,11 +141,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     
     [endNodes makeObjectsPerformSelector:@selector(processIsStarting)];
 	
-    [processLock lock];     //begin critical section
-    if(!endNodes) endNodes = [[NSMutableSet alloc] init];
-    [endNodes addObjectsFromArray:trueEndNodes];
-    if(!running)[self start];
-    [processLock unlock];   //end critical section
+	@try {
+		[processLock lock];     //begin critical section
+		if(!endNodes) endNodes = [[NSMutableSet alloc] init];
+		[endNodes addObjectsFromArray:trueEndNodes];
+		if(!running)[self start];
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
 }
 
 - (void) stopNodes:(NSArray*) someNodes
@@ -167,64 +171,88 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     
     [trueEndNodes makeObjectsPerformSelector:@selector(processIsStopping)];
 	
-    [processLock lock];     //begin critical section
-    [endNodes minusSet:objectSet];
-    if(![endNodes count]){
-        if(running)[self stop];
-        [endNodes release];
-        endNodes = nil;
-    }
-    [processLock unlock];   //end critical section
+ 	@try {
+		[processLock lock];     //begin critical section
+		[endNodes minusSet:objectSet];
+		if(![endNodes count]){
+			if(running)[self stop];
+			[endNodes release];
+			endNodes = nil;
+		}
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
 }
 
 - (void) startNode:(ORProcessEndNode*) aNode
 {
-    if(!aNode)return;
-    if(![aNode isTrueEndNode])return;
-    [processLock lock];     //begin critical section
-    if(!endNodes) endNodes = [[NSMutableSet alloc] init];
-    [aNode processIsStarting];
-    [endNodes addObject:aNode];
-    if(!running)[self start];
-    [processLock unlock];   //end critical section
+ 	@try {
+		if(!aNode)return;
+		if(![aNode isTrueEndNode])return;
+		[processLock lock];     //begin critical section
+		if(!endNodes) endNodes = [[NSMutableSet alloc] init];
+		[aNode processIsStarting];
+		[endNodes addObject:aNode];
+		if(!running)[self start];
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
 }
 
 - (void) stopNode:(ORProcessEndNode*) aNode
 {
-    [processLock lock];     //begin critical section
-    [aNode processIsStopping];
-    [endNodes removeObject:aNode];
-    if([endNodes count] == 0){
-        if(running)[self stop];
-        [endNodes release];
-        endNodes = nil;
-    }
-    [processLock unlock];   //end critical section
+  	@try {
+		[processLock lock];     //begin critical section
+		[aNode processIsStopping];
+		[endNodes removeObject:aNode];
+		if([endNodes count] == 0){
+			if(running)[self stop];
+			[endNodes release];
+			endNodes = nil;
+		}
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
 }
 
 - (BOOL) nodesRunning:(NSArray*)someNodes
 {
     BOOL result = NO;
-    [processLock lock];     //begin critical section
-    result = [endNodes intersectsSet:[NSSet setWithArray:someNodes]];
-    [processLock unlock];   //end critical section
+  	@try {
+		[processLock lock];     //begin critical section
+		result = [endNodes intersectsSet:[NSSet setWithArray:someNodes]];
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
     return result;
 }
 
 - (void) registerInputObject:(id)anObject
 {
-    [processLock lock];     //begin critical section
-    if(!inputs)inputs = [[ProcessElementSet alloc] retain];
-	[inputs addObject:anObject];
-    [processLock unlock];   //end critical section
+   	@try {
+		[processLock lock];     //begin critical section
+		if(!inputs)inputs = [[ProcessElementSet alloc] retain];
+		[inputs addObject:anObject];
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
 }
 
 - (void) registerOutputObject:(id)anObject
 {
-    [processLock lock];     //begin critical section
-    if(!outputs)outputs = [[ProcessElementSet alloc] retain];
-	[outputs addObject:anObject];
-    [processLock unlock];   //end critical section
+   	@try {
+		[processLock lock];     //begin critical section
+		if(!outputs)outputs = [[ProcessElementSet alloc] retain];
+		[outputs addObject:anObject];
+	}
+	@finally {
+		[processLock unlock];   //end critical section
+	}
 }
 
 #pragma mark ¥¥¥Thread
