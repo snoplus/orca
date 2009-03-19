@@ -803,7 +803,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [self setRunningState:eRunInProgress];
 		
         _ignoreRunTimeout = NO;
-        
+		
+		//one final check of the vetos in case one was posted during start up
+		[self checkVetos];
 	}
 	@catch(NSException* localException) {
         //[self stopRun];
@@ -1299,6 +1301,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 - (void) vetosChanged:(NSNotification*)aNotification
+{
+	[self checkVetos];
+}
+		
+- (void) checkVetos
 {
 	[self setUpImage];
 	if([[ORGlobal sharedGlobal] anyVetosInPlace] && [self isRunning]){

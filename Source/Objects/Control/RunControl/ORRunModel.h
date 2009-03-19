@@ -192,6 +192,7 @@
 - (BOOL) readRunTypeNames;
 - (NSString*) shortStatus;
 - (NSString*) endOfRunState;
+- (void) checkVetos;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
