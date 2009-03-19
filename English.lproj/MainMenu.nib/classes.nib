@@ -919,6 +919,8 @@
 				<string>id</string>
 				<key>draggingExited</key>
 				<string>id</string>
+				<key>getInfo</key>
+				<string>id</string>
 				<key>paste</key>
 				<string>id</string>
 				<key>sendToBack</key>
@@ -1095,6 +1097,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clearAction</key>
+				<string>id</string>
 				<key>cut</key>
 				<string>id</string>
 				<key>delete</key>
@@ -1104,6 +1108,8 @@
 				<key>listLockAction</key>
 				<string>id</string>
 				<key>loadListAction</key>
+				<string>id</string>
+				<key>refreshRateAction</key>
 				<string>id</string>
 				<key>refreshTimeAction</key>
 				<string>id</string>
@@ -1126,6 +1132,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>clearButton</key>
+				<string>NSButton</string>
 				<key>cycleRateField</key>
 				<string>NSTextField</string>
 				<key>listLockButton</key>
@@ -1138,6 +1146,10 @@
 				<string>ORValueBar</string>
 				<key>readoutListView</key>
 				<string>NSOutlineView</string>
+				<key>refreshButton</key>
+				<string>NSButton</string>
+				<key>refreshRatePU</key>
+				<string>NSPopUpButton</string>
 				<key>removeAllButton</key>
 				<string>NSButton</string>
 				<key>removeButton</key>
@@ -1148,6 +1160,8 @@
 				<string>NSTabView</string>
 				<key>timeScaleMatrix</key>
 				<string>NSMatrix</string>
+				<key>timerEnabledWarningField</key>
+				<string>NSTextField</string>
 				<key>totalListView</key>
 				<string>NSOutlineView</string>
 				<key>totalListViewDrawer</key>
@@ -1636,6 +1650,8 @@
 				<key>copy</key>
 				<string>id</string>
 				<key>differentiateAction</key>
+				<string>id</string>
+				<key>refresh</key>
 				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>

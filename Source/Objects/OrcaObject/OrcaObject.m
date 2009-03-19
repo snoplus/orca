@@ -103,13 +103,25 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 #pragma mark ¥¥¥Accessors
 - (NSString*) description
 {
-    return [NSString stringWithFormat: @"Class: <%@ %ld>\nRetainCount: %d\nFrame: %.0f %.0f %.0f %.0f\n",
-        NSStringFromClass([self class]),(long)self,
-        [self retainCount],
-        [self frame].origin.x,
-        [self frame].origin.y,
-        [self frame].size.width,
-        [self frame].size.height];
+    NSString* base =  [NSString stringWithFormat: @"(%@)",[self fullID]];
+	if([self conformsToProtocol:NSProtocolFromString(@"ORDataTaker")]){
+		base = [base stringByAppendingString:@"\nData Taker"];
+	}
+	if([self respondsToSelector:@selector(dataRecordDescription)]){
+		NSDictionary* dict = [self dataRecordDescription];
+		id recDict;
+		NSString* decoders = @"";
+		NSEnumerator* e = [dict objectEnumerator];
+		while(recDict = [e nextObject]){
+			id decoder = [recDict objectForKey:@"decoder"];
+			if(decoder){
+				decoders = [decoders stringByAppendingString:decoder];
+				decoders = [decoders stringByAppendingString:@"\n"];
+			}
+		}
+		if([decoders length])base = [base stringByAppendingFormat:@"\nDecoders:\n%@",decoders];
+	}
+	return base;
 }
 
 - (int)	x

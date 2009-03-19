@@ -470,6 +470,7 @@
 		return changesAllowed;
 	}
 	
+    else if ([menuItem action] == @selector(getInfo:))			return (selectedCount>0);
     else if ([menuItem action] == @selector(arrangeInCircle:))	return changesAllowed & (selectedCount>0);
     else if ([menuItem action] == @selector(alignLeft:))		return changesAllowed & (selectedCount>0);
     else if ([menuItem action] == @selector(alignRight:))		return changesAllowed & (selectedCount>0);
@@ -500,7 +501,15 @@
 
 
 #pragma mark ¥¥¥Actions
-
+- (IBAction) getInfo:(id)sender
+{
+	NSArray* objects = [group selectedObjects];
+	id obj;
+	NSEnumerator* e = [objects objectEnumerator];
+	while(obj = [e nextObject]){
+		NSLog(@"%@\n",obj);
+	}
+}
 - (IBAction) alignBottom:(id)sender
 {
 	NSArray* items = [group selectedObjects];
@@ -896,7 +905,8 @@
 - (void)keyDown:(NSEvent *)event
 {
 	NSString *input = [event characters];
-
+	BOOL cmdKeyDown   = ([event modifierFlags] & NSCommandKeyMask)!=0;
+	
 	if([input isEqual:[NSString stringWithFormat:@"%C", NSUpArrowFunctionKey]]){
 		[self moveSelectedObjectsUp:event];
 	}
@@ -916,7 +926,7 @@
 	else if([input isEqual:@"-"]){
 		[group changeSelectedObjectsLevel:YES];
 		[self setNeedsDisplay:YES];
-	}
+	}	
 	else [super keyDown:event];
 }
 

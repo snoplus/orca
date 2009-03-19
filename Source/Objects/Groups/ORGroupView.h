@@ -81,6 +81,7 @@
 - (IBAction) alignHorizontalCenters:(id)sender;
 - (IBAction) sendToBack:(id)sender;
 - (IBAction) bringToFront:(id)sender;
+- (IBAction) getInfo:(id)sender;
 
 #pragma mark ¥¥¥Drag and Drop
 - (NSPoint) suggestPasteLocationFor:(id)anObject;
