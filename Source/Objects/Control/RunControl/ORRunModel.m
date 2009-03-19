@@ -1302,9 +1302,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) vetosChanged:(NSNotification*)aNotification
 {
-	[self checkVetos];
+	if([self runningState] != eRunStarting){
+		[self performSelectorOnMainThread:@selector(checkVetos) withObject:nil waitUntilDone:NO];
+	}
 }
-		
+
 - (void) checkVetos
 {
 	[self setUpImage];
