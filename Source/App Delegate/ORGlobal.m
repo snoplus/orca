@@ -274,7 +274,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 			NSLog(@"%@ : %@\n",key,[runVetos objectForKey:key]);
 		}
 	}
-	else NSLog(@"No run vetos in place. Run is OK to go.");
+	else NSLog(@"No run vetos in place. Run is OK to go.\n");
 }
 
 #pragma mark •••Archival
