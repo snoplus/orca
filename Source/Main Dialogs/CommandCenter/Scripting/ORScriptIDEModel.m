@@ -25,6 +25,7 @@
 #import "ORLineMarker.h"
 #import "ORNodeEvaluator.h"
 #import "NSNotifications+Extensions.h"
+#import "NSString+Extensions.h"
 
 NSString* ORScriptIDEModelCommentsChanged		 = @"ORScriptIDEModelCommentsChanged";
 NSString* ORScriptIDEModelShowSuperClassChanged	 = @"ORScriptIDEModelShowSuperClassChanged";
@@ -333,7 +334,28 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 - (void) loadScriptFromFile:(NSString*)aFilePath
 {
 	[self setLastFile:aFilePath];
-	[self setScript:[NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]]];
+	NSString* theContents = [NSString stringWithContentsOfFile:[lastFile stringByExpandingTildeInPath]];
+	//if the name and description are prepended then strip off and restore
+	//the name is always first if it exists
+	if([theContents hasPrefix:@"//#Name:"]){
+		unsigned eofLoc = [theContents rangeOfString:@"\n"].location;
+		NSString* theName = [theContents substringToIndex:eofLoc];
+		theContents = [theContents substringFromIndex:eofLoc+1];
+		theName = [theName substringFromIndex:[theName rangeOfString:@":"].location+1];
+		if(theName)[self setScriptName:theName];
+	}
+	else [self setScriptName:@"OrcaScript"];
+	//the description comment is always second if it exists
+	if([theContents hasPrefix:@"//#Comments:"]){
+		unsigned eofLoc = [theContents rangeOfString:@"\n"].location;
+		NSString* theComments = [theContents substringToIndex:eofLoc];
+		theContents = [theContents substringFromIndex:eofLoc+1];
+		theComments = [theComments substringFromIndex:[theComments rangeOfString:@":"].location+1];
+		if(theComments)[self setComments:theComments];
+		else [self setComments:@""];
+	}
+	else [self setComments:@""];
+	[self setScript: theContents];
 }
 
 - (void) saveFile
@@ -347,7 +369,19 @@ NSString* ORScriptIDEModelBreakChainChanged		 = @"ORScriptIDEModelBreakChainChan
 	if([fm fileExistsAtPath:[aFilePath stringByExpandingTildeInPath]]){
 		[fm removeFileAtPath:[aFilePath stringByExpandingTildeInPath] handler:nil];
 	}
-	NSData* theData = [script dataUsingEncoding:NSASCIIStringEncoding];
+	//prepend the name and description
+	NSMutableString* theScript = [script mutableCopy];
+	if([[self comments] length]){
+		[theScript insertString:[NSString stringWithFormat:@"//#Comments:%@\n",[[self comments]removeNLandCRs]] atIndex:0];
+	}
+	if([[self scriptName] length]){
+		[theScript insertString:[NSString stringWithFormat:@"//#Name:%@\n",[[self scriptName] removeNLandCRs]] atIndex:0];
+	}
+	else {
+		[theScript insertString:@"//#Name:OrcaScript\n" atIndex:0];
+	}
+	NSData* theData = [theScript dataUsingEncoding:NSASCIIStringEncoding];
+	[theScript release];
 	[fm createFileAtPath:[aFilePath stringByExpandingTildeInPath] contents:theData attributes:nil];
 	[self setLastFile:aFilePath];
 }

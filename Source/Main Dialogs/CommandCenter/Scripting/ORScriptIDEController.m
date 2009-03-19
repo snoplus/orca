@@ -303,6 +303,7 @@
 - (void) nameChanged:(NSNotification*)aNote
 {
 	[nameField setStringValue:[model scriptName]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Script: %@",[model scriptName]]];
 }
 
 - (void) errorChanged:(NSNotification*)aNote
@@ -435,7 +436,6 @@
 - (IBAction) nameAction:(id) sender
 {
 	[model setScriptName:[sender stringValue]];
-	[[self window] setTitle:[NSString stringWithFormat:@"Script: %@",[model scriptName]]];
 }
 
 
@@ -627,6 +627,7 @@
 - (void)saveFileDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
+		[self endEditing];
         [model saveScriptToFile:[sheet filename]];
     }
 }
