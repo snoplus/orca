@@ -24,7 +24,6 @@
 	NSArray*			 parsedNodes;
 	NSDecimalNumber*	 _one;
 	NSDecimalNumber*	 _zero;
-	NSString*			 scriptName;
 	NSDictionary*		 functionTable;
 	NSMutableDictionary* sysCallTable;
 	unsigned short       switchLevel;
@@ -47,7 +46,6 @@
 - (ORNodeEvaluator*) functionEvaluator;
 - (void) setDelegate:(id)aDelegate;
 - (NSString*) scriptName;
-- (void) setScriptName:(NSString*)aString;
 - (BOOL)	exitNow;
 
 #pragma mark •••Symbol Table Routines

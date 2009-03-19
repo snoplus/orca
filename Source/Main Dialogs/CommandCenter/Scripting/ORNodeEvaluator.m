@@ -133,14 +133,9 @@
 
 - (NSString*) scriptName
 {
-	return scriptName;
+	return [delegate scriptName];
 }
 
-- (void) setScriptName:(NSString*)aString
-{
-    [scriptName autorelease];
-    scriptName = [aString copy];	
-}
 
 #pragma mark •••Symbol Table Routines
 - (void) setUpSysCallTable
@@ -298,7 +293,7 @@
 			return nil;
 		}
 		else {
-			NSLogColor([NSColor redColor],@"[%@] %@ called with wrong number of arguments. Check the syntax.\n",scriptName,aFunctionName);
+			NSLogColor([NSColor redColor],@"[%@] %@ called with wrong number of arguments. Check the syntax.\n",[self scriptName],aFunctionName);
 			[NSException raise:@"Run time" format:@"Wrong number of Arguments"];
 		}
 	}
@@ -620,7 +615,7 @@
 		result =  [NodeValue(0) decimalNumberByDividingBy:NodeValue(1)];
 	}
 	@catch(NSException* localException) {
-		NSLog(@"divide by zero in %@\n",scriptName);
+		NSLog(@"divide by zero in %@\n",[self scriptName]);
 		result = [NSDecimalNumber notANumber];
 	}
 	return result;
@@ -633,7 +628,7 @@
 		result =  [self setValue:[NodeValue(0) decimalNumberByDividingBy:NodeValue(1)] forSymbol:VARIABLENAME(0)];
 	}
 	@catch(NSException* localException) {
-		NSLog(@"divide by zero in %@\n",scriptName);
+		NSLog(@"divide by zero in %@\n",[self scriptName]);
 		result = [NSDecimalNumber notANumber];
 	}
 	return result;
@@ -684,7 +679,7 @@
 
 - (id) print:(id) p
 {
-	NSString* s = [scriptName length]?scriptName:@"OrcaScript";
+	NSString* s = [[delegate scriptName] length]?[delegate scriptName]:@"OrcaScript";
 	id output = NodeValue(0);
 	NSLog(@"[%@] %@\n",s, output);
 	
@@ -701,7 +696,7 @@
 
 - (id) openLogFile:(id) p
 {
-	NSString*       s = [scriptName length]?scriptName:@"OrcaScript";
+	NSString*       s = [[self scriptName] length]?[self scriptName]:@"OrcaScript";
 	NSFileManager* fm = [NSFileManager defaultManager];
 	NSString*    shortPath = NodeValue(0);
 	NSString*    path = [shortPath stringByExpandingTildeInPath];
@@ -809,7 +804,7 @@
 		else if([aFunctionName isEqualToString:@"rectw"])    return [self extractValue:2			name:aFunctionName	args:argObject];
 		else if([aFunctionName isEqualToString:@"recth"])    return [self extractValue:3			name:aFunctionName	args:argObject];
 		else {
-			NSLog(@"%@ has no function called %@ in its function table. Check the syntax.\n",scriptName,aFunctionName);
+			NSLog(@"%@ has no function called %@ in its function table. Check the syntax.\n",[self scriptName],aFunctionName);
 			[NSException raise:@"Run time" format:@"Function not found"];
 		}
 	}
@@ -1097,13 +1092,13 @@
 	if([[p nodeData] count] == 3){
 		id s = NodeValue(2);
 		if([s isKindOfClass:[NSString class]]){
-			s = [s stringByAppendingFormat:@"\n\n Script [%@] posted this alarm. Acknowledge it and it will go away.",scriptName];
+			s = [s stringByAppendingFormat:@"\n\n Script [%@] posted this alarm. Acknowledge it and it will go away.",[self scriptName]];
 			[anAlarm setHelpString:s];
 			needsHelp = NO;
 		}
 	}
 	if(needsHelp) {
-		NSString* s = [NSString stringWithFormat:@"\nScript [%@] posted this alarm. Acknowledge it and it will go away.",scriptName];
+		NSString* s = [NSString stringWithFormat:@"\nScript [%@] posted this alarm. Acknowledge it and it will go away.",[self scriptName]];
 		[anAlarm setHelpString:s];
 	}
 	[anAlarm performSelectorOnMainThread:@selector(postAlarm) withObject:nil waitUntilDone:YES];
@@ -1153,7 +1148,7 @@
 		}
 	}
 	
-	NSLog(@"In %@, <%@> not passed the right kind of argument. Check the syntax.\n",scriptName,aFunctionName);
+	NSLog(@"In %@, <%@> not passed the right kind of argument. Check the syntax.\n",[self scriptName],aFunctionName);
 	[NSException raise:@"Run time" format:@"Arg Type error"];
 	return nil;
 }

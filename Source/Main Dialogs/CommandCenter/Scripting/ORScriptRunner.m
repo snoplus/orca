@@ -298,7 +298,6 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 				
 		exitNow	   = NO;
 		stopThread = NO;
-		[eval setScriptName:scriptName];
 		[eval setArgs:someArgs];
 		NSArray* mainNodes = [functionTable objectForKey:@"main"];
 		if(mainNodes){
