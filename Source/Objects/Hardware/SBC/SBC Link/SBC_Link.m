@@ -146,7 +146,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 
 - (int) errorTimeOutSeconds
 {
-	static int translatedTimeOut[4] = {2,0,10,60};
+	static int translatedTimeOut[4] = {2,10,60,0};
 	if(errorTimeOut<0 || errorTimeOut>3)return 2;
 	else return translatedTimeOut[errorTimeOut];
 }
