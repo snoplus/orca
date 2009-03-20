@@ -1233,19 +1233,26 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 		@catch(NSException* localException) {
             [self incExceptionCount];
             NSLogError(@"Uncaught exception",@"Main Run Loop",nil);
+			[self performSelectorOnMainThread:@selector(haltRun) withObject:nil waitUntilDone:NO];
         }
         [pool release];
     }
     
 	[client runIsStopping:dataPacket userInfo:nil];
 	
-	BOOL allDone = NO;
-	if(client) do {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
-		[client takeData:dataPacket userInfo:nil];
-		allDone = [client doneTakingData];
-		[pool release];
-	}while(!allDone);
+	@try {
+		BOOL allDone = NO;
+		if(client) do {
+			NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
+			[client takeData:dataPacket userInfo:nil];
+			allDone = [client doneTakingData];
+			[pool release];
+		}while(!allDone);
+	}
+	@catch(NSException* localException) {
+		[self incExceptionCount];
+		NSLogError(@"Uncaught exception",@"Run Loop Cleanup",nil);
+	}
 	
 	NSLog(@"DataTaking Thread Exited\n");
 	dataTakingThreadRunning = NO;
