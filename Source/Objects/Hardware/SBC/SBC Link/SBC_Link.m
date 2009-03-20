@@ -44,6 +44,7 @@
 #define kNoData				-2
 
 #define kSBCRateIntegrationTime 1.5
+#define kErrTimeOut				2
 
 #pragma mark ***External Strings
 NSString* SBC_LinkLoadModeChanged			= @"SBC_LinkLoadModeChanged";
@@ -1939,10 +1940,18 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	int n;			
     int  selectionResult = 0;
 	long numBytesToGet = 0;
-    
+	time_t t1 = time(0);
 	do {
 		n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);
-	} while (n<0 && (errno == EAGAIN || errno == EINTR));
+		if(n<0 && (errno == EAGAIN || errno == EINTR)){
+			if((time(0)-t1)>kErrTimeOut) {
+				[self disconnect];
+				[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+			}
+		}
+		else break;
+
+	} while (1);
 	
 	if(n==0){
 		[self disconnect];
@@ -1970,9 +1979,17 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 			} while (selectionResult == kSelectionError && (errno == EAGAIN || errno == EINTR));
 
             if(selectionResult > 0){
+				time_t t1 = time(0);
 				do {
 					n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
-				} while (n<0 && (errno == EAGAIN || errno == EINTR));
+					if(n<0 && (errno == EAGAIN || errno == EINTR)){
+						if((time(0)-t1)>kErrTimeOut) {
+							[self disconnect];
+							[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+						}
+					}
+					else break;
+				} while (1);
 				if(n==0){
 					[self disconnect];
 					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
@@ -2017,9 +2034,18 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
         else if (selectionResult == kSelectionTimeout) {
             [NSException raise:@"ConnectionTimeOut" format:@"Read from %@ <%@> port: %d timed out",[self crateName],IPNumber,portNumber];
         }
+		time_t t1 = time(0);
 		do {
 			n = recv(aSocket, packetPtr, numBytesToGet, 0);
-		} while (n<0 && (errno == EAGAIN || errno == EINTR));
+			if(n<0 && (errno == EAGAIN || errno == EINTR)){
+				if((time(0)-t1)>kErrTimeOut) {
+					[self disconnect];
+					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+				}
+			}
+			else break;
+			
+		} while (1);
 		
         if(n==0){
             [self disconnect];
