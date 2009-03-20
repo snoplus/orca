@@ -265,6 +265,12 @@
                      selector : @selector(payloadSizeChanged:)
                          name : ORSBC_LinkNumPayloadSizeChanged
                        object : [model sbcLink]];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(errorTimeOutChanged:)
+                         name : ORSBC_LinkErrorTimeOutChanged
+                       object : [model sbcLink]];
+	
 }
 
 - (void) updateWindow
@@ -299,6 +305,12 @@
     [self payloadSizeChanged:nil];
 	
 	[self lamSlotChanged:nil];
+	[self errorTimeOutChanged:nil];
+}
+
+- (void) errorTimeOutChanged:(NSNotification*)aNote
+{
+	[errorTimeOutPU selectItemAtIndex:[[model sbcLink] errorTimeOut]];
 }
 
 - (void) checkGlobalSecurity
@@ -464,6 +476,7 @@
     [loadModeMatrix setEnabled:!locked && !runInProgress];
     [forceReloadButton setEnabled:!locked && !runInProgress];
     [verboseButton setEnabled:!locked && !runInProgress];
+    [errorTimeOutPU setEnabled:!locked];
 	
 	[self setToggleCrateButtonState];
 }
@@ -704,6 +717,11 @@
 - (IBAction) ipNumberAction:(id)sender
 {
 	[[model sbcLink] setIPNumber:[sender stringValue]];
+}
+
+- (IBAction) errorTimeOutAction:(id)sender
+{
+	[[model sbcLink] setErrorTimeOut:[sender indexOfSelectedItem]];
 }
 
 - (IBAction) portNumberAction:(id)sender

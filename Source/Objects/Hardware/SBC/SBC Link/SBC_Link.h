@@ -130,6 +130,7 @@ typedef enum eSBC_ThrottleConsts{
 	id				jobDelegate;
 	SEL				statusSelector;
 	ORSBCLinkJobStatus* jobStatus;
+	int				errorTimeOut;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
@@ -140,6 +141,8 @@ typedef enum eSBC_ThrottleConsts{
 #pragma mark ¥¥¥Accessors
 - (int) slot;
 - (NSUndoManager*) undoManager;
+- (void) setErrorTimeOut:(int)aValue;
+- (int) errorTimeOut;
 - (int) numTestPoints;
 - (void) setNumTestPoints:(int)num;
 - (int) infoType;
@@ -387,3 +390,5 @@ extern NSString* ORSBC_LinkCBTest;
 extern NSString* ORSBC_LinkNumCBTextPointsChanged;
 extern NSString* ORSBC_LinkNumPayloadSizeChanged;
 extern NSString* ORSBC_LinkJobStatus;
+extern NSString* ORSBC_LinkErrorTimeOutChanged;
+

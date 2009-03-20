@@ -44,7 +44,6 @@
 #define kNoData				-2
 
 #define kSBCRateIntegrationTime 1.5
-#define kErrTimeOut				2
 
 #pragma mark ***External Strings
 NSString* SBC_LinkLoadModeChanged			= @"SBC_LinkLoadModeChanged";
@@ -78,6 +77,7 @@ NSString* ORSBC_LinkCBTest					= @"ORSBC_LinkCBTest";
 NSString* ORSBC_LinkNumCBTextPointsChanged	= @"ORSBC_LinkNumCBTextPointsChanged";
 NSString* ORSBC_LinkNumPayloadSizeChanged	= @"ORSBC_LinkNumPayloadSizeChanged";
 NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
+NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 
 @implementation SBC_Link
 - (id)   initWithDelegate:(ORCard*)aDelegate
@@ -130,6 +130,25 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 - (int) slot
 {
 	return [delegate slot];
+}
+
+- (void) setErrorTimeOut:(int)aValue
+{
+	[[[self undoManager] prepareWithInvocationTarget:self] setErrorTimeOut:errorTimeOut];
+    errorTimeOut = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSBC_LinkErrorTimeOutChanged object:self];
+}
+
+- (int) errorTimeOut
+{
+	return errorTimeOut;
+}
+
+- (int) errorTimeOutSeconds
+{
+	static int translatedTimeOut[4] = {2,0,10,60};
+	if(errorTimeOut<0 || errorTimeOut>3)return 2;
+	else return translatedTimeOut[errorTimeOut];
 }
 
 - (int) numTestPoints
@@ -590,6 +609,7 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
     [self setDoRange:		[decoder decodeBoolForKey:	@"DoRange"]];
     [self setReadWriteType: [decoder decodeIntForKey:   @"ReadWriteType"]];	
     [self setAddressModifier: [decoder decodeIntForKey:   @"addressModifier"]];	
+    [self setErrorTimeOut:  [decoder decodeIntForKey:   @"errorTimeOut"]];	
 	socketLock = [[NSLock alloc] init];
 	
 	exitCBTest    = YES;
@@ -619,6 +639,7 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	[encoder encodeBool:forceReload		forKey:@"ForceReload"];
     [encoder encodeInt:readWriteType    forKey:@"ReadWriteType"];
     [encoder encodeInt:addressModifier    forKey:@"addressModifier"];
+    [encoder encodeInt:errorTimeOut    forKey:@"errorTimeOut"];
 }
 
 
@@ -1944,9 +1965,12 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 	do {
 		n = recv(aSocket, &numBytesToGet, sizeof(numBytesToGet), 0);
 		if(n<0 && (errno == EAGAIN || errno == EINTR)){
-			if((time(0)-t1)>kErrTimeOut) {
-				[self disconnect];
-				[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+			int timeout = [self errorTimeOutSeconds];
+			if(timeout>0){
+				if((time(0)-t1)>timeout) {
+					[self disconnect];
+					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+				}
 			}
 		}
 		else break;
@@ -1983,9 +2007,12 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 				do {
 					n = recv(aSocket, ptrToNumBytesToGet, numToGet, 0);	
 					if(n<0 && (errno == EAGAIN || errno == EINTR)){
-						if((time(0)-t1)>kErrTimeOut) {
-							[self disconnect];
-							[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+						int timeout = [self errorTimeOutSeconds];
+						if(timeout>0){
+							if((time(0)-t1)>timeout) {
+								[self disconnect];
+								[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+							}
 						}
 					}
 					else break;
@@ -2038,9 +2065,12 @@ NSString* ORSBC_LinkJobStatus				= @"ORSBC_LinkJobStatus";
 		do {
 			n = recv(aSocket, packetPtr, numBytesToGet, 0);
 			if(n<0 && (errno == EAGAIN || errno == EINTR)){
-				if((time(0)-t1)>kErrTimeOut) {
-					[self disconnect];
-					[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+				int timeout = [self errorTimeOutSeconds];
+				if(timeout>0){
+					if((time(0)-t1)>timeout) {
+						[self disconnect];
+						[NSException raise:@"Socket Disconnected" format:@"%@ Disconnected",IPNumber];
+					}
 				}
 			}
 			else break;

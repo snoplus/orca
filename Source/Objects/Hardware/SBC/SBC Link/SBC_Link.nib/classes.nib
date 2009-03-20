@@ -176,9 +176,21 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>alignBottom</key>
+				<string>id</string>
+				<key>alignHorizontalCenters</key>
+				<string>id</string>
 				<key>alignLeft</key>
 				<string>id</string>
+				<key>alignRight</key>
+				<string>id</string>
+				<key>alignTop</key>
+				<string>id</string>
+				<key>alignVerticalCenters</key>
+				<string>id</string>
 				<key>arrangeInCircle</key>
+				<string>id</string>
+				<key>bringToFront</key>
 				<string>id</string>
 				<key>concludeDragOperation</key>
 				<string>id</string>
@@ -190,7 +202,11 @@
 				<string>id</string>
 				<key>draggingExited</key>
 				<string>id</string>
+				<key>getInfo</key>
+				<string>id</string>
 				<key>paste</key>
+				<string>id</string>
+				<key>sendToBack</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -219,6 +235,8 @@
 				<key>connectionAction</key>
 				<string>id</string>
 				<key>doRangeAction</key>
+				<string>id</string>
+				<key>errorTimeOutAction</key>
 				<string>id</string>
 				<key>filePathAction</key>
 				<string>id</string>
@@ -301,6 +319,8 @@
 				<string>NSTextField</string>
 				<key>doRangeButton</key>
 				<string>NSButton</string>
+				<key>errorTimeOutPU</key>
+				<string>NSPopUpButton</string>
 				<key>filePathField</key>
 				<string>NSTextField</string>
 				<key>forceReloadButton</key>
@@ -455,6 +475,8 @@
 				<key>copy</key>
 				<string>id</string>
 				<key>differentiateAction</key>
+				<string>id</string>
+				<key>refresh</key>
 				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>

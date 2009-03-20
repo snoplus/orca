@@ -62,6 +62,7 @@
 	IBOutlet NSButton*		connectButton;
 	IBOutlet NSButton*		connect1Button;
 	IBOutlet NSTextField*	status1Field;
+	IBOutlet NSPopUpButton* errorTimeOutPU;
 
 	//Basic Ops
 	IBOutlet NSTextField*	functionAllowedField;
@@ -104,7 +105,6 @@
 
 #pragma mark ***Interface Management
 - (void) settingsLockChanged:(NSNotification*)aNote;
-
 - (void) numTestPointsChanged:(NSNotification*)aNote;
 - (void) filePathChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
@@ -125,6 +125,7 @@
 - (void) ipNumberChanged:(NSNotification*)aNote;
 - (void) portNumberChanged:(NSNotification*)aNote;
 - (void) lamSlotChanged:(NSNotification*)aNotification;
+- (void) errorTimeOutChanged:(NSNotification*)aNote;
 
 - (void) addressChanged:(NSNotification*)aNote;
 - (void) writeValueChanged:(NSNotification*)aNote;
@@ -156,6 +157,7 @@
 - (IBAction) userNameAction:(id)sender;
 - (IBAction) passWordAction:(id)sender;
 - (IBAction) connectionAction:(id)sender;
+- (IBAction) errorTimeOutAction:(id)sender;
 
 - (IBAction) addressAction:(id)sender;
 - (IBAction) writeValueAction:(id)sender;
