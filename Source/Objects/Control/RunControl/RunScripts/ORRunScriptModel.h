@@ -32,6 +32,9 @@
 	id						target;
 }
 
+- (void) registerNotificationObservers;
+- (void) runningChanged:(NSNotification*)aNote;
+
 #pragma mark ***Scripting
 - (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
 - (void) setSelectorOK:(SEL)aSelectorOK bad:(SEL)aSelectorBAD withObject:(id)anObject target:(id)aTarget;
@@ -43,10 +46,6 @@
 - (void) syncDataIdsWith:(id)anotherObj;
 - (NSDictionary*) dataRecordDescription;
 - (void) shipTaskRecord:(id)aTask running:(BOOL)aState;
-
-#pragma mark •••Archival
-- (id)initWithCoder:(NSCoder*)decoder;
-- (void)encodeWithCoder:(NSCoder*)encoder;
 @end
 
 @interface ORDecoderRunScript : ORBaseDecoder

@@ -24,19 +24,29 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
+#import "ORScriptRunner.h"
 
 @implementation ORRunScriptModel
 
 #pragma mark ***Initialization
+- (void) registerNotificationObservers
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(runningChanged:)
+                         name : ORScriptRunnerRunningChanged
+						object: nil];	
+}
 
-- (void) connectionChanged
+- (void) runningChanged:(NSNotification*)aNote
 {
 	[self setUpImage];
 }
 
 - (void) setUpImage
 {
-	// [self setImage:[NSImage imageNamed:@"RunScript"]];
 	
     //---------------------------------------------------------------------------------------------------
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
@@ -54,13 +64,23 @@
 								nil];		
 	[[self identifier] drawInRect:NSMakeRect(30,-4, imageSize.width,imageSize.height) 
 				   withAttributes:attributes];
-    [i unlockFocus];
+
+	if([self running]){
+		NSImage* runningImage = [NSImage imageNamed:@"ScriptRunning"];
+		[runningImage setSize:NSMakeSize(40,40)];
+		NSSize imageSize = [runningImage size];
+		NSSize ourSize = [self frame].size;
+        [runningImage compositeToPoint:NSMakePoint(ourSize.width - imageSize.width,-16) operation:NSCompositeSourceOver];
+    }
+	
+	[i unlockFocus];
     
     [self setImage:i];
     [i release];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORForceRedraw object: self];
 }
+
 
 - (void) setUniqueIdNumber:(unsigned long)anIdNumber
 {
@@ -141,23 +161,6 @@
 	target = nil;
 }
 
-#pragma mark •••Archival
-- (id)initWithCoder:(NSCoder*)decoder
-{
-    self = [super initWithCoder:decoder];
-    
-    [[self undoManager] disableUndoRegistration];
-	
-    [[self undoManager] enableUndoRegistration];
-	
-    return self;
-}
-
-- (void)encodeWithCoder:(NSCoder*)encoder
-{
-    [super encodeWithCoder:encoder];
-}
-
 - (void) shipTaskRecord:(id)aTask running:(BOOL)aState
 {
     if(dataId!= -1){
@@ -170,6 +173,15 @@
 															object:[NSData dataWithBytes:&data length:sizeof(long)*3]];
     }
 }
+
+- (id)initWithCoder:(NSCoder*)decoder
+{
+    self = [super initWithCoder:decoder];
+	[self registerNotificationObservers];
+    return self;
+}
+
+
 @end
 
 @implementation ORDecoderRunScript
