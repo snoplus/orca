@@ -905,7 +905,6 @@
 - (void)keyDown:(NSEvent *)event
 {
 	NSString *input = [event characters];
-	BOOL cmdKeyDown   = ([event modifierFlags] & NSCommandKeyMask)!=0;
 	
 	if([input isEqual:[NSString stringWithFormat:@"%C", NSUpArrowFunctionKey]]){
 		[self moveSelectedObjectsUp:event];
