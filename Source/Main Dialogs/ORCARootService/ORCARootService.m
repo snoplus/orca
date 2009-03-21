@@ -33,6 +33,7 @@ NSString* ORCARootServiceConnectAtStartChanged	= @"ORCARootServiceConnectAtStart
 NSString* ORCARootServiceAutoReconnectChanged	= @"ORCARootServiceAutoReconnectChanged";
 NSString* ORORCARootServiceLock					= @"ORORCARootServiceLock";
 
+
 @implementation ORCARootService
 
 SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
@@ -46,9 +47,18 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
     if(port==0)port = kORCARootServicePort;
 	[self setAutoReconnect:[[NSUserDefaults standardUserDefaults] integerForKey: @"orca.rootservice.AutoReconnect"]];
 	[self setConnectAtStart:[[NSUserDefaults standardUserDefaults] integerForKey: @"orca.rootservice.ConnectAtStartUp"]];
+	
 	NSString* s = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.rootservice.ServiceHostName"];
-	if(s==nil)s = kORCARootServiceHost;
-	[self setHostName: s];
+	hostNameIndex = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.rootservice.HostNameIndex"];
+	connectionHistory = [[NSUserDefaults standardUserDefaults] objectForKey: @"orca.rootservice.ServiceHistory"];
+	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
+
+	if(s){
+		if(![connectionHistory containsObject:s])[connectionHistory addObject:s];
+	}
+	if(![connectionHistory containsObject:kORCARootServiceHost])[connectionHistory addObject:kORCARootServiceHost];
+	
+	[self setHostName:[connectionHistory objectAtIndex:	hostNameIndex]];
     [self setSocketPort:port];
     [[self undoManager] enableUndoRegistration];
     	
@@ -71,7 +81,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	[socket setDelegate:nil];
     [timeConnected release];
     [name release];
+	[hostName release];
 	[dataBuffer release];
+	[connectionHistory release];
     [super dealloc];
 }
 
@@ -97,6 +109,35 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
         [socket close];
         [self setIsConnected:[socket isConnected]];
     }
+}
+
+- (NSString*) hostName
+{
+	return hostName;
+}
+
+- (void) setHostName:(NSString*)aName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHostName:hostName];
+    [hostName autorelease];
+    hostName = [aName copy];    	
+
+	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
+	if(![connectionHistory containsObject:hostName]){
+		[connectionHistory addObject:hostName];
+	}
+	if(aName)hostNameIndex = [connectionHistory indexOfObject:aName];
+	else hostNameIndex = 0;
+
+    [[NSUserDefaults standardUserDefaults] setObject:connectionHistory forKey:@"orca.rootservice.ServiceHistory"];
+    [[NSUserDefaults standardUserDefaults] setInteger:hostNameIndex forKey:@"orca.rootservice.HostNameIndex"];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORCARootServiceHostNameChanged object:self userInfo:nil];
+
+}
+
+- (unsigned) hostNameIndex
+{
+	return hostNameIndex;
 }
 
 - (NetSocket*) socket
@@ -126,7 +167,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 						  userInfo:userInfo];
 
 	[self setTimeConnected:isConnected?[NSCalendarDate date]:nil];
+}
 
+- (void) clearHistory
+{
+	[connectionHistory release];
+	connectionHistory = nil;
+
+	[self setHostName:kORCARootServiceHost];
+	
 }
 
 - (void) broadcastConnectionStatus
@@ -138,23 +187,22 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 					userInfo:userInfo];
 }
 
-- (NSString*) hostName
+- (NSArray*) connectionHistory
 {
-	return hostName;
+	return connectionHistory;
 }
 
-- (void) setHostName:(NSString*)aName
+- (unsigned) connectionHistoryCount
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setHostName:hostName];
-    [hostName autorelease];
-    hostName = [aName copy];
-    
-    [[NSNotificationCenter defaultCenter]
-				postNotificationName:ORCARootServiceHostNameChanged
-                              object:self];
-	
-    [[NSUserDefaults standardUserDefaults] setObject:hostName forKey:@"orca.rootservice.ServiceHostName"];
+	return [connectionHistory count];
 }
+
+- (id) connectionHistoryItem:(unsigned)index
+{
+	if(connectionHistory)return [connectionHistory objectAtIndex:index];
+	else return nil;
+}
+
 
 - (int) socketPort
 {

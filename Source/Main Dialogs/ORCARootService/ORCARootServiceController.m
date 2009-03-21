@@ -50,6 +50,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 {
     [self registerNotificationObservers];
     [self updateWindow];
+	[hostComboBox reloadData];
 }
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow*)window
@@ -113,6 +114,11 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
                           name: ORCARootServiceAutoReconnectChanged
                        object : [self orcaRootService]];
 					   
+	[notifyCenter addObserver : self
+                      selector: @selector(hostNameChanged:)
+                          name: ORCARootServiceHostNameChanged
+                       object : [self orcaRootService]];
+	
 	//we don't want this notification
 	[notifyCenter removeObserver:self name:NSWindowDidResignKeyNotification object:nil];
 
@@ -148,9 +154,14 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
         [[self orcaRootService] setSocketPort:[sender intValue]];
     }
 }
-- (IBAction) setHostAction:(id) sender
+- (IBAction) setHostNameAction:(id) sender
 {
 	[[self orcaRootService] setHostName:[sender stringValue]];
+}
+
+- (IBAction) clearHistory:(id) sender
+{
+	[[self orcaRootService] clearHistory];
 }
 
 - (IBAction) saveDocument:(id)sender
@@ -214,7 +225,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
     [lockButton setState: locked];
     
     [portField setEnabled:!locked];   
-    [hostField setEnabled:!locked];   
+    [hostComboBox setEnabled:!locked];   
     [connectAtStartButton setEnabled:!locked];   
     [autoReconnectButton setEnabled:!locked];   
 }
@@ -227,13 +238,19 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 
 - (void) hostNameChanged:(NSNotification*)aNotification
 {
-	[hostField setStringValue: [[self orcaRootService] hostName]];
+	unsigned index = [[self orcaRootService] hostNameIndex];
+	if(index!=NSNotFound)[hostComboBox selectItemAtIndex: index];
+	[hostComboBox reloadData];
 }
 
 - (void) connectedChanged:(NSNotification*)aNotification
 {
-	[statusField setStringValue: [[self orcaRootService] isConnected]?@"YES":@"NO"];
-	[connectButton setTitle:[[self orcaRootService] isConnected]?@"Disconnect":@"Connect"];
+	BOOL connected = [[self orcaRootService] isConnected];
+	[statusField setStringValue: connected?@"YES":@"NO"];
+	[connectButton setTitle:connected?@"Disconnect":@"Connect"];
+	[hostComboBox setEnabled:!connected];
+	[portField setEnabled:!connected];
+	[clearHistoryButton setEnabled:!connected];
 }
 
 - (void) timeConnectedChanged:(NSNotification*)aNotification
@@ -245,6 +262,17 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootServiceController);
 		[timeField setStringValue: @""];
 	}
 }
+
+- (unsigned ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+{
+	return  [[self orcaRootService] connectionHistoryCount];
+}
+
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
+{
+	return [[self orcaRootService] connectionHistoryItem:index];
+}
+
 
 @end
 

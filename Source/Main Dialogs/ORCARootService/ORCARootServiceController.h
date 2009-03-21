@@ -29,13 +29,14 @@
 @interface ORCARootServiceController : NSWindowController 
 {
     IBOutlet NSTextField*	portField;
-    IBOutlet NSTextField*	hostField;
+    IBOutlet NSComboBox*	hostComboBox;
 	IBOutlet NSTextField*	statusField;
 	IBOutlet NSTextField*	timeField;
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*      connectButton;
 	IBOutlet NSButton*      connectAtStartButton;
 	IBOutlet NSButton*      autoReconnectButton;
+	IBOutlet NSButton*      clearHistoryButton;
 }
 
 #pragma mark ¥¥¥Initialization
@@ -51,13 +52,15 @@
 
 #pragma mark ¥¥¥Actions
 - (IBAction) setPortAction:(id) sender;
-- (IBAction) setHostAction:(id) sender;
+- (IBAction) setHostNameAction:(id) sender;
 - (IBAction) lockAction:(id)sender;
 - (IBAction) connectAction:(id)sender;
 - (IBAction) connectAtStartAction:(id)sender;
 - (IBAction) autoReconnectAction:(id)sender;
+- (IBAction) clearHistory:(id) sender;
 
 #pragma mark ¥¥¥Interface Management
+- (void) hostNameChanged:(NSNotification*)aNotification;
 - (void) securityStateChanged:(NSNotification*)aNotification;
 - (void) checkGlobalSecurity;
 - (void) portChanged:(NSNotification*)aNotification;

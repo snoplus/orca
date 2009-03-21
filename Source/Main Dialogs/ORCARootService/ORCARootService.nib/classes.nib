@@ -36,6 +36,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
@@ -51,13 +53,15 @@
 			<dict>
 				<key>autoReconnectAction</key>
 				<string>id</string>
+				<key>clearHistory</key>
+				<string>id</string>
 				<key>connectAction</key>
 				<string>id</string>
 				<key>connectAtStartAction</key>
 				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
-				<key>setHostAction</key>
+				<key>setHostNameAction</key>
 				<string>id</string>
 				<key>setPortAction</key>
 				<string>id</string>
@@ -70,12 +74,14 @@
 			<dict>
 				<key>autoReconnectButton</key>
 				<string>NSButton</string>
+				<key>clearHistoryButton</key>
+				<string>NSButton</string>
 				<key>connectAtStartButton</key>
 				<string>NSButton</string>
 				<key>connectButton</key>
 				<string>NSButton</string>
-				<key>hostField</key>
-				<string>NSTextField</string>
+				<key>hostComboBox</key>
+				<string>NSComboBox</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
 				<key>portField</key>

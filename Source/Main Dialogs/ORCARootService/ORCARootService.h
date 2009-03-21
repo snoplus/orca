@@ -32,7 +32,7 @@
 @interface ORCARootService : NSObject
 {
     int             socketPort;
-    NSString*       hostName;
+	NSString*		hostName;
     NSString*		name;
     NetSocket*		socket;
 	BOOL			isConnected;
@@ -45,6 +45,8 @@
 	NSMutableData*	dataBuffer;
 	BOOL			autoReconnect;
 	BOOL			connectAtStart;
+	NSMutableArray* connectionHistory;
+	unsigned 		hostNameIndex;
 }
 
 + (ORCARootService*) sharedORCARootService;
@@ -53,7 +55,10 @@
 - (void) connectAtStartUp;
 
 #pragma mark ¥¥¥Accessors
+- (void) clearHistory;
+- (NSArray*) connectionHistory;
 - (NSString*) hostName;
+- (unsigned) hostNameIndex;
 - (void) setHostName:(NSString*)aName;
 - (BOOL) autoReconnect;
 - (void) setAutoReconnect:(BOOL)aAutoReconnect;
@@ -84,6 +89,8 @@
 - (NSDictionary*) dataRecordDescription;
 - (void) requestNotification:(NSNotification*)aNote;
 - (void) sendRequest:(NSMutableDictionary*)request fromObject:(id)anObject;
+- (unsigned) connectionHistoryCount;
+- (id) connectionHistoryItem:(unsigned)index;
 
 #pragma mark ¥¥¥Delegate Methods
 - (void) netsocketDisconnected:(NetSocket*)insocket;
@@ -93,11 +100,13 @@
 
 extern NSString* ORCARootServicePortChanged;
 extern NSString* ORCARootServiceTimeConnectedChanged;
-extern NSString* ORCARootServiceHostNameChanged;
 extern NSString* ORORCARootServiceLock;
 extern NSString* ORORCARootServiceAutoReconnectChanged;
 extern NSString* ORCARootServiceConnectAtStartChanged;
 extern NSString* ORCARootServiceAutoReconnectChanged;
+extern NSString* ORCARootServiceConnectionHistoryChanged;
+extern NSString* ORCARootServiceConnectionHistoryIndexChanged;
+extern NSString* ORCARootServiceHostNameChanged;
 
 
 @interface NSObject (ORCARootService)
