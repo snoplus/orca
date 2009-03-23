@@ -116,7 +116,7 @@
 
 - (NSString*) fullID
 {
-    return [NSString stringWithFormat:@"%@,%d,%d",NSStringFromClass([self class]),[self crateNumber], [self slot]];
+    return [NSString stringWithFormat:@"%@,%d,%d",[self className],[self crateNumber], [self slot]];
 }
 
 - (NSString*) identifier
