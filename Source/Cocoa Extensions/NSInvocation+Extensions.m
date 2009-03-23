@@ -239,9 +239,12 @@
 			}
 		}
 		if(ok){
+			[theInvocation retainArguments];
 			[theInvocation performSelectorOnMainThread:@selector(invokeWithTarget:) withObject:aTarget waitUntilDone:YES];
 			//[theInvocation invokeWithTarget:aTarget];
-			if(returnLength!=0)result =  [theInvocation returnValue];
+			if(returnLength!=0){
+				result =  [theInvocation returnValue];
+			}
 		}
 	}
 	else {
