@@ -257,7 +257,7 @@
 {
 	id aValue  = [symbolTable threadSafeObjectForKey:aKey usingLock:symbolTableLock];
 	if(!aValue){
-		aValue = [NSDecimalNumber zero];
+		aValue = _zero;
 		[self setValue:aValue forSymbol:aKey];
 	}
 	return aValue;
@@ -267,10 +267,10 @@
 {
 	if(!aSymbol){
 		NSLog(@"Warning: <%@> used before initialized... was set to zero\n",aSymbol);
-		aValue = [NSDecimalNumber zero];
+		aValue = _zero;
 	}
 	if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
-	if(!aValue)aValue = [NSDecimalNumber zero];
+	if(!aValue)aValue = _zero;
 	[symbolTable threadSafeSetObject:aValue forKey:aSymbol usingLock:symbolTableLock];
 	return aValue;
 }
@@ -330,7 +330,7 @@
 	//needs to return NSDecimalNumber holding the obj pointer.
 	Class theClass = NSClassFromString(VARIABLENAME(0));
 	NSArray* objects = [[[NSApp delegate]  document] collectObjectsOfClass:theClass];
-	if([objects count] == 0)return [NSDecimalNumber zero];
+	if([objects count] == 0)return _zero;
 	if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORVmeDaughterCard")])  return [self findVmeDaughterCard:p collection:objects];
 	else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCard")])  return [self findCard:p collection:objects];
 	else {
@@ -351,7 +351,7 @@
 					}
 				}
 			}
-			return [NSDecimalNumber zero];
+			return _zero;
 		}
 	}
 }
@@ -374,7 +374,7 @@
 		crateNumber = 0;
 		cardNumber = [NodeValue(1) intValue];
 	}
-	else return [NSDecimalNumber zero];
+	else return _zero;
 	
 	while(anObj = [e nextObject]){
 		if([anObj respondsToSelector:@selector(stationNumber)]){
@@ -388,7 +388,7 @@
 			}
 		}
 	}
-	return [NSDecimalNumber zero];
+	return _zero;
 }
 
 
@@ -407,18 +407,18 @@
 	}
 	else if(numArgs == 3){
 		//only a slot number is included
-		crateNumber = 1;
+		crateNumber = 0;
 		carrierSlot  = [NodeValue(1) intValue];
 		cardNumber  = [NodeValue(2) intValue];
 	}
-	else return [NSDecimalNumber zero];
+	else return _zero;
 	
 	while(anObj = [e nextObject]){
 		if([anObj crateNumber] == crateNumber  && [[anObj guardian] slot] == carrierSlot &&  [anObj slot] == cardNumber){
 			return anObj;
 		}
 	}
-	return [NSDecimalNumber zero];
+	return _zero;
 }
 
 
@@ -1158,16 +1158,16 @@
 {
 	NSMutableDictionary* aSymbolTable = [NSMutableDictionary dictionary];
 	//preload with some constants
-	[aSymbolTable setObject:[NSDecimalNumber zero] forKey:@"nil"];
-	[aSymbolTable setObject:[NSDecimalNumber zero] forKey:@"NULL"];
-	[aSymbolTable setObject:[NSDecimalNumber zero] forKey:@"FALSE"];
-	[aSymbolTable setObject:[NSDecimalNumber zero] forKey:@"false"];
-	[aSymbolTable setObject:[NSDecimalNumber one]  forKey:@"true"];
-	[aSymbolTable setObject:[NSDecimalNumber one]  forKey:@"TRUE"];
-	[aSymbolTable setObject:[NSDecimalNumber zero]  forKey:@"no"];
-	[aSymbolTable setObject:[NSDecimalNumber zero]  forKey:@"NO"];
-	[aSymbolTable setObject:[NSDecimalNumber one]  forKey:@"yes"];
-	[aSymbolTable setObject:[NSDecimalNumber one]  forKey:@"YES"];
+	[aSymbolTable setObject:_zero forKey:@"nil"];
+	[aSymbolTable setObject:_zero forKey:@"NULL"];
+	[aSymbolTable setObject:_zero forKey:@"FALSE"];
+	[aSymbolTable setObject:_zero forKey:@"false"];
+	[aSymbolTable setObject:_one  forKey:@"true"];
+	[aSymbolTable setObject:_one  forKey:@"TRUE"];
+	[aSymbolTable setObject:_zero  forKey:@"no"];
+	[aSymbolTable setObject:_zero  forKey:@"NO"];
+	[aSymbolTable setObject:_one  forKey:@"yes"];
+	[aSymbolTable setObject:_one  forKey:@"YES"];
 	return aSymbolTable;
 }
 @end
