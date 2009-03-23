@@ -34,7 +34,7 @@ NSString* ORSBC_LAMLock						= @"ORSBC_LAMLock";
 - (id) init
 {
 	self = [super init];
-    ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:@"DualPort Readout"];
+    ORReadOutList* r1 = [[ORReadOutList alloc] initWithIdentifier:@"Readout"];
     [self setReadoutGroup:r1];
     [self setVariableNames:[NSMutableArray array]];
     [r1 release];

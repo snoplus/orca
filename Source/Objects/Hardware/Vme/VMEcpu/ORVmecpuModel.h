@@ -122,4 +122,9 @@
 
 @end
 
+@interface ORVmecpuModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects;
+- (int) objWidth;
+@end
+
 extern NSString* ORVmecpuLock;	

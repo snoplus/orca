@@ -404,4 +404,46 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	[sbcLink executeCommandList:aList];
 }
 
+#pragma mark ¥¥¥OROrderedObjHolding Protocol
+
+- (int) maxNumberOfObjects	{ return 7; }
+- (int) objWidth			{ return 48; }
+- (int) groupSeparation		{ return 0; }
+
+- (NSString*) nameForSlot:(int)aSlot	{ return [NSString stringWithFormat:@"LAM %d",aSlot]; }
+
+- (BOOL) slot:(int)aSlot excludedFor:(id)anObj { return NO;}
+
+- (NSRange) legalSlotsForObj:(id)anObj
+{
+	return NSMakeRange(0,[self maxNumberOfObjects]);
+}
+- (int) slotAtPoint:(NSPoint)aPoint 
+{
+	return floor(((int)aPoint.x)/[self objWidth]);
+}
+- (NSPoint) pointForSlot:(int)aSlot 
+{
+	return NSMakePoint(aSlot*[self objWidth],0);
+}
+
+- (void) place:(id)anObj intoSlot:(int)aSlot
+{
+	[anObj setSlot: aSlot];
+	[anObj moveTo:[self pointForSlot:aSlot]];
+}
+- (int) slotForObj:(id)anObj
+{
+	return [anObj slot];
+}
+- (int) numberSlotsNeededFor:(id)anObj
+{	
+	return 1;
+}
 @end
+
+@implementation ORVmecpuModel (OROrderedObjHolding)
+- (int) maxNumberOfObjects	{ return 7; }
+- (int) objWidth			{ return 48; }
+@end
+

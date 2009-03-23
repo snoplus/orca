@@ -25,6 +25,4 @@
 @interface SBCLamView : ORCardContainerView {
 	CTGradient* gradient;
 }
-- (int)  maxNumberOfObjects;
-- (int)  objWidth;
 @end

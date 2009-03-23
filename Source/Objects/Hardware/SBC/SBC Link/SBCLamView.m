@@ -31,15 +31,6 @@
 	[super dealloc];
 }
 
-- (int) maxNumberOfObjects
-{
-    return 7;
-}
-
-- (int) objWidth
-{
-    return 48;
-}
 
 - (void)drawRect:(NSRect)rect
 {
@@ -52,8 +43,8 @@
 	
 	float y1 = [self bounds].origin.y;
     float y2 = y1+[self bounds].size.height;
-    float x = [self bounds].origin.x + [self objWidth];
-    for(;x<[self bounds].size.width;x+=[self objWidth]){
+    float x = [self bounds].origin.x + 48;
+    for(;x<[self bounds].size.width;x+=48){
         [NSBezierPath strokeLineFromPoint:NSMakePoint(x,y1) toPoint:NSMakePoint(x,y2)];
     }
 	
