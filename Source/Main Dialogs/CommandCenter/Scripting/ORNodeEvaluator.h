@@ -66,6 +66,7 @@
 
 #pragma mark •••Finders
 - (id) findObject:(id) p;
+- (id) findCrate:(id)p collection:objects;
 - (id) findCard:(id)p collection:objects;
 - (id) findVmeDaughterCard:(id)p collection:objects;
 

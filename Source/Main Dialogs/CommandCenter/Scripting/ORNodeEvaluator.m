@@ -333,6 +333,7 @@
 	if([objects count] == 0)return _zero;
 	if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORVmeDaughterCard")])  return [self findVmeDaughterCard:p collection:objects];
 	else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCard")])  return [self findCard:p collection:objects];
+	else if([[objects objectAtIndex:0] isKindOfClass:NSClassFromString(@"ORCrate")])  return [self findCrate:p collection:objects];
 	else {
 		int numArgs = [[p nodeData] count];
 		if(numArgs == 1){
@@ -354,6 +355,33 @@
 			return _zero;
 		}
 	}
+}
+
+- (id) findCrate:(id)p collection:objects
+{
+	//needs to return NSDecimalNumber holding the obj pointer.
+	id anObj;
+	NSEnumerator* e = [objects objectEnumerator];
+	int numArgs = [[p nodeData] count];
+	int crateNumber;
+	if(numArgs == 1){
+		//both crate and slot numbers are included
+		crateNumber = 0;
+	}
+	else if(numArgs == 2){
+		//both crate and slot numbers are included
+		crateNumber = [NodeValue(1) intValue];
+	}
+	else return _zero;
+	
+	while(anObj = [e nextObject]){
+		if([anObj respondsToSelector:@selector(crateNumber)]){
+			if([anObj crateNumber] == crateNumber) {
+				return anObj; 
+			}
+		}
+	}
+	return _zero;
 }
 
 - (id) findCard:(id)p collection:objects
