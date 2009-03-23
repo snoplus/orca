@@ -581,7 +581,8 @@
 		}
 		else if([[aCol identifier] isEqualToString:@"iValueHex"]){
 			id aValue = [anArray objectForKey:[keyArray objectAtIndex:aRow]];
-			return [NSString stringWithFormat:@"0x%08x",[aValue longValue]];
+			if([aValue isKindOfClass:[NSDecimalNumber class]]) return [NSString stringWithFormat:@"0x%08x",[aValue longValue]];
+			else return @"Not Number";
 		}
 		else return nil;
 	}
