@@ -53,8 +53,9 @@
 	IBOutlet NSTextField*   cbPercentField;
 
 	//IP Settings
-	IBOutlet NSTextField*	ipNumberField;
+	IBOutlet NSComboBox*	ipNumberComboBox;
 	IBOutlet NSTextField*	portNumberField;
+	IBOutlet NSTextField*	irqNumberField;
 	IBOutlet NSSecureTextField* passWordField;
 	IBOutlet NSTextField*   userNameField;
 	IBOutlet NSTextField*	connectionStatus1Field;
@@ -63,6 +64,7 @@
 	IBOutlet NSButton*		connect1Button;
 	IBOutlet NSTextField*	status1Field;
 	IBOutlet NSPopUpButton* errorTimeOutPU;
+	IBOutlet NSButton*		clearHistoryButton;
 
 	//Basic Ops
 	IBOutlet NSTextField*	functionAllowedField;
@@ -94,7 +96,6 @@
 }
 
 #pragma mark ¥¥¥Initialization
-
 - (void) dealloc;
 - (void) awakeFromNib;
 
@@ -142,6 +143,7 @@
 
 
 #pragma mark ¥¥¥Actions
+- (IBAction) clearHistory:(id) sender;
 - (IBAction) lockAction:(id)sender;
 
 - (IBAction) loadModeAction:(id)sender;

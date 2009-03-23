@@ -88,7 +88,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	
 	exitCBTest    = YES;
 	cbTestRunning = NO;
-	
+	[self initConnectionHistory];
 	return self;
 }
 
@@ -106,7 +106,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	[eRunFailedAlarm clearAlarm];
 	[eRunFailedAlarm release];
     [timeConnected release];
-	
+	[connectionHistory release];
     [filePath release];
     [userName release];
     [passWord release];
@@ -126,7 +126,42 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(calculateRates) object:nil];
 }
 
+- (void) initConnectionHistory
+{
+	ipNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.%d.IPNumberIndex",[self className],[self slot]]];
+	if(!connectionHistory){
+		NSArray* his = [[NSUserDefaults standardUserDefaults] objectForKey: [NSString stringWithFormat:@"orca.%@.%d.ConnectionHistory",[self className],[self slot]]];
+		connectionHistory = [his mutableCopy];
+	}
+	if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
+}
+
 #pragma mark ***Accessors
+- (void) clearHistory
+{
+	[connectionHistory release];
+	connectionHistory = nil;
+	
+	[self setIPNumber:[self IPNumber]];
+}
+
+
+- (unsigned) connectionHistoryCount
+{
+	return [connectionHistory count];
+}
+
+- (id) connectionHistoryItem:(unsigned)index
+{
+	if(connectionHistory && index>=0 && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
+	else return nil;
+}
+
+- (unsigned) ipNumberIndex
+{
+	return ipNumberIndex;
+}
+
 - (int) slot
 {
 	return [delegate slot];
@@ -463,14 +498,24 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 
 - (void) setIPNumber:(NSString*)aIPNumber
 {
-	if(!aIPNumber)aIPNumber = @"";
-	
-    [[[self undoManager] prepareWithInvocationTarget:self] setIPNumber:IPNumber];
-    
-    [IPNumber autorelease];
-    IPNumber = [aIPNumber copy];    
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkIPNumberChanged object:self];
+	if([aIPNumber length]){
+		
+		[[[self undoManager] prepareWithInvocationTarget:self] setIPNumber:IPNumber];
+		
+		[IPNumber autorelease];
+		IPNumber = [aIPNumber copy];    
+		
+		if(!connectionHistory)connectionHistory = [[NSMutableArray alloc] init];
+		if(![connectionHistory containsObject:IPNumber]){
+			[connectionHistory addObject:IPNumber];
+		}
+		ipNumberIndex = [connectionHistory indexOfObject:aIPNumber];
+			
+		[[NSUserDefaults standardUserDefaults] setObject:connectionHistory forKey:[NSString stringWithFormat:@"orca.%@.%d.ConnectionHistory",[self className],[self slot]]];
+		[[NSUserDefaults standardUserDefaults] setInteger:ipNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.%d.IPNumberIndex",[self className],[self slot]]];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		[[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkIPNumberChanged object:self];
+	}
 }
 
 - (void) calculateRates
@@ -585,6 +630,8 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	self = [super init];
 	[[self undoManager] disableUndoRegistration];
 	
+	[self initConnectionHistory];
+	
 	int num = [decoder decodeIntForKey:   @"numTestPoints"];
 	if(num == 0) [self setNumTestPoints:20];
 	else [self setNumTestPoints:num];
@@ -592,7 +639,8 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	long lnum = [decoder decodeInt32ForKey:  @"payloadSize"];
 	if(lnum==0)[self setPayloadSize:65000];
 	else [self setPayloadSize:lnum];
-	
+
+
 	[self setInfoType:		[decoder decodeIntForKey:   @"infoType"]];
 	[self setLoadMode:		[decoder decodeIntForKey:   @"loadMode"]];
 	[self setInitAfterConnect:[decoder decodeBoolForKey:@"InitAfterConnect"]];
@@ -614,7 +662,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	
 	exitCBTest    = YES;
 	cbTestRunning = NO;
-	
+
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }

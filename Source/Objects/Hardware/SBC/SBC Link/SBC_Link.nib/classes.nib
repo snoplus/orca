@@ -232,6 +232,8 @@
 				<string>id</string>
 				<key>cbTest</key>
 				<string>id</string>
+				<key>clearHistory</key>
+				<string>id</string>
 				<key>connectionAction</key>
 				<string>id</string>
 				<key>doRangeAction</key>
@@ -309,6 +311,8 @@
 				<string>NSButton</string>
 				<key>cbTestProgress</key>
 				<string>NSProgressIndicator</string>
+				<key>clearHistoryButton</key>
+				<string>NSButton</string>
 				<key>connect1Button</key>
 				<string>NSButton</string>
 				<key>connectButton</key>
@@ -335,7 +339,9 @@
 				<string>NSMatrix</string>
 				<key>initAfterConnectButton</key>
 				<string>NSButton</string>
-				<key>ipNumberField</key>
+				<key>ipNumberComboBox</key>
+				<string>NSComboBox</string>
+				<key>irqNumberField</key>
 				<string>NSTextField</string>
 				<key>killCrateButton</key>
 				<string>NSButton</string>

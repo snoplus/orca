@@ -73,6 +73,7 @@
 	
 	[payloadSizeSlider setMinValue:0];
 	[payloadSizeSlider setMaxValue:300];
+	[ipNumberComboBox reloadData];
 }
 
 - (void) setModel:(id)aModel
@@ -423,6 +424,7 @@
 - (void) startStatusChanged:(NSNotification*)aNote
 {
 	BOOL connected		 = [[model sbcLink] isConnected];
+    BOOL locked = [gSecurity isLocked:[model sbcLockName]];
 	NSString*  connectionState = [[model sbcLink] crateProcessState];
 	
 	[self setToggleCrateButtonState];
@@ -448,6 +450,11 @@
     [rangeTextField setEnabled:functionsExist && [[model sbcLink] doRange]];
     [resetCrateBusButton setEnabled:functionsExist];
     [cbTestButton setEnabled:connected];
+	[clearHistoryButton setEnabled:!locked  && !connected];
+    [ipNumberComboBox setEnabled:!locked  && !connected];
+    [portNumberField setEnabled:!locked  && !connected];
+    [passWordField setEnabled:!locked && !connected];
+    [userNameField setEnabled:!locked && !connected];
 	
 	[self loadModeChanged:nil];
 	
@@ -463,13 +470,14 @@
     BOOL locked = [gSecurity isLocked:[model sbcLockName]];
 	BOOL connected		 = [[model sbcLink] isConnected];
 	
+	[clearHistoryButton setEnabled:!locked  && !connected];
+    [ipNumberComboBox setEnabled:!locked  && !connected];
+    [portNumberField setEnabled:!locked  && !connected];
+    [passWordField setEnabled:!locked && !connected];
+    [userNameField setEnabled:!locked && !connected];
 	[pingButton setEnabled:!locked && !runInProgress];
     [cbTestButton setEnabled:!locked && !runInProgress && connected];
 	[payloadSizeSlider setEnabled:!locked && !runInProgress && connected];
-    [ipNumberField setEnabled:!locked && !runInProgress];
-    [portNumberField setEnabled:!locked && !runInProgress];
-    [passWordField setEnabled:!locked && !runInProgress];
-    [userNameField setEnabled:!locked && !runInProgress];
     [connectButton setEnabled:!locked && !runInProgress];
     [connect1Button setEnabled:!locked && !runInProgress];
 	[killCrateButton setEnabled:!locked && !runInProgress];
@@ -477,7 +485,6 @@
     [forceReloadButton setEnabled:!locked && !runInProgress];
     [verboseButton setEnabled:!locked && !runInProgress];
     [errorTimeOutPU setEnabled:!locked];
-	
 	[self setToggleCrateButtonState];
 }
 
@@ -578,9 +585,6 @@
 			}
 			else theInfoString = [NSString stringWithFormat: @"No info available, or no job running"];
 		break;
-			
-	
-	
 	}
 	float amountFilled;
 	float totalAmount = (float)(aMaxValue-aMinValue);
@@ -633,12 +637,13 @@
 
 - (void) ipNumberChanged:(NSNotification*)aNote
 {
-	[ipNumberField setStringValue:[[model sbcLink] IPNumber]];
+	[ipNumberComboBox setStringValue:[[model sbcLink] IPNumber]];
 }
 
 - (void) portNumberChanged:(NSNotification*)aNote
 {
 	[portNumberField setIntValue:[[model sbcLink] portNumber]];
+	[irqNumberField setIntValue:[[model sbcLink] portNumber]];
 }
 
 - (void) addressChanged:(NSNotification*)aNote
@@ -654,6 +659,11 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) clearHistory:(id) sender
+{
+	[[model sbcLink] clearHistory];
+}
+
 - (IBAction) lockAction:(id)sender
 {
     [gSecurity tryToSetLock:[model sbcLockName] to:[sender intValue] forWindow:[self window]];
@@ -1004,6 +1014,16 @@
 	if([[model sbcLink] productionSpeedValueValid])*yValue = [[model sbcLink] productionSpeed];
     else *yValue = 0;
     return YES;
+}
+
+- (unsigned ) numberOfItemsInComboBox:(NSComboBox *)aComboBox
+{
+	return  [[model sbcLink] connectionHistoryCount];
+}
+
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(unsigned)index
+{
+	return [[model sbcLink] connectionHistoryItem:index];
 }
 
 @end

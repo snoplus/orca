@@ -131,14 +131,19 @@ typedef enum eSBC_ThrottleConsts{
 	SEL				statusSelector;
 	ORSBCLinkJobStatus* jobStatus;
 	int				errorTimeOut;
+	NSMutableArray* connectionHistory;
+	unsigned 		ipNumberIndex;
 }
 
 - (id)   initWithDelegate:(ORCard*)anDelegate;
 - (void) dealloc;
 - (void) wakeUp; 
 - (void) sleep ;	
+- (void) initConnectionHistory;
+- (void) clearHistory;
 
 #pragma mark ¥¥¥Accessors
+- (unsigned) ipNumberIndex;
 - (int) slot;
 - (NSUndoManager*) undoManager;
 - (void) setErrorTimeOut:(int)aValue;
@@ -200,6 +205,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) setPayloadSize:(long)aValue;
 - (ORSBCLinkJobStatus*) jobStatus;
 - (void) setJobStatus:(ORSBCLinkJobStatus*)theJobStatus;
+- (unsigned) connectionHistoryCount;
+- (id) connectionHistoryItem:(unsigned)index;
 
 - (void) calculateRates;
 - (void) setByteRateSent:(float)aRate;
