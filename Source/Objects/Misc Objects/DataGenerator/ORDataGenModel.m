@@ -117,7 +117,7 @@
         
         short card = random()%2;
         short chan = random()%8;
-        unsigned long aValue = (100*chan) + ((random()%500 + random()%500 + random()%500)/3);
+        unsigned long aValue = (100*chan) + ((random()%500 + random()%500 + random()%500+ random()%500)/4);
         if(card==0 && chan ==0)aValue = 100;
         unsigned long data[3];
         data[0] = dataId1D | 2;
