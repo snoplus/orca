@@ -345,8 +345,8 @@
 			id anObj;
 			NSEnumerator* e = [objects objectEnumerator];
 			while(anObj = [e nextObject]){
-				if([anObj respondsToSelector:@selector(tag)]){
-					if([anObj tag] == tag) {
+				if([anObj respondsToSelector:@selector(uniqueIdNumber)]){
+					if([anObj uniqueIdNumber] == tag) {
 						return anObj; 
 					}
 				}
