@@ -29,7 +29,8 @@
 
 @interface ORDataPacket : NSObject <NSCoding>{
     @private
-		unsigned long        runNumber;             //current run number for this data
+		unsigned long        runNumber;				//current run number for this data
+		unsigned long        subRunNumber;           //current subrun number for this data
 		NSString*            filePrefix;             //name for file prefix (i.e. Run, R_Run, etc..)
 		NSMutableDictionary* objectLookup;			//table of objects that are taking data.
 		id					 fastLookupCache[kFastLoopupCacheSize];
@@ -63,6 +64,8 @@
 - (void)  setVersion:(int)aVersion;
 - (void) setRunNumber:(unsigned long)aRunNumber;
 - (unsigned long)runNumber;
+- (void) setSubRunNumber:(unsigned long)aSubRunNumber;
+- (unsigned long)subRunNumber;
 - (NSMutableDictionary *) fileHeader;
 - (void) setFileHeader: (NSMutableDictionary *) aFileHeader;
 - (void) makeFileHeader;
@@ -133,8 +136,11 @@
 - (id) fileDetails;
 - (void) generateObjectLookup;
 - (BOOL) readHeader: (NSFileHandle*)fp;
-- (BOOL) readHeaderReturnRunLength: (NSFileHandle*)fp runStart:(unsigned long*)runStart runEnd:(unsigned long*)runEnd runNumber:(unsigned long*)runNumber
-;
+- (BOOL) readHeaderReturnRunLength: (NSFileHandle*)fp runStart:(unsigned long*)runStart 
+							runEnd:(unsigned long*)runEnd runNumber:(unsigned long*)runNumber 
+						 useSubRun:(BOOL*)aUseSubRun
+					  subRunNumber:(unsigned long*)subRunNumber;
+
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
 
 #pragma mark •••Archival
