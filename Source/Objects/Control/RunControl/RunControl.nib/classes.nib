@@ -100,6 +100,8 @@
 				<string>id</string>
 				<key>newRunAction</key>
 				<string>id</string>
+				<key>newSubRunAction</key>
+				<string>id</string>
 				<key>openShutDownScript</key>
 				<string>id</string>
 				<key>openStartScript</key>
@@ -163,7 +165,11 @@
 				<string>NSButton</string>
 				<key>repeatRunCB</key>
 				<string>NSButton</string>
+				<key>restartButtonsTab</key>
+				<string>NSTabView</string>
 				<key>restartRunButton</key>
+				<string>NSButton</string>
+				<key>restartRunButton1</key>
 				<string>NSButton</string>
 				<key>runBar</key>
 				<string>NSProgressIndicator</string>
@@ -213,6 +219,8 @@
 				<string>NSTextField</string>
 				<key>stopRunButton</key>
 				<string>NSButton</string>
+				<key>subRunButton</key>
+				<string>NSButton</string>
 				<key>timeLimitField</key>
 				<string>NSTextField</string>
 				<key>timeLimitStepper</key>
@@ -223,6 +231,8 @@
 				<string>NSTextField</string>
 				<key>timedRunCB</key>
 				<string>NSButton</string>
+				<key>usingSubRunsField</key>
+				<string>NSTextField</string>
 				<key>vetoCountField</key>
 				<string>NSTextField</string>
 				<key>vetoedTextField</key>

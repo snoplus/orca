@@ -359,17 +359,14 @@
 
 - (id) findCrate:(id)p collection:objects
 {
-	//needs to return NSDecimalNumber holding the obj pointer.
 	id anObj;
 	NSEnumerator* e = [objects objectEnumerator];
 	int numArgs = [[p nodeData] count];
 	int crateNumber;
 	if(numArgs == 1){
-		//both crate and slot numbers are included
 		crateNumber = 0;
 	}
 	else if(numArgs == 2){
-		//both crate and slot numbers are included
 		crateNumber = [NodeValue(1) intValue];
 	}
 	else return _zero;
@@ -386,7 +383,6 @@
 
 - (id) findCard:(id)p collection:objects
 {
-	//needs to return NSDecimalNumber holding the obj pointer.
 	//CAMAC and AUGER use station numbers instead of slot number (station numbers are +1)
 	id anObj;
 	NSEnumerator* e = [objects objectEnumerator];
@@ -422,7 +418,6 @@
 
 - (id) findVmeDaughterCard:(id)p collection:objects
 {
-	//needs to return NSDecimalNumber holding the obj pointer.
 	id anObj;
 	NSEnumerator* e = [objects objectEnumerator];
 	int numArgs = [[p nodeData] count];
@@ -687,8 +682,11 @@
 	argList = [argList stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"#"]];
 	id result= nil;
 	@try {
-		[[self undoManager] disableUndoRegistration];
-		result =  [NSInvocation invoke:argList withTarget:NodeValue(0)];
+		id target = NodeValue(0);
+		if(target != _zero){
+			[[self undoManager] disableUndoRegistration];
+			result =  [NSInvocation invoke:argList withTarget:target];
+		}
 		[[self undoManager] enableUndoRegistration];
 	}
 	@catch (NSException* localException){

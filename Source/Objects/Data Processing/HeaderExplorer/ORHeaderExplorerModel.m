@@ -401,6 +401,8 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 	int i;
 	for(i=0;i<n;i++){
 		NSNumber* runNumber = [[runArray objectAtIndex:i] objectForKey:@"RunNumber"];
+		BOOL	  useSubRun = [[[runArray objectAtIndex:i] objectForKey:@"UseSubRun"] boolValue];
+		NSNumber* subRunNumber = [[runArray objectAtIndex:i] objectForKey:@"SubRunNumber"];
 		id aHeader = [[runArray objectAtIndex:i] objectForKey:@"FileHeader"];
 		NSMutableDictionary* filteredStuff = [self filteredHeader:aHeader];
 		if(filteredStuff){
@@ -411,7 +413,7 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 				ORHeaderItem* keyItem = [[headerItem items] objectAtIndex:keyNumber];
 				if([[keyItem name] hasPrefix:@"Key"]){
 					if([keyItem object]){
-						NSLog(@"%@ %@\n",runNumber, [keyItem object]);
+						NSLog(@"%@%s%@ %@\n",runNumber, useSubRun?@".":@"",useSubRun?subRunNumber:@"",[keyItem object]);
 					}
 					else {
 						NSArray* array = [keyItem items];
@@ -420,7 +422,7 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 						for(i=0;i<n;i++){
 							ORHeaderItem* lowestItem = headerItem = [array objectAtIndex:i];
 							if([lowestItem object]){
-								NSLog(@"%@ %@\n",runNumber, [lowestItem object]);
+								NSLog(@"%@%s%@ %@\n",runNumber, useSubRun?@".":@"",useSubRun?subRunNumber:@"",[lowestItem object]);
 							}
 						}						
 					}
@@ -562,7 +564,13 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 			unsigned long runStart  = 0;
 			unsigned long runEnd    = 0;
 			unsigned long runNumber = 0;
-			if([fileAsDataPacket readHeaderReturnRunLength:fp runStart:&runStart runEnd:&runEnd runNumber:&runNumber]){
+			BOOL		  useSubRun	= NO;
+			unsigned long subRunNumber = 0;
+		
+			if([fileAsDataPacket readHeaderReturnRunLength:fp runStart:&runStart 
+													runEnd:&runEnd runNumber:&runNumber 
+												 useSubRun:&useSubRun
+											  subRunNumber:&subRunNumber]){
 				if(runStart!=0 && runEnd!=0){
 				
 					if(runStart < minRunStartTime) minRunStartTime = runStart;
@@ -575,6 +583,8 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
 							[NSNumber numberWithUnsignedLong:runEnd],				  @"RunEnd",
 							[NSNumber numberWithUnsignedLong:runEnd-runStart],		  @"RunLength",
 							[NSNumber numberWithUnsignedLong:runNumber],			  @"RunNumber",
+							[NSNumber numberWithBool:useSubRun],					  @"UseSubRun",
+							[NSNumber numberWithUnsignedLong:subRunNumber],			  @"SubRunNumber",
 							[NSNumber numberWithUnsignedLong:[fp offsetInFile]],	  @"FileSize",
 							[fileAsDataPacket fileHeader],							  @"FileHeader",
 							nil];

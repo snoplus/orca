@@ -27,8 +27,11 @@
     IBOutlet NSButton*  runNumberButton;
     IBOutlet NSButton*  runTypeButton;
     
+    IBOutlet NSTabView* restartButtonsTab;
     IBOutlet NSButton*  startRunButton;
     IBOutlet NSButton*  restartRunButton;
+    IBOutlet NSButton*  restartRunButton1;
+    IBOutlet NSButton*  subRunButton;
     IBOutlet NSButton*  stopRunButton;
     IBOutlet NSButton*  remoteControlCB;
     IBOutlet NSButton*  quickStartCB;
@@ -43,6 +46,7 @@
     IBOutlet NSStepper*     timeLimitStepper;
     IBOutlet NSMatrix*      runModeMatrix;
     
+    IBOutlet NSTextField* usingSubRunsField;
     IBOutlet NSTextField* statusField;
     IBOutlet NSTextField* timeStartedField;
     IBOutlet NSTextField* elapsedTimeField;
@@ -80,6 +84,7 @@
 #pragma  mark ¥¥¥Actions
 - (IBAction) startRunAction:(id)sender;
 - (IBAction) newRunAction:(id)sender;
+- (IBAction) newSubRunAction:(id)sender;
 - (IBAction) stopRunAction:(id)sender;
 - (IBAction) remoteControlAction:(id)sender;
 - (IBAction) timeLimitStepperAction:(id)sender;
@@ -102,8 +107,8 @@
 - (IBAction) openShutDownScript:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
-- (void) sequenceCommentChanged:(NSNotification*)aNote;
-- (void) sequenceNumberChanged:(NSNotification*)aNote;
+- (void) subRunCommentChanged:(NSNotification*)aNote;
+- (void) subRunNumberChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) registerNotificationObservers;
 - (void) startUpScriptStateChanged:(NSNotification*)aNote;

@@ -38,8 +38,7 @@ enum eRunState{
 
 typedef enum eRunType {
     eMaintenanceRunType = (1 << 0),
-    eCalibrationRunType = (1 << 1),
-    eSourceRunType      = (1 << 2)
+    eSubRunType			= (1 << 1),
 }eRunType;
 
 

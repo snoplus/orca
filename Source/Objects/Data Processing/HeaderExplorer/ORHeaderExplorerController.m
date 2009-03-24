@@ -500,7 +500,12 @@
 			NSString* problem = [runDictionary objectForKey:@"Failed"];
 			NSString* s;
 			if(!problem){
-				s = [NSString stringWithFormat:@"Run Summary\nRun Number: %@\n",[runDictionary objectForKey:@"RunNumber"]];
+				s = [NSString stringWithFormat:@"Run Summary\nRun Number: %@",[runDictionary objectForKey:@"RunNumber"]];
+				BOOL subRunsUsed = [[runDictionary objectForKey:@"UseSubRun"] boolValue];
+				NSString* sub = [runDictionary objectForKey:@"SubRunNumber"];
+				if(sub && subRunsUsed)	s = [s stringByAppendingFormat:@".%@\n",sub];
+				else s = [s stringByAppendingString:@"\n"];
+
 				NSCalendarDate* startTime = [NSCalendarDate dateWithTimeIntervalSince1970:[[runDictionary objectForKey:@"RunStart"] unsignedLongValue]];
 				s = [s stringByAppendingFormat:@"Started   : %@\n",startTime];
 				s = [s stringByAppendingFormat:@"Run Length: %@ sec\n",[runDictionary objectForKey:@"RunLength"]];

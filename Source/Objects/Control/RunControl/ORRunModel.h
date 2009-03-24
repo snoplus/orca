@@ -56,6 +56,7 @@
         unsigned long	exceptionCount;
 
         BOOL			forceFullInit;
+		BOOL			_newSubRun;
 		BOOL			_forceRestart;
 		BOOL			_ignoreMode;
 		BOOL			_wasQuickStart;
@@ -64,7 +65,8 @@
 		unsigned long	_currentRun;
         int				runningState;
         ORDataTypeAssigner* dataTypeAssigner;
-        unsigned long lastRunNumberShipped;
+		unsigned long lastRunNumberShipped;
+		unsigned long lastSubRunNumberShipped;
         NSMutableArray* runTypeNames;
         BOOL        remoteInterface;
 		BOOL		runPaused;
@@ -82,8 +84,8 @@
 
 		NSString* startScriptState;
 		NSString* shutDownScriptState;
-		int sequenceNumber;
-		NSString* sequenceComment;
+		int subRunNumber;
+		NSString* subRunComment;
 }
 
 
@@ -91,10 +93,10 @@
 - (void) makeConnectors;
 
 #pragma mark ¥¥¥Accessors
-- (NSString*) sequenceComment;
-- (void) setSequenceComment:(NSString*)aSequenceComment;
-- (int) sequenceNumber;
-- (void) setSequenceNumber:(int)aSequenceNumber;
+- (NSString*) subRunComment;
+- (void) setSubRunComment:(NSString*)aSubRunComment;
+- (int) subRunNumber;
+- (void) setSubRunNumber:(int)aSubRunNumber;
 - (NSString*) shutDownScriptState;
 - (void) setShutDownScriptState:(NSString*)aShutDownScriptState;
 - (NSString*) startScriptState;
@@ -144,6 +146,7 @@
 - (int)		runningState;
 - (void)	setRunningState:(int)aRunningState;
 - (void)	setForceRestart:(BOOL)aState;
+- (void)	setPrepareForNewSubRun:(BOOL)aState;
 - (BOOL)	quickStart;
 - (void)	setQuickStart:(BOOL)flag;
 - (NSString *)  definitionsFilePath;
@@ -154,6 +157,8 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setOfflineRun:(BOOL)flag;
 - (BOOL) offlineRun;
+- (void) setUseSubRuns:(BOOL)aState;
+- (void) setMaintenanceRuns:(BOOL)aState;
 
 #pragma mark ¥¥¥Run Modifiers
 - (void) remoteStartRun:(unsigned long)aRunNumber;
@@ -166,6 +171,7 @@
 - (void) startRun:(BOOL)doInit;
 - (void) startRun;
 - (void) restartRun;
+- (void) restartSubRun;
 - (void) stopRun;
 - (void) haltRun;
 
@@ -193,6 +199,7 @@
 - (NSString*) shortStatus;
 - (NSString*) endOfRunState;
 - (void) checkVetos;
+- (NSString*) fullRunNumberString;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -218,8 +225,8 @@
 - (BOOL) doneTakingData;
 @end
 
-extern NSString* ORRunModelSequenceCommentChanged;
-extern NSString* ORRunModelSequenceNumberChanged;
+extern NSString* ORRunModelSubRunCommentChanged;
+extern NSString* ORRunModelSubRunNumberChanged;
 extern NSString* ORRunModelShutDownScriptStateChanged;
 extern NSString* ORRunModelStartScriptStateChanged;
 extern NSString* ORRunModelShutDownScriptChanged;

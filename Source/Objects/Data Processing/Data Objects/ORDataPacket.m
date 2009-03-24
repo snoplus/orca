@@ -73,6 +73,16 @@
     return runNumber;
 }
 
+- (void) setSubRunNumber:(unsigned long)aSubRunNumber
+{
+    subRunNumber = aSubRunNumber;
+}
+
+- (unsigned long)subRunNumber
+{
+    return subRunNumber;
+}
+
 - (NSMutableDictionary *) fileHeader
 {
     return fileHeader; 
@@ -830,6 +840,8 @@
 						  runStart:(unsigned long*)aRunStart 
 							runEnd:(unsigned long*)aRunEnd
 						 runNumber:(unsigned long*)aRunNumber
+					  useSubRun:(BOOL*)aUseSubRun
+					  subRunNumber:(unsigned long*)aSubRunNumber
 {
 	//a special function for reading the file and extracting the run length
 	//assumes special knowledge of the run record
@@ -858,6 +870,8 @@
 			if((run1[1] & 0x1) && !(run2[1] & 0x1)){
 				//OK, we have a start and end run record
 				//return the run length in seconds
+				*aUseSubRun= run1[1]&0x10;
+				*aSubRunNumber= run1[1]>>16;
 				*aRunNumber= run1[2];
 				*aRunStart = run1[3];
 				*aRunEnd = run2[3];

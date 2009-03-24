@@ -27,8 +27,8 @@
 
 #pragma mark ¥¥¥Definitions
 
-NSString* ORRunModelSequenceCommentChanged		= @"ORRunModelSequenceCommentChanged";
-NSString* ORRunModelSequenceNumberChanged		= @"ORRunModelSequenceNumberChanged";
+NSString* ORRunModelSubRunCommentChanged		= @"ORRunModelSubRunCommentChanged";
+NSString* ORRunModelSubRunNumberChanged		= @"ORRunModelSubRunNumberChanged";
 NSString* ORRunModelShutDownScriptStateChanged	= @"ORRunModelShutDownScriptStateChanged";
 NSString* ORRunModelStartScriptStateChanged		= @"ORRunModelStartScriptStateChanged";
 NSString* ORRunModelShutDownScriptChanged		= @"ORRunModelShutDownScriptChanged";
@@ -75,14 +75,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[self undoManager] enableUndoRegistration];
     
     _ignoreMode = YES;
-    
-    
+
     return self;
 }
 
 - (void) dealloc
 {
-    [sequenceComment release];
+    [subRunComment release];
     [shutDownScriptState release];
     [startScriptState release];
     [shutDownScript release];
@@ -174,30 +173,41 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Accessors
-
-- (NSString*) sequenceComment
+- (NSString*) fullRunNumberString
 {
-	if(!sequenceComment)return @"no Comment";
-    else return sequenceComment;
+	NSString* rn;
+	if(runType & eSubRunType){
+		rn = [NSString stringWithFormat:@"%d.%d",[self runNumber],[self subRunNumber]];
+	}
+	else {
+		rn = [NSString stringWithFormat:@"%d",[self runNumber]];
+	}
+	return rn;
 }
 
-- (void) setSequenceComment:(NSString*)aSequenceComment
+- (NSString*) subRunComment
 {
-	if(!aSequenceComment)aSequenceComment = @"no Comment";
-    [sequenceComment autorelease];
-    sequenceComment = [aSequenceComment copy];    
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSequenceCommentChanged object:self];
+	if(!subRunComment)return @"no Comment";
+    else return subRunComment;
 }
 
-- (int) sequenceNumber
+- (void) setSubRunComment:(NSString*)aSubRunComment
 {
-    return sequenceNumber;
+	if(!aSubRunComment)aSubRunComment = @"no Comment";
+    [subRunComment autorelease];
+    subRunComment = [aSubRunComment copy];    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSubRunCommentChanged object:self];
 }
 
-- (void) setSequenceNumber:(int)aSequenceNumber
+- (int) subRunNumber
 {
-    sequenceNumber = aSequenceNumber;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSequenceNumberChanged object:self];
+    return subRunNumber;
+}
+
+- (void) setSubRunNumber:(int)aSubRunNumber
+{
+    subRunNumber = aSubRunNumber;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRunModelSubRunNumberChanged object:self];
 }
 
 - (NSString*) shutDownScriptState
@@ -505,6 +515,23 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return runType;
 }
 
+//special runType setter for use in scripts
+- (void) setUseSubRuns:(BOOL)aState
+{
+	unsigned long aMask = [self runType];
+	if(aState)aMask |= eSubRunType;
+	else aMask &= ~eSubRunType;
+	[self setRunType:aMask];
+}
+
+- (void) setMaintenanceRuns:(BOOL)aState
+{
+	unsigned long aMask = [self runType];
+	if(aState)aMask |= eMaintenanceRunType;
+	else aMask &= ~eMaintenanceRunType;
+	[self setRunType:aMask];
+}
+
 - (void) setRunType:(unsigned long)aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRunType:runType];
@@ -607,10 +634,18 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	 userInfo: userInfo];
 }
 
+//not private, but don't call
 - (void) setForceRestart:(BOOL)aState
 {
     [self setNextRunWillQuickStart:YES];
     _forceRestart = aState;
+}
+
+//not private, but don't call
+- (void) setPrepareForNewSubRun:(BOOL)aState
+{
+    [self setNextRunWillQuickStart:YES];
+    _newSubRun = aState;
 }
 
 - (NSString *)definitionsFilePath
@@ -643,7 +678,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     dataTypeAssigner = aDataTypeAssigner;
 }
 
-
 - (void) setDataIds:(id)assigner
 {
     dataId       = [assigner assignDataIds:kLongForm];
@@ -661,10 +695,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 }
 
 #pragma mark ¥¥¥Run Modifiers
-
 - (void) startRun
 {
-    
     [self setNextRunWillQuickStart:quickStart];
     if([self isRunning]){
         _forceRestart = YES;
@@ -678,11 +710,25 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [self setNextRunWillQuickStart:YES];
     if([self isRunning]){
         _forceRestart = YES;
-        [self stopRun];
+		_newSubRun = NO;
+       [self stopRun];
     }
     else [self startRun:NO];
 }
 
+- (void) restartSubRun
+{
+	if([self runType] & eSubRunType){
+		[self setNextRunWillQuickStart:YES];
+		if([self isRunning]){
+			_forceRestart = YES;
+			_newSubRun = YES;
+			[self stopRun];
+		}
+		else [self startRun:NO];
+	}
+	else [self restartRun];
+}
 
 - (void) remoteStartRun:(unsigned long)aRunNumber
 {
@@ -739,7 +785,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
     
     _forceRestart = NO;
-    
     if([self isRunning]){
         NSLogColor([NSColor redColor],@"Warning...Programming error..should not be able to\n");
         NSLogColor([NSColor redColor],@"Start a run while one is already in progress.\n");
@@ -750,9 +795,15 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[self getCurrentRunNumber];
 	
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun && (!remoteControl || remoteInterface)){
-		[self setRunNumber:[self runNumber]+1];
+		if((runType & eSubRunType) && _newSubRun){
+			[self setSubRunNumber:[self subRunNumber]+1];
+			_newSubRun = NO;
+		}
+		else {
+			[self setRunNumber:[self runNumber]+1];
+			[self setSubRunNumber:0];
+		}
 	}
-	
 	[self setRunningState:eRunStarting];
 	//pass off to the next event cycle so the run starting state can be drawn on the screen
 	if(startScript){
@@ -976,10 +1027,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	if(remoteControl){
 		data[1] |= 0x4;			//set the remotebit
 	}
-	
+	if([self runType] & eSubRunType){
+		data[1] |= 0x10;
+		data[1] |= (lastSubRunNumberShipped&0xffff)<<16;
+	}
 	data[2] = lastRunNumberShipped;
 	data[3] = ut_time;
-	
+
 	[dataPacket addLongsToFrameBuffer:data length:4];
 	
 	//closeout run will wait until the processing thread is done.
@@ -1011,7 +1065,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	if(_forceRestart ||([self timedRun] && [self repeatRun] && !ignoreRepeat && (!remoteControl || remoteInterface))){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;
-		[self restartRun];
+		if(!_newSubRun)[self restartRun];
+		else [self restartSubRun];
 	}
  	[NSThread setThreadPriority:.9];
 	
@@ -1048,6 +1103,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
             if(!_ignoreRunTimeout && timedRun &&(deltaTime >= timeLimit)){
                 if(repeatRun){
                     [self setNextRunWillQuickStart:YES];
+					if(runType & eSubRunType)_newSubRun = YES;
+					else _newSubRun = NO;
                 }
                 [self stopRun];
             }
@@ -1072,9 +1129,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [objDictionary setObject:[NSNumber numberWithLong:runType]          forKey:@"runType"];
     [objDictionary setObject:[NSNumber numberWithBool:quickStart]       forKey:@"quickStart"];
     [objDictionary setObject:[NSNumber numberWithLong:[self runNumber]] forKey:@"RunNumber"];
-    [objDictionary setObject:[NSNumber numberWithInt:[self sequenceNumber]] forKey:@"sequenceNumber"];
-    [objDictionary setObject:[self sequenceComment]						forKey:@"sequenceComment"];
-    
+	if([self runType] & eSubRunType){
+		[objDictionary setObject:[NSNumber numberWithInt:[self subRunNumber]] forKey:@"subRunNumber"];
+		[objDictionary setObject:[self subRunComment]						forKey:@"subRunComment"];
+    }
     [dictionary setObject:objDictionary forKey:@"Run Control"];
     
     
@@ -1154,7 +1212,10 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     if(remoteControl){
         data[1] |= 0x4;			//set the remotebit
     }
-    
+	if([self runType] & eSubRunType){
+        data[1] |= 0x10;			//set the remotebit
+		data[1] |= (subRunNumber&0xFFFF)<<16;
+	}
     data[2] = [self runNumber];
     data[3] = ut_time;
     
@@ -1163,6 +1224,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [dataPacket addData:[NSData dataWithBytes:data length:4*sizeof(long)]];
     
     lastRunNumberShipped = data[2];
+    lastSubRunNumberShipped = data[1]>>16;
 	
     //pack up some info about the run.
     NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1482,7 +1544,8 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
         NSMutableArray* names = [NSMutableArray array];
         int i;
         [names addObject:[NSString stringWithFormat:@"Maintenance"]];
-        for(i=1;i<32;i++){
+        [names addObject:[NSString stringWithFormat:@"Enable SubRuns"]];
+        for(i=2;i<32;i++){
             [names addObject:[NSString stringWithFormat:@"Bit %d",i]];
         }
         
@@ -1610,13 +1673,16 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 @implementation ORRunDecoderForRun
 - (unsigned long)decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
-	return 4; //must return number of longs processed.
+	unsigned long* p = (unsigned long*)someData;
+	return ExtractLength(p[0]); //must return number of longs processed.
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
     NSString* runState;
     NSString* thirdWordKey;
+	BOOL subRun = NO;
+	int subRunNumber = 0;
     NSString* init = @"";
     NSString* title= @"Run Control Record\n\n";
     if(dataPtr[1] & 0x8){
@@ -1625,18 +1691,30 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
     }
     else {
         thirdWordKey = @"Run Number = ";
-        
+       
         if(dataPtr[1] & 0x1){
             runState = @"Type       = Start Run\n";
             init = [NSString stringWithFormat:@"Full Init  = %@\n",(dataPtr[1]&0x2)?@"YES":@"NO"];
         }
         else runState = @"Type       = End Run\n";
-    }
-    NSString* remote    = [NSString stringWithFormat:@"Remote     = %@\n",(dataPtr[1] & 0x4)?@"YES":@"NO"];
-    NSString* thirdWord = [NSString stringWithFormat:@"%@%d\n",thirdWordKey,dataPtr[2]];
-    
-    if(dataPtr[1] & 0x1) return [NSString stringWithFormat:@"%@%s%@%@%@%@",title,ctime((const time_t *)(&dataPtr[3])),runState,init,remote,thirdWord]; 
-    else                 return [NSString stringWithFormat:@"%@%s%@%@%@",title,ctime((const time_t *)(&dataPtr[3])),runState,remote,thirdWord];               
+		
+		if(dataPtr[1] & 0x10){
+			subRun = YES;
+			subRunNumber = dataPtr[1]>>16;
+		}   
+	}
+
+    NSString* remote     = [NSString stringWithFormat:@"Remote     = %@\n",(dataPtr[1] & 0x4)?@"YES":@"NO"];
+    NSString* thirdWord  = [NSString stringWithFormat:@"%@%d",thirdWordKey,dataPtr[2]];
+	if(subRun){
+		thirdWord = [thirdWord stringByAppendingFormat:@".%d",subRunNumber];
+	}
+	thirdWord = [thirdWord stringByAppendingString:@"\n"];
+
+    NSString* s;
+    if(dataPtr[1] & 0x1) s= [NSString stringWithFormat:@"%@%s%@%@%@%@",title,ctime((const time_t *)(&dataPtr[3])),runState,init,remote,thirdWord]; 
+    else                 s= [NSString stringWithFormat:@"%@%s%@%@%@",title,ctime((const time_t *)(&dataPtr[3])),runState,remote,thirdWord];               
+	return s;
 }
 
 @end

@@ -175,17 +175,23 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
             break;
             
         default:
-        case kNormalRun:	    
+        case kNormalRun:	
+		{
+			NSString* rs = @"Run In Progress.";
             if(runType){
-                if((runType & eMaintenanceRunType) && (runType & ~eMaintenanceRunType)){
-                    return [NSString stringWithFormat:@"Run In Progress. (Maintenance + Run Mask: 0x%X)",runType & ~eMaintenanceRunType];
+				if(runType & eMaintenanceRunType){
+					rs = [rs stringByAppendingString:@" Maintenance."];
+				}
+				if(runType & eSubRunType){
+					rs = [rs stringByAppendingString:@" SubRun."];
+				}
+
+                if(runType & ~(eMaintenanceRunType | eSubRunType)){
+                   rs = [rs stringByAppendingFormat:@" Mask: 0x%X",runType & ~(eMaintenanceRunType | eSubRunType)];
                 }
-                else if(runType & eMaintenanceRunType){
-                    return @"Run In Progress. (Maintenance)";
-                }
-                else return [NSString stringWithFormat:@"Run In Progress. (Run Mask: 0x%X)",runType];
             }
-            else return @"Run In Progress.";
+			return rs;
+		}
             break;
     }
 }
