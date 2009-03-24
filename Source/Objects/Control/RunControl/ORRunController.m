@@ -760,7 +760,7 @@
 
 - (IBAction) clearRunTypeAction:(id)sender
 {
-    [model setRunType:0L];
+    [model setRunType:[model runType] & (eMaintenanceRunType | eSubRunType)];
 }
 
 - (IBAction) runNumberLockAction:(id)sender
