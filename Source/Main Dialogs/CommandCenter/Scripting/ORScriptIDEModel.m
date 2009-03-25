@@ -322,9 +322,10 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 			[nextScriptTask runScript];
 		}
 	}
-	
 	if(normalFinish)NSLog(@"[%@] Returned with: %@\n",[self identifier],aValue);
 	else NSLogColor([NSColor redColor],@"[%@] Abnormal exit!\n",[[self scriptRunner] scriptName]);
+	[scriptRunner release];
+	scriptRunner = nil;
 }
 
 - (BOOL) running
