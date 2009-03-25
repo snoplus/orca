@@ -29,6 +29,7 @@
 - (IBAction) manualPlotLockAction:(id)sender;
 
 #pragma mark •••Data Source
+- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (int)numberOfRowsInTableView:(NSTableView *)tableView;
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
 @end

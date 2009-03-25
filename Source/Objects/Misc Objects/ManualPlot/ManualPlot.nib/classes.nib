@@ -6,26 +6,15 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
-			<string>NSSplitView</string>
+			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
+			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ZFlowLayout</string>
+			<string>NSSplitView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
@@ -114,6 +103,51 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>manualPlotLockAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORManualPlotController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>dataTableView</key>
+				<string>NSTableView</string>
+				<key>manualPlotLockButton</key>
+				<string>NSButton</string>
+				<key>plotter</key>
+				<string>ORPlotter1D</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>addGateAction</key>
 				<string>id</string>
 				<key>analyze</key>
@@ -133,6 +167,8 @@
 				<key>copy</key>
 				<string>id</string>
 				<key>differentiateAction</key>
+				<string>id</string>
+				<key>refresh</key>
 				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>
@@ -162,28 +198,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>manualPlotLockAction</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORManualPlotController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>dataTableView</key>
-				<string>NSTableView</string>
-				<key>manualPlotLockButton</key>
-				<string>NSButton</string>
-				<key>plotter</key>
-				<string>ORPlotter1D</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>OrcaObjectController</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

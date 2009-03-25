@@ -80,30 +80,44 @@
 #pragma mark •••Data Source
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [model numberBins];
+	return [model numPoints];
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
 {
-	if([[tableColumn identifier] isEqualToString:@"Value"])return [NSNumber numberWithInt:[model value:row]];
-	else return [NSNumber numberWithInt:row];
+	return [model dataAtIndex:row key:[tableColumn identifier]];
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (BOOL) useXYPlot
 {
-	if([[tableColumn identifier] isEqualToString:@"Value"]){
-		[model setValue:[object intValue] channel:row];
-	}
+	return YES;
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (int) 	numberOfDataSetsInPlot:(id)aPlotter
 {
-    return [model numberBins];
+	return 2;
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+- (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-    return [model value:x];
+	return [model numPoints];
+}
+- (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
+{
+	return [model dataSet:set index:index x:xValue y:yValue];
 }
 
+- (BOOL)   	willSupplyColors
+{
+    return YES;
+}
+
+- (NSColor*) colorForDataSet:(int)set
+{
+    switch(set){
+        case 0:  return [NSColor redColor];
+        case 1:  return [NSColor blueColor];
+		default: return [NSColor colorWithCalibratedRed:10/255. green:90/255. blue:0 alpha:1];
+    }
+}
 @end

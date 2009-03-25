@@ -9,31 +9,23 @@
 @interface ORManualPlotModel : OrcaObject  
 {
     int				textSize;
-    unsigned long 	overFlow;
-    unsigned int 	numberBins;
-    unsigned long* 	histogram;
 	NSLock*			dataSetLock;
+	NSMutableArray*	data;
     BOOL			scheduledForUpdate;
 }
 
 #pragma mark ***Accessors
-- (void)setNumberBins:(int)aNumberBins;
-- (int) numberBins;
-- (void) setValue:(unsigned long)aValue channel:(unsigned short)aChan;
-- (unsigned long)value:(unsigned short)aBin;
-- (unsigned long) overFlow;
-- (void) histogram:(unsigned long)aValue;
-- (void) scheduleUpdateOnMainThread;
+- (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3;
+- (id) dataAtIndex:(int)i key:(id)aKey;
+- (void) clearData;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
 
-
 #pragma mark •••Data Source Methods
-- (int)		numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
-- (float)	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x;
-
+- (unsigned long) numPoints;
+- (BOOL) dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue;
 @end
 
 extern NSString* ORManualPlotLock;

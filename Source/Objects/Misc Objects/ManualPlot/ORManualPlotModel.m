@@ -8,6 +8,7 @@
 
 #pragma mark •••Imported Files
 #import "ORManualPlotModel.h"
+#import "NSNotifications+Extensions.h"
 
 NSString* ORManualPlotLock						= @"ORManualPlotLock";
 NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
@@ -18,9 +19,6 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
 - (id) init 
 {
     self = [super init];
-    numberBins = 4096;
-    overFlow = 0;
-    histogram = nil;
 	dataSetLock = [[NSLock alloc] init];
     return self;    
 }
@@ -29,72 +27,33 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
 {
 	[dataSetLock release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	if(histogram)free(histogram);
-    histogram = nil;
+	[data release];
     [super dealloc];
 }
 
--(void)setNumberBins:(int)aNumberBins
+- (void) clearData
 {
 	[dataSetLock lock];
-    if(histogram) {
-        free(histogram);
-        histogram = 0;
-    }
-    numberBins = aNumberBins;
-    histogram = malloc(numberBins*sizeof(unsigned long));
-    if(histogram)memset(histogram,0,numberBins*sizeof(unsigned long));
-	[dataSetLock unlock];
+	[data release];
+	data = nil;
+	[dataSetLock unlock];	
 }
 
--(int) numberBins
-{
-    return numberBins;
-}
-
--(unsigned long) overFlow
-{
-    return overFlow;
-}
-
-- (void) setValue:(unsigned long)aValue channel:(unsigned short)aChan
+- (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3
 {
 	[dataSetLock lock];
-    if(aChan<numberBins) histogram[aChan] = aValue;
-	else overFlow++;
-	[self scheduleUpdateOnMainThread];
-	[dataSetLock unlock];
-}
+	if(!data) data = [[NSMutableArray array] retain];
+	[data addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+					 [NSNumber numberWithFloat:v1],@"0",
+					 [NSNumber numberWithFloat:v2],@"1",
+					 [NSNumber numberWithFloat:v3],@"2",
+					 nil]];
+	[dataSetLock unlock];	
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORManualPlotDataChanged object:self];
 
--(unsigned long) value:(unsigned short)aChan
-{
-    unsigned long theValue;
-	[dataSetLock lock];
-    if(aChan<numberBins)theValue = histogram[aChan];
-    else theValue = 0;
-
-	[dataSetLock unlock];
-    return theValue;
-}
-
-- (void) scheduleUpdateOnMainThread
-{
-	if(!scheduledForUpdate){
-		scheduledForUpdate = YES;
-		[self performSelector:@selector(postUpdate) withObject:nil afterDelay:1.0];
-	}
-}
-
-- (void) postUpdate
-{
-	[[NSNotificationCenter defaultCenter]
-		postNotificationName:ORManualPlotDataChanged
-					  object:self];    
-	scheduledForUpdate = NO;
 }
 
 #pragma mark ***Accessors
-
 - (void) setUpImage
 {
 	[self setImage:[NSImage imageNamed:@"ManualPlot"]];
@@ -105,14 +64,12 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
     [self linkToController:@"ORManualPlotController"];
 }
 
-
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setNumberBins:[decoder decodeIntForKey:@"NumberBins"]];
 		
     [[self undoManager] enableUndoRegistration];
 
@@ -124,55 +81,52 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:numberBins forKey:@"NumberBins"];
 }
 
 -(void)clear
 {
 	[dataSetLock lock];
-    memset(histogram,0,sizeof(unsigned long)*numberBins);
-    overFlow = 0;
+	[data release];
+	data = nil;
 	[dataSetLock unlock];
 }
 
 #pragma mark •••Writing Data
 - (void) writeDataToFile:(FILE*)aFile
 {
-//	[dataSetLock lock];
-//    fprintf( aFile, "WAVES/I/N=(%d) '%s'\nBEGIN\n",numberBins,[shortName cStringUsingEncoding:NSASCIIStringEncoding]);
-//    int i;
-//    for (i=0; i<numberBins; ++i) {
-//        fprintf(aFile, "%ld\n",histogram[i]);
-//    }
-//    fprintf(aFile, "END\n\n");
-//	[dataSetLock unlock];
+}
+		
+#pragma mark *** delegate methods
+-(id) dataAtIndex:(int)i key:(id)aKey
+{
+	if(i<[data count]){
+		return [[data objectAtIndex:i] objectForKey:aKey];
+	}
+	else return nil;
 }
 
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+- (unsigned long) numPoints
 {
-    return numberBins;
+    return [data count];
 }
 
-- (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-    return [self value:x];
-}
 
-- (void) histogram:(unsigned long)aValue
+
+- (BOOL) dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
 {
-    if(!histogram){
-        [self setNumberBins:4096];
-    }
 	[dataSetLock lock];
-    if(aValue>=numberBins){
-        ++overFlow;
-        ++histogram[numberBins-1];
-    }
-    else {
-        ++histogram[aValue];
-    }
+	if(index<[data count]){
+		id d = [data objectAtIndex:index];
+		*xValue = [[d objectForKey:@"0"] floatValue];
+		if(set==0) *yValue = [[d objectForKey:@"1"] floatValue]; 
+		else	   *yValue = [[d objectForKey:@"2"] floatValue];
+	}
+	else {
+		*xValue = 0;
+		*yValue = 0;
+	}
 	[dataSetLock unlock];
-
+    return YES;    
 }
 
 @end
