@@ -670,6 +670,12 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     return nil;
 }
 
+- (id) findController
+{
+	NSArray* controllers = [[self document] findControllersWithModel:self];
+	if([controllers count])return [controllers objectAtIndex:0];
+	else return nil;
+}
 
 - (NSArray*) collectObjectsConformingTo:(Protocol*)aProtocol
 {

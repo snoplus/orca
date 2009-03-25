@@ -154,6 +154,7 @@ extern NSString* ORObjArrayPtrPBType;
 - (NSArray*) subObjectsThatMayHaveDialogs;
 - (id) findObjectWithFullID:(NSString*)aFullID;
 - (void) postWarning:(NSString*)warningString;
+- (id) findController;
 
 
 #pragma mark ¥¥¥Dialog Linking
