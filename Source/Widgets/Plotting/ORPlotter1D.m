@@ -259,6 +259,18 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     mYScale=[newYScale retain];
 }
 
+- (id) curve:(int)aCurveIndex gate:(int)aGateIndex
+{
+	if(aCurveIndex<[curves count]){
+		id theGates = [[curves objectAtIndex:aCurveIndex] gates];
+		if(aGateIndex<[theGates count]){
+			return [theGates objectAtIndex:aGateIndex];
+		}
+		else return nil;
+	}
+	else return nil;
+}
+
 - (double) plotHeight
 {
     return [self bounds].size.height-1;

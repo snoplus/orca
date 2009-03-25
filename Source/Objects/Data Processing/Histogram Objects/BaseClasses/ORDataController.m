@@ -57,6 +57,11 @@
     return YES;
 }
 
+- (id) curve:(int)aCurveIndex gate:(int)aGateIndex
+{
+	return [plotter curve:aCurveIndex gate:aGateIndex];
+}
+
 - (void)flagsChanged:(NSEvent*)inEvent
 {
 	[[self window] resetCursorRects];

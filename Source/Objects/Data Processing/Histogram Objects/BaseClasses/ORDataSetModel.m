@@ -20,6 +20,7 @@
 
 
 #import "ORDataSetModel.h"
+#import "ORDataController.h"
 #import "ORScale.h"
 #import "ORGate.h"
 
@@ -55,6 +56,11 @@ NSString* ORDataSetDataChanged				= @"ORDataSetDataChanged";
 }
 
 #pragma mark ¥¥¥Accessors
+- (id) curve:(int)aCurveIndex gate:(int)aGateIndex
+{
+	ORDataController* dialog = [self findController];
+	return [dialog curve:aCurveIndex gate:aGateIndex];
+}
 
 - (BOOL) paused
 {

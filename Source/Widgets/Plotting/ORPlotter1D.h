@@ -59,7 +59,7 @@
 - (int)activeCurveIndex;
 - (void)setActiveCurveIndex:(int)anactiveCurveIndex;
 - (id) activeCurve;
-
+- (id) curve:(int)aCurveIndex gate:(int)aGateIndex;
 - (void) setBackgroundColor:(NSColor*)c;
 - (void) setGridColor:(NSColor*)c;
 - (NSColor*) backgroundColor;

@@ -34,6 +34,7 @@
 }
 
 #pragma mark ¥¥¥Accessors
+- (id) curve:(int)aCurveIndex gate:(int)aGateIndex;
 - (BOOL) paused;
 - (void) setPaused:(BOOL)aPaused;
 - (int) refreshMode;
