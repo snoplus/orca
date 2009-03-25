@@ -124,6 +124,8 @@
 				<string>id</string>
 				<key>draggingExited</key>
 				<string>id</string>
+				<key>getInfo</key>
+				<string>id</string>
 				<key>paste</key>
 				<string>id</string>
 				<key>sendToBack</key>
