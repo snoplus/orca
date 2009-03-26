@@ -10,8 +10,12 @@
 #import "ORManualPlotModel.h"
 #import "NSNotifications+Extensions.h"
 
-NSString* ORManualPlotLock						= @"ORManualPlotLock";
-NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
+NSString* ORManualPlotModelCol2TitleChanged = @"ORManualPlotModelCol2TitleChanged";
+NSString* ORManualPlotModelCol1TitleChanged = @"ORManualPlotModelCol1TitleChanged";
+NSString* ORManualPlotModelCol0TitleChanged = @"ORManualPlotModelCol0TitleChanged";
+NSString* ORManualPlotModelColKeyChanged	= @"ORManualPlotModelColKeyChanged";
+NSString* ORManualPlotLock					= @"ORManualPlotLock";
+NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 
 @implementation ORManualPlotModel
 
@@ -25,6 +29,9 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
 
 - (void) dealloc
 {
+    [col2Title release];
+    [col1Title release];
+    [col0Title release];
 	[dataSetLock release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[data release];
@@ -43,10 +50,10 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
 {
 	[dataSetLock lock];
 	if(!data) data = [[NSMutableArray array] retain];
-	[data addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-					 [NSNumber numberWithFloat:v1],@"0",
-					 [NSNumber numberWithFloat:v2],@"1",
-					 [NSNumber numberWithFloat:v3],@"2",
+	[data addObject:[NSArray arrayWithObjects:
+					 [NSNumber numberWithFloat:v1],
+					 [NSNumber numberWithFloat:v2],
+					 [NSNumber numberWithFloat:v3],
 					 nil]];
 	[dataSetLock unlock];	
 	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORManualPlotDataChanged object:self];
@@ -54,6 +61,82 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
 }
 
 #pragma mark ***Accessors
+
+- (NSString*) col2Title
+{
+    return col2Title;
+}
+
+- (void) setCol2Title:(NSString*)aCol2Title
+{
+    [col2Title autorelease];
+    col2Title = [aCol2Title copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelCol2TitleChanged object:self];
+}
+
+- (NSString*) col1Title
+{
+    return col1Title;
+}
+
+- (void) setCol1Title:(NSString*)aCol1Title
+{
+    [col1Title autorelease];
+    col1Title = [aCol1Title copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelCol1TitleChanged object:self];
+}
+
+- (NSString*) col0Title
+{
+    return col0Title;
+}
+
+- (void) setCol0Title:(NSString*)aCol0Title
+{
+    [col0Title autorelease];
+    col0Title = [aCol0Title copy];    
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelCol0TitleChanged object:self];
+}
+
+- (int) col2Key;
+{
+    return col2Key;
+}
+
+- (void) setCol2Key:(int)aCol2Key;
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCol2Key:col2Key];
+    col2Key = aCol2Key;    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKeyChanged object:self];
+}
+
+- (int) col1Key;
+{
+    return col1Key;
+}
+
+- (void) setCol1Key:(int)aCol1Key;
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCol1Key:col1Key];
+    col1Key = aCol1Key;    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKeyChanged object:self];
+}
+
+- (int) col0Key
+{
+    return col0Key;
+}
+
+- (void) setCol0Key:(int)aCol0Key;
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCol0Key:col0Key];
+    col0Key = aCol0Key;    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotModelColKeyChanged object:self];
+}
+
 - (void) setUpImage
 {
 	[self setImage:[NSImage imageNamed:@"ManualPlot"]];
@@ -70,7 +153,13 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-		
+    [self setCol2Key:[decoder decodeIntForKey:@"ORManualPlotModelCol2Key"]];
+    [self setCol1Key:[decoder decodeIntForKey:@"ORManualPlotModelCol1Key"]];
+    [self setCol0Key:[decoder decodeIntForKey:@"ORManualPlotModelCol0Key"]];
+	if(col0Key==0 && col1Key==0 && col2Key==0){
+		[self setCol0Key:0]; 
+		[self setCol1Key:1];		
+	}
     [[self undoManager] enableUndoRegistration];
 
 	dataSetLock = [[NSLock alloc] init];
@@ -81,6 +170,9 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:col2Key forKey:@"ORManualPlotModelCol2Key"];
+    [encoder encodeInt:col1Key forKey:@"ORManualPlotModelCol1Key"];
+    [encoder encodeInt:col0Key forKey:@"ORManualPlotModelCol0Key"];
 }
 
 -(void)clear
@@ -92,34 +184,59 @@ NSString* ORManualPlotDataChanged				= @"ORManualPlotDataChanged";
 }
 
 #pragma mark •••Writing Data
-- (void) writeDataToFile:(FILE*)aFile
+- (void) writeDataToFile:(NSString*)aFileName
 {
+	[dataSetLock lock];
+	
+	NSString* fullFileName = [aFileName stringByExpandingTildeInPath];
+	FILE* aFile = fopen([fullFileName cStringUsingEncoding:NSASCIIStringEncoding],"w"); 
+	if(aFile){
+		NSLog(@"Writing Manual Plot File: %@\n",fullFileName);
+		NSEnumerator* e = [data objectEnumerator];
+		NSArray* row;
+		while(row=[e nextObject]){
+			fprintf(aFile, "%f\t%f\t%f\n",[[row objectAtIndex:0] floatValue],[[row objectAtIndex:1] floatValue],[[row objectAtIndex:2] floatValue]);
+		}
+		fclose(aFile);
+	}
+	
+	[dataSetLock unlock];
 }
 		
 #pragma mark *** delegate methods
--(id) dataAtIndex:(int)i key:(id)aKey
+-(id) dataAtRow:(int)r column:(int)c
 {
-	if(i<[data count]){
-		return [[data objectAtIndex:i] objectForKey:aKey];
+	if(r<[data count]){
+		NSArray* row =  [data objectAtIndex:r];
+		if(c<[row count]){
+			return [row objectAtIndex:c];
+		}
 	}
-	else return nil;
+	return nil;
 }
+
 
 - (unsigned long) numPoints
 {
     return [data count];
 }
 
-
-
 - (BOOL) dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
 {
 	[dataSetLock lock];
+	
 	if(index<[data count]){
 		id d = [data objectAtIndex:index];
-		*xValue = [[d objectForKey:@"0"] floatValue];
-		if(set==0) *yValue = [[d objectForKey:@"1"] floatValue]; 
-		else	   *yValue = [[d objectForKey:@"2"] floatValue];
+		if(col0Key <= 2) *xValue = [[d objectAtIndex:col0Key] floatValue];
+		else *xValue = index;
+		if(set==0) {
+			if(col1Key <= 2) *yValue = [[d objectAtIndex:col1Key] floatValue];
+			else *yValue=0;
+		}
+		else {
+			if(col2Key <= 2) *yValue = [[d objectAtIndex:col2Key] floatValue];
+			else *yValue=0;
+		}
 	}
 	else {
 		*xValue = 0;

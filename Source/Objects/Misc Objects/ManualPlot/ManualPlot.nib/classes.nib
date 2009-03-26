@@ -101,16 +101,45 @@
 			<string>NSView</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>col0KeyAction</key>
+				<string>id</string>
+				<key>col1KeyAction</key>
+				<string>id</string>
+				<key>col2KeyAction</key>
+				<string>id</string>
+				<key>refreshPlot</key>
+				<string>id</string>
+				<key>writeDataFileAction</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>ORManualPlotController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>col0KeyPU</key>
+				<string>NSPopUpButton</string>
+				<key>col0LabelField</key>
+				<string>NSTextField</string>
+				<key>col1KeyPU</key>
+				<string>NSPopUpButton</string>
+				<key>col1LabelField</key>
+				<string>NSTextField</string>
+				<key>col2KeyPU</key>
+				<string>NSPopUpButton</string>
+				<key>col2LabelField</key>
+				<string>NSTextField</string>
 				<key>dataTableView</key>
 				<string>NSTableView</string>
 				<key>plotter</key>
 				<string>ORPlotter1D</string>
+				<key>y1LengendField</key>
+				<string>NSTextField</string>
+				<key>y2LengendField</key>
+				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
