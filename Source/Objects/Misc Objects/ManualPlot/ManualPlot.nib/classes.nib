@@ -101,11 +101,6 @@
 			<string>NSView</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>manualPlotLockAction</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
 			<string>ORManualPlotController</string>
 			<key>LANGUAGE</key>
@@ -114,8 +109,6 @@
 			<dict>
 				<key>dataTableView</key>
 				<string>NSTableView</string>
-				<key>manualPlotLockButton</key>
-				<string>NSButton</string>
 				<key>plotter</key>
 				<string>ORPlotter1D</string>
 			</dict>

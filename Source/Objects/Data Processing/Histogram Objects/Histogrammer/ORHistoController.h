@@ -52,6 +52,7 @@
 - (void)splitViewDidResizeSubviews:(NSNotification *)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) getInfo:(id)sender;
 - (IBAction) shipFinalHistogramsAction:(id)sender;
 - (IBAction) doubleClick:(id)sender;
 - (IBAction) chooseDir:(id)sender;

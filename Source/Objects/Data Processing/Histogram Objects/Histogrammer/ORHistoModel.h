@@ -65,6 +65,7 @@
 - (void) addMultiPlot:(id)aMultiPlot;
 - (void) removeMultiPlot:(id)aMultiPlot;
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
+- (ORDataSet*) dataSetWithName:(NSString*)aName;
 
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo;

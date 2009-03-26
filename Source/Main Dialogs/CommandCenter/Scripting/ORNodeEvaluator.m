@@ -572,6 +572,7 @@
 				else return _zero;
 			}
 			else if(!NodeValue(0))return _one;
+			else return _zero;
 		}
 			
 		case AND_OP:

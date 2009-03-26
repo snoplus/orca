@@ -232,8 +232,19 @@
 }
 
 #pragma  mark ¥¥¥Actions
+- (IBAction) getInfo:(id)sender
+{
+    if([[self window] firstResponder] == outlineView){
+        NSArray *selection = [outlineView allSelectedItems];
+        NSEnumerator* e = [selection objectEnumerator];
+        id item;
+        while(item = [e nextObject]){
+			NSLog(@"%@\n",[item shortName]);
+        }
+    }
+}
 
-- (void) shipFinalHistogramsAction:(id)sender
+- (IBAction) shipFinalHistogramsAction:(id)sender
 {
 	[model setShipFinalHistograms:[sender intValue]];	
 }
@@ -388,6 +399,7 @@
     else if ([menuItem action] == @selector(copy:)) {
         return NO;
     }
+    else if ([menuItem action] == @selector(getInfo:))	return ([outlineView selectedRow] >= 0);
     else  return [super validateMenuItem:menuItem];
 }
 

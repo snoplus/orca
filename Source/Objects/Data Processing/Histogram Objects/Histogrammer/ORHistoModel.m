@@ -201,7 +201,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     
 }
 
-
+- (ORDataSet*) dataSetWithName:(NSString*)aName
+{
+	return [dataSet dataSetWithName:aName];
+}
 
 - (void) setDirectoryName:(NSString*)aDirName
 {

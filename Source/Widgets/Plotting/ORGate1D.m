@@ -407,6 +407,7 @@ const float kGateAlpha2 = .1;
     [self setGateMaxChannel:aMax];
     gate1 = aMin;
     gate2 = aMax;
+	[mPlot setNeedsDisplay:YES];
 }
 
 - (double) average

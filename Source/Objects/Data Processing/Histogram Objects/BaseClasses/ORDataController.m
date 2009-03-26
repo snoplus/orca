@@ -330,6 +330,19 @@
 	[rawDataTabView selectTabViewItemAtIndex:index];
 }
 
+- (void) openAnalysisDrawer
+{
+	[analysisDrawer open];
+	[plotter analyze:nil];
+	[plotter setNeedsDisplay:YES];
+}
+
+- (void) closeAnalysisDrawer
+{
+	[analysisDrawer close];
+	[plotter analyze:nil];
+	[plotter setNeedsDisplay:YES];
+}
 - (IBAction)doAnalysis:(NSToolbarItem*)item
 {
 	[analysisDrawer toggle:self];

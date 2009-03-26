@@ -29,11 +29,6 @@
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];   
     
     [notifyCenter addObserver: self
-                     selector: @selector(manualPlotLockChanged:)
-                         name: ORManualPlotLock
-                       object: model];
-
-    [notifyCenter addObserver: self
                      selector: @selector(dataChanged:)
                          name: ORManualPlotDataChanged
                        object: model];
@@ -49,14 +44,6 @@
 - (void) updateWindow
 {
 	[super updateWindow];
-    [self manualPlotLockChanged:nil];
-}
-
-- (void) checkGlobalSecurity
-{
-    BOOL secure = [gSecurity globalSecurityEnabled];
-    [gSecurity setLock:ORManualPlotLock to:secure];
-    [manualPlotLockButton setEnabled:secure];
 }
 
 - (void) dataChanged:(NSNotification*)aNotification
@@ -65,17 +52,7 @@
 	[plotter setNeedsDisplay:YES];
 }
 
-- (void) manualPlotLockChanged:(NSNotification*)aNotification
-{
-    BOOL locked = [gSecurity isLocked:ORManualPlotLock];
-    [manualPlotLockButton setState: locked];
-}
-
 #pragma mark •••Actions
-- (IBAction)manualPlotLockAction:(id)sender
-{
-    [gSecurity tryToSetLock:ORManualPlotLock to:[sender intValue] forWindow:[self window]];
-}
 
 #pragma mark •••Data Source
 - (int)numberOfRowsInTableView:(NSTableView *)tableView

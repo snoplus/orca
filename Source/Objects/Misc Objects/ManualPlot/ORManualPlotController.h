@@ -10,7 +10,6 @@
 
 @interface ORManualPlotController : OrcaObjectController
 {
-    IBOutlet NSButton*    manualPlotLockButton;
     IBOutlet NSTableView* dataTableView;
     IBOutlet ORPlotter1D* plotter;
 }
@@ -21,12 +20,9 @@
 #pragma mark •••Interface Management
 - (void) registerNotificationObservers;
 - (void) updateWindow;
-- (void) manualPlotLockChanged:(NSNotification *)aNote;
 - (void) dataChanged:(NSNotification*)aNote;
-- (void) checkGlobalSecurity;
 
 #pragma mark •••Actions
-- (IBAction) manualPlotLockAction:(id)sender;
 
 #pragma mark •••Data Source
 - (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
