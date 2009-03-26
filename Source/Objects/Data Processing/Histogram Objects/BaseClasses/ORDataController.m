@@ -330,6 +330,11 @@
 	[rawDataTabView selectTabViewItemAtIndex:index];
 }
 
+- (BOOL) analysisDrawerIsOpen
+{
+	return [analysisDrawer state] == NSDrawerOpenState;
+}
+
 - (void) openAnalysisDrawer
 {
 	[analysisDrawer open];
