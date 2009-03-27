@@ -110,7 +110,7 @@
 	id cal		= [[ORCalibration alloc] initCalibrationArray:calArray];
 	[cal setUnits:[unitsField stringValue]];
 	[cal setCalibrationName:[nameField stringValue]];
-	[cal setType:[customButton intValue]];
+	[cal setType:![customButton intValue]];
 	[cal setIgnoreCalibration:[ignoreButton intValue]];
 	
 	if([storeButton intValue]== 1 && [[nameField stringValue] length]){
@@ -354,6 +354,7 @@
 	[self setUnits:				[decoder decodeObjectForKey:@"units"]];
 	[self setIgnoreCalibration:	[decoder decodeBoolForKey:@"ignoreCalibration"]];
 	[self setCalibrationName:	[decoder decodeObjectForKey:@"calibrationName"]];
+	[self setType:				[decoder decodeIntForKey:@"type"]];
 	[self calibrate];
     return self;
 }
@@ -364,6 +365,7 @@
 	[encoder encodeObject:units				forKey:@"units"];
 	[encoder encodeBool:ignoreCalibration	forKey:@"ignoreCalibration"];
 	[encoder encodeObject:calibrationName	forKey:@"calibrationName"];
+	[encoder encodeInt:type					forKey:@"type"];
 }
 
 
