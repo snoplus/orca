@@ -490,6 +490,8 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 		
 		[callBack setTarget:finishTarget];
 		[callBack performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:YES];
+		[eval release];
+		eval = nil;
 	}
 }
 
