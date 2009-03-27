@@ -997,8 +997,11 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	}
 	else {
 		NSLog(@"----------------------------------------\n");
-		NSLog(@"Error returned for Fit on %@\n",[[[self dataSource] window] title]);
+		NSLog(@"Error returned for OrcaRoot Service on %@\n",[[[self dataSource] window] title]);
 		NSLog(@"Error message: %@\n",[aResponse objectForKey:@"Request Error"]);
+		if([[aResponse objectForKey:@"Request Type"] isEqualToString:@"OROrcaRequestFFTProcessor"]){
+			NSLog(@"Check the ROOT installation: --it appears that it was not compiled with fftw support\n");
+		}
 		NSLog(@"----------------------------------------\n");
 	}
 }
