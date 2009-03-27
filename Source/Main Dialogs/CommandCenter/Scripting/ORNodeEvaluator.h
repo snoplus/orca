@@ -94,5 +94,9 @@
 @interface OrcaObject (ORNodeEvaluation)
 - (NSComparisonResult)compare:(NSNumber *)otherNumber;
 - (BOOL)	exitNow;
+@end
 
+@interface OrcaObjectController (ORNodeEvaluation)
+- (NSComparisonResult)compare:(NSNumber *)otherNumber;
+- (BOOL)	exitNow;
 @end

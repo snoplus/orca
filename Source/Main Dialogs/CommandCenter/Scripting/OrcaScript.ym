@@ -352,6 +352,7 @@ hex_str
 //							      [obj setLabel:"Test"]
 objectPtr
 : findObj						{ $$ = $1; }
+| objC							{ $$ = $1; }
 | VARIABLE						{ $$ = identifierNode($1);}
 ;
 

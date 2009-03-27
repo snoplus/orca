@@ -1417,13 +1417,26 @@
 @implementation OrcaObject (ORNodeEvaluation)
 - (NSComparisonResult)compare:(NSNumber *)otherNumber
 {
-	long* ptr = (long*)self;
-	return [[NSNumber numberWithLong:(long)ptr] compare: otherNumber];
+	if( [self isEqualTo: otherNumber])return NSOrderedSame;
+	else return NSOrderedDescending;
 }
+
 - (BOOL)	exitNow
 {
 	return NO;
 }
+@end
 
+@implementation OrcaObjectController (ORNodeEvaluation)
+- (NSComparisonResult)compare:(NSNumber *)otherNumber
+{
+	if( [self isEqualTo: otherNumber])return NSOrderedSame;
+	else return NSOrderedDescending;
+}
+
+- (BOOL)	exitNow
+{
+	return NO;
+}
 @end
 
