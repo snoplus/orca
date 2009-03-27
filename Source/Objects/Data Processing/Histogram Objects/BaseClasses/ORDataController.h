@@ -56,6 +56,7 @@
 - (void) pausedChanged:(NSNotification*)aNote;
 - (void) openAnalysisDrawer;
 - (void) closeAnalysisDrawer;
+- (BOOL) analysisDrawerIsOpen;
 
 - (IBAction) printDocument:(id)sender;
 
