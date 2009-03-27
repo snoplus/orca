@@ -2,13 +2,24 @@
 //  ORManualPlotController.h
 //  Orca
 //
-//  Created by Mark Howe on Sat Nov 19 2005.
-//  Copyright ¬© 2002 CENPA, University of Washington. All rights reserved.
-//
+//  Created by Mark Howe on Fri Apr 27 2009.
+//  Copyright (c) 2009 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
+#import "ORDataController.h"
 
-@class ORPlotter1D;
-
-@interface ORManualPlotController : OrcaObjectController
+@interface ORManualPlotController : ORDataController
 {
     IBOutlet NSTableView* dataTableView;
 	IBOutlet NSPopUpButton* col2KeyPU;
@@ -19,7 +30,7 @@
 	IBOutlet NSTextField*   col2LabelField;
 	IBOutlet NSTextField*   y1LengendField;
 	IBOutlet NSTextField*   y2LengendField;
-    IBOutlet ORPlotter1D* plotter;
+	id						calibrationPanel;
 }
 
 #pragma mark •••Initialization
@@ -40,6 +51,7 @@
 - (IBAction) col1KeyAction:(id)sender;
 - (IBAction) col0KeyAction:(id)sender;
 - (IBAction) writeDataFileAction:(id)sender;
+- (IBAction) calibrate:(id)sender;
 
 #pragma mark •••Data Source
 - (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;

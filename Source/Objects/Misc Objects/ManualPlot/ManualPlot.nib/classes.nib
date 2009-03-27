@@ -14,14 +14,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>NSSplitView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -101,8 +93,23 @@
 			<string>NSView</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>ORToolbarFactory</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>owner</key>
+				<string>NSWindow</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>calibrate</key>
+				<string>id</string>
 				<key>col0KeyAction</key>
 				<string>id</string>
 				<key>col1KeyAction</key>
@@ -120,6 +127,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>calibrationPanel</key>
+				<string>id</string>
 				<key>col0KeyPU</key>
 				<string>NSPopUpButton</string>
 				<key>col0LabelField</key>
@@ -134,15 +143,13 @@
 				<string>NSTextField</string>
 				<key>dataTableView</key>
 				<string>NSTableView</string>
-				<key>plotter</key>
-				<string>ORPlotter1D</string>
 				<key>y1LengendField</key>
 				<string>NSTextField</string>
 				<key>y2LengendField</key>
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>OrcaObjectController</string>
+			<string>ORDataController</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -166,6 +173,64 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>autoScale</key>
+				<string>NSToolbarItem</string>
+				<key>clear</key>
+				<string>NSToolbarItem</string>
+				<key>clearROI</key>
+				<string>NSToolbarItem</string>
+				<key>doAnalysis</key>
+				<string>NSToolbarItem</string>
+				<key>hideShowControls</key>
+				<string>id</string>
+				<key>logLin</key>
+				<string>NSToolbarItem</string>
+				<key>pauseAction</key>
+				<string>id</string>
+				<key>printDocument</key>
+				<string>id</string>
+				<key>refreshModeAction</key>
+				<string>id</string>
+				<key>toggleRaw</key>
+				<string>NSToolbarItem</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORDataController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>containingView</key>
+				<string>NSView</string>
+				<key>hideShowButton</key>
+				<string>NSButton</string>
+				<key>pauseButton</key>
+				<string>NSButton</string>
+				<key>pausedField</key>
+				<string>NSTextField</string>
+				<key>plotter</key>
+				<string>id</string>
+				<key>plotterGroupView</key>
+				<string>NSView</string>
+				<key>positionField</key>
+				<string>NSTextField</string>
+				<key>rawDataTabView</key>
+				<string>NSTabView</string>
+				<key>rawDataTable</key>
+				<string>NSTableView</string>
+				<key>refreshModePU</key>
+				<string>NSPopUpButton</string>
+				<key>titleField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>

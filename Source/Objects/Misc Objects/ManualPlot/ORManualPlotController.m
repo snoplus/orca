@@ -3,17 +3,31 @@
 //  ORManualPlotController.m
 //  Orca
 //
-//  Created by Mark Howe on Sat Nov 19 2005.
-//  Copyright ¬© 2002 CENPA, University of Washington. All rights reserved.
-//
+//  Created by Mark Howe on Fri Apr 27 2009.
+//  Copyright (c) 2009 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
 
 #pragma mark •••Imported Files
 #import "ORManualPlotController.h"
 #import "ORManualPlotModel.h"
 #import "ORPlotter1D.h"
+#import "ORCalibration.h"
 
 @interface ORManualPlotController (private)
 - (void) selectWriteFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 @implementation ORManualPlotController
@@ -118,6 +132,15 @@
 	[plotter setNeedsDisplay:YES];
 }
 
+- (void) refreshModeChanged:(NSNotification*)aNotification
+{
+	//we don't have refresh modes
+}
+- (void) pausedChanged:(NSNotification*)aNotification
+{
+	//we don't have paused modes
+}
+
 #pragma mark •••Actions
 - (IBAction) refreshPlot:(id)sender
 {
@@ -182,6 +205,17 @@
                           contextInfo:NULL];
 	
 }
+- (IBAction) calibrate:(id)sender
+{
+	NSDictionary* aContextInfo = [NSDictionary dictionaryWithObjectsAndKeys: model, @"ObjectToCalibrate",
+								  model , @"ObjectToUpdate",
+								  nil];
+	calibrationPanel = [[ORCalibrationPane calibrateForWindow:[self window] 
+												modalDelegate:self 
+											   didEndSelector:@selector(_calibrationDidEnd:returnCode:contextInfo:)
+												  contextInfo:aContextInfo] retain];
+	
+}
 
 #pragma mark •••Data Source
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
@@ -234,6 +268,12 @@
     if(returnCode){
         [model writeDataToFile:[[sheet filenames] objectAtIndex:0]];
     }
+}
+
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+	[calibrationPanel release];
+	calibrationPanel = nil;
 }
 
 @end

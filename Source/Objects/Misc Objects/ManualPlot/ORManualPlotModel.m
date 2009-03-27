@@ -2,9 +2,21 @@
 //  ORManualPlotModel.m
 //  Orca
 //
-//  Created by Mark Howe on Sat Nov 19 2005.
-//  Copyright ¬© 2002 CENPA, University of Washington. All rights reserved.
-//
+//  Created by Mark Howe on Fri Apr 27 2009.
+//  Copyright (c) 2009 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
 
 #pragma mark •••Imported Files
 #import "ORManualPlotModel.h"
@@ -61,6 +73,22 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 }
 
 #pragma mark ***Accessors
+- (void) postUpdate
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORManualPlotDataChanged object:self];    
+}
+
+- (id) calibration
+{
+	return calibration;
+}
+
+- (void) setCalibration:(id)aCalibration
+{
+	[aCalibration retain];
+	[calibration release];
+	calibration  = aCalibration;
+}
 
 - (NSString*) col2Title
 {
@@ -156,6 +184,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [self setCol2Key:[decoder decodeIntForKey:@"ORManualPlotModelCol2Key"]];
     [self setCol1Key:[decoder decodeIntForKey:@"ORManualPlotModelCol1Key"]];
     [self setCol0Key:[decoder decodeIntForKey:@"ORManualPlotModelCol0Key"]];
+	[self setCalibration:[decoder decodeObjectForKey:@"calibration"]];
 	if(col0Key==0 && col1Key==0 && col2Key==0){
 		[self setCol0Key:0]; 
 		[self setCol1Key:1];		
@@ -173,6 +202,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [encoder encodeInt:col2Key forKey:@"ORManualPlotModelCol2Key"];
     [encoder encodeInt:col1Key forKey:@"ORManualPlotModelCol1Key"];
     [encoder encodeInt:col0Key forKey:@"ORManualPlotModelCol0Key"];
+    [encoder encodeObject:calibration forKey:@"calibration"];
 }
 
 -(void)clear
@@ -181,6 +211,17 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 	[data release];
 	data = nil;
 	[dataSetLock unlock];
+}
+
+- (NSString*) fullName
+{
+	return [self fullID];
+}
+
+- (NSString*) fullNameWithRunNumber
+{
+	//fake out so we can inherit
+	return [self fullID];
 }
 
 #pragma mark •••Writing Data

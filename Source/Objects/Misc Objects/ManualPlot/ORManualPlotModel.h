@@ -1,10 +1,22 @@
 //
-//  ORContainerModel.h
+//  ORManualPlotModel.h
 //  Orca
 //
-//  Created by Mark Howe on Sat Nov 19 2005.
-//  Copyright ¬© 2002 CENPA, University of Washington. All rights reserved.
-//
+//  Created by Mark Howe on Fri Apr 27 2009.
+//  Copyright (c) 2009 CENPA, University of Washington. All rights reserved.
+//-----------------------------------------------------------
+//This program was prepared for the Regents of the University of 
+//Washington at the Center for Experimental Nuclear Physics and 
+//Astrophysics (CENPA) sponsored in part by the United States 
+//Department of Energy (DOE) under Grant #DE-FG02-97ER41020. 
+//The University has certain rights in the program pursuant to 
+//the contract and the program should not be copied or distributed 
+//outside your organization.  The DOE and the University of 
+//Washington reserve all rights in the program. Neither the authors,
+//University of Washington, or U.S. Government make any warranty, 
+//express or implied, or assume any liability or responsibility 
+//for the use of this software.
+//-------------------------------------------------------------
 #define kManualPlotMacol0Keys 3
 
 @interface ORManualPlotModel : OrcaObject  
@@ -19,9 +31,11 @@
     NSString*		col0Title;
     NSString*		col1Title;
     NSString*		col2Title;
+	id				calibration;
 }
 
 #pragma mark ***Accessors
+- (void) postUpdate;
 - (NSString*) col2Title;
 - (void) setCol2Title:(NSString*)aCol2Title;
 - (NSString*) col1Title;
@@ -37,6 +51,7 @@
 - (void) addValue1:(float)v1 value2:(float)v2 value3:(float)v3;
 -(id) dataAtRow:(int)r column:(int)c;
 - (void) clearData;
+- (NSString*) fullName;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;

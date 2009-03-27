@@ -1041,6 +1041,7 @@
 		847E6C200CFF4C3200E963C6 /* OReGunModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 847E6C190CFF4C3200E963C6 /* OReGunModel.m */; };
 		847F8B35063DB29E00A8597A /* ORTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 847F8B33063DB29E00A8597A /* ORTimer.h */; };
 		847F8B36063DB29E00A8597A /* ORTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F8B34063DB29E00A8597A /* ORTimer.m */; };
+		847F8D7E0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 847F8D7D0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist */; };
 		848326E906DA614B00172F1C /* ORDualPortLAMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E506DA614B00172F1C /* ORDualPortLAMController.h */; };
 		848326EA06DA614B00172F1C /* ORDualPortLAMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 848326E606DA614B00172F1C /* ORDualPortLAMController.m */; };
 		848326EB06DA614B00172F1C /* ORDualPortLAMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E706DA614B00172F1C /* ORDualPortLAMModel.h */; };
@@ -2885,6 +2886,7 @@
 		847F59EA0450CB61005F64B1 /* TriggerCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = TriggerCard.gif; path = Source/Objects/Hardware/Vme/Trigger/TriggerCard.gif; sourceTree = SOURCE_ROOT; };
 		847F8B33063DB29E00A8597A /* ORTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTimer.h; sourceTree = "<group>"; };
 		847F8B34063DB29E00A8597A /* ORTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimer.m; sourceTree = "<group>"; };
+		847F8D7D0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.ManualPlot.plist; path = "Source/Objects/Misc Objects/ManualPlot/edu.washington.npl.orca.ManualPlot.plist"; sourceTree = SOURCE_ROOT; };
 		848326E506DA614B00172F1C /* ORDualPortLAMController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMController.h; sourceTree = "<group>"; };
 		848326E606DA614B00172F1C /* ORDualPortLAMController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDualPortLAMController.m; sourceTree = "<group>"; };
 		848326E706DA614B00172F1C /* ORDualPortLAMModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMModel.h; sourceTree = "<group>"; };
@@ -7770,6 +7772,7 @@
 				84C897BA0F7A99540016A3B2 /* ORManualPlotController.m */,
 				84C897BB0F7A99540016A3B2 /* ORManualPlotModel.h */,
 				84C897BC0F7A99540016A3B2 /* ORManualPlotModel.m */,
+				847F8D7D0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist */,
 			);
 			name = ManualPlot;
 			path = "Source/Objects/Misc Objects/ManualPlot";
@@ -10124,6 +10127,7 @@
 				84BA5F300F70388D00CF92D6 /* ZupIcon.tif in Resources */,
 				84C897BD0F7A99540016A3B2 /* ManualPlot.nib in Resources */,
 				84C897BE0F7A99540016A3B2 /* ManualPlot.tif in Resources */,
+				847F8D7E0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
