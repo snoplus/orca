@@ -276,48 +276,78 @@ const float kGateAlpha2 = .1;
         int	x;
         int maxValX = 0;
 		int xStart = [self gateMinChannel];
-		int xEnd   = [self gateMaxChannel];
+		int xEnd = [self gateMaxChannel];
+		
 		int totalNum = xEnd - xStart;
-
-        for (x=xStart; x<xEnd; ++x) {
-            val = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
-            sumVal += val;
+		
+		if([mDataSource useXYPlot]){
+			int index;
+			int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSet];
+			for (index=0; index<numPoints; ++index) {
+				float x;
+				[mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&val];
+				if(x>xStart && x<xEnd){
+					sumVal += val;
+				}
+			}
         }
+		else {
+			for (x=xStart; x<xEnd; ++x) {
+				val = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
+				sumVal += val;
+			}
+		}
+		
 		double aveVal = 0;
 		if(totalNum>0) {
 			aveVal = sumVal/(double)totalNum;
-
+			
 			float sum_x_minus_xBar_squared = 0;
-			for (x=xStart; x<xEnd; ++x) {
-				val = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
-				sum_x_minus_xBar_squared += (val - aveVal) * (val-aveVal);
-
-				sumValX += val * x;
-				if (val < minVal) minVal = val;
-				if (val > maxVal) {
-					maxVal = val;
-					maxValX = x;
+			if([mDataSource useXYPlot]){
+				int index;
+				int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSet];
+				for (index=0; index<numPoints; ++index) {
+					float x;
+					[mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&val];
+					if(x>xStart && x<xEnd){
+						sumValX += val * x;
+						if (val < minVal) minVal = val;
+						if (val > maxVal) {
+							maxVal = val;
+							maxValX = x;
+						}
+					}
 				}
 			}
-			
+			else {
+				for (x=xStart; x<xEnd; ++x) {
+					val = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
+					sum_x_minus_xBar_squared += (val - aveVal) * (val-aveVal);
+					
+					sumValX += val * x;
+					if (val < minVal) minVal = val;
+					if (val > maxVal) {
+						maxVal = val;
+						maxValX = x;
+					}
+				}
+			}
 			[self setPeakx:maxValX];
 			[self setPeaky:maxVal];
 			
 			if (sumVal) {
 				[self setCentroid:sumValX / sumVal];
 				[self setSigma:sqrt((sum_x_minus_xBar_squared) / (double)totalNum)];
-			} else {
+			} 
+			else {
 				[self setCentroid:0];
 				[self setSigma:0];
 			}
 			
 			[self setAverage: sumVal / ([self gateMaxChannel] - [self gateMinChannel])];
 			[self setTotalSum:sumVal];
-      }
-		        
-        
-        
-    }
+		}
+	}
 }
 
 - (BOOL) gateValid

@@ -169,8 +169,8 @@
 	if([title length]==0)title = @"Index";
 	
 	
-	[y1LengendField setTextColor:[self colorForDataSet:col1Key==1?0:1]];
-	[y2LengendField setTextColor:[self colorForDataSet:col2Key==2?1:0]];
+	[y1LengendField setTextColor:[self colorForDataSet:0]];
+	[y2LengendField setTextColor:[self colorForDataSet:1]];
 
 	[[plotter yScale] setLabel:title];
 	[plotter setNeedsDisplay:YES];

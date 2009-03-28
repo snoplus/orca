@@ -287,4 +287,5 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     return YES;    
 }
 
+
 @end

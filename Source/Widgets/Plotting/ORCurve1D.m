@@ -193,6 +193,11 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	id mDataSource = [aPlot dataSource];
 	ORAxis*    mXScale = [aPlot xScale];
 	ORAxis*    mYScale = [aPlot yScale];
+
+	if(showActiveGate){
+        [gates makeObjectsPerformSelector:@selector(drawGateInPlot:) withObject:aPlot];
+    }
+	
 	int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSetID];
     if(numPoints == 0) return;
 
@@ -228,9 +233,6 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
     /* initialize x and y values */
     yl = -1;
     xl = x = [mXScale getPixAbs:minX]-inc/2;
-    if(showActiveGate){
-        [gates makeObjectsPerformSelector:@selector(drawGateInPlot:) withObject:aPlot];
-    }
     
     NSBezierPath* theDataPath = [NSBezierPath bezierPath];
     
@@ -403,6 +405,11 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	id mDataSource = [aPlot dataSource];
 	ORAxis*    mXScale = [aPlot xScale];
 	ORAxis*    mYScale = [aPlot yScale];
+	
+	if(showActiveGate){
+        [gates makeObjectsPerformSelector:@selector(drawGateInPlot:) withObject:aPlot];
+    }
+	
 	int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSetID];
     if(numPoints == 0) return;
 
@@ -454,7 +461,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	else [[curveColor highlightWithLevel:.4]set];
 	[theDataPath setLineWidth:.5];
 	[theDataPath stroke];
-
+	
 }
 
 - (void) drawXYTimePlot:(ORPlotter1D*)aPlot
