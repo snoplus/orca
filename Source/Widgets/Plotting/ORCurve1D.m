@@ -539,32 +539,53 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 			if(numPoints == 0) return;
 												
 			/* get scale limits */
-			ORAxis*    mXScale = [aPlot xScale];
-			ORAxis*    mYScale = [aPlot yScale];
-			int minX = MAX(0,MAX([theGate fitMinChannel],roundToLong([mXScale minValue])));
-			int maxX = MIN(numPoints,MIN(roundToLong([mXScale maxValue]),[theGate fitMaxChannel]));
-									
+			ORAxis* mXScale = [aPlot xScale];
+			ORAxis* mYScale = [aPlot yScale];
+			
 			//cache some stuff
-			BOOL aLogY = [mYScale isLog];
-			BOOL aIntY = [mYScale integer];
+			BOOL aLogY		= [mYScale isLog];
+			BOOL aIntY		= [mYScale integer];
 			double aMinPadY = [mYScale minPad];
-			BOOL aLogX = [mXScale isLog];
-			BOOL aIntX = [mXScale integer];
+			BOOL aLogX		= [mXScale isLog];
+			BOOL aIntX		= [mXScale integer];
 			double aMinPadX = [mXScale minPad];
-					
+			
+														
 			NSBezierPath* theDataPath = [NSBezierPath bezierPath];
-			float theValue = [theGate plotter:aPlot dataSet:dataSetID dataValue:minX];
-			float y = [mYScale getPixAbsFast:theValue log:aLogY integer:aIntY minPad:aMinPadY];
-			float x = [mXScale getPixAbsFast:minX log:aLogX integer:aIntX minPad:aMinPadX];
-			[theDataPath moveToPoint:NSMakePoint(x,y)];
-			float halfBinWidth = ([aPlot bounds].size.width - 1) / (float)[mXScale valueRange]/2.;
+			if([aPlot useXYPlot]){
+				int minX		= MAX(0,MAX([theGate fitMinChannel],roundToLong([mXScale minValue])));
+				float theValue	= [theGate plotter:aPlot dataSet:dataSetID dataValue:0];
+				float y			= [mYScale getPixAbsFast:theValue log:aLogY integer:aIntY minPad:aMinPadY];
+				float x			= [mXScale getPixAbsFast:minX log:aLogX integer:aIntX minPad:aMinPadX];
+				
+				[theDataPath moveToPoint:NSMakePoint(x,y)];
+				float halfBinWidth = ([aPlot bounds].size.width - 1) / (float)[mXScale valueRange]/2.;
+				
+				long    ix;
+				for (ix=0; ix<numPoints;++ix) {
+					theValue = [theGate plotter:aPlot dataSet:dataSetID dataValue:ix];
+					y = [mYScale getPixAbsFast:theValue log:aLogY integer:aIntY minPad:aMinPadY];
+					x = [mXScale getPixAbsFast:ix+minX log:aLogX integer:aIntX minPad:aMinPadX] + halfBinWidth;
+					[theDataPath lineToPoint:NSMakePoint(x,y)];
+				}
+			}
+			else {
+				int minX		= MAX(0,MAX([theGate fitMinChannel],roundToLong([mXScale minValue])));
+				int maxX		= MIN(numPoints,MIN(roundToLong([mXScale maxValue]),[theGate fitMaxChannel]));
+				float theValue	= [theGate plotter:aPlot dataSet:dataSetID dataValue:minX];
+				float y			= [mYScale getPixAbsFast:theValue log:aLogY integer:aIntY minPad:aMinPadY];
+				float x			= [mXScale getPixAbsFast:minX log:aLogX integer:aIntX minPad:aMinPadX];
+				
+				[theDataPath moveToPoint:NSMakePoint(x,y)];
+				float halfBinWidth = ([aPlot bounds].size.width - 1) / (float)[mXScale valueRange]/2.;
 
-			long    ix;
-			for (ix=minX; ix<maxX;++ix) {
-				theValue = [theGate plotter:aPlot dataSet:dataSetID dataValue:ix];
-				y = [mYScale getPixAbsFast:theValue log:aLogY integer:aIntY minPad:aMinPadY];
-				x = [mXScale getPixAbsFast:ix log:aLogX integer:aIntX minPad:aMinPadX] + halfBinWidth;
-				[theDataPath lineToPoint:NSMakePoint(x,y)];
+				long    ix;
+				for (ix=minX; ix<maxX;++ix) {
+					theValue = [theGate plotter:aPlot dataSet:dataSetID dataValue:ix];
+					y = [mYScale getPixAbsFast:theValue log:aLogY integer:aIntY minPad:aMinPadY];
+					x = [mXScale getPixAbsFast:ix log:aLogX integer:aIntX minPad:aMinPadX] + halfBinWidth;
+					[theDataPath lineToPoint:NSMakePoint(x,y)];
+				}
 			}
 			[[NSColor blackColor] set];
 			[theDataPath setLineWidth:1];
@@ -584,7 +605,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	id mDataSource = [aPlot dataSource];
 	int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSetID];
     if(numPoints == 0) return nil;
-
+	
 	BOOL useUnsignedValues  = [mDataSource useUnsignedValues];
 	
  	char*  cPtr;
@@ -595,34 +616,49 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	unsigned short unitSize = -1;
 	double theValue;
 	
-	if([mDataSource useDataObject:aPlot dataSet:dataSetID]){
-		theData = [mDataSource plotter:aPlot dataSet:dataSetID];
-		if(!theData)return nil;
-		unitSize = [mDataSource unitSize:aPlot dataSet:dataSetID];
-		offset	= [mDataSource startingByteOffset:aPlot dataSet:dataSetID];
-	}
-	else unitSize = -1;
-	NSMutableArray* dataPointArray = [NSMutableArray arrayWithCapacity:numPoints];
-	int ix;
 	int end = aRange.location + aRange.length;
-	for(ix=aRange.location;ix<end;ix++){
-		if(useUnsignedValues){
-			switch(unitSize){
-				case 1: cPtr = (char*) [theData bytes] + offset; theValue = (unsigned)cPtr[ix]; break;
-				case 2: sPtr = (short*)[theData bytes] + offset; theValue = (unsigned)sPtr[ix]; break;
-				case 4: lPtr = (long*) [theData bytes] + offset; theValue = (unsigned)lPtr[ix]; break;
-				default:theValue = (unsigned)[mDataSource plotter:aPlot dataSet:dataSetID dataValue:ix]; break;
+	NSMutableArray* dataPointArray = [NSMutableArray arrayWithCapacity:numPoints];
+	if([mDataSource useXYPlot]){
+		int index;
+		int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSetID];
+		for (index=0; index<numPoints; ++index) {
+			float x;
+			float val;
+			[mDataSource plotter:aPlot dataSet:dataSetID index:index  x:&x y:&val];
+			if(x>aRange.location && x<end){
+				[dataPointArray addObject:[NSNumber numberWithDouble:val]];
 			}
 		}
-		else {
-			switch(unitSize){
-				case 1: cPtr = (char*) [theData bytes] + offset; theValue = cPtr[ix]; break;
-				case 2: sPtr = (short*)[theData bytes] + offset; theValue = sPtr[ix]; break;
-				case 4: lPtr = (long*) [theData bytes] + offset; theValue = lPtr[ix]; break;
-				default:theValue = [mDataSource plotter:aPlot dataSet:dataSetID dataValue:ix]; break;
-			}
+	}
+	else {
+		
+		if([mDataSource useDataObject:aPlot dataSet:dataSetID]){
+			theData = [mDataSource plotter:aPlot dataSet:dataSetID];
+			if(!theData)return nil;
+			unitSize = [mDataSource unitSize:aPlot dataSet:dataSetID];
+			offset	= [mDataSource startingByteOffset:aPlot dataSet:dataSetID];
 		}
-		[dataPointArray addObject:[NSNumber numberWithDouble:theValue]];
+		else unitSize = -1;
+		int ix;
+		for(ix=aRange.location;ix<end;ix++){
+			if(useUnsignedValues){
+				switch(unitSize){
+					case 1: cPtr = (char*) [theData bytes] + offset; theValue = (unsigned)cPtr[ix]; break;
+					case 2: sPtr = (short*)[theData bytes] + offset; theValue = (unsigned)sPtr[ix]; break;
+					case 4: lPtr = (long*) [theData bytes] + offset; theValue = (unsigned)lPtr[ix]; break;
+					default:theValue = (unsigned)[mDataSource plotter:aPlot dataSet:dataSetID dataValue:ix]; break;
+				}
+			}
+			else {
+				switch(unitSize){
+					case 1: cPtr = (char*) [theData bytes] + offset; theValue = cPtr[ix]; break;
+					case 2: sPtr = (short*)[theData bytes] + offset; theValue = sPtr[ix]; break;
+					case 4: lPtr = (long*) [theData bytes] + offset; theValue = lPtr[ix]; break;
+					default:theValue = [mDataSource plotter:aPlot dataSet:dataSetID dataValue:ix]; break;
+				}
+			}
+			[dataPointArray addObject:[NSNumber numberWithDouble:theValue]];
+		}
 	}
 	return dataPointArray;
 }

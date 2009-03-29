@@ -149,6 +149,11 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     return [[[self window] windowController] undoManager];
 }
 
+- (BOOL) useXYPlot
+{
+	return [mDataSource useXYPlot];;
+}
+
 - (void) initCurves
 {
     [self setCurves:[NSMutableArray array]];
