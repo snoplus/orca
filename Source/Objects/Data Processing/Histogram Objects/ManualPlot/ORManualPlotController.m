@@ -72,8 +72,8 @@
 
 - (void) awakeFromNib
 {
-	[plotter setUseGradient:YES];
 	[super awakeFromNib];
+	[plotter setUseGradient:YES];
 }
 
 - (void) updateWindow

@@ -14,23 +14,15 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-// -----------------------------------------------------------------------------
-//	Headers:
-// -----------------------------------------------------------------------------
  
 #import "ORToolbarFactory.h"
 
-
 @interface ORToolbarFactory (ORToolbarFactoryPrivateMethods)
-
--(void)		setupToolbar: (id)sender;
-
+-(void)		setupToolbar;
 @end
 
 
 @implementation ORToolbarFactory
- 
 -(void) dealloc
 {
 	[toolbarItems release];
@@ -40,25 +32,21 @@
  
 -(void) awakeFromNib
 {
-	[self setupToolbar: self];  // Create toolbar.
+	[self setupToolbar];
 }
-
 
 // -----------------------------------------------------------------------------
 //	setToolbarIdentifier:
 //		Lets you change the toolbar identifier at runtime. This will recreate
 //		the toolbar from the item definition .plist file for that identifier.
 // -----------------------------------------------------------------------------
- 
--(void)			setToolbarIdentifier: (NSString*)str
+-(void)	setToolbarIdentifier: (NSString*)str
 {
-	[str retain];
-	[toolbarIdentifier release];
-	toolbarIdentifier = str;
+	[toolbarIdentifier autorelease];
+	toolbarIdentifier = [str copy];
 	
-	[self setupToolbar: nil];   // Recreate toolbar.
+	[self setupToolbar];
 }
-
 
 // -----------------------------------------------------------------------------
 //	toolbarIdentifier:
@@ -66,15 +54,13 @@
 //		application's bundle identifier with the autosave name of the owning
 //		window appended to it.
 // -----------------------------------------------------------------------------
- 
--(NSString*)	toolbarIdentifier
+-(NSString*) toolbarIdentifier
 {
-	if( !toolbarIdentifier )
+	if( !toolbarIdentifier ) {
 		toolbarIdentifier = [[NSString stringWithFormat: @"%@.%@", [[NSBundle mainBundle] bundleIdentifier], [[owner windowController] windowNibName]] retain];
-	
+	}
 	return toolbarIdentifier;
 }
-
 
 // -----------------------------------------------------------------------------
 //	toolbar:itemForItemIdentifier:willBeInsertedIntoToolbar:
@@ -83,9 +69,7 @@
 //		while setting up all others according to the dictionaries from the
 //		.plist file.
 // -----------------------------------------------------------------------------
- 
--(NSToolbarItem*)   toolbar: (NSToolbar*)toolbar itemForItemIdentifier: (NSString*)itemIdentifier
-						willBeInsertedIntoToolbar: (BOOL)flag;
+-(NSToolbarItem*) toolbar: (NSToolbar*)toolbar itemForItemIdentifier: (NSString*)itemIdentifier willBeInsertedIntoToolbar: (BOOL)flag;
 {
 	NSDictionary*	allItems = [toolbarItems objectForKey: @"Items"];
 	NSDictionary*   currItem;
@@ -103,8 +87,7 @@
 	
 	// Otherwise, look it up in our list of custom items:
 	currItem = [allItems objectForKey: itemIdentifier];
-	if( currItem )
-	{
+	if( currItem ){
 		SEL			itemAction = NSSelectorFromString([currItem objectForKey: @"Action"]);
 		NSString*   itemLabel = [currItem objectForKey: @"Label"];
 		NSString*   itemCustomLabel = [currItem objectForKey: @"CustomizationLabel"];
@@ -116,12 +99,9 @@
 		[tbi setAction: itemAction];
 		[tbi setLabel: itemLabel];
 		[tbi setImage: itemImage];
-		if( itemCustomLabel )
-			[tbi setPaletteLabel: itemCustomLabel];
-		else
-			[tbi setPaletteLabel: itemLabel];
-		if( itemTooltip )
-			[tbi setToolTip: itemTooltip];
+		if(itemCustomLabel) [tbi setPaletteLabel: itemCustomLabel];
+		else				[tbi setPaletteLabel: itemLabel];
+		if(itemTooltip)		[tbi setToolTip: itemTooltip];
 	}
 	
 	return tbi;
@@ -133,12 +113,10 @@
 //		Returns the list of item identifiers we want to be in this toolbar by
 //		default. The list is loaded from the .plist file's "DefaultItems" array.
 // -----------------------------------------------------------------------------
- 
 -(NSArray*) toolbarDefaultItemIdentifiers: (NSToolbar*)toolbar
 {
 	return [toolbarItems objectForKey: @"DefaultItems"];
 }
-
 
 // -----------------------------------------------------------------------------
 //	toolbarAllowedItemIdentifiers:
@@ -151,18 +129,17 @@
 //		the toolbar. Though if this returns it, that doesn't mean it currently
 //		is in the toolbar.
 // -----------------------------------------------------------------------------
- 
 -(NSArray*) toolbarAllowedItemIdentifiers: (NSToolbar*)toolbar
 {
 	NSDictionary*	allItems = [toolbarItems objectForKey: @"Items"];
-	int				icount = [allItems count];
+	int				icount   = [allItems count];
 	NSMutableArray*	allowedItems = [NSMutableArray arrayWithCapacity: icount +4];
 	NSEnumerator*   allItemItty;
 	NSString*		currItem;
 	
-	for( allItemItty = [allItems keyEnumerator]; currItem = [allItemItty nextObject]; )
+	for( allItemItty = [allItems keyEnumerator]; currItem = [allItemItty nextObject]; ){
 		[allowedItems addObject: currItem];
-	
+	}	
 	[allowedItems addObject: NSToolbarSeparatorItemIdentifier];
 	[allowedItems addObject: NSToolbarSpaceItemIdentifier];
 	[allowedItems addObject: NSToolbarFlexibleSpaceItemIdentifier];
@@ -170,24 +147,20 @@
 	
 	return allowedItems;
 }
-
 @end
 
 @implementation ORToolbarFactory (ORToolbarFactoryPrivateMethods)
-
 // -----------------------------------------------------------------------------
 //	setupToolbar:
 //		(Re)create our toolbar. This loads the .plist file whose name is the
 //		toolbar identifier and loads it. Then it adds the toolbar to our
 //		window.
 // -----------------------------------------------------------------------------
- 
--(void)			setupToolbar: (id)sender
+- (void) setupToolbar
 {
 	// Load list of items:
 	NSString*   toolbarItemsPlistPath = [[NSBundle mainBundle] pathForResource: [self toolbarIdentifier] ofType: @"plist"];
-	if( toolbarItems )
-		[toolbarItems release];
+	if(toolbarItems)[toolbarItems release];
 	toolbarItems = [[NSDictionary dictionaryWithContentsOfFile: toolbarItemsPlistPath] retain];
 
 	// (Re-) create toolbar:
@@ -197,6 +170,5 @@
 	[tb setAutosavesConfiguration: YES];
 	[owner setToolbar: tb];
 }
-
 @end
 

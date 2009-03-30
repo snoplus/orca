@@ -1,5 +1,6 @@
 //
 //  ORToolbarFactory.h
+//  found on the web somewhere?????
 //
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
@@ -77,7 +78,12 @@
 	NSString*				toolbarIdentifier;  // The toolbar identifier and base file name.
 }
 
--(void)			setToolbarIdentifier: (NSString*)str;
--(NSString*)	toolbarIdentifier;  // Defaults to the application's bundle identifier with a period and the autosave name of the owning window.
+-(void) dealloc;
+-(void) awakeFromNib;
+-(void)	setToolbarIdentifier: (NSString*)str;
+-(NSString*) toolbarIdentifier;
+-(NSToolbarItem*) toolbar: (NSToolbar*)toolbar itemForItemIdentifier: (NSString*)itemIdentifier willBeInsertedIntoToolbar: (BOOL)flag;
+-(NSArray*) toolbarDefaultItemIdentifiers: (NSToolbar*)toolbar;
+-(NSArray*) toolbarAllowedItemIdentifiers: (NSToolbar*)toolbar;
 
 @end
