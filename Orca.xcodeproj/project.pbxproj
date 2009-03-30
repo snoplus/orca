@@ -138,6 +138,13 @@
 		8408A4BE09071C6A004A3B34 /* ORHV2132Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A4B809071C6A004A3B34 /* ORHV2132Controller.m */; };
 		8408A4BF09071C6A004A3B34 /* ORHV2132Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408A4B909071C6A004A3B34 /* ORHV2132Model.h */; };
 		8408A4C009071C6A004A3B34 /* ORHV2132Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A4BA09071C6A004A3B34 /* ORHV2132Model.m */; };
+		8409735D0F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840973560F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist */; };
+		8409735E0F81136F00036BE8 /* ManualPlot.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840973570F81136F00036BE8 /* ManualPlot.nib */; };
+		8409735F0F81136F00036BE8 /* ManualPlot.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840973580F81136F00036BE8 /* ManualPlot.tif */; };
+		840973600F81136F00036BE8 /* ORManualPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840973590F81136F00036BE8 /* ORManualPlotController.h */; };
+		840973610F81136F00036BE8 /* ORManualPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8409735A0F81136F00036BE8 /* ORManualPlotController.m */; };
+		840973620F81136F00036BE8 /* ORManualPlotModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8409735B0F81136F00036BE8 /* ORManualPlotModel.h */; };
+		840973630F81136F00036BE8 /* ORManualPlotModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8409735C0F81136F00036BE8 /* ORManualPlotModel.m */; };
 		840AF86D0819924D005B750D /* SourceMask.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AF86B0819924D005B750D /* SourceMask.h */; };
 		840AF86E0819924D005B750D /* SourceMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AF86C0819924D005B750D /* SourceMask.m */; };
 		840B207C0B4D79400021220C /* NSScanner+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B207A0B4D79400021220C /* NSScanner+Extensions.h */; };
@@ -1041,7 +1048,6 @@
 		847E6C200CFF4C3200E963C6 /* OReGunModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 847E6C190CFF4C3200E963C6 /* OReGunModel.m */; };
 		847F8B35063DB29E00A8597A /* ORTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 847F8B33063DB29E00A8597A /* ORTimer.h */; };
 		847F8B36063DB29E00A8597A /* ORTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 847F8B34063DB29E00A8597A /* ORTimer.m */; };
-		847F8D7E0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 847F8D7D0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist */; };
 		848326E906DA614B00172F1C /* ORDualPortLAMController.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E506DA614B00172F1C /* ORDualPortLAMController.h */; };
 		848326EA06DA614B00172F1C /* ORDualPortLAMController.m in Sources */ = {isa = PBXBuildFile; fileRef = 848326E606DA614B00172F1C /* ORDualPortLAMController.m */; };
 		848326EB06DA614B00172F1C /* ORDualPortLAMModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 848326E706DA614B00172F1C /* ORDualPortLAMModel.h */; };
@@ -1651,12 +1657,6 @@
 		84C7542D06654C3E00EC5D1C /* ORGate1D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C7541D06654C3E00EC5D1C /* ORGate1D.m */; };
 		84C7542E06654C3E00EC5D1C /* ORGate1D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C7541E06654C3E00EC5D1C /* ORGate1D.h */; };
 		84C859050665624C00FBAF9C /* Bugs.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84C859040665624C00FBAF9C /* Bugs.tif */; };
-		84C897BD0F7A99540016A3B2 /* ManualPlot.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84C897B70F7A99540016A3B2 /* ManualPlot.nib */; };
-		84C897BE0F7A99540016A3B2 /* ManualPlot.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84C897B80F7A99540016A3B2 /* ManualPlot.tif */; };
-		84C897BF0F7A99540016A3B2 /* ORManualPlotController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C897B90F7A99540016A3B2 /* ORManualPlotController.h */; };
-		84C897C00F7A99540016A3B2 /* ORManualPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C897BA0F7A99540016A3B2 /* ORManualPlotController.m */; };
-		84C897C10F7A99540016A3B2 /* ORManualPlotModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C897BB0F7A99540016A3B2 /* ORManualPlotModel.h */; };
-		84C897C20F7A99540016A3B2 /* ORManualPlotModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C897BC0F7A99540016A3B2 /* ORManualPlotModel.m */; };
 		84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3630EA4EB2E0060076A /* Fec32.gif */; };
 		84CEA36D0EA4EB2E0060076A /* Fec32.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3640EA4EB2E0060076A /* Fec32.nib */; };
 		84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3650EA4EB2E0060076A /* Fec32Card.gif */; };
@@ -2192,6 +2192,13 @@
 		8408A4B809071C6A004A3B34 /* ORHV2132Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV2132Controller.m; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Controller.m; sourceTree = SOURCE_ROOT; };
 		8408A4B909071C6A004A3B34 /* ORHV2132Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHV2132Model.h; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Model.h; sourceTree = SOURCE_ROOT; };
 		8408A4BA09071C6A004A3B34 /* ORHV2132Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV2132Model.m; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Model.m; sourceTree = SOURCE_ROOT; };
+		840973560F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.ManualPlot.plist; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/edu.washington.npl.orca.ManualPlot.plist"; sourceTree = SOURCE_ROOT; };
+		840973570F81136F00036BE8 /* ManualPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ManualPlot.nib; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ManualPlot.nib"; sourceTree = SOURCE_ROOT; };
+		840973580F81136F00036BE8 /* ManualPlot.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ManualPlot.tif; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ManualPlot.tif"; sourceTree = SOURCE_ROOT; };
+		840973590F81136F00036BE8 /* ORManualPlotController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORManualPlotController.h; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ORManualPlotController.h"; sourceTree = SOURCE_ROOT; };
+		8409735A0F81136F00036BE8 /* ORManualPlotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORManualPlotController.m; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ORManualPlotController.m"; sourceTree = SOURCE_ROOT; };
+		8409735B0F81136F00036BE8 /* ORManualPlotModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORManualPlotModel.h; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ORManualPlotModel.h"; sourceTree = SOURCE_ROOT; };
+		8409735C0F81136F00036BE8 /* ORManualPlotModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORManualPlotModel.m; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ORManualPlotModel.m"; sourceTree = SOURCE_ROOT; };
 		840AF86B0819924D005B750D /* SourceMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SourceMask.h; sourceTree = "<group>"; };
 		840AF86C0819924D005B750D /* SourceMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceMask.m; sourceTree = "<group>"; };
 		840B207A0B4D79400021220C /* NSScanner+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSScanner+Extensions.h"; path = "Source/Cocoa Extensions/NSScanner+Extensions.h"; sourceTree = SOURCE_ROOT; };
@@ -2886,7 +2893,6 @@
 		847F59EA0450CB61005F64B1 /* TriggerCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = TriggerCard.gif; path = Source/Objects/Hardware/Vme/Trigger/TriggerCard.gif; sourceTree = SOURCE_ROOT; };
 		847F8B33063DB29E00A8597A /* ORTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTimer.h; sourceTree = "<group>"; };
 		847F8B34063DB29E00A8597A /* ORTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimer.m; sourceTree = "<group>"; };
-		847F8D7D0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.ManualPlot.plist; path = "Source/Objects/Misc Objects/ManualPlot/edu.washington.npl.orca.ManualPlot.plist"; sourceTree = SOURCE_ROOT; };
 		848326E506DA614B00172F1C /* ORDualPortLAMController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMController.h; sourceTree = "<group>"; };
 		848326E606DA614B00172F1C /* ORDualPortLAMController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ORDualPortLAMController.m; sourceTree = "<group>"; };
 		848326E706DA614B00172F1C /* ORDualPortLAMModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORDualPortLAMModel.h; sourceTree = "<group>"; };
@@ -3572,12 +3578,6 @@
 		84C7541D06654C3E00EC5D1C /* ORGate1D.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGate1D.m; path = Source/Widgets/Plotting/ORGate1D.m; sourceTree = SOURCE_ROOT; };
 		84C7541E06654C3E00EC5D1C /* ORGate1D.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGate1D.h; path = Source/Widgets/Plotting/ORGate1D.h; sourceTree = SOURCE_ROOT; };
 		84C859040665624C00FBAF9C /* Bugs.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Bugs.tif; path = Source/Preferences/Bugs.tif; sourceTree = SOURCE_ROOT; };
-		84C897B70F7A99540016A3B2 /* ManualPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ManualPlot.nib; sourceTree = "<group>"; };
-		84C897B80F7A99540016A3B2 /* ManualPlot.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = ManualPlot.tif; sourceTree = "<group>"; };
-		84C897B90F7A99540016A3B2 /* ORManualPlotController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORManualPlotController.h; sourceTree = "<group>"; };
-		84C897BA0F7A99540016A3B2 /* ORManualPlotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORManualPlotController.m; sourceTree = "<group>"; };
-		84C897BB0F7A99540016A3B2 /* ORManualPlotModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORManualPlotModel.h; sourceTree = "<group>"; };
-		84C897BC0F7A99540016A3B2 /* ORManualPlotModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORManualPlotModel.m; sourceTree = "<group>"; };
 		84CDDA3B047167C7005F64B1 /* ORGpibDeviceModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGpibDeviceModel.m; path = "Source/Objects/Hardware/GPIB/GPIB Base Classes/ORGpibDeviceModel.m"; sourceTree = SOURCE_ROOT; };
 		84CDDA3C047167C7005F64B1 /* ORGpibDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGpibDeviceModel.h; path = "Source/Objects/Hardware/GPIB/GPIB Base Classes/ORGpibDeviceModel.h"; sourceTree = SOURCE_ROOT; };
 		84CDDA3F04716AA9005F64B1 /* ORHPPulserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHPPulserModel.h; sourceTree = "<group>"; };
@@ -4405,6 +4405,21 @@
 			path = Source/Objects/Hardware/Camac/HV2132;
 			sourceTree = SOURCE_ROOT;
 		};
+		840973550F81136F00036BE8 /* ManualPlot */ = {
+			isa = PBXGroup;
+			children = (
+				840973560F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist */,
+				840973570F81136F00036BE8 /* ManualPlot.nib */,
+				840973580F81136F00036BE8 /* ManualPlot.tif */,
+				840973590F81136F00036BE8 /* ORManualPlotController.h */,
+				8409735A0F81136F00036BE8 /* ORManualPlotController.m */,
+				8409735B0F81136F00036BE8 /* ORManualPlotModel.h */,
+				8409735C0F81136F00036BE8 /* ORManualPlotModel.m */,
+			);
+			name = ManualPlot;
+			path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot";
+			sourceTree = SOURCE_ROOT;
+		};
 		840B4BAB03D8754D005F64B1 /* Alarms */ = {
 			isa = PBXGroup;
 			children = (
@@ -5037,7 +5052,6 @@
 				844048AB08350BEE000D03DB /* MemoryWatcher */,
 				2ACEE0DD0612266000CAD497 /* ThresholdCalibration */,
 				8484811107288C26009EDCE2 /* Dots */,
-				84C897B60F7A99540016A3B2 /* ManualPlot */,
 				84CF3B3A05E6BF0700C5C320 /* Views */,
 				84CF3B1E05E6B2B800C5C320 /* PrefsPanel */,
 				84F18E6405AF49A8001799E6 /* HeartBeat */,
@@ -7758,24 +7772,10 @@
 				841DA0E90781F09B0099BBF6 /* Histogram1D */,
 				841DA0D50781F0740099BBF6 /* Histogram2D */,
 				9CD6DD800BE83F1B007096CE /* PlotFFT */,
+				840973550F81136F00036BE8 /* ManualPlot */,
 			);
 			name = "Histogram Objects";
 			path = "Source/Objects/Data Processing/Histogram Objects";
-			sourceTree = SOURCE_ROOT;
-		};
-		84C897B60F7A99540016A3B2 /* ManualPlot */ = {
-			isa = PBXGroup;
-			children = (
-				84C897B70F7A99540016A3B2 /* ManualPlot.nib */,
-				84C897B80F7A99540016A3B2 /* ManualPlot.tif */,
-				84C897B90F7A99540016A3B2 /* ORManualPlotController.h */,
-				84C897BA0F7A99540016A3B2 /* ORManualPlotController.m */,
-				84C897BB0F7A99540016A3B2 /* ORManualPlotModel.h */,
-				84C897BC0F7A99540016A3B2 /* ORManualPlotModel.m */,
-				847F8D7D0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist */,
-			);
-			name = ManualPlot;
-			path = "Source/Objects/Misc Objects/ManualPlot";
 			sourceTree = SOURCE_ROOT;
 		};
 		84CDDA4504717079005F64B1 /* Misc */ = {
@@ -9526,8 +9526,8 @@
 				84BA5DE80F6E8C8900CF92D6 /* ORHVRampItemController.h in Headers */,
 				84BA5F2B0F70388D00CF92D6 /* ORZupController.h in Headers */,
 				84BA5F2D0F70388D00CF92D6 /* ORZupModel.h in Headers */,
-				84C897BF0F7A99540016A3B2 /* ORManualPlotController.h in Headers */,
-				84C897C10F7A99540016A3B2 /* ORManualPlotModel.h in Headers */,
+				840973600F81136F00036BE8 /* ORManualPlotController.h in Headers */,
+				840973620F81136F00036BE8 /* ORManualPlotModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10125,9 +10125,9 @@
 				84BA5DE60F6E8C8900CF92D6 /* HVRampItem.nib in Resources */,
 				84BA5F2F0F70388D00CF92D6 /* Zup.nib in Resources */,
 				84BA5F300F70388D00CF92D6 /* ZupIcon.tif in Resources */,
-				84C897BD0F7A99540016A3B2 /* ManualPlot.nib in Resources */,
-				84C897BE0F7A99540016A3B2 /* ManualPlot.tif in Resources */,
-				847F8D7E0F7D3A2800DF9DFB /* edu.washington.npl.orca.ManualPlot.plist in Resources */,
+				8409735D0F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist in Resources */,
+				8409735E0F81136F00036BE8 /* ManualPlot.nib in Resources */,
+				8409735F0F81136F00036BE8 /* ManualPlot.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10821,8 +10821,8 @@
 				84BA5DE70F6E8C8900CF92D6 /* ORHVRampItemController.m in Sources */,
 				84BA5F2C0F70388D00CF92D6 /* ORZupController.m in Sources */,
 				84BA5F2E0F70388D00CF92D6 /* ORZupModel.m in Sources */,
-				84C897C00F7A99540016A3B2 /* ORManualPlotController.m in Sources */,
-				84C897C20F7A99540016A3B2 /* ORManualPlotModel.m in Sources */,
+				840973610F81136F00036BE8 /* ORManualPlotController.m in Sources */,
+				840973630F81136F00036BE8 /* ORManualPlotModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
