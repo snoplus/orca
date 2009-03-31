@@ -25,7 +25,7 @@
 @class ORDataPacket;
 @class ORDataSet;
 
-@interface ORIP408DecoderForValue : ORVmeCardDecoder {
+@interface ORIP408DecoderForValues : ORVmeCardDecoder {
 }
 - (NSString*) getSlotKey:(unsigned short)aSlot;
 - (unsigned long) decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;

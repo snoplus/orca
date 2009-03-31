@@ -46,7 +46,7 @@ static NSString* kIPSlotKey[4] = {
 		@"IP B",
 		@"IP A"
 };
-@implementation ORIP408DecoderForValue
+@implementation ORIP408DecoderForValues
 
 - (NSString*) getSlotKey:(unsigned short)aSlot
 {
