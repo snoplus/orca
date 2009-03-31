@@ -145,6 +145,8 @@
 		840973610F81136F00036BE8 /* ORManualPlotController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8409735A0F81136F00036BE8 /* ORManualPlotController.m */; };
 		840973620F81136F00036BE8 /* ORManualPlotModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 8409735B0F81136F00036BE8 /* ORManualPlotModel.h */; };
 		840973630F81136F00036BE8 /* ORManualPlotModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8409735C0F81136F00036BE8 /* ORManualPlotModel.m */; };
+		840975E10F8242B300036BE8 /* ORIP408Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 840975DF0F8242B300036BE8 /* ORIP408Decoders.m */; };
+		840975E20F8242B300036BE8 /* ORIP408Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 840975E00F8242B300036BE8 /* ORIP408Decoders.h */; };
 		840AF86D0819924D005B750D /* SourceMask.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AF86B0819924D005B750D /* SourceMask.h */; };
 		840AF86E0819924D005B750D /* SourceMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AF86C0819924D005B750D /* SourceMask.m */; };
 		840B207C0B4D79400021220C /* NSScanner+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B207A0B4D79400021220C /* NSScanner+Extensions.h */; };
@@ -2199,6 +2201,8 @@
 		8409735A0F81136F00036BE8 /* ORManualPlotController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORManualPlotController.m; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ORManualPlotController.m"; sourceTree = SOURCE_ROOT; };
 		8409735B0F81136F00036BE8 /* ORManualPlotModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORManualPlotModel.h; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ORManualPlotModel.h"; sourceTree = SOURCE_ROOT; };
 		8409735C0F81136F00036BE8 /* ORManualPlotModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORManualPlotModel.m; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ORManualPlotModel.m"; sourceTree = SOURCE_ROOT; };
+		840975DF0F8242B300036BE8 /* ORIP408Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIP408Decoders.m; path = Source/Objects/Hardware/Vme/IPCarrier/IP408/ORIP408Decoders.m; sourceTree = SOURCE_ROOT; };
+		840975E00F8242B300036BE8 /* ORIP408Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIP408Decoders.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP408/ORIP408Decoders.h; sourceTree = SOURCE_ROOT; };
 		840AF86B0819924D005B750D /* SourceMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SourceMask.h; sourceTree = "<group>"; };
 		840AF86C0819924D005B750D /* SourceMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceMask.m; sourceTree = "<group>"; };
 		840B207A0B4D79400021220C /* NSScanner+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSScanner+Extensions.h"; path = "Source/Cocoa Extensions/NSScanner+Extensions.h"; sourceTree = SOURCE_ROOT; };
@@ -5715,6 +5719,8 @@
 				845115ED04030088005F64B1 /* ORIP408Model.m */,
 				845115E804030088005F64B1 /* ORIP408Controller.h */,
 				845115E904030088005F64B1 /* ORIP408Controller.m */,
+				840975DF0F8242B300036BE8 /* ORIP408Decoders.m */,
+				840975E00F8242B300036BE8 /* ORIP408Decoders.h */,
 				845115E504030088005F64B1 /* IP408.gif */,
 				845115E604030088005F64B1 /* IP408.nib */,
 			);
@@ -9528,6 +9534,7 @@
 				84BA5F2D0F70388D00CF92D6 /* ORZupModel.h in Headers */,
 				840973600F81136F00036BE8 /* ORManualPlotController.h in Headers */,
 				840973620F81136F00036BE8 /* ORManualPlotModel.h in Headers */,
+				840975E20F8242B300036BE8 /* ORIP408Decoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10823,6 +10830,7 @@
 				84BA5F2E0F70388D00CF92D6 /* ORZupModel.m in Sources */,
 				840973610F81136F00036BE8 /* ORManualPlotController.m in Sources */,
 				840973630F81136F00036BE8 /* ORManualPlotModel.m in Sources */,
+				840975E10F8242B300036BE8 /* ORIP408Decoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
