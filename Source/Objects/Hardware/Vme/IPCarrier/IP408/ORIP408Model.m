@@ -156,7 +156,7 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 								 [NSNumber numberWithBool:NO],                  @"variable",
 								 [NSNumber numberWithLong:kORIP408RecordLength],@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"IP480Values"];
+    [dataDictionary setObject:aDictionary forKey:@"IP408Values"];
 	
 
     return dataDictionary;
