@@ -549,86 +549,96 @@ const float kGateAlpha2 = .1;
 {
     if([self gateValid]){
     
-        short x, y, xl, x1,x2=0;
-        short xRng, frc,width,height;
-        long  ix;
-        int minX,maxX;
-        double sum;
         ORAxis* yAxis = [aPlot yScale];
         ORAxis* xAxis = [aPlot xScale];
         id mDataSource = [aPlot dataSource];
-        double inc = [aPlot channelWidth];
         int dataID = [mCurve dataSetID];
-        
-        minX = MAX(0,roundToLong([xAxis minValue]));
-        maxX = roundToLong([xAxis maxValue]);
+       
+        int minX = MAX(0,roundToLong([xAxis minValue]));
+        int maxX = roundToLong([xAxis maxValue]);
         
         BOOL curveIsActive = [aPlot activeCurve] == mCurve;
-        BOOL gateIsActive = [mCurve activeGate] == self;
-        xRng = [xAxis valueRange];
-        width = [aPlot plotWidth];
-        height = [aPlot plotHeight];
-        frc =  width % xRng;
-        sum = -(xRng + 1) / 2.;
-        x1 = xl = x = [xAxis getPixAbs:minX];
+        BOOL gateIsActive  = [mCurve activeGate] == self;
         NSColor* gateColor = [aPlot colorForDataSet:dataID];
         [NSBezierPath setDefaultLineWidth:.5];
-        short startGate = [xAxis getPixAbs:[self gateMinChannel]]-inc/2;
-        short endGate   = [xAxis getPixAbs:[self gateMaxChannel]]-inc/2;
-        if(curveIsActive && gateIsActive){
-            [[gateColor colorWithAlphaComponent:kGateAlpha]set];
-        }
-        else {
-            [[gateColor colorWithAlphaComponent:kGateAlpha2]set];
-        }
-        BOOL first = YES;
-        BOOL last = YES;
-        for (ix=minX; ix<maxX;) {
-            x += inc;
-            /* increment the running sum and check for overflow to next pixel */
-            if ((sum+=frc) >= 0) {
-                ++x;
-                sum -= xRng;
-            }
-            
-            if(xl>=startGate && xl<endGate){
-                y = [yAxis getPixAbs:[mDataSource plotter:self dataSet:dataID dataValue:ix ]];
-                [NSBezierPath fillRect:NSMakeRect(xl-inc/2,0,x-xl,y)];
-                if(first){
-                    if(curveIsActive && gateIsActive){
-                        [[NSColor redColor] set];
-                        [NSBezierPath strokeLineFromPoint:NSMakePoint(xl-inc/2,0) toPoint:NSMakePoint(xl-inc/2,height)];
-                        first = NO;
-                        x1 = xl;
-                        
-                        
-                        [[gateColor colorWithAlphaComponent:kGateAlpha]set];
-
-                    }
-                }		
-                
-            }
-            if(last && xl > endGate){
-                if(curveIsActive && gateIsActive){
-                    last = NO;
-                    x2 = xl;
-                    [[NSColor redColor] set];
-                    [NSBezierPath strokeLineFromPoint:NSMakePoint(xl-inc/2,0) toPoint:NSMakePoint(xl-inc/2,height)];
-
-                     
-                    [[gateColor colorWithAlphaComponent:kGateAlpha]set];
-                }
-                break;
-            }
-            // save previous x and y values
-            xl = x;
-            
-            
-            ++ix;
-        }
-        
-        if(curveIsActive && gateIsActive){
-            if([mCurve gateCount]>1 || displayGate){
+		
+		double inc = [aPlot channelWidth];
+        float startGate = [xAxis getPixAbs:[self gateMinChannel]]-inc/2;
+        float endGate   = [xAxis getPixAbs:[self gateMaxChannel]]+inc/2;
+		
+		
+        if(curveIsActive && gateIsActive)	[[gateColor colorWithAlphaComponent:kGateAlpha]set];
+        else								[[gateColor colorWithAlphaComponent:kGateAlpha2]set];
+		
+		if([aPlot useXYPlot]){
+			int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataID];
+			BOOL aLog = [yAxis isLog];
+			BOOL aInt = [yAxis integer];
+			double aMinPad = [yAxis minPad];
+			
+			float xl  = [xAxis getPixAbs:minX];
+			
+			if(curveIsActive && gateIsActive)	[[gateColor colorWithAlphaComponent:kGateAlpha]set];
+			else								[[gateColor colorWithAlphaComponent:kGateAlpha2]set];
+			
+			int i;
+			float xValue,yValue;
+			BOOL first = YES;
+			BOOL lastPtInROI = NO;
+			BOOL gotData = NO;
+			NSBezierPath* theDataPath = [NSBezierPath bezierPath];
+			for (i=0; i<numPoints;++i) {
+				
+				[mDataSource plotter:aPlot dataSet:dataID index:i x:&xValue y:&yValue];
+				float x = [xAxis getPixAbs:xValue];
+				float y = [yAxis getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
+				if(x>=startGate && x<endGate){
+					if(first){
+						[theDataPath moveToPoint:NSMakePoint(x,0)];
+						[theDataPath lineToPoint:NSMakePoint(x,y)];
+						first = NO;
+						gotData = YES;
+					}
+					else {
+						[theDataPath lineToPoint:NSMakePoint(x,y)];
+					}
+				}
+				else if(x>endGate){
+					[theDataPath lineToPoint:NSMakePoint(xl,y)];
+					[theDataPath lineToPoint:NSMakePoint(xl,0)];
+					lastPtInROI = YES;
+					break;
+				}
+				// save previous x and y values
+				xl = x;
+			}
+			if(!lastPtInROI && gotData){
+				[theDataPath lineToPoint:NSMakePoint(xl,0)];
+			}
+			if(gotData)[theDataPath fill];
+		}
+		else {
+			short x = [xAxis getPixAbs:minX]-inc/2.;
+			short xl = x;
+			long  ix;
+			for (ix=minX; ix<maxX;++ix) {
+				x = [xAxis getPixAbs:ix]-inc/2.;
+				if(xl>=startGate && xl<endGate){
+					short y = [yAxis getPixAbs:[mDataSource plotter:aPlot dataSet:dataID dataValue:ix ]];
+					[NSBezierPath fillRect:NSMakeRect(xl,0,x-xl,y)];
+				}
+				if(xl > endGate)break;
+				xl = x;
+			}
+		}
+		if(curveIsActive && gateIsActive){
+			float height = [aPlot plotHeight];
+			[[NSColor redColor] set];
+			[NSBezierPath strokeLineFromPoint:NSMakePoint(startGate,0) toPoint:NSMakePoint(startGate,height)];
+			[NSBezierPath strokeLineFromPoint:NSMakePoint(endGate,0) toPoint:NSMakePoint(endGate,height)];
+			[[gateColor colorWithAlphaComponent:kGateAlpha]set];
+			
+           // if([mCurve gateCount]>1){
                 NSString* label;
                 if(displayGate){
                    if(displayedGateName) label = [NSString stringWithFormat:@"Gate: %@",displayedGateName];
@@ -643,7 +653,7 @@ const float kGateAlpha2 = .1;
 
                 [label drawAtPoint:NSMakePoint(startGate+(endGate-startGate)/2-labelWidth/2,height-20) withAttributes:[xAxis labelAttributes]];
 
-            }
+            //}
 			int fitLabelHeight = [fitString sizeWithAttributes:fitLableAttributes].height;
 			[fitString drawAtPoint:NSMakePoint(20,height-10-fitLabelHeight) withAttributes:fitLableAttributes];
         }
@@ -876,31 +886,40 @@ const float kGateAlpha2 = .1;
 
 - (void) doFit:(id)userInfo
 {
-	fitMinChannel = [self gateMinChannel];
-	fitMaxChannel = [self gateMaxChannel];
-	NSArray* dataPoints = [mCurve dataPointArray:mPlot range:NSMakeRange(0,[self gateMaxChannel])];
+	NSArray* dataPoints;
+	if([[mPlot dataSource] useXYPlot])	dataPoints = [mCurve dataPointArray:mPlot range:NSMakeRange([self gateMinChannel],[self gateMaxChannel])];
+	else						dataPoints = [mCurve dataPointArray:mPlot range:NSMakeRange(0,[self gateMaxChannel])];
+	
 	if([dataPoints count]){
 		NSMutableDictionary* serviceRequest = [NSMutableDictionary dictionary];
 		[serviceRequest setObject:@"OROrcaRequestFitProcessor" forKey:@"Request Type"];
 		[serviceRequest setObject:@"Normal"					 forKey:@"Request Option"];
 		
-			NSMutableDictionary* requestInputs = [NSMutableDictionary dictionary];
+		NSMutableDictionary* requestInputs = [NSMutableDictionary dictionary];
+		fitMinChannel = [self gateMinChannel];
+		fitMaxChannel = [self gateMaxChannel];
+		if([[mPlot dataSource] useXYPlot]){
+			[requestInputs setObject:[NSNumber numberWithInt:0] forKey:@"FitLowerBound"];
+			[requestInputs setObject:[NSNumber numberWithInt:[dataPoints count]] forKey:@"FitUpperBound"];
+		}
+		else {
 			[requestInputs setObject:[NSNumber numberWithInt:fitMinChannel] forKey:@"FitLowerBound"];
 			[requestInputs setObject:[NSNumber numberWithInt:fitMaxChannel] forKey:@"FitUpperBound"];
-			
-			NSString* fitFunction = kORCARootFitShortNames[[[userInfo objectForKey:ORCARootServiceFitFunctionKey] intValue]];
-			if([fitFunction hasPrefix:@"pol"]){
-				int order = [[userInfo objectForKey:ORCARootServiceFitOrderKey] intValue];
-				fitFunction = [fitFunction stringByAppendingFormat:@"%d",order];
-			}
-			[requestInputs setObject:fitFunction forKey:@"FitFunction"];
-			
-			[requestInputs setObject:[NSArray array] forKey:@"FitParameters"];
-			[requestInputs setObject:@"" forKey:@"FitOptions"];
-			[requestInputs setObject:dataPoints forKey:@"FitYValues"];
-			
+		}
+		
+		NSString* fitFunction = kORCARootFitShortNames[[[userInfo objectForKey:ORCARootServiceFitFunctionKey] intValue]];
+		if([fitFunction hasPrefix:@"pol"]){
+			int order = [[userInfo objectForKey:ORCARootServiceFitOrderKey] intValue];
+			fitFunction = [fitFunction stringByAppendingFormat:@"%d",order];
+		}
+		[requestInputs setObject:fitFunction forKey:@"FitFunction"];
+		
+		[requestInputs setObject:[NSArray array] forKey:@"FitParameters"];
+		[requestInputs setObject:@"" forKey:@"FitOptions"];
+		[requestInputs setObject:dataPoints forKey:@"FitYValues"];
+		
 		[serviceRequest setObject:requestInputs	forKey:@"Request Inputs"];
-
+		
 		//we do this via a notification so that this object (which is a widget) is decoupled from the ORCARootService object.
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:serviceRequest forKey:ServiceRequestKey];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORCARootServiceRequestNotification object:self userInfo:userInfo];
@@ -958,7 +977,8 @@ const float kGateAlpha2 = .1;
 
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x
 {
-	return [[fit objectAtIndex:x] floatValue];
+	if(x>[fit count])return 0.0;
+	else return [[fit objectAtIndex:x] floatValue];
 }
 
 

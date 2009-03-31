@@ -31,6 +31,7 @@
 	IBOutlet NSTextField*   y1LengendField;
 	IBOutlet NSTextField*   y2LengendField;
 	id						calibrationPanel;
+    IBOutlet NSDrawer*		dataDrawer;
 }
 
 #pragma mark •••Initialization
@@ -44,6 +45,7 @@
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) dataChanged:(NSNotification*)aNote;
+- (void) drawDidOpen:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) refreshPlot:(id)sender;

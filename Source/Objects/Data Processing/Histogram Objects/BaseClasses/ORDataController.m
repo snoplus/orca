@@ -66,6 +66,7 @@
 {
 	[[self window] resetCursorRects];
 }
+
 // this is needed too because the modifiers can change 
 // when it's not main without it being told
 - (void)windowDidBecomeMain:(NSNotification*)inNot
@@ -235,6 +236,11 @@
 }
 
 #pragma mark •••Accessors
+- (id) analysisDrawer
+{
+	return analysisDrawer;
+}
+
 - (id) plotter
 {
 	return plotter;

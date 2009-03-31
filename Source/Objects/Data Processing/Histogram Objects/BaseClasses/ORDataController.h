@@ -40,6 +40,7 @@
 #pragma mark •••Accessors
 - (id) plotter;
 - (id) curve:(int)aCurveIndex gate:(int)aGateIndex;
+- (id) analysisDrawer;
 
 #pragma mark •••Interface Management
 - (void) registerNotificationObservers;

@@ -23,6 +23,7 @@
 #import "ORManualPlotController.h"
 #import "ORManualPlotModel.h"
 #import "ORPlotter1D.h"
+#import "ORCurve1D.h"
 #import "ORCalibration.h"
 
 @interface ORManualPlotController (private)
@@ -67,7 +68,13 @@
     [notifyCenter addObserver : self
                      selector : @selector(col2TitleChanged:)
                          name : ORManualPlotModelCol2TitleChanged
-						object: model];
+						object: model];	
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(drawDidOpen:)
+                         name : NSDrawerDidOpenNotification
+						object: nil];	
+	
 }
 
 - (void) awakeFromNib
@@ -86,6 +93,13 @@
 }
 
 #pragma mark •••Interface Management
+
+- (void) drawDidOpen:(NSNotification*)aNote
+{
+	if([aNote object] == [self analysisDrawer])[dataDrawer close:nil];
+	else if([aNote object] == dataDrawer)[[self analysisDrawer] close:nil];
+}
+
 - (void) colKeyChanged:(NSNotification*)aNote
 {
 	[col0KeyPU selectItemAtIndex: [model col0Key]];

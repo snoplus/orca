@@ -648,24 +648,39 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 - (IBAction) resetScales:(id)sender
 {
-    int          i, minX, maxX;
-    double          t, minY, maxY;
-    double	    rngY = 0;
-    
-    /* determine the maximum value of the data */
-    minX = 0;
-    maxX = [mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex];
-    minY = 1e100;
-    maxY = -1e100;
-	
-    for (i=minX+1; i<maxX; ++i) {
-        t = [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i];
-        if (t > maxY) maxY = t;
-        if (t < minY) minY = t;
-    }
+    double rngY = 0;
+	double minY = 1e100;
+	double maxY = -1e100;
+	double minX = 0;
+	double maxX = -1e100;
+	int numPts = [mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex];
+	if([self useXYPlot]){
+		if(numPts==0)return;
+		int i;
+		float x,y;
+		[mDataSource plotter:self dataSet:activeCurveIndex index:0 x:&x y:&y];
+		double firstX = x;
+		for(i=0;i<numPts;i++){
+			[mDataSource plotter:self dataSet:activeCurveIndex index:i x:&x y:&y];
+			if (y > maxY) maxY = y;
+			if (y < minY) minY = y;
+			if (x > maxX) maxX = x;
+		}
+		maxX += firstX; //just to space the end the same as the beginning
+	}
+	else {	
+		/* determine the maximum value of the data */
+		maxX = numPts;
+		
+		int i;
+		for (i=minX+1; i<maxX; ++i) {
+			double t = [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i];
+			if (t > maxY) maxY = t;
+			if (t < minY) minY = t;
+		}
+	}
     rngY = maxY - minY;
     if(rngY<10)rngY = 10;
-    
     
     if(maxX < minX || (maxX-minX) < 1)return;
     
@@ -697,21 +712,35 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     double maxY = -1e100;
     double minPlotX = 0;
     double maxPlotX = 0;
-    int xMin = [mXScale minValue];
-    int xMax = [mXScale maxValue];
+    double xMin = [mXScale minValue];
+    double xMax = [mXScale maxValue];
     int oldCenter = xMin+(xMax-xMin)/2;
     
-    minPlotX = 0;
-    maxPlotX = MAX(maxPlotX,[mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex]);    
-    
-    int i;
-    for (i=minPlotX; i<maxPlotX; ++i) {
-        double val = [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i];
-        if (val > maxY) {
-            maxY = val;
-            maxX = i;
-        }
-    }
+	int numPts = [mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex];
+	if([self useXYPlot]){
+		int i;
+		for(i=0;i<numPts;i++){
+			float x,y;
+			[mDataSource plotter:self dataSet:activeCurveIndex index:i x:&x y:&y];
+			if (y > maxY) {
+				maxY = y;
+				maxX = x;
+			}
+		}
+	}
+	else {
+		minPlotX = 0;
+		maxPlotX = MAX(maxPlotX,numPts);    
+		
+		int i;
+		for (i=minPlotX; i<maxPlotX; ++i) {
+			double val = [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i];
+			if (val > maxY) {
+				maxY = val;
+				maxX = i;
+			}
+		}
+	}
     //maxX is now the channel containing the maxY value of this plot.
     double dx = oldCenter-maxX;
     int new_lowX  = xMin - dx;
@@ -766,57 +795,76 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 {
 	[self setNeedsDisplay:YES];
 }
+
 - (IBAction) autoScale:(id)sender
 {
-    int         i, minX, maxX;
-    double      t, minY, maxY;
     double	    rngY = 0;
-	
-    minX = [mXScale minValue];
-    maxX = MIN([mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex],[mXScale maxValue]);
-	BOOL differentiate		= [self differentiate];
-	double averageWindow	= [self averageWindow];
-	if(differentiate){
-		minX += averageWindow/2;
-		maxX -= averageWindow/2;
-	}
-    minY = 1e100;
-    maxY = -1e100;
-	
-	double forwardSum = 0;
-	double backwardSum = 0;
-	int n = averageWindow/2;
-	double dn = (double)n;
-	
-	BOOL firstTime = YES;
-	if(dn!=0){
-		for (i=minX+1; i<maxX; ++i) {
-			if(!differentiate){
-				t = [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i];
+	double minY = 1e100;
+	double maxY = -1e100;
+	if([self useXYPlot]){
+		int n = [mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex];
+		double minX = [mXScale minValue];
+		double maxX = [mXScale maxValue];
+		BOOL gotAtLeastOne = NO;
+		int i;
+		for(i=0;i<n;i++){
+			float x,y;
+			[mDataSource plotter:self dataSet:activeCurveIndex index:i x:&x y:&y];
+			if(x>=minX && x<=maxX){
+				if (y > maxY) maxY = y;
+				if (y < minY) minY = y;
+				gotAtLeastOne = YES;
 			}
-			else {
-				if(!firstTime){
-					firstTime = NO;
-					int j;
-					for(j = 0;j<n;j++) forwardSum  += [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i+j];
-					for(j = 1;j<n;j++) backwardSum += [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i-j];
+		}
+		if(!gotAtLeastOne)return;
+	}
+	else {
+		double      t;
+		int minX = [mXScale minValue];
+		int maxX = MIN([mDataSource numberOfPointsInPlot:self dataSet:activeCurveIndex],[mXScale maxValue]);
+		BOOL differentiate		= [self differentiate];
+		double averageWindow	= [self averageWindow];
+		if(differentiate){
+			minX += averageWindow/2;
+			maxX -= averageWindow/2;
+		}
+		
+		double forwardSum = 0;
+		double backwardSum = 0;
+		int n = averageWindow/2;
+		double dn = (double)n;
+		
+		BOOL firstTime = YES;
+		if(dn!=0){
+			int i;
+			for (i=minX+1; i<maxX; ++i) {
+				if(!differentiate){
+					t = [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i];
 				}
 				else {
-					//if not first time just adjust the average using the new location	
-					forwardSum  = forwardSum  - [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i-1]/dn + [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i+n-1]/dn;
-					backwardSum = backwardSum + [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i-1]/(dn-1) - [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i-n]/(dn-1);
+					if(!firstTime){
+						firstTime = NO;
+						int j;
+						for(j = 0;j<n;j++) forwardSum  += [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i+j];
+						for(j = 1;j<n;j++) backwardSum += [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i-j];
+					}
+					else {
+						//if not first time just adjust the average using the new location	
+						forwardSum  = forwardSum  - [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i-1]/dn + [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i+n-1]/dn;
+						backwardSum = backwardSum + [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i-1]/(dn-1) - [mDataSource plotter:self dataSet:activeCurveIndex dataValue:i-n]/(dn-1);
+					}
+					t = forwardSum/dn - backwardSum/(dn-1);
 				}
-				t = forwardSum/dn - backwardSum/(dn-1);
+				if (t > maxY) maxY = t;
+				if (t < minY) minY = t;
 			}
-			if (t > maxY) maxY = t;
-			if (t < minY) minY = t;
 		}
+		if(maxX < minX || (maxX-minX) < 1)return;
 	}
+	
     rngY = maxY - minY;
     if(rngY<10)rngY = 10;
     
-    
-    if(maxX < minX || (maxX-minX) < 1)return;
     
     /* set the scale to 20% beyond extremes */
     double mmax = maxY+0.2*rngY/2.;

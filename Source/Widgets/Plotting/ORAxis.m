@@ -860,8 +860,9 @@ enum {
 			nearPinFlag = [self nearPinPoint:mouseLoc];
 			
 			/* invert the pin if we are grabbing near the pin-point */
-			if (pinned == (nearPinFlag==0)) invertPin = YES;
-			else							invertPin = NO;
+				if (pinned == (nearPinFlag==0)) invertPin = YES;
+				else							invertPin = NO;
+			
 			
 			if([self mouse:mouseLoc inRect:[self bounds]]){
 				mGrabValue = [self startDrag:mouseLoc];
@@ -1277,8 +1278,7 @@ enum {
     else 	pix = p.y;
     
     mDragInProgress = YES;
-    
-    return([self convertPoint:pix] );
+   return([self convertPoint:pix] );
 }
 
 /* Drag - drag the scale */
@@ -1360,7 +1360,7 @@ enum {
 {
     int       range = [self valueRange];
     int       amount = range/32;
-    if(amount==0)amount = 10;
+    if(amount==0)amount = 1;
     /* get the current x range of the slider */
     int xMin = [self minValue];
     int xMax = [self maxValue];
@@ -1379,7 +1379,7 @@ enum {
         if(xMax > [self maxLimit])xMax = [self maxLimit];
     }
     else if(plotOp ==kShrinkPlot){
-        if(abs(xMax-xMin)>10){
+        if(range>([self minimumRange] + 10)){
             xMax -= amount;
             xMin += amount;
         }
