@@ -23,8 +23,10 @@
 #import "ORIP408Model.h"
 #import "ORIPCarrierModel.h"
 #import "ORVmeCrateModel.h"
+#import "ORDataTypeAssigner.h"
+#import "ORDataPacket.h"
 
-//
+#define kORIP408RecordLength 7
 
 #define  kIP408DigitalInputA15_0	0x00
 #define  kIP408DigitalInputA15_8	0x00
@@ -125,6 +127,40 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 }
 
 #pragma mark ¥¥¥Accessors
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) aDataId
+{
+    dataId = aDataId;
+}
+- (void) setDataIds:(id)assigner
+{
+    dataId			= [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherCard
+{
+    [self setDataId:[anotherCard dataId]];
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP408"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORIP408DecoderForValues",					@"decoder",
+								 [NSNumber numberWithLong:dataId],              @"dataId",
+								 [NSNumber numberWithBool:NO],                  @"variable",
+								 [NSNumber numberWithLong:kORIP408RecordLength],@"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"IP480Values"];
+	
+
+    return dataDictionary;
+}
 
 
 - (unsigned long) writeMask
@@ -191,7 +227,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 }
 
 
-
 #pragma mark ¥¥¥Hardware Access
 - (unsigned long) getInputWithMask:(unsigned long) aChannelMask
 {
@@ -217,7 +252,6 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	@catch(NSException* localException) {
 	}
 	[hwLock unlock];
-	
 	
 	return aReturnValue;
 }
@@ -249,6 +283,32 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
 	[hwLock unlock];
 }
 
+- (void) shipRecord
+{
+    BOOL runInProgress = [gOrcaGlobals runInProgress];
+	
+	if(runInProgress){
+		unsigned long data[kORIP408RecordLength];
+		
+		data[0] = dataId | kORIP408RecordLength;
+		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
+		
+		//get the time(UT!)
+		time_t	theTime;
+		time(&theTime);
+		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t ut_time = mktime(theTimeGMTAsStruct);
+		data[2] = ut_time;	//seconds since 1970
+		data[3]	= writeMask;	
+		data[4]	= readMask;	
+		data[5]	= writeValue;	
+		data[6]	= readValue;	
+		
+		//the full record goes into the data stream via a notification
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:data length:kORIP408RecordLength*sizeof(long)]];
+	}
+}
 
 #pragma mark ¥¥¥Archival
 static NSString *ORIP408WriteMask 		= @"IP408 WriteMask";

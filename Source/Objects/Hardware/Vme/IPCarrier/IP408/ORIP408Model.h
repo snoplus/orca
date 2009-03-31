@@ -29,6 +29,7 @@
 @interface ORIP408Model :  ORVmeIPCard <ORBitProcessing>
 {
 	@private
+		unsigned long   dataId;
 		unsigned long writeMask;
 		unsigned long readMask;
 		unsigned long writeValue;
@@ -49,6 +50,7 @@
 - (void) runStopping:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Accessors
+- (NSDictionary*) dataRecordDescription;
 - (unsigned long) writeMask;
 - (void) setWriteMask:(unsigned long)aMask;
 - (unsigned long) writeValue;
@@ -57,6 +59,14 @@
 - (void) setReadMask:(unsigned long)aMask;
 - (unsigned long) readValue;
 - (void) setReadValue:(unsigned long)aValue;
+
+#pragma mark ¥¥¥Hardware Records
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) aDataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherCard;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) shipRecord;
 
 #pragma mark ¥¥¥Hardware Access
 - (unsigned long) getInputWithMask:(unsigned long) aChannelMask;
