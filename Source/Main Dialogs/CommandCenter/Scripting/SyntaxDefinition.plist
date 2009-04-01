@@ -21,6 +21,7 @@
 		<string>case</string>
 		<string>default</string>
 		<string>unless</string>
+		<string>array</string>
 	</array>
 	<key>Identifiers2</key>
 	<array>
@@ -33,8 +34,10 @@
 		<string>hex</string>
 		<string>logfile</string>
 		<string>string</string>
+		<string>@</string>
 		<string>strcat</string>
-		<string>array</string>
+		<string>nsdictionary</string>
+		<string>nsarray</string>
 		<string>point</string>
 		<string>rect</string>
 		<string>pointx</string>

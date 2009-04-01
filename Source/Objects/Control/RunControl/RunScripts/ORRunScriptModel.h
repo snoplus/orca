@@ -18,14 +18,10 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import "ORBaseDecoder.h"
 #import "ORScriptIDEModel.h"
-
-@class ORDataSet;
 
 @interface ORRunScriptModel : ORScriptIDEModel
 {	
-	unsigned long		    dataId;
 	SEL						selectorOK;
 	SEL						selectorBAD;
 	id						anArg;
@@ -39,18 +35,7 @@
 - (void) scriptRunnerDidFinish:(BOOL)normalFinish returnValue:(id)aValue;
 - (void) setSelectorOK:(SEL)aSelectorOK bad:(SEL)aSelectorBAD withObject:(id)anObject target:(id)aTarget;
 
-#pragma mark ***Data ID
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (NSDictionary*) dataRecordDescription;
-- (void) shipTaskRecord:(id)aTask running:(BOOL)aState;
 @end
 
-@interface ORDecoderRunScript : ORBaseDecoder
-{}
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)ptr;
-@end
+
 

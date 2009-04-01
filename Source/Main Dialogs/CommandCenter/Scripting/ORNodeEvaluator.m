@@ -65,6 +65,7 @@
 - (id)		extractValue:(int)index name:(NSString*)aFunctionName args:(NSArray*)valueArray;
 - (id)		sleepFunc:(id)p;
 - (NSMutableDictionary*) makeSymbolTable;
+- (NSComparisonResult) compare:(id)a to:(id)b;
 @end
 
 @interface ORNodeEvaluator (Graph_Private)
@@ -505,6 +506,8 @@
 			
 			//built-in funcs
 		case SLEEP:			return [self sleepFunc:p];
+		case NSDICTIONARY:	return [NSMutableDictionary dictionary];
+		case NSARRAY:		return [NSMutableArray array];
 		case DISPLAY:		return [delegate display:NodeValue(1) forKey:NodeValue(0)];
 		case WAITUNTIL:		return [self waitUntil:p];
 		case kWaitTimeOut:	return [self waitTimeOut:p];
@@ -584,33 +587,33 @@
 			else return _zero;
 			
 		case '>':       
-			if([NodeValue(0) compare: NodeValue(1)] == NSOrderedDescending) return _one;
+			if([self compare:NodeValue(0) to: NodeValue(1)] == NSOrderedDescending) return _one;
 			else return _zero;
 			
 		case '<':       
-			if([NodeValue(0) compare: NodeValue(1)]==NSOrderedAscending)return _one;
+			   if([self compare:NodeValue(0) to: NodeValue(1)]==NSOrderedAscending)return _one;
 			else return _zero;
 			
 		case LE_OP:       
-			result = [NodeValue(0) compare: NodeValue(1)];
+			   result = [self compare:NodeValue(0) to: NodeValue(1)];
 			if(result==NSOrderedSame || result==NSOrderedAscending)return _one;
 			else return _zero;
 			
 		case GE_OP: 
-			result = [NodeValue(0) compare: NodeValue(1)];
+			   result = [self compare:NodeValue(0) to: NodeValue(1)];
 			if(result==NSOrderedSame || result==NSOrderedDescending)return _one;
 			else return _zero;
 			
 		case NE_OP:       
-			result = [NodeValue(0) compare: NodeValue(1)];
+			   result = [self compare:NodeValue(0) to: NodeValue(1)];
 			if(result!=NSOrderedSame)return _one;
 			else return _zero;
 			
-		case EQ_OP:    					
-			result = [NodeValue(0) compare: NodeValue(1)];
+		case EQ_OP:   
+			result = [self compare:NodeValue(0) to: NodeValue(1)];
 			if(result==NSOrderedSame)return _one;
 			else return _zero;
-			
+			   
 			//inc/dec ops
 		case kPreInc: return  [self setValue:[NodeValue(0) decimalNumberByAdding: _one] forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
 		case kPreDec: return [self setValue:[NodeValue(0) decimalNumberBySubtracting: _one] forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
@@ -1197,6 +1200,14 @@
 	[aSymbolTable setObject:_one  forKey:@"YES"];
 	return aSymbolTable;
 }
+- (NSComparisonResult) compare:(id)a to:(id)b
+{
+	if([a class] == [b class])return [a compare:b];
+	else if([a class] != [NSDecimalNumber class]){
+		return [b compare:a];
+	}
+	else return [a compare:b];
+}
 @end
 
 @implementation ORNodeEvaluator (Graph_Private)
@@ -1271,6 +1282,8 @@
 				case RETURN:			line = [NSMutableString stringWithString:@"[return]"];		break;
 				case CONTINUE:			line = [NSMutableString stringWithString:@"[continue]"];	break;
 				case SLEEP:				line = [NSMutableString stringWithString:@"[sleep]"];		break;
+				case NSDICTIONARY:		line = [NSMutableString stringWithString:@"[nsdictionary]"];	break;
+				case NSARRAY:			line = [NSMutableString stringWithString:@"[nsarray]"];	break;
 				case HEX:				line = [NSMutableString stringWithString:@"[hex]"];			break;
 				case WAITUNTIL:			line = [NSMutableString stringWithString:@"[waituntil]"];	break;				
 				case ALARM:				line = [NSMutableString stringWithString:@"[alarm]"];		break;				
@@ -1417,10 +1430,9 @@
 @implementation OrcaObject (ORNodeEvaluation)
 - (NSComparisonResult)compare:(NSNumber *)otherNumber
 {
-	if( [self isEqualTo: otherNumber])return NSOrderedSame;
+	if( [self isEqual: otherNumber])return NSOrderedSame;
 	else return NSOrderedDescending;
 }
-
 - (BOOL)	exitNow
 {
 	return NO;
@@ -1430,7 +1442,7 @@
 @implementation OrcaObjectController (ORNodeEvaluation)
 - (NSComparisonResult)compare:(NSNumber *)otherNumber
 {
-	if( [self isEqualTo: otherNumber])return NSOrderedSame;
+	if( [self isEqual: otherNumber])return NSOrderedSame;
 	else return NSOrderedDescending;
 }
 

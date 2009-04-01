@@ -94,6 +94,7 @@
 - (int) debugMode;
 - (void) setDebugMode:(int) aMode;
 - (id) display:(id)aValue forKey:(id)aKey;
+- (void) runScriptAsString:(NSString*)aScript; //for testing
 
 #pragma mark ¥¥¥Parsers
 - (id)		 parseFile:(NSString*) aPath;

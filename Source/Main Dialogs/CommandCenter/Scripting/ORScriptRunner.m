@@ -405,6 +405,14 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	}
 }
 
+- (void) runScriptAsString:(NSString*)aScript
+{
+	if(!running){
+		[self parse:aScript];
+		[self run:nil sender:nil];
+	}
+}
+
 @end
 
 @implementation ORScriptRunner (private)

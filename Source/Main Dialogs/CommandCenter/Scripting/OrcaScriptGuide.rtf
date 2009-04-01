@@ -140,6 +140,15 @@ rectw(<rect structure>)
 \i0 \
 \
 
+\b Strings\
+
+\b0 Strings can be formed as either  'C' strings or ObjC string objects.\
+b = "a String";  	//or\
+b = @"a String";
+\b \
+
+\b0 \
+
 \b Output
 \b0 \
 print(<var,var,...>);\
@@ -167,8 +176,15 @@ strcat(<var,var,...>)	      //concatenate values into string for printing or an 
 \i0 \
 postalarm(<alarmName>, <alarmSeverity> [,<alarmHelp>]);  //the help string is optional\
 clearalarm(<alarmName>);\
+nsdictionary()                     
+\i //makes an NSDictionary
+\i0 \
+nsarray()                            
+\i //makes an NSArray
+\i0 \
 
 \b \
+\
 Array Declaration
 \b0 \
 array varName[<size>];\

@@ -593,6 +593,7 @@
 			id aValue = [[model evaluator] symbolValueForIndex:aRow];
 			if([aValue isKindOfClass:[OrcaObject class]]) return [NSString stringWithFormat:@"<%@>",[aValue className]];
 			else if([aValue isKindOfClass:[NSArray class]]) return [NSString stringWithFormat:@"<%@>",[aValue className]];
+			else if([aValue isKindOfClass:[NSDictionary class]]) return [NSString stringWithFormat:@"<%@>",[aValue className]];
 			else return aValue;
 		}
 	}

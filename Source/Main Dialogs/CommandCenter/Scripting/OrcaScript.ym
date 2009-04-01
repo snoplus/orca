@@ -34,7 +34,7 @@
 %token FUNCTION WHILE DO FOR IF PRINT LOGFILE FIND BREAK EXIT CONTINUE SLEEP RETURN WAITUNTIL HEX MAKEARRAY
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN
 %token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT
-%token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY
+%token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY NSDICTIONARY NSARRAY
 %nonassoc ELSE
 
 %left '+' '-' 
@@ -44,7 +44,7 @@
 %type <nPtr> program  functionCall statement arrayElement make_string  cat_string break_statement
 %type <nPtr> hex_str expr statement_list objC findObj selection_statement iteration_statement 
 %type <nPtr> objVar objVar_list print_list log_list print_statement log_statement arg_list argName_list clear_statement
-%type <nPtr> compound_statement expression_statement jump_statement special_statement
+%type <nPtr> compound_statement expression_statement jump_statement special_statement ns_object
 %type <nPtr> case_statement case_list constant_expr point_str rect_str wait_statement alarm_statement
 %type <nPtr> primary_expr multiplicative_expr postfix_expr unary_expr  additive_expr
 %type <nPtr> shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr
@@ -99,6 +99,12 @@ special_statement
 | VARIABLE '=' make_string ';'		 { $$ = executionNode('=', identifierNode($1), $3,nil); }
 | VARIABLE '=' cat_string ';'		 { $$ = executionNode('=', identifierNode($1), $3,nil); }
 | VARIABLE '=' wait_statement ';'	 { $$ = executionNode('=', identifierNode($1), $3,nil); }
+| VARIABLE '=' ns_object ';'	     { $$ = executionNode('=', identifierNode($1), $3,nil); }
+;
+
+ns_object
+: NSDICTIONARY '('')'					{ $$ = executionNode(NSDICTIONARY,nil);}
+| NSARRAY '('')'						{ $$ = executionNode(NSARRAY,nil);}
 ;
 
 wait_statement
@@ -196,6 +202,7 @@ primary_expr
 : VARIABLE					{ $$ = identifierNode($1); }
 | CONSTANT					{ $$ = constantNode($1); }
 | STRING					{ $$ = stringNode($1); }
+| '@' STRING				{ $$ = stringNode($2); }
 | functionCall				{ $$ = $1; }
 | objC						{ $$ = $1; }
 | findObj					{ $$ = $1; }

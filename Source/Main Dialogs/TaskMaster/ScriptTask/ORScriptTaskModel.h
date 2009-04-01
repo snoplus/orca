@@ -17,8 +17,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-
 #pragma mark ***Imported Files
 #import "ORBaseDecoder.h"
 #import "ORScriptIDEModel.h"
@@ -30,9 +28,7 @@
 @interface ORScriptTaskModel : ORScriptIDEModel
 {
 	ORScriptInterface*		task;
-	unsigned long		    dataId;
 }
-
 
 #pragma mark ***Initialization
 - (void) dealloc;
@@ -42,12 +38,6 @@
 - (void) runningChanged:(NSNotification*)aNote;
 
 #pragma mark ***Data ID
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
-- (void) setDataIds:(id)assigner;
-- (void) syncDataIdsWith:(id)anotherObj;
-- (NSDictionary*) dataRecordDescription;
-- (void) shipTaskRecord:(id)aTask running:(BOOL)aState;
 - (void) taskDidStart:(NSNotification*)aNote;
 - (void) taskDidFinish:(NSNotification*)aNote;
 
@@ -66,10 +56,4 @@ extern NSString* ORScriptTaskNameChanged;
 extern NSString* ORScriptTaskArgsChanged;
 extern NSString* ORScriptTaskLastFileChangedChanged;
 
-
-@interface ORDecoderScriptTask : ORBaseDecoder
-{}
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
-- (NSString*) dataRecordDescription:(unsigned long*)ptr;
-@end
 

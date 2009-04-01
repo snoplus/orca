@@ -17,11 +17,16 @@
 //for the use of this software.
 //-------------------------------------------------------------
 #import "OrcaObject.h"
+#import "ORBaseDecoder.h"
 
 @class ORScriptRunner;
+@class ORDataPacket;
+@class ORDataSet;
 
 @interface ORScriptIDEModel : OrcaObject
 {
+	unsigned long		    dataId;
+	unsigned long			recordDataId;
 	NSString*				script;
 	ORScriptRunner*			scriptRunner;
 	NSString*				scriptName;
@@ -41,6 +46,7 @@
 - (void) dealloc;
 
 #pragma mark ***Accessors
+
 - (BOOL)	breakChain;
 - (void)	setBreakChain:(BOOL)aState;
 - (id)		inputValue;
@@ -91,6 +97,19 @@
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
+
+#pragma mark ***Data ID
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) aDataId;
+- (unsigned long) recordDataId;
+- (void) setRecordDataId: (unsigned long) aDataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherObj;
+- (NSDictionary*) dataRecordDescription;
+- (void) shipTaskRecord:(id)aTask running:(BOOL)aState;
+- (void) shipDataRecord:(id)someData idNumber:(unsigned long)anID;
+- (int) scriptType;
+
 @end
 
 extern NSString* ORScriptIDEModelCommentsChanged;
@@ -102,4 +121,16 @@ extern NSString* ORScriptIDEModelLastFileChangedChanged;
 extern NSString* ORScriptIDEModelBreakpointsChanged;
 extern NSString* ORScriptIDEModelBreakChainChanged;
 extern NSString* ORScriptIDEModelGlobalsChanged;
+
+@interface ORScriptDecoderForState : ORBaseDecoder
+{}
+- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end
+
+@interface ORScriptDecoderForRecord : ORBaseDecoder
+{}
+- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)ptr;
+@end
 

@@ -26,6 +26,8 @@
 #import "ORNodeEvaluator.h"
 #import "NSNotifications+Extensions.h"
 #import "NSString+Extensions.h"
+#import "ORDataPacket.h"
+#import "ORDataSet.h"
 
 NSString* ORScriptIDEModelCommentsChanged		 = @"ORScriptIDEModelCommentsChanged";
 NSString* ORScriptIDEModelShowSuperClassChanged	 = @"ORScriptIDEModelShowSuperClassChanged";
@@ -55,6 +57,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 }
 
 #pragma mark ***Accessors
+
 - (BOOL) breakChain
 {
 	return breakChain;
@@ -286,6 +289,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 					[scriptRunner setBreakpoints:[self breakpointSet]];
 				}
 				[scriptRunner setDebugMode:kRunToBreakPoint];
+				[self shipTaskRecord:self running:YES];
 				[scriptRunner run:inputValues sender:self];
 			}
 			else {
@@ -324,6 +328,8 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 	}
 	if(normalFinish)NSLog(@"[%@] Returned with: %@\n",[self identifier],aValue);
 	else NSLogColor([NSColor redColor],@"[%@] Abnormal exit!\n",[[self scriptRunner] scriptName]);
+
+	[self shipTaskRecord:self running:NO];
 }
 
 - (BOOL) running
@@ -427,6 +433,135 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 - (NSPoint) testFuncPointReturn:(NSPoint)aPoint					{ return aPoint; }
 - (NSRect) testFuncRectReturn:(NSRect)aRect						{ return aRect; }
 
+#pragma mark ***Data ID
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+- (unsigned long) recordDataId { return recordDataId; }
+- (void) setRecordDataId: (unsigned long) aDataId
+{
+    recordDataId = aDataId;
+}
+
+- (void) setDataIds:(id)assigner
+{
+    dataId        = [assigner assignDataIds:kLongForm];
+    recordDataId  = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherObj
+{
+    [self setDataId:[anotherObj dataId]];
+    [self setRecordDataId:[anotherObj recordDataId]];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORScriptDecoderForState",		@"decoder",
+								 [NSNumber numberWithLong:dataId],	@"dataId",
+								 [NSNumber numberWithBool:NO],      @"variable",
+								 [NSNumber numberWithLong:4],       @"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"State"];
+  
+	aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORScriptDecoderForRecord",			@"decoder",
+								 [NSNumber numberWithLong:recordDataId],	@"dataId",
+								 [NSNumber numberWithBool:YES],				@"variable",
+								 [NSNumber numberWithLong:-1],				@"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"Record"];
+	
+	
+    return dataDictionary;
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORCAScript"];
+    
+}
+
+- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
+{
+    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
+	if(inputValues) [objDictionary setObject:inputValues forKey:@"inputValues"];
+    if(scriptName)  [objDictionary setObject:scriptName forKey:@"scriptName"];
+    if(lastFile) [objDictionary setObject:lastFile forKey:@"lastFile"];
+    [dictionary setObject:objDictionary forKey:@"Script"];
+	return objDictionary;
+}
+
+- (int) scriptType
+{
+	short scriptType = 0;
+	if([self class] == NSClassFromString(@"ORRunScriptModel"))scriptType = 1;
+	else if([self class] == NSClassFromString(@"ORScriptTaskModel"))scriptType = 2;
+	return scriptType;
+}
+
+- (void) shipTaskRecord:(id)aTask running:(BOOL)aState
+{
+    if([gOrcaGlobals runInProgress]){
+		
+		//get the time(UT!)
+		time_t	theTime;
+		time(&theTime);
+		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		time_t ut_time = mktime(theTimeGMTAsStruct); //seconds since 1970
+		
+		unsigned long data[4];		
+		data[0] = dataId | 4; 
+		data[1] = ([self scriptType]&0xf)<<24 | [self uniqueIdNumber]; 
+		data[2] = ut_time;	
+		data[3] = aState;
+		
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:&data length:sizeof(long)*4]];
+    }
+}
+
+- (void) shipDataRecord:(id)someData idNumber:(unsigned long)anID
+{
+    if([gOrcaGlobals runInProgress]){
+		if([someData respondsToSelector:@selector(description)]){
+			id plist = [NSPropertyListSerialization dataFromPropertyList:someData
+																  format:NSPropertyListXMLFormat_v1_0 errorDescription:nil];
+			if([plist length]){
+				//get the time(UT!)
+				time_t	theTime;
+				time(&theTime);
+				struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+				time_t ut_time = mktime(theTimeGMTAsStruct);
+				
+				NSMutableData*  theRecord = [NSMutableData dataWithCapacity:1024];
+				unsigned long data[5];
+				data[0] = recordDataId | (5 + ([plist length]+3)/4) ; 		
+				data[1] = ([self scriptType]&0xf)<<24 | [self uniqueIdNumber]; 
+				data[2] = ut_time;	//seconds since 1970
+				data[3] = anID;
+				data[4] = [plist length];
+				
+				[theRecord appendBytes:data length:sizeof(long) * 5];
+				[theRecord appendData:plist];
+				int pad = [plist length]%4;
+				if(pad){
+					unsigned long padWord = 0;
+					[theRecord appendBytes:&padWord length:4-pad]; //pad to nearest long
+				}
+				[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+																	object:theRecord];
+			}
+		}
+	}
+}
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -443,7 +578,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 	[self setBreakpoints:[decoder decodeObjectForKey:@"breakpoints"]];
     inputValues = [[decoder decodeObjectForKey:@"inputValues"] retain];	
     [[self undoManager] enableUndoRegistration];
-	
+		
     return self;
 }
 
@@ -460,4 +595,64 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     [encoder encodeObject:breakpoints forKey:@"breakpoints"];
 }
 @end
+
+@implementation ORScriptDecoderForState
+- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long value = *((unsigned long*)someData);
+    return ExtractLength(value);
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    NSString* title= @"ORCA Script\n";
+	int theObjID = ptr[1] & 0xff;
+	int scriptType = (ptr[1]>>24) & 0xff;
+	NSString* typeString;
+	if(scriptType == 1)			typeString = @"ORRunScriptModel";
+	else if(scriptType == 2)	typeString = @"ORScriptTaskModel";
+	else						typeString = @"ID"; //should never use this one if all types defined.
+	
+    NSString* state = [NSString stringWithFormat:@"%@,%d %@\n",typeString,theObjID,ptr[3]?@"Started":@"Stopped"];
+	
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ptr[2]];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+
+    return [NSString stringWithFormat:@"%@%@%@",title,state,date];               
+}
+@end
+
+@implementation ORScriptDecoderForRecord
+- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long value = *((unsigned long*)someData);
+    return ExtractLength(value);
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    NSString* title= @"ORCA Script Record\n";
+	int theObjID = ptr[1] & 0xff;
+	int scriptType = (ptr[1]>>24) & 0xff;
+	NSString* typeString;
+	if(scriptType == 1)			typeString = @"ORRunScriptModel";
+	else if(scriptType == 2)	typeString = @"ORScriptTaskModel";
+	else						typeString = @"ID"; //should never use this one if all types defined.
+    NSString* idString = [NSString stringWithFormat:@"%@,%d id: %d\n",typeString,theObjID,ptr[3]];
+	
+	NSPropertyListFormat format;
+	NSData *plistXML = [NSData dataWithBytes:&ptr[5] length:ptr[4]];
+	id result = [NSPropertyListSerialization
+						  propertyListFromData:plistXML
+						  mutabilityOption:NSPropertyListMutableContainersAndLeaves
+						  format:&format errorDescription:nil];
+	
+	
+	NSCalendarDate* date = [NSCalendarDate dateWithTimeIntervalSince1970:ptr[2]];
+	[date setCalendarFormat:@"%m/%d/%y %H:%M:%S %z\n"];
+	
+    return [NSString stringWithFormat:@"%@%@%@Data:%@",title,date,idString,result];               
+}
+@end
+
 

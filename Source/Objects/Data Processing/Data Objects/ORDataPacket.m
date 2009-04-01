@@ -623,7 +623,9 @@
                 if(!shortName){
 					NSString* sname = [[NSStringFromClass([anObj class]) componentsSeparatedByString:@"DecoderFor"] componentsJoinedByString:@" "];
                     if([sname hasPrefix:@"OR"])     sname = [sname substringFromIndex:2];
-                    if([sname hasSuffix:@"Record"]) sname = [sname substringToIndex:[sname length]-6];
+                    if([sname hasSuffix:@"Record"] && ![sname hasSuffix:@" Record"]){
+						sname = [sname substringToIndex:[sname length]-7];
+					}
                     [nameCatalog setObject:sname forKey:aKey]; 
                     shortName = sname;
                 }

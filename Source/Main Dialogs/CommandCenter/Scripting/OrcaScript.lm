@@ -47,7 +47,7 @@ E			[Ee][+-]?{D}+
 						return CONSTANT;
 					}
 
-[-()<>=+*/%!;:\[\],{}~^&|?.]	{ return *yytext; }
+[-()<>=+*/%!;:\[\],{}~^&|?.@]	{ return *yytext; }
 
 "function"		return FUNCTION;
 "\""			{ grabString(); return STRING;}
@@ -102,6 +102,8 @@ E			[Ee][+-]?{D}+
 "postalarm"		return ALARM;
 "clearalarm"	return CLEAR;
 "logfile"		return LOGFILE;
+"nsdictionary"	return NSDICTIONARY;
+"nsarray"		return NSARRAY;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);

@@ -88,53 +88,6 @@
 	[self setUpImage];
 }
 
-#pragma mark ***Data ID
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
-{
-    dataId = DataId;
-}
-- (void) setDataIds:(id)assigner
-{
-    dataId        = [assigner assignDataIds:kLongForm];
-}
-
-- (void) syncDataIdsWith:(id)anotherObj
-{
-    [self setDataId:[anotherObj dataId]];
-}
-
-- (NSDictionary*) dataRecordDescription
-{
-    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
-    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-								 @"ORDecoderRunScript",					@"decoder",
-								 [NSNumber numberWithLong:dataId],		@"dataId",
-								 [NSNumber numberWithBool:NO],           @"variable",
-								 [NSNumber numberWithLong:3],            @"length",
-								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"runScript"];
-    
-    return dataDictionary;
-}
-
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{
-    //----------------------------------------------------------------------------------------
-    // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORRunScriptModel"];
-    
-}
-
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
-{
-    NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
-	if([super inputValues]) [objDictionary setObject:inputValues forKey:@"inputValues"];
-    if([super scriptName])  [objDictionary setObject:scriptName forKey:@"scriptName"];
-    if([super lastFile]) [objDictionary setObject:lastFile forKey:@"lastFile"];
-    [dictionary setObject:objDictionary forKey:@"RunScript"];
-	return objDictionary;
-}
 
 
 - (void) setSelectorOK:(SEL)aSelectorOK bad:(SEL)aSelectorBAD withObject:(id)anObject target:(id)aTarget
@@ -161,19 +114,6 @@
 	target = nil;
 }
 
-- (void) shipTaskRecord:(id)aTask running:(BOOL)aState
-{
-    if(dataId!= -1){
-		unsigned long data[3];
-		data[0] = dataId | 3; 
-		data[1] = [self uniqueIdNumber]; 
-		data[2] = aState;
-		
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*3]];
-    }
-}
-
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -182,20 +122,5 @@
 }
 
 
-@end
-
-@implementation ORDecoderRunScript
-- (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
-{
-    unsigned long value = *((unsigned long*)someData);
-    return ExtractLength(value);
-}
-
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
-{
-    NSString* title= @"Script Task\n\n";
-    NSString* state = [NSString stringWithFormat:    @"Task %d State = %@\n",ptr[1],ptr[2]?@"Started":@"Stopped"];
-    return [NSString stringWithFormat:@"%@%@",title,state];               
-}
 @end
 
