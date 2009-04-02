@@ -561,7 +561,6 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 		}
 	}
 }
-
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -596,6 +595,18 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 }
 @end
 
+
+/*
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
+ -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length (fixed at 4)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^------------------------------------ Script Type 1==RunScript 2==TaskScript
+ -----------------------------------^^^^- Script Object ID number
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Unix Time (seconds from 1970)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Script state 1==started. 0==stopped
+*/
+
 @implementation ORScriptDecoderForState
 - (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
@@ -621,6 +632,22 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     return [NSString stringWithFormat:@"%@%@%@",title,state,date];               
 }
 @end
+
+
+/*
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
+ -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^------------------------------------ Script Type 1==RunScript 2==TaskScript
+ -----------------------------------^^^^- Script Object ID number
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -Unix Time (seconds from 1970)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -An Arbitrary data tag (User specified)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx -length of xml data in bytes
+ ...
+ XML data follows									
+ ...
+ */
 
 @implementation ORScriptDecoderForRecord
 - (unsigned long) decodeData:(void*)someData  fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
