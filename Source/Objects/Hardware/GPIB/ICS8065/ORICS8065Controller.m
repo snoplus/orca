@@ -171,6 +171,7 @@
     long	maxLength = sizeof( data ) - 1;
     
     @try {
+		[self endEditing];
         returnLen =  [[self model] writeReadDevice:[primaryAddressPU indexOfSelectedItem] 
 										   command:[model command]
 											  data:&data[0]
@@ -220,6 +221,7 @@
 - (IBAction) write: (id) aSender
 {
     @try {
+		[self endEditing];
         [[self model] writeToDevice: [primaryAddressPU indexOfSelectedItem]
 							command: [model command]];
 		
