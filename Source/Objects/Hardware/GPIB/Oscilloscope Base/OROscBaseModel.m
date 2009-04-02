@@ -76,7 +76,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
     [[ self undoManager ] disableUndoRegistration ];
     
 	// Initialize channel parameters.
-    for ( i = 0; i < kMaxOscChnls; i++ )
+    for ( i = 0; i < [self numberChannels]; i++ )
     {
         [ self setChnlAcquire: i setting: kDefaultAcquire ];
         [ self setChnlCoupling: i coupling: kChnlCouplingDC50Index ];
@@ -118,6 +118,12 @@ NSString*	OROscChnl								= @"Osc Chnl";
 }
 
 #pragma mark ***Accessors
+
+- (int)     numberChannels
+{
+	return kMaxOscChnls;
+}
+
 //--------------------------------------------------------------------------------
 /*!\method  scopeType  
 * \brief	Returns the scope type.
@@ -795,7 +801,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 	[ self oscSetQueryFormat: kLongLabel ]; 
     
 	//	Get channel settings
-	for ( i = 0; i < kMaxOscChnls; i++ )
+	for ( i = 0; i < [self numberChannels]; i++ )
 	{
 		[ self oscGetChnlAcquire: i ];
 		//		if ( [ self chnlAcquire: i ] )
@@ -860,7 +866,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 		
         //	Set channel settings
         [ self oscSetChnlAcquire];
-        for ( i = 0; i < kMaxOscChnls; i++ )
+        for ( i = 0; i < [self numberChannels]; i++ )
 		{
             if ( [ self chnlAcquire: i ] )
 			{
@@ -978,7 +984,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 - (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo: (id) userInfo 
 {
     int i;
-    for(i=0;i<kMaxOscChnls;i++){
+    for(i=0;i<[self numberChannels];i++){
         eventCount[i]= 0;
     }
   
@@ -1086,7 +1092,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
     NSString*		errorMsg;    
     bool			bRetVal = false;
     
-    if ( aChnl > -1 && aChnl < kMaxOscChnls ) 
+    if ( aChnl > -1 && aChnl < [self numberChannels] ) 
         bRetVal = true;
 	
 	// Raise error if channel number is bad.
@@ -1136,7 +1142,7 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
 	
 	// Retrieve the parameters
 	// Retrieve channel parameters.
-    for ( i = 0; i < kMaxOscChnls; i++ ){
+    for ( i = 0; i < [self numberChannels]; i++ ){
         [self setChnlAcquire:i setting:[aDecoder decodeBoolForKey:[NSString stringWithFormat: OROscAcqChnl, i]]];
         [self setChnlCoupling:i coupling:[aDecoder decodeIntForKey:[NSString stringWithFormat: OROscCouplingChnl, i]]];
         [self setChnlPos:i position:[aDecoder decodeFloatForKey:[NSString stringWithFormat: OROscPosChnl, i]]];
@@ -1179,7 +1185,7 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
     [ super encodeWithCoder: anEncoder ];
     
 	// Save the channel parameters
-    for ( i = 0; i < kMaxOscChnls; i++ ){
+    for ( i = 0; i < [self numberChannels]; i++ ){
         [anEncoder encodeBool: [self chnlAcquire: i]    forKey: [ NSString stringWithFormat: OROscAcqChnl, i ]];
         [anEncoder encodeInt: [self chnlCoupling: i]    forKey: [ NSString stringWithFormat: OROscCouplingChnl, i ]];
         [anEncoder encodeFloat: [self chnlPos: i]       forKey: [ NSString stringWithFormat: OROscPosChnl, i ]];
@@ -1206,20 +1212,20 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
     NSMutableArray* array;
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
     int i;
-    array = [NSMutableArray arrayWithCapacity:kMaxOscChnls];
-    for ( i = 0; i < kMaxOscChnls; i++ ) [array addObject:[NSNumber numberWithBool:[self chnlAcquire: i]]];
+    array = [NSMutableArray arrayWithCapacity:[self numberChannels]];
+    for ( i = 0; i < [self numberChannels]; i++ ) [array addObject:[NSNumber numberWithBool:[self chnlAcquire: i]]];
     [objDictionary setObject:array forKey:@"chnlAcquire"];
     
-    array = [NSMutableArray arrayWithCapacity:kMaxOscChnls];
-    for ( i = 0; i < kMaxOscChnls; i++ ) [array addObject:[NSNumber numberWithInt:[self chnlCoupling: i]]];
+    array = [NSMutableArray arrayWithCapacity:[self numberChannels]];
+    for ( i = 0; i < [self numberChannels]; i++ ) [array addObject:[NSNumber numberWithInt:[self chnlCoupling: i]]];
     [objDictionary setObject:array forKey:@"chnlCoupling"];
     
-    array = [NSMutableArray arrayWithCapacity:kMaxOscChnls];
-	for ( i = 0; i < kMaxOscChnls; i++ ) [array addObject:[NSNumber numberWithFloat:[self chnlPos: i]]];
+    array = [NSMutableArray arrayWithCapacity:[self numberChannels]];
+	for ( i = 0; i < [self numberChannels]; i++ ) [array addObject:[NSNumber numberWithFloat:[self chnlPos: i]]];
     [objDictionary setObject:array forKey:@"chnlPos"];
 	
-    array = [NSMutableArray arrayWithCapacity:kMaxOscChnls];
-	for ( i = 0; i < kMaxOscChnls; i++ ) [array addObject:[NSNumber numberWithFloat:[self chnlScale: i]]];
+    array = [NSMutableArray arrayWithCapacity:[self numberChannels]];
+	for ( i = 0; i < [self numberChannels]; i++ ) [array addObject:[NSNumber numberWithFloat:[self chnlScale: i]]];
     [objDictionary setObject:array forKey:@"chnlScale"];
 	
     [objDictionary setObject:[NSNumber numberWithFloat:[self horizontalPos]] forKey:@"horizontalPos"];

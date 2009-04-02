@@ -249,7 +249,7 @@
     [ super updateWindow ];
     
     // Loop through all vertical scale parameters and reset them.
-    for ( i = 0; i < kMaxOscChnls; i++ ){
+    for ( i = 0; i < [model numberChannels]; i++ ){
         
         // Create dictionary item with channel number.
         NSMutableDictionary* userInfo = [ NSMutableDictionary dictionary ];

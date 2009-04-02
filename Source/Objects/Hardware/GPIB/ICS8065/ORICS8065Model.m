@@ -127,7 +127,8 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 
 - (NSString*) command
 {
-    return command;
+	if(!command)return @"";
+    else return command;
 }
 
 - (void) setCommand:(NSString*)aCommand
@@ -180,7 +181,8 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 
 - (NSString*) ipAddress
 {
-    return ipAddress;
+	if(!ipAddress)return @"";
+    else return ipAddress;
 }
 
 - (void) setIpAddress:(NSString*)aIpAddress
@@ -480,7 +482,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     if ( ! [self isEnabled]) return;
     @try {
         // Handle the master error register and extract error.
-        [theHWLock unlock];   //-----end critical section
+        //[theHWLock unlock];   //-----end critical section
         [aMsg appendString: [NSString stringWithFormat:  @" e = %d < ", anErrorNum]];
         
         NSMutableString *errorType = [[NSMutableString alloc] initWithFormat: @""];
@@ -495,7 +497,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         [errorType release];
         
 		
-        [theHWLock unlock];   //-----end critical section
+        //[theHWLock unlock];   //-----end critical section
 		// Call ibonl to take the device and interface offline
 		//    ibonl( Device, 0 );
 		//    ibonl( BoardIndex, 0 );

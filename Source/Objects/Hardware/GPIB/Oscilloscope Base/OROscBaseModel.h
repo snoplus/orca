@@ -136,7 +136,7 @@ typedef struct Channels {
 - (unsigned long) scopeVersion;
 
 #pragma mark ***Accessors
-
+- (int)     numberChannels;
 - (bool) 	chnlAcquire: (short) aChnl;
 - (void) 	setChnlAcquire: (short) aChnl setting: (bool) aState;
 - (short)	chnlCoupling: (short) aChnl;

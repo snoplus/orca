@@ -147,6 +147,14 @@
 		840973630F81136F00036BE8 /* ORManualPlotModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8409735C0F81136F00036BE8 /* ORManualPlotModel.m */; };
 		840975E10F8242B300036BE8 /* ORIP408Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 840975DF0F8242B300036BE8 /* ORIP408Decoders.m */; };
 		840975E20F8242B300036BE8 /* ORIP408Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 840975E00F8242B300036BE8 /* ORIP408Decoders.h */; };
+		8409825D0F84EA5900036BE8 /* ORTek220.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840982550F84EA5900036BE8 /* ORTek220.nib */; };
+		8409825E0F84EA5900036BE8 /* ORTek220Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 840982560F84EA5900036BE8 /* ORTek220Controller.h */; };
+		8409825F0F84EA5900036BE8 /* ORTek220Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 840982570F84EA5900036BE8 /* ORTek220Controller.m */; };
+		840982600F84EA5900036BE8 /* ORTek220Data.h in Headers */ = {isa = PBXBuildFile; fileRef = 840982580F84EA5900036BE8 /* ORTek220Data.h */; };
+		840982610F84EA5900036BE8 /* ORTek220Data.m in Sources */ = {isa = PBXBuildFile; fileRef = 840982590F84EA5900036BE8 /* ORTek220Data.m */; };
+		840982620F84EA5900036BE8 /* ORTek220Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8409825A0F84EA5900036BE8 /* ORTek220Model.h */; };
+		840982630F84EA5900036BE8 /* ORTek220Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8409825B0F84EA5900036BE8 /* ORTek220Model.m */; };
+		840982680F84EC4700036BE8 /* Tek220.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840982670F84EC4700036BE8 /* Tek220.tif */; };
 		840AF86D0819924D005B750D /* SourceMask.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AF86B0819924D005B750D /* SourceMask.h */; };
 		840AF86E0819924D005B750D /* SourceMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AF86C0819924D005B750D /* SourceMask.m */; };
 		840B207C0B4D79400021220C /* NSScanner+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B207A0B4D79400021220C /* NSScanner+Extensions.h */; };
@@ -2203,6 +2211,14 @@
 		8409735C0F81136F00036BE8 /* ORManualPlotModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORManualPlotModel.m; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ORManualPlotModel.m"; sourceTree = SOURCE_ROOT; };
 		840975DF0F8242B300036BE8 /* ORIP408Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORIP408Decoders.m; path = Source/Objects/Hardware/Vme/IPCarrier/IP408/ORIP408Decoders.m; sourceTree = SOURCE_ROOT; };
 		840975E00F8242B300036BE8 /* ORIP408Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORIP408Decoders.h; path = Source/Objects/Hardware/Vme/IPCarrier/IP408/ORIP408Decoders.h; sourceTree = SOURCE_ROOT; };
+		840982550F84EA5900036BE8 /* ORTek220.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ORTek220.nib; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220.nib; sourceTree = SOURCE_ROOT; };
+		840982560F84EA5900036BE8 /* ORTek220Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTek220Controller.h; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220Controller.h; sourceTree = SOURCE_ROOT; };
+		840982570F84EA5900036BE8 /* ORTek220Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTek220Controller.m; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220Controller.m; sourceTree = SOURCE_ROOT; };
+		840982580F84EA5900036BE8 /* ORTek220Data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTek220Data.h; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220Data.h; sourceTree = SOURCE_ROOT; };
+		840982590F84EA5900036BE8 /* ORTek220Data.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTek220Data.m; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220Data.m; sourceTree = SOURCE_ROOT; };
+		8409825A0F84EA5900036BE8 /* ORTek220Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTek220Model.h; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220Model.h; sourceTree = SOURCE_ROOT; };
+		8409825B0F84EA5900036BE8 /* ORTek220Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTek220Model.m; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220Model.m; sourceTree = SOURCE_ROOT; };
+		840982670F84EC4700036BE8 /* Tek220.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Tek220.tif; path = Source/Objects/Hardware/GPIB/Tek220/Tek220.tif; sourceTree = SOURCE_ROOT; };
 		840AF86B0819924D005B750D /* SourceMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SourceMask.h; sourceTree = "<group>"; };
 		840AF86C0819924D005B750D /* SourceMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceMask.m; sourceTree = "<group>"; };
 		840B207A0B4D79400021220C /* NSScanner+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSScanner+Extensions.h"; path = "Source/Cocoa Extensions/NSScanner+Extensions.h"; sourceTree = SOURCE_ROOT; };
@@ -4422,6 +4438,22 @@
 			);
 			name = ManualPlot;
 			path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot";
+			sourceTree = SOURCE_ROOT;
+		};
+		840982540F84EA5900036BE8 /* Tek220 */ = {
+			isa = PBXGroup;
+			children = (
+				840982550F84EA5900036BE8 /* ORTek220.nib */,
+				840982560F84EA5900036BE8 /* ORTek220Controller.h */,
+				840982570F84EA5900036BE8 /* ORTek220Controller.m */,
+				840982580F84EA5900036BE8 /* ORTek220Data.h */,
+				840982590F84EA5900036BE8 /* ORTek220Data.m */,
+				8409825A0F84EA5900036BE8 /* ORTek220Model.h */,
+				8409825B0F84EA5900036BE8 /* ORTek220Model.m */,
+				840982670F84EC4700036BE8 /* Tek220.tif */,
+			);
+			name = Tek220;
+			path = Source/Objects/Hardware/GPIB/Tek220;
 			sourceTree = SOURCE_ROOT;
 		};
 		840B4BAB03D8754D005F64B1 /* Alarms */ = {
@@ -7630,6 +7662,7 @@
 				847D7A7104701EB6005F64B1 /* HPPulser */,
 				84C493AB04059AEA005F64B1 /* Oscilloscope T754D */,
 				8445147B0674DF9500A19654 /* Oscilloscope LC950 */,
+				840982540F84EA5900036BE8 /* Tek220 */,
 			);
 			path = GPIB;
 			sourceTree = "<group>";
@@ -9535,6 +9568,9 @@
 				840973600F81136F00036BE8 /* ORManualPlotController.h in Headers */,
 				840973620F81136F00036BE8 /* ORManualPlotModel.h in Headers */,
 				840975E20F8242B300036BE8 /* ORIP408Decoders.h in Headers */,
+				8409825E0F84EA5900036BE8 /* ORTek220Controller.h in Headers */,
+				840982600F84EA5900036BE8 /* ORTek220Data.h in Headers */,
+				840982620F84EA5900036BE8 /* ORTek220Model.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10135,6 +10171,8 @@
 				8409735D0F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist in Resources */,
 				8409735E0F81136F00036BE8 /* ManualPlot.nib in Resources */,
 				8409735F0F81136F00036BE8 /* ManualPlot.tif in Resources */,
+				8409825D0F84EA5900036BE8 /* ORTek220.nib in Resources */,
+				840982680F84EC4700036BE8 /* Tek220.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10831,6 +10869,9 @@
 				840973610F81136F00036BE8 /* ORManualPlotController.m in Sources */,
 				840973630F81136F00036BE8 /* ORManualPlotModel.m in Sources */,
 				840975E10F8242B300036BE8 /* ORIP408Decoders.m in Sources */,
+				8409825F0F84EA5900036BE8 /* ORTek220Controller.m in Sources */,
+				840982610F84EA5900036BE8 /* ORTek220Data.m in Sources */,
+				840982630F84EA5900036BE8 /* ORTek220Model.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
