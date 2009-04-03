@@ -30,7 +30,7 @@
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORTimeRate.h"
-#import "ORAxis.h"
+#import "NSNotifications+Extensions.h"
 
 NSString* ORJADCLModelPollingStateChanged = @"ORJADCLModelPollingStateChanged";
 NSString* ORJADCLModelLastReadChanged = @"ORJADCLModelLastReadChanged";
@@ -145,10 +145,9 @@ struct {
 
 - (void) setLastRead:(NSString*)aLastRead
 {
-    [lastRead autorelease];
-    lastRead = [aLastRead copy];    
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORJADCLModelLastReadChanged object:self];
+	[lastRead autorelease];
+	lastRead = [aLastRead copy];    
+	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORJADCLModelLastReadChanged object:self userInfo:nil waitUntilDone:NO]; 
 }
 
 - (int) rangeIndex
@@ -357,18 +356,19 @@ struct {
 
 - (void) readLimits
 {
-	unsigned short theLowLimit[16];
-	unsigned short theHighLimit[16];
-	NSLog(@"Lower and Upper limits for JADC-L (station %d)\n",[self stationNumber]);
-	int chan;
-	for(chan=0;chan<16;chan++){
-		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:4 data:&theLowLimit[chan]]; //read lower limit
-		[[self adapter] camacShortNAF:[self stationNumber] a:chan f:6 data:&theHighLimit[chan]]; //read lower limit
-	}
-	for(chan=0;chan<16;chan++){
-		NSLog(@"%2d:%.2f %.2f\n",chan,[self convertRawLimitToVolts:theLowLimit[chan]],[self convertRawLimitToVolts:theHighLimit[chan]]);
-	}
-	
+	@synchronized(self){
+		unsigned short theLowLimit[16];
+		unsigned short theHighLimit[16];
+		NSLog(@"Lower and Upper limits for JADC-L (station %d)\n",[self stationNumber]);
+		int chan;
+		for(chan=0;chan<16;chan++){
+			[[self adapter] camacShortNAF:[self stationNumber] a:chan f:4 data:&theLowLimit[chan]]; //read lower limit
+			[[self adapter] camacShortNAF:[self stationNumber] a:chan f:6 data:&theHighLimit[chan]]; //read lower limit
+		}
+		for(chan=0;chan<16;chan++){
+			NSLog(@"%2d:%.2f %.2f\n",chan,[self convertRawLimitToVolts:theLowLimit[chan]],[self convertRawLimitToVolts:theHighLimit[chan]]);
+		}
+	}	
 }
 
 - (float) convertRawAdcToVolts:(unsigned short)rawValue
@@ -456,15 +456,19 @@ struct {
 //note that everything called by these routines MUST be threadsafe
 - (void)processIsStarting
 {
-	[self initBoard];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[self setLastRead:@"Via Process Manager"];
+	@synchronized(self){
+		[self initBoard];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+		[self setLastRead:@"Via Process Manager"];
+	}
 }
 
 - (void)processIsStopping
 {
-	[self _setUpPolling];
-	[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
+	@synchronized(self){
+		[self _setUpPolling];
+		[self setLastRead:[[NSCalendarDate date] descriptionWithCalendarFormat:@"%m/%d/%y %H:%M:%S"]];
+	}
 }
 
 - (void) startProcessCycle
