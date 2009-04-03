@@ -58,15 +58,6 @@
 
 #pragma mark ¥¥¥Interface Management
 
-- (void) subRunCommentChanged:(NSNotification*)aNote
-{
-	//nothing to do right now
-}
-
-- (void) subRunNumberChanged:(NSNotification*)aNote
-{
-	//nothing to do right now
-}
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -81,15 +72,9 @@
                          name: ORRunRepeatRunChangedNotification
                        object: model];
     
-    
     [notifyCenter addObserver: self
-                     selector: @selector(timeLimitStepperChanged:)
-                         name: ORRunTimeLimitChangedNotification
-                       object: model];
-    
-    [notifyCenter addObserver: self
-                     selector: @selector(elapsedTimeChanged:)
-                         name: ORRunElapsedTimeChangedNotification
+                     selector: @selector(elapsedTimesChanged:)
+                         name: ORRunElapsedTimesChangedNotification
                        object: model];
     
     [notifyCenter addObserver: self
@@ -197,15 +182,11 @@
                      selector: @selector(shutDownScriptChanged:)
                          name: ORRunModelShutDownScriptChanged
                        object: nil];	
-    [notifyCenter addObserver : self
-                     selector : @selector(subRunNumberChanged:)
-                         name : ORRunModelSubRunNumberChanged
-						object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(subRunCommentChanged:)
-                         name : ORRunModelSubRunCommentChanged
-						object: model];
+    [notifyCenter addObserver: self
+                     selector: @selector(timeLimitChanged:)
+                         name: ORRunTimeLimitChangedNotification
+                       object: nil];	
 }
 
 
@@ -215,10 +196,9 @@
     [super updateWindow];
 	[self populatePopups];
     [self runStatusChanged:nil];
-    [self timeLimitStepperChanged:nil];
     [self timedRunChanged:nil];
     [self repeatRunChanged:nil];
-    [self elapsedTimeChanged:nil];
+    [self elapsedTimesChanged:nil];
     [self startTimeChanged:nil];
     [self runNumberChanged:nil];
     [self runNumberDirChanged:nil];
@@ -234,8 +214,7 @@
 	[self startUpScriptChanged:nil];
 	[self shutDownScriptChanged:nil];
 	[self vetosChanged:nil];
-	[self subRunNumberChanged:nil];
-	[self subRunCommentChanged:nil];
+	[self timeLimitChanged:nil];
 }
 
 
@@ -252,18 +231,13 @@
 	
 	[runModeMatrix setEnabled:![model remoteControl] && !running && [model runningState] != eRunStarting && [model runningState] != eRunStopping];
 
-	
     if([model remoteControl]){
         [startRunButton setEnabled:NO];
         [restartRunButton setEnabled:NO];
-        [restartRunButton1 setEnabled:NO];
-        [subRunButton setEnabled:NO];
         [stopRunButton setEnabled:NO];
         [timedRunCB setEnabled:NO];
         [repeatRunCB setEnabled:NO];
         [timeLimitField setEnabled:NO];
-        [timeLimitStepper setEnabled:NO];
-        //[runModeMatrix setEnabled:NO];
 		[quickStartCB setEnabled:NO];
 		[startUpScripts setEnabled:NO];
 		[shutDownScripts setEnabled:NO];
@@ -274,48 +248,50 @@
 		
         if([model runningState] == eRunInProgress){
             [startRunButton setEnabled:NO];
+            [endSubRunButton setEnabled:YES];
+            [startSubRunButton setEnabled:NO];
             [restartRunButton setEnabled:YES];
-            [restartRunButton1 setEnabled:YES];
-            if([model runType] & eSubRunType)[subRunButton setEnabled:YES];
-			else [subRunButton setEnabled:NO];
             [stopRunButton setEnabled:YES];
             [timedRunCB setEnabled:NO];
             [timeLimitField setEnabled:NO];
-            [timeLimitStepper setEnabled:NO];
-            //[runModeMatrix setEnabled:NO];
             [repeatRunCB setEnabled:[model timedRun]];
 			[startUpScripts setEnabled:NO];
 			[shutDownScripts setEnabled:NO];
         }
         else if([model runningState] == eRunStopped){
             [startRunButton setEnabled:anyVetos?NO:YES];
-            [restartRunButton setEnabled:NO];
-            [restartRunButton1 setEnabled:NO];
-			[subRunButton setEnabled:NO];
+            [endSubRunButton setEnabled:NO];
+			[startSubRunButton setEnabled:NO];
+			[restartRunButton setEnabled:NO];
 			[stopRunButton setEnabled:NO];
             [timedRunCB setEnabled:YES];
             [timeLimitField setEnabled:[model timedRun]];
-            [timeLimitStepper setEnabled:[model timedRun]];
-           // [runModeMatrix setEnabled:YES];
             [repeatRunCB setEnabled:[model timedRun]];
 			[startUpScripts setEnabled:YES];
 			[shutDownScripts setEnabled:YES];
         }
         else if([model runningState] == eRunStarting || [model runningState] == eRunStopping){
             [startRunButton setEnabled:NO];
-            [restartRunButton setEnabled:NO];
-            [restartRunButton1 setEnabled:NO];
-			[subRunButton setEnabled:NO];
+			[endSubRunButton setEnabled:NO];
+            [startSubRunButton setEnabled:NO];
+			[restartRunButton setEnabled:NO];
             [stopRunButton setEnabled:NO];
             [timedRunCB setEnabled:NO];
             [timeLimitField setEnabled:NO];
-            [timeLimitStepper setEnabled:NO];
-            //[runModeMatrix setEnabled:NO];
             [repeatRunCB setEnabled:NO];
 			[startUpScripts setEnabled:NO];
 			[shutDownScripts setEnabled:NO];
         }
+		else if([model runningState] == eRunBetweenSubRuns){
+			[endSubRunButton setEnabled:NO];
+            [startSubRunButton setEnabled:YES];
+		}
     }
+}
+
+- (void) timeLimitChanged:(NSNotification*)aNotification
+{
+	[timeLimitField setIntValue:[model timeLimit]];
 }
 
 - (void) startUpScriptChanged:(NSNotification*)aNotification
@@ -367,13 +343,17 @@
 		[remoteControlCB setEnabled:YES];
 		[lightBoardView setState:kStoppedLight];
 	}
-	else if([model runningState] == eRunStarting || [model runningState] == eRunStopping){
+	else if([model runningState] == eRunStarting || [model runningState] == eRunStopping || [model runningState] == eRunBetweenSubRuns){
 		[runProgress startAnimation:self];
 		if([model runningState] == eRunStarting)[statusField setStringValue:@"Starting.."];
-		else [statusField setStringValue:@"Stopping.."];
+		else {
+			if([model runningState] == eRunBetweenSubRuns)	[statusField setStringValue:@"Between Sub Runs.."];
+			else											[statusField setStringValue:@"Stopping.."];
+		}
 		[lightBoardView setState:kCautionLight];
 	}
     [self updateButtons];
+	[endOfRunStateField setStringValue:[model endOfRunState]];
     
 }
 
@@ -418,12 +398,6 @@
 	if([model dirName]!=nil)[runNumberDirField setStringValue: [model dirName]];
 }
 
-- (void) timeLimitStepperChanged:(NSNotification*)aNotification
-{
-	[self updateStepper:timeLimitStepper setting:[model timeLimit]];
-	[self updateIntText:timeLimitField setting:[model timeLimit]];
-}
-
 
 - (void) repeatRunChanged:(NSNotification*)aNotification
 {
@@ -438,20 +412,25 @@
 	[self updateTwoStateCheckbox:timedRunCB setting:[model timedRun]];
 	[repeatRunCB setEnabled: [model timedRun]];
 	[timeLimitField setEnabled:[model timedRun]];
-	[timeLimitStepper setEnabled:[model timedRun]];
+	[endOfRunStateField setStringValue:[model endOfRunState]];
 }
 
 
-- (void) elapsedTimeChanged:(NSNotification*)aNotification
+- (void) elapsedTimesChanged:(NSNotification*)aNotification
 {
-
-	[elapsedTimeField setStringValue:[model elapsedTimeString]];
+	[elapsedRunTimeField setStringValue:[model elapsedTimeString:[model elapsedRunTime]]];
+	[elapsedSubRunTimeField setStringValue:[model elapsedTimeString:[model elapsedSubRunTime]]];
+	if([model runningState] == eRunBetweenSubRuns){
+		[elapsedBetweenSubRunTimeField setStringValue:[model elapsedTimeString:[model elapsedBetweenSubRunTime]]];
+	}
+	else {
+		[elapsedBetweenSubRunTimeField setStringValue:@"---"];
+	}
 	[endOfRunStateField setStringValue:[model endOfRunState]];
-	
 	if([model timedRun]){
 		double timeLimit = [model timeLimit];
-		double elapsedTime = [model elapsedTime];
-		[runBar setDoubleValue:100*elapsedTime/timeLimit];
+		double elapsedRunTime = [model elapsedRunTime];
+		[runBar setDoubleValue:100*elapsedRunTime/timeLimit];
 	}
 	
 }
@@ -480,8 +459,6 @@
 	for(i=0;i<32;i++){
 		[[runTypeMatrix cellWithTag:i] setState:(runType &(1L<<i))!=0];
 	}
-	[usingSubRunsField setStringValue:([model runType] & eSubRunType)?@"YES":@"NO"];
-	[restartButtonsTab selectTabViewItemAtIndex:([model runType] & eSubRunType)?0:1];
 }
 
 - (void) remoteControlChanged:(NSNotification *)notification
@@ -535,6 +512,25 @@
 }
 
 #pragma  mark ¥¥¥Actions
+- (IBAction) startNewSubRunAction:(id)sender
+{
+	if(!wasInMaintenance){
+		[model setMaintenanceRuns:NO];
+	}
+	[model startNewSubRun];
+}
+
+- (IBAction) prepareForSubRunAction:(id)sender
+{
+	if([model runType] & eMaintenanceRunType){
+		wasInMaintenance = YES;
+	}
+	else {
+		wasInMaintenance = NO;
+		[model setMaintenanceRuns:YES];
+	}
+	[model prepareForNewSubRun];
+}
 
 - (IBAction) openStartScript:(id)sender
 {
@@ -561,9 +557,9 @@
 	[self endEditing];
 	[statusField setStringValue:@"Starting..."];
 	[startRunButton setEnabled:NO];
+	[endSubRunButton setEnabled:NO];
+	[startSubRunButton setEnabled:NO];
 	[restartRunButton setEnabled:NO];
-	[restartRunButton1 setEnabled:NO];
-	[subRunButton setEnabled:NO];
 	[stopRunButton setEnabled:NO];
 	[model performSelector:@selector(startRun)withObject:nil afterDelay:.1];
 }
@@ -574,28 +570,12 @@
     [statusField setStringValue:@"Restart..."];
     [startRunButton setEnabled:NO];
     [restartRunButton setEnabled:NO];
-    [restartRunButton1 setEnabled:NO];
- 	[subRunButton setEnabled:NO];
 	[stopRunButton setEnabled:NO];
+	[endSubRunButton setEnabled:YES];
+	[startSubRunButton setEnabled:NO];
     [model setForceRestart:YES];
-    [model setPrepareForNewSubRun:NO];
     [model performSelector:@selector(stopRun) withObject:nil afterDelay:0];
 }
-
-- (IBAction) newSubRunAction:(id)sender
-{
-    [self endEditing];
-    [statusField setStringValue:@"Restart..."];
-    [startRunButton setEnabled:NO];
-    [restartRunButton setEnabled:NO];
-    [restartRunButton1 setEnabled:NO];
-	[subRunButton setEnabled:NO];
-    [stopRunButton setEnabled:NO];
-    [model setForceRestart:YES];
-    [model setPrepareForNewSubRun:YES];
-    [model performSelector:@selector(stopRun) withObject:nil afterDelay:0];
-}
-
 
 - (IBAction) stopRunAction:(id)sender
 {
@@ -623,13 +603,6 @@
     }
 }
 
-- (IBAction) timeLimitStepperAction:(id)sender
-{
-    if([model timeLimit] != [sender intValue]){
-        [[self undoManager] setActionName: @"Set Run Time Limit"];
-        [model setTimeLimit:[sender intValue]];
-    }
-}
 
 - (IBAction) timeLimitTextAction:(id)sender
 {
@@ -760,7 +733,7 @@
 
 - (IBAction) clearRunTypeAction:(id)sender
 {
-    [model setRunType:[model runType] & (eMaintenanceRunType | eSubRunType)];
+    [model setRunType:[model runType] & (eMaintenanceRunType)];
 }
 
 - (IBAction) runNumberLockAction:(id)sender
@@ -850,12 +823,12 @@
     int n = [theNames count];
     int i;
     if(n){
-        for(i=2;i<n;i++){
+        for(i=1;i<n;i++){
             [[runTypeMatrix cellWithTag:i] setTitle:[theNames objectAtIndex:i]];
         }
     }
     else {
-        for(i=2;i<32;i++){
+        for(i=1;i<32;i++){
             [[runTypeMatrix cellWithTag:i] setTitle:[NSString stringWithFormat:@"Bit %d",i]];
         }
     }

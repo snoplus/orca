@@ -100,11 +100,11 @@
 				<string>id</string>
 				<key>newRunAction</key>
 				<string>id</string>
-				<key>newSubRunAction</key>
-				<string>id</string>
 				<key>openShutDownScript</key>
 				<string>id</string>
 				<key>openStartScript</key>
+				<string>id</string>
+				<key>prepareForSubRunAction</key>
 				<string>id</string>
 				<key>quickStartCBAction</key>
 				<string>id</string>
@@ -126,11 +126,11 @@
 				<string>id</string>
 				<key>selectStartUpScript</key>
 				<string>id</string>
+				<key>startNewSubRunAction</key>
+				<string>id</string>
 				<key>startRunAction</key>
 				<string>id</string>
 				<key>stopRunAction</key>
-				<string>id</string>
-				<key>timeLimitStepperAction</key>
 				<string>id</string>
 				<key>timeLimitTextAction</key>
 				<string>id</string>
@@ -147,10 +147,16 @@
 				<string>NSButton</string>
 				<key>definitionsFileTextField</key>
 				<string>NSTextField</string>
-				<key>elapsedTimeField</key>
+				<key>elapsedBetweenSubRunTimeField</key>
+				<string>NSTextField</string>
+				<key>elapsedRunTimeField</key>
+				<string>NSTextField</string>
+				<key>elapsedSubRunTimeField</key>
 				<string>NSTextField</string>
 				<key>endOfRunStateField</key>
 				<string>NSTextField</string>
+				<key>endSubRunButton</key>
+				<string>NSButton</string>
 				<key>lightBoardView</key>
 				<string>StopLightView</string>
 				<key>listVetosButton</key>
@@ -165,11 +171,7 @@
 				<string>NSButton</string>
 				<key>repeatRunCB</key>
 				<string>NSButton</string>
-				<key>restartButtonsTab</key>
-				<string>NSTabView</string>
 				<key>restartRunButton</key>
-				<string>NSButton</string>
-				<key>restartRunButton1</key>
 				<string>NSButton</string>
 				<key>runBar</key>
 				<string>NSProgressIndicator</string>
@@ -211,6 +213,8 @@
 				<string>NSPopUpButton</string>
 				<key>startRunButton</key>
 				<string>NSButton</string>
+				<key>startSubRunButton</key>
+				<string>NSButton</string>
 				<key>startUpScriptStateField</key>
 				<string>NSTextField</string>
 				<key>startUpScripts</key>
@@ -219,20 +223,14 @@
 				<string>NSTextField</string>
 				<key>stopRunButton</key>
 				<string>NSButton</string>
-				<key>subRunButton</key>
-				<string>NSButton</string>
 				<key>timeLimitField</key>
 				<string>NSTextField</string>
-				<key>timeLimitStepper</key>
-				<string>NSStepper</string>
 				<key>timeStartedField</key>
 				<string>NSTextField</string>
 				<key>timeToGoField</key>
 				<string>NSTextField</string>
 				<key>timedRunCB</key>
 				<string>NSButton</string>
-				<key>usingSubRunsField</key>
-				<string>NSTextField</string>
 				<key>vetoCountField</key>
 				<string>NSTextField</string>
 				<key>vetoedTextField</key>

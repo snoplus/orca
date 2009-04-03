@@ -33,12 +33,12 @@ enum eRunState{
     eRunInProgress,
     eRunStarting,
     eRunStopping,
+    eRunBetweenSubRuns,
     kNumRunStates //must be last
 };
 
 typedef enum eRunType {
     eMaintenanceRunType = (1 << 0),
-    eSubRunType			= (1 << 1),
 }eRunType;
 
 

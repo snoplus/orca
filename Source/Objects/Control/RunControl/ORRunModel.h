@@ -35,10 +35,14 @@
         unsigned long 	runNumber;
 
         NSCalendarDate* startTime;
+		NSCalendarDate* subRunStartTime;
+		NSCalendarDate* subRunEndTime;
         NSTimer* 		timer;
         NSTimer* 		heartBeatTimer;
 
-        NSTimeInterval  elapsedTime;
+		NSTimeInterval  elapsedRunTime;
+		NSTimeInterval  elapsedSubRunTime;
+		NSTimeInterval	elapsedBetweenSubRunTime;
         NSTimeInterval  timeToGo;
         NSTimeInterval  timeLimit;
         BOOL            timedRun;
@@ -56,17 +60,16 @@
         unsigned long	exceptionCount;
 
         BOOL			forceFullInit;
-		BOOL			_newSubRun;
 		BOOL			_forceRestart;
 		BOOL			_ignoreMode;
 		BOOL			_wasQuickStart;
 		BOOL			_nextRunWillQuickStart;
 		BOOL			_ignoreRunTimeout;
 		unsigned long	_currentRun;
+		BOOL			_betweenSubRuns;
         int				runningState;
         ORDataTypeAssigner* dataTypeAssigner;
 		unsigned long lastRunNumberShipped;
-		unsigned long lastSubRunNumberShipped;
         NSMutableArray* runTypeNames;
         BOOL        remoteInterface;
 		BOOL		runPaused;
@@ -85,7 +88,6 @@
 		NSString* startScriptState;
 		NSString* shutDownScriptState;
 		int subRunNumber;
-		NSString* subRunComment;
 }
 
 
@@ -93,8 +95,6 @@
 - (void) makeConnectors;
 
 #pragma mark ¥¥¥Accessors
-- (NSString*) subRunComment;
-- (void) setSubRunComment:(NSString*)aSubRunComment;
 - (int) subRunNumber;
 - (void) setSubRunNumber:(int)aSubRunNumber;
 - (NSString*) shutDownScriptState;
@@ -116,11 +116,20 @@
 - (unsigned long)   runNumber;
 - (void)	    setRunNumber:(unsigned long)aRunNumber;
 - (NSString*) startTimeAsString;
+- (NSCalendarDate*) subRunStartTime;
+- (void)	setSubRunStartTime:(NSCalendarDate*) aDate;
+- (NSCalendarDate*) subRunEndTime;
+- (void)	setSubRunEndTime:(NSCalendarDate*) aDate;
+- (NSString*) elapsedTimeString:(NSTimeInterval) aTimeInterval;
 - (NSCalendarDate*) startTime;
 - (void)	setStartTime:(NSCalendarDate*) aDate;
-- (NSTimeInterval)  elapsedTime;
-- (NSString*) elapsedTimeString;
-- (void)	setElapsedTime:(NSTimeInterval) aValue;
+- (NSTimeInterval)  elapsedRunTime;
+- (void)	setElapsedRunTime:(NSTimeInterval) aValue;
+- (NSTimeInterval)  elapsedSubRunTime;
+- (void)	setElapsedSubRunTime:(NSTimeInterval) aValue;
+- (NSTimeInterval)  elapsedBetweenSubRunTime;
+- (void)	setElapsedBetweenSubRunTime:(NSTimeInterval) aValue;
+
 - (NSTimeInterval)  timeToGo;
 - (void)	setTimeToGo:(NSTimeInterval) aValue;
 - (BOOL)	timedRun;
@@ -146,7 +155,6 @@
 - (int)		runningState;
 - (void)	setRunningState:(int)aRunningState;
 - (void)	setForceRestart:(BOOL)aState;
-- (void)	setPrepareForNewSubRun:(BOOL)aState;
 - (BOOL)	quickStart;
 - (void)	setQuickStart:(BOOL)flag;
 - (NSString *)  definitionsFilePath;
@@ -157,7 +165,6 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setOfflineRun:(BOOL)flag;
 - (BOOL) offlineRun;
-- (void) setUseSubRuns:(BOOL)aState;
 - (void) setMaintenanceRuns:(BOOL)aState;
 
 #pragma mark ¥¥¥Run Modifiers
@@ -171,9 +178,11 @@
 - (void) startRun:(BOOL)doInit;
 - (void) startRun;
 - (void) restartRun;
-- (void) restartSubRun;
 - (void) stopRun;
 - (void) haltRun;
+
+- (void) prepareForNewSubRun;
+- (void) startNewSubRun;
 
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSDictionary*) dataRecordDescription;
@@ -225,8 +234,6 @@
 - (BOOL) doneTakingData;
 @end
 
-extern NSString* ORRunModelSubRunCommentChanged;
-extern NSString* ORRunModelSubRunNumberChanged;
 extern NSString* ORRunModelShutDownScriptStateChanged;
 extern NSString* ORRunModelStartScriptStateChanged;
 extern NSString* ORRunModelShutDownScriptChanged;
@@ -234,7 +241,7 @@ extern NSString* ORRunModelStartScriptChanged;
 extern NSString* ORRunTimedRunChangedNotification;
 extern NSString* ORRunRepeatRunChangedNotification;
 extern NSString* ORRunTimeLimitChangedNotification;
-extern NSString* ORRunElapsedTimeChangedNotification;
+extern NSString* ORRunElapsedTimesChangedNotification;
 extern NSString* ORRunStartTimeChangedNotification;
 extern NSString* ORRunTimeToGoChangedNotification;
 extern NSString* ORRunNumberChangedNotification;

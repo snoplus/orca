@@ -626,6 +626,11 @@
                     if([sname hasSuffix:@"Record"] && ![sname hasSuffix:@" Record"]){
 						sname = [sname substringToIndex:[sname length]-7];
 					}
+					else if([sname hasSuffix:@"Run"]){
+						sname = [sname substringToIndex:[sname length]-3];
+						sname = [sname stringByAppendingString:@"Control"];
+					}
+					
                     [nameCatalog setObject:sname forKey:aKey]; 
                     shortName = sname;
                 }

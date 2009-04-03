@@ -250,7 +250,7 @@
 
    [notifyCenter addObserver: self
                      selector: @selector(elapsedTimeChanged:)
-                         name: ORRunElapsedTimeChangedNotification
+                         name: ORRunElapsedTimesChangedNotification
                        object: nil];
 
     [notifyCenter addObserver : self
@@ -331,12 +331,12 @@
 -(void) elapsedTimeChanged:(NSNotification*)aNotification
 {
 
-	if(runControl)[elapsedTimeField setStringValue:[runControl elapsedTimeString]];
+	if(runControl)[elapsedTimeField setStringValue:[runControl elapsedTimeString:[model elapsedRunTime]]];
 	else [elapsedTimeField setStringValue:@"---"];
 	if([runControl timedRun]){
 		double timeLimit = [runControl timeLimit];
-		double elapsedTime = [runControl elapsedTime];
-		[runBar setDoubleValue:100*elapsedTime/timeLimit];
+		double elapsedRunTime = [runControl elapsedRunTime];
+		[runBar setDoubleValue:100*elapsedRunTime/timeLimit];
 	}
 }
 

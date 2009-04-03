@@ -27,29 +27,29 @@
     IBOutlet NSButton*  runNumberButton;
     IBOutlet NSButton*  runTypeButton;
     
-    IBOutlet NSTabView* restartButtonsTab;
     IBOutlet NSButton*  startRunButton;
     IBOutlet NSButton*  restartRunButton;
-    IBOutlet NSButton*  restartRunButton1;
-    IBOutlet NSButton*  subRunButton;
     IBOutlet NSButton*  stopRunButton;
     IBOutlet NSButton*  remoteControlCB;
     IBOutlet NSButton*  quickStartCB;
-    
+
+	IBOutlet NSButton*  endSubRunButton;
+	IBOutlet NSButton*  startSubRunButton;
+	
     IBOutlet NSProgressIndicator* 	runProgress;
     IBOutlet NSProgressIndicator* 	runBar;
-    IBOutlet NSTextField*		runNumberField;
+    IBOutlet NSTextField*			runNumberField;
     
     IBOutlet NSButton*      timedRunCB;
     IBOutlet NSButton*      repeatRunCB;
     IBOutlet NSTextField*   timeLimitField;
-    IBOutlet NSStepper*     timeLimitStepper;
     IBOutlet NSMatrix*      runModeMatrix;
     
-    IBOutlet NSTextField* usingSubRunsField;
     IBOutlet NSTextField* statusField;
     IBOutlet NSTextField* timeStartedField;
-    IBOutlet NSTextField* elapsedTimeField;
+    IBOutlet NSTextField* elapsedRunTimeField;
+    IBOutlet NSTextField* elapsedSubRunTimeField;
+    IBOutlet NSTextField* elapsedBetweenSubRunTimeField;
     IBOutlet NSTextField* endOfRunStateField;
     IBOutlet NSTextField* timeToGoField;
     IBOutlet NSTextField* vetoCountField;
@@ -78,16 +78,15 @@
     IBOutlet NSTextField*   shutDownScriptStateField;
 	
     BOOL retainingRunNotice;
+	BOOL wasInMaintenance;
     
 }
 
 #pragma  mark ¥¥¥Actions
 - (IBAction) startRunAction:(id)sender;
 - (IBAction) newRunAction:(id)sender;
-- (IBAction) newSubRunAction:(id)sender;
 - (IBAction) stopRunAction:(id)sender;
 - (IBAction) remoteControlAction:(id)sender;
-- (IBAction) timeLimitStepperAction:(id)sender;
 - (IBAction) timeLimitTextAction:(id)sender;
 - (IBAction) timedRunCBAction:(id)sender;
 - (IBAction) repeatRunCBAction:(id)sender;
@@ -105,19 +104,19 @@
 - (IBAction) selectShutDownScript:(id)sender;
 - (IBAction) openStartScript:(id)sender;
 - (IBAction) openShutDownScript:(id)sender;
+- (IBAction) startNewSubRunAction:(id)sender;
+- (IBAction) prepareForSubRunAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
-- (void) subRunCommentChanged:(NSNotification*)aNote;
-- (void) subRunNumberChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) registerNotificationObservers;
+- (void) timeLimitChanged:(NSNotification*)aNote;
 - (void) startUpScriptStateChanged:(NSNotification*)aNote;
 - (void) shutDownScriptStateChanged:(NSNotification*)aNote;
 - (void) runStatusChanged:(NSNotification*)aNote;
-- (void) timeLimitStepperChanged:(NSNotification*)aNote;
 - (void) timedRunChanged:(NSNotification*)aNote;
 - (void) repeatRunChanged:(NSNotification*)aNote;
-- (void) elapsedTimeChanged:(NSNotification*)aNote;
+- (void) elapsedTimesChanged:(NSNotification*)aNote;
 - (void) startTimeChanged:(NSNotification*)aNote;
 - (void) timeToGoChanged:(NSNotification*)aNote;
 - (void) runNumberChanged:(NSNotification*)aNote;

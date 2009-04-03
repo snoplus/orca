@@ -28,7 +28,8 @@ NSString* runState[kNumRunStates] ={
     @"Stoppped",
     @"Running",
     @"Run Starting",
-    @"Run Stopping"
+	@"Run Stopping",
+	@"Bewteen Sub Runs"
 };
 //--------------------------------------------------------
 //--------------------------------------------------------
@@ -169,30 +170,33 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 - (NSString*) runModeString
 {
-    switch(runMode){
+	if(runInProgress == eRunStopped)		return  @"";
+	else if(runInProgress == eRunStopping)	return  @"Run Stopping";
+	else  switch(runMode){
         case kOfflineRun:
             return @"Running Offline.";
-            break;
+		break;
             
         default:
         case kNormalRun:	
 		{
-			NSString* rs = @"Run In Progress.";
+			NSString* rs;
+			if(runInProgress == eRunBetweenSubRuns) rs= @"Between Sub Runs.";
+			else {
+				rs= @"Run In Progress.";
+			}
             if(runType){
 				if(runType & eMaintenanceRunType){
 					rs = [rs stringByAppendingString:@" Maintenance."];
 				}
-				if(runType & eSubRunType){
-					rs = [rs stringByAppendingString:@" SubRun."];
-				}
 
-                if(runType & ~(eMaintenanceRunType | eSubRunType)){
-                   rs = [rs stringByAppendingFormat:@" Mask: 0x%X",runType & ~(eMaintenanceRunType | eSubRunType)];
+                if(runType & ~eMaintenanceRunType){
+                   rs = [rs stringByAppendingFormat:@" Mask: 0x%X",runType & ~eMaintenanceRunType];
                 }
             }
 			return rs;
 		}
-            break;
+		break;
     }
 }
 
@@ -222,6 +226,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 - (void) setRunInProgress:(BOOL)state
 {
     runInProgress = state;
+	[[[NSApp delegate] document] setStatusText:[self runModeString]];
 }
 
 - (unsigned long)runType {
