@@ -527,7 +527,7 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     }
 }
 
-- (void) shipDataRecord:(id)someData idNumber:(unsigned long)anID
+- (void) shipDataRecord:(id)someData tag:(unsigned long)anID
 {
     if([gOrcaGlobals runInProgress]){
 		if([someData respondsToSelector:@selector(description)]){

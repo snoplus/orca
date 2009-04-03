@@ -107,7 +107,7 @@
 - (void) syncDataIdsWith:(id)anotherObj;
 - (NSDictionary*) dataRecordDescription;
 - (void) shipTaskRecord:(id)aTask running:(BOOL)aState;
-- (void) shipDataRecord:(id)someData idNumber:(unsigned long)anID;
+- (void) shipDataRecord:(id)someData tag:(unsigned long)anID;
 - (int) scriptType;
 
 @end
