@@ -184,15 +184,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 			if(runInProgress == eRunBetweenSubRuns) rs= @"Between Sub Runs.";
 			else {
 				rs= @"Run In Progress.";
-			}
-            if(runType){
-				if(runType & eMaintenanceRunType){
-					rs = [rs stringByAppendingString:@" Maintenance."];
-				}
+			
+				if(runType){
+					if(runType & eMaintenanceRunType){
+						rs = [rs stringByAppendingString:@" Maintenance."];
+					}
 
-                if(runType & ~eMaintenanceRunType){
-                   rs = [rs stringByAppendingFormat:@" Mask: 0x%X",runType & ~eMaintenanceRunType];
-                }
+					if(runType & ~eMaintenanceRunType){
+						rs = [rs stringByAppendingFormat:@" Mask: 0x%X",runType & ~eMaintenanceRunType];
+					}
+				}
             }
 			return rs;
 		}
