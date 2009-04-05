@@ -145,9 +145,11 @@ struct {
 
 - (void) setLastRead:(NSString*)aLastRead
 {
-	[lastRead autorelease];
-	lastRead = [aLastRead copy];    
-	[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORJADCLModelLastReadChanged object:self userInfo:nil waitUntilDone:YES]; 
+	@synchronized(self){
+		[lastRead autorelease];
+		lastRead = [aLastRead copy];    
+		[[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORJADCLModelLastReadChanged object:self userInfo:nil waitUntilDone:YES]; 
+	}
 }
 
 - (int) rangeIndex
