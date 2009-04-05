@@ -187,6 +187,17 @@
                      selector: @selector(timeLimitChanged:)
                          name: ORRunTimeLimitChangedNotification
                        object: nil];	
+
+    [notifyCenter addObserver: self
+                     selector: @selector(drawerDidOpen:)
+                         name: NSDrawerDidOpenNotification
+                       object: nil];	
+	
+    [notifyCenter addObserver: self
+                     selector: @selector(drawerDidClose:)
+                         name: NSDrawerDidCloseNotification
+                       object: nil];	
+	
 }
 
 
@@ -797,6 +808,7 @@
 
 - (void) drawerDidOpen:(NSNotification *)notification
 {
+	
     if([notification object] == runNumberDrawer){
         [runNumberButton setTitle:@"Close"];
         [runTypeDrawer close];
