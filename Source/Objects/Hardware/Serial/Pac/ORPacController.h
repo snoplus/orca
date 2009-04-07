@@ -24,24 +24,20 @@
 @interface ORPacController : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
-	IBOutlet NSButton*		shipAdcsButton;
+	IBOutlet NSTextField*	preAmpTextField;
+	IBOutlet NSTextField*	moduleTextField;
+	IBOutlet NSTextField*	dacValueField;
+	IBOutlet NSTextField*	dacChannelField;
     IBOutlet NSButton*      lockButton;
-    IBOutlet NSButton*      portDButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
-    IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      readAdcsButton;
     IBOutlet NSMatrix*      adcMatrix;
-    IBOutlet NSMatrix*      adc1Matrix;
     IBOutlet NSMatrix*      timeMatrix;
-	IBOutlet ORPlotter1D*   plotter0;
-    IBOutlet NSMatrix*      portDMatrix;
-	IBOutlet NSMatrix*		dacMatrix;
     IBOutlet NSButton*      readDacButton;
     IBOutlet NSButton*      writeDacButton;
-    IBOutlet NSButton*      setLcmEnaButton;
-    IBOutlet NSButton*      clrLcmEnaButton;
+    IBOutlet NSMatrix*      lcmEnabledMatrix;
 }
 
 #pragma mark •••Initialization
@@ -54,35 +50,29 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
-- (void) updateTimePlot:(NSNotification*)aNote;
-- (void) scaleAction:(NSNotification*)aNote;
-- (void) shipAdcsChanged:(NSNotification*)aNote;
+- (void) lcmEnabledChanged:(NSNotification*)aNote;
+- (void) preAmpChanged:(NSNotification*)aNote;
+- (void) moduleChanged:(NSNotification*)aNote;
+- (void) dacValueChanged:(NSNotification*)aNote;
+- (void) dacChannelChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
 - (void) adcChanged:(NSNotification*)aNote;
-- (void) dacChanged:(NSNotification*)aNote;
-- (void) pollTimeChanged:(NSNotification*)aNote;
-- (void) miscAttributesChanged:(NSNotification*)aNote;
-- (void) scaleAction:(NSNotification*)aNote;
 - (void) loadAdcTimeValuesForIndex:(int)index;
-- (void) portDMaskChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) shipAdcsAction:(id)sender;
+- (IBAction) preAmpAction:(id)sender;
+- (IBAction) moduleAction:(id)sender;
+- (IBAction) dacValueAction:(id)sender;
+- (IBAction) dacChannelAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) readAdcsAction:(id)sender;
-- (IBAction) pollTimeAction:(id)sender;
-- (IBAction) portDAction:(id) sender;
-- (IBAction) dacAction:(id) sender;
-- (IBAction) writePortDAction:(id) sender;
-- (IBAction) dacAction:(id)sender;
 - (IBAction) readDacAction:(id)sender;
 - (IBAction) writeDacAction:(id)sender;
-- (IBAction) setLcmEnaAction:(id)sender;
-- (IBAction) clrLcmEnaAction:(id)sender;
+- (IBAction) lcmEnabledAction:(id)sender;
 
 @end
 

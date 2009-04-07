@@ -28,14 +28,17 @@
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
+NSString* ORPacModelLcmEnabledChanged	= @"ORPacModelLcmEnabledChanged";
+NSString* ORPacModelPreAmpChanged		= @"ORPacModelPreAmpChanged";
+NSString* ORPacModelModuleChanged		= @"ORPacModelModuleChanged";
+NSString* ORPacModelDacValueChanged		= @"ORPacModelDacValueChanged";
+NSString* ORPacModelDacChannelChanged	= @"ORPacModelDacChannelChanged";
 NSString* ORPacModelShipAdcsChanged		= @"ORPacModelShipAdcsChanged";
 NSString* ORPacModelPollTimeChanged		= @"ORPacModelPollTimeChanged";
 NSString* ORPacModelSerialPortChanged	= @"ORPacModelSerialPortChanged";
 NSString* ORPacModelPortNameChanged		= @"ORPacModelPortNameChanged";
 NSString* ORPacModelPortStateChanged	= @"ORPacModelPortStateChanged";
 NSString* ORPacModelAdcChanged			= @"ORPacModelAdcChanged";
-NSString* ORPacModelPortDMaskChanged	= @"ORPacModelPortDMaskChanged";
-NSString* ORPacModelDacChanged			= @"ORPacModelDacChanged";
 NSString* ORPacLock						= @"ORPacLock";
 
 @interface ORPacModel (private)
@@ -66,10 +69,6 @@ NSString* ORPacLock						= @"ORPacLock";
         [serialPort close];
     }
     [serialPort release];
-	int i;
-	for(i=0;i<8;i++){
-		[timeRates[i] release];
-	}
 
 	[super dealloc];
 }
@@ -117,7 +116,6 @@ NSString* ORPacLock						= @"ORPacLock";
 		int i;
 		for(i=0;i<8;i++){
 			data[index++] = adc[i];
-			data[index++] = timeMeasured[i];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 															object:[NSData dataWithBytes:&data length:sizeof(long)*18]];
@@ -127,62 +125,89 @@ NSString* ORPacLock						= @"ORPacLock";
 
 #pragma mark •••Accessors
 
-- (ORTimeRate*)timeRate:(int)index
+- (BOOL) lcmEnabled
 {
-	return timeRates[index];
+    return lcmEnabled;
 }
 
-- (BOOL) shipAdcs
+- (void) setLcmEnabled:(BOOL)aLcmEnabled
 {
-    return shipAdcs;
-}
-
-- (void) setShipAdcs:(BOOL)aShipAdcs
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setShipAdcs:shipAdcs];
+    [[[self undoManager] prepareWithInvocationTarget:self] setLcmEnabled:lcmEnabled];
     
-    shipAdcs = aShipAdcs;
+    lcmEnabled = aLcmEnabled;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelShipAdcsChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelLcmEnabledChanged object:self];
 }
 
-- (int) pollTime
+- (int) preAmp
 {
-    return pollTime;
+    return preAmp;
 }
 
-- (void) setPollTime:(int)aPollTime
+- (void) setPreAmp:(int)aPreAmp
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
-    pollTime = aPollTime;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPollTimeChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setPreAmp:preAmp];
+    
+    preAmp = aPreAmp;
 
-	if(pollTime){
-		[self performSelector:@selector(pollAdcs) withObject:nil afterDelay:2];
-	}
-	else {
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollAdcs) object:nil];
-	}
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPreAmpChanged object:self];
 }
 
-- (void) pollAdcs
+- (int) module
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollAdcs) object:nil];
-	[self readAdcs];
-	
-	[self performSelector:@selector(pollAdcs) withObject:nil afterDelay:pollTime];
+    return module;
 }
+
+- (void) setModule:(int)aModule
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setModule:module];
+    
+    module = aModule;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelModuleChanged object:self];
+}
+
+- (int) dacValue
+{
+    return dacValue;
+}
+
+- (void) setDacValue:(int)aDacValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacValue:dacValue];
+    
+    dacValue = aDacValue;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacValueChanged object:self];
+}
+
+- (int) dacChannel
+{
+    return dacChannel;
+}
+
+- (void) setDacChannel:(int)aDacChannel
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDacChannel:dacChannel];
+    
+    dacChannel = aDacChannel;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacChannelChanged object:self];
+}
+
+
+
+- (float) convertedAdc:(int)index
+{
+	if(index>=0 && index<8)return 0.0;
+	else return 5.0 * adc[index]/65535.0;
+}
+
 
 - (unsigned short) adc:(int)index
 {
 	if(index>=0 && index<8)return adc[index];
 	else return 0.0;
-}
-
-- (unsigned long) timeMeasured:(int)index
-{
-	if(index>=0 && index<8)return timeMeasured[index];
-	else return 0;
 }
 
 - (void) setAdc:(int)index value:(unsigned short)aValue;
@@ -194,30 +219,14 @@ NSString* ORPacLock						= @"ORPacLock";
 		time(&theTime);
 		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		timeMeasured[index] = mktime(theTimeGMTAsStruct);
-
+		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAdcChanged 
 															object:self 
 														userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"]];
 
-		if(timeRates[index] == nil) timeRates[index] = [[ORTimeRate alloc] init];
-		[timeRates[index] addDataToTimeAverage:aValue];
 
 	}
 }
-
-- (unsigned short) dac:(int)index
-{
-	return dac[index];
-}
-
-- (void) setDac:(int)index value:(unsigned short)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setDac:index value:dac[index]];
-	dac[index] = aValue;
-	NSDictionary* chanInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacChanged object:self userInfo:chanInfo];
-}
-
 
 - (NSData*) lastRequest
 {
@@ -293,10 +302,11 @@ NSString* ORPacLock						= @"ORPacLock";
 {
     if(state) {
 		[serialPort setSpeed:9600];
-		[serialPort setParityOdd];
-		[serialPort setStopBits2:1];
-		[serialPort setDataBits:7];
+		[serialPort setParityNone];
+		[serialPort setStopBits2:NO];
+		[serialPort setDataBits:8];
         [serialPort open];
+		[serialPort setDelegate:self];
     }
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
@@ -304,172 +314,105 @@ NSString* ORPacLock						= @"ORPacLock";
     
 }
 
-- (void) setPortDMask:(unsigned char)aMask
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setPortDMask:portDMask];
-	portDMask	 = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelPortDMaskChanged object:self];
-}
-
-- (BOOL) portDBit:(int)i
-{
-	return (portDMask & (1<<i)) != 0;
-}
-
-- (void) writePortD
-{
-	[self enqueWritePortD];
-}
-
-- (void) setLcmEna
-{
-	[self enqueSetLcmEna:YES];
-}
-
-- (void) clrLcmEna
-{
-	[self enqueSetLcmEna:NO];
-}
-
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setShipAdcs:	[decoder decodeBoolForKey:		 @"shipAdcs"]];
-	[self setPollTime:		[decoder decodeIntForKey:	 @"pollTime"]];
+	[self setLcmEnabled:	[decoder decodeBoolForKey:@"ORPacModelLcmEnabled"]];
+	[self setPreAmp:		[decoder decodeIntForKey:@"ORPacModelPreAmp"]];
+	[self setModule:		[decoder decodeIntForKey:@"ORPacModelModule"]];
+	[self setDacValue:		[decoder decodeIntForKey:@"dacValue"]];
+	[self setDacChannel:	[decoder decodeIntForKey:@"dacChannel"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[[self undoManager] enableUndoRegistration];
-	int i;
-	for(i=0;i<8;i++){
-		timeRates[i] = [[ORTimeRate alloc] init];
-	}
     [self registerNotificationObservers];
 
 	return self;
 }
+
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeBool:shipAdcs		forKey: @"shipAdcs"];
-    [encoder encodeInt: pollTime		forKey: @"pollTime"];
+    [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
+    [encoder encodeInt:preAmp			forKey:@"ORPacModelPreAmp"];
+    [encoder encodeInt:module			forKey:@"ORPacModelModule"];
+    [encoder encodeInt:dacValue			forKey: @"dacValue"];
+    [encoder encodeInt:dacChannel		forKey: @"dacChannel"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
 }
 
 #pragma mark ••• Commands
 
-- (void) enqueSetLcmEna:(BOOL)state
+- (void) enqueLcmEnable:(BOOL)state
 {
     if([serialPort isOpen]){ 
-		
+		char cmdData[2];
+		cmdData[0] = kPacLcmEnaCmd;
+		cmdData[1] = (state?kPacLcmEnaSet:kPacLcmEnaClr);
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		
-		NSMutableData* cmd = [NSMutableData data];
-		char theCommand = kPacLcmEnaCmd;
-		[cmd appendBytes:&theCommand length:1];
-		char stateWord = (state?kPacLcmEnaSet:kPacLcmEnaClr);
-		[cmd appendBytes:&stateWord length:1];
-		[cmdQueue addObject:cmd];
-		
+		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:2]];
+				
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
 }
+
 - (void) enqueReadADC:(int)aChannel
 {
     if([serialPort isOpen]){ 
-		
+		char cmdData[4];
+		cmdData[0] = 0x02; //module select
+		cmdData[1] = (module << 3) | (preAmp & 0x7);
+		cmdData[2] = 0x1;		
+		cmdData[3] = aChannel;
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		
-		NSMutableData* cmd = [NSMutableData data];
-		char theCommand = kPacADCmd;
-		[cmd appendBytes:&theCommand length:1];
-		[cmd appendBytes:&aChannel length:1];
-		[cmdQueue addObject:cmd];
+		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:2]];
 		
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
 }
 
-- (void) enqueWritePortD
+- (void) enqueWriteDac
 {
     if([serialPort isOpen]){ 
 		
+		char cmdData[5];
+		cmdData[0] = kPacRDacCmd;
+		cmdData[1] = kPacRDacWriteOneRDac;
+		cmdData[2] = module<<3 | preAmp;
+		cmdData[3] = dacValue>>8;
+		cmdData[4] = dacValue&0xff;
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		
-		NSMutableData* cmd = [NSMutableData data];
-		char theCommand = kPacSelCmd;
-		[cmd appendBytes:&theCommand length:1];
-		[cmd appendBytes:&portDMask length:1];
-		[cmdQueue addObject:cmd];
+		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:5]];
 		
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
 }
 
-
-- (void) enqueWriteDac:(int)aChannel
+- (void) enqueReadDac
 {
     if([serialPort isOpen]){ 
-		
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 
-		NSMutableData* cmd = [NSMutableData data];
-		//put in the cmd
-		char theCommand = kPacRDacCmd;
-		[cmd appendBytes:&theCommand length:1];
-		//put in the cmd that specifies R/W
-		theCommand = kPacRDacWriteOneRDac;
-		[cmd appendBytes:&theCommand length:1];
-		//select the channel
-		[cmd appendBytes:&aChannel length:1];
-		//put in the data
-		char msb = dac[aChannel]>>8;
-		char lsb = dac[aChannel]&0xff;
-		[cmd appendBytes:&msb length:1];
-		[cmd appendBytes:&lsb length:1];
-		
-		[cmdQueue addObject:cmd];
+		char cmdData[3];
+		cmdData[0] = kPacRDacCmd;
+		cmdData[1] = kPacRDacReadOneRDac;
+		cmdData[2] = module<<3 | preAmp;
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:3]];
 		
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
 }
-
-- (void) enqueReadDac:(int)aChannel
-{
-    if([serialPort isOpen]){ 
-		
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		
-		NSMutableData* cmd = [NSMutableData data];
-		//put in the cmd
-		char theCommand = kPacRDacCmd;
-		[cmd appendBytes:&theCommand length:1];
-		//put in the cmd that specifies R/W	
-		theCommand = kPacRDacReadOneRDac;
-		[cmd appendBytes:&theCommand length:1];
-		//select the channel		
-		[cmd appendBytes:&aChannel length:1];
-				
-		[cmdQueue addObject:cmd];
-		
-		if(!lastRequest)[self processOneCommandFromQueue];
-	}
-}
-
-
 
 - (void) enqueShipCmd
 {
     if([serialPort isOpen]){ 
 		
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		
-		NSMutableData* cmd = [NSMutableData data];
 		char theCommand = kPacShipAdcs;
-		[cmd appendBytes:&theCommand length:1];
-		[cmdQueue addObject:cmd];
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		[cmdQueue addObject:[NSData dataWithBytes:&theCommand length:1]];
 		
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
@@ -477,6 +420,7 @@ NSString* ORPacLock						= @"ORPacLock";
 
 - (void) readAdcs
 {
+	[self enqueLcmEnable:[self lcmEnabled]];
 	int i;
 	for(i=0;i<8;i++){
 		[self enqueReadADC:i];
@@ -484,20 +428,14 @@ NSString* ORPacLock						= @"ORPacLock";
 	[self enqueShipCmd];
 }
 
-- (void) writeDacs
+- (void) writeDac
 {
-	int i;
-	for(i=0;i<8;i++){
-		[self enqueWriteDac:i];
-	}
+	[self enqueWriteDac];
 }
 
-- (void) readDacs
+- (void) readDac
 {
-	int i;
-	for(i=0;i<8;i++){
-		[self enqueReadDac:i];
-	}
+	[self enqueReadDac];
 }
 
 #pragma mark •••Data Records
@@ -537,17 +475,7 @@ NSString* ORPacLock						= @"ORPacLock";
     return dataDictionary;
 }
 
-- (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
-{
-    NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-	NSMutableArray* dacArray = [NSArray array];
-	int i;
-	for(i=0;i<8;i++){
-		[dacArray addObject:[NSNumber numberWithShort:dac[i]]];
-    }
-	[objDictionary setObject:dacArray forKey:@"dacs"];
-    return objDictionary;
-}
+
 
 - (void) dataReceived:(NSNotification*)note
 {
@@ -584,10 +512,9 @@ NSString* ORPacLock						= @"ORPacLock";
 				if(theCmd[1] == kPacRDacReadOneRDac){
 					if([inComingData length] == 3) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-						short theChannel = theCmd[1] & 0x7;
 						short msb		 = theData[0];
 						short lsb		 = theData[1];
-						if(theData[2] == kPacOkByte) [self setDac:theChannel value: msb<<8 | lsb];
+						if(theData[2] == kPacOkByte) [self setDacValue: msb<<8 | lsb];
 						else						 NSLogError(@"PAC",@"DAC !OK",nil);
 						done = YES;
 					}
@@ -607,15 +534,23 @@ NSString* ORPacLock						= @"ORPacLock";
 					done = YES;
 				}
 			break;
-				
 		}
 		
 		if(done){
+			[inComingData release];
+			inComingData = nil;
 			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 			[self setLastRequest:nil];			 //clear the last request
 			[self processOneCommandFromQueue];	 //do the next command in the queue
 		}
 	}
+}
+
+- (unsigned long) timeMeasured:(int)index
+{
+	if(index<0)return 0;
+	else if(index>=8)return 0;
+	else return timeMeasured[index];
 }
 
 @end
@@ -632,6 +567,7 @@ NSString* ORPacLock						= @"ORPacLock";
 
 - (void) timeout
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	NSLogError(@"PAC",@"command timeout",nil);
 	[self setLastRequest:nil];
 	[self processOneCommandFromQueue];	 //do the next command in the queue
@@ -644,11 +580,13 @@ NSString* ORPacLock						= @"ORPacLock";
 	[cmdQueue removeObjectAtIndex:0];
 	unsigned char* cmd = (unsigned char*)[cmdData bytes];
 	if(cmd[0] == kPacShipAdcs){
-		if(shipAdcs) [self shipAdcValues];
+		[self shipAdcValues];
 	}
 	else {
 		[self setLastRequest:cmdData];
-		[serialPort writeDataInBackground:cmdData];
+		NSString* s = [[NSString alloc] initWithData:cmdData encoding:NSUTF8StringEncoding];
+		[serialPort writeString:s];
+		[s release];
 		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
 	}
 }

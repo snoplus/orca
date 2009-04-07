@@ -51,14 +51,7 @@
 - (void) awakeFromNib
 {
     [self populatePortListPopup];
-    [[plotter0 yScale] setRngLow:0.0 withHigh:1000.];
-	[[plotter0 yScale] setRngLimitsLow:0.0 withHigh:100000 withMinRng:10];
-	[plotter0 setDrawWithGradient:YES];
-
-    [[plotter0 xScale] setRngLow:0.0 withHigh:10000];
-	[[plotter0 xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
-
-	OHexFormatter *numberFormatter = [[[OHexFormatter alloc] init] autorelease];
+	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 	int i;
 	for(i=0;i<8;i++){
 		NSCell* theCell = [adcMatrix cellAtRow:i column:0];
@@ -98,43 +91,32 @@
                      selector : @selector(adcChanged:)
                          name : ORPacModelAdcChanged
                        object : nil];
-
+		
     [notifyCenter addObserver : self
-                     selector : @selector(pollTimeChanged:)
-                         name : ORPacModelPollTimeChanged
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(shipAdcsChanged:)
-                         name : ORPacModelShipAdcsChanged
+                     selector : @selector(dacChannelChanged:)
+                         name : ORPacModelDacChannelChanged
 						object: model];
 
     [notifyCenter addObserver : self
-					 selector : @selector(scaleAction:)
-						 name : ORAxisRangeChangedNotification
-					   object : nil];
+                     selector : @selector(dacValueChanged:)
+                         name : ORPacModelDacValueChanged
+						object: model];
 
     [notifyCenter addObserver : self
-					 selector : @selector(miscAttributesChanged:)
-						 name : ORMiscAttributesChanged
-					   object : model];
+                     selector : @selector(moduleChanged:)
+                         name : ORPacModelModuleChanged
+						object: model];
 
     [notifyCenter addObserver : self
-					 selector : @selector(updateTimePlot:)
-						 name : ORRateAverageChangedNotification
-					   object : nil];
-	
+                     selector : @selector(preAmpChanged:)
+                         name : ORPacModelPreAmpChanged
+						object: model];
+
     [notifyCenter addObserver : self
-					 selector : @selector(portDMaskChanged:)
-						 name : ORPacModelPortDMaskChanged
-					   object : model];
-	
-    [notifyCenter addObserver : self
-					 selector : @selector(dacChanged:)
-						 name : ORPacModelDacChanged
-					   object : model];
-	
-		
+                     selector : @selector(lcmEnabledChanged:)
+                         name : ORPacModelLcmEnabledChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -150,69 +132,36 @@
     [self portStateChanged:nil];
     [self portNameChanged:nil];
 	[self adcChanged:nil];
-	[self dacChanged:nil];
-	[self pollTimeChanged:nil];
-	[self portDMaskChanged:nil];
-	[self shipAdcsChanged:nil];
-	[self updateTimePlot:nil];
-    [self miscAttributesChanged:nil];
+	[self dacChannelChanged:nil];
+	[self dacValueChanged:nil];
+	[self moduleChanged:nil];
+	[self preAmpChanged:nil];
+	[self lcmEnabledChanged:nil];
 }
 
-- (void) scaleAction:(NSNotification*)aNotification
+- (void) lcmEnabledChanged:(NSNotification*)aNote
 {
-	if(aNotification == nil || [aNotification object] == [plotter0 xScale]){
-		[model setMiscAttributes:[[plotter0 xScale]attributes] forKey:@"XAttributes0"];
-	};
-	
-	if(aNotification == nil || [aNotification object] == [plotter0 yScale]){
-		[model setMiscAttributes:[[plotter0 yScale]attributes] forKey:@"YAttributes0"];
-	};
-
+	[lcmEnabledMatrix selectCellWithTag: [model lcmEnabled]];
 }
 
-- (void) miscAttributesChanged:(NSNotification*)aNote
+- (void) preAmpChanged:(NSNotification*)aNote
 {
-
-	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
-	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
-	
-	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
-		if(attrib){
-			[[plotter0 xScale] setAttributes:attrib];
-			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 xScale] setNeedsDisplay:YES];
-		}
-	}
-	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
-		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
-		if(attrib){
-			[[plotter0 yScale] setAttributes:attrib];
-			[plotter0 setNeedsDisplay:YES];
-			[[plotter0 yScale] setNeedsDisplay:YES];
-		}
-	}
-
+	[preAmpTextField setIntValue: [model preAmp]];
 }
 
-- (void) updateTimePlot:(NSNotification*)aNote
+- (void) moduleChanged:(NSNotification*)aNote
 {
-	if(!aNote || ([aNote object] == [model timeRate:0])){
-		[plotter0 setNeedsDisplay:YES];
-	}
+	[moduleTextField setIntValue: [model module]];
 }
 
-- (void) portDMaskChanged:(NSNotification*)aNote
+- (void) dacValueChanged:(NSNotification*)aNote
 {
-	int i;
-	for(i=0;i<8;i++){
-		[[portDMatrix cellWithTag:i] setIntValue: [model portDBit:i]];
-	}
+	[dacValueField setIntValue: [model dacValue]];
 }
 
-- (void) shipAdcsChanged:(NSNotification*)aNote
+- (void) dacChannelChanged:(NSNotification*)aNote
 {
-	[shipAdcsButton setIntValue: [model shipAdcs]];
+	[dacChannelField setIntValue: [model dacChannel]];
 }
 
 - (void) adcChanged:(NSNotification*)aNote
@@ -229,25 +178,11 @@
 	}
 }
 
-- (void) dacChanged:(NSNotification*)aNote
-{
-	if(aNote){
-		int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
-		[[dacMatrix cellWithTag:index] setIntValue:[model dac:index]];
-	}
-	else {
-		int i;
-		for(i=0;i<8;i++){
-			[[dacMatrix cellWithTag:i] setIntValue:[model dac:i]];
-		}
-	}
-}
 
 
 - (void) loadAdcTimeValuesForIndex:(int)index
 {
-	[[adcMatrix cellWithTag:index] setIntValue:[model adc:index]];
-	[[adc1Matrix cellWithTag:index] setIntValue:[model adc:index]];
+	[[adcMatrix cellWithTag:index] setFloatValue:[model convertedAdc:index]];
 	unsigned long t = [model timeMeasured:index];
 	NSCalendarDate* theDate;
 	if(t){
@@ -256,6 +191,7 @@
 		[[timeMatrix cellWithTag:index] setObjectValue:theDate];
 	}
 	else [[timeMatrix cellWithTag:index] setObjectValue:@"--"];
+	
 }
 
 - (void) checkGlobalSecurity
@@ -276,16 +212,12 @@
 
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
-    [pollTimePopup setEnabled:!locked];
-    [shipAdcsButton setEnabled:!locked];
-    [portDMatrix setEnabled:!locked];
-    [dacMatrix setEnabled:!locked];
+    [dacValueField setEnabled:!locked];
+    [dacChannelField setEnabled:!locked];
     [readDacButton setEnabled:!locked];
     [writeDacButton setEnabled:!locked];
     [readAdcsButton setEnabled:!locked];
-    [portDButton setEnabled:!locked];
-    [setLcmEnaButton setEnabled:!locked];
-    [clrLcmEnaButton setEnabled:!locked];
+    [lcmEnabledMatrix setEnabled:!locked];
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -321,11 +253,6 @@
     }
 }
 
-- (void) pollTimeChanged:(NSNotification*)aNotification
-{
-	[pollTimePopup selectItemWithTag:[model pollTime]];
-}
-
 - (void) portNameChanged:(NSNotification*)aNotification
 {
     NSString* portName = [model portName];
@@ -345,34 +272,41 @@
 
 
 #pragma mark •••Actions
+- (void) lcmEnabledAction:(id)sender
+{
+	[model setLcmEnabled:[[sender selectedCell]tag]];	
+}
+
+- (void) preAmpAction:(id)sender
+{
+	[model setPreAmp:[sender intValue]];	
+}
+
+- (void) moduleAction:(id)sender
+{
+	[model setModule:[sender intValue]];	
+}
+
+- (void) dacValueAction:(id)sender
+{
+	[model setDacValue:[sender intValue]];	
+}
+
+- (void) dacChannelAction:(id)sender
+{
+	[model setDacChannel:[sender intValue]];	
+}
+
 - (IBAction) readDacAction:(id)sender
 {
-	[model readDacs];
-}
-
-- (IBAction) setLcmEnaAction:(id)sender
-{
-	[model setLcmEna];
-}
-
-- (IBAction) clrLcmEnaAction:(id)sender
-{
-	[model clrLcmEna];
+	[self endEditing];
+	[model readDac];
 }
 
 - (IBAction) writeDacAction:(id)sender
 {
-	[model readDacs];
-}
-
-- (IBAction) dacAction:(id)sender
-{
-	[model setDac:[[sender selectedCell] tag] value:[sender intValue]];
-}
-
-- (IBAction) shipAdcsAction:(id)sender
-{
-	[model setShipAdcs:[sender intValue]];	
+	[self endEditing];
+	[model readDac];
 }
 
 - (IBAction) lockAction:(id) sender
@@ -392,65 +326,8 @@
 
 - (IBAction) readAdcsAction:(id)sender
 {
+	[self endEditing];
 	[model readAdcs];
-}
-
-- (IBAction) pollTimeAction:(id)sender
-{
-	[model setPollTime:[[sender selectedItem] tag]];
-}
-- (IBAction) portDAction:(id)sender
-{
-	unsigned char mask = 0;
-	int i;
-	for(i=0;i<8;i++){
-		if([[portDMatrix cellWithTag:i] intValue])mask |= (1<<i);
-	}
-	[model setPortDMask:mask];
-}
-
-- (IBAction) writePortDAction:(id) sender
-{
-	[model writePortD];
-}
-
-#pragma mark •••Data Source
-- (BOOL) willSupplyColors
-{
-	return YES;
-}
-
-- (NSColor*) colorForDataSet:(int)set
-{
-	if(set==0)return [NSColor redColor];
-	else if(set==1)return [NSColor orangeColor];
-	else return [NSColor blackColor];
-}
-
-
-- (int) numberOfDataSetsInPlot:(id)aPlotter
-{
-    return 2;
-}
-
-- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
-{
-	if(aPlotter == plotter0) return [[model timeRate:set] count];
-	else return 0;
-}
-
-- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
-{
-	if(aPlotter == plotter0){
-		int count = [[model timeRate:set] count];
-		return [[model timeRate:set] valueAtIndex:count-x-1];
-	}
-	else return 0;
-}
-
-- (unsigned long)  	secondsPerUnit:(id) aPlotter
-{
-	return [[model timeRate:0] sampleTime]; //all should be the same, just return value for rate 0
 }
 
 @end

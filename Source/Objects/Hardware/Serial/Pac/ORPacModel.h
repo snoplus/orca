@@ -20,7 +20,6 @@
 #pragma mark •••Imported Files
 
 @class ORSerialPort;
-@class ORTimeRate;
 
 #define kPacShipAdcs	0xff
 
@@ -28,6 +27,7 @@
 #define kPacADCmd		0x01    //--II.
 #define kPacSelCmd		0x02	//--III.
 #define kPacLcmEnaCmd	0x04	//-->IV.
+#define kPacAdcCmd		0x04	//-->IV.
 #define kPacRDacCmd		0x10	//-->V.
 //followed by zero or more bytes
 
@@ -60,15 +60,15 @@
         unsigned long		dataId;
 		NSData*				lastRequest;
 		NSMutableArray*		cmdQueue;
-		unsigned short		adc[8];
 		unsigned long		timeMeasured[8];
-		int					pollTime;
         NSMutableString*    buffer;
-		BOOL				shipAdcs;
-		ORTimeRate*			timeRates[8];
+		unsigned short		adc[8];
 		NSMutableData*		inComingData;
-		unsigned char		portDMask;
-		unsigned short		dac[8];
+		int					dacValue;
+		int					dacChannel;
+		int					module;
+		int					preAmp;
+		BOOL				lcmEnabled;
 }
 
 #pragma mark •••Initialization
@@ -80,11 +80,16 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
-- (ORTimeRate*)timeRate:(int)index;
-- (BOOL) shipAdcs;
-- (void) setShipAdcs:(BOOL)aShipAdcs;
-- (int)  pollTime;
-- (void) setPollTime:(int)aPollTime;
+- (BOOL) lcmEnabled;
+- (void) setLcmEnabled:(BOOL)aLcmEnabled;
+- (int) preAmp;
+- (void) setPreAmp:(int)aPreAmp;
+- (int) module;
+- (void) setModule:(int)aModule;
+- (int) dacValue;
+- (void) setDacValue:(int)aDacValue;
+- (int) dacChannel;
+- (void) setDacChannel:(int)aDacChannel;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
@@ -97,10 +102,7 @@
 - (unsigned short) adc:(int)index;
 - (unsigned long) timeMeasured:(int)index;
 - (void) setAdc:(int)index value:(unsigned short)aValue;
-- (void) setPortDMask:(unsigned char)aMask;
-- (BOOL) portDBit:(int)i;
-- (unsigned short) dac:(int)index;
-- (void) setDac:(int)index value:(unsigned short)aValue;
+- (float) convertedAdc:(int)index;
 
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
@@ -109,19 +111,15 @@
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherPac;
-- (void) writePortD;
-- (void) writeDacs;
-- (void) readDacs;
+- (void) writeDac;
+- (void) readDac;
 - (void) shipAdcValues;
-- (void) setLcmEna;
-- (void) clrLcmEna;
 
 #pragma mark •••Commands
 - (void) enqueReadADC:(int)aChannel;
-- (void) enqueWritePortD;
-- (void) enqueWriteDac:(int)aChannel;
-- (void) enqueReadDac:(int)aChannel;
-- (void) enqueSetLcmEna:(BOOL)state;
+- (void) enqueWriteDac;
+- (void) enqueReadDac;
+- (void) enqueLcmEnable:(BOOL)state;
 
 - (void) enqueShipCmd;
 - (void) readAdcs;
@@ -132,12 +130,13 @@
 @end
 
 
-extern NSString* ORPacModelShipAdcsChanged;
-extern NSString* ORPacModelPollTimeChanged;
+extern NSString* ORPacModelLcmEnabledChanged;
+extern NSString* ORPacModelPreAmpChanged;
+extern NSString* ORPacModelModuleChanged;
+extern NSString* ORPacModelDacValueChanged;
+extern NSString* ORPacModelDacChannelChanged;
 extern NSString* ORPacModelSerialPortChanged;
 extern NSString* ORPacLock;
 extern NSString* ORPacModelPortNameChanged;
 extern NSString* ORPacModelPortStateChanged;
 extern NSString* ORPacModelAdcChanged;
-extern NSString* ORPacModelPortDMaskChanged;
-extern NSString* ORPacModelDacChanged;
