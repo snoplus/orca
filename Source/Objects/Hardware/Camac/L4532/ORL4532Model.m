@@ -441,6 +441,7 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 		
 		if(isQbitSet([controller camacShortNAF:cachedStation a:0 f:8])){
 
+			[controller setCrateInhibit:YES];
 			//data is ready to be readout
 			unsigned short bits1_16 = 0;
 			unsigned short bits17_32 = 0;
@@ -489,6 +490,8 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
 			}
 			//clear memory and LAM
 			[controller camacShortNAF:cachedStation a:0 f:9];
+			[controller setCrateInhibit:NO];
+
 		}
 	}
 	@catch(NSException* localException) {
