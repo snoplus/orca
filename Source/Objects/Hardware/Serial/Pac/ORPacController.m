@@ -52,6 +52,7 @@
 {
     [self populatePortListPopup];
 	NSNumberFormatter *numberFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+	[numberFormatter setFormat:@"0.00"];
 	int i;
 	for(i=0;i<8;i++){
 		NSCell* theCell = [adcMatrix cellAtRow:i column:0];
@@ -93,11 +94,6 @@
                        object : nil];
 		
     [notifyCenter addObserver : self
-                     selector : @selector(dacChannelChanged:)
-                         name : ORPacModelDacChannelChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(dacValueChanged:)
                          name : ORPacModelDacValueChanged
 						object: model];
@@ -117,6 +113,11 @@
                          name : ORPacModelLcmEnabledChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(rdacChannelChanged:)
+                         name : ORPacModelRdacChannelChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -132,11 +133,16 @@
     [self portStateChanged:nil];
     [self portNameChanged:nil];
 	[self adcChanged:nil];
-	[self dacChannelChanged:nil];
 	[self dacValueChanged:nil];
 	[self moduleChanged:nil];
 	[self preAmpChanged:nil];
 	[self lcmEnabledChanged:nil];
+	[self rdacChannelChanged:nil];
+}
+
+- (void) rdacChannelChanged:(NSNotification*)aNote
+{
+	[rdacChannelTextField setIntValue: [model rdacChannel]];
 }
 
 - (void) lcmEnabledChanged:(NSNotification*)aNote
@@ -157,11 +163,6 @@
 - (void) dacValueChanged:(NSNotification*)aNote
 {
 	[dacValueField setIntValue: [model dacValue]];
-}
-
-- (void) dacChannelChanged:(NSNotification*)aNote
-{
-	[dacChannelField setIntValue: [model dacChannel]];
 }
 
 - (void) adcChanged:(NSNotification*)aNote
@@ -213,12 +214,13 @@
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [dacValueField setEnabled:!locked];
-    [dacChannelField setEnabled:!locked];
+    [rdacChannelTextField setEnabled:!locked];
     [readDacButton setEnabled:!locked];
 	[writeLcmButton setEnabled:!locked];
     [writeDacButton setEnabled:!locked];
     [readAdcsButton setEnabled:!locked];
     [lcmEnabledMatrix setEnabled:!locked];
+    [selectModuleButton setEnabled:!locked];
 	
     NSString* s = @"";
     if(lockedOrRunningMaintenance){
@@ -272,34 +274,34 @@
 }
 
 #pragma mark •••Actions
-- (void) writeLcmEnabledAction:(id)sender
+
+- (IBAction) rdacChannelAction:(id)sender
+{
+	[model setRdacChannel:[sender intValue]];	
+}
+- (IBAction) writeLcmEnabledAction:(id)sender
 {
 	[model enqueLcmEnable];	
 }
 
-- (void) lcmEnabledAction:(id)sender
+- (IBAction) lcmEnabledAction:(id)sender
 {
 	[model setLcmEnabled:[[sender selectedCell]tag]];	
 }
 
-- (void) preAmpAction:(id)sender
+- (IBAction) preAmpAction:(id)sender
 {
 	[model setPreAmp:[sender intValue]];	
 }
 
-- (void) moduleAction:(id)sender
+- (IBAction) moduleAction:(id)sender
 {
 	[model setModule:[sender intValue]];	
 }
 
-- (void) dacValueAction:(id)sender
+- (IBAction) dacValueAction:(id)sender
 {
 	[model setDacValue:[sender intValue]];	
-}
-
-- (void) dacChannelAction:(id)sender
-{
-	[model setDacChannel:[sender intValue]];	
 }
 
 - (IBAction) readDacAction:(id)sender
@@ -311,7 +313,7 @@
 - (IBAction) writeDacAction:(id)sender
 {
 	[self endEditing];
-	[model readDac];
+	[model writeDac];
 }
 
 - (IBAction) lockAction:(id) sender
@@ -333,6 +335,12 @@
 {
 	[self endEditing];
 	[model readAdcs];
+}
+
+- (IBAction) selectModuleAction:(id)sender
+{
+	[self endEditing];
+	[model selectModule];
 }
 
 @end

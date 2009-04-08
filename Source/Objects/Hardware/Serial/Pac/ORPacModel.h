@@ -27,7 +27,6 @@
 #define kPacADCmd		0x01    //--II.
 #define kPacSelCmd		0x02	//--III.
 #define kPacLcmEnaCmd	0x04	//-->IV.
-#define kPacAdcCmd		0x04	//-->IV.
 #define kPacRDacCmd		0x10	//-->V.
 //followed by zero or more bytes
 
@@ -65,10 +64,10 @@
 		unsigned short		adc[8];
 		NSMutableData*		inComingData;
 		int					dacValue;
-		int					dacChannel;
 		int					module;
 		int					preAmp;
 		BOOL				lcmEnabled;
+		int					rdacChannel;
 }
 
 #pragma mark •••Initialization
@@ -80,6 +79,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (int) rdacChannel;
+- (void) setRdacChannel:(int)aRdacChannel;
 - (BOOL) lcmEnabled;
 - (void) setLcmEnabled:(BOOL)aLcmEnabled;
 - (int) preAmp;
@@ -88,8 +89,6 @@
 - (void) setModule:(int)aModule;
 - (int) dacValue;
 - (void) setDacValue:(int)aDacValue;
-- (int) dacChannel;
-- (void) setDacChannel:(int)aDacChannel;
 - (ORSerialPort*) serialPort;
 - (void) setSerialPort:(ORSerialPort*)aSerialPort;
 - (BOOL) portWasOpen;
@@ -114,27 +113,30 @@
 - (void) writeDac;
 - (void) readDac;
 - (void) shipAdcValues;
+- (void) selectModeul;
 
 #pragma mark •••Commands
 - (void) enqueReadADC:(int)aChannel;
 - (void) enqueWriteDac;
 - (void) enqueReadDac;
 - (void) enqueLcmEnable;
+- (void) enqueModuleSelect;
 
 - (void) enqueShipCmd;
 - (void) readAdcs;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+- (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 
 @end
 
 
+extern NSString* ORPacModelRdacChannelChanged;
 extern NSString* ORPacModelLcmEnabledChanged;
 extern NSString* ORPacModelPreAmpChanged;
 extern NSString* ORPacModelModuleChanged;
 extern NSString* ORPacModelDacValueChanged;
-extern NSString* ORPacModelDacChannelChanged;
 extern NSString* ORPacModelSerialPortChanged;
 extern NSString* ORPacLock;
 extern NSString* ORPacModelPortNameChanged;

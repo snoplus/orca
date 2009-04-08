@@ -82,8 +82,6 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>dacChannelAction</key>
-				<string>id</string>
 				<key>dacValueAction</key>
 				<string>id</string>
 				<key>lcmEnabledAction</key>
@@ -98,11 +96,17 @@
 				<string>id</string>
 				<key>preAmpAction</key>
 				<string>id</string>
+				<key>rdacChannelAction</key>
+				<string>id</string>
 				<key>readAdcsAction</key>
 				<string>id</string>
 				<key>readDacAction</key>
 				<string>id</string>
+				<key>selectModuleAction</key>
+				<string>id</string>
 				<key>writeDacAction</key>
+				<string>id</string>
+				<key>writeLcmEnabledAction</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -113,8 +117,6 @@
 			<dict>
 				<key>adcMatrix</key>
 				<string>NSMatrix</string>
-				<key>dacChannelField</key>
-				<string>NSTextField</string>
 				<key>dacValueField</key>
 				<string>NSTextField</string>
 				<key>lcmEnabledMatrix</key>
@@ -133,17 +135,31 @@
 				<string>NSTextField</string>
 				<key>preAmpTextField</key>
 				<string>NSTextField</string>
+				<key>rdacChannelTextField</key>
+				<string>NSTextField</string>
 				<key>readAdcsButton</key>
 				<string>NSButton</string>
 				<key>readDacButton</key>
+				<string>NSButton</string>
+				<key>selectModuleButton</key>
 				<string>NSButton</string>
 				<key>timeMatrix</key>
 				<string>NSMatrix</string>
 				<key>writeDacButton</key>
 				<string>NSButton</string>
+				<key>writeLcmButton</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

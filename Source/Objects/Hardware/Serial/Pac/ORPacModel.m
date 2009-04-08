@@ -28,11 +28,11 @@
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
+NSString* ORPacModelRdacChannelChanged = @"ORPacModelRdacChannelChanged";
 NSString* ORPacModelLcmEnabledChanged	= @"ORPacModelLcmEnabledChanged";
 NSString* ORPacModelPreAmpChanged		= @"ORPacModelPreAmpChanged";
 NSString* ORPacModelModuleChanged		= @"ORPacModelModuleChanged";
 NSString* ORPacModelDacValueChanged		= @"ORPacModelDacValueChanged";
-NSString* ORPacModelDacChannelChanged	= @"ORPacModelDacChannelChanged";
 NSString* ORPacModelShipAdcsChanged		= @"ORPacModelShipAdcsChanged";
 NSString* ORPacModelPollTimeChanged		= @"ORPacModelPollTimeChanged";
 NSString* ORPacModelSerialPortChanged	= @"ORPacModelSerialPortChanged";
@@ -125,6 +125,20 @@ NSString* ORPacLock						= @"ORPacLock";
 
 #pragma mark •••Accessors
 
+- (int) rdacChannel
+{
+    return rdacChannel;
+}
+
+- (void) setRdacChannel:(int)aRdacChannel
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setRdacChannel:rdacChannel];
+    
+    rdacChannel = aRdacChannel;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelRdacChannelChanged object:self];
+}
+
 - (BOOL) lcmEnabled
 {
     return lcmEnabled;
@@ -181,25 +195,9 @@ NSString* ORPacLock						= @"ORPacLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacValueChanged object:self];
 }
 
-- (int) dacChannel
-{
-    return dacChannel;
-}
-
-- (void) setDacChannel:(int)aDacChannel
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setDacChannel:dacChannel];
-    
-    dacChannel = aDacChannel;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelDacChannelChanged object:self];
-}
-
-
-
 - (float) convertedAdc:(int)index
 {
-	if(index>=0 && index<8)return 0.0;
+	if(index<0 && index>=8)return 0.0;
 	else return 5.0 * adc[index]/65535.0;
 }
 
@@ -319,11 +317,11 @@ NSString* ORPacLock						= @"ORPacLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setRdacChannel:	[decoder decodeIntForKey:@"ORPacModelRdacChannel"]];
 	[self setLcmEnabled:	[decoder decodeBoolForKey:@"ORPacModelLcmEnabled"]];
 	[self setPreAmp:		[decoder decodeIntForKey:@"ORPacModelPreAmp"]];
 	[self setModule:		[decoder decodeIntForKey:@"ORPacModelModule"]];
 	[self setDacValue:		[decoder decodeIntForKey:@"dacValue"]];
-	[self setDacChannel:	[decoder decodeIntForKey:@"dacChannel"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
 	[[self undoManager] enableUndoRegistration];
@@ -335,17 +333,16 @@ NSString* ORPacLock						= @"ORPacLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:rdacChannel		forKey:@"ORPacModelRdacChannel"];
     [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
     [encoder encodeInt:preAmp			forKey:@"ORPacModelPreAmp"];
     [encoder encodeInt:module			forKey:@"ORPacModelModule"];
     [encoder encodeInt:dacValue			forKey: @"dacValue"];
-    [encoder encodeInt:dacChannel		forKey: @"dacChannel"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
 }
 
 #pragma mark ••• Commands
-
 - (void) enqueLcmEnable
 {
     if([serialPort isOpen]){ 
@@ -358,15 +355,25 @@ NSString* ORPacLock						= @"ORPacLock";
 		if(!lastRequest)[self processOneCommandFromQueue];
 	}
 }
+- (void) enqueModuleSelect
+{
+    if([serialPort isOpen]){ 
+		char cmdData[2];
+		cmdData[0] = kPacSelCmd; //module select
+		cmdData[1] = (module << 3) | (preAmp & 0x7);
+		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:2]];
+		
+		if(!lastRequest)[self processOneCommandFromQueue];
+	}
+}
 
 - (void) enqueReadADC:(int)aChannel
 {
     if([serialPort isOpen]){ 
-		char cmdData[4];
-		cmdData[0] = 0x02; //module select
-		cmdData[1] = (module << 3) | (preAmp & 0x7);
-		cmdData[2] = 0x1;		
-		cmdData[3] = aChannel;
+		char cmdData[2];
+		cmdData[0] = kPacADCmd;		
+		cmdData[1] = aChannel;
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:2]];
 		
@@ -418,9 +425,15 @@ NSString* ORPacLock						= @"ORPacLock";
 	}
 }
 
+- (void) selectModule
+{
+	[self enqueModuleSelect];
+}
+
 - (void) readAdcs
 {
 	[self enqueLcmEnable];
+	[self enqueModuleSelect];
 	int i;
 	for(i=0;i<8;i++){
 		[self enqueReadADC:i];
@@ -553,6 +566,9 @@ NSString* ORPacLock						= @"ORPacLock";
 	else return timeMeasured[index];
 }
 
+- (void)serialPortWriteProgress:(NSDictionary *)dataDictionary
+{
+}
 @end
 
 @implementation ORPacModel (private)
@@ -584,9 +600,7 @@ NSString* ORPacLock						= @"ORPacLock";
 	}
 	else {
 		[self setLastRequest:cmdData];
-		NSString* s = [[NSString alloc] initWithData:cmdData encoding:NSUTF8StringEncoding];
-		[serialPort writeString:s];
-		[s release];
+		[serialPort writeDataInBackground:cmdData];
 		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
 	}
 }
