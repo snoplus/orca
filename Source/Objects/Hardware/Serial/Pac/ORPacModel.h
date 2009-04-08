@@ -119,7 +119,7 @@
 - (void) enqueReadADC:(int)aChannel;
 - (void) enqueWriteDac;
 - (void) enqueReadDac;
-- (void) enqueLcmEnable:(BOOL)state;
+- (void) enqueLcmEnable;
 
 - (void) enqueShipCmd;
 - (void) readAdcs;

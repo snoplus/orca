@@ -19,8 +19,6 @@
 
 #pragma mark •••Imported Files
 
-@class ORPlotter1D;
-
 @interface ORPacController : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
@@ -33,6 +31,7 @@
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSButton*      openPortButton;
     IBOutlet NSButton*      readAdcsButton;
+    IBOutlet NSButton*      writeLcmButton;
     IBOutlet NSMatrix*      adcMatrix;
     IBOutlet NSMatrix*      timeMatrix;
     IBOutlet NSButton*      readDacButton;

@@ -215,6 +215,7 @@
     [dacValueField setEnabled:!locked];
     [dacChannelField setEnabled:!locked];
     [readDacButton setEnabled:!locked];
+	[writeLcmButton setEnabled:!locked];
     [writeDacButton setEnabled:!locked];
     [readAdcsButton setEnabled:!locked];
     [lcmEnabledMatrix setEnabled:!locked];
@@ -270,8 +271,12 @@
     [self portStateChanged:nil];
 }
 
-
 #pragma mark •••Actions
+- (void) writeLcmEnabledAction:(id)sender
+{
+	[model enqueLcmEnable];	
+}
+
 - (void) lcmEnabledAction:(id)sender
 {
 	[model setLcmEnabled:[[sender selectedCell]tag]];	

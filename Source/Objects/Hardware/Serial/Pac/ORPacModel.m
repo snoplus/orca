@@ -346,12 +346,12 @@ NSString* ORPacLock						= @"ORPacLock";
 
 #pragma mark ••• Commands
 
-- (void) enqueLcmEnable:(BOOL)state
+- (void) enqueLcmEnable
 {
     if([serialPort isOpen]){ 
 		char cmdData[2];
 		cmdData[0] = kPacLcmEnaCmd;
-		cmdData[1] = (state?kPacLcmEnaSet:kPacLcmEnaClr);
+		cmdData[1] = ([self lcmEnabled]?kPacLcmEnaSet:kPacLcmEnaClr);
 		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
 		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:2]];
 				
@@ -420,7 +420,7 @@ NSString* ORPacLock						= @"ORPacLock";
 
 - (void) readAdcs
 {
-	[self enqueLcmEnable:[self lcmEnabled]];
+	[self enqueLcmEnable];
 	int i;
 	for(i=0;i<8;i++){
 		[self enqueReadADC:i];
