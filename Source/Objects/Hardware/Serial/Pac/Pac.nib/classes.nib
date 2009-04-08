@@ -104,6 +104,8 @@
 				<string>id</string>
 				<key>selectModuleAction</key>
 				<string>id</string>
+				<key>setAllRDacsAction</key>
+				<string>id</string>
 				<key>writeDacAction</key>
 				<string>id</string>
 				<key>writeLcmEnabledAction</key>
@@ -142,6 +144,8 @@
 				<key>readDacButton</key>
 				<string>NSButton</string>
 				<key>selectModuleButton</key>
+				<string>NSButton</string>
+				<key>setAllRDacsButton</key>
 				<string>NSButton</string>
 				<key>timeMatrix</key>
 				<string>NSMatrix</string>

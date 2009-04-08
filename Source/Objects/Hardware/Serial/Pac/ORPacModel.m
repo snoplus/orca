@@ -28,6 +28,7 @@
 #import "ORTimeRate.h"
 
 #pragma mark •••External Strings
+NSString* ORPacModelSetAllRDacsChanged = @"ORPacModelSetAllRDacsChanged";
 NSString* ORPacModelRdacChannelChanged = @"ORPacModelRdacChannelChanged";
 NSString* ORPacModelLcmEnabledChanged	= @"ORPacModelLcmEnabledChanged";
 NSString* ORPacModelPreAmpChanged		= @"ORPacModelPreAmpChanged";
@@ -42,8 +43,6 @@ NSString* ORPacModelAdcChanged			= @"ORPacModelAdcChanged";
 NSString* ORPacLock						= @"ORPacLock";
 
 @interface ORPacModel (private)
-- (void) runStarted:(NSNotification*)aNote;
-- (void) runStopped:(NSNotification*)aNote;
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 @end
@@ -91,17 +90,6 @@ NSString* ORPacLock						= @"ORPacLock";
                      selector : @selector(dataReceived:)
                          name : ORSerialPortDataReceived
                        object : nil];
-
-    [notifyCenter addObserver: self
-                     selector: @selector(runStarted:)
-                         name: ORRunStartedNotification
-                       object: nil];
-    
-    [notifyCenter addObserver: self
-                     selector: @selector(runStopped:)
-                         name: ORRunStoppedNotification
-                       object: nil];
-
 }
 
 - (void) shipAdcValues
@@ -124,6 +112,20 @@ NSString* ORPacLock						= @"ORPacLock";
 
 
 #pragma mark •••Accessors
+
+- (BOOL) setAllRDacs
+{
+    return setAllRDacs;
+}
+
+- (void) setSetAllRDacs:(BOOL)aSetAllRDacs
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setSetAllRDacs:setAllRDacs];
+    
+    setAllRDacs = aSetAllRDacs;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelSetAllRDacsChanged object:self];
+}
 
 - (int) rdacChannel
 {
@@ -317,6 +319,7 @@ NSString* ORPacLock						= @"ORPacLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
+	[self setSetAllRDacs:[decoder decodeBoolForKey:@"ORPacModelSetAllRDacs"]];
 	[self setRdacChannel:	[decoder decodeIntForKey:@"ORPacModelRdacChannel"]];
 	[self setLcmEnabled:	[decoder decodeBoolForKey:@"ORPacModelLcmEnabled"]];
 	[self setPreAmp:		[decoder decodeIntForKey:@"ORPacModelPreAmp"]];
@@ -333,6 +336,7 @@ NSString* ORPacLock						= @"ORPacLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:setAllRDacs forKey:@"ORPacModelSetAllRDacs"];
     [encoder encodeInt:rdacChannel		forKey:@"ORPacModelRdacChannel"];
     [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
     [encoder encodeInt:preAmp			forKey:@"ORPacModelPreAmp"];
@@ -349,10 +353,7 @@ NSString* ORPacLock						= @"ORPacLock";
 		char cmdData[2];
 		cmdData[0] = kPacLcmEnaCmd;
 		cmdData[1] = ([self lcmEnabled]?kPacLcmEnaSet:kPacLcmEnaClr);
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:2]];
-				
-		if(!lastRequest)[self processOneCommandFromQueue];
+		[self enqueCmdData:[NSData dataWithBytes:cmdData length:2]];
 	}
 }
 - (void) enqueModuleSelect
@@ -361,10 +362,7 @@ NSString* ORPacLock						= @"ORPacLock";
 		char cmdData[2];
 		cmdData[0] = kPacSelCmd; //module select
 		cmdData[1] = (module << 3) | (preAmp & 0x7);
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:2]];
-		
-		if(!lastRequest)[self processOneCommandFromQueue];
+		[self enqueCmdData:[NSData dataWithBytes:cmdData length:2]];
 	}
 }
 
@@ -374,27 +372,30 @@ NSString* ORPacLock						= @"ORPacLock";
 		char cmdData[2];
 		cmdData[0] = kPacADCmd;		
 		cmdData[1] = aChannel;
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:2]];
-		
-		if(!lastRequest)[self processOneCommandFromQueue];
+		[self enqueCmdData:[NSData dataWithBytes:cmdData length:2]];
 	}
 }
 
 - (void) enqueWriteDac
 {
     if([serialPort isOpen]){ 
-		
-		char cmdData[5];
-		cmdData[0] = kPacRDacCmd;
-		cmdData[1] = kPacRDacWriteOneRDac;
-		cmdData[2] = module<<3 | preAmp;
-		cmdData[3] = dacValue>>8;
-		cmdData[4] = dacValue&0xff;
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:5]];
-		
-		if(!lastRequest)[self processOneCommandFromQueue];
+		if([self setAllRDacs]){
+			char cmdData[5];
+			cmdData[0] = kPacRDacCmd;
+			cmdData[1] = kPacRDacWriteAll;
+			cmdData[2] = dacValue>>8;
+			cmdData[3] = dacValue&0xff;
+			[self enqueCmdData:[NSData dataWithBytes:cmdData length:4]];
+		}
+		else {
+			char cmdData[5];
+			cmdData[0] = kPacRDacCmd;
+			cmdData[1] = kPacRDacWriteOneRDac;
+			cmdData[2] = rdacChannel;
+			cmdData[3] = dacValue>>8;
+			cmdData[4] = dacValue&0xff;
+			[self enqueCmdData:[NSData dataWithBytes:cmdData length:5]];
+		}
 	}
 }
 
@@ -405,11 +406,8 @@ NSString* ORPacLock						= @"ORPacLock";
 		char cmdData[3];
 		cmdData[0] = kPacRDacCmd;
 		cmdData[1] = kPacRDacReadOneRDac;
-		cmdData[2] = module<<3 | preAmp;
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:[NSData dataWithBytes:cmdData length:3]];
-		
-		if(!lastRequest)[self processOneCommandFromQueue];
+		cmdData[2] = rdacChannel;
+		[self enqueCmdData:[NSData dataWithBytes:cmdData length:3]];
 	}
 }
 
@@ -418,11 +416,16 @@ NSString* ORPacLock						= @"ORPacLock";
     if([serialPort isOpen]){ 
 		
 		char theCommand = kPacShipAdcs;
-		if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-		[cmdQueue addObject:[NSData dataWithBytes:&theCommand length:1]];
-		
-		if(!lastRequest)[self processOneCommandFromQueue];
+		[self enqueCmdData:[NSData dataWithBytes:&theCommand length:1]];
 	}
+}
+
+- (void) enqueCmdData:(NSData*)someData
+{
+	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+	[cmdQueue addObject:someData];
+	
+	if(!lastRequest)[self processOneCommandFromQueue];
 }
 
 - (void) selectModule
@@ -488,8 +491,6 @@ NSString* ORPacLock						= @"ORPacLock";
     return dataDictionary;
 }
 
-
-
 - (void) dataReceived:(NSNotification*)note
 {
 	BOOL done = NO;
@@ -527,7 +528,7 @@ NSString* ORPacLock						= @"ORPacLock";
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						short msb		 = theData[0];
 						short lsb		 = theData[1];
-						if(theData[2] == kPacOkByte) [self setDacValue: msb<<8 | lsb];
+						if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb<<8 | lsb);
 						else						 NSLogError(@"PAC",@"DAC !OK",nil);
 						done = YES;
 					}
@@ -536,8 +537,17 @@ NSString* ORPacLock						= @"ORPacLock";
 					if([inComingData length] == 1) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
+						done = YES;
 					}
 				}
+				else if(theCmd[1] == kPacRDacWriteAll){
+					if([inComingData length] == 1) {
+						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
+						if(theData[0] != kPacOkByte) NSLogError(@"PAC",@"DAC !OK",nil);
+						done = YES;
+					}
+				}
+				
 			break;
 				
 			case kPacLcmEnaCmd:
@@ -573,14 +583,6 @@ NSString* ORPacLock						= @"ORPacLock";
 
 @implementation ORPacModel (private)
 
-- (void) runStarted:(NSNotification*)aNote
-{
-}
-
-- (void) runStopped:(NSNotification*)aNote
-{
-}
-
 - (void) timeout
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
@@ -601,7 +603,7 @@ NSString* ORPacLock						= @"ORPacLock";
 	else {
 		[self setLastRequest:cmdData];
 		[serialPort writeDataInBackground:cmdData];
-		[self performSelector:@selector(timeout) withObject:nil afterDelay:3];
+		[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
 	}
 }
 

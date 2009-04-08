@@ -68,6 +68,7 @@
 		int					preAmp;
 		BOOL				lcmEnabled;
 		int					rdacChannel;
+    BOOL setAllRDacs;
 }
 
 #pragma mark •••Initialization
@@ -79,6 +80,8 @@
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••Accessors
+- (BOOL) setAllRDacs;
+- (void) setSetAllRDacs:(BOOL)aSetAllRDacs;
 - (int) rdacChannel;
 - (void) setRdacChannel:(int)aRdacChannel;
 - (BOOL) lcmEnabled;
@@ -113,9 +116,10 @@
 - (void) writeDac;
 - (void) readDac;
 - (void) shipAdcValues;
-- (void) selectModeul;
+- (void) selectModule;
 
 #pragma mark •••Commands
+- (void) enqueCmdData:(NSData*)someData;
 - (void) enqueReadADC:(int)aChannel;
 - (void) enqueWriteDac;
 - (void) enqueReadDac;
@@ -132,6 +136,7 @@
 @end
 
 
+extern NSString* ORPacModelSetAllRDacsChanged;
 extern NSString* ORPacModelRdacChannelChanged;
 extern NSString* ORPacModelLcmEnabledChanged;
 extern NSString* ORPacModelPreAmpChanged;

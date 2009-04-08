@@ -22,6 +22,7 @@
 @interface ORPacController : OrcaObjectController
 {
     IBOutlet NSTextField*   lockDocField;
+	IBOutlet NSButton*		setAllRDacsButton;
 	IBOutlet NSTextField*	rdacChannelTextField;
 	IBOutlet NSTextField*	preAmpTextField;
 	IBOutlet NSTextField*	moduleTextField;
@@ -34,8 +35,8 @@
     IBOutlet NSButton*      writeLcmButton;
     IBOutlet NSMatrix*      adcMatrix;
     IBOutlet NSMatrix*      timeMatrix;
-    IBOutlet NSButton*      readDacButton;
     IBOutlet NSButton*      writeDacButton;
+    IBOutlet NSButton*      readDacButton;
     IBOutlet NSButton*      selectModuleButton;
     IBOutlet NSMatrix*      lcmEnabledMatrix;
 }
@@ -50,6 +51,7 @@
 - (void) updateWindow;
 
 #pragma mark •••Interface Management
+- (void) setAllRDacsChanged:(NSNotification*)aNote;
 - (void) rdacChannelChanged:(NSNotification*)aNote;
 - (void) lcmEnabledChanged:(NSNotification*)aNote;
 - (void) preAmpChanged:(NSNotification*)aNote;
@@ -62,6 +64,7 @@
 - (void) loadAdcTimeValuesForIndex:(int)index;
 
 #pragma mark •••Actions
+- (IBAction) setAllRDacsAction:(id)sender;
 - (IBAction) rdacChannelAction:(id)sender;
 - (IBAction) writeLcmEnabledAction:(id)sender;
 - (IBAction) preAmpAction:(id)sender;
@@ -71,8 +74,8 @@
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) readAdcsAction:(id)sender;
-- (IBAction) readDacAction:(id)sender;
 - (IBAction) writeDacAction:(id)sender;
+- (IBAction) readDacAction:(id)sender;
 - (IBAction) lcmEnabledAction:(id)sender;
 - (IBAction) selectModuleAction:(id)sender;
 

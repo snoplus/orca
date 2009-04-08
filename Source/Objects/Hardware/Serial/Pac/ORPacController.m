@@ -118,6 +118,11 @@
                          name : ORPacModelRdacChannelChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(setAllRDacsChanged:)
+                         name : ORPacModelSetAllRDacsChanged
+						object: model];
+
 }
 
 - (void) setModel:(id)aModel
@@ -138,6 +143,12 @@
 	[self preAmpChanged:nil];
 	[self lcmEnabledChanged:nil];
 	[self rdacChannelChanged:nil];
+	[self setAllRDacsChanged:nil];
+}
+
+- (void) setAllRDacsChanged:(NSNotification*)aNote
+{
+	[setAllRDacsButton setIntValue: [model setAllRDacs]];
 }
 
 - (void) rdacChannelChanged:(NSNotification*)aNote
@@ -214,10 +225,11 @@
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
     [dacValueField setEnabled:!locked];
-    [rdacChannelTextField setEnabled:!locked];
+    [rdacChannelTextField setEnabled:!locked && ![model setAllRDacs]];
     [readDacButton setEnabled:!locked];
 	[writeLcmButton setEnabled:!locked];
     [writeDacButton setEnabled:!locked];
+    [readDacButton setEnabled:!locked && ![model setAllRDacs]];
     [readAdcsButton setEnabled:!locked];
     [lcmEnabledMatrix setEnabled:!locked];
     [selectModuleButton setEnabled:!locked];
@@ -275,6 +287,12 @@
 
 #pragma mark •••Actions
 
+- (void) setAllRDacsAction:(id)sender
+{
+	[model setSetAllRDacs:[sender intValue]];
+	[self lockChanged:nil];
+}
+
 - (IBAction) rdacChannelAction:(id)sender
 {
 	[model setRdacChannel:[sender intValue]];	
@@ -304,17 +322,18 @@
 	[model setDacValue:[sender intValue]];	
 }
 
+- (IBAction) writeDacAction:(id)sender
+{
+	[self endEditing];
+	[model writeDac];
+}
+
 - (IBAction) readDacAction:(id)sender
 {
 	[self endEditing];
 	[model readDac];
 }
 
-- (IBAction) writeDacAction:(id)sender
-{
-	[self endEditing];
-	[model writeDac];
-}
 
 - (IBAction) lockAction:(id) sender
 {
