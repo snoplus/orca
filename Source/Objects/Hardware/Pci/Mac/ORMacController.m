@@ -180,6 +180,7 @@
 			ORSerialPort* thePort = [model serialPort:index];
 			if([thePort isOpen]){
 				[sendCmdButton setEnabled:YES];
+				[clearDisplayButton setEnabled:YES];
 				
 				[openPortButton setTitle:@"Close"];
 				NSDictionary* options = [thePort getOptions];
@@ -192,6 +193,8 @@
 				[outputView setString:@""];
 
 				[sendCmdButton setEnabled:NO];
+				[clearDisplayButton setEnabled:NO];
+				
 				[openPortButton setTitle:@"Open"];
 				[self setSpeedPopup:nil port:thePort];
 				[self setParityPopup:nil port:thePort];
@@ -201,6 +204,7 @@
 		}
 		else {
 			[sendCmdButton setEnabled:NO];
+			[clearDisplayButton setEnabled:NO];
 			[selectedPortNameField setStringValue:@"---"];
 			[openPortButton setEnabled:NO];
 			[openPortButton setTitle:@"---"];
@@ -351,6 +355,11 @@
             [thePort setOptions:options];
         }
     }
+}
+
+- (IBAction) clearDisplayAction:(id)sender
+{
+	[outputView setString:@""];
 }
 
 - (IBAction) sendAction:(id)sender
