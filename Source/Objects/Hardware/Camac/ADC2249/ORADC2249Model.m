@@ -201,7 +201,7 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
     }
     
 	
-    if([[userInfo objectForKey:@"doinit"]intValue]){
+   if([[userInfo objectForKey:@"doinit"]intValue]){
 		[self generalReset];
     }
 	[self enableLAMEnableLatch];
@@ -267,7 +267,9 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
                 }
                 //read of last channel with this command clears
 				if(!resetDone) [controller camacShortNAF:[self stationNumber] a:11 f:2 data:&dummy]; 
-            }
+				[self enableLAMEnableLatch]; //for testing the lockup problem 4/9/09
+				//[self generalReset]; //this is an f9
+			}
             
             
   		}
