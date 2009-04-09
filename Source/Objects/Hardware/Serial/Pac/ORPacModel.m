@@ -383,8 +383,8 @@ NSString* ORPacLock						= @"ORPacLock";
 			char cmdData[5];
 			cmdData[0] = kPacRDacCmd;
 			cmdData[1] = kPacRDacWriteAll;
-			cmdData[2] = dacValue>>8;
-			cmdData[3] = dacValue&0xff;
+			cmdData[2] = dacValue;
+			cmdData[3] = 0xf0;
 			[self enqueCmdData:[NSData dataWithBytes:cmdData length:4]];
 		}
 		else {
@@ -392,8 +392,8 @@ NSString* ORPacLock						= @"ORPacLock";
 			cmdData[0] = kPacRDacCmd;
 			cmdData[1] = kPacRDacWriteOneRDac;
 			cmdData[2] = rdacChannel;
-			cmdData[3] = dacValue>>8;
-			cmdData[4] = dacValue&0xff;
+			cmdData[3] = dacValue;
+			cmdData[4] = 0xf0;
 			[self enqueCmdData:[NSData dataWithBytes:cmdData length:5]];
 		}
 	}
@@ -527,8 +527,8 @@ NSString* ORPacLock						= @"ORPacLock";
 					if([inComingData length] == 3) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
 						short msb		 = theData[0];
-						short lsb		 = theData[1];
-						if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb<<8 | lsb);
+						//short lsb		 = theData[1];
+						if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb);
 						else						 NSLogError(@"PAC",@"DAC !OK",nil);
 						done = YES;
 					}

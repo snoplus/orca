@@ -212,13 +212,19 @@
 #if ORSerialDebug
         NSLog(@"data read: %@", [NSThread currentThread]);
 #endif
-        data = [NSData dataWithBytes:localBuffer length:bytesRead];
+		if(bytesRead>0){
+			data = [NSData dataWithBytes:localBuffer length:bytesRead];
 #if ORSerialDebug
-        NSLog(@"send ORSerialReadInBackgroundDataMessage\n");
+			NSLog(@"send ORSerialReadInBackgroundDataMessage\n");
 #endif
-        [self performSelectorOnMainThread:@selector(serialPortReadData:) withObject:[NSDictionary dictionaryWithObjectsAndKeys: self, @"serialPort", data, @"data", nil] waitUntilDone:NO];
-        [closeLock unlock];
-        //NSLog(@"closeLock unlocked: %@", [NSThread currentThread]);
+			[self performSelectorOnMainThread:@selector(serialPortReadData:) withObject:[NSDictionary dictionaryWithObjectsAndKeys: self, @"serialPort", data, @"data", nil] waitUntilDone:NO];
+		}
+		[closeLock unlock];
+		if(bytesRead<0){
+			[self close];
+		}
+		//NSLog(@"closeLock unlocked: %@", [NSThread currentThread]);
+		
     } else {
 #if ORSerialDebug
         NSLog(@"read stopped: %@", [NSThread currentThread]);
