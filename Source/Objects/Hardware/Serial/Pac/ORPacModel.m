@@ -134,6 +134,8 @@ NSString* ORPacLock						= @"ORPacLock";
 
 - (void) setRdacChannel:(int)aRdacChannel
 {
+	if(aRdacChannel<1)aRdacChannel=1;
+	if(aRdacChannel>148)aRdacChannel=148;
     [[[self undoManager] prepareWithInvocationTarget:self] setRdacChannel:rdacChannel];
     
     rdacChannel = aRdacChannel;
@@ -190,6 +192,7 @@ NSString* ORPacLock						= @"ORPacLock";
 
 - (void) setDacValue:(int)aDacValue
 {
+	if(aDacValue>256)aDacValue=255;
     [[[self undoManager] prepareWithInvocationTarget:self] setDacValue:dacValue];
     
     dacValue = aDacValue;
@@ -383,8 +386,8 @@ NSString* ORPacLock						= @"ORPacLock";
 			char cmdData[5];
 			cmdData[0] = kPacRDacCmd;
 			cmdData[1] = kPacRDacWriteAll;
-			cmdData[2] = dacValue;
-			cmdData[3] = 0xf0;
+			cmdData[2] = 0x10 | ((dacValue & 0xf0)>>4);
+			cmdData[3] = (dacValue & 0x0f)<<4;
 			[self enqueCmdData:[NSData dataWithBytes:cmdData length:4]];
 		}
 		else {
@@ -392,8 +395,8 @@ NSString* ORPacLock						= @"ORPacLock";
 			cmdData[0] = kPacRDacCmd;
 			cmdData[1] = kPacRDacWriteOneRDac;
 			cmdData[2] = rdacChannel;
-			cmdData[3] = dacValue;
-			cmdData[4] = 0xf0;
+			cmdData[3] = 0x10 | ((dacValue & 0xf0)>>4);
+			cmdData[4] = (dacValue & 0x0f)<<4;
 			[self enqueCmdData:[NSData dataWithBytes:cmdData length:5]];
 		}
 	}
@@ -526,9 +529,9 @@ NSString* ORPacLock						= @"ORPacLock";
 				if(theCmd[1] == kPacRDacReadOneRDac){
 					if([inComingData length] == 3) {
 						unsigned char* theData	 = (unsigned char*)[inComingData bytes];
-						short msb		 = theData[0];
-						//short lsb		 = theData[1];
-						if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb);
+						short msb		 = (theData[0]&0xf)<<4;
+						short lsb		 = (theData[1]&0xf0)>>4;
+						if(theData[2] == kPacOkByte) NSLog(@"0x%x\n",msb | lsb);
 						else						 NSLogError(@"PAC",@"DAC !OK",nil);
 						done = YES;
 					}
