@@ -22,12 +22,10 @@
 #import "ORRamperModel.h"
 #import "ORHWWizard.h"
 
-@class NetSocket;
-
 #define kZupCurrentAdc		0x0
 #define kZupVoltageAdc		0x1
 #define kZupDac				0x2
-#define kZupStatusControl		0x3
+#define kZupStatusControl	0x3
 
 
 //reg defs for ADC AD7734
@@ -50,35 +48,44 @@
 #define kNplHvRead				0x40
 #define kNplHvWrite				0x00
 
+@class ORSerialPort;
+
 @interface ORZupModel : ORRamperModel
 {
-	id comBoard;
-	int boardNumber;
-	int dac[8];
-	int adc[8];
-	int current[8];
-	int controlReg[8];
+	NSString*			portName;
+	BOOL				portWasOpen;
+	ORSerialPort*		serialPort;
+	NSData*				lastRequest;
+	NSMutableArray*		cmdQueue;
+	NSMutableData*		inComingData;
+	NSMutableString*    buffer;
+	float voltage;
 }
 
 #pragma mark ***Accessors
-- (int) adc:(int)aChan;
-- (void) setAdc:(int)channel withValue:(int)aValue;
-- (int) dac:(int)aChan;
-- (void) setDac:(int)channel withValue:(int)aValue;
-- (int) current:(int)aChan;
-- (void) setCurrent:(int)channel withValue:(int)aValue;
-- (int) controlReg:(int)aChan;
-- (void) setControlReg:(int)channel withValue:(int)aValue;
+- (float) voltage:(int)dummy;
+- (void) setVoltage:(int)dummy withValue:(float)aValue;
 - (SEL) getMethodSelector;
 - (SEL) setMethodSelector;
 - (SEL) initMethodSelector;
 - (void) junk;
-- (void) loadDac:(int)aChan;
-- (void) revision;
 - (void) setVoltageReg:(int)aReg chan:(int)aChan value:(int)aValue;
 - (void) setCurrentReg:(int)aReg chan:(int)aChan value:(int)aValue;
 - (int) numberOfChannels;
 - (void) initBoard;
+- (void) loadDac:(int)dummy;
+
+- (void) dataReceived:(NSNotification*)note;
+- (ORSerialPort*) serialPort;
+- (void) setSerialPort:(ORSerialPort*)aSerialPort;
+- (BOOL) portWasOpen;
+- (void) setPortWasOpen:(BOOL)aPortWasOpen;
+- (NSString*) portName;
+- (void) setPortName:(NSString*)aPortName;
+- (NSData*) lastRequest;
+- (void) setLastRequest:(NSData*)aRequest;
+- (void) openPort:(BOOL)state;
+- (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 
 #pragma mark ***Utilities
 - (void) sendCmd;
@@ -89,3 +96,7 @@
 @end
 
 extern NSString* ORZupLock;
+extern NSString* ORZupModelSerialPortChanged;
+extern NSString* ORZupModelPortStateChanged;
+extern NSString* ORZupModelPortNameChanged;
+

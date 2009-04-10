@@ -20,6 +20,12 @@
 
 #import "ORZupController.h"
 #import "ORZupModel.h"
+#import "ORSerialPortList.h"
+#import "ORSerialPort.h"
+
+@interface ORZupController (private)
+- (void) populatePortListPopup;
+@end
 
 @implementation ORZupController
 - (id) init
@@ -36,9 +42,10 @@
 
 - (void) awakeFromNib
 {
-    [super awakeFromNib];
+    [self populatePortListPopup];
 
-    basicOpsSize	= NSMakeSize(320,320);
+
+    basicOpsSize	= NSMakeSize(280,280);
     rampOpsSize		= NSMakeSize(570,710);
     blankView		= [[NSView alloc] init];
 	
@@ -46,6 +53,8 @@
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
+	
+	[super awakeFromNib];
 
 }
 
@@ -63,15 +72,72 @@
 					 selector : @selector(lockChanged:)
 						 name : ORZupLock
 						object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(portNameChanged:)
+                         name : ORZupModelPortNameChanged
+                        object: nil];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(portStateChanged:)
+                         name : ORSerialPortStateChanged
+                       object : nil];
+	
 }
 
 
 - (void) updateWindow
 {
     [ super updateWindow ];
-    
     [self lockChanged:nil];
+	[self portStateChanged:nil];
+    [self portNameChanged:nil];
+   
 }
+
+- (void) portStateChanged:(NSNotification*)aNotification
+{
+    if(aNotification == nil || [aNotification object] == [model serialPort]){
+        if([model serialPort]){
+            [openPortButton setEnabled:YES];
+			
+            if([[model serialPort] isOpen]){
+                [openPortButton setTitle:@"Close"];
+                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
+                [portStateField setStringValue:@"Open"];
+            }
+            else {
+                [openPortButton setTitle:@"Open"];
+                [portStateField setStringValue:@"Closed"];
+                [portStateField setTextColor:[NSColor redColor]];
+            }
+        }
+        else {
+            [openPortButton setEnabled:NO];
+            [portStateField setTextColor:[NSColor blackColor]];
+            [portStateField setStringValue:@"---"];
+            [openPortButton setTitle:@"---"];
+        }
+    }
+}
+
+- (void) portNameChanged:(NSNotification*)aNotification
+{
+    NSString* portName = [model portName];
+    
+	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+	ORSerialPort *aPort;
+	
+    [portListPopup selectItemAtIndex:0]; //the default
+    while (aPort = [enumerator nextObject]) {
+        if([portName isEqualToString:[aPort name]]){
+            [portListPopup selectItemWithTitle:portName];
+            break;
+        }
+	}  
+    [self portStateChanged:nil];
+}
+
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
@@ -145,14 +211,37 @@
     [gSecurity tryToSetLock:ORZupLock to:[sender intValue] forWindow:[self window]];
 }
 
-- (IBAction) version:(id)sender
-{
-	[model revision];
-}
 
 - (IBAction) initBoard:(id) sender
 {
 	[model initBoard];
 }
 
+- (IBAction) portListAction:(id) sender
+{
+    [model setPortName: [portListPopup titleOfSelectedItem]];
+}
+
+- (IBAction) openPortAction:(id)sender
+{
+    [model openPort:![[model serialPort] isOpen]];
+}
+
 @end
+
+@implementation ORZupController (private)
+
+- (void) populatePortListPopup
+{
+	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+	ORSerialPort *aPort;
+    [portListPopup removeAllItems];
+    [portListPopup addItemWithTitle:@"--"];
+	
+	while (aPort = [enumerator nextObject]) {
+        [portListPopup addItemWithTitle:[aPort name]];
+	}    
+}
+@end
+
+

@@ -23,6 +23,10 @@
 {
 	IBOutlet NSButton*		lockButton;
 	IBOutlet NSButton*		sendButton;
+    IBOutlet NSTextField*   portStateField;
+    IBOutlet NSPopUpButton* portListPopup;
+    IBOutlet NSButton*      openPortButton;
+	
 	//lots of other Outlets inherited from the RamperController
 	IBOutlet NSView*		totalView;
 	IBOutlet NSTabView*		tabView;	
@@ -36,12 +40,15 @@
 #pragma mark ***Interface Management
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) setButtonStates;
+- (void) portNameChanged:(NSNotification*)aNote;
+- (void) portStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) version:(id)sender;
 - (IBAction) sendCmdAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) initBoard:(id) sender;
+- (IBAction) portListAction:(id) sender;
+- (IBAction) openPortAction:(id)sender;
 
 @end
 

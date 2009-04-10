@@ -120,6 +120,46 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>initBoard</key>
+				<string>id</string>
+				<key>lockAction</key>
+				<string>id</string>
+				<key>openPortAction</key>
+				<string>id</string>
+				<key>portListAction</key>
+				<string>id</string>
+				<key>sendCmdAction</key>
+				<string>id</string>
+				<key>version</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORZupController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>openPortButton</key>
+				<string>NSButton</string>
+				<key>portListPopup</key>
+				<string>NSPopUpButton</string>
+				<key>portStateField</key>
+				<string>NSTextField</string>
+				<key>sendButton</key>
+				<string>NSButton</string>
+				<key>tabView</key>
+				<string>NSTabView</string>
+				<key>totalView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>ORRamperController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>copy</key>
 				<string>id</string>
 				<key>decDialog</key>
@@ -172,62 +212,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>boardAction</key>
-				<string>id</string>
-				<key>channelAction</key>
-				<string>id</string>
-				<key>connectAction</key>
-				<string>id</string>
-				<key>functionAction</key>
-				<string>id</string>
-				<key>initBoard</key>
-				<string>id</string>
-				<key>ipAddressTextFieldAction</key>
-				<string>id</string>
-				<key>lockAction</key>
-				<string>id</string>
-				<key>sendCmdAction</key>
-				<string>id</string>
-				<key>version</key>
-				<string>id</string>
-				<key>writeValueAction</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORNplHVController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>boardPU</key>
-				<string>NSPopUpButton</string>
-				<key>channelPU</key>
-				<string>NSPopUpButton</string>
-				<key>functionPU</key>
-				<string>NSPopUpButton</string>
-				<key>ipAddressTextField</key>
-				<string>NSTextField</string>
-				<key>ipConnectButton</key>
-				<string>NSButton</string>
-				<key>ipConnectedTextField</key>
-				<string>NSTextField</string>
-				<key>lockButton</key>
-				<string>NSButton</string>
-				<key>sendButton</key>
-				<string>NSButton</string>
-				<key>tabView</key>
-				<string>NSTabView</string>
-				<key>totalView</key>
-				<string>NSView</string>
-				<key>writeValueField</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>ORRamperController</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>

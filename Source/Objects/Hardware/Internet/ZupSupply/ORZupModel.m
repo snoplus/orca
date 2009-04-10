@@ -23,10 +23,19 @@
 #import "ORHWWizParam.h"
 #import "ORHWWizSelection.h"
 #import "ORHVRampItem.h"
+#import "ORSerialPort.h"
+#import "ORSerialPortAdditions.h"
+#import "ORSerialPortList.h"
 
-NSString* ORZupLock						= @"ORZupLock";
-NSString* ZupHVConnector			= @"ZupHVConnector";
+NSString* ORZupLock					= @"ORZupLock";
+NSString* ORZupModelSerialPortChanged	= @"ORZupModelSerialPortChanged";
+NSString* ORZupModelPortNameChanged	= @"ORZupModelPortNameChanged";
+NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 
+@interface ORZupModel (private)
+- (void) timeout;
+- (void) processOneCommandFromQueue;
+@end
 
 @implementation ORZupModel
 
@@ -37,6 +46,17 @@ NSString* ZupHVConnector			= @"ZupHVConnector";
 
 - (void) dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [buffer release];
+	[cmdQueue release];
+	[lastRequest release];
+    [portName release];
+	[inComingData release];
+    if([serialPort isOpen]){
+        [serialPort close];
+    }
+    [serialPort release];
     [super dealloc];
 }
 
@@ -47,21 +67,19 @@ NSString* ZupHVConnector			= @"ZupHVConnector";
 
 - (void) awakeAfterDocumentLoaded
 {
-	comBoard	= [[[[self connectors] objectForKey:ZupHVConnector] connector] objectLink];
-	boardNumber = [[[[self connectors] objectForKey:ZupHVConnector] connector] identifer];
-
 }
 
- - (void) makeConnectors
- {
-	ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(0,[self frame].size.height/2 - kConnectorSize/2) withGuardian:self withObjectLink:self];
-	[[self connectors] setObject:aConnector forKey:ZupHVConnector];
-	[aConnector setConnectorType: 'NSLV' ];
-	[aConnector setIoType:kInputConnector];
-	[aConnector addRestrictedConnectionType: 'NCmO' ]; //can only connect to Comm Boards
-	[aConnector release];
-}
 
+
+- (void) registerNotificationObservers
+{
+	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(dataReceived:)
+                         name : ORSerialPortDataReceived
+                       object : nil];
+}
 
 - (void) addRampItem
 {
@@ -95,67 +113,29 @@ NSString* ZupHVConnector			= @"ZupHVConnector";
 	return ORZupLock;
 }
 
-- (int) adc:(int)aChan
+- (float) voltage:(int)dummy
 {
-	if(aChan>=0 && aChan < [self numberOfChannels])return adc[aChan];
-	else return 0;
+	return voltage;
 }
 
-- (void) setAdc:(int)aChan withValue:(int)aValue
+- (void) setVoltage:(int)dummy withValue:(float)aValue
 {
-	if(aChan>=0 && aChan < [self numberOfChannels]){
-		adc[aChan] = aValue;
-	}
+	voltage = aValue;
 }
 
-- (int) dac:(int)aChan
+- (void) loadDac:(int)dummy
 {
-	if(aChan>=0 && aChan < [self numberOfChannels])return dac[aChan];
-	else return 0;
 }
-
-- (void) setDac:(int)aChan withValue:(int)aValue
-{
-	if(aChan>=0 && aChan < [self numberOfChannels]){
-		dac[aChan] = aValue;
-	}
-}
-
-- (int) current:(int)aChan
-{
-	if(aChan>=0 && aChan < [self numberOfChannels])return current[aChan];
-	else return 0;
-}
-
-- (void) setCurrent:(int)aChan withValue:(int)aValue
-{
-	if(aChan>=0 && aChan < [self numberOfChannels]){
-		current[aChan] = aValue;
-	}
-}
-
-- (int) controlReg:(int)aChan
-{
-	if(aChan>=0 && aChan < [self numberOfChannels])return controlReg[aChan];
-	else return 0;
-}
-
-- (void) setControlReg:(int)aChan withValue:(int)aValue
-{
-	if(aChan>=0 && aChan < [self numberOfChannels]){
-		controlReg[aChan] = aValue;
-	}
-}
-
-
-
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
+    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
     [[self undoManager] enableUndoRegistration];    
+    [self registerNotificationObservers];
 		
     return self;
 }
@@ -163,34 +143,23 @@ NSString* ZupHVConnector			= @"ZupHVConnector";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
+    [encoder encodeObject:portName		forKey: @"portName"];
 }
 
 - (void) sendCmd
 {	
-/*
-    ORConnector* aConnection = [[[self connectors] objectForKey:ZupHVConnector] connector];
-    int board =  [aConnection identifer];
 
-	//send the values from the basic ops
-	char bytes[6];
-	bytes[0] = 5;
-	bytes[1] = ((board & 0xf)<<4) | ((channel & 0x3)<<2) | (functionNumber & 0x3);
-	bytes[2] = 0;
-	bytes[3] = (writeValue>>16 & 0xf);
-	bytes[4] = (writeValue>>8 & 0xf); 
-	bytes[5] = writeValue & 0xf; 
-	[socket write:bytes length:6];
-*/
 }
 
 - (SEL) getMethodSelector
 {
-	return @selector(dac:);
+	return @selector(voltage:);
 }
 
 - (SEL) setMethodSelector
 {
-	return @selector(setDac:withValue:);
+	return @selector(setVoltage:withValue:);
 }
 
 - (SEL) initMethodSelector
@@ -203,19 +172,6 @@ NSString* ZupHVConnector			= @"ZupHVConnector";
 {
 }
 
-- (void) loadDac:(int)aChan
-{
-	//send the values from the basic ops
-	char bytes[6];
-	bytes[0] = 5;
-	bytes[1] = ((1 & 0xf)<<4) | ((aChan & 0x3)<<2) | (2 & 0x3); //set dac
-	bytes[2] = 0;
-	int aValue = dac[aChan];
-	bytes[3] = (aValue>>16 & 0xf);
-	bytes[4] = (aValue>>8 & 0xf); 
-	bytes[5] = aValue & 0xf; 
-	//[socket write:bytes length:6];
-}
 
 - (void) initBoard
 {
@@ -236,65 +192,42 @@ NSString* ZupHVConnector			= @"ZupHVConnector";
 
 - (void) setVoltageReg:(int)aReg chan:(int)aChan value:(int)aValue
 {
-	[comBoard sendBoard: boardNumber 
-				   bloc: aChan % 4
-			   function: kZupVoltageAdc
-			 controlReg: aReg + aChan
-				  value: aValue
-				 cmdLen: 3];	
+
 }
 
 - (void) setCurrentReg:(int)aReg chan:(int)aChan value:(int)aValue
 {
-	[comBoard sendBoard: boardNumber 
-				   bloc: aChan % 4
-			   function: kZupCurrentAdc
-			 controlReg: aReg + aChan
-				  value: aValue
-				 cmdLen: 3];	
+
 }
 
-
-
-
-- (void) revision
-{
-	[comBoard sendBoard:boardNumber bloc:0 function:kZupVoltageAdc controlReg: kZupRevision | kNplHvRead value:0 cmdLen:3];
-}
-
-- (void) connectionChanged
-{
-	comBoard	= [[[[self connectors] objectForKey:ZupHVConnector] connector] objectLink];
-	boardNumber = [[[[self connectors] objectForKey:ZupHVConnector] connector] identifer];
-}
 
 #pragma mark •••HW Wizard
 //the next two methods exist only to 'fake' out Hardware wizard and the Ramper so this item can be selected
-//- (int) crateNumber	{	return 0;	}
-//- (int) slot		{	return [self tag];	}
+- (int) crateNumber	{	return 0;	}
+- (int) slot		{	return [self tag];	}
 
 - (int) numberOfChannels
 {
-    return 4;
+    return 1;
 }
 
-//- (BOOL) hasParmetersToRamp
-//{
-//	return YES;
-//}
+- (BOOL) hasParmetersToRamp
+{
+	return YES;
+}
 
 - (NSArray*) wizardParameters
 {
     NSMutableArray* a = [NSMutableArray array];
-//    ORHWWizParam* p;
+    ORHWWizParam* p;
     
-//    p = [[[ORHWWizParam alloc] init] autorelease];
-//    [p setName:@"Voltage"];
-//    [p setFormat:@"##0" upperLimit:3000 lowerLimit:0 stepSize:1 units:@"V"];
-//    [p setSetMethod:@selector(setDac:withValue:) getMethod:@selector(dac:)];
-//	[p setInitMethodSelector:@selector(sendCmd)];
-//	[p setCanBeRamped:YES];
-//    [a addObject:p];
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Voltage"];
+    [p setFormat:@"##0.0" upperLimit:30 lowerLimit:0 stepSize:0.1 units:@"V"];
+    [p setSetMethod:@selector(setVoltage:witheValue:) getMethod:@selector(voltage:)];
+	[p setInitMethodSelector:@selector(sendVoltage)];
+	[p setCanBeRamped:YES];
+    [a addObject:p];
 	    
     return a;
 }
@@ -306,6 +239,151 @@ NSString* ZupHVConnector			= @"ZupHVConnector";
     [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card"		className:@"ORZupModel"]];
     [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel"	className:@"ORZupModel"]];
     return a;
+	
+}
+
+
+- (NSData*) lastRequest
+{
+	return lastRequest;
+}
+
+- (void) setLastRequest:(NSData*)aRequest
+{
+	[aRequest retain];
+	[lastRequest release];
+	lastRequest = aRequest;    
+}
+
+- (BOOL) portWasOpen
+{
+    return portWasOpen;
+}
+
+- (void) setPortWasOpen:(BOOL)aPortWasOpen
+{
+    portWasOpen = aPortWasOpen;
+}
+
+- (NSString*) portName
+{
+    return portName;
+}
+
+- (void) setPortName:(NSString*)aPortName
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
+    
+    if(![aPortName isEqualToString:portName]){
+        [portName autorelease];
+        portName = [aPortName copy];    
+		
+        BOOL valid = NO;
+        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
+        ORSerialPort *aPort;
+        while (aPort = [enumerator nextObject]) {
+            if([portName isEqualToString:[aPort name]]){
+                [self setSerialPort:aPort];
+                if(portWasOpen){
+                    [self openPort:YES];
+				}
+                valid = YES;
+                break;
+            }
+        } 
+        if(!valid){
+            [self setSerialPort:nil];
+        }       
+    }
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelPortNameChanged object:self];
+}
+
+- (ORSerialPort*) serialPort
+{
+    return serialPort;
+}
+
+- (void) setSerialPort:(ORSerialPort*)aSerialPort
+{
+    [aSerialPort retain];
+    [serialPort release];
+    serialPort = aSerialPort;
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelSerialPortChanged object:self];
+}
+
+- (void) openPort:(BOOL)state
+{
+    if(state) {
+		[serialPort setSpeed:9600];
+		[serialPort setParityNone];
+		[serialPort setStopBits2:NO];
+		[serialPort setDataBits:8];
+        [serialPort open];
+		[serialPort setDelegate:self];
+		
+		if([serialPort isOpen]){ 
+			NSString* s = @"ADR 06\r";
+			if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+			[cmdQueue addObject:[s dataUsingEncoding:NSASCIIStringEncoding]];
+			
+			if(!lastRequest)[self processOneCommandFromQueue];
+			
+		}
+	}
+    else      [serialPort close];
+    portWasOpen = [serialPort isOpen];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelPortStateChanged object:self];
+    
+}
+- (void) dataReceived:(NSNotification*)note
+{
+	BOOL done = NO;
+	if(!lastRequest)return;
+	
+    if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
+		if(!inComingData)inComingData = [[NSMutableData data] retain];
+        [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
+		
+		char* theCmd = (char*)[lastRequest bytes];
+		switch (theCmd[0]){
+		}
+		
+		if(done){
+			[inComingData release];
+			inComingData = nil;
+			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+			[self setLastRequest:nil];			 //clear the last request
+			[self processOneCommandFromQueue];	 //do the next command in the queue
+		}
+	}
+}
+- (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
+{
+}
+
+@end
+
+@implementation ORZupModel (private)
+
+- (void) timeout
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+	NSLogError(@"ZUP",@"command timeout",nil);
+	[self setLastRequest:nil];
+	[self processOneCommandFromQueue];	 //do the next command in the queue
+}
+
+- (void) processOneCommandFromQueue
+{
+	if([cmdQueue count] == 0) return;
+	NSData* cmdData = [[[cmdQueue objectAtIndex:0] retain] autorelease];
+	[cmdQueue removeObjectAtIndex:0];
+	//unsigned char* cmd = (unsigned char*)[cmdData bytes];
+	[self setLastRequest:cmdData];
+	[serialPort writeDataInBackground:cmdData];
+	[self performSelector:@selector(timeout) withObject:nil afterDelay:1];
 	
 }
 
