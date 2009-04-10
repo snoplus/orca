@@ -19,14 +19,14 @@
 
 #pragma mark •••Imported Files
 #import "ORZupModel.h"
-#import "ORNPLCommBoardModel.h"
-#import "ORHWWizParam.h"
-#import "ORHWWizSelection.h"
+
 #import "ORHVRampItem.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORSerialPortList.h"
 
+NSString* ORZupModelOutputStateChanged = @"ORZupModelOutputStateChanged";
+NSString* ORZupModelBoardAddressChanged = @"ORZupModelBoardAddressChanged";
 NSString* ORZupLock					= @"ORZupLock";
 NSString* ORZupModelSerialPortChanged	= @"ORZupModelSerialPortChanged";
 NSString* ORZupModelPortNameChanged	= @"ORZupModelPortNameChanged";
@@ -69,8 +69,6 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 {
 }
 
-
-
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -92,22 +90,50 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 {
 	if(!rampItems)[self setRampItems:[NSMutableArray array]];
 	if([rampItems count] == 0){
-		int i;
 		[[self undoManager] disableUndoRegistration];
-		for(i=0;i<[self numberOfChannels];i++){
-			ORHVRampItem* aRampItem = [[ORHVRampItem alloc] initWithOwner:self];
-			[aRampItem setTargetName:[self className]];
-			[aRampItem setChannelNumber:i];
-			[aRampItem setParameterName:@"Voltage"];
-			[aRampItem loadParams:self];
-			[rampItems addObject:aRampItem];
-			[aRampItem release];
-		}
+		ORHVRampItem* aRampItem = [[ORHVRampItem alloc] initWithOwner:self];
+		[aRampItem setTargetName:[self className]];
+		[aRampItem setParameterName:@"Voltage"];
+		[aRampItem loadParams:self];
+		[rampItems addObject:aRampItem];
+		[aRampItem release];
+	
 		[[self undoManager] enableUndoRegistration];
 	}
 }
 
 #pragma mark ***Accessors
+- (BOOL) sentAddress
+{
+	return sentAddress;
+}
+
+- (BOOL) outputState
+{
+    return outputState;
+}
+
+- (void) setOutputState:(BOOL)aOutputState
+{
+    outputState = aOutputState;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelOutputStateChanged object:self];
+}
+
+- (int) boardAddress
+{
+    return boardAddress;
+}
+
+- (void) setBoardAddress:(int)aBoardAddress
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBoardAddress:boardAddress];
+    
+    boardAddress = aBoardAddress;
+	sentAddress = NO;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelBoardAddressChanged object:self];
+}
+
 - (NSString*) lockName
 {
 	return ORZupLock;
@@ -120,18 +146,30 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 
 - (void) setVoltage:(int)dummy withValue:(float)aValue
 {
-	voltage = aValue;
+	voltage = aValue;	
 }
 
 - (void) loadDac:(int)dummy
 {
+	NSString* s = [NSString stringWithFormat:@"PV %f",[self voltage:0]];
+	[self sendCmd:s];
+	NSLog(@"%.1f\n",[self voltage:0]);
 }
+
+- (void) getStatus
+{
+	[self sendCmd:@"Out?"];
+	[self sendCmd:@"PV?"];
+}
+
+
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setBoardAddress:	[decoder decodeIntForKey:	 @"boardAddress"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
     [[self undoManager] enableUndoRegistration];    
@@ -143,13 +181,22 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:boardAddress		forKey:@"boardAddress"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
 }
 
-- (void) sendCmd
+- (void) sendCmd:(NSString*)aCommand
 {	
-
+	if(![aCommand hasSuffix:@"\r"])aCommand = [aCommand stringByAppendingString:@"\r"];
+	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+	if(!sentAddress){
+		NSString* addressCmd = [NSString stringWithFormat:@"ADR %d\r",[self boardAddress]];
+		[cmdQueue addObject:[addressCmd dataUsingEncoding:NSASCIIStringEncoding]];
+	}
+	
+	[cmdQueue addObject:[aCommand dataUsingEncoding:NSASCIIStringEncoding]];
+	if(!lastRequest)[self processOneCommandFromQueue];
 }
 
 - (SEL) getMethodSelector
@@ -164,84 +211,22 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 
 - (SEL) initMethodSelector
 {
-	//fake out, so we can actually do the load ourselves
-	return @selector(junk);
+	return @selector(rampAboutToStart);
 }
 
-- (void) junk
+- (void) rampAboutToStart
 {
+	NSLog(@"do it\n");
 }
-
 
 - (void) initBoard
 {
-	int chan;
-	for(chan = 0 ; chan<[self numberOfChannels] ; chan++){
-		//set up the Voltage Adc
-		[self setVoltageReg:kZupChanConvTime	chan:chan value:0xff]; //set conversion time to max
-		[self setVoltageReg:kZupChanSetup		chan:chan value:0x5];  //bits 0,1 are gain, bit 2 is enables chan for continous conversion
-		[self setVoltageReg:kZupMode			chan:chan value:0x20]; //20 = continous and 16 bit output word
-
-		//set up the Current Adc
-		[self setCurrentReg:kZupChanConvTime	chan:chan value:0xff]; //set conversion time to max
-		[self setCurrentReg:kZupChanSetup		chan:chan value:0x5];  //bits 0,1 are gain, bit 2 is enables chan for continous conversion
-		[self setCurrentReg:kZupMode			chan:chan value:0x20]; //20 = continous and 16 bit output word
-
-	}
 }
-
-- (void) setVoltageReg:(int)aReg chan:(int)aChan value:(int)aValue
-{
-
-}
-
-- (void) setCurrentReg:(int)aReg chan:(int)aChan value:(int)aValue
-{
-
-}
-
-
-#pragma mark •••HW Wizard
-//the next two methods exist only to 'fake' out Hardware wizard and the Ramper so this item can be selected
-- (int) crateNumber	{	return 0;	}
-- (int) slot		{	return [self tag];	}
 
 - (int) numberOfChannels
 {
     return 1;
 }
-
-- (BOOL) hasParmetersToRamp
-{
-	return YES;
-}
-
-- (NSArray*) wizardParameters
-{
-    NSMutableArray* a = [NSMutableArray array];
-    ORHWWizParam* p;
-    
-    p = [[[ORHWWizParam alloc] init] autorelease];
-    [p setName:@"Voltage"];
-    [p setFormat:@"##0.0" upperLimit:30 lowerLimit:0 stepSize:0.1 units:@"V"];
-    [p setSetMethod:@selector(setVoltage:witheValue:) getMethod:@selector(voltage:)];
-	[p setInitMethodSelector:@selector(sendVoltage)];
-	[p setCanBeRamped:YES];
-    [a addObject:p];
-	    
-    return a;
-}
-
-- (NSArray*) wizardSelections
-{
-    NSMutableArray* a = [NSMutableArray array];
-    [a addObject:[ORHWWizSelection itemAtLevel:kContainerLevel name:@"Crate"	className:@"ORZupModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kObjectLevel name:@"Card"		className:@"ORZupModel"]];
-    [a addObject:[ORHWWizSelection itemAtLevel:kChannelLevel name:@"Channel"	className:@"ORZupModel"]];
-    return a;
-	
-}
-
 
 - (NSData*) lastRequest
 {
@@ -322,15 +307,8 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 		[serialPort setDataBits:8];
         [serialPort open];
 		[serialPort setDelegate:self];
-		
-		if([serialPort isOpen]){ 
-			NSString* s = @"ADR 06\r";
-			if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
-			[cmdQueue addObject:[s dataUsingEncoding:NSASCIIStringEncoding]];
-			
-			if(!lastRequest)[self processOneCommandFromQueue];
-			
-		}
+		sentAddress = NO;
+
 	}
     else      [serialPort close];
     portWasOpen = [serialPort isOpen];
@@ -346,9 +324,40 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
         [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
 		
-		char* theCmd = (char*)[lastRequest bytes];
-		switch (theCmd[0]){
+		NSString* theLastCommand = [[[NSString alloc] initWithData:lastRequest 
+														  encoding:NSASCIIStringEncoding] autorelease];
+		theLastCommand = [theLastCommand uppercaseString];
+		
+		NSString* theResponse = [[[NSString alloc] initWithData:inComingData 
+														  encoding:NSASCIIStringEncoding] autorelease];
+		
+		theLastCommand	= [theLastCommand uppercaseString];
+		theResponse		= [theResponse uppercaseString];
+		
+		if([theResponse hasPrefix:@"OK"]){
+			if([theLastCommand hasPrefix:@"ADR"]){
+				sentAddress = YES;
+			}
+			done = YES;
 		}
+		else if([theLastCommand hasPrefix:@"C"]){
+			NSLog(@"%@\n",theResponse);
+			done = YES;
+		}		
+		else if([theLastCommand rangeOfString:@"?"].location != NSNotFound){
+			if([theLastCommand hasPrefix:@"OUT"]){
+				if([theResponse hasPrefix:@"ON"])		[self setOutputState:YES];
+				else if([theResponse hasPrefix:@"OFF"])	[self setOutputState:NO];
+				done = YES;
+			}
+			if([theLastCommand hasPrefix:@"PV"]){
+				float theVoltage = [theResponse floatValue];
+				NSLog(@"Voltage is %.1f\n",theVoltage);
+				[self setVoltage:0 withValue:theVoltage];
+				[[rampItems objectAtIndex:0] placeCurrentValue];
+				done = YES;
+			}
+		}	
 		
 		if(done){
 			[inComingData release];
@@ -359,6 +368,14 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 		}
 	}
 }
+
+- (void) togglePower
+{
+	NSString* s = [NSString stringWithFormat:@"OUT %d",![self outputState]];
+	[self sendCmd:s];
+	[self sendCmd:@"OUT?"];
+}
+
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 {
 }
@@ -372,6 +389,8 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	NSLogError(@"ZUP",@"command timeout",nil);
 	[self setLastRequest:nil];
+	[cmdQueue removeAllObjects];
+	sentAddress = NO;
 	[self processOneCommandFromQueue];	 //do the next command in the queue
 }
 
@@ -380,7 +399,6 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 	if([cmdQueue count] == 0) return;
 	NSData* cmdData = [[[cmdQueue objectAtIndex:0] retain] autorelease];
 	[cmdQueue removeObjectAtIndex:0];
-	//unsigned char* cmd = (unsigned char*)[cmdData bytes];
 	[self setLastRequest:cmdData];
 	[serialPort writeDataInBackground:cmdData];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:1];

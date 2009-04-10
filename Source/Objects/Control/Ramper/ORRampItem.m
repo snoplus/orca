@@ -465,7 +465,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (void) loadParams:(id)anObj
 {
-	if(anObj){
+	if([anObj respondsToSelector:@selector(wizardParameters)]){
 		NSArray* allParams = [anObj wizardParameters];
 		NSMutableArray* revelantParameters = [NSMutableArray array];
 		NSEnumerator* e = [allParams objectEnumerator];
@@ -485,7 +485,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 - (NSArray*) rampableParametersForTarget:(id)aTarget
 {
 	NSMutableArray* rampableParameters = nil;
-	if(aTarget){
+	if([aTarget respondsToSelector:@selector(wizardParameters)]){
 		NSArray* allParameters = [aTarget wizardParameters]; 
 		rampableParameters = [NSMutableArray array]; 
 		ORHWWizParam* p;
@@ -704,7 +704,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	//cache the target, the selectors that we need....
 	
 	SEL targetIniter = [parameterObject initMethodSelector];
-	if(!targetIniter){
+	if(!targetIniter && [targetObject respondsToSelector:@selector(wizardParameters)]){
 		NSArray* allParams = [targetObject wizardParameters];
 		int n = [allParams count];
 		int i;
@@ -835,6 +835,9 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		//id targetObject;// = [[[readOutList children] objectAtIndex:0] object];
 		//NSLog(@"Ramper %d: Stopped ramping %@ %@ channel %d %@ Final Value = %@. Target was %f\n",[self uniqueIdNumber],[targetObject className],[targetObject identifier],channelNumber,[parameterObject name],finalValue,rampTarget);
 		
+		[self placeCurrentValue];
+		[owner stopRamping:self];
+
 		[invocationForGetter release];
 		invocationForGetter = nil;
 		
@@ -843,8 +846,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		
 		[invocationForInit release];
 		invocationForInit = nil;
-		[self placeCurrentValue];
-		[owner stopRamping:self];
+		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemRunningChanged object:self];
 	}
 }

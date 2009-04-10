@@ -168,19 +168,21 @@
 
 - (void) populatePopups
 {
-	//[targetNamePU removeAllItems];
-	NSArray* wizObjects = [owner collectObjectsConformingTo:@protocol(ORHWWizard)];
-	OrcaObject* obj;
-	NSEnumerator* objEnumy = [wizObjects objectEnumerator];
-	while(obj = [objEnumy nextObject]){
-		NSArray* parameters = [model rampableParametersForTarget:obj];
-		if([parameters count]){
-			NSString* theName = [obj className];
-			int index = [targetNamePU indexOfItemWithTitle:theName];
-			if(index<0)[targetNamePU addItemWithTitle:theName];
+	if([owner respondsToSelector:@selector(collectObjectsConformingTo:)]){
+		[targetNamePU removeAllItems];
+		NSArray* wizObjects = [owner collectObjectsConformingTo:@protocol(ORHWWizard)];
+		OrcaObject* obj;
+		NSEnumerator* objEnumy = [wizObjects objectEnumerator];
+		while(obj = [objEnumy nextObject]){
+			NSArray* parameters = [model rampableParametersForTarget:obj];
+			if([parameters count]){
+				NSString* theName = [obj className];
+				int index = [targetNamePU indexOfItemWithTitle:theName];
+				if(index<0)[targetNamePU addItemWithTitle:theName];
+			}
 		}
+		if([model targetName])[targetNamePU selectItemWithTitle:[model targetName]];
 	}
-	if([model targetName])[targetNamePU selectItemWithTitle:[model targetName]];
 }
 
 - (NSMutableDictionary*) miscAttributesForKey:(NSString*)aKey

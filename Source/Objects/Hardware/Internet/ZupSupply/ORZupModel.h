@@ -20,33 +20,6 @@
 #pragma mark •••Imported Files
 
 #import "ORRamperModel.h"
-#import "ORHWWizard.h"
-
-#define kZupCurrentAdc		0x0
-#define kZupVoltageAdc		0x1
-#define kZupDac				0x2
-#define kZupStatusControl	0x3
-
-
-//reg defs for ADC AD7734
-#define kZupCommReg			0x0
-#define kZupIOPort			0x1
-#define kZupRevision			0x2
-#define kZupTest				0x3
-#define kZupIOAdcStatus		0x4
-#define kZupCheckSum			0x5
-#define kZupAdc0ScaleCalib	0x6
-#define kZupAdcFullScale		0x7
-#define kZupChanData			0x8
-#define kZupChan0ScaleCal		0x10
-#define kZupChanFSCal			0x18
-#define kZupChanStatus		0x20
-#define kZupChanSetup			0x28
-#define kZupChanConvTime		0x30
-#define kZupMode				0x38
-
-#define kNplHvRead				0x40
-#define kNplHvWrite				0x00
 
 @class ORSerialPort;
 
@@ -60,20 +33,26 @@
 	NSMutableData*		inComingData;
 	NSMutableString*    buffer;
 	float voltage;
+    int boardAddress;
+	BOOL sentAddress;
+    BOOL outputState;
 }
 
 #pragma mark ***Accessors
+- (BOOL) sentAddress;
+- (BOOL) outputState;
+- (void) setOutputState:(BOOL)aOutputState;
+- (int) boardAddress;
+- (void) setBoardAddress:(int)aBoardAddress;
 - (float) voltage:(int)dummy;
 - (void) setVoltage:(int)dummy withValue:(float)aValue;
+- (void) loadDac:(int)dummy;
 - (SEL) getMethodSelector;
 - (SEL) setMethodSelector;
 - (SEL) initMethodSelector;
-- (void) junk;
-- (void) setVoltageReg:(int)aReg chan:(int)aChan value:(int)aValue;
-- (void) setCurrentReg:(int)aReg chan:(int)aChan value:(int)aValue;
+- (void) rampAboutToStart;
 - (int) numberOfChannels;
 - (void) initBoard;
-- (void) loadDac:(int)dummy;
 
 - (void) dataReceived:(NSNotification*)note;
 - (ORSerialPort*) serialPort;
@@ -86,15 +65,19 @@
 - (void) setLastRequest:(NSData*)aRequest;
 - (void) openPort:(BOOL)state;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
+- (void) getStatus;
+- (void) togglePower;
 
 #pragma mark ***Utilities
-- (void) sendCmd;
+- (void) sendCmd:(NSString*)aCommand;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORZupModelOutputStateChanged;
+extern NSString* ORZupModelBoardAddressChanged;
 extern NSString* ORZupLock;
 extern NSString* ORZupModelSerialPortChanged;
 extern NSString* ORZupModelPortStateChanged;

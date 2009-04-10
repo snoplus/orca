@@ -259,6 +259,9 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 
 - (void) stopRamping:(ORRampItem*)anItem
 {
+	if([loadSet containsObject:anItem]){
+		[anItem loadHardware]; //one last load
+	}
 	[rampingItems removeObject:anItem];
 	if([rampingItems count] == 0){
 		[rampingItems release];

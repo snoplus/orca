@@ -46,7 +46,7 @@
 
 
     basicOpsSize	= NSMakeSize(280,280);
-    rampOpsSize		= NSMakeSize(570,710);
+    rampOpsSize		= NSMakeSize(570,650);
     blankView		= [[NSView alloc] init];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORZup%d.selectedtab",[model uniqueIdNumber]];
@@ -83,6 +83,16 @@
                          name : ORSerialPortStateChanged
                        object : nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(boardAddressChanged:)
+                         name : ORZupModelBoardAddressChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(outputStateChanged:)
+                         name : ORZupModelOutputStateChanged
+						object: model];
+
 }
 
 
@@ -93,6 +103,25 @@
 	[self portStateChanged:nil];
     [self portNameChanged:nil];
    
+	[self boardAddressChanged:nil];
+	[self outputStateChanged:nil];
+}
+
+- (void) outputStateChanged:(NSNotification*)aNote
+{
+	if([model sentAddress]){
+		[outputStateField setObjectValue: [model outputState]?@"ON":@"OFF"];
+		[onOffButton setTitle:![model outputState]?@"TURN ON":@"TURN OFF"];
+	}
+	else {
+		[outputStateField setObjectValue: @"--"];
+		[onOffButton setTitle:@"--"];
+	}
+}
+
+- (void) boardAddressChanged:(NSNotification*)aNote
+{
+	[boardAddressField setIntValue: [model boardAddress]];
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -105,6 +134,7 @@
                 [openPortButton setTitle:@"Close"];
                 [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
                 [portStateField setStringValue:@"Open"];
+				
             }
             else {
                 [openPortButton setTitle:@"Open"];
@@ -171,9 +201,6 @@
 {
 }
 
-
-
-
 #pragma mark •••Notifications
 
 - (void) setButtonStates
@@ -195,17 +222,20 @@
 - (NSString*) rampItemNibFileName
 {
 	//subclasses can specify a differant RampItem nib file if needed.
-	return @"HVRampItem";
+	return @"ZupRampItem";
 }
 
 #pragma mark •••Actions
 
-- (IBAction) sendCmdAction:(id)sender
+- (IBAction) boardAddressAction:(id)sender
 {
-	[self endEditing];
-	[model sendCmd];
+	[model setBoardAddress:[sender intValue]];	
 }
 
+- (IBAction) getStatusAction:(id)sender
+{
+	[model getStatus];	
+}
 - (IBAction) lockAction:(id) sender
 {
     [gSecurity tryToSetLock:ORZupLock to:[sender intValue] forWindow:[self window]];
@@ -225,6 +255,11 @@
 - (IBAction) openPortAction:(id)sender
 {
     [model openPort:![[model serialPort] isOpen]];
+}
+
+- (IBAction) onOffAction:(id)sender
+{
+	[model togglePower];
 }
 
 @end

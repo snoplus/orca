@@ -120,15 +120,19 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>boardAddressAction</key>
+				<string>id</string>
+				<key>getStatusAction</key>
+				<string>id</string>
 				<key>initBoard</key>
 				<string>id</string>
 				<key>lockAction</key>
 				<string>id</string>
+				<key>onOffAction</key>
+				<string>id</string>
 				<key>openPortAction</key>
 				<string>id</string>
 				<key>portListAction</key>
-				<string>id</string>
-				<key>sendCmdAction</key>
 				<string>id</string>
 				<key>version</key>
 				<string>id</string>
@@ -139,10 +143,16 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>boardAddressField</key>
+				<string>NSTextField</string>
 				<key>lockButton</key>
+				<string>NSButton</string>
+				<key>onOffButton</key>
 				<string>NSButton</string>
 				<key>openPortButton</key>
 				<string>NSButton</string>
+				<key>outputStateField</key>
+				<string>NSTextField</string>
 				<key>portListPopup</key>
 				<string>NSPopUpButton</string>
 				<key>portStateField</key>

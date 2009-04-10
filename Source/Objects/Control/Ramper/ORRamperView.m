@@ -141,7 +141,7 @@
 	}
 	
 	if(mouseIsDown && !selectedWayPoint){
-		NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%.0f",[model rampTarget]]];
+		NSAttributedString* s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%.1f",[model rampTarget]]];
 		NSSize stringSize = [s size];
 		targetLineY += 5;
 		if(targetLineY + stringSize.height + 5  > rampArea.size.height){

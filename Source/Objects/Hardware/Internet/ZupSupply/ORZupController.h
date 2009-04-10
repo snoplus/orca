@@ -22,10 +22,13 @@
 @interface ORZupController : ORRamperController 
 {
 	IBOutlet NSButton*		lockButton;
+	IBOutlet NSTextField*	outputStateField;
+	IBOutlet NSTextField*	boardAddressField;
 	IBOutlet NSButton*		sendButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSPopUpButton* portListPopup;
     IBOutlet NSButton*      openPortButton;
+    IBOutlet NSButton*      onOffButton;
 	
 	//lots of other Outlets inherited from the RamperController
 	IBOutlet NSView*		totalView;
@@ -35,20 +38,22 @@
 	NSView*					blankView;
 }
 
-#pragma mark •••Notifications
-
 #pragma mark ***Interface Management
+- (void) outputStateChanged:(NSNotification*)aNote;
+- (void) boardAddressChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
 - (void) setButtonStates;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) sendCmdAction:(id)sender;
+- (IBAction) boardAddressAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) initBoard:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
+- (IBAction) getStatusAction:(id)sender;
+- (IBAction) onOffAction:(id)sender;
 
 @end
 
