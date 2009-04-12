@@ -32,13 +32,34 @@
 	NSMutableArray*		cmdQueue;
 	NSMutableData*		inComingData;
 	NSMutableString*    buffer;
-	float voltage;
-    int boardAddress;
-	BOOL sentAddress;
-    BOOL outputState;
+	float				voltage;
+    int					boardAddress;
+	BOOL				sentAddress;
+    BOOL				outputState;
+    float				actualCurrent;
+    float				current;
+    int					statusRegister;
+    int					faultRegister;
+    int faultEnableMask;
+    int statusEnableMask;
+    float actualVoltage;
 }
 
 #pragma mark ***Accessors
+- (float) actualVoltage;
+- (void) setActualVoltage:(float)aActualVoltage;
+- (int) statusEnableMask;
+- (void) setStatusEnableMask:(int)aStatusEnableMask;
+- (int) faultEnableMask;
+- (void) setFaultEnableMask:(int)aFaultEnableMask;
+- (int) faultRegister;
+- (void) setFaultRegister:(int)aFaultRegister;
+- (int) statusRegister;
+- (void) setStatusRegister:(int)aStatusRegister;
+- (float) current;
+- (void) setCurrent:(float)aCurrent;
+- (float) actualCurrent;
+- (void) setActualCurrent:(float)aActualCurrent;
 - (BOOL) sentAddress;
 - (BOOL) outputState;
 - (void) setOutputState:(BOOL)aOutputState;
@@ -46,13 +67,17 @@
 - (void) setBoardAddress:(int)aBoardAddress;
 - (float) voltage:(int)dummy;
 - (void) setVoltage:(int)dummy withValue:(float)aValue;
+- (float) voltage;
+- (void) setVoltage:(float)aValue;
 - (void) loadDac:(int)dummy;
+- (float) upperLimit;
+- (float) lowerLimit;
 - (SEL) getMethodSelector;
 - (SEL) setMethodSelector;
 - (SEL) initMethodSelector;
-- (void) rampAboutToStart;
 - (int) numberOfChannels;
 - (void) initBoard;
+- (void) turnOff;
 
 - (void) dataReceived:(NSNotification*)note;
 - (ORSerialPort*) serialPort;
@@ -67,15 +92,25 @@
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 - (void) getStatus;
 - (void) togglePower;
+- (void) sendFailEnableMask;
+- (void) sendStatusEnableMask;
 
 #pragma mark ***Utilities
 - (void) sendCmd:(NSString*)aCommand;
+- (void) sendCmd:(NSString*)aCommand value:(short)hexData;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
+extern NSString* ORZupModelActualVoltageChanged;
+extern NSString* ORZupModelStatusEnableMaskChanged;
+extern NSString* ORZupModelFaultEnableMaskChanged;
+extern NSString* ORZupModelFaultRegisterChanged;
+extern NSString* ORZupModelStatusRegisterChanged;
+extern NSString* ORZupModelCurrentChanged;
+extern NSString* ORZupModelActualCurrentChanged;
 extern NSString* ORZupModelOutputStateChanged;
 extern NSString* ORZupModelBoardAddressChanged;
 extern NSString* ORZupLock;

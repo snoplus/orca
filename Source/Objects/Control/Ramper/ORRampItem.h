@@ -138,6 +138,7 @@
 - (void) incTime;
 - (void) stopRamper;
 - (void) loadHardware;
+- (void) turnOff;
 - (NSString*) itemName;
 - (void) panic;
 
@@ -175,6 +176,10 @@ extern NSString* ORRampItemTargetChanged;
 - (id) initWithPosition:(NSPoint)aPoint;
 - (NSPoint) xyPosition;
 - (void) setXyPosition:(NSPoint)aPoint;
+@end
+
+@interface NSObject (ORRampitem)
+- (void) turnOff;
 @end
 
 extern NSString* ORWayPointChanged;

@@ -31,7 +31,7 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 
 @implementation ORRamperModel
 
-#pragma mark ¥¥¥Initialization
+#pragma mark â€¢â€¢â€¢Initialization
 - (id) init
 {
 	[super init];
@@ -107,7 +107,7 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 	[aRampItem release];
 }
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 - (NSMutableArray*) wayPoints
 {
 	return [selectedRampItem wayPoints];
@@ -197,7 +197,7 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 	return ORRamperObjectListLock;
 }
 
-#pragma mark ¥¥¥Ramping
+#pragma mark â€¢â€¢â€¢Ramping
 - (int) runningCount
 {
 	return [rampingItems count];
@@ -257,11 +257,8 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
     [[self undoManager] enableUndoRegistration];
 }
 
-- (void) stopRamping:(ORRampItem*)anItem
+- (void) stopRamping:(ORRampItem*)anItem turnOff:(BOOL)turnOFF
 {
-	if([loadSet containsObject:anItem]){
-		[anItem loadHardware]; //one last load
-	}
 	[rampingItems removeObject:anItem];
 	if([rampingItems count] == 0){
 		[rampingItems release];
@@ -279,7 +276,7 @@ NSString* ORRamperNeedsUpdate		= @"ORRamperNeedsUpdate";
 }
 
 
-#pragma mark ¥¥¥Archival
+#pragma mark â€¢â€¢â€¢Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];

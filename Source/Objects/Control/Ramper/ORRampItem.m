@@ -720,8 +720,9 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	if(targetIniter){
 		invocationForInit = [[NSInvocation invocationWithMethodSignature:[targetObject methodSignatureForSelector:targetIniter]] retain];
 		[invocationForInit setSelector:targetIniter];
-		[invocationForInit setTarget:targetObject];
+		[invocationForInit setTarget:targetObject];		
 	}
+	
 	
 	SEL targetSetter = [parameterObject setMethodSelector];
 	invocationForSetter = [[NSInvocation invocationWithMethodSignature:[targetObject methodSignatureForSelector:targetSetter]] retain];
@@ -732,12 +733,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	invocationForGetter = [[NSInvocation invocationWithMethodSignature:[targetObject methodSignatureForSelector:targetGetter]] retain];
 	[invocationForGetter setSelector:targetGetter];
 	[invocationForGetter setTarget:targetObject];
-	
-	//get the starting value
-	//[invocationForGetter invoke];
-	//NSString* finalValue = [invocationForGetter returnValue];
-	//NSLog(@"Ramper %d: Started ramping %@ %@ channel %d %@ from %@ to %f.\n",[self uniqueIdNumber],[targetObject className],[targetObject identifier],channelNumber,[parameterObject name],finalValue,rampTarget);
-	
+		
 	[owner startRamping:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRampItemRunningChanged object:self];
 }
@@ -815,6 +811,19 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		@catch(NSException* localException) {
 			[self stopRamper];
 			NSRunAlertPanel([localException name], @"%@\n\nRamp Stopped for %@", @"OK", nil, nil,
+								localException,[self itemName]);
+		}
+	}
+}
+- (void) turnOff
+{
+	if([targetObject respondsToSelector:@selector(turnOff)]){
+		//load to turnOff the hardware
+		@try {
+			[targetObject turnOff];
+		}
+		@catch(NSException* localException) {
+			NSRunAlertPanel([localException name], @"%@\n\nUnable to turn off hw", @"OK", nil, nil,
 							localException,[self itemName]);
 		}
 	}
@@ -827,16 +836,13 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		[startDate release];
 		startDate = nil;
 		[NSObject cancelPreviousPerformRequestsWithTarget:self];
+		
+		[owner stopRamping:self turnOff:panic == YES];
+		
 		running = NO;
 		panic = NO;
 		
-		//[invocationForGetter invoke];
-		//NSString* finalValue = [invocationForGetter returnValue];
-		//id targetObject;// = [[[readOutList children] objectAtIndex:0] object];
-		//NSLog(@"Ramper %d: Stopped ramping %@ %@ channel %d %@ Final Value = %@. Target was %f\n",[self uniqueIdNumber],[targetObject className],[targetObject identifier],channelNumber,[parameterObject name],finalValue,rampTarget);
-		
 		[self placeCurrentValue];
-		[owner stopRamping:self];
 
 		[invocationForGetter release];
 		invocationForGetter = nil;

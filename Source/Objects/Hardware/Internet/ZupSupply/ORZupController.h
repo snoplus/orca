@@ -22,6 +22,13 @@
 @interface ORZupController : ORRamperController 
 {
 	IBOutlet NSButton*		lockButton;
+	IBOutlet NSTextField*	actualVoltageField;
+	IBOutlet NSMatrix*		statusEnableMatrix;
+	IBOutlet NSMatrix*		faultEnableMatrix;
+	IBOutlet NSMatrix*		faultRegMatrix;
+	IBOutlet NSMatrix*		statusRegMatrix;
+	IBOutlet NSTextField*	currentTextField;
+	IBOutlet NSTextField*	actualCurrentTextField;
 	IBOutlet NSTextField*	outputStateField;
 	IBOutlet NSTextField*	boardAddressField;
 	IBOutlet NSButton*		sendButton;
@@ -39,6 +46,13 @@
 }
 
 #pragma mark ***Interface Management
+- (void) actualVoltageChanged:(NSNotification*)aNote;
+- (void) statusEnableMaskChanged:(NSNotification*)aNote;
+- (void) faultEnableMaskChanged:(NSNotification*)aNote;
+- (void) faultRegisterChanged:(NSNotification*)aNote;
+- (void) statusRegisterChanged:(NSNotification*)aNote;
+- (void) currentChanged:(NSNotification*)aNote;
+- (void) actualCurrentChanged:(NSNotification*)aNote;
 - (void) outputStateChanged:(NSNotification*)aNote;
 - (void) boardAddressChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
@@ -47,6 +61,10 @@
 - (void) portStateChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) statusEnableMaskAction:(id)sender;
+- (IBAction) faultEnableMaskAction:(id)sender;
+- (IBAction) currentTextFieldAction:(id)sender;
+- (IBAction) actualCurrentTextFieldAction:(id)sender;
 - (IBAction) boardAddressAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) initBoard:(id) sender;
@@ -54,6 +72,7 @@
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) getStatusAction:(id)sender;
 - (IBAction) onOffAction:(id)sender;
+- (IBAction) sendEnableSRQAction:(id)sender;
 
 @end
 

@@ -25,12 +25,19 @@
 #import "ORSerialPortAdditions.h"
 #import "ORSerialPortList.h"
 
-NSString* ORZupModelOutputStateChanged = @"ORZupModelOutputStateChanged";
-NSString* ORZupModelBoardAddressChanged = @"ORZupModelBoardAddressChanged";
-NSString* ORZupLock					= @"ORZupLock";
-NSString* ORZupModelSerialPortChanged	= @"ORZupModelSerialPortChanged";
-NSString* ORZupModelPortNameChanged	= @"ORZupModelPortNameChanged";
-NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
+NSString* ORZupModelActualVoltageChanged = @"ORZupModelActualVoltageChanged";
+NSString* ORZupModelStatusEnableMaskChanged = @"ORZupModelStatusEnableMaskChanged";
+NSString* ORZupModelFaultEnableMaskChanged = @"ORZupModelFaultEnableMaskChanged";
+NSString* ORZupModelFaultRegisterChanged	= @"ORZupModelFaultRegisterChanged";
+NSString* ORZupModelStatusRegisterChanged	= @"ORZupModelStatusRegisterChanged";
+NSString* ORZupModelCurrentChanged			= @"ORZupModelCurrentChanged";
+NSString* ORZupModelActualCurrentChanged	= @"ORZupModelActualCurrentChanged";
+NSString* ORZupModelOutputStateChanged		= @"ORZupModelOutputStateChanged";
+NSString* ORZupModelBoardAddressChanged		= @"ORZupModelBoardAddressChanged";
+NSString* ORZupLock							= @"ORZupLock";
+NSString* ORZupModelSerialPortChanged		= @"ORZupModelSerialPortChanged";
+NSString* ORZupModelPortNameChanged			= @"ORZupModelPortNameChanged";
+NSString* ORZupModelPortStateChanged		= @"ORZupModelPortStateChanged";
 
 @interface ORZupModel (private)
 - (void) timeout;
@@ -103,6 +110,99 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 }
 
 #pragma mark ***Accessors
+
+- (float) actualVoltage
+{
+    return actualVoltage;
+}
+
+- (void) setActualVoltage:(float)aActualVoltage
+{
+    actualVoltage = aActualVoltage;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelActualVoltageChanged object:self];
+}
+
+- (int) statusEnableMask
+{
+    return statusEnableMask;
+}
+
+- (void) setStatusEnableMask:(int)aStatusEnableMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setStatusEnableMask:statusEnableMask];
+    
+    statusEnableMask = aStatusEnableMask;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelStatusEnableMaskChanged object:self];
+}
+
+- (int) faultEnableMask
+{
+    return faultEnableMask;
+}
+
+- (void) setFaultEnableMask:(int)aFaultEnableMask
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFaultEnableMask:faultEnableMask];
+    
+    faultEnableMask = aFaultEnableMask;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelFaultEnableMaskChanged object:self];
+}
+
+- (int) faultRegister
+{
+    return faultRegister;
+}
+
+- (void) setFaultRegister:(int)aFaultRegister
+{
+    faultRegister = aFaultRegister;
+	NSLog(@"fault:0x%x\n",aFaultRegister);
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelFaultRegisterChanged object:self];
+}
+
+- (int) statusRegister
+{
+    return statusRegister;
+}
+
+- (void) setStatusRegister:(int)aStatusRegister
+{
+    statusRegister = aStatusRegister;
+	NSLog(@"status:0x%x\n",statusRegister);
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelStatusRegisterChanged object:self];
+}
+
+- (float) current
+{
+    return current;
+}
+
+- (void) setCurrent:(float)aCurrent
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setCurrent:current];
+    
+    current = aCurrent;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelCurrentChanged object:self];
+}
+
+- (float) actualCurrent
+{
+    return actualCurrent;
+}
+
+- (void) setActualCurrent:(float)aActualCurrent
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setActualCurrent:actualCurrent];
+    
+    actualCurrent = aActualCurrent;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORZupModelActualCurrentChanged object:self];
+}
 - (BOOL) sentAddress
 {
 	return sentAddress;
@@ -139,6 +239,7 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 	return ORZupLock;
 }
 
+//these needed to interface with the ramper
 - (float) voltage:(int)dummy
 {
 	return voltage;
@@ -149,19 +250,58 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 	voltage = aValue;	
 }
 
+//these are for convienence
+- (void) setVoltage:(float)aValue
+{
+	voltage = aValue;	
+}
+
+- (float)voltage
+{
+	return voltage;
+}
+
 - (void) loadDac:(int)dummy
 {
+	if(![self outputState]){
+		NSException* e = [NSException exceptionWithName:@"No Power" reason:@"Power must be on" userInfo:nil];
+		[e raise];
+	}
+	[self sendCmd:@"MC?"];
+	[self sendCmd:@"MV?"];
 	NSString* s = [NSString stringWithFormat:@"PV %f",[self voltage:0]];
 	[self sendCmd:s];
-	NSLog(@"%.1f\n",[self voltage:0]);
 }
 
 - (void) getStatus
 {
-	[self sendCmd:@"Out?"];
-	[self sendCmd:@"PV?"];
+	[self sendCmd:@"OUT?"];
+	[self sendCmd:@"STT?"];
 }
 
+- (void) turnOff
+{
+	[self sendCmd:@"OUT 0"];
+	[self sendCmd:@"OUT?"];
+}
+
+- (float) upperLimit
+{
+	return 300;
+}
+
+- (float) lowerLimit
+{
+	return 0;
+}
+
+- (void) stopRamping:(ORRampItem*)anItem turnOff:(BOOL)turnOff
+{
+	if([self outputState])[self loadDac:0];
+	[super stopRamping:anItem turnOff:turnOff];
+	if(turnOff)[self turnOff];
+	[self getStatus];
+}
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -169,6 +309,10 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setStatusEnableMask:[decoder decodeIntForKey:@"ORZupModelStatusEnableMask"]];
+    [self setFaultEnableMask:[decoder decodeIntForKey:@"ORZupModelFaultEnableMask"]];
+    [self setCurrent:[decoder decodeFloatForKey:@"ORZupModelCurrent"]];
+    [self setActualCurrent:[decoder decodeFloatForKey:@"ORZupModelActualCurrent"]];
     [self setBoardAddress:	[decoder decodeIntForKey:	 @"boardAddress"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
@@ -181,9 +325,31 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeInt:statusEnableMask forKey:@"ORZupModelStatusEnableMask"];
+    [encoder encodeInt:faultEnableMask forKey:@"ORZupModelFaultEnableMask"];
+    [encoder encodeFloat:current forKey:@"ORZupModelCurrent"];
+    [encoder encodeFloat:actualCurrent forKey:@"ORZupModelActualCurrent"];
     [encoder encodeInt:boardAddress		forKey:@"boardAddress"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
+}
+
+- (void) sendCmd:(NSString*)aCommand value:(short)hexData
+{
+	if(!cmdQueue)cmdQueue = [[NSMutableArray array] retain];
+	if(!sentAddress){
+		NSString* addressCmd = [NSString stringWithFormat:@"ADR %d\r",[self boardAddress]];
+		[cmdQueue addObject:[addressCmd dataUsingEncoding:NSASCIIStringEncoding]];
+	}
+	NSMutableData* theCommand = [NSMutableData data];
+	[theCommand appendData:[aCommand dataUsingEncoding:NSASCIIStringEncoding]];
+	[theCommand appendData:[@" " dataUsingEncoding:NSASCIIStringEncoding]];
+	[theCommand appendBytes:&hexData length:2];
+	[theCommand appendData:[@"\r" dataUsingEncoding:NSASCIIStringEncoding]];
+	
+	[cmdQueue addObject:theCommand];
+	if(!lastRequest)[self processOneCommandFromQueue];
+	
 }
 
 - (void) sendCmd:(NSString*)aCommand
@@ -199,25 +365,9 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 	if(!lastRequest)[self processOneCommandFromQueue];
 }
 
-- (SEL) getMethodSelector
-{
-	return @selector(voltage:);
-}
-
-- (SEL) setMethodSelector
-{
-	return @selector(setVoltage:withValue:);
-}
-
-- (SEL) initMethodSelector
-{
-	return @selector(rampAboutToStart);
-}
-
-- (void) rampAboutToStart
-{
-	NSLog(@"do it\n");
-}
+- (SEL) getMethodSelector  { return @selector(voltage:); }
+- (SEL) setMethodSelector  { return @selector(setVoltage:withValue:); }
+- (SEL) initMethodSelector  { return @selector(initBoard); }
 
 - (void) initBoard
 {
@@ -333,8 +483,14 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 		
 		theLastCommand	= [theLastCommand uppercaseString];
 		theResponse		= [theResponse uppercaseString];
-		
-		if([theResponse hasPrefix:@"OK"]){
+		if([theResponse hasPrefix:@"I"]){
+			NSString* hexString = [theResponse substringFromIndex:3];
+			char s[255];
+			[hexString getCString:s maxLength:255 encoding:NSASCIIStringEncoding];	// NO return if conversion not possible due to encoding errors or too small of a buffer. The buffer should include room for maxBufferCount bytes plus the NULL termination character, which this method adds. (So pass in one less than the size of the buffer.)
+			int theValue = [[NSNumber numberWithLong:strtoul(s,0,16)] intValue];
+			[self setStatusRegister:theValue];
+		}
+		else if([theResponse hasPrefix:@"OK"]){
 			if([theLastCommand hasPrefix:@"ADR"]){
 				sentAddress = YES;
 			}
@@ -350,12 +506,62 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 				else if([theResponse hasPrefix:@"OFF"])	[self setOutputState:NO];
 				done = YES;
 			}
-			if([theLastCommand hasPrefix:@"PV"]){
+			else if([theLastCommand hasPrefix:@"PV"]){
 				float theVoltage = [theResponse floatValue];
-				NSLog(@"Voltage is %.1f\n",theVoltage);
-				[self setVoltage:0 withValue:theVoltage];
+				[self setVoltage:theVoltage];
 				[[rampItems objectAtIndex:0] placeCurrentValue];
 				done = YES;
+			}
+			else if([theLastCommand hasPrefix:@"MV"]){
+				float theVoltage = [theResponse floatValue];
+				[self setActualVoltage:theVoltage];
+				done = YES;
+			}
+			else if([theLastCommand hasPrefix:@"MC"]){
+				//float theCurrent = [theResponse floatValue];
+				//[self actualCurrent:theCurrent];
+				done = YES;
+			}
+			else if([theLastCommand hasPrefix:@"STT"]){
+				NSArray* parts = [theResponse componentsSeparatedByString:@","];
+				if([parts count]>=6){
+					id part;
+					NSEnumerator* e = [parts objectEnumerator];
+					while(part = [e nextObject]){
+						if([part hasPrefix:@"MV("]){
+							float theValue = [[part substringFromIndex:3] floatValue];
+							[self setActualVoltage:theValue];
+						}
+						else if([part hasPrefix:@"PV("]){
+							float theValue = [[part substringFromIndex:3] floatValue];
+							[self setVoltage:theValue];
+							[[rampItems objectAtIndex:0] placeCurrentValue];
+						}
+						else if([part hasPrefix:@"MC("]){
+							float theValue = [[part substringFromIndex:3] floatValue];
+							[self setActualCurrent:theValue];
+						}
+						else if([part hasPrefix:@"PC("]){
+							float theValue = [[part substringFromIndex:3] floatValue];
+							[self setCurrent:theValue];
+						}
+						else if([part hasPrefix:@"SR("]){
+							NSString* hexString = [part substringFromIndex:3];
+							char s[255];
+							[hexString getCString:s maxLength:255 encoding:NSASCIIStringEncoding];	// NO return if conversion not possible due to encoding errors or too small of a buffer. The buffer should include room for maxBufferCount bytes plus the NULL termination character, which this method adds. (So pass in one less than the size of the buffer.)
+							int theValue = [[NSNumber numberWithLong:strtoul(s,0,16)] intValue];
+							[self setStatusRegister:theValue];
+						}
+						else if([part hasPrefix:@"FR("]){
+							NSString* hexString = [part substringFromIndex:3];
+							char s[255];
+							[hexString getCString:s maxLength:255 encoding:NSASCIIStringEncoding];	// NO return if conversion not possible due to encoding errors or too small of a buffer. The buffer should include room for maxBufferCount bytes plus the NULL termination character, which this method adds. (So pass in one less than the size of the buffer.)
+							int theValue = [[NSNumber numberWithLong:strtoul(s,0,16)] intValue];
+							[self setFaultRegister:theValue];
+						}
+					}
+					done = YES;
+				}
 			}
 		}	
 		
@@ -374,6 +580,18 @@ NSString* ORZupModelPortStateChanged	= @"ORZupModelPortStateChanged";
 	NSString* s = [NSString stringWithFormat:@"OUT %d",![self outputState]];
 	[self sendCmd:s];
 	[self sendCmd:@"OUT?"];
+}
+
+- (void) sendFailEnableMask
+{
+	NSString* s = [NSString stringWithFormat:@"FENA %02x",[self faultEnableMask]];
+	[self sendCmd:s];
+}
+
+- (void) sendStatusEnableMask
+{
+	NSString* s = [NSString stringWithFormat:@"SENA %02x",[self statusEnableMask]];
+	[self sendCmd:s];
 }
 
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
