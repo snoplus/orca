@@ -275,6 +275,17 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 	 object: self];
 }
 
+- (int) subRunNumber
+{
+    return subRunNumber;
+}
+
+- (void) setSubRunNumber:(int)aSubRunNumber
+{
+    subRunNumber = aSubRunNumber;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRemoteRunNumberChanged object:self];
+}
+
 -(BOOL)isRunning
 {
     return runningState == eRunInProgress;
@@ -304,6 +315,33 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 -(void) setElapsedTime:(NSTimeInterval)aValue
 {
     elapsedTime = aValue;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORRemoteRunElapsedTimeChanged
+	 object: self];
+}
+
+
+- (NSTimeInterval)  elapsedSubRunTime
+{
+	return elapsedSubRunTime;
+}
+
+- (void)	setElapsedSubRunTime:(NSTimeInterval) aValue
+{
+    elapsedSubRunTime = aValue;
+    [[NSNotificationCenter defaultCenter]
+	 postNotificationName:ORRemoteRunElapsedTimeChanged
+	 object: self];
+}
+
+- (NSTimeInterval)  elapsedBetweenSubRunTime
+{
+	return elapsedBetweenSubRunTime;
+}
+
+- (void)	setElapsedBetweenSubRunTime:(NSTimeInterval) aValue
+{
+    elapsedBetweenSubRunTime = aValue;
     [[NSNotificationCenter defaultCenter]
 	 postNotificationName:ORRemoteRunElapsedTimeChanged
 	 object: self];
@@ -396,6 +434,7 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 {
     if(aRunningState != runningState){
         [self sendCmd:@"runNumber = [RunControl runNumber];"];
+        [self sendCmd:@"subRunNumber = [RunControl subRunNumber];"];
         [self sendCmd:@"startTime = [RunControl startTimeAsString];"];
         
         runningState = aRunningState;
@@ -410,6 +449,18 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 		 object: self
 		 userInfo: userInfo];
     }
+}
+
+- (NSString*) fullRunNumberString
+{
+	NSString* rn;
+	if([self subRunNumber] > 0){
+		rn = [NSString stringWithFormat:@"%d.%d",[self runNumber],[self subRunNumber]];
+	}
+	else {
+		rn = [NSString stringWithFormat:@"%d",[self runNumber]];
+	}
+	return rn;
 }
 
 - (NSString*) shortStatus
@@ -428,8 +479,31 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 }
 
 #pragma mark ¥¥¥Run Modifiers
+- (void) startNewSubRun
+{
+    if([socket isConnected]){
+		[self sendCmd:@"[RunControl setRemoteControl:0];"];
+		[self sendCmd:@"[RunControl startNewSubRun];"];
+		[self sendCmd:@"[RunControl setRemoteControl:1];"];
+    }
+    else {
+        NSLog(@"Not connected: sub run not started\n");
+    }
+}
 
--(void)startRun
+- (void) prepareForNewSubRun
+{
+    if([socket isConnected]){
+		[self sendCmd:@"[RunControl setRemoteControl:0];"];
+		[self sendCmd:@"[RunControl prepareForNewSubRun];"];
+		[self sendCmd:@"[RunControl setRemoteControl:1];"];
+    }
+    else {
+        NSLog(@"Not connected: can not end sub run\n");
+    }
+}
+
+- (void) startRun
 {
     if([socket isConnected]){
         [self startRun:!quickStart];
@@ -439,7 +513,7 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     }
 }
 
--(void)startRun:(BOOL)doInit
+- (void) startRun:(BOOL)doInit
 {
     
     [self sendCmd:@"[RunControl setRemoteControl:0];"];
@@ -447,6 +521,7 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     NSString* startRunCmd = [NSString stringWithFormat:@"[RunControl startRun:%d];",doInit];
     [self sendCmd:startRunCmd];
     [self sendCmd:@"runNumber = [RunControl runNumber];"];
+    [self sendCmd:@"subRunNumber = [RunControl subRunNumber];"];
     [self sendCmd:@"[RunControl setRemoteControl:1];"];
     [self sendCmd:@"[RunControl setRemoteInterface:1];"];
     
@@ -480,15 +555,17 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 }
 
 
--(void)incrementTime
+- (void) incrementTime
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(incrementTime) object:nil];
     
     if([socket isConnected]){
         [self sendCmd:@"runningState=[RunControl runningState];"];
-        [self sendCmd:@"elapsedTime=[RunControl elapsedTime];"];
+        [self sendCmd:@"elapsedTime=[RunControl elapsedRunTime];"];
         [self sendCmd:@"timeToGo=[RunControl timeToGo];"];
-    }
+		[self sendCmd:@"elapsedSubRunTime=[RunControl elapsedSubRunTime];"];
+		[self sendCmd:@"elapsedBetweenSubRunTime=[RunControl elapsedBetweenSubRunTime];"];
+   }
     
     [self performSelector:@selector(incrementTime) withObject:nil afterDelay:2];
 }
@@ -667,7 +744,8 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
 - (void) fullUpdate 
 {
     [self sendCmd:@"runNumber = [RunControl runNumber];"];
-    [self sendCmd:@"elapsedTime = [RunControl elapsedTime];"];
+    [self sendCmd:@"subRunNumber = [RunControl subRunNumber];"];
+    [self sendCmd:@"elapsedTime = [RunControl elapsedRunTime];"];
     [self sendCmd:@"repeatRun = [RunControl repeatRun];"];
     [self sendCmd:@"timedRun = [RunControl timedRun];"];    
     [self sendCmd:@"timeLimit = [RunControl timeLimit];"];
@@ -679,6 +757,8 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [self sendCmd:@"scripts = [RunControl runScriptList];"];
     [self sendCmd:@"selectedStartScriptName = [RunControl selectedStartScriptName];"];
     [self sendCmd:@"selectedShutDownScriptName = [RunControl selectedShutDownScriptName];"];
+	[self sendCmd:@"elapsedSubRunTime=[RunControl elapsedSubRunTime];"];
+	[self sendCmd:@"elapsedBetweenSubRunTime=[RunControl elapsedBetweenSubRunTime];"];
 }
 
 - (void) sendSetup

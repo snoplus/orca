@@ -94,6 +94,8 @@
 				<string>id</string>
 				<key>offlineCBAction</key>
 				<string>id</string>
+				<key>prepareForSubRunAction</key>
+				<string>id</string>
 				<key>quickStartCBAction</key>
 				<string>id</string>
 				<key>remoteHostAction</key>
@@ -107,6 +109,8 @@
 				<key>selectShutDownScript</key>
 				<string>id</string>
 				<key>selectStartUpScript</key>
+				<string>id</string>
+				<key>startNewSubRunAction</key>
 				<string>id</string>
 				<key>startRunAction</key>
 				<string>id</string>
@@ -133,8 +137,14 @@
 				<string>NSButton</string>
 				<key>connectionStatusField</key>
 				<string>NSTextField</string>
+				<key>elapsedBetweenSubRunTimeField</key>
+				<string>NSTextField</string>
+				<key>elapsedSubRunTimeField</key>
+				<string>NSTextField</string>
 				<key>elapsedTimeField</key>
 				<string>NSTextField</string>
+				<key>endSubRunButton</key>
+				<string>NSButton</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
 				<key>offlineCB</key>
@@ -158,6 +168,8 @@
 				<key>shutDownScripts</key>
 				<string>NSPopUpButton</string>
 				<key>startRunButton</key>
+				<string>NSButton</string>
+				<key>startSubRunButton</key>
 				<string>NSButton</string>
 				<key>startUpScripts</key>
 				<string>NSPopUpButton</string>

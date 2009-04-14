@@ -26,10 +26,13 @@
 @interface ORRemoteRunModel :  ORDataChainObject {
     @private
         unsigned long 	runNumber;
+		int subRunNumber;
 
         NSString* startTime;
 
-        NSTimeInterval  elapsedTime;
+		NSTimeInterval  elapsedSubRunTime;
+		NSTimeInterval	elapsedBetweenSubRunTime;
+		NSTimeInterval  elapsedTime;
         NSTimeInterval  timeToGo;
         NSTimeInterval  timeLimit;
         BOOL            timedRun;
@@ -58,6 +61,8 @@
 #pragma mark ¥¥¥Initialization
 
 #pragma mark ¥¥¥Accessors
+- (int) subRunNumber;
+- (void) setSubRunNumber:(int)aSubRunNumber;
 - (NSArray*) scriptNames;
 - (void) setScriptNames:(NSArray*)someNames;
 - (NSString*) selectedStartScriptName;
@@ -101,6 +106,13 @@
 - (void)	setQuickStart:(BOOL)flag;
 - (void)    setPostAlarm:(id)anAlarm;
 - (void)    setClearAlarm:(id)anAlarm;
+- (void)	startNewSubRun;
+- (void)	prepareForNewSubRun;
+- (NSTimeInterval)  elapsedSubRunTime;
+- (void)			setElapsedSubRunTime:(NSTimeInterval) aValue;
+- (NSTimeInterval)  elapsedBetweenSubRunTime;
+- (void)			setElapsedBetweenSubRunTime:(NSTimeInterval) aValue;
+- (NSString*) fullRunNumberString;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

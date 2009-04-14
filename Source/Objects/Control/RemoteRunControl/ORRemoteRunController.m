@@ -195,6 +195,8 @@
         [timeLimitField setEnabled:NO];
         [timeLimitStepper setEnabled:NO];
         [repeatRunCB setEnabled:NO];
+		[endSubRunButton setEnabled:NO];
+		[startSubRunButton setEnabled:NO];
     }
     else {
         if([model runningState] == eRunInProgress){
@@ -205,6 +207,8 @@
             [timeLimitField setEnabled:NO];
             [timeLimitStepper setEnabled:NO];
             [repeatRunCB setEnabled:[model timedRun]];
+            [endSubRunButton setEnabled:YES];
+            [startSubRunButton setEnabled:NO];
         }
         else if([model runningState] == eRunStopped){
             [startRunButton setEnabled:YES];
@@ -214,6 +218,10 @@
             [timeLimitField setEnabled:[model timedRun]];
             [timeLimitStepper setEnabled:[model timedRun]];
             [repeatRunCB setEnabled:[model timedRun]];
+            [endSubRunButton setEnabled:NO];
+			[startSubRunButton setEnabled:NO];
+			[endSubRunButton setEnabled:NO];
+            [startSubRunButton setEnabled:NO];
         }
         else if([model runningState] == eRunStarting || [model runningState] == eRunStopping){
             [startRunButton setEnabled:NO];
@@ -223,7 +231,13 @@
             [timeLimitField setEnabled:NO];
             [timeLimitStepper setEnabled:NO];
             [repeatRunCB setEnabled:NO];
+			[endSubRunButton setEnabled:NO];
+            [startSubRunButton setEnabled:NO];
         }
+		else if([model runningState] == eRunBetweenSubRuns){
+			[endSubRunButton setEnabled:NO];
+            [startSubRunButton setEnabled:YES];
+		}
     }
 }
 
@@ -329,26 +343,24 @@
 	}
 }
 
--(void)runNumberChanged:(NSNotification*)aNotification
+- (void) runNumberChanged:(NSNotification*)aNotification
 {
-	[self updateIntText:runNumberField setting:[model runNumber]];
+	[runNumberField setStringValue:[model fullRunNumberString]];
 }
 
--(void)timeLimitStepperChanged:(NSNotification*)aNotification
+- (void) timeLimitStepperChanged:(NSNotification*)aNotification
 {
 	[self updateStepper:timeLimitStepper setting:[model timeLimit]];
 	[self updateIntText:timeLimitField setting:[model timeLimit]];
 }
 
 
--(void)repeatRunChanged:(NSNotification*)aNotification
+- (void) repeatRunChanged:(NSNotification*)aNotification
 {
 	[self updateTwoStateCheckbox:repeatRunCB setting:[model repeatRun]];
 }
 
-
-
--(void)timedRunChanged:(NSNotification*)aNotification
+- (void) timedRunChanged:(NSNotification*)aNotification
 {
 	[self updateTwoStateCheckbox:timedRunCB setting:[model timedRun]];
 	[repeatRunCB setEnabled: [model timedRun]];
@@ -357,7 +369,7 @@
 }
 
 
--(void)elapsedTimeChanged:(NSNotification*)aNotification
+- (void) elapsedTimeChanged:(NSNotification*)aNotification
 {
 	int hr,min,sec;
 	NSTimeInterval elapsedTime = [model elapsedTime];
@@ -375,6 +387,23 @@
 		else {
 			[runBar setDoubleValue:0];
 		}
+	}
+	
+	elapsedTime = [model elapsedSubRunTime];
+	hr = elapsedTime/3600;
+	min =(elapsedTime - hr*3600)/60;
+	sec = elapsedTime - hr*3600 - min*60;
+	[elapsedSubRunTimeField setStringValue:[NSString stringWithFormat:@"%02d:%02d:%02d",hr,min,sec]];
+
+	if([model runningState] == eRunBetweenSubRuns){
+		elapsedTime = [model elapsedBetweenSubRunTime];
+		hr = elapsedTime/3600;
+		min =(elapsedTime - hr*3600)/60;
+		sec = elapsedTime - hr*3600 - min*60;
+		[elapsedBetweenSubRunTimeField setStringValue:[NSString stringWithFormat:@"%02d:%02d:%02d",hr,min,sec]];
+	}
+	else {
+		[elapsedBetweenSubRunTimeField setStringValue:@"---"];
 	}
 }
 
@@ -417,6 +446,18 @@
     else {
         [model connectSocket:YES];
     }
+}
+
+- (IBAction) prepareForSubRunAction:(id)sender
+{
+    [self endEditing];
+    [model performSelector:@selector(prepareForNewSubRun)withObject:nil afterDelay:.1];
+}
+
+- (IBAction) startNewSubRunAction:(id)sender
+{
+    [self endEditing];
+    [model performSelector:@selector(startNewSubRun)withObject:nil afterDelay:.1];
 }
 
 -(IBAction)startRunAction:(id)sender

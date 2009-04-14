@@ -43,6 +43,8 @@
     IBOutlet NSTextField* timeStartedField;
     IBOutlet NSTextField* elapsedTimeField;
     IBOutlet NSTextField* timeToGoField;
+    IBOutlet NSTextField* elapsedSubRunTimeField;
+    IBOutlet NSTextField* elapsedBetweenSubRunTimeField;
  
     IBOutlet NSTextField* remoteHostField;
     IBOutlet NSTextField* remotePortField;
@@ -53,7 +55,10 @@
 	
 	IBOutlet NSPopUpButton* startUpScripts;
 	IBOutlet NSPopUpButton* shutDownScripts;
-             
+	
+	IBOutlet NSButton*  endSubRunButton;
+	IBOutlet NSButton*  startSubRunButton;
+
     BOOL retainingRunNotice;
 }
 
@@ -78,6 +83,8 @@
 - (IBAction) selectStartUpScript:(id)sender;
 - (IBAction) selectShutDownScript:(id)sender;
 - (IBAction) resynce:(id)sender;
+- (IBAction) startNewSubRunAction:(id)sender;
+- (IBAction) prepareForSubRunAction:(id)sender;
 
 #pragma mark ¥¥¥Interface Management
 - (void) updateButtons;
@@ -101,5 +108,7 @@
 - (void) scriptNamesChanged:(NSNotification*)aNote;
 - (void) startScriptNameChanged:(NSNotification*)aNote;
 - (void) shutDownScriptNameChanged:(NSNotification*)aNote;
+- (IBAction) prepareForSubRunAction:(id)sender;
+- (IBAction) startNewSubRunAction:(id)sender;
 
 @end
