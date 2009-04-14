@@ -402,15 +402,53 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     NSCharacterSet* whiteset     = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     NSCharacterSet* delimiterset = [NSCharacterSet characterSetWithCharactersInString:@": "];
     NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\""];
+    NSCharacterSet* plistStartSet = [NSCharacterSet characterSetWithCharactersInString:@"{"];
+    NSCharacterSet* plistEndSet = [NSCharacterSet characterSetWithCharactersInString:@"}"];
     NSCharacterSet* inverteddelimiterset = [delimiterset invertedSet];
     NSCharacterSet* trimSet = [NSCharacterSet characterSetWithCharactersInString:@" [];\n\r\t"];
 	
 	aCommandString = [[aCommandString componentsSeparatedByString:@"@"] componentsJoinedByString:@""];
 	
-	//preprocess for strings with embedded quotes which cause a problem if there are colons in the string
+	//preprocess for plists
 	NSString* theProcessedString = @"";
-	NSMutableArray* embeddedStrings	= [NSMutableArray array];
+	NSMutableArray* embeddedPLists	= [NSMutableArray array];
 	NSScanner* 	scanner  = [NSScanner scannerWithString:aCommandString];
+	while(![scanner isAtEnd]) {
+		NSString* embeddedPList;
+		NSString* part;
+		if([scanner scanUpToCharactersFromSet:plistStartSet intoString:&part]){
+			if([scanner isAtEnd]){
+				theProcessedString = [theProcessedString stringByAppendingString:@" "];
+				theProcessedString = [theProcessedString stringByAppendingString:part];
+			}
+			else {
+				theProcessedString = [theProcessedString stringByAppendingString:part];
+				[scanner scanString:@"{" intoString:&part];
+				theProcessedString = [theProcessedString stringByAppendingString:part];
+				if([scanner scanUpToCharactersFromSet:plistEndSet intoString:&embeddedPList]){
+					[scanner scanString:@"}" intoString:&part];
+					theProcessedString = [theProcessedString stringByAppendingString:part];
+					NSString* aPlist = @"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\r<plist version=\"1.0\">";
+					aPlist = [aPlist stringByAppendingString:embeddedPList];
+					aPlist = [aPlist stringByAppendingString:@"\r</plist>"];
+					NSPropertyListFormat format;
+					NSString *errorDesc = nil;
+					id anObj  = [NSPropertyListSerialization propertyListFromData: [aPlist dataUsingEncoding:NSASCIIStringEncoding]
+																 mutabilityOption: NSPropertyListMutableContainersAndLeaves
+																		   format: &format 
+																 errorDescription: &errorDesc];
+					[embeddedPLists addObject:anObj];
+				}
+			}
+		}
+	}
+	
+	aCommandString = theProcessedString;
+
+	//preprocess for strings with embedded quotes which cause a problem if there are colons in the string
+	theProcessedString = @"";
+	NSMutableArray* embeddedStrings	= [NSMutableArray array];
+	scanner  = [NSScanner scannerWithString:aCommandString];
 	while(![scanner isAtEnd]) {
 		NSString* embeddedString;
 		NSString* part;
@@ -462,16 +500,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
             while(![scanner isAtEnd]) {
                 NSString*  result = [NSString string];
                 [scanner scanUpToCharactersFromSet:inverteddelimiterset intoString:nil];            //skip leading delimiters
-                if([oneCmd characterAtIndex:[scanner scanLocation]] == '@' && [oneCmd characterAtIndex:[scanner scanLocation]+1] == '\"'){
-                    NSCharacterSet* stringSet = [NSCharacterSet characterSetWithCharactersInString:@"@\""];
-                    [scanner scanUpToCharactersFromSet:[stringSet invertedSet] intoString:nil];
-                    [scanner scanUpToCharactersFromSet:stringSet intoString:&result];
-                    if([result length]){
-                        [cmdItems addObject:result];
-                    }
-                    [scanner scanUpToCharactersFromSet:[stringSet invertedSet] intoString:nil];
-                }
-                else if([scanner scanUpToCharactersFromSet:delimiterset intoString:&result]){            //store up to next delimiter
+				if([scanner scanUpToCharactersFromSet:delimiterset intoString:&result]){            //store up to next delimiter
                     if([result length]){
                         [cmdItems addObject:result];
                     }
@@ -518,6 +547,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
                     int argI;
                     BOOL ok = YES;
 					int argStringCount = 0;
+					int argPListCount = 0;
                     for(i=1,argI=0 ; i<=n*2 ; i+=2,argI++){
 						NSString* aCmdItem = [cmdItems objectAtIndex:i];
 						if([aCmdItem isEqualToString:@"\"\""]){
@@ -526,10 +556,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 								argStringCount++;
 							}
 						}
+						else if([aCmdItem isEqualToString:@"{}"]){
+							if(argPListCount < [embeddedPLists count]){
+								aCmdItem = [embeddedPLists objectAtIndex:argPListCount];
+								argPListCount++;
+							}
+						}
+						
                         if(![theInvocation setArgument:argI to:aCmdItem]){
                             ok = NO;
                             break;
-                            
                         }
                     }
                     if(ok){
