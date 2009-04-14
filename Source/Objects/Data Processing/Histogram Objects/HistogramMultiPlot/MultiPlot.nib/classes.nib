@@ -13,27 +13,6 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>taskFinished</key>
-				<string>id</string>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
@@ -56,30 +35,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>calibrate</key>
-				<string>id</string>
-				<key>plotNameAction</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORMultiPlotController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>calibrationPanel</key>
-				<string>id</string>
-				<key>legendMatrix</key>
-				<string>NSMatrix</string>
-				<key>plotNameField</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>ORDataController</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -112,54 +67,6 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>autoScale</key>
-				<string>NSToolbarItem</string>
-				<key>clear</key>
-				<string>NSToolbarItem</string>
-				<key>clearROI</key>
-				<string>NSToolbarItem</string>
-				<key>doAnalysis</key>
-				<string>NSToolbarItem</string>
-				<key>hideShowControls</key>
-				<string>id</string>
-				<key>logLin</key>
-				<string>NSToolbarItem</string>
-				<key>printDocument</key>
-				<string>id</string>
-				<key>toggleRaw</key>
-				<string>NSToolbarItem</string>
-			</dict>
-			<key>CLASS</key>
-			<string>ORDataController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>analysisDrawer</key>
-				<string>NSDrawer</string>
-				<key>containingView</key>
-				<string>NSView</string>
-				<key>hideShowButton</key>
-				<string>NSButton</string>
-				<key>plotter</key>
-				<string>id</string>
-				<key>plotterGroupView</key>
-				<string>NSView</string>
-				<key>positionField</key>
-				<string>NSTextField</string>
-				<key>rawDataTabView</key>
-				<string>NSTabView</string>
-				<key>rawDataTable</key>
-				<string>NSTableView</string>
-				<key>titleField</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>OrcaObjectController</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
 				<key>setLogScale</key>
 				<string>id</string>
 				<key>shiftLeft</key>
@@ -186,6 +93,124 @@
 			<string>NSView</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>ORToolbarFactory</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>owner</key>
+				<string>NSWindow</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>calibrate</key>
+				<string>id</string>
+				<key>plotNameAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORMultiPlotController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>calibrationPanel</key>
+				<string>id</string>
+				<key>legendMatrix</key>
+				<string>NSMatrix</string>
+				<key>plotNameField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>ORDataController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>autoScale</key>
+				<string>NSToolbarItem</string>
+				<key>clear</key>
+				<string>NSToolbarItem</string>
+				<key>clearROI</key>
+				<string>NSToolbarItem</string>
+				<key>doAnalysis</key>
+				<string>NSToolbarItem</string>
+				<key>hideShowControls</key>
+				<string>id</string>
+				<key>logLin</key>
+				<string>NSToolbarItem</string>
+				<key>pauseAction</key>
+				<string>id</string>
+				<key>printDocument</key>
+				<string>id</string>
+				<key>refreshModeAction</key>
+				<string>id</string>
+				<key>toggleRaw</key>
+				<string>NSToolbarItem</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORDataController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>containingView</key>
+				<string>NSView</string>
+				<key>hideShowButton</key>
+				<string>NSButton</string>
+				<key>pauseButton</key>
+				<string>NSButton</string>
+				<key>pausedField</key>
+				<string>NSTextField</string>
+				<key>plotter</key>
+				<string>id</string>
+				<key>plotterGroupView</key>
+				<string>NSView</string>
+				<key>positionField</key>
+				<string>NSTextField</string>
+				<key>rawDataTabView</key>
+				<string>NSTabView</string>
+				<key>rawDataTable</key>
+				<string>NSTableView</string>
+				<key>refreshModePU</key>
+				<string>NSPopUpButton</string>
+				<key>titleField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>addGateAction</key>
@@ -207,6 +232,8 @@
 				<key>copy</key>
 				<string>id</string>
 				<key>differentiateAction</key>
+				<string>id</string>
+				<key>refresh</key>
 				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>
@@ -236,19 +263,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>ORToolbarFactory</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>owner</key>
-				<string>NSWindow</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>
