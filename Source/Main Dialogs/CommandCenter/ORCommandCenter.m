@@ -405,6 +405,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
     NSCharacterSet* inverteddelimiterset = [delimiterset invertedSet];
     NSCharacterSet* trimSet = [NSCharacterSet characterSetWithCharactersInString:@" [];\n\r\t"];
 	
+	aCommandString = [[aCommandString componentsSeparatedByString:@"@"] componentsJoinedByString:@""];
+	
 	//preprocess for strings with embedded quotes which cause a problem if there are colons in the string
 	NSString* theProcessedString = @"";
 	NSMutableArray* embeddedStrings	= [NSMutableArray array];
@@ -414,6 +416,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 		NSString* part;
 		if([scanner scanUpToCharactersFromSet:quoteSet intoString:&part]){
 			if([scanner isAtEnd]){
+				theProcessedString = [theProcessedString stringByAppendingString:@" "];
 				theProcessedString = [theProcessedString stringByAppendingString:part];
 			}
 			else {
