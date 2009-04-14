@@ -437,7 +437,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(CommandCenter);
 																 mutabilityOption: NSPropertyListMutableContainersAndLeaves
 																		   format: &format 
 																 errorDescription: &errorDesc];
-					[embeddedPLists addObject:anObj];
+					if(anObj){
+						[embeddedPLists addObject:anObj];
+					}
+					else {
+						NSLogError(@"Command Center",@"Invalid plist",nil);
+						return;
+					}
 				}
 			}
 		}
