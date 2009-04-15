@@ -1697,8 +1697,6 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 	}
 	[[self undoManager] enableUndoRegistration];
 }
-
-
 @end
 
 
@@ -1706,7 +1704,26 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 - (unsigned long)decodeData:(void*)someData fromDataPacket:(ORDataPacket*)aDataPacket intoDataSet:(ORDataSet*)aDataSet
 {
 	unsigned long* p = (unsigned long*)someData;
-	return ExtractLength(p[0]); //must return number of longs processed.
+	unsigned long length =  ExtractLength(p[0]); //must return number of longs processed.
+    if(p[1] & 0x8){ //heart beat
+        [aDataSet loadGenericData:@" " sender:self withKeys:@"Run Control",@"Heartbeat",nil];
+	}
+	else {
+		if(p[1] & 0x1){ //end subrun
+			[aDataSet loadGenericData:@" " sender:self withKeys:@"Run Control",@"Start",nil];
+		}
+		else if(p[1] & 0x20){ //start subrun
+			[aDataSet loadGenericData:@" " sender:self withKeys:@"Run Control",@"Subrun Start",nil];
+		}
+		else if(p[1] & 0x10){ //end subrun
+			[aDataSet loadGenericData:@" " sender:self withKeys:@"Run Control",@"Subrun End",nil];
+		}
+		else { //end run
+			[aDataSet loadGenericData:@" " sender:self withKeys:@"Run Control",@"End",nil];
+		}
+	}
+	
+	return length;
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
