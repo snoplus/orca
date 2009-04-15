@@ -67,12 +67,12 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) makeConnectors
 {
-    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x],[self y]) withGuardian:self withObjectLink:self];
+    ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(0,0) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORHistoDataConnection];
 	[aConnector setIoType:kInputConnector];
     [aConnector release];
 
-    aConnector = [[ORConnector alloc] initAt:NSMakePoint([self x]+[self frame].size.width - kConnectorSize ,[self y] ) withGuardian:self withObjectLink:self];
+    aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - kConnectorSize ,0 ) withGuardian:self withObjectLink:self];
     [[self connectors] setObject:aConnector forKey:ORHistoPassThruConnection];
 	[aConnector setIoType:kOutputConnector];
     [aConnector release];
@@ -109,9 +109,9 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     if([self uniqueIdNumber]){
         NSAttributedString* n = [[NSAttributedString alloc] 
                                 initWithString:[NSString stringWithFormat:@"%d",[self uniqueIdNumber]] 
-                                    attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:14] forKey:NSFontAttributeName]];
+                                    attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
         
-        [n drawInRect:NSMakeRect(10,[i size].height-18,[i size].width-20,16)];
+        [n drawInRect:NSMakeRect(3,[i size].height-17,[i size].width-20,16)];
         [n release];
 
     }
