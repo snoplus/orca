@@ -34,10 +34,10 @@
 	NSTimer*      incTimer;
 }
 
-#pragma mark ¥¥¥Initialization
+#pragma mark â€¢â€¢â€¢Initialization
 - (void) ensureMinimumNumberOfRampItems;
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 - (NSString*) lockName;
 - (NSMutableArray*) wayPoints;
 - (float) rampTarget;
@@ -49,7 +49,7 @@
 - (void) setSelectedRampItem:(ORRampItem*)anItem;
 - (void) addRampItem;
 
-#pragma mark ¥¥¥Ramping
+#pragma mark â€¢â€¢â€¢Ramping
 - (int) enabledCount;
 - (int) runningCount;
 - (void) startRamping:(ORRampItem*)anItem;
@@ -59,7 +59,7 @@
 - (void) stopGlobalRamp;
 - (void) startGlobalPanic;
 
-#pragma mark ¥¥¥Archival
+#pragma mark â€¢â€¢â€¢Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
