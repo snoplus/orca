@@ -155,6 +155,15 @@
 		840982620F84EA5900036BE8 /* ORTek220Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8409825A0F84EA5900036BE8 /* ORTek220Model.h */; };
 		840982630F84EA5900036BE8 /* ORTek220Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8409825B0F84EA5900036BE8 /* ORTek220Model.m */; };
 		840982680F84EC4700036BE8 /* Tek220.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840982670F84EC4700036BE8 /* Tek220.tif */; };
+		84098F560F964F0100036BE8 /* ORPDcuController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84098F4E0F964F0100036BE8 /* ORPDcuController.h */; };
+		84098F570F964F0100036BE8 /* ORPDcuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84098F4F0F964F0100036BE8 /* ORPDcuController.m */; };
+		84098F580F964F0100036BE8 /* ORPDcuDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84098F500F964F0100036BE8 /* ORPDcuDecoders.h */; };
+		84098F590F964F0100036BE8 /* ORPDcuDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84098F510F964F0100036BE8 /* ORPDcuDecoders.m */; };
+		84098F5A0F964F0100036BE8 /* ORPDcuModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84098F520F964F0100036BE8 /* ORPDcuModel.h */; };
+		84098F5B0F964F0100036BE8 /* ORPDcuModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84098F530F964F0100036BE8 /* ORPDcuModel.m */; };
+		84098F5C0F964F0100036BE8 /* PDcu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84098F540F964F0100036BE8 /* PDcu.nib */; };
+		84098F5D0F964F0100036BE8 /* PDcu.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84098F550F964F0100036BE8 /* PDcu.tif */; };
+		84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84098F6E0F96589B00036BE8 /* Turbo.gif */; };
 		840AF86D0819924D005B750D /* SourceMask.h in Headers */ = {isa = PBXBuildFile; fileRef = 840AF86B0819924D005B750D /* SourceMask.h */; };
 		840AF86E0819924D005B750D /* SourceMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 840AF86C0819924D005B750D /* SourceMask.m */; };
 		840B207C0B4D79400021220C /* NSScanner+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B207A0B4D79400021220C /* NSScanner+Extensions.h */; };
@@ -2220,6 +2229,15 @@
 		8409825A0F84EA5900036BE8 /* ORTek220Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTek220Model.h; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220Model.h; sourceTree = SOURCE_ROOT; };
 		8409825B0F84EA5900036BE8 /* ORTek220Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTek220Model.m; path = Source/Objects/Hardware/GPIB/Tek220/ORTek220Model.m; sourceTree = SOURCE_ROOT; };
 		840982670F84EC4700036BE8 /* Tek220.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Tek220.tif; path = Source/Objects/Hardware/GPIB/Tek220/Tek220.tif; sourceTree = SOURCE_ROOT; };
+		84098F4E0F964F0100036BE8 /* ORPDcuController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPDcuController.h; path = Source/Objects/Hardware/Serial/PDcu/ORPDcuController.h; sourceTree = SOURCE_ROOT; };
+		84098F4F0F964F0100036BE8 /* ORPDcuController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPDcuController.m; path = Source/Objects/Hardware/Serial/PDcu/ORPDcuController.m; sourceTree = SOURCE_ROOT; };
+		84098F500F964F0100036BE8 /* ORPDcuDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPDcuDecoders.h; path = Source/Objects/Hardware/Serial/PDcu/ORPDcuDecoders.h; sourceTree = SOURCE_ROOT; };
+		84098F510F964F0100036BE8 /* ORPDcuDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPDcuDecoders.m; path = Source/Objects/Hardware/Serial/PDcu/ORPDcuDecoders.m; sourceTree = SOURCE_ROOT; };
+		84098F520F964F0100036BE8 /* ORPDcuModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPDcuModel.h; path = Source/Objects/Hardware/Serial/PDcu/ORPDcuModel.h; sourceTree = SOURCE_ROOT; };
+		84098F530F964F0100036BE8 /* ORPDcuModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPDcuModel.m; path = Source/Objects/Hardware/Serial/PDcu/ORPDcuModel.m; sourceTree = SOURCE_ROOT; };
+		84098F540F964F0100036BE8 /* PDcu.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = PDcu.nib; path = Source/Objects/Hardware/Serial/PDcu/PDcu.nib; sourceTree = SOURCE_ROOT; };
+		84098F550F964F0100036BE8 /* PDcu.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = PDcu.tif; path = Source/Objects/Hardware/Serial/PDcu/PDcu.tif; sourceTree = SOURCE_ROOT; };
+		84098F6E0F96589B00036BE8 /* Turbo.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Turbo.gif; path = Source/Objects/Hardware/Serial/PDcu/Turbo.gif; sourceTree = SOURCE_ROOT; };
 		840AF86B0819924D005B750D /* SourceMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SourceMask.h; sourceTree = "<group>"; };
 		840AF86C0819924D005B750D /* SourceMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SourceMask.m; sourceTree = "<group>"; };
 		840B207A0B4D79400021220C /* NSScanner+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = "NSScanner+Extensions.h"; path = "Source/Cocoa Extensions/NSScanner+Extensions.h"; sourceTree = SOURCE_ROOT; };
@@ -4458,6 +4476,23 @@
 			path = Source/Objects/Hardware/GPIB/Tek220;
 			sourceTree = SOURCE_ROOT;
 		};
+		84098F4D0F964F0100036BE8 /* PDcu */ = {
+			isa = PBXGroup;
+			children = (
+				84098F4E0F964F0100036BE8 /* ORPDcuController.h */,
+				84098F4F0F964F0100036BE8 /* ORPDcuController.m */,
+				84098F500F964F0100036BE8 /* ORPDcuDecoders.h */,
+				84098F510F964F0100036BE8 /* ORPDcuDecoders.m */,
+				84098F520F964F0100036BE8 /* ORPDcuModel.h */,
+				84098F530F964F0100036BE8 /* ORPDcuModel.m */,
+				84098F540F964F0100036BE8 /* PDcu.nib */,
+				84098F550F964F0100036BE8 /* PDcu.tif */,
+				84098F6E0F96589B00036BE8 /* Turbo.gif */,
+			);
+			name = PDcu;
+			path = Source/Objects/Hardware/Serial/PDcu;
+			sourceTree = SOURCE_ROOT;
+		};
 		840B4BAB03D8754D005F64B1 /* Alarms */ = {
 			isa = PBXGroup;
 			children = (
@@ -5619,6 +5654,7 @@
 				84B28CD50F4C597900E2B056 /* BocTIC3 */,
 				84499CBD0F13E457004B855B /* CTITemp */,
 				84499B6E0F13BB6E004B855B /* MksPdr2000 */,
+				84098F4D0F964F0100036BE8 /* PDcu */,
 				840D56D70F39E9BF00F9A274 /* Pac */,
 				84B28D180F4C614000E2B056 /* XYScanner */,
 				84B28D340F4C63A000E2B056 /* LakeShore210 */,
@@ -9574,6 +9610,9 @@
 				8409825E0F84EA5900036BE8 /* ORTek220Controller.h in Headers */,
 				840982600F84EA5900036BE8 /* ORTek220Data.h in Headers */,
 				840982620F84EA5900036BE8 /* ORTek220Model.h in Headers */,
+				84098F560F964F0100036BE8 /* ORPDcuController.h in Headers */,
+				84098F580F964F0100036BE8 /* ORPDcuDecoders.h in Headers */,
+				84098F5A0F964F0100036BE8 /* ORPDcuModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10177,6 +10216,9 @@
 				8409825D0F84EA5900036BE8 /* ORTek220.nib in Resources */,
 				840982680F84EC4700036BE8 /* Tek220.tif in Resources */,
 				844484D10F8FB2B60013E933 /* ZupRampItem.nib in Resources */,
+				84098F5C0F964F0100036BE8 /* PDcu.nib in Resources */,
+				84098F5D0F964F0100036BE8 /* PDcu.tif in Resources */,
+				84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10876,6 +10918,9 @@
 				8409825F0F84EA5900036BE8 /* ORTek220Controller.m in Sources */,
 				840982610F84EA5900036BE8 /* ORTek220Data.m in Sources */,
 				840982630F84EA5900036BE8 /* ORTek220Model.m in Sources */,
+				84098F570F964F0100036BE8 /* ORPDcuController.m in Sources */,
+				84098F590F964F0100036BE8 /* ORPDcuDecoders.m in Sources */,
+				84098F5B0F964F0100036BE8 /* ORPDcuModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
