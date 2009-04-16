@@ -54,7 +54,7 @@
 - (int) runningCount;
 - (void) startRamping:(ORRampItem*)anItem;
 - (void) incTime;
-- (void) stopRamping:(ORRampItem*)anItem;
+- (void) stopRamping:(ORRampItem*)anItem turnOff:(BOOL)turnOFF;
 - (void) startGlobalRamp;
 - (void) stopGlobalRamp;
 - (void) startGlobalPanic;
