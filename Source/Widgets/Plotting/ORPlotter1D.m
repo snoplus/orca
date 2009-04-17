@@ -317,7 +317,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	if([self useGradient]){
 		if(!gradient){
 			float red,green,blue,alpha;
-			NSColor* color = [self backgroundColor];
+			NSColor* color = [[self backgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
 			[color getRed:&red green:&green blue:&blue alpha:&alpha];
 		
 			red *= .75;
