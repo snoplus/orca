@@ -28,9 +28,12 @@
 #import "ORTimeRate.h"
 #import "OHexFormatter.h"
 #import "StopLightView.h"
+#import "ORPlotter1D.h"
+#import "ORAxis.h"
 
 @interface ORPDcuController (private)
 - (void) populatePortListPopup;
+- (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 @end
 
 @implementation ORPDcuController
@@ -51,6 +54,12 @@
 - (void) awakeFromNib
 {
     [self populatePortListPopup];	
+    [[plotter yScale] setRngLow:0.0 withHigh:1000.];
+	[[plotter yScale] setRngLimitsLow:0.0 withHigh:1000000000 withMinRng:10];
+	[plotter setDrawWithGradient:YES];
+	
+    [[plotter xScale] setRngLow:0.0 withHigh:10000];
+	[[plotter xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 	[super awakeFromNib];	
 	[model getPressure];
 }
@@ -61,6 +70,12 @@
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
     [super registerNotificationObservers];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(pollTimeChanged:)
+                         name : ORPDcuModelPollTimeChanged
+                       object : nil];
+	
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORRunStatusChangedNotification
@@ -141,7 +156,37 @@
                          name : ORPDcuModelMotorPowerChanged
 						object: model];
 
- }
+    [notifyCenter addObserver : self
+                     selector : @selector(stationPowerChanged:)
+                         name : ORPDcuModelStationPowerChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+					 selector : @selector(scaleAction:)
+						 name : ORAxisRangeChangedNotification
+					   object : nil];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(miscAttributesChanged:)
+						 name : ORMiscAttributesChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(updateTimePlot:)
+						 name : ORRateAverageChangedNotification
+					   object : nil];
+	
+	[notifyCenter addObserver : self
+                     selector : @selector(pressureScaleChanged:)
+                         name : ORPDcuModelPressureScaleChanged
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(tmpRotSetChanged:)
+                         name : ORPDcuModelTmpRotSetChanged
+						object: model];
+
+}
 
 - (void) setModel:(id)aModel
 {
@@ -166,12 +211,85 @@
 	[self oilDeficiencyChanged:nil];
 	[self pressureChanged:nil];
 	[self motorPowerChanged:nil];
+	[self stationPowerChanged:nil];
+	[self updateTimePlot:nil];
+    [self miscAttributesChanged:nil];
+	[self pressureScaleChanged:nil];
+	[self pollTimeChanged:nil];
+	[self tmpRotSetChanged:nil];
+}
+
+- (void) tmpRotSetChanged:(NSNotification*)aNote
+{
+	[tmpRotSetField setIntValue: [model tmpRotSet]];
+}
+
+- (void) pressureScaleChanged:(NSNotification*)aNote
+{
+	[pressureScalePU selectItemAtIndex: [model pressureScale]];
+	[plotter setNeedsDisplay:YES];
+	if([model pressureScale]>0){
+		[[plotter yScale] setLabel:[NSString stringWithFormat:@"xE-%02d mbar",[model pressureScale]]];
+	}
+	else {
+		[[plotter yScale] setLabel:@"mbar"];
+	}
+}
+- (void) scaleAction:(NSNotification*)aNotification
+{
+	if(aNotification == nil || [aNotification object] == [plotter xScale]){
+		[model setMiscAttributes:[[plotter xScale]attributes] forKey:@"XAttributes0"];
+	};
+	
+	if(aNotification == nil || [aNotification object] == [plotter yScale]){
+		[model setMiscAttributes:[[plotter yScale]attributes] forKey:@"YAttributes0"];
+	};
+	
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+	
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString:@"XAttributes0"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"XAttributes0"];
+		if(attrib){
+			[[plotter xScale] setAttributes:attrib];
+			[plotter setNeedsDisplay:YES];
+			[[plotter xScale] setNeedsDisplay:YES];
+		}
+	}
+	if(aNote == nil || [key isEqualToString:@"YAttributes0"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"YAttributes0"];
+		if(attrib){
+			[[plotter yScale] setAttributes:attrib];
+			[plotter setNeedsDisplay:YES];
+			[[plotter yScale] setNeedsDisplay:YES];
+		}
+	}
+	
+}
+
+- (void) updateTimePlot:(NSNotification*)aNote
+{
+	if(!aNote || ([aNote object] == [model timeRate])){
+		[plotter setNeedsDisplay:YES];
+	}
 }
 
 - (void) motorCurrentChanged:(NSNotification*)aNote		{ [motorCurrentField		setFloatValue:	[model motorCurrent]]; }
 - (void) actualRotorSpeedChanged:(NSNotification*)aNote	{ [actualRotorSpeedField	setIntValue:	[model actualRotorSpeed]]; }
 - (void) setRotorSpeedChanged:(NSNotification*)aNote	{ [setRotorSpeedField		setIntValue:	[model setRotorSpeed]]; }
 - (void) deviceAddressChanged:(NSNotification*)aNote	{ [deviceAddressField		setIntValue:	[model deviceAddress]]; }
+
+- (void) stationPowerChanged:(NSNotification*)aNote		
+{ 
+	[stationPowerField	setStringValue:	[model stationPower]? @"ON":@"OFF"];
+	[self updateStopLight];
+	[self updateButtons];
+}
 
 - (void) speedAttainedChanged:(NSNotification*)aNote	
 { 
@@ -203,8 +321,8 @@
 - (void) motorPowerChanged:(NSNotification*)aNote		
 { 
 	[motorPowerField setStringValue: [model motorPower] ? @"ON":@"OFF"];
-	[motorPowerButton setTitle:		 [model motorPower] ? @"OFF":@"ON"];
 	[self updateStopLight];
+	[self updateButtons];
 }
 
 - (void) turboOverTempChanged:(NSNotification*)aNote
@@ -234,13 +352,30 @@
 
 - (void) lockChanged:(NSNotification*)aNotification
 {
-    //BOOL runInProgress = [gOrcaGlobals runInProgress];
+	[self updateButtons];
+}
+
+- (void) updateButtons
+{
     BOOL locked = [gSecurity isLocked:ORPDcuLock];
+	BOOL portOpen = [[model serialPort] isOpen];
+	BOOL stationOn = [model stationPower] && [model motorPower];
     [lockButton setState: locked];
 	
     [portListPopup setEnabled:!locked];
     [openPortButton setEnabled:!locked];
-    [motorPowerButton setEnabled:!locked];
+    [stationOnButton setEnabled:!locked && portOpen && !stationOn];
+    [stationOffButton setEnabled:!locked && portOpen && stationOn];
+	[tmpRotSetField setEnabled:!locked && portOpen];
+    [updateButton setEnabled:portOpen];
+
+    [pollTimePopup setEnabled:!locked && portOpen];
+	[initButton  setEnabled:!locked && portOpen && stationOn];
+}
+
+- (void) pollTimeChanged:(NSNotification*)aNotification
+{
+	[pollTimePopup selectItemWithTag:[model pollTime]];
 }
 
 - (void) portStateChanged:(NSNotification*)aNotification
@@ -266,6 +401,7 @@
             [portStateField setStringValue:@"---"];
             [openPortButton setTitle:@"---"];
         }
+		[self updateButtons];
     }
 }
 
@@ -287,12 +423,34 @@
 }
 
 #pragma mark •••Actions
-- (void) motorPowerAction:(id)sender
+- (IBAction) tmpRotSetAction:(id)sender
 {
-	[model sendMotorPower:![model motorPower]];
+	[model setTmpRotSet:[sender intValue]];	
 }
 
-- (void) deviceAddressAction:(id)sender
+- (IBAction) pressureScaleAction:(id)sender
+{
+	[model setPressureScale:[sender indexOfSelectedItem]];	
+}
+
+- (IBAction) turnOnAction:(id)sender
+{
+	[model turnStationOn];
+}
+
+- (IBAction) turnOffAction:(id)sender
+{
+    NSBeginAlertSheet(@"Turning Off Pumping Station!",
+                      @"Cancel",
+                      @"Yes, Turn it OFF",
+                      nil,[self window],
+                      self,
+                      @selector(_turnOffSheetDidEnd:returnCode:contextInfo:),
+                      nil,
+                      nil,@"Is this really what you want?");
+}
+
+- (IBAction) deviceAddressAction:(id)sender
 {
 	[model setDeviceAddress:[sender intValue]];	
 }
@@ -317,9 +475,54 @@
 	[model updateAll];
 }
 
+- (IBAction) pollTimeAction:(id)sender
+{
+	[model setPollTime:[[sender selectedItem] tag]];
+}
+
+- (IBAction) initAction:(id)sender
+{
+	[self endEditing];
+	[model initUnit];
+}
+
+
+#pragma mark •••Data Source
+
+- (int) numberOfDataSetsInPlot:(id)aPlotter
+{
+    return 1;
+}
+
+- (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
+{
+	if(aPlotter == plotter) return [[model timeRate] count];
+	else return 0;
+}
+
+- (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
+{
+	if(aPlotter == plotter){
+		int count = [[model timeRate] count];
+		return [[model timeRate] valueAtIndex:count-x-1] * [model pressureScaleValue];
+	}
+	else return 0;
+}
+
+- (unsigned long)  	secondsPerUnit:(id) aPlotter
+{
+	return [[model timeRate] sampleTime]; //all should be the same, just return value for rate 0
+}
+
 @end
 
 @implementation ORPDcuController (private)
+- (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+{
+    if(returnCode == NSAlertAlternateReturn){
+		[model turnStationOff];
+    }    
+}
 
 - (void) populatePortListPopup
 {

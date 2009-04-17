@@ -29,6 +29,9 @@
 #import "ORSafeQueue.h"
 
 #pragma mark •••External Strings
+NSString* ORPDcuModelTmpRotSetChanged		= @"ORPDcuModelTmpRotSetChanged";
+NSString* ORPDcuModelPressureScaleChanged	= @"ORPDcuModelPressureScaleChanged";
+NSString* ORPDcuModelStationPowerChanged	= @"ORPDcuModelStationPowerChanged";
 NSString* ORPDcuModelMotorPowerChanged		= @"ORPDcuModelMotorPowerChanged";
 NSString* ORPDcuModelPressureChanged		= @"ORPDcuModelPressureChanged";
 NSString* ORPDcuModelMotorCurrentChanged	= @"ORPDcuModelMotorCurrentChanged";
@@ -48,6 +51,8 @@ NSString* ORPDcuOilDeficiencyChanged		= @"ORPDcuOilDeficiencyChanged";
 NSString* ORPDcuLock						= @"ORPDcuLock";
 
 #pragma mark •••Status Parameters
+#define kTMPRotSet		707
+#define kDeviceAddress	797
 #define kOilDeficiency	301
 #define kTempDriveUnit	304
 #define kTempTurbo		305
@@ -57,6 +62,8 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 #define kActualSpeed	309
 #define kMotorCurrent	310
 #define kPressure		340
+#define kUnitName		350
+#define kStationPower	10
 #define kMotorPower		23
 
 @interface ORPDcuModel (private)
@@ -69,6 +76,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (BOOL) extractBool:(NSString*)aCommand;
 - (int) extractInt:(NSString*)aCommand;
 - (float) extractFloat:(NSString*)aCommand;
+- (NSString*) extractString:(NSString*)aCommand;
 @end
 
 @implementation ORPDcuModel
@@ -116,6 +124,85 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 }
 
 #pragma mark •••Accessors
+- (int) tmpRotSet
+{
+    return tmpRotSet;
+}
+
+- (void) setTmpRotSet:(int)aTmpRotSet
+{
+	if(aTmpRotSet<20)aTmpRotSet = 20;
+	else if(aTmpRotSet>100)aTmpRotSet=100;
+    [[[self undoManager] prepareWithInvocationTarget:self] setTmpRotSet:tmpRotSet];
+    tmpRotSet = aTmpRotSet;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelTmpRotSetChanged object:self];
+}
+
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
+    pollTime = aPollTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelPollTimeChanged object:self];
+	
+	if(pollTime){
+		[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
+	}
+	else {
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
+	}
+}
+
+- (void) pollPressures
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollPressures) object:nil];
+	[self updateAll];
+	[self performSelector:@selector(pollPressures) withObject:nil afterDelay:pollTime];
+}
+
+- (float) pressureScaleValue
+{
+	return pressureScaleValue;
+}
+
+- (int) pressureScale
+{
+    return pressureScale;
+}
+
+- (void) setPressureScale:(int)aPressureScale
+{
+	if(aPressureScale<0)aPressureScale=0;
+	else if(aPressureScale>11)aPressureScale=11;
+	
+    [[[self undoManager] prepareWithInvocationTarget:self] setPressureScale:pressureScale];
+    
+    pressureScale = aPressureScale;
+	
+	pressureScaleValue = powf(10.,(float)pressureScale);
+	
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelPressureScaleChanged object:self];
+}
+
+- (ORTimeRate*)timeRate
+{
+	return timeRate;
+}
+
+- (BOOL) stationPower
+{
+    return stationPower;
+}
+
+- (void) setStationPower:(BOOL)aStationPower
+{
+    stationPower = aStationPower;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelStationPowerChanged object:self];
+}
 
 - (BOOL) motorPower
 {
@@ -136,6 +223,8 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) setPressure:(float)aPressure
 {
     pressure = aPressure;
+	if(timeRate == nil) timeRate = [[ORTimeRate alloc] init];
+	[timeRate addDataToTimeAverage:aPressure];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelPressureChanged object:self];
 }
 
@@ -235,7 +324,13 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 
 - (void) setDeviceAddress:(int)aDeviceAddress
 {
+	if(aDeviceAddress<1)aDeviceAddress = 1;
+	else if(aDeviceAddress>255)aDeviceAddress= 255;
+	
     [[[self undoManager] prepareWithInvocationTarget:self] setDeviceAddress:deviceAddress];
+	if([serialPort isOpen]){
+		[self sendDataSet:kDeviceAddress integer:aDeviceAddress];
+	}
     deviceAddress = aDeviceAddress;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelDeviceAddressChanged object:self];
 }
@@ -318,8 +413,10 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 		[serialPort setDataBits:8];
         [serialPort open];
 		[serialPort setDelegate:self];
+		[self sendDataSet:kDeviceAddress integer:deviceAddress];
+		[self getUnitName];
     }
-    else      [serialPort close];
+    else [serialPort close];
     portWasOpen = [serialPort isOpen];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelPortStateChanged object:self];
     
@@ -330,12 +427,14 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setDeviceAddress:	[decoder decodeIntForKey:@"deviceAddress"]];
-	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
-    [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
+	[self setTmpRotSet:		[decoder decodeIntForKey:	@"tmpRotSet"]];
+	[self setPollTime:		[decoder decodeIntForKey:	@"pollTime"]];
+	[self setPressureScale:	[decoder decodeIntForKey:	@"pressureScale"]];
+	[self setDeviceAddress:	[decoder decodeIntForKey:	@"deviceAddress"]];
+	[self setPortWasOpen:	[decoder decodeBoolForKey:	@"portWasOpen"]];
+    [self setPortName:		[decoder decodeObjectForKey:@"portName"]];
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
-
 	cmdQueue = [[ORSafeQueue alloc] init];
 	
 	return self;
@@ -344,12 +443,22 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:deviceAddress	forKey:@"deviceAddress"];
+    [encoder encodeInt:tmpRotSet		forKey:@"tmpRotSet"];
+    [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
+    [encoder encodeInt:deviceAddress	forKey: @"deviceAddress"];
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
+    [encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
 
-#pragma mark •••Specific HW Requests
+#pragma mark •••HW Methods
+- (void) initUnit
+{
+	[self sendTmpRotSet:[self tmpRotSet]];
+}
+
+- (void) getDeviceAddress	{ [self sendDataRequest:kDeviceAddress]; }
+- (void) getTMPRotSet		{ [self sendDataRequest:kTMPRotSet]; }
 - (void) getOilDeficiency	{ [self sendDataRequest:kOilDeficiency]; }
 - (void) getTurboTemp		{ [self sendDataRequest:kTempTurbo]; }
 - (void) getDriveTemp		{ [self sendDataRequest:kTempDriveUnit]; }
@@ -360,6 +469,8 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) getMotorCurrent	{ [self sendDataRequest:kMotorCurrent]; }
 - (void) getPressure		{ [self sendDataRequest:kPressure]; }
 - (void) getMotorPower		{ [self sendDataRequest:kMotorPower]; }
+- (void) getStationPower	{ [self sendDataRequest:kStationPower]; }
+- (void) getUnitName		{ [self sendDataRequest:kUnitName]; }
 
 - (void) updateAll
 {
@@ -372,12 +483,35 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	[self getActualSpeed];
 	[self getMotorCurrent];
 	[self getPressure];
+	[self getStationPower];
 	[self getMotorPower];
+}
+
+- (void) sendTmpRotSet:(int)aValue
+{
+	[self sendDataSet:kTMPRotSet integer:aValue];
 }
 
 - (void) sendMotorPower:(BOOL)aState
 {
 	[self sendDataSet:kMotorPower bool:aState];
+}
+
+- (void) sendStationPower:(BOOL)aState
+{
+	[self sendDataSet:kStationPower bool:aState];
+}
+
+- (void) turnStationOn
+{
+	[self sendMotorPower:YES];
+	[self sendStationPower:YES];
+}
+
+- (void) turnStationOff
+{
+	[self sendMotorPower:NO];
+	[self sendStationPower:NO];
 }
 
 #pragma mark •••Commands
@@ -404,7 +538,6 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	//NSNotification* note =  [NSNotification notificationWithName:@"junk" object:nil userInfo:userInfo]; 
 	//[self dataReceived:note];
 	//-^^^^^^^^^^^^^^^^^^^^^^^
-	
 }
 
 //---------------------------
@@ -520,6 +653,8 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) decode:(int)paramNumber command:(NSString*)aCommand
 {
 	switch (paramNumber) {
+		case kDeviceAddress: [self setDeviceAddress:	[self extractInt:aCommand]]; break;
+		case kStationPower:	 [self setStationPower:		[self extractBool:aCommand]]; break;
 		case kMotorPower:	 [self setMotorPower:		[self extractBool:aCommand]]; break;
 		case kOilDeficiency: [self setOilDeficiency:	[self extractBool:aCommand]]; break;
 		case kTempDriveUnit: [self setDriveUnitOverTemp:[self extractBool:aCommand]]; break;
@@ -531,7 +666,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 		case kActualSpeed:  [self setActualRotorSpeed:	[self extractInt:aCommand]];   break;
 		case kMotorCurrent: [self setMotorCurrent:		[self extractFloat:aCommand]]; break;
 		case kPressure:		[self setPressure:			[self extractFloat:aCommand]]; break;			
-		
+		case kUnitName:		NSLog(@"DCU Unit: %@\n",	[self extractString:aCommand]);break;	
 		default:
 		break;
 	}
@@ -548,6 +683,11 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (BOOL)  extractBool: (NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] intValue]!=0; }
 - (int)   extractInt:  (NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] intValue]; }
 - (float) extractFloat:(NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] floatValue]; }
+- (NSString*) extractString:(NSString*)aCommand	
+{
+	int numChars = [[aCommand substringWithRange:NSMakeRange(8,2)] intValue];
+	return [aCommand substringWithRange:NSMakeRange(10,numChars)];
+}
 
 - (void) timeout
 {
@@ -579,8 +719,10 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 
 - (void) enqueCmdString:(NSString*)aString
 {
-	[cmdQueue enqueue:aString];
-	if(!lastRequest)[self processOneCommandFromQueue];
+	if([serialPort isOpen]){
+		[cmdQueue enqueue:aString];
+		if(!lastRequest)[self processOneCommandFromQueue];
+	}
 }
 
 - (NSString*) formatExp:(float)aFloat
@@ -598,10 +740,8 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 			s = [NSString stringWithFormat:@"0%@",s];
 		}
 	}
-	
 	return s;
 }
-
 
 - (void) processReceivedString:(NSString*)aCommand
 {

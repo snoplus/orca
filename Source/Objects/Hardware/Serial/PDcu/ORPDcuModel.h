@@ -21,35 +21,7 @@
 
 @class ORSerialPort;
 @class ORSafeQueue;
-
-#define kPDcuShipAdcs	0xff
-
-//Main Cmd Bytes
-#define kPDcuADCmd		0x01    //--II.
-#define kPDcuSelCmd		0x02	//--III.
-#define kPDcuLcmEnaCmd	0x04	//-->IV.
-#define kPDcuRDacCmd		0x10	//-->V.
-//followed by zero or more bytes
-
-//Secondary Cmd Bytes
-//II.
-#define kPDcuSelectMask 0x07
-
-//III.
-//no further command byte
-
-//IV.
-#define kPDcuLcmEnaSet   0x01		
-#define kPDcuLcmEnaClr   0x02	
-
-//V.
-#define kPDcuRDacWriteAll		0x01 //write all with same value. 2 data words follow		
-#define kPDcuRDacReadAll			0x02 //Read all	
-#define kPDcuRDacWriteOneRDac    0x10 //Write One RDAC.  Position follows (1 Byte) Value Follows (two bytes)	
-#define kPDcuRDacReadOneRDac		0x20 //Read One RDAC.   Position follows (1 Byte) Output of two bytes	
-
-#define kPDcuOkByte				0xf0
-#define kPDcuErrorByte			0x0f
+@class ORTimeRate;
 
 @interface ORPDcuModel : OrcaObject
 {
@@ -72,6 +44,12 @@
 		float motorCurrent;
 		float pressure;
 		BOOL motorPower;
+		BOOL stationPower;
+		ORTimeRate*		timeRate;
+		int pressureScale;
+		float pressureScaleValue;
+		int	  pollTime;
+		int tmpRotSet;
 }
 
 #pragma mark •••Initialization
@@ -80,6 +58,16 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Accessors
+- (int) tmpRotSet;
+- (void) setTmpRotSet:(int)aTmpRotSet;
+- (int)  pollTime;
+- (void) setPollTime:(int)aPollTime;
+- (float) pressureScaleValue;
+- (int) pressureScale;
+- (void) setPressureScale:(int)aPressureScale;
+- (ORTimeRate*)timeRate;
+- (BOOL) stationPower;
+- (void) setStationPower:(BOOL)aStationPower;
 - (BOOL) motorPower;
 - (void) setMotorPower:(BOOL)aMotorPower;
 - (float) pressure;
@@ -136,7 +124,9 @@
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 - (void) dataReceived:(NSNotification*)note;
 
-#pragma mark •••Request Methods
+#pragma mark •••HW Methods
+- (void) initUnit;
+- (void) getDeviceAddress;
 - (void) getOilDeficiency;
 - (void) getTurboTemp;
 - (void) getDriveTemp;
@@ -146,12 +136,20 @@
 - (void) getActualSpeed	;
 - (void) getMotorCurrent;
 - (void) getPressure;	
+- (void) getUnitName;
 - (void) updateAll;
 
 - (void) sendMotorPower:(BOOL)aState;
+- (void) sendStationPower:(BOOL)aState;
+- (void) sendTmpRotSet:(int)aValue;
+- (void) turnStationOn;
+- (void) turnStationOff;
 
 @end
 
+extern NSString* ORPDcuModelTmpRotSetChanged;
+extern NSString* ORPDcuModelPressureScaleChanged;
+extern NSString* ORPDcuModelStationPowerChanged;
 extern NSString* ORPDcuModelMotorPowerChanged;
 extern NSString* ORPDcuTurboAcceleratingChanged;
 extern NSString* ORPDcuTurboSpeedAttainedChanged;
@@ -169,3 +167,4 @@ extern NSString* ORPDcuModelSerialPortChanged;
 extern NSString* ORPDcuLock;
 extern NSString* ORPDcuModelPortNameChanged;
 extern NSString* ORPDcuModelPortStateChanged;
+extern NSString* ORPDcuModelPollTimeChanged;

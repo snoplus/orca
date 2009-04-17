@@ -19,9 +19,13 @@
 
 #pragma mark •••Imported Files
 @class StopLightView;
+@class ORPlotter1D;
+
 @interface ORPDcuController : OrcaObjectController
 {
 	IBOutlet NSTextField*	motorPowerField;
+	IBOutlet NSTextField*	tmpRotSetField;
+	IBOutlet NSTextField*	stationPowerField;
 	IBOutlet NSTextField*	pressureField;
 	IBOutlet NSTextField*	motorCurrentField;
 	IBOutlet NSTextField*	actualRotorSpeedField;
@@ -35,9 +39,14 @@
     IBOutlet NSButton*		lockButton;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSButton*		openPortButton;
-    IBOutlet NSButton*		motorPowerButton;
+    IBOutlet NSButton*		stationOnButton;
+    IBOutlet NSButton*		stationOffButton;
+    IBOutlet NSButton*		updateButton;
+    IBOutlet NSButton*		initButton;
     IBOutlet StopLightView* lightBoardView;
-	
+    IBOutlet ORPlotter1D*		plotter;
+	IBOutlet NSPopUpButton*	pressureScalePU;
+    IBOutlet NSPopUpButton* pollTimePopup;
     IBOutlet NSPopUpButton* portListPopup;
 }
 
@@ -49,8 +58,11 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) updateButtons;
 
 #pragma mark •••Interface Management
+- (void) tmpRotSetChanged:(NSNotification*)aNote;
+- (void) stationPowerChanged:(NSNotification*)aNote;
 - (void) motorPowerChanged:(NSNotification*)aNote;
 - (void) turboAcceleratingChanged:(NSNotification*)aNote;
 - (void) speedAttainedChanged:(NSNotification*)aNote;
@@ -72,14 +84,25 @@
 - (void) unitOverTempChanged:(NSNotification*)aNote;
 - (void) oilDeficiencyChanged:(NSNotification*)aNote;
 - (void) updateStopLight;
+- (void) pressureScaleChanged:(NSNotification*)aNote;
+- (void) updateTimePlot:(NSNotification*)aNotification;
+- (void) scaleAction:(NSNotification*)aNotification;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) motorPowerAction:(id)sender;
+- (IBAction) tmpRotSetAction:(id)sender;
+- (IBAction) pollTimeAction:(id)sender;
+- (IBAction) pressureScaleAction:(id)sender;
+- (IBAction) turnOnAction:(id)sender;
+- (IBAction) turnOffAction:(id)sender;
 - (IBAction) deviceAddressAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) portListAction:(id) sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) updateAllAction:(id)sender;
+- (IBAction) pollTimeAction:(id)sender;
+- (IBAction) initAction:(id)sender;
 
 @end
 
