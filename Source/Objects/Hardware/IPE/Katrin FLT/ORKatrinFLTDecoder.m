@@ -244,7 +244,8 @@ followed by waveform data (n x 1024 16-bit words)
     //  2. swap back:
 	if ((ntohl(1) == 1) && (isSwapped) ){ // big endian host
         #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
-        NSLog(@"    ORKatrinFLTDecoder::decodeData:   will swap back unsigned long  NOW!\n" );
+		//this was swamping the statuslog comment out mah 04/20/09
+        //NSLog(@"    ORKatrinFLTDecoder::decodeData:   will swap back unsigned long  NOW!\n" );
         #endif
 		// Point to ADC data
 		ptr += (sizeof(katrinEventDataStruct)+sizeof(katrinDebugDataStruct))/sizeof(unsigned long);
