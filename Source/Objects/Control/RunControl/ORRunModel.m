@@ -398,6 +398,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	 object: self];
 }
 
+- (NSString*) elapsedRunTimeString
+{
+	return [self elapsedTimeString:[self elapsedRunTime]];
+}
+
 - (NSString*) elapsedTimeString:(NSTimeInterval) aTimeInterval;
 
 {
