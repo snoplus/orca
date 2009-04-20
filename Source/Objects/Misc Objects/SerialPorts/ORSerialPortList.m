@@ -30,8 +30,7 @@
 #include <IOKit/IOKitLib.h>
 #include <IOKit/serial/IOSerialKeys.h>
 #include <IOKit/IOBSD.h>
-
-static ORSerialPortList *ORSerialPortListSoliton = nil;
+#import "SynthesizeSingleton.h"
 
 @interface ORSerialPortList (Private)
 - (NSArray*) oldPortList;
@@ -41,62 +40,13 @@ static ORSerialPortList *ORSerialPortListSoliton = nil;
 
 @implementation ORSerialPortList
 
-
-// we do not want more than one instance of this class
-+(id)allocWithZone:(NSZone*) zone
-{
-	if (ORSerialPortListSoliton != nil) return ORSerialPortListSoliton;
-	else {
-		ORSerialPortListSoliton = [super allocWithZone:zone];
-		return ORSerialPortListSoliton;
-	}
-}
-
-+(ORSerialPortList*) sharedPortList
-{
-	if (ORSerialPortListSoliton != nil) return ORSerialPortListSoliton;
-	else {
-		ORSerialPortListSoliton = [[super alloc] init];
-		return ORSerialPortListSoliton;
-	}
-}
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 
 + (NSEnumerator*) portEnumerator
 {
-	return [[[ORStandardEnumerator alloc] initWithCollection:[ORSerialPortList sharedPortList] countSelector:@selector(count) objectAtIndexSelector:@selector(objectAtIndex:)] autorelease];
+	return [[[ORStandardEnumerator alloc] initWithCollection:[ORSerialPortList sharedSerialPortList] countSelector:@selector(count) objectAtIndexSelector:@selector(objectAtIndex:)] autorelease];
 }
 
-// we do not want to deallocate this object 'til the app ends
-//-(void)dealloc
-//{
-	/*
-	[oldPortList release];
-	[portList release];
-	[super dealloc];
-	 */
-//}
-
-
-// no copies allowed
-+ (id)copyWithZone:(NSZone*) zone;
-{
-	return self;
-}
-
-// nothing to retain ...
-- (id)retain
-{
-    return self;
-}
-
-// ... or release
-- (oneway void)release
-{}
-
-- (id)autorelease
-{
-    return self;
-}
 
 // ---------------------------------------------------------
 // - oldPortList:
@@ -226,7 +176,9 @@ static ORSerialPortList *ORSerialPortListSoliton = nil;
 		do { 
 			serialPort = [self getNextSerialPort:serialPortIterator];
 			if (serialPort != NULL) {
-				[portList addObject:serialPort];
+				//if(	[[serialPort name] rangeOfString:@"Bluetooth"].location == NSNotFound){
+					[portList addObject:serialPort];
+				//}
 			}
 		}
 		while (serialPort != NULL);

@@ -18,9 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//  Modified from ORSerialPortList.h by Andreas Mayer
-
-
+//  Mark Howe  -- Modified from ORSerialPortList.h by Andreas Mayer
 
 #import "ORSerialPort.h"
 
@@ -31,7 +29,7 @@
         NSArray *oldPortList;
 }
 
-+ (ORSerialPortList*) sharedPortList;
++ (ORSerialPortList*) sharedSerialPortList;
 + (NSEnumerator*) portEnumerator;
 
 - (unsigned) count;
