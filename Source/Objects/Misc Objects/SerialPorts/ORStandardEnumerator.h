@@ -19,8 +19,6 @@
 //-------------------------------------------------------------
 
 
-
-
 typedef int (*CountMethod)(id, SEL);
 typedef id (*NextObjectMethod)(id, SEL, int);
 
