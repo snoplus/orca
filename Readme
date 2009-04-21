@@ -13,19 +13,19 @@ starting with svn:
        
 3) get the sources
 cd Dev
-svn co svn://128.95.100.177/Orca
-svn co svn://128.95.100.177/OrcaPlugin
+svn co svn://orca.physics.unc.edu/Orca
+svn co svn://orca.physics.unc.edu/OrcaPlugin
 
 if you use OrcaRoot:
-svn co svn://128.95.100.177/OrcaRoot
+svn co svn://orca.physics.unc.edu/OrcaRoot
 	
+Drivers:
+svn co svn://orca.physics.unc.edu/Drivers
+
 -double-click on the Orca.xcodeproj file to launch project builder and compile the code.
 -alternatively type "open Orca.xcodeproj"
 
--Note that the Drivers folder is not under svn at this time. Check the Orca help ("Getting Started" page) for a link to obtain them.
-
 Updating
- 
 -to do a normal update with no new files you can use the project builder svn functions.
  
 -to do a full update from the command line do:
