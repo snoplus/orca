@@ -931,11 +931,9 @@ const float kGateAlpha2 = .1;
 			fitFunction = [fitFunction stringByAppendingFormat:@"%d",order];
 		}
 		else if([fitFunction hasPrefix:@"arb"]){
-			[requestInputs setObject:[userInfo objectForKey:ORCARootServiceFitFunction] forKey:@"FitFunction"];
+			fitFunction = [userInfo objectForKey:ORCARootServiceFitFunction];
 		}
-		else {
-			[requestInputs setObject:fitFunction forKey:@"FitFunction"];
-		}
+		[requestInputs setObject:fitFunction forKey:@"FitFunction"];
 		[requestInputs setObject:[NSArray array] forKey:@"FitParameters"];
 		[requestInputs setObject:@"" forKey:@"FitOptions"];
 		[requestInputs setObject:dataPoints forKey:@"FitYValues"];
