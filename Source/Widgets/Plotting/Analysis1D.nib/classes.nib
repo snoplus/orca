@@ -31,6 +31,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
@@ -55,6 +57,8 @@
 				<key>fftWindowAction</key>
 				<string>id</string>
 				<key>fitAction</key>
+				<string>id</string>
+				<key>fitFunctionAction</key>
 				<string>id</string>
 				<key>fitOrderAction</key>
 				<string>id</string>
@@ -93,6 +97,8 @@
 				<string>NSPopUpButton</string>
 				<key>fitButton</key>
 				<string>NSButton</string>
+				<key>fitFunctionField</key>
+				<string>NSTextField</string>
 				<key>fitTypePopup</key>
 				<string>NSPopUpButton</string>
 				<key>gateField</key>

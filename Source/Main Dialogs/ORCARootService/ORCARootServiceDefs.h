@@ -24,6 +24,7 @@
 #define ORCARootServiceConnectedKey			@"ORCARootServiceConnectedKey"
 #define ORCARootServiceFitFunctionKey		@"ORCARootServiceFitFunctionKey"
 #define ORCARootServiceFitOrderKey			@"ORCARootServiceFitOrderKey"
+#define ORCARootServiceFitFunction			@"ORCARootServiceFitFunction"
 #define ServiceRequestKey					@"ServiceRequestKey"
 #define ORCARootServiceConnectionChanged	@"ORCARootServiceConnectionChanged"
 #define ORCARootServiceFFTOptionKey			@"ORCARootServiceFFTOptionKey"
@@ -33,19 +34,22 @@
 #define ORCARootServiceResponseKey			@"ORCARootServiceResponseKey"
 #define ORCARootServiceFFTWindowKey			@"ORCARootServiceFFTWindowKey"
 
-#define kNumORCARootFitTypes 4
+#define kNumORCARootFitTypes 5
 static NSString* kORCARootFitNames[kNumORCARootFitTypes] = {
 	@"gaussian",
 	@"exponential",
 	@"polynomial",
-	@"landau"
+	@"landau",
+	@"arbitrary"
 };
 
 static NSString* kORCARootFitShortNames[kNumORCARootFitTypes] = {
 	@"gaus",
 	@"expo",
 	@"pol",
-	@"landau"
+	@"landau",
+	@"arbitrary"
+
 };
 
 #define kNumORCARootFFTOptions 4 

@@ -63,11 +63,13 @@
 	[self populateFFTServicePopup];
 	[self populateFFTWindowPopup];
     [self setFitOrder:1];
+    [self setFitFunction:@""];
 }
 
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[fitFunction release];
     [view removeFromSuperview];
     [super dealloc];
 }
@@ -202,6 +204,7 @@
     [self displayGateChanged:nil];
     [self displayedGateChanged:nil];
     [self fitOrderChanged];
+    [self fitFunctionChanged];
     [self fitTypeChanged];
     [self fftOptionChanged];
     [self fftWindowChanged];
@@ -221,6 +224,16 @@
 	else if(order>10)order = 10;
 	fitOrder = order;
 	[self fitOrderChanged];
+}
+
+- (void) setFitFunction:(NSString*)aFunction
+{
+	if(!aFunction)aFunction = @"";
+	
+    [fitFunction autorelease];
+	fitFunction = [aFunction copy];
+	
+	[self fitFunctionChanged];
 }
 
 - (int) fitType
@@ -258,7 +271,12 @@
 	if(aWindow >= kNumORCARootFFTWindows)aWindow = 0;
 	fftWindow = aWindow;
 	[self fftWindowChanged];
-	
+}
+
+- (void) fitFunctionChanged
+{
+	if(fitFunction) [fitFunctionField setObjectValue:fitFunction];
+	else [fitFunctionField setObjectValue:@""];
 }
 
 - (void) fitOrderChanged
@@ -270,6 +288,7 @@
 {
 	[fitTypePopup selectItemAtIndex:fitType];	
 	[polyOrderField setEnabled: serviceAvailable && [gate gateIsActive] && fitType == 2];
+	[fitFunctionField setEnabled: serviceAvailable && [gate gateIsActive] && fitType == 4];
 }
 
 - (void) fftOptionChanged
@@ -298,6 +317,7 @@
 	[deleteButton setEnabled: [gate fitExists] & [gate gateIsActive]];
 	[fitTypePopup setEnabled: okToEnable];
 	[polyOrderField setEnabled: okToEnable && fitType == 2];
+	[fitFunctionField setEnabled: okToEnable && fitType == 4];
 	[fftButton setEnabled: okToEnable];
 	[fftWindowPopup setEnabled: okToEnable];
 	[fftOptionPopup setEnabled: okToEnable];
@@ -466,8 +486,11 @@
 	
 	[userInfo setObject:[NSNumber numberWithInt:fitType] forKey:ORCARootServiceFitFunctionKey];
 	[userInfo setObject:[NSNumber numberWithInt:fitOrder] forKey:ORCARootServiceFitOrderKey];
+	[userInfo setObject:fitFunction forKey:ORCARootServiceFitFunction];
 	[gate doFit:userInfo];
 }
+
+
 
 - (IBAction) fftAction:(id)sender
 {
@@ -492,6 +515,11 @@
 - (IBAction) fitOrderAction:(id)sender
 {
 	[self setFitOrder:[sender intValue]];
+}
+
+- (IBAction) fitFunctionAction:(id)sender
+{
+	[self setFitFunction:[sender stringValue]];
 }
 
 - (IBAction) fftOptionAction:(id)sender

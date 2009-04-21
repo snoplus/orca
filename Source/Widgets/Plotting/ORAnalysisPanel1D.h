@@ -50,8 +50,9 @@
 
     IBOutlet NSPopUpButton* gatePopup;
     IBOutlet NSButton*      displayGateButton;
-
+	IBOutlet NSTextField*   fitFunctionField;
     ORGate1D* gate;
+    NSString* fitFunction;
     int fitOrder;
     int fitType;
 	BOOL serviceAvailable;
@@ -69,6 +70,7 @@
 - (void) gateValidChanged:(NSNotification*)aNotification;
 - (NSView*) view;
 - (int) fitOrder;
+- (void) setFitFunction:(NSString*)aFunction;
 - (void) setFitOrder:(int)order;
 - (int) fitType;
 - (void) setFitType:(int)order;
@@ -80,6 +82,7 @@
 - (void) orcaRootServiceConnectionChanged:(NSNotification*)aNote;
 - (void) orcaRootServiceFitChanged:(NSNotification*)aNote;
 - (void)  activeGateChanged:(NSNotification*)aNote;
+- (void) fitFunctionChanged;
 - (void) fitOrderChanged;
 - (void) fitTypeChanged;
 - (void) fftOptionChanged;
@@ -106,6 +109,7 @@
 - (IBAction) fftAction:(id)sender;
 - (IBAction) fftOptionAction:(id)sender;
 - (IBAction) fftWindowAction:(id)sender;
+- (IBAction) fitFunctionAction:(id)sender;
 
 
 @end

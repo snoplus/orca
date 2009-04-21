@@ -930,8 +930,12 @@ const float kGateAlpha2 = .1;
 			int order = [[userInfo objectForKey:ORCARootServiceFitOrderKey] intValue];
 			fitFunction = [fitFunction stringByAppendingFormat:@"%d",order];
 		}
-		[requestInputs setObject:fitFunction forKey:@"FitFunction"];
-		
+		else if([fitFunction hasPrefix:@"arb"]){
+			[requestInputs setObject:[userInfo objectForKey:ORCARootServiceFitFunction] forKey:@"FitFunction"];
+		}
+		else {
+			[requestInputs setObject:fitFunction forKey:@"FitFunction"];
+		}
 		[requestInputs setObject:[NSArray array] forKey:@"FitParameters"];
 		[requestInputs setObject:@"" forKey:@"FitOptions"];
 		[requestInputs setObject:dataPoints forKey:@"FitYValues"];
