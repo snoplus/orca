@@ -264,6 +264,7 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 
 - (BOOL) dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue
 {
+	BOOL valid = YES;
 	[dataSetLock lock];
 	
 	if(index<[data count]){
@@ -280,11 +281,12 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 		}
 	}
 	else {
+		valid = NO;
 		*xValue = 0;
 		*yValue = 0;
 	}
 	[dataSetLock unlock];
-    return YES;    
+    return valid;    
 }
 
 

@@ -355,7 +355,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 		}
 		float y = [mYScale getPixAbsFast:theValue log:aLog integer:aInt minPad:aMinPad];
 		if(y>maxValue)maxValue = y;
-		x = [mXScale getPixAbsFast:ix log:NO integer:YES minPad:aMinPadx] - inc/2.;
+		x = [mXScale getPixAbsFast:ix log:NO integer:YES minPad:aMinPadx] + inc/2.;
 		if(differentiate &&  ix == minX){
 			xl = x;
 			yl = y;	
@@ -428,9 +428,10 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 		y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
 		x = [mXScale getPixAbs:xValue];
 		
-		[theDataPath moveToPoint:NSMakePoint(xl,yl)];
-		//[theDataPath lineToPoint:NSMakePoint(x,yl)];
-		[theDataPath lineToPoint:NSMakePoint(x,y)];
+		if(i>0){
+			[theDataPath moveToPoint:NSMakePoint(xl,yl)];
+			[theDataPath lineToPoint:NSMakePoint(x,y)];
+		}
 		
 		// save previous x and y values
 		xl = x;
@@ -547,7 +548,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 				int fitIndex = 0;
 				for(i=0;i<numPoints;i++){
 					[[aPlot dataSource] plotter:aPlot dataSet:dataSetID index:i x:&x y:&y];
-					if(x > [theGate fitMinChannel] && x < [theGate fitMaxChannel]){
+					if(x >= [theGate fitMinChannel] && x <= [theGate fitMaxChannel]){
 						theFitValue = [theGate plotter:aPlot dataSet:dataSetID dataValue:fitIndex++];
 						y = [mYScale getPixAbsFast:theFitValue log:aLogY integer:aIntY minPad:aMinPadY];
 						x = [mXScale getPixAbsFast:x log:aLogX integer:aIntX minPad:aMinPadX];
@@ -610,7 +611,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 			float x;
 			float val;
 			[mDataSource plotter:aPlot dataSet:dataSetID index:index  x:&x y:&val];
-			if(x>aRange.location && x<aRange.length){
+			if(x>=aRange.location && x<=aRange.length){
 				[dataPointArray addObject:[NSNumber numberWithDouble:val]];
 			}
 		}

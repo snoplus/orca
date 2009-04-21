@@ -54,9 +54,12 @@
 - (IBAction) col0KeyAction:(id)sender;
 - (IBAction) writeDataFileAction:(id)sender;
 - (IBAction) calibrate:(id)sender;
+- (IBAction) copy:(id)sender;
 
 #pragma mark •••Data Source
 - (int) numberOfPointsInPlot:(id)aPlotter dataSet:(int)set;
 - (int)numberOfRowsInTableView:(NSTableView *)tableView;
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row;
+- (BOOL) plotter:(id)aPlotter dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue;
+
 @end

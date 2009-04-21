@@ -685,13 +685,13 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     if(maxX < minX || (maxX-minX) < 1)return;
     
     /* set the scale to 20% beyond extremes */
-    double mmax = maxY+0.2*rngY/2.;
+    double mmax = maxX+(0.2*maxX);
     double mmin = 0;
     if(minY<0)mmin = minY - 0.2*rngY/2.;
 	
     [mYScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:25];
     [mYScale setRngLow:MIN(mmin,0) withHigh:mmax];
-    [mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:100];
+    [mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:20];
     [mXScale setRngLow:0 withHigh:maxX];
     [self setNeedsDisplay:YES];
     [mYScale setNeedsDisplay:YES];
@@ -889,9 +889,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 
 - (IBAction)copy:(id)sender
-{
-	if([mDataSource useXYPlot])return;
-	
+{	
     //declare our custom type.
     NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSGeneralPboard];
     [pboard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil] owner:self];
@@ -928,6 +926,12 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 					NSCalendarDate* theDate = [NSCalendarDate dateWithTimeIntervalSince1970:secs];
 					[theDate setCalendarFormat:@"%m/%d %H:%M:%S"];
 					[string appendFormat:@"\t%@\t%f",theDate,data];
+				}
+				else if([mDataSource useXYPlot]){
+					float xValue;
+					float yValue;
+					[mDataSource plotter:self dataSet:set index:i x:&xValue y:&yValue];
+					[string appendFormat:@"\t%f",yValue];
 				}
 				else {
 					data =  [mDataSource plotter:self dataSet:set dataValue:i];
@@ -1349,10 +1353,11 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 	return [[NSDate date] timeIntervalSince1970];
 }
 
-- (void)  plotter:(id) aPlotter dataSet:(int)set index:(int)i x:(float*)x y:(float*)y
+- (BOOL)  plotter:(id) aPlotter dataSet:(int)set index:(int)i x:(float*)x y:(float*)y
 {
 	*x = 0;
 	*y = 0;
+	return NO;
 }
 - (void)  plotter:(id) aPlotter dataSet:(int)set index:(int)i time:(unsigned long*)x y:(float*)y
 {

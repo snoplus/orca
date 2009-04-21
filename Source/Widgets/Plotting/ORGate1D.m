@@ -278,24 +278,27 @@ const float kGateAlpha2 = .1;
 		int xStart = [self gateMinChannel];
 		int xEnd = [self gateMaxChannel];
 		
-		int totalNum = xEnd - xStart;
+		int totalNum = xEnd - xStart+1;
 		
 		if([mDataSource useXYPlot]){
 			int index;
 			int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSet];
 			for (index=0; index<numPoints; ++index) {
 				float x;
-				[mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&val];
-				if(x>xStart && x<xEnd){
-					sumVal += val;
+				if([mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&val]){
+					if(x>=xStart && x<=xEnd){
+						sumVal += val;
+					}
 				}
 			}
         }
 		else {
-			for (x=xStart; x<xEnd; ++x) {
+			x=xStart;
+			do {
 				val = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
 				sumVal += val;
-			}
+				++x;
+			} while(x<=xEnd);
 		}
 		
 		double aveVal = 0;
@@ -306,21 +309,27 @@ const float kGateAlpha2 = .1;
 			if([mDataSource useXYPlot]){
 				int index;
 				int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataSet];
+				int n=0;
 				for (index=0; index<numPoints; ++index) {
 					float x;
-					[mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&val];
-					if(x>xStart && x<xEnd){
-						sumValX += val * x;
-						if (val < minVal) minVal = val;
-						if (val > maxVal) {
-							maxVal = val;
-							maxValX = x;
+					if([mDataSource plotter:aPlot dataSet:dataSet index:index  x:&x y:&val]){
+						if(x>=xStart && x<=xEnd){
+							n++;
+							sumValX += val * x;
+							if (val < minVal) minVal = val;
+							if (val > maxVal) {
+								maxVal = val;
+								maxValX = x;
+							}
 						}
 					}
 				}
+				if(n)[self setAverage: sumVal / (float)n];
+				else [self setAverage: 0];
 			}
 			else {
-				for (x=xStart; x<xEnd; ++x) {
+				x = xStart;
+				do {
 					val = [mDataSource plotter:aPlot dataSet:dataSet dataValue:x];
 					sum_x_minus_xBar_squared += (val - aveVal) * (val-aveVal);
 					
@@ -330,7 +339,9 @@ const float kGateAlpha2 = .1;
 						maxVal = val;
 						maxValX = x;
 					}
-				}
+					++x;
+				} while(x<=xEnd);
+				[self setAverage: sumVal / (double) totalNum];
 			}
 			[self setPeakx:maxValX];
 			[self setPeaky:maxVal];
@@ -344,7 +355,6 @@ const float kGateAlpha2 = .1;
 				[self setSigma:0];
 			}
 			
-			[self setAverage: sumVal / ([self gateMaxChannel] - [self gateMinChannel])];
 			[self setTotalSum:sumVal];
 		}
 	}
@@ -563,14 +573,14 @@ const float kGateAlpha2 = .1;
         [NSBezierPath setDefaultLineWidth:.5];
 		
 		double inc = [aPlot channelWidth];
-        float startGate = [xAxis getPixAbs:[self gateMinChannel]]-inc/2;
-        float endGate   = [xAxis getPixAbs:[self gateMaxChannel]]+inc/2;
 		
 		
         if(curveIsActive && gateIsActive)	[[gateColor colorWithAlphaComponent:kGateAlpha]set];
         else								[[gateColor colorWithAlphaComponent:kGateAlpha2]set];
 		
 		if([aPlot useXYPlot]){
+			short startGate = [self gateMinChannel];
+			short endGate   = [self gateMaxChannel];
 			int numPoints = [mDataSource numberOfPointsInPlot:aPlot dataSet:dataID];
 			BOOL aLog = [yAxis isLog];
 			BOOL aInt = [yAxis integer];
@@ -589,28 +599,29 @@ const float kGateAlpha2 = .1;
 			NSBezierPath* theDataPath = [NSBezierPath bezierPath];
 			for (i=0; i<numPoints;++i) {
 				
-				[mDataSource plotter:aPlot dataSet:dataID index:i x:&xValue y:&yValue];
-				float x = [xAxis getPixAbs:xValue];
-				float y = [yAxis getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
-				if(x>=startGate && x<endGate){
-					if(first){
-						[theDataPath moveToPoint:NSMakePoint(x,0)];
-						[theDataPath lineToPoint:NSMakePoint(x,y)];
-						first = NO;
-						gotData = YES;
+				if([mDataSource plotter:aPlot dataSet:dataID index:i x:&xValue y:&yValue]){
+					float x = [xAxis getPixAbs:xValue];
+					float y = [yAxis getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
+					if(xValue>=startGate && xValue<=endGate){
+						if(first){
+							[theDataPath moveToPoint:NSMakePoint(x,0)];
+							[theDataPath lineToPoint:NSMakePoint(x,y)];
+							first = NO;
+						}
+						else {
+							[theDataPath lineToPoint:NSMakePoint(x,y)];
+							gotData = YES;
+						}
 					}
-					else {
-						[theDataPath lineToPoint:NSMakePoint(x,y)];
+					else if(xValue>=endGate && gotData){
+						[theDataPath lineToPoint:NSMakePoint(xl,y)];
+						[theDataPath lineToPoint:NSMakePoint(xl,0)];
+						lastPtInROI = YES;
+						break;
 					}
+					// save previous x and y values
+					xl = x;
 				}
-				else if(x>endGate){
-					[theDataPath lineToPoint:NSMakePoint(xl,y)];
-					[theDataPath lineToPoint:NSMakePoint(xl,0)];
-					lastPtInROI = YES;
-					break;
-				}
-				// save previous x and y values
-				xl = x;
 			}
 			if(!lastPtInROI && gotData){
 				[theDataPath lineToPoint:NSMakePoint(xl,0)];
@@ -618,24 +629,33 @@ const float kGateAlpha2 = .1;
 			if(gotData)[theDataPath fill];
 		}
 		else {
-			short x = [xAxis getPixAbs:minX]-inc/2.;
-			short xl = x;
+			int startGate = [self gateMinChannel];
+			int endGate   = [self gateMaxChannel];
 			long  ix;
 			for (ix=minX; ix<maxX;++ix) {
-				x = [xAxis getPixAbs:ix]-inc/2.;
-				if(xl>=startGate && xl<endGate){
-					short y = [yAxis getPixAbs:[mDataSource plotter:aPlot dataSet:dataID dataValue:ix ]];
-					[NSBezierPath fillRect:NSMakeRect(xl,0,x-xl,y)];
+				if(ix>=startGate && ix<=endGate){
+					float x = [xAxis getPixAbs:ix]-inc/2.;
+					float y = [yAxis getPixAbs:[mDataSource plotter:aPlot dataSet:dataID dataValue:ix ]];
+					[NSBezierPath fillRect:NSMakeRect(x,0,inc,y)];
 				}
-				if(xl > endGate)break;
-				xl = x;
+				if(ix > endGate)break;
 			}
 		}
 		if(curveIsActive && gateIsActive){
+			float startGatef;
+			float endGatef;
+			if([aPlot useXYPlot]){
+				startGatef = [xAxis getPixAbs:[self gateMinChannel]];
+				endGatef   = [xAxis getPixAbs:[self gateMaxChannel]];
+			}
+			else {
+				startGatef = [xAxis getPixAbs:[self gateMinChannel]]-inc/2.;
+				endGatef   = [xAxis getPixAbs:[self gateMaxChannel]]+inc/2.;
+			}
 			float height = [aPlot plotHeight];
 			[[NSColor redColor] set];
-			[NSBezierPath strokeLineFromPoint:NSMakePoint(startGate,0) toPoint:NSMakePoint(startGate,height)];
-			[NSBezierPath strokeLineFromPoint:NSMakePoint(endGate,0) toPoint:NSMakePoint(endGate,height)];
+			[NSBezierPath strokeLineFromPoint:NSMakePoint(startGatef,0) toPoint:NSMakePoint(startGatef,height)];
+			[NSBezierPath strokeLineFromPoint:NSMakePoint(endGatef,0) toPoint:NSMakePoint(endGatef,height)];
 			[[gateColor colorWithAlphaComponent:kGateAlpha]set];
 			
            // if([mCurve gateCount]>1){
@@ -648,10 +668,8 @@ const float kGateAlpha2 = .1;
                     label = [NSString stringWithFormat:@"%d,%d",dataID,[mCurve activeGateIndex]];
                 }
                 int labelWidth = [label sizeWithAttributes:[xAxis labelAttributes]].width;
-                short startGate = [xAxis getPixAbs:[self gateMinChannel]]-inc/2;
-                short endGate   = [xAxis getPixAbs:[self gateMaxChannel]]-inc/2;
 
-                [label drawAtPoint:NSMakePoint(startGate+(endGate-startGate)/2-labelWidth/2,height-20) withAttributes:[xAxis labelAttributes]];
+                [label drawAtPoint:NSMakePoint(startGatef+(endGatef-startGatef)/2-labelWidth/2,height-20) withAttributes:[xAxis labelAttributes]];
 
             //}
 			int fitLabelHeight = [fitString sizeWithAttributes:fitLableAttributes].height;

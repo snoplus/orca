@@ -156,6 +156,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) copy:(id)sender
+{
+	[plotter copy:sender];
+}
+
 - (IBAction) refreshPlot:(id)sender
 {
 	int col0Key = [model col0Key];
