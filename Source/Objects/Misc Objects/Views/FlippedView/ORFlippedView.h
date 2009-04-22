@@ -18,7 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-@interface ORAnalysisView : NSView
+@interface ORFlippedView : NSView
 {
 }
 - (BOOL) isFlipped;
