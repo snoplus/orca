@@ -13,6 +13,36 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>openPortAction</key>
+				<string>id</string>
+				<key>portListAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORSerialPortController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>openPortButton</key>
+				<string>NSButton</string>
+				<key>owner</key>
+				<string>id</string>
+				<key>portControlsContent</key>
+				<string>NSView</string>
+				<key>portControlsView</key>
+				<string>NSBox</string>
+				<key>portListPopup</key>
+				<string>NSPopUpButton</string>
+				<key>portStateField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
@@ -140,6 +170,8 @@
 				<string>NSButton</string>
 				<key>selectModuleButton</key>
 				<string>NSButton</string>
+				<key>serialPortController</key>
+				<string>ORSerialPortController</string>
 				<key>setAllRDacsButton</key>
 				<string>NSButton</string>
 				<key>setRotorSpeedField</key>

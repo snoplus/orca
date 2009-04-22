@@ -176,9 +176,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 		do { 
 			serialPort = [self getNextSerialPort:serialPortIterator];
 			if (serialPort != NULL) {
-				//if(	[[serialPort name] rangeOfString:@"Bluetooth"].location == NSNotFound){
+				if(	[[serialPort name] rangeOfString:@"Bluetooth"].location == NSNotFound &&
+					[[serialPort name] rangeOfString:@"KeySerial"].location == NSNotFound ){
 					[portList addObject:serialPort];
-				//}
+				}
 			}
 		}
 		while (serialPort != NULL);

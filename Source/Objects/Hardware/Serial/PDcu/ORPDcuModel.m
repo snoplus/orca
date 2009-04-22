@@ -22,7 +22,6 @@
 #import "ORPDcuModel.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
-#import "ORSerialPortList.h"
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
@@ -67,40 +66,40 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 #define kMotorPower		23
 
 @interface ORPDcuModel (private)
-- (void) timeout;
-- (void) processOneCommandFromQueue;
-- (int) checkSum:(NSString*)aString;
-- (void) enqueCmdString:(NSString*)aString;
 - (NSString*) formatExp:(float)aFloat;
-- (void) processReceivedString:(NSString*)aCommand;
-- (BOOL) extractBool:(NSString*)aCommand;
-- (int) extractInt:(NSString*)aCommand;
-- (float) extractFloat:(NSString*)aCommand;
+- (void)	timeout;
+- (void)	processOneCommandFromQueue;
+- (int)		checkSum:(NSString*)aString;
+- (void)	enqueCmdString:(NSString*)aString;
+- (void)	processReceivedString:(NSString*)aCommand;
+- (BOOL)	extractBool:(NSString*)aCommand;
+- (int)		extractInt:(NSString*)aCommand;
+- (float)	extractFloat:(NSString*)aCommand;
 - (NSString*) extractString:(NSString*)aCommand;
+- (void) clearAlarms;
 @end
 
 @implementation ORPDcuModel
-- (id) init
-{
-	self = [super init];
-    [self registerNotificationObservers];
-	return self;
-}
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[cmdQueue release];
 	[lastRequest release];
-    [portName release];
 	[inComingData release];
-    if([serialPort isOpen]){
-        [serialPort close];
-    }
-    [serialPort release];
-
+    [noOilAlarm clearAlarm];
+    [noOilAlarm release];
+	
 	[super dealloc];
+}
+
+- (void)sleep
+{
+    [super sleep];
+    	
+    [noOilAlarm clearAlarm];
+    [noOilAlarm release];
+    noOilAlarm = nil;
 }
 
 - (void) setUpImage
@@ -111,16 +110,6 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) makeMainController
 {
 	[self linkToController:@"ORPDcuController"];
-}
-
-- (void) registerNotificationObservers
-{
-	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(dataReceived:)
-                         name : ORSerialPortDataReceived
-                       object : nil];
 }
 
 #pragma mark •••Accessors
@@ -314,6 +303,23 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) setOilDeficiency:(BOOL)aOilDeficiency
 {    
     oilDeficiency = aOilDeficiency;
+	if(oilDeficiency){
+		if(!noOilAlarm){
+			NSString* s = [NSString stringWithFormat:@"No Oil -- DCU %d",[self uniqueIdNumber]];
+			noOilAlarm = [[ORAlarm alloc] initWithName:s severity:kImportantAlarm];
+			[noOilAlarm setSticky:YES];
+			[noOilAlarm setHelpStringFromFile:@"NoOilHelp"];
+			[noOilAlarm setAcknowledged:NO];
+		}                      
+		[noOilAlarm postAlarm];
+	}
+	else {
+		if(noOilAlarm){
+			[noOilAlarm clearAlarm];
+			[noOilAlarm release];
+			noOilAlarm = nil;
+		}
+	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuOilDeficiencyChanged object:self];
 }
 
@@ -346,64 +352,6 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	lastRequest = [aCmdString copy];    
 }
 
-- (BOOL) portWasOpen
-{
-    return portWasOpen;
-}
-
-- (void) setPortWasOpen:(BOOL)aPortWasOpen
-{
-    portWasOpen = aPortWasOpen;
-}
-
-- (NSString*) portName
-{
-    return portName;
-}
-
-- (void) setPortName:(NSString*)aPortName
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
-    if(![aPortName isEqualToString:portName]){
-        [portName autorelease];
-        portName = [aPortName copy];    
-
-        BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-                 }
-                valid = YES;
-                break;
-            }
-        } 
-        if(!valid){
-            [self setSerialPort:nil];
-        }       
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelPortNameChanged object:self];
-}
-
-- (ORSerialPort*) serialPort
-{
-    return serialPort;
-}
-
-- (void) setSerialPort:(ORSerialPort*)aSerialPort
-{
-    [aSerialPort retain];
-    [serialPort release];
-    serialPort = aSerialPort;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelSerialPortChanged object:self];
-}
-
 - (void) openPort:(BOOL)state
 {
     if(state) {
@@ -416,9 +364,12 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 		[self sendDataSet:kDeviceAddress integer:deviceAddress];
 		[self getUnitName];
     }
-    else [serialPort close];
+    else {
+		[serialPort close];
+		[self clearAlarms];
+	}
     portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelPortStateChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
     
 }
 
@@ -431,10 +382,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	[self setPollTime:		[decoder decodeIntForKey:	@"pollTime"]];
 	[self setPressureScale:	[decoder decodeIntForKey:	@"pressureScale"]];
 	[self setDeviceAddress:	[decoder decodeIntForKey:	@"deviceAddress"]];
-	[self setPortWasOpen:	[decoder decodeBoolForKey:	@"portWasOpen"]];
-    [self setPortName:		[decoder decodeObjectForKey:@"portName"]];
 	[[self undoManager] enableUndoRegistration];
-    [self registerNotificationObservers];
 	cmdQueue = [[ORSafeQueue alloc] init];
 	
 	return self;
@@ -446,8 +394,6 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
     [encoder encodeInt:tmpRotSet		forKey:@"tmpRotSet"];
     [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
     [encoder encodeInt:deviceAddress	forKey: @"deviceAddress"];
-    [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
-    [encoder encodeObject:portName		forKey: @"portName"];
     [encoder encodeInt:pollTime			forKey: @"pollTime"];
 }
 
@@ -628,28 +574,30 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 {
 	if(!lastRequest)return;
 	
-    //if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
-	if(!inComingData)inComingData = [[NSMutableData data] retain];
-	[inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-	
-	char* p = (char*)[inComingData bytes];
-	int i;
-	int numCharsProcessed=0;
-	NSMutableData* cmd =  [NSMutableData dataWithCapacity:64];
-	for(i=0;i<[inComingData length];i++){
-		[cmd appendBytes:p length:1];
-		if(*p == '\r'){
-			NSString* s = [[[NSString alloc] initWithData:cmd encoding:NSASCIIStringEncoding] autorelease];
-			[self processReceivedString:s];
-			numCharsProcessed += [cmd length];
-			[cmd setLength:0];
+    if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
+		if(!inComingData)inComingData = [[NSMutableData data] retain];
+		[inComingData appendData:[[note userInfo] objectForKey:@"data"]];
+		
+		char* p = (char*)[inComingData bytes];
+		int i;
+		int numCharsProcessed=0;
+		NSMutableData* cmd =  [NSMutableData dataWithCapacity:64];
+		for(i=0;i<[inComingData length];i++){
+			[cmd appendBytes:p length:1];
+			if(*p == '\r'){
+				NSString* s = [[[NSString alloc] initWithData:cmd encoding:NSASCIIStringEncoding] autorelease];
+				[self processReceivedString:s];
+				numCharsProcessed += [cmd length];
+				[cmd setLength:0];
+			}
+			p++;
 		}
-		p++;
-	}
-	if(numCharsProcessed){
-		[inComingData replaceBytesInRange:NSMakeRange(0,numCharsProcessed) withBytes:nil length:0];
+		if(numCharsProcessed){
+			[inComingData replaceBytesInRange:NSMakeRange(0,numCharsProcessed) withBytes:nil length:0];
+		}
 	}
 }
+
 - (void) decode:(int)paramNumber command:(NSString*)aCommand
 {
 	switch (paramNumber) {
@@ -671,14 +619,17 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 		break;
 	}
 }
-
-- (void)serialPortWriteProgress:(NSDictionary *)dataDictionary
-{
-}
-
 @end
 
 @implementation ORPDcuModel (private)
+- (void) clearAlarms
+{
+	if(noOilAlarm){
+		[noOilAlarm clearAlarm];
+		[noOilAlarm release];
+		noOilAlarm = nil;
+	}	
+}
 
 - (BOOL)  extractBool: (NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] intValue]!=0; }
 - (int)   extractInt:  (NSString*)aCommand	{ return [[aCommand substringWithRange:NSMakeRange(10,6)] intValue]; }

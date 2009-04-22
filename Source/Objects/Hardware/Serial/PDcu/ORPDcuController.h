@@ -18,8 +18,10 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+
 @class StopLightView;
 @class ORPlotter1D;
+@class ORSerialPortController;
 
 @interface ORPDcuController : OrcaObjectController
 {
@@ -37,8 +39,6 @@
 	IBOutlet NSTextField*	oilDeficiencyField;
 	IBOutlet NSTextField*	deviceAddressField;
     IBOutlet NSButton*		lockButton;
-    IBOutlet NSTextField*   portStateField;
-    IBOutlet NSButton*		openPortButton;
     IBOutlet NSButton*		stationOnButton;
     IBOutlet NSButton*		stationOffButton;
     IBOutlet NSButton*		updateButton;
@@ -47,7 +47,7 @@
     IBOutlet ORPlotter1D*		plotter;
 	IBOutlet NSPopUpButton*	pressureScalePU;
     IBOutlet NSPopUpButton* pollTimePopup;
-    IBOutlet NSPopUpButton* portListPopup;
+    IBOutlet ORSerialPortController* serialPortController;
 }
 
 #pragma mark •••Initialization
@@ -78,8 +78,6 @@
 - (void) setRotorSpeedChanged:(NSNotification*)aNote;
 - (void) deviceAddressChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNote;
-- (void) portNameChanged:(NSNotification*)aNote;
-- (void) portStateChanged:(NSNotification*)aNote;
 - (void) turboOverTempChanged:(NSNotification*)aNote;
 - (void) unitOverTempChanged:(NSNotification*)aNote;
 - (void) oilDeficiencyChanged:(NSNotification*)aNote;
@@ -89,6 +87,7 @@
 - (void) scaleAction:(NSNotification*)aNotification;
 - (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
+- (BOOL) portLocked;
 
 #pragma mark •••Actions
 - (IBAction) tmpRotSetAction:(id)sender;
@@ -98,8 +97,6 @@
 - (IBAction) turnOffAction:(id)sender;
 - (IBAction) deviceAddressAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
-- (IBAction) portListAction:(id) sender;
-- (IBAction) openPortAction:(id)sender;
 - (IBAction) updateAllAction:(id)sender;
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) initAction:(id)sender;

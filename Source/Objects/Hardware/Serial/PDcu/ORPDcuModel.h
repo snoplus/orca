@@ -18,44 +18,41 @@
 //-------------------------------------------------------------
 
 #pragma mark •••Imported Files
+#import "ORSerialPortModel.h"
 
-@class ORSerialPort;
 @class ORSafeQueue;
 @class ORTimeRate;
+@class ORAlarm;
 
-@interface ORPDcuModel : OrcaObject
+@interface ORPDcuModel : ORSerialPortModel
 {
     @private
-        NSString*			portName;
-        BOOL				portWasOpen;
-        ORSerialPort*		serialPort;
-        unsigned long		dataId;
-		NSString*			lastRequest;
-		ORSafeQueue*		cmdQueue;
-		NSMutableData*		inComingData;
-		int					deviceAddress;
-		BOOL oilDeficiency;
-		BOOL driveUnitOverTemp;
-		BOOL turboPumpOverTemp;
-		BOOL speedAttained;
-		BOOL turboAccelerating;
-		int setRotorSpeed;
-		int actualRotorSpeed;
-		float motorCurrent;
-		float pressure;
-		BOOL motorPower;
-		BOOL stationPower;
+        unsigned long	dataId;
+		NSString*		lastRequest;
+		ORSafeQueue*	cmdQueue;
+		NSMutableData*	inComingData;
+		int				deviceAddress;
+		int				setRotorSpeed;
+		int				actualRotorSpeed;
+		int				pressureScale;
+		int				pollTime;
+		int				tmpRotSet;
+		float			motorCurrent;
+		float			pressure;
+		float			pressureScaleValue;
+		BOOL			oilDeficiency;
+		BOOL			driveUnitOverTemp;
+		BOOL			turboPumpOverTemp;
+		BOOL			speedAttained;
+		BOOL			turboAccelerating;
+		BOOL			motorPower;
+		BOOL			stationPower;
 		ORTimeRate*		timeRate;
-		int pressureScale;
-		float pressureScaleValue;
-		int	  pollTime;
-		int tmpRotSet;
+		ORAlarm*		noOilAlarm;
 }
 
 #pragma mark •••Initialization
-- (id)   init;
 - (void) dealloc;
-- (void) registerNotificationObservers;
 
 #pragma mark •••Accessors
 - (int) tmpRotSet;
@@ -90,12 +87,6 @@
 - (void) setOilDeficiency:(BOOL)aOilDeficiency;
 - (int) deviceAddress;
 - (void) setDeviceAddress:(int)aDeviceAddress;
-- (ORSerialPort*) serialPort;
-- (void) setSerialPort:(ORSerialPort*)aSerialPort;
-- (BOOL) portWasOpen;
-- (void) setPortWasOpen:(BOOL)aPortWasOpen;
-- (NSString*) portName;
-- (void) setPortName:(NSString*)aPortName;
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aCmdString;
 - (void) openPort:(BOOL)state;
@@ -121,7 +112,6 @@
 - (void) sendDataSet:(int)aParamNum shortInteger:(unsigned short)aShort;
 
 #pragma mark •••Port Methods
-- (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 - (void) dataReceived:(NSNotification*)note;
 
 #pragma mark •••HW Methods
@@ -163,8 +153,5 @@ extern NSString* ORPDcuModelActualRotorSpeedChanged;
 extern NSString* ORPDcuModelSetRotorSpeedChanged;
 extern NSString* ORPDcuTurboStateChanged;
 extern NSString* ORPDcuModelDeviceAddressChanged;
-extern NSString* ORPDcuModelSerialPortChanged;
 extern NSString* ORPDcuLock;
-extern NSString* ORPDcuModelPortNameChanged;
-extern NSString* ORPDcuModelPortStateChanged;
 extern NSString* ORPDcuModelPollTimeChanged;
