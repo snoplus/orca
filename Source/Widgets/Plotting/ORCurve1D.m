@@ -115,6 +115,10 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
     return rollOver;
 }
 
+- (void) adjustAnalysisPanels
+{
+	[gates makeObjectsPerformSelector:@selector(adjustAnalysisPanels)];
+}
 
 
 - (NSMutableDictionary *)attributes 

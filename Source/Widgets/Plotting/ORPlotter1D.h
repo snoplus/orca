@@ -17,12 +17,12 @@
 
 @class ORAxis;
 @class ORGate1D;
-@class ZFlowLayout;
 @class CTGradient;
+@class ORFlippedView;
 
 @interface ORPlotter1D : NSView <NSCoding>
 {
-    IBOutlet ZFlowLayout*   analysisView;
+    IBOutlet ORFlippedView*		analysisView;
     IBOutlet NSDrawer*		analysisDrawer;
     IBOutlet ORAxis*		mXScale;
     IBOutlet ORAxis*		mYScale;
@@ -47,6 +47,7 @@
 - (BOOL) useGradient;
 - (void) setUseGradient:(BOOL)aflag;
 - (void) drawerDidOpen:(NSNotification*)aNote;
+
 - (void) forcedUpdate:(NSNotification*)aNote;
 - (void) windowResizing:(NSNotification*)aNote;
 - (void) setDrawWithGradient:(BOOL)flag;
@@ -83,6 +84,8 @@
 - (void) didEnd:(NSSavePanel *)sheet
 	 returnCode:(int)code
 	contextInfo:(void *)contextInfo;
+
+- (void) tileAnalysisPanels;
 
 - (IBAction) copy:(id)sender;
 - (IBAction) clearActiveGate:(id)sender;

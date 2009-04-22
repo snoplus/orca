@@ -78,7 +78,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>NSView</string>
+				<string>NSBox</string>
 				<key>averageField</key>
 				<string>NSTextField</string>
 				<key>centroidField</key>
@@ -123,8 +123,6 @@
 				<string>NSTextField</string>
 				<key>totalSumField</key>
 				<string>NSTextField</string>
-				<key>view</key>
-				<string>NSView</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>

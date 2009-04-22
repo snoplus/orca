@@ -127,14 +127,6 @@
 			<string>ObjC</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>calibrate</key>
@@ -263,7 +255,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ZFlowLayout</string>
+				<string>ORFlippedView</string>
 				<key>mDataSource</key>
 				<string>id</string>
 				<key>mXScale</key>

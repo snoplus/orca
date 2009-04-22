@@ -22,7 +22,6 @@
 @class ORGate1D;
 
 @interface ORAnalysisPanel1D : NSObject {
-    IBOutlet NSView*			view;
     IBOutlet NSTextField*       curveField;
     IBOutlet NSTextField*       gateField;
     IBOutlet NSTextField*       gateMinField;
@@ -46,7 +45,7 @@
     IBOutlet NSPopUpButton* fftWindowPopup;
 	
     IBOutlet NSDrawer*		analysisDrawer;
-    IBOutlet NSView*		analysisView;
+    IBOutlet NSBox*			analysisView;
 
     IBOutlet NSPopUpButton* gatePopup;
     IBOutlet NSButton*      displayGateButton;
@@ -63,7 +62,7 @@
 + (id) panel;
 
 - (id) init;
-
+- (void) adjustSize;
 - (void) setGate:(id)aGate;
 - (void) registerNotificationObservers;
 - (void) updateWindow;
@@ -111,6 +110,6 @@
 - (IBAction) fftWindowAction:(id)sender;
 - (IBAction) fitFunctionAction:(id)sender;
 
-
 @end
+
 

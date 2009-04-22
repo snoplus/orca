@@ -126,6 +126,12 @@ const float kGateAlpha2 = .1;
                        object: nil];
 }
 
+
+- (void) adjustAnalysisPanels
+{
+	[analysis adjustSize];
+}
+
 - (void) gateNameChanged:(NSNotification*)aNote
 {
     if([[[aNote userInfo] objectForKey:@"oldGateName"] isEqualToString: displayedGateName]){
@@ -552,7 +558,11 @@ const float kGateAlpha2 = .1;
 
 - (BOOL) gateIsActive
 {
-	return [mCurve activeGate] == self;
+	return ([mPlot activeCurve] == mCurve) && ([mCurve activeGate] == self);
+}
+- (ORPlotter1D*) plotter
+{
+	return mPlot;
 }
 
 - (void) drawGateInPlot:(ORPlotter1D*)aPlot

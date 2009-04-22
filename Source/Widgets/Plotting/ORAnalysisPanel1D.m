@@ -25,6 +25,10 @@
 #import "ORGate.h"
 #import "ORCARootServiceDefs.h"
 #import "ORCurve1D.h"
+#import "ORPlotter1D.h"
+
+#define kAnalysisPanelExpandedHeight  307
+#define kAnalysisPanelCollapsedHeight 100
 
 @interface ORAnalysisPanel1D (private)
 - (void) populateSelectGatePopup;
@@ -43,7 +47,7 @@
 -(id)	init
 {
     if( self = [super init] ){
-        [NSBundle loadNibNamed: @"Analysis1D" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our view, right now).
+        [NSBundle loadNibNamed: @"Analysis1D" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our analysisView, right now).
 		if(kORCARootFitNames[0] != nil){} //just to get rid of stupid compiler warning
 		if(kORCARootFitShortNames[0] != nil){} //just to get rid of stupid compiler warning
 		if(kORCARootFFTWindowOptions[0] != nil){} //just to get rid of stupid compiler warning
@@ -54,10 +58,11 @@
 
 
 - (void)awakeFromNib
-{
-    [self updateWindow];
+{	
     [self gateValidChanged:nil];
-    [view setAutoresizingMask:NSViewNotSizable];
+    [analysisView setAutoresizingMask:NSViewNotSizable];
+	[analysisView setBoxType:NSBoxCustom];
+	[analysisView setBorderType:NSBezelBorder];
     [self populateSelectGatePopup];
 	[self populateFitServicePopup];
 	[self populateFFTServicePopup];
@@ -70,14 +75,14 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[fitFunction release];
-    [view removeFromSuperview];
+    [analysisView removeFromSuperview];
     [super dealloc];
 }
 
 
 - (NSView*) view
 {
-    return view;
+    return analysisView;
 }
 
 - (void) setGate:(id)aGate
@@ -102,8 +107,7 @@
     [notifyCenter addObserver : self
                      selector : @selector(gateValidChanged:)
                          name : ORGateValidChangedNotification
-                       object : gate];
-    
+                       object : nil];
     
     [notifyCenter addObserver : self
                      selector : @selector(gateMinChanged:)
@@ -304,7 +308,21 @@
 - (void)  activeGateChanged:(NSNotification*)aNote
 {
 	[self orcaRootServiceConnectionChanged:nil];
-	[activeField setStringValue:[gate gateIsActive]?@"Active":@""];
+	[activeField setStringValue:[gate gateIsActive] ? @"Selected":@""];
+	if([gate gateIsActive]){
+		[analysisView setFillColor:[NSColor colorWithCalibratedRed:1 green:1 blue:1 alpha:.7]];
+	}
+	else {
+		[analysisView setFillColor:[NSColor colorWithCalibratedRed:.9 green:.9 blue:.9 alpha:1]];
+	}
+}
+
+- (void) adjustSize
+{
+	NSSize oldSize = [analysisView frame].size;
+	if([gate gateIsActive]) oldSize.height = kAnalysisPanelExpandedHeight;
+	else					oldSize.height = kAnalysisPanelCollapsedHeight;
+	[analysisView setFrameSize:oldSize];
 }
 
 - (void) orcaRootServiceConnectionChanged:(NSNotification*)aNote
@@ -365,20 +383,18 @@
 
 - (void) gateValidChanged:(NSNotification*)aNotification
 {
-    if(([aNotification object] == gate) || (aNotification == nil)){
-        if(![gate gateValid]){
-            [gateMinField setStringValue:@"---"];	
-            [gateMaxField setStringValue:@"---"];	
-            [gateWidthField setStringValue:@"---"];	
-            [totalSumField setStringValue:@"---"];	
-            [sigmaField setStringValue:@"---"];	
-            [averageField setStringValue:@"---"];	
-            [centroidField setStringValue:@"---"];	
-            [gatePeakXField setStringValue:@"---"];	
-            [gatePeakYField setStringValue:@"---"];	
-        }
-        else [self updateWindow];
-    }
+	if(![gate gateValid]){
+		[gateMinField setStringValue:@"---"];	
+		[gateMaxField setStringValue:@"---"];	
+		[gateWidthField setStringValue:@"---"];	
+		[totalSumField setStringValue:@"---"];	
+		[sigmaField setStringValue:@"---"];	
+		[averageField setStringValue:@"---"];	
+		[centroidField setStringValue:@"---"];	
+		[gatePeakXField setStringValue:@"---"];	
+		[gatePeakYField setStringValue:@"---"];	
+	}
+	else [self updateWindow];
 }
 
 
@@ -478,8 +494,8 @@
 
 - (IBAction) fitAction:(id)sender
 {
-	if(![[view window] makeFirstResponder:[view window]]){
-		[[view window] endEditingFor:nil];		
+	if(![[analysisView window] makeFirstResponder:[analysisView window]]){
+		[[analysisView window] endEditingFor:nil];		
 	}
 
 	NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -572,7 +588,6 @@
         [gatePopup insertItemWithTitle:[[gateGroup objectAtIndex:i] gateName] atIndex:i];
     }
 }
-
-
 @end
+	
 

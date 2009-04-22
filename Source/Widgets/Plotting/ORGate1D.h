@@ -66,12 +66,14 @@ enum {
 - (id) initForCurve:(ORCurve1D*)aCurve plot:(ORPlotter1D*)aPlot;
 - (id) init;
 - (void)dealloc;
+- (void) adjustAnalysisPanels;
 - (void) setDefaults;
 - (void) setDefaultMin:(double)aMin max:(double)aMax;
 - (void) setFit:(NSArray*)anArray;
 - (BOOL) fitExists;
 - (void) setFitString:(NSString*)aString;
 - (BOOL) gateIsActive;
+- (ORPlotter1D*) plotter;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

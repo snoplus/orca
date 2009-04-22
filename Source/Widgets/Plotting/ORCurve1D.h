@@ -38,6 +38,7 @@
 - (id) initWithCurve:(int)aDataSetID;
 - (id) init;
 - (void)dealloc;
+- (void) adjustAnalysisPanels;
 - (void) setDefaults;
 - (NSMutableDictionary *)attributes;
 - (void)setAttributes:(NSMutableDictionary *)anAttributes;

@@ -19,6 +19,7 @@
 #import "ZFlowLayout.h"
 #import "ORCARootServiceDefs.h"
 #import "CTGradient.h"
+#import "ORFlippedView.h"
 
 NSString* ORPlotter1DDifferentiate		= @"ORPlotter1DDifferentiate";
 NSString* ORPlotter1DAverageWindow		= @"ORPlotter1DAverageWindow";
@@ -101,8 +102,9 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
            selector: @selector( forcedUpdate: )
                name: ORForcePlotUpdateNotification
              object: nil ];
-
+	
     //[self forcedUpdate:nil];
+	[self tileAnalysisPanels];
 }
 
 - (void) setDefaults
@@ -194,6 +196,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
                         userInfo: nil];
                         
     [self setShowActiveGate:([analysisDrawer state] == NSDrawerOpenState)];
+	[self tileAnalysisPanels];
 }
 
 
@@ -602,7 +605,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
                       contextInfo: nil];
 }
 
-- (void)didEnd:(NSSavePanel *)sheet
+- (void) didEnd:(NSSavePanel *)sheet
     returnCode:(int)code
    contextInfo:(void *)contextInfo
 {
@@ -624,16 +627,44 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     ORAnalysisPanel1D* analysisPanel = [ORAnalysisPanel1D panel];
     [aGate setAnalysis:analysisPanel];
     [analysisPanel setGate:aGate];
-    [analysisView setSizing:ZMakeFlowLayoutSizing( [[analysisPanel view] frame].size, 10, 0, NO )];
     [analysisView addSubview:[analysisPanel view]];
-    
+	[self tileAnalysisPanels];
 }
+
 - (IBAction) removeGateAction:(id)sender
 {
     [[self activeCurve] removeActiveGate];	
     [self setNeedsDisplay:YES];
     [mYScale setNeedsDisplay:YES];
     [mXScale setNeedsDisplay:YES];
+	[self tileAnalysisPanels];
+}
+
+- (void) selectGate:(ORGate1D*)aGate
+{
+	[[curves objectAtIndex:activeCurveIndex] selectGate:aGate];
+}
+
+- (void) tileAnalysisPanels
+{
+	[curves makeObjectsPerformSelector:@selector(adjustAnalysisPanels)];
+    NSArray* subViews   = [analysisView subviews];
+    float totalHeightNeeded = 0;
+    NSEnumerator*   e   = [subViews objectEnumerator];
+    NSView* aView;
+    while(aView = [e nextObject]){
+        totalHeightNeeded += [aView frame].size.height+5;
+    }
+    [analysisView setFrameSize: NSMakeSize([analysisView frame].size.width,totalHeightNeeded)];
+	
+    NSPoint origin = NSMakePoint(0,[analysisView frame].size.height+5);
+    e              = [subViews objectEnumerator];
+    while(aView = [e nextObject]){
+        NSRect viewRect = [aView frame];
+        origin.y -= viewRect.size.height+5;
+        origin.x = 5;
+        [aView setFrameOrigin: origin];
+    }
 }
 
 - (IBAction) differentiateAction:(id)sender
@@ -1002,6 +1033,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
         [NSObject cancelPreviousPerformRequestsWithTarget:self];
         [self setNeedsDisplay:YES];
         [self performSelector:@selector(resetDrawFlag) withObject:nil afterDelay:0];
+		[self setActiveCurveIndex:activeCurveIndex]; //work around to force a redraw
     }
 }
 
@@ -1189,10 +1221,8 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     else if(analysisView){
         if([theEvent modifierFlags] & NSShiftKeyMask){
             [self addGateAction:self];
-            
         }
         [[self activeCurve] mouseDown:theEvent plotter:self];
-
     }
 }
 
