@@ -912,7 +912,9 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 - (void)setShowActiveGate:(BOOL)flag
 {
-    [[self activeCurve] setShowActiveGate:flag plotter:self];
+	if(!flag)[curves makeObjectsPerformSelector:@selector(clearAllGates)];
+	else [[self activeCurve] setShowActiveGate:flag plotter:self];
+
     [self setNeedsDisplay:YES];
     [mYScale setNeedsDisplay:YES];
     [mXScale setNeedsDisplay:YES];

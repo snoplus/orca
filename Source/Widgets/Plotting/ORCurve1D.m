@@ -170,7 +170,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 
 - (void) clearAllGates
 {
-    [gates makeObjectsPerformSelector:@selector(clearGates) withObject:nil];
+    [gates makeObjectsPerformSelector:@selector(clearGate) withObject:nil];
 }
 
 - (int) gateNumber:(ORGate1D*)aGate
