@@ -21,6 +21,8 @@
 #pragma mark •••Imported Files
 #import "ORManualPlotModel.h"
 #import "NSNotifications+Extensions.h"
+#import "ORDataSet.h"
+#import "ORCARootServiceDefs.h"
 
 NSString* ORManualPlotModelCol2TitleChanged = @"ORManualPlotModelCol2TitleChanged";
 NSString* ORManualPlotModelCol1TitleChanged = @"ORManualPlotModelCol1TitleChanged";
@@ -36,11 +38,17 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 {
     self = [super init];
 	dataSetLock = [[NSLock alloc] init];
+	if(kORCARootFitNames[0] != nil){} //just to get rid of stupid compiler warning
+	if(kORCARootFFTNames[0] != nil){} //just to get rid of stupid compiler warning
+	if(kORCARootFitShortNames[0] != nil){} //just to get rid of stupid compiler warning
+	if(kORCARootFFTWindowOptions[0] != nil){} //just to get rid of stupid compiler warning
+	if(kORCARootFFTWindowNames[0] != nil){} //just to get rid of stupid compiler warning
     return self;    
 }
 
 - (void) dealloc
 {
+	[fftDataSet release];
     [col2Title release];
     [col1Title release];
     [col0Title release];
@@ -243,7 +251,18 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
 	
 	[dataSetLock unlock];
 }
-		
+
+- (void) processResponse:(NSDictionary*)aResponse
+{
+	NSString* title = [aResponse objectForKey:ORCARootServiceTitleKey];
+	NSMutableArray* keyArray = [NSMutableArray arrayWithArray:[title componentsSeparatedByString:@","]];
+	[keyArray insertObject:@"FFT" atIndex:0];
+	NSArray* complex = [aResponse nestedObjectForKey:@"Request Outputs",@"FFTComplex",nil];
+	NSArray* real    = [aResponse nestedObjectForKey:@"Request Outputs",@"FFTReal",nil];
+	if(!fftDataSet)fftDataSet = [[ORDataSet alloc] initWithKey:@"fftSet" guardian:nil];
+	[fftDataSet loadFFTReal:real imaginary:complex withKeyArray:keyArray];
+}
+
 #pragma mark *** delegate methods
 -(id) dataAtRow:(int)r column:(int)c
 {

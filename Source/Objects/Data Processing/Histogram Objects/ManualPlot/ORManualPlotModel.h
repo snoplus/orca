@@ -19,6 +19,8 @@
 //-------------------------------------------------------------
 #define kManualPlotMacol0Keys 3
 
+@class ORDataSet;
+
 @interface ORManualPlotModel : OrcaObject  
 {
     int				textSize;
@@ -32,6 +34,7 @@
     NSString*		col1Title;
     NSString*		col2Title;
 	id				calibration;
+	ORDataSet*		fftDataSet;
 }
 
 #pragma mark ***Accessors
@@ -59,6 +62,7 @@
 - (void) writeDataToFile:(NSString*)aFileName;
 
 #pragma mark •••Data Source Methods
+- (void) processResponse:(NSDictionary*)aResponse;
 - (unsigned long) numPoints;
 - (BOOL) dataSet:(int)set index:(unsigned long)index x:(float*)xValue y:(float*)yValue;
 @end
