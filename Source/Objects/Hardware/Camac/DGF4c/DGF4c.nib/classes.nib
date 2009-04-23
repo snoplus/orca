@@ -1,121 +1,359 @@
-{
-    IBClasses = (
-        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {
-            ACTIONS = {"" = id; }; 
-            CLASS = FirstResponder; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            ACTIONS = {
-                autoFindTauAction = id; 
-                baselineCutAction = id; 
-                bootDSPAction = id; 
-                calibrateAction = id; 
-                chanCSRAAction = id; 
-                channelAction = id; 
-                decimationAction = id; 
-                dspCodePathAction = id; 
-                energyFilterAction = id; 
-                firmWarePathAction = id; 
-                histogramAction = id; 
-                loadDefaults = id; 
-                loadFirmWareAction = id; 
-                loadParamsToHWAction = id; 
-                loadSetAction = id; 
-                mergeSetAction = id; 
-                offsetAction = id; 
-                oscChanEnableAction = id; 
-                pulseShapeAction = id; 
-                registerAction = id; 
-                runBehaviorAction = id; 
-                runTypeAction = id; 
-                sampleAction = id; 
-                sampleWaveformsAction = id; 
-                saveSetAction = id; 
-                settingLockAction = id; 
-                triggerFilterAction = id; 
-                xwaitAction = id; 
-            }; 
-            CLASS = ORDGF4cController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                autoTauFindButton = NSButton; 
-                baselineCutButton = NSButton; 
-                bootDSPButton = NSButton; 
-                calibrateFieldMatrix = NSMatrix; 
-                calibrateStepperMatrix = NSMatrix; 
-                chanCSRAMatrix = NSMatrix; 
-                channelField = NSTextField; 
-                channelStepper = NSStepper; 
-                decimationPopup = NSPopUpButton; 
-                dspChanTableView = NSTableView; 
-                dspCodePathButton = NSButton; 
-                dspCodePathField = NSTextField; 
-                dspParamTableView = NSTableView; 
-                energyFilterFieldMatrix = NSMatrix; 
-                energyFilterStepperMatrix = NSMatrix; 
-                firmWarePathButton = NSButton; 
-                firmWarePathField = NSTextField; 
-                histogramFieldMatrix = NSMatrix; 
-                histogramStepperMatrix = NSMatrix; 
-                inputCountsMatrix = NSMatrix; 
-                liveTimeMatrix = NSMatrix; 
-                loadDefaultsButton = NSButton; 
-                loadFirmWareButton = NSButton; 
-                loadParamsToHWButton = NSButton; 
-                loadParamsToHWButton2 = NSButton; 
-                loadSetButton = NSButton; 
-                mergeSetButton = NSButton; 
-                ocsChanEnableMatrix = NSMatrix; 
-                offsetButton = NSButton; 
-                plotter = ORPlotter1D; 
-                pulseShapeFieldMatrix = NSMatrix; 
-                pulseShapeStepperMatrix = NSMatrix; 
-                registerFieldMatrix = NSMatrix; 
-                revisionField = NSTextField; 
-                runBehaviorMatrix = NSMatrix; 
-                runTypePopup = NSPopUpButton; 
-                sampleButton = NSButton; 
-                sampleContinousButton = NSButton; 
-                sampleWaveformsButton = NSButton; 
-                samplingWarning = NSTextField; 
-                saveSetButton = NSButton; 
-                settingLockButton = NSButton; 
-                settingLockDocField = NSTextField; 
-                timeMatrix = NSMatrix; 
-                triggerFilterFieldMatrix = NSMatrix; 
-                triggerFilterStepperMatrix = NSMatrix; 
-                xScale = ORAxis; 
-                xwaitField = NSTextField; 
-                xwaitStepper = NSStepper; 
-                yScale = ORAxis; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {CLASS = ORTimedTextField; LANGUAGE = ObjC; SUPERCLASS = NSTextField; }, 
-        {
-            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
-            CLASS = OrcaController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {
-                copy = id; 
-                decDialog = id; 
-                incDialog = id; 
-                saveDocument = id; 
-                saveDocumentAs = id; 
-            }; 
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {model = id; warningField = ORTimedTextField; }; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORFlippedView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key></key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>autoFindTauAction</key>
+				<string>id</string>
+				<key>baselineCutAction</key>
+				<string>id</string>
+				<key>bootDSPAction</key>
+				<string>id</string>
+				<key>calibrateAction</key>
+				<string>id</string>
+				<key>chanCSRAAction</key>
+				<string>id</string>
+				<key>channelAction</key>
+				<string>id</string>
+				<key>decimationAction</key>
+				<string>id</string>
+				<key>dspCodePathAction</key>
+				<string>id</string>
+				<key>energyFilterAction</key>
+				<string>id</string>
+				<key>firmWarePathAction</key>
+				<string>id</string>
+				<key>histogramAction</key>
+				<string>id</string>
+				<key>loadDefaults</key>
+				<string>id</string>
+				<key>loadFirmWareAction</key>
+				<string>id</string>
+				<key>loadParamsToHWAction</key>
+				<string>id</string>
+				<key>loadSetAction</key>
+				<string>id</string>
+				<key>mergeSetAction</key>
+				<string>id</string>
+				<key>offsetAction</key>
+				<string>id</string>
+				<key>oscChanEnableAction</key>
+				<string>id</string>
+				<key>pulseShapeAction</key>
+				<string>id</string>
+				<key>registerAction</key>
+				<string>id</string>
+				<key>runBehaviorAction</key>
+				<string>id</string>
+				<key>runTypeAction</key>
+				<string>id</string>
+				<key>sampleAction</key>
+				<string>id</string>
+				<key>sampleWaveformsAction</key>
+				<string>id</string>
+				<key>saveSetAction</key>
+				<string>id</string>
+				<key>settingLockAction</key>
+				<string>id</string>
+				<key>triggerFilterAction</key>
+				<string>id</string>
+				<key>xwaitAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORDGF4cController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>autoTauFindButton</key>
+				<string>NSButton</string>
+				<key>baselineCutButton</key>
+				<string>NSButton</string>
+				<key>bootDSPButton</key>
+				<string>NSButton</string>
+				<key>calibrateFieldMatrix</key>
+				<string>NSMatrix</string>
+				<key>calibrateStepperMatrix</key>
+				<string>NSMatrix</string>
+				<key>chanCSRAMatrix</key>
+				<string>NSMatrix</string>
+				<key>channelField</key>
+				<string>NSTextField</string>
+				<key>channelStepper</key>
+				<string>NSStepper</string>
+				<key>decimationPopup</key>
+				<string>NSPopUpButton</string>
+				<key>dspChanTableView</key>
+				<string>NSTableView</string>
+				<key>dspCodePathButton</key>
+				<string>NSButton</string>
+				<key>dspCodePathField</key>
+				<string>NSTextField</string>
+				<key>dspParamTableView</key>
+				<string>NSTableView</string>
+				<key>energyFilterFieldMatrix</key>
+				<string>NSMatrix</string>
+				<key>energyFilterStepperMatrix</key>
+				<string>NSMatrix</string>
+				<key>firmWarePathButton</key>
+				<string>NSButton</string>
+				<key>firmWarePathField</key>
+				<string>NSTextField</string>
+				<key>histogramFieldMatrix</key>
+				<string>NSMatrix</string>
+				<key>histogramStepperMatrix</key>
+				<string>NSMatrix</string>
+				<key>inputCountsMatrix</key>
+				<string>NSMatrix</string>
+				<key>liveTimeMatrix</key>
+				<string>NSMatrix</string>
+				<key>loadDefaultsButton</key>
+				<string>NSButton</string>
+				<key>loadFirmWareButton</key>
+				<string>NSButton</string>
+				<key>loadParamsToHWButton</key>
+				<string>NSButton</string>
+				<key>loadParamsToHWButton2</key>
+				<string>NSButton</string>
+				<key>loadSetButton</key>
+				<string>NSButton</string>
+				<key>mergeSetButton</key>
+				<string>NSButton</string>
+				<key>ocsChanEnableMatrix</key>
+				<string>NSMatrix</string>
+				<key>offsetButton</key>
+				<string>NSButton</string>
+				<key>plotter</key>
+				<string>ORPlotter1D</string>
+				<key>pulseShapeFieldMatrix</key>
+				<string>NSMatrix</string>
+				<key>pulseShapeStepperMatrix</key>
+				<string>NSMatrix</string>
+				<key>registerFieldMatrix</key>
+				<string>NSMatrix</string>
+				<key>revisionField</key>
+				<string>NSTextField</string>
+				<key>runBehaviorMatrix</key>
+				<string>NSMatrix</string>
+				<key>runTypePopup</key>
+				<string>NSPopUpButton</string>
+				<key>sampleButton</key>
+				<string>NSButton</string>
+				<key>sampleContinousButton</key>
+				<string>NSButton</string>
+				<key>sampleWaveformsButton</key>
+				<string>NSButton</string>
+				<key>samplingWarning</key>
+				<string>NSTextField</string>
+				<key>saveSetButton</key>
+				<string>NSButton</string>
+				<key>settingLockButton</key>
+				<string>NSButton</string>
+				<key>settingLockDocField</key>
+				<string>NSTextField</string>
+				<key>timeMatrix</key>
+				<string>NSMatrix</string>
+				<key>triggerFilterFieldMatrix</key>
+				<string>NSMatrix</string>
+				<key>triggerFilterStepperMatrix</key>
+				<string>NSMatrix</string>
+				<key>xScale</key>
+				<string>ORAxis</string>
+				<key>xwaitField</key>
+				<string>NSTextField</string>
+				<key>xwaitStepper</key>
+				<string>NSStepper</string>
+				<key>yScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>addGateAction</key>
+				<string>id</string>
+				<key>analyze</key>
+				<string>id</string>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>averageWindowAction</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>clearActiveCurveGates</key>
+				<string>id</string>
+				<key>clearActiveGate</key>
+				<string>id</string>
+				<key>clearAllGates</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>differentiateAction</key>
+				<string>id</string>
+				<key>refresh</key>
+				<string>id</string>
+				<key>removeGateAction</key>
+				<string>id</string>
+				<key>resetScales</key>
+				<string>id</string>
+				<key>savePDF</key>
+				<string>id</string>
+				<key>xAndYAutoScale</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPlotter1D</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>analysisView</key>
+				<string>ORFlippedView</string>
+				<key>mDataSource</key>
+				<string>id</string>
+				<key>mXScale</key>
+				<string>ORAxis</string>
+				<key>mYScale</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
