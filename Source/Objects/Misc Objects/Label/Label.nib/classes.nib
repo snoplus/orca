@@ -1,48 +1,112 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {
-            ACTIONS = {
-                concludeDragOperation = id; 
-                copy = id; 
-                cut = id; 
-                draggingExited = id; 
-                paste = id; 
-            }; 
-            CLASS = ORGroupView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {mouseTask = id; }; 
-            SUPERCLASS = NSView; 
-        }, 
-        {
-            ACTIONS = {labelAction = id; labelLockAction = id; textSizeAction = id; }; 
-            CLASS = ORLabelController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                labelField = NSTextView; 
-                labelLockButton = NSButton; 
-                textSizeField = NSTextField; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            CLASS = ORPlacardScrollView; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {placard = NSView; }; 
-            SUPERCLASS = NSScrollView; 
-        }, 
-        {
-            CLASS = ORToolbarFactory; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {owner = NSWindow; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {CLASS = ORVmeCrateView; LANGUAGE = ObjC; SUPERCLASS = ORGroupView; }, 
-        {
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>labelAction</key>
+				<string>id</string>
+				<key>labelLockAction</key>
+				<string>id</string>
+				<key>textSizeAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORLabelController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>labelField</key>
+				<string>NSTextView</string>
+				<key>labelLockButton</key>
+				<string>NSButton</string>
+				<key>textSizeField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
