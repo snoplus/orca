@@ -101,9 +101,21 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>alignBottom</key>
+				<string>id</string>
+				<key>alignHorizontalCenters</key>
+				<string>id</string>
 				<key>alignLeft</key>
 				<string>id</string>
+				<key>alignRight</key>
+				<string>id</string>
+				<key>alignTop</key>
+				<string>id</string>
+				<key>alignVerticalCenters</key>
+				<string>id</string>
 				<key>arrangeInCircle</key>
+				<string>id</string>
+				<key>bringToFront</key>
 				<string>id</string>
 				<key>concludeDragOperation</key>
 				<string>id</string>
@@ -115,7 +127,11 @@
 				<string>id</string>
 				<key>draggingExited</key>
 				<string>id</string>
+				<key>getInfo</key>
+				<string>id</string>
 				<key>paste</key>
+				<string>id</string>
+				<key>sendToBack</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -124,6 +140,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>group</key>
+				<string>id</string>
 				<key>mouseTask</key>
 				<string>id</string>
 			</dict>
