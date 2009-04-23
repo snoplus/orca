@@ -532,10 +532,8 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     if([gOrcaGlobals runInProgress]){
 		if([someData respondsToSelector:@selector(description)]){
 			id plist = nil;
-			//handle some special cases to make it easier for the orcaRoot decoders
-			if([someData isKindOfClass:[NSString class]] || [someData isKindOfClass:[NSNumber class]]){
-				someData = [NSDictionary dictionaryWithObject:someData	forKey:@"RecordKey"];
-			}
+			//this just wrapps the data in a top level dictionary to make it easy for orca root decoders
+			someData = [NSDictionary dictionaryWithObject:someData	forKey:@"DataRecord"];
 			plist = [NSPropertyListSerialization dataFromPropertyList:someData
 															   format:NSPropertyListXMLFormat_v1_0 errorDescription:nil];
 			
