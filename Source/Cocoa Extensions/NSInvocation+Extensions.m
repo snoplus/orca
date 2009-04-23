@@ -198,8 +198,11 @@
 
 + (id) invoke:(NSString*)args withTarget:(id)aTarget
 {
+	//this is a special method that is used by the ORCA scripting language to decode an arglist
+	//the argList (args) is string of "name:<objPtr> name:<objPtr> etc..."
+	//the <objPtr>'s are object pointers as integer strings. Here they are converted from strings back to integers and 
+	//recast back to id pointers.
 	id result = nil;
-	//args is string of "name:value name:value etc..."
 	NSArray* pairList = [args componentsSeparatedByString:@"#"];
 	NSMutableArray* orderedList = [NSMutableArray array];
 	NSString* pairString;
@@ -231,7 +234,7 @@
 		int argI;
 		BOOL ok = YES;
 		for(i=1,argI=0 ; i<=n*2 ; i+=2,argI++){
-			id theVar = [orderedList objectAtIndex:i];
+			id theVar = (id)([[orderedList objectAtIndex:i]intValue]);
 			if(![theInvocation setArgument:argI to:theVar]){
 				ok = NO;
 				break;

@@ -531,8 +531,15 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
 {
     if([gOrcaGlobals runInProgress]){
 		if([someData respondsToSelector:@selector(description)]){
-			id plist = [NSPropertyListSerialization dataFromPropertyList:someData
-																  format:NSPropertyListXMLFormat_v1_0 errorDescription:nil];
+			id plist = nil;
+			//handle some special cases to make it easier for the orcaRoot decoders
+			if([someData isKindOfClass:[NSString class]] || [someData isKindOfClass:[NSNumber class]]){
+				someData = [NSDictionary dictionaryWithObject:someData	forKey:@"RecordKey"];
+			}
+			plist = [NSPropertyListSerialization dataFromPropertyList:someData
+															   format:NSPropertyListXMLFormat_v1_0 errorDescription:nil];
+			
+			
 			if([plist length]){
 				//get the time(UT!)
 				time_t	theTime;

@@ -55,6 +55,7 @@
 - (id)		doCase:(id)p;
 - (id)		doDefault:(id)p;
 - (id)		processObjC:(id) p;
+- (id)		processSelectName:(id) p;
 - (id)		processDiv:(id) p;
 - (id)		processDIV_ASSIGN:(id) p;
 - (id)		doReturn:(id) p;
@@ -528,7 +529,7 @@
 			//obj-C ops
 		case '@':			return [self processObjC:p];
 		case kObjList:		return [NodeValue(0) stringByAppendingFormat:@"%@",NodeValue(1)];
-		case kSelName:		return [NSString stringWithFormat:@"%@:%@#",NodeValue(0),NodeValue(1)];
+		case kSelName:		return [self processSelectName:p];
 		case FIND:			return [self findObject:p];
 			
 			//math ops
@@ -697,6 +698,13 @@
 	}
 	if(result == nil) return _zero;
 	else			  return result;
+}
+
+- (id) processSelectName:(id) p
+{
+	id selName  = NodeValue(0);
+	id selValue = NodeValue(1);
+	return [NSString stringWithFormat:@"%@:%u#",selName,(unsigned long)selValue];
 }
 
 - (id) processStatements:(id) p
