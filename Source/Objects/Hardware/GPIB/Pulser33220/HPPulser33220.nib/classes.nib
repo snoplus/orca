@@ -14,6 +14,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>ORFlippedView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -278,14 +286,6 @@
 			<string>ORGpibDeviceController</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>connectionProtocolAction</key>
@@ -350,6 +350,8 @@
 				<string>id</string>
 				<key>differentiateAction</key>
 				<string>id</string>
+				<key>refresh</key>
+				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>
 				<key>resetScales</key>
@@ -368,7 +370,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ZFlowLayout</string>
+				<string>ORFlippedView</string>
 				<key>mDataSource</key>
 				<string>id</string>
 				<key>mXScale</key>
