@@ -1,81 +1,107 @@
-{
-    IBClasses = (
-        {CLASS = C617Hardware; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            ACTIONS = {
-                addressModifierAction = id; 
-                doTests = id; 
-                ioSpaceAction = id; 
-                read = id; 
-                readWriteTypeMatrixAction = id; 
-                reset = id; 
-                rwAddressStepperAction = id; 
-                rwAddressTextAction = id; 
-                sysReset = id; 
-                write = id; 
-                writeValueStepperAction = id; 
-                writeValueTextAction = id; 
-            }; 
-            CLASS = OR617Controller; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                addressStepper = NSStepper; 
-                addressValueField = NSTextField; 
-                readWriteAddressModifierPopUp = NSPopUpButton; 
-                readWriteIOSpacePopUp = NSPopUpButton; 
-                readWriteTypeMatrix = NSMatrix; 
-                writeValueField = NSTextField; 
-                writeValueStepper = NSStepper; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {
-                addressModifierAction = id; 
-                doTests = id; 
-                ioSpaceAction = id; 
-                read = id; 
-                readWriteTypeMatrixAction = id; 
-                reset = id; 
-                rwAddressStepperAction = id; 
-                rwAddressTextAction = id; 
-                sysReset = id; 
-                write = id; 
-                writeValueStepperAction = id; 
-                writeValueTextAction = id; 
-            }; 
-            CLASS = OR620Controller; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                addressStepper = NSStepper; 
-                addressValueField = NSTextField; 
-                readWriteAddressModifierPopUp = NSPopUpButton; 
-                readWriteIOSpacePopUp = NSPopUpButton; 
-                readWriteTypeMatrix = NSMatrix; 
-                writeValueField = NSTextField; 
-                writeValueStepper = NSStepper; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {printConfig = id; }; 
-            CLASS = ORPCICamacController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {showAboutBox = id; showConfiguration = id; showStatus = id; }; 
-            CLASS = OrcaController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>printConfig</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORPCICamacController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

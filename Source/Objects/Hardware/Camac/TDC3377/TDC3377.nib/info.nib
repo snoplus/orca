@@ -1,105 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>IBDocumentLocation</key>
-	<string>92 48 487 454 0 0 1680 1028 </string>
 	<key>IBFramework Version</key>
-	<string>364.0</string>
-	<key>IBGroupedObjects</key>
-	<dict>
-		<key>20</key>
-		<array>
-			<string>655</string>
-			<string>654</string>
-			<string>685</string>
-		</array>
-		<key>26</key>
-		<array>
-			<string>741</string>
-			<string>739</string>
-			<string>742</string>
-		</array>
-		<key>27</key>
-		<array>
-			<string>737</string>
-			<string>735</string>
-			<string>738</string>
-		</array>
-		<key>3</key>
-		<array>
-			<string>665</string>
-			<string>659</string>
-		</array>
-		<key>31</key>
-		<array>
-			<string>638</string>
-			<string>641</string>
-		</array>
-		<key>32</key>
-		<array>
-			<string>637</string>
-			<string>628</string>
-		</array>
-		<key>33</key>
-		<array>
-			<string>645</string>
-			<string>642</string>
-		</array>
-		<key>34</key>
-		<array>
-			<string>653</string>
-			<string>650</string>
-		</array>
-		<key>35</key>
-		<array>
-			<string>743</string>
-			<string>745</string>
-			<string>746</string>
-		</array>
-		<key>36</key>
-		<array>
-			<string>833</string>
-			<string>827</string>
-		</array>
-		<key>37</key>
-		<array>
-			<string>842</string>
-			<string>830</string>
-		</array>
-		<key>38</key>
-		<array>
-			<string>855</string>
-			<string>856</string>
-			<string>865</string>
-			<string>871</string>
-			<string>875</string>
-			<string>877</string>
-		</array>
-		<key>4</key>
-		<array>
-			<string>674</string>
-			<string>668</string>
-		</array>
-		<key>7</key>
-		<array>
-			<string>688</string>
-			<string>687</string>
-		</array>
-		<key>8</key>
-		<array>
-			<string>690</string>
-			<string>689</string>
-			<string>691</string>
-		</array>
-	</dict>
-	<key>IBLastGroupID</key>
-	<string>39</string>
+	<string>677</string>
+	<key>IBLastKnownRelativeProjectPath</key>
+	<string>../../../../../Orca.xcodeproj</string>
+	<key>IBOldestOS</key>
+	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>21</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>7W98</string>
+	<string>9G55</string>
+	<key>targetFramework</key>
+	<string>IBCocoaFramework</string>
 </dict>
 </plist>
