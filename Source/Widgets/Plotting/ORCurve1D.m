@@ -166,11 +166,13 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 - (void) clearActiveGate
 {
     [[self activeGate] setGateValid:NO];
+	showActiveGate = NO;
 }
 
 - (void) clearAllGates
 {
     [gates makeObjectsPerformSelector:@selector(clearGate) withObject:nil];
+	showActiveGate = NO;
 }
 
 - (int) gateNumber:(ORGate1D*)aGate
@@ -522,7 +524,7 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 	int i;
 	for(i=0;i<numGates;i++){
 		ORGate1D* theGate = [gates objectAtIndex:i];
-		if([theGate fitExists]){
+		if([theGate fitExists] && [theGate gateIsActive]){
 			int numPoints = [theGate numberOfPointsInPlot:aPlot dataSet:dataSetID];
 			if(numPoints == 0) return;
 												
