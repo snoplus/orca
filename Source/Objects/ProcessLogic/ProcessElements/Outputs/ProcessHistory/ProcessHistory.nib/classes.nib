@@ -218,6 +218,8 @@
 				<string>id</string>
 				<key>differentiateAction</key>
 				<string>id</string>
+				<key>refresh</key>
+				<string>id</string>
 				<key>removeGateAction</key>
 				<string>id</string>
 				<key>resetScales</key>
