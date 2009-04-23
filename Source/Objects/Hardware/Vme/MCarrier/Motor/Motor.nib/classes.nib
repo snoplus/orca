@@ -1,81 +1,269 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            ACTIONS = {
-                absBreakPointAction = id; 
-                absRelAction = id; 
-                breakPointAction = id; 
-                decAction = id; 
-                goAction = id; 
-                holdCurrentAction = id; 
-                incAction = id; 
-                motorNameAction = id; 
-                multiplierAction = id; 
-                optionMaskAction = id; 
-                patternAction = id; 
-                patternFileAction = id; 
-                patternTypeAction = id; 
-                readHomeAction = id; 
-                readMotorAction = id; 
-                risingEdgeAction = id; 
-                seekAmountAction = id; 
-                seekHomeAction = id; 
-                selectPatternFileAction = id; 
-                setProfileAction = id; 
-                setStepCountAction = id; 
-                startPatternRunAction = id; 
-                stepCountAction = id; 
-                stepModeAction = id; 
-                stopAction = id; 
-                targetAction = id; 
-                usePatternFileAction = id; 
-            }; 
-            CLASS = ORMotorController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                absRelBrkPtPopUp = NSPopUpButton; 
-                absRelStepPopUp = NSPopUpButton; 
-                breakPointField = NSTextField; 
-                decButton = NSButton; 
-                goButton = NSButton; 
-                holdCurrentPopUp = NSPopUpButton; 
-                homeButton = NSButton; 
-                homeDetectedField = NSTextField; 
-                incButton = NSButton; 
-                motorNameField = NSTextField; 
-                motorPatternMatrix = NSMatrix; 
-                motorPositionField = NSTextField; 
-                motorProfileFields = NSMatrix; 
-                motorRunningProgress = NSProgressIndicator; 
-                multiplierMatrix = NSMatrix; 
-                optionMatrix = NSMatrix; 
-                patternFileName = NSTextField; 
-                patternTypeMatrix = NSMatrix; 
-                queueView = ORQueueView; 
-                readHomeButton = NSButton; 
-                risingEdgePopUp = NSPopUpButton; 
-                seekAmountField = NSTextField; 
-                setPatternFileButton = NSButton; 
-                setStepCountButton = NSButton; 
-                startRunningPatternButton = NSButton; 
-                statusMatrix = NSMatrix; 
-                stepCountField = NSTextField; 
-                stepModePopUp = NSPopUpButton; 
-                stepTargetField = NSTextField; 
-                stopButton = NSButton; 
-                targetField = NSTextField; 
-                usePatternFileCB = NSButton; 
-                xAxis = ORAxis; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSWindowController; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORQueueView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>dataSource</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>setLogScale</key>
+				<string>id</string>
+				<key>shiftLeft</key>
+				<string>id</string>
+				<key>shiftRight</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORAxis</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>preferenceController</key>
+				<string>id</string>
+				<key>viewToScale</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>absBreakPointAction</key>
+				<string>id</string>
+				<key>absRelAction</key>
+				<string>id</string>
+				<key>breakPointAction</key>
+				<string>id</string>
+				<key>decAction</key>
+				<string>id</string>
+				<key>goAction</key>
+				<string>id</string>
+				<key>holdCurrentAction</key>
+				<string>id</string>
+				<key>incAction</key>
+				<string>id</string>
+				<key>motorNameAction</key>
+				<string>id</string>
+				<key>multiplierAction</key>
+				<string>id</string>
+				<key>optionMaskAction</key>
+				<string>id</string>
+				<key>patternAction</key>
+				<string>id</string>
+				<key>patternFileAction</key>
+				<string>id</string>
+				<key>patternTypeAction</key>
+				<string>id</string>
+				<key>readHomeAction</key>
+				<string>id</string>
+				<key>readMotorAction</key>
+				<string>id</string>
+				<key>risingEdgeAction</key>
+				<string>id</string>
+				<key>seekAmountAction</key>
+				<string>id</string>
+				<key>seekHomeAction</key>
+				<string>id</string>
+				<key>selectPatternFileAction</key>
+				<string>id</string>
+				<key>setProfileAction</key>
+				<string>id</string>
+				<key>setStepCountAction</key>
+				<string>id</string>
+				<key>startPatternRunAction</key>
+				<string>id</string>
+				<key>stepCountAction</key>
+				<string>id</string>
+				<key>stepModeAction</key>
+				<string>id</string>
+				<key>stopAction</key>
+				<string>id</string>
+				<key>targetAction</key>
+				<string>id</string>
+				<key>usePatternFileAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORMotorController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>absRelBrkPtPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>absRelStepPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>breakPointField</key>
+				<string>NSTextField</string>
+				<key>decButton</key>
+				<string>NSButton</string>
+				<key>goButton</key>
+				<string>NSButton</string>
+				<key>holdCurrentPopUp</key>
+				<string>NSPopUpButton</string>
+				<key>homeButton</key>
+				<string>NSButton</string>
+				<key>homeDetectedField</key>
+				<string>NSTextField</string>
+				<key>incButton</key>
+				<string>NSButton</string>
+				<key>motorNameField</key>
+				<string>NSTextField</string>
+				<key>motorPatternMatrix</key>
+				<string>NSMatrix</string>
+				<key>motorPositionField</key>
+				<string>NSTextField</string>
+				<key>motorProfileFields</key>
+				<string>NSMatrix</string>
+				<key>motorRunningProgress</key>
+				<string>NSProgressIndicator</string>
+				<key>multiplierMatrix</key>
+				<string>NSMatrix</string>
+				<key>optionMatrix</key>
+				<string>NSMatrix</string>
+				<key>patternFileName</key>
+				<string>NSTextField</string>
+				<key>patternTypeMatrix</key>
+				<string>NSMatrix</string>
+				<key>queueView</key>
+				<string>ORQueueView</string>
+				<key>readHomeButton</key>
+				<string>NSButton</string>
+				<key>risingEdgePopUp</key>
+				<string>NSPopUpButton</string>
+				<key>seekAmountField</key>
+				<string>NSTextField</string>
+				<key>setPatternFileButton</key>
+				<string>NSButton</string>
+				<key>setStepCountButton</key>
+				<string>NSButton</string>
+				<key>startRunningPatternButton</key>
+				<string>NSButton</string>
+				<key>statusMatrix</key>
+				<string>NSMatrix</string>
+				<key>stepCountField</key>
+				<string>NSTextField</string>
+				<key>stepModePopUp</key>
+				<string>NSPopUpButton</string>
+				<key>stepTargetField</key>
+				<string>NSTextField</string>
+				<key>stopButton</key>
+				<string>NSButton</string>
+				<key>targetField</key>
+				<string>NSTextField</string>
+				<key>usePatternFileCB</key>
+				<string>NSButton</string>
+				<key>xAxis</key>
+				<string>ORAxis</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>OHexFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSFormatter</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
