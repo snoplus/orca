@@ -716,14 +716,16 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     if(maxX < minX || (maxX-minX) < 1)return;
     
     /* set the scale to 20% beyond extremes */
-    double mmax = maxX+(0.2*maxX);
+    double mmax = maxY+(0.2*maxY);
     double mmin = 0;
     if(minY<0)mmin = minY - 0.2*rngY/2.;
 	
     [mYScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:25];
     [mYScale setRngLow:MIN(mmin,0) withHigh:mmax];
+	
     [mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:20];
     [mXScale setRngLow:0 withHigh:maxX];
+	
     [self setNeedsDisplay:YES];
     [mYScale setNeedsDisplay:YES];
     [mXScale setNeedsDisplay:YES];
