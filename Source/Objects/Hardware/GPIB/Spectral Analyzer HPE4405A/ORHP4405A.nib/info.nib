@@ -1,97 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>IBDocumentLocation</key>
-	<string>39 351 462 446 0 0 1280 832 </string>
 	<key>IBFramework Version</key>
-	<string>443.0</string>
-	<key>IBGroupedObjects</key>
-	<dict>
-		<key>13</key>
-		<array>
-			<string>585</string>
-			<string>586</string>
-		</array>
-		<key>28</key>
-		<array>
-			<string>690</string>
-			<string>689</string>
-		</array>
-		<key>29</key>
-		<array>
-			<string>694</string>
-			<string>693</string>
-		</array>
-		<key>34</key>
-		<array>
-			<string>709</string>
-			<string>704</string>
-			<string>359</string>
-		</array>
-		<key>36</key>
-		<array>
-			<string>529</string>
-			<string>719</string>
-			<string>527</string>
-			<string>530</string>
-			<string>525</string>
-			<string>523</string>
-			<string>526</string>
-			<string>724</string>
-			<string>466</string>
-		</array>
-		<key>37</key>
-		<array>
-			<string>609</string>
-			<string>610</string>
-		</array>
-		<key>38</key>
-		<array>
-			<string>745</string>
-			<string>746</string>
-		</array>
-		<key>39</key>
-		<array>
-			<string>666</string>
-			<string>663</string>
-			<string>659</string>
-			<string>671</string>
-			<string>675</string>
-			<string>254</string>
-		</array>
-		<key>40</key>
-		<array>
-			<string>211</string>
-			<string>240</string>
-			<string>248</string>
-			<string>656</string>
-			<string>243</string>
-			<string>699</string>
-			<string>697</string>
-		</array>
-	</dict>
-	<key>IBLastGroupID</key>
-	<string>43</string>
-	<key>IBLockedObjects</key>
-	<array/>
+	<string>677</string>
+	<key>IBLastKnownRelativeProjectPath</key>
+	<string>../../../../../Orca.xcodeproj</string>
+	<key>IBOldestOS</key>
+	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>5</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>8S165</string>
-	<key>IBUserGuides</key>
-	<dict>
-		<key>5</key>
-		<dict>
-			<key>guideLocations</key>
-			<array>
-				<string>Horizontal:30.000000</string>
-			</array>
-			<key>guidesLocked</key>
-			<false/>
-		</dict>
-	</dict>
+	<string>9G55</string>
+	<key>targetFramework</key>
+	<string>IBCocoaFramework</string>
 </dict>
 </plist>

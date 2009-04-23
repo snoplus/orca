@@ -23,6 +23,8 @@
 				<string>id</string>
 				<key>readHWAction</key>
 				<string>id</string>
+				<key>resetAction</key>
+				<string>id</string>
 				<key>sendCommandAction</key>
 				<string>id</string>
 				<key>sendToHWAction</key>
@@ -51,6 +53,8 @@
 				<key>readFromHWButton</key>
 				<string>NSButton</string>
 				<key>readIdButton</key>
+				<string>NSButton</string>
+				<key>resetButton</key>
 				<string>NSButton</string>
 				<key>sendCommandButton</key>
 				<string>NSButton</string>
@@ -143,6 +147,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
 				<key>taskFinished</key>
 				<string>id</string>
 				<key>tasksCompleted</key>
