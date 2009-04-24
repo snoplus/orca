@@ -98,7 +98,7 @@ unless(<condition>)\{\
 \b0 var = <expression>?<stmt>:<stmt>\
 \
 
-\b ORCA Filter Interface
+\b ORCA Filter functions
 \b0 \
 currentRecordIs(<var>);		//returns YES  if current record is of type <var>\
 id = extractRecordID(<var>);	//returns dataid of current record\
@@ -138,6 +138,19 @@ Other special variables include
 \i0\b0  of the data ids that are in the run header. An example would be 
 \i ORShaperDecoderForShaper
 \i0  is the name of the data id for the Shaper card adc data id. Others must be gleaned from knowledge of the run header itself. Look at an example run header or examine the ORCA source code to discover the proper names.\
+\
+
+\b Important:\
+
+\b0 Note that some of the functions take 
+\i variables
+\i0  and some take 
+\i pointers 
+\i0 as arguments. For example, you would use 
+\i extractRecordLen(CurrentRecordPtr[0]) 
+\i0\b NOT 
+\i\b0 extractRecordLen(CurrentRecordPtr).
+\i0  Unfortunately, it is not possible for FilterScript to warn you of type mismatches.\
 \
 
 \b Output
