@@ -17,6 +17,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import "ORFlippedView.h"
 
 @implementation ORFlippedView : NSView
 - (BOOL) isFlipped {return YES;}
