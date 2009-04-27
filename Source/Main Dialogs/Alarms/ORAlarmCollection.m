@@ -197,8 +197,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 - (void) addAlarm:(ORAlarm*)anAlarm
 {
     if(!alarms)		  [self setAlarms:[NSMutableArray array]];
+	NSEnumerator* e = [alarms objectEnumerator];
+	BOOL alarmAlreadyPosted = NO;
+	ORAlarm* alarm;
+	while(alarm = [e nextObject]){
+		if([[alarm name] isEqualToString:[anAlarm name]]){
+			alarmAlreadyPosted = YES;
+			break;
+		}
+	}
 	
-    if(![alarms containsObject:anAlarm]){
+    if(![alarms containsObject:anAlarm] &&  !alarmAlreadyPosted){
 		BOOL added = NO;
 		NSEnumerator* e = [alarms objectEnumerator];
 		ORAlarm* alarm;
@@ -220,9 +229,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 
 - (void) removeAlarm:(ORAlarm*)anAlarm
 {
-    if([alarms containsObject:anAlarm]){
+	ORAlarm* alarm;
+	BOOL alarmWasPosted = NO;
+	ORAlarm* alarmToRemove = nil;
+	NSEnumerator* e = [alarms objectEnumerator];
+	while(alarm = [e nextObject]){
+		if([[alarm name] isEqualToString:[anAlarm name]]){
+			alarmWasPosted = YES;
+			alarmToRemove = alarm;
+			break;
+		}
+	}
+    if([alarms containsObject:anAlarm] || alarmWasPosted){
 		NSLog(@" Alarm: [%@] Cleared\n",[anAlarm name]);
 		[alarms removeObject:anAlarm];
+		[alarms removeObject:alarmToRemove];
     }
 }
 
