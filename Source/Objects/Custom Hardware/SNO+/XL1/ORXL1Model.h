@@ -37,6 +37,7 @@
 		float			memoryClock;
 		float			adcAllowedError[kNumFecMonitorAdcs];
 		NSString*		clockFile;
+		NSString*		cableFile;
 }
 
 #pragma mark •••Connection Stuff
@@ -56,10 +57,12 @@
 - (id)   getXL1;
 
 #pragma mark •••Accessors
-- (NSString*) clockFile;
-- (void) setClockFile:(NSString*)aClockFile;
+- (NSString*)	clockFile;
+- (void)	setClockFile:(NSString*)aClockFile;
 - (NSString*)	xilinxFile;
-- (void)		setXilinxFile:(NSString*)aFilePath;
+- (void)	setXilinxFile:(NSString*)aFilePath;
+- (NSString*)	cableFile;
+- (void)	setCableFile:(NSString*)aFilePath;
 - (float)		adcClock;
 - (void)		setAdcClock:(float)aValue;
 - (float)		sequencerClock;
@@ -88,6 +91,7 @@
 
 extern NSString* ORXL1ClockFileChanged;
 extern NSString* ORXL1XilinxFileChanged;
+extern NSString* ORXL1CableFileChanged;
 extern NSString* ORXL1AdcClockChanged;
 extern NSString* ORXL1SequencerClockChanged;
 extern NSString* ORXL1MemoryClockChanged;

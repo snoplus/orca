@@ -25,6 +25,7 @@
 @interface ORXL1Controller (private)
 - (void) setClockFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 - (void) setXilinxFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
+- (void) setCableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo;
 @end
 
 
@@ -52,8 +53,13 @@
                      selector : @selector(clockFileChanged:)
                          name : ORXL1ClockFileChanged
 						object: model];
-	
-    [notifyCenter addObserver : self
+
+	[notifyCenter addObserver : self
+			 selector : @selector(cableFileChanged:)
+			     name : ORXL1CableFileChanged
+			   object : model];
+
+	[notifyCenter addObserver : self
 					 selector : @selector(adcClockChanged:)
 						 name : ORXL1AdcClockChanged
 					   object : model];
@@ -94,6 +100,7 @@
 	[self memoryClockChanged:nil];
 	[self xlinixFileChanged:nil];
 	[self clockFileChanged:nil];
+	[self cableFileChanged:nil];
 	[self updateButtons];
 }
 
@@ -121,6 +128,7 @@
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORXL1Lock];
 	[xlinixSelectFileButton	setEnabled: !lockedOrRunningMaintenance];
 	[clockSelectFileButton	setEnabled: !lockedOrRunningMaintenance];
+	[cableSelectFileButton	setEnabled: !lockedOrRunningMaintenance];
 	[adcClockField			setEnabled: !lockedOrRunningMaintenance];
 	[adcClockStepper		setEnabled: !lockedOrRunningMaintenance];
 	[sequencerClockField	setEnabled: !lockedOrRunningMaintenance];
@@ -132,6 +140,11 @@
 - (void) xlinixFileChanged:(NSNotification*)aNote
 {
 	[xlinixFileField setStringValue:[[model xilinxFile] stringByAbbreviatingWithTildeInPath]];
+}
+
+- (void) cableFileChanged:(NSNotification*)aNote
+{
+	[cableFileTextField setStringValue:[[model cableFile] stringByAbbreviatingWithTildeInPath]];
 }
 
 - (void) adcClockChanged:(NSNotification*)aNote
@@ -203,6 +216,28 @@
                           contextInfo:NULL];
 }
 
+- (IBAction) cableFileAction:(id) sender
+{
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+	[openPanel setCanChooseDirectories:NO];
+	[openPanel setCanChooseFiles:YES];
+	[openPanel setAllowsMultipleSelection:NO];
+	[openPanel setPrompt:@"Choose"];
+	NSString* startingDir;
+	
+	NSString* fullPath = [[model cableFile] stringByExpandingTildeInPath];
+	if(fullPath)	startingDir = [[model cableFile] stringByDeletingLastPathComponent];
+	else			startingDir = NSHomeDirectory();
+	
+	[openPanel beginSheetForDirectory:startingDir
+				     file:nil
+				    types:nil
+			   modalForWindow:[self window]
+			    modalDelegate:self
+			   didEndSelector:@selector(setCableFileDidEnd:returnCode:contextInfo:)
+			      contextInfo:NULL];
+}
+
 
 - (IBAction) adcClockAction:(id) sender
 {
@@ -229,11 +264,22 @@
 		NSLog(@"FEC Xilinx default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
     }
 }
+
+
 - (void) setClockFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
 {
     if(returnCode){
         [model setClockFile:[[sheet filenames] objectAtIndex:0]];
 		NSLog(@"FEC Clock default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
     }
+}
+
+
+- (void) setCableFileDidEnd:(NSOpenPanel *)sheet returnCode:(int)returnCode contextInfo:(void  *)contextInfo
+{
+	if(returnCode){
+		[model setCableFile:[[sheet filenames] objectAtIndex:0]];
+		NSLog(@"CableDB.h default file set to: %@\n",[[[[sheet filenames] objectAtIndex:0] stringByAbbreviatingWithTildeInPath] stringByDeletingPathExtension]);
+	}
 }
 @end

@@ -29,6 +29,7 @@
 
 NSString* ORXL1ClockFileChanged			= @"ORXL1ClockFileChanged";
 NSString* ORXL1XilinxFileChanged		= @"ORXL1XilinxFileChanged";
+NSString* ORXL1CableFileChanged			= @"ORXL1CableFileChanged";
 NSString* ORXL1AdcClockChanged			= @"ORXL1AdcClockChanged";
 NSString* ORXL1SequencerClockChanged	= @"ORXL1SequencerClockChanged";
 NSString* ORXL1MemoryClockChanged		= @"ORXL1MemoryClockChanged";
@@ -211,6 +212,27 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL1XilinxFileChanged object:self];
 }
 
+- (NSString*) cableFile 
+{
+	return cableFile;
+}
+
+- (void)setCableFile:(NSString*)aFilePath;
+{
+	if(!aFilePath)aFilePath = @"";
+	[[[self undoManager] prepareWithInvocationTarget:self] setCableFile:cableFile];
+	
+	[aFilePath retain];
+	[cableFile release];
+	cableFile = aFilePath;
+	
+	ORSNOCableDB* db = [ORSNOCableDB sharedSNOCableDB];
+	[db setCableDBFilePath:[self cableFile]];
+		
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL1CableFileChanged object:self];
+}
+
+
 - (float) adcClock
 {
 	return adcClock;
@@ -277,6 +299,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
     [self setConnector:		[decoder decodeObjectForKey:@"connector"]];
 	[self setSlot:			[decoder decodeIntForKey:@"slot"]];
 	[self setXilinxFile:	[decoder decodeObjectForKey: @"xilinxFile"]];
+	[self setCableFile:	[decoder decodeObjectForKey: @"cableFile"]];
     [self setAdcClock:		[decoder decodeFloatForKey: @"adcClock"]];
     [self setSequencerClock:[decoder decodeFloatForKey: @"sequencerClock"]];
     [self setMemoryClock:	[decoder decodeFloatForKey: @"memoryClock"]];
@@ -285,7 +308,8 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 		[self setAdcAllowedError:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"adcAllowedError%d",i]]];
 	}
 	ORSNOCableDB* db = [ORSNOCableDB sharedSNOCableDB];
-	[db setCableDBFilePath:@"/Users/markhowe/Desktop/CableDB.h"];
+	//[db setCableDBFilePath:@"/Users/markhowe/Desktop/CableDB.h"];
+	[db setCableDBFilePath:[self cableFile]];
 	
     [[self undoManager] enableUndoRegistration];
     
@@ -298,8 +322,9 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
     [encoder encodeObject:clockFile			forKey:@"clockFile"];
     [encoder encodeObject:connectorName		forKey:@"connectorName"];
     [encoder encodeObject:connector			forKey:@"connector"];
-    [encoder encodeInt:[self slot]			forKey:@"slot"];
+	[encoder encodeInt:[self slot]			forKey:@"slot"];
 	[encoder encodeObject:xilinxFile		forKey:@"xilinxFile"];
+	[encoder encodeObject:cableFile			forKey:@"cableFile"];
 	[encoder encodeFloat:adcClock			forKey:@"adcClock"];
 	[encoder encodeFloat:sequencerClock		forKey:@"sequencerClock"];
 	int i;

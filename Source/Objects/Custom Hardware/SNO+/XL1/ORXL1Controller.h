@@ -24,8 +24,10 @@
 @interface ORXL1Controller : OrcaObjectController {
 	IBOutlet NSTextField*	xlinixFileField;
 	IBOutlet NSTextField* clockFileTextField;
+	IBOutlet NSTextField* cableFileTextField;
 	IBOutlet NSButton*		xlinixSelectFileButton;
 	IBOutlet NSButton*		clockSelectFileButton;
+	IBOutlet NSButton*		cableSelectFileButton;
 	IBOutlet NSTextField*	adcClockField;
 	IBOutlet NSStepper*		adcClockStepper;
 	IBOutlet NSTextField*	sequencerClockField;
@@ -41,6 +43,7 @@
 - (void) clockFileChanged:(NSNotification*)aNote;
 - (void) updateButtons;
 - (void) xlinixFileChanged:(NSNotification*)aNote;
+- (void) cableFileChanged:(NSNotification*)aNote;
 - (void) adcClockChanged:(NSNotification*)aNote;
 - (void) sequencerClockChanged:(NSNotification*)aNote;
 - (void) memoryClockChanged:(NSNotification*)aNote;
@@ -50,6 +53,7 @@
 - (IBAction) clockFileAction:(id) sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) xlinixFileAction:(id) sender;
+- (IBAction) cableFileAction:(id) sender;
 - (IBAction) adcClockAction:(id) sender;
 - (IBAction) sequencerClockAction:(id) sender;
 - (IBAction) memoryClockAction:(id) sender;
