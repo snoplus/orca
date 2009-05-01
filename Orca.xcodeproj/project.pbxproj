@@ -1717,6 +1717,13 @@
 		84D0592E08FF367A00A99A83 /* goBack.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D0592C08FF367A00A99A83 /* goBack.tif */; };
 		84D0593F08FF39EA00A99A83 /* goBackPressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D0593D08FF39EA00A99A83 /* goBackPressed.tif */; };
 		84D05976090017B200A99A83 /* ORContainerModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B0CFBD08FC60BC00EBE23C /* ORContainerModel.m */; };
+		84D258680FA7340B00626276 /* MotionNode.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D2585D0FA7340B00626276 /* MotionNode.gif */; };
+		84D258690FA7340B00626276 /* MotionNode.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D2585E0FA7340B00626276 /* MotionNode.nib */; };
+		84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D258600FA7340B00626276 /* NoMotionNodeDriverHelp.plist */; };
+		84D2586C0FA7340B00626276 /* ORMotionNodeController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D258610FA7340B00626276 /* ORMotionNodeController.h */; };
+		84D2586D0FA7340B00626276 /* ORMotionNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D258620FA7340B00626276 /* ORMotionNodeController.m */; };
+		84D2586E0FA7340B00626276 /* ORMotionNodeModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D258630FA7340B00626276 /* ORMotionNodeModel.h */; };
+		84D2586F0FA7340B00626276 /* ORMotionNodeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D258640FA7340B00626276 /* ORMotionNodeModel.m */; };
 		84D435B70798851B003D089F /* NoCamacDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D435B60798851B003D089F /* NoCamacDriverHelp.plist */; };
 		84D60BCB07428C7D0061F795 /* OrcaObjectController.m in Sources */ = {isa = PBXBuildFile; fileRef = F51E69EE03AE4776015F64B1 /* OrcaObjectController.m */; };
 		84D852E60BE171AF00290BDC /* ORCARootServiceDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */; };
@@ -3682,6 +3689,13 @@
 		84CFB09B042A80BE005F64B1 /* ORDataFileController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORDataFileController.m; path = "Source/Objects/Data Processing/Data Storage/ORDataFileController.m"; sourceTree = SOURCE_ROOT; };
 		84D0592D08FF367A00A99A83 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/goBack.tif; sourceTree = "<group>"; };
 		84D0593E08FF39EA00A99A83 /* English */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = English; path = English.lproj/goBackPressed.tif; sourceTree = "<group>"; };
+		84D2585D0FA7340B00626276 /* MotionNode.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = MotionNode.gif; path = Source/Objects/Hardware/Serial/MotionNode/MotionNode.gif; sourceTree = SOURCE_ROOT; };
+		84D2585E0FA7340B00626276 /* MotionNode.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MotionNode.nib; path = Source/Objects/Hardware/Serial/MotionNode/MotionNode.nib; sourceTree = SOURCE_ROOT; };
+		84D258600FA7340B00626276 /* NoMotionNodeDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = NoMotionNodeDriverHelp.plist; sourceTree = "<group>"; };
+		84D258610FA7340B00626276 /* ORMotionNodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMotionNodeController.h; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeController.h; sourceTree = SOURCE_ROOT; };
+		84D258620FA7340B00626276 /* ORMotionNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotionNodeController.m; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeController.m; sourceTree = SOURCE_ROOT; };
+		84D258630FA7340B00626276 /* ORMotionNodeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMotionNodeModel.h; sourceTree = "<group>"; };
+		84D258640FA7340B00626276 /* ORMotionNodeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMotionNodeModel.m; sourceTree = "<group>"; };
 		84D435B60798851B003D089F /* NoCamacDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoCamacDriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoCamacDriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCARootServiceDefs.h; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceDefs.h"; sourceTree = SOURCE_ROOT; };
 		84D967710CA03E50000C0C76 /* ORScriptController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptController.h; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptController.h; sourceTree = SOURCE_ROOT; };
@@ -4274,6 +4288,7 @@
 			isa = PBXGroup;
 			children = (
 				2AE87BDD0D6E486900A839FC /* libmysqlclient.a */,
+				84F7FB550AE555C600A5AA4C /* mysql.h */,
 			);
 			path = libUniversal;
 			sourceTree = "<group>";
@@ -5691,6 +5706,7 @@
 				84B28D180F4C614000E2B056 /* XYScanner */,
 				84B28D340F4C63A000E2B056 /* LakeShore210 */,
 				84B28D830F4C66BE00E2B056 /* VXM */,
+				84D258590FA7340B00626276 /* MotionNode */,
 			);
 			name = Serial;
 			path = Source/Objects/Hardware/Serial;
@@ -8003,6 +8019,21 @@
 			path = "Source/Objects/Data Processing/Data Storage";
 			sourceTree = SOURCE_ROOT;
 		};
+		84D258590FA7340B00626276 /* MotionNode */ = {
+			isa = PBXGroup;
+			children = (
+				84D2585D0FA7340B00626276 /* MotionNode.gif */,
+				84D2585E0FA7340B00626276 /* MotionNode.nib */,
+				84D258600FA7340B00626276 /* NoMotionNodeDriverHelp.plist */,
+				84D258610FA7340B00626276 /* ORMotionNodeController.h */,
+				84D258620FA7340B00626276 /* ORMotionNodeController.m */,
+				84D258630FA7340B00626276 /* ORMotionNodeModel.h */,
+				84D258640FA7340B00626276 /* ORMotionNodeModel.m */,
+			);
+			name = MotionNode;
+			path = Source/Objects/Hardware/Serial/MotionNode;
+			sourceTree = SOURCE_ROOT;
+		};
 		84D967700CA03E50000C0C76 /* Script */ = {
 			isa = PBXGroup;
 			children = (
@@ -8337,7 +8368,6 @@
 			isa = PBXGroup;
 			children = (
 				2AE87BDC0D6E486900A839FC /* libUniversal */,
-				84F7FB550AE555C600A5AA4C /* mysql.h */,
 				84F7FB630AE5569100A5AA4C /* my_alloc.h */,
 				84F7FB590AE5566D00A5AA4C /* mysql_version.h */,
 				84F7FB5A0AE5566D00A5AA4C /* mysql_time.h */,
@@ -9649,6 +9679,8 @@
 				84BC88E00F9CDB5600336DF1 /* ORSerialPortController.h in Headers */,
 				84BC88EE0F9CDD5B00336DF1 /* ORSerialPortModel.h in Headers */,
 				840823CC0F9F83DC007E6061 /* ORFlippedView.h in Headers */,
+				84D2586C0FA7340B00626276 /* ORMotionNodeController.h in Headers */,
+				84D2586E0FA7340B00626276 /* ORMotionNodeModel.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10257,6 +10289,9 @@
 				84098F6F0F96589B00036BE8 /* Turbo.gif in Resources */,
 				84BC89C20F9CE75F00336DF1 /* SerialPortControls.nib in Resources */,
 				84BC8DF40F9DF76500336DF1 /* NoOilHelp.plist in Resources */,
+				84D258680FA7340B00626276 /* MotionNode.gif in Resources */,
+				84D258690FA7340B00626276 /* MotionNode.nib in Resources */,
+				84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10962,6 +10997,8 @@
 				84BC88DF0F9CDB5600336DF1 /* ORSerialPortController.m in Sources */,
 				84BC89130F9CDDAC00336DF1 /* ORSerialPortModel.m in Sources */,
 				840823CD0F9F83DC007E6061 /* ORFlippedView.m in Sources */,
+				84D2586D0FA7340B00626276 /* ORMotionNodeController.m in Sources */,
+				84D2586F0FA7340B00626276 /* ORMotionNodeModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11119,8 +11156,22 @@
 					Libraries,
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_4)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_5)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_6)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_4 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_5 = "\"$(SRCROOT)/../../Downloads/MotionNodeAccelAPI\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_6 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_7 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_8 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",
 					"-falign-loops=32",
@@ -11174,7 +11225,23 @@
 					Libraries,
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_5)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_6)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
 				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../../Downloads/capi\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/../../Downloads/MotionNodeAccelAPI\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_7 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_8 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",
@@ -11225,7 +11292,23 @@
 					Libraries,
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_2)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_3)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_4)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_5)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_6)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_7)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_8)",
 				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_3 = "\"$(SRCROOT)/../../Downloads/capi\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_4 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_5 = "\"$(SRCROOT)/../../Downloads/MotionNodeAccelAPI\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_6 = "\"$(SRCROOT)/Source/Objects/Hardware/USB/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_7 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_8 = "\"$(SRCROOT)/Source/Objects/Hardware/Serial/MotionNode\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				OTHER_CFLAGS = (
 					"-fobjc-exceptions",

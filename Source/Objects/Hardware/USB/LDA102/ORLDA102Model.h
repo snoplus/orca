@@ -112,5 +112,4 @@ extern NSString* ORLDA102ModelSerialNumberChanged;
 extern NSString* ORLDA102ModelUSBInterfaceChanged;
 extern NSString* ORLDA102ModelRelayChanged;
 extern NSString* ORLDA102ModelLock;
-extern NSString* ORLDA102ModelSerialPortChanged;
 

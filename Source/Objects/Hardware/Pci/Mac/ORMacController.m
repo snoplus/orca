@@ -273,12 +273,24 @@
     if(index >=0){
         ORSerialPort* thePort = [model serialPort:index];
         if([[note userInfo] objectForKey:@"serialPort"] == thePort){
-            NSString* theString = [[[NSString alloc] initWithData:[[note userInfo] objectForKey:@"data"] 
-                                                        encoding:NSASCIIStringEncoding] autorelease];
+			//it's possible the data is non-ascii. We'll keep only the ascii part for display.
+			NSMutableData* theData = [NSMutableData dataWithData:[[note userInfo] objectForKey:@"data"]];
+			char* p = (char*)[theData bytes];
+			NSString* theString = @"<non ascii>";
+			if(p[0]>= 0x20){
+				int i;
+				for(i=0;i<[theData length];i++){
+					if(p[i]< 0x20){
+						[theData setLength:i];
+						break;
+					}
+				}
+				theString = [[[NSString alloc] initWithData:theData encoding:NSASCIIStringEncoding] autorelease];
+			}
 
             theString = [[theString componentsSeparatedByString:@"\r"] componentsJoinedByString:@""];
             theString = [[theString componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
-            
+            theString = [theString stringByAppendingString:@"\n"];
             [outputView replaceCharactersInRange:NSMakeRange([[outputView textStorage] length], 0) withString:theString];
             [outputView scrollRangeToVisible: NSMakeRange([[outputView textStorage] length], 0)];
             

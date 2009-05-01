@@ -22,7 +22,6 @@
 #import "ORLDA102Model.h"
 #import "ORUSB.h"
 #import "ORUSBInterface.h"
-#import "ORSerialPortList.h"
 
 @implementation ORLDA102Controller
 - (id) init

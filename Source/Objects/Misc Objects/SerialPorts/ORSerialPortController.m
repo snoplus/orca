@@ -46,8 +46,8 @@
 		else NSLog(@"Failed to load SerialPortControls.nib");
 	}
     else {
-		[self registerNotificationObservers];
 		[self populatePortListPopup];	
+		[self registerNotificationObservers];
 	}
 }
 
@@ -74,14 +74,14 @@
 
 - (void) updateWindow
 {
-    [self portStateChanged:nil];
     [self portNameChanged:nil];
+    [self portStateChanged:nil];
 }
 
 - (void) updateButtons:(BOOL)locked
 {
-	//BOOL portOpen = [[[owner model] serialPort] isOpen];
-    [portListPopup setEnabled:!locked];
+	BOOL portOpen = [[[owner model] serialPort] isOpen];
+    [portListPopup setEnabled:!locked && !portOpen];
     [openPortButton setEnabled:!locked];
 }
 
@@ -138,9 +138,9 @@
 
 - (void) updateButtons;
 {
-	//BOOL portOpen = [[model serialPort] isOpen];
+	BOOL portOpen = [[[owner model] serialPort] isOpen];
 	BOOL locked = [self portLocked];
-    [portListPopup setEnabled:!locked];
+    [portListPopup setEnabled:!locked && !portOpen];
     [openPortButton setEnabled:!locked];
 }
 

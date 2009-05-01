@@ -720,7 +720,9 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
     double mmin = 0;
     if(minY<0)mmin = minY - 0.2*rngY/2.;
 	
-    [mYScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:25];
+    if([mYScale integer])[mYScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:25];
+	else 	[mYScale setRngLimitsLow:-3E9 withHigh:3E9 withMinRng:.1];
+
     [mYScale setRngLow:MIN(mmin,0) withHigh:mmax];
 	
     [mXScale setRngLimitsLow:minX withHigh:maxX withMinRng:20];
