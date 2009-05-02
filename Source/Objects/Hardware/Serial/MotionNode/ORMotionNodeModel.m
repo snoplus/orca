@@ -46,6 +46,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 };
 
 @interface ORMotionNodeModel (private)
+- (void) processIt;
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) enqueCmd:(int)aCmd;
@@ -57,7 +58,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void) setAy:(float)aAy;
 - (void) setTraceIndex:(int)aTraceIndex;
 - (void) setTotalxyz;
-
+- (void) flushCheck;
 @end
 
 
@@ -332,33 +333,39 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
 		[inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-		if(!lastRequest){
-			if(packetLength){
-				if([inComingData length] >= packetLength){
-					do {
-						[self processPacket:inComingData];
-						[inComingData replaceBytesInRange:NSMakeRange(0,packetLength) withBytes:nil length:0];
-					} while([inComingData length] >= packetLength);
-				}
-			}
-			else {
-				//arg, the device is running from a previous time
-				//since the packetLength is zero we have never been inited.in
-				//we just throw the data away until we get none for .5 sec. then we init
-				[self performSelectorOnMainThread:@selector(flushCheck) withObject:nil waitUntilDone:YES];
-			}
-		}
-		else {
-			int expectedLength = [[lastRequest objectForKey:@"expectedLength"] intValue];
-			if([inComingData length] == expectedLength){
-				[self processInComingData];
-			}
-		}
+		[self performSelectorOnMainThread:@selector(processIt) withObject:nil waitUntilDone:YES];
 	}
 }
 @end
 
 @implementation ORMotionNodeModel (private)
+- (void) processIt
+{
+	if(!lastRequest){
+		if(packetLength){
+			if([inComingData length] >= packetLength){
+				do {
+					[self processPacket:inComingData];
+					[inComingData replaceBytesInRange:NSMakeRange(0,packetLength) withBytes:nil length:0];
+				} while([inComingData length] >= packetLength);
+			}
+		}
+		else {
+			//arg, the device is running from a previous time
+			//since the packetLength is zero we have never been inited.in
+			//we just throw the data away until we get none for .5 sec. then we init
+			[self flushCheck];
+		}
+	}
+	else {
+		int expectedLength = [[lastRequest objectForKey:@"expectedLength"] intValue];
+		if([inComingData length] == expectedLength){
+			//have to process on the main thread because it posts notifications that cuase drawing.
+			[self processInComingData];
+		}
+	}
+}
+			
 - (void) flushCheck
 {
 	[self setNodeRunning:YES];
