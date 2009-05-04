@@ -247,6 +247,12 @@ NSString* ORZupModelPortStateChanged		= @"ORZupModelPortStateChanged";
 	[self loadDac:dummy];
 }
 
+- (void) setImmediatelyToCurrent:(float)aCurrent
+{
+	NSString* s = [NSString stringWithFormat:@"PC %f",aCurrent];
+	[self sendCmd:s];
+}
+
 
 //these needed to interface with the ramper
 - (float) voltage:(int)dummy

@@ -97,6 +97,7 @@
 
 //helper methods (useful for scripting)
 - (void) setImmediatelyToVoltage:(float)aVoltage;
+- (void) setImmediatelyToCurrent:(float)aCurrent;
 
 #pragma mark ***Utilities
 - (void) sendCmd:(NSString*)aCommand;
