@@ -95,6 +95,9 @@
 - (void) sendFailEnableMask;
 - (void) sendStatusEnableMask;
 
+//helper methods (useful for scripting)
+- (void) setImmediatelyToVoltage:(float)aVoltage;
+
 #pragma mark ***Utilities
 - (void) sendCmd:(NSString*)aCommand;
 - (void) sendCmd:(NSString*)aCommand value:(short)hexData;

@@ -239,6 +239,15 @@ NSString* ORZupModelPortStateChanged		= @"ORZupModelPortStateChanged";
 	return ORZupLock;
 }
 
+//helper methods (useful for scripting)
+- (void) setImmediatelyToVoltage:(float)aVoltage
+{
+	int dummy = 0;
+	[self setVoltage:dummy withValue:aVoltage];
+	[self loadDac:dummy];
+}
+
+
 //these needed to interface with the ramper
 - (float) voltage:(int)dummy
 {
