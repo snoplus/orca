@@ -1673,6 +1673,8 @@
 		84C37D2F0EF834DD00E77E09 /* SNOModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C37D290EF834DD00E77E09 /* SNOModel.h */; };
 		84C37D300EF834DD00E77E09 /* SNOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C37D2A0EF834DD00E77E09 /* SNOModel.m */; };
 		84C37E250EF8408F00E77E09 /* ORPSUPTubePosition.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C37E240EF8408F00E77E09 /* ORPSUPTubePosition.h */; };
+		84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CB6E0FB071BC00725AC3 /* M927.rbf */; };
+		84C4CB830FB0725800725AC3 /* M927.rbf in CopyFiles */ = {isa = PBXBuildFile; fileRef = 84C4CB6E0FB071BC00725AC3 /* M927.rbf */; };
 		84C5332A0652BA6B00E4731F /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84C533280652BA6B00E4731F /* MainMenu.nib */; };
 		84C7542006654C3E00EC5D1C /* ORAnalysisPanel1D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C7540F06654C3D00EC5D1C /* ORAnalysisPanel1D.m */; };
 		84C7542106654C3E00EC5D1C /* ORAnalysisPanel1D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C7541006654C3D00EC5D1C /* ORAnalysisPanel1D.h */; };
@@ -1685,6 +1687,12 @@
 		84C7542D06654C3E00EC5D1C /* ORGate1D.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C7541D06654C3E00EC5D1C /* ORGate1D.m */; };
 		84C7542E06654C3E00EC5D1C /* ORGate1D.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C7541E06654C3E00EC5D1C /* ORGate1D.h */; };
 		84C859050665624C00FBAF9C /* Bugs.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84C859040665624C00FBAF9C /* Bugs.tif */; };
+		84CC16CD0FAF157000CEE642 /* MCA927.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CC16C60FAF157000CEE642 /* MCA927.nib */; };
+		84CC16CE0FAF157000CEE642 /* MCA927.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84CC16C70FAF157000CEE642 /* MCA927.tif */; };
+		84CC16D00FAF157000CEE642 /* ORMCA927Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CC16C90FAF157000CEE642 /* ORMCA927Controller.h */; };
+		84CC16D10FAF157000CEE642 /* ORMCA927Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CC16CA0FAF157000CEE642 /* ORMCA927Controller.m */; };
+		84CC16D20FAF157000CEE642 /* ORMCA927Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 84CC16CB0FAF157000CEE642 /* ORMCA927Model.h */; };
+		84CC16D30FAF157000CEE642 /* ORMCA927Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 84CC16CC0FAF157000CEE642 /* ORMCA927Model.m */; };
 		84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3630EA4EB2E0060076A /* Fec32.gif */; };
 		84CEA36D0EA4EB2E0060076A /* Fec32.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3640EA4EB2E0060076A /* Fec32.nib */; };
 		84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84CEA3650EA4EB2E0060076A /* Fec32Card.gif */; };
@@ -1724,6 +1732,8 @@
 		84D2586D0FA7340B00626276 /* ORMotionNodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D258620FA7340B00626276 /* ORMotionNodeController.m */; };
 		84D2586E0FA7340B00626276 /* ORMotionNodeModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D258630FA7340B00626276 /* ORMotionNodeModel.h */; };
 		84D2586F0FA7340B00626276 /* ORMotionNodeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D258640FA7340B00626276 /* ORMotionNodeModel.m */; };
+		84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */; };
+		84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */; };
 		84D435B70798851B003D089F /* NoCamacDriverHelp.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84D435B60798851B003D089F /* NoCamacDriverHelp.plist */; };
 		84D60BCB07428C7D0061F795 /* OrcaObjectController.m in Sources */ = {isa = PBXBuildFile; fileRef = F51E69EE03AE4776015F64B1 /* OrcaObjectController.m */; };
 		84D852E60BE171AF00290BDC /* ORCARootServiceDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */; };
@@ -2077,6 +2087,16 @@
 				84C37A110EF6FCB900E77E09 /* SBC_Job.h in SBC_Code Copy */,
 			);
 			name = "SBC_Code Copy";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84C4CBA30FB0726500725AC3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = FPGA_Files;
+			dstSubfolderSpec = 7;
+			files = (
+				84C4CB830FB0725800725AC3 /* M927.rbf in CopyFiles */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE6885F90D0CDEAD00FA4158 /* CopyFiles */ = {
@@ -3627,6 +3647,7 @@
 		84C494920405A0C0005F64B1 /* NcdMuxController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdMuxController.m; sourceTree = "<group>"; };
 		84C494950405A0C0005F64B1 /* NcdMuxModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NcdMuxModel.h; sourceTree = "<group>"; };
 		84C494960405A0C0005F64B1 /* NcdMuxModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = NcdMuxModel.m; sourceTree = "<group>"; };
+		84C4CB6E0FB071BC00725AC3 /* M927.rbf */ = {isa = PBXFileReference; lastKnownFileType = file; name = M927.rbf; path = Source/Objects/Hardware/USB/MCA927/M927.rbf; sourceTree = SOURCE_ROOT; };
 		84C533290652BA6B00E4731F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		84C5FD20050E740A005F64B1 /* ORTimeRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTimeRate.h; sourceTree = "<group>"; };
 		84C5FD21050E740A005F64B1 /* ORTimeRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTimeRate.m; sourceTree = "<group>"; };
@@ -3641,6 +3662,12 @@
 		84C7541D06654C3E00EC5D1C /* ORGate1D.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGate1D.m; path = Source/Widgets/Plotting/ORGate1D.m; sourceTree = SOURCE_ROOT; };
 		84C7541E06654C3E00EC5D1C /* ORGate1D.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGate1D.h; path = Source/Widgets/Plotting/ORGate1D.h; sourceTree = SOURCE_ROOT; };
 		84C859040665624C00FBAF9C /* Bugs.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Bugs.tif; path = Source/Preferences/Bugs.tif; sourceTree = SOURCE_ROOT; };
+		84CC16C60FAF157000CEE642 /* MCA927.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MCA927.nib; path = Source/Objects/Hardware/USB/MCA927/MCA927.nib; sourceTree = SOURCE_ROOT; };
+		84CC16C70FAF157000CEE642 /* MCA927.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MCA927.tif; path = Source/Objects/Hardware/USB/MCA927/MCA927.tif; sourceTree = SOURCE_ROOT; };
+		84CC16C90FAF157000CEE642 /* ORMCA927Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Controller.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Controller.h; sourceTree = SOURCE_ROOT; };
+		84CC16CA0FAF157000CEE642 /* ORMCA927Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Controller.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Controller.m; sourceTree = SOURCE_ROOT; };
+		84CC16CB0FAF157000CEE642 /* ORMCA927Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Model.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Model.h; sourceTree = SOURCE_ROOT; };
+		84CC16CC0FAF157000CEE642 /* ORMCA927Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Model.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Model.m; sourceTree = SOURCE_ROOT; };
 		84CDDA3B047167C7005F64B1 /* ORGpibDeviceModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORGpibDeviceModel.m; path = "Source/Objects/Hardware/GPIB/GPIB Base Classes/ORGpibDeviceModel.m"; sourceTree = SOURCE_ROOT; };
 		84CDDA3C047167C7005F64B1 /* ORGpibDeviceModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORGpibDeviceModel.h; path = "Source/Objects/Hardware/GPIB/GPIB Base Classes/ORGpibDeviceModel.h"; sourceTree = SOURCE_ROOT; };
 		84CDDA3F04716AA9005F64B1 /* ORHPPulserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHPPulserModel.h; sourceTree = "<group>"; };
@@ -3696,6 +3723,8 @@
 		84D258620FA7340B00626276 /* ORMotionNodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotionNodeController.m; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeController.m; sourceTree = SOURCE_ROOT; };
 		84D258630FA7340B00626276 /* ORMotionNodeModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMotionNodeModel.h; sourceTree = "<group>"; };
 		84D258640FA7340B00626276 /* ORMotionNodeModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMotionNodeModel.m; sourceTree = "<group>"; };
+		84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMCA927Decoders.h; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.h; sourceTree = SOURCE_ROOT; };
+		84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMCA927Decoders.m; path = Source/Objects/Hardware/USB/MCA927/ORMCA927Decoders.m; sourceTree = SOURCE_ROOT; };
 		84D435B60798851B003D089F /* NoCamacDriverHelp.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = NoCamacDriverHelp.plist; path = "Source/Objects/Hardware/Pci/Pci Base Classes/NoCamacDriverHelp.plist"; sourceTree = SOURCE_ROOT; };
 		84D852E50BE171AE00290BDC /* ORCARootServiceDefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORCARootServiceDefs.h; path = "Source/Main Dialogs/ORCARootService/ORCARootServiceDefs.h"; sourceTree = SOURCE_ROOT; };
 		84D967710CA03E50000C0C76 /* ORScriptController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORScriptController.h; path = Source/Objects/ProcessLogic/ProcessElements/Script/ORScriptController.h; sourceTree = SOURCE_ROOT; };
@@ -6793,6 +6822,7 @@
 		849E7C900B6956B200353D50 /* USB */ = {
 			isa = PBXGroup;
 			children = (
+				84CC16C50FAF157000CEE642 /* MCA927 */,
 				849E7C910B6956C800353D50 /* ADU200 */,
 				84A4E8950C287CA900CBC222 /* USBtoGPIB */,
 				84B28E2A0F4C7FD400E2B056 /* LDA102 */,
@@ -6810,6 +6840,7 @@
 				846A08F10B77BAAA00B811F4 /* NoADUDriverHelp.plist */,
 				849E7C940B6957BF00353D50 /* ADU200.nib */,
 				849E7C920B69570700353D50 /* ADU200.tif */,
+				84C4CB6E0FB071BC00725AC3 /* M927.rbf */,
 			);
 			name = ADU200;
 			path = Source/Objects/Hardware/USB/ADU200;
@@ -7902,6 +7933,22 @@
 			);
 			name = "Histogram Objects";
 			path = "Source/Objects/Data Processing/Histogram Objects";
+			sourceTree = SOURCE_ROOT;
+		};
+		84CC16C50FAF157000CEE642 /* MCA927 */ = {
+			isa = PBXGroup;
+			children = (
+				84CC16C60FAF157000CEE642 /* MCA927.nib */,
+				84CC16C70FAF157000CEE642 /* MCA927.tif */,
+				84CC16C90FAF157000CEE642 /* ORMCA927Controller.h */,
+				84CC16CA0FAF157000CEE642 /* ORMCA927Controller.m */,
+				84CC16CB0FAF157000CEE642 /* ORMCA927Model.h */,
+				84CC16CC0FAF157000CEE642 /* ORMCA927Model.m */,
+				84D359CA0FB487AA005F429B /* ORMCA927Decoders.h */,
+				84D359CB0FB487AA005F429B /* ORMCA927Decoders.m */,
+			);
+			name = MCA927;
+			path = Source/Objects/Hardware/USB/MCA927;
 			sourceTree = SOURCE_ROOT;
 		};
 		84CDDA4504717079005F64B1 /* Misc */ = {
@@ -9681,6 +9728,9 @@
 				840823CC0F9F83DC007E6061 /* ORFlippedView.h in Headers */,
 				84D2586C0FA7340B00626276 /* ORMotionNodeController.h in Headers */,
 				84D2586E0FA7340B00626276 /* ORMotionNodeModel.h in Headers */,
+				84CC16D00FAF157000CEE642 /* ORMCA927Controller.h in Headers */,
+				84CC16D20FAF157000CEE642 /* ORMCA927Model.h in Headers */,
+				84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9702,6 +9752,7 @@
 				8493CC890C99FA9B00B46CD4 /* VME_Copy */,
 				842241B00D85EA7F0048D331 /* SLTv4_Copy */,
 				8491DD760EB616630084BAD6 /* ShellScript */,
+				84C4CBA30FB0726500725AC3 /* CopyFiles */,
 			);
 			buildRules = (
 				9C2595AC0D5171B90039C5DF /* PBXBuildRule */,
@@ -10292,6 +10343,9 @@
 				84D258680FA7340B00626276 /* MotionNode.gif in Resources */,
 				84D258690FA7340B00626276 /* MotionNode.nib in Resources */,
 				84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */,
+				84CC16CD0FAF157000CEE642 /* MCA927.nib in Resources */,
+				84CC16CE0FAF157000CEE642 /* MCA927.tif in Resources */,
+				84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10999,6 +11053,9 @@
 				840823CD0F9F83DC007E6061 /* ORFlippedView.m in Sources */,
 				84D2586D0FA7340B00626276 /* ORMotionNodeController.m in Sources */,
 				84D2586F0FA7340B00626276 /* ORMotionNodeModel.m in Sources */,
+				84CC16D10FAF157000CEE642 /* ORMCA927Controller.m in Sources */,
+				84CC16D30FAF157000CEE642 /* ORMCA927Model.m in Sources */,
+				84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
