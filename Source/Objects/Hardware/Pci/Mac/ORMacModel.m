@@ -82,8 +82,6 @@ void registryChanged(
 													 name : ORGroupObjectsRemoved
 												   object : nil];
 		
-		usb = [[ORUSB alloc] init];
-		[usb awakeAfterDocumentLoaded];
 	}
 	@catch(NSException* localException) {
 	}
@@ -279,10 +277,8 @@ void registryChanged(
     [[self undoManager] enableUndoRegistration];
 	[self scanForSerialPorts];
 	
-	if(!usb){
-		usb = [[ORUSB alloc] init];
-		[usb awakeAfterDocumentLoaded];
-	}
+	usb = [ORUSB sharedUSB];
+	
     return self;
 }
 
