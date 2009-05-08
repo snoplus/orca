@@ -46,9 +46,11 @@ typedef  struct  {
 		IONotificationPortRef	_notifyPort;
 		io_iterator_t			_deviceAddedIter;
 		io_iterator_t			_deviceRemovedIter;
+		BOOL					matching;
 }
 
 #pragma mark ¥¥¥initialization
++ (ORUSB*) sharedUSB;
 - (void) dealloc;
 - (void) awakeAfterDocumentLoaded;
 

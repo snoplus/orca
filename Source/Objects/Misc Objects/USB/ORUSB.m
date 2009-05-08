@@ -22,6 +22,7 @@
 #import "ORUSB.h"
 #import "ORUSBInterface.h"
 #import "SupportedUSBDevices.h"
+#import "SynthesizeSingleton.h"
 
 NSString* ORUSBDevicesAdded		= @"ORUSBDevicesAdded";
 NSString* ORUSBDevicesRemoved	= @"ORUSBDevicesRemoved";
@@ -42,6 +43,9 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 @implementation ORUSB
 
 #pragma mark ¥¥¥initialization
+
+SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
+
 - (id) init
 {
 	self = [super init];
@@ -216,6 +220,8 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 #pragma mark ¥¥¥HW access
 - (void) startMatching
 {
+	if(matching)return;
+	matching = YES;
 	mach_port_t                 masterPort;
 	CFMutableDictionaryRef      matchingDict;
 	kern_return_t               kr;
@@ -345,14 +351,14 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			}
 			
 			
-			NSLog(@"%@ added\n",deviceNameAsString);
-			NSLog(@"location: 0x%0x\n",locationID);
+			NSLog(@"USB: %@ added\n",deviceNameAsString);
+			//NSLog(@"location: 0x%0x\n",locationID);
 			// Save the device's name to our private data.        
 			[ usbCallbackData setDeviceName:deviceNameAsString];
 			
 			unsigned char theSpeed;
 			kr = (*deviceInterface)->GetDeviceSpeed(deviceInterface, &theSpeed);
-			if(kr == KERN_SUCCESS)NSLog(@"Device Speed: %d\n",theSpeed);
+			//if(kr == KERN_SUCCESS)NSLog(@"Device Speed: %d\n",theSpeed);
 			
 			UInt8 snsi;
 			kr = (*deviceInterface)->USBGetSerialNumberStringIndex(deviceInterface, &snsi);
@@ -468,7 +474,7 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
     ORUSBInterface* usbCallbackData = (ORUSBInterface*) refCon;
     
     if (messageType == kIOMessageServiceIsTerminated){    
-		NSLog(@"%@ removed.\n",[usbCallbackData deviceName]);
+		NSLog(@"USB: %@ removed.\n",[usbCallbackData deviceName]);
 		[interfaces removeObject:usbCallbackData];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfaceRemoved object:self userInfo:nil];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfacesChanged object:self userInfo:nil];
@@ -558,11 +564,16 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			[NSException raise: @"USB Exception" format:@"unable to get number of endpoints (%08x)\n", kr];
 		}
 		
-		unsigned char inPipe			= 0;
-		unsigned char outPipe		= 0;
-		unsigned char controlPipe	= 0;
-		unsigned char interruptInPipe	= 0;
-		unsigned char interruptOutPipe	= 0;
+		unsigned char inPipes[8];
+		unsigned char outPipes[8];
+		unsigned char controlPipes[8]; //not used right now....
+		unsigned char interruptInPipes[8];
+		unsigned char interruptOutPipes[8];
+		int inPipeCount			 = 0;
+		int outPipeCount		 = 0;
+		int controlPipeCount	 = 0;
+		int interruptInPipeCount = 0;
+		int interruptOutPipeCount= 0;
 		
 		UInt8 pipeRef;
 		for (pipeRef = 1; pipeRef <= intfNumEndpoints; pipeRef++){
@@ -578,20 +589,14 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 			else if(kIOReturnNotOpen == kr2) NSLog(@"not open\n");
 			if (kIOReturnSuccess == kr2) {
 				if (transferType == kUSBBulk){
-					if (direction == kUSBIn) {
-						if(!inPipe) inPipe = pipeRef;
-					}
-					else if (direction == kUSBOut){
-						if(!outPipe) outPipe = pipeRef;
-					}
+					int kr = (*intf)->ClearPipeStallBothEnds(intf, pipeRef);
+					if(kr)NSLog(@"unable to clear pipe stall: 0x%0x\n",kr);
+					if (direction == kUSBIn)		inPipes[inPipeCount++]   = pipeRef;
+					else if (direction == kUSBOut)	outPipes[outPipeCount++] = pipeRef;
 				}
 				else if(transferType == kUSBInterrupt){
-					if (direction == kUSBIn) {
-						if(!interruptInPipe) interruptInPipe = pipeRef;
-					}
-					else if (direction == kUSBOut){
-						if(!interruptOutPipe) interruptOutPipe = pipeRef;
-					}
+					if (direction == kUSBIn)		interruptInPipes[interruptInPipeCount++]   = pipeRef;
+					else if (direction == kUSBOut)	interruptOutPipes[interruptOutPipeCount++] = pipeRef;
 				}
 			}
 			else{
@@ -614,11 +619,11 @@ static void DeviceNotification(void* refCon, io_service_t service, natural_t mes
 		(void) (*intf)->USBInterfaceClose(intf);
 		
 		[usbCallbackData setInterface:intf];
-		[usbCallbackData setInPipe:inPipe];
-		[usbCallbackData setOutPipe:outPipe];
-		[usbCallbackData setControlPipe:controlPipe];
-		[usbCallbackData setInterruptInPipe:interruptInPipe];
-		[usbCallbackData setInterruptOutPipe:interruptOutPipe];
+		[usbCallbackData setInPipes:inPipes		numberPipes:inPipeCount];
+		[usbCallbackData setOutPipes:outPipes	numberPipes:outPipeCount];
+		[usbCallbackData setControlPipes:controlPipes numberPipes:controlPipeCount];
+		[usbCallbackData setInterruptInPipes:interruptInPipes	numberPipes:interruptInPipeCount];
+		[usbCallbackData setInterruptOutPipes:interruptOutPipes numberPipes:interruptOutPipeCount];
 		
 		if(!interfaces)interfaces	 = [[NSMutableArray array] retain];
 		

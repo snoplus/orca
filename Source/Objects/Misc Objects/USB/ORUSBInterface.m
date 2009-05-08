@@ -155,6 +155,7 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 	return transferType;
 }
 
+
 - (void) setInterface:(IOUSBInterfaceInterface197**)anInterface
 {
 	if(interface) {
@@ -165,12 +166,13 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 	
 	if(interface){
 		IOReturn kr = (*interface)->USBInterfaceOpen(interface);
-		NSLog(@"Open: 0x%x\n",kr);
+		if(kr)NSLog(@"USB: Open Error: 0x%x\n",kr);
 		(void) (*interface)->AddRef(interface);
-		kr = (int)(*interface)->GetPipeStatus(interface, outPipe);
+		
+		kr = (int)(*interface)->GetPipeStatus(interface, outPipes[0]);
 		if (kr == kIOUSBPipeStalled) {
 			NSLog(@"pipe stalled. (%d)\n", (int)kr);
-			kr = (int)(*interface)->ClearPipeStall (interface, outPipe); 		
+			kr = (int)(*interface)->ClearPipeStall (interface, outPipes[0]); 		
 			NSLog(@"cleared. (%d)\n", (int)kr);
 		}
 		(void) (*interface)->AddRef(interface);
@@ -210,7 +212,7 @@ NSString* ORUSBRegisteredObjectChanged	= @"ORUSBRegisteredObjectChanged";
 	
 readon:
     bzero(receiveBuffer, 1024);
-    kr = (*interface)->ReadPipeAsync(interface, inPipe, receiveBuffer, 1024, (IOAsyncCallback1)_interruptRecieved, self);
+    kr = (*interface)->ReadPipeAsync(interface, inPipes[0], receiveBuffer, 1024, (IOAsyncCallback1)_interruptRecieved, self);
     if (kIOReturnSuccess != kr) {
         NSLog(@"unable to do async interrupt read (%08x). this means the card is stopped!\n", kr);
     }
@@ -226,9 +228,9 @@ readon:
 - (void) writeString:(NSString*)aCommand
 {
 	[usbLock lock];
-	UInt8 pipe = outPipe;
-	if(transferType == kUSBBulk)		 pipe = outPipe;
-	else if(transferType == kUSBInterrupt) pipe = interruptOutPipe;
+	UInt8 pipe = outPipes[0];
+	if(transferType == kUSBBulk)		 pipe = outPipes[0];
+	else if(transferType == kUSBInterrupt) pipe = interruptOutPipes[0];
 	
 	char* p = (char*)[aCommand cStringUsingEncoding:NSASCIIStringEncoding];
 	IOReturn kr = (*interface)->WritePipe(interface, pipe, p, strlen(p));
@@ -283,9 +285,14 @@ readon:
 
 - (void) writeBytes:(void*)bytes length:(int)length
 {
+	[self writeBytes:bytes length:length pipe:0];
+}
+
+- (void) writeBytes:(void*)bytes length:(int)length pipe:(int)aPipeIndex
+{
 	[usbLock lock];
 	UInt8 pipe;
-	pipe = outPipe;
+	pipe = outPipes[aPipeIndex];
 	IOReturn kr = (*interface)->WritePipeTO(interface, pipe, bytes, length,5000,5000);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
@@ -344,14 +351,19 @@ readon:
 	return bytesRead;
 }
 
-- (int) readBytes:(void*)bytes length:(int)amountRead
+- (int) readBytes:(void*)bytes length:(int)length
+{
+	return [self readBytes:bytes length:length pipe:0];
+}
+
+- (int) readBytes:(void*)bytes length:(int)amountRead pipe:(int)aPipeIndex
 {
 	int result;
     [usbLock lock];
 	unsigned long actualRead = amountRead;
-	UInt8 pipe = inPipe;
+	UInt8 pipe = inPipes[aPipeIndex];
 	
-	IOReturn kr = (*interface)->ReadPipeTO(interface, pipe, bytes, &actualRead, 100, 100);
+	IOReturn kr = (*interface)->ReadPipeTO(interface, pipe, bytes, &actualRead, 1000, 1000);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
 		if(kr = kIOUSBPipeStalled){
@@ -385,9 +397,9 @@ readon:
 	int result;
     [usbLock lock];
 	unsigned long actualRead = amountRead;
-	UInt8 pipe = inPipe;
-	if(transferType == kUSBBulk)		 pipe = inPipe;
-	else if(transferType == kUSBInterrupt) pipe = interruptInPipe;
+	UInt8 pipe = inPipes[0];
+	if(transferType == kUSBBulk)		 pipe = inPipes[0];
+	else if(transferType == kUSBInterrupt) pipe = interruptInPipes[0];
 	
 	IOReturn kr = (*interface)->ReadPipe(interface, pipe, bytes, &actualRead);
 	if(kr)	{
@@ -420,9 +432,9 @@ readon:
 - (void) writeBytesOnInterruptPipe:(void*)bytes length:(int)length
 {
 	[usbLock lock];
-	UInt8 pipe = outPipe;
-	if(transferType == kUSBBulk)		 pipe = outPipe;
-	else if(transferType == kUSBInterrupt) pipe = interruptOutPipe;	
+	UInt8 pipe = outPipes[0];
+	if(transferType == kUSBBulk)		 pipe = outPipes[0];
+	else if(transferType == kUSBInterrupt) pipe = interruptOutPipes[0];	
 	IOReturn kr = (*interface)->WritePipe(interface, pipe, bytes, length);
 	if(kr)	{
 		kr = (*interface)->GetPipeStatus(interface, pipe);
@@ -454,7 +466,7 @@ readon:
 	int result;
 	[usbLock lock];
 	UInt8 pipe;
-	pipe = inPipe;
+	pipe = inPipes[0];
 	unsigned long actualRead = amountRead;
 	IOReturn kr = (*interface)->ReadPipeTO(interface, pipe, bytes, &actualRead, 10, 10);
 	if(kr)	{
@@ -469,28 +481,34 @@ readon:
 	return result;
 }
 
-- (void) setInPipe:(unsigned char)aPipeRef
+- (void) setInPipes:(unsigned char*)aPipeRef numberPipes:(int)n
 {
-	inPipe = aPipeRef;
+	int i;
+	for(i=0;i<n;i++)inPipes[i] = aPipeRef[i];
 }
 
-- (void) setOutPipe:(unsigned char)aPipeRef
+- (void) setOutPipes:(unsigned char*)aPipeRef numberPipes:(int)n
 {
-	outPipe = aPipeRef;
+	int i;
+	for(i=0;i<n;i++)outPipes[i] = aPipeRef[i];
 }
 
-- (void) setControlPipe:(unsigned char)aPipeRef
+- (void) setControlPipes:(unsigned char*)aPipeRef numberPipes:(int)n
 {
-	controlPipe = aPipeRef;
+	int i;
+	for(i=0;i<n;i++)controlPipes[i] = aPipeRef[i];
 }
 
-- (void) setInterruptInPipe:(unsigned char)aPipeRef
+- (void) setInterruptInPipes:(unsigned char*)aPipeRef numberPipes:(int)n
 {
-	interruptInPipe = aPipeRef;
+	int i;
+	for(i=0;i<n;i++)interruptInPipes[i] = aPipeRef[i];
 }
-- (void) setInterruptOutPipe:(unsigned char)aPipeRef
+
+- (void) setInterruptOutPipes:(unsigned char*)aPipeRef numberPipes:(int)n
 {
-	interruptOutPipe = aPipeRef;
+	int i;
+	for(i=0;i<n;i++)interruptOutPipes[i] = aPipeRef[i];
 }
 
 - (NSString*)   connectionState
@@ -515,16 +533,16 @@ readon:
 	if(serialNumber){
 		s = [s stringByAppendingFormat:@"Serial # : %@\n",serialNumber];
 	}
-	if(inPipe){
-		s = [s stringByAppendingFormat:@"In Pipe  : 0x%x\n",inPipe];
+	if(inPipes[0]){
+		s = [s stringByAppendingFormat:@"In Pipe  : 0x%x\n",inPipes[0]];
 	}
 	else	  s = [s stringByAppendingString:@"In Pipe  : ?\n"];
-	if(outPipe){
-		s = [s stringByAppendingFormat:@"Out Pipe : 0x%x\n",outPipe];
+	if(outPipes[0]){
+		s = [s stringByAppendingFormat:@"Out Pipe : 0x%x\n",outPipes[0]];
 	}
 	else	  s = [s stringByAppendingString:@"Out Pipe : ?\n"];
-	if(controlPipe){
-		s = [s stringByAppendingFormat:@"Control Pipe : 0x%x\n",outPipe];
+	if(controlPipes[0]){
+		s = [s stringByAppendingFormat:@"Control Pipe : 0x%x\n",outPipes[0]];
 	}
 	else	  s = [s stringByAppendingString:@"Control Pipe : ?\n"];
 	return s;
