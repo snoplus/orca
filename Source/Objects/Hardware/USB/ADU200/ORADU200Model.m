@@ -278,7 +278,6 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 
 - (void) setUsbInterface:(ORUSBInterface*)anInterface
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[usbInterface release];
 	usbInterface = anInterface;
