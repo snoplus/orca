@@ -25,6 +25,7 @@
 #import "ORStatusController.h"
 #import "ORDocumentController.h"
 #import "ORAlarmCollection.h"
+#import "ORUSB.h"
 
 //#import "NKDPostgreSQLConnection.h"
 #import "ORTaskMaster.h"
@@ -474,6 +475,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		 object:self];
 		
 		@try {
+			[[ORUSB sharedUSB] awakeAfterDocumentLoaded];
 			[group awakeAfterDocumentLoaded];
 		}
 		@catch(NSException* localException) {
