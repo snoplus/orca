@@ -92,6 +92,11 @@
                          name : ORMotionNodeModelDisplayComponentsChanged
 						object: model];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(showDeltaFromAveChanged:)
+                         name : ORMotionNodeModelShowDeltaFromAveChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -118,6 +123,12 @@
     [self lockChanged:nil];
 	[self temperatureChanged:nil];
 	[self dispayComponentsChanged:nil];
+	[self showDeltaFromAveChanged:nil];
+}
+
+- (void) showDeltaFromAveChanged:(NSNotification*)aNote
+{
+	[showDeltaFromAveCB setIntValue: [model showDeltaFromAve]];
 }
 
 - (void) dispayComponentsChanged:(NSNotification*)aNote
@@ -204,6 +215,12 @@
 }
 
 #pragma mark •••Actions
+
+- (void) showDeltaFromAveAction:(id)sender
+{
+	[model setShowDeltaFromAve:[sender intValue]];	
+}
+
 - (IBAction) displayComponentsAction:(id)sender
 {
 	[model setDisplayComponents:[[displayComponentsMatrix selectedCell] tag]];
@@ -261,11 +278,20 @@
 
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) i 
 {
-	if(set == 0)		return [model axAt:i];
-	else if(set == 1)	return [model ayAt:i];
-	else if(set == 2)	return [model azAt:i];
-	else if(set == 3)	return [model totalxyzAt:i];
-	return 0;
+	if([model showDeltaFromAve]){
+		if(set == 0)		return [model axDeltaAveAt:i];
+		else if(set == 1)	return [model ayDeltaAveAt:i];
+		else if(set == 2)	return [model azDeltaAveAt:i];
+		else if(set == 3)	return [model xyzDeltaAveAt:i];
+		return 0;
+	}
+	else {
+		if(set == 0)		return [model axAt:i];
+		else if(set == 1)	return [model ayAt:i];
+		else if(set == 2)	return [model azAt:i];
+		else if(set == 3)	return [model totalxyzAt:i];
+		return 0;
+	}
 }
 
 @end

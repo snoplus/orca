@@ -26,6 +26,7 @@
 @interface ORMotionNodeController : OrcaObjectController 
 {
 	IBOutlet NSButton*		startButton;
+	IBOutlet NSButton*		showDeltaFromAveCB;
 	IBOutlet NSTextField*	temperatureField;
 	IBOutlet NSButton*		stopButton;
 	IBOutlet NSButton*		lockButton;
@@ -42,6 +43,7 @@
 }
 
 #pragma mark ***Interface Management
+- (void) showDeltaFromAveChanged:(NSNotification*)aNote;
 - (void) temperatureChanged:(NSNotification*)aNote;
 - (void) nodeRunningChanged:(NSNotification*)aNote;
 - (void) traceIndexChanged:(NSNotification*)aNote;
@@ -55,6 +57,7 @@
 - (void) dispayComponentsChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) showDeltaFromAveAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) readOnboardMemory:(id)sender;
 - (IBAction) readConnect:(id)sender;

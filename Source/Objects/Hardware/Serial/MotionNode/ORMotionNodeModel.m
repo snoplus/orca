@@ -25,6 +25,7 @@
 #import "ORSafeQueue.h"
 
 
+NSString* ORMotionNodeModelShowDeltaFromAveChanged = @"ORMotionNodeModelShowDeltaFromAveChanged";
 NSString* ORMotionNodeModelDisplayComponentsChanged = @"ORMotionNodeModelDisplayComponentsChanged";
 NSString* ORMotionNodeModelTemperatureChanged	= @"ORMotionNodeModelTemperatureChanged";
 NSString* ORMotionNodeModelNodeRunningChanged	= @"ORMotionNodeModelNodeRunningChanged";
@@ -36,17 +37,17 @@ NSString* ORMotionNodeModelLock					= @"ORMotionNodeModelLock";
 NSString* ORMotionNodeModelSerialNumberChanged	= @"ORMotionNodeModelSerialNumberChanged";
 
 #define kMotionNodeDriverPath @"/System/Library/Extensions/SiLabsUSBDriver.kext"
+#define kMotionNodeAveN 2/(100.+1.)
 
 static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
-	{kMotionNodeConnectResponse,@"0",		14,		NO},
-	{kMotionNodeMemoryContents,	@"rrr",		256,	NO}, 
-	{kMotionNodeStop,			@")",		-1,		YES}, 
-	{kMotionNodeStart,			@"xxx\0",	-1,		YES},
-	{kMotionNodeClosePort,		@"",		-1,		NO}
+{kMotionNodeConnectResponse,@"0",		14,		NO},
+{kMotionNodeMemoryContents,	@"rrr",		256,	NO}, 
+{kMotionNodeStop,			@")",		-1,		YES}, 
+{kMotionNodeStart,			@"xxx\0",	-1,		YES},
+{kMotionNodeClosePort,		@"",		-1,		NO}
 };
 
 @interface ORMotionNodeModel (private)
-- (void) processIt;
 - (void) timeout;
 - (void) processOneCommandFromQueue;
 - (void) enqueCmd:(int)aCmd;
@@ -58,7 +59,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void) setAy:(float)aAy;
 - (void) setTraceIndex:(int)aTraceIndex;
 - (void) setTotalxyz;
-- (void) flushCheck;
+
 @end
 
 
@@ -122,6 +123,20 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 
 #pragma mark ***Accessors
 
+- (BOOL) showDeltaFromAve
+{
+    return showDeltaFromAve;
+}
+
+- (void) setShowDeltaFromAve:(BOOL)aShowDeltaFromAve
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowDeltaFromAve:showDeltaFromAve];
+    
+    showDeltaFromAve = aShowDeltaFromAve;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelShowDeltaFromAveChanged object:self];
+}
+
 - (float) temperature
 {
     return temperature;
@@ -130,7 +145,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void) setTemperature:(float)aTemperature
 {
     temperature = aTemperature;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelTemperatureChanged object:self];
 }
 
@@ -164,17 +179,37 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
     return traceIndex;
 }
 
+- (float) axDeltaAveAt:(int)i
+{
+	return xTrace[(i+traceIndex)%kModeNodeTraceLength] - xAve;
+}
+
+- (float) ayDeltaAveAt:(int)i
+{
+	return yTrace[(i+traceIndex)%kModeNodeTraceLength] - yAve;
+}
+
+- (float) azDeltaAveAt:(int)i
+{
+	return zTrace[(i+traceIndex)%kModeNodeTraceLength] - zAve;
+}
+
+- (float) xyzDeltaAveAt:(int)i
+{
+	return xyzTrace[(i+traceIndex)%kModeNodeTraceLength] - xyzAve;
+}
+
 - (float) axAt:(int)i
 {
 	return xTrace[(i+traceIndex)%kModeNodeTraceLength];
 }
 - (float) ayAt:(int)i
 {
-	 return yTrace[(i+traceIndex)%kModeNodeTraceLength];
+	return yTrace[(i+traceIndex)%kModeNodeTraceLength];
 }
 - (float) azAt:(int)i
 {
-	 return zTrace[(i+traceIndex)%kModeNodeTraceLength];
+	return zTrace[(i+traceIndex)%kModeNodeTraceLength];
 }
 
 - (float) totalxyzAt:(int)i
@@ -190,7 +225,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void) setPacketLength:(int)aPacketLength
 {
     packetLength = aPacketLength;
-
+	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelPacketLengthChanged object:self];
 }
 
@@ -278,8 +313,9 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setShowDeltaFromAve:[decoder decodeBoolForKey:@"ORMotionNodeModelShowDeltaFromAve"]];
     [self setDisplayComponents:[decoder decodeBoolForKey:@"displayComponents"]];
-
+	
     [[self undoManager] enableUndoRegistration];    
 	cmdQueue = [[ORSafeQueue alloc] init];
 	
@@ -289,6 +325,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:showDeltaFromAve forKey:@"ORMotionNodeModelShowDeltaFromAve"];
     [encoder encodeBool:displayComponents		forKey: @"displayComponents"];
 }
 
@@ -333,39 +370,33 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
     if([[note userInfo] objectForKey:@"serialPort"] == serialPort){
 		if(!inComingData)inComingData = [[NSMutableData data] retain];
 		[inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-		[self performSelectorOnMainThread:@selector(processIt) withObject:nil waitUntilDone:YES];
+		if(!lastRequest){
+			if(packetLength){
+				if([inComingData length] >= packetLength){
+					do {
+						[self processPacket:inComingData];
+						[inComingData replaceBytesInRange:NSMakeRange(0,packetLength) withBytes:nil length:0];
+					} while([inComingData length] >= packetLength);
+				}
+			}
+			else {
+				//arg, the device is running from a previous time
+				//since the packetLength is zero we have never been inited.in
+				//we just throw the data away until we get none for .5 sec. then we init
+				[self performSelectorOnMainThread:@selector(flushCheck) withObject:nil waitUntilDone:YES];
+			}
+		}
+		else {
+			int expectedLength = [[lastRequest objectForKey:@"expectedLength"] intValue];
+			if([inComingData length] == expectedLength){
+				[self processInComingData];
+			}
+		}
 	}
 }
 @end
 
 @implementation ORMotionNodeModel (private)
-- (void) processIt
-{
-	if(!lastRequest){
-		if(packetLength){
-			if([inComingData length] >= packetLength){
-				do {
-					[self processPacket:inComingData];
-					[inComingData replaceBytesInRange:NSMakeRange(0,packetLength) withBytes:nil length:0];
-				} while([inComingData length] >= packetLength);
-			}
-		}
-		else {
-			//arg, the device is running from a previous time
-			//since the packetLength is zero we have never been inited.in
-			//we just throw the data away until we get none for .5 sec. then we init
-			[self flushCheck];
-		}
-	}
-	else {
-		int expectedLength = [[lastRequest objectForKey:@"expectedLength"] intValue];
-		if([inComingData length] == expectedLength){
-			//have to process on the main thread because it posts notifications that cuase drawing.
-			[self processInComingData];
-		}
-	}
-}
-			
 - (void) flushCheck
 {
 	[self setNodeRunning:YES];
@@ -385,7 +416,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 
 - (void) processPacket:(NSData*)thePacket
 {
-
+	
 	char* data = (char*)[thePacket bytes];
 	
 	const unsigned char lMask = 0xF0;
@@ -394,11 +425,11 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	if (data[0] == 0x31) {
 		
 #		if defined(__BIG_ENDIAN__)
-			const int highBtyeIndex = 0;
-			const int lowBtyeIndex  = 1;
+		const int highBtyeIndex = 0;
+		const int lowBtyeIndex  = 1;
 #		else
-			const int highBtyeIndex = 1;
-			const int lowBtyeIndex  = 0;
+		const int highBtyeIndex = 1;
+		const int lowBtyeIndex  = 0;
 #		endif // __BIG_ENDIAN__
 		
 		union {
@@ -423,14 +454,18 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 		rawData.bytes[highBtyeIndex] = (data[5] >> 4) & rMask;
 		rawData.bytes[lowBtyeIndex] = data[4];
 		[self setAx:kSlope * rawData.unpacked + kIntercept];
-				
-		if((throttle == 0) || (throttle%200 == 0)){
-			// Temperature reading.
-			rawData.bytes[highBtyeIndex] = data[14] & rMask;
-			rawData.bytes[lowBtyeIndex] = data[15];
 		
-			// Convert to signed degrees Celsius.		
-			[self setTemperature:rawData.unpacked * (330./4095.) - 50.];
+		
+		//do a runing average for the temperature
+		float temp;
+		rawData.bytes[highBtyeIndex] = data[14] & rMask;
+		rawData.bytes[lowBtyeIndex] = data[15];
+		temp = rawData.unpacked * (330./4095.) - 50.;
+		float k  = 2/(300.+1.);
+		temperatureAverage = temp * k+temperatureAverage*(1-k);
+		
+		if((throttle == 0) || (throttle%300 == 0)){			
+			[self setTemperature:temperatureAverage];
 		}
 		throttle++;
 		
@@ -443,23 +478,23 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 		[inComingData release];
 		inComingData = nil;
 	}
- 
-/*		// Convert to signed degrees Celsius.
-		float celsius = sample[9] * (1.0/8.0);
-		// Invert the old temperature function to get the raw value
-		// from degrees Celsius. Add a half to "round up".
-		float temperature = (celsius + 50.0) * (4095.0/330.0) + 0.5;
-		if (temperature > 4095) temperature = 4095;
-		else if (temperature < 0) temperature = 0;
-		else temperature = (int)temperature;
-		
-		NSLog(@"%.3f,%.3f,%.3f,%.2f\n", 
-		  kIntercept + kSlope*sample[0],
-		  kIntercept + kSlope*sample[1],
-		  kIntercept + kSlope*sample[2],
-		  temperature
-		);
-*/
+	
+	/*		// Convert to signed degrees Celsius.
+	 float celsius = sample[9] * (1.0/8.0);
+	 // Invert the old temperature function to get the raw value
+	 // from degrees Celsius. Add a half to "round up".
+	 float temperature = (celsius + 50.0) * (4095.0/330.0) + 0.5;
+	 if (temperature > 4095) temperature = 4095;
+	 else if (temperature < 0) temperature = 0;
+	 else temperature = (int)temperature;
+	 
+	 NSLog(@"%.3f,%.3f,%.3f,%.2f\n", 
+	 kIntercept + kSlope*sample[0],
+	 kIntercept + kSlope*sample[1],
+	 kIntercept + kSlope*sample[2],
+	 temperature
+	 );
+	 */
 	
 	
 }
@@ -527,7 +562,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 		char* p = (char*)[inComingData bytes];
 		switch([[lastRequest objectForKey:@"cmdNumber"] intValue]){
 			case kMotionNodeConnectResponse:
-			break;
+				break;
 				
 			case kMotionNodeMemoryContents:
 				for(i=0;i<[inComingData length];i++){
@@ -549,22 +584,22 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 					[self setNodeVersion:0];
 					[self setPacketLength:0];
 				}
-			break;
+				break;
 				
 			case kMotionNodeStop:
 				
-			break;
+				break;
 				
 			case kMotionNodeStart:
-			break;
+				break;
 		}
 		[self setLastRequest:nil];			 //clear the last request
-
+		
 		[inComingData release];
 		inComingData = nil;
 		doNextCommand = YES;
 	}
-
+	
 	if(doNextCommand){
 		[self processOneCommandFromQueue];	 //do the next command in the queue
 	}
@@ -580,22 +615,26 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 {
     az = aAz;
 	zTrace[traceIndex] = az;
+	zAve = az * kMotionNodeAveN+zAve*(1-kMotionNodeAveN);
 }
 
 - (void) setAy:(float)aAy
 {
     ay = aAy;
 	yTrace[traceIndex] = ay;
+	yAve = ay * kMotionNodeAveN+yAve*(1-kMotionNodeAveN);
 }
 
 - (void) setAx:(float)aAx
 {
     ax = aAx;
 	xTrace[traceIndex] = ax;
+	xAve = ax * kMotionNodeAveN+xAve*(1-kMotionNodeAveN);
 }
 
 - (void) setTotalxyz
 {
 	xyzTrace[traceIndex] = 0.86 - sqrtf(ax*ax + ay*ay + az*az);
+	xyzAve = xyzTrace[traceIndex] * kMotionNodeAveN+xyzAve*(1-kMotionNodeAveN);
 }
 @end

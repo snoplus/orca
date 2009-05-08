@@ -61,14 +61,22 @@ typedef struct MotionNodeCommands {
 	float			yTrace[kModeNodeTraceLength];
 	float			zTrace[kModeNodeTraceLength];
 	float			xyzTrace[kModeNodeTraceLength];
+	float			xAve;
+	float			yAve;
+	float			zAve;
+	float			xyzAve;
 	BOOL			dump;
 	int				throttle;
+	float			temperatureAverage;
     float			temperature;
     float			totalxyz;
 	BOOL			displayComponents;
+    BOOL			showDeltaFromAve;
 }
 
 #pragma mark ***Accessors
+- (BOOL) showDeltaFromAve;
+- (void) setShowDeltaFromAve:(BOOL)aShowDeltaFromAve;
 - (float) displayComponents;
 - (void) setDisplayComponents:(BOOL)aState;
 - (float) temperature;
@@ -79,6 +87,11 @@ typedef struct MotionNodeCommands {
 - (float) axAt:(int)i;
 - (float) ayAt:(int)i;
 - (float) azAt:(int)i;
+- (float) axDeltaAveAt:(int)i;
+- (float) ayDeltaAveAt:(int)i;
+- (float) azDeltaAveAt:(int)i;
+- (float) xyzDeltaAveAt:(int)i;
+
 - (int) traceIndex;
 - (int) packetLength;
 - (void) setPacketLength:(int)aPacketLength;
@@ -106,6 +119,7 @@ typedef struct MotionNodeCommands {
 - (void) dataReceived:(NSNotification*)note;
 @end
 
+extern NSString* ORMotionNodeModelShowDeltaFromAveChanged;
 extern NSString* ORMotionNodeModelTemperatureChanged;
 extern NSString* ORMotionNodeModelNodeRunningChanged;
 extern NSString* ORMotionNodeModelTraceIndexChanged;
