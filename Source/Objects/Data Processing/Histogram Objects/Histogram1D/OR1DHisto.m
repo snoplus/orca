@@ -295,6 +295,21 @@ NSString* OR1DHisotRebinNumberChanged	= @"OR1DHisotRebinNumberChanged";
 
 }
 
+- (void) loadData:(NSData*)someData;
+{
+    if(!histogram){
+        [self setNumberBins:[someData length]/4];
+    }
+		
+	[dataSetLock lock];
+    
+	unsigned long* lPtr = (unsigned long*)[someData bytes];
+	int i;
+	for(i=0;i<[someData length]/4;i++)histogram[i] = *lPtr++;
+	[dataSetLock unlock];
+	[self incrementTotalCounts];	
+}
+
 - (void) mergeHistogram:(unsigned long*)ptr numValues:(unsigned long)numBins
 {
     if(!histogram || numberBins != numBins){

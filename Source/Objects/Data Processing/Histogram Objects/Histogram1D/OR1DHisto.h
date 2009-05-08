@@ -54,6 +54,7 @@
 #pragma mark ¥¥¥Data Management
 - (void) histogram:(unsigned long)aValue;
 - (void) histogramWW:(unsigned long)aValue weight:(unsigned long) weight; // ak 6.8.07
+- (void) loadData:(NSData*)someData;
 - (void) mergeHistogram:(unsigned long*)ptr numValues:(unsigned long)numBins;
 - (void) mergeEnergyHistogram:(unsigned long*)ptr numBins:(unsigned long)numBins maxBins:(unsigned long)maxBins
                                                  firstBin:(unsigned long)firstBin   stepSize:(unsigned long)stepSize 
