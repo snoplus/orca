@@ -491,6 +491,8 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     else [histo mergeHistogram:ptr numValues:numBins];
 }
 
+
+
 - (void) histogram:(unsigned long)aValue numBins:(unsigned long)numBins sender:(id)obj  withKeys:(NSString*)firstArg,...
 {
     va_list myArgs;
@@ -941,6 +943,54 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     }
     va_end(myArgs);
     
+}
+
+- (void) loadSpectrum:(NSData*)aSpectrum  sender:(id)obj  withKeys:(NSString*)firstArg,...
+{
+	va_list myArgs;
+    va_start(myArgs,firstArg);
+    
+    NSString* s             = firstArg;
+    ORDataSet* currentLevel = self;
+    ORDataSet* nextLevel    = nil;
+    [currentLevel incrementTotalCounts];
+    
+    do {
+        nextLevel = [currentLevel objectForKey:s];
+        if(nextLevel){
+            if([nextLevel guardian] == nil)[nextLevel setGuardian:currentLevel];
+            currentLevel = nextLevel;
+        }
+        else {
+            nextLevel = [[ORDataSet alloc] initWithKey:s guardian:currentLevel];
+            [currentLevel setObject:nextLevel forKey:s];
+            currentLevel = nextLevel;
+            [nextLevel release];
+        }
+        [currentLevel incrementTotalCounts];
+        
+    } while(s = va_arg(myArgs, NSString *));
+    
+    [[aSpectrum retain] autorelease];
+    OR1DHisto* histo = [nextLevel data];
+    if(!histo){
+        histo = [[OR1DHisto alloc] init];
+        [histo setKey:[nextLevel key]];
+        [histo setFullName:[[nextLevel guardian] prependFullName:[nextLevel key]]];
+		[histo setDataSet:self];
+		[histo setNumberBins:[aSpectrum length]/4];
+		[nextLevel setData:histo];
+        [histo loadData:aSpectrum];
+        [histo release];
+        [[NSNotificationCenter defaultCenter]
+		 postNotificationName:ORDataSetAdded
+		 object:self
+		 userInfo: nil];
+    }
+    else [histo loadData:aSpectrum];
+    
+    va_end(myArgs);
+	
 }
 
 

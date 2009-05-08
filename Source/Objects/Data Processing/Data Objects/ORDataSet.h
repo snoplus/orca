@@ -92,6 +92,7 @@
 - (void) loadScalerSum:(unsigned long)aValue sender:(id)obj withKeys:(NSString*)firstArg,...;
 - (void) loadFFTReal:(NSArray*)realArray imaginary:(NSArray*)imaginaryArray withKeyArray:(NSArray*)keyArray;
 - (void) loadTimeSeries:(float)aValue atTime:(unsigned long)aTime sender:(id)obj withKeys:(NSString*)firstArg,...;
+- (void) loadSpectrum:(NSData*)aSpectrum  sender:(id)obj  withKeys:(NSString*)firstArg,...;
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
 
