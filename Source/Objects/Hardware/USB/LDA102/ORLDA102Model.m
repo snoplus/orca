@@ -344,7 +344,6 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 - (void) setUsbInterface:(ORUSBInterface*)anInterface
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	[usbInterface release];
 	usbInterface = anInterface;
