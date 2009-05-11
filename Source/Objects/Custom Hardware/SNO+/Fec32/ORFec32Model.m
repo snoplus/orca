@@ -115,7 +115,7 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 
 - (unsigned long) cmosReadDisabledMask;
 {
-    return cmosReadDisabledMask;;
+    return cmosReadDisabledMask;
 }
 
 - (void) setCmosReadDisabledMask:(unsigned long)aCmosReadDisabledMask;
@@ -898,6 +898,27 @@ const short kVoltageADCMaximumAttempts = 10;
 		//LoadCmosShiftRegisters(true); //always disable TR20 and TR100 on autoinit - as per JFW instructions 07/23/98 PH
 		[self setPedestals];			// set up the hardware according to the ConfigDB	//MAH 3/22/98
 		[self performPMTSetup:YES];		// now setup the PMT's wrt online/offline status - added 8/20/98 PMT
+		
+	}
+	@catch(NSException* localException) {	
+		// set the flags for the off-line status
+		//theConfigDB -> SlotOnline(GetTheSnoCrateNumber(),itsFec32SlotNumber,FALSE);
+		[self setOnlineMask:0x00000000];
+		@throw;
+	}
+}
+
+- (void) initTheCard:(BOOL) flgAutoInit
+{
+	@try {
+		
+		[self setOnlineMask:0xFFFFFFFF];
+		//Do standard Board Init Things
+		[self fullResetOfCard];
+		[self loadAllDacs];
+		//LoadCmosShiftRegisters(true); //always disable TR20 and TR100 on autoinit - as per JFW instructions 07/23/98 PH
+		[self setPedestals];			// set up the hardware according to the ConfigDB	//MAH 3/22/98
+		[self performPMTSetup:flgAutoInit?YES:NO];		// now setup the PMT's wrt online/offline status - added 8/20/98 PMT
 		
 	}
 	@catch(NSException* localException) {	

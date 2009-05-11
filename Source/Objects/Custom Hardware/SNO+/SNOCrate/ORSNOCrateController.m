@@ -103,9 +103,14 @@
 			[xilinixLoadProgress setDoubleValue:[jobStatus progress]];
 		}
 		else {
-			if([jobStatus finalStatus]) [xilinixStatusField setStringValue:@""];
-			else						[xilinixStatusField setStringValue:@"FAILED"];
-			[xilinixStatusField setStringValue:@""];
+			if([jobStatus finalStatus]) {
+				[xilinixStatusField setStringValue:@""];
+				[model initCrate:NO phase:1];
+			}
+			else{
+				[xilinixStatusField setStringValue:@"FAILED"];
+				NSLog(@"jobStatus screwed becouse running: %d, finalstatus: %d, message: %@\n", [jobStatus running], [jobStatus finalStatus], [jobStatus message]);
+			}
 			[xilinixLoadProgress setDoubleValue:0];
 			[xilinixLoadProgress stopAnimation:self];
 		}
@@ -130,7 +135,8 @@
 - (IBAction) autoInit:(id)sender
 {
 	@try {
-		[model autoInit];
+		[model setAutoInit:YES];
+		[model initCrate:YES phase:0];
 	}
 	@catch (NSException* localException) {
 		NSBeginAlertSheet(@"Crate AutoInit Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
@@ -141,7 +147,8 @@
 - (IBAction) initXilinx:(id)sender
 {
 	@try {
-		[model initCrate:YES];
+		[model setAutoInit:NO];
+		[model initCrate:YES phase:0];
 	}
 	@catch (NSException* localException) {
 		NSBeginAlertSheet(@"Crate Init Xinlinix Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	
@@ -152,7 +159,8 @@
 - (IBAction) initNoXilinx:(id)sender
 {
 	@try {
-		[model initCrate:NO];
+		[model setAutoInit:NO];
+		[model initCrate:NO phase:0];
 	}
 	@catch (NSException* localException) {
 		NSBeginAlertSheet(@"Crate Init No Xinlinix Failed",@"OK",nil,nil,[self window],self,nil,nil,nil, @"%@",localException);	

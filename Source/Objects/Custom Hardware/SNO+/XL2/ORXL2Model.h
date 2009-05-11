@@ -23,6 +23,27 @@
 #import "ORSNOCard.h"
 @class ORCommandList;
 
+//select register:
+//bit0--bit15 select FEC
+//bit16 selects CTC
+//bit17 selects XL2 itself, to readout regs at base + 0x10 and higher
+//the 4 low regs are always at xl2
+//the 8 top regs are always at FECs
+//multiple fecs may be selected
+
+//control and status register
+//bit0--bit5 crate geographic address (r)
+//bit6 halt acknowledge light (r/w)
+//bit7 reset ored with the sys reset (r/w)
+//bit8  xilinx prog done
+//bit9  xilinx data
+//bit10 xilinx clock
+//bit11 xilinx activate
+//bit8--bit11 are used to download the xilinx code, bit is pushed on rising edge of the clock
+//the clock raises itself not later than 5 usec after toggle down.
+//bits24-30 errors
+//bit31 error flag
+
 // SNTR XL2 register indices, Changed 4/13/97 for new XL2, JB
 #define XL2_SELECT_REG							0
 #define XL2_DATA_AVAILABLE_REG					1
@@ -43,6 +64,7 @@
 #define XL2_CONTROL_DONE_PROG			0x00000100
 #define XL2_CONTROL_DATA				0x00000200
 #define XL2_CONTROL_CLOCK				0x00000400
+//bit11 is the xilinx active bit
 #define XL2_CONTROL_BIT11				0x00000800
 
 #define XL2_SELECT_XL2					0x00020000
@@ -55,6 +77,7 @@
 
 #define XL2_XLPERMIT					0x000000A0 // Permit Xilinx Loading
 #define XL2_ENABLE_DP					0x00000008 // Enable DP on FEC32/DB 
+//we differ from penn: 0x04 for dis_dp
 #define XL2_DISABLE_DP					0x000000A4 // Disable DP on FEC32/DB
 
 @interface ORXL2Model :  ORSNOCard 
@@ -92,8 +115,7 @@
 - (unsigned long) readHardwareRegister:(unsigned long) regAddress;
 - (void) reset;
 - (void) loadTheClocks;
-- (void) loadTheXilinx;
-- (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask;
+- (void) loadTheXilinx:(unsigned long) selectBits;
 
 - (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern;
 - (id) readHardwareRegisterCmd:(unsigned long) regAddress;

@@ -447,7 +447,7 @@ NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 		result = [[self guardian] performBoardIDRead:DC_BOARD0_ID_INDEX + boardIndex];
 	}
 	@catch(NSException* localException) {
-		//result=@"0000";
+		[localException raise];
 	}
 	return result;
 }

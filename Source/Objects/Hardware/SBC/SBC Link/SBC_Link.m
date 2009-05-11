@@ -2308,10 +2308,11 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 		if([jobDelegate respondsToSelector:statusSelector]){
 			ORSBCLinkJobStatus* aJobStatus = [ORSBCLinkJobStatus jobStatus:p message:aPacket.message];
 			[self setJobStatus:aJobStatus];
+			//NSLog(@"monitor job ok: job %s running with message: %s\n", [aJobStatus running]?"is":"is not", [aJobStatus message]);
 			[jobDelegate performSelector:statusSelector withObject:jobStatus];
 		}
 		if(p->running){
-			[self performSelector:@selector(monitorJob) withObject:nil afterDelay:1];
+			[self performSelector:@selector(monitorJob) withObject:nil afterDelay:0.1];
 		}
 	}
 	@catch(NSException* localException) {

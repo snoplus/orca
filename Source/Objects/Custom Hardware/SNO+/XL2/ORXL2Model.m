@@ -47,13 +47,14 @@ unsigned long xl2_register_offsets[] =
 
 @interface ORXL2Model (SBC)
 - (void) loadClocksUsingSBC:(NSData*)theData;
-- (void) loadXilinixUsingSBC:(NSData*)theData;
+- (void) loadXilinixUsingSBC:(NSData*)theData selectBits:(unsigned long) selectBits;
 - (void) xilinxLoadStatus:(ORSBCLinkJobStatus*) jobStatus;
 @end
 
 @interface ORXL2Model (LocalAdapter)
 - (void) loadClocksUsingLocalAdapter:(NSData*)theData;
-- (void) loadXilinixUsingLocalAdapter:(NSData*)theData;
+- (void) loadXilinixUsingLocalAdapter:(NSData*)theData selectBits:(unsigned long) selectBits;
+- (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask;
 @end
 
 @implementation ORXL2Model
@@ -300,12 +301,16 @@ unsigned long xl2_register_offsets[] =
 	unsigned long selectBits;
 	if(aCard == self)	selectBits = XL2_SELECT_XL2;
 	else				selectBits = (1L<<[aCard stationNumber]);
+	//NSLog(@"selectBits for card in slot %d: 0x%x\n", [aCard slot], selectBits);
 	[self selectCards:selectBits];
 }
 
 - (void) writeToXL2Register:(unsigned long) aRegister value:(unsigned long) aValue
 {
+	//NSLog(@"writexl2 value: 0x%x to 0x%x\n", aValue, [self xl2RegAddress:aRegister]);
 	if (aRegister > XL2_MASK_REG) {   //Higer registers require that bit 17 be set in the XL2 select register
+		unsigned long readValue = [self xl2RegAddress:XL2_SELECT_REG];
+		if(~0x00020000UL & readValue) NSLog(@"in readFromXL2Register: changing selection mask!");
 		[[self xl1] writeHardwareRegister:[self xl2RegAddress:XL2_SELECT_REG] value:0x20000];
 	}
 	[[self xl1] writeHardwareRegister:[self xl2RegAddress:aRegister] value:aValue]; 		//Now write the value	
@@ -320,6 +325,8 @@ unsigned long xl2_register_offsets[] =
 - (unsigned long) readFromXL2Register:(unsigned long) aRegister
 {
 	if (aRegister > XL2_MASK_REG){   //Higer registers require that bit 17 be set in the XL2 select register
+		unsigned long readValue = [self xl2RegAddress:XL2_SELECT_REG];
+		if(~0x00020000UL & readValue) NSLog(@"in readFromXL2Register: changing selection mask!");
 		[self writeHardwareRegister:[self xl2RegAddress:XL2_SELECT_REG] value:0x20000];
 	}
 	
@@ -362,8 +369,20 @@ unsigned long xl2_register_offsets[] =
 - (void) reset
 {
 	@try {
-		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_CRATE_RESET | XL2_CONTROL_DONE_PROG]; // select the cards by writing to the XL2 REG 0 
-		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_DONE_PROG]; // select the cards by writing to the XL2 REG 0 
+		[self deselectCards];
+		unsigned long readValue = [self readFromXL2Register: XL2_CONTROL_STATUS_REG];
+		if (readValue & XL2_CONTROL_DONE_PROG) {
+			NSLog(@"XilinX code found in the crate, keeping it.\n");
+			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_DONE_PROG]; 
+			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: (XL2_CONTROL_CRATE_RESET | XL2_CONTROL_DONE_PROG)];
+			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_DONE_PROG];
+		}
+		else {
+			//do not set the dp bit if the xilinx hasn't been loaded
+			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: 0UL]; 
+			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_CRATE_RESET];
+			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: 0UL];
+		}
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Failure during reset of XL2 Crate %d Slot %d.\n", [self crateNumber], [self stationNumber]);
@@ -384,34 +403,11 @@ unsigned long xl2_register_offsets[] =
 	else					[self loadClocksUsingLocalAdapter:theData];
 }
 
-- (void) loadTheXilinx
+- (void) loadTheXilinx:(unsigned long) selectBits
 {
 	NSData* theData = [[self xl1] xilinxFileData];	// load the entire content of the file
-	if([self adapterIsSBC])	[self loadXilinixUsingSBC:theData];
-	else					[self loadXilinixUsingLocalAdapter:theData];
-}
-
-- (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask
-{
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG];
-	[self selectCards:aSelectionMask];
-	
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_BIT11];
-	// More Changes, PW, RGV
-	// check to see if the Xilinx was loaded properly 
-	// read the bit 8, this should be high if the Xilinx was loaded
-	unsigned long readValue = [self readFromXL2Register:XL2_CONTROL_STATUS_REG];
-	
-	if (!(readValue & XL2_CONTROL_DONE_PROG)){	
-		[ORTimer delay:.1];
-		readValue = [self readFromXL2Register:XL2_CONTROL_STATUS_REG];
-		if (!(readValue & XL2_CONTROL_DONE_PROG)){	
-			return false;
-		}
-	}
-	
-	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG]; // set bit 11 low
-	return true;
+	if([self adapterIsSBC])	[self loadXilinixUsingSBC:theData selectBits:selectBits];
+	else			[self loadXilinixUsingLocalAdapter:theData selectBits:selectBits];
 }
 
 @end
@@ -458,7 +454,7 @@ unsigned long xl2_register_offsets[] =
 	}
 }
 
-- (void) loadXilinixUsingSBC:(NSData*)theData
+- (void) loadXilinixUsingSBC:(NSData*)theData selectBits:(unsigned long) selectBits
 {
 	
 	NSLog(@"Sending Xilinx file\n");
@@ -471,7 +467,7 @@ unsigned long xl2_register_offsets[] =
 	
 	SNOXL2_XilinixLoadStruct* payloadPtr	= (SNOXL2_XilinixLoadStruct*)aPacket.payload;
 	payloadPtr->addressModifier				= [self addressModifier];
-	payloadPtr->selectBits					= ( 1UL << 8) | XL2_SELECT_XL2;  //Temp ....just loading board 8 and the xl2 in the test stand
+	payloadPtr->selectBits					= selectBits | XL2_SELECT_XL2;
 	payloadPtr->xl2_select_reg				= [self xl2RegAddress:XL2_SELECT_REG];
 	payloadPtr->xl2_control_status_reg		= [self xl2RegAddress:XL2_CONTROL_STATUS_REG];
 	payloadPtr->xl2_xilinx_user_control		= [self xl2RegAddress:XL2_XILINX_USER_CONTROL];
@@ -589,7 +585,7 @@ unsigned long xl2_register_offsets[] =
 }
 
 
-- (void) loadXilinixUsingLocalAdapter:(NSData*)theData
+- (void) loadXilinixUsingLocalAdapter:(NSData*)theData selectBits:(unsigned long) selectBits
 {
 	
 	//--------------------------- The file format as of 4/17/96 -------------------------------------
@@ -620,18 +616,18 @@ unsigned long xl2_register_offsets[] =
 		unsigned long index = length; 
 		
 		// select the mother cards in the SNO Crate
-		int card_index;
-		for (card_index = 0; card_index < kNumSNOCards ; card_index++){
+		//int card_index;
+		//for (card_index = 0; card_index < kNumSNOCards ; card_index++){
 			//TBD Make select mask based on old criteria
 			//if(    ( theConfigDB -> MCPresent(its_SC_Number,card_index) )
 			//   && ( theConfigDB -> SlotOnline(its_SC_Number,card_index) ) ){
 			
 			// build the bit pattern			
-			mc_SelectBits |= ( 1UL << 8);
+			//mc_SelectBits |= ( 1UL << 8);
 			
 			//}
-		}	
-		mc_SelectBits |= XL2_SELECT_XL2;
+		//}	
+		mc_SelectBits = selectBits | XL2_SELECT_XL2;
 		[self selectCards:mc_SelectBits];
 		selectOK = YES;
 		// make sure that the XL2 DP bit is set low and bit 11 (xilinx active) is high -- 
@@ -646,6 +642,7 @@ unsigned long xl2_register_offsets[] =
 		
 		// DO NOT USE CXL2_Secondary_Reg_Access here unless you retain the state
 		// of the select bits in register zero!!!!		
+		// !!! the next write resets the selectBits !!! to be corrected...
 		writeValue = XL2_XLPERMIT | XL2_ENABLE_DP;
 		[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
 		//		Wait(100);   // 100 msec delay  QRA 1/18/98
@@ -741,4 +738,28 @@ unsigned long xl2_register_offsets[] =
 	}	
 	
 }
+
+- (BOOL) checkXlinixLoadOK:(unsigned long) aSelectionMask
+{
+	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG];
+	[self selectCards:aSelectionMask];
+	
+	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_BIT11];
+	// More Changes, PW, RGV
+	// check to see if the Xilinx was loaded properly 
+	// read the bit 8, this should be high if the Xilinx was loaded
+	unsigned long readValue = [self readFromXL2Register:XL2_CONTROL_STATUS_REG];
+	
+	if (!(readValue & XL2_CONTROL_DONE_PROG)){	
+		[ORTimer delay:.1];
+		readValue = [self readFromXL2Register:XL2_CONTROL_STATUS_REG];
+		if (!(readValue & XL2_CONTROL_DONE_PROG)){	
+			return false;
+		}
+	}
+	
+	[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_DONE_PROG]; // set bit 11 low
+	return true;
+}
+
 @end

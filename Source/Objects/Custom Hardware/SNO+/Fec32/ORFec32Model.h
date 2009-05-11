@@ -285,6 +285,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) readBoardIds;
 - (void) boardIDOperation:(unsigned long)theDataValue boardSelectValue:(unsigned long) boardSelectVal beginIndex:(short) beginIndex;
 - (void) autoInit;
+- (void) initTheCard:(BOOL) flgAutoInit;
 - (void) fullResetOfCard;
 - (void) resetFifo;
 - (void) resetSequencer;

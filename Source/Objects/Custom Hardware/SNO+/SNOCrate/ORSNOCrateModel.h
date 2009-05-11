@@ -26,6 +26,7 @@
 	int workingSlot;
 	BOOL working;
 	BOOL pauseWork;
+	BOOL autoInit;
 	eFecMonitorState  voltageStatus;
 }
 
@@ -38,6 +39,8 @@
 - (void) setSlot:(int)aSlot;
 - (int)  slot;
 - (id) xl2;
+//- (BOOL) autoInit;
+- (void) setAutoInit:(BOOL) autoInit;
 
 #pragma mark •••Accessors
 - (unsigned long) memoryBaseAddress;
@@ -46,10 +49,15 @@
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 
-- (void) autoInit;
 - (void) scanWorkingSlot;
 - (short) numberSlotsUsed;
-- (void) initCrate:(BOOL) loadTheFEC32XilinxFile;
+- (void) initCrate:(BOOL) loadTheFEC32XilinxFile phase:(int) phase;
+- (void) initCrateDone;
+- (void) resetCrate;
+- (void) loadClocks;
+- (void) loadXilinx;
+- (void) initFec32Cards;
+- (void) initCTCDelays;
 - (eFecMonitorState) voltageStatus;
 - (void) setVoltageStatus:(eFecMonitorState)aState;
 @end

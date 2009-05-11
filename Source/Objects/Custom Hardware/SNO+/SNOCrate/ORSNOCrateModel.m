@@ -28,6 +28,9 @@
 #import "ORFec32Model.h"
 #import "ObjectFactory.h"
 #import "OROrderedObjManager.h"
+#import "ORSelectorSequence.h"
+#import "SBC_Link.h"
+
 
 const struct {
 	unsigned long Register;
@@ -158,6 +161,14 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	return voltageStatus;
 }
 
+- (void) setAutoInit:(BOOL) aAutoInit {
+	autoInit = aAutoInit;
+}
+
+- (BOOL) autoInit {
+	return autoInit;
+}
+	
 - (void) setVoltageStatus:(eFecMonitorState)aState
 {
 	voltageStatus = aState;
@@ -247,6 +258,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	return [self adapter];
 }
 
+/*
 - (void) autoInit
 {
 	NSLog(@"scanning crate %d for FEC32 cards\n",[self crateNumber]);
@@ -254,6 +266,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	working = YES;
 	[self performSelector:@selector(scanWorkingSlot)withObject:nil afterDelay:0];
 }
+*/
 
 - (void) scanWorkingSlot
 {
@@ -274,7 +287,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 			[proxyFec32 setGuardian:self];
 			
 			NSString* boardID = [proxyFec32 performBoardIDRead:MC_BOARD_ID_INDEX];
-			if(![boardID isEqual: @"0000"]){
+			if(![boardID isEqual: @"0000"] && ![boardID isEqual: @"0000"]){
 				NSLog(@"Crate %2d Fec %2d BoardID: %@\n",[self crateNumber],[self stationForSlot:workingSlot],boardID);
 				ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:workingSlot];
 				if(!theCard){
@@ -286,6 +299,7 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 				[theCard setBoardID:boardID];
 				[theCard scan:@selector(scanWorkingSlot)];
 				workingSlot--;
+				//if (workingSlot == 0) working = NO;
 			}
 			else {
 				NSLog(@"Crate %2d Fec %2d BoardID: %@\n",[self crateNumber],[self stationForSlot:workingSlot],boardID);
@@ -332,35 +346,251 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	return 1;
 }
 
-- (void) initCrate:(BOOL) loadTheFEC32XilinxFile
+- (void) initCrate:(BOOL) loadTheFEC32XilinxFile phase:(int) phase
 {
+
+	//don't proceed to load the XilinX if this crate is supplying high voltage!
+	//MAH TBC implement this check somehow
+	//			if( theHVStatus.IsThisSNOCrateSupplyingHV(its_SC_Number) ) {
+	//				SetStatustoWarningStyle();
+	//				StatusPrintf("Can not load Xilinx on crate %d",its_SC_Number);
+	//				StatusPrintf("As the crate is supplying HV!!");
+	//				StatusPrintf("Xilinx load skipped for crate %d",its_SC_Number);
+	//				RestoreStatusStyle();
+	//			}
 	
 	@try {
-		// Now perfom a crate level initialization
-		[[self xl2] reset];			// STEP 1
-		[[self xl2] loadTheClocks]; // STEP 2
-		
-		// STEP 3 - don't load Xilinx if this crate is supplying HV
-		if(loadTheFEC32XilinxFile){
-			//MAH TBC implement this check somehow
-			//			if( theHVStatus.IsThisSNOCrateSupplyingHV(its_SC_Number) ) {
-			//				SetStatustoWarningStyle();
-			//				StatusPrintf("Can not load Xilinx on crate %d",its_SC_Number);
-			//				StatusPrintf("As the crate is supplying HV!!");
-			//				StatusPrintf("Xilinx load skipped for crate %d",its_SC_Number);
-			//				RestoreStatusStyle();
-			//			}
-			//			else {
-			[[self xl2] loadTheXilinx];
-			//			}
+		if (phase == 0) {
+			NSLog(@"Starting crate %d init process: (load Xilinx: %@) (autoInit: %@)\n", [self crateNumber], loadTheFEC32XilinxFile?@"YES":@"NO", autoInit?@"YES":@"NO");
+			
+			[self resetCrate];
+			[self loadClocks];
+
+			// don't load the Xilinx if this crate is supplying voltage
+			if (loadTheFEC32XilinxFile) [self loadXilinx];
+			else phase = 1;
 		}
-		
+
+		if (phase == 1) {
+			[self initFec32Cards];
+			[self initCTCDelays];
+			[self initCrateDone];
+		}
 	}
 	@catch(NSException* localException) {		
-		NSLog(@"Crate %d init failed\n",[self crateNumber]);
+		NSLog(@"***Initialization of the crate %d (%@ Xilinx, %@ autoInit) failed!***\n", 
+		      [self crateNumber], loadTheFEC32XilinxFile?@"with":@"no", autoInit?@"with":@"no");
+		NSLog(@"Exception: %@\n",localException);
+		[localException raise];		
 	}
 }
 
+- (void) initCrateDone
+{
+	NSLog(@"Initialization of the crate %d done.\n", [self crateNumber]);
+}
+
+//get ready for the XL3 card
+- (void) resetCrate
+{
+	[[self xl2] reset];
+}
+
+- (void) loadClocks
+{
+	[[self xl2] loadTheClocks];
+}
+
+- (void) loadXilinx
+{
+	unsigned long selectBits = 0L;
+	if (autoInit) {
+		selectBits = 0xffff;
+	}
+	else {
+		NSEnumerator* e  = [[self collectObjectsOfClass:NSClassFromString(@"ORFec32Model")] objectEnumerator];
+		ORFec32Model* proxyFec32;
+		while(proxyFec32 = [e nextObject]) {
+			selectBits |= 1L << [proxyFec32 stationNumber];
+		}
+	}
+		
+	[[self xl2] loadTheXilinx:selectBits];
+}
+
+- (void) initFec32Cards
+{
+	NSMutableArray* slotList = [NSMutableArray arrayWithCapacity:16];
+	ORFec32Model* proxyFec32;
+
+	if (autoInit) {
+		// will be replaced with the config data
+		int i;
+		for (i = 16; i > 0; i--) [slotList addObject:[NSNumber numberWithInt:i]];
+	}
+	else {
+		NSEnumerator* e  = [[self collectObjectsOfClass:NSClassFromString(@"ORFec32Model")] objectEnumerator];
+		while(proxyFec32 = [e nextObject]) {
+			[slotList addObject:[NSNumber numberWithInt:[proxyFec32 slot]]];
+		}
+	}
+	
+	NSEnumerator* eSlot = [slotList objectEnumerator];
+	NSNumber* iSlot;
+	
+	while (iSlot = [eSlot nextObject]) {		
+		//1. select the channel
+		@try {
+			[[self xl2] selectCards:1L<<[self stationForSlot:[iSlot	intValue]]];
+			NSLog(@"Select, data, and csr: 0x%08x, 0x%08x, 0x%08x.\n", [[self xl2] readFromXL2Register:XL2_SELECT_REG], [[self xl2] readFromXL2Register:XL2_DATA_AVAILABLE_REG], [[self xl2] readFromXL2Register:XL2_CONTROL_STATUS_REG]);
+		}
+		@catch(NSException* localException) {
+			NSLog(@"Unable to reach XL2 in crate: %d\n",[self crateNumber]);
+			[[self xl2] deselectCards];
+			[localException raise];
+		}
+		
+		//2. readboard id; finds out if the card is there
+		@try {
+			proxyFec32 = [ObjectFactory makeObject:@"ORFec32Model"];
+			[proxyFec32 setGuardian:self];
+			
+			NSString* boardID = [proxyFec32 performBoardIDRead:MC_BOARD_ID_INDEX];
+			if(![boardID isEqual: @"0000"] && ![boardID isEqual: @"ffff"]){
+				NSLog(@"Crate %2d Fec %2d BoardID: %@\n", [self crateNumber], [self stationForSlot:[iSlot intValue]], boardID);
+				ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:[iSlot intValue]];
+				if(!theCard){
+					[self addObjects:[NSArray arrayWithObject:proxyFec32]];
+					[self place:proxyFec32 intoSlot:[iSlot intValue]];
+					theCard = proxyFec32;
+				}
+				[theCard setBoardID:boardID];
+				proxyFec32 = theCard;
+			}
+			else {
+				@throw [NSException exceptionWithName:@"SNO Crate" reason:@"FEC with unknown board ID found." userInfo:nil];
+				NSLog(@"Crate %2d Fec %2d xBoardID: %@\n", [self crateNumber], [self stationForSlot:[iSlot intValue]], boardID);
+				ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:[iSlot intValue]];
+				if(theCard && autoInit)[self removeObject:theCard];
+				proxyFec32 = nil; //do not continue with the inititialization
+			}
+		}
+		@catch(NSException* localException) {
+			NSLog(@"Crate %2d Fec %2d BoardID: ----\n", [self crateNumber], [self stationForSlot:[iSlot intValue]]);
+			ORFec32Model* theCard = [[OROrderedObjManager for:self] objectInSlot:[iSlot intValue]];
+			if (theCard) {
+				//is the XilinX loaded? (the sharc way)
+				@try{
+					[[self xl2] deselectCards];
+					unsigned long xilinx_loaded = ([[self xl2] readFromXL2Register:XL2_CONTROL_STATUS_REG] & (unsigned long) XL2_CONTROL_DONE_PROG);
+					unsigned long clear_csr = xilinx_loaded?(0UL | XL2_CONTROL_DONE_PROG):0UL;
+					[[self xl2] writeToXL2Register:XL2_CONTROL_STATUS_REG value:clear_csr];
+					[[self xl2] select:theCard];
+					[[self xl2] writeToXL2Register:XL2_CONTROL_STATUS_REG value:XL2_CONTROL_BIT11];
+					xilinx_loaded = [[self xl2] readFromXL2Register:XL2_CONTROL_STATUS_REG] & XL2_CONTROL_DONE_PROG;
+					[[self xl2] writeToXL2Register:XL2_CONTROL_STATUS_REG value:clear_csr]; // set bit 11 low
+					if (xilinx_loaded) {
+						NSLog(@"FEC card not present.\n");
+						//proxyFec32 = nil;
+					}
+					else NSLog(@"Xilinx code is not running in the FEC.\n");
+					[[self xl2] deselectCards];
+				}
+				@catch(NSException* localException) {
+					NSLog(@"Not able to access the card to find the XilinX code.\n");
+					[[self xl2] deselectCards];
+				}
+			}
+			if(theCard && autoInit)[self removeObject:theCard];
+			proxyFec32 = nil;
+		}
+
+		//3. daughter boards
+
+		if (proxyFec32) {
+			[[self xl2] select:proxyFec32];
+			NSMutableArray* dcList = [NSMutableArray arrayWithCapacity:4];
+			ORFecDaughterCardModel* proxyDC;
+			
+			if (autoInit) {
+				// get ready for the configDB
+				int i;
+				for (i = 0; i < 4; i++) [dcList addObject:[NSNumber numberWithInt:i]];
+			}
+			else {
+				NSEnumerator* e  = [proxyFec32 objectEnumerator];
+				while(proxyDC = [e nextObject]) {
+					[dcList addObject:[NSNumber numberWithInt:[proxyDC slot]]];
+				}
+			}
+			
+			NSEnumerator* eDC = [dcList objectEnumerator];
+			NSNumber* iDC;
+			while (iDC = [eDC nextObject]) {
+				@try {
+					proxyDC = [ObjectFactory makeObject:@"ORFecDaughterCardModel"];
+					[proxyDC setGuardian:proxyFec32];
+					
+					NSString* aBoardID = [proxyDC performBoardIDRead:[iDC intValue]];
+					if(![aBoardID isEqual: @"0000"]){
+						NSLog(@"\tDC Slot: %d BoardID: %@\n", [iDC intValue], aBoardID);
+						ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:proxyFec32] objectInSlot:[iDC intValue]];
+						if(!theCard){
+							NSLog(@"New dc for slot %d\n", [iDC intValue]);
+							[proxyFec32 addObject:proxyDC];
+							[proxyFec32 place:proxyDC intoSlot:[iDC intValue]];
+							theCard = proxyDC;
+						}
+						[theCard setBoardID:aBoardID];
+					}
+					else {
+						NSLog(@"\tDC Slot: %d BoardID: BAD\n", [iDC intValue]);
+						ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:proxyFec32] objectInSlot:[iDC intValue]];
+						if(theCard && autoInit)[proxyFec32 removeObject:theCard];
+					}
+				}
+				@catch(NSException* localException) {
+					NSLog(@"\tDC Slot: %d BoardID: ----\n", [iDC intValue]);
+					ORFecDaughterCardModel* theCard = [[OROrderedObjManager for:proxyFec32] objectInSlot:[iDC intValue]];
+					if(theCard && autoInit)[proxyFec32 removeObject:theCard];
+				}
+			}
+		}
+
+		//call the fec32 init function...
+		if (proxyFec32) {
+			@try {
+				//correct the different trigger selection for auto and nonauto
+				//correct the selection mask if the daughter card is missing
+				NSLog(@"calling fec init...\n");
+				[proxyFec32 initTheCard:autoInit];
+			}
+			@catch(NSException* localException) {
+				[localException raise];
+			}
+		}
+		
+		[[self xl2] deselectCards];
+	}
+}
+
+- (void) initCTCDelays
+{
+
+	//CTC_Control *theTCControl = NIL_POINTER;
+	//TRY {
+	//	theTCControl = new CTC_Control;
+	//	FailNil(theTCControl);
+	//	theTCControl->ITC_Control (Get_IC_Number(), Get_SC_Number(), theConfigDB);
+	//	theTCControl->Init20NSDelays();
+	//	delete theTCControl;
+	//} 	
+	//CATCH {
+	//	if(theTCControl)delete theTCControl;
+	//}
+	//DONE
+	
+}
 
 @end
 
