@@ -1473,7 +1473,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 {
 	if(userInfo)NSLog(@"Got stop run request:     %@\n",userInfo);
 	else NSLog(@"Got stop run request (No reason given)\n");
-	ignoreRepeat = YES;
 	[self stopRun];
 }
 
