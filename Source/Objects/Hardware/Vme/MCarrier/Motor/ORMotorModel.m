@@ -930,7 +930,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
         if( [self optionSet:kSyncWithRunOption] && [self optionSet:kStopRunOption]){
             NSString* reason = [NSString stringWithFormat:@"%@  Pattern Finished",[self  motorName]];
             [[NSNotificationCenter defaultCenter]
-			 postNotificationName:ORRequestRunStop
+			 postNotificationName:ORRequestRunHalt
 			 object:self
 			 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
         }

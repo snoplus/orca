@@ -926,7 +926,7 @@ NSString* ORVXMLock = @"ORVXMLock";
 						NSString* reason = [NSString stringWithFormat:@"VXM %d port finished pattern",[self  uniqueIdNumber]];
 						
 						[[NSNotificationCenter defaultCenter]
-                                postNotificationName:ORRequestRunStop
+                                postNotificationName:ORRequestRunHalt
                                               object:self
                                             userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
                         

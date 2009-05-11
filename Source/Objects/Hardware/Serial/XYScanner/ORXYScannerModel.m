@@ -788,7 +788,7 @@ NSString* ORXYScannerLock = @"ORXYScannerLock";
                             NSString* reason = [NSString stringWithFormat:@"XYScanner %d port finished pattern",[self  uniqueIdNumber]];
                             
                             [[NSNotificationCenter defaultCenter]
-                                postNotificationName:ORRequestRunStop
+                                postNotificationName:ORRequestRunHalt
                                               object:self
                                             userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
                         

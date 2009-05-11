@@ -1758,7 +1758,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 
 - (void) runFailed
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunStop object:self];
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt object:self];
 	if(!eRunFailedAlarm){
 		eRunFailedAlarm = [[ORAlarm alloc] initWithName:@"Crate failed to start run" severity:kRunInhibitorAlarm];
 		[eRunFailedAlarm setSticky:NO];
