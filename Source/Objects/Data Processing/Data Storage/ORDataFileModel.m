@@ -415,7 +415,7 @@ static const int currentVersion = 1;           // Current version
 			
 			if(sizeLimitReachedAction == kStopOnLimit){
 				[[NSNotificationCenter defaultCenter]
-				 postNotificationName:ORRequestRunStop
+				 postNotificationName:ORRequestRunHalt
 				 object:self
 				 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:reason,@"Reason",nil]];
 				
