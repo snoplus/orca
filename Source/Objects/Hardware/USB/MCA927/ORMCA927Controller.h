@@ -26,9 +26,10 @@
 
 @interface ORMCA927Controller : OrcaObjectController 
 {
+	IBOutlet ORTimedTextField* noDataWarningField;
+	IBOutlet ORTimedTextField* checkFPGAField;
 	IBOutlet NSPopUpButton* serialNumberPopup;
-	IBOutlet NSButton*		enableChan1CB;
-	IBOutlet NSButton*		enableChan0CB;
+	IBOutlet NSMatrix*		runOptionsMatrix;
 	IBOutlet NSMatrix*		selectedChannelMatrix;
 	IBOutlet NSTabView*		tabView;
 	IBOutlet ORPlotter1D*   plotter;
@@ -43,7 +44,10 @@
 	IBOutlet NSPopUpButton* convGainPopup;
 	IBOutlet NSTextField*	lowerDiscriminatorField;
 	IBOutlet NSTextField*	upperDiscriminatorField;
-		
+	IBOutlet NSTextField*	lowerDiscriminatorPercentField;
+	IBOutlet NSTextField*	upperDiscriminatorPercentField;
+	IBOutlet NSButton*		autoClearCB;
+
 	IBOutlet NSButton*		useCustomFileCB;
 	IBOutlet NSTextField*	fpgaFilePathField;
 	IBOutlet NSButton*		selectFileButton;
@@ -69,8 +73,8 @@
 - (void) updateChannelParams;
 
 #pragma mark ***Interface Management
-- (void) enableChan1Changed:(NSNotification*)aNote;
-- (void) enableChan0Changed:(NSNotification*)aNote;
+- (void) autoClearChanged:(NSNotification*)aNote;
+- (void) runOptionsChanged:(NSNotification*)aNote;
 - (void) statusParamsChanged:(NSNotification*)aNote;
 - (void) liveTimeChanged:(NSNotification*)aNote;
 - (void) realTimeChanged:(NSNotification*)aNote;
@@ -90,10 +94,13 @@
 - (void) upperDiscriminatorChanged:(NSNotification*)aNote;
 - (void) selectedChannelChanged:(NSNotification*)aNote;
 - (void) runningStatusChanged:(NSNotification*)aNote;
+- (void) displayFPGAError;
 
 #pragma mark •••Actions
-- (IBAction) enableChan1Action:(id)sender;
-- (IBAction) enableChan0Action:(id)sender;
+- (IBAction) view0Action:(id)sender;
+- (IBAction) view1Action:(id)sender;
+- (IBAction) autoClearAction:(id)sender;
+- (IBAction) runOptionsAction:(id)sender;
 - (IBAction) selectedChannelAction:(id)sender;
 - (IBAction) clearSpectrumAction:(id)sender;
 - (IBAction) readSpectrumAction:(id)sender;

@@ -159,17 +159,15 @@
                          name : ORMCA927ModelRunningStatusChanged
 						object: model];
 	
-
     [notifyCenter addObserver : self
-                     selector : @selector(enableChan0Changed:)
-                         name : ORMCA927ModelEnableChan0Changed
+                     selector : @selector(runOptionsChanged:)
+                         name : ORMCA927ModelRunOptionsChanged
 						object: model];
-
+	
     [notifyCenter addObserver : self
-                     selector : @selector(enableChan1Changed:)
-                         name : ORMCA927ModelEnableChan1Changed
+                     selector : @selector(autoClearChanged:)
+                         name : ORMCA927ModelAutoClearChanged
 						object: model];
-
 }
 
 - (void) awakeFromNib
@@ -190,18 +188,8 @@
 	[self statusParamsChanged:nil];
 	[self updateChannelParams];
 	[self runningStatusChanged:nil];
-	[self enableChan0Changed:nil];
-	[self enableChan1Changed:nil];
-}
-
-- (void) enableChan1Changed:(NSNotification*)aNote
-{
-	[enableChan1CB setIntValue: [model enableChan1]];
-}
-
-- (void) enableChan0Changed:(NSNotification*)aNote
-{
-	[enableChan0CB setIntValue: [model enableChan0]];
+	[self runOptionsChanged:nil];
+	[self autoClearChanged:nil];
 }
 
 - (void) updateChannelParams
@@ -215,16 +203,25 @@
 	[self roiPresetChanged:nil];
 	[self roiPeakPresetChanged:nil];
 	[self convGainChanged:nil];	
-	[self upperDiscriminatorChanged:nil];	
-	[self lowerDiscriminatorChanged:nil];	
+}
+
+
+- (void) runOptionsChanged:(NSNotification*)aNote
+{
+	int i;
+	for(i=0;i<2;i++){
+		unsigned long optionsMask = [model runOptions:i];
+		[[runOptionsMatrix cellAtRow:0 column:i] setIntValue: (optionsMask&kChannelEnabledMask) != 0];
+		[[runOptionsMatrix cellAtRow:1 column:i] setIntValue: (optionsMask&kChannelAutoStopMask) != 0];
+	}
 }
 
 - (void) runningStatusChanged:(NSNotification*)aNote
 {
-	[startChannelButton setEnabled:![model runningStatus:[model selectedChannel]]];
-	[stopChannelButton setEnabled:[model runningStatus:[model selectedChannel]]];
-	[startAllButton setEnabled:(![model runningStatus:0] || ![model runningStatus:1])];
-	[stopAllButton setEnabled:[model runningStatus:0] || [model runningStatus:1]];
+	[startChannelButton setEnabled:![model runningStatus:[model selectedChannel]] && ![model startedFromMainRunControl:[model selectedChannel]]];
+	[stopChannelButton setEnabled:[model runningStatus:[model selectedChannel]]   && ![model startedFromMainRunControl:[model selectedChannel]]];
+	[startAllButton setEnabled:(![model runningStatus:0] || ![model runningStatus:1]) ];
+	[stopAllButton setEnabled:([model runningStatus:0] || [model runningStatus:1]) ];
 }
 
 - (void) selectedChannelChanged:(NSNotification*)aNote
@@ -234,19 +231,32 @@
 	[self runningStatusChanged:nil];
 }
 
+- (void) autoClearChanged:(NSNotification*)aNote
+{
+	[autoClearCB setIntValue:[model autoClear:[model selectedChannel]]];
+}
+
 - (void) lowerDiscriminatorChanged:(NSNotification*)aNote
 {
-	[lowerDiscriminatorField setIntValue:[model lowerDiscriminator:[model selectedChannel]]];
+	int raw = [model lowerDiscriminator:[model selectedChannel]];
+	int n = [model numChannels:[model selectedChannel]];
+	[lowerDiscriminatorField setIntValue:raw*n/16384.];	
+	[lowerDiscriminatorPercentField setFloatValue:raw/16384.];	
 }
 
 - (void) upperDiscriminatorChanged:(NSNotification*)aNote
 {
-	[upperDiscriminatorField setIntValue:[model upperDiscriminator:[model selectedChannel]]];
+	int raw = [model upperDiscriminator:[model selectedChannel]];
+	int n = [model numChannels:[model selectedChannel]];
+	[upperDiscriminatorField setIntValue:raw*n/16384.];
+	[upperDiscriminatorPercentField setFloatValue:raw/16384.];	
 }
 
 - (void) convGainChanged:(NSNotification*)aNote
 {
 	[convGainPopup selectItemAtIndex:[model convGain:[model selectedChannel]]];
+	[self lowerDiscriminatorChanged:nil];
+	[self upperDiscriminatorChanged:nil];
 }
 
 - (void) rtPresetChanged:(NSNotification*)aNote
@@ -330,7 +340,7 @@
 		if(bitSet != [[controlRegMatrix cellWithTag:i] intValue]){
 			[[controlRegMatrix cellWithTag:i] setState:bitSet];
 		}
-	}		
+	}	
 }
 
 - (void) presetCtrlRegChanged:(NSNotification*)aNote
@@ -379,24 +389,53 @@
 	[selectFileButton setEnabled:!locked];
 	[clearAllButton setEnabled:!locked];
 	[loadFpgaButton setEnabled:!locked];
-	[enableChan0CB setEnabled:!locked && !runInProgress];
-	[enableChan1CB setEnabled:!locked && !runInProgress];
-	
+	[runOptionsMatrix setEnabled:!locked && !runInProgress];
+	[autoClearCB setEnabled:!locked && !runInProgress];
+}
+
+- (void) displayFPGAError
+{
+	[checkFPGAField setStringValue:@"Check/Load FPGA"];
 }
 
 #pragma mark •••Actions
 
-- (void) enableChan1Action:(id)sender
+- (IBAction) view0Action:(id)sender
 {
-	[model setEnableChan1:[sender intValue]];	
+	if(![model viewChannel0]){
+		[noDataWarningField setStringValue:@"No Data To Show"];
+	}
+	else [noDataWarningField setStringValue:@""];
+
 }
 
-- (void) enableChan0Action:(id)sender
+- (IBAction) view1Action:(id)sender
 {
-	[model setEnableChan0:[sender intValue]];	
+	if(![model viewChannel1]){
+		[noDataWarningField setStringValue:@"No Data To Show"];
+	}
+	else [noDataWarningField setStringValue:@""];
 }
 
-- (void) selectedChannelAction:(id)sender
+- (IBAction) runOptionsAction:(id)sender
+{
+	int i;
+	unsigned long optionsMask[2] = {0,0};
+	for(i=0;i<2;i++){
+		if([[runOptionsMatrix cellAtRow:0 column:i] intValue]) optionsMask[i] |= kChannelEnabledMask;
+		if([[runOptionsMatrix cellAtRow:1 column:i] intValue]) optionsMask[i] |= kChannelAutoStopMask;
+	}
+	for(i=0;i<2;i++){
+		[model setRunOptions:i withValue:optionsMask[i]];	
+	}
+}
+
+- (IBAction) autoClearAction:(id)sender
+{
+	[model setAutoClear:[model selectedChannel] withValue:[sender intValue]];	
+}
+
+- (IBAction) selectedChannelAction:(id)sender
 {
 	[model setSelectedChannel:[[sender selectedCell] tag]];	
 }
@@ -423,6 +462,7 @@
 		[plotter setNeedsDisplay:YES];
 	}
 	@catch (NSException* localException){
+		[self displayFPGAError];
 		NSLogColor([NSColor redColor],@"MCA927 failed to read spectrum\n");
 		NSLogColor([NSColor redColor],@"%@\n",localException);
 	}
@@ -436,6 +476,7 @@
 		[model startAcquisition:1];	
 	}
 	@catch (NSException* localException){
+		[self displayFPGAError];
 		NSLogColor([NSColor redColor],@"MCA927 failed to start\n");
 		NSLogColor([NSColor redColor],@"%@\n",localException);
 	}
@@ -449,6 +490,7 @@
 		[model stopAcquisition:1];	
 	}
 	@catch (NSException* localException){
+		[self displayFPGAError];
 		NSLogColor([NSColor redColor],@"MCA927 failed to stop\n");
 		NSLogColor([NSColor redColor],@"%@\n",localException);
 	}
@@ -461,6 +503,7 @@
 		[model startAcquisition:[model selectedChannel]];	
 	}
 	@catch (NSException* localException){
+		[self displayFPGAError];
 		NSLogColor([NSColor redColor],@"MCA927 failed to start channel %d\n",[model selectedChannel]);
 		NSLogColor([NSColor redColor],@"%@\n",localException);
 	}
@@ -473,6 +516,7 @@
 		[model stopAcquisition:[model selectedChannel]];	
 	}
 	@catch (NSException* localException){
+		[self displayFPGAError];
 		NSLogColor([NSColor redColor],@"MCA927 failed to stop Channel %d\n",[model selectedChannel]);
 		NSLogColor([NSColor redColor],@"%@\n",localException);
 	}
@@ -515,12 +559,16 @@
 
 - (IBAction) lowerDiscriminatorAction:(id)sender
 {
-	[model setLowerDiscriminator:[model selectedChannel] withValue:[sender intValue]];	
+	int dialogValue = [sender intValue];
+	int n = [model numChannels:[model selectedChannel]];
+	[model setLowerDiscriminator:[model selectedChannel] withValue:dialogValue/(float)n*16384.];	
 }
 
 - (IBAction) upperDiscriminatorAction:(id)sender
 {
-	[model setUpperDiscriminator:[model selectedChannel] withValue:[sender intValue]];	
+	int dialogValue = [sender intValue];
+	int n = [model numChannels:[model selectedChannel]];
+	[model setUpperDiscriminator:[model selectedChannel] withValue:dialogValue/(float)n*16384.];	
 }
 
 - (IBAction) useCustomFileAction:(id)sender
@@ -539,6 +587,7 @@
 		[model report];
 	}
 	@catch (NSException* localException) {
+		[self displayFPGAError];
 		NSLog(@"Report Failed\n");
 		NSLog(@"%@\n",localException);
 	}
@@ -559,6 +608,7 @@
 		}
 	}
 	[model setControlReg:[model selectedChannel] withValue:mask];
+
 }
 
 - (IBAction) presetCtrlRegAction:(id)sender
@@ -668,6 +718,7 @@
 			[plotter setNeedsDisplay:YES];
 		}
 		@catch (NSException* localException){
+			[self displayFPGAError];
 			NSLogColor([NSColor redColor],@"MCA927 failed to clear spectrum\n");
 			NSLogColor([NSColor redColor],@"%@\n",localException);
 		}

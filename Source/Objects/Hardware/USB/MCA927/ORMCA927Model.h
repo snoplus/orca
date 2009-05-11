@@ -27,6 +27,7 @@
 
 @class ORUSBInterface;
 @class ORAlarm;
+@class ORDataSet;
 
 enum {
 	kCtlReg,
@@ -61,6 +62,9 @@ enum {
 #define kEnableRealTimeMask	(0x1<<2)
 #define kEnableOverFlowMask	(0x1<<1)
 
+#define kChannelEnabledMask  (0x1<<0)
+#define kChannelAutoStopMask (0x1<<1)
+
 typedef struct MCA927Registers {
 	NSString*       regName;
 	unsigned long 	addressOffset;
@@ -91,15 +95,19 @@ typedef struct MCA927Registers {
     unsigned long upperDiscriminator[2];
     unsigned long lowerDiscriminator[2];
 	unsigned long spectrum[2][0x3fff];
-    BOOL enableChan0;
-    BOOL enableChan1;
+    unsigned long runOptions[2];
+    BOOL		  autoClear[2];
+	BOOL		  startedFromMainRunControl[2];
+	BOOL		  mainRunIsStopping;
+	ORDataSet*    dataSet;
 }
 
 #pragma mark ***Accessors
-- (BOOL) enableChan1;
-- (void) setEnableChan1:(BOOL)aEnableChan1;
-- (BOOL) enableChan0;
-- (void) setEnableChan0:(BOOL)aEnableChan0;
+- (BOOL) startedFromMainRunControl:(int)index;
+- (BOOL) autoClear:(int)index;
+- (void) setAutoClear:(int)index withValue:(BOOL)aValue;
+- (unsigned long) runOptions:(int)index;
+- (void) setRunOptions:(int)index withValue:(unsigned long)optionMask;
 - (int) selectedChannel;
 - (void) setSelectedChannel:(int)aSelectedChannel;
 - (unsigned long) upperDiscriminator:(int)index;
@@ -149,6 +157,8 @@ typedef struct MCA927Registers {
 - (void) setPresetCtrlReg:(int)index withValue:(unsigned long)aValue;
 - (int) numChannels:(int)index;
 - (const char*) convGainLabel:(int)aValue;
+- (BOOL) viewChannel0;
+- (BOOL) viewChannel1;
 
 #pragma mark ***Comm methods
 //all throw on error
@@ -189,8 +199,7 @@ typedef struct MCA927Registers {
 
 @end
 
-extern NSString* ORMCA927ModelEnableChan1Changed;
-extern NSString* ORMCA927ModelEnableChan0Changed;
+extern NSString* ORMCA927ModelRunOptionsChanged;
 extern NSString* ORMCA927ModelSelectedChannelChanged;
 extern NSString* ORMCA927ModelLowerDiscriminatorChanged;
 extern NSString* ORMCA927ModelUpperDiscriminatorChanged;
@@ -212,5 +221,6 @@ extern NSString* ORMCA927ModelRoiPresetChanged;
 extern NSString* ORMCA927ModelRoiPeakPresetChanged;
 extern NSString* ORMCA927ModelConvGainChanged;
 extern NSString* ORMCA927ModelRunningStatusChanged;
+extern NSString* ORMCA927ModelAutoClearChanged;
 
 

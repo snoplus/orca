@@ -25,9 +25,9 @@
 #import "ORMCA927Model.h"
 #import "ORUSBInterface.h"
 #import "ORDataTypeAssigner.h"
+#import "ORDataSet.h"
 
-NSString* ORMCA927ModelEnableChan1Changed = @"ORMCA927ModelEnableChan1Changed";
-NSString* ORMCA927ModelEnableChan0Changed = @"ORMCA927ModelEnableChan0Changed";
+NSString* ORMCA927ModelRunOptionsChanged	= @"ORMCA927ModelRunOptionsChanged";
 NSString* ORMCA927ModelSelectedChannelChanged = @"ORMCA927ModelSelectedChannelChanged";
 NSString* ORMCA927ModelLiveTimeStatusChanged= @"ORMCA927ModelLiveTimeStatusChanged";
 NSString* ORMCA927ModelRealTimeStatusChanged= @"ORMCA927ModelRealTimeStatusChanged";
@@ -48,6 +48,7 @@ NSString* ORMCA927ModelLowerDiscriminatorChanged	= @"ORMCA927ModelLowerDiscrimin
 NSString* ORMCA927ModelUpperDiscriminatorChanged	= @"ORMCA927ModelUpperDiscriminatorChanged";
 NSString* ORMCA927ModelStatusParamsChanged	= @"ORMCA927ModelStatusParamsChanged";
 NSString* ORMCA927ModelRunningStatusChanged	= @"ORMCA927ModelRunningStatusChanged";
+NSString* ORMCA927ModelAutoClearChanged		= @"ORMCA927ModelAutoClearChanged";
 
 NSString* ORMCA927USBInConnection			= @"ORMCA927USBInConnection";
 NSString* ORMCA927USBNextConnection			= @"ORMCA927USBNextConnection";
@@ -89,6 +90,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (NSData*) fpgaFileData;
 - (void) pollStatus;
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(unsigned long*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(BOOL*)anArray forKey:(NSString*)aKey;
 - (void) ship:(ORDataPacket*)aDataPacket spectra:(int)index;
 @end
 
@@ -131,6 +133,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     [noDriverAlarm clearAlarm];
     [noDriverAlarm release];
     [serialNumber release];
+	[dataSet release];
     [super dealloc];
 }
 
@@ -211,30 +214,41 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 }
 
 #pragma mark ***Accessors
-
-- (BOOL) enableChan1;
+- (BOOL) startedFromMainRunControl:(int)index
 {
-    return enableChan1;
+	if(index>=0 && index<2) return startedFromMainRunControl[index];
+	else return 0;
 }
 
-- (void) setEnableChan1:(BOOL)aEnableChan1
+- (BOOL) autoClear:(int)index
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnableChan1:enableChan1];
-    enableChan1 = aEnableChan1;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelEnableChan1Changed object:self];
+	if(index>=0 && index<2) return autoClear[index];
+	else return 0;
+}
+- (void) setAutoClear:(int)index withValue:(BOOL)aValue
+{
+	if(index>=0 && index<2){
+		[[[self undoManager] prepareWithInvocationTarget:self] setAutoClear:index withValue:autoClear[index]];
+		autoClear[index] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelAutoClearChanged object:self];
+	}
 }
 
-- (BOOL) enableChan0
+- (unsigned long) runOptions:(int)index
 {
-    return enableChan0;
+	if(index>=0 && index<2) return runOptions[index];
+	else return 0;
 }
 
-- (void) setEnableChan0:(BOOL)aEnableChan0
+- (void) setRunOptions:(int)index withValue:(unsigned long)optionMask
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setEnableChan0:enableChan0];
-    enableChan0 = aEnableChan0;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelEnableChan0Changed object:self];
+	if(index>=0 && index<2){
+		[[[self undoManager] prepareWithInvocationTarget:self] setRunOptions:index withValue:runOptions[index]];
+		runOptions[index] = optionMask;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelRunOptionsChanged object:self];
+	}
 }
+
 
 - (int) selectedChannel
 {
@@ -588,25 +602,36 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) startAcquisition:(int)index
 {
-	[self initBoard:index];
-	[self resetMDA];
-	unsigned long mask;
-	mask = controlReg[index];
-	mask |= 0x1;
-	[self writeReg:kCtlReg adc:index value:mask];
-	[self pollStatus];
+	
+	if(!([self readReg:kAcqStatus adc:index]&kStartMask)){
+	
+		[self initBoard:index];
+		[self resetMDA];
+
+		if(autoClear[index]) [self clearSpectrum:index];
+
+		unsigned long mask;
+		mask = controlReg[index];
+		mask |= 0x1;
+		[self writeReg:kCtlReg adc:index value:mask];
+		[self pollStatus];
+	}
+	else NSLog(@"MCA927 Channel %d already running... command to start ignored\n",index);
 }	
 
 - (void) stopAcquisition:(int)index
 {
-	[self writeReg:kStopAcq adc:index value:0x1];
-	[self writeReg:kStopAcq adc:index value:0x0];
-	unsigned long mask;
-	mask = controlReg[index];
-	mask &= ~0x1;
-	[self writeReg:kCtlReg adc:index value:mask];
-	[self pollStatus];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollStatus) object:nil];
+	if(([self readReg:kAcqStatus adc:index]&kStartMask)){
+		[self writeReg:kStopAcq adc:index value:0x1];
+		[self writeReg:kStopAcq adc:index value:0x0];
+		unsigned long mask;
+		mask = controlReg[index];
+		mask &= ~0x1;
+		[self writeReg:kCtlReg adc:index value:mask];
+		[self pollStatus];
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollStatus) object:nil];
+	}
+	else NSLog(@"MCA927 Channel %d not running... command to stop ignored\n",index);
 }	
 
 - (const char*) convGainLabel:(int)aValue
@@ -648,25 +673,12 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[usbInterface writeBytes:aCommand  length:(0x3fff+2)*sizeof(long) pipe:1];
 	long dummy;
 	[usbInterface readBytes:&dummy length:4 pipe:1];
-	
-/*
-	unsigned long aCommand[3];
-	int n = [self numChannels:index];
-	
-	int i;
-	for(i=0;i<n;i++){
-		aCommand[0] =  (index==0?kWriteSpectrum0Cmd+i:kWriteSpectrum1Cmd+i);
-		aCommand[1] = 1;	//number to write
-		aCommand[2] = 0;	//value
-		[usbInterface writeBytes:aCommand  length:3*sizeof(long) pipe:1];
-		long dummy;
-		[usbInterface readBytes:&dummy length:4 pipe:1];
-	}
- */
 }
 
 - (void) readSpectrum:(int)index
 {
+	if(!dataSet)dataSet = [[ORDataSet alloc]initWithKey:@"System" guardian:nil];
+
 	unsigned long aCommand[2];
 	int n = [self numChannels:index];
 	
@@ -674,7 +686,31 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	aCommand[1] = n;	//number to read back
 	[usbInterface writeBytes:aCommand  length:2*sizeof(long) pipe:1];
 	[usbInterface readBytes:&spectrum[index] length:n*sizeof(long)+1 pipe:1];
+
+	[dataSet loadSpectrum:[NSMutableData dataWithBytes:&spectrum[index] length:n*sizeof(long)] 
+					sender:self  
+				  withKeys:@"Spectra",[NSString stringWithFormat:@"Channel%d",index],nil];
 	
+}
+
+- (BOOL) viewChannel0
+{
+	ORDataSet* aDataSet = [dataSet dataSetWithName:@"Spectra,Channel0"];
+	if(aDataSet){
+		[aDataSet doDoubleClick:self];
+		return YES;
+	}
+	else return NO;
+}
+
+- (BOOL) viewChannel1
+{
+	ORDataSet* aDataSet = [dataSet dataSetWithName:@"Spectra,Channel1"];
+	if(aDataSet){
+		[aDataSet doDoubleClick:self];
+		return YES;
+	}
+	else return NO;
 }
 
 - (unsigned long) spectrum:(int)index valueAtChannel:(int)x
@@ -715,6 +751,13 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	NSLogFont(aFont,@"   Aux Counter 1|%17d |%17d\n",[self readReg:kAux1Counter adc:0],[self readReg:kAux1Counter adc:1]);
 	NSLogFont(aFont,@"------------------------------------------------------\n");
 	NSLog(@"Firmware Version: %d\n",[self readReg:kVersion adc:1]);
+	[self setRunningStatus:0 withValue:(aValue0&kStartMask)];
+	[self setRunningStatus:1 withValue:(aValue1&kStartMask)];
+	if((aValue0&kStartMask) || (aValue1&kStartMask)){
+		[self pollStatus];
+	}
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelStatusParamsChanged object:self];
 
 }
 
@@ -865,8 +908,6 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setEnableChan1:[decoder decodeBoolForKey:@"enableChan0"]];
-    [self setEnableChan0:[decoder decodeBoolForKey:@"enableChan0"]];
 	[self setSelectedChannel: [decoder decodeIntForKey:   @"selectedChannel"]];
 	[self setUseCustomFile:	  [decoder decodeBoolForKey:  @"useCustomFile"]];
     [self setFpgaFilePath:	  [decoder decodeObjectForKey:@"fpgaFilePath"]];
@@ -884,6 +925,8 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		[self setConvGain:i withValue:		[decoder decodeInt32ForKey:	   [@"convGain" stringByAppendingFormat:@"%d",i]]];
 		[self setLowerDiscriminator:i withValue:[decoder decodeInt32ForKey:[@"lowerDiscriminator" stringByAppendingFormat:@"%d",i]]];
 		[self setUpperDiscriminator:i withValue:[decoder decodeInt32ForKey:[@"upperDiscriminator" stringByAppendingFormat:@"%d",i]]];
+		[self setRunOptions:i withValue:	[decoder decodeInt32ForKey:    [@"runOptions" stringByAppendingFormat:@"%d",i]]];
+		[self setAutoClear:i withValue:		[decoder decodeBoolForKey:     [@"autoClear" stringByAppendingFormat:@"%d",i]]];
 	}
     [[self undoManager] enableUndoRegistration];    
 	
@@ -893,8 +936,6 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeBool:enableChan1 forKey:@"enableChan10"];
-	[encoder encodeBool:enableChan0 forKey:@"enableChan0"];
 	[encoder encodeInt:selectedChannel	forKey:@"selectedChannel"];
     [encoder encodeBool:useCustomFile	forKey:@"useCustomFile"];
     [encoder encodeObject:fpgaFilePath	forKey:@"fpgaFilePath"];
@@ -911,6 +952,8 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		[encoder encodeInt32:convGain[i] forKey:[@"convGain" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt32:lowerDiscriminator[i] forKey:[@"lowerDiscriminator" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt32:upperDiscriminator[i] forKey:[@"upperDiscriminator" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt32:runOptions[i] forKey:[@"runOptions" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeBool:autoClear[i] forKey:[@"autoClear" stringByAppendingFormat:@"%d",i]];
 	}
 }
 
@@ -918,6 +961,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 {
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	
+	[self addCurrentState:objDictionary cArray:runOptions forKey:@"RunOptions"];
 	[self addCurrentState:objDictionary cArray:liveTime forKey:@"LiveTime"];
 	[self addCurrentState:objDictionary cArray:realTime forKey:@"Debug Mode"];
 	[self addCurrentState:objDictionary cArray:presetCtrlReg forKey:@"PresetCtrlReg"];
@@ -928,7 +972,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[self addCurrentState:objDictionary cArray:convGain forKey:@"ConvGain"];
 	[self addCurrentState:objDictionary cArray:lowerDiscriminator forKey:@"LowerDiscriminator"];
 	[self addCurrentState:objDictionary cArray:upperDiscriminator forKey:@"UpperDiscriminator"];
-	
+	[self addCurrentState:objDictionary boolArray:autoClear forKey:@"AutoClear"];
 	
     return objDictionary;
 }
@@ -970,29 +1014,35 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORMCA927Model"];    
 	//----------------------------------------------------------------------------------------
 	@try {
-		if(enableChan0) [self startAcquisition:0];
-		if(enableChan1) [self startAcquisition:1];
+		mainRunIsStopping = NO;
+		if(runOptions[0] & kChannelEnabledMask) {
+			startedFromMainRunControl[0] = YES;
+			[self startAcquisition:0];
+		}
+		if(runOptions[1] & kChannelEnabledMask){
+			startedFromMainRunControl[1] = YES;
+			[self startAcquisition:1];
+		}
 	}
 	@catch(NSException* localException){
 	}
 }
 
-//**************************************************************************************
-// Function:	TakeData
-// Description: Read data from a card
-//**************************************************************************************
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
+ //nothing to do....
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
 	@try {
-		if(enableChan0)[self stopAcquisition:0];
-		if(enableChan1)[self stopAcquisition:1];
-		if(enableChan0)[self ship:aDataPacket spectra:0];
-		if(enableChan1)[self ship:aDataPacket spectra:1];
+		mainRunIsStopping = YES;
+		startedFromMainRunControl[0] = NO;
+		startedFromMainRunControl[1] = NO;
+		if(runOptions[0] & kChannelEnabledMask)[self stopAcquisition:0];
+		if(runOptions[1] & kChannelEnabledMask)[self stopAcquisition:1];
+		if(runOptions[0] & kChannelEnabledMask)[self ship:aDataPacket spectra:0];
+		if(runOptions[1] & kChannelEnabledMask)[self ship:aDataPacket spectra:1];
 
 	}
 	@catch(NSException* localException){
@@ -1000,9 +1050,11 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 }
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+	//nothing to do....
 }
 - (void) reset
 {
+	//nothing to do....
 }
 
 @end
@@ -1083,7 +1135,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[self setRunningStatus:0 withValue:([self readReg:kAcqStatus adc:0]&kStartMask)];
 	[self setRunningStatus:1 withValue:([self readReg:kAcqStatus adc:1]&kStartMask)];
 	unsigned long isRunning = [self runningStatus:0] || [self runningStatus:1];
-	
+		
 	int i;
 	for(i=0;i<2;i++){
 		//aValue = [self readReg:kAcqStatus adc:i];
@@ -1091,14 +1143,24 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		[self setRealTimeStatus:i withValue:[self readReg:kRealTime adc:i]];
 	}
 	
-	//temp
-	[self readSpectrum:0];
-	[self readSpectrum:1];
+	if([self runningStatus:0])[self readSpectrum:0];
+	if([self runningStatus:1])[self readSpectrum:1];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName: ORMCA927ModelStatusParamsChanged object: self];
 
 	if(isRunning)[self performSelector:@selector(pollStatus) withObject:nil afterDelay:1];
+	if([gOrcaGlobals runInProgress]){
+		int i;
+		for(i=0;i<2;i++){
+			if(![self runningStatus:i] && startedFromMainRunControl[i]){
+				startedFromMainRunControl[i] = NO;
+				if(!mainRunIsStopping)[[NSNotificationCenter defaultCenter] postNotificationName: ORRequestRunStop object: self];
+			}
+		}
+	}
+	
 }
+
 - (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(unsigned long*)anArray forKey:(NSString*)aKey
 {
 	NSMutableArray* ar = [NSMutableArray array];
@@ -1109,6 +1171,15 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	}
 	[dictionary setObject:ar forKey:aKey];
 }
-
+- (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(BOOL*)anArray forKey:(NSString*)aKey
+{
+	NSMutableArray* ar = [NSMutableArray array];
+	int i;
+	for(i=0;i<2;i++){
+		[ar addObject:[NSNumber numberWithBool:*anArray]];
+		anArray++;
+	}
+	[dictionary setObject:ar forKey:aKey];
+}
 
 @end

@@ -39,14 +39,7 @@
 	unsigned long* lPtr = (unsigned long*)[tmpData bytes];
 	int i;
 	//skip the spares
-	ptr++;
-	ptr++;
-	ptr++;
-	ptr++;
-	ptr++;
-	ptr++;
-	ptr++;
-	ptr++;
+	ptr+=8;
 
 	for(i=0;i<length-10;i++){
 		*lPtr++ = *ptr++;
