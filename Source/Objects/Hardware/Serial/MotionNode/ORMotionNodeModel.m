@@ -36,7 +36,7 @@ NSString* ORMotionNodeModelVersionChanged		= @"ORMotionNodeModelVersionChanged";
 NSString* ORMotionNodeModelLock					= @"ORMotionNodeModelLock";
 NSString* ORMotionNodeModelSerialNumberChanged	= @"ORMotionNodeModelSerialNumberChanged";
 
-#define kMotionNodeDriverPath @"/System/Library/Extensions/SiLabsUSBDriver.kext"
+#define kMotionNodeDriverPath @"/System/Library/Extensions/SLAB_USBtoUART.kext"
 #define kMotionNodeAveN 2/(100.+1.)
 
 static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
