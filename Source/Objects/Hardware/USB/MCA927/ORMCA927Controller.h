@@ -47,6 +47,8 @@
 	IBOutlet NSTextField*	lowerDiscriminatorPercentField;
 	IBOutlet NSTextField*	upperDiscriminatorPercentField;
 	IBOutlet NSButton*		autoClearCB;
+	IBOutlet NSPopUpButton* zdtSpeedPU;
+	IBOutlet NSMatrix*		zdtModeMatrix;
 
 	IBOutlet NSButton*		useCustomFileCB;
 	IBOutlet NSTextField*	fpgaFilePathField;
@@ -95,6 +97,7 @@
 - (void) selectedChannelChanged:(NSNotification*)aNote;
 - (void) runningStatusChanged:(NSNotification*)aNote;
 - (void) displayFPGAError;
+- (void) zdtModeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) view0Action:(id)sender;
@@ -120,6 +123,8 @@
 - (IBAction) serialNumberAction:(id)sender;
 - (IBAction) lowerDiscriminatorAction:(id)sender;
 - (IBAction) upperDiscriminatorAction:(id)sender;
+- (IBAction) zdtModeAction:(id)sender;
+- (IBAction) zdtSpeedAction:(id)sender;
 
 - (IBAction) reportAction:(id)sender;
 

@@ -138,7 +138,7 @@
                      selector : @selector(convGainChanged:)
                          name : ORMCA927ModelConvGainChanged
 						object: model];
-
+		
     [notifyCenter addObserver : self
                      selector : @selector(lowerDiscriminatorChanged:)
                          name : ORMCA927ModelLowerDiscriminatorChanged
@@ -168,6 +168,11 @@
                      selector : @selector(autoClearChanged:)
                          name : ORMCA927ModelAutoClearChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(zdtModeChanged:)
+                         name : ORMCA927ModelZdtModeChanged
+						object: model];
 }
 
 - (void) awakeFromNib
@@ -189,7 +194,6 @@
 	[self updateChannelParams];
 	[self runningStatusChanged:nil];
 	[self runOptionsChanged:nil];
-	[self autoClearChanged:nil];
 }
 
 - (void) updateChannelParams
@@ -203,6 +207,8 @@
 	[self roiPresetChanged:nil];
 	[self roiPeakPresetChanged:nil];
 	[self convGainChanged:nil];	
+	[self zdtModeChanged:nil];
+	[self autoClearChanged:nil];
 }
 
 
@@ -234,6 +240,15 @@
 - (void) autoClearChanged:(NSNotification*)aNote
 {
 	[autoClearCB setIntValue:[model autoClear:[model selectedChannel]]];
+}
+
+- (void) zdtModeChanged:(NSNotification*)aNote
+{
+	unsigned long zdtMode = [model zdtMode:[model selectedChannel]];
+	[zdtSpeedPU selectItemWithTag:zdtMode & kZDTSpeedMask];
+	[[zdtModeMatrix cellWithTag:0] setIntValue: (zdtMode & kEnableZDTMask)!=0];
+	[[zdtModeMatrix cellWithTag:1] setIntValue: (zdtMode & kZDTModeMask)!=0];
+	[self lockChanged:nil];
 }
 
 - (void) lowerDiscriminatorChanged:(NSNotification*)aNote
@@ -391,6 +406,9 @@
 	[loadFpgaButton setEnabled:!locked];
 	[runOptionsMatrix setEnabled:!locked && !runInProgress];
 	[autoClearCB setEnabled:!locked && !runInProgress];
+	
+	[zdtModeMatrix setEnabled:!locked];
+	[zdtSpeedPU setEnabled:!locked && ([model zdtMode:[model selectedChannel]] & kEnableZDTMask)!=0];
 }
 
 - (void) displayFPGAError
@@ -459,6 +477,8 @@
 	@try {
 		[model readSpectrum:0];	
 		[model readSpectrum:1];	
+		if([model zdtMode:0] & kEnableZDTMask) [model readZDT:0];	
+		if([model zdtMode:1] & kEnableZDTMask) [model readZDT:1];	
 		[plotter setNeedsDisplay:YES];
 	}
 	@catch (NSException* localException){
@@ -571,6 +591,23 @@
 	[model setUpperDiscriminator:[model selectedChannel] withValue:dialogValue/(float)n*16384.];	
 }
 
+- (IBAction) zdtModeAction:(id)sender
+{
+	unsigned long aValue = [model zdtMode:[model selectedChannel]];
+	aValue &= ~kZDTMask;
+	if([[sender cellWithTag:0] intValue]) aValue |= kEnableZDTMask;
+	if([[sender cellWithTag:1] intValue]) aValue |= kZDTModeMask;
+	[model setZdtMode:[model selectedChannel] withValue:aValue];	
+}
+	 
+ - (IBAction) zdtSpeedAction:(id)sender
+{
+	unsigned long aValue = [model zdtMode:[model selectedChannel]];
+	aValue &= ~kZDTSpeedMask;
+	aValue |= [[sender selectedItem] tag];
+	[model setZdtMode:[model selectedChannel] withValue:aValue];	
+}
+
 - (IBAction) useCustomFileAction:(id)sender
 {
 	[model setUseCustomFile:[sender intValue]];	
@@ -680,12 +717,23 @@
 
 - (int)	numberOfDataSetsInPlot:(id)aPlotter
 {
-    return 2;
+    return 4;
 }
 
 - (int)	numberOfPointsInPlot:(id)aPlotter dataSet:(int)set
 {
-    return [model numChannels:set];
+	if(set == 0 || set == 1)return [model numChannels:set];
+	else {
+		if(set==2){
+			if([model zdtMode:0] & kEnableZDTMask)return [model numChannels:set];
+			else return 0;
+		}
+		else if(set == 3){
+			if([model zdtMode:1] & kEnableZDTMask)return [model numChannels:set];
+			else return 0;
+		}
+	}
+	return 0;
 }
 
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x

@@ -49,6 +49,7 @@ NSString* ORMCA927ModelUpperDiscriminatorChanged	= @"ORMCA927ModelUpperDiscrimin
 NSString* ORMCA927ModelStatusParamsChanged	= @"ORMCA927ModelStatusParamsChanged";
 NSString* ORMCA927ModelRunningStatusChanged	= @"ORMCA927ModelRunningStatusChanged";
 NSString* ORMCA927ModelAutoClearChanged		= @"ORMCA927ModelAutoClearChanged";
+NSString* ORMCA927ModelZdtModeChanged		= @"ORMCA927ModelZdtModeChanged";
 
 NSString* ORMCA927USBInConnection			= @"ORMCA927USBInConnection";
 NSString* ORMCA927USBNextConnection			= @"ORMCA927USBNextConnection";
@@ -76,6 +77,8 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 #define kReadSpectrum0Cmd		0x00000000
 #define kReadSpectrum1Cmd		0x00008000
+#define kReadZDT0Cmd			0x00004000
+#define kReadZDT1Cmd			0x00010000
 #define kWriteSpectrum0Cmd		((1L<<24) | 0x00000000)
 #define kWriteSpectrum1Cmd		((1L<<24) | 0x00008000)
 #define kReadZDTSpectrum0Cmd	0x00004000
@@ -291,6 +294,21 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		[[[self undoManager] prepareWithInvocationTarget:self] setLowerDiscriminator:index withValue:lowerDiscriminator[index]];
 		lowerDiscriminator[index] = aValue;
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelLowerDiscriminatorChanged object:self];
+	}
+}
+- (unsigned long) zdtMode:(int)index
+{
+	if(index>=0 && index<2) return zdtMode[index];
+	else return 0;
+}
+
+- (void) setZdtMode:(int)index withValue:(unsigned long)aValue
+{
+	if(index>=0 && index<2){
+		if(aValue>0x3fff)aValue = 0x3fff;
+		[[[self undoManager] prepareWithInvocationTarget:self] setZdtMode:index withValue:zdtMode[index]];
+		zdtMode[index] = aValue;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelZdtModeChanged object:self];
 	}
 }
 
@@ -608,8 +626,10 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		[self initBoard:index];
 		[self resetMDA];
 
-		if(autoClear[index]) [self clearSpectrum:index];
-
+		if(autoClear[index]) {
+			[self clearSpectrum:index];
+			[self clearZDT:index];
+		}
 		unsigned long mask;
 		mask = controlReg[index];
 		mask |= 0x1;
@@ -675,6 +695,21 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[usbInterface readBytes:&dummy length:4 pipe:1];
 }
 
+- (void) clearZDT:(int)index
+{
+	unsigned long aCommand[0x3fff+2];
+	aCommand[0] =  (index==0?0x04008000:0x0400C000);
+	aCommand[1] = 0x3fff;	//number to write
+	int i;
+	for(i=0;i<0x3fff;i++){
+		aCommand[2+i] = 0;	//value
+	}
+	[usbInterface writeBytes:aCommand  length:(0x3fff+2)*sizeof(long) pipe:1];
+	long dummy;
+	[usbInterface readBytes:&dummy length:4 pipe:1];
+}
+
+
 - (void) readSpectrum:(int)index
 {
 	if(!dataSet)dataSet = [[ORDataSet alloc]initWithKey:@"System" guardian:nil];
@@ -692,6 +727,25 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 				  withKeys:@"Spectra",[NSString stringWithFormat:@"Channel%d",index],nil];
 	
 }
+
+- (void) readZDT:(int)index
+{
+	if(!dataSet)dataSet = [[ORDataSet alloc]initWithKey:@"System" guardian:nil];
+	
+	unsigned long aCommand[2];
+	int n = [self numChannels:index];
+	
+	aCommand[0] =  index==0?kReadZDT0Cmd:kReadZDT1Cmd;
+	aCommand[1] = n;	//number to read back
+	[usbInterface writeBytes:aCommand  length:2*sizeof(long) pipe:1];
+	[usbInterface readBytes:&spectrum[index+2] length:n*sizeof(long)+1 pipe:1];
+	
+	[dataSet loadSpectrum:[NSMutableData dataWithBytes:&spectrum[index+2] length:n*sizeof(long)] 
+				   sender:self  
+				 withKeys:@"ZDTSpectra",[NSString stringWithFormat:@"Channel%d",index],nil];
+	
+}
+
 
 - (BOOL) viewChannel0
 {
@@ -764,7 +818,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void) initBoard:(int)i
 {
 	[self loadDiscriminators:i];
-	[self writeReg:kZDTMode adc:i value:0x0];
+	[self writeReg:kZDTMode adc:i value:0];
 	[self writeReg:kPresetCtl adc:i value:presetCtrlReg[i]];
 	[self writeReg:kConvGain adc:i value:convGain[i]];
 	[self writeReg:kLtPreset adc:i value:ltPreset[i]];
@@ -927,6 +981,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		[self setUpperDiscriminator:i withValue:[decoder decodeInt32ForKey:[@"upperDiscriminator" stringByAppendingFormat:@"%d",i]]];
 		[self setRunOptions:i withValue:	[decoder decodeInt32ForKey:    [@"runOptions" stringByAppendingFormat:@"%d",i]]];
 		[self setAutoClear:i withValue:		[decoder decodeBoolForKey:     [@"autoClear" stringByAppendingFormat:@"%d",i]]];
+		[self setZdtMode:i withValue:		[decoder decodeInt32ForKey:	   [@"zdtMode" stringByAppendingFormat:@"%d",i]]];
 	}
     [[self undoManager] enableUndoRegistration];    
 	
@@ -954,6 +1009,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		[encoder encodeInt32:upperDiscriminator[i] forKey:[@"upperDiscriminator" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt32:runOptions[i] forKey:[@"runOptions" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeBool:autoClear[i] forKey:[@"autoClear" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInt32:zdtMode[i] forKey:[@"zdtMode" stringByAppendingFormat:@"%d",i]];
 	}
 }
 
@@ -973,6 +1029,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[self addCurrentState:objDictionary cArray:lowerDiscriminator forKey:@"LowerDiscriminator"];
 	[self addCurrentState:objDictionary cArray:upperDiscriminator forKey:@"UpperDiscriminator"];
 	[self addCurrentState:objDictionary boolArray:autoClear forKey:@"AutoClear"];
+	[self addCurrentState:objDictionary cArray:zdtMode forKey:@"ZdtMode"];
 	
     return objDictionary;
 }
@@ -1003,7 +1060,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 								 [NSNumber numberWithBool:YES],     @"variable",
 								 [NSNumber numberWithLong:-1],		@"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"Spectra"];
+    [dataDictionary setObject:aDictionary forKey:@"Spectrum"];
     
     return dataDictionary;
 }
@@ -1041,8 +1098,14 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		startedFromMainRunControl[1] = NO;
 		if(runOptions[0] & kChannelEnabledMask)[self stopAcquisition:0];
 		if(runOptions[1] & kChannelEnabledMask)[self stopAcquisition:1];
-		if(runOptions[0] & kChannelEnabledMask)[self ship:aDataPacket spectra:0];
-		if(runOptions[1] & kChannelEnabledMask)[self ship:aDataPacket spectra:1];
+		if(runOptions[0] & kChannelEnabledMask){
+			[self ship:aDataPacket spectra:0];
+			if(zdtMode[0] & kEnableZDTMask)[self ship:aDataPacket spectra:2];
+		}
+		if(runOptions[1] & kChannelEnabledMask){
+			[self ship:aDataPacket spectra:1];
+			if(zdtMode[1] & kEnableZDTMask)[self ship:aDataPacket spectra:3];
+		}
 
 	}
 	@catch(NSException* localException){
@@ -1064,15 +1127,22 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) ship:(ORDataPacket*)aDataPacket spectra:(int)index
 {
+	int chan = index;
+	int zdt = 0;
+	if(chan>=2){
+		chan = chan-2;
+		zdt  = 1;
+	}
+	
 	int numLongsInSpectrum = [self numChannels:index];
 	int numLongsInHeader = 10;
 	NSMutableData* dataBlock = [NSMutableData dataWithLength: (numLongsInSpectrum + numLongsInHeader)*sizeof(long)];
 	unsigned long* data = (unsigned long*)[dataBlock bytes];
 	data[0] = dataId | (numLongsInSpectrum + numLongsInHeader);
-	data[1] = (index<<12) | [self uniqueIdNumber]&0xfff;
+	data[1] = (zdt<<13) | (chan<<12) | [self uniqueIdNumber]&0xfff;
 	data[2] = [self liveTimeStatus:index];
 	data[3] = [self realTimeStatus:index];
-	data[4] = 0; //spare
+	data[4] = [self zdtMode:index];
 	data[5] = 0; //spare
 	data[6] = 0; //spare
 	data[7] = 0; //spare
@@ -1145,6 +1215,8 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	
 	if([self runningStatus:0])[self readSpectrum:0];
 	if([self runningStatus:1])[self readSpectrum:1];
+	if([self runningStatus:0] && ([self zdtMode:0] & kEnableZDTMask))[self readZDT:0];
+	if([self runningStatus:1] && ([self zdtMode:1] & kEnableZDTMask))[self readZDT:1];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName: ORMCA927ModelStatusParamsChanged object: self];
 

@@ -65,6 +65,11 @@ enum {
 #define kChannelEnabledMask  (0x1<<0)
 #define kChannelAutoStopMask (0x1<<1)
 
+#define kZDTMask			(0x3<<4)
+#define kEnableZDTMask		(0x1<<4)
+#define kZDTModeMask		(0x1<<5)
+#define kZDTSpeedMask		0xf
+
 typedef struct MCA927Registers {
 	NSString*       regName;
 	unsigned long 	addressOffset;
@@ -94,7 +99,8 @@ typedef struct MCA927Registers {
     unsigned long convGain[2];
     unsigned long upperDiscriminator[2];
     unsigned long lowerDiscriminator[2];
-	unsigned long spectrum[2][0x3fff];
+    unsigned long zdtMode[2];
+	unsigned long spectrum[4][0x3fff];
     unsigned long runOptions[2];
     BOOL		  autoClear[2];
 	BOOL		  startedFromMainRunControl[2];
@@ -114,6 +120,8 @@ typedef struct MCA927Registers {
 - (void) setUpperDiscriminator:(int)index withValue:(unsigned long)aValue;
 - (unsigned long) lowerDiscriminator:(int)index;
 - (void) setLowerDiscriminator:(int)index withValue:(unsigned long)aValue;
+- (unsigned long) zdtMode:(int)index;
+- (void) setZdtMode:(int)index withValue:(unsigned long)aValue;
 - (BOOL) runningStatus:(int)index;
 - (void) setRunningStatus:(int)index withValue:(BOOL)aValue;
 
@@ -181,7 +189,9 @@ typedef struct MCA927Registers {
 - (void) stopAcquisition:(int)index;
 - (void) loadDiscriminators:(int) index;
 - (void) clearSpectrum:(int)index;
+- (void) clearZDT:(int)index;
 - (void) readSpectrum:(int)index;
+- (void) readZDT:(int)index;
 
 #pragma mark •••Data Taker
 - (unsigned long) dataId;
@@ -222,5 +232,6 @@ extern NSString* ORMCA927ModelRoiPeakPresetChanged;
 extern NSString* ORMCA927ModelConvGainChanged;
 extern NSString* ORMCA927ModelRunningStatusChanged;
 extern NSString* ORMCA927ModelAutoClearChanged;
+extern NSString* ORMCA927ModelZdtModeChanged;
 
 
