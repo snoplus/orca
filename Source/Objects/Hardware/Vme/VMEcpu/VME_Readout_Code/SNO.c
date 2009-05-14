@@ -421,8 +421,8 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 	uint32_t xl2_control_status_reg		= p->xl2_control_status_reg;
 	uint32_t xl2_xilinx_user_control	= p->xl2_xilinx_user_control;
 	uint32_t selectBits			= p->selectBits;
-	uint32_t xl2_select_xl2			= 0x00020000UL;
-	uint32_t xl2_xlpermit			= 0x000000A0UL;
+	uint32_t xl2_select_xl2			= p->xl2_select_xl2;
+	uint32_t xl2_xlpermit			= p->xl2_xlpermit;
 	uint32_t xl2_enable_dp			= 0x00000008UL;
 	uint32_t xl2_disable_dp			= 0x00000004UL;
 	uint32_t xl2_control_bit11		= 0x00000800UL;
@@ -439,8 +439,8 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 	uint8_t  finalStatus = 0; //assume failure
 
 	// these have to be adjustable and crate dependent
-	uint theRegDelay = 200000;   //the coarse delay for register settings in us
-	double theXilinxDelay = 50;  //the fine delay in between the XilinX bits in us
+	uint theRegDelay = 500;   //the coarse delay for register settings in us
+	double theXilinxDelay = 10;  //the fine delay in between the XilinX bits in us
 
 	//const double ticks_to_nsec = 1000 / parse_cpu_freq();
 	const double nsec_to_ticks = parse_cpu_freq() / 1000;
@@ -483,7 +483,7 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 		result = write_device(device, (char*)(&selectBits), 4, xl2_select_reg);
 		if(result!=4) FATAL_ERROR(3,"Write Error: select xl2")
 
-		usleep(theRegDelay);	//200 ms
+		//usleep(theRegDelay);	//200 ms
 		
 		// now tell the fecs we are going to load xilinx
 		// now toggle this on the MB and turn on the XL2 xilinx load permission bit
@@ -493,7 +493,7 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 		result = write_device(device, (char*)(&writeValue), 4, xl2_xilinx_user_control);
 		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_xlpermit | xl2_enable_dp")	
 		
-		usleep(theRegDelay);	//200 ms
+		//usleep(theRegDelay);	//200 ms
 		
 		// turn off the DP bit but keep the permission 
 		writeValue = xl2_xlpermit | xl2_disable_dp;
@@ -507,7 +507,7 @@ void loadXL2Xilinx_penn(SBC_Packet* aPacket)
 		result = write_device(device, (char*)(&writeValue), 4, xl2_control_status_reg);
 		if(result!=4) FATAL_ERROR(3,"Write Error: xl2_control_bit11 | xl2_control_clock")
 		
-		usleep(theRegDelay);	//200 ms
+		//usleep(theRegDelay);	//200 ms
 			
 		uint32_t i;
 		for (i = 1;i < index;i++){

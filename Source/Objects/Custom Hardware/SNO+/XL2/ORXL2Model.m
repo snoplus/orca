@@ -383,6 +383,9 @@ unsigned long xl2_register_offsets[] =
 			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: XL2_CONTROL_CRATE_RESET];
 			[self writeToXL2Register:XL2_CONTROL_STATUS_REG value: 0UL];
 		}
+
+		[self deselectCards];
+		
 	}
 	@catch(NSException* localException) {
 		NSLog(@"Failure during reset of XL2 Crate %d Slot %d.\n", [self crateNumber], [self stationNumber]);
@@ -400,7 +403,7 @@ unsigned long xl2_register_offsets[] =
 {
 	NSData* theData = [[self xl1] clockFileData];	// load the entire content of the file
 	if([self adapterIsSBC])	[self loadClocksUsingSBC:theData];
-	else					[self loadClocksUsingLocalAdapter:theData];
+	else			[self loadClocksUsingLocalAdapter:theData];
 }
 
 - (void) loadTheXilinx:(unsigned long) selectBits
@@ -469,6 +472,7 @@ unsigned long xl2_register_offsets[] =
 	payloadPtr->addressModifier				= [self addressModifier];
 	payloadPtr->selectBits					= selectBits | XL2_SELECT_XL2;
 	payloadPtr->xl2_select_reg				= [self xl2RegAddress:XL2_SELECT_REG];
+	NSLog(@"sending the xilinx file to reg: 0x%08x selectBits: 0x%08x\n", payloadPtr->xl2_select_reg, payloadPtr->selectBits);
 	payloadPtr->xl2_control_status_reg		= [self xl2RegAddress:XL2_CONTROL_STATUS_REG];
 	payloadPtr->xl2_xilinx_user_control		= [self xl2RegAddress:XL2_XILINX_USER_CONTROL];
 	payloadPtr->xl2_select_xl2				= XL2_SELECT_XL2;
@@ -532,7 +536,8 @@ unsigned long xl2_register_offsets[] =
 		selectOK = YES;
 		
 		// Enable master clock 
-		[self writeToXL2Register:XL2_CLOCK_CS_REG value:XL2_MASTER_CLK_EN];
+//		[self writeToXL2Register:XL2_CLOCK_CS_REG value:XL2_MASTER_CLK_EN];
+		[self writeHardwareRegister:[self xl2RegAddress:XL2_CLOCK_CS_REG] value:XL2_MASTER_CLK_EN];
 		
 		int j;
 		for(j = 1; j<=3; j++){			// there are three clocks, Memory, Sequencer and ADC
@@ -556,12 +561,14 @@ unsigned long xl2_register_offsets[] =
 					}
 					charData++;
 					
-					[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+					//[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+					[self writeHardwareRegister:[self xl2RegAddress:XL2_CLOCK_CS_REG] value:writeValue];
 					
 					if (theOffset == 0)	writeValue += 1;
 					else				writeValue |= (1UL << theOffset);
 					
-					[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+					//[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+					[self writeHardwareRegister:[self xl2RegAddress:XL2_CLOCK_CS_REG] value:writeValue];
 					
 				}
 				
@@ -572,7 +579,8 @@ unsigned long xl2_register_offsets[] =
 		
 		// keep the master clock enabled and enable all three clocks
 		writeValue = XL2_MASTER_CLK_EN | XL2_MEMORY_CLK_EN | XL2_SEQUENCER_CLK_EN | XL2_ADC_CLK_EN;	
-		[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+		//[self writeToXL2Register:XL2_CLOCK_CS_REG value:writeValue];
+		[self writeHardwareRegister:[self xl2RegAddress:XL2_CLOCK_CS_REG] value:writeValue];
 		
 		[self deselectCards];
 		NSLog(@"loaded the clock file\n");
@@ -633,7 +641,8 @@ unsigned long xl2_register_offsets[] =
 		// make sure that the XL2 DP bit is set low and bit 11 (xilinx active) is high -- 
 		// this is not yet sent to the MB
 		writeValue = XL2_CONTROL_BIT11;	
-		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
+		//[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
+		[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue];
 		
 		// This seems to fix the xilinx reprogramming problem with the Power PC
 		[ORTimer delay:.200];   // doubled MAH 01/18/00
@@ -644,18 +653,21 @@ unsigned long xl2_register_offsets[] =
 		// of the select bits in register zero!!!!		
 		// !!! the next write resets the selectBits !!! to be corrected...
 		writeValue = XL2_XLPERMIT | XL2_ENABLE_DP;
-		[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
+		[self writeHardwareRegister:[self xl2RegAddress:XL2_XILINX_USER_CONTROL] value:writeValue];
+		//[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
 		//		Wait(100);   // 100 msec delay  QRA 1/18/98
 		// This seems to fix the xilinx reprogramming problem with the Power PC
 		[ORTimer delay:.200];   // doubled MAH 01/18/00
 		
 		// turn off the DP bit but keep 
 		writeValue = XL2_XLPERMIT | XL2_DISABLE_DP;
-		[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
+		//[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
+		[self writeHardwareRegister:[self xl2RegAddress:XL2_XILINX_USER_CONTROL] value:writeValue];
 		
 		// set  bit 11 high, bit 10 high
 		writeValue = XL2_CONTROL_BIT11 | XL2_CONTROL_CLOCK;
-		[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
+		//[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue];
+		[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue];
 		
 		[ORTimer delay:.200];   // doubled MAH 01/18/00
 		
@@ -701,11 +713,13 @@ unsigned long xl2_register_offsets[] =
 				}
 				charData++;	
 				
-				[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue | XL2_CONTROL_CLOCK];	// changed PMT 1/17/98 to match Penn code
+				//[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue | XL2_CONTROL_CLOCK];	// changed PMT 1/17/98 to match Penn code
+				[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue | XL2_CONTROL_CLOCK];
 				[ORTimer delayNanoseconds:theDelay];
 				
 				// toggle clock high
-				[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue]; // changed PMT 1/17/98 to match Penn code
+				//[self writeToXL2Register:XL2_CONTROL_STATUS_REG value:writeValue]; // changed PMT 1/17/98 to match Penn code
+				[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue];
 				[ORTimer delayNanoseconds:theDelay];
 			}
 		}
@@ -716,7 +730,8 @@ unsigned long xl2_register_offsets[] =
 		// system now works. Why this should make any diferrence is a puzzle. 
 		// More Changes, RGV, PW : turn off XLPERMIT & clear this register
 		writeValue = 0UL;
-		[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
+		//[self writeToXL2Register:XL2_XILINX_USER_CONTROL value:writeValue];
+		[self writeHardwareRegister:[self xl2RegAddress:XL2_CONTROL_STATUS_REG] value:writeValue];
 		
 		[ORTimer delay:.200];// added MAH 01/18/00
 		

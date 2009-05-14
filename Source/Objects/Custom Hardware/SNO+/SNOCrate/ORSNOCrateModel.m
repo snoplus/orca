@@ -367,7 +367,10 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 			[self loadClocks];
 
 			// don't load the Xilinx if this crate is supplying voltage
-			if (loadTheFEC32XilinxFile) [self loadXilinx];
+			if (loadTheFEC32XilinxFile) {
+				[self loadXilinx];
+				if(![[self xl2] adapterIsSBC]) phase = 1;
+			}
 			else phase = 1;
 		}
 
@@ -416,13 +419,14 @@ NSString* ORSNOCrateSlotChanged = @"ORSNOCrateSlotChanged";
 	}
 		
 	[[self xl2] loadTheXilinx:selectBits];
+	
 }
 
 - (void) initFec32Cards
 {
 	NSMutableArray* slotList = [NSMutableArray arrayWithCapacity:16];
 	ORFec32Model* proxyFec32;
-
+		
 	if (autoInit) {
 		// will be replaced with the config data
 		int i;
