@@ -127,10 +127,11 @@
 - (void) getMotorCurrent;
 - (void) getPressure;	
 - (void) getUnitName;
+- (void) getStandby;
 - (void) updateAll;
-
 - (void) sendMotorPower:(BOOL)aState;
 - (void) sendStationPower:(BOOL)aState;
+- (void) sendStandby:(BOOL)aState;
 - (void) sendTmpRotSet:(int)aValue;
 - (void) turnStationOn;
 - (void) turnStationOff;

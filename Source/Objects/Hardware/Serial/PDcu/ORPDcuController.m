@@ -58,7 +58,7 @@
     [[plotter xScale] setRngLow:0.0 withHigh:10000];
 	[[plotter xScale] setRngLimitsLow:0.0 withHigh:200000. withMinRng:200];
 	[super awakeFromNib];	
-	[model getPressure];
+	//[model getPressure];
 }
 
 #pragma mark •••Notifications
@@ -102,12 +102,7 @@
                      selector : @selector(turboOverTempChanged:)
                          name : ORPDcuTurboOverTempChanged
 						object: model];
-	
-	[notifyCenter addObserver : self
-                     selector : @selector(driveOverTempChanged:)
-                         name : ORPDcuTurboOverTempChanged
-						object: model];
-	
+		
 	[notifyCenter addObserver : self
                      selector : @selector(oilDeficiencyChanged:)
                          name : ORPDcuOilDeficiencyChanged
@@ -354,13 +349,13 @@
 	
 	[serialPortController updateButtons:locked];
 	
-    [stationOnButton setEnabled:!locked && portOpen && !stationOn];
-    [stationOffButton setEnabled:!locked && portOpen && stationOn];
+    //[stationOnButton setEnabled:!locked && portOpen && !stationOn];
+   // [stationOffButton setEnabled:!locked && portOpen && stationOn];
 	[tmpRotSetField setEnabled:!locked && portOpen];
     [updateButton setEnabled:portOpen];
 
     [pollTimePopup setEnabled:!locked && portOpen];
-	[initButton  setEnabled:!locked && portOpen && stationOn];
+	//[initButton  setEnabled:!locked && portOpen && stationOn];
 }
 
 - (void) pollTimeChanged:(NSNotification*)aNotification

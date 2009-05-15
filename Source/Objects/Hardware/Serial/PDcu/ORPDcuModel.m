@@ -62,8 +62,10 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 #define kMotorCurrent	310
 #define kPressure		340
 #define kUnitName		350
+#define kStandby		2
 #define kStationPower	10
 #define kMotorPower		23
+#define kRemoteOps		28
 
 @interface ORPDcuModel (private)
 - (NSString*) formatExp:(float)aFloat;
@@ -330,12 +332,12 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 
 - (void) setDeviceAddress:(int)aDeviceAddress
 {
-	if(aDeviceAddress<1)aDeviceAddress = 1;
-	else if(aDeviceAddress>255)aDeviceAddress= 255;
+	//if(aDeviceAddress<1)aDeviceAddress = 1;
+	//else if(aDeviceAddress>255)aDeviceAddress= 255;
 	
     [[[self undoManager] prepareWithInvocationTarget:self] setDeviceAddress:deviceAddress];
 	if([serialPort isOpen]){
-		[self sendDataSet:kDeviceAddress integer:aDeviceAddress];
+		//[self sendDataSet:kDeviceAddress integer:aDeviceAddress];
 	}
     deviceAddress = aDeviceAddress;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPDcuModelDeviceAddressChanged object:self];
@@ -361,8 +363,6 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 		[serialPort setDataBits:8];
         [serialPort open];
 		[serialPort setDelegate:self];
-		[self sendDataSet:kDeviceAddress integer:deviceAddress];
-		[self getUnitName];
     }
     else {
 		[serialPort close];
@@ -416,6 +416,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) getPressure		{ [self sendDataRequest:kPressure]; }
 - (void) getMotorPower		{ [self sendDataRequest:kMotorPower]; }
 - (void) getStationPower	{ [self sendDataRequest:kStationPower]; }
+- (void) getStandby			{ [self sendDataRequest:kStandby]; }
 - (void) getUnitName		{ [self sendDataRequest:kUnitName]; }
 
 - (void) updateAll
@@ -435,7 +436,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 
 - (void) sendTmpRotSet:(int)aValue
 {
-	[self sendDataSet:kTMPRotSet integer:aValue];
+	[self sendDataSet:kTMPRotSet real:aValue];
 }
 
 - (void) sendMotorPower:(BOOL)aState
@@ -448,16 +449,23 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	[self sendDataSet:kStationPower bool:aState];
 }
 
+- (void) sendStandby:(BOOL)aState
+{
+	[self sendDataSet:kStandby bool:aState];
+}
+
 - (void) turnStationOn
 {
-	[self sendMotorPower:YES];
+	[self sendStandby:YES];
 	[self sendStationPower:YES];
+	[self sendMotorPower:YES];
 }
 
 - (void) turnStationOff
 {
 	[self sendMotorPower:NO];
 	[self sendStationPower:NO];
+	[self sendStandby:NO];
 }
 
 #pragma mark •••Commands
@@ -500,35 +508,35 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 {
 	NSString* trueString = @"111111";
 	NSString* falseString = @"000000";
-	NSString* cmdString = [NSString stringWithFormat:@"%03d00%03d06%@",deviceAddress,aParamNum,aState?trueString:falseString];
+	NSString* cmdString = [NSString stringWithFormat:@"%03d10%03d06%@",deviceAddress,aParamNum,aState?trueString:falseString];
 	cmdString = [cmdString stringByAppendingFormat:@"%03d\r",[self checkSum:cmdString]];
 	[self enqueCmdString:cmdString];
 }
 
 - (void) sendDataSet:(int)aParamNum integer:(unsigned int)anInt 
 {
-	NSString* cmdString = [NSString stringWithFormat:@"%03d00%03d06%06u",deviceAddress,aParamNum,anInt];
+	NSString* cmdString = [NSString stringWithFormat:@"%03d10%03d06%06u",deviceAddress,aParamNum,anInt];
 	cmdString = [cmdString stringByAppendingFormat:@"%03d\r",[self checkSum:cmdString]];
 	[self enqueCmdString:cmdString];
 }
 
 - (void) sendDataSet:(int)aParamNum real:(float)aFloat 
 {
-	NSString* cmdString = [NSString stringWithFormat:@"%03d00%03d06%06.2f",deviceAddress,aParamNum,aFloat];
+	NSString* cmdString = [NSString stringWithFormat:@"%03d10%03d06%06d",deviceAddress,aParamNum,(int)(aFloat*100)];
 	cmdString = [cmdString stringByAppendingFormat:@"%03d\r",[self checkSum:cmdString]];
 	[self enqueCmdString:cmdString];
 }
 
 - (void) sendDataSet:(int)aParamNum expo:(float)aFloat 
 {
-	NSString* cmdString = [NSString stringWithFormat:@"%03d00%03d06%@",deviceAddress,aParamNum,[self formatExp:aFloat]];
+	NSString* cmdString = [NSString stringWithFormat:@"%03d10%03d06%@",deviceAddress,aParamNum,[self formatExp:aFloat]];
 	cmdString = [cmdString stringByAppendingFormat:@"%03d\r",[self checkSum:cmdString]];
 	[self enqueCmdString:cmdString];
 }
 
 - (void) sendDataSet:(int)aParamNum shortInteger:(unsigned short)aShort 
 {
-	NSString* cmdString = [NSString stringWithFormat:@"%03d00%03d03%03u",deviceAddress,aParamNum,aShort];
+	NSString* cmdString = [NSString stringWithFormat:@"%03d10%03d03%03u",deviceAddress,aParamNum,aShort];
 	cmdString = [cmdString stringByAppendingFormat:@"%03d\r",[self checkSum:cmdString]];
 	[self enqueCmdString:cmdString];
 }
@@ -586,9 +594,12 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 			[cmd appendBytes:p length:1];
 			if(*p == '\r'){
 				NSString* s = [[[NSString alloc] initWithData:cmd encoding:NSASCIIStringEncoding] autorelease];
-				[self processReceivedString:s];
 				numCharsProcessed += [cmd length];
 				[cmd setLength:0];
+				if([s rangeOfString:@"=?"].location == NSNotFound){
+					NSLog(@"received: %@\n",s);
+					[self processReceivedString:s];
+				}
 			}
 			p++;
 		}
@@ -654,6 +665,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	if([cmdQueue count] == 0) return;
 	NSString* cmdString = [cmdQueue dequeue];
 	[self setLastRequest:cmdString];
+	NSLog(@"send: %@\n",cmdString);
 	[serialPort writeDataInBackground:[cmdString dataUsingEncoding:NSASCIIStringEncoding]];
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:.3];
 }
@@ -700,12 +712,12 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	//double check that the device address matches.
 	int anAddress = [[aCommand substringToIndex:3] intValue];
 	if(anAddress == deviceAddress){
-		int receivedParam = [[lastRequest substringWithRange:NSMakeRange(5,3)] intValue];
+		int receivedParam = [[aCommand substringWithRange:NSMakeRange(5,3)] intValue];
 		[self decode:receivedParam command:aCommand];
 		
 		if(lastRequest){
 			//if the param number matches the last cmd sent, then assume a match and remove the timeout
-			int lastParam	  = [[aCommand    substringWithRange:NSMakeRange(5,3)] intValue];
+			int lastParam	  = [[lastRequest    substringWithRange:NSMakeRange(5,3)] intValue];
 			if(receivedParam == lastParam){
 				[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 				[self setLastRequest:nil];			 //clear the last request
@@ -715,6 +727,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	}
 	
 	if(doNextCommand){
+		[ORTimer delay:.1];
 		[self processOneCommandFromQueue];	 //do the next command in the queue
 	}
 }

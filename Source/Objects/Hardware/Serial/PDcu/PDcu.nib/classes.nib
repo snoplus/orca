@@ -40,7 +40,7 @@
 				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>OrcaObjectController</string>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
