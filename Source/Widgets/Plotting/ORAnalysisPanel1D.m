@@ -75,7 +75,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[fitFunction release];
-    [analysisView removeFromSuperview];
+    //[analysisView removeFromSuperview];
     [super dealloc];
 }
 
