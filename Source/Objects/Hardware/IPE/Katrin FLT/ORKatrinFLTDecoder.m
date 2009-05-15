@@ -742,12 +742,18 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx offsetEMin
             sumEvents += *(ptr+i);
         }
         unsigned long energy;
-        energy= ( ((ePtr->firstBin) << (ePtr->binSize))/2 )   + ePtr->offsetEMin;
+        //energy= ( ((ePtr->firstBin) << (ePtr->binSize))/2 )   + ePtr->offsetEMin;
+        //energy= ( ((ePtr->firstBin) << (ePtr->binSize))/4 )   + ePtr->offsetEMin;// since 2009 May: /4 instead of /2, see getHistoEnergyOfBin of ORKatrinFLTDecoder.m
+        energy= ( ((ePtr->firstBin) << (ePtr->binSize-2)) )   + ePtr->offsetEMin;// since 2009 May: /4 instead of /2, see getHistoEnergyOfBin of ORKatrinFLTDecoder.m
+                       // maybe I should use getHistoEnergyOfBin here (then need to include header) ... -tb-
+        int stepSize;
+        stepSize = 1 << (ePtr->binSize -2);// again: see  getHistoEnergyOfBin of ORKatrinFLTDecoder.m
+
         [aDataSet mergeEnergyHistogram: ptr
                           numBins: ePtr->histogramLength  
                           maxBins: 65536  //32768
                          firstBin: energy   
-                         stepSize: ePtr->binSize
+                         stepSize: stepSize
                            counts: sumEvents
                          withKeys: @"FLT",
                                    @"Energy Histogram (HW, energy mode units)", // use better name -tb-

@@ -226,7 +226,9 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     
     //set filter gap feature (dont change it, if HWVersion <= 2 ... )
     if([self versionRegHWVersion]>=0x3){
-        if([self versionRegApplicationID]==0 && [self versionRegFPGA6Version]>=0x04 ){//only in standard fpga since FPGA6>4
+        if([self versionRegApplicationID]==0 && [self versionRegFPGA6Version]>=0x04 ){//only in standard fpga since FPGA6>=4
+            [self setFilterGapFeatureIsAvailable: YES];
+        }else  if([self versionRegApplicationID]==2 && [self versionRegFPGA6Version]>=0x06 ){//since may 2009 in HistoFirmware (FPGA6>=6)
             [self setFilterGapFeatureIsAvailable: YES];
         }else{
             [self setFilterGapFeatureIsAvailable: NO];
@@ -2080,6 +2082,7 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
     unsigned int func  = 0x6; // = b110
     unsigned int LAddr12 = 0x2; //0x2 is E_min
 	[self write:   ([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12) value: EMin/2];// write EMin/2 -tb-
+	[self write:   ([self slot] << 24) | (func << 21) | (aChan << 16) | (LAddr12 <<12) value: EMin];// since May 2009 Emin/2 is not necessary any more -tb-
 }
 
 
@@ -2316,10 +2319,17 @@ static NSString* fltTestName[kNumKatrinFLTTests]= {
 /** Returns the energy (at left end of the bin)  the given histogram bin contains for the given offset emin and bin size bs.
  * energy will be in "EnergyMode" units, emin and bs in "user interface" units.
  * For bs == 0 (i.e. binsize 1/2) the energy will be rounded down (to be a int value).
+ *
+ * Update for Histogram Version 2009-May:
+ * The binsize scale has been "shifted" one step (bs=2 -> "user interface" =1)
+ * Smallest bs is 2 so "user interface" binsize is  2^(bs-2) ((the exponent never is <0)
  */ //-tb-
 - (int) getHistoEnergyOfBin:(int) bin  withOffsetEMin:(int) emin binSize:(int) bs
 {
-    return ( ((bin) << (bs))/2 )   + emin;
+     // this code is used in ORKatrinFLTDecoder for the histogram decoder -tb-
+    return ( ((bin) << (bs-2)) )   + emin; //since  May 2009 -tb-
+    //return ( ((bin) << (bs))/4 )   + emin; //since  May 2009 -tb-
+    //return ( ((bin) << (bs))/2 )   + emin; before May 2009
     //return (emin+ ((1<<bs)*bin)/2)];
 }
 
