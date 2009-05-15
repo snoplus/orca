@@ -418,22 +418,40 @@
 
 #pragma mark •••Actions
 
-- (IBAction) view0Action:(id)sender
+- (IBAction) viewSpectrum0Action:(id)sender
 {
-	if(![model viewChannel0]){
+	if(![model viewSpectrum0]){
 		[noDataWarningField setStringValue:@"No Data To Show"];
 	}
 	else [noDataWarningField setStringValue:@""];
 
 }
 
-- (IBAction) view1Action:(id)sender
+- (IBAction) viewSpectrum1Action:(id)sender
 {
-	if(![model viewChannel1]){
+	if(![model viewSpectrum1]){
 		[noDataWarningField setStringValue:@"No Data To Show"];
 	}
 	else [noDataWarningField setStringValue:@""];
 }
+
+- (IBAction) viewZDT0Action:(id)sender
+{
+	if(![model viewZDT0]){
+		[noDataWarningField setStringValue:@"No Data To Show"];
+	}
+	else [noDataWarningField setStringValue:@""];
+	
+}
+
+- (IBAction) viewZDT1Action:(id)sender
+{
+	if(![model viewZDT1]){
+		[noDataWarningField setStringValue:@"No Data To Show"];
+	}
+	else [noDataWarningField setStringValue:@""];
+}
+
 
 - (IBAction) runOptionsAction:(id)sender
 {
@@ -761,8 +779,12 @@
 		@try {
 			[model clearSpectrum:0];	
 			[model clearSpectrum:1];	
+			[model clearZDT:0];	
+			[model clearZDT:1];	
 			[model readSpectrum:0];	
 			[model readSpectrum:1];	
+			[model readZDT:0];	
+			[model readZDT:1];	
 			[plotter setNeedsDisplay:YES];
 		}
 		@catch (NSException* localException){

@@ -78,7 +78,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 #define kReadSpectrum0Cmd		0x00000000
 #define kReadSpectrum1Cmd		0x00008000
 #define kReadZDT0Cmd			0x00004000
-#define kReadZDT1Cmd			0x00010000
+#define kReadZDT1Cmd			0x0000C000
 #define kWriteSpectrum0Cmd		((1L<<24) | 0x00000000)
 #define kWriteSpectrum1Cmd		((1L<<24) | 0x00008000)
 #define kReadZDTSpectrum0Cmd	0x00004000
@@ -698,7 +698,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void) clearZDT:(int)index
 {
 	unsigned long aCommand[0x3fff+2];
-	aCommand[0] =  (index==0?0x04008000:0x0400C000);
+	aCommand[0] =  (index==0?0x04004000:0x0400C000);
 	aCommand[1] = 0x3fff;	//number to write
 	int i;
 	for(i=0;i<0x3fff;i++){
@@ -742,12 +742,12 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	
 	[dataSet loadSpectrum:[NSMutableData dataWithBytes:&spectrum[index+2] length:n*sizeof(long)] 
 				   sender:self  
-				 withKeys:@"ZDTSpectra",[NSString stringWithFormat:@"Channel%d",index],nil];
+				 withKeys:@"ZDT",[NSString stringWithFormat:@"Channel%d",index],nil];
 	
 }
 
 
-- (BOOL) viewChannel0
+- (BOOL) viewSpectrum0
 {
 	ORDataSet* aDataSet = [dataSet dataSetWithName:@"Spectra,Channel0"];
 	if(aDataSet){
@@ -757,7 +757,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	else return NO;
 }
 
-- (BOOL) viewChannel1
+- (BOOL) viewSpectrum1
 {
 	ORDataSet* aDataSet = [dataSet dataSetWithName:@"Spectra,Channel1"];
 	if(aDataSet){
@@ -766,6 +766,27 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	}
 	else return NO;
 }
+
+- (BOOL) viewZDT0
+{
+	ORDataSet* aDataSet = [dataSet dataSetWithName:@"ZDT,Channel0"];
+	if(aDataSet){
+		[aDataSet doDoubleClick:self];
+		return YES;
+	}
+	else return NO;
+}
+
+- (BOOL) viewZDT1
+{
+	ORDataSet* aDataSet = [dataSet dataSetWithName:@"ZDT,Channel1"];
+	if(aDataSet){
+		[aDataSet doDoubleClick:self];
+		return YES;
+	}
+	else return NO;
+}
+
 
 - (unsigned long) spectrum:(int)index valueAtChannel:(int)x
 {

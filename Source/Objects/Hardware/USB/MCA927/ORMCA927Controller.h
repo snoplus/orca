@@ -100,8 +100,10 @@
 - (void) zdtModeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
-- (IBAction) view0Action:(id)sender;
-- (IBAction) view1Action:(id)sender;
+- (IBAction) viewSpectrum0Action:(id)sender;
+- (IBAction) viewSpectrum1Action:(id)sender;
+- (IBAction) viewZDT0Action:(id)sender;
+- (IBAction) viewZDT1Action:(id)sender;
 - (IBAction) autoClearAction:(id)sender;
 - (IBAction) runOptionsAction:(id)sender;
 - (IBAction) selectedChannelAction:(id)sender;

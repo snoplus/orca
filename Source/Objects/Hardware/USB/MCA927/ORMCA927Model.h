@@ -165,8 +165,10 @@ typedef struct MCA927Registers {
 - (void) setPresetCtrlReg:(int)index withValue:(unsigned long)aValue;
 - (int) numChannels:(int)index;
 - (const char*) convGainLabel:(int)aValue;
-- (BOOL) viewChannel0;
-- (BOOL) viewChannel1;
+- (BOOL) viewSpectrum0;
+- (BOOL) viewSpectrum1;
+- (BOOL) viewZDT0;
+- (BOOL) viewZDT1;
 
 #pragma mark ***Comm methods
 //all throw on error
