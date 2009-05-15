@@ -2419,7 +2419,7 @@ AAD//kgAZQBsAHYAZQB0AGkAYwBhAIQBZgyEAWMAmAGYAJgAhg</bytes>
             <object class="NSTextField" id="269642528">
               <reference key="NSNextResponder" ref="13076153"/>
               <int key="NSvFlags">268</int>
-              <string key="NSFrame">{{188, 594}, {177, 35}}</string>
+              <string key="NSFrame">{{55, 594}, {334, 35}}</string>
               <reference key="NSSuperview" ref="13076153"/>
               <bool key="NSEnabled">YES</bool>
               <object class="NSTextFieldCell" key="NSCell" id="771482378">
@@ -4093,7 +4093,6 @@ OQA</bytes>
               </object>
               <reference ref="539419409"/>
               <reference ref="187756910"/>
-              <reference ref="269642528"/>
               <reference ref="560634185"/>
               <reference ref="304592405"/>
               <reference ref="394002699"/>
@@ -4108,6 +4107,7 @@ OQA</bytes>
               <reference ref="758727817"/>
               <reference ref="875262397"/>
               <reference ref="1051812673"/>
+              <reference ref="269642528"/>
             </object>
             <reference key="parent" ref="845440574"/>
           </object>
@@ -6794,7 +6794,7 @@ OQA</bytes>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">NSView</string>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="589043452">
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">Source/Cocoa Extensions/ZFlowLayout/ZFlowLayout.h</string>
           </object>
@@ -6857,6 +6857,14 @@ OQA</bytes>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBUserSource</string>
             <string key="minorKey"/>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">ORFlippedView</string>
+          <string key="superclassName">NSView</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">Source/Objects/Misc Objects/Views/FlippedView/ORFlippedView.h</string>
           </object>
         </object>
         <object class="IBPartialClassDescription">
@@ -7163,11 +7171,6 @@ OQA</bytes>
             <string key="majorKey">IBUserSource</string>
             <string key="minorKey"/>
           </object>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">ZFlowLayout</string>
-          <string key="superclassName">NSView</string>
-          <reference key="sourceIdentifier" ref="589043452"/>
         </object>
       </object>
     </object>
