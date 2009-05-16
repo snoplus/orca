@@ -349,8 +349,8 @@
 	
 	[serialPortController updateButtons:locked];
 	
-    //[stationOnButton setEnabled:!locked && portOpen && !stationOn];
-   // [stationOffButton setEnabled:!locked && portOpen && stationOn];
+    [stationOnButton setEnabled:!locked && portOpen && !stationOn];
+    [stationOffButton setEnabled:!locked && portOpen && stationOn];
 	[tmpRotSetField setEnabled:!locked && portOpen];
     [updateButton setEnabled:portOpen];
 
