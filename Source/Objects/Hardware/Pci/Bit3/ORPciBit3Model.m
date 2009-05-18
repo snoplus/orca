@@ -309,7 +309,7 @@ struct {
 - (const char*) serviceClassName
 {
 	//subclasses will have different sevices to match against.
-	return "com_vme_PCIBit3Driver";
+	return "edu_washington_npl_driver_PCIBit3Driver";
 }
 
 - (NSString*) driverPath
