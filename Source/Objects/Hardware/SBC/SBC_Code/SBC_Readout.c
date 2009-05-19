@@ -917,6 +917,8 @@ void processCmdBlock(SBC_Packet* aPacket)
 		uint32_t bytesInThisCmd = ((SBC_Packet*)theCmdPacket)->numBytes;
 		if(!bytesInThisCmd)break;
 		processBuffer((SBC_Packet*)theCmdPacket,kNoReply); //we'll do the reply, so tell them not to.
+		//swap back the size and the SBC_CommandHeader
+		if(needToSwap)SwapLongBlock(theCmdPacket,1+sizeof(SBC_CommandHeader)/sizeof(int32_t));
 		theCmdPacket += bytesInThisCmd/sizeof(uint32_t);
 		totalBytes -= bytesInThisCmd;
 	}
