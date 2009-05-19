@@ -131,6 +131,8 @@
 		84080D300B3C7FBF009D3704 /* OrcaScript.lm in Sources */ = {isa = PBXBuildFile; fileRef = 84080D290B3C7FBF009D3704 /* OrcaScript.lm */; };
 		840823CC0F9F83DC007E6061 /* ORFlippedView.h in Headers */ = {isa = PBXBuildFile; fileRef = 840823CA0F9F83DC007E6061 /* ORFlippedView.h */; };
 		840823CD0F9F83DC007E6061 /* ORFlippedView.m in Sources */ = {isa = PBXBuildFile; fileRef = 840823CB0F9F83DC007E6061 /* ORFlippedView.m */; };
+		8408322B0FC3307F002B2394 /* ORLongTermView.h in Headers */ = {isa = PBXBuildFile; fileRef = 840832290FC3307F002B2394 /* ORLongTermView.h */; };
+		8408322C0FC3307F002B2394 /* ORLongTermView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408322A0FC3307F002B2394 /* ORLongTermView.m */; };
 		8408591407A1935D0056503B /* ORBaseDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408591207A1935D0056503B /* ORBaseDecoder.h */; };
 		8408591507A1935D0056503B /* ORBaseDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408591307A1935D0056503B /* ORBaseDecoder.m */; };
 		8408A4BB09071C6A004A3B34 /* HV2132.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8408A4B509071C6A004A3B34 /* HV2132.nib */; };
@@ -2240,6 +2242,8 @@
 		84080D290B3C7FBF009D3704 /* OrcaScript.lm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.lex; name = OrcaScript.lm; path = "Source/Main Dialogs/CommandCenter/Scripting/OrcaScript.lm"; sourceTree = SOURCE_ROOT; };
 		840823CA0F9F83DC007E6061 /* ORFlippedView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORFlippedView.h; path = "Source/Objects/Misc Objects/Views/FlippedView/ORFlippedView.h"; sourceTree = SOURCE_ROOT; };
 		840823CB0F9F83DC007E6061 /* ORFlippedView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORFlippedView.m; path = "Source/Objects/Misc Objects/Views/FlippedView/ORFlippedView.m"; sourceTree = SOURCE_ROOT; };
+		840832290FC3307F002B2394 /* ORLongTermView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORLongTermView.h; path = "Source/Objects/Misc Objects/Views/LongTermView/ORLongTermView.h"; sourceTree = SOURCE_ROOT; };
+		8408322A0FC3307F002B2394 /* ORLongTermView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLongTermView.m; path = "Source/Objects/Misc Objects/Views/LongTermView/ORLongTermView.m"; sourceTree = SOURCE_ROOT; };
 		8408591207A1935D0056503B /* ORBaseDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORBaseDecoder.h; sourceTree = "<group>"; };
 		8408591307A1935D0056503B /* ORBaseDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORBaseDecoder.m; sourceTree = "<group>"; };
 		8408A4B509071C6A004A3B34 /* HV2132.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HV2132.nib; path = Source/Objects/Hardware/Camac/HV2132/HV2132.nib; sourceTree = SOURCE_ROOT; };
@@ -4491,6 +4495,16 @@
 			);
 			name = FlippedView;
 			path = "Source/Objects/Misc Objects/Views/FlippedView";
+			sourceTree = SOURCE_ROOT;
+		};
+		840832280FC3307F002B2394 /* LongTermView */ = {
+			isa = PBXGroup;
+			children = (
+				840832290FC3307F002B2394 /* ORLongTermView.h */,
+				8408322A0FC3307F002B2394 /* ORLongTermView.m */,
+			);
+			name = LongTermView;
+			path = "Source/Objects/Misc Objects/Views/LongTermView";
 			sourceTree = SOURCE_ROOT;
 		};
 		8408596607A1ABAB0056503B /* Gates */ = {
@@ -8025,6 +8039,7 @@
 		84CF3B3A05E6BF0700C5C320 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				840832280FC3307F002B2394 /* LongTermView */,
 				840823C90F9F83DC007E6061 /* FlippedView */,
 				8491F4730EC0CDEF0084BAD6 /* pmtImage */,
 				8491FE880EC1DF780084BAD6 /* switchImage */,
@@ -9731,6 +9746,7 @@
 				84CC16D00FAF157000CEE642 /* ORMCA927Controller.h in Headers */,
 				84CC16D20FAF157000CEE642 /* ORMCA927Model.h in Headers */,
 				84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */,
+				8408322B0FC3307F002B2394 /* ORLongTermView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11056,6 +11072,7 @@
 				84CC16D10FAF157000CEE642 /* ORMCA927Controller.m in Sources */,
 				84CC16D30FAF157000CEE642 /* ORMCA927Model.m in Sources */,
 				84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */,
+				8408322C0FC3307F002B2394 /* ORLongTermView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

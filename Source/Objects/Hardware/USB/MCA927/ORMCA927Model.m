@@ -131,11 +131,13 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
  	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[fpgaFilePath release];
 	
+	[usbInterface release];
 	[noUSBAlarm clearAlarm];
 	[noUSBAlarm release];
     [noDriverAlarm clearAlarm];
     [noDriverAlarm release];
     [serialNumber release];
+	[localLock release];
 	[dataSet release];
     [super dealloc];
 }

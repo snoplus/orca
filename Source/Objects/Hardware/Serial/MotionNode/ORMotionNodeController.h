@@ -22,10 +22,12 @@
 
 @class ORSerialPortController;
 @class ORPlotter1D;
+@class ORLongTermView;
 
 @interface ORMotionNodeController : OrcaObjectController 
 {
 	IBOutlet NSButton*		startButton;
+	IBOutlet NSTextField*   startTimeField;
 	IBOutlet NSButton*		showDeltaFromAveCB;
 	IBOutlet NSTextField*	temperatureField;
 	IBOutlet NSButton*		stopButton;
@@ -40,9 +42,14 @@
 	IBOutlet NSTextField*	xLabel;
 	IBOutlet NSTextField*	yLabel;
 	IBOutlet NSTextField*	zLabel;
+	IBOutlet ORLongTermView*	longTermView;
+	IBOutlet NSSlider*		sensitivitySlider;
+	IBOutlet NSTextField*	sensitivityField;
 }
 
 #pragma mark ***Interface Management
+- (void) longTermSensitivityChanged:(NSNotification*)aNote;
+- (void) startTimeChanged:(NSNotification*)aNote;
 - (void) showDeltaFromAveChanged:(NSNotification*)aNote;
 - (void) temperatureChanged:(NSNotification*)aNote;
 - (void) nodeRunningChanged:(NSNotification*)aNote;
@@ -55,8 +62,10 @@
 - (void) updateButtons;
 - (void) portStateChanged:(NSNotification*)aNote;
 - (void) dispayComponentsChanged:(NSNotification*)aNote;
+- (void) updateLongTermView:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) longTermSensitivityAction:(id)sender;
 - (IBAction) showDeltaFromAveAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) readOnboardMemory:(id)sender;
@@ -64,6 +73,12 @@
 - (IBAction) start:(id)sender;
 - (IBAction) stop:(id)sender;
 - (IBAction) displayComponentsAction:(id)sender;
+
+- (int) maxLinesInLongTermView:(id)aLongTermView;
+- (int) longTermView:(id)aView indexForLine:(int)m;
+- (int) numLinesInLongTermView:(id)aLongTermView;
+- (int) numPointsPerLineInLongTermView:(id)aLongTermView;
+- (float) longTermView:(id)aLongTermView line:(int)m point:(int)i;
 
 @end
 

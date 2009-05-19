@@ -24,6 +24,7 @@
 #import "ORSerialPort.h"
 #import "ORPlotter1D.h"
 #import "ORAxis.h"
+#import "ORLongTermView.h"
 
 @implementation ORMotionNodeController
 - (id) init
@@ -96,14 +97,28 @@
                      selector : @selector(showDeltaFromAveChanged:)
                          name : ORMotionNodeModelShowDeltaFromAveChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(updateLongTermView:)
+                         name : ORMotionNodeModelUpdateLongTermTrace
+						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(startTimeChanged:)
+                         name : ORMotionNodeModelStartTimeChanged
+						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(longTermSensitivityChanged:)
+                         name : ORMotionNodeModelLongTermSensitivityChanged
+						object: model];
 }
 
 - (void) awakeFromNib
 {
 	[[tracePlot xScale] setRngLow:0 withHigh:kModeNodeTraceLength];
 	[[tracePlot xScale] setRngLimitsLow:0 withHigh:kModeNodeTraceLength withMinRng:kModeNodeTraceLength];
-
+	[[tracePlot yScale] setLabel:@"Accel (g)"];
 	[[tracePlot yScale]  setInteger:NO];
 	[[tracePlot yScale]  setRngDefaultsLow:-2 withHigh:2];
 	[[tracePlot yScale] setRngLow:-2 withHigh:2];
@@ -124,16 +139,47 @@
 	[self temperatureChanged:nil];
 	[self dispayComponentsChanged:nil];
 	[self showDeltaFromAveChanged:nil];
+	[self updateLongTermView:nil];
+	[self startTimeChanged:nil];
+	[self longTermSensitivityChanged:nil];
+}
+
+- (void) longTermSensitivityChanged:(NSNotification*)aNote
+{
+	[sensitivitySlider setIntValue: [model longTermSensitivity]];
+	[sensitivityField setIntValue:[model longTermSensitivity]];
+}
+
+- (void) startTimeChanged:(NSNotification*)aNote
+{
+	if([model startTime])[startTimeField setObjectValue: [model startTime]];
+	else [startTimeField setObjectValue: @""];
+}
+
+- (void) updateLongTermView:(NSNotification*)aNote
+{
+	[longTermView setNeedsDisplay:YES];
 }
 
 - (void) showDeltaFromAveChanged:(NSNotification*)aNote
 {
 	[showDeltaFromAveCB setIntValue: [model showDeltaFromAve]];
+	[tracePlot setNeedsDisplay:YES];
 }
 
 - (void) dispayComponentsChanged:(NSNotification*)aNote
 {
 	[displayComponentsMatrix selectCellWithTag: [model displayComponents]];
+	if([model displayComponents]){
+		[xLabel setStringValue:@"Ax"];
+		[yLabel setStringValue:@"Ay"];
+		[zLabel setStringValue:@"Az"];
+	}
+	else {
+		[xLabel setStringValue:@"1-Total"];
+		[yLabel setStringValue:@""];
+		[zLabel setStringValue:@""];
+	}
 	[tracePlot setNeedsDisplay:YES];
 }
 
@@ -216,7 +262,13 @@
 
 #pragma mark •••Actions
 
-- (void) showDeltaFromAveAction:(id)sender
+- (IBAction) longTermSensitivityAction:(id)sender
+{
+	[model setLongTermSensitivity:[sender intValue]];	
+	[longTermView setNeedsDisplay:YES];
+}
+
+- (IBAction) showDeltaFromAveAction:(id)sender
 {
 	[model setShowDeltaFromAve:[sender intValue]];	
 }
@@ -224,16 +276,6 @@
 - (IBAction) displayComponentsAction:(id)sender
 {
 	[model setDisplayComponents:[[displayComponentsMatrix selectedCell] tag]];
-	if([model displayComponents]){
-		[xLabel setStringValue:@"Ax"];
-		[yLabel setStringValue:@"Ay"];
-		[zLabel setStringValue:@"Az"];
-	}
-	else {
-		[xLabel setStringValue:@"1-Total"];
-		[yLabel setStringValue:@""];
-		[zLabel setStringValue:@""];
-	}
 }
 
 - (IBAction) settingLockAction:(id) sender
@@ -272,7 +314,6 @@
 	else {
 		if(set < 3) return 0;
 		else return kModeNodeTraceLength;
-
 	}
 }
 
@@ -293,6 +334,32 @@
 		return 0;
 	}
 }
+
+- (int) longTermView:(id)aView indexForLine:(int)m
+{
+	return [model indexForLine:m];
+}
+
+- (int) maxLinesInLongTermView:(id)aLongTermView
+{
+	return [model maxLinesInLongTermView];
+}
+
+- (int) numLinesInLongTermView:(id)aLongTermView
+{
+	return [model numLinesInLongTermView];
+}
+
+- (int) numPointsPerLineInLongTermView:(id)aLongTermView
+{
+	return [model numPointsPerLineInLongTermView];
+}
+
+- (float) longTermView:(id)aLongTermView line:(int)m point:(int)i
+{
+	return [model longTermDataAtLine:m point:i];
+}
+
 
 @end
 

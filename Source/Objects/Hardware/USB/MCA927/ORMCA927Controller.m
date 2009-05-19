@@ -797,6 +797,7 @@
 
 - (void) populateInterfacePopup:(ORUSB*)usb
 {
+    [[self undoManager] disableUndoRegistration];
 	NSArray* interfaces = [usb interfacesForVender:[model vendorID] product:[model productID]];
 	[serialNumberPopup removeAllItems];
 	[serialNumberPopup addItemWithTitle:@"N/A"];
@@ -811,9 +812,9 @@
 	[self validateInterfacePopup];
 	if([model serialNumber]){
 		[serialNumberPopup selectItemWithTitle:[model serialNumber]];
-		[model setSerialNumber:[model serialNumber]];
 	}
 	else [serialNumberPopup selectItemAtIndex:0];
+    [[self undoManager] enableUndoRegistration];
 	
 }
 

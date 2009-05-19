@@ -40,7 +40,11 @@ typedef struct MotionNodeCommands {
 	BOOL		okToTimeOut;
 } MotionNodeCommands; 
 
-#define kModeNodeTraceLength 1024
+#define kModeNodeTraceLength 1500
+
+#define kModeNodeLongTraceLength 1000
+#define kModeNodePtsToCombine (6000/kModeNodeLongTraceLength)
+#define kNumMin 60
 
 @interface ORMotionNodeModel : ORSerialPortModel {
     BOOL			nodeRunning;
@@ -57,24 +61,30 @@ typedef struct MotionNodeCommands {
     float			ay;
     float			az;
     int				traceIndex;
+    int				longTraceIndex;
+    int				longTraceMinIndex;
 	float			xTrace[kModeNodeTraceLength];
 	float			yTrace[kModeNodeTraceLength];
 	float			zTrace[kModeNodeTraceLength];
 	float			xyzTrace[kModeNodeTraceLength];
-	float			xAve;
-	float			yAve;
-	float			zAve;
-	float			xyzAve;
-	BOOL			dump;
+	float**			longTermTrace;
 	int				throttle;
 	float			temperatureAverage;
     float			temperature;
     float			totalxyz;
 	BOOL			displayComponents;
     BOOL			showDeltaFromAve;
+	BOOL			longTermValid;
+    NSDate*			startTime;
+    int				longTermSensitivity;
+	BOOL			cycledOnce;
 }
 
 #pragma mark ***Accessors
+- (int) longTermSensitivity;
+- (void) setLongTermSensitivity:(int)aLongTermSensitivity;
+- (NSDate*) startTime;
+- (void) setStartTime:(NSDate*)aStartTime;
 - (BOOL) showDeltaFromAve;
 - (void) setShowDeltaFromAve:(BOOL)aShowDeltaFromAve;
 - (float) displayComponents;
@@ -92,7 +102,6 @@ typedef struct MotionNodeCommands {
 - (float) azDeltaAveAt:(int)i;
 - (float) xyzDeltaAveAt:(int)i;
 
-- (int) traceIndex;
 - (int) packetLength;
 - (void) setPacketLength:(int)aPacketLength;
 - (BOOL) isAccelOnly;
@@ -117,8 +126,17 @@ typedef struct MotionNodeCommands {
 
 #pragma mark •••Port Methods
 - (void) dataReceived:(NSNotification*)note;
+
+- (int) maxLinesInLongTermView;
+- (int) indexForLine:(int)m;
+- (int) numLinesInLongTermView;
+- (int) numPointsPerLineInLongTermView;
+- (float)longTermDataAtLine:(int)m point:(int)i;
+
 @end
 
+extern NSString* ORMotionNodeModelLongTermSensitivityChanged;
+extern NSString* ORMotionNodeModelStartTimeChanged;
 extern NSString* ORMotionNodeModelShowDeltaFromAveChanged;
 extern NSString* ORMotionNodeModelTemperatureChanged;
 extern NSString* ORMotionNodeModelNodeRunningChanged;
@@ -129,4 +147,5 @@ extern NSString* ORMotionNodeModelVersionChanged;
 extern NSString* ORMotionNodeModelLock;
 extern NSString* ORMotionNodeModelSerialNumberChanged;
 extern NSString* ORMotionNodeModelDisplayComponentsChanged;
+extern NSString* ORMotionNodeModelUpdateLongTermTrace;
 
