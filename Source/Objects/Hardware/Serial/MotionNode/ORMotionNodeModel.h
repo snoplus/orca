@@ -82,6 +82,12 @@ typedef struct MotionNodeCommands {
     BOOL			showLongTermDelta;
 	BOOL			scheduledToShip;
     BOOL			autoStart;
+    float			shipThreshold;
+    BOOL			shipExcursions;
+    BOOL			outOfBand;
+    NSDate*			lastRecordShipped;
+    int				totalShipped;
+	int				excursionIndex;
 }
 
 #pragma mark ***Initialization
@@ -90,6 +96,16 @@ typedef struct MotionNodeCommands {
 - (void) runStopping:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
+- (int) totalShipped;
+- (void) setTotalShipped:(int)aTotalShipped;
+- (NSDate*) lastRecordShipped;
+- (void) setLastRecordShipped:(NSDate*)aLastRecordShipped;
+- (BOOL) outOfBand;
+- (void) setOutOfBand:(BOOL)aOutOfBand;
+- (BOOL) shipExcursions;
+- (void) setShipExcursions:(BOOL)aShipExcursions;
+- (float) shipThreshold;
+- (void) setShipThreshold:(float)aShipThreshold;
 - (BOOL) autoStart;
 - (void) setAutoStart:(BOOL)aAutoStart;
 - (BOOL) showLongTermDelta;
@@ -158,6 +174,11 @@ typedef struct MotionNodeCommands {
 
 @end
 
+extern NSString* ORMotionNodeModelTotalShippedChanged;
+extern NSString* ORMotionNodeModelLastRecordShippedChanged;
+extern NSString* ORMotionNodeModelOutOfBandChanged;
+extern NSString* ORMotionNodeModelShipExcursionsChanged;
+extern NSString* ORMotionNodeModelShipThresholdChanged;
 extern NSString* ORMotionNodeModelAutoStartChanged;
 extern NSString* ORMotionNodeModelShowLongTermDeltaChanged;
 extern NSString* ORMotionNodeModelLongTermSensitivityChanged;

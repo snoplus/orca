@@ -173,6 +173,10 @@
 				<string>id</string>
 				<key>settingLockAction</key>
 				<string>id</string>
+				<key>shipExcursionsAction</key>
+				<string>id</string>
+				<key>shipThresholdAction</key>
+				<string>id</string>
 				<key>showDeltaFromAveAction</key>
 				<string>id</string>
 				<key>showLongTermDeltaAction</key>
@@ -194,11 +198,15 @@
 				<string>NSMatrix</string>
 				<key>isAccelOnlyField</key>
 				<string>NSTextField</string>
+				<key>lastRecordShippedField</key>
+				<string>NSTextField</string>
 				<key>lockButton</key>
 				<string>NSButton</string>
 				<key>longTermView</key>
 				<string>ORLongTermView</string>
 				<key>nodeRunningField</key>
+				<string>NSTextField</string>
+				<key>outOfBandField</key>
 				<string>NSTextField</string>
 				<key>packetLengthField</key>
 				<string>NSTextField</string>
@@ -208,6 +216,12 @@
 				<string>NSSlider</string>
 				<key>serialPortController</key>
 				<string>ORSerialPortController</string>
+				<key>shipExcursionsCB</key>
+				<string>NSButton</string>
+				<key>shipThresholdField</key>
+				<string>NSTextField</string>
+				<key>shipThresholdSlider</key>
+				<string>NSSlider</string>
 				<key>showDeltaFromAveCB</key>
 				<string>NSButton</string>
 				<key>showLongTermDeltaCB</key>
@@ -219,6 +233,8 @@
 				<key>stopButton</key>
 				<string>NSButton</string>
 				<key>temperatureField</key>
+				<string>NSTextField</string>
+				<key>totalShippedField</key>
 				<string>NSTextField</string>
 				<key>tracePlot</key>
 				<string>ORPlotter1D</string>

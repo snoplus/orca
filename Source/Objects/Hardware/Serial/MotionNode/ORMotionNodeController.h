@@ -27,6 +27,12 @@
 @interface ORMotionNodeController : OrcaObjectController 
 {
 	IBOutlet NSButton*		startButton;
+	IBOutlet NSTextField*	totalShippedField;
+	IBOutlet NSTextField*	lastRecordShippedField;
+	IBOutlet NSTextField*	outOfBandField;
+	IBOutlet NSButton*		shipExcursionsCB;
+	IBOutlet NSSlider*		shipThresholdSlider;
+	IBOutlet NSTextField*	shipThresholdField;
 	IBOutlet NSButton*		autoStartCB;
 	IBOutlet NSButton*		showLongTermDeltaCB;
 	IBOutlet NSTextField*   startTimeField;
@@ -50,6 +56,11 @@
 }
 
 #pragma mark ***Interface Management
+- (void) totalShippedChanged:(NSNotification*)aNote;
+- (void) lastRecordShippedChanged:(NSNotification*)aNote;
+- (void) outOfBandChanged:(NSNotification*)aNote;
+- (void) shipExcursionsChanged:(NSNotification*)aNote;
+- (void) shipThresholdChanged:(NSNotification*)aNote;
 - (void) autoStartChanged:(NSNotification*)aNote;
 - (void) showLongTermDeltaChanged:(NSNotification*)aNote;
 - (void) longTermSensitivityChanged:(NSNotification*)aNote;
@@ -69,6 +80,8 @@
 - (void) updateLongTermView:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) shipExcursionsAction:(id)sender;
+- (IBAction) shipThresholdAction:(id)sender;
 - (IBAction) autoStartAction:(id)sender;
 - (IBAction) showLongTermDeltaAction:(id)sender;
 - (IBAction) longTermSensitivityAction:(id)sender;

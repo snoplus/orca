@@ -123,6 +123,31 @@
                          name : ORMotionNodeModelAutoStartChanged
 						object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(shipThresholdChanged:)
+                         name : ORMotionNodeModelShipThresholdChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(shipExcursionsChanged:)
+                         name : ORMotionNodeModelShipExcursionsChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(outOfBandChanged:)
+                         name : ORMotionNodeModelOutOfBandChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lastRecordShippedChanged:)
+                         name : ORMotionNodeModelLastRecordShippedChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(totalShippedChanged:)
+                         name : ORMotionNodeModelTotalShippedChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -155,6 +180,38 @@
 	[self longTermSensitivityChanged:nil];
 	[self showLongTermDeltaChanged:nil];
 	[self autoStartChanged:nil];
+	[self shipThresholdChanged:nil];
+	[self shipExcursionsChanged:nil];
+	[self outOfBandChanged:nil];
+	[self lastRecordShippedChanged:nil];
+	[self totalShippedChanged:nil];
+}
+
+- (void) totalShippedChanged:(NSNotification*)aNote
+{
+	[totalShippedField setIntValue: [model totalShipped]];
+}
+
+- (void) lastRecordShippedChanged:(NSNotification*)aNote
+{
+	[lastRecordShippedField setObjectValue: [model lastRecordShipped]?[model lastRecordShipped]:@"--"];
+}
+
+- (void) outOfBandChanged:(NSNotification*)aNote
+{
+	[outOfBandField setObjectValue: [model outOfBand]?@"X":@""];
+}
+
+- (void) shipExcursionsChanged:(NSNotification*)aNote
+{
+	[shipExcursionsCB setIntValue: [model shipExcursions]];
+	[self updateButtons];
+}
+
+- (void) shipThresholdChanged:(NSNotification*)aNote
+{
+	[shipThresholdSlider setFloatValue: [model shipThreshold]];
+	[shipThresholdField setFloatValue: [model shipThreshold]];
 }
 
 - (void) autoStartChanged:(NSNotification*)aNote
@@ -265,6 +322,9 @@
     [lockButton setState: locked];
 	[startButton setEnabled: portOpen && !locked && !nodeRunning && nodeValid];
 	[stopButton setEnabled: portOpen && !locked && nodeRunning && nodeValid];
+	[shipThresholdField setEnabled: portOpen && !locked && [model shipExcursions]];
+	[shipThresholdSlider setEnabled: portOpen && !locked && [model shipExcursions]];
+	[shipExcursionsCB setEnabled: portOpen && !locked];
 	
 	[serialPortController updateButtons:locked];
 }
@@ -285,6 +345,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) shipExcursionsAction:(id)sender
+{
+	[model setShipExcursions:[sender intValue]];	
+}
+
+- (void) shipThresholdAction:(id)sender
+{
+	[model setShipThreshold:[sender floatValue]];	
+}
 
 - (void) autoStartAction:(id)sender
 {

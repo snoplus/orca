@@ -48,7 +48,6 @@ static NSString* kMotionNodeTraceType[3] = {
 	ptr++; //location info
     int type   = (*ptr>>16) & 0x3;
 	int device = *ptr&0xFFF;
-	NSString* traceType = kMotionNodeTraceType[type];
 	ptr++; //time
 	ptr++; //start of data
 
@@ -64,7 +63,7 @@ static NSString* kMotionNodeTraceType[3] = {
 					offset:0 //bytes!
 				  unitSize:sizeof(long) //unit size in bytes!
 					sender:self  
-				  withKeys:[NSString stringWithFormat: @"MotionNode (%d)",device], traceType,nil];
+				  withKeys:[NSString stringWithFormat: @"MotionNode (%d)",device], [self getChannelKey:type],nil];
 	
     return length; //must return number of longs processed.
 }

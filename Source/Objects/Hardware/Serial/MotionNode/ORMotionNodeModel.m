@@ -27,26 +27,36 @@
 #import "ORDataPacket.h"
 
 
+NSString* ORMotionNodeModelTotalShippedChanged			= @"ORMotionNodeModelTotalShippedChanged";
+NSString* ORMotionNodeModelLastRecordShippedChanged		= @"ORMotionNodeModelLastRecordShippedChanged";
+NSString* ORMotionNodeModelOutOfBandChanged				= @"ORMotionNodeModelOutOfBandChanged";
+NSString* ORMotionNodeModelShipExcursionsChanged		= @"ORMotionNodeModelShipExcursionsChanged";
+NSString* ORMotionNodeModelShipThresholdChanged			= @"ORMotionNodeModelShipThresholdChanged";
 NSString* ORMotionNodeModelAutoStartChanged				= @"ORMotionNodeModelAutoStartChanged";
 NSString* ORMotionNodeModelShowLongTermDeltaChanged		= @"ORMotionNodeModelShowLongTermDeltaChanged";
 NSString* ORMotionNodeModelLongTermSensitivityChanged	= @"ORMotionNodeModelLongTermSensitivityChanged";
 NSString* ORMotionNodeModelStartTimeChanged				= @"ORMotionNodeModelStartTimeChanged";
 NSString* ORMotionNodeModelShowDeltaFromAveChanged		= @"ORMotionNodeModelShowDeltaFromAveChanged";
 NSString* ORMotionNodeModelDisplayComponentsChanged		= @"ORMotionNodeModelDisplayComponentsChanged";
-NSString* ORMotionNodeModelTemperatureChanged	= @"ORMotionNodeModelTemperatureChanged";
-NSString* ORMotionNodeModelNodeRunningChanged	= @"ORMotionNodeModelNodeRunningChanged";
-NSString* ORMotionNodeModelTraceIndexChanged	= @"ORMotionNodeModelTraceIndexChanged";
-NSString* ORMotionNodeModelPacketLengthChanged	= @"ORMotionNodeModelPacketLengthChanged";
-NSString* ORMotionNodeModelIsAccelOnlyChanged	= @"ORMotionNodeModelIsAccelOnlyChanged";
-NSString* ORMotionNodeModelVersionChanged		= @"ORMotionNodeModelVersionChanged";
-NSString* ORMotionNodeModelLock					= @"ORMotionNodeModelLock";
-NSString* ORMotionNodeModelSerialNumberChanged	= @"ORMotionNodeModelSerialNumberChanged";
-NSString* ORMotionNodeModelUpdateLongTermTrace	= @"ORMotionNodeModelUpdateLongTermTrace";
+NSString* ORMotionNodeModelTemperatureChanged			= @"ORMotionNodeModelTemperatureChanged";
+NSString* ORMotionNodeModelNodeRunningChanged			= @"ORMotionNodeModelNodeRunningChanged";
+NSString* ORMotionNodeModelTraceIndexChanged			= @"ORMotionNodeModelTraceIndexChanged";
+NSString* ORMotionNodeModelPacketLengthChanged			= @"ORMotionNodeModelPacketLengthChanged";
+NSString* ORMotionNodeModelIsAccelOnlyChanged			= @"ORMotionNodeModelIsAccelOnlyChanged";
+NSString* ORMotionNodeModelVersionChanged				= @"ORMotionNodeModelVersionChanged";
+NSString* ORMotionNodeModelLock							= @"ORMotionNodeModelLock";
+NSString* ORMotionNodeModelSerialNumberChanged			= @"ORMotionNodeModelSerialNumberChanged";
+NSString* ORMotionNodeModelUpdateLongTermTrace			= @"ORMotionNodeModelUpdateLongTermTrace";
 
 #define kMotionNodeDriverPath @"/System/Library/Extensions/SLAB_USBtoUART.kext"
 #define kMotionNodeAveN (2/(100.+1.))
 #define kSlope		 (4.0/4095.0)
 #define kIntercept	 (-2.0)
+
+#define kPtPerSec 100
+#define kSecToShip 5
+#define kPerTrigger 1 //sec
+
 
 static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	{kMotionNodeConnectResponse,@"0",		14,		NO},
@@ -83,6 +93,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 
 - (void) dealloc
 {
+    [lastRecordShipped release];
  	if([self nodeRunning])[self stopDevice];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];	
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -142,6 +153,8 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 		if(!nodeRunning)[self startDevice];
 	}
 	scheduledToShip = NO;
+	[self setTotalShipped:0];
+
 }
 
 - (void) runStopping:(NSNotification*)aNote
@@ -171,6 +184,75 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 }
 
 #pragma mark ***Accessors
+
+- (int) totalShipped
+{
+    return totalShipped;
+}
+
+- (void) setTotalShipped:(int)aTotalShipped
+{
+    totalShipped = aTotalShipped;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelTotalShippedChanged object:self];
+}
+
+- (NSDate*) lastRecordShipped
+{
+    return lastRecordShipped;
+}
+
+- (void) setLastRecordShipped:(NSDate*)aLastRecordShipped
+{
+    [aLastRecordShipped retain];
+    [lastRecordShipped release];
+    lastRecordShipped = aLastRecordShipped;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelLastRecordShippedChanged object:self];
+}
+
+- (BOOL) outOfBand
+{
+    return outOfBand;
+}
+
+- (void) setOutOfBand:(BOOL)aOutOfBand
+{
+	if(aOutOfBand!=outOfBand){
+		outOfBand = aOutOfBand;
+		[[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelOutOfBandChanged object:self];
+	}
+}
+
+- (BOOL) shipExcursions
+{
+    return shipExcursions;
+}
+
+- (void) setShipExcursions:(BOOL)aShipExcursions
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipExcursions:shipExcursions];
+    
+    shipExcursions = aShipExcursions;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelShipExcursionsChanged object:self];
+}
+
+- (float) shipThreshold
+{
+    return shipThreshold;
+}
+
+- (void) setShipThreshold:(float)aShipThreshold
+{
+	if(aShipThreshold <.001)aShipThreshold = .001;
+	else if(aShipThreshold > 2)aShipThreshold = 2;
+    [[[self undoManager] prepareWithInvocationTarget:self] setShipThreshold:shipThreshold];
+    
+    shipThreshold = aShipThreshold;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelShipThresholdChanged object:self];
+}
 
 - (BOOL) autoStart
 {
@@ -418,6 +500,8 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setShipExcursions:		[decoder decodeBoolForKey:@"shipExcursions"]];
+    [self setShipThreshold:			[decoder decodeFloatForKey:@"shipThreshold"]];
     [self setAutoStart:				[decoder decodeBoolForKey:@"autoStart"]];
     [self setShowLongTermDelta:		[decoder decodeBoolForKey:@"showLongTermDelta"]];
     [self setLongTermSensitivity:	[decoder decodeIntForKey:@"longTermSensitivity"]];
@@ -435,6 +519,8 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
+    [encoder encodeBool:shipExcursions		forKey:@"shipExcursions"];
+    [encoder encodeFloat:shipThreshold		forKey:@"shipThreshold"];
     [encoder encodeBool:autoStart			forKey:@"autoStart"];
     [encoder encodeBool:showLongTermDelta	forKey:@"showLongTermDelta"];
     [encoder encodeInt:longTermSensitivity	forKey:@"longTermSensitivity"];
@@ -591,6 +677,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
     return dataDictionary;
 }
 
+
 - (void) shipXYZTrace
 {
 	scheduledToShip = NO;
@@ -601,23 +688,29 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 		time_t	theTime;
 		time(&theTime);
 		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		int i;
-		int shipLen = kModeNodeTraceLength/3;
-				
+		int shipLen = kSecToShip * kPtPerSec;
+		
+		int backIndex = (excursionIndex - kPerTrigger*kPtPerSec);
+		if(backIndex<0)backIndex = kModeNodeTraceLength + backIndex; //wrap it
+		
 		int type;
 		for(type=0;type<3;type++){
-			unsigned long data[3 + (kModeNodeTraceLength/3)];
+			unsigned long data[3 + (kSecToShip * kPtPerSec)];
 			data[0] = dataId | (3 + shipLen);
 			data[1] = ((type&0x3)<<16) | ([self uniqueIdNumber]&0xfff); // xtrace
 			data[2] = mktime(theTimeGMTAsStruct);
+			int i;
 			for(i=0;i<shipLen;i++){
-				if(type==0)		data[3+i] = (xTrace[(3+i)%shipLen] - kIntercept)/kSlope;
-				else if(type==1)data[3+i] = (yTrace[(3+i)%shipLen] - kIntercept)/kSlope;
-				else if(type==2)data[3+i] = (zTrace[(3+i)%shipLen] - kIntercept)/kSlope;
+				if(type==0)		data[3+i] = (xTrace[(backIndex+i)%kModeNodeTraceLength] - kIntercept)/kSlope;
+				else if(type==1)data[3+i] = (yTrace[(backIndex+i)%kModeNodeTraceLength] - kIntercept)/kSlope;
+				else if(type==2)data[3+i] = (zTrace[(backIndex+i)%kModeNodeTraceLength] - kIntercept)/kSlope;
 			}
+			
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 															object:[NSData dataWithBytes:&data length:sizeof(long)*(3 + (kModeNodeTraceLength/3))]];
+			[self setLastRecordShipped:[NSDate date]];
 		}
+		[self setTotalShipped:[self totalShipped]+1];
 	}
 }
 
@@ -845,11 +938,16 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	xyzTrace[traceIndex] = 0.86 - sqrtf(ax*ax + ay*ay + az*az);
 	if(traceIndex>0){
 		float delta = xyzTrace[(traceIndex)%kModeNodeTraceLength] - xyzTrace[(traceIndex-1)%kModeNodeTraceLength];
-		if(fabs(delta)>.1){
-			if(!scheduledToShip){
-				[self performSelector:@selector(shipXYZTrace) withObject:nil afterDelay:5];
-				scheduledToShip = YES;
+		if(shipExcursions){
+			BOOL shouldShip = fabs(delta)>shipThreshold;
+			if(shouldShip){
+				if(!scheduledToShip){
+					excursionIndex = traceIndex;
+					[self performSelector:@selector(shipXYZTrace) withObject:nil afterDelay:kSecToShip-kPerTrigger];
+					scheduledToShip = YES;
+				}
 			}
+			[self setOutOfBand:shouldShip];
 		}
 	}
 	
