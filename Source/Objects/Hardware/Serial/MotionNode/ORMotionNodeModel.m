@@ -23,12 +23,16 @@
 #import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORSafeQueue.h"
+#import "ORDataTypeAssigner.h"
+#import "ORDataPacket.h"
 
 
-NSString* ORMotionNodeModelLongTermSensitivityChanged = @"ORMotionNodeModelLongTermSensitivityChanged";
-NSString* ORMotionNodeModelStartTimeChanged = @"ORMotionNodeModelStartTimeChanged";
-NSString* ORMotionNodeModelShowDeltaFromAveChanged = @"ORMotionNodeModelShowDeltaFromAveChanged";
-NSString* ORMotionNodeModelDisplayComponentsChanged = @"ORMotionNodeModelDisplayComponentsChanged";
+NSString* ORMotionNodeModelAutoStartChanged				= @"ORMotionNodeModelAutoStartChanged";
+NSString* ORMotionNodeModelShowLongTermDeltaChanged		= @"ORMotionNodeModelShowLongTermDeltaChanged";
+NSString* ORMotionNodeModelLongTermSensitivityChanged	= @"ORMotionNodeModelLongTermSensitivityChanged";
+NSString* ORMotionNodeModelStartTimeChanged				= @"ORMotionNodeModelStartTimeChanged";
+NSString* ORMotionNodeModelShowDeltaFromAveChanged		= @"ORMotionNodeModelShowDeltaFromAveChanged";
+NSString* ORMotionNodeModelDisplayComponentsChanged		= @"ORMotionNodeModelDisplayComponentsChanged";
 NSString* ORMotionNodeModelTemperatureChanged	= @"ORMotionNodeModelTemperatureChanged";
 NSString* ORMotionNodeModelNodeRunningChanged	= @"ORMotionNodeModelNodeRunningChanged";
 NSString* ORMotionNodeModelTraceIndexChanged	= @"ORMotionNodeModelTraceIndexChanged";
@@ -40,14 +44,16 @@ NSString* ORMotionNodeModelSerialNumberChanged	= @"ORMotionNodeModelSerialNumber
 NSString* ORMotionNodeModelUpdateLongTermTrace	= @"ORMotionNodeModelUpdateLongTermTrace";
 
 #define kMotionNodeDriverPath @"/System/Library/Extensions/SLAB_USBtoUART.kext"
-#define kMotionNodeAveN 2/(100.+1.)
+#define kMotionNodeAveN (2/(100.+1.))
+#define kSlope		 (4.0/4095.0)
+#define kIntercept	 (-2.0)
 
 static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
-{kMotionNodeConnectResponse,@"0",		14,		NO},
-{kMotionNodeMemoryContents,	@"rrr",		256,	NO}, 
-{kMotionNodeStop,			@")",		-1,		YES}, 
-{kMotionNodeStart,			@"xxx\0",	-1,		YES},
-{kMotionNodeClosePort,		@"",		-1,		NO}
+	{kMotionNodeConnectResponse,@"0",		14,		NO},
+	{kMotionNodeMemoryContents,	@"rrr",		256,	NO}, 
+	{kMotionNodeStop,			@")",		-1,		YES}, 
+	{kMotionNodeStart,			@"xxx\0",	-1,		YES},
+	{kMotionNodeClosePort,		@"",		-1,		NO}
 };
 
 @interface ORMotionNodeModel (private)
@@ -63,10 +69,18 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void) setTraceIndex:(int)aTraceIndex;
 - (void) incTraceIndex;
 - (void) setTotalxyz;
+- (void) checkForDriver;
 @end
 
 
 @implementation ORMotionNodeModel
+- (id) init
+{
+	self = [super init];
+	[self checkForDriver];
+	return self;
+}
+
 - (void) dealloc
 {
  	if([self nodeRunning])[self stopDevice];
@@ -82,29 +96,17 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	[serialNumber release];
 	[localLock release];
 	
-	
-	int i;
-	for (i = 0; i < kNumMin; i++) free(longTermTrace[i]);
-	free(longTermTrace);
-	
+	if(longTermTrace){
+		int i;
+		for (i = 0; i < kNumMin; i++) free(longTermTrace[i]);
+		free(longTermTrace);
+	}
 	[super dealloc];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
 	@try {
-		//make sure the driver is installed.
-		NSFileManager* fm = [NSFileManager defaultManager];
-		if(![fm fileExistsAtPath:kMotionNodeDriverPath]){
-			NSLogColor([NSColor redColor],@"*** Unable To Locate MotionNode Driver ***\n");
-			if(!noDriverAlarm){
-				noDriverAlarm = [[ORAlarm alloc] initWithName:@"No MotionNode Driver Found" severity:0];
-				[noDriverAlarm setSticky:NO];
-				[noDriverAlarm setHelpStringFromFile:@"NoMotionNodeDriverHelp"];
-			}                      
-			[noDriverAlarm setAcknowledged:NO];
-			[noDriverAlarm postAlarm];
-		}
 		//alloc a large 2-D array for the long term storage
 		int i;
 		longTermTrace = malloc(kNumMin * sizeof(float *));
@@ -116,7 +118,35 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	}
 	@catch(NSException* localException) {
 	}
+}
+
+- (void) registerNotificationObservers
+{
+	[super registerNotificationObservers];
+    NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];        
+    [notifyCenter addObserver : self
+                     selector : @selector(runStarting:)
+                         name : ORRunAboutToStartNotification
+                       object : nil];
 	
+    [notifyCenter addObserver : self
+                     selector : @selector(runStopping:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+}
+
+- (void) runStarting:(NSNotification*)aNote
+{
+	if(autoStart){
+		if(![serialPort isOpen])[self openPort:YES];
+		if(!nodeRunning)[self startDevice];
+	}
+	scheduledToShip = NO;
+}
+
+- (void) runStopping:(NSNotification*)aNote
+{
+	if(scheduledToShip)[self shipXYZTrace];
 }
 
 - (void) setUpImage
@@ -141,6 +171,34 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 }
 
 #pragma mark ***Accessors
+
+- (BOOL) autoStart
+{
+    return autoStart;
+}
+
+- (void) setAutoStart:(BOOL)aAutoStart
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setAutoStart:autoStart];
+    
+    autoStart = aAutoStart;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelAutoStartChanged object:self];
+}
+
+- (BOOL) showLongTermDelta
+{
+    return showLongTermDelta;
+}
+
+- (void) setShowLongTermDelta:(BOOL)aShowLongTermDelta
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowLongTermDelta:showLongTermDelta];
+    
+    showLongTermDelta = aShowLongTermDelta;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelShowLongTermDeltaChanged object:self];
+}
 
 - (int) longTermSensitivity
 {
@@ -360,12 +418,16 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
+    [self setAutoStart:				[decoder decodeBoolForKey:@"autoStart"]];
+    [self setShowLongTermDelta:		[decoder decodeBoolForKey:@"showLongTermDelta"]];
     [self setLongTermSensitivity:	[decoder decodeIntForKey:@"longTermSensitivity"]];
     [self setShowDeltaFromAve:		[decoder decodeBoolForKey:@"showDeltaFromAve"]];
-    [self setDisplayComponents:	[decoder decodeBoolForKey:@"displayComponents"]];
+    [self setDisplayComponents:		[decoder decodeBoolForKey:@"displayComponents"]];
 	
     [[self undoManager] enableUndoRegistration];    
 	cmdQueue = [[ORSafeQueue alloc] init];
+	
+	[self checkForDriver];
 	
     return self;
 }
@@ -373,7 +435,9 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:longTermSensitivity		forKey:@"longTermSensitivity"];
+    [encoder encodeBool:autoStart			forKey:@"autoStart"];
+    [encoder encodeBool:showLongTermDelta	forKey:@"showLongTermDelta"];
+    [encoder encodeInt:longTermSensitivity	forKey:@"longTermSensitivity"];
     [encoder encodeBool:showDeltaFromAve	forKey:@"showDeltaFromAve"];
     [encoder encodeBool:displayComponents	forKey: @"displayComponents"];
 }
@@ -394,6 +458,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 
 - (void) startDevice
 {
+	scheduledToShip = NO;
 	[self setStartTime:[NSDate date]];
 	memset(xTrace,0,sizeof(float)*kModeNodeTraceLength);
 	memset(yTrace,0,sizeof(float)*kModeNodeTraceLength);
@@ -456,7 +521,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 
 - (int) indexForLine:(int)m
 {
-	int line = longTraceMinIndex-m;
+	int line = longTraceMinIndex-m-1;
 	if(line<0)line = kNumMin + (longTraceMinIndex - m);
 	return line;
 }
@@ -479,10 +544,81 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 
 - (float)longTermDataAtLine:(int)m point:(int)i
 {
-	if(longTermValid && i>0){
-		return (longTermTrace[m][(i-1)] - longTermTrace[m][i])  * longTermSensitivity;
+	if(longTermValid){
+		if(showLongTermDelta && i>0){
+			return (longTermTrace[m][(i-1)] - longTermTrace[m][i])  * longTermSensitivity;
+		}
+		else return longTermTrace[m][i]*longTermSensitivity;
 	}
 	else return 0;
+}
+
+#pragma mark •••Data Records
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+
+- (void) setDataIds:(id)assigner
+{
+    dataId       = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anotherPDcu
+{
+    [self setDataId:[anotherPDcu dataId]];
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"MotionNodeModel"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+								 @"ORMotionNodeDecoderForXYZTrace",	@"decoder",
+								 [NSNumber numberWithLong:dataId],  @"dataId",
+								 [NSNumber numberWithBool:YES],     @"variable",
+								 [NSNumber numberWithLong:-1],		@"length",
+								 nil];
+    [dataDictionary setObject:aDictionary forKey:@"XYZTrace"];
+    
+    return dataDictionary;
+}
+
+- (void) shipXYZTrace
+{
+	scheduledToShip = NO;
+    if([[ORGlobal sharedGlobal] runInProgress]){
+		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(shipXYZTrace) object:nil];
+
+		//get the time(UT!)
+		time_t	theTime;
+		time(&theTime);
+		struct tm* theTimeGMTAsStruct = gmtime(&theTime);
+		int i;
+		int shipLen = kModeNodeTraceLength/3;
+				
+		int type;
+		for(type=0;type<3;type++){
+			unsigned long data[3 + (kModeNodeTraceLength/3)];
+			data[0] = dataId | (3 + shipLen);
+			data[1] = ((type&0x3)<<16) | ([self uniqueIdNumber]&0xfff); // xtrace
+			data[2] = mktime(theTimeGMTAsStruct);
+			for(i=0;i<shipLen;i++){
+				if(type==0)		data[3+i] = (xTrace[(3+i)%shipLen] - kIntercept)/kSlope;
+				else if(type==1)data[3+i] = (yTrace[(3+i)%shipLen] - kIntercept)/kSlope;
+				else if(type==2)data[3+i] = (zTrace[(3+i)%shipLen] - kIntercept)/kSlope;
+			}
+			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
+															object:[NSData dataWithBytes:&data length:sizeof(long)*(3 + (kModeNodeTraceLength/3))]];
+		}
+	}
 }
 
 @end
@@ -528,8 +664,6 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 			unsigned char bytes[2];
 		}rawData;
 		
-		const float kSlope		= 4.0/4095.0;
-		const float kIntercept	= -2.0;
 		
 		// accel 0
 		rawData.bytes[highBtyeIndex] = (data[2] >> 4) & rMask;
@@ -577,7 +711,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 	[self setLastRequest:nil];
 	if(!okToTimeOut) {
-		NSLogError(@"PAC",@"command timeout",nil);
+		NSLogError(@"Motion Node",@"command timeout",nil);
 		[cmdQueue removeAllObjects];
 	}
 	[self processOneCommandFromQueue];	 //do the next command in the queue
@@ -709,6 +843,16 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void) setTotalxyz
 {
 	xyzTrace[traceIndex] = 0.86 - sqrtf(ax*ax + ay*ay + az*az);
+	if(traceIndex>0){
+		float delta = xyzTrace[(traceIndex)%kModeNodeTraceLength] - xyzTrace[(traceIndex-1)%kModeNodeTraceLength];
+		if(fabs(delta)>.1){
+			if(!scheduledToShip){
+				[self performSelector:@selector(shipXYZTrace) withObject:nil afterDelay:5];
+				scheduledToShip = YES;
+			}
+		}
+	}
+	
 	if(longTermValid){
 		if(traceIndex >= kModeNodeTraceLength-1){
 			int i;
@@ -717,11 +861,11 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 				if(fabs(xyzTrace[i]) > fabs(longTraceValueToKeep)){
 					longTraceValueToKeep = xyzTrace[i];
 				}
-				if(i!=0 && !(i%kModeNodePtsToCombine)){				
+				if(((i!=0) && !(i%kModeNodePtsToCombine))){				
 					longTermTrace[longTraceMinIndex][longTraceIndex] = longTraceValueToKeep;
 					longTraceValueToKeep = 0;
 					longTraceIndex = (longTraceIndex+1)%kModeNodeLongTraceLength;
-					if(longTraceIndex==0){
+					if(longTraceIndex==kModeNodeLongTraceLength-1){
 						[[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelUpdateLongTermTrace object:self];
 						longTraceMinIndex = (longTraceMinIndex+1)%kNumMin;
 						if(longTraceMinIndex == 0) cycledOnce = YES;
@@ -734,10 +878,23 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 			}
 		}
 	}
-	
 }
 
-	
+- (void) checkForDriver
+{
+	//make sure the driver is installed.
+	NSFileManager* fm = [NSFileManager defaultManager];
+	if(![fm fileExistsAtPath:kMotionNodeDriverPath]){
+		NSLogColor([NSColor redColor],@"*** Unable To Locate MotionNode Driver ***\n");
+		if(!noDriverAlarm){
+			noDriverAlarm = [[ORAlarm alloc] initWithName:@"No MotionNode Driver Found" severity:0];
+			[noDriverAlarm setSticky:NO];
+			[noDriverAlarm setHelpStringFromFile:@"NoMotionNodeDriverHelp"];
+		}                      
+		[noDriverAlarm setAcknowledged:NO];
+		[noDriverAlarm postAlarm];
+	}	
+}
 
 
 @end

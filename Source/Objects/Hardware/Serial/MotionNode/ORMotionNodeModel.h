@@ -47,6 +47,7 @@ typedef struct MotionNodeCommands {
 #define kNumMin 60
 
 @interface ORMotionNodeModel : ORSerialPortModel {
+	unsigned long	dataId;
     BOOL			nodeRunning;
 	NSMutableData*	inComingData;
 	ORSafeQueue*	cmdQueue;
@@ -78,9 +79,21 @@ typedef struct MotionNodeCommands {
     NSDate*			startTime;
     int				longTermSensitivity;
 	BOOL			cycledOnce;
+    BOOL			showLongTermDelta;
+	BOOL			scheduledToShip;
+    BOOL			autoStart;
 }
 
+#pragma mark ***Initialization
+- (void) registerNotificationObservers;
+- (void) runStarting:(NSNotification*)aNote;
+- (void) runStopping:(NSNotification*)aNote;
+
 #pragma mark ***Accessors
+- (BOOL) autoStart;
+- (void) setAutoStart:(BOOL)aAutoStart;
+- (BOOL) showLongTermDelta;
+- (void) setShowLongTermDelta:(BOOL)aShowLongTermDelta;
 - (int) longTermSensitivity;
 - (void) setLongTermSensitivity:(int)aLongTermSensitivity;
 - (NSDate*) startTime;
@@ -127,6 +140,16 @@ typedef struct MotionNodeCommands {
 #pragma mark •••Port Methods
 - (void) dataReceived:(NSNotification*)note;
 
+#pragma mark •••Data Records
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherPDcu;
+- (void) shipXYZTrace;
+
+#pragma mark •••Data Source
 - (int) maxLinesInLongTermView;
 - (int) indexForLine:(int)m;
 - (int) numLinesInLongTermView;
@@ -135,6 +158,8 @@ typedef struct MotionNodeCommands {
 
 @end
 
+extern NSString* ORMotionNodeModelAutoStartChanged;
+extern NSString* ORMotionNodeModelShowLongTermDeltaChanged;
 extern NSString* ORMotionNodeModelLongTermSensitivityChanged;
 extern NSString* ORMotionNodeModelStartTimeChanged;
 extern NSString* ORMotionNodeModelShowDeltaFromAveChanged;

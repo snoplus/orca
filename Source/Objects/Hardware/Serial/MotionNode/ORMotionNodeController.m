@@ -112,6 +112,17 @@
                      selector : @selector(longTermSensitivityChanged:)
                          name : ORMotionNodeModelLongTermSensitivityChanged
 						object: model];
+	
+    [notifyCenter addObserver : self
+                     selector : @selector(showLongTermDeltaChanged:)
+                         name : ORMotionNodeModelShowLongTermDeltaChanged
+						object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(autoStartChanged:)
+                         name : ORMotionNodeModelAutoStartChanged
+						object: model];
+
 }
 
 - (void) awakeFromNib
@@ -142,6 +153,19 @@
 	[self updateLongTermView:nil];
 	[self startTimeChanged:nil];
 	[self longTermSensitivityChanged:nil];
+	[self showLongTermDeltaChanged:nil];
+	[self autoStartChanged:nil];
+}
+
+- (void) autoStartChanged:(NSNotification*)aNote
+{
+	[autoStartCB setIntValue: [model autoStart]];
+}
+
+- (void) showLongTermDeltaChanged:(NSNotification*)aNote
+{
+	[showLongTermDeltaCB setIntValue: [model showLongTermDelta]];
+	[longTermView setNeedsDisplay:YES];
 }
 
 - (void) longTermSensitivityChanged:(NSNotification*)aNote
@@ -261,6 +285,16 @@
 }
 
 #pragma mark •••Actions
+
+- (void) autoStartAction:(id)sender
+{
+	[model setAutoStart:[sender intValue]];	
+}
+
+- (void) showLongTermDeltaAction:(id)sender
+{
+	[model setShowLongTermDelta:[sender intValue]];	
+}
 
 - (IBAction) longTermSensitivityAction:(id)sender
 {

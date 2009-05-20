@@ -1419,6 +1419,8 @@
 		84B0CFC208FC60BC00EBE23C /* ORContainerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B0CFBC08FC60BC00EBE23C /* ORContainerController.h */; };
 		84B0CFEE08FC6C9B00EBE23C /* OfflineRunAlarmHelp in Resources */ = {isa = PBXBuildFile; fileRef = 84AA48320461DE37005F64B1 /* OfflineRunAlarmHelp */; };
 		84B0CFF208FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFF108FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist */; };
+		84B194BC0FC44E1800775CF1 /* ORMotionNodeDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B194BA0FC44E1800775CF1 /* ORMotionNodeDecoders.m */; };
+		84B194BD0FC44E1800775CF1 /* ORMotionNodeDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B194BB0FC44E1800775CF1 /* ORMotionNodeDecoders.h */; };
 		84B28CDE0F4C597900E2B056 /* BocTIC3.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28CD60F4C597900E2B056 /* BocTIC3.nib */; };
 		84B28CDF0F4C597900E2B056 /* BocTIC3.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28CD70F4C597900E2B056 /* BocTIC3.tif */; };
 		84B28CE00F4C597900E2B056 /* ORBocTIC3Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CD80F4C597900E2B056 /* ORBocTIC3Controller.h */; };
@@ -3336,6 +3338,8 @@
 		84B180FA044C7AAC005F64B1 /* 620Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = 620Card.gif; sourceTree = "<group>"; };
 		84B18101044C7AAC005F64B1 /* OR620Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = OR620Model.h; sourceTree = "<group>"; };
 		84B18102044C7AAC005F64B1 /* OR620Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = OR620Model.m; sourceTree = "<group>"; };
+		84B194BA0FC44E1800775CF1 /* ORMotionNodeDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotionNodeDecoders.m; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeDecoders.m; sourceTree = SOURCE_ROOT; };
+		84B194BB0FC44E1800775CF1 /* ORMotionNodeDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMotionNodeDecoders.h; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeDecoders.h; sourceTree = SOURCE_ROOT; };
 		84B28CD60F4C597900E2B056 /* BocTIC3.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BocTIC3.nib; path = Source/Objects/Hardware/Serial/BocTIC3/BocTIC3.nib; sourceTree = SOURCE_ROOT; };
 		84B28CD70F4C597900E2B056 /* BocTIC3.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BocTIC3.tif; path = Source/Objects/Hardware/Serial/BocTIC3/BocTIC3.tif; sourceTree = SOURCE_ROOT; };
 		84B28CD80F4C597900E2B056 /* ORBocTIC3Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Controller.h; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Controller.h; sourceTree = SOURCE_ROOT; };
@@ -8091,6 +8095,8 @@
 				84D258620FA7340B00626276 /* ORMotionNodeController.m */,
 				84D258630FA7340B00626276 /* ORMotionNodeModel.h */,
 				84D258640FA7340B00626276 /* ORMotionNodeModel.m */,
+				84B194BA0FC44E1800775CF1 /* ORMotionNodeDecoders.m */,
+				84B194BB0FC44E1800775CF1 /* ORMotionNodeDecoders.h */,
 			);
 			name = MotionNode;
 			path = Source/Objects/Hardware/Serial/MotionNode;
@@ -9747,6 +9753,7 @@
 				84CC16D20FAF157000CEE642 /* ORMCA927Model.h in Headers */,
 				84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */,
 				8408322B0FC3307F002B2394 /* ORLongTermView.h in Headers */,
+				84B194BD0FC44E1800775CF1 /* ORMotionNodeDecoders.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11073,6 +11080,7 @@
 				84CC16D30FAF157000CEE642 /* ORMCA927Model.m in Sources */,
 				84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */,
 				8408322C0FC3307F002B2394 /* ORLongTermView.m in Sources */,
+				84B194BC0FC44E1800775CF1 /* ORMotionNodeDecoders.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

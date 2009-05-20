@@ -44,6 +44,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>ORFlippedView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -151,16 +159,10 @@
 			<string>ObjC</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>autoStartAction</key>
+				<string>id</string>
 				<key>displayComponentsAction</key>
 				<string>id</string>
 				<key>longTermSensitivityAction</key>
@@ -173,6 +175,8 @@
 				<string>id</string>
 				<key>showDeltaFromAveAction</key>
 				<string>id</string>
+				<key>showLongTermDeltaAction</key>
+				<string>id</string>
 				<key>start</key>
 				<string>id</string>
 				<key>stop</key>
@@ -184,6 +188,8 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>autoStartCB</key>
+				<string>NSButton</string>
 				<key>displayComponentsMatrix</key>
 				<string>NSMatrix</string>
 				<key>isAccelOnlyField</key>
@@ -203,6 +209,8 @@
 				<key>serialPortController</key>
 				<string>ORSerialPortController</string>
 				<key>showDeltaFromAveCB</key>
+				<string>NSButton</string>
+				<key>showLongTermDeltaCB</key>
 				<string>NSButton</string>
 				<key>startButton</key>
 				<string>NSButton</string>
@@ -269,7 +277,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ZFlowLayout</string>
+				<string>ORFlippedView</string>
 				<key>mDataSource</key>
 				<string>id</string>
 				<key>mXScale</key>

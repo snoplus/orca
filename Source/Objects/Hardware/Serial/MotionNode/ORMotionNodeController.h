@@ -27,6 +27,8 @@
 @interface ORMotionNodeController : OrcaObjectController 
 {
 	IBOutlet NSButton*		startButton;
+	IBOutlet NSButton*		autoStartCB;
+	IBOutlet NSButton*		showLongTermDeltaCB;
 	IBOutlet NSTextField*   startTimeField;
 	IBOutlet NSButton*		showDeltaFromAveCB;
 	IBOutlet NSTextField*	temperatureField;
@@ -48,6 +50,8 @@
 }
 
 #pragma mark ***Interface Management
+- (void) autoStartChanged:(NSNotification*)aNote;
+- (void) showLongTermDeltaChanged:(NSNotification*)aNote;
 - (void) longTermSensitivityChanged:(NSNotification*)aNote;
 - (void) startTimeChanged:(NSNotification*)aNote;
 - (void) showDeltaFromAveChanged:(NSNotification*)aNote;
@@ -65,6 +69,8 @@
 - (void) updateLongTermView:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) autoStartAction:(id)sender;
+- (IBAction) showLongTermDeltaAction:(id)sender;
 - (IBAction) longTermSensitivityAction:(id)sender;
 - (IBAction) showDeltaFromAveAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
