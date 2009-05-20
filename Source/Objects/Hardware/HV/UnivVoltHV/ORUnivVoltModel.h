@@ -19,8 +19,7 @@
 //-------------------------------------------------------------
 
 
-#pragma mark •••Imported Filesg
-
+#pragma mark •••Imported Files
 #import "ORCard.h"
 
 #define UVkChnlNumParameters 11 //see below for list.
@@ -30,18 +29,23 @@ enum hveStatus {eHVUEnabled = 1, eHVURampingUp = 2, eHVURampingDown = 4, evHVUTr
                 eHVUTripForUserCurrent = 32, eHVUTripForHVError = 64, eHVUTripForHVLimit= 128};
 typedef enum hveStatus hveStatus;
 
+@class ORCircularBufferUV;
 
 @interface ORUnivVoltModel : ORCard 
 {
 	id						adapter;
 	NSMutableArray*			mChannelArray;	// Stores dictionary objects (one for each channel) of the parameter values for that channel.
-//	NSArray*				mSetCommands;
-//	NSArray*				mAllCommands;
+	NSDate*					mTimeStamp;		// Time of last reading.
 	NSMutableDictionary*	mParams;	//Dictionary of HV unit parameters indicating type of parameter and whether it is R or R/W. 
 	NSMutableArray*			mCommands;  //Crate commands for HV Unit
+	NSMutableArray*			mCircularBuffers;	// Array holding circular buffers of data one for each channel.  Used for
+												// plotting.
+	long					mPoints;			// number of points in each channel-data circular buffer.
 	NSNumber*				mPollTimeMinutes; 
 	int						mWParams;
 	bool					mPollTaskIsRunning;
+	
+	double					mHVValues[ UVkNumChannels ];
 }
 
 #pragma mark ••• Notifications
@@ -66,6 +70,8 @@ typedef enum hveStatus hveStatus;
 #pragma mark •••Accessors
 - (NSMutableArray*) channelArray;
 - (void) setChannelArray:(NSMutableArray*)anArray;
+- (ORCircularBufferUV*) circularBuffer: (int) aChnl;
+- (long) circularBufferSize: (int) aChnl;
 - (NSMutableDictionary*) channelDictionary: (int) aCurrentChnl;
 - (void)  setChannelEnabled: (int) anEnabled chnl: (int) aCurrentChnl;
 - (int)   chnlEnabled: (int) aCurrentChnl;
@@ -95,6 +101,7 @@ typedef enum hveStatus hveStatus;
 #pragma mark •••Utilities
 - (void) printDictionary: (int) aCurrentChnl;
 - (NSDictionary*) createChnlRetDict: (int) aCurrentChnl;
+- (void) fakeData: (int) aSlot channel: (int) aCurrentChnl;
 
 #pragma mark ***Archival
 - (id) initWithCoder: (NSCoder*) decoder;

@@ -22,11 +22,17 @@
 #import "ORUnivVoltController.h"
 #import "ORUnivVoltModel.h"
 #import "ORUnivVoltHVCrateModel.h"
+#import "ORCircularBufferUV.h"
+#import "ORPlotter1D.h"
 
 @implementation ORUnivVoltController
 - (id) init
 {
     self = [ super initWithWindowNibName: @"UnivVolt" ];
+	if ( self ) 
+	{
+	
+	}
     return self;
 }
 
@@ -38,7 +44,7 @@
 	  [super registerNotificationObservers];
 
     
-   [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector( channelChanged: )
                          name : UVChnlChanged
 						object: model];
@@ -68,12 +74,12 @@
 //					     name : HVSocketNotConnectedNotification
 //					   object : nil];
 
-   [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector( rampUpRateChanged:)
                          name : UVChnlRampUpRateChanged
 						object: model];
 
-   [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector( rampDownRateChanged:)
                          name : UVChnlRampDownRateChanged
 						object: model];
@@ -88,7 +94,7 @@
                          name : UVChnlMVDZChanged
 						object: model];
 						
-   [notifyCenter addObserver : self
+	[notifyCenter addObserver : self
                      selector : @selector( MVDZChanged:)
                          name : UVChnlMVDZChanged
 						object: model];
@@ -123,7 +129,6 @@
 					     name : HVShortErrorNotification
 					   object : nil];
 	
-
 }
 
 
@@ -138,6 +143,7 @@
 	[mChannelNumberField setIntValue: mCurrentChnl];
 	
 	[mChnlTable reloadData];
+
 }
 
 - (void) setValues: (NSNotification *) aNote
@@ -212,7 +218,16 @@
 - (void) measuredHVChanged: (NSNotification*) aNote
 {
 //	[self setCurrentChnl: (NSNotification *) aNote ];  
-	[mMeasuredHV setFloatValue: [model measuredHV: mCurrentChnl]];
+	float hvValue = [model measuredHV: mCurrentChnl];
+	[mMeasuredHV setFloatValue: hvValue];	
+//	ORCircularBufferUV* cbObj = [mCircularBuffers objectAtIndex: mCurrentChnl];
+	
+/*	if (cbObj ) {
+		NSDate* dateObj = [NSDate date];
+//	NSNumber* hvValueObj = [NSNumber numberWithFloat: hvValue];
+		[cbObj insertHVEntry: dateObj hvValue: hvValue];
+	}
+	*/
 }
 
 - (void) tripCurrentChanged: (NSNotification*) aNote
@@ -404,6 +419,66 @@
 	}
 }
 
+#pragma mark •••Code for plotter
+- (int) numberOfDataSetsInPlot: (id) aPlotter
+{
+	return( UVkNumChannels/2 );
+}
+
+- (float) plotter: (id) aPlotter dataSet: (int) aChnl dataValue: (int) anX 
+{
+	if ( aChnl >= 0 ) {
+		ORCircularBufferUV* cbObj = [model circularBuffer: aChnl];
+		NSDictionary* retDataObj = [cbObj HVEntry: anX];
+		NSNumber* hvValueObj = [retDataObj objectForKey: @"HVValue"];
+		float hvValue = [hvValueObj floatValue];
+		return( hvValue );
+//		int count = [[[model adcRateGroup]timeRate] count];
+//		return [[[model adcRateGroup]timeRate]valueAtIndex:count-x-1];
+	}
+	return 0;
+}
+
+
+/*
+- (double) getBarValue: (int) aTag
+{
+	ORCircularBufferUV* cbObj = [model circularBuffer: aTag ];
+	NSDictionary* retData = [cbObj HVEntry: aTag];
+	NSNumber*  hvMeasuredObj = [retDate objectForKey: ];
+	return( [hvMeasuredObj floatValue] );
+}
+*/
+
+
+
+
+- (int)	numberOfPointsInPlot: (id) aPlotter dataSet: (int) aChnl
+{
+	return( [model circularBufferSize: aChnl] );
+}
+
+
+/*- (float) plotter: (id) aPlotter dataSet: (int) aChnl dataValue: (int) x  
+{
+	
+	if( aChnl ) {
+		ORCircularBufferUV* cbObj = [model circularBuffer: aChnl];
+		NSDictionary* dictObj = [cbObj HVEntry: -1 * x];
+//		NSString* keyStr = [[cbObj mKeys] objectAtIndex: 1];
+		NSNumber* numObj = [dictObj objectForKey: CBkHVKey];
+		return [numObj floatValue];
+
+	}
+	return 0;
+}
+*/
+
+- (unsigned long) secondsPerUnit: (id) aPlotter
+{
+	unsigned long sampleTime = [mPollingTimeMinsField intValue] * 60;
+	return( sampleTime );
+}
 
 
 #pragma mark ***Code no longer used.

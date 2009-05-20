@@ -19,8 +19,8 @@
 //-------------------------------------------------------------
 
 #import "OrcaObjectController.h"
-//#import "ORCard.h"
-
+@class ORPlotter1D;
+@class ORCircularBufferUV;
 
 @interface ORUnivVoltController : OrcaObjectController {
 	IBOutlet NSTableView*			mChnlTable;
@@ -40,10 +40,12 @@
 	IBOutlet NSTextField*			mCmdStatus;			// Status of executed command.
 	IBOutlet NSTextField*			mPollingTimeMinsField;	// Number of minutes between refresh of data.
 	IBOutlet NSTextField*			mLastPoll;			// Time when last poll conducted.
+	IBOutlet NSTextField*			mPointsXAxis;		// Number of points in x-axis for HV (y) vs time (x)
 	IBOutlet NSButton*				mStartStopPolling;  // Button that can start and stop the polling.
+	IBOutlet ORPlotter1D*			mPlottingObj;
 	char							mStatusByte;
 	int								mCurrentChnl;		// Current channel visible in display.
-	int								mOrigChnl;		// Channel last displayed in channel view.
+	int								mOrigChnl;			// Channel last displayed in channel view.
 }
 
 #pragma mark •••Notifications

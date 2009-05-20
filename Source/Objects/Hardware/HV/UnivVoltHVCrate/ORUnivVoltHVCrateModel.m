@@ -116,7 +116,6 @@ NSString* UVkSlot	 = @"Slot";
 NSString* UVkChnl    = @"Chnl";
 NSString* UVkCommand = @"Command";
 NSString* UVkReturn  = @"Return";
-
 NSString* HVkErrorMsg = @"ErrorMsg";
 
 @implementation ORUnivVoltHVCrateModel
