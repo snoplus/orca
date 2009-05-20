@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
+		146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */ = {isa = PBXBuildFile; fileRef = 146822420FC4799C0082BD70 /* ORCircularBufferUV.m */; };
 		1C50F9F108033CA9008D18EA /* ADC2249.nib in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E608033CA9008D18EA /* ADC2249.nib */; };
 		1C50F9F208033CA9008D18EA /* ADC2249Card.gif in Resources */ = {isa = PBXBuildFile; fileRef = 1C50F9E708033CA9008D18EA /* ADC2249Card.gif */; };
 		1C50F9F408033CA9008D18EA /* ORADC2249Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 1C50F9E908033CA9008D18EA /* ORADC2249Controller.h */; };
@@ -2117,6 +2119,8 @@
 
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = InfoPlist.strings; sourceTree = "<group>"; };
+		146822410FC4799C0082BD70 /* ORCircularBufferUV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORCircularBufferUV.h; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.h; sourceTree = SOURCE_ROOT; };
+		146822420FC4799C0082BD70 /* ORCircularBufferUV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCircularBufferUV.m; path = Source/Objects/Hardware/HV/UnivVoltHV/ORCircularBufferUV.m; sourceTree = SOURCE_ROOT; };
 		1C50F9E608033CA9008D18EA /* ADC2249.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = ADC2249.nib; sourceTree = "<group>"; };
 		1C50F9E708033CA9008D18EA /* ADC2249Card.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ADC2249Card.gif; sourceTree = "<group>"; };
 		1C50F9E908033CA9008D18EA /* ORADC2249Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORADC2249Controller.h; sourceTree = "<group>"; };
@@ -7351,6 +7355,8 @@
 		84B28E400F4C835500E2B056 /* UnivVoltHV */ = {
 			isa = PBXGroup;
 			children = (
+				146822410FC4799C0082BD70 /* ORCircularBufferUV.h */,
+				146822420FC4799C0082BD70 /* ORCircularBufferUV.m */,
 				84B28E410F4C835500E2B056 /* ORUnivVoltController.h */,
 				84B28E420F4C835500E2B056 /* ORUnivVoltController.m */,
 				84B28E430F4C835500E2B056 /* ORUnivVoltDecoders.h */,
@@ -9754,6 +9760,7 @@
 				84D359CC0FB487AA005F429B /* ORMCA927Decoders.h in Headers */,
 				8408322B0FC3307F002B2394 /* ORLongTermView.h in Headers */,
 				84B194BD0FC44E1800775CF1 /* ORMotionNodeDecoders.h in Headers */,
+				146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11081,6 +11088,7 @@
 				84D359CD0FB487AA005F429B /* ORMCA927Decoders.m in Sources */,
 				8408322C0FC3307F002B2394 /* ORLongTermView.m in Sources */,
 				84B194BC0FC44E1800775CF1 /* ORMotionNodeDecoders.m in Sources */,
+				146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
