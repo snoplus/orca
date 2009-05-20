@@ -64,6 +64,16 @@ NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageSt
 - (void) loadCmosShiftRegisters:(BOOL) aTriggersDisabled;
 @end
 
+@interface ORFec32Model (SBC)
+- (void) loadAllDacsUsingSBC;
+- (NSString*) performBoardIDReadUsingSBC:(short) boardIndex;
+@end
+
+@interface ORFec32Model (LocalAdapter)
+- (void) loadAllDacsUsingLocalAdapter;
+- (NSString*) performBoardIDReadUsingLocalAdapter:(short) boardIndex;
+@end
+
 @implementation ORFec32Model
 
 #pragma mark •••Initialization
@@ -754,56 +764,10 @@ const short kVoltageADCMaximumAttempts = 10;
 
 - (NSString*) performBoardIDRead:(short) boardIndex
 {
-	unsigned short 	dataValue = 0;
-	unsigned long	writeValue = 0UL;
-	unsigned long	theRegister = BOARD_ID_REG_NUMBER;
-	// first select the board (XL2 must already be selected)
-	unsigned long boardSelectVal = 0;
-	boardSelectVal |= (1UL << boardIndex);
-	
-	ORCommandList* aList = [ORCommandList commandList];		//start a command list.
-	
-	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:boardSelectVal]];
-	
-	//-------------------------------------------------------------------------------------------
-	// load and clock in the first 9 bits instruction code and register address
-	//[self boardIDOperation:(BOARD_ID_READ | theRegister) boardSelectValue:boardSelectVal beginIndex: 8];
-	//moved here so we could combine all the commands into one list for speed.
-	unsigned long theDataValue = (BOARD_ID_READ | theRegister);
-	short index;
-	for (index = 8; index >= 0; index--){
-		if ( theDataValue & (1U << index) ) writeValue = (boardSelectVal | BOARD_ID_DI);
-		else								writeValue = boardSelectVal;
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];					// load data value
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
-	}
-	//-------------------------------------------------------------------------------------------
-	
-	// now read the data value; 17 reads, the last data bit is a dummy bit
-	writeValue = boardSelectVal;
-	
-	int cmdRef[16];
-	for (index = 15; index >= 0; index--){
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
-		cmdRef[index] = [aList addCommand: [self readFromFec32RegisterCmd:FEC32_BOARD_ID_REG]];											// read the data bit
-	}
-	
-	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];					// read out the dummy bit
-	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
-	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:0UL]];						// Now de-select all and clock
-	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:BOARD_ID_SK]];				// now clock in value
-
-	[self executeCommandList:aList]; //send out the list (blocks until reply or timeout)
-	
-	//OK, assemble the result
-	for (index = 15; index >= 0; index--){
-		long readValue = [aList longValueForCmd:cmdRef[index]];
-		if ( readValue & BOARD_ID_DO)dataValue |= (1U << index);
-	}
-	
-	return hexToString(dataValue);
+	if([[self xl2] adapterIsSBC])	return [self performBoardIDReadUsingSBC:boardIndex];
+	else				return [self performBoardIDReadUsingLocalAdapter:boardIndex];
 }
+
 
 - (void) executeCommandList:(ORCommandList*)aList
 {
@@ -1063,167 +1027,13 @@ const short kVoltageADCMaximumAttempts = 10;
 }
 
 
-
 - (void) loadAllDacs
 {
-	//-------------- variables -----------------
-	unsigned long	i,j,k;								
-	short			theIndex;
-	const short		numChannels = 8;
-	unsigned long	writeValue  = 0;
-	unsigned long	dacValues[8][17];
-	//------------------------------------------
 	
-	NSLog(@"Setting all DACs for FEC32 (%d,%d)....\n", [self crateNumber],[self stationNumber]);
-	
-	@try {
-		[[self xl2] select:self];
-		
-		// Need to do Full Buffer mode before and after the DACs are loaded the first time
-		// Full Buffer Mode of DAC loading, before the DACs are loaded -- this works 1/20/97
-		
-		ORCommandList* aList = [ORCommandList commandList];
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x0]];  // set DACSEL
-		
-		for ( i = 1; i<= 16 ; i++) {
-			if ( ( i<9 ) || ( i == 10) ){
-				writeValue = 0UL;
-				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
-			}
-			else {
-				writeValue = 0x0007FFFC;
-				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];	// address value, enable this channel					
-			}
-			[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue+1]];
-		}
-		
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x2]];// remove DACSEL
-		
-		// now clock in the address and data values
-		for ( i = numChannels; i >= 1 ; i--) {			// 8 channels, i.e. there are 8 lines of data values
-			
-			[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x0]];  // set DACSEL
-			
-			// clock in the address values
-			for ( j = 1; j<= 8; j++){					
-				if ( j == i) {
-					// enable all 17 DAC address lines for a particular channel
-					writeValue = 0x0007FFFC;
-					[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
-				}
-				else{
-					writeValue = 0UL;
-					[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]]; //disable channel
-				}
-				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue+1]];	// clock in
-			}
-			
-			// first load the DAC values from the database into a 8x17 matirx
-			short cIndex;
-			for (cIndex = 0; cIndex <= 16; cIndex++){
-				short rIndex;
-				for (rIndex = 0; rIndex <= 7; rIndex++){
-					switch( cIndex ){
-							
-						case 0:
-							if ( rIndex%2 == 0 )	{
-								theIndex = (rIndex/2);
-								dacValues[rIndex][cIndex]		= [dc[theIndex] rp2:0];
-								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] rp2:1];
-							}	
-						break;
-							
-						case 1:
-							if ( rIndex%2 == 0)	{
-								theIndex = (rIndex/2);
-								dacValues[rIndex][cIndex]		= [dc[theIndex] vli:0];					
-								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] vli:1];	
-							}	
-						break;
-							
-						case 2:
-							if ( rIndex%2 == 0 )	{
-								theIndex = (rIndex/2);
-								dacValues[rIndex][cIndex]		= [dc[theIndex] vsi:0];					
-								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] vsi:1];		
-							}	
-						break;
-							
-						case 15:
-							if ( rIndex%2 == 0 )	{
-								theIndex = (rIndex/2);
-								dacValues[rIndex][cIndex]		= [dc[theIndex] rp1:0];						
-								dacValues[rIndex + 1][cIndex]   = [dc[theIndex] rp1:0];		
-							}	
-						break;
-					}
-					
-					if ( (cIndex >= 3) && (cIndex <= 6) ) {
-						dacValues[rIndex][cIndex] = [dc[cIndex - 3] vt:rIndex];
-					}
-					
-					else if ( (cIndex >= 7) && (cIndex <= 14) ) {
-						if ( (cIndex - 7)%2 == 0)	{
-							theIndex = ( (cIndex - 7) / 2 );
-							
-							unsigned long theGain;
-							if (rIndex/4)	theGain = 1;
-							else			theGain = 0;
-							dacValues[rIndex][cIndex]	= [dc[theIndex] vb:rIndex%4    egain:theGain];
-							dacValues[rIndex][cIndex+1] = [dc[theIndex] vb:(rIndex%4)+4 egain:theGain];
-						}
-					}
-					else if ( cIndex == 16) {
-						switch( rIndex){
-							case 6:  dacValues[rIndex][cIndex] = [self vRes];			break;
-							case 7:  dacValues[rIndex][cIndex] = [self hVRef];			break;
-							default: dacValues[rIndex][cIndex] = [self cmos:rIndex];	break;
-						}		
-					}
-				}
-			}
-			// load data values, 17 DAC values at a time, from the electronics database
-			// there are a total of 8x17 = 136 DAC values
-			// load the data values
-			for (j = 8; j >= 1; j--){					// 8 bits of data per channel
-				writeValue = 0UL;
-				for (k = 2; k<= 18; k++){				// 17 octal DACs
-					if ( (1UL << j-1 ) & dacValues[numChannels - i][k-2] ) {
-						writeValue |= 1UL << k;
-					}
-				}
-				
-				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
-				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue+1]];	// clock in
-			}
-			
-			[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x2]]; // remove DACSEL
-		}
-		// Full Buffer Mode of DAC loading, after the DACs are loaded -- this works 1/13/97
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x0]]; // set DACSEL
-		
-		for ( i = 1; i<= 16 ; i++){
-			if ( ( i<9 ) || ( i == 10) ){
-				writeValue = 0UL;
-				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
-			}
-			else{
-				writeValue = 0x0007FFFC;
-				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
-			}
-			[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue + 1]];	// clock in with bit 0 high
-		}
-		
-		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x2]]; // remove DACSEL
-		[self executeCommandList:aList];
-		
-		[[self xl2] deselectCards];		
-	}
-	@catch(NSException* localException) {
-		[[self xl2] deselectCards];		
-		NSLog(@"Could not load the DACs for FEC32(%d,%d)!\n", [self crateNumber], [self stationNumber]);			
-	}	
+	if([[self xl2] adapterIsSBC])	[self loadAllDacsUsingSBC];
+	else				[self loadAllDacsUsingLocalAdapter];
 }
+
 
 - (void) setPedestals
 {
@@ -1658,3 +1468,416 @@ const short kVoltageADCMaximumAttempts = 10;
 
 @end
 
+@implementation ORFec32Model (SBC)
+- (void) loadAllDacsUsingSBC
+{
+	//-------------- variables -----------------
+	unsigned long	i,j,k;								
+	short			theIndex;
+	const short		numChannels = 8;
+	unsigned long	writeValue  = 0;
+	unsigned long	dacValues[8][17];
+	//------------------------------------------
+	
+	NSLog(@"Setting all DACs for FEC32 (%d,%d)....\n", [self crateNumber],[self stationNumber]);
+	
+	@try {
+		[[self xl2] select:self];
+		
+		// Need to do Full Buffer mode before and after the DACs are loaded the first time
+		// Full Buffer Mode of DAC loading, before the DACs are loaded -- this works 1/20/97
+		
+		ORCommandList* aList = [ORCommandList commandList];
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x0]];  // set DACSEL
+		
+		for ( i = 1; i<= 16 ; i++) {
+			if ( ( i<9 ) || ( i == 10) ){
+				writeValue = 0UL;
+				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
+			}
+			else {
+				writeValue = 0x0007FFFC;
+				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];	// address value, enable this channel					
+			}
+			[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue+1]];
+		}
+		
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x2]];// remove DACSEL
+		
+		// now clock in the address and data values
+		for ( i = numChannels; i >= 1 ; i--) {			// 8 channels, i.e. there are 8 lines of data values
+			
+			[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x0]];  // set DACSEL
+			
+			// clock in the address values
+			for ( j = 1; j<= 8; j++){					
+				if ( j == i) {
+					// enable all 17 DAC address lines for a particular channel
+					writeValue = 0x0007FFFC;
+					[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
+				}
+				else{
+					writeValue = 0UL;
+					[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]]; //disable channel
+				}
+				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue+1]];	// clock in
+			}
+			
+			// first load the DAC values from the database into a 8x17 matirx
+			short cIndex;
+			for (cIndex = 0; cIndex <= 16; cIndex++){
+				short rIndex;
+				for (rIndex = 0; rIndex <= 7; rIndex++){
+					switch( cIndex ){
+							
+						case 0:
+							if ( rIndex%2 == 0 )	{
+								theIndex = (rIndex/2);
+								dacValues[rIndex][cIndex]		= [dc[theIndex] rp2:0];
+								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] rp2:1];
+							}	
+							break;
+							
+						case 1:
+							if ( rIndex%2 == 0)	{
+								theIndex = (rIndex/2);
+								dacValues[rIndex][cIndex]		= [dc[theIndex] vli:0];					
+								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] vli:1];	
+							}	
+							break;
+							
+						case 2:
+							if ( rIndex%2 == 0 )	{
+								theIndex = (rIndex/2);
+								dacValues[rIndex][cIndex]		= [dc[theIndex] vsi:0];					
+								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] vsi:1];		
+							}	
+							break;
+							
+						case 15:
+							if ( rIndex%2 == 0 )	{
+								theIndex = (rIndex/2);
+								dacValues[rIndex][cIndex]		= [dc[theIndex] rp1:0];						
+								dacValues[rIndex + 1][cIndex]   = [dc[theIndex] rp1:0];		
+							}	
+							break;
+					}
+					
+					if ( (cIndex >= 3) && (cIndex <= 6) ) {
+						dacValues[rIndex][cIndex] = [dc[cIndex - 3] vt:rIndex];
+					}
+					
+					else if ( (cIndex >= 7) && (cIndex <= 14) ) {
+						if ( (cIndex - 7)%2 == 0)	{
+							theIndex = ( (cIndex - 7) / 2 );
+							
+							unsigned long theGain;
+							if (rIndex/4)	theGain = 1;
+							else			theGain = 0;
+							dacValues[rIndex][cIndex]	= [dc[theIndex] vb:rIndex%4    egain:theGain];
+							dacValues[rIndex][cIndex+1] = [dc[theIndex] vb:(rIndex%4)+4 egain:theGain];
+						}
+					}
+					else if ( cIndex == 16) {
+						switch( rIndex){
+							case 6:  dacValues[rIndex][cIndex] = [self vRes];			break;
+							case 7:  dacValues[rIndex][cIndex] = [self hVRef];			break;
+							default: dacValues[rIndex][cIndex] = [self cmos:rIndex];	break;
+						}		
+					}
+				}
+			}
+			// load data values, 17 DAC values at a time, from the electronics database
+			// there are a total of 8x17 = 136 DAC values
+			// load the data values
+			for (j = 8; j >= 1; j--){					// 8 bits of data per channel
+				writeValue = 0UL;
+				for (k = 2; k<= 18; k++){				// 17 octal DACs
+					if ( (1UL << j-1 ) & dacValues[numChannels - i][k-2] ) {
+						writeValue |= 1UL << k;
+					}
+				}
+				
+				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
+				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue+1]];	// clock in
+			}
+			
+			[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x2]]; // remove DACSEL
+		}
+		// Full Buffer Mode of DAC loading, after the DACs are loaded -- this works 1/13/97
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x0]]; // set DACSEL
+		
+		for ( i = 1; i<= 16 ; i++){
+			if ( ( i<9 ) || ( i == 10) ){
+				writeValue = 0UL;
+				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
+			}
+			else{
+				writeValue = 0x0007FFFC;
+				[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue]];
+			}
+			[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue + 1]];	// clock in with bit 0 high
+		}
+		
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:0x2]]; // remove DACSEL
+		[self executeCommandList:aList];
+		
+		[[self xl2] deselectCards];		
+	}
+	@catch(NSException* localException) {
+		[[self xl2] deselectCards];		
+		NSLog(@"Could not load the DACs for FEC32(%d,%d)!\n", [self crateNumber], [self stationNumber]);			
+	}	
+}
+
+
+- (NSString*) performBoardIDReadUsingSBC:(short) boardIndex
+{
+	unsigned short 	dataValue = 0;
+	unsigned long	writeValue = 0UL;
+	unsigned long	theRegister = BOARD_ID_REG_NUMBER;
+	// first select the board (XL2 must already be selected)
+	unsigned long boardSelectVal = 0;
+	boardSelectVal |= (1UL << boardIndex);
+	
+	ORCommandList* aList = [ORCommandList commandList];		//start a command list.
+	
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:boardSelectVal]];
+	
+	//-------------------------------------------------------------------------------------------
+	// load and clock in the first 9 bits instruction code and register address
+	//[self boardIDOperation:(BOARD_ID_READ | theRegister) boardSelectValue:boardSelectVal beginIndex: 8];
+	//moved here so we could combine all the commands into one list for speed.
+	unsigned long theDataValue = (BOARD_ID_READ | theRegister);
+	short index;
+	for (index = 8; index >= 0; index--){
+		if ( theDataValue & (1U << index) ) writeValue = (boardSelectVal | BOARD_ID_DI);
+		else								writeValue = boardSelectVal;
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];					// load data value
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
+	}
+	//-------------------------------------------------------------------------------------------
+	
+	// now read the data value; 17 reads, the last data bit is a dummy bit
+	writeValue = boardSelectVal;
+	
+	int cmdRef[16];
+	for (index = 15; index >= 0; index--){
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];
+		[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
+		cmdRef[index] = [aList addCommand: [self readFromFec32RegisterCmd:FEC32_BOARD_ID_REG]];											// read the data bit
+	}
+	
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:writeValue]];					// read out the dummy bit
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)]];	// now clock in value
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:0UL]];						// Now de-select all and clock
+	[aList addCommand: [self writeToFec32RegisterCmd:FEC32_BOARD_ID_REG value:BOARD_ID_SK]];				// now clock in value
+	
+	[self executeCommandList:aList]; //send out the list (blocks until reply or timeout)
+	
+	//OK, assemble the result
+	for (index = 15; index >= 0; index--){
+		long readValue = [aList longValueForCmd:cmdRef[index]];
+		if ( readValue & BOARD_ID_DO)dataValue |= (1U << index);
+	}
+	
+	return hexToString(dataValue);
+}
+
+@end
+
+@implementation ORFec32Model (LocalAdapter)
+- (void) loadAllDacsUsingLocalAdapter
+{
+	//-------------- variables -----------------
+	unsigned long	i,j,k;								
+	short			theIndex;
+	const short		numChannels = 8;
+	unsigned long	writeValue  = 0;
+	unsigned long	dacValues[8][17];
+	//------------------------------------------
+	
+	NSLog(@"Setting all DACs for FEC32 (%d,%d)....\n", [self crateNumber],[self stationNumber]);
+	
+	@try {
+		[[self xl2] select:self];
+		[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:0x0];  // set DACSEL
+		
+		for ( i = 1; i<= 16 ; i++) {
+			if ( ( i<9 ) || ( i == 10) ){
+				writeValue = 0UL;
+				[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue];
+			}
+			else {
+				writeValue = 0x0007FFFC;
+				[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue];	// address value, enable this channel					
+			}
+			[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue+1];
+		}
+		
+		[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:0x2];// remove DACSEL
+		
+		// now clock in the address and data values
+		for ( i = numChannels; i >= 1 ; i--) {			// 8 channels, i.e. there are 8 lines of data values
+			[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:0x0];  // set DACSEL
+			// clock in the address values
+			for ( j = 1; j<= 8; j++){					
+				if ( j == i) {
+					// enable all 17 DAC address lines for a particular channel
+					writeValue = 0x0007FFFC;
+					[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue];
+				}
+				else{
+					writeValue = 0UL;
+					[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue]; //disable channel
+				}
+				[self writeToFec32RegisterCmd:FEC32_DAC_PROGRAM_REG value:writeValue+1]; // clock in
+			}
+			
+			// first load the DAC values from the database into a 8x17 matirx
+			short cIndex;
+			for (cIndex = 0; cIndex <= 16; cIndex++){
+				short rIndex;
+				for (rIndex = 0; rIndex <= 7; rIndex++){
+					switch( cIndex ){
+						case 0:
+							if ( rIndex%2 == 0 )	{
+								theIndex = (rIndex/2);
+								dacValues[rIndex][cIndex]		= [dc[theIndex] rp2:0];
+								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] rp2:1];
+							}	
+							break;
+						case 1:
+							if ( rIndex%2 == 0)	{
+								theIndex = (rIndex/2);
+								dacValues[rIndex][cIndex]		= [dc[theIndex] vli:0];					
+								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] vli:1];	
+							}	
+							break;
+						case 2:
+							if ( rIndex%2 == 0 )	{
+								theIndex = (rIndex/2);
+								dacValues[rIndex][cIndex]		= [dc[theIndex] vsi:0];					
+								dacValues[rIndex + 1][cIndex]	= [dc[theIndex] vsi:1];		
+							}	
+							break;
+						case 15:
+							if ( rIndex%2 == 0 )	{
+								theIndex = (rIndex/2);
+								dacValues[rIndex][cIndex]		= [dc[theIndex] rp1:0];						
+								dacValues[rIndex + 1][cIndex]   = [dc[theIndex] rp1:0];		
+							}	
+							break;
+					}
+					if ( (cIndex >= 3) && (cIndex <= 6) ) {
+						dacValues[rIndex][cIndex] = [dc[cIndex - 3] vt:rIndex];
+					}
+					else if ( (cIndex >= 7) && (cIndex <= 14) ) {
+						if ( (cIndex - 7)%2 == 0)	{
+							theIndex = ( (cIndex - 7) / 2 );
+							
+							unsigned long theGain;
+							if (rIndex/4)	theGain = 1;
+							else			theGain = 0;
+							dacValues[rIndex][cIndex]	= [dc[theIndex] vb:rIndex%4    egain:theGain];
+							dacValues[rIndex][cIndex+1] = [dc[theIndex] vb:(rIndex%4)+4 egain:theGain];
+						}
+					}
+					else if ( cIndex == 16) {
+						switch( rIndex){
+							case 6:  dacValues[rIndex][cIndex] = [self vRes];			break;
+							case 7:  dacValues[rIndex][cIndex] = [self hVRef];			break;
+							default: dacValues[rIndex][cIndex] = [self cmos:rIndex];	break;
+						}		
+					}
+				}
+			}
+			// load data values, 17 DAC values at a time, from the electronics database
+			// there are a total of 8x17 = 136 DAC values
+			// load the data values
+			for (j = 8; j >= 1; j--){					// 8 bits of data per channel
+				writeValue = 0UL;
+				for (k = 2; k<= 18; k++){				// 17 octal DACs
+					if ( (1UL << j-1 ) & dacValues[numChannels - i][k-2] ) {
+						writeValue |= 1UL << k;
+					}
+				}
+				[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue];
+				[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue+1];	// clock in
+			}
+			[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:0x2]; // remove DACSEL
+		}
+		// Full Buffer Mode of DAC loading, after the DACs are loaded -- this works 1/13/97
+		[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:0x0]; // set DACSEL
+		
+		for ( i = 1; i<= 16 ; i++){
+			if ( ( i<9 ) || ( i == 10) ){
+				writeValue = 0UL;
+				[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue];
+			}
+			else{
+				writeValue = 0x0007FFFC;
+				[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue];
+			}
+			[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:writeValue + 1];	// clock in with bit 0 high
+		}
+		
+		[self writeToFec32Register:FEC32_DAC_PROGRAM_REG value:0x2]; // remove DACSEL
+		[[self xl2] deselectCards];		
+	}
+	@catch(NSException* localException) {
+		[[self xl2] deselectCards];		
+		NSLog(@"Could not load the DACs for FEC32(%d,%d)!\n", [self crateNumber], [self stationNumber]);			
+	}	
+}
+
+
+- (NSString*) performBoardIDReadUsingLocalAdapter:(short) boardIndex
+{
+	unsigned short 	dataValue = 0;
+	unsigned long	writeValue = 0UL;
+	unsigned long	theRegister = BOARD_ID_REG_NUMBER;
+	// first select the board (XL2 must already be selected)
+	unsigned long boardSelectVal = 0;
+	boardSelectVal |= (1UL << boardIndex);
+	
+	[self writeToFec32Register:FEC32_BOARD_ID_REG value:boardSelectVal];
+	
+	//-------------------------------------------------------------------------------------------
+	// load and clock in the first 9 bits instruction code and register address
+	//[self boardIDOperation:(BOARD_ID_READ | theRegister) boardSelectValue:boardSelectVal beginIndex: 8];
+	//moved here so we could combine all the commands into one list for speed.
+	unsigned long theDataValue = (BOARD_ID_READ | theRegister);
+	short index;
+	for (index = 8; index >= 0; index--){
+		if (theDataValue & (1U << index))	writeValue = (boardSelectVal | BOARD_ID_DI);
+		else					writeValue = boardSelectVal;
+		[self writeToFec32Register:FEC32_BOARD_ID_REG value:writeValue];			// load data value
+		[self writeToFec32Register:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)];	// now clock in value
+	}
+	//-------------------------------------------------------------------------------------------
+	
+	// now read the data value; 17 reads, the last data bit is a dummy bit
+	writeValue = boardSelectVal;
+	
+	int cmdRef[16];
+	for (index = 15; index >= 0; index--){
+		[self writeToFec32Register:FEC32_BOARD_ID_REG value:writeValue];
+		[self writeToFec32Register:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)];	// now clock in value
+		cmdRef[index] = [self readFromFec32Register:FEC32_BOARD_ID_REG];			// read the data bit
+	}
+	
+	[self writeToFec32Register:FEC32_BOARD_ID_REG value:writeValue];				// read out the dummy bit
+	[self writeToFec32Register:FEC32_BOARD_ID_REG value:(writeValue | BOARD_ID_SK)];		// now clock in value
+	[self writeToFec32Register:FEC32_BOARD_ID_REG value:0UL];					// Now de-select all and clock
+	[self writeToFec32Register:FEC32_BOARD_ID_REG value:BOARD_ID_SK];				// now clock in value
+		
+	//OK, assemble the result
+	for (index = 15; index >= 0; index--){
+		long readValue = cmdRef[index];
+		if (readValue & BOARD_ID_DO) dataValue |= (1U << index);
+	}
+	
+	return hexToString(dataValue);
+}
+@end
