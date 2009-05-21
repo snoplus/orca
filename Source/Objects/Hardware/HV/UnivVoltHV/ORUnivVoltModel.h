@@ -102,6 +102,7 @@ typedef enum hveStatus hveStatus;
 - (void) printDictionary: (int) aCurrentChnl;
 - (NSDictionary*) createChnlRetDict: (int) aCurrentChnl;
 - (void) fakeData: (int) aSlot channel: (int) aCurrentChnl;
+- (int) numChnlsEnabled;
 
 #pragma mark ***Archival
 - (id) initWithCoder: (NSCoder*) decoder;

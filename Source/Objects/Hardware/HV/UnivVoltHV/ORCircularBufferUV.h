@@ -8,8 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 
-//#define CBkTimeKey = @"Time";
-//#define CBkHVKey = @"HVValue";
+#define CBkTimeKey = @"Time";
+#define CBkHVKey = "@HVValue";
 
 //const int CBkTimeIndex = 0;
 //const int CBkHVIndex = 1;

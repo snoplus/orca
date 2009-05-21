@@ -25,6 +25,8 @@
 #import "ORCircularBufferUV.h"
 #import "ORPlotter1D.h"
 
+const int MAXcCHNLS_PER_PLOT = 6;
+
 @implementation ORUnivVoltController
 - (id) init
 {
@@ -422,19 +424,38 @@
 #pragma mark •••Code for plotter
 - (int) numberOfDataSetsInPlot: (id) aPlotter
 {
-	return( UVkNumChannels/2 );
+	int totalChnls;
+	
+	totalChnls = [model numChnlsEnabled];
+	NSLog( @"Total chnls: %d\n", totalChnls );
+	
+	if ( aPlotter == mPlottingObj1 ) {
+		if ( totalChnls > MAXcCHNLS_PER_PLOT ) {
+			return( MAXcCHNLS_PER_PLOT );
+		}
+		else {
+			return( totalChnls );
+		}
+	}
+	else {
+		return( totalChnls - MAXcCHNLS_PER_PLOT );
+	}
+	return( 0 );
 }
 
 - (float) plotter: (id) aPlotter dataSet: (int) aChnl dataValue: (int) anX 
 {
+	
 	if ( aChnl >= 0 ) {
 		ORCircularBufferUV* cbObj = [model circularBuffer: aChnl];
+		if ( anX >= [cbObj size] )
+			return( 0.0 );
+			
 		NSDictionary* retDataObj = [cbObj HVEntry: anX];
 		NSNumber* hvValueObj = [retDataObj objectForKey: @"HVValue"];
 		float hvValue = [hvValueObj floatValue];
+		
 		return( hvValue );
-//		int count = [[[model adcRateGroup]timeRate] count];
-//		return [[[model adcRateGroup]timeRate]valueAtIndex:count-x-1];
 	}
 	return 0;
 }

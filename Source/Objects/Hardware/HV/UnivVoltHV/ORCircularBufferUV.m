@@ -16,14 +16,10 @@
     mTailIndex = 0;
 	mHeadIndex = 0;
 	mFWrapped = NO;
-	mKeys = [NSArray arrayWithObjects: @"Time", @"HVValue", nil];
+	mKeys = [NSArray arrayWithObjects: @"Time", @"Value", nil];
 	[mKeys retain];
 	
 	// what is going on.
-	NSDate* timeObj = [mKeys objectAtIndex: 0];
-	NSString* hvStr = [mKeys objectAtIndex: 1];
-	NSLog( @"Time key: %@\n", timeObj );
-	NSLog( @"Value key: %@\n", hvStr );
 	[mKeys retain];
 	
     return self;
@@ -39,9 +35,8 @@
 {
 	mSize = aSizeCB;
 	mStorageArray = [NSMutableArray arrayWithCapacity: mSize];
-//	NSNumber* numObj = [NSNumber numberWithFloat: 0.0];
-//	[mStorageArray insertObject: numObj atIndex: 0];
-	NSLog( @"Size of array: %d\n", [mStorageArray count] );
+	[mStorageArray retain];
+//	NSLog( @"Size of array: %d\n", [mStorageArray count] );
 }
 
 - ( long ) size
@@ -56,26 +51,25 @@
 
 - (void) insertHVEntry: (NSDate *) aDateOfAquistion hvValue: (NSNumber*) anHVEntry
 {
-	int i;
 	@try
 	{
-		NSLog( @"Date: %@, HV Value: %f\n", aDateOfAquistion, anHVEntry );
+		NSLog( @"Date: %@, HV Value: %@\n", aDateOfAquistion, anHVEntry );
+//	NSNumber* numObj = [NSNumber numberWithFloat: anHVEntry];
+//	NSLog( @"Number: %@\n", numObj );
 		NSArray* tmpTimePoint = [NSArray arrayWithObjects: aDateOfAquistion, anHVEntry, nil];
+//	NSLog( @"time: %@, value: %@\n", [tmpTimePoint objectAtIndex: 0], [tmpTimePoint objectAtIndex: 1] );
 		NSDictionary* dictObj = [NSDictionary dictionaryWithObjects: tmpTimePoint forKeys: mKeys];
 	
+		int i;
 	 
-		if ( mFWrapped == YES )
+		if ( mFWrapped ) 
 		{
-			[mStorageArray removeObjectAtIndex: mTailIndex];
+			[mStorageArray replaceObjectAtIndex: mTailIndex  withObject: dictObj];
 		}
-		[mStorageArray insertObject: dictObj atIndex: mTailIndex];
-/*	}
-	else
-	{
-		[mStorageArray addObject: dictObj];
-		NSDictionary* checkObj = [mStorageArray objectAtIndex: mTailIndex];
-	}
-*/
+		else
+		{
+			[mStorageArray addObject: dictObj];
+		}
 //	NSLog( @"insert: %f at index: %d, size: %d\n", anHVEntry, mTailIndex, [mStorageArray count] );
 //	NSLog( @"Entry after insertion ( %d ): %f\n", mTailIndex, [[mStorageArray objectAtIndex: mTailIndex] floatValue] );
 		mTailIndex += 1;
@@ -84,17 +78,19 @@
 			mFWrapped = YES;
 		}
 	
-		for( i = 0; i < 5; i++ )
+		int maxCount;
+		maxCount = [mStorageArray count] > 5 ? 5: [mStorageArray count];
+		for( i = 0; i < [mStorageArray count]; i++ )
 		{
 			NSDictionary* timeDataPoint = [mStorageArray objectAtIndex: i];
 			NSLog( @"Entry ( %d ) - Time %@ value: %f\n", i, [timeDataPoint objectForKey: [mKeys objectAtIndex: 0]], 
-				[[timeDataPoint objectForKey: [mKeys objectAtIndex: 1]] floatValue] );
+					[[timeDataPoint objectForKey: [mKeys objectAtIndex: 1]] floatValue] );
 		}
 		NSLog( @"-----Count: %d\n\n\n", [mStorageArray count] );
 	}
-	@catch( NSException* e )
+	@catch (NSException* e )
 	{
-		NSLog( @"Caught expception '@'.", [e reason] );
+		NSLog( @"Encountered expection %@ in 'ORCircularBuffer:insertHVEntry'\n", [e reason] );
 	}
 }
 

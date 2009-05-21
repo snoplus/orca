@@ -843,7 +843,7 @@ NSString* UVkWrite = @"W";
 //		[notifyCenter postNotificationName: UVChnlHVLimitChanged object: self userInfo: chnlDictObj];
 	}
 	@catch (NSException * e) {
-		NSLog( @"Caught exception '%@'.", [e reason] );
+		NSLog( @"Caught exception '%@'.\n", [e reason] );
 	}
 	@finally {
 		
@@ -1192,17 +1192,35 @@ NSString* UVkWrite = @"W";
 	return( retDict );
 }
 
+- (int) numChnlsEnabled
+{
+	int total;
+	int i;
+	
+	total = 0;
+	
+	// go through array of channel parameters
+	for (i = 0; i < [mChannelArray count]; i++ ) {
+		NSMutableDictionary* chnlParams = [self channelDictionary: i];
+		NSNumber* chnlEnabledObj = [chnlParams objectForKey: HVkChannelEnabled]; 
+		if ( [chnlEnabledObj intValue] == 1 ) total += 1; 
+	}
+	return( total );
+	
+}
+
 - (void) fakeData: (int) aSlot channel: (int) aCurrentChnl
 {
 	@try
 	{
 		float measuredHVFloat = ((float)rand())/RAND_MAX;
-		measuredHVFloat = 2000.0 + measuredHVFloat;
-		NSNumber* measuredHV = [NSNumber numberWithFloat: measuredHVFloat];
 		NSString* commandRet = [NSString stringWithString: @"DMP"];
 		NSString*  slotChnlNumber = [NSString stringWithString: @"S0.0"];
-		NSNumber* channelEnabled = [NSNumber numberWithInt: 1];
 		NSNumber* measuredCurrent = [NSNumber numberWithFloat: 1000.0];
+		measuredHVFloat = 2000.0 + measuredHVFloat;
+		NSNumber* measuredHV = [NSNumber numberWithFloat: measuredHVFloat];
+		NSNumber* demandHV = [NSNumber numberWithFloat: 2000.0];
+		NSNumber* channelEnabled = [NSNumber numberWithInt: 1];
 		NSNumber* rampUpRate = [NSNumber numberWithFloat: 50.0];
 		NSNumber* rampDownRate = [NSNumber numberWithFloat: 51.0];
 		NSNumber* tripCurrent = [NSNumber numberWithFloat: 2300.0];
@@ -1212,17 +1230,20 @@ NSString* UVkWrite = @"W";
 		NSNumber* HVLimit = [NSNumber numberWithFloat: 3000.0];
 		NSArray* rawFakeData = [NSArray arrayWithObjects: commandRet,
 														  slotChnlNumber,
-													      channelEnabled,
-													      measuredCurrent,
-													      measuredHV,
+														  measuredCurrent,
+														  measuredHV,
+														  demandHV,
 													      rampUpRate,
 													      rampDownRate,
 													      tripCurrent,
+														  channelEnabled,
 													      status,
 													      mvdZ,
 													      mcdz,
 													      HVLimit,
 													      nil];
+														  
+		NSLog( @"Number of fake data %d\n.", [rawFakeData count] );
 		NSNumber* slot = [NSNumber numberWithInt: 0];
 		NSNumber* chnl = [NSNumber numberWithInt: 0];
 		NSString* command = [NSString stringWithString: @"DMP"];

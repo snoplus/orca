@@ -76,7 +76,9 @@
 				<string>NSTextField</string>
 				<key>mMeasuredHV</key>
 				<string>NSTextField</string>
-				<key>mPlottingObj</key>
+				<key>mPlottingObj1</key>
+				<string>ORPlotter1D</string>
+				<key>mPlottingObj2</key>
 				<string>ORPlotter1D</string>
 				<key>mPointsXAxis</key>
 				<string>NSTextField</string>

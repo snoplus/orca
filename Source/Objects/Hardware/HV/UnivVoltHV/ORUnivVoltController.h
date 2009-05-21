@@ -42,7 +42,8 @@
 	IBOutlet NSTextField*			mLastPoll;			// Time when last poll conducted.
 	IBOutlet NSTextField*			mPointsXAxis;		// Number of points in x-axis for HV (y) vs time (x)
 	IBOutlet NSButton*				mStartStopPolling;  // Button that can start and stop the polling.
-	IBOutlet ORPlotter1D*			mPlottingObj;
+	IBOutlet ORPlotter1D*			mPlottingObj1;
+	IBOutlet ORPlotter1D*			mPlottingObj2;
 	char							mStatusByte;
 	int								mCurrentChnl;		// Current channel visible in display.
 	int								mOrigChnl;			// Channel last displayed in channel view.
