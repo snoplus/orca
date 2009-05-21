@@ -29,6 +29,7 @@
 	int numLines  = [dataSource numLinesInLongTermView:self];
 	int numPoints = [dataSource numPointsPerLineInLongTermView:self];
 	int maxLines = [dataSource maxLinesInLongTermView:self];
+	int startingLine = [dataSource startingLineInLongTermView:self];
 	
 	float dh =  h/(float)maxLines;
 	float yOffset = dh/2;
@@ -45,13 +46,13 @@
 		[thePath setLineWidth:.5];
 		int i;
 		[thePath moveToPoint:NSMakePoint( 0, yOffset)];
-		int theLine = [dataSource longTermView:self indexForLine:m];
-
 		for(i=1;i<numPoints;i++){
-			float y = [dataSource longTermView:self line:theLine point:i];
+			float y = [dataSource longTermView:self line:startingLine point:i];
 			[thePath lineToPoint:NSMakePoint( i * xscale, yOffset+y)];
 		}
 		yOffset += dh;
+		startingLine--;
+		if(startingLine<0)startingLine = maxLines-1;
 	}
 	[[NSColor redColor] set];
 	[thePath stroke];

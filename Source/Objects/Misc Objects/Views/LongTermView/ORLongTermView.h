@@ -12,7 +12,7 @@
 @end
 
 @interface NSObject (ORLongTermView)
-- (int) longTermView:(id)aView indexForLine:(int)m;
+- (int) startingLineInLongTermView:(id)aLongTermView;
 - (int) maxLinesInLongTermView:(id)aLongTermView;
 - (int) numLinesInLongTermView:(id)aLongTermView;
 - (int) numPointsPerLineInLongTermView:(id)aLongTermView;

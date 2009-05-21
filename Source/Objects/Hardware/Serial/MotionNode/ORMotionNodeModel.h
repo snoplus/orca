@@ -88,6 +88,7 @@ typedef struct MotionNodeCommands {
     NSDate*			lastRecordShipped;
     int				totalShipped;
 	int				excursionIndex;
+	float			longTraceValueToKeep;
 }
 
 #pragma mark ***Initialization
@@ -167,7 +168,7 @@ typedef struct MotionNodeCommands {
 
 #pragma mark •••Data Source
 - (int) maxLinesInLongTermView;
-- (int) indexForLine:(int)m;
+- (int) startingLine;
 - (int) numLinesInLongTermView;
 - (int) numPointsPerLineInLongTermView;
 - (float)longTermDataAtLine:(int)m point:(int)i;

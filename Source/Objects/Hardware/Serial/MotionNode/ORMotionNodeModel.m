@@ -545,6 +545,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void) startDevice
 {
 	scheduledToShip = NO;
+	longTraceValueToKeep = 0;
 	[self setStartTime:[NSDate date]];
 	memset(xTrace,0,sizeof(float)*kModeNodeTraceLength);
 	memset(yTrace,0,sizeof(float)*kModeNodeTraceLength);
@@ -605,11 +606,9 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	}
 }
 
-- (int) indexForLine:(int)m
+- (int) startingLine
 {
-	int line = longTraceMinIndex-m-1;
-	if(line<0)line = kNumMin + (longTraceMinIndex - m);
-	return line;
+	return longTraceMinIndex;
 }
 
 - (int) maxLinesInLongTermView
@@ -620,7 +619,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (int) numLinesInLongTermView
 {
 	if(cycledOnce) return kNumMin;
-	else return longTraceMinIndex;
+	else return longTraceMinIndex+1;
 }
 
 - (int) numPointsPerLineInLongTermView
@@ -952,26 +951,20 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	}
 	
 	if(longTermValid){
-		if(traceIndex >= kModeNodeTraceLength-1){
-			int i;
-			float	longTraceValueToKeep = 0;
-			for(i=0;i<kModeNodeTraceLength;i++){
-				if(fabs(xyzTrace[i]) > fabs(longTraceValueToKeep)){
-					longTraceValueToKeep = xyzTrace[i];
-				}
-				if(((i!=0) && !(i%kModeNodePtsToCombine))){				
-					longTermTrace[longTraceMinIndex][longTraceIndex] = longTraceValueToKeep;
-					longTraceValueToKeep = 0;
-					longTraceIndex = (longTraceIndex+1)%kModeNodeLongTraceLength;
-					if(longTraceIndex==kModeNodeLongTraceLength-1){
-						[[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelUpdateLongTermTrace object:self];
-						longTraceMinIndex = (longTraceMinIndex+1)%kNumMin;
-						if(longTraceMinIndex == 0) cycledOnce = YES;
-						int i;
-						for(i=0;i<kModeNodeLongTraceLength;i++){
-							longTermTrace[longTraceMinIndex][i] = 0;
-						}
-					}
+		if(fabs(xyzTrace[traceIndex]) > fabs(longTraceValueToKeep)){
+			longTraceValueToKeep = xyzTrace[traceIndex];
+		}
+		if(!(traceIndex%kModeNodePtsToCombine)){				
+			longTermTrace[longTraceMinIndex][longTraceIndex] = longTraceValueToKeep;
+			longTraceValueToKeep = 0;
+			longTraceIndex = (longTraceIndex+1)%kModeNodeLongTraceLength;
+			if(longTraceIndex==kModeNodeLongTraceLength-1){
+				[[NSNotificationCenter defaultCenter] postNotificationName:ORMotionNodeModelUpdateLongTermTrace object:self];
+				longTraceMinIndex = (longTraceMinIndex+1)%kNumMin;
+				if(longTraceMinIndex == 0) cycledOnce = YES;
+				int i;
+				for(i=0;i<kModeNodeLongTraceLength;i++){
+					longTermTrace[longTraceMinIndex][i] = 0;
 				}
 			}
 		}

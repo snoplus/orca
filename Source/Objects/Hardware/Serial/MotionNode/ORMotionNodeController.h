@@ -94,7 +94,7 @@
 - (IBAction) displayComponentsAction:(id)sender;
 
 - (int) maxLinesInLongTermView:(id)aLongTermView;
-- (int) longTermView:(id)aView indexForLine:(int)m;
+- (int) startingLineInLongTermView:(id)aLongTermView;
 - (int) numLinesInLongTermView:(id)aLongTermView;
 - (int) numPointsPerLineInLongTermView:(id)aLongTermView;
 - (float) longTermView:(id)aLongTermView line:(int)m point:(int)i;

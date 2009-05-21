@@ -439,9 +439,9 @@
 	}
 }
 
-- (int) longTermView:(id)aView indexForLine:(int)m
+- (int) startingLineInLongTermView:(id)aView 
 {
-	return [model indexForLine:m];
+	return [model startingLine];
 }
 
 - (int) maxLinesInLongTermView:(id)aLongTermView
