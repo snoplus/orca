@@ -60,7 +60,7 @@
 //	NSLog( @"time: %@, value: %@\n", [tmpTimePoint objectAtIndex: 0], [tmpTimePoint objectAtIndex: 1] );
 		NSDictionary* dictObj = [NSDictionary dictionaryWithObjects: tmpTimePoint forKeys: mKeys];
 	
-		int i;
+//		int i;
 	 
 		if ( mFWrapped ) 
 		{
@@ -80,6 +80,7 @@
 	
 		int maxCount;
 		maxCount = [mStorageArray count] > 5 ? 5: [mStorageArray count];
+/*
 		for( i = 0; i < [mStorageArray count]; i++ )
 		{
 			NSDictionary* timeDataPoint = [mStorageArray objectAtIndex: i];
@@ -87,6 +88,7 @@
 					[[timeDataPoint objectForKey: [mKeys objectAtIndex: 1]] floatValue] );
 		}
 		NSLog( @"-----Count: %d\n\n\n", [mStorageArray count] );
+*/
 	}
 	@catch (NSException* e )
 	{
@@ -108,10 +110,10 @@
 - (NSDictionary *) HVEntry
 {
 	NSDictionary* dictObj = [[mStorageArray objectAtIndex: mHeadIndex] autorelease];
-	NSNumber* numObj = [dictObj objectForKey: [mKeys objectAtIndex: 1]];
-	NSDate* dateObj = [dictObj	objectForKey: [mKeys objectAtIndex: 0]];
-	float tmpFloat = [numObj floatValue];
-	NSLog( @"returned for date: %@, Value: %f, for index %d\n", dateObj, tmpFloat, mHeadIndex );
+//	NSNumber* numObj = [dictObj objectForKey: [mKeys objectAtIndex: 1]];
+//	NSDate* dateObj = [dictObj	objectForKey: [mKeys objectAtIndex: 0]];
+//	float tmpFloat = [numObj floatValue];
+//	NSLog( @"returned for date: %@, Value: %f, for index %d\n", dateObj, tmpFloat, mHeadIndex );
 	
 	// Set up index for next call to this routine.
 	mHeadIndex += 1;

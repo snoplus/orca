@@ -42,6 +42,7 @@ typedef enum hveStatus hveStatus;
 												// plotting.
 	long					mPoints;			// number of points in each channel-data circular buffer.
 	NSNumber*				mPollTimeMinutes; 
+	NSNumber*				mPlotterPoints;		// number of points in histogram displays.
 	int						mWParams;
 	bool					mPollTaskIsRunning;
 	
@@ -91,6 +92,8 @@ typedef enum hveStatus hveStatus;
 - (float) MCDZ: (int) aCurrentChnl;
 - (void)  setMCDZ: (float) aMCDZ chnl: (int) aCurrentChnl;
 - (float)  HVLimit: (int) aCurrentChnl;
+- (int) plotterPoints;
+- (void) setPlotterPoints: (int) aNumPoints;
 - (int) stationNumber;
 
 #pragma mark •••Interpret data
@@ -127,7 +130,11 @@ extern NSString* UVCardSlotChanged;
 extern NSString* UVChnlHVValuesChanged;
 
 extern NSString* UVPollTimeMinutesChanged;
+extern NSString* UVLastPollTimeChanged;
+extern NSString* UVNumPlotterPointsChanged;
 extern NSString* UVStatusPollTaskChanged;
+
+extern NSString* HVkLastPollTime;
 
 //extern NSString* UVErrorNotification;
 

@@ -37,6 +37,8 @@
 				<string>id</string>
 				<key>setMVDZ</key>
 				<string>id</string>
+				<key>setPlotterChannels</key>
+				<string>id</string>
 				<key>setRampDownRate</key>
 				<string>id</string>
 				<key>setRampUpRate</key>

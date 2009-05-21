@@ -43,6 +43,8 @@ NSString* HVkCurChnl = @"HVCurChnl";
 //NSString* HVkTimeStamp = @"HVTimeStamp";
 
 NSString* HVkPollTimeMinutes = @"mPollTimeMinutes";
+NSString* HVkPlotterPoints = @"mPlotterPoints";
+NSString* HVkLastPollTime = @"mLastPollTime";
 NSString* HVkChannel = @"Channel";
 
 // Order in which data is returned from DMP command.  Index in token array.
@@ -81,6 +83,8 @@ NSString* UVChnlHVLimitChanged			= @"ChnlHVLimitChanged";
 NSString* UVCardSlotChanged				= @"UVCardSlotChanged";
 
 NSString* UVPollTimeMinutesChanged		= @"UVPollTimeMinutesChanged";
+NSString* UVLastPollTimeChanged			= @"UVLastPollTimeChanged";
+NSString* UVNumPlotterPointsChanged		= @"UVNumPlotterPointsChanged";
 NSString* UVStatusPollTaskChanged		= @"UVStatusPollTaskChanged";
 
 NSString* UVChnlHVValuesChanged			= @"ChnlHVValuesChanged";
@@ -473,19 +477,19 @@ NSString* UVkWrite = @"W";
 	NSString* lastPollTime = [now descriptionWithCalendarFormat: @"%H:%M:%S"
 	                                                   timeZone: nil   
 													     locale: [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]];
-	NSString* lastPollTimeMsg = [NSString stringWithFormat: @"Last Poll :%@", lastPollTime];
+	NSString* lastPollTimeMsg = [NSString stringWithFormat: @"%@", lastPollTime];
 	
-	NSLog( @"%@\n", lastPollTimeMsg );
+	NSLog( @"Last Poll Time ORUnivVoltModel: %@\n", lastPollTimeMsg );
 
 	// Send notification of latest poll time.
-	NSDictionary* retMsg = [NSDictionary dictionaryWithObject: lastPollTimeMsg forKey: HVkErrorMsg]; 
-	[[NSNotificationCenter defaultCenter] postNotificationName: HVShortErrorNotification object: self userInfo: retMsg];
+	NSDictionary* retMsg = [NSDictionary dictionaryWithObject: lastPollTimeMsg forKey: HVkLastPollTime]; 
+	[[NSNotificationCenter defaultCenter] postNotificationName:  UVLastPollTimeChanged object: self userInfo: retMsg];
 	
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
-	[self fakeData: 0 channel: 0];
-//	[self getValues: -1];
+	[self fakeData: 0 channel: 0];	// fake data
+//	[self getValues: -1];			// real data
 	[self performSelector: @selector( pollTask) withObject: nil afterDelay: pollTimeSecs];
-//	mPollTaskIsRunning = TRUE;	
+	mPollTaskIsRunning = TRUE;	
 }
 
 - (bool) isPollingTaskRunning
@@ -686,6 +690,20 @@ NSString* UVkWrite = @"W";
 	return( [[tmpChnl objectForKey: HVkHVLimit] floatValue] );
 }
 
+- (void) setPlotterPoints: (int) aNumPoints
+{
+	[mPlotterPoints release];
+    mPlotterPoints = [NSNumber numberWithFloat: aNumPoints];
+	[mPlotterPoints retain];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: UVNumPlotterPointsChanged object: self];
+}
+
+- (int) plotterPoints
+{
+	return( [mPlotterPoints intValue] );
+}
+
 #pragma mark •••Interpret Data
 - (void) interpretDataReturn: (NSNotification*) aNote
 {
@@ -793,7 +811,7 @@ NSString* UVkWrite = @"W";
 	
 		// Interpret status
 	
-		NSLog( @"interpretDMPReturn - Status: %d\n", status );
+//		NSLog( @"interpretDMPReturn - Status: %d\n", status );
 		// status case statement
 		switch ( status ) {
 			case eHVUEnabled:
@@ -1056,14 +1074,16 @@ NSString* UVkWrite = @"W";
     [[self undoManager] disableUndoRegistration];
 	[self setChannelArray: [decoder decodeObjectForKey: @"mChannelArray"]];
 	mPollTimeMinutes = [decoder decodeObjectForKey: HVkPollTimeMinutes];
+	mPlotterPoints = [decoder decodeObjectForKey: HVkPlotterPoints];
 	if( !mChannelArray ) {
 		//first time.... set up the structure....
 		[self setChannelArray: [NSMutableArray array]];
 		int i;
 		
 		mPollTimeMinutes = [NSNumber numberWithFloat: 1.0];
+		mPlotterPoints = [NSNumber numberWithInt: 1440];
 		// Put in dummy values for testing.
-		for(i = 0 ; i < UVkNumChannels; i++ )
+		for( i = 0 ; i < UVkNumChannels; i++ )
 		{
 
 			NSNumber* chnl = [NSNumber numberWithInt: i];
@@ -1103,6 +1123,7 @@ NSString* UVkWrite = @"W";
 	
 	[mChannelArray retain];
 	[mPollTimeMinutes retain];
+	[mPlotterPoints retain];
     [[self undoManager] enableUndoRegistration]; 
 	
 	// Model does not automatically call registerNotificationObservers so we do it here where object is restored
@@ -1118,6 +1139,7 @@ NSString* UVkWrite = @"W";
 	[encoder encodeObject: mChannelArray forKey: @"mChannelArray"];
 //	NSNumber* pollingTime = [NSNumber numberWithFloat: mPollTimeMinutes];
 	[encoder encodeObject: mPollTimeMinutes forKey: HVkPollTimeMinutes];
+	[encoder encodeObject:  mPlotterPoints forKey: HVkPlotterPoints];
 }
 
 #pragma mark •••Utilities
@@ -1243,7 +1265,7 @@ NSString* UVkWrite = @"W";
 													      HVLimit,
 													      nil];
 														  
-		NSLog( @"Number of fake data %d\n.", [rawFakeData count] );
+//		NSLog( @"Number of fake data %d\n.", [rawFakeData count] );
 		NSNumber* slot = [NSNumber numberWithInt: 0];
 		NSNumber* chnl = [NSNumber numberWithInt: 0];
 		NSString* command = [NSString stringWithString: @"DMP"];

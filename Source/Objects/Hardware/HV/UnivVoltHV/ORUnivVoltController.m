@@ -117,14 +117,24 @@ const int MAXcCHNLS_PER_PLOT = 6;
 					   object : model];
 
     [notifyCenter addObserver : self
-                     selector : @selector( pollingTimeChanged:)
+                     selector : @selector( pollingTimeChanged: )
                          name : UVPollTimeMinutesChanged
-						object: model];
+					   object : model];
 
     [notifyCenter addObserver : self
-                     selector : @selector( pollingStatusChanged:)
+                     selector : @selector( pollingStatusChanged: )
                          name : UVStatusPollTaskChanged
-						object: model];
+					   object : model];
+						
+	[notifyCenter addObserver : self
+	                 selector : @selector( lastPollTimeChanged: )
+					     name : UVLastPollTimeChanged
+					   object : model];
+						
+	[notifyCenter addObserver : self
+	                 selector : @selector( numPlotterPointsChanged: )
+					     name : UVNumPlotterPointsChanged
+					   object : model]; 
 
 	[notifyCenter  addObserver: self
 	                  selector: @selector( writeErrorMsg: )
@@ -143,6 +153,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	NSLog( @"UnivVolt:AwakeFromNIB.  Current chnl: ", mCurrentChnl );
 	[mChannelStepperField setIntValue: mCurrentChnl];
 	[mChannelNumberField setIntValue: mCurrentChnl];
+//	[mPointsXAxis setIntValue: [model plotterPoints]];
 	
 	[mChnlTable reloadData];
 
@@ -182,6 +193,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	[self MCDZChanged: nil];
 	[self hvLimitChanged: nil];
 	[self pollingTimeChanged: nil];
+	[self numPlotterPointsChanged: nil];
 	
 	[mChnlTable reloadData];	
 }
@@ -294,6 +306,21 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	bool ifPoll = [model isPollingTaskRunning];
 	[mStartStopPolling setTitle: ( ifPoll ? @"Stop" : @"Start" ) ];
 }
+
+- (void) numPlotterPointsChanged: (NSNotification *) aNote
+{
+	int numPlotterPoints = [model plotterPoints];
+	[mPointsXAxis setIntValue: numPlotterPoints];
+}
+
+- (void) lastPollTimeChanged: (NSNotification*) aNote
+{
+	NSDictionary* pollObj = [aNote userInfo];
+	NSString* lastPollTime = [pollObj objectForKey: HVkLastPollTime];
+	NSLog( @"Last polltime %@\n", lastPollTime );
+	[mLastPoll setObjectValue: lastPollTime];
+}
+
 
 - (void) writeErrorMsg: (NSNotification*) aNote
 {
@@ -421,7 +448,18 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	}
 }
 
+- (IBAction) setPlotterChannels: (id) aSender
+{
+	[model setPlotterPoints: [mPointsXAxis intValue]];
+}
+
+
 #pragma mark •••Code for plotter
+- (void) setNumberOfPoints: (int) aNumOfPoints
+{
+	[model setNumberOfPoints: aNumOfPoints];
+}
+
 - (int) numberOfDataSetsInPlot: (id) aPlotter
 {
 	int totalChnls;
@@ -445,19 +483,25 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (float) plotter: (id) aPlotter dataSet: (int) aChnl dataValue: (int) anX 
 {
+	float retVal;
 	
+	retVal = 0.0;
 	if ( aChnl >= 0 ) {
 		ORCircularBufferUV* cbObj = [model circularBuffer: aChnl];
-		if ( anX >= [cbObj size] )
-			return( 0.0 );
-			
-		NSDictionary* retDataObj = [cbObj HVEntry: anX];
-		NSNumber* hvValueObj = [retDataObj objectForKey: @"HVValue"];
-		float hvValue = [hvValueObj floatValue];
-		
-		return( hvValue );
+		if ( anX == 1 ) {
+			NSDictionary* storedData = [cbObj HVEntry: anX];
+			float value = [[storedData objectForKey: @"HVValue"] floatValue];
+			NSLog( @"plotter: %f\n", value );
+		}
+		if ( anX < [cbObj size] ) {			
+			NSDictionary* retDataObj = [cbObj HVEntry: anX];
+			NSNumber* hvValueObj = [retDataObj objectForKey: @"HVValue"];
+			retVal = [hvValueObj floatValue];
+			if ( retVal > 10.0 )
+				NSLog( @"Returning: %f\n", retVal );		
+		}
 	}
-	return 0;
+	return (retVal);
 }
 
 
@@ -476,7 +520,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (int)	numberOfPointsInPlot: (id) aPlotter dataSet: (int) aChnl
 {
-	return( [model circularBufferSize: aChnl] );
+	return( [model plotterPoints] );
 }
 
 
@@ -558,9 +602,9 @@ const int MAXcCHNLS_PER_PLOT = 6;
 #pragma mark •••Delegate
 - (void) tabView: (NSTabView*) aTabView didSelectTabViewItem: (NSTabViewItem*) aTabViewItem
 {
-	int index = [aTabView indexOfTabViewItem: aTabViewItem];
+//	int index = [aTabView indexOfTabViewItem: aTabViewItem];
 	NSString* labelTab = [aTabViewItem label];
-	NSLog( @"tab index: %d, tab label %@\n", index, labelTab );
+	//( @"tab index: %d, tab label %@\n", index, labelTab );
 	if ( [labelTab isEqualToString: @"Channel"] )
 	{
 		mCurrentChnl = mOrigChnl;
@@ -596,7 +640,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 {
 	NSMutableDictionary* tmpChnl = [model channelDictionary: aRowIndex];
 	NSString* colIdentifier = [aTableColumn identifier];
-	if ( [colIdentifier isEqualToString: @"chnlEnabled"]) NSLog( @"ORUnivVoltCont - Row: %d, column: %@", aRowIndex, colIdentifier );
+//	if ( [colIdentifier isEqualToString: @"chnlEnabled"]) NSLog( @"ORUnivVoltCont - Row: %d, column: %@", aRowIndex, colIdentifier );
 	return( [tmpChnl objectForKey: colIdentifier] );
 }
 

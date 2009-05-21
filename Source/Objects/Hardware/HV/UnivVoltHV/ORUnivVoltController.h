@@ -65,7 +65,8 @@
 - (void) writeErrorMsg: (NSNotification*) aNote;
 - (void) pollingTimeChanged: (NSNotification*) aNote;
 - (void) pollingStatusChanged: (NSNotification*) aNote;
-//- (void) settingsLockChanged:(NSNotification*)aNote;
+- (void) lastPollTimeChanged: (NSNotification*) aNote;
+- (void) numPlotterPointsChanged: (NSNotification *) aNote;
 
 #pragma mark •••Actions
 - (IBAction) setChannelNumberField: (id) aSender;
@@ -83,6 +84,7 @@
 - (IBAction) hardwareValues: (id) aSender;
 - (IBAction) pollTimeAction: (id) aSender;
 - (IBAction) startStopPolling: (id ) aSender;
+- (IBAction) setPlotterChannels: (id) aSender;
 //- (IBAction) updateTable: (id) aSender;
 
 #pragma mark ***Getters
