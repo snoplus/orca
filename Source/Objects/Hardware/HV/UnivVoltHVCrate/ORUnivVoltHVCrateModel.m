@@ -407,7 +407,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 			    NSLog( @"Queue cmd with id: %d - %@\n", aCmdId, aCommand );
 				*/
 				queuedCmd = YES;
-				NSLog( @"Queue cmd: %@ for cmd id: %d\n", aCommand, aCmdId );
+//				NSLog( @"Queue cmd: %@ for cmd id: %d\n", aCommand, aCmdId );
 		    }
 		
 		    // Queue has been filled so dequeue a single command.
@@ -513,7 +513,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 //		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
 		tokens = [returnFromSocket componentsSeparatedByCharactersInSet: separators]; 
 #endif
- 		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
+// 		NSLog( @"return from socket '%@'  #tokens: %d\n", returnFromSocket, [tokens count] );
 
 		// Process return code
 		if ( returnCode != 1 )
@@ -521,7 +521,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 			NSString* fullErrorMsg = [tokens componentsJoinedByString: @" " ];
 			NSString* shortErrorMsg = [NSString stringWithFormat: @"Hardware error %d (%@)\n", returnCode, fullErrorMsg];
 			NSString* longErrorMsg = [NSString stringWithFormat: @"%@ - for cmd '%@' \n", shortErrorMsg, queuedCommandStr]; 
-			NSLog( @"handleDataReturn - longErrorMsg: '%@'\n", longErrorMsg );
+//			NSLog( @"handleDataReturn - longErrorMsg: '%@'\n", longErrorMsg );
 			
 			// Clear command and return queues.
 			[mCmdCmdQueue removeAllObjects];
