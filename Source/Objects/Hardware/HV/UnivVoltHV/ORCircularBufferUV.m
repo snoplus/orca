@@ -39,7 +39,8 @@
 //	NSLog( @"Size of array: %d\n", [mStorageArray count] );
 }
 
-- ( long ) size
+//mah -- changed to count to remove compiler warning with other methods named 'size' in other objects that return diff type than long.
+- ( long ) count
 {
 	return( [mStorageArray count] );
 }
@@ -102,7 +103,7 @@
 	if ( index < 0 ) index += [mStorageArray count];
 	if ( index >= [mStorageArray count] ) index -= [mStorageArray count];
 	
-	NSDictionary* dictObj = [[mStorageArray objectAtIndex: index] autorelease];
+	NSDictionary* dictObj = [mStorageArray objectAtIndex: index];
 	return( dictObj );
 }
 

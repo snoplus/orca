@@ -249,8 +249,7 @@ NSString* UVkWrite = @"W";
 		mPollTaskIsRunning = FALSE;
 		
 		// Alloc circular buffers.
-		mCircularBuffers = [NSMutableArray arrayWithCapacity: UVkNumChannels];
-		[mCircularBuffers retain];
+		mCircularBuffers = [[NSMutableArray arrayWithCapacity: UVkNumChannels] retain];
 		mPoints = 1440;
 		mPoints = 10;
 		int i;
@@ -260,6 +259,7 @@ NSString* UVkWrite = @"W";
 			[cbObj setSize: mPoints];
 					
 			[mCircularBuffers addObject: cbObj];
+			[cbObj release]; //mah -- added -- the CB holds it now
 		}
 		
 	}	
@@ -702,6 +702,11 @@ NSString* UVkWrite = @"W";
 - (int) plotterPoints
 {
 	return( [mPlotterPoints intValue] );
+}
+
+- (int) numPointsInCB:(int)aChnl
+{
+	return [[mCircularBuffers objectAtIndex:aChnl] count];
 }
 
 #pragma mark •••Interpret Data
@@ -1281,7 +1286,7 @@ NSString* UVkWrite = @"W";
 	
 		[[NSNotificationCenter defaultCenter] postNotificationName: HVUnitInfoAvailableNotification 
 														    object: self 
-														  userInfo: retDictObj];
+														  userInfo: [retDictObj autorelease]];  //mah -- added the autorelease
 		// Used for debugging
 		NSMutableDictionary* tmpReadDictObj = [mChannelArray objectAtIndex: aCurrentChnl];
 		NSNumber* readBackHV = [tmpReadDictObj objectForKey: HVkMeasuredHV];

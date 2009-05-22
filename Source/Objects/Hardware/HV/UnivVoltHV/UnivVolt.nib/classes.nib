@@ -102,14 +102,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ORFlippedView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -205,6 +197,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>ORTimeAxis</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -254,7 +254,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ORFlippedView</string>
+				<string>ZFlowLayout</string>
 				<key>mDataSource</key>
 				<string>id</string>
 				<key>mXScale</key>

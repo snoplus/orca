@@ -95,6 +95,7 @@ typedef enum hveStatus hveStatus;
 - (int) plotterPoints;
 - (void) setPlotterPoints: (int) aNumPoints;
 - (int) stationNumber;
+- (int) numPointsInCB:(int)aChnl; //mah -- added to get the actual number of plots in CB rather
 
 #pragma mark •••Interpret data
 - (void) interpretDataReturn: (NSNotification*) aNote;

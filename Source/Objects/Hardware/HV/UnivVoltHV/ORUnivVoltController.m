@@ -484,18 +484,17 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (float) plotter: (id) aPlotter dataSet: (int) aChnl dataValue: (int) anX 
 {
 	float retVal;
-	
 	retVal = 0.0;
 	if ( aChnl >= 0 ) {
 		ORCircularBufferUV* cbObj = [model circularBuffer: aChnl];
 		if ( anX == 1 ) {
 			NSDictionary* storedData = [cbObj HVEntry: anX];
-			float value = [[storedData objectForKey: @"HVValue"] floatValue];
+			float value = [[storedData objectForKey: @"Value"] floatValue];//MAH -- key was wrong
 			NSLog( @"plotter: %f\n", value );
 		}
-		if ( anX < [cbObj size] ) {			
+		if ( anX < [cbObj count] ) {			
 			NSDictionary* retDataObj = [cbObj HVEntry: anX];
-			NSNumber* hvValueObj = [retDataObj objectForKey: @"HVValue"];
+			NSNumber* hvValueObj = [retDataObj objectForKey: @"Value"]; //MAH -- key was wrong
 			retVal = [hvValueObj floatValue];
 			if ( retVal > 10.0 )
 				NSLog( @"Returning: %f\n", retVal );		
@@ -520,7 +519,8 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (int)	numberOfPointsInPlot: (id) aPlotter dataSet: (int) aChnl
 {
-	return( [model plotterPoints] );
+	//mah. changed from a fixed value to the actual number of points in the CB
+	return( [model numPointsInCB:aChnl] );
 }
 
 
