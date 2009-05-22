@@ -16,14 +16,14 @@
 
 
 @class ORAxis;
-@class ZFlowLayout;
+@class ORFlippedView;
 @class ORCurve2D;
 @class ORColorScale;
 @class CTGradient;
 
 @interface ORPlotter2D : NSView <NSCoding>
 {
-    IBOutlet ZFlowLayout*   analysisView;
+    IBOutlet ORFlippedView*   analysisView;
     IBOutlet NSDrawer*		analysisDrawer;
     IBOutlet ORColorScale*	mColorScale;
     IBOutlet ORAxis*		mZScale;

@@ -31,6 +31,7 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 - (void) windowResizing:(NSNotification*)aNote;
 - (void) resetDrawFlag;
 - (void) reportMousePosition:(NSEvent*)theEvent;
+- (void) tileAnalysisPanels;
 @end
 
 @implementation ORPlotter2D
@@ -88,6 +89,7 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
                name: NSWindowDidResizeNotification
              object: [self window] ];
     
+	[self tileAnalysisPanels];
 }
 
 
@@ -551,14 +553,15 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 	ORAnalysisPanel2D* analysisPanel = [ORAnalysisPanel2D panel];
 	[aGate setAnalysis:analysisPanel];
 	[analysisPanel setGate:aGate];
-	[analysisView setSizing:ZMakeFlowLayoutSizing( [[analysisPanel view] frame].size, 10, 0, NO )];
 	[analysisView addSubview:[analysisPanel view]];
 	[aGate release];
-	
+	[self tileAnalysisPanels];
+
 }
 - (IBAction) removeGateAction:(id)sender
 {
     [curve removeActiveGate];	
+	[self tileAnalysisPanels];
     [self setNeedsDisplay:YES];
 }
 
@@ -596,6 +599,28 @@ NSString* ORPlotter2DMousePosition      = @"ORPlotter2DMousePosition";
 @end
 
 @implementation ORPlotter2D (private)
+
+- (void) tileAnalysisPanels
+{
+    NSArray* subViews   = [analysisView subviews];
+    float totalHeightNeeded = 0;
+    NSEnumerator*   e   = [subViews objectEnumerator];
+    NSView* aView;
+    while(aView = [e nextObject]){
+        totalHeightNeeded += [aView frame].size.height+5;
+    }
+    [analysisView setFrameSize: NSMakeSize([analysisView frame].size.width,totalHeightNeeded)];
+	
+    NSPoint origin = NSMakePoint(0,[analysisView frame].size.height+5);
+    e              = [subViews objectEnumerator];
+    while(aView = [e nextObject]){
+        NSRect viewRect = [aView frame];
+        origin.y -= viewRect.size.height+5;
+        origin.x = 5;
+        [aView setFrameOrigin: origin];
+    }
+}
+
 - (void) reportMousePosition:(NSEvent*)theEvent
 {
     NSPoint p = [self convertPoint:[theEvent locationInWindow] fromView:nil];
