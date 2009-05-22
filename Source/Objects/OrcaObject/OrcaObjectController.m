@@ -36,11 +36,6 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
     return self;
 }
 
-- (void) release
-{
-    [super release];
-}
-
 - (void) dealloc
 {
 	[[self window] close];
