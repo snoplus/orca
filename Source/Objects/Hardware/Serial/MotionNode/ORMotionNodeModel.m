@@ -80,6 +80,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 - (void) incTraceIndex;
 - (void) setTotalxyz;
 - (void) checkForDriver;
+- (void) createLongTermTraceStorage;
 @end
 
 
@@ -88,6 +89,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 {
 	self = [super init];
 	[self checkForDriver];
+	[self createLongTermTraceStorage];
 	return self;
 }
 
@@ -111,24 +113,15 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 		int i;
 		for (i = 0; i < kNumMin; i++) free(longTermTrace[i]);
 		free(longTermTrace);
+		longTermTrace = nil;
+		longTermValid = NO;
 	}
 	[super dealloc];
 }
 
 - (void) awakeAfterDocumentLoaded
 {
-	@try {
-		//alloc a large 2-D array for the long term storage
-		int i;
-		longTermTrace = malloc(kNumMin * sizeof(float *));
-		for (i = 0; i < kNumMin; i++) {
-			longTermTrace[i] = malloc(kModeNodeLongTraceLength * sizeof(float));
-			memset(longTermTrace[i],0,kModeNodeLongTraceLength * sizeof(float));
-		}
-		longTermValid = YES;
-	}
-	@catch(NSException* localException) {
-	}
+	[self createLongTermTraceStorage];
 }
 
 - (void) registerNotificationObservers
@@ -512,6 +505,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	cmdQueue = [[ORSafeQueue alloc] init];
 	
 	[self checkForDriver];
+	[self createLongTermTraceStorage];
 	
     return self;
 }
@@ -706,10 +700,10 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 			}
 			
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:&data length:sizeof(long)*(3 + (kModeNodeTraceLength/3))]];
-			[self setLastRecordShipped:[NSDate date]];
+															object:[NSData dataWithBytes:&data length:sizeof(long)*(3+shipLen)]];
 		}
 		[self setTotalShipped:[self totalShipped]+1];
+		[self setLastRecordShipped:[NSDate date]];
 	}
 }
 
@@ -986,6 +980,17 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 		[noDriverAlarm postAlarm];
 	}	
 }
-
-
+- (void) createLongTermTraceStorage
+{
+	if(!longTermValid){
+		//alloc a large 2-D array for the long term storage
+		int i;
+		longTermTrace = malloc(kNumMin * sizeof(float *));
+		for (i = 0; i < kNumMin; i++) {
+			longTermTrace[i] = malloc(kModeNodeLongTraceLength * sizeof(float));
+			memset(longTermTrace[i],0,kModeNodeLongTraceLength * sizeof(float));
+		}
+		longTermValid = YES;
+	}
+}
 @end
