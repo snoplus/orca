@@ -90,6 +90,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	self = [super init];
 	[self checkForDriver];
 	[self createLongTermTraceStorage];
+	shipThreshold = .2;
 	return self;
 }
 
