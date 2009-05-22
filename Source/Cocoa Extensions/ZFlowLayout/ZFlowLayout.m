@@ -77,6 +77,8 @@ NSColor *_backgroundColor, *_gridColor;
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[_backgroundColor release];
+	[_gridColor release];
     [super dealloc];
 }
 
