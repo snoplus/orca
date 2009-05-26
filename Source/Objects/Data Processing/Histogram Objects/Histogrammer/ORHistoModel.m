@@ -181,6 +181,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHistoModelShipFinalHistogramsChanged object:self];
 }
+
 - (ORDataSet*) dataSet
 {
 	[mLock lock];
@@ -203,7 +204,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (ORDataSet*) dataSetWithName:(NSString*)aName
 {
-	return [dataSet dataSetWithName:aName];
+	[mLock lock];
+	ORDataSet* theSet =  [[[dataSet dataSetWithName:aName]retain] autorelease];
+	[mLock unlock];
+	return theSet;
 }
 
 - (void) setDirectoryName:(NSString*)aDirName
@@ -298,12 +302,14 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (void) processData:(ORDataPacket*)someData userInfo:(NSDictionary*)userInfo
 {
+	[mLock lock];
     if(!dataSet){
         [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease] ];
     }
     
 	//process the data
     [someData decodeIntoDataSet:dataSet];
+	[mLock unlock];
 	
 	//pass it on
 	id theNextObject = [self objectConnectedTo:ORHistoPassThruConnection];
@@ -522,7 +528,9 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
 	e = [objs2d objectEnumerator];
 	while(anObj = [e nextObject])[anObj setDataId:[dummy2DHisto dataId]];
 	
+	[mLock lock];
 	[dataSet packageData:aDataPacket userInfo:nil];
+	[mLock unlock];
 }
 @end
 

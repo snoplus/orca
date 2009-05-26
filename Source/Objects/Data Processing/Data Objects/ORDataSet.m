@@ -298,6 +298,7 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (void) removeObject:(id)anObj
 {
+	[dataSetLock lock];
     NSEnumerator* e = [realDictionary keyEnumerator];
     id aKey;
 	NSMutableArray* keysToRemoveFromSelf = [NSMutableArray array];
@@ -313,24 +314,29 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
     [realDictionary removeObjectsForKeys: keysToRemoveFromSelf];
     [sortedArray release];
     sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
+	[dataSetLock unlock];
 
 }
 
 - (void) removeObjectForKey: (id) aKey;
 {
-    [realDictionary removeObjectForKey: aKey];
+ 	[dataSetLock lock];
+	[realDictionary removeObjectForKey: aKey];
     [sortedArray release];
     sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
+	[dataSetLock unlock];
 }
 
 - (void) setObject: (id) anObject forKey: (id) aKey;
 {
+ 	[dataSetLock lock];
     BOOL newObj = NO;
     if(![realDictionary objectForKey:aKey])newObj = YES;
     
     [realDictionary setObject: anObject  forKey: aKey];
     [sortedArray release];
     sortedArray = [[realDictionary keysSortedByValueUsingSelector:@selector(compare:)] retain];
+	[dataSetLock unlock];
 
 }
 
@@ -1318,12 +1324,17 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
 
 - (id)   childAtIndex:(int)index
 {
-    if([self leafNode])return data;
+	[dataSetLock lock];
+	id theData = nil;
+    if([self leafNode])theData = [[data retain] autorelease];
     else {
-        id obj = [realDictionary objectForKey:[sortedArray objectAtIndex:index]];
-        if(obj)return obj;
+		if(index < [sortedArray count]){
+			id obj = [realDictionary objectForKey:[sortedArray objectAtIndex:index]];
+			if(obj)theData =  [[obj retain] autorelease];
+		}
     }
-    return nil;
+	[dataSetLock unlock];
+	return theData;
 }
 
 - (void) doDoubleClick:(id)sender
