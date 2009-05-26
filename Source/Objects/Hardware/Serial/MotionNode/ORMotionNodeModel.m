@@ -654,7 +654,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
-    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"MotionNodeModel"];
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORMotionNodeModel"];
 }
 
 - (NSDictionary*) dataRecordDescription
