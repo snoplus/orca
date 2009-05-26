@@ -64,11 +64,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
     	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(requestNotification:) name:ORCARootServiceRequestNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(broadcastConnectionStatus) name:ORCARootServiceBroadcastConnection object:nil];
-	if(kORCARootFitNames[0] != nil){} //just to get rid of stupid compiler warning
-	if(kORCARootFitShortNames[0] != nil){} //just to get rid of stupid compiler warning
-	if(kORCARootFFTNames[0] != nil){} //just to get rid of stupid compiler warning
-	if(kORCARootFFTWindowOptions[0] != nil){} //just to get rid of stupid compiler warning
-	if(kORCARootFFTWindowNames[0] != nil){} //just to get rid of stupid compiler warning
+	RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
 		
     return self;
 }

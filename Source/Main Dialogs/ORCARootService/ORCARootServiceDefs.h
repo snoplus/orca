@@ -72,3 +72,11 @@ static NSString* kORCARootFFTWindowNames[kNumORCARootFFTWindows] = {
 	@"Blackman",
 	@"Hamming",
 };
+
+#define RemoveORCARootWarnings { 	\
+			if(kORCARootFitNames[0] != nil){} \
+			if(kORCARootFFTNames[0] != nil){} \
+			if(kORCARootFitShortNames[0] != nil){} \
+			if(kORCARootFFTWindowOptions[0] != nil){} \
+			if(kORCARootFFTWindowNames[0] != nil){}\
+} 

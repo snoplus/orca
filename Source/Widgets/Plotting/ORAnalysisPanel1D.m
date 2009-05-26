@@ -48,10 +48,7 @@
 {
     if( self = [super init] ){
         [NSBundle loadNibNamed: @"Analysis1D" owner: self];	// We're responsible for releasing the top-level objects in the NIB (our analysisView, right now).
-		if(kORCARootFitNames[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFitShortNames[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFFTWindowOptions[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFFTWindowNames[0] != nil){} //just to get rid of stupid compiler warning
+		RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
     }
     return self;
 }

@@ -46,10 +46,7 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 -(id)init
 {
     if(self = [super init]){
-		if(kORCARootFitNames[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFitShortNames[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFFTWindowOptions[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFFTWindowNames[0] != nil){} //just to get rid of stupid compiler warning
+		RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
     }
     return self;
 }

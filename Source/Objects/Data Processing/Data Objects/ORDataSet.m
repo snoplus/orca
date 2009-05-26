@@ -48,12 +48,8 @@ NSString* ORDataSetAdded  = @"ORDataSetAdded";
         [self setGuardian:aGuardian]; //we don't retain the guardian, so just set it here.
         data = nil;
 		dataSetLock = [[NSLock alloc] init];
-		if(kORCARootFitNames[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFFTNames[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFitShortNames[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFFTWindowOptions[0] != nil){} //just to get rid of stupid compiler warning
-		if(kORCARootFFTWindowNames[0] != nil){} //just to get rid of stupid compiler warning
-    }
+		RemoveORCARootWarnings; //a #define from ORCARootServiceDefs.h 
+	}
     return self;
 }
 
