@@ -1204,7 +1204,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 								 [NSNumber numberWithBool:YES],          @"variable",
 								 [NSNumber numberWithLong:-1],			 @"length",
 								 nil];
-    [dataDictionary setObject:aDictionary forKey:@"SIS3300"];
+    [dataDictionary setObject:aDictionary forKey:@"Waveform"];
     
     return dataDictionary;
 }
