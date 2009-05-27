@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>DefaultItems</key>
@@ -10,7 +10,7 @@
 		<string>Wizard</string>
 		<string>preferences</string>
 		<string>CommandCenter</string>
-        <string>NSToolbarPrintItem</string>
+		<string>NSToolbarPrintItem</string>
 		<string>NSToolbarFlexibleSpaceItem</string>
 		<string>NSToolbarCustomizeToolbarItem</string>
 	</array>
@@ -106,9 +106,17 @@
 			<key>ToolTip</key>
 			<string>Open ORCARoot Service</string>
 		</dict>
-
 		<key>NSToolbarPrintItem</key>
 		<dict/>
+		<key>help</key>
+		<dict>
+			<key>Action</key>
+			<string>openHelp:</string>
+			<key>Label</key>
+			<string>Help</string>
+			<key>ToolTip</key>
+			<string>Open ORCA Help</string>
+		</dict>
 	</dict>
 </dict>
 </plist>
