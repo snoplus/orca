@@ -58,7 +58,7 @@
 	<key>CFBundleVersion</key>
 	<string>7.9h</string>
 	<key>CFfile://localhost/Users/markhowe/Dev/Orca/Source/Objects/Misc%20Objects/SQL/BundleGetInfoString</key>
-	<string>Orca 6.1, Copyright ©2002 Mark Howe CENPA, University of Washington</string>
+	<string>Orca 7.9, Copyright ©2009 Mark Howe Physics Dept, University of North Carolina</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
