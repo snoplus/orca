@@ -1030,12 +1030,14 @@ NSString* ORPlotter1DAverageWindowChanged = @"ORPlotter1DAverageWindowChanged";
 
 - (void) windowResizing:(NSNotification*)aNote
 {
-    if(!ignoreDoNotDrawFlag){
-        doNotDraw = YES;
-        [NSObject cancelPreviousPerformRequestsWithTarget:self];
-        [self setNeedsDisplay:YES];
-        [self performSelector:@selector(resetDrawFlag) withObject:nil afterDelay:0];
-		[self setActiveCurveIndex:activeCurveIndex]; //work around to force a redraw
+	if([aNote object] == [self window]){
+		if(!ignoreDoNotDrawFlag){
+			doNotDraw = YES;
+			[NSObject cancelPreviousPerformRequestsWithTarget:self];
+			[self setNeedsDisplay:YES];
+			[self performSelector:@selector(resetDrawFlag) withObject:nil afterDelay:0];
+			[self setActiveCurveIndex:activeCurveIndex]; //work around to force a redraw
+		}
     }
 }
 
