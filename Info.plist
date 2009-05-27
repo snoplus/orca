@@ -9,7 +9,7 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>fs</string>
+				<string>ofs</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>OrcaFilterScript</string>

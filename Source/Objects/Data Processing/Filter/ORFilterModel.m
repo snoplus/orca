@@ -105,6 +105,11 @@ int filterGraph(nodeType*);
 	[expressionAsData release];
 	[inputValues release];
 	[outputValues release];
+	[lastFile release];
+	[script release];
+	[scriptName release];
+	[timerLock release];
+	[mainTimer release];
     [super dealloc];
 }
 
