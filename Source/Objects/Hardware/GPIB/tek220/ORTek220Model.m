@@ -60,6 +60,11 @@ NSString* ORTek220GpibLock  = @"ORTek220GpibLock";
     [self linkToController:@"ORTek220Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"GPIB/TK220.html";
+}
+
 - (int)     numberChannels
 {
 	return 4;

@@ -65,6 +65,11 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
     [self linkToController:@"OR2228AController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/2228A.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) shortName
 {

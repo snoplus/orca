@@ -64,6 +64,11 @@ NSString* ORIP220SettingsLock			= @"ORIP220SettingsLock";
     [self linkToController:@"ORIP220Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/IP220.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (float) outputVoltage:(unsigned short)index
 {

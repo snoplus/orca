@@ -88,6 +88,11 @@ NSString* ORL2551PollWhenRunningChangedNotification = @"ORL2551PollWhenRunningCh
     [poller stop];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/L2551.html";
+}
+
 #pragma mark ¥¥¥Notifications
 -(void)registerNotificationObservers
 {

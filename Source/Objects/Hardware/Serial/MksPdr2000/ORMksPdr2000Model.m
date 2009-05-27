@@ -87,6 +87,11 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
 	[self linkToController:@"ORMksPdr2000Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"RS232/MKS_PDR2000.html";
+}
+
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];

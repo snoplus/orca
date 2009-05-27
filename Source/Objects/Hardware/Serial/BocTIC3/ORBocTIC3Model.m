@@ -85,6 +85,11 @@ NSString* ORBocTIC3Lock = @"ORBocTIC3Lock";
 	[self linkToController:@"ORBocTIC3Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"RS232/BocTIC3.html";
+}
+
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];

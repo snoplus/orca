@@ -39,6 +39,8 @@
 #import "ORCARootService.h"
 #import "ORCARootServiceController.h"
 #import "ORMailer.h"
+#import <WebKit/WebKit.h>
+#import "ORHelpCenter.h"
 
 #import <sys/sysctl.h>
 
@@ -122,6 +124,11 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     [self registerNotificationObservers];
     [self setAlarmCollection:[[[ORAlarmCollection alloc] init] autorelease]];
     [self setMemoryWatcher:[[[MemoryWatcher alloc] init] autorelease]];
+}
+
+- (ORHelpCenter*) helpCenter
+{
+	return helpCenter;
 }
 
 - (MemoryWatcher*) memoryWatcher

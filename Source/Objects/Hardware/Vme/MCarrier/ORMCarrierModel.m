@@ -48,6 +48,11 @@
     [self linkToController:@"ORMCarrierController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/M_Carrier.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0xFE);

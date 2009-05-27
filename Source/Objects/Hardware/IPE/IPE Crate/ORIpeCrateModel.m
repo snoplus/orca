@@ -99,6 +99,10 @@ static NSString* ORIpeCrateFireWireOut 	= @"ORIpeCrateFireWireOut";
     [self linkToController:@"ORIpeCrateController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"IPE_Auger/Crates.html";
+}
 
 #pragma mark ¥¥¥Accessors
 

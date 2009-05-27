@@ -150,6 +150,11 @@ int filterGraph(nodeType*);
     [self linkToController:@"ORFilterController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Chain/Data_Filter.html";
+}
+
 - (void) makeConnectors
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(0,2*[self frame].size.height/3. - kConnectorSize/2) withGuardian:self withObjectLink:self];

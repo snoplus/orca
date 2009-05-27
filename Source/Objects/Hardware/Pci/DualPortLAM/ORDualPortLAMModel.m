@@ -61,6 +61,10 @@ NSString* ORDualPortLAMLock						= @"ORDualPortLAMLock";
 	[self linkToController:@"ORDualPortLAMController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Mac_Pci/LAM.html";
+}
 
 #pragma mark ***Accessors
 - (NSString*) cardSlotChangedNotification

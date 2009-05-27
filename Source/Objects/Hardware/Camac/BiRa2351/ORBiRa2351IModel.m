@@ -68,6 +68,11 @@ NSString* ORBiRa2351IModelLastReadChanged		= @"ORBiRa2351IModelLastReadChanged";
     [self linkToController:@"ORBiRa2351IController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/BiRa2351.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) shortName
 {

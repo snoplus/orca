@@ -165,6 +165,11 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
     [self linkToController:@"ORHVRampController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"NCD/HV_Control.html";
+}
+
 - (void) makeConnectors
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(2,[self frame].size.height - kConnectorSize-2) withGuardian:self withObjectLink:self];

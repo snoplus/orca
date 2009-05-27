@@ -137,6 +137,11 @@ enum {
     [self linkToController:@"ORDGF4cController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/DGF4c.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) shortName
 {

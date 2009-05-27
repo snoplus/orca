@@ -110,6 +110,10 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     [self linkToController:@"ORDataTaskController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Chain/Data_Read_out.html";
+}
 
 - (void) makeConnectors
 {

@@ -128,6 +128,11 @@ static const int currentVersion = 1;           // Current version
     [self linkToController:@"ORDataFileController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Chain/Data_Storage.html";
+}
+
 - (void)setTitles
 {
     [dataFolder setTitle:@"Data Files"];

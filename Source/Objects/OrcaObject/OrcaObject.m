@@ -22,6 +22,8 @@
 #pragma mark ¥¥¥Imported Files
 #import "ORDataTaker.h"
 #import "ORHWWizard.h"
+#import "ORHelpCenter.h"
+
 #pragma mark ¥¥¥Notification Strings
 NSString* OROrcaObjectMoved         = @"OrcaObject Moved Notification";
 NSString* OROrcaObjectDeleted       = @"OrcaObject Deleted Notification";
@@ -259,6 +261,18 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 - (void) makeMainController
 {
     //subclasses will override
+}
+
+- (BOOL) hasDialog
+{
+	//by default objects have dialogs. subclasses can override. 
+	//used to validate the popup contextual menu
+	return YES;
+}
+
+- (NSString*) helpURL
+{
+	return nil;
 }
 
 - (id) calibration
@@ -510,6 +524,10 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 
 #pragma mark ¥¥¥Mouse Events
+- (void) openHelp:(id)sender
+{
+	[[[NSApp delegate] helpCenter] showHelpCenterPage:[self helpURL]];
+}
 
 - (void) doDoubleClick:(id)sender
 {
@@ -518,6 +536,44 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) doCmdClick:(id)sender
 {
+	//subclasses can use as needed.
+}
+
+- (void) doCntrlClick:(id)sender
+{
+	NSEvent* theCurrentEvent = [NSApp currentEvent];
+    NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
+                                         location:[theCurrentEvent locationInWindow]
+                                    modifierFlags:NSLeftMouseDownMask // 0x100
+                                        timestamp:(NSTimeInterval)0
+                                     windowNumber:[theCurrentEvent windowNumber]
+                                          context:[theCurrentEvent context]
+                                      eventNumber:0
+                                       clickCount:1
+                                         pressure:1];
+	
+    NSMenu *menu = [[NSMenu alloc] init];
+     [[menu insertItemWithTitle:@"Open"
+                       action:@selector(doDoubleClick:)
+                keyEquivalent:@""
+					   atIndex:0] setTarget:self];
+	[[menu insertItemWithTitle:@"Help"
+						action:@selector(openHelp:)
+				 keyEquivalent:@""
+					   atIndex:1] setTarget:self];
+	[menu setDelegate:self];
+    [NSMenu popUpContextMenu:menu withEvent:event forView:nil];
+}
+
+- (BOOL) validateMenuItem:(NSMenuItem *)anItem
+{
+    if ([anItem action] == @selector(doDoubleClick:)) {
+        return [self hasDialog];
+    }
+    else if ([anItem action] == @selector(openHelp:)) {
+        return [[self helpURL] length];
+    }
+	else return YES;
 }
 
 - (ORConnector*) requestsConnection: (NSPoint)aPoint

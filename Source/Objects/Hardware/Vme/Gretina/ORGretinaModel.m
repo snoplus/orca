@@ -127,6 +127,11 @@ static struct {
     [self linkToController:@"ORGretinaController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/Gretina.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,baseAddress*0x100+0xffff);

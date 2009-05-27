@@ -40,6 +40,12 @@ typedef struct MotionNodeCommands {
 	BOOL		okToTimeOut;
 } MotionNodeCommands; 
 
+typedef struct MotionNodeCalibrations {
+	float  intercept;
+	float  slope;
+} MotionNodeCalibrations; 
+
+
 #define kModeNodeTraceLength 1500
 
 #define kModeNodeLongTraceLength 1000

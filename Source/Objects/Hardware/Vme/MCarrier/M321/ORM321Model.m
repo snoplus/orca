@@ -90,6 +90,11 @@ NSString* ORM321FourPhaseChangedNotification		= @"ORM321FourPhaseChangedNotifica
     [self linkToController:@"ORM321Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/M321.html";
+}
+
 - (void) makeConnectors
 {
     //make and cache our connectors. However these connector will be 'owned' by another object (the crate)

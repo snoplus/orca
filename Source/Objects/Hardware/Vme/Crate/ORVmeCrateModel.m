@@ -83,6 +83,11 @@
     [self linkToController:@"ORVmeCrateController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/Crates.html";
+}
+
 - (void) connected
 {
 	[[self orcaObjects] makeObjectsPerformSelector:@selector(connected)];

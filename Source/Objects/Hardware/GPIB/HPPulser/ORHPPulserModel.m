@@ -153,6 +153,11 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     [self linkToController:@"ORHPPulserController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"GPIB/Aglient_33120a.html";
+}
+
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [ NSNotificationCenter defaultCenter ];    

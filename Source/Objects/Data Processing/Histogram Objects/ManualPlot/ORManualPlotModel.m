@@ -179,6 +179,11 @@ NSString* ORManualPlotDataChanged			= @"ORManualPlotDataChanged";
     [self linkToController:@"ORManualPlotController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Subsystems/Manual_Plotter.html";
+}
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {

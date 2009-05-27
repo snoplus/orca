@@ -340,6 +340,14 @@
 			<string>NSView</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>ORFlippedView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>delete</key>
@@ -525,7 +533,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ZFlowLayout</string>
+				<string>ORFlippedView</string>
 				<key>curve</key>
 				<string>id</string>
 				<key>mColorScale</key>
@@ -722,6 +730,8 @@
 				<key>delete</key>
 				<string>id</string>
 				<key>doubleClick</key>
+				<string>id</string>
+				<key>getInfo</key>
 				<string>id</string>
 				<key>plotGroupAction</key>
 				<string>id</string>
@@ -1049,6 +1059,56 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>calibrate</key>
+				<string>id</string>
+				<key>col0KeyAction</key>
+				<string>id</string>
+				<key>col1KeyAction</key>
+				<string>id</string>
+				<key>col2KeyAction</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>refreshPlot</key>
+				<string>id</string>
+				<key>writeDataFileAction</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORManualPlotController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>calibrationPanel</key>
+				<string>id</string>
+				<key>col0KeyPU</key>
+				<string>NSPopUpButton</string>
+				<key>col0LabelField</key>
+				<string>NSTextField</string>
+				<key>col1KeyPU</key>
+				<string>NSPopUpButton</string>
+				<key>col1LabelField</key>
+				<string>NSTextField</string>
+				<key>col2KeyPU</key>
+				<string>NSPopUpButton</string>
+				<key>col2LabelField</key>
+				<string>NSTextField</string>
+				<key>dataDrawer</key>
+				<string>NSDrawer</string>
+				<key>dataTableView</key>
+				<string>NSTableView</string>
+				<key>y1LengendField</key>
+				<string>NSTextField</string>
+				<key>y2LengendField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>ORDataController</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -1548,6 +1608,64 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>autoScale</key>
+				<string>NSToolbarItem</string>
+				<key>clear</key>
+				<string>NSToolbarItem</string>
+				<key>clearROI</key>
+				<string>NSToolbarItem</string>
+				<key>doAnalysis</key>
+				<string>NSToolbarItem</string>
+				<key>hideShowControls</key>
+				<string>id</string>
+				<key>logLin</key>
+				<string>NSToolbarItem</string>
+				<key>pauseAction</key>
+				<string>id</string>
+				<key>printDocument</key>
+				<string>id</string>
+				<key>refreshModeAction</key>
+				<string>id</string>
+				<key>toggleRaw</key>
+				<string>NSToolbarItem</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORDataController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>analysisDrawer</key>
+				<string>NSDrawer</string>
+				<key>containingView</key>
+				<string>NSView</string>
+				<key>hideShowButton</key>
+				<string>NSButton</string>
+				<key>pauseButton</key>
+				<string>NSButton</string>
+				<key>pausedField</key>
+				<string>NSTextField</string>
+				<key>plotter</key>
+				<string>id</string>
+				<key>plotterGroupView</key>
+				<string>NSView</string>
+				<key>positionField</key>
+				<string>NSTextField</string>
+				<key>rawDataTabView</key>
+				<string>NSTabView</string>
+				<key>rawDataTable</key>
+				<string>NSTableView</string>
+				<key>refreshModePU</key>
+				<string>NSPopUpButton</string>
+				<key>titleField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>newDocument</key>
 				<string>id</string>
 				<key>openDocument</key>
@@ -1589,6 +1707,8 @@
 			<dict>
 				<key>document</key>
 				<string>id</string>
+				<key>helpCenter</key>
+				<string>ORHelpCenter</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>

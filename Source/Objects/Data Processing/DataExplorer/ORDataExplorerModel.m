@@ -58,6 +58,11 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     [self linkToController:@"ORDataExplorerController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Format_Viewing/Data_Explorer.html";
+}
+
 #pragma mark ¥¥¥Accessors
 
 - (BOOL) histoErrorFlag

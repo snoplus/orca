@@ -78,6 +78,11 @@ NSString* ORCrateUSBConnector		    = @"ORCrateUSBConnector";
     [self linkToController:@"ORCamacCrateController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/Crates.html";
+}
+
 - (id) usbController
 {
 	return [[self objectConnectedTo:ORCrateUSBConnector] getUSBController];

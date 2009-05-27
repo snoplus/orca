@@ -106,6 +106,11 @@ struct {
     [self linkToController:@"ORJADCLController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/JADCLA.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) shortName
 {

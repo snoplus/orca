@@ -94,6 +94,10 @@ static float DC440_fullscale[8] = {0.05, 0.10, 0.20, 0.50, 1.0, 2.0, 5.0, 10.0};
 	[self linkToController:@"ORAcqirisDC440Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"cPCI/DC440.html";
+}
 
 #pragma mark ¥¥¥Accessors
 - (BOOL) samplingWaveforms

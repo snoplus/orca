@@ -87,6 +87,12 @@ NSString* ORXYScannerLock = @"ORXYScannerLock";
 	[self linkToController:@"ORXYScannerController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Motor_Controllers/Newmark_X_Y.html";
+}
+
+
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];

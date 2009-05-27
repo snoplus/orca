@@ -152,6 +152,11 @@ enum {
 	return [NSString stringWithFormat:@"CC-USB (Serial# %@)",[usbInterface serialNumber]];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/CCUSB.html";
+}
+
 #pragma mark ¥¥¥USB Protocol
 - (id) getUSBController
 {

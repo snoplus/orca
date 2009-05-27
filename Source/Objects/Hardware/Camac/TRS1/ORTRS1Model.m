@@ -71,6 +71,11 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
     [self linkToController:@"ORTRS1Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/TRS1.html";
+}
+
 - (short) numberSlotsUsed
 {
     return 3;

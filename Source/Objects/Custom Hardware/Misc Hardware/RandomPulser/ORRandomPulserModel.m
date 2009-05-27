@@ -56,6 +56,11 @@ NSString* ORRandomPulserSettingsLock						= @"ORRandomPulserSettingsLock";
 	[self linkToController:@"ORRandomPulserController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"NCD/Random_Pulser.html";
+}
+
 -(void)makeConnectors
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint(40, [self frame].size.height - kConnectorSize+2) withGuardian:self withObjectLink:self];

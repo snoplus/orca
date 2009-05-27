@@ -17,7 +17,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-#pragma mark ¥¥¥Imported Files
+#pragma mark â€¢â€¢â€¢Imported Files
 
 #import "ORAmi286Model.h"
 #import "ORSerialPort.h"
@@ -28,7 +28,7 @@
 #import "ORDataPacket.h"
 #import "ORTimeRate.h"
 
-#pragma mark ¥¥¥External Strings
+#pragma mark â€¢â€¢â€¢External Strings
 NSString* ORAmi286ModelEnabledMaskChanged		= @"ORAmi286ModelEnabledMaskChanged";
 NSString* ORAmi286ModelShipLevelsChanged		= @"ORAmi286ModelShipLevelsChanged";
 NSString* ORAmi286ModelPollTimeChanged			= @"ORAmi286ModelPollTimeChanged";
@@ -94,6 +94,11 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) makeMainController
 {
 	[self linkToController:@"ORAmi286Controller"];
+}
+
+- (NSString*) helpURL
+{
+	return @"RS232/Ami286.html";
 }
 
 - (void) registerNotificationObservers
@@ -174,7 +179,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 }
 
 
-#pragma mark ¥¥¥Accessors
+#pragma mark â€¢â€¢â€¢Accessors
 
 - (unsigned char) enabledMask
 {
@@ -509,7 +514,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 }
 
 
-#pragma mark ¥¥¥Archival
+#pragma mark â€¢â€¢â€¢Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
 	self = [super initWithCoder:decoder];
@@ -548,7 +553,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	}
 }
 
-#pragma mark ¥¥¥ Commands
+#pragma mark â€¢â€¢â€¢ Commands
 - (void) loadHardware
 {
 	int i;
@@ -627,7 +632,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[self addCmdToQueue:@"*OPC?"];
 }
 
-#pragma mark ¥¥¥Data Records
+#pragma mark â€¢â€¢â€¢Data Records
 - (unsigned long) dataId { return dataId; }
 - (void) setDataId: (unsigned long) DataId
 {

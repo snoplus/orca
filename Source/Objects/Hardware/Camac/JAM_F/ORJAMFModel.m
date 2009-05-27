@@ -108,6 +108,11 @@ struct {
     [self linkToController:@"ORJAMFController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/JAM_F.html";
+}
+
 #pragma mark •••Accessors
 
 - (unsigned long) dataId { return dataId; }

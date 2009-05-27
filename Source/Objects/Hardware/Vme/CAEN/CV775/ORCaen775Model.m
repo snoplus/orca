@@ -114,6 +114,11 @@ static RegisterNamesStruct reg[kNumRegisters] = {
     [self linkToController:@"ORCaen775Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/V775.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0x1080);

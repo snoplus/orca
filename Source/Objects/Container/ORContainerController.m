@@ -31,6 +31,7 @@
 #import "ORPreferencesController.h"
 #import "ORCommandCenterController.h"
 #import "ORGateKeeper.h"
+#import "ORHelpCenter.h"
 
 @implementation ORContainerController
 
@@ -169,7 +170,10 @@
 }
 
 #pragma mark ¥¥¥Toolbar
-
+- (IBAction) openHelp:(NSToolbarItem*)item 
+{
+	[[[NSApp delegate] helpCenter] showHelpCenter:nil];
+}
 - (IBAction) statusLog:(NSToolbarItem*)item 
 {
     [[ORStatusController sharedStatusController] showWindow:self];

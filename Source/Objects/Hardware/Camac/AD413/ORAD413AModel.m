@@ -67,6 +67,11 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     [self linkToController:@"ORAD413AController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/AD413.html";
+}
+
 - (short) numberSlotsUsed
 {
     return 2;

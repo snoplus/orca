@@ -65,6 +65,12 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
     [self linkToController:@"ORAD3511Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/3512A.html";
+}
+
+
 - (short) numberSlotsUsed
 {
     return 2;

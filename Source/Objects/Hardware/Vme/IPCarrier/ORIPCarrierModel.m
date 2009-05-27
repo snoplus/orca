@@ -50,6 +50,11 @@
     [self linkToController:@"ORIPCarrierController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/IP_Carrier.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0x0380);

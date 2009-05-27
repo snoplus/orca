@@ -124,6 +124,11 @@ static struct {
     [self linkToController:@"ORIP320Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/IP320.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSDate*) calibrationDate
 {

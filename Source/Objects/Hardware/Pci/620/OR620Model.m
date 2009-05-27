@@ -32,6 +32,11 @@
     [self loadImage:@"620Card"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Mac_Pci/620.html";
+}
+
 - (const char*) serviceClassName
 {
 	//subclasses will have different sevices to match again.

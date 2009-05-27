@@ -125,6 +125,11 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     [self linkToController:@"ORMCA927Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"USB/MCA927.html";
+}
+
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];

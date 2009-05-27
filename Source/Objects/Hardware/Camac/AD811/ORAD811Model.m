@@ -57,6 +57,11 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
     [self linkToController:@"ORAD811Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/AD811.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) shortName
 {

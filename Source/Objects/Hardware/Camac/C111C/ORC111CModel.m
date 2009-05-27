@@ -71,6 +71,11 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
     [super dealloc];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/C111C.html";
+}
+
 #pragma mark ***Accessors
 - (ORCmdHistory*) cmdHistory
 {

@@ -96,6 +96,12 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
     [self linkToController:@"ORLDA102Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"USB/LDA120.html";
+}
+
+
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];

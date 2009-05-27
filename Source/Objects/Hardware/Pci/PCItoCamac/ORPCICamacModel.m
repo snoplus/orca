@@ -160,6 +160,11 @@ static UInt32 *fVPCICamacMem;
     [self linkToController:@"ORPCICamacController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Mac_Pci/CAMAC_PCI.html";
+}
+
 - (void) makeConnectors
 {
     //make and cache our connector. However this connector will be 'owned' by another object (the crate)

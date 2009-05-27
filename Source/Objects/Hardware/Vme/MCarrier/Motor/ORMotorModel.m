@@ -114,6 +114,11 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [self linkToController:@"ORMotorController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/Motor.html";
+}
+
 - (id)   motorController
 {
     return [self objectConnectedTo:ORMotorControlConnection];

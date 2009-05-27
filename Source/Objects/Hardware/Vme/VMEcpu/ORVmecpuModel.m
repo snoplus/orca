@@ -69,6 +69,11 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	[self linkToController:@"SBC_LinkController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/SBC.html";
+}
+
 - (void) awakeAfterDocumentLoaded
 {
 	@try {

@@ -73,6 +73,11 @@ NSString* ORL4532ModelTriggerNamesChanged	  = @"ORL4532ModelTriggerNamesChanged"
     [self linkToController:@"ORL4532Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/L4532.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) shortName
 {

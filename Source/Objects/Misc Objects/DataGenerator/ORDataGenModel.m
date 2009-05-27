@@ -35,6 +35,11 @@
     [self setImage:[NSImage imageNamed:@"DataGen"]];
 }
 
+- (BOOL) hasDialog
+{
+	return NO;
+}
+
 
 - (unsigned long) dataId1D { return dataId1D; }
 - (void) setDataId1D: (unsigned long) aDataId

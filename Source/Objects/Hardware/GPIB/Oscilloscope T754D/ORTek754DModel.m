@@ -87,7 +87,10 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
     [ self linkToController: @"ORTek754DController" ];
 }
 
-
+- (NSString*) helpURL
+{
+	return @"GPIB/TK754.html";
+}
 
 #pragma mark ***Accessors
 

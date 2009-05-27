@@ -50,6 +50,7 @@ NSString* ORMotionNodeModelUpdateLongTermTrace			= @"ORMotionNodeModelUpdateLong
 
 #define kMotionNodeDriverPath @"/System/Library/Extensions/SLAB_USBtoUART.kext"
 #define kMotionNodeAveN (2/(100.+1.))
+
 #define kSlope		 (4.0/4095.0)
 #define kIntercept	 (-2.0)
 
@@ -64,6 +65,13 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	{kMotionNodeStop,			@")",		-1,		YES}, 
 	{kMotionNodeStart,			@"xxx\0",	-1,		YES},
 	{kMotionNodeClosePort,		@"",		-1,		NO}
+};
+
+static MotionNodeCalibrations motionNodeCalibration[3] = {
+	{-2.528, 0.001205}, //z (blue)
+	{-2.497, 0.00123}, //y (green)
+	{-2.536, 0.00123}, //x (red)
+//{-2.0, 0.000976801}, //Z
 };
 
 @interface ORMotionNodeModel (private)
@@ -171,11 +179,16 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 	}
 }
 
-
 - (void) makeMainController
 {
     [self linkToController:@"ORMotionNodeController"];
 }
+
+- (NSString*) helpURL
+{
+	return @"USB/Motion_Node.html";
+}
+
 
 #pragma mark ***Accessors
 
@@ -694,10 +707,12 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 			data[1] = ((type&0x3)<<16) | ([self uniqueIdNumber]&0xfff); // xtrace
 			data[2] = mktime(theTimeGMTAsStruct);
 			int i;
+			float slope		= motionNodeCalibration[type].slope;
+			float intercept = motionNodeCalibration[type].intercept;
 			for(i=0;i<shipLen;i++){
-				if(type==0)		data[3+i] = (xTrace[(backIndex+i)%kModeNodeTraceLength] - kIntercept)/kSlope;
-				else if(type==1)data[3+i] = (yTrace[(backIndex+i)%kModeNodeTraceLength] - kIntercept)/kSlope;
-				else if(type==2)data[3+i] = (zTrace[(backIndex+i)%kModeNodeTraceLength] - kIntercept)/kSlope;
+				if(type==0)		data[3+i] = (xTrace[(backIndex+i)%kModeNodeTraceLength] - intercept)/slope;
+				else if(type==1)data[3+i] = (yTrace[(backIndex+i)%kModeNodeTraceLength] - intercept)/slope;
+				else if(type==2)data[3+i] = (zTrace[(backIndex+i)%kModeNodeTraceLength] - intercept)/slope;
 			}
 			
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
@@ -754,18 +769,19 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 		
 		// accel 0
 		rawData.bytes[highBtyeIndex] = (data[2] >> 4) & rMask;
-		rawData.bytes[lowBtyeIndex] = data[1];
-		[self setAz:kSlope * rawData.unpacked + kIntercept];
+		rawData.bytes[lowBtyeIndex] = data[1];			
+		
+		[self setAz:motionNodeCalibration[0].slope * rawData.unpacked + motionNodeCalibration[0].intercept];
 		
 		// accel 1
 		rawData.bytes[highBtyeIndex] = data[3] & rMask;
 		rawData.bytes[lowBtyeIndex] = ((data[2] << 4) & lMask) | ((data[3] >> 4) & rMask);
-		[self setAy:kSlope * rawData.unpacked + kIntercept];
+		[self setAy:motionNodeCalibration[1].slope * rawData.unpacked + motionNodeCalibration[1].intercept];
 		
 		// accel 2
 		rawData.bytes[highBtyeIndex] = (data[5] >> 4) & rMask;
 		rawData.bytes[lowBtyeIndex] = data[4];
-		[self setAx:kSlope * rawData.unpacked + kIntercept];
+		[self setAx:motionNodeCalibration[2].slope * rawData.unpacked + motionNodeCalibration[2].intercept];
 		
 		
 		//do a runing average for the temperature
@@ -911,7 +927,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 
 - (void) setAz:(float)aAz
 {
-    az = aAz;
+	az = aAz;
 	zTrace[traceIndex] = az;
 }
 
@@ -929,7 +945,7 @@ static MotionNodeCommands motionNodeCmds[kNumMotionNodeCommands] = {
 
 - (void) setTotalxyz
 {
-	xyzTrace[traceIndex] = 0.86 - sqrtf(ax*ax + ay*ay + az*az);
+	xyzTrace[traceIndex] = 1 - sqrtf(ax*ax + ay*ay + az*az);
 	if(traceIndex>0){
 		float delta = xyzTrace[(traceIndex)%kModeNodeTraceLength] - xyzTrace[(traceIndex-1)%kModeNodeTraceLength];
 		if(shipExcursions){

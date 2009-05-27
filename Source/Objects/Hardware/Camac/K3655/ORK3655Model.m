@@ -69,6 +69,11 @@ NSString* ORK3655Chan							= @"ORK3655Chan";
     [self linkToController:@"ORK3655Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/k3655.html";
+}
+
 #pragma mark ¥¥¥Notifications
 -(void)registerNotificationObservers
 {

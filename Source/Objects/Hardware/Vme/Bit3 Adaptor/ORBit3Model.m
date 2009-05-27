@@ -47,6 +47,11 @@
     [self linkToController:@"ORBit3Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/SBS_Bit3.html";
+}
+
 #pragma mark ¥¥¥Hardware Access
 - (id) controllerCard
 {

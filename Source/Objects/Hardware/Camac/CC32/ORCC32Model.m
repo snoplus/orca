@@ -109,6 +109,11 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
     [self linkToController:@"ORCC32Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/CC32.html";
+}
+
 - (short) numberSlotsUsed
 {
     return 2;

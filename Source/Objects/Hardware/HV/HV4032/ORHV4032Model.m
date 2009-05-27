@@ -115,6 +115,12 @@ NSString* HV4032Lock					= @"HV4032Lock";
 		}
 	}
 }
+
+- (NSString*) helpURL
+{
+	return @"CAMAC/HV2132_4032.html";
+}
+
 #pragma mark ***Accessors
 
 - (BOOL) hvState

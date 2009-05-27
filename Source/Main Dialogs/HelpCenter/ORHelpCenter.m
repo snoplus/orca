@@ -18,10 +18,10 @@
 //-------------------------------------------------------------
 
 #pragma mark ¥¥¥Imported Files
-#import <WebKit/WebKit.h>
 #import "ORHelpCenter.h"
 
 #define kORCAHelpURL @"http://orca.physics.unc.edu"
+#define kAccountRoot @"~markhowe"
 
 @implementation ORHelpCenter
 - (id)init
@@ -65,6 +65,7 @@
 - (void) awakeFromNib
 {
 	[self defaultPathChanged:nil];
+	[[self window] orderOut:nil]; //this forces everything to be set up so the first showHelpCenterPage call works
 }
 
 - (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame
@@ -79,6 +80,18 @@
 		[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[self helpFilePath]]]];
 	}
 }
+
+- (void) showHelpCenterPage:(NSString*)aPage
+{
+	if([aPage length]){
+		NSString* mainPage = [self helpFilePath];
+		NSString* thePage = [mainPage stringByAppendingFormat:@"/%@/%@",kAccountRoot,aPage];
+		[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:thePage]]];
+		[[self window] makeKeyAndOrderFront:nil];
+	}
+	else [self showHelpCenter:self];
+}
+
 
 #pragma mark ¥¥¥Actions
 - (IBAction) showHelpCenter:(id)sender

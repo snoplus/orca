@@ -110,6 +110,11 @@ static short register_offset[] = { 0x01,0x03,0x04,0x09 };
     [self linkToController:@"ORFifoController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/IPFifo.html";
+}
+
 
 #pragma mark ¥¥¥Accessors
 

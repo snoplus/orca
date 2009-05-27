@@ -271,6 +271,10 @@ enum {
     [self linkToController:@"NcdController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"NCD/NCD_Control.html";
+}
 
 - (void) reloadData:(id)obj
 {

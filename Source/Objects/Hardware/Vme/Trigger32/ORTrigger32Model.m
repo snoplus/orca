@@ -130,6 +130,11 @@ NSString* ORTrigger32LiveTimeCalcRunningChangedNotification     = @"ORTrigger32L
     [self linkToController:@"ORTrigger32Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/Trigger%2832_Bit%29.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0x3C);

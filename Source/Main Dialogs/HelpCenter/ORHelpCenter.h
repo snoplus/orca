@@ -16,6 +16,7 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+#import <WebKit/WebKit.h>
 
 @interface ORHelpCenter : NSWindowController
 {
@@ -26,6 +27,7 @@
 - (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame;
 - (NSString *) helpFilePath;
 - (void) defaultPathChanged:(NSNotification*) aNote;
+- (void) showHelpCenterPage:(NSString*)aPage;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) showHelpCenter:(id)sender;

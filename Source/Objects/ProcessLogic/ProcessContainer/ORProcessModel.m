@@ -49,6 +49,12 @@ NSString* ORProcessModelShortNameChangedNotification   = @"ORProcessModelShortNa
 	[super dealloc];
 }
 
+- (NSString*) helpURL
+{
+	return @"Process_Control/Process_Container.html";
+}
+
+
 #pragma mark ***Accessors
 
 - (float) sampleRate

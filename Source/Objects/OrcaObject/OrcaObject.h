@@ -62,6 +62,8 @@ extern NSString* ORObjArrayPtrPBType;
 
 #pragma mark *Subclass Methods
 - (void) makeMainController;
+- (BOOL) hasDialog;
+- (NSString*) helpURL;
 
 #pragma mark ¥¥¥Accessors
 - (void)		setLoopChecked:(BOOL)aFlag;
@@ -120,10 +122,13 @@ extern NSString* ORObjArrayPtrPBType;
 - (NSString*)		fullID;
 
 #pragma mark ¥¥¥Mouse Events
+- (void) openHelp:(id)sender;
 - (void) doDoubleClick:(id)sender;
 - (void) doCmdClick:(id)sender;
+- (void) doCntrlClick:(id)sender;
 - (ORConnector*) requestsConnection: (NSPoint)aPoint;
 - (BOOL) rectIntersectsIcon:(NSRect)aRect;
+- (BOOL) validateMenuItem:(NSMenuItem *)anItem;
 
 #pragma mark ¥¥¥Archival
 - (id)	initWithCoder:(NSCoder*)aCoder;

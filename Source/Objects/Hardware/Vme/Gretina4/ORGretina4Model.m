@@ -214,6 +214,11 @@ static struct {
     [self linkToController:@"ORGretina4Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/Gretina.html";
+}
+
 - (Class) guardianClass
 {
 	return NSClassFromString(@"ORVme64CrateModel");

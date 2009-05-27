@@ -28,6 +28,11 @@
 
 @implementation ORRunScriptModel
 
+- (NSString*) helpURL
+{
+	return @"Data_Chain/Run_Scripts.html";
+}
+
 #pragma mark ***Initialization
 - (void) registerNotificationObservers
 {

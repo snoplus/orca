@@ -87,6 +87,10 @@ NSString* ORLC950GpibLock  = @"ORLC950GpibLock";
     [ self linkToController: @"ORLC950Controller" ];
 }
 
+- (NSString*) helpURL
+{
+	return @"GPIB/LC950.html";
+}
 
 #pragma mark ***Hardware - General
 //--------------------------------------------------------------------------------

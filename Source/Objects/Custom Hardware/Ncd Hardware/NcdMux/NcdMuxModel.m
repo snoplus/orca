@@ -139,6 +139,11 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
     [self linkToController:@"NcdMuxController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"NCD/Mux.html";
+}
+
 #pragma mark ¥¥¥Notification
 - (void) registerNotificationObservers
 {    

@@ -73,10 +73,14 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 	[self setImage:[NSImage imageNamed:@"Caen265Card"]];	
 }
 
-
 - (void) makeMainController
 {
     [self linkToController:@"ORCaen265Controller"];
+}
+
+- (NSString*) helpURL
+{
+	return @"VME/V265.html";
 }
 
 - (NSRange)	memoryFootprint

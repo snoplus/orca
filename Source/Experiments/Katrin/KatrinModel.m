@@ -40,6 +40,11 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     [self linkToController:@"KatrinController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"KATRIN/Index.html";
+}
+
 - (void) makeConnectors
 {
     ORConnector* aConnector = [[ORConnector alloc] initAt:NSMakePoint([self frame].size.width - 35,2) withGuardian:self withObjectLink:self];

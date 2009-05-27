@@ -24,6 +24,7 @@
 #import "ORStatusController.h"
 #import "ORAlarmController.h"
 #import "ORCatalogController.h"
+#import "ORHelpCenter.h"
 #import "ORHWWizardController.h"
 #import "ORPreferencesController.h"
 #import "ORCommandCenterController.h"
@@ -240,9 +241,7 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     [gSecurity tryToSetLock:ORDocumentLock to:[sender intValue] forWindow:[self window]];
 }
 
-
 #pragma mark ¥¥¥Toolbar
-
 - (IBAction) statusLog:(NSToolbarItem*)item 
 {
     [[ORStatusController sharedStatusController] showWindow:self];
@@ -254,6 +253,11 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 - (IBAction) openCatalog:(NSToolbarItem*)item 
 {
     [[ORCatalogController sharedCatalogController] showWindow:self];
+}
+
+- (IBAction) openHelp:(NSToolbarItem*)item 
+{
+	[[[NSApp delegate] helpCenter] showHelpCenter:nil];
 }
 
 - (IBAction) openGateKeeper:(NSToolbarItem*)item 

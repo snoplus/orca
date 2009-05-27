@@ -101,6 +101,11 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     [self linkToController:@"ORReplayDataController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Format_Viewing/Data_Replay.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (unsigned long)   totalLength
 {

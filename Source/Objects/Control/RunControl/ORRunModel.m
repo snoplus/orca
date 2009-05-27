@@ -122,6 +122,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [self linkToController:@"ORRunController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Chain/Run_Control.html";
+}
+
 - (void) setUpImage
 {
     //---------------------------------------------------------------------------------------------------

@@ -209,6 +209,11 @@ NSString* ORShaperSettingsLock			= @"ORShaperSettingsLock";
     [self linkToController:@"ORShaperController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/Shaper.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0x2e);

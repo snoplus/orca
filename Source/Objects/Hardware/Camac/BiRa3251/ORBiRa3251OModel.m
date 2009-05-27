@@ -42,6 +42,11 @@ NSString* ORBiRa3251OModelOutputRegisterChanged = @"ORBiRa3251OModelOutputRegist
     [self linkToController:@"ORBiRa3251OController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/BiRa3251.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) shortName
 {

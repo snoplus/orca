@@ -103,6 +103,11 @@ void registryChanged(
     [self linkToController:@"ORMacController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Mac_Pci/Mac.html";
+}
+
 - (NSString*) identifier
 {
     return [NSString stringWithFormat:@"%@ %d",[self className],[self tag]];

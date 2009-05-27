@@ -156,6 +156,11 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     return thresholdDacs;
 }
 
+- (NSString*) helpURL
+{
+	return @"NCD/Mux_Box.html";
+}
+
 - (void) setThresholdDacs:(NSMutableArray*)someThresholds
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setThresholdDacs:[self thresholdDacs]];

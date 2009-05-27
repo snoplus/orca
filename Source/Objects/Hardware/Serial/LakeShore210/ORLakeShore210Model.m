@@ -86,6 +86,11 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	[self linkToController:@"ORLakeShore210Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"RS232/LakeShore_210.html";
+}
+
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];

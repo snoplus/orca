@@ -40,14 +40,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 @implementation ORGpibEnetModel
 #pragma mark ***Initialization
-//--------------------------------------------------------------------------------
-/*! \method		commonInit
- *  \brief		Initializes error message with blank string.  Sets all devices
- *				to not initialized.
- *	\note		This class uses two arrays to keep track of which GPIB devices
- *				are initialized.
- */
-//--------------------------------------------------------------------------------
 - (void) commonInit
 {
     short 	i;
@@ -100,11 +92,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     
 }
 
-//--------------------------------------------------------------------------------
-/*! \method		init
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (id) init
 {
     self = [ super init];
@@ -115,12 +102,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-//--------------------------------------------------------------------------------
-/*! \method		dealloc
- *  \brief		Deallocs the error message string.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) dealloc
 {
     [noDriverAlarm clearAlarm];
@@ -139,12 +120,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-//--------------------------------------------------------------------------------
-/*! \method		setUpImage
- *  \brief		Draws image on screen for this object.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) setUpImage
 {
     NSImage* aCachedImage = [NSImage imageNamed:@"GpibEnetBox"];
@@ -167,13 +142,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     [ self setImage:i];
 }
 
-//--------------------------------------------------------------------------------
-/*! \method		makeConnectors
- *  \brief		Draws the connectors for the object so that one can connect
- *				GPIB objects to the controller.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) makeConnectors
 {
 	ORConnector* connectorObj = [[ ORConnector alloc ] 
@@ -186,18 +154,15 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 	[ connectorObj release ];
 }
 
-//--------------------------------------------------------------------------------
-/*! \method		makeMainController
- *  \brief		Makes the controller object used to control this object from
- *				the user interface.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) makeMainController
 {
     [self linkToController: @"ORGpibEnetController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"GPIB/ENet_100.html";
+}
 
 #pragma mark ***Accessors
 - (BOOL) isEnabled
@@ -213,13 +178,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     return( mBoardIndex );
 }
 
-
-//--------------------------------------------------------------------------------
-/*! \method		setBoardIndex
- *  \brief		Sets the board index and sends notification about change.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) setBoardIndex: (short) anIndex
 {
     mBoardIndex = anIndex;
@@ -261,15 +219,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 
 #pragma mark ***Basic commands
-//--------------------------------------------------------------------------------
-/*! \method		changePrimaryAddress
- *  \brief		Change the primary GPIB address of the device.
- *  \param		anOldPrimaryAddress		- The original primary address of the device.
- *	\param		aNewPrimaryAddress		- The new primary address
- *	\return		True if reset of address is successful.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) changePrimaryAddress: (short) anOldPrimaryAddress newAddress: (short) aNewPrimaryAddress
 {
     // Make sure that device is initialized and that new address is valid.
@@ -297,13 +246,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 
 - (void) changeState: (short) aPrimaryAddress online: (BOOL) aState
-//--------------------------------------------------------------------------------
-/*" Places the device either on or offline.
- _{#aPrimaryAddress	- The primary address for the GPIB device.}
- _{#aState			- True - place board online otherwise place it offline.}
- _{#Error			- Raises exception if low level call fails.}
- "*/
-//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return;
     @try {
@@ -332,13 +274,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-//--------------------------------------------------------------------------------
-/*! \method		checkAddress
- *  \brief		Returns true if device at specified address is initialized.
- *	\param		aPrimaryAddress		- Primary address of the device.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (BOOL) checkAddress: (short) aPrimaryAddress
 {
     BOOL  bRetVal = false;
@@ -364,13 +299,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-//--------------------------------------------------------------------------------
-/*! \method		deactivateAddress
- *  \brief		Deactivates the device.
- *	\param		aPrimaryAddress		- Primary address of the device.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) deactivateAddress: (short) aPrimaryAddress
 {
     if ( ! [ self isEnabled ]) return;
@@ -422,11 +350,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 
 - (void) resetDevice: (short) aPrimaryAddress
-//--------------------------------------------------------------------------------
-/*" Reset the device to start receiving data.
- _{#aPrimaryAddress	- The primary address for the GPIB device.}
- "*/
-//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return;
     @try {
@@ -449,36 +372,16 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     
 }
 
-//--------------------------------------------------------------------------------
-/*!\method: setGPIBMonitorRead
- * \brief   Turn on and off monitoring of GPIB commands.
- * \param   aMonitor			- True - turn on monitor.
- *								  False - turn off monitor.
- */
-//--------------------------------------------------------------------------------
 - (void) setGPIBMonitorRead: (bool) aMonitorRead
 {
 	mMonitorRead = aMonitorRead;
 }
-//--------------------------------------------------------------------------------
-/*!\method: setGPIBMonitorWrite
- * \brief   Turn on and off monitoring of read data.
- * \param   aMonitor			- True - turn on monitor.
- *								  False - turn off monitor.
- */
-//--------------------------------------------------------------------------------
 - (void) setGPIBMonitorWrite: (bool) aMonitorWrite
 {
 	mMonitorWrite = aMonitorWrite;
 }
 
 - (void) setupDevice: (short) aPrimaryAddress secondaryAddress: (short) aSecondaryAddress
-//--------------------------------------------------------------------------------
-/*" Sets up communication with the GPIB device. 
- _{#aPrimaryAddress	- The primary address for the GPIB device.}
- _{#aSecondaryAddress - Normally not used.  Set to 0 if not used.}
- "*/
-//--------------------------------------------------------------------------------
 {  
     if ( ! [ self isEnabled ]) return;
     @try {
@@ -519,15 +422,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 
 - (long) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (long) aMaxLength
-//--------------------------------------------------------------------------------
-/*" Write to a gpib device 
- _{#aPrimaryAddress	- The GPIB primary address of the device.}
- _{#aData			- Pointer to array that can receive data.}
- _{#aMaxLength		- Maximum amount of data that can be returned.  aData must be
- aMaxLength + 1 to contain the "\0". }
- _{#Return - Number of bytes read in.  -1 if read failed.}
- "*/
-//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return -1;
     long	nReadBytes = -1;
@@ -583,15 +477,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-
-//--------------------------------------------------------------------------------
-/*! \method		writeToDevice
- *  \brief		Writes single command line to GPIB device.
- *  \param		aPrimaryAddress			- The primary address of the device.
- *	\param		aCommand				- The command string to write.
- *	\note		Commands that can be written will depend on each GPIB device.
- */
-//--------------------------------------------------------------------------------
 - (void) writeToDevice: (short) aPrimaryAddress command: (NSString*) aCommand
 {
     if ( ! [ self isEnabled ]) return;
@@ -635,16 +520,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 - (long) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
                maxLength: (long) aMaxLength
-//--------------------------------------------------------------------------------
-/*" Write to gpib device and then read results
- _{#aPrimaryAddress	- The GPIB primary address of the device.}
- _{#aCommand			- The command to write to the device.}
- _{#aData			- Pointer to array that can receive data.}
- _{#aMaxLength		- Maximum amount of data that can be returned.  aData must be
- aMaxLength + 1 to contain the "\0". }
- _{#Return - Number of bytes read in.  -1 if read failed.}
- "*/
-//--------------------------------------------------------------------------------
 {
     long retVal = 0;
     if ( ! [ self isEnabled ]) return -1;
@@ -665,16 +540,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 - (void) wait: (short) aPrimaryAddress mask: (short) aWaitMask
-//--------------------------------------------------------------------------------
-/*" Set the address for the GPIB device.  Send notification of change. 
- _{#aPrimaryAddress	- The GPIB primary address of the device.}
- _{#aWaitMask		- The following bits can be set for device:
- TIMO - Wait for time out
- END - Wait for END or EOS
- RQS - Device requested service
- CMPL - I/O is completed.  
- "*/
-//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return;
     @try {
@@ -709,30 +574,12 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-//--------------------------------------------------------------------------------
-/*! \method		checkDeviceThrow
- *  \brief		Checks if device address is valid and whether it really is present.
- *  \param		aPrimaryAddress			- The primary address of the device.
- *	\error		Throws error if check fails.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) checkDeviceThrow: (short) aPrimaryAddress
 {
     [ self checkDeviceThrow: aPrimaryAddress checkSetup: true ];
 }
 
 
-//--------------------------------------------------------------------------------
-/*! \method		checkDeviceThrow
- *  \brief		Checks if device address is valid and optionally whether it
- *				has been initialized.
- *  \param		aPrimaryAddress			- The primary address of the device.
- *	\param		aState					- True - Check if device is initialized.
- *	\error		Throws error if check fails.
- *	\note		
- */
-//--------------------------------------------------------------------------------
 - (void) checkDeviceThrow: (short) aPrimaryAddress checkSetup: (BOOL) aState
 {
     if ( ! [ self isEnabled ]) return;
@@ -776,13 +623,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-//--------------------------------------------------------------------------------
-/*!\method  getGpibController 
- * \brief	Called by objects looking for a gpib controller
- * \return	self
- * \note	
- */
-//--------------------------------------------------------------------------------
 - (id) getGpibController
 {
 	return self;
@@ -790,12 +630,6 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 
 
 - (void) GpibError: (NSMutableString*) aMsg
-//--------------------------------------------------------------------------------
-/*" Set the address for the GPIB device.  Send notification of change. 
- _{#aMsg	- Message passed from calling routine as to what initiated the failure.}
- -{#Return - The full message about what failed.}
- "*/
-//--------------------------------------------------------------------------------
 {
     if ( ! [ self isEnabled ]) return;
     @try {

@@ -92,6 +92,11 @@ NSString* OR4ChanSpecialLock				= @"OR4ChanSpecialLock";
     [self linkToController:@"OR4ChanTriggerController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/Trigger%284_Chan%29.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0x68);

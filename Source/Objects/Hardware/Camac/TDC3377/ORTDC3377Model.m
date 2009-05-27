@@ -90,6 +90,10 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 	[self linkToController:@"ORTDC3377Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/L3377.html";
+}
 
 #pragma mark ***Accessors
 - (NSString*) shortName

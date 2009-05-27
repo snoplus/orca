@@ -80,6 +80,11 @@
     [self linkToController:@"ORcPCICrateController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"cPCI/Crate.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) adapterArchiveKey
 {

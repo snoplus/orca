@@ -68,6 +68,11 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
     [self linkToController:@"ORADU200Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"USB/ADU200.html";
+}
+
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];

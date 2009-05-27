@@ -76,6 +76,11 @@ NSString* ORHV2132OnOffChanged					= @"ORHV2132OnOffChanged";
     [self linkToController:@"ORHV2132Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/HV2132_4032.html";
+}
+
 - (void) makeConnectors
 {
     //make and cache our connector. However this connector will be 'owned' by another object (the crate)

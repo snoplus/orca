@@ -131,6 +131,10 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     [self linkToController:@"ORHistoController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Chain/Data_Monitor.html";
+}
 
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector
 {

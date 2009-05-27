@@ -424,16 +424,16 @@
 - (float)  	plotter:(id) aPlotter dataSet:(int)set dataValue:(int) i 
 {
 	if([model showDeltaFromAve]){
-		if(set == 0)		return [model axDeltaAveAt:i];
+		if(set == 2)		return [model axDeltaAveAt:i];
 		else if(set == 1)	return [model ayDeltaAveAt:i];
-		else if(set == 2)	return [model azDeltaAveAt:i];
+		else if(set == 0)	return [model azDeltaAveAt:i];
 		else if(set == 3)	return [model xyzDeltaAveAt:i];
 		return 0;
 	}
 	else {
-		if(set == 0)		return [model axAt:i];
+		if(set == 2)		return [model axAt:i];
 		else if(set == 1)	return [model ayAt:i];
-		else if(set == 2)	return [model azAt:i];
+		else if(set == 0)	return [model azAt:i];
 		else if(set == 3)	return [model totalxyzAt:i];
 		return 0;
 	}

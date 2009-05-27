@@ -54,6 +54,11 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 	[self linkToController:@"SBC_LinkController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"cPCI/SBC.html";
+}
+
 - (BOOL) showBasicOps
 {
 	return NO;

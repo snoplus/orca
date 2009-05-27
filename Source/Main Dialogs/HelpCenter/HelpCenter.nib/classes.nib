@@ -5,15 +5,12 @@
 	<key>IBClasses</key>
 	<array>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>tasksCompleted</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
-			<string>NSObject</string>
+			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -30,6 +27,21 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>

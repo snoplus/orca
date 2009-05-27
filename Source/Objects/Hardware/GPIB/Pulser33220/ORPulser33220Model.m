@@ -108,6 +108,11 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     [self linkToController:@"ORPulser33220Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"GPIB/Aglient_33220a.html";
+}
+
 - (void) dealloc
 {
 	[noUSBAlarm clearAlarm];

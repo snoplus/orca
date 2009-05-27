@@ -73,6 +73,10 @@ NSString* ORHP6622aLock							= @"ORHP6622aLock";
     [self linkToController:@"ORHP6622aController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"GPIB/HP6622.html";
+}
 
 #pragma mark ¥¥¥Accessors
 - (BOOL) powerOn:(int)index { return powerOn[index]; }

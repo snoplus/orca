@@ -125,6 +125,11 @@ NSString* ORTriggerSpecialLock				= @"ORTriggerSpecialLock";
     [self linkToController:@"ORTriggerController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/Trigger.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0x2a);

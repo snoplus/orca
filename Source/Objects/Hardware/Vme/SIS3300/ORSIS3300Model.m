@@ -197,6 +197,11 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [self linkToController:@"ORSIS3300Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/SIS330x.html";
+}
+
 - (NSRange)	memoryFootprint
 {
 	return NSMakeRange(baseAddress,0x00780000+0x80000);

@@ -69,6 +69,7 @@
 - (IBAction) openCommandCenter:(NSToolbarItem*)item;
 - (IBAction) openTaskMaster:(NSToolbarItem*)item; 
 - (IBAction) openORCARootService:(NSToolbarItem*)item;
+- (IBAction) openHelp:(NSToolbarItem*)item;
 
 #pragma mark ¥¥¥Data Source
 - (id)   outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;

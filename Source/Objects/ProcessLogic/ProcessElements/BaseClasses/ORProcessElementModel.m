@@ -47,6 +47,11 @@ NSString* ORProcessCommentChangedNotification       = @"ORProcessCommentChangedN
     [self setUpNubs];
 }
 
+- (NSString*) helpURL
+{
+	return @"Process_Control/Process_Elements.html";
+}
+
 
 - (void) setUpNubs
 {

@@ -81,6 +81,11 @@ NSString* OReGunLock = @"OReGunLock";
 	[self linkToController:@"OReGunController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"KATRIN/eGun_Controller.html";
+}
+
 - (ORObjectProxy*) x220Object
 {
 	return x220Object;

@@ -1423,6 +1423,7 @@
 		84B0CFF208FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist in Resources */ = {isa = PBXBuildFile; fileRef = 84B0CFF108FC6F0F00EBE23C /* edu.washington.npl.orca.Container.plist */; };
 		84B194BC0FC44E1800775CF1 /* ORMotionNodeDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84B194BA0FC44E1800775CF1 /* ORMotionNodeDecoders.m */; };
 		84B194BD0FC44E1800775CF1 /* ORMotionNodeDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B194BB0FC44E1800775CF1 /* ORMotionNodeDecoders.h */; };
+		84B1B00C0FCDAA1400775CF1 /* help.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B1B00B0FCDAA1400775CF1 /* help.tif */; };
 		84B28CDE0F4C597900E2B056 /* BocTIC3.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84B28CD60F4C597900E2B056 /* BocTIC3.nib */; };
 		84B28CDF0F4C597900E2B056 /* BocTIC3.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84B28CD70F4C597900E2B056 /* BocTIC3.tif */; };
 		84B28CE00F4C597900E2B056 /* ORBocTIC3Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84B28CD80F4C597900E2B056 /* ORBocTIC3Controller.h */; };
@@ -3344,6 +3345,7 @@
 		84B18102044C7AAC005F64B1 /* OR620Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = OR620Model.m; sourceTree = "<group>"; };
 		84B194BA0FC44E1800775CF1 /* ORMotionNodeDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORMotionNodeDecoders.m; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeDecoders.m; sourceTree = SOURCE_ROOT; };
 		84B194BB0FC44E1800775CF1 /* ORMotionNodeDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORMotionNodeDecoders.h; path = Source/Objects/Hardware/Serial/MotionNode/ORMotionNodeDecoders.h; sourceTree = SOURCE_ROOT; };
+		84B1B00B0FCDAA1400775CF1 /* help.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = help.tif; path = "Source/Main Document/help.tif"; sourceTree = SOURCE_ROOT; };
 		84B28CD60F4C597900E2B056 /* BocTIC3.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = BocTIC3.nib; path = Source/Objects/Hardware/Serial/BocTIC3/BocTIC3.nib; sourceTree = SOURCE_ROOT; };
 		84B28CD70F4C597900E2B056 /* BocTIC3.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = BocTIC3.tif; path = Source/Objects/Hardware/Serial/BocTIC3/BocTIC3.tif; sourceTree = SOURCE_ROOT; };
 		84B28CD80F4C597900E2B056 /* ORBocTIC3Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORBocTIC3Controller.h; path = Source/Objects/Hardware/Serial/BocTIC3/ORBocTIC3Controller.h; sourceTree = SOURCE_ROOT; };
@@ -8769,6 +8771,7 @@
 				F51E697603AE4775015F64B1 /* ORDocumentController.h */,
 				849191C60725B5DE00F454F1 /* edu.washington.npl.orca.Document.plist */,
 				84AA48320461DE37005F64B1 /* OfflineRunAlarmHelp */,
+				84B1B00B0FCDAA1400775CF1 /* help.tif */,
 				848E2101059378C700B6708F /* catalog.gif */,
 				848E201B059282F400B6708F /* statusWindow.gif */,
 				848E20690592891800B6708F /* alarmMaster.gif */,
@@ -10376,6 +10379,7 @@
 				84CC16CD0FAF157000CEE642 /* MCA927.nib in Resources */,
 				84CC16CE0FAF157000CEE642 /* MCA927.tif in Resources */,
 				84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */,
+				84B1B00C0FCDAA1400775CF1 /* help.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

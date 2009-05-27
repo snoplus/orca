@@ -56,6 +56,11 @@ NSString* ORScriptIDEModelGlobalsChanged		= @"ORScriptIDEModelGlobalsChanged";
     [self linkToController:@"ORScriptIDEController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Subsystems/Script_IDE.html";
+}
+
 #pragma mark ***Accessors
 
 - (BOOL) breakChain

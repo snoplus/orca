@@ -186,6 +186,11 @@ struct {
     [self loadImage:@"PciBit3Card"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Mac_Pci/Bit_3.html";
+}
+
 - (void) wakeUp
 {
     if([self aWake])return;

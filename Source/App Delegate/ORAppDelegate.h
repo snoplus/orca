@@ -25,12 +25,14 @@
 @class ORAlarmCollection;
 @class MemoryWatcher;
 @class ORSplashWindowController;
+@class ORHelpCenter;
 
 @interface ORAppDelegate : NSObject {
     id   document;
     ORAlarmCollection* alarmCollection;
     MemoryWatcher*     memoryWatcher;
     ORSplashWindowController* theSplashController;
+	IBOutlet ORHelpCenter* helpCenter;
 }
 + (BOOL)isMacOSX10_5;
 + (BOOL)isMacOSX10_4;
@@ -42,6 +44,7 @@
 - (void) mailCrashLog;
 - (void) deleteCrashLog;
 - (void) closeSplashWindow;
+- (ORHelpCenter*) helpCenter;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;

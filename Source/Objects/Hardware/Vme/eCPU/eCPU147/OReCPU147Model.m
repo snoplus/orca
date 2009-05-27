@@ -125,6 +125,11 @@ const struct {
     [self linkToController:@"OReCPU147Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/MVE147_165.html";
+}
+
 #pragma mark •••Notifications
 -(void)registerNotificationObservers
 {

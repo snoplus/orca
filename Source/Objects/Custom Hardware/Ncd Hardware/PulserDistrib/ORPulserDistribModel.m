@@ -142,6 +142,10 @@ NSString* ORPulserDisableForPulserChangedNotification = @"ORPulserDisableForPuls
     [self linkToController:@"ORPulserDistribController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"NCD/PDS.html";
+}
 
 #pragma mark ¥¥¥Accessors
 

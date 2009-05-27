@@ -59,6 +59,11 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
     [self linkToController:@"ORADC2249Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"CAMAC/AD2249.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (NSString*) shortName
 {

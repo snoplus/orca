@@ -101,6 +101,10 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     [self linkToController:@"ORRemoteRunController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Chain/Remote_Run_Control.html";
+}
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers

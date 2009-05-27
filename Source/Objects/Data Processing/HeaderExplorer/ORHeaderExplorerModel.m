@@ -87,6 +87,11 @@ NSString* ORHeaderExplorerSearchKeysChanged		= @"ORHeaderExplorerSearchKeysChang
     [self linkToController:@"ORHeaderExplorerController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Format_Viewing/Header_Explorer.html";
+}
+
 #pragma mark •••Accessors
 
 - (BOOL) useFilter

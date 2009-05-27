@@ -44,6 +44,7 @@
 - (void) remoteScaleFactorChanged:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
+- (IBAction) openHelp:(NSToolbarItem*)item;
 - (IBAction) statusLog:(NSToolbarItem*)item;
 - (IBAction) printDocument:(id)sender;
 - (IBAction) alarmMaster:(NSToolbarItem*)item;

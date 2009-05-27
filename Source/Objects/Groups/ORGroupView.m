@@ -312,16 +312,20 @@
     BOOL somethingHit 			= NO;
     ORConnector* connectorRequestingConnection = nil;
     BOOL hitObjectHighlighted;
-	if(!cntrlKeyDown){
-		while (obj1 = [e nextObject]) {                     //loop thru all icons
-			if(![obj1 selectionAllowed]){
-				if([event clickCount]>=2){
-					[obj1 doDoubleClick:obj1];
-				}                
-				continue;
-			}
-			if( NSPointInRect(localPoint,[obj1 frame])){    //obj1 is hit?
-				if(!cmdKeyDown){
+	while (obj1 = [e nextObject]) {                     //loop thru all icons
+		if(![obj1 selectionAllowed]){
+			if([event clickCount]>=2){
+				[obj1 doDoubleClick:obj1];
+			}                
+			continue;
+		}
+		if( NSPointInRect(localPoint,[obj1 frame])){    //obj1 is hit?
+			if(!cmdKeyDown){
+				if(cntrlKeyDown){
+					[obj1 doCntrlClick:obj1];
+					break;
+				}
+				else {
 					somethingHit = YES;
 					connectorRequestingConnection = [obj1 requestsConnection:localPoint];
 					if(connectorRequestingConnection == nil){
@@ -348,15 +352,18 @@
 							[[group allSelectedObjects] makeObjectsPerformSelector:@selector(doDoubleClick:) withObject:self];
 						}                
 					}
-					break;
 				}
-				else {
-					[obj1 setHighlighted:NO]; 
-					[obj1 doCmdClick:obj1];
-				}
-			}      
-		}
-    }
+				break;
+			}
+			else {
+				[obj1 setHighlighted:NO]; 
+				[obj1 doCmdClick:obj1];
+				break;
+			}
+			
+		}      
+	}
+	
     //something else must be done..
     if(!somethingHit){
 		id theMouseTask;

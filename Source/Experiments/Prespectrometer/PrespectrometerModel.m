@@ -36,6 +36,11 @@
     [self linkToController:@"PrespectrometerController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"KATRIN/Prespectrometer.html";
+}
+
 #pragma mark ¥¥¥Segment Group Methods
 - (void) makeSegmentGroups
 {

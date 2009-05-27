@@ -83,6 +83,11 @@ NSString* ORIP408ReadValueChangedNotification		= @"IP408 ReadValue Changed Notif
     [self linkToController:@"ORIP408Controller"];
 }
 
+- (NSString*) helpURL
+{
+	return @"VME/IP408.html";
+}
+
 - (void) makeConnectors
 {
     //make and cache our connector. However this connector will be 'owned' by another object (the crate)

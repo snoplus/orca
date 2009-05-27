@@ -175,6 +175,11 @@ static NSString *kFanInConnectorKey[10]  = {
     [self linkToController:@"ORFanInController"];
 }
 
+- (NSString*) helpURL
+{
+	return @"Data_Chain/Fan_In_Out.html";
+}
+
 #pragma mark ¥¥¥Accessors
 - (short) numberOfInputs
 {
