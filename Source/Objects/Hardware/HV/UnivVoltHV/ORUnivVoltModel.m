@@ -85,7 +85,9 @@ NSString* UVCardSlotChanged				= @"UVCardSlotChanged";
 NSString* UVPollTimeMinutesChanged		= @"UVPollTimeMinutesChanged";
 NSString* UVLastPollTimeChanged			= @"UVLastPollTimeChanged";
 NSString* UVNumPlotterPointsChanged		= @"UVNumPlotterPointsChanged";
+NSString* UVPlotterDataChanged			= @"UVPlotterDataChanged";
 NSString* UVStatusPollTaskChanged		= @"UVStatusPollTaskChanged";
+NSString* UVAlarmChanged				= @"UVAlarmChanged";
 
 NSString* UVChnlHVValuesChanged			= @"ChnlHVValuesChanged";
 //NSString* UVErrorNotification			= @"UVNotification";
@@ -143,7 +145,9 @@ NSString* UVkWrite = @"W";
 
 - (void) dealloc
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];		
+	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
+	[mHVValueLmtsAlarm clearAlarm];	
+	[mHVValueLmtsAlarm release];
     [super dealloc];
 }
 
@@ -273,7 +277,36 @@ NSString* UVkWrite = @"W";
 
 - (void) setUpImage
 {
-    [self setImage:[NSImage imageNamed:@"UnivVoltHVIcon"]];
+	NSImage* aCachedImage = [NSImage imageNamed: @"UnivVoltHVIcon"];
+	if (mHVValueLmtsAlarm) {
+		NSPoint theOffset = NSZeroPoint;
+		NSSize theIconSize = [aCachedImage size];
+		
+		NSImage* i = [[NSImage alloc] initWithSize: theIconSize];
+		[i lockFocus];
+		
+		[aCachedImage compositeToPoint: theOffset operation: NSCompositeCopy];
+		
+		if(!mHVValueLmtsAlarm){
+			NSBezierPath* path = [NSBezierPath bezierPath];
+			[path moveToPoint: NSMakePoint(5,0)];
+			[path lineToPoint: NSMakePoint(20,20)];
+			[path moveToPoint: NSMakePoint(5,20)];
+			[path lineToPoint: NSMakePoint(20,0)];
+			[path setLineWidth: 3];
+			[[NSColor redColor] set];
+			[path stroke];
+		}    
+		
+		[i unlockFocus];
+		
+		[self setImage: i];
+		[i release];
+    }
+	else
+	{	
+		[self setImage: [NSImage imageNamed: @"UnivVoltHVIcon"]];
+	}
 }
 
 #pragma mark •••Notifications
@@ -488,6 +521,8 @@ NSString* UVkWrite = @"W";
 	[NSObject cancelPreviousPerformRequestsWithTarget: self selector: @selector( pollTask ) object: nil];
 	[self fakeData: 0 channel: 0];	// fake data
 //	[self getValues: -1];			// real data
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVPlotterDataChanged object: self];
+	NSLog( @"Plotter notification sent %@\n", lastPollTime );
 	[self performSelector: @selector( pollTask) withObject: nil afterDelay: pollTimeSecs];
 	mPollTaskIsRunning = TRUE;	
 }
@@ -656,10 +691,10 @@ NSString* UVkWrite = @"W";
 	return( [[tmpChnl objectForKey: HVkMVDZ] floatValue] );
 }
 
-- (void) setMVDZ: (float) aChargeWindow chnl: (int) aCurChannel
+- (void) setMVDZ: (float) anHVRange chnl: (int) aCurChannel
 {
 	NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: aCurChannel];
-	NSNumber* hvWindow = [NSNumber numberWithFloat: aChargeWindow];
+	NSNumber* hvWindow = [NSNumber numberWithFloat: anHVRange];
 	[tmpChnl setObject: hvWindow forKey: HVkMVDZ];
 	
 	// Create return dictionary with channel.  Then send notification that value has changed.
@@ -704,7 +739,40 @@ NSString* UVkWrite = @"W";
 	return( [mPlotterPoints intValue] );
 }
 
-- (int) numPointsInCB:(int)aChnl
+- (bool) areAlarmsEnabled
+{
+/*
+	if ( mAlarmsEnabled ) {
+		if ( mHVValueLmtsAlarm ) {
+			[mHVValueLmtsAlarm clearAlarm];
+		}
+	}
+			
+	[mHVValueLmtsAlarm
+	*/
+	return( mAlarmsEnabled );
+}
+
+- (void) enableAlarms: (bool) aFlag
+{
+	if ( aFlag ) {
+		mAlarmsEnabled = YES;
+		if ( mHVValueLmtsAlarm ) {
+			[mHVValueLmtsAlarm clearAlarm];
+		}
+	}
+	else
+	{
+		mAlarmsEnabled = NO;
+		if ( mHVValueLmtsAlarm ) {
+			[mHVValueLmtsAlarm clearAlarm];
+		}
+	}
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName: UVAlarmChanged object: self];
+}
+
+- (int) numPointsInCB: (int) aChnl
 {
 	return [[mCircularBuffers objectAtIndex:aChnl] count];
 }
@@ -777,15 +845,14 @@ NSString* UVkWrite = @"W";
 		
 		// Place new values into mChannelArray for channel aCurChnl
 		NSNumber* measuredCurrent = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkMeasuredCurrentIndx] floatValue]];
+//		NSArray* dataObjs = [NSArray arrayWithObjects: mTimeStamp, measuredCurrent, nil];
+//		NSArray* keyObs = [NSArray arrayWithObject: CBeTime, CBeValue, nil];
 		[chnlDictObj setObject: measuredCurrent forKey: HVkMeasuredCurrent];
-//	[	notifyCenter postNotificationName: UVChnlMeasuredCurrentChanged object: self userInfo: chnlDictObj];
+	//	[	notifyCenter postNotificationName: UVChnlMeasuredCurrentChanged object: self userInfo: chnlDictObj];
 	
 		NSNumber* measuredHV = [NSNumber numberWithFloat: [[tokens objectAtIndex: HVkMeasuredHVIndx] floatValue]];
 		[chnlDictObj setObject: measuredHV forKey: HVkMeasuredHV];
 		ORCircularBufferUV *cbObj = [self circularBuffer: aCurChnl];
-//	NSArray* dataObj = [NSArray arrayWithObjects: timeStamp, measuredHV, nil];
-//	NSArray* keys = [NSArray arrayWithObjects: HVkTimeStamp, HVkMeasuredHV, nil];
-//	NSDictionary* dataDictObj = [[NSDictionary alloc] initWithObjects: dataObj forKeys: keys];
 		[cbObj insertHVEntry: mTimeStamp hvValue: measuredHV];
 	
 //		[notifyCenter postNotificationName: UVChnlMeasuredHVChanged object: self userInfo: chnlDictObj];
@@ -841,6 +908,12 @@ NSString* UVkWrite = @"W";
 			
 			case eHVUTripForHVError:
 				statusStr = [NSString stringWithString: @"Trip HV for volt. error"];
+				if (!mHVValueLmtsAlarm) {
+					mHVValueLmtsAlarm = [[ORAlarm alloc] initWithName: [NSString stringWithFormat: @"HV out of limits for %d", aCurChnl] severity: kHardwareAlarm];
+					[mHVValueLmtsAlarm setSticky: YES];		
+				}
+				[mHVValueLmtsAlarm setAcknowledged: NO];
+				[mHVValueLmtsAlarm postAlarm];
 				break;
 			
 			case eHVUTripForHVLimit:
@@ -866,7 +939,7 @@ NSString* UVkWrite = @"W";
 //		[notifyCenter postNotificationName: UVChnlHVLimitChanged object: self userInfo: chnlDictObj];
 	}
 	@catch (NSException * e) {
-		NSLog( @"Caught exception '%@'.\n", [e reason] );
+		NSLog( @"Caught exception in ORUnivVoltModel:interpretDMPReturn %@'.\n", [e reason] );
 	}
 	@finally {
 		
@@ -1240,21 +1313,33 @@ NSString* UVkWrite = @"W";
 {
 	@try
 	{
-		float measuredHVFloat = ((float)rand())/RAND_MAX;
+		float measuredHVFloat = (((float)rand())/RAND_MAX * 2) - 2.0;
 		NSString* commandRet = [NSString stringWithString: @"DMP"];
 		NSString*  slotChnlNumber = [NSString stringWithString: @"S0.0"];
 		NSNumber* measuredCurrent = [NSNumber numberWithFloat: 1000.0];
-		measuredHVFloat = 2000.0 + measuredHVFloat;
+		
+		NSMutableDictionary* tmpChnl = [mChannelArray objectAtIndex: 0];
+		NSNumber* demandHV = [tmpChnl objectForKey: HVkDemandHV];
+		measuredHVFloat = [demandHV floatValue] + measuredHVFloat;
 		NSNumber* measuredHV = [NSNumber numberWithFloat: measuredHVFloat];
-		NSNumber* demandHV = [NSNumber numberWithFloat: 2000.0];
+
 		NSNumber* channelEnabled = [NSNumber numberWithInt: 1];
 		NSNumber* rampUpRate = [NSNumber numberWithFloat: 50.0];
 		NSNumber* rampDownRate = [NSNumber numberWithFloat: 51.0];
 		NSNumber* tripCurrent = [NSNumber numberWithFloat: 2300.0];
-		NSNumber* status = [NSNumber numberWithInt: 1];
-		NSNumber* mvdZ = [NSNumber numberWithFloat: 2.5];
-		NSNumber* mcdz = [NSNumber numberWithFloat: 1.0];
+				
+		NSNumber* mvdZ = [tmpChnl objectForKey: HVkMVDZ];
+		NSNumber* mcdz = [tmpChnl objectForKey: HVkMCDZ];
 		NSNumber* HVLimit = [NSNumber numberWithFloat: 3000.0];
+		
+		int statusInt = 1;
+		float demandHVFloat = [demandHV floatValue];
+		float mvdZFloat = [mvdZ floatValue];
+		float difference = abs( measuredHVFloat - demandHVFloat );  
+		if (  difference > mvdZFloat)
+			statusInt = evHVUTripForSupplyLimits;
+		NSNumber* status = [NSNumber numberWithInt: statusInt];
+
 		NSArray* rawFakeData = [NSArray arrayWithObjects: commandRet,
 														  slotChnlNumber,
 														  measuredCurrent,
@@ -1293,7 +1378,7 @@ NSString* UVkWrite = @"W";
 		NSLog( @"Fake Measured HV: %@\n", readBackHV );
 	}
 	@catch (NSException * e) {
-		NSLog( @"Caught exception '%@'.", [e reason] );
+		NSLog( @"Caught exception ORUnivVoltModel::fakeData '%@'.", [e reason] );
 	}
 	@finally {
 		

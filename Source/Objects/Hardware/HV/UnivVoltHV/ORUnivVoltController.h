@@ -25,6 +25,8 @@
 @interface ORUnivVoltController : OrcaObjectController {
 	IBOutlet NSTableView*			mChnlTable;
 	IBOutlet NSButton*				mChnlEnabled;
+	IBOutlet NSButton*				mAlarmButton;
+	IBOutlet NSTextField*			mAlarmEnabledTextField;
 	IBOutlet NSStepper*				mChannelStepperField;
 	IBOutlet NSTextField*			mChannelNumberField;
 	IBOutlet NSTextField*			mDemandHV;
@@ -66,9 +68,12 @@
 - (void) pollingTimeChanged: (NSNotification*) aNote;
 - (void) pollingStatusChanged: (NSNotification*) aNote;
 - (void) lastPollTimeChanged: (NSNotification*) aNote;
-- (void) numPlotterPointsChanged: (NSNotification *) aNote;
+- (void) numPlotterPointsChanged: (NSNotification*) aNote;
+- (void) alarmChanged: (NSNotification*) aNote;
+- (void) plotterDataChanged: (NSNotification*) aNotes;
 
 #pragma mark •••Actions
+- (IBAction) setAlarm: (id) aSender;
 - (IBAction) setChannelNumberField: (id) aSender;
 - (IBAction) setChannelNumberStepper: (id) aSender;
 - (IBAction) setDemandHV: (id) aSender;

@@ -21,6 +21,8 @@
 				<string>id</string>
 				<key>pollTimeAction</key>
 				<string>id</string>
+				<key>setAlarm</key>
+				<string>id</string>
 				<key>setChannelNumberField</key>
 				<string>id</string>
 				<key>setChannelNumberStepper</key>
@@ -54,6 +56,10 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>mAlarmButton</key>
+				<string>NSButton</string>
+				<key>mAlarmEnabledTextField</key>
+				<string>NSTextField</string>
 				<key>mChannelNumberField</key>
 				<string>NSTextField</string>
 				<key>mChannelStepperField</key>
@@ -99,6 +105,14 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>OrcaObjectController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORFlippedView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -197,14 +211,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>ZFlowLayout</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>ORTimeAxis</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -254,7 +260,7 @@
 				<key>analysisDrawer</key>
 				<string>NSDrawer</string>
 				<key>analysisView</key>
-				<string>ZFlowLayout</string>
+				<string>ORFlippedView</string>
 				<key>mDataSource</key>
 				<string>id</string>
 				<key>mXScale</key>

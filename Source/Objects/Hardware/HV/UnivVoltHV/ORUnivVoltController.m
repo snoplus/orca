@@ -17,8 +17,6 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-
-
 #import "ORUnivVoltController.h"
 #import "ORUnivVoltModel.h"
 #import "ORUnivVoltHVCrateModel.h"
@@ -93,7 +91,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 	[notifyCenter addObserver : self
                      selector : @selector( statusChanged:)
-                         name : UVChnlMVDZChanged
+                         name : UVChnlStatusChanged
 						object: model];
 						
 	[notifyCenter addObserver : self
@@ -103,7 +101,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 						
     [notifyCenter addObserver : self
                      selector : @selector( MCDZChanged:)
-                         name : UVChnlMVDZChanged
+                         name : UVChnlMCDZChanged
 						object: model];
 						
     [notifyCenter addObserver : self
@@ -134,6 +132,16 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	[notifyCenter addObserver : self
 	                 selector : @selector( numPlotterPointsChanged: )
 					     name : UVNumPlotterPointsChanged
+					   object : model]; 
+
+	[notifyCenter addObserver : self
+	                 selector : @selector( plotterDataChanged: )
+					     name : UVPlotterDataChanged
+					   object : model]; 
+
+	[notifyCenter addObserver : self
+	                 selector : @selector( alarmChanged: )
+					     name : UVAlarmChanged
 					   object : model]; 
 
 	[notifyCenter  addObserver: self
@@ -223,7 +231,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (void) demandHVChanged: (NSNotification*) aNote
 {
 	float value;
-	[self setCurrentChnl: (NSNotification *) aNote ];  
+	[self setCurrentChnl: (NSNotification*) aNote ];  
 	value = [model demandHV: mCurrentChnl];
 	NSLog( @"Setting demand HV to: %f  for channel %d\n", value, mCurrentChnl);
 	[mDemandHV setFloatValue: value];
@@ -247,7 +255,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (void) tripCurrentChanged: (NSNotification*) aNote
 {
 	float value;
-	[self setCurrentChnl: (NSNotification *) aNote ];  
+	[self setCurrentChnl: (NSNotification*) aNote ];  
 	value = [model tripCurrent: mCurrentChnl];
 	NSLog( @"tripCurrentChanged for chnl %d: %f\n", mCurrentChnl, value );
 	[mTripCurrent setFloatValue: value];
@@ -256,7 +264,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (void) rampUpRateChanged: (NSNotification*) aNote
 {
 	float value;
-	[self setCurrentChnl: (NSNotification *) aNote ]; 
+	[self setCurrentChnl: (NSNotification*) aNote ]; 
 	value = [model rampUpRate: mCurrentChnl];
 	NSLog( @"RampUpRate %f for channel %d changed.\n", value, mCurrentChnl);
 	[mRampUpRate setFloatValue: [model rampUpRate: mCurrentChnl]];
@@ -265,7 +273,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (void) rampDownRateChanged: (NSNotification*) aNote
 {
 	float value;
-	[self setCurrentChnl: (NSNotification *) aNote ]; 
+	[self setCurrentChnl: (NSNotification*) aNote ]; 
 	value = [model rampDownRate: mCurrentChnl];
 	NSLog( @"RampDownRate %f for channel %d changed.\n", value, mCurrentChnl);
 	[mRampDownRate setFloatValue: [model rampDownRate: mCurrentChnl]];
@@ -273,7 +281,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 -(void) statusChanged: (NSNotification*) aNote
 {
-	[self setCurrentChnl: (NSNotification *) aNote ];  
+	[self setCurrentChnl: (NSNotification*) aNote ];  
 	[mStatus setStringValue: [model status: mCurrentChnl]];
 }
 
@@ -285,7 +293,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 
 - (void) MCDZChanged: (NSNotification*) aNote
 {
-	[self setCurrentChnl: (NSNotification *) aNote ];  
+	[self setCurrentChnl: (NSNotification*) aNote ];  
 	[mMCDZ setFloatValue: [model MCDZ: mCurrentChnl]];
 }
 
@@ -301,16 +309,10 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	NSLog( @"Controller - notified of polling time change: %f\n", [mPollingTimeMinsField floatValue]);
 }
 
-- (void) pollingStatusChanged: (NSNotification *) aNote
+- (void) pollingStatusChanged: (NSNotification*) aNote
 {
 	bool ifPoll = [model isPollingTaskRunning];
 	[mStartStopPolling setTitle: ( ifPoll ? @"Stop" : @"Start" ) ];
-}
-
-- (void) numPlotterPointsChanged: (NSNotification *) aNote
-{
-	int numPlotterPoints = [model plotterPoints];
-	[mPointsXAxis setIntValue: numPlotterPoints];
 }
 
 - (void) lastPollTimeChanged: (NSNotification*) aNote
@@ -319,6 +321,25 @@ const int MAXcCHNLS_PER_PLOT = 6;
 	NSString* lastPollTime = [pollObj objectForKey: HVkLastPollTime];
 	NSLog( @"Last polltime %@\n", lastPollTime );
 	[mLastPoll setObjectValue: lastPollTime];
+}
+
+- (void) numPlotterPointsChanged: (NSNotification*) aNote
+{
+	int numPlotterPoints = [model plotterPoints];
+	[mPointsXAxis setIntValue: numPlotterPoints];
+}
+
+- (void) plotterDataChanged: (NSNotification*) aNote
+{
+	[mPlottingObj1 setNeedsDisplay: YES];
+	[mPlottingObj2 setNeedsDisplay: YES];
+}
+
+- (void) alarmChanged: (NSNotification*) aNote
+{
+	[mAlarmEnabledTextField setStringValue: [model areAlarmsEnabled] ? @"Enabled" : @"Disabled"];
+	[mAlarmButton setTitle: [model areAlarmsEnabled] ? @"Disable" : @"Enable"];
+//	[model isConnected] ? [model disconnect] : [model connect];
 }
 
 
@@ -349,6 +370,11 @@ const int MAXcCHNLS_PER_PLOT = 6;
 }
 */
 #pragma mark •••Actions
+- (IBAction) setAlarm: (id) aSender
+{
+	[model areAlarmsEnabled] ? [model enableAlarms: NO] : [model enableAlarms: YES];
+}
+
 - (IBAction) setChannelNumberField: (id) aSender
 {
 	 mCurrentChnl = [mChannelNumberField intValue];
@@ -496,8 +522,6 @@ const int MAXcCHNLS_PER_PLOT = 6;
 			NSDictionary* retDataObj = [cbObj HVEntry: anX];
 			NSNumber* hvValueObj = [retDataObj objectForKey: @"Value"]; //MAH -- key was wrong
 			retVal = [hvValueObj floatValue];
-			if ( retVal > 10.0 )
-				NSLog( @"Returning: %f\n", retVal );		
 		}
 	}
 	return (retVal);
@@ -520,7 +544,7 @@ const int MAXcCHNLS_PER_PLOT = 6;
 - (int)	numberOfPointsInPlot: (id) aPlotter dataSet: (int) aChnl
 {
 	//mah. changed from a fixed value to the actual number of points in the CB
-	return( [model numPointsInCB:aChnl] );
+	return( [model numPointsInCB: aChnl] );
 }
 
 

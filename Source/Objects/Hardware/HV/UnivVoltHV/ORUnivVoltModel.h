@@ -43,8 +43,11 @@ typedef enum hveStatus hveStatus;
 	long					mPoints;			// number of points in each channel-data circular buffer.
 	NSNumber*				mPollTimeMinutes; 
 	NSNumber*				mPlotterPoints;		// number of points in histogram displays.
+	ORAlarm*				mHVValueLmtsAlarm;	// If set have exceeded MVDZ window around demand voltage
+	ORAlarm*				mHVCurrentLmtsAlarm;	// If set have exceeded MCDZ window around current.
 	int						mWParams;
 	bool					mPollTaskIsRunning;
+	bool					mAlarmsEnabled;
 	
 	double					mHVValues[ UVkNumChannels ];
 }
@@ -94,6 +97,8 @@ typedef enum hveStatus hveStatus;
 - (float)  HVLimit: (int) aCurrentChnl;
 - (int) plotterPoints;
 - (void) setPlotterPoints: (int) aNumPoints;
+- (bool) areAlarmsEnabled;
+- (void) enableAlarms: (bool) aFlag;
 - (int) stationNumber;
 - (int) numPointsInCB:(int)aChnl; //mah -- added to get the actual number of plots in CB rather
 
@@ -133,7 +138,10 @@ extern NSString* UVChnlHVValuesChanged;
 extern NSString* UVPollTimeMinutesChanged;
 extern NSString* UVLastPollTimeChanged;
 extern NSString* UVNumPlotterPointsChanged;
+extern NSString* UVPlotterDataChanged;
 extern NSString* UVStatusPollTaskChanged;
+
+extern NSString* UVAlarmChanged;
 
 extern NSString* HVkLastPollTime;
 

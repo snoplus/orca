@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import "ORCircularBufferUV.h"
+NSString* CBeTime		= @"Time";
+NSString* CBeValue		= @"Value";
 
 
 @implementation ORCircularBufferUV
@@ -16,7 +18,6 @@
     mTailIndex = 0;
 	mHeadIndex = 0;
 	mFWrapped = NO;
-	mKeys = [NSArray arrayWithObjects: @"Time", @"Value", nil];
 	[mKeys retain];
 	
 	// what is going on.
@@ -58,8 +59,9 @@
 //	NSNumber* numObj = [NSNumber numberWithFloat: anHVEntry];
 //	NSLog( @"Number: %@\n", numObj );
 		NSArray* tmpTimePoint = [NSArray arrayWithObjects: aDateOfAquistion, anHVEntry, nil];
+		NSArray* keyArray = [NSArray arrayWithObjects: CBeTime, CBeValue, nil];
 //	NSLog( @"time: %@, value: %@\n", [tmpTimePoint objectAtIndex: 0], [tmpTimePoint objectAtIndex: 1] );
-		NSDictionary* dictObj = [NSDictionary dictionaryWithObjects: tmpTimePoint forKeys: mKeys];
+		NSDictionary* dictObj = [NSDictionary dictionaryWithObjects: tmpTimePoint forKeys: keyArray];
 	
 //		int i;
 	 
