@@ -18,18 +18,34 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "OrcaObjectFactory.h"
 
 @implementation OrcaObjectFactory
 
 #pragma mark ¥¥¥Initialization
-
 - (void)awakeFromNib
 {
 	[[[NSApp delegate] undoManager] disableUndoRegistration];
-    [self makeObject];
+	
+	//these are objects that need to draw themselves in the catalog....
+	//otherwise we make the objects on demand when the user clicks
+	NSArray* specialObjectsToPreMake = [NSArray arrayWithObjects:
+										@"ORFanInModel",
+										@"ORFanOutModel",
+										@"ORJoinerModel",
+										@"ORSplitterModel",
+										nil];
+	
+	if([specialObjectsToPreMake containsObject:[self toolTip]]){
+		[self makeObject];
+	}
+	
 	[[[NSApp delegate] undoManager] enableUndoRegistration];
+}
+
+- (BOOL) isFlipped
+{
+	return NO;
 }
 
 - (void)drawRect:(NSRect)rect
@@ -38,10 +54,13 @@
     [object drawSelf:rect];
 }
 
-
 #pragma mark ¥¥¥Mouse Events
 -(void)mouseDown:(NSEvent*)theEvent
 {
+	[[[NSApp delegate] undoManager] disableUndoRegistration];
+    [self makeObject];
+	[[[NSApp delegate] undoManager] enableUndoRegistration];
+	
     [NSApp preventWindowOrdering];
     
     NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
@@ -59,9 +78,16 @@
     
     float w = [self bounds].size.width;
     float h = [self bounds].size.height;
-    
+    NSPoint atPoint;
+	if([self isFlipped]){
+		atPoint = NSMakePoint(w/2. - [theImage size].width/2.,h/2+[theImage size].height/2.);
+	}
+	else {
+		atPoint = NSMakePoint(w/2. - [theImage size].width/2.,0);
+	}
+	
     [self dragImage : theImage
-                 at : NSMakePoint(w/2. - [theImage size].width/2.,h/2+[theImage size].height/2.)
+                 at : atPoint
              offset : NSMakeSize(0.0, 0.0)
               event : theEvent
          pasteboard : pboard

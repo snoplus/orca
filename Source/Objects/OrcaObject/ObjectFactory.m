@@ -120,7 +120,7 @@
 #pragma mark ¥¥¥Factory method
 - (void) makeObject
 {
-    [self setObject:[ObjectFactory makeObject:[self toolTip]]];
+    if(!object)[self setObject:[ObjectFactory makeObject:[self toolTip]]];
 }
 
 + (id) makeObject:(NSString*)aClassName
