@@ -383,21 +383,19 @@ NSString* ORConnectionChanged = @"OR Connection Changed";
 
 - (void) connectTo:(ORConnector*)aConnector
 {
-    //first disconnect if needed
-    if(connector!=nil){
-		[self disconnect];
-    }
-    if([aConnector connector]!=nil){
-		[aConnector disconnect];
-    }
-    if(aConnector!=nil && aConnector != self  && [aConnector objectLink] != objectLink){
+
+    if(aConnector!=nil && aConnector != self  && [aConnector objectLink] != objectLink && [self guardian] != [aConnector guardian]){
 		if( [self acceptsConnectionType:[aConnector connectorType]] && [aConnector acceptsConnectionType:connectorType] && 
 			[self acceptsIoType:[aConnector ioType]] && [aConnector acceptsIoType:ioType] ){
+			//first disconnect if needed
+			if(connector!=nil)[self disconnect];
+			if([aConnector connector]!=nil)[aConnector disconnect];
 			[self setConnection:aConnector];
 			[aConnector setConnection:self];
 		}
 		else{
 			NSRunAlertPanel(@"Illegal Connection",@"Connection refused!",nil,nil,nil);
+			[[[NSApp delegate] undoManager] undo];
 		}
     }
     else if(aConnector!=nil && aConnector != self)NSRunAlertPanel(@"Illegal Connection",@"Connection refused!",nil,nil,nil);
