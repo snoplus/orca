@@ -141,11 +141,9 @@
 -(void) groupChanged:(NSNotification*)note
 {
     if(note == nil || [note object] == model || [[note object] guardian] == model){
-		//the icon needs to be updated, but we may get this notification many times if a group is moving, so 
-		//we'll schedule an update later, cancelling each request until only one is left.
-		[NSObject cancelPreviousPerformRequestsWithTarget:model selector:@selector(setUpImage) object:nil];
-		[model performSelector:@selector(setUpImage) withObject:nil afterDelay:1];
-		[groupView setNeedsDisplay:YES];
+		//the icon needs to be updated, but we have to wait until the next event to 
+		//avoid a drawing conflict
+		[model performSelector:@selector(setUpImage) withObject:nil afterDelay:0];
     }
 }
 
