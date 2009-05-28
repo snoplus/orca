@@ -32,6 +32,7 @@
 #pragma mark ¥¥¥Initialization
 - (void) setUpImage;
 - (void) makeMainController;
+- (int) ioType;
 
 #pragma mark ¥¥¥Subclass responsiblility
 - (void) setUpMessagePipeLocal:(ORConnector*)localConnector remote:(ORConnector*)remoteConnector  pipe:(ORMessagePipe*)aPipe;

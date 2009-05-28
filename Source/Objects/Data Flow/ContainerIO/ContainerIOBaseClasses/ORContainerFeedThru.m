@@ -343,7 +343,9 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
 				if(!remoteConnectors)[self setRemoteConnectors:[NSMutableDictionary dictionary]];
 		
 				ORConnector* remoteConnector = [[ORConnector alloc] initAt:NSMakePoint(0,0) withGuardian:self withObjectLink:self];
+				[remoteConnector setIoType:[self ioType]];
 				[remoteConnectors setObject:remoteConnector forKey:theNewConnectorKey];
+				
 				if(guardian){
 					[remoteConnector setLocalFrame:NSMakeRect([self remoteConnectorXPlane],y_offset,kConnectorSize,kConnectorSize) ];
 					[guardian assumeDisplayOf:remoteConnector withKey:theNewConnectorKey];
@@ -484,8 +486,6 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
 
 	[self adjustFeedThruPositions];
 
-    [self setMessagePipes:[decoder decodeObjectForKey:@"MessagePipes"]];
-
 	if(!messagePipes){
 		[self setMessagePipes:[NSArray arrayWithObjects:
 								[ORMessagePipe messagePipe],
@@ -508,7 +508,6 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
     [super encodeWithCoder:encoder];
     [encoder encodeInt:numberOfFeedThrus forKey:@"NumberFeedThrus"];
     [encoder encodeObject:remoteConnectors forKey:@"RemoteConnectors"];
-    [encoder encodeObject:messagePipes forKey:@"MessagePipes"];
 }
 
 @end

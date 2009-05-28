@@ -45,6 +45,11 @@ static NSString *kContainerInputConnectorKey[4]  = {
     [self linkToController:@"ORContainerInputController"];
 }
 
+- (int) ioType
+{
+	return kInputConnector;
+}
+
 #pragma mark ¥¥¥SubClass Responsibility
 - (NSString*) connectorKey:(int)i
 {
@@ -54,6 +59,7 @@ static NSString *kContainerInputConnectorKey[4]  = {
 
 - (void) setUpMessagePipeLocal:(ORConnector*)localConnector remote:(ORConnector*)remoteConnector  pipe:(ORMessagePipe*)aPipe
 {
+	[localConnector setIoType:kOutputConnector];
 	[remoteConnector setObjectLink:aPipe];
 	[aPipe setDestination:localConnector];
 }

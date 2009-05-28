@@ -122,6 +122,11 @@
 						 name : @"ScaleView"
 						object: groupView];
 	
+	[notifyCenter addObserver : self
+					 selector : @selector(updateWindow)
+						 name : ORConnectionChanged
+					   object : nil];
+	
 }
 
 

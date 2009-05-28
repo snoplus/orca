@@ -32,6 +32,7 @@
 #pragma mark ¥¥¥Initialization
 - (void) setUpImage;
 - (void) makeMainController;
+- (int) ioType;
 
 #pragma mark ¥¥¥SubClass Responsibility
 - (NSString*)	connectorKey:(int)i;
