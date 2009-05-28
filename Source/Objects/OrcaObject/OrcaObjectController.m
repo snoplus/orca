@@ -139,10 +139,10 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
                          name : ORDocumentClosedNotification
                        object : nil];
 	
-    [notifyCenter addObserver : self
-                     selector : @selector(endAllEditing:)
-                         name : NSWindowDidResignKeyNotification
-                       object : [self window]];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(endAllEditing:)
+//                         name : NSWindowDidResignKeyNotification
+//                       object : [self window]];
 	
     [notifyCenter addObserver : self
                      selector : @selector(isNowKeyWindow:)
