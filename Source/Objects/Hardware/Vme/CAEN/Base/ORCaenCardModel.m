@@ -68,6 +68,12 @@ NSString* 	caenChnl				= @"CAEN Chnl";
 
 #pragma mark ***Accessors
 
+- (NSString*) shortName
+{
+	NSString* n = [super shortName];
+	if([n hasPrefix:@"Caen"]) n = [n substringFromIndex:4];
+	return n;
+}
 
 //--------------------------------------------------------------------------------
 // Method:	errorCount

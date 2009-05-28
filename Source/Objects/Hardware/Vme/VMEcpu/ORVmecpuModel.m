@@ -87,6 +87,12 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 }
 
 #pragma mark ¥¥¥Accessors
+
+- (NSString*) shortName
+{
+	return @"SBC";
+}
+
 - (id) controllerCard
 {
 	return self;
