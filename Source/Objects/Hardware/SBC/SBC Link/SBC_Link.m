@@ -1921,7 +1921,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 	//Note there are NO locks on this method, but it is private and can only be called from this object. Care must
 	//be taken that thread locks are provided at a higher level.
 	aPacket->message[0] = '\0';
-	if(!aSocket)	[NSException raise:@"Write Error" format:@"Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
+	if(!aSocket)	[NSException raise:@"Write Error" format:@"SBC Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
 	
 	
 	// wait until timeout or data received
@@ -1974,7 +1974,7 @@ NSString* ORSBC_LinkErrorTimeOutChanged		= @"ORSBC_LinkErrorTimeOutChanged";
 {	
 	//Note that there are NO locks on this method, but it is private and can only be called from this object. 
 	//Care must be taken that thread locks are provided at a higher level in this object
-	if(!aSocket)	[NSException raise:@"Read Error" format:@"Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
+	if(!aSocket)	[NSException raise:@"Read Error" format:@"SBC Not Connected %@ <%@> port: %d",[self crateName],IPNumber,portNumber];
 	
 	// wait until timeout or data received
 	int  selectionResult;

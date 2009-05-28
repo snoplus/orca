@@ -290,7 +290,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		usingAddSpace:(unsigned short) anAddressSpace
 {
 	if(![sbcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readLongBlock:readAddress
 				 atAddress:vmeAddress
@@ -306,7 +306,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
 	if(![sbcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink writeLongBlock:writeAddress
 				  atAddress:vmeAddress
@@ -327,7 +327,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
    usingAddSpace:(unsigned short) anAddressSpace
 {
 	if(![sbcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readLongBlock:readAddress
 				 atAddress:vmeAddress
@@ -343,7 +343,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		usingAddSpace:(unsigned short) anAddressSpace
 {
 	if(![sbcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readByteBlock:readAddress
 				 atAddress:vmeAddress
@@ -360,7 +360,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
 	if(![sbcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink writeByteBlock:writeAddress
 				  atAddress:vmeAddress
@@ -378,7 +378,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 {
 	
 	if(![sbcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink readWordBlock:readAddress
 				 atAddress:vmeAddress
@@ -395,7 +395,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
 	if(![sbcLink isConnected]){
-		[NSException raise:@"Not Connected" format:@"Socket not connected."];
+		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
 	}
 	[sbcLink writeWordBlock:writeAddress
 				  atAddress:vmeAddress

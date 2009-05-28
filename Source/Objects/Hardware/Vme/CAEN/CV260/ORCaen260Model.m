@@ -318,10 +318,16 @@ NSString* ORCaen260ModelShipRecordsChanged	 = @"ORCaen260ModelShipRecordsChanged
 
 - (void) runAboutToStart:(NSNotification*)aNote
 {
-	NSLog(@"clearing scaler values for CV260,%d,%d\n",[self crateNumber],[self slot]);
-	[self clearScalers];
+	@try {
+		NSLog(@"clearing scaler values for CV260,%d,%d\n",[self crateNumber],[self slot]);
+		[self clearScalers];
+	}
+	@catch(NSException* localException){
+		NSLogColor([NSColor redColor],@"unable to clear scaler values for CV260,%d,%d\n",[self crateNumber],[self slot]);
+		@throw;
+	}
 }
-
+	
 - (void) runAboutToStop:(NSNotification*)aNote
 {
 	if(pollRunning){
