@@ -63,7 +63,7 @@ static NSString* kMotionNodeTraceType[3] = {
 					offset:0 //bytes!
 				  unitSize:sizeof(long) //unit size in bytes!
 					sender:self  
-				  withKeys:[NSString stringWithFormat: @"MotionNode (%d)",device], [self getChannelKey:type],nil];
+				  withKeys:@"MotionNode",[NSString stringWithFormat:@"Device %2d",device], [self getChannelKey:type],nil];
 	
     return length; //must return number of longs processed.
 }
