@@ -1047,7 +1047,9 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     @try {
         
+		[nextObject setInvolvedInCurrentRun:NO];
         [nextObject runTaskStopped:dataPacket userInfo:nil];
+
 		[NSThread setThreadPriority:1];
 		
         NSDictionary* statusInfo = [NSDictionary
@@ -1282,7 +1284,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     //tell them to start up
     [nextObject runTaskStarted:dataPacket userInfo:userInfo];
-    
+    [nextObject setInvolvedInCurrentRun:YES];
+	
     //tell them it has been started.
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunStartedNotification
                                                         object: self

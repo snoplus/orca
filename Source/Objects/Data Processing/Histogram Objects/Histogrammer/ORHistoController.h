@@ -26,6 +26,7 @@
     IBOutlet NSOutlineView* outlineView;
     IBOutlet NSOutlineView* multiPlotView;
     IBOutlet NSButton* 		chooseDirButton;
+    IBOutlet NSTextField* 	involvedInRunField;
     IBOutlet NSTextField* 	dirTextField;
     IBOutlet NSTextField* 	fileTextField;
     IBOutlet NSButton* 		writeFileButton;
@@ -34,9 +35,8 @@
     BOOL                    scheduledToUpdate;
 }
 
-#pragma mark ¥¥¥Accessors
-
 #pragma mark ¥¥¥Interface Management
+- (void)involvedInCurrentRunChanged:(NSNotification *)aNote;
 - (void) shipFinalHistogramsChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) modelChanged:(NSNotification*)aNotification;

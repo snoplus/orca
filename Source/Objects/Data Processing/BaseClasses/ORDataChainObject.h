@@ -22,8 +22,13 @@
 @class ORDataPacket;
 
 @interface ORDataChainObject : OrcaObject {
+	BOOL involvedInCurrentRun;
 }
+- (BOOL) involvedInCurrentRun;
+- (void) setInvolvedInCurrentRun:(BOOL)state;
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray;
 - (void) endOfRunCleanup:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 
 @end
+
+extern NSString* ORDataChainObjectInvolvedInCurrentRun;

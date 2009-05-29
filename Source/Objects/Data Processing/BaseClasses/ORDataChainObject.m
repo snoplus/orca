@@ -21,7 +21,21 @@
 #import "ORDataChainObject.h"
 #import "ORDataPacket.h"
 
+NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInCurrentRun";
+
 @implementation ORDataChainObject
+- (BOOL) involvedInCurrentRun
+{
+	return involvedInCurrentRun;
+}
+
+- (void) setInvolvedInCurrentRun:(BOOL)state
+{
+	involvedInCurrentRun = state;
+	[[NSNotificationCenter defaultCenter] postNotificationName:ORDataChainObjectInvolvedInCurrentRun object: self];
+}
+
+
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray
 {
 	NSMutableDictionary* dictionary = [NSMutableDictionary dictionary];

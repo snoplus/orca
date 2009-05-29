@@ -120,12 +120,16 @@
                          name : NSOutlineViewSelectionDidChangeNotification
                        object : outlineView];
 
-
     [notifyCenter addObserver : self
                      selector : @selector(shipFinalHistogramsChanged:)
                          name : ORHistoModelShipFinalHistogramsChanged
 						object: model];
 
+	[notifyCenter addObserver : self
+                     selector : @selector(involvedInCurrentRunChanged:)
+                         name : ORDataChainObjectInvolvedInCurrentRun
+						object: model];
+	
 }
 
 - (void) updateWindow
@@ -137,11 +141,16 @@
     [self fileChanged:nil];
     [self writeFileChanged:nil];
 	[self shipFinalHistogramsChanged:nil];
+	[self involvedInCurrentRunChanged:nil];
 }
 
 
 
 #pragma  mark ¥¥¥Interface Management
+- (void)involvedInCurrentRunChanged:(NSNotification *)notification
+{
+	[involvedInRunField setStringValue:[model involvedInCurrentRun]?@"Running -- Deletions not Allowed":@""];
+}
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
@@ -360,32 +369,35 @@
 
 - (IBAction) removeItemAction:(id)sender
 { 
-    if([[self window] firstResponder] == outlineView){
-        NSArray *selection = [outlineView allSelectedItems];
-        NSEnumerator* e = [selection objectEnumerator];
-        id item;
-        while(item = [e nextObject]){
-            [model removeDataSet:item];
-        }
-        [[model dataSet] recountTotal];
-        [outlineView deselectAll:self];
-        [outlineView reloadData];
-    }
-    else {
-        NSArray *selection = [multiPlotView allSelectedItems];
-        NSEnumerator* e = [selection objectEnumerator];
-        id item;
-        while(item = [e nextObject]){
-            if([item isKindOfClass:[ORMultiPlot class]]){
-                [model removeMultiPlot:item];
-            }
-            else {//if([item isKindOfClass:[ORMultiPlotDataItem class]]){
-                [item removeSelf];
-            }
-        }
-        [multiPlotView deselectAll:self];
-        [multiPlotView reloadData];
-    }
+	if(![model involvedInCurrentRun]){
+		if([[self window] firstResponder] == outlineView){
+			NSArray *selection = [outlineView allSelectedItems];
+			NSEnumerator* e = [selection objectEnumerator];
+			id item;
+			while(item = [e nextObject]){
+				[model removeDataSet:item];
+			}
+			[[model dataSet] recountTotal];
+			[outlineView deselectAll:self];
+			[outlineView reloadData];
+		}
+		else {
+			NSArray *selection = [multiPlotView allSelectedItems];
+			NSEnumerator* e = [selection objectEnumerator];
+			id item;
+			while(item = [e nextObject]){
+				if([item isKindOfClass:[ORMultiPlot class]]){
+					[model removeMultiPlot:item];
+				}
+				else {//if([item isKindOfClass:[ORMultiPlotDataItem class]]){
+					[item removeSelf];
+				}
+			}
+			[multiPlotView deselectAll:self];
+			[multiPlotView reloadData];
+		}
+	}
+	
 }
 
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem

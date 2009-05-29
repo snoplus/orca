@@ -366,6 +366,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     //cache the next object
     nextObject =  [self objectConnectedTo: ORDataTaskDataOut];
     [nextObject runTaskStarted:aDataPacket userInfo:userInfo];
+	[nextObject setInvolvedInCurrentRun:YES];
 	
 	timeToStopProcessThread = NO;
     [NSThread detachNewThreadSelector:@selector(sendDataFromQueue) toTarget:self withObject:nil];
@@ -539,6 +540,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	NSLog(@"Close out run\n");
     //tell everyone it's over and done.
     [nextObject closeOutRun:aDataPacket userInfo:userInfo];
+	[nextObject setInvolvedInCurrentRun:NO];
 	
 	
 	NSLog(@"Final end of run cleanup\n");

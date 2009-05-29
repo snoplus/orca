@@ -263,6 +263,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 {
 	nextObject = [self objectConnectedTo:ORReplayDataConnection];
     [nextObject runTaskStarted:aDataPacket userInfo:nil];
+	[nextObject setInvolvedInCurrentRun:YES];
 }
 
 - (void) readHeaderForFileIndex:(int)index
@@ -565,6 +566,7 @@ static NSString* ORLastFilePath 			= @"ORLastFilePath";
     
     [nextObject runTaskStopped:fileAsDataPacket userInfo:nil];
     [nextObject closeOutRun:fileAsDataPacket userInfo:nil];
+	[nextObject setInvolvedInCurrentRun:NO];
 	
 	[fileAsDataPacket clearData];
     [fileAsDataPacket release];

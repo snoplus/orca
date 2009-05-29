@@ -93,6 +93,8 @@
 				<string>id</string>
 				<key>doubleClick</key>
 				<string>id</string>
+				<key>getInfo</key>
+				<string>id</string>
 				<key>plotGroupAction</key>
 				<string>id</string>
 				<key>removeItemAction</key>
@@ -115,6 +117,8 @@
 				<key>dirTextField</key>
 				<string>NSTextField</string>
 				<key>fileTextField</key>
+				<string>NSTextField</string>
+				<key>involvedInRunField</key>
 				<string>NSTextField</string>
 				<key>multiPlotView</key>
 				<string>NSOutlineView</string>
