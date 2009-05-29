@@ -1,0 +1,34 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
+        {
+            ACTIONS = {autoScale = id; centerOnPeak = id; toggleLog = id; }; 
+            CLASS = ORDataSetController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {view = NSView; }; 
+            SUPERCLASS = OrcaObjectController; 
+        }, 
+        {
+            ACTIONS = {autoScale = id; centerOnPeak = id; toggleLog = id; }; 
+            CLASS = ORSubPlotController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {plotter = ORPlotter1D; title = NSTextField; view = NSView; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                copy = id; 
+                decDialog = id; 
+                incDialog = id; 
+                saveDocument = id; 
+                saveDocumentAs = id; 
+            }; 
+            CLASS = OrcaObjectController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {model = id; }; 
+            SUPERCLASS = NSWindowController; 
+        }
+    ); 
+    IBVersion = 1; 
+}
