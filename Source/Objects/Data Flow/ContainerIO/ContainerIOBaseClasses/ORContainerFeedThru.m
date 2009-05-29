@@ -343,7 +343,7 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
 				if(!remoteConnectors)[self setRemoteConnectors:[NSMutableDictionary dictionary]];
 		
 				ORConnector* remoteConnector = [[ORConnector alloc] initAt:NSMakePoint(0,0) withGuardian:self withObjectLink:self];
-				[remoteConnector setIoType:[self ioType]];
+				[remoteConnector setIoType:[localConnector ioType]];
 				[remoteConnectors setObject:remoteConnector forKey:theNewConnectorKey];
 				
 				if(guardian){
