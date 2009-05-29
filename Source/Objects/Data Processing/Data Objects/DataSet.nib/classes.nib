@@ -1,81 +1,118 @@
-{
-    IBClasses = (
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = NSObject; LANGUAGE = ObjC; }, 
-        {
-            ACTIONS = {scopeSelectionAction = id; }; 
-            CLASS = NcdMuxController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {scopeSelectionMatrix = NSMatrix; }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {CLASS = OHexFormatter; LANGUAGE = ObjC; SUPERCLASS = NSFormatter; }, 
-        {
-            ACTIONS = {doDoubleClick = id; }; 
-            CLASS = ORDataSet; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {data = id; }; 
-            SUPERCLASS = OrcaObject; 
-        }, 
-        {
-            ACTIONS = {autoScale = id; centerOnPeak = id; reLoad = id; toggleLog = id; }; 
-            CLASS = ORDataSetController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {view = NSView; }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {allColAction = id; loadAction = id; noneColAction = id; patternAction = id; }; 
-            CLASS = ORPulserDistribController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                allColButton = NSMatrix; 
-                noneColButton = NSMatrix; 
-                patternMatrix0 = NSMatrix; 
-                patternMatrix1 = NSMatrix; 
-                patternMatrix2 = NSMatrix; 
-                patternMatrix3 = NSMatrix; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {autoScale = id; centerOnPeak = id; toggleLog = id; }; 
-            CLASS = ORSubPlotController; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {plotter = ORPlotter; view = NSView; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {download = id; dump = id; selectFile = id; start = id; stop = id; }; 
-            CLASS = OReCPU147Controller; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                diagButton = NSButton; 
-                diagDrawer = NSDrawer; 
-                dumpCodeButton = NSButton; 
-                dumpUserAreaButton = NSButton; 
-                fileNameField = NSTextField; 
-                hexView = NSTextView; 
-                outputButton = NSButton; 
-                outputDrawer = NSDrawer; 
-                queueView = ORQueueView; 
-                setFileButton = NSButton; 
-            }; 
-            SUPERCLASS = OrcaObjectController; 
-        }, 
-        {
-            ACTIONS = {doDoubleClick = id; }; 
-            CLASS = OrcaObject; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {parent = id; }; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            CLASS = OrcaObjectController; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSWindowController; 
-        }, 
-        {CLASS = ZFlowLayout; LANGUAGE = ObjC; SUPERCLASS = NSView; }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ORTimedTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSTextField</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>copy</key>
+				<string>id</string>
+				<key>decDialog</key>
+				<string>id</string>
+				<key>incDialog</key>
+				<string>id</string>
+				<key>saveDocument</key>
+				<string>id</string>
+				<key>saveDocumentAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>OrcaObjectController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>model</key>
+				<string>id</string>
+				<key>warningField</key>
+				<string>ORTimedTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>sequenceCompleted</key>
+				<string>id</string>
+				<key>taskFinished</key>
+				<string>id</string>
+				<key>tasksCompleted</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>ZFlowLayout</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>autoScale</key>
+				<string>id</string>
+				<key>centerOnPeak</key>
+				<string>id</string>
+				<key>reLoad</key>
+				<string>id</string>
+				<key>toggleLog</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORDataSetController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>view</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>OrcaObjectController</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>
