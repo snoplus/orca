@@ -28,6 +28,7 @@
 		<string>function</string>
 		<string>find</string>
 		<string>waituntil</string>
+		<string>waitUntil</string>
 		<string>sleep</string>
 		<string>print</string>
 		<string>display</string>
@@ -47,7 +48,9 @@
 		<string>rectw</string>
 		<string>recth</string>
 		<string>postalarm</string>
+		<string>postAlarm</string>
 		<string>clearalarm</string>
+		<string>clearAlarm</string>
 	</array>
 	<key>Constants</key>
 	<array>

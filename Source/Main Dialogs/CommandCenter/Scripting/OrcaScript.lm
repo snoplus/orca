@@ -93,6 +93,7 @@ E			[Ee][+-]?{D}+
 "return"		return RETURN;
 "sleep"			return SLEEP;
 "waituntil"		return WAITUNTIL;
+"waitUntil"		return WAITUNTIL;
 "hex"			return HEX;
 "array"			return MAKEARRAY;
 "string"		return MAKESTRING;
@@ -100,7 +101,9 @@ E			[Ee][+-]?{D}+
 "point"			return MAKEPOINT;
 "rect"			return MAKERECT;
 "postalarm"		return ALARM;
+"postAlarm"		return ALARM;
 "clearalarm"	return CLEAR;
+"clearAlarm"	return CLEAR;
 "logfile"		return LOGFILE;
 "nsdictionary"	return NSDICTIONARY;
 "nsarray"		return NSARRAY;
