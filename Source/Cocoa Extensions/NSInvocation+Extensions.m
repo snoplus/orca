@@ -234,7 +234,10 @@
 		int argI;
 		BOOL ok = YES;
 		for(i=1,argI=0 ; i<=n*2 ; i+=2,argI++){
-			id theVar = (id)([[orderedList objectAtIndex:i]intValue]);
+			id str = [orderedList objectAtIndex:i];
+			NSDecimalNumber* ptrNum = [NSDecimalNumber decimalNumberWithString:str];
+			unsigned long ptr = [ptrNum unsignedLongValue];
+			id theVar = (id)(ptr);
 			if(![theInvocation setArgument:argI to:theVar]){
 				ok = NO;
 				break;
