@@ -21,6 +21,8 @@
 
 #import "NodeTree.h"
 #import "setjmp.h"
+#import "OrcaScript.h"
+
 @implementation Node 
 
 - (void) dealloc 
@@ -58,6 +60,12 @@
 	[nodeData release];
 	nodeData = someData;
 }
+
+- (id) description
+{
+	return [NSString stringWithFormat:@"line-type-data-retainCount: %d-%d-%@-%d\n",line,type,nodeData,[nodeData retainCount]];
+}
+
 @end
 
 @implementation OprNode
