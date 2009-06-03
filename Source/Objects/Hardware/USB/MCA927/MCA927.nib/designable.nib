@@ -8,7 +8,7 @@
     <string key="IBDocument.HIToolboxVersion">353.00</string>
     <object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
       <bool key="EncodedWithXMLCoder">YES</bool>
-      <integer value="6"/>
+      <integer value="1294"/>
     </object>
     <object class="NSArray" key="IBDocument.PluginDependencies">
       <bool key="EncodedWithXMLCoder">YES</bool>
@@ -3320,6 +3320,28 @@ OQA</bytes>
                 </object>
               </object>
             </object>
+            <object class="NSButton" id="153348265">
+              <reference key="NSNextResponder" ref="13076153"/>
+              <int key="NSvFlags">268</int>
+              <string key="NSFrame">{{422, 457}, {63, 18}}</string>
+              <reference key="NSSuperview" ref="13076153"/>
+              <bool key="NSEnabled">YES</bool>
+              <object class="NSButtonCell" key="NSCell" id="127094664">
+                <int key="NSCellFlags">67239424</int>
+                <int key="NSCellFlags2">131072</int>
+                <string key="NSContents">Log</string>
+                <reference key="NSSupport" ref="26"/>
+                <reference key="NSControlView" ref="153348265"/>
+                <int key="NSButtonFlags">1211912703</int>
+                <int key="NSButtonFlags2">130</int>
+                <reference key="NSNormalImage" ref="867083948"/>
+                <reference key="NSAlternateImage" ref="390403709"/>
+                <string key="NSAlternateContents"/>
+                <string key="NSKeyEquivalent"/>
+                <int key="NSPeriodicDelay">200</int>
+                <int key="NSPeriodicInterval">25</int>
+              </object>
+            </object>
           </object>
           <string key="NSFrameSize">{582, 629}</string>
           <reference key="NSSuperview"/>
@@ -3982,6 +4004,22 @@ OQA</bytes>
           </object>
           <int key="connectionID">1292</int>
         </object>
+        <object class="IBConnectionRecord">
+          <object class="IBActionConnection" key="connection">
+            <string key="label">setLogScale:</string>
+            <reference key="source" ref="187756910"/>
+            <reference key="destination" ref="153348265"/>
+          </object>
+          <int key="connectionID">1295</int>
+        </object>
+        <object class="IBConnectionRecord">
+          <object class="IBOutletConnection" key="connection">
+            <string key="label">logCB</string>
+            <reference key="source" ref="1012002890"/>
+            <reference key="destination" ref="153348265"/>
+          </object>
+          <int key="connectionID">1296</int>
+        </object>
       </object>
       <object class="IBMutableOrderedSet" key="objectRecords">
         <object class="NSArray" key="orderedObjects">
@@ -4108,6 +4146,7 @@ OQA</bytes>
               <reference ref="875262397"/>
               <reference ref="1051812673"/>
               <reference ref="269642528"/>
+              <reference ref="153348265"/>
             </object>
             <reference key="parent" ref="845440574"/>
           </object>
@@ -5583,6 +5622,20 @@ OQA</bytes>
             <reference key="object" ref="946911317"/>
             <reference key="parent" ref="758727817"/>
           </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">1293</int>
+            <reference key="object" ref="153348265"/>
+            <object class="NSMutableArray" key="children">
+              <bool key="EncodedWithXMLCoder">YES</bool>
+              <reference ref="127094664"/>
+            </object>
+            <reference key="parent" ref="13076153"/>
+          </object>
+          <object class="IBObjectRecord">
+            <int key="objectID">1294</int>
+            <reference key="object" ref="127094664"/>
+            <reference key="parent" ref="153348265"/>
+          </object>
         </object>
       </object>
       <object class="NSMutableDictionary" key="flattenedProperties">
@@ -5711,6 +5764,8 @@ OQA</bytes>
           <string>1284.ImportedFromIB2</string>
           <string>1287.IBPluginDependency</string>
           <string>1288.IBPluginDependency</string>
+          <string>1293.IBPluginDependency</string>
+          <string>1294.IBPluginDependency</string>
           <string>152.IBPluginDependency</string>
           <string>152.ImportedFromIB2</string>
           <string>379.IBPluginDependency</string>
@@ -6075,6 +6130,8 @@ OQA</bytes>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+          <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <reference ref="5"/>
           <string>com.apple.InterfaceBuilder.CocoaPlugin</string>
           <reference ref="5"/>
@@ -6299,7 +6356,7 @@ OQA</bytes>
         </object>
       </object>
       <nil key="sourceID"/>
-      <int key="maxID">1292</int>
+      <int key="maxID">1296</int>
     </object>
     <object class="IBClassDescriber" key="IBDocument.Classes">
       <object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -6653,6 +6710,13 @@ OQA</bytes>
           <string key="className">NSObject</string>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBProjectSource</string>
+            <string key="minorKey">Source/Objects/Misc Objects/Views/LongTermView/ORLongTermView.h</string>
+          </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">NSObject</string>
+          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+            <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">Source/Objects/Misc Objects/Views/OpenGLView/ORBasicOpenGLView.h</string>
           </object>
         </object>
@@ -6794,7 +6858,7 @@ OQA</bytes>
         </object>
         <object class="IBPartialClassDescription">
           <string key="className">NSView</string>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier">
+          <object class="IBClassDescriptionSource" key="sourceIdentifier" id="412743886">
             <string key="majorKey">IBProjectSource</string>
             <string key="minorKey">Source/Cocoa Extensions/ZFlowLayout/ZFlowLayout.h</string>
           </object>
@@ -6857,14 +6921,6 @@ OQA</bytes>
           <object class="IBClassDescriptionSource" key="sourceIdentifier">
             <string key="majorKey">IBUserSource</string>
             <string key="minorKey"/>
-          </object>
-        </object>
-        <object class="IBPartialClassDescription">
-          <string key="className">ORFlippedView</string>
-          <string key="superclassName">NSView</string>
-          <object class="IBClassDescriptionSource" key="sourceIdentifier">
-            <string key="majorKey">IBProjectSource</string>
-            <string key="minorKey">Source/Objects/Misc Objects/Views/FlippedView/ORFlippedView.h</string>
           </object>
         </object>
         <object class="IBPartialClassDescription">
@@ -6956,6 +7012,7 @@ OQA</bytes>
               <string>liveTimeField</string>
               <string>loadFpgaButton</string>
               <string>lockButton</string>
+              <string>logCB</string>
               <string>lowerDiscriminatorField</string>
               <string>lowerDiscriminatorPercentField</string>
               <string>ltPresetField</string>
@@ -6991,6 +7048,7 @@ OQA</bytes>
               <string>NSPopUpButton</string>
               <string>NSTextField</string>
               <string>NSTextField</string>
+              <string>NSButton</string>
               <string>NSButton</string>
               <string>NSButton</string>
               <string>NSTextField</string>
@@ -7171,6 +7229,11 @@ OQA</bytes>
             <string key="majorKey">IBUserSource</string>
             <string key="minorKey"/>
           </object>
+        </object>
+        <object class="IBPartialClassDescription">
+          <string key="className">ZFlowLayout</string>
+          <string key="superclassName">NSView</string>
+          <reference key="sourceIdentifier" ref="412743886"/>
         </object>
       </object>
     </object>
