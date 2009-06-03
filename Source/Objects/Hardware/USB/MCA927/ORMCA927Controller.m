@@ -23,6 +23,9 @@
 #import "ORMCA927Model.h"
 #import "ORUSB.h"
 #import "ORUSBInterface.h"
+#import "ORAxis.h"
+#import "ORPlotter1D.h"
+
 @interface ORMCA927Controller (private)
 - (void) openPanelForFPGADidEnd:(NSOpenPanel*)sheet
 					 returnCode:(int)returnCode
@@ -173,6 +176,17 @@
                      selector : @selector(zdtModeChanged:)
                          name : ORMCA927ModelZdtModeChanged
 						object: model];
+	
+	[notifyCenter addObserver : self
+					 selector : @selector(miscAttributesChanged:)
+						 name : ORMiscAttributesChanged
+					   object : model];
+	
+    [notifyCenter addObserver : self
+					 selector : @selector(scaleAction:)
+						 name : ORAxisRangeChangedNotification
+					   object : nil];
+	
 }
 
 - (void) awakeFromNib
@@ -194,6 +208,7 @@
 	[self updateChannelParams];
 	[self runningStatusChanged:nil];
 	[self runOptionsChanged:nil];
+    [self miscAttributesChanged:nil];
 }
 
 - (void) updateChannelParams
@@ -211,6 +226,41 @@
 	[self autoClearChanged:nil];
 }
 
+//a fake action from the scale object
+- (void) scaleAction:(NSNotification*)aNotification
+{
+	if(aNotification == nil || [aNotification object] == [plotter yScale]){
+		[model setMiscAttributes:[[plotter yScale]attributes] forKey:@"PlotterYAttributes"];
+	}
+	else if(aNotification == nil || [aNotification object] == [plotter xScale]){
+		[model setMiscAttributes:[[plotter xScale]attributes] forKey:@"PlotterXAttributes"];
+	}
+	
+}
+
+- (void) miscAttributesChanged:(NSNotification*)aNote
+{
+	NSString*				key = [[aNote userInfo] objectForKey:ORMiscAttributeKey];
+	NSMutableDictionary* attrib = [model miscAttributesForKey:key];
+	
+	if(aNote == nil || [key isEqualToString:@"PlotterYAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"PlotterYAttributes"];
+		if(attrib){
+			[[plotter yScale] setAttributes:attrib];
+			[plotter setNeedsDisplay:YES];
+			[[plotter yScale] setNeedsDisplay:YES];
+			[logCB setState:[[attrib objectForKey:ORAxisUseLog] boolValue]];
+		}
+	}
+	else if(aNote == nil || [key isEqualToString:@"PlotterXAttributes"]){
+		if(aNote==nil)attrib = [model miscAttributesForKey:@"PlotterXAttributes"];
+		if(attrib){
+			[[plotter xScale] setAttributes:attrib];
+			[plotter setNeedsDisplay:YES];
+			[[plotter xScale] setNeedsDisplay:YES];
+		}
+	}
+}
 
 - (void) runOptionsChanged:(NSNotification*)aNote
 {
@@ -473,6 +523,7 @@
 
 - (IBAction) selectedChannelAction:(id)sender
 {
+	[self endEditing];
 	[model setSelectedChannel:[[sender selectedCell] tag]];	
 }
 

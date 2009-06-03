@@ -1254,7 +1254,11 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		for(i=0;i<2;i++){
 			if(![self runningStatus:i] && startedFromMainRunControl[i]){
 				startedFromMainRunControl[i] = NO;
-				if(!mainRunIsStopping)[[NSNotificationCenter defaultCenter] postNotificationName: ORRequestRunStop object: self];
+				if(!mainRunIsStopping){
+					if(runOptions[i] & kChannelAutoStopMask){
+						[[NSNotificationCenter defaultCenter] postNotificationName: ORRequestRunStop object: self];
+					}
+				}
 			}
 		}
 	}

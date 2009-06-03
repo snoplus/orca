@@ -70,12 +70,12 @@
 	if(zdt){
 		[aDataSet loadSpectrum:tmpData 
 				sender:self  
-				  withKeys:[NSString stringWithFormat: @"MCA927 (%d)",device], @"Spectra",channelKey,nil];
+				  withKeys:[NSString stringWithFormat: @"MCA927 (%d)",device], @"ZDT",channelKey,nil];
 	}
 	else {
 		[aDataSet loadSpectrum:tmpData 
 						sender:self  
-					  withKeys:[NSString stringWithFormat: @"MCA927 (%d)",device], @"ZDT",channelKey,nil];
+					  withKeys:[NSString stringWithFormat: @"MCA927 (%d)",device], @"Spectra",channelKey,nil];
 	}		
     return length; //must return number of longs processed.
 }

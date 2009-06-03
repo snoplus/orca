@@ -62,6 +62,7 @@
 	IBOutlet NSButton*		stopAllButton;
 	IBOutlet NSButton*		clearAllButton;
 	IBOutlet NSButton*		loadFpgaButton;
+    IBOutlet NSButton*		logCB;
 
 	IBOutlet NSButton*		lockButton;
 
@@ -75,6 +76,8 @@
 - (void) updateChannelParams;
 
 #pragma mark ***Interface Management
+- (void) scaleAction:(NSNotification*)aNote;
+- (void) miscAttributesChanged:(NSNotification*)aNote;
 - (void) autoClearChanged:(NSNotification*)aNote;
 - (void) runOptionsChanged:(NSNotification*)aNote;
 - (void) statusParamsChanged:(NSNotification*)aNote;
