@@ -1083,7 +1083,12 @@ enum {
 		}
 		else {
 			markerValue = [markerNumber floatValue];
-			label = [NSString stringWithFormat:@"%.0f",markerValue];
+			NSString* format = @"%.0f";
+			double scaleRange = fabs([self maxValue] - [self minValue]);
+			if(scaleRange<.5)format = @"%.3f";
+			else if(scaleRange<5)format = @"%.2f";
+			else if(scaleRange<50)format = @"%.1f";
+			label = [NSString stringWithFormat:format,markerValue];
 		}
 		if([self isXAxis]){
 			[NSBezierPath strokeLineFromPoint:NSMakePoint(val,0) 
