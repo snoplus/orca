@@ -44,8 +44,8 @@
 
 #import <sys/sysctl.h>
 
-NSString* kCrashLogLocation     = @"~/Library/Logs/CrashReporter/Orca.crash.log";
-NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
+NSString* kCrashLogDir  = @"~/Library/Logs/CrashReporter";
+NSString* kLastCrashLog = @"~/Library/Logs/CrashReporter/LastOrca.crash.log";
 
 #define kORSplashScreenDelay 1
 
@@ -319,10 +319,10 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     NSLog(@"Running MacOS %u.%u.%u %@\n", major, minor, bugFix,minor>=5?@"":@"(Note: some ORCA features require 10.5. Please update)");
     
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
-        [self mailCrashLog];
+        [self mailCrashLogs];
     }
 	else {
-        [self deleteCrashLog];
+        [self deleteCrashLogs];
     }
     
     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:ORNormalShutDownFlag];    
@@ -384,7 +384,14 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
 		}
 	}
 	else NSLog(@"Number Processors: %d\n",count);
-
+	
+	if(getenv("NSZombieEnabled") || getenv("NSAutoreleaseFreedObjectCheckEnabled")) {
+		NSLogColor([NSColor redColor],@"==============================================================================\n");
+		NSLogColor([NSColor redColor],@"NSZombieEnabled/NSAutoreleaseFreedObjectCheckEnabled enabled!\n");
+		NSLogColor([NSColor redColor],@"They are meant to be enabled for debugging only!\n");
+		NSLogColor([NSColor redColor],@"ORCA will be slow, leak memory like crazy, and eventually bring the machine to its knees!\n");
+		NSLogColor([NSColor redColor],@"==============================================================================\n");
+	}
 }
 
 - (void) closeSplashWindow
@@ -424,48 +431,60 @@ NSString* kLastCrashLogLocation = @"~/Library/Logs/CrashReporter/LastOrca.crash.
     return [document undoManager];
 }
 
-- (void) mailCrashLog
+- (void) mailCrashLogs
 {
     if([[[NSUserDefaults standardUserDefaults] objectForKey: ORMailBugReportFlag] boolValue]){
         NSString* address = [[NSUserDefaults standardUserDefaults] objectForKey: ORMailBugReportEMail];
         if(address){
-            NSString* crashLogPath = [kCrashLogLocation stringByExpandingTildeInPath];
-			NSString* contents = [NSString stringWithContentsOfFile:crashLogPath];
-			if(contents){
-				NSAttributedString* crashLog = [[NSAttributedString alloc] initWithString:contents];
-				//the address may be a list... if so it must be a comma separated list... try to make it so...
-				NSMutableString* finalAddressList = [[[[address componentsSeparatedByString:@"\n"] componentsJoinedByString:@","] mutableCopy] autorelease];
-				[finalAddressList replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[address length])];
-				[finalAddressList replaceOccurrencesOfString:@",," withString:@"," options:NSLiteralSearch range:NSMakeRange(0,[address length])];
-				ORMailer* mailer = [ORMailer mailer];
-				[mailer setTo:finalAddressList];
-				[mailer setSubject:@"ORCA Crash Log"];
-				[mailer setBody:crashLog];
-				[mailer send:self];
-				[crashLog release];
-			}
-			
+			NSString *filePath;
+			NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: [kCrashLogDir stringByExpandingTildeInPath]];
+			// iterate over all the log files
+			while (filePath = [dirEnum nextObject]){
+				if([[filePath pathExtension] isEqualToString: @"crash"] && [filePath rangeOfString:@"Orca"].location != NSNotFound){
+					NSString* contents = [NSString stringWithContentsOfFile:[[kCrashLogDir stringByExpandingTildeInPath] stringByAppendingPathComponent:filePath]];
+					if(contents){
+						NSAttributedString* crashLog = [[NSAttributedString alloc] initWithString:contents];
+						//the address may be a list... if so it must be a comma separated list... try to make it so...
+						NSMutableString* finalAddressList = [[[[address componentsSeparatedByString:@"\n"] componentsJoinedByString:@","] mutableCopy] autorelease];
+						[finalAddressList replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:NSMakeRange(0,[address length])];
+						[finalAddressList replaceOccurrencesOfString:@",," withString:@"," options:NSLiteralSearch range:NSMakeRange(0,[address length])];
+						ORMailer* mailer = [ORMailer mailer];
+						[mailer setTo:finalAddressList];
+						[mailer setSubject:@"ORCA Crash Log"];
+						[mailer setBody:crashLog];
+						[mailer send:self];
+						[crashLog release];
+					}
+				}
+			}		
         }
+		[self deleteCrashLogs];
     }
 }
 
 - (void) mailSent:(NSString*)address
 {
-	[self deleteCrashLog];
-	NSLog(@"The last ORCA crash log was sent to: %@",address);
+	NSLog(@"The last ORCA crash log was sent to: %@\n",address);
 }
 
-- (void) deleteCrashLog
+- (void) deleteCrashLogs
 {
     NSFileManager* fm = [NSFileManager defaultManager];
-    NSString* crashLogPath = [kCrashLogLocation stringByExpandingTildeInPath]; 
-    NSString* lastCrashLogPath = [kLastCrashLogLocation stringByExpandingTildeInPath]; 
-    if([fm fileExistsAtPath:lastCrashLogPath]){
-        [fm removeFileAtPath:lastCrashLogPath handler:nil];
-    }
-	[fm copyPath:crashLogPath toPath:lastCrashLogPath handler:nil];
-	NSLog(@"Old crash report copied to: %@\n",lastCrashLogPath);
-    [fm removeFileAtPath:crashLogPath handler:nil];
+    NSString* lastCrashLogPath = [kLastCrashLog stringByExpandingTildeInPath]; 
+	NSString *filePath;
+	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: [kCrashLogDir stringByExpandingTildeInPath]];
+	// iterate over all the log files
+	while (filePath = [dirEnum nextObject]){
+		if([[filePath pathExtension] isEqualToString: @"crash"] && [filePath rangeOfString:@"Orca"].location != NSNotFound){
+			NSString* fullPath = [[kCrashLogDir stringByExpandingTildeInPath] stringByAppendingPathComponent:filePath];
+			if([fm fileExistsAtPath:lastCrashLogPath]){
+				[fm removeFileAtPath:lastCrashLogPath handler:nil];
+			}
+			[fm copyPath:fullPath toPath:lastCrashLogPath handler:nil];
+			NSLog(@"Old crash report copied to: %@\n",lastCrashLogPath);
+			[fm removeFileAtPath:fullPath handler:nil];
+		}
+	}	
 }
 @end
 

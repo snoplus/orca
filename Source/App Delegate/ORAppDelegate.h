@@ -41,8 +41,8 @@
 - (void) setMemoryWatcher:(MemoryWatcher*)aWatcher;
 - (ORAlarmCollection*) alarmCollection;
 - (void) setAlarmCollection:(ORAlarmCollection*)someAlarms;
-- (void) mailCrashLog;
-- (void) deleteCrashLog;
+- (void) mailCrashLogs;
+- (void) deleteCrashLogs;
 - (void) closeSplashWindow;
 - (ORHelpCenter*) helpCenter;
 
