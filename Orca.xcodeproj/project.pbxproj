@@ -1139,6 +1139,7 @@
 		848D8B2F0DE23D2400D44B81 /* ORCaen1190Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 848D8B290DE23D2400D44B81 /* ORCaen1190Model.m */; };
 		848D8CCF0DE35AB500D44B81 /* ORValueBarGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 848D8CCD0DE35AB500D44B81 /* ORValueBarGroup.h */; };
 		848D8CD00DE35AB500D44B81 /* ORValueBarGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 848D8CCE0DE35AB500D44B81 /* ORValueBarGroup.m */; };
+		848D8E590FD83C0800A48832 /* Help.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 848D8E580FD83C0800A48832 /* Help.tiff */; };
 		848E201C059282F400B6708F /* statusWindow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E201B059282F400B6708F /* statusWindow.gif */; };
 		848E206A0592891800B6708F /* alarmMaster.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E20690592891800B6708F /* alarmMaster.gif */; };
 		848E2102059378C800B6708F /* catalog.gif in Resources */ = {isa = PBXBuildFile; fileRef = 848E2101059378C700B6708F /* catalog.gif */; };
@@ -1213,7 +1214,6 @@
 		8493D6C00F21315300BCD331 /* ORCMC203Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6B80F21315300BCD331 /* ORCMC203Decoders.m */; };
 		8493D6C10F21315300BCD331 /* ORCMC203Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8493D6B90F21315300BCD331 /* ORCMC203Model.h */; };
 		8493D6C20F21315300BCD331 /* ORCMC203Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8493D6BA0F21315300BCD331 /* ORCMC203Model.m */; };
-		84951F980CFC805C00B4558E /* Help.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 84951F970CFC805C00B4558E /* Help.tiff */; };
 		84954B8305C87518004EBD3D /* ORHWWizParam.h in Headers */ = {isa = PBXBuildFile; fileRef = 84954B8105C87518004EBD3D /* ORHWWizParam.h */; };
 		84954B8405C87518004EBD3D /* ORHWWizParam.m in Sources */ = {isa = PBXBuildFile; fileRef = 84954B8205C87518004EBD3D /* ORHWWizParam.m */; };
 		84978A290701F02000B7887E /* ORDataGenDecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84978A270701F02000B7887E /* ORDataGenDecoders.h */; };
@@ -3046,6 +3046,7 @@
 		848D8B290DE23D2400D44B81 /* ORCaen1190Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCaen1190Model.m; path = Source/Objects/Hardware/Vme/CAEN/CV1190/ORCaen1190Model.m; sourceTree = SOURCE_ROOT; };
 		848D8CCD0DE35AB500D44B81 /* ORValueBarGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORValueBarGroup.h; path = "Source/Objects/Misc Objects/Views/ValueBarGroup/ORValueBarGroup.h"; sourceTree = SOURCE_ROOT; };
 		848D8CCE0DE35AB500D44B81 /* ORValueBarGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORValueBarGroup.m; path = "Source/Objects/Misc Objects/Views/ValueBarGroup/ORValueBarGroup.m"; sourceTree = SOURCE_ROOT; };
+		848D8E580FD83C0800A48832 /* Help.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Help.tiff; path = Source/Preferences/Help.tiff; sourceTree = SOURCE_ROOT; };
 		848E201B059282F400B6708F /* statusWindow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = statusWindow.gif; path = "Source/Main Document/statusWindow.gif"; sourceTree = SOURCE_ROOT; };
 		848E20690592891800B6708F /* alarmMaster.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = alarmMaster.gif; path = "Source/Main Document/alarmMaster.gif"; sourceTree = SOURCE_ROOT; };
 		848E2101059378C700B6708F /* catalog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = catalog.gif; path = "Source/Main Document/catalog.gif"; sourceTree = SOURCE_ROOT; };
@@ -3122,7 +3123,6 @@
 		8493D6BA0F21315300BCD331 /* ORCMC203Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORCMC203Model.m; path = Source/Objects/Hardware/Camac/CMC203/ORCMC203Model.m; sourceTree = SOURCE_ROOT; };
 		84940B3E04E07FA6005F64B1 /* ORRate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRate.h; sourceTree = "<group>"; };
 		84940B3F04E07FA6005F64B1 /* ORRate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRate.m; sourceTree = "<group>"; };
-		84951F970CFC805C00B4558E /* Help.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Help.tiff; path = Source/Preferences/Help.tiff; sourceTree = SOURCE_ROOT; };
 		84954B8105C87518004EBD3D /* ORHWWizParam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORHWWizParam.h; sourceTree = "<group>"; };
 		84954B8205C87518004EBD3D /* ORHWWizParam.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORHWWizParam.m; sourceTree = "<group>"; };
 		84978A270701F02000B7887E /* ORDataGenDecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORDataGenDecoders.h; sourceTree = "<group>"; };
@@ -5549,13 +5549,13 @@
 				843CDEBD03BE2B2D00C39F5F /* ORPreferencesController.m */,
 				847532B303BE5C3B005A89CB /* ORDefaults.h */,
 				847532B503BE5D8A005A89CB /* ORDefaults.m */,
+				848D8E580FD83C0800A48832 /* Help.tiff */,
 				847BC83C05E2941D0054841E /* preferences.tif */,
 				84CF3B2505E6B85800C5C320 /* Startup.tif */,
 				847BC83D05E2941D0054841E /* PasswordLock.tif */,
 				84CF3B2305E6B60700C5C320 /* Appearance.tif */,
 				84C859040665624C00FBAF9C /* Bugs.tif */,
 				840B20C50B4D7CE80021220C /* Editing.tif */,
-				84951F970CFC805C00B4558E /* Help.tiff */,
 				843CDEDC03BE307400C39F5F /* ORPreferences.nib */,
 			);
 			name = Preferences;
@@ -10207,7 +10207,6 @@
 				8407751C0CEE7CAD0073F5A9 /* home.gif in Resources */,
 				8407751D0CEE7CAD0073F5A9 /* Linkback Green.tiff in Resources */,
 				840775220CEE7CAD0073F5A9 /* SnapBack.tiff in Resources */,
-				84951F980CFC805C00B4558E /* Help.tiff in Resources */,
 				847E6C1A0CFF4C3200E963C6 /* eGun.nib in Resources */,
 				847E6C1B0CFF4C3200E963C6 /* eGun.tif in Resources */,
 				9C1363C70D0A7921006C550D /* Caen265.nib in Resources */,
@@ -10380,6 +10379,7 @@
 				84CC16CE0FAF157000CEE642 /* MCA927.tif in Resources */,
 				84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */,
 				84B1B00C0FCDAA1400775CF1 /* help.tif in Resources */,
+				848D8E590FD83C0800A48832 /* Help.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
