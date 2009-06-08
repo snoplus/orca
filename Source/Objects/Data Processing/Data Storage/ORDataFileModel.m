@@ -223,7 +223,8 @@ static const int currentVersion = 1;           // Current version
 
 - (NSString*) filePrefix
 {
-    return filePrefix;
+    if(filePrefix == nil)return @"Run";
+    else return filePrefix;
 }
 
 - (void) setFilePrefix:(NSString*)aFilePrefix
@@ -344,7 +345,8 @@ static const int currentVersion = 1;           // Current version
 
 - (NSString*)fileName
 {
-    return fileName;
+	if(!fileName)return @"";
+    else return fileName;
 }
 
 
