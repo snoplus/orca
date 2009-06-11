@@ -159,6 +159,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) connectionChanged
 {
+	[self setSerialNumber:serialNumber]; //to force usbinterface at doc startup
 	[self checkUSBAlarm];
 	[[self objectConnectedTo:ORMCA927USBNextConnection] connectionChanged];
 }
@@ -541,6 +542,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		[[self getUSBController] claimInterfaceWithSerialNumber:serialNumber for:self];
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMCA927ModelSerialNumberChanged object:self];
+	[self checkUSBAlarm];
 }
 
 - (ORUSBInterface*) usbInterface
@@ -860,7 +862,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void) initBoard:(int)i
 {
 	[self loadDiscriminators:i];
-	[self writeReg:kZDTMode adc:i value:0];
+	[self writeReg:kZDTMode adc:i value:zdtMode[i]];
 	[self writeReg:kPresetCtl adc:i value:presetCtrlReg[i]];
 	[self writeReg:kConvGain adc:i value:convGain[i]];
 	[self writeReg:kLtPreset adc:i value:ltPreset[i]];
@@ -1039,6 +1041,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     [encoder encodeObject:serialNumber	forKey:@"serialNumber"];
 	int i;
 	for(i=0;i<2;i++){
+		[encoder encodeInt32:controlReg[i] forKey:[@"controlReg" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt32:liveTime[i] forKey:[@"liveTime" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt32:realTime[i] forKey:[@"realTime" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeInt32:presetCtrlReg[i] forKey:[@"presetCtrlReg" stringByAppendingFormat:@"%d",i]];
