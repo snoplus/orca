@@ -31,6 +31,7 @@
 #import "ORGateKeeper.h"
 #import "ORDataTaker.h"
 #import "ORReadOutList.h"
+#import "ORTemplates.h"
 
 int sortListUpFunc(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
 int sortListDnFunc(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
@@ -43,7 +44,6 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 
 - (id) init
 {
-
     if(self = [super initWithWindowNibName:@"Document"]){
         [self setShouldCloseDocument:YES];
         [self setWindowFrameAutosaveName:@"Document"];
@@ -59,7 +59,6 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 
 - (void) awakeFromNib
 {
-
 	ascendingSortingImage = [[NSImage imageNamed:@"NSAscendingSortIndicator"] retain];
     descendingSortingImage = [[NSImage imageNamed:@"NSDescendingSortIndicator"] retain];
 
@@ -70,6 +69,10 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     [outlineView setDoubleAction:@selector(doubleClick:)];
     [self securityStateChanged:nil];
     [self scaleFactorChanged:nil];
+	
+	if([[self group] count] == 0){
+		[templates performSelector:@selector(showPanel) withObject:nil afterDelay:0];
+	}
 }
 
 - (void) dealloc
@@ -115,7 +118,6 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
                                              selector : @selector(updateWindow)
                                                  name : ORGroupObjectsRemoved
                                                object : nil];
-	
 	
 	[[NSNotificationCenter defaultCenter] addObserver : self
                                              selector : @selector(updateWindow)
@@ -173,6 +175,12 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
                                                  name : NSWindowDidBecomeKeyNotification
                                                 object: nil];
     
+	[[NSNotificationCenter defaultCenter] addObserver : self
+                                             selector : @selector(showTemplates:)
+                                                 name : @"ORShowTemplates"
+                                                object: nil];
+	
+	
 }
 
 - (void) updateWindow
@@ -215,6 +223,13 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 	[scaleFactorField setIntValue:[groupView scalePercent]];
 }
 
+- (void) showTemplates:(NSNotification*)aNotification
+{
+	if([[self group] count] == 0){
+		[templates showPanel];
+	}
+}
+
 - (void) windowOrderChanged:(NSNotification*)aNotification
 {
     [[self document] windowMovedToFront:[[aNotification object]windowController]];
@@ -246,10 +261,12 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 {
     [[ORStatusController sharedStatusController] showWindow:self];
 }
+
 - (IBAction) alarmMaster:(NSToolbarItem*)item 
 {
     [[ORAlarmController sharedAlarmController] showWindow:self];
 }
+
 - (IBAction) openCatalog:(NSToolbarItem*)item 
 {
     [[ORCatalogController sharedCatalogController] showWindow:self];
@@ -266,7 +283,6 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
     [aGateKeeper setGateGroup:[[self document] gateGroup]];
     [aGateKeeper showWindow:self];
 }
-
 
 - (IBAction) openPreferences:(NSToolbarItem*)item 
 {

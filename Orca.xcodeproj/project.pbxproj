@@ -137,12 +137,23 @@
 		8408322C0FC3307F002B2394 /* ORLongTermView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408322A0FC3307F002B2394 /* ORLongTermView.m */; };
 		8408591407A1935D0056503B /* ORBaseDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408591207A1935D0056503B /* ORBaseDecoder.h */; };
 		8408591507A1935D0056503B /* ORBaseDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408591307A1935D0056503B /* ORBaseDecoder.m */; };
+		8408A22A0FD85B3A00B0206D /* ORTemplates.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408A2270FD85B3A00B0206D /* ORTemplates.h */; };
+		8408A22B0FD85B3A00B0206D /* ORTemplates.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A2280FD85B3A00B0206D /* ORTemplates.m */; };
 		8408A4BB09071C6A004A3B34 /* HV2132.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8408A4B509071C6A004A3B34 /* HV2132.nib */; };
 		8408A4BC09071C6A004A3B34 /* HV2132Card.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8408A4B609071C6A004A3B34 /* HV2132Card.tif */; };
 		8408A4BD09071C6A004A3B34 /* ORHV2132Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408A4B709071C6A004A3B34 /* ORHV2132Controller.h */; };
 		8408A4BE09071C6A004A3B34 /* ORHV2132Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A4B809071C6A004A3B34 /* ORHV2132Controller.m */; };
 		8408A4BF09071C6A004A3B34 /* ORHV2132Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 8408A4B909071C6A004A3B34 /* ORHV2132Model.h */; };
 		8408A4C009071C6A004A3B34 /* ORHV2132Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 8408A4BA09071C6A004A3B34 /* ORHV2132Model.m */; };
+		8408ACC00FD9A7F500B0206D /* DataChain1.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408ACBE0FD9A7F500B0206D /* DataChain1.png */; };
+		8408ACC10FD9A7F500B0206D /* DataChain2.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408ACBF0FD9A7F500B0206D /* DataChain2.png */; };
+		8408ACC30FD9A81D00B0206D /* VMEBit3.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408ACC20FD9A81D00B0206D /* VMEBit3.png */; };
+		8408AE970FD9B64700B0206D /* VMESBC.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408AE960FD9B64700B0206D /* VMESBC.png */; };
+		8408AFA50FDD3E9A00B0206D /* CAMAC.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408AFA40FDD3E9A00B0206D /* CAMAC.png */; };
+		8408B03A0FDD447000B0206D /* MCA.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408B0390FDD447000B0206D /* MCA.png */; };
+		8408B2270FDD560200B0206D /* cPCI.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408B2260FDD560200B0206D /* cPCI.png */; };
+		8408B23D0FDD579800B0206D /* IPE.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408B23C0FDD579800B0206D /* IPE.png */; };
+		8408B2830FDD5A9D00B0206D /* IPEV4.png in Resources */ = {isa = PBXBuildFile; fileRef = 8408B2820FDD5A9D00B0206D /* IPEV4.png */; };
 		8409735D0F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 840973560F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist */; };
 		8409735E0F81136F00036BE8 /* ManualPlot.nib in Resources */ = {isa = PBXBuildFile; fileRef = 840973570F81136F00036BE8 /* ManualPlot.nib */; };
 		8409735F0F81136F00036BE8 /* ManualPlot.tif in Resources */ = {isa = PBXBuildFile; fileRef = 840973580F81136F00036BE8 /* ManualPlot.tif */; };
@@ -2253,12 +2264,23 @@
 		8408322A0FC3307F002B2394 /* ORLongTermView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORLongTermView.m; path = "Source/Objects/Misc Objects/Views/LongTermView/ORLongTermView.m"; sourceTree = SOURCE_ROOT; };
 		8408591207A1935D0056503B /* ORBaseDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORBaseDecoder.h; sourceTree = "<group>"; };
 		8408591307A1935D0056503B /* ORBaseDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORBaseDecoder.m; sourceTree = "<group>"; };
+		8408A2270FD85B3A00B0206D /* ORTemplates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORTemplates.h; path = "Source/Main Document/Templates/ORTemplates.h"; sourceTree = SOURCE_ROOT; };
+		8408A2280FD85B3A00B0206D /* ORTemplates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORTemplates.m; path = "Source/Main Document/Templates/ORTemplates.m"; sourceTree = SOURCE_ROOT; };
 		8408A4B509071C6A004A3B34 /* HV2132.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HV2132.nib; path = Source/Objects/Hardware/Camac/HV2132/HV2132.nib; sourceTree = SOURCE_ROOT; };
 		8408A4B609071C6A004A3B34 /* HV2132Card.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HV2132Card.tif; path = Source/Objects/Hardware/Camac/HV2132/HV2132Card.tif; sourceTree = SOURCE_ROOT; };
 		8408A4B709071C6A004A3B34 /* ORHV2132Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHV2132Controller.h; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Controller.h; sourceTree = SOURCE_ROOT; };
 		8408A4B809071C6A004A3B34 /* ORHV2132Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV2132Controller.m; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Controller.m; sourceTree = SOURCE_ROOT; };
 		8408A4B909071C6A004A3B34 /* ORHV2132Model.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORHV2132Model.h; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Model.h; sourceTree = SOURCE_ROOT; };
 		8408A4BA09071C6A004A3B34 /* ORHV2132Model.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORHV2132Model.m; path = Source/Objects/Hardware/Camac/HV2132/ORHV2132Model.m; sourceTree = SOURCE_ROOT; };
+		8408ACBE0FD9A7F500B0206D /* DataChain1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DataChain1.png; path = "Source/Main Document/Templates/DataChain1.png"; sourceTree = SOURCE_ROOT; };
+		8408ACBF0FD9A7F500B0206D /* DataChain2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = DataChain2.png; path = "Source/Main Document/Templates/DataChain2.png"; sourceTree = SOURCE_ROOT; };
+		8408ACC20FD9A81D00B0206D /* VMEBit3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = VMEBit3.png; path = "Source/Main Document/Templates/VMEBit3.png"; sourceTree = SOURCE_ROOT; };
+		8408AE960FD9B64700B0206D /* VMESBC.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = VMESBC.png; path = "Source/Main Document/Templates/VMESBC.png"; sourceTree = SOURCE_ROOT; };
+		8408AFA40FDD3E9A00B0206D /* CAMAC.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CAMAC.png; path = "Source/Main Document/Templates/CAMAC.png"; sourceTree = SOURCE_ROOT; };
+		8408B0390FDD447000B0206D /* MCA.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MCA.png; path = "Source/Main Document/Templates/MCA.png"; sourceTree = SOURCE_ROOT; };
+		8408B2260FDD560200B0206D /* cPCI.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cPCI.png; path = "Source/Main Document/Templates/cPCI.png"; sourceTree = SOURCE_ROOT; };
+		8408B23C0FDD579800B0206D /* IPE.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = IPE.png; path = "Source/Main Document/Templates/IPE.png"; sourceTree = SOURCE_ROOT; };
+		8408B2820FDD5A9D00B0206D /* IPEV4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = IPEV4.png; path = "Source/Main Document/Templates/IPEV4.png"; sourceTree = SOURCE_ROOT; };
 		840973560F81136F00036BE8 /* edu.washington.npl.orca.ManualPlot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = edu.washington.npl.orca.ManualPlot.plist; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/edu.washington.npl.orca.ManualPlot.plist"; sourceTree = SOURCE_ROOT; };
 		840973570F81136F00036BE8 /* ManualPlot.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ManualPlot.nib; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ManualPlot.nib"; sourceTree = SOURCE_ROOT; };
 		840973580F81136F00036BE8 /* ManualPlot.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ManualPlot.tif; path = "Source/Objects/Data Processing/Histogram Objects/ManualPlot/ManualPlot.tif"; sourceTree = SOURCE_ROOT; };
@@ -4528,6 +4550,25 @@
 			);
 			name = Gates;
 			path = "Source/Objects/Data Processing/Data Objects/Gates";
+			sourceTree = SOURCE_ROOT;
+		};
+		8408A2260FD85B3A00B0206D /* Templates */ = {
+			isa = PBXGroup;
+			children = (
+				8408A2270FD85B3A00B0206D /* ORTemplates.h */,
+				8408A2280FD85B3A00B0206D /* ORTemplates.m */,
+				8408ACBE0FD9A7F500B0206D /* DataChain1.png */,
+				8408ACBF0FD9A7F500B0206D /* DataChain2.png */,
+				8408ACC20FD9A81D00B0206D /* VMEBit3.png */,
+				8408AE960FD9B64700B0206D /* VMESBC.png */,
+				8408AFA40FDD3E9A00B0206D /* CAMAC.png */,
+				8408B0390FDD447000B0206D /* MCA.png */,
+				8408B2260FDD560200B0206D /* cPCI.png */,
+				8408B23C0FDD579800B0206D /* IPE.png */,
+				8408B2820FDD5A9D00B0206D /* IPEV4.png */,
+			);
+			name = Templates;
+			path = "Source/Main Document/Templates";
 			sourceTree = SOURCE_ROOT;
 		};
 		8408A4B409071C6A004A3B34 /* HV2132 */ = {
@@ -8781,6 +8822,7 @@
 				840B7DAF094DFBCB00B1B135 /* ProcessCenter.tif */,
 				84701AD30E0344CF00195E3E /* ORCARootService.tif */,
 				F51E697203AE4775015F64B1 /* Document.nib */,
+				8408A2260FD85B3A00B0206D /* Templates */,
 			);
 			path = "Main Document";
 			sourceTree = "<group>";
@@ -9764,6 +9806,7 @@
 				8408322B0FC3307F002B2394 /* ORLongTermView.h in Headers */,
 				84B194BD0FC44E1800775CF1 /* ORMotionNodeDecoders.h in Headers */,
 				146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */,
+				8408A22A0FD85B3A00B0206D /* ORTemplates.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10380,6 +10423,15 @@
 				84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */,
 				84B1B00C0FCDAA1400775CF1 /* help.tif in Resources */,
 				848D8E590FD83C0800A48832 /* Help.tiff in Resources */,
+				8408ACC00FD9A7F500B0206D /* DataChain1.png in Resources */,
+				8408ACC10FD9A7F500B0206D /* DataChain2.png in Resources */,
+				8408ACC30FD9A81D00B0206D /* VMEBit3.png in Resources */,
+				8408AE970FD9B64700B0206D /* VMESBC.png in Resources */,
+				8408AFA50FDD3E9A00B0206D /* CAMAC.png in Resources */,
+				8408B03A0FDD447000B0206D /* MCA.png in Resources */,
+				8408B2270FDD560200B0206D /* cPCI.png in Resources */,
+				8408B23D0FDD579800B0206D /* IPE.png in Resources */,
+				8408B2830FDD5A9D00B0206D /* IPEV4.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11093,6 +11145,7 @@
 				8408322C0FC3307F002B2394 /* ORLongTermView.m in Sources */,
 				84B194BC0FC44E1800775CF1 /* ORMotionNodeDecoders.m in Sources */,
 				146822440FC4799C0082BD70 /* ORCircularBufferUV.m in Sources */,
+				8408A22B0FD85B3A00B0206D /* ORTemplates.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

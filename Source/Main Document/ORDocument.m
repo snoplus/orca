@@ -99,7 +99,6 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     [super dealloc];
 }
 
-
 #pragma mark ¥¥¥Assessors
 
 - (BOOL) documentCanBeChanged

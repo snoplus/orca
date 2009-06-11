@@ -26,11 +26,10 @@
     IBOutlet NSTextField* lockStatusTextField;
     IBOutlet NSButton*    lockAllButton;
     IBOutlet NSOutlineView*    outlineView;
-    
     IBOutlet NSTextField* scaleFactorField;
-
     IBOutlet NSButton* documentLockButton;    
-
+	IBOutlet id	templates;
+	
     NSImage* descendingSortingImage;
     NSImage* ascendingSortingImage;
     NSString *_sortColumn;
@@ -55,6 +54,7 @@
 - (void) remoteScaleFactorChanged:(NSNotification*)aNotification;
 - (void) numberLockedPagesChanged:(NSNotification*)aNotification;
 - (void) windowOrderChanged:(NSNotification*)aNotification;
+- (void) showTemplates:(NSNotification*)aNotification;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) statusLog:(NSToolbarItem*)item;
@@ -87,4 +87,5 @@
 - (BOOL)outlineView:(NSOutlineView *)ov writeItems:(NSArray*)writeItems toPasteboard:(NSPasteboard*)pboard;
 - (NSArray*)draggedNodes;
 - (void) dragDone;
+
 @end

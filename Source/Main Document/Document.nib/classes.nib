@@ -34,6 +34,62 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancel</key>
+				<string>id</string>
+				<key>done</key>
+				<string>id</string>
+				<key>hwSelectOption</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>ORTemplates</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>cPCIOption</key>
+				<string>NSButton</string>
+				<key>cPCIPic</key>
+				<string>NSButton</string>
+				<key>camacOption</key>
+				<string>NSButton</string>
+				<key>camacPic</key>
+				<string>NSButton</string>
+				<key>dataChainMatrix</key>
+				<string>NSMatrix</string>
+				<key>ipeOption</key>
+				<string>NSButton</string>
+				<key>ipePic</key>
+				<string>NSButton</string>
+				<key>ipeV4Option</key>
+				<string>NSButton</string>
+				<key>ipeV4Pic</key>
+				<string>NSButton</string>
+				<key>mainWindow</key>
+				<string>id</string>
+				<key>mcaOption</key>
+				<string>NSButton</string>
+				<key>mcaPic</key>
+				<string>NSButton</string>
+				<key>noHWOption</key>
+				<string>NSButton</string>
+				<key>templateSheet</key>
+				<string>id</string>
+				<key>vme64Matrix</key>
+				<string>NSMatrix</string>
+				<key>vmeAdapterMatrix</key>
+				<string>NSMatrix</string>
+				<key>vmeOption</key>
+				<string>NSButton</string>
+				<key>vmePic</key>
+				<string>NSButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>NSOutlineView</string>
 			<key>LANGUAGE</key>
@@ -55,6 +111,8 @@
 				<key>openCommandCenter</key>
 				<string>NSToolbarItem</string>
 				<key>openHWWizard</key>
+				<string>NSToolbarItem</string>
+				<key>openHelp</key>
 				<string>NSToolbarItem</string>
 				<key>openORCARootService</key>
 				<string>NSToolbarItem</string>
@@ -89,6 +147,8 @@
 				<string>NSTextField</string>
 				<key>statusTextField</key>
 				<string>NSTextField</string>
+				<key>templates</key>
+				<string>id</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
