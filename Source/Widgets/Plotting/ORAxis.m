@@ -1299,9 +1299,9 @@ enum {
     else	   pix = p.y;
     
     if ([self isLog]) {
-        
+        pinned = NO;
         newMin = 0;
-        if (pix && (tmp=mGrabValue*dpos/pix)<kMaxArgumentForExp) {
+        if (pix>0 && (tmp=mGrabValue*dpos/pix)<kMaxArgumentForExp) {
             newMax = exp(tmp) - 1.0;
         } 
         else {
