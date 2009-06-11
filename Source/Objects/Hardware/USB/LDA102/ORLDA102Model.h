@@ -79,6 +79,7 @@
 
 - (void) interfaceAdded:(NSNotification*)aNote;
 - (void) interfaceRemoved:(NSNotification*)aNote;
+- (void) checkUSBAlarm;
 
 #pragma mark ***HW Access
 - (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count value:(unsigned long)aValue;

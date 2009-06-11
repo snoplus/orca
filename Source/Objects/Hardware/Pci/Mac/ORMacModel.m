@@ -54,6 +54,8 @@ void registryChanged(
 - (id) init
 {
 	self = [super init];
+	[self scanForSerialPorts];
+	usb = [ORUSB sharedUSB];
 	return self;
 }
 
@@ -66,22 +68,40 @@ void registryChanged(
     [super dealloc];
 }
 
+- (void) setGuardian:(id)aGuardian
+{
+	[super setGuardian:aGuardian];
+	if(aGuardian){
+		[usb searchForDevices];
+		[self registerNotifications];
+	}
+	else {
+		[[NSNotificationCenter defaultCenter] removeObserver:self];
+		[usb removeAllObjects];
+	}
+}
+
+- (void) registerNotifications
+{
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+											 selector : @selector(objectsAdded:)
+												 name : ORGroupObjectsAdded
+											   object : nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver : self
+											 selector : @selector(objectsRemoved:)
+												 name : ORGroupObjectsRemoved
+											   object : nil];
+}
+
 - (void) awakeAfterDocumentLoaded
 {
 	@try {
 		id anObj = [[[self connectors] objectForKey:ORMacFireWireConnection] connectedObject];
 		[anObj setCrateNumber:0];
-		
-		[[NSNotificationCenter defaultCenter] addObserver : self
-												 selector : @selector(objectsAdded:)
-													 name : ORGroupObjectsAdded
-												   object : nil];
-		
-		[[NSNotificationCenter defaultCenter] addObserver : self
-												 selector : @selector(objectsRemoved:)
-													 name : ORGroupObjectsRemoved
-												   object : nil];
-		
 	}
 	@catch(NSException* localException) {
 	}

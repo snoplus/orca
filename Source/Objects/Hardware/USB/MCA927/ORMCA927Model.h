@@ -182,6 +182,7 @@ typedef struct MCA927Registers {
 - (void) resetMDA;
 - (void) resetFPGA;
 - (void) getFirmwareVersion;
+- (void) checkUSBAlarm;
 
 - (void) writeReg:(int)aReg adc:(int)adcIndex value:(unsigned long)aValue;
 - (unsigned long) readReg:(int)aReg adc:(int)adcIndex;

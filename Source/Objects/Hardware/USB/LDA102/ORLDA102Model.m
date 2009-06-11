@@ -137,6 +137,18 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 	}
 }
 
+- (void) connectionChanged
+{
+	[self checkUSBAlarm];
+	[[self objectConnectedTo:ORLDA102USBNextConnection] connectionChanged];
+}
+
+- (void) setGuardian:(id)aGuardian
+{
+	[super setGuardian:aGuardian];
+	[self checkUSBAlarm];
+
+}
 
 -(void) setUpImage
 {
@@ -154,7 +166,7 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 		
 		[aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
 		
-		if(!usbInterface){
+		if(!usbInterface || ![self getUSBController]){
 			NSBezierPath* path = [NSBezierPath bezierPath];
 			[path moveToPoint:NSMakePoint(20,10)];
 			[path lineToPoint:NSMakePoint(40,30)];
@@ -360,21 +372,27 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName: ORLDA102ModelUSBInterfaceChanged
 	 object: self];
-	
-	if(usbInterface){
+	[self checkUSBAlarm];
+}
+
+- (void) checkUSBAlarm
+{
+	if((usbInterface && [self getUSBController]) || !guardian){
 		[self startReadThread];
 		[noUSBAlarm clearAlarm];
 		[noUSBAlarm release];
 		noUSBAlarm = nil;
 	}
 	else {
-		[self stopReadThread];
-		if(!noUSBAlarm){
-			noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for LDA102"] severity:kHardwareAlarm];
-			[noUSBAlarm setSticky:YES];		
+		if(guardian){
+			[self stopReadThread];
+			if(!noUSBAlarm){
+				noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for LDA102"] severity:kHardwareAlarm];
+				[noUSBAlarm setSticky:YES];		
+			}
+			[noUSBAlarm setAcknowledged:NO];
+			[noUSBAlarm postAlarm];
 		}
-		[noUSBAlarm setAcknowledged:NO];
-		[noUSBAlarm postAlarm];
 	}
 	[self setUpImage];
 }

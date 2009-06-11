@@ -46,6 +46,7 @@
 }
 
 - (id) getUSBController;
+- (void) checkUSBAlarm;
 
 #pragma mark ***Accessors
 - (void) formatCommand:(NSString*)aCommand buffer:(char*)data;

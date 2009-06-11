@@ -78,14 +78,19 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 - (void) awakeAfterDocumentLoaded
 {	
 	@try {
-		NSArray* allDevices = [[[NSApp delegate] document] collectObjectsConformingTo:@protocol(USBDevice)];
-		devices = [NSMutableArray arrayWithArray:allDevices];
-		[devices retain];
-		[devices makeObjectsPerformSelector:@selector(registerWithUSB:) withObject:self];
-		[self startMatching];
+		[self searchForDevices];
 	}
 	@catch(NSException* localException) {
 	}
+}
+
+- (void) searchForDevices
+{
+	NSArray* allDevices = [[[NSApp delegate] document] collectObjectsConformingTo:@protocol(USBDevice)];
+	devices = [NSMutableArray arrayWithArray:allDevices];
+	[devices retain];
+	[devices makeObjectsPerformSelector:@selector(registerWithUSB:) withObject:self];
+	[self startMatching];
 }
 
 - (void) registerForUSBNotifications:(id)anObj
@@ -96,6 +101,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		[[NSNotificationCenter defaultCenter] addObserver:anObj selector:@selector(interfaceAdded:)   name:ORUSBInterfaceAdded object:self];
 		[[NSNotificationCenter defaultCenter] addObserver:anObj selector:@selector(interfaceRemoved:) name:ORUSBInterfaceRemoved object:self];
 	}
+}
+
+- (void) removeAllObjects
+{
+	[self objectsRemoved:[NSArray arrayWithArray:devices]]; 
 }
 
 - (void) objectsAdded:(NSArray*)newObjects

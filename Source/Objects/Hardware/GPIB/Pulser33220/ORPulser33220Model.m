@@ -74,11 +74,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 - (void) setGuardian:(id)aGuardian
 {
 	[super setGuardian:aGuardian];
-	if(!aGuardian){
-		[noUSBAlarm clearAlarm];
-		[noUSBAlarm release];
-		noUSBAlarm = nil;
-	}
+	[self checkNoUsbAlarm];
 }
 
 - (void) adjustConnectors:(BOOL)force
@@ -144,6 +140,9 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	else {
 		[self setCanChangeConnectionProtocol:YES];
 	}
+	[self checkNoUsbAlarm];	
+	[[self objectConnectedTo:ORPulserUSBNextConnection] connectionChanged];
+	[self setUpImage];
 }
 
 
@@ -172,7 +171,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     }
     [aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
 	
-    if(connectionProtocol == kHPPulserUseUSB && !usbInterface){
+    if(connectionProtocol == kHPPulserUseUSB && (!usbInterface || ![self getUSBController])){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSMakePoint(20,10)];
         [path lineToPoint:NSMakePoint(40,30)];
@@ -418,21 +417,23 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 
 - (void) checkNoUsbAlarm
 {
-	if(usbInterface){
+	if((usbInterface && [self getUSBController]) || !guardian){
 		[noUSBAlarm clearAlarm];
 		[noUSBAlarm release];
 		noUSBAlarm = nil;
 	}
 	else {
-		if(!noUSBAlarm){
-			noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for Pulser"] severity:kHardwareAlarm];
-			[noUSBAlarm setHelpString:@"\n\nThe USB interface is no longer available for this object. This could mean the cable is disconnected or the power is off"];
-			[noUSBAlarm setSticky:YES];		
+		if(guardian){
+			if(!noUSBAlarm){
+				noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for Pulser"] severity:kHardwareAlarm];
+				[noUSBAlarm setHelpString:@"\n\nThe USB interface is no longer available for this object. This could mean the cable is disconnected or the power is off"];
+				[noUSBAlarm setSticky:YES];		
+			}
+			[noUSBAlarm setAcknowledged:NO];
+			[noUSBAlarm postAlarm];
 		}
-		[noUSBAlarm setAcknowledged:NO];
-		[noUSBAlarm postAlarm];
 	}
-	
+	[self setUpImage];
 }
 
 - (NSArray*) usbInterfaces

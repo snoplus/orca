@@ -150,15 +150,18 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 - (void) awakeAfterDocumentLoaded
 {
 	@try {
-		
 		[self connectionChanged];
-		
 	}
 	@catch(NSException* localException) {
 	}
 	
 }
 
+- (void) connectionChanged
+{
+	[self checkUSBAlarm];
+	[[self objectConnectedTo:ORMCA927USBNextConnection] connectionChanged];
+}
 
 -(void) setUpImage
 {
@@ -169,7 +172,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     //---------------------------------------------------------------------------------------------------
     
 	NSImage* aCachedImage = [NSImage imageNamed:@"MCA927"];
-    if(!usbInterface){
+    if(!usbInterface || ![self getUSBController]){
 		NSSize theIconSize = [aCachedImage size];
 		NSPoint theOffset = NSZeroPoint;
 		
@@ -178,16 +181,14 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 		
 		[aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
 		
-		if(!usbInterface){
-			NSBezierPath* path = [NSBezierPath bezierPath];
-			[path moveToPoint:NSMakePoint(5,0)];
-			[path lineToPoint:NSMakePoint(20,20)];
-			[path moveToPoint:NSMakePoint(5,20)];
-			[path lineToPoint:NSMakePoint(20,0)];
-			[path setLineWidth:3];
-			[[NSColor redColor] set];
-			[path stroke];
-		}    
+		NSBezierPath* path = [NSBezierPath bezierPath];
+		[path moveToPoint:NSMakePoint(5,0)];
+		[path lineToPoint:NSMakePoint(20,20)];
+		[path moveToPoint:NSMakePoint(5,20)];
+		[path lineToPoint:NSMakePoint(20,0)];
+		[path setLineWidth:3];
+		[[NSColor redColor] set];
+		[path stroke];
 		
 		[i unlockFocus];
 		
@@ -547,6 +548,12 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	return usbInterface;
 }
 
+- (void) setGuardian:(id)aGuardian
+{
+	[super setGuardian:aGuardian];
+	[self checkUSBAlarm];
+}
+
 - (void) setUsbInterface:(ORUSBInterface*)anInterface
 {	
 	[usbInterface release];
@@ -555,19 +562,26 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	[usbInterface setUsePipeType:kUSBInterrupt];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName: ORMCA927ModelUSBInterfaceChanged object: self];
-	
-	if(usbInterface){
+
+	[self checkUSBAlarm];
+}
+
+- (void)checkUSBAlarm
+{
+	if((usbInterface && [self getUSBController]) || !guardian){
 		[noUSBAlarm clearAlarm];
 		[noUSBAlarm release];
 		noUSBAlarm = nil;
 	}
 	else {
-		if(!noUSBAlarm){
-			noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for MCA927"] severity:kHardwareAlarm];
-			[noUSBAlarm setSticky:YES];		
+		if(guardian){
+			if(!noUSBAlarm){
+				noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for MCA927"] severity:kHardwareAlarm];
+				[noUSBAlarm setSticky:YES];		
+			}
+			[noUSBAlarm setAcknowledged:NO];
+			[noUSBAlarm postAlarm];
 		}
-		[noUSBAlarm setAcknowledged:NO];
-		[noUSBAlarm postAlarm];
 	}
 	
 	[self setUpImage];

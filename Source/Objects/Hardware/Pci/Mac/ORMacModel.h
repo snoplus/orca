@@ -43,6 +43,7 @@
 
 - (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard;
 - (int) crateNumber;
+- (void) registerNotifications;
 
 #pragma mark ¥¥¥Serial Ports
 - (void) scanForSerialPorts;

@@ -80,9 +80,11 @@ typedef  struct  {
 - (void) claimInterfaceWithSerialNumber:(NSString*)serialNumber for:(id)obj;
 - (void) claimInterfaceWithVendor:(unsigned long)aVendorID product:(unsigned long)aProductID for:(id)obj;
 - (ORUSBInterface*) getUSBInterfaceWithSerialNumber:(NSString*)aSerialNumber;
+- (void) removeAllObjects;
 - (void) objectsAdded:(NSArray*)newObjects;
 - (void) objectsRemoved:(NSArray*)deletedObjects;
 - (void) listSupportedDevices;
+- (void) searchForDevices;
 
 @end
 

@@ -110,6 +110,17 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 	
 }
 
+- (void) connectionChanged
+{
+	[self checkUSBAlarm];
+	[[self objectConnectedTo:ORADU200USBNextConnection] connectionChanged];
+}
+
+- (void) setGuardian:(id)aGuardian
+{
+	[super setGuardian:aGuardian];
+	[self checkUSBAlarm];
+}
 
 -(void) setUpImage
 {
@@ -129,7 +140,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 		
 		[aCachedImage compositeToPoint:theOffset operation:NSCompositeCopy];
 		
-		if(!usbInterface){
+		if(!usbInterface || ![self getUSBController]){
 			NSBezierPath* path = [NSBezierPath bezierPath];
 			[path moveToPoint:NSMakePoint(20,10)];
 			[path lineToPoint:NSMakePoint(40,30)];
@@ -292,19 +303,25 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName: ORADU200ModelUSBInterfaceChanged
 	 object: self];
-	
-	if(usbInterface){
+	[self checkUSBAlarm];
+}
+
+- (void) checkUSBAlarm
+{
+	if((usbInterface && [self getUSBController]) || !guardian){
 		[noUSBAlarm clearAlarm];
 		[noUSBAlarm release];
 		noUSBAlarm = nil;
 	}
 	else {
-		if(!noUSBAlarm){
-			noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for ADU200"] severity:kHardwareAlarm];
-			[noUSBAlarm setSticky:YES];		
+		if(guardian){
+			if(!noUSBAlarm){
+				noUSBAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"No USB for ADU200"] severity:kHardwareAlarm];
+				[noUSBAlarm setSticky:YES];		
+			}
+			[noUSBAlarm setAcknowledged:NO];
+			[noUSBAlarm postAlarm];
 		}
-		[noUSBAlarm setAcknowledged:NO];
-		[noUSBAlarm postAlarm];
 	}
 	
 	[self setUpImage];
