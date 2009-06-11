@@ -112,6 +112,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 
 - (void) connectionChanged
 {
+	[self setSerialNumber:serialNumber]; //to force usbinterface at doc startup
 	[self checkUSBAlarm];
 	[[self objectConnectedTo:ORADU200USBNextConnection] connectionChanged];
 }

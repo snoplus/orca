@@ -139,6 +139,7 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 
 - (void) connectionChanged
 {
+	[self setSerialNumber:serialNumber]; //to force usbinterface at doc startup
 	[self checkUSBAlarm];
 	[[self objectConnectedTo:ORLDA102USBNextConnection] connectionChanged];
 }
