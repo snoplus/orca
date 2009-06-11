@@ -244,6 +244,7 @@ NSString* ORIpeV4SLTIpeCrateVersionChanged			= @"ORIpeV4SLTIpeCrateVersionChange
     [self makePoller:0];
 	[readList release];
     IpeCrateVersion=4;//the default -tb-
+	pbusLink = [[Pbus_Link alloc] initWithDelegate:self]; //mah -- Jun 06,2009 link wasn't made in this path of creation
     return self;
 }
 
