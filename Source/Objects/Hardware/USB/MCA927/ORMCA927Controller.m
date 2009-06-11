@@ -193,6 +193,7 @@
 {
 	[self populateInterfacePopup:[model getUSBController]];
 	[super awakeFromNib];
+    [[plotter yScale] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
 }
 
 - (void) updateWindow

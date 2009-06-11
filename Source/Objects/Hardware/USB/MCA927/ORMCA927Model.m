@@ -159,6 +159,9 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 
 - (void) connectionChanged
 {
+	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
+	if([interfaces count] == 1 && ![serialNumber length])serialNumber = [[interfaces objectAtIndex:0] serialNumber];
+	
 	[self setSerialNumber:serialNumber]; //to force usbinterface at doc startup
 	[self checkUSBAlarm];
 	[[self objectConnectedTo:ORMCA927USBNextConnection] connectionChanged];

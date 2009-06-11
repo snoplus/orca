@@ -140,6 +140,8 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	else {
 		[self setCanChangeConnectionProtocol:YES];
 	}
+	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
+	if([interfaces count] == 1 && ![serialNumber length])serialNumber = [[interfaces objectAtIndex:0] serialNumber];
 	[self setSerialNumber:serialNumber]; //to force usbinterface at doc startup
 	[self checkNoUsbAlarm];	
 	[[self objectConnectedTo:ORPulserUSBNextConnection] connectionChanged];
