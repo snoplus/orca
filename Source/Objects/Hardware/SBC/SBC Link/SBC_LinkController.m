@@ -523,7 +523,9 @@
 
 - (void) filePathChanged:(NSNotification*)aNote
 {
-	[filePathField setStringValue:[[[model sbcLink] filePath] stringByAbbreviatingWithTildeInPath]];
+	NSString* s = [[[model sbcLink] filePath]stringByAbbreviatingWithTildeInPath];
+	if([s length]==0)s = @"";
+	[filePathField setStringValue:s];
 }
 
 - (void) byteRateChanged:(NSNotification*)aNote
