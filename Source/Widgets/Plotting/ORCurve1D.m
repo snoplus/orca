@@ -570,13 +570,13 @@ NSString* ORCurve1DActiveGateChanged = @"ORCurve1DActiveGateChanged";
 				float x			= [mXScale getPixAbsFast:minX log:aLogX integer:aIntX minPad:aMinPadX];
 				
 				[theDataPath moveToPoint:NSMakePoint(x,y)];
-				float halfBinWidth = ([aPlot bounds].size.width - 1) / (float)[mXScale valueRange]/2.;
+				//float halfBinWidth = ([aPlot bounds].size.width - 1) / (float)[mXScale valueRange]/2.;
 
 				long    ix;
 				for (ix=minX; ix<maxX;++ix) {
 					theValue = [theGate plotter:aPlot dataSet:dataSetID dataValue:ix];
 					y = [mYScale getPixAbsFast:theValue log:aLogY integer:aIntY minPad:aMinPadY];
-					x = [mXScale getPixAbsFast:ix log:aLogX integer:aIntX minPad:aMinPadX] + halfBinWidth;
+					x = [mXScale getPixAbsFast:ix log:aLogX integer:aIntX minPad:aMinPadX];// + halfBinWidth;
 					[theDataPath lineToPoint:NSMakePoint(x,y)];
 				}
 			}
